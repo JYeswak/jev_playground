@@ -50,6 +50,11 @@ grades decoration on an unfalsifiable claim.
 
 ## Gate wiring
 
+Gate scripts wired into `foundation/gates.sh`, by basename:
+`10-fixture-integrity.sh`, `20-receipt-freshness.sh`, `30-no-secrets.sh`,
+`40-omp-compact-replay.sh` — plus `commit-msg-verification-level.sh` on the commit edge and
+`sync-docs.sh --check` on the citation edge.
+
 | Gate | Edge it blocks | RED arm (the planted bad) | Wired where |
 |---|---|---|---|
 | `foundation/gates.d/10-fixture-integrity.sh` | a rotten calibration fixture emitting green-looking garbage downstream | a truncated copy of the fixture | `foundation/gates.sh`, and any pass that cites a calibration number |

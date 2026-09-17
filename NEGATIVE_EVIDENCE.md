@@ -1,13 +1,12 @@
-# Negative Evidence
+# NEGATIVE_EVIDENCE — dead-end ledger
 
-**negative-evidence-ledger for the jev lane** (`skill://negative-evidence-ledger`).
-
-Refuted hypotheses, retracted claims, rejected designs, and measured "do not build this" results.
-**Every row carries a retry condition.** A row with no retry condition is a grudge, not evidence.
-
-Read this before starting a hypothesis in this lane: the cheapest experiment is the one someone
-already ran and wrote down. Gate inventory: [`GATES.md`](GATES.md). Acceptance bar:
-[`AGENTS.md` §4](AGENTS.md).
+> Refuted hypotheses, reverted "wins", NO-SHIP measurements, exhausted veins. Read this BEFORE
+> starting any perf/detector/optimization hypothesis. Format + doctrine: the
+> `negative-evidence-ledger` skill. **Every row carries a retry condition** — a row without one
+> is a grudge, not evidence.
+>
+> Gate inventory: [`GATES.md`](GATES.md). Acceptance bar: [`AGENTS.md`](AGENTS.md) §4, which
+> requires a pass to append here or say why it learned nothing negative.
 
 ---
 
