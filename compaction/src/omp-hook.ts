@@ -12,12 +12,11 @@ import type {
  *
  * Recon (see `runs/hook-recon-20260917.md`): omp exposes a pre-compaction
  * interception point, `session_before_compact`, which may return
- * `{ cancel?: boolean; compaction?: CompactionResult }`
- * (`omp://hooks.md` § Session events; `omp://compaction.md` § Extension and
- * hook touchpoints). Hook modules are default-export factories
- * `export default function (pi) { pi.on(...) }` discovered at
- * `<cwd>/.omp/hooks/pre/*.ts` — the live shape is proven at
- * `~/.omp/agent/extensions/dcg-guard.ts:430`.
+ * `{ cancel?: boolean; compaction?: CompactionResult }`. The event name and
+ * return contract come from omp's in-session docs, quoted verbatim in the
+ * receipt. `~/.omp/agent/extensions/dcg-guard.ts:430-431` proves only the
+ * module shape both use — a default-export factory calling `pi.on(...)`
+ * (there, for `tool_call`) — discovered at `<cwd>/.omp/hooks/pre/*.ts`.
  *
  * Contract, mirroring `compactSession` in `fast-jev.ts`:
  * - transcript in (`Message[]` — the same shape `src/omp-adapter.ts`

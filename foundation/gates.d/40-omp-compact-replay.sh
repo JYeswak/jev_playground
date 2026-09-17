@@ -34,6 +34,32 @@ EOF
     echo "SELFTEST_PASS: inverted property refused (RED observed, plant file only)"
     rm -f test/__selftest-inverted.test.ts
   fi
+  # Plant an INVERTED hook property (passthrough must DROP context) against
+  # the real safe wrapper. Correct passthrough preserves -> FAIL (RED).
+  cat > test/__selftest-hook-inverted.test.ts <<'EOF'
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { compactOmpTranscriptSafe, resolveOmpHookConfig } from '../src/omp-hook.js';
+describe('selftest-hook-inverted', () => {
+  it('passthrough drops context', async () => {
+    const input = [{ role: 'user', text: 'EVIDENCE', toolUses: [], toolResults: [] }];
+    const settled = await compactOmpTranscriptSafe(
+      input,
+      { async ask() { throw new Error('down'); } },
+      resolveOmpHookConfig(),
+    );
+    assert.notDeepEqual(settled.messages, input);
+  });
+});
+EOF
+  if node --import tsx --test test/__selftest-hook-inverted.test.ts >/dev/null 2>&1; then
+    echo "SELFTEST_FAIL: passthrough dropped context, fail-safe not enforced"
+    rm -f test/__selftest-hook-inverted.test.ts
+    exit 1
+  else
+    echo "SELFTEST_PASS: passthrough preserves (RED observed, plant file only)"
+    rm -f test/__selftest-hook-inverted.test.ts
+  fi
   exit 0
 fi
 
