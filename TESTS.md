@@ -14,13 +14,22 @@ Every test file committed to this repo, by path. A test surface nobody enumerate
 claim nobody can check:
 
 - `compaction/test/adapter.test.ts` — the omp transcript adapter's mapping tests, including the
-  known-bad (a trailing `toolResult` must be kept). Run: see `compaction/` scripts; gated by
+  known-bad (a trailing `toolResult` must be kept). Gated by
   `foundation/gates.d/40-omp-compact-replay.sh`.
+- `compaction/test/hook-compact.test.ts` — the omp compaction hook surface (sibling-owned, bead
+  `jev-compact-hook-hbs`).
 - `probes/fast-jev-probe.mts` — our black-box probe of the compaction library against a fake Jev.
   Run: `npx tsx probes/fast-jev-probe.mts` → 8 assertions.
 
+**This list is machine-checked.** `foundation/gates.d/70-tests-registry-sync.sh` fails when a
+tracked test file is not named here, or when a named path no longer exists — because a hand-written
+registry goes stale the hour a sibling lands a suite, and a stale registry reads authoritative
+while being wrong. Add the path when you add the test; the gate is the consumer that makes it stay
+true.
+
 Everything else under this root is a **vendored clone** and its tests belong to its owner
-(section 2). They are not tracked here by design — see `.gitignore`'s allowlist.
+(section 2). They are not tracked here by design — see `.gitignore`'s allowlist, which is also why
+`git ls-files` can be an exhaustive scan.
 
 ---
 
