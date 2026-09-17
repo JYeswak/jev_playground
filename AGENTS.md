@@ -26,8 +26,10 @@ clone's own toolchain (`npm run typecheck` / `ruff`), never imposed across them.
    [§ Irreversible actions](#irreversible-git--filesystem-actions--do-not-ever-break-glass)
 4. **Never push, PR, or commit inside a vendored clone.** They are upstream trees under
    evaluation. [§ Vendored clones](#vendored-upstream-clones--read-mostly-pinned-never-pushed)
-5. **`main` only; never `git add -A`** in this shared worktree (`dcg` denies it); every commit
-   subject names its verification level. [§ Git](#git-branch-only-use-main-never-master)
+5. **`main` only; save only your work, every commit** — reserve paths in Agent Mail
+   before editing, stage explicit paths, read back the index, never amend in this
+   shared tree (`dcg` denies `git add -A`); every commit subject names its
+   verification level. [§ Git](#git-branch-only-use-main-never-master)
 6. **The key never enters the tree, a log, a fixture, or a message.**
    [§ Secrets](#secrets-and-the-paid-surface-critical)
 7. **Edit in place; no `_v2` files; never patch upstream to make a demo pass.**
@@ -143,6 +145,22 @@ authorized `git init`. The nested clones are handled by construction, not by dis
 - **NEVER `git add -A` / `git add .`** — `dcg` denies it here
   (`zeststream.shared_worktree:git-add-whole-tree`) and it is right to: three agents share this
   worktree, and a blanket stage commits a sibling's half-finished file. Stage explicit paths.
+- **Save only your work — the per-commit checklist, every commit, no exceptions.**
+  Three agents share this tree and the index is shared too, so a commit takes
+  whatever is staged, not whatever you edited. Measured 2026-09-17: an amend
+  swept a sibling's staged `AGENTS.md`/`GATES.md` into an unrelated commit.
+  1. **Reserve before editing:** `am file_reservations reserve ~/Developer/jev
+     <AGENT> <PATHS>... --exclusive --reason <bead-id>`; conflicts check first
+     with `am file_reservations conflicts` when another pane may be near the file.
+  2. **Stage exactly your reserved paths:** `git add <path>...` — never `-A`/`.`,
+     never a directory that holds a sibling's file.
+  3. **Read back the index:** `git diff --cached --stat` must list ONLY paths you
+     reserved and touched. A sibling's name there means unstage it, not commit it.
+  4. **Commit on `main`, no worktrees, no branches, NEVER amend here** — amend
+     re-commits the shared index including whatever a sibling staged since your
+     last read. A fix is a new commit, not an amend.
+  5. A commit that carries only your paths needs no permission; a commit that
+     would carry anyone else's needs theirs — so it never happens by accident.
 - **Every commit subject must claim a verification level** — the `commit-msg` hook refuses one
   that does not. Levels, weakest first: `pending` (code-first, nothing run), `selftest`, `test`,
   `mutation`, `oracle`, `live`. Form: `[test]` in the subject, or `…-verified` / `(…, test
@@ -1088,13 +1106,22 @@ here is reviewable unless it lands in a real repo.
 
 ## Beads (br) — Dependency-Aware Issue Tracking
 
-Beads provides a lightweight, dependency-aware issue database and CLI (`br` — beads_rust) for selecting "ready work," setting priorities, and tracking status.
+**Bead shape — the JEFF-BEAD-STANDARD**
+(`mission/beadflow/JEFF-BEAD-STANDARD-2026-06-17.md`, plus `skill://beads-north-star`), and its
+two 2026-07-01 addenda, which the base doc predates:
 
-**Important:** `br` is non-invasive—it NEVER runs git commands. After `br sync --flush-only`, you must manually `git add .beads/ && git commit`.
+- **M5 steward** — a bead that owns a domain carries a `steward:<domain>` label, so the domain
+  has a named seat instead of an implicit one. This lane's domains: `steward:jev-api`,
+  `steward:omp-seam`, `steward:calibration`.
+- **M6 directive** — a bead that exists because Joshua said so records the instruction as a
+  `directive,verbatim` block: his words, unparaphrased, above our interpretation. A paraphrased
+  directive is how a lane drifts while every bead looks reasonable.
 
-**Bead shape — the JEFF-BEAD-STANDARD** (`skill://beads-north-star`). A bead whose body is just
-its title is not a bead; it is a reminder that costs a fresh agent a session to reconstruct.
-Every `br create` in this lane carries:
+**Important:** `br` is non-invasive — it NEVER runs git commands. After `br sync --flush-only`,
+you must manually `git add .beads/ && git commit`.
+
+A bead whose body is just its title is not a bead; it is a reminder that costs a fresh agent a
+session to reconstruct. Every `br create` in this lane carries:
 
 - **WHAT** — the observable change, in the imperative.
 - **WHY** — the measurement or failure that makes it worth doing. A bead with no WHY is how a

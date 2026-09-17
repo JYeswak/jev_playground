@@ -14,6 +14,38 @@ cd foundation && ./gates.sh --selftest   # every stage against its PLANTED BAD i
 known-bad specimen. Measured 2026-09-17 — `ALL GREEN` in both modes, so all four stages are
 proven to trip.
 
+## Oracle
+
+Every gate below is *our* check. The **oracle** is the thing this lane does not control and must
+agree with, and no gate substitutes for it:
+
+| Oracle | What it arbitrates | Where |
+|---|---|---|
+| TypeSafe's documented response schema | whether a Jev client is correct | `docs-mirror/typesafe/api.md` — validate every field, refuse on drift |
+| `system-one-adapter-python` (official) | whether Jev beats a chat model on the *same* questions | `upstream/typesafe-ai/system-one-adapter-python` — same state, same questions, differential |
+| `evals.typesafe.ai` | the published eval methodology and per-model results | read before inventing a rival metric |
+| `foundation/fixtures/calibration-v1.jsonl` | whether *our* thresholds are right | `foundation/run_calibration.py` → a receipt under `foundation/runs/` |
+| `model-jaggedness/jev-1.13.md` | whether a surprising answer is a known model failure mode | `docs-mirror/typesafe/` — read before filing a bug |
+
+**No oracle named ⇒ the claim is `EXPLORED`, not `PROBED`.** A gate with no oracle behind it
+grades decoration on an unfalsifiable claim.
+
+---
+
+## Fail-closed rules
+
+1. **An empty scan set is an ERROR.** `10-fixture-integrity.sh` on a missing fixture, `ubs` on a
+   doc-only change (`exit 3`), a grep that matched nothing — none of these are green.
+2. **A timeout is not a verdict.** Re-run; record `TIMEOUT_UNMEASURED`, never `ABSENT`.
+3. **An acknowledgement is not an effect.** `success=true` with empty `data` is `NO_PAYLOAD`
+   (`NEGATIVE_EVIDENCE.md` R7).
+4. **A missing key fails the live lane, it never silently degrades it.** `30-no-secrets.sh`
+   proves the key is not in the tree; the client throws when it is absent from the environment.
+5. **Exit code agrees with verdict text**, and a stage that cannot reach RED is removed from
+   `gates.sh` rather than counted.
+
+---
+
 ---
 
 ## Gate wiring

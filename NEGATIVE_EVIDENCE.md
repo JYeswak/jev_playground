@@ -1,10 +1,13 @@
-# NEGATIVE_EVIDENCE.md — the jev lane
+# Negative Evidence
+
+**negative-evidence-ledger for the jev lane** (`skill://negative-evidence-ledger`).
 
 Refuted hypotheses, retracted claims, rejected designs, and measured "do not build this" results.
 **Every row carries a retry condition.** A row with no retry condition is a grudge, not evidence.
 
 Read this before starting a hypothesis in this lane: the cheapest experiment is the one someone
-already ran and wrote down.
+already ran and wrote down. Gate inventory: [`GATES.md`](GATES.md). Acceptance bar:
+[`AGENTS.md` §4](AGENTS.md).
 
 ---
 
