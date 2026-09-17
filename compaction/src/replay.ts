@@ -1,4 +1,4 @@
-#!/usr/bin/env tsx
+import { createHash } from 'node:crypto';
 /**
  * Live replay: omp JSONL transcript -> adapt -> compactMessages() with the
  * REAL Jev client -> contract assertions -> receipt JSON.
@@ -112,6 +112,7 @@ check('library saw tool calls', result.stats.calls > 0);
 
 const receipt = {
   transcript: file,
+  transcript_sha256: createHash('sha256').update(readFileSync(file)).digest('hex'),
   eventsIn: stats.eventsIn,
   messagesIn: stats.messagesIn,
   thinkingCharsDropped: stats.thinkingCharsDropped,
