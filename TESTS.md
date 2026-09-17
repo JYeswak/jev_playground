@@ -8,6 +8,22 @@ Gate inventory (the enforcement layer, distinct from the tests themselves):
 
 ---
 
+## Tracked test files — the enumeration
+
+Every test file committed to this repo, by path. A test surface nobody enumerated is a coverage
+claim nobody can check:
+
+- `compaction/test/adapter.test.ts` — the omp transcript adapter's mapping tests, including the
+  known-bad (a trailing `toolResult` must be kept). Run: see `compaction/` scripts; gated by
+  `foundation/gates.d/40-omp-compact-replay.sh`.
+- `probes/fast-jev-probe.mts` — our black-box probe of the compaction library against a fake Jev.
+  Run: `npx tsx probes/fast-jev-probe.mts` → 8 assertions.
+
+Everything else under this root is a **vendored clone** and its tests belong to its owner
+(section 2). They are not tracked here by design — see `.gitignore`'s allowlist.
+
+---
+
 ## 1. Ours — first-party, offline, no key
 
 | Suite | Command | What it proves | Count at last run |
