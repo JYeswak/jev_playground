@@ -12,10 +12,13 @@
 !/AGENTS.md
 !/EVAL.md
 !/NEGATIVE_EVIDENCE.md
+!/GATES.md
 !/.fh-agents.toml
+!/githooks/
 !/scripts/
 !/probes/
 !/foundation/
+!/compaction/
 !/notes/
 !/.beads/
 !/docs-mirror/

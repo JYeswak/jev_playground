@@ -1,0 +1,24 @@
+{
+  "transcript": "fixtures/omp-session-20260917.jsonl",
+  "eventsIn": 101,
+  "messagesIn": 11,
+  "thinkingCharsDropped": 338,
+  "resultsPaired": 6,
+  "resultsTrailing": 0,
+  "lib": {
+    "messagesBefore": 5,
+    "messagesAfter": 5,
+    "charsBefore": 1403,
+    "charsAfter": 1403,
+    "calls": 6,
+    "kept": 0,
+    "resultsDropped": 0,
+    "callsDropped": 0,
+    "pinned": 6,
+    "stateTokens": 0,
+    "stateStage": "",
+    "requests": 0,
+    "ms": 0
+  },
+  "failures": []
+}

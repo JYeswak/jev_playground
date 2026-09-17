@@ -6,7 +6,7 @@
 # Hermetic by design: no network, no key. Live replay against real Jev stays
 # manual-with-receipt (npm run replay -- <transcript>), like calibration runs.
 set -u
-here=$(CDPATH='' cd -- "$(dirname -- "$0")/../compaction" && pwd -P)
+here=$(CDPATH='' cd -- "$(dirname -- "$0")/../../compaction" && pwd -P)
 cd "$here" || { echo "RED: cannot cd to compaction/"; exit 1; }
 
 if [ "${1:-}" = "--selftest" ]; then

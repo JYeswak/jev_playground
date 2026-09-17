@@ -1,0 +1,63 @@
+# GATES.md — the jev lane
+
+Every gate in this lane, what edge it blocks, and the command that proves it can go RED.
+A gate that has only ever been observed green is decoration.
+
+**Run everything:**
+
+```bash
+cd foundation && ./gates.sh              # all stages against the real tree
+cd foundation && ./gates.sh --selftest   # every stage against its PLANTED BAD input
+```
+
+`--selftest` is the load-bearing mode: a stage passes there only by **correctly going RED** on a
+known-bad specimen. Measured 2026-09-17 — `ALL GREEN` in both modes, so all four stages are
+proven to trip.
+
+---
+
+## Gate wiring
+
+| Gate | Edge it blocks | RED arm (the planted bad) | Wired where |
+|---|---|---|---|
+| `foundation/gates.d/10-fixture-integrity.sh` | a rotten calibration fixture emitting green-looking garbage downstream | a truncated copy of the fixture | `foundation/gates.sh`, and any pass that cites a calibration number |
+| `foundation/gates.d/20-receipt-freshness.sh` | citing a receipt that does not cover the **current** fixture bytes (recomputes the sha; requires a complete, non-interrupted run and a full denominator) | a receipt whose fixture sha does not match | `foundation/gates.sh` |
+| `foundation/gates.d/30-no-secrets.sh` | a secret **value** entering the workspace tree (names like `TYPESAFE_API_KEY` are expected; values are not) | a planted fake key, asserted to be named in the RED output | `foundation/gates.sh`; run pre-commit by hand until `i-staged-deletion-hook` lands |
+| `foundation/gates.d/40-omp-compact-replay.sh` | an omp transcript adapter that drops a trailing `toolResult` (must be kept) | the known-bad transcript | `foundation/gates.sh`; hermetic — no network, no key |
+| `.git/hooks/commit-msg` → `commit-msg-verification-level.sh` | a commit subject that claims work without naming its **verification level** (`pending` / `selftest` / `test` / `mutation` / `oracle` / `live`) | `--selftest` proves both legs: a level-less subject refused, a level-carrying subject passed | live — it refused this session's first commit attempt |
+| `dcg` (machine-wide) | `git add -A` / whole-tree staging in this shared worktree (`zeststream.shared_worktree:git-add-whole-tree`), and the rest of the destructive set | n/a — external guard | live — it denied a blanket stage during the `git init` |
+| `scripts/sync-docs.sh --check` | citing a vendored primary source that has drifted from its committed sha256 manifest | delete or edit a mirrored file, re-run: reports `MISSING` / `DRIFT` and exits 1 | run before citing `docs-mirror/**`; `CHECK PASS 114 mirrored files` at this commit |
+| `~/.claude/scripts/skill-topology-gate.sh` | skill-store divergence across the 8 agent roots | n/a — external | run after any tool install that "activates skills" |
+
+---
+
+## The rules these gates exist to enforce
+
+1. **An empty scan set is an ERROR, not a pass.** `ubs` on a doc-only change exits 3 with
+   *"nothing was checked (this is NOT a pass)"* — that is the correct behavior and it must never be
+   cited as green. See `NEGATIVE_EVIDENCE.md` R6.
+2. **Exit code agrees with the verdict text.** A stage that prints RED and exits 0 is a fail-open
+   surface under a fail-closed consumer.
+3. **Silent on the healthy path.** A gate that comments on every valid input gets uninstalled.
+4. **Both directions or it is unproven.** Known-bad ⇒ RED *and* known-good ⇒ PASS. An attack-only
+   suite ships an over-strict gate that gets routed around.
+5. **A gate's own source must not trip it.** `30-no-secrets` did exactly that once during its build
+   — it matched the key pattern written in its own script. The fix: assemble the plant at runtime
+   and assert the RED output *names the plant file*.
+
+---
+
+## Not wired yet — stated, not hidden
+
+`stamp-check.sh --repo .` at this commit: **36 PASS, 13 FAIL, 2 PARTIAL, 13 N-A (report-only)**.
+The gate-shaped items still open, with their classification:
+
+| Item | Verdict | Why |
+|---|---|---|
+| `i-staged-deletion-hook` | **HUMAN** | wants a repo-tree pre-commit wrapper + executable that refuses staged deletions. Installing a new hook is a gated action (`skill://hook-certification`) — it is not hand-rolled here. |
+| `p5-autofix` | **FALSE_POSITIVE** | the 969 "code files" it counts are almost entirely *vendored upstream clones*. Wiring an autofix pre-commit over them would rewrite other people's code — actively wrong for this lane. |
+| `p6-cross-lineage` | **NOT ADOPTED** | `REVIEW-PERSONAS.md` with 5 personas. Ceremony unless we actually run persona reviews; adopt it the first time we do. |
+| `p7-worksheet`, `p8-session-feedback` | **NOT ADOPTED** | foundry's committed session-artifact convention (`.flywheel/worksheets/` WHAT/STATE/NEXT). This lane's session record is `EVAL.md` + `NEGATIVE_EVIDENCE.md`; adopting a second one would duplicate it. |
+| `p12-loop-integrity` | **NOT APPLICABLE** | errors `exit 3` (driver missing) — this lane runs no tick-loop driver. |
+| `p18-end-of-shift` | **CONDITIONAL** | goes green when the tree is clean at session end. Currently red partly on a sibling pane's in-flight file, which is not ours to commit. |
+| `rc0-declared-path` | **FALSE_POSITIVE** | the "undeclared Rust bin crate" is `s1-rs`, a vendored clone. It is not our CLI. |

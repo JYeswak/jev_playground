@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# commit-msg — every commit subject names its verification level (stamp item h).
+#
+# RESOLUTION RULE (measured 2026-08-22, wave 11, bead cp-hfei — all four forms tested):
+#   $0                                -> CORRECT in main worktree, linked worktree, AND clone
+#   git rev-parse --show-toplevel     -> WRONG in a linked worktree (returns the worktree root,
+#                                        which has no githooks/ unless committed; the hook errors)
+#   an absolute /Users/... path       -> WRONG on relocation (a clone/CI checkout at another path
+#                                        execs a file outside itself, or nothing at all)
+#   git rev-parse --git-common-dir    -> resolves to the MAIN .git from everywhere, but pins every
+#                                        worktree to the main checkout's hook version
+# git invokes this wrapper by the path it resolved from core.hooksPath, so dirname "$0" is
+# always the githooks/ directory git actually chose. The impl is its sibling, by construction.
+set -euo pipefail
+_hookdir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+_impl="$_hookdir/commit-msg-verification-level.sh"
+# FAIL CLOSED: a missing impl refuses the commit. A gate that cannot find itself must never
+# wave the commit through — that is the fail-open shape this whole bead exists to kill.
+if [ ! -x "$_impl" ]; then
+  printf 'verification-level REFUSE reason=impl-missing path=%s\n' "$_impl" >&2
+  printf '  the commit-msg gate is wired (core.hooksPath) but its impl is absent here.\n' >&2
+  printf '  re-run: bash %s/flywheel/stamp-install.sh --repo <this-repo>\n' "${FOUNDRY_DIR:-/Users/josh/Developer/foundry}" >&2
+  exit 1
+fi
+exec "$_impl" "$@"

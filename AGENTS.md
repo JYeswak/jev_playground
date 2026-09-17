@@ -8,6 +8,42 @@ This file follows the canonical AGENTS.md shape derived from the Dicklesworthsto
 has: a paid probabilistic API, a growing set of pinned third-party clones, omp itself as the
 integration target, and a demand for demos that land where we work.
 
+## §0 The Rules — the non-negotiables, in one place
+
+### Conventions: this list IS the convention contract
+
+The full text of each rule is a section below; this is the index a fresh agent reads in ten
+seconds. **The conventions for this lane are exactly these rules plus the discipline sections
+they point at — there is deliberately no separate CONVENTIONS.md, and a review agent grades a
+change against this list.** Language and formatting conventions are inherited from each vendored
+clone's own toolchain (`npm run typecheck` / `ruff`), never imposed across them.
+
+1. **Joshua's word overrides this file.** [§ RULE 0](#rule-0---the-fundamental-override-prerogative)
+2. **Never delete a file without written permission** — including one you just created.
+   [§ RULE 1](#rule-number-1-no-file-deletion)
+3. **Never break glass.** No `git reset --hard`, `git clean -fd`, `rm -rf` without the exact
+   command from Joshua in the same message.
+   [§ Irreversible actions](#irreversible-git--filesystem-actions--do-not-ever-break-glass)
+4. **Never push, PR, or commit inside a vendored clone.** They are upstream trees under
+   evaluation. [§ Vendored clones](#vendored-upstream-clones--read-mostly-pinned-never-pushed)
+5. **`main` only; never `git add -A`** in this shared worktree (`dcg` denies it); every commit
+   subject names its verification level. [§ Git](#git-branch-only-use-main-never-master)
+6. **The key never enters the tree, a log, a fixture, or a message.**
+   [§ Secrets](#secrets-and-the-paid-surface-critical)
+7. **Edit in place; no `_v2` files; never patch upstream to make a demo pass.**
+   [§ Code editing discipline](#code-editing-discipline)
+8. **Offline lane first; a live call is budgeted and stated.**
+   [§ Testing](#testing)
+9. **Name the oracle, and name your claim level.** No bare "verified".
+   [§ The Jev Oracle](#the-jev-oracle) · [§ Claim discipline](#claim-discipline)
+10. **Read the vendored primary sources from disk, not from memory.**
+    [§ Primary sources](#primary-sources--vendored-locally-read-these-first)
+11. **Done means §4 below** — not compiling, not demoed once.
+    [§4 Definition of Done](#4-definition-of-done--the-acceptance-bar)
+
+Gate inventory and every RED arm: [`GATES.md`](GATES.md). Refuted hypotheses and rejected
+designs, read before starting one: [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md).
+
 ---
 
 ## RULE 0 - THE FUNDAMENTAL OVERRIDE PREROGATIVE
@@ -91,10 +127,29 @@ was evaluated at. Treat them as **upstream trees under evaluation**, not as our 
 - **Never reference `master` in code or docs** — if you see `master` anywhere in our code, it's a bug that needs fixing
 - **Never rename or force a branch in a vendored clone** — their branch convention is theirs
 
-**This workspace root is deliberately not a git repository.** `git -C /Users/josh/Developer/jev
-rev-parse HEAD` fails, and that is the intended state: the root is a staging area whose
-contents either belong to upstream or get promoted into a product repo. Do not `git init` here
-without asking — it would swallow every nested clone.
+### This lane IS a git repo (since 2026-09-17, `e70b1dc`)
+
+It was deliberately not one for its first day; that blocked nine `stamp-check` items fail-closed
+on *"not a git repository"* and made `fh standards stamp` structurally impossible, so Joshua
+authorized `git init`. The nested clones are handled by construction, not by discipline:
+
+- **`.gitignore` is an ALLOWLIST.** It ignores `/*` and un-ignores exactly what we author.
+  **Cloning new prior art needs no change to it**; adding a new first-party directory does.
+  That is why ~20 nested repos never become accidental gitlinks.
+- **`docs-mirror/` and `upstream/` commit PROVENANCE, not BYTES** — the sha256 manifests are
+  tracked; the 5 MB of third-party documentation and the nested first-party clones are not.
+  `scripts/sync-docs.sh --check` proves byte identity against the committed manifest, so a
+  fresh clone is one command away from the full corpus and our history stays ours.
+- **NEVER `git add -A` / `git add .`** — `dcg` denies it here
+  (`zeststream.shared_worktree:git-add-whole-tree`) and it is right to: three agents share this
+  worktree, and a blanket stage commits a sibling's half-finished file. Stage explicit paths.
+- **Every commit subject must claim a verification level** — the `commit-msg` hook refuses one
+  that does not. Levels, weakest first: `pending` (code-first, nothing run), `selftest`, `test`,
+  `mutation`, `oracle`, `live`. Form: `[test]` in the subject, or `…-verified` / `(…, test
+  pending)`. Merges, reverts and fixups are exempt. **Claim the level you actually reached** —
+  the hook checks the form, only you can check the truth.
+- **Bootstrap a fresh clone:** `./scripts/sync-docs.sh && ./scripts/sync-docs.sh --check`, then
+  re-clone whatever prior art `EVAL.md` cites at its pinned SHA. Nothing else is needed.
 
 ---
 
@@ -743,13 +798,16 @@ one of the omp seams below; for a product feature it means the product repo.
 - **Owns its thresholds in our code**, with tests for the policy and the fail-safe direction.
 - **Names the pattern and cites the doc page and prior art** (`docs-mirror/...`, repo@sha,
   owner, license) in its README.
-- Tracked as a bead in **the target repo's** `.beads/` with label `jev` — not here; this root has
-  no git and therefore nowhere to sync a work graph.
+- Tracked as a bead: in **this** repo's `.beads/` (prefix `jev`) when the work is lane work, or
+  in the **target repo's** `.beads/` when it belongs to that product. `br sync --flush-only`
+  then `git add .beads/ && git commit` — `br` never runs git for you.
 
 **Exit artifact:** an `EVAL.md` row naming the seam, the validation rung reached (L0–L4 below),
 and the command that proves it.
 
-### Demo Acceptance Bar
+---
+
+## §4 Definition of Done — the acceptance bar
 
 A demo or integration is done when all of these hold. Anything less is `PROBED`, not `VALIDATED`:
 
@@ -760,9 +818,15 @@ A demo or integration is done when all of these hold. Anything less is `PROBED`,
 - [ ] it names its pattern, its doc page, its prior art (repo@sha + license), and its oracle
 - [ ] every number in its README carries lane, N, date, and model version
 - [ ] no secret anywhere in the tree, including fixtures and recorded responses
-- [ ] `ubs <changed-files>` exit 0
+- [ ] `foundation/gates.sh` green, and `--selftest` green (every stage proves its RED arm)
+- [ ] `ubs <changed-files>` exit 0 **when the change touches TS/Python/Rust**. On a doc-only
+      change `ubs` exits 3 (`nothing was checked — this is NOT a pass`); citing that as green is
+      the empty-scan-set lie. See `NEGATIVE_EVIDENCE.md` R6.
 - [ ] **if it is an omp seam: the seam fires in a real omp session, and a known-bad input makes it
       refuse** — reached rung ≥ L3, with the transcript or frame pasted
+- [ ] a refuted hypothesis or a rejected design from this pass is written to
+      `NEGATIVE_EVIDENCE.md` **with its retry condition** — a pass that learned nothing negative
+      usually did not probe hard enough
 - [ ] an `EVAL.md` row here pointing at where it landed and which rung it reached
 
 ---
@@ -1028,9 +1092,25 @@ Beads provides a lightweight, dependency-aware issue database and CLI (`br` — 
 
 **Important:** `br` is non-invasive—it NEVER runs git commands. After `br sync --flush-only`, you must manually `git add .beads/ && git commit`.
 
-**Where jev work is tracked:** in **the target product repo**, labelled `jev`. This root is not a
-git repository, so a `.beads/` here could never be synced or reviewed. A demo that has no owning
-repo yet has no bead yet — that is a signal you are still in Stage 0.
+**Bead shape — the JEFF-BEAD-STANDARD** (`skill://beads-north-star`). A bead whose body is just
+its title is not a bead; it is a reminder that costs a fresh agent a session to reconstruct.
+Every `br create` in this lane carries:
+
+- **WHAT** — the observable change, in the imperative.
+- **WHY** — the measurement or failure that makes it worth doing. A bead with no WHY is how a
+  lane accumulates work nobody can kill.
+- **ACCEPTANCE** — the command a fresh agent runs to see it is done, and the rung it must reach
+  (see [§4](#4-definition-of-done--the-acceptance-bar)). "Looks right" is not acceptance.
+
+Dependencies are declared (`br dep add <issue> <depends-on>`) so `br ready` means *actually
+startable*, and `br dep cycles` stays empty. Close with a VERDICT comment naming the evidence —
+never a bare `br close`.
+
+**Where jev work is tracked:** here, in `.beads/` with prefix `jev`, for lane work — the store
+already exists and `br ready --json` answers. Work that belongs to a product goes in **that**
+repo's `.beads/`, labelled `jev`. `issues.jsonl` and `config.yaml` are tracked; `beads.db` and
+its WAL are not (`.beads/.gitignore`, shipped by `br`). The JSONL is the truth, the db is
+disposable — after `br sync --flush-only`, run `br sync --import-only` following any pull.
 
 ```bash
 br ready --json            # ready work, no blockers

@@ -100,6 +100,21 @@ framed as next audits in `foundation/CALIBRATION.md`.
   (truncated fixture, empty runs dir, planted key). Caught live during build: a
   selftest that tripped on its own source literal — fixed to assemble the plant
   at runtime and assert the RED names the plant file.
+  Stage 40 (`40-omp-compact-replay.sh`, added with `compaction/` below): the omp
+  adapter typechecks, 5 mapping tests pass, inverted-property selftest proves RED.
+- `compaction/` (added this session): omp-harness replay for fast-jev-compaction.
+  `src/omp-adapter.ts` maps `omp -p --mode json` streams to `Message[]`
+  (message_end only; thinking dropped+counted; results call-adjacent — herding
+  them onto a later user turn pinned 11/11 calls through their results and Jev
+  was never consulted). `src/replay.ts` asserts the true contract (texts
+  verbatim subsequence, no text loss, no invented ids, pruned messages carried
+  no text, candidates imply requests). Live replay, 11-call session, real Jev:
+  **5 dropped, 13→8 messages, 2333→1292 chars (45%), zero text loss** — receipt
+  `compaction/runs/replay-big-20260917.json`. Design facts the replay forced
+  out of the library: Jev never sees result content (state carries ok/error +
+  char count only — relevance judgment, not content review); message pruning is
+  intended (empties dropped); `ToolUse.text` is a Claude-attached mirror the
+  state builder does not render, so the adapter correctly omits it.
 
 ## Lane contract + primary-source mirror (added this session)
 
