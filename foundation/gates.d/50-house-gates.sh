@@ -57,14 +57,22 @@ if [ "${1:-}" = "--selftest" ]; then
 fi
 
 rc=0
+# dag-validate-gate.sh defaults its rendered graph to $BEADS_DIR/dag-graph-<ts>.txt, so every run
+# drops a new untracked file into .beads/ and the end-of-shift clean-tree lane goes red on our own
+# diagnostics. Render to a scratch path instead: the graph is a per-run artifact, not lane state.
+scratch="${TMPDIR:-/tmp}/jev-dag-graph.$$.txt"
 for g in $GATES; do
-    out=$("$KIT/$g" --repo "$REPO" 2>&1)
+    case "$g" in
+        dag-validate-gate.sh) out=$("$KIT/$g" --repo "$REPO" --render-out "$scratch" 2>&1) ;;
+        *)                    out=$("$KIT/$g" --repo "$REPO" 2>&1) ;;
+    esac
     code=$?
     case "$code" in
         0) echo "  PASS  $g" ;;
         *) echo "  REFUSE $g (exit=$code): $(printf '%s' "$out" | tail -5)"; rc=1 ;;
     esac
 done
+rm -f -- "$scratch"
 
 [ "$rc" -eq 0 ] && echo "50-house-gates: dag + close-evidence + commit-evidence green on $REPO"
 exit "$rc"

@@ -41,6 +41,7 @@ upstream/*
 
 # Harness and tool state that belongs to a machine, never to the repo.
 .ntm/
+.beads/dag-graph-*.txt
 .DS_Store
 *.log
 
