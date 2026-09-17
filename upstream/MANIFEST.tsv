@@ -1,0 +1,6 @@
+repo	path	pinned_sha	upstream_sha	behind	fetched_at
+typesafe-sdk-python	upstream/typesafe-ai/typesafe-sdk-python	420ef4f	420ef4f	0	2026-09-17T23:13:08Z
+typesafe-sdk-js	upstream/typesafe-ai/typesafe-sdk-js	66880cc	66880cc	0	2026-09-17T23:13:09Z
+system-one-adapter-python	upstream/typesafe-ai/system-one-adapter-python	0bb819b	0bb819b	0	2026-09-17T23:13:10Z
+skills	upstream/typesafe-ai/skills	65a39f3	65a39f3	0	2026-09-17T23:13:12Z
+ripwire	/Users/josh/Developer/ripwire	f45087a7	f45087a7	0	2026-09-17T23:13:13Z

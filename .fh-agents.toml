@@ -1,0 +1,80 @@
+# Nomenclature map for `fh agents --repo .` — the jev evaluation-and-demo lane
+#
+# Authored 2026-09-17 against `fh agents` skeleton
+# content_id=095decf214531d68e0bc954fc2aa8c620f1e1c97511e307b31346a0800ed7098
+# source_rev=bb595392769567d5c2fefe7ce2e1175c459cc49c (64 canonical sections, 117/221 mirror dirs).
+#
+# WHY THIS FILE EXISTS
+#
+# `fh agents` reports three states per canonical section: NAMED (the mirror's canonical title is
+# present verbatim), UNNAMED (the DOCTRINE is present under OUR heading), ABSENT (nothing).
+# UNNAMED is reachable ONLY through the [synonyms] table below. Without a map, doctrine we DO
+# carry under a locally-correct title cannot be distinguished from doctrine we lack.
+#
+# THE RULE FOR EDITING THIS FILE: every phrase below was verified to ACTUALLY OCCUR in this
+# repo's AGENTS.md, AND to occur in the section that OWNS the doctrine. Occurrence is not
+# ownership — a generic word that appears in five sections credits whichever resolves first.
+# Verify with `grep -ic "<phrase>" AGENTS.md` before declaring, and re-resolve the UNNAMED row
+# back to its heading after.
+
+[headings]
+# INTENTIONALLY EMPTY. No canonical rename is safe here, and two are actively wrong:
+#
+# `## Verification Checks (CRITICAL)` must NOT become the canonical `Compiler Checks` — there is
+# no compiler in this lane. The section is `tsc --noEmit`, `vitest`, `node --test`, `ruff`,
+# `pytest`, and `claude plugin validate`, and an agent looking for "how do I verify" must find it
+# under a title that is true.
+#
+# `## Fleet Coordination — Three omp Agents in One NTM Session` must NOT become the canonical
+# `MCP Agent Mail`. Every agent in this session is omp; coordination is the harness's own `hub`.
+# A canonical rename here would instruct the next agent to reach for a coordination substrate
+# this lane does not run — the exact class of error `value-bearing-gates` prohibits.
+#
+# `## ripwire — Deterministic Code Context` must NOT become `Morph Warp Grep`. Same reason, same
+# precedent as control-plane's `.fh-agents.toml`, which maps that canonical row to `ripwire-first`.
+
+[synonyms]
+# canonical section = [phrases in THIS repo proving the doctrine is present under our own heading]
+
+# `## Fleet Coordination — Three omp Agents in One NTM Session` — peer messaging, file
+# contention on EVAL.md, one-agent-owns-a-tree, shared paid-API budget.
+"mcp agent mail" = ["fleet coordination"]
+
+# `## ripwire — Deterministic Code Context (use before you read files)` — the structural /
+# semantic search surface, with the wire-protocol-name blindness trap.
+"morph warp grep" = ["deterministic code context"]
+
+# `## Verification Checks (CRITICAL)` — the per-tree suites that were green at the pinned SHAs.
+"compiler checks" = ["verification checks"]
+
+# `### Workspace Structure` — the tree, with pinned SHAs, owners, and licenses.
+"project structure" = ["workspace structure"]
+
+# `## jev — This Project` — "a read-mostly evaluation lane over the public Jev ecosystem".
+"what it does" = ["read-mostly evaluation lane"]
+
+# `### Key Design Decisions (observed upstream — adopt these)`. The canonical row did not match
+# on the parenthetical title, so the doctrine is declared by its distinctive phrase instead.
+"key design decisions" = ["observed upstream"]
+
+# NOT DECLARED, deliberately:
+#
+#   "rch"  — RCH offloads cargo builds to remote workers. This lane has no Rust. Declaring a
+#            synonym would claim a mechanism we neither have nor need.
+#   "release profile" / "feature flags" / "rust examples" — Cargo concepts; "feature flags"
+#            occurs ZERO times (verified). No Rust here.
+#   "beads workflow integration" — our `## Beads (br)` section carries the commands, and
+#            `## Landing the Plane` carries the session-end protocol; there is no third phrase
+#            that occurs in exactly one owning section, and "session protocol" occurs ZERO times
+#            (verified). A synonym that does not occur does not fail — it silently stops
+#            measuring, which is worse than an honest gap.
+#   "unit tests" — the run commands live in `## Verification Checks`, which is already declared
+#            for `compiler checks`. One section cannot honestly own two canonical rows, so this
+#            stays an honest ABSENT rather than a double-credited phrase.
+#   "architecture" — genuinely distributed here across `### The Wire Contract`,
+#            `### Workspace Structure`, and the omp seam table. No single heading owns it, and
+#            crediting one would make the row a lie about where to look.
+#   The remaining ABSENT level-3 rows are children of tool sections we deliberately compressed
+#            (bv's `jq quick reference`, UBS's `output format`, agent-mail's `macros vs granular
+#            tools`). The full text lives in the mirror repos; duplicating four screens of it
+#            here would bury this lane's own doctrine.

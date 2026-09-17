@@ -1,0 +1,51 @@
+# The jev lane is an ALLOWLIST repo.
+#
+# The root holds ~20 vendored clones of other people's repositories, and the set grows every
+# session. An opt-out list would go stale the moment a sibling pane clones the next one, and a
+# nested git repo added to this tree becomes a gitlink that nobody configured as a submodule.
+# So: ignore everything at the root, then un-ignore exactly what we author.
+#
+# Adding a new clone requires NO change here. Adding a new first-party directory does.
+
+/*
+!/.gitignore
+!/AGENTS.md
+!/EVAL.md
+!/NEGATIVE_EVIDENCE.md
+!/.fh-agents.toml
+!/scripts/
+!/probes/
+!/foundation/
+!/notes/
+!/.beads/
+!/docs-mirror/
+!/upstream/
+
+# ---------------------------------------------------------------------------
+# docs-mirror/ and upstream/: PROVENANCE is committed, BYTES are not.
+#
+# `scripts/sync-docs.sh` re-fetches the mirror and `--check` proves byte identity against the
+# committed sha256 manifest. So the manifests are the reviewable artifact; the 5 MB of TypeSafe
+# documentation and the nested first-party clones are reproducible, third-party, and would churn
+# every diff. A fresh clone runs one command to materialize them.
+# ---------------------------------------------------------------------------
+docs-mirror/*
+!docs-mirror/MANIFEST.tsv
+upstream/*
+!upstream/MANIFEST.tsv
+!upstream/ORG-INVENTORY.tsv
+
+# Harness and tool state that belongs to a machine, never to the repo.
+.ntm/
+.DS_Store
+*.log
+
+# Language caches and build output, wherever they appear under a first-party path.
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+dist/
+.test-dist/

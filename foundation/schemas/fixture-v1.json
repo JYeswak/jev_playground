@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeststream/jev-foundation/fixture-v1",
+  "title": "Calibration fixture row",
+  "description": "One ground-truth judgment. Language-neutral by construction: plain JSON objects, string enums, numbers. A Rust port reads this file unchanged with serde.",
+  "type": "object",
+  "required": ["id", "kind", "domain", "instructions", "state", "expected"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "minLength": 1 },
+    "kind": { "enum": ["noul", "choice"] },
+    "domain": { "type": "string", "minLength": 1 },
+    "instructions": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "state": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "expected": {
+      "type": "object",
+      "oneOf": [
+        {
+          "required": ["p"],
+          "additionalProperties": false,
+          "properties": { "p": { "enum": [0, 1] } }
+        },
+        {
+          "required": ["choice", "options"],
+          "additionalProperties": false,
+          "properties": {
+            "choice": { "type": "string", "minLength": 1 },
+            "options": {
+              "type": "object",
+              "minItems": 2,
+              "maxItems": 8,
+              "additionalProperties": { "type": "string" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
