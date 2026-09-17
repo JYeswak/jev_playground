@@ -138,9 +138,10 @@ framed as next audits in `foundation/CALIBRATION.md`.
   `negotiate_protocol(v2)` → success and `get_state` → `model.id=claude-opus-5`,
   `contextWindow=1000000` via `omp --mode=rpc --max-time=20`. Pane-profile trap confirmed in
   this very session: `%71` titled `jev__omp-claude_1` runs `omp --profile=codex`.
-- Boundary: no Jev API call was made this session (no live lane, no spend). The omp integration
-  seams are documented at **L0** — designed and cited, nothing wired. `probes/fast-jev-probe.mts`
-  re-run offline (fake Jev, no key): **8/8**, 91% char reduction on its fixture.
+- Boundary (**this pass only** — a sibling pane's `131679e [live] omp compaction replay` DID make
+  live Jev calls, so the lane is no longer spend-free): no Jev API call was made by *this* pass.
+  The omp integration seams I documented are at **L0** — designed and cited, nothing wired.
+  `probes/fast-jev-probe.mts` re-run offline (fake Jev, no key): **8/8**, 0.91 reduction ratio.
 
 ## ripwire upgrade — single binary, latest (2026-09-17)
 
@@ -171,3 +172,41 @@ framed as next audits in `foundation/CALIBRATION.md`.
 - Boundary: only the second binary on disk is `~/Developer/ripwire/build-install/ripwire`, the
   installer's own Release build tree (gitignored, kept so re-installs are incremental). Not on
   PATH, not installed. `build/` holds no binary.
+
+
+## Lane became a git repo + measured-gap closure (2026-09-17)
+
+Joshua authorized `git init` after nine `stamp-check` items were failing fail-closed on
+"not a git repository". **`stamp-check --repo .`: 32 PASS / 20 FAIL / 2 PARTIAL → 41 PASS / 8 FAIL
+/ 2 PARTIAL** (of 64, report-only). Five commits, `e70b1dc`…`625828a` + a sibling's `131679e`.
+
+- **Allowlist `.gitignore`.** Ignores `/*`, un-ignores what we author. A new vendored clone needs
+  no change; ~20 nested repos never become accidental gitlinks. It fired twice as designed —
+  `GATES.md` and `githooks/` were invisible until explicitly allowed.
+- **Provenance committed, bytes not.** `docs-mirror/MANIFEST.tsv` + `upstream/MANIFEST.tsv` are
+  tracked; 5 MB of third-party docs and the nested clones are not. Rejection argued in
+  `NEGATIVE_EVIDENCE.md` R5, reproducible via `sync-docs.sh --check`.
+- **`dcg` denied `git add -A`** (`zeststream.shared_worktree:git-add-whole-tree`) on the first
+  attempt — correct in a worktree three agents share. Everything staged by explicit path since.
+- **The commit-msg hook refused my first commit** for having no verification level. Now in-tree
+  at `githooks/` (byte-identical to `.git/hooks`, sha `420af8f6d4af` / `c325a40aee77`) and wired
+  via an **absolute** `core.hooksPath` — a relative one resolves per-worktree, so every worker
+  lane would commit unhooked.
+- New artifacts, each carrying real content rather than satisfying a checker: `NEGATIVE_EVIDENCE.md`
+  (8 rows with retry conditions, two of them retractions of my own instrument errors), `GATES.md`
+  (every gate, its edge, its RED arm, plus `## Oracle` and `## Fail-closed rules`), `TESTS.md`
+  (three surfaces kept separate; both tracked test files enumerated by path; coverage % refused
+  with an argument), AGENTS.md `§0`/`§4` + the JEFF-BEAD-STANDARD M5/M6 addenda.
+- Gate evidence at `625828a`: `foundation/gates.sh` **and** `--selftest` ALL GREEN (every stage
+  proves its RED arm); hook selftest 4 bad refused / 4 good passed; `gitleaks protect --staged`
+  no leaks; `sync-docs.sh --check` CHECK PASS 114.
+- **Still failing, each classified, none hidden:** `i-staged-deletion-hook` (HUMAN — installing a
+  new pre-commit hook is gated by `skill://hook-certification`, not hand-rolled);
+  `p5-autofix` + `rc0-declared-path` + `p10-commit-sweep` (FALSE_POSITIVE — all three fire on
+  *vendored* clones: 969 upstream code files, `s1-rs`'s bin crate, and a literal `TODO` inside a
+  recorded omp transcript fixture); `p6-cross-lineage` / `p7-worksheet` / `p8-session-feedback`
+  (NOT ADOPTED — persona reviews and `.flywheel/worksheets/`; `EVAL.md` + `NEGATIVE_EVIDENCE.md`
+  already are this lane's session record); `p12-loop-integrity` (N/A — no tick-loop driver);
+  `p18-end-of-shift` (CONDITIONAL — goes green on a clean tree at session end);
+  `d-gate-wiring` PARTIAL (artifact present; the checker's basename extractor does not see the
+  four `.sh` names the block lists — instrument disagreement, recorded not papered over).
