@@ -705,6 +705,11 @@ Rules, because this harness is the thing every later number leans on:
   threshold ≥0.75 → accuracy 1.0 at ≥90% coverage (`EVAL.md`, receipt `20260917T224444Z.json`).
 - **Every gate stage must prove its RED arm on demand** — truncated fixture, empty `runs/`,
   planted key. A stage that has only ever gone green is unproven.
+- **Gate thrift: extend a stage before adding one.** New checks ride an existing stage
+  unless they need a distinct RED arm. A stage wraps a directly-runnable command
+  (`npm test`, `python3 scripts/x.py`, one `run.sh` per harness) — never another
+  wrapper. (His shape at `skillranker@3fe85c4`: validators invoked directly, zero
+  `.sh` outside one `run.sh`.)
 - **A gate that trips on its own source literal is a broken gate, not a catch.** That fired once
   here during the build: `30-no-secrets` matched the key pattern written in its own script. The
   fix is to assemble the plant at runtime and assert the RED output *names the plant file*.
