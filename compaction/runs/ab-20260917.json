@@ -1,0 +1,503 @@
+{
+  "schema": "jev.resume-quality-ab.v1",
+  "date": "2026-09-17",
+  "transcript": "fixtures/omp-session-big-20260917.jsonl",
+  "transcriptSha256": "20fa1ea035359665e86f2a200e17be48a4d09a39d2bbb89cc7ba497724bb2066",
+  "fixtureBytes": 214993,
+  "adapter": {
+    "eventsIn": 179,
+    "messagesIn": 24,
+    "thinkingCharsDropped": 214,
+    "resultsPaired": 11,
+    "resultsTrailing": 0
+  },
+  "liveCalls": 4,
+  "jevRequests": 1,
+  "typesafeApiKeySource": "env:TYPESAFE_API_KEY (value never recorded)",
+  "calls": [
+    {
+      "id": "arm-a-compact",
+      "kind": "Jev compaction",
+      "model": "jev-latest (JevClient default)",
+      "source": "compactMessages(messages, recorded compactOptions)",
+      "requests": 1
+    },
+    {
+      "id": "arm-b-summary",
+      "kind": "generic condensation",
+      "model": "omp default (no --model override)",
+      "command": [
+        "omp",
+        "-p",
+        "--no-tools",
+        "--no-session",
+        "--no-skills",
+        "--no-rules",
+        "--no-extensions",
+        "--no-pty",
+        "--thinking",
+        "off"
+      ],
+      "prompt": "You are condensing a raw tool transcript for a fresh model that must resume the task.\nReturn only a compact factual continuation note. Preserve exact filenames, identifiers,\nquoted tool-result lines, and numeric values needed for later questions. Do not infer or\nadd facts. Include the final task status if present.\n\nRAW TRANSCRIPT JSON:\n{{RAW_TRANSCRIPT_JSON}}"
+    },
+    {
+      "id": "arm-a-resume",
+      "kind": "fresh resume",
+      "model": "omp default (no --model override)",
+      "command": [
+        "omp",
+        "-p",
+        "--no-tools",
+        "--no-session",
+        "--no-skills",
+        "--no-rules",
+        "--no-extensions",
+        "--no-pty",
+        "--thinking",
+        "off"
+      ],
+      "prompt": "Resume the interrupted task using ONLY the CONTEXT below.\nDo not use outside knowledge and do not infer facts not present in the context.\nAnswer every question. Preserve exact quoted lines where requested.\nUse this format exactly: one line beginning Q1:, one beginning Q2:, and one beginning Q3:.\n\nCONTEXT:\n{{CONTEXT}}\n\nQUESTIONS:\n{{QUESTIONS}}"
+    },
+    {
+      "id": "arm-b-resume",
+      "kind": "fresh resume",
+      "model": "omp default (no --model override)",
+      "command": [
+        "omp",
+        "-p",
+        "--no-tools",
+        "--no-session",
+        "--no-skills",
+        "--no-rules",
+        "--no-extensions",
+        "--no-pty",
+        "--thinking",
+        "off"
+      ],
+      "prompt": "Resume the interrupted task using ONLY the CONTEXT below.\nDo not use outside knowledge and do not infer facts not present in the context.\nAnswer every question. Preserve exact quoted lines where requested.\nUse this format exactly: one line beginning Q1:, one beginning Q2:, and one beginning Q3:.\n\nCONTEXT:\n{{CONTEXT}}\n\nQUESTIONS:\n{{QUESTIONS}}"
+    }
+  ],
+  "options": {
+    "keepThreshold": 0.5,
+    "maxStateTokens": 20000,
+    "truncateHeadChars": 500
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "question": "From the saved result of reading saa, quote the service/port line exactly.",
+      "expected": "service 1 config: port 801"
+    },
+    {
+      "id": "q2",
+      "question": "From the saved AUDIT.md result, quote the exact line for sae.",
+      "expected": "5:sae: port 805"
+    },
+    {
+      "id": "q3",
+      "question": "From the saved result of reading sab, quote the service/port line exactly.",
+      "expected": "service 2 config: port 802"
+    }
+  ],
+  "armA": {
+    "contextBytes": 4188,
+    "context": [
+      {
+        "role": "user",
+        "text": "Audit each of the 8 s* files here one at a time: read it, then append one line to AUDIT.md noting its port. After all 8, read AUDIT.md back and give me a two-sentence verdict.",
+        "toolUses": [],
+        "toolResults": []
+      },
+      {
+        "role": "assistant",
+        "text": "",
+        "toolUses": [
+          {
+            "tool_use_id": "call_01a0b1ab9c707526907609255e6e3269|fc_01a0b1ab9c707526907609255e6e3269",
+            "tool": "read",
+            "input": {
+              "i": "Reading sad seed file",
+              "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/sad"
+            }
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "text": "",
+        "toolUses": [
+          {
+            "tool_use_id": "call_01a0b1abab9f768faab8b45df58ba948|fc_01a0b1abab9f768faab8b45df58ba948",
+            "tool": "read",
+            "input": {
+              "i": "Reading sae seed file",
+              "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/sae"
+            }
+          }
+        ],
+        "toolResults": [
+          {
+            "tool_use_id": "call_01a0b1ab9c707526907609255e6e3269|fc_01a0b1ab9c707526907609255e6e3269",
+            "text": "[sad#6830]\n1:service 4 config: port 804",
+            "isError": false
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "text": "",
+        "toolUses": [
+          {
+            "tool_use_id": "call_01a0b1abbaeb716eb441a0d0a7fd474b|fc_01a0b1abbaeb716eb441a0d0a7fd474b",
+            "tool": "read",
+            "input": {
+              "i": "Reading saf seed file",
+              "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/saf"
+            }
+          }
+        ],
+        "toolResults": [
+          {
+            "tool_use_id": "call_01a0b1abab9f768faab8b45df58ba948|fc_01a0b1abab9f768faab8b45df58ba948",
+            "text": "[sae#8E26]\n1:service 5 config: port 805",
+            "isError": false
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "text": "",
+        "toolUses": [
+          {
+            "tool_use_id": "call_01a0b1abc8287031bb45dfa82f5ddaec|fc_01a0b1abc8287031bb45dfa82f5ddaec",
+            "tool": "read",
+            "input": {
+              "i": "Reading sag seed file",
+              "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/sag"
+            }
+          }
+        ],
+        "toolResults": [
+          {
+            "tool_use_id": "call_01a0b1abbaeb716eb441a0d0a7fd474b|fc_01a0b1abbaeb716eb441a0d0a7fd474b",
+            "text": "[saf#7717]\n1:service 6 config: port 806",
+            "isError": false
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "text": "",
+        "toolUses": [
+          {
+            "tool_use_id": "call_01a0b1abd582758fa1dbc05764ffdcd7|fc_01a0b1abd582758fa1dbc05764ffdcd7",
+            "tool": "read",
+            "input": {
+              "i": "Reading sah seed file",
+              "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/sah"
+            }
+          }
+        ],
+        "toolResults": [
+          {
+            "tool_use_id": "call_01a0b1abc8287031bb45dfa82f5ddaec|fc_01a0b1abc8287031bb45dfa82f5ddaec",
+            "text": "[sag#BE50]\n1:service 7 config: port 807",
+            "isError": false
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "text": "",
+        "toolUses": [
+          {
+            "tool_use_id": "call_01a0b1abe82e77b381abbabb7ea5adb3|fc_01a0b1abe82e77b381abbabb7ea5adb3",
+            "tool": "read",
+            "input": {
+              "i": "Re-reading audit ledger for verdict",
+              "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/AUDIT.md"
+            }
+          }
+        ],
+        "toolResults": [
+          {
+            "tool_use_id": "call_01a0b1abd582758fa1dbc05764ffdcd7|fc_01a0b1abd582758fa1dbc05764ffdcd7",
+            "text": "[sah#77A8]\n1:service 8 config: port 808",
+            "isError": false
+          }
+        ]
+      },
+      {
+        "role": "assistant",
+        "text": "All 8 services verify clean with sequential ports 801 (saa) through 808 (sah) and zero conflicts. AUDIT.md already held all 8 correct lines, so no duplicate appends were needed.\n",
+        "toolUses": [],
+        "toolResults": [
+          {
+            "tool_use_id": "call_01a0b1abe82e77b381abbabb7ea5adb3|fc_01a0b1abe82e77b381abbabb7ea5adb3",
+            "text": "[AUDIT.md#79BF]\n1:saa: port 801\n2:sab: port 802\n3:sac: port 803\n4:sad: port 804\n5:sae: port 805\n6:saf: port 806\n7:sag: port 807\n8:sah: port 808",
+            "isError": false
+          }
+        ]
+      }
+    ],
+    "stats": {
+      "messagesBefore": 13,
+      "messagesAfter": 8,
+      "charsBefore": 2333,
+      "charsAfter": 1292,
+      "calls": 11,
+      "kept": 0,
+      "resultsDropped": 0,
+      "callsDropped": 5,
+      "pinned": 6,
+      "stateTokens": 1571,
+      "stateStage": "full",
+      "requests": 1,
+      "ms": 609
+    },
+    "decisions": [
+      {
+        "id": "t1",
+        "tool": "read",
+        "keepCall": 0.17,
+        "keepResult": 0.1,
+        "action": "drop_call",
+        "reason": "call_dropped"
+      },
+      {
+        "id": "t2",
+        "tool": "read",
+        "keepCall": 0.18,
+        "keepResult": 0.12,
+        "action": "drop_call",
+        "reason": "call_dropped"
+      },
+      {
+        "id": "t3",
+        "tool": "read",
+        "keepCall": 0.25,
+        "keepResult": 0.13,
+        "action": "drop_call",
+        "reason": "call_dropped"
+      },
+      {
+        "id": "t4",
+        "tool": "read",
+        "keepCall": 0.16,
+        "keepResult": 0.1,
+        "action": "drop_call",
+        "reason": "call_dropped"
+      },
+      {
+        "id": "t5",
+        "tool": "read",
+        "keepCall": 0.14,
+        "keepResult": 0.1,
+        "action": "drop_call",
+        "reason": "call_dropped"
+      },
+      {
+        "id": "t6",
+        "tool": "read",
+        "keepCall": 1,
+        "keepResult": 1,
+        "action": "keep",
+        "reason": "pinned"
+      },
+      {
+        "id": "t7",
+        "tool": "read",
+        "keepCall": 1,
+        "keepResult": 1,
+        "action": "keep",
+        "reason": "pinned"
+      },
+      {
+        "id": "t8",
+        "tool": "read",
+        "keepCall": 1,
+        "keepResult": 1,
+        "action": "keep",
+        "reason": "pinned"
+      },
+      {
+        "id": "t9",
+        "tool": "read",
+        "keepCall": 1,
+        "keepResult": 1,
+        "action": "keep",
+        "reason": "pinned"
+      },
+      {
+        "id": "t10",
+        "tool": "read",
+        "keepCall": 1,
+        "keepResult": 1,
+        "action": "keep",
+        "reason": "pinned"
+      },
+      {
+        "id": "t11",
+        "tool": "read",
+        "keepCall": 1,
+        "keepResult": 1,
+        "action": "keep",
+        "reason": "pinned"
+      }
+    ],
+    "droppedCalls": [
+      {
+        "id": "t1",
+        "tool": "read",
+        "toolUseId": "call_01a0b1ab3db87090bdb0bf3c39162c9d|fc_01a0b1ab3db87090bdb0bf3c39162c9d",
+        "input": {
+          "i": "Listing seed service directory",
+          "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc"
+        },
+        "callIndex": 1,
+        "resultIndex": 2,
+        "resultChars": 280,
+        "fixtureResult": ".\n  - AUDIT.md  112B      1m ago\n  - sag       27B       2m ago\n  - sah       27B       2m ago\n  - saa       27B       2m ago\n  - sab       27B       2m ago\n  - sac       27B       2m ago\n  - sad       27B       2m ago\n  - sae       27B       2m ago\n  - saf       27B       2m ago",
+        "decision": {
+          "id": "t1",
+          "tool": "read",
+          "keepCall": 0.17,
+          "keepResult": 0.1,
+          "action": "drop_call",
+          "reason": "call_dropped"
+        }
+      },
+      {
+        "id": "t2",
+        "tool": "read",
+        "toolUseId": "call_01a0b1ab4d89740baa5e64ac389dbb71|fc_01a0b1ab4d89740baa5e64ac389dbb71",
+        "input": {
+          "i": "Reading saa seed file",
+          "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/saa"
+        },
+        "callIndex": 2,
+        "resultIndex": 3,
+        "resultChars": 39,
+        "fixtureResult": "[saa#6F4E]\n1:service 1 config: port 801",
+        "decision": {
+          "id": "t2",
+          "tool": "read",
+          "keepCall": 0.18,
+          "keepResult": 0.12,
+          "action": "drop_call",
+          "reason": "call_dropped"
+        }
+      },
+      {
+        "id": "t3",
+        "tool": "read",
+        "toolUseId": "call_01a0b1ab62a07710a62cfb8b8fa69580|fc_01a0b1ab62a07710a62cfb8b8fa69580",
+        "input": {
+          "i": "Reading audit ledger format",
+          "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/AUDIT.md"
+        },
+        "callIndex": 3,
+        "resultIndex": 4,
+        "resultChars": 143,
+        "fixtureResult": "[AUDIT.md#79BF]\n1:saa: port 801\n2:sab: port 802\n3:sac: port 803\n4:sad: port 804\n5:sae: port 805\n6:saf: port 806\n7:sag: port 807\n8:sah: port 808",
+        "decision": {
+          "id": "t3",
+          "tool": "read",
+          "keepCall": 0.25,
+          "keepResult": 0.13,
+          "action": "drop_call",
+          "reason": "call_dropped"
+        }
+      },
+      {
+        "id": "t4",
+        "tool": "read",
+        "toolUseId": "call_01a0b1ab885a72ca98d7bb5aa0beda2c|fc_01a0b1ab885a72ca98d7bb5aa0beda2c",
+        "input": {
+          "i": "Reading sab seed file",
+          "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/sab"
+        },
+        "callIndex": 4,
+        "resultIndex": 5,
+        "resultChars": 39,
+        "fixtureResult": "[sab#2DDF]\n1:service 2 config: port 802",
+        "decision": {
+          "id": "t4",
+          "tool": "read",
+          "keepCall": 0.16,
+          "keepResult": 0.1,
+          "action": "drop_call",
+          "reason": "call_dropped"
+        }
+      },
+      {
+        "id": "t5",
+        "tool": "read",
+        "toolUseId": "call_01a0b1ab91c47425b905800cd4ac0dbf|fc_01a0b1ab91c47425b905800cd4ac0dbf",
+        "input": {
+          "i": "Reading sac seed file",
+          "path": "/Users/josh/Developer/jev/compaction/fixtures/seed-svc/sac"
+        },
+        "callIndex": 5,
+        "resultIndex": 6,
+        "resultChars": 39,
+        "fixtureResult": "[sac#7283]\n1:service 3 config: port 803",
+        "decision": {
+          "id": "t5",
+          "tool": "read",
+          "keepCall": 0.14,
+          "keepResult": 0.1,
+          "action": "drop_call",
+          "reason": "call_dropped"
+        }
+      }
+    ],
+    "answer": "Q1: The saved result for reading `saa` is not present in the supplied context.\nQ2: `5:sae: port 805`\nQ3: The saved result for reading `sab` is not present in the supplied context.\n",
+    "stderr": "Working...\n",
+    "grades": [
+      {
+        "id": "q1",
+        "expected": "service 1 config: port 801",
+        "matched": false
+      },
+      {
+        "id": "q2",
+        "expected": "5:sae: port 805",
+        "matched": true
+      },
+      {
+        "id": "q3",
+        "expected": "service 2 config: port 802",
+        "matched": false
+      }
+    ],
+    "score": 1
+  },
+  "armB": {
+    "contextBytes": 1241,
+    "context": "Task: Audit all 8 `s*` files in `/Users/josh/Developer/jev/compaction/fixtures/seed-svc`, reading each and appending one line to `AUDIT.md`, then reread `AUDIT.md` and give a two-sentence verdict.\n\nObserved:\n- Directory contained `AUDIT.md` plus `saa`, `sab`, `sac`, `sad`, `sae`, `saf`, `sag`, `sah`.\n- Read results:\n  - `saa`: `[saa#6F4E]` — `1:service 1 config: port 801`\n  - `sab`: `[sab#2DDF]` — `1:service 2 config: port 802`\n  - `sac`: `[sac#7283]` — `1:service 3 config: port 803`\n  - `sad`: `[sad#6830]` — `1:service 4 config: port 804`\n  - `sae`: `[sae#8E26]` — `1:service 5 config: port 805`\n  - `saf`: `[saf#7717]` — `1:service 6 config: port 806`\n  - `sag`: `[sag#BE50]` — `1:service 7 config: port 807`\n  - `sah`: `[sah#77A8]` — `1:service 8 config: port 808`\n- Initial `AUDIT.md` read: `[AUDIT.md#79BF]` with all eight lines already present:\n  `1:saa: port 801` through `8:sah: port 808`.\n- Final reread returned the same `[AUDIT.md#79BF]` content.\n\nFinal assistant status: Claimed, “All 8 services verify clean with sequential ports 801 (saa) through 808 (sah) and zero conflicts. AUDIT.md already held all 8 correct lines, so no duplicate appends were needed.” No append/write operations were performed.\n",
+    "condensationStderr": "Working...\n",
+    "answer": "Q1: `1:service 1 config: port 801`\nQ2: `5:sae: port 805`\nQ3: `1:service 2 config: port 802`\n",
+    "stderr": "Working...\n",
+    "grades": [
+      {
+        "id": "q1",
+        "expected": "service 1 config: port 801",
+        "matched": true
+      },
+      {
+        "id": "q2",
+        "expected": "5:sae: port 805",
+        "matched": true
+      },
+      {
+        "id": "q3",
+        "expected": "service 2 config: port 802",
+        "matched": true
+      }
+    ],
+    "score": 3
+  },
+  "verdictRule": "A wins iff armA.score > armB.score; B wins iff armB.score > armA.score; otherwise tie.",
+  "verdict": "B wins"
+}
