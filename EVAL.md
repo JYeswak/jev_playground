@@ -62,6 +62,16 @@ Three MCP judgment tools (verify / screen / find).
 
 Markdown list only — nothing to build. Sampled 15/15 GitHub project links: HTTP 200.
 
+## 7. skillranker @ 3fe85c4 (Dicklesworthstone, Rust 2024, MIT + OpenAI/Anthropic rider)
+
+Jev-as-judge skill router (`sr`): live session context → ranked skills for the next
+step. This pass mined ONLY its AGENTS.md (671 lines, pinned — repo still moving).
+Four rules adopted into our AGENTS.md (commit `24b0b33`): provider-output authority,
+no guessed-equivalent integrations, infra-failure-is-not-pass, Agent Mail
+coordination paragraph. Checked and HELD (not added): peer-work NEVER-disturb rule
+(our tail note), landing checklist, exit-code envelope, prose-is-not-proof.
+Boundary: no source read, nothing built, no live calls; full eval pass still open.
+
 
 - secrets.zeststream.ai speaks API v3 only (v1/v2/v4 → 404; v3 → 401 unauthenticated).
   brew's 0.43.111 calls `/api/v4/secrets` → hard 404. Bisected the cutover by testing
