@@ -126,9 +126,38 @@ out="$(cd "$work/r" && git commit -q --amend -m 'amended' 2>&1)"; code=$?
 if [ "$code" -eq 0 ]; then pass "healthy 5: amend"
 else fail "healthy 5: amend" "$(printf '%s' "$out" | tail -2)"; fi
 
+# ---------------------------------------------------------------- lane 2: autofix (report-only)
+# The wrapper runs loop-kit/autofix-precommit.sh --check --staged after the deletion lane. It must
+# refuse an unclean staged set and stay silent on a clean one — and it must NEVER mutate, because
+# the fixer does not re-stage and a mid-commit rewrite would land the unfixed bytes.
+if [ -x "${LOOP_KIT:-$HOME/Developer/foundry/loop-kit}/autofix-precommit.sh" ]; then
+    new_fixture
+    (cd "$work/r" && printf 'trailing   \n' > dirty.txt && git add dirty.txt)
+    before="$(cd "$work/r" && shasum -a 256 dirty.txt | cut -d' ' -f1)"
+    out="$(run_commit)"; code=$?
+    after="$(cd "$work/r" && shasum -a 256 dirty.txt | cut -d' ' -f1)"
+    if [ "$code" -eq 0 ]; then
+        fail "autofix trigger: unclean staged set" "commit SUCCEEDED — the autofix lane did not fire"
+    elif ! printf '%s' "$out" | grep -q 'AUTOFIX_REFUSED'; then
+        fail "autofix trigger: refusal not named" "$(printf '%s' "$out" | tail -2)"
+    elif [ "$before" != "$after" ]; then
+        fail "autofix trigger: hook MUTATED the file" "sha $before -> $after; --check must never write"
+    else
+        pass "autofix trigger: refused an unclean staged set, and did not mutate it"
+    fi
+
+    new_fixture
+    (cd "$work/r" && printf 'clean\n' > tidy.txt && git add tidy.txt)
+    out="$(run_commit)"; code=$?
+    if [ "$code" -eq 0 ]; then pass "autofix satisfying: clean staged set commits"
+    else fail "autofix satisfying: clean staged set" "$(printf '%s' "$out" | tail -2)"; fi
+else
+    echo "  witness SKIP  autofix lane (loop-kit absent) — lane reports AUTOFIX_LANE_SKIPPED, not a pass"
+fi
+
 # ---------------------------------------------------------------- verdict
 if [ "$fails" -eq 0 ]; then
-    echo "60-staged-deletion-lane: 1 trigger + 5 satisfying witnesses proven"
+    echo "60-staged-deletion-lane: pre-commit wrapper proven — 2 triggers + 6 satisfying witnesses"
     exit 0
 fi
 echo "60-staged-deletion-lane: $fails witness(es) failed" >&2

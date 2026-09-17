@@ -1,13 +1,47 @@
 #!/usr/bin/env bash
-# Portable stamp wrapper. Resolve the implementation beside the hook path Git chose.
+# jev pre-commit: two lanes, in order of severity. Resolve every implementation beside the hook
+# path Git chose (never from the repo root — a worktree may run this from elsewhere).
+#
+# LANE 1 — staged-deletion survival (house implementation, byte-identical to foundry's).
+#   Refuses a path-limited commit that silently DROPPED a staged deletion whose file is still on
+#   disk. Proof: foundation/gates.d/60-staged-deletion-lane.sh, 1 trigger + 5 satisfying witnesses.
+#
+# LANE 2 — autofix, in --check mode ONLY (report-only, exit 1 when the staged set is not clean).
+#   loop-kit/autofix-precommit.sh can MUTATE files, and this is the one wiring decision worth
+#   arguing: three agents share this worktree, and the fixer does NOT re-stage what it rewrites.
+#   Mutating during a commit would therefore land the UNFIXED bytes and leave a modified file
+#   behind — turning every commit into a dirty tree and failing the end-of-shift clean-tree lane.
+#   So the hook FLAGS and the human/agent fixes explicitly:
+#       ~/Developer/foundry/loop-kit/autofix-precommit.sh --staged --repo .
+#       git add -- <the files it rewrote>          # explicit paths; dcg denies git add -A here
+#   The fixer stays one command away; it never runs behind your back.
+#
+# Both lanes are skipped with a named reason rather than silently when their implementation is
+# missing — an unreachable lane must not read like a pass.
 
 set -euo pipefail
 
-_hookdir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+_hookdir=$(unset CDPATH; cd -- "$(dirname -- "$0")" && pwd)
+_repo=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+
+# ── lane 1: staged-deletion survival ────────────────────────────────────────────────────────────
 _impl="$_hookdir/pre-commit-staged-deletion-survives.sh"
 if [ ! -x "$_impl" ]; then
   printf 'STAGED_DELETION_REFUSED reason=impl-missing path=%s\n' "$_impl" >&2
   exit 1
 fi
+"$_impl" "$@"
 
-exec "$_impl" "$@"
+# ── lane 2: autofix cleanliness (report-only) ───────────────────────────────────────────────────
+_autofix="${LOOP_KIT:-$HOME/Developer/foundry/loop-kit}/autofix-precommit.sh"
+if [ ! -x "$_autofix" ]; then
+  printf 'AUTOFIX_LANE_SKIPPED reason=impl-missing path=%s (set LOOP_KIT)\n' "$_autofix" >&2
+  exit 0
+fi
+
+if ! "$_autofix" --check --staged --repo "$_repo"; then
+  printf '\nAUTOFIX_REFUSED: the staged set is not format-clean. Fix it explicitly:\n' >&2
+  printf '  %s --staged --repo %s\n' "$_autofix" "$_repo" >&2
+  printf '  git add -- <the rewritten paths>   # explicit paths; dcg denies git add -A here\n' >&2
+  exit 1
+fi
