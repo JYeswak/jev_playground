@@ -52,8 +52,22 @@ grades decoration on an unfalsifiable claim.
 
 Gate scripts wired into `foundation/gates.sh`, by basename:
 `10-fixture-integrity.sh`, `20-receipt-freshness.sh`, `30-no-secrets.sh`,
-`40-omp-compact-replay.sh` — plus `commit-msg-verification-level.sh` on the commit edge and
-`sync-docs.sh --check` on the citation edge.
+`40-omp-compact-replay.sh`, `50-house-gates.sh`.
+
+`50-house-gates.sh` wraps the **foundry house gates** against this repo — `dag-validate-gate.sh`
+(our bead store must be a valid DAG before anything dispatches from it), `close-evidence-gate.sh`
+(a bead close must carry its proof, not assert "done"), and `commit-evidence-lint.sh` (a `perf(`
+/ `fix(` subject must carry a quantified delta plus a verification token). They are wrapped, never
+re-implemented; our RED arm delegates to each script's own `--selftest`.
+
+**`neg-evidence-gate.sh` is deliberately NOT wired**, and that is an argued refusal: it enforces
+"a RED tick appended to `NEGATIVE_EVIDENCE.md`" and takes `--verdict` from a tick ledger. This
+lane runs no tick loop, so the gate would have no consumer — and a gate whose only consumer is
+another agent is refused by `value-bearing-gates`. Wire it the day this lane gets a loop driver,
+which is the same day `p12-loop-integrity` stops being N/A.
+
+Plus `commit-msg-verification-level.sh` on the commit edge and `sync-docs.sh --check` on the
+citation edge.
 
 | Gate | Edge it blocks | RED arm (the planted bad) | Wired where |
 |---|---|---|---|
