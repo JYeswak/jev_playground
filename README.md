@@ -353,20 +353,21 @@ bash foundation/gates.sh
 
 ```
 PASS 10-fixture-integrity (0s)
-PASS 20-receipt-freshness (0s)
+PASS 20-receipt-freshness (1s)
 PASS 30-no-secrets (0s)
-PASS 40-omp-compact-replay (2s)
-PASS 50-house-gates (0s)
+PASS 40-omp-compact-replay (0s)
+PASS 50-house-gates (1s)
 PASS 60-staged-deletion-lane (3s)
 PASS 70-tests-registry-sync (0s)
-PASS 80-lane-instrument-selftests (16s)
+PASS 80-lane-instrument-selftests (17s)
 PASS 90-sidecar-verifier-wrapper (0s)
 PASS 95-numerals-ratchet (0s)
 PASS 96-verdict-status-agreement (0s)
+PASS 97-readme-counts (0s)
 gates: ALL GREEN
 ```
 
-Eleven stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
+Twelve stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
 because a gate that cannot fail is not a gate. Re-derive the count from `foundation/gates.d/`; a
 number written here goes stale silently, and this one already did once, when it claimed seven
 stages and nine existed.
