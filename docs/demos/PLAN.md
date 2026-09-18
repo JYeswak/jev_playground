@@ -511,6 +511,56 @@ So **demo-6 returns to HELD on its own merits**, with its own open incumbent sea
 was the lowest-ranked survivor at 330 and it may well die — but it must die on its own evidence,
 not by inheriting a sibling's cause of death.
 
+---
+
+## §3g BOTH HUNTS INDEPENDENTLY BEAT THE ORIGINALS
+
+§3d flagged this as conditional — *"if that holds under a non-author cross-score, duel-1 produced
+the wrong backlog."* It now has **two independent hunts**, not one:
+
+| Hunt | top candidate | score | vs best original (820) |
+|---|---|---:|---|
+| pane 2 (`c33cd3c`, 22,872 ch) | **COD-H1** snapshot-bound completion evidence | **940** | +120 |
+| pane 3 (`6c101d5`, 8,275 ch) | **MU-H1** TODO-judge | **900** | +80 |
+
+Neither pane saw the other's hunt. Both independently produced a candidate above **every one of the
+nine**. That is no longer a single pane's enthusiasm — it is convergent evidence that **duel-1
+ideated inside our own pain and therefore produced a lane-local backlog**, which is exactly what
+§3b predicted would happen and §2 now names as the reason the gauntlet exists.
+
+**Naming collision, disambiguated before it causes a merge error.** Both panes labelled their top
+pick "H1" and they are different candidates. Canonical names from here: **COD-H1 … COD-H5** and
+**MU-H1 … MU-H3**. Nothing may be merged, scored or promoted under a bare "H1".
+
+### MU-H1 TODO-judge, and why its mechanism argument is the strongest in either hunt
+
+> *"a chat model cannot do this well because the value is **calibrated batch judgment with a
+> receipt over hundreds of markers**, not one clever answer — prompting per-TODO has no threshold,
+> no comparability, no audit trail."*
+
+That sentence is the cleanest statement of rung 2 anyone has produced, including me. It names the
+property a chat model lacks (**comparability across a batch, with a threshold and an audit trail**)
+rather than asserting that a judgment model is better. It also states its incumbent search result —
+*"age-trackers and dashboards, none judging truth"* — and ships a reproducing command,
+`todo-judge audit --sample 50`.
+
+### Read the two hunt sizes correctly — this is an instrument trap
+
+Pane 2's hunt is **22,872 chars**; pane 3's is **8,275**. **That gap is not a quality signal.**
+Pane 3 disclosed a **throttle**: *"two search batches throttled"*, and it flagged its unverified
+press links rather than presenting them as researched. Reading the shorter file as weaker work
+would be the same instrument error this session has already made seven times — mistaking an
+artifact of the measuring conditions for a property of the thing measured. **A pane that discloses
+a throttle and marks its unverified citations has produced more trustworthy output per char, not
+less.**
+
+### Consequence for sequencing
+
+Rung 3 stays blocked (§3e). Both hunts' candidates now need **two non-author rung-1 scores**, and
+the authorship map is finally favourable: pane 3 is a non-author of COD-H1…H5, and pane 2 is a
+non-author of MU-H1…H3. Each can grade the other's hunt at arm's length, which is the one thing
+the supersession question in §3e could not get.
+
 
 ## §4 Phase arc
 
