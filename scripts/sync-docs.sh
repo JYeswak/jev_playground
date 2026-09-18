@@ -137,13 +137,21 @@ sync_docs() {
 
 # ---------------------------------------------------------------- git surfaces
 record_repo() { # record_repo <name> <path>   ; path may be workspace-relative or absolute
-  local name="$1" path="$2" abs
+  local name="$1" path="$2" abs rec
   case "$path" in /*) abs="$path" ;; *) abs="$ROOT/$path" ;; esac
+  # The manifest is a PUBLISHED artifact, so it must carry no operator home directory, and a
+  # consumer must be able to re-derive the location. Record repo-relative when the clone is
+  # inside this repo; otherwise substitute the literal string $HOME so the row stays portable.
+  case "$abs" in
+    "$ROOT"/*) rec="${abs#"$ROOT"/}" ;;
+    "$HOME"/*) rec="\$HOME/${abs#"$HOME"/}" ;;
+    *)         rec="$abs" ;;
+  esac
   local pinned upstream_sha behind
   pinned="$(git -C "$abs" rev-parse --short HEAD)"
   upstream_sha="$(git -C "$abs" rev-parse --short FETCH_HEAD 2>/dev/null || echo "$pinned")"
   behind="$(git -C "$abs" rev-list --count "HEAD..FETCH_HEAD" 2>/dev/null || echo 0)"
-  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$name" "$path" "$pinned" "$upstream_sha" "$behind" "$(now)" >> "$REPO_MANIFEST"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$name" "$rec" "$pinned" "$upstream_sha" "$behind" "$(now)" >> "$REPO_MANIFEST"
   if [ "${behind:-0}" -gt 0 ]; then
     echo "   $name @ $pinned  ** $behind commit(s) behind $upstream_sha — SHA move is a human decision, not this script's **"
   else

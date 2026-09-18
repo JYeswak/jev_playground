@@ -7,7 +7,7 @@ Handoff for the next agent in this lane. This session mutated substrate, so the 
 
 ## WHAT
 
-Turned `/Users/josh/Developer/jev` from a loose directory of vendored clones into a governed lane:
+Turned this repo from a loose directory of vendored clones into a governed lane:
 
 1. **`AGENTS.md`** authored against the mirror-derived canonical shape (`fh agents` skeleton
    `content_id=095decf2…`, `source_rev=bb59539…`), with `§0` (the non-negotiables index, which is
@@ -29,7 +29,8 @@ Turned `/Users/josh/Developer/jev` from a loose directory of vendored clones int
 
 **Substrate you must know about before you touch anything:**
 
-- **`core.hooksPath` is the ABSOLUTE `/Users/josh/Developer/jev/githooks`.** A relative value
+- **`core.hooksPath` is this clone's ABSOLUTE `githooks/`** (re-derive: `git config
+  core.hooksPath`). A relative value
   resolves per-worktree and every worker lane would commit unhooked. Two hooks live there:
   `commit-msg` (refuses a subject with no verification level: `pending|selftest|test|mutation|
   oracle|live`) and `pre-commit` → `pre-commit-staged-deletion-survives.sh`. Both byte-identical to

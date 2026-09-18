@@ -176,14 +176,17 @@ detection and five fail-closed arms) to fix a real measured gap: the conductor w
 20-minute ticks, reported pane 3 as "still working" while all three of its units sat committed in
 `git log`, and only a human chase surfaced it.
 
-**Then I read the live crontab.** `/Users/josh/.local/bin/fleet-idle-monitor` already exists — a
+**Then I read the live crontab.** `$HOME/.local/bin/fleet-idle-monitor` already exists — a
 6.98 MB arm64 Mach-O binary, installed 2026-09-04 — invoked by **both** other lanes on identical
 rows:
 
 ```
 8,18,28,38,48,58 * * * * cd <repo> && FLEET_SESSION=<session> timeout 480 \
-  /Users/josh/.local/bin/fleet-idle-monitor --report-only >> <log> 2>&1
+  $HOME/.local/bin/fleet-idle-monitor --report-only >> <log> 2>&1
 ```
+
+(The live row spells the path out absolutely, because cron does not expand `$HOME`. Substituted
+here so this file carries no operator home directory — the row is otherwise verbatim.)
 
 It ran against jev **unmodified on the first try** (`FLEET_SESSION=jev`), and in cron's exact
 environment (`env -i` + the four crontab declarations), emitting per-pane rows with pane ids:
