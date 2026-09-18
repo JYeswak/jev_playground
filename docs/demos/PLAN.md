@@ -413,6 +413,57 @@ produced the wrong backlog** and the gauntlet's first real output is that ruling
 **unscored by a non-author** and enter at rung 1 like everything else — a self-graded 940 is a
 hypothesis, not a rank.
 
+---
+
+## §3e RUNG 3 IS BLOCKED — do not build the second-best thing
+
+**State at 2026-09-18 03:1xZ.** Rung 2 cleared on structure for **demo-4 (820)**, **demo-5 (755)**
+and **demo-2 (700)** (`docs/demos/duel-2/RUNG2_JEV_SHAPE_COD.md`, `36a142b`, 15,554 chars).
+demo-9 was **recused**, correctly: its proposer cannot grade it and rung 1 already measured what
+self-grading does there (820 self vs 550 non-author).
+
+So demo-4 is the leading candidate for rung 3 — **and rung 3 is blocked anyway.**
+
+**Why.** The duel-2 hunt produced five candidates at **915–940**, all above demo-4's 820. Spending
+days of rung-3 effort on an 820 while a 940 sits unscored is building the second-best thing. **Rung
+3 does not open until H1–H5 have cleared rung 1 with two non-author scores.** A self-graded 940 is
+a hypothesis; it is also not something you ignore because it is inconvenient.
+
+### The supersession question, and why I am not ruling on it
+
+**H1 "snapshot-bound completion evidence" (940) may supersede demo-4 foreman-lite (820) rather than
+compete with it.** Both attack false completion. The differences that matter:
+
+| | demo-4 foreman-lite | H1 snapshot-bound evidence |
+|---|---|---|
+| judges | bead ACCEPTANCE vs the diff | any CLAIM vs machine-observable receipts |
+| needs | `br` and a bead graph | a transcript, a revision, command receipts |
+| mechanism | typed completion verdict + checklist | **claims bound to the revision they were made at**, so a later mutation invalidates them |
+| install | requires the tracker | no service, no key, no tracker |
+
+If H1 subsumes demo-4, the tracker coupling that cost demo-4 points in every ranking disappears and
+one candidate should be withdrawn. If they are genuinely distinct, both stay.
+
+**I am not the one to decide this, and the reason is on the record.** I have made exactly this
+"are these the same thing" error **twice today**: the convergence headline that called four
+adjacent pairs identical (2 of 4 survived an arms-length audit), and the B1 rejection that
+conflated three distinct ideas and had to be un-retired. A third instance of the same judgment from
+the same source is not evidence.
+
+**And no non-author exists.** Pane 3 authored demo-4 (as MU-3); pane 2 authored H1. Neither can
+rule.
+
+**Procedure instead — each author argues for the OTHER's candidate.** Pane 3 must write the
+strongest case that H1 supersedes demo-4; pane 2 must write the strongest case that demo-4 survives
+H1. Adjudication then runs on the **arguments**, not on my similarity intuition:
+- **Both concede** ⇒ supersession; withdraw the weaker and record it with a retry condition.
+- **Both hold** ⇒ genuinely distinct; both stay at their own rungs.
+- **Split** ⇒ the conceding side loses its candidate, and the reasoning is recorded either way.
+
+This is the steelman pattern turned on a sequencing decision, and it uses authorship productively:
+an author arguing for their rival's idea is the one configuration where self-interest points at
+the truth.
+
 
 ## §4 Phase arc
 
