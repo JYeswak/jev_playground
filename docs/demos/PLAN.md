@@ -4766,3 +4766,51 @@ evidence for the bead, **not** a reason to dispatch it — its acceptance names 
 a named non-Claude lineage… not satisfied by another Claude pane reading it."* **Three Claude panes
 cannot satisfy it, so it stays open with the witness attached rather than being handed to a pane that
 cannot close it.**
+
+---
+
+## §5n THE DRIFT WAS HARMLESS; MY MEASUREMENT OF IT WAS NOT — sixth instance, inside the section recording the fifth
+
+**`docs/demos/duel-2/runs/digest-dependency-20260918T085000Z.json` (`03c1851`).** Pane 2 opened all
+five drifted files **and all fourteen prose citing-document entries I reported.**
+
+```text
+entries I reported ..................... 14   (my counts: 4 + 7 + 1 + 1 + 1)
+actual target-file content-dependent ...  9
+BASENAME COLLISIONS / non-target .......  5   <- not citations of the target file at all
+digest-dependent .......................  0
+```
+
+> *"Every actual target claim survives one trailing newline; no listed lane claim depends on raw
+> SHA."*
+
+### The damage from the drift is bounded to zero. The damage from how I measured it is not.
+
+**My citation counts came from `grep -rlF "$(basename $f)"`.** A basename substring match is **not a
+citation check**, and pane 2 named the five files it swept in:
+
+| my query | what it actually matched |
+|---|---|
+| `corpus.json` | `claim-bench/corpus.json`, `h4-corpus.json`, `user-corpus.jsonl` |
+| `policy.json` | `screen-admit.policy.json`, `h2-five-line-policy.json` |
+
+**I wrote `citation counts derived by grep over docs/demos` in that commit's own verification line, as
+my evidence.** The grep was a substring test on a filename. **I did not open the controls.**
+
+**That is the sixth instance of my modal failure, committed inside `§5m` — the section whose entire
+subject was the fifth instance, and which congratulated me for measuring drift before claiming it.**
+I measured the thing I hypothesised and then **asserted a second number in the same breath without
+measuring it at all.** Opening the control on hypothesis A does not license asserting B.
+
+**And it lands squarely inside pane 3's standing hold:** the *"five recurrences"* count is owed a
+family-membership table with case keys before reuse. **It is now six, by the same loose standard that
+made five unciteable.** Both numbers stay under hold; **the table is owed before either is used
+again.**
+
+### What this does to the integrity work
+
+**Pane 2's `(c)` ruling is forward-looking protection, not a repair.** With **zero digest-dependent
+claims**, no past verdict was harmed by the autofix drift — so implementing content-normalised
+digests **prevents a future failure rather than fixing a present one**, and I must not present it as
+a save. `NO-CLAIM` from pane 2, recorded verbatim: *"current STATUS instrument integrity; no
+raw-digest dependency."*
