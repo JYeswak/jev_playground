@@ -31,7 +31,9 @@
     "quotient": 0.000446951774,
     "percent": 0.0446951774,
     "cited_as": "0.0447pct",
-    "basis": "counterfactual -- STATED here because the choice is not inferable from the row"
+    "basis": "counterfactual -- STATED here because the choice is not inferable from the row",
+    "rounded_4sf": 0.0447,
+    "rounding_rule": "percent rounded to four significant figures; this is the value the STATUS reason cites, stated here as a DERIVATION OUTPUT rather than only as a quotation of the row -- see circular_opening_disclosed"
   },
   "alternate_basis_disclosed": {
     "denominator_field": "totals.actualSpend",
@@ -50,5 +52,11 @@
     "This receipt does not re-rule the kill. Pane 3 ruled RULED_OUT survives; this states the number only.",
     "It does not claim 0.0447% is materially different from 0.047% for any threshold -- pane 3's ruling is that no plausible rung-4 threshold separates them.",
     "It does not touch the 13 other assertion sites; pane 3's site map assigns 9 to their authors and 4 to itself."
-  ]
+  ],
+  "circular_opening_disclosed": {
+    "finding": "When STATUS first pointed here, verify-reason-numerals.sh went GREEN on four sites that were all RESTATEMENTS OF THE CITATION -- the quoted reason string, prose about the figure, a field literally named cited_as, and a no-claim sentence. The derivation's own output was 0.0446951774, and 0.0447 was stated nowhere as a derived value. A receipt that merely QUOTES a claim satisfied the gate.",
+    "class": "the quoted-prose false positive pane 2 named as untested in docs/demos/duel-2/runs/audit-q105-numerals-20260918T141500Z.json: 'digit-bounded matching is sufficient for literal opening only, not semantic field correspondence'",
+    "fix_applied_here": "rounded_4sf is now an asserted derivation OUTPUT, so the numeral opens against a derivation field rather than a quotation of the row",
+    "residual": "the gate weakness is UNCHANGED by this file: any receipt quoting its own row's reason still opens every numeral in it. Dispatched for ruling, not fixed here."
+  }
 }
