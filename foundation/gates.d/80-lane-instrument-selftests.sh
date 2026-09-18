@@ -106,9 +106,50 @@ for s in "${suites[@]}"; do
     rc=1
   fi
 done
+# SECOND SCAN SET — the stages' OWN selftests, which nothing invoked until now.
+#
+# Measured 2026-09-18 while wiring stage 95: EIGHT stages in gates.d ship a `--selftest`, and NOT ONE
+# of them was ever run by anything. The glob above discovers scripts/selftest-*.sh and stops there, so
+# a selftest co-located with its stage was invisible — the exact defect pane 3 named for this stage
+# once already ("a 4th selftest lands silently unrun"), recurring in a different directory because the
+# fix was applied to one glob instead of to the idea.
+#
+# This matters most for stage 95, whose arms pane 3 ruled must NOT be hand-run
+# (stage95-arms-ruling-20260918T162059Z.json): "a comm-direction inversion would fail toward allowlist
+# SILENTLY". Verified by mutation — swapping its two comm(1) directions leaves the gate green while it
+# reports the opposite of the truth, and two of its five arms catch it.
+#
+# Support is DETECTED, never listed: a stage is only invoked with --selftest if its source contains
+# the guard. Passing --selftest to a stage that ignores unknown args would run the STAGE and report
+# its pass as an arm's pass, which is laundering.
+stage_selftests=()
+for p in "$root"/foundation/gates.d/*.sh; do
+  [ -e "$p" ] || continue
+  case "$(basename "$p")" in 80-*) continue ;; esac   # never recurse into this stage
+  grep -qE '"\$\{1:-\}"[[:space:]]*(==|=)[[:space:]]*.--selftest' "$p" || continue
+  stage_selftests+=("$p")
+done
+
+if [ "${#stage_selftests[@]}" -eq 0 ]; then
+  echo "  ERROR   no gates.d stage exposes --selftest — an empty scan set is NOT a pass (RULE 1)"
+  rc=1
+else
+  for p in "${stage_selftests[@]}"; do
+    n="gates.d/$(basename "$p")"
+    if out=$(cd "$root" && bash "$p" --selftest 2>&1); then
+      printf '  PASS    %-44s %s\n' "$n --selftest" "$(printf '%s\n' "$out" | tail -1)"
+    else
+      printf '  RED     %-44s %s\n' "$n --selftest" "$(printf '%s\n' "$out" | tail -1)"
+      rc=1
+    fi
+  done
+fi
+
 
 # Count DERIVED from the glob, never written down — the "3 suites PASS" literal this replaced would
 # have staled on the fourth suite, which pane 3 flagged as cosmetic and is the same class as every
 # other count this session got wrong.
-[ "$rc" -eq 0 ] && printf '80-lane-instrument-selftests: %d suites PASS (hermetic; no shared state written)\n' "${#suites[@]}"
+# BOTH counts, because reporting only the first made the line WRONG the moment the second scan set
+# landed: it printed "4 suites PASS" while eleven had run. Same class as the literal it replaced.
+[ "$rc" -eq 0 ] && printf '80-lane-instrument-selftests: %d instrument suite(s) + %d stage selftest(s) PASS (hermetic; no shared state written)\n' "${#suites[@]}" "${#stage_selftests[@]}"
 exit "$rc"

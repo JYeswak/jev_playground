@@ -162,6 +162,29 @@ things, and mixing them is how a number gets believed harder than it earned.
 ## Quick start
 
 ```bash
+./scripts/quickstart.sh
+```
+
+```
+quickstart — node v24.4.1, no install step, no network, no API key
+
+=== routing-backtest    would a cheap-model router have saved money on recorded traffic
+=== routing-mutations   whether that demo's tests can still fail — seven planted mutations
+=== usage-shape         how much of a coding agent's context is retransmitted each turn
+=== retransmit-whatif   what a retransmission cap would have cost, per turn
+=== probe-replay        one recorded Jev judgment, decoded offline with no key
+
+quickstart: 5 passed, 0 failed
+```
+
+**That is the whole setup.** Every demo is zero-dependency — `node --test`, no install, no network,
+no key, no state from this lane. Measured from a frozen clone of a pinned commit, which is the
+environment the gate suite below fails in, and it goes red on a real defect: planting a throw in one
+demo's test reports `4 passed, 1 failed`, names the demo, and exits 1.
+
+Then the gate suite, which is a different thing with a different answer:
+
+```bash
 bash foundation/gates.sh
 ```
 
@@ -175,18 +198,19 @@ PASS 60-staged-deletion-lane (3s)
 PASS 70-tests-registry-sync (0s)
 PASS 80-lane-instrument-selftests (12s)
 PASS 90-sidecar-verifier-wrapper (1s)
+PASS 95-numerals-ratchet (0s)
 gates: ALL GREEN
 ```
 
-Nine stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
+Ten stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
 because a gate that cannot fail is not a gate. Re-derive the count from `foundation/gates.d/`; a
 number written here goes stale silently, and this one already did once, when it claimed seven
 stages and nine existed.
 
-**On a fresh clone you get seven of nine, not `ALL GREEN`, and the output above is from a developed
+**On a fresh clone you get eight of ten, not `ALL GREEN`, and the output above is from a developed
 checkout.** Measured by running the suite inside a frozen clone of a pinned commit
 (`scripts/verify-frozen.sh`), which exits non-zero for that reason: stages
-10/20/30/60/70/80/90 pass from a bare clone. Stage 40 needs
+10/20/30/60/70/80/90/95 pass from a bare clone. Stage 40 needs
 `npm install` inside `compaction/`, so that stage does need the network, contrary to what this line
 claimed until it was measured. Stage 50 needs a Beads DAG imported with `br import`, since only
 `.beads/issues.jsonl` is tracked and the database is not. Neither is a gate defect; both are state a
