@@ -72,7 +72,7 @@ this lane's vocabulary.
 | Candidate | Score | Why, with the number | Retry |
 |---|---|---|---|
 | **demo-1** route-backtest | 520 | Died at **rung 4**: **0.047%** savings vs upstream's −60%. Then found to make **zero Jev calls** behind a hand-written token heuristic. | none — surface owned by LangChain `ModelRouterMiddleware` (§3t) |
-| **MU-H1** todo-judge | 820 | **17 markers across 283,786 KLOC**; density 0.0599/KLOC; 13 of 16 repos zero; **183 short** of its own 200-marker study (R14) | ≥5 legacy repos (≥100 KLOC, ≥5 yr, ≥20 contributors) at ≥1.0 markers/KLOC |
+| **MU-H1** todo-judge | 820 | **17 markers across 283.786 KLOC** (283,786 lines); density 0.0599/KLOC; 13 of 16 repos zero; **183 short** of its own 200-marker study (R14) | ≥5 legacy repos (≥100 KLOC, ≥5 yr, ≥20 contributors) at ≥1.0 markers/KLOC |
 | **COD-H3** price-drift auditor | 890 | **4 of 5 stages deterministic**, and 100% of the verified pain (LiteLLM #38064, 262% excess) lives in those four. The lone Jev stage names a tier a **committed table** already names (R15) | T1 deterministic tooling outside the lane; T2 re-file as router with a calibration wedge + misclassification fixture |
 | **demo-8** credential screen | 100 | Structural safety leak | none stated |
 
@@ -502,8 +502,9 @@ COD-H3's Fork B arriving at the second-place candidate. **Claim: the unknown-cre
 
 ### Ruled out — 4, every one now carrying a checkable predicate
 
-demo-1 (died at **0.047%**, then found to make **zero Jev calls**) · MU-H1 (**17 markers / 283,786
-KLOC**) · COD-H3 (**4 of 5 stages deterministic**) · demo-8 (structural safety leak). **Two of the
+demo-1 (died at **0.0447%** on the receipt basis, then found to make **zero Jev calls**) · MU-H1
+(**17 markers / 283.786 KLOC**, i.e. 283,786 lines) · COD-H3 (**4 of 5 stages deterministic**) ·
+demo-8 (structural safety leak). **Two of the
 four were killed by a measurement rather than an opinion.** The retry predicates were **absent on
 three of them until a non-author audit caught it** — a §3c violation inside the document that
 enforces §3c.

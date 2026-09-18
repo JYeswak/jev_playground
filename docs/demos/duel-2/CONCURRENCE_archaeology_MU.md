@@ -48,7 +48,7 @@ own candidate is fine; a conductor killing another pane's candidate needs non-au
 
 ## Row 4 — MU-H1-todo-judge (author pane3)
 
-- **Grounds:** denominator too thin (17 markers / 283,786 KLOC; 183 short of the 200-study).
+- **Grounds:** denominator too thin (17 markers / 283.786 KLOC; 183 short of the 200-study).
 - **Kill receipt:** `docs/demos/duel-2/runs/muh1-marker-census-20260918T034820Z.json`
   (interpretation result `DENOMINATOR_TOO_THIN_FOR_LABELLED_HALF`; no actor key — attribution via
   NEGATIVE_EVIDENCE R14 "run by a non-author" and PLAN §3l "run by pane 2 as a non-author of MU-H1"),
