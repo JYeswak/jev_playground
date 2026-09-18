@@ -19,4 +19,4 @@
 # candidate<TAB>numeral<TAB>class<TAB>ruling_receipt
 demo-7-signals-starter	3.5	MISPOINTED_RECEIPT_RULED_RECITE_ELSEWHERE	docs/demos/duel-2/runs/demo7-muh1-hits-20260918T132451Z.json
 demo-7-signals-starter	76.25	LEGITIMATE_ROUNDING_AND_UNIT_CHANGE	docs/demos/duel-2/runs/numerals-hold-ruling-20260918T161328Z.json
-MU-H1-todo-judge	283	LEGITIMATE_UNIT_CHANGE_KLOC	docs/demos/duel-2/runs/numerals-hold-ruling-20260918T161328Z.json
+MU-H1-todo-judge	283	DERIVED_TOTAL_NOT_STORED_SUM_OF_16_REPO_KLOC	docs/demos/duel-2/runs/numerals-hold-ruling-20260918T161328Z.json
