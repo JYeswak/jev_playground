@@ -18,7 +18,19 @@ const events = fixtureBytes
   .filter((line) => line.trim())
   .map((line) => JSON.parse(line) as OmpEvent);
 const adapted = adaptOmpTranscript(events);
-const messages = adapted.messages;
+
+function relativizeMachinePaths(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(relativizeMachinePaths);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, relativizeMachinePaths(entry)]),
+    );
+  }
+  if (typeof value === 'string') return value.replace(/^\/Users\/[^/]+\/Developer\/jev\//, '');
+  return value;
+}
+
+const messages = relativizeMachinePaths(adapted.messages) as Message[];
 const compactOptions = {
   keepThreshold: 0.5,
   maxStateTokens: 20_000,
