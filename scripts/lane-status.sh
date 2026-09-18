@@ -140,6 +140,24 @@ case "$JEV_TRANSIENT_ATTEMPT" in
   *) printf 'lane-status: JEV_TRANSIENT_ATTEMPT must be 1 or 2, got %s\n' \
        "$JEV_TRANSIENT_ATTEMPT" >&2; exit 2 ;;
 esac
+
+# SELF-FINGERPRINT — pane 3, RULE_broadcast_discipline_MU.md (0ae3991). It RETIRED its own broadcast
+# discipline (0/9 compliance by the only obligated party, and "hub sends leave NO DURABLE QUERYABLE
+# TRACE", so the rule "can neither fire nor be audited — prose by construction, not by neglect") and
+# replaced it with this, which needs nobody to remember anything:
+#
+#   "lane-status.sh already fingerprints its evidentiary inputs BUT NOT ITS OWN CODE — the one input
+#    that can splice it."
+#
+# Bash reads a script INCREMENTALLY, so editing this file while a pane runs it splices new bytes into
+# a live interpreter. The demonstrated case was loud (a syntax error in foundation/gates.sh, caused by
+# the conductor); the dangerous case is QUIET — half-old/half-new logic reporting wrong verdicts as
+# fact. A spliced interpreter invalidates EVERY claim below, so this ranks ABOVE the input transient.
+# Overridable ONLY for the known-bad arm, exactly like JEV_STATUS / JEV_SIDECAR / JEV_SELFTEST_EXTRA_
+# SUITE. Racing a mid-run edit against a ~1s scan produced an arm that proved nothing twice in this
+# session, and tuning the sleep until it passed would be a witness that passes by construction. The
+# override is FAIL-SAFE: it can only manufacture a FALSE TRANSIENT (no verdict), never a false pass.
+SELF_BEFORE="${JEV_SELF_DIGEST_OVERRIDE:-$(norm_digest "$0")}"
 FP_BEFORE="$(fingerprint)"
 printf 'JEV LANE STATUS  %s  HEAD=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(git rev-parse --short HEAD)"
 printf '%s\n' "----------------------------------------------------------------------"
@@ -364,6 +382,18 @@ fi
 # foundation/gates.sh caused syntax error mid-run, not a runtime sample" — and that peer was the
 # conductor, editing a shared script while a pane executed it. One tick earlier this risk was
 # recorded here as having no witness.
+# SELF FIRST: a spliced interpreter invalidates every claim above, including the transient check
+# itself, so this is tested before the inputs. Exit 11, adjacent to 10 and in the same family: NOT a
+# pass, NOT a RED, NO VERDICT.
+SELF_AFTER="$(norm_digest "$0")"
+if [ "$SELF_BEFORE" != "$SELF_AFTER" ]; then
+  printf '\n%s\n' "----------------------------------------------------------------------"
+  printf 'UNSTABLE-SELF: this script'"'"'s own bytes changed while it was running (%s -> %s).\n' \
+    "$SELF_BEFORE" "$SELF_AFTER"
+  printf 'NO VERDICT is reported. Bash reads scripts incrementally, so the logic that produced the\n'
+  printf 'output above may be half-old and half-new. Re-run once the edit has settled.\n'
+  exit 11
+fi
 FP_AFTER="$(fingerprint)"
 if [ "$FP_BEFORE" != "$FP_AFTER" ]; then
   if [ "${JEV_TRANSIENT_ATTEMPT}" -ge 2 ]; then

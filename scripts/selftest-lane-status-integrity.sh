@@ -34,6 +34,10 @@ REPO="${JEV_REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 LS="$REPO/scripts/lane-status.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 fail=0
+# Transients are tallied SEPARATELY and still exit nonzero. Counting them as passes would let a peer
+# commit launder an unverified arm into a green suite, which is the laundering the whole transient
+# contract exists to prevent.
+transient=0
 
 mk() { # $1=receipt body [$2=verdict] [$3=kill_concurrence] [$4=receipt_type] -> 10-col fixture
   printf '%s' "$1" > "$TMP/receipt.json"
@@ -140,40 +144,95 @@ expect 'ARM 14 receipt_type EMPTY' 9 'not in enum' 'empty fails closed, never in
 # stable fixture, so there is no sleep and no race — the shape I failed to build when I tried to time
 # a mutation against a 0.43s scan and got an arm that proved nothing.
 
+# HEAD-BRACKETED, with one bounded retry — pane 3, 4221cc6: "my runs HEAD-bracketed; ARMS DO NOT — a
+# concurrent lane commit mid-arm drives attempt-2 to rc=10 and FAILS THE ARM SPURIOUSLY. Windows are
+# ~1s in a lane committing every few minutes: rare, real, and INDISTINGUISHABLE FROM A TRUE FAILURE
+# without bracketing." The fingerprint binds git HEAD, so a peer commit during the arm is exactly the
+# transient the thing under test exists to report — and an arm that cannot tell that apart from a
+# defect is the false-RED class this lane calls worse than a missed trip.
+#
+# The retry is BOUNDED AT ONE, mirroring the contract under test. A second movement is reported as
+# TRANSIENT and counted in its own tally: NOT a pass, NOT a fail. The suite exits nonzero on it, so a
+# transient can never be read as a clean run.
+bracketed_arm() { # $1=label $2=want_rc $3=forbidden_pattern $4=pass_note
+  local attempt=1 h0 h1 out rc
+  while :; do
+    h0=$(git -C "$REPO" rev-parse HEAD 2>/dev/null)
+    out=$(JEV_TRANSIENT_ATTEMPT=2 run); rc=$?
+    h1=$(git -C "$REPO" rev-parse HEAD 2>/dev/null)
+    [ "$h0" = "$h1" ] && break
+    if [ "$attempt" -ge 2 ]; then
+      printf 'TRANS %-48s HEAD moved during both attempts (%s -> %s); NOT a pass, NOT a fail\n' \
+        "$1" "${h0:0:7}" "${h1:0:7}"
+      transient=$((transient+1)); return
+    fi
+    attempt=2
+  done
+  if [ "$rc" = "$2" ] && ! printf '%s\n' "$out" | grep -q "$3"; then
+    printf 'PASS  %-48s rc=%s %s\n' "$1" "$rc" "$4"
+  else
+    printf 'FAIL  %-48s rc=%s (want %s) or forbidden pattern %s present\n' "$1" "$rc" "$2" "$3"
+    fail=$((fail+1))
+  fi
+}
+
 mk '{"a":1}'
-out=$(JEV_TRANSIENT_ATTEMPT=2 run); rc=$?
-if [ "$rc" = 0 ] && ! printf '%s\n' "$out" | grep -q '^SNAPSHOT MOVED'; then
-  printf 'PASS  %-48s rc=0 stable second attempt accepted, silent\n' 'ARM 15 attempt=2, stable clean'
-else
-  printf 'FAIL  %-48s rc=%s (want 0) or a notice was printed\n' 'ARM 15 attempt=2, stable clean' "$rc"
-  fail=$((fail+1))
-fi
+bracketed_arm 'ARM 15 attempt=2, stable clean' 0 '^SNAPSHOT MOVED' 'stable second attempt accepted, silent'
 
 # The half that matters most: a stable second attempt's RED is ACCEPTED, not laundered by the
 # transient class. Pane 2's spec: "a stable second snapshot is validated EVEN IF RED."
 mk '{"a":1}'; printf '{"a":2}' > "$TMP/receipt.json"
-out=$(JEV_TRANSIENT_ATTEMPT=2 run); rc=$?
-if [ "$rc" = 4 ] && ! printf '%s\n' "$out" | grep -q '^TRANSIENT_UNSTABLE'; then
-  printf 'PASS  %-48s rc=4 settled RED accepted, not laundered\n' 'ARM 16 attempt=2, stable drifted'
-else
-  printf 'FAIL  %-48s rc=%s (want 4) or it was called transient\n' 'ARM 16 attempt=2, stable drifted' "$rc"
+bracketed_arm 'ARM 16 attempt=2, stable drifted' 4 '^TRANSIENT_UNSTABLE' 'settled RED accepted, not laundered'
+
+# ARM 17 — the changed-paths EXTRACTOR. It EXTRACTS THE PRODUCTION SED FROM lane-status.sh AT TEST
+# TIME rather than carrying a copy, which was pane 3's finding on the first version
+# (audit-arms-15-17-20260918T122235Z.json, 4221cc6, REAL_DEFECT_LATENT): "ARM 17 feeds a HAND-WRITTEN
+# line through a HAND-COPIED sed. If lane-status.sh's sed changes again, the arm keeps passing on its
+# frozen pair while production diverges — the stale-assertion class ONE LEVEL UP. b031ffb's defect was
+# an un-re-run assertion; THIS IS AN ASSERTION THAT CANNOT OBSERVE THE NEXT CHANGE."
+#
+# Its proposed honest form, implemented here: pull the expression out of the source and apply it to
+# the fixture line. A format change now FAILS this arm until a human updates the fixture — the forced
+# re-examination, not a convenience. If the expression cannot be located at all that is ALSO a FAIL:
+# an arm that silently stops testing anything is the defect it exists to catch.
+fpline='raw:0123456789abcdef norm:fedcba9876543210  docs/demos/x.json'
+prod_sed=$(sed -n "s/.*| *sed -n '\(.*\)' *| *sort -u.*/\1/p" "$REPO/scripts/lane-status.sh" | head -1)
+if [ -z "$prod_sed" ]; then
+  printf 'FAIL  %-48s could not extract the production sed from lane-status.sh\n' \
+    'ARM 17 changed-paths extractor'
   fail=$((fail+1))
+else
+  got=$(printf '%s\n' "< $fpline" | sed -n "$prod_sed")
+  if [ "$got" = 'docs/demos/x.json' ]; then
+    printf 'PASS  %-48s production sed extracted and applied\n' 'ARM 17 changed-paths extractor'
+  else
+    printf 'FAIL  %-48s got %s — production sed and this fixture have diverged\n' \
+      'ARM 17 changed-paths extractor' "'${got:-<empty>}'"
+    fail=$((fail+1))
+  fi
 fi
 
-# ARM 17 — the changed-paths EXTRACTOR, unit-tested against the live fingerprint format. This is the
-# arm that would have caught b031ffb's functional defect: 8459b1a changed the fingerprint lines to
-# `raw:<hex> norm:<hex>  <path>` and left the sed matching the old shape, so Changed-paths was ALWAYS
-# EMPTY while a commit message claimed the path was named. A format change invalidated an assertion
-# nobody re-ran; this arm re-runs it.
-fpline='raw:0123456789abcdef norm:fedcba9876543210  docs/demos/x.json'
-got=$(printf '%s\n' "< $fpline" | sed -n 's/^[<>] *raw:[0-9a-f]* norm:[0-9a-f]*  //p')
-if [ "$got" = 'docs/demos/x.json' ]; then
-  printf 'PASS  %-48s extracts the path from the live format\n' 'ARM 17 changed-paths extractor'
+# ARM 18 — UNSTABLE-SELF. Pane 3 retired its own broadcast discipline (0/9 compliance, and hub sends
+# leave no auditable trace) and replaced it with a mechanism: lane-status fingerprints its inputs but
+# not its own code, "the one input that can splice it". This arm proves the branch DETERMINISTICALLY
+# via JEV_SELF_DIGEST_OVERRIDE, because racing a mid-run edit against a ~1s scan produced an arm that
+# proved nothing twice in this session and tuning the sleep until it passed would be a false witness.
+# The override is fail-safe: it can only manufacture a FALSE TRANSIENT, never a false pass.
+mk '{"a":1}'
+out=$(JEV_SELF_DIGEST_OVERRIDE=0000000000000000 run); rc=$?
+if [ "$rc" = 11 ] && printf '%s\n' "$out" | grep -q '^UNSTABLE-SELF'; then
+  printf 'PASS  %-48s rc=11 spliced self reports NO VERDICT\n' 'ARM 18 UNSTABLE-SELF'
 else
-  printf 'FAIL  %-48s got %s — extractor and fingerprint format have diverged\n' \
-    'ARM 17 changed-paths extractor' "'${got:-<empty>}'"
+  printf 'FAIL  %-48s rc=%s (want 11) or no UNSTABLE-SELF line\n' 'ARM 18 UNSTABLE-SELF' "$rc"
   fail=$((fail+1))
 fi
 printf '\n%s\n' '----------------------------------------------------------------------'
-[ "$fail" = 0 ] && { printf 'OK: all four gates discriminate on all 17 arms.\n'; exit 0; }
+if [ "$fail" = 0 ] && [ "$transient" = 0 ]; then
+  printf 'OK: all four gates discriminate on all 18 arms.\n'; exit 0
+fi
+if [ "$fail" = 0 ]; then
+  printf 'TRANSIENT: %d arm(s) could not be verified — HEAD moved during both attempts.\n' "$transient"
+  printf 'This is NOT a pass. Re-run when the lane settles; nothing here is a defect claim.\n'
+  exit 6
+fi
 printf 'FAIL: %d arm(s) did not discriminate.\n' "$fail"; exit 1
