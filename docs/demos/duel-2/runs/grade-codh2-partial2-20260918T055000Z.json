@@ -1,0 +1,75 @@
+{
+  "schema": "jev.codh2.partial2-grade.v1",
+  "generated_at": "2026-09-18T05:24:41Z",
+  "target_receipt": "docs/demos/duel-2/runs/codh2-rung3-partial2-20260918T055000Z.json",
+  "target_receipt_sha256": "31aed5963e05b396d9099a121ab54043f086d1ea6d9ebe675fbd629293f60ca4",
+  "target_receipt_bytes": 1342,
+  "build": {
+    "contract": "d231432",
+    "implementation": "0f6cb2d",
+    "policy": "demos/preaction-abstention/policy.json"
+  },
+  "internal_consistency": {
+    "calls_claimed": 6,
+    "probe_plus_cases": "1 + 5",
+    "cases": 5,
+    "p_range": [
+      0.02,
+      0.94
+    ],
+    "outcomes": {
+      "pass": 1,
+      "withhold": 2,
+      "escalate": 2
+    },
+    "mismatches": [
+      "boundary-high"
+    ],
+    "thresholds": {
+      "pass_at_or_above": 0.75,
+      "escalate_below": 0.4,
+      "withhold": "[0.40,0.75)"
+    },
+    "boundary_high": {
+      "p": 0.74,
+      "outcome": "withhold",
+      "expected": "pass",
+      "explanation": "policy threshold is 0.75; the one-point mismatch is an expected threshold boundary, not evidence of miscalibration at N=5"
+    }
+  },
+  "findings": [
+    {
+      "id": "P1",
+      "status": "HOLD",
+      "area": "pin verification",
+      "detail": "policy and source client pin model=jev-1.13.0 and POST the real endpoint, but the partial2 receipt only asserts requested/resolved identity. It contains no raw request, response model echo, request IDs, or independent pin-probe artifact."
+    },
+    {
+      "id": "P2",
+      "status": "HOLD",
+      "area": "live versus canned provenance",
+      "detail": "source code separates --asker jev from cannedAsker, so reuse is not the normal live path; however, the receipt has no per-call evidence proving the five probabilities came from five live responses rather than copied values. The claim is plausible but not independently receipt-proven."
+    },
+    {
+      "id": "P3",
+      "status": "PASS_WITH_LIMIT",
+      "area": "boundary explanation",
+      "detail": "0.74 is below the committed 0.75 pass threshold and maps to withhold exactly. N=5 cannot establish calibration, accuracy, coverage, or whether the boundary is well chosen; the receipt explicitly makes no such claim."
+    },
+    {
+      "id": "P4",
+      "status": "PASS",
+      "area": "wedge outcomes",
+      "detail": "Pass, withhold, and escalate are distinct in the five cases; the receipt is not a single-threshold block-only result."
+    },
+    {
+      "id": "P5",
+      "status": "UNVERIFIED",
+      "area": "UBS",
+      "detail": "Q23 receipt does not carry the prior UBS provenance question; Q17 grade remains the source of that standing risk."
+    }
+  ],
+  "overall": "PARTIAL_ACCEPTED_HELD_FOR_CALL_PROVENANCE_AND_N5_LIMITS",
+  "no_claim": "No live call was made by pane2; no accuracy/calibration/coverage claim is accepted at N=5. The implementation path is real, but this receipt does not independently prove each p came from the live response.",
+  "failures": []
+}
