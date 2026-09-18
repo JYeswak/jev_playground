@@ -107,8 +107,9 @@ taste one.
 - *Trigger:* a ledger entry whose `quote` is not byte-identical to its `sourceMessageId` span ⇒
   **refuse** (a paraphrase in a fact ledger is the failure mode; it must be structurally impossible
   to ship one).
-- *Satisfying:* the four existing questions, with the ledger, score ≥ arm B's 3 — and if they do not,
-  that is a publishable result, not a failure of the demo.
+- *Satisfying:* the **three** existing questions (`q1,q2,q3` — the receipt's actual set), with the
+  ledger, score ≥ arm B's 3/3 — and if they do not, that is a publishable result, not a failure of
+  the demo.
 - Offline throughout with an injected asker; exactly one budgeted live run for the scored arm.
 
 **Ship criteria:** install script (`npm run fact-ledger` + the CLI bin); deterministic tests incl.
@@ -208,7 +209,9 @@ my classification?") and the measured answer is "not the way you are about to as
 any triage surface we build later.
 
 **Why it beats the obvious alternative:** the obvious alternative — ask Jev "is this X?" and threshold
-the answer — is *measurably 33 points worse* on the in-tree corpus. The template's whole thesis is
+the answer — loses by **32.5 points** on the upstream corpus (`jev-phishing-bench@1d56e8c`, map §9:
+verdict-only **62.6%** vs five signal questions + logistic regression **95.1%**). Quoting both
+endpoints rather than a rounded delta, because the delta is the claim. The template's whole thesis is
 that the obvious thing loses, and it ships the comparison so the user sees it on their own data.
 
 **Tests, with RED arms:**
