@@ -126,6 +126,54 @@ expect 'ARM 13 receipt_type out of enum' 9 "TYPE: 'bogus' not in enum" 'illegal 
 mk '{"a":1}' CLEARED '' ''
 expect 'ARM 14 receipt_type EMPTY' 9 'not in enum' 'empty fails closed, never inferred'
 
+# ANCHORED AT COLUMN 0, and the reason is a defect these arms hit on their first run: lane-status
+# prints a LAST 6 COMMITS block, and commit cccaf39's own subject contains the literal string
+# "TRANSIENT_UNSTABLE". An unanchored grep therefore matched a COMMIT MESSAGE instead of the verdict
+# line, and ARM 16 failed with a correct rc=4. An arm whose predicate can be satisfied by unrelated
+# text in the same output is not an assertion about behaviour. Verdict lines start at column 0; the
+# commit block is indented two spaces, so the anchor discriminates.
+# ARMS 15-17 — the TRANSIENT_UNSTABLE paths, added because pane 3's
+# audit-transient-arms-20260918T120704Z.json (b031ffb) found the highest-traffic one UNTESTED:
+# "accept-after-recapture had NEVER EXECUTED — confirmed by code inspection plus absence of any such
+# run." It closed the gap by EXECUTION rather than argument, and these arms commit that execution so
+# it is a witness rather than a memory of one. Deterministic: attempt 2 is entered DIRECTLY on a
+# stable fixture, so there is no sleep and no race — the shape I failed to build when I tried to time
+# a mutation against a 0.43s scan and got an arm that proved nothing.
+
+mk '{"a":1}'
+out=$(JEV_TRANSIENT_ATTEMPT=2 run); rc=$?
+if [ "$rc" = 0 ] && ! printf '%s\n' "$out" | grep -q '^SNAPSHOT MOVED'; then
+  printf 'PASS  %-48s rc=0 stable second attempt accepted, silent\n' 'ARM 15 attempt=2, stable clean'
+else
+  printf 'FAIL  %-48s rc=%s (want 0) or a notice was printed\n' 'ARM 15 attempt=2, stable clean' "$rc"
+  fail=$((fail+1))
+fi
+
+# The half that matters most: a stable second attempt's RED is ACCEPTED, not laundered by the
+# transient class. Pane 2's spec: "a stable second snapshot is validated EVEN IF RED."
+mk '{"a":1}'; printf '{"a":2}' > "$TMP/receipt.json"
+out=$(JEV_TRANSIENT_ATTEMPT=2 run); rc=$?
+if [ "$rc" = 4 ] && ! printf '%s\n' "$out" | grep -q '^TRANSIENT_UNSTABLE'; then
+  printf 'PASS  %-48s rc=4 settled RED accepted, not laundered\n' 'ARM 16 attempt=2, stable drifted'
+else
+  printf 'FAIL  %-48s rc=%s (want 4) or it was called transient\n' 'ARM 16 attempt=2, stable drifted' "$rc"
+  fail=$((fail+1))
+fi
+
+# ARM 17 — the changed-paths EXTRACTOR, unit-tested against the live fingerprint format. This is the
+# arm that would have caught b031ffb's functional defect: 8459b1a changed the fingerprint lines to
+# `raw:<hex> norm:<hex>  <path>` and left the sed matching the old shape, so Changed-paths was ALWAYS
+# EMPTY while a commit message claimed the path was named. A format change invalidated an assertion
+# nobody re-ran; this arm re-runs it.
+fpline='raw:0123456789abcdef norm:fedcba9876543210  docs/demos/x.json'
+got=$(printf '%s\n' "< $fpline" | sed -n 's/^[<>] *raw:[0-9a-f]* norm:[0-9a-f]*  //p')
+if [ "$got" = 'docs/demos/x.json' ]; then
+  printf 'PASS  %-48s extracts the path from the live format\n' 'ARM 17 changed-paths extractor'
+else
+  printf 'FAIL  %-48s got %s — extractor and fingerprint format have diverged\n' \
+    'ARM 17 changed-paths extractor' "'${got:-<empty>}'"
+  fail=$((fail+1))
+fi
 printf '\n%s\n' '----------------------------------------------------------------------'
-[ "$fail" = 0 ] && { printf 'OK: all four gates discriminate on all 14 arms.\n'; exit 0; }
+[ "$fail" = 0 ] && { printf 'OK: all four gates discriminate on all 17 arms.\n'; exit 0; }
 printf 'FAIL: %d arm(s) did not discriminate.\n' "$fail"; exit 1

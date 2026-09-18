@@ -361,8 +361,21 @@ if [ "$FP_BEFORE" != "$FP_AFTER" ]; then
     printf 'TRANSIENT_UNSTABLE: the evidentiary inputs moved during BOTH capture attempts.\n'
     printf 'NO VERDICT is reported — the scan above was computed against a state that changed.\n'
     printf 'Changed paths:\n'
-    diff <(printf '%s\n' "$FP_BEFORE") <(printf '%s\n' "$FP_AFTER") \
-      | sed -n 's/^[<>] *[0-9a-f]\{16\}  /  /p' | sort -u
+    # PATTERN REPAIRED — pane 3, audit-transient-arms-20260918T120704Z.json (b031ffb): the raw/norm
+    # fix in 8459b1a changed these lines to `raw:<hex> norm:<hex>  <path>` and left this sed expecting
+    # `<hex><space><space>`, so NOTHING EVER MATCHED and Changed-paths was ALWAYS EMPTY at that HEAD.
+    # My commit message for 8459b1a claimed "the changed path named in the output" — FALSE at HEAD. I
+    # re-ran the EXIT CODE and carried the OUTPUT claim forward from the previous commit. "A format
+    # change invalidated an assertion nobody re-ran — the exact stale-assertion class this lane
+    # polices." The cut is anchored on the printf format above; change one and this must change too.
+    changed=$(diff <(printf '%s\n' "$FP_BEFORE") <(printf '%s\n' "$FP_AFTER") \
+      | sed -n 's/^[<>] *raw:[0-9a-f]* norm:[0-9a-f]*  //p; s/^[<>] *HEAD /HEAD /p' | sort -u)
+    if [ -n "$changed" ]; then
+      printf '  %s\n' $changed
+    else
+      # A silently empty list is how the defect above hid. If the paths cannot be extracted, SAY SO.
+      printf '  (extraction produced nothing — the fingerprint format and this cut have diverged)\n'
+    fi
     printf 'A peer is mid-write. Re-run when the tree settles; do NOT read this as a pass or a RED.\n'
     exit 10
   fi
