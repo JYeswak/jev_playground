@@ -180,7 +180,8 @@ gates: ALL GREEN
 
 Nine stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
 because a gate that cannot fail is not a gate. Re-derive the count from `foundation/gates.d/`; a
-number written here goes stale silently, and this one did, having said seven.
+number written here goes stale silently, and this one already did once, when it claimed seven
+stages and nine existed.
 
 **On a fresh clone you get seven of nine, not `ALL GREEN`, and the output above is from a developed
 checkout.** Measured by running the suite inside a frozen clone of a pinned commit
