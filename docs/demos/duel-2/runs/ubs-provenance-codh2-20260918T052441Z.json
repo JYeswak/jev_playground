@@ -1,0 +1,78 @@
+{
+  "schema": "jev.duel2.ubs-provenance.v1",
+  "generated_at": "2026-09-18T05:24:41Z",
+  "target": "demos/preaction-abstention/src",
+  "build_receipt": "docs/demos/duel-2/runs/codh2-rung3-20260918T053000Z.json",
+  "source_commit": "0f6cb2d",
+  "reported_receipt_claim": "Two criticals adjudicated false positives: CLI-flag string comparison and typeof-check; neither compares secret material.",
+  "reruns": [
+    {
+      "command": "ubs --format=json --ci demos/preaction-abstention/src",
+      "rc": 1,
+      "files": 4,
+      "critical": 2,
+      "warning": 0,
+      "info": 11,
+      "locations": false,
+      "elapsed_seconds": 6.5
+    },
+    {
+      "command": "ubs --format=sarif --ci demos/preaction-abstention/src",
+      "rc": 1,
+      "summary_only": true,
+      "locations": false,
+      "elapsed_seconds": 6.8
+    },
+    {
+      "command": "ubs -v --only=js demos/preaction-abstention/src",
+      "rc": 1,
+      "critical": 2,
+      "warning": 0,
+      "info": 11,
+      "locations_partial": true,
+      "elapsed_seconds": 6
+    }
+  ],
+  "code_quotes": [
+    {
+      "path": "demos/preaction-abstention/src/run.mjs",
+      "line": 48,
+      "quote": "live = new JevClient({ apiKey: process.env.TYPESAFE_API_KEY, model: policy.model });",
+      "relevance": "environment lookup, not a secret comparison"
+    },
+    {
+      "path": "demos/preaction-abstention/src/jev-client.mjs",
+      "line": 17,
+      "quote": "headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' },",
+      "relevance": "transport header construction, not a comparison"
+    },
+    {
+      "path": "demos/preaction-abstention/src/gate.mjs",
+      "line": 66,
+      "quote": "if (!a || !('noul' in a) || typeof a.noul !== 'number' || !Number.isFinite(a.noul)) {",
+      "relevance": "typed-answer guard; not secret/signature/token comparison"
+    }
+  ],
+  "findings": [
+    {
+      "id": "UBS-CRIT-1",
+      "rule": "Secret, signature, or token compared with ==/!=",
+      "ruling": "UNASKABLE",
+      "reason": "The UBS aggregate output provides no finding location or rule instance. JSON, SARIF, and verbose reruns still emit count-only critical summary; no cited scan log is present in the build receipt."
+    },
+    {
+      "id": "UBS-CRIT-2",
+      "rule": "Secret, signature, or token compared with ==/!=",
+      "ruling": "UNASKABLE",
+      "reason": "Same provenance gap; the two criticals are not individually mapped, so assigning FALSE_POSITIVE_CONFIRMED would overclaim."
+    }
+  ],
+  "rerun_assessment": {
+    "needed": true,
+    "price": "~19 seconds elapsed for three read-only UBS formats; no key, network mutation, or source change",
+    "worth_it": "Yes once: it proved the installed UBS output cannot establish per-finding provenance. Not worth repeating the same command; next step would require UBS scanner/module detail output or a scan-log artifact containing locations.",
+    "retry_condition": "Re-run only with a UBS output mode or underlying scanner result that emits per-finding file/line locations; then quote each location and rule it."
+  },
+  "overall": "UNASKABLE_PROVENANCE_HOLD",
+  "failures": []
+}
