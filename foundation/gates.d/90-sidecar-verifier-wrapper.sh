@@ -35,6 +35,43 @@ set -euo pipefail
 root="${JEV_REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 cd "$root"
 
+
+if [ "${1:-}" = '--selftest' ]; then
+  # Mapping arms: the stage's ONLY logic is rc -> verdict/exit, so drive it with
+  # a stub verifier in a fake root (JEV_REPO override; the copy under test is never
+  # the production file, and no real STATUS/sidecar is touched). No mid-run race is
+  # needed: the race is the verifier's business; the mapping is a pure function of rc.
+  tmp=$(mktemp -d) || { echo "90-sidecar-verifier-wrapper --selftest: FAILED — mktemp"; exit 1; }
+  mkdir -p "$tmp/fakeroot/scripts"
+  cp "$root/foundation/gates.d/90-sidecar-verifier-wrapper.sh" "$tmp/stage90-copy.sh"
+  run_case() { # run_case <stub-rc> ; echoes "<exit-code>##<stdout>"
+    local want="$1"
+    printf '#!/usr/bin/env bash\necho "stub verifier, nothing verified"\nexit %s\n' "$want" \
+      > "$tmp/fakeroot/scripts/verify-other-reasons.sh"
+    chmod +x "$tmp/fakeroot/scripts/verify-other-reasons.sh"
+    local out rc
+    if out=$(JEV_REPO="$tmp/fakeroot" bash "$tmp/stage90-copy.sh" 2>&1); then rc=0; else rc=$?; fi
+    printf '%s##%s' "$rc" "$out"
+  }
+  # ARM 1 (RED arm): rc10 must be UNMEASURED exit 7, and MUST NOT print PASS.
+  # Exit 0 here was pane 3's laundering defect (2e7bab2); exit 1 would manufacture
+  # outages from concurrency. Either regression REDs this arm.
+  r=$(run_case 10)
+  [ "${r%%##*}" = "7" ] || { echo "90 --selftest: FAILED — rc10 exited ${r%%##*}, want 7"; exit 1; }
+  printf '%s' "${r#*##}" | grep -q 'UNMEASURED' || { echo "90 --selftest: FAILED — rc10 printed no UNMEASURED"; exit 1; }
+  printf '%s' "${r#*##}" | grep -q '^PASS' && { echo "90 --selftest: FAILED — rc10 printed a PASS line (laundering)"; exit 1; }
+  # ARM 2: rc13 (symlink escape, durable) must FAIL exit 1, never UNMEASURED.
+  r=$(run_case 13)
+  [ "${r%%##*}" = "1" ] || { echo "90 --selftest: FAILED — rc13 exited ${r%%##*}, want 1"; exit 1; }
+  printf '%s' "${r#*##}" | grep -q 'FAIL' || { echo "90 --selftest: FAILED — rc13 printed no FAIL"; exit 1; }
+  # ARM 3: rc0 must stay PASS exit 0, so the rc10 arm cannot pass on an always-7 stub.
+  r=$(run_case 0)
+  [ "${r%%##*}" = "0" ] || { echo "90 --selftest: FAILED — rc0 exited ${r%%##*}, want 0"; exit 1; }
+  printf '%s' "${r#*##}" | grep -q '^PASS' || { echo "90 --selftest: FAILED — rc0 printed no PASS"; exit 1; }
+  rm -rf "$tmp"
+  echo "90-sidecar-verifier-wrapper --selftest: OK (3 arms: rc10->7+UNMEASURED+no-PASS, rc13->1+FAIL, rc0->0+PASS)"
+  exit 0
+fi
 out="$(./scripts/verify-other-reasons.sh 2>&1)" && rc=0 || rc=$?
 
 case "$rc" in
