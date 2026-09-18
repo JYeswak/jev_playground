@@ -34,9 +34,18 @@ PASS 90-sidecar-verifier-wrapper (0s)
 gates: ALL GREEN
 ```
 
-Nine stages, no network, no key. Each one has a planted bad input that turns it red, listed in
+Nine stages, no key. Each one has a planted bad input that turns it red, listed in
 [`GATES.md`](GATES.md) — **a gate that cannot fail is not a gate.** Re-derive the count from
 `foundation/gates.d/`; a number written here goes stale silently, and this one did — it said seven.
+
+**On a fresh clone you will get six of nine, not `ALL GREEN`, and that output above is from a
+developed checkout.** Measured by running the suite inside a frozen clone of a pinned commit
+(`scripts/verify-frozen.sh`): stages 10/20/30/60/80/90 pass from a bare clone; **stage 40 needs
+`npm install` inside `compaction/`** — so that one stage does need the network, contrary to what
+this line claimed until it was measured — and **stage 50 needs a Beads DAG imported** (`br import`),
+since only `.beads/issues.jsonl` is tracked and the database is not. Neither is a defect in the
+gates; both are state a clone legitimately does not carry. The defect was this README asserting a
+green a stranger could not reproduce.
 
 ## What you can run, offline, with no key
 
