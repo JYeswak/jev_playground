@@ -1,0 +1,22 @@
+{
+  "schema": "jev.current-tick.binding-qualification.v1",
+  "generated_at": "2026-09-18T16:10:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "subject": "verify-q106-demo1-authority-20260918T150000Z.json",
+  "ruling": "VERIFIED_CONTENT_AND_BINDING remains correct but is narrower than the number claim",
+  "verified": [
+    "pane3 ruling opened",
+    "STATUS receipt path matches the ruling",
+    "STATUS reason matches the ruling",
+    "cited receipt opened and supports the 30-turn measurement object",
+    "normalized digest recomputes to STATUS pin 25581b15c0f20489"
+  ],
+  "not_verified": [
+    "whether 0.0447% is the correct semantic figure under every possible spend basis",
+    "whether the old 0.047% figure is a dropped digit rather than a different documented basis",
+    "whether the kill trigger was self-kill or cross-boundary"
+  ],
+  "qualification": "The receipt proves artifact binding and mutation correctness. It must not be cited as numeric semantic verification. The tick's statement that binding-verified was read as number-verified is a process error; the receipt's NO-CLAIM was accurate.",
+  "reexamination": "Reopen only when a non-author reviews both documented spend bases and the derivation policy, or when a gate is asked to consume the numeral as current semantic truth.",
+  "no_claim": "No claim that the status row's scalar is semantically adjudicated by this binding receipt."
+}
