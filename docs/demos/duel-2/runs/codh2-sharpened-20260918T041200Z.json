@@ -1,1 +1,82 @@
-{"actor":"CopperCarp (pane 3, muse)","bead":"jev-demo-loop-a1q","design":"Q12: sharpen eval read-side vs mutating, re-run same 111 journals","failure_rule_q9_unchanged":"irreversible_share<0.02 AND wilson_upper<0.05 AND ambiguous_share<0.10","generated_at":null,"manifest":[],"measured":null,"pattern_design_basis":"harness namespace semantics; eval args are {code, language, title} (keys only, verified without reading content)","patterns_v2":{"ambiguous_unchanged":["tool:task/hub/computer/browser (effect unknowable from name)","bash: unrecognized shape or empty"],"eval_mutating_markers":["\\bwrite\\s*\\(","\\btool\\.","\\bagent\\s*\\(","\\bworkpool\\s*\\(","\\bbrowser\\.","tab\\s*\\.\\s*(run|click|type|close)\\b","\\bfetch\\s*\\(","\\bopen\\s*\\([^)]*[wa+]","\\bos\\.","\\bsubprocess\\b","\\bshutil\\b","write_text|mkdir|unlink|rename|remove\\b","Bun\\.write","method\\s*:\\s*['\"]?(POST|PUT|DELETE|PATCH)"],"eval_read_rule_v2_1_SUPERSEDES":"eval code contains NONE of the mutating markers => reversible","eval_verdict":"code matching a mutating marker => ambiguous (conservative); string-literal false positives accepted and documented — bias runs against clearing the bar","rule_versions":[{"reason":"v2.0 unworkable: stdlib calls (print/json/math) are neither read-shape nor mutating, stranding most cells as ambiguous. Absence-of-mutation-channels is the correct predicate: markers enumerate every file/network/process/agent/browser/tool/write channel in both runtimes. Amended BEFORE any run; no results seen.","v":"2.1"},{"v":"2.0","commit":"b077d3b","rule":"code matches ONLY read-shape calls AND no markers"}]},"preregistered_at":"2026-09-18T04:12:00Z","ran_at":null,"rule_amended_at":"2026-09-18T04:14:00Z (before run; reason above)","schema":"jev.h2.sharpened.v1","unit":"Q12 COD-H2 build precondition","verdict":"UNMEASURED (patterns pre-registered; run pending)"}
+{
+ "actor": "CopperCarp (pane 3, muse)",
+ "bead": "jev-demo-loop-a1q",
+ "design": "Q12: sharpen eval read-side vs mutating, re-run same 111 journals",
+ "failure_rule_q9_unchanged": "irreversible_share<0.02 AND wilson_upper<0.05 AND ambiguous_share<0.10",
+ "generated_at": "2026-09-18T04:20:00Z",
+ "manifest": [],
+ "measured": {
+  "journals": 111,
+  "turns": 14556,
+  "turns_irreversible": 5435,
+  "turns_ambiguous_only": 5431,
+  "turns_destructive_bash": 907,
+  "irreversible_share": 0.3734,
+  "ambiguous_share": 0.3731,
+  "destructive_share": 0.0623,
+  "wilson95_irr": [
+   0.3656,
+   0.3813
+  ],
+  "wilson95_amb": [
+   0.3653,
+   0.381
+  ],
+  "wilson95_des": [
+   0.0585,
+   0.0664
+  ]
+ },
+ "pattern_design_basis": "harness namespace semantics; eval args are {code, language, title} (keys only, verified without reading content)",
+ "patterns_v2": {
+  "ambiguous_unchanged": [
+   "tool:task/hub/computer/browser (effect unknowable from name)",
+   "bash: unrecognized shape or empty"
+  ],
+  "eval_mutating_markers": [
+   "\\bwrite\\s*\\(",
+   "\\btool\\.",
+   "\\bagent\\s*\\(",
+   "\\bworkpool\\s*\\(",
+   "\\bbrowser\\.",
+   "tab\\s*\\.\\s*(run|click|type|close)\\b",
+   "\\bfetch\\s*\\(",
+   "\\bopen\\s*\\([^)]*[wa+]",
+   "\\bos\\.",
+   "\\bsubprocess\\b",
+   "\\bshutil\\b",
+   "write_text|mkdir|unlink|rename|remove\\b",
+   "Bun\\.write",
+   "method\\s*:\\s*['\"]?(POST|PUT|DELETE|PATCH)"
+  ],
+  "eval_read_rule_v2_1_SUPERSEDES": "eval code contains NONE of the mutating markers => reversible",
+  "eval_verdict": "code matching a mutating marker => ambiguous (conservative); string-literal false positives accepted and documented \u2014 bias runs against clearing the bar",
+  "rule_versions": [
+   {
+    "reason": "v2.0 unworkable: stdlib calls (print/json/math) are neither read-shape nor mutating, stranding most cells as ambiguous. Absence-of-mutation-channels is the correct predicate: markers enumerate every file/network/process/agent/browser/tool/write channel in both runtimes. Amended BEFORE any run; no results seen.",
+    "v": "2.1"
+   },
+   {
+    "v": "2.0",
+    "commit": "b077d3b",
+    "rule": "code matches ONLY read-shape calls AND no markers"
+   }
+  ]
+ },
+ "preregistered_at": "2026-09-18T04:12:00Z",
+ "ran_at": "2026-09-18T04:20:00Z",
+ "rule_amended_at": "2026-09-18T04:14:00Z (before run; reason above)",
+ "schema": "jev.h2.sharpened.v1",
+ "unit": "Q12 COD-H2 build precondition",
+ "verdict": "PRECONDITION NOT MET: ambiguous 0.3731 vs bar 0.10 (Wilson lower 0.3653, not close). Build stays blocked. Destructive-subset share 0.0623 [0.0585,0.0664] reported as ordered.",
+ "v22_round": {
+  "eval_calls_total": 165755,
+  "eval_matching_mutating_markers": 155801,
+  "eval_read_side": 9954,
+  "dominant_marker": "tool. at 150719 hits (fleet drives tools through eval tool-bridge)",
+  "consequence": "94% of eval is genuinely effect-capable; ambiguous bucket is architectural opacity, not pattern weakness"
+ },
+ "denominator_note": "v1 dropped file-trailing turns (close never called at EOF, N=14533); v2 closes at EOF (N=14556, +23). More correct; effect on shares negligible (0.16% of N). Comparison across versions mixes classifier + denominator effects, stated here.",
+ "recommended_next": "v2.2 round (pre-registered below): parse tool.<name> after tool. and apply the same tool table one level down (tool.read/tree/grep->reversible; tool.bash->bash rules; tool.write/edit->irreversible; tool.task/hub->ambiguous). Principled, not data-tuned. If v2.2 still clears nothing, accept tool-dispatch opacity as irreducible and rule on the precondition itself (keep bar = block indefinitely; or accept with runtime controls).",
+ "failures": []
+}
