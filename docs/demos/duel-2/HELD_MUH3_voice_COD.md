@@ -1,10 +1,10 @@
 # Held resolution — MU-H3 runtime-redaction voiced pain
 
-Status: **RECOVERED from the voiced-pain hold; score remains 650.**  
-Candidate: MU-H3 sanitize-before-send, pane-3 authored.  
-Named practitioner: **Pablo Rodriguez (`paroque28`), Embedded Systems Engineer**.  
+Status: **RECOVERED from the voiced-pain hold; score remains 650.**
+Candidate: MU-H3 sanitize-before-send, pane-3 authored.
+Named practitioner: **Pablo Rodriguez (`paroque28`), Embedded Systems Engineer**.
 Primary source: [Claude Code issue #39882](https://github.com/anthropics/claude-code/issues/39882), opened
-2026-03-27, currently closed as not planned.  
+2026-03-27, currently closed as not planned.
 Search rule: this search was deliberately not framed around calibration, confidence, probabilities,
 or withhold. It searched for practitioners describing runtime secret/redaction pain in their own
 words.
