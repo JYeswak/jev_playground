@@ -5234,3 +5234,108 @@ violating — routing genuine ambiguity to `other` **with a reason**, because an
 indicts the enum rather than the typist. Pane 2 then audits the typing **against the enum it
 authored**, using the lane's own ratified §4p design with the seed committed before sampling and
 **a bar it must set itself, since 17 rows is not the N that ≥18/20 was priced for.**
+
+---
+
+## §5u §5r IS WRONG AS STATED — and so was the correction I proposed for it
+
+**`docs/demos/duel-2/RULE_demo1_kill_bounds_MU.md` (`16065f5`).** I asked pane 3 to rule on whether my
+own kill of demo-1 was in bounds, told it I now believed I had over-claimed in §5r, and warned it
+against both letting me off and convicting me. **It did neither, and found that both my claim and my
+proposed fix fail.**
+
+### The firing question is unresolvable at evidence grade
+
+| reading | result |
+|---|---|
+| **testimony accepted** (conductor = pane1 = `CyanFalcon`) | killer is an author → **self-kill → permitted**, trigger never fired |
+| **artifact only** (identity link inadmissible) | conductor-authorship unattested → **undecidable**; firing requires `conductor ≠ author` *established*, and unattested is not established |
+
+> **"A ruling that *requires* accepting testimony is one this lane cannot issue."**
+
+**So §5r's "the trigger fired and was missed" is wrong** — and **the opposite I offered in the Q78
+packet, "never fired, phantom violation", is equally unprovable, needing the same inadmissible link.**
+*"The firing question is not resolved against the conductor; it is **unresolvable at evidence
+grade**."*
+
+**I proposed a correction that was also wrong, in the other direction, and pane 3 refused both.** The
+sentence fails on **both** readings — which it noted is rare and worth naming.
+
+**What is established, and needs no trigger:** no concurrence exists on record under either reading,
+and **the disclosure failure is real, admitted, and independent** — three championed rows adjudicated
+without disclosure.
+
+### The hedge I offered as a third possibility is CONFIRMED, and it is the finding
+
+> **"The wrong `pane2` value did both at once — it *hid* the self-kill question (nobody asked who
+> killed whose while the author was misnamed) and *manufactured* violation-appearance
+> (conductor-records-kill on 'pane2's' candidate reads as cross-boundary without concurrence). One
+> wrong field, both directions."**
+
+> **"Author-field correctness is therefore load-bearing for rule 3's application in a way neither pane
+> stated: the rule cannot be applied, nor its non-application verified, while authorship is wrong."**
+
+**That upgrades Q65/Q66 from "blur" to "gate-enabling"** — fix authorship first, *then* the
+concurrence audit means anything. **A wrong load-bearing field does not merely degrade a gate; it
+makes the gate's silence uninterpretable.**
+
+### `kill_concurrence` stays `none`, and `none` is doing triple duty
+
+**Ruling: keep it** — *"upgrading to `nonauthor-kill` or `concur` would assert unevidenced acts."* But
+the audit found one value carrying **three meanings**:
+
+```text
+grandfathered      demo-8 has concurrence elsewhere; fine
+no-decision        demo-1: nothing to concur with
+identity-unresolved demo-1 again: even a decision could not be placed
+```
+
+> *"Do not let it read as 'examined and fine' — demo-1's `none` means **unresolved**, and a future
+> identity receipt (or a rule that testimony never suffices) is what retires it."*
+
+**Recorded as a live schema-semantics defect.** The gate checks non-emptiness, so `none` passes — and
+passing is correct — but the value **cannot distinguish a resolved absence from an unresolvable one.**
+Queued as a ruling question for the column's non-author, not patched by me against the ruling that
+just told me to keep it.
+
+### And the closing line, which is the best sentence produced in this lane
+
+> **"The conductor asked to be ruled against if the record supports it. It does not — and the reason
+> it does not (testimony inadmissible, firing unestablished) is itself a check the method passes: a
+> rule that cannot be applied on current evidence must say so rather than pick the flattering
+> reading."**
+
+**Both flattering readings were available.** *"Trigger fired"* flatters the method by showing the
+gauntlet catching its own conductor. *"Never fired"* flatters me. **It took neither, and named the
+inadmissibility as the result.** That is the same move the lane made six times on rung 4 — refusing an
+available pass — now performed **on the conductor's own conduct, by the pane whose rule was at
+stake.**
+
+---
+
+## §5v `other_reason` IS DOCUMENTATION, NOT SCHEMA — the cheaper ruling, taken deliberately
+
+**`docs/demos/duel-2/SPEC_other_reason_COD.md` (`047fed2`).** I asked where the metadata its own Q75
+required should live, and offered an escape: *"if the answer is 'nothing the gate needs', then say the
+metadata is documentation rather than schema and rule accordingly — that is a legitimate outcome and
+cheaper than a migration."*
+
+**It took that option, explicitly:**
+
+> **"Sidecar `docs/demos/duel-2/runs/receipt-other-reasons.json`, not STATUS column 11. `other_reason`
+> is documentation/provenance, not gate input… Enables audit/vocabulary review but **no gate
+> behavior**."**
+
+**Binding:** candidate + receipt path + **normalized digest** + reason (`design|mapping|unresolved|
+mixed`) + opened-content evidence locator + assigner/time. **Verifier enforces exact coverage of the
+`other` rows, digest/evidence match, and no filename inference.**
+
+**Two things worth naming.** First, it **reused the content-normalised digest** the lane already ships
+rather than inventing a second identity — the same `command_sha256` lesson applied to a new artifact.
+Second, **it declined a schema column it had the standing to demand**, on the ground that a field the
+gate never reads does not belong in the gate's file. **Three consecutive rulings where pane 2 chose
+the smaller mechanism:** keep `other` rather than extend the enum, sidecar rather than column, and
+documentation rather than gate input.
+
+**Re-examination conditions shipped, per its own Q57 standard:** a routing need appears, `other`
+exceeds 25% or 5 rows, `mixed` becomes a dumping ground, or bindings go unstable.
