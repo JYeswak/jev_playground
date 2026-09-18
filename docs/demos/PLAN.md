@@ -4272,3 +4272,81 @@ the two are indistinguishable in a commit message.** A commit message saying *di
 evidence of nothing but that I meant to. **Only the pane's leg-1 callback is delivery evidence** —
 §4a established that for sends that report success; this is the weaker case where I never sent at
 all.
+
+---
+
+## §5f BLOCKER 5 DEFINITIVELY FAILS AT 25% — and the cause is one clause on one pattern
+
+**Join computed from `docs/demos/duel-2/runs/label-id-mapping-20260918T073641Z.json` (`f4ffad7`),
+`rows_field_agreement 20/20`, `unmapped: []`, ordering verified byte-exact against
+`command_preview` rather than assumed.**
+
+```text
+PER-CASE AGREEMENT: 5/20 = 25%        bar: >=18/20 = 90%
+```
+
+**Worse than the 45% upper bound §5d derived from marginals** — the actual pairing is worse than the
+best possible pairing, which is what a *systematic* rather than random disagreement looks like.
+
+### Confusion matrix (pane 2 → pane 3)
+
+```text
+withhold -> escalate   6
+pass     -> escalate   5        11 of 15 disagreements are pane 3 escalating
+withhold -> pass       2        where pane 2 did not
+withhold -> block      1
+escalate -> pass       1
+escalate -> escalate   2  agree
+pass     -> pass       2  agree
+withhold -> withhold   1  agree
+```
+
+**The asymmetry is exactly what pane 3 self-reported before the join existed:** it applied *"locally
+reversible"* strictly, so deletions escalate. **Eleven of fifteen disagreements are that single
+reading.**
+
+### Disagreement by pattern — 13 of 15 are `rm`
+
+```text
+ambiguous_authority     rm         7
+reversible_safe         rm         5     <-- the stratum ASSERTS reversibility
+ambiguous_authority     kill       1
+ambiguous_authority     git_push   1
+disallowed_destructive  rm         1
+```
+
+### The sharpest finding: two committed artifacts define the same concept differently
+
+**Five disagreements sit in the stratum literally named `reversible_safe`.** The Q45 draw's
+`reversible_safe` predicate classifies those commands as reversible; the rubric's strict *"locally
+reversible"* reading holds that **deletion never qualifies.** Both are committed lane artifacts.
+
+> **The term is not merely undefined in the rubric (§4x). It is defined *inconsistently across two
+> committed artifacts*, and the disagreement measurement located the contradiction.**
+
+That is a materially different diagnosis. §4x said *nobody has defined licensed*. §5f says **the lane
+has defined the load-bearing sub-term twice, differently, and built both a corpus and a rubric on the
+two readings.** No amount of rater care closes that — one of the two artifacts has to yield.
+
+### What this does to COD-H2's phase 1: bounded, with measured support
+
+Pane 3 *estimated* ~8 escalates would move if regenerable-temp deletion counted as reversible. The
+**measured** concentration is **13 of 15 disagreements on `rm`, 5 of them inside `reversible_safe`.**
+
+> **COD-H2's specification phase reduces to one decision: does deletion of regenerable scoped-temp
+> content count as locally reversible?** Everything else is downstream, and the estimate is now
+> confirmed by a per-case join rather than projected.
+
+**That is the most useful thing this lane could have produced about the candidate** — and it required
+the fresh-sample test to *fail*. A pass would have licensed a project with the contradiction still
+buried in it.
+
+### Reusable finding from the mapping: `journal:turn_index` is not a unique key
+
+**The 19-vs-20 discrepancy resolved into a real defect:** the sample holds **two cases at the same
+`(journal, turn_index=107)` with different commands** (`8a7a110b…`, `7edf93df…`). **Pane 2's
+`journal:turn_index` scheme collides there** — it had 20 labels under 19 distinct ids. Under
+`command_sha256` coverage is **20/20, no duplicates, no misses.**
+
+**`command_sha256` is the only sound case identity in this corpus**, and that belongs in the
+evidence-manifest spec (§5b) as a requirement rather than a convention.

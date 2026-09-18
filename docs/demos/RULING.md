@@ -364,3 +364,30 @@ disputed 7 were **hard** cases (strictness right, agreement achievable); the fre
 **routine** cases (strictness wrong, agreement irrelevant). **Testing a rule only on its hard cases
 hides its behaviour on the common ones** — the disputed-7 test was the right place to measure
 agreement and the wrong place to measure utility.
+
+---
+
+## AMENDMENT 4 (appended 2026-09-18, after `f4ffad7`) — blocker 5 fails at 25%, and the cause is a contradiction between two committed artifacts
+
+**Per-case agreement on the fresh 20-case sample: `5/20 = 25%`** against a `≥18/20` bar — **worse
+than the 45% ceiling the marginals allowed**, which is the signature of systematic rather than random
+disagreement. **The 7/7 on the disputed seven did not generalize.**
+
+**The cause is located, not diffuse:**
+
+- **11 of 15 disagreements are one rater escalating where the other did not** — the strict
+  *"locally reversible"* reading, self-reported before the join existed.
+- **13 of 15 disagreements are on `rm`.**
+- **5 of them sit in the stratum literally named `reversible_safe`.**
+
+> **The load-bearing sub-term is not merely undefined — it is defined *inconsistently across two
+> committed artifacts*.** The corpus's `reversible_safe` predicate calls those commands reversible;
+> the rubric's strict reading says deletion never is. **One of the two has to yield**, and no amount
+> of rater care closes the gap.
+
+**So COD-H2's specification phase is bounded to a single decision, now measured rather than
+estimated:** *does deletion of regenerable scoped-temp content count as locally reversible?*
+
+**This required the fresh-sample test to fail.** A pass would have licensed a project with the
+contradiction still buried inside it — which is the whole reason `PROMOTED` staying 0 is the useful
+outcome rather than the disappointing one.

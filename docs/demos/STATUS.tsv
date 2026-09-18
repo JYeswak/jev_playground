@@ -14,7 +14,7 @@ demo-7-signals-starter	1	560	HELD	pane1	docs/demos/duel-2/runs/demo7-weights-202
 demo-8-credential-screen	1	100	RULED_OUT	pane3	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md	none-structural-safety-leak
 demo-9-review-signal	2	550	HELD	pane2	docs/demos/duel-2/HELD_demo9_build_or_skip_COD.md	SKIP-rung3-now-NOT-ruled-out-priced-1-2-eng-days-retry-20pp-recall-over-ubs-5pct-FP-20pct-action-lift
 COD-H1-snapshot-completion	2	885	HELD	pane2	docs/demos/duel-2/runs/codh41-labelfree-20260918T054800Z.json	UNASKABLE-corpus-only-2-of-30-transcripts-across-3-harnesses-retry-on-sourcing
-COD-H2-preaction-abstention	4	905	HELD	pane2	docs/demos/duel-2/runs/audit-rung4-labels-20260918T063500Z.json	RUNG4-UNASKABLE-5-blockers-label-agreement-7of14-SYSTEMATIC-central-term-LICENSED-undefined-first-phase-is-SPECIFICATION-not-corpus
+COD-H2-preaction-abstention	4	905	HELD	pane2	docs/demos/duel-2/runs/label-id-mapping-20260918T073641Z.json	RUNG4-UNASKABLE-blocker5-FAILS-25pct-agreement-13of15-disagreements-on-rm-5-inside-reversible-safe-phase1-is-ONE-clause-locally-reversible
 COD-H3-price-drift-auditor	2	890	RULED_OUT	pane2	docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md	no-jev-necessary-stage-4of5-deterministic-retry-T1-tooling-T2-router-wedge
 COD-H4-toolresult-replay	2	900	HELD	pane2	docs/demos/duel-2/runs/codh41-labelfree-20260918T054800Z.json	UNASKABLE-corpus-absent-manifest-missing-PRICED-4h-build-deferral-not-blocker
 COD-H5-compaction-integrity	2	895	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD-H5_owned_MU.md	ownership-resolved-DISTINCT-tester-to-subject-shipped-tool-decides-before-H5-measures-after-queued-behind-COD-H2
