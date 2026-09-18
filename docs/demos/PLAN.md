@@ -4507,3 +4507,58 @@ very cases the clause exists to decide.
 And it checked the clause is **additive**: *"L12 is the narrowing edge… **the clause adds a policy
 path; it does not remove the authority path.**"* A new rule that silently deleted the old one would
 have been a regression wearing a fix.
+
+---
+
+## §5i THE C5 SEAM WAS A CATEGORY CONFUSION, NOT A CONTRADICTION — and pane 2 refused the number I asked for
+
+**`docs/demos/duel-2/RECONCILE_c5_sufficiency_COD.md` (`bc4479e`), pane 2.**
+
+**Both artifacts yield in scope, and they were never measuring the same thing:**
+
+- **Q44's preview-sufficiency predicate is *stratum-token visibility*** — is the token that assigned
+  the stratum visible in the preview?
+- **Clause C5 requires a *complete evidence span* or a relocatable full command**, and **cannot treat
+  the preview as authoritative.**
+- **`L15` is a genuine C5 failure** — not a predicate error.
+
+**So §5h's "seam" was a category confusion rather than an inconsistency.** Unlike §5f — where the
+corpus predicate and the strict rule genuinely contradicted each other about the same concept — here
+two tests with different subjects were being read as one. **That distinction matters: §5f required an
+artifact to yield; §5i required only that each stop being read as the other.**
+
+### The refusal is the finding
+
+**My packet said: *"how many would fail C5? … I want that stated with a number rather than as a
+principle."* Pane 2 declined:**
+
+> *"Exact C5-specific count is **NOT recorded**, so 40 is an **evidence-risk upper bound** and
+> **44/68 max unresolved** from current artifacts — **not a fabricated exact C5 count**."*
+
+**I pushed for a number and it gave me a bound, its derivation, and the name of the thing it would
+have had to invent.** 40 preview-insufficient + 4 unrelocatable = **≤44 of 68 unresolved**, stated as
+a ceiling because the artifacts do not record C5 outcomes per case.
+
+**That is the correct response to a conductor demanding precision the record cannot support** — and
+it is the seventh time this session a pane has declined to over-claim when over-claiming was the
+easier path. **A bound with its derivation is worth more than an exact-looking number with none.**
+
+### Conclusion, quantified
+
+> **"Manifest evidence spans are a precondition for exact / non-nagware committed-artifact
+> labeling."**
+
+**The manifest fix is now confirmed as a precondition rather than a parallel task, with the exposure
+bounded at ≤44/68.** §5g inferred the coupling from condition 5's text; §5i bounds it from the
+measured artifacts.
+
+### `NEXT none lane-bounded` — the lane's terminus, honestly reported
+
+**Pane 2's callback closes with `NEXT none lane-bounded`.** That is stronger than the first true
+QUEUE DRY (§4z), which said *no pane-2-eligible unit*. **This says no bounded question remains in the
+lane at all.**
+
+**It is correct.** What is left is **manifest implementation** (phase-1 project work), **an external
+corpus** (outside this lane by construction), and **a specification decision whose one clause has
+already been written and tested.** **The gauntlet has answered everything answerable with the data it
+has.**

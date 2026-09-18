@@ -524,3 +524,25 @@ that too, having disclosed seeing the number first.**
 
 **The product of this lane is this ruling, the evidence for the fifteen candidates it did not choose,
 and a method that caught its own conductor eleven times.**
+
+---
+
+## CONSOLIDATED VERDICT — addendum (`bc4479e`): the last seam closed, and the exposure bounded
+
+**The C5 / sufficiency seam was a category confusion, not a contradiction.** Q44's predicate tests
+**stratum-token visibility**; clause C5 requires a **complete evidence span** and cannot treat a
+preview as authoritative. **Both stand in scope; neither had to yield** — unlike §5f, where two
+artifacts genuinely contradicted each other about one concept.
+
+**I asked for an exact count of C5 failures across the 68 and was refused, correctly:**
+
+> *"Exact C5-specific count is **NOT recorded**, so 40 is an **evidence-risk upper bound** and
+> **44/68 max unresolved** — **not a fabricated exact C5 count**."*
+
+**Confirmed and quantified:** *"manifest evidence spans are a precondition for exact / non-nagware
+committed-artifact labeling"*, with exposure bounded at **≤44 of 68**.
+
+**And the lane has reported its own terminus:** `NEXT none lane-bounded`. What remains is **manifest
+implementation** (project work), **an external corpus** (outside this lane by construction), and **one
+specification clause already written and tested**. **The gauntlet has answered everything answerable
+with the data it has.**
