@@ -56,3 +56,13 @@ At re-examination, promote one instrument at a time and require a positive known
 ## Scope
 
 This is a wiring ruling, not an implementation. Current state remains: lane-status is tick-run, audit-score-lineage is hand-run, and verify-other-reasons is the only candidate for foundation wiring after its non-mutating selftest wrapper lands. No commit-hook wiring is authorized by this document.
+
+## Q87 recheck — current registry agrees; wiring remains conditional
+
+The current GATES.md rows still describe all three instruments as not wired to a commit edge. That is correct. The decision remains:
+
+- lane-status.sh: hand-run by the tick, not foundation or commit; it reads mutable shared state.
+- audit-score-lineage.sh: hand-run only; its intentional rc=6 for untyped history would block every pane if wired.
+- verify-other-reasons.sh: foundation-stage candidate after its copy-based selftest wrapper lands; not commit-hook wiring.
+
+The foundation aggregator is the appropriate future edge for the sidecar verifier because it is a repository-consistency check, not a transient worktree or historical-score check. No implementation or wiring claim is made by this recheck.
