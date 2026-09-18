@@ -1,0 +1,64 @@
+{
+  "schema": "jev.author-column-lineage-audit.v1",
+  "generated_at": "2026-09-18T10:15:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit of CopperCarp's Q65 mapping",
+  "target": "docs/demos/duel-2/runs/author-column-audit-20260918T100413Z.json",
+  "target_commit": "2f75165",
+  "mapping": {
+    "ruling": "OPERATIONALLY_CORRECT_BUT_CIRCUMSTANTIAL",
+    "pane2": "COD lineage",
+    "pane3": "MU lineage",
+    "confidence": "convergent sixfold evidence; no single definitive sentence",
+    "why_pane2_is_COD": [
+      "RUNG2_COD_HUNT_MU.md labels pane 3 as non-author muse over COD candidates and records its own COD scores.",
+      "HUNT_SCORES_MU_ON_COD.md is pane 3's independent score of COD candidates.",
+      "HUNT_SCORES_COD_ON_MU.md explicitly says pane 2 is non-author of MU candidates and records pane 2's score surface.",
+      "The COD/MU suffix and DEMAND_RANK/HUNT headers consistently use this direction across the reviewed artifacts.",
+      "The label audit and other non-author receipts use pane 2 as the COD-side non-author and pane 3 as the MU-side non-author."
+    ]
+  },
+  "attack": {
+    "mapping_right": true,
+    "plain_answer": "I am pane 2 and the COD lineage mapping is correct for the operational author-column audit. If the mapping were false, the COD/MU non-author assignments and four defective-row findings would be mis-derived; the reviewed cross-score artifacts support the mapping.",
+    "independence_limit": "The six evidence lines are not six independent experiments: suffix conventions and reciprocal score files encode the same operating convention, and some receipts inherit that convention. The receipt correctly calls the evidence circumstantial rather than proof-grade."
+  },
+  "q62_correction": {
+    "ruling": "SUFFICIENT_FOR_THE_TRANSFER_WITH_A_RESIDUAL_BOUND",
+    "what_it_fixed": "It separated model lineage from the pane-scoped STATUS author column and supplied the missing pane-to-lineage bridge before transferring lineage multiplicity into pane multiplicity.",
+    "what_still_leaks": "The bridge is still a convention reconstructed from artifacts, not a single authoritative authorship declaration. It supports the COD/MU mapping but cannot, by itself, prove the pane-1 rows or every champion field."
+  },
+  "pane1_rows": {
+    "identity": "Pane 1 is the conductor in the live session, but the audit correctly requires artifact evidence rather than relying on that conversational identity.",
+    "rows": [
+      {
+        "candidate": "demo-3-claim-check-gate",
+        "status_author": "pane1",
+        "ruling": "NOT_CITABLE_AS_GATED",
+        "reason": "The receipt identifies a multi-form history and an unattested champion; there is no authoritative artifact proving pane 1 was a scoring party or that a non-author rung-1 check occurred. Treat the row as authorship-unresolved, not as a valid gated score."
+      },
+      {
+        "candidate": "demo-7-signals-starter",
+        "status_author": "pane1",
+        "ruling": "NOT_CITABLE_AS_GATED",
+        "reason": "The audit found no form citation, champion statement, or duel-1 lineage tag. The live conductor identity does not repair the missing row provenance. A non-author check cannot be credited until the author and grader are evidenced."
+      }
+    ],
+    "effect": "The two rows may remain historical STATUS annotations, but they must not be cited as satisfying a rung-1 non-author gate. Mark them author-unattested or provide an opened receipt tying author, grader, and score."
+  },
+  "four_defective_rows": {
+    "ruling": "DERIVED_CORRECTLY_WITH_PANE1_CAVEAT",
+    "rows": [
+      "demo-1-route-backtest: pane2+pane3 multi-author; mapping supports the transfer, but the row needs a multi-author field rather than a scalar.",
+      "demo-2-admission-screen: pane2+pane3 merge authorship; same scalar-column defect.",
+      "demo-3-claim-check-gate: pane1 champion unattested; not a valid gated row.",
+      "demo-7-signals-starter: pane1 authorship unattested; not a valid gated row."
+    ]
+  },
+  "recommended_state": {
+    "author_field": "Keep multi-author values and an explicit unattested marker as Q65 recommends; do not collapse pane2+pane3 to one pane.",
+    "rung1_gate": "Require author, grader, receipt, and score provenance for every row cited as a non-author check. If author or grader is unattested, fail closed for gating and preserve the row as historical annotation.",
+    "reexamination": "Re-open the mapping when a row changes verdict/score, a new lineage appears, a pane authors a cross-lineage artifact, or a future receipt contradicts the COD/MU direction. Replace convention inference with an explicit author/lineage field at that point."
+  },
+  "no_claim": "No claim that pane1 rows are gated, that circumstantial lineage is definitive proof, or that the author column is already lossless."
+}
