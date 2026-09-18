@@ -3349,3 +3349,75 @@ which §4q records as adopted from my packet — and it means the ground truth c
 **Three pre-label preconditions are now fixed and none of them are mine to relax:** stratified 5-per-
 stratum audit with a `≥4/5` floor (§4p) · clause-cited disagreements with the missing-clause escape
 (§4s) · six anti-gaming guards verified present in the runner (§4q).
+
+---
+
+## §4t THE CORPUS YIELDS 68 OF 200 — and the shortfall says what COD-H2 can actually be measured on
+
+**`docs/demos/duel-2/runs/rung4-corpus-20260918T064500Z.json`, manifest
+`demos/preaction-abstention/fixtures/rung4-corpus.json` (`a583fa1`), seed `20260919` committed before
+the draw.**
+
+```text
+target 50 per stratum × 4 = 200          drawn 68
+  ambiguous_authority      50   FULL
+  reversible_safe          10   short 40
+  disallowed_destructive    8   short 42
+  credential_injection      0   short 50
+boundary band 30/30 MET, defined by committed (a)(b)(c) command-characteristic rule
+allocation: "equal-50-or-take-all per committed spec; NO cross-filling"
+```
+
+### Three things pane 3 did right, and the third is the one that matters
+
+1. **The band was defined by spec, not by probabilities** — the design subtlety I flagged in the Q34
+   packet, honored. The most decision-sensitive stratum is **full at 30/30** and cannot be accused of
+   having been selected to flatter a result.
+2. **No cross-filling.** It refused to backfill the scarce strata from the abundant one. **A
+   cross-filled 200 would have been ~190 ambiguous cases wearing four labels** — a corpus that looks
+   like the design and measures something else.
+3. **It refused to rule.** *"N=200 unattainable from destructive turns under committed rules;
+   widening source or re-stratifying is a **conductor ruling, not a same-night fix**."* The pane that
+   would benefit from a convenient re-stratification declined to perform one.
+
+### What the shortfalls actually mean — they are measurements, not sampling failures
+
+- **`credential_injection: 0`.** Not scarce: **absent.** There are **no credential-injection cases in
+  111 journals.** This is consistent with pane 3's earlier design decision to delete the credential
+  branch entirely (*"credential-positive withholds without a Jev call"*), and it means **COD-H2 can
+  never claim anything about credential injection from this corpus.**
+- **`disallowed_destructive: 8`.** The stratum closest to the product's stated purpose yields **eight
+  cases** from 907 destructive-bash flags. **"907 destructive-bash flags" ≠ "907 policy-relevant
+  destructive actions"** — the same over-inclusive-classifier problem as §4b's write/edit caveat, one
+  level further down. Eight distinct cases cannot support a per-stratum claim at any K.
+- **`ambiguous_authority: 50`, band 30/30.** The only stratum that filled is the one about
+  **uncertainty**.
+
+### Ruling: re-scope rung 4 to what the corpus can support, and narrow the claim to match
+
+**I am not running at N=68 against a design pre-registered for 200** — the design's own clause says a
+small sample returns `UNASKABLE/HELD`, and honoring that clause is the entire reason it was written
+before the draw. **Nor am I widening the source tonight**: adding journals or relaxing the
+destructive filter changes the population the gate measures, and that is a new pre-registration, not
+a patch.
+
+**Proposed re-scope:** rung 4 measures **calibrated abstention on ambiguous-authority actions** —
+n=50 with the full 30-case boundary band — and the other three strata are recorded as
+**measured-unavailable** and **explicitly excluded from any claim.**
+
+**This is defensible rather than post-hoc because the ambiguous stratum hit its pre-registered 50
+exactly, the band is full and spec-defined, and the excluded strata are absences reported rather than
+results discarded.** It also happens to be the honest product question: **the withhold path exists for
+uncertainty, not for obvious destruction.** A gate on ambiguous authority tests the wedge; a gate on
+eight disallowed-destructive cases would have tested nothing.
+
+**But I am the wrong person to declare that legitimate.** I want the leader to advance, which is
+exactly the bias the re-scope could launder. **So pane 2 rules on it** — it authored the gates,
+and it has already proven (§4q) that it will attack its own design: *do the four gates remain
+meaningful at n=50 plus a 30-case band, or does the re-scope hollow them out?* If they do not survive,
+**rung 4 is `UNASKABLE` on this corpus** and COD-H2 holds at rung 4 unmeasured, which is a legitimate
+terminal state.
+
+**Labelling is not blocked and starts now.** Pane 3: *"labeling can start on the 68 committed cases
+immediately."* At the measured ~90-min/200 rate, 68 cases is roughly half an hour, and every one of
+them is needed under either the re-scope or a later widening.
