@@ -49,6 +49,10 @@ denominator before any share.
 node demos/usage-shape/bin/shape.mjs ~/.claude/projects
 ```
 
+`~/.claude/projects` is where Claude Code keeps its session logs. **If you do not use Claude Code,
+pass your own `.jsonl` session files or a directory of them instead** — the tool takes either, and
+reports how many files and sessions it actually read before any share.
+
 Measured on this machine, 2026-09-18, over 4,626 files / 4,619 sessions / 488,724 billed turns:
 **98.878% of all tokens are retransmitted context** (cache read), 0.980% context first-write,
 0.140% output, 0.002% fresh input. Mean context re-sent per turn: **341,496 tokens**. Weighted at
@@ -90,8 +94,14 @@ reopen it. One candidate died there today because an MIT-licensed tool already s
 ## What you'll need
 
 - `bash`, `git`, `curl`, `python3` — all preinstalled on macOS and most Linux
+- **`node` >= 20** — required by all three tools in *What you can run* above. Their
+  `package.json` files declare it; a machine without node fails every one of them, so check
+  `node --version` before you start.
 - A `TYPESAFE_API_KEY` in your environment **only** if you want to make live Jev calls.
   Everything above runs without one.
+
+Runtimes, measured on an M3 Ultra: `foundation/gates.sh` about 16 s (stage 80 alone is 12 s), and
+`usage-shape` about 19 s over 4,626 files. Nothing here is instant and nothing here needs a network.
 
 ## What is not here yet
 
