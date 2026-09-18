@@ -1,0 +1,116 @@
+{
+  "schema": "jev.instrument-audit.v1",
+  "generated_at": "2026-09-18T10:10:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "targets": [
+    "scripts/lane-status.sh",
+    "scripts/selftest-lane-status-integrity.sh",
+    "scripts/audit-score-lineage.sh",
+    "scripts/selftest-score-lineage.sh"
+  ],
+  "commands_run": [
+    {
+      "command": "bash scripts/selftest-lane-status-integrity.sh",
+      "producer_exit": 0,
+      "result": "7/7 PASS"
+    },
+    {
+      "command": "bash scripts/selftest-score-lineage.sh",
+      "producer_exit": 0,
+      "result": "7/7 PASS"
+    },
+    {
+      "command": "scripts/lane-status.sh",
+      "producer_exit": 0,
+      "result": "17 existence, 17 integrity, 0 drift, 4/4 concurrence"
+    }
+  ],
+  "verdict": "MECHANISMS_FIRE_BUT_SCORE_LINEAGE_HAS_A_REAL_FALSE-RED_HOLE_AND_LANE_SCHEMA_ERRORS_ARE_UNDERTESTED",
+  "arms": {
+    "lane_status": {
+      "false_green_guard": {
+        "status": "PRESENT_BUT_INCOMPLETE",
+        "evidence": "Arms 1-3 require integrity_checked=1; arm 3 mutates a non-terminal byte and requires drifted=1/exit=4; arm 2 adds only a terminal newline and requires drifted=0. This defeats the prior 8-column false-green fixture.",
+        "remaining_hole": "The selftest does not plant a malformed, short, or over-wide STATUS row, and lane-status.sh does not validate the row field count or the header/data schema. A parser can silently accept shifted or extra fields while all seven current arms pass."
+      },
+      "score_lineage": {
+        "status": "FALSE_GREEN_RELATIVE_TO_R17_DEFECT",
+        "evidence": "Arms A-G pass, including upward/downward coincidence, no-verdict/no-score controls, RECUSED->CLEARED amendment, and non-score RULING_notes receipt.",
+        "remaining_hole": "No arm supplies a semantically genuine score receipt whose filename matches none of SCORE_RECEIPT. ARM C uses HUNT_SCORES_COD_ON_MU.md, which is exactly the regex-positive shape. The selftest therefore cannot catch the known undercoverage."
+      }
+    }
+  },
+  "false_red": [
+    {
+      "instrument": "scripts/audit-score-lineage.sh",
+      "severity": "HIGH",
+      "finding": "A legitimate score receipt with a filename outside the regex can trigger a false trip: score delta + verdict change + changed-row receipt that is semantically score but does not match (SCORES?_|DEMAND_|HUNT_|RUNG2_|_score|-score). The script then reports no distinct score receipt and exits 5.",
+      "why": "The commit b2eaf6f claims the regex is permissive and 'never false accusations'. Under the actual trip predicate, false classification of a real score receipt produces a false accusation. The 17/48 match count is evidence of undercoverage, not proof of safety.",
+      "repair": "Implement Q19's declared receipt_type before treating the zero-trip history as fully trustworthy. Add a positive selftest arm with a score receipt named outside the old regex; it must remain clean."
+    },
+    {
+      "instrument": "scripts/lane-status.sh",
+      "severity": "LOW",
+      "finding": "An unpinned but existing receipt is intentionally reported OK as existence-only. This is not a false RED, but it can be mistaken for an integrity pass if callers read only the exit code.",
+      "repair": "Keep separate output counts and require callers to consume integrity_checked/drifted, as Q58 specified."
+    }
+  ],
+  "exit_codes": {
+    "lane_status": {
+      "observed": [
+        "0 clean",
+        "3 missing receipt",
+        "3 missing kill_concurrence",
+        "4 digest drift",
+        "2 missing state/repository error"
+      ],
+      "ruling": "CONFLATED",
+      "detail": "Missing evidence and missing authorship concurrence print different diagnostics but share exit 3. If both occur, the missing-receipt branch wins and the concurrence failure is not the terminal reason. Add distinct machine codes or a structured failure list while preserving both counters."
+    },
+    "score_lineage": {
+      "observed": [
+        "0 clean",
+        "5 trip",
+        "2 usage/environment/no-history"
+      ],
+      "ruling": "TRIP_AND_SCHEMA_ERROR_NOT_YET_SEPARATED",
+      "detail": "The current script has no declared receipt-type schema check. Q19 must add a separate schema-incomplete result before a missing type is confused with a genuine lineage trip."
+    }
+  },
+  "commit_claim_audit": [
+    {
+      "commit": "b2eaf6f",
+      "claim": "filename regex is permissive, under-fires, and never falsely accuses",
+      "ruling": "FALSE_AS_A_GENERAL_CLAIM",
+      "reason": "A semantically scoring receipt with a nonmatching filename causes the no-score-receipt trip. Historical matching receipts do not establish future false-red immunity."
+    },
+    {
+      "commit": "b2eaf6f",
+      "claim": "ARM G proves the row-receipt branch is now the only branch",
+      "ruling": "SUPPORTED",
+      "reason": "The selftest's RULING_notes non-score row trips even though the commit-message branch is gone. This proves removal of that specific escape hatch, not correctness of filename classification."
+    },
+    {
+      "commit": "44ed719",
+      "claim": "six-arm discrimination including amendment",
+      "ruling": "SUPERSEDED_BUT_SUPPORTED_FOR_ITS_TESTSET",
+      "reason": "The current selftest has seven arms and passes; the original six-arm claim remains true for the original testset, but neither version tests a nonmatching genuine score receipt."
+    },
+    {
+      "commit": "4ac1b58",
+      "claim": "17/17 integrity and 4/4 concurrence after pin/backfill",
+      "ruling": "OBSERVED_CURRENTLY",
+      "reason": "The live instrument run reproduced 17 integrity-checked, 0 drifted, and 4/4 concurrence-recorded. This is an observed state, not proof of schema validation or future digest correctness."
+    }
+  ],
+  "required_new_arms": [
+    "lane STATUS row with missing field",
+    "lane STATUS row with extra field",
+    "lane STATUS header/data column mismatch",
+    "score receipt with semantic type=score but filename matching none of the legacy regex",
+    "missing/unknown receipt_type produces schema error distinct from trip",
+    "simultaneous missing receipt and missing concurrence reports both and deterministic precedence"
+  ],
+  "no_claim": "No claim that either instrument is production-complete, that the filename regex is safe, or that 7/7 selftests close the known R17 defect."
+}
