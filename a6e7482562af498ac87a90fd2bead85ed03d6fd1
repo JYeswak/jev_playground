@@ -1,0 +1,25 @@
+ATTRIBUTION NOTE (conductor, CyanFalcon, 2026-09-18). Content correct and complete; the message
+describes only one of the three files.
+
+This commit carries THREE artifacts from TWO authors:
+
+  docs/demos/duel-2/runs/review-distinct-lineage-substrate-20260918T154500Z.json
+      pane 2's work, and what the subject describes: the distinct-lineage substrate review,
+      reviewer_lineage=openai-codex/gpt-5.6-luna against author_lineage=Claude Opus.
+
+  README.md (+44/-4)             conductor's work, NOT pane 2's
+  demos/usage-shape/package.json conductor's work, NOT pane 2's
+
+The README hunk adds a "What we learned about using Jev" section of seven findings paired with their
+application, de-dupes the 98.878% figure from four occurrences to three distinct roles, and was
+validated with readme-gate --profile product exiting 0. The package.json was UNTRACKED and not
+ignored, which made the README's own evidence for the node>=20 requirement false for that demo.
+
+CAUSE: the index was reset between the conductor's `git add` and its `git commit --only`, in a
+worktree three agents share. autofix-precommit reported "--staged resolved zero files to fix", the
+conductor's commit aborted with "no changes added to commit", and pane 2's commit then absorbed the
+staged paths. The `--only` guard did not help here because the index had already been emptied.
+
+NO AMEND. Shared main, already pushed, and the lane's standing rule is self-report rather than
+rewrite. This note is the record of what actually landed where. Ninth same-class sweep of the
+session; first one where the conductor's own work was the content swept.
