@@ -285,6 +285,58 @@ is worth more than the code that would have discovered the same thing expensivel
 
 ---
 
+### CORRECTION appended 2026-09-18 — DO NOT KILL FOR THE SAKE OF KILLING
+
+> Joshua: *"but dont kill for the sake of kill - oftentimes this rule has agents killing things WAY
+> TOO EARLY"*
+
+**The paragraph above contains a Goodhart trap I wrote myself.** §2 says success is *"measured by
+how much it rules out per unit of effort"* — a metric that **rewards killing**. An agent optimizing
+it will kill good ideas to score. That sentence stands as written (append, don't insert) but it is
+**superseded by this section**, and the corrected metric is:
+
+> **The gauntlet succeeds when its rulings are CORRECT, not when they are numerous.** A lane that
+> rules out nothing and promotes the right idea has succeeded completely.
+
+**It already happened here, tonight, twice.** I killed blind-spot B1 on novelty grounds by
+conflating it with two other ideas it does not duplicate — a non-author caught it and B1 had to be
+un-retired (see the correction in §5.9). And I stamped demo-6 **REJECT** when the non-author's
+framing was strictly better: *"do not build unless demo-3 pays — if the 30-day contradiction rate
+is flat, kill demo-6 with it."* That is a **conditional hold with a measurement**, which is what I
+should have written.
+
+### Five rules that make a kill expensive
+
+1. **The burden of proof is on the KILL, not on survival.** Missing evidence makes a candidate
+   **UNASKABLE or HELD — never RULED OUT.** "We could not find a user" is not "there is no user".
+2. **A kill must cite, not infer.** Naming a rung is not a ruling. A kill needs the specific
+   measurement, incumbent tool, or failed reproduction that killed it. *"Probably already solved"*
+   is a research task, not a verdict.
+3. **A kill needs a non-author, exactly like a score.** One agent's rejection is an opinion. If the
+   author of a candidate is the one killing it, that is fine; if the *conductor* is killing another
+   pane's candidate, a non-author must concur.
+4. **Every RULED OUT ships a retry condition.** Same contract as `NEGATIVE_EVIDENCE.md`: the
+   observation that would make us reconsider. This is not ceremony — measured tonight, **R6's
+   retry condition fired and produced real work**, and **R12's fired nine minutes after it was
+   written**. A kill without a retry condition is a permanent loss dressed as a decision.
+5. **Rungs 1 and 2 may only kill on STRUCTURE, never on taste.** Rung 1 kills when a maintained
+   tool provably owns the niche or no user can be named. Rung 2 kills when the value is
+   demonstrably generation rather than judgment. **"I don't find this compelling" is not a rung.**
+   If a candidate needs rung 3 or 4 evidence to judge, the honest output is **HELD — needs thin
+   proof**, and thin proof is days, not weeks.
+
+### The bias this corrects, stated plainly
+
+Killing feels like rigor and costs nothing to write. Holding feels like indecision and leaves work
+on the board. So an agent under pressure to look decisive will over-kill — and every over-kill is
+invisible, because the counterfactual never gets built. **Over-promotion is self-correcting: the
+project fails and we learn. Over-killing is silent forever.** That asymmetry is why the burden sits
+on the kill.
+
+**Practical default when uncertain: HELD, with the cheapest experiment that would resolve it
+named.** A candidate parked with a named next measurement costs one line in this file. A candidate
+killed wrongly costs the whole idea.
+
 
 ## §4 Phase arc
 
