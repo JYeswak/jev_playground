@@ -230,21 +230,29 @@ JEV_PRICES=prices.json ./scripts/quickstart.sh --mine
 ```
 
 ```
-converted 2,462 of 2,565 assistant turns; 103 refused
-  no rate supplied for claude-fable-5 (102 turns) — add it to your sheet
-  no rate supplied for <synthetic> (1 turns) — add it to your sheet
+converted 47,428 of 55,794 assistant turns; 8,366 refused
+  no rate supplied for claude-fable-5 (7454 turns) — add it to your sheet
+  no rate supplied for claude-opus-4-8 (669 turns) — add it to your sheet
+  no rate supplied for <synthetic> (24 turns) — add it to your sheet
+The backtest REFUSED the converted data: NO_CHEAP_CANDIDATES: no turn qualifies for the cheap scenario
 ```
 
-**This repo ships no rates.** Claude Code records no cost, so every dollar downstream is *computed*
-from your sheet plus two declared rules — a cache multiplier, and `prompt = input + cache_read`. A
-model missing from your sheet is refused and named, never priced by guess; `<synthetic>` is not a
-model and gets no number.
+**That refusal is the answer, not a failure.** Under the demo's 20,000-token cheap-model budget, and
+with cache creation counted toward the context a turn occupies, **not one of 47,428 turns fits** — on
+a corpus where every turn carries a large cached prefix, cheap-model routing has nothing to route.
 
-**The second declared rule exists because the demo refused my first attempt.** Emitting raw
-`input_tokens` as the prompt made *every* turn qualify for the cheap model, and the backtest rejected
-the run: `NO_BASELINE_CANDIDATES — every turn qualifies for the cheap scenario`. It was right; a turn
-with `input_tokens: 2` and `cache_read_input_tokens: 55141` is not a 2-token prompt. **Its floor
-caught a conversion bug and refused to report fictional savings.**
+**This repo ships no rates.** Claude Code records no cost, so every dollar is *computed* from your
+sheet plus two declared rules — cache multipliers, and
+`context = input + cache_read + cache_creation`. A model missing from your sheet is refused and
+named, never priced by guess; `<synthetic>` is not a model and gets no number. A sheet that still
+carries the template's `REQUIRED:` provenance placeholders is **refused outright**, because a
+computed dollar figure must name where its rates came from.
+
+**Both declared rules were forced by failures, and the second by a non-author.** My first attempt
+counted only raw `input_tokens`, every turn qualified as cheap, and the backtest rejected the run —
+`NO_BASELINE_CANDIDATES`. I then declared `input + cache_read`, and a reviewing pane ruled that
+incomplete: a prefix being *written* to cache still occupies the window. **Its floors fired against
+the authors twice, in opposite directions.**
 
 Then the gate suite, which is a different thing with a different answer:
 
