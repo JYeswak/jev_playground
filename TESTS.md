@@ -80,3 +80,8 @@ The full census (~20 clones, growing) is derived, never hardcoded — see `AGENT
 Coverage percentages. This lane's test surface is a handful of first-party files plus other
 people's suites; a repo-wide coverage number would average our 8 assertions against ~20 vendored
 projects and mean nothing. Per-suite counts above are the honest unit.
+
+## 4. Routing backtest — first-party offline
+
+- `demos/routing-backtest/test/reader.test.mjs` — transcript denominator extraction and the empty-classifiable-set ERROR arm. Run: `cd demos/routing-backtest && npm test`.
+- `demos/routing-backtest/src/counterfactual.test.mjs` — deterministic cheap-route policy, recorded-spend preservation, missing-price ERROR, unknown-model fixture RED arm, and missing-spend failure. Run: `cd demos/routing-backtest && npm test`.
