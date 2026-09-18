@@ -5,7 +5,7 @@
 #	author: which pane authored it; a score from its author is NOT a rung-1 score
 candidate	rung	score	verdict	author	receipt	blocked_on
 demo-1-route-backtest	4	520	RULED_OUT	pane2	demos/routing-backtest/runs/backtest-real-excerpt.json	none-died-rung4-0.047pct
-demo-2-admission-screen	2	700	HELD	pane3	docs/demos/duel-2/runs/quoted-number-census-20260918T042957Z.json	demand-rests-on-jev-mcp-README-narrative-no-labelled-corpus-no-control-USAGE-1a-UNVERIFIED
+demo-2-admission-screen	2	700	CLEARED	pane3	docs/demos/duel-2/HELD_demo2_demand_COD.md	demand-RECOVERED-joergmichno-mcp-toolbox-2844-named-engineer-replaces-README-narrative-score-unchanged
 demo-3-claim-check-gate	2	430	HELD	pane1	docs/demos/duel-2/BASELINE_claimcheck_vs_jev_COD.md	rung3-headtohead-designed-ship-at-30pt-lift
 demo-4-foreman-lite	2	820	HELD	pane3	docs/demos/duel-2/SUPERSESSION_MU_argues_COD-H1.md	WITHDRAWN-standalone-retained-as-integration-of-COD-H1
 demo-5-fact-ledger	2	755	CLEARED	pane3	docs/demos/duel-2/RUNG2_JEV_SHAPE_COD.md	rung3-blocked-by-hunt-scores

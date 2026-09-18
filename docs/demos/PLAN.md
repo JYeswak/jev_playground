@@ -2636,3 +2636,52 @@ COD-H2 regardless, because the WIP limit is one and 650 < 905.
 *"No candidate was sent to a model"* — so the probe that asks whether a judgment model is needed was
 itself conducted without one. That is the cheapest possible form of this question, and it was
 available all along.
+
+---
+
+## §4g SECOND UNSEEDED EXTERNAL VOICE — and it points the same way as the first, away from §3m
+
+**`docs/demos/duel-2/HELD_demo2_demand_COD.md` (`ad7d8c6`), pane 2 as non-author of demo-2.**
+`DEMAND_HOLD_RECOVERED`, **score unchanged at 700.**
+
+**Named practitioner: Jörg Michno (`joergmichno`), Embedded Systems Engineer.** Google **MCP Toolbox
+issue #2844**, verbatim: database content entering LLM context, asking for **output sanitization
+before context**.
+
+That replaces the `jev-mcp` README narrative (`USAGE-1a`, `UNVERIFIED`, `control_exists: false`) that
+§3w demoted this candidate for. **demo-2's demand now rests on a filed issue by a named engineer
+instead of a vendor sentence.**
+
+### The pattern across two unseeded probes is now the strongest external evidence the lane has, and it is negative
+
+| Probe | Practitioner | What they asked for | Mentions calibration? |
+|---|---|---|---|
+| §3q (Q6) | Pablo Rodriguez, `paroque28` | `PreApiCall` hook — redact before the request leaves | **no** |
+| §4g (Q20) | Jörg Michno, `joergmichno` | output sanitization **before context** | **no** |
+
+**Two named practitioners, two different surfaces, two independent searches, and neither mentions
+calibration, confidence, probability or uncertainty.** Both ask for **an interception point that does
+not exist**. And pane 2 flagged it unprompted *both times* — *"No calibration framing"* — after I had
+explicitly retracted my lens for Q6 and never reinstated it.
+
+**§3m's standing is therefore worse than §3q left it.** The thesis now stands on: two designs I
+seeded (§3o), one third-party benchmark repriced to 3.5 points of method (§3p) and further narrowed to
+two signals (§3r), one external survey synthesis whose ceiling figures the census ruled
+`UNVERIFIED_EXTERNAL`/`CONFLICTED_EXTERNAL` (§3w), and **one local n=60 receipt that nobody has had
+to correct.** Against it: **two for two unseeded practitioner voices asking for coverage and timing.**
+
+**The honest reading, stated plainly:** *calibration may still be the right engineering wedge —
+`AutoModeMiddleware` provably lacks it (§3u), and entropy provably cannot substitute for judgment on
+unknown credentials (§4f).* **But it is not what the people with the pain are asking for.** Those are
+different claims, and conflating them is how a lane talks itself into building the wrong thing. **What
+practitioners voice is a missing hook; what the engineering evidence supports is calibrated
+abstention behind that hook.** The hook is the product; the calibration is how it decides.
+
+**That reframing is the single most useful thing the external probes produced**, and it took two panes
+independently refusing to translate complaints into my vocabulary to surface it.
+
+### Fourth unprompted application of the scoring rule
+
+Score stayed at **700**. Pane 2 has now applied *resolving a hold is not raising a score* **four
+times without being reminded** — demo-7, MU-H3, demo-6, demo-2. It is no longer a rule I enforce; it
+is how that pane works.
