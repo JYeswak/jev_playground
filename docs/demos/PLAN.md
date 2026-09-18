@@ -2923,3 +2923,67 @@ infrastructure, zero verdict.**
 **And the queue order does not change.** WIP is one, COD-H2 holds it at rung 4 with 905, MU-H2 sits at
 430. **MU-H2 does not get a live run ahead of COD-H2's rung-4 measurement**, however cheap it looks —
 that is the ordering §3k exists to enforce.
+
+---
+
+## §4l THREE OF FIVE COD CANDIDATES ARE BLOCKED BY **CORPUS SCARCITY**, NOT BY IDEA QUALITY
+
+**`docs/demos/duel-2/runs/codh41-labelfree-20260918T054800Z.json` (`53946b3`), pane 2 — author of
+both candidates, running thresholds pane 3 pre-registered.** Both label-free halves return
+**`UNASKABLE`**, and neither for a reason about the idea:
+
+- **COD-H1 snapshot-completion (885):** **41 candidate JSONL files, only 2 transcript-shaped**, both
+  in the jev root. The design requires **≥30 real transcripts across ≥3 harnesses** — *"unavailable
+  without subjective classification/labels."*
+- **COD-H4 toolresult-replay (900):** the public-source manifest
+  `demos/preaction-abstention/fixtures/h4-public-sources.json` is **absent**, and a 30-case corpus
+  **costs the full 4-hour build timebox.**
+
+**`No thresholds moved, no labels, no Jev, no model.`** The author of both candidates declined to
+advance either, and priced the obstacle instead of arguing past it.
+
+### The pattern, stated as a fact about this lane rather than about these ideas
+
+| Candidate | Score | Corpus situation |
+|---|---|---|
+| **COD-H2** | **905** | **already existed** — 111 journals, 14,556 turns, on disk |
+| COD-H4 | 900 | **does not exist**; 4-hour build |
+| COD-H1 | 885 | **2 of ≥30** transcripts; needs labelling |
+| MU-H1 | 820 | **17 markers / 283 KLOC** — died at rung 4 on the denominator (R14) |
+
+**The top five COD candidates sit inside a 20-point band (885–905), so idea quality is not what
+separates them. What separates them is whether the data already existed.** COD-H2 is at rung 4
+because its corpus was sitting on disk before anyone asked; MU-H1 died and two more are blocked
+because theirs were not.
+
+**That is a finding about the lane's environment: this lane does not have the data its best ideas
+need.** And it is worth more than any individual verdict here, because it predicts which future
+candidates can be tested at all.
+
+### Gauntlet amendment: corpus availability becomes a **rung-2** screen
+
+**The gauntlet currently discovers corpus scarcity at rung 3 or rung 4 — after a design, sometimes
+after a build.** MU-H1 got a full rung-1 and rung-2 pass and a falsification design before anyone
+counted its markers. COD-H1 and COD-H4 got falsification designs before anyone checked their
+corpora.
+
+**New rung-2 question, added to "does this need a calibrated per-decision auditable probability with
+the option to withhold":**
+
+> **Does the corpus this candidate needs already exist on disk, unlabelled, right now?** If yes,
+> proceed. If no, **price it before proceeding** — the candidate is `UNASKABLE` until the corpus cost
+> is stated, and that cost is part of its rung-3 estimate.
+
+**This is §3k's principle one layer earlier.** §3k says estimate rung 4 before paying for rung 3;
+this says **estimate the corpus before designing the falsifier**, because a falsification design for
+a corpus that cannot be assembled is a document, not a test.
+
+### Neither candidate is killed, and both retry conditions are concrete
+
+**COD-H1 → HELD on corpus.** Retry: **≥30 transcript-shaped files across ≥3 harnesses**, obtainable
+without subjective classification. Two exist. **That is a sourcing problem with a countable target.**
+
+**COD-H4 → HELD on corpus, priced.** Retry: **build the 30-case corpus at a 4-hour cost.** This is
+not a blocker, it is **a deferral with a price tag** — and at score 900 it is the first candidate
+behind COD-H2, so if COD-H2's rung 4 succeeds, **four hours is a known and probably acceptable
+entry fee.** Recording the price is what makes that decision possible later.
