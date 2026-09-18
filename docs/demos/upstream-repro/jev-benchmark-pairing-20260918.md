@@ -66,6 +66,31 @@ near-1.000 band is where its one expensive mistake lives.
 2. **Add cases on the `readonly`/`privileged` boundary** rather than more cases overall.
 3. **Widen the high-confidence miss check to a band** (`>= 0.95`), where `t060` already lives.
 
+## Correction, 2026-09-18: a suggestion this receipt made does not survive its own data
+
+TypeSafe's vendored documentation (`docs-mirror/typesafe/confidence.md`) states that `confidence` is
+a convenience statistic over the distribution, and that *"you are never locked into our definition …
+which is exactly why we give you the full `probabilities` in the response."* That reads as the
+remedy for saturation: if the collapsed number is near-binary, compute a different one.
+
+**It does not work here, and the committed results say so.** Across the 40 cases where
+`confidence == 1.000` exactly:
+
+```
+margin  (top - second)   min 1.000000   max 1.000000   distinct values: 1
+entropy                  min 0          max 0          distinct values: 1
+```
+
+**The distribution itself is degenerate, not merely the statistic derived from it.** No alternative
+measure over these probabilities recovers signal, because there is nothing left to measure: the
+second-place mass is zero to the precision recorded. Entropy does not separate the misses either —
+`t060` is wrong at entropy 0.098, *lower* (more certain) than `t032` at 0.423, which is also wrong.
+
+So the honest suggestion to upstream is narrower than the one above: **recording higher-precision
+probabilities would tell you whether the saturation is the model or the serialisation.** Until then,
+"route on confidence" and "route on your own statistic" fail for the same reason, and this receipt
+originally implied only the first.
+
 ## No-claim
 
 - This is re-analysis of **upstream's committed results**. No live call was made, nothing was
