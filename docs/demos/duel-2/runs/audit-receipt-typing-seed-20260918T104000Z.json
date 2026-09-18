@@ -1,0 +1,34 @@
+{
+  "schema": "jev.receipt-typing-audit-seed.v1",
+  "generated_at": "2026-09-18T10:40:00Z",
+  "seed": 20260918,
+  "population_source": "docs/demos/STATUS.tsv",
+  "population_n": 17,
+  "population_ids": [
+    "demo-1-route-backtest",
+    "demo-2-admission-screen",
+    "demo-3-claim-check-gate",
+    "demo-4-foreman-lite",
+    "demo-5-fact-ledger",
+    "demo-6-claim-check-notes",
+    "demo-7-signals-starter",
+    "demo-8-credential-screen",
+    "demo-9-review-signal",
+    "COD-H1-snapshot-completion",
+    "COD-H2-preaction-abstention",
+    "COD-H3-price-drift-auditor",
+    "COD-H4-toolresult-replay",
+    "COD-H5-compaction-integrity",
+    "MU-H1-todo-judge",
+    "MU-H2-outbound-redaction",
+    "MU-H3-runtime-redaction"
+  ],
+  "selection": "mulberry32(seed); Fisher-Yates over population order; first 8 indices; no stratification or replacement",
+  "sample_n": 8,
+  "agreement_bar": {
+    "exact_type_agreement": ">=7/8",
+    "critical_types": "all sampled score and hold-resolution assignments must agree; any critical disagreement fails the bar"
+  },
+  "declared_before_sampling": true,
+  "author": "WindyJaguar / pane 2"
+}
