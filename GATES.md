@@ -81,6 +81,7 @@ citation edge.
 | `dcg` (machine-wide) | `git add -A` / whole-tree staging in this shared worktree (`zeststream.shared_worktree:git-add-whole-tree`), and the rest of the destructive set | n/a — external guard | live — it denied a blanket stage during the `git init` |
 | `scripts/sync-docs.sh --check` | citing a vendored primary source that has drifted from its committed sha256 manifest | delete or edit a mirrored file, re-run: reports `MISSING` / `DRIFT` and exits 1 | run before citing `docs-mirror/**`; `CHECK PASS 114 mirrored files` at this commit |
 | `~/.claude/scripts/skill-topology-gate.sh` | skill-store divergence across the 8 agent roots | n/a — external | run after any tool install that "activates skills" |
+| `$HOME/.local/bin/fleet-idle-monitor` (shared binary, cron `8,18,…`) | a worker pane sitting idle between 20-minute ticks — the conductor was blind to it and a human chase was the only detector | n/a — external, and see the three defects below | **live, `--report-only` ONLY.** Read its output **workers-only**: `pane_index 0` is the user shell (`cmd=zsh`) and is idle by definition. **Never run this row in `--nudge` mode for jev** until a binary-side exclusion exists — measured 2026-09-18, it has none (`--help` exposes only `--nudge`/`--report-only`/`--selftest`; no worker, agent_type, exclude or shell filter in help or `strings`), so a nudge mode would type a dispatch into Joshua's shell |
 
 ---
 

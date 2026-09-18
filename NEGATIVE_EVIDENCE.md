@@ -276,3 +276,51 @@ with a pinned generator (fixed model, fixed temperature, fixed seed if the provi
 **or** a reported distribution — n≥10 per arm with the spread published, not a single verdict
 string. Until then the harness may report arm A absolutely and must not emit a `verdict` field at
 all; a one-word verdict over a stochastic arm is the defect, not the presentation.
+
+---
+
+## R12 — Do not grep for the line you expect. It hides the state that produced it.
+
+**Near-miss, 2026-09-18.** Pane 2's probe (`1a4dd77`) found the shared `fleet-idle-monitor` embeds
+`FLEET_QUEUE_REPO` and defaults to `/Users/josh/Developer/uds`, which neatly explained why it
+recommended the cross-project bead `uds-ry5d` for a jev pane. I tested the env var like this:
+
+```bash
+FLEET_SESSION=jev … fleet-idle-monitor --report-only | grep -E 'ACTIONABLE|bead='   # default: 1 row
+FLEET_SESSION=jev FLEET_QUEUE_REPO=…/jev … --report-only | grep -E 'ACTIONABLE|bead='  # with var: NOTHING
+```
+
+The `ACTIONABLE` row disappeared, and I was one command away from recording "`FLEET_QUEUE_REPO`
+fixes the cross-project recommendation."
+
+**It fixed nothing.** Reading the *full* output showed both runs identical: `UNPROVEN session=jev
+pane=%70 reason=capture_gap` plus three WORKING panes and `OK no two-capture idle panes beside
+ready work`. The row vanished because a fresh invocation resets `%70` to **UNPROVEN** — the binary
+states its own contract in its usage banner, *"true idle requires two captures"* — and the single
+`ACTIONABLE` observation came from **cron-accumulated** state (`age=2041s`). The env var was never
+exercised.
+
+**Why the grep hid it:** `grep -E 'ACTIONABLE|bead='` over output containing neither pattern
+returns empty, and empty was exactly what "fixed" looks like. **A filter tuned to the expected
+answer cannot distinguish "the condition changed" from "the condition never occurred."** Same
+family as the five earlier instrument errors in this file: `^PASS` versus `name PASS`, "ripwire"
+matching `*-skill-tripwire.sh`, a usage banner read as a removed flag, a fixture's own hooks read
+as a gate misfire, and "4 questions" reconstructed from `liveCalls: 4`. **Seventh of the family,
+and the first one caught before it was written down.**
+
+Attempted reproduction so the claim could be tested honestly: two invocations 3 s apart, with and
+without the variable. Both still `reason=capture_gap` — the required interval is longer than 3 s
+(fleet doctrine says 30 s is too short and ≥75 s is the working window), so **the env var's effect
+is UNMEASURED, not confirmed and not refuted.**
+
+**What was done instead of claiming a fix:** the jev cron row now sets
+`FLEET_QUEUE_REPO=/Users/josh/Developer/jev` (diff +0/−0 lines, one row edited, `crontab -l` grep
+confirms 1 occurrence). It is strictly more correct than pointing at another project, it is
+reversible in one edit, and **the cron is now the instrument** — the next `ACTIONABLE` row in
+`~/.local/state/flywheel/jev-fleet-idle.log` either names a jev bead or it does not.
+
+**Retry condition:** read that log after any `IDLE_PROVEN` row appears. If the accompanying
+`ACTIONABLE` row names a `jev-*` bead, the variable works and `jev-demo-loop-a1q.4` loses one of
+its three defects. If it still names `uds-*`, the queue source is not env-configurable and the
+upstream bead must cover it. **Either way the measurement belongs to the cron, not to an inline
+run that cannot reach the two-capture state.**
