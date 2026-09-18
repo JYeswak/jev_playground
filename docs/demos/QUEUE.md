@@ -240,7 +240,7 @@ Then, and only then, fall through to the `PLAN.md` §3c dry-queue default. **Exh
 never happened; if it does, that is a real finding about the lane and not a reason to stop.**
 
 ## UNIT Q14 — **does the shipped incumbent ABSTAIN, or only allow/deny?** (COD-H2's life)
-**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2). **CLAIM:** unclaimed
+**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/RUNG2_COD-H2_owned_MU.md` `25eee0c` — middleware binary, COD-H2 narrowed (Q67 triage).
 
 **External market evidence landed and COD-H2 — the lane's only rung-3 candidate — may already be
 shipped by two well-resourced parties.** Vercel runs a safety reviewer over *every command* in
@@ -276,7 +276,7 @@ rules COD-H2 out, v2.2's result stops mattering — finish or abandon it as you 
 Output `docs/demos/duel-2/RUNG2_COD-H2_owned_MU.md`, ≥4,000 chars.
 
 ## UNIT Q15 — COD-H5: is shipped compaction doing **integrity**, or only score-and-drop?
-**ELIGIBLE: pane 3 only** (pane 2 authored COD-H5). **CLAIM:** unclaimed
+**ELIGIBLE: pane 3 only** (pane 2 authored COD-H5). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/RUNG2_COD-H5_owned_MU.md` `17f842c` — distinct products, tester-to-subject (Q67 triage).
 
 Same shape, same urgency. `github.com/tamaratran/fast-jev-compaction` is shipped and running as a
 Claude plugin; Alex Volkov reports **1M tokens → 86K in one second**, and Diogo Almeida's own reply
@@ -436,7 +436,7 @@ and §3t's survey shows pre-context screening is a live pattern people are shipp
 Output `docs/demos/duel-2/HELD_demo2_demand_COD.md`, ≥4,000 chars.
 
 ## UNIT Q24 — **the last gate on rung 3**: prove the calls were live, do not assert it
-**ELIGIBLE: pane 3** (owns the build and the client). **CLAIM:** unclaimed
+**ELIGIBLE: pane 3** (owns the build and the client). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/runs/codh2-rung3-provenance-20260918T070000Z.json` `2818a57` — 5 live calls + absent-field finding (Q67 triage).
 
 Pane 2's Q23 grade (`47d9e54`) accepted Partial 2's internal consistency and **refused its liveness
 claim**: *"pin identity and per-call live provenance are **asserted, not receipt-proven**."* **It is
@@ -529,7 +529,7 @@ has an open unit. If not, it gets the next dispatch first.** Callback-driven dis
 intrinsically biased toward the faster pane; the correction has to be mechanical, not attentive.
 
 ## UNIT Q30 — price the 200 policy labels. **The only thing blocking rung 4 on the leader.**
-**ELIGIBLE: pane 3** (owns the corpus and `policy.json`). **CLAIM:** unclaimed
+**ELIGIBLE: pane 3** (owns the corpus and `policy.json`). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/RUNG4_LABEL_PLAN_MU.md` `525bfc2` — N=200 ~90 label-minutes (Q67 triage).
 
 Pane 2's rung-4 design (`3a5851f`) is accepted and needs *"one immutable manifest of **N=200
 labelled cases** before live calls"* with *"ground-truth labels [that] are **policy labels, not model
@@ -552,7 +552,7 @@ an external figure with no control opened (§3w) — unverified at the point of 
 Output `docs/demos/duel-2/RUNG4_LABEL_PLAN_MU.md`.
 
 ## UNIT Q31 — demo-9 vs `ubs`: run the baseline it was cleared *conditional* on
-**ELIGIBLE: pane 3** (pane 2 authored demo-9). **CLAIM:** unclaimed
+**ELIGIBLE: pane 3** (pane 2 authored demo-9). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/runs/demo9-vs-ubs-20260918T061500Z.json` `980f4e8` — corpus PROCEED, comparison UNASKABLE (Q67 triage).
 
 demo-9 sits CLEARED at **550** with the condition *"must **beat** `ubs` baseline, not subset"* —
 **never run.**
@@ -613,19 +613,47 @@ artifact read as current.
 **RULE: a unit dispatched in a packet MUST also be appended here in the same turn, or the fallback is
 broken by design.** Not for bookkeeping — because the fallback *reads this file.*
 
-## CURRENT OPEN UNITS — authoritative as of `2026-09-18`, after Q47's block
+## CURRENT OPEN UNITS — authoritative as of `2026-09-18T10:15Z`, Q67 triage from receipts
+
+**Q67 finding on the five pane-locked rows:** Q14/Q15/Q24/Q30/Q31 are ALL DONE with landed
+receipts (shas below) — but all five CLAIM lines still read `unclaimed`. The pane locks were
+CORRECT (authorship/non-author standing required pane 3 in each case; see per-row notes), so no
+row needs unlocking. The defect was bookkeeping, same stale-file class as the Q32 section above:
+locks justified, CLAIM lines rotten. CLAIM lines corrected in the same commit as this table.
+**Q32, Q26, Q19, Q20 CLAIM lines still read `unclaimed` against executed work (§4p `db6e78d`,
+provenance file `2818a57`, RUNG2_MU-H3_entropy file, HELD_demo2 file) — NOT touched by Q67
+(out of scope); conductor should correct or confirm.**
 
 | Unit | Owner | State |
 |---|---|---|
-| **Q45** draw 20-case sample from the **24 verifiable** cases, seed committed first | pane 3 | open |
-| **Q46** label those 20 blind under the risk-tiered rubric | pane 3 | open, after Q45 |
-| **Q47** label the same 20 blind, independently | pane 2 | **BLOCKED** — `demos/preaction-abstention/fixtures/rung4-verifiable-sample.json` absent (`rc1`, correctly reported); fires on arrival |
-| **Q48** is MU-H3's prevalence measurable here at all, given Q39 struck the credential stratum | pane 2 | open |
-| **Q49** specify + price the evidence-carrying manifest | pane 2 | open |
+| **Q14** incumbent abstention question | pane 3 | DONE `RUNG2_COD-H2_owned_MU.md` `25eee0c` — middleware binary, COD-H2 narrowed |
+| **Q15** shipped-compaction integrity question | pane 3 | DONE `RUNG2_COD-H5_owned_MU.md` `17f842c` — distinct products, tester-to-subject |
+| **Q24** per-call wire provenance | pane 3 | DONE `codh2-rung3-provenance-20260918T070000Z.json` `2818a57` — 5 live calls + absent-field finding |
+| **Q30** price 200 policy labels | pane 3 | DONE `RUNG4_LABEL_PLAN_MU.md` `525bfc2` — N=200 ~90 label-minutes |
+| **Q31** demo-9 vs ubs baseline | pane 3 | DONE `demo9-vs-ubs-20260918T061500Z.json` `980f4e8` — corpus PROCEED, comparison UNASKABLE |
+| **Q45** 20-case draw | pane 3 | DONE `verifiable-draw-20260918T071500Z.json` `3daa157` |
+| **Q46** label 20 blind (risk rubric) | pane 3 | DONE `verifiable-labels-mu-20260918T072000Z.json` `8cf062b` |
+| **Q47** label 20 blind (pane 2) | pane 2 | DONE `verifiable-labels-cod-20260918T072249Z.json` (file commit `2fc1165`) |
+| **Q48** MU-H3 prevalence measurable | pane 2 | DONE `HELD_MUH3_prevalence_measurable_COD.md` (`8a99920`) |
+| **Q49** evidence manifest spec+price | pane 2 | DONE `SPEC_evidence_manifest_COD.md` (`58f7302`) |
+| **Q51** label-id mapping | pane 3 | DONE `label-id-mapping-20260918T073641Z.json` `f4ffad7` |
+| **Q53** clause relabel | pane 3 | DONE `verifiable-labels-mu-clause-20260918T074520Z.json` `8dd06f0` |
+| **Q55** gauntlet spec extraction | pane 3 | DONE `GAUNTLET_SPEC_MU.md` `c9a2fd9` |
+| **Q56** spec audit (non-author) | pane 2 | DONE `audit-gauntlet-spec-20260918T081500Z.json` `226adfb` |
+| **Q57** deletion rulings | pane 2/conductor | DONE `RULE_deletions_COD.md` `1cb3cf3` |
+| **Q60** concede-or-contest | pane 3 | DONE `CONCEDE_spec_audit_MU.md` `58cbf94` |
+| **Q61** audit deletions ruling | pane 3 | DONE `audit-deletions-ruling-20260918T084539Z.json` `fe0f9e1` |
+| **Q62** concurrence archaeology | pane 3 | DONE `CONCURRENCE_archaeology_MU.md` `1bad293` |
+| **Q63** score-edit lineage | pane 3 | DONE `score-edit-lineage-20260918T085146Z.json` `f8b8cb8` |
+| **Q64** prose-means ruling | pane 3 | DONE `RULE_prose_means_MU.md` `c415530` |
+| **Q65** author-column audit | pane 3 | DONE `author-column-audit-20260918T100413Z.json` `2f75165` |
+| **Q66** pane-1 identity | pane 3 | DONE `pane1-identity-20260918T100907Z.json` `f58b14e` |
+| **Q50/Q52/Q54/Q58/Q59** | — | state per conductor packets; NOT re-derived in Q67 triage |
+| **Q1–Q44** | — | inherits prior claim (DONE/BLOCKED-reported/superseded); NOT re-audited in Q67 |
 
-**Everything Q1–Q44 is DONE, BLOCKED-and-reported, or superseded.** The four units pane 2's fallback
-named (Q12/Q14/Q15/Q16) are all complete — Q12 and Q14 landed the classifier sharpening and the
-`AutoModeMiddleware` source-read, Q15 the COD-H5 distinctness ruling, Q16 the rung-3 build.
+**Open units: NONE.** Lane terminus stands (pane 2 `NEXT none lane-bounded`; pane-3 dry-queues
+agree). Next work is manifest implementation (project), external corpus (outside lane), or fresh
+conductor dispatch — not this file.
 
 **If this table is older than the last dispatch when you read it, that is the same defect again and
 you should say so in a callback rather than working from it.**
