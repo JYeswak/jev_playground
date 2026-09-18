@@ -3421,3 +3421,66 @@ terminal state.
 **Labelling is not blocked and starts now.** Pane 3: *"labeling can start on the 68 committed cases
 immediately."* At the measured ~90-min/200 rate, 68 cases is roughly half an hour, and every one of
 them is needed under either the re-scope or a later widening.
+
+---
+
+## §4u I PROPOSED A NARROWING THAT WOULD HAVE ADVANCED MY OWN LEADER. PANE 2 REFUSED IT WITH ARITHMETIC.
+
+**`docs/demos/duel-2/runs/rescope-rung4-ruling-20260918T061200Z.json` (`e3451a9`).** Verdict:
+**`RUNG4_UNASKABLE_ON_THIS_CORPUS`.**
+
+I asked four questions in the Q36 packet and every answer came back against the proposal:
+
+| My question | Answer, with the number |
+|---|---|
+| How wide are the intervals at n=50; does any gate become unfalsifiable? | **Wilson width `.2671` at 50% coverage**; at 90% coverage the interval is **`.7864–.9565`** |
+| Does K=10 repetition substitute for case count on ECE? | **No — "K10 measures stability, not case calibration"** |
+| Is a 30-case band enough to detect flip behaviour at `flip ≤ 5%`? | **No — n=30 zero-flip upper bound is `.1135`**, so **≤5% cannot clear even with zero observed flips** |
+| Does excluding `disallowed_destructive` gut the safety claim? | **Yes — human lift and whole-policy safety are both unaskable** |
+
+**The flip result is the one that settles it, and it is a hard fact rather than a judgement.** At
+n=30, **perfect observed stability still yields a 95% upper bound of 11.35%** — so a `≤5%` gate is
+**unfalsifiable at that sample size.** A gate that cannot be cleared by a flawless result is not a
+gate; it is a formality. **Running it would have produced a number that looked like evidence and
+carried none.**
+
+### What this says about my own proposal, which is the part worth keeping
+
+I argued the re-scope was *"defensible rather than post-hoc"* and gave three reasons: the ambiguous
+stratum hit its pre-registered 50 exactly, the band was full and spec-defined, and the exclusions
+were absences reported rather than results discarded.
+
+**All three are true and all three are irrelevant to whether the measurement works.** I answered
+*"is this narrowing honest?"* and **never asked *"can n=50 support these gates?"*** — a power
+question I omitted entirely. **That is a different failure from my usual one:** not a miscited
+number (§3w, §4b) but **a whole dimension of the problem left unexamined while I reasoned carefully
+about a different one.**
+
+**And I had explicitly refused to ratify my own proposal for exactly this reason** — *"I want the
+leader to advance, which is exactly the bias a re-scope could launder."* **The refusal was the only
+part of that turn that did any work.** Had I ratified it, the lane would now hold a rung-4 "pass" on
+50 cases with a 27-point interval.
+
+### Ruling: COD-H2 holds at rung 4, UNMEASURED. `PROMOTED` stays 0.
+
+**What is permitted:** a *narrow ambiguous-authority **descriptive pilot*** — pane 2's words — which
+may describe behaviour and **may not claim a gate.**
+**What is forbidden:** any destructive or credential claim. `credential_injection` is **absent** from
+the corpus (0 of 111 journals) and `disallowed_destructive` has **8 cases**; neither supports a
+claim at any K.
+
+**So the lane's answer to the question it was built to ask now has a precise shape.** COD-H2
+pre-action abstention:
+
+- cleared **rung 1** at 905 on a blind non-author score,
+- cleared **rung 2** on structure, against a shipped incumbent proven binary by source-read,
+- cleared **rung 3** completely — real client with `rc2` and no fallback, RED arms that caught two
+  real bugs plus an independent 9/9 probe, three wedge outcomes driven by live probabilities, model
+  echoed 5/5, clean-clone **13/0**,
+- and is **UNASKABLE at rung 4 on available data.**
+
+**Its promotion is now a sourcing question, not an idea question.** Everything about the candidate
+that could be tested has passed; what blocks it is that this lane's corpus contains 8
+policy-relevant destructive actions and zero credential injections. **That is the §4l finding —
+"this lane does not have the data its best ideas need" — arriving at the top of the backlog instead
+of the bottom.** Pane 3 is pricing the widening now (Q39), and that price is the whole decision.
