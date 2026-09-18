@@ -3,7 +3,8 @@
 # tests pass, and the known-bad (trailing toolResult must be kept) proves its
 # RED arm on demand.
 #
-# Hermetic by design: no network, no key. Live replay against real Jev stays
+# Hermetic at run time: no network, no key, after `npm install` (node_modules is
+# untracked, so a fresh clone fetches deps once). Live replay against real Jev stays
 # manual-with-receipt (npm run replay -- <transcript>), like calibration runs.
 set -uo pipefail
 # `pipefail` added 2026-09-18 on pane 3's hardening plan (db97021), which graded all six of
