@@ -94,7 +94,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`foreman`|watch a software factory floor with Jev|**RUN**: 57/58, one real failure reported|it is a per-worker supervisor with no queue concept, so it does not replace the tick|
 |`bicameral`|System 2 writes the code, System 1 judges it|**RUN** (pane 3): 41 tests pass offline, no key|adopt its two differences: pluggable judgment, and degrading toward patterns not passthrough|
 |`jev-review`|Jev for code review|not run|read|
-|`system-one-adapter-python`|a drop-in `system_one` backed by an LLM|not run|useful as a control: an LLM standing in for Jev|
+|`system-one-adapter-python`|a drop-in `system_one` backed by an LLM|**RUN** (pane 2): 204 tests pass|the seam we needed already exists in our code; a Python bridge is refused with costs named|
 |`skillranker`|a ranker built on Jev, mirrored here|mirror current|read its Jev question construction; never copy its files|
 |`jev-benchmark` (themsquared)|is Jev's confidence score worth routing on, at n=60|**RUN** — pairing shows the two versions never disagree|add cases on the `readonly`/`privileged` boundary, not more cases|
 |`awesome-jev`, `awesome-jev-by-typesafe`, `awesome-typesafe`|curated indexes of everything above|read|a discovery source, not evidence|
