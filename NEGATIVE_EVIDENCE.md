@@ -600,3 +600,48 @@ attempt to size the regex counted **all 17 rows' receipts** (14/14/12 matching) 
 ever reads the **changed** rows' receipts. **Wrong control, caught mid-measurement before any claim
 was published** — the first time in this session that the loop closed before the number left my
 hands.
+
+### R17 CORRECTION (2026-09-18, pane 2 `965005a`) — the direction claim was false in its load-bearing half
+
+**R17 above says:** *"the direction is permissive — it under-fires (missed trips), it never falsely
+accuses."* **That is wrong, and pane 2 found it in a non-author audit of my instruments:**
+
+> **"`b2eaf6f` claim `regex under-fires but never false-accuses` is FALSE generally: a real score
+> receipt with nonmatching filename triggers rc5."**
+
+**The regex is used NEGATED** — `if not any(SCORE_RECEIPT.search(r)): trip` — so:
+
+| filename lies... | consequence |
+|---|---|
+| a **non-score** receipt **matches** the pattern | no trip → **false GREEN** (what R17 described) |
+| a **genuine score** receipt **misses** the pattern | trip → **false RED on honest work** |
+
+**And a false RED is the failure mode I myself called worse**, because it trains everyone to ignore
+the gate. **I asserted the safe direction and shipped the unsafe one alongside it.**
+
+**Measured exposure, both directions live in the current file:**
+
+```text
+unique receipts in STATUS.tsv ....... 16
+matching SCORE_RECEIPT .............. 6
+NOT matching ........................ 10   <- false-RED exposure, the MAJORITY
+```
+
+And the false-GREEN half is concrete too: **`docs/demos/duel-2/HELD_demo2_demand_COD.md` matches** —
+because `demand_` satisfies `DEMAND_` under `re.I`. **A hold receipt passing as a score receipt.**
+
+**No arm caught this, and that is why I believed the wrong direction.** Pane 2: *"score selftest has
+no genuine score receipt whose filename misses `SCORE_RECEIPT`, so the R17 false-red hole remains."*
+**`ARM G` tests a non-score receipt tripping correctly; nothing tested a score receipt tripping
+wrongly.**
+
+**RESOLUTION — not a regex patch.** Pane 2's Q19 ruling (`RULE_receipt_type_COD.md`, `fe63347`)
+replaces inference with a **declared** `receipt_type` enum read as a field, fail-closed on
+empty/unknown/out-of-enum, **never filename-backfilled.** That **removes the defect class** rather
+than tuning a pattern, so both error directions go together. Patching the regex would have kept a
+label-defining rule alive with better constants.
+
+**And the measurement error inside this correction, recorded because the pattern is the point:** my
+first attempt to size the exposure ran a **case-sensitive `grep -E`** against a **`re.I`** regex, and
+reported 12 nonmatching. Wrong control; corrected to 10 before publishing. **Eighth instance, second
+consecutive one caught before the number left my hands.**

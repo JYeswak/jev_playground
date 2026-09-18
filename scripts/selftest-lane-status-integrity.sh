@@ -70,17 +70,57 @@ else
   fail=$((fail+1))
 fi
 
+# ARM 6 — concurrence missing ALONE. Was rc=3; now rc=5, because pane 2's non-author audit found that
+# "lane rc3 conflates missing receipt and missing concurrence (output distinguishes, exit does not;
+# missing branch MASKS concurrence if both)". Each class now has its own code.
 mk '{"a":1}' RULED_OUT ''
 out=$(run); rc=$?
-if [ "$rc" = 3 ] && printf '%s' "$out" | grep -q 'NO kill_concurrence'; then
-  printf 'PASS  %-46s rc=3 authorship boundary unrecorded\n' 'ARM 6 RULED_OUT, empty concurrence'
+if [ "$rc" = 5 ] && printf '%s' "$out" | grep -q 'NO kill_concurrence'; then
+  printf 'PASS  %-46s rc=5 authorship boundary unrecorded\n' 'ARM 6 RULED_OUT, empty concurrence'
 else
-  printf 'FAIL  %-46s rc=%s (want 3)\n' 'ARM 6 RULED_OUT, empty concurrence' "$rc"; fail=$((fail+1))
+  printf 'FAIL  %-46s rc=%s (want 5)\n' 'ARM 6 RULED_OUT, empty concurrence' "$rc"; fail=$((fail+1))
 fi
 
 mk '{"a":1}' RULED_OUT 'author-self'
 check 'ARM 7 RULED_OUT, concurrence recorded' 0 0 0 1
 
+# ARM 8 — BOTH classes at once. This is the arm pane 2's finding demanded: under the old elif chain
+# the missing-receipt branch fired and the verdict line said NOTHING about concurrence, so a caller
+# reading the exit code could not tell one failure from two.
+mk '{"a":1}' RULED_OUT ''; rm -f "$TMP/receipt.json"
+out=$(run); rc=$?
+if [ "$rc" = 6 ] && printf '%s' "$out" | grep -q 'RECEIPT MISSING' && printf '%s' "$out" | grep -q 'NO kill_concurrence'; then
+  printf 'PASS  %-46s rc=6 both classes reported, neither masked\n' 'ARM 8 missing receipt AND concurrence'
+else
+  printf 'FAIL  %-46s rc=%s (want 6) — one class masked the other\n' 'ARM 8 missing receipt AND concurrence' "$rc"
+  fail=$((fail+1))
+fi
+
+# ARM 9 — SHORT ROW (6 columns, schema violation). Pane 2: "no malformed/short/extra STATUS schema
+# arms". Pinning the behaviour rather than asserting it is safe: a short RULED_OUT row has no
+# concurrence field, so it must fail closed on that, not pass quietly.
+printf '#\tfixture\n' > "$TMP/status.tsv"
+printf '%s' '{"a":1}' > "$TMP/receipt.json"
+printf 'FIX-1\t2\t900\tRULED_OUT\tCOD\t%s\n' "$TMP/receipt.json" >> "$TMP/status.tsv"
+out=$(run); rc=$?
+if [ "$rc" = 5 ]; then
+  printf 'PASS  %-46s rc=5 short row fails closed on concurrence\n' 'ARM 9 short row (6 cols)'
+else
+  printf 'FAIL  %-46s rc=%s (want 5) — schema violation passed\n' 'ARM 9 short row (6 cols)' "$rc"
+  fail=$((fail+1))
+fi
+
+# ARM 10 — EXTRA COLUMN. `read` assigns every trailing field to the last variable, so an extra column
+# corrupts the digest rather than being ignored. That must surface as LOUD drift, never as a pass.
+mk '{"a":1}'; perl -i -pe 's/$/\tEXTRA/ if !/^#/' "$TMP/status.tsv"
+out=$(run); rc=$?
+if [ "$rc" = 4 ]; then
+  printf 'PASS  %-46s rc=4 extra column surfaces as drift, not a pass\n' 'ARM 10 extra column (10 cols)'
+else
+  printf 'FAIL  %-46s rc=%s (want 4) — extra column silently tolerated\n' 'ARM 10 extra column (10 cols)' "$rc"
+  fail=$((fail+1))
+fi
+
 printf '\n%s\n' '----------------------------------------------------------------------'
-[ "$fail" = 0 ] && { printf 'OK: both gates discriminate on all 7 arms.\n'; exit 0; }
+[ "$fail" = 0 ] && { printf 'OK: both gates discriminate on all 10 arms.\n'; exit 0; }
 printf 'FAIL: %d arm(s) did not discriminate.\n' "$fail"; exit 1

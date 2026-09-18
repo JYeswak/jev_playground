@@ -168,20 +168,39 @@ fi
 
 # ---------------------------------------------------------------- verdict
 printf '\n%s\n' "----------------------------------------------------------------------"
+# EXIT-CODE DISAGGREGATION — pane 2, audit-instruments-20260918T101000Z.json (965005a), non-author:
+# "lane rc3 conflates missing receipt and missing concurrence (output distinguishes, exit does not;
+# MISSING BRANCH MASKS CONCURRENCE IF BOTH)." Correct on both counts. The elif chain meant a tree
+# with one absent receipt reported nothing about concurrence at the verdict line, and a caller
+# reading only the exit code could not tell the two failures apart. Now: every failing class is
+# REPORTED, and the exit code names which classes fired rather than which one was checked first.
+#   3 = missing receipt (alone)      6 = missing receipt AND missing concurrence
+#   4 = digest drift (alone)         7 = any other combination of two or more classes
+#   5 = missing concurrence (alone)
+fails=0
 if [ "$missing" -gt 0 ]; then
   printf 'FAIL: %d of %d STATUS rows cite a receipt that does not exist.\n' "$missing" "$rows"
   printf 'A verdict with no artifact behind it is the known-bad this script fires on.\n'
-  rc=3
-elif [ "$concur_missing" -gt 0 ]; then
+  fails=$((fails+1))
+fi
+if [ "$concur_missing" -gt 0 ]; then
   printf 'FAIL: %d of %d RULED_OUT rows carry no kill_concurrence value.\n' "$concur_missing" "$ruled_out"
   printf 'A kill whose authorship boundary is unrecorded is the same known-bad as a missing receipt.\n'
-  rc=3
-elif [ "$drifted" -gt 0 ]; then
+  fails=$((fails+1))
+fi
+if [ "$drifted" -gt 0 ]; then
   printf 'FAIL: %d of %d integrity-checked receipts drifted from their pinned digest.\n' "$drifted" "$pinned"
   printf 'Content changed beyond terminal whitespace. Re-pin deliberately or explain the change.\n'
-  rc=4
-else
+  fails=$((fails+1))
+fi
+if [ "$fails" -eq 0 ]; then
   printf 'OK: %d candidates. %d receipt(s) exist; %d integrity-checked, %d existence-only; %d/%d kills concurrence-recorded.\n' \
     "$rows" "$with_receipt" "$pinned" "$unpinned" "$((ruled_out-concur_missing))" "$ruled_out"
+elif [ "$fails" -gt 1 ]; then
+  if [ "$missing" -gt 0 ] && [ "$concur_missing" -gt 0 ] && [ "$drifted" -eq 0 ]; then rc=6; else rc=7; fi
+  printf 'FAIL: %d distinct failure classes fired. Exit %d.\n' "$fails" "$rc"
+elif [ "$missing" -gt 0 ]; then rc=3
+elif [ "$drifted" -gt 0 ]; then rc=4
+else rc=5
 fi
 exit "$rc"
