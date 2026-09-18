@@ -1,0 +1,57 @@
+{
+  "schema": "jev.r10.merge-audit.v1",
+  "bead": "jev-demo-loop-a1q.4",
+  "generated_at": "2026-09-18T01:34:51Z",
+  "artifact": "docs/demos/duel-1/WIZARD_MERGE_MU.md",
+  "artifact_commit": "a58b1bc",
+  "reviewer": "WindyJaguar (non-author)",
+  "findings": [
+    {
+      "severity": "major",
+      "claim": "Four ideas converged; no pair needs a fifth implementation.",
+      "verdict": "OVERSTATED",
+      "evidence": "WIZARD_CONVERGENCE_AUDIT_COD.md 9b0965b ruled only 2/4 top-five pairs SAME DEMO, 2 ADJACENT BUT DISTINCT, with two counterparts outside the other shortlist.",
+      "detail": "The merge is a post-ruling implementation plan, not evidence that four concepts independently converged."
+    },
+    {
+      "severity": "major",
+      "claim": "Pair 2 admission screen is MU-2 ≡ CC-5 / one merged scope.",
+      "verdict": "SCOPE_SOFTENED",
+      "evidence": "Merge lines 41-66; convergence ruling 9b0965b.",
+      "detail": "The merged remedy is coherent, but the scored proposals were ADJACENT BUT DISTINCT: MU-2 included a credential question/fail-closed branch, CC-5 was injection-only shadow-first. The merge must preserve that this is a post-reveal union."
+    },
+    {
+      "severity": "major",
+      "claim": "Pair 3 claim-checker is one demo, two phases.",
+      "verdict": "SCOPE_SOFTENED",
+      "evidence": "Merge lines 68-91; convergence ruling 9b0965b.",
+      "detail": "The two proposals were ADJACENT BUT DISTINCT: MU-4 checks notes against an evidence directory; CC-2 checks staged commit-message triples. A phased product may be valid, but it is not independent same-demo convergence."
+    },
+    {
+      "severity": "minor",
+      "claim": "Pair 2/3 merged rulings use all named RED arms without a missing count.",
+      "verdict": "CHECK",
+      "evidence": "Merge lines 55-58 and 83-86.",
+      "detail": "Pair 3 says “Seven arms” but visibly lists six named items: 7-vs-8, missing artifact, span mismatch, empty evidence, unlabeled citation, skip path. Confirm whether a seventh arm is intended before treating the count as acceptance evidence."
+    },
+    {
+      "severity": "minor",
+      "claim": "B1 sanitize-before-send already exists.",
+      "verdict": "UNVERIFIED",
+      "evidence": "Merge lines 8-11.",
+      "detail": "This audit did not locate or run a B1 artifact; the merge text itself says it is referenced, not re-ruled."
+    },
+    {
+      "severity": "info",
+      "claim": "Pair 1 routing and Pair 4 signals are merged implementations.",
+      "verdict": "FAITHFUL_WITH_BOUNDARY",
+      "evidence": "Merge lines 15-39 and 93-115; convergence ruling 9b0965b.",
+      "detail": "Both are genuine SAME DEMO pairs, but the merge must not turn implementation union into a new measurement."
+    }
+  ],
+  "arithmetic": {
+    "claim": "No aggregate score arithmetic is asserted by this artifact.",
+    "verdict": "NOT_APPLICABLE"
+  },
+  "no_claim": "No implementation, RED arm, or live validation was run; this is a non-author review of a planning artifact."
+}
