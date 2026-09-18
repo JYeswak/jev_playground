@@ -1,0 +1,22 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readSessionLog } from '../../routing-backtest/src/transcript-reader.mjs';
+import { buildUsageShape } from '../src/usage-shape.mjs';
+
+test('known shape preserves retransmit and explicit residual', async () => {
+  const session = await readSessionLog(new URL('../fixtures/known-shape.jsonl', import.meta.url).pathname);
+  const result = buildUsageShape([session]);
+  assert.equal(result.denominator.turnsWithUsage, 1);
+  const usage = result.levers.perTurn[0].usage;
+  assert.equal(usage.RETRANSMIT, 900);
+  assert.equal(usage.OUTPUT, 10);
+  assert.equal(usage.CACHEWRITE, 5);
+  assert.equal(usage.UNRECONCILED, -1005);
+});
+
+test('missing usage is counted, not silently treated as zero', async () => {
+  const session = await readSessionLog(new URL('../fixtures/known-shape.jsonl', import.meta.url).pathname);
+  session.turns.push({ ...session.turns[0], usage: null });
+  const result = buildUsageShape([session]);
+  assert.equal(result.denominator.turnsWithoutUsage, 1);
+});

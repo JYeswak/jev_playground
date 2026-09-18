@@ -1,0 +1,119 @@
+{
+  "schema": "jev.usage-shape.receipt.v1",
+  "generated_at": "2026-09-18T14:27:36.136Z",
+  "inputs": [
+    {
+      "path": "~/Developer/jev/demos/usage-shape/fixtures/known-shape.jsonl",
+      "sha256": "0e1de83bef31047d42db9eb9e275af6785234d5b284ab169b00225a23e9e5b27"
+    }
+  ],
+  "failures": [],
+  "denominator": {
+    "sessions": 1,
+    "turns": 1,
+    "turnsWithUsage": 1,
+    "turnsWithoutUsage": 0,
+    "tokensUnattributed": 0
+  },
+  "accounting": {
+    "inputIncludesCache": "unknown",
+    "rule": "observed input is shown as provisional FRESH; UNRECONCILED is never absorbed"
+  },
+  "levers": {
+    "perTurn": [
+      {
+        "sessionId": "known-shape",
+        "turnIndex": 1,
+        "measured": true,
+        "usage": {
+          "RETRANSMIT": 900,
+          "FRESH": 100,
+          "OUTPUT": 10,
+          "CACHEWRITE": 5,
+          "UNRECONCILED": -1005,
+          "billedTotal": 10
+        }
+      }
+    ],
+    "perSession": [
+      {
+        "source": "/Users/josh/Developer/jev/demos/usage-shape/fixtures/known-shape.jsonl",
+        "sessionId": "known-shape",
+        "denominator": {
+          "turns": 1,
+          "turnsWithUsage": 1,
+          "turnsWithoutUsage": 0
+        },
+        "levers": [
+          {
+            "lever": "UNRECONCILED",
+            "value": -1005,
+            "share": -100.5
+          },
+          {
+            "lever": "RETRANSMIT",
+            "value": 900,
+            "share": 90
+          },
+          {
+            "lever": "FRESH",
+            "value": 100,
+            "share": 10
+          },
+          {
+            "lever": "OUTPUT",
+            "value": 10,
+            "share": 1
+          },
+          {
+            "lever": "CACHEWRITE",
+            "value": 5,
+            "share": 0.5
+          }
+        ],
+        "turns": [
+          {
+            "sessionId": "known-shape",
+            "turnIndex": 1,
+            "measured": true,
+            "usage": {
+              "RETRANSMIT": 900,
+              "FRESH": 100,
+              "OUTPUT": 10,
+              "CACHEWRITE": 5,
+              "UNRECONCILED": -1005,
+              "billedTotal": 10
+            }
+          }
+        ]
+      }
+    ],
+    "aggregate": [
+      {
+        "lever": "UNRECONCILED",
+        "value": -1005,
+        "share": -100.5
+      },
+      {
+        "lever": "RETRANSMIT",
+        "value": 900,
+        "share": 90
+      },
+      {
+        "lever": "FRESH",
+        "value": 100,
+        "share": 10
+      },
+      {
+        "lever": "OUTPUT",
+        "value": 10,
+        "share": 1
+      },
+      {
+        "lever": "CACHEWRITE",
+        "value": 5,
+        "share": 0.5
+      }
+    ]
+  }
+}
