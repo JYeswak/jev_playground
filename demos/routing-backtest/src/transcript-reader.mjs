@@ -73,7 +73,7 @@ export function parseSessionText(text, source = '<memory>') {
       activeModel = row.model ?? activeModel;
       continue;
     }
-    if (row.type !== 'message' || !row.message) continue;
+    if ((row.type !== 'message' && row.type !== 'message_end') || !row.message) continue;
     const message = row.message;
     if (message.role === 'user') {
       pushTurn(turns, current);
