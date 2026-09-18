@@ -464,6 +464,53 @@ This is the steelman pattern turned on a sequencing decision, and it uses author
 an author arguing for their rival's idea is the one configuration where self-interest points at
 the truth.
 
+---
+
+## §3f FIRST LEGITIMATE KILL — demo-3, on a cited incumbent
+
+**demo-3 claim-check gate: RULED OUT** (`docs/demos/duel-2/HELD_demo3_incumbent_COD.md`,
+`f24ffaf`, 10,722 chars). This is the gauntlet's first kill on **external structural evidence**
+rather than on taste, and it is exactly the output Joshua asked the lane to produce.
+
+**The incumbent is real, maintained, pinned and installable:** `bhumik154/claim-check` at
+**v0.6.0** verifies **numeric test-count claims against pytest / Vitest / Jest evidence at
+commit-msg time**. That is demo-3's niche, occupied, with a release tag and a pinned README.
+
+### The lesson, and it is sharper than the kill
+
+**My recovery condition was satisfied and the demo still died.** §3d held demo-3 pending one
+question: *"do `commitlint`/`gitlint`/`husky` verify numeric claims, or only format?"* The answer
+came back **format only** — my stated condition for demo-3 to *recover*. And demo-3 is dead
+anyway, because a **different tool I never named** owns the niche.
+
+So: **a recovery condition that names specific incumbents can be satisfied while the niche is
+still owned.** The question is never *"is it owned by X?"* but **"is it owned by anything?"** —
+an open search, not a checklist. Both pane 3 and I had misidentified the incumbent; only a
+dedicated unit with an open brief found the real one.
+
+That generalizes to rung 1: the demand question *"what already solves this"* must be answered by
+searching the problem, not by clearing a list of tools someone happened to think of.
+
+**Retry condition** (per §3c rule 4, and it is narrow rather than decorative): the surviving gap is
+claims **outside `claim-check`'s documented scope** — non-test-count numeric claims checked against
+arbitrary cited artifacts. That is a **new, narrower candidate** which must enter at rung 1 on its
+own evidence, not a resurrection of demo-3.
+
+### demo-6 does NOT die with it — my chaining was wrong
+
+§3d held demo-6 as *"conditional on demo-3 paying."* Demo-3 did not pay, so the naive chain says
+demo-6 falls too. **That reasoning is invalid**, and noticing it is the anti-premature-kill rule
+doing its job on my own logic:
+
+- demo-3 died because a maintained tool owns the **commit-msg** surface.
+- demo-6 operates on a **different surface entirely**: a notes file checked against an evidence
+  directory, writer-facing rather than commit-triggered.
+- `claim-check` occupying commit-msg says **nothing** about whether anything owns notes-vs-evidence.
+
+So **demo-6 returns to HELD on its own merits**, with its own open incumbent search required. It
+was the lowest-ranked survivor at 330 and it may well die — but it must die on its own evidence,
+not by inheriting a sibling's cause of death.
+
 
 ## §4 Phase arc
 
