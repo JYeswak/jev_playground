@@ -1,59 +1,435 @@
-# docs/demos/PLAN.md — the demo backlog
+# jev lane — implementation plan and evidence roadmap
 
-**WIP limit: one.** No second demo starts before the active one ships.
+**Status:** v2, rewritten 2026-09-18 to the standard measured in `skillranker@3fe85c4`.
+**What this document is:** the single source the bead graph is emitted from.
+**What it is not:** a document implementers read during implementation.
 
-**A demo has shipped when all four exist:** an install script a stranger can run · tests including
-at least one RED arm that fails on a planted defect · a receipt JSON with inputs, counts and a
-`failures` array · an `EVAL.md` row naming its verification level and its Boundary.
+## The emission contract
+
+This plan exists to be converted into beads **once**. After conversion, **the beads are
+authoritative and this file is history.** Every bead must embed the contract it needs — product
+scope, guardrails, mechanism, RED arms, ship criteria, boundary — so that an implementer who has
+never opened this file can execute from `br show <id>` alone.
+
+That rule is not stylistic. Measured 2026-09-18: a dispatch packet named an artifact by bare
+filename instead of full path, and the receiving pane reported it BLOCKED/absent **twice** while
+the file sat tracked in its own working tree. A pane cannot act on a reference it must resolve by
+guessing. A bead that says "see PLAN.md §5" has the same defect.
+
+Comparison that set this bar (measured, `skillranker@3fe85c4`, 195 beads):
+
+| | skillranker | jev before this rewrite |
+|---|---:|---:|
+| beads | 195 | 21 |
+| median description | **7,363 chars** | 1,252 |
+| with dependencies | 191/195 (98%) | partial |
+| epics | 11 | **0** |
+| priorities in use | P1, P2 only | P0–P3, 6 of 21 at P0 |
+| creation pattern | one burst from a plan | accreted reactively |
+
+His entire graph was emitted in a single burst (earliest `09:06:49`, latest `15:17:43`, the two
+roadmap epics sharing an identical timestamp). Ours grew by tripping over findings. The
+difference in outcome is that his implementers never need the plan and ours do.
 
 ---
 
-## ACTIVE — demo-1: `jev-route-backtest`
+## §0 GUARDRAIL BLOCK — embed verbatim in every bead
 
-**What.** A read-only CLI that replays our own omp session logs and reports what per-turn model
-routing *would have* spent versus what we actually spent. It answers "would routing have saved us
-anything on OUR turns" before anybody builds live rerouting.
-
-**Why this one first.** Highest agreement in the duel: 4 graders, mean 853.8, range 45, and both
-lineages proposed it independently (`DUELING_WIZARDS_REPORT.md` §8). CC-5 scored 14.7 higher but
-carries a 410-point sibling disagreement on the same seam — an unsettled implementation is exactly
-what a first demo must not be. And it is **read-only with inputs already on disk**, so it produces
-its evidence with zero live calls. That matters more than it looks: the lane's one live measurement
-turned out to be a coin flip (`NEGATIVE_EVIDENCE.md` R11).
-
-**Ship criteria, beyond the four artifacts.**
-- Reports **arm A absolutely**. No `verdict` string over a stochastic arm — R11 and
-  `jev-demo-loop-a1q.3`.
-- A missing per-model price entry is an **ERROR, never a `$0` row.** MU-1's best RED arm.
-- The price table carries a dated `as_of` and a re-derivation path. Pinned dollar figures rot
-  silently; our own doc review flagged that class at stale-risk 2+.
-- The model that actually served each turn is a **baseline, not an oracle.** It is the incumbent
-  policy's choice, not ground truth for what the turn needed.
-- Receipt states its denominator: how many turns, over which sessions, and how many were skipped
-  and why. An empty scan set is an ERROR, not a pass.
+> **Product scope.** The jev lane evaluates community repositories built on **Jev** (TypeSafe's
+> System One judgment model) and converts proven capabilities into individually installable,
+> tested demos wired into the omp harness. Jev is the only judgment engine; it returns typed
+> verdicts with probabilities, and it **judges — it does not extract, generate, or summarize.**
+>
+> **Effects are bounded.** Offline lane first. Live calls are budgeted and stated in the receipt.
+> The API key lives only in the environment as `TYPESAFE_API_KEY` and its value is never recorded
+> in any artifact — names are expected, values are not.
+>
+> **Evidence rules.** A claim with no re-derivation path is not evidence. An empty scan set is an
+> ERROR, never a pass. A one-item scan set is not a demonstration. A timeout is not a verdict.
+> Exit code must agree with verdict text. These are implementation requirements, **not statements
+> that any code or gate has passed.**
+>
+> **Shared worktree.** Three agents share this checkout and all commit as the same git identity,
+> so `%an` cannot attribute a commit. Stage explicit paths, own files only, never `git add -A`,
+> never amend, never rewrite shared history. Preserve peer changes: if a file you need belongs to
+> another lane, message its owner with the exact replacement text rather than editing it.
+>
+> **Blocker protocol.** If a prerequisite is unavailable, report the exact blocker with the command
+> and its verbatim output. Never substitute a stub for evidence, never weaken an adversarial
+> assertion, and never let a missing capability be reported as a passing check.
 
 ---
 
-## QUEUED — 7 remaining demos, ranked
+## §1 What Jev is — measured, not recalled
 
-The duel produced **8 distinct demos**, not 5 — two merged pairs plus four separate
-implementations of two shared seams plus two cross-shortlist demos
-(`DUELING_WIZARDS_REPORT.md` §1, corrected on pane 2's audit).
+- **Endpoint:** `POST https://api.typesafe.ai/v1/systemone`, Bearer auth.
+- **Model:** `jev-latest` resolves to `jev-1.13.0`.
+- **Primitives:** a **Noul** (typed judgment with probability) and a **Choice** (selection over
+  supplied candidates). A Noul judges a claim; it cannot produce content that was not given to it.
+- **Mirror:** 111 doc pages + `llms-full.txt` + ripwire docs are vendored locally;
+  `scripts/sync-docs.sh --check` reports `CHECK PASS 114 mirrored files`. Four first-party repos
+  are pinned: `typesafe-sdk-python@420ef4f`, `typesafe-sdk-js@66880cc`,
+  `system-one-adapter-python@0bb819b`, `skills@65a39f3`.
 
-| # | Demo | graders | mean | note |
-|---|---|---:|---:|---|
-| 2 | admission screen — **CC-5 form** (injection-only, shadow-first) | 2 | 867.5 | merge with MU-2's install rigor; **the merged form is unscored** and must be graded before it ships |
-| 3 | claim-check — **CC-2 form** (commit-message gate) | 2 | 835.0 | adopt MU-4's *insufficient-context ⇒ withhold, never approve* |
-| 4 | foreman-lite completion judge | 2 | 812.5 | best RED arm in the duel: empty diff ⇒ human-needed, never complete |
-| 5 | fact ledger | 2 | 792.5 | premise **strengthened** by R11: arm A scored 1/3 in all three runs |
-| 6 | claim-check — MU-4 form (notes vs evidence dir) | 2 | 767.5 | distinct from #3; **build one, not both** |
-| 7 | signals starter | 4 | 712.5 | gate is now a **property**, not a count: pinned generator or published distribution, never "N≥50 receipts" (R11) |
-| 8 | admission screen — MU-2 form (credential, fail-closed) | 2 | 545.0 | **the credential branch is deleted, not fixed.** Conceded by its author |
+**The central measured lesson, and it shapes every demo.** On one public benchmark a single Jev
+verdict scores **62.6%** while **five signal questions** fed to a small fitted model reach
+**95.1%** (`jev-phishing-bench`, usage map §9). A delta of **32.5 points** between asking for a
+verdict and asking for signals. Therefore: **never build a demo whose output is one verdict.** Ask
+signals, fit locally, publish calibration, keep a fixed-rule floor.
 
-**Killed:** MU-2's credential question. Asking Jev whether content carries credential material
-requires shipping the credential to a third-party API — the hook would leak what it exists to
-protect.
+---
 
-**Blocked on evidence, not on effort:** every mean above rests on 18 pinned community-repo
-citations that are **not vendored**, so 37 of 60 numeric claims are unverifiable in-repo
-(`jev-demo-loop-a1q.2`). Ranking is usable; the absolute numbers are transcriptions.
+## §2 Mission and non-goals
+
+**Mission.** Ship installable Jev demos repeatedly, each one proving a capability a stranger can
+reproduce from a clean clone.
+
+**Non-goals, stated so they are not re-litigated:**
+- Not a Jev SDK. The first-party SDKs are vendored and used, not re-implemented.
+- Not a benchmark suite. `evals.typesafe.ai` is the published methodology; we do not invent a
+  rival metric.
+- Not a live-routing product. Demo-1 is a backtest; whether a router is ever built depends on what
+  the backtest measures (see §5.1 — it has now measured near-zero, so the router is **not** queued).
+- No Reddit MCP in this lane (`NEGATIVE_EVIDENCE.md` R9).
+- No jev-local forks of shared fleet substrate (R10).
+
+---
+
+## §3 Definition of shipped
+
+A demo has shipped when **all four** exist and a non-author has verified them:
+
+1. **An install script a stranger can run.** Clean-clone tested: `git clone` to a temp dir, run
+   the script, get a green result. No placeholders in any command. Defaults to committed fixtures,
+   never to a path in the author's home directory.
+2. **Tests including at least one RED arm** that fails on a planted defect, with the plant asserted
+   by name in the failure output.
+3. **A receipt JSON** carrying inputs, denominators (how many, over what, how many skipped and
+   why), counts, and a `failures` array.
+4. **An `EVAL.md` row** naming its verification level and a Boundary stating what it does **not**
+   prove.
+
+**Verification levels** (enforced by `githooks/commit-msg`; every commit subject must name one):
+
+| Level | Means |
+|---|---|
+| `pending` | judgment only, nothing run |
+| `selftest` | the thing's own selftest passed |
+| `test` | re-derived by running a check that would fail if the claim were wrong |
+| `mutation` | a planted defect turned it red, then byte-identical restore |
+| `oracle` | an external arbiter agreed |
+| `live` | observed against the real service or session |
+
+**WIP limit: one demo.** No second demo starts before the active one ships.
+
+---
+
+## §4 Phase arc
+
+Phases are sequential in *gating*, not in calendar time; within a phase, tasks parallelize.
+
+- **P0 — Substrate (DONE).** Allowlist `.gitignore`, `AGENTS.md`, 7 gate stages ALL GREEN, git
+  hooks live via absolute `core.hooksPath`, `EVAL.md` / `GATES.md` / `TESTS.md` /
+  `NEGATIVE_EVIDENCE.md` / `REVIEW-PERSONAS.md`, doc mirror with sha manifests,
+  `stamp-check --repo .` at 51 PASS / 1 FAIL / 1 PARTIAL / 11 N-A.
+- **P1 — Loop (DONE).** 20-minute conductor tick, 10-minute installed `fleet-idle-monitor` in
+  `--report-only`, four-leg callback contract with a push leg, dry-queue default.
+- **P2 — Backlog selection (DONE).** Duel-1: two lineages × five ideas, 20 grader scores, an
+  arms-length convergence audit that corrected the conductor's own headline, and a claim audit
+  (19 EXACT / 4 WRONG / 37 UNVERIFIABLE).
+- **P3 — Demo-1 (ACTIVE).** `jev-route-backtest`. Blocked on one defect, §5.1.
+- **P4 — Publish boundary.** Fresh-history export; see §7.
+- **P5 — Demos 2–4.** Admission screen, claim-check gate, foreman-lite.
+- **P6 — Demos 5–8.** Fact ledger, claim-check notes form, signals starter, credential screen
+  (the last is killed; kept numbered so nobody re-proposes it).
+- **P7 — Calibration.** Re-run `foundation/run_calibration.py` once ≥2 demos emit labelled
+  outcomes. Current baseline: ECE 0.061, Brier 0.020.
+
+---
+
+## §5 The eight demos — normative contracts
+
+Ranked by mean of all graders. Scores are 2–4 rubric opinions each, **not measurements**: a
+15-point gap is noise, and every underlying citation count is subject to §9's unverifiable-claims
+finding.
+
+### §5.1 demo-1 — `jev-route-backtest` · ACTIVE · mean 853.8 (4 graders, range 830–875)
+
+**What.** A read-only CLI that replays omp session logs and reports what per-turn model routing
+*would have* spent versus what was actually spent.
+
+**Why first.** Most graders, tightest agreement, both lineages proposed it independently, and it
+is **read-only with inputs already on disk** — it produces evidence with zero live calls, which
+matters in a lane whose one live measurement turned out to be a coin flip (§9 R11).
+
+**Measured status.** Reader reads real omp logs: 2 sessions, 1910 + 1183 rows, 30 turns, 30
+classifiable, 0 skipped, models `gpt-5.6-luna` and `muse-spark-1.3-contributor`. Counterfactual:
+actual **$7.230350988** vs counterfactual **$7.226928188** → savings **$0.0034228**, or **0.047%**.
+Install passes clean-clone at 10 tests / 0 failures / exit 0.
+
+**THE HEADLINE FINDING, AND IT KILLS ITS OWN FOLLOW-ON.** Upstream measured **−60%** on *their*
+237 turns (`jev-codex-router@8292b51`). On our turns: **0.047%**. The backtest exists to answer
+"would routing pay off on OUR turns", and the answer is **no**. The live-router demo is therefore
+**not queued**. A demo that prevents a build is worth more than one that enables it.
+
+**Open defect, P1 blocker.** Three artifacts assert three different turn counts for one fixture:
+94 rows, **18** model-bearing rows, manifest says **"turns 1-6"**, reader reports **1**. Cause
+found in code by a non-author: the fixture carries explicit `turn_start`/`turn_end` markers and
+**the reader ignored them**. The manifest was right; the reader is the defect. Fix at the source —
+define "turn" **once**, in one place, and have the reader and the fixture READMEs cite that
+definition. Three artifacts asserting three counts is a missing shared definition, not three bugs.
+
+**RED arms.** (a) empty classifiable set ⇒ `ERROR EMPTY_CLASSIFIABLE_SET`, proven firing;
+(b) a turn naming a model absent from the price table ⇒ ERROR, never a `$0` row;
+(c) classifiable-turn count below a stated floor ⇒ WARN or ERROR, never a receipt that reads like
+a successful backtest. **n=1 must not read as a pass.**
+
+**Boundary.** Prices a counterfactual on past turns. Does **not** prove routing would work live,
+and does not measure answer quality — only spend.
+
+**Hard constraints.** Emit **no `verdict` string** (§9 R11). The price table carries a dated
+`as_of` and a re-derivation path; pinned dollar figures rot silently. The model that actually
+served a turn is a **baseline, not an oracle** — it is the incumbent policy's choice, not ground
+truth for what the turn needed.
+
+### §5.2 demo-2 — admission screen, CC-5 form · mean 867.5 (2 graders)
+
+**What.** A hook that judges inbound `tool_result` bytes for injection directives **before** they
+enter context. Shadow-first: logs a verdict, blocks nothing, until a false-positive rate is
+measured.
+
+**Why.** Highest single mean in the duel, and the capability has a strong upstream witness (0.99
+on the injection question, usage map §1).
+
+**The credential branch is DELETED, not fixed.** Asking Jev whether content *carries credential
+material* requires shipping the credential to a third-party API — the hook would leak precisely
+what it exists to protect. Its author conceded this fully. Instead: run the local deterministic
+`30-no-secrets` detector first and redact; keep only the injection question.
+
+**Unscored merge warning.** The shipped form is CC-5's injection-only scope **plus MU-2's install
+rigor** (idempotent; refuses when the hook directory is undiscoverable — the
+`.omp/hooks/`-without-`pre/` silent miss). **That merged design has never been scored by anyone.**
+MU-2's own form sits at 470/620. Grade the merge before it ships.
+
+**RED arms.** A known-injection fixture must be flagged in shadow mode; a benign fixture must not;
+an undiscoverable hook directory must **refuse to install** rather than install silently.
+
+**Boundary.** Shadow mode measures detection, not protection. No blocking claim until the
+false-positive rate is published.
+
+### §5.3 demo-3 — claim-check commit gate, CC-2 form · mean 835.0
+
+**What.** A `githooks/pre-commit` lane that extracts number/unit/cited-artifact triples from a
+staged commit message and checks each against the cited receipt. Exits nonzero on a contradiction.
+
+**Why.** This lane's own failure mode, mechanized. Measured tonight: a claim audit of 60 numeric
+claims across four documents found **4 WRONG**, two of them residual instances of an error already
+corrected elsewhere in the same file. Fixing a claim is not fixing its instances.
+
+**Adopt from MU-4:** insufficient context ⇒ **withhold, never approve.** That single rule is the
+difference between a checker and a rubber stamp.
+
+**Named skip path.** `CLAIM_CHECK_SKIPPED`, exit 0, when the API is unreachable. A pre-commit lane
+that blocks the whole fleet during a paid outage is unshippable.
+
+**RED arms.** A contradicted triple must refuse; an empty evidence directory ⇒ ERROR, never "all
+supported"; a claim citing no file ⇒ insufficient, never supported.
+
+**Boundary.** Checks numbers against cited artifacts. Does not check prose, reasoning, or claims
+without a citation.
+
+### §5.4 demo-4 — foreman-lite completion judge · mean 812.5
+
+**What.** `jev-bead-check <bead-id>`: reads WHAT/ACCEPTANCE via `br show`, diffs work since the
+bead started, returns a typed verdict plus an evidence checklist mapping each diff hunk to the
+acceptance line it answers. Composes as `jev-bead-check <id> && br close <id>`.
+
+**Why.** The best RED arm proposed in the duel: **a bead with an empty diff must return
+human-needed, never complete.** Our `close-evidence-gate` checks a close reason's *form*; nothing
+checks its *substance*.
+
+**Known weaknesses to design around.** Our own closed beads are a biased labelled set — we closed
+them, so nearly all carry "complete" and negatives exist only where a follow-up bug appeared. And
+with three panes committing, "the diff since the bead started" is ambiguous; name the baseline
+explicitly.
+
+**Boundary.** Judges evidence against stated acceptance. Does not judge whether the acceptance was
+the right acceptance.
+
+### §5.5 demo-5 — fact ledger · mean 792.5 (widest spread: 740 → 845)
+
+**What.** A byte-exact ledger of answer-bearing facts from dropped messages, appended to pruned
+context, then re-scored on the same three recall questions.
+
+**Why, and this premise got STRONGER tonight.** Arm A (Jev-prune) scored **1/3 in all three runs
+across two corpora**. Pruning robustly drops answer-bearing facts. The same evidence that refuted
+the demo's *comparison* confirmed the problem it exists to solve.
+
+**Mechanism, and the first version was wrong.** Deterministic extractor → **Choice** over
+candidate lines → **Noul** verbatim verification. A Noul judges; it does not extract. A paraphrase
+in a fact ledger is the failure mode, so it must be structurally impossible to ship one.
+
+**Threshold: 3/3 absolute.** Never "beat arm B" — arm B scores 3, 1, 3 on identical input, so a
+demo pinned to it could pass by standing still on a bad roll. **A stochastic baseline is not a
+threshold.**
+
+**The spread is explained, not noise.** 740 was scored *before* the mechanism was named; 845
+*after*. Grader means differ by only 6 points, so the ~105-point gap is the repair, not harshness.
+
+### §5.6 demo-6 — claim-check notes form, MU-4 · mean 767.5
+
+**What.** `jev-claims <notes.md> --evidence <dir>`: checks working-file claims against a cited
+evidence directory.
+
+**Distinct from demo-3, and only one gets built.** A non-author audit ruled these **ADJACENT BUT
+DISTINCT**: demo-3 is triggered by a commit and parses commit-message triples; this is
+writer-facing over a notes file and an evidence directory. Different trigger, parser, evidence
+contract, and failure boundary. Build demo-3 first; build this only if demo-3 proves the seam
+valuable.
+
+**Its stage-1 defect is the same one demo-5 had.** "Extracts verifiable working points" is not a
+mechanism. Needs deterministic extraction → Choice → Noul, or RED arms guarding an unnamed stage.
+
+### §5.7 demo-7 — signals starter · mean 712.5 (4 graders)
+
+**What.** A template, not a model: ask K signal questions per item, fit a tiny logistic regression
+on user labels, emit a calibration report (accuracy, AUROC, ECE + bins, flip rates) **plus a
+fixed-rule floor** — the best single rule alone.
+
+**Why.** It packages §1's central lesson: verdict-only 62.6% vs five signals 95.1%.
+
+**ITS OWN GATE HAS BEEN INVALIDATED AND MUST BE REWRITTEN.** The original gate was disciplined:
+*"apply only once A/B receipts accumulate past N≥50 — today N=4."* But R11 then established that
+arm B is **nondeterministic** (3, 1, 3 on a byte-identical fixture). Accumulating 50 receipts of a
+coin-flip arm would fit a model on noise and call it calibration. **The gate must become a
+property, not a count:** N≥50 receipts *from a pinned generator*, or a published distribution with
+spread. A sample-count threshold over an unpinned generator is the same error class as pinning a
+demo threshold to a stochastic baseline.
+
+**RED arms.** Shuffled labels ⇒ "no signal found", nonzero exit, never a fitted model; empty
+corpus ⇒ ERROR; the shipped synthetic example must reproduce its committed report within tolerance.
+
+### §5.8 demo-8 — credential screen, MU-2 form · mean 545.0 · **KILLED**
+
+Numbered so it is not re-proposed. Asking Jev whether content carries credential material ships
+the credential to a third-party API. Conceded by its author; the injection-only scope survives as
+demo-2.
+
+---
+
+## §6 Substrate contracts
+
+**Gates** (`foundation/gates.d/`, run via `foundation/gates.sh`, currently 7/7 ALL GREEN). Each
+stage blocks one named edge and has a planted bad input listed in `GATES.md`. A gate that cannot
+fail is not a gate. Rules the gates enforce: an empty scan set is an ERROR; exit code agrees with
+verdict text; silent on the healthy path; both directions or unproven; a gate's own source must not
+trip it.
+
+**Hooks.** `core.hooksPath` is this clone's **absolute** `githooks/` — a relative value resolves
+per-worktree and every worker lane would then commit unhooked. `commit-msg` refuses a subject with
+no verification level. `pre-commit` refuses a path-limited commit that would silently drop a staged
+deletion, and runs autofix in `--check` mode.
+
+**Receipts.** Every measurement writes JSON with inputs, denominators, counts, and a `failures`
+array. **Never retro-edit a receipt** — it is evidence, and editing its bytes converts evidence
+into assertion. To correct one, re-run and emit a new one; supersede, never overwrite.
+
+**Fleet monitor.** The shared installed binary runs `--report-only` only. Read its output
+**workers-only**: `pane_index 0` is the user shell and is idle by definition. Three measured
+defects, all unfixed **by decision** (R10 + Joshua's ruling): it recommends the user shell as
+actionable; its queue source defaults to another project (fixed jev-side with `FLEET_QUEUE_REPO`,
+confirmed by the cron naming a `jev-*` bead); and it reported WORKING for an idle pane — outcome
+measured, mechanism unknown. **Never `--nudge` for jev** until an exclusion exists.
+
+---
+
+## §7 Publish boundary — P4
+
+**The acceptance and the non-goal are in conflict, and an export resolves it.**
+`jev-publish-playground-hog` wants "secret scan clean" on the public remote with the explicit
+non-goal "no history rewrite". For an in-place push those cannot both hold:
+
+| | history | tip |
+|---|---:|---:|
+| `/Users/<name>` added-lines | **129** | 34 → 60 |
+| `thinkingSignature` added-lines | **48** | 0 |
+
+Scrubbing the tip changes what the repo *shows*, not what it *serves*. And the tip scrub
+**regressed 34 → 60 within an hour**, because dispatch packets and bead bodies legitimately need
+absolute paths — a pane cannot run a command with a redacted path.
+
+**Therefore: publish via a fresh-history export of an allowlisted publish set.** An orphan branch
+or clean init populated from the scrubbed tip rewrites nothing — local repo, local history, and
+"local dir stays jev/" are all untouched, and the public repo simply begins at its first commit,
+already clean. `tip == history` by construction, which is what makes the scan provable rather than
+partial. It also resolves `.beads/` for free: the internal tracker stays tracked locally for fleet
+bead-sharing and simply is not on the allowlist.
+
+**Hero.** Shipped at 1920×1080, sha `b6414da0…`, generated via Grok `/v1/images/edits` with the
+canonical anchor attached (anchor sha verified `52fb1b09…`). phash **33** against the approved
+exemplar's **34**; combined 47.3 because the grader's vision leg needs an OpenAI key that returns
+**401**. `identity_pass` is **false** and the operator approved the image directly. **Approval is
+recorded separately from the grade and is not a grade.**
+
+---
+
+## §8 Dependency graph
+
+```
+P0 substrate ──┬─> P1 loop ──> P2 backlog ──> P3 demo-1 ──> P4 publish ──> P5 demos 2-4 ──> P6 demos 5-7
+               └─> gates/hooks/receipts (blocking prerequisites for every demo)
+
+demo-1  blocked-by: turn-contract defect (§5.1)
+demo-2  blocked-by: demo-1 shipped; merge-form grading (never scored)
+demo-3  blocked-by: demo-1 shipped
+demo-4  blocked-by: demo-3 (reuses the claim/evidence checker shape)
+demo-5  blocked-by: demo-1 shipped; a pinned-generator harness (R11)
+demo-6  blocked-by: demo-3 shipped AND demo-3 proving the seam valuable
+demo-7  blocked-by: pinned generator or published distribution (R11) — NOT a receipt count
+demo-8  KILLED
+P7 calibration blocked-by: ≥2 demos emitting labelled outcomes
+```
+
+Cross-cutting, blocking the *evidence* of every demo rather than its code:
+**37 of 60 numeric claims are unverifiable in-repo** because the 18 pinned community repos the
+usage map cites are not vendored. Ranking survives; absolute numbers are transcriptions.
+
+---
+
+## §9 Negative evidence that constrains this plan
+
+Thirteen entries in `NEGATIVE_EVIDENCE.md`; these five bind the demos above.
+
+- **R9** — Reddit MCP stays with grokbot. Retry only if a demo needs reddit text as *input* and
+  grokbot's output is not readable as a file.
+- **R10** — Never fork shared fleet substrate. A jev-local monitor was written, measured **worse**
+  (single-capture `safe_to_dispatch` vs the installed binary's required two captures), and
+  withdrawn. The lane was missing one crontab row, not a script.
+- **R11** — The A/B "B wins" was a coin flip. Arm B scores **3, 1, 3** on a byte-identical fixture
+  because it is a live summarization call with no temperature pin. Arm A scored **1/3 three times**.
+  No relative claim is licensed; demo thresholds must be absolute.
+- **R12** — Do not grep for the line you expect. A filter tuned to the expected answer returns
+  empty for both "the condition changed" and "the condition never occurred". Seventh instrument
+  error of that family this session, first caught before it was written down.
+- **R13** — The hero's documented generation paths were all closed, and the skill's claim that
+  "Grok is TEXT-ONLY" was **false**: `grok-imagine-image{,-2.0}` declare
+  `input_modalities: ["text","image"]` and `/v1/images/edits` accepts up to 5 reference images.
+  The limitation was in *our* script, which only called `/v1/images/generations`. **A tool
+  limitation had been recorded as a provider limitation.**
+
+---
+
+## §10 Review log
+
+| Round | Reviewer | Outcome |
+|---|---|---|
+| 1 | — | v2 authored 2026-09-18 from the skillranker standard |
+| 2 | pending | non-author pane: self-containment + dependency DAG + justification sampling |
+| 3 | pending | distinct-lineage pane: adversarial pass on §5 contracts |
+| 4 | pending | steady-state diff check before bead emission |
+
+**Emission is gated on round 4.** Beads are not created from a plan that has not reached
+steady-state, because a bead graph inherits every structural error in its source — measured
+tonight: the conductor's overstated convergence headline became the *premise* of a worker's merge
+document before an audit caught it, and a refuted A/B verdict reached **17 tracked files** before
+anything ran the harness twice.
