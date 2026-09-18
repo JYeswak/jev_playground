@@ -2338,3 +2338,76 @@ discrimination verified at both boundaries and at saturation. **When `STATUS.tsv
 — a new column, a row inserted above line 7, a candidate count past ~25 — the arms above must be
 re-run.** The original test's expiry was invisible precisely because nothing recorded what it had
 been run against.
+
+---
+
+## §4a CAUSE 5 OF PANE IDLENESS, AND IT IS THE WORST ONE: **a send that reports success and never delivers**
+
+**Measured 2026-09-18, confirmed by the receiving pane's own report.** Joshua has asked twice *"are
+you not dispatching them, are they not calling back, what is failing"*. `tick.md` §0b records four
+causes, two of them conductor defects. **This is the fifth, and it invalidates the evidence the other
+four were diagnosed with.**
+
+### What happened
+
+Both panes measured **`IDLE_PROVEN`, age 1097s (~18 minutes)**, with **no new commits and no fresh
+files** — so not a silent finish. I asked pane 2 directly, per §1. Its answer:
+
+> **`(c) Dispatch received now; Q18-Q20 work had not started before this message. No block/rate-limit.`**
+
+**My Q18–Q20 dispatch never arrived.** And `ntm --robot-send` had printed
+**`"Sent to 1 agent(s) successfully"`**.
+
+### The distinguishing variable, and I had it before I asked
+
+That dispatch was a **~2,900-character single-line inline `--msg=` string.** Every dispatch this
+session that produced a callback was sent with **`--msg-file=`**. The correlation is total across the
+session:
+
+| Form | Dispatches | Callbacks |
+|---|---|---|
+| `--msg-file=<path>` | all of them | **all landed** |
+| one long inline `--msg="…"` | 1 | **never arrived** |
+
+**`tick.md` already contains the right principle in a weaker form** — *"sender success is not
+receiver receipt"* — filed under aborted tool calls. **This is the strong form: the sender printed an
+explicit success line for content that never reached the pane.** An aborted call at least leaves you
+uncertain; this one lies.
+
+### Why this is the worst of the five causes
+
+The other four are visible in the artifacts once you look: a wait condition with no check, a packet
+count skew, a throttled pane given oversized units, an append that was never pushed. **This one is
+invisible by construction.** The conductor sees success, the pane sees nothing, and the resulting
+silence looks exactly like a lazy or stuck worker.
+
+**And I was one step from mis-attributing it.** My previous tick reported both panes idle and I began
+diagnosing *them*. The only reason the cause is recorded correctly is that §1 says **ask the pane
+directly** — and pane 2's one-line answer overturned my framing in eleven words.
+
+### Rules, effective immediately
+
+1. **Never inline `--msg=` for anything beyond a single short line. Always `--msg-file=<full path>`,
+   and `wc -c` the file first** so the size is in the record.
+2. **A send's success line is not delivery evidence. The pane's leg-1 callback is the only delivery
+   evidence that exists.** Treat an un-acknowledged dispatch as undelivered after one tick, and
+   **re-send from a file rather than diagnosing the pane.**
+3. **When a pane is idle with no fresh artifacts, the first hypothesis is now my delivery, not their
+   diligence.** Four of five recorded causes are conductor defects; the base rate says suspect
+   myself first.
+
+### Leg 2 is dead, fourth independent measurement
+
+`am inbox --project ~/Developer/jev --agent CyanFalcon` → **`"count": 0`**, again, while every pane
+callback this session arrived via leg 1. **Four checks, four zeros, two panes, ~20 delivered units.**
+I have now told both panes in writing to stop spending effort on leg 3 — *"dead transport, my defect
+to fix, not yours."* A four-leg contract with one permanently dead leg is a three-leg contract that
+wastes worker effort on every unit.
+
+### Partial 2 resized in the same message, per §0b Cause 3
+
+Pane 3 is throttled. I had written *"N ≤ 20"*; the resend states **N ≤ 20 is the ceiling, not the
+target, and N = 5 with a receipt beats N = 20 that never lands** — plus the key's verified location
+(`/tmp/.tskey`, present, mode 600, 108 bytes) shipped as `ls -l` with a non-blocking fallback, and an
+explicit statement that **whether rung 3 can close on the offline mechanism alone is my ruling to
+make, not a reason for a pane to sit.**
