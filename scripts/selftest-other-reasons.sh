@@ -25,12 +25,17 @@ worktree three panes are reading.
                                                                               been carried unchecked)
   ARM 5  short STATUS row (7 cols)                      -> SCHEMA      rc=1  (failed, never skipped)
   ARM 6  untouched real files                           -> clean       rc=0
+  ARM 7  forced input movement                          -> TRANSIENT   rc=10 (and NO verdict text)
+  ARM 8  manifest self-digest                           -> recompute   third party re-derives it
+  ARM 9  snapshot copies re-hashed OFF DISK             -> fidelity    not the field claiming it
 
 EXIT  0 all arms discriminate · 1 an arm failed · 2 usage/environment error
 """
 import json
 import os
 import subprocess
+import hashlib
+import re
 import sys
 import tempfile
 from pathlib import Path
@@ -103,12 +108,58 @@ def main() -> int:
         print(f"FAIL  {'ARM 6 untouched real files':<46} rc={rc} {fails[:1]}")
         fail += 1
 
+    # ---------------------------------------------- SNAPSHOT ARMS (pane 2 Q99 spec, 44feaf2)
+    # Pane 2's Q97 promotion ledger listed FOUR preconditions; these arms are the witnesses for the
+    # three it said were unmet or partial. A precondition with no arm is a claim, not a promotion.
+    env = dict(os.environ, JEV_FORCE_MOVED="docs/demos/STATUS.tsv")
+    r = subprocess.run([str(VERIFIER)], capture_output=True, text=True, env=env)
+    leaked = ("OK: exact coverage" in r.stdout) or ("FAIL:" in r.stdout)
+    if r.returncode == 10 and "TRANSIENT_UNSTABLE" in r.stdout and not leaked:
+        print(f"PASS  {'ARM 7 verifier-owned TRANSIENT_UNSTABLE':<46} rc=10 no verdict leaked")
+    else:
+        # A verdict printed alongside a transient is the defect, not just the wrong code: it is what
+        # let lane-status emit a full table for a run it had already decided was unjudgeable.
+        print(f"FAIL  {'ARM 7 verifier-owned TRANSIENT_UNSTABLE':<46} rc={r.returncode} leaked={leaked}")
+        fail += 1
+
+    r = subprocess.run([str(VERIFIER)], capture_output=True, text=True)
+    m = re.search(r"snapshot: (\S+)", r.stdout)
+    if not m:
+        print(f"FAIL  {'ARM 8 manifest self-digest recomputes':<46} no snapshot path emitted")
+        print(f"FAIL  {'ARM 9 snapshot copy fidelity':<46} no snapshot path emitted")
+        fail += 2
+    else:
+        man = json.loads((Path(m.group(1)) / "manifest.json").read_text())
+        recorded = man.pop("manifest_digest", None)
+        canon = json.dumps(man, sort_keys=True, separators=(",", ":")).encode()
+        recomputed = hashlib.sha256(canon).hexdigest()[:16]
+        if recorded and recorded == recomputed:
+            print(f"PASS  {'ARM 8 manifest self-digest recomputes':<46} {recorded} third-party checkable")
+        else:
+            print(f"FAIL  {'ARM 8 manifest self-digest recomputes':<46} {recorded} != {recomputed}")
+            fail += 1
+        # COPY FIDELITY, not copy EXISTENCE. The manifest could record a path it never wrote, or
+        # record a digest of the source while the copy diverged — so this reads the COPIED BYTES off
+        # disk and re-hashes them, rather than trusting the field that claims they match.
+        bad = []
+        for f in man["files"]:
+            sp = Path(f["snapshot_path"])
+            if not sp.is_file():
+                bad.append(f"{f['source_path']}: copy absent")
+            elif hashlib.sha256(sp.read_bytes()).hexdigest()[:16] != f["source_pre_raw"]:
+                bad.append(f"{f['source_path']}: copy bytes != source_pre_raw")
+        if man["files"] and not bad:
+            print(f"PASS  {'ARM 9 snapshot copy fidelity':<46} {len(man['files'])} copies re-hashed off disk")
+        else:
+            print(f"FAIL  {'ARM 9 snapshot copy fidelity':<46} {bad[:2]}")
+            fail += 1
+
     print("\n" + "-" * 70)
     print(f"fixtures under {tmp} (left in place; temp dir)")
     if fail:
         print(f"FAIL: {fail} arm(s) did not discriminate.")
         return 1
-    print("OK: sidecar verifier discriminates on all 6 arms; real files never written.")
+    print("OK: sidecar verifier discriminates on all 9 arms; real files never written.")
     return 0
 
 
