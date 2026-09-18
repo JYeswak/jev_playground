@@ -81,15 +81,37 @@ signals, fit locally, publish calibration, keep a fixed-rule floor.
 
 ## §2 Mission and non-goals
 
-**Mission.** Ship installable Jev demos repeatedly, each one proving a capability a stranger can
-reproduce from a clean clone.
+**Mission — corrected 2026-09-18 by Joshua's ruling.** This lane is a **GAUNTLET, not a demo
+factory.** Its product is not N installable demos; it is a **defensible ruling on which one or two
+ideas deserve to become their own deeply-planned projects**, and evidence for every idea it rules
+out.
+
+> *"we don't have to build the entire rust ecosystem, i just want to ensure that every single thing
+> we build here has a genuine deep story & impact. each of these demos could be turned into a
+> subsequent deep plan that gets turned into its own project. think of this as the gauntlet that
+> rules out what we shouldn't work on while focusing deeply on what we think will have the biggest
+> impact."*
+
+**What that changes, concretely.** A demo is no longer a deliverable — it is an **instrument**: the
+cheapest artifact that answers "is this capability real, needed, and unowned?" The demo exists to
+produce a verdict, then to be thrown away or promoted. Success for this lane is measured by **how
+much it rules out per unit of effort**, not by how many demos it ships. A gauntlet that passes
+everything has told us nothing, and a gauntlet that ships nine demos has become the thing it was
+built to prevent.
+
+**The seven demo contracts already written (~100 KB) are therefore GAUNTLET ENTRIES, not build
+commitments.** They are deliberately deep because a shallow entry cannot be ruled out honestly —
+you cannot reject an idea you never specified. Depth at plan time is what makes cheap rejection
+possible.
 
 **Non-goals, stated so they are not re-litigated:**
 - Not a Jev SDK. The first-party SDKs are vendored and used, not re-implemented.
 - Not a benchmark suite. `evals.typesafe.ai` is the published methodology; we do not invent a
   rival metric.
-- Not a live-routing product. Demo-1 is a backtest; whether a router is ever built depends on what
-  the backtest measures (see §5.1 — it has now measured near-zero, so the router is **not** queued).
+- **Not a product line.** At most one idea gets promoted to its own project at a time. Promotion
+  is the scarce resource, not implementation capacity.
+- Not a live-routing product. Demo-1 measured **0.047%** savings on our turns against upstream's
+  −60% on theirs, so the router is **not** queued — and that is the gauntlet working, not failing.
 - No Reddit MCP in this lane (`NEGATIVE_EVIDENCE.md` R9).
 - No jev-local forks of shared fleet substrate (R10).
 
@@ -172,6 +194,97 @@ shipped **fails**.
 did not have. Not a script that tells *us* something about *our* logs.
 
 ---
+
+## §3c THE GAUNTLET — five rungs, and most candidates die on one of them
+
+Every candidate — the nine from duel-1, everything the duel-2 hunt produces, and anything proposed
+later — climbs the same ladder. **A rung is a kill point, not a checkpoint.** Dying on rung 2 after
+an hour of research is the gauntlet succeeding; discovering the same flaw after three weeks of
+implementation is the gauntlet having been skipped.
+
+Cost rises roughly 10× per rung. That asymmetry is the whole design: spend the cheap rungs
+generously and the expensive ones almost never.
+
+### Rung 1 — DEMAND (cheap: research only)
+
+The four questions of §3b, answered in writing in the candidate's contract file, with **external
+evidence**: who downloads it, what pain they voiced and where, what maintained tool already owns
+the niche, and the measurable before/after.
+
+**Gate:** ≥700 from **two non-author graders**. An author cannot grade their own candidate —
+measured 2026-09-18, pane 2 scored its own proposal **820** while the non-author scored it **550**,
+a 270-point gap that only the authorship rule catches.
+
+**Kills so far:** demo-6 (redundant given demo-3), demo-8 (unsafe by construction).
+
+### Rung 2 — JEV SHAPE (cheap: reasoning)
+
+It must require what only a judgment model supplies: a **typed verdict with a calibrated
+probability, cheap and repeatable at volume**. A **Noul** judges; a **Choice** selects from supplied
+candidates; **neither generates**.
+
+**Gate:** one sentence stating why prompting a chat model does this *worse*, and it must survive a
+non-author reading. If the value comes from generation, summarization, or extraction, **it is not a
+Jev candidate** however good an idea it is.
+
+**Kills so far:** demo-1 retroactively — it makes **zero Jev calls** and decides routing with a
+hand-written token heuristic. It should have died on this rung before anyone built it.
+
+### Rung 3 — THIN PROOF (moderate: days, one artifact)
+
+The cheapest installable thing that answers *"is the capability real?"* — **not the product.** A
+stranger clones, runs one command against shipped fixtures, and sees the capability work or not
+work. This is what a "demo" means in this lane, and its four artifacts are §3's.
+
+**Gate:** clean-clone verified by a non-author, at least one RED arm firing on a planted defect,
+and a receipt with stated denominators.
+
+**Passed so far:** demo-1 — the only candidate on this rung, and it is exactly why rung 2 matters:
+a candidate can pass the expensive rung while having failed a cheap one nobody ran.
+
+### Rung 4 — MEASURED LIFT (moderate: the number that decides)
+
+A before-value, an after-value, and the command a third party runs to reproduce both. **No verdict
+strings** (R11). Absolute thresholds only, never "beat a stochastic baseline".
+
+**Gate:** the lift is large enough that a stranger would change behaviour because of it. A
+statistically real but operationally trivial number **fails**.
+
+**Kills so far:** demo-1 again, and decisively — **$0.0034228, or 0.047%**, on 30 real turns
+against upstream's −60% claim on theirs. Nobody changes anything for 0.047%. The demo worked
+perfectly: it cost days instead of weeks and it prevented a router.
+
+### Rung 5 — PROMOTION (expensive: its own project)
+
+Only a candidate that cleared rungs 1–4 earns a **deep plan of its own** — on the measured
+skillranker standard: a ~190 KB plan, emitted into a ~200 KB bead graph with 98% dependency
+coverage, in its own repository with its own gates, hooks, receipts and publish boundary.
+
+**Gate, all four:**
+1. Rungs 1–4 cleared, each by a non-author.
+2. **No candidate currently promoted.** One at a time; promotion is the scarce resource.
+3. A named owner who is not the conductor.
+4. A stated kill criterion **for the project** — the observation that would make us abandon it
+   *after* promotion. A project with no kill criterion is an aspiration with a repository.
+
+**Promoted so far: none.** That is the correct state. Nine candidates entered, one reached rung 3,
+it died on rung 4, and the lane's net product to date is a well-evidenced **"do not build the
+router"** plus a gauntlet that now catches that class before implementation rather than after.
+
+### What the gauntlet is allowed to output
+
+| Output | Meaning |
+|---|---|
+| **PROMOTED** | rungs 1–4 cleared; gets its own project and deep plan |
+| **HELD** | cleared some rungs, blocked on a named prerequisite with a retry condition |
+| **RULED OUT** | died on a named rung, with the evidence, recorded in `NEGATIVE_EVIDENCE.md` |
+| **UNASKABLE** | the question cannot be answered with available evidence — never a pass |
+
+A ruled-out candidate is a **deliverable**, not a failure. The evidence that kills an idea cheaply
+is worth more than the code that would have discovered the same thing expensively.
+
+---
+
 
 ## §4 Phase arc
 
