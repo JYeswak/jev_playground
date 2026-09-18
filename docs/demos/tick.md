@@ -53,6 +53,18 @@ Carry: bead id · commit sha · NEXT (what you'd pick up unprompted) ·
 NO-CLAIM (exact limit of what you proved).
 ```
 
+**EVERY PACKET SHIPS A QUEUE, NOT A TASK.** A pane that finishes a single-unit
+packet is idle until the next tick — up to 20 minutes of a worker doing nothing
+while the conductor is between turns. Measured 2026-09-18: two panes delivered
+cross-scores and both went idle waiting for a relay that only a human chase
+produced. So every packet carries 2–3 numbered units and this line verbatim:
+**"Finish one, fire its callback, then start the next YOURSELF. Do not wait for
+a dispatch between them."** A blocked unit is a callback too — fire it and move
+to the next unit. The only failure mode is silence.
+
+The REPLY-VIA `NEXT` field is therefore not a suggestion to the conductor: it is
+the pane's own next unit, named in the packet, which it self-claims.
+
 ## 3. DISPATCH — project-aware, by hand, in this order
 
 0. DONE callback → close (conductor classifies) → dispatch that pane's NEXT
