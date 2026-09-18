@@ -204,6 +204,24 @@ is zero-dependency — no install, no network, no key, no state from this lane. 
 clone of a pinned commit, which is the environment the gate suite below fails in, and a receipt missing
 a field the answer depends on exits 1 rather than printing a branch it did not measure.
 
+### Answer them on your own logs
+
+```bash
+./scripts/quickstart.sh --mine              # defaults to ~/.claude/projects
+./scripts/quickstart.sh --mine /path/to/logs
+```
+
+Nothing is uploaded and no key is used. On the author's machine that is 4,626 session files, and the
+shape answer comes back personal: **4,619 sessions, 488,724 billed turns, 98.9% of tokens
+retransmitted context, a mean 341,496 retransmitted tokens per turn, 0 unparsable lines.**
+
+**And it exposes a limit we would never have found on the fixture.** The router backtest *cannot
+answer* on a real Claude Code corpus — it returns `EMPTY_CLASSIFIABLE_SET`, because it classifies
+turns by model and usage fields in a shape those logs do not carry. So the fixture's `16.4% worse` is
+proof that **the accounting works, not that it works on your data.** `--mine` prints the demo's own
+refusal code rather than a guessed cause; an earlier version guessed "a model with no price" and was
+simply wrong.
+
 Then the gate suite, which is a different thing with a different answer:
 
 ```bash
