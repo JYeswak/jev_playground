@@ -1715,3 +1715,79 @@ does not justify a K-question framework.
 **Still unclaimed and unproven:** that ~3.5 points plus a calibration report is worth shipping to
 anyone. §3q's unseeded probe found a practitioner asking for **coverage and timing**, not
 calibration; nothing has yet found one asking for a calibration report.
+
+---
+
+## §3s the 0.10 bar was written on a false premise — **the ambiguity is architectural, not pattern weakness**
+
+**`docs/demos/duel-2/runs/codh2-sharpened-20260918T041200Z.json` (`8d120e3`).** Pane 3 executed the
+sharpening I ordered in Q12, and the number barely moved: **ambiguous 0.3765 → 0.3731** against a
+**0.10** bar, Wilson lower **0.3653**. *"Not close."* **COD-H2's build stays blocked.**
+
+### Why it did not move, measured rather than assumed
+
+```text
+eval calls total .................. 165,755
+matching a mutating marker ........ 155,801   (94%)
+read-side ..........................   9,954   ( 6%)
+dominant marker ... "tool." at 150,719 hits — the fleet drives tools THROUGH the eval tool-bridge
+```
+
+**Pane 3's conclusion: *"94% of eval is genuinely effect-capable; the ambiguous bucket is
+architectural opacity, not pattern weakness."***
+
+**So the premise under the pre-condition was false, and it was mine.** I wrote Q12 quoting pane 3's
+own earlier caveat — *"this fleet's evals are predominantly read-side compute"* — and instructed a
+split on that basis. **It is the opposite: 94% are effect-capable.** The original caveat was a
+plausible guess about a corpus nobody had counted, I promoted it to a binding pre-condition, and the
+count refuted it. **Pane 3 refuted its own caveat and my order in the same run, which is the correct
+outcome and the reason the unit was worth running.**
+
+### This is §3r's shape again: right discipline, wrong question
+
+The 0.10 bar is well-formed and was held without flinching. But it was a **proxy** for *"are the
+labels trustworthy?"*, written on the theory that ambiguity was an artifact of blunt patterns.
+Measured, ambiguity is **where tool identity lives one level below where the classifier looks** —
+`eval` calls `tool.read`, `tool.write`, `tool.bash`, and the tool name is opaque at the call site.
+**A bar cannot be met by sharpening patterns when the information is not at that layer.**
+
+### Ruling, pre-committed BEFORE v2.2 runs so it cannot be read as post-hoc
+
+**v2.2 is authorised as pane 3 pre-registered it** — parse `tool.<name>` and apply the same tool
+table one level down (`tool.read/tree/grep` → reversible; `tool.bash` → bash rules;
+`tool.write/edit` → irreversible; `tool.task/hub` → ambiguous). It is **principled, not data-tuned**,
+and pane 3 said so in the receipt.
+
+**And here is the ruling if v2.2 also fails, decided now:**
+
+> **The 0.10 bar stays at 0.10 for the full corpus — it is not lowered.** What changes is the
+> **scope of the labelled study**: it narrows to the **destructive-bash subset — 907 turns, share
+> 0.0623, Wilson [0.0585, 0.0664]** — where effect is knowable from the command itself with no
+> tool-bridge indirection. In that subset the ambiguity the bar guards against does not arise.
+
+**That is not re-cutting the number.** The bar keeps its value and its meaning; the study moves to
+the population where the bar is satisfiable. **And it is where the original Q9 receipt already said
+the build should aim**: *"rung-3 should target the gate at the destructive subset, not all writes."*
+Two independent routes arriving at the same 907 turns is the strongest thing about this ruling.
+
+**If v2.2 succeeds instead**, the full corpus becomes available and the study can be broader. Either
+way COD-H2 proceeds; what v2.2 decides is **how wide**, not **whether**.
+
+### Two disclosures in this receipt that deserve naming
+
+1. **Denominator change, volunteered.** v1 dropped file-trailing turns (N=14,533); v2 closes at EOF
+   (N=14,556, **+23**). Pane 3 flagged that *"comparison across versions mixes classifier +
+   denominator effects"* — 0.16% of N, negligible, and disclosed anyway. **That is the discipline
+   whose absence produced eight instrument errors in this lane.**
+2. **Bias direction stated.** String-literal false positives were accepted and documented, with the
+   note that *"bias runs against clean"* — i.e. the conservative direction, chosen deliberately and
+   named.
+
+### The terminal fork pane 3 wrote, and I accept
+
+*"If v2.2 still clears nothing, accept tool-dispatch opacity as irreducible and rule on the
+precondition itself — keep bar = block indefinitely; or accept with runtime controls."* **I reject
+the first option.** Blocking the lane's only rung-3 candidate indefinitely on a bar that measures an
+architectural property of the observation corpus, rather than anything about the candidate, would be
+a kill by paperwork — and the anti-kill rule (§3c) applies to a candidate strangled by its own
+instrument exactly as it applies to one rejected on taste.
