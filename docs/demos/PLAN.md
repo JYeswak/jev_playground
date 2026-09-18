@@ -4562,3 +4562,64 @@ lane at all.**
 corpus** (outside this lane by construction), and **a specification decision whose one clause has
 already been written and tested.** **The gauntlet has answered everything answerable with the data it
 has.**
+
+---
+
+## §5j THREE RULES NEVER FIRED — and one of them is a discipline I praised four times
+
+**`docs/demos/GAUNTLET_SPEC_MU.md` (`c9a2fd9`) §8, pane 3 as non-author of the method.** Graded
+strictly — *"a rule with no outcome-changing firing in this lane"* — with a three-way taxonomy that
+is itself the contribution: **delete-or-demote** (trigger arose and passed without it) ·
+**not-yet-due** (young, trigger never arose) · **dormant-by-design** (conditional, condition never
+fired). *"Only the first class should be deleted; the other two should be marked."*
+
+### Delete or demote — the trigger arose and the rule did nothing
+
+1. **Conductor-kill concurrence (§3c rule 3).** *"Every kill on record was executed or concurred by
+   non-authors **on other grounds**; no concurrence was ever **invoked** to license or block a
+   kill."* Either it constrains nothing, or its trigger never arose. **"Cost without evidence either
+   way."**
+
+2. **"Resolving a hold is not raising a score"** — **and this is the one that stings, because I
+   recorded pane 2 applying it four times unprompted as evidence of discipline.** Pane 3: *"No
+   instance on record of anyone conflating the two — holds were resolved without the rule visibly
+   doing work. **Mistake-proofing against an error nobody committed.**"*
+
+   **It is right.** A pane declining to raise a score it had no reason to raise is **not the rule
+   working; it is the rule being unnecessary.** The counterfactual is unobservable, so the rule has
+   no demonstrated effect — the same standard I applied to every candidate in this lane, now applied
+   to a rule I was collecting compliance with. **I was counting obedience as evidence.**
+
+3. **Rung-5 gate as specified.** *"No promotion was ever attempted; sub-gates 2–4 were never
+   exercised. Untestable in any lane that promotes nothing — which, if the method works, is most
+   lanes."*
+
+   > **"This lane validated rungs 1–4 and the refusal of 5. Rung 5's gate is untested doctrine. The
+   > honest diagram has four tested rungs and one grey box."**
+
+   **That corrects something implicit in everything I have written this session.** I have presented
+   the five-rung gauntlet as *the method*. **Four rungs are tested; the fifth is doctrine**, and
+   `PROMOTED 0` is precisely why. **The ladder is 80% validated and I never said so.**
+
+### Not-yet-due — keep, mark the trigger
+
+Retry predicates (R14 legacy-repos, R15 T1/T2, demo-8's dual condition) — *"young, stated checkably —
+the property the method needs"*, with the one that fired (**R6→R12, nine minutes**) proving *"the
+machinery works when the world cooperates."* Plus the provenance authorship bar and the
+manifest-design rule, whose *"first test is someone else's unit."*
+
+### The standing rule it extracts from §3h, which is the best self-maintenance event on record
+
+> **"Every gate ships the condition under which it is re-examined, and gates nothing can satisfy are
+> removed, not worked around."**
+
+§3h is where **the lane deleted its own dead gate** rather than venerating it — *"a gate nothing can
+satisfy is not a high bar, it is a dead gate."* **Pane 3 promotes that one-off into doctrine**, and
+then applies it to three more of my rules in the same document.
+
+### Dispatched: the spec gets the same treatment the ruling got
+
+**The spec is now a lane deliverable and its author is pane 3, so it must be audited by a non-author
+before it is trusted — exactly as `RULING.md` was.** Pane 2 also **rules on the three
+delete-or-demote candidates**, because deleting a rule is a ruling and pane 2 is third party to both
+the rules' author (me) and the finding's author (pane 3).
