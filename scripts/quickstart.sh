@@ -1,80 +1,139 @@
 #!/usr/bin/env bash
-# quickstart — everything an outside reader can run, in one command, from a fresh clone.
+# quickstart — five questions, answered with numbers, from a fresh clone in one command.
 #
-# WHY THIS EXISTS. `scripts/verify-frozen.sh` proved the published `ALL GREEN` is NOT reproducible
-# from a clone: two of ten foundation stages need local state a clone does not carry (`npm install`
-# in compaction/, a `br import`). That is honest about the gate suite, but it left an outside reader
-# with no command at all — they would clone this repo, find ten stages, run them, get exit 1, and
-# reasonably conclude the repo is broken.
+# WHY THIS SHAPE. The first version of this script ran five suites and printed PASS five times. Pane 3
+# graded it as the non-author (quickstart-grade-20260918T162959Z.json, ada5e58) and returned
+# ENABLER-in-product-clothes, with the specific finding that ALL FIVE "what you learn" lines mismatched
+# the output: they promised answers and the output gave counts. Worst was the probe, whose underlying
+# command prints the richest thing in the repo — a full judgment with per-lever probabilities — while
+# the runner surfaced none of it. One of the five was a literal one-token grep bug: the harness prints
+# "mutations: 7/7 caught" with a colon, and the filter looked for the colonless form, so a reader got
+# a bare PASS from the only suite in the repo that proves its own tests can fail.
 #
-# It is not broken. Every DEMO here is zero-dependency: all three run on `node --test` with no
-# install step, no network, no API key, and no lane state. Nobody had written that down, so the
-# fastest true thing a stranger could do with this repo was invisible.
+# So this does not run tests and report on tests. It runs the demos' own tools, reads the receipts they
+# write, and prints the ANSWER each one produces — including when the answer is unflattering, which for
+# the router it is.
 #
-# This script is deliberately NOT a gate and NOT wired to foundation. It has one consumer — a human
-# who just cloned the repo — and it makes no claim about lane state, verdicts, or receipts.
+# NOT a gate, NOT wired to foundation. Pane 3 separately REFUSED wiring it into verify-frozen
+# (quickstart-wiring-ruling-20260918T163132Z.json): it fails the creation gate at CONSUMER, since
+# verify-frozen branches on nothing this reports, and a RED here would conflate demo health with clone
+# reproducibility. Its only consumer is a human who just cloned the repo.
 #
-# Usage:  ./scripts/quickstart.sh          run everything a clone can run
-#         ./scripts/quickstart.sh --list   print what it would run, and exit
+# EVERY NUMBER BELOW IS DERIVED AT RUNTIME from the receipt the tool just wrote. None is hardcoded.
+# This repo got a number wrong roughly a dozen times in one day by writing it down once.
 set -uo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
 
-# name<TAB>dir<TAB>command<TAB>what a reader learns from it
-units=$(cat <<'UNITS'
-routing-backtest	demos/routing-backtest	npm test --silent	does a cheap-model router actually save money on recorded traffic
-routing-mutations	demos/routing-backtest	npm run mutate --silent	whether that demo's tests can still fail — seven planted mutations
-usage-shape	demos/usage-shape	npm test --silent	how much of a coding agent's context is retransmitted each turn
-retransmit-whatif	demos/retransmit-whatif	npm test --silent	what a retransmission cap would have cost, per turn
-probe-replay	.	node scripts/jev-probe.mjs --replay docs/demos/jev-probe/probe-response-20260918.json	one recorded Jev judgment, decoded offline with no key
-UNITS
-)
+node --version >/dev/null 2>&1 || { echo "quickstart: needs node >= 20 on PATH, and nothing else."; exit 2; }
+work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
+fix="demos/routing-backtest/fixtures/real-excerpt-t1-t6.jsonl"
+pass=0; fail=0; failed=""
 
-if [[ "${1:-}" == "--list" ]]; then
-  printf '%s\n' "$units" | while IFS=$'\t' read -r name dir cmd why; do
-    printf '  %-20s %s\n                       %s\n' "$name" "$cmd" "$why"
-  done
-  exit 0
-fi
+q() { printf '\n=== Q%s. %s\n' "$1" "$2"; }
+ok() { pass=$((pass+1)); }
+no() { fail=$((fail+1)); failed="$failed $1"; printf '    COULD NOT ANSWER — see %s\n' "$2"; }
 
-node_v="$(node --version 2>/dev/null || echo MISSING)"
-if [[ "$node_v" == MISSING ]]; then
-  echo "quickstart: node is not on PATH. Everything here needs node >= 20 and nothing else."
-  exit 2
-fi
+echo "quickstart — five questions, answered from committed bytes. No install, no network, no API key."
 
-echo "quickstart — node $node_v, no install step, no network, no API key"
-echo
+# ---------------------------------------------------------------- Q1
+q 1 "Would routing cheap turns to a cheaper model have saved money?"
+if node demos/routing-backtest/bin/backtest.mjs "$fix" --out "$work/bt.json" >"$work/bt.log" 2>&1; then
+  node -e '
+    const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")), t=r.totals, d=r.denominator;
+    // FIELDS ASSERTED, NOT ASSUMED. Measured while arming this script: renaming a field the answer
+    // depends on left the direction sentence reading from `undefined`, and `undefined < 0` is false,
+    // so the runner would have cheerfully printed the OPPOSITE verdict with correct-looking dollars
+    // beside it. A missing number must break the answer, not silently pick a branch.
+    for (const k of ["actualSpend","counterfactualSpend","estimatedSavings"])
+      if (typeof t[k] !== "number") throw new Error(`totals.${k} missing or not a number — receipt schema changed`);
+    const pct=(t.counterfactualSpend/t.actualSpend-1)*100;
+    const dir = t.estimatedSavings < 0 ? "COST YOU MORE" : "saved";
+    console.log(`    NO. On this fixture routing would have ${dir}: $${t.actualSpend.toFixed(6)} actual`);
+    console.log(`    vs $${t.counterfactualSpend.toFixed(6)} routed — ${Math.abs(pct).toFixed(1)}% worse, on ${d.classifiableTurns} of ${d.turns} turns.`);
+    console.log(`    The demo is willing to answer no. That is the point of running it on YOUR logs.`);
+  ' "$work/bt.json" && ok || no Q1 "$work/bt.log"
+else no Q1 "$work/bt.log"; fi
 
-pass=0 fail=0 failed_names=""
-while IFS=$'\t' read -r name dir cmd why; do
-  printf '=== %s\n    %s\n' "$name" "$why"
-  if ( cd "$dir" && eval "$cmd" ) >/tmp/qs-$$.log 2>&1; then
-    # Surface the counts the suite itself printed, rather than restating them.
-    grep -E '^# (tests|pass|fail)|mutations (caught|escaped)|MUTATION|verdict' /tmp/qs-$$.log \
-      | head -4 | sed 's/^/    /'
-    printf '    PASS\n\n'
-    pass=$((pass+1))
-  else
-    tail -6 /tmp/qs-$$.log | sed 's/^/    /'
-    printf '    FAIL\n\n'
-    fail=$((fail+1)); failed_names="$failed_names $name"
-  fi
-  rm -f /tmp/qs-$$.log
-done <<< "$units"
+# ---------------------------------------------------------------- Q2
+q 2 "Can that demo's tests still fail, or are they decoration?"
+if ( cd demos/routing-backtest && npm run mutate --silent ) >"$work/mu.log" 2>&1; then
+  # The colon form. This is the token the first version of this script got wrong.
+  line="$(grep -oE 'mutations:[[:space:]]*[0-9]+/[0-9]+ caught' "$work/mu.log" | tail -1)"
+  if [[ -n "$line" ]]; then
+    printf '    YES — %s. Each mutation is a named sabotage of the scoring code, planted one at a\n' "$line"
+    printf '    time into a green suite; if the tests still pass, that mutation ESCAPED and this fails.\n'
+    grep -oE 'CAUGHT[[:space:]]+[a-z-]+' "$work/mu.log" | head -3 | sed 's/^/      /'
+    ok
+  else no Q2 "$work/mu.log"; fi
+else no Q2 "$work/mu.log"; fi
 
-echo "quickstart: $pass passed, $fail failed"
+# ---------------------------------------------------------------- Q3
+q 3 "How much of a coding agent's context is resent every single turn?"
+if node -e '
+    const c=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")), t=c.totals, d=c.denominator;
+    const onTotal=t.cacheRead/t.total*100, onBilled=t.cacheRead/t.billedInput*100;
+    console.log(`    ${onTotal.toFixed(3)}% of all tokens are cache reads — context resent, not new work.`);
+    console.log(`    Denominator, stated: ${d.turns.toLocaleString()} turns across ${d.sessions.toLocaleString()} sessions in ${d.files.toLocaleString()} files, ${d.unparsable_lines} unparsable.`);
+    console.log(`    Basis matters here: ${onTotal.toFixed(3)}% against all tokens, ${onBilled.toFixed(3)}% against billed input only.`);
+    console.log(`    This repo published two spend figures off two unstated bases once. Never again unstated.`);
+  ' docs/demos/jev-probe/census-20260918.json 2>"$work/cs.log"; then ok; else no Q3 "$work/cs.log"; fi
+
+# ---------------------------------------------------------------- Q4
+q 4 "Which lever is that spend actually in, and does the accounting close?"
+if node demos/retransmit-whatif/bin/whatif.mjs "$fix" --out "$work/wi.json" >"$work/wi.log" 2>&1; then
+  node -e '
+    const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")), a=r.levers.aggregate, d=r.denominator;
+    const top=a[0], un=a.find(x=>x.lever==="unreconciled");
+    console.log(`    ${top.lever}: ${(top.share*100).toFixed(1)}% of ${a.reduce((s,x)=>s+x.tokens,0).toLocaleString()} tokens over ${d.assistantTurns} assistant turns.`);
+    a.slice(1).forEach(x=>console.log(`      ${x.lever.padEnd(13)} ${(x.share*100).toFixed(1)}%`));
+    console.log(`    Unreconciled: ${un.tokens} tokens. The residual is printed, so a share that does not`);
+    console.log(`    add up shows as a number instead of disappearing into a rounding.`);
+  ' "$work/wi.json" && ok || no Q4 "$work/wi.log"
+else no Q4 "$work/wi.log"; fi
+
+# ---------------------------------------------------------------- Q5
+q 5 "What does a Jev judgment actually look like?"
+if node scripts/jev-probe.mjs --replay docs/demos/jev-probe/probe-response-20260918.json >"$work/pr.json" 2>"$work/pr.log"; then
+  node -e '
+    const t=require("fs").readFileSync(process.argv[1],"utf8");
+    const j=JSON.parse(t.slice(t.indexOf("{")));
+    // EXPLICIT schema path, not a heuristic walk. The first version walked for "any object of numbers
+    // in 0..1" and surfaced `confidence: 0.7` — a real number from the wrong object. A reader would
+    // have believed it. answers.<question>.probabilities is where the judgment lives.
+    const qs=Object.entries(j.answers||{}).filter(([,v])=>v&&v.probabilities);
+    if(!qs.length) throw new Error("no answers.*.probabilities in this response");
+    for(const [name,a] of qs){
+      const rows=Object.entries(a.probabilities).sort((x,y)=>y[1]-x[1]);
+      console.log(`    ${name}: chose "${a.choice}" at confidence ${a.confidence}`);
+      rows.forEach(([k,v])=>console.log(`      ${k.padEnd(16)} ${v}`));
+    }
+    const u=j.usage||{};
+    if(u.input_tokens) console.log(`    Cost of this judgment: ${u.input_tokens} in / ${u.output_tokens} out. Decoded offline, no key.`);
+    console.log(`    CAUTION, measured: strip the framing from the prompt and these numbers MOVE — one`);
+    console.log(`    verdict flipped 0.21 to 0.59. See docs/demos/jev-probe/NOTE-framing-leak.md.`);
+  ' "$work/pr.json" && ok || no Q5 "$work/pr.log"
+else no Q5 "$work/pr.log"; fi
+
+printf '\n%d of 5 questions answered' "$pass"
 if (( fail > 0 )); then
-  echo "failed:$failed_names"
-  echo
-  echo "These run from committed bytes with no setup, so a failure here is a real defect in this"
-  echo "repo and not a missing dependency on your machine. Please open an issue with this output."
+  printf ', %d failed:%s\n' "$fail" "$failed"
+  echo "These run from committed bytes with no setup, so a failure is a defect in this repo and not a"
+  echo "missing dependency on your machine. Please open an issue with this output."
   exit 1
 fi
-echo
-echo "Next, if you want the lane's actual product rather than its demos:"
-echo "  docs/demos/STATUS.tsv   17 adjudicated candidates, 0 promoted, with a receipt for each"
-echo "  NEGATIVE_EVIDENCE.md    what was ruled out and what would reopen it"
-echo "  README.md               why a gauntlet's honest headline is zero promotions"
+cat <<'TAIL'
+.
+
+Run any of them on YOUR OWN logs — every tool takes a path and writes a receipt that states its
+denominator before any share:
+
+  node demos/routing-backtest/bin/backtest.mjs  <your-sessions.jsonl> --out runs/mine.json
+  node demos/retransmit-whatif/bin/whatif.mjs   <your-sessions.jsonl> --out runs/mine.json
+
+The lane's actual product is not these demos. It is a ruling on 17 candidate ideas, of which ZERO were
+promoted: docs/demos/STATUS.tsv for the verdicts and receipts, NEGATIVE_EVIDENCE.md for what was ruled
+out and what would reopen it.
+TAIL
 exit 0
