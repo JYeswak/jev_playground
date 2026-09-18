@@ -198,12 +198,77 @@ def main() -> int:
               f"refused={'REFUSED' in r.stdout} transient={'TRANSIENT_UNSTABLE' in r.stdout}")
         fail += 1
 
+    # ------------------- ARMS FOR PANE 2'S Q103 FINDINGS (audit-q103-fixes, audit-q103-promotion)
+    # Pane 2 DEFERRED PROMOTION A THIRD TIME on exactly these two gaps. Each gets a witness.
+
+    # ARM 12 — an outward-pointing symlink must be REJECTED, not followed. Pane 2:
+    # "Path.is_file() FOLLOWS a symlink and read_bytes() COPIES THE TARGET BYTES ... the snapshot then
+    # contains OUTWARD-TARGET BYTES UNDER AN APPARENTLY IN-ROOT source_path." `contained()` was
+    # lexical: it fixed where bytes LAND, not where they COME FROM.
+    sym_root = Path(tempfile.mkdtemp())
+    (sym_root / "docs/demos").mkdir(parents=True)
+    (sym_root / "runs").mkdir(parents=True)
+    outside = Path(tempfile.mkdtemp()) / "external.json"
+    outside.write_text(json.dumps({"other_reason": "design"}))
+    (sym_root / "runs/link.json").symlink_to(outside)
+    hdr = "\t".join(["candidate", "rung", "score", "verdict", "author", "receipt", "reason",
+                     "concurrence", "digest", "receipt_type"])
+    srow = "\t".join(["sym-cand", "4", "500", "RULED_OUT", "pane2", "runs/link.json", "died",
+                      "none", "deadbeefdeadbeef", "other"])
+    sstat = sym_root / "docs/demos/STATUS.tsv"
+    sstat.write_text(hdr + "\n" + srow + "\n")
+    sside = sym_root / "side.json"
+    sside.write_text(json.dumps({"rows": []}))
+    r = subprocess.run([str(VERIFIER)], capture_output=True, text=True, cwd=str(sym_root),
+                       env=dict(os.environ, JEV_REPO=str(sym_root), JEV_STATUS=str(sstat),
+                                JEV_SIDECAR=str(sside)))
+    if r.returncode == 13 and "SYMLINK ESCAPE" in r.stdout:
+        print(f"PASS  {'ARM 12 outward symlink rejected':<46} rc=13 not followed, not snapshotted")
+    else:
+        print(f"FAIL  {'ARM 12 outward symlink rejected':<46} rc={r.returncode} "
+              f"escape_named={'SYMLINK ESCAPE' in r.stdout}")
+        fail += 1
+
+    # ARM 13 — forced movement must be recorded IN THE MANIFEST, not only on stdout. Pane 2: "a SAVED
+    # MANIFEST ALONE CANNOT DISTINGUISH AN OBSERVED MOVEMENT FROM A FORCED TEST CLASSIFICATION ...
+    # transparent during execution but NOT FULLY EVIDENCE-CARRYING AFTER THE RUN."
+    r = subprocess.run([str(VERIFIER)], capture_output=True, text=True,
+                       env=dict(os.environ, JEV_FORCE_MOVED="docs/demos/STATUS.tsv"))
+    mm = re.search(r"manifest: (\S+)/manifest\.json", r.stdout)
+    if mm:
+        mv = json.loads((Path(mm.group(1)) / "manifest.json").read_text())["movement"]
+        if mv.get("forced") is True and mv.get("forced_reason") and mv.get("moved_paths"):
+            print(f"PASS  {'ARM 13 manifest carries forced provenance':<46} forced=True + reason + paths")
+        else:
+            print(f"FAIL  {'ARM 13 manifest carries forced provenance':<46} {mv}")
+            fail += 1
+    else:
+        print(f"FAIL  {'ARM 13 manifest carries forced provenance':<46} no manifest path emitted")
+        fail += 1
+
+    # ARM 14 — is_symlink must not fire on ordinary relative paths. The FIRST predicate here was
+    # `realpath != source_path`, true for EVERY relative path, so it reported is_symlink on all 19
+    # inputs. Caught by opening the manifest rather than trusting the field.
+    r = subprocess.run([str(VERIFIER)], capture_output=True, text=True)
+    m3 = re.search(r"snapshot: (\S+)", r.stdout)
+    if m3:
+        fs = json.loads((Path(m3.group(1)) / "manifest.json").read_text())["files"]
+        bogus = [f["source_path"] for f in fs if f["is_symlink"]]
+        if not bogus:
+            print(f"PASS  {'ARM 14 is_symlink does not fire on relatives':<46} 0 of {len(fs)} flagged")
+        else:
+            print(f"FAIL  {'ARM 14 is_symlink does not fire on relatives':<46} {bogus[:2]}")
+            fail += 1
+    else:
+        print(f"FAIL  {'ARM 14 is_symlink does not fire on relatives':<46} no snapshot path emitted")
+        fail += 1
+
     print("\n" + "-" * 70)
     print(f"fixtures under {tmp} (left in place; temp dir)")
     if fail:
         print(f"FAIL: {fail} arm(s) did not discriminate.")
         return 1
-    print("OK: sidecar verifier discriminates on all 11 arms; real files never written.")
+    print("OK: sidecar verifier discriminates on all 14 arms; real files never written.")
     return 0
 
 

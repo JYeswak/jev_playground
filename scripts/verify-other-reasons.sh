@@ -39,6 +39,9 @@ from pathlib import Path
 # require mutating production state is a verifier that will not be tested.
 STATUS = Path(os.environ.get("JEV_STATUS", "docs/demos/STATUS.tsv"))
 SIDECAR = Path(os.environ.get("JEV_SIDECAR", "docs/demos/duel-2/runs/receipt-other-reasons.json"))
+# The containment boundary for snapshot copies. Same JEV_REPO hook the sibling instruments use, so
+# arms can point it at a private root instead of mutating the real tree.
+REPO = Path(os.environ.get("JEV_REPO", Path(__file__).resolve().parent.parent))
 ALLOWED = {"design", "mapping", "unresolved", "mixed"}
 
 
@@ -77,21 +80,44 @@ def contained(root: Path, p) -> Path:
     return root / "files" / Path(*parts) if parts else root / "files"
 
 
-def snapshot(paths, root: Path):
-    """Copy each path into root/files/<original relative path>. Returns {original: snapshot}."""
-    mapped = {}
+def snapshot(paths, root: Path, boundary: Path):
+    """Copy each path into root/files/<original path>. Returns (mapped, rejected, realpaths).
+
+    SYMLINK ESCAPE, found by pane 2 (audit-q103-fixes-20260918T134500Z.json):
+    "LEXICAL_CONTAINMENT_MET_SYMLINK_CONTAINMENT_NOT_MET ... Path.is_file() FOLLOWS a symlink and
+    read_bytes() COPIES THE TARGET BYTES. An inward-looking path inside the repository can point
+    outside it; the implementation does not reject symlinks or verify realpath containment. The
+    snapshot then contains OUTWARD-TARGET BYTES UNDER AN APPARENTLY IN-ROOT source_path."
+
+    `contained()` was lexical only — it fixed where bytes LAND, not where they COME FROM. I had told
+    pane 2 I expected this gap was live and had not handled it; it confirmed with the mechanism.
+
+    `boundary` is the repo root. A path that RESOLVES outside it is rejected rather than copied, so
+    the snapshot cannot carry an unapproved external object behind an in-repo-looking name. Paths
+    supplied directly by JEV_STATUS/JEV_SIDECAR/__file__ are exempt: they are the caller's declared
+    inputs, not receipt references discovered inside evidence.
+    """
+    mapped, rejected, realpaths = {}, [], {}
+    bound = boundary.resolve()
     for p in paths:
         src = Path(p)
         if not src.is_file():
+            continue
+        real = src.resolve()
+        realpaths[str(src)] = {"realpath": str(real), "is_symlink": src.is_symlink()}
+        declared = str(src) in {str(STATUS), str(SIDECAR), str(Path(__file__).resolve())}
+        escapes = bound not in real.parents and real != bound
+        if not declared and escapes:
+            rejected.append((str(src), str(real)))
             continue
         dst = contained(root, src)
         dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_bytes(src.read_bytes())
         mapped[str(src)] = dst
-    return mapped
+    return mapped, rejected, realpaths
 
 
-def manifest_for(mapped, pre, post, attempts, head):
+def manifest_for(mapped, pre, post, attempts, head, realpaths=None, moved=(), forced=False):
     """Everything a third party needs to re-derive that the snapshot matched the source."""
     files = []
     for orig, snap in sorted(mapped.items()):
@@ -104,6 +130,16 @@ def manifest_for(mapped, pre, post, attempts, head):
             "source_post_raw": post.get(orig),
             "copy_raw": hashlib.sha256(b).hexdigest()[:16],
             "norm": norm_digest(snap),
+            # REALPATH IS EVIDENCE. Pane 2's symlink finding means source_path alone can look in-root
+            # while the bytes came from outside; recording where each path actually resolved lets a
+            # third party check containment instead of trusting that it was checked.
+            # `realpath != source_path` was the FIRST predicate here and it was WRONG: it is true
+            # for EVERY relative path, so it reported is_symlink on all 19 inputs. Caught by opening
+            # the manifest instead of trusting the field — a predicate satisfiable by an unrelated
+            # condition, which is the defect class this lane has now caught six times in its own
+            # instruments. `Path.is_symlink()` is asked at capture time, where the answer exists.
+            "source_realpath": (realpaths or {}).get(orig, {}).get("realpath"),
+            "is_symlink": (realpaths or {}).get(orig, {}).get("is_symlink", False),
         })
     # THE INSTRUMENT, CALLED OUT BY NAME. It is already in `files` because it is an input now, but an
     # outsider should not have to know which of 19 rows is the executable. Pane 2's ledger graded this
@@ -114,8 +150,30 @@ def manifest_for(mapped, pre, post, attempts, head):
     payload = {
         "schema": "jev.snapshot-manifest.v1",
         "spec": "docs/demos/duel-2/SPEC_snapshot_manifest_COD.md (44feaf2)",
+        # PANE 2 ANSWERED THE QUESTION I ASKED IT (audit-q103-source-head-20260918T135500Z.json,
+        # 1ea965e). I had offered to DELETE this field: its outsider rerun reached the verdict with
+        # source_head=no-head, so what is it load-bearing for? Its ruling: "NOT required for
+        # data-level evidence verdict ... but IS load-bearing provenance: pins intended repository
+        # revision and SEPARATES IDENTICAL EVIDENCE CAPTURED UNDER DIFFERENT CODE. HEAD alone is not
+        # working-tree identity; per-file hashes cover dirty inputs. Keep source_head, LABEL
+        # PROVENANCE NOT VERDICT INPUT." Labelled, so the next reader cannot mistake it for one.
         "source_head": head,
+        "source_head_role": ("provenance only — NOT a verdict input; per-file hashes cover dirty "
+                             "inputs, and a no-head capture still yields a valid evidence verdict"),
         "capture_attempts": attempts,
+        # MOVEMENT PROVENANCE, IN THE ARTIFACT THAT OUTLIVES THE RUN. Pane 2, audit-q103-fixes
+        # (c9ddb0f): "the manifest records movement and hashes but does not record forced=true/reason.
+        # A SAVED MANIFEST ALONE CANNOT DISTINGUISH AN OBSERVED MOVEMENT FROM A FORCED TEST
+        # CLASSIFICATION ... transparent during execution but NOT FULLY EVIDENCE-CARRYING AFTER THE
+        # RUN." That last phrase is the whole standard this verifier exists to meet.
+        "movement": {
+            "moved_paths": list(moved),
+            "forced": bool(forced),
+            "forced_reason": "JEV_FORCE_MOVED test hook" if forced else None,
+            "note": ("at least one movement was FORCED by a test hook, not observed; equal "
+                     "source_pre_raw/source_post_raw on a moved path is the signature")
+            if forced else "all movements, if any, were observed",
+        },
         "verifier": {
             "source_path": me,
             "snapshot_path": mine["snapshot_path"] if mine else None,
@@ -168,7 +226,17 @@ def main() -> int:
         pre = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest()[:16]
                for p in inputs if Path(p).is_file()}
         root = Path(tempfile.mkdtemp(prefix="jev-snap-"))
-        mapped = snapshot(inputs, root)
+        mapped, rejected, realpaths = snapshot(inputs, root, REPO)
+        if rejected:
+            # A REJECTED SYMLINK IS A DURABLE FAILURE, NOT A TRANSIENT. Pane 2: the snapshot would
+            # otherwise "admit an unapproved external source object" behind an in-root-looking
+            # source_path. That is a defect in the evidence, so it gets a verdict — not "no verdict".
+            print("SYMLINK ESCAPE: cited evidence resolves outside the repository boundary.")
+            for src, real in rejected:
+                print(f"  rejected: {src}  ->  {real}")
+            print(f"  boundary: {REPO.resolve()}")
+            print(f"REJECTED: {len(rejected)} path(s) not snapshotted; no verdict is issued on them.")
+            return 13
         # NEVER FALL BACK TO A LIVE PATH. Found by reading pane 2's OWN re-open condition — "no live
         # shared path is read after the snapshot is declared complete" — against my implementation:
         # `mapped.get(str(p), Path(p))` returned the LIVE path for anything not copied, and
@@ -181,8 +249,6 @@ def main() -> int:
         rc, report = _verify(resolve(STATUS), resolve(SIDECAR), resolve)
         post = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest()[:16]
                 for p in inputs if Path(p).is_file()}
-        man = manifest_for(mapped, pre, post, attempt, head)
-        (root / "manifest.json").write_text(json.dumps(man, indent=2, sort_keys=True) + "\n")
         moved = sorted(p for p in pre if pre[p] != post.get(p))
         # DETERMINISTIC KNOWN-BAD HOOK, same pattern as lane-status's JEV_SELF_DIGEST_OVERRIDE:
         # racing a mid-run mutation against a ~0.3s verify proved nothing THREE times, and tuning the
@@ -206,6 +272,13 @@ def main() -> int:
             else:
                 moved = sorted(set(moved) | {os.environ["JEV_FORCE_MOVED"]})
                 forced = True
+        # MANIFEST IS GENERATED HERE, AFTER `forced` IS KNOWN. Pane 2 (audit-q103-fixes, c9ddb0f):
+        # "forced=true disclosure is STDOUT-ONLY, NOT MANIFEST-BOUND ... a saved manifest alone
+        # cannot distinguish an observed movement from a forced test classification." It was written
+        # before the classification existed, so it could not have carried it. The manifest is the
+        # artifact that outlives the run, so the run's provenance has to be IN it, not beside it.
+        man = manifest_for(mapped, pre, post, attempt, head, realpaths, moved, forced)
+        (root / "manifest.json").write_text(json.dumps(man, indent=2, sort_keys=True) + "\n")
         if not moved:
             print(report, end="")
             print(f"  snapshot: {root}  manifest_digest: {man['manifest_digest']}")
