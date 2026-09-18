@@ -65,6 +65,42 @@ to the next unit. The only failure mode is silence.
 The REPLY-VIA `NEXT` field is therefore not a suggestion to the conductor: it is
 the pane's own next unit, named in the packet, which it self-claims.
 
+**A QUEUE IS NOT SELF-SUSTAINING. SHIP A DRY-QUEUE DEFAULT.** Measured
+2026-09-18, one hour after the clause above was written: pane 3 was given a
+3-unit queue, completed all three (`11c3c33`, `3f765a9`, `fa15c47`), and went
+idle anyway — because a finite queue is just a longer task list. A human chase
+found it, again. So every packet also carries a standing rule for the empty
+queue, in priority order: (1) review the highest-value **unreviewed** artifact
+in the lane — one grader, zero graders, or an unaudited claim — non-author
+only; (2) the oldest `NEGATIVE_EVIDENCE.md` item whose retry condition has
+become satisfiable, or a `GATES.md` gap with no witness; (3) fire a **QUEUE
+DRY** callback naming what was considered and rejected. (3) is a success. It
+has never yet been true.
+
+**NEVER PUSH INTO A WORKING PANE.** `ntm --robot-send` types into the pane's
+prompt, so a pane mid-unit gets interrupted and the interruption is invisible
+to you. Measured 2026-09-18: pane 2 was sent a queue extension while working
+through unit 3. Push ONLY to a pane that is idle or whose callback just landed.
+To extend a working pane's queue, append to its queue file
+(`docs/demos/**/dispatch/<pane>-*.md`) and let it read at the unit boundary, or
+use `am mail`, which is pull. A DONE callback in this turn is consent; silence
+is not.
+
+**VERIFY LEG 2, DO NOT ASSUME IT.** Measured 2026-09-18: `am inbox --agent
+CyanFalcon` returned `count: 0` after two panes had delivered six units. Every
+bead comment and every commit landed; not one `am mail` arrived — both panes
+routed callbacks through the pane relay instead. A three-leg contract with one
+silently dead leg is a two-leg contract that looks like three. Read the inbox
+during §1, and when a packet asks for leg 2, require the pane to report what
+the send returned.
+
+**AND CHECK THE ARTIFACTS BEFORE REPORTING A PANE'S STATE.** Measured
+2026-09-18: the conductor reported pane 3 as "no callback yet" while all three
+of its units sat committed in `git log`. Idle + fresh commits = silent finish,
+not silence. §1 names the surfaces for a reason; inferring a pane's state from
+the absence of a message is the same instrument error as trusting a summary
+over a receipt.
+
 ## 3. DISPATCH — project-aware, by hand, in this order
 
 0. DONE callback → close (conductor classifies) → dispatch that pane's NEXT

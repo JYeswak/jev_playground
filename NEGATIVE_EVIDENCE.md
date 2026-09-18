@@ -165,3 +165,54 @@ SHAs, `skillranker` as it moves, and X.
 classifier fixture whose corpus is builder-sub threads (`USAGE-MAP.md` §9 shape) — **and** grokbot's
 Reddit Pulse output is not already reachable as a file we can read. Until both hold, read grokbot's
 artifacts instead of adding a server.
+
+---
+
+## R10 — Do not build a jev-local fleet-idle monitor. One is already installed.
+
+**Rejected 2026-09-18.** I wrote `scripts/fleet-idle-monitor.sh` (5,044 bytes) plus
+`scripts/selftest-fleet-idle-monitor.sh` (8 arms, all PASS including fires-on-known-bad idle
+detection and five fail-closed arms) to fix a real measured gap: the conductor was blind between
+20-minute ticks, reported pane 3 as "still working" while all three of its units sat committed in
+`git log`, and only a human chase surfaced it.
+
+**Then I read the live crontab.** `/Users/josh/.local/bin/fleet-idle-monitor` already exists — a
+6.98 MB arm64 Mach-O binary, installed 2026-09-04 — invoked by **both** other lanes on identical
+rows:
+
+```
+8,18,28,38,48,58 * * * * cd <repo> && FLEET_SESSION=<session> timeout 480 \
+  /Users/josh/.local/bin/fleet-idle-monitor --report-only >> <log> 2>&1
+```
+
+It ran against jev **unmodified on the first try** (`FLEET_SESSION=jev`), and in cron's exact
+environment (`env -i` + the four crontab declarations), emitting per-pane rows with pane ids:
+`UNPROVEN session=jev pane=%70 reason=first_capture` / `WORKING … reason=omp_working_marker` /
+`OK no two-capture idle panes beside ready work`, exit 0.
+
+**It is strictly better substrate than what I wrote, on the axis that decides correctness.** Its
+usage banner states the contract: *"true idle requires two captures; dead means absent from tmux
+list-panes -a."* Mine read `safe_to_dispatch` from a **single** capture — and `safe_to_dispatch` is
+explicitly not liveness (a pane pending a client restart accepts a packet, parks it, and never
+submits). My selftest's 8 green arms proved my detector matched my own fixtures; they could not
+prove the detector was asking the right question. **A green selftest against self-authored fixtures
+is not evidence that the design is right.**
+
+**What the lane was actually missing was one crontab row, not a script.** jev had the `*/20` tick
+row and no 10-minute monitor row, while omp-orchestrator and cfsios each had both. Installed:
+diff +1/−0, jev now carries 2 rows, matching the live convention exactly.
+
+**Both scripts withdrawn** (uncommitted, never in git history — removing my own unlanded work, not
+deleting anything of Joshua's).
+
+**The rule, and it generalizes past this instance:** before writing lane infrastructure, grep
+`crontab -l` and `~/.local/bin` for the capability. Two other lanes doing the same thing by an
+identical row is the signal that the substrate exists and is parameterized. `ompo`
+(omp-orchestrator) is where general fleet orchestration is being built and is **not finished** — so
+a jev-local conductor would have become a competing implementation of an in-progress system, the
+"five competing conductors" failure the ntm-fleet-monitor skill names.
+
+**Retry condition:** the installed binary cannot express something jev specifically needs — e.g. it
+cannot report a **dry queue** (a pane that is idle *because its packet ran out of units*, which is a
+packet defect, not a pane state). If that need becomes concrete, the fix is a flag or an upstream
+bead against the shared binary, **never** a jev-local fork.
