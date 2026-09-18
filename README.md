@@ -132,6 +132,10 @@ the confidence is honest where it saturates and carries almost no signal to rout
 that needs a larger n than anyone has run. That is a concrete improvement on published work, in our
 own domain.
 
+**A stranger-readable summary of every upstream run lives at
+[`docs/demos/upstream-repro/README.md`](docs/demos/upstream-repro/README.md)**: one line per repo,
+each linked to the receipt that produced it.
+
 **Four of twenty-two are now run, and running them produced things we could not have produced
 ourselves.** `jev-rerank-bench`'s headline reproduces from its committed cache (Jev rubric 0.692
 against Cohere Pro 0.691, inside noise at p=.910), while a fresh `nevir_eval` over 1,383 pairs gives
