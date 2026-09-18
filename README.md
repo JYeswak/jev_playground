@@ -66,6 +66,64 @@ a retraction to learn.
 The full retraction, with both sides of the framing test, is in
 [`docs/demos/jev-probe/NOTE-framing-leak.md`](docs/demos/jev-probe/NOTE-framing-leak.md).
 
+### The twenty-two upstream Jev repos: what each one tests, and where we are
+
+These are cloned in this tree and gitignored. They are **not ours** — they are TypeSafe's and the
+community's, and each already asks a question we would otherwise re-ask badly. Derive the list with
+`for d in */; do [ -d "$d/.git" ] && echo $d; done`; the purposes below are quoted from each repo's
+own README, not inferred from its name.
+
+`RUN` means we executed it here and compared its output to its claims. `BLOCKED` names the
+obstacle. Everything else is untouched, which is the honest state.
+
+|Repo|The question it answers|State|Next action|
+|---|---|---|---|
+|`jev-spam-eval`|does a plain-English question beat a classifier trained on labels|**RUN** — both headlines reproduce|fetch the other three datasets; check the out-of-distribution claim|
+|`jev-rerank-bench`|can Jev rerank thirty search results usefully|not run|run `eval.py`, `determinism.py`, `significance.py`; report what fails to reproduce|
+|`jev-phishing-bench`|Jev against LLMs on phishing, with a stated **net floor**|not run|run `net_floor.py` first — a benchmark whose floor beats its headline measures nothing|
+|`jev-sec-bench`|blind security benchmarks|not run, README only|establish whether code exists or it is a results write-up|
+|`jev-agent-failure-benchmark`|can a cheap decision model find what broke an agent|not run|run it; the closest upstream analogue to this lane's own question|
+|`typesafe-ai-benchmark`|LLM structured output vs Jev on latency, cost, judgment|not run|run its documented examples; report which are stale at HEAD|
+|`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**BLOCKED** — local Rust denied; RCH `critical_pressure=4`|run both examples the moment a worker frees|
+|`jev-router`|per-turn model routing for Claude Code and Codex|not run|compare with `demos/routing-backtest`; upstream may already own this|
+|`jev-codex-router`|the same idea, Codex-specific|not run|read before extending our own router work|
+|`jev-mcp`|Jev judgments exposed as MCP tools|not run|the cheapest path to Jev inside this harness|
+|`jev-ultrafast`|a browser agent driven by Jev|not run; needs a URL and a key|lowest priority, it is a live-network demo|
+|`fast-jev-compaction`|continuous context compaction with Jev|not run|directly relevant: our own `compaction/` sits beside it|
+|`commit-miner`|classify commit diffs and messages with Jev|not run|runnable against this repo's own history|
+|`foreman`|watch a software factory floor with Jev|not run|closest upstream analogue to the conductor loop|
+|`bicameral`|System 2 writes the code, System 1 judges it|not run|the architectural claim this lane assumes|
+|`jev-review`|Jev for code review|not run|read|
+|`system-one-adapter-python`|a drop-in `system_one` backed by an LLM|not run|useful as a control: an LLM standing in for Jev|
+|`skillranker`|a ranker built on Jev, mirrored here|mirror current|read its Jev question construction; never copy its files|
+|`jev-benchmark` (themsquared)|is Jev's confidence score worth routing on, at n=60|**RUN** — their cached results re-analysed|raise n: the author says the models are "not separable at this sample size"|
+|`awesome-jev`, `awesome-jev-by-typesafe`, `awesome-typesafe`|curated indexes of everything above|read|a discovery source, not evidence|
+
+**What running one actually taught us.** On Ling-Spam a question with **no labels** scores 0.9857
+and a TF-IDF classifier with **2,300 labels** scores 0.9941 — and their errors are mirror images:
+the question makes 2 false negatives and 39 false positives, the classifier makes 40 and 1. An
+elaborated *"structured criteria"* question scored **worse** than the plain one, 0.9701 against
+0.9857, so elaboration is not free. Averaging the question with the classifier beats both at 0.9983.
+Receipt:
+[`docs/demos/upstream-repro/lingspam-20260918.md`](docs/demos/upstream-repro/lingspam-20260918.md).
+
+**What asking outside changed, and it is not flattering.** TypeSafe's own dashboard puts Jev at
+**67.8% aggregate against 74.1% for the best comparator**, and **61.8% against 79.1%** on invoice
+processing. Nothing this lane had written about Jev mentioned that it trails on aggregate. Any claim
+here about where Jev wins has to sit beside that.
+
+**The gap worth taking, from an independent benchmark.** `jev-benchmark` scores Jev at 91.7% on agent
+tool-call risk with **ECE 0.0505**, and its author states plainly that two model versions are *"not
+separable at this sample size"* (n=60). Re-analysing their shipped results shows why the question is
+still open: **confidence is exactly `1.000` on 40 of 60 cases**, with 0 of 5 misses landing there. So
+the confidence is honest where it saturates and carries almost no signal to route on — and settling
+that needs a larger n than anyone has run. That is a concrete improvement on published work, in our
+own domain.
+
+**The rule that produced:** run the upstream question before writing our own. Nineteen of these
+twenty sat untouched while this lane built and re-graded demos of its own, and the one we ran
+returned a reproducible finding in ten minutes.
+
 ## What you can run
 
 Each tool takes one command, reads your own logs, and writes a receipt that states its denominator

@@ -118,6 +118,46 @@ defect-class, and loss fields; this section is the default adoption path.
 
 ---
 
+## RULE 13 - RUN THE UPSTREAM QUESTION BEFORE WRITING YOUR OWN
+
+Joshua, 2026-09-18, after this lane spent a day grading artifacts it wrote itself: *"we seem to
+proving ourselves out of doing anything - what are things that we are actualky GOING to get done and
+measured - jev github has examples we can run, why aren't we using those and then building on them
+- what are we doing here"*. And immediately after: *"stop jacking eachother off - make sure we're
+going truly next gen on this at every turn - with everything we've done - lets ask online - is that
+good enough - what have others done that we can improve upon"*.
+
+He was right and the tree proved it: **twenty-two Jev repositories are cloned here** and nineteen
+were untouched while this lane built and re-graded demos of its own. The first one run reproduced a
+published table in ten minutes.
+
+**Four clauses. All of them bind.**
+
+1. **UPSTREAM FIRST.** Before building an instrument, demo, or benchmark, check whether a cloned
+   repo already asks that question, and run it. Derive the list with
+   `for d in */; do [ -d "$d/.git" ] && echo $d; done`. Our version is justified only by what
+   theirs failed to answer, stated as a measured gap.
+2. **AN EXTERNAL ORACLE OUTRANKS AN INTERNAL ONE.** A number reproduced from someone else's script
+   on someone else's checksum-verified corpus is `[oracle]`. A number from our fixture, measured by
+   our harness, graded by our pane, is `[test]` at best. Two panes agreeing about our own artifact
+   is not evidence; it is the same origin counted twice.
+3. **MUTUAL GRADING IS NOT WORK.** A ruling on our instrument, an audit of our README, or a review
+   of a review does not count as product. It is legitimate only when it BLOCKS a ship, and the
+   thing it blocks must be named. The audit that returned USER 0 / ENABLER 5 / PROCESS 17 is what
+   this clause exists to stop recurring.
+4. **ASK OUTSIDE, EVERY CYCLE.** Before calling a result good, search what others have published on
+   it and record what beats us. Measured the first time this ran: TypeSafe's own dashboard has Jev
+   at **67.8% aggregate against 74.1% for the best comparator**, and 61.8% against 79.1% on invoice
+   processing — absent from everything this lane had written about Jev's strengths. An independent
+   benchmark (`jev-benchmark`, n=60) states its models are **"not separable at this sample size"**,
+   which names the improvable gap: its confidence is exactly `1.000` on 40 of 60 cases, so "route on
+   confidence" has almost no signal to route on.
+
+**Retirement, since a rule needs one:** clause 1 retires when every cloned repo has been run or has
+a recorded refusal with a named blocker. Clauses 2–4 do not retire.
+
+---
+
 ## RULE NUMBER 1: NO FILE DELETION
 
 **YOU ARE NEVER ALLOWED TO DELETE A FILE WITHOUT EXPRESS PERMISSION.** Even a new file that you yourself created, such as a test code file. You have a horrible track record of deleting critically important files or otherwise throwing away tons of expensive work. As a result, you have permanently lost any and all rights to determine that a file or folder should be deleted.

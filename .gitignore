@@ -67,3 +67,5 @@ __pycache__/
 .ruff_cache/
 dist/
 .test-dist/
+jev-benchmark/
+awesome-typesafe/
