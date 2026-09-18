@@ -1,0 +1,24 @@
+{
+  "schema": "jev.q106.derivation-gate-ruling.v1",
+  "generated_at": "2026-09-18T15:15:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "question": "Should STATUS cite the derivation receipt or retain the open numeral hit?",
+  "inputs": {
+    "gate": "scripts/verify-reason-numerals.sh",
+    "derivation": "demos/routing-backtest/runs/derivation-0447-20260918T134500Z.json",
+    "source_measurement": "demos/routing-backtest/runs/backtest-20260918T020440Z.json",
+    "current_status_receipt": "demos/routing-backtest/runs/backtest-20260918T020440Z.json"
+  },
+  "ruling": "CITE_THE_DERIVATION_RECEIPT_AFTER_REPIN_AND_REVIEW",
+  "why": "The derivation receipt is not a hidden gate exception: it is a content-bearing, opened receipt that records numerator/denominator fields, formula, basis, source receipt, and alternate basis. Citing it lets the literal-opening gate see 0.0447 while preserving an explicit indirection to the measurement source. Teaching the gate a derived-accepted class would add judgment to the mechanical layer; changing the STATUS citation to the derivation receipt does not.",
+  "current_state": "Until STATUS receipt is changed and its digest is pinned, the numeral hit remains OPEN and the current gate correctly returns it as unopenable in the source measurement receipt.",
+  "required_migration": [
+    "Update demo-1 STATUS receipt path to the derivation receipt.",
+    "Recompute/pin column-9 normalized digest for the derivation receipt.",
+    "Keep derivation source_receipt and source field locators in the derivation receipt.",
+    "Run verify-reason-numerals and an independent content audit after the edit.",
+    "Do not alter the gate to accept derived classes implicitly."
+  ],
+  "boundary": "The derivation receipt is evidence of arithmetic, not a re-ruling of RULED_OUT. The original measurement receipt remains the source object reachable through one declared indirection.",
+  "no_claim": "No claim that the STATUS edit has landed, no claim that the numeral hit is currently closed, and no claim that the gate can validate semantic derivations generally."
+}
