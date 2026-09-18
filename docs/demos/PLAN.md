@@ -833,7 +833,71 @@ reach"*, not *"no such population exists anywhere"*.
 **Honest note on the density figure:** 0.0599/KLOC is a ratio over a corpus whose composition we
 chose. It is the right number for deciding whether *we* can run the study, and the wrong number for
 any claim about software in general.
+
 ---
+
+## §3m TWO PANES CONVERGED INDEPENDENTLY ON THE SAME JEV WEDGE — **calibration**
+
+**This was not designed, asked for, or coordinated, and it is the most useful thing the gauntlet has
+produced.** Within the same hour, two panes working different candidates from opposite directions
+named the identical property as the thing an incumbent cannot supply:
+
+- **Pane 2, on MU-H2 vs `docverity` / `fiberplane/drift`**
+  (`BASELINE_MU-H2_vs_incumbents_COD.md`, `75cfb9f`): *"Typed calibrated probability — no documented
+  probability"* in either incumbent, and *"if its confidence is not a typed, labelled, calibrated
+  probability with an audit trail, it remains a non-Jev model baseline."* Its ship gate hard-codes
+  **ECE ≤ 0.10 and Brier ≤ 0.15.**
+- **Pane 3, on COD-H3's T2 retry track** (`RUNG2_COD-H3_resolved_MU.md`, `51c2bb1`): the wedge
+  against RouteLLM/Martian is *"calibration the routers cannot emit: per-decision probabilities with
+  withhold on novel requests."*
+
+Different candidates, different surfaces (staleness detection vs cost routing), different
+incumbents, **same answer.** Neither pane read the other's file — pane 2 was the non-author of
+MU-H2, pane 3 the non-author of COD-H3, and the two units were claimed off the queue independently.
+
+### Why this is a finding and not a coincidence
+
+The gauntlet has spent this entire session asking *what is Jev actually necessary for*, and killing
+candidates that could not answer: demo-1 (**zero Jev calls**, a hand-written token heuristic),
+COD-H3 (**four of five stages deterministic**, the fifth served by a committed table), MU-H1 (the
+judgment was real but **the corpus supplies 17 markers**). Each kill narrowed by elimination. **This
+is the first time two independent processes narrowed to the same positive claim:**
+
+> **A deterministic tool can decide. It cannot tell you how much to trust the decision, per
+> decision, in a form you can audit and threshold on — and it cannot decline.**
+
+That is not "Jev is smarter." It is a **capability difference with a measurable surface**: ECE,
+Brier, coverage at a withhold threshold, and the false-clean rate you accept in exchange. Every one
+of those is a number an incumbent baseline **structurally cannot produce**, because it has no
+probability to calibrate.
+
+### What this changes operationally
+
+1. **Rung 2's question sharpens.** It stops being *"does this need a model?"* — a question that
+   invites garnish answers — and becomes: **does this need a calibrated, per-decision, auditable
+   probability, with the option to withhold?** demo-1 fails that instantly. COD-H3-as-filed fails
+   it. MU-H1 passes it and dies on denominator instead. The four COD survivors were all filed
+   around abstention or confidence, which is why they scored 885–905.
+2. **demo-7 is the measurement that already tested it.** Verdict-only **62.6%** against five
+   signals plus a fitted head **95.1%** — a **32.5-point** delta — *is* the calibration thesis,
+   measured, before either pane articulated it. demo-7 sits HELD at 560 on demand, not on
+   mechanism; §3m says its **mechanism is the lane's strongest**, which is a reason to falsify it
+   (Q7) rather than let it sit.
+3. **Every future rung-2 pass must state the withhold behaviour.** A candidate that cannot decline
+   is a classifier with extra steps, and classifiers have incumbents.
+
+### Honest limits
+
+Two panes agreeing is **corroboration, not proof** — and they share a conductor, a plan file, and a
+§3i doctrine that already told them to hunt for what incumbents cannot do, so the priors were
+partially seeded. **What is not seeded is the specific property.** §3i says *find the gap*; it never
+says *the gap is calibration*. And the claim remains **unmeasured against an incumbent**: pane 2
+designed the head-to-head and explicitly filed `NO-CLAIM — no install, no benchmark, no model call,
+no result`. **The thesis is now the lane's most valuable unproven claim, and Q9 plus the MU-H2 gate
+are the two places it gets tested.**
+
+---
+
 
 ## §4 Phase arc
 
