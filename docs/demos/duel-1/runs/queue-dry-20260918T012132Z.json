@@ -1,0 +1,40 @@
+{
+  "schema": "jev.publish-redteam.queue-dry.v2",
+  "bead": "jev-publish-redteam-7s0",
+  "generated_at": "2026-09-18T01:21:32Z",
+  "status": "QUEUE_DRY",
+  "artifact_checked": "DUELING_WIZARDS_REPORT.md",
+  "artifact_present": false,
+  "considered": [
+    {
+      "id": "R7",
+      "decision": "rejected",
+      "reason": "retry requires documented abort_bash cancellation semantics or a probe showing cancelled=true; neither was supplied for this unit"
+    },
+    {
+      "id": "R8",
+      "decision": "rejected",
+      "reason": "retry requires editing ripwire C++ and contributor-mode activation; not this lane task"
+    },
+    {
+      "id": "R9",
+      "decision": "rejected",
+      "reason": "reddit input is not required by this task and Reddit Pulse already owns that signal"
+    },
+    {
+      "id": "R10",
+      "decision": "selected",
+      "reason": "dry queue is concrete now; R10 explicitly says the installed fleet-idle monitor cannot express it and the fix belongs upstream/shared, never a jev-local fork"
+    },
+    {
+      "id": "R11",
+      "decision": "rejected",
+      "reason": "A/B retry requires pinned generator or n>=10 distribution; current evidence is n=3 with no temperature pin"
+    }
+  ],
+  "selected": "R10",
+  "retry_condition": "Installed fleet-idle substrate cannot report a dry queue; queue an upstream/shared-binary flag or bead, not a local fork.",
+  "queue_action": "QUEUE DRY only: name R10 for conductor routing; do not implement a monitor in this lane.",
+  "next": "Conductor routes the shared fleet-idle-monitor dry-queue capability or reruns report audit when DUELING_WIZARDS_REPORT.md lands.",
+  "no_claim": "No R7/R8/R9/R10/R11 implementation or probe was run; this is a queue decision."
+}
