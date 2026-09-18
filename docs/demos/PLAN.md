@@ -4694,3 +4694,75 @@ is no bounded question left that this lane can answer with the data it has**, an
 would be the process-porn the tick explicitly forbids.
 
 **`PROMOTED 0`, 17 candidates, every cited receipt present, exit 0.**
+
+---
+
+## §5m §5l IS SUPERSEDED — I declared the lane terminal from my own prose, and the next status pull found work
+
+**`§5l` above is superseded, not edited.** It says *"the lane is terminal"* and *"there is no bounded
+question left that this lane can answer with the data it has."* **One `./scripts/lane-status.sh` run
+later, two bounded questions were open.**
+
+**The defect is not the wrong conclusion — it is where the conclusion came from.** I wrote the
+terminus from **both panes reporting `NEXT none lane-bounded`**, which is *their* report of *their*
+queues, relayed through my own summary. **That is the exact failure §0 of the tick describes:
+"assembled from prose it had written itself… that is memory with extra steps."** A pane's empty queue
+is evidence about the pane, **not** about the lane, and I treated the former as the latter.
+
+**Sixth conductor-side defect, and the first one where the instrument I was told to run is what
+caught it.**
+
+### And my first hypothesis about the finding was also wrong, which is the part worth keeping
+
+I saw five modified JSON files in `git status` and hypothesised that **cited receipts had drifted**,
+which would break the ruling's sha citations. **Measured before claiming:**
+
+```text
+cited in docs/demos/STATUS.tsv ......... 16 receipts checked,  0 drifted
+cited in PROSE only .................... 5 artifacts drifted, across 11 documents
+drift, in every case ................... `\ No newline at end of file` -> newline
+                                         content identical, sha256 different
+```
+
+**The hypothesis failed on the set I cared about most.** The receipts the instrument actually checks
+are clean. **Had I written the hazard up before measuring it, I would have published a fifth
+instance of my own modal failure inside a section about integrity.**
+
+### The real finding, stated at its true size
+
+**`scripts/lane-status.sh` verifies that every cited receipt *exists*. It does not verify
+*integrity*** — there is no per-receipt digest in it. And the drifted five are cited in prose across
+eleven documents:
+
+| artifact | citing docs |
+|---|---|
+| `demos/doc-drift/corpus.json` | 4 |
+| `demos/doc-drift/policy.json` | 7 |
+| `demos/preaction-abstention/fixtures/rung4-sample-spec.json` | `CLAUSE_locally_reversible_COD.md` |
+| `demos/preaction-abstention/fixtures/rung4-verifiable-sample.json` | `QUEUE.md` |
+| `docs/demos/duel-2/runs/verifiable-draw-20260918T071500Z.json` | `PLAN.md` |
+
+**And it sharpens the manifest specification rather than damaging it.** The manifest's priced claim
+was *"survives the real autofix hook with sha256 unchanged."* **Five existing JSON receipts just
+failed exactly that property** — so the manifest's survival is a **distinguishing** property of its
+format, not a truism, and the lane's current receipts do not have it.
+
+### Why I routed the ruling instead of making it
+
+**A digest gate added today would be broken by the hook that runs on every commit** — which, by the
+lane's own §3h doctrine, is **a dead gate on arrival**: *"a gate nothing can satisfy is not a high
+bar."* But a receipt nobody can verify by digest is **a receipt on trust.** Both horns are real, so
+**pane 2 rules (Q58)** across pin-after-normalisation / pin-nothing-and-say-so /
+pin-content-normalised, with a re-examination condition. **Pane 2 also measures (Q59) whether any
+lane claim is digest-dependent at all** — if none is, the damage is bounded to zero and that is the
+good outcome.
+
+### New witness on a P1 that still cannot be dispatched
+
+`jev-distinct-lineage-review-substrate-nl9` asks, as its question 2, *"is `--check-mode` autofix the
+right call, or does flagging-without-fixing just move the friction?"* **It now has a witness: the
+autofix lane silently rewrote five committed JSON artifacts' bytes in a shared worktree.** That is
+evidence for the bead, **not** a reason to dispatch it — its acceptance names *"a written review from
+a named non-Claude lineage… not satisfied by another Claude pane reading it."* **Three Claude panes
+cannot satisfy it, so it stays open with the witness attached rather than being handed to a pane that
+cannot close it.**
