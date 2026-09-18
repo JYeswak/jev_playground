@@ -1,0 +1,111 @@
+{
+  "schema": "jev.duel.duelist-file.v1",
+  "bead": "jev-demo-loop-a1q",
+  "unit": "duel-1 duelist A (Claude side): 15 ideas winnowed to 5",
+  "outcome": "DONE",
+  "actor": "CyanFalcon",
+  "pane": 1,
+  "generated_at": "20260918T000328Z",
+  "artifact": {
+    "path": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+    "bytes": 17704,
+    "sha256": "b7220d42946882dfdf0ba189c054884f2200c62d663fae85f03bf55f13b3f000",
+    "landed_in_commit": "8b111ef",
+    "verification_level": "pending",
+    "level_rationale": "proposal doc; nothing in it built or measured, so claiming [test] would borrow an unrelated green"
+  },
+  "head_at_receipt": "16d76c6",
+  "sources_read_first": {
+    "docs/demos/USAGE-MAP.md": {
+      "sections": 14,
+      "sha256": "e497a1df0374c5bcd097f63c17f1c5566e5946812668de0cbd4cad138b54c64f"
+    },
+    "compaction/runs/replay-big-20260917.json": {
+      "eventsIn": 179,
+      "messagesIn": 24,
+      "lib": {
+        "messagesBefore": 13,
+        "messagesAfter": 8,
+        "charsBefore": 2333,
+        "charsAfter": 1292
+      },
+      "kept": 0,
+      "resultsTrailing": 0,
+      "failures": [],
+      "reduction_pct": 44.6
+    },
+    "compaction/runs/ab-20260917.json": {
+      "schema": "jev.resume-quality-ab.v1",
+      "armA_score": 1,
+      "armB_score": 3,
+      "verdict": "B wins",
+      "armA_contextBytes": 4188,
+      "armB_contextBytes": 1241,
+      "liveCalls": 4,
+      "jevRequests": 1
+    }
+  },
+  "ideas": {
+    "long_list": 15,
+    "shortlist": 5,
+    "every_entry_cites_usage_map_section": true,
+    "shipped_work_reproposed": false,
+    "extended_instead": [
+      "compaction hook",
+      "replay.ts",
+      "resume-quality A/B"
+    ]
+  },
+  "shortlist_ordered": [
+    {
+      "rank": 1,
+      "name": "fact-ledger companion, re-scored on the existing A/B",
+      "map": "14",
+      "why_first": "only idea that decides a question already in flight (does demo-1 ship?); reuses our fixture, scorer and schema"
+    },
+    {
+      "rank": 2,
+      "name": "claim-check pre-commit lane",
+      "map": "2",
+      "why": "our hooks check the FORM of a claim; nothing checks the NUMBER against the cited receipt"
+    },
+    {
+      "rank": 3,
+      "name": "routing backtest over our own omp session logs",
+      "map": "4",
+      "why": "read-only; upstream measured -60% on 237 turns of THEIR traffic, ours is unmeasured and on disk"
+    },
+    {
+      "rank": 4,
+      "name": "signals-not-verdicts classifier starter",
+      "map": "9+13",
+      "why": "RED arm is its own thesis: verdict-only 62.6 vs 5-signal 95.1"
+    },
+    {
+      "rank": 5,
+      "name": "context-admission screen hook",
+      "map": "1+12",
+      "why": "highest ceiling and highest blast radius; runs on every read, wants #2's cost lesson first"
+    }
+  ],
+  "declared_bias": "weighted decisions-we-are-about-to-make over artifacts-the-space-would-applaud; named the inversion a duelist could land (#4 over #1)",
+  "cuts_with_reasons": {
+    "skillranker": "BLOCKED not unpromising - EVAL.md \u00a77: AGENTS.md mined only, no source read, no live call, moving repo",
+    "blind-corpus-L3": "folded into idea 5 as its RED arm, not a standalone demo",
+    "rerank-recipe": "no first-party retrieval surface with gold labels"
+  },
+  "no_claim": [
+    "NOT scored: neither file cross-scored; WIZARD_IDEAS_MU.md deliberately unread",
+    "docs/demos/PLAN.md exists UNTRACKED from the pre-redirect order and is deliberately unstaged; it is not duel input and will be rewritten after synthesis",
+    "no demo implemented, no demo beads filed, no cron edits, no new gate stages",
+    "no live Jev call made by this pane this unit"
+  ],
+  "next_unprompted": "nothing - WIP limit is one and cross-scoring is the conductor's relay. If dispatched: cross-score MU against the same rubric, or start idea 1 (fact ledger) since it reuses compaction/ab/run-ab.ts unchanged.",
+  "reservation": {
+    "paths": [
+      "docs/demos/**"
+    ],
+    "holder": "CyanFalcon",
+    "mode": "shared"
+  }
+}
