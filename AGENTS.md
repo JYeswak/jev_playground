@@ -42,6 +42,9 @@ clone's own toolchain (`npm run typecheck` / `ruff`), never imposed across them.
     [§ Primary sources](#primary-sources--vendored-locally-read-these-first)
 11. **Done means §4 below** — not compiling, not demoed once.
     [§4 Definition of Done](#4-definition-of-done--the-acceptance-bar)
+12. **When Jeffrey does it, default to ADOPT.** He is this lane's mentor. The burden of proof sits
+    on NOT adopting, never on adopting.
+    [§ RULE 12](#rule-12---adopt-from-the-mentor-by-default)
 
 Gate inventory and every RED arm: [`GATES.md`](GATES.md). Refuted hypotheses and rejected
 designs, read before starting one: [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md).
@@ -53,6 +56,43 @@ designs, read before starting one: [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md
 If I tell you to do something, even if it goes against what follows below, YOU MUST LISTEN TO ME. I AM IN CHARGE, NOT YOU.
 
 ---
+
+## RULE 12 - ADOPT FROM THE MENTOR BY DEFAULT
+
+Joshua, 2026-09-18: *"if jeffrey is doing it - we should always lean towards adopt vs rule out -
+he's our mentor."*
+
+**Jeffrey Emanuel (`Dicklesworthstone`) is this lane's mentor. When he does something, the default
+is ADOPT. The burden of proof sits on NOT adopting, and it is a high bar.**
+
+This inverts how this lane had been treating his work. The conductor had been dispatching
+"adopt-or-reject" rulings and asking panes to decide whether a practice of his was "scaffolding we
+do not need at our scale" — a framing that makes rejection the cheap default and adoption the thing
+requiring justification. Backwards. Measured the same day: three of his self-citing fixes were
+defect classes this lane had independently rediscovered at greater cost, and the one atomic practice
+we did adopt — planting named mutations and restoring files with a compare — found **three real
+holes under a suite that was already green at 12/12**, one of them directly beneath a figure the
+README publishes.
+
+So the question is never *"should we adopt this?"* It is *"what is the smallest honest version of
+this we can land today, and what specifically blocks it?"*
+
+**A refusal to adopt must name, concretely:**
+
+- what it costs to adopt at our current size, in files or hours, not in adjectives;
+- which of our own measured defect classes it would NOT have caught;
+- what we lose by adopting — not merely that we could survive without it.
+
+*"We are smaller"* is not a reason. *"We do not need it at our scale"* is not a reason. Both were
+used in this lane before this rule existed, and both are the shape of a cheap rejection.
+
+**Still binding, and not in tension with any of it:** `skillranker/` and every other vendored clone
+stay read-mostly, pinned, and **never pushed** (rule 4). Adopting a practice means implementing it
+in our own tree, in our own smallest form, with our own evidence — never copying his files, and
+never asserting his measured results as ours. Adopt the mechanism; earn the number.
+
+---
+
 
 ## RULE NUMBER 1: NO FILE DELETION
 
