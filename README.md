@@ -79,8 +79,8 @@ obstacle. Everything else is untouched, which is the honest state.
 |Repo|The question it answers|State|Next action|
 |---|---|---|---|
 |`jev-spam-eval`|does a plain-English question beat a classifier trained on labels|**RUN** — both headlines reproduce|fetch the other three datasets; check the out-of-distribution claim|
-|`jev-rerank-bench`|can Jev rerank thirty search results usefully|not run|run `eval.py`, `determinism.py`, `significance.py`; report what fails to reproduce|
-|`jev-phishing-bench`|Jev against LLMs on phishing, with a stated **net floor**|not run|run `net_floor.py` first — a benchmark whose floor beats its headline measures nothing|
+|`jev-rerank-bench`|can Jev rerank thirty search results usefully|**RUN** — headlines reproduce; two scripts crash|raise `nevir` beyond one run; upstream report filed for the crash|
+|`jev-phishing-bench`|Jev against LLMs on phishing, with a stated **net floor**|**RUN** — floor reproduces exactly|the LLM comparison arms need an Anthropic key we do not hold|
 |`jev-sec-bench`|blind security benchmarks|not run, README only|establish whether code exists or it is a results write-up|
 |`jev-agent-failure-benchmark`|can a cheap decision model find what broke an agent|not run|run it; the closest upstream analogue to this lane's own question|
 |`typesafe-ai-benchmark`|LLM structured output vs Jev on latency, cost, judgment|not run|run its documented examples; report which are stale at HEAD|
@@ -100,7 +100,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`awesome-jev`, `awesome-jev-by-typesafe`, `awesome-typesafe`|curated indexes of everything above|read|a discovery source, not evidence|
 
 **What running one actually taught us.** On Ling-Spam a question with **no labels** scores 0.9857
-and a TF-IDF classifier with **2,300 labels** scores 0.9941 — and their errors are mirror images:
+and a TF-IDF classifier with **2,300 labels** scores 0.9941, and their errors are mirror images:
 the question makes 2 false negatives and 39 false positives, the classifier makes 40 and 1. An
 elaborated *"structured criteria"* question scored **worse** than the plain one, 0.9701 against
 0.9857, so elaboration is not free. Averaging the question with the classifier beats both at 0.9983.
@@ -116,12 +116,21 @@ here about where Jev wins has to sit beside that.
 tool-call risk with **ECE 0.0505**, and its author states plainly that two model versions are *"not
 separable at this sample size"* (n=60). Re-analysing their shipped results shows why the question is
 still open: **confidence is exactly `1.000` on 40 of 60 cases**, with 0 of 5 misses landing there. So
-the confidence is honest where it saturates and carries almost no signal to route on — and settling
+the confidence is honest where it saturates and carries almost no signal to route on, and settling
 that needs a larger n than anyone has run. That is a concrete improvement on published work, in our
 own domain.
 
-**The rule that produced:** run the upstream question before writing our own. Nineteen of these
-twenty sat untouched while this lane built and re-graded demos of its own, and the one we ran
+**Four of twenty-two are now run, and running them produced things we could not have produced
+ourselves.** `jev-rerank-bench`'s headline reproduces from its committed cache (Jev rubric 0.692
+against Cohere Pro 0.691, inside noise at p=.910), while a fresh `nevir_eval` over 1,383 pairs gives
+Jev **+4.2 points at p=.002**: one benchmark, one result inside noise and one real. Its
+`determinism.py` and `batching.py` crash with a `KeyError` naming a document id when the actual cause
+is an absent corpus file, reported at
+[`docs/upstream/jev-rerank-bench-missing-docs-file-reads-as-empty.md`](docs/upstream/jev-rerank-bench-missing-docs-file-reads-as-empty.md)
+rather than patched. `jev-phishing-bench`'s keyless floor reproduces exactly.
+
+**The rule that produced:** run the upstream question before writing our own. Nineteen of the
+twenty-two sat untouched while this lane built and re-graded demos of its own, and the first one run
 returned a reproducible finding in ten minutes.
 
 ## What you can run
