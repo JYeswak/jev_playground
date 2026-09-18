@@ -42,6 +42,36 @@ STATUS="${JEV_STATUS:-docs/demos/STATUS.tsv}"
 # fix a past one.
 norm_digest() { perl -0777 -pe 's/\s+\z//' "$1" 2>/dev/null | shasum -a 256 | cut -c1-16; }
 
+# ---------------------------------------------------------- TRANSIENT_UNSTABLE (pane 2, Q92 spec)
+# docs/demos/duel-2/SPEC_transient_unstable_COD.md (185ccdd). Pane 2's Q89 ruling refused to promote
+# the sidecar verifier to a foundation stage until this primitive existed, and named the reason:
+# reading live shared state can observe A PEER'S PARTIAL EDIT and produce a transient RED, which
+# "trains rerun-until-green". THREE PANES SHARE THIS WORKTREE, so lane-status has always been exposed
+# to it — the tick has been trusting a reading that could have been wrong, with no way to tell.
+#
+# THE CONTRACT, as specified: fingerprint the evidentiary inputs (STATUS + sidecar + every referenced
+# receipt) before and after the scan; MAX 2 CAPTURE ATTEMPTS; a first change triggers ONE bounded
+# recapture; A STABLE SECOND SNAPSHOT IS VALIDATED EVEN IF RED; only a SECOND instability returns
+# TRANSIENT_UNSTABLE, with the changed paths and NO VERDICT. Exit 10, reserved because 2-9 are taken.
+#
+# The bound is the whole design. One recapture is not "retry until green" — the second snapshot's
+# verdict is accepted whatever it says, so instability can never launder a RED into a pass.
+#
+# SCOPE per the spec: this covers RECEIPT / SCHEMA / INTEGRITY claims. The mutable pane, bead and
+# worktree surfaces below stay POINT-IN-TIME OBSERVATIONS and are deliberately not fingerprinted —
+# they change constantly by design and snapshotting them would make every run unstable.
+fingerprint() {
+  {
+    printf '%s\n' "$(git rev-parse HEAD 2>/dev/null || echo no-head)"
+    for f in "$STATUS" docs/demos/duel-2/runs/receipt-other-reasons.json; do
+      [ -f "$f" ] && printf '%s  %s\n' "$(shasum -a 256 <"$f" | cut -c1-16)" "$f"
+    done
+    awk -F'\t' '!/^#/ && $1!="candidate" {print $6}' "$STATUS" 2>/dev/null | sort -u | while read -r r; do
+      [ -f "$r" ] && printf '%s  %s\n' "$(shasum -a 256 <"$r" | cut -c1-16)" "$r"
+    done
+  } 2>/dev/null
+}
+
 # COLUMN COLLISION, resolved in the author's favour: pane 3's CONCURRENCE_archaeology_MU.md proposed
 # `kill_concurrence` at column 8 with a fail-closed schema rule; this script had already implemented
 # `receipt_digest` at column 8. Both said "append after blocked_on". Concurrence keeps 8 (it is a
@@ -71,6 +101,9 @@ if [ "${1:-}" = '--pin' ]; then
   exit 0
 fi
 rc=0
+# Attempt counter for the bounded recapture. The spec allows MAX 2, so attempt 2 never re-execs.
+: "${JEV_TRANSIENT_ATTEMPT:=1}"
+FP_BEFORE="$(fingerprint)"
 printf 'JEV LANE STATUS  %s  HEAD=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(git rev-parse --short HEAD)"
 printf '%s\n' "----------------------------------------------------------------------"
 
@@ -279,5 +312,35 @@ elif [ "$fails" -gt 1 ]; then
 elif [ "$missing" -gt 0 ]; then rc=3
 elif [ "$drifted" -gt 0 ]; then rc=4
 else rc=5
+fi
+
+# ---------------------------------------------------- TRANSIENT_UNSTABLE check (pane 2 Q92, 185ccdd)
+# The evidentiary inputs are fingerprinted again HERE, after every receipt/schema/integrity claim
+# above was computed. If they moved during the scan, the verdict above was computed against a state
+# that no longer exists, so it is not reported as either a pass or a failure.
+#
+# BOUNDED AT TWO ATTEMPTS, and the bound is the design. One recapture is not retry-until-green: the
+# second attempt's verdict is accepted WHATEVER IT SAYS, so instability can never launder a RED into
+# a pass. Only a SECOND instability yields exit 10 with the changed paths and NO VERDICT.
+#
+# WITNESSED, not theoretical: pane 2's Q93 runtime run recorded "peer mutation of
+# foundation/gates.sh caused syntax error mid-run, not a runtime sample" — and that peer was the
+# conductor, editing a shared script while a pane executed it. One tick earlier this risk was
+# recorded here as having no witness.
+FP_AFTER="$(fingerprint)"
+if [ "$FP_BEFORE" != "$FP_AFTER" ]; then
+  if [ "${JEV_TRANSIENT_ATTEMPT}" -ge 2 ]; then
+    printf '\n%s\n' "----------------------------------------------------------------------"
+    printf 'TRANSIENT_UNSTABLE: the evidentiary inputs moved during BOTH capture attempts.\n'
+    printf 'NO VERDICT is reported — the scan above was computed against a state that changed.\n'
+    printf 'Changed paths:\n'
+    diff <(printf '%s\n' "$FP_BEFORE") <(printf '%s\n' "$FP_AFTER") \
+      | sed -n 's/^[<>] *[0-9a-f]\{16\}  /  /p' | sort -u
+    printf 'A peer is mid-write. Re-run when the tree settles; do NOT read this as a pass or a RED.\n'
+    exit 10
+  fi
+  printf '\nSNAPSHOT MOVED during attempt 1 — recapturing once (bounded at 2 per Q92 spec).\n'
+  printf 'The second attempt'"'"'s verdict is accepted whatever it says; instability cannot launder a RED.\n'
+  exec env JEV_TRANSIENT_ATTEMPT=2 "$0" "$@"
 fi
 exit "$rc"
