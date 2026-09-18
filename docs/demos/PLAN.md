@@ -4144,3 +4144,70 @@ be.** If pane 2 reads reversibility *loosely*, agreement will crater — and tha
 disagreement on **exactly the sub-definition pane 3 flagged**, which is the most useful possible
 outcome. **A low agreement number here is not a failure of the rubric; it is the rubric telling us
 which clause to write first.**
+
+---
+
+## §5d THE LAST MEASUREMENT WAS DEFEATED BY A MISSING JOIN KEY — and the lane had already written the rule
+
+**`verifiable-labels-cod-20260918T072249Z.json` (`c623ac6`, pane 2) and
+`verifiable-labels-mu-20260918T072000Z.json` (`8cf062b`, pane 3): twenty cases labelled twice, blind,
+and the two receipts cannot be joined.**
+
+```text
+pane 2 ids   "-Developer-control-plane/2026-09-03T14-01-16-144Z_…jsonl:261"   journal:turn_index   n=19
+pane 3 ids   "L01" … "L20"                                                   positional            n=20
+common ids   0
+```
+
+**This is my defect.** I dispatched Q46 and Q47 without specifying a shared case-ID convention, so
+each pane chose a reasonable one and they do not intersect. **The last cheap question in this lane is
+unanswerable as delivered.**
+
+**And the rule already existed, written by pane 3 against its own earlier receipt** (§5a): *"per-case
+ID lists are part of any count claim — my Q44 receipt failed its own re-derivation standard."* **Its
+Q45 sample file carries canonical per-case identity for exactly this purpose.** Both panes then
+labelled without using it, because **I never said to** — the canonical key was sitting in the drawn
+sample and my packets did not name it.
+
+**Third instance of one shape this session:** §4v's guards existed as prose not code; §5a's
+"immutable" manifest passed through a reformatter; **now a join key existed in the artifact and not
+in the instruction.** Each time the authoritative thing was present and the path to it was not.
+
+### What survives without the join, and what does not
+
+**Survives — the failure verdict, from marginals alone:**
+
+```text
+pane 2:  pass 7 · escalate  3 · withhold 10 · block 0
+pane 3:  pass 5 · escalate 13 · withhold  1 · block 1
+
+max possible agreement = 5 + 3 + 1 + 0 = 9/20 = 45%
+```
+
+**Even the most favourable pairing cannot exceed 9 of 20, against a `≥18/20` bar.** **Blocker 5 fails
+on the fresh sample**, and that conclusion needs no join — it follows from the marginals being
+incompatible. **The 7/7 on the disputed seven did not generalize**, exactly as the bound I recorded
+in §4z warned it might not.
+
+**Does not survive — everything about *where* they disagree.** Per-case agreement, the confusion
+matrix, and whether the disagreement concentrates on the `locally reversible` sub-definition pane 3
+flagged as the highest-leverage open question. **That was the most valuable thing the test could have
+produced and it is exactly what the missing key destroyed.**
+
+### Two further discrepancies to name rather than smooth
+
+1. **19 labels versus 20** on a twenty-case sample. Unexplained; neither receipt flags it.
+2. **Pane 2 reports its own labels as a stratum cross-tab** — *"pass7/reversible7, escalate3/
+   destructive3, withhold10/ambiguous10"* — i.e. **a 1:1 mapping from stratum to outcome.** If that
+   is what it means, **§4w's tautology has returned on the fresh sample**: pane 2's labels would be a
+   perfect function of the pattern rule again, while pane 3's (5/13/1/1) cross it. **I am recording
+   that as pane 2's own reported cross-tab and not as my finding**, because I cannot compute it
+   without the join — and asserting a per-case conclusion from an aggregate is precisely what §4y
+   falsified me for.
+
+### Recovery is cheap and I am dispatching it rather than re-running the test
+
+**Pane 2's `journal:turn_index` form should map directly onto the sample file's canonical identity.
+Pane 3's `L01…L20` are positional and recoverable only if its numbering follows the sample file's
+order — likely, and to be verified rather than assumed.** Pane 3 owns the numbering, so pane 3
+publishes the mapping. **No re-labelling: both label sets stand, and the join is a lookup.**
