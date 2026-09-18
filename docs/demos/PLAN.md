@@ -2685,3 +2685,65 @@ independently refusing to translate complaints into my vocabulary to surface it.
 Score stayed at **700**. Pane 2 has now applied *resolving a hold is not raising a score* **four
 times without being reminded** — demo-7, MU-H3, demo-6, demo-2. It is no longer a rule I enforce; it
 is how that pane works.
+
+---
+
+## §4h MU-H2's INCUMBENTS MEASURED — the baseline is **scoped, not bad**, and a pane refused to spend money to close its own gate
+
+**`docs/demos/duel-2/runs/muh2-baseline-partial-20260918T064500Z.json` (`7cfe98c`)**, corpus harness
+`7ddb7de`. Pane 3 executing the gate **pane 2 designed** (`75cfb9f`) — author of the candidate,
+executor of someone else's test.
+
+### The corpus is the first immutable manifest-backed fixture set this lane owns
+
+**20 cases, committed immutable, `demos/doc-drift/corpus.json` carrying bytes + sha256 per file.**
+Truth: **4 accurate · 14 drifted · 2 unknown.** Classes: valid-anchor 4, reference-drift 4,
+semantic-default 4, behavior 3, coverage 3, ambiguous 2.
+
+### D0 — `drift v0.10.1`: MEASURED, and scored honestly
+
+sha-verified release asset, run **from `/tmp` so the binary never enters the tree**. Fresh → pass;
+mutated → fail with `stale/changed_after_baseline`. Verdict:
+
+> *"D0 detects **file-change, not semantic truth** (as designed)."*
+
+**It refused to score an incumbent badly for doing its actual job** — the §3i posture applied
+without prompting. Subset semantics recorded rather than hidden: *"4 anchored valid cases only;
+corpus root sees 0 docs (no recursion into case dirs)."*
+
+### D1 — `docverity 0.5.0 --no-llm`: MEASURED, and the number is a **coverage** result
+
+- valid: **3 ok + 1 ok-with-unverifiable**
+- reference-drift: **2 flagged correctly**
+- **semantic / behavior / coverage / ambiguous — all 14 cases: SILENT, zero false verdicts**
+
+**So 5 of 20 fully correct, 14 silent, 1 unverifiable.** *(The callback's `5/20 + 15 silent`
+reconciles exactly once `ok-with-unverifiable` is counted as not-fully-correct — I checked before
+flagging a discrepancy, and there wasn't one.)*
+
+**The shape of this result is the whole point: the incumbent is silent, not wrong.** Zero false
+verdicts across 14 cases it cannot address. **That is a scoped tool behaving correctly at its
+boundary**, and it means MU-H2's opportunity is precisely the 14 semantic cases — a *coverage* gap,
+not an accuracy contest. It also makes pane 2's `coverage ≥ 80%` threshold the operative one of its
+six.
+
+Subset caveat again volunteered: *"repo-root run misattributes relative paths (recorded, not
+used)."*
+
+### D2 — UNASKABLE, and the reason is doctrine
+
+> *"default model `claude-opus-4-8` needs an Anthropic key this lane does not hold; **no spend
+> authorized for vendor-model baselines**."*
+
+**A pane declined to spend money to close its own gate.** It could have justified a small charge —
+it was measuring its own candidate's competition, and a favourable D2 result was not even in its
+interest. **Recording this as standing doctrine: an unauthorized spend is never the cheapest path to
+a verdict; `UNASKABLE` is.** Third `UNASKABLE` accepted in this lane rather than converted into a
+convenient answer (§4c UBS, §3q voice, here).
+
+### State
+
+**MU-H2 remains CLEARED-conditional at rung 2**, score **430**, queued far behind COD-H2. What the
+partial establishes is the *incumbent side* of its head-to-head, measured on an immutable corpus. Its
+own judge's run against the same 20 cases is Q25; **pane 3 runs it and reports numbers, pane 2
+grades**, because its author may not adjudicate it.
