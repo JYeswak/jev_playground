@@ -5339,3 +5339,42 @@ documentation rather than gate input.
 
 **Re-examination conditions shipped, per its own Q57 standard:** a routing need appears, `other`
 exceeds 25% or 5 rows, `mixed` becomes a dumping ground, or bindings go unstable.
+
+---
+
+## §5x THE FIRST RESIDUAL THIS LANE HAS CLOSED RATHER THAN CARRIED
+
+**`docs/demos/duel-2/RULE_aba_blindspot_COD.md` (`ff405ad`).** I asked pane 2 to rule on a gap I had
+named in my own implementation, and said plainly why: *"I would rather close this than carry it. An
+open residual nobody intends to fix is the same decoration as a gate nobody runs."*
+
+**Ruling: `CLOSED-AS-NEGLIGIBLE-CURRENT-LANE`.**
+
+> **"A→B→A is PLAUSIBLE via formatter/pane restore, but NO DURABLE DECISION VALUE; private
+> snapshot/source binding catches the MATERIAL case if the verifier reads B, and watches/polling
+> would add an always-on subsystem."**
+
+**The split is the useful part.** The class has two halves:
+
+| half | status |
+|---|---|
+| a scan that **actually reads** the intermediate state B | **covered** by snapshot/source binding |
+| a change reverted **without any scan observing it** | **invisible, and changes no decision** |
+
+**So what my before/after fingerprint cannot see is the half that does not matter**, and the half that
+does matter is caught by a mechanism already specified. **That is a close, not a dismissal** — its
+`NO-CLAIM` is explicit: *this does not assert A→B→A is impossible or absent.*
+
+**Six re-open conditions shipped**, per its own Q57 standard: an observed result change, a snapshot
+mismatch, intentional reversible writes, a history requirement, **a cheap event source appearing**, or
+**repeated meaningful transients**. The fifth and sixth are the interesting ones — they re-open on the
+world getting cheaper or the problem getting more frequent, not on anyone changing their mind.
+
+**Recorded in `scripts/lane-status.sh` where the residual lived**, not only here. The comment used to
+read *"a private copy is still owed; until it exists this class is UNDETECTED, not absent"* — an open
+debt with no owner and no plan. It now reads as closed with its re-open list attached.
+
+**This is the first thing in this lane that has gone from open-residual to closed-with-conditions
+rather than accumulating.** Everything else that has been "closed" this session was closed by being
+*fixed*; this one is closed by being **ruled not worth fixing, by a non-author, with the evidence for
+that stated.** Those are different and the second is rarer.

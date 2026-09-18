@@ -67,10 +67,20 @@ norm_digest() { perl -0777 -pe 's/\s+\z//' "$1" 2>/dev/null | shasum -a 256 | cu
 #
 # THIS IS a live before/after comparison of the evidentiary inputs, binding git HEAD plus BOTH the raw
 # and the content-normalised digest of every input (the raw/normalised pair the spec asked for, now
-# actually present). THIS IS NOT the spec's private-copy snapshot, and the gap is specific and worth
-# naming: A CHANGE THAT IS UNDONE BEFORE THE SECOND FINGERPRINT IS INVISIBLE. A -> B -> A inside the
-# scan window fingerprints identical, and only a real snapshot taken at scan start would catch it.
-# A private copy is still owed; until it exists this class is UNDETECTED, not absent.
+# actually present). THIS IS NOT the spec's private-copy snapshot, and the gap is specific: A CHANGE
+# THAT IS UNDONE BEFORE THE SECOND FINGERPRINT IS INVISIBLE — A -> B -> A inside the scan window
+# fingerprints identical.
+#
+# THAT GAP IS NOW CLOSED-AS-NEGLIGIBLE, not carried. Pane 2 ruled on it rather than letting me guess
+# (RULE_aba_blindspot_COD.md, ff405ad): "A->B->A is PLAUSIBLE via formatter/pane restore, but NO
+# DURABLE DECISION VALUE; private snapshot/source binding catches the MATERIAL case if the verifier
+# reads B, and watches/polling would add an always-on subsystem." So the dangerous half — a scan that
+# actually READS the intermediate state — is covered by binding, and the invisible half changes no
+# decision. Its NO-CLAIM is explicit: this does not assert A->B->A is impossible or absent.
+#
+# RE-OPEN on any of: an observed result change, a snapshot mismatch, intentional reversible writes,
+# a history requirement, a cheap event source appearing, or repeated meaningful transients. An open
+# residual nobody intends to fix is the same decoration as a gate nobody runs.
 #
 # JEV_SIDECAR is honoured — pane 2 found the path hardcoded here while verify-other-reasons.sh takes
 # the override, so an alternate sidecar was unprotected. Same defect class as a hardcoded suite list.
