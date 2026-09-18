@@ -1,0 +1,152 @@
+{
+  "schema": "jev.digest-dependency-audit.v1",
+  "generated_at": "2026-09-18T08:50:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "method": "opened each listed drifted artifact and each prose citing document; classified the claim's dependency, not the filename's appearance",
+  "drift_facts": {
+    "known_mutation": "one terminal newline added by autofix",
+    "raw_sha256_changed": true,
+    "content_bytes_semantically_changed": false,
+    "raw_sha256_checked": true,
+    "normalized_terminal_whitespace_sha256_checked": true,
+    "artifacts": [
+      {
+        "path": "demos/doc-drift/corpus.json",
+        "bytes": 7920,
+        "raw_sha256": "3d9e86d521d2bfc2e041b0b9410d7241708075147b6585f5cd3576fa2f968b6e",
+        "normalized_bytes": 7919,
+        "normalized_sha256": "503f3cba48093885d58ca212df645fbdbe0d4038351d9a7459a16d243d8e6830"
+      },
+      {
+        "path": "demos/doc-drift/policy.json",
+        "bytes": 643,
+        "raw_sha256": "569357956a0b78c109b541fa459bc6f99dafa94439e37becf050f1c9e61b5cfc",
+        "normalized_bytes": 642,
+        "normalized_sha256": "bc104804bff60ed01488a8e217691aaed11e761c758ad76188b8d86d94407e43"
+      },
+      {
+        "path": "demos/preaction-abstention/fixtures/rung4-sample-spec.json",
+        "bytes": 2001,
+        "raw_sha256": "4e9782ed1143c6498dc622d829cc3217d3428a841dc0a545a68333ec9d8048bd",
+        "normalized_bytes": 2000,
+        "normalized_sha256": "c9ed41d6d3dacdc4eaa0b8fdd4d410638f35f44f76a56dffd277320980031f20"
+      },
+      {
+        "path": "demos/preaction-abstention/fixtures/rung4-verifiable-sample.json",
+        "bytes": 9689,
+        "raw_sha256": "4c0e07daa1c71092ab99be79b4e870e50e03be9b973ec58813363228a9f7770d",
+        "normalized_bytes": 9688,
+        "normalized_sha256": "e4aef43c78537ec8b143311742888f3a237d1097abc9f954333938d61125ed3a"
+      },
+      {
+        "path": "docs/demos/duel-2/runs/verifiable-draw-20260918T071500Z.json",
+        "bytes": 1894,
+        "raw_sha256": "8d91d18e614772037389a93527bb18512e23509f49d835b53d5138e595caf1cd",
+        "normalized_bytes": 1893,
+        "normalized_sha256": "fc6e92672174f3984a74391886e5ffc01de9a4a72d5b0b3363138070cbaf28a2"
+      }
+    ]
+  },
+  "citation_scope": {
+    "unit": "one listed prose citing-document per listed artifact; duplicate mentions within one document count once",
+    "listed_documents": 14,
+    "content_dependent": 9,
+    "digest_dependent": 0,
+    "digest_dependent_documents": [],
+    "conclusion": "No lane claim in the listed prose set depends on the raw SHA-256 of any of the five drifted files. The 9 actual target-file content dependencies survive the one-terminal-newline mutation; 5 basename collisions are not dependencies on the targets.",
+    "basename_collision_not_target": 5,
+    "citation_classes": {
+      "content_dependent": 9,
+      "basename_collision_not_target": 5,
+      "digest_dependent": 0
+    }
+  },
+  "citations": [
+    {
+      "artifact": "demos/doc-drift/corpus.json",
+      "document": "docs/demos/PLAN.md",
+      "class": "content-dependent",
+      "basis": "Claims the corpus has 20 cases, truth counts, embedded per-file bytes/SHA fields, and records the later autofix drift. No outer digest of corpus.json is used."
+    },
+    {
+      "artifact": "demos/doc-drift/corpus.json",
+      "document": "docs/demos/duel-2/BASELINE_claimcheck_vs_jev_COD.md",
+      "class": "basename-collision-not-target",
+      "basis": "The opened references are runs/claim-bench/corpus.json, a different path. No dependency on demos/doc-drift/corpus.json."
+    },
+    {
+      "artifact": "demos/doc-drift/corpus.json",
+      "document": "docs/demos/duel-2/FALSIFY_COD-H145_MU.md",
+      "class": "basename-collision-not-target",
+      "basis": "The opened reference is runs/h4-corpus.json, a different path. No dependency on demos/doc-drift/corpus.json."
+    },
+    {
+      "artifact": "demos/doc-drift/corpus.json",
+      "document": "docs/demos/duel-2/FALSIFY_demo7_MU.md",
+      "class": "basename-collision-not-target",
+      "basis": "The opened references are fixtures/user-corpus.jsonl and fixtures/corpus-regex.json, different paths and formats."
+    },
+    {
+      "artifact": "demos/doc-drift/policy.json",
+      "document": "docs/demos/PLAN.md",
+      "class": "content-dependent",
+      "basis": "Uses the policy's existence, executable thresholds/source role, authorship, and suite behavior. No raw file digest is cited."
+    },
+    {
+      "artifact": "demos/doc-drift/policy.json",
+      "document": "docs/demos/QUEUE.md",
+      "class": "content-dependent",
+      "basis": "Uses policy ownership and author/non-author labeling constraints. No digest is cited."
+    },
+    {
+      "artifact": "demos/doc-drift/policy.json",
+      "document": "docs/demos/contracts/demo-2-admission-screen.md",
+      "class": "basename-collision-not-target",
+      "basis": "The opened reference is .omp/hooks/pre/screen-admit.policy.json, a different file."
+    },
+    {
+      "artifact": "demos/doc-drift/policy.json",
+      "document": "docs/demos/duel-2/FALSIFY_COD-H2_MU.md",
+      "class": "basename-collision-not-target",
+      "basis": "The opened reference is fixtures/h2-five-line-policy.json, a different file."
+    },
+    {
+      "artifact": "demos/doc-drift/policy.json",
+      "document": "docs/demos/duel-2/PRICE_license_spec_COD.md",
+      "class": "content-dependent",
+      "basis": "Uses policy.json as the owner of executable thresholds and outcome mapping; the claim is semantic and architectural, not digest-pinned."
+    },
+    {
+      "artifact": "demos/doc-drift/policy.json",
+      "document": "docs/demos/duel-2/RUNG4_LABEL_PLAN_MU.md",
+      "class": "content-dependent",
+      "basis": "Uses the policy author's identity and label-audit separation. No digest is cited."
+    },
+    {
+      "artifact": "demos/doc-drift/policy.json",
+      "document": "docs/demos/duel-2/SPEC_evidence_manifest_COD.md",
+      "class": "content-dependent",
+      "basis": "policy_sha256 is a manifest schema placeholder ('policy.json hash'), not a populated digest or dependency on this current file's raw bytes."
+    },
+    {
+      "artifact": "demos/preaction-abstention/fixtures/rung4-sample-spec.json",
+      "document": "docs/demos/duel-2/CLAUSE_locally_reversible_COD.md",
+      "class": "content-dependent",
+      "basis": "Uses the predicate's path roots and semantic rule; no hash or byte identity is cited."
+    },
+    {
+      "artifact": "demos/preaction-abstention/fixtures/rung4-verifiable-sample.json",
+      "document": "docs/demos/QUEUE.md",
+      "class": "content-dependent",
+      "basis": "Uses the file's presence/absence to describe Q47's blocked state; no digest is cited. The old absence claim is stale after arrival, but that is content/state drift, not digest dependence."
+    },
+    {
+      "artifact": "docs/demos/duel-2/runs/verifiable-draw-20260918T071500Z.json",
+      "document": "docs/demos/PLAN.md",
+      "class": "content-dependent",
+      "basis": "Uses the draw's seed, allocation, per-case identity, and disclosed discrepancy; no raw digest is cited."
+    }
+  ],
+  "basename_collision_note": "A basename grep is not a path citation test. Several apparent corpus.json/policy.json hits name different files. They were opened and classified above rather than counted as dependencies on the five drifted targets.",
+  "ruling": "GOOD_OUTCOME: zero digest-dependent lane claims in the listed prose set. The raw SHA drift damages integrity verification and any future raw-digest pin, but it does not invalidate these content-dependent claims."
+}
