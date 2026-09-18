@@ -445,3 +445,65 @@ its charter.**
 reach."* **Not** *"no such population exists anywhere."* The density figure is a ratio over a corpus
 we selected; it is the right number for deciding whether **we** can run the study and the wrong
 number for any claim about software at large.
+
+---
+
+## R15 — COD-H3 price-drift auditor: real pain, no Jev-necessary stage
+
+**Refuted 2026-09-18** by its non-author, in `docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md`
+(`51c2bb1`), resolving the structural question its rung-2 pass had left open.
+
+**The demand was never the charge and is reaffirmed.** LiteLLM #38064 is verified independently,
+carries a runnable repro and a measured **262% excess**, and has a deep buyer. COD-H3's rung-1 score
+of **890 stands.** What failed is the mechanism.
+
+**Stage decomposition — 4 of 5 stages need no judgment model:**
+
+| Stage | Needs Jev? |
+|---|---|
+| Parse price manifests + usage logs | No |
+| Detect drift (manifest vs observed) | No |
+| Attribute effective cost per route/provider | No |
+| Refuse unverifiable rows | No |
+| Counterfactual tier comparison | **the only filed Jev role — claimed, unproven** |
+
+**And 100% of the verified pain lives in the deterministic four.** #38064 is a ranking-arithmetic
+bug — cache-read price unread, plus a stable-sort tie-break — with **no judgment anywhere in its
+causal chain.** The single Jev stage classifies request complexity so a counterfactual can name a
+tier, but tier assignment for operator-owned model sets is served today by **fixed capability
+tables** (model → tier, committed, versioned) that a FinOps operator already maintains. The
+candidate never exhibits a request the table misclassifies, a tier the table cannot name, or a
+dollar figure that moves on the difference.
+
+**The fork it cannot avoid.** Push on that one stage and it becomes exactly one of two other things:
+**Fork A**, the counterfactual genuinely needs judgment — then it is *shadow routing*, a realer
+product that competes head-on with RouteLLM, Martian and LiteLLM's own cost routing, which the
+candidate filed as *neighbours rather than rivals* with no wedge and audit-shaped pricing. **Fork
+B**, it does not — then the table classifies tiers, the deterministic core does the rest, and **the
+shipped artifact contains zero Jev calls**, which is precisely demo-1's shape. *"H3-as-filed sits
+between the forks: too router-shaped to be pure audit, too audit-shaped to face routers, with one
+Jev call mediating a question a table answers. That is not a third position. It is the absence of
+one."*
+
+**Two executable retry tracks, neither of them taste:**
+- **T1 — deterministic auditor, outside this lane.** Build Fork B as lane tooling with the #38064
+  repro as fixture one. Predeclared success: catches the tie-break misroute plus one novel drift
+  class on real manifests. No Jev call, no demo slot, no rung. If it works, every future routing
+  discussion in this lane cites its numbers.
+- **T2 — counterfactual router, inside the lane.** Re-file Fork A with a named wedge against
+  RouteLLM/Martian on operator-owned traffic (e.g. calibration they cannot emit: per-decision
+  probabilities with withhold on novel requests), plus the head-to-head fixture where fixed-tier
+  rules misclassify at material cost. **That fixture is the price of re-entry; without it the Jev
+  call is garnish.**
+
+**Why this kill matters beyond one candidate.** It is the first time the demo-1 lesson was applied
+*before* a build rather than after one. demo-1 shipped, then turned out to make zero Jev calls;
+COD-H3 was caught wearing one unproven Jev call over a deterministic core **at rung 2, for the cost
+of a decomposition table.** As the ruling puts it: a backlog that keeps a valuable non-Jev tool
+wearing a single unproven Jev call *"will eventually ship the demo-1 shape again — valuable,
+Jev-free, mislabeled."*
+
+**Untouched:** the #38064 pain, the auditor-not-router positioning insight, and the
+confidence-interval and refuse-unverifiable discipline in H3's receipt plan — all of it transfers
+verbatim into T1. **The two retries keep everything valuable; they refuse to keep it in one
+artifact.**

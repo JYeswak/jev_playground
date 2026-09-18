@@ -48,8 +48,39 @@ REQUEST` back to pane 1 still works and costs a round trip; editing the line you
   split every falsification into its label-free and labelled halves.
 - **Measurements beat designs.** The lane has ~350 KB of analysis and one measurement. A unit that
   produces a number outranks a unit that produces a document.
+- **SCARCE ELIGIBILITY OUTRANKS POSITION — and this rule exists because I broke it.** I appended a
+  unit, called it *"the highest-value unit in this file"*, and put it at the **bottom**, while the
+  protocol says *take the first unclaimed unit you are eligible for*. Position is the protocol;
+  labels are not. Pane 3 correctly took an either-pane unit instead. **So: if a unit lists ONE
+  eligible pane and you are that pane, it outranks every either-pane unit regardless of position,
+  because an either-pane unit can be done by the other pane and a single-pane unit cannot.** Sole
+  eligibility is the scarce resource in a two-pane lane; do not spend it on fungible work. When I
+  add a unit that must run next, I will now **place it first** rather than labelling it.
 
 ---
+
+## UNIT Q9 — RUN COD-H2's label-free falsification half. **HIGHEST VALUE UNIT IN THIS FILE.**
+**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2; pane 3 designed the falsifier). **CLAIM:** unclaimed
+
+**Q1 and Q2 just made four candidates rung-3 eligible at once — COD-H2 905, COD-H4 900, COD-H5 895,
+COD-H1 885 — and the WIP limit is ONE.** So the question stops being *which to build* and becomes
+*which survives its own falsifier*, and §3k answers it: **run the label-free half before paying for
+any build.**
+
+Execute the label-free half of your own design in `docs/demos/duel-2/FALSIFY_COD-H2_MU.md`
+(`f894425`) against COD-H2, the leader. **Do not build COD-H2. Do not label anything.** Run only
+the part that needs no ground truth, and report the pre-registered number against the
+pre-registered threshold.
+
+**This is the exact shape that just killed MU-H1 in an hour** — a census, no labels, no Jev calls,
+no money, and a verdict of `DENOMINATOR_TOO_THIN` that would otherwise have cost days. If COD-H2's
+label-free half comes back thin, the lane's leader dies cheap and COD-H4 is next. **If it comes back
+healthy, COD-H2 is the first candidate in this lane to earn a build.** Both outcomes are wins; the
+only loss is not running it.
+
+Report `HEALTHY` / `THIN` / `UNASKABLE` with the measured number, the threshold it was compared
+against, and the command. Output `docs/demos/duel-2/runs/codh2-labelfree-<ISO>.json` plus a short
+companion `.md` if the reasoning needs prose.
 
 ## UNIT Q1 — falsifier for COD-H2 pre-action abstention (THE LEADER)
 **ELIGIBLE: pane 3 only** (pane 2 authored it). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/FALSIFY_COD-H2_MU.md` `f894425` — 9,095 chars. **This unblocked rung 3.**
@@ -75,7 +106,7 @@ corpus cannot be built cheaply, that is a rung-3 cost worth knowing now.
 Output `docs/demos/duel-2/FALSIFY_COD-H145_MU.md`, ≥6,000 chars.
 
 ## UNIT Q3 — resolve COD-H3's open structural question
-**ELIGIBLE: pane 3 only.** **CLAIM:** CopperCarp 2026-09-18T04:58Z
+**ELIGIBLE: pane 3 only.** **CLAIM:** DONE CopperCarp `docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md` `51c2bb1` — 5,763 chars. **RULED_OUT on structure, two retry tracks.**
 
 COD-H3 price-drift auditor is the **only** hunt candidate HELD at rung 2, on a structural question
 left open in `docs/demos/duel-2/RUNG2_COD_HUNT_MU.md` (`e23251d`). Resolve it: CLEARED, or
@@ -84,7 +115,7 @@ RULED_OUT on structure with a retry condition, or **UNASKABLE**.
 Output `docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md`, ≥4,000 chars.
 
 ## UNIT Q4 — baseline design: MU-H2 vs docverity + fiberplane/drift
-**ELIGIBLE: pane 2 only** (pane 3 authored MU-H2). **CLAIM:** WindyJaguar 2026-09-18T03:50:35Z
+**ELIGIBLE: pane 2 only** (pane 3 authored MU-H2). **CLAIM:** DONE WindyJaguar docs/demos/duel-2/BASELINE_MU-H2_vs_incumbents_COD.md 75cfb9f
 
 MU-H2 outbound redaction was RULED_OUT, then **un-killed by §3i** because neither `docverity
 v0.5.0` nor `fiberplane/drift v0.10.1` uses a judgment model. Design the head-to-head, modelled on
@@ -118,7 +149,7 @@ finds none, return UNASKABLE — not a kill.** Absence of a public complaint is 
 Output `docs/demos/duel-2/HELD_MUH3_voice_COD.md`, ≥4,000 chars.
 
 ## UNIT Q7 — falsifier for demo-7 signals starter
-**ELIGIBLE: either pane** (I authored demo-7, so both of you are non-authors). **CLAIM:** unclaimed
+**ELIGIBLE: pane 2 preferred** — I authored demo-7 so both panes are non-authors, but this is an EITHER-PANE unit and pane 3 is the sole eligible runner for Q9, so spending pane 3 here wastes scarce eligibility. **CLAIM:** unclaimed
 
 demo-7 is HELD at 560 with its hold **resolved** — a named user exists (Oscar Beijbom, Nyckel, on
 GPT confidence being badly calibrated or inversely related to correctness) and the score correctly
@@ -139,29 +170,6 @@ the alternatives, and audit its arithmetic and reasoning. Exclude anything you a
 Output `docs/demos/duel-2/runs/audit-<target>-<ISO>.json`.
 
 ---
-
-## UNIT Q9 — RUN COD-H2's label-free falsification half. **HIGHEST VALUE UNIT IN THIS FILE.**
-**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2; pane 3 designed the falsifier). **CLAIM:** unclaimed
-
-**Q1 and Q2 just made four candidates rung-3 eligible at once — COD-H2 905, COD-H4 900, COD-H5 895,
-COD-H1 885 — and the WIP limit is ONE.** So the question stops being *which to build* and becomes
-*which survives its own falsifier*, and §3k answers it: **run the label-free half before paying for
-any build.**
-
-Execute the label-free half of your own design in `docs/demos/duel-2/FALSIFY_COD-H2_MU.md`
-(`f894425`) against COD-H2, the leader. **Do not build COD-H2. Do not label anything.** Run only
-the part that needs no ground truth, and report the pre-registered number against the
-pre-registered threshold.
-
-**This is the exact shape that just killed MU-H1 in an hour** — a census, no labels, no Jev calls,
-no money, and a verdict of `DENOMINATOR_TOO_THIN` that would otherwise have cost days. If COD-H2's
-label-free half comes back thin, the lane's leader dies cheap and COD-H4 is next. **If it comes back
-healthy, COD-H2 is the first candidate in this lane to earn a build.** Both outcomes are wins; the
-only loss is not running it.
-
-Report `HEALTHY` / `THIN` / `UNASKABLE` with the measured number, the threshold it was compared
-against, and the command. Output `docs/demos/duel-2/runs/codh2-labelfree-<ISO>.json` plus a short
-companion `.md` if the reasoning needs prose.
 
 ## WHEN THIS FILE IS EXHAUSTED
 
