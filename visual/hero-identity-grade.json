@@ -77,5 +77,22 @@
   "identity_pass is FALSE and no vision score has been fabricated.",
   "RE-GRADE with --judge openai when a working OpenAI key exists; that is the only thing that can turn this into a pass."
  ],
- "refutes": "skill://repo-hero-image states 'Grok is TEXT-ONLY (no reference image)'. Measured false 2026-09-18: grok-imagine-image and grok-imagine-image-2.0 both declare input_modalities [text,image], and POST /v1/images/edits accepts up to 5 reference images. The limitation was in zesttube/scripts/yuzu-gen.py, which only calls /v1/images/generations."
+ "refutes": "skill://repo-hero-image states 'Grok is TEXT-ONLY (no reference image)'. Measured false 2026-09-18: grok-imagine-image and grok-imagine-image-2.0 both declare input_modalities [text,image], and POST /v1/images/edits accepts up to 5 reference images. The limitation was in zesttube/scripts/yuzu-gen.py, which only calls /v1/images/generations.",
+ "operator_approval": {
+  "approved_by": "Joshua",
+  "date": "2026-09-18",
+  "verbatim": "approved on image",
+  "context": "Shown the shipped artifact directly (opened visual/hero.jpg) before approving.",
+  "authority": "RULE 0 \u2014 the operator's word settles the taste question this grade could not.",
+  "what_it_DOES_settle": [
+   "Whether a phash-competitive, vision-unjudged hero is acceptable for this repo: YES.",
+   "Whether the reject classification blocks the ship: NO, overridden knowingly by the operator."
+  ],
+  "what_it_does_NOT_settle": [
+   "identity_pass stays FALSE. Approval is not a grade and must never be recorded as one.",
+   "The vision leg is still ABSENT; combined 47.3 is still phash+palette only.",
+   "The re-grade condition still stands: re-run --judge openai when a working key exists.",
+   "A future reader must be able to tell 'the operator accepted this' from 'the grader passed this'."
+  ]
+ }
 }
