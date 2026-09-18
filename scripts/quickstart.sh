@@ -101,6 +101,30 @@ EOF
     echo "    the accounting works, NOT evidence that it works on your data."
   fi
 
+  echo
+  echo "=== Which lever is YOUR spend in, and does the accounting close?"
+  # THE THIRD DEMO WORKS ON REAL DATA, which nobody had checked until the routing demo failed and the
+  # question "is a demo that only answers on its own fixture a demo or a fixture?" became live. It
+  # answers: 2 of 3 run on a reader's corpus, and this is the one that closes its books while doing it.
+  echo "    (bounded sample: ${#mine_files[@]} of $n_files session files)"
+  if node demos/retransmit-whatif/bin/whatif.mjs "${mine_files[@]}" --out "$mine_work/wi.json" >"$mine_work/wi.log" 2>&1; then
+    node -e '
+      const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));
+      const a=r.levers && r.levers.aggregate, d=r.denominator;
+      if (!Array.isArray(a) || !a.length) throw new Error("levers.aggregate missing — receipt schema changed");
+      const un=a.find(x=>x.lever==="unreconciled");
+      if (!un) throw new Error("no unreconciled row — the residual must be reported, not omitted");
+      const tot=a.reduce((s,x)=>s+x.tokens,0);
+      console.log(`    ${d.assistantTurns} assistant turns, ${d.turnsWithoutUsage} without usage, ${tot.toLocaleString()} tokens:`);
+      a.filter(x=>x.lever!=="unreconciled").forEach(x=>console.log(`      ${x.lever.padEnd(12)} ${(x.share*100).toFixed(2)}%`));
+      console.log(`    Unreconciled residual: ${un.tokens} tokens — printed, so a share that does not add up`);
+      console.log(`    shows as a number rather than vanishing into a rounding.`);
+    ' "$mine_work/wi.json" || echo "    COULD NOT ANSWER — receipt written but unreadable."
+  else
+    echo "    NO ANSWER on your corpus:"
+    tail -3 "$mine_work/wi.log" | sed 's/^/      /'
+  fi
+
   echo "None of this is a recommendation. These are YOUR numbers under this repo's STATED assumptions:"
   echo "the price table and the cheap-model rates are assumptions, not facts, and the receipt written"
   echo "by demos/routing-backtest/bin/backtest.mjs says so in its own rederivation field."
