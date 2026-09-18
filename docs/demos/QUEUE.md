@@ -76,7 +76,7 @@ RULED_OUT on structure with a retry condition, or **UNASKABLE**.
 Output `docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md`, ≥4,000 chars.
 
 ## UNIT Q4 — baseline design: MU-H2 vs docverity + fiberplane/drift
-**ELIGIBLE: pane 2 only** (pane 3 authored MU-H2). **CLAIM:** unclaimed
+**ELIGIBLE: pane 2 only** (pane 3 authored MU-H2). **CLAIM:** WindyJaguar 2026-09-18T03:50:35Z
 
 MU-H2 outbound redaction was RULED_OUT, then **un-killed by §3i** because neither `docverity
 v0.5.0` nor `fiberplane/drift v0.10.1` uses a judgment model. Design the head-to-head, modelled on
