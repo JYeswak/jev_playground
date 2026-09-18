@@ -106,3 +106,13 @@ jev-sec-bench fdb16b9 · jev-spam-eval 76ef183 · jev-agent-failure-benchmark 4d
 typesafe-ai-benchmark e94fcda · commit-miner 977617e · foreman 2c43982 ·
 bicameral 3bea244 · s1-rs b916897 · system-one-adapter-python 0bb819b ·
 awesome-jev-by-typesafe d57f5ce · fast-jev-compaction 6e1da50 · skillranker 3fe85c4
+
+## Owners (resolved 2026-09-18; checkouts under `upstream/`, see `scripts/sync-docs.sh --check`)
+jkudish/jev-mcp · NiazMorshed2007/jev-review · browser-use/jev-ultrafast ·
+gargpratyush/jev-router · 0xNatoshi/jev-codex-router · anessbelbati/jev-rerank-bench ·
+anisselbd/jev-phishing-bench · Gaurav-Gosain/jev-sec-bench · bitnovus/jev-spam-eval ·
+TokenTrim/jev-agent-failure-benchmark · iammrduncan/typesafe-ai-benchmark ·
+devanshbatham/commit-miner · thruwire/foreman · AbdelStark/bicameral ·
+AbdelStark/s1-rs · typesafe-ai/system-one-adapter-python ·
+Anil-matcha/awesome-jev-by-typesafe · tamaratran/fast-jev-compaction ·
+Dicklesworthstone/skillranker

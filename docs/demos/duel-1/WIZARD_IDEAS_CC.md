@@ -11,7 +11,7 @@ criteria.
 **What I read first, and the two numbers that shaped the ranking:**
 
 - `compaction/runs/replay-big-20260917.json` — 179 events → 24 messages; the library took 13 → 8
-  messages and 2333 → 1292 chars (**45% reduction**), `kept: 0`, `resultsTrailing: 0`,
+  messages and 2047 → 1136 chars (**45% reduction**), `kept: 0`, `resultsTrailing: 0`,
   `failures: []`. Pruning works mechanically and loses no text it keeps.
 - `compaction/runs/ab-20260917.json` — schema `jev.resume-quality-ab.v1`, `liveCalls: 4`,
   `jevRequests: 1`, **3** recall questions (`q1`,`q2`,`q3`), **`armA.score: 1` vs `armB.score: 3`**,

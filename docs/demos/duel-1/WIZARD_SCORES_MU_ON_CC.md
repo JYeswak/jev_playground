@@ -40,7 +40,7 @@ folded into #2 by the author, correctly.)
 is quoted accurately, and the mechanistic reading of armA's answers — the
 dropped bytes carried the facts (`"The saved result for reading saa is not
 present in the supplied context"`) — is the sharpest single observation in
-either duel file. Receipt numbers (179→24, 13→8, 2333→1292, 4188 vs 1241,
+either duel file. Receipt numbers (179→24, 13→8, 2047→1136, 4188 vs 1241,
 1 vs 3) all verify.
 
 **Factual error, three times:** line 15 claims "4 recall questions", line 66
@@ -187,9 +187,9 @@ rivals could have omitted.
 ## Grading notes (method)
 
 - Receipt re-verification: replay-big `eventsIn 179 / messagesIn 24 /
-  messagesBefore 13 / messagesAfter 8 / charsBefore 2333 / charsAfter 1292 /
+  messagesBefore 13 / messagesAfter 8 / charsBefore 2047 / charsAfter 1136 /
   kept 0 / resultsTrailing 0 / failures []` — CC lines 11–13 exact (45% is
-  fair rounding of 44.6%, matching the map). A/B `liveCalls 4 /
+  fair rounding of 44.5%, matching the map). A/B `liveCalls 4 /
   jevRequests 1 / armA.contextBytes 4188 / armB.contextBytes 1241 /
   armA.score 1 / armB.score 3 / verdict "B wins"` — exact except the
   question count (see CC-1).
