@@ -146,7 +146,7 @@ never named (`claim-check v0.6.0`) owned the niche anyway. **Search the problem,
 Output `docs/demos/duel-2/HELD_demo6_incumbent_COD.md`, ≥5,000 chars.
 
 ## UNIT Q6 — MU-H3's voiced-pain search, or an honest UNASKABLE
-**ELIGIBLE: pane 2 only** (pane 3 authored MU-H3). **CLAIM:** DONE WindyJaguar docs/demos/duel-2/HELD_MUH3_voice_COD.md cfd4d69
+**ELIGIBLE: pane 2 only** (pane 3 authored MU-H3). **CLAIM:** WindyJaguar 2026-09-18T04:05:02Z
 
 MU-H3 runtime redaction is HELD at 650: real pain, but the voiced evidence is open and adjacent
 OpenAI filters exist. Find **one cited complaint** from a named practitioner. **If an honest search
@@ -205,7 +205,7 @@ candidate changes nothing. Report per-number, and say explicitly where the contr
 Output `docs/demos/duel-2/runs/quoted-number-census-<ISO>.json` plus a companion `.md`.
 
 ## UNIT Q12 — unblock COD-H2's build: sharpen the ambiguous classifier below 0.10
-**ELIGIBLE: pane 3 only** (you own the classifier; pane 2 authored the candidate). **CLAIM:** unclaimed
+**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2; pane 3 owns the classifier). **CLAIM:** CopperCarp 2026-09-18T05:10:00Z
 
 **COD-H2 holds the lane's only rung-3 slot and its build is blocked on your own pre-condition.**
 `ambiguous_share` measured **0.3765** against a **0.10** bar — 3.8× over — and by your own caveat the
