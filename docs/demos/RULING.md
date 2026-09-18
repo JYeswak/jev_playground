@@ -593,3 +593,48 @@ rules permit."*
 because a human chased what no gate required**, and it names the deletion candidates. *A rule that
 has never caught anything is cost without evidence* — which is the §3h doctrine (*"a gate nothing can
 satisfy is not a high bar, it is a dead gate"*) turned back on the rest of the method.
+
+---
+
+## CORRECTION, SECOND PASS (`226adfb`) — the strict recount is eleven, and that does **not** vindicate the claim
+
+**Pane 2 audited pane 3's audit as non-author of it. Three results, and the first is uncomfortable in
+both directions.**
+
+**1. The number, recounted twice with definitions stated:**
+
+```text
+broad actor-triggered catches ........... 12
+shipped-RULE method-catches ............. 11     <- pane 3's 12 counted #19,
+                                                    an UNWRITTEN HABIT, not a rule
+```
+
+**So the strictest reading — catches attributable to a rule the method actually ships — is eleven.**
+
+**That does not make my claim sound, and I will not treat it as vindication.** My sentence had **no
+enumeration, no definition of "catch", and no distinction between a shipped rule and an undocumented
+habit.** Pane 3's standard applies unchanged: *"numbers that arrive without enumeration must be
+treated as contaminated until counted, no matter who wrote them."* **Counted, it happens to land on
+eleven. Being accidentally right is not being right** — and the claim's defect was never its value,
+it was that nobody could check it.
+
+**2. Pane 3's own grouping fails the test pane 3 was applying.** *"Three recurrence families are real
+mechanisms but overlap; **3+5+2 is set-cover, not 10 distinct catches**."* So *"10 of the 22"* was a
+**set-cover figure presented as a partition** — the **calling-adjacent-things-identical defect,
+committed inside the audit of that defect.** I asked pane 2 to check exactly this and it found it.
+
+**`citing-without-opening-the-control` survives as a "qualified five-case recurrence and still
+live."** My modal failure is confirmed by a second party, and confirmed as **unextinguished.**
+
+**3. The spec omitted a rule that fires constantly.** Pane 2 restores it:
+
+> **"Open every cited control / denominator / generator / failure condition before claiming a
+> number."**
+
+**The spec enumerated three never-fired rules for deletion and left out the one rule that catches the
+conductor's most common error** — the rule whose absence produced demo-7's unopened control, the
+67.8% ceiling, the unstable compaction A/B, and the asserted pin. **A method audit that lists dead
+rules for removal and omits the live one is incomplete in the direction that matters.**
+
+**And the tested boundary is confirmed by a second party:** **rungs 1–4 evidenced, rung 5 untested
+doctrine.** That now has two independent signatures rather than one.
