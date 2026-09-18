@@ -153,6 +153,29 @@ Ranked by mean of all graders. Scores are 2–4 rubric opinions each, **not meas
 15-point gap is noise, and every underlying citation count is subject to §9's unverifiable-claims
 finding.
 
+### AUTHORITY: each §5.N below is an ABSTRACT. The contract file is authoritative.
+
+For every demo, the authoritative specification is
+**`docs/demos/contracts/demo-<N>-<slug>.md`**. The §5.N section here is its abstract — enough to
+rank, sequence and rule on the demo, never enough to implement it. **When the two disagree, the
+contract file wins**, and the §5.N abstract is the defect.
+
+**Why this splits from his single file, deliberately.** `skillranker` keeps one
+191,829-byte plan and slices it into beads, with each requirement copied word-for-word into a mean
+of **5.35** beads (max 17). That redundancy is the point: a bead must stand alone. We reach the
+same property by a different route — one standalone contract per demo, embedded **whole** into the
+beads of that demo's family. Same invariant (a bead needs no other document), different mechanism
+(per-demo file rather than per-sentence duplication from a monolith).
+
+Two consequences, stated so neither is discovered later:
+1. **Drift risk moves to the abstract.** In his layout a requirement exists once; in ours it exists
+   twice — here and in the contract. That is why authority is declared above rather than implied,
+   and why an abstract is deliberately kept short: the less it says, the less can rot.
+2. **Corpus size is split across files.** Ours: this plan plus `BEAD-TEMPLATE.md` plus the
+   contracts. Measured at the time of writing: **89,580 bytes** with 4 of 8 contracts written,
+   projecting to roughly **142 KB** — against his 192 KB. The gap is real and named; it is not
+   closed by padding the abstracts.
+
 ### §5.1 demo-1 — `jev-route-backtest` · ACTIVE · mean 853.8 (4 graders, range 830–875)
 
 **What.** A read-only CLI that replays omp session logs and reports what per-turn model routing
