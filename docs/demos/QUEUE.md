@@ -288,3 +288,58 @@ integrity-detection is a thing the shipped tool does not do.** Determine which, 
 
 `CLEARED` / `HELD` / `RULED_OUT` with a retry condition. Output
 `docs/demos/duel-2/RUNG2_COD-H5_owned_MU.md`, ≥4,000 chars.
+
+## UNIT Q16 — **RUNG 3: build COD-H2's thin proof.** First build this lane has attempted since demo-1.
+**ELIGIBLE: pane 3 builds** (you own the corpus, the classifier, the falsifier and the scope). **Pane 2 grades it** as non-author of the implementation. **CLAIM:** unclaimed
+
+**Everything blocking this is now resolved.** Demand 905 non-author · rung-2 structural pass ·
+falsifier designed and executed HEALTHY · ownership risk resolved against the only readable
+incumbent · scope fixed. **It holds the single WIP slot. Build it.**
+
+### Scope — fixed, do not widen
+
+**The 907 destructive-bash turns** (share 0.0623, Wilson [0.0585, 0.0664]) from
+`codh2-sharpened-20260918T041200Z.json`. **Not** the 5,421 write/edit turns: your own caveat says
+most are recoverable in a git worktree, and §3s pre-committed this narrowing before v2.2 ran.
+
+### The three wedge properties — build exactly these, nothing else
+
+From your own Q14 ruling. **Anything outside them overlaps `AutoModeMiddleware` and gets cut on
+sight:**
+
+1. **A withhold outcome distinct from both allow and error-block.** The incumbent has two outcomes;
+   you must have three. Uncertain evidence routes somewhere that is neither execution nor refusal.
+2. **Calibrated confidence with coverage semantics** — selective accuracy at stated coverage, not a
+   point threshold. The incumbent has one constant at 0.5. Report accuracy *at* coverage levels.
+3. **A human-routing outcome** (`clarify`/`escalate`) — the exact path the incumbent's docstring
+   disavows: *"it does not request human approval."*
+
+### Adopt from the incumbent rather than re-learn
+
+Quoted in your Q14: **30-message state window** with assistant/tool context; **per-tool scoping with
+pass-through** for unlisted tools (narrower blast radius than a universal gate); **trace redaction**
+— `TracePolicy(process_inputs=omit_payload)`.
+
+### Non-negotiables, each from a specific death in this lane
+
+- **It MUST make real Jev calls.** demo-1 shipped, installed clean, passed 10/0 — and made **zero**
+  Jev calls behind a hand-written token heuristic. Record the model version and the call count in
+  the receipt.
+- **RED arms MUST discriminate.** The lane's first RED-arm test fired on **all 16 rows and
+  "passed"**; the corrected one flagged **exactly 1 of 16 and exited 3**. A detector that fires on
+  everything has measured nothing. Prove discrimination both directions.
+- **Clean-clone install must verify.** demo-1's standard: fresh clone, install, tests pass, counted.
+- **Pre-register thresholds before running anything**, in the artifact, as you did twice today.
+- **Do NOT claim recall superiority over a deterministic checker.** §3t's ceiling: TypeSafe's own
+  four-workflow average is **67.8% agreement**, and a frontier model caught 7/7 defects where Jev
+  caught 6/7. **Claim coverage, latency, cost, and the withhold path — not accuracy.** A candidate
+  that needs to beat a careful regex on recall is mispriced, and that is the general case (§3p).
+
+### What "done" means
+
+A thing that installs and runs on the 907-turn corpus, emits the three outcomes with calibrated
+confidence and a receipt, and whose RED arms are shown to discriminate. **Split it and ship
+partials** — a partial with a receipt beats a complete build that never lands, and you are throttled.
+
+Output under `demos/preaction-abstention/` plus a receipt at
+`docs/demos/duel-2/runs/codh2-rung3-<ISO>.json`.
