@@ -1,0 +1,31 @@
+{
+  "schema": "jev.smallest-shippable-artifact-proposal.v1",
+  "generated_at": "2026-09-18T16:30:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "artifact": "portable receipt-other-reasons verifier bundle",
+  "consumer": "a non-lane operator with a STATUS/sidecar evidence bundle who wants to verify exact other-row coverage and evidence bindings",
+  "smallest_scope": {
+    "inputs": ["STATUS.tsv", "receipt-other-reasons.json", "referenced receipts"],
+    "command": "verify-other-reasons --status STATUS.tsv --sidecar receipt-other-reasons.json",
+    "no_network": true,
+    "no_model": true,
+    "no_commit_hook": true,
+    "snapshot": "private copy with manifest and bounded transient classification"
+  },
+  "why_this_is_smallest": "The lane already has the verifier logic, sidecar schema, copy-based arms, normalized digest binding, evidence locator checks, and snapshot contract. Packaging the narrow evidence-bundle verifier is smaller than shipping a new judgment demo or wiring a lane-wide gate.",
+  "observed_defect_it_addresses": "evidence claims can point at an existing but semantically unsupported receipt, sidecar coverage can drift, and a shared-worktree verifier can observe partial input state",
+  "acceptance": {
+    "positive": "A clean bundle exits 0 and prints exact coverage, three-way digest agreement, resolved locators, and a manifest digest.",
+    "negative": [
+      "missing or extra other entry exits nonzero",
+      "sidecar/live/STATUS digest mismatch exits nonzero",
+      "invalid primary or corroborating locator exits nonzero",
+      "short STATUS row exits nonzero",
+      "unstable two-capture input returns TRANSIENT_UNSTABLE without a verdict"
+    ],
+    "installability": "one local command plus fixture bundle; no repository-specific absolute paths"
+  },
+  "retirement_condition": "Retire or merge into a stronger evidence-verification tool if an external maintained tool accepts the same bundle contract and passes the same positive/negative fixture matrix.",
+  "status": "PROPOSAL_ONLY",
+  "no_claim": "Nothing is packaged, installed, externally validated, or consumed outside this lane yet."
+}
