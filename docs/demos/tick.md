@@ -1,11 +1,13 @@
-# JEV conductor tick — every 30 minutes. Automated. Not a human message.
+# JEV conductor tick — every 20 minutes. Automated. Not a human message.
 
 You are the on-duty conductor (a pane or a process holding the conductor brief).
 Joshua's standing order: the demo loop ships installable Jev demos repeatedly,
 and without this tick it stops the moment the conductor goes quiet.
 
 NO AUTO-DISPATCH EXISTS. You send project-aware dispatches by hand. This tick
-only guarantees the loop is ASKED about every 30 minutes.
+only guarantees the loop is ASKED about every 20 minutes — and every dispatch
+you send REQUIRES the callback contract in §2. A tick that moves nothing and
+sends nothing is a tick you must explain in one line, not skip.
 
 ## 0. STAGE CENSUS — first line of every tick action, re-derived never cited
 
