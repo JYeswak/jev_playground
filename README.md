@@ -377,14 +377,17 @@ because a gate that cannot fail is not a gate. Re-derive the count from `foundat
 number written here goes stale silently, and this one already did once, when it claimed seven
 stages and nine existed.
 
-**On a fresh clone you get ten of twelve, not `ALL GREEN`, and the output above is from a developed
-checkout.** Measured by running the suite inside a frozen clone of a pinned commit
-(`scripts/verify-frozen.sh`), which exits non-zero for that reason: stages
-10/20/30/60/70/80/90/95/96/97 pass from a bare clone. Stage 40 needs
-`npm install` inside `compaction/`, so that stage does need the network, contrary to what this line
-claimed until it was measured. Stage 50 needs a Beads DAG imported with `br import`, since only
-`.beads/issues.jsonl` is tracked and the database is not. Neither is a gate defect; both are state a
-clone legitimately does not carry.
+**On a fresh clone of the public repo you get eleven of twelve, not `ALL GREEN`, and the output
+above is from a developed checkout.** Measured 2026-09-18 by cloning
+`github.com/JYeswak/jev_playground` into an empty directory and running the suite there. **Only
+stage 40 fails**, on `compaction typecheck failed`: it needs `npm install` inside `compaction/`, so
+that stage does need the network. That is state a clone legitimately does not carry, not a gate
+defect.
+
+**This figure was wrong here twice before it was measured this way.** It read *"eight of ten"*, then
+*"ten of twelve"* taken from a local detached worktree, which is **not** what a stranger gets: a
+worktree inherits state the public clone does not, and stage 50 passes on the clone while it failed
+in the worktree. Measure the audience you are describing.
 
 ## Command reference
 
@@ -450,7 +453,7 @@ every reason lives in [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 19 entries
 condition that would reopen it. One candidate died there because an MIT-licensed tool already ships
 its surface, which is a reason to stop building and not a reason to build faster.
 
-**A fresh clone cannot run two of the twelve gate stages**, and the reasons are in Quick start above.
+**A fresh clone cannot run one of the twelve gate stages**, and the reasons are in Quick start above.
 There is no bootstrap step that closes both, so `scripts/verify-frozen.sh` fails at HEAD by design
 rather than silently.
 
