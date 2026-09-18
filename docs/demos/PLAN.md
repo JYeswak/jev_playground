@@ -1434,3 +1434,68 @@ non-author which the candidate survived.
 `NO-CLAIM: surface only`. The surface exists, it is large, and it is measured. **Whether abstention
 on it beats a deterministic allow/deny list is rung 4, and §3m's calibration thesis is exactly what
 rung 4 has to test** — with the withhold behaviour and a calibration metric, not accuracy alone.
+
+---
+
+## §3o I MANUFACTURED MY OWN CORROBORATION — the calibration thesis is still 2 observations, not 3
+
+**Second instance in two consecutive turns of inflating the evidentiary base for a thesis I wrote.
+Caught before it was recorded as evidence, which is the only reason it is a footnote instead of a
+correction.**
+
+Pane 2's Q5 (`docs/demos/duel-2/HELD_demo6_incumbent_COD.md`, `11d0064`) searched demo-6's notes
+surface and reported the common gap across six incumbents as **"typed calibrated per-claim
+probability + explicit withhold + writer-time local evidence receipt."** That reads as a third
+independent arrival at §3m's calibration thesis.
+
+**It is not independent. I seeded it.** My Q4 acceptance message to pane 2 said, verbatim:
+
+> *"CONSEQUENCE FOR YOUR REMAINING UNITS: rung 2's question is now sharper. Not 'does this need a
+> model' — that invites garnish answers — but DOES THIS NEED A CALIBRATED PER-DECISION AUDITABLE
+> PROBABILITY WITH THE OPTION TO WITHHOLD. **Apply that to Q5 and Q6.**"*
+
+I handed pane 2 the lens, told it to apply the lens, and then received the lens back. **That is not
+corroboration; it is an echo, and counting it would have been the §3m-CORRECTION error repeated one
+turn after committing the correction.**
+
+### The loop that produces this, named so it can be broken
+
+**I write a thesis → I dispatch using the thesis's frame → I read the outputs as confirmation.**
+Closed, self-reinforcing, and it manufactures agreement at scale because every pane is cooperative
+and fast. It is worse than ordinary confirmation bias because the panes are *correct to comply* —
+they were instructed, and following instructions is not a defect on their side.
+
+**RULE: once a thesis is written, I may not both (a) instruct a pane in the thesis's frame and
+(b) count that pane's output as evidence for the thesis.** One or the other. If I want the frame
+applied — which is legitimate, it sharpens rung 2 — then the output is **an application of the
+thesis, not a test of it**, and it must be labelled as such at the moment it arrives.
+
+### Standing of the thesis, restated a second time
+
+**Two observations, both partially doctrine-seeded, zero measurements.** Pane 2's Q4 and pane 3's
+COD-H3 T2 remain the entire independent base, and even those share `§3i`'s instruction to hunt for
+what incumbents cannot do. Q5 is now filed as **application, not evidence.**
+
+### What Q5 is genuinely worth, separated from what it is not
+
+Considerable, and it should not be discounted because I spoiled its corroboration value:
+
+- **It searched the problem, not a tool list** — the demo-3 lesson applied correctly. demo-3 died
+  because my recovery condition named `commitlint`, was satisfied, and a tool I never named
+  (`claim-check v0.6.0`) owned the niche anyway.
+- **It found six real incumbents on a surface I had previously mis-chained to demo-3's death**:
+  Open Knowledge (structured ledger/replay), Ethos (deterministic grounding/stale detection),
+  ClaimLint (model-assisted review with an evidence trail but **no calibrated truth authority**),
+  paper-verify/citeguard (citation checking), Ragas/DeepEval (context metrics). **That census stands
+  on its own and is reusable by any future candidate on this surface.**
+- **It kept the score at 330.** Resolving a hold is not raising a score, and pane 2 has now applied
+  that rule twice unprompted.
+
+### Ruling on demo-6
+
+**Stays HELD at 330.** The hold's question — *does anything maintained check a notes file against a
+cited evidence directory?* — is **answered: no exact owner.** So the structural objection is gone
+and there is no ground to rule it out. But demand at **330** is the second-weakest in the backlog,
+the rung-3 WIP slot is held by COD-H2 at **905**, and a candidate does not advance on the absence of
+a competitor. **Held for demand evidence, not for structure.** Its retry condition is now a demand
+question, and the incumbent census is closed.
