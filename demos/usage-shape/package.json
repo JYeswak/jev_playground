@@ -1,0 +1,9 @@
+{
+  "name": "jev-usage-shape",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline usage-shape lever census for omp session logs.",
+  "engines": {"node": ">=20"},
+  "scripts": {"test": "node --test", "shape": "node bin/shape.mjs"}
+}

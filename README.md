@@ -22,10 +22,46 @@ everything ruled out.
 | [`demos/routing-backtest`](demos/routing-backtest) | Would a cheaper-model router have paid? | 0.0447%. Candidate ruled out |
 | [`demos/retransmit-whatif`](demos/retransmit-whatif) | How much is the top lever worth? | Upper bound only, with residual |
 
-**The single most useful finding, and you can reproduce it on your machine in about 20 seconds:**
-on a corpus of 4,619 real agent sessions, **98.878% of every token billed is context being re-sent**,
-and model output is 0.140%. Three whole classes of cost intervention are dead on that workload
-before anyone writes code.
+**The table above is reproducible on your own machine in about 20 seconds.** On a corpus of 4,619
+real agent sessions, context retransmission dominates and model output is 0.140% of tokens, which
+kills three whole classes of cost intervention on that workload before anyone writes code.
+
+## What we learned about using Jev
+
+Seven findings from live calls against `api.typesafe.ai`, each with what it means for the next
+implementation. Every one is measured here, and the limits are stated because most of them cost us
+a retraction to learn.
+
+- **The measurement is the asset, not the model's prior.** Given a measured usage shape in its
+  state, Jev derives the consequence that follows from it. Withhold that shape and ask the same two
+  questions, and the verdict flips: `router_pays` moves from 0.21 to 0.59 and the lever it picks
+  drops from 0.75 to 0.49 confidence. **Apply it by spending the effort on the measurement and
+  giving Jev the state; a judgment model does not discover the lever for you.**
+- **Framing leaks through the criteria, not just the state.** A criterion worded
+  *"reduce the number of turns, since each re-sends the whole context"* teaches while it asks. The
+  answer then tracks your implication rather than the evidence. **Apply it by stripping rationale
+  out of criterion text, and by running the same question with your evidence withheld as a control.**
+- **Output moves on state content that has nothing to do with the question.** Adding three
+  provenance fields to a request shifted `noul` from 0.26 to 0.36 with the question unchanged.
+  **Apply it by pinning the exact request bytes and versioning them, the way you would a prompt.**
+- **Agreement from a model shown your own summary is same-origin and counts once.** It is not
+  independent confirmation, however much it reads like it. **Apply it by treating concurrence as a
+  consistency check on your reasoning, never as a second source.**
+- **A handful of calls characterises nothing.** Across three runs with three slightly different
+  states the same question returned 0.21, 0.26 and 0.36. **Apply it by refusing the word
+  "calibrated" until you have run enough trials to earn it.**
+- **The typed surface is the reason to use it.** Requests are `{model, state, questions}` with
+  `noul` for a probability and `choice` for a ranked set, and both admit a real none-equivalent.
+  That is what makes an abstention expressible instead of inferred from a low score. **Apply it by
+  designing the question so "none of these" is a first-class answer.**
+- **It is fast and cheap enough to run on every item.** Measured 743 to 773 ms per call at 523 to
+  629 input tokens. An independent public write-up reports 0.35 to 0.52 s medians against 1.68 to
+  4.85 s for a general model at comparable agreement. **Apply it where per-item judgment was
+  previously too slow or too expensive to attempt, and not where a deterministic rule already
+  works.**
+
+The full retraction, with both sides of the framing test, is in
+[`docs/demos/jev-probe/NOTE-framing-leak.md`](docs/demos/jev-probe/NOTE-framing-leak.md).
 
 ## What you can run
 
