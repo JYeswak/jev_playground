@@ -1,0 +1,36 @@
+{
+  "receipt_type": "independent_drift_classification",
+  "date": "2026-09-18",
+  "window_anchor": "c5737c3",
+  "window": "git log -12 --format='%H %h %s' c5737c3",
+  "reviewer_lineage": "openai-codex/gpt-5.6-luna",
+  "rubric": {
+    "USER": "directly improves a stranger-consumable runnable tool or public explanation",
+    "ENABLER": "test/gate/registry mechanism that makes a user artifact trustworthy but is not itself the user answer",
+    "PROCESS": "internal audit, ruling, dispatch, negative-evidence, or receipt-only artifact"
+  },
+  "classification": [
+    {"commit":"c5737c3","bucket":"PROCESS","reason":"honesty tally receipt only"},
+    {"commit":"8436570","bucket":"PROCESS","reason":"test-ownership audit receipt only"},
+    {"commit":"77a9a54","bucket":"PROCESS","reason":"whatif grade/ruling receipt only"},
+    {"commit":"4518a6f","bucket":"USER","reason":"retransmit-whatif streaming implementation, receipt, and usable output"},
+    {"commit":"ef44a3c","bucket":"USER","reason":"new runnable retransmit-whatif tool, README, fixtures, and tests"},
+    {"commit":"3049d48","bucket":"ENABLER","reason":"TESTS.md registry repair; no stranger-facing behavior"},
+    {"commit":"1b84fcb","bucket":"USER","reason":"jev-probe replay/live tool plus committed readable receipt"},
+    {"commit":"90d1270","bucket":"PROCESS","reason":"probe-state closure receipt only"},
+    {"commit":"6127ee4","bucket":"PROCESS","reason":"dispatch report of peer work only"},
+    {"commit":"9f83ac2","bucket":"PROCESS","reason":"NEGATIVE_EVIDENCE ruling only"},
+    {"commit":"360ca40","bucket":"PROCESS","reason":"wedge ruling receipt only"},
+    {"commit":"c854adf","bucket":"PROCESS","reason":"retransmission proposal/ruling receipt, no shipped user surface"}
+  ],
+  "independent_counts": {"USER":3,"ENABLER":1,"PROCESS":8},
+  "claimed_counts": {"USER":5,"ENABLER":3,"PROCESS":4},
+  "ruling": "CLAIMED_USER_PLURALITY_NOT_REPRODUCED",
+  "why": "The claimed result treats internal receipts and rulings as product work. Under the stated outsider-consumption rubric, only three commits directly ship or improve a stranger-consumable tool; process artifacts do not become USER work merely because an outsider can read the JSON.",
+  "specific_misclassification": "3049d48 is ENABLER, not USER: it changes only TESTS.md. The same mistake applies to receipt-only commits 90d1270, 360ca40, c854adf, and the three GRADE/WEDGE receipts.",
+  "drift_exit": "This window does not establish USER plurality. It cannot count as the first consecutive USER-plurality window without a rubric change that is declared before classification.",
+  "no_claim": [
+    "This does not judge the value of the process receipts; it classifies their artifact role.",
+    "No commit was changed by this ruling."
+  ]
+}
