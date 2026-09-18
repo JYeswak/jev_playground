@@ -51,8 +51,10 @@ The best idea anyone filed: judge whether a TODO comment is still *true*, in
 calibrated batches with receipts. Cleared rungs 1–2, led the board — then a
 one-hour census by a non-author counted the reachable world:
 `docs/demos/duel-2/runs/muh1-marker-census-20260918T034820Z.json` found **17
-markers in 283,786 lines across 16 repositories** (13 repos have zero; one
-repo holds 70%). Batch judgment over hundreds of markers needs hundreds of
+markers across 16 repositories whose per-repo sizes sum to 283,786 lines**
+(the receipt stores sixteen `kloc` figures totaling 283.786 — the total is a
+plain sum, computed here, not a quoted field; 13 repos have zero, one holds
+70%). Batch judgment over hundreds of markers needs hundreds of
 markers, and they do not exist here. Retry is deliberately narrow: show
 ≥5 large old repositories with marker density 17× higher, and it re-opens
 (`NEGATIVE_EVIDENCE.md` R14). Refuted: *"a judgeable marker population in the
