@@ -96,31 +96,62 @@ else
   fail=$((fail+1))
 fi
 
-# ARM 9 — SHORT ROW (6 columns, schema violation). Pane 2: "no malformed/short/extra STATUS schema
-# arms". Pinning the behaviour rather than asserting it is safe: a short RULED_OUT row has no
-# concurrence field, so it must fail closed on that, not pass quietly.
+# ARM 9 — SHORT ROW (6 columns). REVISED: previously asserted rc=5 and PASSED FOR THE WRONG REASON.
+# Pane 2, a915e11: "ARM9 returns rc5 because empty concurrence fires, NOT because schema width is
+# validated; parser has no field-count check." The parser now checks width, so a short row must fail
+# as SCHEMA (8), not as a downstream symptom that happens to fire.
 printf '#\tfixture\n' > "$TMP/status.tsv"
 printf '%s' '{"a":1}' > "$TMP/receipt.json"
 printf 'FIX-1\t2\t900\tRULED_OUT\tCOD\t%s\n' "$TMP/receipt.json" >> "$TMP/status.tsv"
 out=$(run); rc=$?
-if [ "$rc" = 5 ]; then
-  printf 'PASS  %-46s rc=5 short row fails closed on concurrence\n' 'ARM 9 short row (6 cols)'
+if [ "$rc" = 8 ] && printf '%s' "$out" | grep -q 'SCHEMA: 6 cols, want 9'; then
+  printf 'PASS  %-46s rc=8 width validated, not inferred\n' 'ARM 9 short row (6 cols)'
 else
-  printf 'FAIL  %-46s rc=%s (want 5) — schema violation passed\n' 'ARM 9 short row (6 cols)' "$rc"
+  printf 'FAIL  %-46s rc=%s (want 8) — width not validated\n' 'ARM 9 short row (6 cols)' "$rc"
   fail=$((fail+1))
 fi
 
-# ARM 10 — EXTRA COLUMN. `read` assigns every trailing field to the last variable, so an extra column
-# corrupts the digest rather than being ignored. That must surface as LOUD drift, never as a pass.
+# ARM 10 — EXTRA COLUMN. REVISED, and this is the arm that was actively DANGEROUS. It used to assert
+# rc=4 (drift), pinning the behaviour that `read` folds trailing fields into the last variable and
+# corrupts the digest. Pane 2 ruled that UNSAFE for Q19: "receipt_type column10 would break EVERY ROW
+# until parser migrates to exact 10-column validation." A 10th column must now be a SCHEMA error, so
+# the operator is told to fix the width instead of being shown 17 false drift reports.
 mk '{"a":1}'; perl -i -pe 's/$/\tEXTRA/ if !/^#/' "$TMP/status.tsv"
 out=$(run); rc=$?
-if [ "$rc" = 4 ]; then
-  printf 'PASS  %-46s rc=4 extra column surfaces as drift, not a pass\n' 'ARM 10 extra column (10 cols)'
+if [ "$rc" = 8 ] && printf '%s' "$out" | grep -q 'SCHEMA: 10 cols, want 9'; then
+  printf 'PASS  %-46s rc=8 schema takes precedence over false drift\n' 'ARM 10 extra column (10 cols)'
 else
-  printf 'FAIL  %-46s rc=%s (want 4) — extra column silently tolerated\n' 'ARM 10 extra column (10 cols)' "$rc"
+  printf 'FAIL  %-46s rc=%s (want 8) — extra column read as drift\n' 'ARM 10 extra column (10 cols)' "$rc"
+  fail=$((fail+1))
+fi
+
+# ARM 11 — THE MIGRATION ITSELF. A 10-column file with JEV_EXPECTED_COLS=10 must come back GREEN.
+# This is the proof pane 2's blocker demanded: bumping one constant is the whole migration, so
+# receipt_type can land as column 10 without a parser rewrite.
+mk '{"a":1}'
+perl -i -pe 's/$/\tscore/ if !/^#/' "$TMP/status.tsv"
+d=$(perl -0777 -pe 's/\s+\z//' "$TMP/receipt.json" | shasum -a 256 | cut -c1-16)
+perl -i -pe "s/\t[0-9a-f]{16}\tscore\$/\t$d\tscore/ if !/^#/" "$TMP/status.tsv"
+out=$(JEV_EXPECTED_COLS=10 JEV_STATUS="$TMP/status.tsv" "$LS" 2>/dev/null); rc=$?
+if [ "$rc" = 0 ] && printf '%s' "$out" | grep -q 'expected_cols: 10'; then
+  printf 'PASS  %-46s rc=0 one constant IS the migration\n' 'ARM 11 10-col file, EXPECTED_COLS=10'
+else
+  printf 'FAIL  %-46s rc=%s (want 0) — migration needs more than the constant\n' 'ARM 11 10-col file, EXPECTED_COLS=10' "$rc"
+  fail=$((fail+1))
+fi
+
+# ARM 12 — rc=7, the multi-class code pane 2 flagged as "reachable in principle, not selftested".
+# Drift AND missing concurrence, with no missing receipt and correct width.
+mk '{"a":1}' RULED_OUT ''
+printf '{"a":2}' > "$TMP/receipt.json"
+out=$(run); rc=$?
+if [ "$rc" = 7 ]; then
+  printf 'PASS  %-46s rc=7 multi-class code is reachable and tested\n' 'ARM 12 drift AND concurrence'
+else
+  printf 'FAIL  %-46s rc=%s (want 7) — rc7 still unexercised\n' 'ARM 12 drift AND concurrence' "$rc"
   fail=$((fail+1))
 fi
 
 printf '\n%s\n' '----------------------------------------------------------------------'
-[ "$fail" = 0 ] && { printf 'OK: both gates discriminate on all 10 arms.\n'; exit 0; }
+[ "$fail" = 0 ] && { printf 'OK: both gates discriminate on all 12 arms.\n'; exit 0; }
 printf 'FAIL: %d arm(s) did not discriminate.\n' "$fail"; exit 1

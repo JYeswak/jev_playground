@@ -78,21 +78,41 @@ printf '%s\n' "-----------------------------------------------------------------
 printf '\nGAUNTLET (state of record: %s)\n' "$STATUS"
 printf '  %-30s %-4s %-5s %-10s %-6s %s\n' CANDIDATE RUNG SCORE VERDICT AUTHOR BLOCKED_ON
 missing=0; rows=0; with_receipt=0; pinned=0; drifted=0; unpinned=0
-ruled_out=0; concur_missing=0
-# TAB IS IFS-WHITESPACE IN BASH: `IFS=$'\t' read` COLLAPSES consecutive tabs, so an EMPTY middle
-# column makes every later field shift left. Measured 2026-09-18: with col-8 empty on 13 rows, `concur`
-# swallowed the digest and `digest` came back empty — integrity_checked reported 4 (exactly the 4
-# RULED_OUT rows, whose col 8 is non-empty) instead of 17. Splitting on \037 (NOT whitespace) preserves
-# empty fields. BSD tr has no \x hex escape — octal \037 is portable, \x1f silently corrupted the split.
-# Do not "simplify" this back to a tab IFS.
-while IFS=$'\037' read -r cand rung score verdict author receipt blocked concur digest; do
-  case "$cand" in '#'*|''|candidate) continue ;; esac
+ruled_out=0; concur_missing=0; schema_bad=0
+# SCHEMA WIDTH IS VALIDATED EXACTLY, and this is a PREREQUISITE, not a nicety. Pane 2,
+# verify-exit-disaggregation-20260918T102000Z.json (a915e11), non-author, asked the question I had
+# put in its packet and answered it with a blocker:
+#   "ARM10 behaviour is UNSAFE for Q19: extra column is folded into final digest and false-REDs;
+#    receipt_type column10 would break EVERY ROW until parser migrates to exact 10-column validation."
+# `read` assigns all trailing fields to the last variable, so appending column 10 would have silently
+# corrupted the digest of all 17 rows and reported drift on every one of them. It also found my own
+# new arm passing for the wrong reason: "ARM9 returns rc5 because empty concurrence fires, NOT because
+# schema width is validated; parser has no field-count check." I had pinned a behaviour and read it as
+# validation — the pass-by-construction class I had asked it to attack.
+#
+# EXPECTED_COLS is the single constant to bump when a column lands. Bumping it is the migration.
+# Overridable so the MIGRATION ITSELF is testable: JEV_EXPECTED_COLS=10 against a 10-column fixture
+# must come back green, which is the proof that bumping this constant is all the migration requires.
+EXPECTED_COLS="${JEV_EXPECTED_COLS:-9}"
+while IFS= read -r raw; do
+  case "$raw" in '#'*|'') continue ;; esac
+  nf=$(printf '%s' "$raw" | awk -F'\037' '{print NF}')
+  # `receipt_type` is read NOW, while it is still empty at 9 columns. ARM 11 falsified my own comment
+  # claiming "bumping one constant is the whole migration": `read` folds every trailing field into the
+  # LAST variable, so at 10 columns `digest` came back as "<16hex>\037score" and every row false-RED'd
+  # as drift — the exact breakage pane 2 predicted, reproduced by the arm written to test the fix.
+  # With the variable present, the constant genuinely is the migration.
+  IFS=$'\037' read -r cand rung score verdict author receipt blocked concur digest receipt_type <<<"$raw"
+  case "$cand" in candidate) continue ;; esac
   rows=$((rows+1))
   mark=''
+  if [ "$nf" -ne "$EXPECTED_COLS" ]; then
+    mark="  <<< SCHEMA: $nf cols, want $EXPECTED_COLS"; schema_bad=$((schema_bad+1))
+  fi
   if [ -n "$receipt" ]; then
     with_receipt=$((with_receipt+1))
     if [ ! -e "$receipt" ]; then
-      mark='  <<< RECEIPT MISSING'; missing=$((missing+1))
+      mark="$mark  <<< RECEIPT MISSING"; missing=$((missing+1))
     elif [ ! -f "$receipt" ]; then
       mark='  (dir receipt: existence only)'; unpinned=$((unpinned+1))
     elif [ -n "${digest:-}" ]; then
@@ -122,6 +142,8 @@ printf '  integrity_checked: %-4d drifted:  %d   (content-normalised sha256; ter
 printf '  NOT integrity-checked (no pinned digest): %d   <- existence proven, bytes unverified\n' "$unpinned"
 printf '\nKILL CONCURRENCE (§3c rule 3, demoted to guidance — checked mechanically, not by a volunteer)\n'
 printf '  ruled_out rows: %-4d missing kill_concurrence: %d\n' "$ruled_out" "$concur_missing"
+printf '\nSCHEMA (exact width — a row of the wrong width makes every other counter on it unreliable)\n'
+printf '  expected_cols: %-4d rows with wrong width: %d\n' "$EXPECTED_COLS" "$schema_bad"
 
 # ---------------------------------------------------------------- derived counts
 printf '\nDERIVED FROM %s (not from prose)\n' "$STATUS"
@@ -193,9 +215,19 @@ if [ "$drifted" -gt 0 ]; then
   printf 'Content changed beyond terminal whitespace. Re-pin deliberately or explain the change.\n'
   fails=$((fails+1))
 fi
+# Schema is reported LAST but ranks FIRST in the exit code: a row of the wrong width makes every
+# other counter on that row untrustworthy, so it must not be masked by a downstream class.
+if [ "$schema_bad" -gt 0 ]; then
+  printf 'FAIL: %d of %d rows have the wrong column count (want %d).\n' "$schema_bad" "$rows" "$EXPECTED_COLS"
+  printf 'Every other counter on a malformed row is unreliable. Fix the width before reading anything else.\n'
+  fails=$((fails+1))
+fi
 if [ "$fails" -eq 0 ]; then
-  printf 'OK: %d candidates. %d receipt(s) exist; %d integrity-checked, %d existence-only; %d/%d kills concurrence-recorded.\n' \
-    "$rows" "$with_receipt" "$pinned" "$unpinned" "$((ruled_out-concur_missing))" "$ruled_out"
+  printf 'OK: %d candidates. %d receipt(s) exist; %d integrity-checked, %d existence-only; %d/%d kills concurrence-recorded; %d-col schema clean.\n' \
+    "$rows" "$with_receipt" "$pinned" "$unpinned" "$((ruled_out-concur_missing))" "$ruled_out" "$EXPECTED_COLS"
+elif [ "$schema_bad" -gt 0 ]; then
+  rc=8
+  [ "$fails" -gt 1 ] && printf 'NOTE: %d classes fired; schema takes precedence because the other counters are unreliable.\n' "$fails"
 elif [ "$fails" -gt 1 ]; then
   if [ "$missing" -gt 0 ] && [ "$concur_missing" -gt 0 ] && [ "$drifted" -eq 0 ]; then rc=6; else rc=7; fi
   printf 'FAIL: %d distinct failure classes fired. Exit %d.\n' "$fails" "$rc"
