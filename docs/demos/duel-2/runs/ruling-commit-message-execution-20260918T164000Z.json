@@ -1,0 +1,23 @@
+{
+  "schema": "jev.commit-message-execution-ruling.v1",
+  "generated_at": "2026-09-18T16:40:00Z",
+  "incident": "03059df",
+  "finding": "An inline double-quoted git commit -m message executed backtick command substitutions before git received the message; one substitution ran node bin/backtest.mjs from repo root and recorded empty spans.",
+  "ruling": {
+    "git_notes": "CORRECT_NONDESTRUCTIVE_REMEDY",
+    "why": "Shared main cannot be amended or rewritten safely. A git note preserves the original commit and records the damage without changing history.",
+    "prevention": "NOT_SUFFICIENT_ALONE",
+    "required_rule": "Use git commit -F <message-file> only in this shared worktree. The message file is written as data, reviewed, and passed without shell interpolation."
+  },
+  "stronger_boundary": {
+    "why_hooks_cannot_fully_prevent": "Command substitution occurs in the invoking shell before git or a git hook runs; a commit-msg hook cannot undo code execution that already happened.",
+    "recommended_control": "Use an allowlisted commit wrapper or command policy that requires -F and refuses inline -m in the shared worktree; keep the tick rule as the human/agent contract.",
+    "no_secret_claim": "Do not place secrets in commit messages; shell execution risk is broader than secret leakage."
+  },
+  "history_audit": {
+    "observed": "Historical commit messages contain backticks and shell-looking prose, but stored git messages do not record whether the original invocation used -m or -F, nor whether a substitution executed.",
+    "03059df": "Confirmed incident and noted via git notes.",
+    "earlier_messages": "No additional execution can be proven from the git object history alone. Do not claim a clean retrospective scan; inspect shell/agent command logs if a complete incident census is required."
+  },
+  "no_claim": "No claim that git notes prevent recurrence, no claim that earlier backticks were executed, and no claim that a commit hook can intercept shell substitution."
+}
