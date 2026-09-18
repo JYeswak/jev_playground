@@ -694,3 +694,33 @@ itself."* Assigned to pane 2 as the receipt's author; I did not edit another pan
 instrument, and I asked for a mechanism to be specified rather than invent one. The pane's answer was
 that the right size is zero — and a refusal with a trigger is worth more here than a gate that fires
 on every legitimately-adjacent pair of numbers in the corpus.
+
+---
+
+## R19 — read-triage with calibrated withhold: incumbent ships the surface, wedge gaps immaterial (2026-09-18)
+
+**Candidate (pane 3's, killed by its author-pane's own ruling):** a pre-read gate — Jev Choice per
+candidate chunk (read/skip) with calibrated probability, withhold routing to reading — aimed at the
+measured ~99% retransmission lever. Ruling: `docs/demos/duel-2/runs/wedge-ruling-20260918T145151Z.json`.
+
+**Why it dies:** the named wedge was calibration-plus-withhold against BorisLeMeec/jev's find/read-hook.
+On their published evidence both halves fail as a *product* wedge: (1) calibration is asserted
+without measurement, but their bimodal scores (true 0.92–0.99 vs false 0.02–0.13, "the threshold
+barely matters") leave no material room where calibration changes a decision — an unmeasured gap with
+no demonstrated materiality is a hypothesis, not a wedge; (2) fail-open is stated ("every gate fails
+toward doing nothing") without a refusal-path arm, but their 50/50 recall vs 28% chance already covers
+the underlying fear (hidden code) the accounting would serve. Real narrow gaps, audit-trail grade.
+
+**What stands (not retracted):** different levers / under-scoped rung-4 (EXT-U1 ruling) — the kill
+is of this candidate's wedge, not of the lever analysis that motivated it.
+
+**RETRY CONDITION (two independent tracks, either re-opens):**
+1. **Materiality:** evidence that mid-range (non-bimodal) triage scores occur materially in practice —
+   then calibration has something to fix and the wedge re-opens as a head-to-head on paired-agent cost.
+2. **Tester-to-subject bench:** a withhold-behavior bench for triage tools (theirs and any successor)
+   measuring refusal necessity — declined-vs-necessary refusals — in the COD-H5 mold: it benchmarks the
+   thing that ships rather than rivaling it.
+
+**Fairness recorded (from the ruling):** labels by agents forbidden from self-grading, 6/6 negative
+controls read correctly, fitted-and-overridable thresholds disclosed, leverage-vs-saving distinguished
+against their own headline. Killed on the wedge, not on the shop.
