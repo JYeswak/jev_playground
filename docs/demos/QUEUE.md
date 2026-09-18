@@ -26,6 +26,14 @@ currently unblocked, and claimable without asking.
 
 **Never wait for a file to appear.** Every path here is full — `ls` it. Absent ⇒ BLOCKED, next unit.
 
+**AUTHORIZATION — you ARE allowed to edit this file, and only these lines.** Every dispatch packet
+this session ended with a NON-GOALS list telling you not to edit conductor-owned files, which
+trained exactly the right caution and then collided with this protocol. Pane 3 hit that collision
+and asked rather than assuming, which was correct. **Resolving it: editing a `CLAIM:` line in this
+file is explicitly authorized for any pane, and it is the ONE exception to own-files-only.** Touch
+nothing else here — not the unit bodies, not the rules, not another pane's claim. A `QUEUE-MARK-
+REQUEST` back to pane 1 still works and costs a round trip; editing the line yourself does not.
+
 ## RULES THAT BIND EVERY UNIT
 
 - **No taste kills.** Rungs 1–2 permit structural kills only. Every RULED_OUT ships a retry
@@ -44,7 +52,7 @@ currently unblocked, and claimable without asking.
 ---
 
 ## UNIT Q1 — falsifier for COD-H2 pre-action abstention (THE LEADER)
-**ELIGIBLE: pane 3 only** (pane 2 authored it). **CLAIM:** CopperCarp 2026-09-18T04:42:00Z
+**ELIGIBLE: pane 3 only** (pane 2 authored it). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/FALSIFY_COD-H2_MU.md` `f894425` — 9,095 chars. **This unblocked rung 3.**
 
 COD-H2 leads the whole backlog: **905 non-author, both rungs cleared.** §3k blocks rung 3 until it
 has a falsification design, and **this single unit is what stands between the gauntlet and its
@@ -58,7 +66,7 @@ interval, and explicit held/unaskable paths.
 Output `docs/demos/duel-2/FALSIFY_COD-H2_MU.md`, ≥5,000 chars.
 
 ## UNIT Q2 — falsifiers for COD-H1, COD-H4, COD-H5
-**ELIGIBLE: pane 3 only** (pane 2 authored them). **CLAIM:** unclaimed
+**ELIGIBLE: pane 3 only** (pane 2 authored them). **CLAIM:** CopperCarp 2026-09-18T04:50Z
 
 Same shape as Q1, three candidates, all rung-2 cleared: COD-H1 (885), COD-H4 (900, flagged *corpus
 does not exist yet*), COD-H5 (895). COD-H4's missing corpus is itself a falsifier candidate — if the

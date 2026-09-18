@@ -14,7 +14,7 @@ demo-7-signals-starter	1	560	HELD	pane1	docs/demos/duel-2/HELD_demo7_user_COD.md
 demo-8-credential-screen	1	100	RULED_OUT	pane3	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md	none-structural-safety-leak
 demo-9-review-signal	2	550	CLEARED	pane2	docs/demos/duel-2/RUNG2_demo9_MU.md	conditional-must-beat-ubs-baseline-not-subset
 COD-H1-snapshot-completion	2	885	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	falsify-before-rung3
-COD-H2-preaction-abstention	2	905	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	LEADER-falsify-then-rung3
+COD-H2-preaction-abstention	2	905	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H2_MU.md	RUNG3-ELIGIBLE-falsifier-designed-run-labelfree-half-first
 COD-H3-price-drift-auditor	2	890	HELD	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	rung2-held-structural-question-open
 COD-H4-toolresult-replay	2	900	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	falsify-before-rung3-corpus-absent
 COD-H5-compaction-integrity	2	895	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	falsify-before-rung3
