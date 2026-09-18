@@ -64,6 +64,15 @@ arm 'ARM E verdict change, no score change' 0 0
 { row 1 550 CLEARED docs/demos/duel-2/HELD_thing_COD.md; } > "$TMP/a.tsv"
 arm 'ARM F RECUSED->CLEARED + score change (amendment)' 5 1
 
+# ARM G — the escape hatch that used to exist. The first version read
+#   `SCORE_RECEIPT.search(msg) or <changed-row receipts>`
+# so a commit message containing "RUNG2_" satisfied the gate — written by the conductor, who is the
+# party the gate constrains. This arm proves the ROW-receipt branch is now the ONLY branch: a legal
+# shape whose changed-row receipt is NOT a scoring artifact must TRIP.
+{ row 1 900 HELD    docs/demos/duel-2/RULING_notes_COD.md; } > "$TMP/b.tsv"
+{ row 1 820 CLEARED docs/demos/duel-2/RULING_notes_COD.md; } > "$TMP/a.tsv"
+arm 'ARM G changed-row receipt is NOT a score receipt' 5 1
+
 printf '\n%s\n' '----------------------------------------------------------------------'
-[ "$fail" = 0 ] && { printf 'OK: score-lineage watcher discriminates on all 6 arms.\n'; exit 0; }
+[ "$fail" = 0 ] && { printf 'OK: score-lineage watcher discriminates on all 7 arms.\n'; exit 0; }
 printf 'FAIL: %d arm(s) did not discriminate.\n' "$fail"; exit 1

@@ -80,10 +80,25 @@ def compare(before, after, msg, sha="(pair)"):
             verdict_changed.append((cand, old_verdict, verdict))
     trips = []
     if score_events and verdict_changed:
-        cited = SCORE_RECEIPT.search(msg) or any(
-            SCORE_RECEIPT.search(r) for *_, r in score_events
-        )
-        if not cited:
+        # THE COMMIT-MESSAGE BRANCH WAS REMOVED, and this is the reason it is worth a paragraph.
+        # The first version read `SCORE_RECEIPT.search(msg) or <row receipts>`. A gate that can be
+        # satisfied by typing "RUNG2_" into your own commit message is not a gate — and the party
+        # writing those messages is the conductor, i.e. the party this gate exists to constrain.
+        # I built myself an escape hatch. Measured on real history: 7622790 passed via BOTH branches,
+        # 1bb9a4b and 1ccddf9 passed on row receipts ALONE, so removing the message branch changes no
+        # historical verdict — it only closes the hole. A gate reads STATE, never prose written by
+        # the gated party.
+        #
+        # KNOWN LIMITATION, not fixed here: SCORE_RECEIPT is still a PATTERN RULE over filenames, and
+        # it matches 17 of the 48 top-level duel-2 documents. That is the same label-defining-regex
+        # defect this lane ruled COD-H2's rung 4 UNASKABLE over, now inside one of its own gates. The
+        # direction is permissive — it under-fires (missed trips), it never falsely accuses — and all
+        # three historical passes cite receipts that are genuinely scoring artifacts
+        # (HUNT_SCORES_COD_ON_MU.md, HUNT_SCORES_MU_ON_COD.md, RUNG2_demo9_MU.md), so the clean
+        # result stands on the merits. RETRY CONDITION: replace the regex with a DECLARED receipt
+        # type in STATUS.tsv, so "is this a score receipt" is stated by the row rather than inferred
+        # from its filename. Until then this gate's `0 trips` carries a weaker claim than it looks.
+        if not any(SCORE_RECEIPT.search(r) for *_, r in score_events):
             trips.append((sha, score_events, verdict_changed))
     return score_events, verdict_changed, trips
 

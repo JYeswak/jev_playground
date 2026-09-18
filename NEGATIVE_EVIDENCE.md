@@ -561,3 +561,42 @@ weights before building anything.**
 full session without opening the source's own control arm. The control was committed, documented,
 and one file away. **A number quoted from a report's abstract is not evidence until someone reads
 the report's controls.**
+
+## R17 — my own gate carried the defect I ruled a candidate UNASKABLE over (2026-09-18)
+
+**Claim retired:** that `scripts/audit-score-lineage.sh` as first committed (`44ed719`) was a sound
+gate.
+
+**Two defects, self-found within one tick of shipping it.**
+
+**1. A self-satisfiable escape branch.** The trip condition read
+`SCORE_RECEIPT.search(msg) or <changed-row receipts>`. **A gate that can be satisfied by typing
+`RUNG2_` into your own commit message is not a gate** — and the party writing those messages is the
+conductor, the party this gate exists to constrain. **I built myself an escape hatch and shipped it
+with a `[selftest]` verification level.** Removed; the row-receipt branch is now the only branch, and
+**ARM G** proves it (a legal shape whose changed-row receipt is not a scoring artifact must TRIP).
+
+Measured before removing it: `7622790` passed via **both** branches; `1bb9a4b` and `1ccddf9` passed
+on **row receipts alone**. **So removing it changes no historical verdict** — `7 changes, 0 upward,
+3 coincidences, 0 trips` is byte-identical after the fix. The hole was live but never load-bearing.
+
+**2. `SCORE_RECEIPT` is a pattern rule over filenames — still.** It matches **17 of the 48**
+top-level `duel-2` documents. **That is the same label-defining-regex defect this lane ruled COD-H2's
+rung 4 `UNASKABLE` over** (*"labels = pattern rule, fixed by the rubric"*), now sitting inside one of
+the lane's own gates.
+
+**Direction matters and is stated:** the regex is **permissive**, so it **under-fires** — missed
+trips, never false accusations. And all three historical passes cite receipts that are genuinely
+scoring artifacts (`HUNT_SCORES_COD_ON_MU.md`, `HUNT_SCORES_MU_ON_COD.md`, `RUNG2_demo9_MU.md`), so
+**the clean result stands on the merits while the gate stays weaker than it looks.**
+
+**RETRY CONDITION:** replace the regex with a **declared receipt type in `STATUS.tsv`**, so *"is this
+a score receipt"* is **stated by the row rather than inferred from its filename.** Until then this
+gate's `0 trips` carries a weaker claim than its output suggests, and the script says so in its own
+source.
+
+**And the measurement error inside the diagnosis, recorded because it is the pattern:** my first
+attempt to size the regex counted **all 17 rows' receipts** (14/14/12 matching) when the gate only
+ever reads the **changed** rows' receipts. **Wrong control, caught mid-measurement before any claim
+was published** — the first time in this session that the loop closed before the number left my
+hands.
