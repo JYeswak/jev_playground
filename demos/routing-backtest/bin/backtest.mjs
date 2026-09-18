@@ -12,7 +12,18 @@ import {
 function usage(message) {
   if (message) console.error(`ERROR ${message}`);
   console.error('usage: npm run backtest -- <session.jsonl>... --out runs/backtest.json');
-  process.exitCode = 2;
+  console.error('');
+  console.error('Answers one question: would model routing have saved money on YOUR sessions?');
+  console.error('Offline, no API key, no network. Reads omp session JSONL and writes a receipt.');
+  console.error('');
+  console.error('  npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out runs/try.json');
+  console.error('');
+  console.error('The other fixtures are INTENTIONAL NEGATIVES (unknown model, zero classifiable');
+  console.error('turns) and are meant to fail; a glob over all of them returns a failure receipt.');
+  // process.exitCode alone does NOT stop execution: argument validation continued with `out`
+  // undefined, reached dirname(undefined), and the FIRST THING A STRANGER SAW was an
+  // ERR_INVALID_ARG_TYPE stack trace instead of this text. Exit here.
+  process.exit(2);
 }
 
 function displayPath(path) {
