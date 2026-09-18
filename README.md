@@ -85,8 +85,8 @@ obstacle. Everything else is untouched, which is the honest state.
 |`jev-agent-failure-benchmark`|can a cheap decision model find what broke an agent|not run|run it; the closest upstream analogue to this lane's own question|
 |`typesafe-ai-benchmark`|LLM structured output vs Jev on latency, cost, judgment|not run|run its documented examples; report which are stale at HEAD|
 |`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**RUN**: both examples, offline, via a linux/amd64 container|the blocker was a platform mismatch, routed around; `RCH-E327` is still unfixed upstream|
-|`jev-router`|per-turn model routing for Claude Code and Codex|not run|compare with `demos/routing-backtest`; upstream may already own this|
-|`jev-codex-router`|the same idea, Codex-specific|not run|read before extending our own router work|
+|`jev-router`|per-turn model routing for Claude Code and Codex|**RUN** (pane 3): 58/58|upstream owns routing; ours narrows to the `blockedBy` histogram|
+|`jev-codex-router`|the same idea, Codex-specific|**RUN** (pane 3): backtest on real sessions|import its cached-token price columns, which supersede our R20 default|
 |`jev-mcp`|Jev judgments exposed as MCP tools|**RUN**: 9/9 unit, 4/4 live e2e|wire `jev_verify` into the conductor's number-checking|
 |`jev-ultrafast`|a browser agent driven by Jev|not run; needs a URL and a key|lowest priority, it is a live-network demo|
 |`fast-jev-compaction`|continuous context compaction with Jev|**RUN**: 29/29 tests; live run 21 messages to 7, 87.1% chars saved|it owns the core; ours keeps only the omp adapter and replay harness|
@@ -278,9 +278,17 @@ quickstart — five questions, answered from committed bytes. No install, no net
 ```
 
 **Q1 answers "no", and that is the point.** Routing would have cost 16.4% *more* on this repo's own
-fixture. A runner that could only print `PASS` could never tell you that — which is exactly what the
+fixture. A runner that could only print `PASS` could never tell you that, which is exactly what the
 first version of this script did, until a non-author pane graded it
 `ENABLER-in-product-clothes` and named what to build instead.
+
+**The savings figure is no longer what this demo is for.** A reviewing pane ran `jev-router` and
+`jev-codex-router` (58/58 tests, plus a routing backtest on its own sessions) and ruled ours should
+**narrow**: upstream owns per-turn routing, so what is worth keeping here is the **`blockedBy`
+histogram**, which says *which policy constraint* stops a turn from routing, and the multi-shape
+harness behind it. A savings percentage derived from our own price assumptions is the part upstream
+already does better. It is retired as a claim rather than deleted as code.
+[`docs/demos/upstream-repro/routers-20260918.md`](docs/demos/upstream-repro/routers-20260918.md)
 
 Every number is derived at runtime from the receipt the tool just wrote; none is hardcoded. Every demo
 is zero-dependency — no install, no network, no key, no state from this lane. Measured from a frozen
