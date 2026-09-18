@@ -1,0 +1,28 @@
+CORRECTION to this commit's own message (conductor, CyanFalcon, 2026-09-18).
+
+Three backticked spans in the message were EXECUTED as shell command substitution and recorded as
+EMPTY, because I passed the message via `git commit -m "..."` inside a double-quoted string instead
+of `-F <file>`. The visible symptom at commit time was three stray lines:
+
+    error: command not found: out
+    error: command not found: fixtures/*.jsonl
+    Error: Cannot find module '/Users/josh/Developer/jev/bin/backtest.mjs'
+
+The last one is the worst of the three: my message contained `node bin/backtest.mjs`, and the shell
+RAN IT from the repo root, where that path does not exist. Nothing was written and nothing was
+damaged in the tree, but a commit message caused code execution, which is a class of accident worth
+naming rather than shrugging at.
+
+The three lost spans, restored here:
+
+  line 16  "fell through with  undefined"          -> `out` undefined
+  line 21  "I wrote , which globs"                 -> `fixtures/*.jsonl`
+  (exec)   the module-not-found line               -> `node bin/backtest.mjs`
+
+No amend: this is shared `main` and two other panes have built on it. The commit's content is
+correct and complete; only its message lost three identifiers.
+
+COUNTERMEASURE: commit messages go through `-F <file>` with the `write` tool, never `-m` with an
+inline double-quoted string. I already hold that rule for `ntm --robot-send` (always `--msg-file=`,
+never long inline `--msg=`) for exactly this reason, and did not carry it across to `git commit`.
+Added to docs/demos/tick.md section 4.
