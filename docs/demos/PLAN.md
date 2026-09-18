@@ -147,7 +147,7 @@ Phases are sequential in *gating*, not in calendar time; within a phase, tasks p
 
 ---
 
-## §5 The eight demos — normative contracts
+## §5 The nine demos — normative contracts
 
 Ranked by mean of all graders. Scores are 2–4 rubric opinions each, **not measurements**: a
 15-point gap is noise, and every underlying citation count is subject to §9's unverifiable-claims
@@ -315,6 +315,55 @@ Numbered so it is not re-proposed. Asking Jev whether content carries credential
 the credential to a third-party API. Conceded by its author; the injection-only scope survives as
 demo-2.
 
+### §5.9 demo-9 — continuous review signal · UNSCORED · admitted 2026-09-18 by ruling
+
+**Provenance, and it is a conductor defect that this section exists late.** Pane 2's blind-spot
+probe (`docs/demos/duel-1/WIZARD_BLINDSPOTS_COD.md`, `210704f`) identified this as the thing
+**neither duelist proposed**: usage map §5, `jev-review@57690af`, a continuous review signal
+alongside `ubs`. I read that file, acknowledged the finding in chat, and **did not carry it into
+the plan.** A later non-author audit (`docs/demos/duel-1/runs/audit-blindspots-cod-20260918T022600Z.json`,
+`9573ba2`) caught the omission and demanded a ruling. That is the "reported in chat, forever lost
+to relearn" failure, committed by the conductor, in the document whose whole purpose is to prevent
+it.
+
+**The same audit also refuted the neighbouring claim, so the record is symmetric.** Blind spot B1
+(sanitize-before-send) **fails novelty**: it already existed as MU's winnowed R9 and in CC's long
+list at #5. So of pane 2's blind spots, one was genuine and one was not, and only the genuine one
+is admitted here.
+
+**RULING: ADMITTED as demo-9, queued behind demo-3, UNSCORED.**
+
+Three reasons it earns a slot rather than a rejection:
+1. **It is genuinely distinct from both claim-checkers.** Demos 3 and 6 check *claims against
+   cited artifacts*. This scores *code* on dimensions a linter structurally cannot see — design
+   coherence, whether a change matches its stated intent. Different input, different oracle.
+2. **The surface now exists.** R6's retry condition fired: the lane has first-party TypeScript
+   (`compaction/src/{omp-adapter,omp-hook,replay}.ts`, `compaction/ab/run-ab.ts`) and `ubs` runs on
+   it — 1 critical / 6 warnings / 27 info, every finding classified non-defect by a non-author,
+   with an `eval()` positive control proving the scanner fires. So there is a real code surface and
+   a measured baseline of what `ubs` *does* catch, which is exactly what a complementary signal
+   needs to be judged against.
+3. **Its author shipped it with the right caution already**, in a section titled *"why it should
+   not become a new blocking gate immediately."* A proposal that names its own failure mode before
+   anyone asks is the kind this lane should accept.
+
+**Hard constraints, inherited from demo-2 because it is the same class of mistake.** It is
+**advisory, never blocking**, until a false-positive rate is published. `GATES.md` rule 3 — silent
+on the healthy path; a gate that comments on every valid input gets uninstalled — binds it. And it
+must never be cited as green on an empty scan set: `ubs` on a doc-only change exits 3 with
+*"nothing was checked (this is NOT a pass)"*, which is the correct behaviour and the precedent
+here.
+
+**Why it is UNSCORED, stated rather than hidden.** Every other demo in §5 carries two to four
+grader scores from duel-1. This one has **zero** — it was never in either shortlist, so it has
+never been ranked against the others. Its position behind demo-3 is a conductor judgment, not a
+measured rank. **It must be scored by two non-authors before it is built**, on the same rubric, or
+the backlog's ordering silently mixes measured ranks with opinions.
+
+**Boundary.** Produces a review signal on first-party code. Does not fix anything, does not block,
+and does not replace `ubs` — it is judged by whether it finds defects `ubs` structurally cannot,
+and it fails if its findings are a subset of what `ubs` already reports.
+
 ---
 
 ## §6 Substrate contracts
@@ -387,6 +436,8 @@ demo-5  blocked-by: demo-1 shipped; a pinned-generator harness (R11)
 demo-6  blocked-by: demo-3 shipped AND demo-3 proving the seam valuable
 demo-7  blocked-by: pinned generator or published distribution (R11) — NOT a receipt count
 demo-8  KILLED
+demo-9  blocked-by: demo-3 shipped AND two non-author rubric scores (it has ZERO; its
+        position is a conductor judgment, not a measured rank)
 P7 calibration blocked-by: ≥2 demos emitting labelled outcomes
 ```
 
