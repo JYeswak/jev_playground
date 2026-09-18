@@ -123,7 +123,12 @@ for (const [name, v, fix] of levers) {
   console.log(`  ${' '.repeat(width)}         reduce by: ${fix}`);
 }
 console.log('');
-console.log(`  billed input ${billedInput} tokens, output ${t.output} tokens`);
+// ubs flags the next two lines CRITICAL "console.log with sensitive data" on the substring
+// "token". They print INTEGER COUNTS of billed tokens; there is no credential anywhere in this
+// file, which reads only usage blocks. Recorded rather than silenced: renaming an accurate unit to
+// quiet a scanner is gaming the instrument, and the substring predicate is the same
+// satisfiable-by-unrelated-text class this lane has caught seven times in its own checks.
+  console.log(`  billed input ${billedInput} tokens, output ${t.output} tokens`);
 console.log(`  mean retransmitted context per turn: ${t.turns ? Math.round(t.cacheRead / t.turns) : 0} tokens`);
 console.log('');
 console.log('  Token counts only. No prices here, and no claim that the top lever is worth');
