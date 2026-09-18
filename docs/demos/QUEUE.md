@@ -56,11 +56,18 @@ REQUEST` back to pane 1 still works and costs a round trip; editing the line you
   because an either-pane unit can be done by the other pane and a single-pane unit cannot.** Sole
   eligibility is the scarce resource in a two-pane lane; do not spend it on fungible work. When I
   add a unit that must run next, I will now **place it first** rather than labelling it.
+- **A CONDITIONAL ELIGIBILITY LABEL MUST NAME ITS EXPIRY, or it outlives its reason — measured
+  within the hour.** I marked Q7 *"pane 2 preferred"* because pane 3's sole eligibility on Q9 was
+  scarce. Pane 3 then finished Q9 and reported **`NEXT dry-queue`** while Q7 and Q8 both sat
+  unclaimed and available to it — because the label survived the condition that justified it.
+  **The queue was not dry; my label made it look dry.** So: any narrowing I add ships the event
+  that cancels it, and **if you believe the queue is dry, say which units you rejected and why**
+  (the QUEUE DRY callback already requires this) — that report is what caught this defect.
 
 ---
 
 ## UNIT Q9 — RUN COD-H2's label-free falsification half. **HIGHEST VALUE UNIT IN THIS FILE.**
-**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2; pane 3 designed the falsifier). **CLAIM:** CopperCarp 2026-09-18T04:55:00Z
+**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2; pane 3 designed the falsifier). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/runs/codh2-labelfree-20260918T040016Z.json` `db1e541` — **HEALTHY, surface only. COD-H2 took the rung-3 WIP slot.**
 
 **Q1 and Q2 just made four candidates rung-3 eligible at once — COD-H2 905, COD-H4 900, COD-H5 895,
 COD-H1 885 — and the WIP limit is ONE.** So the question stops being *which to build* and becomes
@@ -126,7 +133,7 @@ provably cannot do, one shared corpus where their coverage is a strict subset, p
 Output `docs/demos/duel-2/BASELINE_MU-H2_vs_incumbents_COD.md`, ≥6,000 chars.
 
 ## UNIT Q5 — demo-6's own incumbent search, on the NOTES surface
-**ELIGIBLE: pane 2 only** (pane 3 authored demo-6). **CLAIM:** WindyJaguar 2026-09-18T03:56:45Z
+**ELIGIBLE: pane 2 only** (pane 3 authored demo-6). **CLAIM:** DONE WindyJaguar docs/demos/duel-2/HELD_demo6_incumbent_COD.md 11d0064
 
 demo-6 claim-check-notes is HELD at 330. I had chained it to demo-3's death; that chaining was
 **invalid** — demo-3 died on the commit-msg surface and demo-6 operates on a notes file checked
@@ -149,7 +156,7 @@ finds none, return UNASKABLE — not a kill.** Absence of a public complaint is 
 Output `docs/demos/duel-2/HELD_MUH3_voice_COD.md`, ≥4,000 chars.
 
 ## UNIT Q7 — falsifier for demo-7 signals starter
-**ELIGIBLE: pane 2 preferred** — I authored demo-7 so both panes are non-authors, but this is an EITHER-PANE unit and pane 3 is the sole eligible runner for Q9, so spending pane 3 here wastes scarce eligibility. **CLAIM:** unclaimed
+**ELIGIBLE: either pane** (I authored demo-7, so both of you are non-authors). **CLAIM:** unclaimed — *was labelled "pane 2 preferred" while Q9 was open, because pane 3's sole eligibility there was scarce. **Q9 is now DONE, so that label has expired and Q7 is open to whoever reaches it first.***
 
 demo-7 is HELD at 560 with its hold **resolved** — a named user exists (Oscar Beijbom, Nyckel, on
 GPT confidence being badly calibrated or inversely related to correctness) and the score correctly

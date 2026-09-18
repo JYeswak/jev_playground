@@ -1368,3 +1368,69 @@ route that happened to include a false step.**
 **Left in place per §5:** §3m's original text is unedited above. Correcting in place would renumber
 every line and silently orphan any pointer into that section — a correction that breaks pointers is
 a second defect wearing a fix.
+
+---
+
+## §3n RUNG 3 OPENS — COD-H2 is the first candidate in this lane to earn a build
+
+**`docs/demos/duel-2/runs/codh2-labelfree-20260918T040016Z.json` (`db1e541`), run by pane 3: the
+non-author of the candidate and the author of the test.** Third measurement in the lane's history,
+and the first one a candidate survived.
+
+### What the number is, and what it is not
+
+The pre-registered failure rule is a three-way AND —
+`irreversible_share<0.02 AND wilson_upper<0.05 AND ambiguous_share<0.10` — and it did not fire:
+
+| Condition | Bar | Measured | Fired |
+|---|---|---:|---|
+| `irreversible_share` | < 0.02 | **0.373** (Wilson 95%: 0.3652–0.3809) | no |
+| `wilson_upper` | < 0.05 | **0.3809** | no |
+| `ambiguous_share` | < 0.10 | **0.3765** | **exceeds by 3.8×** |
+
+**14,533 turns across 111 journals** (1 of 112 skipped — a single malformed line, disclosed), with
+a stated turn definition, pre-registered patterns, per-file shas, and a secrets posture that records
+*counts, tool names, pattern-ids, file paths and shas only.*
+
+**The verdict is HEALTHY on surface existence, and pane 3 said so explicitly rather than letting the
+headline stand:** *"the HEALTHY verdict covers surface existence, not pattern quality."*
+
+### The honest number is smaller than the headline, by the receipt's own admission
+
+Two caveats do real work, and both were volunteered:
+
+1. **Ambiguity is inflated by a conservative choice.** All `eval` calls were classed ambiguous
+   (effect unknowable from the name), but this fleet's evals are *predominantly read-side compute* —
+   so 37.65% overstates true uncertainty. `eval` is the single largest tool at **165,596 calls**.
+2. **"Irreversible" is over-inclusive on this surface.** Write/edit were counted irreversible per
+   the pre-registered patterns, but **in a git worktree most are recoverable routine edits.** The
+   gate-relevant subset is the destructive-bash flags: **1,000**, not 5,421. That is **6.9% of
+   turns, not 37.3%.**
+
+**Pane 3 held the pre-registered definition anyway** — *"Definition held as pre-registered;
+refinement belongs to rung-3 targeting, not to re-cutting this number."* **That is the discipline
+the whole gauntlet exists to produce.** A pane that re-cut its own denominator after seeing the
+result would have produced a prettier number and a worthless one; the lane has already been burned
+by exactly that family of error eight times.
+
+### Ruling
+
+**COD-H2 pre-action abstention is RUNG-3 ELIGIBLE and claims the single WIP slot.** It is the first
+candidate to arrive here legitimately: non-author demand score **905**, rung-2 structural pass by a
+non-author, falsification design by a non-author, and a label-free execution by that same
+non-author which the candidate survived.
+
+**Two pre-conditions bind the build, both from the receipt, not from taste:**
+
+- **Sharpen the patterns before any labelled phase.** `ambiguous_share` must come under 0.10, and
+  the obvious first move is splitting `eval` by read-side versus mutating rather than blanket-
+  classing it. Until that lands, no labelled study may be run — its denominator would be 37.65%
+  mush.
+- **Target the gate at the destructive subset.** Build against the ~1,000 destructive-bash events,
+  not the 5,421 write/edit events. A gate that prompts on every routine edit in a git worktree is
+  a gate nobody leaves enabled, which is the failure mode that kills abstention products.
+
+**What is still unproven and must not be claimed:** that gating those events has value to a user.
+`NO-CLAIM: surface only`. The surface exists, it is large, and it is measured. **Whether abstention
+on it beats a deterministic allow/deny list is rung 4, and §3m's calibration thesis is exactly what
+rung 4 has to test** — with the withhold behaviour and a calibration metric, not accuracy alone.
