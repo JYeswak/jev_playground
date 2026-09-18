@@ -44,7 +44,7 @@ currently unblocked, and claimable without asking.
 ---
 
 ## UNIT Q1 — falsifier for COD-H2 pre-action abstention (THE LEADER)
-**ELIGIBLE: pane 3 only** (pane 2 authored it). **CLAIM:** unclaimed
+**ELIGIBLE: pane 3 only** (pane 2 authored it). **CLAIM:** CopperCarp 2026-09-18T04:42:00Z
 
 COD-H2 leads the whole backlog: **905 non-author, both rungs cleared.** §3k blocks rung 3 until it
 has a falsification design, and **this single unit is what stands between the gauntlet and its
