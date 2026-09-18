@@ -612,6 +612,67 @@ both tools' documented scope, entering as a new narrower candidate.
 and adjacent OpenAI filters exist. Resolve by finding one cited complaint; absent that it is
 **UNASKABLE**, never a rejection.
 
+
+---
+
+## §3i INCUMBENT ≠ OWNER — "these incumbents don't use Jev, let's baseline and obliterate"
+
+> Joshua, 2026-09-18: *"the thing is these incumbents dont use jev - lets baseline and obliterate"*
+
+**This inverts rung 1's incumbent test and reverses two of my kills.** I ruled **demo-3
+RULED_OUT** because `claim-check v0.6.0` occupies the commit-msg slot, and **MU-H2 RULED_OUT** on
+`docverity v0.5.0` + `fiberplane/drift v0.10.1`. **None of those tools use a judgment model.** They
+parse, regex and match formats.
+
+So they do not own the niche — **they are the control arm, handed to us for free.**
+
+### Why a deterministic incumbent is an asset, not a wall
+
+A maintained tool doing the narrow deterministic version of a task is the **best possible
+baseline**: installable, pinned, already trusted, and someone else maintains it. *"Here is the
+maintained tool, here is ours, here is the measured delta on the same corpus"* is a far stronger
+demo than any greenfield build — and it is precisely the **"genuine deep story & impact"** the
+gauntlet exists to find. A greenfield demo has to argue that a problem exists; a head-to-head demo
+has an incumbent's existence as proof the problem is real, and its scope as proof of where it stops.
+
+### Corrected rung-1 incumbent test
+
+An incumbent kills a candidate **only** if it already does the **calibrated-judgment** thing. Ask
+in this order:
+
+1. **Does the incumbent use a judgment model at all?** No ⇒ it is a **BASELINE**, not an owner.
+   Proceed to the head-to-head design.
+2. **If yes, is it calibrated** — typed verdicts with probabilities, a tunable threshold, an audit
+   trail? An LLM wrapper emitting prose is not a judgment system and does not own the niche either.
+3. **Only if 1 and 2 are both yes** is the niche genuinely occupied, and even then the kill needs
+   the overlap demonstrated on a shared corpus, not inferred from a feature list.
+
+**The head-to-head a baselined candidate must then design** (rung-2 cost, before any build):
+what the incumbent provably cannot do; one shared corpus where its supported subset is a **strict
+subset**; precision/recall for both; **where the incumbent wins** — deterministic, free, offline,
+no key, while a Jev checker costs money and latency; and the base-rate risk that we obliterate it
+on a corpus nobody encounters, which is demo-1's 0.047% death restated.
+
+**If the honest answer is "use the incumbent for its subset and ours for the rest", that is a
+composition seam, not a defeat** — the same conclusion pane 2 reached defending demo-4 against its
+own COD-H1.
+
+### Reversals, recorded
+
+- **demo-3 claim-check gate: RULED_OUT → HELD.** `claim-check v0.6.0` verifies numeric
+  **test-count** claims against test-runner output. Non-count numerics, percentages, claims citing
+  arbitrary artifacts, and true-but-stale claims are all outside it. Resolve by the head-to-head
+  design above; our own claim audit (**19 EXACT / 4 WRONG / 37 UNVERIFIABLE** across four
+  documents) is a ready corpus.
+- **MU-H2 outbound redaction: RULED_OUT → HELD.** Killed on `docverity` + `fiberplane/drift`;
+  neither judges. Same treatment.
+
+**This is my third over-kill of the session**, after B1 on mistaken identity and demo-6 by invalid
+chaining. The pattern is now unmistakable and worth stating as a rule about me rather than about
+the candidates: **I kill on the first plausible sufficient reason and stop looking.** The
+anti-kill rules in §3c exist because of this, and they caught the first two only after the fact.
+The structural fix is the one Joshua keeps supplying: **make the kill condition narrower than
+"something exists that overlaps".**
 ---
 
 ## §4 Phase arc
