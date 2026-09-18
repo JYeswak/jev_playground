@@ -124,6 +124,11 @@ So, every tick:
 - `cmd | tail` reports **tail's** exit status. Take exit codes from separate unpiped invocations.
 - An **aborted tool call proves nothing either way** — re-derive both sides, re-issue the missing
   half alone.
+- **Commit messages go through `-F <file>`, never `-m "..."`.** Measured 2026-09-18: backticked
+  spans in an inline double-quoted `-m` were **executed as command substitution** and recorded as
+  empty — one of them ran `node bin/backtest.mjs` from the repo root. A commit message caused code
+  execution. Same rule already held for `ntm --msg-file=`; carry it to `git commit`. Damage is
+  unamendable on shared `main` — attach `git notes` instead (see `03059df`).
 - **Never `git add -A`.** `git commit --only <explicit paths>`. Verification level in every subject:
   `pending|selftest|test|mutation|oracle|live`.
 - **Never rewrite shared history.** Self-report a miscommit; do not amend.
