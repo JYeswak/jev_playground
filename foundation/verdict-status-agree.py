@@ -111,7 +111,8 @@ def main(argv):
     status_path, verdict_path = argv[1], argv[2]
     try:
         rows = load_status(status_path)
-        lines = open(verdict_path, encoding="utf-8").read().splitlines()
+        with open(verdict_path, encoding="utf-8") as fh:
+            lines = fh.read().splitlines()
     except OSError as exc:
         print(f"FAIL  input unreadable: {exc}")
         return 2

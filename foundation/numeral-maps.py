@@ -40,7 +40,8 @@ def main() -> int:
         print("UNPARSEABLE")
         return 0
     try:
-        raw = open(path, "r", encoding="utf-8", errors="replace").read()
+        with open(path, "r", encoding="utf-8", errors="replace") as fh:
+            raw = fh.read()
     except OSError as exc:
         print("UNPARSEABLE")
         print(f"# {exc}", file=sys.stderr)
