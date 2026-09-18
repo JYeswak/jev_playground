@@ -1,0 +1,207 @@
+{
+  "schema": "jev.duel2.quoted-number-census.v1",
+  "generated_at": "2026-09-18T04:29:57Z",
+  "map": {
+    "path": "docs/demos/USAGE-MAP.md",
+    "sha256": "e497a1df0374c5bcd097f63c17f1c5566e5946812668de0cbd4cad138b54c64f"
+  },
+  "scope": {
+    "surviving_dependencies": [
+      "Demo-2 admission",
+      "Demo-4 completion",
+      "Demo-5 compaction",
+      "Demo-7 signals",
+      "Demo-9 guardrail/review context",
+      "MU-H1 TODO judge",
+      "COD-H2 held/rung3 slot"
+    ],
+    "excluded_no_live_dependency": [
+      "rerank",
+      "router",
+      "browser",
+      "failure-attribution headline families"
+    ]
+  },
+  "entries": [
+    {
+      "id": "USAGE-1a",
+      "pattern": "Pre-context screening",
+      "headline": "injection probability 0.99 while page remained readable",
+      "source": "jev-mcp@6ec5efc README.md:12-13 and examples",
+      "repo": "jev-mcp",
+      "repo_sha": "6ec5efc6601477557c1436981ba69eb7b35832bd",
+      "live_dependency": "Demo-2 admission screen",
+      "control_exists": false,
+      "control_opened": true,
+      "control": "README narrative/example only; no labelled corpus or independent control committed.",
+      "result": "UNVERIFIED",
+      "finding": "Quoted README claim only; no source-side control or re-run."
+    },
+    {
+      "id": "USAGE-2a",
+      "pattern": "Claim verification",
+      "headline": "contradicted claim caught at confidence 1.0 against a city ordinance",
+      "source": "jev-mcp@6ec5efc README.md:12",
+      "repo": "jev-mcp",
+      "repo_sha": "6ec5efc6601477557c1436981ba69eb7b35832bd",
+      "live_dependency": "Demo-6/Demo-3 claim surface",
+      "control_exists": false,
+      "control_opened": true,
+      "control": "No ordinance fixture, claim/evidence pair, or independent control in checkout.",
+      "result": "UNVERIFIED",
+      "finding": "Narrative headline only."
+    },
+    {
+      "id": "USAGE-7a",
+      "pattern": "Failure attribution",
+      "headline": "6,257 traces; Who 73.4, When 76.4, All 31.3; $1.28",
+      "source": "jev-agent-failure-benchmark@4d46af7 RESULTS.md:5,8,10",
+      "repo": "jev-agent-failure-benchmark",
+      "repo_sha": "4d46af795a4a4409940a65857da73e45abaea2db",
+      "live_dependency": "None currently; excluded",
+      "control_exists": true,
+      "control_opened": true,
+      "control": "RESULTS includes CIs, gpt-5.4 baseline, ECE, pricing and tests.",
+      "result": "EXCLUDED",
+      "finding": "Source control opened, but no surviving candidate depends on this surface."
+    },
+    {
+      "id": "USAGE-9a",
+      "pattern": "Zero-label classification",
+      "headline": "TF-IDF needs 100–10,000 labels to match; shifted mail loses 20+ points",
+      "source": "jev-spam-eval@76ef183 README.md:232-262",
+      "repo": "jev-spam-eval",
+      "repo_sha": "76ef18305710f8f38c984a56a80fc43e6bb18c6f",
+      "live_dependency": "Demo-7 signals starter",
+      "control_exists": true,
+      "control_opened": true,
+      "control": "Five-draw learning curves at 25..10,000 labels; OOD files and multiple seeds.",
+      "result": "REPRICED_BUT_SUPPORTED",
+      "finding": "Range is dataset-specific: email logistic reaches parity near 1,000/10,000, Ling-Spam near 200, three-category near 100; broad wording hides the split."
+    },
+    {
+      "id": "USAGE-9b",
+      "pattern": "Phishing signal starter",
+      "headline": "verdict 62.6 vs 81.3; five signals + fitted head 95.1; AUROC .988; ECE .027; fixed 89.5",
+      "source": "jev-phishing-bench@1d56e8c results/report.md:10,103-119",
+      "repo": "jev-phishing-bench",
+      "repo_sha": "1d56e8c64d029a9554a0874e2ef2901ed196e230",
+      "live_dependency": "Demo-7 signals starter",
+      "control_exists": true,
+      "control_opened": true,
+      "control": "Control 1 no-AI 91.6; Control 2 A/B split; Controls 3-5 alternative LLM/verdict wording/dataset knowledge.",
+      "result": "SURVIVES_NUMERICALLY_REPRICED",
+      "finding": "Numbers reappear in source; interpretation is repriced 62.6→91.6 (+29.0)→95.1 (+3.5), then Q10 shows two-signal concentration."
+    },
+    {
+      "id": "USAGE-12a",
+      "pattern": "Guardrail benchmarks",
+      "headline": "662 injection messages and 200 vulnerable-code pairs",
+      "source": "jev-sec-bench@fdb16b9 README.md:8-20 and code section",
+      "repo": "jev-sec-bench",
+      "repo_sha": "fdb16b94d37535db9bad77f8ef0faa971bd7d69a",
+      "live_dependency": "Demo-2 guardrail framing",
+      "control_exists": true,
+      "control_opened": true,
+      "control": "No-context/with-context comparison; vulnerable-code pair setup; internal label audit.",
+      "result": "SURVIVES_SCOPE",
+      "finding": "Corpus sizes survive; source warns accuracy is affected by context and noisy secure labels."
+    },
+    {
+      "id": "USAGE-14a",
+      "pattern": "Context compaction",
+      "headline": "45% reduction, zero text loss; summary won 3–1 at one-third bytes",
+      "source": "fast-jev-compaction@6e1da50 plus compaction receipts",
+      "repo": "fast-jev-compaction/compaction",
+      "repo_sha": "6e1da50d064cc06aa08e720b534b4d873e2bb0b6",
+      "live_dependency": "Demo-5 fact ledger",
+      "control_exists": true,
+      "control_opened": true,
+      "control": "Replay receipt and three A/B receipts with q1-q3; same-fixture rerun exists.",
+      "result": "UNSTABLE_HEADLINE",
+      "finding": "Reduction 2047→1136 (44.43%) survives; 3–1 B-wins does not: reruns are 1–1 and 1–3, exposing generator variance."
+    },
+    {
+      "id": "USAGE-13a",
+      "pattern": "Calibration discipline",
+      "headline": "ECE .061, Brier .020, Noul 58/60, Choice 19/20",
+      "source": "foundation/runs/20260917T224444Z.json",
+      "repo": "foundation",
+      "repo_sha": "current jev checkout",
+      "live_dependency": "All probability-bearing candidates",
+      "control_exists": true,
+      "control_opened": true,
+      "control": "80-row hashed fixture; metrics n=60, bins, threshold coverage, choice accuracy.",
+      "result": "SURVIVES_LOCAL_FIXTURE_ONLY",
+      "finding": "Receipt matches numbers; no external transfer claim."
+    },
+    {
+      "id": "SURVEY-1",
+      "pattern": "External market survey",
+      "headline": "TypeSafe four-workflow average 67.8% agreement",
+      "source": "PLAN.md §3q; public discussion https://www.datacamp.com/blog/system-one-models-jev",
+      "repo": null,
+      "repo_sha": null,
+      "live_dependency": "Calibration/decision-layer claims",
+      "control_exists": false,
+      "control_opened": false,
+      "control": "Raw 11-sweep/716-item artifact absent; public account says references were model-averaged, not human ground truth.",
+      "result": "UNVERIFIED_EXTERNAL",
+      "finding": "Ceiling not locally rederived and is agreement-to-reference, not correctness."
+    },
+    {
+      "id": "SURVEY-2",
+      "pattern": "External market survey",
+      "headline": "Mike Taylor 12 passages: Jev 6/7, Fable 5.1 7/7; ~25x faster, ~580x cheaper",
+      "source": "PLAN.md §3q; https://visionhub.jp/presentations/day_slides/day_slide_2026_09_14.html",
+      "repo": null,
+      "repo_sha": null,
+      "live_dependency": "External early-warning ceiling",
+      "control_exists": false,
+      "control_opened": false,
+      "control": "No raw survey receipt or local control; small planted-defect test.",
+      "result": "UNVERIFIED_EXTERNAL",
+      "finding": "Useful context, not a broad accuracy benchmark."
+    },
+    {
+      "id": "SURVEY-3",
+      "pattern": "External market survey",
+      "headline": "193.6x faster and 444.6x cheaper against a named LLM baseline",
+      "source": "PLAN.md §3q; https://typesafe.ai/blog/introducing-system-one-models-and-jev",
+      "repo": null,
+      "repo_sha": null,
+      "live_dependency": "Any cost/latency superiority claim",
+      "control_exists": false,
+      "control_opened": false,
+      "control": "Raw survey absent; public source summaries attach headline to different workflow/model baselines and separately report ~75x/171x.",
+      "result": "CONFLICTED_EXTERNAL",
+      "finding": "Baseline identity must be pinned before use."
+    },
+    {
+      "id": "SURVEY-4",
+      "pattern": "External market survey",
+      "headline": "HN 1,863-point discussion warns typed output can still be a wrong valid value",
+      "source": "PLAN.md §3q; HN source not pinned in repo",
+      "repo": null,
+      "repo_sha": null,
+      "live_dependency": "Typed judgment claims",
+      "control_exists": false,
+      "control_opened": false,
+      "control": "Public sentiment, not a controlled benchmark.",
+      "result": "NON_BENCHMARK",
+      "finding": "Qualitative counterevidence only."
+    }
+  ],
+  "summary": {
+    "entries": 12,
+    "local_controls_opened": 8,
+    "external_unopened": 4,
+    "findings": [
+      "phishing 32.5pp headline decomposes to 29.0 dataset knowledge + 3.5 method",
+      "compaction 3–1 winner unstable across reruns",
+      "external survey ceilings and speed/cost claims unpinned/conflicted",
+      "guardrail controls exist and expose context/label-noise caveats"
+    ]
+  },
+  "failures": []
+}
