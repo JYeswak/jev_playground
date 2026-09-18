@@ -236,3 +236,60 @@ that demonstrably converges, applied to artifacts that cannot evidence the resul
 
 **Net: the idea looks better and the infrastructure looks worse** — the inverse of how this session
 opened, when demo-1 had excellent infrastructure with no Jev calls inside it.
+
+---
+
+## AMENDMENT (appended 2026-09-18, after non-author audit `c49407d`) — three defects, one major
+
+**Pane 2 audited this ruling as non-author: `RATIFIED_WITH_RETRY_AMENDMENTS`.** What it upheld and
+what it required:
+
+**Upheld (R1, R4):** the **MU-H3 evidence-over-score pick is defensible** — *"MU-H3 has a measured
+entropy baseline failure and an unseeded named practitioner complaint, while H4 corpus and H1
+transcript prevalence are blocked"* — and **no omitted candidate is clearly stronger** for the second
+slot. The dated rubric correction *"explicitly retracts the stale claim… the live ruling does not
+silently retain the falsified conclusion."*
+
+**R2, flagged limit, accepted verbatim:** the entropy defeat is *"a 23-sentinel **synthetic** probe…
+not real outbound prevalence"*, and the practitioner issue *"proves runtime-redaction pain but says
+nothing about calibration."* **MU-H3's project claim is the unknown-credential wedge only — never
+broad redaction superiority.**
+
+### R3 — "rung 3 in full" overclaims. Corrected wording:
+
+**COD-H2's rung 3 is: mechanism and proof accepted, with disclosed standing risks.** Not
+unconditional security or calibration clearance. The standing risks, both already recorded: **UBS's
+two criticals remain location-unverifiable (§4c, `UNASKABLE`)**, and **live-call provenance was
+discharged at its *declared ceiling*** — status + model-echo + usage + probabilities, with **no
+`response_id` or server timestamp available from the API at all** (§4i). Every earlier use of *"rung
+3 in full"* in this document is qualified by this paragraph.
+
+### R5 (major) — two RULED_OUT candidates had NO retry condition. That violates §3c in the ruling itself.
+
+**§3c requires every `RULED_OUT` to ship a retry condition, and I wrote "none" twice.** Replaced with
+observable predicates:
+
+**demo-1 route-backtest** — re-opens if a measured head-to-head shows **Jev-based routing beating
+`ModelRouterMiddleware` on cost-at-equal-task-success by a margin whose 95% CI excludes zero, over
+≥100 real routed requests, with model version and call count recorded.** This forces the comparison
+demo-1 never made: it measured 0.047% against *nothing*, not against the incumbent that now owns the
+surface.
+
+**demo-8 credential screen** — re-opens only if **both** hold: (a) a design in which **zero raw
+secret bytes cross any boundary**, proven by MU-H3's own method (deterministic sentinels plus an
+asserting sink, per-boundary byte counts), with judgment on a derived non-reversible feature rather
+than the secret; **and** (b) **≥20 observed credential-injection instances** in a relocatable corpus
+— because §4t measured **zero in 111 journals** and pane 3 struck the stratum as permanently
+unmeasurable here. **A safe design with no instances is still unaskable.**
+
+**COD-H3 T1/T2** — directions made measurable:
+
+- **T1 (deterministic auditor, outside the lane)** re-opens if it **catches the LiteLLM #38064
+  tie-break misroute AND ≥1 novel drift class across ≥3 real manifests, with zero false positives on
+  a clean manifest.**
+- **T2 (counterfactual router, inside the lane)** re-opens if a fixture shows **fixed-tier rules
+  misclassifying at material measured cost on real traffic, AND per-decision calibrated probability
+  with withhold reducing that cost with a 95% CI excluding zero.**
+
+**A retry condition that cannot be checked is a kill wearing a retry**, which is exactly what §3c
+exists to prevent — and the ruling shipped three of them before this audit.
