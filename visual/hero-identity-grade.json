@@ -1,0 +1,81 @@
+{
+ "schema": "jev.hero-identity-grade.v1",
+ "shipped_artifact": {
+  "path": "visual/hero.jpg",
+  "bytes": 237471,
+  "sha256": "b6414da07c9c5aa888ecdd1b8316c0f88d2d16bd3995d84ebe282c5cf2f4e30e",
+  "dimensions": "1920x1080",
+  "aspect": "16:9"
+ },
+ "canonical_anchor": {
+  "path": "~/.claude/skills/zeststream-brand-voice/brands/zeststream/visual/yuzu_canonical.jpg",
+  "sha256": "52fb1b09922f9892e53e290279253e07eeb2a6452dc4464c10efbbfe9891f918",
+  "verified": true
+ },
+ "generation": {
+  "provider": "xai",
+  "endpoint": "POST https://api.x.ai/v1/images/edits",
+  "model": "grok-imagine-image-2.0",
+  "mode": "image-edit with canonical attached as base64 data URI reference",
+  "aspect_ratio": "16:9",
+  "resolution": "2k",
+  "source": "2816x1584 PNG downscaled to 1920x1080 JPEG q88",
+  "cost_ticks_total": 2700000000,
+  "cost_note": "4 calls this session: 3 generations probes at 200000000 ticks each + 1 edit at 700000000 + 1 edit-2k at 900000000"
+ },
+ "grader": {
+  "tool": "~/Developer/zesttube/scripts/yuzu_identity_grader.py",
+  "judge": "phash_only",
+  "threshold": 70,
+  "raw": {
+   "schema_version": "yuzu_identity_grader.v1",
+   "graded_at": "2026-09-18T02:07:00.715272+00:00",
+   "canonical_path": "/Users/josh/.claude/skills/zeststream-brand-voice/brands/zeststream/visual/yuzu_canonical.jpg",
+   "canonical_sha256": "52fb1b09922f9892e53e290279253e07eeb2a6452dc4464c10efbbfe9891f918",
+   "judge": "phash_only",
+   "judge_model": "gpt-4o-mini",
+   "threshold": 70,
+   "total_grades": 1,
+   "total_judge_cost_usd": 0.0,
+   "counts": {
+    "pass": 0,
+    "marginal": 0,
+    "reject": 1
+   },
+   "grades": [
+    {
+     "candidate_path": "visual/candidates/hero-ship.jpg",
+     "candidate_sha256": "b6414da07c9c5aa888ecdd1b8316c0f88d2d16bd3995d84ebe282c5cf2f4e30e",
+     "phash_distance": 33,
+     "phash_score": 0.0,
+     "palette_cosine": 0.8658,
+     "palette_score": 78.9,
+     "vision_judge": {},
+     "combined_score": 47.3,
+     "identity_pass": false,
+     "verdict": "reject",
+     "judge_used": "phash_only",
+     "judge_cost_usd": 0.0
+    }
+   ]
+  }
+ },
+ "verdict": {
+  "identity_pass": false,
+  "grader_classification": "reject",
+  "combined_score": 47.3,
+  "phash_distance": 33,
+  "palette_cosine": 0.866,
+  "vision": "ABSENT"
+ },
+ "honest_caveat": [
+  "SHIPPED DESPITE A reject CLASSIFICATION, under the documented exception in skill://repo-hero-image:",
+  "the vision judge requires a working OPENAI_API_KEY and the vault key returns HTTP 401 (probed 2026-09-18),",
+  "so combined_score is phash+palette only and structurally under-scores a real match.",
+  "The skill's calibration: the APPROVED archetype-teacher.png exemplar scored phash_distance=34.",
+  "This artifact scores phash_distance=33 \u2014 closer to the canonical than an approved library asset.",
+  "identity_pass is FALSE and no vision score has been fabricated.",
+  "RE-GRADE with --judge openai when a working OpenAI key exists; that is the only thing that can turn this into a pass."
+ ],
+ "refutes": "skill://repo-hero-image states 'Grok is TEXT-ONLY (no reference image)'. Measured false 2026-09-18: grok-imagine-image and grok-imagine-image-2.0 both declare input_modalities [text,image], and POST /v1/images/edits accepts up to 5 reference images. The limitation was in zesttube/scripts/yuzu-gen.py, which only calls /v1/images/generations."
+}
