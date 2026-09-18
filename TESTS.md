@@ -85,6 +85,7 @@ projects and mean nothing. Per-suite counts above are the honest unit.
 
 - `demos/routing-backtest/test/reader.test.mjs` — transcript denominator extraction and the empty-classifiable-set ERROR arm. Run: `cd demos/routing-backtest && npm test`.
 - `demos/routing-backtest/src/counterfactual.test.mjs` — deterministic cheap-route policy, recorded-spend preservation, missing-price ERROR, unknown-model fixture RED arm, and missing-spend failure. Run: `cd demos/routing-backtest && npm test`.
+- `demos/routing-backtest/test/hostile-input.test.mjs` — the §4 hostile-input arm: four named refusal codes (MALFORMED_JSONL, INVALID_USAGE_TOKENS, DUPLICATE turn index, NON_STRING_SESSION_ID), asserting the reader REFUSES and executes nothing rather than crashing or silently accepting. 6 tests. Run: `cd demos/routing-backtest && npm test`.
 - `demos/doc-drift/test/judge.test.mjs` — the doc-drift judge's decision surface. Registered
   2026-09-18 after `foundation/gates.d/70-tests-registry-sync.sh` fired RED on it live: it was
   tracked and unnamed here, a sibling landing whose registry update never happened. Run:
