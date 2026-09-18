@@ -38,8 +38,26 @@ fi
 # ── lane 2: autofix cleanliness (report-only) ───────────────────────────────────────────────────
 _autofix="${LOOP_KIT:-$HOME/Developer/foundry/loop-kit}/autofix-precommit.sh"
 if [ ! -x "$_autofix" ]; then
-  printf 'AUTOFIX_LANE_SKIPPED reason=impl-missing path=%s (set LOOP_KIT)\n' "$_autofix" >&2
-  exit 0
+  # FAILS CLOSED, with a deliberate escape. This branch used to `exit 0`: a MISSING checker silently
+  # permitted the commit, while lane 1 above refuses when ITS implementation is absent, and
+  # foundation/gates.sh treats an empty scan set as an ERROR rather than a pass. Same repo, opposite
+  # doctrine, and the inconsistency stayed invisible because every machine running these hooks has
+  # loop-kit installed, so the open branch never fired here.
+  #
+  # Adopted from bicameral (docs/demos/upstream-repro/bicameral-20260918.md): its degraded path falls
+  # back to pattern rules rather than letting work through unjudged. A checker that vanishes must not
+  # read as a checker that passed.
+  #
+  # The escape is explicit and has to be typed: JEV_ALLOW_MISSING_AUTOFIX=1 names the risk at the
+  # moment it is taken, which `exit 0` never did.
+  if [ "${JEV_ALLOW_MISSING_AUTOFIX:-}" = "1" ]; then
+    printf 'AUTOFIX_LANE_SKIPPED reason=impl-missing path=%s (allowed by JEV_ALLOW_MISSING_AUTOFIX=1)\n' "$_autofix" >&2
+    exit 0
+  fi
+  printf 'AUTOFIX_REFUSED reason=impl-missing path=%s\n' "$_autofix" >&2
+  printf '  install loop-kit, set LOOP_KIT=<path>, or take the risk deliberately:\n' >&2
+  printf '  JEV_ALLOW_MISSING_AUTOFIX=1 git commit --only <paths> -F <msg-file>\n' >&2
+  exit 1
 fi
 
 if ! "$_autofix" --check --staged --repo "$_repo"; then
