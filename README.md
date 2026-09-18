@@ -48,8 +48,11 @@ a retraction to learn.
   independent confirmation, however much it reads like it. **Apply it by treating concurrence as a
   consistency check on your reasoning, never as a second source.**
 - **A handful of calls characterises nothing.** Across three runs with three slightly different
-  states the same question returned 0.21, 0.26 and 0.36. **Apply it by refusing the word
-  "calibrated" until you have run enough trials to earn it.**
+  states the same question returned 0.21, 0.26 and 0.36. **Apply it by putting the bar in the tool
+  rather than in a caution.** The A/B harness here refuses a relative verdict until an arm has at
+  least ten zero-spread samples (`compaction/ab/verdict.ts`), `--verdict` exits 2 below that bar, and
+  twenty-one historical citations of single-run verdicts are annotated as retracted rather than
+  quietly left standing.
 - **The typed surface is the reason to use it.** Requests are `{model, state, questions}` with
   `noul` for a probability and `choice` for a ranked set, and both admit a real none-equivalent.
   That is what makes an abstention expressible instead of inferred from a low score. **Apply it by
