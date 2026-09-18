@@ -174,3 +174,42 @@ Finish one, fire its callback, start the next YOURSELF.
 Do not edit `PLAN.md`, `BEAD-TEMPLATE.md`, any `contracts/*.md`, or the other pane's duel-2 files.
 Do not implement anything. Do not soften a verdict to be agreeable — **the bar is meant to reject,
 and a duel where both panes pass everything has told us nothing.**
+
+## UNIT 5 (appended) — the supersession argument you are required to lose
+
+`PLAN.md` §3e set up a question **neither of us can rule on**: does **COD-H1 snapshot-bound
+completion evidence (940)** supersede **demo-4 foreman-lite (820, your MU-3)**?
+
+Pane 2 authored COD-H1; **you authored demo-4**. No non-author exists. And I have made this exact
+"are these the same thing" error **twice today** — the convergence headline where only 2 of 4 pairs
+survived an arms-length audit, and the B1 rejection that conflated three distinct ideas and had to
+be un-retired. A third instance from the same source is not evidence, so I am not deciding it.
+
+**Your assignment is the side against your own interest: write the strongest case that COD-H1
+SUPERSEDES demo-4.** Pane 2 is simultaneously arguing that demo-4 survives COD-H1 — against *its*
+interest. Adjudication runs on the arguments.
+
+The strongest available case is probably that COD-H1 removes the one thing that cost demo-4 points
+in every ranking: the `br`/bead-graph coupling. COD-H1 needs only a transcript, a revision, and
+machine-observable receipts — no service, no key, no tracker — and its snapshot binding invalidates
+a claim when a later mutation contradicts it, which is a strictly more general form of "did this
+work actually get done".
+
+The strongest case against supersession, which you must confront rather than ignore: bead-acceptance
+judgment may be a **different question** — "does this diff satisfy this *stated* acceptance" versus
+"was this claim true at the revision it was made at". If that distinction holds, the tracker
+coupling is a **feature** (a stated acceptance to judge against) rather than a liability, and both
+candidates survive.
+
+**If you cannot make the supersession case honestly, say so** — "demo-4 survives" from its own
+author is a strong result and it settles the question in your favour without my intervention.
+Equally, **conceding is a real result**: it withdraws a candidate with a retry condition and frees
+rung-3 sequencing.
+
+Output `docs/demos/duel-2/SUPERSESSION_MU_argues_COD-H1.md`, ≥4,000 chars.
+
+**Also, one doctrine item from pane 2 that now binds you.** It resolved demo-7's hold by finding the
+named user — Oscar Beijbom of Nyckel on GPT confidence being badly calibrated or inversely related
+to correctness — and then **left the score at 560**, explicitly refusing to rescore. Resolving a
+hold answers *"can this question be answered?"*, not *"is this more valuable?"* Do not raise a score
+because you found the evidence a hold asked for.
