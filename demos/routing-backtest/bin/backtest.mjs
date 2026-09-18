@@ -115,6 +115,23 @@ try {
     ...baseReceipt,
     priceTable: result.priceTable,
     denominator: parsed.totals,
+    // WHY EACH TURN DID NOT QUALIFY, aggregated. The engine already computes a reason per turn and
+    // the receipt threw every one away, so the demo could report that routing was blocked but never
+    // BY WHAT. Measured on real logs: zero turns exceeded the 2,000-token completion budget while 291
+    // of 500 carried tool calls, so the completion budget never binds and maxToolCalls does — and the
+    // prompt-budget sweep alone would have told a reader none of that. A histogram, not per-turn rows:
+    // one line per reason keeps the receipt small enough to read.
+    blockedBy: result.turns.reduce((acc, turn) => {
+      if (turn.cheapSufficient) return acc;
+      // classificationReason, not reason. My first version read `turn.reason`, which does not
+      // exist on these objects, and every blocked turn aggregated as 'unrecorded' — a histogram
+      // that looked populated and carried no information. The 'unrecorded' bucket is KEPT rather
+      // than defaulted away, so the same mistake shows up as a number next time instead of
+      // hiding behind a plausible label.
+      const reason = turn.classificationReason ?? 'unrecorded';
+      acc[reason] = (acc[reason] ?? 0) + 1;
+      return acc;
+    }, {}),
     sessions: parsed.sessions.map((session) => ({
       source: displayPath(session.source),
       sessionId: session.sessionId,

@@ -165,3 +165,25 @@ test('the backtest receipt records the EFFECTIVE policy, not the default', () =>
   assert.equal(receipt.policy.maxPromptTokens, 50_000);
   assert.equal(receipt.policy.maxCompletionTokens, 2_000, 'unspecified policy fields keep their defaults');
 });
+
+test('the receipt records WHY each blocked turn was blocked, by reason', () => {
+  const dir = work();
+  writeFileSync(join(dir, 's.jsonl'),
+    // One turn over the prompt budget, one inside it: the histogram must name the first and omit
+    // the second, and it must use classificationReason — reading `turn.reason` instead aggregated
+    // everything as "unrecorded", a histogram that looked populated and said nothing.
+    sessionLine('known-1', { input_tokens: 60_000, output_tokens: 10 })
+    + sessionLine('known-1', { input_tokens: 40, output_tokens: 10 }));
+  const prices = sheet(dir, { 'known-1': { input: 1, output: 2 }, 'cheap-1': { input: 0.1, output: 0.2 } });
+  run([join(dir, 's.jsonl'), '--prices', prices, '--out', join(dir, 'o.jsonl')]);
+  const BT = new URL('../bin/backtest.mjs', import.meta.url).pathname;
+  const out = join(dir, 'bt.json');
+  execFileSync('node', [
+    BT, join(dir, 'o.jsonl'), '--prices', join(dir, 'o.jsonl.prices.json'),
+    '--max-prompt-tokens', '50000', '--out', out,
+  ], { encoding: 'utf8' });
+  const { blockedBy } = JSON.parse(readFileSync(out, 'utf8'));
+  assert.equal(blockedBy['prompt-token-budget'], 1);
+  assert.ok(!('unrecorded' in blockedBy), 'a reason must never aggregate as unrecorded');
+  assert.equal(Object.values(blockedBy).reduce((a, b) => a + b, 0), 1, 'qualifying turns are not counted');
+});

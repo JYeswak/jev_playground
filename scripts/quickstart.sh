@@ -139,6 +139,25 @@ EOF
               printf '      %7s tokens: %s\n' "$budget" "$code"
             fi
           done
+          # WHAT ACTUALLY BLOCKS ROUTING, from the default-budget run's own receipt. The sweep varies
+          # ONE axis; the policy has three. On my corpus zero turns exceeded the 2,000-token completion
+          # budget while 291 of 500 carried tool calls, so a prompt-only curve can leave a reader
+          # tuning the wrong number.
+          if [[ -f "$mine_work/bt.json" ]]; then
+            node -e '
+              const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));
+              const b=r.blockedBy||{};
+              const rows=Object.entries(b).sort((x,y)=>y[1]-x[1]);
+              if (!rows.length) { console.log("    (no blocked turns recorded at the default budget)"); }
+              else {
+                console.log(`    What blocked routing at ${r.policy.maxPromptTokens} tokens:`);
+                for (const [reason,n] of rows) console.log(`      ${String(n).padStart(6)}  ${reason}`);
+                console.log("    The sweep above varies the prompt budget only. If a reason other than");
+                console.log("    prompt-token-budget dominates here, the budget is not your binding constraint.");
+              }
+            ' "$mine_work/bt.json"
+            echo
+          fi
           echo "    A budget is a POLICY CHOICE, not a measurement. Each row is your own traffic"
           echo "    against a different assumption; the dollars still come from your sheet."
           echo "    Its floors are deliberate. A run where every turn qualifies for the cheap model,"
