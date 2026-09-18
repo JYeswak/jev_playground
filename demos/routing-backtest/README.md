@@ -47,6 +47,9 @@ committed receipts other documents cite — do not leave trial files beside them
 
 On our own 30 turns: **$0.0034228 saved, or 0.0447%** (`0.0034228/7.658096908`,
 counterfactual-spend basis). Upstream reports −60% on theirs; on ours, routing barely pays.
+Scope: this prices the SAME turns at a cheaper model. It does not measure turn reduction —
+a tool that deletes turns (fewer re-sends of the full context) plays a different lever this
+does not price.
 
 **Do not build a router on the upstream number — run this on your logs first.** If your savings
 clearly beat ours, a router may pay for you; if they look like ours, it will not. Re-derive past
