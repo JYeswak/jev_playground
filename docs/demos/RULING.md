@@ -856,3 +856,18 @@ is 5 headings or 8 sub-defects), **unit** (instances vs families vs headings). C
 WITH a stated triple are derivable from the table; a scalar without one is not a claim.
 **This document asserts no catch-count scalar after this line.** The withdrawn-twelve block above
 is struck in place; the 526 strike stands. Future citations use the table or stay silent.
+
+---
+
+## SCOPE NOTE — demo-1 RULED_OUT answers one question, not two (live-oracle concurrence)
+
+**demo-1's verdict answers:** would same-turn cheaper-model routing pay on our turns? No —
+0.0447% (`0.0034228/7.658096908`, 30 turns, receipt-backed). **It does not answer** whether
+turn elimination would pay, or whether nothing pays.
+
+A live Jev probe given only the measured usage shape (~99% retransmission) returned the same
+ranking from the measured shape alone (fewer_turns first, cheaper_model fourth) —
+same-origin evidence, counted once, but pointing the same way as the logs: the dominant lever
+(turn count × retransmitted context) was unexamined by the rung-4 question that killed routing.
+**Future reader: "routing does not pay" is scoped to
+price-substitution. Read it as "nothing pays" and you repeat the under-scoping, not the finding.**
