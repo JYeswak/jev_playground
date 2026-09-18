@@ -1,5 +1,6 @@
 {
   "transcript": "fixtures/omp-session-20260917.jsonl",
+  "transcript_sha256": "1701c2502c97b96ea200397c8f3a49b8a10823b4b82c07d2bc315985004337bb",
   "eventsIn": 101,
   "messagesIn": 11,
   "thinkingCharsDropped": 338,
