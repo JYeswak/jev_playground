@@ -1,0 +1,36 @@
+{
+  "schema": "jev.q105-promotion-rerule.v1",
+  "generated_at": "2026-09-18T14:00:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author rerule",
+  "implementation_commit": "959c3ca",
+  "preconditions": {
+    "copy_snapshot": {
+      "status": "PARTIAL_MET",
+      "reason": "Outward-resolving symlinks are rejected at rc13 before copy, and lexical containment is enforced. Hardlinks, symlinked parent directories, and in-root symlinks outside the declared evidence set remain untested by the disclosed arms."
+    },
+    "revision_hash_pair": {
+      "status": "MET",
+      "reason": "Manifest includes HEAD role, per-file source pre/post/copy raw hashes, normalized hashes, and source/snapshot paths; verifier source is an input."
+    },
+    "copy_based_arms": {
+      "status": "MET_WITH_UNTESTED_SYMLINK_CLASSES",
+      "reason": "14 arms include outward symlink rejection, forced provenance, and prior copy fidelity; disclosed hardlink/parent-symlink/in-root-outside-set attacks are not yet arms."
+    },
+    "verifier_transient_unstable": {
+      "status": "MET",
+      "reason": "Verifier owns bounded two-capture rc10/no-verdict behavior, refuses forced movement on dirty verdicts, and saves forced provenance in the manifest."
+    }
+  },
+  "reopen_conditions": {
+    "path_expansion_traversal": "CLOSED for lexical absolute/.. paths and outward-resolving symlink rejection; hardlinks, symlinked parent directories, and in-root symlink target outside declared set remain OPEN",
+    "new_receipt_type_or_format": "No new issue",
+    "two_capture_instability": "CLOSED for current bounded implementation",
+    "caller_misreads_rc10": "Still a caller concern; no foundation promotion",
+    "live_path_after_snapshot": "CLOSED for mapped/unmapped resolver behavior; source post-read remains stability validation before completion",
+    "foundation_wiring": "Not promoted and must remain separately re-examinable"
+  },
+  "promotion": "DEFER",
+  "reason": "The implementation closes the known Q103 blockers, but promotion would overclaim containment while three symlink/hardlink classes named by the implementer remain untested. A green live run is insufficient.",
+  "no_claim": "No claim hardlinks or parent-directory symlinks are safe, no claim in-root/outside-set symlink targets are handled, and no promotion claim."
+}
