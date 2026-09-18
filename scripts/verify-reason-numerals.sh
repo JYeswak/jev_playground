@@ -46,6 +46,22 @@ def variants(tok: str):
     return out
 
 
+def opens(tok: str, blob: str) -> bool:
+    """Digit-bounded match. A SUBSTRING TEST IS NOT AN OPENING.
+
+    FOUND BY THIS GATE'S OWN FIRST REAL USE. After pane 3 ruled demo-1's reason should be repriced to
+    `0.0447pct`, the hit CLOSED — and it closed for the wrong reason: `0.0447` matched
+    `0.044756498000000006`, a PER-TURN DOLLAR AMOUNT in an unrelated field. The number the verdict
+    cites is a PERCENTAGE the receipt never states; a coincidental prefix of a different quantity was
+    being accepted as the control.
+
+    That is a predicate satisfiable by unrelated text — the seventh instance of that class this lane
+    has caught inside its own instruments, and the first one I built the instrument to catch. A digit
+    on either side means this is a different number, so the match is rejected.
+    """
+    return re.search(r"(?<![0-9])" + re.escape(tok) + r"(?![0-9])", blob) is not None
+
+
 def main() -> int:
     if not STATUS.exists():
         print(f"verify-reason-numerals: missing {STATUS}", file=sys.stderr)
@@ -71,7 +87,7 @@ def main() -> int:
         blob = p.read_text(errors="replace")
         for t in toks:
             checked += 1
-            if not any(v in blob for v in variants(t)):
+            if not any(opens(v, blob) for v in variants(t)):
                 unsupported.append((cand, receipt, t, reason))
 
     print("REASON NUMERALS vs CITED RECEIPTS")

@@ -8,7 +8,10 @@
                                                                     real, not aspirational)
   ARM 5  single digits ignored (4of5, T1)                -> rc=0   (a detector that fires on every
                                                                     row discriminates nothing)
-  ARM 6  absent receipt reported ONCE, not per numeral   -> rc=12  (lane-status owns absence)
+  ARM 7  prefix of a longer number is NOT a match        -> rc=12  (0.0447 vs 0.044756498 — the
+                                                                    gate got this WRONG on first use)
+  ARM 8  3.5 does not open against 3.53                  -> rc=12  (same class, second real case)
+  ARM 9  absent receipt reported ONCE, not per numeral   -> rc=12  (lane-status owns absence)
 
 ARM 4 exists because the docstring CLAIMS rounding is not folded. A documented limitation with no
 arm is a promise, and this lane has caught itself shipping those: a witness that passes by
@@ -77,12 +80,22 @@ def main() -> int:
     arm("ARM 5 single digits ignored", 0, rel, "no-jev-stage-4of5-T1-T2",
         json.dumps({"unrelated": True}))
 
+    # ARM 7/8 — A SUBSTRING IS NOT AN OPENING. Both are real cases this gate got WRONG on its first
+    # live use: `0.0447` matched `0.044756498000000006` (a per-turn DOLLAR amount, not the cited
+    # percentage) and `3.5` matched `3.53`. A coincidental prefix of a different quantity was being
+    # accepted as the control — a predicate satisfiable by unrelated text, which is the exact defect
+    # class this gate exists to catch, committed inside it.
+    arm("ARM 7 prefix of a longer number is NOT a match", 12, rel, "lift-0.0447pct",
+        json.dumps({"actualSpend": 0.044756498000000006}), want_text="UNOPENABLE")
+    arm("ARM 8 3.5 does not open against 3.53", 12, rel, "repriced-3.5pt",
+        json.dumps({"delta": 3.53}), want_text="UNOPENABLE")
+
     rc, out = run(tmp, rel, "died-0.047pct-and-283786-KLOC", None)
     hits = out.count("UNOPENABLE arm-candidate")
     if rc == 12 and hits == 1 and "<receipt absent>" in out:
-        print(f"PASS  {'ARM 6 absent receipt reported once':<52} rc=12 one row, not per-numeral")
+        print(f"PASS  {'ARM 9 absent receipt reported once':<52} rc=12 one row, not per-numeral")
     else:
-        print(f"FAIL  {'ARM 6 absent receipt reported once':<52} rc={rc} hits={hits}")
+        print(f"FAIL  {'ARM 9 absent receipt reported once':<52} rc={rc} hits={hits}")
         fail += 1
 
     print("\n" + "-" * 70)
@@ -90,7 +103,7 @@ def main() -> int:
     if fail:
         print(f"FAIL: {fail} arm(s) did not discriminate.")
         return 1
-    print("OK: reason-numeral gate discriminates on all 6 arms; real STATUS never written.")
+    print("OK: reason-numeral gate discriminates on all 9 arms; real STATUS never written.")
     return 0
 
 

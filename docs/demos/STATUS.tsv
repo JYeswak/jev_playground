@@ -4,7 +4,7 @@
 #	verdict values: CLEARED HELD RULED_OUT UNASKABLE PROMOTED RECUSED
 #	author: which pane authored it; a score from its author is NOT a rung-1 score
 candidate	rung	score	verdict	author	receipt	blocked_on
-demo-1-route-backtest	4	520	RULED_OUT	pane2	demos/routing-backtest/runs/backtest-real-excerpt.json	none-died-rung4-0.047pct	none	474c78cab6e6984a	measurement
+demo-1-route-backtest	4	520	RULED_OUT	pane2	demos/routing-backtest/runs/backtest-20260918T020440Z.json	none-died-rung4-0.0447pct	none	25581b15c0f20489	measurement
 demo-2-admission-screen	2	700	CLEARED	pane3	docs/demos/duel-2/HELD_demo2_demand_COD.md	demand-RECOVERED-joergmichno-mcp-toolbox-2844-named-engineer-replaces-README-narrative-score-unchanged		55e4459416af0335	hold-resolution
 demo-3-claim-check-gate	2	430	HELD	pane1	docs/demos/duel-2/BASELINE_claimcheck_vs_jev_COD.md	rung3-headtohead-designed-ship-at-30pt-lift		0b8d197635f1e03f	other
 demo-4-foreman-lite	2	820	HELD	pane3	docs/demos/duel-2/SUPERSESSION_MU_argues_COD-H1.md	WITHDRAWN-standalone-retained-as-integration-of-COD-H1		d7b2a31eaa5bf33e	verdict
