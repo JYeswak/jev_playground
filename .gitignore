@@ -31,6 +31,10 @@
 !/.beads/
 !/docs-mirror/
 !/upstream/
+# The README-NOTES sidecar is TRACKED ON PURPOSE (skill://readme-update). An untracked note is
+# unreproducible: a fresh clone cannot see it, so an undrained fact would be invisible to the next
+# agent exactly when it matters. Its job is to be a log that gets emptied into README.md as state.
+!/README-NOTES.md
 
 # ---------------------------------------------------------------------------
 # docs-mirror/ and upstream/: PROVENANCE is committed, BYTES are not.
