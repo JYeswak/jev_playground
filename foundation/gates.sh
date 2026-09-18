@@ -3,7 +3,13 @@
 # foundation/gates.d/, one line per stage, nonzero exit on any RED.
 # Usage: ./gates.sh [--selftest]   (--selftest runs each stage's planted-bad
 # check instead: every stage must prove it can go RED, or the gate is decoration.)
-set -u
+set -uo pipefail
+# `pipefail` added 2026-09-18 on pane 3's hardening plan (db97021), which graded all six of
+# these SAFE-TO-HARDEN and behaviour-neutral TODAY. Its qualifier is the load-bearing half and
+# is reproduced here rather than left in a receipt: neutrality holds ONLY because this file does
+# not `set -e`. IF `set -e` IS EVER ADDED, RE-AUDIT — pipefail+errexit aborts on a middle-stage
+# failure, and every pipe then existing needs explicit handling (see 30-no-secrets.sh:21, whose
+# `grep … | head` is the feared shape and is already neutralised with `|| true`).
 here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 mode=${1:-run}
 rc=0

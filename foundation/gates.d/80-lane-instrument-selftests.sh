@@ -32,14 +32,30 @@ root="$(cd "$here/../.." && pwd)"
 rc=0
 
 if [ "${1:-}" = '--selftest' ]; then
-  # The stage's own known-bad: a missing suite must be a RED, not a silent skip. That is the masking
-  # class this lane keeps finding (an elif chain, a `continue` on a short row), so the stage refuses
-  # to pass when a suite it names is absent.
+  # ARM 1 — a missing suite must be a RED, not a silent skip. That is the masking class this lane
+  # keeps finding (an elif chain, a `continue` on a short row), so the stage refuses to pass when a
+  # suite it names is absent.
   out=$(JEV_SELFTEST_FAKE_MISSING=1 "$0" 2>&1) && {
     echo "80-lane-instrument-selftests --selftest: FAILED — a missing suite did not RED"; exit 1; }
   printf '%s\n' "$out" | grep -q 'ABSENT' || {
     echo "80-lane-instrument-selftests --selftest: FAILED — no ABSENT line for the missing suite"; exit 1; }
-  echo "80-lane-instrument-selftests --selftest: OK (missing suite REDs and is named)"
+
+  # ARM 2 — a suite that is PRESENT but has lost its +x bit must RED as UNEXEC, not as ABSENT.
+  # Pane 3's Q95 found the old single `[ ! -x ]` branch reported both identically, and its own
+  # recommendation carried back the SLB precedent: the arm runs on a TEMP COPY and NEVER chmods a real
+  # script. Absence covered by ARM 1; this is the branch ARM 1 could not reach.
+  tmp=$(mktemp -d) || { echo "80-lane-instrument-selftests --selftest: FAILED — mktemp"; exit 1; }
+  cp "$root/scripts/selftest-other-reasons.sh" "$tmp/mode-dropped.sh" 2>/dev/null || {
+    echo "80-lane-instrument-selftests --selftest: FAILED — could not copy a suite to $tmp"; exit 1; }
+  chmod -x "$tmp/mode-dropped.sh"
+  out2=$(JEV_SELFTEST_EXTRA_SUITE="$tmp/mode-dropped.sh" "$0" 2>&1) && {
+    echo "80-lane-instrument-selftests --selftest: FAILED — a mode-dropped suite did not RED"; exit 1; }
+  printf '%s\n' "$out2" | grep -q 'UNEXEC' || {
+    echo "80-lane-instrument-selftests --selftest: FAILED — mode-dropped suite not named UNEXEC"; exit 1; }
+  printf '%s\n' "$out2" | grep -q 'ABSENT.*mode-dropped' && {
+    echo "80-lane-instrument-selftests --selftest: FAILED — mode drop reported as ABSENT (the conflation)"; exit 1; }
+
+  echo "80-lane-instrument-selftests --selftest: OK (2 arms: missing REDs as ABSENT, mode-dropped REDs as UNEXEC)"
   exit 0
 fi
 
@@ -56,15 +72,30 @@ for p in "$root"/scripts/selftest-*.sh; do
   suites+=("scripts/$(basename "$p")")
 done
 [ -n "${JEV_SELFTEST_FAKE_MISSING:-}" ] && suites+=("scripts/selftest-does-not-exist.sh")
+# Accepts an ABSOLUTE path so the mode-drop arm can point at a temp COPY. Pane 3's Q95 recommendation
+# carried my own SLB lesson back at me: "never the real scripts, per the SLB refusal precedent. Do not
+# chmod real scripts to test this."
+[ -n "${JEV_SELFTEST_EXTRA_SUITE:-}" ] && suites+=("$JEV_SELFTEST_EXTRA_SUITE")
 if [ "${#suites[@]}" -eq 0 ]; then
   echo "  ERROR   scripts/selftest-*.sh matched nothing — an empty scan set is NOT a pass (RULE 1)"
   exit 3
 fi
 
 for s in "${suites[@]}"; do
-  p="$root/$s"
+  case "$s" in /*) p="$s" ;; *) p="$root/$s" ;; esac
+  # ABSENT and UNEXECUTABLE are SPLIT — pane 3, stage80-x-conflation-20260918T114656Z.json (9b9c639),
+  # verdict SPLIT_WORTH_IT: "the conflation hides cause while the stage's job is to name what is
+  # wrong." A suite that exists but lost its +x bit (fresh clone without exec bits, partial checkout,
+  # a copy tool dropping the mode) reported IDENTICALLY to one that never landed. It also answered the
+  # objection I raised — `git checkout -- <path>` repairs both, since git tracks content AND mode — and
+  # kept the split anyway for diagnosis speed: absent is a SUPPLY problem, unexecutable is a MODE one.
+  if [ ! -e "$p" ]; then
+    echo "  ABSENT  $s — named by this stage and not on disk; restore it (git checkout -- $s) or remove it from the suite list"
+    rc=1
+    continue
+  fi
   if [ ! -x "$p" ]; then
-    echo "  ABSENT  $s — named by this stage and not executable on disk"
+    echo "  UNEXEC  $s — on disk but mode dropped; chmod +x $s or git checkout -- $s (mode is tracked) to restore"
     rc=1
     continue
   fi
