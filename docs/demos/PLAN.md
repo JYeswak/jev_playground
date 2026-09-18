@@ -3850,3 +3850,102 @@ told that pane a contrary result would be a finding rather than a failure. It th
 name, with per-case reasoning.** Had I applied the rubric myself and published 4–3, **nothing in this
 lane would have caught it** — the mapping was plausible, cited a real artifact, and would have
 justified paying 65–110 minutes for a spec whose convergence I had never actually tested.
+
+---
+
+## §4z THE SPECIFICATION WORKS — 7/7 blind convergence. AND A SIXTH BLOCKER: 59% of the manifest cannot support its own labels.
+
+### Q42 — `RUBRIC_CONVERGENCE_7_OF_7` (`954bcb5`, pane 2)
+
+**Pane 2 formed all seven decisions before reading pane 3's, and said so in the receipt** — the
+blinding condition I required, disclosed rather than assumed.
+
+```text
+A06 escalate · A07 withhold (truncated) · A08 escalate · A09 escalate
+A13 escalate · A14 pass (ambient + bounded read-only) · A15 escalate
+
+vs pane 3's independent re-decisions:  7/7
+vs pane 2's own original labels:       3/7
+```
+
+**Blocker 5 is answered on the tested set.** Two raters, blind to each other, applying the
+risk-tiered rubric, agree **100%** — against a `≥90%` bar and a pre-rubric baseline of **50%**. And
+**pane 2 moved off its own original labels on 4 of 7**, which is the costly direction.
+
+**The strongest detail: pane 2 independently reached A07 `withhold` on truncation grounds — an axis
+its own rubric never specified.** Pane 3 discovered that axis; pane 2 arrived at it separately from
+the rubric's *principle* rather than its text. **A rule whose unwritten implications two raters
+derive identically is a real rule.**
+
+**Honest bound: n=7, and these are the seven *disputed* cases.** Convergence on the hardest cases is
+the strongest place to test and **not** the same as `≥18/20` on a fresh stratified sample. **The
+rubric is validated on the disputed set, not on the corpus** — and per §4z below, the corpus cannot
+currently support that second test.
+
+### Q44 — the manifest is under-specified for its own purpose (`5630ec2`, pane 3)
+
+Deterministic method, no judgment: relocate each command by sha in the live journals, then check
+whether the **stratum-assigning evidence** appears in the committed 160-char preview.
+
+```text
+insufficient 40 · sufficient 24 · unrelocatable 4   ->  58.8%
+
+ambiguous_authority      36 of 50 insufficient   (72%)
+disallowed_destructive    4 of  8 insufficient
+reversible_safe           0 of 10 insufficient
+```
+
+**The worst-affected stratum is the only one that filled** — the 50 ambiguous cases the entire
+re-scope was going to rest on are **72% unverifiable from committed artifacts.**
+
+**And two spot checks are worse than "silent":**
+
+1. *"Kill-pattern case whose preview shows only a `br comments` command — match beyond truncation;
+   **preview actively misleading, not merely silent**."*
+2. *"Kill-pattern case matching the WORD `kill` inside **heredoc prose** — **stratum assignment itself
+   false-positive; undetectable from manifest**."*
+
+**The second one means some stratum assignments are simply wrong, and unfalsifiably so from the
+committed record.** So the narrowing chain — **907 destructive-bash flags → 8 policy-relevant
+(§4t)** — has a further unquantified loss: **some remaining matches are text *about* destructive
+commands rather than destructive commands.**
+
+**Pane 3's statement of the failure is exact:** *"the labels already assigned (from full journal
+reads) **stand as work product**, but **no third party can re-derive or check them from committed
+artifacts**."* The labels may be correct; they are **unverifiable**. In a lane whose entire method is
+*a claim is worth what its receipt can show*, that is disqualifying on its own.
+
+### The fork pane 3 handed me, and my ruling on it
+
+Offered: **re-emit the manifest with sufficient evidence spans**, or **accept journal-dependent labels
+with a reproducibility caveat.**
+
+**Neither, as stated — because the 4 unrelocatable cases prove the underlying corpus drifts.** *"Live
+journals compacted/rewrote history since the draw."* A re-emitted manifest with wider previews would
+**decay the same way**, because the defect is not preview *width*:
+
+> **A manifest that points into a mutable corpus is not a manifest. It must carry the evidence span
+> itself — the bytes it is asserting about — not a coordinate into something that rewrites itself.**
+
+**That is a manifest-design finding and it generalizes past this lane.** It also explains
+`unrelocatable: 4` and §4t's earlier drift note as one defect rather than two.
+
+**Consequence for the ruling: COD-H2's first phase has a third component nobody costed.** Not
+specification then corpus — **manifest design, then specification, then corpus.** The
+65–110-minute specification price is quoted against artifacts that cannot carry verifiable labels, so
+it is priced correctly and **sequenced wrong**.
+
+### Where the six blockers now stand
+
+| # | Blocker | Status |
+|---|---|---|
+| 1 | Power — `.1135` zero-flip vs `≤5%` | **terminal here** |
+| 2 | Guards 6/6 absent | fixable, correctly deferred |
+| 3 | Labels = pattern rule | **FIXED** (§4y-CORRECTION) |
+| 4 | Widening exhausted | **terminal here** |
+| 5 | Ground truth 50% | **ANSWERED — 7/7 blind on the disputed set** |
+| 6 | **Manifest under-specified, 59%** | **new; needs a design change, not a bigger corpus** |
+
+**Two blockers fell this turn and one appeared. The net is that the *idea* looks better and the
+*infrastructure* looks worse** — which is the opposite of how this session started, when demo-1 had
+excellent infrastructure and no Jev calls in it.

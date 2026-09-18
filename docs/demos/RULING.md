@@ -198,3 +198,41 @@ central rule while claiming to apply it** (§4y-CORRECTION).
 **COD-H2's ruling is unchanged in substance: viable as a project, specification first, rung 4
 unrunnable in this lane.** What changed is that **the specification's convergence is now an open
 question rather than a solved one**, and the 65–110-minute price buys an attempt, not an outcome.
+
+---
+
+## UPDATE 2 (appended 2026-09-18, after `954bcb5` + `5630ec2`) — the specification works; the artifacts do not
+
+**Two results landed together and they point opposite ways.**
+
+**The specification converges.** Both panes re-decided the 7 disputed cases independently under the
+risk-tiered rubric — pane 2 stating it formed its answers **before** reading pane 3's — and reached
+**7/7 agreement**, against a `≥90%` bar and a pre-rubric baseline of **50%**. Pane 2 moved off **4 of
+its own 7 original labels.** Both independently reached a `withhold`-on-truncated-evidence axis **the
+rubric never specified**. **Blocker 5 is answered on the disputed set** (n=7; not yet `≥18/20` on a
+fresh stratified sample).
+
+**The artifacts cannot carry it.** **59% of the 68 committed cases (40 of 68) do not contain the
+stratum-assigning evidence in their preview** — and the worst-affected stratum is **the only one that
+filled**: `ambiguous_authority` at **36 of 50 (72%)**. Two spot checks are worse than silence: one
+preview is *"actively misleading, not merely silent"*, and one stratum assignment is a **false
+positive on the word `kill` inside heredoc prose — undetectable from the manifest.** Plus **4 cases
+no longer relocate at all**, because the live journals rewrote history since the draw.
+
+> **The labels may be correct. They are unverifiable.** *"No third party can re-derive or check them
+> from committed artifacts."* In a lane whose method is *a claim is worth what its receipt can show*,
+> that is disqualifying by itself.
+
+**Ruling on the fix:** not wider previews. **A manifest that points into a mutable corpus is not a
+manifest — it must carry the evidence span itself, not a coordinate into something that rewrites
+itself.**
+
+**So COD-H2's first phase has a third component, and the order changes:**
+
+> **manifest design → specification → corpus.**
+
+The 65–110-minute specification price is **priced correctly and sequenced wrong**: it buys a rubric
+that demonstrably converges, applied to artifacts that cannot evidence the result.
+
+**Net: the idea looks better and the infrastructure looks worse** — the inverse of how this session
+opened, when demo-1 had excellent infrastructure with no Jev calls inside it.
