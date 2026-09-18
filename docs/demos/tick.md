@@ -111,6 +111,15 @@ Carry: bead id · sha · **NEXT** (the unit the pane is *starting*, never what i
   uncommitted append gets swept by another pane's commit. Append stages; push delivers.
 - **Acceptance criteria, never "make it pass."** Positive observable + planted negative + NO-CLAIM.
   Name `DEFER` / `BLOCKED` / `REFUSE` as real outcomes explicitly.
+- **A TEST FILE AND ITS `TESTS.md` ENTRY LAND IN THE SAME COMMIT.** Measured 2026-09-18: stage 70
+  `tests-registry-sync` went RED **five separate times in one day**, always the same shape — a test
+  file committed, its registry entry not. Once each for `hostile-input.test.mjs`,
+  `whatif.test.mjs`, `shape-bin.test.mjs`, `ab-verdict.test.ts`, and one earlier. Different panes,
+  same omission, and the fifth one blocked a P0 publish bead. The gate caught every one, which is
+  the gate working; **five conductor repairs of one class means the rule was missing, not the
+  entries.** Derive the entry's facts by running the file alone — a per-file count, and the test
+  names read out of the source — never from a callback's summary, which reported 21 tests for a file
+  that has 6.
 - **A pane's report is a claim, not evidence.** Re-execute cited commands; read diffs for touched
   test/gate code, new fixtures standing in for live proof, and regenerated goldens.
 - **Throttled panes get smaller units** and explicit permission to split. A partial with a receipt
