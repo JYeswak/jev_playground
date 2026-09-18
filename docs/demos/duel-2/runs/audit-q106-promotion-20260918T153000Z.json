@@ -1,0 +1,34 @@
+{
+  "schema": "jev.q106.promotion-rerule.v1",
+  "generated_at": "2026-09-18T15:30:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author promotion rerule",
+  "implementation": "fa620d8",
+  "preconditions": {
+    "copy_snapshot": {
+      "status": "MET_WITH_DECLARED_LINK_POLICY",
+      "evidence": "Outward symlink and symlinked parent attacks reject rc13; in-root symlink is disclosed; hardlink is accepted and disclosed via nlink."
+    },
+    "revision_hash_pair": {
+      "status": "MET",
+      "evidence": "Manifest binds HEAD role, verifier input, raw pre/post/copy hashes, normalized hashes, realpath/symlink metadata, and self-digest."
+    },
+    "copy_based_arms": {
+      "status": "MET_WITH_EXPLICIT_HARDLINK_POLICY",
+      "evidence": "Arms 12-17 cover outward symlink, forced provenance, predicate correction, parent symlink, hardlink disclosure, and in-root symlink disclosure; prior arms remain present."
+    },
+    "verifier_transient_unstable": {
+      "status": "MET",
+      "evidence": "Verifier-owned bounded capture, rc10/no-verdict, forced-dirty refusal, and saved movement provenance."
+    }
+  },
+  "remaining_scope": {
+    "hardlinks": "Accepted as in-root byte identity, disclosed via nlink; not treated as a containment escape.",
+    "symlinked_parent": "Rejected at rc13.",
+    "in_root_symlink": "Allowed but disclosed with source_realpath/is_symlink; this is a declared policy choice, not hidden equivalence.",
+    "source_head": "Provenance only, not verdict input; verifier identity and file hashes remain binding."
+  },
+  "promotion": "QUALIFIES_FOR_PROMOTION_REVIEW",
+  "promotion_boundary": "The four Q97 conditions are met for the declared link policy. Promotion still means foundation-stage review, not commit-hook wiring; the implementation must retain the 14-arm selftest and the explicit hardlink/in-root-symlink semantics.",
+  "no_claim": "No claim that hardlinks are rejected, no claim that an in-root symlink is equivalent to a regular file, and no commit-hook promotion."
+}

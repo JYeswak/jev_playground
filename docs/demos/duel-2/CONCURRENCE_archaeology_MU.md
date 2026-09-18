@@ -12,9 +12,9 @@ own candidate is fine; a conductor killing another pane's candidate needs non-au
 
 ## Row 1 — demo-1-route-backtest (author pane2 per STATUS; nuance below)
 
-- **Grounds:** rung-4 measured lift 0.047% ($0.0034228 on 30 real turns) + zero Jev calls behind a
+- **Grounds:** rung-4 measured lift 0.0447% ($0.0034228 on 30 real turns; `0.0034228/7.658096908`, counterfactual-spend basis) + zero Jev calls behind a
   hand-written token heuristic.
-- **Kill receipt:** `demos/routing-backtest/runs/backtest-real-excerpt.json` (the 0.047% measurement;
+- **Kill receipt:** `demos/routing-backtest/runs/backtest-20260918T020440Z.json` (the 0.0447% measurement;
   receipt carries no actor/verdict keys — it is a measurement, not a kill decision).
 - **Killer:** diffuse — no single kill decision on record. Measurement (backtest runs under
   `jev-demo-loop-a1q`) + zero-Jev code finding ("found in code by a non-author", PLAN §5.1) recorded

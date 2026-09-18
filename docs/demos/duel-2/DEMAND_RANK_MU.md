@@ -147,7 +147,7 @@ Exemplary install story.
 market is saturated and measured: LiteLLM/RouteLLM/Martian open source,
 NotDiamond powering OpenRouter's auto router with a cost/quality dial,
 a 400K-instance ACL benchmark (LLMRouterBench), vendors claiming
-60–90% cuts. And our own measured result is **0.047%** — the demo's
+60–90% cuts. And our own measured result is **0.0447%** — the demo's
 honest product is evidence that *on our turns, routing barely pays*.
 A backtest harness others run on their own logs has some value, but it
 competes with an entire measured industry plus the finding that the

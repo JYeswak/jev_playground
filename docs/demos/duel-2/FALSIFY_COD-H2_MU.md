@@ -41,7 +41,7 @@ space: the addressable surface is a rounding error, and H2's buyer
 ("owner of an agent that mutates durable state") describes almost
 nobody's typical traffic. HELD — the honest smaller product is
 per-action confirm prompts, not a judgment gate, and that product needs
-no Jev call at all. This is Demo-1's 0.047% lesson applied before the
+no Jev call at all. This is Demo-1's 0.0447% lesson applied before the
 build instead of after it.
 
 ### Half 2 (labelled, only if Half 1 clears): policy-table equivalence
