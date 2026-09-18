@@ -1,0 +1,97 @@
+{
+  "schema": "jev.retransmit-whatif.receipt.v1",
+  "generated_at": "2026-09-18T15:03:57.720Z",
+  "inputs": [
+    {
+      "path": "fixtures/known-shape.jsonl",
+      "sha256": "7ee5f1001890f8fa195a0270d0b59e9c080cc890d9c4350ad8564f39bda395bc"
+    }
+  ],
+  "denominator": {
+    "files": 1,
+    "sessions": 1,
+    "assistantTurns": 2,
+    "turnsWithUsage": 2,
+    "turnsWithoutUsage": 0,
+    "nonTurnRecords": 1
+  },
+  "observedModels": [
+    "model-a"
+  ],
+  "accounting": {
+    "unit": "tokens",
+    "billedTotal": "input + cacheRead + cacheWrite + output",
+    "assumption": "a reduction removes cacheRead * reduction from each usage-bearing turn; all other fields, turns, model behavior, retrieval quality, and tool behavior remain unchanged",
+    "notModeled": [
+      "quality preservation",
+      "retrieval recall",
+      "top_k effects",
+      "turn elimination overhead"
+    ]
+  },
+  "levers": {
+    "aggregate": [
+      {
+        "lever": "total",
+        "tokens": 1450,
+        "share": 0.5
+      },
+      {
+        "lever": "cacheRead",
+        "tokens": 1000,
+        "share": 0.3448275862068966
+      },
+      {
+        "lever": "input",
+        "tokens": 300,
+        "share": 0.10344827586206896
+      },
+      {
+        "lever": "output",
+        "tokens": 100,
+        "share": 0.034482758620689655
+      },
+      {
+        "lever": "cacheWrite",
+        "tokens": 50,
+        "share": 0.017241379310344827
+      }
+    ],
+    "perSession": [
+      {
+        "source": "fixtures/known-shape.jsonl",
+        "sessionId": "known-shape",
+        "turns": 2,
+        "levers": [
+          {
+            "lever": "total",
+            "tokens": 1450,
+            "share": 0.5
+          },
+          {
+            "lever": "cacheRead",
+            "tokens": 1000,
+            "share": 0.3448275862068966
+          },
+          {
+            "lever": "input",
+            "tokens": 300,
+            "share": 0.10344827586206896
+          },
+          {
+            "lever": "output",
+            "tokens": 100,
+            "share": 0.034482758620689655
+          },
+          {
+            "lever": "cacheWrite",
+            "tokens": 50,
+            "share": 0.017241379310344827
+          }
+        ]
+      }
+    ],
+    "turnsFile": "runs/known-shape.json.turns.ndjson"
+  },
+  "failures": []
+}

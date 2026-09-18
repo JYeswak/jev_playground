@@ -14,7 +14,7 @@ export function measureTurn(turn, reduction = null) {
   const output = Number(turn.output);
   const total = cacheRead + cacheWrite + input + output;
   const saved = reduction === null ? 0 : cacheRead * reduction;
-  return { cacheRead, cacheWrite, input, output, total, reduction, saved, remaining: total - saved };
+  return { cacheRead, cacheWrite, input, output, total, unreconciled: 0, reduction, saved, remaining: total - saved };
 }
 
 export function aggregate(turns) {
@@ -24,7 +24,8 @@ export function aggregate(turns) {
     input: sum.input + turn.input,
     output: sum.output + turn.output,
     total: sum.total + turn.total,
-  }), { cacheRead: 0, cacheWrite: 0, input: 0, output: 0, total: 0 });
+    unreconciled: sum.unreconciled + (turn.unreconciled ?? 0),
+  }), { cacheRead: 0, cacheWrite: 0, input: 0, output: 0, total: 0, unreconciled: 0 });
 }
 
 export function shares(values) {

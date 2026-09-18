@@ -2,7 +2,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readUsageFiles } from '../src/reader.mjs';
 import { aggregate, measureTurn, shares } from '../src/whatif-core.mjs';
-
 const fixture = new URL('../fixtures/known-shape.jsonl', import.meta.url).pathname;
 
 test('known shape recovers all four token fields and denominator', async () => {
@@ -11,7 +10,7 @@ test('known shape recovers all four token fields and denominator', async () => {
   assert.equal(result.denominator.turnsWithUsage, 2);
   assert.equal(result.denominator.nonTurnRecords, 1);
   const total = aggregate(result.sessions[0].turns);
-  assert.deepEqual(total, { cacheRead: 1000, cacheWrite: 50, input: 300, output: 100, total: 1450 });
+  assert.deepEqual(total, { cacheRead: 1000, cacheWrite: 50, input: 300, output: 100, total: 1450, unreconciled: 0 });
   assert.equal(measureTurn(result.sessions[0].turns[0], 0.5).saved, 450);
   assert.equal(shares(total).cacheRead, 1000 / 1450);
 });
