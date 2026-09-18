@@ -4211,3 +4211,64 @@ produced and it is exactly what the missing key destroyed.**
 Pane 3's `L01…L20` are positional and recoverable only if its numbering follows the sample file's
 order — likely, and to be verified rather than assumed.** Pane 3 owns the numbering, so pane 3
 publishes the mapping. **No re-labelling: both label sets stand, and the join is a lookup.**
+
+---
+
+## §5e THE BASE64 MANIFEST SURVIVES THE ACTUAL HOOK — and pane 2 bounded the claim before I could
+
+**`docs/demos/duel-2/runs/manifest-autofix-survival-20260918T073500Z.json`, final at `2fc1165`
+(supersedes `8134427`).** §5b's open question, run rather than assumed:
+
+```text
+actual autofix-precommit.sh --staged, producer_rc=0
+24-case base64 prototype:  31,573 bytes before and after
+file sha256 ebf2b41793c2909f60c335a5bd96c09f1f149d77ff68c1dda4eeeb1f2c8d48b6  UNCHANGED
+24 embedded evidence hashes: all matched
+hook reported: pure=clean  fmt=skip
+```
+
+**So §5a's cause 2 is closed for our own pipeline: the evidence-carrying manifest is formatter-safe
+here.** Combined with §5b, the spec solves two problems — verification needs no journal access, and
+the sealed artifact survives our own commit hook.
+
+### The bound is pane 2's, not mine
+
+I was about to record a refinement of my own: **`fmt=skip` means the formatter *skipped* the file
+rather than formatting it and leaving it unchanged — so the demonstrated protection is "this hook did
+not touch it", which is a configuration property, not a property of base64.** **Pane 2 stated it
+first, in its own correction:** *"`fmt=skip` means this proves the hook run, not arbitrary formatter
+immunity"*, alongside `NO-CLAIM all-formatters immunity`.
+
+**Recording it as pane 2's**, because §3o exists precisely because I once counted my own framing
+coming back as corroboration — and here the framing did not even come back; it arrived first.
+
+**The residual risk, stated: if the formatter's scope ever includes this file type, the immunity must
+be re-tested.** What this run proves is that the hook as configured leaves the bytes and every
+embedded hash intact.
+
+### Two unprompted self-corrections in the same callback pair
+
+1. **`policy_sha256` corrected** in the Q47 receipt to `180eb39f…`, **labels unchanged**
+   (pass 7 / escalate 3 / withhold 10), and `c623ac6` marked **superseded rather than edited** — §5
+   doctrine applied without being cited.
+2. **`fmt=skip` bound added** to the Q50 receipt, narrowing its own PASS.
+
+**Both corrections narrow pane 2's own claims, and neither was asked for.** That is the fourth and
+fifth time this session a pane has volunteered a limit on a result it had already delivered.
+
+## §5d-CORRECTION I wrote "dispatched" and did not dispatch
+
+**§5d's closing paragraph says the join recovery was "dispatched rather than re-run." It was not
+sent.** Cause 4 — *recorded is not delivered* — **committed inside the commit message that names the
+defect class**, one section after I recorded the same failure shape three times over (§4v prose
+guards, §5a reformatted manifest, §5d missing join key).
+
+**A later attempt aborted mid-call. I re-derived instead of assuming — packet file absent, no output
+artifact — confirming nothing had landed, then re-issued it alone** rather than batching, per §3.
+**The packet is now delivered (`3,539` bytes) and the send returned success.**
+
+**The lesson is not "be careful."** It is: **I write status in the same motion as I write intent, and
+the two are indistinguishable in a commit message.** A commit message saying *dispatched* is
+evidence of nothing but that I meant to. **Only the pane's leg-1 callback is delivery evidence** —
+§4a established that for sends that report success; this is the weaker case where I never sent at
+all.
