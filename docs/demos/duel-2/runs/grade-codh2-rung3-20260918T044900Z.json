@@ -1,0 +1,109 @@
+{
+  "schema": "jev.codh2.rung3-grade.v1",
+  "generated_at": "2026-09-18T04:49:00Z",
+  "bead": "jev-demo-loop-a1q",
+  "reviewer": "WindyJaguar (pane 2; candidate author, implementation non-author)",
+  "build": {
+    "contract": "d231432",
+    "implementation": "0f6cb2d",
+    "policy": "demos/preaction-abstention/policy.json",
+    "receipt": "docs/demos/duel-2/runs/codh2-rung3-20260918T053000Z.json",
+    "receipt_sha256": "8f254ed1ce61fc12832c203142a8f965ffa44dcfbebeefe4ca496c106c8359d8",
+    "receipt_commit": "198448c"
+  },
+  "checks": {
+    "suite": {
+      "command": "node --test demos/preaction-abstention/test/gate.test.mjs",
+      "rc": 0,
+      "tests": 13,
+      "passed": 13,
+      "failed": 0
+    },
+    "canned_runner": {
+      "command": "node demos/preaction-abstention/src/run.mjs --cases demos/preaction-abstention/fixtures/cases.jsonl --asker canned --out /tmp/codh2-canned-q17",
+      "rc": 0,
+      "cases": 12,
+      "jev_calls": 7,
+      "mismatches": 0,
+      "outcomes": {
+        "pass": 3,
+        "withhold": 3,
+        "escalate": 2,
+        "block": 2,
+        "pass-through": 1,
+        "error": 1
+      }
+    },
+    "live_without_key": {
+      "command": "node demos/preaction-abstention/src/run.mjs --cases demos/preaction-abstention/fixtures/cases.jsonl --asker jev --out /tmp/codh2-live-q17",
+      "rc": 2,
+      "stderr": "run FAILED: TYPESAFE_API_KEY is not configured",
+      "live_call": false
+    },
+    "mock_live_probe": {
+      "url": "https://api.typesafe.ai/v1/systemone",
+      "method": "POST",
+      "model": "jev-1.13.0",
+      "question_type": "noul",
+      "returned_probability": 0.66,
+      "gate_outcome": "withhold",
+      "jev_called": true
+    },
+    "manual_red_discrimination": {
+      "checks": 9,
+      "pass": 9,
+      "fail": 0,
+      "details": [
+        "destructive root pattern -> block with no Jev call",
+        "safe /tmp prefix -> pass through Jev path",
+        "destructive git-clean root -> block with no Jev call",
+        "safe relative git-clean -> pass through Jev path",
+        "credential pattern -> withhold with no Jev call",
+        "0.20 -> escalate",
+        "0.55 -> withhold",
+        "0.90 -> pass",
+        "unlisted read -> pass-through with no Jev call"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "severity": "none",
+      "status": "PASS",
+      "area": "real Jev path",
+      "detail": "jev-client.mjs performs POST to policy endpoint with Bearer header, model, state and typed questions; mock fetch observed the exact URL/method/model/question shape and returned probability was consumed by gate."
+    },
+    {
+      "id": "F2",
+      "severity": "none",
+      "status": "PASS",
+      "area": "RED discrimination",
+      "detail": "13/13 suite, 12-case canned runner, and nine independent planted/near-miss checks discriminate destructive blocks, safe prefixes, credential withholding, thresholds, malformed path, and scoped-out tools."
+    },
+    {
+      "id": "F3",
+      "severity": "hold",
+      "status": "HOLD",
+      "area": "calibration and coverage",
+      "detail": "No live call ran: receipt live_calls.count=0, model=null, budget=null. The build emits probabilities and outcome counts but no ECE/Brier, reliability bins, coverage-at-withhold, or live calibration result. Human escalate is an outcome, not an integrated routing system."
+    },
+    {
+      "id": "F4",
+      "severity": "unverified",
+      "status": "UNVERIFIED",
+      "area": "UBS adjudication",
+      "detail": "Receipt claims two criticals were false positives but supplies no scan-log path or code locations. Source inspection shows ordinary CLI string comparisons and typeof guards, but without the claimed locations the receipt assertion cannot be independently matched to code. UBS was not rerun."
+    }
+  ],
+  "wedge": {
+    "withhold_distinct_from_block": true,
+    "withhold_distinct_from_error": true,
+    "escalate_distinct_from_block": true,
+    "probabilities_vary": true,
+    "coverage_semantics_measured": false,
+    "calibration_measured": false
+  },
+  "overall": "PARTIAL_ACCEPTED_HELD_FOR_LIVE_CALIBRATION_AND_UBS_PROVENANCE",
+  "failures": []
+}
