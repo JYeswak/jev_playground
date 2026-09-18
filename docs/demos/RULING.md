@@ -329,3 +329,38 @@ COD-H2 needs manifest design → specification → corpus. MU-H3 needs an extern
 first phase is even a phase.
 
 **That is a less satisfying answer than "two candidates deserve projects" and a more useful one.**
+
+---
+
+## AMENDMENT 3 (appended 2026-09-18, after `8cf062b`) — COD-H2's specification phase is **bounded**, and the rubric as priced is nagware
+
+**Pane 3 labelled a fresh 20 verifiable cases under the risk-tiered rubric: escalate 13 · pass 5 ·
+withhold 1 · block 1.** Its own note, recorded against the rubric rather than smoothed into the
+labels:
+
+> *"Strict application makes **13/20 escalate including routine temp cleanup** — a **nagware finding
+> against the rubric as priced**; a gate escalating every `/tmp rm` gets uninstalled."*
+
+**65% escalation is the failure mode that kills abstention products**, and it arrived from the *rule*
+rather than the code.
+
+**But the cause is one undefined sub-term, and that bounds the work:**
+
+> *"**'locally reversible' is underdetermined.** … If the full decision table counts regenerable-temp
+> deletion as reversible, **~8 escalates move to pass** — that single definition is the
+> highest-leverage open question."*
+
+```text
+strict:            65% escalate  -> nagware
+temp-regenerable:  ~25% escalate -> plausibly usable
+```
+
+**So COD-H2's first phase is not "define licensed" open-endedly. It is: decide the de-minimis rule
+for scoped-temp deletion, then define the rest downstream of it.** One rule moves **40% of the
+sample**.
+
+**And the two convergence results are both true**, because they measured different populations: the
+disputed 7 were **hard** cases (strictness right, agreement achievable); the fresh 20 include
+**routine** cases (strictness wrong, agreement irrelevant). **Testing a rule only on its hard cases
+hides its behaviour on the common ones** — the disputed-7 test was the right place to measure
+agreement and the wrong place to measure utility.

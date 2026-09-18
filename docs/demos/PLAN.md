@@ -4074,3 +4074,73 @@ for.**
 plausible mechanism I had not run** (§4b's asserted pin, §4y's scoped-vs-low-risk). **Q50 runs the
 prototype through the actual hook and checks whether the bytes and sha256 survive.** If they do not,
 the manifest has to live outside the formatter's reach — which would be a second, separate fix.
+
+---
+
+## §5c THE RUBRIC IS REPRODUCIBLE **AND** NAGWARE — and one sub-definition swings 40% of the sample
+
+**`docs/demos/duel-2/runs/verifiable-labels-mu-20260918T072000Z.json` (`8cf062b`), pane 3, fresh 20
+under the risk-tiered rubric.** Distribution: **escalate 13 · pass 5 · withhold 1 · block 1.**
+
+**`consequence_note`, recorded against the rubric rather than smoothed out of the labels:**
+
+> *"Strict application makes **13/20 escalate including routine temp cleanup**. That is a **nagware
+> finding AGAINST the rubric as priced** (a gate escalating every `/tmp rm` gets uninstalled),
+> **recorded here rather than softened in the labels**: the rubric needs a **de-minimis rule for
+> scoped-temp deletions** or calibration will drown in **true-but-useless escalations**."*
+
+**65% escalation is the failure mode I named in the Q16 build spec** — *"a gate that prompts on every
+routine edit is a gate nobody leaves enabled, which is the failure mode that kills abstention
+products."* It has now arrived from the rule rather than from the code.
+
+**And the discipline is the thing: it applied the rule as written, got an unusable result, and
+reported the unusability as a finding about the rule.** The available alternative — quietly relaxing
+the reading to produce a nicer distribution — is exactly the move §4k caught in the canned asker and
+§4q's "do not lower K" clause forbids. **A pane that reports its own rule as broken is worth more
+than one that makes the numbers look right.**
+
+### The pivot is a single sub-definition, and it is located precisely
+
+**`ambiguity_on_record`:**
+
+> *"**'locally reversible' is underdetermined** in the priced spec… Applied **STRICTLY** (creation/
+> read-only only; deletion never qualifies) for consistency with Q41-A15. **If the full decision
+> table counts regenerable-temp deletion as reversible, ~8 escalates move to pass** — that single
+> definition is **the highest-leverage open question in the rubric**."*
+
+```text
+strict reading:   escalate 13 · pass  5      -> 65% escalate, nagware
+temp-regenerable: escalate ~5 · pass ~13     -> ~25% escalate, plausibly usable
+```
+
+**One rule, eight of twenty cases, 40% of the sample.** COD-H2's specification phase is therefore
+**not open-ended**: the highest-leverage decision is a **de-minimis rule for scoped-temp deletion**,
+and everything else is downstream of it.
+
+### Why 7/7 convergence and 65% nagware are both true — and what that teaches about test-set choice
+
+**They are not in tension; they measured different things on different populations.** The disputed 7
+were **hard** cases, where strictness is the right answer and two raters can agree on it. The fresh
+20 include **routine** cases, where strictness is the wrong answer and agreement is irrelevant
+because nobody would ship it.
+
+> **Testing a rule only on its hard cases hides its behaviour on the common ones.** The disputed-7
+> test was the right place to measure **agreement** and the wrong place to measure **utility**.
+
+**That is a generalizable finding about the lane's own method**, and it arrived because I happened to
+run a fresh-sample test for a different reason — to bound the 7/7 claim, not to discover nagware.
+
+### Method note worth keeping: it used precedent, not fresh judgment
+
+*"Q41 precedents (A13/A14/A15 shapes) applied as **stare decisis** where shapes match."* **That is
+how reproducibility is actually achieved** — a rater bound by its own prior rulings rather than
+re-deciding from principle each time. It is also why the strict reading propagated: A15 set the
+precedent, and the pane held it even where holding it produced an unusable distribution.
+
+### What this does to the pending agreement test
+
+**Pane 2's Q47 labels the same 20, and the measurement is now more informative than I designed it to
+be.** If pane 2 reads reversibility *loosely*, agreement will crater — and that would locate the
+disagreement on **exactly the sub-definition pane 3 flagged**, which is the most useful possible
+outcome. **A low agreement number here is not a failure of the rubric; it is the rubric telling us
+which clause to write first.**
