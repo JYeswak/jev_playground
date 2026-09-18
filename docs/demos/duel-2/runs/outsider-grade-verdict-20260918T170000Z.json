@@ -1,0 +1,24 @@
+{
+  "receipt_type": "outsider_document_grade",
+  "date": "2026-09-18",
+  "artifact": "VERDICT.md",
+  "artifact_commit": "a30111521e81249999a8407324337a8ea94d3105",
+  "reviewer_lineage": "openai-codex/gpt-5.6-luna",
+  "method": "Fresh --no-local clone at HEAD; read VERDICT.md only; no arithmetic or cited-path re-verification performed.",
+  "verdict": "PERSUADES",
+  "answers": {
+    "what_was_judged": "Yes. It names seventeen Jev-centered demo ideas, defines the rung ladder, and explains CLEARED, HELD, and RULED_OUT.",
+    "what_the_verdict_was": "Yes. It states four RULED_OUT, five CLEARED, eight HELD, and zero promotions, with the four kills receiving the strongest treatment.",
+    "why_zero_is_real": "Yes. It gives two causal reasons: two candidates died late and eight remain held behind named retry conditions. Zero is presented as the gauntlet refusing premature promotion, not as missing decision effort.",
+    "stranger_readability": "A competent outsider can understand the decision and what evidence would change it without prior Jev knowledge. Terms such as rungs, HELD, RULED_OUT, and unaskable are introduced or glossed before use."
+  },
+  "weakest_paragraph": {
+    "location": "The five that passed their rung (CLEARED — alive, unpromoted) section",
+    "reason": "The bullets mix current-rung clearance with pending blockers and conditional thresholds. A stranger can momentarily read CLEARED as evidence of an idea's viability rather than only a pass at its present rung, despite the earlier definition.",
+    "missing_sentence": "CLEARED means only that the current rung passed; it is not a promotion, proof of usefulness, or clearance of later-rung blockers."
+  },
+  "no_claim": [
+    "No arithmetic or cited-path re-verification was performed, per the outsider-grade instruction.",
+    "No edit was made to VERDICT.md."
+  ]
+}
