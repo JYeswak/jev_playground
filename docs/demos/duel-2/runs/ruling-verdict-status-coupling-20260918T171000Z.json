@@ -1,0 +1,39 @@
+{
+  "receipt_type": "state_of_record_ruling",
+  "date": "2026-09-18",
+  "reviewer_lineage": "openai-codex/gpt-5.6-luna",
+  "question": "How should stranger-readable VERDICT.md relate to machine-readable STATUS.tsv?",
+  "observed_current_state": {
+    "authoritative_file": "docs/demos/STATUS.tsv",
+    "status_rows": 17,
+    "status_verdicts": {
+      "RULED_OUT": 4,
+      "CLEARED": 5,
+      "HELD": 8
+    },
+    "status_promoted": 0,
+    "verdict_path": "VERDICT.md",
+    "lane_status_receipts": {
+      "existence_checked": 17,
+      "missing": 0,
+      "integrity_checked": 17,
+      "drifted": 0
+    }
+  },
+  "ruling": "HAND_WRITTEN_NARRATIVE_WITH_DETERMINISTIC_AGREEMENT_GATE",
+  "why_not_mechanical_generation": "VERDICT.md is a persuasion artifact with causal explanations, outsider vocabulary, and selective strongest-treatment detail. Generating that prose from STATUS.tsv would either lose the explanation or create a second hidden template that is harder to audit than the current document.",
+  "authority": "STATUS.tsv remains the sole state-of-record for candidate identity, rung, score, verdict, author, receipt, and blocker. VERDICT.md may explain and select, but must not independently assert a conflicting count or category.",
+  "required_gate": {
+    "consumer": "The stranger-readable verdict and the publish/readability gate need a machine-visible proof that the prose summary has not drifted from the state of record.",
+    "gate": "A deterministic verifier must parse STATUS.tsv and VERDICT.md, assert the summary counts and zero-promotions claim, require each candidate to occur in exactly one verdict section, and fail on a candidate/category mismatch or changed headline count. Receipt existence/integrity remains delegated to lane-status.sh.",
+    "observed_defects": "This lane has measured the duplicate-state drift class repeatedly: the 283.786 KLOC rollup was rendered as 283,786 lines without derivation wording, a 0.047% prose-only basis survived beside a 0.0447% receipt-backed derivation, and README gate counts went stale. These are concrete reasons not to accept unguarded duplicate prose.",
+    "retirement": "Retire the agreement gate only when VERDICT.md is mechanically generated from STATUS.tsv with equivalent outsider persuasion, or a successor proves stronger semantic synchronization and carries the same RED arms."
+  },
+  "decision": "BUILD_FOLLOW_UP_REQUIRED",
+  "refusal": null,
+  "no_claim": [
+    "The agreement gate is not implemented by this receipt.",
+    "VERDICT.md was not edited by this unit.",
+    "Current matching counts do not prove future hand-written prose will remain synchronized."
+  ]
+}
