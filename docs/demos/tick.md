@@ -188,3 +188,17 @@ fix direction — plus a conductor note recording what actually landed where.
 If all three panes are genuinely working, you are not done — hold your own
 claimed bead and work it. Do not manufacture a packet to look busy, and do not
 sit watching timers.
+
+## 5. APPEND CORRECTIONS, DO NOT INSERT (finding: pane 3, audit `7964ac2`)
+
+An in-place correction renumbers lines, so every external line-number
+pointer into that file silently aims at the wrong content afterward —
+with no error anywhere. Measured instance: `WIZARD_IDEAS_CC.md`
+corrections shifted CC lines ~8–17 downward, orphaning five cited ranges
+in the cross-scores (e.g. CC:166–168 meant a determinism bullet at
+scoring time and means a section header now — demonstrated by
+`git show ad99a27:<file> | sed -n '166,168p'` vs current bytes).
+Remedy, in order: append a dated correction block and leave the original
+lines in place; or cite by stable anchor (section heading, sha, quoted
+phrase) rather than line number. A correction that breaks pointers is a
+second defect wearing a fix.
