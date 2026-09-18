@@ -104,6 +104,18 @@ and a TF-IDF classifier with **2,300 labels** scores 0.9941, and their errors ar
 the question makes 2 false negatives and 39 false positives, the classifier makes 40 and 1. An
 elaborated *"structured criteria"* question scored **worse** than the plain one, 0.9701 against
 0.9857, so elaboration is not free. Averaging the question with the classifier beats both at 0.9983.
+
+**Elaboration costs accuracy in two of three paired tests, and the third is only directional.** Across
+three comparisons on two corpora, with exact McNemar on the paired cases:
+Ling-Spam plain 98.57% against structured 97.01% (**-1.56pp, p=1.4e-9**); modern mail category 97.00%
+against urgency-and-authority criteria 96.68% (-0.32pp, **p=.50, directional only**); and a
+**names-only** question at 98.58% against category 97.00% (**+1.58pp, p=.0064**), the shortest
+question winning outright. This is a **confirmation, not a discovery**: `jev-spam-eval`'s own README
+already notes its headline came from a question *"written after reading the mistakes in 1,000 sampled
+emails"*, which is the same effect seen from the tuning side. Falsifier, stated by its author:
+pre-register the prompts, use a fresh held-out source, and test paired — the inversion must vanish or
+reverse consistently.
+[`docs/demos/upstream-repro/criteria-inversion-20260918.md`](docs/demos/upstream-repro/criteria-inversion-20260918.md)
 Receipt:
 [`docs/demos/upstream-repro/lingspam-20260918.md`](docs/demos/upstream-repro/lingspam-20260918.md).
 
