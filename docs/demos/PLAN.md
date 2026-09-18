@@ -337,6 +337,82 @@ on the kill.
 named.** A candidate parked with a named next measurement costs one line in this file. A candidate
 killed wrongly costs the whole idea.
 
+---
+
+## §3d RECONCILIATION — duel-2 results, and my pre-registration graded
+
+Two panes ranked all nine on demand **blind to §3b** (both reported `read_3b=no`), then pane 2
+cross-scored pane 3's ranking and reconciled the two
+(`docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md`, `b8d0be9`, 20,581 chars).
+
+| Demo | my §3b verdict | pane 3 | pane 2 | **reconciled** | gauntlet status |
+|---|---|---:|---:|---:|---|
+| demo-4 foreman-lite | PASS, *narrowed* | 800 | — | **820** | rung 1 CLEARED |
+| demo-5 fact ledger | PASS | 750 | 760 | **755** | rung 1 CLEARED |
+| demo-2 admission screen | PASS (#2) | 450 | 780 | **700** | rung 1 CLEARED, at the line |
+| demo-9 review signal | *WEAK — hold* | 550 | 820 | **700** | rung 1 CLEARED, at the line |
+| demo-7 signals starter | **PASS (#1)** | 620 | 520 | **560** | **HELD** — needs a named user |
+| demo-1 route backtest | FAILS | 350 | 540 | **520** | died on rung 4 (0.047%) |
+| demo-3 claim-check gate | PASS | 500 | — | **430** | **HELD** — incumbent `commitlint` unassessed |
+| demo-6 claim-check notes | REJECT | 350 | — | **330** | **HELD**, conditional on demo-3 |
+| demo-8 credential screen | KILLED | 150 | — | **100** | **RULED OUT** — structural, safety |
+
+### Grading my own pre-registration: I got the bottom right and the top completely wrong
+
+- **My #1 became their 6th.** I ranked demo-7 signals first; reconciled **560**. My reasoning was
+  that a *method* transfers further than a *tool* — defensible in the abstract, and it survived
+  neither pane's demand test because I never named a user who had voiced the pain.
+- **Their #1 was my "narrowed".** demo-4 foreman-lite reconciled **820**, the highest of the nine.
+  I discounted it for coupling to `br`, mistaking *integration surface* for *audience size*. The
+  pain — trusting an agent's self-reported "done" — is universal; the integration is incidental.
+- **I under-rated demo-9 at "WEAK — hold"**; reconciled **700**. Note the authorship flag: its
+  proposer scored it **820** and the non-author **550**, so 700 is a reconciliation of a contested
+  score, not a consensus.
+- **I over-rated demo-3** (PASS → **430**), because I scored the pain we had measured ourselves
+  rather than checking that `commitlint` already occupies the commit-hook slot.
+- **Correct at the bottom:** demo-1, demo-6 and demo-8 all landed where I put them.
+
+**The pattern in my errors is one thing, and it is the thing §3b was written to stop.** Every miss
+came from scoring **capability strength** instead of **unmet need** — the 0.99 injection witness,
+the 32.5-point signals delta, our own claim-audit numbers. Those are all *supply-side* facts.
+**I wrote the demand bar and then applied the supply rubric through it.** Pre-registration is the
+only reason that is visible rather than deniable.
+
+### Reclassified under §3c's anti-kill correction
+
+Three candidates I had marked REJECT or FAIL are **HELD**, each with the cheapest experiment that
+would resolve it:
+
+- **demo-7 (560) — HELD.** Resolve by naming one practitioner who voiced the pain, with a link. If
+  none exists after an honest search, it becomes UNASKABLE, not ruled out.
+- **demo-3 (430) — HELD.** Resolve by assessing `commitlint` and friends directly: do they check
+  *numeric claims against cited artifacts*, or only message *format*? Pane 3's note says format
+  only. Confirm that and demo-3 recovers; refute it and demo-3 is genuinely owned.
+- **demo-6 (330) — HELD, conditional**, in the non-author's better words: *"do not build unless
+  demo-3 pays — if the 30-day contradiction rate is flat, kill demo-6 with it."*
+
+**One genuine kill: demo-8**, on structure rather than taste — asking Jev whether content carries
+credential material ships the credential to a third party. Both panes concurred (150, 100), its
+author conceded, and deterministic scanners own the niche.
+
+### The hunt outranks every original, which is the duel's real finding
+
+`docs/demos/duel-2/DEMAND_HUNT_COD.md` (`c33cd3c`, 22,872 chars) produced five candidates scoring
+above every one of the nine:
+
+| | candidate | demand |
+|---|---|---:|
+| H1 | snapshot-bound completion evidence | **940** |
+| H2 | pre-action abstention evaluator | **935** |
+| H3 | cache-aware routing price-drift auditor | 925 |
+| H4 | tool-result admission replay | 920 |
+| H5 | compaction-boundary integrity | 915 |
+
+Ceiling moved from **820** to **940**. If that holds under a non-author cross-score, **duel-1
+produced the wrong backlog** and the gauntlet's first real output is that ruling. H1–H5 are
+**unscored by a non-author** and enter at rung 1 like everything else — a self-graded 940 is a
+hypothesis, not a rank.
+
 
 ## §4 Phase arc
 
