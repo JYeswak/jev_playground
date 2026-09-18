@@ -733,3 +733,48 @@ is tasked to watch. That is the prose-guard defect until proven otherwise… Thi
 **Its own callback declined to claim the concessions run against interest** — leaving that judgement
 to a reader rather than asserting it. **Q61 is already dispatched to test exactly the reservation it
 stated.**
+
+---
+
+## §5t THE SESSION'S BEST METHOD ADVANCE DOES NOT MOVE THE LEADER — zero of six blockers dissolve
+
+**`docs/demos/duel-2/RULE_label_declaration_transfer_COD.md` (`a958ac7`).** I asked the first
+candidate-advancing question in many ticks: this arc replaced a pattern rule with a **declared** type
+in the lane's own instruments, and COD-H2's rung 4 was blocked partly on *"labels = pattern rule,
+fixed by the rubric."* **Same defect name, same remedy shape. Does it transfer?**
+
+> **"Transfers ON AUTHORITY/PROVENANCE, not as a mechanism for COD-H2 construct validity. A label
+> manifest can declare author/rubric/evidence/blind-state, but A PATTERN-DERIVED LABEL REMAINS
+> TAUTOLOGICAL UNDER A NEW FIELD NAME."**
+
+**That is sharper than what I asked, and it is the distinction I had missed.** The instruments' fix
+worked because **a party opened each receipt and judged its content** — the *substance* changed, not
+only the field. For 907 destructive-bash turns, "declaring" a label would **relabel the regex's own
+output**. **Renaming an inference as a declaration is not a fix**, and pane 2's own Q21
+authority-versus-mechanism distinction is what catches it.
+
+### Zero blockers dissolve, and the remaining five are restated with numbers
+
+```text
+power ................... .1135 zero-flip upper vs a <=5% bar
+guards .................. 6/6 absent (prose only)
+widening ................ exhausted
+inter-rater agreement ... 5/20 = 25%
+evidence ................ 40/68 previews insufficient  (+4 UNRELOCATABLE)
+```
+
+**`+4 unrelocatable` is new to this record** — the manifest blocker is worse than the 40/68 figure I
+had been citing. **And the ruling refuses rung-4 reopening explicitly:** *"even future independent
+labels leave five blockers… No rung4 reopening."*
+
+### What this does to `PROMOTED 0`
+
+**It strengthens it.** The leader's rung-4 blockers were tested against **the strongest new idea this
+session produced** — an idea that demonstrably worked on the lane's own instruments, retiring a regex
+that was right one time in six — **and not one blocker moved.** A verdict that survives a genuine
+attempt to overturn it is worth more than one nobody tried to shift.
+
+**This is also the honest terminus for candidate work in this lane**, and it is a different claim from
+the terminus I asserted in §5l and had to supersede. **That one came from my own prose about pane
+queues. This one comes from a ruling that named the five surviving blockers with their numbers and
+declined to reopen the rung.**
