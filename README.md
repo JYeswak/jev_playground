@@ -84,15 +84,15 @@ obstacle. Everything else is untouched, which is the honest state.
 |`jev-sec-bench`|blind security benchmarks|not run, README only|establish whether code exists or it is a results write-up|
 |`jev-agent-failure-benchmark`|can a cheap decision model find what broke an agent|not run|run it; the closest upstream analogue to this lane's own question|
 |`typesafe-ai-benchmark`|LLM structured output vs Jev on latency, cost, judgment|not run|run its documented examples; report which are stale at HEAD|
-|`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**BLOCKED** — local Rust denied; RCH `critical_pressure=4`|run both examples the moment a worker frees|
+|`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**BLOCKED**: remote build returns ELF for an arm64-darwin host (`RCH-E327`)|needs a same-platform worker; capacity was never the real blocker|
 |`jev-router`|per-turn model routing for Claude Code and Codex|not run|compare with `demos/routing-backtest`; upstream may already own this|
 |`jev-codex-router`|the same idea, Codex-specific|not run|read before extending our own router work|
-|`jev-mcp`|Jev judgments exposed as MCP tools|**RUN** — 9/9 unit, 4/4 live e2e|wire `jev_verify` into the conductor's number-checking|
+|`jev-mcp`|Jev judgments exposed as MCP tools|**RUN**: 9/9 unit, 4/4 live e2e|wire `jev_verify` into the conductor's number-checking|
 |`jev-ultrafast`|a browser agent driven by Jev|not run; needs a URL and a key|lowest priority, it is a live-network demo|
-|`fast-jev-compaction`|continuous context compaction with Jev|**RUN** — 29/29 tests; live run 21 messages to 7, 87.1% chars saved|it owns the core; ours keeps only the omp adapter and replay harness|
+|`fast-jev-compaction`|continuous context compaction with Jev|**RUN**: 29/29 tests; live run 21 messages to 7, 87.1% chars saved|it owns the core; ours keeps only the omp adapter and replay harness|
 |`commit-miner`|classify commit diffs and messages with Jev|not run|runnable against this repo's own history|
-|`foreman`|watch a software factory floor with Jev|**RUN** — 57/58, one real failure reported|it is a per-worker supervisor with no queue concept, so it does not replace the tick|
-|`bicameral`|System 2 writes the code, System 1 judges it|not run|the architectural claim this lane assumes|
+|`foreman`|watch a software factory floor with Jev|**RUN**: 57/58, one real failure reported|it is a per-worker supervisor with no queue concept, so it does not replace the tick|
+|`bicameral`|System 2 writes the code, System 1 judges it|**RUN** (pane 3): 41 tests pass offline, no key|adopt its two differences: pluggable judgment, and degrading toward patterns not passthrough|
 |`jev-review`|Jev for code review|not run|read|
 |`system-one-adapter-python`|a drop-in `system_one` backed by an LLM|not run|useful as a control: an LLM standing in for Jev|
 |`skillranker`|a ranker built on Jev, mirrored here|mirror current|read its Jev question construction; never copy its files|
