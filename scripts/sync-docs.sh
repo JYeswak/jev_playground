@@ -82,7 +82,21 @@ if [ "$MODE" = check ]; then
   if [ -f "$REPO_MANIFEST" ]; then
     while IFS=$'\t' read -r repo path pinned upstream_sha behind fetched; do
       [ "$repo" = "repo" ] && continue
-      case "$path" in /*) abs="$path" ;; *) abs="$ROOT/$path" ;; esac
+      # `$HOME/...` is stored LITERALLY in upstream/MANIFEST.tsv, on purpose: a clone outside this
+      # repo must be recorded portably, not pinned to one machine's absolute path. But the original
+      # case had only `/*` and a repo-relative fallback, so `$HOME/Developer/ripwire` fell through to
+      # `$ROOT/$HOME/Developer/ripwire` and the gate reported `MISSING clone` for a clone that EXISTS.
+      # Measured 2026-09-18 (pane 3, 85d75a0 via Q84): CHECK FAIL 1 of 114, and `/Users/josh/
+      # Developer/ripwire/.git` was present the whole time. A FALSE RED is the failure mode this lane
+      # calls worse than a missed trip, because it teaches everyone to ignore the gate — so the fix
+      # is to expand the portable prefixes, NOT to rewrite the manifest into a machine-specific path.
+      case "$path" in
+        /*)          abs="$path" ;;
+        '$HOME'/*)   abs="$HOME/${path#\$HOME/}" ;;
+        '${HOME}'/*) abs="$HOME/${path#\$\{HOME\}/}" ;;
+        '~'/*)       abs="$HOME/${path#\~/}" ;;
+        *)           abs="$ROOT/$path" ;;
+      esac
       [ -d "$abs/.git" ] || { echo "MISSING clone $path"; bad=$((bad+1)); continue; }
       cur="$(git -C "$abs" rev-parse --short HEAD)"
       [ "$cur" = "$pinned" ] || echo "SHA-MOVED $path  manifest=$pinned head=$cur"
