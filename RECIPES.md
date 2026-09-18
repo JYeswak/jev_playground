@@ -1,0 +1,119 @@
+# Five recipes that won today
+
+Joshua, 2026-09-18: *"how has the team done so much today and not found a single winning recipe -
+that seems like you all dont know what you're doing"*.
+
+He is right that nothing was promoted, and wrong that nothing won. **Five things won, measured, and
+none of them reached a verdict** — because the gauntlet in `docs/demos/STATUS.tsv` adjudicates ideas
+*this lane proposes*, and every result below came from running somebody else's code. The evidence
+never entered the machinery that would have ruled on it. That is a defect in the process, not an
+absence of findings.
+
+Each recipe below states what to do, the number that supports it, where that number came from, and
+**when it stops being true**. Nothing here is a lane opinion; every figure is reproducible from a
+receipt in [`docs/demos/upstream-repro/`](docs/demos/upstream-repro/README.md).
+
+---
+
+## 1. Ask a plain question instead of training a classifier, when your data will drift
+
+**Do this:** for a classification job where tomorrow's inputs will not look like today's labels, ask
+Jev in plain English rather than training on the labels you have.
+
+| | zero-label question | TF-IDF trained on labels |
+|---|---|---|
+| in-distribution (Ling-Spam) | 98.57% | 99.41% (2,300 labels) |
+| recent phishing | **91.3%** | 70.3% |
+| modern legitimate-vs-not | **97.00%** | 72.51% |
+
+**In-distribution the trained model wins.** Out of distribution it collapses by twenty-plus points
+while the question holds. The recipe is not *"questions beat classifiers"*; it is **the labelled
+model is better until your inputs move, and it has no warning that they have.**
+
+**Stops being true when:** your inputs are stable and you have labels for them. Then train, and beat
+the question by a point.
+Source: [lingspam](docs/demos/upstream-repro/lingspam-20260918.md) ·
+[ood](docs/demos/upstream-repro/jev-spam-eval-ood-20260918.json)
+
+## 2. Use the short question. Elaborating it makes it worse
+
+**Do this:** write the plainest question that states the task, then stop. Do not add criteria,
+rationale, or worked definitions.
+
+| comparison | plain / short | elaborated | p |
+|---|---|---|---|
+| Ling-Spam | **98.57%** | 97.01% | 1.4e-9 |
+| modern mail, names-only vs category | **98.58%** | 97.00% | 0.0064 |
+| modern mail, category vs urgency-authority | 97.00% | 96.68% | 0.50 (directional only) |
+
+Two of three are significant, the third is directional. **The shortest question tested won
+outright.** Upstream's own README concedes the same effect from the other side: its headline came
+from a question *"written after reading the mistakes in 1,000 sampled emails."*
+
+**Stops being true when:** the short question is ambiguous about the task itself, which is recipe 3.
+Source: [criteria-inversion](docs/demos/upstream-repro/criteria-inversion-20260918.md)
+
+## 3. Tell it what the system is for. Do not tell it what the answer is
+
+**Do this:** put the deployment's purpose in the request. Keep the expected conclusion out of it.
+
+| prompt-injection detection | bare | + context |
+|---|---|---|
+| recall | 74.9% | **95.1%** |
+| accuracy | 89.7% | **96.5%** |
+
+Twenty points of recall for one sentence about what the assistant does. The same sensitivity, pointed
+the other way, produced this lane's only public retraction: a criterion worded *"reduce turns, since
+each re-sends the whole context"* moved a verdict from 0.21 to 0.59.
+
+**Context that states the task is state. Context that states the answer is leakage.**
+
+**Stops being true when:** the "purpose" you add encodes the outcome. Test by running with the
+framing stripped as a control.
+Source: [sec-bench](docs/demos/upstream-repro/jev-sec-bench-20260918.md) ·
+[framing leak](docs/demos/jev-probe/NOTE-framing-leak.md)
+
+## 4. Average the question with the classifier rather than choosing
+
+**Do this:** where you already have a trained model, average its score with a zero-label judgment
+instead of picking a winner.
+
+| | accuracy | false negatives | false positives |
+|---|---|---|---|
+| question alone | 98.57% | 2 | 39 |
+| logreg alone (2,300 labels) | 98.57% | 40 | 1 |
+| **averaged** | **99.83%** | **4** | **1** |
+
+Identical headline accuracy, **opposite failure shapes** — the question protects recall, the
+classifier protects precision — so the average is better than either at both.
+
+**Stops being true when:** the two are correlated. This pair was not, which is exactly why the
+average paid.
+Source: [lingspam](docs/demos/upstream-repro/lingspam-20260918.md)
+
+## 5. Pair your runs before you blame your sample size
+
+**Do this:** when two variants score the same, compare them case by case before concluding
+"underpowered".
+
+An independent benchmark reported its two model versions *"not separable at this sample size"*
+(n=60). Pairing the committed per-case results: **zero discordant pairs, identical choices on
+60/60.** No increase in n on that task set can separate them, because no case discriminates them.
+The limit was the task set, not the count.
+
+**Stops being true when:** you have discordant pairs. Then n genuinely is the constraint.
+Source: [pairing](docs/demos/upstream-repro/jev-benchmark-pairing-20260918.md)
+
+---
+
+## What this file does not claim
+
+- **These are other people's measurements**, reproduced or re-analysed here. Recipes 1, 2 and 4 come
+  from one email corpus family; recipe 3 from one security benchmark; recipe 5 from one n=60 set.
+- **None has been promoted through this repo's gauntlet**, which requires held-out n, stated
+  uncertainty and leakage controls that these runs mostly do not carry. They are recipes with
+  evidence, not adjudicated verdicts, and `docs/demos/STATUS.tsv` still reads **0 promoted**.
+- **Recipes 1 and 2 may be the same finding** seen twice: both say the elaborate thing loses to the
+  simple thing. They are listed separately because the interventions differ, not because they are
+  known to be independent.
+- Live figures were single runs. Nothing here is a reliability measurement.

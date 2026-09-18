@@ -14,6 +14,11 @@ makes it tempting to build things with it before knowing whether the thing is wo
 **zero were promoted** to their own project. The product is the ruling plus the evidence for
 everything ruled out.
 
+**What actually works.** Five recipes won on measurements taken here, each with the number behind it
+and the condition that ends it: [`RECIPES.md`](RECIPES.md). They sit outside the gauntlet on purpose.
+Every one came from running somebody else's benchmark rather than from a candidate we proposed, so
+none has been through this repo's promotion bar, and the count above stays at zero.
+
 **What you get.** Three tools that run offline with no API key, and read your own logs:
 
 | Tool | Answers | Verdict it produced |
