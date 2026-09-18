@@ -2872,3 +2872,54 @@ exists (Q27).
 independently**, and pane 3 proposed the remedy unprompted: **"split verify/commit steps."** Content
 intact, both files present, tree clean — **no history rewrite**, per standing ruling. Three sweeps
 this session, three self-reports, zero attempts to hide one.
+
+---
+
+## §4k A 20/20 THAT COULD NOT HAVE BEEN ANYTHING ELSE — third instance of the tautological-test family
+
+**`docs/demos/duel-2/runs/grade-muh2-judge-20260918T054622Z.json` (`be2cab5`), pane 2 grading pane
+3's MU-H2 judge run.** Verdict: **`HELD_WIRING_PROOF_ONLY_NO_RUNG3_GATE`.**
+
+The decisive line:
+
+> **`canned p keyed directly by gold label`**
+
+**The canned asker derives its probability from the gold label, so 20/20 is tautological — the
+harness cannot fail, because the answer is the input.** Everything else pane 2 checked confirms the
+scope: per-class denominators correct, 18 non-ambiguous decided and 2 withheld, **Jev calls 0**,
+incumbent arms not run, **ECE/Brier null**, human lift null. *"Wires proven, semantic/threshold gate
+not."*
+
+### This is a family, not an incident, and it is now three deep
+
+| Instance | Shape | Caught by |
+|---|---|---|
+| The lane's first RED-arm test | fired on **all 16 rows** and "passed" | conductor, on re-test |
+| demo-1 | passed **10/0** around a hand-written token heuristic | rung-4 measurement |
+| MU-H2 canned judge | scored **20/20** with the answer keyed from the label | **non-author grade** |
+
+**The family is: a test whose outcome is fixed by construction rather than by the thing under test.**
+Each instance produced a clean-looking number that measured nothing, and each was caught later and
+cheaper than the last — the third by a non-author grade before any claim was made.
+
+### Neither pane overclaimed, and that is why this cost nothing
+
+Pane 3 labelled its own receipt **`WIRING-ONLY`** with **`NO-CLAIM wiring`** — it never presented
+20/20 as correctness. Pane 2 then independently established *why* it could not be correctness. **The
+author scoped honestly and the non-author verified the scope**, which is the whole mechanism working
+on a result that could easily have been paraded.
+
+**Standing consequence: `20/20` from the canned asker may never be cited as evidence of anything but
+wiring**, in any lane document. It is recorded here so that a future reader — or a future me, given
+§3w — cannot quote it.
+
+### MU-H2's state is unchanged and its gate is untouched
+
+**Rung 2, score 430, CLEARED-conditional.** Its six-threshold gate (`75cfb9f`) remains entirely
+unmeasured: ECE/Brier null, no live judge run, no human-lift measurement, and the incumbent arms
+measured separately in §4h. **What exists is a wired harness over an immutable 20-case corpus — real
+infrastructure, zero verdict.**
+
+**And the queue order does not change.** WIP is one, COD-H2 holds it at rung 4 with 905, MU-H2 sits at
+430. **MU-H2 does not get a live run ahead of COD-H2's rung-4 measurement**, however cheap it looks —
+that is the ordering §3k exists to enforce.

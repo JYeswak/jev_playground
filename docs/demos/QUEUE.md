@@ -489,3 +489,27 @@ neither can the conductor who already over-credited this exact claim once.
 
 `HOLD_DISCHARGED` / `HOLD_STANDS` with what is missing. Output
 `docs/demos/duel-2/runs/discharge-codh2-rung3-<ISO>.json`.
+
+## UNIT Q28 — run the label-free halves for COD-H4 and COD-H1, on pane 3's pre-registered designs
+**ELIGIBLE: pane 2** — you authored these candidates, **but pane 3 pre-registered the thresholds**
+(`docs/demos/duel-2/FALSIFY_COD-H145_MU.md`, `8a8ec06`), so you cannot tune them. **CLAIM:** unclaimed
+
+**§3k's rule, unapplied to two candidates for hours: estimate rung 4 before paying for rung 3.**
+COD-H4 (**900**) and COD-H1 (**885**) are the next two behind COD-H2 and both carry non-author
+falsification designs whose **label-free halves have never been run.** That is exactly the state
+MU-H1 was in when its label-free half killed it in an hour and saved days.
+
+`ls docs/demos/duel-2/FALSIFY_COD-H145_MU.md` first. Present ⇒ proceed. Absent ⇒ BLOCKED callback
+naming the path, then the dry-queue default.
+
+For **each** of COD-H4 and COD-H1: run **only** the part of the pre-registered design that needs no
+ground truth, and report the pre-registered number against the pre-registered threshold. **Do not
+move a threshold.** You are the author; the numbers rule, not your judgement of them.
+
+**COD-H4 carries a specific known hazard** — it was flagged at rung 2 as *"corpus does not exist
+yet."* If the label-free half cannot run because the corpus is unbuildable cheaply, **that is the
+finding**: report `UNASKABLE` with what building it would cost, because a rung-3 cost is worth
+knowing before it is paid.
+
+`HEALTHY` / `THIN` / `UNASKABLE` per candidate, with the command and the number. Output
+`docs/demos/duel-2/runs/codh41-labelfree-<ISO>.json`.
