@@ -3112,3 +3112,53 @@ detect, and the one a random sample is weakest against.
 
 **`NO-CLAIM strata estimated`** — the per-stratum rates come from a 10-case trial, so the 90-minute
 figure is an extrapolation with its basis stated. Recorded as such.
+
+---
+
+## §4o §4l's CORPUS SCREEN DISCRIMINATES — and demo-9 is "a contract, not code"
+
+**`docs/demos/duel-2/runs/demo9-vs-ubs-20260918T061500Z.json` (`980f4e8`), pane 3 as non-author of
+demo-9.** A **split** verdict, which is the useful kind:
+
+- **Corpus: PROCEED.** 15 code-touching commits via `git log --diff-filter=AM` over `*.ts/*.mjs/*.js`,
+  unlabelled diffs present — *"no pricing needed, no `UNASKABLE` on corpus grounds."*
+- **`ubs` baseline: non-empty and therefore usable.** **6 critical · 6 warnings · 50 info across 8
+  files** in `compaction/src` (2) + `demos/preaction-abstention/src` (4) + `demos/doc-drift/src` (2)
+  at HEAD.
+- **Comparison: UNASKABLE.** *"No Jev-signal implementation exists to run; **demo-9 is a contract,
+  not code**."*
+
+> *"Next unit is a **build-or-skip decision on the Jev arm**, not more screening."*
+
+### The screen I added one turn ago now has three results, and they differ
+
+| Candidate | Corpus screen |
+|---|---|
+| COD-H1 | **UNASKABLE** — 2 of ≥30 transcripts, needs labelling |
+| COD-H4 | **UNASKABLE, priced** — manifest absent, 4-hour build |
+| demo-9 | **PROCEED** — diffs exist unlabelled, baseline runs |
+
+**Three runs, two UNASKABLE, one PROCEED.** That matters for the same reason the RED-arm test
+mattered: **an instrument that returns the same verdict on every input has measured nothing.** §4l's
+screen separates *"the data does not exist"* from *"the code does not exist"* — and those need
+opposite responses. COD-H4 needs a 4-hour corpus build; demo-9 needs a rung-3 implementation.
+
+**demo-9 stays CLEARED-conditional at 550, condition sharpened:** corpus verified present, blocked on
+a **build** that the WIP limit defers behind COD-H2. It is no longer waiting on an unknown; it is
+queued behind a known.
+
+### A weak corroboration of §4c that does not resolve it
+
+§4c left the two UBS criticals in `demos/preaction-abstention/src` **UNASKABLE**, because every UBS
+mode *"counts criticals and emits no per-finding locations."* This differently-scoped run reads its
+categories as *"loose-null idiom, **non-secret comparisons**, documented async-listener shape,
+missing-`AbortSignal` on short timeout calls."*
+
+**"Non-secret comparisons" is exactly the category pane 3 originally claimed for the preaction
+criticals** — now appearing from a second run over a wider scope. **That makes the original
+adjudication more plausible and proves nothing**, because the locations are still absent and the
+counts merely scale with scope (2 in one directory, 6 across three).
+
+**§4c stays UNASKABLE.** And pane 3 drew the same line itself: *"full adjudication with per-finding
+dispositions belongs to the head-to-head run, not this screen."* **A category reading is not a
+per-finding disposition**, and it declined to promote one into the other.
