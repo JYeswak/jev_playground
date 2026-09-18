@@ -2,17 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { spawn } from 'node:child_process';
 
-const bin = new URL('../bin/shape.mjs', import.meta.url).pathname;
+const bin = process.env.SHAPE_BIN ? resolve(process.env.SHAPE_BIN) : new URL('../bin/shape.mjs', import.meta.url).pathname;
 async function run(args) {
-  return new Promise((resolve) => {
+  return new Promise((resolveResult) => {
     const child = spawn(process.execPath, [bin, ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
     let stdout = ''; let stderr = '';
     child.stdout.on('data', (data) => { stdout += data; });
     child.stderr.on('data', (data) => { stderr += data; });
-    child.on('close', (code) => resolve({ code, stdout, stderr }));
+    child.on('close', (code) => resolveResult({ code, stdout, stderr }));
   });
 }
 
