@@ -5023,3 +5023,131 @@ line below and orphan external pointers, the second-defect-wearing-a-fix this fi
 orders to avoid, and it would restate numbers I have just been told are not authoritative.
 **Grader-spread annotations in those sections remain valid as context and are explicitly not ranking
 input.**
+
+---
+
+## §5r THE CONDUCTOR AUTHORED THREE OF THE CANDIDATES IT HAS BEEN ADJUDICATING
+
+**`docs/demos/duel-2/runs/pane1-identity-20260918T100907Z.json` (`f58b14e`).** I asked pane 3 to test
+its own residual — *"if pane1 is not a scoring party, rung-1 non-author checks on demo-3/demo-7 are
+vacuous"* — and told it plainly *"pane 1 is me, the conductor."* It went to the record instead.
+
+### The identity question, resolved by the only party who can
+
+Pane 3 found **`docs/demos/duel-1/runs/pane1-cc-20260918T000328Z.json`** — actor **`CyanFalcon`**,
+`pane=1`, unit *"duel-1 duelist A (Claude side)"* — and ruled: *"a distinct agent self-identifying as
+pane 1… per lane rules the artifact wins on agent-identity."*
+
+**`CyanFalcon` is my own agent id.** So the artifact does not contradict my testimony — **it extends
+it**, and pane 3 applied exactly the right rule to an ambiguity it had no standing to resolve. Its
+instinct was correct and its conclusion needed one fact only I hold. **Recorded as the conductor
+supplying evidence, not overruling a finding.**
+
+### And the extension is a conflict of interest I did not disclose because I did not know it
+
+That file is **15 ideas winnowed to 5**, and it contains the precursors of:
+
+| candidate | pane-1 rank | STATUS author | current verdict |
+|---|---|---|---|
+| `demo-1-route-backtest` | **3** | `pane2` | **RULED_OUT** |
+| `demo-3-claim-check-gate` | **2** | `pane1` | HELD |
+| `demo-7-signals-starter` | **4** | `pane1` | HELD |
+
+**The conductor championed three of the seventeen candidates it has spent this lane adjudicating.**
+I have been writing the rulings, the taxonomy, the kill table and the gates while holding authorship
+of three rows, and I disclosed none of it — **because until this receipt was opened I did not know
+the duel-1 duelist file was mine.**
+
+### The sharpest consequence: I ruled out my own candidate with no kill decision on record
+
+**`demo-1` is mine, and Q62 already found that it is the one kill in the lane with no discrete killer
+at all** — *"the 'kill' is a measurement plus a finding."* Put together:
+
+> **The conductor recorded a `RULED_OUT` verdict on its own candidate, on evidence that contains no
+> kill decision, and logged it in the `RULING` table as a rung-4 kill.**
+
+**Nothing here suggests the kill was wrong** — 0.047% measured lift and zero Jev calls behind a
+hand-written heuristic is as clean a rung-4 death as the lane has. **But the authorship boundary the
+concurrence rule exists to protect was crossed without anyone noticing, including me.** The rule pane
+2 demoted to guidance for never having been invoked **had a live trigger the whole time and nobody
+saw it, because the author column said `pane2`.**
+
+### `pane2` on the demo-1 row is not lossy — it is wrong
+
+> *"No artifact shows pane2 proposing, championing, or building demo-1 — **pane2's sole relation is
+> grader (demand 540)**. STATUS value `pane2` is therefore **not lossy but WRONG**. Correct row value:
+> `pane1+pane3`."*
+
+**Q65 called the row multi-author; Q66 finds it mis-attributed to a party whose only involvement was
+grading it.** And **`demo-7`'s `AUTHOR_UNATTESTED` from Q65 is also corrected** — pane-1 rank 4,
+matching §5.7 verbatim (*"verdict-only 62.6 vs 5-signal 95.1"*). *"The duelist file closed the gap my
+Q65 search had not yet opened."*
+
+**Third self-correction by pane 3 in three consecutive units** — Q62's lineage-to-pane transfer,
+Q65's demo-1 verdict, Q66's demo-7 finding — **each against its own prior work, each volunteered.**
+
+### No vacuity — the risk it raised is real in principle and empty in fact
+
+```text
+demo-3  rung-1: NOT MET under ANY authorship  (best grade 500 < 700)   HELD properly supported
+demo-7  rung-1: NOT MET under ANY authorship  (best grade 620 < 700)   HELD properly supported
+non-author standing: VERIFIED — pane2 and pane3 are distinct from pane1
+```
+
+**`HELD` needs no clearance to stand, so no verdict rests on a vacuous check.** Pane 3 raised the
+risk, then measured it to zero rather than leaving it hanging as a scare.
+
+### And one more unverifiable count, found in passing
+
+> **`pane1_grader_artifact: NONE FOUND`** — *"no score, grade, or audit receipt carries a pane-1
+> actor… **the §5 '4 graders' composition is itself unattributed**."*
+
+**So the conductor never graded anything** — which is the one piece of good news in this section —
+**and the "4 graders" figure appearing throughout §5 has no attribution behind it.** Another count
+whose control was never opened, and it is mine.
+
+### What I am doing about it
+
+1. **`STATUS.tsv` stays untouched until pane 2's Q22 mapping audit lands.** Pane 3 declined to apply
+   its own finding for the same reason; two authors already collided on column 8 and I will not add a
+   third on column 5.
+2. **The conductor's authorship of demo-1, demo-3 and demo-7 is now on the record** — and every
+   ruling I have written about those three rows should be read with it.
+3. **`§3c` rule 3's trigger fired and was missed.** Pane 2 demoted it as never-invoked; that grading
+   was correct on the evidence then available and is **now falsified by a case nobody could see.**
+   Recorded for its re-examination condition, which is exactly what a demoted-with-condition rule is
+   for.
+
+### AMENDED BEFORE PUBLICATION (`d3b8c9a`) — my testimony is not a receipt, and pane 2 said so
+
+**This section originally read "the identity question, resolved by the only party who can."** Pane 2's
+Q22 mapping audit landed before this was committed and qualifies that sentence:
+
+> **"`demo-3` and `demo-7` status `author=pane1` are NOT CITABLE as gated non-author checks until
+> author/grader provenance is evidenced; **pane1 live identity alone does not repair artifact
+> gap**."**
+
+**It is right, and it is the lane's own rule turned on the conductor.** A claim is worth what its
+receipt can show. Splitting the two claims honestly:
+
+| claim | grade |
+|---|---|
+| pane 1 authored the duel-1 shortlist containing demo-1/3/7 precursors | **artifact-evidenced** (`pane1-cc-20260918T000328Z.json`, actor `CyanFalcon`) |
+| `CyanFalcon` **is** the conductor | **testimony-grade only** — my word, no receipt |
+| pane 1 ever **graded** anything | **`NONE FOUND`** |
+
+**So the conflict of interest in §5r above is real on the authorship half and testimony-grade on the
+identity half.** I am not marking it resolved. **The conductor asserting its own identity is exactly
+the shape of claim this lane has refused from everyone else**, and it does not get an exception for
+being about me.
+
+**Pane 2 and pane 3 are not in conflict here** — they answered different questions. Q66: *no current
+verdict rests on a vacuous check*, because both rows are `HELD` and `HELD` needs no clearance. Q22:
+*the rows may not be cited as gated*. **Both hold simultaneously**, and the combination is the useful
+statement: **nothing is wrong today, and nothing about those two rows may be leaned on tomorrow.**
+
+**Mapping status, stated at its measured strength:** `pane2↔COD`, `pane3↔MU` is *"operationally
+correct"* on four independent supports (the `RUNG2_COD_HUNT_MU` header, reciprocal `HUNT_SCORES`
+files, the suffix/header convention, non-author receipts) and **remains circumstantial — no single
+definitive sentence exists.** Both panes graded their own mapping evidence the same way,
+independently, and neither upgraded it.
