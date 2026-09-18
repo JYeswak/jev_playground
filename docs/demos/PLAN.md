@@ -2034,3 +2034,85 @@ behaviour §3o had to invent a rule to enforce on me.** It arrived here without 
 
 **COD-H5 returns to CLEARED** at rung 2, ownership risk resolved, with its rung-3 order unchanged:
 it queues behind COD-H2 because the WIP limit is one and 895 < 905.
+
+---
+
+## §3w-CORRECTION the census audited ME — **the 67.8% "ceiling" is not a ceiling, and the compaction A/B does not replicate**
+
+**`docs/demos/duel-2/runs/quoted-number-census-20260918T042957Z.json` (`1fea26c`) + companion `.md`.**
+Pane 2 censused 12 headline numbers, opened **8 local controls**, and found **4 external entries
+whose controls were never opened.** Three of its findings land on prose I committed **within the last
+two turns.**
+
+### Correction 1 — §3t's ceiling measures agreement with a model, not correctness
+
+`SURVEY-1`, result **`UNVERIFIED_EXTERNAL`**:
+
+> *"Raw 11-sweep/716-item artifact absent; public account says **references were model-averaged, not
+> human ground truth**." … "Ceiling not locally rederived and is **agreement-to-reference, not
+> correctness**."*
+
+**I used 67.8% as an accuracy ceiling and wrote it into a build order.** It is agreement with a
+model-averaged reference. Those are different quantities, and treating one as the other is my
+signature failure — *mistaking a probe's conditions for the thing measured*, the eighth instance this
+session.
+
+**The Q16 instruction does not change; its justification does.** *Claim coverage, latency, cost and
+the withhold path — not accuracy* remains correct, but it now rests on **§3p, which is local and
+verified**: 29.0 points of the phishing delta are dataset knowledge and 3.5 are method, CIs disjoint
+at each step. **That was always the better argument and I reached past it for a borrowed number.**
+
+### Correction 2 — the COD-H5 A/B I cited one turn ago does not replicate
+
+`USAGE-14a`, result **`UNSTABLE_HEADLINE`**:
+
+> *"Reduction 2047→1136 (44.43%) survives; **3–1 B-wins does not: reruns are 1–1 and 1–3, exposing
+> generator variance.**"*
+
+§3v cited *"pruned context 1/3 recall vs summary 3/3"* and I flagged it as small-N — *"a pointer, not
+a result."* **The real defect is worse than small N: the ordering flips across reruns.** An unstable
+comparison is not weak evidence, it is **no evidence**, and the caveat I wrote was the wrong caveat.
+
+**What survives: the 44.43% byte reduction (2047→1136).** **What is withdrawn: any claim that
+summarisation beats pruning on recall.** COD-H5's distinctness ruling (§3v) is **unaffected** — it
+rests on the architectural reading that the shipped tool decides-before while H5 measures-after, not
+on this A/B. But COD-H5 may no longer cite it, and if COD-H5 reaches rung 4 it must **generate its
+own stable comparison**, with seeds and repeats, because generator variance is now a known hazard on
+this exact surface.
+
+### Correction 3 — the speed/cost headline is conflicted, baseline unpinned
+
+`SURVEY-3`, result **`CONFLICTED_EXTERNAL`**: *"public source summaries attach headline to different
+workflow/model baselines and **separately report ~75x/171x**. Baseline identity must be pinned before
+use."* **No document in this lane may cite 193.6x/444.6x, or any speed/cost multiple, without naming
+the baseline model and workflow.**
+
+### A finding that is not about my errors: **the lane has a local calibration receipt**
+
+`entries[7]` — `foundation/runs/20260917T224444Z.json`: **ECE .061, Brier .020, Noul 58/60, Choice
+19/20.** Census verdict: *"Receipt matches numbers; no external transfer claim."*
+
+**That is a local, verified, honest calibration measurement, and §3m never cited it.** n=60 is small
+and it carries no transfer claim, but it is *ours*, it *replicates against its own receipt*, and it
+is strictly better evidence than the demo-7 prop I over-claimed in §3m and the survey line I
+over-read in §3t. **§3m's evidence base is now: two seeded designs, one external observer's
+synthesis, and one local n=60 receipt** — and the local receipt is the only item on that list nobody
+has had to correct.
+
+### demo-2's demand rests on a README narrative
+
+`USAGE-1a` and `USAGE-2a`, both **`UNVERIFIED`**, both with `control_exists: False`: the *"injection
+probability 0.99 while the page remained readable"* and *"contradicted claim caught at confidence
+1.0"* figures are `jev-mcp@6ec5efc` **README narrative with no labelled corpus and no committed
+control.** Live dependencies: **demo-2's admission screen** and the **demo-6/demo-3 claim surface**.
+
+demo-2 sits CLEARED at 700. **It moves to HELD**: not because the mechanism is wrong, but because
+its demand evidence is a vendor README sentence, and this lane has now been burned three times by
+headline numbers whose controls nobody opened.
+
+### The rule this earns
+
+**RULE: a number entering any lane document must carry its control's status — `opened`, `absent`, or
+`unopened` — at the point of use.** Pane 2 built the census that proves the rule necessary; four of
+twelve entries had controls nobody had looked at, and **three of my last four rulings leaned on
+them.**

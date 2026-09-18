@@ -343,3 +343,31 @@ partials** — a partial with a receipt beats a complete build that never lands,
 
 Output under `demos/preaction-abstention/` plus a receipt at
 `docs/demos/duel-2/runs/codh2-rung3-<ISO>.json`.
+
+---
+
+## AMENDMENT TO Q16 (appended after `1fea26c`, before pane 3's first partial)
+
+**The instruction is unchanged. Its justification was wrong and you must not repeat it.**
+
+Q16 says *"do NOT claim recall superiority over a deterministic checker"* and justified it with
+*"TypeSafe's own four-workflow average is 67.8% agreement."* **Pane 2's census (`1fea26c`) rules that
+number `UNVERIFIED_EXTERNAL`**: the raw artifact is absent, and the public account says the
+references were **model-averaged, not human ground truth** — so it is *agreement-to-reference, not
+correctness*. I used it as an accuracy ceiling. It is not one.
+
+**Do not cite 67.8% in the build, the README, or the receipt.** The instruction stands on **§3p**
+instead, which is local and verified: 29.0 points of the phishing delta are dataset knowledge, 3.5
+are method, CIs disjoint at each step. Claim **coverage, latency, cost and the withhold path.**
+
+**Also barred from the build's prose:** `193.6x`/`444.6x` or any speed/cost multiple without naming
+the baseline model *and* workflow — census rules it `CONFLICTED_EXTERNAL`, with other public
+summaries reporting **~75x/171x** for the same claim.
+
+**Use instead, if you want a calibration reference the lane actually owns:**
+`foundation/runs/20260917T224444Z.json` — **ECE .061, Brier .020, Noul 58/60, Choice 19/20**, census
+verdict *"receipt matches numbers; no external transfer claim."* n=60, no transfer claim, **and it is
+the only calibration number in this lane nobody has had to correct.**
+
+**New standing rule, effective now:** every number entering a lane document carries its control's
+status at the point of use — `opened`, `absent`, or `unopened`.
