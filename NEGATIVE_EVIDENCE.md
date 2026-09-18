@@ -645,3 +645,52 @@ label-defining rule alive with better constants.
 first attempt to size the exposure ran a **case-sensitive `grep -E`** against a **`re.I`** regex, and
 reported 12 nonmatching. Wrong control; corrected to 10 before publishing. **Eighth instance, second
 consecutive one caught before the number left my hands.**
+
+---
+
+## R18 — a receipt that contradicts ITSELF is real, and a gate for it is refused (2026-09-18)
+
+**Not a gap I closed. A mechanism a pane refused to let me build, with the trigger that would
+change the answer.**
+
+Pane 3 (`docs/demos/duel-2/runs/internal-consistency-ruling-20260918T133055Z.json`, `2c2519b`) found
+**three values for one share** inside a single cited receipt,
+`docs/demos/duel-2/runs/demo7-weights-20260918T041352Z.json`:
+
+```text
+0.7624955689471817   stored fraction      = 76.2496%
+76.22                stored INTERPRETATION TEXT   <- neither the fraction rounded nor explained
+76.25                cited in STATUS.tsv  = the fraction, correctly rounded
+```
+
+`scripts/verify-reason-numerals.sh` cannot see this. It checks **STATUS → receipt** literals and
+**never receipt ↔ receipt**. The defect lives entirely inside one file, in the half no instrument
+reads.
+
+**The ruling was BOTH, and the split is the finding.** Pane 3: *"Conceding either half loses
+something: calling it only a receipt defect leaves the blind spot unnamed; calling it only a gate gap
+demands machinery for one observation."*
+
+**Why no gate — and this is the reasoning worth keeping, not the verdict.** *"A general
+internal-consistency gate is UNDECIDABLE WITHOUT PER-SCHEMA DERIVATION RULES: any two numbers
+coexisting in one file are usually DIFFERENT QUANTITIES (91.6 vs 3.5 in FALSIFY_demo7 sit side by
+side legitimately), so a mechanical pair-check FALSE-POSITIVES BY CONSTRUCTION."* The only honest
+narrow form — author-declared `assert_equal` pairs — is new machinery for one observed case, and the
+lane's own family rule forbids it: **the tautology breaker waited for FOUR instances.**
+
+It labelled its own answer to stop it reading as evasion: **`NONE NOW — stated as a finding, not a
+dodge.`**
+
+**RETRY CONDITION (the part that makes a refusal usable):** a **SECOND** observed receipt-internal
+contradiction triggers a schema-level rule. Until then this row is the ledger entry that future
+recurrence is measured against — one observation is an instance, two is a class.
+
+**Remedy for the instance, not the class:** its owner explains or corrects the `76.22`, a
+**0.03-point unexplained gap inside a cited receipt.** Pane 3: *"No new gate, no guidance prose. The
+receipt's fraction and interpretation must agree or the disagreement must be explained in the receipt
+itself."* Assigned to pane 2 as the receipt's author; I did not edit another pane's receipt.
+
+**Why this row exists at all.** My instinct on being handed a blind spot was to extend the
+instrument, and I asked for a mechanism to be specified rather than invent one. The pane's answer was
+that the right size is zero — and a refusal with a trigger is worth more here than a gate that fires
+on every legitimately-adjacent pair of numbers in the corpus.
