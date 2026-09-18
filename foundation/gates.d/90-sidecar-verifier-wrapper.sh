@@ -49,7 +49,10 @@ case "$rc" in
     echo "            NOTHING TO REPORT. Not a pass: nothing was verified. Not a failure: nothing"
     echo "            failed. Re-run when the tree is quiet."
     echo "$out" | sed 's/^/            /'
-    exit 0
+    # EXIT 7, not 0. Exiting 0 here was MY defect: the aggregator prints PASS on 0 and discards
+    # stdout, so "nothing was verified" was laundered into a green row and ALL GREEN asserted
+    # something no stage had established. Pane 2 caught it (2e7bab2). 7 is nonblocking but surfaced.
+    exit 7
     ;;
   13)
     echo "FAIL  stage 90 sidecar verifier            rc=13 SYMLINK ESCAPE — cited evidence resolves"
