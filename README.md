@@ -91,7 +91,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`jev-ultrafast`|a browser agent driven by Jev|not run; needs a URL and a key|lowest priority, it is a live-network demo|
 |`fast-jev-compaction`|continuous context compaction with Jev|**RUN** — 29/29 tests; live run 21 messages to 7, 87.1% chars saved|it owns the core; ours keeps only the omp adapter and replay harness|
 |`commit-miner`|classify commit diffs and messages with Jev|not run|runnable against this repo's own history|
-|`foreman`|watch a software factory floor with Jev|not run|closest upstream analogue to the conductor loop|
+|`foreman`|watch a software factory floor with Jev|**RUN** — 57/58, one real failure reported|it is a per-worker supervisor with no queue concept, so it does not replace the tick|
 |`bicameral`|System 2 writes the code, System 1 judges it|not run|the architectural claim this lane assumes|
 |`jev-review`|Jev for code review|not run|read|
 |`system-one-adapter-python`|a drop-in `system_one` backed by an LLM|not run|useful as a control: an LLM standing in for Jev|
