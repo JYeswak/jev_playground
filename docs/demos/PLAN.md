@@ -124,6 +124,55 @@ A demo has shipped when **all four** exist and a non-author has verified them:
 
 ---
 
+## §3b THE DEMAND BAR — four questions, asked BEFORE a demo is built
+
+**Why this section exists, and it is an indictment of §3.** Every criterion in §3 is
+**supply-side**: does it install, does it test, does it emit a receipt, does it carry an EVAL row.
+Not one of them asks whether anybody would want the thing. Joshua, 2026-09-18: *"each demo needs
+to go through a rigorous bar — is it installable, what benefits does it provide to AI usage as a
+whole, who would want to download this and why, what does it help or improve?"*
+
+Demo-1 is the proof that §3 alone is insufficient: it satisfies **all four** ship artifacts,
+passes a clean-clone install, and **demonstrates nothing about Jev** (see the correction appended
+to §5.1). A bar that a valueless demo passes is not a bar.
+
+**Every demo must answer all four, in writing, in its contract file, before implementation
+starts.** An unanswerable question is a rejection, not a gap to fill later.
+
+1. **Is it installable by a stranger?** Clean clone, one command, green result, no placeholders, no
+   dependency on a path in the author's home directory. Defaults to committed fixtures.
+2. **What does it give AI usage as a whole?** Not what it gives *us*. A demo whose benefit is
+   lane-local is a tool, not a demo, and belongs in `scripts/` rather than `demos/`.
+3. **Who downloads it, and why?** Name the person and their pain in one sentence each. "Anyone
+   interested in Jev" is not an answer.
+4. **What does it help or improve, measurably?** The before-value and the after-value, and the
+   command that produces both. A benefit with no measurement is a hope.
+
+### Retroactive verdicts — applied 2026-09-18, and they re-order the backlog
+
+| Demo | installable | benefit to AI usage at large | who downloads it, why | verdict |
+|---|---|---|---|---|
+| **demo-7** signals starter | yes, template | **highest of the set** — the 62.6% → 95.1% method transfers to *any* zero-label classification, not just Jev | anyone asking "can a model do my classification"; the obvious approach loses by 32.5 points | **PASS** |
+| **demo-2** admission screen | yes, hook | prompt injection is a live, universal agent attack class | anyone whose agent reads web or tool output; 0.99 upstream witness | **PASS** |
+| **demo-5** fact ledger | yes, CLI | compaction that provably keeps answer-bearing facts; every long-running agent hits this | anyone hitting context limits; pruning scored 1/3 in all three runs | **PASS** |
+| **demo-3** claim-check gate | yes, pre-commit | agents fabricate numbers; this refuses a contradicted claim at commit time | anyone whose agents write cited claims; our own audit: 4 WRONG, 37 UNVERIFIABLE of 60 | **PASS** |
+| **demo-4** foreman-lite | yes, CLI | independent completion judging kills the self-certified close | agent-swarm operators with an issue tracker — **narrower**, it couples to `br` | **PASS, narrowed** |
+| **demo-9** review signal | yes | unproven: must find what `ubs` structurally cannot | unclear, and it is **UNSCORED** by any grader | **WEAK — hold** |
+| **demo-6** claim-check notes | yes | **redundant given demo-3** — same capability, different surface | nobody, *once demo-3 exists* | **REJECT unless demo-3 proves the seam** |
+| **demo-1** route backtest | yes, verified | **near zero** — spend arithmetic over *our* logs, decided by a hand-written token heuristic, zero Jev calls | a stranger learns nothing about their own routing from our fixtures | **FAILS the demand bar** (shipped before the bar existed) |
+| **demo-8** credential screen | n/a | n/a | n/a | **KILLED** earlier, on safety |
+
+**What the bar changed.** §5's ordering was by grader mean, which is a *supply-side* rubric —
+it rewarded well-specified demos. On demand, **demo-7 rises from last of the converged demos to
+first**, because a method that transfers to any classification task is worth more than a tool that
+serves one lane. **demo-6 becomes a reject** rather than a queued build. And the demo we already
+shipped **fails**.
+
+**The rule this produces:** a demo must be something a stranger installs to get a capability they
+did not have. Not a script that tells *us* something about *our* logs.
+
+---
+
 ## §4 Phase arc
 
 Phases are sequential in *gating*, not in calendar time; within a phase, tasks parallelize.
