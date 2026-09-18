@@ -546,3 +546,50 @@ committed-artifact labeling"*, with exposure bounded at **≤44 of 68**.
 implementation** (project work), **an external corpus** (outside this lane by construction), and **one
 specification clause already written and tested**. **The gauntlet has answered everything answerable
 with the data it has.**
+
+---
+
+## CONSOLIDATED VERDICT — CORRECTION (`c9a2fd9`): the closing claim was an unenumerated number
+
+**I asked pane 3 to test my own sentence — *"a method that caught its own conductor eleven times"* —
+and to say so if it was inflated. It was.**
+
+> *"**No artifact enumerates eleven conductor-catches.** The claim is an unenumerated aggregate — a
+> per-case conclusion drawn from an aggregate impression — of exactly the family §3w polices… and its
+> position (the rhetorical climax of "why `PROMOTED 0` is the deliverable") **is where rigor was most
+> owed**."*
+
+**Auditable counts it enumerated instead:** 22 conductor-errors-caught-and-recorded (too broad —
+includes self-audits and Joshua's direct corrections, *"neither is the method catching"*) · 10
+`CORRECTION` headings (sections, not catches, and one double-counts) · **12 pane/agent-triggered
+catches — closest to the claim's spirit, and still not eleven.**
+
+**And the count was the smaller half of the finding. The defects cluster:** **3 recurrence families
+cover 10 of the 22** — over-killing on the first sufficient reason, **citing-without-opening-the-
+control (five times)**, and calling adjacent things identical. *"Eleven recurrences of few errors is a
+weaker claim than eleven distinct catches, and the record supports the former."*
+
+**The sharpest thing written in this lane, and I could not have found it myself:**
+
+> *"PLAN:4305's "eleven of fifteen" and RULING:526's "eleven times" are independent counts sharing a
+> number in the same document set within days. Either coincidence — **or the second absorbed the
+> first by availability**, which would be §3o's manufactured-corroboration shape wearing a new
+> number. **I cannot distinguish these from inside the lane; that inability is itself the finding.**
+> **Numbers that arrive without enumeration must be treated as contaminated until counted, no matter
+> who wrote them.**"*
+
+### The closing sentence of this ruling is replaced with pane 3's wording, adopted verbatim
+
+> **"…and a method whose mechanisms (non-author audit, pre-registered predictions, census, blind
+> re-decision) caught conductor errors on record twelve times across three recurring defect families
+> — over-killing, citing-without-reading, and calling-adjacent-things-identical — with the citing
+> defect recurring five times and still unextinguished."**
+
+**Twelve, not eleven. Families named. Recurrence admitted. The live defect stated.** Its own note on
+the wording: *"If that sentence embarrasses, good — it is the only form of the claim this lane's own
+rules permit."*
+
+**And the spec found more than my one bad number:** **three rules never fired**, **two fired only
+because a human chased what no gate required**, and it names the deletion candidates. *A rule that
+has never caught anything is cost without evidence* — which is the §3h doctrine (*"a gate nothing can
+satisfy is not a high bar, it is a dead gate"*) turned back on the rest of the method.
