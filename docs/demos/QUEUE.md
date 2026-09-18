@@ -66,7 +66,7 @@ interval, and explicit held/unaskable paths.
 Output `docs/demos/duel-2/FALSIFY_COD-H2_MU.md`, ≥5,000 chars.
 
 ## UNIT Q2 — falsifiers for COD-H1, COD-H4, COD-H5
-**ELIGIBLE: pane 3 only** (pane 2 authored them). **CLAIM:** CopperCarp 2026-09-18T04:50Z
+**ELIGIBLE: pane 3 only** (pane 2 authored them). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/FALSIFY_COD-H145_MU.md` `8a8ec06` — 8,779 chars. All four COD candidates now falsifier-designed.
 
 Same shape as Q1, three candidates, all rung-2 cleared: COD-H1 (885), COD-H4 (900, flagged *corpus
 does not exist yet*), COD-H5 (895). COD-H4's missing corpus is itself a falsifier candidate — if the
@@ -75,7 +75,7 @@ corpus cannot be built cheaply, that is a rung-3 cost worth knowing now.
 Output `docs/demos/duel-2/FALSIFY_COD-H145_MU.md`, ≥6,000 chars.
 
 ## UNIT Q3 — resolve COD-H3's open structural question
-**ELIGIBLE: pane 3 only.** **CLAIM:** unclaimed
+**ELIGIBLE: pane 3 only.** **CLAIM:** CopperCarp 2026-09-18T04:58Z
 
 COD-H3 price-drift auditor is the **only** hunt candidate HELD at rung 2, on a structural question
 left open in `docs/demos/duel-2/RUNG2_COD_HUNT_MU.md` (`e23251d`). Resolve it: CLEARED, or
@@ -139,6 +139,29 @@ the alternatives, and audit its arithmetic and reasoning. Exclude anything you a
 Output `docs/demos/duel-2/runs/audit-<target>-<ISO>.json`.
 
 ---
+
+## UNIT Q9 — RUN COD-H2's label-free falsification half. **HIGHEST VALUE UNIT IN THIS FILE.**
+**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2; pane 3 designed the falsifier). **CLAIM:** unclaimed
+
+**Q1 and Q2 just made four candidates rung-3 eligible at once — COD-H2 905, COD-H4 900, COD-H5 895,
+COD-H1 885 — and the WIP limit is ONE.** So the question stops being *which to build* and becomes
+*which survives its own falsifier*, and §3k answers it: **run the label-free half before paying for
+any build.**
+
+Execute the label-free half of your own design in `docs/demos/duel-2/FALSIFY_COD-H2_MU.md`
+(`f894425`) against COD-H2, the leader. **Do not build COD-H2. Do not label anything.** Run only
+the part that needs no ground truth, and report the pre-registered number against the
+pre-registered threshold.
+
+**This is the exact shape that just killed MU-H1 in an hour** — a census, no labels, no Jev calls,
+no money, and a verdict of `DENOMINATOR_TOO_THIN` that would otherwise have cost days. If COD-H2's
+label-free half comes back thin, the lane's leader dies cheap and COD-H4 is next. **If it comes back
+healthy, COD-H2 is the first candidate in this lane to earn a build.** Both outcomes are wins; the
+only loss is not running it.
+
+Report `HEALTHY` / `THIN` / `UNASKABLE` with the measured number, the threshold it was compared
+against, and the command. Output `docs/demos/duel-2/runs/codh2-labelfree-<ISO>.json` plus a short
+companion `.md` if the reasoning needs prose.
 
 ## WHEN THIS FILE IS EXHAUSTED
 

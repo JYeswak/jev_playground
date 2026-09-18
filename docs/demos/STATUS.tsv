@@ -13,11 +13,11 @@ demo-6-claim-check-notes	1	330	HELD	pane3	docs/demos/duel-2/DEMAND_SCORES_COD_ON
 demo-7-signals-starter	1	560	HELD	pane1	docs/demos/duel-2/HELD_demo7_user_COD.md	hold-resolved-score-unchanged
 demo-8-credential-screen	1	100	RULED_OUT	pane3	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md	none-structural-safety-leak
 demo-9-review-signal	2	550	CLEARED	pane2	docs/demos/duel-2/RUNG2_demo9_MU.md	conditional-must-beat-ubs-baseline-not-subset
-COD-H1-snapshot-completion	2	885	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	falsify-before-rung3
+COD-H1-snapshot-completion	2	885	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H145_MU.md	RUNG3-ELIGIBLE-falsifier-designed-labelfree-half-first
 COD-H2-preaction-abstention	2	905	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H2_MU.md	RUNG3-ELIGIBLE-falsifier-designed-run-labelfree-half-first
 COD-H3-price-drift-auditor	2	890	HELD	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	rung2-held-structural-question-open
-COD-H4-toolresult-replay	2	900	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	falsify-before-rung3-corpus-absent
-COD-H5-compaction-integrity	2	895	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	falsify-before-rung3
+COD-H4-toolresult-replay	2	900	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H145_MU.md	RUNG3-ELIGIBLE-falsifier-designed-labelfree-half-first
+COD-H5-compaction-integrity	2	895	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H145_MU.md	RUNG3-ELIGIBLE-falsifier-designed-labelfree-half-first
 MU-H1-todo-judge	4	820	RULED_OUT	pane3	docs/demos/duel-2/runs/muh1-marker-census-20260918T034820Z.json	denominator-too-thin-17-markers-283KLOC-retry-on-legacy-corpus
 MU-H2-outbound-redaction	1	430	HELD	pane3	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md	baseline-vs-docverity-drift-neither-judges
 MU-H3-runtime-redaction	1	650	HELD	pane3	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md	voice-evidence-open-adjacent-openai-filters
