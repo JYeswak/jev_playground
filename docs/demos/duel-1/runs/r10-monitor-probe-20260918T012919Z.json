@@ -1,0 +1,68 @@
+{
+  "schema": "jev.r10.monitor-probe.v1",
+  "bead": "jev-demo-loop-a1q.4",
+  "generated_at": "2026-09-18T01:29:19Z",
+  "binary": {
+    "path": "/Users/josh/.local/bin/fleet-idle-monitor",
+    "installed": "2026-09-04",
+    "type": "Mach-O 64-bit executable arm64",
+    "help": "usage: fleet-idle-monitor [--nudge|--report-only|--selftest]; true idle requires two captures; dead means absent from tmux list-panes -a"
+  },
+  "mechanisms": {
+    "pane_index_token": true,
+    "agent_type_token": false,
+    "worker_filter_flag": false,
+    "exclude_flag": false,
+    "shell_filter_flag": false,
+    "help_flags": [
+      "--nudge",
+      "--report-only",
+      "--selftest",
+      "-h",
+      "--help"
+    ],
+    "strings_matches": [
+      "#{pane_index}",
+      "FLEET_QUEUE_REPO",
+      "mode=report-only",
+      "crates/fleet-monitor/src/bin/fleet-idle-monitor.rs",
+      "/Users/josh/Developer/uds"
+    ]
+  },
+  "pane_map": {
+    "session": "jev",
+    "user_pane": {
+      "pane_id": "%70",
+      "pane_index": 0,
+      "current_command": "zsh"
+    },
+    "agent_panes": [
+      {
+        "pane_id": "%74",
+        "pane_index": 1,
+        "current_command": "cli.js"
+      },
+      {
+        "pane_id": "%71",
+        "pane_index": 2,
+        "current_command": "cli.js"
+      },
+      {
+        "pane_id": "%73",
+        "pane_index": 3,
+        "current_command": "cli.js"
+      }
+    ],
+    "raw_command": "tmux list-panes -a -F '#{pane_id} idx=#{pane_index} sess=#{session_name} cmd=#{pane_current_command}'"
+  },
+  "ruling": "No binary-side user-shell or agent-type exclusion is exposed. The binary exposes pane_index in strings but no worker/agent_type/exclude/shell mechanism in help or strings.",
+  "owner": {
+    "repo": "/Users/josh/Developer/uds",
+    "evidence": "binary embeds /Users/josh/Developer/uds and crates/fleet-monitor/src/bin/fleet-idle-monitor.rs; current uds Cargo workspace does not list a fleet-monitor member"
+  },
+  "observed_risks": [
+    "%70 idx=0 cmd=zsh is the user shell and must not be actionable",
+    "bead uds-ry5d is cross-project leakage when recommended for a jev pane"
+  ],
+  "no_claim": "Read-only probe only; no binary patch, cron edit, or upstream bead was filed in this unit."
+}
