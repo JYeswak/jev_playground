@@ -42,13 +42,16 @@ zero callbacks; both finished beads were discovered by filesystem archaeology.
 A missing callback is a defect in YOUR packet, not in the pane.
 
 ```
-REPLY-VIA (all three, fire the moment the unit lands — DONE, BLOCKED, or
+REPLY-VIA (all FOUR, fire the moment the unit lands — DONE, BLOCKED, or
 NEEDS-RULING; a BLOCKED callback is a SUCCESS, it routes around the unknown):
-1. `br comments add <bead> --actor <YOU> -m "<OUTCOME> <receipt path> <sha>"`
-2. `am mail send --project ~/Developer/jev --from <YOU> --to <CONDUCTOR>
+1. THE ONLY LEG THAT WAKES THE CONDUCTOR — legs 2-4 are all PULL:
+   `ntm --robot-send=jev --panes=1 --msg="CALLBACK-P<N>-<UNIT>-<DONE|BLOCKED>:
+    <receipt path> <sha>. NEXT <unit>. NO-CLAIM <limit>."`
+2. `br comments add <bead> --actor <YOU> -m "<OUTCOME> <receipt path> <sha>"`
+3. `am mail send --project ~/Developer/jev --from <YOU> --to <CONDUCTOR>
    -s "[<bead>] <OUTCOME>" -b "<receipt> <sha> <NEXT> <NO-CLAIM>"`
    (find <CONDUCTOR> via `am agents list ~/Developer/jev`)
-3. Receipt file in tree (runs/ or docs/), committed with own-files-only.
+4. Receipt file in tree (runs/ or docs/), committed with own-files-only.
 Carry: bead id · commit sha · NEXT (what you'd pick up unprompted) ·
 NO-CLAIM (exact limit of what you proved).
 ```
@@ -116,6 +119,30 @@ going to both send a packet and file a bead was aborted mid-flight. The bead did
 callback was the only hint. Do not batch a dispatch with a bead filing: on abort you cannot tell
 which half landed, and "sender success is not receiver receipt" degrades to "no sender result at
 all". Re-derive both sides, then re-issue the missing one alone.
+
+**LEG 1 IS `ntm --robot-send` TO PANE 1. THE OTHER THREE DO NOT WAKE YOU.** Joshua, 2026-09-18,
+after finding the whole lane idle: *"your callbacks need to tell workers to send you a message
+back at pane 1 via ntm send when they are done."* The contract above lists a bead comment, mail,
+and a committed receipt — and **all three are PULL.** A bead comment sits in the store, mail sits
+in an inbox, a commit sits in the log; the conductor only sees any of them by polling, and between
+turns the conductor is not polling. So every packet MUST require, as the FIRST leg:
+
+```bash
+ntm --robot-send=jev --panes=1 --msg="CALLBACK-P<N>-<UNIT>-<DONE|BLOCKED>: <receipt path> <sha>. NEXT <unit>. NO-CLAIM <limit>."
+```
+
+**This was already the only leg that ever worked, and the evidence was sitting in plain sight.**
+Every pane-2 callback this session arrived promptly — because pane 2 was sending this message
+unprompted. Every pane-3 unit was discovered by archaeology, and pane 3 sat idle ~35 minutes —
+because pane 3 was not. Same instructions, one pane inventing the missing leg. The conductor read
+that asymmetry as "pane 2 is more diligent" instead of "my contract has no push leg", and
+separately blamed `am mail` (leg 3) for a silence that a push leg would have prevented regardless.
+
+Corollary: the conductor's own census is not a substitute. `fleet-idle-monitor` reported
+`WORKING pane=%73` while pane 3 was idle, and the conductor repeated it as fact **in the same turn
+it retracted a claim about that binary's false-WORKING defect**. A push callback is the only
+worker-state signal that does not depend on an instrument the conductor has already measured as
+unreliable.
 
 ## 3. DISPATCH — project-aware, by hand, in this order
 
