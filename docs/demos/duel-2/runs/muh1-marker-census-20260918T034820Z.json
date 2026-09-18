@@ -1,0 +1,358 @@
+{
+  "distribution": {
+    "max_repo": {
+      "name": "skillranker",
+      "total_markers": 12
+    },
+    "max_repo_share": 0.7058823529411765,
+    "mean_markers_per_repo": 1.0625,
+    "median_markers_per_repo": 0,
+    "nonzero_repo_count": 3,
+    "repo_count": 16,
+    "sorted_counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      3,
+      12
+    ],
+    "successful_repo_count": 16,
+    "total_markers": 17,
+    "zero_repo_count": 13
+  },
+  "failures": [],
+  "generated_at": "2026-09-18T03:48:20.030383Z",
+  "method": {
+    "excluded_pathspecs": [
+      ":!vendor/**",
+      ":!node_modules/**",
+      ":!dist/**",
+      ":!build/**",
+      ":!target/**"
+    ],
+    "kloc": "newline count in tracked, non-binary files",
+    "marker_count": "one count per token occurrence from git grep -I -h -o -E",
+    "marker_tokens": [
+      "TODO",
+      "FIXME",
+      "HACK",
+      "XXX"
+    ],
+    "model_discovery": false
+  },
+  "repositories": [
+    {
+      "expected_sha_prefix": "6ec5efc",
+      "failures": [],
+      "kloc": 2.288,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "jev-mcp",
+      "path": "/Users/josh/Developer/jev/jev-mcp",
+      "remote": "https://github.com/jkudish/jev-mcp",
+      "sha": "6ec5efc6601477557c1436981ba69eb7b35832bd",
+      "total_markers": 0,
+      "tracked_text_files": 14
+    },
+    {
+      "expected_sha_prefix": "57690af",
+      "failures": [],
+      "kloc": 3.909,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "jev-review",
+      "path": "/Users/josh/Developer/jev/jev-review",
+      "remote": "https://github.com/NiazMorshed2007/jev-review",
+      "sha": "57690af54ef7d862c2483342c1e61c14dffcf727",
+      "total_markers": 0,
+      "tracked_text_files": 30
+    },
+    {
+      "expected_sha_prefix": "452c1ad",
+      "failures": [],
+      "kloc": 5.566,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "jev-ultrafast",
+      "path": "/Users/josh/Developer/jev/jev-ultrafast",
+      "remote": "https://github.com/browser-use/jev-ultrafast",
+      "sha": "452c1ad2dd628008f1d5608f28158d76e49e6cc0",
+      "total_markers": 0,
+      "tracked_text_files": 36
+    },
+    {
+      "expected_sha_prefix": "86660a0",
+      "failures": [],
+      "kloc": 2.445,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "jev-router",
+      "path": "/Users/josh/Developer/jev/jev-router",
+      "remote": "https://github.com/gargpratyush/jev-router",
+      "sha": "86660a0248eba0e4523f81645ac2925e9808c000",
+      "total_markers": 0,
+      "tracked_text_files": 29
+    },
+    {
+      "expected_sha_prefix": "8292b51",
+      "failures": [],
+      "kloc": 2.43,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "jev-codex-router",
+      "path": "/Users/josh/Developer/jev/jev-codex-router",
+      "remote": "https://github.com/0xNatoshi/jev-codex-router",
+      "sha": "8292b519659280884627a962c826ac7721136a64",
+      "total_markers": 0,
+      "tracked_text_files": 19
+    },
+    {
+      "expected_sha_prefix": "cd9a35b",
+      "failures": [],
+      "kloc": 59.632,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 3,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0.05030855916286558,
+      "name": "jev-rerank-bench",
+      "path": "/Users/josh/Developer/jev/jev-rerank-bench",
+      "remote": "https://github.com/anessbelbati/jev-rerank-bench",
+      "sha": "cd9a35b22aeb4187334f7018a0ee1960a7470586",
+      "total_markers": 3,
+      "tracked_text_files": 58
+    },
+    {
+      "expected_sha_prefix": "1d56e8c",
+      "failures": [],
+      "kloc": 5.32,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "jev-phishing-bench",
+      "path": "/Users/josh/Developer/jev/jev-phishing-bench",
+      "remote": "https://github.com/anisselbd/jev-phishing-bench",
+      "sha": "1d56e8c64d029a9554a0874e2ef2901ed196e230",
+      "total_markers": 0,
+      "tracked_text_files": 23
+    },
+    {
+      "expected_sha_prefix": "fdb16b9",
+      "failures": [],
+      "kloc": 20.849,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "jev-sec-bench",
+      "path": "/Users/josh/Developer/jev/jev-sec-bench",
+      "remote": "https://github.com/Gaurav-Gosain/jev-sec-bench",
+      "sha": "fdb16b94d37535db9bad77f8ef0faa971bd7d69a",
+      "total_markers": 0,
+      "tracked_text_files": 29
+    },
+    {
+      "expected_sha_prefix": "76ef183",
+      "failures": [],
+      "kloc": 76.633,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "jev-spam-eval",
+      "path": "/Users/josh/Developer/jev/jev-spam-eval",
+      "remote": "https://github.com/bitnovus/jev-spam-eval",
+      "sha": "76ef18305710f8f38c984a56a80fc43e6bb18c6f",
+      "total_markers": 0,
+      "tracked_text_files": 40
+    },
+    {
+      "expected_sha_prefix": "4d46af7",
+      "failures": [],
+      "kloc": 11.631,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "jev-agent-failure-benchmark",
+      "path": "/Users/josh/Developer/jev/jev-agent-failure-benchmark",
+      "remote": "https://github.com/TokenTrim/jev-agent-failure-benchmark",
+      "sha": "4d46af795a4a4409940a65857da73e45abaea2db",
+      "total_markers": 0,
+      "tracked_text_files": 37
+    },
+    {
+      "expected_sha_prefix": "977617e",
+      "failures": [],
+      "kloc": 10.429,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "commit-miner",
+      "path": "/Users/josh/Developer/jev/commit-miner",
+      "remote": "https://github.com/devanshbatham/commit-miner",
+      "sha": "977617ebce07c56b965253a68577b1d92b93fdf1",
+      "total_markers": 0,
+      "tracked_text_files": 46
+    },
+    {
+      "expected_sha_prefix": "2c43982",
+      "failures": [],
+      "kloc": 3.773,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "foreman",
+      "path": "/Users/josh/Developer/jev/foreman",
+      "remote": "https://github.com/thruwire/foreman",
+      "sha": "2c439828b9fe45ee5d40f6f57be81f7ff1f8a140",
+      "total_markers": 0,
+      "tracked_text_files": 41
+    },
+    {
+      "expected_sha_prefix": "3bea244",
+      "failures": [],
+      "kloc": 7.246,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 2,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0.2760143527463428,
+      "name": "bicameral",
+      "path": "/Users/josh/Developer/jev/bicameral",
+      "remote": "https://github.com/AbdelStark/bicameral",
+      "sha": "3bea244b072cdacd3c8a85aec8d788a3ae0ac1cc",
+      "total_markers": 2,
+      "tracked_text_files": 70
+    },
+    {
+      "expected_sha_prefix": "b916897",
+      "failures": [],
+      "kloc": 6.81,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "s1-rs",
+      "path": "/Users/josh/Developer/jev/s1-rs",
+      "remote": "https://github.com/AbdelStark/s1-rs",
+      "sha": "b9168979a9beaeb74878483ff2876958acb98b86",
+      "total_markers": 0,
+      "tracked_text_files": 52
+    },
+    {
+      "expected_sha_prefix": "6e1da50",
+      "failures": [],
+      "kloc": 16.242,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 0,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0,
+      "name": "fast-jev-compaction",
+      "path": "/Users/josh/Developer/jev/fast-jev-compaction",
+      "remote": "https://github.com/tamaratran/fast-jev-compaction",
+      "sha": "6e1da50d064cc06aa08e720b534b4d873e2bb0b6",
+      "total_markers": 0,
+      "tracked_text_files": 26
+    },
+    {
+      "expected_sha_prefix": "3fe85c4",
+      "failures": [],
+      "kloc": 48.583,
+      "markers": {
+        "FIXME": 0,
+        "HACK": 0,
+        "TODO": 12,
+        "XXX": 0
+      },
+      "markers_per_kloc": 0.2469999794166684,
+      "name": "skillranker",
+      "path": "/Users/josh/Developer/jev/skillranker",
+      "remote": "https://github.com/Dicklesworthstone/skillranker",
+      "sha": "3fe85c432ba5e2b4f980e842fc94d57fae6c4189",
+      "total_markers": 12,
+      "tracked_text_files": 151
+    }
+  ],
+  "schema": "jev.duel2.muh1-marker-census.v1",
+  "study_denominator": {
+    "label_free_census_supports_200_marker_study": false,
+    "reason": "actionability is intentionally not inferred from marker text; labels are required for that half"
+  },
+  "command": "python3 - <<'PY' > /tmp/jev-muh1-marker-census.json 2>&1\nimport json\nimport os\nimport subprocess\nfrom datetime import datetime, timezone\n\nREPOS = [\n  (\"jev-mcp\", \"/Users/josh/Developer/jev/jev-mcp\", \"6ec5efc\"),\n  (\"jev-review\", \"/Users/josh/Developer/jev/jev-review\", \"57690af\"),\n  (\"jev-ultrafast\", \"/Users/josh/Developer/jev/jev-ultrafast\", \"452c1ad\"),\n  (\"jev-router\", \"/Users/josh/Developer/jev/jev-router\", \"86660a0\"),\n  (\"jev-codex-router\", \"/Users/josh/Developer/jev/jev-codex-router\", \"8292b51\"),\n  (\"jev-rerank-bench\", \"/Users/josh/Developer/jev/jev-rerank-bench\", \"cd9a35b\"),\n  (\"jev-phishing-bench\", \"/Users/josh/Developer/jev/jev-phishing-bench\", \"1d56e8c\"),\n  (\"jev-sec-bench\", \"/Users/josh/Developer/jev/jev-sec-bench\", \"fdb16b9\"),\n  (\"jev-spam-eval\", \"/Users/josh/Developer/jev/jev-spam-eval\", \"76ef183\"),\n  (\"jev-agent-failure-benchmark\", \"/Users/josh/Developer/jev/jev-agent-failure-benchmark\", \"4d46af7\"),\n  (\"commit-miner\", \"/Users/josh/Developer/jev/commit-miner\", \"977617e\"),\n  (\"foreman\", \"/Users/josh/Developer/jev/foreman\", \"2c43982\"),\n  (\"bicameral\", \"/Users/josh/Developer/jev/bicameral\", \"3bea244\"),\n  (\"s1-rs\", \"/Users/josh/Developer/jev/s1-rs\", \"b916897\"),\n  (\"fast-jev-compaction\", \"/Users/josh/Developer/jev/fast-jev-compaction\", \"6e1da50\"),\n  (\"skillranker\", \"/Users/josh/Developer/jev/skillranker\", \"3fe85c4\"),\n]\nTOKENS = (\"TODO\", \"FIXME\", \"HACK\", \"XXX\")\nEXCLUDES = (\":!vendor/**\", \":!node_modules/**\", \":!dist/**\", \":!build/**\", \":!target/**\")\n\n\ndef run_git(root, args, check=True):\n    p = subprocess.run([\"git\", \"-C\", root, *args], stdout=subprocess.PIPE, stderr=subprocess.PIPE)\n    if check and p.returncode != 0:\n        raise RuntimeError(f\"git -C {root} {' '.join(args)} rc={p.returncode}: {p.stderr.decode(errors='replace').strip()}\")\n    return p\n\nresults = []\nfailures = []\nfor name, root, expected_prefix in REPOS:\n    row = {\"name\": name, \"path\": root, \"expected_sha_prefix\": expected_prefix, \"failures\": []}\n    try:\n        sha = run_git(root, [\"rev-parse\", \"HEAD\"]).stdout.decode().strip()\n        remote = run_git(root, [\"config\", \"--get\", \"remote.origin.url\"], check=False).stdout.decode().strip()\n        row[\"sha\"] = sha\n        row[\"remote\"] = remote\n        if not sha.startswith(expected_prefix):\n            row[\"failures\"].append(f\"HEAD {sha} does not match pinned prefix {expected_prefix}\")\n        tracked = run_git(root, [\"ls-files\", \"-z\", \"--\", *EXCLUDES]).stdout\n        paths = [p.decode(errors=\"surrogateescape\") for p in tracked.split(b\"\\0\") if p]\n        total_lines = 0\n        text_files = 0\n        for rel in paths:\n            try:\n                data = open(os.path.join(root, rel), \"rb\").read()\n            except OSError as exc:\n                row[\"failures\"].append(f\"read {rel}: {exc}\")\n                continue\n            if b\"\\0\" in data:\n                continue\n            text_files += 1\n            total_lines += data.count(b\"\\n\")\n        row[\"tracked_text_files\"] = text_files\n        row[\"kloc\"] = total_lines / 1000.0\n        counts = {}\n        for token in TOKENS:\n            pattern = f\"(^|[^[:alnum:]_]){token}([^[:alnum:]_]|$)\"\n            p = run_git(root, [\"grep\", \"-I\", \"-h\", \"-o\", \"-E\", pattern, \"--\", *EXCLUDES], check=False)\n            if p.returncode not in (0, 1):\n                row[\"failures\"].append(f\"git grep {token} rc={p.returncode}: {p.stderr.decode(errors='replace').strip()}\")\n                counts[token] = None\n            else:\n                counts[token] = len(p.stdout.splitlines())\n        row[\"markers\"] = counts\n        row[\"total_markers\"] = sum(v for v in counts.values() if v is not None)\n        row[\"markers_per_kloc\"] = (row[\"total_markers\"] / row[\"kloc\"]) if row[\"kloc\"] else None\n    except Exception as exc:\n        row[\"failures\"].append(str(exc))\n    failures.extend({\"repo\": name, \"failure\": f} for f in row[\"failures\"])\n    results.append(row)\n\ncounts = [r[\"total_markers\"] for r in results if not r[\"failures\"]]\ncounts_sorted = sorted(counts)\nmedian = None\nif counts_sorted:\n    mid = len(counts_sorted) // 2\n    median = counts_sorted[mid] if len(counts_sorted) % 2 else (counts_sorted[mid - 1] + counts_sorted[mid]) / 2\n\ntotal = sum(counts)\ntop = max(results, key=lambda r: r.get(\"total_markers\", -1), default=None)\nreceipt = {\n    \"schema\": \"jev.duel2.muh1-marker-census.v1\",\n    \"generated_at\": datetime.now(timezone.utc).isoformat().replace(\"+00:00\", \"Z\"),\n    \"method\": {\n        \"marker_tokens\": list(TOKENS),\n        \"marker_count\": \"one count per token occurrence from git grep -I -h -o -E\",\n        \"kloc\": \"newline count in tracked, non-binary files\",\n        \"excluded_pathspecs\": list(EXCLUDES),\n        \"model_discovery\": False,\n    },\n    \"repositories\": results,\n    \"distribution\": {\n        \"repo_count\": len(results),\n        \"successful_repo_count\": len(counts),\n        \"nonzero_repo_count\": sum(1 for x in counts if x > 0),\n        \"zero_repo_count\": sum(1 for x in counts if x == 0),\n        \"total_markers\": total,\n        \"mean_markers_per_repo\": (total / len(counts)) if counts else None,\n        \"median_markers_per_repo\": median,\n        \"max_repo\": {\"name\": top[\"name\"], \"total_markers\": top[\"total_markers\"]} if top else None,\n        \"max_repo_share\": (top[\"total_markers\"] / total) if top and total else None,\n        \"sorted_counts\": counts_sorted,\n    },\n    \"study_denominator\": {\n        \"label_free_census_supports_200_marker_study\": total >= 200,\n        \"reason\": \"actionability is intentionally not inferred from marker text; labels are required for that half\",\n    },\n    \"failures\": failures,\n}\nprint(json.dumps(receipt, indent=2, sort_keys=True))\nPY\nproducer_rc=$?\nprintf 'producer_rc=%s\\n' \"$producer_rc\"\nprintf 'producer_bytes='; wc -c < /tmp/jev-muh1-marker-census.json\nif [ \"$producer_rc\" -ne 0 ]; then cat /tmp/jev-muh1-marker-census.json; exit \"$producer_rc\"; fi\ncat /tmp/jev-muh1-marker-census.json",
+  "interpretation": {
+    "result": "DENOMINATOR_TOO_THIN_FOR_LABELLED_HALF",
+    "observed_total_markers": 17,
+    "required_markers_for_pre_registered_labelled_half": 200,
+    "shortfall": 183,
+    "labelled_actionability_not_evaluated": true,
+    "reason": "Only 17 deterministic marker occurrences exist across 16 pinned repositories; 13 repositories have zero markers, so this corpus cannot supply the planned 200-marker human-label sample without changing the repository frame."
+  }
+}
