@@ -9,14 +9,43 @@ only guarantees the loop is ASKED about every 20 minutes — and every dispatch
 you send REQUIRES the callback contract in §2. A tick that moves nothing and
 sends nothing is a tick you must explain in one line, not skip.
 
-## 0. STAGE CENSUS — first line of every tick action, re-derived never cited
+## 0. PULL LIVE STATUS — FIRST ACTION OF EVERY TICK, BEFORE ANY PROSE
+
+```bash
+./scripts/lane-status.sh          # exits 3 if any verdict cites a receipt that does not exist
+```
+
+**Run it before you write a single sentence of status.** Joshua, 2026-09-18: *"your cron should
+remind you to pull live status - keep close tabs on what work has been done, what is left, it
+should not come from memory - it needs to be up to date."*
+
+**The defect this fixes is subtler than forgetting to check.** The conductor's status reports were
+assembled from **prose it had written itself** — `PLAN.md` sections, its own commit messages, its
+own summaries of pane callbacks. That is memory with extra steps, and it degrades silently: a
+verdict recorded in a paragraph cannot be checked against the artifact it claims, so a stale or
+invented state reads exactly like a current one.
+
+`docs/demos/STATUS.tsv` is therefore the **machine-readable state of record** — one row per
+candidate with rung, score, verdict, author and receipt path. The script renders it, **verifies
+every cited receipt exists on disk**, and derives everything else live: bead counts, artifact
+bytes, uncommitted deliveries, recent commits, worker panes.
+
+**It is a gate, and it discriminates in both directions** (measured 2026-09-18): a planted row
+citing a nonexistent receipt flags **exactly 1 of 16** and exits **3**; the unmodified state
+reports **15 candidates, every receipt present**, exit **0**. A detector that fired on every row
+would not have discriminated — that was the first version, and it was wrong.
+
+**When a verdict lands, update `STATUS.tsv` in the same turn as the commit that produced it.** A
+verdict that exists only in a commit message is invisible to the next tick, which is how the lane
+ended up reporting state from memory in the first place.
 
 ```
 DEMO <HH:MMZ> backlog N · active <demo-id or none> · beads live L · closed C
 ```
 
-Backlog authority: `docs/demos/PLAN.md`. WIP LIMIT IS ONE DEMO: no second demo
-starts before the active one ships (install + tests + receipt + EVAL row).
+Census line still required, and **every number in it comes from the script's output, not from
+recall**. Backlog authority: `docs/demos/PLAN.md` for reasoning, `docs/demos/STATUS.tsv` for state.
+WIP LIMIT IS ONE DEMO, and rung 3 is currently blocked (`PLAN.md` §3e).
 
 ## 1. CHECK ALL WORKERS
 
