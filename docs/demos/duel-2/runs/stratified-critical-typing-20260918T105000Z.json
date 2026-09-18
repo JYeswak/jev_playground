@@ -1,0 +1,72 @@
+{
+  "schema": "jev.stratified-critical-receipt-typing.v1",
+  "generated_at": "2026-09-18T10:50:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "independent content audit of pane3 typing",
+  "inputs": {
+    "proposal": "docs/demos/duel-2/runs/receipt-type-proposal-20260918T102335Z.tsv",
+    "status": "docs/demos/STATUS.tsv",
+    "rows": [
+      "demo-8-credential-screen",
+      "demo-2-admission-screen",
+      "demo-6-claim-check-notes",
+      "demo-9-review-signal"
+    ]
+  },
+  "bar": {
+    "n": 4,
+    "chosen_bar": "4/4 exact type agreement",
+    "why": "All four rows are the critical score/hold-resolution strata; with N=4, one disagreement is 25 percentage points and leaves the gate's only score escape clause unresolved. A partial bar would be too weak for this deliberately stratified pass.",
+    "declared_before_look": false,
+    "procedure_violation": "The four receipts were opened before this bar was recorded. The classifications below are independent content findings, but this is not a valid pre-registered agreement test."
+  },
+  "rows": [
+    {
+      "candidate": "demo-8-credential-screen",
+      "receipt": "docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md",
+      "proposed_type": "score",
+      "independent_type": "score",
+      "agreement": true,
+      "discriminator": "The document emits numeric grades for every candidate in a side-by-side ranking table, including Demo-8 120/150 -> 100; the kill language follows the grade and does not define a separate standing ruling.",
+      "filename_used": false,
+      "gate_relevance": "This is genuinely a score receipt by content and is the only STATUS row that can satisfy the score-receipt escape clause."
+    },
+    {
+      "candidate": "demo-2-admission-screen",
+      "receipt": "docs/demos/duel-2/HELD_demo2_demand_COD.md",
+      "proposed_type": "hold-resolution",
+      "independent_type": "hold-resolution",
+      "agreement": true,
+      "discriminator": "The status is demand RECOVERED from a hold, and the score is explicitly unchanged; the primary act disposes of the hold rather than issuing a new grade."
+    },
+    {
+      "candidate": "demo-6-claim-check-notes",
+      "receipt": "docs/demos/duel-2/HELD_demo6_incumbent_COD.md",
+      "proposed_type": "hold-resolution",
+      "independent_type": "hold-resolution",
+      "agreement": true,
+      "discriminator": "The document keeps the candidate HELD rather than ruled out, states the incumbent-search disposition, and names what would move it; it does not issue a new score."
+    },
+    {
+      "candidate": "demo-9-review-signal",
+      "receipt": "docs/demos/duel-2/HELD_demo9_build_or_skip_COD.md",
+      "proposed_type": "hold-resolution",
+      "independent_type": "hold-resolution",
+      "agreement": true,
+      "discriminator": "The primary act is SKIP/HOLD with a retry condition for build-or-skip; the existing score is context, not a new grade."
+    }
+  ],
+  "result": {
+    "exact_agreement": 4,
+    "agreement_rate": 1.0,
+    "observed_bar": "4/4",
+    "pre_registration_valid": false,
+    "classification_ruling": "All four assignments are content-sound. The score row is correctly typed and the three hold rows are not score receipts.",
+    "procedure_ruling": "The audit cannot claim a pre-registered agreement pass because the bar was recorded after opening the receipts. This is a process defect, not a typing disagreement."
+  },
+  "filename_audit": {
+    "filename_inference_found": false,
+    "basis": "Every type was decided from the opened table, status language, numeric grade structure, or hold/ruling content. Paths were used only to locate the artifacts."
+  },
+  "no_claim": "No valid pre-registered agreement statistic, no claim that all 17 rows were independently retyped, and no claim that future receipt types are covered."
+}
