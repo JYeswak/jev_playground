@@ -3217,3 +3217,62 @@ authorship risk into a text-checkable one, which is the only kind this lane has 
 
 **`NO-CLAIM no labels authored/started`** — the protocol is fixed, nothing is labelled, and the seed
 is not yet drawn (pane 3's Q34).
+
+---
+
+## §4q THE DESIGN'S AUTHOR FOUND FOUR WAYS TO GAME IT — before any run
+
+**`docs/demos/duel-2/runs/gameability-rung4-20260918T060939Z.json` (`3134260`), pane 2, adversarial
+against its own design.** Verdict: **`AMEND_Q29_DESIGN_BEFORE_RUNG4`.** I offered it the option to
+decline the unit as unperformable. It did not take it.
+
+| Gaming path | Gate defeated |
+|---|---|
+| **Always-withhold** | passes `flip ≤ 5%` — **but fails coverage**, so already partly caught |
+| **Constant probability** | games **ECE and Brier** |
+| **Easy-prefix answering** | games **selective accuracy** |
+| **Weak comparison baseline** | games **human action lift ≥ 20%** |
+
+**The `flip` gate behaved as I suspected and the coverage gate saved it.** I distrusted `flip ≤ 5%`
+because a policy that withholds more often never sits near the line — confirmed, and the existing
+coverage requirement already blocks the degenerate case. **That is the first time this session a gate
+I distrusted turned out to be adequately defended.**
+
+**The one that would have wrecked rung 4 silently is the second.** A **constant** predictor at the
+base rate can post a respectable ECE and Brier while carrying **zero discriminative information**.
+Raw Brier is not interpretable without a reference — and the design's gate was a raw threshold
+(`Brier ≤ .15`). **A degenerate model could have passed the headline calibration gates and been
+recorded as a rung-4 success.**
+
+### Six guards, each tied to a specific path
+
+- **model coverage ≥ .80** — blocks always-withhold.
+- **Brier *skill* against a prevalence baseline** — the correct fix: a constant predictor scores zero
+  skill by construction, so the gate now measures information rather than agreeableness.
+- **full coverage curve**, not a single point — blocks easy-prefix answering.
+- **full denominators** and **no silent skips** — blocks quiet exclusion of hard cases.
+- **boundary band separated** — retained, and now load-bearing given §4j's 0.74 → 0.70.
+
+### On the policy-disagreement guard: **adopted, not independently arrived at**
+
+The receipt lists *"every label disagreement must cite `policy.json` clause; no negotiated ground
+truth"* as a new guard. **That guard was in the Q33 packet I sent.** Its appearance is **adoption,
+not corroboration**, and §3o exists because I once counted exactly this kind of echo as evidence.
+**Recorded as adopted.** What is pane 2's own is the four gaming paths and the five statistical
+guards; the disagreement clause is mine, correctly incorporated.
+
+### Consequence: the rung-4 design is amended, and the amendment needs a non-author check
+
+The accepted design (`3a5851f`) is **superseded in its gate definitions** — `Brier ≤ .15` becomes a
+**skill score against prevalence**, coverage becomes a **hard floor**, and the curve replaces point
+readings.
+
+**One authorship gap, and I am closing it inside an existing role rather than adding a round trip:**
+pane 2 authored the design, audited it, and wrote the guards. **Pane 3 — already bound as the
+auditor — must confirm the six guards are actually implemented in the runner before the live run
+fires.** That is a precondition of the run, not a new gate: a guard that exists only in a receipt is
+the same defect as a threshold asserted rather than checked (§4b-CORRECTION).
+
+**Rung 4 remains authorized-not-started.** Preconditions now: immutable 200-case manifest (pane 3,
+Q34, in flight) · 200 labels with clause-cited disagreements · **six guards verified present in the
+runner**.
