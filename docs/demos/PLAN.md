@@ -3162,3 +3162,58 @@ counts merely scale with scope (2 in one directory, 6 across three).
 **§4c stays UNASKABLE.** And pane 3 drew the same line itself: *"full adjudication with per-finding
 dispositions belongs to the head-to-head run, not this screen."* **A category reading is not a
 per-finding disposition**, and it declined to promote one into the other.
+
+---
+
+## §4p AUDIT BAR RATIFIED AND STRENGTHENED — with a role-concentration note and one guard
+
+**`docs/demos/duel-2/runs/ratify-label-audit-20260918T060749Z.json` (`db6e78d`), pane 2.**
+**`RATIFIED_WITH_STRATIFIED_AMENDMENT`.**
+
+- **`≥18/20` retained overall**, and **amended to stratified sampling: 5 from each of the 4 strata,
+  with `≥4/5` agreement required in *every* stratum.**
+- Seed and case IDs **committed before sampling**.
+- **Pane A = WindyJaguar (pane 2) labels 200; Pane B = CopperCarp (pane 3) blind-audits 20;
+  conductor adjudicates disagreements.**
+
+**The amendment answers the exact question I asked and fixes the exact weakness.** A random 20 *could*
+have drawn ~5 per stratum; now it is **guaranteed** 5 per stratum with a per-stratum floor. **A
+stratum labelled systematically wrong can no longer be averaged away by three good strata** — and
+**the boundary band is one of the four**, so the most decision-sensitive population carries the
+tightest check. Strictly stronger than what it replaced.
+
+### Role concentration, stated because nobody else will
+
+Pane 2 now holds **three of four roles** on COD-H2: it authored the **candidate**, authored the
+**rung-4 design and its gates**, and has assigned itself the **200 labels**. The only independent
+role is pane 3's blind audit of 20.
+
+**Pane 2 chose the harder half** — 200 labels, ~90 minutes, versus 20 audited — and its binding
+satisfies my stated hard constraint exactly: **the author of `policy.json` (pane 3) does not author
+the labels its policy is graded against.**
+
+**But with two panes, some conflict is unavoidable, and it is worth naming which one we accepted:**
+
+| Assignment | Violates |
+|---|---|
+| **Chosen:** pane 2 labels, pane 3 audits | the **candidate author** produces the ground truth its candidate is scored against |
+| Alternative: pane 3 labels, pane 2 audits | the **policy author** produces labels for its own policy |
+
+**Neither is clean. The choice is defensible because a policy label is rule-application, not
+opinion:** the design specifies *"policy labels, **not model answers**"*, `policy.json` is
+**committed**, and applying a committed rule is checkable by anyone against its text. **The audit is
+therefore the real control, not the labeller's identity.**
+
+### One guard added, aimed at the risk that actually remains
+
+**The audit must be a mechanical check against the committed `policy.json` text, not a second
+opinion.** Specifically: **every disagreement must cite the policy clause it turns on.** Without
+that, a disagreement is two panes' intuitions colliding, the conductor adjudicates on taste, and the
+ground truth quietly becomes negotiated rather than derived.
+
+**With it, the labeller's conflict mostly evaporates** — pane 2 cannot label in COD-H2's favour
+without contradicting a committed clause that pane 3 can point at. That converts the residual
+authorship risk into a text-checkable one, which is the only kind this lane has been able to settle.
+
+**`NO-CLAIM no labels authored/started`** — the protocol is fixed, nothing is labelled, and the seed
+is not yet drawn (pane 3's Q34).
