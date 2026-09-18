@@ -26,14 +26,59 @@ PASS 10-fixture-integrity (0s)
 PASS 20-receipt-freshness (0s)
 PASS 30-no-secrets (0s)
 PASS 40-omp-compact-replay (1s)
-PASS 50-house-gates (0s)
-PASS 60-staged-deletion-lane (4s)
+PASS 50-house-gates (1s)
+PASS 60-staged-deletion-lane (3s)
 PASS 70-tests-registry-sync (0s)
+PASS 80-lane-instrument-selftests (12s)
+PASS 90-sidecar-verifier-wrapper (0s)
 gates: ALL GREEN
 ```
 
-Seven stages, no network, no key. Each one has a planted bad input that turns it red, listed in
-[`GATES.md`](GATES.md). A gate that cannot fail is not a gate.
+Nine stages, no network, no key. Each one has a planted bad input that turns it red, listed in
+[`GATES.md`](GATES.md) — **a gate that cannot fail is not a gate.** Re-derive the count from
+`foundation/gates.d/`; a number written here goes stale silently, and this one did — it said seven.
+
+## What you can run, offline, with no key
+
+Three tools. Each takes one command, reads your own logs, and writes a receipt that states its
+denominator before any share.
+
+**[`demos/usage-shape`](demos/usage-shape)** — *which token lever is worth attacking?*
+
+```bash
+node demos/usage-shape/bin/shape.mjs ~/.claude/projects
+```
+
+Measured on this machine, 2026-09-18, over 4,626 files / 4,619 sessions / 488,724 billed turns:
+**98.878% of all tokens are retransmitted context** (cache read), 0.980% context first-write,
+0.140% output, 0.002% fresh input. Mean context re-sent per turn: **341,496 tokens**. Weighted at
+published relative rates (cache read 0.1x, output 5x) that is **~84% of billed cost**. Run it on
+yours; that is the point.
+
+**[`demos/routing-backtest`](demos/routing-backtest)** — *would a cheaper-model router have paid?*
+
+```bash
+cd demos/routing-backtest && npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out runs/try.json
+```
+
+On our 30 classifiable turns it measured **0.0447%** savings and the candidate was **ruled out**. The
+verdict is scoped deliberately: it answers *same-turn price substitution*, not turn elimination. 21
+tests, and **7/7 planted mutations caught** — three of which were real holes found under a suite that
+was already green.
+
+**[`demos/retransmit-whatif`](demos/retransmit-whatif)** — *how much is the top lever worth?*
+
+An upper bound on per-turn retransmission reduction, with an explicit residual row that reconciles to
+zero. Graded **rung-2 fail as a demo** by a non-author pane — *"deterministic calculator; no judgment
+model needed"* — and kept as an instrument. Its bound does **not** cover turn elimination, and citing
+it as though it did would repeat the exact defect the backtest already made once.
+
+## What none of this claims
+
+**`PROMOTED 0`.** Seventeen candidates adjudicated: four ruled out, five cleared, eight held, none
+promoted to its own project. That is the deliverable, not a shortfall — and every reason lives in
+[`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 19 rows, each carrying the condition that would
+reopen it. One candidate died there today because an MIT-licensed tool already ships its surface.
 
 ## What it does
 
