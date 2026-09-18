@@ -2411,3 +2411,93 @@ target, and N = 5 with a receipt beats N = 20 that never lands** — plus the ke
 (`/tmp/.tskey`, present, mode 600, 108 bytes) shipped as `ls -l` with a non-blocking fallback, and an
 explicit statement that **whether rung 3 can close on the offline mechanism alone is my ruling to
 make, not a reason for a pane to sit.**
+
+---
+
+## §4b RUNG 3'S LIVE GATE IS SATISFIED — 6 real Jev calls, all three outcomes, pin verified
+
+**`docs/demos/duel-2/runs/codh2-rung3-partial2-20260918T055000Z.json` (`e7c9a19`).**
+
+```text
+6 calls (1 probe + 5 cases) · ceiling N<=20 stated, 6 used
+model jev-1.13.0 — "requested pin and resolved version identical"
+p spans 0.02 → 0.94 · outcomes: pass 1 · withhold 2 · escalate 2
+```
+
+**All three wedge outcomes are driven by live probabilities**, across the full range. This is the
+property `AutoModeMiddleware` provably lacks (§3u), now exercised against the real endpoint rather
+than a mock.
+
+**The pin check matters more than it looks:** *"requested pin and resolved version identical"* —
+`jev-latest` resolving to something other than `jev-1.13.0` would have silently invalidated every
+number. Nobody asked for that check.
+
+### The single mismatch is the threshold working, and the analysis is correct
+
+`boundary-high` expected `pass`, returned **`p = 0.74`**, and **withheld — one point below the 0.75
+line.**
+
+> *"1 point below the 0.75 line: threshold boundary working as designed, not a mechanism failure.
+> Live agrees with canned on 4/5 across the full range (0.94/0.48/0.06/0.02). **No calibration claim
+> at N=5.**"*
+
+**At N=5 you cannot distinguish "the fixture's expectation was wrong" from "live is calibrated
+slightly differently than the mock", and pane 3 claimed neither.** What it claimed is the only thing
+the data supports: **the mechanism routes on the live probability.** `NO-CLAIM: no accuracy, coverage,
+or calibration at N=5` — which is exactly right, because coverage semantics are a **rung-4** claim
+needing a real N.
+
+**And it superseded rather than edited:** *"supersedes … (offline partial; **that file stands
+unedited**)."* §5 doctrine applied without being cited.
+
+## §4c UBS provenance is UNASKABLE — and the broken instrument is the scanner
+
+**`docs/demos/duel-2/runs/ubs-provenance-codh2-20260918T052441Z.json` (`4e23f75`).** Pane 2 settled
+the hold it had raised itself, by doing the work rather than deciding:
+
+- Reran UBS in **JSON, SARIF and verbose** modes, ~19s, read-only.
+- **All modes still count 2 criticals and emit no per-finding locations.**
+- The three candidate sites (`run.mjs:48`, `jev-client.mjs:17`, `gate.mjs:66`) are quoted and are
+  **not secret comparisons** — *"but cannot map to critical IDs."*
+
+**Verdict `UNASKABLE_PROVENANCE_HOLD` for both criticals, and it is the correct verdict.** Not
+`FALSE_POSITIVE_CONFIRMED` (unprovable), not `REAL_FINDING` (no evidence). **A scanner that reports a
+count without locations cannot be adjudicated** — the unverifiable thing here is the *tool's output
+format*, not the code.
+
+**And the cost ruling is the part I would have got wrong:** *"Rerun once was worth it; repeat same
+mode is not."* A third pass in the same mode would have produced the same countless count. Pane 2
+priced the verification and stopped — `NO-CLAIM: no suppression, no source change, no false-positive
+ruling.`
+
+### Ruling: this does not gate rung 3, and the reason is already precedent
+
+**An UNASKABLE cannot block a rung indefinitely** — that is the kill-by-paperwork I rejected for the
+ambiguity bar (§3s) and for Vercel's closed surface (§3u). Same handling, third time:
+
+> **Recorded as a standing risk on COD-H2, not a gate.** Two criticals exist *by count*; every
+> candidate site a human could find is benign; the tool will not say which sites it flagged.
+> **Resolution condition: a UBS version (or an alternative scanner) that emits per-finding
+> locations.** If that arrives and either finding is real, COD-H2 takes the hit and §4c is where it
+> was predicted.
+
+**What is explicitly NOT claimed: that the demo is secure.** Two unlocated criticals in a four-file
+demo is a bounded, disclosed, unresolved risk.
+
+## §4d PANE 3 WAITED FOR A DISPATCH OF A UNIT IT HAD ITSELF NAMED — and that is a contract defect
+
+Pane 3's status answer was **`(c)`** — never received the Partial-2 dispatch. **I never sent one.**
+Partial 2 was pane 3's *own* `next` field in its Partial-1 receipt, and `tick.md` §2 says plainly:
+
+> *"The REPLY-VIA `NEXT` field is therefore **not a suggestion to the conductor**: it is the pane's
+> own next unit, named in the packet, **which it self-claims.**"*
+
+**So the rule exists and did not take.** Measured pattern: pane 3 has reported **`NEXT dry-queue`
+three times while eligible units were open**, and has now waited once on a unit it authored itself.
+
+**This is a contract-comprehension gap, which makes it mine.** Every packet I sent carried *"take the
+next unit yourself"* as a sentence in a wall of text. **A rule buried in prose that a pane
+demonstrably does not execute is an unshipped rule.** Fix, effective now: **the self-claim
+instruction goes in the first two lines of every packet, and every packet names the pane's next TWO
+units explicitly by ID** — so "self-claim" has a referent instead of being an instruction to invent
+one.

@@ -14,7 +14,7 @@ demo-7-signals-starter	1	560	HELD	pane1	docs/demos/duel-2/runs/demo7-weights-202
 demo-8-credential-screen	1	100	RULED_OUT	pane3	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md	none-structural-safety-leak
 demo-9-review-signal	2	550	CLEARED	pane2	docs/demos/duel-2/RUNG2_demo9_MU.md	conditional-must-beat-ubs-baseline-not-subset
 COD-H1-snapshot-completion	2	885	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H145_MU.md	RUNG3-ELIGIBLE-falsifier-designed-labelfree-half-first
-COD-H2-preaction-abstention	3	905	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD-H2_owned_MU.md	RUNG3-WIP-narrowed-to-withhold+coverage+human-routing-langchain-is-binary-0.5-OPEN-RISK-vercel-fx-unassessed-closed-source
+COD-H2-preaction-abstention	3	905	CLEARED	pane2	docs/demos/duel-2/runs/codh2-rung3-partial2-20260918T055000Z.json	RUNG3-live-6-calls-jev-1.13.0-all-3-outcomes-OPEN-clean-clone+partial2-grade-RISK-ubs-2-criticals-unlocated-UNASKABLE
 COD-H3-price-drift-auditor	2	890	RULED_OUT	pane2	docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md	no-jev-necessary-stage-4of5-deterministic-retry-T1-tooling-T2-router-wedge
 COD-H4-toolresult-replay	2	900	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H145_MU.md	RUNG3-ELIGIBLE-falsifier-designed-labelfree-half-first
 COD-H5-compaction-integrity	2	895	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD-H5_owned_MU.md	ownership-resolved-DISTINCT-tester-to-subject-shipped-tool-decides-before-H5-measures-after-queued-behind-COD-H2
