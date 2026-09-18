@@ -1,0 +1,28 @@
+{
+  "schema": "jev.tick.shipping-order-ruling.v1",
+  "generated_at": "2026-09-18T16:50:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "question": "Should the backtest README ship before the portable verifier bundle?",
+  "decision": "YES_BACKTEST_FIRST",
+  "reason": "The backtest already has a non-lane consumer path: Node 20, no dependencies, no key, no network, fixture input, required receipt output, and documented negative fixtures. The verifier bundle is still a proposal requiring packaging, snapshot boundary, and external validation.",
+  "candidate_order": [
+    {
+      "artifact": "demos/routing-backtest",
+      "order": 1,
+      "consumer": "a non-lane operator with omp session logs",
+      "ship_gate": "npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out runs/try.json",
+      "positive": "receipt with denominator and spend/counterfactual totals",
+      "negative": "unknown model/unclassifiable-turn fixtures and nonzero failures",
+      "blocking_polish": "README duplicates its opening answer paragraph; remove duplication before external publication."
+    },
+    {
+      "artifact": "portable receipt-other-reasons verifier bundle",
+      "order": 2,
+      "status": "proposal only",
+      "blockers": ["package/install surface", "snapshot/verifier identity contract", "external validation"],
+      "no_key": true
+    }
+  ],
+  "ruling": "The backtest is the smallest externally consumable artifact now. The verifier bundle is smaller in code delta but not yet shippable because its snapshot/verifier identity boundary is unfinished.",
+  "no_claim": "No claim that the backtest README is already published externally, no claim that its duplicate prose is acceptable, and no claim that the verifier bundle is shipped."
+}
