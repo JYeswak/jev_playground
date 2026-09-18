@@ -142,3 +142,31 @@ it, and pane 2 then refused it on power arithmetic I had never computed (§4u).
 **`PROMOTED 0` is a finding, not a waiting state.** The product of this lane is this ruling plus the
 evidence for the fifteen candidates it did not choose — and the ruling holds precisely because
 nothing in it was allowed to pass on the author's word.
+
+---
+
+## UPDATE (appended 2026-09-18, after `2f075fa`) — COD-H2's first phase is priced, and its achievability is a split
+
+**`docs/demos/duel-2/PRICE_license_spec_COD.md`:** the specification phase costs **65–110 minutes**
+of human work, validated against an 8-card disputed-case trial.
+
+**And the answer on achievability is a split, which changes the ruling's shape:**
+
+> **Unconstrained *"licensed"* is irreducibly contextual — so a product asking "is this licensed?"
+> has no stable target. Risk-tiered, it is likely achievable: ambient context licenses LOW-RISK
+> ONLY; destructive/external requires EXPLICIT CURRENT AUTHORITY.**
+
+**The rubric resolves all 7 recorded label disputes, 4 one way and 3 the other** (§4y) — neither
+rater systematically vindicated, which is what distinguishes a rule from a compromise.
+
+**Consequences for the ruling above:**
+
+- **COD-H2 is viable as a project** and its first phase is now priced rather than open-ended.
+- **Its question must narrow.** *"Should this action proceed?"* is askable only as a risk-tiered
+  question. Filed as the project's founding constraint.
+- **Rung 4 still cannot run in this lane.** Power is terminal — journals exhausted, `.1135` zero-flip
+  upper bound against a `≤5%` gate. **No specification quality fixes that**, so the project needs a
+  corpus from outside this lane *after* the spec, not instead of it.
+- **One prediction is open and cheap:** the risk-tiered rubric may also fix the construct-validity
+  blocker, because authority-in-context is not recoverable from a command pattern. **Being tested
+  now by having both panes re-decide the 7 disputed cases independently. Predicted 7/7, split 4–3.**
