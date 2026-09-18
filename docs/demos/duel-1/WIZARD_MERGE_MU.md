@@ -1,14 +1,18 @@
 # Duel 1 — merged-implementation rulings, duelist B (muse)
 
-Four ideas converged across lineages; the backlog needs implementations,
-not winners. For each pair I rule per dimension — scope, mechanism, RED
-arms, install, failure mode — naming which file's version survives and why,
-with my bias declared per pair (I authored the MU side of all four).
-"Neither" was considered every time; the honest result is that no pair
-needs a fifth implementation — the unions are coherent. (The duel's actual
-fifth implementation already exists: B1 sanitize-before-send, which is
-neither file's version but MU-2's ashes plus CC-5's scope. It is referenced,
-not re-ruled.)
+Two pairs are the same demo and two are adjacent-but-distinct, per the
+convergence ruling (`WIZARD_CONVERGENCE_AUDIT_COD.md`, `9b0965b`) — not
+four converged ideas. (CORRECTED per non-author audit
+`runs/merge-audit-20260918T013451Z.json`: this file first presented the
+merge as evidence of convergence; it is a post-ruling implementation plan
+built on an overstated headline.) For each pair I rule per dimension —
+scope, mechanism, RED arms, install, failure mode — naming which file's
+version survives and why, with my bias declared per pair (I authored the
+MU side of all four). "Neither" was considered every time; the honest
+result is that no pair needs a fifth implementation — the unions are
+coherent. (The duel's emergent fifth, B1 sanitize-before-send, exists as
+a *specified* blindspot in `WIZARD_BLINDSPOTS_MU.md` — unbuilt, unrun;
+referenced here, not re-ruled.)
 
 ---
 
@@ -38,7 +42,12 @@ not re-ruled.)
 - **Failure mode:** carries both files' named risks — status-quo bias via
   the baseline (MU), silent dollar-rot via stale prices (CC).
 
-## Pair 2 — admission screen (MU-2 ≡ CC-5): CC-5's scope, MU-2's rigor
+## Pair 2 — admission screen (MU-2 × CC-5): post-reveal union, CC-5's scope, MU-2's rigor
+
+(CORRECTED per merge-audit: the scored proposals were ADJACENT BUT
+DISTINCT — MU-2 carried a credential question with fail-closed block,
+CC-5 was injection-only shadow-first. What follows is a post-reveal
+union, not same-demo convergence.)
 
 **Bias:** authored MU-2, the flawed half. This ruling goes against
 authorship on scope — necessarily, since my scope shipped a leak.
@@ -65,7 +74,11 @@ authorship on scope — necessarily, since my scope shipped a leak.
   note stands), FP-nag route-around (silent-healthy-path rule is the
   guard).
 
-## Pair 3 — claim-checker (MU-4 ≡ CC-2): CC-2 first, MU-4 second — one demo, two phases
+## Pair 3 — claim-checker (MU-4 × CC-2): post-reveal union, CC-2 first, MU-4 second
+
+(CORRECTED per merge-audit: ADJACENT BUT DISTINCT — MU-4 checks notes
+against an evidence directory, CC-2 checks staged commit-message triples.
+A phased product is valid; it is not independent same-demo convergence.)
 
 **Bias:** authored MU-4. Ruling ships the rival scope first; reasoning below.
 
@@ -80,9 +93,11 @@ authorship on scope — necessarily, since my scope shipped a leak.
   specification); CC-2 contributes `CLAIM_CHECK_SKIPPED` on API outage.
   Extraction v1 = explicit blocks + structured citations (both files now
   agree; arbitrary prose stays refused).
-- **RED arms:** union — 7-vs-8 refuse naming both numbers, missing artifact,
-  span-mismatch (CC's addition, adopted), empty evidence, unlabeled
-  citation, skip path. Seven arms is a lot; every one maps to a distinct
+- **RED arms:** union, seven — contradicted-must-refuse (restored: covers
+  non-numeric contradictions, which the 7-vs-8 numeric instance does not;
+  the prior draft claimed seven and listed six), 7-vs-8 refuse naming both
+  numbers, missing artifact, span-mismatch (CC's addition, adopted), empty
+  evidence, unlabeled citation, skip path. Every one maps to a distinct
   failure observed in-lane this month.
 - **Install:** CC-2's `githooks/` + `core.hooksPath` path (no new
   mechanism); single canonical runtime, killing my `uvx`/`npx` fork.
