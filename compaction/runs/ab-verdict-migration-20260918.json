@@ -1,0 +1,63 @@
+{
+  "receipt_type": "ab_verdict_migration",
+  "date": "2026-09-18",
+  "bead": "jev-demo-loop-a1q.3",
+  "harness": "compaction/ab/run-ab.ts",
+  "contract": "No relative verdict at n=1; requested verdict requires >=10 zero-spread samples per arm.",
+  "specified_census_command": "git ls-files -z | xargs -0 grep -lE '3/3|B wins|ab-20260917'",
+  "producer_rc": 0,
+  "current_match_count": 34,
+  "matched_paths": [
+    ".beads/issues.jsonl",
+    "EVAL.md",
+    "NEGATIVE_EVIDENCE.md",
+    "compaction/ab/run-ab.ts",
+    "docs/demos/BEAD-TEMPLATE.md",
+    "docs/demos/PLAN.md",
+    "docs/demos/contracts/demo-1-route-backtest.md",
+    "docs/demos/contracts/demo-5-fact-ledger.md",
+    "docs/demos/duel-1/DUELING_WIZARDS_REPORT.md",
+    "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+    "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+    "docs/demos/duel-1/WIZARD_REACTIONS_CC.md",
+    "docs/demos/duel-1/WIZARD_REPORT_AUDIT_COD.md",
+    "docs/demos/duel-1/WIZARD_SCORES_COD_ON_CC.md",
+    "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md",
+    "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+    "docs/demos/duel-1/WIZARD_STEELMAN_MU.md",
+    "docs/demos/duel-1/dispatch/pane2-deep-contracts.md",
+    "docs/demos/duel-1/dispatch/pane2-publish-paths.md",
+    "docs/demos/duel-1/dispatch/pane2-queue-extension.md",
+    "docs/demos/duel-1/dispatch/pane2-r6-ubs.md",
+    "docs/demos/duel-1/dispatch/pane2-report-audit-repath.md",
+    "docs/demos/duel-1/dispatch/pane2-score-MU.md",
+    "docs/demos/duel-1/dispatch/pane2-steelman-and-queue.md",
+    "docs/demos/duel-1/dispatch/pane3-score-CC.md",
+    "docs/demos/duel-1/runs/claim-audit-20260918T003836Z.json",
+    "docs/demos/duel-1/runs/pane1-cc-20260918T000328Z.json",
+    "docs/demos/duel-2/RUNG2_COD-H5_owned_MU.md",
+    "docs/demos/duel-2/RUNG2_JEV_SHAPE_COD.md",
+    "docs/demos/duel-2/runs/audit-gates-registry-20260918T110806Z.json",
+    "docs/demos/duel-2/runs/audit-stage80-20260918T112921Z.json",
+    "docs/demos/duel-2/runs/levers-ruling-20260918T140638Z.json",
+    "docs/demos/duel-2/runs/publish-redteam-20260918T153930Z.json",
+    "docs/demos/duel-2/runs/quoted-number-census-20260918T042957Z.md"
+  ],
+  "disposition": {
+    "active_authoritative_docs": [
+      "EVAL.md",
+      "NEGATIVE_EVIDENCE.md",
+      "compaction/README.md",
+      "compaction/runs/ab-20260917.json",
+      "compaction/runs/ab-rerun-20260918.json",
+      "compaction/runs/ab-sample3-20260918.json"
+    ],
+    "historical_markdown_annotated": 18,
+    "historical_json_annotated": 3,
+    "remaining_matches": "Historical score literals, fixture content, bead descriptions, and the implementation guard; none are current verdict outputs."
+  },
+  "no_claim": [
+    "This grep is intentionally lexical and overcounts non-verdict 3/3 strings.",
+    "It does not claim every historical file is semantically a verdict citation."
+  ]
+}

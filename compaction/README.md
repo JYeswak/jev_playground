@@ -25,10 +25,20 @@ verifying the library contract on omp-shaped traffic.
 
 ```sh
 npm install
-npm test                      # 4 deterministic adapter tests
+npm test                      # deterministic adapter and verdict-contract tests
 npm run replay -- <t.jsonl> [--out runs/r.json]
 ../../foundation/gates.d/40-omp-compact-replay.sh   # gate (hermetic)
 ```
+
+## Resume-quality A/B boundary
+
+`ab/run-ab.ts` records arm scores and sampling evidence. It does **not** emit a
+relative verdict for the historical single-sample runs: an arm is only eligible
+for a requested verdict after at least 10 zero-spread samples. The three existing
+receipts retain their observed scores but mark their old n=1 verdicts retracted;
+the identical fixture producing arm-B scores 1 and 3 is evidence of variance, not
+a result. `ab/verdict.ts` and `test/ab-verdict.test.ts` cover the red arm and the
+minimum sample contract.
 
 - Thinking content is dropped (counted in receipt). If a future task needs
   reasoning preserved, the adapter must grow a channel for it — currently none.

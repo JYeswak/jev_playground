@@ -1,3 +1,5 @@
+<!-- A/B verdict migration (2026-09-18): any literal n=1 relative verdict below is historical/retracted. Current harness withholds verdicts until each arm has >=10 zero-spread samples; see compaction/ab/verdict.ts. -->
+
 # DISPATCH — pane 2 · publish-path scrub · 3 units
 
 Your BLOCKED callback was correct and useful: `a6e1353` scrubbed 76 `thinkingSignature` fields and

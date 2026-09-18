@@ -97,11 +97,11 @@ calibration audit. No adversarial corpora yet — framed as a next audit in
 established.** This line previously read "No A/B-vs-LLM runs yet", which was true when written and
 false by 2026-09-18. All three receipts are in `compaction/runs/`:
 
-| Receipt | fixture bytes / sha | armA Jev-prune | armB LLM summary | verdict |
+| Receipt | fixture bytes / sha | armA Jev-prune | armB LLM summary | verdict status |
 |---|---|---:|---:|---|
-| `ab-20260917.json` | 214,993 · `20fa1ea0…` | **1/3** | 3/3 | "B wins" |
-| `ab-rerun-20260918.json` | 82,214 · `2346451d…` | **1/3** | 1/3 | "tie" |
-| `ab-sample3-20260918.json` | 82,214 · `2346451d…` (**identical to row 2**) | **1/3** | 3/3 | "B wins" |
+| `ab-20260917.json` | 214,993 · `20fa1ea0…` | **1/3** | 3/3 | **withheld (n=1)** |
+| `ab-rerun-20260918.json` | 82,214 · `2346451d…` | **1/3** | 1/3 | **withheld (n=1)** |
+| `ab-sample3-20260918.json` | 82,214 · `2346451d…` (**identical to row 2**) | **1/3** | 3/3 | **withheld (n=1)** |
 
 Rows 2 and 3 share a byte-identical fixture and disagree by two points on arm B. That settles the
 attribution, and it was not what the first two rows suggested. The fixture *had* changed between
@@ -116,7 +116,7 @@ What is stable and what is not, stated separately because only one of them is us
   facts, robustly. This is the lane's one supported compaction finding, and it is the premise the
   fact-ledger demo rests on.
 - **Unstable: armB scores 3, 1, 3 on identical input.** So "summarizing beats pruning" was a
-  coin flip reported as a result. The original "B wins" was n=1 on a stochastic arm.
+  coin flip reported as a result. The original relative verdict was n=1 on a stochastic arm and is now retracted.
 
 Boundary on the boundary: no run licenses a claim about Jev's pruning *relative* to
 summarization, and adding samples of a 2-point-variance arm will not fix that cheaply — it needs a

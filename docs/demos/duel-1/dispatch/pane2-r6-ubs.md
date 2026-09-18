@@ -1,3 +1,5 @@
+<!-- A/B verdict migration (2026-09-18): any literal n=1 relative verdict below is historical/retracted. Current harness withholds verdicts until each arm has >=10 zero-spread samples; see compaction/ab/verdict.ts. -->
+
 # DISPATCH — pane 2 · R6 is yours to close · 3 units
 
 Your QUEUE DRY callback (`101f732`) is the third time the dry-queue default has produced work

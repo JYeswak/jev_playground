@@ -471,7 +471,18 @@
         "matched": false
       }
     ],
-    "score": 1
+    "score": 1,
+    "sampling": {
+      "deterministic": false,
+      "determinism": "unestablished",
+      "sampleCount": 1,
+      "scores": [
+        1
+      ],
+      "min": 1,
+      "max": 1,
+      "spread": 0
+    }
   },
   "armB": {
     "contextBytes": 630,
@@ -496,8 +507,20 @@
         "matched": false
       }
     ],
-    "score": 1
+    "score": 1,
+    "sampling": {
+      "deterministic": false,
+      "determinism": "unestablished",
+      "sampleCount": 1,
+      "scores": [
+        1
+      ],
+      "min": 1,
+      "max": 1,
+      "spread": 0
+    }
   },
-  "verdictRule": "A wins iff armA.score > armB.score; B wins iff armB.score > armA.score; otherwise tie.",
-  "verdict": "tie"
+  "samplingPolicy": "Historical n=1 score only; no verdict is established or emitted.",
+  "historicalVerdictStatus": "retracted",
+  "historicalVerdictWas": "equal-score-at-n1"
 }

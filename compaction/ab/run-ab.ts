@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { compactMessages, type Message } from 'fast-jev-compaction';
 import { collectToolCalls } from '../../fast-jev-compaction/src/state.ts';
 import { adaptOmpTranscript, type OmpEvent } from '../src/omp-adapter.ts';
+import { requestedVerdict, summarizeSamples } from './verdict.ts';
 
 const transcript = process.argv[2] ?? '../compaction/fixtures/omp-session-big-20260917.jsonl';
 const output = process.argv[3] ?? '../compaction/runs/ab-20260917.json';
@@ -161,7 +162,18 @@ const armBGrades = grade(armBResume.stdout);
 const score = (grades: { matched: boolean }[]) => grades.filter((item) => item.matched).length;
 const armAScore = score(armAGrades);
 const armBScore = score(armBGrades);
-const verdict = armAScore > armBScore ? 'A wins' : armBScore > armAScore ? 'B wins' : 'tie';
+const armASampling = summarizeSamples([armAScore]);
+const armBSampling = summarizeSamples([armBScore]);
+const demandVerdict = process.argv.includes('--verdict');
+let verdict: ReturnType<typeof requestedVerdict> | undefined;
+let verdictError: string | undefined;
+if (demandVerdict) {
+  try {
+    verdict = requestedVerdict(armASampling, armBSampling);
+  } catch (error) {
+    verdictError = error instanceof Error ? error.message : String(error);
+  }
+}
 
 const receipt = {
   schema: 'jev.resume-quality-ab.v1',
@@ -215,6 +227,7 @@ const receipt = {
     stderr: armAResume.stderr,
     grades: armAGrades,
     score: armAScore,
+    sampling: armASampling,
   },
   armB: {
     contextBytes: Buffer.byteLength(armBContext, 'utf8'),
@@ -224,9 +237,12 @@ const receipt = {
     stderr: armBResume.stderr,
     grades: armBGrades,
     score: armBScore,
+    sampling: armBSampling,
   },
-  verdictRule: 'A wins iff armA.score > armB.score; B wins iff armB.score > armA.score; otherwise tie.',
-  verdict,
+  samplingPolicy: 'A verdict is withheld until each arm has at least 10 zero-spread samples; n=1 is evidence only.',
+  ...(verdict ? { verdict } : {}),
+  ...(verdictError ? { verdictError } : {}),
 };
 writeFileSync(output, `${JSON.stringify(receipt, null, 2)}\n`);
-console.log(JSON.stringify({ output, liveCalls: 4, jevRequests: armAResult.stats.requests, droppedCallIds: dropped.map((call) => call.id), armAScore, armBScore, verdict }));
+console.log(JSON.stringify({ output, liveCalls: 4, jevRequests: armAResult.stats.requests, droppedCallIds: dropped.map((call) => call.id), armAScore, armBScore, ...(verdict ? { verdict } : {}), ...(verdictError ? { verdictError } : {}) }));
+if (verdictError) process.exitCode = 2;

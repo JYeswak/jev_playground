@@ -1,3 +1,5 @@
+<!-- A/B verdict migration (2026-09-18): any literal n=1 relative verdict below is historical/retracted. Current harness withholds verdicts until each arm has >=10 zero-spread samples; see compaction/ab/verdict.ts. -->
+
 # DISPATCH — pane 2 · duel-1 cross-score: score the MUSE side's ideas
 
 Bead: `jev-demo-loop-a1q` (conductor holds it; you are grading, not claiming it).

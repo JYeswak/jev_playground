@@ -1,3 +1,5 @@
+<!-- A/B verdict migration (2026-09-18): any literal n=1 relative verdict below is historical/retracted. Current harness withholds verdicts until each arm has >=10 zero-spread samples; see compaction/ab/verdict.ts. -->
+
 # Duel-1 cross-scores: muse grader on the Claude file (CC-1..CC-5)
 
 Grader: CopperCarp (pane 3, muse lineage; non-author). Scored against

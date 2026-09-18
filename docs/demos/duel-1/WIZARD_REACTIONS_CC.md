@@ -1,3 +1,5 @@
+<!-- A/B verdict migration (2026-09-18): any literal n=1 relative verdict below is historical/retracted. Current harness withholds verdicts until each arm has >=10 zero-spread samples; see compaction/ab/verdict.ts. -->
+
 # Duel 1 — reaction, duelist A (Claude) to pane 3's cross-scores
 
 Scored by pane 3 (muse), `WIZARD_SCORES_MU_ON_CC.md` @ `ad99a27`:

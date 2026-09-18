@@ -235,16 +235,16 @@ bead against the shared binary, **never** a jev-local fork.
 
 ---
 
-## R11 — The A/B's "B wins" was a coin flip. Do not pin a threshold to arm B.
+## R11 — The A/B's historical relative verdict was a coin flip. Do not pin a threshold to arm B.
 
 **Refuted 2026-09-18** — by a re-run pane 2 was told to report honestly rather than paper over,
 and then by a third sample that overturned the obvious explanation for the disagreement.
 
-| Receipt | fixture bytes / sha | armA Jev-prune | armB LLM summary | verdict |
+| Receipt | fixture bytes / sha | armA Jev-prune | armB LLM summary | verdict status |
 |---|---|---:|---:|---|
-| `compaction/runs/ab-20260917.json` | 214,993 · `20fa1ea0…` | **1/3** | 3/3 | "B wins" |
-| `compaction/runs/ab-rerun-20260918.json` | 82,214 · `2346451d…` | **1/3** | 1/3 | "tie" |
-| `compaction/runs/ab-sample3-20260918.json` | 82,214 · `2346451d…` (**identical**) | **1/3** | 3/3 | "B wins" |
+| `compaction/runs/ab-20260917.json` | 214,993 · `20fa1ea0…` | **1/3** | 3/3 | **withheld (n=1)** |
+| `compaction/runs/ab-rerun-20260918.json` | 82,214 · `2346451d…` | **1/3** | 1/3 | **withheld (n=1)** |
+| `compaction/runs/ab-sample3-20260918.json` | 82,214 · `2346451d…` (**identical**) | **1/3** | 3/3 | **withheld (n=1)** |
 
 **The wrong explanation, which I held for about ten minutes and which the data supported.** Rows 1
 and 2 disagreed, and the fixture had changed between them: `a6e1353` removed 76 `thinkingSignature`

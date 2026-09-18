@@ -1,3 +1,5 @@
+<!-- A/B verdict migration (2026-09-18): any literal n=1 relative verdict below is historical/retracted. Current harness withholds verdicts until each arm has >=10 zero-spread samples; see compaction/ab/verdict.ts. -->
+
 # Demo-1 contract — `jev-route-backtest` (SHIPPED, written from measured reality)
 
 Mean 853.8 (4 graders, range 830–875). Source: `PLAN.md` §5.1. Status:

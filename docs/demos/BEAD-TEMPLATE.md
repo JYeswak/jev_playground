@@ -1,3 +1,5 @@
+<!-- A/B verdict migration (2026-09-18): any literal n=1 relative verdict below is historical/retracted. Current harness withholds verdicts until each arm has >=10 zero-spread samples; see compaction/ab/verdict.ts. -->
+
 # BEAD-TEMPLATE — the shape every jev bead must have
 
 **Derived, not invented.** Every number below was measured from `skillranker@3fe85c4`

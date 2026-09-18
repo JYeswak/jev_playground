@@ -1,3 +1,5 @@
+<!-- A/B verdict migration (2026-09-18): any literal n=1 relative verdict below is historical/retracted. Current harness withholds verdicts until each arm has >=10 zero-spread samples; see compaction/ab/verdict.ts. -->
+
 # jev lane — implementation plan and evidence roadmap
 
 **Status:** v2, rewritten 2026-09-18 to the standard measured in `skillranker@3fe85c4`.
