@@ -43,7 +43,15 @@ const url = 'https://api.typesafe.ai/v1/systemone';
 const body = {
   model: 'jev-latest',
   // The state is the evidence the model judges. Deliberately a claim this lane can check itself.
+  // EVERY FIGURE BELOW IS BOUND TO A COMMITTED RECEIPT, because pane 3's grade
+  // (docs/demos/duel-2/runs/probe-grade-20260918T144541Z.json) found the earlier version citing
+  // "the 4619-session/488724-turn census [with] no located receipt — the script's own numbers are an
+  // unopened control." That is my modal failure, citing a number without binding its control,
+  // arriving inside the probe built to test claims. The receipt is now in the tree and named here.
   state: {
+    census_receipt: 'docs/demos/jev-probe/census-20260918.json',
+    census_receipt_norm_sha256_16: 'af6c682c26014b69',
+    census_producer: 'demos/usage-shape/bin/shape.mjs --json over ~/.claude/projects, 2026-09-18',
     finding: 'Across 4619 local agent sessions and 488724 billed turns, 98.878% of all tokens are '
       + 'cache-read context re-sent on every turn; model output is 0.140% of tokens.',
     question_context: 'A team is deciding whether to build a cheaper-model router to cut spend.',

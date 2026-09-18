@@ -1,0 +1,102 @@
+{
+  "schema": "jev.usage-shape.v1",
+  "generated_at": "2026-09-18T14:57:07.425Z",
+  "denominator": {
+    "sessions": 4619,
+    "turns": 488724,
+    "files": 4626,
+    "unparsable_lines": 0,
+    "records_without_usage": 1247069
+  },
+  "totals": {
+    "cacheRead": 166897346309,
+    "cacheWrite": 1654382638,
+    "input": 2909832,
+    "output": 236197691,
+    "billedInput": 168554638779,
+    "total": 168790836470
+  },
+  "levers": [
+    {
+      "lever": "retransmitted context (cache read)",
+      "tokens": 166897346309,
+      "share_pct": 98.8782,
+      "reduced_by": "fewer turns, or less parked in context"
+    },
+    {
+      "lever": "context first-write (cache create)",
+      "tokens": 1654382638,
+      "share_pct": 0.9801,
+      "reduced_by": "read less into context at all"
+    },
+    {
+      "lever": "model output",
+      "tokens": 236197691,
+      "share_pct": 0.1399,
+      "reduced_by": "ask for less output"
+    },
+    {
+      "lever": "fresh input (uncached)",
+      "tokens": 2909832,
+      "share_pct": 0.0017,
+      "reduced_by": "shorter prompts"
+    }
+  ],
+  "by_model": [
+    {
+      "model": "claude-opus-5",
+      "turns": 408265,
+      "cacheRead": 139640750063,
+      "output": 185234054
+    },
+    {
+      "model": "<synthetic>",
+      "turns": 464,
+      "cacheRead": 0,
+      "output": 0
+    },
+    {
+      "model": "claude-fable-5",
+      "turns": 15658,
+      "cacheRead": 4809459010,
+      "output": 10183362
+    },
+    {
+      "model": "claude-sonnet-5",
+      "turns": 9394,
+      "cacheRead": 1011526070,
+      "output": 2449723
+    },
+    {
+      "model": "claude-haiku-4-5-20251001",
+      "turns": 3922,
+      "cacheRead": 197692314,
+      "output": 704783
+    },
+    {
+      "model": "claude-opus-4-8",
+      "turns": 49842,
+      "cacheRead": 20831760201,
+      "output": 35586935
+    },
+    {
+      "model": "claude-opus-4-6",
+      "turns": 227,
+      "cacheRead": 23840283,
+      "output": 53075
+    },
+    {
+      "model": "claude-fable-5-1",
+      "turns": 777,
+      "cacheRead": 368728332,
+      "output": 1939751
+    },
+    {
+      "model": "claude-sonnet-4-6",
+      "turns": 175,
+      "cacheRead": 13590036,
+      "output": 46008
+    }
+  ],
+  "no_claim": "Token counts only. No prices, no dollar figures, and no claim any lever is worth intervening on."
+}
