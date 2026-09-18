@@ -253,3 +253,13 @@ Joshua authorized `git init` after nine `stamp-check` items were failing fail-cl
   `p18-end-of-shift` (CONDITIONAL — goes green on a clean tree at session end);
   `d-gate-wiring` PARTIAL (artifact present; the checker's basename extractor does not see the
   four `.sh` names the block lists — instrument disagreement, recorded not papered over).
+
+## jev-route-backtest — offline counterfactual backtest [test]
+
+Receipt: `demos/routing-backtest/runs/backtest-20260918T020440Z.json`.
+Inputs: 2 real omp session JSONL files under `~/.omp/profiles/*/agent/sessions/-Developer-jev/`.
+Denominator: 2 sessions, 30 turns, 30 classifiable, 0 skipped. Models observed: gpt-5.6-luna and muse-spark-1.3-contributor.
+Policy: cheap-1 is a deterministic text-only/token-budget counterfactual (no tool calls, prompt ≤20,000, completion ≤2,000); actual spend comes from recorded usage.cost.total.
+Result: actual spend $7.230350988; counterfactual spend $7.226928188; estimated savings $0.0034228; 2 turns routed to the cheap scenario. No verdict field.
+Verification: 10 offline tests pass, including empty-class ERROR and unknown-price ERROR RED arms; install.sh runs npm install without a lockfile write and the test suite.
+Boundary: this prices a deterministic counterfactual over past logs. It does not prove a cheap model would preserve task quality, that the incumbent model is an oracle, or that live routing would work. No live Jev calls were made.

@@ -1,6 +1,6 @@
 {
   "schema": "jev.route-backtest.receipt.v1",
-  "generated_at": "2026-09-18T02:04:54.034Z",
+  "generated_at": "2026-09-18T02:08:30.801Z",
   "inputs": [
     "~/.omp/profiles/codex/agent/sessions/-Developer-jev/2026-09-17T22-29-58-345Z_01a0b17d-abc9-7459-91cf-f23e057c4ebf.jsonl",
     "~/.omp/profiles/muse/agent/sessions/-Developer-jev/2026-09-17T22-29-58-828Z_01a0b17d-adac-76f6-a3b2-7b3fb991646a.jsonl"
@@ -45,7 +45,7 @@
     {
       "source": "~/.omp/profiles/codex/agent/sessions/-Developer-jev/2026-09-17T22-29-58-345Z_01a0b17d-abc9-7459-91cf-f23e057c4ebf.jsonl",
       "sessionId": "01a0b17d-abc9-7459-91cf-f23e057c4ebf",
-      "rows": 2131,
+      "rows": 2201,
       "totals": {
         "turns": 17,
         "classifiableTurns": 17,
@@ -66,8 +66,8 @@
   "perModel": {
     "gpt-5.6-luna": {
       "turns": 17,
-      "actualSpend": 6.75890016,
-      "counterfactualSpend": 6.75547736,
+      "actualSpend": 7.190068879999999,
+      "counterfactualSpend": 7.18664608,
       "routedCheap": 2
     },
     "muse-spark-1.3-contributor": {
@@ -81,8 +81,8 @@
     "turnsSeen": 30,
     "classifiableTurns": 30,
     "routedCheap": 2,
-    "actualSpend": 7.230350988,
-    "counterfactualSpend": 7.2269281880000005,
+    "actualSpend": 7.661519707999999,
+    "counterfactualSpend": 7.658096908,
     "estimatedSavings": 0.003422799999999171
   },
   "turns": [
@@ -331,14 +331,14 @@
       "sessionId": "01a0b17d-abc9-7459-91cf-f23e057c4ebf",
       "turnIndex": 17,
       "model": "gpt-5.6-luna",
-      "promptTokens": 43050,
-      "completionTokens": 8149,
-      "toolCalls": 22,
-      "actualSpend": 0.59162708,
+      "promptTokens": 66510,
+      "completionTokens": 13223,
+      "toolCalls": 37,
+      "actualSpend": 1.0227958000000001,
       "cheapModel": "cheap-1",
       "cheapSufficient": false,
       "classificationReason": "tool-call-turn",
-      "counterfactualSpend": 0.59162708,
+      "counterfactualSpend": 1.0227958000000001,
       "estimatedSavings": 0
     },
     {
