@@ -45,10 +45,11 @@ if [[ "${1:-}" == "--selftest" ]]; then
   root_s="${JEV_REPO:-$(cd "$(dirname "$self")/../.." && pwd)}"
   tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
   live="$root_s/foundation/numerals-ruled.tsv"
-  fails=0
+  fails=0; arms=0
   arm() { # name expected_rc register_path
     local name="$1" want="$2" reg="$3" got
     JEV_NUMERALS_REGISTER="$reg" JEV_REPO="$root_s" bash "$self" >/dev/null 2>&1 && got=0 || got=$?
+    arms=$((arms+1))
     if [[ "$got" == "$want" ]]; then
       printf '  ok   %-34s rc=%s\n' "$name" "$got"
     else
@@ -67,7 +68,10 @@ if [[ "${1:-}" == "--selftest" ]]; then
 
   # A dead row is surfaced, not fatal: the citation may simply have been fixed.
   cp "$live" "$tmp/stale.tsv"
-  printf 'ghost\t999\tRULED\tsome-receipt.json\n' >> "$tmp/stale.tsv"
+  # The ghost row must carry a VALID class and a real receipt: an invalid one now REDs on the class
+  # check, which is correct behaviour and would make this arm test the wrong thing. A stale row has no
+  # live hit, so the class check skips it and only the STALE surfacing is under test here.
+  printf 'ghost\t999\tLEGITIMATE_ROUNDING\tdocs/demos/duel-2/runs/numerals-hold-ruling-20260918T161328Z.json\n' >> "$tmp/stale.tsv"
   arm "dead row -> PASS with STALE" 0 "$tmp/stale.tsv"
 
   # ABSENCE SPEC, quoted from the ruling: "empty register + zero hits = PASS-with-EMPTY-note (failing
@@ -78,8 +82,23 @@ if [[ "${1:-}" == "--selftest" ]]; then
   printf '# empty register\n' > "$tmp/empty.tsv"
   arm "empty register, hits live -> RED" 1 "$tmp/empty.tsv"
 
+  # CLASS-TRUTH ARMS. Arm 6 replays the exact row I committed at 8a46915 and had to retract: the
+  # numeral 283 classed as a unit change when no single number in the census maps to it. All five
+  # membership arms above PASS on that row, which is the whole reason this half of the gate exists.
+  sed 's/LEGITIMATE_DERIVED_ROLLUP_TRUNCATION/LEGITIMATE_UNIT_CHANGE_KLOC/' "$live" > "$tmp/falseclass.tsv"
+  arm "false class (my 8a46915 row) -> RED" 1 "$tmp/falseclass.tsv"
+
+  # And the inverse: calling an honest rounding a derived rollup must also RED, or the gate catches
+  # only one direction and a lazy "DERIVED" label becomes a universal pass.
+  sed 's/LEGITIMATE_ROUNDING_AND_UNIT_CHANGE/LEGITIMATE_DERIVED_ROLLUP/' "$live" > "$tmp/wrongway.tsv"
+  arm "rounding mislabelled derived -> RED" 1 "$tmp/wrongway.tsv"
+
+  # A class outside the closed vocabulary is not silently tolerated.
+  sed 's/LEGITIMATE_DERIVED_ROLLUP_TRUNCATION/VIBES/' "$live" > "$tmp/vocab.tsv"
+  arm "class outside vocabulary -> RED" 1 "$tmp/vocab.tsv"
+
   if (( fails > 0 )); then echo "stage 95 selftest: $fails arm(s) FAILED"; exit 1; fi
-  echo "stage 95 selftest: 5 arms ok"
+  echo "stage 95 selftest: $arms arms ok"
   exit 0
 fi
 
@@ -103,6 +122,81 @@ hits="$(printf '%s\n' "$out" \
   | LC_ALL=C sort -u)"
 
 ruled="$(grep -vE '^[[:space:]]*(#|$)' "$register" | cut -f1,2 | LC_ALL=C sort -u)"
+
+# SEMANTIC CLASS GATE — authorized by pane 2's non-author adjudication
+# (docs/demos/duel-2/runs/numeral-adjudication-20260918T162500Z.json, c7615a2): "Stage95 current PASS
+# is membership-only and cannot validate class truth ... BUILD_FOLLOW_UP_REQUIRED; current green is
+# not semantic validation." It passed the creation gate there with all four fields named, which is the
+# only reason this exists — I wrote the register and the gate, so I do not get to authorize my own
+# successor.
+#
+# THE OBSERVED DEFECT IS MINE. I registered MU-H1-todo-judge/283 as LEGITIMATE_UNIT_CHANGE_KLOC. That
+# class asserts the value IS in the receipt in another unit; it is not there in any unit — it is a sum
+# over sixteen per-repo kloc floats with no total field. All five membership arms passed on that false
+# row, and a human opening a control caught it.
+#
+# WHAT IS MECHANICALLY CHECKABLE, and no more: each class name makes a claim about LITERAL PRESENCE in
+# the cited receipt, and literal presence is decidable by grep.
+#
+#   *ROUNDING* / *UNIT_CHANGE*   the value is PRESENT in some form -> a literal must exist
+#   *DERIVED* / *ROLLUP*         the value is COMPUTED, not stored -> the literal must be ABSENT,
+#                                because a stored literal makes "derived" the wrong class
+#   *MISPOINTED*                 the receipt is the wrong one -> no presence claim to check
+#
+# NOT CHECKABLE, deliberately not attempted: whether the derivation is CORRECT. Summing the right
+# sixteen fields is human judgment — I got it wrong once today by summing thirty-two. This checks that
+# a class does not contradict the file it cites, nothing more.
+classes_bad=""
+while IFS=$'\t' read -r cand num class receipt; do
+  [ -n "${cand:-}" ] || continue
+  case "$cand" in \#*) continue ;; esac
+  if [ -z "${receipt:-}" ]; then
+    classes_bad="$classes_bad|$cand/$num: row cites NO receipt — a class with no evidence file is unfalsifiable"
+    continue
+  fi
+  if [ ! -f "$root/$receipt" ]; then
+    classes_bad="$classes_bad|$cand/$num: cited receipt does not exist: $receipt"
+    continue
+  fi
+  # THE EVIDENCE FILE IS THE ONE STATUS CITES, NOT THE RULING RECEIPT. Column 4 holds the ruling — the
+  # pane's judgment — and a ruling file naturally CONTAINS the numeral it is ruling on. Checking
+  # presence there inverted the whole gate on its first run: it flagged the TRUE class and passed the
+  # FALSE one I had committed. The verifier already prints the receipt STATUS cites for each hit, so
+  # that is what a presence claim must be checked against.
+  evidence="$(printf '%s\n' "$out" | sed -nE "s|^[[:space:]]*UNOPENABLE ${cand}: '${num}' does not appear in (.*)$|\1|p" | head -1)"
+  if [ -z "$evidence" ]; then
+    # No live hit for this row: it is stale, already surfaced below, and has no presence claim to test.
+    continue
+  fi
+  if [ ! -f "$root/$evidence" ]; then
+    classes_bad="$classes_bad|$cand/$num: STATUS cites a receipt that does not exist: $evidence"
+    continue
+  fi
+  # PRESENCE IS THE WRONG TEST, AND MY FIRST VERSION USED IT. Every row in this register is a numeral
+  # the verifier already proved LITERALLY ABSENT — that is why it is a hit at all. So "the literal must
+  # exist" can never pass, and on its first run the gate REDed the two honest roundings. The checkable
+  # claim is NUMERIC: a rounding or unit change means some number in the receipt maps to the cited one
+  # by rounding and/or a power of ten. A derived rollup means NO single number does, because the value
+  # is a sum over parts.
+  #
+  # Decidable and narrow. It does NOT check that a sum is the RIGHT sum — that stays human judgment.
+  verdict_class="$(JEV_N="$num" JEV_F="$root/$evidence" python3 "$root/foundation/numeral-maps.py")"
+  case "$class" in
+    *ROUNDING*|*UNIT_CHANGE*)
+      [ "$verdict_class" = MAPS ] || classes_bad="$classes_bad|$cand/$num: class $class claims a rounding or unit change, but NO number in $evidence maps to '$num' by rounding or a power of ten" ;;
+    *DERIVED*|*ROLLUP*)
+      [ "$verdict_class" != MAPS ] || classes_bad="$classes_bad|$cand/$num: class $class claims the value is COMPUTED from parts, but a single number in $evidence already maps to '$num' — stored, not derived" ;;
+    *MISPOINTED*) : ;;
+    *) classes_bad="$classes_bad|$cand/$num: class $class is outside the closed vocabulary (ROUNDING / UNIT_CHANGE / DERIVED / ROLLUP / MISPOINTED)" ;;
+  esac
+done < <(grep -vE '^[[:space:]]*(#|$)' "$register")
+
+if [ -n "$classes_bad" ]; then
+  echo "FAIL  stage 95 numerals ratchet          a register row's CLASS contradicts the file it cites."
+  printf '%s' "$classes_bad" | tr '|' '\n' | grep -v '^$' | sed 's/^/      /'
+  echo "      A class is a claim about evidence. Fix the class, or fix the citation — not the gate."
+  exit 1
+fi
 
 # Unregistered hits: present live, absent from the register.
 new="$(LC_ALL=C comm -23 <(printf '%s\n' "$hits" | grep -v '^$' || true) \
