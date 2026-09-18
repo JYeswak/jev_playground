@@ -215,12 +215,36 @@ Nothing is uploaded and no key is used. On the author's machine that is 4,626 se
 shape answer comes back personal: **4,619 sessions, 488,724 billed turns, 98.9% of tokens
 retransmitted context, a mean 341,496 retransmitted tokens per turn, 0 unparsable lines.**
 
-**And it exposes a limit we would never have found on the fixture.** The router backtest *cannot
-answer* on a real Claude Code corpus — it returns `EMPTY_CLASSIFIABLE_SET`, because it classifies
-turns by model and usage fields in a shape those logs do not carry. So the fixture's `16.4% worse` is
-proof that **the accounting works, not that it works on your data.** `--mine` prints the demo's own
-refusal code rather than a guessed cause; an earlier version guessed "a model with no price" and was
-simply wrong.
+**It exposed a limit we would never have found on the fixture — and then we fixed it.** The router
+backtest *could not answer* on a real Claude Code corpus: it returned `EMPTY_CLASSIFIABLE_SET`,
+because those logs carry tokens and a model string but **no cost field at all**, which is what the
+reader needs. Recorded as a refuted hypothesis (`NEGATIVE_EVIDENCE.md` `R20`), because the README
+implied the fixture shape generalises and 4,626 real files falsified that.
+
+It answers now, and only on rates **you** supply:
+
+```bash
+node demos/routing-backtest/bin/adapt-claude.mjs --print-price-template > prices.json
+# fill in your provider's rates, then:
+JEV_PRICES=prices.json ./scripts/quickstart.sh --mine
+```
+
+```
+converted 2,462 of 2,565 assistant turns; 103 refused
+  no rate supplied for claude-fable-5 (102 turns) — add it to your sheet
+  no rate supplied for <synthetic> (1 turns) — add it to your sheet
+```
+
+**This repo ships no rates.** Claude Code records no cost, so every dollar downstream is *computed*
+from your sheet plus two declared rules — a cache multiplier, and `prompt = input + cache_read`. A
+model missing from your sheet is refused and named, never priced by guess; `<synthetic>` is not a
+model and gets no number.
+
+**The second declared rule exists because the demo refused my first attempt.** Emitting raw
+`input_tokens` as the prompt made *every* turn qualify for the cheap model, and the backtest rejected
+the run: `NO_BASELINE_CANDIDATES — every turn qualifies for the cheap scenario`. It was right; a turn
+with `input_tokens: 2` and `cache_read_input_tokens: 55141` is not a 2-token prompt. **Its floor
+caught a conversion bug and refused to report fictional savings.**
 
 Then the gate suite, which is a different thing with a different answer:
 
