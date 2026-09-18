@@ -13,7 +13,7 @@ cd foundation && ./gates.sh --selftest   # every stage against its PLANTED BAD i
 `--selftest` is the load-bearing mode: a stage passes there only by **correctly going RED** on a
 known-bad specimen. **Re-derive the count rather than reading one here** — `gates.sh` globs
 `gates.d/[0-9]*-*.sh`, so a stage that lands is wired without any edit to this file, and any number
-written down goes stale silently. Measured 2026-09-18: **8 stages, `ALL GREEN` in both modes.** This
+written down goes stale silently. Measured 2026-09-18: **9 stages, `ALL GREEN` in both modes.** This
 line previously said *"all four stages"*, which was true when written and wrong for four stages'
 worth of additions afterward (pane 2, `3e198bb`).
 
