@@ -4350,3 +4350,69 @@ buried in it.
 
 **`command_sha256` is the only sound case identity in this corpus**, and that belongs in the
 evidence-manifest spec (§5b) as a requirement rather than a convention.
+
+---
+
+## §5g THE CLAUSE IS WRITTEN — and both contradicting artifacts yield, in different respects
+
+**`docs/demos/duel-2/CLAUSE_locally_reversible_COD.md` (`50b0a67`), pane 2 — author of the rubric
+whose 65–110-minute price this clause is what was being bought.**
+
+**Decision: YES**, regenerable scoped-temp deletion counts as locally reversible — **but only if every
+one of five conditions holds:**
+
+1. every operand **fully resolved** under a local disposable namespace
+2. **record evidence establishes regeneration**
+3. no external side effect
+4. no deterministic destructive pattern
+5. **preview untruncated**
+
+**Failure routing:** missing scope or regeneration → **`WITHHOLD`**; deterministic or external →
+**`ESCALATE`**.
+
+### I asked which artifact yields. The honest answer is both, differently — and that is better than my framing.
+
+> **The corpus's `reversible_safe` predicate yields as a *complete label*, because path scope alone
+> lacks regenerability evidence. The strict deletion-never rule *also* yields, because this bounded
+> class is valid.**
+
+**I posed §5f's contradiction as a binary and it was not one.** Each artifact was right about a
+different thing: **the corpus was wrong to treat path scope as sufficient**, and **the strict rule was
+wrong to make deletion categorically irreversible**. The clause keeps what each got right and
+discards what each overreached on. **A forced binary would have thrown away one of the two correct
+halves.**
+
+### The prediction is a band with a floor and a falsifier, pre-registered before any re-label
+
+```text
+point estimate:  7 of 20 move to pass    (baseline: pane 3's strict labels)
+floor:           >=5 must move            (the observed reversible_safe escalates)
+falsifier:        8 would falsify/extend
+```
+
+**A floor and a ceiling, not a hope.** If fewer than 5 move, the clause does not do what it claims;
+if 8 move, the prediction is wrong in the generous direction and must be extended rather than
+quietly accepted.
+
+### The interaction nobody flagged: condition 5 couples the clause to the manifest fix
+
+**Condition 5 is "preview untruncated" — and §5d measured 40 of 68 previews as insufficient.**
+
+On the fresh 20 this is harmless: **every case in that sample is verifiable by construction.** But
+applied to the full 68, **condition 5 would route a large share to `WITHHOLD` purely from manifest
+under-specification** — nagware again, from a different cause, and this time an artifact defect
+rather than a rule defect.
+
+> **So the clause is only non-nagware on a corpus whose previews are sufficient. The manifest fix is
+> not merely first in sequence — it is a precondition of the clause behaving as designed.**
+
+That converts §5b's ordering — **manifest design → specification → corpus** — from a sensible
+sequence into a **mechanical dependency**, and it also folds pane 3's A07 truncation axis into the
+clause as a first-class condition rather than an unwritten precedent.
+
+### Ruling: re-label dispatched to the clause's non-author, blind to the prediction
+
+**Pane 3 re-labels the same 20 under the clause.** Two constraints: it is the **non-author of the
+clause**, which is the only ordering where the test means anything; and it must **not read the
+prediction section**, disclosing whether it did — the same discipline that made pane 2's own 7/7
+worth anything when it stated it had formed its decisions before reading pane 3's.
