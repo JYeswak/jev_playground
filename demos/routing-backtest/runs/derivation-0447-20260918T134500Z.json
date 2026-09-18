@@ -46,7 +46,16 @@
     "value": "0.047pct",
     "defect": "transcription -- 0.00047 written where the ratio is 0.000447, a DROPPED DIGIT",
     "relative_overstatement": "~5% high versus the derived value",
-    "direction": "the correction moves the number AWAY from any behaviour-change threshold, which is why pane 3 ruled the kill survives A FORTIORI (docs/demos/duel-2/RULE_demo1_repricing_MU.md, 083f781)"
+    "direction": "the correction moves the number AWAY from any behaviour-change threshold, which is why pane 3 ruled the kill survives A FORTIORI (docs/demos/duel-2/RULE_demo1_repricing_MU.md, 083f781)",
+    "CORRECTION_20260918T1350Z": {
+      "retracted": "defect: transcription -- 0.00047 written where the ratio is 0.000447, a DROPPED DIGIT",
+      "why_false": "I asserted that without opening the control. docs/demos/contracts/demo-1-route-backtest.md:83-84 and docs/demos/PLAN.md:965 both state actual $7.230350988 / counterfactual $7.226928188, and 0.0034228/7.226928188 = 0.0473618% -> 0.047%. The arithmetic was RIGHT. There was never a transcription error.",
+      "what_was_actually_true": "two runs with a constant-shifted base: exactly 0.43116872 added to BOTH legs, absolute savings identical to float noise. A re-run (fixed-cost term or price-table as_of move), not a typo and not new information about routing.",
+      "ruled_by": "pane 3, docs/demos/duel-2/runs/basis-ruling-20260918T134439Z.json (415e155): 'dropped_digit_theory: WITHDRAWN (falsified)'",
+      "why_0_0447_still_stands": "basis A is PROSE-ONLY -- $7.230350988 appears in no machine receipt (pane 3 searched demos/ and docs/). Basis B is the only openable control, so it is authoritative under the lane's own rule. The value is unchanged; only its GROUNDS are corrected.",
+      "propagation": "the false premise reached pane 3's Q102-U1 ruling and three landed file corrections. Pane 3 ruled those stand -- they cite the receipt-backed figure, valid under corrected grounds. No revert.",
+      "my_failure_mode": "I supplied the premise as established fact in the dispatch packet, so pane 3's agreement was never independent evidence. Same-origin evidence counts once."
+    }
   },
   "no_claim": [
     "This receipt does not re-rule the kill. Pane 3 ruled RULED_OUT survives; this states the number only.",
@@ -58,5 +67,10 @@
     "class": "the quoted-prose false positive pane 2 named as untested in docs/demos/duel-2/runs/audit-q105-numerals-20260918T141500Z.json: 'digit-bounded matching is sufficient for literal opening only, not semantic field correspondence'",
     "fix_applied_here": "rounded_4sf is now an asserted derivation OUTPUT, so the numeral opens against a derivation field rather than a quotation of the row",
     "residual": "the gate weakness is UNCHANGED by this file: any receipt quoting its own row's reason still opens every numeral in it. Dispatched for ruling, not fixed here."
+  },
+  "open_debt_conductor_owned": {
+    "finding": "pane 3: basis-A LEGS ($7.23/$7.23) in the contract and PLAN Sec 5.1 contradict the committed receipt's legs ($7.66/$7.66) with NO receipt behind them. The LEGS, not just the ratio, need reconciliation.",
+    "not_taken": "recommended, not executed. Rewriting prose legs to match a receipt is a claim about which run happened; the $7.23 run may exist and be unlocated. Awaiting a ruling.",
+    "invalidated_instruction": "the earlier correction spec's 'digit-swap 0.047 -> 0.0447 at the 13 PLAN sites' MUST NOT be applied blindly: at PLAN:965 the 0.047% is CORRECT for the basis-A legs stated on that same line. Swapping it there would create the internal contradiction this lane recorded as R18."
   }
 }
