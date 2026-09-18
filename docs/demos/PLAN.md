@@ -1303,3 +1303,68 @@ steady-state, because a bead graph inherits every structural error in its source
 tonight: the conductor's overstated convergence headline became the *premise* of a worker's merge
 document before an audit caught it, and a refuted A/B verdict reached **17 tracked files** before
 anything ran the harness twice.
+
+---
+
+## §3m-CORRECTION (appended 2026-09-18, one turn after §3m was committed) — **I cited an upstream benchmark as if it were our measurement**
+
+**Self-audit of §3m, run because §3m leaned on demo-7's numbers and misciting a measurement is my
+documented worst error class (`NEGATIVE_EVIDENCE.md` R12: grepping for the expected line and
+treating the hit as the finding). It was the right thing to audit. It was wrong.**
+
+### Defect 1 — the load-bearing sentence is false
+
+§3m point 2 says *"demo-7 is the measurement that already tested it"* and the commit message
+(`c348ba7`) escalates that to *"demo-7 already MEASURED this thesis."* **Neither is true.**
+`docs/demos/contracts/demo-7-signals-starter.md:130-138` states it verbatim:
+
+> Usage Map §9 records `jev-phishing-bench@1d56e8c`: verdict-only accuracy 62.6% versus a signal
+> question head at 95.1% … **Those are source claims, not local measurements.**
+
+Those numbers belong to a **third-party upstream repository we have never run.** Confirmed
+structurally: `demos/` contains exactly one directory — `routing-backtest`, which is demo-1, which
+is **RULED_OUT**. There is no phishing-bench reproduction in this lane at any stage of completion.
+
+### Defect 2 — I dropped a number the contract warns about dropping
+
+Usage Map §9 line 67 reads *"Jev verdict alone loses on accuracy (**62.6 vs 81.3**)"*. My §3m prose
+cited 62.6 → 95.1 and **omitted 81.3 entirely** — the figure verdict-only actually loses to. The
+contract anticipates exactly this: *"Do not round that to a vague '33 points' claim without naming
+both endpoints and the denominator."* I quoted the 32.5-point delta and then committed the adjacent
+sin of reporting a two-point comparison as though no third point existed.
+
+### Corrected evidentiary base for the calibration thesis
+
+| What §3m implied | What is actually there |
+|---|---|
+| Two designs **plus a local measurement** | **Two design documents.** `75cfb9f`, `51c2bb1` |
+| demo-7 measured calibration here | **Zero local calibration measurements.** None. |
+| — | One **unreproduced third-party** benchmark that reports ECE 0.027 |
+
+**The lane's own status line was right and my prose contradicted it.** The recorded count has always
+been *two measurements* — demo-1's 0.047% and MU-H1's marker census — and demo-7's numbers were
+correctly excluded from that count. §3m then narrated them back in as ours.
+
+### What the upstream benchmark does and does not contribute
+
+**Does:** an independent party, with no stake in this lane's doctrine, chose to report **ECE** at all
+— alongside AUROC and accuracy. That is weak corroboration that calibration is a *salient axis* for
+this class of task, and it is the reason demo-7's contract was written around a calibration report.
+
+**Does not:** establish that calibration is a **wedge against incumbents**. The incumbent comparison
+is what pane 2 designed and explicitly did not run (`NO-CLAIM — no install, no benchmark, no model
+call, no result`). An upstream repo reporting ECE says nothing about whether `docverity` or
+RouteLLM could report one too if asked.
+
+### §3m's standing, restated honestly
+
+The **convergence finding survives** — two panes independently naming calibration is exactly as
+strong as it was, because it never depended on demo-7. What collapses is the **corroboration leg**
+I bolted on. The thesis is now: *two independent designs agree, one third-party benchmark is
+consistent with them, and nothing in this lane has measured it.* **That makes Q9 and the MU-H2 gate
+the only two places it can become evidence — which is what §3m concluded anyway, arriving there by a
+route that happened to include a false step.**
+
+**Left in place per §5:** §3m's original text is unedited above. Correcting in place would renumber
+every line and silently orphan any pointer into that section — a correction that breaks pointers is
+a second defect wearing a fix.
