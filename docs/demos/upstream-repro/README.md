@@ -32,6 +32,7 @@ judgment beat a trained model or a hand-written rule."*
 | `fast-jev-compaction` | **29/29** tests; a live run took 21 messages to 7, saving **87.1% of characters** in one request at 1,277 ms | [compaction](fast-jev-compaction-20260918.json) |
 | `foreman` | **57/58**. It is a per-worker *supervisor*: there is no queue concept, so a worker idle **while work is ready** reads as finished | [foreman](foreman-20260918.md) |
 | `s1-rs` | both examples run offline against a `FakeClient`: typed questions in, `nearest=Annoyed expected=1.20` and `urgent p=0.97` out. Blocked all day by a **misdiagnosed** obstacle, not by Rust | [s1-rs](s1-rs-20260918.md) |
+| `jev-review` | a code-quality scorer that returns **`applicable: false`** for dimensions its context cannot support: a refusal-to-score state shipped as contract, not retrofitted | [jev-review](jev-review-20260918.md) |
 | `bicameral` | the System 2 writes / System 1 judges split is real, with two differences worth copying: **judgment is a pluggable interface**, and its degraded path **falls back to pattern rules rather than passing work through unjudged** | [bicameral](bicameral-20260918.md) |
 
 ## Three things worth taking from these, whoever you are

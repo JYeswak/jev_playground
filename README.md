@@ -93,7 +93,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`commit-miner`|classify commit diffs and messages with Jev|**RUN** (pane 3): 130 of our own commits classified|its disagreements were mostly right; import: lint commit bodies, not prefixes|
 |`foreman`|watch a software factory floor with Jev|**RUN**: 57/58, one real failure reported|it is a per-worker supervisor with no queue concept, so it does not replace the tick|
 |`bicameral`|System 2 writes the code, System 1 judges it|**RUN** (pane 3): 41 tests pass offline, no key|adopt its two differences: pluggable judgment, and degrading toward patterns not passthrough|
-|`jev-review`|Jev for code review|not run|read|
+|`jev-review`|Jev for code review|**RUN**: 13/13 offline, zero skipped|it already ships the refusal-to-score state we had to retrofit into our gates|
 |`system-one-adapter-python`|a drop-in `system_one` backed by an LLM|**RUN** (pane 2): 204 tests pass|the seam we needed already exists in our code; a Python bridge is refused with costs named|
 |`skillranker`|a ranker built on Jev, mirrored here|mirror current|read its Jev question construction; never copy its files|
 |`jev-benchmark` (themsquared)|is Jev's confidence score worth routing on, at n=60|**RUN** — pairing shows the two versions never disagree|add cases on the `readonly`/`privileged` boundary, not more cases|
