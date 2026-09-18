@@ -105,11 +105,24 @@ def manifest_for(mapped, pre, post, attempts, head):
             "copy_raw": hashlib.sha256(b).hexdigest()[:16],
             "norm": norm_digest(snap),
         })
+    # THE INSTRUMENT, CALLED OUT BY NAME. It is already in `files` because it is an input now, but an
+    # outsider should not have to know which of 19 rows is the executable. Pane 2's ledger graded this
+    # PARTIALLY_BOUND: "records source HEAD and spec references, but does not contain the verifier
+    # source or a content digest of the verifier itself."
+    me = str(Path(__file__).resolve())
+    mine = next((f for f in files if f["source_path"] == me), None)
     payload = {
         "schema": "jev.snapshot-manifest.v1",
         "spec": "docs/demos/duel-2/SPEC_snapshot_manifest_COD.md (44feaf2)",
         "source_head": head,
         "capture_attempts": attempts,
+        "verifier": {
+            "source_path": me,
+            "snapshot_path": mine["snapshot_path"] if mine else None,
+            "digest": mine["copy_raw"] if mine else None,
+            "bundled": bool(mine),
+            "note": "execute THIS copy, not the live checkout, to reproduce the verdict",
+        },
         "files": files,
     }
     # SELF-DIGEST over the canonical payload EXCLUDING the digest field, per the spec. A manifest
@@ -137,7 +150,17 @@ def main() -> int:
     # at exit 10 with NO VERDICT. Pane 2's Q97 named a verifier-owned transient class as the fourth
     # unmet precondition, and "lane-status rc10 DOES NOT TRANSFER" — so this one is its own.
     for attempt in (1, 2):
-        inputs = [str(STATUS), str(SIDECAR)]
+        # THE INSTRUMENT IS AN INPUT. Pane 2's outsider rerun (audit-q100-outsider-20260918T132000Z
+        # .json, 86420cb) proved the snapshot is NOT cosmetic — it reached the evidence verdict from
+        # the copies alone, with source_head=no-head — and then named the one live dependency left:
+        # "the snapshot does not bundle or hash verify-other-reasons.sh, so exact automatic rerun
+        # needs that code at source revision or a bundled artifact." Its ledger graded the
+        # verifier/spec binding PARTIALLY_BOUND for exactly that reason.
+        #
+        # Binding it buys a second thing for free: the verifier is now covered by its OWN movement
+        # check, so editing this file mid-run is a TRANSIENT rather than a silent splice — which is
+        # the protection lane-status.sh gained at exit 11 and this verifier did not have.
+        inputs = [str(STATUS), str(SIDECAR), str(Path(__file__).resolve())]
         for line in STATUS.read_text().splitlines():
             f = line.split("\t")
             if line and not line.startswith("#") and f[0] != "candidate" and len(f) >= 10:
