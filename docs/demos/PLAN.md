@@ -4958,3 +4958,68 @@ markers beats `capture_gap`, which is no capture at all** — that is the whole 
 **Q19 and Q65 are both defects the panes found in my work and are now being asked to rule on, and
 Q20 is an audit of the instruments I built while they were idle.** The conductor's four-tick silence
 produced a worse backlog than any interrupt would have.
+
+---
+
+## §5p PROSE MEANS ARE RETIRED AS STATE-OF-RECORD — and the blind spot was in the opposite direction
+
+**`docs/demos/duel-2/RULE_prose_means_MU.md` (`c415530`).** Pane 3 audited the blind spot **it had
+disclosed itself** in Q63, and the first result deflates its own disclosure: across **69 commits**
+touching `PLAN.md`, every mean-score line was **9 creations + 1 restructure pair**, with
+**modifications 0, upward 0, downward 0.**
+
+> **"Means are write-once."**
+
+**So the "11 edits" were 11 *appearances*, not 11 *changes*, and the smuggling channel it warned
+about never existed** — *"the first-uploaded-means problem never arose because means were never
+touched again."* The lane's all-downward table pattern has **no prose counterpart, because prose
+means never move.**
+
+### And the defect is in the direction nobody was watching
+
+> **"Including when they should: demo-7 was REPRICED (§3p, transferable claim ~3 points) yet its
+> heading still reads 712.5. The observed failure mode is STALENESS, not smuggling — frozen rank
+> info, harmless once, misleading by default over time."**
+
+**A live, concrete defect in the lane's own documents, found by auditing for the opposite problem.**
+I was watching for a number that moves dishonestly; **the actual risk was a number that refuses to
+move at all.**
+
+### Ruling: RETIRE — and the distinction it preserves is the valuable half
+
+**Retired as state-of-record:** the §5 mean headings. *"STATUS.tsv is already the state of record for
+order… the §5 means duplicate the ranking function while rotting (demo-7 proves it)."* Same principle
+as §3h: **retiring a surface is cheaper than watching it.**
+
+**Explicitly NOT retired, and a cruder ruling would have thrown this away:** the **grader-spread
+annotations** (N graders, range, *"widest spread 740→845"*). *"STATUS holds one score; spread is
+disagreement information the table cannot carry."* **The single-score column cannot represent
+disagreement, so deleting the spread would destroy the only record of how contested a score was.**
+
+### It refused to bank its own unimplemented check as a mechanism
+
+> *"Until that check exists, the rule is guidance — recorded as such per Q61's standard, **not banked
+> as mechanism**."*
+
+**Pane 3 applying to itself the exact standard it used to grade pane 2's conditions
+`CONDITION_PROSE_SHAPED`.** It proposed a staleness tripwire, then declined to count it as a gate
+because nothing implements it. **Third time a pane in this lane has refused credit it could have
+taken silently.**
+
+### Residual, bounded and assigned onward rather than absorbed
+
+> *"Integer score prose (`score 905`, `820 non-author`, `re-scored`, `repriced`) was **NOT traced** —
+> a boost smuggled as integer prose trips neither the STATUS watcher nor any mean check. That is the
+> next unit, not this one."*
+
+## §5q RETIREMENT NOTICE — §5 mean-score headings are no longer state of record
+
+**Effective `c415530`.** Every `### §5.N … mean X` heading in this file is **frozen historical
+annotation**, not current state. **`docs/demos/STATUS.tsv` is the sole state of record for score and
+rank.** Known-stale instance: **§5 demo-7 reads `mean 712.5`** and was repriced in §3p by ~3 points.
+
+**The headings are left byte-identical on purpose** — correcting them in place would renumber every
+line below and orphan external pointers, the second-defect-wearing-a-fix this file is under standing
+orders to avoid, and it would restate numbers I have just been told are not authoritative.
+**Grader-spread annotations in those sections remain valid as context and are explicitly not ranking
+input.**
