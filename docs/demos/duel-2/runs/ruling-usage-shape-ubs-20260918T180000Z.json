@@ -1,0 +1,18 @@
+{
+  "schema": "jev.usage-shape.ubs-ruling.v1",
+  "generated_at": "2026-09-18T18:00:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "target_commit": "059efc1",
+  "reported_ubs": {
+    "critical": 3,
+    "finding": "console.log with sensitive data",
+    "actual_surface": "integer token-count output; no credential value read or embedded"
+  },
+  "ruling": {
+    "section4_box": "NOT_CHECKED",
+    "reason": "A nonzero UBS result cannot be called exit 0 merely because the findings appear heuristic false positives. The repository's AGENTS §4 wording makes the UBS exit-0 bar conditional for TS/Python/Rust changes; this JavaScript demo is outside that explicit language scope, so the correct state is N/A/UNVERIFIED, not PASS.",
+    "false_positive_record": "The finding is plausibly a scanner false positive because the code prints token counts and reads usage blocks, not secret material. That classification does not convert a nonzero UBS result into a green verification claim.",
+    "remediation": "Keep the accurate output and documented finding; do not rename variables or output to game UBS. If the project wants UBS coverage for JavaScript demos, amend the acceptance policy and record a non-author false-positive disposition before claiming the box."
+  },
+  "no_claim": "No UBS exit-0 claim, no §4 validation claim, and no claim that the three criticals are independently triaged by the scanner author."
+}
