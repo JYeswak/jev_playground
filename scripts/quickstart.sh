@@ -27,6 +27,86 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
 
 node --version >/dev/null 2>&1 || { echo "quickstart: needs node >= 20 on PATH, and nothing else."; exit 2; }
+# --mine: the same questions, answered against the READER'S OWN logs instead of our fixture.
+#
+# WHY THIS EXISTS. Every answer this script gives without --mine is computed from a 6-turn fixture
+# committed to this repo. That proves the tools RUN; it tells a stranger nothing about their own
+# spend. The only bridge was a closing line telling them to pass their own path — a bridge the reader
+# has to build. This walks it for them, which is the difference between a demo and a tool.
+if [[ "${1:-}" == "--mine" ]]; then
+  corpus="${2:-$HOME/.claude/projects}"
+  if [[ ! -d "$corpus" && ! -f "$corpus" ]]; then
+    cat <<EOF
+quickstart --mine: no session logs at $corpus
+
+This looks for Claude Code session JSONL, which normally lives in ~/.claude/projects. If yours are
+elsewhere, pass the path: ./scripts/quickstart.sh --mine /path/to/logs
+
+Nothing is uploaded and no key is used — every tool reads local files and writes a local receipt. If
+you have no such logs, the fixture answers (./scripts/quickstart.sh) still show what the tools do.
+EOF
+    exit 2
+  fi
+  n_files="$(find "$corpus" -name '*.jsonl' -type f 2>/dev/null | grep -c . || true)"
+  if [[ "${n_files:-0}" -eq 0 ]]; then
+    echo "quickstart --mine: $corpus exists but holds no .jsonl session files."
+    exit 2
+  fi
+  mine_work="$(mktemp -d)"
+  trap 'test -n "${mine_work:-}" && find "$mine_work" -mindepth 1 -delete 2>/dev/null; rmdir "$mine_work" 2>/dev/null' EXIT
+  echo "quickstart --mine — YOUR logs: $n_files session file(s) under $corpus"
+  echo "Offline. No key. No upload. Receipts are written to a temp dir and discarded on exit."
+  echo
+
+  echo "=== Where does your agent spend actually go?"
+  node demos/usage-shape/bin/shape.mjs "$corpus" 2>&1 | sed 's/^/    /' \
+    || echo "    COULD NOT ANSWER — the shape tool failed on your corpus, which is worth an issue."
+
+  echo
+  echo "=== Would routing cheap turns to a cheaper model have saved YOU money?"
+  # FILES, NOT THE DIRECTORY. Passing the corpus root returned EISDIR: this demo takes session files
+  # while the shape tool takes a directory, and nothing said so. A bounded sample keeps the argument
+  # list finite, and the sample size is PRINTED rather than hidden, because a silently sampled
+  # denominator is the defect this repo has spent the day removing from its own documents.
+  sample_n=200
+  mine_files=()
+  while IFS= read -r f; do mine_files+=("$f"); done < <(find "$corpus" -name '*.jsonl' -type f 2>/dev/null | head -"$sample_n")
+  echo "    (bounded sample: ${#mine_files[@]} of $n_files session files, newest-first as the filesystem lists them)"
+  if node demos/routing-backtest/bin/backtest.mjs "${mine_files[@]}" --out "$mine_work/bt.json" >"$mine_work/bt.log" 2>&1; then
+    node -e '
+      const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")), t=r.totals, d=r.denominator;
+      for (const k of ["actualSpend","counterfactualSpend","estimatedSavings"])
+        if (typeof t[k] !== "number") throw new Error(`totals.${k} missing — receipt schema changed`);
+      const pct=(t.counterfactualSpend/t.actualSpend-1)*100;
+      console.log(`    ${t.estimatedSavings<0?"NO — it would have COST you more":"YES — it would have saved"}: $${t.actualSpend.toFixed(4)} actual vs $${t.counterfactualSpend.toFixed(4)} routed (${Math.abs(pct).toFixed(1)}%).`);
+      console.log(`    Denominator: ${d.classifiableTurns} classifiable of ${d.turns} turns, ${d.skippedTurns} skipped.`);
+    ' "$mine_work/bt.json" || echo "    COULD NOT ANSWER — receipt written but unreadable."
+  else
+    # THE FAILURE CODE IS QUOTED, NOT EXPLAINED AWAY. An earlier version of this branch asserted the
+    # cause was "a model this demo has no price for". That was a GUESS, and it was wrong: on a real
+    # Claude Code corpus the receipt returns EMPTY_CLASSIFIABLE_SET. Printing the demo's own code is
+    # the only honest thing to do when the demo declines.
+    codes="$(node -e '
+      try {
+        const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));
+        console.log((r.failures||[]).map(f=>`${f.code}: ${f.message}`).join("; ")||"no failures recorded");
+      } catch { console.log("receipt unreadable"); }
+    ' "$mine_work/bt.json" 2>/dev/null || echo "receipt unreadable")"
+    echo "    NO ANSWER, and the demo refused rather than guessed: $codes"
+    echo
+    echo "    THIS IS A REAL LIMIT OF THE DEMO, not a problem with your logs. It classifies turns by"
+    echo "    model and usage fields in a shape this corpus does not provide, so on Claude Code"
+    echo "    sessions it finds no classifiable turns at all. Measured here against $n_files real"
+    echo "    session files. The fixture answer (./scripts/quickstart.sh) is therefore a proof that"
+    echo "    the accounting works, NOT evidence that it works on your data."
+  fi
+
+  echo "None of this is a recommendation. These are YOUR numbers under this repo's STATED assumptions:"
+  echo "the price table and the cheap-model rates are assumptions, not facts, and the receipt written"
+  echo "by demos/routing-backtest/bin/backtest.mjs says so in its own rederivation field."
+  exit 0
+fi
+
 work="$(mktemp -d)"; trap 'rm -rf "$work"' EXIT
 fix="demos/routing-backtest/fixtures/real-excerpt-t1-t6.jsonl"
 pass=0; fail=0; failed=""
