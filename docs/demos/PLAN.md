@@ -722,6 +722,62 @@ question exists.
 had cleared rungs 1 and 2. It leaves the standalone backlog not because it failed a rung but
 because a better-positioned candidate arrived — which is the gauntlet working as designed, and it
 is the first time a *passing* candidate has been withdrawn rather than killed.
+
+---
+
+## §3k RUNG ORDERING AMENDED — estimate rung 4 BEFORE paying for rung 3
+
+**The ladder had the right rungs in the wrong order for one case, and pane 2 found it by doing the
+work.** §3c orders rungs 1→2→3→4 with cost rising ~10× per rung, on the assumption that a measured
+lift requires a built thing. **Sometimes it does not.**
+
+`docs/demos/duel-2/FALSIFY_MUH1_COD.md` (`0f619de`, 9,536 chars) designs MU-H1's rung-4 kill at
+rung-2 cost: sample **200 TODO markers across ≥10 pinned real repos**, deterministic enumeration
+plus human labels, and **fail if the actionable rate is <5%, the Wilson-95 upper bound <10%, or
+ambiguity >20%.** Pre-registered thresholds, an exact command, a receipt, and explicit
+held/unaskable paths. It is labelled **UNMEASURED DESIGN, not a kill** — correctly.
+
+**This is exactly what would have saved demo-1.** demo-1 passed expensive rung 3 (reader, pricer,
+install, tests, receipt, clean-clone verification) and then died at rung 4 on **0.047%** — real,
+reproducible, operationally worthless. A crude token-count estimate over existing logs would have
+produced that number to within an order of magnitude **before** anything was built.
+
+### Amended ordering
+
+**Before paying for rung 3, ask: can the rung-4 number be estimated without building the thing?**
+
+- **Yes ⇒ estimate it first.** A pre-registered threshold plus a cheap estimate is a rung-4 kill at
+  rung-2 cost, and it is the highest-leverage move in the whole gauntlet.
+- **No ⇒ proceed to rung 3**, and say *why* the estimate is impossible rather than skipping the
+  question.
+
+This does not reorder the rungs; it inserts a **cheap-estimate probe** wherever one exists. The
+cost curve is the whole point of §3c, and an estimate that costs rung-2 money to answer a rung-4
+question is the steepest discount available.
+
+**Additionally, split every falsification into its label-free half and its labelled half.** MU-H1's
+design needs human labels for 200 markers — expensive, and it needs Joshua's time or degrades to
+agent labels. But **the enumeration half needs no labels at all**: count markers across 10 repos
+and you learn whether there is even a denominator. If real repos carry few markers, MU-H1 dies for
+an hour's work and nobody labels anything.
+
+### State after pane 3's rung-2 pass
+
+`docs/demos/duel-2/RUNG2_COD_HUNT_MU.md` (`e23251d`, 15,631 chars): **4 CLEARED, 1 HELD**.
+
+| Candidate | rung 1 (non-author) | rung 2 | next |
+|---|---:|---|---|
+| **COD-H2 pre-action abstention** | **905** | **CLEARED** | **leader — falsify, then rung 3** |
+| COD-H4 tool-result replay | 900 | CLEARED | falsify; corpus absent |
+| COD-H5 compaction integrity | 895 | CLEARED | falsify |
+| COD-H1 snapshot completion | 885 | CLEARED | falsify |
+| COD-H3 price-drift auditor | 890 | **HELD** | structural question open |
+| MU-H1 TODO-judge | 820 | CLEARED | **falsification designed** — run the label-free half |
+
+**Rung 3 is no longer blocked** (§3e's condition is met: hunt candidates carry non-author rung-1
+scores, and four now carry rung-2 as well). **But it does not open yet** — under this amendment
+each rung-2 survivor needs a falsification design first, and **COD-H2 does not have one.** Writing
+that design is cheaper than building COD-H2 and may remove the need to.
 ---
 
 ## §4 Phase arc
