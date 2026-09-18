@@ -154,6 +154,35 @@ unreliable.
 4. Re-derive every COUNT a bead's acceptance asserts before dispatching.
    Never dispatch a bead whose acceptance is unobtainable.
 
+**COMMIT A QUEUE-FILE APPEND IN THE SAME TURN.** The mechanism above — append to the pane's queue
+file instead of pushing into its prompt — has a hazard measured within minutes of its first use.
+An uncommitted append sits in a shared worktree where **any** pane's next commit can absorb it.
+Measured 2026-09-18: the conductor appended units 4–5 to `pane2-demo1-build.md`, and pane 3's
+`d14387e` swept that file plus two of pane 2's source files into a commit about a steelman audit.
+Content intact, attribution wrong. So: append, then commit that one file immediately, before the
+turn ends.
+
+**`git author` CANNOT ATTRIBUTE A COMMIT TO A PANE HERE.** All three panes commit as the same
+identity — `git log -1 --format=%an` returns `Josh <joshua@zeststream.ai>` for every one of them.
+Measured 2026-09-18: the conductor read `d14387e`'s message ("COD steelman") and attributed it to
+pane 2, when pane 3 authored it while *auditing* pane 2's steelman. **Attribution comes from the
+commit-message convention and the pane's own callback — never from `%an`, and never from guessing
+at the subject line.** Pane 3's self-report was the only reliable signal, and it arrived because
+the pane volunteered it.
+
+**NEVER VERIFY A COMMIT'S CONTENTS FROM A TRUNCATED `--stat`.** Pane 3's stated cause for the
+miscommit was reading a tail-cut `--stat` and missing the extra files. The conductor makes the same
+error in the same family constantly — `| head`, `| tail`, and a grep tuned to the expected line all
+hide what they cut. Before committing in a shared tree, read the **full** `git diff --cached
+--stat`, and count the files rather than eyeballing them.
+
+**RULING ON A MISCOMMIT: DO NOT REWRITE SHARED HISTORY.** `d14387e` swept three sibling files.
+The content is correct and complete, the tree is clean, and nothing was lost — only the commit
+message misdescribes what it carries. Amending or reverting shared `main` to repair attribution is
+strictly worse than a note: it rewrites history other panes have already built on, to fix
+bookkeeping. The correct response is what pane 3 did — self-report, refuse to amend, escalate the
+fix direction — plus a conductor note recording what actually landed where.
+
 ## 4. WHAT ARE *YOU* DOING
 
 If all three panes are genuinely working, you are not done — hold your own
