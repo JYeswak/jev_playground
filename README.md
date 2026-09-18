@@ -87,7 +87,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**BLOCKED** — local Rust denied; RCH `critical_pressure=4`|run both examples the moment a worker frees|
 |`jev-router`|per-turn model routing for Claude Code and Codex|not run|compare with `demos/routing-backtest`; upstream may already own this|
 |`jev-codex-router`|the same idea, Codex-specific|not run|read before extending our own router work|
-|`jev-mcp`|Jev judgments exposed as MCP tools|not run|the cheapest path to Jev inside this harness|
+|`jev-mcp`|Jev judgments exposed as MCP tools|**RUN** — 9/9 unit, 4/4 live e2e|wire `jev_verify` into the conductor's number-checking|
 |`jev-ultrafast`|a browser agent driven by Jev|not run; needs a URL and a key|lowest priority, it is a live-network demo|
 |`fast-jev-compaction`|continuous context compaction with Jev|not run|directly relevant: our own `compaction/` sits beside it|
 |`commit-miner`|classify commit diffs and messages with Jev|not run|runnable against this repo's own history|
@@ -96,7 +96,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`jev-review`|Jev for code review|not run|read|
 |`system-one-adapter-python`|a drop-in `system_one` backed by an LLM|not run|useful as a control: an LLM standing in for Jev|
 |`skillranker`|a ranker built on Jev, mirrored here|mirror current|read its Jev question construction; never copy its files|
-|`jev-benchmark` (themsquared)|is Jev's confidence score worth routing on, at n=60|**RUN** — their cached results re-analysed|raise n: the author says the models are "not separable at this sample size"|
+|`jev-benchmark` (themsquared)|is Jev's confidence score worth routing on, at n=60|**RUN** — pairing shows the two versions never disagree|add cases on the `readonly`/`privileged` boundary, not more cases|
 |`awesome-jev`, `awesome-jev-by-typesafe`, `awesome-typesafe`|curated indexes of everything above|read|a discovery source, not evidence|
 
 **What running one actually taught us.** On Ling-Spam a question with **no labels** scores 0.9857
