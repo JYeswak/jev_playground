@@ -4912,3 +4912,49 @@ content lost.**
 the past; nothing yet checks the future, and pane 3's amended form (*any* verdict-change, not
 HELD-exits) is unimplemented. **That is the next instrument unit, and until it exists the
 hold-vs-score demotion is — by pane 3's own words — "delete with extra steps."**
+
+---
+
+## §6d FOURTH `fleet-idle-monitor` DEFECT — and the cost of it landed on the panes, not the binary
+
+**Four consecutive ticks reported `UNPROVEN … reason=capture_gap` for both worker panes.** I read that
+as "cannot confirm idle", and under *"never push into a working pane"* I withheld dispatch **four
+times in a row.**
+
+**A sanctioned sibling surface in the same tool had a fresh answer the entire time:**
+
+```text
+$ ntm --robot-agent-health=jev
+pane 2  observation_state=idle   is_working=False  freshness=fresh  work_indicators=[]
+pane 3  observation_state=idle   is_working=False  freshness=fresh  work_indicators=[]
+```
+
+**`fleet-idle-monitor` had no reading. `--robot-agent-health` had one.** That is the fourth recorded
+defect for that binary, and it is a **different failure mode from the three already logged**: not a
+false `WORKING`, but **an absence of information presented in the same shape as information.**
+`UNPROVEN` reads like a measurement and is the lack of one.
+
+**The conductor defect is mine and it is Cause 2 wearing a new hat.** *"A fast pane pulls dispatch
+attention away from a slow one, and the conductor mistakes the resulting idleness for the slow pane's
+fault."* This time **an unreliable instrument pulled dispatch away from both panes at once**, and
+I never asked whether a better surface existed — for four ticks, while writing three instruments of
+my own about the danger of trusting summaries over receipts.
+
+**Honest limit on the new surface, stated before relying on it further:** pane 2 and 3 report
+`confidence=0.5` with **empty work indicators**, so "idle" here is **absence of work markers in the
+captured lines** — evidence, not proof. Pane 1 reports `working` at `confidence=0.6` on the strength
+of a **shell prompt** (`work: ['$ ']`), which is thin. **Two panes with a fresh capture and no work
+markers beats `capture_gap`, which is no capture at all** — that is the whole of the claim.
+
+**Dispatched immediately on that signal**, both panes, four units:
+
+| pane | unit | what it rules |
+|---|---|---|
+| 2 | **Q19** | the schema that closes **R17** — a declared receipt type so *"is this a score receipt"* is **stated, not inferred from a filename** |
+| 2 | **Q20** | non-author audit of **all four** of my instrument scripts — one author, zero graders |
+| 3 | **Q64** | the **§5 prose mean-score blind spot it named itself** — any upward move, then mechanise or retire |
+| 3 | **Q65** | the **lossy `author` column** its own archaeology found — and whether any other row shares it |
+
+**Q19 and Q65 are both defects the panes found in my work and are now being asked to rule on, and
+Q20 is an audit of the instruments I built while they were idle.** The conductor's four-tick silence
+produced a worse backlog than any interrupt would have.
