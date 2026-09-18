@@ -4018,3 +4018,59 @@ predicates are quoted verbatim *"so the draw re-derives exactly."*
 **Ruling: the 20-case sample stands.** It is self-consistent against stated predicates with committed
 identities and a pre-committed seed. **The 59% insufficiency headline stands directionally and its
 exact per-stratum counts do not** — and that distinction is now recorded rather than papered over.
+
+---
+
+## §5b THE MANIFEST FIX IS CHEAP AND SPECIFIED — §4z's open question closes
+
+**`docs/demos/duel-2/SPEC_evidence_manifest_COD.md` (`58f7302`), pane 2 as non-author of the current
+manifest.**
+
+```text
+prototype:  24 cases = 25,521 bytes  (~1,063 bytes/case)
+extrapolated:  68 cases ≈  72 KB     ·   200 cases ≈ 213 KB
+```
+
+**213 KB for a 200-case manifest, and that was the only thing nobody knew.** I ruled in §4z that a
+manifest *"must carry the evidence span itself, not a coordinate into something that rewrites
+itself"* — a principle with an unpriced cost that could have made it impractical. **It does not: the
+fix is the cheapest of COD-H2's three phase-1 components.**
+
+**And the spec realizes the principle precisely.** Immutable turn/command/context spans, base64 bytes
+plus sha256, policy and rubric clause paths, and the two lines that matter:
+
+> *"`source_snapshot_sha256` is **provenance, not a dependency for verification**."*
+> *"**A verifier needs no journal access.**"*
+
+**That is the defect closed at the root.** §4x's disqualifying finding was *"no third party can
+re-derive or check them from committed artifacts."* Under this spec a third party needs **only the
+manifest** — the journals can compact, rewrite or vanish, as four of them already did.
+
+**Its price is honestly a lower bound and it says so:** *"the current journal files are absent; the
+24-case prototype is a lower-bound"* — exact byte offsets are `BLOCKED`. **The thing that prevented
+exact pricing of the fix is the same drift that motivated the fix**, which is a tidy demonstration
+that the defect is real rather than theoretical.
+
+### Where COD-H2's three phase-1 components now stand
+
+| Component | State |
+|---|---|
+| **Manifest design** | **specified and priced** — `58f7302`, ~213 KB at N=200 |
+| **Specification** (*define licensed*) | **priced** 65–110 min, **validated 7/7 on the disputed set**, fresh-sample test in flight |
+| **Corpus** | **terminal in this lane** — journals exhausted, credential stratum struck |
+
+**Two of three are done or priced. The third is the blocker, and it is the one that needs someone
+outside this lane.** That is a materially more actionable ruling than "three components nobody
+costed" — which is where §4z left it two hours ago.
+
+### The open question I dispatched rather than assumed
+
+**Does base64-encoding the evidence bytes also defeat the `autofix` hazard?** §5a's cause 2 is that a
+reformatter may rewrite a supposedly immutable manifest at commit time. **A base64 blob has no
+whitespace for a formatter to normalise — so the spec may close a hazard it was never designed
+for.**
+
+**I did not record that as a finding, because I have been caught twice this session asserting a
+plausible mechanism I had not run** (§4b's asserted pin, §4y's scoped-vs-low-risk). **Q50 runs the
+prototype through the actual hook and checks whether the bytes and sha256 survive.** If they do not,
+the manifest has to live outside the formatter's reach — which would be a second, separate fix.
