@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # sync-docs.sh — vendor the PRIMARY sources this lane reads, locally and verifiably.
-#
 #   1. docs.typesafe.ai      → docs-mirror/typesafe/**.md   (via llms.txt, the doc site's own index)
 #   2. github.com/typesafe-ai → upstream/typesafe-ai/<repo>  (first-party SDKs + agent skills)
 #   3. ripwire               → docs-mirror/ripwire/*         (repo docs + the installed CLI's own help)
+#   4. USAGE-MAP community sources → upstream/<owner>/<repo> (third-party Jev-ecosystem
+#      repos at the EXACT cited SHA, detached — provenance for the demo backlog's numbers)
 #
 # Contract:
 #   - IDEMPOTENT. Re-running overwrites mirrored bytes and rewrites the manifests. Nothing else.
@@ -28,6 +29,31 @@ DOCS_HOST="https://docs.typesafe.ai"
 ORG="typesafe-ai"
 ORG_REPOS=(typesafe-sdk-python typesafe-sdk-js system-one-adapter-python skills)
 RIPWIRE_URL="https://github.com/redhat-et/ripwire.git"
+# COMMUNITY_REPOS: every third-party repo docs/demos/USAGE-MAP.md cites, as
+# "owner/repo full-sha". Owners resolved 2026-09-18 via GitHub search + commit-SHA
+# verification (receipt: bead jev-demo-loop-a1q.2); all 19 SHAs resolved, zero
+# UNRESOLVABLE. Short SHAs in USAGE-MAP.md match these commits' prefixes.
+COMMUNITY_REPOS=(
+"jkudish/jev-mcp 6ec5efc6601477557c1436981ba69eb7b35832bd"
+"NiazMorshed2007/jev-review 57690af54ef7d862c2483342c1e61c14dffcf727"
+"browser-use/jev-ultrafast 452c1ad2dd628008f1d5608f28158d76e49e6cc0"
+"gargpratyush/jev-router 86660a0248eba0e4523f81645ac2925e9808c000"
+"0xNatoshi/jev-codex-router 8292b519659280884627a962c826ac7721136a64"
+"anessbelbati/jev-rerank-bench cd9a35b22aeb4187334f7018a0ee1960a7470586"
+"anisselbd/jev-phishing-bench 1d56e8c64d029a9554a0874e2ef2901ed196e230"
+"Gaurav-Gosain/jev-sec-bench fdb16b94d37535db9bad77f8ef0faa971bd7d69a"
+"bitnovus/jev-spam-eval 76ef18305710f8f38c984a56a80fc43e6bb18c6f"
+"TokenTrim/jev-agent-failure-benchmark 4d46af795a4a4409940a65857da73e45abaea2db"
+"iammrduncan/typesafe-ai-benchmark e94fcdaf5058da3e8988f525c3a647f53588d5f3"
+"devanshbatham/commit-miner 977617ebce07c56b965253a68577b1d92b93fdf1"
+"thruwire/foreman 2c439828b9fe45ee5d40f6f57be81f7ff1f8a140"
+"AbdelStark/s1-rs b9168979a9beaeb74878483ff2876958acb98b86"
+"Anil-matcha/awesome-jev-by-typesafe d57f5ce8002cc7cadc2c744b34a45933507e0508"
+"AbdelStark/bicameral 3bea244b072cdacd3c8a85aec8d788a3ae0ac1cc"
+"Dicklesworthstone/skillranker 3fe85c432ba5e2b4f980e842fc94d57fae6c4189"
+"tamaratran/fast-jev-compaction 6e1da50d064cc06aa08e720b534b4d873e2bb0b6"
+"typesafe-ai/system-one-adapter-python 0bb819b85d67a98c736d7c3004eae95f49f3daa3"
+)
 RIPWIRE_LOCAL="${RIPWIRE_LOCAL:-$HOME/Developer/ripwire}"
 UA="OpenAI File Downloader, XaiImageApiFetch/1.0"
 
@@ -102,8 +128,10 @@ if [ "$MODE" = check ]; then
       [ "$cur" = "$pinned" ] || echo "SHA-MOVED $path  manifest=$pinned head=$cur"
     done < "$REPO_MANIFEST"
   fi
-  if [ "$bad" -gt 0 ]; then echo "CHECK FAIL  $bad of $n mirrored files missing or drifted"; rc=1
-  else echo "CHECK PASS  $n mirrored files match MANIFEST.tsv"; fi
+  rcount=0
+  [ -f "$REPO_MANIFEST" ] && rcount=$(($(wc -l < "$REPO_MANIFEST" | tr -d ' ') - 1))
+  if [ "$bad" -gt 0 ]; then echo "CHECK FAIL  $bad of $n mirrored files missing or drifted ($rcount repo clones pinned)"; rc=1
+  else echo "CHECK PASS  $n mirrored files match MANIFEST.tsv ($rcount repo clones pinned)"; fi
   exit $rc
 fi
 
@@ -173,13 +201,45 @@ record_repo() { # record_repo <name> <path>   ; path may be workspace-relative o
   fi
 }
 
+sync_community() {
+  echo "== USAGE-MAP community sources → upstream/<owner>/<repo> @ cited SHA (detached)"
+  for spec in "${COMMUNITY_REPOS[@]}"; do
+    local owner_repo="${spec% *}" full="${spec#* }"
+    local owner="${owner_repo%/*}" repo="${owner_repo#*/}"
+    local path="upstream/$owner/$repo"
+    local abs="$ROOT/$path"
+    if [ -d "$abs/.git" ]; then
+      git -C "$abs" fetch --quiet origin "$full" 2>/dev/null \
+        || echo "   warn: fetch failed for $owner_repo (offline?)"
+    else
+      echo "   cloning $owner_repo"
+      mkdir -p "$ROOT/upstream/$owner"
+      git clone --quiet "https://github.com/$owner/$repo.git" "$abs" \
+        || { echo "FAIL  clone $owner_repo" >&2; return 1; }
+      [ -d "$abs/.git" ] || { echo "FAIL  clone reported success but $path has no .git" >&2; return 1; }
+      git -C "$abs" fetch --quiet origin "$full" 2>/dev/null || true
+    fi
+      if ! git -C "$abs" checkout --quiet "$full" 2>/dev/null; then
+        # Cited SHA not fetchable (dangling after upstream rewrite, or pruned).
+        # Recorded, not silent: item 5 marks these UNRESOLVABLE in USAGE-MAP.md
+        # itself; the pin set stays check-clean without them.
+        grep -q "^${owner_repo}	" "$UP_DIR/UNRESOLVABLE.tsv" 2>/dev/null \
+          || printf '%s\t%s\t%s\n' "$owner_repo" "$full" "$(now)" >> "$UP_DIR/UNRESOLVABLE.tsv"
+        echo "   UNRESOLVABLE $owner_repo @ ${full:0:7} (cited SHA not fetchable upstream)"
+        continue
+      fi
+    record_repo "$repo" "$path"
+  done
+}
+
 sync_repos() {
   echo "== github.com/$ORG → upstream/$ORG"
   mkdir -p "$UP_DIR/$ORG"
   printf 'repo\tpath\tpinned_sha\tupstream_sha\tbehind\tfetched_at\n' > "$REPO_MANIFEST"
 
   for r in "${ORG_REPOS[@]}"; do
-    local path="upstream/$ORG/$r" abs="$ROOT/upstream/$ORG/$r"
+    local path="upstream/$ORG/$r"
+    local abs="$ROOT/upstream/$ORG/$r"
     if [ -d "$abs/.git" ]; then
       git -C "$abs" fetch --quiet origin 2>/dev/null || echo "   warn: fetch failed for $r (offline?)"
     else
@@ -189,6 +249,8 @@ sync_repos() {
     fi
     record_repo "$r" "$path"
   done
+
+  sync_community
 
   # ripwire: reuse the existing local checkout when present; never clone twice.
   local rw_path rw_abs

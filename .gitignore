@@ -49,6 +49,7 @@ docs-mirror/*
 upstream/*
 !upstream/MANIFEST.tsv
 !upstream/ORG-INVENTORY.tsv
+!upstream/UNRESOLVABLE.tsv
 
 # Harness and tool state that belongs to a machine, never to the repo.
 .ntm/
