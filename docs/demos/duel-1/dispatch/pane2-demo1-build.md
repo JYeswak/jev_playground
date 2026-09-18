@@ -56,6 +56,38 @@ Then the `EVAL.md` row — **append only, do not restructure the file** — nami
 level and a Boundary stating exactly what the backtest does *not* prove (it does not prove routing
 would work live; it prices a counterfactual on past turns).
 
+## UNIT 4 — the install script. Nobody owns this and the demo cannot ship without it.
+
+`docs/demos/PLAN.md` defines shipped as four artifacts, and this is the one with no owner: **an
+install script a stranger can run.** You own the tree, so you own it.
+
+`demos/routing-backtest/install.sh` plus a short `demos/routing-backtest/README.md`:
+- **Idempotent, and it says so** — safe to re-run, per the README-skeleton rule.
+- Copy-pasteable with **no placeholders**. A stranger clones, runs one command, and gets a
+  backtest over the shipped fixtures — not over `~/.omp`, which they do not have.
+- **Default to the committed fixtures**, with the real omp session path as an opt-in flag. Your
+  reader currently reads `~/.omp/profiles/...`; a stranger has no such directory, so an install
+  that assumes it fails on first contact.
+- No key required. This demo is read-only and offline; if the install mentions
+  `TYPESAFE_API_KEY` at all, it is to say it is **not needed**.
+- The README states the Boundary in one line: it prices a counterfactual on past turns and does
+  **not** prove routing would work live.
+
+## UNIT 5 — make pane 3's absence check effective
+
+Pane 3's `demos/routing-backtest/fixtures/verify-fixtures.mjs` passes 8/8 but records an honest
+NOTE: *"no price table in tree yet — absence check becomes effective once pane 2 ships one;
+sentinel value asserted meanwhile."* That is the correct way to report a check that cannot yet
+bite, and it creates a dependency on you.
+
+Once your price table exists, re-run that verifier and confirm the `unknown-model` fixture's 18
+model fields are genuinely **absent from your table** — turning a sentinel assertion into a real
+absence check. **Do not edit pane 3's file**; if the assertion needs to change shape, message
+pane 3 with what the table looks like and let them change it.
+
+Report the verifier's exit code in your callback. If it still cannot bite, say so — a check that
+passes because it is inert is the failure mode this lane keeps catching.
+
 ---
 
 ## REPLY-VIA — three legs, per unit

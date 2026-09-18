@@ -11,7 +11,7 @@ const session = (messages, model = 'cheap-1') =>
     .map((row) => JSON.stringify(row))
     .join('\n');
 
-test('extracts model and token counts per classifiable turn', () => {
+test('extracts model, token, cost, and tool-call counts per classifiable turn', () => {
   const parsed = parseSessionText(
     session([
       { type: 'message', message: { role: 'user', content: [{ type: 'text', text: 'one' }] } },
@@ -34,6 +34,8 @@ test('extracts model and token counts per classifiable turn', () => {
     models: ['cheap-1'],
     promptTokens: 11,
     completionTokens: 7,
+    actualSpend: null,
+    toolCalls: 0,
     assistantMessages: 1,
     classifiable: true,
     skipReason: null,
@@ -81,6 +83,13 @@ test('empty classifiable set is an error, never an empty green run', () => {
         skippedTurns: parsed.totals.skippedTurns,
       },
     }),
+    (error) => error?.code === 'EMPTY_CLASSIFIABLE_SET',
+  );
+});
+
+test('committed zero-classifiable fixture fires the same RED arm', async () => {
+  await assert.rejects(
+    () => readSessionLogs([new URL('../fixtures/zero-classifiable-turns.jsonl', import.meta.url).pathname]),
     (error) => error?.code === 'EMPTY_CLASSIFIABLE_SET',
   );
 });

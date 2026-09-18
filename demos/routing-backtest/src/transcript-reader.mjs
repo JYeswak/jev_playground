@@ -17,12 +17,20 @@ function finishTurn(current) {
   const assistants = current.assistants;
   const models = [...new Set(assistants.map((message) => message.model ?? message.activeModel).filter(Boolean))];
   const usage = assistants.map((message) => message.usage).filter(Boolean);
+  const costs = usage.map((value) => value.cost).filter(Boolean);
   const promptTokens = usage.length
     ? usage.reduce((total, value) => total + (Number(value.input) || 0), 0)
     : null;
   const completionTokens = usage.length
     ? usage.reduce((total, value) => total + (Number(value.output) || 0), 0)
     : null;
+  const actualSpend = costs.length
+    ? costs.reduce((total, value) => total + (Number(value.total) || 0), 0)
+    : null;
+  const toolCalls = assistants.reduce(
+    (total, message) => total + (message.content ?? []).filter((part) => part?.type === 'toolCall').length,
+    0,
+  );
   let skipReason = null;
   if (!userText.trim()) skipReason = 'empty user prompt';
   else if (assistants.length === 0) skipReason = 'no assistant response';
@@ -34,6 +42,8 @@ function finishTurn(current) {
     models,
     promptTokens,
     completionTokens,
+    actualSpend,
+    toolCalls,
     assistantMessages: assistants.length,
     classifiable: skipReason === null,
     skipReason,
