@@ -1,0 +1,27 @@
+{
+ "schema": "jev.routing-backtest-fixtures.v1",
+ "source": "compaction/fixtures/omp-session-big-20260917.jsonl (excerpt rows 0-93), synthetic derivatives documented per file",
+ "files": [
+  {
+   "path": "real-excerpt-t1-t6.jsonl",
+   "bytes": 35611,
+   "sha256": "d1432c59de9a57190f82b5e381f91fc8c6c672284740e6508d553d11f9d6bddb",
+   "purpose": "happy-path corpus turns 1-6",
+   "arm": "determinism + frontier-needed arms"
+  },
+  {
+   "path": "zero-classifiable-turns.jsonl",
+   "bytes": 721,
+   "sha256": "eb102de95d375bbfc1c1eac562d81d416086f4d31c10299445627f58f1587fbc",
+   "purpose": "known-bad: 3 spans, no assistant/model rows",
+   "arm": "empty-scan-set ERROR arm"
+  },
+  {
+   "path": "unknown-model-turns.jsonl",
+   "bytes": 35485,
+   "sha256": "e2bc151af448465b00712cfac1fb25bacfafeb68249071a8698846497a8dd962",
+   "purpose": "synthetic single-field rewrite: 18 model fields -> frontier-unlisted-9x",
+   "arm": "missing-price ERROR arm"
+  }
+ ]
+}

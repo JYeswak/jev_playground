@@ -1,0 +1,1 @@
+Known-bad: 3 turn spans, zero assistant/message-model rows — triggers pane 2's empty-scan-set ERROR arm (must ERROR, never report savings).
