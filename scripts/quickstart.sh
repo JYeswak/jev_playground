@@ -67,7 +67,11 @@ EOF
   # denominator is the defect this repo has spent the day removing from its own documents.
   sample_n=200
   mine_files=()
-  while IFS= read -r f; do mine_files+=("$f"); done < <(find "$corpus" -name '*.jsonl' -type f 2>/dev/null | head -"$sample_n")
+  # SORTED, so the sample is the SAME 200 files on every run and on every machine. Unsorted `find`
+  # order is filesystem order: my two runs happened to agree, which is luck rather than a property.
+  # A bounded sample whose membership can silently change is a denominator that can silently change,
+  # and a peer re-executing this must be able to get my number or a different one FOR A STATED REASON.
+  while IFS= read -r f; do mine_files+=("$f"); done < <(find "$corpus" -name '*.jsonl' -type f 2>/dev/null | LC_ALL=C sort | head -"$sample_n")
   # THE ADAPTER PATH, and it needs YOUR price sheet because Claude Code records no cost.
   #
   # Claude Code logs carry tokens and a model string but no money, so a dollar answer can only come
@@ -99,9 +103,21 @@ EOF
             console.log(`    Both dollar figures are COMPUTED from your sheet. Claude Code records no cost.`);
           ' "$mine_work/bt.json"
         else
-          echo "    The backtest refused the converted data. Its floors are deliberate — a run where"
-          echo "    EVERY turn qualifies for the cheap model is rejected as NO_BASELINE_CANDIDATES"
-          echo "    rather than reported as a saving, which is how this path caught a conversion bug."
+          # QUOTE THE CODE, DO NOT NARRATE ONE. This branch previously asserted the cause was
+          # NO_BASELINE_CANDIDATES. That was the same guessed-cause defect I had already fixed once in
+          # the raw path, reintroduced in the branch I wrote to avoid it — and on a sorted sample the
+          # real code differed. A failure message that names a cause it did not read is a lie with a
+          # helpful tone.
+          why="$(node -e '
+            try {
+              const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));
+              console.log((r.failures||[]).map(f=>`${f.code}${f.reason?": "+f.reason:""}${f.message?": "+f.message:""}`).join("; ")||"no failures recorded");
+            } catch { console.log("receipt unreadable"); }
+          ' "$mine_work/bt.json" 2>/dev/null || echo "receipt unreadable")"
+          echo "    The backtest REFUSED the converted data: $why"
+          echo "    Its floors are deliberate. A run where every turn qualifies for the cheap model,"
+          echo "    or one with too few classifiable turns, is rejected rather than reported as a"
+          echo "    saving — which is how this path caught a conversion bug in its own author's work."
         fi
       else
         echo "    Conversion failed:"

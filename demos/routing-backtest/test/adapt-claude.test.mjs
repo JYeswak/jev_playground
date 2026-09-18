@@ -65,7 +65,7 @@ test('a model absent from the sheet is refused and NAMED, never priced', () => {
   assert.ok(!('known-1' in receipt.refusedModels));
 });
 
-test('prompt tokens are input + cacheRead, the declared rule the backtest floor forced', () => {
+test('context tokens are input + cacheRead + cacheWrite, per the non-author pricing ruling', () => {
   const dir = work();
   writeFileSync(join(dir, 's.jsonl'), sessionLine('known-1', {
     input_tokens: 7, output_tokens: 3, cache_read_input_tokens: 500, cache_creation_input_tokens: 11,
@@ -77,7 +77,11 @@ test('prompt tokens are input + cacheRead, the declared rule the backtest floor 
   const rows = readFileSync(join(dir, 'o.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
   const msg = rows.find((r) => r.type === 'message_end');
   assert.ok(msg, 'must emit message_end; the reader ignores message_start entirely');
-  assert.equal(msg.message.usage.input, 507, 'prompt must include the processed cached prefix');
+  // 7 + 500 + 11. Pane 2 ruled cache_creation belongs in the context fit too
+  // (ruling-routing-pricing-semantics-20260918T174000Z.json): a prefix being WRITTEN to cache is
+  // still occupying the context window on that turn, so a router deciding whether a cheap model
+  // FITS must count it. My first rule counted only input + cacheRead and was incomplete.
+  assert.equal(msg.message.usage.input, 518, 'context must include cache creation as well as reads');
   assert.equal(msg.message.usage.cacheRead, 500, 'cacheRead stays itemised for pricing');
 });
 
@@ -112,4 +116,26 @@ test('the emitted price table marks converted models recorded and the cheap cand
   assert.equal(table.models['cheap-1'].mode, 'scenario');
   assert.equal(table.models['cheap-1'].inputPerMillion, 0.25);
   assert.match(table.rederivation, /Claude Code records no cost/);
+});
+
+test('a sheet still carrying the template placeholders is refused, not used', () => {
+  const dir = work();
+  writeFileSync(join(dir, 's.jsonl'), sessionLine('known-1', { input_tokens: 1, output_tokens: 1 }));
+  const p = join(dir, 'placeholder.json');
+  writeFileSync(p, JSON.stringify({
+    cacheReadMultiplier: 0.1,
+    cacheWriteMultiplier: 1.25,
+    // Exactly what --print-price-template emits, with rates filled in and provenance left alone.
+    source: 'REQUIRED: the URL or document you copied these rates from',
+    cacheRuleSource: 'REQUIRED: where the cache multipliers come from; they are billing assumptions',
+    models: { 'known-1': { input: 1, output: 2 } },
+  }));
+  assert.throws(
+    () => run([join(dir, 's.jsonl'), '--prices', p, '--out', join(dir, 'o.jsonl')], { stdio: 'pipe' }),
+    (err) => {
+      assert.equal(err.status, 2);
+      assert.match(String(err.stderr), /template placeholder/);
+      return true;
+    },
+  );
 });

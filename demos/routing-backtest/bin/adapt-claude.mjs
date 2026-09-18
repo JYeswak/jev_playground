@@ -104,6 +104,18 @@ function main() {
   for (const field of ['cacheReadMultiplier', 'cacheWriteMultiplier', 'models']) {
     if (sheet[field] === undefined) die(`price file has no ${field}`);
   }
+  // FAIL CLOSED ON THE TEMPLATE'S OWN PLACEHOLDERS. Pane 2's non-author ruling
+  // (ruling-routing-pricing-semantics-20260918T174000Z.json, 7f845f0): the multipliers are "declared
+  // assumptions, not measurements", and accepting REQUIRED/UNSTATED placeholders means the tool "is
+  // not fully fail-closed". It was right — you could fill in rates, leave both source fields as the
+  // words the template printed, and get dollars whose provenance said REQUIRED.
+  for (const field of ['source', 'cacheRuleSource']) {
+    const v = sheet[field];
+    if (typeof v !== 'string' || !v.trim() || /^(REQUIRED|UNSTATED)\b/i.test(v.trim())) {
+      die(`price file's ${field} is missing or still the template placeholder: a computed dollar `
+        + 'figure must name where its rates came from');
+    }
+  }
   const readMult = Number(sheet.cacheReadMultiplier);
   const writeMult = Number(sheet.cacheWriteMultiplier);
   if (!Number.isFinite(readMult) || !Number.isFinite(writeMult)) die('cache multipliers must be numbers');
@@ -196,11 +208,11 @@ function main() {
             // cache_read_input_tokens=55141 is not a 2-token prompt — the model processes the whole
             // cached prefix, so the PROMPT the router would have to fit is input + cacheRead. The
             // cost fields below stay itemised, so the cached share is still priced at its own rate.
-            input: input + cacheRead,
+            input: input + cacheRead + cacheWrite,
             output,
             cacheRead,
             cacheWrite,
-            promptRule: 'prompt = input_tokens + cache_read_input_tokens (declared; the cached prefix is processed)',
+            promptRule: 'contextInputTokens = input_tokens + cache_read_input_tokens + cache_creation_input_tokens (declared)',
             totalTokens: input + output + cacheRead + cacheWrite,
             cost,
           },
