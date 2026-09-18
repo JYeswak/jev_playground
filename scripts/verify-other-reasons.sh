@@ -58,6 +58,25 @@ def norm_digest(path: Path) -> str:
 #
 # So the evidence bytes are never altered: a third party recomputes the same digests over the same
 # bytes. Only the READ is redirected.
+def contained(root: Path, p) -> Path:
+    """Map any path INTO root/files, so nothing can escape the private snapshot root.
+
+    PANE 2 FOUND THIS, Q100 clause audit (audit-q100-contract-20260918T131500Z.json, 4ceec76):
+    "preserved MET for relative production paths but ABSOLUTE ENV INPUTS ESCAPE PRIVATE ROOT."
+
+    The mechanism is a Python join rule I did not check: `Path("/a/b") / "/tmp/x"` is `/tmp/x` — an
+    absolute right operand DISCARDS the left. So `root/"files"/Path("/tmp/st.tsv")` was `/tmp/st.tsv`:
+    the copy wrote the source back onto itself, `mapped` recorded the LIVE path, and the verifier read
+    live inputs while reporting a snapshot. With JEV_STATUS pointed at an absolute fixture — which is
+    exactly how I tested the transient class — THE SNAPSHOT SILENTLY DID NOT HAPPEN.
+
+    `..` escapes too (`root/"files"/"../../etc/x"`), which pane 2's own spec had listed under
+    "re-examine on path expansion, traversal/symlink". Both are dropped here, anchor and all.
+    """
+    parts = [x for x in Path(p).parts if x not in (os.sep, "/", "..", "")]
+    return root / "files" / Path(*parts) if parts else root / "files"
+
+
 def snapshot(paths, root: Path):
     """Copy each path into root/files/<original relative path>. Returns {original: snapshot}."""
     mapped = {}
@@ -65,7 +84,7 @@ def snapshot(paths, root: Path):
         src = Path(p)
         if not src.is_file():
             continue
-        dst = root / "files" / src
+        dst = contained(root, src)
         dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_bytes(src.read_bytes())
         mapped[str(src)] = dst
@@ -135,20 +154,35 @@ def main() -> int:
         # snapshotted, passing a check the manifest cannot account for. Unmapped paths now resolve
         # INTO the snapshot root, where they are absent, so "absent at capture" stays absent.
         def resolve(p, _m=mapped, _r=root):
-            return _m.get(str(p)) or (_r / "files" / p)
+            return _m.get(str(p)) or contained(_r, p)
         rc, report = _verify(resolve(STATUS), resolve(SIDECAR), resolve)
         post = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest()[:16]
                 for p in inputs if Path(p).is_file()}
         man = manifest_for(mapped, pre, post, attempt, head)
         (root / "manifest.json").write_text(json.dumps(man, indent=2, sort_keys=True) + "\n")
         moved = sorted(p for p in pre if pre[p] != post.get(p))
-        # DETERMINISTIC KNOWN-BAD HOOK, same pattern and same reason as lane-status's
-        # JEV_SELF_DIGEST_OVERRIDE: racing a mid-run mutation against a ~0.3s verify produced an arm
-        # that proved nothing THREE times in this session, and tuning the sleep until it passed would
-        # be a witness that passes by construction. FAIL-SAFE BY CONSTRUCTION — it can only
-        # manufacture a FALSE TRANSIENT (no verdict), never a false pass.
+        # DETERMINISTIC KNOWN-BAD HOOK, same pattern as lane-status's JEV_SELF_DIGEST_OVERRIDE:
+        # racing a mid-run mutation against a ~0.3s verify proved nothing THREE times, and tuning the
+        # sleep until it passed would be a witness that passes by construction. It cannot manufacture
+        # a PASS. It COULD mask a RED — pane 2 falsified my "fail-safe by construction" claim below —
+        # so that hole is now closed structurally rather than asserted. TEST-ONLY either way.
+        forced = False
         if os.environ.get("JEV_FORCE_MOVED"):
-            moved = sorted(set(moved) | {os.environ["JEV_FORCE_MOVED"]})
+            # PANE 2 FALSIFIED MY CLAIM, Q100-U2 (audit-q100-arms-20260918T130000Z.json, c9ddb0f):
+            # "JEV_FORCE_MOVED cannot create PASS but CAN SUPPRESS DURABLE RED into
+            # TRANSIENT_UNSTABLE, so test-only." I had committed "fail-safe by construction: it can
+            # only manufacture a false TRANSIENT, never a false pass" TWICE — and a hook that can
+            # convert a real FAIL into "no verdict" is not fail-safe, it is a RED-masking hook. I
+            # asked pane 2 to falsify that claim and it did.
+            #
+            # So the guarantee is now STRUCTURAL rather than asserted: the hook is REFUSED whenever
+            # the underlying verdict is not clean. It cannot suppress what it cannot reach.
+            if rc != 0:
+                print(f"JEV_FORCE_MOVED REFUSED: underlying verdict is rc={rc}, not clean. "
+                      f"The hook may not convert a durable failure into a transient.")
+            else:
+                moved = sorted(set(moved) | {os.environ["JEV_FORCE_MOVED"]})
+                forced = True
         if not moved:
             print(report, end="")
             print(f"  snapshot: {root}  manifest_digest: {man['manifest_digest']}")
@@ -157,7 +191,17 @@ def main() -> int:
         if attempt == 2:
             print("TRANSIENT_UNSTABLE: source inputs moved during BOTH captures. NO VERDICT.")
             for p in moved:
-                print(f"  moved: {p}  {pre[p]} -> {post.get(p)}")
+                # PANE 2 RULED AGAINST MY OTHER CLAIM, same receipt: "moved equal-digest line is NOT
+                # self-disclosing; add forced=true/reason." I had argued that printing identical
+                # pre/post digests self-discloses a forced classification. It does not — it requires
+                # the reader to notice two hex strings are equal AND to know what that implies, which
+                # is an inference, not a disclosure. Marked explicitly now.
+                mark = ""
+                if forced and p == os.environ.get("JEV_FORCE_MOVED"):
+                    mark = "   forced=true reason=JEV_FORCE_MOVED (test hook; digests are EQUAL)"
+                print(f"  moved: {p}  {pre[p]} -> {post.get(p)}{mark}")
+            if forced:
+                print("  NOTE: at least one movement was FORCED by a test hook, not observed.")
             print(f"  manifest: {root}/manifest.json (records both source_pre and source_post)")
             return 10
         print(f"SNAPSHOT MOVED during capture 1 ({len(moved)} input(s)) — recapturing once, bounded.")

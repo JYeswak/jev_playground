@@ -154,12 +154,56 @@ def main() -> int:
             print(f"FAIL  {'ARM 9 snapshot copy fidelity':<46} {bad[:2]}")
             fail += 1
 
+    # ------------------------------- ARMS FOR PANE 2'S Q100 FINDINGS (c9ddb0f, 4ceec76)
+    # Both of these were DEFECTS I SHIPPED and pane 2 found by attacking claims I asked it to attack.
+    # An arm for each, so neither can return silently.
+
+    # ARM 10 — absolute inputs must not escape the private snapshot root. Pane 2: "absolute env
+    # inputs escape private root". Mechanism: Path("/a")/"/tmp/x" == "/tmp/x", so the copy mapped the
+    # source ONTO ITSELF and the verifier read live while reporting a snapshot.
+    abs_side = Path(tempfile.mkdtemp()) / "abs-sidecar.json"
+    abs_side.write_text(REAL_SIDE.read_text())
+    r = subprocess.run([str(VERIFIER)], capture_output=True, text=True,
+                       env=dict(os.environ, JEV_SIDECAR=str(abs_side)))
+    m = re.search(r"snapshot: (\S+)", r.stdout)
+    if m:
+        man = json.loads((Path(m.group(1)) / "manifest.json").read_text())
+        escaped = [f["source_path"] for f in man["files"]
+                   if not f["snapshot_path"].startswith(m.group(1))
+                   or f["snapshot_path"] == f["source_path"]]
+        if not escaped:
+            print(f"PASS  {'ARM 10 absolute input contained in root':<46} 0 of {len(man['files'])} escaped")
+        else:
+            print(f"FAIL  {'ARM 10 absolute input contained in root':<46} escaped: {escaped[:2]}")
+            fail += 1
+    else:
+        print(f"FAIL  {'ARM 10 absolute input contained in root':<46} no snapshot path emitted")
+        fail += 1
+
+    # ARM 11 — the test hook must NOT be able to mask a durable RED. Pane 2: "JEV_FORCE_MOVED cannot
+    # create PASS but CAN SUPPRESS DURABLE RED into TRANSIENT_UNSTABLE". I had committed the claim
+    # that it was fail-safe by construction TWICE. It is now refused on a dirty verdict, and this arm
+    # is the witness: a known-bad sidecar plus the hook must stay rc=1, never rc=10.
+    bad_side = Path(tempfile.mkdtemp()) / "dirty-sidecar.json"
+    d = json.loads(REAL_SIDE.read_text())
+    d["rows"][0].pop("assigned_by", None)
+    bad_side.write_text(json.dumps(d, indent=2))
+    r = subprocess.run([str(VERIFIER)], capture_output=True, text=True,
+                       env=dict(os.environ, JEV_SIDECAR=str(bad_side),
+                                JEV_FORCE_MOVED="docs/demos/STATUS.tsv"))
+    if r.returncode == 1 and "REFUSED" in r.stdout and "TRANSIENT_UNSTABLE" not in r.stdout:
+        print(f"PASS  {'ARM 11 hook cannot mask a durable RED':<46} rc=1 refused, not laundered to 10")
+    else:
+        print(f"FAIL  {'ARM 11 hook cannot mask a durable RED':<46} rc={r.returncode} "
+              f"refused={'REFUSED' in r.stdout} transient={'TRANSIENT_UNSTABLE' in r.stdout}")
+        fail += 1
+
     print("\n" + "-" * 70)
     print(f"fixtures under {tmp} (left in place; temp dir)")
     if fail:
         print(f"FAIL: {fail} arm(s) did not discriminate.")
         return 1
-    print("OK: sidecar verifier discriminates on all 9 arms; real files never written.")
+    print("OK: sidecar verifier discriminates on all 11 arms; real files never written.")
     return 0
 
 
