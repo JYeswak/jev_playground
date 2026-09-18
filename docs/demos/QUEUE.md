@@ -224,7 +224,7 @@ and not a re-cut. You already refused to re-cut once; hold that line.
 Output `docs/demos/duel-2/runs/codh2-labelfree-sharpened-<ISO>.json`.
 
 ## UNIT Q8 — non-author audit of an unreviewed duel-2 artifact
-**ELIGIBLE: either pane, non-author of the target.** **CLAIM:** WindyJaguar 2026-09-18T04:37:06Z
+**ELIGIBLE: either pane, non-author of the target.** **CLAIM:** DONE WindyJaguar docs/demos/duel-2/runs/audit-hunt-scores-mu-on-cod-20260918T043846Z.json 198448c
 
 Pick the highest-value duel-2 artifact with **no non-author audit**, state why you picked it over
 the alternatives, and audit its arithmetic and reasoning. Exclude anything you authored.
