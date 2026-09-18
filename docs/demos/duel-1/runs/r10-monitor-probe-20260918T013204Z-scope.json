@@ -1,0 +1,33 @@
+{
+  "schema": "jev.r10.monitor-scope.v1",
+  "bead": "jev-demo-loop-a1q.4",
+  "generated_at": "2026-09-18T01:32:04Z",
+  "binary_owner": {
+    "repo": "/Users/josh/Developer/uds",
+    "source_hint": "crates/fleet-monitor/src/bin/fleet-idle-monitor.rs",
+    "local_source_status": "current Cargo workspace does not list fleet-monitor; upstream destination only"
+  },
+  "user_shell_exclusion": {
+    "ruling": "Upstream/shared-binary responsibility; no local fork or cron patch in this unit.",
+    "evidence": "monitor exposes pane_index token but no worker/agent_type/exclude/shell filter; tmux maps %70 idx=0 cmd=zsh and agent panes %74/%71/%73 cmd=cli.js",
+    "temporary_convention": "Treat jev actionable output as workers-only and never dispatch pane_index=0/user command=zsh until upstream filter lands.",
+    "required_upstream_input": "pane_current_command or agent_type/pane metadata at monitor decision time."
+  },
+  "dry_queue": {
+    "ruling": "CONDUCTOR-SIDE, out of scope for the binary.",
+    "reason": "The monitor can observe liveness and pane identity but cannot know the conductor packet or remaining unit count; idle-because-finished and idle-because-packet-exhausted require opposite responses.",
+    "required_input": "Conductor packet/queue state carrying remaining units and receipt status.",
+    "remedy": "Shared conductor packet/queue contract or upstream shared-binary integration only; never a jev-local fork."
+  },
+  "cross_project_bead": {
+    "observed": "uds-ry5d recommended for a jev pane",
+    "ruling": "Cross-project leakage; bead selection must be session-scoped or the monitor output must be treated as non-dispatchable.",
+    "owner": "Upstream/shared monitor or conductor selection layer."
+  },
+  "false_working": {
+    "observed": "pane %73 reported WORKING on timer_changed while idle",
+    "ruling": "Liveness false positive attributed to spinner/timer content; upstream monitor needs a stable discriminator, not a local fork."
+  },
+  "conclusion": "Reject dry-queue support as a binary feature; file the user-shell and cross-project selection defects upstream/shared, and keep conductor-side packet state as the dry-queue owner.",
+  "no_claim": "No binary patch, cron edit, upstream bead creation, or conductor queue tracker was performed."
+}
