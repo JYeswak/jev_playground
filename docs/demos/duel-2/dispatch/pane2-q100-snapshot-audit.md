@@ -78,3 +78,31 @@ exact limit of what you proved).
 
 Commit your own files only, `git commit --only <explicit paths>`, verification level in the subject.
 Never `git add -A`.
+
+---
+
+## CORRECTION 1 (appended 2026-09-18T12:50Z — do not insert, this is a live-pointer file)
+
+**The ledger path above is wrong, and pane 2's BLOCKED callback was correct.** There is no
+`docs/demos/duel-2/audit-sidecar-promotion-*.json`; I invented that glob from memory rather than
+deriving it from the commit I cited. The real artifact is:
+
+    docs/demos/duel-2/RULE_promote_sidecar_verifier_v2_COD.md   (eb26591, 54 lines)
+
+This is the un-re-derived-citation defect — committed inside a packet that asks a pane to audit
+citations. It is the same class as the bare filename that produced two correct BLOCKED callbacks
+earlier in the session: **a packet that names a path the pane cannot resolve is a defective packet.**
+
+**Two additions to UNIT 1, both of which I want ruled AGAINST me if the record supports it:**
+
+- The ledger's **six re-open conditions** were not read against my implementation before I shipped
+  it. Doing so immediately found a live defect: condition 5, *"no live shared path is read after the
+  snapshot is declared complete"*, caught the resolver falling back to the **live** path for anything
+  `snapshot()` skipped — so a receipt absent at capture but appearing mid-run would have been read
+  live and verified. Fixed in `0e024ee`. **Read all six adversarially; one of them already paid.**
+- I **still** read live files after verification to compute `source_post`. That is literally a live
+  read after the snapshot. I claim the bounded-capture contract requires it. **Rule whether that
+  violates condition 5 or is exempt** — if it violates, promotion stays deferred.
+- Condition 6 requires foundation execution stay **explicitly non-commit-wired**, and you earlier
+  warned foundation *"would collapse rc10 to RED if wired"*. **Is stage 80 still safe now that the
+  verifier owns an rc10?**
