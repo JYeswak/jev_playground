@@ -1,6 +1,10 @@
 #	jev gauntlet state of record. MACHINE-READABLE, updated when a verdict lands.
 #	Every row's receipt MUST exist; scripts/lane-status.sh exits 3 if one does not.
 #	rung values: 0=unscored 1=demand 2=jev-shape 3=thin-proof 4=measured-lift 5=promoted
+#	A RUNG IS PROCESS STATE, NOT EFFICACY. Ruled 2026-09-18 by a non-author pane against an
+#	upstream benchmark asking a near-identical question at n=6257 with intervals on every cell:
+#	CLEARED here means an idea survived the rung it was tested at. No row carries held-out n,
+#	stated uncertainty, or leakage controls, so no row is evidence that an idea WORKS.
 #	verdict values: CLEARED HELD RULED_OUT UNASKABLE PROMOTED RECUSED
 #	author: which pane authored it; a score from its author is NOT a rung-1 score
 candidate	rung	score	verdict	author	receipt	blocked_on
