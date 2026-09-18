@@ -42,8 +42,15 @@ something like (yours will differ — this is 6 turns, not our 30-turn measureme
 `failures` is a list of internal errors (not verdicts). A non-empty list means the run itself
 broke; do not quote its numbers. `[]` is the healthy state.
 
-Write `--out` outside the repo (`/tmp/`, a scratch dir). `demos/routing-backtest/runs/` holds
-committed receipts other documents cite — do not leave trial files beside them.
+## Prior art and oracle
+
+Pattern: read-only counterfactual replay — reprice recorded turns under assumed prices,
+change nothing about what ran. Doc page: `docs/demos/USAGE-MAP.md` §4 (per-turn model routing).
+Prior art: `jev-codex-router@8292b51` (upstream −60% claim; license not opened in this lane —
+uncited on that point) and `github.com/BorisLeMeec/jev@c4de6d7` (MIT; adjacent turn-elimination
+result, different lever — see Scope above, not a rival measurement).
+Oracle: the price table pinned in the receipt (`priceTable`, `as_of`) plus the input session
+logs. If either drifts, re-derive; neither is implied.
 
 ## Verdict (measured 2026-09-18, price table `as_of` 2026-09-18)
 
