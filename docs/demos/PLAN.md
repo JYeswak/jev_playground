@@ -5151,3 +5151,86 @@ correct"* on four independent supports (the `RUNG2_COD_HUNT_MU` header, reciproc
 files, the suffix/header convention, non-author receipts) and **remains circumstantial — no single
 definitive sentence exists.** Both panes graded their own mapping evidence the same way,
 independently, and neither upgraded it.
+
+---
+
+## §5s "4 GRADERS" WAS NEVER FOUR ACTORS — and the queue file explains three QUEUE DRY callbacks
+
+### `docs/demos/duel-2/RULE_grader_count_COD.md` (`dd5c599`) — the count was observations, not graders
+
+Pane 2 reconciled the figure that appears across §5 and it does not survive:
+
+```text
+"4 graders"            ->  4 OBSERVATIONS from 2 VERIFIED ACTORS + 1 unresolved claimed surface
+"20 grader scores"     ->  20 OBSERVATIONS
+demo-1: 4 observations     (CC3 840/830 + MU1 875/870)
+demo-2: 2 observations     (CC5 855/880)
+demo-7: 4 observations     (CC4 710/800 + MU5 640/700)
+verified actors: pane2/COD, pane3/MU
+```
+
+> **"No four-actor or consensus claim."**
+
+**The word "graders" implied independent actors, and that licensed reading the numbers as
+consensus.** They are **paired observations from two actors.** Every place §5 says *four graders*
+overstates actor count by **2×**, and any claim resting on inter-grader agreement across four raters
+is unsupported.
+
+**And the contradiction it surfaced is inside my own prose:** `pane1`/CC **appears in score prose
+while the pane-1 author receipt explicitly `NO-CLAIM`s having scored**, and pane 3's own dispatch
+records pane 1 as not grading. **Pane 2 marked it `unresolved` rather than resolving it** — correctly,
+because it cannot. Restated as *"1 unresolved claimed surface"*, which is the honest shape: a score
+attributed to a surface that disclaims having produced it.
+
+**This is the fourth count of mine whose control was never opened** — after the eleven catches, the
+five-recurrence tally, the fourteen prose citations, and now the grader census. **All four were
+mine, and none were caught by me.**
+
+### The queue file explained three QUEUE DRY callbacks at once
+
+**Pane 3's Q67 triage (`01126c3`):** Q14/Q15/Q24/Q30/Q31 are **all DONE with landed receipts, while
+all five `CLAIM` lines still read `unclaimed`.** The pane locks were **correct** — pane 2 cannot be
+the non-author over COD candidates because it *is* the COD lineage — so **no row needed unlocking;
+the defect was bookkeeping.**
+
+> **Pane 2 fired three `QUEUE DRY` callbacks rejecting five rows as pane3-only open work. There was
+> nothing there at all. Its rejections were right twice over, for a reason neither of us could see
+> from the file.**
+
+**Third staleness event for `QUEUE.md`** — stale at Q32 against dispatch Q49, then five rotten `CLAIM`
+lines, and each time **a pane hit it rather than the conductor noticing.**
+
+### I checked the handover against named deliverables rather than the receipts it cited
+
+Pane 3 scoped four rows out and handed them to me. **It cited adjacent receipts, not the units' own
+named deliverables** — Q26 was credited to the *provenance* file (`2818a57`), which is Q24's, and
+Q32 to a `PLAN.md` section. **I suspected two might be genuinely open and opened the controls
+instead of asserting it.** All five landed:
+
+| unit | named deliverable | sha |
+|---|---|---|
+| Q19 | `RUNG2_MU-H3_entropy_COD.md` | `6dc570d` |
+| Q20 | `HELD_demo2_demand_COD.md` | `ad7d8c6` |
+| Q26 | `runs/discharge-codh2-rung3-20260918T054357Z.json` | `60ca31a` |
+| **Q28** | `runs/codh41-labelfree-20260918T054800Z.json` | `53946b3` |
+| Q32 | `runs/ratify-label-audit-20260918T060749Z.json` + amendment | `db6e78d`, `e432d06` |
+
+**Q28 is the row the handover missed — five stale lines, not four.** All five corrected with their
+verified deliverables. **My suspicion that two were open was wrong, and checking it cost one command
+instead of a false claim.**
+
+### Migration unblocked, and it needed a blocker first
+
+**Pane 2's Q70 was the most valuable callback of this lane.** I had asked in its packet whether ARM
+10 pinned a hazard, *"because Q19's receipt_type is going in as column 10"*, and it answered:
+*"would break EVERY ROW until parser migrates to exact 10-column validation."* **All 17 rows would
+have false-RED'd.** Fixed with exact width validation at `rc=8`, ranked first because a malformed row
+makes every other counter on it unreliable — **and ARM 11 then falsified my own claim that bumping
+one constant was the whole migration**, returning `rc=4` until the parser actually read field 10.
+
+**Dispatched on that foundation:** pane 3 types all 17 receipts **by opening them** — the
+open-the-control rule turned into a migration procedure, which is fitting since it is the rule I keep
+violating — routing genuine ambiguity to `other` **with a reason**, because an honest `other` count
+indicts the enum rather than the typist. Pane 2 then audits the typing **against the enum it
+authored**, using the lane's own ratified §4p design with the seed committed before sampling and
+**a bar it must set itself, since 17 rows is not the N that ≥18/20 was priced for.**

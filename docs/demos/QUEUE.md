@@ -398,7 +398,7 @@ finding, not a failure.
 Output `docs/demos/duel-2/runs/ubs-provenance-codh2-<ISO>.json`.
 
 ## UNIT Q19 — MU-H3's rung-2 question: does judging unknown credentials beat an entropy threshold?
-**ELIGIBLE: pane 2 only** (pane 3 authored MU-H3). **CLAIM:** unclaimed
+**ELIGIBLE: pane 2 only** (pane 3 authored MU-H3). **CLAIM:** DONE WindyJaguar `docs/demos/duel-2/RUNG2_MU-H3_entropy_COD.md` `6dc570d` — conductor correction, verified against the unit's own named deliverable.
 
 **§3q opened this and nobody has answered it.** MU-H3 sits HELD at **650** with real voiced pain
 (Pablo Rodriguez, Claude Code #39882) — but **your own scope comparison described it as "a
@@ -421,7 +421,7 @@ rung 2.
 specifies. Output `docs/demos/duel-2/RUNG2_MU-H3_entropy_COD.md`, ≥4,000 chars.
 
 ## UNIT Q20 — demo-2's demand: real evidence, or UNASKABLE
-**ELIGIBLE: pane 2 only** (pane 3 authored demo-2). **CLAIM:** unclaimed
+**ELIGIBLE: pane 2 only** (pane 3 authored demo-2). **CLAIM:** DONE WindyJaguar `docs/demos/duel-2/HELD_demo2_demand_COD.md` `ad7d8c6` — conductor correction, verified against the unit's own named deliverable.
 
 **Your own census demoted this candidate.** `USAGE-1a`/`USAGE-2a` are `UNVERIFIED` with
 `control_exists: false` — demo-2's admission screen rests on `jev-mcp@6ec5efc` **README narrative**
@@ -459,7 +459,7 @@ Output `docs/demos/duel-2/runs/codh2-rung3-provenance-<ISO>.json`, superseding n
 stands unedited).
 
 ## UNIT Q26 — discharge (or refuse to discharge) the hold you placed on rung 3
-**ELIGIBLE: pane 2 only** — you raised the hold; pane 3 authored the receipt that answers it. **CLAIM:** unclaimed
+**ELIGIBLE: pane 2 only** — you raised the hold; pane 3 authored the receipt that answers it. **CLAIM:** DONE WindyJaguar `docs/demos/duel-2/runs/discharge-codh2-rung3-20260918T054357Z.json` `60ca31a` — conductor correction. Pane 3's Q67 handover cited the *provenance* receipt `2818a57` (which is Q24's); the discharge ruling is this file, and it exists.
 
 Your Q23 grade held COD-H2's rung 3 on *"pin identity and per-call live provenance are **asserted,
 not receipt-proven**"* — a call I had got wrong in §4b by treating an assertion as a check.
@@ -492,7 +492,7 @@ neither can the conductor who already over-credited this exact claim once.
 
 ## UNIT Q28 — run the label-free halves for COD-H4 and COD-H1, on pane 3's pre-registered designs
 **ELIGIBLE: pane 2** — you authored these candidates, **but pane 3 pre-registered the thresholds**
-(`docs/demos/duel-2/FALSIFY_COD-H145_MU.md`, `8a8ec06`), so you cannot tune them. **CLAIM:** unclaimed
+(`docs/demos/duel-2/FALSIFY_COD-H145_MU.md`, `8a8ec06`), so you cannot tune them. **CLAIM:** DONE WindyJaguar `docs/demos/duel-2/runs/codh41-labelfree-20260918T054800Z.json` `53946b3` — conductor correction. **This is the row pane 3's Q67 handover missed: five stale CLAIM lines, not four.**
 
 **§3k's rule, unapplied to two candidates for hours: estimate rung 4 before paying for rung 3.**
 COD-H4 (**900**) and COD-H1 (**885**) are the next two behind COD-H2 and both carry non-author
@@ -564,7 +564,7 @@ on a 550-score candidate while the leader is blocked.
 Output `docs/demos/duel-2/runs/demo9-vs-ubs-<ISO>.json`.
 
 ## UNIT Q32 — ratify or amend the audit bar **before** any label is authored
-**ELIGIBLE: pane 2** — pane 3 wrote the plan and will be labelling; you own the design the labels feed. **CLAIM:** unclaimed
+**ELIGIBLE: pane 2** — pane 3 wrote the plan and will be labelling; you own the design the labels feed. **CLAIM:** DONE WindyJaguar `docs/demos/duel-2/runs/ratify-label-audit-20260918T060749Z.json` `db6e78d` plus amendment `ratify-label-audit-amendment-20260918T061500Z.json` `e432d06` — conductor correction, verified against the unit's own named deliverable.
 
 Pane 3's `docs/demos/duel-2/RUNG4_LABEL_PLAN_MU.md` (`525bfc2`) prices N=200 at **~90 label-minutes**,
 verifies the API price first-party (`docs-mirror/typesafe/models.md:13-16`, `$0.042/Mtok`, total
