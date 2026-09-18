@@ -3484,3 +3484,74 @@ that could be tested has passed; what blocks it is that this lane's corpus conta
 policy-relevant destructive actions and zero credential injections. **That is the §4l finding —
 "this lane does not have the data its best ideas need" — arriving at the top of the backlog instead
 of the bottom.** Pane 3 is pricing the widening now (Q39), and that price is the whole decision.
+
+---
+
+## §4v THE SIX GUARDS ARE PROSE — 6/6 ABSENT. And the existing machinery implements the **gameable** metric.
+
+**`docs/demos/duel-2/runs/verify-rung4-guards-20260918T063000Z.json` (`53d6533`), pane 3 as
+non-author of the design.** Method stated: repo-wide grep for guard identifiers across
+`.mjs/.py/.ts/.sh` with vendored clones excluded, a recent-commit file census, and a read of
+`foundation/run_calibration.py:140-175` plus the design and audit documents.
+
+**Verdict: `6/6 ABSENT`, `code: null` on every one.**
+
+> *"Every guard exists **only as prose** in the gameability audit and `RUNG4_DESIGN`. The live run is
+> BLOCKED on runner implementation, **which is exactly what this precondition exists to catch before
+> spend.** No code was written to satisfy this audit."*
+
+### The partial it found is worse than absence
+
+`foundation/run_calibration.py` computes **raw Brier** (MSE vs expected p) and ECE with threshold
+sweeps. Pane 3's read: *"reusable machinery, but no skill-vs-prevalence, no coverage floor, no
+flip-rate, no withhold accounting. **Parts, not the guard.**"*
+
+**The existing machinery implements precisely the metric pane 2's audit said must be replaced.** Raw
+Brier is the gameable version — a constant predictor at base rate passes it (§4q). **So anyone wiring
+rung 4 to the convenient existing code would have imported the defect for free**, and the receipt
+would have looked like reuse rather than regression.
+
+### My §4q error, named
+
+I wrote *"six guards, each tied to a specific path"* and *"the accepted design is **superseded in its
+gate definitions** — `Brier ≤ .15` becomes a skill score"* — **describing a change to a document as
+though it changed the runner.** In the same section I wrote the correct principle: *"a guard that
+exists only in a receipt is the same defect as a threshold asserted rather than checked."*
+
+**I stated the rule, filed it as a precondition, and then did not dispatch it for a full turn.**
+Cause 4 — recorded is not delivered — committed against my own rule, in the same section that named
+it.
+
+### Defence in depth actually worked, and that is the finding
+
+**Two independent gates each independently sufficient to stop a hollow rung-4 result:**
+
+| Gate | Blocked on | Would have stopped it alone |
+|---|---|---|
+| §4u re-scope ruling (pane 2) | **power** — n=30 zero-flip upper bound `.1135` cannot clear `≤5%` | yes |
+| §4q precondition → Q38 (pane 3) | **implementation** — 6/6 guards absent | yes |
+
+**Neither pane knew the other was about to block it.** Pane 2 ruled on statistics; pane 3 audited
+code. **A single-gate process would have needed to get one thing right; this one had to get two
+things wrong simultaneously to fail.** That is the first time this session the redundancy has been
+demonstrated rather than asserted.
+
+### And the auditor did not fix what it audited
+
+*"No code was written to satisfy this audit."* **An auditor that implements the thing it audits has
+destroyed its own independence** — the next verification would be checking its own work. Pane 3
+declined, unprompted.
+
+### Sequencing ruling: do NOT implement the guards yet
+
+The temptation is to unblock by writing the six guards. **That would be wasted work and the wrong
+order.** Rung 4 is **UNASKABLE on this corpus** (§4u) — so:
+
+> **The corpus decision comes first.** Pane 3's widening price (Q39, in flight) determines whether
+> rung 4 can ever run. **If widening is unaffordable, rung 4 never runs and the guards are dead
+> code.** Implement them only after the corpus supports a measurement.
+
+**That is §3k a third time — estimate the later rung before paying for the earlier work** — and it is
+the specific mistake I would have made by treating "6/6 absent" as a to-do list instead of a
+sequencing question. **When the guards are implemented, pane 2 writes them (it authored them) and
+pane 3 re-verifies (it audited them). Not the reverse.**
