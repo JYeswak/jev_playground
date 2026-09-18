@@ -19,7 +19,11 @@ _impl="$_hookdir/commit-msg-verification-level.sh"
 if [ ! -x "$_impl" ]; then
   printf 'verification-level REFUSE reason=impl-missing path=%s\n' "$_impl" >&2
   printf '  the commit-msg gate is wired (core.hooksPath) but its impl is absent here.\n' >&2
-  printf '  re-run: bash %s/flywheel/stamp-install.sh --repo <this-repo>\n' "${FOUNDRY_DIR:-/Users/josh/Developer/foundry}" >&2
+if [ -n "${FOUNDRY_DIR:-}" ]; then
+  printf '  re-run: bash %s/flywheel/stamp-install.sh --repo <this-repo>\n' "$FOUNDRY_DIR" >&2
+else
+  printf '  re-run: set FOUNDRY_DIR to the Foundry checkout, then rerun the stamp-install command.\n' >&2
+fi
   exit 1
 fi
 exec "$_impl" "$@"
