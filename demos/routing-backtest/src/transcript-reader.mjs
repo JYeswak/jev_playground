@@ -15,7 +15,32 @@ function pushTurn(turns, current) {
   if (current) turns.push(current);
 }
 
-function finishTurn(current) {
+const USAGE_TOKEN_FIELDS = ['input', 'output', 'cacheRead', 'cacheWrite'];
+
+function assertUsageTokens(assistants, turnIndex, source) {
+  for (const message of assistants) {
+    const usage = message.usage ?? {};
+    if (usage === null || typeof usage !== 'object') continue;
+    for (const field of USAGE_TOKEN_FIELDS) {
+      const value = usage[field];
+      if (value === undefined || value === null) continue;
+      if (typeof value === 'boolean' || !Number.isFinite(Number(value)) || Number(value) < 0) {
+        const error = new Error(`invalid usage tokens in ${source} turn ${turnIndex}: ${field}=${JSON.stringify(value)} (must be a non-negative number)`);
+        error.code = 'INVALID_USAGE_TOKENS';
+        throw error;
+      }
+    }
+    const total = usage.cost?.total;
+    if (total !== undefined && total !== null && (typeof total === 'boolean' || !Number.isFinite(Number(total)) || Number(total) < 0)) {
+      const error = new Error(`invalid usage tokens in ${source} turn ${turnIndex}: cost.total=${JSON.stringify(total)} (must be a non-negative number)`);
+      error.code = 'INVALID_USAGE_TOKENS';
+      throw error;
+    }
+  }
+}
+
+function finishTurn(current, source = '<memory>') {
+  assertUsageTokens(current.assistants, current.turnIndex, source);
   const assistants = current.assistants;
   const models = [...new Set(assistants.map((message) => message.model ?? message.activeModel).filter(Boolean))];
   const usage = assistants.map((message) => message.usage).filter(Boolean);
@@ -65,10 +90,18 @@ export function parseSessionText(text, source = '<memory>') {
     try {
       row = JSON.parse(line);
     } catch (error) {
-      throw new Error(`invalid JSON in ${source} at nonblank line ${lineIndex + 1}: ${error.message}`);
+      const malformed = new Error(`invalid JSON in ${source} at nonblank line ${lineIndex + 1}: ${error.message}`);
+      malformed.code = 'MALFORMED_JSONL';
+      throw malformed;
     }
     if (row.type === 'session') {
-      sessionId = row.id ?? row.sessionId ?? sessionId;
+      const id = row.id ?? row.sessionId ?? sessionId;
+      if (id !== null && id !== undefined && typeof id !== 'string') {
+        const badId = new Error(`non-string session id in ${source} at nonblank line ${lineIndex + 1}: ${JSON.stringify(id)}`);
+        badId.code = 'NON_STRING_SESSION_ID';
+        throw badId;
+      }
+      sessionId = id;
       continue;
     }
     if (row.type === 'model_change') {
@@ -111,7 +144,7 @@ export function parseSessionText(text, source = '<memory>') {
     }
   }
   pushTurn(turns, current);
-  const normalized = turns.map(finishTurn);
+  const normalized = turns.map((turn) => finishTurn(turn, source));
   const classifiableTurns = normalized.filter((turn) => turn.classifiable).length;
   const skippedTurns = normalized.length - classifiableTurns;
   return {
@@ -142,6 +175,17 @@ export async function readSessionLog(path) {
 
 export async function readSessionLogs(paths) {
   const sessions = await Promise.all(paths.map(readSessionLog));
+  const seen = new Map();
+  for (const session of sessions) {
+    const id = session.sessionId;
+    if (id === null || id === undefined) continue;
+    if (seen.has(id)) {
+      const error = new Error(`duplicate session id ${JSON.stringify(id)} in ${seen.get(id)} and ${session.source} (same session counted twice inflates the denominator)`);
+      error.code = 'DUPLICATE_SESSION_ID';
+      throw error;
+    }
+    seen.set(id, session.source);
+  }
   const turns = sessions.flatMap((session) => session.turns);
   const classifiableTurns = turns.filter((turn) => turn.classifiable).length;
   return requireClassifiable({

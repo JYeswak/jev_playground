@@ -1,0 +1,3 @@
+{"type":"session","id":"hostile-dup-1"}
+{"type":"message","message":{"role":"user","content":[{"type":"text","text":"price my logs"}]}}
+{"type":"message","message":{"role":"assistant","model":"cheap-1","usage":{"input":10,"output":5},"content":[{"type":"text","text":"done"}]}}

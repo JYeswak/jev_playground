@@ -1,0 +1,3 @@
+known-bad: session id is a number, not a string. Must refuse with
+NON_STRING_SESSION_ID naming file and line — untyped identifiers flow into receipts and
+denominators otherwise.

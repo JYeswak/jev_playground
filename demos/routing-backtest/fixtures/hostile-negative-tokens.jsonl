@@ -1,0 +1,3 @@
+{"type":"session","id":"hostile-negative"}
+{"type":"message","message":{"role":"user","content":[{"type":"text","text":"price my logs"}]}}
+{"type":"message","message":{"role":"assistant","model":"cheap-1","usage":{"input":-50,"output":10},"content":[{"type":"text","text":"done"}]}}

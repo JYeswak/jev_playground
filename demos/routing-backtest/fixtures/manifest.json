@@ -22,6 +22,41 @@
    "sha256": "e2bc151af448465b00712cfac1fb25bacfafeb68249071a8698846497a8dd962",
    "purpose": "synthetic single-field rewrite: 18 model fields -> frontier-unlisted-9x",
    "arm": "missing-price ERROR arm"
+  },
+  {
+   "path": "hostile-truncated.jsonl",
+   "bytes": 212,
+   "sha256": "76f2d427185b8cee50fec2375e458fc86b97640a801ad27838e0bcdb775d7fda",
+   "purpose": "known-bad: truncated mid-object final line",
+   "arm": "MALFORMED_JSONL refusal arm"
+  },
+  {
+   "path": "hostile-negative-tokens.jsonl",
+   "bytes": 283,
+   "sha256": "ba7ba7663d6a26fd041c80581662b56fd9b47cfeeda317beb41e4b6d8c9d3d43",
+   "purpose": "known-bad: negative token count",
+   "arm": "INVALID_USAGE_TOKENS refusal arm"
+  },
+  {
+   "path": "hostile-nonstring-session-id.jsonl",
+   "bytes": 268,
+   "sha256": "ab15cf546f55315d8c46114d538ac3bb47ef4d027579304e33813f7733d9fbac",
+   "purpose": "known-bad: numeric session id",
+   "arm": "NON_STRING_SESSION_ID refusal arm"
+  },
+  {
+   "path": "hostile-duplicate-session-a.jsonl",
+   "bytes": 278,
+   "sha256": "c8604a056dee073ab2b4bb445768e0e134273757b4acd3d5cafb26dbbf5300f8",
+   "purpose": "known-bad with -b: shared session id hostile-dup-1",
+   "arm": "DUPLICATE_SESSION_ID refusal arm (pair)"
+  },
+  {
+   "path": "hostile-duplicate-session-b.jsonl",
+   "bytes": 284,
+   "sha256": "3a430a29fe084ec6c3dba2d606a470afe18e1495f2a32b1bf53b2743fc9f0a4f",
+   "purpose": "known-bad with -a: shared session id hostile-dup-1",
+   "arm": "DUPLICATE_SESSION_ID refusal arm (pair)"
   }
  ]
 }

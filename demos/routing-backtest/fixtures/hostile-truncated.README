@@ -1,0 +1,2 @@
+known-bad: truncated mid-object on the final line. The parser must refuse with
+MALFORMED_JSONL naming file and line, never silently drop the tail and price the prefix.
