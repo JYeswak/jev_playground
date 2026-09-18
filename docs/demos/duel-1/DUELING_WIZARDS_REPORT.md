@@ -92,7 +92,14 @@ competition, the matrix is worthless. They did not, and the arithmetic says so:
 
 - **Both authors rated the opponent's file at or above the neutral grader.** MU rated CC 820 vs
   COD's 814. I rated MU 762 vs COD's 705 — I was **57 points more generous to my opponent than
-  the neutral party was.** Whatever failure modes this duel had, score-suppression was not one.
+  the neutral party was.** Score-suppression is not visible in these numbers.
+- **But that is suggestive, not dispositive, and pane 2's audit was right to say so.** An author
+  scoring an opponent above the neutral grader does **not** prove absence of bias: the scores are
+  subjective rubric judgments with no calibrated external oracle behind them, so "generous to my
+  opponent" and "correctly graded my opponent" are indistinguishable from the numbers alone. Bias
+  could also run the other way — inflating a rival's weakest ideas costs nothing and buys the
+  appearance of fairness. **What the disclosure buys is auditability, not exoneration.** The
+  arithmetic is evidence in its favour; it is not proof, and I should not have implied otherwise.
 - **The neutral grader's own cross-file gap is the largest of all:** COD put CC at 814 and MU at
   705, a **109-point** gap. So the finding "CC's shortlist scored higher" is *strongest* in the
   one pass with no stake in it.
@@ -115,10 +122,17 @@ Pane 2 found it while grading, then steelmanned it (`ad4c1d0`) and concluded the
 calling it "the finding of the duel." I scored it 620 rather than 470 on the argument that one
 deletable branch is not a design.
 
-**All three lineages independently converged on the same remedy**, and it is now the merged spec:
-run the local deterministic `30-no-secrets` detector first and redact; keep only the injection
-question (the 0.99 witness); adopt **MU-2's install rigor** (idempotent; refuses when the hook dir
-is undiscoverable — the `.omp/hooks/`-without-`pre/` silent miss, a check CC-5 lacked).
+**All three lineages reached the same remedy — but POST-REVEAL, and that distinction is the one I
+keep getting wrong.** Pane 2 arrived at it by steelmanning MU-2 after grading it; pane 3 conceded
+it after reading pane 2's scores. That is sequential agreement following disclosure, **not
+independent convergence** — nobody proposed this remedy before seeing another lineage's critique.
+Calling it independent would repeat the exact error that made my §1 headline wrong. Corrected on
+pane 2's audit (`WIZARD_REPORT_AUDIT_COD.md`, `b11aaa5`), which caught it.
+
+The merged spec: run the local deterministic `30-no-secrets` detector first and redact; keep only
+the injection question (the 0.99 witness); adopt **MU-2's install rigor** (idempotent; refuses when
+the hook dir is undiscoverable — the `.omp/hooks/`-without-`pre/` silent miss, a check CC-5
+lacked).
 
 **This is the duel's actual product.** A single pane proposing the screen hook would have shipped
 either CC-5's under-specified install or MU-2's leak. Neither author found their own defect.
@@ -127,11 +141,13 @@ either CC-5's under-specified install or MU-2's leak. Neither author found their
 
 ## 5. Consensus · contested · killed
 
-**Consensus (build-worthy, no grader below 800):**
+**Consensus (build-worthy):**
 - **routing backtest** — 4 graders, mean 853.8, range 45 across two lineages. Read-only, inputs
-  already on disk, no live calls to produce evidence.
-- **admission screen, CC-5 form + MU-2 install rigor** — mean 867.5, and the merged form resolves
-  the only serious objection either grader raised.
+  already on disk, no live calls to produce evidence. No grader below 830.
+- **admission screen — CC-5 form only** — mean 867.5, no grader below 855. **The merged
+  CC-5-form-plus-MU-2-install-rigor design has never been scored by anyone**; MU-2's own form sits
+  at 470/620. So "no grader below 800" is true of CC-5 as written and says nothing about the merge.
+  Any build of the merged form starts unscored and should be graded before it ships.
 - **claim-check, CC-2 form** — mean 835. Takes MU-4's *insufficient-context ⇒ withhold, never
   approve* rule, which was better specified than CC-2's original.
 - **foreman-lite** — mean 812.5, and it carries the best single RED arm in either file: *a bead
