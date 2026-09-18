@@ -81,6 +81,13 @@ world lacks their input; this one died because it should not exist.
 
 ## The five that passed their rung (CLEARED — alive, unpromoted)
 
+**CLEARED is the weakest positive verdict here.** It means an idea survived the
+rung it was tested at — nothing more. It is not promotion, not proof the idea is
+useful, and not clearance at any later rung; four of the five below already
+carry a named blocker at the next one, and only demo-2 does not. A gauntlet
+that cleared an idea has declined to kill it, which is not the same as
+endorsing it.
+
 - **demo-2, admission screen (700):** demand recovered — a named engineer
   replaced the README narrative (`docs/demos/duel-2/HELD_demo2_demand_COD.md`).
 - **demo-5, fact ledger (755):** rung 3 waits on hunt scores.
