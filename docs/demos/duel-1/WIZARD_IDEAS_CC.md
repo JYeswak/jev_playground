@@ -108,8 +108,15 @@ taste one.
   **refuse** (a paraphrase in a fact ledger is the failure mode; it must be structurally impossible
   to ship one).
 - *Satisfying:* the **three** existing questions (`q1,q2,q3` — the receipt's actual set), with the
-  ledger, score ≥ arm B's 3/3 — and if they do not, that is a publishable result, not a failure of
-  the demo.
+  ledger, score **3/3 absolute** — and if they do not, that is a publishable result, not a failure
+  of the demo.
+- **Threshold corrected 2026-09-18, and the correction is the interesting part.** This line used
+  to read "score ≥ arm B's 3/3". A second A/B run then scored arm B at **1/3**
+  (`compaction/runs/ab-rerun-20260918.json`), so a demo pinned to "beat arm B" would have passed
+  by standing still. arm B is a single sample from a live summarization call with no temperature
+  pin; **a stochastic baseline is not a threshold.** What survived both runs is the premise this
+  demo rests on: arm A (Jev-prune) scored **1/3 twice**, so pruning really does drop
+  answer-bearing facts. The demo's own target must be absolute.
 - Offline throughout with an injected asker; exactly one budgeted live run for the scored arm.
 
 **Ship criteria:** install script (`npm run fact-ledger` + the CLI bin); deterministic tests incl.

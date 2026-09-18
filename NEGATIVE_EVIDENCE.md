@@ -219,3 +219,47 @@ a jev-local conductor would have become a competing implementation of an in-prog
 cannot report a **dry queue** (a pane that is idle *because its packet ran out of units*, which is a
 packet defect, not a pane state). If that need becomes concrete, the fix is a flag or an upstream
 bead against the shared binary, **never** a jev-local fork.
+
+---
+
+## R11 — The A/B's "B wins" was a coin flip. Do not pin a threshold to arm B.
+
+**Refuted 2026-09-18** — by a re-run pane 2 was told to report honestly rather than paper over,
+and then by a third sample that overturned the obvious explanation for the disagreement.
+
+| Receipt | fixture bytes / sha | armA Jev-prune | armB LLM summary | verdict |
+|---|---|---:|---:|---|
+| `compaction/runs/ab-20260917.json` | 214,993 · `20fa1ea0…` | **1/3** | 3/3 | "B wins" |
+| `compaction/runs/ab-rerun-20260918.json` | 82,214 · `2346451d…` | **1/3** | 1/3 | "tie" |
+| `compaction/runs/ab-sample3-20260918.json` | 82,214 · `2346451d…` (**identical**) | **1/3** | 3/3 | "B wins" |
+
+**The wrong explanation, which I held for about ten minutes and which the data supported.** Rows 1
+and 2 disagreed, and the fixture had changed between them: `a6e1353` removed 76 `thinkingSignature`
+blobs — roughly 133 KB of base64 — shrinking the corpus 62% and moving its sha. Corpus change was
+the obvious cause, and I wrote it into `EVAL.md` as "unattributed between corpus change and
+generator variance" with a named separating experiment.
+
+**Row 3 ran that experiment and exonerated the corpus.** Same fixture bytes as row 2, and arm B
+came back 3/3. Arm B is produced by a live `runOmp` summarization call with **no temperature pin**,
+so it scores **3, 1, 3 on identical input**. The disagreement is generator variance, and the
+corpus scrub was innocent.
+
+**What this refutes:** "Jev-pruning loses to generic summarization, 1/3 vs 3/3." That was **n=1 on
+a stochastic arm** — a coin flip reported as a measurement. It propagated into 17 tracked files
+before anything tested it twice.
+
+**What survives, and it is the more useful half:** **armA (Jev-prune) scored 1/3 in all three runs,
+across two different corpora.** Pruning really does drop answer-bearing facts. That is robust, and
+it is exactly the premise the fact-ledger demo (duel CC-1) rests on — so the demo's motivation is
+*strengthened* by the same evidence that killed its comparison.
+
+**The design defect this exposed, which is the durable lesson:** CC-1's satisfying arm read
+*"score ≥ arm B's 3/3"*. Against a 2-point-variance baseline, that threshold is unfalsifiable in
+both directions — a demo could pass by standing still on a bad roll, or fail on a good one. **A
+stochastic baseline is not a threshold.** Corrected to an absolute 3/3.
+
+**Retry condition:** a *relative* claim about pruning versus summarization becomes available only
+with a pinned generator (fixed model, fixed temperature, fixed seed if the provider exposes one)
+**or** a reported distribution — n≥10 per arm with the spread published, not a single verdict
+string. Until then the harness may report arm A absolutely and must not emit a `verdict` field at
+all; a one-word verdict over a stochastic arm is the defect, not the presentation.
