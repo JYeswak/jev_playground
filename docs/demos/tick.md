@@ -47,6 +47,50 @@ Census line still required, and **every number in it comes from the script's out
 recall**. Backlog authority: `docs/demos/PLAN.md` for reasoning, `docs/demos/STATUS.tsv` for state.
 WIP LIMIT IS ONE DEMO, and rung 3 is currently blocked (`PLAN.md` §3e).
 
+## 0b. WHY PANE 3 KEPT GOING IDLE — three causes, measured 2026-09-18
+
+Joshua: *"pane 3 keeps going idle - are you not dispatching them, are they not calling back, what
+is failing"*. Diagnosed from the artifacts, and **two of the three are conductor defects**.
+
+**Cause 1 — I wrote a wait condition and gave no way to check it.** Duel-2 Unit 3 said *"score the
+other pane's ranking"*, a cross-dependency. Timeline:
+
+```
+20:56  pane 2 hunt lands      <- pane 3's Unit-3 inputs existed from here
+21:03  pane 2 reveal lands    <- pane 2 COMPLETE, all four units
+21:16  pane 3 hunt lands      <- 13 min later, still on Unit 2
+       pane 3 callback: "NEXT Unit 3 cross-score WHEN PEER FILES LAND"
+```
+
+**The files had landed twenty minutes earlier.** Pane 3 held a unit waiting on a condition already
+satisfied, because it cannot observe another pane's progress and I never gave it a check.
+**Whoever finishes first hits the wait**: pane 2 never blocked only because it was second.
+**RULE: every dependency ships with `ls <full path>` plus a non-blocking fallback** — present ⇒
+proceed, absent ⇒ BLOCKED callback naming the path, then the dry-queue default. **Never write
+"when X lands".** And a pane's `NEXT` field must name the unit it is *starting*, never the thing it
+is waiting for.
+
+**Cause 2 — I under-dispatched it.** Packet count at diagnosis: **12 to pane 2, 9 to pane 3.** 25%
+fewer. Not deliberate; it accumulated because pane 2's faster callbacks created more dispatch
+moments, and §3.0 dispatches on callback. **A fast pane pulls dispatch attention away from a slow
+one, and the conductor mistakes the resulting idleness for the slow pane's fault.**
+
+**Cause 3 — pane 3 is throttled and I sized its units as if it were not.** It disclosed two
+throttled search batches; pane 2 completed four units in the seven minutes pane 3 took for one.
+That is **capacity, not quality** — pane 3's throttle disclosure and its marking of unverified
+citations made its output more trustworthy per char, not less (`PLAN.md` §3g). **RULE: a throttled
+pane gets smaller units and explicit permission to split** — a partial unit with a receipt beats a
+complete unit that never lands.
+
+**Cause 4, and it is the one I would have missed** — a queue-file append is **staging, not
+delivery.** Unit 5 was appended to pane 3's queue file at `853f2b6`, after pane 3 had already read
+that file. It may never have re-read it. The append rule (§3) avoids interrupting a working pane,
+but **the append must still be pushed at the pane's next callback**, or it sits unread forever.
+Append to stage; push to deliver.
+
+**What was NOT the cause:** pane 3 not calling back. It fired leg-1 callbacks on every unit it
+completed, and its receipts are all committed. The pane's reporting was sound throughout.
+
 ## 1. CHECK ALL WORKERS
 
 Panes are 1, 2, 3 (0 is the user shell — never dispatch it). For each worker,

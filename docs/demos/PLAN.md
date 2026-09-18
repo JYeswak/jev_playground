@@ -562,6 +562,58 @@ non-author of MU-H1…H3. Each can grade the other's hunt at arm's length, which
 the supersession question in §3e could not get.
 
 
+---
+
+## §3h CORRECTION — the "two non-author graders" gate is UNSATISFIABLE, and nothing ever met it
+
+**Measured 2026-09-18.** §3c rung 1 requires *"≥700 from two non-author graders"*. §3e and §8
+repeat it. **With two worker panes, a candidate authored by one can only ever receive ONE
+non-author score.** There is no third grader. The rule was unsatisfiable the moment I wrote it —
+and worse, **nothing currently marked CLEARED has ever met it:**
+
+- demo-4, demo-5, demo-2: one non-author pass each (pane 2 cross-scoring pane 3's ranking).
+- MU-H1: author 900, non-author 820. One.
+- COD-H1…H5: author scores only, awaiting pane 3's single non-author pass.
+
+So I had a gate that read as rigorous, was never met, and was never going to be. **A gate nothing
+can satisfy is not a high bar — it is a dead gate**, and a dead gate is worse than a lower live
+one because it launders unverified state as blocked-pending-rigour.
+
+### Corrected rung-1 gate
+
+**≥700 from ONE non-author grader, with three disclosures that are not optional:**
+1. The **author's own score**, recorded beside it. MU-H1: author **900**, non-author **820**.
+2. The **gap**, because the gap is the signal. A small gap corroborates; a large one flags
+   self-interest — demo-9's proposer scored it **820** against a non-author's **550**, and that
+   270-point spread is why demo-9 is RECUSED rather than cleared.
+3. **Who graded it**, by pane, in `STATUS.tsv`'s `author` column and the receipt path.
+
+**The conductor may serve as a second grader where it is not the author, with its bias declared.**
+That is what happened in duel-1 (`WIZARD_SCORES_CC_ON_MU.md`): I scored MU as an interested party,
+said so, and the arms-length pane's numbers were given precedence on disagreement. That is weaker
+than a true third lineage and it is better than a dead gate.
+
+**Retry condition for restoring the stricter rule:** a third worker pane of a distinct lineage
+joins the session. Then two genuine non-author scores become obtainable and the gate should go back
+up — with the note that every candidate cleared under the one-grader rule must be re-scored, not
+grandfathered.
+
+### What this changes right now
+
+**MU-H1 TODO-judge has CLEARED rung 1** at 820 non-author (900 author, gap 80 — small, and in the
+direction that corroborates rather than flatters). It **ties demo-4's 820** and needs rung 2.
+
+**MU-H2 is RULED OUT on structure**, and this is the demo-3 lesson applied correctly by a
+non-author: pane 2 searched the problem and found **two** maintained incumbents — `docverity
+v0.5.0` and `fiberplane/drift v0.10.1` — that directly overlap it. Retry condition: a gap outside
+both tools' documented scope, entering as a new narrower candidate.
+
+**MU-H3 is HELD at 650**, not killed: real runtime-redaction pain, but the voiced evidence is open
+and adjacent OpenAI filters exist. Resolve by finding one cited complaint; absent that it is
+**UNASKABLE**, never a rejection.
+
+---
+
 ## §4 Phase arc
 
 Phases are sequential in *gating*, not in calendar time; within a phase, tasks parallelize.
