@@ -6,10 +6,12 @@ Give it your omp session logs. It replays every model turn twice — once at the
 actually paid, once at a cheap-model counterfactual — and reports the difference. Read-only:
 it never calls a model, needs no API key, and makes no network requests.
 
+Requires Node.js 20 or newer (`node --version`). No dependencies to install.
+
 ## Run it
 
 ```sh
-npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out runs/try.json
+npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out /tmp/rb-try.json
 ```
 
 That runs the worked example (6 turns, finishes in under a second). For your own logs, pass
@@ -19,11 +21,12 @@ unclassifiable turns) — start with `real-excerpt-t1-t6.jsonl`.
 
 ## Read the receipt
 
-`runs/try.json` carries a `denominator` and a `totals` block:
+`/tmp/rb-try.json` carries a `denominator` and a `totals` block. The fixture run emits
+something like (yours will differ — this is 6 turns, not our 30-turn measurement below):
 
 ```jsonc
-"denominator": {"sessions": 2, "turns": 30, "classifiableTurns": 30, "skippedTurns": 0},
-"totals": {"actualSpend": 7.6615, "counterfactualSpend": 7.6581, "estimatedSavings": 0.0034228, ...}
+"denominator": {"sessions": 1, "turns": 6, "classifiableTurns": 6, "skippedTurns": 0},
+"totals": {"actualSpend": 0.0111, "counterfactualSpend": 0.0129, "estimatedSavings": -0.0018, ...}
 ```
 
 - `turns` / `classifiableTurns` / `skippedTurns` — what the run actually priced. A verdict over
@@ -31,9 +34,13 @@ unclassifiable turns) — start with `real-excerpt-t1-t6.jsonl`.
   shape and the numbers below mean less.
 - `actualSpend` vs `counterfactualSpend` — dollars at served-model prices vs cheap-model prices.
 - `estimatedSavings` — the difference. Divide by `counterfactualSpend` for the percentage.
+  (Negative here is fine — the 6-turn fixture is a shape demo, not a verdict.)
 
-`failures` counts internal errors (not verdicts). Anything nonzero means the run itself broke;
-do not quote its numbers.
+`failures` is a list of internal errors (not verdicts). A non-empty list means the run itself
+broke; do not quote its numbers. `[]` is the healthy state.
+
+Write `--out` outside the repo (`/tmp/`, a scratch dir). `demos/routing-backtest/runs/` holds
+committed receipts other documents cite — do not leave trial files beside them.
 
 ## Verdict (measured 2026-09-18, price table `as_of` 2026-09-18)
 
