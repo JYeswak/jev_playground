@@ -2206,3 +2206,75 @@ turn — never leave the append sitting.**
 **A small budgeted live run — proposed N ≤ 20 — with model version and call count recorded.** Until
 that lands, COD-H2 has a working offline mechanism and **no evidence that Jev is in it.** That is the
 one sentence demo-1 could not say about itself in time.
+
+---
+
+## §3y THE DEMO-1 QUESTION IS CLEARED — non-author grade confirms the Jev path is real
+
+**`docs/demos/duel-2/runs/grade-codh2-rung3-20260918T044900Z.json` (`1fe6c30`).** Pane 2 graded the
+implementation as non-author of the code. Verdict:
+**`PARTIAL_ACCEPTED_HELD_FOR_LIVE_CALIBRATION_AND_UBS_PROVENANCE`.**
+
+### The question that has haunted this lane since demo-1 died
+
+demo-1 shipped, installed clean, passed 10/0 — and **made zero Jev calls**, running a hand-written
+token heuristic behind a Jev-shaped façade. Partial 1 reported `live_calls: 0`, so the same question
+was open on the same evidence. **I ordered pane 2 to attack it first.** It did:
+
+- **The live path is real:** mock `POST https://api.typesafe.ai/v1/systemone`, model **`jev-1.13.0`**,
+  a **typed `Noul`** question, and the returned probability **`.66` drives the `withhold` outcome.**
+  Correct endpoint, correct pinned model, typed question, and the probability actually determines the
+  decision rather than decorating it.
+- **The no-key run exits `rc2` with no call.** **This is the decisive difference from demo-1.**
+  demo-1's defect was not "no calls today" — it was *a heuristic that could stand in for the model
+  forever*. Here, absent a key, the thing **refuses and exits non-zero**. There is no fallback
+  heuristic to hide behind, because there is no fallback.
+
+**So the Jev dependency is structural, not cosmetic.** `live_calls: 0` now means *"not yet run"*
+rather than *"not actually used"* — and those were indistinguishable from the receipt alone, which is
+exactly why a non-author had to read the client.
+
+### Independent RED-arm probe: 9/9
+
+Pane 2 planted its own defects rather than re-reading pane 3's: **RED probe 9/9.** Combined with the
+two bugs the arms caught during the build (`found_by: "failing RED arm, not review"`), the arms are
+now **confirmed to discriminate by two parties using different methods.** The lane's first RED-arm
+test fired on all 16 rows and "passed"; this is the opposite of that failure in every respect.
+
+### What the hold is for, and both items are legitimate
+
+1. **Live calibration** — Partial 2. Still the gate on rung 3 closing.
+2. **UBS provenance** — the two criticals pane 3 adjudicated as false positives (a CLI-flag string
+   comparison, a `typeof` check) were dismissed with code locations, and **pane 2 could not verify
+   the provenance of that adjudication.** That is the correct response to an unverifiable claim:
+   hold, do not accept and do not reject.
+
+Pane 2 also correctly scoped out an irrelevance — *"max-weight Q10 not relevant here"* — rather than
+importing a finding because it was recent. And its `NO-CLAIM` is exact: *no live provider/model, no
+calibration, no UBS rerun, no production-safety claim.*
+
+### State of COD-H2 after the grade
+
+**Rung 3, Partial 1 accepted by a non-author, held for Partial 2.** Every structural doubt raised
+against it has now been answered by someone other than its author:
+
+| Doubt | Answered by | Result |
+|---|---|---|
+| Demand real? | pane 3 rung-1 blind score | **905**, top of backlog |
+| Jev-necessary stage? | pane 3 rung-2 | cleared on structure |
+| Falsifiable? | pane 3 Q1 design | pre-registered, executed |
+| Surface exists? | pane 3 Q9 | **HEALTHY**, 14,556 turns |
+| Already owned? | pane 3 Q14 | incumbent is binary; **wedge survives** |
+| Jev actually in it? | **pane 2 Q17** | **yes — rc2 without a key** |
+| Calibrated in practice? | — | **OPEN: Partial 2** |
+
+**PROMOTED remains 0, and that is still the correct state.** A candidate that has cleared six
+independent doubts and holds a working offline mechanism is not promoted; it is one live run from
+being judgeable at rung 4.
+
+### Pane 2 filed a QUEUE DRY callback — the first true one
+
+The dry-queue rule has stood in `tick.md` since it was written with the note *"(3) is a success. It
+has never yet been true."* **It is true now**, for pane 2: every unit it was eligible for is DONE.
+That is not idleness, it is a correctly reported exhaustion, and the conductor owes it new units —
+which is the whole point of requiring the callback.
