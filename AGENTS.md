@@ -93,6 +93,30 @@ never asserting his measured results as ours. Adopt the mechanism; earn the numb
 
 ---
 
+### Phase boundary: affirmative toolbox growth, bounded by use
+
+Rule 12 resolves this doctrine conflict in favor of ADOPT, but adoption is not an
+unbounded process-porn mandate. The current phase is **instrument-to-consumer convergence**:
+keep building the toolbox only when the next instrument has a named consumer path, a planted
+RED arm, and a receipt that records what it actually gates. A check-before-building gate is
+necessary but not sufficient; the directive must affirm growth toward those consumers.
+
+The phase boundary is measured, not aesthetic:
+
+- **BUILD** when a proposed instrument closes a named gap, has a consumer, and can be made
+  fail on a known-bad input.
+- **HOLD** when an instrument has no consumer or gates nothing; repair or wire it before
+  adding another.
+- **AUDIT** when the process audit drifts (USER 0 / ENABLER 5 / PROCESS 17 or worse) or
+  the instrument inventory has two or more unconsumed tools. The audit is a feedback signal,
+  not a reason to stop all useful tooling.
+
+This adopts the mentor's affirmative build-more direction while preserving our measured
+anti-ceremony boundary: no tool earns permanence from existing; it earns permanence by
+closing a consumer-visible failure mode. Every future refusal must use Rule 12's cost,
+defect-class, and loss fields; this section is the default adoption path.
+
+---
 
 ## RULE NUMBER 1: NO FILE DELETION
 
