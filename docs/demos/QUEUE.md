@@ -290,7 +290,7 @@ integrity-detection is a thing the shipped tool does not do.** Determine which, 
 `docs/demos/duel-2/RUNG2_COD-H5_owned_MU.md`, ≥4,000 chars.
 
 ## UNIT Q16 — **RUNG 3: build COD-H2's thin proof.** First build this lane has attempted since demo-1.
-**ELIGIBLE: pane 3 builds** (you own the corpus, the classifier, the falsifier and the scope). **Pane 2 grades it** as non-author of the implementation. **CLAIM:** unclaimed
+**ELIGIBLE: pane 3 builds** (you own the corpus, the classifier, the falsifier and the scope). **Pane 2 grades it** as non-author of the implementation. **CLAIM:** CopperCarp 2026-09-18T05:20:00Z
 
 **Everything blocking this is now resolved.** Demand 905 non-author · rung-2 structural pass ·
 falsifier designed and executed HEALTHY · ownership risk resolved against the only readable
