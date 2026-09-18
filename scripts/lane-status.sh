@@ -115,7 +115,12 @@ while IFS= read -r raw; do
   # `overflow` exists so field 10 can never absorb an 11th column. ARM 11 caught this exact fold one
   # column along: with 11 fields and 10 variables, `receipt_type` arrived as "measurement\037EXTRA"
   # and failed the enum instead of failing the width. Reading N+1 fields makes EXPECTED_COLS the
-  # whole migration for EXACTLY ONE more column — and no further, which is the honest scope of the
+  # whole migration for EXACTLY ONE more column OF WIDTH — and no further. Pane 3 graded this
+  # sentence STRUCTURALLY_TRUE_SEMANTICALLY_MISLEADING: "the commit's own content falsifies any
+  # semantic reading: receipt_type itself required VALID_TYPES + rc=9 + arms 13/14 + the overflow var
+  # — far more than the constant. A future SEMANTIC column needs var+check+arms, not a bump." Correct:
+  # I understated the cost of the very migration I had just performed. Width is one constant; MEANING
+  # is a variable, a validator, an exit code and two arms. This comment is the honest scope of the
   # claim "bumping one constant is the migration".
   IFS=$'\037' read -r cand rung score verdict author receipt blocked concur digest receipt_type overflow <<<"$raw"
   case "$cand" in candidate) continue ;; esac
@@ -252,8 +257,16 @@ if [ "$type_bad" -gt 0 ]; then
   fails=$((fails+1))
 fi
 if [ "$fails" -eq 0 ]; then
-  printf 'OK: %d candidates. %d receipt(s) exist; %d integrity-checked, %d existence-only; %d/%d kills concurrence-recorded; %d-col schema and enum clean.\n' \
-    "$rows" "$with_receipt" "$pinned" "$unpinned" "$((ruled_out-concur_missing))" "$ruled_out" "$EXPECTED_COLS"
+  # WORDING CORRECTED — pane 3, audit-migration-impl-20260918T103832Z.json (96cf7cc), non-author of
+  # this code: "'4/4 kills concurrence-recorded' OVERSTATES: demo-1 col 8 is `none` (explicitly NO
+  # concurrence); the gate checks non-empty, so ABSENCE-AS-RECORDED COUNTS AS RECORDED." The gate's
+  # behaviour is correct — a recorded `none` IS the honest value per Q62 — but the summary line
+  # asserted concurrence where the row asserts its absence. The instrument was overstating its own
+  # result, which is the exact class of defect this lane exists to catch.
+  explicit_none=$(awk -F'\t' '!/^#/ && $1!="candidate" && $4=="RULED_OUT" && $8=="none"' "$STATUS" | wc -l | tr -d ' ')
+  printf 'OK: %d candidates. %d receipt(s) exist; %d integrity-checked, %d existence-only; concurrence-field-present %d/%d (of which explicit-none %d); %d-col schema and enum clean.\n' \
+    "$rows" "$with_receipt" "$pinned" "$unpinned" "$((ruled_out-concur_missing))" "$ruled_out" \
+    "$explicit_none" "$EXPECTED_COLS"
 elif [ "$schema_bad" -gt 0 ]; then
   rc=8
   [ "$fails" -gt 1 ] && printf 'NOTE: %d classes fired; schema takes precedence because the other counters are unreliable.\n' "$fails"

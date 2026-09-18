@@ -1,0 +1,46 @@
+{
+  "schema": "jev.receipt-other-reasons.v1",
+  "spec": "docs/demos/duel-2/SPEC_other_reason_COD.md (047fed2), pane 2 as enum author",
+  "gate_behavior": "NONE. Per the spec: documentation/provenance only, never gate input. scripts/verify-other-reasons.sh exits nonzero on a coverage or binding failure, and NO other instrument reads this file.",
+  "generated_at": "2026-09-18T10:45:00Z",
+  "assigner": "CyanFalcon (pane 1, conductor) — reasons derived by OPENING each receipt, per the spec's no-filename-inference rule and the open-the-control rule the conductor has broken repeatedly",
+  "allowed_reasons": ["design", "mapping", "unresolved", "mixed"],
+  "digest_convention": "content-normalised sha256, first 16 hex — the SAME convention as STATUS.tsv column 9 (terminal whitespace stripped, then sha256). Deliberately not a second identity: the spec warned against inventing one.",
+  "rows": [
+    {
+      "candidate": "demo-3-claim-check-gate",
+      "receipt": "docs/demos/duel-2/BASELINE_claimcheck_vs_jev_COD.md",
+      "receipt_type": "other",
+      "other_reason": "design",
+      "evidence_locator": "BASELINE_claimcheck_vs_jev_COD.md:3",
+      "evidence_quote": "Status: rung-2 comparison design, not implementation or benchmark result.",
+      "corroborating_locator": "BASELINE_claimcheck_vs_jev_COD.md:200",
+      "corroborating_quote": "The design's commands are exact placeholders for the eventual package; no command was run in this"
+    },
+    {
+      "candidate": "MU-H2-outbound-redaction",
+      "receipt": "docs/demos/duel-2/BASELINE_MU-H2_vs_incumbents_COD.md",
+      "receipt_type": "other",
+      "other_reason": "design",
+      "evidence_locator": "BASELINE_MU-H2_vs_incumbents_COD.md:3",
+      "evidence_quote": "Status: Q4 queue unit, rung-2 baseline design. No implementation or benchmark was run.",
+      "corroborating_locator": "BASELINE_MU-H2_vs_incumbents_COD.md:248",
+      "corroborating_quote": "No incumbent or Jev tool was installed or benchmarked in this unit."
+    },
+    {
+      "candidate": "COD-H2-preaction-abstention",
+      "receipt": "docs/demos/duel-2/runs/label-id-mapping-20260918T073641Z.json",
+      "receipt_type": "other",
+      "other_reason": "mapping",
+      "evidence_locator": "label-id-mapping-20260918T073641Z.json $.unit",
+      "evidence_quote": "Q51 label-id mapping (no re-labelling; both label sets stand)",
+      "corroborating_locator": "label-id-mapping-20260918T073641Z.json $.schema",
+      "corroborating_quote": "jev.verifiable.label_id_mapping.v1"
+    }
+  ],
+  "no_claim": [
+    "The reasons are the conductor's readings of opened content; no pane has audited them. Pane 2's Q81 is the non-author audit.",
+    "`unresolved` and `mixed` are allowed by the spec and are UNUSED here. Two designs and one mapping is the whole population, so this file does not exercise those two values.",
+    "Three rows is too few to say whether the vocabulary is adequate. The spec's own re-examination trigger is >25% or 5 `other` rows."
+  ]
+}
