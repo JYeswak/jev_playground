@@ -6,4 +6,4 @@ cd "$root"
 node --version
 npm install --ignore-scripts --no-audit --no-fund --package-lock=false
 npm test
-printf 'jev-route-backtest ready: npm run backtest -- <session.jsonl>... --out runs/backtest.json\n'
+printf 'jev-route-backtest ready: npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out runs/backtest-real-excerpt.json\n'

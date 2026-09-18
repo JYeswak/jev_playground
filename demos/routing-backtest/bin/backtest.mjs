@@ -1,8 +1,13 @@
 #!/usr/bin/env node
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, relative } from 'node:path';
 import { readSessionLogs } from '../src/transcript-reader.mjs';
-import { DEFAULT_POLICY, runCounterfactual } from '../src/counterfactual.mjs';
+import {
+  DEFAULT_POLICY,
+  MIN_CLASSIFIABLE_TURNS,
+  runCounterfactual,
+  validateBacktestFloor,
+} from '../src/counterfactual.mjs';
 
 function usage(message) {
   if (message) console.error(`ERROR ${message}`);
@@ -43,12 +48,18 @@ const baseReceipt = {
   generated_at: new Date().toISOString(),
   inputs: absoluteInputs.map(displayPath),
   policy: DEFAULT_POLICY,
+  floor: {
+    minimumClassifiableTurns: MIN_CLASSIFIABLE_TURNS,
+    requiresCheapCandidate: true,
+    requiresBaselineCandidate: true,
+  },
   failures: [],
 };
 
 try {
   const parsed = await readSessionLogs(absoluteInputs);
   const result = runCounterfactual(parsed.sessions);
+  const failures = validateBacktestFloor(result);
   const receipt = {
     ...baseReceipt,
     priceTable: result.priceTable,
@@ -62,12 +73,12 @@ try {
     perModel: result.perModel,
     totals: result.totals,
     turns: result.turns,
-    failures: result.failures,
+    failures,
   };
   await mkdir(dirname(out), { recursive: true });
   await writeFile(out, `${JSON.stringify(receipt, null, 2)}\n`);
-  console.log(JSON.stringify({ output: out, denominator: parsed.totals, failures: result.failures.length }));
-  process.exitCode = result.failures.length ? 1 : 0;
+  console.log(JSON.stringify({ output: out, denominator: parsed.totals, failures: failures.length }));
+  process.exitCode = failures.length ? 1 : 0;
 } catch (error) {
   const receipt = {
     ...baseReceipt,

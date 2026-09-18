@@ -1,0 +1,168 @@
+{
+  "schema": "jev.route-backtest.receipt.v1",
+  "generated_at": "2026-09-18T02:26:45.498Z",
+  "inputs": [
+    "~/Developer/jev/demos/routing-backtest/fixtures/real-excerpt-t1-t6.jsonl"
+  ],
+  "policy": {
+    "cheapModel": "cheap-1",
+    "maxPromptTokens": 20000,
+    "maxCompletionTokens": 2000,
+    "maxToolCalls": 1
+  },
+  "floor": {
+    "minimumClassifiableTurns": 2,
+    "requiresCheapCandidate": true,
+    "requiresBaselineCandidate": true
+  },
+  "failures": [],
+  "priceTable": {
+    "schema": "jev-route-backtest.price-table.v1",
+    "as_of": "2026-09-18",
+    "currency": "USD",
+    "unit": "USD per million tokens for scenario prices",
+    "rederivation": "Baseline spend is read from usage.cost.total in each session log. cheap-1 rates are an explicit counterfactual assumption and must be refreshed from the provider price sheet before any live routing.",
+    "models": {
+      "gpt-5.6-luna": {
+        "source": "observed usage.cost.total",
+        "mode": "recorded"
+      },
+      "muse-spark-1.3-contributor": {
+        "source": "observed usage.cost.total",
+        "mode": "recorded"
+      },
+      "cheap-1": {
+        "source": "scenario assumption; refresh before live use",
+        "mode": "scenario",
+        "inputPerMillion": 0.2,
+        "outputPerMillion": 0.8
+      }
+    }
+  },
+  "denominator": {
+    "sessions": 1,
+    "turns": 6,
+    "classifiableTurns": 6,
+    "skippedTurns": 0
+  },
+  "sessions": [
+    {
+      "source": "~/Developer/jev/demos/routing-backtest/fixtures/real-excerpt-t1-t6.jsonl",
+      "sessionId": "01a0b1ab-2515-762b-9790-111c1b35fb20",
+      "rows": 94,
+      "totals": {
+        "turns": 6,
+        "classifiableTurns": 6,
+        "skippedTurns": 0
+      }
+    }
+  ],
+  "perModel": {
+    "muse-spark-1.3-contributor": {
+      "turns": 6,
+      "actualSpend": 0.011106414,
+      "counterfactualSpend": 0.012932900000000002,
+      "routedCheap": 5
+    }
+  },
+  "totals": {
+    "turnsSeen": 6,
+    "classifiableTurns": 6,
+    "routedCheap": 5,
+    "actualSpend": 0.011106414,
+    "counterfactualSpend": 0.012932900000000002,
+    "estimatedSavings": -0.0018264860000000022
+  },
+  "turns": [
+    {
+      "classifiable": true,
+      "sessionId": "01a0b1ab-2515-762b-9790-111c1b35fb20",
+      "turnIndex": 1,
+      "model": "muse-spark-1.3-contributor",
+      "promptTokens": 82979,
+      "completionTokens": 267,
+      "toolCalls": 1,
+      "actualSpend": 0.0083513,
+      "cheapModel": "cheap-1",
+      "cheapSufficient": false,
+      "classificationReason": "prompt-token-budget",
+      "counterfactualSpend": 0.0083513,
+      "estimatedSavings": 0
+    },
+    {
+      "classifiable": true,
+      "sessionId": "01a0b1ab-2515-762b-9790-111c1b35fb20",
+      "turnIndex": 2,
+      "model": "muse-spark-1.3-contributor",
+      "promptTokens": 13814,
+      "completionTokens": 203,
+      "toolCalls": 1,
+      "actualSpend": 0.001561234,
+      "cheapModel": "cheap-1",
+      "cheapSufficient": true,
+      "classificationReason": "text-only-within-token-budgets",
+      "counterfactualSpend": 0.0029252,
+      "estimatedSavings": -0.001363966
+    },
+    {
+      "classifiable": true,
+      "sessionId": "01a0b1ab-2515-762b-9790-111c1b35fb20",
+      "turnIndex": 3,
+      "model": "muse-spark-1.3-contributor",
+      "promptTokens": 360,
+      "completionTokens": 409,
+      "toolCalls": 1,
+      "actualSpend": 0.00028442600000000006,
+      "cheapModel": "cheap-1",
+      "cheapSufficient": true,
+      "classificationReason": "text-only-within-token-budgets",
+      "counterfactualSpend": 0.00039920000000000005,
+      "estimatedSavings": -0.000114774
+    },
+    {
+      "classifiable": true,
+      "sessionId": "01a0b1ab-2515-762b-9790-111c1b35fb20",
+      "turnIndex": 4,
+      "model": "muse-spark-1.3-contributor",
+      "promptTokens": 606,
+      "completionTokens": 843,
+      "toolCalls": 1,
+      "actualSpend": 0.000396338,
+      "cheapModel": "cheap-1",
+      "cheapSufficient": true,
+      "classificationReason": "text-only-within-token-budgets",
+      "counterfactualSpend": 0.0007956,
+      "estimatedSavings": -0.00039926200000000005
+    },
+    {
+      "classifiable": true,
+      "sessionId": "01a0b1ab-2515-762b-9790-111c1b35fb20",
+      "turnIndex": 5,
+      "model": "muse-spark-1.3-contributor",
+      "promptTokens": 933,
+      "completionTokens": 185,
+      "toolCalls": 1,
+      "actualSpend": 0.00029846200000000004,
+      "cheapModel": "cheap-1",
+      "cheapSufficient": true,
+      "classificationReason": "text-only-within-token-budgets",
+      "counterfactualSpend": 0.0003346,
+      "estimatedSavings": -0.00003613799999999996
+    },
+    {
+      "classifiable": true,
+      "sessionId": "01a0b1ab-2515-762b-9790-111c1b35fb20",
+      "turnIndex": 6,
+      "model": "muse-spark-1.3-contributor",
+      "promptTokens": 259,
+      "completionTokens": 94,
+      "toolCalls": 1,
+      "actualSpend": 0.00021465400000000002,
+      "cheapModel": "cheap-1",
+      "cheapSufficient": true,
+      "classificationReason": "text-only-within-token-budgets",
+      "counterfactualSpend": 0.000127,
+      "estimatedSavings": 0.00008765400000000003
+    }
+  ]
+}

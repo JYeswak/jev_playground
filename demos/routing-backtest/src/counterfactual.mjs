@@ -4,7 +4,7 @@ export const DEFAULT_POLICY = {
   cheapModel: 'cheap-1',
   maxPromptTokens: 20_000,
   maxCompletionTokens: 2_000,
-  maxToolCalls: 0,
+  maxToolCalls: 1,
 };
 
 function classifyTurn(turn, policy) {
@@ -126,4 +126,23 @@ export function runCounterfactual(sessions, options = {}) {
     },
     failures,
   };
+}
+
+export const MIN_CLASSIFIABLE_TURNS = 2;
+
+export function validateBacktestFloor(result, minimum = MIN_CLASSIFIABLE_TURNS) {
+  const failures = [...result.failures];
+  if (result.totals.classifiableTurns < minimum) {
+    failures.push({
+      code: 'INSUFFICIENT_CLASSIFIABLE_TURNS',
+      reason: `classifiable turns ${result.totals.classifiableTurns} < required floor ${minimum}`,
+    });
+  }
+  if (result.totals.classifiableTurns > 0 && result.totals.routedCheap === 0) {
+    failures.push({ code: 'NO_CHEAP_CANDIDATES', reason: 'no turn qualifies for the cheap scenario' });
+  }
+  if (result.totals.classifiableTurns > 0 && result.totals.routedCheap === result.totals.classifiableTurns) {
+    failures.push({ code: 'NO_BASELINE_CANDIDATES', reason: 'every turn qualifies for the cheap scenario' });
+  }
+  return failures;
 }

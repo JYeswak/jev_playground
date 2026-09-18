@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { readSessionLogs } from './transcript-reader.mjs';
-import { runCounterfactual } from './counterfactual.mjs';
+import { runCounterfactual, validateBacktestFloor } from './counterfactual.mjs';
 import { PRICE_TABLE } from './pricing.mjs';
 
 const turn = (overrides = {}) => ({
@@ -25,11 +25,25 @@ test('routes a small text-only turn to cheap and prices both paths', () => {
   assert.equal(result.failures.length, 0);
 });
 
-test('tool-call turns stay on the recorded baseline', () => {
+test('one simple tool call can be a cheap candidate', () => {
   const result = runCounterfactual([{ turns: [turn({ toolCalls: 1 })] }]);
+  assert.equal(result.totals.routedCheap, 1);
+});
+
+test('multiple tool calls stay on the recorded baseline', () => {
+  const result = runCounterfactual([{ turns: [turn({ toolCalls: 2 })] }]);
   assert.equal(result.totals.routedCheap, 0);
   assert.equal(result.turns[0].classificationReason, 'tool-call-turn');
   assert.equal(result.turns[0].counterfactualSpend, result.turns[0].actualSpend);
+});
+
+test('floor rejects a one-turn no-split run', () => {
+  const result = runCounterfactual([{ turns: [turn({ toolCalls: 2 })] }]);
+  const failures = validateBacktestFloor(result);
+  assert.deepEqual(
+    failures.map((failure) => failure.code),
+    ['INSUFFICIENT_CLASSIFIABLE_TURNS', 'NO_CHEAP_CANDIDATES'],
+  );
 });
 
 test('missing price-table model is an error, never a zero row', () => {
