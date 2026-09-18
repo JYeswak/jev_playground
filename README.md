@@ -89,7 +89,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`jev-codex-router`|the same idea, Codex-specific|not run|read before extending our own router work|
 |`jev-mcp`|Jev judgments exposed as MCP tools|**RUN** — 9/9 unit, 4/4 live e2e|wire `jev_verify` into the conductor's number-checking|
 |`jev-ultrafast`|a browser agent driven by Jev|not run; needs a URL and a key|lowest priority, it is a live-network demo|
-|`fast-jev-compaction`|continuous context compaction with Jev|not run|directly relevant: our own `compaction/` sits beside it|
+|`fast-jev-compaction`|continuous context compaction with Jev|**RUN** — 29/29 tests; live run 21 messages to 7, 87.1% chars saved|it owns the core; ours keeps only the omp adapter and replay harness|
 |`commit-miner`|classify commit diffs and messages with Jev|not run|runnable against this repo's own history|
 |`foreman`|watch a software factory floor with Jev|not run|closest upstream analogue to the conductor loop|
 |`bicameral`|System 2 writes the code, System 1 judges it|not run|the architectural claim this lane assumes|
