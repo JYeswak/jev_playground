@@ -10,6 +10,9 @@
 /*
 !/.gitignore
 !/AGENTS.md
+!/README.md
+!/LICENSE
+!/visual/
 !/EVAL.md
 !/NEGATIVE_EVIDENCE.md
 !/GATES.md
