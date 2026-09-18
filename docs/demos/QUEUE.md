@@ -513,3 +513,52 @@ knowing before it is paid.
 
 `HEALTHY` / `THIN` / `UNASKABLE` per candidate, with the command and the number. Output
 `docs/demos/duel-2/runs/codh41-labelfree-<ISO>.json`.
+
+---
+
+# REFILL — Q30/Q31 (pane 3), after Cause-2 recurrence
+
+**Pane 3 measured `IDLE_PROVEN` 359s because pane 2's faster callbacks pulled four consecutive
+dispatches (Q26–Q29) while pane 3 got nothing after Q25.** That is `tick.md` §0b **Cause 2**,
+recurring after being documented — *a fast pane pulls dispatch attention away from a slower one, and
+the conductor mistakes the result for the slow pane's fault.*
+
+**Documenting a cause does not fix it.** Cause 2's stated remedy was awareness, and awareness failed.
+**Operational fix: before dispatching to a pane that just called back, check whether the OTHER pane
+has an open unit. If not, it gets the next dispatch first.** Callback-driven dispatch is
+intrinsically biased toward the faster pane; the correction has to be mechanical, not attentive.
+
+## UNIT Q30 — price the 200 policy labels. **The only thing blocking rung 4 on the leader.**
+**ELIGIBLE: pane 3** (owns the corpus and `policy.json`). **CLAIM:** unclaimed
+
+Pane 2's rung-4 design (`3a5851f`) is accepted and needs *"one immutable manifest of **N=200
+labelled cases** before live calls"* with *"ground-truth labels [that] are **policy labels, not model
+answers**."* **Those labels do not exist** — the 907 destructive-bash turns are unlabelled.
+
+**Deliver a priced plan:** how 200 labels get authored, **by whom**, at what **measured** cost per
+label and in total, and **who verifies them**. Hard constraint: **the author of `policy.json` cannot
+be the sole source of the labels its policy is graded against** — specify a split where one pane
+labels and the other audits a sample, with audit size and agreement threshold pre-registered.
+
+**Price it from a real trial: label 10 cases, time it, extrapolate.** A measured per-label cost beats
+an estimate. **If the true cost makes N=200 unaffordable, say so and state the largest affordable
+N** — the design's failure clause says a small sample returns `UNASKABLE/HELD`, so an honest smaller
+N may mean rung 4 cannot close, **and that is a finding rather than a problem to hide.**
+
+Call-cost arithmetic already done from pane 3's **measured** usage (mean 435 input tokens): 2,000
+calls → 0.870M input tokens → **≈$0.037** at a publicly quoted $0.042/M. **That price per million is
+an external figure with no control opened (§3w) — unverified at the point of use.**
+
+Output `docs/demos/duel-2/RUNG4_LABEL_PLAN_MU.md`.
+
+## UNIT Q31 — demo-9 vs `ubs`: run the baseline it was cleared *conditional* on
+**ELIGIBLE: pane 3** (pane 2 authored demo-9). **CLAIM:** unclaimed
+
+demo-9 sits CLEARED at **550** with the condition *"must **beat** `ubs` baseline, not subset"* —
+**never run.**
+
+**Apply the §4l screen first:** does the corpus this needs exist on disk, unlabelled, right now? If
+not, **price it and return `UNASKABLE`** — do not build a corpus to satisfy a conditional clearance
+on a 550-score candidate while the leader is blocked.
+
+Output `docs/demos/duel-2/runs/demo9-vs-ubs-<ISO>.json`.
