@@ -263,12 +263,91 @@ def main() -> int:
         print(f"FAIL  {'ARM 14 is_symlink does not fire on relatives':<46} no snapshot path emitted")
         fail += 1
 
+
+    # --------- ARMS 15-17: THE THREE CLASSES PANE 2 DEFERRED PROMOTION ON (98c441f, Q105-U1)
+    # Its reason: "promotion would OVERCLAIM CONTAINMENT while three symlink/hardlink classes named
+    # by the implementer remain untested. A GREEN LIVE RUN IS INSUFFICIENT." I disclosed them; it
+    # refused to promote on a disclosure. Behaviour was DERIVED before these arms were written, and
+    # two of the three turned out already-correct — so these arms LOCK behaviour rather than fix it.
+    def probe(build):
+        root = Path(tempfile.mkdtemp(prefix="jev-arm-"))
+        (root / "docs/demos").mkdir(parents=True)
+        rel = build(root)
+        hdr = "\t".join(["candidate", "rung", "score", "verdict", "author", "receipt", "reason",
+                         "concurrence", "digest", "receipt_type"])
+        prow = "\t".join(["c1", "4", "500", "RULED_OUT", "p2", rel, "died", "none",
+                          "deadbeefdeadbeef", "other"])
+        st = root / "docs/demos/STATUS.tsv"
+        st.write_text(hdr + "\n" + prow + "\n")
+        sd = root / "side.json"
+        sd.write_text(json.dumps({"rows": []}))
+        return subprocess.run([str(VERIFIER)], capture_output=True, text=True, cwd=str(root),
+                              env=dict(os.environ, JEV_REPO=str(root), JEV_STATUS=str(st),
+                                       JEV_SIDECAR=str(sd)))
+
+    # A symlinked PARENT lands outside just as surely as a symlinked file. resolve() follows it, so
+    # this was already rejected; the arm exists so it cannot stop being rejected silently.
+    def build_parent(root):
+        outdir = Path(tempfile.mkdtemp())
+        (outdir / "r.json").write_text('{"x":1}')
+        (root / "runs").symlink_to(outdir)
+        return "runs/r.json"
+    r = probe(build_parent)
+    if r.returncode == 13 and "SYMLINK ESCAPE" in r.stdout:
+        print(f"PASS  {'ARM 15 symlinked PARENT dir rejected':<46} rc=13 resolve() follows parents")
+    else:
+        print(f"FAIL  {'ARM 15 symlinked PARENT dir rejected':<46} rc={r.returncode}")
+        fail += 1
+
+    # A HARDLINK is invisible to containment: in-root path, is_symlink False, resolve() in-root. It
+    # is NOT a breach — the path is in-root, bytes are hashed, mid-run mutation is caught by the
+    # pre/post pair — so it gets DISCLOSURE (nlink > 1), and this arm asserts the disclosure exists.
+    # Asserting rejection here would have been the wrong fix to a correctly-behaving case.
+    def build_hard(root):
+        outside = Path(tempfile.mkdtemp()) / "ext.json"
+        outside.write_text('{"x":1}')
+        os.link(outside, root / "hard.json")
+        return "hard.json"
+    try:
+        r = probe(build_hard)
+        mh = re.search(r"snapshot: (\S+)", r.stdout)
+        nl = None
+        if mh:
+            fs = json.loads((Path(mh.group(1)) / "manifest.json").read_text())["files"]
+            nl = next((f["nlink"] for f in fs if f["source_path"].endswith("hard.json")), None)
+        if r.returncode != 13 and nl is not None and nl > 1:
+            print(f"PASS  {'ARM 16 hardlink disclosed via nlink':<46} nlink={nl} not rejected")
+        else:
+            print(f"FAIL  {'ARM 16 hardlink disclosed via nlink':<46} rc={r.returncode} nlink={nl}")
+            fail += 1
+    except OSError as exc:
+        print(f"FAIL  {'ARM 16 hardlink disclosed via nlink':<46} could not create hardlink: {exc}")
+        fail += 1
+
+    # An IN-ROOT symlink pointing at another in-root file is not an escape, but the cited path is not
+    # where the bytes live. Safety here comes from DISCLOSURE, so the arm asserts both fields.
+    def build_inroot(root):
+        (root / "real.json").write_text('{"x":1}')
+        (root / "alias.json").symlink_to(root / "real.json")
+        return "alias.json"
+    r = probe(build_inroot)
+    mi = re.search(r"snapshot: (\S+)", r.stdout)
+    rec = None
+    if mi:
+        fs = json.loads((Path(mi.group(1)) / "manifest.json").read_text())["files"]
+        rec = next((f for f in fs if f["source_path"].endswith("alias.json")), None)
+    if r.returncode != 13 and rec and rec["is_symlink"] and rec["source_realpath"].endswith("real.json"):
+        print(f"PASS  {'ARM 17 in-root symlink disclosed, not hidden':<46} realpath -> real.json")
+    else:
+        print(f"FAIL  {'ARM 17 in-root symlink disclosed, not hidden':<46} rc={r.returncode} rec={rec}")
+        fail += 1
+
     print("\n" + "-" * 70)
     print(f"fixtures under {tmp} (left in place; temp dir)")
     if fail:
         print(f"FAIL: {fail} arm(s) did not discriminate.")
         return 1
-    print("OK: sidecar verifier discriminates on all 14 arms; real files never written.")
+    print("OK: sidecar verifier discriminates on all 17 arms; real files never written.")
     return 0
 
 

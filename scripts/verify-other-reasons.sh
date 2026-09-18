@@ -104,7 +104,20 @@ def snapshot(paths, root: Path, boundary: Path):
         if not src.is_file():
             continue
         real = src.resolve()
-        realpaths[str(src)] = {"realpath": str(real), "is_symlink": src.is_symlink()}
+        # nlink is recorded because a HARDLINK is INVISIBLE to every other check here: its path is
+        # in-root, is_symlink() is False, and resolve() returns the in-root path, so containment
+        # cannot see that the inode is shared with a file outside the repository. Pane 2 named
+        # hardlinks as an untested class (audit-q105-promotion, 98c441f). Deriving the behaviour
+        # first: a hardlink is NOT a containment breach — the evidence path is in-root, the bytes are
+        # captured and hashed, and mutation during the run is caught by the pre/post pair. What it
+        # lacks is a SIGNAL, so it gets disclosure rather than rejection. nlink > 1 means some other
+        # path shares these bytes; a third party can then decide whether that matters.
+        try:
+            nlink = src.stat().st_nlink
+        except OSError:
+            nlink = None
+        realpaths[str(src)] = {"realpath": str(real), "is_symlink": src.is_symlink(),
+                               "nlink": nlink}
         declared = str(src) in {str(STATUS), str(SIDECAR), str(Path(__file__).resolve())}
         escapes = bound not in real.parents and real != bound
         if not declared and escapes:
@@ -140,6 +153,7 @@ def manifest_for(mapped, pre, post, attempts, head, realpaths=None, moved=(), fo
             # instruments. `Path.is_symlink()` is asked at capture time, where the answer exists.
             "source_realpath": (realpaths or {}).get(orig, {}).get("realpath"),
             "is_symlink": (realpaths or {}).get(orig, {}).get("is_symlink", False),
+            "nlink": (realpaths or {}).get(orig, {}).get("nlink"),
         })
     # THE INSTRUMENT, CALLED OUT BY NAME. It is already in `files` because it is an input now, but an
     # outsider should not have to know which of 19 rows is the executable. Pane 2's ledger graded this
