@@ -588,3 +588,44 @@ catch, and after labelling begins any change to the bar looks like tuning.
 
 `RATIFIED` / `AMENDED` with the replacement values. Output
 `docs/demos/duel-2/runs/ratify-label-audit-<ISO>.json`. **Rung 4 does not start until this lands.**
+
+---
+
+# ⚠️ THIS FILE WENT STALE AND THE DRY-QUEUE FALLBACK READ IT ANYWAY
+
+**Measured 2026-09-18: QUEUE.md contains units Q1–Q32. Dispatch has reached Q49. Seventeen units
+(Q33–Q49) existed only inside dispatch packets and never in this file.**
+
+**Pane 2 fell back to the dry-queue default, read this file, and reported
+*"no current pane2-eligible unclaimed Q unit; pane3-only Q12/Q14/Q15/Q16 remain"* — naming four units
+that had been DONE for hours.** Its report was **correct given what it could read.** The file was
+stale; the pane was not.
+
+**This is `tick.md` §0b Cause 4 inverted.** Cause 4 says *an append stages, a push delivers* — so
+append **and** push. **I did the opposite: I pushed without appending**, and the queue file quietly
+stopped being the queue. **The dry-queue fallback is the one mechanism designed to keep a pane
+productive with no conductor in the loop, and I had left it pointed at a two-hour-old snapshot.**
+
+**Same shape as §4v**, where six guards existed as prose and not as code: **the authoritative artifact
+and the actual state diverged, and only a pane hitting it exposed the gap.** In both cases the
+artifact read as current.
+
+**RULE: a unit dispatched in a packet MUST also be appended here in the same turn, or the fallback is
+broken by design.** Not for bookkeeping — because the fallback *reads this file.*
+
+## CURRENT OPEN UNITS — authoritative as of `2026-09-18`, after Q47's block
+
+| Unit | Owner | State |
+|---|---|---|
+| **Q45** draw 20-case sample from the **24 verifiable** cases, seed committed first | pane 3 | open |
+| **Q46** label those 20 blind under the risk-tiered rubric | pane 3 | open, after Q45 |
+| **Q47** label the same 20 blind, independently | pane 2 | **BLOCKED** — `demos/preaction-abstention/fixtures/rung4-verifiable-sample.json` absent (`rc1`, correctly reported); fires on arrival |
+| **Q48** is MU-H3's prevalence measurable here at all, given Q39 struck the credential stratum | pane 2 | open |
+| **Q49** specify + price the evidence-carrying manifest | pane 2 | open |
+
+**Everything Q1–Q44 is DONE, BLOCKED-and-reported, or superseded.** The four units pane 2's fallback
+named (Q12/Q14/Q15/Q16) are all complete — Q12 and Q14 landed the classifier sharpening and the
+`AutoModeMiddleware` source-read, Q15 the COD-H5 distinctness ruling, Q16 the rung-3 build.
+
+**If this table is older than the last dispatch when you read it, that is the same defect again and
+you should say so in a callback rather than working from it.**
