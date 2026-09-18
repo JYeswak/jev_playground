@@ -83,7 +83,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`jev-phishing-bench`|Jev against LLMs on phishing, with a stated **net floor**|**RUN** — floor reproduces exactly|the LLM comparison arms need an Anthropic key we do not hold|
 |`jev-sec-bench`|blind security benchmarks|**RUN**: Go TUI builds and renders; 3 committed result sets|it replicates our framing-leak effect at n=662, with the opposite lesson|
 |`jev-agent-failure-benchmark`|can a cheap decision model find what broke an agent|**RUN**: 20/20 with the pinned dataset, 18/20 without|its leakage test is one of the two that silently skip on a fresh clone|
-|`typesafe-ai-benchmark`|LLM structured output vs Jev on latency, cost, judgment|not run|run its documented examples; report which are stale at HEAD|
+|`typesafe-ai-benchmark`|LLM structured output vs Jev on latency, cost, judgment|**RUN** (pane 3): 7/7 offline examples|its docs omit an install step; reported upstream|
 |`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**RUN**: both examples, offline, via a linux/amd64 container|the blocker was a platform mismatch, routed around; `RCH-E327` is still unfixed upstream|
 |`jev-router`|per-turn model routing for Claude Code and Codex|**RUN** (pane 3): 58/58|upstream owns routing; ours narrows to the `blockedBy` histogram|
 |`jev-codex-router`|the same idea, Codex-specific|**RUN** (pane 3): backtest on real sessions|import its cached-token price columns, which supersede our R20 default|
@@ -354,26 +354,27 @@ bash foundation/gates.sh
 ```
 PASS 10-fixture-integrity (0s)
 PASS 20-receipt-freshness (0s)
-PASS 30-no-secrets (1s)
-PASS 40-omp-compact-replay (1s)
-PASS 50-house-gates (1s)
+PASS 30-no-secrets (0s)
+PASS 40-omp-compact-replay (2s)
+PASS 50-house-gates (0s)
 PASS 60-staged-deletion-lane (3s)
 PASS 70-tests-registry-sync (0s)
-PASS 80-lane-instrument-selftests (12s)
-PASS 90-sidecar-verifier-wrapper (1s)
+PASS 80-lane-instrument-selftests (16s)
+PASS 90-sidecar-verifier-wrapper (0s)
 PASS 95-numerals-ratchet (0s)
+PASS 96-verdict-status-agreement (0s)
 gates: ALL GREEN
 ```
 
-Ten stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
+Eleven stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
 because a gate that cannot fail is not a gate. Re-derive the count from `foundation/gates.d/`; a
 number written here goes stale silently, and this one already did once, when it claimed seven
 stages and nine existed.
 
-**On a fresh clone you get eight of ten, not `ALL GREEN`, and the output above is from a developed
+**On a fresh clone you get nine of eleven, not `ALL GREEN`, and the output above is from a developed
 checkout.** Measured by running the suite inside a frozen clone of a pinned commit
 (`scripts/verify-frozen.sh`), which exits non-zero for that reason: stages
-10/20/30/60/70/80/90/95 pass from a bare clone. Stage 40 needs
+10/20/30/60/70/80/90/95/96 pass from a bare clone. Stage 40 needs
 `npm install` inside `compaction/`, so that stage does need the network, contrary to what this line
 claimed until it was measured. Stage 50 needs a Beads DAG imported with `br import`, since only
 `.beads/issues.jsonl` is tracked and the database is not. Neither is a gate defect; both are state a
@@ -443,7 +444,7 @@ every reason lives in [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 19 entries
 condition that would reopen it. One candidate died there because an MIT-licensed tool already ships
 its surface, which is a reason to stop building and not a reason to build faster.
 
-**A fresh clone cannot run two of the nine gate stages**, and the reasons are in Quick start above.
+**A fresh clone cannot run two of the eleven gate stages**, and the reasons are in Quick start above.
 There is no bootstrap step that closes both, so `scripts/verify-frozen.sh` fails at HEAD by design
 rather than silently.
 
