@@ -580,14 +580,14 @@ weaker claim than eleven distinct catches, and the record supports the former."*
 
 ### The closing sentence of this ruling is replaced with pane 3's wording, adopted verbatim
 
-> **"…and a method whose mechanisms (non-author audit, pre-registered predictions, census, blind
-> re-decision) caught conductor errors on record twelve times across three recurring defect families
-> — over-killing, citing-without-reading, and calling-adjacent-things-identical — with the citing
-> defect recurring five times and still unextinguished."**
-
-**Twelve, not eleven. Families named. Recurrence admitted. The live defect stated.** Its own note on
-the wording: *"If that sentence embarrasses, good — it is the only form of the claim this lane's own
-rules permit."*
+> **"…caught conductor errors on record twelve times across three recurring defect families…"**
+> — WITHDRAWN BY ITS AUTHOR (FOURTH PASS): inherits the set-cover taint; any replacement must state
+> distinctness or explicitly disclaim it. Do not cite. Case-key table:
+> `docs/demos/duel-2/runs/catch-case-table-20260918T124819Z.json` (`b1ba11e`) — 25 keyed rows,
+> ruling UNCOUNTABLE-AS-SCALAR.
+**Twelve withdrawn, not replaced.** The honest end state is the table plus the triple
+(inclusion, granularity, unit) — see CLOSED block at end of document. Its note stands as method:
+*"numbers arriving without enumeration are contaminated until counted."*
 
 **And the spec found more than my one bad number:** **three rules never fired**, **two fired only
 because a human chased what no gate required**, and it names the deletion candidates. *A rule that
@@ -842,3 +842,17 @@ back; until they arrive **this row of the cleanup is open, not done.**
 
 **Nothing above resolves a blocker.** `PROMOTED 0` stands, the six blockers stand, and **this document
 is not certified publish-safe by anyone.**
+
+---
+
+## CATCH COUNT — CLOSED AS UNCOUNTABLE (Q101-U1/U2, `b1ba11e`)
+
+**No bare catch count is citeable — not 11, 12, 9, 5, 8, 10, or 22.** Case-key table
+(`docs/demos/duel-2/runs/catch-case-table-20260918T124819Z.json`): 25 rows keyed by defect slug,
+each with claim, control, catcher, recording commit, and verification level (8 DIRECT re-reads,
+17 CARRIED from enumeration). The count depends on three degrees of freedom no artifact fixes:
+**inclusion** (self vs pane vs human vs shipped-rule triggers), **granularity** (the citing family
+is 5 headings or 8 sub-defects), **unit** (instances vs families vs headings). Counted-statements
+WITH a stated triple are derivable from the table; a scalar without one is not a claim.
+**This document asserts no catch-count scalar after this line.** The withdrawn-twelve block above
+is struck in place; the 526 strike stands. Future citations use the table or stay silent.
