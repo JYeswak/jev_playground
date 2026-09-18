@@ -78,7 +78,7 @@ printf '%s\n' "-----------------------------------------------------------------
 printf '\nGAUNTLET (state of record: %s)\n' "$STATUS"
 printf '  %-30s %-4s %-5s %-10s %-6s %s\n' CANDIDATE RUNG SCORE VERDICT AUTHOR BLOCKED_ON
 missing=0; rows=0; with_receipt=0; pinned=0; drifted=0; unpinned=0
-ruled_out=0; concur_missing=0; schema_bad=0
+ruled_out=0; concur_missing=0; schema_bad=0; type_bad=0
 # SCHEMA WIDTH IS VALIDATED EXACTLY, and this is a PREREQUISITE, not a nicety. Pane 2,
 # verify-exit-disaggregation-20260918T102000Z.json (a915e11), non-author, asked the question I had
 # put in its packet and answered it with a blocker:
@@ -93,7 +93,17 @@ ruled_out=0; concur_missing=0; schema_bad=0
 # EXPECTED_COLS is the single constant to bump when a column lands. Bumping it is the migration.
 # Overridable so the MIGRATION ITSELF is testable: JEV_EXPECTED_COLS=10 against a 10-column fixture
 # must come back green, which is the proof that bumping this constant is all the migration requires.
-EXPECTED_COLS="${JEV_EXPECTED_COLS:-9}"
+# MIGRATED to 10 on 2026-09-18: receipt_type landed as column 10 from pane 3's opened-receipt typing
+# (receipt-type-proposal-20260918T102335Z.tsv), audited by pane 2 as enum author. Bumping this
+# constant WAS the whole migration, as ARM 11 requires — and the pre-migration state failed loudly
+# at rc=8 with "17 of 17 rows have the wrong column count", never as 17 false drift reports.
+EXPECTED_COLS="${JEV_EXPECTED_COLS:-10}"
+# SEMANTIC validation, closing the bound pane 2 stated in verify-schema-width-20260918T103000Z.json:
+# "ARM11 proves structural read, not semantic receipt_type enum validation." Structure said the field
+# is there; nothing said its value was legal. Pane 2's Q19 ruling requires fail-closed on
+# empty/missing/unknown/out-of-enum, NEVER inferred as non-score — so an illegal value is its own
+# failure class (rc=9), not a silent demotion to "not a score receipt".
+VALID_TYPES=' score hold-resolution verdict measurement other '
 while IFS= read -r raw; do
   case "$raw" in '#'*|'') continue ;; esac
   nf=$(printf '%s' "$raw" | awk -F'\037' '{print NF}')
@@ -102,12 +112,23 @@ while IFS= read -r raw; do
   # LAST variable, so at 10 columns `digest` came back as "<16hex>\037score" and every row false-RED'd
   # as drift — the exact breakage pane 2 predicted, reproduced by the arm written to test the fix.
   # With the variable present, the constant genuinely is the migration.
-  IFS=$'\037' read -r cand rung score verdict author receipt blocked concur digest receipt_type <<<"$raw"
+  # `overflow` exists so field 10 can never absorb an 11th column. ARM 11 caught this exact fold one
+  # column along: with 11 fields and 10 variables, `receipt_type` arrived as "measurement\037EXTRA"
+  # and failed the enum instead of failing the width. Reading N+1 fields makes EXPECTED_COLS the
+  # whole migration for EXACTLY ONE more column — and no further, which is the honest scope of the
+  # claim "bumping one constant is the migration".
+  IFS=$'\037' read -r cand rung score verdict author receipt blocked concur digest receipt_type overflow <<<"$raw"
   case "$cand" in candidate) continue ;; esac
   rows=$((rows+1))
   mark=''
   if [ "$nf" -ne "$EXPECTED_COLS" ]; then
     mark="  <<< SCHEMA: $nf cols, want $EXPECTED_COLS"; schema_bad=$((schema_bad+1))
+  fi
+  if [ "$nf" -eq "$EXPECTED_COLS" ]; then
+    case "$VALID_TYPES" in
+      *" ${receipt_type:-} "*) : ;;
+      *) mark="$mark  <<< TYPE: '${receipt_type:-<empty>}' not in enum"; type_bad=$((type_bad+1)) ;;
+    esac
   fi
   if [ -n "$receipt" ]; then
     with_receipt=$((with_receipt+1))
@@ -144,6 +165,8 @@ printf '\nKILL CONCURRENCE (§3c rule 3, demoted to guidance — checked mechani
 printf '  ruled_out rows: %-4d missing kill_concurrence: %d\n' "$ruled_out" "$concur_missing"
 printf '\nSCHEMA (exact width — a row of the wrong width makes every other counter on it unreliable)\n'
 printf '  expected_cols: %-4d rows with wrong width: %d\n' "$EXPECTED_COLS" "$schema_bad"
+printf '  receipt_type enum: %s\n' "$(printf '%s' "$VALID_TYPES" | sed 's/^ //; s/ $//; s/ /|/g')"
+printf '  rows with illegal receipt_type: %d   (fail-closed; never inferred as non-score)\n' "$type_bad"
 
 # ---------------------------------------------------------------- derived counts
 printf '\nDERIVED FROM %s (not from prose)\n' "$STATUS"
@@ -222,12 +245,21 @@ if [ "$schema_bad" -gt 0 ]; then
   printf 'Every other counter on a malformed row is unreliable. Fix the width before reading anything else.\n'
   fails=$((fails+1))
 fi
+if [ "$type_bad" -gt 0 ]; then
+  printf 'FAIL: %d of %d rows carry a receipt_type outside the enum (%s).\n' "$type_bad" "$rows" \
+    "$(printf '%s' "$VALID_TYPES" | sed 's/^ //; s/ $//; s/ /|/g')"
+  printf 'Per Q19: empty, unknown, or out-of-enum FAILS CLOSED and is never inferred as non-score.\n'
+  fails=$((fails+1))
+fi
 if [ "$fails" -eq 0 ]; then
-  printf 'OK: %d candidates. %d receipt(s) exist; %d integrity-checked, %d existence-only; %d/%d kills concurrence-recorded; %d-col schema clean.\n' \
+  printf 'OK: %d candidates. %d receipt(s) exist; %d integrity-checked, %d existence-only; %d/%d kills concurrence-recorded; %d-col schema and enum clean.\n' \
     "$rows" "$with_receipt" "$pinned" "$unpinned" "$((ruled_out-concur_missing))" "$ruled_out" "$EXPECTED_COLS"
 elif [ "$schema_bad" -gt 0 ]; then
   rc=8
   [ "$fails" -gt 1 ] && printf 'NOTE: %d classes fired; schema takes precedence because the other counters are unreliable.\n' "$fails"
+elif [ "$type_bad" -gt 0 ]; then
+  rc=9
+  [ "$fails" -gt 1 ] && printf 'NOTE: %d classes fired; enum precedence — an illegal type makes the score/non-score read untrustworthy.\n' "$fails"
 elif [ "$fails" -gt 1 ]; then
   if [ "$missing" -gt 0 ] && [ "$concur_missing" -gt 0 ] && [ "$drifted" -eq 0 ]; then rc=6; else rc=7; fi
   printf 'FAIL: %d distinct failure classes fired. Exit %d.\n' "$fails" "$rc"

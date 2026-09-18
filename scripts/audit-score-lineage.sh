@@ -40,11 +40,28 @@ from pathlib import Path
 
 STATUS = "docs/demos/STATUS.tsv"
 # A "score receipt" is an artifact whose job is scoring, distinct from a hold-resolution receipt.
-SCORE_RECEIPT = re.compile(r"(SCORES?_|DEMAND_|HUNT_|RUNG2_|_score|-score)", re.I)
+# THE REGEX IS RETIRED AS A GATE INPUT. Measured against pane 3's opened-receipt typing
+# (receipt-type-proposal-20260918T102335Z.tsv) on all 17 rows:
+#
+#   regex-matched but NOT a score receipt (false GREEN) ... 5
+#   score receipt the regex MISSED        (false RED)  ... 0
+#   correct                                            ... 1
+#
+# It was right once in six. R17 claimed "permissive, never falsely accuses"; pane 2 falsified that as
+# a general statement by construction; measured on the real file the exposure is asymmetric — 5
+# permissive errors, 0 strict ones. BOTH MY CLAIM AND ITS CORRECTION WERE HALF-RIGHT, and only the
+# DECLARED type settles it. Kept below only to describe history, never to judge it.
+LEGACY_REGEX_FOR_HISTORY_ONLY = re.compile(r"(SCORES?_|DEMAND_|HUNT_|RUNG2_|_score|-score)", re.I)
+SCORE_TYPE = "score"
 
 
 def rows(text):
-    """candidate -> (score, verdict, receipt). Split on literal tab; empty fields preserved."""
+    """candidate -> (score, verdict, receipt, receipt_type|None). Empty fields preserved.
+
+    receipt_type is None for PRE-MIGRATION rows (9 columns). Per pane 2's Q19 ruling it is NEVER
+    inferred — not from the filename, not from the regex above. An untyped row is untyped, and the
+    caller must report it as such rather than judging it.
+    """
     out = {}
     for line in text.splitlines():
         if not line or line.startswith("#"):
@@ -52,7 +69,7 @@ def rows(text):
         f = line.split("\t")
         if len(f) < 6 or f[0] == "candidate":
             continue
-        out[f[0]] = (f[2], f[3], f[5])
+        out[f[0]] = (f[2], f[3], f[5], f[9] if len(f) >= 10 else None)
     return out
 
 
@@ -62,45 +79,46 @@ def git(*args):
 
 
 def compare(before, after, msg, sha="(pair)"):
-    """Return (score_events, verdict_changed, trips)."""
+    """Return (score_events, verdict_changed, trips, untyped).
+
+    `untyped` is True when a coincidence exists but the changed rows carry no declared type, i.e. a
+    PRE-MIGRATION commit. Such a commit is reported as UNTYPED, never as clean — the retry condition
+    R17 named has been met going forward, and it cannot be applied backwards.
+    """
     b, a = rows(before), rows(after)
     score_events, verdict_changed = [], []
-    for cand, (score, verdict, receipt) in a.items():
+    for cand, (score, verdict, receipt, rtype) in a.items():
         if cand not in b:
             continue
-        old_score, old_verdict, _ = b[cand]
+        old_score, old_verdict, _, _ = b[cand]
         if score != old_score:
             direction = "?"
             try:
                 direction = "UP" if int(score) > int(old_score) else "down"
             except ValueError:
                 pass
-            score_events.append((cand, old_score, score, direction, receipt))
+            score_events.append((cand, old_score, score, direction, receipt, rtype))
         if verdict != old_verdict:
             verdict_changed.append((cand, old_verdict, verdict))
-    trips = []
+    trips, untyped = [], False
     if score_events and verdict_changed:
-        # THE COMMIT-MESSAGE BRANCH WAS REMOVED, and this is the reason it is worth a paragraph.
-        # The first version read `SCORE_RECEIPT.search(msg) or <row receipts>`. A gate that can be
-        # satisfied by typing "RUNG2_" into your own commit message is not a gate — and the party
-        # writing those messages is the conductor, i.e. the party this gate exists to constrain.
-        # I built myself an escape hatch. Measured on real history: 7622790 passed via BOTH branches,
-        # 1bb9a4b and 1ccddf9 passed on row receipts ALONE, so removing the message branch changes no
-        # historical verdict — it only closes the hole. A gate reads STATE, never prose written by
-        # the gated party.
+        # THE GATE NOW READS THE DECLARED TYPE, which is the R17 retry condition met. Two things the
+        # earlier versions got wrong are both closed here:
+        #   1. the commit-message branch (a gate the gated party could satisfy by typing "RUNG2_" into
+        #      its own message) is gone — a gate reads STATE, never prose written by the constrained
+        #      party;
+        #   2. the filename regex is gone — it was right 1 time in 6 against opened-receipt typing.
         #
-        # KNOWN LIMITATION, not fixed here: SCORE_RECEIPT is still a PATTERN RULE over filenames, and
-        # it matches 17 of the 48 top-level duel-2 documents. That is the same label-defining-regex
-        # defect this lane ruled COD-H2's rung 4 UNASKABLE over, now inside one of its own gates. The
-        # direction is permissive — it under-fires (missed trips), it never falsely accuses — and all
-        # three historical passes cite receipts that are genuinely scoring artifacts
-        # (HUNT_SCORES_COD_ON_MU.md, HUNT_SCORES_MU_ON_COD.md, RUNG2_demo9_MU.md), so the clean
-        # result stands on the merits. RETRY CONDITION: replace the regex with a DECLARED receipt
-        # type in STATUS.tsv, so "is this a score receipt" is stated by the row rather than inferred
-        # from its filename. Until then this gate's `0 trips` carries a weaker claim than it looks.
-        if not any(SCORE_RECEIPT.search(r) for *_, r in score_events):
+        # AND THE HONEST CONSEQUENCE, which retires a number I reported repeatedly: the declared type
+        # exists only from the migration commit forward. Pre-migration coincidences are UNTYPED, and
+        # per Q19 an untyped row is NEVER inferred — so the historical "0 trips" is downgraded to
+        # "0 trips among TYPED coincidences", with the pre-migration ones reported as untyped rather
+        # than clean. The old result rested on the regex, and the regex was wrong 5 times in 6.
+        if all(rt is None for *_, rt in score_events):
+            untyped = True
+        elif not any(rt == SCORE_TYPE for *_, rt in score_events):
             trips.append((sha, score_events, verdict_changed))
-    return score_events, verdict_changed, trips
+    return score_events, verdict_changed, trips, untyped
 
 
 def main():
@@ -111,12 +129,16 @@ def main():
             return 2
         before, after = Path(argv[1]).read_text(), Path(argv[2]).read_text()
         msg = ""
-        se, vc, tr = compare(before, after, msg)
-        print(f"score_changes: {len(se)}  verdict_changes: {len(vc)}  trips: {len(tr)}")
-        for cand, o, n, d, _ in se:
-            print(f"  score {cand}: {o} -> {n} ({d})")
+        se, vc, tr, unt = compare(before, after, msg)
+        print(f"score_changes: {len(se)}  verdict_changes: {len(vc)}  trips: {len(tr)}"
+              f"  untyped: {1 if unt else 0}")
+        for cand, o, n, d, _, rt in se:
+            print(f"  score {cand}: {o} -> {n} ({d})  declared_type={rt or 'UNTYPED'}")
         for sha, se2, vc2 in tr:
-            print(f"  TRIP {sha}: {se2} coincides with {vc2}, no score receipt cited")
+            print(f"  TRIP {sha}: score moved with a verdict change and NO changed row is type 'score'")
+        if unt:
+            print("  UNTYPED: coincidence on pre-migration rows; never inferred, never called clean")
+            return 6
         return 5 if tr else 0
 
     shas = git("log", "--format=%H", "--reverse", "--", STATUS).split()
@@ -125,29 +147,34 @@ def main():
         return 2
     verbose = "--verbose" in argv
     total_score, total_coin, all_trips, ups = 0, 0, [], 0
-    coin_rows, held_exit_rows = 0, 0
+    coin_rows, held_exit_rows, untyped_coin = 0, 0, 0
     prev = ""
     for sha in shas:
         cur = git("show", f"{sha}:{STATUS}")
         msg = git("log", "-1", "--format=%B", sha)
-        se, vc, tr = compare(prev, cur, msg, sha[:7])
+        se, vc, tr, unt = compare(prev, cur, msg, sha[:7])
         total_score += len(se)
         if se and vc:
             total_coin += 1
             coin_rows += len(se)
+            if unt:
+                untyped_coin += 1
             # Pane 3's ORIGINAL (too-narrow) definition, kept so the two denominators stay
             # comparable: it counted only HELD->non-HELD exits, which missed demo-9's
             # RECUSED->CLEARED. Reporting both is how "3" and "6" stop looking like a disagreement.
             if any(o == "HELD" for _, o, _ in vc):
                 held_exit_rows += len(se)
             if verbose:
-                print(f"  COINCIDENCE {sha[:7]}  score_rows={len(se)} verdict_rows={len(vc)}")
-                for c, o, n, d, _ in se:
-                    print(f"      score   {c}: {o} -> {n} ({d})")
+                print(f"  COINCIDENCE {sha[:7]}  score_rows={len(se)} verdict_rows={len(vc)}"
+                      f"  {'UNTYPED (pre-migration)' if unt else 'typed'}")
+                for c, o, n, d, r, rt in se:
+                    print(f"      score   {c}: {o} -> {n} ({d})  declared_type={rt or 'UNTYPED'}")
+                    print(f"              receipt {r}  legacy-regex-would-have-said="
+                          f"{'score' if LEGACY_REGEX_FOR_HISTORY_ONLY.search(r) else 'not-score'}")
                 for c, o, n in vc:
                     flag = "" if o == "HELD" else "   <- escapes HELD-exit definition"
                     print(f"      verdict {c}: {o} -> {n}{flag}")
-        ups += sum(1 for *_, d, _ in se if d == "UP")
+        ups += sum(1 for *_, d, _, _ in se if d == "UP")
         all_trips += tr
         prev = cur
 
@@ -156,17 +183,28 @@ def main():
     print(f"  score changes: {total_score}   upward: {ups}")
     print(f"  coincidences: {total_coin} COMMITS / {coin_rows} ROWS"
           f"   (pane 3's HELD-exit-only definition would see {held_exit_rows} rows)")
-    print(f"  trips (coincidence with no distinct score receipt): {len(all_trips)}")
+    print(f"  coincidences UNTYPED (pre-migration rows): {untyped_coin}"
+          f"   <- never inferred, never counted clean")
+    print(f"  trips among TYPED coincidences: {len(all_trips)}")
     for sha, se, vc in all_trips:
         print(f"  TRIP {sha}:")
-        for cand, o, n, d, _ in se:
-            print(f"      score {cand}: {o} -> {n} ({d})")
+        for cand, o, n, d, _, rt in se:
+            print(f"      score {cand}: {o} -> {n} ({d})  declared_type={rt or 'UNTYPED'}")
         for cand, o, n in vc:
             print(f"      verdict {cand}: {o} -> {n}")
     if all_trips:
-        print("FAIL: a score moved alongside a verdict change with no separate score receipt.")
+        print("FAIL: a score moved with a verdict change and no changed row is declared type 'score'.")
         return 5
-    print("OK: no score change coincided with a verdict change without its own score receipt.")
+    if untyped_coin:
+        # This is the honest downgrade of a number I reported repeatedly. The old "0 trips" was
+        # derived from the filename regex, which opened-receipt typing later showed to be right 1
+        # time in 6. The declared type exists only from the migration commit forward, so the
+        # historical coincidences are UNTYPED — not clean, not tripped, UNJUDGED.
+        print(f"UNTYPED: {untyped_coin} coincidence(s) predate the receipt_type migration.")
+        print("The earlier '0 trips' rested on a filename regex that was right 1 time in 6.")
+        print("Typed coincidences: 0 trips. Untyped ones are not claimed either way.")
+        return 6
+    print("OK: no typed coincidence lacked a declared score receipt.")
     return 0
 
 
