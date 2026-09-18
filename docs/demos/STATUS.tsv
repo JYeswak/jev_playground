@@ -10,7 +10,7 @@ demo-3-claim-check-gate	2	430	HELD	pane1	docs/demos/duel-2/BASELINE_claimcheck_v
 demo-4-foreman-lite	2	820	HELD	pane3	docs/demos/duel-2/SUPERSESSION_MU_argues_COD-H1.md	WITHDRAWN-standalone-retained-as-integration-of-COD-H1
 demo-5-fact-ledger	2	755	CLEARED	pane3	docs/demos/duel-2/RUNG2_JEV_SHAPE_COD.md	rung3-blocked-by-hunt-scores
 demo-6-claim-check-notes	1	330	HELD	pane3	docs/demos/duel-2/HELD_demo6_incumbent_COD.md	incumbent-search-CLOSED-no-owner-held-on-demand-330-not-structure
-demo-7-signals-starter	1	560	HELD	pane1	docs/demos/duel-2/HELD_demo7_user_COD.md	hold-resolved-score-unchanged
+demo-7-signals-starter	1	560	HELD	pane1	docs/demos/duel-2/FALSIFY_demo7_MU.md	REPRICED-32.5-is-89pct-dataset-knowledge-method-gain-3.5pt-transfer-gate-predeclared
 demo-8-credential-screen	1	100	RULED_OUT	pane3	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md	none-structural-safety-leak
 demo-9-review-signal	2	550	CLEARED	pane2	docs/demos/duel-2/RUNG2_demo9_MU.md	conditional-must-beat-ubs-baseline-not-subset
 COD-H1-snapshot-completion	2	885	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H145_MU.md	RUNG3-ELIGIBLE-falsifier-designed-labelfree-half-first

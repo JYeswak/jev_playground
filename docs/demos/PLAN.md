@@ -1499,3 +1499,82 @@ and there is no ground to rule it out. But demand at **330** is the second-weake
 the rung-3 WIP slot is held by COD-H2 at **905**, and a candidate does not advance on the absence of
 a competitor. **Held for demand evidence, not for structure.** Its retry condition is now a demand
 question, and the incumbent census is closed.
+
+---
+
+## §3p demo-7's 32.5-point delta is **89% dataset knowledge**. And pane 3 corrected my correction.
+
+**`docs/demos/duel-2/FALSIFY_demo7_MU.md` (`8757b07`) — designed AND executed the label-free half in
+one unit, $0, read-only.** The most consequential single artifact in this lane so far, because it
+reprices the number the lane has been quoting since the demand duel.
+
+### The decomposition
+
+The source **ships its own no-AI control** — `bench/heuristics.py`, Control 1, `report.md:113-119`:
+**two regex features, no fitting, no labels, 91.6%** [90.4, 92.8], FPR 0.2%. Stacked:
+
+```text
+verdict-only ............ 62.6%          (the problem)
++ dataset knowledge ..... 91.6%  (+29.0)  (regex floor, NO AI)
++ Jev signals + fitting . 95.1%  (+3.5)   (the method)
+```
+
+**CIs disjoint at each step, so the 3.5 is real.** But the advertised 32.5-point "don't trust
+verdicts" delta is **overwhelmingly the gap between knowing the dataset and not knowing it** — not
+between verdicts and signals. **The source says so itself** (`report.md:162-165`): the five questions
+were written after reading the dataset's URL-evasion taxonomy and *"target the way this dataset was
+built."*
+
+> *"A template selling the full 32.5 as transferable method gain is selling 29 points of local
+> knowledge with 3.5 points of method attached."*
+
+### demo-7 is repriced, not killed
+
+**3.5 real points plus the calibration machinery retain value.** The transferable claim is *~3pts +
+ECE/AUROC discipline*, not a 32-point miracle. That is the anti-premature-kill rule working
+correctly: the honest move was repricing, and a kill here would have been the fourth over-kill of
+the session.
+
+**Transfer gate, predeclared** — on any new labelled corpus run three arms (verdict-only, regex
+floor expressing the builder's own knowledge, fitted signals+head) and compute
+`method_gain = acc_fitted − acc_regexfloor`. **`method_gain < 0.05` → HELD: ship the regex and the
+calibration report format, not the template.** Overlapping CIs or either arm under N=200 →
+**UNASKABLE, not a pass.** Pane 3 notes the failing case is *"the common case by the base rate of
+the current evidence."*
+
+**Secondary falsifier worth its own line, and it is $0:** the fitted head may reach 95% by riding
+one dominant signal — committed weights show free-hosting **+9.27**, generic-sender **+12.24**
+(`report.md:107`). If one weight dominates, *"the five signals story is one signal plus
+decoration"* → HELD for scope-narrowing, not a kill. **Check the committed weights before building
+anything.**
+
+### What this does to §3m
+
+**It weakens the calibration thesis's strongest-looking prop and strengthens its honesty.** §3m
+pointed at demo-7's 32.5-point delta as the measured instance of *signals beat verdicts*. That delta
+is now 89% local knowledge. What survives is narrower and better posed: **a regex floor that encodes
+a builder's knowledge beats a verdict by 29 points, and the model's marginal contribution is 3.5
+points plus a calibration report nobody else emits.** The calibration claim is therefore *not*
+"models beat rules" — it is "the last few points plus the trust machinery," which is a much smaller
+and much more falsifiable product claim.
+
+### And pane 3 corrected my §3m-CORRECTION — first time a pane has audited my audit
+
+My correction (`85415e0`) said the phishing-bench figures were *"a third-party upstream repository
+we have never run"* with *"no reproduction in this lane at any stage."* **Partly wrong.** Pane 3
+verified that all three headline numbers **re-derive from a vendored pinned source**
+(`jev-phishing-bench@1d56e8c`, remote `github.com/anisselbd/jev-phishing-bench`): N=2000, seed
+20260916, CIs throughout, 5-fold CV *plus* a stratified A/B split replication with its own seed, and
+`jev-1.13.0` behind `jev-latest` with **0/2000 API errors**. It states plainly: *"the 'unverifiable
+transcription' failure mode does not apply here."*
+
+**Corrected standing of my correction:** the numbers are **not our measurements** — that part holds,
+we never re-ran the benchmark. But they are **not unverified transcription either**; they are
+committed aggregates in a pinned vendored clone, with split discipline visible. I overshot from
+*"not ours"* to *"unverifiable,"* which is the mirror image of the error I was correcting —
+over-trusting became over-distrusting, both without reading the artifact. **The instrument error is
+the same either way: I ruled on a source I had not opened.**
+
+Pane 3 also cites the correction approvingly where it belongs — *"citing upstream tables as
+baselines without re-deriving them repeats the error this lane just self-corrected (85415e0)"* — and
+then does the re-derivation. That is the loop working: my correction became its method.

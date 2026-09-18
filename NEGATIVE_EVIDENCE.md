@@ -507,3 +507,57 @@ Jev-free, mislabeled."*
 confidence-interval and refuse-unverifiable discipline in H3's receipt plan — all of it transfers
 verbatim into T1. **The two retries keep everything valuable; they refuse to keep it in one
 artifact.**
+
+---
+
+## R16 — the 32.5-point "signals beat verdicts" delta is **not** a transferable method gain
+
+**Refuted 2026-09-18** by `docs/demos/duel-2/FALSIFY_demo7_MU.md` (`8757b07`), label-free half
+executed at $0, read-only, against the vendored pinned source `jev-phishing-bench@1d56e8c`.
+
+**The lane quoted "verdict-only 62.6% → 95.1%, a 32.5-point delta" from the demand duel onward — in
+demo-7's contract, in `PLAN.md` §3m, and in my own commit messages. The delta is real and the
+attribution was wrong.**
+
+The source **ships its own no-AI control** (`bench/heuristics.py` Control 1, `report.md:113-119`):
+**two regex features, no fitting, no labels → 91.6%** [90.4, 92.8], FPR 0.2%.
+
+```text
+verdict-only ............ 62.6%
++ dataset knowledge ..... 91.6%  (+29.0)   regex floor, NO AI
++ Jev signals + fitting . 95.1%  (+3.5)    the method
+```
+
+**89% of the advertised delta is the gap between knowing the dataset and not knowing it.** CIs are
+disjoint at each step, so the **3.5 points are real** — and so is the conclusion that the other 29
+are not method. The source states it directly (`report.md:162-165`): the five questions were written
+*after* reading the dataset's URL-evasion taxonomy and *"target the way this dataset was built."*
+
+**What was refuted, precisely:** *"asking signals instead of verdicts buys ~32 points."* **Not**
+*"signals are worthless"* — the marginal method gain is 3.5 points with disjoint CIs, plus
+calibration machinery (ECE 0.027, AUROC 0.988) that no regex emits. **demo-7 was repriced, not
+killed**; a kill here would have been this session's fourth over-kill.
+
+**Retry / decision condition — predeclared, and it is a gate rather than a hope.** On any new
+labelled corpus, run three arms (verdict-only, regex floor encoding the builder's own knowledge,
+fitted signals+head) under identical stratified splits and compute
+`method_gain = acc_fitted − acc_regexfloor`:
+
+- `method_gain < 0.05`, or overlapping 95% CIs, or either arm under N=200 → **HELD / UNASKABLE**:
+  ship the regex and the calibration report format, **not the template.**
+- `method_gain ≥ 0.05` with disjoint CIs → proceed to calibration measurement on held-out data.
+- Builder claims no domain knowledge, so no regex floor is buildable → **UNASKABLE.** Do not grade a
+  template against a missing baseline.
+
+**Pane 3's own note on the base rate:** the failing branch is *"the common case by the base rate of
+the current evidence (one corpus in, dataset-knowledge dominant)."*
+
+**Second, cheaper falsifier still unrun and worth $0:** committed full-fit weights show
+free-hosting **+9.27** and generic-sender **+12.24** (`report.md:107`). If one weight dominates, the
+"five signals" story is *"one signal plus decoration"* → HELD for scope-narrowing. **Check the
+weights before building anything.**
+
+**Methodological note this entry exists to preserve:** the lane repeated a headline number for a
+full session without opening the source's own control arm. The control was committed, documented,
+and one file away. **A number quoted from a report's abstract is not evidence until someone reads
+the report's controls.**
