@@ -1,0 +1,29 @@
+{
+  "receipt_type": "pricing_semantics_ruling",
+  "date": "2026-09-18",
+  "reviewer_lineage": "openai-codex/gpt-5.6-luna",
+  "scope": "demos/routing-backtest/bin/adapt-claude.mjs and src/counterfactual.mjs",
+  "cache_multipliers": {
+    "declared_values": {
+      "cacheReadMultiplier": 0.1,
+      "cacheWriteMultiplier": 1.25
+    },
+    "ruling": "DECLARED_ASSUMPTIONS_NOT_MEASUREMENTS",
+    "honest_part": "The template and receipt label them as billing assumptions and require a source field conceptually.",
+    "defect": "The parser only checks that source/cacheRuleSource fields exist; it accepts the unchanged REQUIRED placeholder and computes a receipt anyway. That lets a semantic guess wear a declaration-shaped input without a real source.",
+    "required_fix": "Fail closed when as_of, source, or cacheRuleSource remains a placeholder/unstated value. Keep the illustrative multipliers only as visible template values, never as provider defaults."
+  },
+  "prompt_quantity": {
+    "current_rule": "promptTokens = input_tokens + cache_read_input_tokens",
+    "ruling": "INCOMPLETE_FOR_CONTEXT_ROUTING",
+    "why": "The cheap-model budget is a context-fit question, not a marginal billing question. Cache-created input is also processed input in the request and must count toward the context budget.",
+    "correct_quantity": "contextInputTokens = input_tokens + cache_read_input_tokens + cache_creation_input_tokens",
+    "separation": "Keep input/cacheRead/cacheWrite itemized for pricing; use contextInputTokens only for context-window/cheap-model eligibility. Do not use recorded marginal input_tokens as the full prompt size.",
+    "no_claim": "This receipt does not implement the quantity change."
+  },
+  "controls_observed": {
+    "routing_tests": "26/26 pass",
+    "mutations": "7/7 caught",
+    "gates": "ALL GREEN"
+  }
+}
