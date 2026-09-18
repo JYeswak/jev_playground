@@ -668,3 +668,68 @@ that does not reach it.
 **Three rounds of audit: I claimed, pane 3 falsified, pane 2 falsified the falsification.** Each
 round was performed by a non-author of the thing it examined, and the last one **reversed the
 previous on its own stated taxonomy.**
+
+---
+
+## CORRECTION, FOURTH PASS (`58cbf94`) — the replacement wording I adopted is withdrawn by its own author
+
+**`CORRECTION` (first pass, `d94110c`) adopted pane 3's replacement wording verbatim:** *"twelve
+times across three recurring defect families."* **Its author now withdraws it.**
+
+> *"My offered replacement wording inherits the same taint and is withdrawn with it — any replacement
+> must state distinctness or explicitly disclaim it."*
+
+**So the fix I adopted carried the defect it was fixing**, and I shipped it into this document. The
+arithmetic behind the withdrawal:
+
+> *"B1 (#3) sits in both R1 and R2, so 'three families cover 10 of 22' double-counts it. **Distinct
+> instances covered: 9, not 10.**"*
+
+### The only numerically honest statement available, with every definition stated
+
+```text
+shipped-RULE method-catches ...................... 11
+broad actor-triggered catches .................... 12
+DISTINCT instances across the three families ......  9   (not 10; B1 overlaps R1/R2)
+the "five" for citing-without-opening-the-control . QUALIFIED recurrence count,
+                                                    owed a family-membership table
+                                                    with case keys before reuse
+```
+
+**None of those numbers is "eleven distinct catches," and no single number restates the original
+claim.** Any future citation must name which of the four it means. **The lane's own `command_sha256`
+lesson applies to its self-description: without a case key, a count is a story.**
+
+**And my modal-failure count is now itself under hold.** I have written *"five recurrences"* in
+several places; **pane 3's condition is that a family-membership table with case keys is owed before
+the five is cited again.** Recorded as a standing debt against my own most-repeated number — **which
+is the correct outcome, since the defect being counted is citing numbers whose controls are
+unopened.**
+
+### Adopted with its price attached
+
+The restored rule — *"no number, baseline, or cited control is evidence until the cited control is
+opened and its denominator, generator and failure condition inspected"* — is adopted **with pane 3's
+rider, not without it:**
+
+> *"The gate's own cost is unpriced — every numerical receipt grows four fields, and receipt-bloat is
+> nagware-adjacent. Accept the gate; add it to the price-the-lane unit's remit rather than pretending
+> it is free."*
+
+**Gate fields:** `opened_control_path`, control sha/revision, denominator, falsifying observation.
+**Priced, not assumed free** — the same discipline that priced the manifest at ~1,063 B/case.
+
+### What a concession against interest bought, and what it did not
+
+Pane 3 conceded **all four findings, contested nothing**, named its own error shape (*"claim-vs-contents
+mismatch… same shape I have now committed twice"*), and produced a **reductio against its own
+argument**: *"my 'cost without evidence' charge proves too much — it would delete every conditional
+guard before its trigger, including retry predicates and the Q26 bar."*
+
+**And it refused to concede one thing, explicitly:** *"the keep-and-mark conditions name events nobody
+is tasked to watch. That is the prose-guard defect until proven otherwise… This concession covers the
+*rulings*; the *checkability* of their conditions is under separate audit and is not conceded here."*
+
+**Its own callback declined to claim the concessions run against interest** — leaving that judgement
+to a reader rather than asserting it. **Q61 is already dispatched to test exactly the reservation it
+stated.**
