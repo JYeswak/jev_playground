@@ -778,6 +778,61 @@ an hour's work and nobody labels anything.
 scores, and four now carry rung-2 as well). **But it does not open yet** — under this amendment
 each rung-2 survivor needs a falsification design first, and **COD-H2 does not have one.** Writing
 that design is cheaper than building COD-H2 and may remove the need to.
+
+---
+
+## §3l §3k PAID FOR ITSELF IN ONE HOUR — MU-H1 RULED_OUT on a measured denominator
+
+**The first rung-4 kill delivered at rung-2 cost, exactly as §3k predicted.**
+
+`docs/demos/duel-2/runs/muh1-marker-census-20260918T034820Z.json` (`6a09e86`), run by pane 2 as a
+non-author of MU-H1:
+
+```
+16 pinned repositories · 283,786 KLOC
+17 TODO/FIXME/HACK/XXX markers TOTAL
+13 repos with ZERO · median 0/repo · mean 1.06/repo
+density 0.0599 markers per KLOC
+skillranker alone accounts for 12 — 70.6% of every marker found
+shortfall: 183 markers against the 200-marker labelled study
+verdict: DENOMINATOR_TOO_THIN
+```
+
+**MU-H1 TODO-judge is RULED_OUT.** Its premise is that TODO markers accumulate and rot; the
+measured reality in our accessible corpus is **17 markers across 283 thousand lines**, with 70% of
+them in one actively-developed repository. A judge with nothing to judge has no product, and
+**calibrated batch judgment over hundreds of markers — its own strongest argument — requires
+hundreds of markers.**
+
+### What this cost, against what the old ordering would have cost
+
+**One hour, no labels, no Jev calls, no money.** Under the pre-§3k ordering, MU-H1 was
+**rung-3 eligible** — the first candidate with a non-author pass at both rungs. It would have got a
+thin proof: a CLI, fixtures, tests with RED arms, a receipt, an install script, clean-clone
+verification. Days. Then the labelled study would have needed 200 markers that **do not exist**,
+and the discovery would have arrived after the build.
+
+**That is demo-1's death avoided rather than repeated.** demo-1 paid rung 3 in full and died at
+rung 4 on 0.047%. MU-H1 died at rung 4 without paying rung 3 at all. The ordering amendment was
+written after demo-1 and its first application killed the very next candidate to reach that point.
+
+### The kill is structural and cited — and its limits are stated
+
+Per §3c, a kill must cite rather than infer, needs a non-author, and ships a retry condition. All
+three hold: pane 2 is MU-H1's non-author, the numbers are measured with a stated command, and:
+
+**Retry condition — and the sample bias is the reason it is narrow, not decorative.** The 16 repos
+are our **vendored corpus**: modern, curated, actively maintained, mostly small. That is close to
+the *least* TODO-dense population in software. Large, long-lived, multi-contributor legacy
+codebases are where marker debt actually accumulates, and **this census says nothing about them.**
+So: **if a corpus of ≥5 large legacy repositories (≥100 KLOC each, ≥5 years old, ≥20 contributors)
+shows density ≥1.0 markers/KLOC — roughly 17× what we measured — MU-H1 re-opens with that corpus as
+its charter.** What has been refuted is *"there is a judgeable marker population in the code we can
+reach"*, not *"no such population exists anywhere"*.
+
+**Honest note on the density figure:** 0.0599/KLOC is a ratio over a corpus whose composition we
+chose. It is the right number for deciding whether *we* can run the study, and the wrong number for
+any claim about software in general.
 ---
 
 ## §4 Phase arc

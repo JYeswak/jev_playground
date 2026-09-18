@@ -399,3 +399,49 @@ publishes unrewritten). The hero is a publish-blocker, not a live defect.
    `visual/HERO-PROMPT.md` is complete, so only generation is missing.
 3. A ruling that a non-identity-locked hero is acceptable — then Grok ships it today, with the
    phash distance recorded and `identity_pass` explicitly **false**.
+
+---
+
+## R14 — MU-H1 TODO-judge: refuted by a marker census, for one hour's work
+
+**Refuted 2026-09-18** by the cheapest half of its own falsification design, run by a non-author.
+
+`docs/demos/duel-2/runs/muh1-marker-census-20260918T034820Z.json` (`6a09e86`):
+
+| | |
+|---|---:|
+| pinned repositories | 16 |
+| total code | **283,786 KLOC** |
+| TODO/FIXME/HACK/XXX markers found | **17** |
+| repositories with zero | 13 |
+| median per repo | **0** |
+| density | **0.0599 markers/KLOC** |
+| concentration | `skillranker` alone = 12, **70.6% of all markers** |
+| shortfall vs the 200-marker labelled study | **183** |
+
+**The idea was good and the world does not supply its input.** MU-H1 proposed judging whether a TODO
+marker is still *true* — a genuinely novel capability, with the strongest rung-2 mechanism argument
+anyone wrote this session (*"calibrated batch judgment with a receipt over hundreds of markers, not
+one clever answer"*). It cleared rung 1 at 820 non-author and rung 2 on structure. **Then the
+premise failed arithmetically: batch judgment over hundreds of markers requires hundreds of
+markers, and our reachable corpus has seventeen.**
+
+**What makes this entry worth writing is the cost.** Under the ordering that existed an hour
+earlier, MU-H1 was the leading rung-3 candidate — first to carry a non-author pass at both rungs.
+It would have received a CLI, fixtures, RED arms, a receipt, an install script and clean-clone
+verification, taking days, and *then* the labelled study would have demanded 200 markers that do
+not exist. **`PLAN.md` §3k — estimate rung 4 before paying for rung 3 — was written after demo-1
+died that exact way, and its first application killed the very next candidate to reach that point,
+for an hour and zero dollars.**
+
+**Retry condition, deliberately narrow because the sample is biased.** The 16 repositories are our
+**vendored corpus**: modern, curated, actively maintained, mostly small — close to the *least*
+marker-dense population in software. Legacy code is where marker debt accrues, and this census says
+nothing about it. **If ≥5 large legacy repositories (≥100 KLOC each, ≥5 years old, ≥20 contributors)
+show density ≥1.0 markers/KLOC — roughly 17× what we measured — MU-H1 re-opens with that corpus as
+its charter.**
+
+**What was refuted, precisely:** *"there is a judgeable marker population in the code we can
+reach."* **Not** *"no such population exists anywhere."* The density figure is a ratio over a corpus
+we selected; it is the right number for deciding whether **we** can run the study and the wrong
+number for any claim about software at large.

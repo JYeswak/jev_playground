@@ -18,6 +18,6 @@ COD-H2-preaction-abstention	2	905	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT
 COD-H3-price-drift-auditor	2	890	HELD	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	rung2-held-structural-question-open
 COD-H4-toolresult-replay	2	900	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	falsify-before-rung3-corpus-absent
 COD-H5-compaction-integrity	2	895	CLEARED	pane2	docs/demos/duel-2/RUNG2_COD_HUNT_MU.md	falsify-before-rung3
-MU-H1-todo-judge	2	820	CLEARED	pane3	docs/demos/duel-2/FALSIFY_MUH1_COD.md	falsification-designed-run-enumeration-half
+MU-H1-todo-judge	4	820	RULED_OUT	pane3	docs/demos/duel-2/runs/muh1-marker-census-20260918T034820Z.json	denominator-too-thin-17-markers-283KLOC-retry-on-legacy-corpus
 MU-H2-outbound-redaction	1	430	HELD	pane3	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md	baseline-vs-docverity-drift-neither-judges
 MU-H3-runtime-redaction	1	650	HELD	pane3	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md	voice-evidence-open-adjacent-openai-filters
