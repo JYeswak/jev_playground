@@ -146,7 +146,7 @@ never named (`claim-check v0.6.0`) owned the niche anyway. **Search the problem,
 Output `docs/demos/duel-2/HELD_demo6_incumbent_COD.md`, ≥5,000 chars.
 
 ## UNIT Q6 — MU-H3's voiced-pain search, or an honest UNASKABLE
-**ELIGIBLE: pane 2 only** (pane 3 authored MU-H3). **CLAIM:** unclaimed
+**ELIGIBLE: pane 2 only** (pane 3 authored MU-H3). **CLAIM:** WindyJaguar 2026-09-18T04:05:02Z
 
 MU-H3 runtime redaction is HELD at 650: real pain, but the voiced evidence is open and adjacent
 OpenAI filters exist. Find **one cited complaint** from a named practitioner. **If an honest search
