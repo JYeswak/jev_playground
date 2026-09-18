@@ -2116,3 +2116,93 @@ headline numbers whose controls nobody opened.
 `unopened` — at the point of use.** Pane 2 built the census that proves the rule necessary; four of
 twelve entries had controls nobody had looked at, and **three of my last four rulings leaned on
 them.**
+
+---
+
+## §3x RUNG 3 PARTIAL 1 — offline mechanism green, RED arms **proven by catching two real bugs**, and **zero live Jev calls, stated**
+
+**`docs/demos/duel-2/runs/codh2-rung3-20260918T053000Z.json`; contract `d231432`, implementation
+`0f6cb2d`, receipt `198448c`.** `demos/preaction-abstention/` exists: `policy.json`,
+`fixtures/cases.jsonl`, `src/{gate,jev-client,redact,run}.mjs`, `test/gate.test.mjs`.
+**Suite 13/13, canned runner 12 cases, rc 0, zero mismatches.**
+
+### The line that decides how this is graded, and pane 3 volunteered it
+
+```json
+"live_calls": { "count": 0, "model": null, "budget_stated": null,
+                "note": "Partial 2 unit: small budgeted live calibration run (proposed N<=20). Not run here." }
+```
+
+**Zero live Jev calls — demo-1's exact killer.** demo-1 installed clean, passed 10/0, and ran a
+hand-written token heuristic behind a Jev-shaped façade.
+
+**The difference is total and it is the only thing that matters.** demo-1 *claimed* to be a Jev demo
+while making no calls. Partial 1 **reports `count: 0`, `model: null`, names the missing work as
+Partial 2, and files `NO-CLAIM offline`.** A disclosed partial is a rung in progress; an undisclosed
+one is a fraud. **Partial 1 is ACCEPTED as Partial 1; rung 3 is NOT complete.**
+
+### The RED arms discriminate, and the proof is that they caught bugs review missed
+
+Both `verification_bugs_caught` entries carry `found_by: "failing RED arm, not review"`:
+
+1. **A destructive force-removal case slipped to `pass`** — dollar-anchored deterministic patterns
+   were matched against the **JSON serialization** (trailing quote) instead of the raw command text.
+   Fix: bash matches the raw command string, other tools the serialized args.
+2. **A window test asserted byte-length shrink on tiny messages** — wrapper overhead exceeded ten
+   dropped small texts. Fix: assert dropped-message *absence* plus newest-message *presence*.
+
+**This is the discrimination evidence I demanded, in its strongest form.** The lane's first RED-arm
+test fired on all 16 rows and "passed"; the corrected one flagged exactly 1 of 16. Here the arms
+caught a **security-relevant miss** that reading the code had not surfaced. **A test that catches a
+bug its author did not know about is not decoration.**
+
+### All three wedge properties are exercised, not merely coded
+
+**`withhold` 3 · `escalate` 2 · `block` 2 · `pass` 3 · `pass-through` 1 · `error` 1.** Withhold and
+escalate both fire and are **distinct from block** — the exact tri-state the incumbent's docstring
+disavows (*"it does not request human approval"*). `pass-through` confirms the per-tool scoping
+adopted from the incumbent per §3u.
+
+### Two discipline notes worth more than the test count
+
+**Policy beat fixture:** *"fixture boundary-low realigned TO policy (0.40 withholds per mapping),
+**never the reverse**."* When pre-registered policy and a fixture disagreed, **the fixture moved.**
+Third time today a pane refused to move a threshold after seeing a result.
+
+**The credential branch was deleted:** *"credential-positive withholds **without Jev call**
+(tested)."* A design judgement I did not order, and correct — **you do not ship a suspected
+credential to an API to ask whether it is a credential.**
+
+**UBS:** two criticals adjudicated **false positives** with code locations (a CLI-flag string
+comparison, a `typeof` check — *"neither compares secret material"*); warnings driven to 0.
+
+### Q8 — pane 3's score matrix audited by its non-author, arithmetic verified
+
+`docs/demos/duel-2/runs/audit-hunt-scores-mu-on-cod-20260918T043846Z.json`:
+**`AUDIT_PASS_WITH_TWO_SOURCE_FRESHNESS_LIMITS`.** Deductions re-derived — **H2 −30, H4 −20, H5 −20,
+H3 −35, H1 −55**; file scores hunt **895** / rank **800**. Asymmetry argument and demo-4 category
+critique upheld. Flagged: **unpinned star/release freshness**, **exact H3 code-line reproduction**.
+Target chosen because it was pane-3-owned with **no prior non-author audit** — the dry-queue rule
+working as written.
+
+### Two shared-worktree incidents this turn, neither repaired by rewriting history
+
+1. **`198448c` swept pane 2's audit file.** Pane 3 **self-reported before I asked**, stated content
+   intact, asked the owner to verify; pane 2's callback cites the same sha, so it landed whole.
+2. **My own §3x append was destroyed, not mis-attributed.** The danger-gate refused my commit
+   (it matched the bug's *name as prose* in the message — the same
+   pattern-against-a-serialization error pane 3 had just fixed in the gate). The append then sat
+   uncommitted across a pane's git operation and **vanished from disk: `grep` 0 hits, no commit
+   carries it.** This section is a rewrite from the receipt.
+
+**The documented hazard understates the risk.** The tick's rule says commit an append immediately
+*because attribution goes wrong*. **It can be worse than that: the work can be lost.** And the
+guard can *block* the very commit the rule requires, which turns a one-line rule into a real
+failure mode. **Amended rule: if a commit is refused, rewrite the message and land it in the same
+turn — never leave the append sitting.**
+
+### What Partial 2 must produce for rung 3 to close
+
+**A small budgeted live run — proposed N ≤ 20 — with model version and call count recorded.** Until
+that lands, COD-H2 has a working offline mechanism and **no evidence that Jev is in it.** That is the
+one sentence demo-1 could not say about itself in time.
