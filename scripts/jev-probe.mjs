@@ -12,6 +12,27 @@
 //   skillranker/src/jev/client.rs:148          (Authorization header, Accept: application/json)
 //   skillranker/src/jev/codec.rs:67-149        (Request{model,state,questions}, Question::Noul|Choice)
 //   skillranker/src/config.rs:25               (model "jev-latest")
+// OFFLINE LANE FIRST, per AGENTS.md §8. --replay decodes a recorded response and makes NO network
+// call, so the probe's decode path is exercised with no key and the live lane is an explicit choice
+// rather than the only mode. The fixture is a real captured response with no credential in it.
+const replay = process.argv.includes('--replay');
+if (replay) {
+  const { readFileSync } = await import('node:fs');
+  const path = 'docs/demos/jev-probe/probe-response-20260918.json';
+  let decoded;
+  try {
+    decoded = JSON.parse(readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'));
+  } catch (error) {
+    // A missing or corrupt fixture must SAY SO. Silently falling through to the live lane would
+    // turn an offline run into a paid call, which is the opposite of what --replay promises.
+    console.error(`REPLAY FAILED: ${path} unreadable or not JSON — ${error.message}`);
+    process.exit(2);
+  }
+  console.log(`REPLAY ${path} — no network call, live lane NOT_RUN`);
+  console.log(JSON.stringify(decoded, null, 2));
+  process.exit(0);
+}
+
 const key = process.env.TYPESAFE_API_KEY ?? process.env.TYPE_SAFE_AI_KEY;
 if (!key) {
   console.error('ERROR no key in env. Run under: infisical run --projectId=<id> --env=prod -- node scripts/jev-probe.mjs');
@@ -75,7 +96,7 @@ const ms = Date.now() - started;
 console.log(`HTTP ${res.status} in ${ms} ms`);
 // Never echo request headers. Response body only.
 try {
-  console.log(JSON.stringify(JSON.parse(text), null, 2));
+  console.log(JSON.stringify(JSON.parse(text), null, 2).slice(0, 4000));
 } catch {
   console.log(text.slice(0, 2000));
 }
