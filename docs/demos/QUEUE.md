@@ -238,3 +238,53 @@ Output `docs/demos/duel-2/runs/audit-<target>-<ISO>.json`.
 Fire a **QUEUE DRY** callback naming every unit you considered and why each was ineligible or done.
 Then, and only then, fall through to the `PLAN.md` §3c dry-queue default. **Exhausting this file has
 never happened; if it does, that is a real finding about the lane and not a reason to stop.**
+
+## UNIT Q14 — **does the shipped incumbent ABSTAIN, or only allow/deny?** (COD-H2's life)
+**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2). **CLAIM:** unclaimed
+
+**External market evidence landed and COD-H2 — the lane's only rung-3 candidate — may already be
+shipped by two well-resourced parties.** Vercel runs a safety reviewer over *every command* in
+`fx` auto mode (Jev **up to 18x faster at p95 and more accurate** than `gpt-5.6-luna`, per Guillermo
+Rauch and Pranit's benchmark), and LangChain shipped the open version the next day:
+
+```python
+guardrail = AutoModeMiddleware(tools=["bash"])
+agent = create_agent("openai:gpt-5.6-luna", middleware=[guardrail])
+```
+
+**§3i does not rescue this.** §3i protects candidates whose incumbents are *deterministic*. **These
+incumbents use Jev** — same mechanism, shipped. And the overlap is on COD-H2's exact measured
+surface: your own receipt puts the gate-relevant population at **907 destructive-bash turns**, and
+the incumbent's API is literally `tools=["bash"]`.
+
+**The one question that decides it:**
+
+> **Does `AutoModeMiddleware` abstain, or only allow/deny?** COD-H2's distinctive claim is
+> *abstention* — declining with a calibrated confidence rather than emitting a verdict. **If the
+> incumbent thresholds on confidence and withholds → COD-H2 is OWNED, rule it out** with a retry
+> condition. **If it returns binary allow/deny with no withhold path → abstention-plus-calibration
+> is a real wedge** and COD-H2 survives, narrowed to exactly that wedge and nothing more.
+
+Read LangChain's published source and the `langchain-typesafe` package. Report the actual control
+flow, quoted. Also check the vendor's own guidance, which the survey reports as *"treat anything
+under 0.3 to 0.5 as a signal to ask a human rather than act"* — if the incumbent implements that,
+say so plainly.
+
+**This is cheaper than the v2.2 round you are running and I should have asked it first.** If Q14
+rules COD-H2 out, v2.2's result stops mattering — finish or abandon it as you judge, and say which.
+
+Output `docs/demos/duel-2/RUNG2_COD-H2_owned_MU.md`, ≥4,000 chars.
+
+## UNIT Q15 — COD-H5: is shipped compaction doing **integrity**, or only score-and-drop?
+**ELIGIBLE: pane 3 only** (pane 2 authored COD-H5). **CLAIM:** unclaimed
+
+Same shape, same urgency. `github.com/tamaratran/fast-jev-compaction` is shipped and running as a
+Claude plugin; Alex Volkov reports **1M tokens → 86K in one second**, and Diogo Almeida's own reply
+was *"free coding agents from designing around the KV cache."*
+
+COD-H5 claims **compaction integrity** — detecting what compaction destroyed. The shipped tool
+scores tool calls and drops the irrelevant ones. **Those are different products if and only if
+integrity-detection is a thing the shipped tool does not do.** Determine which, from its source.
+
+`CLEARED` / `HELD` / `RULED_OUT` with a retry condition. Output
+`docs/demos/duel-2/RUNG2_COD-H5_owned_MU.md`, ≥4,000 chars.

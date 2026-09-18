@@ -1791,3 +1791,117 @@ the first option.** Blocking the lane's only rung-3 candidate indefinitely on a 
 architectural property of the observation corpus, rather than anything about the candidate, would be
 a kill by paperwork — and the anti-kill rule (§3c) applies to a candidate strangled by its own
 instrument exactly as it applies to one rejected on taste.
+
+---
+
+## §3t EXTERNAL MARKET EVIDENCE LANDS — and it inverts the lane's leader
+
+**Joshua supplied a community survey of what people are actually shipping on Jev: 11 `/last30days`
+sweeps, 716 items, 39 candidate workflows with a named source and a real number, 9 kept.** This is
+the first **external, un-seeded** demand signal the lane has ever had — not a pane's output under my
+instruction, not a vendored repo's abstract. It must be adjudicated against the live backlog
+immediately, and it does not favour us.
+
+### 1. COD-H2 — the lane's only rung-3 candidate — is **already shipped, twice, by well-resourced parties**
+
+**COD-H2 is pre-action abstention: judging whether an action should execute.** The survey's item 3
+is titled *"The safety reviewer, unbundled from the harness"*:
+
+- **Vercel, in production.** Guillermo Rauch: *"Default mode in `fx` is auto, with a safety reviewer
+  analyzing every command. That reviewer runs on GPT Luna today. **Jev is up to 18x faster (p95)
+  and more accurate.** It's coming to Vercel AI Gateway and likely new default."* Benchmarked by
+  Pranit at **~5–18x faster and more accurate** than `gpt-5.6-luna`.
+- **LangChain shipped the open version the next day**, as two lines:
+
+```python
+guardrail = AutoModeMiddleware(tools=["bash"])
+agent = create_agent("openai:gpt-5.6-luna", middleware=[guardrail])
+```
+
+**§3i does not rescue this.** §3i says an incumbent that does *not* use a judgment model is a
+baseline rather than an owner — that is what un-killed MU-H2 and re-opened demo-3. **These
+incumbents use Jev.** They are not deterministic tools to be obliterated; they are the same
+mechanism, shipped, by Vercel and LangChain.
+
+**And the overlap is on COD-H2's exact measured surface.** `codh2-sharpened-20260918T041200Z.json`
+puts the gate-relevant population at **907 destructive-bash turns** (share 0.0623). The incumbent's
+API is literally `AutoModeMiddleware(tools=["bash"])`.
+
+**I am not killing it here, and the reason is my own record.** *I kill on the first plausible
+sufficient reason and stop looking* — three over-kills this session, all reversed. So COD-H2 moves
+**CLEARED → HELD** on one crisp, cheap, non-author question:
+
+> **Does `AutoModeMiddleware` abstain, or only allow/deny?** COD-H2's distinctive claim is
+> *abstention* — declining, with a calibrated confidence, rather than emitting a verdict. If the
+> incumbent thresholds on confidence and withholds, **COD-H2 is owned and should be ruled out.** If
+> it returns a binary allow/deny with no withhold path, abstention-plus-calibration is a real wedge
+> and COD-H2 survives, narrowed to that wedge.
+
+The question is answerable by reading LangChain's published source. **It is cheaper than the v2.2
+classifier round I currently have pane 3 running**, and it should have been asked before that round
+was ordered.
+
+**Ordering lesson, and it is §3k's own principle applied one level up:** I spent two units of the
+lane's scarcest capacity unblocking a *build* for a product two well-resourced parties already ship.
+§3k says estimate rung 4 before paying for rung 3. **The missing rule is: re-check the incumbent
+field before paying for either** — an incumbent search is not a one-time rung-2 event when the
+ecosystem is 3 days old and moving daily.
+
+### 2. COD-H5 compaction-integrity is **also shipped**
+
+Survey item 2, *"Instant compaction"*: Tamara Tran shipped `fast-jev-compaction`; Alex Volkov ran it
+as a Claude plugin and reported **1M tokens → 86K in one second**; Diogo Almeida's reply — *"YES!
+free coding agents from designing around the KV cache"*. Repo: `github.com/tamaratran/fast-jev-compaction`.
+
+**COD-H5 moves CLEARED → HELD** on the same shape of question: does the shipped plugin do
+*integrity* (detecting what compaction destroyed) or only *scoring-and-dropping*? Those are
+different products and the distinction is COD-H5's whole claim.
+
+### 3. demo-1's death is confirmed externally
+
+Survey item 4 is **model routing as LangChain `ModelRouterMiddleware`** — eleven lines. demo-1 died
+at rung 4 on 0.047% savings and was found to make zero Jev calls. **The external record shows the
+surface owned by a maintained middleware.** No change in verdict; the retry condition is now
+demonstrably unsatisfiable, which is worth recording as a closed door rather than an open one.
+
+### 4. §3m gets its **first un-seeded external support** — and a ceiling
+
+§3q recorded that nothing had found a practitioner asking for a calibration report. **The survey's
+own synthesis, written by someone who has never read this lane's plan:**
+
+> *"**The confidence score is the product.** Without a calibrated number to threshold on, this is a
+> fast classifier. With one, it is a decision layer that knows when to stop."*
+
+and, from the vendor docs as the survey reports them:
+
+> *"**Threshold on confidence.** The docs tell you to treat anything under 0.3 to 0.5 as a signal to
+> ask a human rather than act. This is the difference between a classifier, which hands you a
+> label, and a decision system, which hands you a label plus permission to use it."*
+
+**That is the §3m property, named independently, by an external observer, in a document I did not
+frame.** It is the support §3q said was missing. **It does not resurrect the demo-7 prop (§3p) or
+un-seed pane 2's Q5 (§3o)** — those remain repriced and reclassified. But the thesis now has one
+genuine external corroboration alongside its two seeded designs.
+
+**And the same survey supplies the ceiling, which I am recording in the same breath so the good news
+does not travel alone:**
+
+- **TypeSafe's own four-workflow average is 67.8% agreement** with reference answers.
+- Mike Taylor's 12-passage defect test: Jev **6 of 7** defects, Fable 5.1 **7 of 7** — at ~25x
+  faster and ~580x cheaper. His verdict: *"useful as an early warning system, because the
+  alternative is not checking at all."*
+- Hacker News, 1,863 points, on *"can't hallucinate"*: *"Sure, it can't emit an invalid type, but it
+  can still emit a completely wrong valid value."* Diogo called the classification-model framing
+  *"very accurate!"*
+
+**Any candidate in this lane that needs better than ~68% agreement, or needs to beat a careful
+deterministic checker on recall rather than on cost and latency, is mispriced.** demo-7's repricing
+(§3p, §3r) now looks like the general case rather than one benchmark's quirk.
+
+### 5. What the survey says about the shape that wins — which is what we keep re-deriving
+
+> *"**Feed it candidates.** The winners never ask Jev to generate an option. They build the option
+> set in code, from the DOM, the retriever, the tool trace, the launcher index, and let it pick."*
+
+Four of our five rung-2 survivors are candidate-picking designs. That is the one place the lane's
+instincts match the external record without my having seeded it.

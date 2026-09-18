@@ -14,10 +14,10 @@ demo-7-signals-starter	1	560	HELD	pane1	docs/demos/duel-2/runs/demo7-weights-202
 demo-8-credential-screen	1	100	RULED_OUT	pane3	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md	none-structural-safety-leak
 demo-9-review-signal	2	550	CLEARED	pane2	docs/demos/duel-2/RUNG2_demo9_MU.md	conditional-must-beat-ubs-baseline-not-subset
 COD-H1-snapshot-completion	2	885	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H145_MU.md	RUNG3-ELIGIBLE-falsifier-designed-labelfree-half-first
-COD-H2-preaction-abstention	3	905	CLEARED	pane2	docs/demos/duel-2/runs/codh2-sharpened-20260918T041200Z.json	RUNG3-WIP-build-BLOCKED-ambiguous-0.3731-vs-0.10-architectural-v2.2-authorized-fallback-scope-to-907-destructive-turns
+COD-H2-preaction-abstention	3	905	HELD	pane2	docs/demos/PLAN.md	OWNED-RISK-vercel-fx-ships-it-langchain-AutoModeMiddleware-wedge-q-does-incumbent-ABSTAIN-or-only-allow-deny
 COD-H3-price-drift-auditor	2	890	RULED_OUT	pane2	docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md	no-jev-necessary-stage-4of5-deterministic-retry-T1-tooling-T2-router-wedge
 COD-H4-toolresult-replay	2	900	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H145_MU.md	RUNG3-ELIGIBLE-falsifier-designed-labelfree-half-first
-COD-H5-compaction-integrity	2	895	CLEARED	pane2	docs/demos/duel-2/FALSIFY_COD-H145_MU.md	RUNG3-ELIGIBLE-falsifier-designed-labelfree-half-first
+COD-H5-compaction-integrity	2	895	HELD	pane2	docs/demos/PLAN.md	OWNED-RISK-fast-jev-compaction-shipped-1M-to-86K-in-1s-wedge-q-integrity-vs-score-and-drop
 MU-H1-todo-judge	4	820	RULED_OUT	pane3	docs/demos/duel-2/runs/muh1-marker-census-20260918T034820Z.json	denominator-too-thin-17-markers-283KLOC-retry-on-legacy-corpus
 MU-H2-outbound-redaction	2	430	CLEARED	pane3	docs/demos/duel-2/BASELINE_MU-H2_vs_incumbents_COD.md	conditional-must-beat-6-threshold-gate-ECE0.10-Brier0.15-20pp-recall-score-unchanged
 MU-H3-runtime-redaction	2	650	HELD	pane3	docs/demos/duel-2/HELD_MUH3_voice_COD.md	voice-RECOVERED-paroque28-issue39882-but-complaint-is-coverage-timing-NOT-calibration-rung2-q-unknown-credential-vs-entropy
