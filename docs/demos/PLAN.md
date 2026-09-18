@@ -673,6 +673,55 @@ the candidates: **I kill on the first plausible sufficient reason and stop looki
 anti-kill rules in §3c exist because of this, and they caught the first two only after the fact.
 The structural fix is the one Joshua keeps supplying: **make the kill condition narrower than
 "something exists that overlaps".**
+
+---
+
+## §3j SUPERSESSION ADJUDICATED — both authors argued against themselves and disagreed
+
+Both sides filed, each assigned the argument against its own interest:
+
+| Filed by | Assigned side | Verdict reached |
+|---|---|---|
+| pane 2 — **author of COD-H1** (`668a783`, 13,943 ch) | demo-4 survives | **demo-4 SURVIVES** — different questions, explicit non-subsumption cases, composition seam |
+| pane 3 — **author of demo-4** (`6ae3bf1`, 5,996 ch) | COD-H1 supersedes | **COD-H1 SUPERSEDES.** *"I withdraw demo-4's standalone slot."* |
+
+**They reached opposite conclusions, and that is the informative result.** Both paid a cost: pane 2
+declined to claim its own candidate subsumes a rival; pane 3 withdrew its own candidate's slot.
+
+### Ruling, and it rests on the arguments rather than on my similarity judgment
+
+**The asymmetry decides it.** Defending a rival is against interest but cheap. **Withdrawing your
+own candidate is the most expensive thing an author can do**, and pane 3 did it with a retry
+condition attached rather than as a gesture. Its reasoning is specific: broader buyer pool,
+strictly more general question, finer invalidation primitive, stronger voice record, larger unbuilt
+remainder after incumbents.
+
+**And the two sides disagree less than their verdicts suggest.** Both independently identified the
+same **composition seam**:
+- pane 2: demo-4 survives *as a distinct question* — "does this diff satisfy this stated
+  acceptance" versus "was this claim true at the revision it was made at".
+- pane 3: demo-4's best future is *"a Beads-lane integration **consuming** H1-style evidence —
+  acceptance lines as claims, close-time verdict from snapshot-bound checks — a downstream consumer
+  of the superseding demo, which is a role, not a rival."*
+
+Those are compatible. The disagreement is about the **backlog slot**, not about whether demo-4's
+question exists.
+
+**RULING:**
+1. **COD-H1 takes the backlog slot.** demo-4 does not compete for it.
+2. **demo-4 is WITHDRAWN as a standalone candidate and RETAINED as a downstream integration** of
+   whatever wins. Not RULED_OUT — its author withdrew a slot, which is not the same as the idea
+   being wrong, and §3c forbids converting a withdrawal into a kill.
+3. **Retry condition, quoted from its author:** *"if H1's implementation cannot serve a close-gate
+   moment (latency, input shape, or exit-code contract mismatch on real bead traffic), demo-4's
+   workflow-specific form re-opens with that failure as its charter."*
+4. `demo-4-foreman-lite`'s contract file **stands as written** — it is the specification of the
+   integration, not dead text.
+
+**Note what this cost and what it bought.** demo-4 was the **highest-scoring original** at 820 and
+had cleared rungs 1 and 2. It leaves the standalone backlog not because it failed a rung but
+because a better-positioned candidate arrived — which is the gauntlet working as designed, and it
+is the first time a *passing* candidate has been withdrawn rather than killed.
 ---
 
 ## §4 Phase arc

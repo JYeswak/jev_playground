@@ -7,7 +7,7 @@ candidate	rung	score	verdict	author	receipt	blocked_on
 demo-1-route-backtest	4	520	RULED_OUT	pane2	demos/routing-backtest/runs/backtest-real-excerpt.json	none-died-rung4-0.047pct
 demo-2-admission-screen	2	700	CLEARED	pane3	docs/demos/duel-2/RUNG2_JEV_SHAPE_COD.md	rung3-blocked-by-hunt-scores
 demo-3-claim-check-gate	1	430	HELD	pane1	docs/demos/duel-2/HELD_demo3_incumbent_COD.md	baseline-vs-claim-check-v0.6.0-headtohead
-demo-4-foreman-lite	2	820	CLEARED	pane3	docs/demos/duel-2/RUNG2_JEV_SHAPE_COD.md	supersession-vs-COD-H1
+demo-4-foreman-lite	2	820	HELD	pane3	docs/demos/duel-2/SUPERSESSION_MU_argues_COD-H1.md	WITHDRAWN-standalone-retained-as-integration-of-COD-H1
 demo-5-fact-ledger	2	755	CLEARED	pane3	docs/demos/duel-2/RUNG2_JEV_SHAPE_COD.md	rung3-blocked-by-hunt-scores
 demo-6-claim-check-notes	1	330	HELD	pane3	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md	own-incumbent-search-notes-surface
 demo-7-signals-starter	1	560	HELD	pane1	docs/demos/duel-2/HELD_demo7_user_COD.md	hold-resolved-score-unchanged
@@ -18,6 +18,6 @@ COD-H2-preaction-abstention	1	905	CLEARED	pane2	docs/demos/duel-2/HUNT_SCORES_MU
 COD-H3-price-drift-auditor	1	890	CLEARED	pane2	docs/demos/duel-2/HUNT_SCORES_MU_ON_COD.md	rung2-jev-shape-needed
 COD-H4-toolresult-replay	1	900	CLEARED	pane2	docs/demos/duel-2/HUNT_SCORES_MU_ON_COD.md	rung2-corpus-does-not-exist
 COD-H5-compaction-integrity	1	895	CLEARED	pane2	docs/demos/duel-2/HUNT_SCORES_MU_ON_COD.md	rung2-demo5-overlap-managed
-MU-H1-todo-judge	1	820	CLEARED	pane3	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md	rung2-jev-shape-non-author
+MU-H1-todo-judge	2	820	CLEARED	pane3	docs/demos/duel-2/RUNG2_MUH1_COD.md	rung3-thin-proof-eligible
 MU-H2-outbound-redaction	1	430	HELD	pane3	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md	baseline-vs-docverity-drift-neither-judges
 MU-H3-runtime-redaction	1	650	HELD	pane3	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md	voice-evidence-open-adjacent-openai-filters
