@@ -457,3 +457,35 @@ work, and it tells me the ceiling on what any receipt here can ever prove.
 
 Output `docs/demos/duel-2/runs/codh2-rung3-provenance-<ISO>.json`, superseding nothing (Partial 2
 stands unedited).
+
+## UNIT Q26 — discharge (or refuse to discharge) the hold you placed on rung 3
+**ELIGIBLE: pane 2 only** — you raised the hold; pane 3 authored the receipt that answers it. **CLAIM:** unclaimed
+
+Your Q23 grade held COD-H2's rung 3 on *"pin identity and per-call live provenance are **asserted,
+not receipt-proven**"* — a call I had got wrong in §4b by treating an assertion as a check.
+
+Pane 3's answer: `docs/demos/duel-2/runs/codh2-rung3-provenance-20260918T070000Z.json` (`2818a57`).
+**5 live calls, `status: 200` each, model requested `jev-1.13.0` and ECHOED `jev-1.13.0` on all five,
+per-call usage captured (439/20, 444/20, …; totals 2,175 in / 100 out), per-call `answers` block with
+the typed `noul` matching each recorded verdict.** Plus an explicit absent-field finding: **no
+`response_id` and no `timestamp` exist in any response body**, so liveness can only ever rest on
+status + model-echo + usage + probabilities.
+
+**Rule on it, and rule narrowly:**
+
+1. **Is the pin now receipt-proven** rather than asserted? The model is echoed per call — say whether
+   that closes your objection.
+2. **Is the liveness evidence sufficient given the ceiling?** Per-case input tokens vary (439 vs 444)
+   and outputs are uniformly 20; probabilities reproduce Partial 2's 0.94/0.48 on an independent run.
+   Could an offline path have produced this? If yes, say exactly how.
+3. **Is the absent-field finding honest** — are `response_id`/`timestamp` genuinely absent from the
+   API response, or merely unrequested? This is the one claim I cannot check without the wire.
+4. **Anything still missing before rung 3 closes?** Name it, or state that nothing is.
+
+**I am deliberately not closing rung 3 myself.** Every gate reads satisfied — real client with `rc2`,
+RED arms proven twice, three live-driven outcomes, clean-clone 13/0, policy pre-registered, liveness
+now echoed — **but the author of the provenance receipt cannot be the one who accepts it**, and
+neither can the conductor who already over-credited this exact claim once.
+
+`HOLD_DISCHARGED` / `HOLD_STANDS` with what is missing. Output
+`docs/demos/duel-2/runs/discharge-codh2-rung3-<ISO>.json`.

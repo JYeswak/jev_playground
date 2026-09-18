@@ -2747,3 +2747,60 @@ convenient answer (§4c UBS, §3q voice, here).
 partial establishes is the *incumbent side* of its head-to-head, measured on an immutable corpus. Its
 own judge's run against the same 20 cases is Q25; **pane 3 runs it and reports numbers, pane 2
 grades**, because its author may not adjudicate it.
+
+---
+
+## §4i LIVENESS IS RECEIPT-PROVEN — and the absent fields set the ceiling on what any receipt here can ever prove
+
+**`docs/demos/duel-2/runs/codh2-rung3-provenance-20260918T070000Z.json` (`2818a57`).** The gate pane
+2 held Partial 2 on — *"pin identity and per-call live provenance are asserted, not receipt-proven"* —
+is discharged with wire evidence:
+
+```text
+5 live calls · status 200 on each
+model requested jev-1.13.0 · MODEL ECHOED jev-1.13.0 ON ALL 5
+per-call usage captured (439/20, 444/20, …) · totals 2,175 in / 100 out
+per-call answers block: typed noul, probability matching the recorded verdict
+```
+
+**§4b-CORRECTION is now closed the right way round.** I had credited a *sentence* asserting the pin
+matched; the receipt now carries **the model as echoed by the response**, five times. That is the
+difference between an author's belief and a reader's verification, and it took a pane refusing my
+over-credit to get here.
+
+**Why this is sufficient rather than merely more:** an offline path does not produce `status: 200`
+with **input-token counts that vary per case** (439 vs 444, tracking payload size) and a uniform
+20-token output consistent with a single typed `noul`. The probabilities also **reproduce Partial 2's
+values** (0.94, 0.48) across an independent run.
+
+### The absent-field finding is the most valuable line in the receipt
+
+> *"`response_id`: no id field in any response body (checked: answers/model/usage only). `timestamp`:
+> no created/timestamp field in any response body. **Absent fields bound the ceiling: no receipt in
+> this lane can cite a response id or server timestamp for these calls; liveness rests on
+> status + model-echo + usage + probabilities.**"*
+
+**I asked for absent fields to be reported as findings and this is why.** The lane now knows its
+**maximum achievable liveness evidence** — not as a guess about API design, but checked against the
+response bodies. **No future receipt here can be held to a standard the API cannot meet**, and no
+future grader can demand a response id without first changing the API. That converts an open-ended
+"prove it harder" into a bounded, closed question.
+
+### Rung 3 gate status — and I am not closing it myself
+
+| Gate | Status |
+|---|---|
+| Real client, no silent fallback | proven — Q17, `rc2` without a key |
+| RED arms discriminate | proven twice — 2 bugs caught in build, independent 9/9 probe |
+| Three wedge outcomes on live probabilities | proven — Partial 2 |
+| Clean-clone install | proven — **13/0**, beats demo-1's 10/0 |
+| Policy pre-registered | proven — fixture realigned *to* policy |
+| **Liveness / pin receipt-proven** | **proven — §4i, model echoed 5/5** |
+| UBS provenance | **UNASKABLE**, standing risk, not a gate (§4c) |
+| Accuracy / coverage / calibration | **not claimed** — rung 4, needs real N |
+
+**Every gate is satisfied. Rung 3 is not closed by me, because pane 2 raised the hold and pane 2
+discharges it.** Closing a rung on the author's own receipt is precisely the authorship violation
+this gauntlet exists to prevent — and the author here is the pane that produced the provenance.
+**Queued as Q26: a non-author confirmation that the hold is discharged, or a statement of what is
+still missing.**
