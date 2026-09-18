@@ -4814,3 +4814,101 @@ claims**, no past verdict was harmed by the autofix drift — so implementing co
 digests **prevents a future failure rather than fixing a present one**, and I must not present it as
 a save. `NO-CLAIM` from pane 2, recorded verbatim: *"current STATUS instrument integrity; no
 raw-digest dependency."*
+
+---
+
+## §5o TWO PROSE CONDITIONS BECAME GATES, AND THE THIRD WAS MEASURED CLEAN IN A WAY NOBODY EXPECTED
+
+**Three pane receipts landed in one window, and together they close the prose-guard loop the lane
+opened when it ruled COD-H2's rung 4 `UNASKABLE` over guards that were 6/6 absent.**
+
+### Q62 — concurrence archaeology (`1bad293`): the rule was never invoked *and* never violated
+
+| row | killer ≠ author? | concurrence on record |
+|---|---|---|
+| `demo-1-route-backtest` | **no discrete killer at all** | **NO** — nothing to concur with |
+| `demo-8-credential-screen` | author-self + non-author cross | **YES** — strongest artifact in the lane |
+| `COD-H3-price-drift-auditor` | yes, killer is the non-author | NO — not required |
+| `MU-H1-todo-judge` | yes, evidence non-authored | NO — not required |
+
+**And it found two defects in my own bookkeeping.** First: **`demo-1` has no kill decision on
+record** — *"the 'kill' is a measurement plus a finding"*, and I recorded it in the `RULING` table as
+a rung-4 kill anyway. Second: **`demo-1`'s author column is lossy** — *"PLAN §5.1 records both
+lineages proposing demo-1 independently."* Backfilled openly as **`none`** rather than inferred,
+per pane 3's own rule that grandfathered rows *"keep this value openly rather than being backfilled
+by inference."*
+
+**All four rows were born `RULED_OUT` in `c85f869`** — STATUS.tsv's own birth commit — **so the state
+of record contains no kill history at all.** Verified independently.
+
+### Q63 — score-edit lineage (`f8b8cb8`): `HYPOTHESIS_HOLDS_WITH_LIMITS`, and the finding is a number
+
+Pane 3 tested *"git IS the watcher"* across **all 32 commits touching `STATUS.tsv`**:
+
+```text
+score changes ...................... 7
+coincident with a verdict move ..... 6
+trips .............................. 0
+direction .......................... ALL DOWNWARD  (900->820, 940->885 x5, 700->550)
+```
+
+> **"Zero upward score moves in lane history — there was never a boost to smuggle."**
+
+**That settles the rule I praised four times.** Pane 3 called *"resolving a hold is not raising a
+score"* **mistake-proofing against an error nobody committed**; it is now measured rather than
+impressionistic. **My "four unprompted applications" was praise for compliance with a rule that had
+nothing to prevent** — and the number, not my impression, is what says so.
+
+**It disclosed its own detector gap and amended its own mechanism**: *"one real coincidence escapes
+that definition — demo-9 700→550 coincided with `RECUSED→CLEARED`… the mechanical form must watch ANY
+verdict-change, not HELD-exits only."* **It hand-included the case its own definition missed.**
+Remaining blind spot, named: **11 `PLAN.md` §5 prose mean-score edits** — a different quantity, and
+*"a boost smuggled via §5 prose would not trip the STATUS check."*
+
+### Q18 — UBS provenance (`f8b8cb8`): both criticals are false positives, and the instrument still can't say where
+
+Pane 2 read `run.mjs:48` (CLI mode comparison) and `gate.mjs:66` (typeof/finite-number guard):
+**both `FALSE_POSITIVE_CONFIRMED` semantically.** Provenance stays `UNASKABLE` because *"prior
+JSON/SARIF/verbose reruns (~19s) emitted 2 criticals without per-finding locations; **no value
+repeating same instrument**."* **A pane declining to re-run a 19-second tool it has already proven
+cannot answer the question.** Retry: a location-emitting UBS or an alternative that maps IDs to
+sites.
+
+**This materially improves the COD-H2 row**: the standing risk was *"UBS criticals whose location is
+unverifiable."* Both are now **confirmed false positives on the source**; only the ID→site mapping
+remains unverifiable.
+
+### What I broke implementing it, and how the number gave it away
+
+**Tab is IFS-whitespace in bash**, so `IFS=$'\t' read` collapses consecutive tabs and an empty middle
+column shifts every later field left. With column 8 empty on 13 rows, `concur` swallowed the digest
+and the instrument reported **`integrity_checked: 4` — exactly the four `RULED_OUT` rows, the only
+ones whose column 8 is non-empty.** `--pin` had cheerfully claimed 17. **A second `--pin` would have
+written the digest into the concurrence column.** Then the first fix used `\x1f`, which **BSD `tr`
+does not implement**, and the script reported `18 candidates / 0 receipts`. Octal `\037` is portable.
+
+**And the selftest caught itself** — its first version emitted an **8-column fixture against the
+9-column schema**, so nothing was ever integrity-checked and arms 1–2 passed with `drifted=0`
+**because no comparison happened at all.**
+
+> **A witness that passes by construction is worse than no witness: it certifies the gate it never
+> exercised.**
+
+Fixed with a **false-green guard** (arms 1–3 assert `integrity_checked=1`). **7/7 arms discriminate**;
+`--pin` idempotent byte-identical; concurrence RED arm proven on the **real** 17-row file before the
+backfill.
+
+### Fifth shared-worktree incident, self-reported within the minute
+
+`f8b8cb8` swept pane 2's Q18 receipt `ubs-provenance-codh2-20260918T090000Z.json` — *"staged in a
+race window after my clean staged-check, no amend per convention; content intact, vehicle
+misattributed."* **Pane 3 ran a clean staged-check and still lost the race**, which is the honest
+shape of this hazard: it is a **race**, not carelessness. Five incidents, **zero amends, zero
+content lost.**
+
+### Standing gap, named rather than quietly carried
+
+**The score-edit condition is historically measured clean but has no standing watcher.** Q63 proved
+the past; nothing yet checks the future, and pane 3's amended form (*any* verdict-change, not
+HELD-exits) is unimplemented. **That is the next instrument unit, and until it exists the
+hold-vs-score demotion is — by pane 3's own words — "delete with extra steps."**
