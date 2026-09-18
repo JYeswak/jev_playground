@@ -115,6 +115,32 @@ EOF
             } catch { console.log("receipt unreadable"); }
           ' "$mine_work/bt.json" 2>/dev/null || echo "receipt unreadable")"
           echo "    The backtest REFUSED the converted data: $why"
+          # THE SWEEP EXISTS BECAUSE THE REFUSAL ALONE IS HALF AN ANSWER. "No turn fits 20,000
+          # tokens" is only useful if a reader can also see what budget WOULD fit their traffic —
+          # otherwise the demo answers one question about somebody else's assumption. The 20,000
+          # default is the demo's policy, not a fact about your logs.
+          echo
+          echo "    At what context budget would ANY of your turns fit a cheap model?"
+          for budget in 50000 100000 200000 400000; do
+            if node demos/routing-backtest/bin/backtest.mjs "$mine_work/adapted.jsonl" \
+                 --prices "$mine_work/adapted.jsonl.prices.json" --max-prompt-tokens "$budget" \
+                 --out "$mine_work/bt-$budget.json" >/dev/null 2>&1; then
+              node -e '
+                const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")), t=r.totals;
+                const pct=t.classifiableTurns ? t.routedCheap/t.classifiableTurns*100 : 0;
+                console.log(`      ${String(r.policy.maxPromptTokens).padStart(7)} tokens: ${String(t.routedCheap).padStart(6)} of ${t.classifiableTurns} turns qualify (${pct.toFixed(1)}%), saving $${t.estimatedSavings.toFixed(2)}`);
+              ' "$mine_work/bt-$budget.json"
+            else
+              code="$(node -e '
+                try { const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));
+                  console.log((r.failures||[]).map(f=>f.code).join(",")||"refused"); }
+                catch { console.log("refused"); }
+              ' "$mine_work/bt-$budget.json" 2>/dev/null || echo refused)"
+              printf '      %7s tokens: %s\n' "$budget" "$code"
+            fi
+          done
+          echo "    A budget is a POLICY CHOICE, not a measurement. Each row is your own traffic"
+          echo "    against a different assumption; the dollars still come from your sheet."
           echo "    Its floors are deliberate. A run where every turn qualifies for the cheap model,"
           echo "    or one with too few classifiable turns, is rejected rather than reported as a"
           echo "    saving — which is how this path caught a conversion bug in its own author's work."

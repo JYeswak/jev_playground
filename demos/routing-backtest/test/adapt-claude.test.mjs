@@ -139,3 +139,29 @@ test('a sheet still carrying the template placeholders is refused, not used', ()
     },
   );
 });
+
+// The CLI contract for the chain this adapter feeds. It lives here because this file already shells
+// out to real binaries, and the flag exists only because the adapter's ruled context rule made every
+// real turn exceed the hardcoded 20,000-token budget.
+test('the backtest receipt records the EFFECTIVE policy, not the default', () => {
+  const dir = work();
+  writeFileSync(join(dir, 's.jsonl'),
+    // One turn ABOVE the 50,000 budget and one below, so both floors are satisfied: the backtest
+    // refuses a run with no baseline candidates AND one with no cheap candidates. My first fixture
+    // put both turns under the budget and the demo correctly refused it.
+    sessionLine('known-1', { input_tokens: 60_000, output_tokens: 10 })
+    + sessionLine('known-1', { input_tokens: 40, output_tokens: 10 }));
+  const prices = sheet(dir, { 'known-1': { input: 1, output: 2 }, 'cheap-1': { input: 0.1, output: 0.2 } });
+  run([join(dir, 's.jsonl'), '--prices', prices, '--out', join(dir, 'o.jsonl')]);
+  const BT = new URL('../bin/backtest.mjs', import.meta.url).pathname;
+  const out = join(dir, 'bt.json');
+  execFileSync('node', [
+    BT, join(dir, 'o.jsonl'), '--prices', join(dir, 'o.jsonl.prices.json'),
+    '--max-prompt-tokens', '50000', '--out', out,
+  ], { encoding: 'utf8' });
+  const receipt = JSON.parse(readFileSync(out, 'utf8'));
+  // Printing DEFAULT_POLICY here would record 20000 for a run that used 50000 — a receipt that
+  // misstates the assumption it ran under is worse than no receipt.
+  assert.equal(receipt.policy.maxPromptTokens, 50_000);
+  assert.equal(receipt.policy.maxCompletionTokens, 2_000, 'unspecified policy fields keep their defaults');
+});

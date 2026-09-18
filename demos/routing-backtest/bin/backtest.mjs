@@ -38,11 +38,23 @@ function parseArgs(argv) {
   const inputs = [];
   let out = null;
   let prices = null;
+  let maxPromptTokens = null;
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--out') {
       out = argv[++index];
       if (!out) usage('--out needs a path');
+    } else if (arg === '--max-prompt-tokens') {
+      // THE POLICY WAS HARDCODED AT 20,000 AND A READER COULD NOT ASK A DIFFERENT QUESTION.
+      // On a real Claude Code corpus every turn carries a large cached prefix, so with the ruled
+      // context rule (input + cache_read + cache_creation) NOT ONE of 47,428 turns fit the 20k
+      // budget and the demo refused with NO_CHEAP_CANDIDATES. That refusal is honest, but "no turn
+      // fits 20k" is only interesting if you can also ask what budget WOULD fit — otherwise the
+      // demo answers one question about someone else's assumption.
+      maxPromptTokens = Number(argv[++index]);
+      if (!Number.isFinite(maxPromptTokens) || maxPromptTokens <= 0) {
+        usage('--max-prompt-tokens needs a positive number');
+      }
     } else if (arg === '--prices') {
       // The engine has ALWAYS accepted an injected price table (runCounterfactual's options.priceTable);
       // the CLI simply had no way to pass one, so every run used the built-in table and any model
@@ -58,16 +70,19 @@ function parseArgs(argv) {
   }
   if (inputs.length === 0) usage('at least one session JSONL is required');
   if (!out) usage('--out is required so the run is receipted');
-  return { inputs, out, prices };
+  return { inputs, out, prices, maxPromptTokens };
 }
 
-const { inputs, out, prices } = parseArgs(process.argv.slice(2));
+const { inputs, out, prices, maxPromptTokens } = parseArgs(process.argv.slice(2));
 const absoluteInputs = inputs.map((path) => (path.startsWith('/') ? path : `${process.cwd()}/${path}`));
 const baseReceipt = {
   schema: 'jev.route-backtest.receipt.v1',
   generated_at: new Date().toISOString(),
   inputs: absoluteInputs.map(displayPath),
-  policy: DEFAULT_POLICY,
+  // THE EFFECTIVE POLICY, not the default. The receipt printed DEFAULT_POLICY, so a run with
+  // --max-prompt-tokens would have recorded 20000 while having actually used another number —
+  // a receipt that misstates the assumption it ran under is worse than no receipt.
+  policy: maxPromptTokens !== null ? { ...DEFAULT_POLICY, maxPromptTokens } : DEFAULT_POLICY,
   floor: {
     minimumClassifiableTurns: MIN_CLASSIFIABLE_TURNS,
     requiresCheapCandidate: true,
@@ -91,7 +106,10 @@ try {
       process.exit(2);
     }
   }
-  const result = runCounterfactual(parsed.sessions, priceTable ? { priceTable } : undefined);
+  const options = {};
+  if (priceTable) options.priceTable = priceTable;
+  if (maxPromptTokens !== null) options.policy = { ...DEFAULT_POLICY, maxPromptTokens };
+  const result = runCounterfactual(parsed.sessions, Object.keys(options).length ? options : undefined);
   const failures = validateBacktestFloor(result);
   const receipt = {
     ...baseReceipt,
