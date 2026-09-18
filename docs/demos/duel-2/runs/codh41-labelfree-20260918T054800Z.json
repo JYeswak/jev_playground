@@ -1,0 +1,326 @@
+{
+  "schema": "jev.codh41.label-free-receipt.v1",
+  "generated_at": "2026-09-18T05:48:00Z",
+  "h1": {
+    "schema": "jev.cod-h1.strict-label-free-precheck.v1",
+    "candidate_files": 41,
+    "candidate_roots": [
+      "control-plane",
+      "grokbot",
+      "local-agents",
+      "jev",
+      "omp-orchestrator"
+    ],
+    "transcript_shape_files": 2,
+    "valid_roots": [
+      "jev"
+    ],
+    "required_files": 30,
+    "required_roots": 3,
+    "status": "UNASKABLE",
+    "reason": "The available JSONL pool is dominated by operational/ledger artifacts; no proof-backed set of 30 real agent transcripts across 3 harnesses could be established without a subjective classifier or labels.",
+    "checked": [
+      {
+        "path": "/Users/josh/Developer/control-plane/.ee/audit.jsonl",
+        "root": "control-plane",
+        "sha256": "a28abccd549f737731ebb54abff259417be7ca9154b010c58f7207c01a08f1a6",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/control-plane/.flywheel/loop-tick-ledger.jsonl",
+        "root": "control-plane",
+        "sha256": "142ba73c22edc4f34b4d8fbfdf18b3bbfb3de2eb6d6e801d0a5f6dff536e3554",
+        "json_rows_sampled": 99,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/control-plane/.flywheel/orchestration-ticks.jsonl",
+        "root": "control-plane",
+        "sha256": "3f2134e869262ec13adb65743c13c99c00f6157ef510337c8c9c54640aa5ee10",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/control-plane/.flywheel/tick-ledger.jsonl",
+        "root": "control-plane",
+        "sha256": "7c1902b28bf86be84b5236ad4486d4ef88b50c5ee71b57d131992da255cbb16b",
+        "json_rows_sampled": 39,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/control-plane/.flywheel/worktree-reconciliation-ledger.jsonl",
+        "root": "control-plane",
+        "sha256": "9dfd928c4c67026f913bc8306bfa7a288501a02a8f9b560a2d85a66d058f5ff6",
+        "json_rows_sampled": 1,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/control-plane/.rch-tmp/rlb-control-plane-39925/session-746573742d636f6e74726f6c2d706c616e65.jsonl",
+        "root": "control-plane",
+        "sha256": "b5552333da81c5ba5010c86e228b7c158ad09dec93c5d32a25993b5f6757f3bd",
+        "json_rows_sampled": 4,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/control-plane/.rch-tmp/rlb-franken-harvest-39925/session-746573742d6672616e6b656e2d68617276657374.jsonl",
+        "root": "control-plane",
+        "sha256": "82f21f2e018934fa95f57a9404ed3922167c323fd156635e4afddac46beb317d",
+        "json_rows_sampled": 1,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/control-plane/.rch-tmp/rlb-liveness-11480/session-636f76657265642d73657373696f6e.jsonl",
+        "root": "control-plane",
+        "sha256": "cbb33563bc92fa5643fb8186cd29fe22439bd3c668f71ba13e87e6e6343cb1bc",
+        "json_rows_sampled": 1,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/control-plane/.rch-tmp/rlb-liveness-39925/session-636f76657265642d73657373696f6e.jsonl",
+        "root": "control-plane",
+        "sha256": "21bcd8c228e2d8868b962483ba287990ce29e23e7fb517548140e1f4353dea7a",
+        "json_rows_sampled": 1,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/control-plane/.rch-tmp/rlb-liveness-53622/session-636f76657265642d73657373696f6e.jsonl",
+        "root": "control-plane",
+        "sha256": "f58764c0310d4462d514065ac04da6bbc6ace3cf37f8c0e6a012369861fa8ea4",
+        "json_rows_sampled": 1,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/agent_ergonomics_audit/surfaces.jsonl",
+        "root": "grokbot",
+        "sha256": "2b90b61cd90651e233273949d90f6bfa9978327cbdbe52fd4958bdb8249a94d5",
+        "json_rows_sampled": 69,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/coach-inbox/queue.jsonl",
+        "root": "grokbot",
+        "sha256": "97d3e6aaae467da85a05aa8e98def2651ed63fbfbfda8a95709cfe8a192b611a",
+        "json_rows_sampled": 12,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/coach-inbox/replies.jsonl",
+        "root": "grokbot",
+        "sha256": "6c08a22e58f40eece93b8d9702c6ad8247932348b2be7787b94954e2d07b7b47",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/coach-inbox/weak.jsonl",
+        "root": "grokbot",
+        "sha256": "500629da1a0f12ff9d6009466f7d5ad4907df74129ec6e2b92450c89e20ffd4a",
+        "json_rows_sampled": 1,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/jobs/inbox.jsonl",
+        "root": "grokbot",
+        "sha256": "6e3f286f6e4cfc0e1344608d09bd60923c64d53e5929109161a749f0be627717",
+        "json_rows_sampled": 5,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/jobs/ticks.jsonl",
+        "root": "grokbot",
+        "sha256": "8370065793a50650f56a5cb53a8d3fc4a16278674d6491ac5e2c4fa0c2fda986",
+        "json_rows_sampled": 16,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/jobs/walks.jsonl",
+        "root": "grokbot",
+        "sha256": "5dd9517cd976669112c9d6b5937426e91a05be9458bba9a2effcb28dcad177a7",
+        "json_rows_sampled": 51,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/schedule/runs.jsonl",
+        "root": "grokbot",
+        "sha256": "d25eaddd48f44665be6da89690d5594f0257794cc82edb6373ef390e57dee7d2",
+        "json_rows_sampled": 27,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/skills/disk.jsonl",
+        "root": "grokbot",
+        "sha256": "c318da38af39f9988bdcc7fbfe38ff4e7d213d888ba698497d2d879f33f4ca86",
+        "json_rows_sampled": 18,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/grokbot/skills/outcomes.jsonl",
+        "root": "grokbot",
+        "sha256": "5d63975ef87af824bee36f3a62af7e601a3e26a1b969bc91a8d4b969b5ccad07",
+        "json_rows_sampled": 1,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/local-agents/output/routing-decisions.jsonl",
+        "root": "local-agents",
+        "sha256": "2c5d9e2fae37ac9f3f099a9b6dc60401ba8fc5138c4a2743ef27e2b384e2b575",
+        "json_rows_sampled": 3,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/jev/compaction/fixtures/omp-session-20260917.jsonl",
+        "root": "jev",
+        "sha256": "1701c2502c97b96ea200397c8f3a49b8a10823b4b82c07d2bc315985004337bb",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 4
+      },
+      {
+        "path": "/Users/josh/Developer/jev/compaction/fixtures/omp-session-big-20260917.jsonl",
+        "root": "jev",
+        "sha256": "2346451dd389f9771f3d79a382b2a1b2dac54962114e6b1bb7460a3b2560d52e",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 6
+      },
+      {
+        "path": "/Users/josh/Developer/jev/foundation/fixtures/calibration-v1.jsonl",
+        "root": "jev",
+        "sha256": "0b3c4d3775740808316d71f4a0a725e3381c2f0a767f9a9fbbb40f79d576e320",
+        "json_rows_sampled": 80,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/jev/jev-rerank-bench/candidates/bright-biology.jsonl",
+        "root": "jev",
+        "sha256": "31000c7a23e5a1a44f281524a7c9837f512c48b364e03fe2820f7ab3f4a4e622",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/jev/jev-rerank-bench/candidates/bright-earth_science.jsonl",
+        "root": "jev",
+        "sha256": "21734d73dec07dc3b75473a181fb94bd05915fa0253cfd04d9448f6a7cbfdf2c",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/jev/jev-rerank-bench/candidates/bright-economics.jsonl",
+        "root": "jev",
+        "sha256": "01a024a9f2c82eac392ae2ed2b4a95531a3a100bbbae1f77695518426e61c88a",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/jev/jev-rerank-bench/candidates/bright-psychology.jsonl",
+        "root": "jev",
+        "sha256": "2c511d4ec93aa5159f8a196967c6b863111efd9605b351dcc8058a9d3f6ba639",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/jev/jev-rerank-bench/candidates/bright-robotics.jsonl",
+        "root": "jev",
+        "sha256": "851df8f9df520a338396e7c9dd4a0ea015aba24fc6ae35c1b40a3923bf4b9f80",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/jev/jev-rerank-bench/candidates/bright-stackoverflow.jsonl",
+        "root": "jev",
+        "sha256": "735a32d7585ea2ac4c338017c57b24c071956ff8051fac4881bdbf58fcb5ad8f",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/jev/jev-rerank-bench/candidates/bright-sustainable_living.jsonl",
+        "root": "jev",
+        "sha256": "5dd86312b6871447b210b9b9a74e6b2e60505907336ee65c39173418e1139820",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/.flywheel/loop-tick-ledger.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "a7394fc4224bc733e952ae0c57deccfc61b42cb3329c4e84ce1b9ca2adcf2034",
+        "json_rows_sampled": 25,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/.flywheel/orchestration-ticks.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "2b5b7f2c9d6f39f88d2ba3dd31ea56e024329de00279b1627bae8103716b1c5f",
+        "json_rows_sampled": 100,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/.grade-cli-axis-7/docs/decisions.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "6c78f2f51fe30eef06c84ab9b98e0309ee7122fe439cf0a70510cfe58d49cc0e",
+        "json_rows_sampled": 85,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/.orchestrator/heartbeat.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "89d6c4fe5766b0d1b73a61a6770c2e7aece7b904cab9ea8f722978c638b75070",
+        "json_rows_sampled": 2,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/.rch-tmp/k6-packet-journal/journal.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "98394c6a7e30880247cc89fcb25375830102f2e6808de162a7f3b4a340d0fe9c",
+        "json_rows_sampled": 3,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/.rch-tmp/k6-packet-roundtrip/packet.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "e807269a5d55a516ac8070180471c729a0e00e5868bfde545f051dcda64b86ba",
+        "json_rows_sampled": 1,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/docs/decisions.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "678b4b2f55a7a8e55c6ec8db72a8114a2b82e7aed3d0aa73cfbdef1de95b8f10",
+        "json_rows_sampled": 89,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/docs/fixtures/r2-empty.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "060a86304f888ccf2d81fe54c2bc8099d52fe58c6399db4207d7c0e7368a600c",
+        "json_rows_sampled": 1,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/docs/fixtures/r2-strangled.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "8d71454f1bc0ac0b898c9bfc1ae47e40677df429c42cc183494e63dea7d007ef",
+        "json_rows_sampled": 2,
+        "transcript_shape_rows": 0
+      },
+      {
+        "path": "/Users/josh/Developer/omp-orchestrator/docs/fixtures/r2-unwired.jsonl",
+        "root": "omp-orchestrator",
+        "sha256": "6831fa53346638b2d41b5c4dbb8c980f10f61dbda51bdbec495c3715a09efac6",
+        "json_rows_sampled": 3,
+        "transcript_shape_rows": 0
+      }
+    ],
+    "failures": [],
+    "decision": "The available files do not establish 30 real agent transcripts across 3 harnesses. Only 2 files show transcript-like role/tool fields, both under jev; control-plane/grokbot/local-agents candidates are ledgers/artifacts. Do not label or infer claim prevalence from them.",
+    "pre_registered_rule": "sessions_with_>=1_checkable_claim/M <0.20 and Wilson upper <0.35 would be the failure rule, but the required transcript sample is unavailable."
+  },
+  "h4": {
+    "status": "UNASKABLE",
+    "manifest_path": "demos/preaction-abstention/fixtures/h4-public-sources.json",
+    "manifest_present": false,
+    "public_source_manifest_entries": 0,
+    "corpus_target": 30,
+    "timebox_hours": 4,
+    "reason": "No committed public-source manifest or replay corpus exists. Building and labelling 30 attack/benign/mixed cases would require the full timebox; no label-free corpus observation can be claimed from the absent input.",
+    "command": "test -f demos/preaction-abstention/fixtures/h4-public-sources.json"
+  },
+  "failures": []
+}
