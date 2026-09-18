@@ -85,10 +85,24 @@ Carry: bead id · sha · **NEXT** (the unit the pane is *starting*, never what i
 
 - **Ship a queue, not a task.** 2–3 numbered units, plus verbatim: *"Finish one, fire its callback,
   then start the next YOURSELF. Do not wait for a dispatch between them."*
-- **Ship a dry-queue default**, or a finished queue just means idle later. Priority: (1) the
-  highest-value **unreviewed** artifact, non-author only; (2) an oldest satisfiable
+- **PANES SELF-CLAIM FROM `br ready`. This is what keeps the lane running when the conductor goes
+  quiet.** Joshua, 2026-09-18, finding every worker idle: *"so what is going to keep this project
+  going? you and all workers are idle"*. The honest answer at that moment was **nothing** — the cron
+  tick wakes pane 1 only, every unit that day was hand-dispatched, and panes idled the instant a
+  queue drained. Meanwhile `br ready` held **thirteen ready beads, three of them P0**, and no pane
+  had ever been told to claim from it. Every packet now ends: *when your queue drains, run
+  `br ready`, claim the highest-priority bead you did not author, and work it.* Claiming means
+  moving it `in_progress` under the pane's actor name — that is the coordination, not a message to
+  the conductor.
+- **A `QUEUE DRY` callback is WRONG while `br ready` is non-empty.** It is correct only when the
+  frontier is genuinely empty, or every ready bead is authored by that pane or locked by a peer.
+  Before this rule, `QUEUE DRY` fired repeatedly and was scored a success each time while a P0
+  publish bead sat ready — the callback was honest about the pane's queue and blind to the graph.
+- **Ship a dry-queue default** anyway, for the case where the frontier truly is empty. Priority:
+  (1) the highest-value **unreviewed** artifact, non-author only; (2) an oldest satisfiable
   `NEGATIVE_EVIDENCE.md` retry condition or a `GATES.md` gap with no witness; (3) a **QUEUE DRY**
-  callback naming what was considered and rejected — a success.
+  callback naming what was considered and rejected — including which ready beads were rejected and
+  why.
 - **Full repo-relative path for every artifact**, plus `ls` before depending on it, plus a
   non-blocking fallback. Never *"when X lands"*. A bare filename is a defective packet and BLOCKED
   is the correct response.
