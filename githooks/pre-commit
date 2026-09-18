@@ -4,7 +4,10 @@
 #
 # LANE 1 — staged-deletion survival (house implementation, byte-identical to foundry's).
 #   Refuses a path-limited commit that silently DROPPED a staged deletion whose file is still on
-#   disk. Proof: foundation/gates.d/60-staged-deletion-lane.sh, 1 trigger + 5 satisfying witnesses.
+#   disk. Proof: foundation/gates.d/60-staged-deletion-lane.sh, **2 trigger + 6 satisfying** witnesses
+#   — corrected 2026-09-18 from "1 trigger + 5 satisfying", the SECOND place that stale count lived
+#   (pane 3, 85d75a0 found it in GATES.md; 71183c0 found this copy). Re-derive from the script, which
+#   is the authority; a count duplicated into a comment rots in every copy independently.
 #
 # LANE 2 — autofix, in --check mode ONLY (report-only, exit 1 when the staged set is not clean).
 #   loop-kit/autofix-precommit.sh can MUTATE files, and this is the one wiring decision worth

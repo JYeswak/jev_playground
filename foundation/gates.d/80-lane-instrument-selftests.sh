@@ -43,12 +43,23 @@ if [ "${1:-}" = '--selftest' ]; then
   exit 0
 fi
 
-suites=(
-  "scripts/selftest-lane-status-integrity.sh"
-  "scripts/selftest-score-lineage.sh"
-  "scripts/selftest-other-reasons.sh"
-)
+# GLOB, NOT A LIST — pane 3, audit-stage80-20260918T112921Z.json (71183c0):
+#   "Suites enumerated literally; A 4TH SELFTEST LANDS SILENTLY UNRUN (the inverse of the guarded
+#    missing-suite case: unlisted-new vs listed-missing). Recommend glob scripts/selftest-*.sh."
+# It is right, and the irony is exact: this stage shipped with a hardcoded list in the same session
+# that replaced GATES.md's hardcoded stage list with "the glob is the authority", for this defect.
+# A listed-missing suite REDs loudly; an unlisted-new suite was invisible. Both directions now hold:
+# the glob discovers every scripts/selftest-*.sh, and an empty glob is an ERROR, not a pass.
+suites=()
+for p in "$root"/scripts/selftest-*.sh; do
+  [ -e "$p" ] || continue
+  suites+=("scripts/$(basename "$p")")
+done
 [ -n "${JEV_SELFTEST_FAKE_MISSING:-}" ] && suites+=("scripts/selftest-does-not-exist.sh")
+if [ "${#suites[@]}" -eq 0 ]; then
+  echo "  ERROR   scripts/selftest-*.sh matched nothing — an empty scan set is NOT a pass (RULE 1)"
+  exit 3
+fi
 
 for s in "${suites[@]}"; do
   p="$root/$s"
@@ -65,5 +76,8 @@ for s in "${suites[@]}"; do
   fi
 done
 
-[ "$rc" -eq 0 ] && echo "80-lane-instrument-selftests: 3 suites PASS (hermetic; no shared state written)"
+# Count DERIVED from the glob, never written down — the "3 suites PASS" literal this replaced would
+# have staled on the fourth suite, which pane 3 flagged as cosmetic and is the same class as every
+# other count this session got wrong.
+[ "$rc" -eq 0 ] && printf '80-lane-instrument-selftests: %d suites PASS (hermetic; no shared state written)\n' "${#suites[@]}"
 exit "$rc"
