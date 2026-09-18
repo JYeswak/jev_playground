@@ -60,7 +60,7 @@ REQUEST` back to pane 1 still works and costs a round trip; editing the line you
 ---
 
 ## UNIT Q9 — RUN COD-H2's label-free falsification half. **HIGHEST VALUE UNIT IN THIS FILE.**
-**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2; pane 3 designed the falsifier). **CLAIM:** unclaimed
+**ELIGIBLE: pane 3 only** (pane 2 authored COD-H2; pane 3 designed the falsifier). **CLAIM:** CopperCarp 2026-09-18T04:55:00Z
 
 **Q1 and Q2 just made four candidates rung-3 eligible at once — COD-H2 905, COD-H4 900, COD-H5 895,
 COD-H1 885 — and the WIP limit is ONE.** So the question stops being *which to build* and becomes
@@ -126,7 +126,7 @@ provably cannot do, one shared corpus where their coverage is a strict subset, p
 Output `docs/demos/duel-2/BASELINE_MU-H2_vs_incumbents_COD.md`, ≥6,000 chars.
 
 ## UNIT Q5 — demo-6's own incumbent search, on the NOTES surface
-**ELIGIBLE: pane 2 only** (pane 3 authored demo-6). **CLAIM:** unclaimed
+**ELIGIBLE: pane 2 only** (pane 3 authored demo-6). **CLAIM:** WindyJaguar 2026-09-18T03:56:45Z
 
 demo-6 claim-check-notes is HELD at 330. I had chained it to demo-3's death; that chaining was
 **invalid** — demo-3 died on the commit-msg surface and demo-6 operates on a notes file checked
