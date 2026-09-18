@@ -14,7 +14,7 @@ The current stamp-check run reports p10's hard finding:
  docs/demos/duel-2/runs/publish-redteam-20260918T153930Z.json
 ```
 
-The matched value is `AKIAIOSFODNN7EXAMPLE`. It appears in a receipt field that explicitly says
+The matched value is AWS’s canonical documentation example value. It appears in a receipt field that explicitly says
 it is AWS documentation example-key prose and that the live key remains in Infisical. No credential
 value, authorization header, or operational secret is present.
 
@@ -40,7 +40,7 @@ repository that honestly documents or tests the pattern the detector claims to r
 ## Suggested fix, not a submitted patch
 
 Keep the detector fail-closed for arbitrary AKIA values, but add a narrow exact-value exception for
-AWS's canonical documentation example key (`AKIAIOSFODNN7EXAMPLE`) when the surrounding line is
+AWS's canonical documentation example key (the canonical AWS documentation example value) when the surrounding line is
 explicitly documentation/test/receipt prose. Emit an advisory row naming the exception rather than
 silently dropping it. A path-only exception is insufficient: a real key in a README must still
 REFUSE, and a future example key should not be guessed safe.
