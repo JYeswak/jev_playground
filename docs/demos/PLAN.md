@@ -1578,3 +1578,84 @@ the same either way: I ruled on a source I had not opened.**
 Pane 3 also cites the correction approvingly where it belongs — *"citing upstream tables as
 baselines without re-deriving them repeats the error this lane just self-corrected (85415e0)"* — and
 then does the re-derivation. That is the loop working: my correction became its method.
+
+---
+
+## §3q §3m FAILED ITS FIRST UN-SEEDED TEST — the one voiced practitioner wants **coverage and timing**, not calibration
+
+**The most important result of the session, and it cuts against me.** After §3o caught me seeding
+pane 2 with the calibration lens, I retracted the lens for Q6 and asked for practitioners' own
+words. `docs/demos/duel-2/HELD_MUH3_voice_COD.md` (`cfd4d69`) is what came back.
+
+**Named practitioner: Pablo Rodriguez (`paroque28`), Embedded Systems Engineer.** Claude Code issue
+**#39882**, opened 2026-03-27, **closed as not planned**. Verbatim:
+
+> *"[FEATURE] PreApiCall / PostApiCall hooks to prevent secret exfiltration to API providers and
+> attackers"* … *"The core need: Organizations need the ability to prevent sensitive data from
+> leaving the machine through any channel"* … *"Because **PostToolUse cannot modify tool output**,
+> there is no way to redact secrets from `Read` tool results, `Grep` search results, `Bash` command
+> output, `Glob` file listings, `WebFetch` responses, or any future tool or MCP tool output."*
+
+### What he asks for is a hook, not a judgment
+
+**He never mentions calibration, confidence, probability, or uncertainty.** Pane 2 stated the
+boundary deliberately and refused to cross it:
+
+> *"It complains about **coverage and timing**: tool-level hooks cannot modify the complete outbound
+> request before provider transmission. I do not translate that complaint into the lane's calibration
+> vocabulary. **The external evidence is valuable precisely because it is not an echo of the
+> conductor's thesis.**"*
+
+And it named the overreach I would otherwise have committed:
+
+> *"The evidence is **positive for runtime redaction pain**, but **silent on calibration**. Any
+> document that cites this issue as proof of a calibrated-probability market need would be
+> overstating it."*
+
+**§3m is therefore UNSUPPORTED by external evidence, not refuted.** One practitioner is a sample of
+one and silence is not contradiction — §3c's own rule. But this was the thesis's first contact with
+a voice I did not frame, and it came back about **interception capability**, not **judgment
+quality**. Two doctrine-seeded design documents, one third-party benchmark now repriced to 3.5
+points of method (§3p), and **one unseeded external probe that does not mention the property at
+all.** That is the honest state of the lane's central claim.
+
+### The un-contamination worked, and that is the finding about the lane itself
+
+**This is the first time the lane has produced evidence against the conductor's own thesis.** The
+mechanism was simple and it should be standing procedure: I removed my lens from the instruction and
+told pane 2 that a result contradicting me would be *more* valuable than one confirming me. It then
+returned a result contradicting me, and flagged the translation error I was at risk of making.
+
+**RULE: every thesis gets at least one probe whose instruction contains none of the thesis's
+vocabulary.** A thesis that has never been tested outside its own framing is a lane artifact, not a
+market fact — that exact phrase went into the Q6 packet, and Q6 is why it is now recorded as
+doctrine rather than a worry.
+
+### MU-H3: hold recovered, and a new rung-2 question opens that pane 2 set up
+
+**Verdict: voiced-pain hold RECOVERED. Score remains 650.** Pane 2 applied *resolving a hold is not
+raising a score* for the **third** time unprompted: *"resolving 'does anyone publicly voice this
+pain?' answers judgeability, not product value."*
+
+**But its own scope comparison raises the COD-H3 fork against MU-H3.** It describes MU-H3 as *"a
+**deterministic** outbound sanitizer"* with *"exact runtime-value and pattern/entropy detection,
+fixed-token redaction, fail-closed detector errors, per-call redaction counts and a receipt."* **A
+deterministic sanitizer has no Jev-necessary stage** — which is precisely why COD-H3 was ruled out
+and why demo-1 died.
+
+The one place judgment could live is pane 2's open distinction #3: **registered exact secrets versus
+unknown credentials.** Exact-match and entropy are deterministic; deciding whether an unrecognised
+string is a credential is a judgment. **So MU-H3's rung-2 question is now explicit: does the
+unknown-credential case exist at material rate, and does judging it beat an entropy threshold?** If
+not, MU-H3 is a valuable Jev-free tool — T1 territory, like COD-H3's Fork B.
+
+**Its baseline is also already named, by the issue itself:** a local proxy via `ANTHROPIC_BASE_URL`,
+with the issue's own list of drawbacks (streaming, TLS, process lifetime, discoverability, failure
+handling). Pane 2: *"That is a real baseline, not proof that a new transport wins."*
+
+### Commit-sweep note (no history rewrite, per tick §3)
+
+My `QUEUE.md` commit absorbed `docs/demos/duel-2/HELD_MUH3_voice_COD.md` while pane 2 was landing
+it — the shared-worktree hazard that `d14387e` demonstrated. **Content intact, nothing lost, tree
+clean; only that commit message misdescribes what it carries.** Pane 2 then committed the file
+properly at `cfd4d69`. Amending shared `main` to fix bookkeeping is strictly worse than this note.
