@@ -282,8 +282,8 @@ all; a one-word verdict over a stochastic arm is the defect, not the presentatio
 ## R12 — Do not grep for the line you expect. It hides the state that produced it.
 
 **Near-miss, 2026-09-18.** Pane 2's probe (`1a4dd77`) found the shared `fleet-idle-monitor` embeds
-`FLEET_QUEUE_REPO` and defaults to `/Users/josh/Developer/uds`, which neatly explained why it
-recommended the cross-project bead `uds-ry5d` for a jev pane. I tested the env var like this:
+`FLEET_QUEUE_REPO` and defaults to **another project's repo path**, which neatly explained why it
+recommended a bead from that project for a jev pane. I tested the env var like this:
 
 ```bash
 FLEET_SESSION=jev … fleet-idle-monitor --report-only | grep -E 'ACTIONABLE|bead='   # default: 1 row
@@ -314,13 +314,36 @@ without the variable. Both still `reason=capture_gap` — the required interval 
 is UNMEASURED, not confirmed and not refuted.**
 
 **What was done instead of claiming a fix:** the jev cron row now sets
-`FLEET_QUEUE_REPO=/Users/josh/Developer/jev` (diff +0/−0 lines, one row edited, `crontab -l` grep
+`FLEET_QUEUE_REPO=<this repo's absolute path>` (one row edited, `crontab -l` grep
 confirms 1 occurrence). It is strictly more correct than pointing at another project, it is
 reversible in one edit, and **the cron is now the instrument** — the next `ACTIONABLE` row in
 `~/.local/state/flywheel/jev-fleet-idle.log` either names a jev bead or it does not.
 
-**Retry condition:** read that log after any `IDLE_PROVEN` row appears. If the accompanying
-`ACTIONABLE` row names a `jev-*` bead, the variable works and `jev-demo-loop-a1q.4` loses one of
-its three defects. If it still names `uds-*`, the queue source is not env-configurable and the
-upstream bead must cover it. **Either way the measurement belongs to the cron, not to an inline
-run that cannot reach the two-capture state.**
+**Retry condition — FIRED AND RESOLVED, 2026-09-18T01:38Z, ~9 minutes after this entry was
+written.** The cron reached the two-capture state that no inline run could, and the row read:
+
+```
+IDLE_PROVEN session=jev pane=%70 age=462s timer=prompt
+ACTIONABLE  session=jev pane=%70 bead=jev-distinct-lineage-review-substrate-nl9 mode=report-only
+```
+
+A **`jev-*` bead**, not the other project's. **`FLEET_QUEUE_REPO` works**, and the queue-source
+defect is closed on `jev-demo-loop-a1q.4`. Two things about *how* this was established are the
+durable part:
+
+1. **The measurement belonged to the instrument I could not rush.** Two inline attempts 3 s apart
+   both returned `reason=capture_gap`; the binary's own banner says *"true idle requires two
+   captures"*, and only accumulated cron state satisfies it. Naming the cron as the instrument and
+   waiting was faster than any clever local reproduction — and it produced an unambiguous row.
+2. **The fix was applied while its effect was still unmeasured, and labelled that way.** That is
+   the correct order when a change is strictly-more-correct and reversible in one edit: apply,
+   record the uncertainty, name what would settle it. What would have been wrong is the version
+   R12 exists to prevent — claiming the fix worked because a grep came back empty.
+
+**A second observation from the same row, recorded because it corrects me:** the binary reported
+`%73 reason=spinner_stripped_hash_changed`. So it *does* strip the animated status line before
+hashing. My attribution of the false-WORKING defect to "a changing content hash off an animating
+spinner" was a **mechanism guess, and this reason string contradicts it.** The false-WORKING
+observation at the time carried `reason=timer_changed`, so if anything it came through the timer
+path. The defect's *outcome* is measured; its *mechanism* is not, and the bead has been corrected
+to say so.
