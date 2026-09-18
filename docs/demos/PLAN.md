@@ -3555,3 +3555,84 @@ order.** Rung 4 is **UNASKABLE on this corpus** (§4u) — so:
 the specific mistake I would have made by treating "6/6 absent" as a to-do list instead of a
 sequencing question. **When the guards are implemented, pane 2 writes them (it authored them) and
 pane 3 re-verifies (it audited them). Not the reverse.**
+
+---
+
+## §4w RUNG 4 IS TERMINALLY UNASKABLE ON THIS LANE'S DATA — three independent reasons, and widening cannot fix them
+
+Two receipts landed together and between them they close the question.
+
+### Reason 3 (new, mine this turn): the labels are a function of the pattern rule
+
+**`docs/demos/duel-2/runs/rung4-labels-20260918T062249Z.json` (`fcdb568`)** — 68 policy labels by
+Pane A, **every label citing exact `policy.json` paths**, no model call, no secret. Excellent
+craft: 59 KB, per-case `policy_paths`, `reason`, `command_sha256`, `journal_sha256`.
+
+**I cross-tabulated stratum against label per case, not by totals:**
+
+```text
+ambiguous_authority     -> withhold    50/50
+reversible_safe         -> pass        10/10
+disallowed_destructive  -> escalate     8/8
+cross-mappings: ZERO
+```
+
+**The ground truth is a deterministic function of the stratum, and the stratum was assigned by pane
+3's committed pattern rule.** Therefore **a regex scores 100% by construction** — it *defined* the
+labels. Rung 4 as constituted would measure *"does Jev reproduce a pattern rule?"*, against a
+baseline that wins by definition.
+
+**This is the fourth instance of the tautological-test family (§4k)** — after the RED-arm test that
+fired on all 16 rows, demo-1's 10/0 around a hand-written heuristic, and the canned asker keyed by
+gold label. **It is the most consequential because it sits at the top of the backlog**, and it would
+have survived both other gates: a powered sample and fully-implemented guards would still have
+measured a regex against itself.
+
+**Credit where it belongs: pane 2 disclosed the property and I computed its consequence.** Its own
+`NO-CLAIM` reads *"labels are **policy-derived, not right-answer/model judgments**; no rung4 gate
+claimed."* **It said the labels were policy-derived; nobody had asked what that implies for a
+measurement whose baseline is the policy.**
+
+### Reason 4 (pane 3): widening is exhausted, so reason 1 cannot be fixed
+
+**`docs/demos/duel-2/runs/widening-price-20260918T064500Z.json` (`8ce39f8`):**
+
+- **Journals exhausted** — only **7 more exist and they are tiny.** The 111-journal corpus is
+  effectively the whole population.
+- **`reversible_safe` needs its own sourcing unit** — not fillable from here.
+- **`credential_injection` STRUCK**, and the reason is a trap worth recording: **97 candidate shapes
+  exist *including our own fixtures*, and reality is unverifiable.** **Widening to catch credential
+  shapes would have caught our own test data** — self-contamination presented as corpus growth.
+  Pane 3 recommends striking the stratum from the design rather than carrying it as a shortfall, and
+  that is right: **a permanently unmeasurable stratum is a design error, not a backlog item.**
+
+### Ruling: COD-H2 cannot be promoted from this lane's data, and that is the answer
+
+| Blocker | Source | Fixable here? |
+|---|---|---|
+| Power — n=30 zero-flip upper `.1135` vs `≤5%` | §4u, pane 2 | **No** — journals exhausted |
+| Implementation — 6/6 guards absent | §4v, pane 3 | Yes, but pointless |
+| **Construct validity — labels are the pattern rule** | §4w, conductor | **No** — the policy *is* the baseline |
+| Widening yield | §4w, pane 3 | **No** — 7 tiny journals, credential struck |
+
+**COD-H2 holds at rung 4, UNMEASURED and unmeasurable here. `PROMOTED` remains 0 — and 0 is now a
+finding rather than a waiting state.**
+
+### What this lane has actually produced, stated as the ruling it was built to deliver
+
+**One candidate deserves its own deeply-planned project: COD-H2 pre-action abstention.** It cleared
+every test that could be run — blind demand 905, rung-2 structure against an incumbent **proven
+binary by source-read**, and rung 3 in full: real client with `rc2` and no fallback, RED arms that
+caught two real bugs plus an independent 9/9 probe, three wedge outcomes on live probabilities, model
+**echoed 5/5**, clean-clone **13/0**.
+
+**And that project's first phase is corpus acquisition, not code.** Not a build — **data**. The
+measurement needs a population this lane does not contain and cannot grow: 8 policy-relevant
+destructive actions, zero verifiable credential injections, 7 tiny journals left, and a ground truth
+that must come from somewhere other than the pattern rule under test.
+
+**That is a more useful answer than a rung-4 pass would have been.** A pass on 50 cases with a
+27-point interval, against a regex that defined its own labels, would have licensed a project built
+on nothing. **The gauntlet's product is this ruling plus the evidence for the sixteen candidates it
+did not choose — and the ruling holds because three independent parties each blocked the convenient
+outcome.**
