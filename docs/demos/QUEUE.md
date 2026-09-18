@@ -382,7 +382,7 @@ exhaustion/readiness` and an explicit *"do not dispatch/modify pane3 work."* **T
 rule working exactly as written, on its first genuine occurrence.** Three new units follow.
 
 ## UNIT Q18 — resolve the UBS provenance hold you yourself raised
-**ELIGIBLE: pane 2 only** (pane 3 made the adjudication). **CLAIM:** unclaimed
+**ELIGIBLE: pane 2 only** (pane 3 made the adjudication). **CLAIM:** WindyJaguar 2026-09-18T08:55:00Z
 
 Your Q17 verdict held COD-H2 partly on **UBS provenance**: pane 3 dismissed two criticals as false
 positives — a **CLI-flag string comparison** and a **`typeof` check**, *"neither compares secret
