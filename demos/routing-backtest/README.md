@@ -6,7 +6,7 @@ Give it your omp session logs. It replays every model turn twice — once at the
 actually paid, once at a cheap-model counterfactual — and reports the difference. Read-only:
 it never calls a model, needs no API key, and makes no network requests.
 
-Requires Node.js 20 or newer (`node --version`). No dependencies to install.
+Requires Node.js 20 or newer (`node --version`; package.json `engines`). No dependencies to install.
 
 ## Run it
 
@@ -14,9 +14,11 @@ Requires Node.js 20 or newer (`node --version`). No dependencies to install.
 npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out /tmp/rb-try.json
 ```
 
-That runs the worked example (6 turns, finishes in under a second). For your own logs, pass
-one or more omp session `.jsonl` files instead of the fixture — they live under your omp
-profiles directory (e.g. `~/.omp/profiles/*/agent/sessions/*/*.jsonl`). `--out` is required
+That runs the worked example: 6 turns, 1 session, `muse-spark-1.3-contributor` only
+(illustrative fixture, not a measurement — your logs are the measurement). It finishes in
+under a second on the author's machine (0.2–0.4s measured). For your own logs, pass one or
+more omp session `.jsonl` files instead of the fixture — they live under your omp profiles
+directory (e.g. `~/.omp/profiles/*/agent/sessions/*/*.jsonl`). `--out` is required
 so every run leaves a receipt. Other files in `fixtures/` are intentional failure cases
 (unknown models, unclassifiable turns) — start with `real-excerpt-t1-t6.jsonl`.
 
@@ -45,8 +47,10 @@ committed receipts other documents cite — do not leave trial files beside them
 
 ## Verdict (measured 2026-09-18, price table `as_of` 2026-09-18)
 
-On our own 30 turns: **$0.0034228 saved, or 0.0447%** (`0.0034228/7.658096908`,
-counterfactual-spend basis). Upstream reports −60% on theirs; on ours, routing barely pays.
+On our own 30 turns (30 classifiable of 30 seen, 2 sessions; 17× `gpt-5.6-luna`,
+13× `muse-spark-1.3-contributor`, per-model counts in the receipt): **$0.0034228 saved, or
+0.0447%** (`0.0034228/7.658096908`, counterfactual-spend basis). Upstream reports −60% on
+their 237 turns (`jev-codex-router@8292b51`); on ours, routing barely pays.
 Scope: this prices the SAME turns at a cheaper model. It does not measure turn reduction —
 a tool that deletes turns (fewer re-sends of the full context) plays a different lever this
 does not price.
