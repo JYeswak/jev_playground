@@ -1905,3 +1905,132 @@ deterministic checker on recall rather than on cost and latency, is mispriced.**
 
 Four of our five rung-2 survivors are candidate-picking designs. That is the one place the lane's
 instincts match the external record without my having seeded it.
+
+---
+
+## §3u COD-H2 SURVIVES, narrowed to three properties — the incumbent is binary, and that is quoted
+
+**`docs/demos/duel-2/RUNG2_COD-H2_owned_MU.md` (`25eee0c`).** Pane 3 **installed
+`langchain-typesafe==0.0.1a2` from PyPI ($0, no key) and read `auto_mode.py`, 255 lines, in full.**
+Not inferred from a blog post — read.
+
+### The incumbent's control flow, quoted (`auto_mode.py:220-226`)
+
+```python
+if request.tool_call["name"] not in self._tool_names:
+    return handler(request)
+response = self.classifier.invoke(self._classification_state(request))
+probability = response.nouls[_QUESTION_ID].noul
+if probability >= _PROBABILITY_THRESHOLD:
+    return self._blocked_tool_message(request, probability)
+return handler(request)
+```
+
+`_PROBABILITY_THRESHOLD = 0.5` (line 39). And the docstring settles it (lines 75-88):
+
+> *"Calls below `threshold` execute normally. Calls at or above the threshold return an error
+> `ToolMessage` without invoking the tool handler"* … *"This middleware blocks risky calls;
+> **it does not request human approval.**"*
+
+**The outcome space is exactly two.** Pane 3: *"No `clarify`, no `gather`, no `abstain`, no
+`escalate`, no withhold-on-uncertainty, no confidence band, no human routing of any kind."* And a
+distinction I would have fumbled: *"Classification failures propagate with the handler unsent
+(fail-closed on error — sound, but **failure ≠ abstention**: it is an exception path, not a
+verdict)."*
+
+### It also audited the survey's own guidance — against my input
+
+The survey reports vendor guidance to *"treat anything under 0.3 to 0.5 as a signal to ask a human."*
+**Not implemented:** one constant at 0.5, no band semantics in 255 lines, *"a 0.49 call executes
+silently; a 0.51 call errors."* Then the part that matters: *"Whether the guidance exists as stated
+is itself **unverified here** — no source was given for it."*
+
+**That is R12 discipline turned on the conductor's own source.** I passed along a survey's paraphrase
+of vendor docs; pane 3 declined to treat it as established while still answering the question I
+asked against it. **Third time today a pane has refused to inherit an unverified claim from me.**
+
+### Ruling: CLEARED, narrowed to exactly three properties so it cannot drift
+
+**§3i does not kill here** — the incumbent is Jev-powered but **does not occupy COD-H2's distinctive
+claim.** The surviving wedge, in pane 3's words:
+
+1. a **withhold outcome** distinct from both allow and error-block — uncertain evidence must route
+   somewhere other than execution or refusal;
+2. **calibrated confidence with coverage semantics** — selective accuracy at stated coverage, not a
+   point threshold;
+3. at minimum a **human-routing outcome** (`clarify`/`escalate`) — *the exact path the incumbent's
+   docstring disavows.*
+
+> *"Anything COD-H2 builds outside those three overlaps a shipped, maintained artifact and should be
+> cut on sight. Inside them, no incumbent surveyed (including this one) competes."*
+
+**COD-H2 resumes the rung-3 WIP slot**, with §3s's scope: the **907 destructive-bash turns**.
+
+### The binding open risk, stated rather than buried: **Vercel is not ruled on**
+
+Pane 3 explicitly refused to rule on Vercel's `fx` auto mode — *"not independently reachable from
+here (search throttled, no source path given)"* — and scoped its verdict to the LangChain artifact
+alone. **That refusal is correct and the risk is real:** Vercel's is the *production* incumbent, at
+**18x p95 and more accurate**, heading for the AI Gateway default.
+
+**`fx`'s safety reviewer is a closed product surface, so it cannot be settled by source-read.** I am
+therefore **not blocking COD-H2 on it**, for the same reason I rejected blocking on the ambiguity bar
+in §3s: *an unverifiable condition used as a gate is a kill by paperwork.* What I am doing instead is
+recording it as the standing risk on the row, so that if Vercel's reviewer is ever shown to withhold
+on confidence, **COD-H2 dies on that evidence and this paragraph is where it was predicted.**
+
+### What COD-H2 must adopt from the incumbent rather than re-learn
+
+Pane 3 quoted these to keep the wedge honest, and they become contract requirements:
+
+- **30-message state window** with assistant/tool context (`_classification_state`, 166-179).
+- **Per-tool scoping** with pass-through for unlisted tools (220-221) — *"narrower blast radius than
+  a universal gate."*
+- **Trace redaction**: `TracePolicy(process_inputs=omit_payload)` (line 129) — *"they thought about
+  secret exposure in telemetry, which is more than most Jev wrappers do."*
+
+**And one fact that reprices "shipped":** the package is **`0.0.1a2`** — alpha, experimental module,
+API explicitly unstable. *Shipped but young.* That cuts both ways and is recorded as such: it is
+weaker as an ownership claim than the survey's framing implied, and it is also a moving target.
+
+---
+
+## §3v COD-H5 survives as **tester-to-subject** — it can benchmark the thing that ships
+
+**`docs/demos/duel-2/RUNG2_COD-H5_owned_MU.md` (`17f842c`).** Pane 3 read
+`github.com/tamaratran/fast-jev-compaction` in full via API — 903 stars, 39 forks, MIT — README,
+file tree, options table, limitations, plugin docs.
+
+**Ruling: DIFFERENT PRODUCTS, and the relationship is stronger than distinctness.**
+
+> *"H5 can **benchmark** fast-jev-compaction itself. … The shipped tool does not detect what
+> compaction destroyed; H5 detects exactly that, **for any compactor handed to it.** Tester to
+> subject is a complementary relationship, and complementary is not overlapping."*
+
+**The shipped tool decides *before* — scores tool calls and drops the junk. COD-H5 measures *after*
+— what did compaction destroy.** Those are orthogonal surfaces, and the second one takes the first
+as input.
+
+### The lane's own prior measurement supports it, with a stated limit
+
+Pane 3 cites an A/B this lane already ran: **pruned context 1/3 recall versus summary 3/3.** Pruning
+— which is what the shipped tool does — recovered one fact of three where summarisation recovered
+all three. **That is direct evidence that the shipped approach loses information COD-H5 claims to
+detect.**
+
+**N = 3 facts.** It is a pointer, not a result, and I am recording it as such so nobody later quotes
+"1/3 vs 3/3" as a measured lift. It earns COD-H5 a rung, not a ship.
+
+### The bias disclosure, which is why I trust the rest of the file
+
+Unprompted:
+
+> *"(Familiarity note: this tree is upstream of our vendored `fast-jev-compaction@6e1da50` — same
+> `src/` modules, same `hooks/fast-jev.ts` — which I read line by line during the hook bead.
+> **No new claims below depend on memory of that read; all citations are to the fetched README.**)"*
+
+**A pane naming a contamination source in its own history and firewalling against it is the exact
+behaviour §3o had to invent a rule to enforce on me.** It arrived here without a rule.
+
+**COD-H5 returns to CLEARED** at rung 2, ownership risk resolved, with its rung-3 order unchanged:
+it queues behind COD-H2 because the WIP limit is one and 895 < 905.
