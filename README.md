@@ -55,9 +55,15 @@ reports how many files and sessions it actually read before any share.
 
 Measured on this machine, 2026-09-18, over 4,626 files / 4,619 sessions / 488,724 billed turns:
 **98.878% of all tokens are retransmitted context** (cache read), 0.980% context first-write,
-0.140% output, 0.002% fresh input. Mean context re-sent per turn: **341,496 tokens**. Weighted at
-published relative rates (cache read 0.1x, output 5x) that is **~84% of billed cost**. Run it on
+0.140% output, 0.002% fresh input. Mean context re-sent per turn: **341,496 tokens**. Run it on
 yours; that is the point.
+
+Those four figures are **measurements** over the stated corpus — token shares, re-derivable by the
+one command above. A separate and weaker claim: weighting them by *assumed* relative rates (cache
+read 0.1x input, output 5x input) puts retransmission near **84% of cost** — that is an
+**estimate under assumed rates, not a measured bill**, the rates are unattributed here, and no
+invoice was observed. It is labelled because a non-author pane caught it presented beside the
+measurements with no class distinction, where it read as measured fact.
 
 **[`demos/routing-backtest`](demos/routing-backtest)** — *would a cheaper-model router have paid?*
 
@@ -68,7 +74,9 @@ cd demos/routing-backtest && npm run backtest -- fixtures/real-excerpt-t1-t6.jso
 On our 30 classifiable turns it measured **0.0447%** savings and the candidate was **ruled out**. The
 verdict is scoped deliberately: it answers *same-turn price substitution*, not turn elimination. 21
 tests, and **7/7 planted mutations caught** — three of which were real holes found under a suite that
-was already green.
+was already green. Reproduce that claim yourself with `npm run mutate`: it plants seven named
+mutations one at a time, requires the baseline green first, restores every file and compares by
+sha256, and exits non-zero if any mutation survives.
 
 **[`demos/retransmit-whatif`](demos/retransmit-whatif)** — *how much is the top lever worth?*
 

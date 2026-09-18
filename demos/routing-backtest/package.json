@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "node --test",
-    "backtest": "node bin/backtest.mjs"
+    "backtest": "node bin/backtest.mjs",
+    "mutate": "node tools/mutation-harness.mjs"
   }
 }
