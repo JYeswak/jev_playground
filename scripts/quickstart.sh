@@ -64,13 +64,56 @@ EOF
 
   echo
   echo "=== Would routing cheap turns to a cheaper model have saved YOU money?"
-  # FILES, NOT THE DIRECTORY. Passing the corpus root returned EISDIR: this demo takes session files
-  # while the shape tool takes a directory, and nothing said so. A bounded sample keeps the argument
-  # list finite, and the sample size is PRINTED rather than hidden, because a silently sampled
   # denominator is the defect this repo has spent the day removing from its own documents.
   sample_n=200
   mine_files=()
   while IFS= read -r f; do mine_files+=("$f"); done < <(find "$corpus" -name '*.jsonl' -type f 2>/dev/null | head -"$sample_n")
+  # THE ADAPTER PATH, and it needs YOUR price sheet because Claude Code records no cost.
+  #
+  # Claude Code logs carry tokens and a model string but no money, so a dollar answer can only come
+  # from rates you supply. This repo ships NONE: inventing them would make the answer fiction with a
+  # receipt attached. Set JEV_PRICES=/path/to/prices.json to get the answer; generate the template
+  # with `node demos/routing-backtest/bin/adapt-claude.mjs --print-price-template`.
+  if [[ -n "${JEV_PRICES:-}" ]]; then
+    if [[ ! -f "$JEV_PRICES" ]]; then
+      echo "    JEV_PRICES is set but $JEV_PRICES does not exist."
+    else
+      echo "    (bounded sample: ${#mine_files[@]} of $n_files session files; rates from $JEV_PRICES)"
+      if node demos/routing-backtest/bin/adapt-claude.mjs "${mine_files[@]}" --prices "$JEV_PRICES" \
+           --out "$mine_work/adapted.jsonl" >"$mine_work/adapt.json" 2>"$mine_work/adapt.log"; then
+        node -e '
+          const a=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));
+          console.log(`    converted ${a.turnsPriced} of ${a.assistantTurnsSeen} assistant turns; ${a.turnsRefused} refused`);
+          const r=a.refusedModels||{};
+          for (const [m,n] of Object.entries(r)) console.log(`      no rate supplied for ${m} (${n} turns) — add it to your sheet`);
+        ' "$mine_work/adapt.json"
+        if node demos/routing-backtest/bin/backtest.mjs "$mine_work/adapted.jsonl" \
+             --prices "$mine_work/adapted.jsonl.prices.json" --out "$mine_work/bt.json" >/dev/null 2>&1; then
+          node -e '
+            const r=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")), t=r.totals;
+            for (const k of ["actualSpend","counterfactualSpend","estimatedSavings","routedCheap","classifiableTurns"])
+              if (typeof t[k] !== "number") throw new Error(`totals.${k} missing — receipt schema changed`);
+            const pct=t.estimatedSavings/t.actualSpend*100;
+            console.log(`    ${t.estimatedSavings>0?"YES":"NO"}: $${t.actualSpend.toFixed(2)} actual vs $${t.counterfactualSpend.toFixed(2)} routed`);
+            console.log(`    = $${Math.abs(t.estimatedSavings).toFixed(2)} (${Math.abs(pct).toFixed(1)}%), routing ${t.routedCheap} of ${t.classifiableTurns} turns to the cheap model.`);
+            console.log(`    Both dollar figures are COMPUTED from your sheet. Claude Code records no cost.`);
+          ' "$mine_work/bt.json"
+        else
+          echo "    The backtest refused the converted data. Its floors are deliberate — a run where"
+          echo "    EVERY turn qualifies for the cheap model is rejected as NO_BASELINE_CANDIDATES"
+          echo "    rather than reported as a saving, which is how this path caught a conversion bug."
+        fi
+      else
+        echo "    Conversion failed:"
+        tail -3 "$mine_work/adapt.log" | sed 's/^/      /'
+      fi
+      echo
+    fi
+  fi
+
+  # FILES, NOT THE DIRECTORY. Passing the corpus root returned EISDIR: this demo takes session files
+  # while the shape tool takes a directory, and nothing said so. A bounded sample keeps the argument
+  # list finite, and the sample size is PRINTED rather than hidden, because a silently sampled
   echo "    (bounded sample: ${#mine_files[@]} of $n_files session files, newest-first as the filesystem lists them)"
   if node demos/routing-backtest/bin/backtest.mjs "${mine_files[@]}" --out "$mine_work/bt.json" >"$mine_work/bt.log" 2>&1; then
     node -e '
