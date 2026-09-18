@@ -1,0 +1,17 @@
+demo-1-route-backtest	measurement
+demo-2-admission-screen	hold-resolution
+demo-3-claim-check-gate	other
+demo-4-foreman-lite	verdict
+demo-5-fact-ledger	verdict
+demo-6-claim-check-notes	hold-resolution
+demo-7-signals-starter	measurement
+demo-8-credential-screen	score
+demo-9-review-signal	hold-resolution
+COD-H1-snapshot-completion	measurement
+COD-H2-preaction-abstention	other
+COD-H3-price-drift-auditor	verdict
+COD-H4-toolresult-replay	measurement
+COD-H5-compaction-integrity	verdict
+MU-H1-todo-judge	measurement
+MU-H2-outbound-redaction	other
+MU-H3-runtime-redaction	measurement
