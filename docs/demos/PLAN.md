@@ -3949,3 +3949,72 @@ it is priced correctly and **sequenced wrong**.
 **Two blockers fell this turn and one appeared. The net is that the *idea* looks better and the
 *infrastructure* looks worse** — which is the opposite of how this session started, when demo-1 had
 excellent infrastructure and no Jev calls in it.
+
+---
+
+## §5a THE RULING'S SECOND PICK IS DEMOTED — and an "immutable" manifest may have been rewritten by our own commit hook
+
+### Q48 — `MU-H3_PREVALENCE_UNASKABLE_CURRENT_LANE` (`8a99920`, pane 2 as non-author)
+
+**I published a ruling telling someone to go measure a thing this lane had already declared
+unmeasurable, and I only caught it because I asked.** Confirmed:
+
+- Q39 struck the credential stratum: **journals exhausted, credential_injection = 0, and the 97
+  candidate shapes are *not real credentials*.**
+- Q19's entropy defeat is **synthetic only** — 23 hand-authored sentinels.
+- **"No honest real outbound prevalence source in lane."**
+
+**Pane 2's structural finding is the part that changes the ruling:** *"Real prevalence is an
+**external prerequisite, not a lane phase**."* You cannot establish that something is a real
+credential *"without either exposing a secret or creating a synthetic canary."* Inside the lane the
+only honest source is a **synthetic runtime canary corpus**; a real estimate *"requires an external
+partner or production telemetry owner."*
+
+**And the sharper consequence, stated by the auditor against my own document:** the ruling *"should
+not present MU-H3 as equally ready with COD-H2"*, and MU-H3's honest in-lane form is **a Jev-free
+deterministic redaction tool plus a synthetic evaluation harness.**
+
+**That is COD-H3's Fork B arriving at the lane's second-place candidate.** If MU-H3's in-lane form is
+Jev-free, it belongs in lane tooling rather than the Jev demo backlog — which is demo-1's lesson
+applied to the very candidate I picked on the strength of the lane's only measured baseline defeat.
+
+**Both of the ruling's picks are now blocked on data this lane cannot obtain**, and they are blocked
+*differently*: COD-H2 needs a redesigned manifest plus a specification plus a corpus; MU-H3 needs an
+external partner before its first phase is even a phase.
+
+### Q45 — the draw is sound, and its disclosed discrepancy indicts our own tooling
+
+**`verifiable-draw-20260918T071500Z.json` (`3daa157`), seed `20260921` committed before the draw.**
+Allocation **ambiguous 10 / disallowed 3 / reversible 7 = 20**, fixed per spec, seed-shuffled within
+stratum, **20/20 self-consistent against the predicates quoted verbatim in the receipt.**
+
+**And a count discrepancy pane 3 disclosed and attributed to itself, three causes in order of
+likelihood:**
+
+```text
+Q44 reported sufficient   12 / 4 / 8
+draw rule-passing pools   13 / 4 / 10
+```
+
+1. Q44's reversible rule used **ANY**-safe-token; the draw uses **ALL**-safe — *stricter, yet yields
+   more* (10 vs 8). *"Inconsistent unless inputs differ."*
+2. **`autofix` reformatted `rung4-corpus.json` at commit time, possibly altering preview strings.**
+3. **Q44's receipt recorded counts without per-case IDs, making exact reconciliation impossible.**
+
+**Cause 2 is the one that should alarm us, and nobody was looking for it: the manifest we called
+immutable passes through a reformatter on the way into the repository.** §4z's finding was that a
+manifest must not point into a mutable corpus — **this is worse and one level closer in: the
+manifest itself is mutable via our own commit hook.** An artifact sealed by convention and unsealed
+by tooling.
+
+**Cause 3 is a rule pane 3 wrote against its own earlier receipt:** *"per-case ID lists are part of
+any count claim — my Q44 receipt **failed its own re-derivation standard**."* **A count without
+identities cannot be re-derived, which makes it a claim rather than a measurement.** The same defect
+family as §4z, one level up: aggregate reported, members unrecoverable.
+
+**This receipt fixes it forward** — the sample file carries full per-case identity and the sufficiency
+predicates are quoted verbatim *"so the draw re-derives exactly."*
+
+**Ruling: the 20-case sample stands.** It is self-consistent against stated predicates with committed
+identities and a pre-committed seed. **The 59% insufficiency headline stands directionally and its
+exact per-stratum counts do not** — and that distinction is now recorded rather than papered over.

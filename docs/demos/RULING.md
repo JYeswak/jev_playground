@@ -293,3 +293,39 @@ unmeasurable here. **A safe design with no instances is still unaskable.**
 
 **A retry condition that cannot be checked is a kill wearing a retry**, which is exactly what §3c
 exists to prevent — and the ruling shipped three of them before this audit.
+
+---
+
+## AMENDMENT 2 (appended 2026-09-18, after `8a99920`) — MU-H3 is demoted; it is not equally ready
+
+**I told someone to measure a thing this lane had already declared unmeasurable.** Pane 2, as
+non-author: **`MU-H3_PREVALENCE_UNASKABLE_CURRENT_LANE`.**
+
+- The credential stratum was struck (§4t/§4w): **journals exhausted, `credential_injection = 0`, and
+  the 97 candidate shapes are *not real credentials*.**
+- The entropy defeat (§4f) is **synthetic** — 23 hand-authored sentinels.
+- *"No honest real outbound prevalence source in lane."*
+
+**The structural correction:** *"Real prevalence is an **external prerequisite, not a lane phase**."*
+Establishing that something is a real credential requires **either exposing a secret or creating a
+synthetic canary** — so inside this lane the only honest source is a **synthetic runtime canary
+corpus**, and a real estimate needs **an external partner or production telemetry owner.**
+
+**MU-H3's entry above is corrected:**
+
+- **It is NOT equally ready with COD-H2** — the auditor's words, and the ruling as written implied
+  otherwise.
+- **First phase is synthetic canary boundary measurement**, not prevalence. Prevalence is a
+  prerequisite that sits outside this lane entirely.
+- **Its honest in-lane form may be a *Jev-free* deterministic redaction tool** plus a synthetic
+  evaluation harness — which is **COD-H3's Fork B arriving at the second-place candidate**, and by
+  demo-1's lesson that belongs in lane tooling rather than the Jev demo backlog.
+- **Retry:** a trusted external corpus returns it to the prevalence phase; synthetic-only narrows it
+  to a Jev-free security tool.
+
+**So the ruling's real shape is one candidate, plus one conditional candidate whose Jev-necessity is
+itself now in doubt** — and **both are blocked on data this lane cannot obtain, differently.**
+COD-H2 needs manifest design → specification → corpus. MU-H3 needs an external partner before its
+first phase is even a phase.
+
+**That is a less satisfying answer than "two candidates deserve projects" and a more useful one.**
