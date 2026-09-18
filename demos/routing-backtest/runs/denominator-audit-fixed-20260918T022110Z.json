@@ -1,0 +1,35 @@
+{
+  "schema": "jev.route-backtest.denominator-audit.v2",
+  "bead": "jev-demo-loop-a1q.5",
+  "generated_at": "2026-09-18T02:21:10Z",
+  "fixture": "demos/routing-backtest/fixtures/real-excerpt-t1-t6.jsonl",
+  "counts": {
+    "jsonlRows": 94,
+    "rowsContainingModelField": 18,
+    "manifestPurpose": "happy-path corpus turns 1-6",
+    "beforeReaderFix": {
+      "sessions": 1,
+      "turns": 1,
+      "classifiableTurns": 1,
+      "skippedTurns": 0
+    },
+    "afterReaderFix": {
+      "sessions": 1,
+      "turns": 6,
+      "classifiableTurns": 6,
+      "skippedTurns": 0
+    },
+    "messageEndRoles": {
+      "user": 1,
+      "assistant": 6,
+      "toolResult": 6
+    },
+    "turnStartEvents": 6,
+    "turnEndEvents": 6
+  },
+  "turnDefinition": "One turn is one turn_start→turn_end pair when markers exist; markerless logs use one user prompt plus following assistant/tool rows.",
+  "authoritativeCount": 6,
+  "sourceFix": "demos/routing-backtest/src/transcript-reader.mjs at 15d639e",
+  "pane3Update": "Exact README replacement sent via ntm to pane 3; manifest not edited.",
+  "no_claim": "Fixture files were not edited; stranger receipt rerun remains Unit 3 work."
+}
