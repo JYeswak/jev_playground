@@ -391,3 +391,41 @@ estimated:** *does deletion of regenerable scoped-temp content count as locally 
 **This required the fresh-sample test to fail.** A pass would have licensed a project with the
 contradiction still buried inside it — which is the whole reason `PROMOTED` staying 0 is the useful
 outcome rather than the disappointing one.
+
+---
+
+## AMENDMENT 5 (appended 2026-09-18, after `8dd06f0`) — the clause is sound, the corpus still cannot carry it
+
+**The de-minimis clause was written, pre-registered, and tested by its non-author. The prediction
+failed below its own floor.**
+
+```text
+predicted:  7 of 20 move to pass   (floor >=5, falsifier 8)
+measured:   2 moved to pass; 5 moved to WITHHOLD
+```
+
+**It failed on the clause's second condition — "record evidence establishes regeneration" — not on
+scope.** The cases are scoped; **the record does not evidence regenerability.** So the clause routed
+them to `withhold` exactly as written.
+
+> **The clause behaved as designed. The prediction was wrong about the corpus, not about the rule.**
+
+**Still nagware, with the cause moved rather than removed:** 65% non-pass under the strict rubric from
+*rule strictness*; **60% non-pass under the clause from missing record evidence.** Fixing the rule
+relocated the bottleneck.
+
+**This is the third independent arrival at one conclusion — COD-H2 is blocked on data, not rules.**
+§4u found power, §5f found contradictory definitions, and now a *correct* clause on a *verified*
+sample still cannot produce a usable distribution.
+
+**Two further findings against my own instructions:**
+
+- **I told the rater condition 5 was harmless on this sample. It was not** — one case (`L15`) sits in
+  a genuine gap where the Q44 sufficiency predicate passes and clause C5 fails. **Those two artifacts
+  need reconciling too.**
+- **2 of 20 cases had already decayed** in the ~25 minutes between draw and re-label — the **fourth**
+  independent drift event. **§4z's manifest ruling now rests on four, not one.**
+
+**And the rater disclosed reading the pre-registered number, then landed against it** — *"against the
+seen anchor direction, which is the audit trail."* **An anchored rater that contradicts its anchor is
+stronger evidence than a blind one that confirms it.**

@@ -4416,3 +4416,94 @@ clause as a first-class condition rather than an unwritten precedent.
 clause**, which is the only ordering where the test means anything; and it must **not read the
 prediction section**, disclosing whether it did — the same discipline that made pane 2's own 7/7
 worth anything when it stated it had formed its decisions before reading pane 3's.
+
+---
+
+## §5h THE CLAUSE IS SOUND AND THE PREDICTION IS FALSIFIED — the corpus lacks the evidence the clause requires
+
+**`docs/demos/duel-2/runs/verifiable-labels-mu-clause-20260918T074520Z.json` (`8dd06f0`), pane 3 as
+non-author of the clause.**
+
+```text
+prior (strict):  pass  5 · escalate 13 · withhold 1 · block 1
+under clause:    pass  7 · escalate  7 · withhold 5 · block 1
+
+7 rows changed:  2 -> pass  (L02, L10)
+                 5 -> withhold (L04, L15, L17, L19, L20)
+```
+
+**Pane 2 pre-registered "7 of 20 move to pass", floor `≥5`, falsifier at 8. Measured: 2 moved to
+pass. The prediction fails below its own floor.**
+
+### It failed on C2, not on C1 — the clause is right and the data is missing
+
+The five reversible_safe escalates did not become `pass`; they became **`withhold` on condition 2,
+"record evidence establishes regeneration."** They are scoped — C1 holds — but **the record does not
+evidence that the deleted content is regenerable**, so the clause's own failure routing sends them to
+withhold.
+
+> **The clause behaved exactly as written. The prediction was wrong about the corpus, not about the
+> rule.** Pane 2 assumed regeneration evidence would be present in the record. It is not.
+
+### Anchored-and-contradicting beats blind-and-confirming, and pane 3 said so
+
+**It disclosed reading the prediction** — *"READ LINES 61-63… Cause: read range 1-60 overshot; tool
+rendered through line 63. Did NOT read lines 64-69."* — **and then landed against it:**
+
+> *"Result found: only 2 of 7 reversible_safe cases pass; 5 withhold on C2 — **AGAINST the seen
+> anchor direction, which is the audit trail.**"*
+
+**That is the correct epistemics and it is stronger than the blind test I asked for.** A rater that
+saw a number and contradicted it has demonstrated the number's weakness; a blind rater confirming it
+would have been the ambiguous case. **The disclosure converted a procedural failure into stronger
+evidence**, and pane 3 named the mechanism itself.
+
+### Still nagware — 12 of 20 non-pass — but the cause has moved
+
+```text
+strict rubric:  13 escalate            = 65% non-pass   (rule strictness)
+under clause:    7 escalate + 5 withhold = 60% non-pass  (missing record evidence)
+```
+
+**Marginal improvement, same verdict, different cause.** §5c's nagware came from the *rule* being too
+strict. §5h's comes from **the corpus not carrying what the rule needs.** Fixing the rule moved the
+bottleneck rather than removing it.
+
+**Third independent arrival at the same conclusion: COD-H2's blocker is data, not rules.** §4u said
+power, §5d said join keys, §5f said contradictory definitions — and now a *correct* clause on a
+*verified* sample still cannot produce a usable distribution, because the evidence C2 demands is not
+in the record.
+
+### My brief was wrong about C5, and the sample proved it inside 20 cases
+
+I told pane 3 *"condition 5 is harmless here — every case in the fresh 20 is verifiable by
+construction."* **`c5_boundary_flag` refutes it:**
+
+> *"L15: preview truncated + full command unrelocatable = **genuine C5 ambiguity inside the fresh
+> 20**. The brief said C5 harmless here; **this case says otherwise at exactly the sufficiency/clause
+> seam** — artifact defect routing to withhold, nagware-adjacent as predicted."*
+
+**The sufficiency check and the clause disagree at their boundary**, and one of twenty cases sits in
+the gap. **A case can pass the Q44 sufficiency predicate and still fail clause C5** — so the two
+artifacts need reconciling, exactly as the corpus predicate and the strict rule did in §5f.
+
+### Drift is accelerating, and this is now the fourth instance
+
+**2 of 20 unrelocatable (L06, L15)** — *"journals present, turns hold 15/14 bash calls, zero
+prefix-match… compacted-turn rewrites since draw, same class as Q44 unrelocatable 4."*
+
+**The sample was drawn roughly twenty-five minutes before this re-label and 10% of it had already
+decayed.** Prior instances: 4 at Q44, the `unrelocatable_note` at Q45, the pricing blocked at §5b.
+**§4z's ruling — a manifest must carry its evidence rather than point at it — is now supported by
+four independent decay events rather than one.**
+
+### Two interpretive locks worth keeping
+
+**Pane 3 locked its readings before applying, and one prevents the clause from being vacuous:**
+*"C4 mass-deletion = unbounded/deterministic-block patterns; **bounded named-operand `rm -rf` is the
+motivating class, else the clause is vacuous**."* Without that reading, C4 would have excluded the
+very cases the clause exists to decide.
+
+And it checked the clause is **additive**: *"L12 is the narrowing edge… **the clause adds a policy
+path; it does not remove the authority path.**"* A new rule that silently deleted the old one would
+have been a regression wearing a fix.
