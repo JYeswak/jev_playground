@@ -1,0 +1,603 @@
+{
+  "schema": "jev.doc-review.v1",
+  "generated_at": "20260918T001523Z",
+  "head": "6b721c9",
+  "actor": "CyanFalcon",
+  "model": "jev-latest",
+  "endpoint": "https://api.typesafe.ai/v1/systemone",
+  "key_source": "file:/tmp/.tskey -> Bearer header (value never recorded)",
+  "budget": {
+    "requests": 48,
+    "questions_per_request": 5,
+    "failures": 0,
+    "wall_seconds": 49,
+    "state_cap_chars": 24000,
+    "units_truncated": 0
+  },
+  "corpus": {
+    "tracked_md": 15,
+    "untracked_draft": 1,
+    "agents_md_sections": 33,
+    "units": 48
+  },
+  "questions": {
+    "receipted": {
+      "type": "noul",
+      "instructions": "Every factual or numeric claim in this document points at something a reader could actually check \u2014 a file path, a command, a commit sha, a receipt file, or a quoted measurement. Answer no if any number or claim of fact appears with no way to verify it."
+    },
+    "fresh_agent_executable": {
+      "type": "noul",
+      "instructions": "A fresh agent with no memory of the session that wrote this could act on this document without asking a human a clarifying question."
+    },
+    "self_contradiction": {
+      "type": "noul",
+      "instructions": "This document contains two instructions or claims that cannot both be true or both be followed."
+    },
+    "stale_risk": {
+      "type": "score",
+      "instructions": "Rate the risk that this document has drifted out of date relative to a fast-moving repository: does it pin versions, counts, or states that go stale, without saying how to re-derive them?"
+    },
+    "process_porn": {
+      "type": "score",
+      "instructions": "Rate how much of this document is process about process \u2014 ceremony, plans about planning, or artifacts whose only consumer is another agent \u2014 versus content that changes what gets built or shipped."
+    }
+  },
+  "medians": {
+    "receipted": 0.27,
+    "fresh_agent": 0.59,
+    "contradiction": 0.18,
+    "stale_risk": 1.15,
+    "process_porn": 1.79
+  },
+  "rows": [
+    {
+      "unit": ".flywheel/feedback/2026-09-17.md",
+      "bytes": 4726,
+      "truncated": false,
+      "receipted": 0.21,
+      "fresh_agent": 0.45,
+      "contradiction": 0.17,
+      "stale_risk": 2.04,
+      "stale_conf": 0.6,
+      "process_porn": 1.94
+    },
+    {
+      "unit": ".flywheel/worksheets/2026-09-17-lane-substrate.md",
+      "bytes": 4797,
+      "truncated": false,
+      "receipted": 0.24,
+      "fresh_agent": 0.5,
+      "contradiction": 0.22,
+      "stale_risk": 1.62,
+      "stale_conf": 0.28,
+      "process_porn": 2.26
+    },
+    {
+      "unit": "AGENTS.md :: # AGENTS.md \u2014 jev",
+      "bytes": 549,
+      "truncated": false,
+      "receipted": 0.17,
+      "fresh_agent": 0.17,
+      "contradiction": 0.13,
+      "stale_risk": 2.01,
+      "stale_conf": 0.71,
+      "process_porn": 2.59
+    },
+    {
+      "unit": "AGENTS.md :: ## \u00a70 The Rules \u2014 the non-negotiables, in one place",
+      "bytes": 2489,
+      "truncated": false,
+      "receipted": 0.17,
+      "fresh_agent": 0.53,
+      "contradiction": 0.16,
+      "stale_risk": 0.23,
+      "stale_conf": 0.77,
+      "process_porn": 2.44
+    },
+    {
+      "unit": "AGENTS.md :: ## RULE NUMBER 1: NO FILE DELETION",
+      "bytes": 531,
+      "truncated": false,
+      "receipted": 0.06,
+      "fresh_agent": 0.78,
+      "contradiction": 0.1,
+      "stale_risk": 0.04,
+      "stale_conf": 0.96,
+      "process_porn": 2.28
+    },
+    {
+      "unit": "AGENTS.md :: ## RULE 1.5: THIS IS A LANE, NOT A LIBRARY",
+      "bytes": 1524,
+      "truncated": false,
+      "receipted": 0.23,
+      "fresh_agent": 0.44,
+      "contradiction": 0.12,
+      "stale_risk": 0.2,
+      "stale_conf": 0.8,
+      "process_porn": 1.31
+    },
+    {
+      "unit": "AGENTS.md :: ## Irreversible Git & Filesystem Actions \u2014 DO NOT EVER BREAK GLASS",
+      "bytes": 1546,
+      "truncated": false,
+      "receipted": 0.32,
+      "fresh_agent": 0.82,
+      "contradiction": 0.11,
+      "stale_risk": 0.06,
+      "stale_conf": 0.94,
+      "process_porn": 2.5
+    },
+    {
+      "unit": "AGENTS.md :: ## Vendored Upstream Clones \u2014 Read-Mostly, Pinned, Never Pushed",
+      "bytes": 1488,
+      "truncated": false,
+      "receipted": 0.28,
+      "fresh_agent": 0.72,
+      "contradiction": 0.16,
+      "stale_risk": 0.63,
+      "stale_conf": 0.37,
+      "process_porn": 2.61
+    },
+    {
+      "unit": "AGENTS.md :: ## Git Branch: ONLY Use `main`, NEVER `master`",
+      "bytes": 3637,
+      "truncated": false,
+      "receipted": 0.19,
+      "fresh_agent": 0.67,
+      "contradiction": 0.26,
+      "stale_risk": 1.66,
+      "stale_conf": 0.56,
+      "process_porn": 1.89
+    },
+    {
+      "unit": "AGENTS.md :: ## Toolchain: npm and uv",
+      "bytes": 1600,
+      "truncated": false,
+      "receipted": 0.16,
+      "fresh_agent": 0.71,
+      "contradiction": 0.21,
+      "stale_risk": 2.11,
+      "stale_conf": 0.76,
+      "process_porn": 1.28
+    },
+    {
+      "unit": "AGENTS.md :: ## Secrets and the Paid Surface (CRITICAL)",
+      "bytes": 1821,
+      "truncated": false,
+      "receipted": 0.13,
+      "fresh_agent": 0.57,
+      "contradiction": 0.12,
+      "stale_risk": 0.29,
+      "stale_conf": 0.71,
+      "process_porn": 0.85
+    },
+    {
+      "unit": "AGENTS.md :: ## Code Editing Discipline",
+      "bytes": 2736,
+      "truncated": false,
+      "receipted": 0.12,
+      "fresh_agent": 0.86,
+      "contradiction": 0.11,
+      "stale_risk": 0.05,
+      "stale_conf": 0.95,
+      "process_porn": 1.26
+    },
+    {
+      "unit": "AGENTS.md :: ## Backwards Compatibility",
+      "bytes": 588,
+      "truncated": false,
+      "receipted": 0.11,
+      "fresh_agent": 0.57,
+      "contradiction": 0.18,
+      "stale_risk": 2.02,
+      "stale_conf": 0.71,
+      "process_porn": 0.43
+    },
+    {
+      "unit": "AGENTS.md :: ## Verification Checks (CRITICAL)",
+      "bytes": 1827,
+      "truncated": false,
+      "receipted": 0.46,
+      "fresh_agent": 0.63,
+      "contradiction": 0.23,
+      "stale_risk": 1.63,
+      "stale_conf": 0.22,
+      "process_porn": 2.18
+    },
+    {
+      "unit": "AGENTS.md :: ## Testing",
+      "bytes": 4157,
+      "truncated": false,
+      "receipted": 0.16,
+      "fresh_agent": 0.74,
+      "contradiction": 0.15,
+      "stale_risk": 1.4,
+      "stale_conf": 0.34,
+      "process_porn": 1.34
+    },
+    {
+      "unit": "AGENTS.md :: ## The Jev Oracle",
+      "bytes": 1635,
+      "truncated": false,
+      "receipted": 0.31,
+      "fresh_agent": 0.55,
+      "contradiction": 0.14,
+      "stale_risk": 0.82,
+      "stale_conf": 0.46,
+      "process_porn": 1.77
+    },
+    {
+      "unit": "AGENTS.md :: ## Named Reward-Hacking Patterns (ALL FORBIDDEN)",
+      "bytes": 1815,
+      "truncated": false,
+      "receipted": 0.15,
+      "fresh_agent": 0.59,
+      "contradiction": 0.11,
+      "stale_risk": 0.35,
+      "stale_conf": 0.65,
+      "process_porn": 2.02
+    },
+    {
+      "unit": "AGENTS.md :: ## Claim Discipline",
+      "bytes": 1386,
+      "truncated": false,
+      "receipted": 0.34,
+      "fresh_agent": 0.59,
+      "contradiction": 0.07,
+      "stale_risk": 0.6,
+      "stale_conf": 0.4,
+      "process_porn": 1.75
+    },
+    {
+      "unit": "AGENTS.md :: ## Third-Party Library Usage",
+      "bytes": 802,
+      "truncated": false,
+      "receipted": 0.25,
+      "fresh_agent": 0.62,
+      "contradiction": 0.19,
+      "stale_risk": 1.1,
+      "stale_conf": 0.47,
+      "process_porn": 2.22
+    },
+    {
+      "unit": "AGENTS.md :: ## Primary Sources \u2014 Vendored Locally (READ THESE FIRST)",
+      "bytes": 6184,
+      "truncated": false,
+      "receipted": 0.42,
+      "fresh_agent": 0.66,
+      "contradiction": 0.21,
+      "stale_risk": 0.93,
+      "stale_conf": 0.51,
+      "process_porn": 1.79
+    },
+    {
+      "unit": "AGENTS.md :: ## jev \u2014 This Project",
+      "bytes": 10007,
+      "truncated": false,
+      "receipted": 0.31,
+      "fresh_agent": 0.6,
+      "contradiction": 0.24,
+      "stale_risk": 1.22,
+      "stale_conf": 0.51,
+      "process_porn": 1.35
+    },
+    {
+      "unit": "AGENTS.md :: ## The Demo Process \u2014 Research \u2192 Pin \u2192 Probe \u2192 Port",
+      "bytes": 3927,
+      "truncated": false,
+      "receipted": 0.24,
+      "fresh_agent": 0.45,
+      "contradiction": 0.26,
+      "stale_risk": 0.78,
+      "stale_conf": 0.47,
+      "process_porn": 1.85
+    },
+    {
+      "unit": "AGENTS.md :: ## \u00a74 Definition of Done \u2014 the acceptance bar",
+      "bytes": 1534,
+      "truncated": false,
+      "receipted": 0.31,
+      "fresh_agent": 0.29,
+      "contradiction": 0.24,
+      "stale_risk": 0.42,
+      "stale_conf": 0.58,
+      "process_porn": 1.98
+    },
+    {
+      "unit": "AGENTS.md :: ## Research Surfaces",
+      "bytes": 1372,
+      "truncated": false,
+      "receipted": 0.24,
+      "fresh_agent": 0.63,
+      "contradiction": 0.23,
+      "stale_risk": 1.75,
+      "stale_conf": 0.59,
+      "process_porn": 2.6
+    },
+    {
+      "unit": "AGENTS.md :: ## Fleet Coordination \u2014 Three omp Agents in One NTM Session",
+      "bytes": 1711,
+      "truncated": false,
+      "receipted": 0.23,
+      "fresh_agent": 0.56,
+      "contradiction": 0.17,
+      "stale_risk": 0.94,
+      "stale_conf": 0.31,
+      "process_porn": 2.7
+    },
+    {
+      "unit": "AGENTS.md :: ## The omp Harness \u2014 Native Surfaces (measured, not remembered)",
+      "bytes": 8115,
+      "truncated": false,
+      "receipted": 0.25,
+      "fresh_agent": 0.62,
+      "contradiction": 0.17,
+      "stale_risk": 1.15,
+      "stale_conf": 0.57,
+      "process_porn": 1.29
+    },
+    {
+      "unit": "AGENTS.md :: ## Jev \u00d7 omp Integration \u2014 Seams and the Validation Ladder",
+      "bytes": 5440,
+      "truncated": false,
+      "receipted": 0.15,
+      "fresh_agent": 0.37,
+      "contradiction": 0.15,
+      "stale_risk": 0.87,
+      "stale_conf": 0.44,
+      "process_porn": 1.26
+    },
+    {
+      "unit": "AGENTS.md :: ## Beads (br) \u2014 Dependency-Aware Issue Tracking",
+      "bytes": 2891,
+      "truncated": false,
+      "receipted": 0.32,
+      "fresh_agent": 0.51,
+      "contradiction": 0.12,
+      "stale_risk": 0.86,
+      "stale_conf": 0.42,
+      "process_porn": 2.59
+    },
+    {
+      "unit": "AGENTS.md :: ## bv \u2014 Graph-Aware Triage Engine",
+      "bytes": 640,
+      "truncated": false,
+      "receipted": 0.44,
+      "fresh_agent": 0.51,
+      "contradiction": 0.12,
+      "stale_risk": 0.24,
+      "stale_conf": 0.76,
+      "process_porn": 1.73
+    },
+    {
+      "unit": "AGENTS.md :: ## UBS \u2014 Ultimate Bug Scanner",
+      "bytes": 875,
+      "truncated": false,
+      "receipted": 0.12,
+      "fresh_agent": 0.61,
+      "contradiction": 0.14,
+      "stale_risk": 0.49,
+      "stale_conf": 0.51,
+      "process_porn": 1.3
+    },
+    {
+      "unit": "AGENTS.md :: ## ripwire \u2014 Deterministic Code Context (use before you read files)",
+      "bytes": 2586,
+      "truncated": false,
+      "receipted": 0.41,
+      "fresh_agent": 0.74,
+      "contradiction": 0.22,
+      "stale_risk": 1.97,
+      "stale_conf": 0.59,
+      "process_porn": 1.79
+    },
+    {
+      "unit": "AGENTS.md :: ## ast-grep vs ripgrep",
+      "bytes": 841,
+      "truncated": false,
+      "receipted": 0.28,
+      "fresh_agent": 0.74,
+      "contradiction": 0.05,
+      "stale_risk": 0.05,
+      "stale_conf": 0.95,
+      "process_porn": 0.93
+    },
+    {
+      "unit": "AGENTS.md :: ## Landing the Plane (Session Completion)",
+      "bytes": 823,
+      "truncated": false,
+      "receipted": 0.64,
+      "fresh_agent": 0.22,
+      "contradiction": 0.11,
+      "stale_risk": 0.3,
+      "stale_conf": 0.7,
+      "process_porn": 2.66
+    },
+    {
+      "unit": "AGENTS.md :: ## cass \u2014 Cross-Agent Session Search",
+      "bytes": 1652,
+      "truncated": false,
+      "receipted": 0.08,
+      "fresh_agent": 0.62,
+      "contradiction": 0.22,
+      "stale_risk": 0.73,
+      "stale_conf": 0.27,
+      "process_porn": 2.74
+    },
+    {
+      "unit": "AGENTS.md :: ## Note on Built-in TODO Functionality",
+      "bytes": 264,
+      "truncated": false,
+      "receipted": 0.32,
+      "fresh_agent": 0.67,
+      "contradiction": 0.12,
+      "stale_risk": 0.03,
+      "stale_conf": 0.97,
+      "process_porn": 2.66
+    },
+    {
+      "unit": "EVAL.md",
+      "bytes": 14871,
+      "truncated": false,
+      "receipted": 0.26,
+      "fresh_agent": 0.32,
+      "contradiction": 0.43,
+      "stale_risk": 1.58,
+      "stale_conf": 0.28,
+      "process_porn": 2.14
+    },
+    {
+      "unit": "GATES.md",
+      "bytes": 9202,
+      "truncated": false,
+      "receipted": 0.28,
+      "fresh_agent": 0.53,
+      "contradiction": 0.43,
+      "stale_risk": 1.72,
+      "stale_conf": 0.25,
+      "process_porn": 1.5
+    },
+    {
+      "unit": "NEGATIVE_EVIDENCE.md",
+      "bytes": 6320,
+      "truncated": false,
+      "receipted": 0.35,
+      "fresh_agent": 0.67,
+      "contradiction": 0.16,
+      "stale_risk": 1.3,
+      "stale_conf": 0.53,
+      "process_porn": 1.58
+    },
+    {
+      "unit": "REVIEW-PERSONAS.md",
+      "bytes": 3747,
+      "truncated": false,
+      "receipted": 0.17,
+      "fresh_agent": 0.37,
+      "contradiction": 0.25,
+      "stale_risk": 2.23,
+      "stale_conf": 0.63,
+      "process_porn": 2.58
+    },
+    {
+      "unit": "TESTS.md",
+      "bytes": 4829,
+      "truncated": false,
+      "receipted": 0.32,
+      "fresh_agent": 0.7,
+      "contradiction": 0.22,
+      "stale_risk": 1.42,
+      "stale_conf": 0.5,
+      "process_porn": 1.93
+    },
+    {
+      "unit": "compaction/README.md",
+      "bytes": 1844,
+      "truncated": false,
+      "receipted": 0.34,
+      "fresh_agent": 0.73,
+      "contradiction": 0.22,
+      "stale_risk": 1.68,
+      "stale_conf": 0.64,
+      "process_porn": 1.09
+    },
+    {
+      "unit": "compaction/runs/hook-recon-20260917.md",
+      "bytes": 4076,
+      "truncated": false,
+      "receipted": 0.27,
+      "fresh_agent": 0.58,
+      "contradiction": 0.29,
+      "stale_risk": 1.4,
+      "stale_conf": 0.53,
+      "process_porn": 1.79
+    },
+    {
+      "unit": "docs/demos/USAGE-MAP.md",
+      "bytes": 6171,
+      "truncated": false,
+      "receipted": 0.32,
+      "fresh_agent": 0.32,
+      "contradiction": 0.26,
+      "stale_risk": 2.42,
+      "stale_conf": 0.42,
+      "process_porn": 1.75
+    },
+    {
+      "unit": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+      "bytes": 17551,
+      "truncated": false,
+      "receipted": 0.34,
+      "fresh_agent": 0.34,
+      "contradiction": 0.27,
+      "stale_risk": 2.06,
+      "stale_conf": 0.55,
+      "process_porn": 1.39
+    },
+    {
+      "unit": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+      "bytes": 13529,
+      "truncated": false,
+      "receipted": 0.4,
+      "fresh_agent": 0.41,
+      "contradiction": 0.23,
+      "stale_risk": 2.21,
+      "stale_conf": 0.5,
+      "process_porn": 1.36
+    },
+    {
+      "unit": "docs/demos/tick.md",
+      "bytes": 3315,
+      "truncated": false,
+      "receipted": 0.24,
+      "fresh_agent": 0.44,
+      "contradiction": 0.32,
+      "stale_risk": 0.67,
+      "stale_conf": 0.48,
+      "process_porn": 2.34
+    },
+    {
+      "unit": "foundation/CALIBRATION.md",
+      "bytes": 3410,
+      "truncated": false,
+      "receipted": 0.37,
+      "fresh_agent": 0.58,
+      "contradiction": 0.17,
+      "stale_risk": 1.61,
+      "stale_conf": 0.3,
+      "process_porn": 1.56
+    },
+    {
+      "unit": "docs/demos/PLAN.md",
+      "bytes": 9379,
+      "truncated": false,
+      "receipted": 0.31,
+      "fresh_agent": 0.59,
+      "contradiction": 0.19,
+      "stale_risk": 1.96,
+      "stale_conf": 0.41,
+      "process_porn": 1.55
+    }
+  ],
+  "hand_verified_findings": [
+    {
+      "jev_signal": "contradiction=0.43 (corpus max, tied)",
+      "unit": "GATES.md",
+      "verdict": "REAL",
+      "evidence": "GATES.md '## Not wired yet' lists i-staged-deletion-hook HUMAN, p5-autofix FALSE_POSITIVE, p6-cross-lineage NOT ADOPTED, p7-worksheet + p8-session-feedback NOT ADOPTED, p18-end-of-shift CONDITIONAL. Live stamp-check at this HEAD: i-staged=PASS p5=PASS p6=PASS p7=PASS p8=PASS p18=PASS. Six of seven rows are false; only p12 (FAIL) and rc0 (PARTIAL) still hold."
+    },
+    {
+      "jev_signal": "contradiction=0.43 (corpus max, tied)",
+      "unit": "EVAL.md",
+      "verdict": "REAL",
+      "evidence": "EVAL.md:131 says 'AGENTS.md (66 KB, 31 \u00a7\u00a7)'; actual at this HEAD is 79,901 bytes / 33 h2 / 1,343 lines. EVAL.md:133 cites '1145 lines'. Siblings grew the file after the row was written."
+    }
+  ],
+  "calibration_caveat": "Absolute Noul values are NOT usable as verdicts in this pass: no APPLICABILITY question was asked first. Pure-prohibition sections (e.g. 'RULE NUMBER 1: NO FILE DELETION', receipted=0.06) contain no numbers to receipt, so a low score there is question-misfit, not a document defect. jev-review@57690af asks an `applicable` noul per dimension before scoring; this runner does not. Usable outputs are (a) RANKING within comparable units and (b) cross-signal agreement. Both hand-verified findings came from the ranking, not the absolute value. Next version must add the applicability gate \u2014 the same lesson jev-phishing-bench@1d56e8c measured (verdict 62.6% vs 5 signals 95.1%).",
+  "no_claim": [
+    "single pass, one model version, no held-out set, no inter-pass flip-rate measured",
+    "AGENTS.md reviewed as 33 sections, not as one document; cross-section contradictions are invisible to this pass",
+    "morph warp_grep was NOT used: only mcp-agent-mail is configured in ~/.omp/agent/mcp.json",
+    "no threshold is proposed and nothing was gated on these numbers"
+  ]
+}

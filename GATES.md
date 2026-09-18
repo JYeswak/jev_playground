@@ -102,15 +102,26 @@ citation edge.
 
 ## Not wired yet — stated, not hidden
 
-`stamp-check.sh --repo .` at this commit: **36 PASS, 13 FAIL, 2 PARTIAL, 13 N-A (report-only)**.
-The gate-shaped items still open, with their classification:
+`stamp-check.sh --repo .` at this commit: **51 PASS, 1 FAIL, 1 PARTIAL, 11 N-A (report-only)**.
+
+> **This table was 6/7 false for about an hour and a machine caught it, not a human.** A Jev pass
+> over every doc in this repo (`docs/reviews/runs/jev-doc-review-20260918T001523Z.json`) ranked
+> `GATES.md` joint-highest in the corpus for internal contradiction (0.43), because the rows below
+> still said HUMAN / NOT ADOPTED / CONDITIONAL for six items that had since gone PASS. Hand-verified
+> against live `stamp-check`, then corrected. The lesson is the section's own: **a classification is
+> a claim, and a claim needs a re-derivation path.** Re-derive this table from
+> `stamp-check.sh --repo .` before citing it; do not read it as current.
+
+Closed since the first pass, each by a mechanism rather than a reclassification: `i-staged-deletion-hook`
+(the lane is wired and proven by `60-staged-deletion-lane.sh`, 2 triggers + 6 satisfying witnesses),
+`p5-autofix` (wired in `--check` mode — the fixer only ever sees staged paths, and staged paths here
+can only be first-party), `p6-cross-lineage` (`REVIEW-PERSONAS.md`, five lenses each owning a doc
+that exists), `p7-worksheet` + `p8-session-feedback` (`.flywheel/` worksheet and feedback, filled
+not scaffolded), `p18-end-of-shift` (green on a clean tree).
+
+Still open, with their classification:
 
 | Item | Verdict | Why |
 |---|---|---|
-| `i-staged-deletion-hook` | **HUMAN** | wants a repo-tree pre-commit wrapper + executable that refuses staged deletions. Installing a new hook is a gated action (`skill://hook-certification`) — it is not hand-rolled here. |
-| `p5-autofix` | **FALSE_POSITIVE** | the 969 "code files" it counts are almost entirely *vendored upstream clones*. Wiring an autofix pre-commit over them would rewrite other people's code — actively wrong for this lane. |
-| `p6-cross-lineage` | **NOT ADOPTED** | `REVIEW-PERSONAS.md` with 5 personas. Ceremony unless we actually run persona reviews; adopt it the first time we do. |
-| `p7-worksheet`, `p8-session-feedback` | **NOT ADOPTED** | foundry's committed session-artifact convention (`.flywheel/worksheets/` WHAT/STATE/NEXT). This lane's session record is `EVAL.md` + `NEGATIVE_EVIDENCE.md`; adopting a second one would duplicate it. |
-| `p12-loop-integrity` | **NOT APPLICABLE** | errors `exit 3` (driver missing) — this lane runs no tick-loop driver. |
-| `p18-end-of-shift` | **CONDITIONAL** | goes green when the tree is clean at session end. Currently red partly on a sibling pane's in-flight file, which is not ours to commit. |
-| `rc0-declared-path` | **FALSE_POSITIVE** | the "undeclared Rust bin crate" is `s1-rs`, a vendored clone. It is not our CLI. |
+| `p12-loop-integrity` | **FALSE FAIL (routed)** | errors `exit 3` (driver missing) and `stamp-check` calls that FAIL. This lane runs no tick-loop *driver*; the honest verdict is N-A, symmetric with `rc0` yielding N-A when there is neither a `.rust-cli-path` nor a `[[bin]]` crate. Filed on `jev-stampcheck-vendored-false-positives-lfn`. |
+| `rc0-declared-path` | **FALSE_POSITIVE (routed)** | the "undeclared Rust bin crate" is `s1-rs`, a vendored clone. It is not our CLI. Same bead. |

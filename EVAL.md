@@ -128,7 +128,9 @@ framed as next audits in `foundation/CALIBRATION.md`.
 
 ## Lane contract + primary-source mirror (added this session)
 
-- `AGENTS.md` (66 KB, 31 §§): authored against the mirror-derived canonical shape.
+- `AGENTS.md` (66 KB, 31 §§ **as authored**; **79,901 B / 33 §§ / 1,343 lines at `6b721c9`** after
+  siblings added the skillranker rules — re-derive with `wc -c AGENTS.md`, never cite the authored
+  size as current): authored against the mirror-derived canonical shape.
   `fh agents --repo .` → DISCIPLINE 14 NAMED / 1 UNNAMED / **2 ABSENT**, REPO_SPECIFIC
   2/3/**2**, TOOL_ONBOARDING 7/2/**31**; `nomenclature_state=VALID`; 1145 lines vs corpus
   median 839, `exceeds_corpus_max=false`. Skeleton `content_id=095decf2…`,
@@ -138,7 +140,7 @@ framed as next audits in `foundation/CALIBRATION.md`.
   (fetch-only on existing clones; a SHA move is reported, never performed). Ran clean:
   **111/111 doc pages**, `--check` → `CHECK PASS 114 mirrored files`. Mirrored
   `docs-mirror/typesafe/` (llms.txt 16.7 KB, llms-full.txt 835 KB, sitemap 111 locs),
-  `docs-mirror/ripwire/` (CLI-HELP 1546 lines, `ripwire 0.4.0 built_from=e663ca8f8`), and
+  `docs-mirror/ripwire/` (CLI-HELP 200-line summary + CLI-HELP-ALL 1826 lines), and
   pinned `upstream/typesafe-ai/{typesafe-sdk-python@420ef4f, typesafe-sdk-js@66880cc,
   system-one-adapter-python@0bb819b, skills@65a39f3}` + a 10-row org inventory.
 - **Finding from the manifest, first run:** the local `~/Developer/ripwire` checkout is
