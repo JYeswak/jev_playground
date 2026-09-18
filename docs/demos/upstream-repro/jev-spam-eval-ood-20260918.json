@@ -1,0 +1,64 @@
+{
+  "receipt_type": "upstream_reproduction",
+  "date": "2026-09-18",
+  "repository": "jev-spam-eval",
+  "fetches": {
+    "ood": {
+      "command": "./fetch_ood.sh",
+      "rc": 0,
+      "spamtrap_sha256_verified": "d4f156ec5a169ceb9771e6dc0703924d69f059a13bb13e997225055e0831106c",
+      "modern_rows": 633
+    },
+    "email_dataset": {
+      "command": "./fetch_dataset.sh",
+      "rc": 0,
+      "revision": "84209612df4c55831f074a65b7c137a4b980059d"
+    },
+    "nazario": {
+      "command": "./fetch_nazario.sh",
+      "rc": 0
+    }
+  },
+  "ood_run": {
+    "command": "uv run ood_test.py --report",
+    "rc": 0,
+    "type_safe_live_requests": 633,
+    "type_safe_errors": 0,
+    "input_tokens": 1183256,
+    "cost_usd": 0.05
+  },
+  "results": {
+    "ling_spam": {
+      "messages": 2876,
+      "spam": 468,
+      "type_safe_plain_accuracy": 0.9857,
+      "type_safe_detailed_criteria_accuracy": 0.9701,
+      "tfidf_trained_on_email_dataset_accuracy": 0.7298,
+      "criteria_inversion": "detailed criteria is 1.56 points worse than plain"
+    },
+    "recent_phishing": {
+      "messages": 853,
+      "type_safe_category_phishing_share": 0.913,
+      "type_safe_names_only_phishing_share": 0.936,
+      "tfidf_phishing_share": 0.703
+    },
+    "modern_mail": {
+      "messages": 633,
+      "legitimate_vs_not": {
+        "type_safe_category_accuracy": 0.9700,
+        "type_safe_urgency_authority_accuracy": 0.9668,
+        "type_safe_names_only_accuracy": 0.9858,
+        "tfidf_accuracy": 0.7251
+      },
+      "criteria_inversion": "urgency_authority is 0.32 points worse than bare category; names-only is 1.58 points better"
+    }
+  },
+  "ruling": {
+    "ood_claim": "REPRODUCED_WITH_SCOPE",
+    "why": "On Ling-Spam, TypeSafe plain 98.57% versus email-dataset-trained TF-IDF 72.98%; on recent phishing TypeSafe 91.3% phishing share versus TF-IDF 70.3%; on modern mail category accuracy 97.00% versus TF-IDF 72.51%.",
+    "criteria_claim": "INVERSION_REPRODUCED",
+    "why_criteria": "Structured/detail criteria are worse than the bare/category question on Ling-Spam and modern mail. More prompt specification was not monotonically helpful.",
+    "failure_recovered": "The first --report/ood_test run stopped after Ling-Spam because nazario phishing mailboxes were absent. fetch_nazario.sh fixed the missing prerequisite; the complete report then exited 0.",
+    "no_claim": "These are exploratory single-run results on the repository's saved TypeSafe answers and one 633-request modern run; they do not establish universal spam-filter accuracy."
+  }
+}
