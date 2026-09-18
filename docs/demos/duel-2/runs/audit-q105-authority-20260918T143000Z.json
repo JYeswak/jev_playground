@@ -1,0 +1,28 @@
+{
+  "schema": "jev.q105-authority-audit.v1",
+  "generated_at": "2026-09-18T14:30:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "subject": {
+    "candidate": "demo-1-route-backtest",
+    "status_row": "demo-1-route-backtest\\t4\\t520\\tRULED_OUT\\tpane2\\tdemos/routing-backtest/runs/backtest-20260918T020440Z.json\\tnone-died-rung4-0.0447pct\\tnone\\t25581b15c0f20489\\tmeasurement",
+    "edit_commit": "86b0a8d",
+    "ruling_source": "docs/demos/duel-2/RULE_demo1_repricing_MU.md (083f781)"
+  },
+  "authority_chain": {
+    "ruling_authority": "pane 3 authored the repricing ruling and explicitly assigned application to the conductor",
+    "execution": "conductor applied the receipt path, reason, and normalized digest re-pin",
+    "authorization": "SUPPORTED: the ruling delegated application; the edit did not invent a new verdict direction",
+    "independent_verification": "MISSING: no third party checked the live row, receipt content, reason text, and 25581b15c0f20489 together before treating the mutation as verified"
+  },
+  "ruling": "AUTHORIZED_BUT_UNVERIFIED",
+  "why": "A pane ruling can authorize the conductor to apply a state change, but authorization is not independent proof that the changed path, reason, digest, and source receipt match the ruling. This is a verdict-bearing STATUS mutation, so the lane's non-author/evidence discipline requires a post-landing check.",
+  "required_check": [
+    "open the ruling and confirm the intended repricing/path/reason",
+    "open the cited receipt and confirm the measurement it supports",
+    "recompute the content-normalized digest and compare 25581b15c0f20489",
+    "verify STATUS row is the intended candidate and verdict",
+    "record a non-author verification receipt before citing the row as checked"
+  ],
+  "no_claim": "No claim that the edit was unauthorized, no claim that 25581b15c0f20489 is wrong, and no claim that the row is independently verified without the post-landing check."
+}
