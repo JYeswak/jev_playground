@@ -94,18 +94,31 @@ reports `DRIFT`/`MISSING` instead of PASS.
 
 ---
 
-## R6 — NOT ADOPTED as a gate: `ubs` on doc-only changes
+## R6 — RETRY CHECKED: `ubs` on first-party TypeScript
 
-**Measured:** `ubs AGENTS.md scripts/sync-docs.sh .fh-agents.toml EVAL.md` →
+**Original measurement:** `ubs AGENTS.md scripts/sync-docs.sh .fh-agents.toml EVAL.md` →
 `no supported languages detected … UBS did not run any scanner: nothing was checked (this is NOT a
 pass). Exiting 3`.
 
-**So:** `ubs` is correct and honest here, and citing it on a markdown-only change would be citing an
-empty scan set as a pass — the exact anti-pattern this lane bans. The Landing-the-Plane checklist
-therefore scopes `ubs` to changes that touch TS/Python/Rust.
+**So:** citing UBS on a markdown-only change would be citing an empty scan set as a pass — the exact
+anti-pattern this lane bans. The Landing-the-Plane checklist scoped UBS to changes that touch
+TS/Python/Rust.
 
-**Retry condition:** the lane gains first-party code (`probes/`, a ported demo, a `.omp/` seam in
-TS). `ubs` applies from that commit onward — and exit 3 still never counts as green.
+**Retry condition:** the lane gains first-party code (`probes/`, a ported demo, or a `.omp/` seam in
+TS). UBS applies from that commit onward — and exit 3 still never counts as green.
+
+**Retry check (2026-09-18, jev-publish-redteam-7s0): SATISFIED as a scan-set condition.** `git ls-files`
+identified exactly four first-party TypeScript paths: `compaction/src/omp-adapter.ts`,
+`compaction/src/omp-hook.ts`, `compaction/src/replay.ts`, and `compaction/ab/run-ab.ts`.
+Vendored clones were excluded by scanning this explicit tracked-file list, not a repository-wide
+path. UBS scanned 4 files and exited 1: 1 critical, 6 warnings, 27 info. The only critical was
+`Possible hardcoded secrets` in `run-ab.ts`; triage found no secret value (only an environment
+variable name/receipt provenance string), and `30-no-secrets` passed. The positive-control temp
+project containing `eval()` exited 1 with `eval() ALLOWS ARBITRARY CODE EXECUTION`, proving the
+scanner fires. Existing async-listener and JSON.parse warnings are documented fail-fast/host-await
+shapes, not confirmed defects; no new defect bead was warranted.
+
+Receipt: `docs/demos/duel-1/runs/ubs-r6-20260918T011614Z.json`.
 
 ---
 
