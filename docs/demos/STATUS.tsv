@@ -12,7 +12,7 @@ demo-5-fact-ledger	2	755	CLEARED	pane3	docs/demos/duel-2/RUNG2_JEV_SHAPE_COD.md	
 demo-6-claim-check-notes	1	330	HELD	pane3	docs/demos/duel-2/HELD_demo6_incumbent_COD.md	incumbent-search-CLOSED-no-owner-held-on-demand-330-not-structure
 demo-7-signals-starter	1	560	HELD	pane1	docs/demos/duel-2/runs/demo7-weights-20260918T041352Z.json	REPRICED-3.5pt-method-AND-scope-narrowed-top-two-signals-76.25pct-of-weight
 demo-8-credential-screen	1	100	RULED_OUT	pane3	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md	none-structural-safety-leak
-demo-9-review-signal	2	550	CLEARED	pane2	docs/demos/duel-2/runs/demo9-vs-ubs-20260918T061500Z.json	corpus-PROCEED-15-diffs-ubs-baseline-6crit-6warn-50info-but-NO-JEV-ARM-demo9-is-a-contract-not-code-build-deferred-by-WIP
+demo-9-review-signal	2	550	HELD	pane2	docs/demos/duel-2/HELD_demo9_build_or_skip_COD.md	SKIP-rung3-now-NOT-ruled-out-priced-1-2-eng-days-retry-20pp-recall-over-ubs-5pct-FP-20pct-action-lift
 COD-H1-snapshot-completion	2	885	HELD	pane2	docs/demos/duel-2/runs/codh41-labelfree-20260918T054800Z.json	UNASKABLE-corpus-only-2-of-30-transcripts-across-3-harnesses-retry-on-sourcing
 COD-H2-preaction-abstention	4	905	CLEARED	pane2	docs/demos/duel-2/runs/discharge-codh2-rung3-20260918T054357Z.json	RUNG3-CLOSED-hold-discharged-by-non-author-10-doubts-cleared-RUNG4-needs-repeated-runs-selective-accuracy-at-coverage-boundary-variance-0.74-to-0.70
 COD-H3-price-drift-auditor	2	890	RULED_OUT	pane2	docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md	no-jev-necessary-stage-4of5-deterministic-retry-T1-tooling-T2-router-wedge

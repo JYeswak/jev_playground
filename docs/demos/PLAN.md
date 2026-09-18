@@ -3276,3 +3276,76 @@ the same defect as a threshold asserted rather than checked (§4b-CORRECTION).
 **Rung 4 remains authorized-not-started.** Preconditions now: immutable 200-case manifest (pane 3,
 Q34, in flight) · 200 labels with clause-cited disagreements · **six guards verified present in the
 runner**.
+
+---
+
+## §4r demo-9 SKIPPED (not killed) — and its cost estimate is wrong by exactly 1000×
+
+**`docs/demos/duel-2/HELD_demo9_build_or_skip_COD.md` (`e399d32`), pane 2 on its own candidate:
+`SKIP_RUNG3_NOW_HOLD_NOT_RULED_OUT`.**
+
+**Price: ~1–2 engineering days + a reviewer session**, plus ~120 Jev calls. Retry conditions are
+quantified and pre-registered: **≥20pp semantic recall lift over `ubs`, ≤5% FP, ≥20% action/review
+lift, ≥10 non-pattern cases, fixed withhold/codes.** `NO-CLAIM no permanent kill`.
+
+**The ruling is right.** demo-9 sits at **550** against COD-H2's **905**, WIP is one, and pane 3's
+screen already established the blocker is a **build**, not data. **An author recommending its own
+candidate be skipped, with the retry priced and quantified, is the correct use of the withdrawal
+asymmetry** — the same move demo-4's author made earlier.
+
+### The arithmetic error, and the file is the reason it was catchable
+
+The receipt states **`$2.19`** for 120 calls, and — crucially — **shows its inputs** (line 117):
+
+> *"The `$2.19` estimate is arithmetic from **120 calls × 435 input tokens × `$0.042/Mtok`**"*
+
+**Those inputs are correct. The result is wrong by exactly 10³:**
+
+```text
+120 × 435 = 52,200 tokens = 0.0522M
+0.0522M × $0.042/Mtok = $0.00219      <- correct
+                        $2.19         <- stated, 1000× high
+```
+
+**The digits are identical (219), which is the signature of a pure unit slip** — almost certainly the
+`$42/Btok` vs `$0.042/Mtok` pair that §4n verified first-party, applied at the wrong scale. Sanity
+check in the other direction: reaching `$2.19` at the real price would need **434,524 tokens per
+call**, which is not plausible for 120 calls.
+
+**Corrected: the entire demo-9 live run costs about a fifth of a cent.**
+
+**The verdict is unaffected** — the binding cost was *1–2 engineering days*, and the receipt itself
+flags the dollar figure as arithmetic rather than a measured spend. **But it would have mattered if
+money had been the deciding factor**, and in a lane that has now corrected a headline number five
+times, a 1000× error in a costing that feeds a build/skip decision is worth recording.
+
+**The doctrine point is why it was findable: the pane showed its work.** Had the receipt said `$2.19`
+alone, nothing could have checked it. **Publishing inputs alongside a derived number is what makes
+the number auditable**, and this is the second time today that habit caught an error (§4h's D1
+arithmetic reconciled the same way).
+
+**And it reinforces §4n's inversion twice over:** model money is never the constraint in this lane.
+Rung 4's 2,000 calls cost **$0.037**; demo-9's 120 cost **$0.002**. **Engineering time and labelling
+time are the only real currencies here.**
+
+## §4s THE CLAUSE GUARD, COMPLETED BY PANE 2 WHERE I LEFT IT INCOMPLETE
+
+**`docs/demos/duel-2/runs/ratify-label-audit-amendment-20260918T061500Z.json` (`e432d06`).** Formal
+pre-label amendment:
+
+> *"Every Pane-B disagreement must cite **exact `policy.json` JSON path/criterion**; no
+> intuition/averaging; **missing clause ⇒ UNASKABLE + policy amendment**."*
+
+**I specified "cite the clause it turns on" and stopped there. I never said what happens when no
+clause covers the case** — and that silence was the real hole, because an uncovered case is exactly
+where an adjudicating conductor would have started inventing ground truth on taste.
+
+**Pane 2's addition closes it: a policy gap becomes a policy amendment, not a judgement call.** The
+case goes `UNASKABLE`, the policy gets fixed, and the fix is committed text that the next label can
+cite. **That is strictly better than what I asked for**, it is pane 2's own — unlike the base guard,
+which §4q records as adopted from my packet — and it means the ground truth can only ever be
+*derived from committed text or declared absent*, never negotiated.
+
+**Three pre-label preconditions are now fixed and none of them are mine to relax:** stratified 5-per-
+stratum audit with a `≥4/5` floor (§4p) · clause-cited disagreements with the missing-clause escape
+(§4s) · six anti-gaming guards verified present in the runner (§4q).
