@@ -3636,3 +3636,81 @@ that must come from somewhere other than the pattern rule under test.
 on nothing. **The gauntlet's product is this ruling plus the evidence for the sixteen candidates it
 did not choose — and the ruling holds because three independent parties each blocked the convenient
 outcome.**
+
+---
+
+## §4x-CORRECTION THE GROUND TRUTH DOES NOT REPRODUCE — and §4w's conclusion was wrong
+
+**`docs/demos/duel-2/runs/audit-rung4-labels-20260918T063500Z.json` (`d5dcf7d`).** Pane 3's blind
+audit as assigned `audit_owner`, independent stratified sample (seed `20260920`, 5+5+5 across
+non-empty strata, credential absent), content-paired comparison.
+
+**Agreement: 7/14 = 50%, against a pre-registered ≥90% bar. `TRIGGER: labels re-done with adjudicated
+rubric, not averaged, not passed.`**
+
+### The disagreement is systematic, and it names the policy's central hole
+
+> *"Pane 2 requires **EXPLICIT license** (ambient lane context insufficient) ⇒ disallowed→escalate,
+> ambiguous→withhold; auditor accepts **ambient lane context + harmless scope** as license ⇒ 4
+> disallowed pass, 3 ambiguous pass. **The dispute is what counts as licensed, which is the policy's
+> central undefined term.**"*
+
+Two competent raters applying the same committed policy diverge **systematically, not randomly**, on
+its core concept. Per §4s the consequence is fixed and not mine to soften: **`UNASKABLE` + policy
+amendment.** Pane 3's recommendation: *"Adjudicate the license definition first… then re-label under
+the adjudicated rubric. **Do NOT average 7/14 with anything.**"*
+
+**Two disclosures it volunteered:** the blinding was partial — *"marginal distribution known in
+advance (10/8/50 from verification step) — **stated as limit, not full blindness**"* — and **A02 was
+excluded as an unrelocatable turn-boundary miss** rather than counted in either direction. Hence 14,
+not 15.
+
+### This refutes an argument I made in §4p, and the control I named is what caught it
+
+In §4p I justified concentrating three of four roles in pane 2 with this:
+
+> *"A policy label is **rule-application, not opinion**… applying a committed rule is checkable by
+> anyone against its text. **The audit is therefore the real control, not the labeller's identity.**"*
+
+**50% systematic disagreement refutes the premise.** Rule-application is not mechanical when the
+rule's central term is undefined — so **the labeller's identity mattered enormously**, and I used a
+false premise to license the concentration.
+
+**And the second half of that sentence held: the audit *was* the real control, and it is exactly what
+caught this.** Right conclusion, wrong reason — which is worth distinguishing, because the process
+survived my bad argument on the strength of a mechanism I had also insisted on.
+
+### §4w's conclusion was wrong, and this is the correction
+
+**§4w, one turn ago:** *"Its promotion is now a **sourcing question, not an idea question**… that
+project's first phase is corpus acquisition, not code."*
+
+**That is now refuted.** If two competent raters cannot agree what "licensed" means, **a model asked
+to judge it has no stable target** — and no quantity of data fixes an undefined target. **There IS an
+idea question, and it is the one the audit just surfaced:**
+
+> **COD-H2's central term is undefined. "Should this action proceed?" reduces to "is it licensed?",
+> and nobody has defined licensed.**
+
+**So the first phase of COD-H2's project is specification, not acquisition.** Define *licensed* —
+explicitly, with ambient-context and scope rules — then the corpus question becomes askable. Ordered
+the other way round, the lane would have bought data to measure against a target that does not exist.
+
+**And this is arguably the most valuable single finding about the idea itself**, as opposed to about
+the lane's instruments: it came from the cheapest possible probe (two raters, 14 cases, no model, no
+spend) and it identifies a defect no amount of rung-3 engineering would have exposed. **The build was
+excellent and the specification was hollow.**
+
+### Fifth independent blocker, and the tally is the point
+
+| # | Blocker | Found by |
+|---|---|---|
+| 1 | Power — zero-flip upper `.1135` vs `≤5%` | pane 2 (§4u) |
+| 2 | Implementation — 6/6 guards absent | pane 3 (§4v) |
+| 3 | Construct validity — labels are the pattern rule | conductor (§4w) |
+| 4 | Widening exhausted — 7 tiny journals, credential struck | pane 3 (§4w) |
+| 5 | **Ground truth does not reproduce — 50%, systematic** | **pane 3 (§4x)** |
+
+**Five independent reasons rung 4 could not have produced a usable result, found by three parties,
+none of whom was looking for the others' finding.** Every one of them arrived **before any spend**.
+`PROMOTED 0` stands, and it now stands on five legs.
