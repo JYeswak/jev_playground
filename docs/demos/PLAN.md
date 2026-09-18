@@ -2278,3 +2278,63 @@ The dry-queue rule has stood in `tick.md` since it was written with the note *"(
 has never yet been true."* **It is true now**, for pane 2: every unit it was eligible for is DONE.
 That is not idleness, it is a correctly reported exhaustion, and the conductor owes it new units —
 which is the whole point of requiring the callback.
+
+---
+
+## §3z THE STATE-OF-RECORD GATE RE-VERIFIED AT 17 ROWS — and I caught my own broken probe **before** recording a false defect
+
+**Conductor's own work this tick, per §4: all three panes were genuinely working, so no packet was
+manufactured.** `scripts/lane-status.sh` is the instrument every tick's status depends on, **I wrote
+it**, and its discrimination had been measured **exactly once** — on a 16-row file, before the file
+grew to 23 lines / 17 candidates and before dozens of subsequent runs. **Trusting an instrument
+because it passed once is the error class this lane has logged eight times.**
+
+### Result: the gate is sound, and now on stronger evidence than the original test
+
+| Arm | Expected | Measured |
+|---|---|---|
+| Unmodified, 17 rows | pass | `OK: 17 candidates, every cited receipt exists`, **exit 0** |
+| 1 bad receipt, **first** data row (7) | fail, count 1 | `FAIL: 1 of 17`, **exit 3** |
+| 1 bad receipt, **last** data row (23) | fail, count 1 | `FAIL: 1 of 17`, **exit 3** |
+| **All 17** rows bad | fail, count 17 | `FAIL: 17 of 17`, **exit 3** |
+| Restored | pass | **md5 identical** to the pre-test file, exit 0 |
+
+**Both boundary rows were tested deliberately** — an off-by-one at the first or last data row is the
+live risk after a file grows, and the original single-arm test could not have seen it. **And the
+count is right in every arm**, which is stronger than flagging: a detector that said "FAIL" without
+counting could be firing blindly.
+
+### The part worth recording is that my first probe was broken in three ways at once
+
+My first run reported **exit 0 on a planted bad receipt** — apparently a gate defect, apparently
+serious, and I was one paragraph from writing it into this file. **Every part of that was my probe:**
+
+1. **I edited comment lines believing they were data rows.** `STATUS.tsv` lines 1–5 are `#` comments
+   (2 fields) and line 6 is the header; data starts at line **7**. ARM 1 planted its bad receipt on
+   **line 5 — a comment** — so the gate ignoring it was *correct behaviour*.
+2. **I miscounted my own plant.** ARM 2 claimed "three bad receipts" but hit lines 3/9/15, one of
+   which is a comment. **Two landed, not three** — and the gate's own output said so, which I did
+   not read.
+3. **I grepped for a string the output never emits.** `grep -c 'GONE-'` returned 0 because the
+   renderer prints candidate and reason columns, **not the receipt path.** That is
+   `NEGATIVE_EVIDENCE.md` **R12 verbatim** — *grepping for the expected line and treating the miss
+   as the finding.*
+
+### Why this instance is different from the previous eight
+
+**I checked the probe's conditions before concluding about the thing measured** — `awk -F'\t' '{print
+NR": f1=["$1"]...}'` on the first six lines, which took one command and immediately showed lines 1–5
+were comments. **The eight prior instances were all recorded as findings first and corrected
+afterwards.** This one never entered the record as a defect.
+
+**That is the whole difference between a lane that measures and a lane that generates plausible
+prose**, and it is the ninth instance of the same class — so the rule earns restating in operational
+form: **before reporting what an instrument shows, print what the instrument was pointed at.**
+
+### Standing consequence for this file
+
+`lane-status.sh` may be trusted as the state of record **at 17 candidates / 23 lines**, with
+discrimination verified at both boundaries and at saturation. **When `STATUS.tsv` next changes shape
+— a new column, a row inserted above line 7, a candidate count past ~25 — the arms above must be
+re-run.** The original test's expiry was invisible precisely because nothing recorded what it had
+been run against.
