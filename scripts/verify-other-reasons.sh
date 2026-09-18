@@ -127,7 +127,15 @@ def main() -> int:
                for p in inputs if Path(p).is_file()}
         root = Path(tempfile.mkdtemp(prefix="jev-snap-"))
         mapped = snapshot(inputs, root)
-        resolve = lambda p: mapped.get(str(p), Path(p))  # noqa: E731
+        # NEVER FALL BACK TO A LIVE PATH. Found by reading pane 2's OWN re-open condition — "no live
+        # shared path is read after the snapshot is declared complete" — against my implementation:
+        # `mapped.get(str(p), Path(p))` returned the LIVE path for anything not copied, and
+        # `snapshot()` skips paths absent at capture. So a receipt that did not exist at capture but
+        # APPEARED MID-RUN would have been read live and verified — bytes that were never
+        # snapshotted, passing a check the manifest cannot account for. Unmapped paths now resolve
+        # INTO the snapshot root, where they are absent, so "absent at capture" stays absent.
+        def resolve(p, _m=mapped, _r=root):
+            return _m.get(str(p)) or (_r / "files" / p)
         rc, report = _verify(resolve(STATUS), resolve(SIDECAR), resolve)
         post = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest()[:16]
                 for p in inputs if Path(p).is_file()}
