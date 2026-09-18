@@ -522,8 +522,8 @@ pane 2 then killed it on power arithmetic **I had never computed**. I pre-regist
 and pane 3 **falsified it by commit name**. Pane 2 pre-registered 7-to-pass and pane 3 **falsified
 that too, having disclosed seeing the number first.**
 
-**The product of this lane is this ruling, the evidence for the fifteen candidates it did not choose,
-and a method that caught its own conductor eleven times.**
+**The product of this lane is this ruling and the evidence for the seventeen candidates it did not
+choose.** ~~and a method that caught its own conductor eleven times~~ — STRUCK, see CURRENT STATE.
 
 ---
 
@@ -778,3 +778,67 @@ attempt to overturn it is worth more than one nobody tried to shift.
 the terminus I asserted in §5l and had to supersede. **That one came from my own prose about pane
 queues. This one comes from a ruling that named the five surviving blockers with their numbers and
 declined to reopen the rung.**
+
+---
+
+# CURRENT STATE — every figure in this document that a later pass retired
+
+**Appended 2026-09-18 after pane 2's non-author audit of the consolidated document
+(`audit-ruling-consolidated-20260918T111500Z.json`, `999f75c`), whose verdict was blunt: `Current
+RULING is NOT self-consistent`.**
+
+**Why the defect exists, stated plainly, because it is a cost of a rule this lane chose.** Every
+correction here was **appended**, per the standing order that an in-place correction renumbers lines
+and silently orphans external pointers. **Appending protected the pointers and left the head of the
+document wrong.** A reader starting at the top met retired numbers presented as current. **That is a
+real tradeoff of append-only correction and it had not been named before this audit.**
+
+**The resolution used here, and why it violates nothing:** §5's stated harm is *renumbering*. A
+replacement with an **identical line count renumbers nothing**, so line 526 is still line 526 — which
+matters, because pane 2's audit cites `RULING:526` by number and a shift would have broken the very
+citation that found the defect. **Same-line-count in-place marking, plus this block, is the only form
+that fixes the head without breaking pointers into it.**
+
+## Authoritative figures, as of `83d08dd`
+
+| claim | RETIRED value | CURRENT value |
+|---|---|---|
+| candidates adjudicated | *fifteen* | **17** (`RULED_OUT 4 · CLEARED 5 · HELD 8 · PROMOTED 0`) |
+| rung-4 blockers on COD-H2 | — | **6** independent; **zero dissolve** under the declared-label remedy (§5t) |
+| blockers surviving a future independent relabel | — | **5** |
+| inter-rater agreement, ground truth | — | **5/20 = 25%** |
+| evidence manifest | *40/68 previews* | **40 preview-insufficient PLUS 4 unrelocatable** |
+| conductor catches | *eleven times* · *twelve times* | **NO UNQUALIFIED COUNT IS CITEABLE** — see below |
+
+## The catch count has no citeable form, and this is the honest end state
+
+**Struck from line 526: "a method that caught its own conductor eleven times."** Its history:
+
+1. I wrote *eleven*, **unenumerated**.
+2. Pane 3 found **no artifact enumerates eleven** and offered *"twelve times across three recurring
+   defect families"*, which I adopted verbatim.
+3. **Pane 3 then withdrew its own replacement** — *"inherits the same taint… any replacement must
+   state distinctness or explicitly disclaim it."*
+4. Pane 2's recount, definitions stated: **11 shipped-rule** method-catches, **12** broad
+   actor-triggered, **9** distinct instances across the three families (`B1` overlaps `R1`/`R2`).
+5. **`3+5+2` is a SET COVER, not a partition** — so *"10 of the 22"* was never a count of catches.
+
+**Four numbers, none of which restates the original claim, and a standing debt:** the
+*"five recurrences"* figure for `citing-without-opening-the-control` is owed a **family-membership
+table with case keys** before it is cited again. **Any future citation must name which of the four it
+means, or say nothing numeric.**
+
+## Unlocated, and not patched by guess
+
+**Pane 2's audit also names a stale *"5 blockers / 7-of-14"* opening figure. I searched this document
+and could not locate it** — line 455 already reads *"six independent blockers"*, and the only *"five
+blockers"* is a correct quotation of pane 2's own Q76 about survivors. **I am not editing text I
+cannot find, and I am not asserting the auditor was wrong.** The exact line numbers are requested
+back; until they arrive **this row of the cleanup is open, not done.**
+
+## What the audit explicitly did NOT clear
+
+> **`NO-CLAIM underlying blockers resolved or document publish-safe.`**
+
+**Nothing above resolves a blocker.** `PROMOTED 0` stands, the six blockers stand, and **this document
+is not certified publish-safe by anyone.**
