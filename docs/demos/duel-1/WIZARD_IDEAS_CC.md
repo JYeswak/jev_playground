@@ -12,9 +12,13 @@ criteria.
   messages and 2333 → 1292 chars (**45% reduction**), `kept: 0`, `resultsTrailing: 0`,
   `failures: []`. Pruning works mechanically and loses no text it keeps.
 - `compaction/runs/ab-20260917.json` — schema `jev.resume-quality-ab.v1`, `liveCalls: 4`,
-  `jevRequests: 1`, 4 recall questions, **`armA.score: 1` vs `armB.score: 3`**, `verdict: "B wins"`,
-  at `armA.contextBytes: 4188` vs `armB.contextBytes: 1241`. **The preserve-instructed summary beat
-  Jev pruning 3–1 on fact recall while spending a third of the bytes.**
+  `jevRequests: 1`, **3** recall questions (`q1`,`q2`,`q3`), **`armA.score: 1` vs `armB.score: 3`**,
+  `verdict: "B wins"`, at `armA.contextBytes: 4188` vs `armB.contextBytes: 1241`. **The
+  preserve-instructed summary scored 3/3 and Jev pruning scored 1/3, on a third of the bytes.**
+  > CORRECTED after pane 3's cross-score (`WIZARD_SCORES_MU_ON_CC.md`, `ad99a27`): I first wrote
+  > "4 recall questions" and "3–1", conflating `liveCalls: 4` with the question count. The receipt
+  > has three questions. The corrected reading is **worse for my own argument** — arm B was
+  > perfect, not merely ahead.
 
 That second receipt is the most valuable thing this lane owns, because it is the one place the
 evidence went *against* the capability we are mid-way through wiring. Every ranking below is driven
@@ -60,17 +64,32 @@ the next duel round; they lost only on "does it change a decision this week".
 **Stands on:** §14 (standing lesson: "relevance-pruning loses verbatim recall; pair with fact ledger
 or yield to summarization for fact-dense transcripts") and our two receipts above.
 
-**The claim under test:** Jev pruning lost 1–3 on fact recall *because it drops the bytes that
-carried the facts*, not because pruning is wrong. So: extract a **byte-exact fact ledger** (the
-quoted lines that answer "what is the value of X" — ports, paths, ids, versions) with a Noul/Choice
-pass, append it to the pruned context, and re-score **the same four questions on the same fixture**.
-Either `armA+ledger` beats `armB` at comparable bytes, or pruning is genuinely the wrong tool for
-fact-dense transcripts and demo-1 ships as summary-first.
+**The claim under test:** Jev pruning scored 1/3 on fact recall *because it drops the bytes that
+carried the facts*, not because pruning is wrong. So: build a **byte-exact fact ledger** (the
+quoted lines that answer "what is the value of X" — ports, paths, ids, versions), append it to the
+pruned context, and re-score **the same three questions on the same fixture**. Either
+`armA+ledger` beats `armB` at comparable bytes, or pruning is the wrong tool for fact-dense
+transcripts and demo-1 ships summary-first.
 
-**The installable thing:** `jev-fact-ledger` — a module plus a CLI that takes a transcript (or the
-pruned message set) and emits `{quote, sourceMessageId, byteRange}[]`. Extends
-`compaction/src/`, reuses `compaction/ab/run-ab.ts` unchanged as the scorer, and emits a third arm
-into the existing `jev.resume-quality-ab.v1` schema.
+**MECHANISM, named after pane 3's hit — this was the file's real defect.** I wrote "with a
+Noul/Choice pass", which is not a mechanism: **a Noul judges, it does not extract.** The extraction
+step is deterministic and Jev only verifies it:
+1. A deterministic extractor proposes candidate lines (regex/structural: `key: value`, port/path/id
+   shapes) from the *dropped* messages — no model involved, so the quote is byte-exact by
+   construction rather than by promise.
+2. **Choice** over those candidates answers "which of these lines states the value of X", one
+   question per fact slot. Choice returns a member of a supplied set, so it cannot paraphrase.
+3. **Noul** verifies each survivor: "this quoted line appears verbatim in the source message."
+
+**The installable thing:** `jev-fact-ledger` — a module plus a CLI emitting
+`{quote, sourceMessageId, byteRange}[]`. Extends `compaction/src/`.
+
+**Second concession:** I wrote that it "reuses `compaction/ab/run-ab.ts` **unchanged** as the
+scorer, and emits a third arm into the existing schema." Pane 3 is right that those cannot both
+hold — an unchanged scorer cannot emit a new arm. Resolution: the scorer takes the third arm as
+*data* (an `armC` config entry, a small change to it, honestly declared) **or** it stays unchanged
+and the ledger arm runs as a second invocation whose receipt is merged after. Pick one in the plan;
+do not claim both.
 
 **Who uses it:** our systems, immediately — it is the blocker on whether the compaction hook ships
 fleet-wide. Then the AI space, because §14's lesson is upstream's too and nobody has published the

@@ -42,7 +42,15 @@
       "armA_contextBytes": 4188,
       "armB_contextBytes": 1241,
       "liveCalls": 4,
-      "jevRequests": 1
+      "jevRequests": 1,
+      "questions": 3,
+      "question_ids": [
+        "q1",
+        "q2",
+        "q3"
+      ],
+      "reading": "armB 3/3, armA 1/3",
+      "correction": "CORRECTED 2026-09-18 after pane 3's cross-score (WIZARD_SCORES_MU_ON_CC.md, ad99a27): this row first said '4 recall questions', conflating liveCalls:4 with the question count. The receipt has three (q1,q2,q3). The corrected reading is WORSE for my own argument: arm B was perfect (3/3), not merely ahead 3-1."
     }
   },
   "ideas": {
@@ -107,5 +115,15 @@
     ],
     "holder": "CyanFalcon",
     "mode": "shared"
-  }
+  },
+  "corrections": [
+    {
+      "at": "2026-09-18",
+      "found_by": "pane 3 (muse), WIZARD_SCORES_MU_ON_CC.md @ad99a27",
+      "field": "sources_read_first['compaction/runs/ab-20260917.json'].questions",
+      "was": "4 recall questions",
+      "now": "3 questions (q1,q2,q3); armB 3/3 vs armA 1/3",
+      "note": "A non-author of a different lineage caught a false denominator in my own receipt. That is P6 leg 1 working, and the reason arms-length grading is the instrument."
+    }
+  ]
 }
