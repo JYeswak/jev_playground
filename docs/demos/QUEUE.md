@@ -170,7 +170,7 @@ Output `docs/demos/duel-2/FALSIFY_demo7_<YOURS>.md`, ≥4,000 chars.
 
 
 ## UNIT Q10 — the $0 weight-dominance check pane 3 designed and did not run
-**ELIGIBLE: either pane.** *Pane 2 slightly preferred as non-designer of the test — this preference expires the moment pane 2 claims any other unit.* **CLAIM:** WindyJaguar 2026-09-18T04:11:50Z
+**ELIGIBLE: either pane.** *Pane 2 slightly preferred as non-designer of the test — this preference expires the moment pane 2 claims any other unit.* **CLAIM:** DONE WindyJaguar docs/demos/duel-2/runs/demo7-weights-20260918T041352Z.json c8e69f7
 
 `FALSIFY_demo7_MU.md` (`8757b07`) names a second falsifier and leaves it unrun, and it costs
 **nothing**: committed full-fit weights show free-hosting **+9.27** and generic-sender **+12.24**
