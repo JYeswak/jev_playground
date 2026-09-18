@@ -2569,3 +2569,70 @@ captured.** Queued as Q24.
 inference demo-1 invited. demo-1's tests passed, its install was clean, and its code *looked* like a
 Jev demo. The lane's entire method is that **a claim is worth what its receipt can show**, and a
 receipt that asserts liveness proves only that its author believed it.
+
+---
+
+## §4f FIRST MEASURED BASELINE DEFEAT IN THIS LANE — entropy has no operating point
+
+**`docs/demos/duel-2/RUNG2_MU-H3_entropy_COD.md` (`6dc570d`), pane 2 as non-author of MU-H3.** The
+§3q question — *does judging unknown credentials beat a Shannon-entropy threshold?* — is answered
+with numbers, no Jev call, no key, no real secret.
+
+Sentinels: **5 known-pattern credentials** (`AKIA`, `ghp`, `xox`, `sk-live`, private-key header),
+**7 unknown credentials** (random base64/hex, bearer, OAuth, JWT, readable password), **11 benign**.
+
+| Shannon threshold | Unknown recall | Benign FP | **Combined precision** |
+|---|---|---|---|
+| 3.0 | **7/7 = 100%** | 11/11 = 100% | **38.9%** |
+| 3.5 | **7/7 = 100%** | 10/11 = 90.9% | **41.2%** |
+| 4.0 | 5/7 = 71.4% | 7/11 = 63.6% | **41.7%** |
+| 4.5 | 4/7 = 57.1% | 6/11 = 54.5% | **40.0%** |
+
+**The column the callback did not name is the one that decides it: combined precision never exceeds
+41.7% at any threshold.** More than half of everything entropy flags is benign, *at every operating
+point*. And the failure is structural, not a tuning problem:
+
+> *"Raising the threshold reduces false positives **only by missing unknown classes**: the 4.0
+> threshold misses the unknown hex and readable-password forms, and 4.5 misses more. The result is
+> not a clean Jev-free solution; it is a recall/false-positive tradeoff."*
+
+**At full recall it flags essentially everything; at tolerable noise it misses 43% of credentials.
+There is no sweet spot to tune toward.**
+
+### Why this result is a first for the lane
+
+**Every prior encounter with a deterministic baseline went the other way:**
+
+- **demo-1** failed to beat upstream routing — **0.047%** — and died at rung 4.
+- **COD-H3** died because **four of five stages were deterministic** and the fifth was served by a
+  committed table.
+- **demo-7** was repriced when the source's own **no-AI regex control hit 91.6%**, making 29 of its
+  32.5 points dataset knowledge.
+- **demo-9** remains conditional on *beating* `ubs` rather than subsetting it.
+- **MU-H2** has a designed gate and no run.
+
+**MU-H3 is the first candidate in this lane to measure the deterministic alternative and show it
+fails.** That is "baseline and obliterate" executed in the correct order — measure the baseline
+first, then claim the gap — rather than asserting a gap and hoping.
+
+### Ruling
+
+**MU-H3 moves HELD → CLEARED, conditionally, at rung 2**, in pane 2's own words: *"cleared
+conditionally on the unknown-candidate wedge, **not as a completed implementation**."*
+
+**The wedge is now narrow and measured:** MU-H3 may claim only the **unknown-credential** case — the
+one entropy cannot serve. The known-pattern cases (`AKIA`, `ghp`, `xox`, `sk-live`, key headers) are
+deterministic and must stay deterministic; per §3u's precedent, anything MU-H3 builds over *those*
+overlaps a solved problem and gets cut on sight.
+
+**And the limit is stated, not buried.** `NO-CLAIM: no real prevalence or production safety.` This
+proves entropy's tradeoff **on 23 hand-authored sentinels**. It does **not** establish how often
+unknown credentials occur in real outbound traffic — which is exactly what §3q asked as the second
+half of the question (*"does the unknown-credential case exist at material rate"*) and remains
+**open**. MU-H3's rung-3 eligibility therefore requires a prevalence number, and it queues behind
+COD-H2 regardless, because the WIP limit is one and 650 < 905.
+
+**Also worth recording as method:** pane 2 ran `redact.scan()` against local sentinel bytes only —
+*"No candidate was sent to a model"* — so the probe that asks whether a judgment model is needed was
+itself conducted without one. That is the cheapest possible form of this question, and it was
+available all along.
