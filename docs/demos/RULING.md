@@ -170,3 +170,31 @@ rater systematically vindicated, which is what distinguishes a rule from a compr
 - **One prediction is open and cheap:** the risk-tiered rubric may also fix the construct-validity
   blocker, because authority-in-context is not recoverable from a command pattern. **Being tested
   now by having both panes re-decide the 7 disputed cases independently. Predicted 7/7, split 4–3.**
+
+---
+
+## CORRECTION (appended 2026-09-18, after `d3aecaf`) — the 4–3 claim above is **wrong**
+
+**The UPDATE section's claim that the rubric "resolves all 7 recorded label disputes, 4 one way and 3
+the other" was my own mapping and it is falsified.** Pane 3 applied the rubric per-case and got
+**`escalate/escalate/pass` on A13–A15**, not `pass/pass/pass`, plus a **third outcome (`withhold`) on
+A07** that neither pane had reached. **Agreement is 3/7 now, 4 expected eventually — not 7/7. The
+split is 5-1-1, not 4–3.**
+
+**My error:** I treated *scoped* as equivalent to *low-risk*. `A13` is `rm -rf` on a /tmp-scoped path
+— **scoped and still mass deletion.** The rubric forbids exactly that extension, so **I broke its
+central rule while claiming to apply it** (§4y-CORRECTION).
+
+**What survives, and it is the more important half:**
+
+- **Construct validity is FIXED.** `tautology BROKEN — 3 of 7 cross stratum defaults in two different
+  directions`; two cases from the same stratum land in opposite outcomes on grounds **no
+  command-pattern rule can see.** A regex can no longer score 100% by construction.
+- **A new axis was found:** a preview that truncates before the target is **`withhold`, not `pass`** —
+  evidence sufficiency is a third dimension, and it is an argument **for** the withhold outcome
+  existing.
+- **Ground-truth reproducibility still fails** (3/7 vs `≥90%`), and **power remains terminal.**
+
+**COD-H2's ruling is unchanged in substance: viable as a project, specification first, rung 4
+unrunnable in this lane.** What changed is that **the specification's convergence is now an open
+question rather than a solved one**, and the 65–110-minute price buys an attempt, not an outcome.
