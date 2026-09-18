@@ -135,3 +135,33 @@ checkout that stops being a contributor setup does not keep one forever.
 
 **Retry condition:** we start editing ripwire's own C++. Then run the activator with
 `--contributor`.
+
+---
+
+## R9 — REJECTED: wiring the reddit MCP into this lane
+
+**Proposal (mine, 2026-09-18):** add grokbot's deployed reddit MCP to `<repo>/.omp/mcp.json` so the
+demo loop could read builder-sub threads as external signal alongside `x-cli` and the skillranker
+watch.
+
+**Rejected by Joshua, same day: "we dont need to give jev reddit."**
+
+**The capability is real — this is a scope refusal, not a dead end.** Measured live before the
+proposal: worker `grokbot-reddit-mcp` (`grokbot/mcp-servers/reddit-mcp/wrangler.jsonc`, keyless, no
+bindings) answers at `https://grokbot-reddit-mcp.joshua-68f.workers.dev/mcp` — `GET / → 200`, and
+`tools/list` returns `get_subreddit_posts` and `get_post_comments`. A plain `content-type: application/json`
+request is refused with `-32000 Not Acceptable`; the client must send
+`accept: application/json, text/event-stream`. grokbot also already owns the cadence: a **Reddit
+Pulse** bot, weekly Wed 07:00, whose contract is worth stealing verbatim — *"Score and comment
+counts are context, never proof"* and *"A complaint with a repro beats a compliment with none."*
+
+**Why the refusal is right, stated so it is not re-litigated:** reddit signal already has an owner,
+a schedule, and an evidence contract in the repo where it belongs. Duplicating the surface here
+would give this lane a second place to read the same threads, with no second consumer — the
+`value-bearing-gates` failure in MCP clothing. This lane's signal is the vendored corpus at pinned
+SHAs, `skillranker` as it moves, and X.
+
+**Retry condition:** a demo's acceptance requires reddit thread text as *input* — e.g. a zero-label
+classifier fixture whose corpus is builder-sub threads (`USAGE-MAP.md` §9 shape) — **and** grokbot's
+Reddit Pulse output is not already reachable as a file we can read. Until both hold, read grokbot's
+artifacts instead of adding a server.
