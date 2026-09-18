@@ -1,0 +1,44 @@
+{
+  "receipt_type": "negative_evidence_ruling",
+  "date": "2026-09-18",
+  "row": "R20",
+  "reviewer_lineage": "openai-codex/gpt-5.6-luna",
+  "fix_commit": "335484a",
+  "readme_commit": "ae48b31",
+  "scope_ruling": "docs/demos/duel-2/runs/routing-scope-ruling-20260918T174327Z.json",
+  "reproduction": {
+    "command": "JEV_PRICES=/tmp/jev-illustrative-prices.json ./scripts/quickstart.sh --mine",
+    "producer_rc": 0,
+    "corpus_files": 4626,
+    "bounded_sample_files": 200,
+    "assistant_turns_seen": 2565,
+    "turns_priced": 2462,
+    "turns_refused": 103,
+    "refused_models": {
+      "claude-fable-5": 102,
+      "<synthetic>": 1
+    },
+    "conditional_routing": {
+      "actual_spend": 545.26,
+      "counterfactual_spend": 432.82,
+      "estimated_savings": 112.44,
+      "estimated_savings_percent": 20.6,
+      "routed_cheap": 110,
+      "classifiable_turns": 2462
+    },
+    "unpriced_direct_run": "EMPTY_CLASSIFIABLE_SET; the original reader shape still refuses raw Claude Code logs, so the adapter path is required."
+  },
+  "controls": {
+    "routing_backtest_tests": "26/26 pass",
+    "mutations": "7/7 caught; files restored byte-identical",
+    "foundation_gates": "ALL GREEN; stages 10,20,30,40,50,60,70,80,90,95,96 pass"
+  },
+  "ruling": "R20_CLOSED_CONDITIONAL",
+  "close_condition": "The (a) fix is landed and answers on real Claude Code-shaped logs when the reader supplies a price sheet. Unknown models remain named and fail-closed. No unconditional dollar claim is made because Claude Code records no cost and this repo ships no rates.",
+  "reopen_trigger": "Reopen if a second demo claims to serve real reader logs but refuses them, or if the adapter silently invents rates, hides refused models, or mixes recorded and table-derived cost bases.",
+  "no_claim": [
+    "The illustrative price sheet is not a provider quote.",
+    "20.6% is conditional on the supplied rates and bounded sample.",
+    "Raw Claude Code logs do not answer the routing question without the adapter and supplied rates."
+  ]
+}
