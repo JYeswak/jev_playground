@@ -724,3 +724,42 @@ is of this candidate's wedge, not of the lever analysis that motivated it.
 **Fairness recorded (from the ruling):** labels by agents forbidden from self-grading, 6/6 negative
 controls read correctly, fitted-and-overridable thresholds disclosed, leverage-vs-saving distinguished
 against their own headline. Killed on the wedge, not on the shop.
+
+---
+
+## R20 — a demo that passes its tests and refuses all real input (2026-09-18)
+
+**Refuted hypothesis (it was a hypothesis, not just a limitation):** the routing demo's fixture
+shape generalizes to reader corpora — the README headline implied it, `--mine` falsified it on
+4,626 real session files: `demos/routing-backtest` returns EMPTY_CLASSIFIABLE_SET
+("no classifiable turns found in supplied session logs", reproduced by pane 3 on 40 files,
+`/tmp/tr/mine-backtest.json`) because it classifies on omp-shaped envelopes (`message` /
+`message_end` rows, `usage.input/output/cost`) that Claude Code logs do not carry (envelope
+`assistant`, Anthropic `input_tokens`/`output_tokens`, no cost field). Score is 2 of 3, not a
+class failure: `usage-shape` answers (4,619 sessions, 488,724 turns) and `retransmit-whatif`
+answers (2,565 turns, residual 0, e923bb1) on the same corpus.
+
+**Scope ruling (pane 3):**
+`docs/demos/duel-2/runs/routing-scope-ruling-20260918T174327Z.json` — (a) FIX the classifier to
+read Claude Code's shape. The mapping is knowable, not guessed: model identity exact in the
+40-file probe sample (`claude-opus-5` × 312, `claude-sonnet-5` × 7, zero inference), usage/token/tool
+renames, turn boundaries via user rows, baseline spend via published-sheet rates. One declared
+choice: cache-token pricing (conservative full-rate default). Refusal stays fail-closed for
+models on no published sheet (MISSING_PRICE_MODEL preserved) and receipts must record per-turn
+cost basis so recorded and table-derived baselines never mix. (b) stating the limit and (c)
+retiring the headline were refused: (b) contradicts `--mine`'s purpose, (c) surrenders the
+README's only answered question.
+
+**Dishonesty recorded (self-reported by the tool author):** the first `--mine` version explained
+the refusal as "a model this demo has no price for" — a guess written as a diagnosis (envelope
+skip precedes model check, so it fired for the wrong reason on every file). It now quotes the
+receipt's own EMPTY_CLASSIFIABLE_SET code. Guessing a cause in a user-facing string teaches a
+stranger something untrue about their own logs — same defect class as an unopened citation.
+
+**RETRY CONDITION (either closes or re-opens):**
+1. **Close:** the (a)-fix lands per the scope ruling (reader adapter + price entries + declared
+   cache rule + basis-tagged receipts) and the demo answers on the real corpus — then this row
+   records the fix commit and closes.
+2. **Re-open as class:** a second demo refuses real input it claims to serve — then the question
+   is no longer one classifier but whether fixture-shaped demos generalize, and the row grows a
+   class section.
