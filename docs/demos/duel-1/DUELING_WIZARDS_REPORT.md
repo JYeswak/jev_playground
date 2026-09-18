@@ -42,6 +42,22 @@ weaker and more useful claim.
 **Consequence for the backlog:** the distinct-demo count is **8, not 6**. Two merged demos, four
 genuinely separate implementations of two shared seams, and two cross-shortlist demos.
 
+**And the overstatement had already propagated before the audit caught it.** Pane 3 built
+`docs/demos/duel-1/WIZARD_MERGE_MU.md` (`a58b1bc`) on my headline as its premise, and a later
+non-author audit (`docs/demos/duel-1/runs/merge-audit-20260918T013451Z.json`, `6df67ad`) graded
+its opening claim — *"four ideas converged; no pair needs a fifth implementation"* — **OVERSTATED**,
+for exactly the reason mine was, plus a softened scope on the screen and claim-check pairs and a
+count defect (Pair 3 says seven RED arms and lists six).
+
+**That is the second time a conductor claim contaminated downstream artifacts before being
+tested.** The first was the A/B verdict, which reached 17 tracked files before anything ran the
+harness twice. A wrong number from the synthesis seat does not stay in the synthesis — it becomes
+the premise of the next worker's document, and the worker is not at fault for believing the
+conductor. The durable mitigation is the one that caught both: **an arms-length audit of the
+orchestrator's own claims, queued by the orchestrator, before the claim is built upon.** Pane 3's
+merge doc needs its premise corrected; it is queued, not silently amended, because it is pane 3's
+file.
+
 ---
 
 ## 2. The complete score matrix
