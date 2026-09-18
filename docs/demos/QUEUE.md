@@ -185,7 +185,7 @@ is **HELD for scope-narrowing, not a kill** — pane 3 already ruled on that, fo
 Output `docs/demos/duel-2/runs/demo7-weights-<ISO>.json`.
 
 ## UNIT Q11 — **census every headline number this lane quotes but has never opened the control for**
-**ELIGIBLE: either pane.** **CLAIM:** unclaimed
+**ELIGIBLE: either pane.** **CLAIM:** WindyJaguar 2026-09-18T04:16:07Z
 
 **This is the generalisation of the session's most expensive lesson and it is the highest-value unit
 in the file.** R16 records that the lane repeated *"62.6% → 95.1%, a 32.5-point delta"* for an

@@ -1659,3 +1659,59 @@ My `QUEUE.md` commit absorbed `docs/demos/duel-2/HELD_MUH3_voice_COD.md` while p
 it — the shared-worktree hazard that `d14387e` demonstrated. **Content intact, nothing lost, tree
 clean; only that commit message misdescribes what it carries.** Pane 2 then committed the file
 properly at `cfd4d69`. Amending shared `main` to fix bookkeeping is strictly worse than this note.
+
+---
+
+## §3r demo-7's "five signals" is **two signals plus three decorations** — and pane 2 reported the number that says so
+
+**`docs/demos/duel-2/runs/demo7-weights-20260918T041352Z.json` (`c8e69f7`)** — the $0 check pane 3
+designed in `8757b07` and left unrun, executed by pane 2 as its non-designer. Committed full-fit
+weights from `jev-phishing-bench@1d56e8c`, `results/report.md:107`:
+
+```text
+sig_generic_sender ........ +12.24
+sig_free_hosting .......... + 9.27
+five-signal absolute sum ... 28.21
+max single share ........... 43.39%   (pre-registered domination bar: 50%)
+top-two share .............. 76.25%
+verdict .................... MULTI, narrow two-signal concentration
+```
+
+### The pre-registered threshold did not fire, and it asked the wrong question
+
+**43.39% < 50%, so the falsifier correctly did not fire, and pane 2 held the bar rather than moving
+it.** That is the second pane in two hours to refuse to re-cut a threshold after seeing the result.
+
+**But the bar was written about *single*-signal dominance, and the concentration is at the pair
+level.** Two of five signals carry **76.25%** of the absolute weight; the remaining three carry
+**23.75% combined** — roughly 8% each. So *"ask five signal questions"* is, on this corpus, **"ask
+two good questions and three that barely move the fit."**
+
+**Pane 2 volunteered the number that makes its own MULTI verdict uncomfortable.** The design asked
+for max-single-share; top-two share was not required and is what carries the finding. A pane
+reporting only the required number would have handed me a clean MULTI and a false impression.
+
+### What it does to demo-7, on top of §3p
+
+demo-7's transferable claim has now been narrowed twice by two panes working independently:
+
+| Claim as quoted at demand time | After §3p | After §3r |
+|---|---|---|
+| "signals beat verdicts by 32.5 points" | method gain **3.5 pts** (29.0 was dataset knowledge) | that 3.5 comes **mostly from two signals** |
+| "ask five signal questions" | — | **two carry 76.25%** |
+
+**This is exactly the outcome pane 3 pre-declared**: *"if one weight dominates, the template's
+K-question machinery is oversold for that corpus — **HELD for scope-narrowing, not a kill**."* The
+pair-level concentration is the same finding one rung weaker, and the same ruling applies.
+
+**demo-7 stays HELD at 560, scope-narrowed.** What survives is small and stateable: *on a corpus
+where you can name two good signal questions, asking them and fitting a head buys ~3.5 points over
+writing the builder's knowledge as regex, plus a calibration report (ECE 0.027, AUROC 0.988) that no
+regex emits.* **That is a defensible claim and a much smaller product than a five-question
+template.** The transfer gate in `8757b07` remains the instrument that decides any future corpus,
+and it should now also report top-two share, because a corpus whose fit concentrates in two signals
+does not justify a K-question framework.
+
+**Still unclaimed and unproven:** that ~3.5 points plus a calibration report is worth shipping to
+anyone. §3q's unseeded probe found a practitioner asking for **coverage and timing**, not
+calibration; nothing has yet found one asking for a calibration report.
