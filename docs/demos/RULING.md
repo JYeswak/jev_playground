@@ -22,8 +22,8 @@ approval"* (§3u). Rung 3 **in full**: real client that exits **`rc2` with no fa
 wedge outcomes driven by **live** probabilities with the model **echoed 5/5** (§4i), clean-clone
 **13 pass / 0 fail** against demo-1's 10/0 bar (§4e).
 
-**And rung 4 is unaskable here for five independent reasons, found by three parties, none looking for
-another's finding — every one before any spend:**
+**HISTORICAL.** This line read *"rung 4 is unaskable here for **five** independent reasons… every one
+before any spend"*. Current state: **SIX** blockers, `5/20 = 25%`. See CURRENT STATE at the tail.
 
 | # | Blocker | Number | Found by |
 |---|---|---|---|
@@ -31,7 +31,7 @@ another's finding — every one before any spend:**
 | 2 | Implementation | anti-gaming guards **6/6 ABSENT**, prose only | pane 3 (§4v) |
 | 3 | Construct validity | labels are a **perfect function of the pattern rule** — a regex scores 100% by construction | conductor (§4w) |
 | 4 | Widening | **7 tiny journals** left; credential stratum **struck** (97 shapes incl. our own fixtures) | pane 3 (§4w) |
-| 5 | **Ground truth** | two-rater agreement **7/14 = 50%**, **systematic** | pane 3 (§4x) |
+| 5 | **Ground truth** | two-rater agreement **7/14 = 50%** — SUPERSEDED, now **5/20 = 25%** (AMENDMENT 4) | pane 3 (§4x) |
 
 **Blocker 5 is the ruling.** The disagreement is not noise — it is *"what counts as **licensed**,
 which is the policy's central undefined term."* **If two careful raters cannot agree, a model asked

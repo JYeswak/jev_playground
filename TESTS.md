@@ -85,3 +85,16 @@ projects and mean nothing. Per-suite counts above are the honest unit.
 
 - `demos/routing-backtest/test/reader.test.mjs` — transcript denominator extraction and the empty-classifiable-set ERROR arm. Run: `cd demos/routing-backtest && npm test`.
 - `demos/routing-backtest/src/counterfactual.test.mjs` — deterministic cheap-route policy, recorded-spend preservation, missing-price ERROR, unknown-model fixture RED arm, and missing-spend failure. Run: `cd demos/routing-backtest && npm test`.
+- `demos/doc-drift/test/judge.test.mjs` — the doc-drift judge's decision surface. Registered
+  2026-09-18 after `foundation/gates.d/70-tests-registry-sync.sh` fired RED on it live: it was
+  tracked and unnamed here, a sibling landing whose registry update never happened. Run:
+  `cd demos/doc-drift && npm test`.
+- `demos/preaction-abstention/test/gate.test.mjs` — the pre-action abstention gate's own suite,
+  the same landing-without-registry-update class. Run: `cd demos/preaction-abstention && npm test`.
+
+**How these two were found, because it is the point of gate 70 and of this file.** Neither was
+discovered by anyone reading `TESTS.md`. `foundation/gates.sh` globs `gates.d/[0-9]*`, so gate 70 was
+**auto-wired and RED on the live tree**, and pane 3's registry audit
+(`audit-gates-registry-20260918T110806Z.json`, `85d75a0`) surfaced it: *"it fires RED on the live
+tree right now and nothing else watches `TESTS.md`."* **The conductor had not run
+`foundation/gates.sh` this session and so did not know the suite was failing.**
