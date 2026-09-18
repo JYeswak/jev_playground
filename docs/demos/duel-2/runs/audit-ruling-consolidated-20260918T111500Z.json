@@ -1,0 +1,101 @@
+{
+  "schema": "jev.ruling-consolidated-audit.v1",
+  "generated_at": "2026-09-18T11:15:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "target": "docs/demos/RULING.md",
+  "method": "read current 45,354-byte document; compared repeated claims to the receipts and later amendments; treated later corrections as superseding only where the text explicitly says so",
+  "verdict": "PRODUCTIVE_BUT_NOT_SELF-CONSISTENT",
+  "state_claim": {
+    "claim": "17 candidates; RULED_OUT 4; CLEARED 5; HELD 8; PROMOTED 0",
+    "ruling": "SUPPORTED",
+    "basis": "Current STATUS.tsv contains 17 rows with the stated verdict distribution and no rung-5 promotion."
+  },
+  "contradictions": [
+    {
+      "severity": "HIGH",
+      "locations": ["RULING.md:7", "RULING.md:28-34", "RULING.md:455-465"],
+      "claim_a": "Rung 4 has five independent blockers; ground truth is 7/14 = 50%.",
+      "claim_b": "The consolidated verdict has six blockers; ground truth is 5/20 = 25% and manifest under-specification is blocker 6.",
+      "ruling": "The later consolidated section supersedes the opening table, but the opening is not marked historical. A reader can take both as current. Add an explicit superseded marker or rewrite the opening summary to the six-blocker/current figures."
+    },
+    {
+      "severity": "HIGH",
+      "locations": ["RULING.md:525-526", "RULING.md:554-590", "RULING.md:675-701"],
+      "claim_a": "The product includes a method that caught its own conductor eleven times.",
+      "claim_b": "No artifact enumerates eleven; twelve was adopted then withdrawn; strict shipped-rule count is eleven but does not vindicate the original claim; no single number restates it.",
+      "ruling": "Line 526 remains an active-looking unsupported claim after the document explicitly withdraws every replacement and rejects the original form. Delete or strike that sentence and replace it with the qualified taxonomy: broad actor-triggered 12, shipped-rule 11, neither an enumerated count of distinct catches."
+    },
+    {
+      "severity": "MEDIUM",
+      "locations": ["RULING.md:133-136", "RULING.md:513-517"],
+      "claim_a": "A rung-4 pass was refused five times; ground truth agreement was half.",
+      "claim_b": "The consolidated verdict says six blockers and 25% agreement.",
+      "ruling": "The later text is the current account, but the earlier headline remains unqualified. Mark it historical or update it."
+    },
+    {
+      "severity": "MEDIUM",
+      "locations": ["RULING.md:215-218", "RULING.md:463-465"],
+      "claim_a": "40 of 68 previews cannot evidence labels.",
+      "claim_b": "Q54 established 40 preview-insufficient plus 4 separately unrelocatable cases.",
+      "ruling": "40/68 is supported as preview insufficiency, but incomplete as the consolidated evidence-risk figure. State `40 preview-insufficient + 4 unrelocatable` and do not imply 44 preview failures."
+    }
+  ],
+  "numbers": {
+    "supported_current": [
+      "17 candidates / RULED_OUT 4 / CLEARED 5 / HELD 8 / PROMOTED 0",
+      "0.047% demo-1 backtest",
+      "41.7% maximum entropy precision",
+      "5/20 = 25% fresh agreement",
+      "40/68 preview-insufficient",
+      "4 unrelocatable separately from the 40",
+      "6/6 guards absent",
+      "7 tiny journals and credential stratum struck"
+    ],
+    "qualified_not_partition_counts": [
+      "12 pane/agent-triggered catches is a broad actor-triggered count, not eleven distinct catches",
+      "11 shipped-rule catches is a qualified scope count, not vindication of the original headline",
+      "citing-without-opening-control five times is a qualified recurrence count without a case-keyed disjoint table",
+      "3 recurrence families covering 10 of 22 is set-cover coverage, not a partition"
+    ],
+    "stale_or_incomplete": [
+      "7/14 = 50% as current ground truth",
+      "five blockers as the current consolidated blocker count",
+      "five refused rung-4 passes as the current total",
+      "40/68 without the four separately unrelocatable cases"
+    ]
+  },
+  "supersession": {
+    "ruling": "PARTIALLY_CORRECT",
+    "what_works": [
+      "The later 5/20 amendment and six-blocker table explicitly revise the earlier 7/14 and five-blocker account.",
+      "The second-pass correction explicitly withdraws the adopted twelve wording.",
+      "The Q76 section correctly says declared labels transfer authority only and does not dissolve COD-H2 blockers."
+    ],
+    "what_fails": [
+      "The opening verdict and the PROMOTED-0 climax retain stale five-blocker/old-agreement language without a historical marker.",
+      "The original eleven-catches sentence survives after its own correction says no single number restates it.",
+      "The consolidated manifest figure omits the four unrelocatable cases from the current evidence-risk qualification."
+    ],
+    "required_cleanup": "Make one current summary authoritative: six blockers; 5/20 agreement; 40 preview-insufficient plus 4 unrelocatable; no unqualified eleven/twelve catch claim. Mark prior figures as historical amendments."
+  },
+  "verified_claim_risks": [
+    {
+      "claim": "every COD-H2 clearance was signed by a non-author",
+      "ruling": "SUPPORTED_ONLY_WITH_SCOPE",
+      "reason": "The cited clearance receipts support the listed clearance events, but this sentence must not be read as full rung-4 validation or as proof of the unresolved author-column/conductor identity problem."
+    },
+    {
+      "claim": "rung 3 in full",
+      "ruling": "QUALIFIED_LATER",
+      "reason": "The later UBS and liveness paragraphs qualify earlier uses. The qualification is present, but earlier wording remains easy to quote out of context."
+    },
+    {
+      "claim": "method caught its own conductor eleven times",
+      "ruling": "UNSUPPORTED_AS_WRITTEN",
+      "reason": "No case-keyed enumeration and later corrections explicitly reject the unqualified claim."
+    }
+  ],
+  "product_ruling": "The document's evidence product is strong but the consolidated state is not yet single-source-of-truth prose. Its largest defect is not a wrong receipt number in isolation; it is stale headline text surviving after explicit superseding corrections.",
+  "no_claim": "No claim that every sentence was exhaustively receipt-checked, no claim that the ruling is safe to publish unchanged, and no claim that the underlying COD-H2 blockers are resolved."
+}
