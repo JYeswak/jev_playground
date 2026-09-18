@@ -84,7 +84,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`jev-sec-bench`|blind security benchmarks|not run, README only|establish whether code exists or it is a results write-up|
 |`jev-agent-failure-benchmark`|can a cheap decision model find what broke an agent|not run|run it; the closest upstream analogue to this lane's own question|
 |`typesafe-ai-benchmark`|LLM structured output vs Jev on latency, cost, judgment|not run|run its documented examples; report which are stale at HEAD|
-|`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**BLOCKED**: remote build returns ELF for an arm64-darwin host (`RCH-E327`)|needs a same-platform worker; capacity was never the real blocker|
+|`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**RUN**: both examples, offline, via a linux/amd64 container|the blocker was a platform mismatch, routed around; `RCH-E327` is still unfixed upstream|
 |`jev-router`|per-turn model routing for Claude Code and Codex|not run|compare with `demos/routing-backtest`; upstream may already own this|
 |`jev-codex-router`|the same idea, Codex-specific|not run|read before extending our own router work|
 |`jev-mcp`|Jev judgments exposed as MCP tools|**RUN**: 9/9 unit, 4/4 live e2e|wire `jev_verify` into the conductor's number-checking|
