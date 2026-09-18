@@ -1,9 +1,9 @@
-# Five recipes that won today
+# Six recipes that won today
 
 Joshua, 2026-09-18: *"how has the team done so much today and not found a single winning recipe -
 that seems like you all dont know what you're doing"*.
 
-He is right that nothing was promoted, and wrong that nothing won. **Five things won, measured, and
+He is right that nothing was promoted, and wrong that nothing won. **Six things won, measured, and
 none of them reached a verdict** — because the gauntlet in `docs/demos/STATUS.tsv` adjudicates ideas
 *this lane proposes*, and every result below came from running somebody else's code. The evidence
 never entered the machinery that would have ruled on it. That is a defect in the process, not an
@@ -103,6 +103,24 @@ The limit was the task set, not the count.
 
 **Stops being true when:** you have discordant pairs. Then n genuinely is the constraint.
 Source: [pairing](docs/demos/upstream-repro/jev-benchmark-pairing-20260918.md)
+
+---
+
+## 6. Keep an open-model control arm, because it is free
+
+**Do this:** before concluding that a typed-judgment result is about *the model*, re-ask the same
+question of an open implementation. `simple-jev` serves the identical `choice`/`score`/`noul`
+interface with no key and no login.
+
+Asked the hardest classification this lane made all day — is a cited figure a stored literal, a
+derived rollup, or absent — an open 35B classifier returned **`derived_rollup` at confidence 0.989**
+with stored-literal at 0.0067, in **1.7 seconds** for 1,040 input tokens. That matches the verdict a
+non-author pane reached after two of my own mechanisms were wrong.
+
+**Stops being true when:** you need calibrated probabilities. Upstream states plainly that these
+distributions are *"not calibrated probabilities of correctness"*, so this is a second opinion, not
+an oracle.
+Source: [simple-jev](docs/demos/upstream-repro/simple-jev-20260918.md)
 
 ---
 
