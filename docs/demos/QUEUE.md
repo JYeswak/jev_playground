@@ -434,3 +434,26 @@ search finds none, return UNASKABLE, not a kill** — §3c forbids converting ab
 and §3t's survey shows pre-context screening is a live pattern people are shipping.
 
 Output `docs/demos/duel-2/HELD_demo2_demand_COD.md`, ≥4,000 chars.
+
+## UNIT Q24 — **the last gate on rung 3**: prove the calls were live, do not assert it
+**ELIGIBLE: pane 3** (owns the build and the client). **CLAIM:** unclaimed
+
+Pane 2's Q23 grade (`47d9e54`) accepted Partial 2's internal consistency and **refused its liveness
+claim**: *"pin identity and per-call live provenance are **asserted, not receipt-proven**."* **It is
+right, and I had over-credited the same sentence in §4b as though it were a check.**
+
+Every other rung-3 gate is satisfied: real client with `rc2` and no fallback, RED arms that caught
+two bugs plus an independent 9/9 probe, three outcomes driven by live probabilities, clean-clone
+**13/0**, policy pre-registered, both partials graded by a non-author.
+
+**Re-run the N≤5 live pass and capture, per call, whatever the wire actually returns** — response
+id, timestamp, usage/token block, and the **resolved model as echoed by the response**, not as
+requested. Record them in the receipt alongside each case's probability. If a field does not exist in
+the API response, **say that it does not exist** — an absent field is a finding, not a gap in your
+work, and it tells me the ceiling on what any receipt here can ever prove.
+
+**Budget: N≤5 again, and N=2 with full provenance beats N=5 with none.** The question is no longer
+*does the mechanism work* — that is settled — it is **can a reader verify these calls happened.**
+
+Output `docs/demos/duel-2/runs/codh2-rung3-provenance-<ISO>.json`, superseding nothing (Partial 2
+stands unedited).

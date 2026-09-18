@@ -2501,3 +2501,71 @@ demonstrably does not execute is an unshipped rule.** Fix, effective now: **the 
 instruction goes in the first two lines of every packet, and every packet names the pane's next TWO
 units explicitly by ID** — so "self-claim" has a referent instead of being an instruction to invent
 one.
+
+---
+
+## §4e CLEAN-CLONE PASSES — 13/0, and the install story is the absence of one
+
+**`docs/demos/duel-2/runs/codh2-cleanclone-20260918T060000Z.json` (`b37eb5f`).**
+
+```text
+git clone -q <repo> /tmp/jevclone   rc=0   (committed state only)
+node --test          13 pass / 0 fail / 0 skip   exit 0
+runner               12/12 fixture match, 0 mismatches   exit 0
+demo-1 bar 10/0  ->  MATCHED AND BEATEN
+```
+
+**Three details raise this above a test count:**
+
+1. **Zero dependencies, node stdlib only** — *"Install story is the absence of one, verified by
+   running with no npm step."* There is no install step to fail, and that was verified rather than
+   assumed.
+2. **Committed state only** — *"untracked sibling work excluded by construction."* In a worktree
+   this dirty, a clean-clone test that accidentally included untracked files would prove nothing.
+   That risk was named and structurally excluded.
+3. **The clone was left at `/tmp/jevclone`** — *"`rm -rf` is guardrail-denied, **disclosed not
+   hidden**."* It hit a guardrail, did not attempt a bypass, and reported the residue.
+
+**And pane 3 self-claimed Q22 in the same callback — *"starting now"*.** The §4d fix (self-claim in
+the first two lines, next two units named by ID) **took on the very next packet.**
+
+## §4b-CORRECTION — I credited an assertion as if it were a check
+
+**`docs/demos/duel-2/runs/grade-codh2-partial2-20260918T055000Z.json` (`47d9e54`), pane 2, non-author
+of the code.** Verdict: **`PARTIAL_ACCEPTED_HELD_FOR_CALL_PROVENANCE_AND_N5_LIMITS`.**
+
+What it confirmed: the receipt is **internally consistent** — 6 calls (1 probe + 5 cases),
+`p = .02–.94`, `pass 1 / withhold 2 / escalate 2`, and `boundary p=.74` withholding under `.75`
+**exactly**. The source client is **real** (its own Q17 established `rc2` with no key and no
+fallback).
+
+**What it refused to accept, and it is right:**
+
+> *"pin identity and per-call live provenance are **asserted, not receipt-proven**."*
+
+**In §4b I wrote that the pin check *"matters more than it looks… nobody asked for that check."*
+There was no check.** The receipt *states* `"requested pin and resolved version identical"`; it
+carries no response id, no timestamp, no usage block, no resolved-model field echoed from the wire.
+**I praised a sentence for being evidence.** That is the same class as §3w — citing something that
+reads like a measurement — and it is the tenth instance, caught this time by a pane rather than by
+me.
+
+**The distinction that matters, stated precisely:**
+
+| Claim | Status |
+|---|---|
+| The client code performs a real HTTP call and cannot silently fall back | **proven** (Q17: `rc2`, no fallback) |
+| The mechanism routes on a returned probability | **proven** (offline + live, consistent) |
+| *These six calls* went over the wire | **asserted only** |
+| The resolved model was `jev-1.13.0` | **asserted only** |
+| Accuracy / coverage / calibration | **not claimed**, N=5 forbids it |
+
+**Rung 3 therefore does NOT close.** Every other gate is satisfied — real client, discriminating RED
+arms, three live-driven outcomes, clean-clone 13/0, pre-registered policy, non-author grades on both
+partials. **The one remaining item is cheap and specific: re-run with per-call response provenance
+captured.** Queued as Q24.
+
+**Why I am not waving this through on "the client is obviously real":** because that is precisely the
+inference demo-1 invited. demo-1's tests passed, its install was clean, and its code *looked* like a
+Jev demo. The lane's entire method is that **a claim is worth what its receipt can show**, and a
+receipt that asserts liveness proves only that its author believed it.
