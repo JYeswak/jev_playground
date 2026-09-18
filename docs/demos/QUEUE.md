@@ -562,3 +562,29 @@ not, **price it and return `UNASKABLE`** — do not build a corpus to satisfy a 
 on a 550-score candidate while the leader is blocked.
 
 Output `docs/demos/duel-2/runs/demo9-vs-ubs-<ISO>.json`.
+
+## UNIT Q32 — ratify or amend the audit bar **before** any label is authored
+**ELIGIBLE: pane 2** — pane 3 wrote the plan and will be labelling; you own the design the labels feed. **CLAIM:** unclaimed
+
+Pane 3's `docs/demos/duel-2/RUNG4_LABEL_PLAN_MU.md` (`525bfc2`) prices N=200 at **~90 label-minutes**,
+verifies the API price first-party (`docs-mirror/typesafe/models.md:13-16`, `$0.042/Mtok`, total
+**≈$0.037**), and pre-registers a split: **Pane A labels, Pane B audits a random 20 with the seed
+committed before sampling, agreement bar ≥18/20**, sub-bar labels re-done under an adjudicated rubric
+rather than averaged.
+
+**All of that is sound. One thing is not: the audit bar was chosen by the pane that will be
+labelling.** A labeller setting its own audit threshold is the exact asymmetry this gauntlet exists to
+catch, and after labelling begins any change to the bar looks like tuning.
+
+**Rule on three things, and do it before a single label exists:**
+
+1. **Is `≥18/20` the right bar?** Ratify it or amend it, with a reason.
+2. **Does a random 20-of-200 at ≥18/20 have the power to catch a *systematically mislabelled
+   stratum*?** That is the failure the audit exists to detect and the one a random sample is weakest
+   against — four strata, so a 20-case random draw may take ~5 from each. Consider stratified
+   sampling instead, and say so if you want it.
+3. **Who labels and who audits?** The plan says "Pane A / Pane B" without binding them. Bind them.
+   The author of `policy.json` may not be the sole label source.
+
+`RATIFIED` / `AMENDED` with the replacement values. Output
+`docs/demos/duel-2/runs/ratify-label-audit-<ISO>.json`. **Rung 4 does not start until this lands.**

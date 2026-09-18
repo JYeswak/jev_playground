@@ -3051,3 +3051,64 @@ rather than a rule.** Consistency is the whole reason the screen is worth having
 cost, and who verifies them, given that the author of the policy cannot be the sole source of the
 labels its policy is graded against. **That is the next unit, and it is cheap to answer badly and
 worth answering well.**
+
+---
+
+## §4n LABELS PRICED, PRICE VERIFIED FIRST-PARTY — rung 4 is affordable, and one authorship gap remains
+
+**`docs/demos/duel-2/RUNG4_LABEL_PLAN_MU.md` (`525bfc2`), pane 3.** *"Bottom line up front: **N=200
+is affordable** (~90 label-minutes + audit). No `UNASKABLE` pressure applies."*
+
+### The pricing is a measured trial, not an estimate
+
+Ten cases labelled and timed, then stratified across four strata that *"price differently"* →
+**~90 minutes total, single pane, one sitting.** Two things make it trustworthy:
+
+- **The trial disclosed its own bias:** the 10-case sample split **7/2/1/0** and *"destructive-only
+  sample skews pass-light on purpose — a pricing trial prices the **act**, and destructive cases are
+  the slow ones."* It priced the slow path deliberately.
+- **Sensitivity stated:** *"If the estimates are off **2× against**, the total is still an
+  afternoon."*
+- **The escape hatch was pre-committed and then not needed:** *"Largest affordable N: **the full
+  200, no reduction argued for**. Had the trial shown otherwise, this section would name the
+  [smaller N]."* I asked for an honest smaller N if the cost demanded it; the plan shows it was
+  prepared to give one.
+
+### It closed the §3w unverified-price flag with a first-party source
+
+I flagged `$0.042/M` as an external figure with no control opened. Pane 3 found it **in-repo** —
+`docs-mirror/typesafe/models.md:13-16`, quoted verbatim: *"| Price (per Btok / per Mtok) | $42 /
+$0.042 |"*. Arithmetic re-derived independently and matches mine to the digit: **2,000 calls × 435
+measured tokens = 0.870M × $0.042 = $0.0365 ≈ $0.037.**
+
+> *"**Model money is not the constraint on rung 4; the ~90 label-minutes are, and they fit.**"*
+
+**That is the correct framing and it inverts the assumption I was carrying.** I had treated the API
+spend as the thing to justify; the binding resource is **human-equivalent labelling time**, and it is
+an afternoon.
+
+### The split honours the hard constraint, fixed before any label exists
+
+- **Pane A labels; Pane B audits a random 20**, with the **seed committed before sampling**.
+- **Agreement bar ≥ 18/20.** Below it, *"labels are re-done with an adjudicated rubric, **not averaged
+  into agreement**."*
+- **Disagreements route to the conductor, case by case.**
+- *"Audit sample and bar are fixed **here, before any label exists**."*
+
+**Pre-registering the bar before the data is the same discipline that made Q9, Q12 and Q24
+trustworthy**, applied now to the labelling rather than the measurement.
+
+### The one remaining authorship gap, and it is the lane's signature asymmetry
+
+**The audit bar was chosen by the pane that will be labelling.** `≥18/20` on a 10% sample is
+plausible for mechanical policy-rule application — but **a labeller setting its own audit threshold
+is exactly the asymmetry this gauntlet exists to catch.** The bar should be **ratified or amended by
+the auditor**, before labelling starts, because afterwards any change looks like tuning.
+
+**So rung 4 is authorized in principle and not yet started.** Queued as Q32: pane 2 ratifies or
+amends the audit sample size and agreement bar, and states whether a 20-of-200 sample at ≥18/20 has
+the power to catch a systematically mislabelled stratum — which is the failure the audit exists to
+detect, and the one a random sample is weakest against.
+
+**`NO-CLAIM strata estimated`** — the per-stratum rates come from a 10-case trial, so the 90-minute
+figure is an extrapolation with its basis stated. Recorded as such.
