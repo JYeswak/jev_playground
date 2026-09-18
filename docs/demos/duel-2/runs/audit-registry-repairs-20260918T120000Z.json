@@ -1,0 +1,95 @@
+{
+  "schema": "jev.gate-registry-repairs-audit.v1",
+  "generated_at": "2026-09-18T12:00:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "targets": [
+    "GATES.md",
+    "foundation/gates.d/80-lane-instrument-selftests.sh",
+    "scripts/sync-docs.sh",
+    "TESTS.md"
+  ],
+  "commands": [
+    {
+      "command": "foundation/gates.sh",
+      "producer_exit": 0,
+      "result": "8 stages PASS: 10,20,30,40,50,60,70,80"
+    },
+    {
+      "command": "foundation/gates.sh --selftest",
+      "producer_exit": 0,
+      "result": "8 stages PASS"
+    },
+    {
+      "command": "scripts/sync-docs.sh --check",
+      "producer_exit": 0,
+      "result": "CHECK PASS 114 mirrored files"
+    },
+    {
+      "command": "foundation/gates.d/80-lane-instrument-selftests.sh --selftest",
+      "producer_exit": 0,
+      "result": "missing suite REDs and is named"
+    }
+  ],
+  "findings": {
+    "registry_snapshot_drift": [
+      {
+        "file": "GATES.md",
+        "location": "Gate wiring preamble",
+        "claim": "foundation gates listed as 10,20,30,40,50,60",
+        "observed": "foundation/gates.sh ran 8 stages, including 70-tests-registry-sync and 80-lane-instrument-selftests",
+        "ruling": "STALE_REGISTRY_SUMMARY",
+        "repair": "State that 70 and 80 are also present, or derive the list from the gates.d glob."
+      },
+      {
+        "file": "TESTS.md",
+        "locations": [42,43],
+        "claim": "foundation/gates.sh and --selftest are 4/4 PASS",
+        "observed": "Current producer output is 8 stages PASS in both modes",
+        "ruling": "STALE_RESULT_SNAPSHOT",
+        "repair": "Replace the result snapshot with the command/re-derivation instruction or update the count and mark it historical."
+      },
+      {
+        "file": "GATES.md",
+        "location": "top-level Run everything note",
+        "claim": "all four stages are proven to trip",
+        "observed": "The current aggregate has eight stages; stage 80's own selftest proves missing-suite RED, while the child suites prove their own arms only in normal stage execution",
+        "ruling": "STALE_AND_SCOPE_AMBIGUOUS",
+        "repair": "Describe aggregate stage count separately from child-arm coverage; do not call four stages current."
+      }
+    ],
+    "measurement_rows": {
+      "ruling": "PARTIALLY_REPAIRED",
+      "good": [
+        "sync-docs row explicitly says RE-DERIVE and records the portable-prefix mechanism rather than treating CHECK PASS 114 as permanent truth",
+        "stage 80 names its suites and the missing-suite RED condition",
+        "stage 60 identifies its witness command/edge rather than only a green result"
+      ],
+      "remaining_snapshot_shape": [
+        "TESTS.md 4/4 claims",
+        "GATES.md's six-stage preamble",
+        "historical commit-msg refusal and dcg denial sentences are event evidence, not re-derivation commands",
+        "stage 80's 14-arm count is a static claim; the actual normal run is the re-derivation path, while --selftest only tests missing-suite detection"
+      ],
+      "ruling_detail": "The re-derive principle is not uniformly applied. The repaired sync row follows it; several registry/test rows still record snapshots or historical events without a clear current command."
+    },
+    "stage_80": {
+      "normal_run": "PASS: executes three child selftest scripts through their temporary fixtures; no shared STATUS/sidecar mutation observed in the stage source",
+      "selftest_run": "PASS: plants a nonexistent suite and requires nonzero plus ABSENT output",
+      "false_green_bound": "The stage selftest proves the wrapper detects a missing named suite. It does not independently prove that each child suite still contains non-vacuous arms; that is delegated to the child suite runs in normal mode and their own selftests.",
+      "ruling": "VALID_WRAPPER_TEST_WITH_DELEGATED_CHILD_PROOF"
+    },
+    "sync_docs": {
+      "portable_prefixes": ["$HOME/", "${HOME}/", "~/", "/*"],
+      "ruling": "CURRENT_CASES_CORRECT",
+      "evidence": "Existing $HOME/Developer/ripwire resolves and absent-clone selftest reports MISSING; current --check passes 114 files.",
+      "false_direction_risk": "A literal $HOME substring that is not a leading prefix falls to the repository-relative fallback, so it is not falsely expanded. ~user/ is unsupported and also falls to repository-relative fallback, producing a likely MISSING rather than a false existing clone. No test arm covers literal-substring or ~user; document unsupported forms or add arms."
+    }
+  },
+  "overall": {
+    "verdict": "REPAIRS_WORK_BUT_REGISTRY_STILL_HAS_STALE_COUNT_SNAPSHOTS",
+    "strongest_result": "The actual foundation producer and selftest producer both pass, and sync-docs now resolves its portable clone path without changing the manifest.",
+    "highest_value_defect": "TESTS.md and GATES.md still state four stages while the aggregate runs eight; this is the same registry-staleness class the sync row now warns against."
+  },
+  "no_claim": "No claim that every registry row is current, no claim that stage 80 selftest exercises all child arms itself, and no claim that unsupported ~user forms are safely resolved."
+}
