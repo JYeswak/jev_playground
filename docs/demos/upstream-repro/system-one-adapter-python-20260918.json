@@ -1,0 +1,36 @@
+{
+  "receipt_type": "upstream_adapter_reproduction_and_ruling",
+  "date": "2026-09-18",
+  "repository": "system-one-adapter-python",
+  "verification": {
+    "command": "uv run --extra openai --extra anthropic pytest",
+    "pytest": "204 passed",
+    "pyrefly": "0 errors",
+    "tach": "not run: configuration file not found; upstream package has no tach config"
+  },
+  "interface": {
+    "client": "SystemOneAdapterClient.system_one(state, questions, provider, model)",
+    "providers": ["openai", "anthropic", "custom OpenAI-compatible endpoint"],
+    "modes": ["probabilities", "discrete"],
+    "response": "typesafe_sdk.SystemOneResponse-compatible answers plus provider attempt/debug history"
+  },
+  "comparison": {
+    "fast_jev_compaction": "Core accepts an injected JevAsker; local omp compaction accepts an asker in compactOmpTranscript and the upstream hook builds the native Jev asker.",
+    "system_one_adapter": "Python package is a provider/model substitution layer, not a TypeScript-compatible drop-in for the existing JevAsker without a bridge.",
+    "hardwired_surface": "The live Claude hook currently constructs the TypeSafe Jev asker from TYPESAFE_API_KEY/model; the reusable compaction core is not hardwired."
+  },
+  "creation_gate": {
+    "consumer": "Provider substitution and Jev-unavailable fallback are real consumers; the existing injected JevAsker seam is already exercised by local tests.",
+    "gate": "A future alternate provider must implement the same JevAsker contract and pass the existing compaction tests plus provider-specific response/error/retry tests. No Python bridge may be added without a consumer that runs it.",
+    "observed_defects": "The missing-key/provider-failure path is already a real condition: the hook fails safe to passthrough/built-in compaction. b801c10 separately proves missing infrastructure must not read as green.",
+    "retirement": "Do not add a Python subprocess/service until a concrete alternate-provider consumer, latency/error budget, secret path, and lifecycle owner exist. The current JevAsker seam remains the reversible boundary."
+  },
+  "ruling": "KEEP_INJECTED_SEAM; RETAIN_JEV_RUNTIME_DEFAULT; DO_NOT_BRIDGE_PYTHON_NOW",
+  "cost_of_hardwiring": "When Jev is unavailable, the hook falls back and loses verbatim compaction, increasing context growth and potentially invoking the built-in summary. That cost is visible and fail-safe, not hidden.",
+  "cost_of_bridge": "A Python bridge would add a process/service boundary, provider secret/config plumbing, response-shape translation, retry semantics, latency, and a second test matrix before any current consumer uses it.",
+  "no_claim": [
+    "No provider substitution was wired into the TypeScript hook.",
+    "No Python service or subprocess was added.",
+    "The upstream adapter's 204 tests do not prove a live alternate provider in this lane."
+  ]
+}
