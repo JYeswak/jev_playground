@@ -39,8 +39,8 @@ Everything else under this root is a **vendored clone** and its tests belong to 
 |---|---|---|---|
 | `probes/fast-jev-probe.mts` | `npx tsx probes/fast-jev-probe.mts` | black-box behavior of the compaction library against a **fake** Jev: verbatim text preservation, message order, truncation-to-head+note on drop, unknown-answer-key ⇒ keep (the fail-safe direction) | 8/8, reduction ratio 0.91 |
 | `foundation/run_calibration.py` | `cd foundation && python3 run_calibration.py` | our thresholds against the labelled held-out set; emits a receipt under `foundation/runs/` | ECE 0.061, Brier 0.020, Noul 58/60, Choice 19/20 (receipt `20260917T224444Z.json`) |
-| `foundation/gates.sh` | `cd foundation && ./gates.sh` | the four gate stages against the real tree | 4/4 PASS |
-| `foundation/gates.sh --selftest` | `cd foundation && ./gates.sh --selftest` | **every stage proves it can go RED** on a planted bad input | 4/4 PASS |
+| `foundation/gates.sh` | `cd foundation && ./gates.sh` | **every** wired stage against the real tree — the suite globs `gates.d/[0-9]*-*.sh`, so the stage count is derived, never fixed here | **8/8 PASS** at `a503b9a`; this row said `4/4` and `the four gate stages` for four stages' worth of additions (pane 2, `3e198bb`) |
+| `foundation/gates.sh --selftest` | `cd foundation && ./gates.sh --selftest` | **every stage proves it can go RED** on a planted bad input | **8/8 PASS** at `a503b9a`; same stale-count correction |
 | `githooks/commit-msg-verification-level.sh --selftest` | as written | the commit-edge hook refuses a level-less subject and accepts a level-carrying one | 4 known-bad refused, 4 known-good passed, 1 prose-not-claim refused |
 | `compaction/` (sibling-owned) | see that directory's own scripts | the omp transcript adapter and its known-bad (a trailing `toolResult` must be kept) | gate `40-omp-compact-replay.sh` PASS |
 

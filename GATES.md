@@ -11,8 +11,11 @@ cd foundation && ./gates.sh --selftest   # every stage against its PLANTED BAD i
 ```
 
 `--selftest` is the load-bearing mode: a stage passes there only by **correctly going RED** on a
-known-bad specimen. Measured 2026-09-17 — `ALL GREEN` in both modes, so all four stages are
-proven to trip.
+known-bad specimen. **Re-derive the count rather than reading one here** — `gates.sh` globs
+`gates.d/[0-9]*-*.sh`, so a stage that lands is wired without any edit to this file, and any number
+written down goes stale silently. Measured 2026-09-18: **8 stages, `ALL GREEN` in both modes.** This
+line previously said *"all four stages"*, which was true when written and wrong for four stages'
+worth of additions afterward (pane 2, `3e198bb`).
 
 ## Oracle
 
@@ -50,9 +53,11 @@ grades decoration on an unfalsifiable claim.
 
 ## Gate wiring
 
-Gate scripts wired into `foundation/gates.sh`, by basename:
+Gate scripts wired into `foundation/gates.sh` — **derived, not maintained by hand:** the suite globs
+`gates.d/[0-9]*-*.sh`, so this list is a convenience and the glob is the authority. As of `a503b9a`:
 `10-fixture-integrity.sh`, `20-receipt-freshness.sh`, `30-no-secrets.sh`,
-`40-omp-compact-replay.sh`, `50-house-gates.sh`, `60-staged-deletion-lane.sh`.
+`40-omp-compact-replay.sh`, `50-house-gates.sh`, `60-staged-deletion-lane.sh`,
+`70-tests-registry-sync.sh`, `80-lane-instrument-selftests.sh`.
 
 `50-house-gates.sh` wraps the **foundry house gates** against this repo — `dag-validate-gate.sh`
 (our bead store must be a valid DAG before anything dispatches from it), `close-evidence-gate.sh`
