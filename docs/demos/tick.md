@@ -101,6 +101,22 @@ not silence. §1 names the surfaces for a reason; inferring a pane's state from
 the absence of a message is the same instrument error as trusting a summary
 over a receipt.
 
+**NAME EVERY ARTIFACT BY ITS FULL REPO-RELATIVE PATH.** Measured 2026-09-18: a packet said
+*"audit `DUELING_WIZARDS_REPORT.md`"* — a bare filename — and the pane correctly reported it
+BLOCKED/absent, twice, while the file sat tracked at
+`docs/demos/duel-1/DUELING_WIZARDS_REPORT.md` in the pane's own tree (`a765840`, the parent of
+that pane's next commit). Every other artifact in the same packet carried a full path; this one did
+not, so the pane was asked to guess a directory. This is the same defect as the "report here" with
+no path that produced zero callbacks — committed *in the packet that quotes the rule*. A bare
+filename is a defective packet, and BLOCKED is the correct response to one.
+
+**AN ABORTED TOOL CALL PROVES NOTHING EITHER WAY.** Measured 2026-09-18: a batched call that was
+going to both send a packet and file a bead was aborted mid-flight. The bead did not exist
+(re-derived: count unchanged at 15) and the send had produced no success line, yet a later pane
+callback was the only hint. Do not batch a dispatch with a bead filing: on abort you cannot tell
+which half landed, and "sender success is not receiver receipt" degrades to "no sender result at
+all". Re-derive both sides, then re-issue the missing one alone.
+
 ## 3. DISPATCH — project-aware, by hand, in this order
 
 0. DONE callback → close (conductor classifies) → dispatch that pane's NEXT
