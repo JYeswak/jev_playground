@@ -60,14 +60,31 @@ norm_digest() { perl -0777 -pe 's/\s+\z//' "$1" 2>/dev/null | shasum -a 256 | cu
 # SCOPE per the spec: this covers RECEIPT / SCHEMA / INTEGRITY claims. The mutable pane, bead and
 # worktree surfaces below stay POINT-IN-TIME OBSERVATIONS and are deliberately not fingerprinted —
 # they change constantly by design and snapshotting them would make every run unstable.
+# WHAT THIS IS, AND WHAT IT IS NOT — corrected after pane 2's non-author audit
+# (audit-transient-impl-20260918T121500Z.json, c2f3134), verdict: "implementation MATERIALLY DEVIATES
+# from Q92 ... private-copy/snapshot and normalized pair claims ARE NOT EARNED." It was right, and my
+# commit message had said "the contract as specified and as built", which overclaimed.
+#
+# THIS IS a live before/after comparison of the evidentiary inputs, binding git HEAD plus BOTH the raw
+# and the content-normalised digest of every input (the raw/normalised pair the spec asked for, now
+# actually present). THIS IS NOT the spec's private-copy snapshot, and the gap is specific and worth
+# naming: A CHANGE THAT IS UNDONE BEFORE THE SECOND FINGERPRINT IS INVISIBLE. A -> B -> A inside the
+# scan window fingerprints identical, and only a real snapshot taken at scan start would catch it.
+# A private copy is still owed; until it exists this class is UNDETECTED, not absent.
+#
+# JEV_SIDECAR is honoured — pane 2 found the path hardcoded here while verify-other-reasons.sh takes
+# the override, so an alternate sidecar was unprotected. Same defect class as a hardcoded suite list.
+SIDECAR_PATH="${JEV_SIDECAR:-docs/demos/duel-2/runs/receipt-other-reasons.json}"
 fingerprint() {
   {
-    printf '%s\n' "$(git rev-parse HEAD 2>/dev/null || echo no-head)"
-    for f in "$STATUS" docs/demos/duel-2/runs/receipt-other-reasons.json; do
-      [ -f "$f" ] && printf '%s  %s\n' "$(shasum -a 256 <"$f" | cut -c1-16)" "$f"
-    done
-    awk -F'\t' '!/^#/ && $1!="candidate" {print $6}' "$STATUS" 2>/dev/null | sort -u | while read -r r; do
-      [ -f "$r" ] && printf '%s  %s\n' "$(shasum -a 256 <"$r" | cut -c1-16)" "$r"
+    printf 'HEAD %s\n' "$(git rev-parse HEAD 2>/dev/null || echo no-head)"
+    {
+      printf '%s\n' "$STATUS" "$SIDECAR_PATH"
+      awk -F'\t' '!/^#/ && $1!="candidate" {print $6}' "$STATUS" 2>/dev/null
+    } | sort -u | while read -r f; do
+      [ -n "$f" ] && [ -f "$f" ] || continue
+      printf 'raw:%s norm:%s  %s\n' \
+        "$(shasum -a 256 <"$f" | cut -c1-16)" "$(norm_digest "$f")" "$f"
     done
   } 2>/dev/null
 }
@@ -102,7 +119,17 @@ if [ "${1:-}" = '--pin' ]; then
 fi
 rc=0
 # Attempt counter for the bounded recapture. The spec allows MAX 2, so attempt 2 never re-execs.
+# VALIDATED, not merely defaulted — pane 2, c2f3134: "bounded reexec is normally max2 via env=2, but
+# EXTERNAL ATTEMPT INPUT IS NOT VALIDATED". An unvalidated bound is not a bound: `=2` from outside
+# skips the recapture entirely and jumps a first instability straight to exit 10, and a non-numeric
+# value made `-ge` fail in a way that decided control flow. Only 1 or 2 are legal; anything else is a
+# usage error, because silently coercing a caller's bad bound is how a bound stops meaning anything.
 : "${JEV_TRANSIENT_ATTEMPT:=1}"
+case "$JEV_TRANSIENT_ATTEMPT" in
+  1|2) ;;
+  *) printf 'lane-status: JEV_TRANSIENT_ATTEMPT must be 1 or 2, got %s\n' \
+       "$JEV_TRANSIENT_ATTEMPT" >&2; exit 2 ;;
+esac
 FP_BEFORE="$(fingerprint)"
 printf 'JEV LANE STATUS  %s  HEAD=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(git rev-parse --short HEAD)"
 printf '%s\n' "----------------------------------------------------------------------"
