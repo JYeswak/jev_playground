@@ -88,6 +88,15 @@ carry a named blocker at the next one, and only demo-2 does not. A gauntlet
 that cleared an idea has declined to kill it, which is not the same as
 endorsing it.
 
+**And a rung is process state, not efficacy.** A reviewing pane compared these
+verdicts against an upstream benchmark asking a near-identical question at
+**n=6257 with confidence intervals on every cell** and ruled that our CLEARED
+rows are *current-rung process-state results, not benchmark-grade efficacy or
+generalization*. Seventeen candidate ideas is a different kind of denominator
+from six thousand traces. Nothing here should be read as evidence that an idea
+works; an empirical claim of that sort needs held-out n, stated uncertainty and
+leakage controls, and no row below carries any of the three.
+
 - **demo-2, admission screen (700):** demand recovered — a named engineer
   replaced the README narrative (`docs/demos/duel-2/HELD_demo2_demand_COD.md`).
 - **demo-5, fact ledger (755):** rung 3 waits on hunt scores.
