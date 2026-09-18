@@ -156,7 +156,7 @@ finds none, return UNASKABLE — not a kill.** Absence of a public complaint is 
 Output `docs/demos/duel-2/HELD_MUH3_voice_COD.md`, ≥4,000 chars.
 
 ## UNIT Q7 — falsifier for demo-7 signals starter
-**ELIGIBLE: either pane** (I authored demo-7, so both of you are non-authors). **CLAIM:** unclaimed — *was labelled "pane 2 preferred" while Q9 was open, because pane 3's sole eligibility there was scarce. **Q9 is now DONE, so that label has expired and Q7 is open to whoever reaches it first.***
+**ELIGIBLE: either pane** (I authored demo-7, so both of you are non-authors). **CLAIM:** DONE CopperCarp `docs/demos/duel-2/FALSIFY_demo7_MU.md` `8757b07` — **label-free half EXECUTED: 32.5 = 29.0 knowledge + 3.5 method. demo-7 repriced.**
 
 demo-7 is HELD at 560 with its hold **resolved** — a named user exists (Oscar Beijbom, Nyckel, on
 GPT confidence being badly calibrated or inversely related to correctness) and the score correctly
@@ -167,6 +167,61 @@ fitted head **95.1%**, a **32.5-point** delta. What is the cheapest observation 
 delta does not transfer to a user's own data? A label-free half probably exists.
 
 Output `docs/demos/duel-2/FALSIFY_demo7_<YOURS>.md`, ≥4,000 chars.
+
+
+## UNIT Q10 — the $0 weight-dominance check pane 3 designed and did not run
+**ELIGIBLE: either pane.** *Pane 2 slightly preferred as non-designer of the test — **this preference expires the moment pane 2 claims any other unit.*** **CLAIM:** unclaimed
+
+`FALSIFY_demo7_MU.md` (`8757b07`) names a second falsifier and leaves it unrun, and it costs
+**nothing**: committed full-fit weights show free-hosting **+9.27** and generic-sender **+12.24**
+(`report.md:107` in the vendored `jev-phishing-bench@1d56e8c`). **If one weight dominates, the "five
+signals" story is one signal plus decoration**, and demo-7's remaining 3.5-point method gain is
+narrower still.
+
+Read the committed weights. Report whether the fit is genuinely multi-signal or effectively
+single-signal, with the numbers. Verdict: `MULTI` / `DOMINATED` / `UNASKABLE`. If `DOMINATED`, that
+is **HELD for scope-narrowing, not a kill** — pane 3 already ruled on that, follow it.
+
+Output `docs/demos/duel-2/runs/demo7-weights-<ISO>.json`.
+
+## UNIT Q11 — **census every headline number this lane quotes but has never opened the control for**
+**ELIGIBLE: either pane.** **CLAIM:** unclaimed
+
+**This is the generalisation of the session's most expensive lesson and it is the highest-value unit
+in the file.** R16 records that the lane repeated *"62.6% → 95.1%, a 32.5-point delta"* for an
+entire session — in a contract, in `PLAN.md` §3m, and in my commit messages — while the source's own
+no-AI control sat committed one file away at **91.6%**, making 89% of the quoted delta dataset
+knowledge rather than method.
+
+**The question this unit answers: how many more of those are there?** `docs/demos/USAGE-MAP.md` is
+full of headline numbers lifted from vendored upstream repos. For each one that any live candidate
+still leans on, determine: (a) does the source ship a control, baseline, or ablation arm; (b) has
+anyone here opened it; (c) does the quoted number survive contact with that arm.
+
+Prioritise numbers that a **surviving** candidate depends on — a repriced number under a RULED_OUT
+candidate changes nothing. Report per-number, and say explicitly where the control does not exist
+(that is a finding, not a gap in your work).
+
+Output `docs/demos/duel-2/runs/quoted-number-census-<ISO>.json` plus a companion `.md`.
+
+## UNIT Q12 — unblock COD-H2's build: sharpen the ambiguous classifier below 0.10
+**ELIGIBLE: pane 3 only** (you own the classifier; pane 2 authored the candidate). **CLAIM:** unclaimed
+
+**COD-H2 holds the lane's only rung-3 slot and its build is blocked on your own pre-condition.**
+`ambiguous_share` measured **0.3765** against a **0.10** bar — 3.8× over — and by your own caveat the
+cause is classing all `eval` as ambiguous when this fleet's evals are *predominantly read-side
+compute*. `eval` is the largest tool in the corpus at **165,596 calls**.
+
+Split `eval` (and any other blanket-ambiguous class) into read-side versus mutating, re-run the
+label-free pass on the same 111 journals, and report the new `ambiguous_share` with its Wilson
+interval. **Also report the destructive-subset share explicitly** — your caveat puts the
+gate-relevant figure near **1,000 events (6.9%)** rather than 5,421 (37.3%), and the build must
+target that subset.
+
+**Pre-register the sharpened patterns before running**, in the same file, so this is a refinement
+and not a re-cut. You already refused to re-cut once; hold that line.
+
+Output `docs/demos/duel-2/runs/codh2-labelfree-sharpened-<ISO>.json`.
 
 ## UNIT Q8 — non-author audit of an unreviewed duel-2 artifact
 **ELIGIBLE: either pane, non-author of the target.** **CLAIM:** unclaimed
