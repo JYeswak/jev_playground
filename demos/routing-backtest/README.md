@@ -15,9 +15,10 @@ npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out /tmp/rb-try.json
 ```
 
 That runs the worked example (6 turns, finishes in under a second). For your own logs, pass
-one or more omp session `.jsonl` files instead of the fixture. `--out` is required so every
-run leaves a receipt. Other files in `fixtures/` are intentional failure cases (unknown models,
-unclassifiable turns) — start with `real-excerpt-t1-t6.jsonl`.
+one or more omp session `.jsonl` files instead of the fixture — they live under your omp
+profiles directory (e.g. `~/.omp/profiles/*/agent/sessions/*/*.jsonl`). `--out` is required
+so every run leaves a receipt. Other files in `fixtures/` are intentional failure cases
+(unknown models, unclassifiable turns) — start with `real-excerpt-t1-t6.jsonl`.
 
 ## Read the receipt
 
