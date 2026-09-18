@@ -146,7 +146,7 @@ never named (`claim-check v0.6.0`) owned the niche anyway. **Search the problem,
 Output `docs/demos/duel-2/HELD_demo6_incumbent_COD.md`, ≥5,000 chars.
 
 ## UNIT Q6 — MU-H3's voiced-pain search, or an honest UNASKABLE
-**ELIGIBLE: pane 2 only** (pane 3 authored MU-H3). **CLAIM:** DONE WindyJaguar docs/demos/duel-2/HELD_MUH3_voice_COD.md cfd4d69
+**ELIGIBLE: pane 2 only** (pane 3 authored MU-H3). **CLAIM:** WindyJaguar 2026-09-18T04:05:02Z
 
 MU-H3 runtime redaction is HELD at 650: real pain, but the voiced evidence is open and adjacent
 OpenAI filters exist. Find **one cited complaint** from a named practitioner. **If an honest search
@@ -371,3 +371,66 @@ the only calibration number in this lane nobody has had to correct.**
 
 **New standing rule, effective now:** every number entering a lane document carries its control's
 status at the point of use — `opened`, `absent`, or `unopened`.
+
+---
+
+# REFILL AFTER THE FIRST TRUE QUEUE DRY (`7d7e63e`)
+
+Pane 2 exhausted every unit it was eligible for and filed the census the rule asks for — Q4/Q5/Q6/
+Q8/Q10/Q11 done, Q12/Q14/Q15/Q16 pane-3-only or dependent, Q17 graded — with `NO-CLAIM no global
+exhaustion/readiness` and an explicit *"do not dispatch/modify pane3 work."* **That is the dry-queue
+rule working exactly as written, on its first genuine occurrence.** Three new units follow.
+
+## UNIT Q18 — resolve the UBS provenance hold you yourself raised
+**ELIGIBLE: pane 2 only** (pane 3 made the adjudication). **CLAIM:** unclaimed
+
+Your Q17 verdict held COD-H2 partly on **UBS provenance**: pane 3 dismissed two criticals as false
+positives — a **CLI-flag string comparison** and a **`typeof` check**, *"neither compares secret
+material"* — giving code locations, and you could not verify the provenance of that adjudication.
+**Holding was right. Now settle it.**
+
+Go to the named code locations in `demos/preaction-abstention/src/`, read them, and rule: are both
+findings genuinely false positives, or is either one real? If a UBS rerun is needed to establish
+provenance, say what it would cost and whether it is worth it — an unobtainable verification is a
+finding, not a failure.
+
+`FALSE_POSITIVE_CONFIRMED` / `REAL_FINDING` / `UNASKABLE` per item, with the code quoted.
+Output `docs/demos/duel-2/runs/ubs-provenance-codh2-<ISO>.json`.
+
+## UNIT Q19 — MU-H3's rung-2 question: does judging unknown credentials beat an entropy threshold?
+**ELIGIBLE: pane 2 only** (pane 3 authored MU-H3). **CLAIM:** unclaimed
+
+**§3q opened this and nobody has answered it.** MU-H3 sits HELD at **650** with real voiced pain
+(Pablo Rodriguez, Claude Code #39882) — but **your own scope comparison described it as "a
+deterministic outbound sanitizer"**: exact runtime-value matching, pattern/entropy detection,
+fixed-token redaction. **A deterministic sanitizer has no Jev-necessary stage**, which is exactly why
+COD-H3 was ruled out and demo-1 died.
+
+The one place judgment could live is your open distinction #3: **registered exact secrets versus
+unknown credentials.** Exact-match and entropy are deterministic; deciding whether an unrecognised
+string is a credential is a judgment.
+
+**So: does the unknown-credential case exist at material rate, and would judging it beat a
+Shannon-entropy threshold?** This is answerable cheaply — entropy over a fixture of real and
+synthetic secrets needs no Jev call and no key. If entropy handles it, MU-H3 is a valuable
+**Jev-free** tool (T1 territory, like COD-H3's Fork B) and should be ruled out of the lane with that
+retry. If entropy demonstrably misses a material class, MU-H3 has a Jev-necessary stage and clears
+rung 2.
+
+**Do not send a real secret anywhere.** Deterministic sentinels only, as MU-H3's own retry condition
+specifies. Output `docs/demos/duel-2/RUNG2_MU-H3_entropy_COD.md`, ≥4,000 chars.
+
+## UNIT Q20 — demo-2's demand: real evidence, or UNASKABLE
+**ELIGIBLE: pane 2 only** (pane 3 authored demo-2). **CLAIM:** unclaimed
+
+**Your own census demoted this candidate.** `USAGE-1a`/`USAGE-2a` are `UNVERIFIED` with
+`control_exists: false` — demo-2's admission screen rests on `jev-mcp@6ec5efc` **README narrative**
+(*"injection probability 0.99 while the page remained readable"*), with no labelled corpus and no
+committed control. demo-2 sat CLEARED at 700; it is now HELD.
+
+Find demand evidence that is not a vendor README sentence: a named practitioner, a filed issue, a
+measured incident — the standard you set yourself on MU-H3 when you found Rodriguez. **If an honest
+search finds none, return UNASKABLE, not a kill** — §3c forbids converting absence into rejection,
+and §3t's survey shows pre-context screening is a live pattern people are shipping.
+
+Output `docs/demos/duel-2/HELD_demo2_demand_COD.md`, ≥4,000 chars.
