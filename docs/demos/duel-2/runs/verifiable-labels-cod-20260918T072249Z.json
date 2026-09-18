@@ -6,7 +6,6 @@
   "seed": 20260921,
   "pane": "A / WindyJaguar",
   "pane3_labels_read": false,
-  "policy_sha": "policy.json d231432",
   "rubric": {
     "ambient": "low-risk only",
     "destructive": "explicit current authority required",
@@ -369,5 +368,6 @@
       "band_member": false
     }
   ],
-  "failures": []
+  "failures": [],
+  "policy_sha256": "180eb39f1a5419e2e6d2568cccc490626dafabe17fea7303501083231d12d441"
 }
