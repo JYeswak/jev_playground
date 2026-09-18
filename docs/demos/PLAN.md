@@ -4623,3 +4623,74 @@ then applies it to three more of my rules in the same document.
 before it is trusted — exactly as `RULING.md` was.** Pane 2 also **rules on the three
 delete-or-demote candidates**, because deleting a rule is a ruling and pane 2 is third party to both
 the rules' author (me) and the finding's author (pane 3).
+
+---
+
+## §5k NONE DELETED — the taxonomy was right and pane 3 mis-binned all three of its own candidates
+
+**`docs/demos/duel-2/RULE_deletions_COD.md` (`1cb3cf3`), pane 2 as third party to both the rules'
+author (me) and the finding's author (pane 3).**
+
+| Rule | Ruling | Re-examination condition |
+|---|---|---|
+| Conductor-kill concurrence (§3c r3) | **DEMOTE-TO-GUIDANCE** | restore when a conductor proposes killing another pane's candidate |
+| "Resolving a hold is not raising a score" | **DEMOTE-TO-GUIDANCE** | keep a one-line semantic reminder; re-promote **only on an actual conflation** |
+| Rung-5 gate | **KEEP-AND-MARK dormant-by-design** | re-examine at the first promotion attempt |
+
+> **"None deleted because no trigger-arose-and-passed evidence."**
+
+**Pane 3 built the three-way taxonomy and then put all three candidates in the wrong class.** Its
+`§8` header for that class reads *"fired never, **trigger arose and passed without it**"* — and pane 2
+finds the trigger **never arose** for any of the three. **Under the taxonomy's own rule, only
+trigger-arose-and-passed licenses deletion.** So the framework is sound and its first application was
+not.
+
+**I gave exactly this caution** — *"a rule that never fired is not automatically useless… if you
+think pane 3 mis-binned any of the three, say which and why."* **The answer is all three.**
+
+### The distinction that saves rung 5, and it is the sharpest line in the ruling
+
+> **"Promotion never attempted, *not structurally unsatisfiable*."**
+
+**§3h's deleted gate was *unsatisfiable*** — two non-author graders with two panes is arithmetically
+impossible, which is why *"a gate nothing can satisfy is not a high bar, it is a dead gate"* licensed
+removing it. **Rung 5 is merely *untested*.**
+
+**Pane 3 invoked §3h's precedent across that boundary.** Dead ≠ dormant: **a gate that cannot be
+satisfied is a defect; a gate that has not yet been tried is a liability with a known trigger.** The
+first gets deleted, the second gets marked — and **conflating them would have deleted the method's
+own terminal gate on the strength of a precedent that does not reach it.**
+
+### Every ruling ships its re-examination condition — pane 3's doctrine, satisfied by its critic
+
+Pane 3 extracted *"every gate ships the condition under which it is re-examined."* **All three of
+pane 2's rulings carry one**, and the middle one is the strictest: *"re-promote only on an actual
+conflation"* — **the rule may not return on suspicion, only on a recorded instance.** That is the
+same evidentiary standard the lane applied to candidates, now applied to its own rules.
+
+### The autofix interaction was bidirectional, and both parties handled it correctly in the same minute
+
+**Pane 2's process note:** *"autofix touched unrelated staged `docs/demos/RULING.md`; **I unstaged it
+before exact-path commit and preserved it as a working-tree change**."*
+
+**I recorded the same event from my side as the gate "preventing a sweep" of pane 2's file. Both are
+true and it was one collision.** Autofix pulled each of our files into the other's staging area;
+**pane 2 unstaged mine rather than committing it, and I used `--only` rather than committing
+pane 2's.** Neither of us was told to; neither lost work; **and pane 2's is the more generous half —
+it protected the conductor's file from its own commit.**
+
+**Recorded as the fourth shared-worktree incident and the first resolved by both parties
+independently without a single amend.**
+
+## §5l THE LANE IS TERMINAL, AND THAT IS THE HONEST REPORT
+
+**Both panes now report `NEXT none lane-bounded`.** The method has been audited three rounds deep —
+**I claimed, pane 3 falsified, pane 2 falsified the falsification** — and the third round reversed
+the second on its own taxonomy.
+
+**What remains is not lane work:** manifest implementation (project phase 1), an external corpus
+(outside this lane by construction), and one specification clause already written and tested. **There
+is no bounded question left that this lane can answer with the data it has**, and manufacturing one
+would be the process-porn the tick explicitly forbids.
+
+**`PROMOTED 0`, 17 candidates, every cited receipt present, exit 0.**

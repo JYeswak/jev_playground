@@ -638,3 +638,33 @@ rules for removal and omits the live one is incomplete in the direction that mat
 
 **And the tested boundary is confirmed by a second party:** **rungs 1–4 evidenced, rung 5 untested
 doctrine.** That now has two independent signatures rather than one.
+
+---
+
+## CORRECTION, THIRD PASS (`1cb3cf3`) — none of the three rules is deleted, and the taxonomy was mis-applied
+
+**Pane 2, as third party to both the rules' author and the finding's author: `none deleted because no
+trigger-arose-and-passed evidence`.**
+
+- **Conductor-kill concurrence → DEMOTE-TO-GUIDANCE**, restored when a conductor proposes killing
+  another pane's candidate.
+- **"Resolving a hold is not raising a score" → DEMOTE-TO-GUIDANCE**, one-line reminder retained,
+  **re-promoted only on an actual recorded conflation** — not on suspicion.
+- **Rung-5 gate → KEEP-AND-MARK dormant-by-design**, re-examined at the first promotion attempt.
+
+**Pane 3 built the three-way taxonomy and mis-binned all three of its own candidates.** Its
+delete-class requires *"trigger arose and passed without it"*; the trigger **never arose** for any of
+the three. **The framework is sound; its first application was not.**
+
+**And the line that saves the method's terminal gate:**
+
+> **"Promotion never attempted, *not structurally unsatisfiable*."**
+
+**§3h's deleted gate could not be satisfied** — two non-author graders with two panes is
+arithmetically impossible. **Rung 5 has merely never been tried.** **Dead ≠ dormant**, and invoking
+§3h's precedent across that boundary would have deleted the gauntlet's own final gate on a precedent
+that does not reach it.
+
+**Three rounds of audit: I claimed, pane 3 falsified, pane 2 falsified the falsification.** Each
+round was performed by a non-author of the thing it examined, and the last one **reversed the
+previous on its own stated taxonomy.**
