@@ -1,5 +1,8 @@
 import { readFile } from 'node:fs/promises';
 
+export const TURN_DEFINITION =
+  'A turn is one turn_start through turn_end pair when markers exist; logs without markers use one user prompt plus following assistant/tool rows.';
+
 function textFromContent(content) {
   if (!Array.isArray(content)) return '';
   return content
@@ -13,7 +16,6 @@ function pushTurn(turns, current) {
 }
 
 function finishTurn(current) {
-  const userText = textFromContent(current.user.content);
   const assistants = current.assistants;
   const models = [...new Set(assistants.map((message) => message.model ?? message.activeModel).filter(Boolean))];
   const usage = assistants.map((message) => message.usage).filter(Boolean);
@@ -32,8 +34,7 @@ function finishTurn(current) {
     0,
   );
   let skipReason = null;
-  if (!userText.trim()) skipReason = 'empty user prompt';
-  else if (assistants.length === 0) skipReason = 'no assistant response';
+  if (assistants.length === 0) skipReason = 'no assistant response';
   else if (models.length === 0) skipReason = 'served model not recorded';
   return {
     sessionId: current.sessionId,
@@ -56,6 +57,7 @@ export function parseSessionText(text, source = '<memory>') {
   let activeModel = null;
   let turnIndex = 0;
   let current = null;
+  let markerMode = false;
   const turns = [];
 
   for (const [lineIndex, line] of rows.entries()) {
@@ -66,20 +68,45 @@ export function parseSessionText(text, source = '<memory>') {
       throw new Error(`invalid JSON in ${source} at nonblank line ${lineIndex + 1}: ${error.message}`);
     }
     if (row.type === 'session') {
-      sessionId = row.id ?? sessionId;
+      sessionId = row.id ?? row.sessionId ?? sessionId;
       continue;
     }
     if (row.type === 'model_change') {
       activeModel = row.model ?? activeModel;
       continue;
     }
+    if (row.type === 'turn_start') {
+      markerMode = true;
+      pushTurn(turns, current);
+      turnIndex += 1;
+      current = { sessionId, turnIndex, user: null, assistants: [] };
+      continue;
+    }
+    if (row.type === 'turn_end') {
+      pushTurn(turns, current);
+      current = null;
+      continue;
+    }
     if ((row.type !== 'message' && row.type !== 'message_end') || !row.message) continue;
     const message = row.message;
     if (message.role === 'user') {
-      pushTurn(turns, current);
-      turnIndex += 1;
-      current = { sessionId, turnIndex, user: message, assistants: [] };
-    } else if (message.role === 'assistant' && current) {
+      if (!current || (!markerMode && current.user)) {
+        pushTurn(turns, current);
+        turnIndex += 1;
+        current = { sessionId, turnIndex, user: message, assistants: [] };
+      } else if (!current.user) {
+        current.user = message;
+      } else {
+        current.user = {
+          ...current.user,
+          content: [...(current.user.content ?? []), ...(message.content ?? [])],
+        };
+      }
+    } else if (message.role === 'assistant') {
+      if (!current) {
+        turnIndex += 1;
+        current = { sessionId, turnIndex, user: null, assistants: [] };
+      }
       current.assistants.push({ ...message, activeModel });
     }
   }
