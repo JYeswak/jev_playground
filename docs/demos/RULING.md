@@ -429,3 +429,98 @@ sample still cannot produce a usable distribution.
 **And the rater disclosed reading the pre-registered number, then landed against it** — *"against the
 seen anchor direction, which is the audit trail."* **An anchored rater that contradicts its anchor is
 stronger evidence than a blind one that confirms it.**
+
+---
+
+# ⬛ CONSOLIDATED VERDICT — read this section; it supersedes every claim above
+
+**Everything above is preserved unedited per `tick.md` §5, which means the head of this document
+still states claims that five dated amendments have since overturned.** That is the §3m failure mode
+applied to the lane's own deliverable: **a confident claim at the top and its correction four hundred
+lines down.** This section is the current ruling in full. Where it differs from anything above, **this
+wins.**
+
+## The verdict
+
+**One candidate earns its own deeply-planned project. Its first phase is not code, and not a corpus.**
+
+### COD-H2 pre-action abstention — `PROMOTED 0`, and the 0 is the finding
+
+**It cleared every test that could be run, each signed by a non-author:** blind demand **905 of 17** ·
+rung-2 structure against a **shipped incumbent proven binary by source-read** · rung 3 as **mechanism
+and proof accepted with disclosed standing risks** — real client exiting **`rc2` with no fallback**,
+RED arms that caught **two real bugs** plus an **independent 9/9** probe, three wedge outcomes on
+**live** probabilities with the model **echoed 5/5**, clean-clone **13/0**.
+
+**Rung 4 is unaskable here on six independent blockers, found by three parties, none looking for
+another's finding, every one before any spend:**
+
+| # | Blocker | Measured | Status |
+|---|---|---|---|
+| 1 | Power | n=30 zero-flip upper `.1135` vs `≤5%` | **terminal here** |
+| 2 | Anti-gaming guards | **6/6 absent**, prose only | fixable, correctly deferred |
+| 3 | Labels = pattern rule | tautology | **FIXED** by the risk-tiered rubric |
+| 4 | Widening | **7 tiny journals**, credential struck | **terminal here** |
+| 5 | Ground truth | **5/20 = 25%** two-rater agreement vs `≥18/20` | **FAILS** |
+| 6 | Manifest under-specified | **40 of 68** previews cannot evidence their labels | **spec'd + priced** |
+
+### The three phase-1 components, and their real order
+
+> **manifest design → specification → corpus**
+
+- **Manifest design — specified and priced.** ~**1,063 bytes/case**, **213 KB at N=200**, and the
+  decisive property: *"a verifier needs no journal access."* **Survives the real commit hook**
+  (sha256 unchanged, 24 embedded hashes intact) — bounded by pane 2 itself to *"this hook run, not
+  arbitrary formatter immunity."*
+- **Specification — priced at 65–110 minutes, and now bounded to one clause.** The de-minimis rule
+  for regenerable scoped-temp deletion was written, pre-registered, and tested by its non-author.
+  **The prediction failed below its own floor: 2 of 20 moved to pass against a predicted 7, floor 5.**
+  **It failed on C2 — "record evidence establishes regeneration" — not on scope.**
+- **Corpus — terminal in this lane.** Journals exhausted; credential stratum struck as permanently
+  unmeasurable; **four independent drift events**, the last losing **10% of a sample within 25
+  minutes of its draw.**
+
+### The finding that actually decides it
+
+**Fixing the rule relocated the bottleneck instead of removing it.** 65% non-pass under the strict
+rubric came from *rule strictness*; **60% non-pass under a correct clause comes from the record not
+carrying what the clause needs.**
+
+> **COD-H2 is blocked on data, not on rules — arrived at independently three times** (§4u power,
+> §5f contradictory definitions, §5h a correct clause on a verified sample).
+
+### MU-H3 runtime redaction — **conditional, and not equally ready**
+
+It holds the lane's **only measured defeat of a deterministic baseline** (entropy precision never
+exceeds **41.7%** at any threshold) and the **only demand from an unseeded practitioner asking for
+exactly its surface** (Rodriguez, Claude Code #39882, *closed as not planned*).
+
+**But its first phase is not a lane phase at all:** *"real prevalence is an **external
+prerequisite**."* Credential injection is **0 of 111 journals** and the 97 candidate shapes **are not
+real credentials**. **Its honest in-lane form may be a *Jev-free* deterministic redaction tool** —
+COD-H3's Fork B arriving at the second-place candidate. **Claim: the unknown-credential wedge only.**
+
+### Ruled out — 4, every one now carrying a checkable predicate
+
+demo-1 (died at **0.047%**, then found to make **zero Jev calls**) · MU-H1 (**17 markers / 283,786
+KLOC**) · COD-H3 (**4 of 5 stages deterministic**) · demo-8 (structural safety leak). **Two of the
+four were killed by a measurement rather than an opinion.** The retry predicates were **absent on
+three of them until a non-author audit caught it** — a §3c violation inside the document that
+enforces §3c.
+
+## Why `PROMOTED 0` is the deliverable
+
+**A rung-4 pass was available at every step and was refused six times.** The cheapest available
+"success" was: run 50 cases, report selective accuracy, ship a green receipt. It would have carried a
+**27-point Wilson interval**, against **a regex that defined its own labels**, measured by **guards
+that existed only as prose**, on a **ground truth two raters agree on 25% of the time**, drawn from a
+**manifest that cannot evidence 59% of its own cases**.
+
+**Three parties each blocked the convenient outcome, including the conductor against its own
+proposal.** I proposed the re-scope that would have advanced my own leader and refused to ratify it;
+pane 2 then killed it on power arithmetic **I had never computed**. I pre-registered a 4–3 mapping
+and pane 3 **falsified it by commit name**. Pane 2 pre-registered 7-to-pass and pane 3 **falsified
+that too, having disclosed seeing the number first.**
+
+**The product of this lane is this ruling, the evidence for the fifteen candidates it did not choose,
+and a method that caught its own conductor eleven times.**
