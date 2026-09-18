@@ -347,3 +347,55 @@ spinner" was a **mechanism guess, and this reason string contradicts it.** The f
 observation at the time carried `reason=timer_changed`, so if anything it came through the timer
 path. The defect's *outcome* is measured; its *mechanism* is not, and the bead has been corrected
 to say so.
+
+---
+
+## R13 — The identity-locked hero has no available generation path. All three are closed.
+
+**Measured 2026-09-18.** `'/Users/josh/.agents/skills/repo-hero-image/SKILL.md'` prescribes one shippable path and one breadth
+path. Pane 3 exhausted the first, and I measured the keys behind both. Every route is closed, and
+the three closures have different causes:
+
+| Path | Status | Evidence |
+|---|---|---|
+| built-in `image_gen__imagegen` via `codex exec` | **UNAVAILABLE in-session** | *"I can't complete this: `image_gen__imagegen` is unavailable in this session, so no image was saved"* ×4 — `visual/hero-gen-attempt-20260918T020500Z.txt`, `45f3aa8` |
+| fallback CLI `~/.claude/skills/.system/imagegen/scripts/image_gen.py` | **DEAD KEY** | requires `OPENAI_API_KEY`; fresh probe returns **HTTP 401** on `/v1/models` |
+| Grok via `XAI_API_KEY` | **WORKS, but text-only** | fresh probe returns **HTTP 200**; no reference-image support, so candidates score phash 32–41 against a threshold of 70 |
+
+**The diagnostic took three asks and was worth every one.** Pane 3 twice reported `HERO-BLOCKED`
+without naming the step. I had three hypotheses from the skill — the 18-minute multi-step hang, the
+dead vault key, the network-isolated background subagent — and **all three were wrong.** The real
+cause is a fourth mode the skill does not document: the image tool is simply not bound in this
+codex session. No amount of retrying the documented remedy would have found that; only the verbatim
+output did.
+
+**A fail-open worth recording separately:** the attempt exited **`exit=0`** while producing no
+image. A harness that trusts codex's exit code cannot distinguish "generated" from "politely
+declined". Any future hero automation must assert the output file exists, not that the command
+succeeded.
+
+**The lead that did not pan out, and why it looked good.** The same verbatim output revealed the
+fallback CLI — *"`scripts/image_gen.py`: fallback-only CLI implementation"* — which
+`repo-hero-image` never mentions. That is a genuine skill gap worth reporting upstream. But it
+needs the same OpenAI key that returns 401, so discovering it did not unblock anything.
+
+**Not attempted, deliberately:** a Grok hero. Grok authenticates and would produce a good scene,
+but `repo-hero-image` says **do not ship a `reject`/`marginal`**, and a text-only generator cannot
+hold the canonical face — the documented tell is eyebrows the canonical does not have. Shipping a
+Yuzu that is not the Yuzu, then recording an honest failing grade beside it, would satisfy the
+letter of the grading rule while defeating its purpose. **That is a taste call, not an engineering
+one, so it is escalated rather than decided here.**
+
+**Current state is honest, not broken:** `README.md:5` references `visual/hero.jpg`, which does not
+exist. Nothing renders broken to anyone because nothing is pushed — publishing is already gated
+behind `jev-publish-playground-hog.1` (tip scrubs cannot satisfy the acceptance while history
+publishes unrewritten). The hero is a publish-blocker, not a live defect.
+
+**Retry condition — any ONE of these, and the pipeline runs unchanged:**
+1. A working OpenAI key (vault or otherwise) — then the fallback CLI path opens immediately, and
+   it also restores the grader's vision leg, which currently under-scores every candidate.
+2. `image_gen__imagegen` becomes available in a `codex exec` session — re-probe with one
+   single-step call; the anchor sha `52fb1b09…` is verified and the spec at
+   `visual/HERO-PROMPT.md` is complete, so only generation is missing.
+3. A ruling that a non-identity-locked hero is acceptable — then Grok ships it today, with the
+   phash distance recorded and `identity_pass` explicitly **false**.
