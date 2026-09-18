@@ -166,21 +166,43 @@ things, and mixing them is how a number gets believed harder than it earned.
 ```
 
 ```
-quickstart — node v24.4.1, no install step, no network, no API key
+quickstart — five questions, answered from committed bytes. No install, no network, no API key.
 
-=== routing-backtest    would a cheap-model router have saved money on recorded traffic
-=== routing-mutations   whether that demo's tests can still fail — seven planted mutations
-=== usage-shape         how much of a coding agent's context is retransmitted each turn
-=== retransmit-whatif   what a retransmission cap would have cost, per turn
-=== probe-replay        one recorded Jev judgment, decoded offline with no key
+=== Q1. Would routing cheap turns to a cheaper model have saved money?
+    NO. On this fixture routing would have COST YOU MORE: $0.011106 actual
+    vs $0.012933 routed — 16.4% worse, on 6 of 6 turns.
 
-quickstart: 5 passed, 0 failed
+=== Q2. Can that demo's tests still fail, or are they decoration?
+    YES — mutations: 7/7 caught.
+
+=== Q3. How much of a coding agent's context is resent every single turn?
+    98.878% of all tokens are cache reads — context resent, not new work.
+    Denominator, stated: 488,724 turns across 4,619 sessions in 4,626 files, 0 unparsable.
+    Basis matters here: 98.878% against all tokens, 99.017% against billed input only.
+
+=== Q4. Which lever is that spend actually in, and does the accounting close?
+    cacheRead: 80.1% of 1,013,018 tokens over 18 assistant turns.
+    Unreconciled: 0 tokens.
+
+=== Q5. What does a Jev judgment actually look like?
+    top_lever: chose "fewer_turns" at confidence 0.7
+      fewer_turns      0.78
+      shorter_prompts  0.15
+      cheaper_model    0.05
+      shorter_output   0.02
+
+5 of 5 questions answered.
 ```
 
-**That is the whole setup.** Every demo is zero-dependency — `node --test`, no install, no network,
-no key, no state from this lane. Measured from a frozen clone of a pinned commit, which is the
-environment the gate suite below fails in, and it goes red on a real defect: planting a throw in one
-demo's test reports `4 passed, 1 failed`, names the demo, and exits 1.
+**Q1 answers "no", and that is the point.** Routing would have cost 16.4% *more* on this repo's own
+fixture. A runner that could only print `PASS` could never tell you that — which is exactly what the
+first version of this script did, until a non-author pane graded it
+`ENABLER-in-product-clothes` and named what to build instead.
+
+Every number is derived at runtime from the receipt the tool just wrote; none is hardcoded. Every demo
+is zero-dependency — no install, no network, no key, no state from this lane. Measured from a frozen
+clone of a pinned commit, which is the environment the gate suite below fails in, and a receipt missing
+a field the answer depends on exits 1 rather than printing a branch it did not measure.
 
 Then the gate suite, which is a different thing with a different answer:
 
