@@ -54,3 +54,26 @@ point, not a placeholder.
 Boundary: zero live calls; no session touched. All evidence read from the shipped
 runtime on disk, which is also the standing rebuke: the .d.ts answered this before
 any of us asked.
+
+## Amendment (2026-09-19, conductor rebuttal accepted)
+
+Conductor weakened Reason 1 with file evidence and I verified it rather than
+defending: `SessionEntryBase{type,id,parentId,timestamp}` and
+`SessionMessageEntry{type:'message', message:AgentMessage}` exist
+(`dist/types/session/session-entries.d.ts:49-58`), and the preparation
+constructor builds **positional parallel arrays** — `u.push(S)` (entries) alongside
+`p.push(v)` (their extracted messages), boundary `h = u[firstKeptEntryIndex].id`,
+summarize-set `w = p.slice(0, y)` (`dist/cli.js` preparation builder). So a
+message→entry-UUID join is constructible at preparation time, and whether the
+hook's `branchEntries` shares those refs is an empirical alignment question, not
+a missing channel. **Reason 1 is withdrawn as a refusal ground.** My NO-CLAIM
+matches the conductor's: neither of us has tested identity alignment on a real
+session.
+
+The settlement now rests on Reason 2 alone, which the conductor concedes as
+decisive: `CompactionResult.summary` is a required string and Jev returns typed
+judgments, not prose. Any boundary-L4 needs a summarizer Jev is not — which would
+make the hook a wrapper around omp's own model. DEFER stands on that ground; the
+entry-linkage probe (does `branchEntries` align with the construction arrays by
+identity or only structurally?) is still the correct next measurement, but it now
+serves a summarizer-gated future, not a mapping impossibility.

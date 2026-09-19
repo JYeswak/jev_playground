@@ -797,3 +797,13 @@ inputs — no message→entry-UUID mapping without guessing, no summary authorsh
 evidence: `docs/demos/omp-seam-fqo-20260919.md`. Retry condition extends: a proven
 message→entry-UUID join (from `SessionMessageEntry` linkage, not content alignment) re-opens
 the boundary half; the message-channel half still needs omp to add one.
+
+### R21 second amendment (2026-09-19, mapping argument withdrawn)
+
+Reason 1 (no message→entry-UUID mapping) is withdrawn: `SessionMessageEntry` carries
+`message: AgentMessage`, and the preparation builder derives messages and boundary from
+positional entry/message arrays — the join is constructible, alignment empirically open.
+R21 now rests on Reason 2 alone: no summary authorship (Jev judges, does not summarize; the
+required `summary` string cannot be produced without a summarizer Jev is not). The retry
+condition's first half (message channel) stands; its new second half (proven entry join)
+is demoted to a measurement serving a summarizer-gated future.

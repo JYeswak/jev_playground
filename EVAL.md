@@ -353,3 +353,13 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   `previousSummary` is stale; decision-lines-as-summary degrades continuation).
 - Receipt: `docs/demos/omp-seam-fqo-20260919.md`. R21 amended, not rewritten.
 - Boundary: zero live calls; no session touched. Lane: offline.
+---
+
+## jev-fqo amendment — mapping argument withdrawn, summarizer argument stands (2026-09-19, pane 3)
+
+- Conductor's rebuttal verified: `SessionMessageEntry{type:'message', message}` exists and the
+  preparation builder keeps entries/messages in positional parallel arrays, so a message→entry-UUID
+  join is constructible — alignment untested by either of us (mutual NO-CLAIM), but not a missing
+  channel. Reason 1 withdrawn.
+- DEFER now rests on Reason 2 alone (conceded decisive): `summary` is required prose; Jev returns
+  judgments. Receipt amended: `docs/demos/omp-seam-fqo-20260919.md`.
