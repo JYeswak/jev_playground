@@ -18,6 +18,13 @@ unmeasured=0
 # version of the outcome log called git inside the loop: twelve extra git invocations per run, and
 # a denied command per stage. It hung two runs before this fix.
 head_sha=$( (CDPATH='' cd -- "$here/.." && git rev-parse --short HEAD) 2>/dev/null || echo unknown )
+root=$(CDPATH='' cd -- "$here/.." && pwd -P)
+beads_db=$(find "$root/.beads" -type f -name '*.db' -print -quit 2>/dev/null)
+if [ -z "$beads_db" ]; then
+    echo "RED  foundation gates require an imported Beads database under $root/.beads/*.db"
+    echo "     Fresh clone fix: run 'br import' from the repository root, then rerun ./foundation/gates.sh"
+    exit 1
+fi
 for stage in "$here"/gates.d/[0-9]*-*.sh; do
     [ -x "$stage" ] || continue
     name=$(basename "$stage" .sh)

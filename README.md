@@ -380,12 +380,13 @@ though it did would repeat the exact scoping defect the backtest already made on
 
 ## Install
 
-```bash
+~~~bash
 git clone https://github.com/JYeswak/jev_playground.git
 cd jev_playground
+# Maintainer-only: fetch primary mirrors; readers can skip this block for offline tools.
 ./scripts/sync-docs.sh          # fetches the primary sources; safe to re-run
 ./scripts/sync-docs.sh --check  # verifies every mirrored byte against MANIFEST.tsv
-```
+~~~
 
 No API key needed to install, and none to run any tool above.
 
@@ -613,12 +614,12 @@ broken:
 
 | command | rc | why |
 |---|---|---|
-| `install-harm-rule.sh --check default` | 1 | no `default` profile exists on a fresh machine — pass a profile you have |
-| the observe-only grep (old `-c` form) | 1 | zero matches is grep's failure status; **fixed above** |
-| `foundation/gates.sh` | 1 | needs a `.beads` DB this repo does not carry |
-| `compaction/install-jev-compact.sh --check` | 1 | the sibling upstream clone is not vendored here |
-| `scripts/sync-docs.sh` | 1 | expects 137 mirror files that are not in the public tree |
-| `scripts/verify-frozen.sh` | 1 | same `.beads` prerequisite as the gates |
+| `install-harm-rule.sh --check default` | 1 | actionable: create a profile/config, run `install-harm-rule.sh <profile>`, then rerun `--check <profile>` |
+| the observe-only grep (old `-c` form) | 1 | zero matches is grep's failure status; the published proof now uses the `-q` form and prints a success message |
+| `foundation/gates.sh` | 1 | actionable: run `br import` from the repository root to create `.beads/*.db`, then rerun gates |
+| `compaction/install-jev-compact.sh --check` | 1 | actionable: run `./scripts/bootstrap-compaction.sh`, then rerun the check |
+| `scripts/sync-docs.sh` | 1 | maintainer-only mirror refresh; readers should skip it and use the offline tools |
+| `scripts/verify-frozen.sh` | 1 | actionable: run `br import` from the repository root, then rerun frozen verification |
 
 Passing on a fresh clone: `usage-shape`, the routing backtest, the quickstart, the compaction
 bootstrap, `gates.sh --selftest`, and the mutation arms.

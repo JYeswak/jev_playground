@@ -82,7 +82,9 @@ if [ "$mode" = "check" ]; then
     echo "  grep -rho '\"kind\":\"harm_[a-z]*\"' \"${OMP_HOME:-\$HOME/.omp}/profiles/$profile/agent/sessions/\" | sort | uniq -c"
     exit 0
   fi
-  echo "RED: not installed (or not listed)"; exit 1
+  echo "RED: not installed (or not listed)"
+  echo "FIX: create the profile and its agent/config.yml, then run $0 $profile to install; rerun $0 --check $profile"
+  exit 1
 fi
 
 [ -f "$src" ] || fail "missing source $src"

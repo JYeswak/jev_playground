@@ -39,6 +39,7 @@ if [ "${1:-}" = "--check" ]; then
     exit 0
   fi
   echo "MISSING: compaction deps (need pinned sibling build + npm install)"
+  echo "FIX: from repository root run ./scripts/bootstrap-compaction.sh, then rerun ./compaction/install-jev-compact.sh --check"
   exit 1
 fi
 

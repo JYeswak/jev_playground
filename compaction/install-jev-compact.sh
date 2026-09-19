@@ -70,9 +70,15 @@ verify() {
 if [ "$mode" = "check" ]; then
   [ -d "$target" ] || fail "target is not a directory: $target"
   need node
+  if [ ! -d "$dep_src" ]; then
+    echo "RED: pinned fast-jev-compaction clone is missing: $dep_src" >&2
+    echo "FIX: from the repository root run ./scripts/bootstrap-compaction.sh, then rerun $0 --check $target" >&2
+    exit 1
+  fi
   verify
   exit 0
 fi
+
 
 # ---- install ----
 [ -d "$target" ] || fail "target is not a directory: $target"

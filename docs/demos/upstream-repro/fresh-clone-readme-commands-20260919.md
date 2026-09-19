@@ -36,3 +36,18 @@ This audit does not claim a clean fresh-clone install, missing mirror data recov
 profile installation, or live Jev behavior. It records the public commands' actual fresh-clone
 behavior. The mismatch findings are left unfixed; no command or README implication was tuned to
 make the audit green.
+
+## Actionable prerequisite rerun
+
+After the first audit, the prerequisite scripts were updated in the working tree and rerun against the same disposable fresh clone (no production profile):
+
+~~~text
+foundation/gates.sh with .beads temporarily absent: rc=1; RED foundation gates require an imported Beads database; FIX run br import, then rerun gates.
+bootstrap-compaction.sh --check with sibling/node_modules temporarily absent: rc=1; FIX run ./scripts/bootstrap-compaction.sh, then rerun compaction/install-jev-compact.sh --check.
+install-harm-rule.sh --check default with a missing temp profile: rc=1; FIX create profile/config, install into a named profile, rerun check.
+compaction/install-jev-compact.sh --check with pinned sibling absent: rc=1; FIX run ./scripts/bootstrap-compaction.sh, then rerun the check.
+~~~
+
+The sync-docs command is now explicitly maintainer-only in README.md. The original full table remains above; the rerun checks prove the five prerequisite failures now explain their fix instead of emitting opaque RED output.
+
+NO-CLAIM: this does not claim a fully installed fresh clone, mirror availability, or live Jev behavior.
