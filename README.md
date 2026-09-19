@@ -203,10 +203,13 @@ Install it into any repo and omp asks it before compacting a session
 | `PortFleetComposite` | 108 | 1 | 501,502 → 6,084 | **98%** |
 | `PortOmpIdleDispatch` | 98 | 1 | 291,909 → 12,911 | **95%** |
 
-**Not a rate — a shape.** A third of the sample saved nothing, because everything in those
-sessions was pinned and the hook correctly spent nothing discovering that. What the six support is
-narrower and more useful: *tool-heavy session, large saving; otherwise, the cost of one skipped
-request.* Six sessions from one machine is a sample, not a distribution.
+**Not a rate — a shape, and the shape is LENGTH.** A third of the sample saved nothing because
+everything in those sessions was pinned: a call is protected when it or its result sits in the
+last six messages, so a seven-message transcript is untouchable no matter how many tools it ran
+(`OmpExtensibility`: 15 calls, all 15 pinned). Measured across **1,653 real sessions** at default
+settings: **1,415 (86%)** have at least one call the hook could ask about, **98 (6%)** are
+entirely pinned, **87 (5%)** exceed Jev's state budget. Six sessions is a sample, not a
+distribution.
 
 Run it against your own history:
 

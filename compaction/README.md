@@ -166,13 +166,27 @@ harness with a real key. All six passed all six invariant checks.
 | `PortFleetComposite` | 108 | 1 | 501,502 → 6,084 | **98%** |
 | `PortOmpIdleDispatch` | 98 | 1 | 291,909 → 12,911 | **95%** |
 
-**The two tool-heavy sessions collapse to a few kilobytes in one request.** The two zeroes are not
+**The two long sessions collapse to a few kilobytes in one request.** The two zeroes are not
 failures and not noise: everything in them was *pinned*, so there was nothing the hook was allowed
 to touch, and it correctly spent nothing finding that out.
 
+**The predictor is LENGTH, not tool-heaviness.** A tool call is pinned when its call *or* its
+result sits in the last six messages, so a transcript of seven to nine messages has almost nothing
+outside the protected window no matter how many tools it used — `OmpExtensibility` above has
+**15 calls in 7 messages and all 15 are pinned**. Long sessions expose nearly all of theirs: 108
+calls, 5 pinned.
+
+Across every real session on the machine this was measured on — 1,653 of them, at the library's
+default settings:
+
+| | sessions |
+|---|---|
+| at least one call the hook could ask about | **1,415 (86%)** |
+| everything pinned, nothing to touch | **98 (6%)** |
+| too large for Jev's state budget | **87 (5%)** |
+
 **Do not read 98% as a rate.** Six sessions, one machine, one person's workload, and a third of
-them saved nothing. What the table supports is narrower and more useful: *when a session is
-tool-heavy, the saving is large, and when it is not, the cost is one skipped request.*
+them saved nothing.
 
 Reproduce on your own sessions — no fixture, no setup beyond the install above:
 
