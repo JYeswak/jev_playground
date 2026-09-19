@@ -67,21 +67,21 @@ Why: `STATUS.tsv:35` chained `backend-502-message-content-missing` to
 `retry-in-quiet-window`. `NEGATIVE_EVIDENCE.md:1286-1288` limits the rule
 to timing. `README.md:802-804` then published the window without the quote.
 
-### Patch 1.4 — Live-registration playbook row
+### Patch 1.4 — Live-registration playbook row (pack G9)
 
 Add to playbook **K** ("Live proof still failing"):
 
 ```markdown
 | Symptom | Dig |
 |---|---|
-| "Registration requires human review" / STOP-LIVE / working-profile deferred | Check: did the user say that? If no, register observe-only fail-open on pane 0, an added test pane, or `omp --profile <lab> --no-extensions --extension=<one>`. Write rollback first. Quote one session row. Do not take down mid-flight panes. A sibling observe-only hook that already registered on a working profile is existence proof the ban was invented. |
+| "Registration requires human review" / STOP-LIVE / working-profile deferred | Check: did the user say that? If no, register observe-only fail-open on pane 0, an added test pane, or `omp --profile=jev-lab --no-extensions --extension=<one>`. **Fleet blast radius is a human gate only for working profiles, never for disposable lab / `--extension=<one>`.** Write rollback first if the target is a working profile. Quote one session row. Do not take down mid-flight panes. P2-15 (`omp-jev-observer-20260919.md:47-60`) is the existence proof: skipping lab UNRUN hid a 0-row loader defect. |
 | Ban retracted in docs; act still "not attempted" | The next command is the act, not another retraction sentence. |
 ```
 
-Why: `harm-rule-promoted-20260919.md` registered on `codex` the same day
-`omp-jev-observer-20260919.md` closed as deliberately UNRUN. The skill
-should point at the working pattern instead of leaving agents to re-derive
-"human review."
+Why: pack G9. `omp-jev-observer-20260919.md:36-43` invented human-review for
+a command that could have been `jev-lab`. `INTEGRATIONS.md:180-181` already
+says lab/RUN-CLONE is free. `harm-rule-promoted-20260919.md` registered on
+`codex` the same day.
 
 ### Patch 1.5 — Checklist item for invented policy
 
@@ -96,11 +96,44 @@ Add to **Decision checklist**:
 If that box is unchecked, filing `blocked` / `deferred` remains forbidden
 (existing checklist closer).
 
+### Patch 1.6 — Worked retract script (pack G1)
+
+Replace hard-rule 1's one-liner ("Do not invent blockers. Retract invented
+STOP / DEFER / quiet-window policy.") with a three-step retract:
+
+```markdown
+1. **Do not invent blockers. Retract invented STOP / DEFER / quiet-window /
+   "off the table" / STOP-LIVE with this script:**
+   (a) Paste the user's stop sentence, or write `user-stop: none`.
+   (b) If `none`, map the hole to RUN-CLONE / `jev-lab` / pane 0 / an added
+       test pane (`docs/INTEGRATIONS.md:178-181`). Mid-flight panes stay
+       untouched; that is courtesy, not a ban.
+   (c) Quiet-window may be honored only for "did not finish in time" on
+       shared hardware (`NEGATIVE_EVIDENCE.md:1286-1288`). A 502, a missing
+       field, a zero-row loader, or an unread file is not a quiet-window.
+```
+
+Why: pack G1. `INTEGRATIONS.md:174` had to retract STOP-LIVE after the fact.
+The skill named the failure and left agents without a retract procedure.
+
+### Patch 1.7 — Lab vs working-profile human gate (pack G9)
+
+Add under **Hard rules**:
+
+```markdown
+1b. **Fleet blast radius is a human gate only for working profiles.**
+    Disposable `jev-lab` and `omp --no-extensions --extension=<one>` do
+    not require invented "human review." Closing a unit as deliberately
+    UNRUN on those paths is invented policy.
+```
+
+Why: pack G9. P2-13 UNRUN delayed the 0-row finding until P2-15.
+
 ### What this pass does not patch
 
-- Over-learned kill, named-hole-then-park, selector misses, ask-instead-of-dig,
-  paperwork-as-progress beyond the retraction-without-act case, or tool
-  playbook holes. Those are Passes 2–7.
+- Over-learned kill, named-hole-then-park, selector misses, paperwork-as-progress
+  beyond retraction-without-act, or tool playbook holes. Those are later
+  passes. Ask-instead-of-dig is touched only as the G9 human-gate mechanism.
 - The Jeffrey-voice essay (Pass 8).
 - Any edit to the uploaded skill file in this turn; the patches are proposed
   text for a later house-skill land.

@@ -9,11 +9,36 @@ Pass date: 2026-09-19. Lane: offline file search + quote verification. No live J
 language that Joshua did not utter, then treated the invention as a reason to
 stop. The skill names that failure; the files below are where it fired.
 
+**Local evidence pack.** Folded here: pack **G1** and **G9** from
+`dont-give-up-evidence` (mined at `f8a8dc9`, 2026-09-19). Pack G2–G8 / G10
+are other failure modes and are **not** expanded in this pass.
+
 **NO-CLAIM.** This pass does not write the Jeffrey-voice essay. It does not
 reclassify Joshua's scoped quiet-window quote as invented. It does not treat
 lane `DEFER` / `BLOCKED` / `REFUSE` as invented merely because those words
 appear. A hit is invented only when (1) the user did not say it, and (2) the
-text was used to walk away from a diggable hole.
+text was used to walk away from a diggable hole. This PR does not start
+Pass 2.
+
+### Invented-policy quote table (pack keyword map, verified)
+
+| Token | file:line | Quote / role |
+|---|---|---|
+| off the table; STOP-LIVE; deferred registration; quiet-window gated | `docs/INTEGRATIONS.md:174` | *“Live omp was never taken off the table. There is **no standing ban** on registering into working omp profiles. The fleet invented "STOP-LIVE" / deferred registration as reasons not to work. This row is not an indefinite deferral and not quiet-window gated.”* |
+| STOP-LIVE (ledger retract) | `EVAL.md:448` | *“No invented STOP-LIVE ban.”* |
+| quiet-window not a science gate | `docs/INTEGRATIONS.md:181` | *“Quiet-window is not a science gate for that work.”* |
+| quiet-window / DEFER not a loop hold | `docs/INTEGRATIONS.md:186` | *“They are not a quiet-window gate and not a reason to DEFER the loop”* |
+| quiet-window = timing only | `NEGATIVE_EVIDENCE.md:1286-1288` | *“a verdict whose evidence is ‘it did not finish in time’ requires a **quiet-window re-run**”* |
+| quiet-window leaked onto 502 | `docs/demos/STATUS.tsv:35` | `retry-in-quiet-window` chained to `backend-502-message-content-missing` |
+| human-review / deliberately UNRUN | `docs/demos/upstream-repro/omp-jev-observer-20260919.md:36-43` | *“Registration requires human review because an extension load… can affect every tool call in the fleet.”* |
+| lab surface is free (contradicts UNRUN) | `docs/INTEGRATIONS.md:180-181` | pane-0 / added test pane; RUN-CLONE / `jev-lab` free |
+
+Adjacent *invented* quotes that are **not** STOP/DEFER/quiet-window policy,
+cited so they are not lost, and left for later passes:
+
+- Invented `helpful` gate: `README.md:724-727`; `.flywheel/feedback/2026-09-19-honesty-pass.md:24`.
+- Invented `sessionId: 'unknown'`: `docs/demos/upstream-repro/omp-jev-observer-sentinel-cleanup-20260919.md:13`.
+- Invented `dcgVerdict ?? 'unknown'`: `docs/INTEGRATIONS.md:64,156,200-201` (pack G7; not expanded here).
 
 ### Search receipt
 
@@ -23,11 +48,12 @@ inferred.
 ```bash
 # README
 rg -n 'STOP-LIVE|quiet[- ]window|off the table|off-the-table|invented "STOP|deferred registration|\bDEFER\b' README.md
-# HIT: README.md:803 quiet-window
+# HIT: README.md:803 quiet-window; :724 invented helpful gate (adjacent)
 
 # docs/INTEGRATIONS.md
 rg -n 'STOP-LIVE|quiet[- ]window|off the table|off-the-table|invented "STOP|deferred registration|\bDEFER\b' docs/INTEGRATIONS.md
 # HIT: :174 invented STOP-LIVE / off the table retraction
+# HIT: :181 quiet-window is not a science gate
 # HIT: :186 "not a quiet-window gate and not a reason to DEFER"
 
 # AGENTS.md
@@ -77,7 +103,79 @@ STOP/quiet-window/off-the-table pattern), `docs/demos/USAGE-MAP.md`,
 
 ---
 
-### GAP 1 — Invented "STOP-LIVE" / "registration requires human review"
+### G1 — Invented STOP-LIVE / quiet-window / DEFER / “off the table”
+
+Pack G1. Taxonomy #1 (invented policy).
+
+**(a) Path + quote.**
+
+`docs/INTEGRATIONS.md:174`:
+
+> Live omp was never taken off the table. There is **no standing ban** on
+> registering into working omp profiles. The fleet invented "STOP-LIVE" /
+> deferred registration as reasons not to work. This row is not an indefinite
+> deferral and not quiet-window gated.
+
+`EVAL.md:448`:
+
+> No invented STOP-LIVE ban.
+
+`docs/INTEGRATIONS.md:181`:
+
+> Quiet-window is not a science gate for that work.
+
+`docs/INTEGRATIONS.md:186`:
+
+> They are not a quiet-window gate and not a reason to DEFER the loop
+
+Joshua's recorded stop is narrower than any of those fleet tokens.
+`NEGATIVE_EVIDENCE.md:1271-1273` (raised by Joshua, not discovered by us):
+
+> *"i have other testing going on locally with stuff so dont mark anything
+> 100% done until we test more thoroughly in a quiet window"*
+
+`NEGATIVE_EVIDENCE.md:1286-1288` keeps that hold on **timing**:
+
+> **Rule:** a verdict whose evidence is "it did not finish in time" requires
+> a **quiet-window re-run** before it is terminal. Timing is the one
+> measurement that shared hardware silently corrupts…
+
+That is a claim-level hold on local-model "100% done", not a ban on
+registering an observe-only fail-open hook, and not a science gate.
+
+**(b) Why this is a dont-give-up failure.**
+
+Failure mode 1 (invented policy) and hard rule 1 (do not invent blockers).
+Checklist item 1 — "Did the user explicitly stop this path?" — is **no** for
+STOP-LIVE / "off the table" / DEFER-the-loop / quiet-window-as-science-gate.
+The scoreboard had to *retract* tokens the fleet minted. The skill names
+the failure but does not give a worked retract: quote the user or write
+"none", then map the hole to a live surface.
+
+**(c) Concrete forward move.**
+
+Land a **worked retract script** on skill hard-rule #1 (see
+`docs/essays/dont-give-up-skill-patches.md` Pass 1, patch 1.6):
+
+1. **Quote the user stop, or write `none`.** If `none`, the ban is yours —
+   retract it in the same sentence.
+2. **Map the hole to a live surface that is already licensed:** RUN-CLONE /
+   `omp --profile jev-lab` / pane 0 / an added test pane
+   (`docs/INTEGRATIONS.md:178-181`). Mid-flight panes stay untouched.
+3. **Forbid expanding quiet-window past timing re-runs.** A 502, a missing
+   field, a loader that writes zero rows, or an unread `.d.ts` is a dig,
+   not a calendar.
+
+Do not start a fleet-wide rewrite in this PR. The next product tick the
+invented STOP-LIVE blocked is still one live observer row on that surface.
+
+---
+
+### G9 — Invented human-gate on lab registration
+
+Pack G9. Invented policy (taxonomy #1) with ask-instead-of-dig / blocked-on-human
+detour as the mechanism. Distinct from G1: G1 is the fleet token; G9 is the
+receipt that minted a **human review** requirement for a disposable lab copy.
 
 **(a) Path + quote.**
 
@@ -91,198 +189,117 @@ STOP/quiet-window/off-the-table pattern), `docs/demos/USAGE-MAP.md`,
 > Registration requires human review because an extension load or hook error
 > can affect every tool call in the fleet.
 
-The later scoreboard names the invention and retracts it.
-`docs/INTEGRATIONS.md:174`:
+Same-day doctrine contradicts a fleet-wide human gate, including for lab.
+`docs/INTEGRATIONS.md:180-181`:
 
-> Live omp was never taken off the table. There is **no standing ban** on
-> registering into working omp profiles. The fleet invented "STOP-LIVE" /
-> deferred registration as reasons not to work. This row is not an indefinite
-> deferral and not quiet-window gated.
+> **Register / dogfood on pane 0 or an added test pane.** Leave mid-flight
+> panes untouched. Promote only after receipts.
+>
+> **RUN-CLONE.** Local clones and disposable lab profiles
+> (`omp --profile jev-lab`) are free for atomic mutation, planted known-bad,
+> and improvement loops. Quiet-window is not a science gate for that work.
 
-`EVAL.md:448-449` (same retraction, ledger form):
+The cost of the invented gate is in the same receipt. After P2-13 closed
+UNRUN, **P2-15 registered the disposable `jev-lab` copy** and found the
+real 0-row defect (`omp-jev-observer-20260919.md:47-53,57-60`):
 
-> No invented STOP-LIVE ban. Live test surface remains pane 0 / added test
-> panes.
+> P2-15 later registered only the disposable jev-lab copy and added the live
+> evidence below
+>
+> The initial live attempt produced no observer rows.
+>
+> `omp --profile=jev-lab --no-extensions --extension=…/omp-jev-observer.ts`
 
-Joshua's recorded stop on live work in this window is **not** that sentence.
-`NEGATIVE_EVIDENCE.md:1271-1273` (raised by Joshua, not discovered by us):
-
-> *"i have other testing going on locally with stuff so dont mark anything
-> 100% done until we test more thoroughly in a quiet window"*
-
-That is a claim-level hold on local-model "100% done", not a ban on
-registering an observe-only fail-open hook.
-
-The invented bar is also contradicted by a later unit that **did** register
-on a working profile without a new Joshua sentence.
-`docs/demos/upstream-repro/harm-rule-promoted-20260919.md:3-5,37-45`:
-one `codex` working-profile registration, observe-only, first-contact rows
-written, no rollback.
+A sibling observe-only hook registered on a **working** profile the same day
+without a new Joshua sentence
+(`docs/demos/upstream-repro/harm-rule-promoted-20260919.md:3-5,37-45`).
 
 **(b) Why this is a dont-give-up failure.**
 
-Failure mode 1 (invented policy) and hard rule 1 (do not invent blockers).
-Checklist item 1 — "Did the user explicitly stop this path?" — is **no**.
-The receipt invented a fleet-wide human-review gate, then scored "deliberately
-UNRUN" as the unit's close. That is "narrate blockers as product strategy"
-(`dont-give-up` What not to do). Playbook K and hard rule 7 already name the
-dig: fail-open, return `undefined`, prove one live row. The offline proof in
-the same file (`:26-34`, 5 tests, `undefined` on success/error/timeout) is
-exactly that dig, stopped one command short of the live row.
+Hard rule 1 (do not invent blockers) plus checklist item 1 = **no**.
+"Registration requires human review" is not a user sentence. Playbook K
+already says: extension loads, zero rows → fix the invocation; hard rule 7
+says fail-open and still log. The receipt invented a fleet blast-radius
+human gate, applied it to a command that could have targeted `jev-lab` /
+`--no-extensions --extension=<one>`, and scored UNRUN as the close. That
+detour hid the 0-row loader defect until P2-15. Offline proof in the same
+file (`:26-34`, 5 tests) is the dig, stopped one command short of the live
+row.
 
 **(c) Concrete forward move.**
 
-Run the already-written registration on the surface the retraction itself
-names, not on a mid-flight pane:
+Skill rule: **fleet blast radius is a human gate only for working
+profiles**, never for disposable `jev-lab` or
+`omp --no-extensions --extension=<one>` (patch 1.4 / 1.7). The next
+command is the one P2-15 eventually ran — not a human-review bead.
 
 ```text
-# from docs/INTEGRATIONS.md:178-180
-# Live test surface = pane 0, or an added test pane. Leave mid-flight panes untouched.
-# Fail-open / observe-only already proven offline in omp-jev-observer-20260919.md:26-34.
+omp --profile=jev-lab --no-extensions \
+  --extension=<path-to-omp-jev-observer.ts> \
+  -p 'run exactly: echo observer-minimal-actual'
 ```
 
-Register the observer the same way `harm-rule-promoted-20260919.md` registered
-the harm-rule: one profile, rollback commands written first, one driven
-probe, quote the session rows. Do not wait for a human-review bead that
-nobody filed.
+Write rollback first if the target is a working profile. For lab, register,
+quote `diagnostic.v1` / `decision.v1`, and keep digging on whatever error
+field comes back.
 
 ---
 
-### GAP 2 — Ban retracted in prose; the act still "has not been attempted"
+### Additional invented-policy findings (same pass, not pack G2+)
 
-**(a) Path + quote.**
+These are the same failure mode as G1/G9: invented or expanded STOP/DEFER/
+quiet-window language used to walk away. They are not over-learned-kill,
+named-hole-then-park, or paperwork-as-progress missions.
 
-`docs/INTEGRATIONS.md:174` retracts STOP-LIVE (quoted in GAP 1).
-Immediately after, the same page still parks the product change.
-`docs/INTEGRATIONS.md:197-199`:
+#### Ban retracted in prose; the act still "has not been attempted"
+
+`docs/INTEGRATIONS.md:174` retracts STOP-LIVE (G1). The same page still
+parks the product change. `docs/INTEGRATIONS.md:197-199`:
 
 > The remaining condition for calling the observer **working** is a
 > **working profile under real traffic**, which has not been attempted: no
 > multi-row live logger exists outside `jev-lab`, and **promoted is 0**.
 
-`docs/INTEGRATIONS.md:186` tells the reader the preconditions "are not a
-quiet-window gate and not a reason to DEFER the loop" — then the loop is
-still deferred.
+`docs/INTEGRATIONS.md:186` says the preconditions are not a reason to DEFER
+the loop — then the loop is still deferred. Retracting an invented ban is
+not a product tick. Replace "has not been attempted" with a session path +
+row counts, or `NOT_RUN` plus the exact next command.
 
-**(b) Why this is a dont-give-up failure.**
+#### Quiet-window applied to a 502 shape error (scope leak)
 
-Hard rule 8 / failure mode 6: paperwork as progress. Retracting an invented
-ban is not a product tick. The skill's done-enough line is "concrete artifact
-that runs + live proof line, or one named human decision." This page named
-neither a human decision nor a command that was run. "Has not been attempted"
-after "there is no standing ban" is the give-up wearing a retraction.
-
-**(c) Concrete forward move.**
-
-Execute GAP 1's registration on pane 0 / an added test pane in the same
-change that cites `INTEGRATIONS.md:174`. Replace "has not been attempted"
-with a session path + row counts, or with `NOT_RUN` plus the exact next
-command. A third paragraph that restates the retraction is not the move.
-
----
-
-### GAP 3 — Quiet-window applied to a 502 shape error (scope leak)
-
-**(a) Path + quote.**
-
-Joshua's rule is scoped to **timing** on a shared box.
-`NEGATIVE_EVIDENCE.md:1286-1288`:
-
-> **Rule:** a verdict whose evidence is "it did not finish in time" requires
-> a **quiet-window re-run** before it is terminal. Timing is the one
-> measurement that shared hardware silently corrupts…
-
-The LocalJev receipt's blocking evidence is not that sentence.
+`NEGATIVE_EVIDENCE.md:1286-1288` limits quiet-window to "did not finish in
+time." The LocalJev blocker is a **502**.
 `docs/demos/upstream-repro/localjev-differential-20260919.md:75-83`:
 
 > 502 upstream did not return an OpenAI chat completion: TypeError: message
 > content is missing
 >
-> **BLOCKED** — not SUBSTITUTE or NOT-SUBSTITUTE. The failure is a
-> LocalJev/oMLX backend completion error on the pinned differential
-> workload, after the feasibility probe itself worked.
+> **BLOCKED** — … backend completion error …
 
-The status row then joins the 502 to quiet-window as if they were one
-blocker. `docs/demos/STATUS.tsv:35`:
+`docs/demos/STATUS.tsv:35` then joins them:
 
-> `NOT-ANSWERABLE-backend-502-message-content-missing-no-complete-denominator-40case-never-ran-retry-in-quiet-window-see-NEGATIVE_EVIDENCE-retry-condition`
+> `NOT-ANSWERABLE-backend-502-message-content-missing-…-retry-in-quiet-window-…`
 
-The same receipt already showed the representative long-state call
-**succeeds** with `message.content` present
-(`localjev-differential-20260919.md:122-124`, `:187-197`). So the 502 is a
-workload/shape hole, not a "did not finish in time" verdict.
+The same receipt already showed a representative long-state call **succeeds**
+with `message.content` present (`:122-124`, `:187-197`). Split the STATUS
+`blocked_on`: 502 shape diagnosis (not quiet-window) vs incomplete 40-case
+vector (R30 only).
 
-**(b) Why this is a dont-give-up failure.**
-
-Invented policy by **expansion**: a user-said, narrow timing hold was
-rewritten as the retry for a TypeError. Hard rule 2 (keep kills narrow)
-and playbook K (fix the invocation; don't abandon the feature). Checklist
-item 1 is yes for *timing-as-100%-done* and **no** for *stop diagnosing a
-502*. Filing `retry-in-quiet-window` on a response-shape error is how a
-scoped user sentence becomes a fleet ban.
-
-**(c) Concrete forward move.**
-
-Split the STATUS `blocked_on` into two named conditions:
-
-1. **502 shape** — isolate one pinned request that reproduces
-   `message content is missing` (the receipt already has a succeeding
-   long-state body to diff against). Quiet-window is not this arm.
-2. **Incomplete 40-case vector** — R30 quiet-window re-run, only for the
-   timing/contention claim.
-
-Do not leave a single hyphen-chain that lets the next pane treat a parser
-error as a calendar hold.
-
----
-
-### GAP 4 — README publishes quiet-window as a standing freeze
-
-**(a) Path + quote.**
+#### README publishes quiet-window as a standing freeze
 
 `README.md:802-804`:
 
-> **Open questions, honestly.** Class-D (does the agent's answer change?) is
-> unmeasured: the ablate-and-rerun harness is built and frozen, its model
-> arms pending a quiet window. Two verdicts are unsafe pending the same
-> window. Everything else above ran.
+> …its model arms pending a quiet window. Two verdicts are unsafe pending
+> the same window.
 
 The class-D receipt is conductor-steered for the **shared local oMLX box**,
-not a general science gate.
-`docs/demos/upstream-repro/ablate-rerun-classD-20260919.md:1-7`:
+one night. `docs/demos/upstream-repro/ablate-rerun-classD-20260919.md:1-7`:
+"expected terminal outcome tonight… the box is shared." `INTEGRATIONS.md:181`
+already retracts the over-read. Rewrite the README to quote Joshua and name
+the box; hosted TypeSafe API and offline recomputes are unaffected
+(`NEGATIVE_EVIDENCE.md:1283-1284`).
 
-> PREPARED-NOT-MEASURED (arms pending a quiet window)
->
-> …Per conductor steering this is the expected terminal outcome tonight,
-> not a deferral: the box is shared…
-
-`docs/INTEGRATIONS.md:181` already retracts the over-read:
-
-> Quiet-window is not a science gate for that work.
-
-**(b) Why this is a dont-give-up failure.**
-
-The one-night, one-box hold is a user/conductor sentence. The README drops
-the scope ("tonight", "same oMLX server", "don't mark 100% done") and
-publishes a standing "pending a quiet window" over class-D **and** "two
-verdicts." A later pane that reads only the README will invent the science
-gate `INTEGRATIONS.md:181` just retracted. That is how invented policy
-reproduces: the scoped quote lives in `NEGATIVE_EVIDENCE.md`; the public
-status line does not.
-
-**(c) Concrete forward move.**
-
-Rewrite `README.md:802-804` to quote Joshua's sentence and name the
-affected box (local oMLX / LocalJev + class-D model arms). State the
-negative: hosted TypeSafe API and every offline recompute are
-**unaffected** (`NEGATIVE_EVIDENCE.md:1283-1284`). Point RUN-CLONE / jev-lab
-/ hosted live work at `docs/INTEGRATIONS.md:181`, not at "the same window."
-
----
-
-### GAP 5 — "Deferral is scheduling" for a priced 4-hour build
-
-**(a) Path + quote.**
+#### "Deferral is scheduling" for a priced 4-hour build
 
 `VERDICT.md:123-124`:
 
@@ -293,81 +310,25 @@ negative: hosted TypeSafe API and every offline recompute are
 
 > `UNASKABLE-corpus-absent-manifest-missing-PRICED-4h-build-deferral-not-blocker`
 
-**(b) Why this is a dont-give-up failure.**
+The user did not say "wait for a free afternoon." `hub start` the priced
+build, or name the one human decision and halt. No more scheduling prose.
 
-"Scheduling, not a blocker" is quiet-window's cousin: a calendar word used
-to walk away from a hole whose cost is already priced. The user did not
-say "wait for a free afternoon." `AGENTS.md:1498-1503` (Joshua, same day)
-says selection and closure are ours; a computable next step is not an
-escalation. A 4-hour local corpus build is either (i) start it under `hub`
-(skill playbook F/H; R29 in `NEGATIVE_EVIDENCE.md` already names `hub
-start` vs `&`), or (ii) the **one** named human decision if 4 hours of
-shared-box time is the paid/irreversible class. Calling it "not a blocker"
-while leaving it unstarted is invented DEFER.
-
-**(c) Concrete forward move.**
-
-Pick one, write it on the STATUS row, and do it:
-
-- **Start:** `hub start` the priced 4-hour corpus build; receipt the PID and
-  the completion marker. or
-- **Halt:** one line — "human decision: authorize 4h corpus construction on
-  this box?" — and stop. No more scheduling prose.
-
----
-
-### GAP 6 — Lane `DEFER` is a real word; the skill does not discriminate
-
-**(a) Path + quote.**
+#### Lane `DEFER` is a real word; the skill does not discriminate
 
 `AGENTS.md:1494-1496` (Joshua's acceptance shape, not a fleet invention):
 
-> Never "make it pass". `DEFER`, `BLOCKED`, `REFUSE` and
-> `PREPARED-NOT-MEASURED` are real outcomes and are preferred over a
-> manufactured number.
+> `DEFER`, `BLOCKED`, `REFUSE` and `PREPARED-NOT-MEASURED` are real outcomes
 
-That vocabulary was then used to park a **file read**.
-`docs/demos/omp-seam-fqo-20260919.md:7,48-51,54-56`:
+That vocabulary parked a **file read**.
+`docs/demos/omp-seam-fqo-20260919.md:7,48-51,54-56` DEFERs L4-as-boundary
+behind reading `entries.d.ts`, then says "zero live calls; no session
+touched. All evidence read from the shipped runtime on disk." The amendment
+(`:58-79`) does the read and still leaves DEFER standing.
 
-> allowed set: REFUSE L4-as-Jev-pruning, DEFER L4-as-boundary behind a named
-> probe.
->
-> **DEFER:** L4-as-boundary behind one concrete probe — read
-> `SessionMessageEntry` linkage in `entries.d.ts` …
->
-> Boundary: zero live calls; no session touched. All evidence read from the
-> shipped runtime on disk…
-
-The same receipt's amendment (`:58-79`) then does the read, withdraws Reason
-1, and **still** leaves DEFER standing — now on Reason 2 (Jev does not
-write `summary` prose). The first DEFER was a walk-away from a `.d.ts` that
-was already on disk.
-
-A **non-invented** DEFER, for contrast:
+Non-invented contrast:
 `docs/demos/duel-2/runs/audit-q105-promotion-20260918T140000Z.json:33-35`
-names three untested symlink/hardlink classes and refuses to promote on a
-green live run. That is checklist item 2 (narrow cost-benefit) plus a named
-next arm, not an invented ban.
-
-**(b) Why this is a dont-give-up failure.**
-
-The skill's failure mode 1 lists `DEFER` next to STOP-LIVE as if the token
-itself were the bug. In this lane the token is legal. The bug is DEFER
-**without** (user stop | narrow kill with cheaper substitute | one named
-human decision | the named probe executed). `omp-seam-fqo` failed that test
-on the first close; Q105 did not. An agent following the skill literally
-will either (i) treat every lane DEFER as invented and re-litigate honest
-holds, or (ii) treat `AGENTS.md:1495` as a license to park.
-
-**(c) Concrete forward move.**
-
-Patch the skill (see `docs/essays/dont-give-up-skill-patches.md` Pass 1):
-`DEFER` is invented iff the named next command was not run **and** the user
-did not stop the path. For `omp-seam-fqo`, convert the first DEFER to the
-amendment's actual state: REFUSE L4-as-Jev-pruning on Reason 2; keep the
-alignment probe only if someone still needs a summarizer-gated L4, and then
-run it on a throwaway keyed session rather than filing it as a follow-up
-bead.
+names three untested symlink/hardlink classes. `DEFER` is invented iff the
+named next command was not run **and** the user did not stop the path.
 
 ---
 
@@ -380,12 +341,16 @@ bead.
   is user-said billing policy.
 - That every HELD row in `STATUS.tsv` is invented policy. Most name a
   corpus, a lift bar, or a concurrence kill.
-- That working-profile dogfood was completed. It was not. GAP 1–2 are
+- That working-profile dogfood was completed. It was not. G1 + G9 are
   the hole.
+- Pack G2 (over-learned kill), G3–G5 (named-hole / ask-instead-of-dig),
+  G6 (selector), G7–G8 / G10 (invented observation / paperwork / live-proof).
+  Those quotes are listed above only so they are findable. Not started.
 
 ### Next lever (Pass 1 close)
 
-Register the observe-only observer on pane 0 or an added test pane
-(INTEGRATIONS.md:178-180), with rollback written first, and quote one live
-row. That is the product tick the invented STOP-LIVE blocked. Pass 2
-(over-learned kill) is a different mission.
+Register the observe-only observer on `jev-lab` or pane 0 / an added test
+pane (`INTEGRATIONS.md:178-181`; G9 command), with rollback written first
+if the target is a working profile, and quote one live row. That is the
+product tick invented STOP-LIVE and the invented human-gate blocked.
+Do not start Pass 2 in this PR.
