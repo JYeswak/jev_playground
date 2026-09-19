@@ -38,8 +38,8 @@ test('an unset API key records review_error, never a scored pass', async () => {
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
     assert.equal('probabilities' in row.data, false);   // RED if a default ever reappears
-    assert.match(row.data.error, /TYPESAFE_API_KEY is not set/);
-    assert.equal(row.data.model, 'none-unconfigured');
+    assert.match(row.data.error, /unconfigured: TYPESAFE_API_KEY is not set/);
+    assert.equal(row.data.failure, 'unconfigured');
   } finally {
     if (previous !== undefined) process.env.TYPESAFE_API_KEY = previous;
   }
@@ -69,16 +69,16 @@ test('a real score is recorded as review_scored with its probabilities', async (
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
-  globalThis.fetch = async () => ({ ok: true, json: async () => ({ probabilities: { yes: 0.82, no: 0.18 } }) });
+  globalThis.fetch = async () => ({ ok: true, status: 200, text: async () => JSON.stringify({ answers: { behaviour: { noul: 0.82 }, boundary: { noul: 0.18 } } }) });
   try {
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff --cached'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_scored');
-    assert.deepEqual(row.data.probabilities, { yes: 0.82, no: 0.18 });
+    assert.deepEqual(row.data.probabilities, { behaviour: 0.82, boundary: 0.18 });
     assert.equal('error' in row.data, false);
-    assert.equal(row.data.model, 'typesafe-systemone');
+    assert.equal(row.data.model, 'jev-1.13.0');
   } finally {
     globalThis.fetch = realFetch;
     if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
@@ -90,14 +90,14 @@ test('a 200 with no probabilities is an error, not a silent pass', async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
-  globalThis.fetch = async () => ({ ok: true, json: async () => ({ unexpected: true }) });
+  globalThis.fetch = async () => ({ ok: true, status: 200, text: async () => JSON.stringify({ unexpected: true }) });
   try {
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
-    assert.match(row.data.error, /no probabilities/);
+    assert.match(row.data.error, /no-answers/);
   } finally {
     globalThis.fetch = realFetch;
     if (previous === undefined) delete process.env.TYPESAFE_API_KEY;

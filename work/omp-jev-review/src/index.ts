@@ -17,47 +17,29 @@
  * A failed call records `review_error`, never a pass — NEGATIVE_EVIDENCE R40: a crashed
  * classifier recording a pass is indistinguishable from a clean result.
  */
+import { askJev } from "../../jev-client/src/index.ts";
+
 const DECISION = "com.zeststream.omp-jev-review.decision.v1";
 const DIAG = "com.zeststream.omp-jev-review.diagnostic.v1";
 
-const ENDPOINT = "https://api.typesafe.ai/v1/systemone";
-const TIMEOUT_MS = 2500;
 const MAX_DIFF = 12000;
 
-const QUESTIONS = [
-  "does this change alter behaviour a caller depends on",
-  "does this change touch a security or permission boundary",
-  "is this change larger than its message implies",
-];
+/**
+ * Questions only. The WIRE SHAPE lives in work/jev-client and nowhere else — this extension
+ * hand-rolled its own fetch once and got HTTP 400 for inventing `{questions: [...], context}`.
+ * If you need a shape the client does not support, extend the client and its tests.
+ */
+const QUESTIONS = {
+  behaviour: "Does this diff alter behaviour that an existing caller depends on?",
+  boundary: "Does this diff touch a security, permission, or authentication boundary?",
+  scope: "Is this diff larger or more invasive than a routine change of its kind?",
+};
 
 type ToolCallEvent = { toolName?: unknown; name?: unknown; toolCallId?: unknown; input?: unknown; command?: unknown };
 type Host = {
   on: (event: string, handler: (event: ToolCallEvent) => Promise<undefined>) => void;
   appendEntry: (type: string, data: Record<string, unknown>) => Promise<unknown>;
 };
-
-/** Named because the systemOne request shape is a contract, not a rename. */
-async function scoreDiff(diff: string, apiKey: string): Promise<Record<string, number> | undefined> {
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  try {
-    const response = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: { "content-type": "application/json", authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({ questions: QUESTIONS, context: diff.slice(0, MAX_DIFF) }),
-      signal: controller.signal,
-    });
-    if (!response.ok) throw new Error(`systemOne HTTP ${response.status}`);
-    const body: unknown = await response.json();
-    if (body && typeof body === "object" && "probabilities" in body) {
-      const candidate = body.probabilities;
-      if (candidate && typeof candidate === "object") return candidate as Record<string, number>;
-    }
-    return undefined;
-  } finally {
-    clearTimeout(timer);
-  }
-}
 
 export default function ompJevReview(pi: Host) {
   pi.on("tool_call", async (event) => {
@@ -81,24 +63,13 @@ export default function ompJevReview(pi: Host) {
         });
       } catch {}
 
-      const apiKey = process.env.TYPESAFE_API_KEY;
-      const started = Date.now();
-      let probabilities: Record<string, number> | undefined;
-      let error: string | undefined;
-
-      if (!apiKey) {
-        // An unset key is a CONFIGURATION state, not a review result. The observer logged
-        // "JEV_OBSERVER_ENDPOINT is not configured" for 27 rows and nobody noticed, because
-        // the rows still looked like decisions.
-        error = "TYPESAFE_API_KEY is not set";
-      } else {
-        try {
-          probabilities = await scoreDiff(command, apiKey);
-          if (!probabilities) error = "systemOne returned no probabilities";
-        } catch (err) {
-          error = String(err);
-        }
-      }
+      const result = await askJev({
+        state: { diff: command.slice(0, MAX_DIFF) },
+        questions: QUESTIONS,
+        timeoutMs: 2500,
+      });
+      const probabilities = result.ok ? result.scores : undefined;
+      const error = result.ok ? undefined : `${result.reason}: ${result.error}`;
 
       try {
         await pi.appendEntry(DECISION, {
@@ -109,8 +80,9 @@ export default function ompJevReview(pi: Host) {
           // absent, never defaulted: a missing score must not read as a clean review
           ...(probabilities ? { probabilities } : {}),
           ...(error === undefined ? {} : { error }),
-          latencyMs: Date.now() - started,
-          model: apiKey ? "typesafe-systemone" : "none-unconfigured",
+          latencyMs: result.latencyMs,
+          model: result.model,
+          ...(result.ok ? {} : { failure: result.reason }),
           timestamp: new Date().toISOString(),
         });
       } catch {
