@@ -1198,3 +1198,41 @@ through it four times.
 in tone.** Read the skill before the script, drain first, and if draining is not possible, say so
 rather than substituting a different mechanism — the skill names substitution explicitly as the
 thing that preserves the defect.
+
+## R28 — an authored corpus inflated a result three times in one day
+
+**Recorded:** 2026-09-19 · **Level:** `[live]` · Three independent instances, three different panes.
+
+| candidate | authored corpus | real / held-out | delta |
+|---|---|---|---|
+| tool-call gate (pane 1) | 0/20 false positives | **3/20** | precision collapse |
+| foreman supervision (pane 3) | AUC **1.000** | AUC **0.750** on 186k real windows | −0.250 |
+| router tier signal (pane 1) | — | — | a wrong field name gave **exactly 0.500** three runs running |
+
+Every one produced a **confident, publishable-looking number that was wrong**, and in two cases the
+authoring pane had already written the caveat that turned out to be exactly right:
+
+> *"two perfect scores may measure vignette-writing, not supervision... shares my fingerprint"*
+
+The gate case is the sharpest: the v2 questions were written **after reading the v1 misses**, so a
+perfect 1.000 on that corpus measured the author's own phrasing. A held-out set authored after
+freezing the questions dropped it to 0.865 with 3/20 false positives on ordinary daily commands.
+
+**A separate lesson from the foreman retraction, worth more than the AUC:** 30 stuck windows in
+186,000 is a base rate of **~0.016%**. At that prevalence a 0.750 separator is unusable at *any*
+threshold — false positives from the ~185,970 healthy windows swamp the 30 true ones. **Report
+prevalence next to every AUC**, because an AUC without a base rate cannot tell you whether a
+detector is deployable.
+
+**Rules this produces:**
+
+1. A corpus authored by the pane that wrote the questions is **not evidence**. Hold one out,
+   authored only after the questions freeze — or better, draw from real transcripts.
+2. **State the prevalence** of the positive class beside every AUC, and say whether the score is
+   usable at that prevalence.
+3. Re-run identical configurations at least twice: the measured noise floor is **~0.006 AUC**
+   (0.865→0.860, 0.522→0.516), and no finding may turn on less.
+
+**Retry condition:** if a fourth instance appears *after* these rules are in force, the rules are
+insufficient and the lane needs a mechanical gate — a `HELD-OUT:` field in the manifest that
+`RUN` refuses to proceed without — rather than a written rule.
