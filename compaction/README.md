@@ -152,6 +152,34 @@ which needs a session whose older prefix contains tool calls.
 you have modified (it is replaced wholesale, without comparison). Backups are copies, not merges —
 you reapply your change by hand.
 
+### How much does it actually save? Measured on six real sessions
+
+Not on fixtures — on transcripts omp wrote during real work on this machine, replayed through the
+harness with a real key. All six passed all six invariant checks.
+
+| session | tool calls | requests | chars before → after | saved |
+|---|---|---|---|---|
+| a small one | 10 | **0** | 44,819 → 44,819 | **0%** |
+| `UdsFeatureUnion` | 9 | 1 | 155,837 → 104,443 | 32% |
+| `MirrorAgentsSurvey` | 15 | 1 | 249,949 → 188,661 | 24% |
+| `OmpExtensibility` | 15 | **0** | 253,465 → 253,465 | **0%** |
+| `PortFleetComposite` | 108 | 1 | 501,502 → 6,084 | **98%** |
+| `PortOmpIdleDispatch` | 98 | 1 | 291,909 → 12,911 | **95%** |
+
+**The two tool-heavy sessions collapse to a few kilobytes in one request.** The two zeroes are not
+failures and not noise: everything in them was *pinned*, so there was nothing the hook was allowed
+to touch, and it correctly spent nothing finding that out.
+
+**Do not read 98% as a rate.** Six sessions, one machine, one person's workload, and a third of
+them saved nothing. What the table supports is narrower and more useful: *when a session is
+tool-heavy, the saving is large, and when it is not, the cost is one skipped request.*
+
+Reproduce on your own sessions — no fixture, no setup beyond the install above:
+
+```bash
+npm run replay -- ~/.omp/**/agent/sessions/**/<a real session>.jsonl
+```
+
 ### Known limits, so you are not surprised
 
 - **Savings come from tool results and thinking blocks.** A session that is one long prose turn has
