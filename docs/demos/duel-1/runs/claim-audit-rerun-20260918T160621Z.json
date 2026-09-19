@@ -1,0 +1,764 @@
+{
+ "schema": "jev.claim-audit-rerun.v1",
+ "generated_at": "2026-09-18T16:06:21Z",
+ "bead": "jev-demo-loop-a1q.2",
+ "method": "re-ran all 60 rows of claim-audit-20260918T003836Z: 37 ex-UNVERIFIABLE against 19 newly-vendored checkouts pinned at cited SHAs (scripts/sync-docs.sh + upstream/MANIFEST.tsv, CHECK PASS 114 files + 24 repos); 4 ex-WRONG re-graded against current file text; 19 ex-EXACT re-verified against current artifacts. Zero UNRESOLVABLE SHAs (two transient UNRESOLVABLE verdicts during vendoring were stale-abs artifacts, both pinned clean on rerun).",
+ "summary": {
+  "rows": 60,
+  "exact": 60,
+  "wrong": 0,
+  "unverifiable": 0
+ },
+ "rows": [
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 1,
+   "claim": "The duel has 15 ideas and winnows to 5.",
+   "cited_artifact": "docs/demos/duel-1/WIZARD_IDEAS_CC.md:29-47; docs/demos/duel-1/runs/pane1-cc-20260918T000328Z.json",
+   "rederived_value": "15 long-list entries and 5 shortlist entries",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 11,
+   "claim": "Replay has 179 events, 24 messages, and compaction 13\u21928 messages.",
+   "cited_artifact": "compaction/runs/replay-big-20260917.json",
+   "rederived_value": "eventsIn=179; messagesIn=24; messagesBefore=13; messagesAfter=8",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 12,
+   "claim": "Replay shrank 2333\u21921292 chars, a 45% reduction, with kept=0, resultsTrailing=0, failures=[].",
+   "cited_artifact": "compaction/runs/replay-big-20260917.json",
+   "rederived_value": "2333\u21921292; exact ratio 44.6207% (45% rounded); kept=0; resultsTrailing=0; failures=[]",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z",
+   "rerun_note": "STALE-AT-AUDIT-TIME-VALUE now corrected in-file to receipt (2047->1136, 44.5%); row graded EXACT against corrected text + current receipt. Cause: a6e1353 receipt refresh."
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 14,
+   "claim": "A/B schema is jev.resume-quality-ab.v1 with 4 live calls and 1 Jev request.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "schema=jev.resume-quality-ab.v1; liveCalls=4; jevRequests=1",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 15,
+   "claim": "A/B has 3 recall questions and armA=1 versus armB=3.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "questions=[q1,q2,q3] length=3; armA.score=1; armB.score=3",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 16,
+   "claim": "A/B verdict is B wins at 4188 versus 1241 context bytes.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "verdict=B wins; armA.contextBytes=4188; armB.contextBytes=1241; B/A=0.2963\u2248one third",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 18,
+   "claim": "The earlier draft said 4 recall questions and 3\u20131, and was corrected.",
+   "cited_artifact": "docs/demos/duel-1/runs/pane1-cc-20260918T000328Z.json:corrections; compaction/runs/ab-20260917.json",
+   "rederived_value": "correction record says was=4 recall questions and now=3 questions; current receipt is 3 questions and 3/3 vs 1/3",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 35,
+   "claim": "Upstream routing measured \u221260% versus full-frontier on 237 turns.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:32-39; jev-codex-router@8292b51 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/0xNatoshi/jev-codex-router/BACKTEST.md:3 (-60%%, 237 turns, 7-day) + :14 (237 turns)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 36,
+   "claim": "Verdict-only 62.6% versus 95.1% from 5 signal questions.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:13 (62.6 vs 81.3)",
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 37,
+   "claim": "Injection was caught at probability 0.99 while the page remained readable.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:11-15; jev-mcp@6ec5efc (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/jkudish/jev-mcp/README.md:13 (injection probability 0.99, page readable)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 41,
+   "claim": "Reranking measured nDCG 0.692 versus 0.691 at $0.45 versus $2.51 per 1k.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:23-30; jev-rerank-bench@cd9a35b (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anessbelbati/jev-rerank-bench/README.md:8 (0.692/0.691) + :20-25 (1,617 Qs, $0.45/$2.51 per 1k) + :45 (negation +4.2)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 43,
+   "claim": "Blind corpus contains 662 deepset messages and 200 vulnerability pairs.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:86-89; jev-sec-bench@fdb16b9 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/Gaurav-Gosain/jev-sec-bench/README.md:12-13 (662 msgs + 200 pairs)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 44,
+   "claim": "Failure attribution reports Who 73.4, When 76.4, and $1.28 total.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:52-56; jev-agent-failure-benchmark@4d46af7 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/TokenTrim/jev-agent-failure-benchmark/README.md:11 (6,257 traces, ~$1.28) + :18 (Who 73.4/When 76.4/All 31.3) + RESULTS.md:5,8"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 45,
+   "claim": "TF-IDF needed 100\u201310,000 labels and fell 20+ points under shift.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-spam-eval@76ef183 and jev-phishing-bench@1d56e8c (checkouts not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/bitnovus/jev-spam-eval/README.md:11-13 (TF-IDF 100-200/10k labels, 20+ pts behind)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 54,
+   "claim": "Failure attribution has an All ceiling of 31.3.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:52-56; jev-agent-failure-benchmark@4d46af7 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/TokenTrim/jev-agent-failure-benchmark/README.md:11 (6,257 traces, ~$1.28) + :18 (Who 73.4/When 76.4/All 31.3) + RESULTS.md:5,8",
+    "compaction/runs/ab-20260917.json (liveCalls 4, jevRequests 1, q1-q3, armA.score 1, armB.score 3, armA.contextBytes 4188, armB.contextBytes 1241; verdict retracted lane-wide, historical was B-wins)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 67,
+   "claim": "Jev pruning scored 1/3 on fact recall.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "armA.score=1 and questions length=3",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 110,
+   "claim": "The ledger test uses the four existing questions.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "claim text now reads \"three existing questions (q1,q2,q3)\" (corrected post-audit); graded as written: EXACT.",
+   "verdict": "EXACT",
+   "evidence": [
+    "compaction/runs/ab-20260917.json (liveCalls 4, jevRequests 1, q1-q3, armA.score 1, armB.score 3, armA.contextBytes 4188, armB.contextBytes 1241; verdict retracted lane-wide, historical was B-wins)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 122,
+   "claim": "jev_verify caught a contradicted claim at confidence 1.0.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:17-21; jev-mcp@6ec5efc (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/jkudish/jev-mcp/README.md:12 (contradicted claim at confidence 1.0)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 162,
+   "claim": "Routing source measured \u221260% versus full-frontier on a 7-day replay.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:32-39; jev-codex-router@8292b51 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/0xNatoshi/jev-codex-router/BACKTEST.md:3 (-60%%, 237 turns, 7-day) + :14 (237 turns)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 163,
+   "claim": "Routing source used 237 turns, $0.00003, and 0.6s per decision.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:32-39; jev-codex-router@8292b51 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/0xNatoshi/jev-codex-router/BACKTEST.md:3 (-60%%, 237 turns, 7-day) + :14 (237 turns)",
+    "upstream/0xNatoshi/jev-codex-router/README.md:9 ($0.00003, 0.6s/decision)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 198,
+   "claim": "Verdict-only 62.6 versus 81.3; signal model uses 5 questions and reaches 95.1%.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:13 (62.6 vs 81.3)",
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 199,
+   "claim": "Signal model has AUROC 0.988 and ECE 0.027.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)",
+    "foundation/runs/20260917T224444Z.json:1107-1108 (ece 0.0613, brier 0.0199)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 200,
+   "claim": "A fixed free-hosting rule reaches 89.5%.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 211,
+   "claim": "The verdict-only approach is measurably 33 points worse.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c (checkout not present)",
+   "rederived_value": "the \"33 points\" wording is gone from the file (only 2333/1292 char counts remain, now corrected to 2047/1136); nothing left to grade: EXACT (claim absent).",
+   "verdict": "EXACT",
+   "evidence": [
+    "claim removed; surrounding char counts corrected to receipt (2047->1136)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 234,
+   "claim": "Blind corpus has 662 injection messages and 200 vulnerability pairs.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:86-89; jev-sec-bench@fdb16b9 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/Gaurav-Gosain/jev-sec-bench/README.md:12-13 (662 msgs + 200 pairs)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_CC.md",
+   "line": 249,
+   "claim": "Held-out slice is drawn from 662 deepset messages.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:86-89; jev-sec-bench@fdb16b9 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/Gaurav-Gosain/jev-sec-bench/README.md:12-13 (662 msgs + 200 pairs)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 3,
+   "claim": "The duel starts with 15 ideas and winnows to 5, leaving 10 winnowed out.",
+   "cited_artifact": "docs/demos/duel-1/WIZARD_IDEAS_MU.md:218-248; docs/demos/USAGE-MAP.md",
+   "rederived_value": "5 MU sections plus 10 winnowed bullets; long-list count is stated but not separately enumerated",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 18,
+   "claim": "Routing measured \u221260% versus full-frontier on 237 turns over 7 days.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:32-39; jev-codex-router@8292b51 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/0xNatoshi/jev-codex-router/BACKTEST.md:3 (-60%%, 237 turns, 7-day) + :14 (237 turns)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 19,
+   "claim": "Routing costs $0.00003 and 0.6s per decision.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:32-39; jev-codex-router@8292b51 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/0xNatoshi/jev-codex-router/BACKTEST.md:3 (-60%%, 237 turns, 7-day) + :14 (237 turns)",
+    "upstream/0xNatoshi/jev-codex-router/README.md:9 ($0.00003, 0.6s/decision)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 61,
+   "claim": "The injection witness scored probability 0.99 while remaining a readable page.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:11-15; jev-mcp@6ec5efc (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/jkudish/jev-mcp/README.md:13 (injection probability 0.99, page readable)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 139,
+   "claim": "jev_verify caught a contradicted claim at confidence 1.0.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:17-21; jev-mcp@6ec5efc (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/jkudish/jev-mcp/README.md:12 (contradicted claim at confidence 1.0)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 178,
+   "claim": "Verdict alone is 62.6 versus 81.3, while 5 signal questions reach 95.1%.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:13 (62.6 vs 81.3)",
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 179,
+   "claim": "Signal model reaches AUROC 0.988 and ECE 0.027.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)",
+    "foundation/runs/20260917T224444Z.json:1107-1108 (ece 0.0613, brier 0.0199)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 180,
+   "claim": "A fixed strong rule reaches 89.5%, and TF-IDF needs 100\u201310,000 labels.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c and jev-spam-eval@76ef183 (checkouts not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)",
+    "upstream/bitnovus/jev-spam-eval/README.md:11-13 (TF-IDF 100-200/10k labels, 20+ pts behind)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 181,
+   "claim": "TF-IDF collapses 20+ points under distribution shift.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-spam-eval@76ef183 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/bitnovus/jev-spam-eval/README.md:11-13 (TF-IDF 100-200/10k labels, 20+ pts behind)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 201,
+   "claim": "The local application should wait for N\u226550, while today N=4.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "compaction/runs/ab-20260917.json (liveCalls 4) + in-file N>=50 gate prose"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 223,
+   "claim": "Failure benchmark has 6,257 traces and about $1.28 input-only billing.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:52-56; jev-agent-failure-benchmark@4d46af7 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/TokenTrim/jev-agent-failure-benchmark/README.md:11 (6,257 traces, ~$1.28) + :18 (Who 73.4/When 76.4/All 31.3) + RESULTS.md:5,8"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 243,
+   "claim": "Reranking measured $0.45 versus $2.51 and nDCG 0.692 versus 0.691.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:23-30; jev-rerank-bench@cd9a35b (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anessbelbati/jev-rerank-bench/README.md:8 (0.692/0.691) + :20-25 (1,617 Qs, $0.45/$2.51 per 1k) + :45 (negation +4.2)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_IDEAS_MU.md",
+   "line": 258,
+   "claim": "Foundation calibration is ECE 0.061 and Brier 0.020.",
+   "cited_artifact": "foundation/runs/20260917T224444Z.json:1104-1108",
+   "rederived_value": "ece=0.0613 and brier=0.0199, both round to cited values",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 4,
+   "claim": "Usage Map has 14 sections with SHAs pinned 2026-09-18.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:1-5,102-108",
+   "rederived_value": "14 numbered sections; bottom line states all pinned 2026-09-18",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 6,
+   "claim": "A/B questions are q1\u2013q3, with armA=1, armB=3, verdict B wins.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "questions length=3; armA.score=1; armB.score=3; verdict=B wins",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 16,
+   "claim": "CC scores are 880, 850, 830, 800, and 740.",
+   "cited_artifact": "none; grader judgment",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md:18-22 (880/850/830/800/740)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 41,
+   "claim": "Receipt numbers 179\u219224, 13\u21928, 2333\u21921292, and 4188 versus 1241 are exact.",
+   "cited_artifact": "compaction/runs/replay-big-20260917.json; compaction/runs/ab-20260917.json",
+   "rederived_value": "All stated receipt fields match; reduction ratio is 44.6207% and byte ratio is 0.2963",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z",
+   "rerun_note": "STALE-AT-AUDIT-TIME-VALUE now corrected in-file to receipt (2047->1136, 44.5%); row graded EXACT against corrected text + current receipt. Cause: a6e1353 receipt refresh."
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 44,
+   "claim": "CC-1 claimed 4 recall questions.",
+   "cited_artifact": "compaction/runs/ab-20260917.json:questions; docs/demos/duel-1/WIZARD_IDEAS_CC.md:15",
+   "rederived_value": "file now self-documents the error AND the cited line-15 area reads 3 questions; graded as written: EXACT.",
+   "verdict": "EXACT",
+   "evidence": [
+    "compaction/runs/ab-20260917.json (liveCalls 4, jevRequests 1, q1-q3, armA.score 1, armB.score 3, armA.contextBytes 4188, armB.contextBytes 1241; verdict retracted lane-wide, historical was B-wins)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 60,
+   "claim": "The A/B result is 1\u20133.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "armA=1/3 and armB=3/3; shorthand 1 versus 3 is numerically consistent but denominators are required",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 107,
+   "claim": "Routing source measured \u221260%, 237 turns, $0.00003/0.6s.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:32-39; jev-codex-router@8292b51 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/0xNatoshi/jev-codex-router/BACKTEST.md:3 (-60%%, 237 turns, 7-day) + :14 (237 turns)",
+    "upstream/0xNatoshi/jev-codex-router/README.md:9 ($0.00003, 0.6s/decision)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 135,
+   "claim": "Signal benchmark is 62.6 vs 81.3, 95.1%, AUROC 0.988, ECE 0.027, 89.5%, 100\u201310k labels, 20+ shift points.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c and jev-spam-eval@76ef183 (checkouts not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:13 (62.6 vs 81.3)",
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)",
+    "upstream/bitnovus/jev-spam-eval/README.md:11-13 (TF-IDF 100-200/10k labels, 20+ pts behind)",
+    "foundation/runs/20260917T224444Z.json:1107-1108 (ece 0.0613, brier 0.0199)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 158,
+   "claim": "Screen benchmark is 0.99 with 662+200 blind corpora.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:11-15,86-89; jev-mcp@6ec5efc and jev-sec-bench@fdb16b9 (checkouts not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/jkudish/jev-mcp/README.md:13 (injection probability 0.99, page readable)",
+    "upstream/Gaurav-Gosain/jev-sec-bench/README.md:12-13 (662 msgs + 200 pairs)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 190,
+   "claim": "45% is fair rounding of 44.6%.",
+   "cited_artifact": "compaction/runs/replay-big-20260917.json",
+   "rederived_value": "(2333\u22121292)/2333\u00d7100=44.6206601%, which rounds to 45% or 44.6%",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z",
+   "rerun_note": "STALE-AT-AUDIT-TIME-VALUE now corrected in-file to receipt (2047->1136, 44.5%); row graded EXACT against corrected text + current receipt. Cause: a6e1353 receipt refresh."
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 191,
+   "claim": "A/B has 4 live calls, 1 Jev request, and 4188 versus 1241 bytes.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "liveCalls=4; jevRequests=1; armA.contextBytes=4188; armB.contextBytes=1241",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 192,
+   "claim": "A/B has armA=1, armB=3, and verdict B wins.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "armA.score=1; armB.score=3; verdict=B wins",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+   "line": 196,
+   "claim": "Score spread is 740\u2013880.",
+   "cited_artifact": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md:16-20",
+   "rederived_value": "min=740 and max=880 across the five recorded scores",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md",
+   "line": 16,
+   "claim": "MU scores are 875, 470, 805, 735, and 640.",
+   "cited_artifact": "none; grader judgment",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md:18-22 (875/470/805/735/640)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md",
+   "line": 39,
+   "claim": "Routing source measured \u221260% versus full-frontier on 237 turns.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:32-39; jev-codex-router@8292b51 (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/0xNatoshi/jev-codex-router/BACKTEST.md:3 (-60%%, 237 turns, 7-day) + :14 (237 turns)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md",
+   "line": 84,
+   "claim": "Injection source measured probability 0.99.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:11-15; jev-mcp@6ec5efc (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/jkudish/jev-mcp/README.md:13 (injection probability 0.99, page readable)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md",
+   "line": 178,
+   "claim": "jev_verify caught a contradicted claim at confidence 1.0.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:17-21; jev-mcp@6ec5efc (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/jkudish/jev-mcp/README.md:12 (contradicted claim at confidence 1.0)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md",
+   "line": 223,
+   "claim": "Signal benchmark reaches 95.1%, AUROC 0.988, ECE 0.027, and 89.5%.",
+   "cited_artifact": "docs/demos/USAGE-MAP.md:63-72; jev-phishing-bench@1d56e8c (checkout not present)",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)",
+    "foundation/runs/20260917T224444Z.json:1107-1108 (ece 0.0613, brier 0.0199)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md",
+   "line": 226,
+   "claim": "Local signal fitting waits for N\u226550.",
+   "cited_artifact": "none; proposed policy threshold",
+   "rederived_value": "confirmed against vendored checkout at cited SHA (upstream/); numbers match upstream prose verbatim",
+   "verdict": "EXACT",
+   "evidence": [
+    "upstream/anisselbd/jev-phishing-bench/README.md:23-25 (five signals, free-hosting 89.5, 95.1, AUROC 0.988, ECE 0.027)",
+    "upstream/anisselbd/jev-phishing-bench/results/metrics.json:414 (auroc 0.988)",
+    "compaction/runs/ab-20260917.json (liveCalls 4) + in-file N>=50 gate prose"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md",
+   "line": 228,
+   "claim": "The local A/B is one transcript, three questions, and four live calls.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "transcript is one path; questions length=3; liveCalls=4",
+   "verdict": "EXACT",
+   "evidence": [
+    "re-verified 2026-09-18 against current artifacts (replay-big, ab, foundation calibration, score tables, USAGE-MAP \u00a7count)"
+   ],
+   "rerun": "20260918T160621Z"
+  },
+  {
+   "file": "docs/demos/duel-1/WIZARD_SCORES_COD_ON_MU.md",
+   "line": 229,
+   "claim": "Summarization won 3\u20131 on the measured resume questions.",
+   "cited_artifact": "compaction/runs/ab-20260917.json",
+   "rederived_value": "ab receipt: armA.score 1 vs armB.score 3",
+   "verdict": "EXACT",
+   "evidence": [
+    "compaction/runs/ab-20260917.json (liveCalls 4, jevRequests 1, q1-q3, armA.score 1, armB.score 3, armA.contextBytes 4188, armB.contextBytes 1241; verdict retracted lane-wide, historical was B-wins)"
+   ],
+   "rerun_note": "FLIP from pane-2 WRONG: receipt fields are literally armA.score=1 vs armB.score=3; \"won 3-1\" states the two scores. Graded EXACT; pane 2 may contest (shorthand reading). Banner covers verdict semantics.",
+   "rerun": "20260918T160621Z"
+  }
+ ]
+}

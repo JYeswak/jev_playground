@@ -1,0 +1,101 @@
+{
+  "schema": "jev.gauntlet-spec-audit.v1",
+  "generated_at": "2026-09-18T08:15:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "target": "docs/demos/GAUNTLET_SPEC_MU.md",
+  "target_commit": "c9a2fd9",
+  "sources_read": [
+    "docs/demos/PLAN.md",
+    "docs/demos/RULING.md",
+    "docs/demos/QUEUE.md",
+    "docs/demos/GAUNTLET_SPEC_MU.md"
+  ],
+  "verdict": "SUBSTANTIALLY_SOUND_WITH_COUNT_AND_SCOPE_CORRECTIONS",
+  "adjudication": {
+    "headline_claim": {
+      "claim": "the method caught its own conductor eleven times",
+      "ruling": "UNVERIFIABLE_AND_REJECTED",
+      "basis": "No artifact enumerates eleven conductor-catches. The available artifact counts are aggregates with different inclusion rules."
+    },
+    "broad_recorded_errors": {
+      "reported": 22,
+      "ruling": "TOO_BROAD_FOR_METHOD_CATCHES",
+      "reason": "Includes self-audits and direct human corrections, not only mechanisms that caught the conductor."
+    },
+    "correction_headings": {
+      "reported": 10,
+      "ruling": "NOT_A_CATCH_COUNT",
+      "reason": "Headings are sections, not events; at least one correction heading was itself corrected, so headings can double-count."
+    },
+    "pane_agent_triggered": {
+      "reported": 12,
+      "ruling": "TOO_HIGH_FOR_METHOD_TRIGGERED_CATCHES",
+      "corrected_method_count": 11,
+      "reason": "The audit explicitly credits #19 (ask-the-pane) although it was an unwritten habit, not a shipped rule. Twelve is defensible only as the broader actor-triggered count, not as method catches."
+    },
+    "replacement": "The headline must be removed. The strongest supported wording is: mechanisms caught conductor errors on record twelve times across recurring defect families, while the narrower shipped-rule count is eleven after excluding the unwritten ask-the-pane habit; neither number means eleven distinct errors."
+  },
+  "recurrence_families": {
+    "ruling": "REAL_MECHANISMS_BUT_NOT_A_DISJOINT_CASE_COUNT",
+    "families": [
+      {
+        "name": "over-kill_on_first_reason",
+        "reported_instances": 3,
+        "assessment": "real; B1, demo-6, and incumbent/novelty decisions share the same stop-after-first-plausible-reason mechanism"
+      },
+      {
+        "name": "citing_without_opening_the_control",
+        "reported_instances": 5,
+        "assessment": "real mechanism, but the receipt does not provide a case-key table proving five independent catches; treat five as a qualified recurrence count, not five distinct errors"
+      },
+      {
+        "name": "adjacent_things_called_identical",
+        "reported_instances": 2,
+        "assessment": "real; convergence headline and B1 are distinct episodes of the same judgment failure, but B1 also appears in the over-kill family, so family totals overlap"
+      }
+    ],
+    "coverage_ruling": "The phrase 'three families cover 10 of 22' is a set-cover statement, not a disjoint enumeration. The families are not merely adjacent labels, but the artifact must not present 10 as ten unique catches. Citing-without-opening-control is a valid modal failure family and remains live; its five count is qualified until case-keyed."
+  },
+  "rule_firing_audit": {
+    "misstates_or_overclaims": [
+      {
+        "rule_or_claim": "caught its own conductor eleven times",
+        "ruling": "REMOVE_REPLACE",
+        "reason": "Unenumerated and numerically contaminated by the separate eleven-of-fifteen count."
+      },
+      {
+        "rule_or_claim": "12 pane/agent-triggered catches are method catches",
+        "ruling": "NARROW",
+        "reason": "#19 was an unwritten habit; distinguish actor-triggered from rule-mediated."
+      },
+      {
+        "rule_or_claim": "the lane validated rungs 1-4 and refused 5",
+        "ruling": "CORRECTED_TO_TESTED_RUNG_BOUNDARY",
+        "reason": "Rungs 1-4 have evidence in this lane; rung 5 was not attempted and is untested doctrine, not a tested refusal gate."
+      },
+      {
+        "rule_or_claim": "a hold-resolution rule demonstrated discipline",
+        "ruling": "NOT_SUPPORTED_AS_FIRING",
+        "reason": "No record shows anyone conflated resolving a hold with raising a score; the rule was unnecessary mistake-proofing, not outcome-changing evidence."
+      }
+    ],
+    "rules_that_match_the_record": [
+      "non-author grading and authorship exclusion fired repeatedly and changed outcomes",
+      "pre-registration and falsifiable floors fired; the clause prediction failed below its floor",
+      "UNASKABLE is correct only with countable missing evidence and a retry predicate",
+      "preview sufficiency is not manifest evidence sufficiency; the C5 addendum is required",
+      "dry-queue and stale-file rules were written after real failures, but prescribed fixes must not be called fired until verified",
+      "the human-chased-catch lifecycle should graduate a catch into a gate or label it unmechanized diligence"
+    ]
+  },
+  "omitted_rule_to_keep": {
+    "rule": "No number, baseline, or cited control is evidence until the cited control is opened and its denominator, generator, and failure condition are inspected.",
+    "reason": "The failure recurred five times by the audit's qualified count and remains live. It is the most consequential portable rule in the record, not merely a retrospective family label.",
+    "required_gate": "Every numerical claim receipt must include opened_control_path, control_sha_or_revision, denominator, and the observation that would falsify the claim."
+  },
+  "limitations": [
+    "This audit did not re-enumerate every PLAN.md event into a case-keyed table; therefore corrected counts distinguish broad, actor-triggered, and rule-mediated scopes but do not claim eleven distinct catches.",
+    "No claim that the gauntlet is validated beyond the tested mechanisms and rungs recorded here."
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "schema": "jev.duel2.q8-audit.v1",
+  "generated_at": "2026-09-18T04:38:46Z",
+  "bead": "jev-demo-loop-a1q",
+  "reviewer": "WindyJaguar (pane 2, non-author)",
+  "target": {
+    "path": "docs/demos/duel-2/HUNT_SCORES_MU_ON_COD.md",
+    "commit": "ead8119f2f71e5b0d26cf19162bbdad6a4dcae04",
+    "sha256": "4c952cf27de649d8a22d56e0f4295dbc51db513d8a286755e6f244abc1659298"
+  },
+  "selection": {
+    "why": "Pane-3-owned cross-score matrix directly controls whether COD-H1 through COD-H5 can reach rung 3; no non-author audit receipt was present.",
+    "alternatives_rejected": [
+      "DEMAND_HUNT_MU already had the pane-2 non-author score",
+      "COD-authored files were excluded",
+      "supersession and rung2 artifacts had lower arithmetic leverage"
+    ]
+  },
+  "arithmetic": {
+    "command": "Python inline checker asserts each table delta equals non-author score minus author score and source-file references are present.",
+    "status": "PASS",
+    "scores": {
+      "H2": {
+        "non_author": 905,
+        "author": 935,
+        "delta": -30
+      },
+      "H4": {
+        "non_author": 900,
+        "author": 920,
+        "delta": -20
+      },
+      "H5": {
+        "non_author": 895,
+        "author": 915,
+        "delta": -20
+      },
+      "H3": {
+        "non_author": 890,
+        "author": 925,
+        "delta": -35
+      },
+      "H1": {
+        "non_author": 885,
+        "author": 940,
+        "delta": -55
+      }
+    },
+    "file_scores": {
+      "hunt": 895,
+      "rank": 800
+    }
+  },
+  "findings": [
+    {
+      "id": "A1",
+      "severity": "none",
+      "status": "PASS",
+      "where": "rung-1 score table arithmetic",
+      "detail": "All five deltas recompute exactly: -30, -20, -20, -35, -55. Author/non-author direction and score ordering are internally consistent."
+    },
+    {
+      "id": "A2",
+      "severity": "none",
+      "status": "PASS",
+      "where": "H1 external pain",
+      "detail": "Codex #36718 is a real evidence-backed-completion issue and supports the stated demand pain. The target correctly narrows the gap rather than pretending deterministic substitutes do not exist."
+    },
+    {
+      "id": "A3",
+      "severity": "minor-limit",
+      "status": "FLAG",
+      "where": "H1 backcheck/evigate freshness and stars",
+      "detail": "The target calls both tools real/maintained and 0–1 stars. Their existence and adjacent scope were independently found, but this audit did not re-pin current star counts or release freshness. This is a source-freshness limit, not an arithmetic error."
+    },
+    {
+      "id": "A4",
+      "severity": "none",
+      "status": "PASS",
+      "where": "H2 evidence restraint",
+      "detail": "The target explicitly says Spec Kit #4290, AgentAbstain, and AbstainQA were cited-not-verified and discounts H2 by 30. This is honest handling, not an unsupported positive claim."
+    },
+    {
+      "id": "A5",
+      "severity": "none",
+      "status": "PASS",
+      "where": "H4 corpus and issue reasoning",
+      "detail": "The target distinguishes four tool-boundary issues plus one protocol issue, names the replay-corpus gap, and does not convert issue count into adoption proof."
+    },
+    {
+      "id": "A6",
+      "severity": "none",
+      "status": "PASS",
+      "where": "H5 lifecycle pain",
+      "detail": "OpenClaw #3560 flush-after-truncation failure is consistent with the cited source search; the target records the duplicate closure caveat and discounts cross-framework buyer scope."
+    },
+    {
+      "id": "A7",
+      "severity": "minor-limit",
+      "status": "FLAG",
+      "where": "H3 262% cache-price claim",
+      "detail": "The 262% arithmetic and LiteLLM #38064 mechanism rederive from the public issue summary, but exact code-line reproduction and current fix status were not locally run here. The target appropriately calls the audience narrow and keeps H3 below its own 900 bar."
+    },
+    {
+      "id": "A8",
+      "severity": "none",
+      "status": "PASS",
+      "where": "rank-file asymmetric standards",
+      "detail": "The target criticism is structurally valid: COD rank accepts vendor adoption material for Demo-9 while treating Codex #36718 as insufficient external voice for Demo-4, despite the latter describing evidence-backed completion pain. This is reasoning analysis, not a numeric contradiction."
+    },
+    {
+      "id": "A9",
+      "severity": "none",
+      "status": "PASS",
+      "where": "NO-CLAIM",
+      "detail": "The target explicitly bounds unverified sources, installations, adoption, and implementation claims."
+    }
+  ],
+  "overall": "AUDIT_PASS_WITH_TWO_SOURCE_FRESHNESS_LIMITS",
+  "retry_condition": "Re-audit H1/H3 source freshness before promotion or after external source/version changes; no score rewrite is authorized from this audit alone.",
+  "failures": []
+}

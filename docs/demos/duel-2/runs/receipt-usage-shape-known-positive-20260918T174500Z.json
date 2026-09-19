@@ -1,0 +1,46 @@
+{
+  "schema": "jev.usage-shape.known-positive-receipt.v1",
+  "generated_at": "2026-09-18T17:45:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "target_commit": "059efc1",
+  "tool": "demos/usage-shape/bin/shape.mjs",
+  "fixture": "/tmp/usage-shape-shipped-q106/known-shape.jsonl",
+  "execution": "node bin/shape.mjs /tmp/usage-shape-shipped-q106/known-shape.jsonl --json",
+  "producer_rc": 0,
+  "expected": {
+    "sessions": 1,
+    "turns": 2,
+    "files": 1,
+    "records_without_usage": 1,
+    "cacheRead": 300,
+    "cacheWrite": 50,
+    "input": 60,
+    "output": 40,
+    "total": 450,
+    "shares": {
+      "retransmitted_context": 66.6667,
+      "fresh_input": 13.3333,
+      "context_first_write": 11.1111,
+      "model_output": 8.8889
+    }
+  },
+  "observed": {
+    "sessions": 1,
+    "turns": 2,
+    "files": 1,
+    "records_without_usage": 1,
+    "cacheRead": 300,
+    "cacheWrite": 50,
+    "input": 60,
+    "output": 40,
+    "total": 450,
+    "shares": {
+      "retransmitted_context": 66.6667,
+      "fresh_input": 13.3333,
+      "context_first_write": 11.1111,
+      "model_output": 8.8889
+    }
+  },
+  "ruling": "KNOWN_SHAPE_RECOVERED",
+  "bound": "This validates the shipped accumulator on the synthetic shape. It does not validate the real-corpus 98.9% claim, skipped-record semantics, or general provider schema coverage."
+}

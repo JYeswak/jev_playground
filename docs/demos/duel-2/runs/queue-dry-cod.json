@@ -1,0 +1,87 @@
+{
+  "schema": "jev.publish-redteam.queue-dry.v3",
+  "bead": "jev-publish-redteam-7s0",
+  "generated_at": "2026-09-18T03:42:22Z",
+  "status": "QUEUE_DRY",
+  "artifact_checked": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+  "artifact_present": true,
+  "artifact_commit": "ad99a27c0594ad878c9525ef5f37de28cfcb4100",
+  "artifact_sha256": "0529d666ec02606b0013c1b72e2c200726b86f53f432c7d4ed75489ed8edf49e",
+  "artifact_owner": "CopperCarp (pane 3, muse lineage)",
+  "reviewer": "WindyJaguar (pane 2, codex lineage, non-author)",
+  "review_receipt_present": false,
+  "considered": [
+    {
+      "candidate": "docs/demos/duel-1/DUELING_WIZARDS_REPORT.md",
+      "decision": "rejected",
+      "reason": "present, but its pane-2 audit is already covered by WIZARD_REPORT_AUDIT_COD.md and the non-author audit-report-audit receipt; no new review claim is available"
+    },
+    {
+      "candidate": "docs/demos/duel-1/WIZARD_MERGE_MU.md",
+      "decision": "rejected",
+      "reason": "pane-3 artifact already has the non-author merge-audit receipt 6df67ad; re-reading it would duplicate a completed review"
+    },
+    {
+      "candidate": "docs/demos/duel-2/DEMAND_HUNT_MU.md",
+      "decision": "rejected",
+      "reason": "just received the pane-2 non-author demand score in HUNT_SCORES_COD_ON_MU.md 98a74d8; no second queue review is claimed"
+    },
+    {
+      "candidate": "docs/demos/duel-1/WIZARD_PICK_MU.md",
+      "decision": "rejected",
+      "reason": "pane-3 decision memo is lower-value than the unreviewed score matrix and is downstream of the scored artifacts"
+    },
+    {
+      "candidate": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+      "decision": "selected",
+      "reason": "pane-3-owned cross-score matrix changes backlog decisions, has no existing non-author audit receipt, and is reviewable without touching a pane-2-authored file"
+    },
+    {
+      "candidate": "COD-authored Duel-2 artifacts",
+      "decision": "rejected",
+      "reason": "author exclusion: WindyJaguar cannot serve as the non-author reviewer"
+    }
+  ],
+  "selected": "docs/demos/duel-1/WIZARD_SCORES_MU_ON_CC.md",
+  "selected_review_scope": "Audit score inputs, cited receipt arithmetic, author/non-author attribution, and any unsupported demand or supply claims; do not modify the pane-3 file.",
+  "oldest_satisfiable_retry_condition_considered": {
+    "id": "R10",
+    "decision": "deferred_after_artifact",
+    "reason": "the installed shared fleet-idle monitor still cannot express a packet-exhausted dry queue; prior R10 scope receipt routed the capability upstream/shared, and this unit must not build a jev-local fork"
+  },
+  "other_retry_conditions_considered": [
+    {
+      "id": "R5",
+      "decision": "rejected",
+      "reason": "no air-gapped requirement or docs-mirror drift/missing signal is present"
+    },
+    {
+      "id": "R6",
+      "decision": "rejected",
+      "reason": "first-party TypeScript scan-set retry already satisfied by ubs-r6 receipt"
+    },
+    {
+      "id": "R7",
+      "decision": "rejected",
+      "reason": "no new abort_bash cancellation documentation or cancelled=true probe was supplied"
+    },
+    {
+      "id": "R8",
+      "decision": "rejected",
+      "reason": "ripwire contributor C++ work is not this queue's lane"
+    },
+    {
+      "id": "R9",
+      "decision": "rejected",
+      "reason": "Reddit text is not required input and no Reddit capability should be added to Jev"
+    },
+    {
+      "id": "R11",
+      "decision": "rejected",
+      "reason": "A/B retry still needs a pinned generator or an n>=10 distribution; current receipts do not supply it"
+    }
+  ],
+  "queue_action": "QUEUE DRY only: conductor dispatches the non-author audit of the selected pane-3 score matrix; do not run that audit or implement R10 in this unit.",
+  "next": "Non-author score-matrix audit, then revisit R10 only if the shared substrate exposes a concrete upstream action.",
+  "no_claim": "No selected artifact was audited, no retry condition was implemented, no dispatch was issued, and no queue liveness or completion was claimed."
+}

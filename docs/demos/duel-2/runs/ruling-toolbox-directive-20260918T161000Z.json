@@ -1,0 +1,25 @@
+{
+  "receipt_type": "doctrine_ruling",
+  "date": "2026-09-18",
+  "question": "Whether this lane adopts an affirmative keep-building-the-toolbox directive under Rule 12",
+  "reviewer": "openai-codex/gpt-5.6-luna",
+  "ruling": "ADOPT_WITH_PHASE_BOUNDARY",
+  "adopted_practice": "Keep building tools toward named consumer paths; a check-before-building gate alone is insufficient.",
+  "phase": "instrument-to-consumer convergence",
+  "boundary": {
+    "build": "Named consumer, known-bad RED arm, and receipt for the observed gate.",
+    "hold": "Instrument has no consumer or gates nothing; wire or repair it before adding another.",
+    "audit": "Process audit drifts at USER 0 / ENABLER 5 / PROCESS 17 or worse, or at least two instruments remain unconsumed."
+  },
+  "reasoning": [
+    "Rule 12 makes ADOPT the default and disqualifies scale and smallness as refusals.",
+    "The measured process-porn audit is a phase signal, not evidence that useful tooling should stop.",
+    "Two of four instruments currently gate nothing, so unconditional growth would create more ceremony instead of consumer value.",
+    "The smallest honest adoption keeps the affirmative direction while requiring consumer, RED arm, and receipt evidence."
+  ],
+  "no_claim": [
+    "This does not authorize unbounded tool proliferation.",
+    "This does not claim the two unconsumed instruments are fixed.",
+    "This does not replace the measured process audit."
+  ]
+}

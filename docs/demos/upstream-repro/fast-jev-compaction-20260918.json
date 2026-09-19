@@ -1,0 +1,51 @@
+{
+  "receipt_type": "upstream_reproduction_and_comparison",
+  "date": "2026-09-18",
+  "repository": "fast-jev-compaction",
+  "upstream_contract": {
+    "surface": "npm package plus Claude Code plugin",
+    "core": "verbatim tool-call/result compaction; text messages remain verbatim",
+    "selection": "Jev separately scores call retention and result retention",
+    "fitting": "staged state fitting, pinned first/recent messages, concurrent request batches",
+    "failure": "throws on Jev failure; hook adapter falls back to built-in summary",
+    "transport": "injectable JevAsker or native TypeSafe client"
+  },
+  "verification": {
+    "npm_test": "29/29 pass",
+    "typecheck": "PASS including hooks",
+    "build": "PASS",
+    "example": {
+      "producer_rc": 0,
+      "messages_before": 21,
+      "messages_after": 7,
+      "chars_before": 4475,
+      "chars_after": 577,
+      "reduction": "87.1%",
+      "calls": 7,
+      "calls_dropped": 7,
+      "requests": 1,
+      "runtime_ms": 1277
+    }
+  },
+  "comparison_to_local_compaction": {
+    "upstream_does": [
+      "owns the reusable compaction core",
+      "owns state fitting and decision semantics",
+      "ships tests and a Claude Code plugin",
+      "supports injectable transport and native client"
+    ],
+    "local_does": [
+      "adapts omp JSONL into the upstream Message contract",
+      "binds the upstream core to omp's pre-compaction hook",
+      "preserves omp-specific result pairing and thinking-drop rules",
+      "provides replay fixtures and local integration tests"
+    ],
+    "overlap": "The local compaction directory imports fast-jev-compaction; it does not duplicate the upstream core algorithm.",
+    "ruling": "KEEP_THIN_LOCAL_ADAPTER_AND_REPLAY; DO_NOT_RETIRE_THE_ADAPTER",
+    "retirement_condition": "Retire or shrink local code only if upstream accepts the omp adapter/result-pairing contract and ships an equivalent supported plugin surface. Until then, local integration is the consumer-specific seam, not a competing compactor.",
+    "no_claim": [
+      "The example demonstrates reduction mechanics, not answer quality or safe production rollout.",
+      "The local omp hook binding remains an integration claim separate from the upstream package tests."
+    ]
+  }
+}

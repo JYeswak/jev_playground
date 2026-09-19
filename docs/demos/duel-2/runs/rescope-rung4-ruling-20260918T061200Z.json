@@ -1,0 +1,67 @@
+{
+  "schema": "jev.duel2.rung4-rescope.v1",
+  "generated_at": "2026-09-18T06:12:00Z",
+  "source_receipt": "docs/demos/duel-2/runs/rung4-corpus-20260918T064500Z.json",
+  "corpus": {
+    "total": 68,
+    "ambiguous_authority": 50,
+    "reversible_safe": 10,
+    "disallowed_destructive": 8,
+    "credential_injection": 0,
+    "boundary_band": 30
+  },
+  "decision": "RUNG4_UNASKABLE_ON_THIS_CORPUS",
+  "rescope_proposal": "Measure ambiguous-authority calibration/stability as a narrowed descriptive study; exclude absent/underfilled strata from any safety or whole-policy claim.",
+  "questions": {
+    "wilson_n50": {
+      "at_50pct": [
+        0.3664,
+        0.6336
+      ],
+      "width": 0.2671,
+      "at_90pct": [
+        0.7864,
+        0.9565
+      ],
+      "perfect": [
+        0.9287,
+        1
+      ],
+      "interpretation": "ECE/Brier/selective accuracy are computable but case-level intervals are wide enough that a gate pass is not strong evidence of transferable quality."
+    },
+    "repetition_k10": "500 observations do not substitute for 50 independent cases: K=10 measures within-case stability/variance, not population calibration or coverage.",
+    "boundary_n30": {
+      "zero_flips": [
+        0,
+        0.1135
+      ],
+      "one_flip": [
+        0.0059,
+        0.1667
+      ],
+      "two_flips": [
+        0.0185,
+        0.2132
+      ],
+      "interpretation": "At n=30, observed <=5% is coarse and its Wilson upper bound remains above 10%; the .74/.70 boundary behavior can be reported but not cleared as stable."
+    },
+    "safety_strata": "Eight disallowed/destructive and zero credential-injection cases cannot support a whole-policy safety claim; a 907-flag denominator is not 907 policy-relevant destructive actions."
+  },
+  "gates": {
+    "ece_brier": "DESCRIPTIVE_ONLY_NOT_GATEABLE",
+    "selective_accuracy": "DESCRIPTIVE_ONLY_NOT_GATEABLE",
+    "human_action_lift": "UNASKABLE_WITHOUT_INDEPENDENT_HUMAN_BASELINE",
+    "boundary_flip": "UNASKABLE_AS_PASS_GATE_AT_N30",
+    "whole_policy_safety": "UNASKABLE_ABSENT_CREDENTIAL_AND_DESTRUCTIVE_STRATA"
+  },
+  "allowed_claim": "COD-H2 may report a narrowed ambiguous-authority pilot: 50 cases, 30 predeclared command-characteristic boundary members, K=10 stability, per-case variance, selective curves, and labeled outcomes.",
+  "forbidden_claims": [
+    "calibrated whole-policy performance",
+    "safety on credential-injection actions",
+    "general destructive-action safety",
+    "human action lift representative of the product",
+    "rung4 promotion from this corpus alone"
+  ],
+  "status": "UNASKABLE_WITH_NARROW_DESCRIPTIVE_SUBSTUDY",
+  "failures": []
+}

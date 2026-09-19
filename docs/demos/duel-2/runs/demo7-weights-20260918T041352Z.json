@@ -1,0 +1,39 @@
+{
+  "schema": "jev.duel2.demo7-weight-dominance.v1",
+  "generated_at": "2026-09-18T04:13:52Z",
+  "status": "MEASURED",
+  "source": {
+    "repo": "~/Developer/jev/jev-phishing-bench",
+    "sha": "1d56e8c64d029a9554a0874e2ef2901ed196e230",
+    "file": "results/report.md",
+    "line": 107
+  },
+  "command": {
+    "path_resolution": "git -C ~/Developer/jev/jev-phishing-bench ls-tree -r --name-only HEAD | grep -E \"(^|/)report\\.md$|metrics\\.json|weights\"",
+    "measurement": "git -C ~/Developer/jev/jev-phishing-bench show HEAD:results/report.md"
+  },
+  "weights": {
+    "bias": -5.04,
+    "sig_domain_mismatch": -4.93,
+    "sig_free_hosting": 9.27,
+    "sig_lure": 1,
+    "sig_urgency": -0.77,
+    "sig_generic_sender": 12.24,
+    "verdict_p": 3.53
+  },
+  "calculation": {
+    "five_signal_abs_sum": 28.21,
+    "max_single_signal": {
+      "name": "sig_generic_sender",
+      "weight": 12.24,
+      "abs_weight": 12.24,
+      "abs_share": 0.43388869195320806
+    },
+    "top_two_signal_abs_share": 0.7624955689471817,
+    "all_predictor_abs_sum": 31.740000000000002
+  },
+  "pre_registered_rule": "DOMINATED iff max single signal absolute weight > 0.50 of five-signal absolute weight; otherwise MULTI; bias and verdict_p excluded from single-signal test",
+  "verdict": "MULTI",
+  "interpretation": "The fit is multi-signal under the stated single-weight rule, but free-hosting and generic-sender together carry the dominant 76.22% of five-signal absolute weight; the five-signal story is narrow, not evenly distributed.",
+  "failures": []
+}

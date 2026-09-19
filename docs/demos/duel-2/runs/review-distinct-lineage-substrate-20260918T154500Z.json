@@ -1,0 +1,73 @@
+{
+  "receipt_type": "distinct_lineage_review",
+  "date": "2026-09-18",
+  "bead": "jev-distinct-lineage-review-substrate-nl9",
+  "reviewer_lineage": "openai-codex/gpt-5.6-luna",
+  "author_lineage": "Claude Opus",
+  "scope": [
+    "githooks/pre-commit",
+    "githooks/pre-commit-staged-deletion-survives.sh",
+    "githooks/commit-msg",
+    "githooks/commit-msg-verification-level.sh",
+    "foundation/gates.sh",
+    "foundation/gates.d/60-staged-deletion-lane.sh"
+  ],
+  "verdict": "DIVERGENCES_FOUND_RECORDED",
+  "answers": {
+    "lane_refusal": {
+      "status": "NO_FALSE_REFUSAL_FOUND",
+      "evidence": [
+        "pre-commit lane 1 resolves its implementation beside the hook and fails closed when missing",
+        "lane 1 compares candidate GIT_INDEX_FILE against the real index and refuses a real staged deletion that disappears from the candidate index while the worktree file still exists",
+        "commit-msg wrapper resolves beside the hook and fails closed when its implementation is missing",
+        "verification-level checker has explicit known-bad and known-good selftests"
+      ]
+    },
+    "autofix_policy": {
+      "status": "ADOPT_REPORT_ONLY",
+      "decision": "Correct for this shared worktree. The fixer can mutate files without restaging them; running it inside commit would commit old bytes and leave rewritten files dirty. --check reports the exact explicit remediation instead.",
+      "residual": "If LOOP_KIT/autofix-precommit.sh is absent, pre-commit reports AUTOFIX_LANE_SKIPPED and exits 0; this is a fail-open optional dependency and should remain an explicit separate policy decision, not be called full coverage."
+    },
+    "staged_deletion_divergence": {
+      "status": "PROVEN",
+      "evidence": [
+        "real_index is resolved with env -u GIT_INDEX_FILE",
+        "candidate_index is taken from GIT_INDEX_FILE when present",
+        "git diff --cached --name-only --diff-filter=D is run under both index values",
+        "the satisfying path checks a deletion present in the real index but absent from the candidate and verifies the worktree still has the path"
+      ],
+      "residual": "The lane is causal for the intended path-limited commit failure. It does not model every exotic index corruption case; those are outside this acceptance contract."
+    },
+    "gate_pass_by_construction": {
+      "status": "DIVERGENCE_FOUND",
+      "findings": [
+        {
+          "id": "GATE-EMPTY-GLOB",
+          "severity": "medium",
+          "where": "foundation/gates.sh",
+          "finding": "If foundation/gates.d contains no executable [0-9]*-*.sh stages, the shell glob remains literal, [ -x ] skips it, rc stays 0, and the aggregate prints ALL GREEN without running a stage.",
+          "disposition": "REFUSAL_TO_FIX_IN_THIS_REVIEW",
+          "reason": "This is a real aggregator hardening change requiring its own fixture and gate contract; changing it inline would mix a distinct source mutation into a lineage review. It is recorded as a required follow-up rather than silently treated as green."
+        },
+        {
+          "id": "HOOK-AUTOFIX-SKIP",
+          "severity": "low",
+          "where": "githooks/pre-commit",
+          "finding": "A missing optional LOOP_KIT autofix implementation is explicitly skipped with exit 0.",
+          "disposition": "REFUSAL_TO_FIX_IN_THIS_REVIEW",
+          "reason": "The current design treats the foundry formatter as optional and preserves portability; changing skip to fail closed would alter the install contract and needs a separate decision."
+        }
+      ]
+    }
+  },
+  "verification": {
+    "selftest": "Kimi K3 caller selftest passed before the call was cancelled; this receipt is the Codex-family independent review, not a Kimi result.",
+    "source_sha_claim": "not applicable",
+    "external_oracle": "independent code inspection by openai-codex/gpt-5.6-luna"
+  },
+  "no_claim": [
+    "No claim that the two recorded divergences are fixed.",
+    "No claim that the gates are complete outside the inspected files.",
+    "No claim that this review replaces the pane-3 red-team history scrub."
+  ]
+}

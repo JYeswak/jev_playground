@@ -1,0 +1,32 @@
+{
+  "schema": "jev.context-retransmit-demo-proposal.v1",
+  "generated_at": "2026-09-18T17:45:00Z",
+  "artifact": "jev-context-retransmit-backtest",
+  "consumer": "an agent-platform operator deciding whether to fund context reduction, retrieval, or turn-elimination work before building an intervention",
+  "gate": "Do not price or build a context intervention until a run produces a receipted retransmission share, candidate-turn denominator, and deterministic what-if bound for the same session corpus.",
+  "observed_defect": "The shipped route-backtest priced model substitution while usage-shape found retransmitted context dominating billed tokens; the earlier backtest measured the wrong lever before shape census. Public adjacent prior art reports retrieval reranking moving a target passage from fifth to first seven times instead of once, but that is prior-art context, not this lane's measurement.",
+  "demo": {
+    "name": "Context retransmit backtest",
+    "input": "omp session JSONL",
+    "offline": true,
+    "key": false,
+    "network": false,
+    "arms": [
+      "known-shape synthetic fixture recovers cacheRead/cacheWrite/input/output exactly",
+      "all-zero-cache fixture proves no retransmission is not silently invented",
+      "missing-usage assistant turn is counted separately from non-turn records",
+      "malformed/truncated JSONL fails with a named receipt failure"
+    ],
+    "output": [
+      "per-turn and per-session retransmitted-token share",
+      "candidate intervention set: turns above declared cache-read share threshold",
+      "deterministic what-if table for 25%, 50%, and 75% retransmission reduction",
+      "denominator: sessions, assistant turns, usage-bearing turns, missing-usage turns, skipped/non-turn records",
+      "source hashes, model/version fields, date, accounting mode, and explicit UNRECONCILED residual"
+    ],
+    "boundary": "A what-if token reduction is an upper-bound scenario, not proof that retrieval, top_k, or turn elimination preserves answer quality."
+  },
+  "retirement_condition": "Retire or merge this demo when a maintained tool accepts the same session inputs, emits stronger per-turn provenance and accounting, and reproduces the same known-shape/negative controls; do not retire because one real run is green.",
+  "status": "PROPOSAL_ONLY",
+  "no_claim": "No implementation, no live model call, no quality-preservation claim, and no external validation of the Isaac Flath prior-art figure."
+}

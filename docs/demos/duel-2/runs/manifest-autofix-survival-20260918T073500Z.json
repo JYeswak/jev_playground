@@ -1,0 +1,29 @@
+{
+  "schema": "jev.manifest-autofix-survival.v1",
+  "generated_at": "2026-09-18T07:35:00Z",
+  "prototype_path": "docs/demos/duel-2/runs/manifest-autofix-prototype-20260918T073500Z.json",
+  "prototype_cases": 24,
+  "prototype_spans_checked": 24,
+  "hook": {
+    "command": "~/Developer/foundry/loop-kit/autofix-precommit.sh --staged --repo ~/Developer/jev",
+    "result": "PASS",
+    "stdout": "~/Developer/jev/docs/demos/duel-2/runs/manifest-autofix-prototype-20260918T073500Z.json\\tclean\\tpure=clean fmt=skip\nautofix: 0 fixed, 1 already-clean, 0 skipped",
+    "producer_exit_code": 0
+  },
+  "before": {
+    "bytes": 31573,
+    "sha256": "ebf2b41793c2909f60c335a5bd96c09f1f149d77ff68c1dda4eeeb1f2c8d48b6"
+  },
+  "after": {
+    "bytes": 31573,
+    "sha256": "ebf2b41793c2909f60c335a5bd96c09f1f149d77ff68c1dda4eeeb1f2c8d48b6"
+  },
+  "evidence": {
+    "base64_payload_bytes_unchanged": true,
+    "all_embedded_evidence_sha256_match": true,
+    "mismatches": [],
+    "byte_and_file_sha256_survived": true
+  },
+  "ruling": "The actual autofix hook left the base64 manifest bytes and file SHA-256 unchanged. This run confirms survival through the hook for this JSON prototype. It does not prove that arbitrary external formatters cannot reindent or reorder the surrounding JSON; the manifest must remain immutable or be protected by a post-format hash check if another formatter is introduced.",
+  "no_claim": "No claim that all formatters preserve the full JSON file; no claim of exact source-journal offsets."
+}

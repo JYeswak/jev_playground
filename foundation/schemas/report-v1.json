@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zeststream/jev-foundation/report-v1",
+  "title": "Calibration run report",
+  "description": "Complete, self-describing record of one calibration run. A stranger with the fixture file and this report can recompute every metric. Measurement failures are rows with error_kind, never silent drops.",
+  "type": "object",
+  "required": ["schema", "model", "fixture", "config", "items", "metrics"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": { "const": "jev-foundation.calibration-report.v1" },
+    "started_at": { "type": "string" },
+    "interrupted": { "type": "boolean" },
+    "model": { "type": "string" },
+    "fixture": {
+      "type": "object",
+      "required": ["name", "rows", "sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "rows": { "type": "integer" },
+        "sha256": { "type": "string" }
+      }
+    },
+    "config": {
+      "type": "object",
+      "required": ["timeout_s", "max_retries", "thresholds"],
+      "additionalProperties": false,
+      "properties": {
+        "timeout_s": { "type": "number" },
+        "max_retries": { "type": "integer" },
+        "thresholds": { "type": "array", "items": { "type": "number" } }
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "expected", "predicted", "error_kind", "latency_ms", "attempts"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "kind": { "enum": ["noul", "choice"] },
+          "expected": {},
+          "predicted": {},
+          "confidence": {},
+          "error_kind": { "enum": ["timeout", "http_error", "malformed", "refused", null] },
+          "latency_ms": { "type": "number" },
+          "attempts": { "type": "integer" }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["n", "errors", "ece", "brier", "bins", "thresholds", "choice_accuracy"],
+      "additionalProperties": false,
+      "properties": {
+        "n": { "type": "integer" },
+        "errors": { "type": "object" },
+        "ece": {},
+        "brier": {},
+        "bins": { "type": "array" },
+        "thresholds": { "type": "array" },
+        "choice_accuracy": {}
+      }
+    }
+  }
+}

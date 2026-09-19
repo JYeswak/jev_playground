@@ -1,0 +1,24 @@
+#	THE WORK QUEUE. Consumer: the cron tick -- it reads the oldest row not at RULED and dispatches that unit.
+#	Gate: a repo may not be RULED without a preregistered win_condition written BEFORE measurement.
+#	Observed defect: 21 rulings landed 2026-09-19 with zero preregistered thresholds; one bar was
+#	later proven impossible (a perfect judge scored 27.2%/29.3% at 0% loss and still failed it).
+#	Retirement: delete when all 8 product rows are RULED and the P5 ratchet holds their floors.
+#	stage: UNASSIGNED -> SPEC -> BUILT -> RUN -> RULED    class: A=mock B=golden C=ground-truth D=outcome
+#	Only class C or better may rule. A failed feasibility arm means BLOCKED-HARNESS, never a verdict.
+#	Plan: docs/demos/ORACLE-PROGRAM.md
+repo	shape	ground_truth_source	win_condition	class_target	class_achieved	stage	receipt
+tamaratran/fast-jev-compaction	2-ratchet	substantive-reuse + byte ceiling	save>=50pct_AND_lose<=10pct	C	C	RULED	docs/demos/upstream-repro/compaction-retention-oracle-20260919.md
+0xNatoshi/jev-codex-router	3-applicability-ratchet	COMPLETION not price: did the downgraded turn finish	flat-tier-baseline_must_not_win	D	C	RULED	docs/demos/upstream-repro/router-savings-inverts-20260919.md
+devanshbatham/commit-miner	4-mixed-denominator	real commits from our history + benign controls	0_false_positives_AND_1plus_true_positive_under_1cent_and_3s	D	C	RULED	docs/demos/upstream-repro/commit-miner-adoption-test-20260919.md
+claude-code-templates/jev-model-router	3-applicability-ratchet	our own sessions; effort+subagent routing only	tier_AUC>=0.70_AND_beats_length_baseline_by_0.05	C	C	RULED	docs/demos/upstream-repro/router-tier-signal-20260919.md
+thruwire/foreman	7-adversarial-survival	30+30 constructed observations, pre-freeze set A + post-freeze holdout B	AUC>=0.90_AND_false-stuck<=1per10_at_0.80	C	C	RULED	docs/demos/upstream-repro/foreman-supervision-adoption-20260919.md
+NiazMorshed2007/jev-review	6-metamorphic-invariant	22 real diffs, future file-overlap labels, own commits excluded	AUC>=0.75_worse-vs-surviving	C	C	RULED	docs/demos/upstream-repro/jev-review-real-diffs-20260919.md
+Dicklesworthstone/skillranker	1-threshold-gate	its own synthetic_cases.v1.jsonl + frozen 0/1/2 loss table	top1_precision>=0.90_AND_mean_loss<always_abstain_0.833	C	C	RULED	docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md
+AbdelStark/bicameral	7-adversarial-survival	frozen four-harm-class corpus, dcg allow/unknown scope, benign alarming controls, metamorphic pairs	FP<=0.97pct_prior_AND_recall>15of20_AND_zero_metamorphic_flips	C	C	RULED	docs/demos/upstream-repro/toolcall-judge-v3-20260919.md
+browser-use/jev-ultrafast	5-metamorphic-golden	its verify(page) end-state checker plus synthetic action-choice smoke arm	top1>=0.80_AND_false_advance<=1of10_AND_feasibility_passes	A	A	RUN	docs/demos/upstream-repro/jev-ultrafast-action-choice-20260919.md
+githubnext/localjev	4-mixed-denominator	real Jev vs LocalJev on 40 pinned questions; feasibility arm required	agreement>=80pct_AND_mean_abs_prob_diff<=0.15_AND_feasibility_arm_passes	C	-	RUN	docs/demos/upstream-repro/localjev-differential-20260919.md
+jkudish/jev-mcp	4-mixed-denominator	committed unit tests + response cassettes for verify/screen/find	PENDING-SPEC: class-B contract only; class-C requires pinned labeled corpus and thresholds	B	-	SPEC	docs/demos/upstream-repro/jev-mcp-oracle-spec-20260919.md
+logan-markewich/jeff	4-mixed-denominator	their committed bench/results/accuracy.jsonl, 22560 per-item rows, 8 public datasets	accuracy_AND_ECE_must_beat_jev_to_substitute	C	C	RULED	docs/demos/upstream-repro/jeff-selfhost-recompute-20260919.md
+ryze-ai/seo-geo-claim	4-mixed-denominator	40 pages with KNOWN citation outcomes (did ChatGPT/Claude cite it) + length/domain-authority baseline	PENDING-SPEC: must beat the dumb baseline, not just be fast	C	-	UNASSIGNED	-
+uehaj/jev-semgrep	4-mixed-denominator	their committed tests/cases.json + verdicts.json + contrast.txt proposition pairs	PENDING-SPEC: tests the CALIBRATION claim that one 0.5 threshold works across queries	C	-	UNASSIGNED	-
+omp/tool_call-surface	4-mixed-denominator	7846-row frozen sample (every 10th time-ordered joinable), isError 4.01pct, split 2026-09-10	PENDING-SPEC: scoring unit must preregister against 4pct error prevalence	C	-	SPEC	docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md

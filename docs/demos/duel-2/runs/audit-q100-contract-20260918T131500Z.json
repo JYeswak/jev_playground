@@ -1,0 +1,64 @@
+{
+  "schema": "jev.q100-contract-audit.v1",
+  "generated_at": "2026-09-18T13:15:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author implementation audit; contract author",
+  "inputs": {
+    "dispatch": "docs/demos/duel-2/dispatch/pane2-q100-snapshot-audit.md",
+    "spec": "docs/demos/duel-2/SPEC_snapshot_manifest_COD.md",
+    "promotion_rule": "docs/demos/duel-2/RULE_promote_sidecar_verifier_v2_COD.md",
+    "implementation": "scripts/verify-other-reasons.sh",
+    "arms": "scripts/selftest-other-reasons.sh"
+  },
+  "six_clauses": [
+    {
+      "clause": 1,
+      "name": "original bytes and paths preserved",
+      "status": "MET_FOR_RELATIVE_PRODUCTION_PATHS_PARTIAL_FOR_ABSOLUTE_TEST_INPUTS",
+      "evidence": "Copied STATUS/sidecar/receipt bytes are not rewritten; resolver preserves original path strings. However Path(root/'files'/absolute_source) discards the snapshot prefix, so an absolute JEV_STATUS/JEV_SIDECAR input can map to itself rather than a private copy."
+    },
+    {
+      "clause": 2,
+      "name": "private snapshot root",
+      "status": "PARTIAL",
+      "evidence": "Production-relative inputs copy under the temp root, but absolute input paths do not: Python path joining with an absolute RHS returns the original absolute path. The hermetic selftests use absolute temporary STATUS/SIDECAR paths, so ARM evidence is not proving a private copy for those inputs."
+    },
+    {
+      "clause": 3,
+      "name": "resolver maps original paths to snapshot paths",
+      "status": "MET_FOR_MAPPED_RELATIVE_PATHS_NOT_COMPLETE",
+      "evidence": "The resolver uses mapped original path keys and otherwise resolves into root/files rather than falling back to live. Missing-at-capture paths remain absent in the snapshot. Absolute-path normalization is missing, so the resolver can inherit the absolute-path snapshot defect."
+    },
+    {
+      "clause": 4,
+      "name": "manifest fields",
+      "status": "MET",
+      "evidence": "Manifest records source HEAD, capture attempt, source_pre_raw, source_post_raw, copy_raw, norm, bytes, source_path, and snapshot_path. Field naming differs slightly from the spec, but the required information is present."
+    },
+    {
+      "clause": 5,
+      "name": "manifest self-digest excludes digest field",
+      "status": "MET",
+      "evidence": "manifest_for constructs a canonical sorted JSON payload before adding manifest_digest; ARM 8 recomputes that payload independently."
+    },
+    {
+      "clause": 6,
+      "name": "third-party recomputation and copied rerun",
+      "status": "PARTIAL",
+      "evidence": "Manifest and copied files support independent digest recomputation and copied verification for relative production paths. Absolute-input selftests and the absolute snapshot_path portability limit prevent a universal claim."
+    }
+  ],
+  "promotion_preconditions": {
+    "copy_snapshot": "NOT_MET_UNTIL_ABSOLUTE_PATHS_ARE_NORMALIZED",
+    "revision_hash_pair": "MET_FOR_CURRENT_IMPLEMENTATION: HEAD plus per-file raw pre/post/copy and normalized hashes are recorded; subject to the absolute-input mapping defect",
+    "copy_based_arms": "MET_AS_ARMED_BUT_ARM_SCOPE_LIMITED: ARM 9 rehashes copied bytes, yet absolute JEV_STATUS/JEV_SIDECAR fixtures can map to themselves",
+    "verifier_owned_transient_unstable": "MET: verifier owns bounded two-capture logic, rc10, no-verdict output, and source-movement reporting",
+    "promotion": "DEFER",
+    "reason": "One clause is materially incomplete and the promotion precondition that depends on private snapshot semantics is not met for the test-hook input form."
+  },
+  "additional_finding": {
+    "path_normalization": "Fix snapshot() to convert absolute inputs under an explicit allowed root into a relative snapshot path, or reject absolute inputs with a clear environment error. Never let an absolute RHS escape the private root.",
+    "post_source_read": "The source post-hash is read after copied verification, but before the snapshot is declared complete. This is the stability check required by the contract, not a live evidence read used for the verdict. It does not violate clause 5 once lifecycle boundaries are explicit."
+  },
+  "no_claim": "No promotion, no claim that ARM 9 proves private-copy fidelity for absolute fixtures, and no claim that the implementation is universally third-party portable until path normalization is fixed."
+}

@@ -1,0 +1,46 @@
+{
+  "schema": "jev.usage-shape-shipped-audit.v1",
+  "generated_at": "2026-09-18T17:15:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit of shipped code",
+  "target_commit": "d807e65 + 059efc1",
+  "evidence": {
+    "run": "4,619 sessions / 488,724 usage records / 168,554,638,779 input tokens / 98.9% cache-read share",
+    "ubs": "user-reported 3 critical findings; source comments identify token-count output as the false-positive surface",
+    "tests": "no tests, mutation harness, or planted-positive control shipped in the target commit"
+  },
+  "completion": {
+    "live_level": "HONEST_FOR_THE_SINGLE_REAL-CORPUS_MEASUREMENT",
+    "full_section4": "NOT_DONE",
+    "reason": "The command actually ran offline over real session files with no key/network, so [live] accurately describes that measurement. It does not satisfy the full §4 bar: no deterministic tests, hostile refusal, planted-positive control, prior-art/oracle evidence, or EVAL row."
+  },
+  "findings": {
+    "denominator": {
+      "ruling": "PARTIAL_AND_POTENTIALLY_MISNAMED",
+      "evidence": "shape.mjs increments turns for every JSONL record carrying message.usage, regardless of explicit assistant-turn identity; records without usage increment noUsage and are excluded.",
+      "risk": "The README calls these billed turns and says 1,247,069 records were skipped. The code does not distinguish non-billed user/tool/session records from assistant/billed turns missing a usage block. A missing-usage assistant record would disappear from the denominator and could inflate a share.",
+      "required_fix": "Classify usage-bearing assistant turns separately from non-turn records and missing-usage assistant turns; publish both counts before treating the share as a billed-turn measurement."
+    },
+    "share_accounting": {
+      "ruling": "VISIBLE_BUT_NOT_FULLY_RECONCILED",
+      "evidence": "The code computes total as cacheRead + cacheWrite + input + output and ranks cacheRead against that total.",
+      "risk": "It does not read usage.cost.total and does not emit an explicit UNRECONCILED/residual row or provider accounting mode. The 98.9% figure is a token-field share, not a billed-cost share, and input/cache semantics are assumed by field presence."
+    },
+    "absence_claim": {
+      "ruling": "NOT_ENOUGH_PROOF_FOR_ABSENCE",
+      "evidence": "The README's 98.9% cache-read share implies the other levers are small, while no planted-positive control demonstrates recovery of a known shape and no mutation suite protects the accumulators.",
+      "required_fix": "Unit 2 must provide a synthetic known-shape session whose shares and denominator are recovered exactly."
+    },
+    "ubs": {
+      "ruling": "BOX_UNCHECKED_UNDER_REPORTED_RULE",
+      "evidence": "The reported UBS criticals are false positives on integer token-count output, but AGENTS §4 makes the changed-files UBS criterion conditional on TS/Python/Rust; this JavaScript demo still has a nonzero UBS result and no recorded clean waiver mechanism in the target commit.",
+      "decision": "Do not rename output or claim UBS exit 0. Record the false positive and keep the §4 box unchecked until the workspace's accepted UBS policy explicitly permits this JS false-positive disposition with a receipt."
+    },
+    "missing_controls": {
+      "ruling": "REAL_GAPS",
+      "items": ["no test suite", "no mutation harness", "no planted-positive known-shape control", "no EVAL row in the shipped target commit"]
+    }
+  },
+  "verdict": "PROBED_LIVE_NOT_VALIDATED",
+  "no_claim": "No claim that 98.9% generalizes, no claim that skipped records are all non-billed, no claim of billed-cost share, and no claim that §4 is complete."
+}

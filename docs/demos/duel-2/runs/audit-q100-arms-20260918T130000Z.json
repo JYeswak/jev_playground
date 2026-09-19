@@ -1,0 +1,28 @@
+{
+  "schema": "jev.q100-arm-audit.v1",
+  "generated_at": "2026-09-18T13:00:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author arm audit",
+  "findings": {
+    "arm9": {
+      "ruling": "PARTIAL_INDEPENDENT_PROOF",
+      "evidence": "ARM9 re-hashes snapshot files from disk and compares copy bytes to source_pre_raw, not to manifest copy_raw; this is independent of the copy_raw field.",
+      "limit": "The arm does not tamper with a copy after manifest creation, and its absolute JEV_STATUS/JEV_SIDECAR fixture form can map to itself, so it does not fully prove private-copy fidelity."
+    },
+    "force_moved": {
+      "ruling": "FAIL_SAFE_TEST_HOOK_WITH_OPERATIONAL_BOUND",
+      "evidence": "JEV_FORCE_MOVED unions a path into moved, causing recapture then rc10 on attempt 2; it cannot create a PASS.",
+      "risk": "It can suppress a real durable RED into TRANSIENT_UNSTABLE when the test hook is present, so the hook must be test-only and never operator-provided in production."
+    },
+    "identical_digest_line": {
+      "ruling": "NOT_SELF_DISCLOSING_ENOUGH",
+      "evidence": "Output can say moved: path c160... -> c160...; equal hashes show classification was forced only to someone who knows the hook.",
+      "repair": "Print forced=true/reason=test-hook or a separate forced_paths field; do not make readers infer from equal hashes."
+    },
+    "no_verdict": {
+      "ruling": "PASS",
+      "evidence": "_verify report is returned but not printed until after movement check; unstable path prints TRANSIENT_UNSTABLE/NO VERDICT only."
+    }
+  },
+  "overall": "ARM suite proves bounded transient control and manifest self-digest/copy checks, but ARM9 scope and forced-movement disclosure remain bounded findings."
+}

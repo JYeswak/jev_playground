@@ -1,0 +1,49 @@
+{
+  "schema": "jev.transient-implementation-audit.v1",
+  "generated_at": "2026-09-18T12:15:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "target": "scripts/lane-status.sh",
+  "target_commit": "cccaf39",
+  "contract": "docs/demos/duel-2/SPEC_transient_unstable_COD.md",
+  "findings": {
+    "snapshot_copy": {
+      "ruling": "MATERIAL_DEVIATION",
+      "implementation": "fingerprint before and after in the live tree; does not copy STATUS, sidecar, or referenced receipts into a private snapshot",
+      "contract": "requires an immutable private copy and verifier execution against that copy",
+      "impact": "A file can change after the first hash and before or during the scan, then change back before the final hash; that transient can be missed. A peer can also mutate the bytes the scan is reading. The before/after check detects many races, but it is not a snapshot boundary."
+    },
+    "normalized_hashes": {
+      "ruling": "MATERIAL_DEVIATION",
+      "implementation": "fingerprint uses raw shasum first 16 hex for STATUS, sidecar, and receipts",
+      "contract": "requires per-file raw SHA-256 plus normalized receipt hash where the existing convention defines one",
+      "impact": "The implementation detects all raw byte changes, including harmless terminal-newline changes, but does not expose the normalized digest pair required by the contract. It can produce transient instability for a formatting-only mutation and cannot prove the normalized identity used by STATUS."
+    },
+    "bounded_reexec": {
+      "ruling": "BOUND_IS_PRESENT_WITH_INPUT_VALIDATION_GAP",
+      "implementation": "JEV_TRANSIENT_ATTEMPT defaults to 1; first change execs with JEV_TRANSIENT_ATTEMPT=2; attempt >=2 returns rc10 without reexec",
+      "what_is_proven": "The child environment receives attempt=2 through env, so a normal first run has at most one recapture and two scans.",
+      "remaining_gap": "A caller can start with JEV_TRANSIENT_ATTEMPT=2 or a nonnumeric value and bypass the first-attempt semantics; nonnumeric comparison behavior is not an explicit fail-closed usage path. It does not create an unbounded loop, but the script should reject externally supplied attempts outside {1,2} or reserve the variable as internal-only."
+    },
+    "exit_10": {
+      "ruling": "NO_REPO_COLLISION_FOUND",
+      "evidence": "Repository search found exit 10 only in the transient specification/rule and lane-status implementation. Existing lane-status codes occupy 2-9; foundation stage aggregation treats any nonzero as RED but does not assign code 10 itself.",
+      "bound": "Foundation/gates.sh would collapse rc10 to stage RED if lane-status were ever wired; the structured lane-status output must carry TRANSIENT_UNSTABLE so callers do not misread aggregate RED as durable failure."
+    },
+    "sidecar_path": {
+      "ruling": "CONFIGURATION_DEFECT",
+      "implementation": "fingerprint hardcodes docs/demos/duel-2/runs/receipt-other-reasons.json",
+      "contract_risk": "verify-other-reasons.sh supports JEV_SIDECAR, but lane-status's fingerprint does not. A JEV_SIDECAR fixture or alternate sidecar can be scanned/verified without its actual input being fingerprinted; the canonical sidecar can change instead and cause unrelated instability.",
+      "repair": "Use the same JEV_SIDECAR default/path resolution as the verifier, and include the resolved path in the fingerprint manifest."
+    }
+  },
+  "clause_matrix": {
+    "private_snapshot": "FAILS",
+    "revision_hash_pair": "PARTIAL: HEAD plus raw path hashes, no normalized pair and no copied-input manifest",
+    "bounded_retry": "MOSTLY_PASS: two normal attempts, external counter validation incomplete",
+    "transient_exit": "PASS: rc10 and no-verdict text exist, subject to caller preserving the distinction",
+    "sidecar_configurability": "FAILS: canonical path hardcoded"
+  },
+  "ruling": "The implementation is a useful bounded before/after race detector, not a faithful implementation of the full Q92 snapshot contract. It must not be used to claim immutable snapshot verification or promoted sidecar safety until private-copy execution, normalized hashes, input-path configuration, and attempt validation land.",
+  "no_claim": "No claim that the observed ARM B/C behavior proves private snapshot semantics, no claim that exit 10 is consumed distinctly by foundation, and no claim that alternate JEV_SIDECAR inputs are protected."
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "jev.q103-fix-audit.v1",
+  "generated_at": "2026-09-18T13:45:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "inputs": ["34f1c16", "0e024ee", "scripts/verify-other-reasons.sh", "scripts/selftest-other-reasons.sh"],
+  "findings": {
+    "contained": {
+      "ruling": "LEXICAL_CONTAINMENT_MET_SYMLINK_CONTAINMENT_NOT_MET",
+      "evidence": "contained() strips absolute-root and .. components and both snapshot join sites use it; unmapped paths resolve inside the snapshot root.",
+      "symlink_gap": "Path.is_file() follows a symlink and read_bytes() copies the target bytes. An inward-looking path inside the repository can point outside it; the implementation does not reject symlinks or verify realpath containment. The snapshot then contains outward-target bytes under an apparently in-root source_path.",
+      "impact": "The verifier does not read live after copying, but it can admit an unapproved external source object into the snapshot. The Q99 re-examine condition explicitly listed symlink escape, so this is a live gap."
+    },
+    "force_moved": {
+      "ruling": "RED_MASKING_BLOCKED_FOR_TEST_HOOK",
+      "evidence": "If the underlying verifier rc is nonzero, JEV_FORCE_MOVED is refused and cannot convert that durable failure into rc10. If a real movement occurs on attempt 1 and a dirty verdict exists on attempt 2, the real movement still yields rc10/no verdict; that is correct instability, not forced laundering.",
+      "bound": "The hook can still manufacture a transient on a clean verdict; that is its intended test-only behavior. It must remain unavailable as an ordinary production input."
+    },
+    "forced_disclosure": {
+      "ruling": "STDOUT_DISCLOSURE_MET_MANIFEST_DISCLOSURE_NOT_MET",
+      "evidence": "Output marks forced=true and reason=JEV_FORCE_MOVED, with equal digests explicitly explained.",
+      "gap": "The manifest records movement and hashes but does not record forced=true/reason. A saved manifest alone cannot distinguish an observed movement from a forced test classification.",
+      "impact": "The arm result is transparent during execution but not fully evidence-carrying after the run."
+    },
+    "verdict_withholding": {
+      "ruling": "MET",
+      "evidence": "_verify output is held until movement classification; unstable returns TRANSIENT_UNSTABLE/NO VERDICT."
+    }
+  },
+  "ruling": "The fixes close the absolute-path escape and durable-RED force-laundering findings, but promotion remains blocked by symlink escape and missing forced provenance in the manifest."
+}

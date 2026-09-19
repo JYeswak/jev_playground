@@ -1,0 +1,44 @@
+{
+  "schema": "jev.foundation-stages-current-audit.v1",
+  "generated_at": "2026-09-18T17:30:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "stage_count": 9,
+  "runs": {
+    "normal": {
+      "producer_rc": 1,
+      "stages_passed": ["10", "20", "30", "50", "60", "70", "80", "90"],
+      "red": [{"stage":"40-omp-compact-replay","exit":1,"text":"compaction typecheck failed"}],
+      "aggregate": "FAILING"
+    },
+    "selftest": {
+      "producer_rc": 0,
+      "stages_passed": 9,
+      "aggregate": "ALL GREEN"
+    }
+  },
+  "weak_exit_zero_audit": {
+    "stage_90": {
+      "ruling": "FIXED_AGGREGATE_SEMANTICS",
+      "evidence": "Transient rc10 maps to stage exit 7; foundation now prints UNMEASURED and summary GREEN WITH N UNMEASURED rather than ALL GREEN."
+    },
+    "stage_80": {
+      "ruling": "WRAPPER_SELFTEST_NARROWER_THAN_NORMAL_PROOF",
+      "evidence": "Normal mode runs all globbed selftests; --selftest plants a missing suite and proves named ABSENT/RED. It does not independently rerun every child arm in its own selftest mode, so child discrimination is delegated to normal child execution."
+    },
+    "stage_40": {
+      "ruling": "CURRENT_NORMAL_RED_IS_VISIBLE",
+      "evidence": "Normal run returned exit 1 and aggregate printed RED compaction typecheck failed. Selftest mode passed its planted arms; those are not a claim that normal typecheck is green."
+    },
+    "other_stages": {
+      "ruling": "NO_WEAK_EXIT_ZERO_FOUND_FROM_CURRENT_PRODUCER_RUN",
+      "evidence": "10,20,30,50,60,70,80,90 printed PASS and returned zero in the normal run; selftest aggregate printed all stages PASS. A full semantic proof of every internal branch is outside this run."
+    }
+  },
+  "registry_ruling": {
+    "stage_count": "9 is current; stale four/six-stage prose is fixed or must be derived from the glob",
+    "summary_rule": "ALL GREEN is valid only when no stage is RED and unmeasured count is zero; UNMEASURED must remain visible.",
+    "normal_result": "The real suite is currently RED at stage 40; selftest green does not override that."
+  },
+  "no_claim": "No claim that every stage's internal branch is exhaustively audited, no claim normal foundation is green, and no claim selftest mode proves normal typecheck."
+}

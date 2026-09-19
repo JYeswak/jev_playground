@@ -1,0 +1,43 @@
+{
+  "schema": "jev.codh2.rung3-discharge.v1",
+  "generated_at": "2026-09-18T05:43:57Z",
+  "source_receipt": "docs/demos/duel-2/runs/codh2-rung3-provenance-20260918T070000Z.json",
+  "source_receipt_commit": "2818a57",
+  "source_receipt_sha256": "UNHASHED_EXTERNAL_RECEIPT",
+  "calls": 5,
+  "findings": [
+    {
+      "id": "P1",
+      "status": "PASS_BOUNDED",
+      "detail": "Requested model and echoed response model are jev-1.13.0 on all five status-200 calls; this upgrades the pin from assertion to response-echo evidence at the captured receipt layer. It is not an independent server audit."
+    },
+    {
+      "id": "P2",
+      "status": "PASS_BOUNDED",
+      "detail": "Five status-200 calls have varying input usage 439/444/438/434/420, uniform output 20, typed Noul answers, and probabilities 0.94/0.48/0.06/0.02/0.70. The first two reproduce Partial2 values independently. The receipt ceiling is accepted: no response ID/timestamp means no external request correlation."
+    },
+    {
+      "id": "P3",
+      "status": "PASS_BOUNDED",
+      "detail": "The absent-field statement is honest as written: every captured response body has response_id=null and timestamp=null, and the receipt states it checked answers/model/usage. This proves absence from captured JSON bodies, not absence from unrequested headers or server metadata."
+    },
+    {
+      "id": "P4",
+      "status": "DISCHARGED",
+      "detail": "No provenance blocker remains for rung3 at the stated ceiling. Remaining limits are explicit: no response ID/timestamp and N=5 is not calibration evidence; neither is a new provenance hold."
+    }
+  ],
+  "summary": {
+    "pin": "RECEIPT_PROVEN_AT_RESPONSE_ECHO_LEVEL",
+    "liveness": "SUFFICIENT_AT_DECLARED_CEILING",
+    "absent_fields": "HONEST_BOUNDED",
+    "rung3_hold": "DISCHARGED"
+  },
+  "missing_before_rung3_close": [],
+  "standing_limits": [
+    "No server response ID/timestamp is available for external correlation.",
+    "N=5 does not establish accuracy, coverage, or calibration.",
+    "Do not call this production safety certification."
+  ],
+  "failures": []
+}

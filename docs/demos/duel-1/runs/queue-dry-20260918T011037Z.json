@@ -1,0 +1,35 @@
+{
+  "schema": "jev.publish-redteam.queue-dry.v1",
+  "bead": "jev-publish-redteam-7s0",
+  "generated_at": "2026-09-18T01:10:37Z",
+  "status": "QUEUE_DRY",
+  "artifact_checked": "DUELING_WIZARDS_REPORT.md",
+  "artifact_present": false,
+  "considered": [
+    {
+      "candidate": "DUELING_WIZARDS_REPORT.md",
+      "decision": "rejected",
+      "reason": "artifact absent; no synthesis review can be claimed"
+    },
+    {
+      "candidate": "NEGATIVE_EVIDENCE R1",
+      "decision": "rejected",
+      "reason": "retry condition requires documented omp pane-to-live-session binding; no such surface was provided"
+    },
+    {
+      "candidate": "NEGATIVE_EVIDENCE R5",
+      "decision": "rejected",
+      "reason": "retry condition requires air-gapped operation or mirror drift/missing evidence; neither is present"
+    },
+    {
+      "candidate": "NEGATIVE_EVIDENCE R6",
+      "decision": "selected",
+      "reason": "oldest satisfiable retry condition: first-party TypeScript exists under compaction/src and compaction/ab/run-ab.ts"
+    }
+  ],
+  "selected": "NEGATIVE_EVIDENCE R6",
+  "selected_retry_condition": "Lane gains first-party code; ubs applies from that commit onward and exit 3 is never green.",
+  "queue_action": "Name R6 as the next satisfiable retry; do not run ubs in this queue-dry unit.",
+  "next": "Conductor dispatches R6 UBS evidence or a later DUELING_WIZARDS_REPORT.md review; pane 2 starts nothing unprompted.",
+  "no_claim": "No synthesis artifact was reviewed and no UBS scan was run in this queue-dry unit."
+}

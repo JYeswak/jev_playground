@@ -1,0 +1,34 @@
+{
+  "schema": "jev.stage90-wrapper-audit.v1",
+  "generated_at": "2026-09-18T17:00:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "target": "foundation/gates.d/90-sidecar-verifier-wrapper.sh",
+  "commands": {
+    "foundation_gates": "ALL GREEN 9 stages rc0",
+    "foundation_selftest": "ALL GREEN 9 stages rc0",
+    "stage90_known_branches": "rc0 clean, rc10 transient unmeasured, rc13 symlink durable fail, rc2 environment durable fail"
+  },
+  "findings": {
+    "transient_mapping": {
+      "ruling": "STAGE_LOCAL_CORRECT_AGGREGATE_LOSS",
+      "evidence": "Stage 90 prints UNMEASURED, not PASS or FAIL, and exits 0 for rc10 as required by the hard constraint.",
+      "defect": "foundation/gates.sh sees only code 0 and prints PASS stage90; it discards the captured UNMEASURED text. A reader of the aggregate cannot distinguish 'nothing was verified' from a clean PASS.",
+      "required_fix": "Teach foundation/gates.sh or its stage protocol a nonblocking UNMEASURED result, or emit a durable machine-readable stage status that the aggregate preserves. Do not map rc10 directly to ordinary PASS text."
+    },
+    "rc13": {
+      "ruling": "CORRECT_DURABLE_FAIL",
+      "evidence": "Stage 90 maps symlink escape rc13 to exit 1 and prints durable evidence defect text."
+    },
+    "rc2": {
+      "ruling": "REASONABLE_DURABLE_STAGE_FAIL",
+      "evidence": "Missing STATUS/sidecar is an environment/input failure and stage 90 maps it to exit 1. It is not a verifier RED, but it must not produce a green foundation run."
+    },
+    "consumer_fields": {
+      "ruling": "PRESENT",
+      "evidence": "Stage source records consumer, gate, observed defect classes, and retirement condition."
+    }
+  },
+  "overall": "Stage-local transient semantics are correct; aggregate foundation output loses the distinction and currently overstates rc10 as PASS. The wrapper is not fully honest at the foundation edge until UNMEASURED survives aggregation.",
+  "no_claim": "No claim that ALL GREEN foundation output means every stage was verified; no claim that rc10 is durable failure."
+}

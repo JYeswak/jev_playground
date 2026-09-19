@@ -1,0 +1,156 @@
+[
+ {
+  "sha": "fcdeca30687e6857b18b8d30e1518f881e2c9f7c",
+  "short": "fcdeca3",
+  "subject": "feat(gate): Jev clears its preregistered bar as a tool-call gate -- AUC 0.974, 0/20 false positives [live]",
+  "label": "worse",
+  "stat": " docs/demos/ORACLE-MANIFEST.tsv                     |  2 +-\n docs/demos/STATUS.tsv                              |  1 +\n .../bicameral-gate-adoption-20260919.md            | 60 ++++++++++++++++\n work/bicameral-gate/commands.json                  | 47 +++++++++++++\n work/bicameral-gate/oracle.mjs     "
+ },
+ {
+  "sha": "eb99a33db454ec8aaaf90d8192c7e18b8b7a54a4",
+  "short": "eb99a33",
+  "subject": "feat(fidelity): a hindsight oracle for Jev's keep/drop, and it scores no better than random [live]",
+  "label": "worse",
+  "stat": " TESTS.md                          |   6 ++\n compaction/hindsight.ts           | 206 ++++++++++++++++++++++++++++++++++++++\n compaction/test/hindsight.test.ts |  59 +++++++++++\n 3 files changed, 271 insertions(+)\n"
+ },
+ {
+  "sha": "50c57b7054d771034dc77553a38d16b0add8727f",
+  "short": "50c57b7",
+  "subject": "feat(adapter): read omp's on-disk sessions -- first compaction measured on a file omp wrote [live]",
+  "label": "worse",
+  "stat": " TESTS.md                        |  6 ++++--\n compaction/src/omp-adapter.ts   | 11 ++++++++++-\n compaction/test/adapter.test.ts | 39 +++++++++++++++++++++++++++++++++++++++\n 3 files changed, 53 insertions(+), 3 deletions(-)\n"
+ },
+ {
+  "sha": "7cdb58f5ecc5babdafd6f8713a2bbd2f11a3dff6",
+  "short": "7cdb58f",
+  "subject": "fix(installer): the install command failed from a clean clone too [live]",
+  "label": "worse",
+  "stat": " compaction/README.md              | 11 ++++++++++-\n compaction/install-jev-compact.sh | 16 +++++++++++++++-\n 2 files changed, 25 insertions(+), 2 deletions(-)\n"
+ },
+ {
+  "sha": "62595a231edb0276d59ddb1403cf879e165328b4",
+  "short": "62595a2",
+  "subject": "fix(installer): re-install never refreshed the skill -- it nested a copy and printed PASS [test]",
+  "label": "worse",
+  "stat": " compaction/install-jev-compact.sh | 18 +++++++++++++++++-\n 1 file changed, 17 insertions(+), 1 deletion(-)\n"
+ },
+ {
+  "sha": "221a466818fea5a4154ba1bf0bf1ece3c533a49e",
+  "short": "221a466",
+  "subject": "fix(installer): protect the vendored sources too -- the same data-loss bug, one level down [test]",
+  "label": "worse",
+  "stat": " compaction/install-jev-compact.sh | 15 +++++++++++++--\n 1 file changed, 13 insertions(+), 2 deletions(-)\n"
+ },
+ {
+  "sha": "b234b2d3c22e3d4c8a578f981d31bbb99b99a052",
+  "short": "b234b2d",
+  "subject": "fix(installer): re-install silently destroyed a user's edited hook [test]",
+  "label": "worse",
+  "stat": " compaction/install-jev-compact.sh | 10 ++++++++++\n 1 file changed, 10 insertions(+)\n"
+ },
+ {
+  "sha": "715d07bec9721dd3a71cbdc89c9f885b793a569a",
+  "short": "715d07b",
+  "subject": "feat(scripts): harvest the lane's own NO-CLAIM lines into a work frontier [test]",
+  "label": "worse",
+  "stat": " scripts/noclaim-harvest.sh | 50 ++++++++++++++++++++++++++++++++++++++++++++++\n 1 file changed, 50 insertions(+)\n"
+ },
+ {
+  "sha": "b307ba640d9b1a7319ee87efea9a3f422b60864e",
+  "short": "b307ba6",
+  "subject": "fix(publish): the export scanner blocked a clean publish on prose [test]",
+  "label": "better",
+  "stat": " scripts/publish-export.sh | 6 +++++-\n 1 file changed, 5 insertions(+), 1 deletion(-)\n"
+ },
+ {
+  "sha": "762cfd1e22c04e8faece8b7dc8389609cb200da3",
+  "short": "762cfd1",
+  "subject": "docs(skillranker): jev-0bp BLOCKED -- local Rust builds are denied by construction, and we will not dodge it [oracle]",
+  "label": "better",
+  "stat": " docs/demos/upstream-repro/skillranker-20260919.md | 41 +++++++++++++++++++++++\n 1 file changed, 41 insertions(+)\n"
+ },
+ {
+  "sha": "9ac58ee3867af5ab138ad32e6fad038de28e1881",
+  "short": "9ac58ee",
+  "subject": "docs(readme): commit-miner graded our own history, and mostly beat our prefixes [oracle]",
+  "label": "better",
+  "stat": " README.md | 2 +-\n 1 file changed, 1 insertion(+), 1 deletion(-)\n"
+ },
+ {
+  "sha": "dc2756e8bcd39c7d49f3e96baa5a38561ff49c59",
+  "short": "dc2756e",
+  "subject": "docs(readme): document --mine, and put the demo's measured limit in public [test]",
+  "label": "better",
+  "stat": " README.md | 18 ++++++++++++++++++\n 1 file changed, 18 insertions(+)\n"
+ },
+ {
+  "sha": "ea914a8539aba4b55c3401bf82cbe7f4a288bc07",
+  "short": "ea914a8",
+  "subject": "[test] docs(duel-2): redteam sweep findings, 0 emergencies (jev-demo-loop-a1q)",
+  "label": "better",
+  "stat": " docs/demos/duel-2/runs/publish-redteam-20260918T153930Z.json | 1 +\n 1 file changed, 1 insertion(+)\n"
+ },
+ {
+  "sha": "565dbf6fb1ac38eafa0ea5b735d7d23fb5b4b79b",
+  "short": "565dbf6",
+  "subject": "test(demo-1): plant 7 mutations in the shipping code; 4 caught, 3 holes named [mutation]",
+  "label": "better",
+  "stat": " demos/routing-backtest/tools/mutation-harness.mjs | 137 ++++++++++++++++++++++\n 1 file changed, 137 insertions(+)\n"
+ },
+ {
+  "sha": "97af38802cffd7e6c1a5c75c5db4a5c3f983fba6",
+  "short": "97af388",
+  "subject": "docs(dispatch): Q104 close the numeral hits, Q105 fourth promotion re-rule [pending]",
+  "label": "better",
+  "stat": " .../duel-2/dispatch/pane2-q105-fourth-rerule.md    | 83 ++++++++++++++++++++++\n .../duel-2/dispatch/pane3-q104-close-the-hits.md   | 83 ++++++++++++++++++++++\n 2 files changed, 166 insertions(+)\n"
+ },
+ {
+  "sha": "99c92b87b3ae0021d85977782f32e1228531387b",
+  "short": "99c92b8",
+  "subject": "fix(ruling): CURRENT STATE block \u2014 the product contradicted itself, and append-only is why [oracle]",
+  "label": "better",
+  "stat": " docs/demos/RULING.md | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++--\n 1 file changed, 66 insertions(+), 2 deletions(-)\n"
+ },
+ {
+  "sha": "f8b8cb8f66e336a86758fb3bcc5c6f169b08080b",
+  "short": "f8b8cb8",
+  "subject": "[test] docs(duel-2): Q63 git-is-watcher holds, 7 changes 0 trips (jev-demo-loop-a1q)",
+  "label": "better",
+  "stat": " .../runs/score-edit-lineage-20260918T085146Z.json  |  1 +\n .../ubs-provenance-codh2-20260918T090000Z.json     | 39 ++++++++++++++++++++++\n 2 files changed, 40 insertions(+)\n"
+ },
+ {
+  "sha": "8a99920ca03be9163e993d6ad1393ad5d9ae6eb6",
+  "short": "8a99920",
+  "subject": "docs(duel-2): resolve MU-H3 prevalence measurability [pending]",
+  "label": "better",
+  "stat": " .../duel-2/HELD_MUH3_prevalence_measurable_COD.md  | 124 +++++++++++++++++++++\n 1 file changed, 124 insertions(+)\n"
+ },
+ {
+  "sha": "26de7edd761b3a7464f6cdd06eacdb7d53515862",
+  "short": "26de7ed",
+  "subject": "feat(rung4): \u00a74n labels priced at ~90 min, price verified first-party; one authorship gap left [test]",
+  "label": "better",
+  "stat": " docs/demos/PLAN.md  | 61 +++++++++++++++++++++++++++++++++++++++++++++++++++++\n docs/demos/QUEUE.md | 26 +++++++++++++++++++++++\n 2 files changed, 87 insertions(+)\n"
+ },
+ {
+  "sha": "e9a59c6f430faf7d5c4ad2a152ea9b31a99a3d01",
+  "short": "e9a59c6",
+  "subject": "test(queue): finish Q8 hunt score audit [test]",
+  "label": "better",
+  "stat": " docs/demos/QUEUE.md | 2 +-\n 1 file changed, 1 insertion(+), 1 deletion(-)\n"
+ },
+ {
+  "sha": "db1e541efb738d33e3597a5919a2cd9d90a984a3",
+  "short": "db1e541",
+  "subject": "[test] docs(duel-2): Q9 run, COD-H2 label-free HEALTHY 37.3% surface (jev-demo-loop-a1q)",
+  "label": "better",
+  "stat": " .../runs/codh2-labelfree-20260918T040016Z.json     | 641 +++++++++++++++++++++\n .../runs/codh2-labelfree-20260918T040016Z.md       |  54 ++\n 2 files changed, 695 insertions(+)\n"
+ },
+ {
+  "sha": "6c101d5ea51bfa6243dcf9d0db9d3a09383e0a14",
+  "short": "6c101d5",
+  "subject": "[pending] docs(duel-2): demand hunt, TODO judge 900 beats backlog (jev-demo-loop-a1q)",
+  "label": "better",
+  "stat": " docs/demos/duel-2/DEMAND_HUNT_MU.md | 141 ++++++++++++++++++++++++++++++++++++\n 1 file changed, 141 insertions(+)\n"
+ }
+]

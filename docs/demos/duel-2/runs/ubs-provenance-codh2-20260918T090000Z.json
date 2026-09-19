@@ -1,0 +1,39 @@
+{
+  "schema": "jev.ubs-provenance-codh2.v2",
+  "generated_at": "2026-09-18T09:00:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "unit": "Q18",
+  "target": "demos/preaction-abstention/src",
+  "prior_hold": "UBS reported two criticals but did not emit per-finding locations; pane 3 adjudicated a CLI-flag string comparison and a typeof check as false positives.",
+  "code_review": [
+    {
+      "finding_label": "CLI-flag string comparison",
+      "location": "demos/preaction-abstention/src/run.mjs:48",
+      "code": "if (args.asker === 'jev') {",
+      "classification": "FALSE_POSITIVE_CONFIRMED",
+      "reason": "This compares a parsed command-line mode selector with the literal mode name 'jev'. It does not compare secret material, authenticate a value, or treat a credential as a flag. The related parser comparisons at run.mjs:11-13 likewise compare fixed option names (--cases, --asker, --out)."
+    },
+    {
+      "finding_label": "typeof check",
+      "location": "demos/preaction-abstention/src/gate.mjs:66",
+      "code": "if (!a || !('noul' in a) || typeof a.noul !== 'number' || !Number.isFinite(a.noul)) {",
+      "classification": "FALSE_POSITIVE_CONFIRMED",
+      "reason": "This validates the external asker's numeric response shape before using it as a probability. It is a type/finite-number guard, not a secret comparison or credential authorization check. A malformed response throws into the caller's withhold path."
+    }
+  ],
+  "adjacent_candidate_site": {
+    "location": "demos/preaction-abstention/src/jev-client.mjs:17",
+    "code": "headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' },",
+    "classification": "NOT_ONE_OF_THE_TWO_NAMED_FINDINGS",
+    "reason": "This is the credential-bearing request header site, but it contains no comparison. It is relevant context for why UBS may flag the file, not evidence that either named finding is real."
+  },
+  "provenance_limit": {
+    "ruling": "UNASKABLE",
+    "reason": "Both reviewed code sites are semantically benign, but the scanner output does not map critical IDs to those sites. Code review cannot prove that these are the exact two findings UBS emitted.",
+    "prior_rerun": "The recorded JSON, SARIF, and verbose reruns took approximately 19 seconds and still emitted two criticals without per-finding locations.",
+    "retry_condition": "A UBS version or alternative scanner emits stable per-finding locations/IDs for the same tracked commit and maps both criticals to these sites or another reviewed site.",
+    "worth_running_now": false,
+    "why": "Repeating the same location-less instrument would reproduce the count, not resolve provenance. A location-emitting scanner rerun is worth the cost when available."
+  },
+  "no_claim": "No unconditional security clearance, no claim that UBS is wrong as an instrument, and no claim that the two benign sites are definitively the scanner's emitted criticals."
+}

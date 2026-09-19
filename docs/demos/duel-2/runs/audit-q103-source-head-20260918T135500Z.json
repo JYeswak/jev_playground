@@ -1,0 +1,26 @@
+{
+  "schema": "jev.q103-source-head-audit.v1",
+  "generated_at": "2026-09-18T13:55:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "question": "what is source_head load-bearing for if evidence verdict is reproducible without live git?",
+  "finding": {
+    "immediate_verdict_validity": "source_head is not required to recompute the sidecar verdict from copied STATUS/sidecar/receipts; the outsider rerun proved this with no-head.",
+    "provenance": "source_head is load-bearing provenance: it identifies the repository revision the capture claims to describe, lets a third party locate the intended verifier/spec/source context, and distinguishes two byte-identical evidence snapshots captured under different code revisions.",
+    "reproducibility_bound": "source_head alone is insufficient for uncommitted changes; it must be paired with the per-file source pre/post/copy hashes and, for exact verifier reproduction, a verifier source digest or bundled verifier artifact.",
+    "ruling": "KEEP source_head in the manifest, but label it provenance rather than evidence-verdict input. Add verifier source digest/bundle identity if exact executable reproduction is claimed."
+  },
+  "what_no_head_means": "The outsider rerun can still validate evidence and return the sidecar verdict with source_head=no-head. That demonstrates data-level reproducibility, not full implementation-level reproducibility.",
+  "required_manifest_semantics": {
+    "source_head": "provenance pointer to repository revision when available",
+    "dirty_tree": "must be represented by source file hashes; HEAD must not be treated as a complete working-tree identity",
+    "verifier_identity": "source digest or bundled executable/source revision required for exact automatic rerun claims",
+    "evidence_identity": "per-file raw/normalized hashes remain the authoritative copied-byte identity"
+  },
+  "reexamination": [
+    "source_head is absent for a production capture and no source hashes are present",
+    "verifier source changes without a verifier digest/bundle change",
+    "a consumer treats source_head as proof of a clean tree",
+    "third-party rerun disagrees despite matching evidence hashes"
+  ],
+  "no_claim": "No claim that source_head alone proves working-tree state, no claim that no-head invalidates the evidence verdict, and no claim of exact executable reproduction without verifier identity."
+}

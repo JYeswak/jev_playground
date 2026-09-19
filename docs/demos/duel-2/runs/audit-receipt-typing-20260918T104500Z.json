@@ -1,0 +1,144 @@
+{
+  "schema": "jev.receipt-typing-audit.v1",
+  "generated_at": "2026-09-18T10:45:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit of pane3 receipt typing",
+  "dependency": {
+    "path": "docs/demos/duel-2/TYPING_receipts_MU.md",
+    "present": true,
+    "opened": true
+  },
+  "population": {
+    "source": "docs/demos/STATUS.tsv",
+    "rows": 17,
+    "typing_artifact": "docs/demos/duel-2/TYPING_receipts_MU.md",
+    "typing_artifact_distribution": {
+      "measurement": 6,
+      "hold-resolution": 3,
+      "verdict": 4,
+      "score": 1,
+      "other": 3
+    }
+  },
+  "pre_registration": {
+    "seed_receipt": "docs/demos/duel-2/runs/audit-receipt-typing-seed-20260918T104000Z.json",
+    "seed_commit": "61000d1",
+    "seed": 20260918,
+    "selection": "mulberry32 + Fisher-Yates, first 8 of 17, no replacement",
+    "sample_n": 8,
+    "agreement_bar": ">=7/8 exact type agreement; all sampled score and hold-resolution rows must agree",
+    "declared_before_sampling": true
+  },
+  "sample": [
+    {
+      "status_index": 1,
+      "candidate": "demo-1-route-backtest",
+      "receipt": "demos/routing-backtest/runs/backtest-real-excerpt.json",
+      "pane3_type": "measurement",
+      "pane2_retype": "measurement",
+      "agreement": true,
+      "content_evidence": "route-backtest receipt has denominator, sessions, perModel, totals, turns, priceTable, and failures; no grade or standing ruling is the primary act",
+      "filename_used_as_discriminator": false
+    },
+    {
+      "status_index": 10,
+      "candidate": "COD-H1-snapshot-completion",
+      "receipt": "docs/demos/duel-2/runs/codh41-labelfree-20260918T054800Z.json",
+      "pane3_type": "measurement",
+      "pane2_retype": "measurement",
+      "agreement": true,
+      "content_evidence": "JSON contains h1/h4 label-free checks, counts, transcript shapes, failures, and UNASKABLE threshold outcomes; no top-level score/standing verdict act",
+      "filename_used_as_discriminator": false
+    },
+    {
+      "status_index": 13,
+      "candidate": "COD-H4-toolresult-replay",
+      "receipt": "docs/demos/duel-2/runs/codh41-labelfree-20260918T054800Z.json",
+      "pane3_type": "measurement",
+      "pane2_retype": "measurement",
+      "agreement": true,
+      "content_evidence": "same opened measurement object as COD-H1; shared receipt does not change its primary speech act",
+      "filename_used_as_discriminator": false
+    },
+    {
+      "status_index": 4,
+      "candidate": "demo-4-foreman-lite",
+      "receipt": "docs/demos/duel-2/SUPERSESSION_MU_argues_COD-H1.md",
+      "pane3_type": "verdict",
+      "pane2_retype": "verdict",
+      "agreement": true,
+      "content_evidence": "document has a dedicated Verdict section and standing supersession/slot conclusion; scores are arguments for the ruling",
+      "filename_used_as_discriminator": false
+    },
+    {
+      "status_index": 17,
+      "candidate": "MU-H3-runtime-redaction",
+      "receipt": "docs/demos/duel-2/RUNG2_MU-H3_entropy_COD.md",
+      "pane3_type": "measurement",
+      "pane2_retype": "measurement",
+      "agreement": true,
+      "content_evidence": "explicit deterministic sentinel measurement with threshold table, recall, false-positive, and precision columns; no Jev call or production verdict as primary act",
+      "filename_used_as_discriminator": false
+    },
+    {
+      "status_index": 12,
+      "candidate": "COD-H3-price-drift-auditor",
+      "receipt": "docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md",
+      "pane3_type": "verdict",
+      "pane2_retype": "verdict",
+      "agreement": true,
+      "content_evidence": "explicit RULED OUT ruling with retry tracks; structural reasoning supports the standing decision",
+      "filename_used_as_discriminator": false
+    },
+    {
+      "status_index": 15,
+      "candidate": "MU-H1-todo-judge",
+      "receipt": "docs/demos/duel-2/runs/muh1-marker-census-20260918T034820Z.json",
+      "pane3_type": "measurement",
+      "pane2_retype": "measurement",
+      "agreement": true,
+      "content_evidence": "JSON is a marker census with study denominator, distribution, failures, repositories, and interpretation; threshold outcome is measurement output",
+      "filename_used_as_discriminator": false
+    },
+    {
+      "status_index": 11,
+      "candidate": "COD-H2-preaction-abstention",
+      "receipt": "docs/demos/duel-2/runs/label-id-mapping-20260918T073641Z.json",
+      "pane3_type": "other",
+      "pane2_retype": "other",
+      "agreement": true,
+      "content_evidence": "JSON maps two label sets, verifies row identity and SHA links, and reports discrepancies; it is mapping/derivation, not score, measurement, verdict, or hold disposition",
+      "filename_used_as_discriminator": false
+    }
+  ],
+  "agreement": {
+    "rows": 8,
+    "exact_agreement": 8,
+    "rate": 1.0,
+    "bar": ">=7/8",
+    "bar_result": "PASS",
+    "score_rows_sampled": 0,
+    "hold_resolution_rows_sampled": 0,
+    "critical_type_bar": "NOT_EXERCISED: no sampled row was score or hold-resolution",
+    "caveat": "The 8/8 result validates the sampled content discriminators but does not test the two most failure-sensitive enum classes."
+  },
+  "enum_ruling": {
+    "other_count": 3,
+    "other_share": 0.1765,
+    "other_members": [
+      "demo-3 design",
+      "COD-H2 mapping",
+      "MU-H2 design"
+    ],
+    "adequacy": "SAFE_FAIL_CLOSED_BUT_SEMANTICALLY_INCOMPLETE",
+    "reason": "other is the honest non-inferential fallback and prevents design/mapping artifacts from being miscalled scores or verdicts. But two recurring speech acts are visible: design/proposal and mapping/derivation. An 18% other share is high enough to indict the vocabulary for analytics and future routing, though not high enough to invalidate the current fail-closed enum.",
+    "recommendation": "Keep other as the required fallback; add design and mapping (or derivation) in the next enum migration, with a reason field retained for unresolved cases."
+  },
+  "discriminator_audit": {
+    "filename_inference_found": false,
+    "basis": "Every sampled assignment was made from opened JSON keys/values or markdown status/ruling content. Receipt paths were used for lookup only, never as type evidence.",
+    "remaining_risk": "Pane3's full 17-row document must be re-audited when score and hold-resolution rows are sampled; this sample did not exercise those classes."
+  },
+  "ruling": "Pane3's sampled typing is sound at 8/8 and satisfies the pre-registered overall bar. The enum's other fallback is correct but signals a vocabulary gap, not a typing error. No filename-derived discriminator was found.",
+  "no_claim": "No claim of full-population independent agreement, no exercised critical-type agreement, and no claim that the enum is complete for future receipt classes."
+}

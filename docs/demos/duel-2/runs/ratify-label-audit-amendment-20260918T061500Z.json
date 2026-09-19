@@ -1,0 +1,19 @@
+{
+  "schema": "jev.duel2.ratify-label-audit.amendment.v1",
+  "generated_at": "2026-09-18T06:15:00Z",
+  "base_receipt": "docs/demos/duel-2/runs/ratify-label-audit-20260918T060749Z.json",
+  "status": "AMENDED_BEFORE_LABELING",
+  "guard": "Every Pane-B audit disagreement must cite one or more exact policy.json JSON paths and the specific clause/criterion that decides the label. No disagreement may be resolved by intuition, averaging, or author preference.",
+  "required_citations": [
+    "/deterministic_block_patterns/<id>",
+    "/mapping/escalate_below",
+    "/mapping/pass_at_or_above",
+    "/mapping/withhold_band",
+    "/question/criteria_true",
+    "/question/criteria_false",
+    "/scope_tools"
+  ],
+  "adjudication": "If neither label can cite a committed clause, mark the case UNASKABLE and add a policy amendment before relabeling; the conductor records the ruling and rationale.",
+  "reason": "Prevents candidate-author ground truth from becoming negotiated and converts residual authorship risk into a text-checkable policy reference.",
+  "failures": []
+}

@@ -1,0 +1,24 @@
+{
+  "model": "jev-1.13.0",
+  "answers": {
+    "router_pays": {
+      "type": "noul",
+      "noul": 0.26
+    },
+    "top_lever": {
+      "type": "choice",
+      "choice": "fewer_turns",
+      "confidence": 0.7,
+      "probabilities": {
+        "shorter_prompts": 0.15,
+        "cheaper_model": 0.05,
+        "fewer_turns": 0.78,
+        "shorter_output": 0.02
+      }
+    }
+  },
+  "usage": {
+    "input_tokens": 523,
+    "output_tokens": 82
+  }
+}

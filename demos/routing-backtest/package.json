@@ -1,0 +1,15 @@
+{
+  "name": "jev-route-backtest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Read-only counterfactual model-routing backtest for omp session logs.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test",
+    "backtest": "node bin/backtest.mjs",
+    "mutate": "node tools/mutation-harness.mjs"
+  }
+}

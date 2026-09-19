@@ -1,0 +1,26 @@
+{
+  "schema": "jev.current-tick.sidecar-promotion.v1",
+  "generated_at": "2026-09-18T16:00:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "arm_count": {
+    "observed": 17,
+    "command": "./scripts/selftest-other-reasons.sh",
+    "producer_rc": 0,
+    "all_passed": true,
+    "meaning": "17 discriminating arms, including containment, transient, manifest, provenance, malformed STATUS, and symlink/hardlink policy arms."
+  },
+  "promotion": {
+    "ruling": "PROMOTE_TO_FOUNDATION_WRAPPER",
+    "not_commit_hook": true,
+    "reason": "The arm count is 17, not 14, and the implementation has the Q97 snapshot/transient prerequisites. Keeping it indefinitely hand-run would make it process under the new tick boundary. Promotion must be through a foundation wrapper, not direct commit wiring."
+  },
+  "required_edge_contract": {
+    "consumer": "foundation/gates.sh",
+    "gate": "sidecar metadata integrity",
+    "observed_defects": ["exact other-row coverage", "digest mismatch", "locator mismatch", "provenance absence", "short-row masking", "snapshot/transient races"],
+    "retirement_condition": "retire or demote only after a replacement verifier consumes the same sidecar contract with equal or stronger arms and a recorded migration; never delete because the current run is green",
+    "transient_rc10": "foundation wrapper must distinguish TRANSIENT_UNSTABLE from durable RED; direct aggregation of rc10 as ordinary durable RED is not acceptable"
+  },
+  "current_boundary": "The current stage-80 selftest is support evidence, not verifier wiring. The next implementation is the wrapper that runs the verifier against a stable snapshot and maps transient to UNMEASURED rather than durable gate failure.",
+  "no_claim": "No claim that the foundation wrapper is implemented, no commit-hook wiring, and no claim that 17 arms makes the current hand-run verifier a consumer by itself."
+}

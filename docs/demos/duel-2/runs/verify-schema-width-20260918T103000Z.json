@@ -1,0 +1,53 @@
+{
+  "schema": "jev.schema-width-verification.v1",
+  "generated_at": "2026-09-18T10:30:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author verification",
+  "target_commit": "b75e0a1",
+  "commands": [
+    {
+      "command": "bash scripts/selftest-lane-status-integrity.sh",
+      "producer_exit": 0,
+      "arms": 12,
+      "all_passed": true
+    },
+    {
+      "command": "printf 'a\\037b\\037\\n' | awk -F'\\037' '{print NF}'",
+      "producer_exit": 0,
+      "result": 3,
+      "meaning": "trailing empty field is counted; a 9-column row with empty column 9 remains width 9"
+    }
+  ],
+  "findings": {
+    "arm_11": {
+      "ruling": "REAL_MIGRATION_PROOF_FOR_STRUCTURAL_PARSER",
+      "evidence": "The fixture is changed from nine to ten fields, JEV_EXPECTED_COLS=10 is set, the parser reads ten variables including receipt_type, and the pinned digest remains clean with rc=0 and expected_cols=10.",
+      "bound": "The arm proves the tenth field is structurally consumed rather than folded into digest; it does not prove receipt_type's semantic enum is validated."
+    },
+    "trailing_empty_width": {
+      "ruling": "CORRECT",
+      "evidence": "BSD awk with FS=0x1f reports NF=3 for a-b-empty, so an empty final field is retained. Unpinned nine-column rows do not false-fail width solely because column 9 is empty."
+    },
+    "schema_precedence": {
+      "ruling": "ACCEPTABLE_FAIL_CLOSED_PRECEDENCE",
+      "evidence": "Malformed rows still print missing/drift/concurrence counters, but rc=8 dominates because those counters are unreliable on a malformed row. This is not the old masking defect: diagnostics are emitted and the exit explicitly names schema failure.",
+      "remaining_gap": "No selftest combines schema error with missing receipt/concurrence; the code path reports all counters and returns rc=8, but that combined precedence is not directly armed."
+    },
+    "commit_claims": {
+      "claim": "exact width validation, schema rc=8 ranked first, ARM 9/10 revised, ARM 11 migration, ARM 12 rc7",
+      "ruling": "SUPPORTED",
+      "bound": "The claim that bumping EXPECTED_COLS is the migration is true for the current structural parser, but future semantic receipt_type validation remains outside this arm."
+    }
+  },
+  "exit_matrix_observed": {
+    "0": "clean and ten-column migration fixture",
+    "3": "missing receipt alone",
+    "4": "digest drift alone",
+    "5": "missing concurrence alone",
+    "6": "missing receipt plus concurrence",
+    "7": "drift plus concurrence",
+    "8": "wrong field count",
+    "2": "environment/state error remains code path, not a selftest arm"
+  },
+  "ruling": "Q70's blocker is closed for the structural parser: Q19's column 10 can be added after EXPECTED_COLS is migrated to 10. Add semantic receipt_type validation separately; do not treat ARM 11 as proving it."
+}

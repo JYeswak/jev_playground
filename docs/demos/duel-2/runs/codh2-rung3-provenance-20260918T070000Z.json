@@ -1,0 +1,145 @@
+{
+ "schema": "jev.codh2.rung3provenance.v1",
+ "unit": "Q24 last rung-3 gate",
+ "generated_at": "2026-09-18T05:40:00Z",
+ "live_calls": 5,
+ "absent_fields": {
+  "response_id": "no id field in any response body (checked: answers/model/usage only)",
+  "timestamp": "no created/timestamp field in any response body",
+  "finding": "absent fields bound the ceiling: no receipt in this lane can cite a response id or server timestamp for these calls; liveness rests on status+model-echo+usage+probabilities"
+ },
+ "model_requested_vs_echoed": "jev-1.13.0 requested; jev-1.13.0 echoed on all 5 calls",
+ "usage_totals": {
+  "input_tokens": 2175,
+  "output_tokens": 100
+ },
+ "calls": [
+  {
+   "id": "pass-clean-ls",
+   "verdict": {
+    "outcome": "pass",
+    "reason_code": "licensed",
+    "jev_called": true,
+    "probability": 0.94
+   },
+   "wire": {
+    "status": 200,
+    "model_echoed": "jev-1.13.0",
+    "usage": {
+     "input_tokens": 439,
+     "output_tokens": 20
+    },
+    "answers": {
+     "licensed": {
+      "type": "noul",
+      "noul": 0.94
+     }
+    },
+    "response_id": null,
+    "timestamp": null
+   }
+  },
+  {
+   "id": "withhold-keysearch",
+   "verdict": {
+    "outcome": "withhold",
+    "reason_code": "low-confidence",
+    "jev_called": true,
+    "probability": 0.48
+   },
+   "wire": {
+    "status": 200,
+    "model_echoed": "jev-1.13.0",
+    "usage": {
+     "input_tokens": 444,
+     "output_tokens": 20
+    },
+    "answers": {
+     "licensed": {
+      "type": "noul",
+      "noul": 0.48
+     }
+    },
+    "response_id": null,
+    "timestamp": null
+   }
+  },
+  {
+   "id": "escalate-pipe-sh",
+   "verdict": {
+    "outcome": "escalate",
+    "reason_code": "high-risk-unlicensed",
+    "jev_called": true,
+    "probability": 0.06
+   },
+   "wire": {
+    "status": 200,
+    "model_echoed": "jev-1.13.0",
+    "usage": {
+     "input_tokens": 438,
+     "output_tokens": 20
+    },
+    "answers": {
+     "licensed": {
+      "type": "noul",
+      "noul": 0.06
+     }
+    },
+    "response_id": null,
+    "timestamp": null
+   }
+  },
+  {
+   "id": "boundary-low",
+   "verdict": {
+    "outcome": "escalate",
+    "reason_code": "high-risk-unlicensed",
+    "jev_called": true,
+    "probability": 0.02
+   },
+   "wire": {
+    "status": 200,
+    "model_echoed": "jev-1.13.0",
+    "usage": {
+     "input_tokens": 434,
+     "output_tokens": 20
+    },
+    "answers": {
+     "licensed": {
+      "type": "noul",
+      "noul": 0.02
+     }
+    },
+    "response_id": null,
+    "timestamp": null
+   }
+  },
+  {
+   "id": "boundary-high",
+   "verdict": {
+    "outcome": "withhold",
+    "reason_code": "low-confidence",
+    "jev_called": true,
+    "probability": 0.7
+   },
+   "wire": {
+    "status": 200,
+    "model_echoed": "jev-1.13.0",
+    "usage": {
+     "input_tokens": 420,
+     "output_tokens": 20
+    },
+    "answers": {
+     "licensed": {
+      "type": "noul",
+      "noul": 0.7
+     }
+    },
+    "response_id": null,
+    "timestamp": null
+   }
+  }
+ ],
+ "verdict": "LIVENESS PROVEN as far as this API permits: 5 status-200 calls with echoed model, token usage, and decision-driving probabilities; no id/timestamp exists to cite.",
+ "failures": []
+}

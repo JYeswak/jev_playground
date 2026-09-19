@@ -1,0 +1,61 @@
+{
+  "schema": "jev.other-reasons-implementation-audit.v1",
+  "generated_at": "2026-09-18T11:00:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "dependency": {
+    "sidecar": "docs/demos/duel-2/runs/receipt-other-reasons.json",
+    "verifier": "scripts/verify-other-reasons.sh",
+    "present": true
+  },
+  "command": {
+    "run": "scripts/verify-other-reasons.sh",
+    "producer_exit": 0,
+    "output": "STATUS rows typed other: 3; sidecar entries: 3; OK: exact coverage, bindings match STATUS pins, every locator resolves to its quote."
+  },
+  "checks": {
+    "exact_coverage": {
+      "ruling": "PASS_FOR_CURRENT_SCHEMA",
+      "evidence": "Verifier computes missing and extra candidate sets in both directions; current 3 STATUS other rows match 3 sidecar entries.",
+      "bound": "Rows with fewer than 10 fields are skipped rather than reported as schema errors; the verifier assumes lane-status has already enforced width."
+    },
+    "digest_binding": {
+      "ruling": "EFFECTIVE_STATUS_BINDING_PASS_BUT_SPEC_FIELD_MISSING",
+      "evidence": "Verifier uses the same terminal-whitespace-normalized SHA-256 convention as STATUS column 9 and compares live receipt content to the STATUS pin.",
+      "defect": "The sidecar entries do not contain the Q77-specified receipt_digest field. The implementation binds through STATUS, not independently through a sidecar digest. A sidecar entry can omit its own digest and still pass.",
+      "impact": "No current false pass while STATUS is authoritative and unchanged, but the sidecar does not fully implement the specified candidate+receipt path+normalized digest key."
+    },
+    "evidence_locator": {
+      "ruling": "PASS_FOR_CURRENT_THREE_ENTRIES",
+      "evidence": "Markdown locators parse a line number and verify the quote occurs on that line; JSON locator $.unit or $.schema resolves a present field and verifies the quote. The current verifier run passed all three.",
+      "defect": "The sidecar carries corroborating_locator/corroborating_quote fields, but the verifier does not check them. The primary locator is third-party checkable; corroborating evidence is currently unchecked metadata."
+    },
+    "assigner_time": {
+      "ruling": "PARTIAL",
+      "evidence": "Top-level assigner and generated_at are required and present.",
+      "defect": "Q77's entry schema specified assigned_by and assigned_at per row. The implementation stores only one top-level assigner/time and does not validate per-entry ownership/time."
+    },
+    "gate_isolation": {
+      "ruling": "PASS",
+      "evidence": "lane-status.sh and audit-score-lineage.sh contain no sidecar reference; verifier output explicitly says documentation only and no gate reads the file. Its nonzero failure exit is a standalone metadata-verifier result, not a lane gate result.",
+      "no_gate_behavior": true
+    }
+  },
+  "overall": {
+    "ruling": "CURRENT_DATA_PASS_WITH_SPEC_CONFORMANCE_GAPS",
+    "what_is_fixed": "Exact current coverage, normalized digest comparison through STATUS, checkable primary evidence locators, and gate isolation all work for the three rows.",
+    "what_is_not_implemented": [
+      "sidecar-owned receipt_digest binding",
+      "per-entry assigned_by and assigned_at",
+      "corroborating locator verification",
+      "fail-closed schema reporting for malformed STATUS rows"
+    ],
+    "recommended_repair_order": [
+      "add receipt_digest to each sidecar entry and require equality with STATUS/live normalized digest",
+      "add per-entry assigned_by and assigned_at or amend the spec explicitly to permit top-level provenance",
+      "either verify corroborating locators or remove them from the sidecar schema",
+      "make malformed STATUS width an explicit verifier error rather than silently skipping rows"
+    ]
+  },
+  "no_claim": "No claim that the sidecar is fully spec-conformant, no claim that its verifier changes lane verdicts, and no claim that unchecked corroborating metadata is independently verified."
+}

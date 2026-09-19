@@ -1,0 +1,22 @@
+# PRE-REGISTERED NUMERAL HITS — each one ruled by a non-author pane, with the receipt that ruled it.
+#
+# WHY A REGISTER RATHER THAN A FIX. `verify-reason-numerals.sh` reports every cited numeral it cannot
+# open in the receipt cited for it. Three hits are live, and pane 3 ruled ALL THREE legitimate in form
+# (docs/demos/duel-2/runs/numerals-hold-ruling-20260918T161328Z.json, 20df1d7): a rounding, a unit
+# change, and a scope-narrowing are honest citations, not defects. A gate that went RED on them would
+# be demanding that correct prose be rewritten to satisfy a substring match — which is why pane 3
+# refused to wire this instrument for the whole session, and it was right to.
+#
+# So the gate does not check "zero hits". It checks "NO UNREGISTERED hits" — a ratchet. Every row here
+# is a hit a pane examined and cleared, naming the receipt that carries the ruling. A new hit, or a
+# changed numeral in an old one, is unregistered and turns the stage RED.
+#
+# HOW TO ADD A ROW, and the order is not negotiable: a non-author pane rules the hit first and writes
+# a receipt, THEN the row cites that receipt. Adding a row to silence a gate — registering first and
+# ruling later, or citing no receipt — is the exact laundering this file exists to prevent, and it is
+# indistinguishable from an allowlist unless the ruling predates the row.
+#
+# candidate<TAB>numeral<TAB>class<TAB>ruling_receipt
+demo-7-signals-starter	3.5	MISPOINTED_RECEIPT_RULED_RECITE_ELSEWHERE	docs/demos/duel-2/runs/demo7-muh1-hits-20260918T132451Z.json
+demo-7-signals-starter	76.25	LEGITIMATE_ROUNDING_AND_UNIT_CHANGE	docs/demos/duel-2/runs/numerals-hold-ruling-20260918T161328Z.json
+MU-H1-todo-judge	283	LEGITIMATE_DERIVED_ROLLUP_TRUNCATION	docs/demos/duel-2/runs/numerals-hold-ruling-20260918T161328Z.json

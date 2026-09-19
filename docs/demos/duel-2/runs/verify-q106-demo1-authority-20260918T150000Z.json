@@ -1,0 +1,26 @@
+{
+  "schema": "jev.q106.demo1-authority-verification.v1",
+  "generated_at": "2026-09-18T15:00:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "independent post-landing verification",
+  "candidate": "demo-1-route-backtest",
+  "status_row": {
+    "receipt": "demos/routing-backtest/runs/backtest-20260918T020440Z.json",
+    "reason": "none-died-rung4-0.0447pct",
+    "normalized_digest": "25581b15c0f20489"
+  },
+  "ruling": "VERIFIED_CONTENT_AND_BINDING",
+  "checks": {
+    "ruling_opened": true,
+    "ruling_path_matches_status": true,
+    "ruling_reason_matches_status": true,
+    "receipt_opened": true,
+    "receipt_supports_30_turn_measurement": true,
+    "normalized_digest_recomputed": "25581b15c0f204896af91e2f8047c02fa9acfa15f6bc8b93f6cb344778820f9d",
+    "normalized_digest16": "25581b15c0f20489",
+    "status_digest_matches": true,
+    "status_verdict": "RULED_OUT"
+  },
+  "authority_ruling": "The pane3 ruling authorized the conductor to apply the change; this independent receipt now verifies the applied path, reason, source content, and digest. Authorization and verification are separate claims.",
+  "no_claim": "No claim about whether the original kill trigger was self-kill or cross-boundary; this receipt verifies the repricing mutation only."
+}

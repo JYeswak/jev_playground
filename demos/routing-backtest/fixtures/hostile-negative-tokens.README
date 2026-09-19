@@ -1,0 +1,3 @@
+known-bad: negative token count (input -50). Number(value)||0 would silently sum it.
+Must refuse with INVALID_USAGE_TOKENS naming file, turn and field — hostile data is refused,
+never priced.

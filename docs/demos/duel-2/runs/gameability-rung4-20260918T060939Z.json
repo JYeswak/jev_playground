@@ -1,0 +1,68 @@
+{
+  "schema": "jev.codh2.rung4-gameability.v1",
+  "generated_at": "2026-09-18T06:09:39Z",
+  "design": "docs/demos/duel-2/RUNG4_DESIGN_COD-H2_COD.md",
+  "design_commit": "3a5851f",
+  "findings": [
+    {
+      "id": "G1",
+      "gate": "ECE/Brier",
+      "status": "GAMEABLE_WITHOUT_GUARD",
+      "degenerate": "A constant prevalence probability can have acceptable Brier/ECE while having no discrimination or useful action ordering.",
+      "guard": "Require full non-redacted denominator, no missing/zero-case metric, Brier skill score versus constant-prevalence baseline, and report resolution/sharpness plus selective accuracy."
+    },
+    {
+      "id": "G2",
+      "gate": "flip_rate<=5%",
+      "status": "GAMEABLE_WITHOUT_GUARD",
+      "degenerate": "Always-withhold has zero outcome flips and can look maximally stable while doing no useful work.",
+      "guard": "Define model coverage as (pass + escalate) / Noul-eligible cases; withhold/error are abstention, not coverage. Require coverage>=0.80 at the fixed operating report and apply the same coverage floor per stratum."
+    },
+    {
+      "id": "G3",
+      "gate": "selective accuracy",
+      "status": "GAMEABLE_IF_CURVE_TRUNCATED",
+      "degenerate": "A candidate can abstain on hard cases and report only an easy high-confidence prefix.",
+      "guard": "Publish the complete coverage curve, require the fixed >=0.80 coverage point and lower Wilson accuracy bound>=0.90, and report withhold/skip counts. No post-run coverage selection."
+    },
+    {
+      "id": "G4",
+      "gate": "human action lift>=20%",
+      "status": "GAMEABLE_WITH_BAD_BASELINE",
+      "degenerate": "A weak or unmeasured baseline, or self-reported reviewer time, can manufacture lift.",
+      "guard": "Pair the same randomized cases and reviewers across gate-off/gate-on arms; pre-register baseline, measure wall time externally, and require no increase in risk-weighted false-pass rate."
+    },
+    {
+      "id": "G5",
+      "gate": "boundary stability",
+      "status": "GAMEABLE_IF_POOLED",
+      "degenerate": "Pooling the .74/.70 boundary movement with stable .94/.48/.06/.02 cases hides the exact variance that matters.",
+      "guard": "Boundary band [.65,.85] is a separate population with per-case K=10 variance, threshold-crossing counts, and its own ECE/Brier/flip report. Boundary failure cannot be averaged away."
+    },
+    {
+      "id": "G6",
+      "gate": "coverage accounting",
+      "status": "GAMEABLE_IF_SILENT",
+      "degenerate": "Dropping credential-redacted, malformed, timeout, or provider-error cases inflates every metric.",
+      "guard": "Every input must land in pass/withhold/escalate/block/error/redacted with explicit denominators; error or missing receipt is a failed run, not a dropped row."
+    }
+  ],
+  "always_withhold": {
+    "passes_flip_gate": true,
+    "passes_ece_brier": false,
+    "passes_coverage_gate": false,
+    "passes_selective_accuracy_gate": false,
+    "passes_human_lift_gate": false,
+    "conclusion": "Always-withhold is blocked once model coverage and full-denominator metric guards are applied."
+  },
+  "replacement_guards": {
+    "model_coverage": "(pass + escalate) / Noul-eligible cases >= 0.80 at fixed operating report; withhold/error/credential-redacted separate",
+    "calibration": "ECE<=0.10 and Brier<=0.15 on full labelled denominator plus positive Brier skill against constant-prevalence baseline",
+    "selective": "complete curve required; fixed 0.80 coverage lower Wilson accuracy bound>=0.90",
+    "boundary": "K=10 per case; [0.65,0.85] separate; report variance and threshold crossings",
+    "human_lift": "paired randomized gate-off/on review; >=20% measured lift only if risk-weighted false-pass does not increase",
+    "accounting": "no silent exclusions; failures and redaction skip paths count"
+  },
+  "overall": "AMEND_Q29_DESIGN_BEFORE_RUNG4",
+  "failures": []
+}

@@ -1,0 +1,3 @@
+known-bad: same session id as hostile-duplicate-session-b ("hostile-dup-1").
+Loading both must refuse with DUPLICATE_SESSION_ID naming both files — the same session
+counted twice silently inflates the denominator. Pair with -b; neither file is bad alone.

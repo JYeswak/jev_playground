@@ -1,0 +1,82 @@
+{
+  "receipt_type": "upstream_reproduction",
+  "date": "2026-09-18",
+  "repository": "jev-rerank-bench",
+  "uv": {
+    "environment": "created/resolved by uv run",
+    "python": "3.14.2",
+    "dependencies": "32 packages installed"
+  },
+  "commands": {
+    "run_bm25_scifact": "uv run python run.py --model bm25 --dataset scifact --variant both",
+    "eval": "uv run python eval.py",
+    "significance": "uv run python significance.py 1000",
+    "jev_smoke": "infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=prod --silent -- uv run python run.py --model jev-noul-batch --dataset scifact --variant present --limit 5",
+    "determinism": "infisical run ... -- uv run python determinism.py 3",
+    "batching": "infisical run ... -- uv run python batching.py 3",
+    "coldstart": "infisical run ... -- uv run python coldstart.py 0",
+    "nevir": "infisical run ... -- uv run python nevir_eval.py"
+  },
+  "reproduced": {
+    "headline": {
+      "jev_rubric_ndcg10": 0.692,
+      "cohere_pro_ndcg10": 0.691,
+      "qwen_one_passage_ndcg10": 0.471,
+      "bm25_ndcg10": 0.486,
+      "scope": "eval.py reproduced the committed cached-results tables; this is not a fresh full rerun."
+    },
+    "significance": {
+      "eight_dataset_jev_score_batch_ndcg10": 0.692,
+      "cohere_pro": 0.691,
+      "gap": 0.001,
+      "ci95": [-0.009, 0.012],
+      "p": 0.910,
+      "verdict": "within noise"
+    },
+    "nevir_fresh_run": {
+      "pairs": 1383,
+      "jev_rubric_paired": 0.711,
+      "cohere_pro_paired": 0.670,
+      "gap_points": 4.2,
+      "jev_score_batch_vs_cohere_p": 0.002,
+      "verdict": "REAL"
+    },
+    "bm25": {
+      "scifact_present_queries": 300,
+      "scifact_absent_queries": 264,
+      "new_calls": 0,
+      "failed_queries": 0
+    },
+    "jev_smoke": {
+      "requested_limit": 5,
+      "observed_queries": 300,
+      "new_calls": 300,
+      "failed_queries": 0,
+      "cost_usd": 0.166619,
+      "median_latency_ms": 332.3,
+      "p95_latency_ms": 873.2
+    }
+  },
+  "not_reproduced": {
+    "determinism": {
+      "rc": 1,
+      "error": "KeyError: '14717500' while resolving candidate document ids",
+      "script": "determinism.py"
+    },
+    "batching": {
+      "rc": 1,
+      "error": "KeyError: '14717500' while resolving candidate document ids",
+      "script": "batching.py"
+    },
+    "coldstart": {
+      "rc": 1,
+      "error": "JEV_API_KEY is missing from jev-rerank-bench/.env despite Infisical injection",
+      "script": "coldstart.py"
+    }
+  },
+  "interpretation": {
+    "strong_claim_reproduced": "The headline 0.692 vs 0.691 table and the near-zero significant gap are reproduced from committed results; the fresh NevIR run reproduces the README's 71% vs 67% and +4.2-point REAL comparison.",
+    "strong_claim_not_fully_reproduced": "The full runner suite is not clean: determinism and batching crash on a missing candidate document id, and coldstart has an environment-variable mismatch.",
+    "no_claim": "No claim that the full eight-dataset benchmark was freshly rerun; eval.py consumed the repository's existing cached result set."
+  }
+}

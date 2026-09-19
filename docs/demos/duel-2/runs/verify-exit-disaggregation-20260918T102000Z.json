@@ -1,0 +1,56 @@
+{
+  "schema": "jev.exit-disaggregation-verification.v1",
+  "generated_at": "2026-09-18T10:20:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author verification",
+  "target_commit": "55fbe29",
+  "targets": [
+    "scripts/lane-status.sh",
+    "scripts/selftest-lane-status-integrity.sh"
+  ],
+  "selftest": {
+    "command": "bash scripts/selftest-lane-status-integrity.sh",
+    "producer_exit": 0,
+    "arms": 10,
+    "all_passed": true,
+    "observed": {
+      "arm_6_concurrence_alone": 5,
+      "arm_8_missing_receipt_and_concurrence": 6,
+      "arm_9_short_row": 5,
+      "arm_10_extra_column": 4
+    }
+  },
+  "exit_reachability": {
+    "reachable": {
+      "0": "clean",
+      "2": "repository or missing STATUS environment error",
+      "3": "missing receipt alone",
+      "4": "digest drift alone, and currently also an extra-column parse collision",
+      "5": "missing kill_concurrence alone",
+      "6": "missing receipt plus missing concurrence with no digest drift",
+      "7": "other multi-class combinations, such as missing+drift or concurrence+drift"
+    },
+    "ruling": "All documented failure exits are reachable in principle. Exit 7 is not covered by the ten-arm selftest; no arm combines drift with either missing class."
+  },
+  "extra_column": {
+    "ruling": "UNSAFE_SCHEMA_BEHAVIOR",
+    "observed": "ARM 10 turns a ten-column row into digest drift because bash read assigns the trailing field(s) to the final digest variable.",
+    "why_it_matters": "Q19's receipt_type is intended to be column 10. With the current nine-field parser, a valid receipt_digest plus receipt_type will be read as a corrupted digest and every such row will false-RED with exit 4.",
+    "required_fix": "Migrate the parser and status schema to ten columns before adding receipt_type. Validate exact field count; do not treat extra columns as a digest mismatch. Add a ten-column positive arm and a malformed-field-count error arm."
+  },
+  "short_row": {
+    "ruling": "NOT_TRUE_SCHEMA_VALIDATION",
+    "observed": "ARM 9 returns exit 5 because a six-column RULED_OUT row leaves concurrence empty. That is the same observable state as a valid-width row with an empty kill_concurrence field.",
+    "why": "The parser never checks column count. ARM 9 passes because the semantic concurrence check fires, not because the row is recognized as malformed. A short CLEARED row could pass and a short RULED_OUT row is not distinguished from missing concurrence.",
+    "required_fix": "Validate field count before semantic checks and assign a distinct schema-error code. Keep the concurrence fail-closed arm separately."
+  },
+  "commit_claim_audit": {
+    "claim": "every failing class is reported and exit code names which classes fired",
+    "ruling": "SUPPORTED_FOR_THE_THREE_KNOWN_COUNTERS",
+    "bound": "The counters report missing, drift, and concurrence separately; exit 7 groups several combinations and is not class-specific. The parser still lacks schema validation, so malformed rows can enter the counters through field collapse.",
+    "claim": "ten arms pass including three new ones",
+    "ruling_2": "SUPPORTED_AS_TESTSET_RESULT",
+    "bound_2": "The arms do not prove future column-10 compatibility or reach exit 7."
+  },
+  "final": "The disaggregation repair fixes the original masking defect, but ARM 10 is a warning, not a safe schema policy. Q19 receipt_type cannot be landed by appending column 10 until parser/schema migration is implemented."
+}

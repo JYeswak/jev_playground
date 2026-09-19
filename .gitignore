@@ -1,0 +1,78 @@
+# The jev lane is an ALLOWLIST repo.
+#
+# The root holds ~20 vendored clones of other people's repositories, and the set grows every
+# session. An opt-out list would go stale the moment a sibling pane clones the next one, and a
+# nested git repo added to this tree becomes a gitlink that nobody configured as a submodule.
+# So: ignore everything at the root, then un-ignore exactly what we author.
+#
+# Adding a new clone requires NO change here. Adding a new first-party directory does.
+
+/*
+!/.gitignore
+!/AGENTS.md
+!/README.md
+!/VERDICT.md
+!/RECIPES.md
+!/.omp/
+!/LICENSE
+!/visual/
+!/demos/
+!/EVAL.md
+!/NEGATIVE_EVIDENCE.md
+!/GATES.md
+!/REVIEW-PERSONAS.md
+!/TESTS.md
+!/.fh-agents.toml
+!/githooks/
+!/scripts/
+!/probes/
+!/foundation/
+# Per-machine gate run history. Append-only and written on every gates.sh run, so tracking it in a
+# three-pane shared worktree would conflict constantly and tell a reader nothing they can act on.
+/foundation/gate-outcomes.tsv
+!/compaction/
+!/ensemble/
+!/work/
+!/docs/
+!/notes/
+!/.flywheel/
+!/.beads/
+!/docs-mirror/
+!/upstream/
+# The README-NOTES sidecar is TRACKED ON PURPOSE (skill://readme-update). An untracked note is
+# unreproducible: a fresh clone cannot see it, so an undrained fact would be invisible to the next
+# agent exactly when it matters. Its job is to be a log that gets emptied into README.md as state.
+!/README-NOTES.md
+
+# ---------------------------------------------------------------------------
+# docs-mirror/ and upstream/: PROVENANCE is committed, BYTES are not.
+#
+# `scripts/sync-docs.sh` re-fetches the mirror and `--check` proves byte identity against the
+# committed sha256 manifest. So the manifests are the reviewable artifact; the 5 MB of TypeSafe
+# documentation and the nested first-party clones are reproducible, third-party, and would churn
+# every diff. A fresh clone runs one command to materialize them.
+# ---------------------------------------------------------------------------
+docs-mirror/*
+!docs-mirror/MANIFEST.tsv
+upstream/*
+!upstream/MANIFEST.tsv
+!upstream/ORG-INVENTORY.tsv
+!upstream/UNRESOLVABLE.tsv
+
+# Harness and tool state that belongs to a machine, never to the repo.
+.ntm/
+.beads/dag-graph-*.txt
+.DS_Store
+*.log
+
+# Language caches and build output, wherever they appear under a first-party path.
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+dist/
+.test-dist/
+jev-benchmark/
+awesome-typesafe/

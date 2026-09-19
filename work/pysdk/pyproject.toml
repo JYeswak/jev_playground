@@ -1,0 +1,14 @@
+[project]
+name = "jev-pysdk-env"
+version = "0.1.0"
+description = "Reproducible Python environment for TypeSafe Jev work in this lane."
+# The SDK's own floor is >=3.10. We pin 3.12 in .python-version because the system
+# interpreter here is 3.9.6, where msgspec>=0.21.1 has no resolvable wheel.
+requires-python = ">=3.12"
+dependencies = ["typesafe-sdk"]
+
+[tool.uv.sources]
+# NOT on PyPI as of 2026-09-19. Pinned to a git rev so the environment is reproducible
+# off this machine -- a local clone path is not. When it publishes, delete this block
+# and pin a version in `dependencies` instead.
+typesafe-sdk = { git = "https://github.com/typesafe-ai/typesafe-sdk-python.git", rev = "420ef4ffb612d5a539a1e0f0fe883ff6770340af" }

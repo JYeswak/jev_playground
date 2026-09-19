@@ -1,0 +1,63 @@
+{
+  "receipt_type": "non_author_numeral_adjudication",
+  "date": "2026-09-18",
+  "artifact_under_review": [
+    "VERDICT.md",
+    "foundation/numerals-ruled.tsv",
+    "docs/demos/duel-2/runs/muh1-marker-census-20260918T034820Z.json",
+    "docs/demos/duel-2/runs/scalar-audit-20260918T125247Z.json"
+  ],
+  "reviewer_lineage": "openai-codex/gpt-5.6-luna",
+  "author_lineages": {
+    "VERDICT.md": "pane 3",
+    "foundation/numerals-ruled.tsv": "Joshua",
+    "muh1_marker_census": "non-author pane",
+    "scalar_audit": "pane 3"
+  },
+  "question_1_receipt_opening": {
+    "literal_283786": false,
+    "literal_283_comma_786": false,
+    "line_count_key": false,
+    "stored_components": "repositories[*].kloc",
+    "repository_count": 16,
+    "sum_kloc": 283.786,
+    "derived_lines": 283786,
+    "marker_sum": 17,
+    "ruling": "DERIVATION_OPENS",
+    "explanation": "The cited receipt does not store the aggregate literal, but it stores every per-repository KLOC component. Summing those components yields 283.786 KLOC, which converts to approximately 283,786 lines. The scalar audit's claim that the value is unreadable/absent is false; its narrower observation that the aggregate is not stored literally is true."
+  },
+  "question_2_register_class": {
+    "current_row": "MU-H1-todo-judge\t283\tLEGITIMATE_UNIT_CHANGE_KLOC\tdocs/demos/duel-2/runs/numerals-hold-ruling-20260918T161328Z.json",
+    "semantic_status": "LEGITIMATE_BUT_MISLABELED",
+    "correct_class": "LEGITIMATE_DERIVED_ROLLUP_TRUNCATION",
+    "basis": "The cited hold ruling explicitly states that the sum of 16 per-repo kloc fields is 283.786 and that 283KLOC is integer truncation of the derived total.",
+    "not": [
+      "MISPOINTED_RECEIPT",
+      "ABSENT_MEASUREMENT"
+    ]
+  },
+  "question_3_verdict_rule": {
+    "pane3_text_status": "NEEDS_AMENDMENT",
+    "reason": "It says '283,786 lines' while citing a receipt whose aggregate is KLOC-derived. The public text should name the derivation and unit conversion rather than imply a stored line-count field.",
+    "required_wording": "17 markers across 283.786 KLOC (derived sum of the 16 per-repository kloc fields; approximately 283,786 lines)",
+    "action": "Do not edit VERDICT.md while pane 3 is available and mid-unit. Route this exact amendment to pane 3. RULING.md and PLAN.md already use KLOC wording."
+  },
+  "question_4_stage95": {
+    "current_result": "PASS: 3 live hit(s), all registered; 3 ruled row(s)",
+    "selftest": "5 arms PASS",
+    "structural_gap": "The stage compares candidate+numeral set membership only. It does not open the ruling receipt, compare the register CLASS to the receipt's structured ruling, or detect a class that contradicts an audit finding.",
+    "creation_gate": {
+      "consumer": "Stage 95 and future non-author adjudicators need a machine-visible distinction between 'registered' and 'semantically supported'.",
+      "gate": "A register row passes only when its ruling receipt resolves the exact hit and its structured class agrees with the register class; altered class, missing hit, missing evidence, or receipt schema mismatch REDs.",
+      "observed_defects": "This incident exposed the class-truth gap: stage95 passes membership while the scalar audit and hold ruling disagree about whether the aggregate is absent versus derivable, and the current row label omits derived-rollup truncation.",
+      "retirement": "Retire only after a successor opens all current rows, has a RED arm for class mutation and receipt-evidence removal, and preserves the existing unregistered/stale-row arms."
+    },
+    "ruling": "BUILD_FOLLOW_UP_REQUIRED",
+    "reason": "All four creation-gate fields are present. Do not trust the current green as semantic validation."
+  },
+  "no_claim": [
+    "No edit was made to VERDICT.md because pane 3 is available.",
+    "No claim that the stage95 structural successor is implemented by this receipt.",
+    "No claim that the scalar audit is wholly invalid; its literal-storage observation remains accurate."
+  ]
+}

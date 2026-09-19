@@ -1,0 +1,32 @@
+{
+  "schema": "jev.queue.post-q17-dry.v1",
+  "generated_at": "2026-09-18T04:51:36Z",
+  "eligible_runner": "WindyJaguar",
+  "status": "QUEUE_DRY_PANE2",
+  "completed": [
+    "Q17 COD-H2 build grade — 1fe6c30, partial accepted/held for live calibration and UBS provenance"
+  ],
+  "pane2_done": [
+    "Q4",
+    "Q5",
+    "Q6",
+    "Q8",
+    "Q10",
+    "Q11"
+  ],
+  "pane3_or_ineligible": [
+    "Q1",
+    "Q2",
+    "Q3",
+    "Q7",
+    "Q9 done by pane3",
+    "Q12 pane3-only claimed",
+    "Q14 pane3-only",
+    "Q15 pane3-only",
+    "Q16 pane3 build/Pane2 grade dependent"
+  ],
+  "next": null,
+  "action": "No unclaimed pane2-eligible unit remains in the live queue. Do not dispatch or modify pane3-owned work.",
+  "no_claim": "No global queue exhaustion claim; this is pane2 eligibility dry only.",
+  "failures": []
+}

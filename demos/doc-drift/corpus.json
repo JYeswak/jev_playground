@@ -1,0 +1,353 @@
+{
+ "schema": "jev.docdrift.corpus.v1",
+ "cases": [
+  {
+   "case_id": "a01",
+   "class": "ambiguous",
+   "truth": "unknown",
+   "files": [
+    {
+     "path": "a01/doc.md",
+     "bytes": 72,
+     "sha256": "81e01efc621bd57d73636668aa315b7f72817d622eb3248ae74f883713799115"
+    },
+    {
+     "path": "a01/src/version.mjs",
+     "bytes": 32,
+     "sha256": "e3264d1fa329056871c0cc6dc413995ac4c613684b320f991baf2625c5faaedd"
+    }
+   ]
+  },
+  {
+   "case_id": "a02",
+   "class": "ambiguous",
+   "truth": "unknown",
+   "files": [
+    {
+     "path": "a02/doc.md",
+     "bytes": 83,
+     "sha256": "4df9e5dd2c6d87f45c070c42e862791ecf129542145c6a9982f6843255dc5ba4"
+    },
+    {
+     "path": "a02/src/build.mjs",
+     "bytes": 28,
+     "sha256": "bed93ee527e546925699b4c81126dda9438e08319a9c9869162349617baa8c3a"
+    }
+   ]
+  },
+  {
+   "case_id": "b01",
+   "class": "behavior",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "b01/doc.md",
+     "bytes": 88,
+     "sha256": "162ac694bb7dece109844d410325cf92659613f5ccd787882df7cdcd2bbc63bc"
+    },
+    {
+     "path": "b01/src/run.mjs",
+     "bytes": 43,
+     "sha256": "d11c09e9fbf26dd9da9f265184489d38a44c510a086fa6f733bc8e7e06684d2a"
+    }
+   ]
+  },
+  {
+   "case_id": "b02",
+   "class": "behavior",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "b02/doc.md",
+     "bytes": 64,
+     "sha256": "b16caab650aaffefc493734f199beb8cb2685759702b68725482fc9bd764bcb3"
+    },
+    {
+     "path": "b02/src/parse.mjs",
+     "bytes": 120,
+     "sha256": "b3d225848cc26e4efd7a12afa3667e267ea2c59fc6aa4acb7a1d816823bcd44f"
+    }
+   ]
+  },
+  {
+   "case_id": "b03",
+   "class": "behavior",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "b03/doc.md",
+     "bytes": 95,
+     "sha256": "55a3aae648e59ecab982fe7ff25e39d883d4f2ecd0875d8bd622a2390a4db8a3"
+    },
+    {
+     "path": "b03/src/safe.mjs",
+     "bytes": 44,
+     "sha256": "10d525cc23d5310dd1f19e19562078da9a0ba905de241e08a80cc585c0e5b38c"
+    }
+   ]
+  },
+  {
+   "case_id": "c01",
+   "class": "coverage",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "c01/doc.md",
+     "bytes": 71,
+     "sha256": "1a84645bd6aef77f8a35edf22aa9849788ce8a4b96ee7737367869fd811b3f3b"
+    },
+    {
+     "path": "c01/src/cmds.mjs",
+     "bytes": 50,
+     "sha256": "f9428f72226711125f33732ca122d10c5405abd75cbc11373dc9890b014509ab"
+    }
+   ]
+  },
+  {
+   "case_id": "c02",
+   "class": "coverage",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "c02/doc.md",
+     "bytes": 78,
+     "sha256": "a35313a7686795f11ed04ad8166d0416053b029b2908cd2caba2b9b276fe1fd8"
+    },
+    {
+     "path": "c02/src/config.mjs",
+     "bytes": 228,
+     "sha256": "0b6115011b44a904dccea6b7d85f3d6bf3e8bcf3c77b81c56366dba3e5f77286"
+    }
+   ]
+  },
+  {
+   "case_id": "c03",
+   "class": "coverage",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "c03/doc.md",
+     "bytes": 72,
+     "sha256": "7791d46bf3ab40ccc72450a6a5fa56d780947988c6461a8b26795db557cb62b3"
+    },
+    {
+     "path": "c03/src/outcomes.mjs",
+     "bytes": 76,
+     "sha256": "7a16421fe8b47a7b6e575f3b9f16c34eebad8076f86f55e1598e8ebe9fbfda2b"
+    }
+   ]
+  },
+  {
+   "case_id": "r01",
+   "class": "reference-drift",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "r01/doc.md",
+     "bytes": 91,
+     "sha256": "eebadd37c2a07c37202b87fd06ac3f6814dd5a2a65f3e0e23e7775fa51337133"
+    },
+    {
+     "path": "r01/src/new-name.ts",
+     "bytes": 46,
+     "sha256": "07f2b75dc9dfa884d8bf0db4cb2e3e8f1ba1d8b5fc5f3cbe4fe50ccada1df562"
+    }
+   ]
+  },
+  {
+   "case_id": "r02",
+   "class": "reference-drift",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "r02/doc.md",
+     "bytes": 69,
+     "sha256": "b79eab000a41ca38875616626d34322ecd96809fd831a851b01b6360c23890c3"
+    },
+    {
+     "path": "r02/src/flags.mjs",
+     "bytes": 180,
+     "sha256": "0770f764e5e0710b3f36199c2ce19caeabce243b1bc66fdcd7552dc1fcd189ba"
+    }
+   ]
+  },
+  {
+   "case_id": "r03",
+   "class": "reference-drift",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "r03/doc.md",
+     "bytes": 84,
+     "sha256": "e4ea399f0c6c3eab30c164bde8167522ba09692456f99519df0b9c68aa79c077"
+    },
+    {
+     "path": "r03/src/auth.mjs",
+     "bytes": 154,
+     "sha256": "f0c04b1107db4903d87cbc4216631a875c7f4488d53931971470e8e7d4f5cee7"
+    }
+   ]
+  },
+  {
+   "case_id": "r04",
+   "class": "reference-drift",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "r04/doc.md",
+     "bytes": 72,
+     "sha256": "403283b6e2e4b247de1623b49d116110551dcd43c804d4db7c3176e814f449ae"
+    },
+    {
+     "path": "r04/src/store.mjs",
+     "bytes": 75,
+     "sha256": "d09221645a8615f9c380d46345cdaff0ac19708568a6401ca47bcfe7841262c6"
+    }
+   ]
+  },
+  {
+   "case_id": "s01",
+   "class": "semantic-default",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "s01/doc.md",
+     "bytes": 73,
+     "sha256": "fd2c2439b48a5de6929fa3c69186b2a72de846c1242e47d3d9c64da1d0ab4ec9"
+    },
+    {
+     "path": "s01/src/limits.mjs",
+     "bytes": 35,
+     "sha256": "bed78c3f5a0d188d45d967b539dee55c3688ed065c9acaa8360bebb80b3fdef5"
+    }
+   ]
+  },
+  {
+   "case_id": "s02",
+   "class": "semantic-default",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "s02/doc.md",
+     "bytes": 73,
+     "sha256": "b5824f6b79e02a6c2e6cd380959f5b49a01e2faf09168a55fab70a0941f5a1c5"
+    },
+    {
+     "path": "s02/src/policy.mjs",
+     "bytes": 35,
+     "sha256": "32a6884fc14ce438168413ada50356bc04de3700a2b4baea1830f44c4e177c2e"
+    }
+   ]
+  },
+  {
+   "case_id": "s03",
+   "class": "semantic-default",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "s03/doc.md",
+     "bytes": 79,
+     "sha256": "92626d61f5d74613e6b766bd38a7ac6ad4cc4e4964304720c55a3c0eed21063d"
+    },
+    {
+     "path": "s03/src/keep.mjs",
+     "bytes": 35,
+     "sha256": "fd96d9cbc750ab00936414c9831a6122658f2d0d769104684014b06caa7d5fdb"
+    }
+   ]
+  },
+  {
+   "case_id": "s04",
+   "class": "semantic-default",
+   "truth": "drifted",
+   "files": [
+    {
+     "path": "s04/doc.md",
+     "bytes": 63,
+     "sha256": "dbaba37962b739b0287ef19ea9c37642744e241b500a056c13cb3f09c5fdfafc"
+    },
+    {
+     "path": "s04/package.json",
+     "bytes": 41,
+     "sha256": "451fd17e5f112d64609225063eec0b157ffed4daf7dd2039f56721ad0d6c2c11"
+    }
+   ]
+  },
+  {
+   "case_id": "v01",
+   "class": "valid-anchor",
+   "truth": "accurate",
+   "files": [
+    {
+     "path": "v01/doc.md",
+     "bytes": 196,
+     "sha256": "8bf7ebd7e95e563713e0dd8bb7a70f737319084a2b24c9a573ec712b9d64784a"
+    },
+    {
+     "path": "v01/src/net.ts",
+     "bytes": 280,
+     "sha256": "922d789fe4cdc40648a312fb9d5ae8f5ff00f3bcd6dfc7758aa480b8de11e1b7"
+    }
+   ]
+  },
+  {
+   "case_id": "v02",
+   "class": "valid-anchor",
+   "truth": "accurate",
+   "files": [
+    {
+     "path": "v02/doc.md",
+     "bytes": 128,
+     "sha256": "1013590d7a005f1bd9f0cd3c4bd79454cc7c68031e087ffd79b505b5e39c189c"
+    },
+    {
+     "path": "v02/src/cli.mjs",
+     "bytes": 255,
+     "sha256": "b4d816cb1a53dff523c8923b20468f57139aae6bdc67e1b72dad1402b133cc22"
+    }
+   ]
+  },
+  {
+   "case_id": "v03",
+   "class": "valid-anchor",
+   "truth": "accurate",
+   "files": [
+    {
+     "path": "v03/doc.md",
+     "bytes": 123,
+     "sha256": "fe4bf9da9fbb04e9abe0a9979052416b22cafdd3b258b44ad99b44ff6fa0107f"
+    },
+    {
+     "path": "v03/policy.json",
+     "bytes": 50,
+     "sha256": "51b73616ca24ba6fafd9449fe63fc0b3e0fa1b11069a7a081a86b90af82f58c5"
+    }
+   ]
+  },
+  {
+   "case_id": "v04",
+   "class": "valid-anchor",
+   "truth": "accurate",
+   "files": [
+    {
+     "path": "v04/doc.md",
+     "bytes": 120,
+     "sha256": "8fdc948fdb434f62963f26edea332176bc7dc9d40a5a77a92369b7188cbe4bd5"
+    },
+    {
+     "path": "v04/src/fail.mjs",
+     "bytes": 99,
+     "sha256": "ee59763d927ccd7cefca6fa138456c51f828ffba51a7de2fd9e8b710fdefe452"
+    }
+   ]
+  }
+ ],
+ "counts": {
+  "valid-anchor": 4,
+  "reference-drift": 4,
+  "semantic-default": 4,
+  "behavior": 3,
+  "coverage": 3,
+  "ambiguous": 2
+ }
+}

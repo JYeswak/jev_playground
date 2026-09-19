@@ -1,0 +1,37 @@
+{
+  "schema": "jev.q103-promotion-rerule.v1",
+  "generated_at": "2026-09-18T13:30:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author contract rerule",
+  "inputs": ["docs/demos/duel-2/RULE_promote_sidecar_verifier_v2_COD.md", "34f1c16", "0e024ee", "2568d9d"],
+  "preconditions": {
+    "copy_snapshot": {
+      "status": "PARTIAL_NOT_MET",
+      "reason": "Absolute path containment and unmapped-path fallback are fixed, but outward symlinks are followed into copied bytes without realpath containment."
+    },
+    "revision_hash_pair": {
+      "status": "MET_WITH_SYMLINK_BOUND",
+      "reason": "Source HEAD, raw pre/post/copy, normalized hashes, and verifier source input are manifest-bound; symlink source identity remains unresolved."
+    },
+    "copy_based_arms": {
+      "status": "MET_BUT_SCOPE_LIMITED",
+      "reason": "ARM 9 rehashes snapshot copies; ARM 10/11 proved prior fixes against reverted code. Absolute containment is now covered, but symlink escape is not armed."
+    },
+    "verifier_transient_unstable": {
+      "status": "MET_WITH_TEST-HOOK_BOUND",
+      "reason": "Verifier owns bounded two-capture rc10/no-verdict behavior; dirty verdict refuses forced movement. Forced classification is stdout-disclosed but not manifest-recorded."
+    }
+  },
+  "reopen_conditions": {
+    "path_expansion_and_traversal": "CLOSED for lexical absolute/.. paths; symlink containment remains open",
+    "new_receipt_type_or_format": "No new format issue observed",
+    "two_capture_instability": "Implemented and bounded",
+    "caller_misreads_rc10": "Still a caller responsibility; no foundation promotion",
+    "live_path_after_snapshot": "Resolver no longer falls back live; post-hash is source stability validation before snapshot completion",
+    "foundation_wiring": "Not promoted; remains separately re-examinable"
+  },
+  "promotion": "DEFER",
+  "promotion_reason": "Symlink realpath containment is a live copy/snapshot gap, and forced-test provenance is absent from the manifest. A green live run is insufficient.",
+  "required_next": ["reject or safely copy outward symlinks with explicit manifest status", "record forced=true/reason in manifest", "add symlink and manifest-forced arms"],
+  "no_claim": "No promotion, no universal snapshot fidelity, and no claim that all six re-open conditions are closed."
+}

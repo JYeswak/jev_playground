@@ -1,0 +1,41 @@
+{
+  "schema": "jev.q105-numerals-audit.v1",
+  "generated_at": "2026-09-18T14:15:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author audit",
+  "target": "scripts/verify-reason-numerals.sh",
+  "fix_commits": ["07fa334", "86b0a8d"],
+  "rulings": {
+    "digit_bounded_matching": {
+      "status": "SUFFICIENT_FOR_LITERAL_OPENING_ONLY",
+      "evidence": "Negative lookbehind/lookahead rejects 0.0447 inside 0.044756498 and 3.5 inside 3.53; thousands separators are the only folded variant.",
+      "remaining_false_positive_shapes": [
+        "the cited numeral appears in an unrelated field of the correct receipt",
+        "the numeral appears in quoted prose rather than the measurement field",
+        "scientific notation or another tokenization can contain the cited decimal without asserting the same measurement"
+      ],
+      "boundary": "The gate proves literal numeral presence in the cited receipt, not semantic field correspondence or unit/rounding equivalence."
+    },
+    "arm_7": {
+      "ruling": "DISCRIMINATES",
+      "evidence": "A cited 0.0447 does not open against longer 0.044756498; expected rc12.",
+      "construction_risk": "Not tautological: it tests a close-but-invalid token against the actual predicate, but it does not cover unrelated fields or scientific notation."
+    },
+    "arm_8": {
+      "ruling": "DISCRIMINATES",
+      "evidence": "A cited 3.5 does not open against 3.53; expected rc12.",
+      "construction_risk": "Same bounded predicate test; it is a second shape, not proof of semantic correctness."
+    },
+    "hit_count_2_to_4": {
+      "ruling": "HONEST_DIRECTION_WITH_SCOPE",
+      "reason": "The old substring predicate falsely accepted two prefix coincidences. Digit-bounded matching correctly exposes more unopenable citations. The increase is not evidence of over-eagerness by itself; semantic unrelated-field cases remain outside the gate's contract."
+    }
+  },
+  "required_future_arms": [
+    "same numeral in unrelated JSON field versus cited measurement field",
+    "quoted prose numeral versus measurement value",
+    "scientific notation and unit-form variants",
+    "explicitly unsupported rounding remains rc12"
+  ],
+  "no_claim": "No claim that digit-bounded matching proves semantic correctness, no claim that ARM7/8 cover all false-negative shapes, and no claim that the gate can distinguish rounding from a mispointed receipt."
+}

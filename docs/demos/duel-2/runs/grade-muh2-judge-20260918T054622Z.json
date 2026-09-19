@@ -1,0 +1,105 @@
+{
+  "schema": "jev.muh2.judgerun-grade.v1",
+  "generated_at": "2026-09-18T05:46:22Z",
+  "source_receipt": "docs/demos/duel-2/runs/muh2-judge-20260918T071500Z.json",
+  "source_receipt_commit": "60ca31a",
+  "corpus": "demos/doc-drift/corpus.json (20 cases: 4 accurate, 14 drifted, 2 unknown)",
+  "baseline_design": "docs/demos/duel-2/BASELINE_MU-H2_vs_incumbents_COD.md (75cfb9f)",
+  "arithmetic": {
+    "corpus_n": 20,
+    "per_class": {
+      "ambiguous": [
+        2,
+        2
+      ],
+      "behavior": [
+        3,
+        3
+      ],
+      "coverage": [
+        3,
+        3
+      ],
+      "reference-drift": [
+        4,
+        4
+      ],
+      "semantic-default": [
+        4,
+        4
+      ],
+      "valid_anchor": [
+        4,
+        4
+      ]
+    },
+    "matched": 20,
+    "decided_nonambiguous": 18,
+    "uncertain": 2
+  },
+  "threshold_grade": {
+    "structural_parity": {
+      "status": "WIRING_ONLY",
+      "value": "1.0 recall / 0 false-clean / 0 false-stale on canned truth"
+    },
+    "semantic_lift": {
+      "status": "UNMEASURED",
+      "value": null,
+      "reason": "No live judgment and no incumbent arm comparison"
+    },
+    "coverage": {
+      "status": "WIRING_ONLY",
+      "value": "18/18 non-ambiguous decided; 2/2 ambiguous withheld"
+    },
+    "calibration": {
+      "status": "FAIL_GATE_UNMEASURED",
+      "ece": null,
+      "brier": null
+    },
+    "human_action_lift": {
+      "status": "FAIL_GATE_UNMEASURED",
+      "value": null
+    },
+    "incumbent_head_to_head": {
+      "status": "NOT_RUN",
+      "arms": [
+        "docverity --no-llm",
+        "docverity LLM/D2",
+        "fiberplane/drift"
+      ]
+    },
+    "cost_latency": {
+      "status": "NOT_RUN",
+      "value": null
+    }
+  },
+  "findings": [
+    {
+      "id": "M1",
+      "status": "PASS_WIRING_ONLY",
+      "detail": "Per-class denominators sum to 20 and all 20 canned outcomes match truth-derived expectations."
+    },
+    {
+      "id": "M2",
+      "status": "HOLD",
+      "detail": "Canned asker probability is keyed directly by gold label (accurate .9, drifted .15, unknown .55); the 20/20 result is a mock-echo plumbing result, not judgment accuracy."
+    },
+    {
+      "id": "M3",
+      "status": "HOLD",
+      "detail": "No Jev calls occurred and no docverity/fiberplane control arm ran, so structural parity and semantic lift cannot be compared."
+    },
+    {
+      "id": "M4",
+      "status": "HOLD",
+      "detail": "ECE/Brier and human action lift are explicitly null; the six-threshold ship gate requires both measurement surfaces."
+    },
+    {
+      "id": "M5",
+      "status": "PASS",
+      "detail": "The receipt is honest: it labels every gate dimension WIRING-ONLY/UNMEASURABLE and explicitly refuses to treat canned matches as evidence."
+    }
+  ],
+  "overall": "HELD_WIRING_PROOF_ONLY_NO_RUNG3_GATE",
+  "failures": []
+}

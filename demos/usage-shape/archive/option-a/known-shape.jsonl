@@ -1,0 +1,4 @@
+{"type":"session","id":"known-shape"}
+{"type":"turn_start"}
+{"type":"message","message":{"role":"assistant","model":"m","usage":{"input":100,"output":10,"cacheRead":900,"cacheWrite":5,"totalTokens":1015,"cost":{"total":10}}}}
+{"type":"turn_end"}

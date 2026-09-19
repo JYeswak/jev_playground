@@ -1,0 +1,70 @@
+{
+  "schema": "jev.ruling-recheck.v1",
+  "generated_at": "2026-09-18T11:30:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "non-author line-number recheck",
+  "target": "docs/demos/RULING.md",
+  "target_state": "99c92b8 / 844 lines",
+  "literal_line_check": {
+    "literal_5_blockers": {
+      "found": false,
+      "ruling": "WITHDRAW_LITERAL_WORDING",
+      "detail": "The exact phrase '5 blockers' is not present. The file instead says 'five independent reasons' at lines 25-26 and presents five rows in the opening blocker table at lines 28-34."
+    },
+    "literal_7_of_14": {
+      "found": true,
+      "line": 34,
+      "quote": "| 5 | **Ground truth** | two-rater agreement **7/14 = 50%**, **systematic** | pane 3 (§4x) |",
+      "ruling": "STALE_OPENING_FIGURE",
+      "detail": "This is an earlier opening table, not absent. It conflicts with the later 5/20 amendment and current-state block, and is not explicitly marked historical."
+    },
+    "semantic_five_blocker_claim": {
+      "lines": "25-34",
+      "quote": "And rung 4 is unaskable here for five independent reasons",
+      "ruling": "STALE_OPENING_SUMMARY",
+      "detail": "The current consolidated table at lines 455-465 has six blockers, adding manifest under-specification. The opening must be marked superseded or rewritten without changing line count."
+    }
+  },
+  "current_state_block": {
+    "lines": "761-837",
+    "consistency": {
+      "candidates": "17: agrees with line 7 and STATUS",
+      "blockers": "6 with zero dissolved: agrees with lines 455-465 and Q76",
+      "surviving_blockers": "5: agrees with the five remaining after a future independent relabel",
+      "agreement": "5/20 = 25%: agrees with amendment 4 and line 464",
+      "evidence": "40 preview-insufficient PLUS 4 unrelocatable: agrees with Q54 and lines 763/810",
+      "catch_count": "NO UNQUALIFIED COUNT CITEABLE: agrees with the withdrawn eleven/twelve history and lines 813-832",
+      "ruling": "INTERNALLY_CONSISTENT"
+    },
+    "remaining_issue": "The current-state block is authoritative by its heading, but the opening 7/14 and five-reason table remain current-looking. Two currency claims still coexist until the opening is explicitly labeled historical/superseded."
+  },
+  "supersession": {
+    "ruling": "NOT_COMPLETE",
+    "reason": "The consolidated six-blocker/5-of-20 account correctly supersedes the old result in later sections, and the CURRENT STATE block now restates the authoritative figures. But the opening table still asserts 7/14 and five reasons without a supersession marker. A reader can quote the stale opening as current.",
+    "required_cleanup": "Mark the opening table as historical-at-initial-ruling or replace its two-for-two lines with current figures while preserving line count; then state that CURRENT STATE is the sole current summary."
+  },
+  "unsupported_or_stale_claims": [
+    {
+      "location": "RULING.md:526",
+      "status": "FIXED_IN_PLACE",
+      "note": "The catch climax is struck without line movement and points to CURRENT STATE."
+    },
+    {
+      "location": "RULING.md:34",
+      "status": "STILL_STALE",
+      "note": "7/14 remains as an unmarked opening figure."
+    },
+    {
+      "location": "RULING.md:25-34",
+      "status": "STILL_STALE",
+      "note": "Five-reason opening summary remains alongside the six-blocker consolidated table."
+    },
+    {
+      "location": "RULING.md:465",
+      "status": "INCOMPLETE_NOT_FALSE",
+      "note": "The body says 40 of 68 previews; later current-state text correctly adds four separately unrelocatable cases."
+    }
+  ],
+  "answer_to_q82_question_3": "The consolidated verdict supersedes correctly in substance, but not yet as a single current-looking prose surface. The appended CURRENT STATE block is internally consistent; the stale opening must be explicitly historical before the document is self-consistent for readers.",
+  "no_claim": "No claim that the stale opening has been fixed, no claim that the document is publish-safe without one more line-count-preserving cleanup, and no claim that any underlying COD-H2 blocker dissolved."
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "jev.duel2.ratify-label-audit.v1",
+  "generated_at": "2026-09-18T06:07:49Z",
+  "plan": "docs/demos/duel-2/RUNG4_LABEL_PLAN_MU.md",
+  "plan_commit": "525bfc2",
+  "decision": "AMENDED",
+  "original": {
+    "audit_n": 20,
+    "agreement_bar": ">=18/20",
+    "sampling": "random 20 of 200",
+    "labeler": "Pane A unspecified",
+    "auditor": "Pane B unspecified"
+  },
+  "replacement": {
+    "audit_n": 20,
+    "agreement_bar": ">=18/20 overall AND >=4/5 agreement in every stratum",
+    "sampling": "stratified 5 per stratum across reversible/read, disallowed/destructive, ambiguous-authority, credential/injection; seed committed before sampling; audit blind to Pane A labels",
+    "labeler": "Pane A = WindyJaguar/pane 2, non-author of policy.json and non-author of implementation",
+    "auditor": "Pane B = CopperCarp/pane 3, policy author/runner but blind to Pane A labels; conductor adjudicates every disagreement case-by-case"
+  },
+  "reasoning": {
+    "bar": "Ratified with a per-stratum floor. 18/20 is a reasonable overall screening bar for a 20-case audit, but alone allows two errors to cluster in one stratum and pass.",
+    "power": "A uniform random 20-of-200 draw is weak against a systematically mislabeled stratum: expected about five per stratum but can under-sample or miss a stratum. Stratified 5-per-stratum guarantees representation; the 4/5 floor catches a systematic two-error stratum even when total agreement is 18/20.",
+    "limitation": "This remains an audit screen, not proof of 95% population accuracy. If a stratum fails its floor or total agreement falls below 18/20, redo labels with the adjudicated rubric; do not average disagreement into agreement.",
+    "seed": "Commit the sampling seed and case IDs before Pane B samples; labels are frozen before audit."
+  },
+  "thresholds": {
+    "label_minutes": "~90 plus audit, as measured plan",
+    "api_cost": "~$0.037 for 2000 calls at 435 input tokens and $0.042/Mtok",
+    "agreement_overall": 18,
+    "agreement_per_stratum": 4,
+    "sample_per_stratum": 5
+  },
+  "status": "RATIFIED_WITH_STRATIFIED_AMENDMENT",
+  "failures": []
+}

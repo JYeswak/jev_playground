@@ -1,0 +1,53 @@
+{
+  "schema": "jev.q100-outsider-verdict.v1",
+  "generated_at": "2026-09-18T13:20:00Z",
+  "actor": "WindyJaguar / pane 2",
+  "role": "outsider snapshot re-derivation",
+  "original_snapshot": "/var/folders/d0/09qgt_0n1m1ff8nyzbxppx9c0000gn/T/jev-snap-jrqv113j",
+  "original_manifest_digest": "dd5999f83a5dbec9",
+  "procedure": {
+    "source_repo_used_for_evidence": false,
+    "working_directory": "/var/folders/d0/09qgt_0n1m1ff8nyzbxppx9c0000gn/T/jev-snap-jrqv113j/files",
+    "status_input": "snapshot files/docs/demos/STATUS.tsv",
+    "sidecar_input": "snapshot files/docs/demos/duel-2/runs/receipt-other-reasons.json",
+    "command": "~/Developer/jev/scripts/verify-other-reasons.sh with JEV_STATUS/JEV_SIDECAR pointing into snapshot",
+    "producer_exit": 0
+  },
+  "verdict": {
+    "text": "OTHER_REASON SIDECAR: 3 other rows, 3 sidecar entries, exact coverage, bindings match STATUS pins, every locator resolves",
+    "classification": "PASS",
+    "snapshot_rerun_manifest_digest": "5ca0b971ae20201e",
+    "snapshot_rerun_source_head": "no-head",
+    "no_live_evidence_read": true
+  },
+  "rederivation": {
+    "manifest_files_rehashed": true,
+    "copied_verifier_read_snapshot_paths": true,
+    "evidence_verdict_reached_without_live_STATUS_or_receipts": true,
+    "path_mapping_required": "The verifier was run from snapshot/files so original relative receipt paths resolved inside the snapshot. No evidence bytes were rewritten."
+  },
+  "live_repo_dependencies": [
+    {
+      "dependency": "verifier implementation",
+      "status": "required_for_exact_automatic_rerun",
+      "detail": "The snapshot does not bundle scripts/verify-other-reasons.sh. The run used the live checkout's verifier code; an outsider needs that code at the recorded source revision or a bundled verifier artifact."
+    },
+    {
+      "dependency": "verifier/spec version",
+      "status": "partially_bound",
+      "detail": "The manifest records source HEAD and spec references, but does not contain the verifier source or a content digest of the verifier itself."
+    },
+    {
+      "dependency": "live evidence files",
+      "status": "not_required",
+      "detail": "STATUS, sidecar, and referenced receipts were present in the snapshot and the verdict was reached without reading their live counterparts."
+    },
+    {
+      "dependency": "git repository metadata",
+      "status": "not_required_for_evidence_verdict",
+      "detail": "The copied rerun reported source_head=no-head and still produced the same sidecar verdict. Git is needed only to contextualize source revision, not to inspect evidence bytes."
+    }
+  ],
+  "ruling": "The snapshot is not cosmetic: the evidence verdict can be rerun from snapshot files alone when the verifier code is supplied separately. Exact automatic reproducibility still depends on the verifier implementation/spec revision because the manifest does not bundle or hash that code.",
+  "no_claim": "No claim of fully self-contained archive reproducibility, no claim that the verifier source was snapshot-bound, and no claim that a third party can execute without obtaining the verifier implementation."
+}

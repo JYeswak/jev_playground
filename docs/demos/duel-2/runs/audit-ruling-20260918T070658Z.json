@@ -1,0 +1,72 @@
+{
+  "schema": "jev.duel2.ruling-audit.v1",
+  "generated_at": "2026-09-18T07:06:58Z",
+  "ruling": "docs/demos/RULING.md",
+  "ruling_commit": "e5b389abee207a285e2a197f82c486071d0cecc5",
+  "auditor": "WindyJaguar (pane 2, non-author of ruling)",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "none",
+      "status": "PASS_WITH_LIMITS",
+      "area": "MU-H3 selection",
+      "detail": "Evidence-over-score selection is defensible: MU-H3 has a measured entropy baseline failure and an unseeded named practitioner complaint, while H4 corpus and H1 transcript prevalence are blocked. It is not proof of product value; the ruling correctly makes prevalence the first phase."
+    },
+    {
+      "id": "R2",
+      "severity": "minor",
+      "status": "FLAG",
+      "area": "MU-H3 evidence strength",
+      "detail": "The entropy defeat is a 23-sentinel synthetic probe with precision never above 41.7%, not real outbound prevalence. The practitioner issue proves runtime-redaction pain but says nothing about calibration. The ruling mostly states these limits; the project claim must remain unknown-credential wedge, not broad redaction superiority."
+    },
+    {
+      "id": "R3",
+      "severity": "minor",
+      "status": "FLAG",
+      "area": "COD-H2 rung3 wording",
+      "detail": "Ruling says rung 3 “in full” while Q17 grade retained live-call provenance/calibration and UBS-location standing risks. Q26 discharged provenance at its declared ceiling, but the precise claim should be “rung3 mechanism/proof accepted with disclosed standing risks,” not unconditional security or calibration clearance."
+    },
+    {
+      "id": "R4",
+      "severity": "none",
+      "status": "PASS_WITH_CORRECTION",
+      "area": "rubric convergence",
+      "detail": "The dated correction explicitly retracts the stale 4–3/7-of-7 claim and records 3/7 plus pane3’s 5-1-1 split. The live ruling does not silently retain the falsified conclusion."
+    },
+    {
+      "id": "R5",
+      "severity": "major",
+      "status": "AMEND_REQUIRED",
+      "area": "RULED_OUT retry conditions",
+      "detail": "The ruled-out table gives demo-1 retry “none” and demo-8 “none stated.” §3c requires every RULED_OUT to ship an observable retry condition. Add conditions such as a new maintained router surface no longer covering the route, or a safe local-only credential-screen design with a non-leaking boundary; “none” is not a retry predicate."
+    },
+    {
+      "id": "R6",
+      "severity": "minor",
+      "status": "AMEND_REQUIRED",
+      "area": "COD-H3 retry",
+      "detail": "COD-H3 retry entries “T1 deterministic tooling outside the lane” and “T2 re-file as router with calibration wedge” are directions, not observable predicates. Add a concrete source/tool capability or measured misclassification fixture that reopens the candidate."
+    },
+    {
+      "id": "R7",
+      "severity": "none",
+      "status": "PASS_WITH_LIMITS",
+      "area": "omitted second project",
+      "detail": "No omitted candidate is clearly stronger under the ruling’s evidence-first rule. COD-H4 lacks its corpus, COD-H5 needs the shipped-integrity distinction, and COD-H1 lacks transcript prevalence. MU-H3 is defensible as a first-phase prevalence project, not as a proven winner over their scores."
+    },
+    {
+      "id": "R8",
+      "severity": "none",
+      "status": "PASS",
+      "area": "external ceiling claims",
+      "detail": "The ruling records survey ceilings as unverified/conflicted and preserves the local calibration receipt as n=60 rather than converting external agreement into correctness."
+    }
+  ],
+  "overall": "RATIFIED_WITH_RETRY_AMENDMENTS",
+  "required_amendments": [
+    "Replace demo-1 and demo-8 “none” retry entries with observable predicates.",
+    "Make COD-H3 retry conditions measurable predicates.",
+    "Qualify COD-H2 “rung3 in full” with the disclosed UBS/provenance standing risks."
+  ],
+  "failures": []
+}

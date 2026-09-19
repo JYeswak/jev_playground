@@ -1,0 +1,31 @@
+{
+  "schema": "jev.route-backtest.denominator-audit.v1",
+  "bead": "jev-demo-loop-a1q.5",
+  "generated_at": "2026-09-18T02:17:21Z",
+  "fixture": "demos/routing-backtest/fixtures/real-excerpt-t1-t6.jsonl",
+  "counts": {
+    "jsonlRows": 94,
+    "rowsContainingModelField": 18,
+    "manifestPurpose": "happy-path corpus turns 1-6",
+    "readerBeforeFix": {
+      "sessions": 1,
+      "turns": 1,
+      "classifiableTurns": 1,
+      "skippedTurns": 0
+    },
+    "messageEndRoles": {
+      "user": 1,
+      "assistant": 6,
+      "toolResult": 6
+    },
+    "turnStartEvents": 6,
+    "turnEndEvents": 6
+  },
+  "authority": {
+    "definition": "One turn is one turn_start→turn_end pair when those markers exist; fallback logs without markers use one user prompt plus following assistant/tool rows.",
+    "authoritativeCount": 6,
+    "why": "The real omp excerpt carries six turn_start/turn_end pairs and six assistant message_end records; the reader ignored markers and split only on user messages, producing one."
+  },
+  "finding": "Reader segmentation was wrong for marker-bearing excerpts; manifest turn range and marker count were authoritative.",
+  "no_claim": "No fixture files were edited; this receipt only records the measured denominator defect and source-level hypothesis."
+}
