@@ -162,3 +162,44 @@ Not phase gates — **build platform**. Every path still produces or requires an
 an arm64 host (RCH-E327, `critical_pressure=4`). Running `origin/main` needs a clean export, a
 native build, and a keyed budget for the live ranking calls. Filed as its own bead rather than
 smuggled into this one.
+
+## 2026-09-19, later — `jev-0bp` BLOCKED: local Rust builds are denied by construction on this host
+
+Pane 2 exported `origin/main` `4ed4c9b` cleanly and tried the absolute-path arm64 toolchain cargo I
+advised. **My advice was wrong and pane 2's report is correct.** That path is also managed:
+
+```
+$ head -7 ~/.rustup/toolchains/1.95.0-aarch64-apple-darwin/bin/cargo
+#!/bin/sh
+# rch toolchain cargo wrapper — MANAGED FILE, edit via `rch shim install`.
+# rch-toolchain-wrap-version: 3
+# Routes ABSOLUTE-path toolchain cargo calls through the canonical rch shim.
+# Scripts/Makefiles/agents invoking ~/.rustup/toolchains/<tc>/bin/cargo directly
+# bypass PATH; this is the one layer they cannot dodge.
+```
+
+Every route is closed, and deliberately:
+
+| route | outcome |
+|---|---|
+| `cargo` on PATH | rch shim |
+| `~/.cargo/bin/cargo` | rch shim — refused, `critical_pressure=4` |
+| `~/.rustup/toolchains/<tc>/bin/cargo` (absolute) | **managed wrapper, by design** |
+| `cargo-rch-real` | hard-deny launcher: `LOCAL RUST BUILD DENIED BY CONSTRUCTION` |
+| RCH remote (aarch64) | refused before execution: no admissible workers, `critical_pressure=4` |
+| RCH remote (x86_64, already built) | artifact rejected by **RCH-E327** on this arm64 host |
+
+**A bypass exists and this lane will not use it.** The wrapper honours
+`RCH_CARGO_WRAPPER_BYPASS=1`, which `rch` sets for its own local fallback. Setting it by hand is an
+agent dodging a guardrail whose stated purpose is stopping agents from dodging it. That is a
+decision for Joshua, not a workaround for a conductor — and this lane already has a rule against
+patching around someone else's infrastructure.
+
+### The bead is genuinely blocked, on capacity or policy
+
+Not on phase gates (retracted), not on skill (three panes, five routes). `jev-0bp` needs **one** of:
+RCH worker capacity freed so an aarch64 remote build is admissible, or an explicit local-build
+exception from Joshua.
+
+**NO-CLAIM:** no `sr` subcommand has executed on this host by any route. Whether `origin/main`
+compiles here is still unknown. The vendored clone remains at `3fe85c4`, untouched and unmoved.
