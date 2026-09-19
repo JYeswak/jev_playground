@@ -1,6 +1,8 @@
+import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Message } from 'fast-jev-compaction';
+import { adaptOmpTranscript } from '../src/omp-adapter.js';
 import ompCompactionHook, { registerOmpCompactionHook, type OmpLike } from '../src/omp-binding.js';
 
 // A stub standing in for omp's extension API. It captures the handler the binding registers, so a
@@ -92,4 +94,31 @@ test('the default export refuses to be installed without a configured asker', ()
     /requires a configured JevAsker/,
     'installing the module directly must fail loudly rather than register a broken hook',
   );
+});
+
+
+// THE BRANCH THE SYNTHETIC FIXTURES COULD NOT REACH. Plain turns and hand-made `toolUses` both
+// short-circuit on "no tool calls" before the asker is called, so the Jev-failure path went
+// untested. A REAL omp transcript through the adapter reaches it: 179 events in, 24 messages, 11
+// tool results paired, 13 messages out — enough tool structure that `compact` actually asks Jev.
+test('REAL TRANSCRIPT: a Jev outage passes through with its reason, context intact', async () => {
+  const raw = readFileSync(
+    new URL('../fixtures/omp-session-big-20260917.jsonl', import.meta.url),
+    'utf8',
+  );
+  const events = raw.split('\n').filter(Boolean).map((l) => JSON.parse(l));
+  const { messages } = adaptOmpTranscript(events);
+  assert.ok(messages.length > 0, 'the adapter must produce messages from the fixture');
+
+  const { pi, fire } = stubPi();
+  const seen: string[] = [];
+  registerOmpCompactionHook(pi, {
+    asker: { ask: async () => { throw new Error('jev is down'); } },
+    onDecision: (o, r) => seen.push(`${o}:${r}`),
+  });
+
+  const out = await fire({ messages });
+  assert.equal(out, undefined, 'a dead Jev must never return a compaction');
+  assert.match(seen[0], /^passthrough:jev failure: jev is down$/,
+    'the outage reason is reported verbatim, not swallowed into a generic passthrough');
 });
