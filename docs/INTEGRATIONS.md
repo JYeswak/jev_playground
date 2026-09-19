@@ -19,16 +19,16 @@ mirror after `fh` ranked them — `asupersync` `eprocess.rs:224-238`, `franken_o
 
 Receipt: [`docs/demos/upstream-repro/toolcall-headtohead-20260919.md`](demos/upstream-repro/toolcall-headtohead-20260919.md) (`f7bcd9d` on `main`). Ruling, second axis: [`docs/demos/upstream-repro/RULING-authored-vs-real-20260919.md`](demos/upstream-repro/RULING-authored-vs-real-20260919.md) (`268073e`). Pane 3 (muse) scored; pane 2 authored the rule. Held-out split neither scoring pane authored. **Not a promotion.**
 
-**Headline.** Ship pane 2's classifier; drop Jev from this surface. Four regexes beat the model on recall at identical false-positive rate, at zero cost and zero latency.
+**Headline.** Ship pane 2's classifier; drop Jev from this surface. Four regexes beat the model on recall (12/12 vs 11/12) at zero cost and zero latency. Rule FP is **0/38** on the committed corpus. The receipt **0/40** is historical and unreproducible (`NEGATIVE_EVIDENCE.md` R34; two benign cases never committed).
 
 | arm | FP | recall | bar |
 |---|---|---|---|
-| rule (unmodified, shasum-verified) | **0/40** | **12/12** | PASS |
-| live Jev (`jev-latest` → `jev-1.13.0`) | **0/40** | **11/12** | PASS, strictly dominated |
-| dumb keyword list | **0/40** | **5/12** | MISS |
+| rule (unmodified, shasum-verified) | **0/38** (committed corpus; `verify-claim.mjs`) | **12/12** | PASS |
+| live Jev (`jev-latest` → `jev-1.13.0`) | **0/40** (historical receipt; unreproducible offline) | **11/12** | PASS, strictly dominated |
+| dumb keyword list | **0/40** (historical receipt; unreproducible offline) | **5/12** | MISS |
 | feasibility (test-path) | — | AUC **1.000** | PASS |
 
-Jev's miss is r3 (`git push --force origin main`). **Jev was not bad** — 11/12 with 0 FP on 40 benign commands is strong in isolation. This is a cost-benefit kill (API per tool call), not a capability kill.
+The FP column is **not** a like-for-like comparison. Only recall (12/12 vs 11/12 vs 5/12) still compares cleanly. Jev's miss is r3 (`git push --force origin main`). **Jev was not bad** — 11/12 with 0 FP on a historical 40 benign commands is strong in isolation. This is a cost-benefit kill (API per tool call), not a capability kill.
 
 **The pattern, which is the headline.** Fifth time a dumb baseline beat the model: phishing regex +27 points; flat mid-tier pricing (Jev +90.2% more expensive); prompt length (2 of 3 sessions); keep-everything on compaction (7× fewer mistakes); four regexes on tool-call harm. **Where the harm is expressible, express it.** A judge earns its place only where a rule cannot be written; five surfaces did not find such a place.
 
@@ -171,7 +171,7 @@ on the `createObserver` gate path.
 
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
-| tool_call head-to-head | RULE WINS; ship classifier, drop Jev | rule 12/12 vs Jev 11/12 vs dumb 5/12, both FP 0/40; cost-benefit kill | no |
+| tool_call head-to-head | RULE WINS; ship classifier, drop Jev | rule 12/12, FP **0/38** committed corpus; Jev 11/12 / dumb 5/12, historical FP 0/40 unreproducible (R34); cost-benefit kill | no |
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
 | dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1** (`a2e2035`, receipt `omp-jev-observer-id-join-20260919.md`); working profile under real traffic **OPEN**; lab only; not working/production dogfood | no |

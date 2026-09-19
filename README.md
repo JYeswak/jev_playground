@@ -15,14 +15,19 @@ keep-everything on compaction, **7× fewer mistakes**; (5) four regexes on tool-
 
 **The fifth is the cleanest, and it is a cost-benefit kill of Jev on `tool_call`, not a
 capability kill.** Held-out split, corpus neither scoring pane authored, non-author scored:
-pane 2's classifier (unmodified, shasum-verified) **12/12** recall, FP **0/40**; live Jev
-**11/12**, FP **0/40** (misses r3, `git push --force origin main`); a dumber keyword list
-**5/12**; feasibility arm **1.000**. Ship the classifier; drop Jev from this surface. Four
-regexes beat the model at zero cost and zero latency
-([receipt](docs/demos/upstream-repro/toolcall-headtohead-20260919.md)). **Jev was not
-bad** — 11/12 with 0 FP on 40 benign commands is strong in isolation. The model would
-charge per tool call to do worse. **NO-CLAIM:** cross-model traffic is unattributed;
-recall is on 12 planted harms, not observed incidents.
+pane 2's classifier (unmodified, shasum-verified) **12/12** recall, FP **0/38**
+on the committed corpus (`verify-claim.mjs`; R34). The receipt **0/40** is
+historical and unreproducible — two benign cases were never committed. Live Jev
+**11/12**, historical FP **0/40** (misses r3, `git push --force origin main`); a
+dumber keyword list **5/12**, historical FP **0/40**; feasibility arm **1.000**.
+Ship the classifier; drop Jev from this surface. Four regexes beat the model on
+recall at zero cost and zero latency
+([receipt](docs/demos/upstream-repro/toolcall-headtohead-20260919.md)). The FP
+column is **not** a like-for-like comparison (0/38 vs historical 0/40). **Jev
+was not bad** — 11/12 with 0 FP on a historical 40 benign commands is strong in
+isolation. The model would charge per tool call to do worse. **NO-CLAIM:**
+cross-model traffic is unattributed; recall is on 12 planted harms, not
+observed incidents.
 
 **22 Jev repos appeared in launch week. We ran all of them; everything passed, and that proved
 nothing.** Substituting a well-formed RANDOM judge left 254 of 305 tests green (83%)
