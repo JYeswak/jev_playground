@@ -872,3 +872,25 @@ installer defects got written in the first place.
 `~/.omp/.../sessions/*.jsonl` replaying with `messagesBefore > 0` and at least one request, plus
 the existing six invariant checks still green. Until then, no replay figure may be described as
 measured on a live session.
+
+### R23 addendum, same day — our fixtures are NOT stale; there are two live surfaces
+
+R23's NO-CLAIM said *"I did not determine when the on-disk shape changed, or whether the stream
+shape is still emitted anywhere — so 'our fixtures are stale' is a plausible reading I have not
+established."* Established now, and the plausible reading was **wrong**.
+
+`message_end` is current. It is the `--mode json` **stream** contract:
+`types/modes/print-mode.d.ts:24-36` documents `printableEvent` dropping `message_update` snapshots
+because *"the authoritative message follows in `message_end`"*. That surface is alive and is what
+our fixtures captured.
+
+So omp has **two** transcript shapes, both current, for different purposes:
+
+| surface | shape | our support |
+|---|---|---|
+| `omp --mode json` stdout (stream) | `message_end` events | **works** — the adapter and every replay figure |
+| `~/.omp/.../sessions/*.jsonl` (on disk) | `SessionEntry`, `type: "message"` | **absent** — `jev-0c6` |
+
+This makes `jev-0c6` an ADDITION, not a repair, and it removes the implication that our published
+replay numbers were measured on a dead format. They were measured on a live one — just not the one
+a user's session history is written in.
