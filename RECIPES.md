@@ -97,6 +97,21 @@ being true when the two are correlated"; the phi coefficient between the scorers
 that is *why* the average pays. Reproduce with `python3 ensemble/run_lingspam.py` (no API key, no
 training).
 
+**Updated 2026-09-19 — the falsifier was tested and the rule survived it.** Three pairs from
+upstream's committed scores, `python3 ensemble/run_all.py`:
+
+| pair | phi | gain |
+|---|---|---|
+| bare question + logreg (Ling-Spam) | +0.035 | **+1.25 pp** |
+| Jev choice + TF-IDF (phish, n=5,733) | +0.107 | **+0.38 pp** |
+| logreg + naive Bayes, **same features** (Ling-Spam) | **+0.526** | **-0.14 pp** |
+
+The correlated pair **loses accuracy when averaged**. That third row is the natural experiment:
+two genuinely different algorithms, both good, sharing a feature space — exactly the case the
+recipe predicts must fail, and it does. So the rule is now a *predictor* on three points rather
+than a mechanism consistent with one, and the practical form is: **measure phi before you build an
+ensemble; near zero, average — above ~0.5, pick the better scorer.**
+
 Identical headline accuracy, **opposite failure shapes** — the question protects recall, the
 classifier protects precision — so the average is better than either at both.
 

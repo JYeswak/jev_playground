@@ -112,3 +112,11 @@ phi is reported; mismatched lengths and empty input are refused with the lengths
 load-bearing one is the **planted negative** — averaging a scorer with *itself* must buy exactly
 zero and report `AVERAGE_DID_NOT_PAY`, because a measurement that showed a gain there would be
 measuring arithmetic rather than decorrelation. Run: `cd ensemble && python3 -m unittest test_decorrelation`.
+
+### `ensemble/run_all.py` — runner, not a test suite
+
+Reproduces recipe 4's predicate across three pairs from upstream's committed out-of-fold scores
+(no API key, no training). Not registered as a test because it asserts nothing; its value is the
+printed ordering, including the **correlated control** (`logreg + naiveBayes`, same features,
+phi +0.53) which loses accuracy when averaged. The assertions live in
+`ensemble/test_decorrelation.py`. Run: `python3 ensemble/run_all.py`.
