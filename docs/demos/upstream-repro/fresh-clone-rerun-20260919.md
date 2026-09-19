@@ -40,3 +40,25 @@ output AND in `verify-frozen.sh` output (same string, two surfaces).
 
 Live-key commands (`jev-probe` without `--replay`, keyed suites) not run;
 `sync-docs.sh` not run; mine-mode only on an empty dir; one machine, one run.
+
+## Second re-run after 850ea73 (new temp clone, public HEAD incl. the fix)
+
+End-to-end arm, exactly as printed: clone fresh -> gates rc=1 naming
+`br sync --import-only` -> run it verbatim (Created: 32 issues, rc=0) ->
+rerun gates: **ALL GREEN, 12/12 including stage 40**. The corrected fix line
+is now proven from a cold start, not just from a developed tree. This closes
+the loop the first re-run opened.
+
+| Command | rc | Verdict |
+|---|---|---|
+| quickstart | 0 | tail fixed: no count, points at lane-status.sh; reads correctly |
+| gates --selftest | 0 | 12 stages prove RED arms |
+| verify-frozen | 1 | FAILs on gates (missing .db in frozen clone); 4 suites PASS inside |
+| lane-status | 4 | same UP-R8 drift, named + actionable (re-pin or explain) |
+| jev-probe --replay | 0 | — |
+| quickstart --mine /tmp | 0 | clean empty-dir message |
+| observe-only grep (`-q` form) | 0 | "observe-only: no block path" |
+| verify-claim.mjs | 0 | 12/12 + 0/38 REPRODUCIBLE |
+
+sync-docs --check and live-key commands not run (stated, as before). No R37
+regression: every row behaves or fails with its fix attached.
