@@ -69,6 +69,20 @@ mistuned" — **no threshold can work, because the probability does not rank fut
 separately reports mistakes/10KB flat at 1.7–2.1 across the whole 0.1–0.9 sweep, with no operating
 point, and nothing beating keep-everything.
 
+## Positive control: the harness detects signal, so the null is real
+
+Pane 3 ran deterministic labels through the identical pipeline, SDK and scorer (`66fa05d`):
+
+| label | AUC | n |
+|---|---|---|
+| was-a-read (`toolName == read`) | **0.941** | 23 |
+| is-an-error (regex) | **0.698** | 56 |
+| keep_p vs needed, same run | **0.457** | 111 |
+
+A pipeline that scores 0.941 on a detectable label and 0.457 on keep-vs-needed is detecting signal
+where signal exists. That is what makes the null a finding rather than a broken harness — the
+defect class that produced two false readings earlier in this session.
+
 ## The ruling
 
 **Do not run this compactor on an omp session.** In agentic coding transcripts ~90% of tool
