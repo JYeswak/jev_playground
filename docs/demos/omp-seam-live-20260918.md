@@ -76,3 +76,34 @@ loading half is unproven.** Calling this L3 would be the claim §4 exists to pre
   not a test this suite should own. It is a probe, run deliberately, receipted here.
 - `live-probe.mjs` is committed so the run is reproducible, and it **refuses to do anything without
   `TYPESAFE_API_KEY` in the environment**.
+
+## 2026-09-19 — the hook fired in production, and reached L3
+
+Joshua ran a handful of tests and then `/compact`. The hook fired. Five real
+`session_before_compact` events later, every assumption this lane held about omp's contract had
+been replaced by an observed one. The full progression, each line read from `~/.jev-compact.log`:
+
+| # | decision log line | what it falsified |
+|---|---|---|
+| 1 | `refused: no messages on the event envelope` | `event.messages` — the documented field — does not exist |
+| 2 | `refused: ... envelope keys: type,preparation,branchEntries,customInstructions,signal` | found the real one: `preparation.messagesToSummarize` |
+| 3 | `passthrough: ... 'tool of message.toolUses'` | omp's live messages are not `fast-jev-compaction`'s `Message` |
+| 4 | `refused: adapter yielded 0 of 1; role=custom parts=string` | `content` can be a bare string; `role` can be `custom` |
+| 5 | `passthrough: below minimum reduction: 0% reduction; no tool calls` | nothing — the path runs and declines on the merits |
+
+**The fail-safe property was tested by production, not by us.** The hook was wrong four times in a
+row and omp's own summarizer handled every one of those compactions. No transcript was touched.
+
+**Why line 5 is a correct answer and not a failure.** `messagesToSummarize` carries the *older
+prefix* omp has chosen to summarize — not the whole session. In a one-shot `omp -p` run that prefix
+is a single user message, and this compactor's savings come from tool results and thinking blocks.
+Zero tool calls means zero to remove. A run deliberately built to make eight tool calls produced
+the same line, which is the useful finding: the tool-call turns were in `recentMessages`, which a
+hook **must not** compact, because omp intends to keep them verbatim.
+
+### Rung
+
+**L3 reached** — the seam fires in a real omp session, and known-bad input makes it refuse.
+**L4 (a real transcript measurably shrunk in production) is NOT reached** and cannot be reached
+from `omp -p`: it needs a long interactive session whose older prefix contains tool calls. The hook
+is installed and logging, so the next such `/compact` will record it either way.
