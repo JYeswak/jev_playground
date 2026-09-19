@@ -65,3 +65,27 @@ real. Baseline on block-form config: install 0.
 "No fourth defect found in the five arms tried." Remaining uncovered (stated,
 not attempted): non-UTF8 config, Windows line endings, concurrent installs,
 real profiles.
+
+## Round 3 — verify-claim.mjs grade: clean on all five arms (pane 3, non-author)
+
+1. Run: rc=0 unpiped, 12/12 + 0/38 REPRODUCIBLE. README table matches exactly
+   (0/38 rule vs 0/40 historical, rows-do-not-share-denominator stated).
+2. Mutation (777→778 in shipped rule): recall drops to 10/12 (confirms
+   pane2's figure independently), VERDICT BLOCKED, exit 2 taken UNPIPED.
+   File restored byte-identical after (no diff). Not theatre.
+3. Import, not reimplementation: dynamic `import()` of the shipped
+   harm-rule.ts (line 4) driven through a stub pi; zero regex copies in the
+   verifier.
+4. Provenance: positives from committed corpus-v3.json; benign from committed
+   corpus-v3 + bicameral commands.json + heldout.json (all present on disk).
+   The 2 missing historical cases are openly admitted in the script's own
+   output (0/40 → 0/38 with NO-CLAIM) — the circularity the unit feared is
+   disclosed, not hidden.
+5. Tamper (`chmod 666 /var/tmp/myfile` appended): denominator 38→39, FP 0→1,
+   BLOCKED. Sensitive to its inputs. Heldout file restored shasum-verified
+   after (8109a74c6c5af86a before and after).
+
+"No defect found in the five arms tried." Worktree verified clean for
+harm-rule.ts and heldout.json after (git status shows only pane2's own
+install-harm-rule.sh edit, untouched). Uncovered: non-UTF8/CRLF inputs to the
+verifier, concurrent runs, real-profile sessions.
