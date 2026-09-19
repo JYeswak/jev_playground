@@ -58,6 +58,8 @@ function futureText(messages: readonly Message[], i: number): string {
 }
 
 export interface Hindsight {
+  /** per-call: did this decision drop something later reused? (aligned across judge and baseline) */
+  errFlags: boolean[];
   dropped: number;
   droppedButReused: number;
   kept: number;
@@ -77,7 +79,7 @@ export function scoreDecisions(
   });
 
   const h: Hindsight = {
-    dropped: 0, droppedButReused: 0, kept: 0, keptAndNeverReused: 0, reusedOverall: 0, callsScored: 0,
+    errFlags: [], dropped: 0, droppedButReused: 0, kept: 0, keptAndNeverReused: 0, reusedOverall: 0, callsScored: 0,
   };
   // DECISIONS CARRY SYNTHETIC IDS. fast-jev-compaction renames every call to `t1`, `t2`, ... to
   // shrink the state it sends, so `decision.id` never matches a transcript `tool_use_id`. The
@@ -106,7 +108,9 @@ export function scoreDecisions(
     const reused = marks.some((t) => future.includes(t));
     h.callsScored += 1;
     if (reused) h.reusedOverall += 1;
-    if (d.action === 'drop_result' || d.action === 'drop_call') {
+    const dropping = d.action === 'drop_result' || d.action === 'drop_call';
+    h.errFlags.push(dropping && reused);
+    if (dropping) {
       h.dropped += 1;
       if (reused) h.droppedButReused += 1;
     } else {
@@ -142,6 +146,48 @@ export function randomBaseline(
   return scoreDecisions(messages, asRandom);
 }
 
+/**
+ * ANYTIME-VALID VERDICT, borrowed from the corpus rather than invented here.
+ *
+ * `asupersync/src/lab/oracle/eprocess.rs` implements an e-process: a non-negative supermartingale
+ * whose type-I error is controlled under OPTIONAL STOPPING by Ville's inequality. Its update is
+ *
+ *     e_t = e_{t-1} * max(1e-15, 1 + lambda * (x_t - p0))        reject when e >= 1/alpha
+ *
+ * and that is reproduced exactly below, constants included (lambda 0.5, alpha 0.05).
+ *
+ * Why it belongs here: "45.0% vs 44.1%" is a point estimate on two sessions and invites exactly
+ * the error of stopping when the number looks good. An e-process lets evidence accumulate call by
+ * call and stay valid whenever you stop looking.
+ *
+ * The test is PAIRED and uses only DISCORDANT calls — those where exactly one of {Jev, random}
+ * erred. Under the null "Jev is no better than random" each discordant call is a fair coin, so
+ * p0 = 0.5, and x_t = 1 only when RANDOM erred and Jev did not. e >= 20 is evidence for Jev;
+ * e <= 0.05 is evidence against it.
+ */
+export function eProcessVerdict(
+  jevErrs: readonly boolean[],
+  randomErrs: readonly boolean[],
+  lambda = 0.5,
+  p0 = 0.5,
+  alpha = 0.05,
+): { e: number; discordant: number; verdict: string } {
+  let e = 1;
+  let discordant = 0;
+  for (let i = 0; i < Math.min(jevErrs.length, randomErrs.length); i++) {
+    if (jevErrs[i] === randomErrs[i]) continue; // concordant calls carry no paired evidence
+    discordant += 1;
+    const x = randomErrs[i] && !jevErrs[i] ? 1 : 0;
+    const factor = Math.max(1e-15, 1 + lambda * (x - p0));
+    e = Math.min(e * factor, 1e15);
+  }
+  const verdict =
+    e >= 1 / alpha ? 'JEV BEATS RANDOM (reject null)'
+      : e <= alpha ? 'RANDOM BEATS JEV (reject the other way)'
+        : 'INCONCLUSIVE — no anytime-valid evidence either way';
+  return { e, discordant, verdict };
+}
+
 async function main(): Promise<number> {
   const files = process.argv.slice(2);
   if (files.length === 0) {
@@ -152,9 +198,10 @@ async function main(): Promise<number> {
     console.error('TYPESAFE_API_KEY is not set; run under infisical. Jev decisions are the input.');
     return 2;
   }
-  let J: Hindsight = { dropped: 0, droppedButReused: 0, kept: 0, keptAndNeverReused: 0, reusedOverall: 0, callsScored: 0 };
+  let J: Hindsight = { errFlags: [], dropped: 0, droppedButReused: 0, kept: 0, keptAndNeverReused: 0, reusedOverall: 0, callsScored: 0 };
   let R: Hindsight = { ...J };
   const add = (a: Hindsight, b: Hindsight): Hindsight => ({
+    errFlags: [...a.errFlags, ...b.errFlags],
     dropped: a.dropped + b.dropped,
     droppedButReused: a.droppedButReused + b.droppedButReused,
     kept: a.kept + b.kept,
@@ -196,6 +243,10 @@ async function main(): Promise<number> {
   console.log(`JEV    dropped ${J.dropped}, of which later reused: ${J.droppedButReused}  (${(rate(J) * 100).toFixed(1)}% mistakes)`);
   console.log(`RANDOM dropped ${R.dropped}, of which later reused: ${R.droppedButReused}  (${(rate(R) * 100).toFixed(1)}% mistakes)`);
   console.log(`kept but never reused:   ${J.keptAndNeverReused}  (missed savings)`);
+  const ev = eProcessVerdict(J.errFlags, R.errFlags);
+  console.log(`\nE-PROCESS (paired, anytime-valid; asupersync lab::oracle::eprocess rule)`);
+  console.log(`  discordant calls: ${ev.discordant}   e-value: ${ev.e.toFixed(3)}   threshold: 20`);
+  console.log(`  ${ev.verdict}`);
   console.log('\nLower is better for mistakes. If JEV is not below RANDOM, the judgement is not');
   console.log('earning its cost, whatever the byte reduction says.');
   return 0;
