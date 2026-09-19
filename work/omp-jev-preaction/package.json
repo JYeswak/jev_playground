@@ -1,0 +1,11 @@
+{
+  "name": "omp-jev-preaction",
+  "version": "0.1.0",
+  "description": "Observe-only preaction gate for omp bash: deterministic wipe patterns from the measured preaction-abstention policy (no Jev call on the cheap arm)",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["omp-plugin", "omp-extension", "pi-package", "jev", "preaction"],
+  "omp": { "extensions": ["./src/index.ts"] },
+  "pi": { "extensions": ["./src/index.ts"] },
+  "files": ["src", "README.md"]
+}

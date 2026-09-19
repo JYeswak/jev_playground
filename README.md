@@ -243,6 +243,33 @@ returned a reproducible finding in ten minutes.
 Each tool takes one command, reads your own logs, and writes a receipt that states its denominator
 before any share. No API key. No network.
 
+## The omp extensions
+
+Six installable omp packages, each mined from one upstream Jev repo. Every one is
+**observe-only**: it writes a decision row and changes nothing the agent does. The column that
+matters is the last one — whether a model call earns its place on that surface, decided by
+measurement rather than preference.
+
+| extension | mined from | offline tests | live-proven | calls Jev? |
+|---|---|---|---|---|
+| [`omp-harm-rule`](work/omp-harm-rule/) | the tool_call corpus | 12/12 recall, 0/38 FP | yes, working profile | **no** — four regexes beat it 12/12 to 11/12 |
+| [`omp-jev-preaction`](work/omp-jev-preaction/) | `preaction-abstention` policy | 6/6 incl. a false-positive arm | yes, `jev-lab` | **no** — deterministic patterns only |
+| [`omp-jev-observer`](work/omp-jev-observer/) | the observe-and-log seam | 7/7 | yes, `jev-lab` | yes |
+| [`omp-jev-review`](work/omp-jev-review/) | `jev-review` | 6/6 | yes, `review_scored` | yes — no regex for "this refactor changed a default" |
+| [`omp-jev-rerank`](work/omp-jev-rerank/) | `jev-rerank-bench` | 7/7 | yes, `{ordered: 0.91}` | yes, **one** question — measurement killed the other two |
+| [`omp-jev-failure`](work/omp-jev-failure/) | `jev-agent-failure-benchmark` | 4/4 | yes, `failure_scored` | yes |
+
+Two of six contain **no model call at all**, and that is the most useful thing this lane has
+produced. The harm gate was decided by putting four regexes, a live model and a dumb baseline on
+the same held-out split and reading the result: the regexes won by one recall point at zero cost
+and zero latency. A judge earns its seat where a rule cannot be written — and nowhere else.
+
+All six share one typed caller, [`work/jev-client`](work/jev-client/), because every hand-rolled
+request body in this repo was wrong at least once (`{questions: […], context}` → HTTP 400;
+`.probability` instead of `.noul` → undefined). The API key lives in Infisical; see
+[`.env.example`](.env.example) for the exact command, because "the key is missing" was reported
+three times and was wrong three times.
+
 ### `work/omp-harm-rule/` — the model lost, so we shipped the regexes
 
 ```bash
