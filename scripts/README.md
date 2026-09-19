@@ -29,7 +29,8 @@ tool directory is one where nobody can tell a live instrument from an abandoned 
 
 | Script | Does | Exit codes beyond 0/1 |
 |---|---|---|
-| `verify-frozen.sh` | runs `foundation/gates.sh`, every demo's tests and mutation harness, and the probe's offline replay inside a git worktree **pinned to a commit**, then `cmp`s the executables. Exits non-zero at HEAD by design, because two gate stages need state a clone does not carry | — |
+| `bootstrap-compaction.sh` | fetches the pinned `fast-jev-compaction` sibling, builds `dist/`, and `npm install`s `compaction/`. Idempotent. `--check` exits 1 when a fresh clone would fail stage 40 | — |
+| `verify-frozen.sh` | runs `foundation/gates.sh`, every demo's tests and mutation harness, and the probe's offline replay inside a git worktree **pinned to a commit**, then `cmp`s the executables. Stage 40 is bootstrapped; stages 50/60 still need `LOOP_KIT` | — |
 | `sync-docs.sh` | fetches the mirrored primary sources; `--check` verifies every byte against `MANIFEST.tsv` | — |
 | `jev-probe.mjs` | one live Jev call, or `--replay` to decode a recorded response with no network and no key | 2 no key present |
 

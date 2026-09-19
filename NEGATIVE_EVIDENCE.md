@@ -1317,3 +1317,29 @@ re-measurement, which cannot happen while nothing is promoted.
 two independent re-measurements. At that point a floor has something to protect and the observed
 defect becomes nameable. Until then the tick spends its budget on shipping a surface, not on
 guarding an empty shelf.
+
+## R32 — `npm install --prefix compaction` does not make stage 40 green on a fresh clone (2026-09-19)
+
+**Refuted hypothesis:** stage 40 fails on a stranger clone only because `compaction/node_modules`
+is absent, and `npm install --prefix compaction` is the fix. That is what `README.md` said
+through `d6b52ea`.
+
+**Measured on a clean checkout of the public repo** (this cloud agent, no sibling clone, no
+`compaction/node_modules`):
+
+1. `bash foundation/gates.d/40-omp-compact-replay.sh` → `RED: compaction typecheck failed`.
+2. `npm install --prefix compaction --no-audit --no-fund` → **exit 0**, 7 packages.
+3. `compaction/node_modules/fast-jev-compaction` is a **dangling symlink** to
+   `../../fast-jev-compaction`, which this repo does not vendor (`file:../fast-jev-compaction`
+   in `compaction/package.json`).
+4. `npx tsc --noEmit` → exit 2, `Cannot find module 'fast-jev-compaction'`.
+
+So the published fix installs the *dev* toolchain and still leaves typecheck red. A second,
+independent hole on the same machine: `/bin/sh` is dash, and every `#!/bin/sh` + `set -o pipefail`
+stage exited 2 before doing work (`Illegal option -o pipefail`). macOS `/bin/sh` is bash, which
+is why the 2026-09-18 "eleven of twelve" measurement never saw this.
+
+**Retry condition:** a fresh clone of the public repo, no `node_modules`, no sibling clone, on
+both macOS and Debian, with `bash foundation/gates.sh` — stage 40 must PASS after the
+bootstrap (and the dash stages must actually run). Closed in form by
+`scripts/bootstrap-compaction.sh` + bash shebangs; reopen if that clone still REDs stage 40.
