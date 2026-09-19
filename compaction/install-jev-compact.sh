@@ -124,7 +124,23 @@ if [ -f "$entry" ] && ! cmp -s "$entry_src" "$entry"; then
   echo "note: existing $entry differs from the template; kept a copy at $backup"
 fi
 cp "$entry_src" "$entry" || fail "copy of hook entry failed"
-cp -r "$skill_src" "$skill" || fail "copy of skill failed"
+# `cp -r "$skill_src" "$skill"` NESTS on re-install. Measured 2026-09-19: the second install
+# produced .omp/skills/jev-compact/jev-compact/SKILL.md, left the original stale, and still
+# printed PASS -- because the verification below looks for $skill/SKILL.md, which existed. A
+# false green that survives every re-install. Copy the FILE, with the same divergence rule as
+# the entry and the sources.
+# `cp -r` used to create this directory as a side effect; copying a file does not. A fresh install
+# failed RED on the first run after that change -- closed, not silent, but a regression I caused.
+mkdir -p "$skill" || fail "could not create $skill"
+if [ -f "$skill/SKILL.md" ] && ! cmp -s "$skill_src/SKILL.md" "$skill/SKILL.md"; then
+  skill_backup="$skill/SKILL.md.superseded-$(date -u +%Y%m%dT%H%M%SZ)"
+  cp "$skill/SKILL.md" "$skill_backup" || fail "could not back up $skill/SKILL.md"
+  echo "note: existing $skill/SKILL.md differs from source; kept a copy at $skill_backup"
+fi
+cp "$skill_src/SKILL.md" "$skill/SKILL.md" || fail "copy of skill failed"
+# A nested directory from an installer older than this fix is reported, never deleted: removing a
+# user's files is not this script's call.
+[ -d "$skill/jev-compact" ] && echo "note: stale nested $skill/jev-compact left by an older installer; safe to delete by hand"
 
 dep_ver=$(node -p "require('$lib/node_modules/fast-jev-compaction/package.json').version" 2>/dev/null || echo unknown)
 dep_sha=$(git -C "$dep_src" rev-parse HEAD 2>/dev/null || echo unknown)
