@@ -1,0 +1,12 @@
+{
+  "name": "omp-jev-failure",
+  "version": "0.1.0",
+  "description": "Observe-only Jev scoring for errored omp tool executions.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["omp-plugin", "omp-extension", "jev", "failure-observer"],
+  "omp": { "extensions": ["./src/index.ts"] },
+  "pi": { "extensions": ["./src/index.ts"] },
+  "files": ["src", "README.md"],
+  "scripts": { "test": "node --test test/*.test.mjs" }
+}
