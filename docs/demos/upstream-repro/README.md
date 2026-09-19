@@ -121,9 +121,18 @@ That string appears in no receipt, and what the receipt records is that a bare `
 **fails collection** — the pinned `whowhen_eval` dependency is absent, so there is no score at all.
 A dependency failure had been written up as a degraded result. Corrected in `db37dac`.
 
-Two figures (`87.1% chars saved`, `21 messages to 7`) traced only to this index rather than to a
-primary receipt, and one (`29/29`) was upgraded from index-backed to **re-executed**: a fresh
-`npm install && npm test` in `fast-jev-compaction` gives 2 files, 29 passed.
+**All three weak links are now closed by re-execution, not argument.** `29/29` was upgraded from
+index-backed to re-executed (fresh `npm install && npm test` in `fast-jev-compaction`: 2 files, 29
+passed). The two live figures — `87.1% chars saved` and `21 messages to 7` — traced only to a pane
+callback, so upstream's own `examples/demo.ts` was run against a real key:
+
+```
+stats: {"messagesBefore":21,"messagesAfter":7,"charsBefore":4475,"charsAfter":577,
+        "callsDropped":7,"requests":1,"ms":1377}
+chars saved: 87.1%
+```
+
+Exact match to the figure this page had been carrying on a callback's word.
 
 **What this audit does not establish:** it checks that each figure *appears in* a receipt, not that
 the figure is *correct*. A wrong number copied consistently into both the receipt and the README
