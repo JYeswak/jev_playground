@@ -100,7 +100,10 @@ obstacle. Everything else is untouched, which is the honest state.
 |`bicameral`|System 2 writes the code, System 1 judges it|**RUN** (pane 3): 41 tests pass offline, no key|adopt its two differences: pluggable judgment, and degrading toward patterns not passthrough|
 |`jev-review`|Jev for code review|**RUN**: 13/13 offline, zero skipped|it already ships the refusal-to-score state we had to retrofit into our gates|
 |`system-one-adapter-python`|a drop-in `system_one` backed by an LLM|**RUN** (pane 2): 204 tests pass|the seam we needed already exists in our code; a Python bridge is refused with costs named|
-|`skillranker`|a ranker built on Jev, mirrored here|mirror current|read its Jev question construction; never copy its files|
+|`skillranker`|a ranker built on Jev, mirrored here|**RUN** (partial): only `sr doctor --config` exists at our pin; every other command is phase-gated. Our clone is **103 commits stale** — they are wired on `origin/main`|build it at `origin/main`; local Rust builds are denied by construction on this host, so it needs remote capacity|
+|`typesafe-sdk-js`|the JavaScript client we and everyone else calls Jev through|**RUN** — 189/189 pass **with 8 unhandled errors**, and a request timeout **kills a default Node process** ([repro](docs/demos/upstream-repro/sdk-js-timeout-crash-repro.mjs))|report upstream; the repro is one file and needs no key|
+|`typesafe-sdk-python`|the Python client, and the control for the above|**RUN** — 534 pass / 50 skipped, **zero** errors; the identical timeout scenario leaks nothing and the process survives|nothing; it is the evidence that the JS leak is a defect and not inherent|
+|`skills` (typesafe-ai)|the vendor's own rules for designing Jev judgments|**RUN** — read and checked against our code; nothing to fix, because we author no questions and delegate to a library that already complies|read it *before* designing judgments, which we did not|
 |`jev-benchmark` (themsquared)|is Jev's confidence score worth routing on, at n=60|**RUN** — pairing shows the two versions never disagree|add cases on the `readonly`/`privileged` boundary, not more cases|
 |`awesome-jev`, `awesome-jev-by-typesafe`, `awesome-typesafe`|curated indexes of everything above|read|a discovery source, not evidence|
 
