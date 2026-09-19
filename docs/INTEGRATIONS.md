@@ -49,27 +49,34 @@ tail ~/.jev-compact.log
 
 The append-only decision/outcome logger lives at `work/dogfood-logger/`. Its schema, join, concurrent appends, and rotation are tested locally (`work/dogfood-logger/test/logger.test.mjs`; receipt `docs/demos/upstream-repro/dogfood-logger-20260919.md`).
 
-**State today: UNRUN.** No live omp profile has this registered. That is a measured fact (`docs/demos/upstream-repro/dogfood-logger-20260919.md:57-58`), not a standing ban on live omp and not a quiet-window gate. Joshua did not take live omp off the table.
+**State today: UNRUN.** No omp profile has this registered (`docs/demos/upstream-repro/dogfood-logger-20260919.md:57-58`). Live omp was never taken off the table. The fleet was over-using DEFER, and invented "STOP-LIVE" / deferred registration as reasons not to work. This row is not an indefinite deferral and not a standing ban.
 
-**Stop-before-register is the engineering gate, not a deferral.** A `tool_call` observer on `bash` would fire on every bash in every session, so the act has preconditions. They are:
+### Where the next fire runs
+
+- **Mid-flight panes stay up.** Do not take down current agents or panes to dogfood. Leave them untouched.
+- **Live test surface.** Pane 0 in the jev NTM session, or added test panes in that same session — not a separate agent farm. OMP is the common harness across many model/agent types. Register and dogfood there once the checks below pass.
+- **RUN-CLONE.** Local clones and disposable lab profiles (`omp --profile jev-lab`) are free for atomic mutation, planted known-bad, and improvement loops. Quiet-window is not a science gate for that work.
+- **Promote only after receipts.** The improvement loop — carve the cases regex cannot express, tighten criteria, re-measure against the 0.97% dcg prior — is how a later fire is earned. Then promote onto pane 0 or an added test pane.
+
+### Engineering checks before the act
+
+A `tool_call` observer on `bash` would fire on every bash in every session, so the act has preconditions. They are not a quiet-window gate and not a reason to DEFER the loop:
 
 1. **Offline proof first** — writer tests green; a synthetic `tool_call` proves the handler returns `undefined` on success, error, and timeout.
 2. **Fail-open** — logger/observer failures return `false` / `undefined` and never throw into the host (`work/dogfood-logger/src/logger.mjs`; `compaction/src/omp-binding.ts:226-231`).
 3. **`0 block:true`** — observe only. Never return omp's `{block: true, reason}` shape.
-4. **jsm preconditions before the act** — the installed file must be self-contained. `9e6c88d` imported `../../dogfood-logger/src/logger.mjs`, a parent path that does not exist after a copy into `~/.omp`. `348894e` inlined the record builder so the extension no longer depends on a repo-relative parent. That defect is why stop-before-register earned its keep as a *check*.
+4. **jsm preconditions** — the installed file must be self-contained. `9e6c88d` imported `../../dogfood-logger/src/logger.mjs`, a parent path that does not exist after a copy into `~/.omp`. `348894e` inlined the record builder so the extension no longer depends on a repo-relative parent. That defect is why stop-before-register earned its keep as a *check*.
 
-Once those pass, observe-and-log is shippable to live omp. The path that earns a later fire is the improvement loop: carve the cases regex cannot express, tighten criteria, re-measure against the dcg prior — not an indefinite DEFER.
+Once those pass, observe-and-log is shippable to live omp on pane 0 or an added test pane. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`. This page does not give a take-down-the-mid-flight-pane command.
 
-There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`. This page does not give a register-now command.
-
-**Where a probabilistic judge belongs.** Only on what regex cannot express. The receipt that states the prior — `docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md` — landed on `origin/main` (`9e6c88d`) after this branch forked (`d6b52ea`). **It is not on this tip.** Numbers from that file will be linked on the next tip sync rather than restated here.
+**Where a probabilistic judge belongs.** Only on what regex cannot express. The receipt that states the prior — `docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md` — landed on `origin/main` (`9e6c88d`) after this branch forked (`d6b52ea`). **It is not on this tip.** Numbers from that file (including the 0.97% dcg fire-rate prior the loop re-measures against) will be linked on the next tip sync rather than restated here.
 
 ## Scoreboard
 
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log logger | library + tests; **UNRUN** | shippable after the four checks above | no |
+| dogfood / observe-and-log logger | library + tests; **UNRUN** | shippable to live omp (pane 0 / added test pane) after the four checks; RUN-CLONE earns that fire; mid-flight panes untouched | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31. dcg prior: pending next tip sync (`dcg-block-rate-prior-20260919.md` on `origin/main`, not this tip).

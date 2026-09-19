@@ -435,10 +435,17 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   EVAL.md pin `6e1da50`, builds `dist/`, npm-installs `compaction/`. Stage 40 calls it
   when `--check` fails. Six `#!/bin/sh` + pipefail files now `#!/usr/bin/env bash`.
 - **Docs:** `docs/INTEGRATIONS.md` — `jev-compact` L3 measurement, does not prune;
-  observe-and-log UNRUN and shippable after offline proof / fail-open / `0 block:true` /
-  self-contained install (`9e6c88d` → `348894e`). `fh` is a ranker; citations are
-  file:line we opened. dcg prior receipt is on `origin/main`, not this tip — pending
-  sync, numbers not restated. README Quick start is three commands. **0 promoted.**
+  observe-and-log UNRUN. Live omp was never taken off the table; "STOP-LIVE" as a
+  standing ban was invented and is not the policy. Mid-flight panes stay up.
+  Live test surface is pane 0 or added test panes in the jev NTM session (OMP is
+  the common harness; not a separate agent farm). RUN-CLONE / `jev-lab` is the
+  improvement loop (carve regex-miss, tighten criteria, re-measure vs the 0.97%
+  dcg prior) that earns a later fire — not an indefinite DEFER. Quiet-window is
+  not a science gate for that work. Engineering checks stay: offline proof /
+  fail-open / `0 block:true` / self-contained install (`9e6c88d` → `348894e`).
+  `fh` is a ranker; citations are file:line we opened. dcg prior receipt is on
+  `origin/main`, not this tip — pending sync, numbers not restated.
+  README Quick start is three commands. **0 promoted.**
 - **Boundary:** this PR did not register any OMP hook. R30 unread and unedited.
   Stages 50/60 still need `LOOP_KIT` (foundry); this cloud does not have it, so the
   aggregate cannot be `ALL GREEN` here. No live Jev calls. Lane: offline.
