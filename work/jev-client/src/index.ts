@@ -123,3 +123,38 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
   }
   return { ok: true, scores, latencyMs, model };
 }
+
+/**
+ * omp session rows come in TWO shapes and this has now cost the lane four wrong scans:
+ *   A) { customType: { type: "…decision.v1", data: {…} } }   — observer rows
+ *   B) { customType: "…decision.v1", data: {…} }             — harm-rule / failure rows
+ * A scanner written against one returns silently empty on the other, which reads as "no rows"
+ * and has twice led me to contradict a peer who was right (NEGATIVE_EVIDENCE R33, R41).
+ *
+ * Use this instead of reaching into a row by hand.
+ */
+export function readRow(line: unknown): { type: string; data: Record<string, unknown> } | undefined {
+  let parsed: unknown = line;
+  if (typeof line === "string") {
+    try {
+      parsed = JSON.parse(line);
+    } catch {
+      return undefined;
+    }
+  }
+  if (!parsed || typeof parsed !== "object" || !("customType" in parsed)) return undefined;
+  const custom: unknown = parsed.customType;
+
+  if (typeof custom === "string") {
+    const data = "data" in parsed ? parsed.data : undefined;
+    if (!data || typeof data !== "object") return undefined;
+    return { type: custom, data: { ...data } };
+  }
+  if (custom && typeof custom === "object" && "type" in custom) {
+    const type: unknown = custom.type;
+    const data: unknown = "data" in custom ? custom.data : undefined;
+    if (typeof type !== "string" || !data || typeof data !== "object") return undefined;
+    return { type, data: { ...data } };
+  }
+  return undefined;
+}

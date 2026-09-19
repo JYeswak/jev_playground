@@ -103,3 +103,19 @@ test('no questions is refused before any network call', async () => {
     assert.equal(r.reason, 'no-answers');
   } finally { globalThis.fetch = real; }
 });
+
+// Both real omp row shapes. A reader that handles one and not the other reports "no rows"
+// on live data that plainly contains them — the exact failure behind R33 and R41.
+test('readRow handles BOTH omp row shapes, and rejects neither-shaped input', async () => {
+  const { readRow } = await import('../src/index.ts');
+  const nested = { customType: { type: 'x.decision.v1', data: { kind: 'harm_fire', score: 1 } } };
+  const flat = { customType: 'x.decision.v1', data: { kind: 'failure_scored', score: 2 } };
+
+  assert.deepEqual(readRow(nested), { type: 'x.decision.v1', data: { kind: 'harm_fire', score: 1 } });
+  assert.deepEqual(readRow(flat), { type: 'x.decision.v1', data: { kind: 'failure_scored', score: 2 } });
+  assert.deepEqual(readRow(JSON.stringify(flat)), { type: 'x.decision.v1', data: { kind: 'failure_scored', score: 2 } });
+
+  assert.equal(readRow('not json'), undefined);
+  assert.equal(readRow({ noCustomType: true }), undefined);
+  assert.equal(readRow({ customType: 'x', data: 'not-an-object' }), undefined);
+});
