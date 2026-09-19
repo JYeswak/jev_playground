@@ -6,18 +6,14 @@ reproduces the reused fact as often as arm A (intact). Paired difference over
 >=20 turns; discordant count reported (concordant pairs carry no information).
 Verdict via e-process (Ville, conservative): e>=20 either way else
 INCONCLUSIVE. HARMLESS / HARMFUL / INCONCLUSIVE.
-
-Indexing is LINEAR (token -> first/last row maps, after oracle.mjs); an
-earlier quadratic version OOM-stalled and was killed.
-
-Per turn: transcript prefix (<=12 messages) from the real session file,
-A intact, B with result -> head(300) + note. Local model produces the next
-assistant message (temperature 0). Score: any oracle-identified reused token
-in the output (deterministic check).
+Arm C (withheld context): same task with NO transcript — facts appearing here
+come from the model's prior knowledge, not the transcript, bounding the
+contamination reading.
+Indexing is LINEAR (token first/last maps, after oracle.mjs).
 Model: Qwen3.6-27B-4bit-MTP-MLX-Serve @127.0.0.1:11238 (NOT the brief's
 3.8-Splash: not serving on this machine; substitution disclosed).
-Usage: python ablate.py [--prep-only]  (writes ablate_turns.jsonl always;
-  with model arms, ablate_pairs.jsonl)
+Usage: python ablate.py [--prep-only]  (always writes ablate_turns.jsonl;
+  with model arms, ablate_pairs.jsonl with per-call wall-clock latencies)
 """
 
 import glob
@@ -25,6 +21,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.request
 
 TOKEN = re.compile(r"[a-z0-9]{5,}")
@@ -89,27 +86,27 @@ def render(m, drop_result_id=None):
     return f"role={role}\n" + "\n".join(parts)
 
 
-def ask(transcript):
+def ask_raw(messages, timeout=300):
     body = json.dumps(
-        {
-            "model": MODEL,
-            "temperature": 0,
-            "max_tokens": 800,
-            "messages": [
-                {
-                    "role": "system",
-                    "content": "You are continuing an agent transcript. Produce the next assistant message text for the task at hand.",
-                },
-                {"role": "user", "content": transcript},
-            ],
-        }
+        {"model": MODEL, "temperature": 0, "max_tokens": 800, "messages": messages}
     )
     req = urllib.request.Request(
         URL, data=body.encode(), headers={"Content-Type": "application/json"}
     )
-    with urllib.request.urlopen(req, timeout=300) as r:
+    t0 = time.time()
+    with urllib.request.urlopen(req, timeout=timeout) as r:
         d = json.loads(r.read())
-    return d["choices"][0]["message"]["content"] or ""
+    return (d["choices"][0]["message"]["content"] or ""), round(time.time() - t0, 1)
+
+
+SYS = "You are continuing an agent transcript. Produce the next assistant message text for the task at hand."
+
+
+def ask(transcript):
+    out, _ = ask_raw(
+        [{"role": "system", "content": SYS}, {"role": "user", "content": transcript}]
+    )
+    return out
 
 
 def build_turns():
@@ -183,14 +180,25 @@ def main():
     with open("ablate_pairs.jsonl", "w") as out:
         for k, t in enumerate(pick):
             base = "\n---\n".join(render(m) for m in t["prefix"])
-            outA = ask(base)
+            outA, latA = ask_raw(
+                [{"role": "system", "content": SYS}, {"role": "user", "content": base}]
+            )
             baseB = "\n---\n".join(
                 render(m, drop_result_id=t["tid"]) for m in t["prefix"]
             )
-            outB = ask(baseB)
-            lowA, lowB = outA.lower(), outB.lower()
+            outB, latB = ask_raw(
+                [{"role": "system", "content": SYS}, {"role": "user", "content": baseB}]
+            )
+            outC, latC = ask_raw(
+                [
+                    {"role": "system", "content": SYS},
+                    {"role": "user", "content": "Continue the agent's task."},
+                ]
+            )
+            lowA, lowB, lowC = outA.lower(), outB.lower(), outC.lower()
             hitA = any(f in lowA for f in t["facts"])
             hitB = any(f in lowB for f in t["facts"])
+            hitC = any(f in lowC for f in t["facts"])
             out.write(
                 json.dumps(
                     {
@@ -200,12 +208,20 @@ def main():
                         "facts": t["facts"],
                         "hitA": hitA,
                         "hitB": hitB,
+                        "hitC": hitC,
+                        "latA": latA,
+                        "latB": latB,
+                        "latC": latC,
                     }
                 )
                 + "\n"
             )
             out.flush()
-            print(f"turn {k}: A={hitA} B={hitB} facts={len(t['facts'])}", flush=True)
+            print(
+                f"turn {k}: A={hitA} B={hitB} C={hitC} "
+                f"lat={latA}/{latB}/{latC}s facts={len(t['facts'])}",
+                flush=True,
+            )
     print("done", flush=True)
 
 

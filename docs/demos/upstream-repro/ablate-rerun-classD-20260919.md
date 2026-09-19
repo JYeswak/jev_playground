@@ -40,3 +40,20 @@ deliberately NOT set to D: the experiment has not completed.
 - NO-CLAIM (as briefed): the local 27B model standing in for the original
   agent is a PROXY; a fact reproduced from prior knowledge is not recovery
   from the transcript. Load at run time must be recorded per the steering.
+
+## Outcome: INCONCLUSIVE by ceiling-zero design flaw — run killed early (pane 3, 2026-09-19)
+
+12 of 24 turns ran (A/B/C arms, Qwen3.6-27B, load 9-13 shared): every arm
+scored False on every turn, latencies 0.5-19s (recorded per call, box shared
+throughout). Before spending the remaining 12, the offline check that should
+have preceded the run: the ORIGINAL agent's own next message contains the
+oracle facts **0/24 times**. Facts were defined over the whole future but
+scored on a single next message — the ceiling is zero by construction, so no
+outcome of this run could separate the arms. Killed to spare shared GPU.
+
+Verdict: INCONCLUSIVE (not HARMLESS/HARMFUL — the comparison is void, and a
+0-0 e-value would be theatre). Manifest class_achieved NOT set to D; STATUS
+untouched. The durable finding is procedural: always compute the
+original-agent ceiling offline before spending model calls — one query over
+committed transcripts, zero GPU. Redesign (multi-message horizon or
+next-message-defined facts) is a new preregistration, not a mid-run patch.
