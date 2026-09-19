@@ -16,3 +16,4 @@ NiazMorshed2007/jev-review	6-metamorphic-invariant	good/bad pairs; ordering is t
 Dicklesworthstone/skillranker	1-threshold-gate	its own synthetic_cases.v1.jsonl + frozen 0/1/2 loss table	PENDING-SPEC	C	-	UNASSIGNED	-
 AbdelStark/bicameral	7-adversarial-survival	injection + destructive-command corpus; benign reads as negatives	PENDING-SPEC	C	-	UNASSIGNED	-
 browser-use/jev-ultrafast	5-metamorphic-golden	its verify(page) end-state checker behind a fixture	PENDING-SPEC	D	-	UNASSIGNED	-
+githubnext/localjev	4-mixed-denominator	differential vs real Jev on identical pinned questions + their AG News/BoolQ/SST-5 gold labels	PENDING-SPEC	C	-	SPEC	-
