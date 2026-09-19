@@ -11,12 +11,11 @@ function stable(value) {
 }
 function digest(value) { return createHash('sha256').update(stable(value)).digest('hex'); }
 function raw(value) { try { return JSON.stringify(value); } catch { return '[unserializable]'; } }
-function makeRecord(command, error, context, latencyMs, toolCallId) {
+function makeRecord(command, error, context, latencyMs, toolCallId, costUsd) {
   if (typeof toolCallId !== 'string' || toolCallId.length === 0) throw new TypeError('toolCallId required');
   const sessionId = context?.sessionId;
-  return { schemaVersion: SCHEMA_VERSION, recordType: 'decision', decisionId: randomUUID(), timestamp: new Date().toISOString(), ...(sessionId ? { sessionId } : {}), tool: 'bash', toolCallId, argsDigest: digest({ command }), questionSet: ['privilege widening', 'secret staging', 'irreversible publication', 'security-control tampering'], probabilities: { flag: null, pass: null }, latencyMs, costUsd: 0, error };
+  return { schemaVersion: SCHEMA_VERSION, recordType: 'decision', decisionId: randomUUID(), timestamp: new Date().toISOString(), ...(sessionId ? { sessionId } : {}), tool: 'bash', toolCallId, argsDigest: digest({ command }), questionSet: ['privilege widening', 'secret staging', 'irreversible publication', 'security-control tampering'], probabilities: { flag: null, pass: null }, latencyMs, ...(costUsd === undefined ? {} : { costUsd }), error };
 }
-async function safeAppend(pi, type, data) { try { await pi.appendEntry(type, data); return true; } catch { return false; } }
 
 export function withTimeout(promise, timeoutMs) {
   let timer;
@@ -36,8 +35,8 @@ export function createObserver({ logger, dcg, classify, enabled = true, timeoutM
       if (verdict === 'block') return undefined;
       const started = performance.now();
       let result;
-      try { result = await withTimeout(classify({ command, event, context }), timeoutMs); } catch (error) { result = { questionSet: ['observer flag question'], probabilities: { flag: null, pass: null }, costUsd: 0, error: String(error) }; }
-      try { await logger.append({ ...makeRecord(command, result.error ?? null, context, performance.now() - started, event?.toolCallId), timestamp: now(), questionSet: result.questionSet, probabilities: result.probabilities, costUsd: result.costUsd ?? 0 }); } catch {}
+      try { result = await withTimeout(classify({ command, event, context }), timeoutMs); } catch (error) { result = { questionSet: ['observer flag question'], probabilities: { flag: null, pass: null }, error: String(error) }; }
+      try { await logger.append({ ...makeRecord(command, result.error ?? null, context, performance.now() - started, event?.toolCallId, result.costUsd), timestamp: now(), questionSet: result.questionSet, probabilities: result.probabilities }); } catch {}
       return undefined;
     } catch { return undefined; }
   };
