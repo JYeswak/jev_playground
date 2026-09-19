@@ -6,6 +6,15 @@ This is the user-facing scoreboard for what we have actually wired into OMP, and
 
 Do not read a later rung than the evidence named below. **BUILT ≠ WIRED; WIRED ≠ VALIDATED.**
 
+### How citations work here
+
+If this page mentions `fh`, it is as a *ranker*, not as a citation. `fh doctor` may report STALE
+or degraded SCHEDULING (a 1/8 schedule-declaration miss does not retract shipped doctrine).
+Corpus citations already in this repo were opened at file:line from the pinned Dicklesworthstone
+mirror after `fh` ranked them — `asupersync` `eprocess.rs:224-238`, `franken_ocr`
+`RATCHET.md:33-51`, `franken_engine` `promotion_gate_runner.rs:266-328`, `frankensearch`
+`perf_ratchet.rs:732-740`. Pattern: **fh ranked, we opened.** A ranking alone is not a citation.
+
 ## Proven: `jev-compact` — L3 measurement instrument
 
 | | |
@@ -36,22 +45,31 @@ tail ~/.jev-compact.log
 
 `refused` / `passthrough` / `would-compact` are decisions. No new line means the hook did not run — not a silent success.
 
-## WIP: observe-and-log / dogfood logger — stop before register
+## WIP: observe-and-log / dogfood logger — UNRUN, shippable after checks
 
 The append-only decision/outcome logger lives at `work/dogfood-logger/`. Its schema, join, concurrent appends, and rotation are tested locally (`work/dogfood-logger/test/logger.test.mjs`; receipt `docs/demos/upstream-repro/dogfood-logger-20260919.md`).
 
-**It is not an OMP hook. Do not register it.**
+**State today: UNRUN.** No live omp profile has this registered. That is a measured fact (`docs/demos/upstream-repro/dogfood-logger-20260919.md:57-58`), not a standing ban on live omp and not a quiet-window gate. Joshua did not take live omp off the table.
 
-- **NO-CLAIM from the receipt** (`docs/demos/upstream-repro/dogfood-logger-20260919.md:57-58`): it has not run in a live omp session. Tests prove the writer, not a production hook.
-- **Stop-before-register.** An untested hook runs inside the session that would have to repair it. A `pi` extension install made every invocation of that host fail while documented removal reported success (`compaction/src/omp-binding.ts:15-19`). omp itself was measured *fail-open on a broken load* (`docs/demos/omp-seam-live-20260918.md:49-53`), but a throwing handler is fail-closed in this harness (`AGENTS.md` seam 1). Either way, a logger hook error can deny work fleet-wide. The logger stays a library until a throwaway session proves both the healthy path and a planted failure, and even then the first install is a human-gated step — the same rule `omp-binding.ts` already follows.
-- There is no dogfood file under `.omp/hooks/`. The only pre-hook in this tree is `jev-compact`.
+**Stop-before-register is the engineering gate, not a deferral.** A `tool_call` observer on `bash` would fire on every bash in every session, so the act has preconditions. They are:
+
+1. **Offline proof first** — writer tests green; a synthetic `tool_call` proves the handler returns `undefined` on success, error, and timeout.
+2. **Fail-open** — logger/observer failures return `false` / `undefined` and never throw into the host (`work/dogfood-logger/src/logger.mjs`; `compaction/src/omp-binding.ts:226-231`).
+3. **`0 block:true`** — observe only. Never return omp's `{block: true, reason}` shape.
+4. **jsm preconditions before the act** — the installed file must be self-contained. `9e6c88d` imported `../../dogfood-logger/src/logger.mjs`, a parent path that does not exist after a copy into `~/.omp`. `348894e` inlined the record builder so the extension no longer depends on a repo-relative parent. That defect is why stop-before-register earned its keep as a *check*.
+
+Once those pass, observe-and-log is shippable to live omp. The path that earns a later fire is the improvement loop: carve the cases regex cannot express, tighten criteria, re-measure against the dcg prior — not an indefinite DEFER.
+
+There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`. This page does not give a register-now command.
+
+**Where a probabilistic judge belongs.** Only on what regex cannot express. The receipt that states the prior — `docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md` — landed on `origin/main` (`9e6c88d`) after this branch forked (`d6b52ea`). **It is not on this tip.** Numbers from that file will be linked on the next tip sync rather than restated here.
 
 ## Scoreboard
 
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log logger | library + tests only | WIP; stop-before-register | no |
+| dogfood / observe-and-log logger | library + tests; **UNRUN** | shippable after the four checks above | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
-Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
+Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31. dcg prior: pending next tip sync (`dcg-block-rate-prior-20260919.md` on `origin/main`, not this tip).

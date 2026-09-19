@@ -434,8 +434,11 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
 - **Fix:** `scripts/bootstrap-compaction.sh` clones `tamaratran/fast-jev-compaction` at
   EVAL.md pin `6e1da50`, builds `dist/`, npm-installs `compaction/`. Stage 40 calls it
   when `--check` fails. Six `#!/bin/sh` + pipefail files now `#!/usr/bin/env bash`.
-- **Docs:** `docs/INTEGRATIONS.md` — `jev-compact` L3 measurement, does not prune; dogfood
-  logger WIP / stop-before-register. README Quick start is three commands. **0 promoted.**
-- **Boundary:** no OMP hook registered in any live profile. R30 unread and unedited.
+- **Docs:** `docs/INTEGRATIONS.md` — `jev-compact` L3 measurement, does not prune;
+  observe-and-log UNRUN and shippable after offline proof / fail-open / `0 block:true` /
+  self-contained install (`9e6c88d` → `348894e`). `fh` is a ranker; citations are
+  file:line we opened. dcg prior receipt is on `origin/main`, not this tip — pending
+  sync, numbers not restated. README Quick start is three commands. **0 promoted.**
+- **Boundary:** this PR did not register any OMP hook. R30 unread and unedited.
   Stages 50/60 still need `LOOP_KIT` (foundry); this cloud does not have it, so the
   aggregate cannot be `ALL GREEN` here. No live Jev calls. Lane: offline.
