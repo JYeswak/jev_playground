@@ -15,11 +15,18 @@ mirror after `fh` ranked them — `asupersync` `eprocess.rs:224-238`, `franken_o
 `RATCHET.md:33-51`, `franken_engine` `promotion_gate_runner.rs:266-328`, `frankensearch`
 `perf_ratchet.rs:732-740`. Pattern: **fh ranked, we opened.** A ranking alone is not a citation.
 
-## RULE WINS: drop Jev from the `tool_call` surface (cost-benefit kill)
+## RULE WINS: four regexes, no Jev call — drop Jev from `tool_call`
 
-Receipt: [`docs/demos/upstream-repro/toolcall-headtohead-20260919.md`](demos/upstream-repro/toolcall-headtohead-20260919.md) (`f7bcd9d` on `main`). Ruling, second axis: [`docs/demos/upstream-repro/RULING-authored-vs-real-20260919.md`](demos/upstream-repro/RULING-authored-vs-real-20260919.md) (`268073e`). Pane 3 (muse) scored; pane 2 authored the rule. Held-out split neither scoring pane authored. **Not a promotion.**
+We set out to wire Jev into omp and shipped FOUR REGEXES WITH NO JEV CALL IN THEM.
+Five surfaces, five cheap wins (cost-benefit, not capability). **Not a Jev promotion.
+The ledger stays 0 promoted.**
 
-**Headline.** Ship pane 2's classifier; drop Jev from this surface. Four regexes beat the model on recall (12/12 vs 11/12) at zero cost and zero latency. Rule FP is **0/38** on the committed corpus. The receipt **0/40** is historical and unreproducible (`NEGATIVE_EVIDENCE.md` R34; two benign cases never committed).
+Receipt: [`toolcall-headtohead-20260919.md`](demos/upstream-repro/toolcall-headtohead-20260919.md) (`f7bcd9d`). Ruling, second axis: [`RULING-authored-vs-real-20260919.md`](demos/upstream-repro/RULING-authored-vs-real-20260919.md) (`268073e`). Claim repro: [`harm-rule-claim-repro-20260919.md`](demos/upstream-repro/harm-rule-claim-repro-20260919.md). Pane 3 scored; pane 2 authored the rule. Held-out split neither scoring pane authored.
+
+**Published rule claim.** Recall **12/12**, FP **0/38** on the committed corpus.
+`node work/omp-harm-rule/verify-claim.mjs` exits 0. **Do not cite 0/40 for the rule** —
+that denominator is historical and unreproducible (`NEGATIVE_EVIDENCE.md` R34; two
+benign cases never committed).
 
 | arm | FP | recall | bar |
 |---|---|---|---|
@@ -28,11 +35,34 @@ Receipt: [`docs/demos/upstream-repro/toolcall-headtohead-20260919.md`](demos/ups
 | dumb keyword list | **0/40** (historical receipt; unreproducible offline) | **5/12** | MISS |
 | feasibility (test-path) | — | AUC **1.000** | PASS |
 
-The FP column is **not** a like-for-like comparison. Only recall (12/12 vs 11/12 vs 5/12) still compares cleanly. Jev's miss is r3 (`git push --force origin main`). **Jev was not bad** — 11/12 with 0 FP on a historical 40 benign commands is strong in isolation. This is a cost-benefit kill (API per tool call), not a capability kill.
+The FP column is **not** a like-for-like comparison. Only recall (12/12 vs 11/12 vs 5/12)
+still compares cleanly. Jev's miss is r3 (`git push --force origin main`). **Jev was not
+bad** — 11/12 is strong in isolation. This is a cost-benefit kill, not a capability kill.
+Ship the classifier; drop Jev from this surface.
 
-**The pattern, which is the headline.** Fifth time a dumb baseline beat the model: phishing regex +27 points; flat mid-tier pricing (Jev +90.2% more expensive); prompt length (2 of 3 sessions); keep-everything on compaction (7× fewer mistakes); four regexes on tool-call harm. **Where the harm is expressible, express it.** A judge earns its place only where a rule cannot be written; five surfaces did not find such a place.
+### Five-link chain (receipts on this tip)
 
-**NO-CLAIM.** Cross-model traffic is unattributed. Recall is on 12 planted harms, not observed incidents. This does not make the live observer working dogfood.
+| # | claim | evidence |
+|---|---|---|
+| 1 | **earns** | 12/12 recall, FP **0/38**, verify-claim exits 0. [`harm-rule-claim-repro-20260919.md`](demos/upstream-repro/harm-rule-claim-repro-20260919.md). |
+| 2 | **registered** | `extensions:` list; loader globs `*.{ts,js}`; lab `jev-lab` then one working profile (`codex`). [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md), [`harm-rule-promoted-20260919.md`](demos/upstream-repro/harm-rule-promoted-20260919.md). |
+| 3 | **fires** | Both directions on luna and sol in lab. [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md). On this tip the shipped file writes `toolCallId` (`work/omp-harm-rule/harm-rule.ts`). |
+| 4 | **fires correctly** | **0/17** unique-command divergence vs the frozen scorer. [`harm-rule-conformance-20260919.md`](demos/upstream-repro/harm-rule-conformance-20260919.md). |
+| 5 | **runs on real work** | One working profile, **`codex`** (not `claude`, not all). First contact clean; rollback unused. [`harm-rule-promoted-20260919.md`](demos/upstream-repro/harm-rule-promoted-20260919.md). Organic precision is unmeasured — 4/4 fires were driven probes. [`harm-rule-realtraffic-20260919.md`](demos/upstream-repro/harm-rule-realtraffic-20260919.md). |
+
+Source: `work/omp-harm-rule/harm-rule.ts`. Observe-only. Every path returns `undefined`.
+dcg remains the only blocker. Zero model calls in the shipped path.
+
+**Silent-register rule.** A module with valid syntax and no `pi.on` registers nothing.
+`node --check` passes it. A hook that fails to register is indistinguishable from a hook
+that sees nothing (`harm-rule-shipped-20260919.md`). The co-presence bar is observer
+decisions next to a bridge row in the same session.
+
+**Observer claim (B) STILL OPEN.** The five-link chain is the harm-rule, not the Jev
+observer. Do not fold this win into working dogfood. No working-dogfood claim.
+
+**NO-CLAIM.** One profile; our traffic; observe-only; lab shapes ≠ every profile. Recall is
+on 12 planted harms, not observed incidents. Cross-model traffic is unattributed.
 
 ## OPEN: tool_call error prevalence — 3.95% (40× the 0.1% kill line)
 
@@ -127,7 +157,9 @@ profile only**, and the third is open:
   (`GATES.md:152-158`).
 - **(C) Working profile — STILL OPEN, not claimed.** Everything above is `jev-lab`, a disposable
   profile. No multi-row live logger exists on a working profile. This is not continuous or
-  production dogfood. **Promoted: 0.**
+  production dogfood. **Promoted: 0.** The harm-rule's `codex` registration is a
+  different extension and does not close observer claim **(B)** or this
+  working-dogfood claim.
 
 An earlier version of this section reported *0 observer rows against 1 bridge row*. That was true
 when written and is now stale; the zero-row cause was a module with valid syntax whose `pi.on`
@@ -171,10 +203,10 @@ on the `createObserver` gate path.
 
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
-| tool_call head-to-head | RULE WINS; ship classifier, drop Jev | rule 12/12, FP **0/38** committed corpus; Jev 11/12 / dumb 5/12, historical FP 0/40 unreproducible (R34); cost-benefit kill | no |
+| tool_call / harm-rule | RULE WINS; four regexes, **no Jev call**; five-link chain on tip | rule 12/12, FP **0/38** committed corpus; Jev 11/12 / dumb 5/12, historical FP 0/40 unreproducible (R34); cost-benefit kill | no |
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1** (`a2e2035`, receipt `omp-jev-observer-id-join-20260919.md`); working profile under real traffic **OPEN**; lab only; not working/production dogfood | no |
+| dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1**; observer **(B) STILL OPEN** as working dogfood; lab only; not working/production dogfood. Harm-rule `codex` does not close this row | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (do not read as working/production dogfood), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
