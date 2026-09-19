@@ -110,7 +110,10 @@ export function registerOmpCompactionHook(pi: OmpLike, deps: BindingDeps): void 
       } else {
         try {
           adapted = adaptOmpTranscript(
-            (messages as unknown[]).map((m) => ({ type: 'message_end', message: m as never })),
+            (messages as unknown[]).map((m) => ({
+              type: 'message_end',
+              message: normalizeLiveMessage(m) as never,
+            })),
           ).messages;
         } catch (error) {
           record('refused', `could not adapt omp messages: ${error instanceof Error ? error.message : String(error)}`);
@@ -172,4 +175,31 @@ export default function ompCompactionHook(_pi: OmpLike): void {
     'omp-binding: default export requires a configured JevAsker; call registerOmpCompactionHook(pi, deps) '
       + 'from a hook file that supplies one. Installing this module directly is deliberately not supported.',
   );
+}
+
+/**
+ * Bring one of omp's live messages to the shape src/omp-adapter.ts consumes.
+ *
+ * Observed in production, not documented: `content` is sometimes a plain STRING rather than a parts
+ * array, and `role` is sometimes `custom` (omp's own injected entries, tagged further by
+ * `customType`). The adapter only emits for user/assistant messages with array content, so an
+ * unnormalized transcript adapted to zero messages and the hook refused.
+ *
+ * Unknown roles map to `user`, which is the conservative direction: a Jev question about a user
+ * turn is answerable, and the alternative — dropping the entry — would silently shrink the
+ * transcript before anything decided it was droppable.
+ */
+export function normalizeLiveMessage(raw: unknown): {
+  role: string;
+  content: Array<{ type: string; text?: string }>;
+} {
+  const m = (raw ?? {}) as { role?: unknown; content?: unknown };
+  const role = m.role === 'assistant' ? 'assistant' : 'user';
+  if (typeof m.content === 'string') {
+    return { role, content: [{ type: 'text', text: m.content }] };
+  }
+  if (Array.isArray(m.content)) {
+    return { role, content: m.content as Array<{ type: string; text?: string }> };
+  }
+  return { role, content: [] };
 }

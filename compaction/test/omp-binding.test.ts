@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Message } from 'fast-jev-compaction';
 import { adaptOmpTranscript } from '../src/omp-adapter.js';
-import ompCompactionHook, { registerOmpCompactionHook, type OmpLike } from '../src/omp-binding.js';
+import ompCompactionHook, { normalizeLiveMessage, registerOmpCompactionHook, type OmpLike } from '../src/omp-binding.js';
 
 // A stub standing in for omp's extension API. It captures the handler the binding registers, so a
 // test can drive `session_before_compact` without a live session. This proves the BINDING's
@@ -179,4 +179,21 @@ test('PRODUCTION SHAPE: the transcript is read from preparation.messagesToSummar
     `the handler must FIND the transcript, not refuse the envelope: ${seen[0]}`,
   );
   assert.ok(seen[0].startsWith('passthrough:'), seen[0]);
+});
+
+// The exact shape that refused in production: role=custom, content a plain string.
+// Log line, 2026-09-19: "refused: adapter yielded 0 of 1; role=custom parts=string".
+test('PRODUCTION SHAPE: a custom role with string content is normalized, not dropped', () => {
+  const out = normalizeLiveMessage({ role: 'custom', customType: 'x', content: 'hello world' });
+  assert.equal(out.role, 'user', 'an unknown role maps to user rather than vanishing');
+  assert.deepEqual(out.content, [{ type: 'text', text: 'hello world' }]);
+
+  // And the array form is passed through untouched.
+  const arr = normalizeLiveMessage({ role: 'assistant', content: [{ type: 'text', text: 'hi' }] });
+  assert.equal(arr.role, 'assistant');
+  assert.deepEqual(arr.content, [{ type: 'text', text: 'hi' }]);
+
+  // A missing content field yields an empty parts array, never a throw.
+  assert.deepEqual(normalizeLiveMessage({ role: 'user' }).content, []);
+  assert.deepEqual(normalizeLiveMessage(undefined).content, []);
 });
