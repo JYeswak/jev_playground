@@ -18,6 +18,7 @@
  * `<cwd>/.omp/hooks/pre/` runs inside the agent that would have to repair it. So this ships as a
  * module with a stub-driven proof, and the live install is a gated step a human takes.
  */
+import { appendFileSync } from 'node:fs';
 import type { JevAsker, Message } from 'fast-jev-compaction';
 import { compactOmpTranscriptSafe, OMP_HOOK_DEFAULTS, type OmpHookConfig } from './omp-hook.js';
 
@@ -40,6 +41,15 @@ export interface BindingDeps {
   config?: Partial<OmpHookConfig>;
   /** Injected so a test can observe decisions without a log scraper. */
   onDecision?: (outcome: string, reason: string) => void;
+  /**
+   * Append one line per decision here. Lives in THIS module, not in the hook file, because a sink
+   * in the hook is unreachable by any test: the hook sits outside `compaction/`'s package scope and
+   * node refuses to resolve it from here. An observability feature nothing can test is the shape
+   * this repo spent the day removing.
+   *
+   * Never receives the key or the transcript — outcome and reason only.
+   */
+  decisionLogPath?: string;
 }
 
 /**
@@ -53,25 +63,35 @@ export interface BindingDeps {
 export function registerOmpCompactionHook(pi: OmpLike, deps: BindingDeps): void {
   const config: OmpHookConfig = { ...OMP_HOOK_DEFAULTS, ...(deps.config ?? {}) } as OmpHookConfig;
 
+  const record = (outcome: string, reason: string): void => {
+    deps.onDecision?.(outcome, reason);
+    if (!deps.decisionLogPath) return;
+    try {
+      appendFileSync(deps.decisionLogPath, `${new Date().toISOString()} ${outcome}: ${reason}\n`);
+    } catch {
+      // A log that cannot be written must never break compaction.
+    }
+  };
+
   pi.on('session_before_compact', async (event) => {
     const messages = event?.messages;
     // A malformed envelope is a KNOWN-BAD INPUT and must make the seam refuse, not guess.
     if (!Array.isArray(messages) || messages.length === 0) {
-      deps.onDecision?.('refused', 'no messages on the event envelope');
+      record('refused', 'no messages on the event envelope');
       return undefined;
     }
 
     const outcome = await compactOmpTranscriptSafe(messages, deps.asker, config);
     if (outcome.outcome !== 'compacted') {
-      deps.onDecision?.('passthrough', outcome.reason);
+      record('passthrough', outcome.reason);
       return undefined;
     }
     if (outcome.messages.length >= messages.length) {
       // Defensive: a "compaction" that does not shrink is not a compaction.
-      deps.onDecision?.('refused', 'compacted output was not smaller than its input');
+      record('refused', 'compacted output was not smaller than its input');
       return undefined;
     }
-    deps.onDecision?.('compacted', `${messages.length} -> ${outcome.messages.length}`);
+    record('compacted', `${messages.length} -> ${outcome.messages.length}`);
     return { compaction: { messages: outcome.messages } };
   });
 }

@@ -35,8 +35,9 @@ export default function jevCompactHook(pi: OmpLike): void {
     }
     registerOmpCompactionHook(pi, {
       asker: new JevClient({ apiKey }),
+      // The sink lives in omp-binding.ts so the tests can reach it; this file only says where.
+      decisionLogPath: `${process.env.HOME}/.jev-compact.log`,
       onDecision: (outcome, reason) => {
-        // stderr only, and never the key or the transcript.
         process.stderr.write(`[jev-compact] ${outcome}: ${reason}\n`);
       },
     });

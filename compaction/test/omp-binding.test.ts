@@ -1,4 +1,6 @@
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Message } from 'fast-jev-compaction';
@@ -121,4 +123,35 @@ test('REAL TRANSCRIPT: a Jev outage passes through with its reason, context inta
   assert.equal(out, undefined, 'a dead Jev must never return a compaction');
   assert.match(seen[0], /^passthrough:jev failure: jev is down$/,
     'the outage reason is reported verbatim, not swallowed into a generic passthrough');
+});
+
+// THE SINK, PROVEN. `decisionLogPath` exists so "did the hook fire?" is answerable by `ls` rather
+// than by watching a pane: if omp swallows hook stderr, a working hook and a dead one look
+// identical from outside. This arm is why the sink lives in this module and not in the hook file —
+// the hook sits outside compaction/'s package scope and no test here can import it.
+test('every decision is appended to decisionLogPath, and a bad path cannot break compaction', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'jev-sink-'));
+  const logPath = join(dir, 'decisions.log');
+  const { pi, fire } = stubPi();
+  registerOmpCompactionHook(pi, {
+    asker: { ask: async () => { throw new Error('jev is down'); } },
+    decisionLogPath: logPath,
+  });
+
+  await fire({});                       // refused: malformed envelope
+  await fire({ messages: many(4) });    // passthrough
+
+  const lines = readFileSync(logPath, 'utf8').trim().split('\n');
+  assert.equal(lines.length, 2, 'one line per decision');
+  assert.match(lines[0], /^\d{4}-\d{2}-\d{2}T.*refused: no messages on the event envelope$/);
+  assert.match(lines[1], /passthrough: /);
+  assert.ok(!lines.join('\n').includes('sk-'), 'no key material reaches the log');
+
+  // An unwritable path must degrade to silence, never to a thrown hook.
+  const { pi: pi2, fire: fire2 } = stubPi();
+  registerOmpCompactionHook(pi2, {
+    asker: { ask: async () => { throw new Error('unused'); } },
+    decisionLogPath: '/nonexistent-dir-xyz/decisions.log',
+  });
+  assert.equal(await fire2({}), undefined, 'a dead log sink must not break the handler');
 });
