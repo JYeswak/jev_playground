@@ -11,8 +11,9 @@ function stable(value) {
 }
 function digest(value) { return createHash('sha256').update(stable(value)).digest('hex'); }
 function raw(value) { try { return JSON.stringify(value); } catch { return '[unserializable]'; } }
-function makeRecord(command, error, context, latencyMs, dcgVerdict = context?.dcgVerdict ?? 'unknown') {
-  return { schemaVersion: SCHEMA_VERSION, recordType: 'decision', decisionId: randomUUID(), timestamp: new Date().toISOString(), sessionId: context?.sessionId ?? 'unknown', tool: 'bash', argsDigest: digest({ command }), dcgVerdict, questionSet: ['privilege widening', 'secret staging', 'irreversible publication', 'security-control tampering'], probabilities: { flag: null, pass: null }, latencyMs, costUsd: 0, error };
+function makeRecord(command, error, context, latencyMs, toolCallId) {
+  if (typeof toolCallId !== 'string' || toolCallId.length === 0) throw new TypeError('toolCallId required');
+  return { schemaVersion: SCHEMA_VERSION, recordType: 'decision', decisionId: randomUUID(), timestamp: new Date().toISOString(), sessionId: context?.sessionId ?? 'unknown', tool: 'bash', toolCallId, argsDigest: digest({ command }), questionSet: ['privilege widening', 'secret staging', 'irreversible publication', 'security-control tampering'], probabilities: { flag: null, pass: null }, latencyMs, costUsd: 0, error };
 }
 async function safeAppend(pi, type, data) { try { await pi.appendEntry(type, data); return true; } catch { return false; } }
 
@@ -35,7 +36,7 @@ export function createObserver({ logger, dcg, classify, enabled = true, timeoutM
       const started = performance.now();
       let result;
       try { result = await withTimeout(classify({ command, event, context }), timeoutMs); } catch (error) { result = { questionSet: ['observer flag question'], probabilities: { flag: null, pass: null }, costUsd: 0, error: String(error) }; }
-      try { await logger.append({ ...makeRecord(command, result.error ?? null, context, performance.now() - started, verdict), timestamp: now(), questionSet: result.questionSet, probabilities: result.probabilities, costUsd: result.costUsd ?? 0 }); } catch {}
+      try { await logger.append({ ...makeRecord(command, result.error ?? null, context, performance.now() - started, event?.toolCallId), timestamp: now(), questionSet: result.questionSet, probabilities: result.probabilities, costUsd: result.costUsd ?? 0 }); } catch {}
       return undefined;
     } catch { return undefined; }
   };
@@ -64,7 +65,7 @@ export default function ompJevObserver(pi) {
         if (!response.ok) throw new Error(`Jev HTTP ${response.status}`);
         await response.json();
       } catch (caught) { error = String(caught); }
-      await safeAppend(pi, DECISION_TYPE, makeRecord(command, error, context, performance.now() - started));
+      await safeAppend(pi, DECISION_TYPE, makeRecord(command, error, context, performance.now() - started, event?.toolCallId));
       return undefined;
     } catch { return undefined; }
   });

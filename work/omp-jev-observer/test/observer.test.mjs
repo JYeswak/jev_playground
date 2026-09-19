@@ -24,7 +24,8 @@ test('success returns undefined and records an allow decision', async () => {
   assert.equal(result, undefined);
   assert.equal(records.length, 1);
   assert.equal(records[0].recordType, 'decision');
-  assert.equal(records[0].dcgVerdict, 'allow');
+  assert.equal(records[0].toolCallId, 'synthetic-1');
+  assert.equal('dcgVerdict' in records[0], false);
   assert.equal(records[0].tool, 'bash');
 });
 
@@ -57,10 +58,12 @@ test('disabled observer is inert', async () => {
   assert.equal(result, undefined);
   assert.equal(records.length, 0);
 });
-test('live-shaped bash event uses name and input.command without throwing', async () => {
+
+test('live-shaped bash event preserves toolCallId', async () => {
   const { observer, records } = setup();
-  const result = await observer({ type: 'tool_call', name: 'bash', input: { command: 'echo live-shaped' } }, context);
+  const result = await observer({ type: 'tool_call', name: 'bash', toolCallId: 'live-shaped-1', input: { command: 'echo live-shaped' } }, context);
   assert.equal(result, undefined);
   assert.equal(records.length, 1);
   assert.equal(records[0].tool, 'bash');
+  assert.equal(records[0].toolCallId, 'live-shaped-1');
 });
