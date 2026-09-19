@@ -53,3 +53,34 @@ Vignettes, not worker transcripts; n=40 scored + 20 ambiguous, one model
 version, one run each; Jev cost trivial (~60 small requests). Foreman's own
 thresholds/scenarios unopened by this pane. STATUS score 900, composed: 1000
 for the bar outcome minus 100 for the single-author vignette caveat.
+
+## P3-7 appendix — PROMOTION NARROWED on real observations (pane 3, 2026-09-19)
+
+Method: 186,449 windows of 8 consecutive tool calls mined from all 97 sessions
+(`work/p3-calibration/scan_windows.py`); labels from the transcript's own
+future, predicate stated verbatim: STUCK iff ≥3 consecutive identical-tool
+repeats AND no write tool AND >300s elapsed AND the next user message matches
+an intervention regex; HEALTHY iff a write/edit tool fired AND no intervention
+match in the next 5 user messages; else AMBIGUOUS. Yield: 30 stuck / 9,776
+healthy / 176,643 ambiguous (real stuck is rare — good for the fleet).
+Sample: 10 + 10 + 10 spread across sessions (`real_run.py`, seed 7).
+Same frozen stuck question, same 0.80 bar, same feasibility question.
+30 live requests, jev-1.13.0.
+
+Result: REAL AUC=0.750 (n=20), false-stuck 0/10, feasibility 0.783
+(both classes present). Ambiguous p range 0.07–0.68.
+
+Verdict: PROMOTION NARROWED — works on vignettes (1.000/1.000), not on real
+observations (0.750 < 0.90). Two misses recorded without moving any threshold:
+the primary bar missed independently of feasibility, and feasibility itself
+missed its gate (0.783 < 0.80, both classes present) — the testfail regex truth
+is harder on terse real outputs than on vignettes, stated as a caveat on the
+arm, not a rescue of the verdict. What HOLDS on real data: the safety half
+(0 FP at 0.80 in both regimes) and the ambiguous band behaving like a boundary.
+Representation weakness disclosed: many real windows carry unknown ('?') tool
+names from tool_execution_start rows, which may depress AUC.
+UP-R7 moved off rung 5 by its author per the unit brief; vignette PROMOTE
+stands as a decision-shape result only.
+
+NO-CLAIM (P3-7): labels are predicate-mechanical (intervention regex,
+write-tool list), not human review; n=20 scored; one model, one run each.
