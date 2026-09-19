@@ -229,13 +229,21 @@ matched or beat the model.
 It is observe-only **by construction**, which you can check rather than trust:
 
 ```bash
-grep -cE '\b(block|deny|abort|reject)\b' work/omp-harm-rule/harm-rule.ts   # 0
+# prints a reassuring line and exits 0 when the file is clean
+grep -qE '\b(block|deny|abort|reject)\b' work/omp-harm-rule/harm-rule.ts \
+  && echo "FOUND a block path" || echo "observe-only: no block path"
 ```
 
-The `\b` word boundaries and `-E` are load-bearing: a substring form (`grep -c 'block'`) also
-matches the word inside comments and reports a nonzero count on a file that contains no block
-path at all. Pane 3 caught that while grading the installer — the proof only proves anything in
-its exact form.
+Two things about that command, both learned the hard way on a fresh clone:
+
+- **`grep -c … # 0` was the published form and it exits `1`.** Zero matches *is* grep's failure
+  status, so our proof-of-no-block-path returned failure on success. A reader checking exit
+  codes would have concluded the opposite of what the command demonstrates.
+- **The `\b` and `-E` are load-bearing.** A substring form (`grep -c 'block'`) matches the word
+  inside comments and reports nonzero on a file with no block path at all.
+
+Both were found by running, not reading — the first on a fresh clone by pane 2, the second by
+pane 3 while grading the installer.
 
 The installer backs up your `config.yml` before touching it, never overwrites that backup on a
 re-run, and prints the exact rollback line. Every decision row it writes carries the command it
@@ -596,6 +604,30 @@ cd demos/routing-backtest && npm run mutate
 that three agents were editing at once. It adds a git worktree pinned to a commit, runs the suites
 there, and `cmp`s the executables. Its first run failed and found three stages that pass locally and
 cannot pass from a clone, which is how the fresh-clone caveat above got measured instead of assumed.
+
+### What a genuinely fresh clone does, measured 2026-09-19 at `fb137d2`
+
+Pane 2 cloned the public repo to a temp dir and ran every command this README offers, taking
+each exit code **unpiped**. Six returned `1`, and none of them because the thing they test is
+broken:
+
+| command | rc | why |
+|---|---|---|
+| `install-harm-rule.sh --check default` | 1 | no `default` profile exists on a fresh machine — pass a profile you have |
+| the observe-only grep (old `-c` form) | 1 | zero matches is grep's failure status; **fixed above** |
+| `foundation/gates.sh` | 1 | needs a `.beads` DB this repo does not carry |
+| `compaction/install-jev-compact.sh --check` | 1 | the sibling upstream clone is not vendored here |
+| `scripts/sync-docs.sh` | 1 | expects 137 mirror files that are not in the public tree |
+| `scripts/verify-frozen.sh` | 1 | same `.beads` prerequisite as the gates |
+
+Passing on a fresh clone: `usage-shape`, the routing backtest, the quickstart, the compaction
+bootstrap, `gates.sh --selftest`, and the mutation arms.
+
+**We are publishing the failures rather than quietly fixing the table.** Five of the six are
+missing prerequisites we never told a reader about; one was a genuine defect in a published
+proof. Receipt:
+[`fresh-clone-readme-commands-20260919.md`](docs/demos/upstream-repro/fresh-clone-readme-commands-20260919.md).
+
 
 ## Mistakes we made
 
