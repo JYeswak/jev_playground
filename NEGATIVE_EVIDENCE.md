@@ -1492,3 +1492,38 @@ measured — and the measurement being honest is exactly what makes the gap invi
 **Retry condition:** if the two benign cases surface in an uncommitted working tree, a session
 log, or another machine's checkout, commit them and restore `0/40` — but only with provenance
 stated. Absent that, `0/38` is the permanent published figure.
+
+## R35 — three defects in one 130-line shell script, every one found by running it
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · Closed by an independent grader finding nothing further.
+
+`work/omp-harm-rule/install-harm-rule.sh` accumulated **three** defects before a non-author
+graded it, and **not one was visible on inspection**:
+
+| # | defect | how it presented |
+|---|---|---|
+| 1 | re-run clobbered `config.yml.bak` | rollback "succeeded" and restored a modified config |
+| 2 | an edit deleted `cp "$src" "$dst"` | reported GREEN while copying nothing |
+| 3 | appended a block item after `extensions: []` | **corrupted the config**, then `--check` reported GREEN on unparseable YAML |
+
+Defects 1 and 2 were mine, found by my own six arms. Defect 3 was found by **pane 3 grading an
+artifact it did not author** — I could not grade it, having written it.
+
+**Round 2 closed clean.** Five further breakage arms — read-only extensions dir (exits 1 loudly,
+config untouched), double-run-then-single-rollback (pristine, byte-identical), empty
+`extensions:` key, preexisting unlisted `harm-rule.ts` (backed up), and a **commented**
+`# - harm-rule` (correctly not counted as installed) — found **no fourth defect**. Two of the
+five I re-executed myself and they reproduced exactly.
+
+**What this is evidence for:** an author cannot grade their own installer, and reading cannot
+substitute for running. Three defects, three executions, zero inspection catches. The commented-
+entry arm also independently validates the fix for defect 3 — requiring
+`^[[:space:]]*-[[:space:]]*harm-rule$` rather than a bare string grep means a comment no longer
+reads as installed.
+
+**Still uncovered, stated rather than implied clean:** non-UTF8 configs, Windows line endings,
+concurrent installs, and any real profile. A clean grade over five arms is not a clean script.
+
+**Retry condition:** if a fourth defect appears in the uncovered arms, this entry's conclusion —
+that the script is sound *for the arms tried* — narrows rather than breaks. Re-grade after any
+edit to the file; three of three defects entered through edits, one of them a repair.
