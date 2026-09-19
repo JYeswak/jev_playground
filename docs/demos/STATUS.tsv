@@ -29,3 +29,4 @@ UP-R1-tier-routing-for-cost	4	905	RULED_OUT	pane1	docs/demos/upstream-repro/rout
 UP-R2-commit-security-triage	3	885	CLEARED	pane1	docs/demos/upstream-repro/router-savings-inverts-20260919.md	no-held-out-n-fixture-authored-by-tester		bdb6187d993c0a3d	measurement
 UP-R3-worker-supervision	3	870	CLEARED	pane1	docs/demos/upstream-repro/router-savings-inverts-20260919.md	no-held-out-n-thresholds-uncalibrated-upstream-declines-to-claim		bdb6187d993c0a3d	measurement
 UP-R4-jev-judged-compaction	4	930	RULED_OUT	pane1	docs/demos/upstream-repro/compaction-retention-oracle-20260919.md	none-died-rung4-keep_p-does-not-rank-future-need-AUC-0.348-to-0.648-across-2-SDKs-positive-control-0.941-passes	concur:pane3:4@66fa05d	e4bf84ae426e75ab	measurement
+UP-R5-jev-toolcall-gate	4	940	CLEARED	pane1	docs/demos/upstream-repro/bicameral-gate-adoption-20260919.md	adopt-as-confirm-gate-not-complete-safety-net-misses-5of20-question-coverage-gap		61981ea5a05f12b2	measurement
