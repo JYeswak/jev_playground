@@ -88,3 +88,22 @@ The 40-case run produced no complete per-case agreement/delta vector. The LocalJ
 - No agreement or probability-difference statistic was computed for the 40-case bar.
 - Feasibility success does not establish calibration or workload-scale reliability.
 - No LocalJev source or vendored clone was edited.
+
+## P2-6 bounded retry (2026-09-19)
+
+The pinned 40-case SHA and preregistered bar were not changed. The feasibility cases were rechecked first with the shared work/oracle-kit scorer:
+
+- feasibility AUC: 1.0
+- bar: 0.8
+- constant score: false
+- SDK field extraction used noul/probabilities and throws on missing fields
+
+The 40 cases were then attempted with one question per LocalJev request, sequentially, with the SDK timeout raised to 180 seconds. This did not produce a complete vector. LocalJev returned:
+
+    502 upstream did not return an OpenAI chat completion: TypeError: message content is missing
+
+The bar remains unchanged. Verdict remains BLOCKED. This is a backend/model completion failure on the shrunk request, not a substitute/non-substitute result.
+
+Exact served model: incoai/Qwen3.8-27B-Splash.
+
+NO-CLAIM: feasibility correctness does not establish calibration; agreement with Jev would not establish accuracy because both systems can be wrong together.
