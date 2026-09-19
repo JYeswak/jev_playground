@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # gates.sh -- aggregate gate for the Jev workspace. Runs every stage in
 # foundation/gates.d/, one line per stage, nonzero exit on any RED.
 # Usage: ./gates.sh [--selftest]   (--selftest runs each stage's planted-bad

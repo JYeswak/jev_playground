@@ -423,3 +423,31 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   cassettes, latency logs, or no data. Receipt with full table:
   `docs/demos/phi-clone-sweep-20260919.md`. Feeding phi further needs keyed runs,
   the absent themsquared clone, or new live calls. Zero live calls.
+
+## fresh-clone gates + integrations doc (2026-09-19)
+
+- **Stage 40 hole, measured not remembered.** On a clean public-repo checkout, stage 40
+  typecheck failed. `npm install --prefix compaction` exited 0 and left
+  `node_modules/fast-jev-compaction` → dangling `file:../fast-jev-compaction`. `tsc` still
+  exit 2. Second hole: Debian `/bin/sh` is dash; `set -o pipefail` stages exited 2 before
+  work. Receipt: `NEGATIVE_EVIDENCE.md` R32.
+- **Fix:** `scripts/bootstrap-compaction.sh` clones `tamaratran/fast-jev-compaction` at
+  EVAL.md pin `6e1da50`, builds `dist/`, npm-installs `compaction/`. Stage 40 calls it
+  when `--check` fails. Six `#!/bin/sh` + pipefail files now `#!/usr/bin/env bash`.
+- **Docs:** `docs/INTEGRATIONS.md` + README TL;DR pointer — public chapter for
+  `docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md` (`33aa633`).
+  Headline: 3.95% isError on allowed (frozen 4.01%), 40× the 0.1% kill line,
+  216,507 decisions, split 36,955 / 41,500, zero API. JOIN YIELD 36.8%; miss
+  class `js-bash-<uuid>`; logger must capture command text at decision time.
+  Pane 3 withdrew revert-predicate as INVALIDATED; `isError` survived.
+  Fail-open verified at `dcg-guard.ts:599-610` via the corpus
+  (`toolcall-groundtruth-corpus-20260919.md:9-12`); proposed certification
+  files not cited as source. Observe-and-log is registered on `jev-lab` and
+  is **not working**: observer wrote 0 rows, `dcg-tool-bridge` wrote 1. Loader
+  globs `*.{ts,js}`; config is `extensions:` in profile `agent/config.yml`.
+  No invented STOP-LIVE ban. Live test surface remains pane 0 / added test
+  panes. `jev-compact` L3 measurement, does not prune. **0 promoted.**
+- **Boundary:** this PR did not register any OMP hook and does not claim the
+  live observer works. R30 unread and unedited. Stages 50/60 still need
+  `LOOP_KIT` (foundry); this cloud does not have it, so the aggregate cannot
+  be `ALL GREEN` here. No live Jev calls. Lane: offline.

@@ -1,10 +1,12 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # 40-omp-compact-replay: the omp transcript adapter typechecks, its mapping
 # tests pass, and the known-bad (trailing toolResult must be kept) proves its
 # RED arm on demand.
 #
-# Hermetic at run time: no network, no key, after `npm install` (node_modules is
-# untracked, so a fresh clone fetches deps once). Live replay against real Jev stays
+# Hermetic at run time once deps exist: no key. A fresh clone does not carry
+# compaction/node_modules or the fast-jev-compaction sibling, so the live path
+# runs scripts/bootstrap-compaction.sh when either is missing (network, once).
+# --selftest stays offline. Live replay against real Jev stays
 # manual-with-receipt (npm run replay -- <transcript>), like calibration runs.
 set -uo pipefail
 # `pipefail` added 2026-09-18 on pane 3's hardening plan (db97021), which graded all six of
@@ -13,8 +15,10 @@ set -uo pipefail
 # not `set -e`. IF `set -e` IS EVER ADDED, RE-AUDIT — pipefail+errexit aborts on a middle-stage
 # failure, and every pipe then existing needs explicit handling (see 30-no-secrets.sh:21, whose
 # `grep … | head` is the feared shape and is already neutralised with `|| true`).
-here=$(CDPATH='' cd -- "$(dirname -- "$0")/../../compaction" && pwd -P)
+repo=$(CDPATH='' cd -- "$(dirname -- "$0")/../.." && pwd -P)
+here="$repo/compaction"
 cd "$here" || { echo "RED: cannot cd to compaction/"; exit 1; }
+bootstrap="$repo/scripts/bootstrap-compaction.sh"
 
 if [ "${1:-}" = "--selftest" ]; then
   # Plant an INVERTED property test (trailing result must be ABSENT) against
@@ -68,6 +72,17 @@ EOF
     rm -f test/__selftest-hook-inverted.test.ts
   fi
   exit 0
+fi
+
+# Fresh-clone hole (R32): node_modules is gitignored AND the file: sibling is
+# not on the allowlist. npm install alone leaves a dangling symlink.
+if [ ! -x "$bootstrap" ]; then
+  echo "RED: missing $bootstrap"
+  exit 1
+fi
+if ! "$bootstrap" --check >/dev/null; then
+  echo "bootstrap: compaction deps missing; running $bootstrap (network, once)"
+  "$bootstrap" || { echo "RED: compaction bootstrap failed"; exit 1; }
 fi
 
 npx tsc --noEmit >/dev/null 2>&1 || { echo "RED: compaction typecheck failed"; exit 1; }

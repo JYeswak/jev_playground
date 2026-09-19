@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # 10-fixture-integrity: the calibration fixture parses, holds 80 rows with the
 # expected kind/domain mix and balanced labels, and every row carries the fields
 # the runner needs. A rotten fixture emits green-looking garbage downstream, so

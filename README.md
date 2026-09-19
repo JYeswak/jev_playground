@@ -26,6 +26,15 @@ true catches at any threshold that catches anything
 a base rate next to their accuracy, including us until this week: eight ledger rows now carry one
 ([receipt](docs/demos/upstream-repro/prevalence-retrofit-20260919.md)).
 
+**A second prevalence, now public, on the tool_call surface we would actually gate.** Error
+rate on allowed commands is **3.95%** (frozen split **4.01%**) — **40×** the 0.1% kill line —
+on **216k** dcg decisions, frozen split **36,955** train / **41,500** held-out, zero API
+([receipt](docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md)). Join yield is
+**36.8%**; the miss class is `js-bash-<uuid>` foreign ids, so a logger must capture command
+text at decision time. Pane 3 withdrew the revert-predicate as INVALIDATED; `isError` survived.
+Fail-open is verified at `dcg-guard.ts:599-610`. The live observer is **not working** — see
+[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
+
 **What Jev IS good at, stated fairly.** Ties a TF-IDF classifier trained on ~14,800 in-domain
 labels at zero labels (McNemar p=0.677), holds 0.97–0.99 under shift where that classifier
 collapses to 0.70 ([receipt](docs/demos/upstream-repro/judgment-quality-20260919.md)); 96.5% on
@@ -35,7 +44,9 @@ always-abstain control 5× on their own corpus
 ([receipt](docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md)).
 
 **Scoreboard, present tense:** 25 verdict rows (7 cleared, 9 held, 8 ruled out, **0 promoted**),
-31 dead-end ledger entries each with a reopen condition, 12 gate stages green. The product is the
+31 dead-end ledger entries each with a reopen condition, 12 gate stages green. Tool_call
+surface OPEN at 3.95% — proven vs WIP seams:
+[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). The product is the
 ruling plus the evidence for everything ruled out.
 
 **What you get.** Three tools that run offline with no API key, and read your own logs:
@@ -331,6 +342,24 @@ things, and mixing them is how a number gets believed harder than it earned.
 
 ## Quick start
 
+Three commands from a stranger clone. No API key.
+
+```bash
+git clone https://github.com/JYeswak/jev_playground && cd jev_playground
+./scripts/quickstart.sh
+bash foundation/gates.sh
+```
+
+`gates.sh` runs `scripts/bootstrap-compaction.sh` when stage 40's deps are missing (`compaction/node_modules` and the pinned `fast-jev-compaction` sibling). That step uses the network once and does not commit `node_modules`. You can run the bootstrap yourself first if you want the fetch to be visible:
+
+```bash
+./scripts/bootstrap-compaction.sh
+```
+
+Proven vs WIP OMP/Jev seams, with claim levels: [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md) (**0 promoted**).
+
+Then the five questions, from committed bytes:
+
 ```bash
 ./scripts/quickstart.sh
 ```
@@ -459,23 +488,26 @@ because a gate that cannot fail is not a gate. Re-derive the count from `foundat
 number written here goes stale silently, and this one already did once, when it claimed seven
 stages and nine existed.
 
-**On a fresh clone of the public repo you get eleven of twelve, not `ALL GREEN`, and the output
-above is from a developed checkout.** Measured 2026-09-18 by cloning
-`github.com/JYeswak/jev_playground` into an empty directory and running the suite there. **Only
-stage 40 fails**, on `compaction typecheck failed`: it needs `npm install` inside `compaction/`, so
-that stage does need the network. That is state a clone legitimately does not carry, not a gate
-defect.
+**Stage 40 no longer requires a pre-seeded `node_modules`.** A fresh clone used to fail that
+stage on `compaction typecheck failed`. The README's previous fix (`npm install --prefix
+compaction`) is **insufficient**: `package.json` depends on `file:../fast-jev-compaction`, which
+this repo does not vendor, so npm leaves a dangling symlink and `tsc` still fails. Measured
+2026-09-19 on a clean public-repo checkout (`NEGATIVE_EVIDENCE.md` R32). `scripts/bootstrap-compaction.sh`
+clones the sibling at the EVAL.md pin, builds `dist/` (git does not carry it), then npm-installs.
+Stage 40 runs that script when the ready-check fails.
 
-**This figure was wrong here twice before it was measured this way.** It read *"eight of ten"*, then
-*"ten of twelve"* taken from a local detached worktree, which is **not** what a stranger gets: a
-worktree inherits state the public clone does not, and stage 50 passes on the clone while it failed
-in the worktree. Measure the audience you are describing.
+**`ALL GREEN` is still not what every stranger gets.** Stages 50 and 60 wrap foundry house
+gates and need `LOOP_KIT` (default `$HOME/Developer/foundry/loop-kit`). A machine without that
+kit exits 3 on stage 50 — instrument unreachable, not a content fail. The 2026-09-18
+"eleven of twelve" measurement was taken on a machine that already had foundry; it understated
+the sibling-clone hole and overstated how far a random clone goes green. Measure the audience
+you are describing.
 
 ## Command reference
 
 | Command | Effect | Needs a key? |
 |---|---|---|
-| `bash foundation/gates.sh` | nine gate stages over the whole repo | no |
+| `bash foundation/gates.sh` | every wired stage; stage 40 bootstraps compaction deps if missing | no |
 | `bash foundation/gates.sh --selftest` | every stage against its planted bad input | no |
 | `bash scripts/verify-frozen.sh [ref]` | runs the suites in a clone pinned to a commit | no |
 | `./scripts/lane-status.sh` | renders `docs/demos/STATUS.tsv`, verifies every cited receipt | no |
@@ -532,7 +564,7 @@ on offer here — only receipts.
 | Symptom | Cause | Fix |
 
 | `SyntaxError` or `Cannot find module` on any tool | node older than 20, or missing | `node --version`, then install node >= 20 |
-| `gates.sh` red on `40-omp-compact-replay` | no `compaction/node_modules` in a fresh clone | `npm install --prefix compaction` |
+| `gates.sh` red on `40-omp-compact-replay` | missing sibling clone or `compaction/node_modules` | `./scripts/bootstrap-compaction.sh` |
 | `gates.sh` red on `50-house-gates` | no Beads database, only the tracked JSONL | `br import` |
 | `gates.sh` red on `70-tests-registry-sync` | a test file exists that `TESTS.md` does not name | add its entry to `TESTS.md` |
 | `shape.mjs` reports 0 turns | logs are not a Claude Code or omp shape | check one file has `message.usage` keys |
@@ -557,9 +589,9 @@ That is the deliverable rather than a shortfall, and every reason lives in
 reopen it. One candidate died there because an MIT-licensed tool already ships its surface, which
 is a reason to stop building and not a reason to build faster.
 
-**A fresh clone cannot run one of the twelve gate stages**, and the reasons are in Quick start above.
-There is no bootstrap step that closes both, so `scripts/verify-frozen.sh` fails at HEAD by design
-rather than silently.
+**Stage 40's fresh-clone hole has a bootstrap.** `scripts/verify-frozen.sh` may still fail on a
+machine without foundry (`LOOP_KIT` for stages 50/60). That is an environment limit, not a missing
+`node_modules`.
 
 **The `~84% of cost` figure is an estimate under assumed rates**, and the rates are unattributed
 here. A reader can check that assumed rates were used, not which multiplier.

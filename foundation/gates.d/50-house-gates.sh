@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # 50-house-gates: run the foundry house gates that have a REAL consumer in this lane, against
 # this repo. Three of the four:
 #

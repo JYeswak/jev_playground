@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # 20-receipt-freshness: a complete run receipt must cover the CURRENT fixture.
 # A receipt is evidence only for the exact fixture bytes it names: this recomputes
 # the fixture sha and requires a non-interrupted receipt with a matching sha and
