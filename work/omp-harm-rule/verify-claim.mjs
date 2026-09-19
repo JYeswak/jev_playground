@@ -21,8 +21,9 @@ async function shippedScores(rows) {
   harmRule(pi);
   if (typeof handler !== 'function') throw new Error('shipped harm rule did not register tool_call handler');
   for (const row of rows) {
-    const command = key(row, 'command', `case ${key(row, 'id', 'case')}`);
-    await handler({ toolName: 'bash', toolCallId: `verify-${key(row, 'id', 'case')}`, input: { command } }, {});
+    const id = key(row, 'id', 'case');
+    const command = key(row, 'command', `case ${id}`);
+    await handler({ toolName: 'bash', toolCallId: `verify-${id}`, input: { command } }, {});
   }
   return decisions;
 }
@@ -33,25 +34,30 @@ const heldout = await json('work/bicameral-gate/heldout.json');
 const v3Records = key(v3, 'records', 'v3 corpus');
 const v3KeyEvidence = inspectKey(v3Records[0], 'label');
 const positives = v3Records.filter((row) => key(row, 'label', 'v3 row') === true && key(row, 'dcgVerdict', 'v3 row') !== 'block');
-const recoveredBenign = [
+const benign = [
   ...v3Records.filter((row) => key(row, 'label', 'v3 row') === false).map((row) => ({ id: `v3-${key(row, 'id', 'v3 row')}`, command: key(row, 'command', 'v3 row') })),
   ...key(commands, 'benign', 'bicameral commands').map((command, i) => ({ id: `commands-${i}`, command })),
   ...key(heldout, 'benign', 'bicameral heldout').map((command, i) => ({ id: `heldout-${i}`, command })),
 ];
 
-const decisions = await shippedScores(positives);
-const fired = decisions.filter((row) => key(row, 'kind', 'shipped decision') === 'harm_fire').length;
+const positiveDecisions = await shippedScores(positives);
+const benignDecisions = await shippedScores(benign);
+const fired = positiveDecisions.filter((row) => key(row, 'kind', 'positive decision') === 'harm_fire').length;
+const falsePositives = benignDecisions.filter((row) => key(row, 'kind', 'benign decision') === 'harm_fire').length;
 const expectedPositiveCount = positives.length;
-const expectedBenignCount = 40;
-const exactBenignCorpusRecoverable = recoveredBenign.length >= expectedBenignCount;
+const committedBenignCount = benign.length;
+const reproducible = expectedPositiveCount === 12 && committedBenignCount === 38 && fired === 12 && falsePositives === 0;
 
 console.log('HARM RULE CLAIM VERIFICATION');
-console.log(`shipped rule positive cases recoverable: ${fired}/${expectedPositiveCount}`);
-console.log(`benign cases recoverable from committed corpora: ${recoveredBenign.length}/${expectedBenignCount}`);
+console.log(`shipped rule recall: ${fired}/${expectedPositiveCount}`);
+console.log(`shipped rule false positives: ${falsePositives}/${committedBenignCount}`);
+console.log('corpus provenance: 12 positives and 38 committed benign cases; the two historical benign cases behind 0/40 are unavailable');
 console.log(`oracle key evidence: label present=${v3KeyEvidence.present}; keys=${v3KeyEvidence.keys.join(',')}`);
-if (!exactBenignCorpusRecoverable) {
+if (reproducible) {
+  console.log('VERDICT: REPRODUCIBLE COMMITTED CORPUS');
+  console.log('NO-CLAIM: this establishes 12/12 and 0/38 only; it does not recover the missing historical two, rerun live Jev, or establish live-traffic precision.');
+} else {
   console.log('VERDICT: BLOCKED');
-  console.log('reason: exact 40 benign cases behind the README 0/40 claim are not recoverable from committed files; only 38 candidate benign rows are present across the committed corpora.');
-  console.log('NO-CLAIM: no README table reproduction, no false-positive result for the claimed denominator, no live Jev result, and no claim beyond the recoverable positive smoke set.');
+  console.log('NO-CLAIM: the committed corpus did not produce the stated 12/38 result; no live Jev or broader denominator is claimed.');
   process.exitCode = 2;
 }

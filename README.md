@@ -206,21 +206,21 @@ the scoring done by a pane that authored none of them:
 
 | | recall | false positives | can you re-run it? |
 |---|---|---|---|
-| **deterministic rule** | **12/12** | 0/40 | recall **yes**; FP **no** |
+| **deterministic rule** | **12/12** | **0/38** | recall **yes**; FP **yes, committed corpus** |
 | Jev | 11/12 | 0/40 | **no** — needs a live model |
-| dumb baseline | 5/12 | 0/40 | recall **yes**; FP **no** |
+| dumb baseline | 5/12 | 0/40 | recall **yes**; FP **historical only** |
 
-```bash
-node work/omp-harm-rule/verify-claim.mjs      # exits 2, BLOCKED, on purpose
-```
+~~~bash
+node work/omp-harm-rule/verify-claim.mjs      # exits 0, 12/12 recall and 0/38 FP
+~~~
 
-**That command fails, and we are leaving it that way.** It imports the shipped rule, recovers
-**12/12** positives from committed corpora — and finds only **38 of the 40** benign cases. So the
-`0/40` column above **is not reproducible from this repo**: two of the forty cases behind our own
-headline number were never committed. We found this by writing the verifier *after* publishing
-the claim, which is the wrong order, and the verifier fails closed rather than quietly scoring
-38 and calling it 40. Receipt:
-[`harm-rule-claim-repro-20260919.md`](docs/demos/upstream-repro/harm-rule-claim-repro-20260919.md).
+The verifier imports the shipped rule and reproduces the committed **12/12** positive and **0/38**
+benign result. The original **0/40** denominator is not recoverable: two historical benign cases
+were never committed. We publish the smaller denominator rather than reconstructing them silently.
+Receipt: [harm-rule-claim-repro-20260919.md](docs/demos/upstream-repro/harm-rule-claim-repro-20260919.md).
+
+A mutated copy of the rule (777 -> 778) drops recall to 10/12, proving the verifier detects
+rule breakage. The Jev and dumb-baseline rows remain historical measurements, not offline reruns.
 
 The recall column is real and you can check it now; a mutated copy of the rule (`777`→`778`)
 drops it to 10/12, which is how we know the harness detects a broken rule rather than always
