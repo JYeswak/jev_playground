@@ -14,6 +14,10 @@ here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 mode=${1:-run}
 rc=0
 unmeasured=0
+# Resolved ONCE, in a subshell cd rather than `git -C` (dcg denies the -C form), because the first
+# version of the outcome log called git inside the loop: twelve extra git invocations per run, and
+# a denied command per stage. It hung two runs before this fix.
+head_sha=$( (CDPATH='' cd -- "$here/.." && git rev-parse --short HEAD) 2>/dev/null || echo unknown )
 for stage in "$here"/gates.d/[0-9]*-*.sh; do
     [ -x "$stage" ] || continue
     name=$(basename "$stage" .sh)
@@ -31,6 +35,17 @@ for stage in "$here"/gates.d/[0-9]*-*.sh; do
         echo "UNMEASURED $name (${ms}s): $(printf '%s' "$out" | head -c 300)"
         unmeasured=$(( unmeasured + 1 ))
     elif [ "$code" -eq 0 ]; then echo "PASS $name (${ms}s)"; else echo "RED  $name (exit=$code, ${ms}s): $(printf '%s' "$out" | head -c 300)"; rc=1; fi
+    # RECORD THE OUTCOME VECTOR. Until 2026-09-19 this loop persisted nothing, so "do two of our
+    # twelve gates fail on the same commits?" was unanswerable — and that question decides whether
+    # a gate earns its slot or is a second copy of one we already run (RECIPES.md recipe 4: two
+    # checkers are only worth having if they fail on DIFFERENT things). One TSV line per stage per
+    # run makes the phi measurement in ensemble/decorrelation.py applicable to our own instruments.
+    # Append-only, best-effort: a log that cannot be written must never turn a gate RED.
+    if [ "${JEV_GATE_LOG:-1}" != "0" ]; then
+        printf '%s\t%s\t%s\t%s\t%s\n' \
+            "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$name" "$code" "$mode" "$head_sha" \
+            >> "$here/gate-outcomes.tsv" 2>/dev/null || true
+    fi
 done
 if [ "$rc" -ne 0 ]; then
     echo "gates: FAILING (see RED rows)"
