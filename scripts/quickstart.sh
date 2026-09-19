@@ -340,8 +340,9 @@ denominator before any share:
   node demos/routing-backtest/bin/backtest.mjs  <your-sessions.jsonl> --out runs/mine.json
   node demos/retransmit-whatif/bin/whatif.mjs   <your-sessions.jsonl> --out runs/mine.json
 
-The lane's actual product is not these demos. It is a ruling on 17 candidate ideas, of which ZERO were
-promoted: docs/demos/STATUS.tsv for the verdicts and receipts, NEGATIVE_EVIDENCE.md for what was ruled
-out and what would reopen it.
+The lane's actual product is not these demos. It is a ruling on every candidate idea, of which ZERO
+were promoted. Counts go stale silently, so this text no longer carries one: run
+./scripts/lane-status.sh for the live verdict tally, docs/demos/STATUS.tsv for the verdicts and
+receipts, and NEGATIVE_EVIDENCE.md for what was ruled out and what would reopen it.
 TAIL
 exit 0

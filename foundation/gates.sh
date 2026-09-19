@@ -22,7 +22,7 @@ root=$(CDPATH='' cd -- "$here/.." && pwd -P)
 beads_db=$(find "$root/.beads" -type f -name '*.db' -print -quit 2>/dev/null)
 if [ -z "$beads_db" ]; then
     echo "RED  foundation gates require an imported Beads database under $root/.beads/*.db"
-    echo "     Fresh clone fix: run 'br import' from the repository root, then rerun ./foundation/gates.sh"
+    echo "     Fresh clone fix: run 'br sync --import-only' from the repository root, then rerun ./foundation/gates.sh"
     exit 1
 fi
 for stage in "$here"/gates.d/[0-9]*-*.sh; do

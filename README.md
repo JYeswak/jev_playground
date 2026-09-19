@@ -676,10 +676,10 @@ broken:
 |---|---|---|
 | `install-harm-rule.sh --check default` | 1 | actionable: create a profile/config, run `install-harm-rule.sh <profile>`, then rerun `--check <profile>` |
 | the observe-only grep (old `-c` form) | 1 | zero matches is grep's failure status; the published proof now uses the `-q` form and prints a success message |
-| `foundation/gates.sh` | 1 | actionable: run `br import` from the repository root to create `.beads/*.db`, then rerun gates |
+| `foundation/gates.sh` | 1 | actionable: run `br sync --import-only` from the repository root to create `.beads/*.db`, then rerun gates |
 | `compaction/install-jev-compact.sh --check` | 1 | actionable: run `./scripts/bootstrap-compaction.sh`, then rerun the check |
 | `scripts/sync-docs.sh` | 1 | maintainer-only mirror refresh; readers should skip it and use the offline tools |
-| `scripts/verify-frozen.sh` | 1 | actionable: run `br import` from the repository root, then rerun frozen verification |
+| `scripts/verify-frozen.sh` | 1 | actionable: run `br sync --import-only` from the repository root, then rerun frozen verification |
 
 Passing on a fresh clone: `usage-shape`, the routing backtest, the quickstart, the compaction
 bootstrap, `gates.sh --selftest`, and the mutation arms.
@@ -718,7 +718,7 @@ on offer here — only receipts.
 
 | `SyntaxError` or `Cannot find module` on any tool | node older than 20, or missing | `node --version`, then install node >= 20 |
 | `gates.sh` red on `40-omp-compact-replay` | missing sibling clone or `compaction/node_modules` | `./scripts/bootstrap-compaction.sh` |
-| `gates.sh` red on `50-house-gates` | no Beads database, only the tracked JSONL | `br import` |
+| `gates.sh` red on `50-house-gates` | no Beads database, only the tracked JSONL | `br sync --import-only` |
 | `gates.sh` red on `70-tests-registry-sync` | a test file exists that `TESTS.md` does not name | add its entry to `TESTS.md` |
 | `shape.mjs` reports 0 turns | logs are not a Claude Code or omp shape | check one file has `message.usage` keys |
 | `jev-probe.mjs` exits 2 | no `TYPESAFE_API_KEY` in the environment | run it under a secret manager, or use `--replay` |
