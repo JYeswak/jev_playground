@@ -1343,3 +1343,35 @@ is why the 2026-09-18 "eleven of twelve" measurement never saw this.
 both macOS and Debian, with `bash foundation/gates.sh` — stage 40 must PASS after the
 bootstrap (and the dash stages must actually run). Closed in form by
 `scripts/bootstrap-compaction.sh` + bash shebangs; reopen if that clone still REDs stage 40.
+
+## R32 — the class-D experiment was void by construction, and the flaw was in my packet
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · Found by pane 3, caused by pane 1.
+
+The ablate-and-re-run design asked: replace a tool result with the truncation note, re-run the
+turn, and check whether the later-reused fact still appears. Pane 3 ran it and killed it at 12 of
+24 turns with **INCONCLUSIVE — ceiling zero**.
+
+**The flaw:** the "reused fact" was defined over the **entire future** of the transcript, but the
+arms scored only the **single next assistant message**. Those are different questions. Measured
+consequence: **the original agent's own next message scores 0/24** — the unablated ground truth
+cannot reproduce the fact either. With a ceiling of zero, arm A and arm B are both floored, the
+comparison carries no information, and any e-value computed over it would be noise dressed as a
+verdict.
+
+**This was my packet, not the pane's execution.** I wrote "produce the next assistant message"
+while inheriting a fact definition scoped to the whole future, and I did not notice the mismatch
+across two dispatches. Pane 3 caught it by measuring the ceiling instead of trusting the design.
+
+**The procedural rule, which generalises past this experiment:** *compute the ceiling offline
+before spending a single model call.* If the best possible arm — the real agent, unablated,
+oracle conditions — cannot pass, the experiment is void and costs nothing to discover. This is
+the feasibility-arm rule (R28-era) applied to experimental **design** rather than to a scorer:
+an arm that ought to pass must be shown to pass *before* the arms that might fail.
+
+**Cost of the flaw:** 12 turns of a shared GPU, killed early on load 9–13 rather than run to
+completion. Cheap, because the pane stopped instead of finishing a void run.
+
+**Retry condition:** a redesign with a **new preregistration**, in which (a) the fact definition
+and the scoring window are the same window, and (b) the original-agent ceiling is measured
+offline first and is non-trivial. Without both, do not spend calls.
