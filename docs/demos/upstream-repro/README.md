@@ -1,8 +1,10 @@
-# What ten Jev repositories say when you actually run them
+# What 22 Jev repositories say when you actually run them
 
 Written for someone who does not work on this lane. Every line below was produced by running
 somebody else's code on somebody else's data, and every claim links to the receipt that produced it.
-We patched none of these repositories; five defects went upstream as reports.
+We patched none of these repositories. **Every one of the 22 vendored clones has now been run**
+(completed 2026-09-19 on Joshua's order: *"stop NOT USING the repos we've downloaded"*), and the
+last four taught us more than the first eighteen.
 
 This page exists because a reviewing pane ruled that upstream evidence *"is not USER shipping until
 promoted into a clear stranger-consumable surface"*
@@ -62,3 +64,49 @@ judgment beat a trained model or a hand-written rule."*
   [`README.md`](../../../README.md). `s1-rs` is blocked on a platform mismatch, not a finding.
 - **Live figures cost real calls** and were run once. Nothing here is a reliability measurement, and
   no figure on this page should be read as a benchmark of the current model.
+
+## 2026-09-19 — the last four clones, and what running them cost us in retracted claims
+
+Four repositories sat unrun while this lane built its own versions of their questions. Running them
+produced the session's only shipped-code defect **and** forced three retractions of our own work.
+
+### A timeout in `typesafe-sdk-js` kills a default Node process
+
+Their suite reports **189/189 passing with 8 unhandled errors** — Vitest's own warning is that this
+"might cause false positive tests". Run file by file, all 8 come from one file, which makes exactly
+8 aborted requests: **one leaked rejection per timed-out request.**
+
+Outside their harness entirely — real `node:http`, real global `fetch`, no test doubles — a single
+timed-out call gives the caller the correct `APITimeoutError` and then **kills the process**
+(`exit 1`, from `client.ts:421`). Repro: [`sdk-js-timeout-crash-repro.mjs`](sdk-js-timeout-crash-repro.mjs),
+report: [`sdk-js-timeout-crash-20260919.md`](sdk-js-timeout-crash-20260919.md).
+
+**And the same vendor's Python SDK does not have it.** Identical scenario:
+`TypeSafeAPITimeoutError` to the caller, **zero** leaked async errors, process survives
+([`sdk-python-20260919.md`](sdk-python-20260919.md)). That control is what turns "async timeouts are
+hard" into "this is a defect", and it only exists because the Python clone got run too.
+
+### The vendor's own guidance was in the tree, unread
+
+[`typesafe-ai/skills`](sdk-js-and-skills-20260919.md) is TypeSafe's own instructions for designing
+Jev judgments — meaning belongs in `instructions` because question IDs are never sent to the model,
+state must be complete, include a no-match outcome. We had spent a day designing judgments without
+opening it. Checking our code against it found **nothing to fix**, for the useful reason that we
+author no questions at all: we delegate to `fast-jev-compaction`, which already complies.
+
+### Three claims of ours that did not survive contact
+
+| we said | what the control showed |
+|---|---|
+| the JS SDK's timeout timer leaks | `clearTimeout` is in the `finally`; the caller path is clean. Right impact, **wrong mechanism** |
+| `skillranker`'s README documents a CLI that does not exist | our clone is **103 commits stale**; the commands are wired on `origin/main`. **Retracted** ([`skillranker-20260919.md`](skillranker-20260919.md)) |
+| a gate run was hanging on our own code | it was a 77s stage against a 60s timeout — **no hang at all** |
+
+No upstream report was filed for the `skillranker` "gap", which is the point of holding reports for
+a human: it would have told a maintainer their docs were broken when the defect was our pin.
+
+### What this is worth to someone outside the lane
+
+Four of the six things the sweep produced are things we were about to build ourselves and did not
+need to. The pattern is consistent enough to state plainly: **before writing code to answer a
+question, check whether a repository you already cloned answers it, and run that instead.**
