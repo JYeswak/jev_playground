@@ -46,3 +46,52 @@ minimum sample contract.
   call-adjacent rule still places each result next to its call.
 - The `-big-` fixture keeps full raw rows including opaque `thinkingSignature`
   blobs (provider metadata, never model content).
+
+## Installing the omp compaction hook
+
+This turns the compactor into something omp calls for you: when a session hits its context limit,
+omp asks this hook first, and the hook either returns a smaller transcript or declines and lets
+omp's own summarizer run.
+
+**It cannot break your session.** Every failure path — no API key, Jev unreachable, a malformed
+envelope, output that did not actually shrink — returns `undefined`, which means "omp, you do it".
+That was not a design claim until 2026-09-19, when the hook was wrong four times in a row against
+a real omp and no session was harmed. See `../docs/demos/omp-seam-live-20260918.md`.
+
+```bash
+# 1. from the repo root — the hook is already committed, just point omp at it
+ls .omp/hooks/pre/jev-compact.ts
+
+# 2. install deps for the compactor it calls
+cd compaction && npm install && cd ..
+
+# 3. give it a key. WITHOUT ONE THE HOOK REGISTERS NOTHING AND OMP IS UNAFFECTED.
+export TYPESAFE_API_KEY=...   # or run omp under your secret manager
+
+# 4. verify it loaded, in a throwaway session rather than one you care about
+omp -p 'reply OK'
+```
+
+### Did it actually do anything?
+
+omp can swallow hook stderr, so a working hook and a dead one look identical from outside. The hook
+therefore appends every decision to `~/.jev-compact.log`:
+
+```
+$ tail -2 ~/.jev-compact.log
+2026-09-19T01:26:51.059Z passthrough: below minimum reduction: 0% reduction; no tool calls
+2026-09-19T01:23:06.489Z refused: no messages on the event envelope; envelope keys: ...
+```
+
+`compacted A -> B` means it shrank the transcript. `passthrough:` and `refused:` both mean omp's
+summarizer handled that compaction and nothing was lost. Set `JEV_COMPACT_LOG` to move the file.
+
+### Known limits, so you are not surprised
+
+- **Savings come from tool results and thinking blocks.** A session that is one long prose turn has
+  nothing this can remove, and it will correctly decline with `0% reduction; no tool calls`.
+- It only ever sees `preparation.messagesToSummarize` — the older prefix omp has already decided to
+  summarize. Recent turns are omp's to keep, and this hook does not touch them.
+- Tested against omp 18.2.4. The envelope shape was discovered by observation, not documentation,
+  so a different omp version may present something else; the hook refuses loudly in the log rather
+  than guessing.
