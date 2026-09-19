@@ -1023,3 +1023,31 @@ itself. **The replay is the oracle; every static shortcut I wrote disagreed with
 
 **Retry condition:** re-run the census with `preserveRecentMessages: 6` before any corpus-level
 claim is published. Until then `R24`/`R25` carry this warning inline.
+
+### R26 retry, same day — the census re-run at the real default
+
+R26's retry condition was: re-run the corpus census with `preserveRecentMessages: 6` before any
+corpus-level claim is published. Done, keyless, 55 seconds.
+
+| | at `2` (**wrong**, as published) | at `6` (**the default**) |
+|---|---|---|
+| sessions fitting the state budget | 1,566 | 1,566 |
+| refused, too large | 86 | 87 |
+| sessions with ≥1 **eligible** call | 1,513 | **1,415** |
+| sessions where **everything is pinned** | 0 | **98** |
+| eligible calls | 88,288 | **77,857** |
+| pinned calls | 0 | **10,021** |
+
+**The correction is smaller than I feared and sharper than I expected.** The direction I predicted
+was right — 88,288 over-counted by about 12% — but the headline is the row that was structurally
+impossible at the wrong setting: **98 sessions (6.3%) have nothing the hook may touch**, and at
+`preserveRecentMessages: 2` that number could only ever read zero. The zero-request sessions in
+the sample are members of that 98, not anomalies.
+
+So the corrected corpus picture at the library's actual default: of 1,653 real sessions, **87 are
+too large, 98 are entirely pinned, and 1,415 (86%) have at least one call the hook could ask
+about.** `R24` and `R25` are superseded by this table on every count except the fitting total,
+which is unchanged.
+
+**Retirement:** this supersedes the warnings added to `R24`/`R25`; those entries stay as the
+record of how the error was made, not as figures to quote.
