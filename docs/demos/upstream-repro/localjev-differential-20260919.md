@@ -183,3 +183,15 @@ This is the raw body from the direct upstream request for the 9,929-character ca
   }
 }
 ```
+
+## P2-8 reasoning/output-budget diagnosis (2026-09-19)
+
+The direct oMLX body for a 9,929-character case contained both message.content and reasoning_content, with finish_reason=stop. The LocalJev parser failure shape was therefore not reproduced on that exact representative case.
+
+The 200/1000/4000/9929 LocalJev ladder remained successful. Raising LOCALJEV_MAX_OUTPUT_TOKENS from 2048 to 8192 and keeping one question per request did not produce a complete 40-case run: the sequential workload stalled beyond the practical experiment window and was stopped. No substitute result was claimed.
+
+The observed LocalJev 502 body remains: upstream did not return an OpenAI chat completion: TypeError: message content is missing. The direct body proves the model can return content plus reasoning_content, but does not identify which 40-case request produced the missing-content response.
+
+Verdict: STILL-BLOCKED-WITH-RAW-BODY. Exact model: incoai/Qwen3.8-27B-Splash. The bar and pinned case SHA are unchanged.
+
+NO-CLAIM: this does not diagnose output-budget exhaustion or prove a reasoning-parser defect; it proves only that the representative long case succeeds and the 40-case workload remains incomplete.
