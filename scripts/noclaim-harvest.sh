@@ -45,6 +45,13 @@ if [ "$found" -eq 0 ]; then
     echo 'none — every NO-CLAIM in the window is harvested or the window is empty.'
     echo 'QUEUE DRY is defensible on this axis.'
 else
-    printf '%s unharvested. A QUEUE DRY callback is WRONG while this is non-zero.\n' "$found"
+    # BOUNDED OBLIGATION. The first version said "QUEUE DRY is WRONG while this is non-zero", and
+    # within one tick the count went 37 -> 76 -> 109 because most NO-CLAIM lines are PERMANENT
+    # LIMITS ("one platform", "one Node version") that will never be work. An unbounded count makes
+    # the gate fire on everything forever, which tick.md §1 ranks BELOW a refusal with a trigger.
+    # So the obligation is capped: clear the top few or say why they are not work.
+    printf '\n%s unharvested rows in this window (most are permanent limits, NOT a backlog).\n' "$found"
+    echo 'GATE: you may report QUEUE DRY only after EITHER filing one bead from the rows above,'
+    echo 'OR naming why each of the most recent 5 is not actionable. Not after clearing all of them.'
     echo 'Harvest by filing a bead whose description contains: harvested-from:<sha>'
 fi
