@@ -38,7 +38,7 @@ claim nobody can check:
   Run: `npx tsx probes/fast-jev-probe.mts` → 8 assertions.
 
 - `work/dogfood-logger/test/logger.test.mjs` — append-only decision/outcome logger: joined false-positive scoring, malformed/orphan record handling, concurrent append preservation, and rotation. Run: `node --test work/dogfood-logger/test/logger.test.mjs` (4 tests).
-
+- `work/omp-jev-observer/test/observer.test.mjs` — observe-only OMP tool_call extension: success, Jev error, timeout, DCG skip, and disable-switch paths. Run: `node --test work/omp-jev-observer/test/observer.test.mjs` (5 tests).
 **This list is machine-checked.** `foundation/gates.d/70-tests-registry-sync.sh` fails when a
 tracked test file is not named here, or when a named path no longer exists — because a hand-written
 registry goes stale the hour a sibling lands a suite, and a stale registry reads authoritative
