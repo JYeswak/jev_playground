@@ -76,7 +76,21 @@ fi
 
 # ---- install ----
 [ -d "$target" ] || fail "target is not a directory: $target"
-[ -d "$dep_src" ] || fail "pinned clone missing: $dep_src"
+# A FRESH CLONE OF THIS REPO CANNOT RUN THIS SCRIPT without fetching the dependency first: the
+# upstream clones are gitignored. Verified 2026-09-19 from a clean clone of jev_playground --
+# rc=1 with a bare "pinned clone missing", which is closed but useless. Say what to fetch.
+if [ ! -d "$dep_src" ]; then
+  printf '%s\n' \
+    "RED: pinned clone missing: $dep_src" \
+    "" \
+    "This repo does not vendor fast-jev-compaction. Fetch it, from the repo root:" \
+    "" \
+    "    mkdir -p upstream/tamaratran" \
+    "    git clone https://github.com/tamaratran/fast-jev-compaction upstream/tamaratran/fast-jev-compaction" \
+    "" \
+    "then re-run this installer." >&2
+  exit 1
+fi
 [ -f "$entry_src" ] || fail "entry template missing: $entry_src"
 [ -f "$skill_src/SKILL.md" ] || fail "skill missing: $skill_src/SKILL.md"
 need node

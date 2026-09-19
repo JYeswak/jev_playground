@@ -58,7 +58,16 @@ envelope, output that did not actually shrink — returns `undefined`, which mea
 That was not a design claim until 2026-09-19, when the hook was wrong four times in a row against
 a real omp and no session was harmed. See `../docs/demos/omp-seam-live-20260918.md`.
 
-**Into any repo, which is the path you want:**
+**Into any repo, which is the path you want.** From a fresh clone of *this* repo you need the
+compactor first — it is not vendored here, and the installer prints these exact lines if it is
+missing:
+
+```bash
+mkdir -p upstream/tamaratran
+git clone https://github.com/tamaratran/fast-jev-compaction upstream/tamaratran/fast-jev-compaction
+```
+
+Then:
 
 ```bash
 ./compaction/install-jev-compact.sh /path/to/your/repo
