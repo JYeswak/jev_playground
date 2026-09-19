@@ -1494,3 +1494,74 @@ A packet missing any of them is defective, and `BLOCKED` is the correct response
 4. **The acceptance shape**: positive observable, planted negative, and a NO-CLAIM naming the
    exact limit. Never "make it pass". `DEFER`, `BLOCKED`, `REFUSE` and
    `PREPARED-NOT-MEASURED` are real outcomes and are preferred over a manufactured number.
+
+## THE AUTONOMOUS LOOP — decisions are made by data, not by asking Joshua
+
+**Appended 2026-09-19 after Joshua: *"how are those mine to choose? … neither of these rely on me
+- we use data and research to guide our decisions - it's a loop … once we truly rule something
+out from 20 different ways fully validated through our jsm skills and fh and tooling, then we
+move on to next. autonomously."***
+
+The conductor had been ending ticks with "your call on X". That is the failure mode wearing a
+politeness costume: a decision with a computable answer is not an escalation, it is unfinished
+work. **Joshua's input is for mission and taste. Selection, ordering, and closure are ours.**
+
+### What is NEVER escalated
+
+Surface order, candidate order, thresholds, whether to freeze a queue, whether a row is done.
+All of these have data. Compute them.
+
+### What IS escalated — the only three
+
+1. A **paid or irreversible** action (spend beyond the ordinary API trickle, anything public and
+   undeletable, anything touching his other work).
+2. A **mission change** — the five stages themselves.
+3. A **contradiction between two rules here** that cannot be resolved by evidence.
+
+Everything else: decide, act, record the rule you applied, and say what would reverse it.
+
+### SELECTION — which surface or candidate is next
+
+Rank by a computed score, never by interest. In order of tie-breaking:
+
+1. **Ground truth exists today** — a labelled corpus already on disk beats one we must author.
+   Authored corpora have now inflated three results (`NEGATIVE_EVIDENCE.md` R28).
+2. **Prevalence of the positive class** — higher first. At 0.016% even a 0.750 separator implies
+   ~1:2300 true-to-false and is undeployable at any threshold.
+3. **Cost to measure** — cheaper first; zero-API beats keyed, offline beats live.
+4. **Decision leverage** — a surface that can act beats one that can only observe, *unless* the
+   acting version is already ruled out by false-positive rate, in which case observe-and-log wins
+   because it still accrues outcome data.
+
+Compute all four, write them in the dispatch, take the top row. If two tie, take the one whose
+failure would teach us more.
+
+### CLOSURE — when a thing is truly ruled out
+
+A candidate is closed when **its bar was preregistered, its corpus was not authored by the
+scorer, its feasibility arm passed, its prevalence is stated, and a non-author confirms** — or
+when a cheaper deterministic baseline beats it. That is the "twenty different ways" standard in
+operational form: not twenty repetitions, but every independent way we have of being wrong having
+been checked.
+
+**A closed row is closed. Do not re-litigate it; spend the tick on the next row.** Reopening
+requires a new fact, recorded as a retry condition.
+
+### THE LOOP, and it does not stop for permission
+
+```
+mine (fh over the mirror · ripwire · ast-grep · rg · jsm skills)
+  → find the candidate and its ground truth
+  → preregister the bar IN THE FILE
+  → validate on data we did not author
+  → prevalence check
+  → non-author confirmation
+  → SHIP it into an omp surface, or CLOSE it with a retry condition
+  → dogfood what shipped; the log becomes the next round's ground truth
+  → re-validate against that real data
+  → next row
+```
+
+**A tick that ends with a question to Joshua and no dispatch is a wasted tick.** If the answer is
+computable, compute it. If a pane is idle and the queue is empty, the selection rules above name
+the next unit — run them rather than asking which.
