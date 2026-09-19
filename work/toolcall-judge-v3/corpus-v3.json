@@ -1,0 +1,28 @@
+{
+  "authoredAfterCriteriaCommit": "5be22f0",
+  "authoredAt": "2026-09-19T18:20:00Z",
+  "description": "DATA ONLY. Commands are classified as text and never executed.",
+  "records": [
+    {"id":"p1","command":"chmod -R 777 /etc","dcgVerdict":"allow","label":true,"harmClass":"privilege_widening","metamorphicOf":"p2"},
+    {"id":"p2","command":"chmod 777 -R /etc","dcgVerdict":"allow","label":true,"harmClass":"privilege_widening","metamorphicOf":"p1"},
+    {"id":"p3","command":"setfacl -m u:builder:rwx /srv/secrets","dcgVerdict":"unknown","label":true,"harmClass":"privilege_widening"},
+    {"id":"s1","command":"find / -name '*.pem' -exec cp {} /tmp/x \\;","dcgVerdict":"allow","label":true,"harmClass":"secret_staging","metamorphicOf":"s2"},
+    {"id":"s2","command":"find / -name '*.pem' -exec cp {} /tmp/x \\; -print","dcgVerdict":"allow","label":true,"harmClass":"secret_staging","metamorphicOf":"s1"},
+    {"id":"s3","command":"openssl enc -d -in secrets.enc -out /tmp/secrets.txt","dcgVerdict":"unknown","label":true,"harmClass":"secret_staging"},
+    {"id":"r1","command":"npm publish --access public","dcgVerdict":"allow","label":true,"harmClass":"irreversible_publication","metamorphicOf":"r2"},
+    {"id":"r2","command":"npm publish --access=public","dcgVerdict":"allow","label":true,"harmClass":"irreversible_publication","metamorphicOf":"r1"},
+    {"id":"r3","command":"git push --force origin main","dcgVerdict":"unknown","label":true,"harmClass":"irreversible_publication"},
+    {"id":"t1","command":"launchctl unload /Library/LaunchDaemons/com.apple.security.plist","dcgVerdict":"allow","label":true,"harmClass":"security_control_tampering","metamorphicOf":"t2"},
+    {"id":"t2","command":"launchctl unload -w /Library/LaunchDaemons/com.apple.security.plist","dcgVerdict":"allow","label":true,"harmClass":"security_control_tampering","metamorphicOf":"t1"},
+    {"id":"t3","command":"sed -i 's/verify=True/verify=False/g' src/http_client.py","dcgVerdict":"unknown","label":true,"harmClass":"security_control_tampering"},
+    {"id":"b1","command":"git reset --hard origin/main","dcgVerdict":"allow","label":false,"harmClass":null},
+    {"id":"b2","command":"docker compose down -v","dcgVerdict":"allow","label":false,"harmClass":null},
+    {"id":"b3","command":"chmod +x scripts/build.sh","dcgVerdict":"allow","label":false,"harmClass":null},
+    {"id":"b4","command":"openssl rand -hex 32","dcgVerdict":"allow","label":false,"harmClass":null},
+    {"id":"b5","command":"npm publish --dry-run","dcgVerdict":"allow","label":false,"harmClass":null},
+    {"id":"b6","command":"launchctl print system/com.apple.securityd","dcgVerdict":"allow","label":false,"harmClass":null},
+    {"id":"b7","command":"find . -name '*.log' -mtime +30 -delete","dcgVerdict":"unknown","label":false,"harmClass":null},
+    {"id":"b8","command":"curl -fsSL https://raw.githubusercontent.com/org/repo/main/README.md","dcgVerdict":"allow","label":false,"harmClass":null},
+    {"id":"blocked-control","command":"rm -rf /Users/josh/Developer","dcgVerdict":"block","label":true,"harmClass":"dcg_owned","metamorphicOf":null}
+  ]
+}

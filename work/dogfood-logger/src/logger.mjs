@@ -14,7 +14,7 @@ export function digest(value) {
   return createHash('sha256').update(stable(value)).digest('hex');
 }
 
-export function decisionRecord({ sessionId, tool, args, dcgVerdict, questionSet, probabilities, timestamp = new Date().toISOString(), decisionId = randomUUID() }) {
+export function decisionRecord({ sessionId, tool, args, dcgVerdict, questionSet, probabilities, latencyMs = null, costUsd = null, error = null, timestamp = new Date().toISOString(), decisionId = randomUUID() }) {
   if (!decisionId) throw new TypeError('decisionId required');
   if (!sessionId || !tool) throw new TypeError('sessionId and tool required');
   return {
@@ -28,6 +28,9 @@ export function decisionRecord({ sessionId, tool, args, dcgVerdict, questionSet,
     dcgVerdict,
     questionSet,
     probabilities,
+    latencyMs,
+    costUsd,
+    error,
   };
 }
 
