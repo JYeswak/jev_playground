@@ -107,3 +107,79 @@ The bar remains unchanged. Verdict remains BLOCKED. This is a backend/model comp
 Exact served model: incoai/Qwen3.8-27B-Splash.
 
 NO-CLAIM: feasibility correctness does not establish calibration; agreement with Jev would not establish accuracy because both systems can be wrong together.
+
+## P2-7 state-length diagnosis (2026-09-19)
+
+The exact long-state ladder used one pinned Ling-Spam email (full state 9,929 characters) and one noul question per call against the served model incoai/Qwen3.8-27B-Splash. Results:
+
+| State chars | Result | p | wall ms | input tokens | output tokens |
+|---:|---|---:|---:|---:|---:|
+| 200 | OK | 0.10 | 4,356 | 343 | 173 |
+| 1,000 | OK | 0.05 | 4,333 | 513 | 149 |
+| 4,000 | OK | 0.03 | 4,850 | 1,164 | 129 |
+| 9,929 | OK | 0.03 | 6,302 | 2,571 | 200 |
+
+State length is not the threshold for this case. A direct oMLX request using the exact LocalJev chat payload for the 9,929-character state returned HTTP 200 with a nonempty message.content and a reasoning_content field. The raw response body is captured in the run evidence; it does not prove every model response has that shape.
+
+The earlier LocalJev 502 remains a backend response-shape failure: message content missing. The direct representative long-state response does not reproduce it, so the cause is not diagnosed as a universal length ceiling or a universal reasoning-field parse bug.
+
+Verdict: STILL-BLOCKED-WITH-RAW-BODY. The 40-case bar remains unchanged and no subset substitute verdict is claimed.
+
+NO-CLAIM: no complete differential vector; agreement with Jev is not accuracy because both can be wrong together; finding is specific to incoai/Qwen3.8-27B-Splash and the observed LocalJev/oMLX response-shape failure.
+
+## Direct oMLX body (representative long state)
+
+This is the raw body from the direct upstream request for the 9,929-character case. It has message.content and finish_reason stop, plus reasoning_content; therefore it does not reproduce the LocalJev 502 on this representative input.
+
+```json
+{
+  "id": "chatcmpl-39720ef7fddaa163fd9c69ef0d90666a",
+  "object": "chat.completion",
+  "created": 1789838156,
+  "model": "incoai/Qwen3.8-27B-Splash",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "\n\n{\"answers\":{\"q1\":0.03}}",
+        "reasoning_content": "We need answer user's request. Need produce JSON only. Need classify q1 yes/no: Is this email spam? Document is an email invitation to become program committee member for GECCO-99. Need probability it is spam. We must evaluate only document. It appears legitimate academic conference solicitation, not spam. But could be mass email? It is targeted to recent authors, asks to email with info. Spam? likely no. Need calibrated probability. Maybe 0.05 or 0.1. Need return number. Since question yes/no: probability answer is yes. We need decide. The email is a conference invitation, likely not spam. But in spam classification datasets, this might be considered non-spam. It is a legitimate email from conference chair. Probability yes maybe 0.02. Need output JSON {\"answers\":{\"q1\":0.02}}. Ensure no markdown.\n"
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 2571,
+    "completion_tokens": 200,
+    "total_tokens": 2771,
+    "prompt_tokens_details": {
+      "cached_tokens": 2560
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 186
+    }
+  },
+  "metrics": {
+    "prefill": {
+      "tokens": 11
+    },
+    "decode": {
+      "tokens": 192
+    },
+    "request_latency": {
+      "start_to_first_token_ms": 660.157,
+      "first_token_to_done_ms": 6028.001,
+      "wall_ms": 6702.212,
+      "ttft_ms": 674.2110000000002,
+      "queue_to_start_ms": 14.054000000000201,
+      "stream_tokens_per_second": 31.851355034612634
+    },
+    "cache": {
+      "status": "hit",
+      "matched_tokens": 2560,
+      "capacity": 262144,
+      "slot": 0
+    }
+  }
+}
+```
