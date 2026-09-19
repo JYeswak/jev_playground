@@ -423,3 +423,19 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   cassettes, latency logs, or no data. Receipt with full table:
   `docs/demos/phi-clone-sweep-20260919.md`. Feeding phi further needs keyed runs,
   the absent themsquared clone, or new live calls. Zero live calls.
+
+## fresh-clone gates + integrations doc (2026-09-19)
+
+- **Stage 40 hole, measured not remembered.** On a clean public-repo checkout, stage 40
+  typecheck failed. `npm install --prefix compaction` exited 0 and left
+  `node_modules/fast-jev-compaction` → dangling `file:../fast-jev-compaction`. `tsc` still
+  exit 2. Second hole: Debian `/bin/sh` is dash; `set -o pipefail` stages exited 2 before
+  work. Receipt: `NEGATIVE_EVIDENCE.md` R32.
+- **Fix:** `scripts/bootstrap-compaction.sh` clones `tamaratran/fast-jev-compaction` at
+  EVAL.md pin `6e1da50`, builds `dist/`, npm-installs `compaction/`. Stage 40 calls it
+  when `--check` fails. Six `#!/bin/sh` + pipefail files now `#!/usr/bin/env bash`.
+- **Docs:** `docs/INTEGRATIONS.md` — `jev-compact` L3 measurement, does not prune; dogfood
+  logger WIP / stop-before-register. README Quick start is three commands. **0 promoted.**
+- **Boundary:** no OMP hook registered in any live profile. R30 unread and unedited.
+  Stages 50/60 still need `LOOP_KIT` (foundry); this cloud does not have it, so the
+  aggregate cannot be `ALL GREEN` here. No live Jev calls. Lane: offline.

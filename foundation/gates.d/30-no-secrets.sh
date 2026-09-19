@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # 30-no-secrets: no secret VALUES live in this workspace. Names (TYPESAFE_API_KEY)
 # are fine and expected; values are not. Flags `apikey_` tokens and long
 # base64-ish assignments. Scoped to the workspace root only — the live key file
