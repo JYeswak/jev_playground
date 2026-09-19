@@ -25,13 +25,14 @@ function classify(command) {
 }
 
 export default function harmRule(pi) {
-  pi.on('tool_call', async (event) => {
+  pi.on('tool_call', async (event, ctx) => {
     try {
       if (process.env.HARM_RULE_DEBUG_KEYS === '1') {
         try {
           await pi.appendEntry(DIAG_TYPE, {
             kind: 'ctx_event_keys',
             eventKeys: event && typeof event === 'object' ? Object.keys(event) : typeof event,
+            ctxKeys: ctx && typeof ctx === 'object' ? Object.keys(ctx) : typeof ctx,
             timestamp: new Date().toISOString(),
           });
         } catch { /* never break the session */ }
@@ -42,6 +43,7 @@ export default function harmRule(pi) {
         await pi.appendEntry(DIAG_TYPE, {
           kind: 'tool_call_observed',
           toolName: String(toolName),
+          toolCallId: event?.toolCallId ?? null,
           timestamp: new Date().toISOString(),
         });
       } catch { /* observability must never break the session */ }
@@ -60,6 +62,7 @@ export default function harmRule(pi) {
         await pi.appendEntry(DECISION_TYPE, {
           kind: score >= 0.5 ? 'harm_fire' : 'harm_pass',
           command: command.slice(0, 2000),
+          toolCallId: event?.toolCallId ?? null,
           score,
           probabilities,
           error,

@@ -75,3 +75,26 @@ re-proven live. Silent non-firing modules are now demonstrated twice.
 NO-CLAIM: lab-profile co-presence is not a working profile under real user
 traffic; js-bash ids in this session repeat the corpus finding (no transcript
 counterpart).
+
+## P3-18 appendix — ID-join closed; filter restated as read-time (pane 3, 2026-09-19)
+
+Extension now emits `toolCallId` on every diagnostic and decision row, and a
+`HARM_RULE_DEBUG_KEYS=1` run dumped the handler's second argument: ctx keys
+are exactly `["ui"]` — no verdict, no cwd, nothing else. So (b) is refuted as
+a recovery path: the verdict is NOT reachable from ctx, and any reader of a
+ctx verdict field is reading a default. (a) CONFIRMED instead: bridge rows
+carry real verdicts in-session, joinable post-hoc on toolCallId.
+
+Join proof, session `--private-tmp--/2026-09-19T19-15-48` (luna): 3
+tool_call_observed + harm_pass + harm_fire on our side; 2 dcg_allow on the
+bridge side. Matched on toolCallId: 2/3 overall, 2/2 on bash decisions (the
+miss is a non-bash tool with no bridge row by the bridge's own design, which
+logs bash only). INTEGRATIONS' three-claim split needs no edit: its (B) row
+describes pane 2's observer rows (still toolCallId-less), and the ctx finding
+confirms rather than changes its premise.
+
+Restated filter semantics, honestly: this extension logs EVERYTHING observable
+(every tool_call gets a diagnostic; every bash call gets a decision) and
+filters NOTHING at write time. "Log only where dcg allows" is enforced at
+READ time by inner-joining bridge rows on toolCallId. The deployed code never
+claimed otherwise; the receipt did not say so plainly until now.
