@@ -413,3 +413,13 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   Foundry's own hooks NOT exercised (different repo; noted, not edited).
 - Fixes: none needed. NO-CLAIM: green-path (all-present) behavior covered by daily
   use + gates, not re-proven here.
+---
+
+## jev-d92 — pair hunt exhausted: 22 of 22 searched, no second pair (2026-09-19, pane 3)
+
+- Method: all results/ dirs + `probability` grep over committed data + per-clone
+  survey. Only paired item-level scores with truth: spam-eval (excluded, same
+  project) and sec-bench (used). All else: aggregates, single scorers, n<=2
+  cassettes, latency logs, or no data. Receipt with full table:
+  `docs/demos/phi-clone-sweep-20260919.md`. Feeding phi further needs keyed runs,
+  the absent themsquared clone, or new live calls. Zero live calls.
