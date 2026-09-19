@@ -6,6 +6,14 @@ This is the user-facing scoreboard for what we have actually wired into OMP, and
 
 Do not read a later rung than the evidence named below. **BUILT ≠ WIRED; WIRED ≠ VALIDATED.**
 
+**Corpus finding, not a live write:** allowed-command error prevalence is **OPEN** at 3.95%
+(frozen 4.01%), 40× the 0.1% kill line — 216k dcg decisions, split 36,955 / 41,500, zero API,
+JOIN YIELD 36.8% (`js-bash` foreign ids; capture command text at decision time). Pane 3
+withdrew the revert-predicate as INVALIDATED; `isError` survived. Fail-open at
+`dcg-guard.ts:599-610`. Receipt:
+[`demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md`](demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md).
+Observe-and-log remains **UNRUN** (see below); this row is not a live dogfood claim.
+
 ### How citations work here
 
 If this page mentions `fh`, it is as a *ranker*, not as a citation. `fh doctor` may report STALE

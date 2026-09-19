@@ -26,6 +26,13 @@ true catches at any threshold that catches anything
 a base rate next to their accuracy, including us until this week: eight ledger rows now carry one
 ([receipt](docs/demos/upstream-repro/prevalence-retrofit-20260919.md)).
 
+**Surface OPEN: allowed-command error prevalence is 3.95% (frozen split 4.01%), 40× the
+0.1% kill line.** 216k dcg decisions; frozen split 36,955 train / 41,500 held-out; zero API.
+JOIN YIELD 36.8% — the miss class is `js-bash` foreign ids, so a logger must capture command
+text at decision time. Pane 3 withdrew the revert-predicate as INVALIDATED; `isError` survived.
+Fail-open verified at `dcg-guard.ts:599-610`. Receipt:
+[`docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md`](docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md).
+
 **What Jev IS good at, stated fairly.** Ties a TF-IDF classifier trained on ~14,800 in-domain
 labels at zero labels (McNemar p=0.677), holds 0.97–0.99 under shift where that classifier
 collapses to 0.70 ([receipt](docs/demos/upstream-repro/judgment-quality-20260919.md)); 96.5% on
@@ -618,6 +625,10 @@ supervision cleared its bar on authored vignettes (AUC 1.000 twice), then scored
 real windows and was moved off rung 5 by its author. The retraction is the system working, not
 failing. Verdicts and receipts: `docs/demos/STATUS.tsv`; reopen conditions:
 `NEGATIVE_EVIDENCE.md` (31 entries).
+
+**tool_call surface remains OPEN** at 3.95% allowed-command error prevalence (frozen 4.01%),
+40× the 0.1% kill line — see the TL;DR chapter and
+[`docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md`](docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md).
 
 **Open questions, honestly.** Class-D (does the agent's answer change?) is unmeasured: the
 ablate-and-rerun harness is built and frozen, its model arms pending a quiet window. Two verdicts
