@@ -1,0 +1,24 @@
+SELF-REPORTED MESSAGE DEFECT (conductor, pane1).
+
+This commit's message was built with `printf` from a shell argument list containing BACKTICKED
+spans (`helpful`, `__none__`). Inside double quotes the shell executed them as command
+substitution: the run emitted `error: command not found: helpful`, and the corresponding words
+were replaced with empty strings in the recorded message.
+
+The lane rule already covers this and I broke it: commit messages go through `-F <file>` with the
+body written by the file tool, NEVER assembled inline, because backticks execute. The rule was
+written for `git commit -m`; `printf '%s\n' "...`x`..." > file` is the same hazard in different
+clothes, and the rule now covers both.
+
+No amend and no revert: shared history is not rewritten here. The affected sentences read
+correctly with these two words restored:
+  - "...also required a `helpful` noul >= 0.5 beside the choice."
+  - "...a bounded Choice with `__none__` as the abstain option, no second gate..."
+
+The measurement itself is unaffected: mean loss 0.167, top-1 precision 0.800 on 12 cases against
+skillranker's own loss table and 0.90 gate. Receipt
+docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md carries the full per-case table
+and the harness-defect section verbatim, and it was written with the file tool, so it has no
+substitution damage.
+
+Precedent for note-as-repair: 03059df, and 27f63a6 earlier today.
