@@ -41,7 +41,7 @@ The kill, scoped:
 
 > ## RULE WINS: four regexes, no Jev call — drop Jev from `tool_call`
 
-`docs/INTEGRATIONS.md:40-41`:
+`docs/INTEGRATIONS.md:39-41`:
 
 > **Jev was not bad** — 11/12 is strong in isolation. This is a
 > cost-benefit kill, not a capability kill. Ship the classifier; drop
@@ -78,7 +78,7 @@ rg -n 'RULE WINS|drop Jev|no Jev call|cost-benefit|this surface|ban on the model
   docs/INTEGRATIONS.md
 # HIT: :18 drop Jev from `tool_call`
 # HIT: :21 Five surfaces, five cheap wins (cost-benefit, not capability)
-# HIT: :40-41 cost-benefit kill, not capability; drop Jev from this surface
+# HIT: :39-41 Jev was not bad; cost-benefit kill, not capability; drop Jev from this surface
 # HIT: :203 judge belongs only where regex cannot; then only cites the drop
 # HIT: :209 scoreboard row: tool_call / harm-rule · no Jev call
 
@@ -138,7 +138,7 @@ The kill is already narrow in the receipt it cites.
 > Ship pane 2's classifier, drop Jev from this surface. The judge is
 > unnecessary where the harm is expressible
 
-`docs/INTEGRATIONS.md:18,40-41` copies that scope (`tool_call` / *this
+`docs/INTEGRATIONS.md:18,39-41` copies that scope (`tool_call` / *this
 surface*) and names the cheaper substitute (four regexes, recall 12/12,
 FP 0/38 on the committed corpus).
 
@@ -176,7 +176,7 @@ model” without a surface name. The card for *this* kill:
 
 | surface | cheaper substitute | still-calls-Jev-elsewhere | proof receipt |
 |---|---|---|---|
-| `tool_call` / `omp-harm-rule` | four regexes; recall 12/12, FP 0/38 | `omp-jev-review` `askJev` (`src/index.ts:66`); `omp-jev-rerank` (`src/index.ts:94`); `omp-jev-failure` (`src/index.ts:8`); `omp-jev-observer` (`observer.mjs:45-46,63-65`) | `toolcall-headtohead-20260919.md:39-41`; `INTEGRATIONS.md:18,40-41`; review `README.md:11-18` |
+| `tool_call` / `omp-harm-rule` | four regexes; recall 12/12, FP 0/38 | `omp-jev-review` `askJev` (`src/index.ts:66`); `omp-jev-rerank` (`src/index.ts:94`); `omp-jev-failure` (`src/index.ts:8`); `omp-jev-observer` (`observer.mjs:45-46,63-65`) | `toolcall-headtohead-20260919.md:39-41`; `INTEGRATIONS.md:18,39-41`; review `README.md:11-18` |
 
 Do not start a fleet rewrite in this PR. The next product tick the
 over-read blocked is one live `review_scored` / `rerank_scored` /

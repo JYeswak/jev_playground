@@ -41,7 +41,7 @@ that must be filled before any drop / never-call sentence:
    finished the card — search before you ban.
 ```
 
-Why: pack G2. `docs/INTEGRATIONS.md:18,40-41` already has surface +
+Why: pack G2. `docs/INTEGRATIONS.md:18,39-41` already has surface +
 substitute + receipt. `README.md:107` drops the surface and becomes
 the over-read. `work/omp-jev-review/README.md:11-18` is the sibling
 agents skip. The skill named “keep kills narrow” and left agents
