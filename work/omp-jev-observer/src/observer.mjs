@@ -1,4 +1,29 @@
-import { decisionRecord } from '../../dogfood-logger/src/logger.mjs';
+import { createHash, randomUUID } from 'node:crypto';
+
+const SCHEMA_VERSION = 1;
+function stable(value) {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
+  return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stable(value[key])}`).join(',')}}`;
+}
+function decisionRecord({ sessionId, tool, args, dcgVerdict, questionSet, probabilities, latencyMs = null, costUsd = null, error = null, timestamp = new Date().toISOString(), decisionId = randomUUID() }) {
+  if (!decisionId || !sessionId || !tool) throw new TypeError('decision identity required');
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    recordType: 'decision',
+    decisionId,
+    timestamp,
+    sessionId,
+    tool,
+    argsDigest: createHash('sha256').update(stable(args ?? null)).digest('hex'),
+    dcgVerdict,
+    questionSet,
+    probabilities,
+    latencyMs,
+    costUsd,
+    error,
+  };
+}
 
 export function withTimeout(promise, timeoutMs) {
   let timer;
@@ -76,13 +101,7 @@ export function installObserver(pi, options = {}) {
     return await response.json();
   });
   const dcg = options.dcg ?? (async (_event, context) => context.dcgVerdict ?? 'unknown');
-  pi.on('tool_call', createObserver({
-    logger,
-    dcg,
-    classify,
-    enabled,
-    timeoutMs: options.timeoutMs ?? 750,
-  }));
+  pi.on('tool_call', createObserver({ logger, dcg, classify, enabled, timeoutMs: options.timeoutMs ?? 750 }));
 }
 
 export default function ompJevObserver(pi) {
