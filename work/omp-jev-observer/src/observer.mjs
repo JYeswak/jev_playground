@@ -13,7 +13,8 @@ function digest(value) { return createHash('sha256').update(stable(value)).diges
 function raw(value) { try { return JSON.stringify(value); } catch { return '[unserializable]'; } }
 function makeRecord(command, error, context, latencyMs, toolCallId) {
   if (typeof toolCallId !== 'string' || toolCallId.length === 0) throw new TypeError('toolCallId required');
-  return { schemaVersion: SCHEMA_VERSION, recordType: 'decision', decisionId: randomUUID(), timestamp: new Date().toISOString(), sessionId: context?.sessionId ?? 'unknown', tool: 'bash', toolCallId, argsDigest: digest({ command }), questionSet: ['privilege widening', 'secret staging', 'irreversible publication', 'security-control tampering'], probabilities: { flag: null, pass: null }, latencyMs, costUsd: 0, error };
+  const sessionId = context?.sessionId;
+  return { schemaVersion: SCHEMA_VERSION, recordType: 'decision', decisionId: randomUUID(), timestamp: new Date().toISOString(), ...(sessionId ? { sessionId } : {}), tool: 'bash', toolCallId, argsDigest: digest({ command }), questionSet: ['privilege widening', 'secret staging', 'irreversible publication', 'security-control tampering'], probabilities: { flag: null, pass: null }, latencyMs, costUsd: 0, error };
 }
 async function safeAppend(pi, type, data) { try { await pi.appendEntry(type, data); return true; } catch { return false; } }
 
@@ -31,7 +32,7 @@ export function createObserver({ logger, dcg, classify, enabled = true, timeoutM
       const command = event?.input?.command ?? event?.command ?? event?.input?.cmd;
       if (typeof command !== 'string' || command.length === 0) return undefined;
       const gate = await dcg(event, context);
-      const verdict = typeof gate === 'string' ? gate : gate?.verdict ?? 'unknown';
+      const verdict = typeof gate === 'string' ? gate : gate?.verdict;
       if (verdict === 'block') return undefined;
       const started = performance.now();
       let result;
@@ -44,7 +45,7 @@ export function createObserver({ logger, dcg, classify, enabled = true, timeoutM
 export function installObserver(pi, options = {}) {
   const endpoint = options.endpoint ?? process.env.JEV_OBSERVER_ENDPOINT;
   const classify = options.classify ?? (async ({ command }) => { if (!endpoint) throw new Error('JEV_OBSERVER_ENDPOINT is not configured'); const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ command }), signal: AbortSignal.timeout(options.timeoutMs ?? 750) }); if (!response.ok) throw new Error(`Jev HTTP ${response.status}`); return response.json(); });
-  const observer = createObserver({ enabled: options.enabled ?? process.env.OMP_JEV_OBSERVER_DISABLED !== '1', timeoutMs: options.timeoutMs ?? 750, classify, dcg: options.dcg ?? (async (_e, context) => context.dcgVerdict ?? 'unknown'), logger: options.logger ?? { append: (record) => safeAppend(pi, DECISION_TYPE, record) }, diagnostic: options.diagnostic ?? ((data) => safeAppend(pi, DIAGNOSTIC_TYPE, data)) });
+  const observer = createObserver({ enabled: options.enabled ?? process.env.OMP_JEV_OBSERVER_DISABLED !== '1', timeoutMs: options.timeoutMs ?? 750, classify, dcg: options.dcg ?? (async (_e, context) => context.dcgVerdict), logger: options.logger ?? { append: (record) => safeAppend(pi, DECISION_TYPE, record) }, diagnostic: options.diagnostic ?? ((data) => safeAppend(pi, DIAGNOSTIC_TYPE, data)) });
   pi.on('tool_call', observer);
 }
 export default function ompJevObserver(pi) {

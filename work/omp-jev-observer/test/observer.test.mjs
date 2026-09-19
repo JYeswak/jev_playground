@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createObserver } from '../src/observer.mjs';
+import { createObserver, installObserver } from '../src/observer.mjs';
 
 function setup({ classify, dcg = async () => ({ verdict: 'allow' }), enabled = true, timeoutMs = 25 } = {}) {
   const records = [];
@@ -66,4 +66,22 @@ test('live-shaped bash event preserves toolCallId', async () => {
   assert.equal(records.length, 1);
   assert.equal(records[0].tool, 'bash');
   assert.equal(records[0].toolCallId, 'live-shaped-1');
+});
+
+test('missing gate and session context stay absent without blocking', async () => {
+  let handler;
+  const records = [];
+  const pi = {
+    on: (_event, callback) => { handler = callback; },
+    appendEntry: async (type, data) => {
+      if (type === 'com.zeststream.omp-jev-observer.decision.v1') records.push(data);
+    },
+  };
+  installObserver(pi, { classify: async () => ({ questionSet: [], probabilities: {}, costUsd: 0 }) });
+  const result = await handler({ type: 'tool_call', toolName: 'bash', toolCallId: 'no-context-1', input: { command: 'echo no-context' } }, {});
+  assert.equal(result, undefined);
+  assert.equal(records.length, 1);
+  assert.equal(records[0].toolCallId, 'no-context-1');
+  assert.equal('sessionId' in records[0], false);
+  assert.equal('dcgVerdict' in records[0], false);
 });
