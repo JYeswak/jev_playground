@@ -434,20 +434,20 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
 - **Fix:** `scripts/bootstrap-compaction.sh` clones `tamaratran/fast-jev-compaction` at
   EVAL.md pin `6e1da50`, builds `dist/`, npm-installs `compaction/`. Stage 40 calls it
   when `--check` fails. Six `#!/bin/sh` + pipefail files now `#!/usr/bin/env bash`.
-- **Docs:** `docs/INTEGRATIONS.md` — `jev-compact` L3 measurement, does not prune;
-  observe-and-log UNRUN. Live omp was never taken off the table. There is no
-  standing ban on registering into working omp profiles; "STOP-LIVE" / deferred
-  registration as reasons not to work were invented. Shippable to live omp once
-  the four checks pass (offline proof / fail-open / `0 block:true` /
-  self-contained install `9e6c88d` → `348894e`) — not indefinitely deferred,
-  not quiet-window gated. Live test surface is **pane 0** in the jev NTM
-  session, or **added test panes** in that same session — not a separate agent
-  farm. OMP is the common harness across many model/agent types. Do not take
-  down mid-flight panes to dogfood. Register/dogfood there; promote only after
-  receipts. RUN-CLONE / `jev-lab` earns the fire vs the 0.97% dcg
-  prior. `fh` is a ranker; citations are file:line we opened. dcg prior receipt
-  is on `origin/main`, not this tip — pending sync, numbers not restated.
-  README Quick start is three commands. **0 promoted.**
-- **Boundary:** this PR did not register any OMP hook. R30 unread and unedited.
-  Stages 50/60 still need `LOOP_KIT` (foundry); this cloud does not have it, so the
-  aggregate cannot be `ALL GREEN` here. No live Jev calls. Lane: offline.
+- **Docs:** `docs/INTEGRATIONS.md` + README TL;DR pointer — public chapter for
+  `docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md` (`33aa633`).
+  Headline: 3.95% isError on allowed (frozen 4.01%), 40× the 0.1% kill line,
+  216,507 decisions, split 36,955 / 41,500, zero API. JOIN YIELD 36.8%; miss
+  class `js-bash-<uuid>`; logger must capture command text at decision time.
+  Pane 3 withdrew revert-predicate as INVALIDATED; `isError` survived.
+  Fail-open verified at `dcg-guard.ts:599-610` via the corpus
+  (`toolcall-groundtruth-corpus-20260919.md:9-12`); proposed certification
+  files not cited as source. Observe-and-log is registered on `jev-lab` and
+  is **not working**: observer wrote 0 rows, `dcg-tool-bridge` wrote 1. Loader
+  globs `*.{ts,js}`; config is `extensions:` in profile `agent/config.yml`.
+  No invented STOP-LIVE ban. Live test surface remains pane 0 / added test
+  panes. `jev-compact` L3 measurement, does not prune. **0 promoted.**
+- **Boundary:** this PR did not register any OMP hook and does not claim the
+  live observer works. R30 unread and unedited. Stages 50/60 still need
+  `LOOP_KIT` (foundry); this cloud does not have it, so the aggregate cannot
+  be `ALL GREEN` here. No live Jev calls. Lane: offline.
