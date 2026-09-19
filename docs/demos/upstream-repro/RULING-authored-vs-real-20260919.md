@@ -123,3 +123,35 @@ baselines were chosen by us after seeing the model's failure mode, which biases 
 baseline — the tool-call head-to-head is the exception, where the rule was frozen and
 shasum-verified before the comparison. "Beaten" means *failed the preregistered bar against a
 cheaper alternative*, not *carries no signal*.
+
+---
+
+## SHARPENING, appended 2026-09-19 — the compaction proxy is UNVALIDATABLE on this corpus, not merely unvalidated
+
+Every compaction finding here rests on one proxy: *a tool result "was needed" if novel tokens it
+introduced reappear later*. The ruling above carried that as a caveat. A zero-API ceiling sweep
+now makes a stronger and less comfortable statement possible.
+
+**The sweep** (`classd-ceiling-sweep-20260919.md`, `b255b30`): for each candidate scoring window,
+what fraction of frozen turns does the **original agent's own continuation** reproduce the reused
+fact? That is the ceiling — the best any ablation experiment could score.
+
+| scoring window | ceiling (both fact definitions) |
+|---|---|
+| 1 → 80 messages | **≤ 0.083** |
+| unbounded (rest of session) | 0.708 / 0.375 |
+
+**Reuse in these transcripts is long-horizon — beyond 80 messages.** No generable window clears a
+0.5 ceiling, so an ablate-and-re-run experiment cannot be scored on this corpus at any window we
+could actually generate. Class D is **NOT ANSWERABLE this way here**, and no preregistration was
+written because there was nothing to register against.
+
+**What this changes, and what it does not.** It does not rescue compaction: the measured result
+stands — Jev ≈ drop-everything, keep-everything 7× better, `keep_p` AUC 0.35–0.65 with a passing
+positive control. What changes is the honesty of the caveat. We can no longer say "validating the
+proxy is future work"; we must say **the proxy is unvalidatable on this corpus by generation**,
+because the thing it proxies for happens too far in the future to regenerate.
+
+**Trigger that reopens it:** a corpus with near-term reuse (facts reused within a generable
+window), or a continuation method cheap enough to regenerate 80+ messages of context faithfully.
+Absent either, class D stays closed here rather than deferred indefinitely.
