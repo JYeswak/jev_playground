@@ -15,6 +15,28 @@ mirror after `fh` ranked them — `asupersync` `eprocess.rs:224-238`, `franken_o
 `RATCHET.md:33-51`, `franken_engine` `promotion_gate_runner.rs:266-328`, `frankensearch`
 `perf_ratchet.rs:732-740`. Pattern: **fh ranked, we opened.** A ranking alone is not a citation.
 
+## OPEN: tool_call error prevalence — 3.95% (40× the 0.1% kill line)
+
+Receipt: [`docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md`](demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md) (`33aa633` on `main`). Pane 3 (muse), 2026-09-19. **Zero API.** Harness `work/p3-calibration/mine_decisions.py`; frozen sample `work/p3-calibration/toolcall-corpus-frozen.jsonl`.
+
+**Headline.** 216,507 dcg decisions (11,727 files). On joinable allowed commands (n=78,455): `isError` **3.95%** (3,098). Frozen sample **4.01%** (315/7,846). Frozen split, time-ordered at 2026-09-10T00:00:00Z: **36,955** train (err 4.3%) / **41,500** held-out (err 3.6%). Against the 0.1% kill line the surface is **not killed** — machine-observable badness is ~**40×** above it (`toolcall-groundtruth-corpus-20260919.md:47-55`).
+
+True harm is strictly below 3.95% (benign errors: grep-no-match etc.) and unmeasured without human review. Transcript-derived outcomes are a proxy for harm, not harm.
+
+### JOIN YIELD 36.8% — capture command text at decision time
+
+Of 216,507 decisions, 79,743 resolve to a command AND an outcome (**36.8%**). The 63.2% miss is one mechanistic class, not random loss: 136,718/136,764 miss tids (99.997%) are `js-bash-<uuid>` — a foreign id namespace with no transcript mapping (`toolcall-groundtruth-corpus-20260919.md:27-35`). History recovers barely a third.
+
+**The logger must capture command text at decision time.** That is why `work/dogfood-logger/` exists. Decision rows carry exactly `{kind, toolCallId}` — no command (`dcg-block-rate-prior-20260919.md:46-51`).
+
+### Pane 3 withdrew the revert-predicate (INVALIDATED)
+
+BAD was `isError` **or** a revert-signal regex on the next three user messages. A laxer revert predicate (bare failed/wrong/stop) put 59k of 62k BAD through coordination chatter ("revision, not revert", "repair the gate-runner FAIL") — demonstrated with verbatim examples, **WITHDRAWN**, not reported (`toolcall-groundtruth-corpus-20260919.md:37-45`). Revert-signal prevalence is not reported (predicate invalid on coordination traffic). **`isError` survived.**
+
+### fail-open verified at `dcg-guard.ts:599-610`
+
+Infrastructure failure + non-block classification returns `undefined` (= allow): fail-open CONFIRMED. Exit 1 without a blocking decision still blocks (`:615-617`). Source for that claim: the corpus check at `toolcall-groundtruth-corpus-20260919.md:9-12`, which opened `dcg-guard.ts:599-610`. Do not inherit a proposed certification file.
+
 ## Proven: `jev-compact` — L3 measurement instrument
 
 | | |
@@ -45,41 +67,43 @@ tail ~/.jev-compact.log
 
 `refused` / `passthrough` / `would-compact` are decisions. No new line means the hook did not run — not a silent success.
 
-## WIP: observe-and-log / dogfood logger — UNRUN, shippable after checks
+## WIP: observe-and-log / dogfood logger — registered on jev-lab, NOT working
 
-The append-only decision/outcome logger lives at `work/dogfood-logger/`. Its schema, join, concurrent appends, and rotation are tested locally (`work/dogfood-logger/test/logger.test.mjs`; receipt `docs/demos/upstream-repro/dogfood-logger-20260919.md`).
+The append-only decision/outcome logger lives at `work/dogfood-logger/`. Its schema, join, concurrent appends, and rotation are tested locally (`work/dogfood-logger/test/logger.test.mjs`; receipt `docs/demos/upstream-repro/dogfood-logger-20260919.md`). The observer library is at `work/omp-jev-observer/` (offline: 5 tests; receipt `docs/demos/upstream-repro/omp-jev-observer-20260919.md`).
 
-**State today: UNRUN.** No omp profile has this registered (`docs/demos/upstream-repro/dogfood-logger-20260919.md:57-58`). That is a measured fact, not a policy. Live omp was never taken off the table. There is **no standing ban** on registering into working omp profiles. The fleet invented "STOP-LIVE" / deferred registration as reasons not to work. This row is not an indefinite deferral and not quiet-window gated.
+**Do not read this as a working live observer.** It is registered on `jev-lab`. The observer wrote **0 rows** while `dcg-tool-bridge` wrote **1**. That is a live defect in flight, not a green. The loader globs `*.{ts,js}`; the config is an `extensions:` list in the profile `agent/config.yml`.
 
-**Once the four checks below pass, observe-and-log is shippable to live omp.** Register and dogfood there. There is still no invented STOP-LIVE ban.
+Live omp was never taken off the table. There is **no standing ban** on registering into working omp profiles. The fleet invented "STOP-LIVE" / deferred registration as reasons not to work. This row is not an indefinite deferral and not quiet-window gated. Registration happened; capture did not.
 
 ### How to iterate on live omp
 
 **Live test surface = pane 0** in the jev NTM session, or **added test panes** in that same session. That is not a separate agent farm. OMP is the common harness across many model/agent types. Do not take down mid-flight panes to dogfood.
 
 - **Register / dogfood on pane 0 or an added test pane.** Leave mid-flight panes untouched. Promote only after receipts.
-- **RUN-CLONE.** Local clones and disposable lab profiles (`omp --profile jev-lab`) are free for atomic mutation, planted known-bad, and improvement loops. Quiet-window is not a science gate for that work.
-- **The improvement loop** — carve the cases regex cannot express, tighten criteria, re-measure against the 0.97% dcg prior — is how a later fire on pane 0 / an added test pane is earned. Then promote.
+- **RUN-CLONE.** Local clones and disposable lab profiles (`omp --profile jev-lab`) are free for atomic mutation, planted known-bad, and improvement loops. Quiet-window is not a science gate for that work. `jev-lab` is where the 0-row defect was seen — that is a finding, not a working install.
+- **The improvement loop** — carve the cases regex cannot express, tighten criteria, re-measure against the 0.97% dcg prior (`docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md`) and the 3.95% allowed-command error rate — is how a later fire on pane 0 / an added test pane is earned. Then promote.
 
 ### Engineering checks before the act
 
 A `tool_call` observer on `bash` would fire on every bash in every session, so the act has preconditions. They are the gate. They are not a quiet-window gate and not a reason to DEFER the loop:
 
 1. **Offline proof first** — writer tests green; a synthetic `tool_call` proves the handler returns `undefined` on success, error, and timeout.
-2. **Fail-open** — logger/observer failures return `false` / `undefined` and never throw into the host (`work/dogfood-logger/src/logger.mjs`; `compaction/src/omp-binding.ts:226-231`).
+2. **Fail-open** — logger/observer failures return `false` / `undefined` and never throw into the host (`work/dogfood-logger/src/logger.mjs`; `compaction/src/omp-binding.ts:226-231`). Guard fail-open is verified at `dcg-guard.ts:599-610` (corpus `toolcall-groundtruth-corpus-20260919.md:9-12`).
 3. **`0 block:true`** — observe only. Never return omp's `{block: true, reason}` shape.
-4. **jsm preconditions** — the installed file must be self-contained. `9e6c88d` imported `../../dogfood-logger/src/logger.mjs`, a parent path that does not exist after a copy into `~/.omp`. `348894e` inlined the record builder so the extension no longer depends on a repo-relative parent. That defect is why the checks earned their keep.
+4. **jsm preconditions** — the installed file must be self-contained. `9e6c88d` imported `../../dogfood-logger/src/logger.mjs`, a parent path that does not exist after a copy into `~/.omp`. `348894e` inlined the record builder so the extension no longer depends on a repo-relative parent.
+5. **The loader must actually load it.** Globs `*.{ts,js}`. Config is `extensions:` in the profile `agent/config.yml`. A register that writes 0 rows while another extension writes 1 is not loaded. That is the current jev-lab defect.
 
-Once those pass, register on pane 0 or an added test pane in the jev NTM session — live omp, same session, not a farm, not a mid-flight pane. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`.
+Once those pass **and** a row is observed next to a `dcg-tool-bridge` row in the same session, the live observer may be called working. That has not happened. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`.
 
-**Where a probabilistic judge belongs.** Only on what regex cannot express. The receipt that states the prior — `docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md` — landed on `origin/main` (`9e6c88d`) after this branch forked (`d6b52ea`). **It is not on this tip.** Numbers from that file (including the 0.97% dcg fire-rate prior the loop re-measures against) will be linked on the next tip sync rather than restated here.
+**Where a probabilistic judge belongs.** Only on what regex cannot express. The dcg prior is now on this tip: [`docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md`](demos/upstream-repro/dcg-block-rate-prior-20260919.md) — 49,661 allow / 488 block = **0.97%**.
 
 ## Scoreboard
 
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
+| tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log logger | library + tests; **UNRUN** | shippable to live omp on pane 0 / added test panes after the four checks; same NTM session, not a farm; mid-flight panes untouched | no |
+| dogfood / observe-and-log | registered on `jev-lab`; observer wrote **0** rows (`dcg-tool-bridge` wrote **1**) | **not working**; live defect in flight; loader globs `*.{ts,js}` | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
-Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31. dcg prior: pending next tip sync (`dcg-block-rate-prior-20260919.md` on `origin/main`, not this tip).
+Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (offline-only; do not read as live-working), `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
