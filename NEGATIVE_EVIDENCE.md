@@ -1051,3 +1051,37 @@ which is unchanged.
 
 **Retirement:** this supersedes the warnings added to `R24`/`R25`; those entries stay as the
 record of how the error was made, not as figures to quote.
+
+## R27 — tuning the protected window helps short sessions and almost nothing else (2026-09-19)
+
+The six-message window is a caller-settable default and no page discussed what changing it buys.
+Swept, keyless, over all 1,653 real sessions:
+
+| `preserveRecentMessages` | sessions with ≥1 eligible call | sessions entirely pinned | eligible calls |
+|---|---|---|---|
+| 2 | 1,583 | **17** | 394,570 |
+| 4 | 1,556 | 44 | 390,959 |
+| **6 (default)** | 1,502 | **98** | 387,288 |
+| 8 | 1,410 | 190 | 383,811 |
+| 12 | 1,264 | 336 | 377,769 |
+| 20 | 1,060 | **540** | 367,432 |
+
+**The window is almost entirely a short-session knob.** Going from 20 down to 2 rescues **523
+sessions** from being wholly untouchable — a 32-fold reduction in the all-pinned count — while
+total eligible calls move only **7%** (367k → 395k). Long sessions have so many calls outside any
+plausible window that the setting barely reaches them.
+
+So the honest advice for a user seeing 0%: **your session is short, and lowering the window is the
+only lever that will change that** — at the cost of the hook being allowed to touch more recent
+turns, which is exactly what the window exists to prevent. That is a safety trade, not free.
+
+### A number here disagrees with R26's, on purpose
+
+R26's corrected census reported **77,857** eligible calls at window 6; this sweep reports
+**387,288**. Both are right for what they measure and neither should be quoted without its
+qualifier: R26 counted only sessions that also **pass `fitState`** (the 20k state budget), this
+sweep counts every session with messages and applies no budget filter. The gap is the 87 too-large
+sessions, which are the longest ones and therefore carry a hugely disproportionate share of calls.
+
+**Retry condition:** if anyone wants a single headline "eligible calls" figure, it must state
+which filter it used; the two differ by ~5×.
