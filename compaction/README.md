@@ -96,6 +96,25 @@ $ tail -2 ~/.jev-compact.log
 `compacted A -> B` means it shrank the transcript. `passthrough:` and `refused:` both mean omp's
 summarizer handled that compaction and nothing was lost. Set `JEV_COMPACT_LOG` to move the file.
 
+### What the installer has actually been run against
+
+Three re-install defects were found and fixed on 2026-09-19 by exercising these paths rather than
+reading the script, so the list is evidence, not reassurance:
+
+| case | behaviour |
+|---|---|
+| fresh empty target | installs; 1 skill file, no nested directories |
+| re-install, nothing changed | idempotent, **zero** notes, no backup churn |
+| you edited the hook entry | **backed up** to `jev-compact.ts.superseded-<UTC>`, announced |
+| you edited a vendored source | same: backed up and announced |
+| you edited `SKILL.md` | same — and re-install now *refreshes* it, which it previously never did |
+| a sibling hook of your own | untouched |
+| read-only target | fails closed: `RED: cannot create dirs`, **nothing created** |
+
+**Not tested:** a symlinked `.omp`, two installs running at once, and a target whose `node_modules`
+you have modified (it is replaced wholesale, without comparison). Backups are copies, not merges —
+you reapply your change by hand.
+
 ### Known limits, so you are not surprised
 
 - **Savings come from tool results and thinking blocks.** A session that is one long prose turn has
