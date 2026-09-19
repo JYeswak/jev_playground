@@ -985,3 +985,41 @@ invalidates any attempt to extrapolate R25's 88,288 candidates into expected sav
 **Retry condition, narrowed:** the 0%-saved sessions are the interesting case now — why is
 everything pinned there, and is it size, recency, or shape? A ten-session sample drawn only from
 the zero-request population would answer it.
+
+## R26 — my corpus probes used the wrong default, and the zero-request mystery dissolves (2026-09-19)
+
+R25's narrowed retry asked why two sessions saved nothing. Answer: **short transcripts pin
+everything**, and I could not see it because every static probe I ran passed
+`preserveRecentMessages: 2` while the library's actual default is **6**
+(`fast-jev-compaction/src/compact.ts:20`).
+
+A call is pinned when *either* its call index *or* its result index falls in the protected window
+(`state.ts:86-88`), so with a window of 6 a transcript of 7–9 messages has almost nothing outside
+it. Re-measured with the true default, the static figures reproduce the replay **exactly**:
+
+| session | msgs | calls | pinned@6 | eligible@6 | replay said | saved |
+|---|---|---|---|---|---|---|
+| `2026-08-29T15-26` | 8 | 10 | **10** | 0 | `pinned: 10`, 0 req | 0% |
+| `OmpExtensibility` | 7 | 15 | **15** | 0 | 0 req | 0% |
+| `UdsFeatureUnion` | 9 | 9 | 7 | 2 | 1 req | 32% |
+| `MirrorAgentsSurvey` | 13 | 15 | 10 | 5 | 1 req | 24% |
+| `PortFleetComposite` | 116 | 108 | **5** | 103 | `pinned: 5`, 1 req | 98% |
+| `PortOmpIdleDispatch` | 105 | 98 | **6** | 92 | 1 req | 95% |
+
+**So the rule is simple and it is about LENGTH, not content:** a session shorter than roughly the
+protected window has nothing the hook may touch. Long sessions expose nearly all their calls.
+That is a better predictor than "tool-heavy", which is what the README currently says.
+
+### What this costs the earlier numbers
+
+`R24`'s 5.2% too-large and `R25`'s 88,288 candidates were both computed with
+`preserveRecentMessages: 2`. **They do not describe the library's default behaviour** and must not
+be quoted as if they do. The direction of the error is known — a smaller window pins fewer calls,
+so 88,288 is an over-count — but the corrected figures have not been computed.
+
+Three probes, three wrong assumptions, each found by comparing against a real run: the crude
+token estimate (79% vs 5.2%), the static pinning count (0 pinned vs 10), and now the option value
+itself. **The replay is the oracle; every static shortcut I wrote disagreed with it.**
+
+**Retry condition:** re-run the census with `preserveRecentMessages: 6` before any corpus-level
+claim is published. Until then `R24`/`R25` carry this warning inline.
