@@ -1,0 +1,15 @@
+ATTRIBUTION CORRECTION (conductor, pane1).
+
+This commit swept two files it did not author, which were pre-staged by pane1 and awaiting their
+own commit:
+  work/compaction-proof/fair-oracle.mjs
+  docs/demos/upstream-repro/rigged-oracle-selfcheck-20260919.md
+Both are pane1's work; their reasoning is in e846139's message.
+
+Cause, self-reported by pane3: the index was verified with `tail -2`, which hid the other staged
+paths. This is the same class as the conductor's own standing rule -- `head`/`tail`/a tuned grep
+hide what they cut -- and it is why the rule says read the FULL `git diff --cached --stat` before
+committing in a shared tree.
+
+No amend and no revert: content is correct and already pushed, and shared history is not rewritten
+here. A note is the sanctioned repair (precedent 03059df). Pane3's own work in this commit stands.
