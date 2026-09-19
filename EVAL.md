@@ -311,7 +311,8 @@ installed in the clone and **still has not been pointed at a single claim of our
 1,282 ms** by one live call to `api.typesafe.ai`, `jev-latest` → `jev-1.13.0`, key supplied through
 `infisical run` and absent from the tree.
 
-Rung reached: **L2+**, not L3. The success, outage and malformed-envelope paths are all exercised,
-the last two by committed tests; but **omp itself has never loaded the binding**, so the
-"fires in a real session" half of §4 remains open and the install is gated to a human.
+Rung reached: **L3-minus** after install, 2026-09-18. The success, outage and malformed-envelope paths are all exercised,
+the last two by committed tests; and `.omp/hooks/pre/jev-compact.ts` now **loads in a real omp session** (verified keyless and keyed
+via separate `omp -p` runs). What remains open is the last step: no real `session_before_compact`
+event has fired it yet.
 Receipt: [`docs/demos/omp-seam-live-20260918.md`](docs/demos/omp-seam-live-20260918.md).

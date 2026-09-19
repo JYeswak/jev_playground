@@ -36,11 +36,28 @@ The middle row is the §4 *"known-bad input makes it refuse"* clause on real dat
 the transcript untouched and omp's own summarizer in charge. The third is the same property for a
 malformed event.
 
+## Installed, 2026-09-18, on Joshua's instruction
+
+`.omp/hooks/pre/jev-compact.ts` is live. It loads in a real omp session, verified in **separate
+non-interactive sessions** (`omp -p`) so a failure could not reach the conductor's own:
+
+```
+keyless   omp -p "…"                        -> HOOKLOADTEST2, no load error, registers nothing
+keyed     infisical run -- omp -p "…"       -> KEYEDLOAD,     no load error, handler registered
+```
+
+**omp fails OPEN on a broken hook, and that is measured rather than assumed.** The first install
+used a bare `fast-jev-compaction` specifier, which cannot resolve from `.omp/hooks/pre/`. omp
+printed `Failed to load extension …` *and answered the prompt anyway*. The same class of mistake in
+`pi` earlier today made every invocation fail. Fixed with a relative import to the package's `dist`
+entry; the contrast is recorded because it is the reason this install was safe to attempt.
+
 ## What is still not L3
 
-**omp has not loaded this binding.** Every path above is driven by a stub `pi` that captures the
-registered callback, or by a script calling the handler directly. No live omp session has installed
-the hook, and no real `session_before_compact` event has fired it. The envelope field names still
+**omp now loads this binding, but has not fired it.** The hook registers in a real session; no real
+`session_before_compact` event has yet reached it, because that needs a session long enough to
+trigger compaction. Until one does, the handler's behaviour in production is inferred from the three
+paths tested above, not observed. The envelope field names still
 come from omp's in-session docs rather than a type on disk, because omp ships as a compiled binary.
 
 That install is deliberately gated to a human. A hook at `<cwd>/.omp/hooks/pre/` runs inside the
