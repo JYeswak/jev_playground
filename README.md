@@ -113,29 +113,15 @@ obstacle. Everything else is untouched, which is the honest state.
 
 |Repo|The question it answers|State|Next action|
 |---|---|---|---|
-|`jev-spam-eval`|does a plain-English question beat a classifier trained on labels|**RUN** — both headlines reproduce|fetch the other three datasets; check the out-of-distribution claim|
-|`jev-rerank-bench`|can Jev rerank thirty search results usefully|**RUN** — headlines reproduce; two scripts crash|raise `nevir` beyond one run; upstream report filed for the crash|
-|`jev-phishing-bench`|Jev against LLMs on phishing, with a stated **net floor**|**RUN** — floor reproduces exactly|the LLM comparison arms need an Anthropic key we do not hold|
-|`jev-sec-bench`|blind security benchmarks|**RUN**: Go TUI builds and renders; 3 committed result sets|it replicates our framing-leak effect at n=662, with the opposite lesson|
-|`jev-agent-failure-benchmark`|can a cheap decision model find what broke an agent|**RUN**: 20/20 with `uv run --extra dev pytest`. A bare `uv run pytest` does not score at all — it **fails collection**, because the pinned `whowhen_eval` dependency is absent|its leakage test is one of the two that silently skip on a fresh clone|
-|`typesafe-ai-benchmark`|LLM structured output vs Jev on latency, cost, judgment|**RUN** (pane 3): 7/7 offline examples|its docs omit an install step; reported upstream|
-|`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**RUN**: both examples, offline, via a linux/amd64 container|the blocker was a platform mismatch, routed around; `RCH-E327` is still unfixed upstream|
-|`jev-router`|per-turn model routing for Claude Code and Codex|**RUN** (pane 3): 58/58|upstream owns routing; ours narrows to the `blockedBy` histogram|
-|`jev-codex-router`|the same idea, Codex-specific|**RUN** (pane 3): backtest on real sessions|import its cached-token price columns, which supersede our R20 default|
-|`jev-mcp`|Jev judgments exposed as MCP tools|**RUN**: 9/9 unit, 4/4 live e2e|wire `jev_verify` into the conductor's number-checking|
-|`jev-ultrafast`|a browser agent driven by Jev|action-choice smoke run: 20/20 top-1, 0/10 false advance, $0.0003|class A only, authored states; the live browser path is still unrun|
-|`fast-jev-compaction`|continuous context compaction with Jev|**RUN**: 29/29 tests; live run 21 messages to 7, 87.1% chars saved|it owns the core; ours keeps only the omp adapter and replay harness|
-|`commit-miner`|classify commit diffs and messages with Jev|**RUN** (pane 3): 130 of our own commits classified|its disagreements were mostly right; import: lint commit bodies, not prefixes|
-|`foreman`|watch a software factory floor with Jev|**RUN**: 57/58, one real failure reported|it is a per-worker supervisor with no queue concept, so it does not replace the tick|
-|`bicameral`|System 2 writes the code, System 1 judges it|**RUN** (pane 3): 41 tests pass offline, no key|adopt its two differences: pluggable judgment, and degrading toward patterns not passthrough|
-|`jev-review`|Jev for code review|**RUN**: 13/13 offline, zero skipped|it already ships the refusal-to-score state we had to retrofit into our gates|
-|`system-one-adapter-python`|a drop-in `system_one` backed by an LLM|**RUN** (pane 2): 204 tests pass|the seam we needed already exists in our code; a Python bridge is refused with costs named|
-|`skillranker`|a ranker built on Jev, mirrored here|**RUN** (partial): only `sr doctor --config` exists at our pin; every other command is phase-gated. Our clone is **103 commits stale** — they are wired on `origin/main`|build it at `origin/main`; local Rust builds are denied by construction on this host, so it needs remote capacity|
-|`typesafe-sdk-js`|the JavaScript client we and everyone else calls Jev through|**RUN** — 189/189 pass **with 8 unhandled errors**, and a request timeout **kills a default Node process** ([repro](docs/demos/upstream-repro/sdk-js-timeout-crash-repro.mjs))|report upstream; the repro is one file and needs no key|
-|`typesafe-sdk-python`|the Python client, and the control for the above|**RUN** — 534 pass / 50 skipped, **zero** errors; the identical timeout scenario leaks nothing and the process survives|nothing; it is the evidence that the JS leak is a defect and not inherent|
-|`skills` (typesafe-ai)|the vendor's own rules for designing Jev judgments|**RUN** — read and checked against our code; nothing to fix, because we author no questions and delegate to a library that already complies|read it *before* designing judgments, which we did not|
-|`jev-benchmark` (themsquared)|is Jev's confidence score worth routing on, at n=60|**RUN** — pairing shows the two versions never disagree|add cases on the `readonly`/`privileged` boundary, not more cases|
-|`awesome-jev`, `awesome-jev-by-typesafe`, `awesome-typesafe`|curated indexes of everything above|read|a discovery source, not evidence|
+| `jev-sec-bench` | blind security benchmarks | **RUN**: Go TUI builds and renders; 3 committed result sets | it replicates our framing-leak effect at n=662, with the opposite lesson ([receipt](docs/demos/upstream-repro/jev-sec-bench-20260918.md)) |
+| `jev-agent-failure-benchmark` | can a cheap decision model find what broke an agent | **RUN**: 20/20 with `uv run --extra dev pytest` ([receipt](docs/demos/upstream-repro/agent-failure-benchmark-20260918.md)) | its leakage test is one of the two that silently skip on a fresh clone |
+| `jev-ultrafast` | a browser agent driven by Jev | action-choice smoke run: 20/20 top-1, 0/10 false advance, $0.0003 ([receipt](docs/demos/upstream-repro/jev-ultrafast-action-choice-20260919.md)) | class A only; live browser path still unrun |
+| `fast-jev-compaction` | continuous context compaction with Jev | **RUN**: 29/29 tests; live run 21 messages to 7, 87.1% chars saved ([receipt](docs/demos/upstream-repro/compaction-retention-oracle-20260919.md)) | it owns the core; ours keeps only the omp adapter and replay harness |
+| `jev-review` | Jev for code review | **RUN**: 13/13 offline, zero skipped ([receipt](docs/demos/upstream-repro/jev-review-real-diffs-20260919.md)) | it already ships the refusal-to-score state we had to retrofit into our gates |
+| `typesafe-sdk-js` | the JavaScript client we and everyone else calls Jev through | **RUN** — 189/189 pass with 8 unhandled errors; timeout crash has a committed repro ([repro](docs/demos/upstream-repro/sdk-js-timeout-crash-repro.mjs)) | report upstream |
+| `typesafe-sdk-python` | the Python client and control for the above | **RUN** — 534 pass / 50 skipped, zero errors ([receipt](docs/demos/upstream-repro/sdk-python-20260919.md)) | evidence that the JS leak is a defect |
+
+Rows with unsupported numeric state were removed rather than preserved as numbers without a committed reproduction or receipt. See the P2-27 claim-disposition audit for the deletion decision.
 
 **What running one actually taught us.** On Ling-Spam a question with **no labels** scores 0.9857
 and a TF-IDF classifier with **2,300 labels** scores 0.9941, and their errors are mirror images:

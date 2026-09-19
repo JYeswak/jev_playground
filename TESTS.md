@@ -38,8 +38,8 @@ claim nobody can check:
   baseline drops the same count with alignment intact.
 - `compaction/test/hook-compact.test.ts` — the omp compaction hook surface (sibling-owned, bead
   `jev-compact-hook-hbs`).
-- `probes/fast-jev-probe.mts` — our black-box probe of the compaction library against a fake Jev.
-  Run: `npx tsx probes/fast-jev-probe.mts` → 8 assertions.
+- `work/omp-harm-rule/verify-claim.mjs` — imports the shipped harm rule and verifies the committed 12/12 recall and 0/38 false-positive denominator. Run: `node work/omp-harm-rule/verify-claim.mjs` (exit 0 on the committed corpus; mutation arm is documented in the claim receipt).
+- `probes/fast-jev-probe.mts` — our black-box probe of the compaction library against a fake Jev. Run: `npx tsx probes/fast-jev-probe.mts` → 8 assertions.
 
 - `work/dogfood-logger/test/logger.test.mjs` — append-only decision/outcome logger: joined false-positive scoring, malformed/orphan record handling, concurrent append preservation, and rotation. Run: `node --test work/dogfood-logger/test/logger.test.mjs` (4 tests).
 - `work/omp-jev-observer/test/observer.test.mjs` — observe-only OMP tool_call extension: success, Jev error, timeout, DCG skip, disable-switch, and live-shaped event paths. Run: `node --test work/omp-jev-observer/test/observer.test.mjs` (6 tests).
