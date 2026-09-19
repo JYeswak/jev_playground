@@ -13,9 +13,10 @@ devanshbatham/commit-miner	4-mixed-denominator	real commits from our history + b
 claude-code-templates/jev-model-router	3-applicability-ratchet	our own sessions; effort+subagent routing only	tier_AUC>=0.70_AND_beats_length_baseline_by_0.05	C	C	RULED	docs/demos/upstream-repro/router-tier-signal-20260919.md
 thruwire/foreman	7-adversarial-survival	30+30 constructed observations, pre-freeze set A + post-freeze holdout B	AUC>=0.90_AND_false-stuck<=1per10_at_0.80	C	C	RULED	docs/demos/upstream-repro/foreman-supervision-adoption-20260919.md
 NiazMorshed2007/jev-review	6-metamorphic-invariant	good/bad pairs; ordering is the invariant	PENDING-SPEC	C	C	SPEC	docs/demos/upstream-repro/router-savings-inverts-20260919.md
-Dicklesworthstone/skillranker	1-threshold-gate	its own synthetic_cases.v1.jsonl + frozen 0/1/2 loss table	PENDING-SPEC	C	-	UNASSIGNED	-
+Dicklesworthstone/skillranker	1-threshold-gate	its own synthetic_cases.v1.jsonl + frozen 0/1/2 loss table	top1_precision>=0.90_AND_mean_loss<always_abstain_0.833	C	C	RULED	docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md
 AbdelStark/bicameral	7-adversarial-survival	injection + destructive-command corpus; benign reads as negatives	AUC>=0.90_AND_FP<=1of20_at_0.5	C	C	RULED	docs/demos/upstream-repro/bicameral-gate-adoption-20260919.md
 browser-use/jev-ultrafast	5-metamorphic-golden	its verify(page) end-state checker behind a fixture	PENDING-SPEC	D	-	UNASSIGNED	-
 githubnext/localjev	4-mixed-denominator	real Jev vs LocalJev on 40 pinned questions; feasibility arm required	agreement>=80pct_AND_mean_abs_prob_diff<=0.15_AND_feasibility_arm_passes	C	-	RUN	docs/demos/upstream-repro/localjev-differential-20260919.md
 logan-markewich/jeff	4-mixed-denominator	their committed bench/results/accuracy.jsonl, 22560 per-item rows, 8 public datasets	accuracy_AND_ECE_must_beat_jev_to_substitute	C	C	RULED	docs/demos/upstream-repro/jeff-selfhost-recompute-20260919.md
 ryze-ai/seo-geo-claim	4-mixed-denominator	40 pages with KNOWN citation outcomes (did ChatGPT/Claude cite it) + length/domain-authority baseline	PENDING-SPEC: must beat the dumb baseline, not just be fast	C	-	UNASSIGNED	-
+uehaj/jev-semgrep	4-mixed-denominator	their committed tests/cases.json + verdicts.json + contrast.txt proposition pairs	PENDING-SPEC: tests the CALIBRATION claim that one 0.5 threshold works across queries	C	-	UNASSIGNED	-
