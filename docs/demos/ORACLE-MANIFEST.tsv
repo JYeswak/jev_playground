@@ -9,7 +9,7 @@
 repo	shape	ground_truth_source	win_condition	class_target	class_achieved	stage	receipt
 tamaratran/fast-jev-compaction	2-ratchet	substantive-reuse + byte ceiling	save>=50pct_AND_lose<=10pct	C	C	RULED	docs/demos/upstream-repro/compaction-retention-oracle-20260919.md
 0xNatoshi/jev-codex-router	3-applicability-ratchet	COMPLETION not price: did the downgraded turn finish	flat-tier-baseline_must_not_win	D	C	RULED	docs/demos/upstream-repro/router-savings-inverts-20260919.md
-devanshbatham/commit-miner	4-mixed-denominator	real commits from our history + benign controls	0_false_positives_AND_1plus_true_positive_under_1cent_and_3s	D	-	BLOCKED-HARNESS	docs/demos/upstream-repro/commit-miner-adoption-test-20260919.md
+devanshbatham/commit-miner	4-mixed-denominator	real commits from our history + benign controls	0_false_positives_AND_1plus_true_positive_under_1cent_and_3s	D	C	RULED	docs/demos/upstream-repro/commit-miner-adoption-test-20260919.md
 claude-code-templates/jev-model-router	3-applicability-ratchet	our own sessions; effort+subagent routing only	tier_AUC>=0.70_AND_beats_length_baseline_by_0.05	C	C	RULED	docs/demos/upstream-repro/router-tier-signal-20260919.md
 thruwire/foreman	7-adversarial-survival	constructed observations at upstream thresholds + trap pairs	PENDING-SPEC	C	C	SPEC	docs/demos/upstream-repro/router-savings-inverts-20260919.md
 NiazMorshed2007/jev-review	6-metamorphic-invariant	good/bad pairs; ordering is the invariant	PENDING-SPEC	C	C	SPEC	docs/demos/upstream-repro/router-savings-inverts-20260919.md
@@ -18,3 +18,4 @@ AbdelStark/bicameral	7-adversarial-survival	injection + destructive-command corp
 browser-use/jev-ultrafast	5-metamorphic-golden	its verify(page) end-state checker behind a fixture	PENDING-SPEC	D	-	UNASSIGNED	-
 githubnext/localjev	4-mixed-denominator	differential vs real Jev on identical pinned questions + their AG News/BoolQ/SST-5 gold labels	PENDING-SPEC	C	-	SPEC	-
 logan-markewich/jeff	4-mixed-denominator	their committed bench/results/accuracy.jsonl, 22560 per-item rows, 8 public datasets	accuracy_AND_ECE_must_beat_jev_to_substitute	C	C	RULED	docs/demos/upstream-repro/jeff-selfhost-recompute-20260919.md
+ryze-ai/seo-geo-claim	4-mixed-denominator	40 pages with KNOWN citation outcomes (did ChatGPT/Claude cite it) + length/domain-authority baseline	PENDING-SPEC: must beat the dumb baseline, not just be fast	C	-	UNASSIGNED	-
