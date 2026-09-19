@@ -5413,3 +5413,36 @@ three mechanisms were found by opening controls rather than by argument:
 - **A candidate clearing rung 3 MUST get a non-author adoption test dispatched**, with a
   preregistered bar whose satisfaction means PROMOTE. Leaving a `CLEARED` row to sit is the
   failure this section exists to end.
+
+### CORRECTION appended 2026-09-19 — READ THE ARTIFACT, DO NOT RECALL IT
+
+> Joshua: *"every action should have ripwire, ast-grep, morph, ripgrep, fh backed rigor from our
+> dicklesworthstone-mirror. we keep making stupid mistakes because we're not regularly asking for
+> insight from these tools."*
+
+Five defects in one session, every one discoverable by reading the installed artifact:
+`client.systemOne.evaluate` (does not exist), noul `.probability` (it is `.noul`), choice
+`.distribution` (it is `.probabilities`), omp tool results as content parts (they are whole
+messages with `role:"toolResult"`), and a grep for `"role": "toolResult"` **with a space**, which
+matches **zero files** because that spacing exists only in Python's serializer.
+
+The third is the dangerous one and defines the rule. A wrong field name **does not crash** — it
+yields `undefined`, then a constant score, then an all-ties AUC of **exactly 0.500**, which is
+indistinguishable from a real null. **Three router runs reported that bogus 0.500 before the
+"exactly 0.500 three times" smell caught it.** A guessed field name fabricates findings.
+
+**Three rules, effective now:**
+
+- **Cite `file:line` from the installed artifact before any external-API claim.** `grep` /
+  `ast-grep` over `node_modules/**/*.d.mts`, the vendored clone, or the mirror — never the README,
+  never recall. A README states intent; the declarations are what ships. The extracted surface
+  lives in `docs/demos/SDK-SURFACE.md` and is the first thing a pane reads before writing a scorer.
+- **A scorer that can read a missing field MUST throw.** Scoring silence is how a harness
+  fabricates a null. `work/router-spec/oracle.mjs` now raises when `probabilities` is absent.
+- **Suspect any too-round number.** Exactly 0.500, exactly 100%, exactly 0 — check for a
+  degenerate denominator, an all-ties comparison, or an empty class before reporting it. The
+  feasibility arm returning `NaN` on a degenerate label, and refusing to rule, is this rule working.
+
+`fh` over the mirror is the same discipline applied to design rather than APIs: the e-process, the
+seven oracle shapes, and the ratchet pattern were all read out of `asupersync`, `franken_ocr`,
+`franken_engine` and `frankensearch` rather than invented here.
