@@ -192,6 +192,49 @@ returned a reproducible finding in ten minutes.
 Each tool takes one command, reads your own logs, and writes a receipt that states its denominator
 before any share. No API key. No network.
 
+### `work/omp-harm-rule/` — the model lost, so we shipped the regexes
+
+```bash
+work/omp-harm-rule/install-harm-rule.sh --check default   # verify without writing
+work/omp-harm-rule/install-harm-rule.sh default           # install into an omp profile
+```
+
+Four regular expressions that flag destructive-shaped bash commands, logged and never blocked.
+**It contains no Jev call.** We built it by putting a language model and a dumb baseline on the
+same task, scoring all three on a held-out, time-ordered split of 216k real tool decisions, with
+the scoring done by a pane that authored none of them:
+
+| | recall | false positives |
+|---|---|---|
+| **deterministic rule** | **12/12** | 0/40 |
+| Jev | 11/12 | 0/40 |
+| dumb baseline | 5/12 | 0/40 |
+
+One recall point, at zero cost, zero latency and zero network. That is the whole reason the model
+is not in the shipped artifact — and it is the fifth surface in this repo where the cheap thing
+matched or beat the model.
+
+It is observe-only **by construction**, which you can check rather than trust:
+
+```bash
+grep -cE '\b(block|deny|abort|reject)\b' work/omp-harm-rule/harm-rule.ts   # 0
+```
+
+The installer backs up your `config.yml` before touching it, never overwrites that backup on a
+re-run, and prints the exact rollback line. Every decision row it writes carries the command it
+judged, so a fire is always quotable — we learned that the hard way and
+[retracted a published claim](NEGATIVE_EVIDENCE.md) that said otherwise.
+
+Installed is not firing. After some real work:
+
+```bash
+grep -rho '"kind":"harm_[a-z]*"' ~/.omp/profiles/default/agent/sessions/ | sort | uniq -c
+```
+
+On our own machine the live fires so far are **all self-generated probe shapes**
+(`chmod -R 777 /etc/nonexistent-*`), so we claim no precision figure from live traffic yet: n=16
+with our own test commands in it supports no interval in either direction.
+
 ### `ensemble/` — should you average two scorers, or just use the better one?
 
 ```bash
