@@ -44,7 +44,11 @@ scan_export() { # scan_export <dir> ; the acceptance probe
     echo "   key patterns: 0 hits"
   fi
   # thinkingSignature prose may remain; blobs may not. A blob is a long line.
-  local longsig; longsig=$(grep -r -n "thinkingSignature" "$dir" --exclude-dir=.git 2>/dev/null | awk -F: 'length($0) > 300' || true)
+  # A BLOB IS A LONG VALUE, NOT A LONG LINE. The original heuristic flagged any line over 300
+  # chars containing the word, which false-positives on MINIFIED JSON: a 1,831-char single-line
+  # receipt whose only hit was the prose "thinkingSignature blobs public in history" failed the
+  # scan on 2026-09-19 and would have blocked a clean publish. Match the assignment shape instead.
+  local longsig; longsig=$(grep -r -n -E '"thinkingSignature"[[:space:]]*:[[:space:]]*"[A-Za-z0-9+/=_-]{100,}' "$dir" --exclude-dir=.git 2>/dev/null || true)
   [ -z "$longsig" ] || { echo "FAIL  long thinkingSignature lines (blob-shaped):"; printf '%s\n' "$longsig"; bad=1; }
   # History leg: the committed content itself (tip == history by construction).
   if [ -d "$dir/.git" ]; then
