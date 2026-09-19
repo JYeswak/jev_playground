@@ -18,6 +18,12 @@ claim nobody can check:
   (the `--mode json` stream) and `message` (the on-disk SessionEntry), which must produce
   identical messages, plus a planted negative that an unknown envelope still yields nothing.
   Gated by `foundation/gates.d/40-omp-compact-replay.sh`.
+- `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
+  scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
+  a mistake only when the result is later reused; the **planted negative** that keeping everything
+  scores zero mistakes but must still show the missed saving; a token present earlier is not a
+  fingerprint (this defect made the first run report 90% mistakes on noise); and the random
+  baseline drops the same count with alignment intact.
 - `compaction/test/hook-compact.test.ts` — the omp compaction hook surface (sibling-owned, bead
   `jev-compact-hook-hbs`).
 - `probes/fast-jev-probe.mts` — our black-box probe of the compaction library against a fake Jev.
