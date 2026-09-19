@@ -26,6 +26,15 @@ true catches at any threshold that catches anything
 a base rate next to their accuracy, including us until this week: eight ledger rows now carry one
 ([receipt](docs/demos/upstream-repro/prevalence-retrofit-20260919.md)).
 
+**A second prevalence, now public, on the tool_call surface we would actually gate.** Error
+rate on allowed commands is **3.95%** (frozen split **4.01%**) — **40×** the 0.1% kill line —
+on **216k** dcg decisions, frozen split **36,955** train / **41,500** held-out, zero API
+([receipt](docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md)). Join yield is
+**36.8%**; the miss class is `js-bash-<uuid>` foreign ids, so a logger must capture command
+text at decision time. Pane 3 withdrew the revert-predicate as INVALIDATED; `isError` survived.
+Fail-open is verified at `dcg-guard.ts:599-610`. The live observer is **not working** — see
+[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
+
 **What Jev IS good at, stated fairly.** Ties a TF-IDF classifier trained on ~14,800 in-domain
 labels at zero labels (McNemar p=0.677), holds 0.97–0.99 under shift where that classifier
 collapses to 0.70 ([receipt](docs/demos/upstream-repro/judgment-quality-20260919.md)); 96.5% on
@@ -35,7 +44,9 @@ always-abstain control 5× on their own corpus
 ([receipt](docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md)).
 
 **Scoreboard, present tense:** 25 verdict rows (7 cleared, 9 held, 8 ruled out, **0 promoted**),
-31 dead-end ledger entries each with a reopen condition, 12 gate stages green. The product is the
+31 dead-end ledger entries each with a reopen condition, 12 gate stages green. Tool_call
+surface OPEN at 3.95% — proven vs WIP seams:
+[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). The product is the
 ruling plus the evidence for everything ruled out.
 
 **What you get.** Three tools that run offline with no API key, and read your own logs:
