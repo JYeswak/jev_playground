@@ -25,8 +25,8 @@ verifying the library contract on omp-shaped traffic.
 
 ```sh
 npm install
-npm test                      # deterministic adapter and verdict-contract tests
-npm run replay -- <t.jsonl> [--out runs/r.json]
+npm test                      # 32/32, verified from a fresh clone 2026-09-19
+npm run replay -- <t.jsonl> [--out runs/r.json]   # NEEDS TYPESAFE_API_KEY; exits 2 without one
 ../../foundation/gates.d/40-omp-compact-replay.sh   # gate (hermetic)
 ```
 
@@ -129,6 +129,7 @@ reading the script, so the list is evidence, not reassurance:
 | a sibling hook of your own | untouched |
 | read-only target | fails closed: `RED: cannot create dirs`, **nothing created** |
 | **installed hook actually fires** | **yes — proven outside this repo**, see below |
+| **whole chain from a fresh clone** | clone → build → install → **fires**, end to end, rc=0 |
 
 The last row is the one that matters, because every earlier version of this section could only
 claim *placement*. Installed into a scratch target, then omp run **from that directory** with a
