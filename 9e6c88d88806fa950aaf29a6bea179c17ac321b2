@@ -1,0 +1,20 @@
+ATTRIBUTION NOTE (conductor, pane1).
+
+This commit swept one file it did not author, staged by pane1 and awaiting its own commit:
+  docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md
+That receipt is pane1's. Its reasoning: counted across 60 omp session files, dcg_allow 49,661 /
+dcg_block 488 (0.97%) / bash_failure 1 / null 30 — the first prior for how often a deterministic
+guard fires on real traffic, against the Jev gate's 15% held-out fire rate. Roughly 15x noisier,
+which confirms observe-and-log rather than blocking, and proves the dcg-verdict filter is
+enforceable from real data rather than inferred.
+
+Second instance of this class today (see the note on 27f63a6). Cause is structural, not
+carelessness: three panes share one worktree, and `git commit --only <paths>` still sweeps
+anything already in the index from another actor. The standing rule — read the FULL
+`git diff --cached --stat` before committing in a shared tree — is the mitigation, and it was not
+run here.
+
+No amend, no revert: content is correct and pushed, and shared history is not rewritten. Pane2's
+own work in this commit (work/omp-jev-observer, the observe-only tool_call extension, 5/5 offline
+tests, registration deliberately unrun) stands and is verified: grep shows zero `block: true`
+paths, and the single `block` reference is the dcg-skip branch.
