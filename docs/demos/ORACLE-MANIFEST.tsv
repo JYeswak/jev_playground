@@ -16,6 +16,6 @@ NiazMorshed2007/jev-review	6-metamorphic-invariant	good/bad pairs; ordering is t
 Dicklesworthstone/skillranker	1-threshold-gate	its own synthetic_cases.v1.jsonl + frozen 0/1/2 loss table	PENDING-SPEC	C	-	UNASSIGNED	-
 AbdelStark/bicameral	7-adversarial-survival	injection + destructive-command corpus; benign reads as negatives	AUC>=0.90_AND_FP<=1of20_at_0.5	C	C	RULED	docs/demos/upstream-repro/bicameral-gate-adoption-20260919.md
 browser-use/jev-ultrafast	5-metamorphic-golden	its verify(page) end-state checker behind a fixture	PENDING-SPEC	D	-	UNASSIGNED	-
-githubnext/localjev	4-mixed-denominator	differential vs real Jev on identical pinned questions + their AG News/BoolQ/SST-5 gold labels	PENDING-SPEC	C	-	SPEC	-
+githubnext/localjev	4-mixed-denominator	real Jev vs LocalJev on 40 pinned questions; feasibility arm required	agreement>=80pct_AND_mean_abs_prob_diff<=0.15_AND_feasibility_arm_passes	C	-	RUN	docs/demos/upstream-repro/localjev-differential-20260919.md
 logan-markewich/jeff	4-mixed-denominator	their committed bench/results/accuracy.jsonl, 22560 per-item rows, 8 public datasets	accuracy_AND_ECE_must_beat_jev_to_substitute	C	C	RULED	docs/demos/upstream-repro/jeff-selfhost-recompute-20260919.md
 ryze-ai/seo-geo-claim	4-mixed-denominator	40 pages with KNOWN citation outcomes (did ChatGPT/Claude cite it) + length/domain-authority baseline	PENDING-SPEC: must beat the dumb baseline, not just be fast	C	-	UNASSIGNED	-
