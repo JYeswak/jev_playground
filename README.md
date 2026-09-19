@@ -159,6 +159,30 @@ returned a reproducible finding in ten minutes.
 Each tool takes one command, reads your own logs, and writes a receipt that states its denominator
 before any share. No API key. No network.
 
+### `ensemble/` — should you average two scorers, or just use the better one?
+
+```bash
+python3 ensemble/run_all.py
+```
+
+Runs in about a second against data already in this repo. Averaging two scorers is folk wisdom;
+these four pairs show when it pays and when it costs you:
+
+| pair | phi (error correlation) | accuracy gap | averaging gained |
+|---|---|---|---|
+| plain question + logistic regression | +0.035 | 0.0 pp | **+1.25 pp** |
+| Jev + TF-IDF (phishing, n=5,733) | +0.107 | 4.2 pp | **+0.38 pp** |
+| with-context + without-context (n=662) | +0.343 | 6.8 pp | **-0.60 pp** |
+| logistic regression + naive Bayes | **+0.526** | 0.8 pp | **-0.14 pp** |
+
+**Two conditions, not one.** Averaging paid only when the scorers failed on *different items* and
+were *close in accuracy*. Row three is the one that cost us a published rule: phi well under 0.5,
+and it still lost, because no amount of decorrelation at 9% disagreement beats a 6.8-point accuracy
+gap. Point `ensemble/decorrelation.py` at your own two scorers before you build the ensemble.
+
+Four points do not locate a boundary, and [`ensemble/README.md`](ensemble/README.md) says so at
+more length than this summary does.
+
 ### `demos/usage-shape` — where does your agent spend go?
 
 ```bash
