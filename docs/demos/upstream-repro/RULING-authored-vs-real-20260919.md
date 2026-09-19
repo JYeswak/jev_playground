@@ -1,0 +1,78 @@
+# The ruling: every candidate that looked good on authored data failed on real data
+
+**Date:** 2026-09-19 · **Level:** `[live]` · Derived from the committed receipts below, not recalled.
+
+This lane exists to produce a defensible ruling on which ideas deserve deeply-planned projects.
+After a day of measurement across nine candidates, the ruling is not about any one of them.
+
+## The pattern
+
+| candidate | on authored / synthetic data | on real data | receipt |
+|---|---|---|---|
+| tool-call gate (bicameral) | 0/20 false positives | **3/20 FP**, AUC 0.865 | `bicameral-gate-adoption` |
+| worker supervision (foreman) | AUC **1.000** | **0.750** on 186k real windows | `foreman-supervision-adoption` |
+| code-review ordering (jev-review) | **12/12** pair orderings | AUC **0.625** on 22 real diffs | `jev-review-real-diffs` |
+| context compaction | — | Jev ≈ drop-everything; keeping all is **7× better** | `compaction-retention-oracle` |
+| tier routing for cost | vendor: **−59.9%** | **+90.2%** vs flat mid-tier on our 643 sessions | `router-savings-inverts` |
+| router tier signal | — | AUC 0.56–0.63, loses to **prompt length** | `router-tier-signal` |
+| skill selection (skillranker) | their synthetic 12: **0.800** | *not yet run on real data* | `skillranker-corpus-measured` |
+
+**Three candidates were measured both ways. All three fell.** Not one authored result survived
+contact with real data, and the drops are large: −0.250 AUC, −0.375 AUC, and a precision collapse
+from perfect to 15% false positives.
+
+**Nothing has cleared a preregistered bar on real data.** One promotion was awarded and
+**retracted by its own author** within two hours when the real-data number arrived.
+
+## Why authored corpora inflate — the mechanism, not the moral
+
+An authored case embeds the author's own phrasing of the distinction being tested. The model is
+then asked to recover a distinction that was written *to be recoverable*. Real data does not
+cooperate: the signal is entangled with noise the author would never think to include.
+
+The sharpest instance: the gate's v2 questions were written **after reading its v1 misses**, so a
+perfect 1.000 on that corpus measured the author's phrasing. Held-out data returned it to 0.865
+with 3/20 false positives on ordinary daily commands.
+
+## The second finding, which outranks every AUC here
+
+**Prevalence decides deployability, and none of the vendor claims mention it.** Pane 3 mined
+186,449 real windows and found **30 stuck ones — a 0.016% base rate** — then computed what the
+measured separator does at that prevalence: at 80% recall, roughly **24 true catches against
+~55,791 false alarms, about 1:2300**. Suppressing false alarms to parity requires a threshold
+that also zeroes recall.
+
+So the useful instruction is not "improve the threshold." It is **change the base rate** — trigger
+only in already-suspicious contexts — or find a far stronger separator. An AUC without a
+prevalence figure cannot tell you whether a detector is deployable, and every number in this
+ecosystem is published without one.
+
+## What this does NOT say
+
+Jev is strong where it has been measured honestly: it ties a TF-IDF classifier trained on ~14,800
+in-domain labels at **zero labels** (McNemar p=0.677) and holds 0.97–0.99 under distribution shift
+where that classifier collapses to 0.70; prompt-injection detection with deployment context is
+**96.5%** at AUC 0.993; and on skillranker's own corpus it scores **5× better than that repo's own
+always-abstain control**, missing their 0.90 gate by a single case. Both of its failures there are
+*cheap* ones — it declined rather than misled.
+
+**The gap is not capability. It is that the decisions people are wiring Jev into are being
+validated on data the wirer wrote.**
+
+## Ruling for anyone reading this from outside the lane
+
+1. **Decompose the decision into narrow typed questions**; never consume a monolithic verdict.
+   Measured: a phishing verdict scores 63.8% while the *same call's* sub-question scores AUC 0.96.
+2. **Keep a dumb baseline.** In this lane a two-line regex, a flat pricing tier, prompt length,
+   and "keep everything" each beat the model at least once.
+3. **Validate on data you did not author**, and state the **prevalence** beside every score.
+4. **Pick thresholds from labels**, never at the shipped 0.5 — calibration is the recurring
+   weakness (code-vulnerability ECE 0.19; the 0.5–0.6 band only 38% positive).
+
+## NO-CLAIM
+
+Nine candidates, one machine, one model version, one day; sample sizes from n=12 to n=96 per arm
+with a measured re-run noise floor of ~0.006 AUC. Three of the real-data oracles use *proxies* for
+ground truth — token reappearance, file-overlap-in-future-commits, and a predicate over tool-call
+timing — and each proxy carries noise that biases against the model by an unmeasured amount.
+"Failed on real data" here means *failed the bar we preregistered*, not *carries no signal*.
