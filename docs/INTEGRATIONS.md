@@ -67,11 +67,37 @@ tail ~/.jev-compact.log
 
 `refused` / `passthrough` / `would-compact` are decisions. No new line means the hook did not run — not a silent success.
 
-## WIP: observe-and-log / dogfood logger — registered on jev-lab, NOT working
+## WIP: observe-and-log / dogfood logger — fires on jev-lab; session co-presence MET, id-join NOT
 
 The append-only decision/outcome logger lives at `work/dogfood-logger/`. Its schema, join, concurrent appends, and rotation are tested locally (`work/dogfood-logger/test/logger.test.mjs`; receipt `docs/demos/upstream-repro/dogfood-logger-20260919.md`). The observer library is at `work/omp-jev-observer/` (offline: 5 tests; receipt `docs/demos/upstream-repro/omp-jev-observer-20260919.md`).
 
-**Do not read this as a working live observer.** It is registered on `jev-lab`. The observer wrote **0 rows** while `dcg-tool-bridge` wrote **1**. That is a live defect in flight, not a green. The loader globs `*.{ts,js}`; the config is an `extensions:` list in the profile `agent/config.yml`.
+**Measured on the `jev-lab` profile's session JSONL (counts re-derived, not quoted):**
+
+| row type | count |
+|---|---|
+| `com.zeststream.omp-jev-observer.decision.v1` | **14** |
+| `com.zeststream.omp-jev-observer.diagnostic.v1` | **33** |
+| `com.zeststream.omp-dcg-bridge.decision.v1` | **13** (all `kind=dcg_allow`) |
+| sessions containing observer decision **and** bridge rows | **6** |
+
+Three separate claims, and only the first is met:
+
+- **(A) Session co-presence — MET.** Six lab sessions carry observer decision rows alongside
+  `com.zeststream.omp-dcg-bridge.decision.v1` rows with a real verdict.
+- **(B) Id-join — NOT met.** All **14** observer decisions carry `dcgVerdict: "unknown"`, and the
+  observer rows carry no `toolCallId`, so the id-level join to bridge rows is **0**. The event
+  exposes `[type, toolName, toolCallId, input]` and **no verdict**, so the original
+  `context.dcgVerdict` read a field that does not exist: those `unknown`s are defaults, not
+  observations. The non-duplication filter is therefore **corrected, not working-as-designed**.
+- **(C) Working profile — NOT claimed.** Everything above is `jev-lab`, a disposable profile.
+  None of it is evidence about a working profile under real user traffic.
+
+An earlier version of this section reported *0 observer rows against 1 bridge row*. That was true
+when written and is now stale; the zero-row cause was a module with valid syntax whose `pi.on`
+registration line was absent — reproduced deliberately and repaired
+(`harm-rule-shipped-20260919.md`, `658922f`). **A hook that fails to register is indistinguishable
+from a hook that sees nothing.** The loader globs `*.{ts,js}`; the config is an `extensions:` list
+in the profile `agent/config.yml`.
 
 Live omp was never taken off the table. There is **no standing ban** on registering into working omp profiles. The fleet invented "STOP-LIVE" / deferred registration as reasons not to work. This row is not an indefinite deferral and not quiet-window gated. Registration happened; capture did not.
 
@@ -91,9 +117,9 @@ A `tool_call` observer on `bash` would fire on every bash in every session, so t
 2. **Fail-open** — logger/observer failures return `false` / `undefined` and never throw into the host (`work/dogfood-logger/src/logger.mjs`; `compaction/src/omp-binding.ts:226-231`). Guard fail-open is verified at `dcg-guard.ts:599-610` (corpus `toolcall-groundtruth-corpus-20260919.md:9-12`).
 3. **`0 block:true`** — observe only. Never return omp's `{block: true, reason}` shape.
 4. **jsm preconditions** — the installed file must be self-contained. `9e6c88d` imported `../../dogfood-logger/src/logger.mjs`, a parent path that does not exist after a copy into `~/.omp`. `348894e` inlined the record builder so the extension no longer depends on a repo-relative parent.
-5. **The loader must actually load it.** Globs `*.{ts,js}`. Config is `extensions:` in the profile `agent/config.yml`. A register that writes 0 rows while another extension writes 1 is not loaded. That is the current jev-lab defect.
+5. **The loader must actually load it.** Globs `*.{ts,js}`. Config is `extensions:` in the profile `agent/config.yml`. A register that writes 0 rows while another extension writes rows is not loaded — verify against a known-firing neighbour, never against silence alone.
 
-Once those pass **and** a row is observed next to a `dcg-tool-bridge` row in the same session, the live observer may be called working. That has not happened. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`.
+Session co-presence has now been observed (6 sessions, lab only), so that condition is met. The remaining conditions for calling the observer working are the **id-level join** (currently 0: no `toolCallId` on observer rows, all verdicts defaulted to `unknown`) and a **working profile under real traffic**, which has not been attempted. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`.
 
 **Where a probabilistic judge belongs.** Only on what regex cannot express. The dcg prior is now on this tip: [`docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md`](demos/upstream-repro/dcg-block-rate-prior-20260919.md) — 49,661 allow / 488 block = **0.97%**.
 
@@ -103,7 +129,7 @@ Once those pass **and** a row is observed next to a `dcg-tool-bridge` row in the
 |---|---|---|---|
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log | registered on `jev-lab`; observer wrote **0** rows (`dcg-tool-bridge` wrote **1**) | **not working**; live defect in flight; loader globs `*.{ts,js}` | no |
+| dogfood / observe-and-log | `jev-lab`: observer **14** decision / **33** diagnostic rows; bridge **13**; **6** sessions co-present | **partial** — session co-presence MET, id-join **0** (no `toolCallId`, all `dcgVerdict` defaulted `unknown`); lab only | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (offline-only; do not read as live-working), `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
