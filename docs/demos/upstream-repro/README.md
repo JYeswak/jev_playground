@@ -110,3 +110,22 @@ a human: it would have told a maintainer their docs were broken when the defect 
 Four of the six things the sweep produced are things we were about to build ourselves and did not
 need to. The pattern is consistent enough to state plainly: **before writing code to answer a
 question, check whether a repository you already cloned answers it, and run that instead.**
+
+## Provenance of the figures on this page (audited 2026-09-19)
+
+Every numeric claim in the root README's twenty-two-repo table was checked against a committed
+receipt. **Fifteen claims, fourteen backed, one fabricated.**
+
+The fabricated one said the agent-failure benchmark scored *"18/20 without the pinned dataset"*.
+That string appears in no receipt, and what the receipt records is that a bare `uv run pytest`
+**fails collection** — the pinned `whowhen_eval` dependency is absent, so there is no score at all.
+A dependency failure had been written up as a degraded result. Corrected in `db37dac`.
+
+Two figures (`87.1% chars saved`, `21 messages to 7`) traced only to this index rather than to a
+primary receipt, and one (`29/29`) was upgraded from index-backed to **re-executed**: a fresh
+`npm install && npm test` in `fast-jev-compaction` gives 2 files, 29 passed.
+
+**What this audit does not establish:** it checks that each figure *appears in* a receipt, not that
+the figure is *correct*. A wrong number copied consistently into both the receipt and the README
+passes unchanged. Prose claims — "headlines reproduce", "floor reproduces exactly" — were not
+re-executed.
