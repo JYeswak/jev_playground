@@ -957,3 +957,31 @@ the upper bound on benefit, not the benefit — each one costs a keyed request t
 **Retry condition:** a keyed replay over a stratified sample (say 20 sessions across the 3–10,
 11–50 and 50+ bands) with the cost stated up front. That converts the upper bound into a real
 distribution of savings; nothing smaller should be called "how much this saves".
+
+### R25 retry, same day — the stratified keyed sample, and it is not a small effect
+
+R25 asked for a stratified sample with the cost stated first. Six real sessions, 255 candidates,
+one batched request each at most. Every run passed all six invariant checks:
+
+| session | calls | requests | chars before → after | saved |
+|---|---|---|---|---|
+| `2026-08-29T15-26-13` | 10 | **0** | 44,819 → 44,819 | 0% |
+| `UdsFeatureUnion` | 9 | 1 | 155,837 → 104,443 | **32%** |
+| `MirrorAgentsSurvey` | 15 | 1 | 249,949 → 188,661 | **24%** |
+| `OmpExtensibility` | 15 | **0** | 253,465 → 253,465 | 0% |
+| `PortFleetComposite` | 108 | 1 | 501,502 → **6,084** | **98%** |
+| `PortOmpIdleDispatch` | 98 | 1 | 291,909 → **12,911** | **95%** |
+
+**Four of six saved something; the two largest saved almost everything.** On a 108-call session the
+transcript goes from half a megabyte to six kilobytes in one request.
+
+**Two sessions saved nothing and made no request**, which is the honest other half: having calls is
+not sufficient — in those, everything was pinned inside `compact()`. Note that pinning is decided
+**inside** `compact()`, not on the `ToolCall` objects `collectToolCalls` returns: a corpus-wide
+static count says `pinnedCalls: 0` while the replay reports `pinned: 5` and `pinned: 10` on
+individual sessions. **The static census cannot predict eligibility; only a replay can.** That
+invalidates any attempt to extrapolate R25's 88,288 candidates into expected savings.
+
+**Retry condition, narrowed:** the 0%-saved sessions are the interesting case now — why is
+everything pinned there, and is it size, recency, or shape? A ten-session sample drawn only from
+the zero-request population would answer it.
