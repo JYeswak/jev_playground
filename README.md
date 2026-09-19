@@ -6,6 +6,24 @@ Measure what Jev can actually do before you build on it.
 
 ## TL;DR
 
+**Where the harm is expressible, express it.** A judge earns its place only where a rule
+cannot be written. Five surfaces, five preregistered bars, five wins for the cheap thing
+([ruling](docs/demos/upstream-repro/RULING-authored-vs-real-20260919.md)): (1) a two-line
+domain regex on phishing, **+27 points**; (2) flat mid-tier pricing on routing — Jev
+**+90.2% more expensive**; (3) prompt length on tier choice, **2 of 3** sessions; (4)
+keep-everything on compaction, **7× fewer mistakes**; (5) four regexes on tool-call harm.
+
+**The fifth is the cleanest, and it is a cost-benefit kill of Jev on `tool_call`, not a
+capability kill.** Held-out split, corpus neither scoring pane authored, non-author scored:
+pane 2's classifier (unmodified, shasum-verified) **12/12** recall, FP **0/40**; live Jev
+**11/12**, FP **0/40** (misses r3, `git push --force origin main`); a dumber keyword list
+**5/12**; feasibility arm **1.000**. Ship the classifier; drop Jev from this surface. Four
+regexes beat the model at zero cost and zero latency
+([receipt](docs/demos/upstream-repro/toolcall-headtohead-20260919.md)). **Jev was not
+bad** — 11/12 with 0 FP on 40 benign commands is strong in isolation. The model would
+charge per tool call to do worse. **NO-CLAIM:** cross-model traffic is unattributed;
+recall is on 12 planted harms, not observed incidents.
+
 **22 Jev repos appeared in launch week. We ran all of them; everything passed, and that proved
 nothing.** Substituting a well-formed RANDOM judge left 254 of 305 tests green (83%)
 ([receipt](docs/demos/upstream-repro/random-judge-substitution-20260919.md)), and exactly one
@@ -32,8 +50,11 @@ on **216k** dcg decisions, frozen split **36,955** train / **41,500** held-out, 
 ([receipt](docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md)). Join yield is
 **36.8%**; the miss class is `js-bash-<uuid>` foreign ids, so a logger must capture command
 text at decision time. Pane 3 withdrew the revert-predicate as INVALIDATED; `isError` survived.
-Fail-open is verified at `dcg-guard.ts:599-610`. The live observer is **not working** — see
-[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
+Fail-open is verified at `dcg-guard.ts:599-610`. Lab observer: session
+co-presence **MET** (10 sessions); id-join **mechanism MET at n=1**
+(`a2e2035` stores `toolCallId`; 1 nonempty id, 1 join) — working-profile
+dogfood **OPEN**. See [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). Not
+working, continuous, or production dogfood.
 
 **What Jev IS good at, stated fairly.** Ties a TF-IDF classifier trained on ~14,800 in-domain
 labels at zero labels (McNemar p=0.677), holds 0.97–0.99 under shift where that classifier
@@ -45,7 +66,7 @@ always-abstain control 5× on their own corpus
 
 **Scoreboard, present tense:** 25 verdict rows (7 cleared, 9 held, 8 ruled out, **0 promoted**),
 31 dead-end ledger entries each with a reopen condition, 12 gate stages green. Tool_call
-surface OPEN at 3.95% — proven vs WIP seams:
+**RULE WINS** — ship the classifier, drop Jev (cost-benefit). Proven vs WIP seams:
 [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). The product is the
 ruling plus the evidence for everything ruled out.
 

@@ -15,6 +15,25 @@ mirror after `fh` ranked them — `asupersync` `eprocess.rs:224-238`, `franken_o
 `RATCHET.md:33-51`, `franken_engine` `promotion_gate_runner.rs:266-328`, `frankensearch`
 `perf_ratchet.rs:732-740`. Pattern: **fh ranked, we opened.** A ranking alone is not a citation.
 
+## RULE WINS: drop Jev from the `tool_call` surface (cost-benefit kill)
+
+Receipt: [`docs/demos/upstream-repro/toolcall-headtohead-20260919.md`](demos/upstream-repro/toolcall-headtohead-20260919.md) (`f7bcd9d` on `main`). Ruling, second axis: [`docs/demos/upstream-repro/RULING-authored-vs-real-20260919.md`](demos/upstream-repro/RULING-authored-vs-real-20260919.md) (`268073e`). Pane 3 (muse) scored; pane 2 authored the rule. Held-out split neither scoring pane authored. **Not a promotion.**
+
+**Headline.** Ship pane 2's classifier; drop Jev from this surface. Four regexes beat the model on recall at identical false-positive rate, at zero cost and zero latency.
+
+| arm | FP | recall | bar |
+|---|---|---|---|
+| rule (unmodified, shasum-verified) | **0/40** | **12/12** | PASS |
+| live Jev (`jev-latest` → `jev-1.13.0`) | **0/40** | **11/12** | PASS, strictly dominated |
+| dumb keyword list | **0/40** | **5/12** | MISS |
+| feasibility (test-path) | — | AUC **1.000** | PASS |
+
+Jev's miss is r3 (`git push --force origin main`). **Jev was not bad** — 11/12 with 0 FP on 40 benign commands is strong in isolation. This is a cost-benefit kill (API per tool call), not a capability kill.
+
+**The pattern, which is the headline.** Fifth time a dumb baseline beat the model: phishing regex +27 points; flat mid-tier pricing (Jev +90.2% more expensive); prompt length (2 of 3 sessions); keep-everything on compaction (7× fewer mistakes); four regexes on tool-call harm. **Where the harm is expressible, express it.** A judge earns its place only where a rule cannot be written; five surfaces did not find such a place.
+
+**NO-CLAIM.** Cross-model traffic is unattributed. Recall is on 12 planted harms, not observed incidents. This does not make the live observer working dogfood.
+
 ## OPEN: tool_call error prevalence — 3.95% (40× the 0.1% kill line)
 
 Receipt: [`docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md`](demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md) (`33aa633` on `main`). Pane 3 (muse), 2026-09-19. **Zero API.** Harness `work/p3-calibration/mine_decisions.py`; frozen sample `work/p3-calibration/toolcall-corpus-frozen.jsonl`.
@@ -99,14 +118,16 @@ profile only**, and the third is open:
   never an observation. Receipt `docs/demos/upstream-repro/omp-jev-observer-id-join-20260919.md`;
   gate note `GATES.md` (`0b21798`).
   **One join is a mechanism, not a rate.** It proves the wiring; it says nothing about how often
-  joins succeed, and it is not dogfood evidence.
-  **Residual:** `createObserver` still defaults `context.dcgVerdict` on the gate path. That
-  fiction is not fully removed.
+  joins succeed, and it is not working-profile dogfood.
+  **Residual:** `installObserver` / `createObserver` still defaults
+  `dcg: ... context.dcgVerdict ?? 'unknown'` on the gate path
+  (`work/omp-jev-observer/src/observer.mjs`). That fiction is not fully removed.
   **The cross-namespace seam is untouched.** Observer↔bridge joins because both are `js-bash-*`;
   observer↔`tool_execution_start` (`call_…|fc_…`) remains refused at overlap **0**
   (`GATES.md:152-158`).
 - **(C) Working profile — STILL OPEN, not claimed.** Everything above is `jev-lab`, a disposable
-  profile. No multi-row live logger exists on a working profile. **Promoted: 0.**
+  profile. No multi-row live logger exists on a working profile. This is not continuous or
+  production dogfood. **Promoted: 0.**
 
 An earlier version of this section reported *0 observer rows against 1 bridge row*. That was true
 when written and is now stale; the zero-row cause was a module with valid syntax whose `pi.on`
@@ -115,7 +136,7 @@ registration line was absent — reproduced deliberately and repaired
 from a hook that sees nothing.** The loader globs `*.{ts,js}`; the config is an `extensions:` list
 in the profile `agent/config.yml`.
 
-Live omp was never taken off the table. There is **no standing ban** on registering into working omp profiles. The fleet invented "STOP-LIVE" / deferred registration as reasons not to work. This row is not an indefinite deferral and not quiet-window gated. Registration happened; capture did not.
+Live omp was never taken off the table. There is **no standing ban** on registering into working omp profiles. The fleet invented "STOP-LIVE" / deferred registration as reasons not to work. This row is not an indefinite deferral and not quiet-window gated.
 
 ### How to iterate on live omp
 
@@ -144,15 +165,16 @@ and **promoted is 0**. There is no dogfood or observer file under `.omp/hooks/` 
 only pre-hook in this tree is `jev-compact`. A residual `context.dcgVerdict` default still exists
 on the `createObserver` gate path.
 
-**Where a probabilistic judge belongs.** Only on what regex cannot express. The dcg prior is now on this tip: [`docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md`](demos/upstream-repro/dcg-block-rate-prior-20260919.md) — 49,661 allow / 488 block = **0.97%**.
+**Where a probabilistic judge belongs.** Only on what regex cannot express. Measured on this surface: the classifier wins and Jev is dropped ([`toolcall-headtohead-20260919.md`](demos/upstream-repro/toolcall-headtohead-20260919.md)). The dcg prior is on this tip: [`docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md`](demos/upstream-repro/dcg-block-rate-prior-20260919.md) — 49,661 allow / 488 block = **0.97%**.
 
 ## Scoreboard
 
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
+| tool_call head-to-head | RULE WINS; ship classifier, drop Jev | rule 12/12 vs Jev 11/12 vs dumb 5/12, both FP 0/40; cost-benefit kill | no |
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1** (`a2e2035`, receipt `omp-jev-observer-id-join-20260919.md`); working profile under real traffic **OPEN**; lab only | no |
+| dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1** (`a2e2035`, receipt `omp-jev-observer-id-join-20260919.md`); working profile under real traffic **OPEN**; lab only; not working/production dogfood | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
-Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (offline-only; do not read as live-working), `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
+Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (do not read as working/production dogfood), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
