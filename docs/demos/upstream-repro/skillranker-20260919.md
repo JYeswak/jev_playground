@@ -126,3 +126,39 @@ modules (`src/demo.rs`, `src/capabilities.rs`, `src/pipeline.rs`, `src/scoring.r
 depth below the CLI surface is unverified (modules exist; behavior unrun), and no
 worktree was moved — running main needs a clean export plus a full build plus keyed
 budget, which is follow-up work, not this receipt.
+
+## RETRACTION, 2026-09-19 — the docs gap was OUR STALE CLONE, not upstream shipping docs ahead of code
+
+Pane 3 answered the open question (addendum `d185fdf`) and I verified it from refs without
+moving the worktree. Pane 3's callback first cited `9f7bcae`, then self-reported it as
+fabricated and supplied the real chain — `c3cfa8c` -> `155b76b` -> `8200051` -> `d185fdf`. I
+checked all five with `git cat-file -t`: **`9f7bcae` does not exist; the other four do.** The
+self-report arrived before I committed anything citing it, which is the transport working:
+
+```
+HEAD                      3fe85c4
+git rev-list --count HEAD..origin/main   -> 103
+origin/main               4ed4c9b
+```
+
+On `origin/main`, `src/cli.rs:221` is `Command::new("demo")` and the help string documents
+`sr [rank]`, `sr doctor`, `sr roster`, `sr capabilities`, `sr demo --case <useful|none|explicit|…>`
+— the full surface. The commands are **wired with real modules.**
+
+**So I withdraw "the README's Quick Start documents a CLI surface that does not exist".** It was
+true of `3fe85c4` and false of the project: our clone is **103 commits stale**, and I read a
+current README beside a months-old source tree and blamed the author. The `planned_cli` entries at
+our pin were a snapshot of work that has since landed. No upstream report should be filed for this,
+and it is fortunate none was — it would have told a maintainer their docs were wrong when the
+defect was our pin.
+
+That is the third self-correction in this session's clone work, all the same shape: **a control was
+open and I did not read it.** Here the control was one `git rev-list --count` against a remote we
+already had on disk.
+
+### What actually blocks running the real thing
+
+Not phase gates — **build platform**. Every path still produces or requires an x86_64 artifact on
+an arm64 host (RCH-E327, `critical_pressure=4`). Running `origin/main` needs a clean export, a
+native build, and a keyed budget for the live ranking calls. Filed as its own bead rather than
+smuggled into this one.
