@@ -58,19 +58,29 @@ envelope, output that did not actually shrink — returns `undefined`, which mea
 That was not a design claim until 2026-09-19, when the hook was wrong four times in a row against
 a real omp and no session was harmed. See `../docs/demos/omp-seam-live-20260918.md`.
 
+**Into any repo, which is the path you want:**
+
 ```bash
-# 1. from the repo root — the hook is already committed, just point omp at it
-ls .omp/hooks/pre/jev-compact.ts
-
-# 2. install deps for the compactor it calls
-cd compaction && npm install && cd ..
-
-# 3. give it a key. WITHOUT ONE THE HOOK REGISTERS NOTHING AND OMP IS UNAFFECTED.
-export TYPESAFE_API_KEY=...   # or run omp under your secret manager
-
-# 4. verify it loaded, in a throwaway session rather than one you care about
-omp -p 'reply OK'
+./compaction/install-jev-compact.sh /path/to/your/repo
 ```
+
+It copies the hook, vendors the compactor and its dependency under
+`<target>/.omp/lib/jev-compact/`, drops a `SKILL.md`, writes an `INSTALL-RECEIPT.txt` pinning the
+`fast-jev-compaction` version and sha, and refuses loudly rather than half-installing. Verified on
+2026-09-19 against a scratch target: `PASS: jev-compact installed (placement + dependency; firing
+proven only by /compact + log)`.
+
+Then, in the target:
+
+```bash
+export TYPESAFE_API_KEY=...   # or launch under your secret manager.
+                              # WITHOUT A KEY THE HOOK REGISTERS NOTHING AND OMP IS UNAFFECTED.
+omp -p 'reply OK'             # a throwaway session, not one you care about
+```
+
+The installer's own closing line is the honest bar, and it is worth repeating: **placement is not
+firing.** It proves the files are where omp looks and the dependency resolves. Whether the hook
+ever runs is answered only by `/compact` and the log below.
 
 ### Did it actually do anything?
 
