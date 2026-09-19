@@ -1560,3 +1560,39 @@ gap I was worried about.
 
 **Retry condition:** none. If the corpora are ever inlined or the import replaced with a copy,
 the mutation arm stops dropping recall and this entry is refuted in turn.
+
+## R37 — every command we published failed silently for a stranger, and nobody had run them
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · Closed the same day it was measured.
+
+Nobody had ever run this README's commands from a clean checkout. When pane 2 finally did — a
+fresh clone of the public repo to a temp dir, every exit code taken unpiped — **six of them
+exited `1`**:
+
+| command | why |
+|---|---|
+| `install-harm-rule.sh --check default` | no `default` profile exists on a fresh machine |
+| the observe-only grep (`-c` form) | **our defect**: zero matches *is* grep's failure status |
+| `foundation/gates.sh` | needs a `.beads` DB the repo does not carry |
+| `compaction/install-jev-compact.sh --check` | sibling upstream clone not vendored |
+| `scripts/sync-docs.sh` | expects 137 mirror files absent from the public tree |
+| `scripts/verify-frozen.sh` | same `.beads` prerequisite |
+
+**The grep one was a genuine published defect.** We shipped `grep -cE … # 0` as the proof the
+rule contains no block path. It prints `0` and exits `1`, so our proof-of-absence *returned
+failure on success*. A reader checking exit codes would have concluded the opposite of what the
+command demonstrates. Replaced with a `-q` form that prints `observe-only: no block path` and
+exits `0`.
+
+**The other five were undisclosed prerequisites** — not broken tools, just things we knew and
+never wrote down. Now each fails **actionably**: `gates.sh` names `br import`, the installer
+prints an exact FIX line, compaction names `bootstrap-compaction`, and `sync-docs` is marked
+maintainer-only where a reader meets it. Exit codes stay non-zero, because they *are* failures;
+what changed is that they now say what is missing and how to fix it.
+
+**Rule:** a command in a README is a claim, and the only way to check it is from a clone that has
+none of your local state. This repo had been published, promoted, and read for days before
+anyone ran its own instructions.
+
+**Retry condition:** re-run the full fresh-clone table after any change to the published command
+set. A row that starts failing opaquely again is a regression of this entry, not a new finding.
