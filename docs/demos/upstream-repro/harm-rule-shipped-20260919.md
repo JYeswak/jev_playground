@@ -98,3 +98,17 @@ Restated filter semantics, honestly: this extension logs EVERYTHING observable
 filters NOTHING at write time. "Log only where dcg allows" is enforced at
 READ time by inner-joining bridge rows on toolCallId. The deployed code never
 claimed otherwise; the receipt did not say so plainly until now.
+
+## P3-27 appendix — failed classifications are harm_error, never harm_pass
+
+Defect (mine, in shipped code): `classify()` throwing produced `kind:
+'harm_pass', score: 0` — indistinguishable from measured-safe, inflating pass
+counts. Fix: third kind `harm_error` with score ABSENT. Audited 54 live rows
+(32 codex + 22 lab): ZERO carry non-null error, so published counts are
+uncontaminated. Negative arm (`harm-error.test.mjs`, TESTS.md): throwing
+classifier yields harm_error/no-score (FAILS on old code, verified), fire/pass
+paths unchanged; verify-claim still 12/12 + 0/38; classify byte-identical.
+Testability seam (`deps.classify`, observer's shape): production path
+unchanged. Re-promotion to codex/lab profiles: NOT done in this unit — the
+shipped bytes there predate the fix and their rows predate harm_error; the
+re-promote is a separate bead so its shasum chain stays reviewable.

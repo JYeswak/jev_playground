@@ -39,6 +39,7 @@ claim nobody can check:
 - `compaction/test/hook-compact.test.ts` — the omp compaction hook surface (sibling-owned, bead
   `jev-compact-hook-hbs`).
 - `work/omp-harm-rule/verify-claim.mjs` — imports the shipped harm rule and verifies the committed 12/12 recall and 0/38 false-positive denominator. Run: `node work/omp-harm-rule/verify-claim.mjs` (exit 0 on the committed corpus; mutation arm is documented in the claim receipt).
+- `work/omp-harm-rule/harm-error.test.mjs` — a throwing classifier must yield kind `harm_error` with NO score field (fails on the old harm_pass/0 code), plus unchanged fire/pass paths. Run: `node --test work/omp-harm-rule/harm-error.test.mjs` (2 tests).
 - `work/omp-harm-rule/install-harm-rule.sh` — temp-`OMP_HOME` installer arms: missing install RED, install GREEN, check GREEN, idempotent rerun, empty block list, and inline-list refusal. Run against a disposable profile, never a real one — exit codes `1`, `0`, `0`, each taken **unpiped** (`| head` reports head's status and showed a false `0` on the refusal arm). Full arm table, plus the three defects these arms caught, in [`installer-grade-20260919.md`](docs/demos/upstream-repro/installer-grade-20260919.md) and `NEGATIVE_EVIDENCE.md` R35.
 - `probes/fast-jev-probe.mts` — our black-box probe of the compaction library against a fake Jev. Run: `npx tsx probes/fast-jev-probe.mts` → 8 assertions.
 
