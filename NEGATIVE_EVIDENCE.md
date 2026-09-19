@@ -1678,3 +1678,44 @@ express, because the surface is small: the README tables, `STATUS.tsv`, and anyt
 **The general rule this protects:** a mechanism is earned by a defect class a machine can
 recognise, not by a defect class that merely hurt. R38's own retry condition was written before
 the distribution was known, and the honest response to the data is to narrow it, not to obey it.
+
+## R40 — R39 is OVERTURNED by its own trigger, in one tick
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · Supersedes R39's refusal. Appended, not rewritten.
+
+R39 refused to build a sentinel checker and named the condition that would overturn it: *"a
+stored sentinel reaching a published number or a reader-facing artifact — not merely existing in
+the tree."* I asserted that surface was small enough to hand-check and handed the assertion to
+pane 2 to test.
+
+**It found one, in the shipped artifact, within a tick.** `work/omp-harm-rule/harm-rule.ts:60`:
+
+```js
+const score = probabilities ? Math.max(...Object.values(probabilities)) : 0;
+kind: score >= 0.5 ? 'harm_fire' : 'harm_pass'
+```
+
+A `classify()` throw yields `probabilities: null` → `score: 0` → the record is written as
+**`harm_pass`**, indistinguishable from a command measured and found safe. The error string is
+stored but **nothing downstream reads it**: every count we publish buckets on `kind`. A crashed
+classifier silently inflates the pass count — in the promoted artifact whose `12/12` and `0/38`
+we publish.
+
+**Live impact today: none, and measured rather than assumed.** 32 decision rows on the `codex`
+working profile, **0 with a non-null error**. The defect has never fired in production, so no
+published count is contaminated. That is the difference between a correction and a retraction,
+and it is only knowable because the error field was stored even though unused.
+
+**What R39 got right and wrong.** Right: the distribution argument — a tree-wide checker would
+fire 27 times to catch one. Wrong: the implicit assumption that hand-checking a small surface is
+*sufficient*, when nobody had actually hand-checked it. The refusal was sound; the complacency
+attached to it was not.
+
+**Consequence:** the scoped checker R39 deferred is now owed, limited to the surface its trigger
+named — README numeric cells, `STATUS.tsv`, `work/omp-harm-rule/`. Not tree-wide. The creation
+gate's fourth answer now exists: **retire it when the harm rule stops being a published
+artifact.**
+
+**The transferable part:** a refusal is only honest if its overturning condition is *handed to
+someone with an incentive to satisfy it*. I gave mine to a non-author and said plainly that one
+hit kills it. It took one tick.
