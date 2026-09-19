@@ -51,3 +51,27 @@ are short, prompted, and developer-driven; production sessions are long,
 multi-pane, and adversarial. The 12/12 + 0/40 describes planted harms plus 40
 routine commands, not the wild. The extension is observe-only precisely so this
 gap costs log volume, never blocked work.
+
+## P3-15 appendix — co-presence bar MET; (a) refuted; my own silent-module fault
+
+Working bar: a session with observer decision rows NEXT TO a dcg-tool-bridge
+row carrying a real verdict. MET in
+`--private-tmp--/2026-09-19T18-56-09-857Z_01a0bb06` (luna): 4×
+tool_call_observed + 1× harm_pass (echo repair-probe) + 1× dcg_allow
+(js-bash id, real non-unknown verdict). Type note: the observer rows are
+`omp-harm-rule.decision.v1` (this lane's working observer); pane 2's
+`omp-jev-observer.decision.v1` type still has zero rows in any session.
+(a) REFUTED with evidence: dcg-tool-bridge IS in jev-lab's config extensions
+list and DOES fire (2 rows 18:51, 1 row 18:56). (b) (their accessor reading a
+possibly-absent ctx field) not ruled on from my data — my handler never reads
+ctx. Live key dump (mandated evidence, one run): event keys are exactly
+[type, toolName, toolCallId, input] — no verdict field on the event; verdicts
+live in bridge rows, joinable by toolCallId where namespaces align (here both
+js-bash, unjoinable to transcript calls per the corpus receipt).
+Causal bonus: my own extension reproduced the silent-zero-row defect (a lost
+`pi.on` line during editing = syntactically valid module that registers
+nothing; node --check passes it). Diagnosed via tsx import probe, repaired,
+re-proven live. Silent non-firing modules are now demonstrated twice.
+NO-CLAIM: lab-profile co-presence is not a working profile under real user
+traffic; js-bash ids in this session repeat the corpus finding (no transcript
+counterpart).

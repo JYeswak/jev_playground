@@ -27,6 +27,15 @@ function classify(command) {
 export default function harmRule(pi) {
   pi.on('tool_call', async (event) => {
     try {
+      if (process.env.HARM_RULE_DEBUG_KEYS === '1') {
+        try {
+          await pi.appendEntry(DIAG_TYPE, {
+            kind: 'ctx_event_keys',
+            eventKeys: event && typeof event === 'object' ? Object.keys(event) : typeof event,
+            timestamp: new Date().toISOString(),
+          });
+        } catch { /* never break the session */ }
+      }
       const toolName = event?.toolName ?? event?.name;
       const command = event?.input?.command ?? event?.command ?? event?.input?.cmd;
       try {
