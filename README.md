@@ -87,7 +87,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`jev-rerank-bench`|can Jev rerank thirty search results usefully|**RUN** — headlines reproduce; two scripts crash|raise `nevir` beyond one run; upstream report filed for the crash|
 |`jev-phishing-bench`|Jev against LLMs on phishing, with a stated **net floor**|**RUN** — floor reproduces exactly|the LLM comparison arms need an Anthropic key we do not hold|
 |`jev-sec-bench`|blind security benchmarks|**RUN**: Go TUI builds and renders; 3 committed result sets|it replicates our framing-leak effect at n=662, with the opposite lesson|
-|`jev-agent-failure-benchmark`|can a cheap decision model find what broke an agent|**RUN**: 20/20 with the pinned dataset, 18/20 without|its leakage test is one of the two that silently skip on a fresh clone|
+|`jev-agent-failure-benchmark`|can a cheap decision model find what broke an agent|**RUN**: 20/20 with `uv run --extra dev pytest`. A bare `uv run pytest` does not score at all — it **fails collection**, because the pinned `whowhen_eval` dependency is absent|its leakage test is one of the two that silently skip on a fresh clone|
 |`typesafe-ai-benchmark`|LLM structured output vs Jev on latency, cost, judgment|**RUN** (pane 3): 7/7 offline examples|its docs omit an install step; reported upstream|
 |`s1-rs`|typed System One decisions in Rust, `examples/triage.rs` offline|**RUN**: both examples, offline, via a linux/amd64 container|the blocker was a platform mismatch, routed around; `RCH-E327` is still unfixed upstream|
 |`jev-router`|per-turn model routing for Claude Code and Codex|**RUN** (pane 3): 58/58|upstream owns routing; ours narrows to the `blockedBy` histogram|
