@@ -100,8 +100,19 @@ npm --prefix "$lib" install --no-save --no-audit --no-fund "$dep_src" >/dev/null
 (cd "$lib" && node --input-type=module -e "await import('fast-jev-compaction')" >/dev/null 2>&1) \
   || fail "installed but unresolvable; aborting before copying sources"
 
-cp "$repo/compaction/src/omp-binding.ts" "$repo/compaction/src/omp-hook.ts" \
-   "$repo/compaction/src/omp-adapter.ts" "$lib/" || fail "copy of binding sources failed"
+# Same rule for the vendored sources, for the same measured reason (2026-09-19): a user edit to
+# .omp/lib/jev-compact/*.ts was overwritten with no warning and rc=0. Protecting only the hook
+# entry fixed the case I happened to test first and left this one identical.
+for src in "$repo/compaction/src/omp-binding.ts" "$repo/compaction/src/omp-hook.ts" \
+           "$repo/compaction/src/omp-adapter.ts"; do
+  dst="$lib/$(basename "$src")"
+  if [ -f "$dst" ] && ! cmp -s "$src" "$dst"; then
+    lib_backup="$dst.superseded-$(date -u +%Y%m%dT%H%M%SZ)"
+    cp "$dst" "$lib_backup" || fail "could not back up $dst"
+    echo "note: existing $dst differs from source; kept a copy at $lib_backup"
+  fi
+  cp "$src" "$dst" || fail "copy of binding source failed: $src"
+done
 # NEVER SILENTLY DESTROY A LOCAL EDIT. Measured 2026-09-19: re-installing over a target whose
 # jev-compact.ts the user had edited overwrote it, with no warning, no backup, and rc=0. An
 # installer we tell people to run against their own repos must not be a data-loss path. If the
