@@ -1,5 +1,5 @@
 // oracle-kit self-test. Every case is a defect this lane actually shipped today.
-import { auc, requireBoth, field, feasibility, ece, eProcess } from './index.mjs';
+import { auc, requireBoth, field, feasibility, ece, eProcess, requireKey, inspectKey } from './index.mjs';
 import assert from 'node:assert/strict';
 
 let pass = 0;
@@ -58,4 +58,20 @@ check('requireBoth names the caller', () => {
   assert.throws(() => requireBoth([true, true], 'myarm'), /myarm/);
 });
 
+
+// R33: absence must be proven against the record's own keys, never inferred from a failed lookup.
+throws('requireKey names every key present when the field is absent',
+  () => requireKey({ command: 'x', kind: 'harm_fire' }, 'toolCallId', 'decision'),
+  /Keys present: \[command, kind\]/);
+
+check('requireKey returns the value when present, and inspectKey reports evidence either way', () => {
+  assert.equal(requireKey({ command: 'chmod -R 777 /etc' }, 'command'), 'chmod -R 777 /etc');
+  const miss = inspectKey({ a: 1, b: 2 }, 'c');
+  assert.equal(miss.present, false);
+  assert.deepEqual(miss.keys, ['a', 'b']);   // absence reported WITH the key list
+  assert.equal(inspectKey({ noul: 0.9 }, 'noul').present, true);
+});
+
+throws('requireKey refuses a non-object rather than reporting a false absence',
+  () => requireKey(undefined, 'command', 'decision'), /not an object/);
 console.log(`\noracle-kit: ${pass}/${pass} checks passed`);

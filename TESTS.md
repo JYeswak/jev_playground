@@ -25,7 +25,11 @@ claim nobody can check:
   rather than score silence (`.distribution` / `.probability`). Plus positive observables: AUC
   separates a real signal in both directions, ECE is 0 when calibrated, and the e-process
   accumulates toward rejection while staying conservative on few observations.
-  Run: `node work/oracle-kit/test.mjs`.
+  Plus **R33's mechanical fix**: `requireKey` refuses to let absence be claimed without the
+  record's own key list in the error, and `inspectKey` returns that list alongside the lookup —
+  written after the eighth wrong-selector failure in one session, the only one that reached a
+  published receipt.
+  Run: `node work/oracle-kit/test.mjs` (13 checks).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything

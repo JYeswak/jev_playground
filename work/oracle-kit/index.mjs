@@ -96,3 +96,35 @@ export function eProcess(observations, { lambda = 0.5, p0 = 0.5, alpha = 0.05, m
   }
   return { e, reject: e >= 1 / alpha, threshold: 1 / alpha };
 }
+
+/**
+ * Absence is a claim and must be proven against the record's own keys.
+ *
+ * Written after the EIGHTH wrong-selector failure in one session (NEGATIVE_EVIDENCE R33 and its
+ * correction): a join was attempted, it returned nothing, and "the artifact cannot attribute its
+ * fires" was PUBLISHED — while the field sat on the row the whole time under a name nobody
+ * dumped. The same shape produced `.distribution` vs `.probabilities` (a constant 0.500 across
+ * three runs), `.probability` vs `.noul`, and a `"role": "toolResult"` grep whose spacing matched
+ * zero files.
+ *
+ * Eight repetitions means the written rule is not the fix. This is the mechanical one:
+ * you cannot report a field missing without having been shown what IS present.
+ *
+ * @throws with the full key list whenever the field is absent — so the error message itself is
+ *         the key dump the caller failed to run.
+ */
+export function requireKey(record, key, who = 'record') {
+  if (record === null || typeof record !== 'object') {
+    throw new Error(`${who}: not an object (${typeof record}); cannot claim '${key}' is absent`);
+  }
+  if (!(key in record)) {
+    throw new Error(`${who}: no '${key}'. Keys present: [${Object.keys(record).sort().join(', ')}]`);
+  }
+  return record[key];
+}
+
+/** Non-throwing counterpart: returns the value and the key list, so absence is always reported WITH evidence. */
+export function inspectKey(record, key) {
+  const keys = (record && typeof record === 'object') ? Object.keys(record).sort() : [];
+  return { present: keys.includes(key), value: record?.[key], keys };
+}
