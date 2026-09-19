@@ -386,3 +386,30 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
 - Outcome (b): no second pair — phishing/rerank/agent-failure/iammrduncan/router
   results carry aggregates, single judgments, or no truth; themsquared absent.
 - Receipt: `docs/demos/phi-second-pair-20260919.md`. Zero live calls.
+---
+
+## jev-0bp — upstream main does not compile on macOS (2026-09-19, pane 3, BLOCKED)
+
+- Clean export of origin/main@4ed4c9b to /tmp/sr-main (clone untouched at 3fe85c4).
+  RCH fleet refuses all builds (critical_pressure=4, local fallback disabled), so
+  native build via pristine `cargo-rch-real.bin` + pinned nightly rustc + isolated
+  target dir (shared cache was cross-toolchain poisoned, E0514).
+- BLOCKED with file:line: `src/cache/coordination.rs:574` uses
+  `crate::storage::...` unconditionally while `src/lib.rs:26` gates
+  `pub mod storage` behind `#[cfg(target_os = "linux")]` — E0433 on macOS.
+  Upstream defect, never patch; report-or-wait is the only move. Conductor's stable
+  toolchain tip (1.95.0) does not apply: this is a cfg bug, not a version skew.
+- Boundary: deps compiled (117s of real work); lib failed. No binary, no arms run.
+
+## jev-4vz — hook sweep: zero silent-passers, every branch empirically fired (2026-09-19, pane 3)
+
+- Hook -> behavior-on-missing-checker (scratch copies, real removals, never live):
+  `commit-msg` impl missing -> exit 1 REFUSE; lane-1 impl missing -> exit 1
+  STAGED_DELETION_REFUSED; lane-2 autofix missing -> exit 1 AUTOFIX_REFUSED;
+  lane-2 missing + JEV_ALLOW_MISSING_AUTOFIX=1 -> exit 0 with named SKIPPED line.
+- `.git/hooks/commit-msg` vs `githooks/commit-msg`: 4-line diff is message text
+  only (FOUNDRY_DIR default); both fail closed. No live divergence.
+- Impls are self-contained bash+git (no external checker binaries to go missing).
+  Foundry's own hooks NOT exercised (different repo; noted, not edited).
+- Fixes: none needed. NO-CLAIM: green-path (all-present) behavior covered by daily
+  use + gates, not re-proven here.
