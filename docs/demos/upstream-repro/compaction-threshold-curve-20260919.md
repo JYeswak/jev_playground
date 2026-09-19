@@ -61,3 +61,20 @@ Per session at t=0.5: grokbot 50 dropped/32 mistakes, harvest 49/39, orch 48/37.
 
 NO-CLAIM: the oracle is a token proxy for "needed", not ground truth (74% base
 rate proves its laxity); bytes≈chars; n=150 across 3 sessions, one model, one day.
+
+## Convergence with the JS arm (2c330e9, read after writing)
+
+The sibling arm (native JS SDK, library-built states, n=96×3, oracle with planted
+negatives: noise→0/200, end-of-transcript→0/200, real→~90%) lands the same
+verdict from the strong side: Jev@0.5 drops 98-99% (≈ drop-everything,
+indistinguishable from random/recency), keep-everything wins 7-23x. This arm
+agrees at every comparable point (my t=0.5 dropped 147/150 = 98%; keep-all has 0
+mistakes here by construction). Two differences bound the claims: (1) their
+oracle is control-validated, mine is not — my 74% base rate vs their ~90% is a
+threshold-definition gap (len>=5/hit>=1 vs their linear first/last-occurrence
+rule), and my non-discrimination result (0.361 vs 0.369) is robust to that gap
+but should be re-run under their oracle; (2) their states are library-faithful
+(transcript window), mine call-local — the fact that BOTH produce drop-rates
+near 98% suggests the threshold is wrong in more than one state regime, but only
+their arm proves it where the product actually runs. Joint reading: do not run
+this compactor on omp sessions; threshold tuning is futile in both regimes.
