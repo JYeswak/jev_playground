@@ -6,18 +6,37 @@ Measure what Jev can actually do before you build on it.
 
 ## TL;DR
 
-**The problem.** [Jev](https://typesafe.ai) is fast and cheap enough to call on every item, which
-makes it tempting to build things with it before knowing whether the thing is worth building. Most
-"AI could do this" ideas die on a measurement nobody took.
+**22 Jev repos appeared in launch week. We ran all of them; everything passed, and that proved
+nothing.** Substituting a well-formed RANDOM judge left 254 of 305 tests green (83%)
+([receipt](docs/demos/upstream-repro/random-judge-substitution-20260919.md)), and exactly one
+test across six repos scores Jev against a label it did not supply (same receipt). A suite that
+passes a coin flip is plumbing, not validation.
 
-**What this is.** A gauntlet, not a demo factory. Seventeen candidate ideas were adjudicated here and
-**zero were promoted** to their own project. The product is the ruling plus the evidence for
-everything ruled out.
+**So we built oracles instead: preregistered bars, data we did not author, seven candidates.**
+Three were measured both ways and all three fell the same direction: authored success,
+real-data miss: a gate at 0/20 false positives authored vs 3/20 held-out, foreman supervision
+at AUC 1.000 on vignettes vs 0.750 on 186,449 real windows, jev-review at 12/12 authored pairs
+vs AUC 0.625 on 22 real diffs
+([ruling](docs/demos/upstream-repro/RULING-authored-vs-real-20260919.md)).
 
-**What actually works.** Six recipes won on measurements taken here, each with the number behind it
-and the condition that ends it: [`RECIPES.md`](RECIPES.md). They sit outside the gauntlet on purpose.
-Every one came from running somebody else's benchmark rather than from a candidate we proposed, so
-none has been through this repo's promotion bar, and the count above stays at zero.
+**Under the finding sits the finding: prevalence decides deployability.** 30 stuck windows in
+186,449 is 0.016%. At that base rate the measured separator implies ~1 false alarm per 2,300
+true catches at any threshold that catches anything
+([receipt](docs/demos/upstream-repro/foreman-supervision-adoption-20260919.md)). Nobody publishes
+a base rate next to their accuracy, including us until this week: eight ledger rows now carry one
+([receipt](docs/demos/upstream-repro/prevalence-retrofit-20260919.md)).
+
+**What Jev IS good at, stated fairly.** Ties a TF-IDF classifier trained on ~14,800 in-domain
+labels at zero labels (McNemar p=0.677), holds 0.97–0.99 under shift where that classifier
+collapses to 0.70 ([receipt](docs/demos/upstream-repro/judgment-quality-20260919.md)); 96.5% on
+prompt injection with context
+([receipt](docs/demos/upstream-repro/jev-sec-bench-20260918.md)); beats skillranker's
+always-abstain control 5× on their own corpus
+([receipt](docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md)).
+
+**Scoreboard, present tense:** 25 verdict rows (7 cleared, 9 held, 8 ruled out, **0 promoted**),
+31 dead-end ledger entries each with a reopen condition, 12 gate stages green. The product is the
+ruling plus the evidence for everything ruled out.
 
 **What you get.** Three tools that run offline with no API key, and read your own logs:
 
@@ -486,10 +505,32 @@ that three agents were editing at once. It adds a git worktree pinned to a commi
 there, and `cmp`s the executables. Its first run failed and found three stages that pass locally and
 cannot pass from a clone, which is how the fresh-clone caveat above got measured instead of assumed.
 
+## Mistakes we made
+
+Four instruments on this page produced wrong numbers before they produced right ones. Each is
+kept here because a repo that omits its own errors is asking to be trusted, and trust is not
+on offer here — only receipts.
+
+- **A guessed field name scored a constant and fabricated a null.** Three router runs read
+  `r.answers.tier.distribution`; the field is `probabilities`, so every score was 0 and the
+  AUC came back exactly 0.500 three times — which looks exactly like "no signal." The fix is
+  procedural: open the installed declarations before claiming about an API
+  ([SDK-SURFACE](docs/demos/SDK-SURFACE.md)), and make scorers throw on a missing field so
+  silence can never again read as measurement.
+- **A degenerate label returned NaN and nearly published as a finding.** A feasibility arm with
+  only one class present yields an undefined AUC; the refusal path (HARNESS BLIND, no verdict)
+  exists because that arm fired here, not as theory.
+- **An invented gate nearly published "Jev abstains on everything."** A loss table scored a
+  free-text gate at 0.750 with 11 of 12 abstentions; scored the way the product actually works
+  (bounded Choice with an abstain option) the same run gives 0.167/0.800
+  ([receipt](docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md)).
+- **A dead build was narrated as running, twice.** A backgrounded `cargo build` died with its
+  parent shell while its stale log line looked like progress
+  ([R29](NEGATIVE_EVIDENCE.md)). Rule since: check the process, not the log.
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
-|---|---|---|
+
 | `SyntaxError` or `Cannot find module` on any tool | node older than 20, or missing | `node --version`, then install node >= 20 |
 | `gates.sh` red on `40-omp-compact-replay` | no `compaction/node_modules` in a fresh clone | `npm install --prefix compaction` |
 | `gates.sh` red on `50-house-gates` | no Beads database, only the tracked JSONL | `br import` |
@@ -510,11 +551,11 @@ Runtimes, measured on an M3 Ultra: `foundation/gates.sh` about 16 s, of which st
 
 ## Limitations
 
-**Nothing has been promoted.** Seventeen candidates adjudicated: four ruled out, five cleared, eight
-held, **zero promoted** to their own project. That is the deliverable rather than a shortfall, and
-every reason lives in [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 19 entries, each carrying the
-condition that would reopen it. One candidate died there because an MIT-licensed tool already ships
-its surface, which is a reason to stop building and not a reason to build faster.
+**Nothing has been promoted.** 25 verdict rows (7 cleared, 9 held, 8 ruled out, **0 promoted**).
+That is the deliverable rather than a shortfall, and every reason lives in
+[`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 31 entries, each carrying the condition that would
+reopen it. One candidate died there because an MIT-licensed tool already ships its surface, which
+is a reason to stop building and not a reason to build faster.
 
 **A fresh clone cannot run one of the twelve gate stages**, and the reasons are in Quick start above.
 There is no bootstrap step that closes both, so `scripts/verify-frozen.sh` fails at HEAD by design
@@ -551,10 +592,15 @@ pointed at another shape reports zero turns, which is a visible result rather th
 
 ## Status
 
-**17 candidate ideas ruled, 0 promoted.** Zero is the honest number: promotion means an idea
-earned a deeply-planned project, and none has. The verdicts and their receipts are in
-`docs/demos/STATUS.tsv`; what was ruled out and what would reopen it is in `NEGATIVE_EVIDENCE.md`,
-which currently holds 27 entries.
+**25 verdict rows, 0 promoted, with one promotion awarded and retracted the same day.** Foreman
+supervision cleared its bar on authored vignettes (AUC 1.000 twice), then scored 0.750 on 186,449
+real windows and was moved off rung 5 by its author. The retraction is the system working, not
+failing. Verdicts and receipts: `docs/demos/STATUS.tsv`; reopen conditions:
+`NEGATIVE_EVIDENCE.md` (31 entries).
+
+**Open questions, honestly.** Class-D (does the agent's answer change?) is unmeasured: the
+ablate-and-rerun harness is built and frozen, its model arms pending a quiet window. Two verdicts
+are unsafe pending the same window. Everything else above ran.
 
 **22 of 22 upstream Jev repositories have been run**, not read. That sweep produced the one
 shipped-code defect on this page (a `typesafe-sdk-js` timeout that kills a default Node process)
