@@ -110,6 +110,21 @@ reading the script, so the list is evidence, not reassurance:
 | you edited `SKILL.md` | same — and re-install now *refreshes* it, which it previously never did |
 | a sibling hook of your own | untouched |
 | read-only target | fails closed: `RED: cannot create dirs`, **nothing created** |
+| **installed hook actually fires** | **yes — proven outside this repo**, see below |
+
+The last row is the one that matters, because every earlier version of this section could only
+claim *placement*. Installed into a scratch target, then omp run **from that directory** with a
+key and a prompt large enough to trigger compaction:
+
+```
+2026-09-19T08:20:33Z passthrough: below minimum reduction: 0% reduction; no tool calls
+```
+
+The hook loaded from a foreign repo, resolved its vendored dependency, was handed a real
+compaction event, and returned a reasoned decision. `passthrough` is the correct answer there —
+a single huge prose turn has no tool results to drop — and it is a *decision*, not a failure to
+load. Placement is no longer the boundary; what remains unproven is a measured **reduction**,
+which needs a session whose older prefix contains tool calls.
 
 **Not tested:** a symlinked `.omp`, two installs running at once, and a target whose `node_modules`
 you have modified (it is replaced wholesale, without comparison). Backups are copies, not merges —
