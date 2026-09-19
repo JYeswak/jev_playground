@@ -924,3 +924,36 @@ the question rather than measurements of it, and either would have been publisha
 
 **Retry condition:** if a future upstream version changes `maxStateTokens` or the truncation
 policy, re-run the probe — it is ~50 lines against `fitState` and takes under a minute.
+
+## R25 — "real sessions have no candidates" was an artefact of my test inputs (2026-09-19)
+
+Every live firing of the hook today ended `passthrough: 0% reduction; no tool calls`, and I
+explained it the same way each time: *a single huge prose turn has no tool results to drop*. True
+of the input, and I let it stand as if it described real sessions.
+
+Measured with upstream's own `collectToolCalls` over every real omp session on this machine, no
+API key needed:
+
+| | sessions |
+|---|---|
+| fit the state budget | 1,566 |
+| of those, **have at least one candidate** | **1,513 (96.6%)** |
+| zero candidates | 53 |
+| refused, too large (R24) | 86 |
+
+**88,288 candidates in total**, and the distribution is not thin: 566 sessions carry **50+**, 771
+carry 11–50. Real sessions are candidate-rich. My synthetic probes — a 1.6 MB prose prompt piped
+into `omp -p` — are the unrepresentative case, not the sessions.
+
+**So the honest reading of every passthrough today inverts.** They do not show that compaction
+rarely applies; they show that *my forcing method never produced a transcript it could apply to*.
+The hook has still never reduced a live session, and the reason is now known to be the test
+harness rather than the workload.
+
+**What is still unmeasured:** whether Jev would answer *drop* for those candidates. Candidates are
+the upper bound on benefit, not the benefit — each one costs a keyed request to resolve, and
+88,288 of them is not a measurement anyone should run casually.
+
+**Retry condition:** a keyed replay over a stratified sample (say 20 sessions across the 3–10,
+11–50 and 50+ bands) with the cost stated up front. That converts the upper bound into a real
+distribution of savings; nothing smaller should be called "how much this saves".
