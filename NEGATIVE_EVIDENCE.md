@@ -1719,3 +1719,51 @@ artifact.**
 **The transferable part:** a refusal is only honest if its overturning condition is *handed to
 someone with an incentive to satisfy it*. I gave mine to a non-author and said plainly that one
 hit kills it. It took one tick.
+
+## R41 — two conductor suspicions refuted in one tick, and a citation I could not verify
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · Refuted predictions and an unverified citation.
+
+### 1. The installer registration scare was wrong
+
+I observed that our installer writes a **bare** `- harm-rule` while every live profile registers
+by **absolute path**, and raised it as a suspected R29-class defect — a valid-syntax,
+never-firing registration in the artifact strangers run. I explicitly did **not** claim it was
+broken, because I could not find the loader.
+
+**Refuted empirically.** Pane 2 installed via our own installer into a disposable profile and
+got a harm-rule decision row **and** a `dcg_allow` neighbour sharing `toolCallId a77abec0…` in
+one fresh session — verified against a firing neighbour, never against silence (R29's own rule).
+**Bare names load. `harm-rule.ts` is an acceptable filename. The installer is unchanged.**
+
+**But the source citation is UNVERIFIED BY ME.** The receipt cites `loader.ts:518-562`; I
+searched and found only a TUI component of that name, not an extension loader. The empirical
+proof stands on its own and is what the conclusion rests on. **Do not cite `loader.ts:518-562`
+as evidence** until someone opens it at that path. The relative-path form was also never
+exercised.
+
+### 2. I contradicted a correct peer with a broken selector — the ninth, then a tenth
+
+Jev reported a live Jev call in the observer. I scanned for it, found **"0 rows with real
+probabilities"**, and was about to treat a correct claim as unsupported. The payload sits at
+**`customType.data`**, not top-level `data`; my scan read `{}`. The row is real:
+`flag 0.04 / pass 0.96`, `error: null`, `378ms`.
+
+That is the **ninth** wrong-selector failure of this session. The `requireKey` commit predicted
+its shape precisely: *"a helper cannot force anyone to call it… the ninth instance will come
+from code that never imported `requireKey`."* It came within hours, in the author's own hands.
+
+A **tenth** followed immediately: my live kind counter returned 16 rows it could not classify —
+same nested shape — so I **refused to publish the pass/fire tally** rather than print a number I
+could not trust.
+
+### What this pair is evidence for
+
+Both suspicions were mine, both were specific, both were wrong, and **both were settled by
+someone else running something**. The lane's error rate is not falling; what changed is that
+wrong conductor claims now die inside one tick instead of reaching a published receipt.
+
+**Retry condition:** none for (1) — reopen only if an install produces zero rows against a
+firing neighbour. For (2): the mechanical fix exists and I did not use it. If an eleventh
+occurs, the honest conclusion is that `requireKey` cannot be adopted voluntarily and the
+inspection path itself must be the only way to read these files.
