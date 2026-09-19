@@ -63,9 +63,18 @@ compactor first — it is not vendored here, and the installer prints these exac
 missing:
 
 ```bash
-mkdir -p upstream/tamaratran
-git clone https://github.com/tamaratran/fast-jev-compaction upstream/tamaratran/fast-jev-compaction
+git clone https://github.com/tamaratran/fast-jev-compaction fast-jev-compaction
+(cd fast-jev-compaction && npm install && npm run build)
 ```
+
+**The build is not optional.** The package exports `./dist/index.js`, which npm publishes but git
+does not carry, so a bare clone resolves to nothing and the installer aborts. This exact sequence
+— clone, build, install — was run end to end from a fresh clone of this repository on
+2026-09-19 and ended `PASS`, rc=0.
+
+It is cloned to the **repo root**, not under `upstream/` — the installer reads
+`$repo/fast-jev-compaction`. An earlier version of this page said `upstream/tamaratran/`, which
+was wrong: following it exactly still failed, verified from a clean clone.
 
 Then:
 

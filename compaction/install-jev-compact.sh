@@ -85,8 +85,11 @@ if [ ! -d "$dep_src" ]; then
     "" \
     "This repo does not vendor fast-jev-compaction. Fetch it, from the repo root:" \
     "" \
-    "    mkdir -p upstream/tamaratran" \
-    "    git clone https://github.com/tamaratran/fast-jev-compaction upstream/tamaratran/fast-jev-compaction" \
+    "    git clone https://github.com/tamaratran/fast-jev-compaction fast-jev-compaction" \
+    "    (cd fast-jev-compaction && npm install && npm run build)" \
+    "" \
+    "The build step is NOT optional: the package exports ./dist/index.js, which is published to" \
+    "npm but not committed to git, so a bare clone resolves to nothing." \
     "" \
     "then re-run this installer." >&2
   exit 1
@@ -112,7 +115,10 @@ npm --prefix "$lib" install --no-save --no-audit --no-fund "$dep_src" >/dev/null
 # The package is ESM-only ("import" condition, no "require"), so resolve it the way the hook
 # loader will: a bare import from inside the lib dir.
 (cd "$lib" && node --input-type=module -e "await import('fast-jev-compaction')" >/dev/null 2>&1) \
-  || fail "installed but unresolvable; aborting before copying sources"
+  || fail "installed but unresolvable -- if $dep_src is a git clone, it needs a build:
+    (cd $dep_src && npm install && npm run build)
+  the package exports ./dist/index.js, which npm publishes but git does not carry.
+  aborting before copying sources"
 
 # Same rule for the vendored sources, for the same measured reason (2026-09-19): a user edit to
 # .omp/lib/jev-compact/*.ts was overwritten with no warning and rc=0. Protecting only the hook
