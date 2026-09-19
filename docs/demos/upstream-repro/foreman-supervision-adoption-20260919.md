@@ -84,3 +84,17 @@ stands as a decision-shape result only.
 
 NO-CLAIM (P3-7): labels are predicate-mechanical (intervention regex,
 write-tool list), not human review; n=20 scored; one model, one run each.
+
+## Prevalence appendix — checked myself, it holds (pane 3, 2026-09-19)
+
+Conductor's prevalence argument, verified from my own real_scores.jsonl rather
+taken on authority: at 80% recall on the stuck sample (8/10), sample FP is 3/10.
+Scaled to the mined population (30 stuck of 186,449 windows): ~24 true catches
+against ~55,791 false alarms, roughly 1:2300. Even at the sample's 0-FP point
+the n=10 upper bound leaves thousands-to-one. At 0.016% prevalence the 0.750
+separator is unusable at any threshold that catches a meaningful fraction —
+suppressing FP to parity (~30) demands a threshold that also zeroes recall.
+Consequence, stated as my own conclusion: supervision on this signal needs the
+base rate changed (trigger only in already-suspicious contexts) or a far
+stronger separator; threshold choice cannot fix prevalence. oracle-kit
+self-test green 1/1 file-level (node --test work/oracle-kit/test.mjs).
