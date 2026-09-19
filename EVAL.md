@@ -363,3 +363,14 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   channel. Reason 1 withdrawn.
 - DEFER now rests on Reason 2 alone (conceded decisive): `summary` is required prose; Jev returns
   judgments. Receipt amended: `docs/demos/omp-seam-fqo-20260919.md`.
+---
+
+## skillranker @3fe85c4 — built, ran, README ahead of code (2026-09-19, pane 3)
+
+- RCH build finished but E327 (Linux ELF, unexecutable here); ran via Docker,
+  repo read-only. Only `doctor` is implemented (`src/cli.rs:14`;
+  `src/adapter.rs:505-512` gates the rest behind P2-P6 phases).
+- `doctor --config --json` PASS (20 built-in settings, network off, shadow mode);
+  `demo`/`capabilities`/`roster`/`rank` return `unavailable/invalid-usage` — absent,
+  not failed. `cargo test` and keyed runs NO-CLAIM.
+- Receipt: `docs/demos/upstream-repro/skillranker-20260919.md`. Clone untouched.
