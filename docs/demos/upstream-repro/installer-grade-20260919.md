@@ -45,3 +45,23 @@ grep without `\b` fires; the word-boundary form is the correct proof.)
 Arms tried: fresh profile, re-run, no-key config, inline-empty config.
 Not tried: read-only dir, rollback-after-double-run, non-UTF8 config,
 Windows line endings. Real-profile installs: none, by unit order.
+
+## Round 2 — five breakage arms, no fourth defect (pane 3, fixed installer)
+
+All exit codes taken UNPIPED. Fixture profiles under /tmp (OMP_HOME), never
+real. Baseline on block-form config: install 0.
+
+1. read-only extensions dir: exit 1, LOUD (cp fails), config unmodified, no
+   duplicate entry. Clean.
+2. double-run then single rollback: pristine config restored byte-identical,
+   file gone, --check RED (1). The kept-pristine-.bak fix holds. Clean.
+3. `extensions:` key present but EMPTY: proper block item appended, parses,
+   `['harm-rule']`, exit 0. Clean.
+4. preexisting harm-rule.ts, unlisted: old content preserved to
+   harm-rule.ts.bak, new installed, exit 0. Clean.
+5. commented `# - harm-rule`: correctly ignored (not matched as installed),
+   real entry appended once, parses to one item. Clean.
+
+"No fourth defect found in the five arms tried." Remaining uncovered (stated,
+not attempted): non-UTF8 config, Windows line endings, concurrent installs,
+real profiles.
