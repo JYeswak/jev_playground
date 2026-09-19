@@ -25,30 +25,38 @@ like-for-like. Ship the classifier; drop Jev from `tool_call`
 ([head-to-head](docs/demos/upstream-repro/toolcall-headtohead-20260919.md)).
 **Jev was not bad** — 11/12 is strong in isolation. Cost-benefit, not capability.
 
-**Five-link chain, all receipts on this tip:**
+**Five-link chain — only what this tip can verify.** Links 1–4 are lab/corpus
+receipts. Link 5 is **NOT VERIFIABLE** as working-dogfood.
 
 1. **earns** — 12/12, FP **0/38**, verify-claim exits 0
    ([harm-rule-claim-repro-20260919.md](docs/demos/upstream-repro/harm-rule-claim-repro-20260919.md)).
-2. **registered** — `extensions:` list, loader glob `*.{ts,js}`; lab `jev-lab`, then
-   one working profile (`codex`)
-   ([harm-rule-shipped-20260919.md](docs/demos/upstream-repro/harm-rule-shipped-20260919.md),
-   [harm-rule-promoted-20260919.md](docs/demos/upstream-repro/harm-rule-promoted-20260919.md)).
+   Historical **0/40** is unreproducible; **NO-CLAIM** on the missing two.
+2. **registered** — `extensions:` list, loader glob `*.{ts,js}`; lab `jev-lab`
+   ([harm-rule-shipped-20260919.md](docs/demos/upstream-repro/harm-rule-shipped-20260919.md)).
 3. **fires** — both directions on luna and sol in lab
    ([harm-rule-shipped-20260919.md](docs/demos/upstream-repro/harm-rule-shipped-20260919.md)).
-4. **fires correctly** — **0/17** unique-command divergence vs the frozen scorer
-   ([harm-rule-conformance-20260919.md](docs/demos/upstream-repro/harm-rule-conformance-20260919.md)).
-5. **runs on real work** — one working profile, **`codex`** (not `claude`, not all);
-   first contact clean; rollback unused
-   ([harm-rule-promoted-20260919.md](docs/demos/upstream-repro/harm-rule-promoted-20260919.md)).
-   Organic precision is unmeasured
+4. **fires correctly (lab)** — **0/17** unique-command divergence vs the frozen scorer
+   ([harm-rule-conformance-20260919.md](docs/demos/upstream-repro/harm-rule-conformance-20260919.md),
+   `bb4fa4f`). Lab shapes ≠ every profile.
+5. **working-profile dogfood — NOT VERIFIABLE / OPEN.** Receipt
+   [harm-rule-promoted-20260919.md](docs/demos/upstream-repro/harm-rule-promoted-20260919.md)
+   (`6c9c8fc`) **exists on this tip**. It is one driven first-contact probe, not
+   multi-row live logger traffic on a working profile. **Do not publish RUNS ON
+   REAL WORK.** Organic precision is unmeasured
    ([harm-rule-realtraffic-20260919.md](docs/demos/upstream-repro/harm-rule-realtraffic-20260919.md)).
+   Jev ledger **0 promoted**.
 
 **Silent-register rule.** A module with valid syntax and no `pi.on` never fires —
 indistinguishable from a hook that sees nothing. The co-presence bar is observer
 decisions next to a bridge row in the same session
 ([harm-rule-shipped-20260919.md](docs/demos/upstream-repro/harm-rule-shipped-20260919.md)).
-Observer claim **(B) is still open** — do not fold it into this win. No
-working-dogfood claim ([`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md)).
+Observer **(B) id-join is a mechanism MET at n=1 lab** (`a2e2035`;
+[omp-jev-observer-id-join-20260919.md](docs/demos/upstream-repro/omp-jev-observer-id-join-20260919.md)):
+`toolCallId` stored; defaulted `context.dcgVerdict` deleted from the makeRecord
+path. Residual: `createObserver` / `installObserver` still defaults
+`context.dcgVerdict ?? 'unknown'` on the gate path. **Working-profile dogfood
+OPEN.** Do not publish working-dogfood
+([`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md)).
 
 **22 Jev repos appeared in launch week. We ran all of them; everything passed, and that proved
 nothing.** Substituting a well-formed RANDOM judge left 254 of 305 tests green (83%)
@@ -78,9 +86,13 @@ on **216k** dcg decisions, frozen split **36,955** train / **41,500** held-out, 
 text at decision time. Pane 3 withdrew the revert-predicate as INVALIDATED; `isError` survived.
 Fail-open is verified at `dcg-guard.ts:599-610`. Lab observer: session
 co-presence **MET** (10 sessions); id-join **mechanism MET at n=1**
-(`a2e2035` stores `toolCallId`; 1 nonempty id, 1 join). Observer claim
-**(B) is still open** — do not fold it into the harm-rule win. No
-working-dogfood claim. See [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
+(`a2e2035` stores `toolCallId`; 1 nonempty id, 1 join; defaulted
+`context.dcgVerdict` deleted from the makeRecord path). Residual:
+`createObserver` / `installObserver` still defaults
+`context.dcgVerdict ?? 'unknown'` on the gate path. **Working-profile
+dogfood OPEN** — no multi-row live logger on a working profile. Do not
+fold that into the harm-rule win. See
+[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
 
 **What Jev IS good at, stated fairly.** Ties a TF-IDF classifier trained on ~14,800 in-domain
 labels at zero labels (McNemar p=0.677), holds 0.97–0.99 under shift where that classifier
@@ -92,8 +104,8 @@ always-abstain control 5× on their own corpus
 
 **Scoreboard, present tense:** 25 verdict rows (7 cleared, 9 held, 8 ruled out, **0 promoted**),
 31 dead-end ledger entries each with a reopen condition, 12 gate stages green. Tool_call
-**RULE WINS** — ship the classifier, drop Jev (cost-benefit). Observer (B) still
-open. Proven vs WIP seams:
+**RULE WINS** — ship the classifier, drop Jev (cost-benefit). Observer (B)
+mechanism MET at n=1 lab; working-profile dogfood **OPEN**. Proven vs WIP seams:
 [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). The product is the
 ruling plus the evidence for everything ruled out.
 
