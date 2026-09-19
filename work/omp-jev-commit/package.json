@@ -1,0 +1,12 @@
+{
+  "name": "omp-jev-commit",
+  "version": "0.1.0",
+  "description": "Observe-only check that a commit message describes its staged diff. Scores at commit time; never blocks.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["omp-plugin", "omp-extension", "pi-package", "jev", "git", "observe-only"],
+  "omp": { "extensions": ["./src/index.ts"] },
+  "pi": { "extensions": ["./src/index.ts"] },
+  "files": ["src", "README.md"],
+  "scripts": { "test": "node --experimental-strip-types --test test/" }
+}
