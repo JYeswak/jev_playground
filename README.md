@@ -210,6 +210,11 @@ the scoring done by a pane that authored none of them:
 | Jev | 11/12 | 0/40 | **no** — needs a live model |
 | dumb baseline | 5/12 | 0/40 | recall **yes**; FP **historical only** |
 
+**The rows do not share a denominator.** The rule's `0/38` is what a committed corpus supports
+today; the historical rows were scored against 40 benign cases, two of which are now lost. So
+this table is *not* a like-for-like false-positive comparison any more, and the recall column
+(12/12 vs 11/12 vs 5/12) is the part that still compares cleanly.
+
 ~~~bash
 node work/omp-harm-rule/verify-claim.mjs      # exits 0, 12/12 recall and 0/38 FP
 ~~~

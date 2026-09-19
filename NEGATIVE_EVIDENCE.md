@@ -1459,3 +1459,36 @@ times in one session and published it once.
 
 **Standing consequence:** the ship is **not** invalidated. Rollback remains conditioned on a
 **non-probe, ordinary-work fire**, which has not been observed.
+
+## R34 — we lost two cases out of the forty behind our own headline number
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · Outcome (c) of three offered; the other two failed.
+
+The README published **`0/40` false positives** for the shipped harm rule from `d1ec069`. When a
+verifier was finally written (`work/omp-harm-rule/verify-claim.mjs`, pane 2, non-author), only
+**38 of the 40 benign cases were recoverable from any committed file**. Recovery was attempted
+from the head-to-head receipt, `work/bicameral-gate/oracle.mjs`, and git history. The two cases
+are gone.
+
+**What was done:** the published number is now **`0/38`**, against a committed corpus the script
+reproduces at `rc=0`. Reconstruction was rejected — inventing two benign cases to restore a round
+number is how a corpus becomes fiction.
+
+**The order of operations was the defect.** We published a number, shipped an installer citing
+it, and wrote the verifier *afterwards*. Between `d1ec069` and `ad9da04` the most-read document
+in this repo carried a false-positive rate no reader could check. The rule was never wrong; the
+**claim** was unverifiable, and those are different failures with the same appearance.
+
+**Second-order cost, now visible in the README:** the table no longer shares a denominator. The
+rule's `0/38` and the historical `0/40` rows are not a like-for-like comparison, so the
+false-positive column has stopped being a comparison at all. Only the recall column
+(12/12 vs 11/12 vs 5/12) still compares cleanly. One lost pair of cases degraded a published
+head-to-head into a half-comparison.
+
+**Rule:** **the verifier ships with the claim, not after it.** A number in a public document
+without a committed reproduction is an unverifiable claim regardless of how carefully it was
+measured — and the measurement being honest is exactly what makes the gap invisible.
+
+**Retry condition:** if the two benign cases surface in an uncommitted working tree, a session
+log, or another machine's checkout, commit them and restore `0/40` — but only with provenance
+stated. Absent that, `0/38` is the permanent published figure.
