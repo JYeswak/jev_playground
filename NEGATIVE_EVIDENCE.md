@@ -1264,3 +1264,29 @@ and prompt construction move that number.
 **Retry condition:** rebuild only when that second question is the one being asked — and then run
 it in a supervised process (`hub start`), not backgrounded with `&`, so its exit code is
 observable.
+
+## R30 — the local-model verdicts are confounded: the box was shared
+
+**Recorded:** 2026-09-19 · **Level:** `[live]` · Raised by Joshua, not discovered by us.
+
+> *"i have other testing going on locally with stuff so dont mark anything 100% done until we test
+> more thoroughly in a quiet window"*
+
+Everything this lane measured through the **local oMLX server** ran on a machine with other
+testing active. Affected, and now downgraded:
+
+- **LocalJev `STILL-BLOCKED`** (three hypotheses refuted: state length, output budget,
+  reasoning tokens). "Did not complete within window" is **indistinguishable from resource
+  contention**. The three refutations may be sound or may be noise; we cannot tell from here.
+- **The class-D ablate-and-re-run**, dispatched tonight, calls the same server.
+
+**Unaffected:** every result obtained through the hosted TypeSafe API, and every offline
+recomputation from committed upstream data. Those do not touch the shared box.
+
+**Rule:** a verdict whose evidence is "it did not finish in time" requires a **quiet-window
+re-run** before it is terminal. Timing is the one measurement that shared hardware silently
+corrupts, and `STILL-BLOCKED` reads exactly like a defect while being a scheduling artifact.
+
+**Retry condition:** re-run the LocalJev 40-case set and the class-D arms in a confirmed quiet
+window. If LocalJev completes, the three "refuted" hypotheses were never tested and the BLOCKED
+verdict is withdrawn, not merely updated.
