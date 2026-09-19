@@ -168,7 +168,9 @@ before any share. No API key. No network.
 python3 ensemble/run_all.py
 ```
 
-Runs in about a second against data already in this repo. Averaging two scorers is folk wisdom;
+Runs in about a second. Needs one upstream clone first — this repo does not redistribute
+their 5.7 MB of scores, and the script prints the exact `git clone` if it is missing. Averaging
+two scorers is folk wisdom;
 these four pairs show when it pays and when it costs you:
 
 | pair | phi (error correlation) | accuracy gap | averaging gained |

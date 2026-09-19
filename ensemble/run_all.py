@@ -68,7 +68,20 @@ def phish_pair():
 
 def main() -> int:
     if not R.exists():
-        print(f"missing {R} -- upstream clone not present", file=sys.stderr)
+        # A READER HITS THIS, NOT US. The scores live in an upstream clone that this repo
+        # gitignores, so a fresh `git clone` of jev_playground cannot run this script -- verified
+        # 2026-09-19 against the public repo: rc=2. Failing closed is right; failing closed with
+        # no way forward is not, so say exactly what to fetch.
+        print(
+            f"missing {R}\n"
+            "\nThis needs upstream's committed scores, which are NOT redistributed here (5.7 MB,\n"
+            "someone else's data). Fetch them, from the repo root:\n"
+            "\n    mkdir -p upstream/bitnovus\n"
+            "    git clone https://github.com/bitnovus/jev-spam-eval upstream/bitnovus/jev-spam-eval\n"
+            "\nNo API key and no training are needed after that -- the scores are committed in\n"
+            "their repo and this script only reads them.",
+            file=sys.stderr,
+        )
         return 2
     print(f"{'pair':28s} {'phi':>8s} {'gain':>9s}  verdict")
     results = []

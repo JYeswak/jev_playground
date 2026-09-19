@@ -1,8 +1,16 @@
 # Should you average two scorers, or just use the better one?
 
 A 120-line module that answers this before you build the ensemble, plus the evidence that it is
-worth asking. Runs offline against data already in this repo: **no API key, no training, no
-network.**
+worth asking. **No API key, no training, no network** — but it does need upstream's committed
+scores, which this repo does not redistribute (5.7 MB of someone else's data). One clone:
+
+```bash
+mkdir -p upstream/bitnovus
+git clone https://github.com/bitnovus/jev-spam-eval upstream/bitnovus/jev-spam-eval
+```
+
+Without it the script exits 2 and prints those commands. Verified against a fresh clone of this
+repository on 2026-09-19 — the earlier wording claimed the data was already here, and it is not.
 
 ```bash
 python3 ensemble/run_all.py          # four pairs, real data, ~1 second
