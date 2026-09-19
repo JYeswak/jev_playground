@@ -113,6 +113,11 @@ obstacle. Everything else is untouched, which is the honest state.
 
 |Repo|The question it answers|State|Next action|
 |---|---|---|---|
+| `jev-spam-eval` | does a plain-English question beat a classifier trained on labels | **RUN** — both headlines reproduce ([receipt](docs/demos/upstream-repro/lingspam-20260918.md), [OOD](docs/demos/upstream-repro/jev-spam-eval-ood-20260918.json)) | fetch the other three datasets; check the out-of-distribution claim |
+| `jev-rerank-bench` | can Jev rerank thirty search results usefully | **RUN** — headlines reproduce; two scripts crash ([receipt](docs/demos/upstream-repro/jev-rerank-bench-20260918.json)) | raise `nevir` beyond one run; upstream report filed for the crash |
+| `jev-phishing-bench` | Jev against LLMs on phishing, with a stated **net floor** | **RUN** — floor reproduces exactly ([receipt](docs/demos/upstream-repro/phishing-20260918.md)) | the LLM comparison arms need an Anthropic key we do not hold |
+| `s1-rs` | typed System One decisions in Rust, `examples/triage.rs` offline | **RUN**: both examples, offline, via a linux/amd64 container ([receipt](docs/demos/upstream-repro/s1-rs-20260918.md)) | the blocker was a platform mismatch, routed around; `RCH-E327` is still unfixed upstream |
+| `jev-router` | per-turn model routing for Claude Code and Codex | **RUN** (pane 3): 58/58 ([receipt](docs/demos/upstream-repro/router-savings-inverts-20260919.md)) | upstream owns routing; ours narrows to the `blockedBy` histogram |
 | `jev-sec-bench` | blind security benchmarks | **RUN**: Go TUI builds and renders; 3 committed result sets | it replicates our framing-leak effect at n=662, with the opposite lesson ([receipt](docs/demos/upstream-repro/jev-sec-bench-20260918.md)) |
 | `jev-agent-failure-benchmark` | can a cheap decision model find what broke an agent | **RUN**: 20/20 with `uv run --extra dev pytest` ([receipt](docs/demos/upstream-repro/agent-failure-benchmark-20260918.md)) | its leakage test is one of the two that silently skip on a fresh clone |
 | `jev-ultrafast` | a browser agent driven by Jev | action-choice smoke run: 20/20 top-1, 0/10 false advance, $0.0003 ([receipt](docs/demos/upstream-repro/jev-ultrafast-action-choice-20260919.md)) | class A only; live browser path still unrun |
