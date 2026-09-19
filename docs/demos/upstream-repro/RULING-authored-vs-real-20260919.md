@@ -76,3 +76,50 @@ with a measured re-run noise floor of ~0.006 AUC. Three of the real-data oracles
 ground truth — token reappearance, file-overlap-in-future-commits, and a predicate over tool-call
 timing — and each proxy carries noise that biases against the model by an unmeasured amount.
 "Failed on real data" here means *failed the bar we preregistered*, not *carries no signal*.
+
+---
+
+## SECOND AXIS, appended 2026-09-19 — a dumb baseline has now beaten the model on five surfaces
+
+The ruling above is about *how* we measure. This is about *what we found*, and it is the stronger
+claim because it is a clean sweep.
+
+| surface | the dumb baseline | margin |
+|---|---|---|
+| phishing verdict | a two-line domain regex | **+27 points** (McNemar p=1.5e-8) |
+| tier routing for cost | flat mid-tier pricing | Jev **+90.2% more expensive** on 643 real sessions |
+| router tier signal | prompt **length** | length won 2 of 3 sessions |
+| context compaction | **keep everything** | 7× fewer mistakes |
+| tool-call harm detection | **four regexes** | rule **12/12** vs Jev 11/12, both FP 0/40 |
+
+Five surfaces, five preregistered bars, five wins for the cheap thing. The last one is the
+cleanest because all three arms ran on a held-out split neither scoring pane authored, with the
+rule imported unmodified and shasum-verified (`toolcall-headtohead-20260919.md`).
+
+**Jev was not bad on any of them.** 11/12 recall with zero false positives on 40 benign commands
+is a strong result in isolation; 96.5% on prompt injection with context is excellent; it ties a
+classifier trained on ~14,800 labels while using **zero**. The finding is narrower and more
+useful: **it was never better than the cheap thing already available on that surface.**
+
+### The rule this produces
+
+**Where the harm is expressible, express it.** A judge earns its place only where a rule cannot
+be written — and across five surfaces we did not find such a place. Before wiring a model into a
+decision, write the regex first and make the model beat it. That test costs an hour and has now
+changed the answer five times out of five.
+
+### What would overturn this
+
+A surface where the deterministic baseline is genuinely unwritable — open-ended semantic
+judgement over text a rule cannot pattern-match, with ground truth we did not author. The spam
+and injection benchmarks are the closest existing evidence *for* that case: there Jev matched a
+trained classifier at zero labels and held under drift where the classifier collapsed. We have
+not yet found such a surface **inside omp**, which is where the integration has to live.
+
+## NO-CLAIM (second axis)
+
+Five surfaces on one machine, one operator, one model version, in one day. Four of the five
+baselines were chosen by us after seeing the model's failure mode, which biases toward the
+baseline — the tool-call head-to-head is the exception, where the rule was frozen and
+shasum-verified before the comparison. "Beaten" means *failed the preregistered bar against a
+cheaper alternative*, not *carries no signal*.
