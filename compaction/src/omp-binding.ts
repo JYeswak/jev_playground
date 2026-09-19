@@ -20,13 +20,32 @@
  */
 import { appendFileSync } from 'node:fs';
 import type { JevAsker, Message } from 'fast-jev-compaction';
+import { adaptOmpTranscript } from './omp-adapter.js';
 import { compactOmpTranscriptSafe, OMP_HOOK_DEFAULTS, type OmpHookConfig } from './omp-hook.js';
 
 /** The subset of omp's extension API this binding touches. */
+/**
+ * The envelope omp actually sends, discovered by logging its keys from a real `/compact` on
+ * 2026-09-19 — NOT from documentation. In-session docs described `{ messages }`; production sends
+ * `{ type, preparation, branchEntries, customInstructions, signal }`, and the transcript lives at
+ * `preparation.messagesToSummarize` alongside `recentMessages`, `tokensBefore` and `previousSummary`.
+ *
+ * Both shapes are accepted: `messages` first for whatever omp version documented it, then the
+ * observed path. A field name taken from docs and never fired is a guess; this one has a log line.
+ */
+export interface OmpCompactEvent {
+  messages?: readonly Message[];
+  preparation?: {
+    messagesToSummarize?: readonly Message[];
+    recentMessages?: readonly Message[];
+    tokensBefore?: number;
+  };
+}
+
 export interface OmpLike {
   on(
     event: 'session_before_compact',
-    handler: (event: { messages?: readonly Message[] }) => Promise<OmpCompactReturn | undefined>,
+    handler: (event: OmpCompactEvent) => Promise<OmpCompactReturn | undefined>,
   ): void;
 }
 
@@ -74,24 +93,76 @@ export function registerOmpCompactionHook(pi: OmpLike, deps: BindingDeps): void 
   };
 
   pi.on('session_before_compact', async (event) => {
-    const messages = event?.messages;
+    const messages = event?.messages ?? event?.preparation?.messagesToSummarize;
+    // ADAPT, do not assume. omp's live messages are {role, customType, content, display,
+    // details, attribution, timestamp} — observed from a real /compact — and are NOT
+    // fast-jev-compaction's Message {role, text, toolUses}. Handing them over raw failed in
+    // production with "undefined is not an object (evaluating 'tool of message.toolUses')".
+    //
+    // src/omp-adapter.ts already flattens exactly this content shape; it consumes `message_end`
+    // events, so the live messages are wrapped into that form rather than given a third mapper.
+    let adapted: readonly Message[] | undefined;
+    if (Array.isArray(messages) && messages.length > 0) {
+      const looksAdapted = typeof (messages[0] as { text?: unknown }).text === 'string'
+        && Array.isArray((messages[0] as { toolUses?: unknown }).toolUses);
+      if (looksAdapted) {
+        adapted = messages as readonly Message[];
+      } else {
+        try {
+          adapted = adaptOmpTranscript(
+            (messages as unknown[]).map((m) => ({ type: 'message_end', message: m as never })),
+          ).messages;
+        } catch (error) {
+          record('refused', `could not adapt omp messages: ${error instanceof Error ? error.message : String(error)}`);
+          return undefined;
+        }
+        if (!adapted || adapted.length === 0) {
+          // The adapter ran and produced nothing: the content-part shape differs too. Report the
+          // first message's role and its parts' `type` values — names only, never their text.
+          const m0 = messages[0] as { role?: unknown; content?: unknown };
+          const parts = Array.isArray(m0?.content)
+            ? (m0.content as Array<{ type?: unknown }>).map((c) => String(c?.type)).slice(0, 8).join('/')
+            : typeof m0?.content;
+          record('refused', `adapter yielded 0 of ${messages.length}; role=${String(m0?.role)} parts=${parts}`);
+          return undefined;
+        }
+      }
+    }
+
     // A malformed envelope is a KNOWN-BAD INPUT and must make the seam refuse, not guess.
-    if (!Array.isArray(messages) || messages.length === 0) {
-      record('refused', 'no messages on the event envelope');
+    if (!Array.isArray(adapted) || adapted.length === 0) {
+      // NAME WHAT ARRIVED. The first production firing (2026-09-19, three events from one
+      // `/compact`) refused every one with "no messages on the event envelope" — which was true and
+      // useless: it proved `event.messages` is not where omp puts the transcript, and gave nothing
+      // to fix it with. Logging the envelope's top-level KEYS (never their values, which are the
+      // transcript) turns the next refusal into the field name we need.
+      const shape = event && typeof event === 'object'
+        ? Object.keys(event as Record<string, unknown>).join(',') || '<no keys>'
+        : typeof event;
+      // One level deeper, still keys-and-counts only: which field holds the transcript?
+      const ev = (event ?? {}) as Record<string, unknown>;
+      const describe = (v: unknown): string =>
+        Array.isArray(v) ? `array[${v.length}]`
+          : v && typeof v === 'object' ? `{${Object.keys(v as object).slice(0, 12).join(',')}}`
+            : typeof v;
+      const detail = ['preparation', 'branchEntries']
+        .map((k) => `${k}=${describe(ev[k])}`)
+        .join(' ');
+      record('refused', `no messages on the event envelope; envelope keys: ${shape}; ${detail}`);
       return undefined;
     }
 
-    const outcome = await compactOmpTranscriptSafe(messages, deps.asker, config);
+    const outcome = await compactOmpTranscriptSafe(adapted, deps.asker, config);
     if (outcome.outcome !== 'compacted') {
       record('passthrough', outcome.reason);
       return undefined;
     }
-    if (outcome.messages.length >= messages.length) {
+    if (outcome.messages.length >= adapted.length) {
       // Defensive: a "compaction" that does not shrink is not a compaction.
       record('refused', 'compacted output was not smaller than its input');
       return undefined;
     }
-    record('compacted', `${messages.length} -> ${outcome.messages.length}`);
+    record('compacted', `${adapted.length} -> ${outcome.messages.length}`);
     return { compaction: { messages: outcome.messages } };
   });
 }

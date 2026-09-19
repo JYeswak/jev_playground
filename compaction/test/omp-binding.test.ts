@@ -143,7 +143,7 @@ test('every decision is appended to decisionLogPath, and a bad path cannot break
 
   const lines = readFileSync(logPath, 'utf8').trim().split('\n');
   assert.equal(lines.length, 2, 'one line per decision');
-  assert.match(lines[0], /^\d{4}-\d{2}-\d{2}T.*refused: no messages on the event envelope$/);
+  assert.match(lines[0], /^\d{4}-\d{2}-\d{2}T.*refused: no messages on the event envelope; envelope keys: /);
   assert.match(lines[1], /passthrough: /);
   assert.ok(!lines.join('\n').includes('sk-'), 'no key material reaches the log');
 
@@ -154,4 +154,29 @@ test('every decision is appended to decisionLogPath, and a bad path cannot break
     decisionLogPath: '/nonexistent-dir-xyz/decisions.log',
   });
   assert.equal(await fire2({}), undefined, 'a dead log sink must not break the handler');
+});
+
+// THE PRODUCTION ENVELOPE, pinned from a real firing rather than from docs. omp's in-session
+// documentation described `{ messages }`; a real `/compact` on 2026-09-19 sent
+// `{ type, preparation, branchEntries, customInstructions, signal }` with the transcript at
+// preparation.messagesToSummarize. Three refusals in the decision log are what found it.
+test('PRODUCTION SHAPE: the transcript is read from preparation.messagesToSummarize', async () => {
+  const { pi, fire } = stubPi();
+  const seen: string[] = [];
+  registerOmpCompactionHook(pi, {
+    asker: { ask: async () => { throw new Error('jev is down'); } },
+    onDecision: (o, r) => seen.push(`${o}:${r}`),
+  });
+
+  // The observed envelope, minus fields this handler does not read.
+  const out = await fire({
+    preparation: { messagesToSummarize: many(6), tokensBefore: 123456 },
+  } as never);
+
+  assert.equal(out, undefined, 'a dead Jev still passes through');
+  assert.ok(
+    !seen[0].startsWith('refused:'),
+    `the handler must FIND the transcript, not refuse the envelope: ${seen[0]}`,
+  );
+  assert.ok(seen[0].startsWith('passthrough:'), seen[0]);
 });
