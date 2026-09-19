@@ -16,16 +16,20 @@ Five-link chain (each with evidence):
 1. **earns** — 12/12 recall, FP **0/40** held-out; beat live Jev **11/12** and a dumber keyword
    list **5/12**
    ([receipt](docs/demos/upstream-repro/toolcall-headtohead-20260919.md), `f7bcd9d`).
-2. **registered** — `extensions:` list, loader glob `*.{ts,js}`, **one profile**.
-3. **fires** — id-join `toolCallId` to a real `dcg_allow`.
+2. **registered** — `extensions:` list, loader glob `*.{ts,js}`, **one profile** (`codex`).
+   Lab register on this tip was `jev-lab`
+   ([receipt](docs/demos/upstream-repro/harm-rule-shipped-20260919.md)).
+3. **fires** — id-join `toolCallId` to a real `dcg_allow`. **Cited, not re-derived on this
+   tip** — `work/omp-harm-rule/harm-rule.ts` here does not write `toolCallId`.
 4. **fires CORRECTLY** — **0/17** unique-command divergence. Cited local path
-   `docs/demos/upstream-repro/harm-rule-conformance-20260919.md` (`bb4fa4f`) — **not on this
-   tip**.
+   `docs/demos/upstream-repro/harm-rule-conformance-20260919.md` (`bb4fa4f`) — **object
+   absent from this checkout and from GitHub**.
 5. **RUNS ON REAL WORK** — promoted to the working omp profile **`codex`** (not `claude`, not
    all). 5 harm rows (2 decision + 3 diagnostic) + 2 bridge; zero errors; rollback unused. Panes
    1/2/3 run on `codex` = this lane's own first real traffic. Cited local path
-   `docs/demos/upstream-repro/harm-rule-promoted-20260919.md` (`6c9c8fc`) — **not on
-   `origin/main`**. This chapter is cut from `f556b1f`.
+   `docs/demos/upstream-repro/harm-rule-promoted-20260919.md` (`6c9c8fc`) — **object absent
+   from this checkout and from GitHub**. This chapter is cut from `f556b1f`. Facts 3–5 are
+   cited, not re-derived.
 
 **The five-surface dumb-baseline pattern**
 ([ruling](docs/demos/upstream-repro/RULING-authored-vs-real-20260919.md)): (1) a two-line domain

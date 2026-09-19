@@ -22,9 +22,10 @@ on five surfaces to cheaper alternatives — never because it was bad, always be
 was as good or better. The integration that survived contains none of it. **Not a Jev promotion.
 The ledger stays 0 promoted.**
 
-**Tip note.** Prefer SHA `6c9c8fc` (`harm-rule-promoted`). That object is **absent** from
-`origin/main` (this chapter is cut from `f556b1f`). Conformance SHA `bb4fa4f` is likewise absent.
-Cited local receipt paths below; facts 4–5 are from those paths, not re-derived on this tip.
+**Tip note.** Prefer SHA `6c9c8fc` (`harm-rule-promoted`). That object is **absent from this
+checkout and from GitHub** (`git cat-file` fails; GitHub 422). Conformance SHA `bb4fa4f` is
+likewise absent. This chapter is cut from `f556b1f`. Cited local receipt paths below; facts
+3–5 are **cited, not re-derived**.
 
 ### Five-link chain
 
@@ -32,9 +33,9 @@ Cited local receipt paths below; facts 4–5 are from those paths, not re-derive
 |---|---|---|
 | 1 | **earns** | 12/12 recall, FP **0/40** held-out; beat Jev **11/12** and dumb **5/12**. [`toolcall-headtohead-20260919.md`](demos/upstream-repro/toolcall-headtohead-20260919.md) (`f7bcd9d`). |
 | 2 | **registered** | `extensions:` list in the profile `agent/config.yml`; loader globs `*.{ts,js}`; **one profile**. Lab register: [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md) (`287f4b9`, `jev-lab`). Working-profile register is `codex` only. |
-| 3 | **fires** | id-join `toolCallId` to a real `dcg_allow`. Event keys are `[type, toolName, toolCallId, input]` — no verdict on the event. Join the bridge at read-time. |
-| 4 | **fires CORRECTLY** | **0/17** unique-command divergence. Cited path `docs/demos/upstream-repro/harm-rule-conformance-20260919.md` (`bb4fa4f`) — **not on this tip**. |
-| 5 | **RUNS ON REAL WORK** | Promoted to working omp profile **`codex`** (not `claude`, not all). 5 harm rows (2 decision + 3 diagnostic) + 2 bridge; zero errors; rollback unused. Panes 1/2/3 run on `codex` = this lane's own first real traffic. Cited path `docs/demos/upstream-repro/harm-rule-promoted-20260919.md` (`6c9c8fc`) — **not on this tip**. |
+| 3 | **fires** | id-join `toolCallId` to a real `dcg_allow`. Event keys on this tip are `[type, toolName, toolCallId, input]` — no verdict on the event. **Cited, not re-derived:** `work/omp-harm-rule/harm-rule.ts` on this tip does not write `toolCallId` onto its rows. Join the bridge at read-time. |
+| 4 | **fires CORRECTLY** | **0/17** unique-command divergence. Cited path `docs/demos/upstream-repro/harm-rule-conformance-20260919.md` (`bb4fa4f`) — **object absent from this checkout and from GitHub**. |
+| 5 | **RUNS ON REAL WORK** | Promoted to working omp profile **`codex`** (not `claude`, not all). 5 harm rows (2 decision + 3 diagnostic) + 2 bridge; zero errors; rollback unused. Panes 1/2/3 run on `codex` = this lane's own first real traffic. Cited path `docs/demos/upstream-repro/harm-rule-promoted-20260919.md` (`6c9c8fc`) — **object absent from this checkout and from GitHub**. |
 
 Source on this tree: `work/omp-harm-rule/harm-rule.ts`. Observe-only. Every path returns `undefined`.
 dcg remains the only blocker. Zero model calls in the shipped path.
@@ -181,11 +182,11 @@ Session co-presence has now been observed (6 sessions, lab only), so that condit
 
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
-| harm-rule (four regexes, no Jev call) | observe-only on **`codex`** (one profile); 5 harm + 2 bridge rows, 0 errors | five-link chain above; **not** a Jev product promotion | **no** |
+| harm-rule (four regexes, no Jev call) | observe-only on **`codex`** (one profile); 5+2 row counts **cited, not re-derived** (`6c9c8fc` absent) | five-link chain above; **not** a Jev product promotion | **no** |
 | tool_call head-to-head | RULE WINS; ship classifier, drop Jev | rule 12/12 vs Jev 11/12 vs dumb 5/12, both FP 0/40; cost-benefit kill | no |
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
 | dogfood / observe-and-log | `jev-lab`: observer **14** decision / **33** diagnostic rows; bridge **13**; **6** sessions co-present | **partial** — session co-presence MET, id-join **0** (no `toolCallId`, all `dcgVerdict` defaulted `unknown`); lab only. Claim **(B) STILL OPEN** | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
-Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (offline-only; do not read as live-working), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/upstream-repro/harm-rule-shipped-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31. Conformance and promoted receipts are cited by local path and are **not on this tip**.
+Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (offline-only; do not read as live-working), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/upstream-repro/harm-rule-shipped-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31. Conformance and promoted receipts are cited by local path; those SHAs are **absent from this checkout and from GitHub**.
