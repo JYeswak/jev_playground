@@ -1236,3 +1236,31 @@ detector is deployable.
 **Retry condition:** if a fourth instance appears *after* these rules are in force, the rules are
 insufficient and the lane needs a mechanical gate — a `HELD-OUT:` field in the manifest that
 `RUN` refuses to proceed without — rather than a written rule.
+
+## R29 — a backgrounded build died with its parent, and I narrated its log as progress
+
+**Recorded:** 2026-09-19 · **Level:** `[live]`
+
+`cargo build --release` for `skillranker` at `origin/main` was launched backgrounded with `&` and
+routed through rch. It died with the parent shell: **no `cargo` process, no `target/` directory,
+and the `build_rc=` line my own command appends never landed** — `grep -c build_rc` → 0.
+
+I reported it as "still building" **twice**, because the log's last line
+(`Updating git repository …asupersync`) looks like progress. A stale log line is not a live
+process. This is the third variant today of the same class — did-not-run read as
+ran-and-found-nothing — after a wrong field name scoring a constant `0.500` and a degenerate
+label returning `NaN`.
+
+**Rule:** before reporting a long job as running, check the **process**, not its log:
+`pgrep -f` plus the log's mtime. A completion marker the command itself writes (`echo rc=$?`) is
+the only proof it finished; its absence is proof it did not.
+
+**It cost nothing, which is the interesting part.** `work/skillranker-eval/oracle.mjs` measured
+Jev on skillranker's corpus under their loss table *without their binary* — mean loss 0.167,
+top-1 precision 0.800 — because the judgement question is Jev's, not the Rust ranker's. The
+binary would answer a **different** question: how skillranker's own roster validation, retrieval
+and prompt construction move that number.
+
+**Retry condition:** rebuild only when that second question is the one being asked — and then run
+it in a supervised process (`hub start`), not backgrounded with `&`, so its exit code is
+observable.
