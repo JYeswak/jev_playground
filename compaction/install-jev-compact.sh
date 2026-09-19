@@ -102,6 +102,16 @@ npm --prefix "$lib" install --no-save --no-audit --no-fund "$dep_src" >/dev/null
 
 cp "$repo/compaction/src/omp-binding.ts" "$repo/compaction/src/omp-hook.ts" \
    "$repo/compaction/src/omp-adapter.ts" "$lib/" || fail "copy of binding sources failed"
+# NEVER SILENTLY DESTROY A LOCAL EDIT. Measured 2026-09-19: re-installing over a target whose
+# jev-compact.ts the user had edited overwrote it, with no warning, no backup, and rc=0. An
+# installer we tell people to run against their own repos must not be a data-loss path. If the
+# existing entry differs from the template, it is preserved beside the new one and the divergence
+# is announced -- the install still proceeds, because refusing would strand a stale hook in place.
+if [ -f "$entry" ] && ! cmp -s "$entry_src" "$entry"; then
+  backup="$entry.superseded-$(date -u +%Y%m%dT%H%M%SZ)"
+  cp "$entry" "$backup" || fail "could not back up the existing hook entry at $entry"
+  echo "note: existing $entry differs from the template; kept a copy at $backup"
+fi
 cp "$entry_src" "$entry" || fail "copy of hook entry failed"
 cp -r "$skill_src" "$skill" || fail "copy of skill failed"
 
