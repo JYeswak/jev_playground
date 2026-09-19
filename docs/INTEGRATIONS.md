@@ -27,7 +27,7 @@ True harm is strictly below 3.95% (benign errors: grep-no-match etc.) and unmeas
 
 Of 216,507 decisions, 79,743 resolve to a command AND an outcome (**36.8%**). The 63.2% miss is one mechanistic class, not random loss: 136,718/136,764 miss tids (99.997%) are `js-bash-<uuid>` — a foreign id namespace with no transcript mapping (`toolcall-groundtruth-corpus-20260919.md:27-35`). History recovers barely a third.
 
-**The logger must capture command text at decision time.** That is why `work/dogfood-logger/` exists. Decision rows carry exactly `{kind, toolCallId}` — no command (`dcg-block-rate-prior-20260919.md:46-51`).
+**The logger must capture command text at decision time.** That is why `work/dogfood-logger/` exists. Decision rows carry exactly `{kind, toolCallId}` — no command (`dcg-block-rate-prior-20260919.md:46-51`). The shipped harm rule does capture `command` at decision time; see `NEGATIVE_EVIDENCE.md` R33 and its correction.
 
 ### Pane 3 withdrew the revert-predicate (INVALIDATED)
 
@@ -67,30 +67,46 @@ tail ~/.jev-compact.log
 
 `refused` / `passthrough` / `would-compact` are decisions. No new line means the hook did not run — not a silent success.
 
-## WIP: observe-and-log / dogfood logger — fires on jev-lab; session co-presence MET, id-join NOT
+## WIP: observe-and-log / dogfood logger — fires on jev-lab; co-presence MET, id-join proven at n=1, working profile OPEN
 
 The append-only decision/outcome logger lives at `work/dogfood-logger/`. Its schema, join, concurrent appends, and rotation are tested locally (`work/dogfood-logger/test/logger.test.mjs`; receipt `docs/demos/upstream-repro/dogfood-logger-20260919.md`). The observer library is at `work/omp-jev-observer/` (offline: 5 tests; receipt `docs/demos/upstream-repro/omp-jev-observer-20260919.md`).
 
-**Measured on the `jev-lab` profile's session JSONL (counts re-derived, not quoted):**
+**Measured on the `jev-lab` profile's session JSONL (counts re-derived by the conductor at
+2026-09-19T21:50Z, not quoted from a callback):**
 
 | row type | count |
 |---|---|
-| `com.zeststream.omp-jev-observer.decision.v1` | **14** |
-| `com.zeststream.omp-jev-observer.diagnostic.v1` | **33** |
-| `com.zeststream.omp-dcg-bridge.decision.v1` | **13** (all `kind=dcg_allow`) |
-| sessions containing observer decision **and** bridge rows | **6** |
+| `com.zeststream.omp-jev-observer.decision.v1` | **28** |
+| ├ with a nonempty `toolCallId` | **1** |
+| ├ `dcgVerdict: "unknown"` (defaulted, legacy) | **27** |
+| └ `dcgVerdict` absent (correct, post-`a2e2035`) | **1** |
+| `com.zeststream.omp-jev-observer.diagnostic.v1` | **55** |
+| `com.zeststream.omp-dcg-bridge.decision.v1` | **27** (all `kind=dcg_allow`) |
+| joins by `toolCallId` to a same-session bridge row | **1** |
+| sessions containing observer decision **and** bridge rows | **10** |
 
-Three separate claims, and only the first is met:
+Three separate claims. The first is met, the second is met **as a mechanism at n=1 in a lab
+profile only**, and the third is open:
 
-- **(A) Session co-presence — MET.** Six lab sessions carry observer decision rows alongside
+- **(A) Session co-presence — MET.** **Ten** lab sessions carry observer decision rows alongside
   `com.zeststream.omp-dcg-bridge.decision.v1` rows with a real verdict.
-- **(B) Id-join — NOT met.** All **14** observer decisions carry `dcgVerdict: "unknown"`, and the
-  observer rows carry no `toolCallId`, so the id-level join to bridge rows is **0**. The event
-  exposes `[type, toolName, toolCallId, input]` and **no verdict**, so the original
-  `context.dcgVerdict` read a field that does not exist: those `unknown`s are defaults, not
-  observations. The non-duplication filter is therefore **corrected, not working-as-designed**.
-- **(C) Working profile — NOT claimed.** Everything above is `jev-lab`, a disposable profile.
-  None of it is evidence about a working profile under real user traffic.
+- **(B) Id-join — MECHANISM MET, n=1, lab only.** `a2e2035` wired `event.toolCallId` into
+  decision records and **deleted** the fictional `context.dcgVerdict ?? 'unknown'` default.
+  Re-derived live: **28** observer decisions, **1** with a nonempty `toolCallId`, **27** bridge
+  rows, **1 join by id**. `dcgVerdict` is `unknown` on the **27** legacy rows and **absent** on
+  the **1** new row — absent is the correct state; the event exposes
+  `[type, toolName, toolCallId, input]` and **no verdict**, so every `unknown` was a default,
+  never an observation. Receipt `docs/demos/upstream-repro/omp-jev-observer-id-join-20260919.md`;
+  gate note `GATES.md` (`0b21798`).
+  **One join is a mechanism, not a rate.** It proves the wiring; it says nothing about how often
+  joins succeed, and it is not dogfood evidence.
+  **Residual:** `createObserver` still defaults `context.dcgVerdict` on the gate path. That
+  fiction is not fully removed.
+  **The cross-namespace seam is untouched.** Observer↔bridge joins because both are `js-bash-*`;
+  observer↔`tool_execution_start` (`call_…|fc_…`) remains refused at overlap **0**
+  (`GATES.md:152-158`).
+- **(C) Working profile — STILL OPEN, not claimed.** Everything above is `jev-lab`, a disposable
+  profile. No multi-row live logger exists on a working profile. **Promoted: 0.**
 
 An earlier version of this section reported *0 observer rows against 1 bridge row*. That was true
 when written and is now stale; the zero-row cause was a module with valid syntax whose `pi.on`
@@ -119,7 +135,14 @@ A `tool_call` observer on `bash` would fire on every bash in every session, so t
 4. **jsm preconditions** — the installed file must be self-contained. `9e6c88d` imported `../../dogfood-logger/src/logger.mjs`, a parent path that does not exist after a copy into `~/.omp`. `348894e` inlined the record builder so the extension no longer depends on a repo-relative parent.
 5. **The loader must actually load it.** Globs `*.{ts,js}`. Config is `extensions:` in the profile `agent/config.yml`. A register that writes 0 rows while another extension writes rows is not loaded — verify against a known-firing neighbour, never against silence alone.
 
-Session co-presence has now been observed (6 sessions, lab only), so that condition is met. The remaining conditions for calling the observer working are the **id-level join** (currently 0: no `toolCallId` on observer rows, all verdicts defaulted to `unknown`) and a **working profile under real traffic**, which has not been attempted. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`.
+Session co-presence is met (**10** sessions, lab only). The id-level join is now proven as a
+**mechanism at n=1** — `a2e2035` stores `event.toolCallId` and drops the defaulted verdict, and
+**1** of **28** observer decisions joins a same-session bridge row by id. That is wiring, not a
+rate. The remaining condition for calling the observer **working** is a **working profile under
+real traffic**, which has not been attempted: no multi-row live logger exists outside `jev-lab`,
+and **promoted is 0**. There is no dogfood or observer file under `.omp/hooks/` on this tip; the
+only pre-hook in this tree is `jev-compact`. A residual `context.dcgVerdict` default still exists
+on the `createObserver` gate path.
 
 **Where a probabilistic judge belongs.** Only on what regex cannot express. The dcg prior is now on this tip: [`docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md`](demos/upstream-repro/dcg-block-rate-prior-20260919.md) — 49,661 allow / 488 block = **0.97%**.
 
@@ -129,7 +152,7 @@ Session co-presence has now been observed (6 sessions, lab only), so that condit
 |---|---|---|---|
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log | `jev-lab`: observer **14** decision / **33** diagnostic rows; bridge **13**; **6** sessions co-present | **partial** — session co-presence MET, id-join **0** (no `toolCallId`, all `dcgVerdict` defaulted `unknown`); lab only | no |
+| dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1** (`a2e2035`, receipt `omp-jev-observer-id-join-20260919.md`); working profile under real traffic **OPEN**; lab only | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (offline-only; do not read as live-working), `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
