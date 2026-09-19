@@ -302,3 +302,16 @@ results. `pi-subagents` and `jev-sec-bench` involved no Jev call at all.
 session; `pi-subagents`' 23 failures are unTRIAGED and no upstream report was filed for them; and the
 `evidence-auditor` agent — the one that checks whether claims are supported by their sources — is
 installed in the clone and **still has not been pointed at a single claim of ours**.
+
+
+## omp seam — live, 2026-09-18
+
+`compaction/src/omp-binding.ts` driven end to end: a real omp transcript
+(`fixtures/omp-session-big-20260917.jsonl`, 179 events → 13 messages) compacted **13 → 8 in
+1,282 ms** by one live call to `api.typesafe.ai`, `jev-latest` → `jev-1.13.0`, key supplied through
+`infisical run` and absent from the tree.
+
+Rung reached: **L2+**, not L3. The success, outage and malformed-envelope paths are all exercised,
+the last two by committed tests; but **omp itself has never loaded the binding**, so the
+"fires in a real session" half of §4 remains open and the install is gated to a human.
+Receipt: [`docs/demos/omp-seam-live-20260918.md`](docs/demos/omp-seam-live-20260918.md).

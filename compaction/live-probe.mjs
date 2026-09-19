@@ -1,0 +1,11 @@
+import { readFileSync } from 'node:fs';
+import { adaptOmpTranscript } from '/Users/josh/Developer/jev/compaction/src/omp-adapter.ts';
+import { registerOmpCompactionHook } from '/Users/josh/Developer/jev/compaction/src/omp-binding.ts';
+import { JevClient } from 'fast-jev-compaction';
+const raw = readFileSync('/Users/josh/Developer/jev/compaction/fixtures/omp-session-big-20260917.jsonl','utf8');
+const { messages } = adaptOmpTranscript(raw.split('\n').filter(Boolean).map(l=>JSON.parse(l)));
+let h; const pi={on:(_e,f)=>{h=f;}}; const seen=[];
+registerOmpCompactionHook(pi,{asker:new JevClient({apiKey:process.env.TYPESAFE_API_KEY}),onDecision:(o,r)=>seen.push([o,r])});
+const t0=Date.now(); const out = await h({messages});
+console.log('in',messages.length,'out',out?out.compaction.messages.length:'undefined','ms',Date.now()-t0);
+console.log('decision',JSON.stringify(seen));
