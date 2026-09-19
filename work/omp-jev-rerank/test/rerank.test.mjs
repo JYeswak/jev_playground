@@ -60,14 +60,14 @@ test('content that is a bare string, not an array of parts, is ignored rather th
 });
 
 test('a scored list records scores, hit count, and the count actually scored', withFetch(
-  answers({ answers: { definitional: { noul: 0.81 }, ordered: { noul: 0.22 }, noise: { noul: 0.4 } } }),
+  answers({ answers: { ordered: { noul: 0.22 } } }),
   async () => {
     const h = host();
     ompJevRerank(h.pi);
     await h.fire(grepResult(42));            // above MAX_HITS, must be capped
     const [row] = decisions(h);
     assert.equal(row.d.kind, 'rerank_scored');
-    assert.deepEqual(row.d.scores, { definitional: 0.81, ordered: 0.22, noise: 0.4 });
+    assert.deepEqual(row.d.scores, { ordered: 0.22 });
     assert.equal(row.d.hitCount, 42, 'the real hit count is reported');
     assert.equal(row.d.scoredCount, 30, 'only MAX_HITS candidates were sent');
     assert.equal('error' in row.d, false);
@@ -101,7 +101,7 @@ test('a transport failure records rerank_error and never throws into the host', 
 ));
 
 test('a host whose appendEntry throws still returns undefined', withFetch(
-  answers({ answers: { definitional: { noul: 0.5 } } }),
+  answers({ answers: { ordered: { noul: 0.5 } } }),
   async () => {
     const h = host();
     ompJevRerank({ on: h.pi.on, appendEntry: async () => { throw new Error('sink down'); } });

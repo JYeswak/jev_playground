@@ -10,20 +10,35 @@ infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- omp   # see ..
 
 Mined from `jev-rerank-bench` (RUN; headline reproduces from its committed cache).
 
+## One question, because measurement killed the other two
+
+The first draft asked three questions. `measure.mjs` ran them against four cases whose answers
+we know by construction — definition first, definition buried, mostly noise, all noise:
+
+| question | behaviour across 4 cases | verdict |
+|---|---|---|
+| `definitional` | said **no** every time, including when the definition was hit #1 | constant — cut |
+| `noise` | said **yes** every time, including on a list with zero irrelevant hits | constant — cut |
+| `ordered` | 4/4 correct, scores moved 0.90 / 0.11 / 0.96 / 0.23 with the actual ordering | kept |
+
+Total agreement was 8/12 against a coin-flip baseline of 6 — which looks like weak signal until
+you split it, and then two of the three questions turn out not to depend on their input at all.
+**A question whose answer does not change with the input is not a cheap signal; it is noise with
+a confidence attached.**
+
+Reproduce:
+
+```bash
+infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
+  node --experimental-strip-types work/omp-jev-rerank/measure.mjs
+```
+
 ## It scores. It does not reorder.
 
-Nothing here changes what the agent sees, and that is not temporary caution — **the first live
-run disagreed with ground truth on two of three questions**:
-
-| question | live score | ground truth |
-|---|---|---|
-| `definitional` — is the definition in the first three hits? | **0.05** | yes, it was hit #1 |
-| `ordered` — is the list already best-first? | 0.92 | correct |
-| `noise` — is >half irrelevant? | **0.94** | no, all 22 hits were relevant |
-
-One run proves nothing about accuracy in either direction, but it is the opposite of a reason to
-act on these scores. This lane has twice watched a model headline invert on real data (R28, the
-router savings backtest). Scoring first, acting later, and only if a measurement earns it.
+`ordered` discriminates on four hand-built cases. That is not evidence it helps on real search
+traffic, so nothing here changes what the agent sees. This lane has twice watched a model
+headline invert on real data (R28, the router savings backtest). Scoring first, acting later,
+and only if a measurement on real traffic earns it.
 
 ## Decision rows
 
