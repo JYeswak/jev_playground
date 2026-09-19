@@ -5380,3 +5380,36 @@ debt with no owner and no plan. It now reads as closed with its re-open list att
 rather than accumulating.** Everything else that has been "closed" this session was closed by being
 *fixed*; this one is closed by being **ruled not worth fixing, by a non-author, with the evidence for
 that stated.** Those are different and the second is rarer.
+
+### CORRECTION appended 2026-09-19 — A CORRECTED METRIC DID NOT PRODUCE A SINGLE ADOPTION
+
+> Joshua: *"why do we keep using broken/bunk oracles that keep denying any progress — that is the
+> worst thing we can do, especially when we have a huge corpus of oracle examples"*
+
+The 2026-09-18 correction above fixed the *wording* of the success metric. Twenty-four hours later
+the count is **21 ruled, 0 promoted**. So the barrier was never the sentence; it is mechanical, and
+three mechanisms were found by opening controls rather than by argument:
+
+1. **No oracle in this lane had an arm that could return YES.** Proven, not asserted: an
+   omniscient `perfect` judge — dropping exactly the tool results never substantively reused —
+   scored 27.2% / 29.3% savings at 0% loss and **still failed** the conductor's own preregistered
+   bar. When a perfect candidate fails, the instrument is broken, not the candidate.
+2. **Every rung-4 row in `STATUS.tsv` is a kill**, and the only rung-3 `CLEARED` rows are authored
+   by the conductor. Rung 5 precondition 1 requires each rung cleared by a **non-author**, so
+   promotion was unreachable — not by rule, but because **an adoption test had never once been
+   dispatched**. (Precondition 2, "no candidate currently promoted", is *satisfied* at zero
+   promoted; a scout reported it as an unsatisfiable bootstrap blocker and that reading is wrong.)
+3. **Refusal is cheap and adoption is expensive**, so an agent under time pressure produces kills.
+
+**Three rules, effective now:**
+
+- **Every oracle MUST include an arm that ought to pass** — a perfect/omniscient arm, or a
+  known-good candidate. If nothing can pass, report the broken instrument, not a verdict. This
+  costs one extra arm and catches an impossible bar in a single run instead of after five kills.
+- **Preregister the threshold in the file, before the run**, and count the benefit in the unit the
+  product actually delivers — bytes, dollars, seconds — never in incidents. A benefit counted
+  per-incident and a cost counted per-byte cannot be summed, and that incommensurability is what
+  made keep-everything unbeatable.
+- **A candidate clearing rung 3 MUST get a non-author adoption test dispatched**, with a
+  preregistered bar whose satisfaction means PROMOTE. Leaving a `CLEARED` row to sit is the
+  failure this section exists to end.
