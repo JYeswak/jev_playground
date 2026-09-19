@@ -19,6 +19,7 @@
 // arm does not clear 0.80, the harness is blind and NO verdict about the router is reported.
 import { readFileSync } from 'node:fs';
 import { TypeSafeClient, choice, score, noul } from '@typesafe-ai/sdk';
+import { auc as kitAuc, field } from '../oracle-kit/index.mjs';
 
 const HARD_CALLS = 5, EASY_CALLS = 2, AUC_BAR = 0.70, MARGIN_BAR = 0.05, ARM_BAR = 0.80;
 const rows = readFileSync(process.argv[2], 'utf8').split('\n').filter(Boolean)
@@ -55,13 +56,7 @@ const sample = [...pick(easies, per), ...pick(hards, per)];
 const hard = sample.map(t => t.calls >= HARD_CALLS);
 const hasPath = sample.map(t => /[\w-]+\/[\w./-]+|\.\w{2,4}\b/.test(t.prompt));   // feasibility arm label
 
-const auc = (scores, labels) => {
-  const A = scores.filter((_, i) => labels[i]), B = scores.filter((_, i) => !labels[i]);
-  if (!A.length || !B.length) return NaN;
-  let w = 0, t = 0;
-  for (const a of A) for (const b of B) { if (a > b) w++; else if (a === b) t++; }
-  return (w + 0.5 * t) / (A.length * B.length);
-};
+const auc = (scores, labels) => kitAuc(scores, labels).value;
 
 const client = new TypeSafeClient({ apiKey: process.env.TYPESAFE_API_KEY });
 const TIERS = { mechanical: 'Mechanical and local: a rename, a small edit, a lookup.',
@@ -80,11 +75,10 @@ for (const t of sample) {
   // The field is `probabilities`, NOT `distribution`. Using the wrong name yields a constant 0
   // score and therefore an all-ties AUC of exactly 0.500 -- which is what three bogus REJECT runs
   // reported before this was caught. Fail loudly instead of scoring silence.
-  const d = r.answers.tier.probabilities;
-  if (!d) throw new Error('tier answer carried no probabilities: ' + JSON.stringify(r.answers.tier));
+  const d = field(r.answers.tier, 'probabilities');
   // rank = expected tier index, so the whole distribution is used rather than the argmax alone
   tierRank.push((d.ordinary ?? 0) * 1 + (d.hard ?? 0) * 2);
-  armScore.push(Number(r.answers.mentions_file.noul ?? r.answers.mentions_file.probability));
+  armScore.push(Number(field(r.answers.mentions_file, 'noul')));
   process.stderr.write('.');
 }
 const lenBaseline = sample.map(t => t.prompt.length);
