@@ -80,9 +80,22 @@ instead of picking a winner.
 
 | | accuracy | false negatives | false positives |
 |---|---|---|---|
-| question alone | 98.57% | 2 | 39 |
+| bare question alone | 98.57% | 2 | 39 |
+| structured-criteria question alone | 97.01% | 8 | 78 |
 | logreg alone (2,300 labels) | 98.57% | 40 | 1 |
-| **averaged** | **99.83%** | **4** | **1** |
+| **averaged** (either question) | **99.83%** | **4** | **1** |
+
+*Corrected 2026-09-19.* This table previously showed one "question alone" row at 98.57% beside an
+average computed from the **other** question variant — the bare question's numbers next to the
+structured-criteria average. Recomputed from upstream's committed out-of-fold scores: both
+averages land on identical 99.83% / FN 4 / FP 1, so the headline survives, but the comparison as
+written was between two different systems.
+
+**And the predicate is now measured, which upstream never did.** The recipe's falsifier is "stops
+being true when the two are correlated"; the phi coefficient between the scorers' error vectors is
+**+0.013** (criteria) and **+0.035** (bare) — essentially zero. They fail on different emails, and
+that is *why* the average pays. Reproduce with `python3 ensemble/run_lingspam.py` (no API key, no
+training).
 
 Identical headline accuracy, **opposite failure shapes** — the question protects recall, the
 classifier protects precision — so the average is better than either at both.

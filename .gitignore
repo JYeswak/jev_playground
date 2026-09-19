@@ -28,6 +28,7 @@
 !/probes/
 !/foundation/
 !/compaction/
+!/ensemble/
 !/docs/
 !/notes/
 !/.flywheel/

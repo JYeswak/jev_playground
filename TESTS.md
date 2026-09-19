@@ -104,3 +104,11 @@ discovered by anyone reading `TESTS.md`. `foundation/gates.sh` globs `gates.d/[0
 (`audit-gates-registry-20260918T110806Z.json`, `85d75a0`) surfaced it: *"it fires RED on the live
 tree right now and nothing else watches `TESTS.md`."* **The conductor had not run
 `foundation/gates.sh` this session and so did not know the suite was failing.**
+
+### `ensemble/test_decorrelation.py` — 5 tests
+
+Covers the predicate behind `RECIPES.md` recipe 4: oppositely-shaped errors make averaging pay;
+phi is reported; mismatched lengths and empty input are refused with the lengths named. The
+load-bearing one is the **planted negative** — averaging a scorer with *itself* must buy exactly
+zero and report `AVERAGE_DID_NOT_PAY`, because a measurement that showed a gain there would be
+measuring arithmetic rather than decorrelation. Run: `cd ensemble && python3 -m unittest test_decorrelation`.
