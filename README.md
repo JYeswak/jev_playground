@@ -6,6 +6,46 @@ Measure what Jev can actually do before you build on it.
 
 ## TL;DR
 
+**THE INTEGRATION RUNS ON REAL WORK.** We set out to wire Jev into omp and shipped FOUR REGEXES
+WITH NO JEV CALL IN THEM. The model lost on five surfaces to cheaper alternatives — never because
+it was bad, always because something free was as good or better. The integration that survived
+contains none of it.
+
+Five-link chain (each with evidence):
+
+1. **earns** — 12/12 recall, FP **0/40** held-out; beat live Jev **11/12** and a dumber keyword
+   list **5/12**
+   ([receipt](docs/demos/upstream-repro/toolcall-headtohead-20260919.md), `f7bcd9d`).
+2. **registered** — `extensions:` list, loader glob `*.{ts,js}`, **one profile**.
+3. **fires** — id-join `toolCallId` to a real `dcg_allow`.
+4. **fires CORRECTLY** — **0/17** unique-command divergence. Cited local path
+   `docs/demos/upstream-repro/harm-rule-conformance-20260919.md` (`bb4fa4f`) — **not on this
+   tip**.
+5. **RUNS ON REAL WORK** — promoted to the working omp profile **`codex`** (not `claude`, not
+   all). 5 harm rows (2 decision + 3 diagnostic) + 2 bridge; zero errors; rollback unused. Panes
+   1/2/3 run on `codex` = this lane's own first real traffic. Cited local path
+   `docs/demos/upstream-repro/harm-rule-promoted-20260919.md` (`6c9c8fc`) — **not on
+   `origin/main`**. This chapter is cut from `f556b1f`.
+
+**The five-surface dumb-baseline pattern**
+([ruling](docs/demos/upstream-repro/RULING-authored-vs-real-20260919.md)): (1) a two-line domain
+regex on phishing, **+27 points**; (2) flat mid-tier pricing — Jev **+90.2% more expensive**;
+(3) prompt length on tier choice, **2 of 3** sessions; (4) keep-everything on compaction, **7×
+fewer mistakes**; (5) four regexes on tool-call harm. **Where the harm is expressible, express
+it.**
+
+**Also published, because they are load-bearing.** A missing `pi.on` is a silent-register: a
+syntax-valid module that loads nothing, indistinguishable from a hook that sees nothing
+([receipt](docs/demos/upstream-repro/harm-rule-shipped-20260919.md)). The co-presence bar is
+observer decisions next to a bridge row in the same session. `context.dcgVerdict` was fiction —
+the event exposes `[type, toolName, toolCallId, input]` and no verdict; join the bridge by
+`toolCallId` at read-time ([`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md)).
+
+**NO-CLAIM (load-bearing):** ONE profile; OUR traffic; OBSERVE-ONLY; lab shapes ≠ every profile.
+Observer claim **(B) STILL OPEN** (no `toolCallId`, defaulted `dcgVerdict`) — do not fold that
+into this win. Error discipline: a selector near-miss counted decisions only and missed
+diagnostics.
+
 **22 Jev repos appeared in launch week. We ran all of them; everything passed, and that proved
 nothing.** Substituting a well-formed RANDOM judge left 254 of 305 tests green (83%)
 ([receipt](docs/demos/upstream-repro/random-judge-substitution-20260919.md)), and exactly one
@@ -32,8 +72,9 @@ on **216k** dcg decisions, frozen split **36,955** train / **41,500** held-out, 
 ([receipt](docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md)). Join yield is
 **36.8%**; the miss class is `js-bash-<uuid>` foreign ids, so a logger must capture command
 text at decision time. Pane 3 withdrew the revert-predicate as INVALIDATED; `isError` survived.
-Fail-open is verified at `dcg-guard.ts:599-610`. The live observer is **not working** — see
-[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md).
+Fail-open is verified at `dcg-guard.ts:599-610`. The Jev observer claim **(B) is still open**
+(no `toolCallId`, defaulted `dcgVerdict`) — see
+[`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). Do not fold that into the harm-rule win.
 
 **What Jev IS good at, stated fairly.** Ties a TF-IDF classifier trained on ~14,800 in-domain
 labels at zero labels (McNemar p=0.677), holds 0.97–0.99 under shift where that classifier
@@ -45,9 +86,10 @@ always-abstain control 5× on their own corpus
 
 **Scoreboard, present tense:** 25 verdict rows (7 cleared, 9 held, 8 ruled out, **0 promoted**),
 31 dead-end ledger entries each with a reopen condition, 12 gate stages green. Tool_call
-surface OPEN at 3.95% — proven vs WIP seams:
+**RULE WINS** on cost-benefit; the surviving omp integration is four regexes on **`codex`**,
+observe-only, and contains no Jev call. Proven vs WIP seams:
 [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). The product is the
-ruling plus the evidence for everything ruled out.
+ruling plus the evidence for everything ruled out. The Jev ledger stays **0 promoted**.
 
 **What you get.** Three tools that run offline with no API key, and read your own logs:
 
