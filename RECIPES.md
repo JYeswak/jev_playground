@@ -106,11 +106,29 @@ upstream's committed scores, `python3 ensemble/run_all.py`:
 | Jev choice + TF-IDF (phish, n=5,733) | +0.107 | **+0.38 pp** |
 | logreg + naive Bayes, **same features** (Ling-Spam) | **+0.526** | **-0.14 pp** |
 
-The correlated pair **loses accuracy when averaged**. That third row is the natural experiment:
-two genuinely different algorithms, both good, sharing a feature space — exactly the case the
-recipe predicts must fail, and it does. So the rule is now a *predictor* on three points rather
-than a mechanism consistent with one, and the practical form is: **measure phi before you build an
-ensemble; near zero, average — above ~0.5, pick the better scorer.**
+The correlated pair **loses accuracy when averaged** — two genuinely different algorithms, both
+good, sharing a feature space, exactly the case the recipe predicts must fail.
+
+**CORRECTED the same night, 2026-09-19 — low phi is NECESSARY BUT NOT SUFFICIENT.** A fourth pair
+(`jev-sec-bench` injection with/without context, n=662, bootstrap B=2000) has phi **0.343**, CI
+`[0.213, 0.469]` **entirely below the 0.5 line** — and it still did not pay: gain **-0.006**, CI
+`[-0.0196, +0.0060]`. The rule as written above predicted a gain and there was none.
+
+| pair | phi | accuracy gap | gain |
+|---|---|---|---|
+| bare question + logreg | +0.035 | **0.0 pp** | **+1.25 pp** |
+| Jev + TF-IDF (phish) | +0.107 | 4.2 pp | **+0.38 pp** |
+| with-context + no-context (sec-bench) | +0.343 | **6.8 pp** | **-0.60 pp** |
+| logreg + naive Bayes | **+0.526** | 0.8 pp | **-0.14 pp** |
+
+Two terms, not one. Averaging pays when the errors are decorrelated **and the scorers are close in
+accuracy**; averaging a 96.5% scorer with an 89.7% one loses, because no amount of decorrelation
+at 9% disagreement overcomes 6.8 points of gap. **Practical form: measure phi AND the accuracy
+gap. Average only when phi is near zero and the gap is small — otherwise take the better scorer.**
+Where the boundary in each term lies is unmeasured; four points do not locate a surface.
+
+Source: [`phi-second-pair-20260919.md`](docs/demos/phi-second-pair-20260919.md), reproduced
+independently by the conductor to the digit including the interval.
 
 Identical headline accuracy, **opposite failure shapes** — the question protects recall, the
 classifier protects precision — so the average is better than either at both.
