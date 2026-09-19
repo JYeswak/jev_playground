@@ -786,3 +786,14 @@ measurably shrunk by this hook) is unreachable on this seam, not merely unreache
 `SessionBeforeCompactResult` (or documents a `details` kind that carries messages) — then the
 `would-compact` log lines are the demand evidence for wiring it, and this row closes with the
 wiring commit.
+
+### R21 amendment (2026-09-19, jev-fqo settlement)
+
+Conductor contested the "no channel" phrasing and was right about the mechanism: summary +
+firstKeptEntryId IS how omp compacts, and a structurally valid return is constructible — the
+row as written overstated. Conclusion stands narrowed: REFUSE L4-as-Jev-pruning (no message
+channel, unchanged); DEFER L4-as-boundary (no value-additive valid return from the hook's
+inputs — no message→entry-UUID mapping without guessing, no summary authorship). Full
+evidence: `docs/demos/omp-seam-fqo-20260919.md`. Retry condition extends: a proven
+message→entry-UUID join (from `SessionMessageEntry` linkage, not content alignment) re-opens
+the boundary half; the message-channel half still needs omp to add one.

@@ -340,3 +340,16 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
 - **Not proven:** firing inside a target repo (only a post-`/compact` decision-log line proves
   that); L4 unreachable on this seam by construction.
 - Boundary: zero live Jev calls in this pass; no production compact ever returned a pruning.
+---
+
+## jev-fqo — R21 contested and settled: mechanism conceded, conclusion narrowed (2026-09-19, pane 3)
+
+- Conductor's counter-claim verified against the runtime: summary + firstKeptEntryId IS the
+  compaction channel (`dist/cli.js` fromHook sites; `CompactionResult`, `compaction.d.ts:21-31`).
+  A structurally valid return is constructible — R21's "no channel" phrasing was too broad.
+- Settlement: REFUSE L4-as-Jev-pruning; DEFER L4-as-boundary. No value-additive valid return
+  exists from the hook's inputs: messages carry no entry UUID (no message→entry mapping without
+  guessing; `branchEntries` is branch lineage), and Jev judges but does not summarize (reusing
+  `previousSummary` is stale; decision-lines-as-summary degrades continuation).
+- Receipt: `docs/demos/omp-seam-fqo-20260919.md`. R21 amended, not rewritten.
+- Boundary: zero live calls; no session touched. Lane: offline.
