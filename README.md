@@ -73,7 +73,7 @@ The full retraction, with both sides of the framing test, is in
 
 ### The twenty-two upstream Jev repos: what each one tests, and where we are
 
-These are cloned in this tree and gitignored. They are **not ours** — they are TypeSafe's and the
+These are cloned in this tree and gitignored. They are **not ours**: they are TypeSafe's and the
 community's, and each already asks a question we would otherwise re-ask badly. Derive the list with
 `for d in */; do [ -d "$d/.git" ] && echo $d; done`; the purposes below are quoted from each repo's
 own README, not inferred from its name.
@@ -121,7 +121,7 @@ against urgency-and-authority criteria 96.68% (-0.32pp, **p=.50, directional onl
 question winning outright. This is a **confirmation, not a discovery**: `jev-spam-eval`'s own README
 already notes its headline came from a question *"written after reading the mistakes in 1,000 sampled
 emails"*, which is the same effect seen from the tuning side. Falsifier, stated by its author:
-pre-register the prompts, use a fresh held-out source, and test paired — the inversion must vanish or
+pre-register the prompts, use a fresh held-out source, and test paired; the inversion must vanish or
 reverse consistently.
 [`docs/demos/upstream-repro/criteria-inversion-20260918.md`](docs/demos/upstream-repro/criteria-inversion-20260918.md)
 Receipt:
@@ -168,7 +168,7 @@ before any share. No API key. No network.
 python3 ensemble/run_all.py
 ```
 
-Runs in about a second. Needs one upstream clone first — this repo does not redistribute
+Runs in about a second. Needs one upstream clone first, because this repo does not redistribute
 their 5.7 MB of scores, and the script prints the exact `git clone` if it is missing. Averaging
 two scorers is folk wisdom;
 these four pairs show when it pays and when it costs you:
@@ -182,7 +182,7 @@ these four pairs show when it pays and when it costs you:
 
 **Two conditions, not one.** Averaging paid only when the scorers failed on *different items* and
 were *close in accuracy*. Row three is the one that cost us a published rule: phi well under 0.5,
-and it still lost, because no amount of decorrelation at 9% disagreement beats a 6.8-point accuracy
+and it still lost: no amount of decorrelation at 9% disagreement beats a 6.8-point accuracy
 gap. Point `ensemble/decorrelation.py` at your own two scorers before you build the ensemble.
 
 Four points do not locate a boundary, and [`ensemble/README.md`](ensemble/README.md) says so at
@@ -192,7 +192,7 @@ more length than this summary does.
 
 Install it into any repo and omp asks it before compacting a session
 ([`compaction/README.md`](compaction/README.md) has the three commands). Measured by replaying
-**real transcripts omp wrote during real work** — not fixtures — all passing six invariant checks:
+**real transcripts omp wrote during real work**, not fixtures, all passing six invariant checks:
 
 | session | tool calls | requests | chars before → after | saved |
 |---|---|---|---|---|
@@ -203,7 +203,7 @@ Install it into any repo and omp asks it before compacting a session
 | `PortFleetComposite` | 108 | 1 | 501,502 → 6,084 | **98%** |
 | `PortOmpIdleDispatch` | 98 | 1 | 291,909 → 12,911 | **95%** |
 
-**Not a rate — a shape, and the shape is LENGTH.** A third of the sample saved nothing because
+**Not a rate. The shape is LENGTH.** A third of the sample saved nothing because
 everything in those sessions was pinned: a call is protected when it or its result sits in the
 last six messages, so a seven-message transcript is untouchable no matter how many tools it ran
 (`OmpExtensibility`: 15 calls, all 15 pinned). Measured across **1,653 real sessions** at default
@@ -317,7 +317,7 @@ things, and mixing them is how a number gets believed harder than it earned.
 ```
 
 ```
-quickstart — five questions, answered from committed bytes. No install, no network, no API key.
+quickstart: five questions, answered from committed bytes. No install, no network, no API key.
 
 === Q1. Would routing cheap turns to a cheaper model have saved money?
     NO. On this fixture routing would have COST YOU MORE: $0.011106 actual
@@ -327,7 +327,7 @@ quickstart — five questions, answered from committed bytes. No install, no net
     YES — mutations: 7/7 caught.
 
 === Q3. How much of a coding agent's context is resent every single turn?
-    98.878% of all tokens are cache reads — context resent, not new work.
+    98.878% of all tokens are cache reads: context resent, not new work.
     Denominator, stated: 488,724 turns across 4,619 sessions in 4,626 files, 0 unparsable.
     Basis matters here: 98.878% against all tokens, 99.017% against billed input only.
 
@@ -359,7 +359,7 @@ already does better. It is retired as a claim rather than deleted as code.
 [`docs/demos/upstream-repro/routers-20260918.md`](docs/demos/upstream-repro/routers-20260918.md)
 
 Every number is derived at runtime from the receipt the tool just wrote; none is hardcoded. Every demo
-is zero-dependency — no install, no network, no key, no state from this lane. Measured from a frozen
+is zero-dependency: no install, no network, no key, no state from this lane. Measured from a frozen
 clone of a pinned commit, which is the environment the gate suite below fails in, and a receipt missing
 a field the answer depends on exits 1 rather than printing a branch it did not measure.
 
@@ -374,7 +374,7 @@ Nothing is uploaded and no key is used. On the author's machine that is 4,626 se
 shape answer comes back personal: **4,619 sessions, 488,724 billed turns, 98.9% of tokens
 retransmitted context, a mean 341,496 retransmitted tokens per turn, 0 unparsable lines.**
 
-**It exposed a limit we would never have found on the fixture — and then we fixed it.** The router
+**It exposed a limit we would never have found on the fixture, and then we fixed it.** The router
 backtest *could not answer* on a real Claude Code corpus: it returned `EMPTY_CLASSIFIABLE_SET`,
 because those logs carry tokens and a model string but **no cost field at all**, which is what the
 reader needs. Recorded as a refuted hypothesis (`NEGATIVE_EVIDENCE.md` `R20`), because the README
@@ -548,6 +548,25 @@ step is one contract with its own suite rather than three parsers that agree by 
 
 Unsupported today: any tool that reads a harness other than Claude Code or omp session JSONL. A tool
 pointed at another shape reports zero turns, which is a visible result rather than a silent one.
+
+## Status
+
+**17 candidate ideas ruled, 0 promoted.** Zero is the honest number: promotion means an idea
+earned a deeply-planned project, and none has. The verdicts and their receipts are in
+`docs/demos/STATUS.tsv`; what was ruled out and what would reopen it is in `NEGATIVE_EVIDENCE.md`,
+which currently holds 27 entries.
+
+**22 of 22 upstream Jev repositories have been run**, not read. That sweep produced the one
+shipped-code defect on this page (a `typesafe-sdk-js` timeout that kills a default Node process)
+and retracted four claims of our own, including a fabricated benchmark score and a "documented but
+unbuilt CLI" that was really a 103-commit-stale clone.
+
+**The compaction hook is installable and measured, and has never reduced a live session.** Both
+halves are load-bearing: 98% and 95% on long real transcripts through the replay harness, and
+every firing inside a running omp has returned passthrough.
+
+Twelve gates run on every commit and are green. This repository is public and its history is
+published as written, including local filesystem paths.
 
 ## About Contributions
 
