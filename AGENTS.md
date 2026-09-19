@@ -1445,3 +1445,52 @@ what `hub list` and `hub send` are for — ask the peer, do not halt the session
 Also, if I ask you to explicitly use your built-in TODO functionality, don't complain about this
 and say you need to use beads. You can use built-in TODOs if I tell you specifically to do so.
 Always comply with such orders.
+
+## THE MISSION — read this before every dispatch, and put it in every packet
+
+**Appended 2026-09-19 at Joshua's instruction, and it outranks every queue in this repo.**
+
+> Validate Jev → build tools from what survives → **liven omp surfaces with them** → **dogfood
+> them in our own systems** → **share the process, the updates and the findings publicly** as we
+> go.
+
+Five stages. As of this writing the lane has completed stage one nine times and stages two
+through four **zero** times. Nine rulings and no shipped tool is a research log, not a product
+loop. A candidate that is ruled and never wired has not finished; it has stopped.
+
+**What this changes about how work is judged:**
+
+- A ruling is not the deliverable. A ruling is what licenses the next stage or kills it. Six
+  "do not build this" verdicts are real value — they are six things we did not build — but they
+  do not advance the mission on their own.
+- **`promoted 0` is a mission signal, not a badge of rigor.** Rigor that never promotes anything
+  is indistinguishable from refusal. See `NEGATIVE_EVIDENCE.md` R28 for the honest version:
+  authored evidence inflates, so the answer is better evidence, never a lower bar.
+- The public repo is a deliverable, not an archive. If a stranger cannot read the arc in two
+  minutes, stage five has not happened.
+
+## EVERY DISPATCH PACKET CARRIES THESE FOUR THINGS
+
+A packet missing any of them is defective, and `BLOCKED` is the correct response to it.
+
+1. **The mission line above**, so the pane knows which stage its unit serves.
+2. **The tools, by name, with what each is for** — not "use our tools":
+   - `fh` over `/Volumes/ZestData/dicklesworthstone-mirror` (306 ledger rows, 102 bead repos) for
+     *design* precedent: the e-process, the seven oracle shapes and the ratchet pattern were all
+     read out of `asupersync`, `franken_ocr`, `franken_engine` and `frankensearch` rather than
+     invented here.
+   - `ripwire <dir> --quality-delta` before calling work done; `--exemplar` before writing a new
+     symbol. It exits rc=2 on duplication and it is what triggered the `oracle-kit` extraction.
+   - `ast-grep` / `sg` for structural search, `rg` for literal — and **both spellings** when a
+     JSON key might be serialized with or without a space. The spaced form of one key matched
+     **zero** files and produced a false conclusion.
+   - `work/oracle-kit/index.mjs` for every score: `auc` reports `constant=true`, `field` throws
+     on a name absent from the SDK, `feasibility` refuses to rule when the arm is blind.
+   - `docs/demos/SDK-SURFACE.md` before touching any answer field.
+3. **The mining process**, in order, because skipping a step is how four wrong numbers were
+   produced in one day: read the artifact and cite `file:line` → preregister the bar **in the
+   file** → build the corpus you did **not** author → include a feasibility arm that ought to
+   pass → state prevalence beside the score → report the verdict a non-author can check.
+4. **The acceptance shape**: positive observable, planted negative, and a NO-CLAIM naming the
+   exact limit. Never "make it pass". `DEFER`, `BLOCKED`, `REFUSE` and
+   `PREPARED-NOT-MEASURED` are real outcomes and are preferred over a manufactured number.

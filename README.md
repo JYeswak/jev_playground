@@ -93,7 +93,7 @@ obstacle. Everything else is untouched, which is the honest state.
 |`jev-router`|per-turn model routing for Claude Code and Codex|**RUN** (pane 3): 58/58|upstream owns routing; ours narrows to the `blockedBy` histogram|
 |`jev-codex-router`|the same idea, Codex-specific|**RUN** (pane 3): backtest on real sessions|import its cached-token price columns, which supersede our R20 default|
 |`jev-mcp`|Jev judgments exposed as MCP tools|**RUN**: 9/9 unit, 4/4 live e2e|wire `jev_verify` into the conductor's number-checking|
-|`jev-ultrafast`|a browser agent driven by Jev|not run; needs a URL and a key|lowest priority, it is a live-network demo|
+|`jev-ultrafast`|a browser agent driven by Jev|action-choice smoke run: 20/20 top-1, 0/10 false advance, $0.0003|class A only, authored states; the live browser path is still unrun|
 |`fast-jev-compaction`|continuous context compaction with Jev|**RUN**: 29/29 tests; live run 21 messages to 7, 87.1% chars saved|it owns the core; ours keeps only the omp adapter and replay harness|
 |`commit-miner`|classify commit diffs and messages with Jev|**RUN** (pane 3): 130 of our own commits classified|its disagreements were mostly right; import: lint commit bodies, not prefixes|
 |`foreman`|watch a software factory floor with Jev|**RUN**: 57/58, one real failure reported|it is a per-worker supervisor with no queue concept, so it does not replace the tick|
