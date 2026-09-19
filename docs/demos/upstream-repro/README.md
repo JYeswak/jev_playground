@@ -134,6 +134,13 @@ chars saved: 87.1%
 
 Exact match to the figure this page had been carrying on a callback's word.
 
+**`RECIPES.md` audited too, 2026-09-19 — clean.** Every figure on the recipes page traces to a
+receipt: the four phi/gain pairs and the Ling-Spam accuracies were re-derived directly this
+session, and the criteria-inversion row matches `criteria-inversion-20260918.md` exactly
+(`97.00% -> 98.58%`, exact McNemar `p = 0.00635`, which the page rounds to `0.0064`). The one
+figure that failed a first grep failed on **rounding, not on truth** — worth stating, because an
+automated version of this check would have flagged a correct number.
+
 **What this audit does not establish:** it checks that each figure *appears in* a receipt, not that
 the figure is *correct*. A wrong number copied consistently into both the receipt and the README
 passes unchanged. Prose claims — "headlines reproduce", "floor reproduces exactly" — were not
