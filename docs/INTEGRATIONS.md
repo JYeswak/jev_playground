@@ -15,6 +15,59 @@ mirror after `fh` ranked them — `asupersync` `eprocess.rs:224-238`, `franken_o
 `RATCHET.md:33-51`, `franken_engine` `promotion_gate_runner.rs:266-328`, `frankensearch`
 `perf_ratchet.rs:732-740`. Pattern: **fh ranked, we opened.** A ranking alone is not a citation.
 
+## THE INTEGRATION RUNS ON REAL WORK — four regexes, no Jev call, one profile
+
+We set out to wire Jev into omp and shipped four regexes with no Jev call in them. The model lost
+on five surfaces to cheaper alternatives — never because it was bad, always because something free
+was as good or better. The integration that survived contains none of it. **Not a Jev promotion.
+The ledger stays 0 promoted.**
+
+**Tip note.** Prefer SHA `6c9c8fc` (`harm-rule-promoted`). That object is **absent from this
+checkout and from GitHub** (`git cat-file` fails; GitHub 422). Conformance SHA `bb4fa4f` is
+likewise absent. This chapter is cut from `f556b1f`. Cited local receipt paths below; facts
+3–5 are **cited, not re-derived**.
+
+### Five-link chain
+
+| # | claim | evidence |
+|---|---|---|
+| 1 | **earns** | 12/12 recall, FP **0/40** held-out; beat Jev **11/12** and dumb **5/12**. [`toolcall-headtohead-20260919.md`](demos/upstream-repro/toolcall-headtohead-20260919.md) (`f7bcd9d`). |
+| 2 | **registered** | `extensions:` list in the profile `agent/config.yml`; loader globs `*.{ts,js}`; **one profile**. Lab register: [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md) (`287f4b9`, `jev-lab`). Working-profile register is `codex` only. |
+| 3 | **fires** | id-join `toolCallId` to a real `dcg_allow`. Event keys on this tip are `[type, toolName, toolCallId, input]` — no verdict on the event. **Cited, not re-derived:** `work/omp-harm-rule/harm-rule.ts` on this tip does not write `toolCallId` onto its rows. Join the bridge at read-time. |
+| 4 | **fires CORRECTLY** | **0/17** unique-command divergence. Cited path `docs/demos/upstream-repro/harm-rule-conformance-20260919.md` (`bb4fa4f`) — **object absent from this checkout and from GitHub**. |
+| 5 | **RUNS ON REAL WORK** | Promoted to working omp profile **`codex`** (not `claude`, not all). 5 harm rows (2 decision + 3 diagnostic) + 2 bridge; zero errors; rollback unused. Panes 1/2/3 run on `codex` = this lane's own first real traffic. Cited path `docs/demos/upstream-repro/harm-rule-promoted-20260919.md` (`6c9c8fc`) — **object absent from this checkout and from GitHub**. |
+
+Source on this tree: `work/omp-harm-rule/harm-rule.ts`. Observe-only. Every path returns `undefined`.
+dcg remains the only blocker. Zero model calls in the shipped path.
+
+### Also published
+
+- **Five-surface dumb-baseline pattern.** Phishing regex +27 points; flat mid-tier pricing (Jev
+  +90.2% more expensive); prompt length (2 of 3); keep-everything on compaction (7× fewer
+  mistakes); four regexes on tool-call harm. Ruling, second axis:
+  [`RULING-authored-vs-real-20260919.md`](demos/upstream-repro/RULING-authored-vs-real-20260919.md)
+  (`268073e`). **Where the harm is expressible, express it.**
+- **Silent-register rule.** A module with valid syntax and no `pi.on` registers nothing.
+  `node --check` passes it. A hook that fails to register is indistinguishable from a hook that
+  sees nothing (`harm-rule-shipped-20260919.md`, `658922f`). Verify against a known-firing
+  neighbour, never against silence alone.
+- **Co-presence bar.** Observer (or harm-rule) decision rows next to a
+  `com.zeststream.omp-dcg-bridge.decision.v1` row in the same session. Session co-presence is
+  not id-join.
+- **`context.dcgVerdict` was fiction.** The event has no verdict field. Those `unknown`s on the
+  Jev observer are defaults, not observations. Join the bridge by `toolCallId` at read-time.
+
+### NO-CLAIM (load-bearing)
+
+- **ONE profile** — `codex`. Not `claude`. Not all profiles.
+- **OUR traffic** — panes 1/2/3 on `codex`. Not a stranger's fleet.
+- **OBSERVE-ONLY** — `0 block:true`. dcg is still the only thing that blocks.
+- **Lab shapes ≠ every profile.** Short prompted lab runs are not every working profile.
+- **Observer claim (B) STILL OPEN.** The Jev observer still has no `toolCallId` and still
+  defaults `dcgVerdict` to `unknown`. Do not fold that into this win.
+
+Error discipline (optional): a selector near-miss counted decisions only and missed diagnostics.
+
 ## OPEN: tool_call error prevalence — 3.95% (40× the 0.1% kill line)
 
 Receipt: [`docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md`](demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md) (`33aa633` on `main`). Pane 3 (muse), 2026-09-19. **Zero API.** Harness `work/p3-calibration/mine_decisions.py`; frozen sample `work/p3-calibration/toolcall-corpus-frozen.jsonl`.
@@ -89,8 +142,10 @@ Three separate claims, and only the first is met:
   exposes `[type, toolName, toolCallId, input]` and **no verdict**, so the original
   `context.dcgVerdict` read a field that does not exist: those `unknown`s are defaults, not
   observations. The non-duplication filter is therefore **corrected, not working-as-designed**.
-- **(C) Working profile — NOT claimed.** Everything above is `jev-lab`, a disposable profile.
-  None of it is evidence about a working profile under real user traffic.
+- **(C) Working profile — NOT claimed for the Jev observer.** Everything in the table above is
+  `jev-lab`, a disposable profile. The **harm-rule** (four regexes, no Jev call) was promoted to
+  **one** working profile (`codex`); that is a different extension and does not close this
+  observer claim. See THE INTEGRATION RUNS ON REAL WORK above.
 
 An earlier version of this section reported *0 observer rows against 1 bridge row*. That was true
 when written and is now stale; the zero-row cause was a module with valid syntax whose `pi.on`
@@ -99,7 +154,7 @@ registration line was absent — reproduced deliberately and repaired
 from a hook that sees nothing.** The loader globs `*.{ts,js}`; the config is an `extensions:` list
 in the profile `agent/config.yml`.
 
-Live omp was never taken off the table. There is **no standing ban** on registering into working omp profiles. The fleet invented "STOP-LIVE" / deferred registration as reasons not to work. This row is not an indefinite deferral and not quiet-window gated. Registration happened; capture did not.
+Live omp was never taken off the table. There is **no standing ban** on registering into working omp profiles. The fleet invented "STOP-LIVE" / deferred registration as reasons not to work. This row is not an indefinite deferral and not quiet-window gated. The Jev observer registered and wrote rows; **id-join capture did not**. The harm-rule's `codex` promotion is a different extension and does not close claim (B).
 
 ### How to iterate on live omp
 
@@ -119,7 +174,7 @@ A `tool_call` observer on `bash` would fire on every bash in every session, so t
 4. **jsm preconditions** — the installed file must be self-contained. `9e6c88d` imported `../../dogfood-logger/src/logger.mjs`, a parent path that does not exist after a copy into `~/.omp`. `348894e` inlined the record builder so the extension no longer depends on a repo-relative parent.
 5. **The loader must actually load it.** Globs `*.{ts,js}`. Config is `extensions:` in the profile `agent/config.yml`. A register that writes 0 rows while another extension writes rows is not loaded — verify against a known-firing neighbour, never against silence alone.
 
-Session co-presence has now been observed (6 sessions, lab only), so that condition is met. The remaining conditions for calling the observer working are the **id-level join** (currently 0: no `toolCallId` on observer rows, all verdicts defaulted to `unknown`) and a **working profile under real traffic**, which has not been attempted. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`.
+Session co-presence has now been observed (6 sessions, lab only), so that condition is met. The remaining condition for calling the **Jev observer** working is the **id-level join** (currently 0: no `toolCallId` on observer rows, all verdicts defaulted to `unknown`). That claim **(B) is still open**. Do not fold the harm-rule's `codex` promotion into it. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`.
 
 **Where a probabilistic judge belongs.** Only on what regex cannot express. The dcg prior is now on this tip: [`docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md`](demos/upstream-repro/dcg-block-rate-prior-20260919.md) — 49,661 allow / 488 block = **0.97%**.
 
@@ -127,9 +182,11 @@ Session co-presence has now been observed (6 sessions, lab only), so that condit
 
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
+| harm-rule (four regexes, no Jev call) | observe-only on **`codex`** (one profile); 5+2 row counts **cited, not re-derived** (`6c9c8fc` absent) | five-link chain above; **not** a Jev product promotion | **no** |
+| tool_call head-to-head | RULE WINS; ship classifier, drop Jev | rule 12/12 vs Jev 11/12 vs dumb 5/12, both FP 0/40; cost-benefit kill | no |
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log | `jev-lab`: observer **14** decision / **33** diagnostic rows; bridge **13**; **6** sessions co-present | **partial** — session co-presence MET, id-join **0** (no `toolCallId`, all `dcgVerdict` defaulted `unknown`); lab only | no |
+| dogfood / observe-and-log | `jev-lab`: observer **14** decision / **33** diagnostic rows; bridge **13**; **6** sessions co-present | **partial** — session co-presence MET, id-join **0** (no `toolCallId`, all `dcgVerdict` defaulted `unknown`); lab only. Claim **(B) STILL OPEN** | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
-Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (offline-only; do not read as live-working), `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
+Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (offline-only; do not read as live-working), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/upstream-repro/harm-rule-shipped-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31. Conformance and promoted receipts are cited by local path; those SHAs are **absent from this checkout and from GitHub**.
