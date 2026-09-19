@@ -18,6 +18,14 @@ claim nobody can check:
   (the `--mode json` stream) and `message` (the on-disk SessionEntry), which must produce
   identical messages, plus a planted negative that an unknown envelope still yields nothing.
   Gated by `foundation/gates.d/40-omp-compact-replay.sh`.
+- `work/oracle-kit/test.mjs` — the shared scorer's self-test, **10 checks, every case a defect
+  this lane actually shipped on 2026-09-19**: a constant score must be flagged rather than
+  returned as a clean `0.500` (three bogus router runs), a degenerate label must throw rather
+  than yield `NaN` (the gate's feasibility arm), and a field name absent from the SDK must throw
+  rather than score silence (`.distribution` / `.probability`). Plus positive observables: AUC
+  separates a real signal in both directions, ECE is 0 when calibrated, and the e-process
+  accumulates toward rejection while staying conservative on few observations.
+  Run: `node work/oracle-kit/test.mjs`.
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
