@@ -2,6 +2,7 @@
 // Live decisions (not replayed), scored against the transcript's own future, vs 4 baselines.
 import { readFileSync } from 'node:fs';
 import { TypeSafeClient, noul } from '@typesafe-ai/sdk';
+import { auc as kitAuc, field } from '../oracle-kit/index.mjs';
 
 const WINDOW = 6;              // messages always pinned, matching the upstream default
 const file = process.argv[2];
@@ -68,7 +69,7 @@ for (let i = 0; i < scored.length; i += 12) {
   const batch = scored.slice(i, i + 12);
   const qs = Object.fromEntries(batch.map((c, k) => [`keep_${k}`, noul(`Will the FULL verbatim output of tool call "${c.name}" (input: ${c.input}) still be needed later in this session?`)]));
   const r = await client.systemOne({ state: { transcript_excerpt: batch.map(c => `${c.name}: ${c.result.slice(0, 600)}`).join('\n---\n') }, questions: qs });
-  batch.forEach((_, k) => jev.push(Number(r.answers[`keep_${k}`].probability ?? r.answers[`keep_${k}`].noul)));
+  batch.forEach((_, k) => jev.push(Number(field(r.answers[`keep_${k}`], 'noul'))));
   process.stderr.write(`.`);
 }
 const drops = { jev: jev.map(p => p < 0.5) };
@@ -94,8 +95,9 @@ for (const [name, d] of Object.entries(drops)) {
   const A = jev.filter((_, i) => needed[i]);
   const B = jev.filter((_, i) => !needed[i]);
   const mean = (a) => a.reduce((x, y) => x + y, 0) / (a.length || 1);
-  let wins = 0, ties = 0;
-  for (const a of A) for (const b of B) { if (a > b) wins++; else if (a === b) ties++; }
-  const auc = (A.length && B.length) ? (wins + 0.5 * ties) / (A.length * B.length) : NaN;
+  // kitAuc throws on a degenerate label rather than returning NaN, and reports constant=true
+  // when every score is identical -- the shape that faked a clean 0.500 three times.
+  const a = kitAuc(jev, needed);
+  const auc = a.value;
   console.log(`SEPARATION  keep_p needed=${mean(A).toFixed(3)} (n=${A.length})  unneeded=${mean(B).toFixed(3)} (n=${B.length})  AUC=${auc.toFixed(3)}   0.5 = no signal`);
 }
