@@ -32,6 +32,7 @@
 /foundation/gate-outcomes.tsv
 !/compaction/
 !/ensemble/
+!/work/
 !/docs/
 !/notes/
 !/.flywheel/
