@@ -188,6 +188,37 @@ gap. Point `ensemble/decorrelation.py` at your own two scorers before you build 
 Four points do not locate a boundary, and [`ensemble/README.md`](ensemble/README.md) says so at
 more length than this summary does.
 
+### `compaction/` — a context-compaction hook for omp, and what it actually saves
+
+Install it into any repo and omp asks it before compacting a session
+([`compaction/README.md`](compaction/README.md) has the three commands). Measured by replaying
+**real transcripts omp wrote during real work** — not fixtures — all passing six invariant checks:
+
+| session | tool calls | requests | chars before → after | saved |
+|---|---|---|---|---|
+| a small one | 10 | **0** | 44,819 → 44,819 | **0%** |
+| `UdsFeatureUnion` | 9 | 1 | 155,837 → 104,443 | 32% |
+| `MirrorAgentsSurvey` | 15 | 1 | 249,949 → 188,661 | 24% |
+| `OmpExtensibility` | 15 | **0** | 253,465 → 253,465 | **0%** |
+| `PortFleetComposite` | 108 | 1 | 501,502 → 6,084 | **98%** |
+| `PortOmpIdleDispatch` | 98 | 1 | 291,909 → 12,911 | **95%** |
+
+**Not a rate — a shape.** A third of the sample saved nothing, because everything in those
+sessions was pinned and the hook correctly spent nothing discovering that. What the six support is
+narrower and more useful: *tool-heavy session, large saving; otherwise, the cost of one skipped
+request.* Six sessions from one machine is a sample, not a distribution.
+
+Run it against your own history:
+
+```bash
+npm --prefix compaction run replay -- ~/.omp/**/agent/sessions/**/<a session>.jsonl
+```
+
+**The hook has never reduced a live session.** Every firing in a running omp has returned
+passthrough, because the only way we could force one on demand produced a transcript with no tool
+calls. The numbers above are the replay harness on real data, which is the strongest evidence
+available and is not the same claim.
+
 ### `demos/usage-shape` — where does your agent spend go?
 
 ```bash
