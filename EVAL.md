@@ -374,3 +374,15 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   `demo`/`capabilities`/`roster`/`rank` return `unavailable/invalid-usage` — absent,
   not failed. `cargo test` and keyed runs NO-CLAIM.
 - Receipt: `docs/demos/upstream-repro/skillranker-20260919.md`. Clone untouched.
+---
+
+## jev-4uy — phi below 0.5 did not pay (2026-09-19, pane 3, offline)
+
+- New pair: sec-bench injection ctx/noctx, n=662, texts verified aligned, phi 0.343
+  [0.213,0.469], gain -0.006 [-0.020,+0.006], AVERAGE_DID_NOT_PAY; strata agree
+  (phish-only 0.394/-0.046, benign-only 0.443/0.0). Low phi did not imply pay —
+  accuracy gap (0.965 vs 0.897) dominates; the 0.5 rule needs a gap term
+  (hypothesis, not claim).
+- Outcome (b): no second pair — phishing/rerank/agent-failure/iammrduncan/router
+  results carry aggregates, single judgments, or no truth; themsquared absent.
+- Receipt: `docs/demos/phi-second-pair-20260919.md`. Zero live calls.
