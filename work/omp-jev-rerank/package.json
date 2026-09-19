@@ -1,0 +1,12 @@
+{
+  "name": "omp-jev-rerank",
+  "version": "0.1.0",
+  "description": "Observe-only relevance scoring for noisy grep/glob results in omp. Scores only; never reorders what the agent sees.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["omp-plugin", "omp-extension", "pi-package", "jev", "rerank", "observe-only"],
+  "omp": { "extensions": ["./src/index.ts"] },
+  "pi": { "extensions": ["./src/index.ts"] },
+  "files": ["src", "README.md"],
+  "scripts": { "test": "node --experimental-strip-types --test test/" }
+}
