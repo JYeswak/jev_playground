@@ -837,3 +837,38 @@ disagreement rate > 0 — and (b) were produced by genuinely different methods, 
 one model. `jev-phishing-bench` (aggregate-only, no per-item output) and `agent-failure-benchmark`
 (no paired scorer) were both checked and do not qualify. **Three of twenty-two clones examined**,
 so the search is not exhausted and `jev-4uy` stays open on that ground, not on this one.
+
+## R23 — the replay harness cannot read a real omp session file (2026-09-19)
+
+**Attempted:** close the standing "no measured reduction on real data" gap by replaying an actual
+omp session instead of a committed fixture. There are real tool-heavy transcripts on this machine
+under `~/.omp/profiles/*/agent/sessions/`.
+
+**Result: the adapter extracted nothing.** A 9.5 MB real session gives `messagesBefore: 0`,
+`requests: 0`, and the harness **failed closed** — `FAIL library saw tool calls`, rc=1. That check
+existed precisely for this and it worked.
+
+**Cause, measured on both files:**
+
+| file | `message_end` | `message` |
+|---|---|---|
+| `compaction/fixtures/omp-session-big-20260917.jsonl` | **24** | 0 |
+| a real `~/.omp/.../sessions/*.jsonl` | 0 | **95** |
+
+Two different shapes. On-disk sessions are `SessionEntry` records (`type: "message"`, per
+`session-entries.d.ts:55`); our fixtures are **stream** events (`type: "message_end"`), and
+`src/omp-adapter.ts` consumes only the latter.
+
+**What this costs the evidence.** Every replay number this lane has published — including the
+`13 → 8, 1 request` measured from a clean clone one tick ago — comes from stream-shaped fixtures.
+It is real compaction of a real transcript, but it is **not** evidence that the harness can
+process the sessions omp actually writes to disk, and nothing said otherwise until now.
+
+**Refused:** writing a second adapter for the entry shape on the spot. It is a genuine unit with a
+real consumer, not a five-minute fix, and bolting it in at the end of a session is how the three
+installer defects got written in the first place.
+
+**Retry condition / trigger:** a bead for an entry-shape adapter, whose acceptance is a real
+`~/.omp/.../sessions/*.jsonl` replaying with `messagesBefore > 0` and at least one request, plus
+the existing six invariant checks still green. Until then, no replay figure may be described as
+measured on a live session.
