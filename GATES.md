@@ -156,3 +156,17 @@ The observer's live diagnostic records expose nested bash IDs in the js-bash-<uu
 Gate: NO-CLAIM on decision-to-execution attribution until a source-level bridge field is emitted and proven against both namespaces. Do not report joined rates, per-command outcomes, or model attribution from these rows. The observer diagnostic raw event preserves the js-bash event for future bridge work; it does not establish a mapping to call_<id>|fc_<id>.
 
 Evidence: docs/INTEGRATIONS.md lines 20-30 and docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md lines 27-35. The required bridge is not present in work/omp-jev-observer/src/observer.mjs; current fields are decisionId, argsDigest, and raw diagnostic event data.
+
+### Update 2026-09-19 — same-namespace join PROVEN, cross-namespace seam UNCHANGED
+
+`a2e2035` wired `event.toolCallId` into observer decision records and dropped the fictional
+`context.dcgVerdict ?? 'unknown'` default. Verified independently in `jev-lab`: 28 decision rows,
+**1** with a nonempty `toolCallId`, 27 bridge rows, **1 join by id**, and `dcgVerdict` absent from
+the new row's keys rather than defaulted.
+
+This does **not** reopen the seam above. Observer and bridge both live in the `js-bash-*`
+namespace, so they can join. The refusal stands for observer -> `tool_execution_start`
+(`call_…|fc_…`), where overlap remains **0** and no bridging field exists.
+
+**Still NO-CLAIM:** n=1, lab profile, mechanism only. One join proves the wiring, not a rate,
+not production behaviour, and not precision. Do not cite this as dogfood evidence.
