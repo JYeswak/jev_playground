@@ -1375,3 +1375,41 @@ completion. Cheap, because the pane stopped instead of finishing a void run.
 **Retry condition:** a redesign with a **new preregistration**, in which (a) the fact definition
 and the scoring window are the same window, and (b) the original-agent ceiling is measured
 offline first and is non-trivial. Without both, do not spend calls.
+
+## R33 — we promoted an extension that cannot explain its own output
+
+**Recorded:** 2026-09-19 · **Level:** `[live]` · Conductor's defect, found after promotion.
+
+The harm rule was promoted to a working profile on a five-link chain: earned-the-right-to-ship
+(12/12, FP 0/40, held-out), registered, fires, fires-correctly (0/17 divergence), runs-clean on
+real work. Every link had its own evidence. **A sixth link was never named: can the artifact
+explain its own output?**
+
+It cannot. On real traffic it emits `harm_fire` rows whose `toolCallId` is in the `js-bash-*`
+namespace, while every other row that carries a command — `tool_execution_start`, the model's
+`toolCall` parts — uses `call_…|fc_…`. **198,876 start rows, zero joins.** Not missing data: an
+incompatible key. This is the same 63.2% unjoinable population the corpus receipt measured,
+now explained as a **namespace mismatch**.
+
+**Consequence:** a measured fire rate of **18.8%** (3 fire / 13 pass, n=16) against a dcg prior
+of 0.97% — and **not one attributable case**. A rate without cases cannot be acted on. It cannot
+even be classified as alarming or benign: our own agentic traffic plausibly contains far more
+rule-matching commands than a human workload, and nothing in the telemetry distinguishes that
+from a nag generator.
+
+**What makes this a conductor defect rather than a pane defect:** pane 3's corpus receipt had
+already concluded *"the logger should capture command text at decision time"*, and pane 2's
+dogfood logger was built to do exactly that. I approved a promotion whose evidence chain did not
+include attributability, with the answer already sitting in two receipts I had verified myself.
+
+**Rule:** a shipped artifact must be able to **name the input it acted on**. Firing, conforming,
+and scoring well on a corpus are all compatible with producing telemetry nobody can act on.
+Before promotion, ask: *when this fires in production, will we know what it fired on?* If the
+answer needs a join, prove the join **before** promoting, not after.
+
+**Cost:** zero harm — the extension is observe-only and fail-open, so it is useless-but-safe
+while imprecise. Fix is one field captured at decision time (`input.command`, per the nested
+event shape) plus a re-promotion under the same rollback discipline.
+
+**Retry condition:** none needed — this is a fix, not a refusal. The precision question it blocks
+(is 18.8% false positives or real traffic composition?) stays open until fires are attributable.
