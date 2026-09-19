@@ -440,11 +440,11 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   registration as reasons not to work were invented. Shippable to live omp once
   the four checks pass (offline proof / fail-open / `0 block:true` /
   self-contained install `9e6c88d` → `348894e`) — not indefinitely deferred,
-  not quiet-window gated. Live iteration: mint fresh **test** omp agents as
-  needed; register/dogfood on disposable test agents/profiles; leave mid-flight
-  agents untouched; promote only after receipts. Live test surface is pane 0 or
-  added test panes in the jev NTM session (OMP is the common harness; not a
-  separate farm). RUN-CLONE / `jev-lab` earns the fire vs the 0.97% dcg
+  not quiet-window gated. Live test surface is **pane 0** in the jev NTM
+  session, or **added test panes** in that same session — not a separate agent
+  farm. OMP is the common harness across many model/agent types. Do not take
+  down mid-flight panes to dogfood. Register/dogfood there; promote only after
+  receipts. RUN-CLONE / `jev-lab` earns the fire vs the 0.97% dcg
   prior. `fh` is a ranker; citations are file:line we opened. dcg prior receipt
   is on `origin/main`, not this tip — pending sync, numbers not restated.
   README Quick start is three commands. **0 promoted.**

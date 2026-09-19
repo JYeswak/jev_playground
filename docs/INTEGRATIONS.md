@@ -55,12 +55,11 @@ The append-only decision/outcome logger lives at `work/dogfood-logger/`. Its sch
 
 ### How to iterate on live omp
 
-Mint fresh **test** omp agents as needed. Do not take down current agents.
+**Live test surface = pane 0** in the jev NTM session, or **added test panes** in that same session. That is not a separate agent farm. OMP is the common harness across many model/agent types. Do not take down mid-flight panes to dogfood.
 
-- **Register / dogfood on disposable test agents and profiles.** Leave mid-flight agents untouched.
-- **Live test surface.** Pane 0 in the jev NTM session, or added test panes in that same session — not a separate agent farm. OMP is the common harness across many model/agent types.
+- **Register / dogfood on pane 0 or an added test pane.** Leave mid-flight panes untouched. Promote only after receipts.
 - **RUN-CLONE.** Local clones and disposable lab profiles (`omp --profile jev-lab`) are free for atomic mutation, planted known-bad, and improvement loops. Quiet-window is not a science gate for that work.
-- **Promote only after receipts.** The improvement loop — carve the cases regex cannot express, tighten criteria, re-measure against the 0.97% dcg prior — is how a later fire is earned. Then promote.
+- **The improvement loop** — carve the cases regex cannot express, tighten criteria, re-measure against the 0.97% dcg prior — is how a later fire on pane 0 / an added test pane is earned. Then promote.
 
 ### Engineering checks before the act
 
@@ -71,7 +70,7 @@ A `tool_call` observer on `bash` would fire on every bash in every session, so t
 3. **`0 block:true`** — observe only. Never return omp's `{block: true, reason}` shape.
 4. **jsm preconditions** — the installed file must be self-contained. `9e6c88d` imported `../../dogfood-logger/src/logger.mjs`, a parent path that does not exist after a copy into `~/.omp`. `348894e` inlined the record builder so the extension no longer depends on a repo-relative parent. That defect is why the checks earned their keep.
 
-Once those pass, register on a disposable test agent or profile — live omp, not a mid-flight pane. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`.
+Once those pass, register on pane 0 or an added test pane in the jev NTM session — live omp, same session, not a farm, not a mid-flight pane. There is no dogfood or observer file under `.omp/hooks/` on this tip. The only pre-hook in this tree is `jev-compact`.
 
 **Where a probabilistic judge belongs.** Only on what regex cannot express. The receipt that states the prior — `docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md` — landed on `origin/main` (`9e6c88d`) after this branch forked (`d6b52ea`). **It is not on this tip.** Numbers from that file (including the 0.97% dcg fire-rate prior the loop re-measures against) will be linked on the next tip sync rather than restated here.
 
@@ -80,7 +79,7 @@ Once those pass, register on a disposable test agent or profile — live omp, no
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log logger | library + tests; **UNRUN** | shippable to live omp on disposable test agents after the four checks; mid-flight agents untouched; promote after receipts | no |
+| dogfood / observe-and-log logger | library + tests; **UNRUN** | shippable to live omp on pane 0 / added test panes after the four checks; same NTM session, not a farm; mid-flight panes untouched | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31. dcg prior: pending next tip sync (`dcg-block-rate-prior-20260919.md` on `origin/main`, not this tip).
