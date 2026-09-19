@@ -45,10 +45,10 @@ Ship the classifier; drop Jev from this surface.
 | # | claim | evidence |
 |---|---|---|
 | 1 | **earns** | 12/12 recall, FP **0/38**, verify-claim exits 0. [`harm-rule-claim-repro-20260919.md`](demos/upstream-repro/harm-rule-claim-repro-20260919.md). |
-| 2 | **registered** | `extensions:` list; loader globs `*.{ts,js}`; lab `jev-lab` then one working profile (`codex`). [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md), [`harm-rule-promoted-20260919.md`](demos/upstream-repro/harm-rule-promoted-20260919.md). |
-| 3 | **fires** | Both directions on luna and sol in lab. [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md). On this tip the shipped file writes `toolCallId` (`work/omp-harm-rule/harm-rule.ts`). |
-| 4 | **fires correctly** | **0/17** unique-command divergence vs the frozen scorer. [`harm-rule-conformance-20260919.md`](demos/upstream-repro/harm-rule-conformance-20260919.md). |
-| 5 | **runs on real work** | One working profile, **`codex`** (not `claude`, not all). First contact clean; rollback unused. [`harm-rule-promoted-20260919.md`](demos/upstream-repro/harm-rule-promoted-20260919.md). Organic precision is unmeasured — 4/4 fires were driven probes. [`harm-rule-realtraffic-20260919.md`](demos/upstream-repro/harm-rule-realtraffic-20260919.md). |
+| 2 | **registered** | `extensions:` list; loader globs `*.{ts,js}`; lab `jev-lab`. [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md). |
+| 3 | **fires (lab)** | Both directions on luna and sol in lab. [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md). On this tip the shipped file writes `toolCallId` (`work/omp-harm-rule/harm-rule.ts`). |
+| 4 | **fires correctly (lab)** | **0/17** unique-command divergence vs the frozen scorer. [`harm-rule-conformance-20260919.md`](demos/upstream-repro/harm-rule-conformance-20260919.md) (`bb4fa4f`). Lab shapes ≠ every profile. |
+| 5 | **working-profile dogfood — NOT VERIFIABLE / OPEN** | [`harm-rule-promoted-20260919.md`](demos/upstream-repro/harm-rule-promoted-20260919.md) (`6c9c8fc`) **exists on this tip**. It is one driven first-contact probe, not multi-row live logger traffic on a working profile. **Do not publish RUNS ON REAL WORK.** Organic precision is unmeasured — 4/4 fires were driven probes. [`harm-rule-realtraffic-20260919.md`](demos/upstream-repro/harm-rule-realtraffic-20260919.md). |
 
 Source: `work/omp-harm-rule/harm-rule.ts`. Observe-only. Every path returns `undefined`.
 dcg remains the only blocker. Zero model calls in the shipped path.
@@ -58,8 +58,11 @@ dcg remains the only blocker. Zero model calls in the shipped path.
 that sees nothing (`harm-rule-shipped-20260919.md`). The co-presence bar is observer
 decisions next to a bridge row in the same session.
 
-**Observer claim (B) STILL OPEN.** The five-link chain is the harm-rule, not the Jev
-observer. Do not fold this win into working dogfood. No working-dogfood claim.
+**Observer (B) — mechanism MET at n=1 lab; working-profile dogfood OPEN.**
+`a2e2035` stores `toolCallId` and deleted the defaulted `context.dcgVerdict`
+from the makeRecord path. Residual: `createObserver` / `installObserver` still
+defaults `context.dcgVerdict ?? 'unknown'` on the gate path. The five-link
+chain is the harm-rule, not the Jev observer. Do not publish working-dogfood.
 
 **NO-CLAIM.** One profile; our traffic; observe-only; lab shapes ≠ every profile. Recall is
 on 12 planted harms, not observed incidents. Cross-model traffic is unattributed.
@@ -203,10 +206,10 @@ on the `createObserver` gate path.
 
 | Surface | State | Claim | Promoted? |
 |---|---|---|---|
-| tool_call / harm-rule | RULE WINS; four regexes, **no Jev call**; five-link chain on tip | rule 12/12, FP **0/38** committed corpus; Jev 11/12 / dumb 5/12, historical FP 0/40 unreproducible (R34); cost-benefit kill | no |
+| tool_call / harm-rule | RULE WINS; four regexes, **no Jev call**; links 1–4 lab/corpus; link 5 **NOT VERIFIABLE** as working-dogfood | rule 12/12, FP **0/38** committed corpus; Jev 11/12 / dumb 5/12, historical FP 0/40 unreproducible (R34); first-contact `6c9c8fc` ≠ multi-row live logger; cost-benefit kill | no |
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1**; observer **(B) STILL OPEN** as working dogfood; lab only; not working/production dogfood. Harm-rule `codex` does not close this row | no |
+| dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1 lab** (`a2e2035`); working-profile dogfood **OPEN**; lab only. First-contact harm-rule receipt does not close this row | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (do not read as working/production dogfood), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
