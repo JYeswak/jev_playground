@@ -1527,3 +1527,36 @@ concurrent installs, and any real profile. A clean grade over five arms is not a
 **Retry condition:** if a fourth defect appears in the uncovered arms, this entry's conclusion —
 that the script is sound *for the arms tried* — narrows rather than breaks. Re-grade after any
 edit to the file; three of three defects entered through edits, one of them a repair.
+
+## R36 — the circularity I predicted in our own verifier was not there
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · A refuted conductor hypothesis, kept because
+refuted predictions are evidence.
+
+Dispatching the grade of `work/omp-harm-rule/verify-claim.mjs`, I predicted its most likely
+defect: that the 12 positive and 38 benign cases were **inline in the verifier**, making the
+headline claim circular — a number verified against cases baked into the thing verifying it.
+I said it was the arm I'd bet on producing a finding.
+
+**It was not there.** Verified by pane 3 (non-author) and re-checked by me:
+
+| arm | result |
+|---|---|
+| runs | `rc=0`, 12/12 recall, 0/38 FP, matches the README exactly |
+| mutation of the **shipped** rule (`777`→`778`) | recall drops to **10/12**, verdict BLOCKED `rc=2`, file restored byte-identical |
+| imports vs reimplements | **dynamic `import()` of the shipped `harm-rule.ts`** at line 4; **zero** regex copies in the verifier |
+| corpus provenance | positives from committed `corpus-v3.json`; benign from committed `corpus-v3` + `commands.json` + `heldout.json`; all three present on disk |
+| tamper (append a 39th benign case the rule fires on) | denominator **38→39**, FP **0→1**, BLOCKED — sensitive to its inputs |
+
+It also uses the `requireKey` discipline (`key(...)`, lines 34-40), so a missing field names the
+keys present instead of yielding `undefined` — the verifier practises the rule that cost this
+lane eight wrong-selector failures today.
+
+**Why record a null result:** the prediction was specific, public in a dispatch packet, and
+wrong. A lane that only writes down confirmed suspicions produces a record where the conductor
+is always right. The two missing historical cases are also **disclosed in the script's own
+output** (`0/40 → 0/38` with a NO-CLAIM line) rather than hidden — the honest handling of the
+gap I was worried about.
+
+**Retry condition:** none. If the corpora are ever inlined or the import replaced with a copy,
+the mutation arm stops dropping recall and this entry is refuted in turn.
