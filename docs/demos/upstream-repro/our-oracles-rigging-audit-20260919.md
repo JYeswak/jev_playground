@@ -1,19 +1,28 @@
-# Our oracles, audited for rigging: one suspicion refuted, one verdict fair, the count confounded
+# Our oracles, audited for rigging: suspicion UPGRADED on sibling evidence
 
 Pane 3 (muse), 2026-09-19. Read-only audit, zero live calls. Every row answers
 with file:line: (1) can it return YES (constructed yes-input or proof none
 exists), (2) preregistered win condition or fit-after-seeing, (3) bounded null
 or universal reading, (4) positive control or only negative controls.
 
-## Prime suspicion: REFUTED with the file open
-
-`work/compaction-proof/oracle.mjs:84-87`: MISTAKES = dropped-but-needed PLUS
-kept-but-never-needed, both columns printed separately. Keep-everything scored
-12/4/13 — it loses through the waste term, on the record. The suspicion ("keep-
-everything cannot lose") is FALSE as stated. The fair version of the worry is
-weaker and also answered: the 1:1 sum equates a correctness loss with a budget
-cost — but the table decomposes both, so any reader can re-weight. No fix
-needed; the suspicion is recorded here so it stops resurfacing. A genuinely fair
+CORRECTION (same session): the prime-suspicion verdict below was written before
+reading the sibling's parallel receipt
+(`docs/demos/upstream-repro/rigged-oracle-selfcheck-20260919.md`, committed
+alongside this file — see the index note at the end). The sibling is right and
+this row is corrected: the waste term exists, so "keep-everything cannot lose"
+is false as stated, BUT the two mistake types are incommensurate (a content loss
+summed 1:1 with a per-call hoarding flag, where hoarding megabytes costs the
+same as hoarding bytes) and no win condition was preregistered — so the
+head-to-head total structurally favors keep-all. Verdict corrected to
+RIGGED-SHAPE on commensurability grounds; the sibling's `fair-oracle.mjs`
+(substantive reuse ≥3 tokens, bytes counted, preregistered adopt rule, perfect-
+judge arm that CONSTRUCTS the yes-input and runs it) is the stronger instrument
+and supersedes this row. My error was stopping at "both directions counted"
+without asking whether the directions are commensurate.
+cost — but the table decomposes both, so any reader can re-weight. [SUPERSEDED
+by the CORRECTION above: decomposition is necessary but not sufficient, because
+the head-to-head TOTAL is what the verdict cites, and the total sums
+incommensurates 1:1 with no preregistered win condition.] A genuinely fair
 variant (score agent outcomes, not token recurrence) remains the ablate-and-rerun
 experiment, already NO-CLAIMed as not-done, not as a defect in this oracle.
 
@@ -21,7 +30,7 @@ experiment, already NO-CLAIMed as not-done, not as a defect in this oracle.
 
 | Oracle | YES-input? | Preregistered? | Bounded? | Positive control? | Verdict |
 |---|---|---|---|---|---|
-| oracle.mjs MISTAKES | yes: oracle policy (future knowledge) scores 0 | 0.5 = product's shipped cut; same-budget baselines in code | 3 sessions, n=96, jev-1.13.0, one run, stated | selftest rejects noise (0/200) AND fires on real (~90%) | FAIR |
+| oracle.mjs MISTAKES | yes in principle (oracle policy scores 0) but the TOTAL cannot promote a real policy: content losses and per-call hoarding flags summed 1:1, no preregistered win rule | 0.5 = product's shipped cut; verdict fitted after seeing data | 3 sessions, n=96, jev-1.13.0, one run, stated | selftest rejects noise AND fires on real, but neither proves the TOTAL can crown a winner | RIGGED-SHAPE (commensurability; corrected on sibling evidence — fair-oracle.mjs supersedes) |
 | eProcessVerdict (hindsight.ts:168-188) | yes either direction (e≥20 / e≤0.05) | thresholds + anytime-validity in code comments | bounded by input arrays | CAN return JEV-BEATS (construct: random errs more) | FAIR |
 | ensemble verdict rule (decorrelation.py:48-54) | yes incl. author-surprising third outcome | 0 / 0.5 stated in code | per-pair n | planted negative (self-average buys nothing, test:45) + opposite-shapes test (:32) | FAIR |
 | pos_control AUC (P3-3) | yes, observed (read 0.94) | A/B rule + >0.9 expectation pre-committed in bead text BEFORE running | n=150, 3 sessions, stated | the read line IS the positive control | FAIR |
