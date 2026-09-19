@@ -86,3 +86,16 @@ for (const [name, d] of Object.entries(drops)) {
   const waste = d.filter((x, i) => !x && !needed[i]).length;
   console.log(`${name.padEnd(11)} ${String(d.filter(Boolean).length).padStart(7)} ${String(bad).padStart(19)} ${String(waste).padStart(22)} ${String(bad + waste).padStart(9)}`);
 }
+
+// SEPARATION: can the keep-probability distinguish needed from unneeded AT ALL?
+// P3's Python arm found none using call-local states; this arm passes result text plus a
+// transcript excerpt, so it either confirms or refutes that on richer states.
+{
+  const A = jev.filter((_, i) => needed[i]);
+  const B = jev.filter((_, i) => !needed[i]);
+  const mean = (a) => a.reduce((x, y) => x + y, 0) / (a.length || 1);
+  let wins = 0, ties = 0;
+  for (const a of A) for (const b of B) { if (a > b) wins++; else if (a === b) ties++; }
+  const auc = (A.length && B.length) ? (wins + 0.5 * ties) / (A.length * B.length) : NaN;
+  console.log(`SEPARATION  keep_p needed=${mean(A).toFixed(3)} (n=${A.length})  unneeded=${mean(B).toFixed(3)} (n=${B.length})  AUC=${auc.toFixed(3)}   0.5 = no signal`);
+}

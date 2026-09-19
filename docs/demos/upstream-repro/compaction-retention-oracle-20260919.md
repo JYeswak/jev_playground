@@ -52,6 +52,23 @@ So the high reuse rate is a property of agentic sessions, not a loose oracle.
 Jev's drop rate: **97.9% / 99.0% / 97.9%**. It is **indistinguishable from dropping everything**,
 from random, and from recency — and **keeping everything is 7×, 23× and 6× better**.
 
+## Follow-up: the keep-probability carries no signal at all
+
+Pane 3's independent Python arm (150 calls, 3 sessions, call-local states) found `keep_p` **0.361
+for needed vs 0.369 for unneeded** and bounded it: maybe call-local states starve the model.
+This arm refutes that bound — it passes result text **plus** a transcript excerpt:
+
+| session | keep_p needed | unneeded | AUC |
+|---|---|---|---|
+| A | 0.346 (n=84) | 0.334 (n=12) | **0.522** |
+| B | 0.342 (n=83) | 0.371 (n=13) | **0.348** |
+| C | 0.338 (n=92) | 0.307 (n=4)  | **0.648** |
+
+Straddling 0.5 across two SDKs and two state shapes. So the finding is not "the threshold is
+mistuned" — **no threshold can work, because the probability does not rank future need.** Pane 3
+separately reports mistakes/10KB flat at 1.7–2.1 across the whole 0.1–0.9 sweep, with no operating
+point, and nothing beating keep-everything.
+
 ## The ruling
 
 **Do not run this compactor on an omp session.** In agentic coding transcripts ~90% of tool
