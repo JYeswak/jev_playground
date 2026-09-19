@@ -42,3 +42,19 @@ exactly the recoverability the corpus receipt asked the logger for.
 One profile, one operator, n=21 driven commands over ~40 minutes — supports no
 interval and no general claim. Organic pane traffic still unobserved; the
 extension stays up under the written rollback, which was not needed.
+
+## Addendum — namespace mismatch confirmed; the fix was already shipped
+
+Conductor's structural finding verified independently in one command:
+tool_execution_start rows carry call_ ids (56,923) and ZERO js-bash ids
+(3000-file sample), while bridge decisions in the same sessions are
+js-bash-majority. Two namespaces, no mapping table: unjoinable by
+construction, not for lack of trying. Join strategies: abandoned, correctly.
+
+Correction to the revised unit's premise: command capture at decision time
+was ALREADY in the promoted bytes (codex copy shasum-identical before and
+after this pass; every quoted fire above came from those rows). No re-promote
+changed behavior — verified by a post-pass probe firing harm_pass with
+command + toolCallId in codex. The defect described (unattributable fires)
+never existed in the shipped extension; the corpus finding stands for
+history-mining only.
