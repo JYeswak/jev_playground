@@ -184,21 +184,21 @@ describe('registerOmpHook', () => {
     assert.match(logs.join('\n'), /passthrough/);
   });
 
-  it('returns the judged compaction envelope on success', async () => {
+  it('yields to the built-in summarizer on success (verdict logged, nothing returned)', async () => {
+    // The seam has no pruned-message channel: omp consumes fromHook as summary plus
+    // keep-boundary, so returning the pruned transcript would arrive malformed. A verdict is
+    // measured in the log; omp's own summarizer keeps the job.
     const { pi, handlers, logs } = fakePi();
     registerOmpHook(pi, {
       asker: cannedAsker({ call_t1: 0.9, result_t1: 0.9, call_t2: 0.9, result_t2: 0.1 }),
       config,
     });
-    const out = (await handlers['session_before_compact']({
+    const out = await handlers['session_before_compact']({
       messages: twoCallTranscript(),
-    } as never)) as { compaction: { messages: Message[]; preserveData: { ompJev: string } } };
-    assert.ok(out.compaction);
-    const dropped = out.compaction.messages
-      .flatMap((m) => m.toolResults ?? [])
-      .find((r) => r.tool_use_id === 'c2');
-    assert.ok(dropped && dropped.text.length < 2007);
-    assert.match(out.compaction.preserveData.ompJev, /reduction/);
+    } as never);
+    assert.equal(out, undefined);
+    assert.match(logs.join('\n'), /would-compact/);
+    assert.match(logs.join('\n'), /reduction/);
     assert.match(logs.join('\n'), /decisions:/);
   });
 });

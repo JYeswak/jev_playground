@@ -192,10 +192,10 @@ export type OmpHookDeps = {
 };
 
 /**
- * Binds the safe path to omp's pre-compact point. Returns `undefined`
- * (omp default behavior) whenever judgment says passthrough — including
- * every error case. Named follow-up, not done here: prove L2/L3 in a live
- * session with this file installed at `<repo>/.omp/hooks/pre/omp-jev.ts`.
+ * Binds the safe path to omp's pre-compact point. Returns `undefined` (omp default behavior) on
+ * every path — passthrough on error or decline, and honest yield on a compact verdict, because
+ * the seam carries summary plus keep-boundary only. Named follow-up, not done here: prove L2/L3
+ * in a live session with this file installed at `<repo>/.omp/hooks/pre/omp-jev.ts`.
  */
 export function registerOmpHook(pi: OmpHookApi, deps: OmpHookDeps): void {
   const config = deps.config ?? resolveOmpHookConfig();
@@ -214,14 +214,12 @@ export function registerOmpHook(pi: OmpHookApi, deps: OmpHookDeps): void {
         log(`omp-jev passthrough (${settled.reason})`);
         return undefined;
       }
+      // Honest yield, same reason omp-binding.ts documents against the runtime: the seam has no
+      // pruned-message channel, so a verdict is logged, never returned. omp's own summarizer
+      // keeps the job; the decision log keeps the measurement.
+      log(`omp-jev would-compact (${summarize(settled.result)}) — yielded to the built-in summarizer`);
       for (const line of decisionLogLines(settled.result)) log(line);
-      return {
-        compaction: {
-          messages: settled.messages,
-          decisions: settled.result.decisions,
-          preserveData: { ompJev: summarize(settled.result) },
-        },
-      };
+      return undefined;
     } catch (error) {
       try {
         log(`omp-jev passthrough (unexpected: ${error instanceof Error ? error.message : String(error)})`);

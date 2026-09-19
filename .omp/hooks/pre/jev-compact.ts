@@ -5,46 +5,32 @@
  * `AGENTS.md` §4 that `docs/demos/omp-seam-live-20260918.md` recorded as open: the seam's logic was
  * proven against real data and a live model at L2+, but omp had never loaded it.
  *
+ * 2026-09-19: environment handling moved into `registerOmpCompactionHookFromEnv`
+ * (`compaction/src/omp-binding.ts`, tested) — this file is now the same minimal entry every
+ * installed repo gets (template: `compaction/deploy/hook-entry.ts`). One env reader, tested once,
+ * deployed everywhere. Skill: `skill://jev-compact`.
+ *
  * SAFETY IS THE WHOLE DESIGN OF THIS FILE. It runs inside the agent that would have to repair it,
  * and today an untested `pi` extension made every invocation of that host fail while its documented
  * removal reported success without fixing it. So:
  *
- *   - every path is wrapped; this module NEVER throws out of `register` or out of the handler;
+ *   - this module NEVER throws out of the entry;
  *   - with no `TYPESAFE_API_KEY` in the environment it registers NOTHING and returns quietly, so a
  *     keyless session behaves exactly as it did before this file existed;
- *   - the handler returns `undefined` on any failure, which leaves omp's own summarizer in charge.
- *     A compaction hook that errors must cost a missed optimisation, never a lost transcript.
+ *   - the handler only ever yields (`undefined`), which leaves omp's own summarizer in charge.
+ *     A compaction hook must cost a missed optimisation at worst, never a lost transcript — and,
+ *     measured 2026-09-19 against the shipped runtime, the seam carries summary plus keep-boundary
+ *     only, so a returned pruning would arrive malformed. Verdicts are measured, not shipped.
  *
  * The compaction logic itself is not here: it is `compaction/src/omp-binding.ts`, tested at
- * `compaction/test/omp-binding.test.ts` (6 tests, including a real-transcript Jev-outage arm), and
+ * `compaction/test/omp-binding.test.ts` (real-transcript arms included), and the library core was
  * exercised live at 13 messages to 8 in 1,282 ms.
  */
-// RELATIVE, not a bare specifier. A hook at .omp/hooks/pre/ is outside compaction/'s package
-// scope, so `from 'fast-jev-compaction'` fails to resolve — omp reported exactly that and, to
-// its credit, kept the session alive and answered the prompt anyway. omp fails OPEN on a broken
-// hook, which is the opposite of what pi did with a broken extension today.
-import { JevClient } from '../../../compaction/node_modules/fast-jev-compaction/dist/index.js';
-import { registerOmpCompactionHook, type OmpLike } from '../../../compaction/src/omp-binding.js';
+import {
+  registerOmpCompactionHookFromEnv,
+  type OmpLike,
+} from '../../../compaction/src/omp-binding.js';
 
 export default function jevCompactHook(pi: OmpLike): void {
-  try {
-    const apiKey = process.env.TYPESAFE_API_KEY;
-    if (!apiKey) {
-      // Not an error: the offline lane is the default, and a keyless session must be unchanged.
-      return;
-    }
-    registerOmpCompactionHook(pi, {
-      asker: new JevClient({ apiKey }),
-      // The sink lives in omp-binding.ts so the tests can reach it; this file only says where.
-      // JEV_COMPACT_LOG relocates the decision log; the default keeps it out of the repo.
-      decisionLogPath: process.env.JEV_COMPACT_LOG || `${process.env.HOME}/.jev-compact.log`,
-      onDecision: (outcome, reason) => {
-        process.stderr.write(`[jev-compact] ${outcome}: ${reason}\n`);
-      },
-    });
-  } catch (error) {
-    process.stderr.write(
-      `[jev-compact] disabled, registration failed: ${error instanceof Error ? error.message : String(error)}\n`,
-    );
-  }
+  registerOmpCompactionHookFromEnv(pi);
 }

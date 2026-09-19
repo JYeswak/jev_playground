@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Message } from 'fast-jev-compaction';
 import { adaptOmpTranscript } from '../src/omp-adapter.js';
-import ompCompactionHook, { normalizeLiveMessage, registerOmpCompactionHook, type OmpLike } from '../src/omp-binding.js';
+import ompCompactionHook, { normalizeLiveMessage, registerOmpCompactionHook, registerOmpCompactionHookFromEnv, type OmpLike } from '../src/omp-binding.js';
 
 // A stub standing in for omp's extension API. It captures the handler the binding registers, so a
 // test can drive `session_before_compact` without a live session. This proves the BINDING's
@@ -196,4 +196,67 @@ test('PRODUCTION SHAPE: a custom role with string content is normalized, not dro
   // A missing content field yields an empty parts array, never a throw.
   assert.deepEqual(normalizeLiveMessage({ role: 'user' }).content, []);
   assert.deepEqual(normalizeLiveMessage(undefined).content, []);
+});
+
+// THE SUCCESS PATH, CORRECTED 2026-09-19. The first version of this seam returned
+// `{compaction: {messages}}` on a Jev verdict — but omp consumes a fromHook compaction as
+// {summary, firstKeptEntryId, tokensBefore, details, preserveData} with no pruned-message
+// channel, so that return would have arrived with undefined summary and boundary. A verdict is
+// now MEASURED (would-compact) while omp's own summarizer keeps the job.
+test('REAL TRANSCRIPT: a Jev verdict is measured and yielded, never returned as messages', async () => {
+  const raw = readFileSync(
+    new URL('../fixtures/omp-session-big-20260917.jsonl', import.meta.url),
+    'utf8',
+  );
+  const events = raw.split('\n').filter(Boolean).map((l) => JSON.parse(l));
+  const { messages } = adaptOmpTranscript(events);
+  assert.ok(messages.length > 0, 'the adapter must produce messages from the fixture');
+
+  // A Jev that drops everything it is asked about: maximum pruning pressure.
+  const dropAll = {
+    ask: async (_state: unknown, questions: Record<string, unknown>) => ({
+      answers: Object.fromEntries(Object.keys(questions).map((name) => [name, { noul: 0.05 }])),
+    }),
+  };
+  const { pi, fire } = stubPi();
+  const seen: string[] = [];
+  registerOmpCompactionHook(pi, { asker: dropAll, onDecision: (o, r) => seen.push(`${o}:${r}`) });
+
+  const out = await fire({ messages });
+  assert.equal(out, undefined, 'even a compact verdict must not return pruned messages: the seam has no channel for them');
+  assert.match(seen[0] ?? '', /^would-compact:/, `the verdict must be measured, not swallowed: ${seen[0]}`);
+  assert.match(seen[0] ?? '', /yielded: no pruned-message channel/, seen[0]);
+});
+
+// THE INSTALL SURFACE. Hook entries (here and in every repo the installer touches) delegate to
+// this factory so there is exactly one place that reads the environment — and it is tested.
+test('fromEnv registers nothing without a key and never throws', () => {
+  // Presence via `in`, never ==/!=: no secret value is compared here (this is env save/restore),
+  // and the timing-unsafe-comparison rule misfires on secret-named equality checks.
+  const hadKey = 'TYPESAFE_API_KEY' in process.env;
+  const savedKey = process.env.TYPESAFE_API_KEY;
+  delete process.env.TYPESAFE_API_KEY;
+  try {
+    let handler: unknown = 'unset';
+    const pi: OmpLike = { on: (_event, h) => { handler = h; } };
+    registerOmpCompactionHookFromEnv(pi);
+    assert.equal(handler, 'unset', 'a keyless session must behave as if the hook did not exist');
+  } finally {
+    if (hadKey) process.env.TYPESAFE_API_KEY = savedKey as string;
+  }
+});
+
+test('fromEnv registers the handler with a key (constructing the asker calls no network)', () => {
+  const hadKey = 'TYPESAFE_API_KEY' in process.env;
+  const savedKey = process.env.TYPESAFE_API_KEY;
+  process.env.TYPESAFE_API_KEY = 'test-key-never-sent';
+  try {
+    let handler: unknown = 'unset';
+    const pi: OmpLike = { on: (_event, h) => { handler = h; } };
+    registerOmpCompactionHookFromEnv(pi);
+    assert.equal(typeof handler, 'function', 'a keyed session gets the pre-compact handler');
+  } finally {
+    if (hadKey) process.env.TYPESAFE_API_KEY = savedKey as string;
+    else delete process.env.TYPESAFE_API_KEY;
+  }
 });

@@ -316,3 +316,27 @@ the last two by committed tests; and `.omp/hooks/pre/jev-compact.ts` now **loads
 via separate `omp -p` runs). What remains open is the last step: no real `session_before_compact`
 event has fired it yet.
 Receipt: [`docs/demos/omp-seam-live-20260918.md`](docs/demos/omp-seam-live-20260918.md).
+---
+
+## jev-compact — skill + anywhere-installer, honest yield (2026-09-19, pane 3)
+
+Hook live here (`.omp/hooks/pre/jev-compact.ts`, keyed sessions only) plus skill
+(`.omp/skills/jev-compact/SKILL.md`) and installer (`compaction/install-jev-compact.sh`).
+Lane: offline throughout this pass; the one cited live figure (13 → 8, 1,282 ms, `jev-1.13.0`)
+is unchanged from `docs/demos/omp-seam-live-20260918.md`.
+
+- **Seam correction:** the success path returned `{compaction: {messages}}`; the runtime consumes
+  `{summary, firstKeptEntryId, tokensBefore, ...}` with no message channel, so that return would
+  have arrived malformed. Now `would-compact` is logged and the hook yields. See
+  NEGATIVE_EVIDENCE R21.
+- **Tests:** `compaction/`: 32/32 green (`npx tsc --noEmit`,
+  `node --import tsx --test test/*.test.ts`), including a real-fixture would-compact arm and
+  fromEnv keyless/keyed registration arms.
+- **Installer proven on scratch targets:** install PASS (files + ESM dep resolution + receipt
+  pinning dep SHA `6e1da50`); `--check` fails closed (exit 1) on an empty dir; deployed lib and
+  entry smoke-load with keyless registration a no-op. Its own probes found and fixed two defects:
+  a CJS `require.resolve` check against an ESM-only package, and a missing `"type": "module"`
+  scope over the deployed lib.
+- **Not proven:** firing inside a target repo (only a post-`/compact` decision-log line proves
+  that); L4 unreachable on this seam by construction.
+- Boundary: zero live Jev calls in this pass; no production compact ever returned a pruning.

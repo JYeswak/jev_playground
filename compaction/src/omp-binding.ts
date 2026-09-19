@@ -19,9 +19,9 @@
  * module with a stub-driven proof, and the live install is a gated step a human takes.
  */
 import { appendFileSync } from 'node:fs';
-import type { JevAsker, Message } from 'fast-jev-compaction';
+import { JevClient, type JevAsker, type Message } from 'fast-jev-compaction';
 import { adaptOmpTranscript } from './omp-adapter.js';
-import { compactOmpTranscriptSafe, OMP_HOOK_DEFAULTS, type OmpHookConfig } from './omp-hook.js';
+import { compactOmpTranscriptSafe, OMP_HOOK_DEFAULTS, summarize, type OmpHookConfig } from './omp-hook.js';
 
 /** The subset of omp's extension API this binding touches. */
 /**
@@ -49,7 +49,11 @@ export interface OmpLike {
   ): void;
 }
 
-/** omp's documented return contract for `session_before_compact`. */
+/** omp's return contract for `session_before_compact`: `{cancel, compaction?}`, where a fromHook
+ * compaction is consumed as {summary, firstKeptEntryId, tokensBefore, details, preserveData} —
+ * measured against the shipped runtime, NOT a pruned-message channel. This binding only ever
+ * returns `undefined` (yield) and reports verdicts through onDecision; the interface documents
+ * the seam, not us. */
 export interface OmpCompactReturn {
   cancel?: boolean;
   compaction?: { messages: readonly Message[] };
@@ -74,10 +78,11 @@ export interface BindingDeps {
 /**
  * Registers the pre-compaction handler.
  *
- * The handler NEVER throws and NEVER returns fewer messages than it was given unless compaction
- * actually succeeded. On any failure it returns `undefined`, which leaves omp's own summarizer in
- * charge — the fail-safe side `omp-hook.ts` documents, and the reason a Jev outage degrades this
- * seam to "no improvement" rather than "context destroyed".
+ * The handler NEVER throws and NEVER returns a compaction: the seam carries summary plus
+ * keep-boundary only, no pruned-message channel, so a returned pruning would arrive malformed.
+ * A Jev verdict is MEASURED (would-compact in the decision log) while omp's own summarizer
+ * keeps the job — the fail-safe side `omp-hook.ts` documents, and the reason a Jev outage (or
+ * a Jev verdict) degrades this seam to "no improvement" rather than "context destroyed".
  */
 export function registerOmpCompactionHook(pi: OmpLike, deps: BindingDeps): void {
   const config: OmpHookConfig = { ...OMP_HOOK_DEFAULTS, ...(deps.config ?? {}) } as OmpHookConfig;
@@ -165,8 +170,16 @@ export function registerOmpCompactionHook(pi: OmpLike, deps: BindingDeps): void 
       record('refused', 'compacted output was not smaller than its input');
       return undefined;
     }
-    record('compacted', `${adapted.length} -> ${outcome.messages.length}`);
-    return { compaction: { messages: outcome.messages } };
+    // HONEST YIELD: omp consumes a fromHook compaction as {summary, firstKeptEntryId,
+    // tokensBefore, details, preserveData} — measured in the runtime, which reads F.summary /
+    // F.firstKeptEntryId / F.tokensBefore and ignores any `messages` field. Returning our pruned
+    // transcript would arrive with undefined summary and boundary, degrading the session to
+    // publish a pruning. So the verdict is MEASURED here and omp's own summarizer keeps the job.
+    record(
+      'would-compact',
+      `${adapted.length} -> ${outcome.messages.length}; ${summarize(outcome.result)}; yielded: no pruned-message channel on this seam`,
+    );
+    return undefined;
   });
 }
 
@@ -202,4 +215,32 @@ export function normalizeLiveMessage(raw: unknown): {
     return { role, content: m.content as Array<{ type: string; text?: string }> };
   }
   return { role, content: [] };
+}
+
+/**
+ * Self-installing entry: reads the host environment and registers the hook, or registers
+ * nothing. The key lives outside every tree (loaded into the environment only, never a file,
+ * fixture, or log); a keyless session behaves exactly as it did before this hook existed.
+ * Never throws: this runs inside the session that would have to repair it.
+ */
+export function registerOmpCompactionHookFromEnv(pi: OmpLike): void {
+  try {
+    const apiKey = process.env.TYPESAFE_API_KEY;
+    if (!apiKey) {
+      // Not an error: the offline lane is the default.
+      return;
+    }
+    registerOmpCompactionHook(pi, {
+      asker: new JevClient({ apiKey }),
+      // JEV_COMPACT_LOG relocates the decision log; the default keeps it out of every repo.
+      decisionLogPath: process.env.JEV_COMPACT_LOG || `${process.env.HOME}/.jev-compact.log`,
+      onDecision: (outcome, reason) => {
+        process.stderr.write(`[jev-compact] ${outcome}: ${reason}\n`);
+      },
+    });
+  } catch (error) {
+    process.stderr.write(
+      `[jev-compact] disabled, registration failed: ${error instanceof Error ? error.message : String(error)}\n`,
+    );
+  }
 }

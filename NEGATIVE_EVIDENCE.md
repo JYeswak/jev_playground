@@ -763,3 +763,26 @@ stranger something untrue about their own logs — same defect class as an unope
 2. **Re-open as class:** a second demo refuses real input it claims to serve — then the question
    is no longer one classifier but whether fixture-shaped demos generalize, and the row grows a
    class section.
+---
+
+## R21 — the omp pre-compact seam carries summary plus keep-boundary, not pruned messages (2026-09-19)
+
+**Refuted hypothesis:** a `session_before_compact` hook can return Jev's pruned transcript and omp
+will compact with it. The binding returned `{compaction: {messages}}` on a Jev verdict — but the
+shipped runtime consumes a fromHook result as `{summary, firstKeptEntryId, tokensBefore, details,
+preserveData}` (`dist/cli.js`, every `F.kind === "fromHook"` site reads summary/boundary and no
+message field), matching the typed `CompactionResult {summary, firstKeptEntryId, tokensBefore,
+...}`. The return would have arrived with undefined summary and boundary. It never fired in
+production (all production outcomes to date refused or passed through; the one `compacted` was
+library-level in `live-probe.mjs`), so no session was degraded — but every success-path test
+asserting the envelope encoded the same mistake.
+
+**Scope ruling (pane 3):** the hook is a measurement instrument, not a pruning hook. On a compact
+verdict it logs `would-compact N -> M` and yields (`undefined`); omp's own summarizer keeps the
+job. Shipped as skill `jev-compact` + `compaction/install-jev-compact.sh`. L4 (a session
+measurably shrunk by this hook) is unreachable on this seam, not merely unreached.
+
+**RETRY CONDITION:** omp adds a pruned-history/message-override channel to
+`SessionBeforeCompactResult` (or documents a `details` kind that carries messages) — then the
+`would-compact` log lines are the demand evidence for wiring it, and this row closes with the
+wiring commit.
