@@ -1,0 +1,18 @@
+#	THE WORK QUEUE. Consumer: the cron tick -- it reads the oldest row not at RULED and dispatches that unit.
+#	Gate: a repo may not be RULED without a preregistered win_condition written BEFORE measurement.
+#	Observed defect: 21 rulings landed 2026-09-19 with zero preregistered thresholds; one bar was
+#	later proven impossible (a perfect judge scored 27.2%/29.3% at 0% loss and still failed it).
+#	Retirement: delete when all 8 product rows are RULED and the P5 ratchet holds their floors.
+#	stage: UNASSIGNED -> SPEC -> BUILT -> RUN -> RULED    class: A=mock B=golden C=ground-truth D=outcome
+#	Only class C or better may rule. A failed feasibility arm means BLOCKED-HARNESS, never a verdict.
+#	Plan: docs/demos/ORACLE-PROGRAM.md
+repo	shape	ground_truth_source	win_condition	class_target	class_achieved	stage	receipt
+tamaratran/fast-jev-compaction	2-ratchet	substantive-reuse + byte ceiling	save>=50pct_AND_lose<=10pct	C	C	RULED	docs/demos/upstream-repro/compaction-retention-oracle-20260919.md
+0xNatoshi/jev-codex-router	3-applicability-ratchet	COMPLETION not price: did the downgraded turn finish	flat-tier-baseline_must_not_win	D	C	RULED	docs/demos/upstream-repro/router-savings-inverts-20260919.md
+devanshbatham/commit-miner	4-mixed-denominator	real commits from our history + benign controls	0_false_positives_AND_1plus_true_positive_under_1cent_and_3s	D	-	BLOCKED-HARNESS	docs/demos/upstream-repro/commit-miner-adoption-test-20260919.md
+claude-code-templates/jev-model-router	3-applicability-ratchet	our own sessions; effort+subagent routing only	PENDING-SPEC	C	-	SPEC	-
+thruwire/foreman	7-adversarial-survival	constructed observations at upstream thresholds + trap pairs	PENDING-SPEC	C	C	SPEC	docs/demos/upstream-repro/router-savings-inverts-20260919.md
+NiazMorshed2007/jev-review	6-metamorphic-invariant	good/bad pairs; ordering is the invariant	PENDING-SPEC	C	C	SPEC	docs/demos/upstream-repro/router-savings-inverts-20260919.md
+Dicklesworthstone/skillranker	1-threshold-gate	its own synthetic_cases.v1.jsonl + frozen 0/1/2 loss table	PENDING-SPEC	C	-	UNASSIGNED	-
+AbdelStark/bicameral	7-adversarial-survival	injection + destructive-command corpus; benign reads as negatives	PENDING-SPEC	C	-	UNASSIGNED	-
+browser-use/jev-ultrafast	5-metamorphic-golden	its verify(page) end-state checker behind a fixture	PENDING-SPEC	D	-	UNASSIGNED	-
