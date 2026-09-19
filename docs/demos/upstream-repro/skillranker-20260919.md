@@ -112,3 +112,17 @@ conductor's dispatch defect, not an execution failure.
   aspirational prose in ours.
 - Their error envelope (`decision/error/schema_version`, `retryable`, `hint`) is
   the honest-unavailable shape our installer `--check` already mimics.
+
+## Addendum — commands ARE reachable upstream (2026-09-19, pane 3)
+
+Conductor's follow-up question (are the phase-gated commands reachable at a later
+tag/branch?) answered read-only: `git fetch origin main` (remote-tracking refs only;
+worktree stays pinned at `3fe85c4`, `git status` clean), upstream main is
+**103 commits ahead at `4ed4c9b`**, and there the commands exist — `Command::new`
+for `rank`, `capabilities`, `roster`, `demo` (`src/cli.rs:56,185,196,221`), demo with
+`--case useful|none|explicit|unavailable` plus `--json|--table`, backed by real
+modules (`src/demo.rs`, `src/capabilities.rs`, `src/pipeline.rs`, `src/scoring.rs`,
+`src/jev/`). So: YES, reachable at origin/main — with two NO-CLAIMs: implementation
+depth below the CLI surface is unverified (modules exist; behavior unrun), and no
+worktree was moved — running main needs a clean export plus a full build plus keyed
+budget, which is follow-up work, not this receipt.
