@@ -50,3 +50,29 @@ One profile, our own traffic (one driven probe so far), observe-only — this
 is not evidence the rule is correct for other users or other workloads, and
 not evidence about sustained multi-pane traffic. The rollback above stays
 valid for the life of this registration.
+
+## P3-28 appendix — re-promoted with harm_error fix (pane 3, 2026-09-19)
+
+## ROLLBACK (written before touching anything; backup taken first)
+
+Deployed bytes before swap: `3d519b84bd8a848a`, backed up to
+`/tmp/codex-harmrule-backup.ts`. Restore verbatim, no re-derivation:
+
+```bash
+cp /tmp/codex-harmrule-backup.ts ~/.omp/profiles/codex/agent/extensions/omp-harm-rule.ts
+```
+
+Config untouched (registration by absolute path already works; pane 2 is
+separately checking the installer's bare-name form — not this unit).
+
+Repo bytes under test: `5526284ef873299f` (harm_error fix + DI seam;
+classify byte-identical to c5966a5, re-verified at swap time).
+
+## Post-swap proof (same session)
+
+`--private-tmp--/2026-09-19T23-01-52`: 2 harm rows (harm_pass echo
+reswap-probe, harm_fire chmod) + 2 dcg-bridge rows — the extension fires
+with the new bytes, and a known-firing neighbour (bridge) wrote in the same
+session, so this is verified against activity, not silence. Rollback
+untried-but-ready (nothing errored). NO-CLAIM: the swap changes no published
+number, re-runs no head-to-head, and promoted stays 0 in the ledger.
