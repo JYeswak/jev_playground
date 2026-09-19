@@ -39,6 +39,7 @@ claim nobody can check:
 - `compaction/test/hook-compact.test.ts` — the omp compaction hook surface (sibling-owned, bead
   `jev-compact-hook-hbs`).
 - `work/omp-harm-rule/verify-claim.mjs` — imports the shipped harm rule and verifies the committed 12/12 recall and 0/38 false-positive denominator. Run: `node work/omp-harm-rule/verify-claim.mjs` (exit 0 on the committed corpus; mutation arm is documented in the claim receipt).
+- `work/omp-harm-rule/install-harm-rule.sh` — temp-OMP_HOME installer arms: missing install RED, install GREEN, check GREEN, idempotent rerun, empty block list, and inline-list refusal. Run each arm with a disposable `OMP_HOME`; six producer exit codes are recorded in the P2-29 callback.
 - `probes/fast-jev-probe.mts` — our black-box probe of the compaction library against a fake Jev. Run: `npx tsx probes/fast-jev-probe.mts` → 8 assertions.
 
 - `work/dogfood-logger/test/logger.test.mjs` — append-only decision/outcome logger: joined false-positive scoring, malformed/orphan record handling, concurrent append preservation, and rotation. Run: `node --test work/dogfood-logger/test/logger.test.mjs` (4 tests).
