@@ -148,3 +148,11 @@ Still open, with their classification:
 |---|---|---|
 | `p12-loop-integrity` | **FALSE FAIL (routed)** | errors `exit 3` (driver missing) and `stamp-check` calls that FAIL. This lane runs no tick-loop *driver*; the honest verdict is N-A, symmetric with `rc0` yielding N-A when there is neither a `.rust-cli-path` nor a `[[bin]]` crate. Filed on `jev-stampcheck-vendored-false-positives-lfn`. |
 | `rc0-declared-path` | **FALSE_POSITIVE (routed)** | the "undeclared Rust bin crate" is `s1-rs`, a vendored clone. It is not our CLI. Same bead. |
+
+## Observer decision-to-execution ID seam — P2-24 Unit 2
+
+The observer's live diagnostic records expose nested bash IDs in the js-bash-<uuid> namespace. OMP tool_execution_start records expose call_<id>|fc_<id> IDs. Pane-3 evidence records 56,923 observer/dcg-style js-bash IDs and zero overlap with execution IDs. The two namespaces have no common field in the current records; observer decision rows carry a decisionId and argsDigest, while execution rows carry toolCallId, so argsDigest cannot be used as an attribution key.
+
+Gate: NO-CLAIM on decision-to-execution attribution until a source-level bridge field is emitted and proven against both namespaces. Do not report joined rates, per-command outcomes, or model attribution from these rows. The observer diagnostic raw event preserves the js-bash event for future bridge work; it does not establish a mapping to call_<id>|fc_<id>.
+
+Evidence: docs/INTEGRATIONS.md lines 20-30 and docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md lines 27-35. The required bridge is not present in work/omp-jev-observer/src/observer.mjs; current fields are decisionId, argsDigest, and raw diagnostic event data.
