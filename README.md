@@ -209,7 +209,7 @@ the scoring done by a pane that authored none of them:
 | **deterministic rule** | **12/12** | 0/40 |
 | Jev | 11/12 | 0/40 |
 | dumb baseline | 5/12 | 0/40 |
-
+Reproduction: `node work/omp-harm-rule/verify-claim.mjs` (currently BLOCKED: the exact 40 benign cases are not committed; see `docs/demos/upstream-repro/harm-rule-claim-repro-20260919.md`).
 One recall point, at zero cost, zero latency and zero network. That is the whole reason the model
 is not in the shipped artifact — and it is the fifth surface in this repo where the cheap thing
 matched or beat the model.
