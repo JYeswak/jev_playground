@@ -1290,3 +1290,30 @@ corrupts, and `STILL-BLOCKED` reads exactly like a defect while being a scheduli
 **Retry condition:** re-run the LocalJev 40-case set and the class-D arms in a confirmed quiet
 window. If LocalJev completes, the three "refuted" hypotheses were never tested and the BLOCKED
 verdict is withdrawn, not merely updated.
+
+## R31 — the P5 ratchet is REFUSED: with promoted 0, there is nothing to ratchet
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · Refusal with a trigger, per the R18 model.
+
+`ORACLE-PROGRAM.md` P5 proposed a ratchet: promoted rows get a floor, regressions fail closed.
+The manifest is now frozen and the rows are stable, so the stated precondition is met and the
+work is dispatchable. I am refusing it anyway.
+
+**The creation gate can be answered, and answering it is what kills it.** A ratchet's consumer
+is the tick, its gate is "a promoted row may not silently regress", and its retirement is when
+rows retire. But the observed-defect question has no honest answer: **there are no promoted
+rows.** `PROMOTED=0`, and the single promotion awarded today was retracted by its own author two
+hours later. A floor over an empty set fires on nothing — it is the fourth instrument in a lane
+that already has two which gate nothing (`verify-other-reasons.sh`, refused promotion four times;
+`verify-reason-numerals.sh`, ruled `KEEP_HAND_RUN_ONLY`).
+
+**What already covers the real regression risk**, so the gap is smaller than P5 assumed:
+`lane-status.sh` pins a content digest per receipt and exits non-zero on drift — it caught a
+real one today (`rc=4`, `drifted: 1`) within minutes. Verdict changes are visible in
+`STATUS.tsv` history. The uncovered case is narrow: a *promoted* row quietly degrading on
+re-measurement, which cannot happen while nothing is promoted.
+
+**Trigger that reverses this refusal:** the first row reaching rung 5 and staying there across
+two independent re-measurements. At that point a floor has something to protect and the observed
+defect becomes nameable. Until then the tick spends its budget on shipping a surface, not on
+guarding an empty shelf.
