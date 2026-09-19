@@ -56,7 +56,16 @@ export function adaptOmpTranscript(events: OmpEvent[]): { messages: Message[]; s
   const pending: Array<{ id: string; text: string; isError: boolean; at: number }> = [];
 
   for (const event of events) {
-    if (event.type !== 'message_end' || !event.message) continue;
+    // TWO LIVE ENVELOPES, ONE PAYLOAD. `message_end` is omp's `--mode json` STREAM event
+    // (print-mode.d.ts:24-36: "the authoritative message follows in message_end"); `message` is
+    // the on-disk SessionEntry record (session-entries.d.ts:55). Both are current, and both wrap
+    // the SAME AgentMessage: measured on a real 9.5 MB session — keys role/content/timestamp/
+    // toolCallId/toolName/details/isError, content parts text/toolCall/thinking, exactly what the
+    // loop below already reads. So this accepts a second ENVELOPE, it does not add a parser.
+    //
+    // Before this line a real session file adapted to ZERO messages and the replay harness failed
+    // closed with "library saw tool calls" (R23, pane 2's receipt 2cde8ac).
+    if ((event.type !== 'message_end' && event.type !== 'message') || !event.message) continue;
     const msg = event.message;
     stats.messagesIn += 1;
     if (msg.role === 'user') {

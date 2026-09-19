@@ -14,8 +14,10 @@ Every test file committed to this repo, by path. A test surface nobody enumerate
 claim nobody can check:
 
 - `compaction/test/adapter.test.ts` — the omp transcript adapter's mapping tests, including the
-  known-bad (a trailing `toolResult` must be kept). Gated by
-  `foundation/gates.d/40-omp-compact-replay.sh`.
+  known-bad (a trailing `toolResult` must be kept) and **both live envelopes**: `message_end`
+  (the `--mode json` stream) and `message` (the on-disk SessionEntry), which must produce
+  identical messages, plus a planted negative that an unknown envelope still yields nothing.
+  Gated by `foundation/gates.d/40-omp-compact-replay.sh`.
 - `compaction/test/hook-compact.test.ts` — the omp compaction hook surface (sibling-owned, bead
   `jev-compact-hook-hbs`).
 - `probes/fast-jev-probe.mts` — our black-box probe of the compaction library against a fake Jev.
