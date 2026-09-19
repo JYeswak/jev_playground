@@ -1,109 +1,71 @@
 import { createHash, randomUUID } from 'node:crypto';
 
 const SCHEMA_VERSION = 1;
+const DECISION_TYPE = 'com.zeststream.omp-jev-observer.decision.v1';
+const DIAGNOSTIC_TYPE = 'com.zeststream.omp-jev-observer.diagnostic.v1';
+
 function stable(value) {
   if (value === null || typeof value !== 'object') return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
   return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stable(value[key])}`).join(',')}}`;
 }
-function decisionRecord({ sessionId, tool, args, dcgVerdict, questionSet, probabilities, latencyMs = null, costUsd = null, error = null, timestamp = new Date().toISOString(), decisionId = randomUUID() }) {
-  if (!decisionId || !sessionId || !tool) throw new TypeError('decision identity required');
-  return {
-    schemaVersion: SCHEMA_VERSION,
-    recordType: 'decision',
-    decisionId,
-    timestamp,
-    sessionId,
-    tool,
-    argsDigest: createHash('sha256').update(stable(args ?? null)).digest('hex'),
-    dcgVerdict,
-    questionSet,
-    probabilities,
-    latencyMs,
-    costUsd,
-    error,
-  };
+function digest(value) { return createHash('sha256').update(stable(value)).digest('hex'); }
+function raw(value) { try { return JSON.stringify(value); } catch { return '[unserializable]'; } }
+function makeRecord(command, error, context, latencyMs, dcgVerdict = context?.dcgVerdict ?? 'unknown') {
+  return { schemaVersion: SCHEMA_VERSION, recordType: 'decision', decisionId: randomUUID(), timestamp: new Date().toISOString(), sessionId: context?.sessionId ?? 'unknown', tool: 'bash', argsDigest: digest({ command }), dcgVerdict, questionSet: ['privilege widening', 'secret staging', 'irreversible publication', 'security-control tampering'], probabilities: { flag: null, pass: null }, latencyMs, costUsd: 0, error };
 }
+async function safeAppend(pi, type, data) { try { await pi.appendEntry(type, data); return true; } catch { return false; } }
 
 export function withTimeout(promise, timeoutMs) {
   let timer;
-  const timeout = new Promise((_, reject) => {
-    timer = setTimeout(() => reject(new Error(`observer timeout after ${timeoutMs}ms`)), timeoutMs);
-  });
+  const timeout = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(`observer timeout after ${timeoutMs}ms`)), timeoutMs); });
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
-
-export function createObserver({ logger, dcg, classify, enabled = true, timeoutMs = 750, now = () => new Date().toISOString() }) {
+export function createObserver({ logger, dcg, classify, enabled = true, timeoutMs = 750, now = () => new Date().toISOString(), diagnostic = async () => {} }) {
+  let rawEmitted = false;
   return async function observeToolCall(event, context = {}) {
     try {
-      if (!enabled || event?.toolName !== 'bash') return undefined;
-      const command = event?.input?.command;
+      if (!rawEmitted) { rawEmitted = true; await diagnostic({ kind: 'tool_call_observed', event: raw(event) }); }
+      if (!enabled || (event?.toolName ?? event?.name) !== 'bash') return undefined;
+      const command = event?.input?.command ?? event?.command ?? event?.input?.cmd;
       if (typeof command !== 'string' || command.length === 0) return undefined;
       const gate = await dcg(event, context);
-      const verdict = typeof gate === 'string' ? gate : gate?.verdict;
+      const verdict = typeof gate === 'string' ? gate : gate?.verdict ?? 'unknown';
       if (verdict === 'block') return undefined;
       const started = performance.now();
-      const decisionId = crypto.randomUUID();
       let result;
-      try {
-        result = await withTimeout(classify({ command, event, context }), timeoutMs);
-      } catch (error) {
-        result = {
-          questionSet: ['observer flag question'],
-          probabilities: { flag: null, pass: null },
-          costUsd: 0,
-          error: String(error),
-        };
-      }
-      await logger.append(decisionRecord({
-        decisionId,
-        timestamp: now(),
-        sessionId: context.sessionId ?? 'unknown',
-        tool: 'bash',
-        args: { command },
-        dcgVerdict: verdict ?? 'unknown',
-        questionSet: result.questionSet,
-        probabilities: result.probabilities,
-        latencyMs: performance.now() - started,
-        costUsd: result.costUsd ?? 0,
-        error: result.error ?? null,
-      }));
+      try { result = await withTimeout(classify({ command, event, context }), timeoutMs); } catch (error) { result = { questionSet: ['observer flag question'], probabilities: { flag: null, pass: null }, costUsd: 0, error: String(error) }; }
+      try { await logger.append({ ...makeRecord(command, result.error ?? null, context, performance.now() - started, verdict), timestamp: now(), questionSet: result.questionSet, probabilities: result.probabilities, costUsd: result.costUsd ?? 0 }); } catch {}
       return undefined;
-    } catch {
-      return undefined;
-    }
+    } catch { return undefined; }
   };
 }
-
 export function installObserver(pi, options = {}) {
-  const enabled = options.enabled ?? process.env.OMP_JEV_OBSERVER_DISABLED !== '1';
-  const appendEntry = pi.appendEntry;
-  const logger = options.logger ?? {
-    append: async (record) => {
-      if (typeof appendEntry !== 'function') return false;
-      try {
-        await appendEntry('com.zeststream.omp-jev-observer.decision.v1', record);
-        return true;
-      } catch {
-        return false;
-      }
-    },
-  };
   const endpoint = options.endpoint ?? process.env.JEV_OBSERVER_ENDPOINT;
-  const classify = options.classify ?? (async ({ command }) => {
-    if (!endpoint) throw new Error('JEV_OBSERVER_ENDPOINT is not configured');
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ command }),
-    });
-    if (!response.ok) throw new Error(`Jev HTTP ${response.status}`);
-    return await response.json();
-  });
-  const dcg = options.dcg ?? (async (_event, context) => context.dcgVerdict ?? 'unknown');
-  pi.on('tool_call', createObserver({ logger, dcg, classify, enabled, timeoutMs: options.timeoutMs ?? 750 }));
+  const classify = options.classify ?? (async ({ command }) => { if (!endpoint) throw new Error('JEV_OBSERVER_ENDPOINT is not configured'); const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ command }), signal: AbortSignal.timeout(options.timeoutMs ?? 750) }); if (!response.ok) throw new Error(`Jev HTTP ${response.status}`); return response.json(); });
+  const observer = createObserver({ enabled: options.enabled ?? process.env.OMP_JEV_OBSERVER_DISABLED !== '1', timeoutMs: options.timeoutMs ?? 750, classify, dcg: options.dcg ?? (async (_e, context) => context.dcgVerdict ?? 'unknown'), logger: options.logger ?? { append: (record) => safeAppend(pi, DECISION_TYPE, record) }, diagnostic: options.diagnostic ?? ((data) => safeAppend(pi, DIAGNOSTIC_TYPE, data)) });
+  pi.on('tool_call', observer);
 }
-
 export default function ompJevObserver(pi) {
-  installObserver(pi);
+  const enabled = process.env.OMP_JEV_OBSERVER_DISABLED !== '1';
+  const endpoint = process.env.JEV_OBSERVER_ENDPOINT;
+  pi.on('tool_call', async (event, context = {}) => {
+    try {
+      const toolName = event?.toolName ?? event?.name;
+      const command = event?.input?.command ?? event?.command ?? event?.input?.cmd;
+      await safeAppend(pi, DIAGNOSTIC_TYPE, { kind: 'tool_call_observed', toolName, event: raw(event) });
+      if (!enabled || toolName !== 'bash' || typeof command !== 'string' || command.length === 0) return undefined;
+      if (context?.dcgVerdict === 'block') return undefined;
+      const started = performance.now();
+      let error = null;
+      try {
+        if (!endpoint) throw new Error('JEV_OBSERVER_ENDPOINT is not configured');
+        const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ command }), signal: AbortSignal.timeout(750) });
+        if (!response.ok) throw new Error(`Jev HTTP ${response.status}`);
+        await response.json();
+      } catch (caught) { error = String(caught); }
+      await safeAppend(pi, DECISION_TYPE, makeRecord(command, error, context, performance.now() - started));
+      return undefined;
+    } catch { return undefined; }
+  });
 }

@@ -57,3 +57,10 @@ test('disabled observer is inert', async () => {
   assert.equal(result, undefined);
   assert.equal(records.length, 0);
 });
+test('live-shaped bash event uses name and input.command without throwing', async () => {
+  const { observer, records } = setup();
+  const result = await observer({ type: 'tool_call', name: 'bash', input: { command: 'echo live-shaped' } }, context);
+  assert.equal(result, undefined);
+  assert.equal(records.length, 1);
+  assert.equal(records[0].tool, 'bash');
+});
