@@ -1641,3 +1641,40 @@ formatted as one.
 
 **Retry condition:** grep the tree for `?? 'unknown'` after any observer change. A third
 instance means the rule needs a mechanical check, not another entry.
+
+## R39 — REFUSING the sentinel checker R38 asked for, with a trigger
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · A refusal, not a gate. Model: R18.
+
+R38 closed with: *"a third instance means the rule needs a mechanical check, not another entry."*
+The sweep (`270acce`) found **27 hits — 6 STORED**, so the trigger fired. **I am refusing the
+checker anyway**, and recording why so the refusal can be overturned on evidence rather than
+mood.
+
+**The creation gate needs all four answers. I can give three:**
+
+1. **Consumer** — `foundation/gates.sh`, as a new stage. ✅
+2. **Gate** — nothing ships carrying a stored sentinel. ✅
+3. **Observed defect class** — real and twice-costly: 27 defaulted `dcgVerdict` rows, and a
+   `costUsd ?? 0` that makes an unmeasured cost indistinguishable from a free call. ✅
+4. **Retirement condition** — ❌ **I cannot name one.** `?? 0` is correct and necessary in most
+   of its 27 appearances. A checker that fires on all of them is noise; one tuned to fire only
+   on the harmful subset requires knowing whether a value is persisted **and** truth-bearing,
+   which is a judgement the sweep made by hand, case by case, and which no grep expresses.
+
+**The distribution is the argument.** Of 27 hits: **6 STORED, 12 CONTROL, 9 FINE** — and of the
+6 STORED, **5 live in probes, an eval report, and an adapter normaliser**, none of which a reader
+ever sees. Exactly **one** was in a shipped artifact. A gate would have fired 27 times to catch
+the one that mattered, and the hand audit found it in a single pass at a fraction of the cost.
+
+**What we did instead:** fixed the shipped one, left the other five documented as out-of-scope
+rather than silently unfixed, and kept the sweep as a receipt anyone can re-run.
+
+**Trigger that overturns this refusal:** a stored sentinel reaching a **published number or a
+reader-facing artifact** — not merely existing in the tree. That is a condition a grep *can*
+express, because the surface is small: the README tables, `STATUS.tsv`, and anything under
+`work/omp-harm-rule/`. If that happens once, build the checker scoped to those paths only.
+
+**The general rule this protects:** a mechanism is earned by a defect class a machine can
+recognise, not by a defect class that merely hurt. R38's own retry condition was written before
+the distribution was known, and the honest response to the data is to narrow it, not to obey it.
