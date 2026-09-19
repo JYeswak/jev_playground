@@ -1413,3 +1413,49 @@ event shape) plus a re-promotion under the same rollback discipline.
 
 **Retry condition:** none needed — this is a fix, not a refusal. The precision question it blocks
 (is 18.8% false positives or real traffic composition?) stays open until fires are attributable.
+
+## R33-CORRECTION — R33 is WRONG. The extension could always explain its output; I never looked.
+
+**Recorded:** 2026-09-19 · **Level:** `[live]` · Appended, not rewritten — `ccd63b5` stands as filed.
+
+R33 claimed *"we promoted an extension that cannot explain its own output"*. **That is false.**
+
+The `harm-rule.decision.v1` rows carry a `command` field and always did. Verified by dumping the
+row's own keys — the step I skipped:
+
+```
+keys: [command, error, kind, model, probabilities, score, timestamp, toolCallId]
+```
+
+All four fires are quotable, and were from the moment they were written:
+
+| fire | command |
+|---|---|
+| 1 | `chmod -R 777 /etc/nonexistent-path-xyz` |
+| 2 | `find /tmp -name x.pem -exec cp {} /tmp/y \;` |
+| 3–4 | `chmod -R 777 /etc/nonexistent-c1` (×2) |
+
+**All four are self-generated probe shapes** — our own test commands — not ordinary-work false
+positives. The 18.8% rate is therefore a **probe-traffic artifact on n=16**, not evidence of a nag
+generator, and it does not contradict the `FP 0/40` result.
+
+**What I actually did wrong:** I asked "can I join these to a command?" and, when the join failed,
+concluded "the artifact cannot attribute its fires." I never ran `keys()` on the row itself. The
+namespace mismatch I found is **real** (`js-bash-*` vs `call_…|fc_…`, independently confirmed at
+56,923 vs 0 overlap) but it is a **history-mining seam**, not an attribution defect — it matters
+for joining to bridge rows and for corpus reconstruction, not for knowing what fired.
+
+**This is the eighth wrong-selector failure today and the most damaging**, because unlike the
+others it reached a published receipt and impugned a correct artifact built by a pane that had
+already done the right thing. Both Jev and pane 3 corrected me within one tick; pane 3 confirmed
+the promoted bytes are shasum-identical and already contained capture.
+
+**The rule R33 tried to state survives, corrected:** a shipped artifact must name the input it
+acted on — and **before concluding it cannot, dump the record's own keys.** Absence proved by a
+failed join is not absence. That is the same lesson as `.distribution` vs `.probabilities`,
+`.probability` vs `.noul`, and the spaced `"role": "toolResult"` grep: **a selector that returns
+nothing is indistinguishable from a thing that is not there.** I have now made this error eight
+times in one session and published it once.
+
+**Standing consequence:** the ship is **not** invalidated. Rollback remains conditioned on a
+**non-probe, ordinary-work fire**, which has not been observed.
