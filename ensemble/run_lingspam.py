@@ -23,7 +23,18 @@ CRITERIA = "TypeSafe: structured criteria (0 labels)"
 
 def main() -> int:
     if not SCORES.exists():
-        print(f"missing {SCORES} -- upstream clone not present", file=sys.stderr)
+        # Same reader-facing gap as run_all.py, fixed the same way: this repo gitignores the
+        # upstream clones, so a fresh checkout has no scores and a bare "not present" leaves the
+        # reader stuck. Verified from a clean clone of jev_playground, 2026-09-19.
+        print(
+            f"missing {SCORES}\n"
+            "\nThis needs upstream's committed scores, which are NOT redistributed here (5.7 MB,\n"
+            "someone else's data). Fetch them, from the repo root:\n"
+            "\n    mkdir -p upstream/bitnovus\n"
+            "    git clone https://github.com/bitnovus/jev-spam-eval upstream/bitnovus/jev-spam-eval\n"
+            "\nNo API key and no training are needed after that.",
+            file=sys.stderr,
+        )
         return 2
     rows = [json.loads(line) for line in SCORES.open()]
     truth = [r["label"] == "spam" for r in rows]
