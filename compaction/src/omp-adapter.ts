@@ -67,9 +67,19 @@ export function adaptOmpTranscript(events: OmpEvent[]): { messages: Message[]; s
     // closed with "library saw tool calls" (R23, pane 2's receipt 2cde8ac).
     if ((event.type !== 'message_end' && event.type !== 'message') || !event.message) continue;
     const msg = event.message;
+    // CONTENT IS SOMETIMES A BARE STRING. Measured across 200 real on-disk sessions: the array
+    // assumption below throws `(msg.content ?? []).filter is not a function`. The live-hook path
+    // already handles this (omp-binding.normalizeLiveMessage); accepting the on-disk envelope
+    // without carrying the same guard here reintroduced the identical bug one layer down.
+    const parts_ =
+      typeof msg.content === 'string'
+        ? [{ type: 'text', text: msg.content }]
+        : Array.isArray(msg.content)
+          ? msg.content
+          : [];
     stats.messagesIn += 1;
     if (msg.role === 'user') {
-      const text = (msg.content ?? [])
+      const text = parts_
         .filter((c) => c.type === 'text')
         .map((c) => c.text ?? '')
         .join('\n');
@@ -77,7 +87,7 @@ export function adaptOmpTranscript(events: OmpEvent[]): { messages: Message[]; s
     } else if (msg.role === 'assistant') {
       const parts: string[] = [];
       const toolUses: Message['toolUses'] = [];
-      for (const c of msg.content ?? []) {
+      for (const c of parts_) {
         if (c.type === 'text') parts.push(c.text ?? '');
         else if (c.type === 'thinking') stats.thinkingCharsDropped += c.thinking?.length ?? 0;
         else if (c.type === 'toolCall' && c.id) {
@@ -86,7 +96,7 @@ export function adaptOmpTranscript(events: OmpEvent[]): { messages: Message[]; s
       }
       messages.push({ role: 'assistant', text: parts.join('\n'), toolUses, toolResults: [] });
     } else if (msg.role === 'toolResult' && msg.toolCallId) {
-      const text = (msg.content ?? [])
+      const text = parts_
         .filter((c) => c.type === 'text')
         .map((c) => c.text ?? '')
         .join('\n');

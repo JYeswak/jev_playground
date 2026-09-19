@@ -894,3 +894,33 @@ So omp has **two** transcript shapes, both current, for different purposes:
 This makes `jev-0c6` an ADDITION, not a repair, and it removes the implication that our published
 replay numbers were measured on a dead format. They were measured on a live one — just not the one
 a user's session history is written in.
+
+## R24 — the 20k state limit is a narrow edge, not the wall I estimated (2026-09-19)
+
+Last commit's NO-CLAIM flagged the too-large refusal as uninvestigated. Investigated, and my
+estimates were **badly wrong in both directions before I measured the real thing**:
+
+| method | "sessions too large for Jev" |
+|---|---|
+| chars/4 over the whole transcript | **79%** (1307/1652) — overstates by ignoring truncation |
+| same, calibrated 8.8× against one measured refusal | **11%** (186/1652) — one calibration point |
+| **upstream's own `fitState`, every session** | **5.2% (86 of 1654)** |
+
+The exact figure needed no API key: `fitState` is pure, so running it over every real session on
+this machine cost 48 seconds. **1,566 of 1,654 real omp sessions fit the state budget.** The
+refusal I hit is real and affects roughly one session in twenty — an edge worth knowing, not the
+applicability wall the crude number implied.
+
+**And measuring it found a defect in the adapter change from twelve minutes earlier.** Across 200
+real sessions, some on-disk messages carry `content` as a bare **string**, and the adapter assumed
+an array: `(msg.content ?? []).filter is not a function`. The live-hook path already normalised
+this (`omp-binding.normalizeLiveMessage`); accepting the on-disk envelope without carrying the
+same guard reintroduced the identical bug one layer down. Fixed; all three readers now share one
+normalised parts list.
+
+**The lesson is the ordering.** Three numbers for the same question — 79%, 11%, 5.2% — and only
+the last came from running the function that actually decides. The first two were arithmetic about
+the question rather than measurements of it, and either would have been publishable-looking.
+
+**Retry condition:** if a future upstream version changes `maxStateTokens` or the truncation
+policy, re-run the probe — it is ~50 lines against `fitState` and takes under a minute.
