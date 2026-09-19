@@ -1085,3 +1085,41 @@ sessions, which are the longest ones and therefore carry a hugely disproportiona
 
 **Retry condition:** if anyone wants a single headline "eligible calls" figure, it must state
 which filter it used; the two differ by ~5×.
+
+## R28 — every sanctioned reclaim tool is blind to what is actually filling the workers (2026-09-19)
+
+Joshua: *"we have reclaim scripts in omp-orchestrator — find and use them"*, with standing
+approval to reclaim space. Found and ran all three. **`jev-0bp` stays blocked, and the reason is
+now exact.**
+
+| tool | scope | result |
+|---|---|---|
+| `reclaim-contabo.sh DRY` (the standing-demand sweep) | `.rch-target*`, `*-mut`, `grade-*` under `/Users/josh/Developer` | **`dirs=0` on all four boxes**; 10 of 11 `.rch-tmp` correctly KEPT as canonical or live |
+| `rch gc --dry-run` (the daemon's own reaper) | per-job `.rch-target-*` under the sync root, idle >=12h | **0 dirs, 0 MB** on all four; pooled dirs are never touched by design |
+| `rch cache clean --execute` | local staging trees under `remote_base` | **514 MiB reclaimed**, local only |
+
+Boxes remain **91 / 91 / 88 / 94 %**. Enumerating `/*` on the fullest one rather than guessing:
+
+```
+/Users  65,286 MB      of which  /Users/josh/Developer   32,790 MB
+/root   13,209 MB                /Users/josh/rch-build   25,663 MB   <- nothing sweeps this
+```
+
+**`/Users/josh/rch-build/rch-remote` holds 25.7 GB on contabo-4 and no sanctioned tool covers
+it.** `rch gc`'s base is `/Users/josh/Developer`; the reclaim script's whitelist does not list it;
+and `rch cache clean` reads the **local** `remote_base`, so running it on the Mac freed 514 MiB
+here and nothing there. Its contents are four per-project build pools (`omp-orchestrator` 10.5 GB,
+`franken-harvest` 10.2 GB, `uds` 4.0 GB, `control-plane` 0.9 GB), last touched 2026-09-13 to 09-17.
+
+**Not removed, and the reason is a guard rather than a doubt.** They are regenerable build
+artifacts, which the standing demand explicitly classifies as housekeeping — but `dcg` refuses
+recursive-removal and bulk-prune commands on any path under `/Users/josh`, and the workers
+**mirror the Mac path layout**, so the guard cannot tell a remote build pool from the operator's
+home directory. Every removal route an agent has is blocked by a rule that is right in general and
+wrong here.
+
+**Retry condition / what would fix it, in preference order:** (1) `rch cache clean` gains a
+`--worker` mode so the sanctioned tool reaches the remote base; (2) the reclaim script's whitelist
+adds `rch-build/rch-remote/<project>` with the same liveness oracle it already applies to
+`.rch-tmp`; (3) a human clears it. Until one happens, `critical_pressure=4` is a true reading of a
+real condition and `jev-0bp` is correctly blocked.
