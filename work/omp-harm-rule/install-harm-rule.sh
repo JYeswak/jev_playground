@@ -50,11 +50,23 @@ fail() { echo "RED: $1" >&2; exit 1; }
 # The loader globs *.{ts,js} only — a .mjs extension is never read. Measured, not assumed.
 case "$src" in *.ts) ;; *) fail "source must be .ts; the loader ignores other extensions" ;; esac
 
+# An inline sequence (extensions: [a, b]) cannot take an appended "  - item" line: the result is
+# unparseable YAML. Detect it rather than corrupting the user's config.
+# Found by pane3 grading this installer (docs/demos/upstream-repro/installer-grade-20260919.md,
+# 2100286) — the THIRD defect in this file, and the first that damaged the file it edited.
+is_inline_list() { grep -qE '^extensions:[[:space:]]*\[' "$1"; }
+
 verify() {
   ok=1
   [ -f "$dst" ] || { echo "  MISSING $dst"; ok=0; }
   if [ -f "$cfg" ]; then
-    grep -q 'harm-rule' "$cfg" || { echo "  NOT LISTED in $cfg extensions:"; ok=0; }
+    # A bare `grep harm-rule` also matches a comment, a corrupted line, or an unrelated key.
+    # Require the entry to be a real block-sequence item.
+    grep -qE '^[[:space:]]*-[[:space:]]*harm-rule[[:space:]]*$' "$cfg" \
+      || { echo "  NOT LISTED as a list item in $cfg"; ok=0; }
+    if is_inline_list "$cfg"; then
+      echo "  MALFORMED: $cfg has an inline extensions: [...] list"; ok=0
+    fi
   else
     echo "  MISSING $cfg"; ok=0
   fi
@@ -77,6 +89,18 @@ fi
 [ -d "$root" ] || fail "no such profile: $root  (create it, or pass an existing profile name)"
 [ -f "$cfg" ] || fail "no config.yml at $cfg — extensions are registered there, not by directory presence"
 
+# Refuse BEFORE touching anything. Appending "  - harm-rule" after an inline sequence produces
+# `extensions: []` followed by a list item, which no YAML parser accepts — and the old --check
+# then reported GREEN on the wreckage because it only grepped for the string.
+if is_inline_list "$cfg"; then
+  fail "$cfg uses an inline list (extensions: [...]). This installer only edits block lists.
+  Convert it by hand first:
+      extensions:
+        - existing-one
+        - harm-rule
+  Nothing has been modified."
+fi
+
 mkdir -p "$ext" || fail "cannot create $ext"
 
 # Back out cleanly: record what was there BEFORE the first install and never overwrite it.
@@ -97,7 +121,7 @@ cp "$src" "$dst" || fail "copy failed"
 # Registration is an explicit list entry. Directory presence does NOT register an
 # extension — that mistake produced a valid-syntax, never-firing module and cost
 # this lane a day (NEGATIVE_EVIDENCE R29).
-if grep -q 'harm-rule' "$cfg"; then
+if grep -qE '^[[:space:]]*-[[:space:]]*harm-rule[[:space:]]*$' "$cfg"; then
   echo "  already listed in config.yml, left as-is"
 else
   if grep -qE '^extensions:' "$cfg"; then

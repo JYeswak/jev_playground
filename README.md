@@ -232,6 +232,11 @@ It is observe-only **by construction**, which you can check rather than trust:
 grep -cE '\b(block|deny|abort|reject)\b' work/omp-harm-rule/harm-rule.ts   # 0
 ```
 
+The `\b` word boundaries and `-E` are load-bearing: a substring form (`grep -c 'block'`) also
+matches the word inside comments and reports a nonzero count on a file that contains no block
+path at all. Pane 3 caught that while grading the installer — the proof only proves anything in
+its exact form.
+
 The installer backs up your `config.yml` before touching it, never overwrites that backup on a
 re-run, and prints the exact rollback line. Every decision row it writes carries the command it
 judged, so a fire is always quotable — we learned that the hard way and
