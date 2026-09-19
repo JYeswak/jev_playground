@@ -1596,3 +1596,48 @@ anyone ran its own instructions.
 
 **Retry condition:** re-run the full fresh-clone table after any change to the published command
 set. A row that starts failing opaquely again is a regression of this entry, not a new finding.
+
+## R38 — the `?? 'unknown'` sentinel: a field that is always present and sometimes real
+
+**Recorded:** 2026-09-19 · **Level:** `[test]` · Second instance of one pattern; now a class.
+
+Two defaults in `work/omp-jev-observer/src/observer.mjs` filled absent data with the string
+`'unknown'`:
+
+```js
+dcg: options.dcg ?? (async (_e, context) => context.dcgVerdict ?? 'unknown')   // gate path
+sessionId: context?.sessionId ?? 'unknown'                                     // STORED
+```
+
+The first produced **27 live rows** reading `dcgVerdict: "unknown"` — every one a default, none
+an observation, because the event exposes `[type, toolName, toolCallId, input]` and **no
+verdict**. The second landed in *every* record.
+
+**Why this is worse than a missing field:** a field that is always present and sometimes real
+cannot be filtered, counted, or trusted, and it **survives inspection**. Nothing downstream can
+distinguish "we observed unknown" from "we had nothing". An absent field announces itself; a
+defaulted one lies quietly and looks measured.
+
+Both removed (`d8472cc`). Fail-open behaviour deliberately preserved — no verdict still means
+*do not block* — proven by an arm that asserts the handler returns `undefined` and still writes
+its record. The negative arm discriminates rather than passing vacuously:
+
+```js
+assert.equal('sessionId' in records[0], false);   // RED under the old default
+assert.equal('dcgVerdict' in records[0], false);
+```
+
+Observer tests 7/7.
+
+**The honesty detail worth keeping:** the receipt states that stored `dcgVerdict` was *already*
+absent before this unit (`a2e2035` removed it), so no credit is taken for removing stored
+fiction that was already gone. I had flagged that overclaim in the dispatch after reading
+`makeRecord` myself and finding the relayed premise wrong; the pane declined the easier
+sentence.
+
+**Rule:** never default an absent observation to a plausible-looking value. Omit the field, or
+use something a reader cannot mistake for data. `'unknown'` is not a value — it is a confession
+formatted as one.
+
+**Retry condition:** grep the tree for `?? 'unknown'` after any observer change. A third
+instance means the rule needs a mechanical check, not another entry.
