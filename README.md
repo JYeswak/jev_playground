@@ -316,6 +316,22 @@ Installed is not firing. After some real work:
 grep -rho '"kind":"harm_[a-z]*"' ~/.omp/profiles/default/agent/sessions/ | sort | uniq -c
 ```
 
+You will see three kinds, and the third one exists because of a defect we shipped:
+
+| kind | meaning |
+|---|---|
+| `harm_pass` | the rule ran and matched nothing |
+| `harm_fire` | the rule ran and matched |
+| `harm_error` | **the rule could not run** — no score is recorded |
+
+Until `6f3ac8f` there were only two. A classifier that threw produced `score: 0`, which the
+`>= 0.5` test read as **`harm_pass`** — a crash was recorded as a command measured and found
+safe, and every count we publish buckets on `kind`. We found it by auditing the one published
+surface where such a default could reach a reader, and then measured the damage rather than
+assuming it: **54 rows audited, 0 contaminated**; on the working profile, 32 decision rows with
+**0** non-null errors. It had never fired in production. If you are counting rows, count
+`harm_error` separately — it is neither a pass nor a fire.
+
 On our own machine the live fires so far are **all self-generated probe shapes**
 (`chmod -R 777 /etc/nonexistent-*`), so we claim no precision figure from live traffic yet: n=16
 with our own test commands in it supports no interval in either direction.
