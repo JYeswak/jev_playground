@@ -807,3 +807,33 @@ R21 now rests on Reason 2 alone: no summary authorship (Jev judges, does not sum
 required `summary` string cannot be produced without a summarizer Jev is not). The retry
 condition's first half (message channel) stands; its new second half (proven entry join)
 is demoted to a measurement serving a summarizer-gated future.
+
+## R22 — a φ data point that is arithmetically forced is not a second dataset (2026-09-19)
+
+**Refused:** adding pane 2's `jev-4uy` result to `RECIPES.md` recipe 4's evidence table.
+
+Pane 2 ran `ensemble/decorrelation.py` against a second clone, `jev-benchmark`, and reported
+`readonly n=60 φ=1.000 gain=0` and `destructive n=60 φ=1.000 gain=0`, both `AVERAGE_DID_NOT_PAY`.
+Superficially that is a fourth and fifth point supporting the predictor: high φ, no gain.
+
+**It is not evidence, and the reason is in our own earlier receipt.**
+[`jev-benchmark-pairing-20260918.md`](docs/demos/upstream-repro/jev-benchmark-pairing-20260918.md)
+measured `latest` and `preview` as making **identical choices on 60/60** with zero discordant
+pairs. Two scorers that agree on every item have **identical error vectors by construction**, so
+φ=1.000 and gain=0 are *arithmetically forced* — the same degenerate case
+`test_PLANTED_NEGATIVE_averaging_a_scorer_with_itself_buys_nothing` already pins in the unit suite.
+A forced result cannot corroborate the rule that predicts it.
+
+Counting it would have moved recipe 4 from "three points" to "five points" while adding **zero**
+information. That is evidence padding, and it is the exact shape this lane audits itself for: the
+number improves, the knowledge does not.
+
+**Pane 2 refused the `RECIPES.md` edit unprompted** and flagged the result as "two one-vs-class
+analyses of one scorer pair, not two independent scorer pairs." The conductor's contribution was
+only to name *why* it is forced rather than merely weak.
+
+**Retry condition:** a pair of scorers from any clone that (a) disagree on at least some items —
+disagreement rate > 0 — and (b) were produced by genuinely different methods, not two versions of
+one model. `jev-phishing-bench` (aggregate-only, no per-item output) and `agent-failure-benchmark`
+(no paired scorer) were both checked and do not qualify. **Three of twenty-two clones examined**,
+so the search is not exhausted and `jev-4uy` stays open on that ground, not on this one.
