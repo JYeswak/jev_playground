@@ -30,7 +30,11 @@ export function classify(command) {
 export default function guardRule(pi, deps = {}) {
   // Testability seam ONLY: production always uses the frozen classify above.
   const classifyFn = deps.classify ?? classify;
-  pi.on('tool_call', async (event, ctx) => {
+  // ubs:ignore — async listener is not awaited by the emitter, but this body CANNOT reject: it is
+  // wrapped try(34)/catch(73) and that catch only `return undefined`, so it cannot itself throw.
+  // The hook is observe-only (every path returns undefined), so a dropped promise loses nothing a
+  // caller branches on. Verified by reading both boundaries, not by assuming the wrapper.
+  pi.on('tool_call', async (event, ctx) => { // ubs:ignore — body cannot reject; see comment above
     try {
       const toolName = event?.toolName ?? event?.name;
       const command = event?.input?.command ?? event?.command ?? event?.input?.cmd;
