@@ -506,3 +506,5 @@ because the receipt I cited is this wave ledger, which other panes append to con
 pinned digest cannot point at a live shared file.** Repointed each row at a stable per-section
 receipt. Final: `lane_rc=0`, 29 candidates, 29 receipts exist, 0 drifted, concurrence 10/10,
 `gates.sh` rc=0.
+
+SECTION 18 jev-compact reality — PASS — big-fixture replay 13->8 reproduces keyed (1 req, 6/6 invariants, sha-pinned input); no session prune exists or is claimed; hook has zero telemetry; receipt lacks model version (next: add it) — NO-CLAIM: transcript replay only, 3 runs.
