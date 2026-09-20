@@ -704,3 +704,43 @@ Also worth recording because it changes how the fleet should be read: `safe_to_d
 **false for pane 1 and true for pane 2** despite both being rate-limited, because pane 1 is
 mid-turn. The flag answers "can this pane accept input now", not "will it do useful work" —
 reading it as the latter is how a dispatch disappears into a throttled agent.
+
+## jev-eww — 32 turns: both questions DISCRIMINATE, and the traps still bite
+
+`eww-32-turns-20260920.md`, 32 keyed calls at jev-1.13.0, 0 errors, 3/3 tests. Verdicts
+recomputed by me against the kit rule rather than read from the receipt:
+
+```
+needs_heavyweight  correct 24 > best_const 16 + near 4 = 20  -> DISCRIMINATES
+mechanical         correct 21 > best_const 16 + near 0 = 16  -> DISCRIMINATES
+```
+
+**MY PREDICTION WAS WRONG AND I AM RECORDING IT AS SUCH.** The dispatch said the route question
+was already refuted as a product and that *"30 turns confirm the refutation is a full-credit
+outcome and probably the likeliest one"*. At n=10 it scored 7/10. At n=32, with labels written
+before scores and the turn set pinned at `ecd696d` **before** the scoring script ever ran, both
+questions clear their own constant. **The n=10 result was the unreliable one, and I treated it as
+settled.** That is the seventh time this session a small-n result failed to survive a bigger
+sample — the novelty is that this time it failed in the *favourable* direction, which is the
+harder one to catch because nobody re-examines a refutation they like.
+
+**The traps are why this is not a promotion.** Kept as named subsets exactly so the length-leak
+finding could be re-tested rather than rediscovered:
+
+```
+heavy-clear   10/10 both          trap-short  needs 1/6, mech 0/6
+mech-clear    needs 8/10, mech 6/10   trap-long   needs 5/6, mech 5/6
+```
+
+**`trap-short` collapses almost entirely — worse than a coin flip on both questions**, and
+`bump-version` misses both again at 0.10/0.94. So the aggregate DISCRIMINATES is carried by the
+clear cases while the adversarial subset is at or below chance. A single pooled number would have
+hidden that completely; the named subset is what makes the result readable.
+
+Honest summary: **the question separates easy cases and fails hard ones.** That is a real finding
+and it is not the same as "works".
+
+NO-CLAIM, the author's and correct: turns are self-authored, so the corpus is not independent of
+the person who knows what the traps are testing; no computed label exists for
+heavyweight/mechanical — they looked for an oracle and found none, and said so rather than
+inventing one.
