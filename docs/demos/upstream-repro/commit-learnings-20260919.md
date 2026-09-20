@@ -49,3 +49,22 @@ stepping over all session: "ground truth that survives real diffs". Every measur
 tonight (commit judge DEGENERATE/WEAK/WEAK, six hand-built corpora that did not transfer) is that
 bead unclosed. A graph-aware tool with zero prior use pointed at it in 0.13s, while I picked beads
 by eyeballing `br ready`. That is the miss, measured, not asserted.
+
+SECTION 5 jsm/ms before invent — PASS, and it caught a live duplication — `jsm search eval` exits
+0, `Found 10 matching skills`, including **`evaluation-framework` (v1, Joshua Nowak, ID
+e292b255-1376-48d5-adf9-f5313d85c40b)** whose description covers "create evaluation rubric",
+"model grading", "eval suite", "regression testing AI", "human evaluation protocol",
+"inter-rater reliability" — i.e. substantially the brief of `jev-vbh.3` (jev-eval-honesty), which
+pane 3 is queued to author from scratch through 8–10 loop passes. `jsm search judge` returns
+`persona-clone`, which already implements "scored against a written charter by a SEPARATE judge
+model" — the separate-judge pattern sections 6 and 10 were going to invent — NO-CLAIM: I read
+descriptions, not skill bodies; overlap is asserted from the trigger lists, and neither skill has
+been installed or diffed against our bead. The next command is
+`jsm install e292b255-1376-48d5-adf9-f5313d85c40b && jsm list` then a real diff against
+`jev-vbh.3`'s WHAT/WHY before any loop pass runs. PREVALENCE: 10 of N indexed skills matched
+"eval"; N unknown, so match rate is UNKNOWN.
+
+SECTION 5b WHY THIS SECTION EXISTS, demonstrated — the arsenal audit in
+`commit-learnings-20260920.md` listed `jsm` as owned-with-zero-refs. One search, five seconds, and
+it found that a queued 8–10-pass authoring job may be re-deriving a skill we already own. That is
+the entire thesis of "search before invent", and it was a miss until this section ran.
