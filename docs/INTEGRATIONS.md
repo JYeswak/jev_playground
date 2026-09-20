@@ -240,6 +240,31 @@ node work/omp-jev-route/src/cli.mjs gate --fixture work/omp-jev-route/fixtures/p
 node --test work/omp-jev-route/test/process.test.mjs work/omp-jev-route/test/gate.test.mjs
 ```
 
+## WIP / UNPROMOTED: skill-router eval-contract mirror
+
+Harness at [`work/skillranker-eval/`](../work/skillranker-eval/README.md). Mirrors
+`Dicklesworthstone/skillranker` `tests/eval/` @ `bb52b8f25` (pulled via `gh`,
+provenance in `contract/PROVENANCE.md`): frozen 0/1/2 loss, always-abstain and
+coin-flip as first-class runners, ≥0.90 top-1 as an **explicit FAIL**, planted
+wrong-pick that must score 2, JSONL eval-row export.
+
+This is the Wave C add-on named in
+[`commit-learnings-20260919.md`](demos/upstream-repro/commit-learnings-20260919.md)
+(abstention + eval gate ≥0.90 + JSONL export). The register at
+`work/jev-score-register/` already persists numeric Jev scores; this harness
+exports the **eval** row (pick / Y / loss) the register's `score` field cannot
+carry.
+
+**Claim level: unpromoted process mirror.** Offline controls and planted RED
+only. Live lane is `NOT_RUN` without a key. **Not a SkillRanker product
+measurement** — no `sr` binary path is invoked. n=12 is `diagnostic_synthetic`;
+their contract forbids promotion on it. A prior live Jev-on-corpus receipt
+(mean loss 0.167, top-1 0.800) lives at
+[`skillranker-corpus-measured-20260919.md`](demos/upstream-repro/skillranker-corpus-measured-20260919.md)
+and is not re-run here.
+
+**NO-CLAIM.** Unpromoted. Ledger stays **0 promoted**.
+
 ## Scoreboard
 
 | Surface | State | Claim | Promoted? |
@@ -250,6 +275,8 @@ node --test work/omp-jev-route/test/process.test.mjs work/omp-jev-route/test/gat
 | dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1 lab** (`a2e2035`); working-profile dogfood **OPEN**; lab only. First-contact harm-rule receipt does not close this row | no |
 | taste-loop (`omp-jev-{default,field,firstlook,fork,heat,heckle,jargon,promise,skip,uncanny,undo}`) | WIP / UNPROMOTED; observe-only scaffold | not wired to working profiles; not validated on live traffic; see `work/taste-loop/CONTRACT.md` | no |
 | skillranker process mirror (`omp-jev-route` slice) | WIP / UNPROMOTED; offline decide/gate CLI | abstain + JSON log + copied 0/1/2 gate; not working-dogfood; not their corpus | no |
+
+| skill-router eval-contract mirror (`work/skillranker-eval/`) | WIP / UNPROMOTED; process mirror of skillranker `tests/eval` @ `bb52b8f25` | offline controls + planted RED; ≥0.90 is a hard FAIL; JSONL eval export; **not** an `sr` product measurement | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (do not read as working/production dogfood), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.

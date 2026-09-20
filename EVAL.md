@@ -487,3 +487,32 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
 - **Boundary:** no live Jev, no `sr` binary, no working-profile register, no
   corpus re-score. Unpromoted. Ledger stays **0 promoted**.
 
+## skillranker EVAL CONTRACT mirror — process harness, not a product measurement (2026-09-20)
+
+- **What landed:** `work/skillranker-eval/` is now a reusable offline+live process,
+  not a one-shot live script. Pulled via `gh` from public
+  `Dicklesworthstone/skillranker` @ `bb52b8f25`: `evaluation_policy.v1.json`,
+  `expected_values.v1.json`, `synthetic_cases.v1.jsonl` (provenance in
+  `contract/PROVENANCE.md`). Their status fields remain
+  `frozen_contract_not_evidence` /
+  `deterministic_contract_examples_not_measured_results`.
+- **First-class runners:** frozen 0/1/2 loss (asserted against the pulled policy);
+  always-abstain (mean 10/12 = 0.833); coin-flip (exact E[loss] + seeded sample);
+  planted wrong-pick must score 2 and RED; `--score`/`--live` treat top-1 < 0.90
+  as **exit 2**, not a printed note. `diagnostic_synthetic` cannot promote.
+- **Export:** `--export` writes `jev.skillranker-eval.score.v1` JSONL (pick / Y /
+  loss). Overflow case `synthetic-overflow-retrieval-paraphrase` is flagged
+  `installableNotOffered` (Y=`testing-fuzzing`, exported roster empty).
+- **Judge shape** for an omp skill-router hook: `judgeSkillPick` in `score.mjs` —
+  one Choice, `__none__` abstain, no second noul. Documented in
+  `work/skillranker-eval/README.md`.
+- **INTEGRATIONS.md:** one WIP / unpromoted row. Ledger stays 0 promoted.
+- **Commands:** `node --test work/skillranker-eval/test/contract.test.mjs`;
+  `node work/skillranker-eval/run.mjs`; `node work/skillranker-eval/run.mjs --selftest`;
+  `node work/skillranker-eval/run.mjs --live` → `NOT_RUN` without a key.
+- **Boundary / NO-CLAIM:** no `sr` binary invoked; do not cite this as a
+  SkillRanker product result. No live Jev call in this pass. Prior live
+  Jev-on-corpus receipt (mean loss 0.167, top-1 0.800, both misses = false
+  abstentions) remains
+  `docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md` and was
+  not re-run. n=12 diagnostic_synthetic cannot promote.
