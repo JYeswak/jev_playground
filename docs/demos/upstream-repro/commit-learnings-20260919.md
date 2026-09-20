@@ -33,3 +33,19 @@ catch. Had I stopped at the first output I would have recorded "fh returns empty
 false negative about a working tool, which is the same shape as the `dcg_allow` harvest that
 returned an empty verdict histogram. The rule that keeps being relearned: **print the keys before
 claiming absence.**
+
+SECTION 4 bv/br robot triage — PASS — `bv --robot-triage` exits 0 on first use, `issue_count 50`,
+`phase2_ready true`, `history_status ok`, PageRank computed 0.021ms / Betweenness computed
+(approximate) 0.079ms, six algorithms skipped; `quick_ref` = open 11 · actionable 23 · blocked 6 ·
+in_progress 6; top picks `jev-fzw 0.275` (ground truth that survives real diffs), `jev-m7r 0.254`
+(harm-rule recall beyond n=2), `jev-gou 0.254` (port measure scripts to measure-kit) — NO-CLAIM:
+ranking quality unjudged; I applied P4 (printed `quick_ref` and `top_picks[0]` keys before reading
+values) but have not verified the scores mean what the names suggest, and six of nine algorithms
+were skipped so this is PageRank+Betweenness only. PREVALENCE: 23 of 50 issues actionable (46%),
+which is the base rate any "bv found work for us" claim must beat.
+
+SECTION 4b THE ACTUAL PRODUCT OF THIS SECTION — bv's top pick `jev-fzw` is the bead I have been
+stepping over all session: "ground truth that survives real diffs". Every measurement failure
+tonight (commit judge DEGENERATE/WEAK/WEAK, six hand-built corpora that did not transfer) is that
+bead unclosed. A graph-aware tool with zero prior use pointed at it in 0.13s, while I picked beads
+by eyeballing `br ready`. That is the miss, measured, not asserted.
