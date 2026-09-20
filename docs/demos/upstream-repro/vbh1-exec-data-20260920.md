@@ -1,20 +1,29 @@
-# VBH1 DONE: executed-vs-data distinguisher clears all organic fires (2026-09-20)
+# VBH1B: distinguisher moved inside the rule — 0 fires on 81,373 (2026-09-20)
 
-Level: `live` (81k-command census) + `test` (10/10).
+## Composition-order finding (the second bug this unit caught)
 
-## The three acceptance legs (R44's words)
+Blank-after-strip FIRED on 3 of my own debug commands: `stripQuotedPayload`
+replaces quoted spans with `<QUOTED>` but leaves the trigger BARE
+(`<QUOTED>' chmod -R 777...`), destroying the literal structure blanking needs.
+Blank-FIRST (original spans intact) then strip: 0 fires. Order recorded in
+`classify()` comments. All four legs re-verified after the reorder.
 
-1. `node work/omp-harm-rule/organic-fires.mjs` → **0 fires** on 81,329 scored
-   (control `--no-filter` on the same denominator: 9). The filter is a
-   blank-data-literals + re-score composition in the measurement script; the
-   shipped rule is untouched.
-2. `node work/omp-harm-rule/verify-claim.mjs` (unmodified control, same session)
-   → `VERDICT: REPRODUCIBLE COMMITTED CORPUS` (12/12, 0/38).
-3. `node --test work/toolcall-judge-v3/rules-v4.test.mjs` → 14/14 green,
-   ground files untouched (`git status` clean on both). New arms live in
-   `exec-data.test.mjs` (10/10), NOT in rules-v4.test.mjs — deliberate deviation
-   from the letter: %71 owns that file and it was reverted to known-good; moving
-   one arm there later is trivial.
+
+Level: `live` (81k-command census) + `test` (11/11).
+
+## The three acceptance legs (R44's revised trigger: a property of the product)
+
+1. `node work/omp-harm-rule/organic-fires.mjs` → **0 fires** on 81,373 scored,
+   with NO filter in the harness — the distinguisher lives INSIDE `classify()`
+   (blank data-literals, then stripQuotedPayload, then regexes), so the census
+   testifies about what ships.
+2. `node work/omp-harm-rule/verify-claim.mjs` (unmodified rule run as own
+   control, same session) → `VERDICT: REPRODUCIBLE COMMITTED CORPUS` (12/12,
+   0/38).
+3. `node --test work/toolcall-judge-v3/rules-v4.test.mjs` → 14/14 green, both
+   ground files untouched. New arms live in `exec-data.test.mjs` (11/11) and
+   `harm-exec-data.test.mjs` (3/3: probe declines, exec fires, bare fires) —
+   NOT in rules-v4.test.mjs, deliberate: %71 owns that file.
 
 ## How it works (one paragraph)
 

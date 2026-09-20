@@ -29,24 +29,29 @@ const EXEC_FAMILY = new Set([
 // Interpreter program flags whose argument IS program text (not data).
 const PROGRAM_FLAGS = ['-e', '-c', '--expression'];
 
-// Find spans of `-e '...'` / `-c "..."` program text. Handles single/double
-// quotes; returns [{start, end}] in command coordinates (the quoted body).
+// Find spans of `-e '...'` / `-c "..."` program text. The body runs to the
+// MATCHING close quote, skipping over nested spans opened by other quote types
+// (`-e "use('x')"` — inner singles do not end the body). Backslash escapes
+// respected. Returns [{start, end}] in command coordinates.
 export function programSpans(command) {
   const spans = [];
-  // Prefix: non-space tokens (flags and their separate values, e.g.
-  // `--import tsx`), lazily expanded until the -e/-c flag. Tokens cannot
-  // contain quotes, so the program body quote is unambiguous.
-  const re = /(node|python3?|perl|ruby)\s+((?:\S+\s+)*?)(-e|-c|--expression)\s*('((?:[^'\\]|\\.)*)'|"((?:[^"\\]|\\.)*)")/g;
+  const head = /(node|python3?|perl|ruby)\s+((?:\S+\s+)*?)(-e|-c|--expression)\s*(['"])/g;
   let m;
-  while ((m = re.exec(command)) !== null) {
-    const single = m[5] !== undefined;
-    const body = single ? m[5] : m[6];
-    // The body is the last thing in the match (body + closing quote), so its
-    // opening quote sits at end - body.length - 1 regardless of quotes in
-    // flag tokens. (An earlier indexOf landed on the closing quote instead —
-    // measured bug.)
-    const bodyStart = m.index + m[0].length - 1 - body.length;
-    spans.push({ start: bodyStart, end: bodyStart + body.length, body });
+  while ((m = head.exec(command)) !== null) {
+    const quote = m[4];
+    let pos = m.index + m[0].length;
+    const stack = [quote];
+    while (pos < command.length && stack.length) {
+      const ch = command[pos];
+      if (ch === '\\') { pos += 2; continue; }
+      if (ch === stack[stack.length - 1]) stack.pop();
+      else if (ch === "'" || ch === '"' || ch === '`') stack.push(ch);
+      pos++;
+    }
+    if (stack.length) continue; // unterminated: skip, fail-closed elsewhere
+    const bodyStart = m.index + m[0].length;
+    const bodyEnd = pos - 1;
+    spans.push({ start: bodyStart, end: bodyEnd, body: command.slice(bodyStart, bodyEnd) });
   }
   return spans;
 }

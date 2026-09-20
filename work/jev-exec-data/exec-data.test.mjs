@@ -63,3 +63,12 @@ test('data: flags with separate values before -e do not hide the program', async
   const cmd = `node --no-warnings --import tsx --input-type=module -e "await h({command: '${TRIG}'});"`;
   assert.equal(await suppressFire(cmd, ruleStub), true);
 });
+test('data: nested program string inside -e body suppresses (the 1 remaining fire)', async () => {
+  const SQ = "'";
+  const BS = '\\';
+  const DQ = '"';
+  // Chars: node -e "const s = 'a \"b \'TRIG\'\" c';"
+  // The trigger sits inside a single-quoted literal nested in the -e body.
+  const cmd = 'node -e ' + DQ + 'const s = ' + SQ + 'a ' + BS + DQ + 'b ' + BS + SQ + TRIG + BS + SQ + BS + DQ + ' c' + SQ + ';' + DQ;
+  assert.equal(await suppressFire(cmd, ruleStub), true);
+});

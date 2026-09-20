@@ -90,26 +90,16 @@ async function fire(command) {
   return { fired: dec.d.kind === 'harm_fire', score: dec.d.score ?? 0 };
 }
 
-// R44 trigger stage: for each shipped-rule fire, blank data-literals and
-// re-score through the SHIPPED rule. Suppress iff the fire clears (every
-// trigger lived in a data-literal). The shipped rule is untouched; this
-// composition is what the trigger measures. --no-filter reproduces the
-// unfiltered count.
-const { suppressFire } = await import('../jev-exec-data/exec-data.mjs');
+// The distinguisher lives INSIDE the shipped rule now (harm-rule.ts classify:
+// stripQuotedPayload, then blankDataLiterals) — no filter here, so this census
+// testifies about what ships. (An earlier revision filtered here; removed when
+// the rule absorbed the mechanism.)
 const fires = [];
-const suppressed = [];
 let n = 0;
-async function firesOn(cmd) {
-  const r = await fire(cmd);
-  return r.fired;
-}
 for (const cmd of sample) {
   n += 1;
   const r = await fire(cmd);
   if (!r.fired) continue;
-  if (!process.argv.includes('--no-filter')) {
-    if (await suppressFire(cmd, firesOn)) { suppressed.push(cmd); continue; }
-  }
   fires.push({ score: r.score, command: cmd });
 }
 console.log(`allow commands joined: ${allows.length} | scored: ${sample.length} | fires: ${fires.length}`);
