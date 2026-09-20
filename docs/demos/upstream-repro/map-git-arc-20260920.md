@@ -312,7 +312,7 @@ which is vgrep's zero-match code. That is a positive proof of absence, not a sil
 
 ---
 
-## 6. Two specific abandonment findings that an alignment decision needs
+## 6. Three specific abandonment findings that an alignment decision needs
 
 ### 6.1 `duel-2` is dead as a theme but its artifacts are still read at runtime
 
