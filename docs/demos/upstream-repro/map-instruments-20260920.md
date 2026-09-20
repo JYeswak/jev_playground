@@ -326,9 +326,11 @@ What I did **not** check:
   verified the file exists and that its logic is delegated to a tested module. There is no
   `.omp/*.json` config naming it; "WIRED" for this row rests on the directory convention plus the
   file's own install note, not on an observed load.
-- `githooks` "WIRED" rests on `core.hooksPath` pointing at the directory. I did not force a commit
-  to observe either hook firing (the assignment forbids touching other files; my own commit below
-  exercises them incidentally but I record no measurement of it).
+- `githooks` "WIRED" is **observed, not inferred**: committing this receipt (`22f959b`) printed
+  `autofix --check: 0 would-change, 1 clean, 0 skipped` from `pre-commit` lane 2 and
+  `verification-level PASS level=receipt` from `commit-msg`. What I did NOT observe is either
+  hook *refusing*: the staged-deletion lane (`pre-commit` lane 1) emitted nothing, which is its
+  correct silent-on-healthy behaviour, and its RED arm is proven at stage 60 rather than here.
 - Arm counts are taken from each suite's own self-reported total line. I did not independently
   count arm blocks in the source of all 10 suites, and I did not mutation-test any of them — a
   suite reporting "8 ok" that secretly runs 7 discriminating arms and 1 tautology would read
