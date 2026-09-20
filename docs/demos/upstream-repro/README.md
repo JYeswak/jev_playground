@@ -1,13 +1,22 @@
 # Index — every receipt in `docs/demos/upstream-repro/`
 
 **This directory is the evidence behind the project, and this file is the only complete index of
-it.** 227 artifacts sit here beside this README. Until this rewrite, no index covered more than 18
-of them and `docs/demos/STATUS.tsv` cited 19 — a union of roughly 30 of the 207 present at
-`038aeb4`, which left ~85% of the corpus reachable only by `ls`. **That gap is widening, not
-closing:** `STATUS.tsv` still cites the same 19 while the directory has grown, so the cited share
-has already fallen from 9.2% to 8.8% and below
-([`map-stranger-check-20260920.md`](map-stranger-check-20260920.md), measured independently).
+it.** Until this rewrite, no index covered more than 18 of the directory and `docs/demos/STATUS.tsv`
+cited 19 — a union of roughly 30 files, which left ~85% of the corpus reachable only by `ls`.
 Every artifact now appears exactly once below, grouped by subject, one line saying what it settles.
+
+**The citation gap is widening, not closing, and no figure for it is safe to quote.** Two numbers
+are pinned and will hold forever — at `038aeb4`,
+`git ls-tree -r --name-only 038aeb4 docs/demos/upstream-repro | grep -c '\.md$'` is **206** and the
+same count excluding this README is **205**, so `MAP.md`'s published 206 reproduces exactly *and
+counts the README itself*. Everything else moves: `STATUS.tsv`'s 19 citations have not changed while
+the directory grew past 220, and the cited share fell through 9.2% and 8.8% inside one session with
+**zero citations added**. Re-derive it, do not quote it:
+
+```sh
+grep -oE 'docs/demos/upstream-repro/[A-Za-z0-9./_-]+' ../STATUS.tsv | sort -u | wc -l   # numerator
+ls -1 | grep -vc '^README.md$'                                                          # denominator
+```
 
 Two things a reader has to know before using the index, both measured in
 [`map-docs-20260920.md`](map-docs-20260920.md):
@@ -81,21 +90,21 @@ cd docs/demos/upstream-repro
 # every row's first cell, one filename per index row
 sed -n 's/^| \[`\([^`]*\)`\].*/\1/p' README.md | sort > /tmp/idx.txt
 ls -1 | grep -v '^README.md$' | sort > /tmp/dir.txt
-wc -l < /tmp/idx.txt          # 227  (index rows)
-wc -l < /tmp/dir.txt          # 227  (files on disk)
+wc -l < /tmp/idx.txt          # 228  (index rows)
+wc -l < /tmp/dir.txt          # 228  (files on disk)
 uniq -d < /tmp/idx.txt        # empty: no file indexed twice
 comm -3 /tmp/idx.txt /tmp/dir.txt   # empty: no gaps either way
 ```
 
-Measured at the commit that wrote this file: **227 index rows, 227 files on disk, 0 duplicates,
+Measured at the commit that wrote this file: **228 index rows, 228 files on disk, 0 duplicates,
 0 differences.** The extractor takes only the first cell of a row, so the supersession links inside
 a description never double-count. Two maps are named again in prose (once under the maps group,
 once under the subject they measure) — prose mentions are not index rows, which is why the row count
 and the file count agree exactly.
 
 The check runs against `ls`, not against git, because that is the denominator a reader actually
-faces. At the commit that wrote this file the two agree: all 227 are tracked. **The directory
-gained five artifacts while this index was being written**, so re-run the five commands above
+faces. At the commit that wrote this file 227 of the 228 were tracked; the newest was still uncommitted in a sibling pane. **The directory
+gained six artifacts while this index was being written**, so re-run the five commands above
 rather than trusting the number — and if one comes back as a gap, add its row rather than editing
 the count.
 
@@ -388,6 +397,7 @@ The lane auditing its own published surface. Read these before trusting a number
 | [`readme-claim-sweep-20260920.md`](readme-claim-sweep-20260920.md) | Part 1, lines 1–488: "22 repos" is 24 clones with 11 RUN, and two more heading counts with it. Every runnable ran, exits unpiped. |
 | [`readme-claim-sweep-part2-20260920.md`](readme-claim-sweep-part2-20260920.md) | Part 2, scope and reader paths — continues part 1 rather than replacing it: compaction's "32/32" is 38/38, and the hook's real scope is narrower than the prose. |
 | [`readme-prose-check-20260920.md`](readme-prose-check-20260920.md) | Prose rather than numbers: 3 CONFIRMED, 1 STALE fixed — `NEGATIVE_EVIDENCE.md` has 50 `## R` headers where the README said 31. |
+| [`readme-stranger-retest-20260920.md`](readme-stranger-retest-20260920.md) | **The root README was not true as written.** All 26 fenced commands run as a stranger: 21 honest, 5 not — a path that does not exist on the machine it was measured on, a command needing the key the page twice promises you will not need, two printing something other than the prose beneath them, and a table corrected in one of the three places it appears. All five fixed in its own commit. Sixth finding, not a README defect and not fixed there: **a guard added 2026-09-20 to stop published counts drifting turns `foundation/gates.sh` RED on a fresh clone**, and the README's fresh-clone table blames the wrong stage. Supersedes the three earlier `readme-*` sweeps as the current answer on whether the page runs. |
 | [`rules-stranger-test-20260920.md`](rules-stranger-test-20260920.md) | Stranger test on `docs/RULES.md`: **TRUE with two fixes** — "Eight rules" for nine, and rules 1–2 never disclosing their session-log dependency. |
 | [`fresh-clone-readme-commands-20260919.md`](fresh-clone-readme-commands-20260919.md) | Every README command run in a genuinely fresh public clone, each producer's exit code captured unpiped. |
 | [`fresh-clone-rerun-20260919.md`](fresh-clone-rerun-20260919.md) | **The re-run, and the current answer**: one wrong fix line, one drift, everything else holds. Supersedes [`fresh-clone-readme-commands-20260919.md`](fresh-clone-readme-commands-20260919.md). |
@@ -484,7 +494,7 @@ It is the stranger-consumable promotion surface that
 [`honesty-window-buckets-20260918.md`](honesty-window-buckets-20260918.md) ruled was required
 before upstream evidence counts as shipped, and
 [`promotion-grade-20260918.md`](promotion-grade-20260918.md) graded it as one. **Scope: it covers 18
-of the 227 artifacts and stops at 2026-09-19** — the index above is the current surface.
+of the directory and stops at 2026-09-19** — the index above is the current surface.
 
 ---
 
