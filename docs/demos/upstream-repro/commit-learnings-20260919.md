@@ -1462,3 +1462,47 @@ corpus is live-monotonic exactly like the harvest family, so every count derived
 an as-of label. Pane 2's denominator (1,043) and my earlier one (1,040) differ for this reason
 and neither is wrong — they are measurements at different times, which is precisely the
 distinction the as-of work established tonight.
+
+## The whole mail corpus, mined: 98.15% of ack-required messages were never acked
+
+`mail-mine-result-20260920.md`. **6,510 of 6,510 rows**, the first corpus we have mined
+exhaustively rather than sampled. Read-only, ids/counts/enums/paths only — no `body_md`, no
+subject text, the A11 precedent held.
+
+Verified independently against the live DB rather than from the receipt:
+
+```
+messages                     6,510   ✓ reproduces
+ack_required = 1             3,135   ✓ reproduces
+acked (ack_ts not null,
+       ack_required = 1)        58   ✓ reproduces
+```
+
+**So 58 of 3,135 = 1.85%.** The coordination protocol this fleet runs on asks for an
+acknowledgement 3,135 times and gets one 58 times. That is a measurement about how our own agents
+actually behave, from a corpus we had touched 4.4% of before tonight, and it is the first thing
+mined here that is about *us* rather than about a model.
+
+One discrepancy found and it is small: threads **4,508** by my count against their **4,509** —
+an off-by-one in how a null thread is counted. Flagged rather than waved through; it changes
+nothing downstream, and the 25% threadless-orphan figure stands either way.
+
+## The pane discounted its own passing result
+
+F1 fired **mechanically at 99.5%** — far above its 10% bar — and pane 2 **refused to bank it**,
+ruling the linkage ambient co-presence rather than action: two things co-occurring in the same
+window is not one causing the other. What survives that audit is small and honest: **7 ack
+linkages and 3 bead linkages**, so the seat is `HELD`, not cleared.
+
+**This is the named-subset lesson applied by the pane without being told.** Four times tonight a
+pooled number looked decisive and a named subset overturned it, always optimistically. Here the
+pane ran the audit on its own headline before anyone asked, and the headline did not survive.
+A 99.5% that gets discounted by its author is worth more than a 99.5% that ships.
+
+## Coverage now
+
+| corpus | size | mined |
+|---|---:|---|
+| this repo's commits | ~1,046 | **100%** |
+| agent-mail messages | 6,510 | **100%** |
+| CASS messages | 5,181,931 | 2.32% — next, and honestly characterised rather than pretended |
