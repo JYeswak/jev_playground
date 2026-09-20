@@ -283,3 +283,14 @@ and is not re-run here.
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (do not read as working/production dogfood), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
+
+## Numbers a reader cannot verify and neither can we
+
+Short and honest, per the denominator audits (`denominator-audit-20260920.md`,
+`harvest-asof-20260920.md`). Nothing below is built to cover them.
+
+| number | why unverifiable |
+|---|---|
+| live-harvest values (216,507 decisions; n=78,455 joinable; 3,098; 36,955/41,500 split) | live-monotonic corpus; exact 78,455 method unsaved and unrecoverable — as-of labeled, regen command recorded, never a standing fact |
+| export-census judgment third (observer inline; failure/foreman wired-at-default) | pattern census only; subtle unwiring would not move the count |
+| README historical runs (254/305, 13/13 observer, 47,428/55,794, latencies, n=662/n=5,733, 0.59, 2/3, 0/10, 5/5, 11/12) | past runs, no cheap regen — except 29/29 backtest, which is wired in `scripts/denominator-sweep.sh` |
