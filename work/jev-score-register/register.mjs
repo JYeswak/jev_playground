@@ -128,3 +128,52 @@ export function recording(ask, { path, extension, model }) {
     return result;
   };
 }
+
+/**
+ * The same thing for `askJevChoice`, which four extensions use (failure, firstlook,
+ * fork, heat) and which returns a DIFFERENT shape: `{choice, confidence, probabilities}`,
+ * with no `scores` field at all. Passing one of those through `recording()` records it
+ * as a FAILURE, because `result.scores` is undefined — a silent misattribution that
+ * would have written four extensions' successful calls into the register as errors.
+ *
+ * One row per label, keyed `<question>:<label>`, so a choice question's full
+ * distribution is recoverable and not just its argmax. The chosen label gets its own
+ * row keyed `<question>:__choice__` carrying the confidence as the score, so a reader
+ * recovers the decision without re-deriving it from the probabilities.
+ *
+ * Same two rules as `recording()`: hash only, and never a cache.
+ */
+export function recordingChoice(ask, { path, extension, model, questionKey = 'choice' }) {
+  return async function recordedChoiceAsk(options) {
+    const result = await ask(options);
+    const identity = inputIdentity(options.state);
+    if (result && result.ok && result.probabilities) {
+      for (const [label, probability] of Object.entries(result.probabilities)) {
+        recordScore(path, {
+          questionKey: `${questionKey}:${label}`,
+          score: Number(probability),
+          model: result.model ?? model,
+          identity,
+          extension,
+        });
+      }
+      recordScore(path, {
+        questionKey: `${questionKey}:__choice__`,
+        score: Number(result.confidence),
+        model: result.model ?? model,
+        identity,
+        extension,
+      });
+    } else {
+      recordScore(path, {
+        questionKey,
+        model,
+        identity,
+        ok: false,
+        failure: result?.failure ?? result?.reason ?? 'unknown',
+        score: 0,
+      });
+    }
+    return result;
+  };
+}

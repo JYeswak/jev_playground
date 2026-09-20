@@ -196,7 +196,7 @@ Tests 6 and 7 FAILED on first run and caught a real bug: `"$(...)"` and backtick
 EXECUTED, so stripping them hid real token capture. Command substitutions are now protected
 before quote removal and restored after.
 
-## `work/jev-score-register/register.test.mjs` — 10 tests
+## `work/jev-score-register/register.test.mjs` — 13 tests
 
 Run: `node --test work/jev-score-register/register.test.mjs` (no API key; pure local I/O).
 
@@ -214,6 +214,16 @@ never share an identity.
 8. recording() does not change the wrapped answer
 9. recording() records a failure without inventing a score
 10. recordScore refuses a row it cannot attribute
+11. recordingChoice records every label, not just the argmax
+12. recordingChoice does not misfile a successful choice as a failure
+13. recordingChoice stores no raw state and no label text
+
+Tests 11–13 cover `recordingChoice`, added because four extensions (failure, firstlook, fork,
+heat) call `askJevChoice`, whose result carries `probabilities` and no `scores`. Test 12 is the
+planted negative for that: it asserts that the ORIGINAL `recording()` misfiles a successful
+choice result as `ok:false`, which is the silent misattribution that would have written four
+extensions' good calls into the register as errors. Test 13 repeats test 3's discipline for the
+choice path — neither the value nor the FIELD NAME of a placeholder secret may appear.
 
 Test 1 encodes the measured jevcache defect directly: `{"command_id":"rm -rf --no-preserve-root /"}`
 and `{"command_id":"echo hello"}` shared a fingerprint there and it served the benign answer for

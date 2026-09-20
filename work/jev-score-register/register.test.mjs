@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, statSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { canonicalise, inputIdentity, recordScore, readRegister, recording } from './register.mjs';
+import { canonicalise, inputIdentity, recordScore, readRegister, recording, recordingChoice } from './register.mjs';
 
 const dir = () => mkdtempSync(join(tmpdir(), 'jsr-'));
 
@@ -98,4 +98,51 @@ test('recordScore refuses a row it cannot attribute', () => {
   const path = join(dir(), 'scores.jsonl');
   assert.throws(() => recordScore(path, { score: 0.5, model: 'm', state: { a: 1 } }), /questionKey/);
   assert.throws(() => recordScore(path, { questionKey: 'q', score: 0.5, model: 'm' }), /identity/);
+});
+
+test('recordingChoice records every label, not just the argmax', async () => {
+  const path = join(dir(), 'scores.jsonl');
+  const choose = async () => ({
+    ok: true,
+    choice: 'timeout',
+    confidence: 0.71,
+    probabilities: { timeout: 0.71, crash: 0.21, other: 0.08 },
+    model: 'jev-test',
+  });
+  const wrapped = recordingChoice(choose, { path, extension: 'omp-jev-failure', model: 'jev-test', questionKey: 'failure_class' });
+  await wrapped({ state: { log: 'boom' }, classes: { timeout: 't', crash: 'c', other: 'o' } });
+  const { rows } = readRegister(path);
+  assert.deepEqual(
+    rows.map((r) => r.questionKey).sort(),
+    ['failure_class:__choice__', 'failure_class:crash', 'failure_class:other', 'failure_class:timeout'],
+    'one row per label plus the chosen-with-confidence row',
+  );
+  assert.equal(rows.find((r) => r.questionKey === 'failure_class:__choice__').score, 0.71);
+});
+
+test('recordingChoice does not misfile a successful choice as a failure', async () => {
+  // recording() would: a choice result has no `scores`, so it takes the else branch.
+  const path = join(dir(), 'scores.jsonl');
+  const result = { ok: true, choice: 'a', confidence: 0.6, probabilities: { a: 0.6, b: 0.4 }, model: 'jev-test' };
+  const viaWrongWrapper = recording(async () => result, { path, extension: 'x', model: 'm' });
+  await viaWrongWrapper({ state: { s: 1 }, questions: { q: '?' } });
+  const wrong = readRegister(path).rows;
+  assert.equal(wrong[0].ok, false, 'recording() misfiles a choice result — this is why recordingChoice exists');
+
+  const path2 = join(dir(), 'scores.jsonl');
+  const viaRight = recordingChoice(async () => result, { path: path2, extension: 'x', model: 'm' });
+  await viaRight({ state: { s: 1 } });
+  assert.ok(readRegister(path2).rows.every((r) => r.ok === true), 'recordingChoice files it correctly');
+});
+
+test('recordingChoice stores no raw state and no label text', async () => {
+  const path = join(dir(), 'scores.jsonl');
+  const secret = 'PLACEHOLDER-NOT-A-REAL-TOKEN-8811';
+  const choose = async () => ({ ok: true, choice: 'a', confidence: 0.5, probabilities: { a: 0.5, b: 0.5 }, model: 'm' });
+  const wrapped = recordingChoice(choose, { path, extension: 'x', model: 'm' });
+  await wrapped({ state: { authorization: secret, note: 'sensitive' } });
+  const raw = readFileSync(path, 'utf8');
+  assert.ok(!raw.includes(secret), 'the value must be unrecoverable');
+  assert.ok(!raw.includes('authorization'), 'the FIELD NAME must be unrecoverable too');
+  assert.ok(!raw.includes('sensitive'), 'no other state value leaks');
 });

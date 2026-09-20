@@ -17,6 +17,25 @@
  * the shape did. See docs/demos/upstream-repro/multiclass-failure-20260919.md.
  */
 import { askJevChoice, type JevChoiceResult } from "../../jev-client/src/index.ts";
+import { recordingChoice } from "../../jev-score-register/register.mjs";
+
+/**
+ * Export what this extension already computes. askJevChoice returns
+ * {choice, confidence, probabilities} and NOT `scores`, so it needs recordingChoice —
+ * passing it through recording() would file every successful call as a failure.
+ * The register stores a sha256 of the input and NEVER the input, and it is not a
+ * cache: it records that a question was answered, it never answers one.
+ *
+ * Wired at the DEFAULT of the injectable `ask` parameter, not at the call site, so a
+ * test that passes its own stub stays unrecorded and stays offline.
+ */
+const REGISTER = process.env.JEV_SCORE_REGISTER ?? "work/jev-score-register/scores.jsonl";
+const recordedAskChoice = recordingChoice(askJevChoice, {
+  path: REGISTER,
+  extension: "omp-jev-failure",
+  model: "jev-1.13.0",
+  questionKey: "failure_class",
+});
 
 const DECISION = "com.zeststream.omp-jev-failure.decision.v1";
 const DIAG = "com.zeststream.omp-jev-failure.diagnostic.v1";
@@ -63,7 +82,7 @@ async function appendSafe(host: Host, type: string, data: Record<string, unknown
 export async function handleToolExecutionEnd(
   host: Host,
   event: ToolExecutionEnd,
-  ask: typeof askJevChoice = askJevChoice,
+  ask: typeof askJevChoice = recordedAskChoice,
 ): Promise<undefined> {
   try {
     const toolCallId = typeof event.toolCallId === "string" ? event.toolCallId : undefined;

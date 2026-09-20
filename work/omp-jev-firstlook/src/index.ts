@@ -17,6 +17,24 @@ import {
   clip,
 } from "../../taste-loop/src/detect.mjs";
 
+import { recordingChoice } from "../../jev-score-register/register.mjs";
+
+/**
+ * Export what this extension already computes. Every Jev probability it produces is
+ * appended to the register instead of being discarded when the run ends.
+ * askJevChoice returns {choice, confidence, probabilities} and NOT `scores`, so it
+ * needs recordingChoice — passing it through recording() would file every successful
+ * call as a failure. The register stores a sha256 of the input and NEVER the input,
+ * and it is not a cache: it records that a question was answered, never answers one.
+ */
+const REGISTER = process.env.JEV_SCORE_REGISTER ?? "work/jev-score-register/scores.jsonl";
+const ask = recordingChoice(askJevChoice, {
+  path: REGISTER,
+  extension: "omp-jev-firstlook",
+  model: "jev-1.13.0",
+  questionKey: "firstlook_class",
+});
+
 const DECISION = "com.zeststream.omp-jev-firstlook.decision.v1";
 
 export const CHOICE = {
@@ -62,7 +80,7 @@ export default function ompJevFirstlook(pi: Host) {
       buffer = [];
       if (copy.length === 0) return undefined;
 
-      const result = await askJevChoice({
+      const result = await ask({
         state: { copy: clip(copy, 4000) },
         instructions: CHOICE.instructions,
         classes: CHOICE.classes,
