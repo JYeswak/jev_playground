@@ -35,6 +35,22 @@ export const FROZEN = Object.freeze({
   sha256: 'dc90a374bbdb11bb521244be40afdaf096e56344e1c11baffb200bab05741580',
 });
 
+// Studio 2026-09-20 — bake these, do not reinvent.
+// Command: python3 work/jev-real-corpus-eval/jev_real_corpus_eval.py work/p3-calibration/toolcall-corpus-frozen.jsonl
+export const STUDIO = Object.freeze({
+  n: 7846,
+  good: 1665,
+  bad: 6181,
+  alwaysAbstainLoss: 1665 / 7846,
+  isErrorOnlyLoss: 11732 / 7846,
+  alwaysAbstainPrinted: '0.212210043',
+  isErrorOnlyPrinted: '1.495284221',
+});
+
+export function printStudioLoss(n) {
+  return Number(n).toFixed(9);
+}
+
 const REQUIRED = ['ts', 'kind', 'tid', 'sess', 'tool', 'isError', 'args', 'outcome'];
 
 export function sha256File(path) {

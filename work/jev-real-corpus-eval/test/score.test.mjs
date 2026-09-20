@@ -9,13 +9,17 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { decisionLoss } from '../../oracle-kit/index.mjs';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import {
   FROZEN,
+  STUDIO,
   assertFrozenIdentity,
   loadFrozen,
   loadRows,
+  printStudioLoss,
   rowToLossArgs,
   runAlwaysAbstain,
   runIsErrorBaseline,
@@ -23,6 +27,8 @@ import {
   refuseAuthoredSubstitute,
   summarize,
 } from '../score.mjs';
+
+const here = dirname(fileURLToPath(import.meta.url));
 
 function writeJsonl(rows) {
   const dir = mkdtempSync(join(tmpdir(), 'jev-real-corpus-'));
@@ -101,17 +107,34 @@ test('isError baseline abstains on error and allows otherwise', () => {
   assert.ok(Math.abs(summary.meanLoss - 2 / 3) < 1e-12);
 });
 
-test('always-abstain on the frozen file is 1665/7846 and beats the isError baseline', () => {
+test('Studio numbers are 1665/7846 and 11732/7846 — print 0.212210043 and 1.495284221', () => {
+  assert.equal(STUDIO.alwaysAbstainLoss, 1665 / 7846);
+  assert.equal(STUDIO.isErrorOnlyLoss, 11732 / 7846);
+  assert.equal(printStudioLoss(STUDIO.alwaysAbstainLoss), '0.212210043');
+  assert.equal(printStudioLoss(STUDIO.isErrorOnlyLoss), '1.495284221');
   const { rows } = loadFrozen();
   const control = runAlwaysAbstain(rows).summary;
   const baseline = runIsErrorBaseline(rows).summary;
-  assert.equal(control.n, 7846);
-  assert.equal(control.good, 1665);
-  assert.equal(control.bad, 6181);
-  assert.ok(Math.abs(control.meanLoss - 1665 / 7846) < 1e-12);
-  assert.ok(Math.abs(baseline.meanLoss - (2 * 5866) / 7846) < 1e-12);
-  assert.ok(baseline.meanLoss > control.meanLoss, 'isError baseline must clearly lose to always-abstain');
-  assert.ok(baseline.meanLoss < 2 * 6181 / 7846, 'isError baseline must still beat always-allow');
+  assert.equal(control.n, STUDIO.n);
+  assert.equal(control.good, STUDIO.good);
+  assert.equal(control.bad, STUDIO.bad);
+  assert.equal(control.meanLoss, 1665 / 7846);
+  assert.equal(baseline.meanLoss, 11732 / 7846);
+  assert.equal(printStudioLoss(control.meanLoss), STUDIO.alwaysAbstainPrinted);
+  assert.equal(printStudioLoss(baseline.meanLoss), STUDIO.isErrorOnlyPrinted);
+  assert.ok(baseline.meanLoss > control.meanLoss, 'isError-only loses to always-abstain');
+});
+
+test('python3 jev_real_corpus_eval.py reprints Studio control/baseline on the frozen file', () => {
+  const py = join(here, '..', 'jev_real_corpus_eval.py');
+  const out = execFileSync('python3', [py, FROZEN.path], { encoding: 'utf8' });
+  assert.match(out, /n=7846/);
+  assert.match(out, /GOOD=1665/);
+  assert.match(out, /BAD=6181/);
+  assert.match(out, /always-abstain mean_loss=0\.212210043 \(1665\/7846\)/);
+  assert.match(out, /isError-only mean_loss=1\.495284221 \(11732\/7846\)/);
+  assert.match(out, /vs_control=LOSE/);
+  assert.match(out, /must beat 0\.212 mean loss/);
 });
 
 test('PLANTED RED: false-allow on BAD scores 2; a weakened expected_loss REDs', () => {

@@ -14,8 +14,9 @@ import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import {
   FROZEN,
+  STUDIO,
   loadFrozen,
-  loadRows,
+  printStudioLoss,
   refuseAuthoredSubstitute,
   runAlwaysAbstain,
   runAlwaysAllow,
@@ -49,7 +50,7 @@ function parse() {
 }
 
 function fmt(n) {
-  return Number(n).toFixed(6);
+  return printStudioLoss(n);
 }
 
 function printLine(title, summary) {
@@ -132,16 +133,21 @@ function main() {
   console.log(
     `n=${identity.n}  GOOD=${identity.good}  BAD=${identity.bad}  prevalence=${fmt(control.prevalence)}`,
   );
-  console.log(`CONTROL always-abstain  mean_loss=${fmt(control.meanLoss)}`);
+  console.log(
+    `CONTROL always-abstain  mean_loss=${fmt(control.meanLoss)} (${STUDIO.good}/${STUDIO.n})`,
+  );
   console.log(`CONTROL always-allow    mean_loss=${fmt(alwaysAllow.meanLoss)}`);
   console.log(
-    `BASELINE isError-abstain-else-allow  mean_loss=${fmt(baseline.meanLoss)}  vs_control=${vsControl}`,
+    `BASELINE isError-only  mean_loss=${fmt(baseline.meanLoss)} (11732/${STUDIO.n})  vs_control=${vsControl}`,
   );
   console.log(
     `TOOLS  ${tools.map(([t, c]) => `${t}=${c}`).join(' ')}  (tool-name is not a separator)`,
   );
   console.log(
     `PLANTED-RED  false-allow-on-BAD loss=${plant.falseAllowLoss}  authored-n=10 REFUSED`,
+  );
+  console.log(
+    'FINDING  isError-only loses to always-abstain; a useful Jev judge must beat 0.212 mean loss on this split.',
   );
   console.log(
     'NO-CLAIM  [pending] promoted=0  offline  no TYPESAFE  no CASS  no agent-mail live',

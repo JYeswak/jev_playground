@@ -1929,12 +1929,14 @@ agent-mail sketches this same day) and treat its always-abstain arithmetic as
 a product tick. Joshua's correction: score the **already-labelled** frozen
 file.
 
-Measured on that file, offline, no key:
+Studio numbers on that file (baked):
 
-- always-abstain mean loss **1665/7846 = 0.212210**
-- isError baseline **1.495284** — uses a real field, **loses** to the control
-- a planted 10-row `diagnostic_synthetic` substitute is **REFUSED** by the
-  identity lock, not scored
+- always-abstain mean loss **0.212210043** (1665/7846)
+- isError-only **1.495284221** (11732/7846) — **loses** to the control
+- a planted 10-row `diagnostic_synthetic` substitute is **REFUSED**
+
+**Finding:** a useful Jev judge must beat **0.212** mean loss on this split.
+isError-only does not.
 
 R28 already said authored labels inflate. This row names the substitute
 class: a skillranker-shaped 10-case contract is not this corpus. n=12 and
