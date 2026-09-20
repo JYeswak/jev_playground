@@ -40,7 +40,15 @@ target="${1:-}"
 [ -n "$target" ] || { echo "guardpack: usage: $0 [--check] <target-repo>" >&2; exit 2; }
 [ -d "$target/.git" ] || { echo "guardpack: $target is not a git repo — refusing" >&2; exit 2; }
 target=$(CDPATH='' cd -- "$target" && pwd -P)
-[ "$target" = "$src" ] && { echo "guardpack: target is the source repo — nothing to do" >&2; exit 2; }
+# SELF-INSTALL IS THE POINT, NOT AN EXCEPTION. The first version of this script refused the
+# source repo ("nothing to do"), which meant the repo that AUTHORED the guards was the only repo
+# they could not protect — dogfooding failure, caught by Joshua within minutes of the commit.
+# The wrappers already live here, so only the hook is copied; that is what `self` means.
+self_install=0
+if [ "$target" = "$src" ]; then
+  self_install=1
+  echo "guardpack: target IS the source repo — installing the hook only (wrappers already present)"
+fi
 
 # TIER 2: result-detectable. These are the two that caught their own author seven times tonight.
 WRAPPERS="scripts/vgrep.sh scripts/pinned-denominator.sh"
@@ -82,22 +90,32 @@ else
 # defect classes that are detectable BEFORE execution. Exit 0 always: advisory, never blocking.
 # Measured basis: 7 of 21 defects in one session were visible in the command string itself.
 cmd="${1:-$(cat)}"
-warn() { printf 'guardpack: %s\n' "$1" >&2; }
+# MEASUREMENT IS NOT OPTIONAL. A hook that fires and is never counted is unobservable, which is
+# how this lane ended up with an observer that had NEVER emitted a row while 13 tests passed.
+# Every warning appends one JSONL row; `guardpack-usage.sh` reads them. No command string is
+# logged — only the class — because command strings carry secrets.
+GP_LOG="${GUARDPACK_LOG:-$HOME/.guardpack/warnings.jsonl}"
+warn() {
+  printf 'guardpack: %s\n' "$2" >&2
+  mkdir -p "$(dirname "$GP_LOG")" 2>/dev/null
+  printf '{"ts":"%s","class":"%s","repo":"%s"}\n' \
+    "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$1" "${PWD##*/}" >> "$GP_LOG" 2>/dev/null
+}
 case "$cmd" in
   *"| head"*|*"| tail"*)
-    warn "pipeline exit status is head/tail's, NOT the command's — 4 false reads measured. Re-run unpiped if you will report an rc." ;;
+    warn pipe-exit "pipeline exit status is head/tail's, NOT the command's — 4 false reads measured. Re-run unpiped if you will report an rc." ;;
 esac
 case "$cmd" in
   *"git add -A"*|*"git add ."*)
-    warn "git add -A stages a shared tree you do not own — use explicit paths with git commit --only." ;;
+    warn stage-all "git add -A stages a shared tree you do not own — use explicit paths with git commit --only." ;;
 esac
 case "$cmd" in
   *"git commit"*-m*'`'*)
-    warn "backticks inside an inline -m are COMMAND SUBSTITUTION and have executed code from a commit message here. Use -F <file>." ;;
+    warn commit-backtick "backticks inside an inline -m are COMMAND SUBSTITUTION and have executed code from a commit message here. Use -F <file>." ;;
 esac
 case "$cmd" in
   *"grep -c"*|*"grep -q"*)
-    warn "grep used as proof: zero matches exits 1 and reads as clean. Prefer scripts/vgrep.sh, which exits 3 on zero hits." ;;
+    warn grep-as-proof "grep used as proof: zero matches exits 1 and reads as clean. Prefer scripts/vgrep.sh, which exits 3 on zero hits." ;;
 esac
 exit 0
 HOOK

@@ -1676,3 +1676,50 @@ I applied it immediately to `634dcd2`, which resolves.
 
 **The pane caught its own fabricated sha and cited the contract against itself.** That is why
 this is a recorded practice rather than a discovered defect.
+
+## I over-read ompo's surface map and dispatched a false premise. The docs say the opposite.
+
+I told pane 2, in a committed dispatch, that **"omp exposes no PreToolUse protocol surface"**,
+citing `OMP-SURFACE-MAP.toml`:
+
+```
+[crates.kernel-only-operator-hook]
+omp_surface = "none"
+why = "a PreToolUse hook over OUR agent's tool calls, not over OMP's protocol"
+```
+
+**That entry classifies one ompo crate. It is not a statement about omp's capabilities.** I read
+a classification of *their* crate as a fact about *the harness* and shipped it as a design
+constraint. `omp://hooks.md` says the opposite, and it was one read away the whole time.
+
+**What is actually true, from the harness's own docs:**
+
+- There **is** a native pre-execution event, `tool_call`, and a handler returning
+  `{block: true, reason}` **stops the tool from executing.** A handler that throws also blocks —
+  fail-closed by design.
+- Discovery is **exactly** `<cwd>/.omp/hooks/pre/*.ts` and `~/.omp/agent/hooks/pre/*.ts`.
+- **Hook factories are loaded as extension modules through the extension runner.** So the
+  hooks-versus-extensions distinction I drew two ticks ago is obsolete: same pipeline.
+- `pi.appendEntry(...)` persists non-LLM state — **that is the decision-row sink** I said did
+  not exist for hooks.
+- `pi.on("tool_call")` sees **every tool**, not just bash; `event.toolName` scopes it.
+- It is a **JS/TS default-export factory taking `pi: HookAPI`**, not a shell script reading
+  stdin — so `.guardpack/pretooluse-advise.sh` was never going to be called by anything, which
+  is exactly what its zero organic fires were telling me.
+
+**And the docs name a trap we have hit 26 times tonight:** a factory placed directly in `hooks/`
+without the `pre/` subdirectory *"loads nothing and reports no error."* **Silent zero, in the
+harness's own loader** — installed-but-inert, indistinguishable from working.
+
+### Why I got it wrong, precisely
+
+I had two sources: a third-party map of someone else's crates, and the harness's own
+documentation. **I cited the map because I had already opened it**, and I treated an entry
+written in that project's vocabulary as an answer to my question. The tick file's rule is *open
+the control before repeating any number* — the same rule applies to a capability claim, and
+"does omp have pre-tool hooks" has an authoritative source that is not a TOML file in another
+repo.
+
+Correction sent to pane 2 with the exact API, and I told them to bill any wasted in-flight work
+to me. **The dispatch is committed, so the false premise is on the record** and this entry sits
+beside it rather than replacing it.
