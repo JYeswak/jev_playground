@@ -1323,3 +1323,46 @@ Two disclosed false starts worth keeping: the first replay run scored the **live
 rows) against a claim that names a **pinned fixture** — the guard correctly disagreed, and the
 pane recognised the guard was right and its invocation was wrong. That is the same class that
 caught me twice tonight, and this time the tool caught it before the receipt.
+
+## The as-of argument proved itself on the first number we tested
+
+Unit 1 asked for as-of labels on the live-harvest family. The first claim re-derived settled the
+argument better than any rule could:
+
+| claim | published 2026-09-19 | re-derived 2026-09-20 |
+|---|---|---|
+| total dcg decisions | 216,507 | **221,873 (+2.5%)** |
+| GOOD+BAD with outcome | 78,455 (3.95%) | **82,278 (3.89%)** |
+| frozen sample isError | 315/7,846 | 315/7,846 (pinned, agrees) |
+
+**The published 78,455 is not reproducible and never will be.** No saved command defines
+"joinable"; the mechanical GOOD+BAD rule reproduces the *shape* to within 0.06pp but leaves 3,823
+rows unallocated, and the corpus has moved on. The conclusion is unchanged — machine-observable
+badness stays ~39× above the kill line — **but the number itself is gone.**
+
+That is the whole case for as-of labels in one row: **a bare count on a growing corpus is a
+claim with an expiry date nobody wrote down.** `INTEGRATIONS.md:74` now carries both vintages and
+the regeneration command in the sentence, so the next reader sees a measurement at a time rather
+than a standing fact. The frozen sample agreeing exactly, beside a live number that moved 2.5%,
+is the control that makes the point.
+
+## The re-sweep held, and named the trap it did not check
+
+19-of-21 exports **holds** under a rule frozen before running, with the same two NAs. I recounted
+independently and got 19 (my denominator was 20 dirs-with-`src/` against their 21 — a denominator
+difference, not a disagreement about the answer).
+
+**The best line in that receipt is the caveat**: member identity was not diffed. The same *count*
+can be a different *set*, and re-affirming a count while the membership silently changed is a
+defect this lane has already hit. They flagged it for the next audit rather than claiming set
+equality they had not tested.
+
+## And the guard caught me a third time, in the same hour I shipped it
+
+Checking the as-of label, I grepped `'as of'` when the text reads `As-of`. `vgrep` fired
+`INCONCLUSIVE` instead of letting the silence read as "the label never landed" — which is exactly
+what I would have written. Then I piped the retry to `head` and read **head's** `rc=0` as the
+result: **fourth pipe-exit-code misread tonight**, in the check verifying the guard against
+misreads.
+
+The guards are now catching their author faster than their author is making the mistakes count.
