@@ -2501,3 +2501,31 @@ destructive set (witness `grep -c`).
 `mem_01M309988RE1XT4VJWP16190AM` (grep, invisible) /
 `mem_01M3099H34EFB8W4KB8AD0V1YT` (rm, visible); tripwire
 `tw_grok_p4_grep_quoted`.
+
+## R52-CORRECTION — the gate is `matches.is_empty()`, not "builtin"; embeddings are not involved
+
+**Recorded:** 2026-09-20 · **Level:** `[receipt]` · Same binary pin 0.15.2.
+Source: `/Volumes/ZestData/dicklesworthstone-mirror/eidetic_engine_cli`
+`Cargo.toml:25` `version = "0.15.2"` (C71: identical to installed `ee`; no newer fix).
+
+R52's **behaviour** stands (`grep -c` empty; `rm -rf` memories 1; tripwires do
+not feed preflight). The **mechanism name** "builtin-gated" is OVERTURNED.
+
+- Gate 1: `src/cli/mod.rs:25807` `if report.matches.is_empty() { return; }`
+- Gate 2: `preflight_guard.rs:2844` kind ∈ {risk, anti-pattern, failure}
+- Gate 3: term intersection (`2774-2841`). `list_memories`, not the search index.
+- `matches[]` writers: builtins ∪ `.ee/preflight_rules.toml`. Not tripwires.
+
+Clean-room toml `pattern = "*grep -c*"` then made
+`matchedMemories: [mem_01M309988RE1XT4VJWP16190AM]`. Control `cargo fmt --check`
+stayed empty. Cataloged recall works; auto-recall does not.
+
+**Verdict:** R52 VEIN-EXHAUSTED **narrowed** to auto-recall. Cataloged recall
+is NO-SHIP as a substitute for the Joshua loop (duplicates TTSR).
+
+**Retry-condition (auto-loop only):** a release **> 0.15.2** where
+`grep -c` yields `matchedMemories ≥ 1` with no builtin hit and no
+`preflight_rules.toml`.
+
+**Evidence:** `docs/demos/upstream-repro/grok-challenge-20260920.md` amendment;
+`cli/mod.rs:25802-25835`; `preflight_guard.rs:2774-2846`.
