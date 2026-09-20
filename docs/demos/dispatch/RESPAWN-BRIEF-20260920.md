@@ -82,6 +82,24 @@ other repo silently disagree. Edit both, or the suite fails.
 
 ## TRAPS MEASURED TODAY — each one cost real time
 
+- **A QUIET TTSR probe is ambiguous, so it is not evidence of absence.** `repeatMode` defaults to
+  **`once`** (`omp://ttsr-injection-lifecycle.md`), and four of our five system-wide rules are
+  `once` — two declare it, two inherit it. A rule that already fired earlier in your session is
+  suppressed for the rest of it, so QUIET means *absent* **or** *present-and-already-fired*. The
+  disambiguating question is "did you see this rule fire at ANY point this session?" Measured
+  2026-09-20: all three panes initially read QUIET on two rules and **all three were fully bound**.
+- **Process start time is not evidence of rule binding.** I compared omp start times against rule
+  file mtimes, found a worker that started **one second** before the files landed, and concluded it
+  had missed them. Live fire refuted that: it had all five. An indirect timestamp comparison is
+  exactly the single-probe inference `absence-from-one-probe` exists to stop, committed by the
+  person who wrote the rule.
+- **`tmux display-message -p '#{pane_index}'` without `-t` reports the ATTACHED CLIENT's active
+  pane, not yours — it returns `1` for everyone.** Confirmed independently by three panes, and it
+  is why a worker reported itself as pane 1 and would have sent every future callback to itself.
+  Use `tmux display-message -pt "$TMUX_PANE" '#{pane_index}'`, or the oracle pane 2 derived: match
+  your shell's parent PID against `tmux list-panes -F '#{pane_index} #{pane_pid}'`. Measured at
+  21 occurrences / 0.0268% in the 78,242-command harvest, so it is **refused as a rule** (below the
+  50 floor) and documented here instead.
 - **TTSR conditions are JavaScript `RegExp`.** An **embedded** `(?i)` is invalid; a **leading** one
   is fine (omp lifts it to the `i` flag). An invalid condition is *logged and ignored* in a live
   session, so the rule **loads, never fires, and looks installed**. Same trap in `hub` `ready.log`
