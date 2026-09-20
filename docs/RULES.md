@@ -63,3 +63,14 @@ preview; the tool that kept a 200-char preview wrote credentials to a world-read
 ```sh
 node --test work/jev-score-register/register.test.mjs 2>&1 | grep "not recoverable"
 ```
+
+**9. A test that asserts nothing was thrown cannot tell working from mute.** Assert that output
+EXISTS. *(§16 — `safeAppend` was called at four sites and defined at none, so the observer threw
+into its own catch and emitted nothing, ever; 13 tests passed for the package's entire life
+because they asserted the handler does not throw, and a handler that swallows everything does not
+throw.)*
+```sh
+# 5/5 against the fixed tree; 1/5 against the pre-fix observer, planted negative failing first
+node --test work/omp-jev-observer/test/emits-rows.test.mjs
+git show 959c321:work/omp-jev-observer/src/observer.mjs | grep -c 'function safeAppend'   # 0
+```
