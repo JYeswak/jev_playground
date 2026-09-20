@@ -103,7 +103,7 @@ prompt injection with context
 always-abstain control 5× on their own corpus
 ([receipt](docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md)).
 
-**Scoreboard, present tense:** 33 verdict rows (8 cleared, 13 held, 12 ruled out, **0 promoted**),
+**Scoreboard, present tense:** 40 verdict rows (8 cleared, 17 held, 15 ruled out, **0 promoted**),
 50 dead-end ledger entries each with a reopen condition, 13 gate stages green. Tool_call
 **RULE WINS** — ship the classifier, drop Jev (cost-benefit). Observer (B)
 mechanism MET at n=1 lab; working-profile dogfood **OPEN**. Proven vs WIP seams:
@@ -803,7 +803,7 @@ Runtimes, measured 2026-09-20 on an M3 Ultra: `foundation/gates.sh` about 24 s; 
 
 ## Limitations
 
-**Nothing has been promoted.** 33 verdict rows (8 cleared, 13 held, 12 ruled out, **0 promoted**).
+**Nothing has been promoted.** 40 verdict rows (8 cleared, 17 held, 15 ruled out, **0 promoted**).
 That is the deliverable rather than a shortfall, and every reason lives in
 [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 50 entries, each carrying the condition that would
 reopen it. One candidate died there because an MIT-licensed tool already ships its surface, which
@@ -844,7 +844,7 @@ pointed at another shape reports zero turns, which is a visible result rather th
 
 ## Status
 
-**33 verdict rows, 0 promoted, with one promotion awarded and retracted the same day.** Foreman
+**40 verdict rows, 0 promoted, with one promotion awarded and retracted the same day.** Foreman
 supervision cleared its bar on authored vignettes (AUC 1.000 twice), then scored 0.750 on 186,449
 real windows and was moved off rung 5 by its author. The retraction is the system working, not
 failing. Verdicts and receipts: `docs/demos/STATUS.tsv`; reopen conditions:
