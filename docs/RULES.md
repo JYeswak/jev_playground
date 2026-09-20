@@ -1,6 +1,6 @@
 # Measurement rules
 
-Eight rules, each earned by a measurement in this repo. Every one names the commit that produced
+Nine rules, each earned by a measurement in this repo. Every one names the commit that produced
 it and a command you can run now. A rule with no runnable command is not on this page.
 
 **1. Compute the ceiling before you measure the candidate.** Give the job to an omniscient judge
@@ -10,6 +10,8 @@ sessions, zero model calls.)*
 ```sh
 node work/jev-retransmit-killer/ceiling-beat.mjs 2
 ```
+(Needs the machine's own omp session logs, which are gitignored and not in a fresh
+clone; without them the harness has no sessions to beat.)
 
 **2. A savings number without a paired retention number is not a result.** "Dropped X%" is
 indistinguishable from deleting everything, which drops 100%. *(`fa78767` — `drop-largest` saved
@@ -18,6 +20,7 @@ indistinguishable from deleting everything, which drops 100%. *(`fa78767` — `d
 # the last two columns are drop-largest: 73.7% saved, 31.1% of substantive reuse lost
 node work/jev-retransmit-killer/ceiling-beat.mjs 1 | grep REJECT
 ```
+(Same session-log dependency as rule 1.)
 
 **3. Commit the falsifier before the first call.** Write down what result would prove you wrong,
 commit it, then run. *(`beb45d5` → `61e953b`, fired and killed a question family; `8e43ccb` →
