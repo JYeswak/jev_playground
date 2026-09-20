@@ -25,7 +25,7 @@ verifying the library contract on omp-shaped traffic.
 
 ```sh
 npm install
-npm test                      # 32/32, verified from a fresh clone 2026-09-19
+npm test                      # 38/38, re-verified 2026-09-20
 npm run replay -- <t.jsonl> [--out runs/r.json]   # NEEDS TYPESAFE_API_KEY; exits 2 without one
 #   keyed, from a fresh clone: fixtures/omp-session-big-20260917.jsonl -> 13 messages to 8,
 #   1 request, 1439 ms, 6/6 invariant checks PASS. The small fixture makes 0 requests: it has
