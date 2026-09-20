@@ -531,3 +531,31 @@ requires; I located the work by path. A missing sha is how a receipt and its cit
 apart, so it is noted rather than silently compensated.
 
 SECTION 19 taste-loop contracts — PASS — 20 packages: zero fetch/block, all 19 suites green (dispatch has none); deviations filed (timeouts 3000/4000/absent, route absolute import, dispatch thinnest); promoted=0, earned by nothing here — NO-CLAIM: static+offline only; 85 gate file absent so bars are dispatch-text.
+
+SECTION 19 taste-loop contracts — **PASS, 0 promoted** — `0a3bd5f`. 20 packages audited
+statically and every suite run offline: commit 6, default 8, failure 5, field 7, firstlook 8,
+foreman 4, fork 8, heat 7, heckle 8, jargon 8, observer 13, preaction 6, promise 9, rerank 7,
+review 7, route 23, skip 8, uncanny 7, undo 8 — **all green, 0 failures**. All 20 import
+`askJev`/`askJevChoice` or are regex-by-design; **zero `fetch`, zero `block:true`** — the
+observe-only contract holds across the whole set. Dispatch has no test dir.
+NO-CLAIM, the author's: static + offline, no model calls.
+
+SECTION 19b IT CAUGHT MY BIGGEST UNFORCED ERROR OF THE SESSION — its NO-CLAIM reads "85 gate
+absent", and it was right. I built the promotion contract, verified it, and repeatedly described
+it as *"wired, auto-discovered, running code branches on it"*. True — **on `fix/pr24-rebase`,
+which became PR #25 and is still OPEN and unmerged.** On `main`, `foundation/gates.d` held
+**twelve** stages and the gate did not exist. Every claim I made about it was scoped to a branch
+nobody else was standing on.
+
+Same defect shape as the other sixteen: **I verified the thing in the place I happened to be
+looking, and the place was wrong.** §19 found it by RUNNING the gate rather than reading my claim
+about it — which is the whole argument for the boundary test.
+
+Landed on main by cherry-pick and re-verified HERE rather than trusting the branch run:
+`ls foundation/gates.d/ | wc -l` = 13, README line 662 "Thirteen stages.",
+`85-promotion-contract.sh --selftest` rc=0 with all three arms firing as required,
+`./foundation/gates.sh` rc=0, `--selftest` rc=0. Exit codes unpiped.
+
+The gate matters more now than when written: STATUS.tsv gained four verdict rows tonight, two
+RULED_OUT, and this is what makes `PROMOTED` mean four named gates plus an existing receipt
+rather than a word anyone can type.
