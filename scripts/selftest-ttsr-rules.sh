@@ -39,15 +39,25 @@ arm "$P" fire  "pipe-exit: rc read after the pipe"           './scripts/lane-sta
 arm "$P" quiet "pipe-exit: rc read with NO pipe"             './scripts/lane-status.sh >/tmp/x 2>&1; echo "rc=$?"'
 arm "$P" quiet "pipe-exit: piped, rc never read"             'grep -c foo bar | tail -1'
 
+S=.omp/rules/bash-structural-def-search.md
+arm "$S" fire  "structural-shape: fn keyword plus a regex hole"   "grep -rn 'fn .*pressure.*polic' . --include='*.rs'"
+arm "$S" quiet "structural-shape: exact known name, no hole"     "grep -rn 'fn resolve_standing_manifest' src/"
+arm "$S" quiet "structural-shape: navigation, no -r"              "grep -n 'fn resume' crates/lib.rs"
+
+C=.omp/rules/bash-callsite-grep-exclusion.md
+arm "$C" fire  "callsite-exclusion: callers piped past a fn def"      "grep -rn 'is_silent(' crates/ --include='*.rs' | grep -v 'fn is_silent'"
+arm "$C" quiet "callsite-exclusion: no exclusion at all"              "grep -rn 'is_silent(' crates/ --include='*.rs'"
+arm "$C" quiet "callsite-exclusion: exclusion is not a def"           "grep -rn 'is_silent(' crates/ | grep -v 'test'"
+
 # Every project rule must own at least one arm above — a rule file with no test is a rule nobody
 # has ever seen fire. An empty scan set is not a pass (RULE 1).
 n_rules=$(ls -1 .omp/rules/*.md 2>/dev/null | wc -l | tr -d ' ')
 if [ "$n_rules" -eq 0 ]; then
   note FAIL ".omp/rules/*.md matched nothing — an empty scan set is NOT a pass"; fail=$((fail+1))
-elif [ "$n_rules" -eq 2 ]; then
+elif [ "$n_rules" -eq 4 ]; then
   note ok "every project rule ($n_rules) has arms here"; pass=$((pass+1))
 else
-  note FAIL "$n_rules project rules but only 2 are tested — add arms for the new one"; fail=$((fail+1))
+  note FAIL "$n_rules project rules but only 4 are tested — add arms for the new one"; fail=$((fail+1))
 fi
 
 echo "scripts/selftest-ttsr-rules.sh: $pass ok, $fail failed"
