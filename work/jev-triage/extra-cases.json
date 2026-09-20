@@ -1,0 +1,72 @@
+{
+  "cases": [
+    {
+      "id": "pipefail-anywhere",
+      "name": "pipefail-anywhere",
+      "description": "The command string contains set -o pipefail. That is shell context, not a defect.",
+      "predicate": "set -o pipefail anywhere in the command",
+      "examples": [
+        "set -o pipefail; cargo test | tail -5",
+        "bash -c 'set -o pipefail; grep -q foo bar | true'",
+        "set -uo pipefail; omp ttsr test --rule x.md --source text zzzz"
+      ],
+      "gold": "REFUSE_NUISANCE",
+      "gold_noul": false,
+      "row_kind": "semantic",
+      "hits": 1619, "N": 78242, "rate": 2.0692, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect",
+      "R": "R55"
+    },
+    {
+      "id": "R59-broad-backticks",
+      "name": "R59-broad-backticks",
+      "description": "A backtick pair inside any quoted span. Dominated by triple-backtick fence extraction over contract docs, the fleet's own writeup idiom.",
+      "predicate": "backtick pair inside a quoted span",
+      "examples": [
+        "sed -n '/^```bash$/,/^```$/p' docs/contracts/s0_io_contract.md | sed '1d;$d'",
+        "sed -n '/^```$/,/^```$/p' docs/contracts/s1_io_contract.md",
+        "python3 -c 'print(\"`field`\")'"
+      ],
+      "gold": "REFUSE_NUISANCE",
+      "gold_noul": false,
+      "row_kind": "semantic",
+      "hits": 1417, "N": 78242, "rate": 1.811, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect",
+      "R": "R59"
+    },
+    {
+      "id": "R56-bare-workaround",
+      "name": "R56-bare-workaround",
+      "description": "Assistant text contains 'workaround'. Clears rate bars; fires on meta-talk and already-compliant C71 behavior.",
+      "predicate": "workaround in assistant text",
+      "examples": [
+        "a workaround that works is the most effective way to stop investigating",
+        "I took the workaround six times",
+        "the wrapper's own words already contained the correction"
+      ],
+      "gold": "REFUSE_NUISANCE",
+      "gold_noul": false,
+      "row_kind": "semantic",
+      "hits": 147, "N": 45220, "rate": 0.3251, "FP": null, "labelled_n": 0, "seed": "20260920",
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect",
+      "R": "R56"
+    },
+    {
+      "id": "R51-pipe-exit-v1",
+      "name": "R51-pipe-exit-v1",
+      "description": "Any pipeline ending in head/tail. 55% of all commands. Wallpaper; detects the precondition not the rc-read defect.",
+      "predicate": "command contains | head or | tail",
+      "examples": [
+        "git log --oneline | head -20",
+        "cargo test 2>&1 | tail -5",
+        "br ready --json | jq -r '.[0].id'"
+      ],
+      "gold": "REFUSE_NUISANCE",
+      "gold_noul": false,
+      "row_kind": "arithmetic",
+      "hits": 43185, "N": 78242, "rate": 55.2, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect",
+      "R": "R51"
+    }
+  ]
+}

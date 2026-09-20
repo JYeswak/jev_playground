@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { askJev, askJevChoice, SYSTEMONE_ENDPOINT } from '../src/index.ts';
+import { askJev, askJevChoice, askJevBundle, SYSTEMONE_ENDPOINT } from '../src/index.ts';
 
 const QUESTIONS = { harm: 'is this harmful?' };
 const STATE = { command: 'rm -rf /' };
@@ -134,6 +134,41 @@ test('askJevChoice sends type:"choice" with criteria as a MAP of label -> descri
     assert.equal(r.choice, 'argument');
     assert.equal(r.confidence, 0.97);
     assert.deepEqual(r.probabilities, { transient: 0, argument: 0.98, bug: 0.02 });
+  },
+));
+
+test('askJevBundle sends Choice and Noul in ONE request against the same state', withFetch(
+  async (url, init) => {
+    assert.equal(url, SYSTEMONE_ENDPOINT);
+    const sent = JSON.parse(init.body);
+    assert.equal(sent.questions.verdict.type, 'choice');
+    assert.equal(sent.questions.defect.type, 'noul');
+    assert.deepEqual(sent.state, STATE);
+    return {
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify({
+        model: 'jev-1.13.0',
+        answers: {
+          verdict: { type: 'choice', choice: 'argument', confidence: 0.9,
+                     probabilities: { transient: 0.05, argument: 0.9, bug: 0.05 } },
+          defect: { type: 'noul', noul: 0.81 },
+        },
+      }),
+    };
+  },
+  async () => {
+    const r = await askJevBundle({
+      state: STATE,
+      questions: {
+        verdict: { type: 'choice', instructions: 'which class?', criteria: CLASSES },
+        defect: { type: 'noul', instructions: 'is this a defect?' },
+      },
+    });
+    assert.equal(r.ok, true);
+    assert.equal(r.resolvedModel, 'jev-1.13.0');
+    assert.equal(r.answers.defect.noul, 0.81);
+    assert.equal(r.answers.verdict.choice, 'argument');
   },
 ));
 

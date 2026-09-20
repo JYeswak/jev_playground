@@ -72,7 +72,7 @@ export type AskChoiceOptions = {
 const CHOICE_KEY = "choice";
 
 type Posted =
-  | { ok: true; answers: object; latencyMs: number }
+  | { ok: true; answers: object; latencyMs: number; resolvedModel: string }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number };
 
 /**
@@ -118,7 +118,9 @@ async function postSystemOne(
   if (!answers || typeof answers !== "object") {
     return { ok: false, reason: "no-answers", error: "`answers` was not an object", latencyMs };
   }
-  return { ok: true, answers, latencyMs };
+  const resolvedModel =
+    "model" in body && typeof body.model === "string" ? body.model : model;
+  return { ok: true, answers, latencyMs, resolvedModel };
 }
 
 export async function askJev(options: AskOptions): Promise<JevResult> {
@@ -249,6 +251,56 @@ export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoice
     return { ok: false, reason: "no-answers", error: "`confidence` was not a number", latencyMs, model };
   }
   return { ok: true, choice: chosen, confidence, probabilities, latencyMs, model };
+}
+
+export type AskBundleOptions = {
+  state: Record<string, unknown>;
+  /** Already-typed question objects (`type: noul|choice|score`). */
+  questions: Record<string, unknown>;
+  timeoutMs?: number;
+  model?: string;
+  apiKey?: string;
+};
+
+export type JevBundleResult =
+  | {
+      ok: true;
+      answers: Record<string, unknown>;
+      latencyMs: number;
+      model: string;
+      resolvedModel: string;
+    }
+  | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
+
+/**
+ * Mixed questions against one state. Choice + Noul in one request run in parallel.
+ * The only sanctioned way to ask both without forking fetch.
+ */
+export async function askJevBundle(options: AskBundleOptions): Promise<JevBundleResult> {
+  const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
+  const apiKey = options.apiKey ?? process.env.TYPESAFE_API_KEY;
+  if (!apiKey) {
+    return {
+      ok: false,
+      reason: "unconfigured",
+      error: "TYPESAFE_API_KEY is not set — see .env.example, use infisical run --projectId=…",
+      latencyMs: 0,
+      model,
+    };
+  }
+  const keys = Object.keys(options.questions ?? {});
+  if (keys.length === 0) {
+    return { ok: false, reason: "no-answers", error: "no questions supplied", latencyMs: 0, model };
+  }
+  const posted = await postSystemOne(apiKey, model, options.state, options.questions, options.timeoutMs ?? 4000);
+  if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
+  return {
+    ok: true,
+    answers: posted.answers as Record<string, unknown>,
+    latencyMs: posted.latencyMs,
+    model,
+    resolvedModel: posted.resolvedModel,
+  };
 }
 
 /**

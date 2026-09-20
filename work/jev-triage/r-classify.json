@@ -1,0 +1,32 @@
+{
+  "n_headings": 62,
+  "note": "NEGATIVE_EVIDENCE.md has duplicate R-numbers (two R28/R32/R33/R42/R43/R44). Classified by heading. SEMANTIC_CLASS = a TTSR/rule candidate that cleared (or would clear) numeric bars and was refused on meaning. ARITHMETIC_CLASS = refused on hits/rate/FP/concentration/wallpaper. NOT_A_CLASS = instrument error, design rejection, omp fact, filing withdraw — not a rule-class to triage.",
+  "semantic_class": [
+    {"id": "digest-truncation", "R": "cited-in-R55", "hits": 827, "rate": 1.06, "why": "ordinary shasum|cut, not a defect"},
+    {"id": "path-nonexistence", "R": "cited-in-R55", "hits": 332, "rate": 0.7361, "why": "file-path claims; one ls is sufficient"},
+    {"id": "pipefail-masked", "R": "R55-loose", "hits": 227, "rate": 0.2901, "why": "correct bash unless pipefail, which the command string cannot see"},
+    {"id": "pipefail-anywhere", "R": "R55-pipefail-token", "hits": 1619, "rate": 2.0692, "why": "context, not a defect"},
+    {"id": "R59-broad-backticks", "R": "R59", "hits": 1417, "rate": 1.811, "why": "triple-backtick fence extraction, the fleet's own idiom"},
+    {"id": "R56-bare-workaround", "R": "R56", "hits": 147, "rate": 0.3251, "why": "clears bars; fires on meta-talk about workarounds"}
+  ],
+  "arithmetic_class": [
+    {"id": "R51-pipe-exit-v1", "R": "R51", "hits": 43185, "rate": 55.2, "why": "wallpaper; also precondition-not-defect but rate already refuses"},
+    {"id": "R56-conjunction", "R": "R56", "hits": 89, "rate": 0.1968, "FP": 0.95, "why": "FP bar"},
+    {"id": "R57-empty-narration", "R": "R57", "hits": 218, "rate": 0.4821, "FP": 1.0, "why": "FP 1.00 on compliant writeups"},
+    {"id": "R58-empty-timeout", "R": "R58", "hits": 27, "rate": 0.0597, "why": "below 50 floor (FP 1.00 too)"},
+    {"id": "R59-narrow-br-body", "R": "R59", "hits": 12, "rate": 0.0153, "why": "below 50 floor"},
+    {"id": "R55-conjunction", "R": "R55", "hits": 1, "rate": 0.0013, "why": "below 50 floor"},
+    {"id": "claim-verb", "R": "cited-P4", "hits": 329, "rate": 0.729, "FP": 0.9167, "concentration": 0.73, "why": "FP and concentration; listed as semantic in the challenge but the bars already refuse"},
+    {"id": "structural-grep-v1", "why": "FP 0.67"},
+    {"id": "D4-read-burst", "why": "FP 0.75"},
+    {"id": "live-file-digest", "why": "hits 14"},
+    {"id": "v2-files", "why": "hits 10 / underpowered channel"}
+  ],
+  "not_a_class": [
+    "R1","R2","R3","R4","R5","R6","R7","R8","R9","R10","R11","R12","R13","R14","R15","R16","R17","R18","R19","R20","R21","R22","R23","R24","R25","R26","R27","R28-reclaim","R28-authored-corpus","R29","R30","R31","R32-npm","R32-class-D","R33","R33-CORRECTION","R34","R35","R36","R37","R38","R39","R40","R41","R42-skillranker","R42-corpus","R42-mail","R43-loss-table","R43-bv-beads","R44-stripQuoted","R44-synthetic","R45","R46","R47","R48","R52","R52-CORRECTION","R53","R54","R60"
+  ],
+  "n_semantic_callable": 6,
+  "n_not_a_class": 54,
+  "R54_note": "WITHDRAW of a cass filing because the claimed defect did not reproduce. Semantic in the sense 'the bug isn't real', but it is not a TTSR class with hits/rate. Excluded from hybrid scoring.",
+  "honest_share": "6 semantic TTSR classes, not 'a large share of 55 R-numbers'. Most R-rows are instrument/design facts."
+}

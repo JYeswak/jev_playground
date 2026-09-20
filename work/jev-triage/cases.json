@@ -1,0 +1,320 @@
+{
+  "n": 19,
+  "source": "dispatch-P4-20260920 hand rulings that predate this automation",
+  "rate_unit": "percent",
+  "fp_unit": "fraction",
+  "concentration_unit": "fraction",
+  "choice_gold_mapping": {
+    "not_a_defect": "REFUSE_NUISANCE",
+    "concentration": "UNDERPOWERED",
+    "note": "Choice has five labels and no NOT_A_DEFECT or CONCENTRATION. These two mappings are a join choice, not observed gold. Noul gold does not use them."
+  },
+  "count_as_verdict_gold": "dispatch-time SHIP (not the later depth-pack overturn)",
+  "examples_corpus": "work/toolcall-judge-v3/real-allowed.json harvestedAt 2026-09-20T05:22:11.742Z unless noted text-corpus",
+  "cases": [
+    {
+      "id": "bash-glob-silenced",
+      "name": "bash-glob-silenced",
+      "description": "grep/rg over an unquoted path glob with stderr silenced, so no-match and no-path print the same empty.",
+      "predicate": "grep/rg/find plus a glob token (* or crates/*) plus 2>/dev/null",
+      "examples": [
+        "find . -name \"*.py\" -not -path \"./.git/*\" 2>/dev/null | head -5",
+        "grep -rln \"60,827\" receipts/ docs/ 2>/dev/null | head -5",
+        "ls -la ~/.local/state/flywheel/franken-harvest/*.lock 2>/dev/null"
+      ],
+      "gold": "SHIP",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 820, "N": 78242, "rate": 1.05, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "bash-pipe-exit-v2",
+      "name": "bash-pipe-exit-v2",
+      "description": "$? after a pipeline reports tail/head, not the command whose status you wanted.",
+      "predicate": "a pipe, then echo EXIT=$? (no pipefail in the same command string)",
+      "examples": [
+        "cd /Users/josh/Developer/jev && ./scripts/lane-status.sh 2>&1 | tail -16; echo \"EXIT=$?\"",
+        "./node_modules/.bin/tsc --noEmit 2>&1 | head -30; echo \"EXIT=$?\"",
+        "cd /Users/josh/Developer/jev && ./scripts/lane-status.sh 2>&1 | tail -20; echo \"EXIT=$?\""
+      ],
+      "gold": "SHIP",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 807, "N": 78242, "rate": 1.03, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "bash-structural-def-search",
+      "name": "bash-structural-def-search",
+      "description": "grep/rg for a code keyword plus a regex hole, which is a shape question not a name lookup.",
+      "predicate": "grep/rg with fn/impl/function/class AND a regex hole (.*, |, [], +)",
+      "examples": [
+        "grep -n \"fn .*split_\" tests/mine_cli.rs src/mine.rs",
+        "grep -n \"SEARCH_INDEX_EMPTY\\|fn .*empty\" src/search_index.rs",
+        "grep -rn 'fn .*pressure.*polic' . --include='*.rs'"
+      ],
+      "gold": "SHIP",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 172, "N": 78242, "rate": 0.22, "FP": 0.20, "labelled_n": 20, "seed": "20260922",
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "bash-callsite-grep-exclusion",
+      "name": "bash-callsite-grep-exclusion",
+      "description": "grep piped through grep -v of the function definition, a shallow call-site search.",
+      "predicate": "grep -rn 'name(' ... | grep -v 'fn name'",
+      "examples": [
+        "grep -rn \"search_index::build\" src/ --include=\"*.rs\" | grep -v \"fn build_with_stats\" | head",
+        "grep -rn \"mine_commit_index\" src/ | grep -v \"fn mine_commit_index\"",
+        "grep -rn 'is_silent(' crates/ --include='*.rs' | grep -v 'fn is_silent'"
+      ],
+      "gold": "SHIP",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 64, "N": 78242, "rate": 0.08, "FP": 0.30, "labelled_n": 20, "seed": "20260920",
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "absence-from-one-probe",
+      "name": "absence-from-one-probe",
+      "description": "Asserting a capability is absent from one probe (command -v, a missing file) without a second kind of look.",
+      "predicate": "assistant text claiming a named capability is not installed / missing / not available",
+      "examples": [
+        "morph is not installed on this machine",
+        "the hook is not wired the way its own author designed",
+        "nvm is not available as a shell command here"
+      ],
+      "gold": "SHIP",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 185, "N": 45103, "rate": 0.4102, "FP": 0.20, "labelled_n": 20, "seed": "20260920",
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "invariant"
+    },
+    {
+      "id": "count-as-verdict",
+      "name": "count-as-verdict",
+      "description": "grep -c whose count is treated as the verdict that something exists or does not.",
+      "predicate": "grep -c as the last printed result of the command",
+      "examples": [
+        "grep -c 'PLANT-myw3-%48' crates/ompo-doctor/src/lib.rs",
+        "grep -c 'mod toolchain_tests' crates/ompo-doctor/src/lib.rs",
+        "git ls-tree -r HEAD --name-only | grep -c hook_digest"
+      ],
+      "gold": "SHIP",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 1486, "N": 78242, "rate": 1.90, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "live-file-digest",
+      "name": "live-file-digest",
+      "description": "shasum of a live session/log/.omp file as if the digest were durable evidence.",
+      "predicate": "shasum under sessions, logs, or .omp",
+      "examples": [
+        "echo \"CODEX-CURRENT: $(shasum -a 256 ~/.omp/profiles/codex/agent/extensions/omp-harm-rule.ts | cut -c1-16)\"",
+        "shasum -a 256 ~/.omp/profiles/jev-lab/agent/config.yml",
+        "shasum -a 256 work/omp-harm-rule/harm-rule.ts; shasum -a 256 ~/.omp/profiles/codex/agent/extensions/omp-harm-rule.ts"
+      ],
+      "gold": "REFUSE_TOO_RARE",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 14, "N": 78242, "rate": 0.02, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "digest-truncation",
+      "name": "digest-truncation",
+      "description": "shasum piped to cut/awk/head to take a prefix of a hash. Ordinary digest truncation, not a defect.",
+      "predicate": "shasum … | cut/awk/head",
+      "examples": [
+        "perl -0777 -pe 's/\\s+\\z//' docs/demos/upstream-repro/foreman-supervision-adoption-20260919.md | shasum -a 256 | cut -c1-16",
+        "shasum -a 256 work/toolcall-judge-v3/score.mjs | cut -c1-16",
+        "shasum -a 256 $A/franken-harvest.first | cut -c1-16"
+      ],
+      "gold": "REFUSE_NUISANCE",
+      "gold_noul": false,
+      "row_kind": "semantic",
+      "hits": 827, "N": 78242, "rate": 1.06, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "path-nonexistence",
+      "name": "path-nonexistence",
+      "description": "Saying a file path does not exist. One ls is sufficient; this is not a capability-absence defect.",
+      "predicate": "assistant text: path/file 'does not exist' / 'no such'",
+      "examples": [
+        "docs/plan/flow/bead-lifecycle.toml does not exist",
+        "grep: crates/: No such file or directory",
+        "the ranking is missing three rows from the table"
+      ],
+      "gold": "REFUSE_NUISANCE",
+      "gold_noul": false,
+      "row_kind": "semantic",
+      "hits": 332, "N": 45103, "rate": 0.7361, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "SCREAMING_CASE-missing",
+      "name": "SCREAMING_CASE-missing",
+      "description": "Env-var-shaped NAME is missing. Below the occurrence floor.",
+      "predicate": "SCREAMING_CASE … is missing",
+      "examples": [
+        "TYPESAFE_API_KEY is missing from this environment",
+        "JEV_API_KEY is missing",
+        "TEXT_MODEL_API_KEY is missing"
+      ],
+      "gold": "REFUSE_TOO_RARE",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 47, "N": 45103, "rate": 0.1042, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "NOT-INSTALLED",
+      "name": "NOT-INSTALLED",
+      "description": "Probe printed MISSING / NOT INSTALLED. Below the floor; also the wrong probe for MCP servers.",
+      "predicate": "NOT INSTALLED / returned MISSING",
+      "examples": [
+        "command -v morph returned MISSING",
+        "UNMEASURED (probe: command -v morph); a second probe is required",
+        "nvm is not available as a shell command here"
+      ],
+      "gold": "REFUSE_TOO_RARE",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 7, "N": 45103, "rate": 0.0155, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "pipefail-masked",
+      "name": "pipefail-masked",
+      "description": "if cmd | grep -q. Correct idiomatic bash unless pipefail is set, and pipefail is almost never in the same command string.",
+      "predicate": "if … | grep -q (loose form, 227 hits; not the 1-hit conjunction with pipefail)",
+      "examples": [
+        "if echo \"$OUT\" | grep -q \"Selected worker\"; then echo ADMITTED; fi",
+        "if cargo test 2>&1 | grep -q FAILED; then exit 1; fi",
+        "if cmd | grep -q pattern; then echo hit; fi"
+      ],
+      "gold": "REFUSE_NUISANCE",
+      "gold_noul": false,
+      "row_kind": "semantic",
+      "hits": 227, "N": 78242, "rate": 0.2901, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "tmux-untargeted",
+      "name": "tmux-untargeted",
+      "description": "tmux display-message -p without -t, which reports the attached client's pane not this agent.",
+      "predicate": "tmux display-message -p with no -t target",
+      "examples": [
+        "tmux display-message -p '#{session_name}:#{window_index}.#{pane_index} #{pane_id} #{pane_title}'",
+        "echo \"TMUX_PANE=$TMUX_PANE\"; tmux display-message -p '#{pane_id} #{pane_title}'",
+        "tmux display-message -p '#{pane_index}'"
+      ],
+      "gold": "REFUSE_TOO_RARE",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 21, "N": 78242, "rate": 0.0268, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "git-add-A",
+      "name": "git-add-A",
+      "description": "git add -A / --all / . on a shared worktree. dcg already denies it.",
+      "predicate": "git add -A or git add --all or git add . as the path",
+      "examples": [
+        "git -C /tmp/gbp-push-0912 add -A",
+        "git add -A",
+        "git add --all"
+      ],
+      "gold": "REFUSE_TOO_RARE",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 1, "N": 78242, "rate": 0.0013, "FP": null, "labelled_n": 1, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "new-scripts-sh",
+      "name": "new-scripts-sh",
+      "description": "Redirect/create a new scripts/*.sh file. Rare at the house path; intent unobservable from bash.",
+      "predicate": "> or tee to scripts/*.sh",
+      "examples": [
+        "cd /Users/josh/Developer/jev && cat > scripts/noclaim-harvest.sh <<'EOF'",
+        "cd /Users/josh/Developer/jev && cat > scripts/feed-idle-panes.sh <<'EOF'",
+        "mkdir -p $D/scripts && printf '%s\\n' '#!/bin/sh' > $D/scripts/plant.sh"
+      ],
+      "gold": "REFUSE_TOO_RARE",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 4, "N": 78242, "rate": 0.0051, "FP": null, "labelled_n": 0, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "v2-files",
+      "name": "v2-files",
+      "description": "*_v2 / *_improved / *_enhanced filenames. Observed bash hits are scratch /tmp files; the real class is write/edit.",
+      "predicate": "path-like token *_v2 / *_improved / *_enhanced in the bash string",
+      "examples": [
+        "python3 /tmp/spec_exclusive_v2.py 2>&1 | tail -18",
+        "cp /tmp/spec_exclusive_v2.json receipts/RC-SPEC-VOCABULARY-OVERLAP-20260907.json",
+        "cat > /tmp/probe_improved.mts <<'EOF'"
+      ],
+      "gold": "UNDERPOWERED",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 10, "N": 78242, "rate": 0.0128, "FP": null, "labelled_n": 10, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "claim-verb",
+      "name": "claim-verb",
+      "description": "Assistant claim-verb with no preceding command. 73% one session; labelled 2 TP / 22 FP.",
+      "predicate": "verified/confirmed/proven in assistant text with no prior tool call",
+      "examples": [
+        "verified per-row",
+        "SHA-256 verified",
+        "this is a verified claim"
+      ],
+      "gold": "UNDERPOWERED",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 329, "N": 45111, "rate": 0.729, "FP": 0.9167, "labelled_n": 24, "seed": "20260920P4c",
+      "concentration_top_session_share": 0.73, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "structural-grep-v1",
+      "name": "structural-grep-v1",
+      "description": "First structural-grep predicate: any fn/=> hunt. 67% FP — mostly named-symbol navigation.",
+      "predicate": "grep/rg whose pattern contains fn / => / impl / function / class",
+      "examples": [
+        "grep -n 'pub fn current_repo' crates/ompo-doctor/src/lib.rs | head -c 100",
+        "grep -n 'pub fn answered' -A 5 crates/ompo-doctor/src/lib.rs",
+        "grep -n \"fn resume\" src/lib.rs"
+      ],
+      "gold": "REFUSE_LOW_PRECISION",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 965, "N": 78242, "rate": 1.2334, "FP": 0.67, "labelled_n": 24, "seed": null,
+      "concentration_top_session_share": null, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    },
+    {
+      "id": "D4-read-burst",
+      "name": "D4-read-burst",
+      "description": "Burst of reads in one directory with no ripwire/ast-grep first. Mostly ranged evidence-gathering at known spots.",
+      "predicate": "≥5 read calls in 10, same dir, no deep tool in the window",
+      "examples": [
+        "read AGENTS.md",
+        "read src/lib.rs:40-80",
+        "read crates/foo/src/main.rs then crates/foo/src/error.rs then crates/foo/tests/it.rs"
+      ],
+      "gold": "REFUSE_LOW_PRECISION",
+      "gold_noul": true,
+      "row_kind": "arithmetic",
+      "hits": 920, "N": null, "rate": null, "FP": 0.75, "labelled_n": 20, "seed": "20260924",
+      "concentration_top_session_share": 0.085, "corpus_is_authored_by_us": false, "is_defect_or_routing": "defect"
+    }
+  ]
+}

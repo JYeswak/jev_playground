@@ -1,0 +1,56 @@
+{
+  "at": "2026-09-20T22:30:00Z",
+  "n": 23,
+  "n_semantic": 6,
+  "aggregate_18_vs_17": {
+    "t": 0.5,
+    "hybrid": "18/23",
+    "baseline": "17/23",
+    "mcnemar": {
+      "b": 3,
+      "c": 2,
+      "n_discordant": 5,
+      "p_exact_two_sided": 1.0,
+      "chi_yates": 0,
+      "verdict": "indistinguishable"
+    },
+    "discordant": [
+      "bash-structural-def-search: baseline right, hybrid wrong",
+      "count-as-verdict: baseline right, hybrid wrong",
+      "digest-truncation: baseline wrong, hybrid right",
+      "path-nonexistence: baseline wrong, hybrid right",
+      "pipefail-anywhere: baseline wrong, hybrid right"
+    ]
+  },
+  "resubstitution_t025": {
+    "label": "resubstitution — t picked on all 23",
+    "t": 0.25,
+    "correct": "20/23",
+    "SHIP_vs_rest": { "tp": 6, "fp": 3, "tn": 14, "fn": 0 },
+    "mcnemar_vs_baseline": { "b": 3, "c": 0, "n_discordant": 3, "p_exact_two_sided": 0.25 }
+  },
+  "loo_of_threshold": {
+    "label": "leave-one-out: t chosen on the other 22, scored on the held-out row",
+    "correct": "20/23",
+    "note": "every fold selected t=0.25, so LOO equals resubstitution on this sample. That is stability of the pick, not an independent test of the noul values.",
+    "SHIP_vs_rest": { "tp": 6, "fp": 3, "tn": 14, "fn": 0 },
+    "held_out_misses": ["pipefail-masked", "R59-broad-backticks", "R56-bare-workaround"]
+  },
+  "orientation": {
+    "SHIP_vs_rest_at_t025": "FN=0 means no gold-SHIP was refused (no good class blocked). FP=3 means three gold-REFUSE still predicted SHIP (three BAD classes still ship: pipefail-masked 0.51, R59 0.74, R56 0.89).",
+    "gate_to_stop_bad_at_t025": "veto TP=3 (digest 0.09, path 0.24, pipefail-anywhere 0.23). veto FN=3 (the high-noul semantic misses). veto FP=0 (no good class vetoed). The buried finding is the opposite of 'no bad class ships': we never block a good rule, and three bad rules still ship because Jev is confident they ARE defects."
+  },
+  "semantic": {
+    "jev_noul_ok_at_0.5": "3/6",
+    "baseline": "0/6 structurally incapable",
+    "one_flip": "3/6 → 2/6 or 4/6. 2/6 is a coin. The structural claim (baseline cannot answer) is immune to one relabel.",
+    "confident_wrongs": {
+      "pipefail-masked": 0.51,
+      "R59-broad-backticks": 0.74,
+      "R56-bare-workaround": 0.89,
+      "t_to_catch_all_three": 0.9,
+      "cost_of_that_t": "FN=5 good classes blocked"
+    }
+  },
+  "seat": "LOW-NOUL VETO only. Survives McNemar killing the aggregate. Dies as a general meaning judge: confident-wrong high noul cannot be caught without FN=5."
+}

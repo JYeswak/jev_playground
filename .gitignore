@@ -96,6 +96,9 @@ awesome-typesafe/
 work/toolcall-judge-v3/real-allowed.json
 
 work/jev-score-register/scores.jsonl
+
+# Advisory veto outcome log (append-only, three-pane conflict if tracked)
+work/jev-triage/advisory-veto.jsonl
 work/p2-localjev/
 
 # Live mail/cass row exports (may contain operational text)
