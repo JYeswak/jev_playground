@@ -722,3 +722,20 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Boundary:** did not reopen the live ZestData archive whose 4.49M df was
   P1's original observation. FTS shadow dropped at 100k (cass GH #413) —
   Quill path still served unique phrases.
+
+## P2 sr issue #4 filed + Jev-call doctrine (2026-09-20)
+
+- Upstream: `Dicklesworthstone/skillranker#4` (One symlinked skill dir empties the whole
+  roster), filed by conductor under `flywheel-4ezzd`. Draft `/tmp/jeff-issue-sr-withhold.md`,
+  rubric pass 7/7. Conductor independently verified the repro (exit 11/eligible 3 → exit 5
+  → exit 11, reversible). `jev-jwr` open for Phase 4 watch (4h reply SLA on Jeffrey response).
+- Filing lessons (mine, all self-inflicted): re-read draft as stranger (shipped empty
+  Out-of-scope + truncated dedup — rubric blind to both); tracking bead must be `flywheel-`
+  (`jev-` fails submit regex AND rubric prefixes); date-at-line-start trips leak detector,
+  do not loosen (gaming-an-axis).
+- Doctrine: `docs/JEV-CALL-DOCTRINE.md` — the durable output. Wide→rerank, sentinel +
+  must-beat-none, Noul gates separate from Choice, untrusted-state discipline, refusal
+  taxonomy shape, replay testing, ledger tables, defaults, and what we do NOT adopt
+  (global withhold until #4 fixed). Level `[live]` (doctrine proven by N=2 live decisions).
+- **Boundary:** no new live calls (0 this unit); skillranker/ untouched; `.beads` rows
+  (jev-jwr/jev-osh) flushed to JSONL, commit deferred — sibling rows present, not mine to carry.
