@@ -869,3 +869,62 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Boundary:** one labeller; frame is records (33,380), not envelope rules
   (36,692) — definitional gap stated, both carried; techniques/rigor/
   oracles still unsearched; corpus/session drift applies.
+
+## P4 hybrid veto — widened semantic gold n=6, n_total=23 (2026-09-20)
+
+- **PART 1:** every R-heading classified in `work/jev-triage/r-classify.json`.
+  Semantic TTSR classes that cleared numeric bars and were refused on meaning:
+  **n=6** (digest-truncation, path-nonexistence, R55-loose, R55-pipefail-token,
+  R59-broad, R56-bare). Not "a large share of 55 R-numbers" — 54 headings are
+  instrument/design/not-a-class. R54 cass withdraw excluded (no hits/rate).
+- **PART 2 hybrid:** numeric first; Noul veto only on survivors. Budget this
+  run: **3** (cached 9 from the fair re-run). Cold cost: 12/23. Model
+  `jev-latest` → jev-1.13.0.
+- **@0.5:** hybrid binary **18/23** (TP=4 FP=3 FN=2) vs baseline **17/23**
+  (TP=6 FP=6 FN=0). Semantic choice 3/6 vs 0/6. New noul: pipefail-anywhere
+  0.23 veto-ok; R59-broad 0.74 and R56-bare 0.89 slip through (Jev rates them
+  as defects).
+- **Calibration:** BEST_T **0.25** → 20/23 FP=3 FN=0. t≥0.55 kills true ships
+  (FN=4). t=0.90 gets semantic 6/6 at FN=5 — not deployable.
+- **COST:** 1 Noul per class that passes hits/rate/FP/concentration. Not per
+  candidate ever mined.
+- **Seat:** hybrid beats both pure arms at 0.5 (+1 vs numeric, 3/6 vs 0/6
+  semantic). The remaining 3 semantic FPs are high-noul; a higher t causes FN.
+  Mapping still a join. Receipt
+  `work/jev-triage/runs/hybrid-2026-09-20T222532529Z.json`.
+
+
+## P4 hybrid challenge — McNemar + LOO, aggregate retracted (2026-09-20)
+
+- **18-vs-17 RETRACTED.** McNemar on SHIP-vs-rest @0.5: b=3 c=2 n_disc=5,
+  p_exact two-sided **1.0**. Indistinguishable. Stop quoting it as a win.
+- **Seat that survives:** semantic noul 3/6 vs baseline **0/6 structurally
+  incapable**. One relabel → 2/6 or 4/6; 2/6 is a coin. The structural claim
+  is immune to one flip.
+- **t=0.25 20/23 is resubstitution.** LOO-of-threshold also **20/23** because
+  every 22-row fold picked t=0.25 (pick stable on this sample, not an
+  independent test of the noul values). Both labelled.
+- **Orientation:** SHIP-vs-rest FN=0 at t=0.25 means no *good* class blocked.
+  FP=3 means three *bad* classes still ship (pipefail-masked 0.51, R59 0.74,
+  R56 0.89). Gate-to-stop-bad: veto TP=3 low-noul, veto FN=3 high-noul
+  confident wrongs, veto FP=0. Not "no bad class ships / 3 extra reviews".
+- **R56/R59:** noul 0.89/0.74 are confident wrongs. Catching them needs t≈0.90
+  at FN=5. Low-noul veto seat survives; general meaning-judge seat does not.
+- Receipt `work/jev-triage/runs/mcnemar-loo-20260920.json`.
+
+
+## P2 container-fit writeup + survival curve (2026-09-20)
+
+- **Write-up:** `docs/essays/container-fit-doctrine-vs-rules-20260920.md` —
+  97% of mirror doctrine has no trigger string; TTSR is the wrong container
+  for it (read-once layer instead); the mine-into-rules plan tops out at
+  114–967 candidates. Ratio, CIs, curve, and doctrine-history filter verdict
+  inside.
+- **Curve (N=78,242):** bare-TUI cmd-position 11/0-true, foreign-pm 110/FP
+  1.00, branch-create 0, vercel-direct 2, bun-test-bare 4, destructive 258
+  (redundant w/ dcg) → **R62**, nothing ships. doctrine-history filter
+  verified working (~7s/repo; mwb 346/107/118); sampled rows are
+  bulk-imported (f2e432e6), not incident-earned.
+- **Lane:** offline. No rule files touched; selftest untouched at 51/0.
+- **Boundary:** one labeller throughout; essay is prose synthesis over
+  ledgered measurements (R56–R62), not new data.

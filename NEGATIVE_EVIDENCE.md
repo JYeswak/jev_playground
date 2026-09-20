@@ -2824,3 +2824,31 @@ suggest — refused by redundancy.
 demonstrably fail.
 
 **Evidence:** `/tmp/fhmine_gitenv.json` (2 hits, both legit); bead below.
+
+## R62 — REFUSE: the survival-curve remainder (bare-TUI, foreign-pm, absent classes)
+
+**Hypothesis:** the unbiased pool's mechanizable classes convert once
+measured prevalence-first: bare-TUI, foreign package managers, and the
+absent-shape classes (branch-create, vercel-direct, bun-test-bare).
+
+**Measured 2026-09-20** on `real-allowed.json`, N=78,242:
+
+- bare-TUI naive (`bv|cass` anywhere): 504 (0.64%) — contaminated by
+  `bv_probe`, `fn bv`, bead titles containing "bv". Command-position
+  refinement: **11 (0.014%), 0 true fires** (all mentions, no invocations).
+- foreign-pm (`pnpm|yarn|bun install`): 110 (0.14%) — labelled n=20, seed
+  `20260920`, one labeller: **TRUE=0, FP 1.00**. Every fire is correct
+  behavior (yarn-berry scratch repos, pnpm workspaces).
+- branch-create 0, vercel-direct 2, bun-test-bare 4 — below the floor;
+  destructive 258 refused by redundancy (dcg enforces; R61 dispositions).
+
+Three classes reached labelling; all refused. Nothing from the unbiased
+pool ships. Full curve in
+`docs/essays/container-fit-doctrine-vs-rules-20260920.md`.
+
+**Retry-condition:** reopen a class only if command-position true fires
+reach ≥50 with FP ≤ 0.30 (bare-TUI), or a fresh corpus shows foreign-pm
+true fires (currently zero: the fleet uses the right manager per repo).
+
+**Evidence:** `/tmp/fhvein_curve.json`, `/tmp/fhvein_bareonly.json`,
+`/tmp/fhvein_barecmd.json`; bead below.
