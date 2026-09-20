@@ -1828,3 +1828,50 @@ Checking my live session I grepped `guard_[a-z]*`, got **41 matches**, and nearl
 hook working. They were **my own prose** — the word `guard_fire` typed into messages. The precise
 selector `"kind":"guard_…"` returns zero. **Instance 30, inside the check for a guard built to
 catch this class.**
+
+## skillranker: the upstream-blocked build now runs on this machine
+
+Pane 3 ported it rather than waiting on `Dicklesworthstone/skillranker#3`. Verified by running
+the artifact, not by reading the receipt:
+
+```
+/tmp/sr-mac-target/release/sr --version   ->  sr 0.1.0
+file …/sr                                 ->  Mach-O 64-bit executable arm64
+sr --help                                 ->  full rank surface, 15 flags
+git -C skillranker-mac log -1             ->  8cca771 "macOS port: storage admission by
+                                               volume name, subprocess group-kill fallback"
+                                               27 files, +308 −63
+```
+
+Three hours ago this was `E0433 cannot find storage in the crate root`, with an experimental
+ungate producing 20 further errors on `nix::sys::statfs` BTRFS/EXT4/TMPFS/XFS magics. **The fix
+was not the obvious one**: rather than stubbing storage out, the port re-expressed admission by
+**volume name** and added a **subprocess group-kill fallback** — the Linux-specific filesystem
+magics were the wrong abstraction to port, not a missing feature to fake.
+
+Committed locally at `8cca771`, **not pushed**, and **no duplicate issue filed** — #3 already
+carries our corroboration. That restraint is right: a fork that fixes a bug is not a mandate to
+open a second thread about it.
+
+### Two honest refusals in the live run
+
+```
+sr rank --latest      -> {"decision":"unavailable","kind":"missing-session",
+                          "message":"no session in the exact workspace"}
+sr rank --session …   -> {"decision":"unavailable","kind":"unsupported-input"}
+```
+
+**Neither is a failure; both are the tool declining to guess.** `--latest` found no session in
+the exact workspace and said which precondition failed; pointed at an omp session JSONL it said
+`unsupported-input` rather than ranking garbage — the file is an omp transcript, not a harness
+format it claims to read. A ranker that refuses an unrecognised input beats one that scores it.
+
+**NO-CLAIM:** `sr` runs and refuses correctly; I have **not** seen it produce a ranking. That
+needs an input in a format it accepts, and the PATH install is still pending SLB approval, so
+`command -v sr` resolves nothing — the binary is at an absolute path only.
+
+**INSTALLED, verified after the fact.** `command -v sr` -> `/Users/josh/.local/bin/sr`,
+`sr 0.1.0`, and `cmp` against the port build reports **byte-identical**. The PATH install
+that was pending SLB approval has landed, so the NO-CLAIM above ("absolute path only") is
+retired. Upstream still ships a Linux-gated storage module; this is our fork on our machine,
+not a fix anyone else has.
