@@ -1,0 +1,33 @@
+# Project-scope omp config. Precedence: defaults <- global <- project (omp://config-usage.md:160),
+# and project .omp is scanned before user .omp, so this overrides the global order for this repo.
+#
+# ONE CHANGE, and only because it has both a mechanical argument and our own measurement behind it.
+#
+# WHY invert methodOrder. Global default is [remote, snapcompact, handoff, shake, soft] — `shake`
+# runs FOURTH, behind three summarizers. omp already elides bulky tool output on the way into
+# `session_before_compact`, so with shake last you pay an LLM to write a lossy summary of bulk that
+# a recoverable `artifact://` placeholder would have handled for free. Cheap and recoverable work
+# belongs first.
+#
+# What our own ledger already ruled, so nobody re-litigates it here:
+#   * Jev-as-PRUNER is REFUSED (UP-R4). `keep_p` does not rank future need — AUC 0.348 / 0.522 /
+#     0.648 across three real sessions, against a 0.941 positive control on the same harness, so
+#     that is a null on the question and not a broken test.
+#     (docs/demos/upstream-repro/compaction-positive-control-20260919.md,
+#      compaction-retention-oracle-20260919.md, math-and-next-level-20260919.md:155)
+#   * Keep-everything beat every pruner on mistakes: 12/4/13 vs 82/91/81. ~90% of tool results are
+#     referenced again, and no threshold 0.1–0.9 beat keeping them.
+#   * The real lever is retransmitted bulk: 98.878% of billed tokens over 4,619 sessions, marked
+#     REPRODUCIBLE in readme-numeric-claims-audit-20260919.md via demos/usage-shape/bin/shape.mjs.
+#     `shake` + supersedeReads + dropUseless remove that WITHOUT rewriting any decision.
+#
+# NOT ADOPTED, deliberately — these were suggested alongside and carry no measurement here:
+#   * keepRecentTokens 20000 -> 24000: no evidence offered for the new number; left at the global.
+#   * display.collapseCompacted: cosmetic, unmeasured.
+#   * idleEnabled: stays OFF. Turning it on to "compact more" is how the 7x mistake regression
+#     comes back. supersedeReads and dropUseless are already true globally and are not restated.
+#
+# RETIRE/REVISIT: if a session shows `shake` reporting "Nothing to shake" while the window is still
+# tight, this repo is in the keep-everything / handoff regime and reordering buys nothing.
+compaction:
+  methodOrder: [shake, snapcompact, handoff, remote, soft]
