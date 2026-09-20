@@ -359,6 +359,7 @@ The one finished stranger-readable question in the corpus. Every mine here is pr
 The instruments built because prose rules did not stop the defect recurring.
 | receipt | what it settles |
 |---|---|
+| [`ttsr-live-proof-20260920.md`](ttsr-live-proof-20260920.md) | The mined rules fire in three environments and two models, control quiet in all three; binding is at session start. Corrects `f22f6f7`: TTSR **injects**, it does not block — the live pane ran the command anyway, so it is not a gate by the boundary test. |
 | [`suggest-leg-mining-20260920.md`](suggest-leg-mining-20260920.md) | The SUGGEST leg: four defect classes mined from the 78,242-command `dcg_allow` harvest. Two ship at ~1% (`glob-silenced` 820, `count-as-verdict` 1,486), two REFUSED (14 hits is too rare to be a rule; `shasum \| cut` is not a defect). The first predicate was 67% false positives and only hand-labelling caught it — it fired at 3.53%, inside the bar. |
 | [`hardening-20260920.md`](hardening-20260920.md) | One session produced 26 silent-zero greps, 8 moved denominators, 4 lost-file branch switches and 4 pipeline exit-status misreads. **Classes turned into code stopped recurring; classes turned into prose did not.** The page that turned the mechanizable ones into commands. |
 | [`hardening-stranger-grade-20260920.md`](hardening-stranger-grade-20260920.md) | Author grading their own hardening page with every runnable command executed and exit codes unpiped — no BROKEN, no runs-but-does-not-demonstrate. |
