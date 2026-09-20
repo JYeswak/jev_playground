@@ -335,3 +335,48 @@ Section 7 read as CLAIMED by pane 3 on the evidence (`work/jev-eval-honesty/` ho
 outcome-join, random-judge, cross-check, shape-check, pipeline-run, NEGATIVES, CROSS-CHECK,
 PLAN-DELTA; `90a480a` is theirs). Collision avoided by checking the tree rather than asking.
 Next: section 21, retransmit-killer.
+
+## Wave E section 21 — retransmit-killer: the ceiling is below the bar
+
+SECTION 21 retransmit-killer — **REJECT, and the gate is the product** — `fa78767` [live],
+falsifier committed FIRST at `8e43ccb` and it did **not** fire. Verified by me: bars are
+preregistered at `work/compaction-proof/fair-oracle.mjs:22` (`SAVE_BAR = 0.50, LOSS_BAR = 0.10`)
+in `27f63a6`, which predates the section; `node work/jev-retransmit-killer/adopt-gate.mjs` exits
+**rc=0** with `SAFE. No production compaction installed; doctrine and bars intact.`; 5/5 tests.
+
+**The flattering number and the one that kills it, side by side — this pairing is now Rule 1 of
+the skill:**
+
+```
+drop-largest  saved 71.3-88.3%   reuse-lost 28.3-35.8%   REJECT 12/12
+perfect       saved 20.8-31.0%   reuse-lost  0%          REJECT 12/12
+bar: save >=50% AND lose <=10%
+```
+
+88.3% is the best figure on the page and it loses a third of substantive reuse. **`perfect` is an
+omniscient judge — nothing real beats it — so no policy clears the bar**, and the keep-probability
+is *irrelevant to the decision* rather than merely mistuned. 12 largest real omp sessions,
+167MB–338MB each, 7,134–14,309 scored tool results apiece. **A ceiling argument needs no model
+call**, and none was made.
+
+**The falsifier's second clause fired and earned its place.** Both committed fixtures have 6 and
+11 scored results and one has ZERO reuse events, so the guard refused them instead of ruling.
+Without it they would have printed `perfect ADOPT 87.0%/0%` — a falsification on a session too
+thin to mean anything.
+
+**Section 5's lesson applied:** no sibling oracle was built. `work/compaction-proof/` already held
+`oracle.mjs`, `oracle-selftest.mjs`, `fair-oracle.mjs` with bars in-file; `ceiling-beat.mjs`
+drives that harness. `keep_p` was not re-derived — AUC 0.522/0.348/0.648, already measured twice.
+
+**On the near-threshold column, a straight answer instead of a substitute:** no Jev call means no
+score distribution and no near-threshold count. Reported as margin-to-bar instead (31.0% best
+against 50%, a 19-point shortfall that no better policy tips), and labelled in SKILL.md as a
+TRANSLATION of the column, not the column. Refusing to produce a number *shaped* like the one
+requested is the right call and is hereby house standard.
+
+SECTION 21b MY FOURTEENTH WRONG-SELECTOR, in the act of verifying theirs — I ran
+`work/compaction-proof/adopt-gate.mjs`, got `MODULE_NOT_FOUND`, and read `gate_rc=0` because I had
+piped through `tail`. Two documented traps in one command: wrong path (the gate is under
+`work/jev-retransmit-killer/`) and **`cmd | tail` reporting tail's exit status**, which this tick's
+own instructions warn about. Had I stopped there I would have filed "the gate does not exist"
+against a gate that exits 0 with five passing tests.
