@@ -2287,3 +2287,38 @@ Automating the catcher buys nothing the catcher does not already do.
 callbacks move to a file-backed outbox a hook can read — then wire the
 grammar check there, with the four historical omissions as trigger arms
 and BLOCKED-format callbacks as the satisfying witness.
+
+## R48 — REFUSED: wiring a guard against pipeline exit-status misread (4 instances)
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Census unit, no new instrument.
+Creation Gate applied before building, answered honestly:
+
+1. CONSUMER — any agent reading a pipeline's `rc` as its producer's
+   (`cmd | head` reads head's 0; `cmd | tail` reads tail's 0).
+2. GATE (candidate) — a wrapper (`rcof.sh <cmd...>`) running the command
+   unpiped and printing output plus true rc.
+3. DEFECT — OBSERVED 4 times, all conductor-attested (dispatch
+   `pane2-pipe-exit-guard.md`); two itemized in the ledger tail: invoking
+   `pinned-denominator.sh` with a shell string and reading `rc=127` as a
+   tool defect, and reading `true_rc=0` off a piped invocation (tail's
+   status) — the trap this repo documents, hit three times in one night
+   by the same reader. Tick file warned all session; prose did not stop it.
+4. RETIREMENT — would require agents to route every truncating pipeline
+   through the wrapper. Unmeasurable and unenforced: see refusal below.
+
+Refused because the wrapper is opt-in prose-with-a-script (the R46/R47
+shape): the misread happens inside a transient tool call, which no repo
+hook ever sees (R47's reason, one level down — there is not even a string
+to scan after the fact, only the reader's memory of `rc=0`). Worse than
+opt-in, it is behavior-altering: agents pipe precisely to truncate, and a
+wrapper that prints full output-then-rc defeats the purpose of the pipe,
+so it would be routed around at exactly the moments it matters. A guard
+nobody can be made to call, which changes what it measures when called,
+is ceremony. Do not build it to have built something.
+
+**Trigger (overturn condition):** the harness exposes per-stage pipeline
+exit codes in tool-call metadata (so the true rc is observable without
+changing invocation shape), OR agent-shell invocations move through a
+ choke point that can enforce unpiped capture — then build the wrapper
+there, with the four historical misreads as trigger arms and a truncated
+`head` run whose true rc is nonzero as the satisfying witness.
