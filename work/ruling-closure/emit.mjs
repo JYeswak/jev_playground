@@ -85,7 +85,16 @@ try {
 const falsifierDigest = (() => {
   try { return normDigest(readFileSync(falsifier)); } catch { return null; }
 })();
-
+// Optional projection fields (for project.mjs → STATUS.tsv columns). Historical
+// rows predate closures, so these default empty rather than fabricate.
+for (const k of ["--score", "--blocked-on", "--concur", "--receipt-type"]) {
+  const i = argv.indexOf(k);
+  if (i !== -1 && !argv[i + 1]) fail(`${k} needs a value (pass "" explicitly for empty)`);
+}
+const score = get("--score") ?? "";
+const blockedOn = get("--blocked-on") ?? "";
+const concur = get("--concur") ?? "";
+const receiptType = get("--receipt-type") ?? "measurement";
 const inputs = [];
 for (const p of getAll("--input")) {
   let d;
@@ -106,6 +115,7 @@ for (const g of getAll("--guard")) {
 
 const closure = {
   candidate, rung: Number(rung), verdict, author,
+  score, blocked_on: blockedOn, concur, receipt_type: receiptType,
   receipt: { path: receipt, digest: receiptDigest },
   falsifier: { path: falsifier, commit_sha: falsifierSha, fired: fired === "yes", digest: falsifierDigest },
   inputs, guards,

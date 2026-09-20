@@ -1,0 +1,23 @@
+{
+ "candidate": "a11-join",
+ "rung": 4,
+ "verdict": "HELD",
+ "author": "Muse",
+ "score": "0",
+ "blocked_on": "",
+ "concur": "",
+ "receipt_type": "measurement",
+ "receipt": {
+  "path": "docs/demos/upstream-repro/a11-join-yield-20260920.md",
+  "digest": "4c2caf97b06d2d7a"
+ },
+ "falsifier": {
+  "path": "docs/demos/upstream-repro/a11-join-falsifier-20260920.md",
+  "commit_sha": "6b0d404",
+  "fired": false,
+  "digest": "46fabd10cb1370f7"
+ },
+ "inputs": [],
+ "guards": {},
+ "emitted_at": "2026-09-20T17:15:43.490Z"
+}

@@ -1,0 +1,23 @@
+{
+ "candidate": "a12-refusal",
+ "rung": 4,
+ "verdict": "REFUSE",
+ "author": "Muse",
+ "score": "0",
+ "blocked_on": "",
+ "concur": "",
+ "receipt_type": "measurement",
+ "receipt": {
+  "path": "docs/demos/upstream-repro/a12-refusal-result-20260920.md",
+  "digest": "7fe02a908a9837c5"
+ },
+ "falsifier": {
+  "path": "docs/demos/upstream-repro/a12-refusal-falsifier-20260920.md",
+  "commit_sha": "60bc0ce",
+  "fired": true,
+  "digest": "f971e2ad49eaf661"
+ },
+ "inputs": [],
+ "guards": {},
+ "emitted_at": "2026-09-20T17:15:43.585Z"
+}
