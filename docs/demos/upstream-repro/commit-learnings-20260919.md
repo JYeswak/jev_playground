@@ -380,3 +380,46 @@ piped through `tail`. Two documented traps in one command: wrong path (the gate 
 `work/jev-retransmit-killer/`) and **`cmd | tail` reporting tail's exit status**, which this tick's
 own instructions warn about. Had I stopped there I would have filed "the gate does not exist"
 against a gate that exits 0 with five passing tests.
+
+## docs/RULES.md — the session's rules as one actionable page
+
+`9b769db` [live], verified by me: 65 lines, eight rules, eight commands, every cited sha resolves
+to a real commit. I ran rule 2's command as a stranger would:
+
+```
+$ node work/jev-retransmit-killer/ceiling-beat.mjs 1 | grep REJECT
+2026-08-29T19-43-42-778Z_01a  338427  11307  7617 |  30.5%  0% REJECT |  73.7%  31.1% REJECT
+```
+
+It prints exactly what its comment claims. The author ran all eight before committing rather than
+trusting them, and **two needed fixing** — rule 2's first attempt printed a column header instead
+of the pair it was meant to demonstrate, and rule 7's was verified to actually print
+`falsifier fired 58 / 130` rather than copied from the receipt. *A rule whose command does not
+show the thing is worse than no command.*
+
+Path chosen `docs/`, not `work/` — burying a USER artifact inside the work tree that produced it
+is how the last one became unfindable.
+
+**One deliberate choice worth keeping:** rule 2's command does NOT use the smallest, fastest
+fixture, because that session has 6 scored results and the oracle reports `perfect ADOPT 87.0%` on
+it — the exact thin-session artifact section 21's insufficiency guard exists to refuse. **A rules
+page demonstrating a rule with an input the rules reject would be self-refuting**, so it costs ~9s
+and reads a real 338MB session instead.
+
+A ninth rule was **cut, not shrunk**: "a planted negative must state why the thing it guards
+exists" overlapped rule 6 and was folded into it. The cap held — the weakest rule came off.
+
+## The fourteen selector failures are ONE defect, and rule 9 is pending a command
+
+Stated by JevCacheReports and adopted: running the wrong path and reading `rc=0` through a `tail`
+is the same defect as "grep the file, not the directory" and as scanning one row shape. **The
+instrument was pointed at the wrong thing and returned silence, and silence read as a result.**
+One defect with fourteen instances tonight, not fourteen mistakes.
+
+It is **not** on `docs/RULES.md`, correctly: there is no command that demonstrates it yet. When
+someone builds the check that catches a wrong-path invocation returning zero, it earns rule 9.
+That is the page's own standard being applied against a rule its author wanted to include.
+
+And the ceiling argument extends one step further than I put it: it worked because **"could
+anything clear this bar" has an answer that does not depend on the candidate.** Any decision with
+a computable upper bound has that shape, and we spent calls all night on questions that did not.
