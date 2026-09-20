@@ -2852,3 +2852,89 @@ true fires (currently zero: the fleet uses the right manager per repo).
 
 **Evidence:** `/tmp/fhvein_curve.json`, `/tmp/fhvein_bareonly.json`,
 `/tmp/fhvein_barecmd.json`; bead below.
+
+## R63 — RETIRE: the ee-preflight RECALL leg has no consumer, and TTSR already holds its slot
+
+**Claim under test:** the four-leg loop (DETECT → WRITE-BACK → RECALL → SUGGEST) can be closed by
+populating `preflight_rules.toml`, which P4 proved at `9058004` is a **supported** configuration
+surface and not a `diag` shim.
+
+**The question nobody asked before proposing the fix: does anything READ it?**
+
+| probe | result |
+|---|---|
+| `grep -rl preflight` over `~/.omp/omp-extensions`, `~/.omp/agent/extensions`, `~/.claude/hooks` | `rc=1`, **0 hits** |
+| every `ee` caller installed in the fleet | exactly two: `ee-ambient-session-start.ts` → `ee orient --workspace . --include-primer --fast --json`, and `ee-failure-journal.ts` → `ee journal append` |
+| `grep -rlE '(ee\|EE_BIN)[ "'\'']+preflight'` over hooks, settings, extensions, profiles, `~/.local/bin`, `scripts/` | 33 files, **all of them captured HTTP-400 request payloads** — the word inside logged LLM requests, zero invocations |
+
+**`ee preflight` has no consumer.** Shipping a `preflight_rules.toml` would populate a surface
+nothing reads — an unconsumed instrument, which AGENTS.md's phase boundary names as the thing to
+refuse.
+
+**And wiring a consumer would still not earn it.** The only advantage preflight has over TTSR is
+that it is *dynamic* — memory-driven, learning from `ee remember`. That is precisely the part P4
+measured as broken on 0.15.2: `remember` → `preflight` does not close except through
+builtin-gated matches (`matches.is_empty()` early return, `cli/mod.rs:25807`). A hand-edited
+`preflight_rules.toml` is a **static rule surface** — and we already have one, better
+instrumented: 12 TTSR rules with fire-and-quiet arms, a compile guard that proves its own RED arm,
+a cross-root drift guard, and live-fire proofs in fresh sessions outside this repo. A second
+static surface would carry no arms, no proof, and no reader.
+
+**Ruling: RETIRE the ee-preflight RECALL leg.** The slot it wanted — inject the relevant lesson at
+the moment of action — is occupied and proven by TTSR. WRITE-BACK (`ee remember`) stays live;
+RECALL is superseded, not repaired. This supersedes the "repair it" reading of `map-hook-ee`'s
+leg table.
+
+**Retry-condition (P4's, unchanged, plus one):** reopen only if **all** hold — (1) `ee` grows a
+non-`diag` tripwire writer; (2) `ee preflight check` returns an armed matching tripwire in
+`matches[]`; (3) it fires for a command **outside** the builtin destructive set (witness:
+`grep -c`); **and (4) a consumer exists that calls it** — today nothing would notice if it worked.
+
+**Evidence:** three probes above; `map-hook-ee-20260920.md:210-217`; P4 receipts `233e24d`,
+`9058004`; the TTSR pack at `~/.agents/rules/` with selftest 76 ok / 0 failed.
+
+## R64 — REFUTED: the file-type doctrine pack binds 1 time in 75 real edits
+
+**The pack I championed, killed by its own preregistered bar.** Five rules
+(`ft-{rs,sh,md,py,json}-doctrine`) injecting Jeffrey's recurring threads once per session per
+file type. Shipped, live-fired in fresh sessions, selftest 76 ok / 0 failed — and **wrong**.
+
+Measured by P3 over the real corpus, 1,778 sessions, with 25 hand-labelled REAL edits per type:
+
+| rule | fire rate | bind rate |
+|---|---:|---:|
+| `ft-md` | 21.37% of sessions | **0 / 25** |
+| `ft-rs` | 6.97% | **0 / 25** |
+| `ft-sh` | 4.33% | **1 / 25** (borderline) |
+
+**1 bind in 75 real edits.** The bar was preregistered at 20% before measuring; every clause also
+sits under the 10% clause bar. Jev could not arbitrate the gap judgment either — 24% agreement at
+t=0.5, trivial at 0.9 — so this is not a labelling artifact we can judge our way out of.
+
+**WHY IT FAILED, and it is the reusable part.** A file-type trigger fires on *what kind of file
+you opened*; the clauses are about *what the edit contains*. Those are independent, so the clause
+is inert unless the edit happens to involve `unsafe`, or an error type, or a `Mutex`. The trigger
+must be conditioned on the **gap**, not the **type** — and once you condition on the gap you have
+written an ordinary condition-based rule. **Which is exactly what omp's six Category-A builtins
+already are** (`rs-box-leak` fires on `Box::leak`, not on `*.rs`). The builtins were right. The
+file-type framing was my error, and the Category-A exclusion we were so pleased with was the
+clue: those rules work *because* they are gap-conditioned.
+
+Joshua's premise — every file type we write carries hard-won wisdom worth injecting — is **not**
+what failed. The delivery mechanism did.
+
+**Action taken, reversible, no file deleted:** `ttsr.disabledRules` now lists all five. Verified
+from a fresh process: registry drops 39 → 34, zero `ft-*` registered, and the three measured
+defect rules (`absence-from-one-probe`, `bash-glob-silenced`, `bash-pipe-exit`) still live. The
+rule files remain on disk with their threads and citations intact, because the THREADS were never
+the defect — `fh rigor` 7 layers / 22 exemplars and `fh oracles` 18 domains are still the best
+doctrine source we have found, and they are now pre-extracted for whatever container earns them.
+
+**Retry-condition:** re-enable a file-type rule only if its clauses are rewritten as
+gap-conditioned predicates (each clause its own `condition`, like the builtins) AND the rewritten
+rule clears **both** bars on a fresh hand-labelled sample: fire rate ≤5% and bind ≥20%. A pack
+that fires on the type and hopes the clause applies does not come back.
+
+**Evidence:** P3 artifacts `6c35c11`; the pack receipt
+`docs/demos/upstream-repro/filetype-doctrine-pack-20260920.md` (`8ecf180`), whose NO-CLAIM named
+exactly this gap and was right to; `omp config get ttsr.disabledRules`.
