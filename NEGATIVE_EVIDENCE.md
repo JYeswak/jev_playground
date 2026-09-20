@@ -2366,3 +2366,95 @@ around exactly when output is large.
 Recording this because the refusal was PREDICTED IN THE DISPATCH by me and then
 returned agreed. Same-origin agreement counts once, so I checked the premise
 instead of banking the confirmation — and one leg was wrong. Trigger unchanged.
+
+**CROSS-REF appended 2026-09-20 (reconciliation lane, non-author).** R48 is
+about the `rcof.sh` **wrapper** — a sender-side, behavior-altering, opt-in
+instrument — and the refusal stands on that object. It is NOT a ruling on
+the receiver-side observe-only string scan; that is R51's object, and R51
+drops it for a different reason (fire rate, not enforceability). The two
+are not in conflict and neither is in conflict with
+`guard-fp-rate-20260920.md`, which measures a third quantity (precision
+given a fire). Three axes, one class; see
+`docs/demos/upstream-repro/pipe-exit-reconciliation-20260920.md` before
+re-litigating any of them. The "fires on everything" premise R48's own
+correction keeps is confirmed at 54.2–55.5% on two corpora — and is the
+one premise that survived measurement.
+
+## R51 — DROPPED: pipe-exit class from guard-rule (wallpaper + precondition-not-defect)
+
+**Recorded:** 2026-09-20 · **Level:** `[receipt]` · Measured on 78,242 real
+commands (`real-allowed.json`), plus the seeded-100 FP sample
+(`guard-fp-rate-20260920.md`: 3/57 FP looked safe — the wrong test).
+
+Fires on 43,185/78,242 = **55.2%** of all commands (conductor measured
+18.4% on a 4,000 subset; same conclusion at both scales). A warning on
+every second command is wallpaper within the hour; low FP does not save
+it because the cost is attention, not correctness. Worse: of piped
+commands, ~91% show no rc read — the class detects the PRECONDITION
+(a pipeline exists), not the DEFECT (reading its exit as the producer's).
+Mention-vs-use, instance 29, inside the guard built to stop it.
+Narrowing fails measured: entire-command + last-stage-head/tail +
+no-pipefail still fires 6.0% AND drops all 4 strong positives (each has
+`; echo` tails reporting the rc — the only catches that mattered). Moving
+to tool_result fails: the read happens in the agent's head or a later
+call; joining needs session-state machinery plus side-effectful producer
+re-runs for a 4-instance class. grep-as-proof (0/10 FP, 10% rate) and the
+two unfired classes are unaffected.
+
+**Trigger (overturn condition):** a surface where the rc READ is
+observable — harness per-stage pipeline exit metadata, or a
+tool_result+isError join exhibiting producer-failed-but-reported-success
+— then build the class there, with the 4 strong positives
+(`echo exit=$?` rows) as trigger arms and the 6.0% narrowed set as the
+FP ceiling it must beat.
+
+**CORRECTION appended 2026-09-20 (reconciliation lane, non-author of R51).**
+The DROP stands and reproduces to the unit. Two numbers and one general
+claim do not. Full working:
+`docs/demos/upstream-repro/pipe-exit-reconciliation-20260920.md`;
+re-derive with `node work/pipe-exit-reconciliation/measure.mjs`.
+
+1. **55.2% CONFIRMED, but measured with a wider predicate than the code it
+   justified.** 43,185/78,242 reproduces exactly under
+   `/\|\s*(head|tail)\b/`. The shipped glob (`*"| head"*|*"| tail"*`) does
+   not match no-space `|head`; its own rate is 42,413 = 54.2%. Independent
+   second corpus (fresh re-harvest, 611 session files, 84,174 joined
+   commands, 81,722 distinct): 55.5% / 53.9%. The collateral claim "~91% of
+   piped commands show no rc read" is CONFIRMED at 90.4% (5,894 of 61,538).
+
+2. **"conductor measured 18.4% on a 4,000 subset; same conclusion at both
+   scales" — WITHDRAWN.** No slice reproduces it: top-4,000-by-`seen`
+   63.7%, oldest-4,000 66.2%, newest-4,000 58.1%, seeded-random-4,000
+   53.7%; oldest chronological quartile (2026-08-30 → 09-07) 45.0%, the
+   floor across three weeks. No predicate variant reproduces it either
+   (nearest is `| tail` alone, 15.3%). And the seeded-100 sample cited two
+   lines above refutes it directly: 57/100 is z = 0.36 from 55.2% and
+   z = 9.96 from 18.4%. The two figures quoted here as mutual corroboration
+   are mutually exclusive; a second number from the same lane was banked
+   without re-derivation. The verdict does not depend on it — 54.2% carries
+   the argument alone.
+
+3. **"Narrowing fails measured" — TRUE OF ONE FAMILY, NOT IN GENERAL.**
+   R51 tested *tighten the pipe pattern* (entire-command + last-stage
+   head/tail + no pipefail) and correctly found it drops the four strong
+   positives, which all have `; echo …$?` tails. The orthogonal family —
+   *require the rc READ* — was never tested. Segment on `;`/`&&`/`||`/
+   newline and fire only when a `$?` segment is immediately preceded by a
+   head/tail-terminated pipeline (no `pipefail`, no `PIPESTATUS`):
+   **812/78,242 = 1.04%**, hand-labelled 17 true / 3 false on a seeded 20,
+   and it CONTAINS all four strong positives by construction. Caught in
+   that set: `./scripts/lane-status.sh 2>&1 | tail -16; echo "EXIT=$?"` —
+   this repo's own lane hitting its own documented trap.
+
+   Consequence for the **trigger**: it is already partly satisfied. The rc
+   read is observable *in the command string*, not only in harness
+   per-stage metadata or a tool_result join — the same string R51 scanned
+   carries it 812 times. This is not an overturn (n=20 is one reader, and
+   all three false calls turned on author intent, which no string scan can
+   see, so 0.15 is an FP floor). It narrows the trigger: what a rebuild
+   must beat is 1.04% at FP ≤ 0.15, not "wait for harness metadata".
+
+Also corrected while verifying: the shipped-code state this entry describes
+was uncommitted when written — HEAD carried `pipe-exit` live and no R51
+until `e26b10f`. Installed code was ahead of committed code, which no gate
+here checks for.

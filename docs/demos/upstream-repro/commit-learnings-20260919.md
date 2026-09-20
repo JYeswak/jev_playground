@@ -1676,3 +1676,493 @@ I applied it immediately to `634dcd2`, which resolves.
 
 **The pane caught its own fabricated sha and cited the contract against itself.** That is why
 this is a recorded practice rather than a discovered defect.
+
+## I over-read ompo's surface map and dispatched a false premise. The docs say the opposite.
+
+I told pane 2, in a committed dispatch, that **"omp exposes no PreToolUse protocol surface"**,
+citing `OMP-SURFACE-MAP.toml`:
+
+```
+[crates.kernel-only-operator-hook]
+omp_surface = "none"
+why = "a PreToolUse hook over OUR agent's tool calls, not over OMP's protocol"
+```
+
+**That entry classifies one ompo crate. It is not a statement about omp's capabilities.** I read
+a classification of *their* crate as a fact about *the harness* and shipped it as a design
+constraint. `omp://hooks.md` says the opposite, and it was one read away the whole time.
+
+**What is actually true, from the harness's own docs:**
+
+- There **is** a native pre-execution event, `tool_call`, and a handler returning
+  `{block: true, reason}` **stops the tool from executing.** A handler that throws also blocks —
+  fail-closed by design.
+- Discovery is **exactly** `<cwd>/.omp/hooks/pre/*.ts` and `~/.omp/agent/hooks/pre/*.ts`.
+- **Hook factories are loaded as extension modules through the extension runner.** So the
+  hooks-versus-extensions distinction I drew two ticks ago is obsolete: same pipeline.
+- `pi.appendEntry(...)` persists non-LLM state — **that is the decision-row sink** I said did
+  not exist for hooks.
+- `pi.on("tool_call")` sees **every tool**, not just bash; `event.toolName` scopes it.
+- It is a **JS/TS default-export factory taking `pi: HookAPI`**, not a shell script reading
+  stdin — so `.guardpack/pretooluse-advise.sh` was never going to be called by anything, which
+  is exactly what its zero organic fires were telling me.
+
+**And the docs name a trap we have hit 26 times tonight:** a factory placed directly in `hooks/`
+without the `pre/` subdirectory *"loads nothing and reports no error."* **Silent zero, in the
+harness's own loader** — installed-but-inert, indistinguishable from working.
+
+### Why I got it wrong, precisely
+
+I had two sources: a third-party map of someone else's crates, and the harness's own
+documentation. **I cited the map because I had already opened it**, and I treated an entry
+written in that project's vocabulary as an answer to my question. The tick file's rule is *open
+the control before repeating any number* — the same rule applies to a capability claim, and
+"does omp have pre-tool hooks" has an authoritative source that is not a TOML file in another
+repo.
+
+Correction sent to pane 2 with the exact API, and I told them to bill any wasted in-flight work
+to me. **The dispatch is committed, so the false premise is on the record** and this entry sits
+beside it rather than replacing it.
+
+## First organic guard fire — and the answer to "how does the system tell us we're doing it wrong"
+
+Verified in a real session, not a probe:
+
+```json
+"kind":"guard_fire","class":"pipe-exit",
+"command":"echo probe-ok | head -1",
+"toolCallId":"bash_1789926557285_1",
+"error":null,
+"model":"none-deterministic-regex-guard-v1"
+```
+
+A real `toolCallId`, a **quotable command** (harm-rule's precedent: a fire nobody can quote is
+not evidence), an explicit `error:null` so a crash can never score as a pass, and a `model` field
+that says out loud there is **no model call** — four regexes, as measured.
+
+It also refutes my own failed test. I reported *"`omp -p` persists no session"*; pane 2 found the
+real causes were **wrong directory plus a quota-dead run**. `-p` does persist. **My diagnosis was
+wrong and the pane corrected it with a row** — the fourth time tonight my verification, not the
+work, was the broken part.
+
+Per-tool denominator on that session: **bash 3/3**. Small, but it is the first honest answer to
+"every tool call measured" — and it is scoped, not claimed universally.
+
+### What is still missing, precisely
+
+The guard now says *"prefer `scripts/vgrep.sh`"*. That is generic advice. It does **not** say
+*"you did this exact thing four times today, here is the corrected command."* The gap is not
+detection any more. It is memory.
+
+`ee` already has the surface, and it is empty:
+
+```
+ee preflight check 'node x.mjs | tail -1' --json
+-> {"matches":[],"matchedMemories":[],"degraded":[]}
+```
+
+**The advisory command-risk store exists, is queryable per command, returns structured matches —
+and we have written zero rules into it in the entire life of this project.** Writing one fails
+today with `EE-E040 migration_drift`, whose error text names its own repair (`ee doctor
+--fix-plan`, 4 of 5 issues fixable). That is the behaviour we are trying to build, shipped by
+someone else, sitting unused.
+
+So the loop is three parts and we have built the first, own the third, and have never connected
+the second:
+
+| part | mechanism | state |
+|---|---|---|
+| detect at the moment | omp `tool_call` hook | **LIVE, proven with a row** |
+| recall past experience | `ee preflight check` | exists, **empty**, DB drifted |
+| suggest the right way | `ee remember --level procedural` | never written to |
+
+The wiring is small: on a fire, the hook queries `ee preflight check` and injects the matched
+memory — the past instance and the corrected command — instead of a generic sentence. And every
+confirmed defect writes one memory back, which is the part that makes each call **feed** the
+system rather than merely be judged by it.
+
+## The guard is live in a real working pane, and hooks bind ONLY at session start
+
+Pane 2, started with bare `omp`, fresh session
+`~/.omp/agent/sessions/-Developer-jev/2026-09-20T18-14-18…jsonl`:
+
+```json
+"kind":"guard_pass","command":"echo $PI_CODING_AGENT_DIR ; echo $OMP_PROFILE ; pwd",
+  "toolCallId":"call_01a0c0092135…","error":null,"model":"none-deterministic-regex-guard-v1"
+
+"kind":"guard_fire","class":"grep-as-proof",
+  "command":"grep -c guard /Users/josh/Developer/jev/README.md",
+  "toolCallId":"call_01a0c009227f…","error":null
+```
+
+**Both classifications are correct**: the env probe carries no class and passes; the `grep -c`
+fires `grep-as-proof`, the one class still live after `pipe-exit` was dropped under R51. Real
+`toolCallId`s, quotable commands, `error:null`, and a `model` field that says out loud there is
+no model call.
+
+### The finding that matters more than the guard
+
+**Hooks bind at session start and a resumed session never rebinds.** Proven on the one case I
+fully control: I ran the identical `grep -c` in **my own** session — started 2026-09-17, with
+`guard-rule.ts` installed 12:05 today — and got **zero** decision rows. Pane 2 ran the same
+command in a session started **after** the install and got a row.
+
+So an install is inert in every pane that predates it, and this applies to **every** hook, not
+just ours. A fleet of long-running panes is a fleet where hook installs silently do nothing.
+
+### Three wrong targets before the right one
+
+1. `~/.omp/profiles/default/` — **does not exist**; the default profile is `~/.omp/agent/`.
+2. `~/.omp/profiles/claude/` — correct for *this* session, useless for pane 2.
+3. `~/.omp/profiles/muse/` — **`muse` is a MODEL, not a profile.** Starting with bare `omp` and
+   switching model writes to the default agent dir regardless of the model chosen.
+
+The profile directory names (`muse`, `codex`, `grok`, `claude`) read like the agents we run,
+which is exactly why I assumed a pane using the muse model wrote to the muse profile. It does
+not. **A directory named after a thing is not evidence that the thing uses it** — the same
+mention-versus-use shape, this time in a filesystem layout.
+
+### And one more instance, in my own verification
+
+Checking my live session I grepped `guard_[a-z]*`, got **41 matches**, and nearly reported the
+hook working. They were **my own prose** — the word `guard_fire` typed into messages. The precise
+selector `"kind":"guard_…"` returns zero. **Instance 30, inside the check for a guard built to
+catch this class.**
+
+## skillranker: the upstream-blocked build now runs on this machine
+
+Pane 3 ported it rather than waiting on `Dicklesworthstone/skillranker#3`. Verified by running
+the artifact, not by reading the receipt:
+
+```
+/tmp/sr-mac-target/release/sr --version   ->  sr 0.1.0
+file …/sr                                 ->  Mach-O 64-bit executable arm64
+sr --help                                 ->  full rank surface, 15 flags
+git -C skillranker-mac log -1             ->  8cca771 "macOS port: storage admission by
+                                               volume name, subprocess group-kill fallback"
+                                               27 files, +308 −63
+```
+
+Three hours ago this was `E0433 cannot find storage in the crate root`, with an experimental
+ungate producing 20 further errors on `nix::sys::statfs` BTRFS/EXT4/TMPFS/XFS magics. **The fix
+was not the obvious one**: rather than stubbing storage out, the port re-expressed admission by
+**volume name** and added a **subprocess group-kill fallback** — the Linux-specific filesystem
+magics were the wrong abstraction to port, not a missing feature to fake.
+
+Committed locally at `8cca771`, **not pushed**, and **no duplicate issue filed** — #3 already
+carries our corroboration. That restraint is right: a fork that fixes a bug is not a mandate to
+open a second thread about it.
+
+### Two honest refusals in the live run
+
+```
+sr rank --latest      -> {"decision":"unavailable","kind":"missing-session",
+                          "message":"no session in the exact workspace"}
+sr rank --session …   -> {"decision":"unavailable","kind":"unsupported-input"}
+```
+
+**Neither is a failure; both are the tool declining to guess.** `--latest` found no session in
+the exact workspace and said which precondition failed; pointed at an omp session JSONL it said
+`unsupported-input` rather than ranking garbage — the file is an omp transcript, not a harness
+format it claims to read. A ranker that refuses an unrecognised input beats one that scores it.
+
+**NO-CLAIM:** `sr` runs and refuses correctly; I have **not** seen it produce a ranking. That
+needs an input in a format it accepts, and the PATH install is still pending SLB approval, so
+`command -v sr` resolves nothing — the binary is at an absolute path only.
+
+**INSTALLED, verified after the fact.** `command -v sr` -> `/Users/josh/.local/bin/sr`,
+`sr 0.1.0`, and `cmp` against the port build reports **byte-identical**. The PATH install
+that was pending SLB approval has landed, so the NO-CLAIM above ("absolute path only") is
+retired. Upstream still ships a Linux-gated storage module; this is our fork on our machine,
+not a fix anyone else has.
+
+## Twelve minutes: the upstream race, and the memory rule it earns
+
+```
+9c52a64  Jeffrey  2026-09-20 18:05:28Z  feat(storage): admit a qualified cache/ledger on macOS APFS/HFS
+8cca771  ours     2026-09-20 18:17:33Z  macOS port: storage admission by volume name
+```
+
+**Our port committed twelve minutes after upstream shipped the same fix.** Seventeen commits have
+landed since our base `abf909d`, three of them macOS/storage, and the gate upstream now reads:
+
+```rust
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub mod storage;
+```
+
+His commit message — *"Linux-only cfg hid the store from macOS even though nix walks work
+there"* — is the **same insight** pane 3 reached independently: admission by filesystem, not
+stubbing storage out. **This is not a wrong turn; it is a race we did not know we were in.**
+
+The one substantive difference favours upstream: **he WIDENED the cfg, we DELETED it.** Ours
+would compile storage on FreeBSD and Windows where the `nix` walks are unvalidated. Adopt his
+shape.
+
+### Why this is the ee/hook problem, exactly
+
+Phase −1 of the issue chain mandates a dedup probe *before diagnostic work*. Pane 3 ran it —
+that is how we knew about #3 and commented instead of filing a duplicate. **The probe was
+correct and still insufficient, because it is defined against ISSUES and this collision happened
+in COMMITS.** An issue list does not show you a fix that landed twelve minutes ago and has not
+been released or written up.
+
+So the missing guard is not "probe harder before starting". It is:
+
+> **Re-probe upstream immediately before committing a port, not only before starting one.**
+> `git fetch && git log <base>..origin/main` costs two seconds and is the only thing that catches
+> a same-hour collision on a repo shipping hourly.
+
+That is a command-shaped rule with a corrected command, which is precisely the shape the `ee`
+memory is supposed to hold and cannot today (`EE-E040 migration_drift`). **Instance one of the
+class we designed the loop for, arriving before the loop exists** — recorded here so the seed
+list has a real entry waiting when `ee` is repaired.
+
+### Consequence for the filing Joshua asked for
+
+A comprehensive new issue would duplicate an **open thread the maintainer is actively working**,
+which is the top anti-pattern in the chain. Jeffrey has already replied on #3: *"Leaving this
+issue open for the actual native macOS portability work."* If upstream now builds clean on this
+Mac, the deliverable is a **comment** carrying only what upstream has not touched — by
+file-level diff: `src/subprocess.rs` group-kill, `src/cache/coordination.rs`,
+`src/context/signals.rs`, and four test files. **Not a new issue.**
+
+## skillranker fork: DELETE. Obsolete 11 minutes before it was written, and it ships a regression.
+
+Non-author inventory (`map-skillranker-20260920.md`, `5f4b250`), with the two claims that decide
+it verified here independently.
+
+### The timing, to the second
+
+```
+9c52a64  upstream  18:05:28Z   feat(storage): admit a qualified cache/ledger on macOS APFS/HFS
+8119163  upstream  18:06:16Z   fix(storage): expand macOS /tmp and /var aliases
+8cca771  ours      18:17:33Z   macOS port: storage admission by volume name
+```
+
+**Obsolete 11m17s before it was committed.** All six overlapping files were rewritten upstream
+more cleanly — one shared `src/storage/platform.rs`, 110 lines — and more safely: upstream
+allowlists `{apfs, hfs}` where we accepted `{apfs, hfs, ufs, exfat, msdos}`.
+
+### It moves the codebase the wrong way
+
+Ours adds **+24 new `target_os = "linux"` gates** in tests. Upstream's `9c52a64` **removes seven
+whole-file `#![cfg(target_os = "linux")]`** and widens them. Opposite directions. Worse,
+`cache_identity.rs` and `cache_live_reuse.rs` **assert the cache must MISS on macOS** — which
+`9c52a64` made false. Our tests now encode the bug as the contract.
+
+### The regression, verified by me, in an installed binary
+
+```
+origin/main  src/context/signals.rs:183 true · :207 true · :267 FALSE
+ours 8cca771 src/context/signals.rs:183 true · :207 true · (267 deleted)
+```
+
+`gather()` sets `inventory_partial = true` on entry; upstream clears it at :267. **Our fork
+deleted the only line that clears it, so the flag latches true forever** — and that binary is
+what `~/.local/bin/sr` is, byte-identical, sha `38f023e2…`. No test demands the deletion and the
+commit subject never mentions it. **An unexplained behavioural change rode in under a
+platform-port commit**, which is exactly why "one mechanical move per commit" exists.
+
+### Ruling: delete the fork, keep five findings
+
+The fork is not worth keeping. What survives is **five things upstream has not touched**, each
+with an origin/main file:line — the strongest being that upstream's macOS port may compile and
+still never open its store: `SQLITE_OPEN_NOFOLLOW` returns `CANTOPEN 1550` on Apple, at
+`src/cache/coordination.rs:645` and `src/storage/mod.rs:522`, both unconditional, and
+`git log abf909d..origin/main -- src/cache/coordination.rs` is **empty**.
+
+Delivery is **one comment on the already-open issue #3** — not a new issue, not a PR. Upstream
+already declined a third party's attached patch and shipped its own fix; sending ours would be
+noise. We already hold a comment in that thread, so this is a reply, not a fresh voice.
+
+**The generalisable lesson**: the dedup probe covers issues, not commits. Ours was correct and
+still lost an 11-minute race. `git fetch && git log <base>..origin/main` immediately before
+committing a port is the missing two-second guard.
+
+## 38 wired instruments, 134 arms — and nothing runs the driver
+
+`map-instruments-20260920.md` (`22f959b`, `b74b250`). The inventory is larger and healthier than
+I believed, and its top line is the most uncomfortable finding of the night.
+
+```
+WIRED 38 · HAND-RUN 12 · total arms 134 · no retirement condition 36
+stage 80 discovers 10 instrument suites + 11 stage selftests, exit 0, 24.2s
+```
+
+### The meta-defect
+
+**`foundation/gates.sh` is itself hand-run.** Thirty-eight instruments hang off it and *nothing
+invokes it*. Verified: `crontab -l | grep -cE 'gates\.sh|lane-status'` → **0**, and every
+in-repo reference to `gates.sh` is a child stage, not a caller. The only automatic triggers in
+this repo are `core.hooksPath` (4 githooks), `.omp/hooks/pre/jev-compact.ts`, and two cron lines
+that do not touch the gates.
+
+So the entire verification apparatus runs **because I type it**. Every green suite reported
+tonight was a green suite I chose to run. That is not a broken gate — it is a gate with a human
+scheduler, and it should be stated that way rather than implied to be CI.
+
+### My premise was stale, in our favour
+
+I have repeated all session that *"two instruments gate nothing"*. **Both now gate**, since
+2026-09-18: `verify-other-reasons.sh` is invoked by `gates.d/90-sidecar-verifier-wrapper.sh:75`
+(live EXIT=0, 38 inputs) and `verify-reason-numerals.sh` by `gates.d/95-numerals-ratchet.sh:117`
+as a ratchet (underlying EXIT=12 by design, stage PASS, 3 live hits registered in
+`foundation/numerals-ruled.tsv`). The four-times-refused ruling was **superseded two days ago**
+and I kept quoting it. A stale premise that flatters us less is still a stale premise.
+
+### A false claim in my own guard, corrected
+
+`scripts/pin-liveness.sh` header claimed its consumer was *"scripts/lane-status.sh's integrity
+check"*. Verified: `vgrep -n 'pin-liveness' scripts/lane-status.sh` exits **3, zero matches** —
+lane-status has never called it. The instrument is real and its 8 arms pass; **the Creation Gate
+answer overstated the wiring.** Instance 31 of mention-vs-use, this time inside a guard's own
+paperwork, written by me while arguing that paperwork is what makes an instrument honest. Header
+corrected in place to say only what is true; 8/8 still green, gates rc=0.
+
+### Two more dead links, reported not fixed
+
+- **`scripts/promotion-four-gates.py` ships a passing 2-arm `--selftest` that no glob reaches.**
+  Stage 80 globs `scripts/selftest-*.sh` only. This is *exactly* the defect stage 80 was built to
+  close — "a 4th selftest lands silently unrun" — recurring one file-extension over. **The fix
+  was applied to two globs, not to the idea.**
+- **`scripts/README.md` says "Eleven scripts"; `ls scripts | wc -l` is 30.** Stage 97 checks typed
+  counts in `README.md` only, so this file has no gate — a live instance of the class stage 97
+  exists for.
+
+**36 of 50 instruments have no retirement condition**, including every gate stage. An instrument
+that cannot say when it should be deleted is one nobody will ever delete.
+
+## The hook/ee slice overturned four of my conclusions. All four were mine.
+
+`map-hook-ee-20260920.md` (`125eeff`, `af6d50e`). I verified every claim below myself before
+writing it down.
+
+### 1. "ee is dead" — WRONG. It is healthy here.
+
+```
+ee doctor --json            (from jev)  -> posture "ok",      healthy true
+ee doctor --workspace ~     (home)      -> posture "blocked", healthy false
+```
+
+**`EE-E040 migration_drift` is a property of the HOME store, not of `ee`.** I ran the probe in a
+context that resolved to home, read "the recall half is dead", and committed that verdict to the
+ledger. `ee remember --level procedural` from this repo returns **rc=0** and writes into
+`jev/.ee/ee.db`. Pane 2's `BLOCKED` was correct about what it observed and **wrong about the
+cause**, and I propagated the wrong cause.
+
+Worse, `ee migrate status` on the home store reports `upToDate:true, pendingCount:0` while
+`doctor` reports blocked — **a surface that disagrees with its own health check**, which is the
+exact two-surfaces-disagree shape the issue-chain doc warns about.
+
+### 2. A THIRD install surface exists, and the ee integration is already written
+
+`~/.omp/omp-extensions/` — **22 files, 11 extensions + 11 tests**, in no jev receipt. It is the
+source of **323,575 of ~328k decision rows**, and it already contains:
+
+- `ee-ambient-session-start.ts` — **the recall leg**
+- `ee-failure-journal.ts` — **the write-back leg**
+
+**Every receipt of mine saying "the ee integration must be built" is wrong. It is built, loaded,
+and running.** I dispatched three units to construct a loop that already exists because I
+enumerated two install surfaces and there are three.
+
+### 3. The real blocker is not EE-E040
+
+Stored a procedural memory naming `grep -c`, then:
+
+```
+ee preflight check --cmd 'grep -c foo bar'  ->  matches 0, matchedMemories 0
+ee tripwire list                            ->  total_count 0
+```
+
+**remember → preflight does not close, in the HEALTHY store.** So the loop's broken link is the
+*matching* step, not the database. My attribution cost a unit of pane 2's time chasing a
+migration.
+
+### 4. My live-fire proof came from a stale copy
+
+`jev-lab`'s `guard-rule.ts` hashed `d26727a0…` against the canonical `f10f7e16…` on the other
+nine installs, and the stale copy still carried `if (command.includes('| head') …) return
+{ cls: 'pipe-exit' }` — **the class DROPPED under R51.** The one profile doing live work ran the
+one stale build, and `guard-dogfood-20260920.md`'s live-fire proof quotes `class: "pipe-exit"`.
+**The dogfood proof and the drifted install are the same artifact.** Reconciled: all 10 installs
+now hash `f10f7e16…`.
+
+### And a contradiction nothing in the tree resolves
+
+`guard-fp-rate-20260920.md` rules pipe-exit **KEEP** (FP 0.053, 67 hand-labelled). `R51` rules it
+**DROPPED** (55.2% fire rate). `R48` refuses a guard for the same class. Shipped code follows
+R51; two installs followed the fp-rate receipt. **Three rulings, one class, no reconciliation** —
+and the drift was the mechanism by which the disagreement became executable.
+
+### The honest re-statement
+
+Extension loading is **pinned at session start**: install ≠ active, uninstall ≠ inactive. The
+muse session still appending 47 minutes after the guard install emits 3,740 dcg-bridge rows and
+**zero** guard rows. Every naive zero-row read I made tonight — including the one I nearly
+reported as "installed but not firing" — is invalidated by that alone.
+
+## The recall leg cannot serve our defect classes. Verdict (b): distinct subsystems.
+
+`ee-loop-close-20260920.md` (`aa41b61`). The agent's decisive experiment is the cleanest piece
+of measurement produced tonight, and I reproduced its core myself.
+
+### One memory, two commands, same call
+
+```
+ee remember --kind risk 'Both rm -rf and grep -c are dangerous here.'
+ee preflight check --cmd 'rm -rf /tmp/x'   -> matches 2
+ee preflight check --cmd 'grep -c foo bar' -> matches 0, matchedMemories 0, degraded []
+```
+
+Content, kind, store and call are held constant. **The only variable is whether a BUILTIN
+pattern already recognised the command as destructive.** `matchedMemories` is gated behind that
+recognition — a stored memory cannot introduce a new trigger.
+
+**So the loop we designed cannot work for our defects.** All four measured classes — pipe-exit
+rc misread, grep-as-proof, env-var-vs-argv, digest-pinned-to-a-live-file — are *non-destructive*
+commands. Seeded correctly with `--kind risk`, every one returns `matches 0 / matchedMemories 0 /
+degraded [] / rc 0`. The recall leg answers "is this dangerous", and our question is "have you
+been wrong this way before". **Different question, not a broken tool.**
+
+### Two layers, and my attribution was wrong twice
+
+1. `matchedMemories` keys off **kind**, not level: `--kind risk|anti-pattern|failure` match,
+   `fact` does not — and `ee remember --level procedural` **defaults to `--kind fact`**, silently
+   excluded. So my seeded memory was invisible for a reason unrelated to the database.
+2. Even with the right kind, layer 1 above gates it.
+
+`EE-E040` was never the blocker. I blamed the migration, pane 2 inherited that, and it cost a
+unit. The home store is genuinely drifted; **the workspace store is healthy and every write
+succeeded rc=0.**
+
+### Also overturned: `ee rule add` is not the answer either
+
+A validated, evidence-verified, workspace-scoped rule whose content **literally contains the
+command string** does not appear in `preflight check` matches — only `builtin:git_stash` with
+`source.kind=builtin` did, while the identically-worded *memory* appeared in `matchedMemories`.
+`ee rule add --help` has **no command/glob/trigger pattern flag** (proved with
+`vgrep --expect-zero`). And `ee tripwire` has **no production writer at all** — no
+`add|create|arm|set` verb exists in a 1.56MB introspect map; only the self-described fixture
+seeder `ee diag tripwire` moves the count.
+
+### The defect I care about most
+
+> `preflight check` emits an **empty** `degraded` for an unrecognised command, making
+> **"checked, no risk" byte-indistinguishable from "not covered."**
+
+That is this repo's dominant defect shape — **instance 32** — living inside the tool we adopted
+to prevent it. Two prescribed repairs are also non-executable: `no_risk_memories.repair` emits a
+`--severity` flag that does not exist (rc=1, `unexpected argument`), and
+`preflight_evidence_unavailable.repair` asks for evidence `preflight run` has no flag to supply.
+
+**Nothing filed upstream.** These are observations against a tool we do not own, gathered while
+using it, and the issue-chain gate has not been run on any of them.
+
+### What this means for the plan
+
+MAP.md action item 1 is **closed as REFUSED, not done**: the round trip closes for destructive
+commands and cannot close for ours. If we want "you have been wrong this way before", the rule
+table belongs **in `guard-rule.ts`**, which already sees every command and already writes rows —
+not in `ee preflight`, which is a danger oracle with a fixed vocabulary.

@@ -2,7 +2,15 @@
 # pin-liveness — refuse a pinned digest that points at a file peers are still appending to.
 #
 # CREATION GATE, answered:
-#   1. CONSUMER  — scripts/lane-status.sh's integrity check, and anyone adding a STATUS.tsv row.
+#   1. CONSUMER  — scripts/selftest-pin-liveness.sh (discovered by gates.d/80) and any human
+#                  adding a STATUS.tsv row. CORRECTED 2026-09-20 by a non-author audit: this
+#                  line claimed "scripts/lane-status.sh's integrity check" and that was FALSE —
+#                  `vgrep -n 'pin-liveness' scripts/lane-status.sh` exits 3, zero matches, and
+#                  lane-status.sh has never called this script. The instrument is real and its
+#                  8 arms pass; the Creation Gate ANSWER overstated the wiring. That is the
+#                  mention-vs-use defect, instance 31, inside a guard's own paperwork. Wiring it
+#                  into lane-status.sh is a real option and a separate decision; until someone
+#                  makes it, this header states only what is true.
 #                  Wired via scripts/selftest-pin-liveness.sh, which foundation/gates.d/80
 #                  auto-discovers by glob. No new stage.
 #   2. GATE      — no STATUS.tsv row may pin a content digest to a file that is being appended to

@@ -74,7 +74,8 @@ git -C "$ROOT" archive HEAD \
   | tar -x -C "$EXPORT" \
     --exclude=".beads" \
     --exclude="docs/demos/duel-1/dispatch" \
-    --exclude="docs/demos/duel-2/dispatch"
+    --exclude="docs/demos/duel-2/dispatch" \
+    --exclude="docs/demos/dispatch"
 
 # Mechanical content transforms (documented in PUBLISH-SET.md).
 grep -r -l "/Users/josh" "$EXPORT" 2>/dev/null | while IFS= read -r f; do

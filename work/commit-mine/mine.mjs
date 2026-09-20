@@ -15,9 +15,14 @@ const raw = execFileSync('git', [
 ], { maxBuffer: 256 * 1024 * 1024, encoding: 'utf8' });
 
 // The convention under test. A subject may carry it as [live] or (live) or bare.
-const LEVELS = ['pending', 'selftest', 'test', 'mutation', 'oracle', 'live'];
+// ALIGNED 2026-09-20 with githooks/commit-msg-verification-level.sh:34, the authority. `receipt`
+// was added to the hook at 10:38 BECAUSE of this miner's finding; the miner froze at 10:30 and
+// was never updated, so it misread all 29 [receipt] commits — 26 as null, 3 misattributed by the
+// bare-word fallback below. The instrument that motivated a vocabulary change lagged the change
+// it caused. Keep this list in sync with the hook, never the other way round.
+const LEVELS = ['pending', 'receipt', 'selftest', 'test', 'mutation', 'oracle', 'live'];
 const levelOf = (subject) => {
-  const m = subject.match(/[[(](pending|selftest|test|mutation|oracle|live)[\])]/i);
+  const m = subject.match(/[[(](pending|receipt|selftest|test|mutation|oracle|live)[\])]/i);
   if (m) return m[1].toLowerCase();
   const bare = LEVELS.find((l) => new RegExp(`\\b${l}\\b`, 'i').test(subject));
   return bare || null;

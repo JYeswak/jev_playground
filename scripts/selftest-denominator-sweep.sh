@@ -15,11 +15,19 @@ pass=0
 
 note() { printf '  %-4s %s\n' "$1" "$2"; }
 
-# Arm 1: the sweep passes on a clean tree and says ALL-AGREE (an exit-0 that
-# stays silent would be an empty success — require the verdict line).
+# Arm 1: the sweep passes and SAYS SO (an exit-0 that stays silent would be an empty success —
+# require a verdict line).
+#
+# ENVIRONMENT-DEPENDENT GREEN, FIXED 2026-09-20. This arm pinned the literal "ALL-AGREE", which
+# is only reachable where every pinned source is present. On a fresh clone the honest verdict is
+# "AGREE-WITH-1-SKIPPED" (cass-dig-rows.jsonl is gitignored by design), so this arm failed for
+# strangers and passed for us: 4 ok locally, 3 ok 1 failed from a clone. Found by a real clone,
+# not by reasoning. The seam is exactly why it hid — JEV_SWEEP_FORCE_ABSENT=1 drives arm 4, while
+# arm 1 runs the real sweep, whose absent-source state is the DEFAULT on a clone and never the
+# case here. Both verdicts are accepted now; the rc=0 conjunct and the no-silence rule stand.
 out=$("$S" 2>&1); rc=$?
-if [ "$rc" -eq 0 ] && grep -q "ALL-AGREE" <<<"$out"; then
-  note ok "sweep ALL-AGREE (rc=0)"; pass=$((pass + 1));
+if [ "$rc" -eq 0 ] && grep -qE 'ALL-AGREE|AGREE-WITH-[0-9]+-SKIPPED' <<<"$out"; then
+  note ok "sweep agreed and said so (rc=0)"; pass=$((pass + 1));
 else
   note FAIL "sweep did not agree: rc=$rc"; printf '%s\n' "$out"; fail=$((fail + 1));
 fi
@@ -38,6 +46,36 @@ cp "$S" "$tmp/sweep-copy.sh"
 "$tmp/sweep-copy.sh" >/dev/null 2>&1
 if [ "$?" -eq 2 ]; then note ok "relocated copy refuses (rc=2)"; pass=$((pass + 1));
 else note FAIL "relocated copy did not refuse"; fail=$((fail + 1)); fi
+
+
+# ARM 4 (2026-09-20): a gitignored source must SKIP, never ERROR. A fresh clone lacks
+# work/cass-mail-mines/exports/cass-dig-rows.jsonl (mined mail, .gitignore:95), and before the fix
+# the sweep printed "ERROR ... the check itself is broken" and turned gates.sh RED for any stranger
+# following the README Quick start. Absence is not breakage and it is not agreement.
+OUT4="$(JEV_SWEEP_FORCE_ABSENT=1 "$S" 2>&1)"; RC4=$?
+if [ "$RC4" -eq 0 ] \
+   && printf '%s\n' "$OUT4" | grep -q '^  SKIP locked-dig-138' \
+   && printf '%s\n' "$OUT4" | grep -q 'AGREE-WITH-1-SKIPPED' \
+   && ! printf '%s\n' "$OUT4" | grep -q 'ERROR locked-dig-138'; then
+  note ok "absent source SKIPs, is named in the verdict, and does not RED a fresh clone"; pass=$((pass + 1))
+else
+  note FAIL "absent source did not SKIP cleanly (rc=$RC4)"; fail=$((fail + 1))
+fi
+
+
+# ARM 5 (2026-09-20): a GROWING set must not RED. census-packages-21 and export-yes-19 count
+# directories under work/, which grows every time the lane ships a package — the live-monotonic
+# nag class this file's own header forbids (R46/R47). Before the floor fix, creating one package
+# produced "DRIFT census-packages-21" -> rc=1 -> stage 80 RED -> gates RED for every reader.
+PROBE="$root/work/omp-jev-zzselftest-probe"
+mkdir -p "$PROBE/src"
+OUT5="$("$S" 2>&1)"; RC5=$?
+rmdir "$PROBE/src" "$PROBE" 2>/dev/null
+if [ "$RC5" -eq 0 ] && printf '%s\n' "$OUT5" | grep -q 'grew, which is not drift'; then
+  note ok "a new package grows the count without REDing (floor, not equality)"; pass=$((pass + 1))
+else
+  note FAIL "a new package RED-ed the sweep (rc=$RC5) — the nag class is back"; fail=$((fail + 1))
+fi
 
 echo "scripts/selftest-denominator-sweep.sh: $pass ok, $fail failed"
 [ "$fail" -eq 0 ] || exit 1
