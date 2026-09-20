@@ -2594,3 +2594,38 @@ this retry.
 
 **Evidence:** `/tmp/cass-repro-cap.ix7l2y1n`; bead `jev-w6u` CLOSED
 WITHDRAW; this receipt amendment.
+
+## R55 — REFUSE: `if cmd | grep -q` as a TTSR class — the precise form is 1 hit
+
+**Hypothesis:** the defect that made my own compile guard read green while
+catching nothing deserves a system-wide rule. Measured 2026-09-20 on
+`work/toolcall-judge-v3/real-allowed.json`, `harvestedAt
+2026-09-20T05:22:11.742Z`, **N=78,242**.
+
+| predicate | hits | rate | verdict |
+|---|---:|---:|---|
+| `if … \| grep -q` (loose) | 227 | 0.2901% | clears both bars, **and is wrong** |
+| `set -o pipefail` anywhere in the command | 1,619 | 2.0692% | context, not a defect |
+| **both in the same command string** | **1** | **0.0013%** | **below the 50 floor** |
+
+**Why the loose form is refused despite clearing the bar:** `if cmd | grep -q X`
+is *correct, idiomatic bash* unless `pipefail` is in effect — and `pipefail` is
+almost always set in a script header, not in the same command string, so no
+string scan can see it. Shipping the 227 would fire on correct code, which is the
+`does not exist` nuisance lesson (332 fires, refused the same day) repeating.
+Narrowing to the honest conjunction leaves **1 hit**, which is far below the
+50-occurrence floor we hold every other class to.
+
+**This is the bar applied to my own defect.** The class burned me today —
+`omp ttsr test … | grep -q` under `set -uo pipefail` returned omp's exit 1, not
+grep's match, so both planted RED arms reported green. It is still not a rule.
+The fix stays where it belongs: capture first, match second, enforced by the
+selftest's own RED arms rather than by a nag.
+
+**Retry-condition:** reopen only if a corpus of **whole scripts** (not single
+command strings, where `pipefail` and the pipeline are visible together) shows
+the conjunction ≥50 occurrences; or if a TTSR scope appears that can see the
+enclosing script rather than one tool call.
+
+**Evidence:** measurement above; `scripts/selftest-ttsr-rules.sh` compile-guard
+RED arms; commit `51edc23`.

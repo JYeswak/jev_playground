@@ -91,16 +91,50 @@ arm_text "$A" quiet "absence: two probes already run"            'I verified it 
 # omp exits 1 when nothing triggers, so the pipeline reports 1 even when grep DID match, and the
 # check silently inverts. That is this repo's own `bash-pipe-exit` class biting the selftest that
 # guards TTSR rules — measured here 2026-09-20, and it made both RED arms below read as green.
-for rf in .omp/rules/*.md; do
-  [ -e "$rf" ] || { note FAIL ".omp/rules/*.md expanded to nothing"; fail=$((fail+1)); break; }
+
+# SYSTEM-WIDE rule, lives in ~/.agents/rules so it fires in every repo. It protects the rule
+# system itself: an EMBEDDED inline flag makes a rule load and never fire, and only `omp ttsr
+# test` says so — a live session logs-and-ignores. The near-miss arm is load-bearing, because a
+# LEADING (?i) is legal (omp lifts it to the `i` flag) and flagging it would be over-strict.
+F="$HOME/.agents/rules/ttsr-embedded-inline-flag.md"
+if [ -e "$F" ]; then
+  armw() { # armw <expect> <label> <payload>
+    local want="$1" label="$2" txt="$3" got
+    if omp ttsr test --rule "$F" --source tool --tool write --path /tmp/probe.md "$txt" 2>&1 \
+         | grep -qE '^Triggered \([1-9]'; then got=fire; else got=quiet; fi
+    if [ "$got" = "$want" ]; then note ok "$label ($want)"; pass=$((pass+1))
+    else note FAIL "$label — wanted $want, got $got"; fail=$((fail+1)); fi
+  }
+  armw fire  "inline-flag: EMBEDDED (?i) — the real known-bad" "condition: 'foo|(?i)bar'"
+  armw quiet "inline-flag: LEADING (?i) is legal"              "condition: '(?i)leading_is_legal'"
+  armw quiet "inline-flag: ordinary condition"                 "condition: 'grep[^|;&]*2>/dev/null'"
+  armw quiet "inline-flag: prose mentioning (?i)"              "the docs say (?i) is invalid here"
+else
+  note FAIL "system-wide rule missing: $F"; fail=$((fail+1))
+fi
+# BOTH ROOTS. Project rules apply only in this repo; `~/.agents/rules/*.md` is the `agents`
+# provider (priority 70) and is PROFILE-INDEPENDENT and PROJECT-INDEPENDENT — proven 2026-09-20
+# by loading a canary from /tmp, where `omp ttsr list` showed it as `[agents]`. That root is where
+# a junior-mistake rule has to live to be system-wide, so it needs the same compile guard: a
+# silently-dead rule there is dead in EVERY repo on the machine, not just this one.
+for rf in .omp/rules/*.md "$HOME"/.agents/rules/*.md; do
+  [ -e "$rf" ] || continue
   out=$(omp ttsr test --rule "$rf" --source text 'zzzz_cannot_exist_9c42' 2>&1 || true)
+  scope=project; case $rf in "$HOME"/.agents/*) scope=systemwide;; esac
   case $out in
     *'no usable TTSR condition'*)
-      note FAIL "compile: $(basename "$rf") has no usable condition — it would load and NEVER fire"; fail=$((fail+1)) ;;
+      note FAIL "compile[$scope]: $(basename "$rf") has no usable condition — loads and NEVER fires"; fail=$((fail+1)) ;;
     *)
-      note ok "compile: $(basename "$rf") condition compiles"; pass=$((pass+1)) ;;
+      note ok "compile[$scope]: $(basename "$rf") compiles"; pass=$((pass+1)) ;;
   esac
 done
+n_project=$(ls -1 .omp/rules/*.md 2>/dev/null | wc -l | tr -d ' ')
+n_system=$(ls -1 "$HOME"/.agents/rules/*.md 2>/dev/null | wc -l | tr -d ' ')
+if [ "$n_project" -eq 0 ] && [ "$n_system" -eq 0 ]; then
+  note FAIL "both rule roots expanded to nothing — an empty scan set is NOT a pass"; fail=$((fail+1))
+else
+  note ok "rule roots scanned: project=$n_project systemwide=$n_system"; pass=$((pass+1))
+fi
 
 # The guard's own RED arm, assembled at runtime, because a guard that has only ever gone green is
 # indistinguishable from a guard that cannot fire. Two genuine known-bads, both measured against
