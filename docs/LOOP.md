@@ -65,6 +65,58 @@ Each rung exists because the rung below it was fooled:
 
 Each of these fooled someone in this session, including me.
 
+### The one rule worth taking away
+
+`DISCRIMINATES` requires `correct > best_constant + near_threshold_count`. Otherwise **WEAK**.
+Same verdict on every case is **DEGENERATE**.
+
+The `near_threshold_count` term exists because a margin a single flip can erase is not a
+margin: `argument` moved `0.47 → 0.50 → 0.48` on **byte-identical input** and flipped
+HIT→MISS→MISS at the 0.5 cut. That rule is now code, not prose
+([`work/jev-client/measure-kit.mjs`](../work/jev-client/measure-kit.mjs)) — extracted after the
+same arithmetic had been reimplemented six times and drifted enough that one `DISCRIMINATES`
+had to be corrected to `WEAK` in a published receipt.
+
+---
+
+## 2b. Hand-built numbers are upper bounds. Five for five.
+
+Every hand-built score in this session failed to survive contact with real data:
+
+| question set | hand-built | real traffic |
+|---|---|---|
+| `route` both questions | 8/9 | **7/10** on ten distinct turns |
+| `review` `behaviour` | 6/7 | **8/14** on real commits — *below* its own constant of 9/14 |
+| `rerank` | 3 questions | 2 cut as constants |
+| `destructive` rescue | 5/5 | **collapsed** — 6/7 while answering *no* to all seven |
+| multiclass superiority | 11/11 vs 9/11 | **tied 8/9** on fresh cases; the structural defect vanished |
+
+**Read a hand-built number as a ceiling, never an estimate.** Nothing here transferred, and the
+two results that survived at all (`route`, `boundary`) came down when they met real input.
+
+### The trap that matters most
+
+Ten real turns, labelled before the scores were read. The instructive rows are the traps:
+
+| trap | shape | result |
+|---|---|---|
+| `bump-version` | short prompt, compiled-in work | **MISS/MISS at 0.09** |
+| `verbose-typo` | long prompt, trivial work | HIT/HIT |
+| `verbose-rename` | long prompt, trivial work | leaked 0.64–0.73 into heavyweight |
+
+**Content leads; length leaks.** A router acting on these scores would send a multi-artifact
+version bump to a light model at 0.09 confidence — *confidently*. That is why every scoring
+extension here observes and none acts.
+
+### And the ground truth is the weak link, not the model
+
+The `review` real-commit run labelled each diff **mechanically** — any non-test source edit is
+behaviour-changing — so the labels could not be tilted. The model then answered `false` on
+commits that *added* a sampler, a measurement script, a hold-out harness. **A reasonable
+reviewer agrees with the model there; the label is blunt.** The verdict is genuinely
+ambiguous, and the honest conclusion is *we cannot yet tell* rather than a number in either
+direction.
+
 ---
 
 ## 3. What survived, and the shape of it
@@ -167,8 +219,9 @@ promoted, not a candidate being promoted, and conflating them would inflate the 
 
 ## 8. What is still not true
 
-- **Nine extensions emit decision rows nobody has ever labelled.** Every measurement here was
-  hand-built at n≈8–11 by the same person who knew the answers.
+- **Three real-traffic measurements now exist** (route 10 turns, review 14 commits, harm
+  census in flight) where hours earlier there were zero. All three came in **below** their
+  hand-built predecessors, and none is large enough to bound anything.
 - **No extension has a real-traffic accuracy figure.** None acts on its scores; all are
   observe-only, and that is not caution, it is the honest consequence of the row above.
 - **The multiclass conversion is kept for coherence, not accuracy** — on fresh cases both
@@ -176,4 +229,5 @@ promoted, not a candidate being promoted, and conflating them would inflate the 
 - `jev-align` would close the labelling gap, but its optimizer changed nothing across ~800
   metric calls for three distinct reasons, one of which is an upstream defect we reproduced.
 
-The next real gain is not a tenth extension. It is **labels on rows we already have**.
+The next real gain is not a tenth extension. It is **ground truth that survives contact with
+real data** — the `review` run showed our labels are now the bottleneck, not the scores.
