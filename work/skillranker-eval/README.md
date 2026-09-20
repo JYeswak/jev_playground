@@ -32,7 +32,7 @@ absent — that is not a pass.
 | runner | what it does | expected on their 12 cases |
 |---|---|---|
 | always-abstain | pick `__none__` every time | mean loss `10/12 = 0.833`, top-1 `0` |
-| coin-flip | uniform over roster ∪ `{__none__}` | exact E[loss] computed; sampled mean worse than abstain |
+| coin-flip | uniform over roster ∪ `{__none__}` | exact E[loss] **1.035**; sampled mean **1.036** sd 0.225 (5000, seed 1) |
 | planted-negative | fixture `wrong-skill` on a positive | **loss 2, must RED** |
 | `--score` / `--live` | candidate judge | **≥0.90 top-1 is an explicit FAIL (exit 2)** |
 

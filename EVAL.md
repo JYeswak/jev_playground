@@ -507,9 +507,13 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   one Choice, `__none__` abstain, no second noul. Documented in
   `work/skillranker-eval/README.md`.
 - **INTEGRATIONS.md:** one WIP / unpromoted row. Ledger stays 0 promoted.
-- **Commands:** `node --test work/skillranker-eval/test/contract.test.mjs`;
-  `node work/skillranker-eval/run.mjs`; `node work/skillranker-eval/run.mjs --selftest`;
-  `node work/skillranker-eval/run.mjs --live` → `NOT_RUN` without a key.
+- **Commands (this pass, offline):** `node --test work/skillranker-eval/test/contract.test.mjs`
+  → 11/11; `run.mjs` always-abstain mean loss **0.833** top-1 **0**; coin-flip exact
+  E[loss] **1.035**, sampled mean **1.036** sd **0.225** (5000 trials, seed 1);
+  planted wrong-pick loss **2**; `--score` on the abstain export **exit 2**
+  (`TOP1_BELOW_GATE`); `--live` without a key prints `NOT_RUN` (exit 0).
+  `--selftest` PASS. The 1.035 coin-flip expectation is not their earlier 1.011:
+  overflow has an empty exported roster, so the action space is `{__none__}` only.
 - **Boundary / NO-CLAIM:** no `sr` binary invoked; do not cite this as a
   SkillRanker product result. No live Jev call in this pass. Prior live
   Jev-on-corpus receipt (mean loss 0.167, top-1 0.800, both misses = false
