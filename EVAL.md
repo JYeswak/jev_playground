@@ -1021,3 +1021,23 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   containered as `scripts/denominator-sweep.sh` — REDIRECT, not refuse.
 - **Boundary:** harvest classes lack session attribution (stated per
   row); one labeller; patterns recorded for rerun, not asserted final.
+
+## P2 consumer-check built (NEEDS #2, 2026-09-20)
+
+- **Path:** `scripts/consumer-check.sh` (+
+  `scripts/selftest-consumer-check.sh`). Answers WHAT READS THIS from
+  executable surfaces (repo .omp seams, scripts, bin, githooks, live
+  global extensions, ~/.local/bin); refuses on zero with surfaces
+  named. Mentions (docs/tests) classified, never counted; session
+  JSONL, logs, vendor, fixtures, templates excluded outright.
+- **Discriminator built from the failure:** command-position +
+  quoted-path match for consumers; sibling scan (shell, COMMAND_ARGS
+  array, EE_BIN const forms) on refusal only. Two bugs found dogfooding
+  it here: a deleted if-branch (always-ZERO) and rg group renumbering
+  across -e alternations (fixed: one -e per call, -U for cross-line).
+- **Arms (selftest 6/6):** ee-preflight → exit 1, ZERO, both basenames
+  with orient/journal; dcg → exit 0, dcg-tool-bridge.ts. RED: nonce
+  tool → ZERO exit 1.
+- **Boundary:** subcommand tokens noisy (comment-sourced); related
+  callers labeled verify-by-reading. Session-JSONL historical
+  invocations deliberately out of scope v1.
