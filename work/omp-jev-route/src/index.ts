@@ -23,6 +23,17 @@ const MAX_PROMPT = 4000;
 // machine-specificity, stated in the receipt. Do not "fix" by vendoring.
 import { askJev } from "/Users/josh/Developer/jev/work/jev-client/src/index.ts";
 import { appendProcessDecision } from "./process.mjs";
+import { recording } from "../../jev-score-register/register.mjs";
+
+/**
+ * Export what this extension already computes. Every Jev score it produces is
+ * appended to the register instead of being discarded when the run ends.
+ * The register stores a sha256 of the input and NEVER the input itself, and it is
+ * not a cache: it records that a question was answered, it never answers one.
+ */
+const REGISTER = process.env.JEV_SCORE_REGISTER ?? "work/jev-score-register/scores.jsonl";
+const ask = recording(askJev, { path: REGISTER, extension: "omp-jev-route", model: "jev-1.13.0" });
+
 /**
  * Frozen questions. Routing advice only; the scores predict nothing until a
  * later unit measures them against outcomes, and this file says so.
@@ -85,7 +96,7 @@ export default function ompJevRoute(pi) {
       const toolCallId = typeof event?.toolCallId === "string" ? event.toolCallId : null;
       await appendProcessDecision(pi.appendEntry.bind(pi), event);
       if (prompt === undefined) return undefined;
-      const r = await askJev({ state: { prompt }, questions: QUESTIONS });
+      const r = await ask({ state: { prompt }, questions: QUESTIONS });
       if (!r.ok) {
         try {
           await pi.appendEntry(DECISION, {

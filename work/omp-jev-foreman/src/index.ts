@@ -5,6 +5,19 @@
  * accumulates calls without a write/edit. There is no default score and no blocking path.
  */
 import { askJev, readRow, type JevResult } from "../../jev-client/src/index.ts";
+import { recording } from "../../jev-score-register/register.mjs";
+
+/**
+ * Export what this extension already computes. Every Jev score it produces is
+ * appended to the register instead of being discarded when the run ends.
+ * The register stores a sha256 of the input and NEVER the input itself, and it is
+ * not a cache: it records that a question was answered, it never answers one.
+ *
+ * Wired at the DEFAULT of the injectable `ask` parameter, not at the call site, so
+ * a test that passes its own stub is still unrecorded and stays offline.
+ */
+const REGISTER = process.env.JEV_SCORE_REGISTER ?? "work/jev-score-register/scores.jsonl";
+const recordedAskJev = recording(askJev, { path: REGISTER, extension: "omp-jev-foreman", model: "jev-1.13.0" });
 
 const DECISION = "com.zeststream.omp-jev-foreman.decision.v1";
 const WINDOW_SIZE = 20;
@@ -25,7 +38,7 @@ function commandText(event: ToolExecutionEvent): string {
 }
 function isWriteTool(toolName: string): boolean { return /^(write|edit|apply_patch|write_file|file_write|save|create_file)$/i.test(toolName); }
 
-export function createForeman({ ask = askJev, append = async () => {}, now = () => new Date().toISOString() } = {}) {
+export function createForeman({ ask = recordedAskJev, append = async () => {}, now = () => new Date().toISOString() } = {}) {
   const window: Array<{ toolCallId?: string; toolName: string; command: string; isError: boolean }> = [];
   const starts = new Map<string, ToolExecutionEvent>();
   let activeTrigger;

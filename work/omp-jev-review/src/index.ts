@@ -19,6 +19,17 @@
  */
 import { askJev } from "../../jev-client/src/index.ts";
 
+import { recording } from "../../jev-score-register/register.mjs";
+
+/**
+ * Export what this extension already computes. Every Jev score it produces is
+ * appended to the register instead of being discarded when the run ends.
+ * The register stores a sha256 of the input and NEVER the input itself, and it is
+ * not a cache: it records that a question was answered, it never answers one.
+ */
+const REGISTER = process.env.JEV_SCORE_REGISTER ?? "work/jev-score-register/scores.jsonl";
+const ask = recording(askJev, { path: REGISTER, extension: "omp-jev-review", model: "jev-1.13.0" });
+
 const DECISION = "com.zeststream.omp-jev-review.decision.v1";
 const DIAG = "com.zeststream.omp-jev-review.diagnostic.v1";
 
@@ -69,7 +80,7 @@ export default function ompJevReview(pi: Host) {
         });
       } catch {}
 
-      const result = await askJev({
+      const result = await ask({
         state: { diff: command.slice(0, MAX_DIFF) },
         questions: QUESTIONS,
         timeoutMs: 2500,
