@@ -1,0 +1,8 @@
+{"query": "no such field", "mech_y": 0, "human_y": 0, "reason": "findings doc about evidence schemas; no field lookup or absence evidence"}
+{"query": "no such key", "mech_y": 0, "human_y": 0, "reason": "AGENTS.md scaffolding plan; nothing about keys"}
+{"query": "keys present", "mech_y": 0, "human_y": 0, "reason": "search results about profiling-span schema; no key-presence answer"}
+{"query": ".distribution", "mech_y": 0, "human_y": 0, "reason": "Beta-distribution scheduler math; not the SDK field"}
+{"query": "field does not exist", "mech_y": 1, "human_y": 1, "reason": "literal traceback: no such column dirty_fields"}
+{"query": "missing field", "mech_y": 1, "human_y": 0, "reason": "FLIP: top hit is a metrics ledger dump; full DB context is reservation tool outputs, no missing-field answer"}
+{"query": "undefined is not", "mech_y": 1, "human_y": 0, "reason": "FLIP: 'undefined' appears only as session_id string value; no error, no answer (full DB context confirms)"}
+{"query": "Cannot read properties of undefined", "mech_y": 1, "human_y": 1, "reason": "literal TypeError plus stack trace"}
