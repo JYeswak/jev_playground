@@ -160,6 +160,52 @@ scanning them.
 --fail-on-warning` over all 220 first-party `.ts`/`.mjs` files and rule on the aggregate. I ran
 three files, not 220, and say so rather than implying coverage.
 
+### R6 successor condition EXECUTED — `ubs` at scale, and it is NOT usable as a gate here
+
+Last tick's successor condition was "run `ubs --ci --fail-on-warning` over all first-party files
+and rule on the aggregate". Done, on `work/` (163 non-test first-party files; 199 scanned):
+
+```
+Files: 199 | Critical: 117 | Warning: 1134 | Info: 5320
+exit code 1   (taken UNPIPED -- the piped run reported 0, which is tail's status)
+```
+
+**117 critical sounds like an emergency. It is not, and reporting the number without opening it
+would have been this lane's own documented failure mode.** Every cluster inspected:
+
+| n | rule | what it actually is |
+|---|---|---|
+| 84 | secret compared with `==`/`!=` | `if (previous === undefined) delete process.env.TYPESAFE_API_KEY` — env **restore** logic in tests. The *variable name* resembles a secret; no secret value is compared. |
+| 7 | possible hardcoded secret | our own `PLACEHOLDERTOKENNODIGITS` / `PLACEHOLDER-NOT-A-REAL-TOKEN-8811` test literals, and a question key named `secret_staging`. **No real credential.** |
+| 4 | loose equality | `==` in scratch measurement code |
+| 3 | `new Function()` | |
+| 2 | logging sensitive data | |
+
+Top rules overall are `security.env-in-client` (372) and `js.async.await-no-try` (307). The first
+is about **client bundles**; this repo ships Node extensions and never bundles. The second flags
+every `await` outside a `try`, including ones inside a caller that already catches.
+
+**RULING: `ubs` is NOT wired as a gate in this lane, and the reason is measured, not assumed.**
+At a 117-critical aggregate where the inspected criticals are placeholder literals and
+env-restore comparisons, a `--fail-on-warning` gate would be RED permanently and would therefore
+be ignored permanently. **A gate that fires on everything is worse than no gate** — this lane
+already refuses instruments on exactly that basis (`R18`), and it refused two of its own for it.
+
+**What `ubs` is good for here:** a hand-run scan whose *clusters* are read, not its totals. It
+confirmed 0 real hardcoded credentials across 199 files, which is a genuine negative result and
+the most valuable thing it produced.
+
+**RETIREMENT TRIGGER for this refusal:** `ubs` gains per-rule suppression (or the lane adopts a
+config that disables `security.env-in-client` and scopes `js.async.await-no-try` to uncaught
+awaits), and a re-run produces a critical count whose members are individually defensible. Then
+it can be a stage. Until then it is `KEEP_HAND_RUN_ONLY`, the same verdict this lane already
+reached for `verify-reason-numerals.sh`.
+
+NO-CLAIM: I inspected the five critical clusters and two top warning rules, not all 117 criticals
+or all 1,134 warnings individually. The 84 and 7 clusters were sampled, not exhaustively read —
+if a real defect hides among them, this ruling did not find it, and the scan output is at
+`/tmp/ubs-all.txt` for anyone who wants to read the rest.
+
 ## R7 — MEASURED, do not design on it: `abort_bash` acknowledges without cancelling
 
 **Measured upstream (`skill://omp-integration` wave 3):** `abort_bash` against a running
