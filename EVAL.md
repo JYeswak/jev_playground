@@ -838,3 +838,34 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Boundary:** git-add-A harvest had no executed `git add -A` (dcg denies);
   two of its examples are the class shape not harvest hits. Text-class
   examples from the measured predicate arms, not a fresh JSONL walk.
+
+## P2 unbiased doctrine ratio + CI + pool (2026-09-20)
+
+- **Correction accepted:** the n=60 split was stratified (marker-enriched),
+  not a ratio, and five searched rows were anecdote. This replaces both with
+  a seeded-random sample: **n=300 from the 33,380-record frame** (AGENTS.md /
+  CONTRACT.md records, generation `08457a25`), seed
+  `20260920-unbiased-300`, frame + indices at
+  `/tmp/fhvein_unbiased_idx.json`, sample at `/tmp/fhvein_unbiased_300.json`
+  (uncommitted scratch, reproducible from seed + generation).
+- **Bar (preregistered):** MECHANIZABLE-SHAPE = the rule as written
+  prescribes/prohibits a concrete tool-call shape (command + args/flags,
+  exit-code handling, path pattern, quoted-arg content) or a tool-result
+  claim checkable by regex over one call/turn, with an identifiable
+  near-miss. Else ADVICE. Universal vs project-specific judged after.
+- **Ratio:** mechanizable-shape **9/300 = 3.00%, 95% Wilson CI
+  [1.59%, 5.60%]** → implied pool over 33,380: **529–1,870 (point ~1,000)**;
+  over 36,692: 582–2,055. Universal-content **3/300 = 1.00%, CI
+  [0.34%, 2.90%]** → 114–967 (point ~334). The 9: R-31 (runner,
+  project), R-33/R-89/R-220 (bare-TUI ×3, fleet), R-41 (secrets-to-git,
+  universal), R-42/R-290 (destructive ×2, universal-redundant),
+  R-197/R-273 (lockfile ×2, project). Classes cluster — the pool is real
+  but thin at the top.
+- **Converted:** R-41 measured → 2 hits, 0 true → **R61**. Verdict on the
+  vein: worth screening (doctrine-history incident-earned filter next), not
+  worth a blind week — the unbiased pool's universal remainder is a handful
+  of already-covered shapes.
+- **Lane:** offline. No rule files touched; selftest untouched at 51/0.
+- **Boundary:** one labeller; frame is records (33,380), not envelope rules
+  (36,692) — definitional gap stated, both carried; techniques/rigor/
+  oracles still unsearched; corpus/session drift applies.

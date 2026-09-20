@@ -2795,3 +2795,32 @@ still unsearched and is the better next vein.
 
 **Evidence:** `/tmp/fh_rejected_all.json` (13.9 MB, 23,151 rows), triage
 counts above.
+
+## R61 — REFUSE: secrets-to-git (`git add/commit` touching `.env`) as TTSR class
+
+**Hypothesis:** the one new universal-content hit from the unbiased n=300
+split (R-41: `cmaes_explainer@…` AGENTS.md:70 — "never commit" `.env`) is a
+junior mistake any project can make, with a clean string shape: `git
+(add|commit)` with a `.env` path in the same command.
+
+**Measured 2026-09-20** on `real-allowed.json`, N=78,242: **2 hits
+(0.0026%)**, both `.env.example`-style legit files — **TRUE defect count 0**.
+The fleet never commits a real `.env` (dcg + the key-canonical-source routing
+rule + review norms hold). A guard against an event with zero observed
+instances is unproven by construction — the same "a rule nobody has seen
+fire" bar that keeps untested arms out of the selftest.
+
+**Dispositions from the same split, recorded so nobody re-mines them:**
+bare-TUI prohibitions (`bv` ×2: R-33/R-89, `cass` ×1: R-220) are a real
+recurring class but fleet-specific tooling — not system-wide material, and
+our lane already mandates `--robot-*` in AGENTS.md; lockfile-exclusivity
+(R-197/R-273 bun-only) and runner-exclusivity (R-31 `bun run test`) are
+project-convention shapes, portable as *shapes* only; destructive-command
+lists (R-42/R-290) duplicate dcg, which *enforces* where TTSR would only
+suggest — refused by redundancy.
+
+**Retry-condition:** reopen only if the harvest shows ≥50 TRUE fires
+(real `.env` paths, examples excluded) — i.e., the day the existing guards
+demonstrably fail.
+
+**Evidence:** `/tmp/fhmine_gitenv.json` (2 hits, both legit); bead below.
