@@ -568,3 +568,29 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Boundary:** no STATUS rewrite, no new `foundation/gates.sh` stage, no key, no
   working-dogfood claim. Negative: `NEGATIVE_EVIDENCE.md` R43 (emission-only loss).
 - Lane: offline. Claim: `[test]`.
+
+## cass TASK TESTS — design only, unpromoted (2026-09-20, [pending])
+
+- Receipt: `docs/demos/upstream-repro/jev-task-tests-cass-20260920.md`.
+- **What it is:** a Jev-specific eval contract for ranking / filtering cass
+  `--robot` hits (dig-vs-invent, stale / wrong-workspace, empty-success
+  refusal, selector≡claim). Adopts skillranker process
+  (Choice+`__none__`, 0/1/2 loss, always-abstain required,
+  `diagnostic_synthetic` cannot promote) from
+  `work/skillranker-eval/contract/evaluation_policy.v1.json` and
+  `skillranker-process-mirror-20260919.md`.
+- **Cases:** 10 synthetic cass envelopes (9 judged + 1 selector plant).
+  Preregistered always-abstain mean loss **6/9 = 0.667**; first-hit / BM25
+  **14/9 ≈ 1.556**; perfect-judge feasibility **0**. Planted RED:
+  always-pick-top-hit (CASS-09), empty-success (CASS-07), missing
+  `source_path` (CASS-08).
+- **omp wiring (designed, not landed):** before scaffold / ask-user, playbook A
+  `cass health` + `cass search "…" --robot --limit 5` (`AGENTS.md:1410-1411`),
+  then observe-only Jev-rank; export pick/Y/loss; neighbour co-presence with
+  dont-give-up A. Never `--workspace <project>`. Never a blocking hook.
+- **Commands this pass:** none executed. `command -v cass` → absent. No Jev
+  call. No omp session. No STATUS / gauntlet edit.
+- **Boundary / NO-CLAIM:** authored fixtures (R28); class A if later scripted
+  against a fake asker; cass hit schema cited from upstream SKILL.md, not a
+  local introspect. Unpromoted. Ledger stays **0 promoted**. Honest state:
+  **EXPLORED**, not PROBED.
