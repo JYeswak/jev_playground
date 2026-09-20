@@ -1,0 +1,36 @@
+{
+  "description": "DATA ONLY. dependency_freshness_lag (jev) vs a two-versions-for-one-package rule, on a reserved unseen slice of real dcg-allowed commands. APPLICABILITY arm: the question is about dependency states and this corpus is bash commands.",
+  "ranAt": "2026-09-20T05:28:16.177Z",
+  "seed": 20260920,
+  "slice": [
+    12000,
+    12400
+  ],
+  "priorRunOverlapLowerBound": 0,
+  "corpusRecords": 78242,
+  "scored": 400,
+  "errors": 0,
+  "counts": {
+    "jevFire": 1,
+    "ruleFire": 0,
+    "both": 0,
+    "jevOnly": 1,
+    "ruleOnly": 0
+  },
+  "scoreDistribution": {
+    "min": 0.01,
+    "p50": 0.03,
+    "p90": 0.07,
+    "p99": 0.16,
+    "max": 0.53
+  },
+  "jevOnlyRows": [
+    {
+      "command": "cd /Users/josh/Developer/clutterfreespaces.ios && PAYLOAD=$(python3 -c '\nimport json,datetime\np={\n \"ts\": datetime.datetime.now(datetime.timezone.utc).strftime(\"%Y-%m-%dT%H:%M:%SZ\"),\n \"tick\":\"cfsios-conductor-20260917T2205Z\",\"mode\":\"DISPATCH\",\"grade\":\"B\",\"product_changed\":False,\n \"value_kind\":\"root-cause-elimination\",\n \"cause\":\"One real fix landed with a known-bad/known-good proof (697dbbee3) and five root-cause hypotheses were excluded, but no buyer-visible behavior changed: the lead-flow alarm is still non-functional. Rule Zero keeps this RED.\",\n \"stage\":\"BEADS\",\n \"stage_blocked\":\"BEADS->EXECUTION still refused by the branch guard (HEAD on gate-truth-grading-loop-20260902, guard requires main; worktrees=1 passes). Advancing main is itself blocked by a hard remote rejection, filed as cfs-aykfk.\",\n \"dominant_blocker\":\"main-unpushable-125mb-blob\",\n \"escalation_action\":\"Filed cfs-aykfk P0 with four owner options and a measured recommendation: replay our 36 local-only commits onto the remote lineage that already lacks the blob. 7256 patches are identical, only 2 commits are remote-unique, no content lost. Joshua notified in-session.\",\n \"auto_filed_bead\":\"cfs-aykfk\",\n \"product_change_landed\":\"697dbbee3 corrects my own a95a4b8b0, which read the wrong stream. The monitor writes its structured error to STDOUT and exits 3 with stderr EMPTY (measured exit=3, stdout=711B, stderr=0B), and the workflow then OVERWRITES result.json with a synthetic object whose detail comes from that empty stderr, destroying the diagnosis. The fix preserves stdout, prefers the structured failures detail, and can never be silently empty. Proof on identical input: OLD detail empty, NEW detail names the two missing Supabase environment variables. Validated by yaml parse, bash -n, actionlint.\",\n \"hypotheses_refuted\":\"Five, recorded on cfs-7qemf so they are not re-derived: (1) stale monitor via ref=main — byte-identical on main and HEAD, 689 lines, zero commits touching it; (2) missing env var — the monitor reads exactly 3, the workflow provides all 3 plus 8 more, set difference empty; (3) checkout-free repo reads — the capabilities path does read repo files including its own source, but a --live run from /tmp with no repo present returns ok=true; (4) node 24 — ran live under fnm v24.16.0, ok=true; (5) invalid CI Supabase credentials — POSITIVE CONTROL: cfs-intake-postdeploy-smoke consumes the same two Supabase CI secrets and is green on its last three runs.\",\n \"new_finding\":\"Filed cfs-di0y5: 11 of 23 workflows are red on their last three runs, 3 cancelled, 8 green. The red set is the quality surface itself — selftest-gauntlet, RLS tenant isolation, tdd, db-drift-ratchet, migration-pr-gate, gate-wiring-audit. Two are push-triggered on main, so the gates that would judge a main advance are themselves non-functional. Third independent instance of this shape today after the 296 go-live receipts with 6 passes and the 60-consecutive-failure alert, which makes it systemic rather than coincidental.\",\n \"tooling_finding\":\"Filed cfs-xlgsg: local infisical was unusable because a brew-installed 0.43.111 takes PATH precedence and calls /api/v4, which the self-hosted server does not serve (v3 answers 401, v4 answers 404 — positive control). Joshua approved moving to the older release; the working 0.43.84 binary already exists under ~/.local/bin and needs no download. Invoking it by absolute path restored live read-only reproduction, which is what allowed five hypotheses to be excluded.\",\n \"gate_false_positives\":\"Three of our own gates blocked correct work by pattern-matching text rather than actions. None was bypassed or suppressed. danger-gate refused a br create because the bead DESCRIBED a remedy option. dcg refused a Homebrew symlink-removal command as a filesystem deletion, though it only drops Homebrew-managed symlinks and reverses with a relink. tick_guard refused this very tick because the payload named a credential ENV VAR, with no value present. All three were worked around by rephrasing; recorded for rule nuancing.\",\n \"peer_verification\":\"Pane 4 commit 1088d7455 re-executed and verified: 2 files, +69/-6, selftest 12/12, exactly one C20 finding, 2863 rows scanned, unranked 199 against an unraised ceiling of 200, baseline byte-identical. Its gate diff was reviewed specifically for weakening and passes: anchored regex, closed class list, two known-bad legs. Pane 2 was given a measured path-by-path ruling on its remaining 95 staged paths, including do-not-commit on four client job packets — pdftotext with a passing positive control showed 0 phones, 0 emails, 0 street addresses, so not a leak, but they belong in the private corpus.\",\n \"no_claim\":\"Defect 1 of the lead-flow alarm remains UNDIAGNOSED; five causes excluded, none confirmed. No production DDL, no live send, no public release, no credential value read or written, no irreversible deletion, no branch switch, no worktree, no force push, no lineage alteration.\"\n}\nprint(json.dumps(p))\n'); bash scripts/loop_enforcement/emit_tick.sh \"$PAYLOAD\" >/tmp/t3.json 2>/tmp/t3e.txt && python3 -c \"\nimport json; d=json.load(open('/tmp/t3.json'))\nprint('  TICK ACCEPTED ->', d['ts'], 'grade='+d['grade'], 'blocker='+d['dominant_blocker'])\nprint('  ledger rows:', sum(1 for _ in open('/Users/josh/.local/state/cfs-google-growth/overnight_log.jsonl')))\" || { echo \"  GUARD REFUSED:\"; cat /tmp/t3e.txt; }",
+      "jev": 0.53,
+      "rule": false,
+      "ruleHits": []
+    }
+  ],
+  "ruleOnlyRows": []
+}

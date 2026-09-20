@@ -244,6 +244,12 @@ writeFileSync(
       disagreements: { jevFiresRegexSilent: jevOnly, regexFiresJevSilent: regexOnly },
       agreementsBothFire: bothFire,
       errorRows: errors,
+      // REPRODUCIBILITY. The first run of this harness recorded only the 46 disagreement and
+      // both-fire rows, so the other 232 scored rows existed nowhere — and real-allowed.json is
+      // gitignored and was regenerated the same evening (77,767 -> 78,242 records), which
+      // reshuffles the seeded sample. The counts in the first receipt were therefore not
+      // reproducible from the repo alone. Every scored row is now carried here.
+      allScoredRows: ok,
       elapsedMs: Date.now() - started,
     },
     null,

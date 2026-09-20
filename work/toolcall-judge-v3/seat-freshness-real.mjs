@@ -15,10 +15,15 @@
  * to clear is a bar that is already perfect by construction.
  *
  * That framing is the point. If the judge matches the oracle it has still earned
- * nothing, because the oracle is 12 lines of semver compare and costs nothing. The
- * only way this question earns a seat is if it is RIGHT where the oracle CANNOT
- * BE RUN — i.e. on states where the versions are present as prose rather than as
- * parseable fields. The mention-vs-use arm below is that case.
+ * nothing, because the oracle is 12 lines of semver compare and costs nothing.
+ *
+ * RETRACTED AFTER RUNNING, and left here rather than quietly edited out: this
+ * comment originally said the `prose` shape was the interesting cell because the
+ * oracle "cannot be run" on it. That was an assertion, and it is FALSE. A ten-line
+ * regex that pulls every \d+.\d+.\d+ token out of the prose in order and compares
+ * the first two decides 39/39 of the prose cases and agrees with the oracle 39/39
+ * — exactly matching Jev. Prose is not beyond a cheap rule; it is one regex away.
+ * The claim was only ever untested intuition, and the test took four minutes.
  *
  * Pins come from real package.json files in this repo. "Available" comes from the
  * public npm registry (no key, no auth, read-only GET).
@@ -162,7 +167,8 @@ for (const [name, shape] of [['fields', shapeFields], ['prose', shapeProse]]) {
 
 console.log('\nORACLE NOTE: the control rule here IS the oracle (exact semver compare) and is');
 console.log('correct by construction on the `fields` shape. Matching it earns the judge nothing.');
-console.log('The only interesting cell is `prose`, where the oracle cannot be run at all.');
+console.log('And `prose` is NOT the escape hatch this harness first assumed: a ten-line regex');
+console.log('over the same prose decides 39/39 and agrees with the oracle 39/39, tying Jev.');
 
 writeFileSync(
   new URL('./seat-freshness-real.json', import.meta.url),
