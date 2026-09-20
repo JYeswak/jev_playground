@@ -906,3 +906,39 @@ else's work was the thing that was broken.**
 
 The retirement condition is the right one: when the counts are *generated into* the README, this
 stage is deleted rather than kept.
+
+## The prose I could not vouch for: 3 CONFIRMED, 1 STALE by nineteen
+
+`readme-prose-check-20260920.md`. My commit's NO-CLAIM said *"I changed four numbers and the
+sentences around them are unverified"*, and honesty pass 7 had just named adjacent-text failure
+as my top defect. So the sentences went to a non-author. **The adjacent text was wrong.**
+
+**`NEGATIVE_EVIDENCE.md` holds 50 entries; the README said 31.** Three places, now fixed.
+Verified here: `grep -cE '^## R[0-9]+'` → 50, and `grep -c '^## '` → 50 as well, which is the
+check that matters — it proves every section header *is* an R-entry, so 50 is the entry count and
+not a pattern that happened to match 50 things.
+
+**50 entries, 44 distinct IDs.** The gap is the known concurrent-pane collision set
+(R28/R32/R33/R42/R43), and the reviewer disclosed it rather than picking whichever number read
+better. **"Entries" is the honest word for 50** — a duplicate ID is still a separate dead end with
+its own reasoning — and the ambiguity I flagged in the dispatch turned out to be real and is now
+stated instead of hidden.
+
+The reopen-condition half is the more careful finding: **10 of 50 sections lack the literal
+words**, but sampled entries each carry one phrased as a retry, a trigger, or an overturn
+condition. So the claim's *number* was wrong and its *shape* was right, and the receipt says
+"sampled, not exhaustive" instead of rounding that to CONFIRMED.
+
+Three held:
+
+- *"one promotion awarded and retracted the same day"* — the `PROMOTE` verdict and the
+  `PROMOTION NARROWED` appendix are in one dated receipt; `UP-R7` is `RULED_OUT` today.
+- *"Observer (B) mechanism MET at n=1 lab; working-profile dogfood OPEN"* — true of the **fixed**
+  tree: `safeAppend` is now defined at `observer.mjs:29`, so the called-never-defined defect is
+  closed rather than routed around, and `emits-rows.test.mjs` is 5/5.
+- `(8 cleared, 13 held, 12 ruled out) = 33` — re-derived from `STATUS.tsv`, not trusted from me.
+
+**Four public numbers were stale this tick and I fixed three of them.** The fourth had sat wrong
+for longer than any of them, in the sentence immediately beside the ones I corrected, and I
+walked past it twice while editing that exact line. That is the adjacent-text defect demonstrating
+itself inside the commit that was supposed to be about adjacent-text defects.
