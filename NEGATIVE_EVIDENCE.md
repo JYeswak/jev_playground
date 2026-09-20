@@ -2240,3 +2240,105 @@ n=10 batteries as a substitute for a real corpus. This catalog is EXPLORED.
 this pane did not author, prints always-abstain + cheap baseline +
 prevalence, identity-locks sha256, and a non-author confirms. Until then
 `promoted = 0`.
+
+## R46 — REFUSED: wiring a guard against staged-file exposure (branch-switch loss)
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Census unit, no new instrument.
+Receipt: `docs/demos/upstream-repro/hardening-census-20260920.md` (rank 1,
+4 instances: 16b THIRD, 18b FOURTH, "lost twice today").
+
+The defect is real and top-ranked, and a guard for it is refused anyway:
+git has no hook point that runs *before* a checkout (post-checkout is after
+the loss), so nothing can interpose at the losing action. The two
+buildable shapes both fail the gate-that-fires-on-everything test:
+(a) refuse checkout on any dirty tree — dirty is the steady state of a
+three-pane worktree (this tree held live peer edits most of tonight), so
+the guard would nag every legitimate switch until uninstalled;
+(b) an overlap-check wrapper (uncommitted paths ∩ inter-branch diff) is
+computable but opt-in — enforcement would need every pane to route
+checkouts through it, which is prose with a script, not a wired guard.
+Commit-on-create stays a rule, not an instrument.
+
+**Trigger (overturn condition):** git gains a pre-checkout hook adopted
+repo-wide, OR all panes route branch-switches through one wrapper for 50
+switches with zero losses AND zero false refusals — then build the
+overlap-check as the guard, with the 50-switch log as its satisfying
+witness.
+
+## R47 — REFUSED: wiring a guard against callback sha omission (4 instances)
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Census unit, no new instrument.
+Instances: 9b three consecutive + 18b receipt/sha landing split. The packet
+contract (receipt path + sha on every callback) is prose, and stays prose:
+a callback is an `ntm --robot-send` runtime string, not a file — no repo
+hook ever sees it (`ntm` is an external binary; the send happens inside a
+tool call, not a commit). The two buildable shapes both fail:
+(a) a send wrapper requiring sha-shaped tokens is opt-in, the R46 shape —
+prose with a script, unwired for anyone who calls `ntm` directly;
+(b) a presence-check false-positives by construction, because BLOCKED
+callbacks legitimately carry no sha (`<SHA|BLOCKED>`), so the check would
+need the full contract grammar reimplemented in regex — and would still
+see nothing, for the reason above. Receiver-side verification already
+exists and works: the conductor caught all four omissions socially.
+Automating the catcher buys nothing the catcher does not already do.
+
+**Trigger (overturn condition):** `ntm` gains a send-time contract check
+(receipt path + sha-or-BLOCKED grammar enforced by the sender), OR
+callbacks move to a file-backed outbox a hook can read — then wire the
+grammar check there, with the four historical omissions as trigger arms
+and BLOCKED-format callbacks as the satisfying witness.
+
+## R48 — REFUSED: wiring a guard against pipeline exit-status misread (4 instances)
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Census unit, no new instrument.
+Creation Gate applied before building, answered honestly:
+
+1. CONSUMER — any agent reading a pipeline's `rc` as its producer's
+   (`cmd | head` reads head's 0; `cmd | tail` reads tail's 0).
+2. GATE (candidate) — a wrapper (`rcof.sh <cmd...>`) running the command
+   unpiped and printing output plus true rc.
+3. DEFECT — OBSERVED 4 times, all conductor-attested (dispatch
+   `pane2-pipe-exit-guard.md`); two itemized in the ledger tail: invoking
+   `pinned-denominator.sh` with a shell string and reading `rc=127` as a
+   tool defect, and reading `true_rc=0` off a piped invocation (tail's
+   status) — the trap this repo documents, hit three times in one night
+   by the same reader. Tick file warned all session; prose did not stop it.
+4. RETIREMENT — would require agents to route every truncating pipeline
+   through the wrapper. Unmeasurable and unenforced: see refusal below.
+
+Refused because the wrapper is opt-in prose-with-a-script (the R46/R47
+shape): the misread happens inside a transient tool call, which no repo
+hook ever sees (R47's reason, one level down — there is not even a string
+to scan after the fact, only the reader's memory of `rc=0`). Worse than
+opt-in, it is behavior-altering: agents pipe precisely to truncate, and a
+wrapper that prints full output-then-rc defeats the purpose of the pipe,
+so it would be routed around at exactly the moments it matters. A guard
+nobody can be made to call, which changes what it measures when called,
+is ceremony. Do not build it to have built something.
+
+**Trigger (overturn condition):** the harness exposes per-stage pipeline
+exit codes in tool-call metadata (so the true rc is observable without
+changing invocation shape), OR agent-shell invocations move through a
+ choke point that can enforce unpiped capture — then build the wrapper
+there, with the four historical misreads as trigger arms and a truncated
+`head` run whose true rc is nonzero as the satisfying witness.
+
+**CORRECTION appended 2026-09-20 (conductor, non-author of R48).** The verdict
+stands; one premise does not. R48 says the misread happens where "no repo hook
+ever sees it ... there is not even a string to scan". That is too strong: a
+PreToolUse-class hook DOES see the bash command string before execution — dcg
+demonstrably inspects and blocks command strings in this very environment
+(it refused heredocs and recursive rm for the conductor tonight). So a hook
+COULD match `| head` / `| tail` in a command that carries status. The scannable
+string exists.
+
+What survives, and is the real reason to refuse: such a check would fire on
+EVERY truncating pipeline, and truncating pipelines are correct almost always —
+a gate that fires on everything, which this lane refuses. Plus the
+behavior-altering objection, which is R48's strongest and is untouched: a
+wrapper that prints full output defeats the purpose of the pipe and gets routed
+around exactly when output is large.
+
+Recording this because the refusal was PREDICTED IN THE DISPATCH by me and then
+returned agreed. Same-origin agreement counts once, so I checked the premise
+instead of banking the confirmation — and one leg was wrong. Trigger unchanged.

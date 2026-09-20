@@ -71,7 +71,7 @@ on 12 planted harms, not observed incidents. Cross-model traffic is unattributed
 
 Receipt: [`docs/demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md`](demos/upstream-repro/toolcall-groundtruth-corpus-20260919.md) (`33aa633` on `main`). Pane 3 (muse), 2026-09-19. **Zero API.** Harness `work/p3-calibration/mine_decisions.py`; frozen sample `work/p3-calibration/toolcall-corpus-frozen.jsonl`.
 
-**Headline.** 216,507 dcg decisions (11,727 files). On joinable allowed commands (n=78,455): `isError` **3.95%** (3,098). Frozen sample **4.01%** (315/7,846). Frozen split, time-ordered at 2026-09-10T00:00:00Z: **36,955** train (err 4.3%) / **41,500** held-out (err 3.6%). Against the 0.1% kill line the surface is **not killed** — machine-observable badness is ~**40×** above it (`toolcall-groundtruth-corpus-20260919.md:47-55`).
+**Headline.** 216,507 dcg decisions (11,727 files). On joinable allowed commands (n=78,455): `isError` **3.95%** (3,098). Frozen sample **4.01%** (315/7,846). Frozen split, time-ordered at 2026-09-10T00:00:00Z: **36,955** train (err 4.3%) / **41,500** held-out (err 3.6%). Against the 0.1% kill line the surface is **not killed** — machine-observable badness is ~**40×** above it (`toolcall-groundtruth-corpus-20260919.md:47-55`). *As-of 2026-09-19 receipt; live corpus re-derived 2026-09-20 at n=221,873 decisions / GOOD+BAD 82,278 at 3.89% — conclusion unchanged. Regen: `python3 work/p3-calibration/mine_decisions.py` (minutes, read-only; writes gitignored `decisions_full.jsonl`, delete after).*
 
 True harm is strictly below 3.95% (benign errors: grep-no-match etc.) and unmeasured without human review. Transcript-derived outcomes are a proxy for harm, not harm.
 
@@ -283,3 +283,14 @@ and is not re-run here.
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (do not read as working/production dogfood), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
+
+## Numbers a reader cannot verify and neither can we
+
+Short and honest, per the denominator audits (`denominator-audit-20260920.md`,
+`harvest-asof-20260920.md`). Nothing below is built to cover them.
+
+| number | why unverifiable |
+|---|---|
+| live-harvest values (216,507 decisions; n=78,455 joinable; 3,098; 36,955/41,500 split) | live-monotonic corpus; exact 78,455 method unsaved and unrecoverable — as-of labeled, regen command recorded, never a standing fact |
+| export-census judgment third (observer inline; failure/foreman wired-at-default) | pattern census only; subtle unwiring would not move the count |
+| README historical runs (254/305, 13/13 observer, 47,428/55,794, latencies, n=662/n=5,733, 0.59, 2/3, 0/10, 5/5, 11/12) | past runs, no cheap regen — except 29/29 backtest, which is wired in `scripts/denominator-sweep.sh` |

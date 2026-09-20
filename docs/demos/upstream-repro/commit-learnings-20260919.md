@@ -1024,3 +1024,345 @@ it, not whether the reviewer could.**
 Pane 3 declined to claim `jev-vbh.5` again after re-checking both skill roots, and said so
 instead of manufacturing progress. **Refusing to claim unadvancable work is the correct callback**,
 and it is the second time tonight that pane has chosen an honest idle over a busy-looking one.
+
+## A11 mail→cass join: HELD, and the honest half is the zero it refused to claim
+
+`a11-join-yield-20260920.md` (3a065f5). Verified rather than accepted.
+
+**The falsifier really did land first.** Rule 3 of `docs/RULES.md` says commit what would prove
+you wrong before the first call. Checked by commit timestamp, not by trusting the sentence:
+falsifier `6b0d404` at `1789917966`, scorer added in `3a065f5` at `1789918051` — **85 seconds
+earlier.** Tight, and real.
+
+**The privacy constraint holds.** `score_a11_join.py` has exactly one occurrence of
+`body_md|subject`, and it is the line *asserting* the exclusion, not a read. Zero
+`INSERT/UPDATE/DELETE/DROP`. Read-only against both live DBs.
+
+**Result, and the distinction that makes it worth keeping:**
+
+| key | outcome |
+|---|---|
+| K1 project↔workspace | **20 id-join paths** (mail-only 133, cass-only 772) |
+| K2 thread_id↔cass tokens | **0 of 4,508** — measured, single-pass intersect over 59,807 conversations |
+| K3 reservation-path↔cass file | **UNMEASURED, not zero** — needs FTS, which is index-busy |
+
+**K3 is the good part.** It would have been easy to write "0" and bank a third clean row. The
+receipt says `UNMEASURED via sqlite, not yield-0`, because `conversations.source_path` is the
+session file rather than the repo file and the real test needs an index that is mid-repair. **An
+unmeasured cell reported as a zero is the silent-zero defect** — this lane has hit it five times
+tonight, including a hook that emitted nothing while thirteen tests passed. Naming it instead is
+the whole discipline.
+
+**HELD is the right verdict, not CLEARED**: cheap exact string-match on paths covers every
+id-join, so there is no Jev seat here. A mine that yields a usable join and no model seat is a
+real answer — it gates A18 and costs nothing to keep.
+
+**The rejection was also correct.** A08/A24 needed fresh CASS queries; `cass search` returns
+index-busy with a repair in flight, and the standing constraint forbids a second rebuild. The
+pane named what it rejected and why instead of running the wedged path — and said so in a
+supplement without being asked.
+
+## The dig BEAT does not survive its slices — fourth pooled number to fall, and I predicted it
+
+`dig-subset-breakdown-20260920.md` (5fb54b7). One tick earlier I told pane 2 to *expect the 0.058
+BEAT to weaken on at least one slice, because named subsets have overturned pooled numbers 3 for
+3 in this lane, always optimistically*. **It is now 4 for 4.**
+
+Recomputed independently from the locked export rather than read off the table:
+
+```
+S_wrong_selector  n=16  y_dig=4  always-invent 0.250  dig-iff 0.500
+```
+
+Exact match. **On the wrong-selector slice, digging costs twice what inventing costs** — hits
+exist (`count>0`) and answer nothing (`Y=0`), at loss 2 each. That is precisely the failure mode
+G6 names, and it is invisible in the pooled 0.058.
+
+| slice | n | always-invent | dig-iff | |
+|---|---:|---:|---:|---|
+| S_wrong_selector | 16 | 0.250 | **0.500** | LOSE |
+| S_lexical_trap | 20 | 0.150 | 0.000 | win |
+| S_topical | 82 | 0.183 | 0.000 | win |
+| S_control | 2 | 0.000 | 0.000 | **UNDERPOWERED** |
+| S_pass_probes | 30 | 0.000 | 0.000 | **UNDERPOWERED** |
+
+**The aggregate was carried by the two easy slices** (82 + 20 rows where dig is perfect) and the
+one slice that matters operationally is the one where it loses. A pooled mean over unequal slices
+is a weighted average of "easy" and "hard", and publishing it alone would have shipped a policy
+that doubles loss on the queries most likely to be asked in anger.
+
+**Two cells say UNDERPOWERED and report no direction** — `S_control` at n=2, and `S_pass_probes`
+with zero positives, where the two policies are identical *by construction* and a tie means
+nothing. Refusing to read a direction out of a structural tie is the same discipline as A11's
+`UNMEASURED` K3 one tick ago.
+
+Ordering verified again by timestamp: falsifier `ffef6d7` at `1789918109`, scorer added at
+`1789918198` — **89 seconds ahead.** Control check clean: `zzzz` count=0, y=0, no control-slice
+positives, so the harness was not silently blocked.
+
+**HELD, resting on n=16.** The pane said so plainly instead of leaning on three winning slices,
+and its NEXT is the right consequence: ship the local refusal on exactly that slice — dig only
+when hits exist *and* something is Y-eligible.
+
+## A12 REFUSED — the refusal I warned them about is the one they built, and they killed it
+
+`a12-refusal-result-20260920.md` (966e52b). One tick earlier I told pane 2 that the thing which
+would decide whether A12 ships is *whether the refusal fires on the CONDITION (hits exist AND
+nothing Y-eligible) or on the SLICE REGEX* — and that a regex-keyed rule is fitted to the 16 rows
+that motivated it, the mention-vs-use defect in policy form. **It fired on the regex, and the
+pane refused it on exactly that ground without being asked twice.**
+
+It also failed its own pre-registered falsifier:
+
+```
+refused empty (of 4)          2   no such field, no such key
+refused Y1 (good digs killed) 2   field does not exist, missing field
+F1: refused-Y1 2 >= refused-empty 2  -> FIRE
+```
+
+**A 2-for-2 trade is not a policy, it is a coin.** The rule kills as many good digs as bad ones,
+and the `0.154 vs 0.308` improvement on the absence slice is bought entirely from rows that
+defined the slice. Ordering verified again by timestamp: falsifier `60bc0ce` at `1789918292`,
+scorer at `1789918359` — **67 seconds ahead.**
+
+Three consecutive mines today, three honest non-wins: A11 `HELD` (join works, no Jev seat), the
+subset breakdown `HELD` (pooled BEAT inverts at n=16), A12 `REFUSE` (fitted and coin-flip). **The
+lane's dig-vs-invent story is now: digging wins on easy queries, loses on the hard ones, and the
+obvious fix does not generalise.** That is a more useful result than the 0.058 headline we
+started the day with.
+
+## And the skillranker build is genuinely blocked upstream
+
+`skillranker-build-20260920.md` (ca2afdb). Verified at source rather than from the receipt:
+`src/lib.rs:27-28` reads `#[cfg(target_os = "linux")] pub mod storage`, while `install.sh:158`
+serves `Darwin/aarch64` and `README.md:267` claims *"Linux and macOS"*. **The installer promises
+a platform the build cannot produce** — `E0433 cannot find storage in the crate root`.
+
+The pane's strongest move was the experiment it *reverted*: ungating produced 20 further errors
+on `nix::sys::statfs` BTRFS/EXT4/TMPFS/XFS magics, which proves the code is genuinely
+Linux-specific and that "just remove the cfg" would waste a maintainer's time. **Knowing which
+fix is wrong is worth more in an upstream report than the bug itself.**
+
+`BLOCKED` with no binary, no demo, no tests and no live rank is the correct callback. A green
+report that skipped the binary would have been the failure.
+
+## A18: unmeasurable, reproduced to the day — and a unit trap worth stealing
+
+`a18-offbus-result-20260920.md` (887b344). REFUSE, and the pane's own framing is the correct one:
+**UNMEASURED on this pair, not yield-0.**
+
+I re-derived the disjointness from the two live DBs rather than reading the table, and the
+reproduction turned up the detail that makes it credible:
+
+```
+cass ws 617   started_at 1781710335548        MILLIseconds -> 2026-06-17 .. 2026-07-27
+mail proj 66  created_ts 1788163552858574     MICROseconds -> 2026-08-31 .. 2026-09-01
+gap: 35 days
+```
+
+**The two stores keep time in different units**, and the pane caught that before the receipt
+rather than after. Had it gone unnoticed, the mail timestamps read as milliseconds would land in
+the year **58,600** and every ±24h window would be empty — producing exactly the same `0` the
+honest answer produces, for entirely the wrong reason. **A silent zero and a real zero are
+indistinguishable in the output; only the unit check separates them.**
+
+That is why `0 of 287` is reported as unmeasurable: the eras never meet under *any* window, so
+the probe has no opportunity to succeed or fail. Widening ±24h would not help; it would take five
+weeks of window to make the corpora touch.
+
+**And it generalises**, which is the part that closes the approach rather than one cell: all 20
+K1 pairs are time-disjoint, so A18's in-window join is unmeasurable on every pair available
+tonight — not just on the rich `clutterfreespaces.ios` cell I warned them to treat as a single
+cell. They treated it as one cell *and* checked the other nineteen.
+
+## Upstream filing: they found the duplicate first
+
+`skillranker-issue-filed-20260920.md`. The pane did not file — `Dicklesworthstone/skillranker#3`
+already covers the macOS gate, OPEN, verified by me via `gh`. It posted corroboration instead:
+still broken at `abf909d`, blast radius **7 files not 1**, and the ungating-is-not-the-fix
+evidence.
+
+**Not filing is the better outcome.** A duplicate issue costs a maintainer attention and teaches
+them to discount the reporter; a comment that adds tip-freshness, true blast radius, and a ruled-
+out fix makes the existing issue more actionable. The dedup check came first, unprompted.
+
+## The CASS mountain, as one page a stranger can read
+
+`cass-mountain-findings-20260920.md` (109f926). Four rulings that existed only as four separate
+receipts are now one 57-line page that opens with the question and ends with advice.
+
+Verified rather than accepted: **all four links resolve**, and every headline number reproduces
+from the locked export —
+
+```
+n=138   always-invent 0.159   dig-iff-count>0 0.058   slice n=16   other 122
+```
+
+**The takeaway earns the page:**
+
+> *Dig by default, but never dig an absence-claim on hit-count alone — demand evidence in the hit
+> that it answers, or invent.*
+
+That is actionable by someone who will never read this repo, and it is derived from the loss, not
+from the win. The arc it rests on is the honest one: digging wins in aggregate, **inverts on the
+16 questions that claim something is missing**, and the obvious fix was built and refused as a
+coin fitted to those same 16 rows.
+
+Three things the page does that I would have had to ask for:
+
+- The mechanical-`Y` caveat is **prominent, not buried**, with a one-line pending-review block —
+  so if pane 3's review overturns the inversion, the page changes in one edit rather than a
+  rewrite. Written to be falsified.
+- The unit trap is published as **practical advice for the reader**, not as our war story:
+  microseconds vs milliseconds, *"compare them raw and every time-window join silently returns
+  zero — the same zero a real disjointness finding produces."*
+- `n=138 with 30 near-duplicate probe rows` is disclosed in the caveats. The page weakens its own
+  denominator where a marketing instinct would have left it at 138.
+
+**My own check was the broken instrument again.** My link-verifier used `tr -d '](.)'`, which
+stripped the dot inside `.md` and reported **4 of 4 links missing**. The links were fine; my
+selector deleted the extension. **Twenty-sixth instance tonight, and the second time I have
+nearly filed a false defect against a pane's correct work** — the same shape as the `grep -c
+'arm'` miscount two hours ago. The pattern is stable and worth stating plainly: I am reliable at
+ruling on evidence and unreliable at the greps I use to fetch it, so every negative finding I
+produce against someone else's artifact gets re-derived a second way before it leaves my hands.
+
+## Joshua asked why we were not hardening our own mistakes. He was right, and here is the count
+
+The answer was measurable, so I measured it before agreeing:
+
+```
+GATED classes, recurrences tonight    TESTS.md 1 · numerals 0 · readme-counts 3 caught
+UNGATED classes                       selector/silent-zero 26 · denominator drift 8
+bare grep-as-proof sites in tooling   35
+```
+
+**Classes we turned into code stopped recurring. Classes we turned into prose did not.** This
+session carries a 200-line tick file warning about the selector defect in three places and it
+still happened 26 times — twice in the last two hours, both while I was auditing a pane's
+*correct* work.
+
+Two guards now exist, both **wired** rather than hand-run — stage 80 discovers
+`scripts/selftest-*.sh` by glob, so neither needed a new stage and instruments stay frozen:
+
+| guard | fires on | arms |
+|---|---|---:|
+| `scripts/vgrep.sh` | a proof-grep matching zero lines exits 3, never 0 or 1 | 8 |
+| `scripts/pinned-denominator.sh` | a claimed count disagreeing with its regeneration command | 11 |
+
+Verified on real history, not just planted arms:
+
+```
+pinned-denominator 138  <regen>  -> agree (138)
+pinned-denominator 77767 <regen> -> rc=3  "the sentence is wrong even though nobody edited it"
+```
+
+That message is the defect stated exactly: **a share whose denominator moved is wrong although no
+one touched the sentence.**
+
+### And my own verification broke twice more while checking them
+
+I invoked `pinned-denominator.sh` with a shell *string* when it takes argv, read `rc=127` as a
+tool defect, and nearly reported it. Then I read `true_rc=0` off a piped invocation — **tail's
+exit status**, the trap this repo documents and I have now hit three times in one night. Both
+were my selector, not their tool. **Twenty-seventh instance.**
+
+The one *real* boundary I found after invoking it correctly: it refuses `wc -l file` because the
+output carries the filename alongside the count. Fail-closed and defensible, worth knowing.
+
+### The census says what is still only prose
+
+Pane 2's ranked remainder puts **staged-file exposure at rank 1 with 4 recurrences** — the class
+that lost two files today and clobbered a third. That is now its Unit 3: guard it, or write the
+R18-style refusal with a trigger. Rank 2 is live numbers quoted without pinned inputs (5), rank 3
+is callback sha omission (4).
+
+**The honest limit on all of this, in the pane's own words:** *wired means a command exits
+nonzero, not that the class is eradicated.* vgrep closes one of the three selector failures I
+replayed through it, and its header says so.
+
+## The lane went RED, and the cause was me applying my own rule to three rows and skipping the fourth
+
+`lane-status.sh` exited **4** for the first time this session: *"1 of 33 integrity-checked
+receipts drifted from their pinned digest."*
+
+`UP-R16-ubs-as-a-gate` cited `NEGATIVE_EVIDENCE.md`. Three panes append to that ledger; pane 2
+landed R46 and the digest drifted the same hour. **I wrote the rule against this in the commit
+message that created the row** — *"a pinned digest cannot point at a live shared file"* — and
+then pinned the fourth row of that same batch to the largest live shared file in the repo.
+Knowing a rule and writing it down did not make me apply it.
+
+Fixed properly rather than re-pinned: the ruling is extracted verbatim into
+`ubs-gate-ruling-20260920.md`, a stable per-section receipt, digest computed
+`3a4796428ddbd003`. A bare re-pin would have gone red again on the next peer append. Swept the
+rest — `UP-R11`/`UP-R12` cite `commit-learnings-20260920.md`, which has **one commit and zero
+appends in six hours**, so it is settled rather than live; left alone deliberately.
+
+**NO-CLAIM, stated in the commit:** the extract is a copy, and if someone edits the R6 section
+the two diverge silently with nothing detecting it. That is the price of pinning, and it beats
+an unpinnable receipt that makes the integrity check vacuous for the row.
+
+## The denominator guard, used in anger the hour it shipped
+
+Pane 2 ran `pinned-denominator.sh` across the public surface: **7 claims with regeneration
+commands, 7 agree, zero drifts.** I re-ran one independently and planted a wrong value against
+it:
+
+```
+138 vs regen -> agree (138)
+139 vs regen -> rc=3  "the sentence is wrong even though nobody edited it"
+```
+
+**The valuable half is the second table, not the clean sweep.** The audit names which public
+numbers have **no regeneration command at all** — the live-harvest family needing as-of labels,
+the 19-numerator needing a re-sweep, README historicals. **Those are the numbers that will rot
+silently, because nothing can check them.** A clean pass on the checkable ones would have been a
+false comfort without that list.
+
+Two disclosed false starts worth keeping: the first replay run scored the **live** register (200
+rows) against a claim that names a **pinned fixture** — the guard correctly disagreed, and the
+pane recognised the guard was right and its invocation was wrong. That is the same class that
+caught me twice tonight, and this time the tool caught it before the receipt.
+
+## The as-of argument proved itself on the first number we tested
+
+Unit 1 asked for as-of labels on the live-harvest family. The first claim re-derived settled the
+argument better than any rule could:
+
+| claim | published 2026-09-19 | re-derived 2026-09-20 |
+|---|---|---|
+| total dcg decisions | 216,507 | **221,873 (+2.5%)** |
+| GOOD+BAD with outcome | 78,455 (3.95%) | **82,278 (3.89%)** |
+| frozen sample isError | 315/7,846 | 315/7,846 (pinned, agrees) |
+
+**The published 78,455 is not reproducible and never will be.** No saved command defines
+"joinable"; the mechanical GOOD+BAD rule reproduces the *shape* to within 0.06pp but leaves 3,823
+rows unallocated, and the corpus has moved on. The conclusion is unchanged — machine-observable
+badness stays ~39× above the kill line — **but the number itself is gone.**
+
+That is the whole case for as-of labels in one row: **a bare count on a growing corpus is a
+claim with an expiry date nobody wrote down.** `INTEGRATIONS.md:74` now carries both vintages and
+the regeneration command in the sentence, so the next reader sees a measurement at a time rather
+than a standing fact. The frozen sample agreeing exactly, beside a live number that moved 2.5%,
+is the control that makes the point.
+
+## The re-sweep held, and named the trap it did not check
+
+19-of-21 exports **holds** under a rule frozen before running, with the same two NAs. I recounted
+independently and got 19 (my denominator was 20 dirs-with-`src/` against their 21 — a denominator
+difference, not a disagreement about the answer).
+
+**The best line in that receipt is the caveat**: member identity was not diffed. The same *count*
+can be a different *set*, and re-affirming a count while the membership silently changed is a
+defect this lane has already hit. They flagged it for the next audit rather than claiming set
+equality they had not tested.
+
+## And the guard caught me a third time, in the same hour I shipped it
+
+Checking the as-of label, I grepped `'as of'` when the text reads `As-of`. `vgrep` fired
+`INCONCLUSIVE` instead of letting the silence read as "the label never landed" — which is exactly
+what I would have written. Then I piped the retry to `head` and read **head's** `rc=0` as the
+result: **fourth pipe-exit-code misread tonight**, in the check verifying the guard against
+misreads.
+
+The guards are now catching their author faster than their author is making the mistakes count.

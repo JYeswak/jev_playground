@@ -11,6 +11,7 @@ read-only sqlite sample from agent_search.db (schema introspected first).
     CASS_TIMEOUT_SEC=60 CASS_LIMIT=10 \\
       python3 work/cass-mail-mines/scripts/run_cass_dig_live.py
 """
+
 from __future__ import annotations
 
 import json
@@ -109,9 +110,12 @@ def sqlite_fallback(queries: list[str], meta: list[str]) -> list[tuple[str, dict
         return [(q, {"count": 0, "hits": [], "status": "no_db"}) for q in queries]
     con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
     con.row_factory = sqlite3.Row
-    tables = [r[0] for r in con.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' ORDER BY 1"
-    )]
+    tables = [
+        r[0]
+        for r in con.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY 1"
+        )
+    ]
     log(meta, f"fallback_tables={tables}")
     schema = []
     text_table = text_col = path_col = line_col = score_col = None
@@ -144,7 +148,9 @@ def sqlite_fallback(queries: list[str], meta: list[str]) -> list[tuple[str, dict
     META_SCHEMA.write_text(json.dumps(schema, indent=2)[:50000])
     if not text_table:
         con.close()
-        return [(q, {"count": 0, "hits": [], "status": "no_text_table"}) for q in queries]
+        return [
+            (q, {"count": 0, "hits": [], "status": "no_text_table"}) for q in queries
+        ]
     out = []
     for q in queries:
         tokens = [t for t in re.split(r"\W+", q) if len(t) >= 3][:3] or ["jev"]
@@ -159,12 +165,22 @@ def sqlite_fallback(queries: list[str], meta: list[str]) -> list[tuple[str, dict
         hits = []
         for r in got:
             d = dict(r)
-            hits.append({
-                "source_path": (d.get(path_col) if path_col else d.get("source_path") or d.get("path") or ""),
-                "line_number": (d.get(line_col) if line_col else d.get("line_number") or d.get("line") or 0),
-                "snippet": str(d.get(text_col) or "")[:500],
-                "score": (d.get(score_col) if score_col else d.get("score") or 0),
-            })
+            hits.append(
+                {
+                    "source_path": (
+                        d.get(path_col)
+                        if path_col
+                        else d.get("source_path") or d.get("path") or ""
+                    ),
+                    "line_number": (
+                        d.get(line_col)
+                        if line_col
+                        else d.get("line_number") or d.get("line") or 0
+                    ),
+                    "snippet": str(d.get(text_col) or "")[:500],
+                    "score": (d.get(score_col) if score_col else d.get("score") or 0),
+                }
+            )
         # cheap BM25-ish: keep order as returned; attach rank index as score if missing
         for i, h in enumerate(hits):
             if not h.get("score"):
@@ -192,7 +208,9 @@ def write_outputs(results: list[tuple[str, dict]], mode: str, meta: list[str]) -
                 "hit_count": hc,
                 "y": y,
                 "status": parsed.get("status"),
-                "top_path": (hits[0].get("source_path") or hits[0].get("path")) if hits else None,
+                "top_path": (hits[0].get("source_path") or hits[0].get("path"))
+                if hits
+                else None,
                 "top_score": hits[0].get("score") if hits else None,
                 "n_receipt_shaped": sum(1 for h in hits if hit_receipt_shaped(h)),
             }
@@ -203,9 +221,11 @@ def write_outputs(results: list[tuple[str, dict]], mode: str, meta: list[str]) -
 
 def score() -> str:
     from score_cass_dig import main as score_main
+
     # capture by re-invoking logic
     import io
     from contextlib import redirect_stdout
+
     buf = io.StringIO()
     with redirect_stdout(buf):
         rc = score_main([str(ROWS)])
