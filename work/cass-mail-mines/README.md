@@ -149,3 +149,21 @@ Until that receipt exists, state is **EXPLORED**, not `PROBED`.
 - any_acked=58 (π≈0.0185) → always-abstain **0.018500797**
 - B0 predict-acked iff elevated → **0.289633174** LOSE
 - Receipt: `exports/ack-sla-receipt.txt`
+
+
+---
+
+## CASS dig-vs-invent (A04 / A12 / A08 battery)
+
+```bash
+CASS_TIMEOUT_SEC=60 CASS_LIMIT=10 \
+  python3 work/cass-mail-mines/scripts/run_cass_dig_live.py
+python3 work/cass-mail-mines/scripts/score_cass_dig.py \
+  work/cass-mail-mines/exports/cass-dig-rows.jsonl
+```
+
+- Queries: `scripts/cass_dig_queries.txt` (≥100)
+- Y helper: `scripts/cass_dig_y.py` (mechanical receipt-shaped / wrong-selector)
+- Parent Studio one-shot: `PARENT_CASS_EXTERNALSHELL.md`
+- Receipt: `docs/demos/upstream-repro/cass-dig-vs-invent-20260920.md`
+- **Do not** start a second cass rebuild
