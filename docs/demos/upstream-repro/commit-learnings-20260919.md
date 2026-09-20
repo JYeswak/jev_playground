@@ -1979,3 +1979,56 @@ noise. We already hold a comment in that thread, so this is a reply, not a fresh
 **The generalisable lesson**: the dedup probe covers issues, not commits. Ours was correct and
 still lost an 11-minute race. `git fetch && git log <base>..origin/main` immediately before
 committing a port is the missing two-second guard.
+
+## 38 wired instruments, 134 arms — and nothing runs the driver
+
+`map-instruments-20260920.md` (`22f959b`, `b74b250`). The inventory is larger and healthier than
+I believed, and its top line is the most uncomfortable finding of the night.
+
+```
+WIRED 38 · HAND-RUN 12 · total arms 134 · no retirement condition 36
+stage 80 discovers 10 instrument suites + 11 stage selftests, exit 0, 24.2s
+```
+
+### The meta-defect
+
+**`foundation/gates.sh` is itself hand-run.** Thirty-eight instruments hang off it and *nothing
+invokes it*. Verified: `crontab -l | grep -cE 'gates\.sh|lane-status'` → **0**, and every
+in-repo reference to `gates.sh` is a child stage, not a caller. The only automatic triggers in
+this repo are `core.hooksPath` (4 githooks), `.omp/hooks/pre/jev-compact.ts`, and two cron lines
+that do not touch the gates.
+
+So the entire verification apparatus runs **because I type it**. Every green suite reported
+tonight was a green suite I chose to run. That is not a broken gate — it is a gate with a human
+scheduler, and it should be stated that way rather than implied to be CI.
+
+### My premise was stale, in our favour
+
+I have repeated all session that *"two instruments gate nothing"*. **Both now gate**, since
+2026-09-18: `verify-other-reasons.sh` is invoked by `gates.d/90-sidecar-verifier-wrapper.sh:75`
+(live EXIT=0, 38 inputs) and `verify-reason-numerals.sh` by `gates.d/95-numerals-ratchet.sh:117`
+as a ratchet (underlying EXIT=12 by design, stage PASS, 3 live hits registered in
+`foundation/numerals-ruled.tsv`). The four-times-refused ruling was **superseded two days ago**
+and I kept quoting it. A stale premise that flatters us less is still a stale premise.
+
+### A false claim in my own guard, corrected
+
+`scripts/pin-liveness.sh` header claimed its consumer was *"scripts/lane-status.sh's integrity
+check"*. Verified: `vgrep -n 'pin-liveness' scripts/lane-status.sh` exits **3, zero matches** —
+lane-status has never called it. The instrument is real and its 8 arms pass; **the Creation Gate
+answer overstated the wiring.** Instance 31 of mention-vs-use, this time inside a guard's own
+paperwork, written by me while arguing that paperwork is what makes an instrument honest. Header
+corrected in place to say only what is true; 8/8 still green, gates rc=0.
+
+### Two more dead links, reported not fixed
+
+- **`scripts/promotion-four-gates.py` ships a passing 2-arm `--selftest` that no glob reaches.**
+  Stage 80 globs `scripts/selftest-*.sh` only. This is *exactly* the defect stage 80 was built to
+  close — "a 4th selftest lands silently unrun" — recurring one file-extension over. **The fix
+  was applied to two globs, not to the idea.**
+- **`scripts/README.md` says "Eleven scripts"; `ls scripts | wc -l` is 30.** Stage 97 checks typed
+  counts in `README.md` only, so this file has no gate — a live instance of the class stage 97
+  exists for.
+
+**36 of 50 instruments have no retirement condition**, including every gate stage. An instrument
+that cannot say when it should be deleted is one nobody will ever delete.
