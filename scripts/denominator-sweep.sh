@@ -114,6 +114,14 @@ check "frozen-iserror-315" 315 grep -c '"isError": true' work/p3-calibration/too
 check "backtest-29" 29 sh -c 'cd demos/routing-backtest && npm test 2>&1 | grep -c -E "^ok|ok [0-9]"'
 check_floor "export-yes-19" 19 sh -c 'n=0; for d in work/omp-jev-* work/omp-harm-rule; do grep -rl -E "appendEntry|writeFileSync|appendFileSync|recording|register" "$d/src/" >/dev/null 2>&1 && grep -rl -E "askJev|systemOne|askJevChoice|jevClient" "$d/src/" >/dev/null 2>&1 && n=$((n+1)); done; echo $n'
 
+# ARC.md freshness (2026-09-20): the root arc's load-bearing numerals are
+# pinned to committed sources so the file fails loudly instead of rotting.
+# Bind count is an equality (hand labels are history); the R-ledger count
+# is a floor (entries are never deleted). Live-corpus figures in ARC.md
+# keep as-of labels in their receipts, per this file's header doctrine.
+check "arc-bind-1" 1 grep -c ': \[$' work/skills-vein/pack-nuisance-labels-20260920.json
+check_floor "arc-negev-R67" 67 sh -c 'grep -c "^## R" NEGATIVE_EVIDENCE.md'
+
 # The verdict NAMES the skips. "ALL-AGREE" over a set with an absent source would be a lie of
 # exactly the kind this sweep exists to catch, one level up from the counts it checks.
 if [ "$fail" -ne 0 ]; then
