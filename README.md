@@ -153,11 +153,14 @@ a retraction to learn.
   `noul` for a probability and `choice` for a ranked set, and both admit a real none-equivalent.
   That is what makes an abstention expressible instead of inferred from a low score. **Apply it by
   designing the question so "none of these" is a first-class answer.**
-- **It is fast and cheap enough to run on every item.** Measured 743 to 773 ms per call at 523 to
-  629 input tokens. An independent public write-up reports 0.35 to 0.52 s medians against 1.68 to
-  4.85 s for a general model at comparable agreement. **Apply it where per-item judgment was
-  previously too slow or too expensive to attempt, and not where a deterministic rule already
-  works.**
+- **It is fast, but not as predictable as we published.** We claimed *"743 to 773 ms per call"*.
+  Re-measured 2026-09-20 with ten consecutive live calls through the documented command:
+  **min 484 ms, median 1,034 ms, max 2,291 ms — and 0 of 10 inside the published range.** The old
+  figure was a narrow window taken from too few calls, which is the exact mistake this page warns
+  about two bullets up. An independent public write-up reports 0.35 to 0.52 s medians against 1.68
+  to 4.85 s for a general model at comparable agreement. **Apply it where per-item judgment was
+  previously too slow or too expensive to attempt — but budget for the tail, not the median, and
+  measure on your own network before promising a latency to anyone.**
 
 The full retraction, with both sides of the framing test, is in
 [`docs/demos/jev-probe/NOTE-framing-leak.md`](docs/demos/jev-probe/NOTE-framing-leak.md).
