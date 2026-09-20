@@ -236,7 +236,7 @@ cheapest possible way to turn REJECT into ADOPT, and it would leave every other 
 Test 5 pins the exit codes apart on purpose: 1 means there is a real install to remove, 2 means
 the evidence the doctrine rests on has rotted, and collapsing them would hide the second.
 
-## `work/jev-score-register/register.test.mjs` — 13 tests
+## `work/jev-score-register/register.test.mjs` — 15 tests
 
 Run: `node --test work/jev-score-register/register.test.mjs` (no API key; pure local I/O).
 

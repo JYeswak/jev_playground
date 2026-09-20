@@ -116,12 +116,15 @@ export function recording(ask, { path, extension, model }) {
         recordScore(path, { questionKey, score: Number(score), model: result.model ?? model, identity, extension });
       }
     } else {
+      // A successful call in an unexpected shape is NOT a transport failure and
+      // must not read as one: name the shape gap explicitly so a third asker
+      // shape misfiles loudly instead of masquerading as an error.
       recordScore(path, {
         questionKey: Object.keys(options.questions ?? { unknown: 1 })[0],
         model,
         identity,
         ok: false,
-        failure: result?.failure ?? 'unknown',
+        failure: result?.ok ? 'shape-mismatch: expected result.scores object' : (result?.failure ?? 'unknown'),
         score: 0,
       });
     }
@@ -170,7 +173,7 @@ export function recordingChoice(ask, { path, extension, model, questionKey = 'ch
         model,
         identity,
         ok: false,
-        failure: result?.failure ?? result?.reason ?? 'unknown',
+        failure: result?.ok ? 'shape-mismatch: expected result.probabilities object' : (result?.failure ?? result?.reason ?? 'unknown'),
         score: 0,
       });
     }

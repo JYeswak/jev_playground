@@ -146,3 +146,30 @@ test('recordingChoice stores no raw state and no label text', async () => {
   assert.ok(!raw.includes('authorization'), 'the FIELD NAME must be unrecoverable too');
   assert.ok(!raw.includes('sensitive'), 'no other state value leaks');
 });
+
+test('a third asker shape misfiles loudly as shape-mismatch, not as transport failure', async () => {
+  const path = join(dir(), 'scores.jsonl');
+  const scoreAsker = async () => ({ ok: true, score: 0.7, distribution: [0.7, 0.3], model: 'm' });
+  await recording(scoreAsker, { path, extension: 'x', model: 'm' })({ state: { s: 1 }, questions: { q: 'w' } });
+  await recordingChoice(scoreAsker, { path, extension: 'x', model: 'm' })({ state: { s: 1 } });
+  const rows = readRegister(path).rows;
+  assert.equal(rows.length, 2);
+  for (const r of rows) {
+    assert.equal(r.ok, false);
+    assert.match(r.failure, /^shape-mismatch: expected result\.(scores|probabilities) object/);
+  }
+});
+
+test('concurrent processes appending never interleave a torn line', async () => {
+  const path = join(dir(), 'scores.jsonl');
+  const worker = `import('${process.cwd()}/work/jev-score-register/register.mjs').then(async ({recordScore}) => {
+    for (let i = 0; i < 25; i++) recordScore('${path}', { questionKey: 'q', score: i / 25, model: 'm', state: { pid: process.pid, i }, extension: 'x' });
+  });`;
+  const { execFile } = await import('node:child_process');
+  const { promisify } = await import('node:util');
+  const run = promisify(execFile);
+  await Promise.all([0, 1, 2, 3].map(() => run(process.execPath, ['--input-type=module', '-e', worker])));
+  const lines = readFileSync(path, 'utf8').split('\n').filter(Boolean);
+  assert.equal(lines.length, 100);
+  for (const line of lines) JSON.parse(line);
+});
