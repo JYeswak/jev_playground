@@ -221,6 +221,25 @@ attention leftover, not taste.
 **NO-CLAIM.** Offline tests and frozen questions only. `measure.mjs` is a harness,
 not a result. No live accuracy. Ledger stays **0 promoted**.
 
+## WIP / UNPROMOTED: skillranker process mirror — route slice
+
+Process copied from `Dicklesworthstone/skillranker@6a74cca` into
+[`work/omp-jev-route`](../work/omp-jev-route/): abstention (`__none__` / local
+eligibility), structured JSON decision log, preregistered 0/1/2 eval gate.
+Receipt: [`demos/upstream-repro/skillranker-process-mirror-20260919.md`](demos/upstream-repro/skillranker-process-mirror-20260919.md).
+
+**Claim level: offline process slice.** Not registered on a working profile. Not
+a re-score of their corpus. Not working-dogfood. **Not promoted.**
+`diagnostic_synthetic` cannot promote.
+
+ACCEPTANCE (no key, no network):
+
+```bash
+node work/omp-jev-route/src/cli.mjs decide --fixture work/omp-jev-route/fixtures/process-cases.v1.jsonl
+node work/omp-jev-route/src/cli.mjs gate --fixture work/omp-jev-route/fixtures/process-cases.v1.jsonl
+node --test work/omp-jev-route/test/process.test.mjs work/omp-jev-route/test/gate.test.mjs
+```
+
 ## Scoreboard
 
 | Surface | State | Claim | Promoted? |
@@ -230,6 +249,7 @@ not a result. No live accuracy. Ledger stays **0 promoted**.
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
 | dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1 lab** (`a2e2035`); working-profile dogfood **OPEN**; lab only. First-contact harm-rule receipt does not close this row | no |
 | taste-loop (`omp-jev-{default,field,firstlook,fork,heat,heckle,jargon,promise,skip,uncanny,undo}`) | WIP / UNPROMOTED; observe-only scaffold | not wired to working profiles; not validated on live traffic; see `work/taste-loop/CONTRACT.md` | no |
+| skillranker process mirror (`omp-jev-route` slice) | WIP / UNPROMOTED; offline decide/gate CLI | abstain + JSON log + copied 0/1/2 gate; not working-dogfood; not their corpus | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (do not read as working/production dogfood), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.

@@ -1767,3 +1767,27 @@ wrong conductor claims now die inside one tick instead of reaching a published r
 firing neighbour. For (2): the mechanical fix exists and I did not use it. If an eleventh
 occurs, the honest conclusion is that `requireKey` cannot be adopted voluntarily and the
 inspection path itself must be the only way to read these files.
+
+---
+
+## R42 — REJECTED: copy skillranker's two-stage wide+rerank, or re-score their corpus, as the process mirror
+
+**Hypothesis this pass killed:** the smallest honest process mirror is their full ranking
+pipeline (wide Choice, then rerank Choice + per-candidate fit Noul, Quill at 254) plus
+another run of `synthetic_cases.v1.jsonl`.
+
+**Why not.** Source at `Dicklesworthstone/skillranker@6a74cca` `src/jev/wide.rs:4-6` says a
+winning `__none__` still reranks — that is two paid calls per turn by construction. Quill
+exists to admit 254 options we do not have. The corpus was already measured
+(`docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md`, 8/10 under their
+gate). Re-running it is the same origin counted twice (RULE 13 clause 2).
+
+**What we copied instead:** `__none__` abstention, local eligibility (empty roster /
+excluded / already-loaded / low-fit / not-above-none, ties abstain), structured JSON
+decision, and their frozen 0/1/2 gate with the always-abstain control. Landed in
+`work/omp-jev-route/`. `diagnostic_synthetic` still cannot promote.
+
+**Retry condition:** an omp session that actually exposes ≥32 distinct loadable skills on
+one turn, *and* a measured miss that a second Jev pass recovers and a local `__none__` gate
+does not. Until both are true, one bounded Choice plus local eligibility is the slice.
+

@@ -471,3 +471,19 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
 - **Boundary:** no `sr` binary, no keyed Jev, no vendored-clone edit.
   Process patterns ≠ product promotion. **promoted=0 untouched.**
 - Lane: offline. Claim: `[pending]` (source read, nothing executed).
+
+## skillranker PROCESS mirror — omp-jev-route slice (2026-09-20, offline, [test])
+
+- Upstream read: `Dicklesworthstone/skillranker` public `origin/main` **`6a74cca`**
+  (shallow clone to `/tmp`, not vendored, not patched). Corpus **not** re-measured.
+- Copied: `__none__` abstention, local eligibility, structured JSON decision,
+  0/1/2 loss + always-abstain control + `diagnostic_synthetic` cannot promote.
+- Refused: Quill 254-wide, two-stage Jev, Claude hook protocol, SQLite ledger, TUI
+  (R42). Landed in `work/omp-jev-route/` (`process.mjs`, `gate.mjs`, `cli.mjs`).
+- Ran: `node --test work/omp-jev-route/test/process.test.mjs work/omp-jev-route/test/gate.test.mjs`
+  → **19/19**. `cli.mjs decide` / `gate` on our 6-row fixture: mean loss 1.167,
+  always-abstain 0.667, top-1 0.333, **`promoted: false`**.
+- Receipt: `docs/demos/upstream-repro/skillranker-process-mirror-20260919.md`.
+- **Boundary:** no live Jev, no `sr` binary, no working-profile register, no
+  corpus re-score. Unpromoted. Ledger stays **0 promoted**.
+

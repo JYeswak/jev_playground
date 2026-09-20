@@ -84,3 +84,28 @@ that isn't.*
 
 This is why the extension **routes nothing**. A router acting on these scores would send the
 compiled-version bump to a light model at 0.09 confidence.
+
+## Process mirror (skillranker @6a74cca) — unpromoted slice
+
+Copied PROCESS, not their corpus. Receipt:
+[`docs/demos/upstream-repro/skillranker-process-mirror-20260919.md`](../../docs/demos/upstream-repro/skillranker-process-mirror-20260919.md).
+
+When a `context` event carries `roster` (and optional injected `scores` / `fit` /
+`excluded` / `alreadyLoaded` / `explicit`), the handler also writes
+`com.zeststream.omp-jev-route.process.v1` with `decision` in
+`ranked | explicit | abstain | unavailable`. No roster → silence on this path.
+Never blocks. `binding: log-only`.
+
+### ACCEPTANCE
+
+```bash
+node work/omp-jev-route/src/cli.mjs decide --fixture work/omp-jev-route/fixtures/process-cases.v1.jsonl
+node work/omp-jev-route/src/cli.mjs gate --fixture work/omp-jev-route/fixtures/process-cases.v1.jsonl
+node --test work/omp-jev-route/test/process.test.mjs work/omp-jev-route/test/gate.test.mjs
+```
+
+`gate` must print `promoted: false`. The 6-row fixture is a contract oracle that
+plants every loss class; always-abstain can beat it. That is the control working.
+
+**NO-CLAIM.** Unpromoted. Not working-dogfood. Not a re-score of their corpus.
+`diagnostic_synthetic` cannot promote.
