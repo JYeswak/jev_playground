@@ -1926,3 +1926,56 @@ issue open for the actual native macOS portability work."* If upstream now build
 Mac, the deliverable is a **comment** carrying only what upstream has not touched — by
 file-level diff: `src/subprocess.rs` group-kill, `src/cache/coordination.rs`,
 `src/context/signals.rs`, and four test files. **Not a new issue.**
+
+## skillranker fork: DELETE. Obsolete 11 minutes before it was written, and it ships a regression.
+
+Non-author inventory (`map-skillranker-20260920.md`, `5f4b250`), with the two claims that decide
+it verified here independently.
+
+### The timing, to the second
+
+```
+9c52a64  upstream  18:05:28Z   feat(storage): admit a qualified cache/ledger on macOS APFS/HFS
+8119163  upstream  18:06:16Z   fix(storage): expand macOS /tmp and /var aliases
+8cca771  ours      18:17:33Z   macOS port: storage admission by volume name
+```
+
+**Obsolete 11m17s before it was committed.** All six overlapping files were rewritten upstream
+more cleanly — one shared `src/storage/platform.rs`, 110 lines — and more safely: upstream
+allowlists `{apfs, hfs}` where we accepted `{apfs, hfs, ufs, exfat, msdos}`.
+
+### It moves the codebase the wrong way
+
+Ours adds **+24 new `target_os = "linux"` gates** in tests. Upstream's `9c52a64` **removes seven
+whole-file `#![cfg(target_os = "linux")]`** and widens them. Opposite directions. Worse,
+`cache_identity.rs` and `cache_live_reuse.rs` **assert the cache must MISS on macOS** — which
+`9c52a64` made false. Our tests now encode the bug as the contract.
+
+### The regression, verified by me, in an installed binary
+
+```
+origin/main  src/context/signals.rs:183 true · :207 true · :267 FALSE
+ours 8cca771 src/context/signals.rs:183 true · :207 true · (267 deleted)
+```
+
+`gather()` sets `inventory_partial = true` on entry; upstream clears it at :267. **Our fork
+deleted the only line that clears it, so the flag latches true forever** — and that binary is
+what `~/.local/bin/sr` is, byte-identical, sha `38f023e2…`. No test demands the deletion and the
+commit subject never mentions it. **An unexplained behavioural change rode in under a
+platform-port commit**, which is exactly why "one mechanical move per commit" exists.
+
+### Ruling: delete the fork, keep five findings
+
+The fork is not worth keeping. What survives is **five things upstream has not touched**, each
+with an origin/main file:line — the strongest being that upstream's macOS port may compile and
+still never open its store: `SQLITE_OPEN_NOFOLLOW` returns `CANTOPEN 1550` on Apple, at
+`src/cache/coordination.rs:645` and `src/storage/mod.rs:522`, both unconditional, and
+`git log abf909d..origin/main -- src/cache/coordination.rs` is **empty**.
+
+Delivery is **one comment on the already-open issue #3** — not a new issue, not a PR. Upstream
+already declined a third party's attached patch and shipped its own fix; sending ours would be
+noise. We already hold a comment in that thread, so this is a reply, not a fresh voice.
+
+**The generalisable lesson**: the dedup probe covers issues, not commits. Ours was correct and
+still lost an 11-minute race. `git fetch && git log <base>..origin/main` immediately before
+committing a port is the missing two-second guard.
