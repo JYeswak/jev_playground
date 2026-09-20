@@ -17,30 +17,26 @@
 # regex: raw count vs real count is the whole point (the 818-class error
 # counted forbid(unsafe_code) churn as danger).
 #
-# VERDICT (standing bars, priority order):
-#   MEASURE      payload hits >= 50, sessions <= 5%, top1 < 50%  (exit 0)
-#   TOO_RARE     payload hits < 50                              (exit 1)
-#   WALLPAPER    sessions-touched > 5%                          (exit 1)
-#   ONE_HABIT    top-1 session share >= 50%                     (exit 1)
-# Cannot-evaluate REFUSALS (exit 2, named; an empty scan is not a pass):
-#   REFUSE_BAD_PATTERN / REFUSE_EMPTY_CORPUS / REFUSE_NO_SIGNAL
-#
-# NON-GOAL v1: ast-grep structural patterns. Session payloads are patch
-# fragments and JSON-escaped args, not parseable source trees; a structural
-# matcher over them would certify noise. Regex over blobs is honest here.
-set -uo pipefail
-
-PATTERN=""; NOT=""; PATHPAT=""; LABEL="pattern"
+PATTERN=""; NOT=""; PATHPAT=""; LABEL="pattern"; TEXTMODE=0
+usage() {
+  sed -n '2,18p' "$0"
+  echo "Flags: --pattern REGEX [--not REGEX] [--path-pattern REGEX]"
+  echo "       [--label NAME] [--text] [--help]"
+  echo "  --text matches assistant text turns instead of tool args."
+}
 while [ $# -gt 0 ]; do
   case "$1" in
     --pattern) PATTERN="$2"; shift 2 ;;
     --not) NOT="$2"; shift 2 ;;
     --path-pattern) PATHPAT="$2"; shift 2 ;;
     --label) LABEL="$2"; shift 2 ;;
-    *) echo "REFUSE_USAGE: unknown flag $1" >&2; exit 2 ;;
+    --text) TEXTMODE=1; shift ;;
+    --help|-h) usage; exit 0 ;;
+    --*) echo "REFUSE_USAGE: unknown flag $1" >&2; usage >&2; exit 2 ;;
+    *) echo "REFUSE_USAGE: did you mean --pattern $1" >&2; usage >&2; exit 2 ;;
   esac
 done
-[ -n "$PATTERN" ] || { echo "REFUSE_USAGE: --pattern required" >&2; exit 2; }
+[ -n "$PATTERN" ] || { echo "REFUSE_USAGE: --pattern required" >&2; usage >&2; exit 2; }
 
 CORPUS="${EXPOSURE_CORPUS_DIR:-$HOME/.omp}"
 HARVEST="${EXPOSURE_HARVEST:-work/toolcall-judge-v3/real-allowed.json}"
@@ -48,6 +44,7 @@ HARVEST="${EXPOSURE_HARVEST:-work/toolcall-judge-v3/real-allowed.json}"
 export EXPOSURE_PATTERN="$PATTERN" EXPOSURE_NOT="$NOT"
 export EXPOSURE_PATHPAT="$PATHPAT" EXPOSURE_CORPUS="$CORPUS"
 export EXPOSURE_HARVEST_F="$HARVEST" EXPOSURE_LABEL="$LABEL"
+export EXPOSURE_TEXT="$TEXTMODE"
 
 python3 - <<'PY'
 import fnmatch
@@ -77,6 +74,8 @@ if notpat:
         print(f"REFUSE_BAD_PATTERN: --not: {e}")
         sys.exit(2)
 pathrx = re.compile(pathpat) if pathpat else None
+textmode = os.environ.get("EXPOSURE_TEXT") == "1"
+unit = "text turns" if textmode else "edit-write payloads"
 
 # --- bash harvest ---
 try:
@@ -124,6 +123,23 @@ for fp in sorted(files):
                 msg = obj.get("message") or {}
                 if msg.get("role") != "assistant":
                     continue
+                if textmode:
+                    texts = [c.get("text", "") for c in (msg.get("content") or [])
+                             if isinstance(c, dict) and c.get("type") == "text"]
+                    if not texts:
+                        continue
+                    seen_any = True
+                    blob = "\n".join(texts)
+                    payload_n += 1
+                    if not rx.search(blob):
+                        continue
+                    raw_hits += 1
+                    if notrx and notrx.search(blob):
+                        continue
+                    real_hits += 1
+                    fire_sessions.add(fp)
+                    per_session[fp] += 1
+                    continue
                 for c in msg.get("content") or []:
                     if not isinstance(c, dict) or c.get("type") != "toolCall":
                         continue
@@ -168,7 +184,7 @@ top1 = (per_session.most_common(1)[0][1] / real_hits) if real_hits else 0.0
 
 print(f"EXPOSURE {label}")
 print(f"bash: {bash_hits}/{bash_n} harvest commands match")
-print(f"payloads: {real_hits}/{payload_n} edit-write payloads match "
+print(f"payloads: {real_hits}/{payload_n} {unit} match "
       f"(raw {raw_hits}, {raw_hits - real_hits} excluded by --not)")
 print(f"sessions: {sess_n}/{sessions_any} sessions-with-calls touch it "
       f"({sess_pct:.2f}%)")
