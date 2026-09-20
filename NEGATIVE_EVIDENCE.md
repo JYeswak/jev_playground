@@ -122,6 +122,44 @@ Receipt: `docs/demos/duel-1/runs/ubs-r6-20260918T011614Z.json`.
 
 ---
 
+### R6 retry EXECUTED 2026-09-20 — `ubs` finally run on first-party TypeScript
+
+The retry condition ("the lane gains first-party code") was marked SATISFIED on 2026-09-18 as a
+scan-set condition, and then **nobody ran the tool for two days**. The arsenal audit
+(`commit-learnings-20260920.md`) listed `ubs` as owned, installed, one reference, never executed.
+Dry-queue rung 2 says take the oldest satisfiable retry, so it got run.
+
+```
+ubs work/jev-client/src/index.ts work/omp-harm-rule/harm-rule.ts work/jev-score-register/register.mjs
+Files: 3 | Critical: 0 | Warning: 5 | Info: 11
+```
+
+**Verdict: the tool runs, the scan-set condition was real, and it found nothing actionable in
+these three files.** Stated plainly rather than dressed up:
+
+- **`harm-rule.ts:55` — "async EventEmitter listener callback is not awaited".** Checked the
+  source rather than the count. The listener body is wrapped in `try`/`catch` at three levels
+  (`catch { /* never break the session */ }`, `catch { /* observability must never break the
+  session */ }`, `catch (err)`), which is **precisely the remediation ubs itself proposes**:
+  *"or handle rejections inside the EventEmitter listener."* Not a defect here.
+- **4 × nested ternary** — style, in the frozen classifier whose arms are pinned by tests.
+  Refactoring frozen scored code to satisfy a readability rule would change a measured artifact
+  for no measured gain.
+- **11 × info, mostly `security.env-in-client`** on `process.env.TYPESAFE_API_KEY` /
+  `JEV_MODEL` / `HARM_RULE_DEBUG_KEYS`. The rule is about client bundles; these are Node
+  extensions and never bundled. Inapplicable, not ignored.
+
+**What this retry actually bought:** evidence that a tool we have owned all along produces
+**0 critical** on our core client, rule and register. That is a weak-but-real result and it cost
+one command. It does **not** say the code is correct — `ubs` scans patterns, and the three
+genuine defects found in these files tonight (missing `safeAppend`, `recording()` misfiling every
+choice success, the census-not-product filter) were all found by **running things**, not by
+scanning them.
+
+**Retry closed.** New condition, if anyone wants a stronger claim: run `ubs --ci
+--fail-on-warning` over all 220 first-party `.ts`/`.mjs` files and rule on the aggregate. I ran
+three files, not 220, and say so rather than implying coverage.
+
 ## R7 — MEASURED, do not design on it: `abort_bash` acknowledges without cancelling
 
 **Measured upstream (`skill://omp-integration` wave 3):** `abort_bash` against a running
