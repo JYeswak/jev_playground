@@ -216,3 +216,5 @@ control-stratum evidence from 14d, which is about a *different* class entirely.
 NO-CLAIM: one slice, one run per command, no stability re-run — and with 49.2% of rows inside the
 near-threshold band, per-row fire/no-fire here is especially unstable. "Benign" is the author's own
 regex classification, not ground truth.
+
+SECTION 6 jev-eval-honesty — PASS — "LIVE matched=15557 unmatched=0 zeroHit=false presence=PRESENT prevalence=0.5351(8324/15557)" + REFUSE exit 2 twice + 19/19 tests — NO-CLAIM: tooling only, no judge scored; kind baselines describe skew, not quality.

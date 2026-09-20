@@ -51,7 +51,7 @@ test("non-decision and keyless decision rows land in unmatched", () => {
   const r = joinOutcomes({ rows: [heartbeat, keyless], expectKey: [] });
   assert.equal(r.matched.length, 0);
   assert.equal(r.unmatched.length, 2);
-  assert.equal(r.unmatched[0].reason, "no-outcome-or-error");
+  assert.equal(r.unmatched[0].reason, "no-verdict-key");
   assert.equal(r.unmatched[1].reason, "missing-id:id");
   assert.equal(r.zeroHit, true);
 });
@@ -68,4 +68,39 @@ test("empty input returns zeroHit:true", () => {
 test("readRow accepts already-parsed objects (Shape A object form)", () => {
   const parsed = readRow({ customType: { type: "t", data: { id: "x", outcome: 1 } } });
   assert.deepEqual(parsed, { type: "t", data: { id: "x", outcome: 1 } });
+});
+
+// Pass 5 join-contract fix: live dcg-bridge decision rows carry
+// data:{kind,toolCallId[,reason]} — never outcome/error — and must match.
+test("dcg-bridge-shaped rows ({kind,toolCallId}) match via default verdictKeys", () => {
+  const dcgA = JSON.stringify({
+    customType: { type: "session.decision.v1", data: { kind: "allow", toolCallId: "t1" } },
+  });
+  const dcgB = JSON.stringify({
+    customType: "session.decision.v1",
+    data: { kind: "deny", toolCallId: "t2", reason: "policy" },
+  });
+  const r = joinOutcomes({ rows: [dcgA, dcgB], expectKey: ["kind"], idKey: "toolCallId" });
+  assert.equal(r.matched.length, 2);
+  assert.deepEqual(r.matched.map((m) => m.id), ["t1", "t2"]);
+  assert.deepEqual(r.matched.map((m) => m.verdict), ["allow", "deny"]);
+  assert.deepEqual(r.matched.map((m) => m.verdictKey), ["kind", "kind"]);
+  assert.equal(r.zeroHit, false);
+  assert.equal(r.unmatched.length, 0);
+});
+
+test("custom verdictKeys narrows the match; rows without any listed key stay unmatched", () => {
+  const outcomeOnly = JSON.stringify({
+    customType: { type: "session.decision.v1", data: { id: "o9", outcome: "pass" } },
+  });
+  const kindRow = JSON.stringify({
+    customType: { type: "session.decision.v1", data: { id: "k1", kind: "allow" } },
+  });
+  const r = joinOutcomes({ rows: [outcomeOnly, kindRow], expectKey: [], verdictKeys: ["kind"] });
+  assert.equal(r.matched.length, 1);
+  assert.equal(r.matched[0].id, "k1");
+  assert.equal(r.matched[0].verdict, "allow");
+  assert.equal(r.unmatched.length, 1);
+  assert.equal(r.unmatched[0].reason, "no-verdict-key");
+  assert.equal(r.zeroHit, false);
 });

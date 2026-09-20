@@ -4,7 +4,10 @@
  * Joins keyed decision records through `readRow` (both omp session row
  * shapes A and B — ported verbatim from work/jev-client/src/index.ts so
  * this .mjs stays dependency-free and offline). Extracts decision records
- * carrying an `outcome`/`error` field.
+ * carrying ANY of the configured `verdictKeys` (default
+ * ["kind","outcome","error","verdict"] — Pass 5: live dcg-bridge decision
+ * rows carry data:{kind,toolCallId[,reason]}, never outcome/error, so the
+ * old outcome/error-only match joined 0/15499).
  *
  * Selector verification: the caller declares which fields it expects
  * (`expectKey` list). Any parsed record missing one is counted in
@@ -60,16 +63,24 @@ export function readRow(line) {
  * @param {Array<unknown>} args.rows - raw lines (JSON strings or objects)
  * @param {string|string[]} [args.expectKey=[]] - fields every parsed record must carry
  * @param {string} [args.idKey="id"] - join key; decision records without it cannot join
+ * @param {string|string[]} [args.verdictKeys=["kind","outcome","error","verdict"]]
+ *   - verdict field names; a record matches iff ANY listed key is present,
+ *   its value carried as `verdict` on the matched entry. Unmatched only
+ *   when NONE is present (reason "no-verdict-key").
  * @returns {{ matched: object[], unmatched: object[], selectorReport: object[],
  *            skipped: number, zeroHit: boolean }}
  *   matched: decision records with all expected fields + a usable join key.
+ *   Each entry: { index, type, id, verdict, verdictKey, record }.
  *   unmatched: parsed rows that cannot join ({ index, type, reason }).
  *   selectorReport: parsed rows missing ≥1 expected field ({ index, type, missing }).
  *   skipped: count of unparseable / foreign lines (never silent — counted).
  *   zeroHit: true when matched is empty (refusal wiring consumes this later).
  */
-export function joinOutcomes({ rows = [], expectKey = [], idKey = "id" } = {}) {
+export function joinOutcomes(
+  { rows = [], expectKey = [], idKey = "id", verdictKeys = ["kind", "outcome", "error", "verdict"] } = {},
+) {
   const expectKeys = Array.isArray(expectKey) ? expectKey : [expectKey];
+  const verdictKeyList = Array.isArray(verdictKeys) ? verdictKeys : [verdictKeys];
   const matched = [];
   const unmatched = [];
   const selectorReport = [];
@@ -91,9 +102,12 @@ export function joinOutcomes({ rows = [], expectKey = [], idKey = "id" } = {}) {
       continue;
     }
 
-    // Only outcome/error-carrying records are joinable decisions.
-    if (!("outcome" in data) && !("error" in data)) {
-      unmatched.push({ index, type, reason: "no-outcome-or-error" });
+    // Verdict-key match: ANY listed key present counts as the verdict field
+    // carrying the outcome value (Pass 5 join-contract fix — live dcg-bridge
+    // rows carry kind, not outcome/error). Unmatched only when NONE is present.
+    const verdictKey = verdictKeyList.find((k) => k in data);
+    if (verdictKey === undefined) {
+      unmatched.push({ index, type, reason: "no-verdict-key" });
       continue;
     }
 
@@ -103,7 +117,7 @@ export function joinOutcomes({ rows = [], expectKey = [], idKey = "id" } = {}) {
       continue;
     }
 
-    matched.push({ index, type, id, record: data });
+    matched.push({ index, type, id, verdict: data[verdictKey], verdictKey, record: data });
   }
 
   return { matched, unmatched, selectorReport, skipped, zeroHit: matched.length === 0 };
