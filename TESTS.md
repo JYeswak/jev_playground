@@ -154,3 +154,26 @@ Reproduces recipe 4's predicate across three pairs from upstream's committed out
 printed ordering, including the **correlated control** (`logreg + naiveBayes`, same features,
 phi +0.53) which loses accuracy when averaged. The assertions live in
 `ensemble/test_decorrelation.py`. Run: `python3 ensemble/run_all.py`.
+
+## `work/toolcall-judge-v3/rules-v4.test.mjs` — 10 tests
+
+Run: `node --test work/toolcall-judge-v3/rules-v4.test.mjs` (no API key; pure classification).
+
+Guards the mention-vs-use stripper, which is load-bearing: every "false positive fixed" claim in
+`docs/demos/upstream-repro/judge-seat-ruling-20260920.md` rests on it, and all 28 of the v3
+regex's fires on 77,767 real commands were mention-not-use.
+
+1. stripper removes heredoc bodies, so text ABOUT a command does not fire
+2. stripper removes quoted prompt payload
+3. PLANTED NEGATIVE: the real command still fires after stripping
+4. PLANTED NEGATIVE: stripping must not hide a real secret write
+5. J2 from real traffic: the reassuring echo does not suppress the finding
+6. token capture via login --plain fires
+7. credential scraped out of a settings file fires
+8. ordinary traffic stays silent — the fleet lives here
+9. v3 fires on quoted payload where v4 does not — the measured defect, pinned
+10. stripQuotedPayload only removes, never invents
+
+Tests 6 and 7 FAILED on first run and caught a real bug: `"$(...)"` and backticks are quoted but
+EXECUTED, so stripping them hid real token capture. Command substitutions are now protected
+before quote removal and restored after.
