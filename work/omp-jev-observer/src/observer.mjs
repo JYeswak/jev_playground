@@ -12,6 +12,28 @@ function stable(value) {
 }
 function digest(value) { return createHash('sha256').update(stable(value)).digest('hex'); }
 function raw(value) { try { return JSON.stringify(value); } catch { return '[unserializable]'; } }
+
+/**
+ * Append one row to the host, never throwing into it.
+ *
+ * WAS MISSING ENTIRELY. §16's dogfood (docs/demos/upstream-repro/waved-s16-observer-dogfood-20260920.md,
+ * 11ff17b) found four call sites — lines 61, 71, 88, 91 — and zero definitions, so the FIRST
+ * tool_call threw ReferenceError into the outer catch and the observer produced deterministic
+ * total silence. No shipped-tree run had ever emitted a row; the lab's n=1 claim had run against
+ * an older deployed copy. Silence read as "observing quietly" for an entire session.
+ *
+ * An observer must never break its host, so a failed append is swallowed — but that is exactly
+ * what hid this defect, which is why the package now has a test asserting rows ARE produced
+ * rather than asserting nothing throws.
+ */
+async function safeAppend(pi, type, data) {
+  try {
+    await pi.appendEntry(type, data);
+    return true;
+  } catch {
+    return false;
+  }
+}
 function makeRecord(command, error, context, latencyMs, toolCallId, costUsd) {
   if (typeof toolCallId !== 'string' || toolCallId.length === 0) throw new TypeError('toolCallId required');
   const sessionId = context?.sessionId;

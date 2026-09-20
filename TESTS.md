@@ -264,3 +264,24 @@ matches nothing is the defect this package exists to prevent.
 
 Registered by the conductor when the files were found STAGED-BUT-UNCOMMITTED during a peer
 branch switch; the author's own registry entry supersedes this one if it differs.
+
+## `work/omp-jev-observer/test/emits-rows.test.mjs` — 5 tests
+
+Run: `node --test work/omp-jev-observer/test/emits-rows.test.mjs` (no API key; host is stubbed).
+
+The tests §16 proved were missing. `safeAppend` was called at four sites and defined at none, so
+the first `tool_call` threw ReferenceError into the outer catch and the observer emitted NOTHING,
+deterministically, for as long as the package existed. Every pre-existing test passed the whole
+time, because they asserted the handler does not throw — and a handler that swallows everything
+does not throw. These assert the opposite: that rows ARE produced.
+
+1. PLANTED NEGATIVE for the safeAppend defect: a tool_call produces at least one row
+2. a decision row is emitted, not only diagnostics
+3. the decision row carries the toolCallId it observed
+4. a failure still emits a decision row carrying the error, never silence
+5. an unwritable host does not throw into it — the swallow is deliberate, and now tested
+
+Test 1 fails against the pre-fix tree (0 rows). Test 4's assertion was corrected during authoring:
+it originally expected an injected `classify` error, but the API-key check runs BEFORE classify, so
+on an unconfigured machine the recorded error is the key error. The contract under test is the
+same one §16 found broken — a failure must be RECORDED, not swallowed.
