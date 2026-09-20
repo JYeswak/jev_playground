@@ -254,10 +254,10 @@ measurement rather than preference.
 |---|---|---|---|---|
 | [`omp-harm-rule`](work/omp-harm-rule/) | the tool_call corpus | 12/12 recall, 0/38 FP | yes, working profile | **no** — four regexes beat it 12/12 to 11/12 |
 | [`omp-jev-preaction`](work/omp-jev-preaction/) | `preaction-abstention` policy | 6/6 incl. a false-positive arm | yes, `jev-lab` | **no** — deterministic patterns only |
-| [`omp-jev-observer`](work/omp-jev-observer/) | the observe-and-log seam | 7/7 | yes, `jev-lab` | yes |
-| [`omp-jev-review`](work/omp-jev-review/) | `jev-review` | 6/6 | yes, `review_scored` | yes — no regex for "this refactor changed a default" |
-| [`omp-jev-rerank`](work/omp-jev-rerank/) | `jev-rerank-bench` | 7/7 | yes, `{ordered: 0.91}` | yes, **one** question — measurement killed the other two |
-| [`omp-jev-failure`](work/omp-jev-failure/) | `jev-agent-failure-benchmark` | 5/5 | yes, `failure_classified` | yes, **one** multiclass question — chosen for coherence, NOT accuracy: on 9 fresh hold-out cases both framings tied 8/9 and the impossible-answer defect did not reappear |
+| [`omp-jev-observer`](work/omp-jev-observer/) | the observe-and-log seam | 13/13 (8 seam + 5 emits-rows) | yes, `jev-lab` — but it emits the generic `tool_call_observed`, which other writers also emit, so its 3,339 rows are **not attributable to this package alone** | yes |
+| [`omp-jev-review`](work/omp-jev-review/) | `jev-review` | 13/13 (7 review + 6 behaviour-label) | **ran live, never scored** — 3 `diff_command_observed`, 3 `review_error` (HTTP 400), **0 `review_scored`** on this machine | yes — no regex for "this refactor changed a default" |
+| [`omp-jev-rerank`](work/omp-jev-rerank/) | `jev-rerank-bench` | 7/7 | **no live rows** — it emits `search_result_observed` and this machine has 0 | yes, **one** question — measurement killed the other two |
+| [`omp-jev-failure`](work/omp-jev-failure/) | `jev-agent-failure-benchmark` | 5/5 | yes — 2 live `failure_scored` rows (the README said `failure_classified`, a kind that does not exist) | yes, **one** multiclass question — chosen for coherence, NOT accuracy: on 9 fresh hold-out cases both framings tied 8/9 and the impossible-answer defect did not reappear |
 
 Eleven more `omp-jev-*` taste packages exist under [`work/taste-loop/`](work/taste-loop/) as
 **unpromoted observe-only scaffolds**. They are not in the table above: not wired to working
@@ -546,9 +546,14 @@ quickstart: five questions, answered from committed bytes. No install, no networ
 === Q1. Would routing cheap turns to a cheaper model have saved money?
     NO. On this fixture routing would have COST YOU MORE: $0.011106 actual
     vs $0.012933 routed — 16.4% worse, on 6 of 6 turns.
+    The demo is willing to answer no. That is the point of running it on YOUR logs.
 
 === Q2. Can that demo's tests still fail, or are they decoration?
-    YES — mutations: 7/7 caught.
+    YES — mutations: 7/7 caught. Each mutation is a named sabotage of the scoring code, planted one at a
+    time into a green suite; if the tests still pass, that mutation ESCAPED and this fails.
+      CAUGHT   tool-call-gate-inclusive
+      CAUGHT   prompt-budget-inverted
+      CAUGHT   completion-budget-dropped
 
 === Q3. How much of a coding agent's context is resent every single turn?
     98.878% of all tokens are cache reads: context resent, not new work.
