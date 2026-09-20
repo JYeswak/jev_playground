@@ -380,11 +380,16 @@ judged, so a fire is always quotable — we learned that the hard way and
 Installed is not firing. After some real work:
 
 ```bash
-# every profile, because `default` is a placeholder: omp names profiles whatever you named them,
-# and there is no `default` directory on the machine this was measured on.
-for p in ~/.omp/profiles/*/agent/sessions ~/.omp/agent/sessions; do [ -d "$p" ] || continue
-  grep -rho '"kind":"harm_[a-z]*"' "$p"          # rc UNPIPED: a bad path here exits 2, and a
-done | sort | uniq -c                            # pipeline would have reported sort's 0 instead
+# Two traps, both live. (1) `default` is a placeholder: omp names profiles whatever you named
+# them, and there is no `default` directory on the machine this page is measured on — so glob.
+# (2) `grep … | sort | uniq -c` reports SORT's status, never grep's, so a dead path prints
+# nothing and reads as a clean zero. You cannot recover grep's rc after this pipe. The `-d`
+# test and the stderr line are what refuse the silent zero: no "scanned" line means nothing
+# was read, which is a different result from "read everything and found none".
+for p in ~/.omp/profiles/*/agent/sessions ~/.omp/agent/sessions; do
+  [ -d "$p" ] || continue; echo "scanned $p" >&2
+  grep -rho '"kind":"harm_[a-z]*"' "$p"
+done | sort | uniq -c
 ```
 
 Three kinds are defined. You will see **two**: measured 2026-09-20 across all 12 profiles on the
@@ -579,13 +584,21 @@ things, and mixing them is how a number gets believed harder than it earned.
 
 ## Quick start
 
-Three commands from a stranger clone. No API key.
+**Four** commands from a stranger clone. No API key.
 
 ```bash
 git clone https://github.com/JYeswak/jev_playground && cd jev_playground
 ./scripts/quickstart.sh
+br sync --import-only        # REQUIRED before gates.sh; the repo tracks .beads/issues.jsonl,
+                             # not the database gates.sh reads. Prints: Created: 50 issues
 bash foundation/gates.sh
 ```
+
+**The import used to be missing from this list, and it is not optional.** On a genuinely
+untouched clone `bash foundation/gates.sh` does not reach stage 10 — it refuses at preflight with
+`RED foundation gates require an imported Beads database under .../.beads/*.db`. Measured
+2026-09-20 on a clone nothing else had been run in; an earlier sweep missed it only because a
+different command had already created the database first. Order of operations was the trap.
 
 `gates.sh` runs `scripts/bootstrap-compaction.sh` when stage 40's deps are missing (`compaction/node_modules` and the pinned `fast-jev-compaction` sibling). That step uses the network once and does not commit `node_modules`. You can run the bootstrap yourself first if you want the fetch to be visible:
 
@@ -811,7 +824,7 @@ are now wrong.** Publishing the correction the same way:
 
 | row | what the table says | what a fresh clone did on 2026-09-20 |
 |---|---|---|
-| `foundation/gates.sh` | rc 1, fix with `br sync --import-only` | rc 1, but stage **50-house-gates PASSED** — the beads hole is gone. The RED is **80-lane-instrument-selftests**: `selftest-denominator-sweep.sh` 2 ok / 1 failed, because `denominator-sweep.sh`'s `locked-dig-138` check reads `work/cass-mail-mines/exports/cass-dig-rows.jsonl`, which `.gitignore:95` excludes. A guard added on 2026-09-20 to stop published counts drifting is itself unrunnable from a clone. **`br sync --import-only` does not fix this row.** |
+| `foundation/gates.sh` | rc 1, fix with `br sync --import-only` | **The table row is right and this page first got the retraction wrong.** On an untouched clone gates.sh refuses at preflight, before stage 10, exactly as the row says; `br sync --import-only` clears it. A first sweep reported "stage 50 PASSED, the beads hole is gone" — false, because an earlier command in that same sweep had already created `.beads/beads.db`. After the import a **second** blocker appears that the row does not name: **80-lane-instrument-selftests**, `selftest-denominator-sweep.sh` 2 ok / 1 failed, because `denominator-sweep.sh`'s `locked-dig-138` read `work/cass-mail-mines/exports/cass-dig-rows.jsonl`, which `.gitignore:95` excludes. A guard added on 2026-09-20 to stop published counts drifting was itself unrunnable from a clone. Fixed at `190668d` (absent ≠ broken: SKIP, counted, named) and `2e76a29` (its selftest's arm 1 asserted the old verdict string and so was green locally, RED for every stranger). |
 | `compaction/install-jev-compact.sh --check` | rc 1, fix with `./scripts/bootstrap-compaction.sh` | rc 1 **before and after** the bootstrap — it printed `already ready` and the check stayed RED. The two do different jobs: bootstrap fetches the sibling and `node_modules`; `--check` verifies a hook *installed into a target repo*. The real fix is `compaction/install-jev-compact.sh <target>`, after which `--check <target>` is rc 0. |
 | — (missing rows) | — | `python3 ensemble/run_all.py` is **rc 2** on a fresh clone (upstream scores not redistributed; it prints the `git clone`), and `npm --prefix compaction run replay` is **rc 2** without `TYPESAFE_API_KEY`. Neither was in the table. |
 
@@ -863,6 +876,8 @@ on offer here — only receipts.
 - `bash`, `git`, `curl`, `python3`, preinstalled on macOS and most Linux
 - **`node` >= 20**, required by all three tools. Their `package.json` files declare it, and a
   machine without node fails every one of them, so check `node --version` first
+- **`br`** (beads), for `br sync --import-only`. Without it `foundation/gates.sh` cannot start:
+  the repo tracks `.beads/issues.jsonl`, never the database the gates read
 - A `TYPESAFE_API_KEY` for exactly two commands — `scripts/jev-probe.mjs` without `--replay`, and
   `compaction`'s `npm run replay`. Everything else runs without one
 
