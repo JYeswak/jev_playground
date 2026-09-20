@@ -1,0 +1,12 @@
+{
+  "name": "omp-jev-default",
+  "version": "0.1.0",
+  "description": "Observe-only preselection scorer. Regex finds a default exists; Jev scores whether it serves the client.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["omp-plugin", "omp-extension", "pi-package", "jev", "taste"],
+  "omp": { "extensions": ["./src/index.ts"] },
+  "pi": { "extensions": ["./src/index.ts"] },
+  "files": ["src", "README.md"],
+  "scripts": { "test": "node --experimental-strip-types --test test/" }
+}

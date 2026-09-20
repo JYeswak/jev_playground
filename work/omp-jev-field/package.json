@@ -1,0 +1,12 @@
+{
+  "name": "omp-jev-field",
+  "version": "0.1.0",
+  "description": "Observe-only form-field scorer. Regex takes form presence; Jev scores label language, placeholder-as-label, and recoverable error.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["omp-plugin", "omp-extension", "pi-package", "jev", "taste"],
+  "omp": { "extensions": ["./src/index.ts"] },
+  "pi": { "extensions": ["./src/index.ts"] },
+  "files": ["src", "README.md"],
+  "scripts": { "test": "node --experimental-strip-types --test test/" }
+}

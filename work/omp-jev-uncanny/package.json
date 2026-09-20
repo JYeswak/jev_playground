@@ -1,0 +1,12 @@
+{
+  "name": "omp-jev-uncanny",
+  "version": "0.1.0",
+  "description": "Observe-only scorer for product-as-observer copy. Prefilter gates volume; Jev scores the remainder.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["omp-plugin", "omp-extension", "pi-package", "jev", "taste"],
+  "omp": { "extensions": ["./src/index.ts"] },
+  "pi": { "extensions": ["./src/index.ts"] },
+  "files": ["src", "README.md"],
+  "scripts": { "test": "node --experimental-strip-types --test test/" }
+}
