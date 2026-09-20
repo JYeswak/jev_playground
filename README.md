@@ -697,7 +697,7 @@ The live call reads `TYPESAFE_API_KEY` from the environment and is meant to be r
 manager so the key never reaches a file:
 
 ```bash
-infisical run --projectId=<id> --env=prod -- node scripts/jev-probe.mjs
+infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=prod -- node scripts/jev-probe.mjs
 ```
 
 ## Verify it yourself

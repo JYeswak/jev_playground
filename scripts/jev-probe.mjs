@@ -35,7 +35,7 @@ if (replay) {
 
 const key = process.env.TYPESAFE_API_KEY ?? process.env.TYPE_SAFE_AI_KEY;
 if (!key) {
-  console.error('ERROR no key in env. Run under: infisical run --projectId=<id> --env=prod -- node scripts/jev-probe.mjs');
+  console.error('ERROR no key in env. Run under: infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=prod -- node scripts/jev-probe.mjs');
   process.exit(2);
 }
 
