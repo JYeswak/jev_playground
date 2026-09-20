@@ -1894,6 +1894,43 @@ on danger. The letter of the trigger was satisfiable; I wrote the letter, so the
 `organic-fires.mjs` fires reaching 0 with `verify-claim.mjs` still `REPRODUCIBLE` and
 `rules-v4.test.mjs` still green. Until then this stays a mitigation, not a fix, and
 `docs/INTEGRATIONS.md`'s 0-of-28 caveat stands with its number updated to 5 fires of 5.
+### R44 leg 1 — SATISFIED IN THE INSTRUMENT, NOT IN THE PRODUCT. Trigger stands.
+
+`vbh1-exec-data-20260920.md` reports leg 1 as `0 fires on 81,329`, and it is reproducible: my own
+run gives `allow commands joined: 81336 | scored: 81336 | fires: 0`.
+
+**But the filter lives in the measurement script, not the rule.** The author said so plainly —
+*"a blank-data-literals + re-score composition in the measurement script; the shipped rule is
+untouched"* — and that disclosure is why this is an honest partial rather than a false claim.
+Verified:
+
+```
+grep -c 'no-filter|blankDataLiterals' work/omp-harm-rule/organic-fires.mjs   2
+grep -c 'blankDataLiterals|exec-family|execSync' work/omp-harm-rule/harm-rule.ts   0
+organic-fires.mjs --no-filter                                                9 fires
+shipped rule on a data-literal probe  ->  kind: harm_fire  score: 0.96
+```
+
+**The product is unchanged.** A `node -e` command whose dangerous string is a data literal still
+fires at 0.96 in production. What moved is what the census counts.
+
+So: **R44's trigger is not defeated.** Its three legs were written to prove the *rule* stopped
+firing on data literals; leg 1 as satisfied proves the *census* stopped counting them. Those are
+different claims, and the gap is in my wording — I wrote the trigger as a command to run rather
+than a property of the shipped artifact, which is the same defect as reading `safe_to_dispatch`
+as "will do useful work".
+
+**What was genuinely produced, and it is worth keeping:** a working executed-vs-data
+distinguisher, proven at 81k scale, currently wired as a filter. Moving it inside
+`classify()` is a small change with a clear test: the probe above must stop firing while
+`verify-claim.mjs` stays `REPRODUCIBLE` and `rules-v4.test.mjs` stays green.
+
+**REVISED TRIGGER, stated as a property of the product this time:**
+`work/omp-harm-rule/harm-rule.ts` itself declines a data-literal probe — `kind` is not
+`harm_fire` — with `organic-fires.mjs --no-filter` at 0 on ~81k, `verify-claim.mjs`
+`REPRODUCIBLE`, and `rules-v4.test.mjs` green. Measured on the shipped rule with no filter in the
+harness, because a census that filters cannot testify about what ships.
+
 ### R44 numbering — an ID collision found during the merge, and it is not only mine
 
 My entry was written as **R41** and a peer had concurrently written a different R41
