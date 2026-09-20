@@ -2102,3 +2102,67 @@ Extension loading is **pinned at session start**: install ≠ active, uninstall 
 muse session still appending 47 minutes after the guard install emits 3,740 dcg-bridge rows and
 **zero** guard rows. Every naive zero-row read I made tonight — including the one I nearly
 reported as "installed but not firing" — is invalidated by that alone.
+
+## The recall leg cannot serve our defect classes. Verdict (b): distinct subsystems.
+
+`ee-loop-close-20260920.md` (`aa41b61`). The agent's decisive experiment is the cleanest piece
+of measurement produced tonight, and I reproduced its core myself.
+
+### One memory, two commands, same call
+
+```
+ee remember --kind risk 'Both rm -rf and grep -c are dangerous here.'
+ee preflight check --cmd 'rm -rf /tmp/x'   -> matches 2
+ee preflight check --cmd 'grep -c foo bar' -> matches 0, matchedMemories 0, degraded []
+```
+
+Content, kind, store and call are held constant. **The only variable is whether a BUILTIN
+pattern already recognised the command as destructive.** `matchedMemories` is gated behind that
+recognition — a stored memory cannot introduce a new trigger.
+
+**So the loop we designed cannot work for our defects.** All four measured classes — pipe-exit
+rc misread, grep-as-proof, env-var-vs-argv, digest-pinned-to-a-live-file — are *non-destructive*
+commands. Seeded correctly with `--kind risk`, every one returns `matches 0 / matchedMemories 0 /
+degraded [] / rc 0`. The recall leg answers "is this dangerous", and our question is "have you
+been wrong this way before". **Different question, not a broken tool.**
+
+### Two layers, and my attribution was wrong twice
+
+1. `matchedMemories` keys off **kind**, not level: `--kind risk|anti-pattern|failure` match,
+   `fact` does not — and `ee remember --level procedural` **defaults to `--kind fact`**, silently
+   excluded. So my seeded memory was invisible for a reason unrelated to the database.
+2. Even with the right kind, layer 1 above gates it.
+
+`EE-E040` was never the blocker. I blamed the migration, pane 2 inherited that, and it cost a
+unit. The home store is genuinely drifted; **the workspace store is healthy and every write
+succeeded rc=0.**
+
+### Also overturned: `ee rule add` is not the answer either
+
+A validated, evidence-verified, workspace-scoped rule whose content **literally contains the
+command string** does not appear in `preflight check` matches — only `builtin:git_stash` with
+`source.kind=builtin` did, while the identically-worded *memory* appeared in `matchedMemories`.
+`ee rule add --help` has **no command/glob/trigger pattern flag** (proved with
+`vgrep --expect-zero`). And `ee tripwire` has **no production writer at all** — no
+`add|create|arm|set` verb exists in a 1.56MB introspect map; only the self-described fixture
+seeder `ee diag tripwire` moves the count.
+
+### The defect I care about most
+
+> `preflight check` emits an **empty** `degraded` for an unrecognised command, making
+> **"checked, no risk" byte-indistinguishable from "not covered."**
+
+That is this repo's dominant defect shape — **instance 32** — living inside the tool we adopted
+to prevent it. Two prescribed repairs are also non-executable: `no_risk_memories.repair` emits a
+`--severity` flag that does not exist (rc=1, `unexpected argument`), and
+`preflight_evidence_unavailable.repair` asks for evidence `preflight run` has no flag to supply.
+
+**Nothing filed upstream.** These are observations against a tool we do not own, gathered while
+using it, and the issue-chain gate has not been run on any of them.
+
+### What this means for the plan
+
+MAP.md action item 1 is **closed as REFUSED, not done**: the round trip closes for destructive
+commands and cannot close for ours. If we want "you have been wrong this way before", the rule
+table belongs **in `guard-rule.ts`**, which already sees every command and already writes rows —
+not in `ee preflight`, which is a danger oracle with a fixed vocabulary.
