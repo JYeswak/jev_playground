@@ -284,3 +284,11 @@ Do not invent STOP-LIVE. Do not spawn NTM from this probe.
 
 **Next lever:** bake parent peak RSS when it arrives. Then a disposable
 NTM pane (classify replay or offline Snake) — not a Jev-replacement eval.
+
+### Studio durable install retest (2026-09-20 ~10:02 MT)
+
+Install: `~/.local/share/laya-mlx/venv` + `~/.local/bin/laya-mlx`; repo `@fc1df62`.
+Pytest: `test_runtime` **18 passed**, `test_snake` **28 passed**.
+Predict retest: p50 **8.194 ms**, p95 9.667; peak RSS **986,644,480 (~941 MiB)**.
+NTM: not dispatched.
+
