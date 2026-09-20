@@ -39,6 +39,21 @@ cp "$S" "$tmp/sweep-copy.sh"
 if [ "$?" -eq 2 ]; then note ok "relocated copy refuses (rc=2)"; pass=$((pass + 1));
 else note FAIL "relocated copy did not refuse"; fail=$((fail + 1)); fi
 
+
+# ARM 4 (2026-09-20): a gitignored source must SKIP, never ERROR. A fresh clone lacks
+# work/cass-mail-mines/exports/cass-dig-rows.jsonl (mined mail, .gitignore:95), and before the fix
+# the sweep printed "ERROR ... the check itself is broken" and turned gates.sh RED for any stranger
+# following the README Quick start. Absence is not breakage and it is not agreement.
+OUT4="$(JEV_SWEEP_FORCE_ABSENT=1 "$S" 2>&1)"; RC4=$?
+if [ "$RC4" -eq 0 ] \
+   && printf '%s\n' "$OUT4" | grep -q '^  SKIP locked-dig-138' \
+   && printf '%s\n' "$OUT4" | grep -q 'AGREE-WITH-1-SKIPPED' \
+   && ! printf '%s\n' "$OUT4" | grep -q 'ERROR locked-dig-138'; then
+  note ok "absent source SKIPs, is named in the verdict, and does not RED a fresh clone"; pass=$((pass + 1))
+else
+  note FAIL "absent source did not SKIP cleanly (rc=$RC4)"; fail=$((fail + 1))
+fi
+
 echo "scripts/selftest-denominator-sweep.sh: $pass ok, $fail failed"
 [ "$fail" -eq 0 ] || exit 1
 exit 0

@@ -31,6 +31,7 @@ cd "$root" || exit 1
 }
 P="$root/scripts/pinned-denominator.sh"
 fail=0
+skipped=0
 
 check() { # check <label> <expected> <cmd...>
   local label="$1" expected="$2"; shift 2
@@ -47,7 +48,32 @@ check() { # check <label> <expected> <cmd...>
   fi
 }
 
-check "locked-dig-138" 138 grep -c . work/cass-mail-mines/exports/cass-dig-rows.jsonl
+# check_needs <source-path> <label> <expected> <cmd...>
+#
+# ABSENT IS NOT BROKEN AND IT IS NOT OK (2026-09-20). Some pinned sources are gitignored on
+# purpose -- mined agent mail, for one -- so a genuinely fresh clone does not have them. Before
+# this, `check` ran anyway, the command exited non-zero for want of a file, and the sweep printed
+# "ERROR ... the check itself is broken", turning gates.sh RED for any stranger who followed the
+# README's Quick start. The guard built to stop published counts from drifting was what failed a
+# first-time reader.
+#
+# Three outcomes now, never two: ok / DRIFT / ERROR when the source is present, and SKIP when it
+# is absent from THIS checkout. A SKIP is never counted as agreement -- it is printed, counted,
+# and named in the summary line, because this repo's dominant defect is silence read as a result.
+check_needs() {
+  local src="$1"; shift
+  # TEST SEAM: a fresh clone's condition is reproducible without moving a real mined artifact
+  # around (a gate that mv's a 20KB export and dies mid-run would destroy it). Set
+  # JEV_SWEEP_FORCE_ABSENT=1 to exercise the SKIP branch. Never consulted in normal operation.
+  if [ ! -e "$src" ] || [ -n "${JEV_SWEEP_FORCE_ABSENT:-}" ]; then
+    printf '  SKIP %s — source absent from this checkout (%s); gitignored by design, so a fresh clone cannot hold it. NOT counted as agreement.\n' "$1" "$src"
+    skipped=$((skipped+1))
+    return 0
+  fi
+  check "$@"
+}
+
+check_needs work/cass-mail-mines/exports/cass-dig-rows.jsonl "locked-dig-138" 138 grep -c . work/cass-mail-mines/exports/cass-dig-rows.jsonl
 check "census-packages-21" 21 sh -c 'ls -d work/omp-jev-* work/omp-harm-rule | wc -l'
 check "pinned-replay-55" 55 sh -c 'node work/jev-score-register/replay.mjs work/jev-score-register/fixtures/scores-pinned-20260920.jsonl | awk "/^rows/{print \$3}"'
 check "pinned-replay-api0" 0 sh -c 'node work/jev-score-register/replay.mjs work/jev-score-register/fixtures/scores-pinned-20260920.jsonl | awk "/^api calls/{print \$5}"'
@@ -56,5 +82,14 @@ check "frozen-iserror-315" 315 grep -c '"isError": true' work/p3-calibration/too
 check "backtest-29" 29 sh -c 'cd demos/routing-backtest && npm test 2>&1 | grep -c -E "^ok|ok [0-9]"'
 check "export-yes-19" 19 sh -c 'n=0; for d in work/omp-jev-* work/omp-harm-rule; do grep -rl -E "appendEntry|writeFileSync|appendFileSync|recording|register" "$d/src/" >/dev/null 2>&1 && grep -rl -E "askJev|systemOne|askJevChoice|jevClient" "$d/src/" >/dev/null 2>&1 && n=$((n+1)); done; echo $n'
 
-echo "scripts/denominator-sweep.sh: $([ "$fail" -eq 0 ] && echo ALL-AGREE || echo DRIFT-FOUND)"
+# The verdict NAMES the skips. "ALL-AGREE" over a set with an absent source would be a lie of
+# exactly the kind this sweep exists to catch, one level up from the counts it checks.
+if [ "$fail" -ne 0 ]; then
+  verdict="DRIFT-FOUND"
+elif [ "$skipped" -gt 0 ]; then
+  verdict="AGREE-WITH-$skipped-SKIPPED (sources absent from this checkout; NOT verified here)"
+else
+  verdict="ALL-AGREE"
+fi
+echo "scripts/denominator-sweep.sh: $verdict"
 exit "$fail"
