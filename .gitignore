@@ -79,3 +79,11 @@ awesome-typesafe/
 
 # jevcache writes plaintext state previews to its ledger; never commit them
 .jevcache-ledger/
+
+# Harvested real shell traffic. Regenerate with:
+#   node work/toolcall-judge-v3/harvest-allowed.mjs
+# 77,767 real commands from our own sessions; a secret-shape scan found 66
+# credential-shaped spans (bearer tokens, ghp_, AKIA, PRIVATE KEY, assignments).
+# Most are our own synthetic probes, but we cannot vouch for all 77,767, and the
+# file is deterministically regenerable, so it never enters git.
+work/toolcall-judge-v3/real-allowed.json
