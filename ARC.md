@@ -27,19 +27,25 @@
 
 | error | caught by |
 |---|---|
-| 1-second process/mtime gap read as "missing rules" (all five bound) | re-measurement |
+| 1-second process/mtime gap read as "missing rules" (all five bound) | re-measurement, reported not re-verified |
 | QUIET probe under `repeatMode: once` read as "rule absent" | P3 validation (present-and-suppressed, not missing) |
 | 3 days of one repo read as "the fleet barely writes Rust" | Joshua — `rs` is top-two fleet-wide |
-| posted body length 6282 read as "body clean" (opened DRAFT-NOT-SUBMITTED) | external review |
-| 818 `unsafe`-churn commits read as danger (was `forbid` churn; real count 2) | re-measurement with `-S'unsafe {'` / `-S'unsafe fn'` |
-
+| posted body length 6282 read as "body clean" (opened DRAFT-NOT-SUBMITTED) | external review, reported not re-verified |
+| 818 `unsafe`-churn commits read as danger (was `forbid` churn; real count 2) | conductor re-measurement with `-S'unsafe {'` / `-S'unsafe fn'` (witnessed in R66, not re-run) |
 Three of the five are one shape: a number without its denominator. Every
 number in this repo now states one.
 
 ## What shipped and stayed
 
-- Three defect rules with fire/quiet arms, suite 84/0:
-  `absence-from-one-probe`, `bash-glob-silenced`, `bash-pipe-exit`.
+- Four live defect rules with fire/quiet arms, suite 84/0:
+  `absence-from-one-probe`, `bash-glob-silenced`, `bash-pipe-exit`,
+  `bash-structural-def-search`.
+- Power caveat (NEEDS #6, same day as this arc): two of the four are
+  shipped-on-underpowered-estimate pending relabel to n=77
+  (`absence-from-one-probe`, `bash-structural-def-search`), and
+  `bash-callsite-grep-exclusion` was DISABLED — its observed FP 6/20 is
+  exactly the 0.30 bar, so no sample size can certify it. BH across the
+  family (m=17, q=0.05) changed no decision.
 - `scripts/exposure-check.sh` — one-screen exposure with denominators,
   raw-vs-real counts, and a RED arm (would have stopped the 818).
 - `consumer-check` (NEEDS #2, `4f04a48`).
