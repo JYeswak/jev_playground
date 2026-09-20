@@ -18,8 +18,10 @@
 #   selftest   the gate's own --selftest passed
 #   test       the suite is green
 #   mutation   named killers die on a planted mutant
-#   oracle     differential against the named external reference (oracles.tsv row)
-#   live       firing where it runs, observed in the production ledger
+#   receipt    the commit records or explains a result (markdown only). The most common
+#              thing this repo commits — added 2026-09-20 after the level mine showed
+#              docs-only oracle|live on 183 commits and the hook itself refused
+#              '[receipt-candidate]': the vocabulary had no word, so prose borrowed one.
 #
 # FORM. Either `[level]` anywhere in the subject, or the Jeff-style prose tail
 # `(…, <level> pending)` / `<level>-verified`. Merge commits, reverts, and fixups are exempt
@@ -29,7 +31,7 @@
 # authoring error and refuses. --selftest proves both legs: known-bad refused, known-good passed.
 set -uo pipefail
 
-LEVELS=(pending selftest test mutation oracle live)
+LEVELS=(pending receipt selftest test mutation oracle live)
 
 usage() { printf 'usage: commit-msg-verification-level.sh <commit-msg-file> | --selftest\n' >&2; }
 
@@ -49,6 +51,20 @@ exempt() {
   printf '%s' "$subject" | grep -qiE '^(Merge |Revert |fixup! |squash! )'
 }
 
+staged_docs_only() {
+  # exit 0 iff the staged paths are ALL markdown/prose (or there are none we can
+  # see — invisible means silent, never a suggestion). Never fails: any git error
+  # or empty set returns 1, because a suggestion must not nag on uncertainty.
+  local paths p
+  paths=$(git diff --cached --name-only 2>/dev/null) || return 1
+  [ -n "$paths" ] || return 1
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    case "$p" in *.md|*.mdx|*.txt|*.mdwn) ;; *) return 1 ;; esac
+  done <<<"$paths"
+  return 0
+}
+
 check_file() {
   local f="$1" subject lv
   [ -r "$f" ] || { printf 'verification-level REFUSE reason=unreadable-message-file path=%s\n' "$f"; return 1; }
@@ -58,7 +74,13 @@ check_file() {
     printf 'verification-level PASS exempt=%s\n' "${subject%% *}"; return 0
   fi
   if lv=$(level_of "$subject"); then
-    printf 'verification-level PASS level=%s\n' "$lv"; return 0
+    if { [ "$lv" = oracle ] || [ "$lv" = live ]; } && staged_docs_only; then
+      printf 'verification-level PASS level=%s\n' "$lv"
+      printf '  suggestion: docs-only diff under [%s] — consider [receipt] (the commit records a result). Passing anyway; 15/15 sampled docs-only oracle|live were genuine records, not overclaims.\n' "$lv" >&2
+    else
+      printf 'verification-level PASS level=%s\n' "$lv"
+    fi
+    return 0
   fi
   printf 'verification-level REFUSE reason=no-level subject=%q\n' "$subject"
   printf '  a commit subject must say what it PROVED. add one of: %s\n' "${LEVELS[*]}" >&2
@@ -99,8 +121,22 @@ selftest() {
   printf 'docs: note that the live demo row is still in production\n' >"$tmp/prose"
   check_file "$tmp/prose" >/dev/null 2>&1 && { echo "selftest: FAIL — 'live' as prose accepted as a level claim"; fails=$((fails+1)); }
 
+  # RECEIPT LEVEL + SUGGESTION (2026-09-20): hermetic temp-repo arms, never the real index.
+  t2=$(mktemp -d) || exit 2
+  ( cd "$t2" && git init -q . && git config user.email t@t && git config user.name t \
+    && printf 'x\n' > r.md && git add r.md && printf 'docs: record the verdict [receipt]\n' >"$tmp/goodR" )
+  ( cd "$t2" && out=$(check_file "$tmp/goodR" 2>&1) && grep -q 'PASS level=receipt' <<<"$out" ) \
+    || { echo "selftest: FAIL — [receipt] not accepted"; fails=$((fails+1)); }
+  ( cd "$t2" && printf 'docs: record the verdict [oracle]\n' >"$tmp/sug" \
+    && out=$(check_file "$tmp/sug" 2>&1) && grep -q 'suggestion:.*receipt' <<<"$out" ) \
+    || { echo "selftest: FAIL — docs-only [oracle] passed WITHOUT suggestion"; fails=$((fails+1)); }
+  ( cd "$t2" && printf 'x\n' > run.sh && git add run.sh && printf 'feat: wire the gate [oracle]\n' >"$tmp/nosug" \
+    && out=$(check_file "$tmp/nosug" 2>&1) && ! grep -q 'suggestion:' <<<"$out" ) \
+    || { echo "selftest: FAIL — runnable [oracle] wrongly suggested receipt"; fails=$((fails+1)); }
+  rm -rf "$t2"
+
   rm -rf "$tmp"
-  if [ "$fails" -eq 0 ]; then echo "selftest: PASS (4 known-bad refused, 4 known-good passed, 1 prose-not-claim refused)"; exit 0; fi
+  if [ "$fails" -eq 0 ]; then echo "selftest: PASS (4 known-bad refused, 4 known-good passed, 1 prose-not-claim refused, 3 receipt/suggestion arms)"; exit 0; fi
   echo "selftest: FAIL ($fails leg(s))"; exit 1
 }
 
