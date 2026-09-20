@@ -21,6 +21,17 @@
  * A failed call records `commit_error` — never a silent pass (NEGATIVE_EVIDENCE R40).
  */
 import { askJev } from "../../jev-client/src/index.ts";
+import { recording } from "../../jev-score-register/register.mjs";
+
+/**
+ * Every score this extension computes is persisted, so a later measurement can read it
+ * without re-calling the API. Closes the hole named in
+ * docs/demos/upstream-repro/commit-learnings-20260920.md (bf12406): 21 packages, 0
+ * exporting a Jev-derived score. The register stores a sha256 of the input, never the
+ * input — the diff and the message never reach disk through this path.
+ */
+const REGISTER = process.env.JEV_SCORE_REGISTER ?? "work/jev-score-register/scores.jsonl";
+const ask = recording(askJev, { path: REGISTER, extension: "omp-jev-commit", model: "jev-1.13.0" });
 
 const DECISION = "com.zeststream.omp-jev-commit.decision.v1";
 const DIAG = "com.zeststream.omp-jev-commit.diagnostic.v1";
@@ -92,7 +103,7 @@ export default function ompJevCommit(pi: Host) {
       }
       if (diff.length === 0) return undefined;
 
-      const result = await askJev({
+      const result = await ask({
         state: { message, diff },
         questions: {
           describes: "Does the commit message accurately describe what this diff actually changes?",
