@@ -82,6 +82,31 @@ arm_text "$A" quiet "absence: REFUSED tier, probe-said-MISSING"  'command -v mor
 arm_text "$A" quiet "absence: already downgraded to UNMEASURED"  'UNMEASURED (probe: command -v morph); a second probe is required'
 arm_text "$A" quiet "absence: two probes already run"            'I verified it with two probes and the binary is present'
 
+# FILE-TYPE rule, lives ONLY in ~/.agents/rules (universal root). No drift
+# pair exists on purpose: the drift guard skips basenames present in one
+# root only. armf mirrors armw but varies tool+path: scope matching is on
+# the tool call shape, so the arms must vary it, not the payload text.
+R="$HOME/.agents/rules/ft-rs-doctrine.md"
+if [ -e "$R" ]; then
+  armf() { # armf <expect fire|quiet> <label> <tool> <path-or-empty> <payload>
+    local want="$1" label="$2" tool="$3" path="$4" txt="$5" got out
+    if [ -n "$path" ]; then
+      out=$(omp ttsr test --rule "$R" --source tool --tool "$tool" --path "$path" "$txt" 2>&1)
+    else
+      out=$(omp ttsr test --rule "$R" --source tool --tool "$tool" "$txt" 2>&1)
+    fi
+    if grep -qE '^Triggered \([1-9]' <<<"$out"; then got=fire; else got=quiet; fi
+    if [ "$got" = "$want" ]; then note ok "$label ($want)"; pass=$((pass+1))
+    else note FAIL "$label — wanted $want, got $got"; fail=$((fail+1)); fi
+  }
+  armf fire  "ft-rs: fire on .rs edit"    edit  /tmp/probe.rs 'fn main() {}'
+  armf fire  "ft-rs: fire on .rs write"   write /tmp/probe.rs 'fn main() {}'
+  armf quiet "ft-rs: quiet on .md edit"   edit  /tmp/probe.md '# notes'
+  armf quiet "ft-rs: quiet on bash cargo" bash  ''            'cargo test -p foo'
+else
+  note FAIL "system-wide rule missing: $R"; fail=$((fail+1))
+fi
+
 # COMPILE GUARD. TTSR conditions are JavaScript RegExp: a PCRE inline flag like (?i) is invalid.
 # omp ttsr test REPORTS that, but a live session does NOT — omp://ttsr-injection-lifecycle.md says
 # an invalid condition is "logged as a warning and ignored", so the rule loads, never fires, and
