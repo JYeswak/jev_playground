@@ -48,21 +48,25 @@ demand evidence in the hit that it answers, or invent.**
 
 ## Caveats a reader needs
 
-- `Y` (which digs were "right") is a **mechanical proxy** — receipt-shaped
-  text / wrong-selector traces — not human labels.
-- > **Pane-3 non-author review: LANDED, and it WEAKENS the headline.** Both numbers
-  > recompute exactly, but the inversion is **fragile in two measured ways**, each
-  > reproduced independently ([review](./mines-nonauthor-review-20260920.md)):
-  > **(a) the "twice as bad" is a chosen constant.** A wrong dig is scored at 2× a wrong
-  > invention. At a 1:1 cost the slice is an exact **tie** (0.250 vs 0.250), not a loss.
-  > The *direction* — digging never beats inventing here — holds at every cost ≥1; the
-  > magnitude does not exist without the 2.
-  > **(b) the inversion hangs on ≤2 proxy labels.** Flip one mechanical `Y` zero to one
-  > and digging still loses (0.375 vs 0.3125); flip two and **digging wins** (0.250 vs
-  > 0.375). Sixteen rows decided by four labels from an uncalibrated proxy.
-  > Snippets are not in the export, so human calibration is impossible from the pinned
-  > file — that grading is the load-bearing next step, and until it exists **read the
-  > takeaway below as a caution, not a measured law.**
+- `Y` (which digs were "right") was a **mechanical proxy**. It has now been
+  **human-calibrated on the 16 rows that decide the finding**
+  ([calibration](./c1-calibration-result-20260920.md), labels in
+  `c1-human-y.jsonl`; [review that demanded it](./mines-nonauthor-review-20260920.md)).
+  A reader read every top snippet and judged whether it answered the question.
+  **Two labels changed, both from "the dig was right" to "it was not"** — a hit that
+  was a metrics-ledger dump, and one where `undefined` appeared only as a `session_id`
+  string value. Both are mention-vs-use: the word was present, the answer was not.
+  Recomputed with human labels, the slice gets **worse for digging, not better**:
+
+  | cost of a wrong dig | inventing | digging | |
+  |---|---:|---:|---|
+  | 1× (equal) | 0.125 | 0.375 | digging loses |
+  | 2× (our assumption) | 0.125 | **0.750** | digging loses badly |
+
+  So the earlier caveat is **retired, not softened**: at equal cost the slice is no
+  longer a tie, it breaks toward inventing, and the direction now holds without
+  depending on our chosen constant. What remains is the honest limit — **one adjacent
+  reader, n=16, and two labels either way** would still move it.
 - Practical warning, reproduced: the mail DB timestamps are in
   **microseconds**, the archive DB's in **milliseconds**. Compare them raw
   and every time-window join silently returns zero — the same zero a real
