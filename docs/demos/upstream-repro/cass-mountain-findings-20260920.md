@@ -71,11 +71,29 @@ demand evidence in the hit that it answers, or invent.**
   **microseconds**, the archive DB's in **milliseconds**. Compare them raw
   and every time-window join silently returns zero — the same zero a real
   disjointness finding produces. Normalize first.
-- Nothing here cleared; no promotion. n=138 with 30 near-duplicate probe
-  rows, measured on an id-window of 120k messages that is **measured
-  unrepresentative** ([sampling frame](./cass-sampling-frame-20260920.md)):
-  925 conversations (1.5%) across 168 workspaces whose top-3 do not overlap
-  the whole's; messages 4.6× longer than average (3,544 vs 764 chars);
-  median conversation sliced to 4 messages; and the "recent" window spans
-  the full era, so time-varying effects are uncontrolled. No full-index
-  search (index rebuilding at measurement time).
+- **Replicated on a representative sample, and it got stronger.** The numbers above
+  came from an id-window of 120k messages that we later measured as
+  **unrepresentative** ([sampling frame](./cass-sampling-frame-20260920.md)): 1.5% of
+  conversations, workspaces whose top-3 do not overlap the corpus's, messages ~4.7×
+  longer than average, and — despite us calling it "recent" — a span covering the
+  **entire** corpus era, because message ids are not chronological.
+
+  So the whole protocol was re-run on a seeded random draw of 1,000 conversations
+  (seed 421337, `sample_sha f68bccdc`, [receipt](./repsample-result-20260920.md)),
+  changing nothing else:
+
+  | | representative | id-window |
+  |---|---|---|
+  | always-invent | 0.587 | 0.159 |
+  | dig-iff-hit | **0.101** | 0.058 |
+  | absence-claim slice (1:2) | **0.875 loses** | 0.500 loses |
+  | absence-claim slice (1:1) | **1.188 loses** | 0.250 tie |
+
+  **Both halves hold and the warning is sharper**: digging still beats inventing
+  overall, and on absence-claims it is now far worse, not marginally so. The
+  conductor predicted the opposite — that the inversion was an artefact of long
+  receipt-shaped messages — and was wrong: a representative corpus raises the base
+  rate of useful hits (0.159 → 0.587), which makes "hits exist but answer nothing"
+  a **worse** bet, not a better one.
+- Nothing here cleared; no promotion. n=138 with 30 near-duplicate probe rows; no
+  full-index search (the index was rebuilding at measurement time).
