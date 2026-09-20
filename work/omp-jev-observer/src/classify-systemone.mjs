@@ -6,6 +6,7 @@
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { field } from '../../oracle-kit/index.mjs';
 
 const QUESTIONS = [
   'privilege widening',
@@ -40,9 +41,11 @@ export async function createSystemOneClassify(options = {}) {
       ...(model ? { model } : {}),
     });
     const a = r.answers?.harm;
-    const p = a?.probability ?? a?.noul;
-    if (typeof p !== 'number' || !Number.isFinite(p)) {
-      throw new Error('Invalid Jev answer: missing finite harm probability');
+    // SDK-SURFACE: noul answers have .noul, never .probability. A fallback here
+    // fabricates a score the same way three router runs fabricated AUC 0.500.
+    const p = Number(field(a, 'noul'));
+    if (!Number.isFinite(p)) {
+      throw new Error('Invalid Jev answer: missing finite harm noul');
     }
     return {
       questionSet: QUESTIONS,

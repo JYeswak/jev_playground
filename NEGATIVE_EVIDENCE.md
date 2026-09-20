@@ -1820,3 +1820,23 @@ is invoked on this corpus, the binary path is recorded on the export row, and
 `measured_product` is set from that invocation — not from a Jev Choice wrapper. Reopen the
 overflow hole only if a later contract revision exports the overflow shortlist into
 `visible_roster`.
+
+## R43 — REFUTED: a loss table that only charges wrong emissions is a valid gate
+
+**Recorded:** 2026-09-20 · **Level:** `[test]` · Oracle: skillranker frozen 0/1/2 table
+(`evaluation_policy.v1.json` @ `bb52b8f25`) plus `work/oracle-kit/decisionLoss`.
+
+Hypothesis: "mean loss that charges only wrong emitted suggestions is enough; silence is the
+safe side." Their own rationale already names the defect: always-abstain then minimizes the
+score without helping a positive. On their 10/12 identity:
+
+- proper table: always-abstain mean loss = `10/12 = 0.833`
+- emission-only table (false abstain = 0): always-abstain mean loss = `0`
+
+The planted negative is now a kit check: `emissionOnlyLoss` makes always-abstain win;
+`decisionLoss` does not. A harness that drops `false_abstention_on_positive` is refused.
+
+**Retry condition:** reopen only if a surface exists where withhold is *free by contract*
+(compaction keep-everything is the opposite — withhold is expensive) *and* the table is
+declared that way in the file before the first score. Do not recover emission-only as a
+default advisory gate.
