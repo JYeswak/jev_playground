@@ -39,7 +39,7 @@ DEMONSTRATE` = exits fine, does not produce the cited figures. `BROKEN` = cannot
 | 4 | L358 | the observe-only `grep -qE` proof | 0 | RUNS | **yes** | `observe-only: no block path` |
 | 5 | L382 | `grep -rho '"kind":"harm_[a-z]*"' ~/.omp/profiles/default/agent/sessions/ \| sort \| uniq -c` | pipeline 0, grep **2** | **BROKEN** | no | `grep: /Users/josh/.omp/profiles/default/agent/sessions/: No such file or directory (os error 2)` — and `$?` after the pipe is `uniq`'s **0**. The page's own dominant defect class, in the page's own proof command. Fixed to loop every profile with the rc taken before the pipe. |
 | 6 | L407 | `python3 ensemble/run_all.py` | 0 | **RUNS-BUT-DOES-NOT-DEMONSTRATE** | **no**, rc 2 | prints **three** pairs; the table above it has **four** and the prose singles out the missing one ("Row three is the one that cost us a published rule"). The script's own docstring says "three pairs". Row 3 is `jev-sec-bench`'s n=662 ablation, computed in a different repo. Fixed by labelling which rows the command prints. |
-| 7 | L456 | `npm --prefix compaction run replay -- …` | **2** | **BROKEN as documented** | no, rc 2 | `TYPESAFE_API_KEY is not set.` Root page said "No API key" (L279) and "none to run any tool above" (L551). `compaction/README.md:29` has said `NEEDS TYPESAFE_API_KEY; exits 2 without one` all along. Also `~/.omp/**/…` needs `shopt -s globstar`, which bash does not set (`shopt -u globstar` measured). Both fixed. |
+| 7 | L456 | `npm --prefix compaction run replay -- …` | **2** keyless / **0** keyed | **BROKEN as documented** | no, rc 2 | `TYPESAFE_API_KEY is not set.` Root page said "No API key" (L279) and "none to run any tool above" (L551). `compaction/README.md:29` has said `NEEDS TYPESAFE_API_KEY; exits 2 without one` all along. Also `~/.omp/**/…` needs `shopt -s globstar`, which bash does not set (`shopt -u globstar` measured). Both fixed. Run **with** a key through the fixed command it is rc 0 on a real jev-lab transcript: `"messagesBefore": 48, "messagesAfter": 8, "charsBefore": 277779, "charsAfter": 35706, "requests": 1, "ms": 1269` — 87.1% chars saved, so the tool works and only its documentation was wrong. |
 | 8 | L467 | `node demos/usage-shape/bin/shape.mjs ~/.claude/projects` | 0 | RUNS; dated figures no longer reproduce | yes (on any dir) | `4512 sessions, 488021 billed turns, 4519 files read` / `mean … 341907` vs the page's 4,619 / 488,724 / 4,626 / 341,496. The corpus **shrank** — Claude Code prunes its own logs. The L474 statement is dated 2026-09-18 and stays; the undated present-tense restatement at L663 was stale and is now dated with both runs. |
 | 9 | L500 | `cd demos/routing-backtest && npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out runs/try.json` | 0 | **RUNS-BUT-DOES-NOT-DEMONSTRATE** | yes | `{"denominator":{"sessions":1,"turns":6,"classifiableTurns":6,…}}` — **6** turns, no savings figure. The next sentence cites "30 classifiable turns … 0.0447%", which comes from `runs/derivation-0447-20260918T134500Z.json` (2 sessions). Fixed by naming the other run. |
 | 10 | L525 | `git clone https://github.com/JYeswak/jev_playground.git` | 0 | RUNS | yes | resolves; public tip `6eee6ab` |
@@ -173,8 +173,9 @@ Stages 95, 96 and 97 re-run after the edit: all `PASS`.
   as-of 2026-09-20 and will not reproduce as equalities later.
 - The `omp-jev-route` 147-row figure is a `customType` count only. **No claim** about what that
   package is, whether it is promoted, or whether it should be in the table.
-- The compaction replay was never run **with** a key, so this receipt says only that it refuses
-  without one. **No claim** that it succeeds with one.
+- The compaction replay **was** run with a key (rc 0, one live request, 48 messages to 8). **No
+  claim** beyond that single transcript: one session, one call, no invariant re-check beyond the
+  harness's own `"failures": []`.
 - **No claim** that the fixes in this commit are complete: five defects were fixed, four more
   (the `137 of 114` fraction, the self-install RED, the gitignored sweep pin, the four undisclosed
   packages) are reported and left to their owners.
