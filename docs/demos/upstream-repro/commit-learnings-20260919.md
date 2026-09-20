@@ -81,3 +81,12 @@ zero API calls (`8e2d533`), so the export half may be satisfied on arrival rathe
 NO-CLAIM: no skillranker PR has landed or been read; this is a registered intent, not evidence.
 Our clone is 217 commits behind `origin/main ba5da08` (bead `jev-0bp`, closed by pane 3 as
 Linux-only with rank quality unrun).
+
+SECTION wave-c skillranker PROCESS archaeology — PASS (source-read, not product) —
+public HEAD `6a74cca` receipt
+`docs/demos/upstream-repro/skillranker-process-archaeology-20260919.md`: rank arc
+wired; hook/feedback/eval CLI still planned; `src/` still does not read
+`synthetic_cases.v1.jsonl` (`frozen_contract_not_evidence`); false abstention
+costs 1 — NO-CLAIM: no `sr` run, no keyed rank, **promoted=0**. The three named
+deliverables (abstention / 0.90 gate / JSONL export) remain process patterns,
+not a shipped omp surface.

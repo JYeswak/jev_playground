@@ -451,3 +451,23 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   live observer works. R30 unread and unedited. Stages 50/60 still need
   `LOOP_KIT` (foundry); this cloud does not have it, so the aggregate cannot
   be `ALL GREEN` here. No live Jev calls. Lane: offline.
+
+---
+
+## skillranker PROCESS archaeology @ public 6a74cca (2026-09-20, DEEP PASS A)
+
+- Public HEAD `6a74ccad279b5ee4a3973790ec01b47265307a54` read via `gh api` +
+  `/tmp` shallow clone (not a workspace clone; not committed).
+- Loop extracted with file:line: session-context → roster → wide/rerank Jev →
+  rank/abstain. Hook CLI, feedback CLI, and `src/` reader of
+  `tests/eval/synthetic_cases.v1.jsonl` are **absent**. Ledger *schema* exists;
+  rank write does not (`persistence: unavailable`).
+- Eval contract still `frozen_contract_not_evidence`; always-abstain required;
+  false abstention = 1, wrong pick = 2; top-1 gate 0.90. `rg` over `src/` for
+  the cases file is empty.
+- Gap vs `omp-jev-route` / `jev-usage-router` / `omp-jev-preaction`: no roster,
+  no typed abstain cheaper than a wrong pick, no closed observe→judge loop.
+- Receipt: `docs/demos/upstream-repro/skillranker-process-archaeology-20260919.md`.
+- **Boundary:** no `sr` binary, no keyed Jev, no vendored-clone edit.
+  Process patterns ≠ product promotion. **promoted=0 untouched.**
+- Lane: offline. Claim: `[pending]` (source read, nothing executed).
