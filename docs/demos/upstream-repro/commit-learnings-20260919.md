@@ -1506,3 +1506,47 @@ A 99.5% that gets discounted by its author is worth more than a 99.5% that ships
 | this repo's commits | ~1,046 | **100%** |
 | agent-mail messages | 6,510 | **100%** |
 | CASS messages | 5,181,931 | 2.32% — next, and honestly characterised rather than pretended |
+
+## I pre-registered a prediction, the representative sample refuted it, and the finding got stronger
+
+Before the draw I wrote: *"I expect the aggregate direction to hold and the `S_wrong_selector`
+inversion to weaken, because that slice's rows are long receipt-shaped messages and the window
+over-samples long messages by ~4.7×."*
+
+**Half right, and the interesting half was wrong.**
+
+| | rep1000 (n=1,000 convs, seed 421337, sha `f68bccdc`) | window (120k ids) |
+|---|---|---|
+| y prevalence | 0.587 | 0.159 |
+| always-invent | 0.587 | 0.159 |
+| dig-iff | **0.101 BEAT** | 0.058 BEAT |
+| `S_wrong_selector` at 1:2 | **0.875 LOSE** | 0.500 LOSE |
+| `S_wrong_selector` at 1:1 | **1.188 LOSE** | 0.250 tie |
+
+The inversion did not weaken. **It roughly doubled**, and the 1:1 case that was a tie in the
+window and broke slightly toward inventing under human calibration now loses by nearly 5×.
+
+**Why my reasoning failed, which is the part worth keeping.** I predicted from the *sampling
+bias* — long messages, receipt-shaped — and ignored what a representative corpus does to the
+*base rate*: `y` prevalence goes 0.159 → 0.587. When hits usefully answer far more often
+overall, an absence-claim question where hits exist and still answer nothing becomes a *worse*
+bet, not a better one. **The window was hiding how bad digging is on that slice, not
+manufacturing it.**
+
+So the public page **stands unchanged**, and it now stands on a defensible frame rather than on
+a slice we published as "one recent 120k-message window" when it was neither recent nor a window.
+
+## What makes this result usable rather than just favourable
+
+- **Seeded and hashed**: seed 421337, `sample_sha f68bccdc03cc2cb6`, frame justified as the
+  retrieval unit, size declared before results were looked at.
+- **The locked n=138 export was not touched** — the window run survives as the comparison arm
+  rather than being overwritten by the better measurement.
+- **The control anomaly was disclosed, not buried**: a `y=1` in `S_control` is reported as slice
+  over-grouping rather than quietly dropped, with `zzzz` clean.
+- Same 138 questions, same tokeniser, same mechanical `Y`, same loss. **One thing changed.**
+
+**This is the first time tonight a conductor prediction was refuted by a pane's measurement and
+the refutation strengthened the lane's published claim.** Four times a named subset overturned a
+pooled number optimistically; this time a better frame overturned my expectation pessimistically
+— against us on the reasoning, for us on the result.
