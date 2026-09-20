@@ -667,21 +667,19 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Boundary:** no harness, no export, no Jev call, no omp seam, no
   STATUS.tsv row. Authored catalog ≠ measurement. State: **EXPLORED**.
 
-## P4 grok-challenge — RECALL kill + independent class rates (2026-09-20)
+## P4 grok-challenge — auto-recall KILL; cataloged recall shipped (2026-09-20)
 
 - Receipt: `docs/demos/upstream-repro/grok-challenge-20260920.md`. Level `[receipt]`.
-- **U2 (amended):** auto-recall KILL sourced at `eidetic_engine_cli` `cli/mod.rs:25807`
-  (`if report.matches.is_empty() { return; }`). Not embeddings. Workspace toml
-  **does** open `matchedMemories` (clean-room `*grep -c*`). Tripwires still
-  do not. Retry: release >0.15.2 with grep-c memory hit and no catalog.
-  R52-CORRECTION. C71: mirror == installed 0.15.2.
-- **U1:** own structural-grep 965/78242; P3 regex **CONFIRM 304/78242**;
-  P3 FP 0.25 **OVERTURN** (62.5% / 70.8% on seeds 20260920P4 / P4b, n=24 each).
-- **U3:** `sr-advise-20260920.md` now in EVAL; see that row. This receipt's
-  first pass was UNDERPOWERED because the file did not exist yet.
-- **Negative:** R52 + R52-CORRECTION.
-- **Boundary:** no Jev call (key absent). Morph MCP unwired in this session.
-- Source **was** read this amendment. Home store untouched.
+- **U2:** auto-recall still KILL at `cli/mod.rs:25807`. Cataloged recall is
+  the supported surface (`preflight_guard.rs:235` toml layer) and is **shipped**
+  as `jev/.ee/preflight_rules.toml`. `grep -c foo bar` → `ws_grep_c_as_proof` +
+  memories including `mem_01M30A8VERE22V7WFGAYJRTMH7`. Control empty.
+  Tripwire shim still refused. R53. Key is Infisical, not missing; no live
+  Jev this tick (choice).
+- **U1:** P3 rate CONFIRM 304; FP OVERTURN 62.5/70.8.
+- **Negative:** R52 (narrowed) + R52-CORRECTION + R53.
+- **Boundary:** no preflight hook at tool_call. Morph MCP unwired here.
+
 
 ## P2 sr-advise — verified=0 ruled, manifest eligibility 0→10, doctrine mined (2026-09-20)
 

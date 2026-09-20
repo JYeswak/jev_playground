@@ -8,7 +8,8 @@ Pane 1 correction applied here, not in the original packet: **morph is an MCP se
 
 Public URL `https://omp.sh/docs/ttsr` resolved to the omp marketing homepage, not a TTSR contract. Contract used: `omp://ttsr-injection-lifecycle.md` (injection, not enforcement).
 
-## U2 — RECALL: KILL on 0.15.2
+## U2 — auto-recall KILL; cataloged recall is the supported surface and is shipped
+
 
 **Claim under test:** WRITE-BACK (`ee remember`) reaches RECALL (`ee preflight check`). Strongest hint: preflight consumes tripwires; a tripwire created directly would close the leg today.
 
@@ -38,18 +39,26 @@ Public URL `https://omp.sh/docs/ttsr` resolved to the omp marketing homepage, no
 
 **The tripwire hint is REFUTED.** Preflight check does not consume tripwires. Using `ee diag tripwire` as a production writer would be a tautological shim; not shipped.
 
-### Ruling
+### Ruling — (a)(b)(c)
 
-**KILL auto-recall (`ee remember` alone → `preflight check`) on 0.15.2.** That loop cannot close: remember writes the memories table; preflight refuses to read it until `matches[]` is nonempty. Empty `degraded` on an uncatalogued command is still indistinguishable from "no risk."
+**(a) Yes.** A toml in `jev/.ee` can carry **our** lessons (not builtins) and make `ee preflight check` surface them for that command. Measured on this workspace, after shipping `.ee/preflight_rules.toml`:
 
-**Do not KILL cataloged recall.** Workspace toml is the documented production writer for `matches[]` besides builtins. Proven above. It is a **pre-registered pattern catalog**, same job TTSR already does at the tool call, not "stop re-learning."
+| cmd | matches | matchedMemories |
+|---|---|---|
+| `grep -c foo bar` | `ws_grep_c_as_proof` (`workspace_file`) | 4, including `mem_01M30A8VERE22V7WFGAYJRTMH7` (just remembered) |
+| `git add -A` via `--cmd-base64` | `ws_git_add_all` (`workspace_file`) | 3 |
+| `cargo fmt --check` | [] | 0 |
 
-**TTSR supersedes the tool-call slot**, not the learning loop. `omp://ttsr-injection-lifecycle.md`: match → inject; **the command still runs**.
+**(b) Supported configuration, not a shim.** Opposite of `ee diag tripwire` ("Seed a deterministic tripwire row for diagnostic fixture replay"). `PreflightGuardRegistry::load` (`preflight_guard.rs:235-238`) **layers** `<workspace>/.ee/preflight_rules.toml` after builtins; missing file is not an error. That is the production `matches[]` writer an operator is allowed to use.
 
-**Retry-conditions (three, because they repair different bugs):**
-1. **Auto-loop:** delete or gate-open `if report.matches.is_empty() { return; }` at `src/cli/mod.rs:25807` in a release **newer than 0.15.2** (C71: this pin is identical; no patch in the mirror). Witness: `grep -c` yields `matchedMemories ≥ 1` with **no** builtin and **no** `preflight_rules.toml`.
-2. **Cataloged recall (already true):** a workspace glob fires `matches[]`, kind ∈ {risk, anti-pattern, failure}, term overlap. Do not treat this as the Joshua loop.
-3. **Tripwires-into-preflight:** `load()` ingests armed tripwires into `matches[]`. Still false on 0.15.2. Do not wrap `diag tripwire`.
+**(c) Write path: hand-edit that file.** `ee preflight` subcommands are only `check/close/guard/run/show`. No `ee preflight rules add`. `ee rule add` writes a different table and does not fill `matches[]` (measured earlier). Same authoring shape as `.omp/rules/*.md`.
+
+**KILL remains for auto-recall only** (`ee remember` with no catalog glob). That is still 0.15.2-closed: `cli/mod.rs:25807`. **The whole-leg KILL in R52 was overstated** and would have blocked this ship.
+
+**Why this is not "TTSR but worse":** TTSR injects **static** rule prose. Catalog + remember injects the **memory body** (the lesson as stored). Author the glob once; later `ee remember --kind risk` updates what preflight says without rewriting the glob. That is MANUAL recall of our lessons. It is not auto-recall, and it is not live at tool-call unless something invokes `ee preflight check` (no hook does that today). Session-time injection remains TTSR's slot.
+
+**Retry auto-loop:** ee > 0.15.2, `grep -c` memories hit with this toml **removed**. Cataloged recall: shipped.
+
 
 
 ## U1 — independent predicates, then P3's exact regex
@@ -138,12 +147,12 @@ Nuisance-rate for shipped TTSR: **1 `bash-glob-silenced` fire** this session (wa
 
 ## NO-CLAIM
 
-- Did not run `foundation/gates.sh`. Did not call Jev (`/tmp/.tskey` absent; not this pane's tick). Did not `/mcp` reload morph.
-- Did not seed tripwires or toml into `jev/.ee` (clean-room only).
-- Did not file upstream. Did not ship a jev toml catalog.
-- P3 FP labels are one reader, n=48 across two seeds. Their seed `20260921` n=20 was not reproduced (I used mine plus a fresh one, as instructed).
-- Corpus still bash-only; read-bursts / claim verbs / skill-routing remain UNMEASURABLE here.
+- Did not run `foundation/gates.sh`. Did not `/mcp` reload morph.
+- Did not call Jev. The key is in Infisical (`projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba`); `/tmp/.tskey` absent is not absence. This amendment did not need a live call (choice, not a constraint).
+- Did not wrap `diag tripwire`. Did not file upstream.
+- P3 FP labels are one reader, n=48. Hook still does not call `ee preflight check` at tool_call.
+- Corpus still bash-only for U1.
 
 ## Next
 
-Auto-recall waits on retry (1). Do not spend a tick authoring `jev/.ee/preflight_rules.toml` — TTSR already catalogs at the tool call. P2 `sr-advise` lands → U3.
+A hook that runs `ee preflight check --cmd-base64` on bash tool_call would put cataloged recall at the moment of the command. That is a separate ship, not this toml. Auto-recall still waits on ee > 0.15.2. P2 live rank is theirs.

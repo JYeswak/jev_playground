@@ -1,0 +1,23 @@
+# Workspace command-risk catalog for `ee preflight check`.
+# Loaded by eidetic_engine_cli 0.15.2 `PreflightGuardRegistry::load`
+# (`src/core/preflight_guard.rs:235`) after builtins. Missing file is not
+# an error. There is no `ee preflight rules add` on this binary — this
+# file is the sanctioned write path (hand-edit; same shape as `.omp/rules`).
+#
+# A glob hit fills `matches[]`, which is what lifts the
+# `if report.matches.is_empty() { return; }` gate in `src/cli/mod.rs:25807`
+# so `ee remember --kind risk|anti-pattern|failure` can surface in
+# `matchedMemories[]`. This is MANUAL recall (catalog + memory), not
+# auto-recall from remember alone, and not a tripwire shim.
+
+[[rules]]
+id = "ws_grep_c_as_proof"
+pattern = "*grep -c*"
+action = "warn"
+message = "grep -c is not proof of absence; a zero count is not evidence the pattern is missing."
+
+[[rules]]
+id = "ws_git_add_all"
+pattern = "*git add -A*"
+action = "warn"
+message = "git add -A stages a sibling's files in this shared worktree. Stage explicit paths."

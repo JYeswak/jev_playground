@@ -2529,3 +2529,26 @@ is NO-SHIP as a substitute for the Joshua loop (duplicates TTSR).
 
 **Evidence:** `docs/demos/upstream-repro/grok-challenge-20260920.md` amendment;
 `cli/mod.rs:25802-25835`; `preflight_guard.rs:2774-2846`.
+
+## R53 — R52 whole-leg KILL was overstated; cataloged recall is the supported surface
+
+**Recorded:** 2026-09-20 · **Level:** `[receipt]`
+**Hypothesis (R52 as written):** RECALL cannot close on 0.15.2 at all.
+**Result:** auto-recall (`remember` alone) still cannot. Cataloged recall
+**can**, via `.ee/preflight_rules.toml`, which `PreflightGuardRegistry::load`
+documents as the workspace layer (`preflight_guard.rs:235`). Not a tripwire
+shim. Write path: hand-edit; no CLI mutator.
+
+Shipped: `jev/.ee/preflight_rules.toml` (git allowlisted; db still ignored).
+`ee preflight check --workspace /Users/josh/Developer/jev --cmd 'grep -c foo bar'`
+→ `matches: ws_grep_c_as_proof`, `matchedMemories` includes
+`mem_01M30A8VERE22V7WFGAYJRTMH7`. Control `cargo fmt --check` empty.
+
+**Verdict:** R52 VEIN-EXHAUSTED **only** for auto-recall. Whole-leg KILL
+**OVERTURNED**. Cataloged recall is NO-SHIP-as-auto-loop, SHIP-as-catalog.
+
+**Retry-condition (auto-loop):** unchanged from R52-CORRECTION (ee > 0.15.2,
+grep-c memories with no toml).
+
+**Evidence:** this commit; `cli/mod.rs:25807`; `preflight_guard.rs:2204-2278`
+(parse `[[rules]]` id/pattern/action/message).

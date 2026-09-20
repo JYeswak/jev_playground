@@ -39,6 +39,13 @@
 !/.beads/
 !/docs-mirror/
 !/upstream/
+# ee db/index is machine state. The workspace rule catalog is ours: it is
+# what opens matchedMemories for non-builtin commands (ee 0.15.2
+# PreflightGuardRegistry::load). Track the toml; never the database.
+!/.ee/
+/.ee/*
+!/.ee/preflight_rules.toml
+
 # The README-NOTES sidecar is TRACKED ON PURPOSE (skill://readme-update). An untracked note is
 # unreproducible: a fresh clone cannot see it, so an undrained fact would be invisible to the next
 # agent exactly when it matters. Its job is to be a log that gets emptied into README.md as state.
