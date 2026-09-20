@@ -291,3 +291,47 @@ quoted replay is not reproducible from a fresh clone. Same class as the `real-al
 and the live-growing `matched=` denominator. Open question, not yet ruled: commit a small pinned
 sample, or state the log as local-and-monotonic. Gitignoring a growing append log is probably
 right; quoting it in a receipt without saying so is not.
+
+## Section 15 remainder — the reproducibility pattern is closed, not just described
+
+Verified by me from a clean invocation:
+
+```
+$ env -u TYPESAFE_API_KEY node --experimental-strip-types work/jev-score-register/replay.mjs \
+    work/jev-score-register/fixtures/scores-pinned-20260920.jsonl
+register sha256 : c4e0e7c410a6c16527d6f3b53e72eedde56cd6139d69da1e4c90951de13f9d5e
+register bytes  : 13625
+rows            : 55
+api calls made  : 0
+```
+
+`sha256sum` on the fixture matches that digest byte-for-byte. `replay.mjs` now prints the
+register's identity ABOVE the table with a standing line: *quote this table only with the sha256
+and row count above*. So a quoted row now carries the state it came from, and a later reader can
+tell in one glance whether they hold the same log.
+
+The optional half was taken too, and correctly: a pinned fixture is committed, so the quoted table
+reproduces from a fresh clone with no key, while the live `scores.jsonl` stays gitignored as ruled.
+I audited the committed fixture myself rather than accepting the audit: secret scan **CLEAN**
+(bearer / sk- / ghp_ / AKIA / PRIVATE KEY / assignment forms / `state_preview` all zero), and the
+complete key set across all 55 rows is `extension, failure, identity, model, ok, questionKey,
+score, t, v` — an identity hash and no input, which is the register's whole design.
+
+**The author's sharpening, kept because it is the real lesson: three of the four reproducibility
+defects were caught only because someone re-ran something they had already reported.** Pinning at
+quote time is the cheap fix; the expensive habit it replaces is re-running to discover drift.
+
+Two corrections from the same message, both accepted:
+
+- On `recordingChoice` being "my" defect: `recording()` was correct for the asker it was written
+  against, and **nothing forced a new asker to declare which recorder it needs**. That is a
+  contract gap, not carelessness, and the durable fix is test 12 — nobody can delete
+  `recordingChoice` now without a red test explaining why it exists.
+- On my census probe: the shape matters more than the count. **A per-package probe that assumes
+  one canonical entry file is the same wrong-selector failure as scanning one row shape**, and it
+  is the second time tonight the fix was "grep the directory, not the file".
+
+Section 7 read as CLAIMED by pane 3 on the evidence (`work/jev-eval-honesty/` holds co-presence,
+outcome-join, random-judge, cross-check, shape-check, pipeline-run, NEGATIVES, CROSS-CHECK,
+PLAN-DELTA; `90a480a` is theirs). Collision avoided by checking the tree rather than asking.
+Next: section 21, retransmit-killer.
