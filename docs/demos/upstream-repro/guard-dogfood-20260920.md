@@ -54,7 +54,8 @@ exists anywhere.**
 The row quoted above is real and is not retracted. But `class: "pipe-exit"`
 was produced by guard-rule at `d26727a0`, and the `pipe-exit` class was
 dropped under `NEGATIVE_EVIDENCE.md` R51 and removed from the classifier at
-`e26b10f`. All 9 installed copies now hash `f10f7e16`. At the time this
+`e26b10f`. All 10 installed copies now hash `f10f7e16` — 1 global
+(`~/.omp/agent/hooks/pre/`) plus 9 profiles. At the time this
 receipt was written, jev-lab still carried the pre-drop build; it no longer
 does. So this is a true record of a build that is gone.
 

@@ -234,7 +234,7 @@ the receiver-side observe-only scan is R51's object, not R48's.
 ## 8. What `guard-dogfood-20260920.md` should now say
 
 Its proof row quotes `class: "pipe-exit"` from session
-`2026-09-20T17-49-12-422Z_01a0bfef`. That build is gone: all 9 installed
+`2026-09-20T17-49-12-422Z_01a0bfef`. That build is gone: all 10 installed
 copies now hash `f10f7e16`, which has no `pipe-exit` branch.
 
 Verified by running the *installed* classifier on the receipt's own witness:
@@ -274,7 +274,7 @@ git at all.
 |---|---|---|
 | `work/omp-guard-rule/guard-rule.ts` | `f10f7e16` — pipe-exit dropped | `d26727a0` — **pipe-exit live** |
 | `NEGATIVE_EVIDENCE.md` R51 | present | **absent** (`grep -c '^## R51'` → 0) |
-| 9 installed hook copies | `f10f7e16` | n/a |
+| 10 installed hook copies | `f10f7e16` | n/a |
 
 The drop ruling and the drop code were **both uncommitted**. A fresh clone
 got a guard that classifies `pipe-exit`, a receipt saying KEEP, and no R51
@@ -300,17 +300,38 @@ not something to bolt on inside a reconciliation.
 
 Adjacent count corrections found while verifying, not part of the ruling:
 
-- **"10 installs" is 9.** `map-hook-ee-20260920.md` publishes 10, and the
-  conductor's fix report says "all ten installs were `f10f7e16`". Counted
-  twice tonight, before and after `e26b10f`, same answer:
-  `ls ~/.omp/profiles/*/agent/hooks/pre/guard-rule.ts | wc -l` → **9**.
-  Twelve profiles exist; `omp-test`, `omp-test2`, `omp-test3` have no
-  `hooks/pre/` at all. A 10th copy of the *source* sits at
-  `~/Developer/jev_playground-export/work/omp-guard-rule/guard-rule.ts`,
-  still `d26727a0` — an export clone, not an install, and plausibly what
-  was counted. The hash claim is right (every install is `f10f7e16`); the
-  count is one high, and it is high in the direction that matters, since
-  the uncounted 10th is the one copy still carrying the dropped class.
+- ~~**"10 installs" is 9.**~~ **RETRACTED within the hour — 10 is correct,
+  and my correction was the defect.** Published first, then overturned by
+  `DogfoodMap`, then re-verified by me rather than taken on their word:
+
+  ```
+  find ~/.omp -name guard-rule.ts -not -path '*/sessions/*' | wc -l   → 10
+  # 1 global  ~/.omp/agent/hooks/pre/guard-rule.ts
+  # 9 profile ~/.omp/profiles/{claude,codex,glm,grok,jev-lab,muse,omp-1,omp-2,omp-3}/...
+  # all 10 hash f10f7e16
+  ```
+
+  I counted with `ls ~/.omp/profiles/*/agent/hooks/pre/guard-rule.ts`,
+  which cannot see the **global** install surface — a real one, which
+  `map-hook-ee` lists separately and credits with 61 `guard_pass` + 1
+  `guard_fire`. Counting it twice did not help: both counts used the same
+  blind glob, so repetition bought precision and zero accuracy. My
+  speculation that the export clone at
+  `~/Developer/jev_playground-export/work/omp-guard-rule/guard-rule.ts`
+  (real, still `d26727a0`) was "what was counted" was invention on top of
+  a bad census. `map-hook-ee`'s 10 and the conductor's "all ten" were both
+  right.
+
+  Left standing rather than deleted because it is this receipt's own
+  instance of the defect it rules on: a narrow probe read as a complete
+  census, published as a correction of someone else's correct number. The
+  guard class I just declined to re-add exists to catch the same shape one
+  layer down.
+
+  `cba7e8b`'s commit subject-body carries the wrong count ("9 installs, not
+  10") and is not amendable. This bullet is the correction of record; a
+  reader mining commit messages for counts will find a number the tree
+  contradicts, which is itself worth knowing about commit-message mining.
 - `DogfoodMap` reports guard-rule row counts of 148 by the canonical
   `customType` key vs 200 published in MAP.md (bare-identifier grep). None
   of my numbers inherit that count — my denominators are command corpora
