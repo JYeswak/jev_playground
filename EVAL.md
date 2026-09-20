@@ -610,3 +610,22 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Boundary:** this is an unpromoted design. The 10 cases were authored by the
   same pass that wrote the questions (R28). Clearing any later bar on this
   split licenses an observe-only CLI, not a working-profile advisor.
+
+## jev-task-tests-agent-mail — unpromoted design (2026-09-20)
+
+- **Receipt:** `docs/demos/upstream-repro/jev-task-tests-agent-mail-20260920.md`
+- **Lane:** offline design. **Level:** `[pending]`. Zero Jev calls. Zero `am` invocations.
+- **Upstream read (not cloned, not run):** `Dicklesworthstone/mcp_agent_mail@ac4966c`
+  (`models.py` Message / MessageRecipient / Agent; README send/ack/overseer/urgent-unread).
+  License on GitHub API: `NOASSERTION`.
+- **Process stolen:** skillranker `tests/eval/evaluation_policy.v1.json` on origin/main —
+  Choice+`__none__`, frozen 0/1/2, always-abstain required, `diagnostic_synthetic` cannot
+  promote. Vendored `skillranker@3fe85c4` was **not** moved.
+- **Contents:** 10 authored cases (8 nonempty Y / 2 empty Y; always-abstain arithmetic
+  0.800), observe-only omp/`askJevChoice` wiring sketch, B0/B1 baselines, NO-CLAIM (never
+  send authority).
+- **Negative:** `NEGATIVE_EVIDENCE.md` R42 — 0/1/2 under-prices missed in-band phishing;
+  re-asking Jev for Human Overseer `importance=high` loses cost-benefit.
+- **Boundary:** no harness, no JSONL, no hook install, no STATUS.tsv row, no live inbox
+  export. `am inbox` remains independently recorded as dead transport elsewhere; that is
+  not re-measured here.

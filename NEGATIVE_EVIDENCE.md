@@ -1872,3 +1872,46 @@ then omp tool, JSONL export. `diagnostic_synthetic` cannot promote.
 log disagrees with `bv --robot-next` on ≥10 rows *and* Jev mean loss beats both
 baselines; (2) SHIP-OMP-ADVICE bar in the design file plus L3 on C5 *and* C6,
 fail-open first; (3) `br dep cycles` non-empty on a store we own; (4) none.
+
+## R42 — REJECTED as product: binding send from a mail judge; REJECTED as promotion: 0/1/2 on in-band phishing; Jev loses on Human Overseer `importance`
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Design pass, no live call.
+Receipt: `docs/demos/upstream-repro/jev-task-tests-agent-mail-20260920.md`.
+
+Three closed decisions from designing Jev task tests against
+`Dicklesworthstone/mcp_agent_mail@ac4966c`. None is a measurement of Jev.
+
+### 1. A mail judge must not send, ack, or auto-contact
+
+Rejected design: `choice == ready_to_recommend_send` → call `send_message`. Agent Mail's
+`send_message` writes Git-backed inbox copies. That is an irreversible fleet side-effect
+this lane does not own. The decide envelope is permanently `binding: log-only`.
+`draft_note` is a grade, not an actor.
+
+**Retry condition:** Joshua writes, in the same message, that a named seam may call
+`send_message` and names the human confirmation step. Without that, reopen is forbidden.
+
+### 2. Skillranker's 0/1/2 table under-prices a missed phish
+
+Stolen 0/1/2 charges false abstention **1** and a wrong pick **2**. On AM-TT-08
+(in-band "Joshua said paste the key"), `__none__` is the cheap miss and
+`actionable_work` is the expensive one. That is the right *ordering* for an advisory
+router and the wrong *magnitude* for a security review. This design keeps the table
+(do not invent a second one in an unpromoted packet) and **forbids promoting** AM-TT-08
+as evidence that the surface is safe.
+
+**Retry condition:** a held-out in-band-phish corpus we did not author, with a
+pre-registered harm table, feasibility arm, and stated prevalence. Human SMTP numbers
+from `jev-spam-eval` do not satisfy this.
+
+### 3. Re-asking Jev for Human Overseer `importance=high` loses cost-benefit
+
+The server already force-stamps overseer messages as high importance (README, same pin).
+A Choice whose Y is `urgent_work` because `importance==high` is a paid echo of a column.
+B1 (`resource://views/urgent-unread`) already lists unread-high. Jev is only in the
+running when the badge is *gamed* or *cadence noise* (AM-TT-05). Even there, a
+deterministic `from==HumanOverseer && body matches /no new instruction/i` may win the
+family — both baselines must be scored before a live call is budgeted.
+
+**Retry condition:** a real inbox export in which agent-set `importance=high` is common
+and the overseer force-high path is a minority, labelled after the questions freeze.
