@@ -196,6 +196,24 @@ Tests 6 and 7 FAILED on first run and caught a real bug: `"$(...)"` and backtick
 EXECUTED, so stripping them hid real token capture. Command substitutions are now protected
 before quote removal and restored after.
 
+## `work/jev-retransmit-killer/adopt-gate.test.mjs` — 5 tests
+
+Run: `node --test work/jev-retransmit-killer/adopt-gate.test.mjs` (no API key; temp trees only).
+
+A gate nobody has seen fail is a decoration, so four of the five tests are PLANTED BAD TREES: the
+gate is pointed at a temp repo where exactly one thing is wrong and the exit code is asserted.
+
+1. a clean tree passes with exit 0
+2. PLANTED: moving the preregistered bar is caught, not silently honoured
+3. PLANTED: a receipt gutted of its finding is caught, not just its presence
+4. PLANTED: a missing receipt is caught
+5. PLANTED: an installed production compaction hook is caught and exits 1, not 2
+
+Test 2 is the load-bearing one. Lowering `SAVE_BAR`/`LOSS_BAR` in `fair-oracle.mjs` is the
+cheapest possible way to turn REJECT into ADOPT, and it would leave every other check green.
+Test 5 pins the exit codes apart on purpose: 1 means there is a real install to remove, 2 means
+the evidence the doctrine rests on has rotted, and collapsing them would hide the second.
+
 ## `work/jev-score-register/register.test.mjs` — 13 tests
 
 Run: `node --test work/jev-score-register/register.test.mjs` (no API key; pure local I/O).
