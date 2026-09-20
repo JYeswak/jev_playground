@@ -188,6 +188,30 @@ if [ -e "$F" ]; then
 else
   note FAIL "system-wide rule missing: $F"; fail=$((fail+1))
 fi
+# GAP-CONDITIONED ROUTER (P4, 2026-09-20). Survives R64 because the trigger IS the gap:
+# `unsafe` inside a .rs edit/write. Injection is skill names + a working jsm query, not
+# doctrine. jsm search hit rate on 15 natural queries was 6/15; the 5-term UB query is 0.
+U="$HOME/.agents/rules/rs-unsafe-added-router.md"
+if [ -e "$U" ]; then
+  armu() { # armu <expect fire|quiet> <label> <tool> <path> <payload>
+    local want="$1" label="$2" tool="$3" path="$4" txt="$5" got out
+    out=$(omp ttsr test --rule "$U" --source tool --tool "$tool" --path "$path" "$txt" 2>&1 || true)
+    case "$out" in
+      *'No rules triggered'*) got=quiet ;;
+      *Triggered*) got=fire ;;
+      *) got=quiet ;;
+    esac
+    if [ "$got" = "$want" ]; then note ok "$label ($want)"; pass=$((pass+1))
+    else note FAIL "$label — wanted $want, got $got"; fail=$((fail+1)); fi
+  }
+  armu fire  "unsafe-router: fire on .rs edit adding unsafe"  edit  /tmp/probe.rs 'unsafe fn f() {}'
+  armu fire  "unsafe-router: fire on .rs write adding unsafe" write /tmp/lib.rs   'let x = unsafe { 1 };'
+  armu quiet "unsafe-router: quiet on .rs without unsafe"     edit  /tmp/probe.rs 'fn main() {}'
+  armu quiet "unsafe-router: quiet on .md containing unsafe"  edit  /tmp/probe.md 'unsafe fn f() {}'
+  armu quiet "unsafe-router: quiet on bash even with .rs path" bash  /tmp/probe.rs 'unsafe fn f() {}'
+else
+  note FAIL "system-wide rule missing: $U"; fail=$((fail+1))
+fi
 # BOTH ROOTS. Project rules apply only in this repo; `~/.agents/rules/*.md` is the `agents`
 # provider (priority 70) and is PROFILE-INDEPENDENT and PROJECT-INDEPENDENT — proven 2026-09-20
 # by loading a canary from /tmp, where `omp ttsr list` showed it as `[agents]`. That root is where
@@ -251,6 +275,47 @@ out=$(omp ttsr test --rule "$red_dir/leading-flag.md" --source text 'zzzz_cannot
 case $out in
   *'no usable TTSR condition'*) note FAIL "compile near-miss: a LEADING (?i) was rejected — guard is over-strict"; fail=$((fail+1)) ;;
   *) note ok "compile near-miss: leading (?i) accepted, not flagged"; pass=$((pass+1)) ;;
+esac
+
+# EXPOSURE RED ARM. The 818-class error counted forbid(unsafe_code) churn as
+# danger: raw `unsafe` is high (60 declaration payloads), real danger is near
+# zero (1 payload). A tool reporting only the raw count would verdict
+# WALLPAPER here (2/2 sessions); the honest tool reports both counts and
+# verdicts TOO_RARE on the real one.
+exp_dir=/tmp/exposure-redarm; mkdir -p "$exp_dir"
+python3 - "$exp_dir" <<'PY'
+import json, os, sys
+d = sys.argv[1]
+rows = []
+for i in range(60):
+    rows.append({"type": "message", "message": {"role": "assistant", "content": [
+        {"type": "toolCall", "name": "edit",
+         "arguments": {"path": "src/a%d.rs" % i,
+                       "content": "#![forbid(unsafe_code)]\nfn f%d() {}\n" % i}}]}})
+with open(os.path.join(d, "sess-a.jsonl"), "w") as fh:
+    for row in rows:
+        fh.write(json.dumps(row) + "\n")
+with open(os.path.join(d, "sess-b.jsonl"), "w") as fh:
+    fh.write(json.dumps({"type": "message", "message": {"role": "assistant", "content": [
+        {"type": "toolCall", "name": "edit",
+         "arguments": {"path": "src/evil.rs",
+                       "content": "fn f() { unsafe { 1 } }\n"}}]}}) + "\n")
+harvest = {"records": [{"command": c} for c in
+           ["cargo test", "rg unsafe src", "ls", "echo hi", "make"]]}
+with open(os.path.join(d, "harvest.json"), "w") as fh:
+    json.dump(harvest, fh)
+PY
+out=$(EXPOSURE_CORPUS_DIR="$exp_dir" EXPOSURE_HARVEST="$exp_dir/harvest.json" \
+  ./scripts/exposure-check.sh --pattern 'unsafe' --not 'forbid\(unsafe_code\)' --label 'red-forbid' 2>&1 || true)
+case "$out" in
+  *'payloads: 1/61'*'raw 61, 60 excluded'*)
+    note ok "exposure RED arm: raw-vs-real discrepancy reported (61 raw, 1 real)"; pass=$((pass+1)) ;;
+  *) note FAIL "exposure RED arm: tool did not report raw-vs-real — got: $out"; fail=$((fail+1)) ;;
+esac
+case "$out" in
+  *'VERDICT: TOO_RARE'*)
+    note ok "exposure RED arm: verdicts on the real count (TOO_RARE)"; pass=$((pass+1)) ;;
+  *) note FAIL "exposure RED arm: wrong verdict — a raw-only tool would say WALLPAPER"; fail=$((fail+1)) ;;
 esac
 
 # Every project rule must own at least one arm above — a rule file with no test is a rule nobody
