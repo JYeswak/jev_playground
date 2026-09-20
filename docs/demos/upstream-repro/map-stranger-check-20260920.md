@@ -40,7 +40,7 @@ All 6 links resolve. All bare paths named in prose exist (`docs/demos/PLAN.md`,
 | 5 | 89 observer rows | **CONFIRMED exactly** | 59 + 30 = 89 |
 | 6 | 200 guard-rule rows | **OVERTURNED** | 148 (81 + 67) |
 | 7 | 40.4% of 1,098 non-merge commits | **CONFIRMED as-of** | 444/1,098 = 40.44%; live 444/1,121 = 39.6% |
-| 8 | 9.2% of 206 receipts cited | **CONFIRMED as-of** | 19/206 = 9.22%; live 19/217 = 8.8% |
+| 8 | 9.2% of 206 receipts cited | **CONFIRMED exactly at `038aeb4`** | 19/206 = 9.22%; live share falling (8.8% → 8.6% during this check) |
 | 9 | largest source file 469 lines | **CONFIRMED exactly** | `work/skillranker-eval/score.mjs` 469 |
 | 10 | `docs/demos/PLAN.md` 5,448 lines | **CONFIRMED exactly** | 5,448 |
 
@@ -196,14 +196,26 @@ that is **221**.
 ### 1.8 — 9.2%: confirmed, and the gap is widening
 
 ```bash
-git ls-files docs/demos/upstream-repro | grep -c '\.md$'                              # 217 (was 206)
+# PINNED — the denominator reproduces exactly at the source receipt's own scan HEAD
+git ls-tree -r --name-only 038aeb4 docs/demos/upstream-repro | grep -c '\.md$'         # 206
+git ls-tree -r --name-only 038aeb4 docs/demos/upstream-repro | grep '\.md$' \
+  | grep -vc '/README\.md$'                                                            # 205
+# LIVE — re-run both, never quote a frozen figure from this receipt
+git ls-files docs/demos/upstream-repro | grep -c '\.md$'                               # 217 -> 221
 awk -F'\t' '!/^#/ && $1!="candidate" {print $6}' docs/demos/STATUS.tsv \
-  | grep 'upstream-repro' | sort -u | wc -l                                           # 19
+  | grep 'upstream-repro' | sort -u | wc -l                                            # 19
 ```
 
-19/206 = **9.22% CONFIRMED as-of**. Live: **19/217 = 8.8%** — 11 receipts added, **zero** citations
-added. This is the mirror image of §1.7: here the numerator is frozen and the denominator grows, so
-the citation gap is *widening*. That strengthens action-plan item 4 rather than dating it.
+19/206 = **9.22% CONFIRMED exactly at `038aeb4`**, and the `206` denominator counts tracked `.md`
+**including `README.md` itself** (205 without it) — so the index cannot cite its way out of its own
+denominator.
+
+**Do not quote a live figure from this receipt; re-run the command.** It was 19/217 = 8.8% when I
+measured and 19/221 = 8.6% forty minutes later, because three siblings landed receipts into this
+directory while I wrote — 15 added since `038aeb4`, **zero** citations added. The numerator is
+frozen and the denominator is growing, which is the mirror image of §1.7: the citation gap is
+*widening*, and it widened measurably during a single session. That strengthens action-plan item 4
+rather than dating it, and it is the reason the pinned pair above exists.
 
 ### 1.9 / 1.10 — the two file-size numbers are exact
 
@@ -421,12 +433,13 @@ grep -cE ':::dead|class .*dead' /tmp/map.mmd        # 0, rc=1
 |---|---:|---:|---|
 | non-merge commits | 1,098 | 1,121 | +23 |
 | abandoned-scope commits | 444 | **444** | unchanged → share falling |
-| tracked receipts in `upstream-repro` | 206 | 217 | +11 |
+| tracked receipts in `upstream-repro` | 206 | 217 → **221** | +15, and moved twice while I wrote |
 | receipts cited by `STATUS.tsv` | 19 | **19** | unchanged → gap widening |
 | `work/` directories | 53 | 54 | +1 |
 
 The 54th `work/` dir is `work/pipe-exit-reconciliation/`, untracked, created **by a sibling agent
-while I was measuring**. MAP.md's NO-CLAIM anticipates exactly this, and it held.
+while I was measuring**, and the receipt count moved 217 → 221 in the same window. MAP.md's
+NO-CLAIM anticipates exactly this, and it held.
 
 Confirmed exactly and not otherwise listed: 13 gate stages · 10 `guard-rule.ts` installs, 10
 distinct inodes, all `f10f7e16` (1 global `~/.omp/agent/hooks/pre/` + 9 profiles) · 22 files in
