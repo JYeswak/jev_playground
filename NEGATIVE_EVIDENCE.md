@@ -1863,3 +1863,34 @@ still `REPRODUCIBLE`, and (c) `organic-fires.mjs` re-run showing fires below 28 
 denominator. All three, or it stays refused. The distinction to build on: **text quoted as an
 argument to an interpreter is code; text quoted as a payload is not** — and the general form of
 that test is the open problem, not the `sed` special case.
+
+### R41 — DEFEATED 2026-09-20 at `e33bd5d`, with the spirit still open
+
+All three trigger conditions met, each run at defeat time:
+
+```
+rules-v4.test.mjs      14/14 (was 10/10; four R41 arms added)
+verify-claim.mjs       VERDICT: REPRODUCIBLE COMMITTED CORPUS  (12/12, FP 0/38)
+organic-fires.mjs      81,175 scored, fires 5  (was 28)
+```
+
+**The fix is POSITIONAL, not a command allowlist** — the distinction my first repair missed. A
+quoted span is code only when it occupies the slot after an interpreter code-flag (`-c`, `-e`,
+`-i`, `--expression`), not when its binary happens to be an interpreter: `python3 -c '...'` is
+code, `python3 app.py --note '...'` is not. **`-p` is excluded and the exclusion is measured** —
+`perl -p` is code but `omp -p "..."` is a prompt, and including it broke the quoted-prompt arm.
+
+**THE SPIRIT IS NOT MET AND THE REFUSAL'S POINT SURVIVES ITS DEFEAT.** Organic precision is still
+**0** — all five survivors are our own probe commands, where a dangerous command string sits as a
+JS string literal inside a `-e` program. The rule is right to treat `-e` as code; that code merely
+*mentions* a command as data. **Mention-vs-use did not die, it retreated one level — from shell
+quoting into program literals.**
+
+So: 82% fewer false positives, the curated result preserved, and a rule that still does not fire
+on danger. The letter of the trigger was satisfiable; I wrote the letter, so the gap is mine.
+
+**NEW TRIGGER, for whoever goes a level deeper:** a rule that distinguishes a command string
+*executed* inside an interpreter program from one *passed as data* within it. Proven by
+`organic-fires.mjs` fires reaching 0 with `verify-claim.mjs` still `REPRODUCIBLE` and
+`rules-v4.test.mjs` still green. Until then this stays a mitigation, not a fix, and
+`docs/INTEGRATIONS.md`'s 0-of-28 caveat stands with its number updated to 5 fires of 5.
