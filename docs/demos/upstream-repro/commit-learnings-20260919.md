@@ -1628,3 +1628,51 @@ then omitted `--falsifier` and read that as one too. **Both times the tool was r
 reading was wrong** — the same argv-versus-shell-string mistake I made against
 `pinned-denominator.sh` two hours earlier. Twenty-eighth instance of the class, and the second
 time against a tool built to stop a *different* instance of it.
+
+## The closure landed, and the two honest results are both zeros
+
+`selftest-ruling-closure.sh` **4/4**, `selftest-rung-demotion.sh` **2/2**, stage 80 now discovers
+**21** suites. Verified here, not accepted.
+
+**Projection: 3 closures render, 40 of 40 committed rows uncovered.** The projector cannot
+reproduce the existing state of record because **the history predates the instrument** — those
+40 rulings were written before a closure existed to emit. Pane 2 reported that as a finding
+rather than backfilling closures to make the number look good, which is the correct call: a
+retro-fitted closure would carry a falsifier nobody committed in advance and would be a lie in
+the exact shape the object exists to prevent.
+
+**Demotion: 0 of 40 rows demote.** The broad rule was unmeasurable — rows carry no authored
+`as_of` — so it was narrowed to the two artifacts we know are live-measured, and those are 0
+too. **A rule that fires on nothing today is a tripwire, not an alarm**, and it was wired as a
+**reporter rather than an auto-editor**: having just built a projector precisely because
+parallel hand-maintained files drift, adding a second thing that edits `STATUS.tsv` would have
+recreated the defect one layer up.
+
+**A vocabulary mismatch surfaced that nobody had noticed**: callbacks speak `DONE|HELD|REFUSE`
+while `STATUS.tsv` speaks `CLEARED|HELD|RULED_OUT`. Two enums for one concept, translated by
+hand at every callback all session. That is the same class as the missing `receipt` level —
+a word we lacked, filled in by improvisation.
+
+## The callback-sha class produced its fifth instance, in a new shape
+
+Pane 2 sent `8a22c35`, then **self-corrected to `b84a226` unprompted**, reporting *"cited from
+memory, unverified — my error, packet contract requires the sha and I sent one I had not read."*
+
+I checked: `git cat-file -t 8a22c35` → `fatal: Not a valid object name`. **The sha did not
+exist.**
+
+R47 refused a guard against sha **omission**, reasoning that no hook sees a callback string.
+That still holds for the sender. **But fabrication is not omission**, and the receiver holds the
+string in hand:
+
+```
+git cat-file -t <sha>     # "commit" = real; "fatal" = fabricated or unpushed
+```
+
+One command, no hook, no sender cooperation. Appended to R47 as a **receiver-side practice**,
+not a gate — there is nothing to wire it into, because the receiver is an agent reading a
+message. I have been doing it inconsistently; it is now part of classifying every callback, and
+I applied it immediately to `634dcd2`, which resolves.
+
+**The pane caught its own fabricated sha and cited the contract against itself.** That is why
+this is a recorded practice rather than a discovered defect.
