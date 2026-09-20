@@ -1,0 +1,7 @@
+MINE importance-prevalence  store=mail  n=6510  elevated=752  prevalence=0.115514593
+  mix  normal=5758 high=566 urgent=186
+CONTROL always-abstain      mean_loss=0.115514593  (752/6510)
+BASELINE always-elevated    mean_loss=1.768970814  vs_control=LOSE
+LENGTH_BASELINE  NOT_RUN  (needs exports/importance-rows.jsonl)
+SOURCE  Studio probe 2026-09-20 parent ExternalShell aggregates
+NO-CLAIM  [pending] promoted=0  no subject/body rows in this arm

@@ -90,3 +90,8 @@ work/toolcall-judge-v3/real-allowed.json
 
 work/jev-score-register/scores.jsonl
 work/p2-localjev/
+
+# Live mail/cass row exports (may contain operational text)
+work/cass-mail-mines/exports/*.jsonl
+!work/cass-mail-mines/exports/*-receipt.txt
+!work/cass-mail-mines/exports/*-blocked.txt
