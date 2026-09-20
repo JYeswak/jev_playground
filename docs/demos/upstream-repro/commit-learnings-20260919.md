@@ -834,3 +834,35 @@ concurrent panes run. It holds at these row sizes, with the caveat pinned in the
 The review's Attack 1 verdict: **the rule is computable, not right.** Interface-compatible
 refactors count as behaviour changes; runtime-read JSON configs are invisible to it. Unaddressed,
 and recorded rather than argued away.
+
+## The stranger test on `docs/RULES.md` — TRUE, after two fixes, one of them mine
+
+`rules-stranger-test-20260920.md`. Nine commands run verbatim from the repo root, unpiped exit
+codes, no Jev calls. All nine RUN and all nine DEMONSTRATE their rule — the distinction that
+mattered, since "exits 0" is not the same as "a reader sees the claimed thing". All cited shas
+resolve.
+
+**Seven of nine work on a fresh clone. Two do not, and now say so.** Rules 1 and 2 read the
+machine's own omp session logs, which are gitignored and cannot be regenerated from a clone —
+**a command that needs a file a stranger does not have is a broken promise even when it runs
+here.** The fix is the disclosure, not a fixture: no committed artifact can substitute for
+another machine's sessions, and the reviewer answered the "smallest honest fixture" question by
+saying so rather than inventing one.
+
+**The other fix is my error.** The header read *"Eight rules"* while the page carried nine. I
+introduced that when I merged rule 7 and added rule 9 — and my own commit message that turn said
+*"Still nine rules, no deletion, 85 lines."* **I verified the rule count and never read the
+sentence above it.** Stage 97 catches exactly this class for README stage counts; `docs/RULES.md`
+has no such gate, so it took a human running the page as a stranger.
+
+Verified here: header now reads "Nine rules"; rule 1 carries *"Needs the machine's own omp session
+logs, which are gitignored and not in a fresh clone"*; rule 2 carries *"Same session-log
+dependency as rule 1."* Spot-ran rule 5 — `api calls made : 0`, `repeat scorings … 0`.
+
+**My own check was too narrow again**: I grepped for one caveat phrasing, found a single hit, and
+briefly doubted a correct report. Both caveats were present in different wording. That is the
+selector defect one more time, at the smallest possible scale, in the act of auditing someone
+else's audit.
+
+**The page is true as written.** That is worth stating plainly because it is the artifact most
+likely to be read by someone who was never in this lane.
