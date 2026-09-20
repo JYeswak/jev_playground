@@ -1875,3 +1875,54 @@ needs an input in a format it accepts, and the PATH install is still pending SLB
 that was pending SLB approval has landed, so the NO-CLAIM above ("absolute path only") is
 retired. Upstream still ships a Linux-gated storage module; this is our fork on our machine,
 not a fix anyone else has.
+
+## Twelve minutes: the upstream race, and the memory rule it earns
+
+```
+9c52a64  Jeffrey  2026-09-20 18:05:28Z  feat(storage): admit a qualified cache/ledger on macOS APFS/HFS
+8cca771  ours     2026-09-20 18:17:33Z  macOS port: storage admission by volume name
+```
+
+**Our port committed twelve minutes after upstream shipped the same fix.** Seventeen commits have
+landed since our base `abf909d`, three of them macOS/storage, and the gate upstream now reads:
+
+```rust
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub mod storage;
+```
+
+His commit message — *"Linux-only cfg hid the store from macOS even though nix walks work
+there"* — is the **same insight** pane 3 reached independently: admission by filesystem, not
+stubbing storage out. **This is not a wrong turn; it is a race we did not know we were in.**
+
+The one substantive difference favours upstream: **he WIDENED the cfg, we DELETED it.** Ours
+would compile storage on FreeBSD and Windows where the `nix` walks are unvalidated. Adopt his
+shape.
+
+### Why this is the ee/hook problem, exactly
+
+Phase −1 of the issue chain mandates a dedup probe *before diagnostic work*. Pane 3 ran it —
+that is how we knew about #3 and commented instead of filing a duplicate. **The probe was
+correct and still insufficient, because it is defined against ISSUES and this collision happened
+in COMMITS.** An issue list does not show you a fix that landed twelve minutes ago and has not
+been released or written up.
+
+So the missing guard is not "probe harder before starting". It is:
+
+> **Re-probe upstream immediately before committing a port, not only before starting one.**
+> `git fetch && git log <base>..origin/main` costs two seconds and is the only thing that catches
+> a same-hour collision on a repo shipping hourly.
+
+That is a command-shaped rule with a corrected command, which is precisely the shape the `ee`
+memory is supposed to hold and cannot today (`EE-E040 migration_drift`). **Instance one of the
+class we designed the loop for, arriving before the loop exists** — recorded here so the seed
+list has a real entry waiting when `ee` is repaired.
+
+### Consequence for the filing Joshua asked for
+
+A comprehensive new issue would duplicate an **open thread the maintainer is actively working**,
+which is the top anti-pattern in the chain. Jeffrey has already replied on #3: *"Leaving this
+issue open for the actual native macOS portability work."* If upstream now builds clean on this
+Mac, the deliverable is a **comment** carrying only what upstream has not touched — by
+file-level diff: `src/subprocess.rs` group-kill, `src/cache/coordination.rs`,
+`src/context/signals.rs`, and four test files. **Not a new issue.**
