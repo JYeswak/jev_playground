@@ -646,3 +646,23 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Negative:** `NEGATIVE_EVIDENCE.md` R44.
 - **Boundary:** no TYPESAFE, no Jev call, no omp seam, no CASS / agent-mail
   (this VM cannot reach those volumes). Lane: offline. Claim: `[test]`.
+
+## cass / agent-mail alpha approaches — 24 mines, unpromoted (2026-09-20)
+
+- **Receipt:** `docs/demos/upstream-repro/cass-mail-alpha-approaches-20260920.md`
+  (24 cards) + `work/cass-mail-mines/README.md` (Studio-first A02 → A05 → A11).
+- **Lane:** offline design. **Level:** `[pending]`. **`promoted = 0`.**
+- **Not PR #31 / #32:** those stay on `toolcall-corpus-frozen.jsonl`
+  (`sess` / `args` / `isError` / `args_len_*`). This catalog does not reprint
+  0.212 / 1.495 / 0.197 as cass or mail numbers.
+- **Process stolen:** skillranker `__none__`, 0/1/2, always-abstain, planted
+  RED, `diagnostic_synthetic` cannot promote, prevalence gates, VOI vs cheap
+  baseline, outcome co-presence, dig-vs-invent, selector≡claim.
+- **Stores named, not opened:** `/Volumes/ZestData/cass-data/agent_search.db`
+  (~59.8k / 5.2M) and live agent-mail (~6510). This VM: no ZestData, no
+  `cass`, no `am`, no key.
+- **First Studio mines:** A02 high-badge echo; A05 ack SLA; A11 mail↔cass
+  join. Cass-fallback if mail is dead: A12 / A08 / A24.
+- **Negative:** `NEGATIVE_EVIDENCE.md` R45.
+- **Boundary:** no harness, no export, no Jev call, no omp seam, no
+  STATUS.tsv row. Authored catalog ≠ measurement. State: **EXPLORED**.

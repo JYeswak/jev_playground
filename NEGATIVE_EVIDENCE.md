@@ -2208,3 +2208,35 @@ n=10 are not n=7846.
 labelled real file (CASS export, agent-mail export) of comparable n, with
 the same identity lock, and states prevalence beside the score. Do not
 reopen by writing ten more authored envelopes.
+
+## R45 — REJECTED: port PR #32 toolcall features onto CASS/mail; REJECTED: promote a 24-card unrun catalog
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Design pass, no store
+access. Receipt:
+`docs/demos/upstream-repro/cass-mail-alpha-approaches-20260920.md`.
+
+Two closed decisions from cataloguing mines against CASS
+(`/Volumes/ZestData/cass-data/agent_search.db`) and Agent Mail (~6510
+messages). This cloud VM cannot see either store.
+
+### 1. Do not port `sess` / `args` / `isError` / `args_len_*` onto cass or mail
+
+PR #31 / #32 already scored `toolcall-corpus-frozen.jsonl` (always-abstain
+0.212210043; isError-only 1.495284221 LOSE; logistic CV 0.197426005 BEAT).
+Those columns are not cass hit fields and not mail frontmatter. Copying the
+feature list is a selector≡claim fail, not a new mine.
+
+**Retry condition:** a *different* identity-locked export whose own columns
+are labelled after questions freeze. Never reopen by renaming `sess_repo_*`
+onto `workspace` or `isError` onto `ack_ts`.
+
+### 2. A 24-card catalog cannot promote
+
+`diagnostic_synthetic` / unrun sketches are `forbidden_use` for promotion
+(`evaluation_policy.v1.json:53-56`). R28 / R44 already killed authored
+n=10 batteries as a substitute for a real corpus. This catalog is EXPLORED.
+
+**Retry condition:** Studio runs A02 (or cass-fallback A12) on an export
+this pane did not author, prints always-abstain + cheap baseline +
+prevalence, identity-locks sha256, and a non-author confirms. Until then
+`promoted = 0`.
