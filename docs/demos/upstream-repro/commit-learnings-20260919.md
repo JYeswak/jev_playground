@@ -1588,3 +1588,43 @@ scoreboard stale.
 commands I used to check other people's work were what broke. That asymmetry is the most useful
 thing I learned about myself tonight, and it is why the guards belong in the repo rather than in
 a doctrine file: the doctrine had warned about all seven.
+
+## The ruling closure exists, and it refuses a ruling with no falsifier
+
+`work/ruling-closure/emit.mjs` (7912b02). Verified rather than accepted:
+
+```
+emit --candidate TEST-probe --rung 3 --verdict HELD --receipt <repsample> \
+     --falsifier <repsample-falsifier> --falsifier-sha abc1234 --falsifier-fired no
+-> wrote TEST-probe.closure.json, receipt digest 27fdfd16c4ae4aa8
+```
+
+**That digest is byte-identical to the `lane-status.sh` rule**, which I computed independently
+before running the emitter. The instruction was *"reuse the normalisation — do not invent a
+second hashing rule"*, and a second rule is exactly the kind of drift that would make the
+closure and the state of record disagree while both looked green.
+
+Refusal legs, each with a named reason:
+
+```
+--rung 9                    -> REFUSE, --rung must be 1-5
+--receipt docs/nope.md      -> REFUSE, receipt unreadable
+no --falsifier at all       -> REFUSE, missing required --falsifier
+```
+
+**The third one is the design decision that matters: a ruling cannot be emitted without a
+falsifier.** Rule 3 of `docs/RULES.md` has said "commit what would prove you wrong before the
+first call" all session, and it was enforced by nothing but attention — panes honoured it because
+they are disciplined, and I verified it by comparing commit timestamps by hand, three times
+tonight (85s, 89s, 67s ahead). **Now the artifact cannot exist without it.**
+
+That is the `franken_alignment` lesson landing in one line of code rather than in a doctrine
+file: the object that authorizes the claim *is* the object that carries its calibration sample.
+
+## My own invocations were wrong twice before the tool was
+
+I passed `--candidate=VALUE` where it documents `--candidate VALUE`, read `REFUSE` as a defect,
+then omitted `--falsifier` and read that as one too. **Both times the tool was right and my
+reading was wrong** — the same argv-versus-shell-string mistake I made against
+`pinned-denominator.sh` two hours earlier. Twenty-eighth instance of the class, and the second
+time against a tool built to stop a *different* instance of it.
