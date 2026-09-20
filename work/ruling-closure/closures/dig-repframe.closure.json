@@ -1,0 +1,34 @@
+{
+ "candidate": "dig-repframe",
+ "rung": 4,
+ "verdict": "CLEARED",
+ "outcome": "DONE",
+ "author": "Muse",
+ "score": "0",
+ "blocked_on": "",
+ "concur": "",
+ "receipt_type": "measurement",
+ "receipt": {
+  "path": "docs/demos/upstream-repro/repsample-result-20260920.md",
+  "digest": "27fdfd16c4ae4aa8"
+ },
+ "falsifier": {
+  "path": "docs/demos/upstream-repro/repsample-falsifier-20260920.md",
+  "commit_sha": "009c224",
+  "fired": false,
+  "digest": "0a6a5cfad424526b"
+ },
+ "inputs": [
+  {
+   "path": "/Volumes/ZestData/cass-data/agent_search.db",
+   "sha": null,
+   "live": true,
+   "as_of": "2026-09-20"
+  }
+ ],
+ "guards": {
+  "pin-liveness": 0,
+  "pinned-denominator": 0
+ },
+ "emitted_at": "2026-09-20T17:25:01.444Z"
+}

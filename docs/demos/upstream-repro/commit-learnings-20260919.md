@@ -1550,3 +1550,129 @@ a slice we published as "one recent 120k-message window" when it was neither rec
 the refutation strengthened the lane's published claim.** Four times a named subset overturned a
 pooled number optimistically; this time a better frame overturned my expectation pessimistically
 — against us on the reasoning, for us on the result.
+
+## Coverage, end of the arc: two corpora at 100%, one honestly characterised
+
+`corpus-coverage-20260920.md`. Four links, all verified to resolve (with the *correct* selector
+this time — my first link-checker tonight stripped the dot in `.md` and reported 4 of 4 missing).
+
+| corpus | size | mined | what it told us |
+|---|---|---|---|
+| this repo's commits | ~1,067 | **100%** | the verification level is decorative — `oracle` never touched a test file |
+| agent-mail | 6,510 | **100%** | **58 of 3,135 ack-required messages were ever acked — 1.85%** |
+| CASS | 5,181,931 | 2.32% window **+ n=1,000 replication** | dig beats invent overall, loses badly on absence-claims |
+
+We began the night at CASS 2.32%, mail 4.4%, commits **0%**.
+
+**The page leads with advice, not status**, which is the bar I set for it. The sharpest line is
+about us: *"A flag that fires 1.85% of the time is not a handshake; it is a log line."* Either
+enforce the ack or design for unacked mail — but do not keep asking for something the fleet
+almost never sends.
+
+### Live-monotonic, now measurable as a rate
+
+The commit corpus across one session: **1,040 → 1,043 → 1,046 → 1,067 → 1,110.**
+
+Every one of those is correct as-of its moment, and any of them quoted bare next week is wrong.
+That is the entire case for the as-of labels, demonstrated on the corpus we control most tightly
+— and it is why the published `78,455` from yesterday is unrecoverable rather than merely stale.
+
+### What the guards did to their author tonight
+
+Shipped four, and they fired on me **seven** times: five `vgrep` catches on my own greps, the
+`STATUS_TSV`-as-env-var misread, and stage 97 going RED one tick after I dispatched the scope
+change that made it able to see numerals — because I added seven rows and left the README
+scoreboard stale.
+
+**Every one was a verification error, not a judgment error.** The rulings I made held up; the
+commands I used to check other people's work were what broke. That asymmetry is the most useful
+thing I learned about myself tonight, and it is why the guards belong in the repo rather than in
+a doctrine file: the doctrine had warned about all seven.
+
+## The ruling closure exists, and it refuses a ruling with no falsifier
+
+`work/ruling-closure/emit.mjs` (7912b02). Verified rather than accepted:
+
+```
+emit --candidate TEST-probe --rung 3 --verdict HELD --receipt <repsample> \
+     --falsifier <repsample-falsifier> --falsifier-sha abc1234 --falsifier-fired no
+-> wrote TEST-probe.closure.json, receipt digest 27fdfd16c4ae4aa8
+```
+
+**That digest is byte-identical to the `lane-status.sh` rule**, which I computed independently
+before running the emitter. The instruction was *"reuse the normalisation — do not invent a
+second hashing rule"*, and a second rule is exactly the kind of drift that would make the
+closure and the state of record disagree while both looked green.
+
+Refusal legs, each with a named reason:
+
+```
+--rung 9                    -> REFUSE, --rung must be 1-5
+--receipt docs/nope.md      -> REFUSE, receipt unreadable
+no --falsifier at all       -> REFUSE, missing required --falsifier
+```
+
+**The third one is the design decision that matters: a ruling cannot be emitted without a
+falsifier.** Rule 3 of `docs/RULES.md` has said "commit what would prove you wrong before the
+first call" all session, and it was enforced by nothing but attention — panes honoured it because
+they are disciplined, and I verified it by comparing commit timestamps by hand, three times
+tonight (85s, 89s, 67s ahead). **Now the artifact cannot exist without it.**
+
+That is the `franken_alignment` lesson landing in one line of code rather than in a doctrine
+file: the object that authorizes the claim *is* the object that carries its calibration sample.
+
+## My own invocations were wrong twice before the tool was
+
+I passed `--candidate=VALUE` where it documents `--candidate VALUE`, read `REFUSE` as a defect,
+then omitted `--falsifier` and read that as one too. **Both times the tool was right and my
+reading was wrong** — the same argv-versus-shell-string mistake I made against
+`pinned-denominator.sh` two hours earlier. Twenty-eighth instance of the class, and the second
+time against a tool built to stop a *different* instance of it.
+
+## The closure landed, and the two honest results are both zeros
+
+`selftest-ruling-closure.sh` **4/4**, `selftest-rung-demotion.sh` **2/2**, stage 80 now discovers
+**21** suites. Verified here, not accepted.
+
+**Projection: 3 closures render, 40 of 40 committed rows uncovered.** The projector cannot
+reproduce the existing state of record because **the history predates the instrument** — those
+40 rulings were written before a closure existed to emit. Pane 2 reported that as a finding
+rather than backfilling closures to make the number look good, which is the correct call: a
+retro-fitted closure would carry a falsifier nobody committed in advance and would be a lie in
+the exact shape the object exists to prevent.
+
+**Demotion: 0 of 40 rows demote.** The broad rule was unmeasurable — rows carry no authored
+`as_of` — so it was narrowed to the two artifacts we know are live-measured, and those are 0
+too. **A rule that fires on nothing today is a tripwire, not an alarm**, and it was wired as a
+**reporter rather than an auto-editor**: having just built a projector precisely because
+parallel hand-maintained files drift, adding a second thing that edits `STATUS.tsv` would have
+recreated the defect one layer up.
+
+**A vocabulary mismatch surfaced that nobody had noticed**: callbacks speak `DONE|HELD|REFUSE`
+while `STATUS.tsv` speaks `CLEARED|HELD|RULED_OUT`. Two enums for one concept, translated by
+hand at every callback all session. That is the same class as the missing `receipt` level —
+a word we lacked, filled in by improvisation.
+
+## The callback-sha class produced its fifth instance, in a new shape
+
+Pane 2 sent `8a22c35`, then **self-corrected to `b84a226` unprompted**, reporting *"cited from
+memory, unverified — my error, packet contract requires the sha and I sent one I had not read."*
+
+I checked: `git cat-file -t 8a22c35` → `fatal: Not a valid object name`. **The sha did not
+exist.**
+
+R47 refused a guard against sha **omission**, reasoning that no hook sees a callback string.
+That still holds for the sender. **But fabrication is not omission**, and the receiver holds the
+string in hand:
+
+```
+git cat-file -t <sha>     # "commit" = real; "fatal" = fabricated or unpushed
+```
+
+One command, no hook, no sender cooperation. Appended to R47 as a **receiver-side practice**,
+not a gate — there is nothing to wire it into, because the receiver is an agent reading a
+message. I have been doing it inconsistently; it is now part of classifying every callback, and
+I applied it immediately to `634dcd2`, which resolves.
+
+**The pane caught its own fabricated sha and cited the contract against itself.** That is why
+this is a recorded practice rather than a discovered defect.

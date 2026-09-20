@@ -2288,6 +2288,30 @@ callbacks move to a file-backed outbox a hook can read — then wire the
 grammar check there, with the four historical omissions as trigger arms
 and BLOCKED-format callbacks as the satisfying witness.
 
+
+**EXTENSION appended 2026-09-20 (conductor, non-author of R47).** R47 refused a guard against
+callback sha OMISSION. A fifth instance arrived tonight in a different shape: pane 2 sent
+`8a22c35`, then self-corrected to `b84a226`, reporting "cited from memory, unverified". The
+first sha DOES NOT EXIST — `git cat-file -t 8a22c35` returns `fatal: Not a valid object name`,
+while `b84a226` resolves to a real commit.
+
+**Fabrication is not omission**, and unlike omission it is cheaply checkable by the RECEIVER,
+with one command that needs no hook and no sender cooperation:
+
+    git cat-file -t <sha>     # "commit" = real; "fatal" = fabricated, or not yet pushed
+
+R47's refusal reasoning — no repo hook ever sees the callback string — still holds for the
+sender side and is unchanged. What it did not consider is that **the receiver holds the string
+in hand and can validate it in one command.** The conductor has been doing this inconsistently;
+it is now part of classifying any callback, and it costs nothing.
+
+This adds a receiver-side practice, not a gate: the receiver is an agent reading a message, and
+there is nothing to wire a gate into. The trigger for revisiting R47's refusal is unchanged.
+
+**Note on the pane:** it caught and reported its own fabricated sha unprompted, citing the packet
+contract against itself. That is why this is a recorded practice rather than a discovered
+defect — a self-reported error is worth more than a clean report.
+
 ## R48 — REFUSED: wiring a guard against pipeline exit-status misread (4 instances)
 
 **Recorded:** 2026-09-20 · **Level:** `[pending]` · Census unit, no new instrument.

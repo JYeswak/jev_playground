@@ -104,11 +104,30 @@ always-abstain control 5× on their own corpus
 ([receipt](docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md)).
 
 **Scoreboard, present tense:** 40 verdict rows (8 cleared, 17 held, 15 ruled out, **0 promoted**),
-50 dead-end ledger entries each with a reopen condition, 13 gate stages green. Tool_call
+55 dead-end ledger entries each with a reopen condition, 13 gate stages green. Tool_call
 **RULE WINS** — ship the classifier, drop Jev (cost-benefit). Observer (B)
 mechanism MET at n=1 lab; working-profile dogfood **OPEN**. Proven vs WIP seams:
 [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). The product is the
 ruling plus the evidence for everything ruled out.
+
+**Guards that fire on our own mistakes.** Rules written in a doctrine file did not stop the
+defects they warned about; commands that exit nonzero did. Measured over one session:
+the defect classes with a wired gate recurred 0–3 times, the classes covered only by prose
+recurred 26 and 8 times. So four guards exist, each discovered automatically by
+`foundation/gates.d/80` and each with a selftest whose arms plant the real defect:
+
+| guard | refuses |
+|---|---|
+| [`scripts/vgrep.sh`](scripts/vgrep.sh) | a grep used as proof that matches **zero** lines — silence stops reading as a clean result |
+| [`scripts/pinned-denominator.sh`](scripts/pinned-denominator.sh) | a published count that disagrees with the command that regenerates it |
+| [`scripts/pin-liveness.sh`](scripts/pin-liveness.sh) | a pinned digest pointing at a file peers are still appending to |
+| [`scripts/denominator-sweep.sh`](scripts/denominator-sweep.sh) | the whole public claim set at once; **refuses to run relocated** rather than emitting false drifts |
+
+Three more classes were **refused** rather than guarded, each with the trigger that would
+reopen it (`NEGATIVE_EVIDENCE.md` R46–R48): git has no pre-checkout hook, a callback is a
+runtime string no hook sees, and a pipeline-exit check would fire on every legitimate pipe.
+**A refusal with a trigger beats a gate that fires on everything.** Run them:
+`bash scripts/selftest-vgrep.sh` and the three siblings, or `bash foundation/gates.sh`.
 
 **What you get.** Three tools that run offline with no API key, and read your own logs:
 
