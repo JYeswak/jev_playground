@@ -621,3 +621,8 @@ packet contract requires. I located each by path. Not a blocker and the work was
 time, but a missing sha is exactly how a receipt and its cited artifact drift apart, and this
 lane has logged five drift instances tonight. Noting the pattern rather than compensating
 silently a fourth time.
+
+SECTION 9 SDK-surface field traps — PASS — recording() misfiles a 0.91-confidence choice as failure-shaped (live demo quoted); recordingChoice writes 4 label rows; 13/13 incl. planted test 12 — NO-CLAIM: deterministic shapes only; prevalence UNKNOWN.
+SECTION 10 random-judge + outcome-join — PASS — join 4 + TRAP-LEAK t1 + constant 2/3 + chance 1/3, demo + 3/3 tests — NO-CLAIM: toy mechanics; adopted pattern unjudged here.
+SECTION 23 dcg explain-before-override — PASS — rm-rf-root-home denial quoted + explicit single-file alternative quoted + 3/3 tests — NO-CLAIM: 5 conductor cases on stated provenance; rule is prose, not enforcement.
+SECTION 24 infisical placeholder cleanup — PASS — 2/2 leftovers replaced (jev-probe.mjs:38, README.md:700), error path exit 2 with working one-liner — NO-CLAIM: tree-wide grep only; corpus literals untouched by design.
