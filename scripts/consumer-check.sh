@@ -56,7 +56,27 @@ if [ -z "$SUB" ]; then
   path_hits=$($RG -n --no-messages "${XCL[@]}" --glob '!*.test.*' --glob '!*.md' \
     "/[\\w./-]*bin/${F}([\"']|$)" "${ROOTS[@]}" 2>/dev/null || true)
 fi
-consumers=$(printf '%s\n%s' "$cmd_hits" "$path_hits" | grep -v '^$' | sort -u)
+ argv_hits=""
+if [ -n "$SUB" ]; then
+  # argv-array form: the binary (CONST_BIN, /bin/<name>) and the subcommand
+  # (quoted literal in an args array) never share a line, so command-position
+  # grep cannot see them. A file carrying BOTH on code lines (full-line
+  # comments stripped) is a consumer. Missing this produced a false ZERO on
+  # 'ee orient' (EE_BIN + COMMAND_ARGS spread) — the dangerous direction:
+  # a false zero retires live wiring. Over-count risk (SUB literal in a
+  # comment-adjacent code line) is the safe direction; lines are shown.
+  FBIN="$(printf '%s' "$F" | tr '[:lower:]' '[:upper:]')_BIN"
+  while read -r f; do
+    ev1=$($RG --with-filename -n --no-messages -e "${FBIN}" -e "/[\\w./-]*bin/${F}([\"']|$)" "$f" 2>/dev/null | grep -vE ':[0-9]+[:-][[:space:]]*(//|#|\*|<!--)' | head -3 || true)
+    [ -z "$ev1" ] && continue
+    ev2=$($RG --with-filename -n --no-messages -e "\"${SUB}\"" -e "'${SUB}'" "$f" 2>/dev/null | grep -vE ':[0-9]+[:-][[:space:]]*(//|#|\*|<!--)' | head -3 || true)
+    [ -z "$ev2" ] && continue
+    argv_hits=$(printf '%s\n%s\n%s' "$argv_hits" "$ev1" "$ev2")
+  done <<EOF
+$($RG -l --no-messages "${XCL[@]}" --glob '!*.test.*' --glob '!*.md' -e "\"${SUB}\"" -e "'${SUB}'" "${ROOTS[@]}" 2>/dev/null | grep -vE '(consumer-check|selftest-consumer-check)\.' || true)
+EOF
+fi
+consumers=$(printf '%s\n%s\n%s' "$cmd_hits" "$path_hits" "$argv_hits" | grep -v '^$' | sort -u)
 
 # Mentions (classified, never counted): docs + tests touching the query.
 mentions=$($RG -l --no-messages --glob '*.md' --glob '*.test.*' \

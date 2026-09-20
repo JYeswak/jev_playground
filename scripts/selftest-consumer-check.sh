@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# selftest-consumer-check.sh — both acceptance arms for consumer-check.
-# ARM1 is the RED arm: 'ee preflight' must refuse (exit 1) AND name the two
-# live ee callers (orient + journal). A tool that cannot tell those apart
-# is not the tool. ARM2 is the live arm: 'dcg' must exit 0 naming
-# dcg-tool-bridge.ts. Capture-first throughout: exit codes come from
+# selftest-consumer-check.sh — acceptance arms for consumer-check.
+# ARM1 is the refusal arm: 'ee preflight' must refuse (exit 1) AND name the
+# two live ee callers (orient + journal). A tool that cannot tell those apart
+# is not the tool. ARM1b is the anti-false-zero arm (CHALLENGE-P2 2026-09-20):
+# 'ee orient' must EXIT 0 — the args-array form (EE_BIN + COMMAND_ARGS spread)
+# fooled v1 into ZERO, the dangerous direction (retires live wiring).
+# ARM2 is the live arm: 'dcg' must exit 0 naming dcg-tool-bridge.ts.
 # separate unpiped runs (this lane's own bash-pipe-exit class).
 set -uo pipefail
 root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd -P)
@@ -26,6 +28,15 @@ esac
 case "$out1" in
   *ee-failure-journal.ts*journal*) note ok "names failure-journal + journal"; pass=$((pass+1));;
   *) note FAIL "missing failure-journal/journal"; fail=$((fail+1));;
+esac
+
+out1b=""; rc1b=""
+out1b=$(./scripts/consumer-check.sh "ee orient" 2>&1); rc1b=$?
+if [ "$rc1b" -eq 0 ]; then note ok "ee-orient exits 0 (CONSUMERS)"; pass=$((pass+1));
+else note FAIL "ee-orient exit=$rc1b, want 0 — false ZERO"; fail=$((fail+1)); fi
+case "$out1b" in
+  *ee-ambient-session-start.ts*COMMAND_ARGS*orient*) note ok "names ambient-start argv-array evidence"; pass=$((pass+1));;
+  *) note FAIL "missing ambient-start argv evidence"; fail=$((fail+1));;
 esac
 
 out2=""; rc2=""

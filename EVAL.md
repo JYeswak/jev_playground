@@ -1041,3 +1041,20 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Boundary:** subcommand tokens noisy (comment-sourced); related
   callers labeled verify-by-reading. Session-JSONL historical
   invocations deliberately out of scope v1.
+
+## P2 consumer-check fix, argv-array false ZERO (CHALLENGE-P2, 2026-09-20)
+
+- **Defect:** `ee orient` returned ZERO though
+  `ee-ambient-session-start.ts` invokes it via `EE_BIN` +
+  `COMMAND_ARGS` spread — the literal `ee orient` never appears.
+  False zero is the dangerous direction (retires live wiring).
+- **Fix:** with a subcommand query, a file carrying BOTH a binary
+  reference (`<NAME>_BIN` const or `/bin/<name>` path) AND the quoted
+  subcommand literal on code lines (full-line comments stripped) is a
+  CONSUMER with evidence lines. Tool never counts its own two files.
+- **Selftest 8/8:** prior 6 + `ee orient` exit 0 with argv-array
+  evidence. Prior verdicts re-examined: `ee preflight` still ZERO
+  (literal absent from all three ee-calling files, confirmed by direct
+  rg), `dcg` still exit 0, nonce still ZERO exit 1.
+- **Boundary:** sibling-scan token noise unchanged (verify-by-reading);
+  filenames with spaces break the argv loop (none on these surfaces).
