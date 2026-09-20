@@ -18,8 +18,8 @@ claim nobody can check:
   (the `--mode json` stream) and `message` (the on-disk SessionEntry), which must produce
   identical messages, plus a planted negative that an unknown envelope still yields nothing.
   Gated by `foundation/gates.d/40-omp-compact-replay.sh`.
-- `work/oracle-kit/test.mjs` — the shared scorer's self-test, **10 checks, every case a defect
-  this lane actually shipped on 2026-09-19**: a constant score must be flagged rather than
+- `work/oracle-kit/test.mjs` — the shared scorer's self-test, **every case a defect
+  this lane actually shipped**: a constant score must be flagged rather than
   returned as a clean `0.500` (three bogus router runs), a degenerate label must throw rather
   than yield `NaN` (the gate's feasibility arm), and a field name absent from the SDK must throw
   rather than score silence (`.distribution` / `.probability`). Plus positive observables: AUC
@@ -29,7 +29,22 @@ claim nobody can check:
   record's own key list in the error, and `inspectKey` returns that list alongside the lookup —
   written after the eighth wrong-selector failure in one session, the only one that reached a
   published receipt.
-  Run: `node work/oracle-kit/test.mjs` (13 checks).
+  Plus **§4(a) `decisionLoss`**: always-abstain mean loss equals nPos/n on the skillranker
+  10/12 identity (0.833); false abstain costs 1, wrong/needless cost 2; a table that
+  omits `false_abstention_on_positive` lets always-abstain win (planted negative).
+  Plus **§4(d) selector≡claim**: `{noul:0.9}` scored as `probabilities` throws;
+  `assertSdkSelector` refuses `.distribution` / an invented `helpfulNoul`;
+  `refuseInventedNoulGate` refuses a second noul on a Choice pick.
+  Run: `node work/oracle-kit/test.mjs` (22 checks).
+- `work/oracle-kit/prevalence_threshold.py` — t*(π) on frozen priors 30/186449 and 488/50149.
+  Run: `python3 work/oracle-kit/prevalence_threshold.py` (exit 0; prints the 1:2300 identity).
+- `work/oracle-kit/selector-guard.mjs` — scorers cannot silently read `.distribution` / `.probability`.
+  Run: `node work/oracle-kit/selector-guard.mjs` and `--selftest` (planted `answer.distribution` RED).
+- `work/oracle-kit/voi_harm_rule.py` — VOI of paid Jev vs free regex on the frozen harm-rule corpus.
+  Run: `python3 work/oracle-kit/voi_harm_rule.py` (exit 0; VOI ≤ 0; NO-CLAIM).
+- `scripts/promotion-four-gates.py` — four-gate VIEW over existing receipts; empty evidence fails.
+  Run: `python3 scripts/promotion-four-gates.py --selftest` (exit 0) and
+  `python3 scripts/promotion-four-gates.py UP-R5-jev-toolcall-gate` (exit 1 today; STATUS not written).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
@@ -45,7 +60,7 @@ claim nobody can check:
 - `work/omp-jev-commit/test/commit.test.mjs` — commit-message-vs-diff scorer: non-commit and message-less commands ignored, the `-F <file>` form (which this repo mandates) is read from the FILE not the command line, a `-F` pointing at a missing file is ignored rather than crashing, an inline `-m "..."` is parsed, unset key -> `commit_error` with no scores, and a throwing host still returns undefined. Run: `node --experimental-strip-types --test work/omp-jev-commit/test/commit.test.mjs` (6 tests). **Three arms are conditional on a staged diff existing in the cwd and therefore pass on a no-op** — the unconditional proof of the scored path is `live-probe.mjs`, which builds a real throwaway repo with a real staged diff.
 - `work/omp-jev-rerank/test/rerank.test.mjs` — observe-only search-result scorer: non-search tools and errored results ignored, short lists skipped, a bare-string `result` (the shape I invented) rejected rather than accepted, a scored list reports real hit count vs capped scored count, unset key -> `rerank_error` with no scores, transport throw -> `rerank_error`, and a throwing host still returns undefined. Run: `node --experimental-strip-types --test work/omp-jev-rerank/test/rerank.test.mjs` (7 tests).
 - `work/omp-jev-review/test/review.test.mjs` — observe-only diff review scorer: ignores non-diff tool calls, unset key records `review_error` not a pass, throwing transport records `review_error`, a real score records `review_scored` with probabilities, a 200 with no probabilities is an error, a throwing host still returns undefined, and it asks exactly the two MEASURED questions and no more (the `scope` question was cut as degenerate and mis-ordered; the test pins `Object.keys(questions)` so it cannot silently return). Run: `node --experimental-strip-types --test work/omp-jev-review/test/review.test.mjs` (7 tests).
-- `work/jev-client/test/client.test.mjs` — the ONLY sanctioned systemOne caller: asserts the exact wire shape (`model` + `state` + `questions` as an object of `{type:'noul',instructions}`), unset key -> `unconfigured` with the infisical fix in the error, HTTP 400 surfaced with the server body, `.probability`/`.distribution` rejected, non-JSON, transport throw, partial answers, and empty questions refused before any network call. Also the MULTICLASS caller `askJevChoice`: `{type:'choice',instructions,criteria}` with `criteria` a MAP (the SDK refuses a list), a degenerate class set refused before any network call, and five plausible-looking 200s — a label never offered, no `choice`, `.distribution` instead of `.probabilities`, a label missing from `probabilities`, non-numeric `confidence` — each refused rather than read, because a scorer that shrugs at a missing field fabricates a finding instead of crashing. Also `readRow`, which handles BOTH omp session row shapes (`customType` as an object with nested `data`, and `customType` as a string with top-level `data`) — a reader that handles one silently reports "no rows" on the other, which is the root cause of R33 and R41. Run: `node --experimental-strip-types --test work/jev-client/test/client.test.mjs` (14 tests, 21 including subtests).
+- `work/jev-client/test/client.test.mjs` — the ONLY sanctioned systemOne caller: asserts the exact wire shape (`model` + `state` + `questions` as an object of `{type:'noul',instructions}`), unset key -> `unconfigured` with the infisical fix in the error, HTTP 400 surfaced with the server body, `.probability`/`.distribution` rejected, non-JSON, transport throw, partial answers, and empty questions refused before any network call. Also the MULTICLASS caller `askJevChoice`: `{type:'choice',instructions,criteria}` with `criteria` a MAP (the SDK refuses a list), a degenerate class set refused before any network call, and five plausible-looking 200s — a label never offered, no `choice`, `.distribution` instead of `.probabilities`, a label missing from `probabilities`, non-numeric `confidence` — each refused rather than read, because a scorer that shrugs at a missing field fabricates a finding instead of crashing. Also `readRow`, which handles BOTH omp session row shapes (`customType` as an object with nested `data`, and `customType` as a string with top-level `data`) — a reader that handles one silently reports "no rows" on the other, which is the root cause of R33 and R44. Run: `node --experimental-strip-types --test work/jev-client/test/client.test.mjs` (14 tests, 21 including subtests).
 - `work/jev-client/test/uncertain.test.mjs` — uncertainty-ranked selection, deterministic random audit sampling, coarse score buckets, and no-near-threshold negative. Run: `node --test work/jev-client/test/uncertain.test.mjs` (4 tests).
 - `work/jev-client/test/measure-kit.test.mjs` — the standard verdict arithmetic, offline with a fake asker: a planted constant (6/7 correct, same verdict everywhere) comes back DEGENERATE, a planted one-item margin with a near-threshold decider comes back WEAK (the 010dd96 correction encoded), a clear separator DISCRIMINATES, and the driver counts drift flips and transport errors. Run: `node --test work/jev-client/test/measure-kit.test.mjs` (4 tests).
 - `work/jev-question-writing/trial-labels.test.mjs` — offline smoke over the question-writing loop's own artefacts, NO Jev calls: the pass4/5/7 label files parse with the candidate key matching, boolean truths (8, 8, 4+4), unique names, and non-empty state fields; plus verdict arithmetic recomputed by `gradeQuestion` on the RECORDED live scores (pass 4 8/8 DISCRIMINATES, pass 5 8/8 DISCRIMINATES, pass 7 4/4 + 4/4 DISCRIMINATES including the 0.49 closest call) and a planted constant-scores arm that stays DEGENERATE. Run: `node --test work/jev-question-writing/trial-labels.test.mjs` (7 tests).
@@ -53,7 +68,7 @@ claim nobody can check:
 - `work/jev-dcg-override/override.test.mjs` — structural test over the explain-before-override rule: all five conductor refusal cases present with alternatives, pane-3 verified denial strings quoted (rm-rf-general, redirect-truncate, rm-rf-root-home, EXPLICIT-SINGLE-FILE-REMOVE-OK), planted negative refuses an entry without a safe alternative. Run: `node --test work/jev-dcg-override/override.test.mjs` (3 tests).
 - `work/jev-persona-eval/adopt.test.mjs` — persona-clone adopt delta mechanics, offline, NO Jev calls: trap-answered rows survive the join and read as TRAP-LEAK, golden-style verdicts get majority-share constant + seeded chance baselines, unanimous set constant 1.0. Run: `node --test work/jev-persona-eval/adopt.test.mjs` (3 tests).
 - `work/jev-eval-honesty/*.test.mjs` — the eval-honesty delta, all offline, NO Jev calls: outcome-join parses both row shapes with selector verification (missing-field lands in selectorReport, unparseable counted, empty input zeroHit) and configurable verdict keys (dcg-bridge `{kind,toolCallId}` rows match); co-presence REFUSEs on zero-hit and distinguishes absent-next-to-firing (not-loaded, never 'no traffic') with a regression test for the keyOf shape bug that made PRESENT unreachable; random-judge gives seeded chance-floor and majority-share constant baselines. Run: `node --test work/jev-eval-honesty/outcome-join.test.mjs work/jev-eval-honesty/co-presence.test.mjs work/jev-eval-honesty/random-judge.test.mjs` (19 tests).
-- `work/skillranker-eval/test/contract.test.mjs` — offline mirror of skillranker's EVAL CONTRACT: frozen 0/1/2 loss vs pulled `evaluation_policy.v1.json`, `expected_values.v1.json` recomputed, always-abstain 10/12=0.833, coin-flip worse than abstain, planted wrong-pick scores 2 and REDs if weakened, ≥0.90 gate is a hard FAIL at 0.800 and still not promotable at 0.900 on `diagnostic_synthetic`, overflow case flagged as installable≠offered, JSONL export rows are not a product claim, judge shape is one Choice plus `__none__` with no second noul. Run: `node --test work/skillranker-eval/test/contract.test.mjs` (11 tests).
+- `work/skillranker-eval/test/contract.test.mjs` — offline mirror of skillranker's EVAL CONTRACT: frozen 0/1/2 loss vs pulled `evaluation_policy.v1.json`, `expected_values.v1.json` recomputed, always-abstain 10/12=0.833, coin-flip worse than abstain, planted wrong-pick scores 2 and REDs if weakened, ≥0.90 gate is a hard FAIL at 0.800 and still not promotable at 0.900 on `diagnostic_synthetic`, overflow case flagged as installable≠offered, JSONL export rows are not a product claim, judge shape is one Choice plus `__none__` with no second noul, invented `helpfulNoul` gate refused. Loss numbers come from `oracle-kit/decisionLoss` (reuse, not a second table). Run: `node --test work/skillranker-eval/test/contract.test.mjs` (12 tests).
 - `work/omp-jev-failure/test/failure.test.mjs` — planted errored-tool arms for the MULTICLASS classifier: `failure_classified` carries one class plus its full distribution at `schemaVersion: 2` and no longer carries `scores`, the call itself is ONE choice question over the three mutually-exclusive classes (`classes`, never a question map) — the shape that took the committed eleven cases from 9/11 with two structurally impossible answers per run to 11/11 with none, `failure_error` without a class, non-error ignored, and fail-open append/classifier failures. Run: `node --experimental-strip-types --test work/omp-jev-failure/test/failure.test.mjs` (5 tests).
 - `work/omp-jev-foreman/test/foreman.test.mjs` — local-trigger progress observer: healthy window no trigger, repeated-command score, classifier error without scores, and fail-open host. Run: `node --test work/omp-jev-foreman/test/*.test.mjs` (4 tests).
 - `work/omp-jev-route/test/route.test.mjs` — pre-staged peer route observer tests. Run: `node --experimental-strip-types --test work/omp-jev-route/test/route.test.mjs`.
@@ -97,7 +112,7 @@ Everything else under this root is a **vendored clone** and its tests belong to 
 | `foundation/gates.sh --selftest` | `cd foundation && ./gates.sh --selftest` | **every stage proves it can go RED** on a planted bad input | **8/8 PASS** at `a503b9a`; same stale-count correction |
 | `githooks/commit-msg-verification-level.sh --selftest` | as written | the commit-edge hook refuses a level-less subject and accepts a level-carrying one | 4 known-bad refused, 4 known-good passed, 1 prose-not-claim refused |
 | `compaction/` (sibling-owned) | see that directory's own scripts | the omp transcript adapter and its known-bad (a trailing `toolResult` must be kept) | gate `40-omp-compact-replay.sh` PASS |
-| `work/skillranker-eval/test/contract.test.mjs` | `node --test work/skillranker-eval/test/contract.test.mjs` | skillranker EVAL CONTRACT process: frozen loss, always-abstain 0.833, coin-flip worse, planted wrong-pick RED at loss 2, ≥0.90 hard FAIL, JSONL export, judge shape | 11/11, this PR |
+| `work/skillranker-eval/test/contract.test.mjs` | `node --test work/skillranker-eval/test/contract.test.mjs` | skillranker EVAL CONTRACT process: frozen loss via oracle-kit `decisionLoss`, always-abstain 0.833, coin-flip worse, planted wrong-pick RED at loss 2, ≥0.90 hard FAIL, JSONL export, judge shape, invented noul gate refused | 12/12, this PR |
 
 **Rule:** a green here is the only green we may call *ours*.
 
@@ -289,12 +304,12 @@ it originally expected an injected `classify` error, but the API-key check runs 
 on an unconfigured machine the recorded error is the key error. The contract under test is the
 same one §16 found broken — a failure must be RECORDED, not swallowed.
 
-### rules-v4.test.mjs — four arms added 2026-09-20 (R41 trigger)
+### rules-v4.test.mjs — four arms added 2026-09-20 (R44 trigger)
 
-11. R41 TRIGGER: a sed program survives the strip — it is code, not payload
-12. R41 TRIGGER: macOS `sed -i ""` form also survives
-13. R41 PLANTED NEGATIVE: a quoted PROMPT is still stripped — -p is not a code flag
-14. R41 PLANTED NEGATIVE: python3 -c is code, python3 script.py --note is not
+11. R44 TRIGGER: a sed program survives the strip — it is code, not payload
+12. R44 TRIGGER: macOS `sed -i ""` form also survives
+13. R44 PLANTED NEGATIVE: a quoted PROMPT is still stripped — -p is not a code flag
+14. R44 PLANTED NEGATIVE: python3 -c is code, python3 script.py --note is not
 
 Arms 13 and 14 are the load-bearing pair: they pin the distinction the whole rule rests on. A
 quoted span is code when it occupies the slot after an interpreter code-flag (-c/-e/-i/

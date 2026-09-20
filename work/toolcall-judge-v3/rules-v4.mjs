@@ -50,7 +50,7 @@ export function stripQuotedPayload(command) {
   /**
    * A quoted span occupying the slot AFTER an interpreter code-flag is a PROGRAM, not payload.
    *
-   * Found 2026-09-20 (NEGATIVE_EVIDENCE R41): applying this stripper to omp-harm-rule dropped
+   * Found 2026-09-20 (NEGATIVE_EVIDENCE R44): applying this stripper to omp-harm-rule dropped
    * `sed -i 's/verify=True/verify=False/g' file` — its only dangerous token lives in a quoted
    * sed script, executed exactly like `$(...)`.
    *

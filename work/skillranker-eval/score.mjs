@@ -17,6 +17,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { decisionLoss, refuseInventedNoulGate } from '../oracle-kit/index.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const CONTRACT_DIR = join(here, 'contract');
@@ -164,27 +165,22 @@ export function scoreDecision({ y = [], pick = null, unavailable = false } = {})
   const labels = Array.isArray(y) ? y : [];
   const yNonEmpty = labels.length > 0;
   const abstained = pick == null || pick === NONE;
+  const pickInY = yNonEmpty && labels.includes(pick);
+  // Shared table: oracle-kit/decisionLoss. Class names stay here so the export schema does not drift.
+  const loss = decisionLoss({ yNonEmpty, abstained, pickInY });
   if (yNonEmpty && abstained) {
-    return { loss: LOSS.false_abstention_on_positive, why: 'false abstention', class: 'false_abstention_on_positive' };
+    return { loss, why: 'false abstention', class: 'false_abstention_on_positive' };
   }
-  if (yNonEmpty && labels.includes(pick)) {
-    return { loss: LOSS.correct_recommendation_on_positive, why: 'correct', class: 'correct_recommendation_on_positive' };
+  if (yNonEmpty && pickInY) {
+    return { loss, why: 'correct', class: 'correct_recommendation_on_positive' };
   }
   if (yNonEmpty) {
-    return {
-      loss: LOSS.incorrect_recommendation_on_positive,
-      why: `wrong pick (${pick})`,
-      class: 'incorrect_recommendation_on_positive',
-    };
+    return { loss, why: `wrong pick (${pick})`, class: 'incorrect_recommendation_on_positive' };
   }
   if (abstained) {
-    return { loss: LOSS.correct_no_match_abstention, why: 'correct abstention', class: 'correct_no_match_abstention' };
+    return { loss, why: 'correct abstention', class: 'correct_no_match_abstention' };
   }
-  return {
-    loss: LOSS.needless_recommendation_on_no_match,
-    why: `needless (${pick})`,
-    class: 'needless_recommendation_on_no_match',
-  };
+  return { loss, why: `needless (${pick})`, class: 'needless_recommendation_on_no_match' };
 }
 
 export function argmax(probabilities) {
@@ -414,7 +410,9 @@ export function verifyExpectedValues(expected = loadExpected()) {
  * instructions, same `__none__` abstain option. Never a second noul gate.
  * `ask` is injected: ({ state, instructions, classes }) => { ok, choice, ... }.
  */
-export async function judgeSkillPick({ roster, task, constraints = '', already_loaded = [], ask, model = null }) {
+export async function judgeSkillPick(opts = {}) {
+  refuseInventedNoulGate(opts);
+  const { roster, task, constraints = '', already_loaded = [], ask, model = null } = opts;
   if (typeof ask !== 'function') throw new Error('judgeSkillPick: ask is required (injectable)');
   const criteria = criteriaFromRoster(roster);
   const state = { task, constraints, already_loaded };

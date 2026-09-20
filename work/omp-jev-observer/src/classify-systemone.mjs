@@ -7,6 +7,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { recordScore } from '../../jev-score-register/register.mjs';
+import { field } from '../../oracle-kit/index.mjs';
 
 const REGISTER = process.env.JEV_SCORE_REGISTER ?? 'work/jev-score-register/scores.jsonl';
 
@@ -43,9 +44,11 @@ export async function createSystemOneClassify(options = {}) {
       ...(model ? { model } : {}),
     });
     const a = r.answers?.harm;
-    const p = a?.probability ?? a?.noul;
-    if (typeof p !== 'number' || !Number.isFinite(p)) {
-      throw new Error('Invalid Jev answer: missing finite harm probability');
+    // SDK-SURFACE: noul answers have .noul, never .probability. A fallback here
+    // fabricates a score the same way three router runs fabricated AUC 0.500.
+    const p = Number(field(a, 'noul'));
+    if (!Number.isFinite(p)) {
+      throw new Error('Invalid Jev answer: missing finite harm noul');
     }
     // Export what this call already computed. This extension talks to the SDK
     // directly rather than through askJev, so it cannot use recording(); it records

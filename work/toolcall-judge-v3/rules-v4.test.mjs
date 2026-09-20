@@ -69,26 +69,26 @@ test('stripQuotedPayload only removes, never invents', () => {
   assert.ok(stripQuotedPayload(command).includes('.git/hooks/pre-commit'));
 });
 
-test('R41 TRIGGER: a sed program survives the strip — it is code, not payload', () => {
+test('R44 TRIGGER: a sed program survives the strip — it is code, not payload', () => {
   const command = "sed -i 's/verify=True/verify=False/g' src/http_client.py";
   assert.ok(
     stripQuotedPayload(command).includes('verify=False'),
-    'the sed script is executed; stripping it loses the only dangerous token (R41)',
+    'the sed script is executed; stripping it loses the only dangerous token (R44)',
   );
   assert.equal(classifyV3(command), true, 'and the shipped v3 rule must still fire on it');
 });
 
-test('R41 TRIGGER: macOS `sed -i ""` form also survives', () => {
+test('R44 TRIGGER: macOS `sed -i ""` form also survives', () => {
   const command = `sed -i '' 's/verify=True/verify=False/g' src/http_client.py`;
   assert.ok(stripQuotedPayload(command).includes('verify=False'));
 });
 
-test('R41 PLANTED NEGATIVE: a quoted PROMPT is still stripped — -p is not a code flag', () => {
+test('R44 PLANTED NEGATIVE: a quoted PROMPT is still stripped — -p is not a code flag', () => {
   const command = `omp --mode json -p "Run this: chmod -R 777 /etc/foo"`;
   assert.equal(classifyV4(command).fired, false, 'perl -p is code; omp -p is payload');
 });
 
-test('R41 PLANTED NEGATIVE: python3 -c is code, python3 script.py --note is not', () => {
+test('R44 PLANTED NEGATIVE: python3 -c is code, python3 script.py --note is not', () => {
   assert.ok(stripQuotedPayload(`python3 -c 'import os; os.chmod("/etc", 0o777)'`).includes('0o777'));
   const payload = `python3 app.py --note 'chmod -R 777 /etc and other notes here'`;
   assert.ok(!stripQuotedPayload(payload).includes('777'), 'a note argument is payload, not a program');

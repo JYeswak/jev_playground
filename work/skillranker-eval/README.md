@@ -7,7 +7,8 @@ runnable offline+live harness on this tree.
 option). Prior art: skillranker itself; TypeSafe `cookbooks/skill_suggestion.md`
 is not in the local docs-mirror, so the contract files under `contract/` are
 the citation. Oracle: their `expected_values.v1.json` + frozen loss table
-(external contract). A prior live Jev-on-corpus receipt exists at
+(external contract). The 0/1/2 numbers are scored by `work/oracle-kit/decisionLoss` —
+this harness does not keep a second table. A prior live Jev-on-corpus receipt exists at
 `docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md` — that is
 **not** this run.
 

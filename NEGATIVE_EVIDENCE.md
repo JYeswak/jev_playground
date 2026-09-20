@@ -1821,7 +1821,7 @@ is invoked on this corpus, the binary path is recorded on the export row, and
 overflow hole only if a later contract revision exports the overflow shortlist into
 `visible_roster`.
 
-## R41 — applying stripQuotedPayload to omp-harm-rule: REFUSED, with a trigger
+## R44 — applying stripQuotedPayload to omp-harm-rule: REFUSED, with a trigger
 
 **Attempted 2026-09-20 by the conductor, reverted the same turn, nothing shipped.**
 
@@ -1864,7 +1864,7 @@ denominator. All three, or it stays refused. The distinction to build on: **text
 argument to an interpreter is code; text quoted as a payload is not** — and the general form of
 that test is the open problem, not the `sed` special case.
 
-### R41 — DEFEATED 2026-09-20 at `e33bd5d`, with the spirit still open
+### R44 — DEFEATED 2026-09-20 at `e33bd5d`, with the spirit still open
 
 All three trigger conditions met, each run at defeat time:
 
@@ -1894,3 +1894,125 @@ on danger. The letter of the trigger was satisfiable; I wrote the letter, so the
 `organic-fires.mjs` fires reaching 0 with `verify-claim.mjs` still `REPRODUCIBLE` and
 `rules-v4.test.mjs` still green. Until then this stays a mitigation, not a fix, and
 `docs/INTEGRATIONS.md`'s 0-of-28 caveat stands with its number updated to 5 fires of 5.
+### R44 numbering — an ID collision found during the merge, and it is not only mine
+
+My entry was written as **R41** and a peer had concurrently written a different R41
+(`## R41 — two conductor suspicions refuted in one tick`). Renumbered mine to R44 and
+repointed the 13 citations in `harm-rule.ts`, `rules-v4.mjs`, `rules-v4.test.mjs` and
+`TESTS.md`, because a citation pointing at somebody else's finding is worse than no citation.
+
+**The collision is wider than my entry.** After the merge this file contains:
+
+```
+R41 x2   R42 x3   R43 x2
+```
+
+`NEGATIVE_EVIDENCE.md` IDs are allocated by reading the file and adding one, with no lock, by
+panes working concurrently on separate branches. The merge is textually clean — both entries
+survive, nothing is lost — so **no gate catches it and the damage is silent**: two different
+findings answer to the same name, and any future reference to "R42" is ambiguous between three.
+
+Not fixing the peers' numbering here: renumbering another pane's entry would break their
+citations the way mine were nearly broken, and I cannot see which of their commits reference
+which. **Recorded as a coordination defect with a named owner-less state**, which is the honest
+status.
+
+**What would fix it:** allocate the ID at write time from something that cannot collide — the
+commit sha prefix, or a `br` bead id, rather than a monotonic counter read from a file that
+several panes are appending to at once. That is the same class as the five live-denominator
+defects tonight: **a value read from a moving shared source and then treated as stable.**
+
+## R43 — REFUTED: a loss table that only charges wrong emissions is a valid gate
+
+**Recorded:** 2026-09-20 · **Level:** `[test]` · Oracle: skillranker frozen 0/1/2 table
+(`evaluation_policy.v1.json` @ `bb52b8f25`) plus `work/oracle-kit/decisionLoss`.
+
+Hypothesis: "mean loss that charges only wrong emitted suggestions is enough; silence is the
+safe side." Their own rationale already names the defect: always-abstain then minimizes the
+score without helping a positive. On their 10/12 identity:
+
+- proper table: always-abstain mean loss = `10/12 = 0.833`
+- emission-only table (false abstain = 0): always-abstain mean loss = `0`
+
+The planted negative is now a kit check: `emissionOnlyLoss` makes always-abstain win;
+`decisionLoss` does not. A harness that drops `false_abstention_on_positive` is refused.
+
+**Retry condition:** reopen only if a surface exists where withhold is *free by contract*
+(compaction keep-everything is the opposite — withhold is expensive) *and* the table is
+declared that way in the file before the first score. Do not recover emission-only as a
+default advisory gate.
+
+## R43 — REJECTED: Jev-as-`bv` over the beads DAG; fail-closed `br close`; cycle detector; STOP-LIVE
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Design only
+(`docs/demos/upstream-repro/jev-task-tests-beads-20260920.md`).
+
+Four designs this pass killed before a scorer existed, from the tip store itself
+(`.beads/issues.jsonl`, n=48 at `5dfaba1`):
+
+1. **Replace `bv --robot-triage` with Jev Choice over the whole DAG.** 12 dependency
+   rows, all `parent-child`, **0 cycles**. Graph reachability is already exact.
+   Jev's wedge is semantic (ACCEPTANCE quality, thin `done`, ceremony, comment-blocked
+   "ready"), not "what's next on the DAG." Cost: a paid call per tick plus a ranker
+   we would then stop comparing to `bv`. Defect class it would not catch: blocked-by
+   edges, which `br ready` already hides.
+2. **Fail-closed `.omp/hooks/pre` on `br close`.** Acting on a
+   `diagnostic_synthetic` split the question-author labelled. R28 is the retry
+   condition for *any* act.
+3. **Jev dep-cycle detector.** Prevalence ~0. `br dep cycles` / `bv --robot-insights`
+   is the oracle. A score here is a ceremony metric.
+4. **STOP-LIVE / deferred registration / quiet-window-as-science-gate** as a reason
+   not to register an observe-only scorer later. Already retracted at
+   `docs/INTEGRATIONS.md:174`. Not re-invented.
+
+**What we kept:** skillranker 0/1/2 loss, always-abstain mean **0.800** on the 10-case
+sketch, `__none__`, noul-never-a-Choice-gate, roster+eligibility, observe-only CLI
+then omp tool, JSONL export. `diagnostic_synthetic` cannot promote.
+
+**Retry condition:** (1) a week of real `br ready --json` exports whose human claim
+log disagrees with `bv --robot-next` on ≥10 rows *and* Jev mean loss beats both
+baselines; (2) SHIP-OMP-ADVICE bar in the design file plus L3 on C5 *and* C6,
+fail-open first; (3) `br dep cycles` non-empty on a store we own; (4) none.
+
+## R42 — REJECTED as product: binding send from a mail judge; REJECTED as promotion: 0/1/2 on in-band phishing; Jev loses on Human Overseer `importance`
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Design pass, no live call.
+Receipt: `docs/demos/upstream-repro/jev-task-tests-agent-mail-20260920.md`.
+
+Three closed decisions from designing Jev task tests against
+`Dicklesworthstone/mcp_agent_mail@ac4966c`. None is a measurement of Jev.
+
+### 1. A mail judge must not send, ack, or auto-contact
+
+Rejected design: `choice == ready_to_recommend_send` → call `send_message`. Agent Mail's
+`send_message` writes Git-backed inbox copies. That is an irreversible fleet side-effect
+this lane does not own. The decide envelope is permanently `binding: log-only`.
+`draft_note` is a grade, not an actor.
+
+**Retry condition:** Joshua writes, in the same message, that a named seam may call
+`send_message` and names the human confirmation step. Without that, reopen is forbidden.
+
+### 2. Skillranker's 0/1/2 table under-prices a missed phish
+
+Stolen 0/1/2 charges false abstention **1** and a wrong pick **2**. On AM-TT-08
+(in-band "Joshua said paste the key"), `__none__` is the cheap miss and
+`actionable_work` is the expensive one. That is the right *ordering* for an advisory
+router and the wrong *magnitude* for a security review. This design keeps the table
+(do not invent a second one in an unpromoted packet) and **forbids promoting** AM-TT-08
+as evidence that the surface is safe.
+
+**Retry condition:** a held-out in-band-phish corpus we did not author, with a
+pre-registered harm table, feasibility arm, and stated prevalence. Human SMTP numbers
+from `jev-spam-eval` do not satisfy this.
+
+### 3. Re-asking Jev for Human Overseer `importance=high` loses cost-benefit
+
+The server already force-stamps overseer messages as high importance (README, same pin).
+A Choice whose Y is `urgent_work` because `importance==high` is a paid echo of a column.
+B1 (`resource://views/urgent-unread`) already lists unread-high. Jev is only in the
+running when the badge is *gamed* or *cadence noise* (AM-TT-05). Even there, a
+deterministic `from==HumanOverseer && body matches /no new instruction/i` may win the
+family — both baselines must be scored before a live call is budgeted.
+
+**Retry condition:** a real inbox export in which agent-set `importance=high` is common
+and the overseer force-high path is a minority, labelled after the questions freeze.

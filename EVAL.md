@@ -536,3 +536,96 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
 - **Boundary:** no STATUS rewrite, no new gate stage, no crate import, no key. Inventory
   remains `franken-crate-alpha-20260919.md`. **promoted=0 untouched.**
 - Lane: offline. Claim: `[oracle]` (public HEAD + committed receipts).
+
+---
+
+## §4 product ticks — decisionLoss / t*(π) / four-gate VIEW / selector≡claim (2026-09-20)
+
+Landed the ranked ticks from `docs/demos/upstream-repro/math-and-next-level-20260919.md` §4
+as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema change.
+
+- **(a)** `decisionLoss({ yNonEmpty, abstained, pickInY })` in `work/oracle-kit/index.mjs`.
+  `node work/oracle-kit/test.mjs` → **22/22**, including always-abstain `10/12 = 0.833`,
+  false-abstain=1 / wrong=2 / needless=2, and the planted emission-only table that lets
+  always-abstain win. `work/skillranker-eval/score.mjs` reuses the kit (does not duplicate
+  the 0/1/2 numbers). `node --test work/skillranker-eval/test/contract.test.mjs` → **12/12**.
+  `node work/skillranker-eval/run.mjs --control always-abstain` mean loss **0.833**.
+- **(b)** `python3 work/oracle-kit/prevalence_threshold.py` exit **0**. Frozen priors
+  `30/186449` and `488/50149`. Prints `FP/TP = 55791/24 = 2324.625` (~1:2300),
+  `t*(foreman, L_FP=L_FN=1) = 0.99983910`, dcg `L_FN ∈ {1,10,100}`, planted `π=0.5 → 0.500`,
+  planted `π=0` refuses. Shipped 0.80/0.50 are not Bayes under the signed triples.
+- **(c)** `python3 scripts/promotion-four-gates.py UP-R5-jev-toolcall-gate` exit **1**
+  (all four bits fail: 12/12≠11/12, block⊈observe-only, 15% vs 0.97%, adversarial
+  unmeasured). `--selftest` exit **0**: empty evidence ≠ pass; STATUS.tsv digest unchanged.
+- **(d)** kit planted `{noul:0.9}` as `probabilities` throws; `assertSdkSelector` /
+  `refuseInventedNoulGate`; `node work/oracle-kit/selector-guard.mjs` exit **0** (no silent
+  readers under `work/` `scripts/`); `--selftest` catches a planted silent reader.
+  Closed a live fallback in `work/omp-jev-observer/src/classify-systemone.mjs`
+  (`a?.probability ?? a?.noul` → `field(a, 'noul')`). Observer tests **8/8**.
+- **(e)** `python3 work/oracle-kit/voi_harm_rule.py` exit **0**. Declared
+  `L_miss=1, L_fp=10, c_call=0.01`. `VOI(jev vs regex) = -1.5200` on the frozen 12/12 vs
+  11/12 identities. NO-CLAIM: planted harms, not incidents; FP dens. not like-for-like (R34).
+- **Boundary:** no STATUS rewrite, no new `foundation/gates.sh` stage, no key, no
+  working-dogfood claim. Negative: `NEGATIVE_EVIDENCE.md` R43 (emission-only loss).
+- Lane: offline. Claim: `[test]`.
+
+## cass TASK TESTS — design only, unpromoted (2026-09-20, [pending])
+
+- Receipt: `docs/demos/upstream-repro/jev-task-tests-cass-20260920.md`.
+- **What it is:** a Jev-specific eval contract for ranking / filtering cass
+  `--robot` hits (dig-vs-invent, stale / wrong-workspace, empty-success
+  refusal, selector≡claim). Adopts skillranker process
+  (Choice+`__none__`, 0/1/2 loss, always-abstain required,
+  `diagnostic_synthetic` cannot promote) from
+  `work/skillranker-eval/contract/evaluation_policy.v1.json` and
+  `skillranker-process-mirror-20260919.md`.
+- **Cases:** 10 synthetic cass envelopes (9 judged + 1 selector plant).
+  Preregistered always-abstain mean loss **6/9 = 0.667**; first-hit / BM25
+  **14/9 ≈ 1.556**; perfect-judge feasibility **0**. Planted RED:
+  always-pick-top-hit (CASS-09), empty-success (CASS-07), missing
+  `source_path` (CASS-08).
+- **omp wiring (designed, not landed):** before scaffold / ask-user, playbook A
+  `cass health` + `cass search "…" --robot --limit 5` (`AGENTS.md:1410-1411`),
+  then observe-only Jev-rank; export pick/Y/loss; neighbour co-presence with
+  dont-give-up A. Never `--workspace <project>`. Never a blocking hook.
+- **Commands this pass:** none executed. `command -v cass` → absent. No Jev
+  call. No omp session. No STATUS / gauntlet edit.
+- **Boundary / NO-CLAIM:** authored fixtures (R28); class A if later scripted
+  against a fake asker; cass hit schema cited from upstream SKILL.md, not a
+  local introspect. Unpromoted. Ledger stays **0 promoted**. Honest state:
+  **EXPLORED**, not PROBED.
+
+## jev-task-tests-beads design (2026-09-20) — `[pending]`, not a run
+
+- Receipt: `docs/demos/upstream-repro/jev-task-tests-beads-20260920.md`.
+  Fixtures: `work/jev-beads-eval/{policy.v1.json,cases.v1.jsonl}` (10 cases,
+  always-abstain mean 0.800, `split: diagnostic_synthetic`).
+- Tip census, not memory: `.beads/issues.jsonl` **n=48** at `5dfaba1`
+  (26 closed / 11 open / 5 in_progress / 6 blocked; 6 P0 all `jev-publish-*`;
+  7/26 `close_reason=done`; 12 parent-child deps; 0 cycles on a key scan;
+  Muse children `jev-vbh` + `.1`–`.5`).
+- `br` / `bv` **not executed** (absent from PATH here). No Jev call. No omp
+  registration. **promoted=0.**
+- Rejected designs: `NEGATIVE_EVIDENCE.md` R43.
+- **Boundary:** this is an unpromoted design. The 10 cases were authored by the
+  same pass that wrote the questions (R28). Clearing any later bar on this
+  split licenses an observe-only CLI, not a working-profile advisor.
+
+## jev-task-tests-agent-mail — unpromoted design (2026-09-20)
+
+- **Receipt:** `docs/demos/upstream-repro/jev-task-tests-agent-mail-20260920.md`
+- **Lane:** offline design. **Level:** `[pending]`. Zero Jev calls. Zero `am` invocations.
+- **Upstream read (not cloned, not run):** `Dicklesworthstone/mcp_agent_mail@ac4966c`
+  (`models.py` Message / MessageRecipient / Agent; README send/ack/overseer/urgent-unread).
+  License on GitHub API: `NOASSERTION`.
+- **Process stolen:** skillranker `tests/eval/evaluation_policy.v1.json` on origin/main —
+  Choice+`__none__`, frozen 0/1/2, always-abstain required, `diagnostic_synthetic` cannot
+  promote. Vendored `skillranker@3fe85c4` was **not** moved.
+- **Contents:** 10 authored cases (8 nonempty Y / 2 empty Y; always-abstain arithmetic
+  0.800), observe-only omp/`askJevChoice` wiring sketch, B0/B1 baselines, NO-CLAIM (never
+  send authority).
+- **Negative:** `NEGATIVE_EVIDENCE.md` R42 — 0/1/2 under-prices missed in-band phishing;
+  re-asking Jev for Human Overseer `importance=high` loses cost-benefit.
+- **Boundary:** no harness, no JSONL, no hook install, no STATUS.tsv row, no live inbox
+  export. `am inbox` remains independently recorded as dead transport elsewhere; that is
+  not re-measured here.

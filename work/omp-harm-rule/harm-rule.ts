@@ -17,7 +17,7 @@ import { stripQuotedPayload } from '../toolcall-judge-v3/rules-v4.mjs';
 const DECISION_TYPE = 'com.zeststream.omp-harm-rule.decision.v1';
 const DIAG_TYPE = 'com.zeststream.omp-harm-rule.diagnostic.v1';
 /**
- * MENTION-VS-USE, applied 2026-09-20 under NEGATIVE_EVIDENCE R41's retirement trigger.
+ * MENTION-VS-USE, applied 2026-09-20 under NEGATIVE_EVIDENCE R44's retirement trigger.
  * Section 17 measured this rule's ORGANIC precision at 0 of 28: every fire across 80,975 real
  * allow-commands was text ABOUT danger. stripQuotedPayload removes heredoc bodies and quoted
  * payload while protecting $(...), backticks, and quoted spans in an interpreter code-flag slot
