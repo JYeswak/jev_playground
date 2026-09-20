@@ -26,3 +26,29 @@ turn instead. No routing benefit is claimed or measured.
 | `route_error` | key unset, transport failed, or a 200 with no probabilities |
 
 Never blocks. Never throws into the host. Returns `undefined` on every path.
+
+## Real traffic: 24 rows, one turn, effective n=1
+
+The live rows were labelled against what the turn actually became
+([receipt](../../docs/demos/upstream-repro/route-rows-labelled-20260919.md),
+labels in `labels-20260920.jsonl`).
+
+| | |
+|---|---|
+| rows | 24 |
+| **distinct turns** | **1** |
+| hits | 24/24 on both questions, zero FP/FN |
+| score range across all 24 | **0.01** (heavy 0.90–0.91, mechanical 0.09–0.11) |
+
+**This is weaker than "24/24" sounds, and the number that matters is the 1.** All 24 rows
+judge the same prompt in the same session, 4.5 minutes apart. The tally measures **scorer
+stability, not accuracy** — it is one correct judgement repeated, not twenty-four independent
+ones. Effective **n=1**.
+
+What it does establish: on the one real turn we have, both questions were right, and the
+scorer does not wobble (0.01 range where `argument` in the failure classifier moved 0.47–0.50
+on byte-identical input). What it cannot establish: anything about a second turn, because
+there isn't one — the `turn_start` era wrote zero scored rows, and the twin session wrote
+diagnostics only.
+
+Against the 8/9 hand-built measurement, real traffic says: **correct once, stable always.**
