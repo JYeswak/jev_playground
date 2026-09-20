@@ -253,9 +253,21 @@ authorized `git init`. The nested clones are handled by construction, not by dis
   Three agents share this tree and the index is shared too, so a commit takes
   whatever is staged, not whatever you edited. Measured 2026-09-17: an amend
   swept a sibling's staged `AGENTS.md`/`GATES.md` into an unrelated commit.
-  1. **Reserve before editing:** `am file_reservations reserve ~/Developer/jev
+  1. **Reserve before editing — every shared root artifact, not just the ledger:**
+     `am file_reservations reserve ~/Developer/jev
      <AGENT> <PATHS>... --exclusive --reason <bead-id>`; conflicts check first
      with `am file_reservations conflicts` when another pane may be near the file.
+     The ledger is the highest-contention file but it is not alone:
+     `EVAL.md`, `NEGATIVE_EVIDENCE.md`, `ARC.md`, `GATES.md` all collide.
+     Measured 2026-09-20, two independent instances in one session: a commit
+     swept an uncommitted ledger entry (benign), and a stale-anchored edit
+     destroyed two table rows in `ARC.md` (destructive). Reserve the exact
+     paths first; if another pane holds them, wait or coordinate.
+  1b. **Re-read immediately before any line-anchored write.** A `read`
+     snapshot tag goes stale between your read and your write in this tree;
+     an edit anchored on stale line numbers lands in the wrong place with
+     no error and no warning. Re-read the region, then write in the same
+     pass — never read, deliberate elsewhere, then write.
   2. **Stage exactly your reserved paths:** `git add <path>...` — never `-A`/`.`,
      never a directory that holds a sibling's file.
   3. **Read back the index:** `git diff --cached --stat` must list ONLY paths you
