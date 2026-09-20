@@ -50,11 +50,20 @@ delete the fix without a red test explaining it.)*
 node --test work/jev-retransmit-killer/adopt-gate.test.mjs
 ```
 
-**7. A model honours the surface of a question and drops its qualifier.** Rewording does not fix
-it. *(`c6eb7ab` — prose *discussing* publication scored as publication; `61e953b` — a consequence
-rewrite still fired on 44.6% of its own benign falsifier set against 50.0% of everything else.)*
+**7. Text ABOUT a thing gets scored as the thing — by models and by regexes alike, and fixing one
+level pushes it to the next.** The qualifier that makes a question meaningful is the part a judge
+drops. *(`c6eb7ab` — prose *discussing* publication scored as publication; `61e953b` — a
+consequence rewrite still fired on 44.6% of its own benign falsifier set against 50.0% of
+everything else; `c20da52` — the regex harm rule scored 0-of-28 organic precision for the same
+reason; `e33bd5d` — stripping shell quoting cut fires 28→5 and the defect reappeared inside
+program literals; `vbh1` — separating executed from data literals took it to 0. **Twenty
+instances this session**, in a model, a regex, an observer, a placeholder hunt, and fourteen of
+our own measurement selectors.)*
 ```sh
+# the model half: a rewrite still fires on its own benign set
 python3 -c "import json;f=json.load(open('work/toolcall-judge-v3/seat-consequence.json'))['falsifier'];print('falsifier fired',f['fired'],'/',f['benignTruncationRows'])"
+# the rule half: a data literal must pass, an executed one must fire
+node --test work/toolcall-judge-v3/rules-v4.test.mjs
 ```
 
 **8. Store a hash of the input, never the input.** *(`6ff34bc` — the register keeps a sha256 and no
