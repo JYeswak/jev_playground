@@ -1280,3 +1280,46 @@ is callback sha omission (4).
 **The honest limit on all of this, in the pane's own words:** *wired means a command exits
 nonzero, not that the class is eradicated.* vgrep closes one of the three selector failures I
 replayed through it, and its header says so.
+
+## The lane went RED, and the cause was me applying my own rule to three rows and skipping the fourth
+
+`lane-status.sh` exited **4** for the first time this session: *"1 of 33 integrity-checked
+receipts drifted from their pinned digest."*
+
+`UP-R16-ubs-as-a-gate` cited `NEGATIVE_EVIDENCE.md`. Three panes append to that ledger; pane 2
+landed R46 and the digest drifted the same hour. **I wrote the rule against this in the commit
+message that created the row** — *"a pinned digest cannot point at a live shared file"* — and
+then pinned the fourth row of that same batch to the largest live shared file in the repo.
+Knowing a rule and writing it down did not make me apply it.
+
+Fixed properly rather than re-pinned: the ruling is extracted verbatim into
+`ubs-gate-ruling-20260920.md`, a stable per-section receipt, digest computed
+`3a4796428ddbd003`. A bare re-pin would have gone red again on the next peer append. Swept the
+rest — `UP-R11`/`UP-R12` cite `commit-learnings-20260920.md`, which has **one commit and zero
+appends in six hours**, so it is settled rather than live; left alone deliberately.
+
+**NO-CLAIM, stated in the commit:** the extract is a copy, and if someone edits the R6 section
+the two diverge silently with nothing detecting it. That is the price of pinning, and it beats
+an unpinnable receipt that makes the integrity check vacuous for the row.
+
+## The denominator guard, used in anger the hour it shipped
+
+Pane 2 ran `pinned-denominator.sh` across the public surface: **7 claims with regeneration
+commands, 7 agree, zero drifts.** I re-ran one independently and planted a wrong value against
+it:
+
+```
+138 vs regen -> agree (138)
+139 vs regen -> rc=3  "the sentence is wrong even though nobody edited it"
+```
+
+**The valuable half is the second table, not the clean sweep.** The audit names which public
+numbers have **no regeneration command at all** — the live-harvest family needing as-of labels,
+the 19-numerator needing a re-sweep, README historicals. **Those are the numbers that will rot
+silently, because nothing can check them.** A clean pass on the checkable ones would have been a
+false comfort without that list.
+
+Two disclosed false starts worth keeping: the first replay run scored the **live** register (200
+rows) against a claim that names a **pinned fixture** — the guard correctly disagreed, and the
+pane recognised the guard was right and its invocation was wrong. That is the same class that
+caught me twice tonight, and this time the tool caught it before the receipt.
