@@ -2938,3 +2938,85 @@ that fires on the type and hopes the clause applies does not come back.
 **Evidence:** P3 artifacts `6c35c11`; the pack receipt
 `docs/demos/upstream-repro/filetype-doctrine-pack-20260920.md` (`8ecf180`), whose NO-CLAIM named
 exactly this gap and was right to; `omp config get ttsr.disabledRules`.
+
+## R66 — REFUTED: gap-conditioned rules also yield zero, because our EXPOSURE is the constraint
+
+R64's retry condition was "rewrite each clause as a gap-conditioned predicate." P3 did exactly
+that over **845 real `.rs` edit/write calls**:
+
+| thread | gap occurrences | verdict |
+|---|---:|---|
+| error shape | 114 | clears 50, **0/20 bind** |
+| newtype/typestate | 32 | below floor |
+| unsafe discipline | **6** | below floor |
+| oracle-per-domain | 5 | below floor **and** no gap signal in a diff |
+
+**Zero survivors.** The veto logger concurred offline on all four at zero spend.
+
+**I tried to overturn this with a bigger number and the number was wrong.** I measured
+`git log -S'unsafe'` across five Rust repos: 818 commits in 60 days, 304 in `omp-orchestrator`
+alone, and told P4 the gap signal was "16× our floor". Then I checked what the string actually
+was:
+
+```
+omp-orchestrator, 60 days:  -S'unsafe' → 304 commits
+                            -S'unsafe {' → 2      -S'unsafe fn' → 1
+in-tree:                    forbid(unsafe_code) → 437      unsafe fn → 1
+```
+
+`omp-orchestrator` is a `#![forbid(unsafe_code)]` codebase. **I was counting the churn of
+`forbid(unsafe_code)` declarations — evidence of safety — and reading it as evidence of danger.**
+Fifth measurement error of the day, same family as the other four: a proxy read as the quantity.
+
+**THE REUSABLE CONCLUSION, and it outranks the rule question.** We have 651 skills and a
+221-repo doctrine mirror. The binding constraint on wiring them into rules is **not discovery and
+not delivery — it is EXPOSURE.** A rule can only pay when we actually hit the gap it guards, and
+our measured gap profile is narrow: bash hygiene, absence-from-one-probe, evidence discipline.
+Which is exactly the three rules that survived. The deep Rust skills
+(`rust-unsafe-code-exorcist`, `rust-undefined-behavior-exorcist`) are excellent and nearly
+unreachable for us, because our Rust is already forbid-unsafe — the honest mode for our repos is
+that skill's own `forbid-soundness` fast path, not an audit.
+
+**Before wiring any skill into a rule, measure our exposure to its gap.** That check costs one
+grep and would have saved this whole arc.
+
+**Retry-condition:** revisit if our exposure profile changes — a new repo that actually writes
+`unsafe`, FFI, or SIMD; or a measured gap class clearing 50 occurrences AND 20% bind on real
+edits. Do not re-derive the delivery mechanism; R64 settled that.
+
+**Evidence:** P3 funnel `ac05a6a`; the omp-orchestrator counts above; `jsm search` routing probe
+(natural 5-term query returns 0 while single terms hit).
+
+## R65 — REFUSE: gap-conditioned .sh/.md rules (funnel: 3 in, 0 survive)
+
+**Corpus:** 30,041 edit/write toolCalls over 1,817 sessions
+(toolCall blocks, arguments capped at 20 KB), walked 2026-09-20.
+Denominators stated per class below.
+
+| candidate | hits | rate | ≥50 | bind (n=20, seed 20260920-gap) | advisory | verdict |
+|---|---:|---|---|---|---|---|
+| SH1 rc-capture-no-verdict (.sh) | 2 | 0.06% sessions | no | unlabelled (floor fail) | REFUSE_TOO_RARE | refuse |
+| SH2 pipeline-status-in-edit (.sh) | 95 | 1.65% sessions | yes | FP 1.00 — fires on the correct `out=$(…); rc=$?` idiom | REFUSE_LOW_PRECISION | refuse |
+| MD1 number-without-provenance (.md) | 37 | 0.50% sessions | no | FP 1.00 — fixtures, dispatch packets, provenanced claims | REFUSE_TOO_RARE | refuse |
+
+**Overlap check (ordered):** SH2's shape is bash-pipe-exit seen from the
+edit scope — same defect, and the edit-scope instances are overwhelmingly
+the already-correct capture-first form. Not a rebuild; a confirmation
+that the existing rule holds the class.
+
+**Permanently closed as rules** (read-once layer owns them):
+single-entry script count (repo-state-dependent, invisible to a
+single-string predicate); equal-or-weaker as a gap detector (no surface;
+the commit-msg hook already enforces the class); wrapper-verdict as a gap
+(covered by the SH1 measurement: 2 instances fleet-wide); capture-first
+in .sh (SH2: fires only on correct code).
+
+**Retry-condition:** reopen a class only with a new predicate that clears
+50 + FP ≤ 0.30 + concentration < 0.5 on this corpus, logged through
+`advisory-veto.mjs` first. MD1 sits at 37 with top-share 0.49 — closest
+to reconsideration, still short on both axes.
+
+**Evidence:** `/tmp/fhgap_hits.json`, `/tmp/fhgap_snipcheck.json`,
+class files `/tmp/fhgap_class_{pipe,mdnum,rcno}.json`, verdict rows in
+`work/jev-triage/advisory-veto.jsonl` (mine: 23:16:54Z ×3; P3's rs-gap
+rows at 23:15:25Z show the same machinery). Bead below.
