@@ -28,3 +28,17 @@ Receipt: `docs/demos/upstream-repro/frozen-toolcall-scorer-20260920.md`.
 
 CASS (`/Volumes/ZestData/cass-data/agent_search.db`) and live agent-mail are
 **not** queried from this cloud VM. Next offline-export levers only.
+
+## Multi-feature judge (beats always-abstain)
+
+```bash
+python3 work/jev-real-corpus-eval/mine_features.py \
+  work/p3-calibration/toolcall-corpus-frozen.jsonl
+python3 work/jev-real-corpus-eval/multi_feature_judge.py \
+  work/p3-calibration/toolcall-corpus-frozen.jsonl
+```
+
+Measured (2026-09-20): logistic **5-fold CV mean_loss=0.197426005** vs always-abstain
+**0.212210043** → **BEAT**. Receipt:
+`docs/demos/upstream-repro/toolcall-multi-feature-judge-20260920.md`.
+Allow only when estimated P(GOOD)>2/3 (loss math under class imbalance).
