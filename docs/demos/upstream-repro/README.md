@@ -103,10 +103,10 @@ once under the subject they measure) — prose mentions are not index rows, whic
 and the file count agree exactly.
 
 The check runs against `ls`, not against git, because that is the denominator a reader actually
-faces. At the commit that wrote this file 227 of the 228 were tracked; the newest was still uncommitted in a sibling pane. **The directory
-gained six artifacts while this index was being written**, so re-run the five commands above
-rather than trusting the number — and if one comes back as a gap, add its row rather than editing
-the count.
+faces. The two converged at the commit that wrote this line — every file on disk was tracked — but
+they diverge whenever a sibling pane is mid-write, and **six artifacts landed here while this index
+was being written**. Re-run the five commands above rather than trusting any count in this file;
+if one comes back as a gap, add its row rather than editing the count.
 
 ---
 
