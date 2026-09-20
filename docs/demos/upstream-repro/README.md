@@ -1,10 +1,13 @@
 # Index — every receipt in `docs/demos/upstream-repro/`
 
 **This directory is the evidence behind the project, and this file is the only complete index of
-it.** 225 artifacts sit here beside this README. Until this rewrite, no index covered more than 18
+it.** 227 artifacts sit here beside this README. Until this rewrite, no index covered more than 18
 of them and `docs/demos/STATUS.tsv` cited 19 — a union of roughly 30 of the 207 present at
-`038aeb4`, which left ~85% of the corpus reachable only by `ls`. Every artifact now appears exactly
-once below, grouped by subject, one line saying what it settles.
+`038aeb4`, which left ~85% of the corpus reachable only by `ls`. **That gap is widening, not
+closing:** `STATUS.tsv` still cites the same 19 while the directory has grown, so the cited share
+has already fallen from 9.2% to 8.8% and below
+([`map-stranger-check-20260920.md`](map-stranger-check-20260920.md), measured independently).
+Every artifact now appears exactly once below, grouped by subject, one line saying what it settles.
 
 Two things a reader has to know before using the index, both measured in
 [`map-docs-20260920.md`](map-docs-20260920.md):
@@ -78,19 +81,26 @@ cd docs/demos/upstream-repro
 # every row's first cell, one filename per index row
 sed -n 's/^| \[`\([^`]*\)`\].*/\1/p' README.md | sort > /tmp/idx.txt
 ls -1 | grep -v '^README.md$' | sort > /tmp/dir.txt
-wc -l < /tmp/idx.txt          # 225  (index rows)
-wc -l < /tmp/dir.txt          # 225  (files on disk)
+wc -l < /tmp/idx.txt          # 227  (index rows)
+wc -l < /tmp/dir.txt          # 227  (files on disk)
 uniq -d < /tmp/idx.txt        # empty: no file indexed twice
 comm -3 /tmp/idx.txt /tmp/dir.txt   # empty: no gaps either way
 ```
 
-Measured at the commit that wrote this file: **225 index rows, 225 files on disk, 0 duplicates,
+Measured at the commit that wrote this file: **227 index rows, 227 files on disk, 0 duplicates,
 0 differences.** The extractor takes only the first cell of a row, so the supersession links inside
 a description never double-count. Two maps are named again in prose (once under the maps group,
 once under the subject they measure) — prose mentions are not index rows, which is why the row count
 and the file count agree exactly.
 
+The check runs against `ls`, not against git, because that is the denominator a reader actually
+faces. At the commit that wrote this file the two agree: all 227 are tracked. **The directory
+gained five artifacts while this index was being written**, so re-run the five commands above
+rather than trusting the number — and if one comes back as a gap, add its row rather than editing
+the count.
+
 ---
+
 ## Upstream sweep — spam, phishing, prompt injection
 Somebody else's code on somebody else's corpus. Nothing in these clones was patched.
 | receipt | what it settles |
@@ -344,6 +354,7 @@ The instruments built because prose rules did not stop the defect recurring.
 | [`guard-dogfood-20260920.md`](guard-dogfood-20260920.md) | **LOADING PROVEN** — the guard rule firing live in a real session on a real piped bash command. |
 | [`guard-fp-rate-20260920.md`](guard-fp-rate-20260920.md) | Its false-positive rate on a seeded 100-command sample from 78,242 harvest records, threshold frozen before any fire was seen, 67 fires hand-labelled one at a time. **The number stands; its `KEEP` disposition is superseded** by [`pipe-exit-reconciliation-20260920.md`](pipe-exit-reconciliation-20260920.md), which shows this measured precision *given a fire* rather than the decision axis. |
 | [`pipe-exit-reconciliation-20260920.md`](pipe-exit-reconciliation-20260920.md) | **Settles the three contradicting `pipe-exit` rulings: not a conflict, three axes.** The decision axis — rate × precision on the defect population — had never been measured by any of them; measured here at 1.04% (812) with FP 3/20, keeping all four strong positives. R51's 55.2% reproduces to the unit (43,185/78,242), its 18.4% is **overturned** (refuted at z=9.96, and no slice or predicate variant reproduces it), the FP receipt's `KEEP` is superseded, and R48 was never in this fight. Author: `ReconcilePipeExit`. |
+| [`pipe-exit-v2-dcg-mine-20260920.md`](pipe-exit-v2-dcg-mine-20260920.md) | The same class mined from the corpus nobody reads: `dcg` holds **223,945 `dcg_allow` rows** and **zero `ee` extensions read any of it** while `ee journal list` reports `entryCount 0` against 14,196 `bash_failure` rows. The narrowed v2 predicate fires **1.03%** with 0–1 FP of 10. The richest corpus we own and the memory system that needs it are not connected — that is the finding, not the rate. |
 | [`hook-exit-code-sweep-20260919.md`](hook-exit-code-sweep-20260919.md) | **No silent default pass remains in the exercised hook paths.** The one `rc=0` missing-checker case requires an explicit risk override and prints a named skip — an intentional escape hatch, not an unqualified PASS. |
 | [`measurement-premortem-20260920.md`](measurement-premortem-20260920.md) | "Observe every tool call" cut down to **NARROW**: no new capture, no private sink, no model, no unqualified "every" — a reporter over session JSONL with per-surface denominators. |
 | [`ee-repair-blocked-20260920.md`](ee-repair-blocked-20260920.md) | **BLOCKED**: a memory that cannot be written to is not a component, and hand-repairing a corrupt shared store is out of scope. **Overturned in scope** by [`map-hook-ee-20260920.md`](map-hook-ee-20260920.md), which shows this measured the *home* store and a second store is healthy. |
@@ -395,14 +406,15 @@ The lane auditing its own published surface. Read these before trusting a number
 | [`vbh4-shadow-20260920.md`](vbh4-shadow-20260920.md) | **REFUSE live action**: the shadow beats abstain and argmax on correct-minus-wrong, but all 5 errors sit in the trap-short class, so the abstention band catches the cautious middle rather than the hard cases. |
 | [`vbh-program-closeout-20260920.md`](vbh-program-closeout-20260920.md) | The `jev-vbh` advanced-skills programme closed out child by child, with what shipped and what did not. |
 
-## The six maps — the 2026-09-20 read-only inventory sweep
-One slice each, all frozen at `038aeb4`, all synthesised in the root [`MAP.md`](../../../MAP.md). Read a map before you read its slice's receipts.
+## The six maps, and the stranger check on their synthesis
+One slice each, all frozen at `038aeb4`, all synthesised in the root [`MAP.md`](../../../MAP.md). Read a map before you read its slice's receipts — and read the stranger check before trusting `MAP.md`'s numbers.
 | receipt | what it settles |
 |---|---|
 | [`map-docs-20260920.md`](map-docs-20260920.md) | The documentation corpus: 407 `docs/` files plus 11 root. **The two findings this index exists to answer** — the citation surface reaches 9.2% of receipts, and orphanhood here measures age, not worth (orphan rate 12% → 25% → 32% across three days, with the authoritative later file being the orphan in 6 of 7 supersession pairs). |
 | [`map-git-arc-20260920.md`](map-git-arc-20260920.md) | The git arc: 1,140 commits in 67 hours, and 40.4% of them sitting in abandoned scopes. |
 | [`map-instruments-20260920.md`](map-instruments-20260920.md) | The verification machinery: 38 instruments wired, and nothing runs the driver. |
 | [`map-work-packages-20260920.md`](map-work-packages-20260920.md) | `work/`: 53 directories measured — KEEP 39 / ALIGN 12 / DISCARD 2 — against a README partition that no longer matches. |
+| [`map-stranger-check-20260920.md`](map-stranger-check-20260920.md) | Non-author re-derivation of every number in `MAP.md` at `1c2b4f0`: **7 of 10 reproduce exactly, 2 are overturned, 1 has no source anywhere** — guard-rule 200 → 148 (the 200 was a bare-grep artifact), 323,575 → 381,142 (a label sitting below the sum of its own children), "57 files use `appendEntry`" traces to nothing, and the 207-commit duel-2 blocker names the wrong file (`lane-status.sh:87` is fail-open; the real gate is `verify-other-reasons.sh:41` at stage 90). Also confirms the 9.2% this index answers, and that `206` counts tracked `.md` **including the README itself**. Author: `DogfoodMap`. |
 
 The other two maps are listed under the subjects they measure, so they stay one index row each:
 the hook/learning/`ee` loop map sits in **Guards, hardening, and the `ee` learning loop**, and the
@@ -456,19 +468,27 @@ The remaining claimed sections. Each stub is superseded by its own full receipt.
 - **Nothing here was renamed, moved or deleted.** The one duplicate found
   (`cass-dig-vs-invent-mine-20260920.md`, which declares itself canonical and holds no numbers) is
   flagged in place for its owner.
+- **There is no "cited" or "safe to delete" column, deliberately.** Besides the age artifact, an
+  uncited receipt can still be load-bearing in a way no index can see: `map-stranger-check` found
+  that `docs/demos/duel-2/FALSIFY_COD-H2_MU.md` is the only in-repo source for the refusal of the
+  published routing-savings figure and is cited by nothing machine-checked, while 15 other
+  `duel-2` receipts are hard-required fail-closed by `lane-status.sh`. Any index that scored
+  citation count would have marked the load-bearing one disposable.
 
-## Appendix — the 2026-09-19 promotion surface, unchanged
+## Appendix — the 2026-09-19 promotion surface
 
-Everything below this line is the previous edition of this file, kept verbatim. It is the
-stranger-consumable promotion surface that
+Everything below this line is the previous edition of this file, kept word for word. **The only
+change is heading depth — every heading is pushed down two levels so the appendix nests under one
+top-level heading. No sentence, number, link or table cell was touched.**
+It is the stranger-consumable promotion surface that
 [`honesty-window-buckets-20260918.md`](honesty-window-buckets-20260918.md) ruled was required
 before upstream evidence counts as shipped, and
 [`promotion-grade-20260918.md`](promotion-grade-20260918.md) graded it as one. **Scope: it covers 18
-of the 225 artifacts and stops at 2026-09-19** — the index above is the current surface.
+of the 227 artifacts and stops at 2026-09-19** — the index above is the current surface.
 
 ---
 
-# What 22 Jev repositories say when you actually run them
+### What 22 Jev repositories say when you actually run them
 
 Written for someone who does not work on this lane. Every line below was produced by running
 somebody else's code on somebody else's data, and every claim links to the receipt that produced it.
@@ -481,7 +501,7 @@ promoted into a clear stranger-consumable surface"*
 ([`honesty-window-buckets-20260918.md`](honesty-window-buckets-20260918.md)). Receipts in a folder
 are not a surface. This is the promotion.
 
-## The short version
+#### The short version
 
 **A plain-English question with no labels is competitive with a classifier trained on thousands of
 them, and the gap widens on mail the classifier was not trained for.** Elaborating the question makes
@@ -489,7 +509,7 @@ it worse. Jev is fast and cheap enough to ask per item, and it trails general mo
 workflow scores, so the interesting question is never *"is it better"* but *"where does a typed
 judgment beat a trained model or a hand-written rule."*
 
-## What each run returned
+#### What each run returned
 
 | Repo | Finding | Receipt |
 |---|---|---|
@@ -510,7 +530,7 @@ judgment beat a trained model or a hand-written rule."*
 | `jev-review` | a code-quality scorer that returns **`applicable: false`** for dimensions its context cannot support: a refusal-to-score state shipped as contract, not retrofitted | [jev-review](jev-review-20260918.md) |
 | `bicameral` | the System 2 writes / System 1 judges split is real, with two differences worth copying: **judgment is a pluggable interface**, and its degraded path **falls back to pattern rules rather than passing work through unjudged** | [bicameral](bicameral-20260918.md) |
 
-## Three things worth taking from these, whoever you are
+#### Three things worth taking from these, whoever you are
 
 1. **Ask the short question.** Across three paired comparisons the elaborated question never won, and
    the shortest one won outright where it was tested. `jev-spam-eval`'s own README says its headline
@@ -524,7 +544,7 @@ judgment beat a trained model or a hand-written rule."*
    silently permitted the commit. A fail-open path that never fires is indistinguishable from a
    correct one until the day it matters.
 
-## What none of this establishes
+#### What none of this establishes
 
 - **No head-to-head we ran is ours.** These are other people's harnesses and corpora; we reproduced
   and re-analysed, and where we disagree with an author it is stated against their own data.
@@ -535,12 +555,12 @@ judgment beat a trained model or a hand-written rule."*
 - **Live figures cost real calls** and were run once. Nothing here is a reliability measurement, and
   no figure on this page should be read as a benchmark of the current model.
 
-## 2026-09-19 — the last four clones, and what running them cost us in retracted claims
+#### 2026-09-19 — the last four clones, and what running them cost us in retracted claims
 
 Four repositories sat unrun while this lane built its own versions of their questions. Running them
 produced the session's only shipped-code defect **and** forced three retractions of our own work.
 
-### A timeout in `typesafe-sdk-js` kills a default Node process
+##### A timeout in `typesafe-sdk-js` kills a default Node process
 
 Their suite reports **189/189 passing with 8 unhandled errors** — Vitest's own warning is that this
 "might cause false positive tests". Run file by file, all 8 come from one file, which makes exactly
@@ -556,7 +576,7 @@ report: [`sdk-js-timeout-crash-20260919.md`](sdk-js-timeout-crash-20260919.md).
 ([`sdk-python-20260919.md`](sdk-python-20260919.md)). That control is what turns "async timeouts are
 hard" into "this is a defect", and it only exists because the Python clone got run too.
 
-### The vendor's own guidance was in the tree, unread
+##### The vendor's own guidance was in the tree, unread
 
 [`typesafe-ai/skills`](sdk-js-and-skills-20260919.md) is TypeSafe's own instructions for designing
 Jev judgments — meaning belongs in `instructions` because question IDs are never sent to the model,
@@ -564,7 +584,7 @@ state must be complete, include a no-match outcome. We had spent a day designing
 opening it. Checking our code against it found **nothing to fix**, for the useful reason that we
 author no questions at all: we delegate to `fast-jev-compaction`, which already complies.
 
-### Three claims of ours that did not survive contact
+##### Three claims of ours that did not survive contact
 
 | we said | what the control showed |
 |---|---|
@@ -575,13 +595,13 @@ author no questions at all: we delegate to `fast-jev-compaction`, which already 
 No upstream report was filed for the `skillranker` "gap", which is the point of holding reports for
 a human: it would have told a maintainer their docs were broken when the defect was our pin.
 
-### What this is worth to someone outside the lane
+##### What this is worth to someone outside the lane
 
 Four of the six things the sweep produced are things we were about to build ourselves and did not
 need to. The pattern is consistent enough to state plainly: **before writing code to answer a
 question, check whether a repository you already cloned answers it, and run that instead.**
 
-## Provenance of the figures on this page (audited 2026-09-19)
+#### Provenance of the figures on this page (audited 2026-09-19)
 
 Every numeric claim in the root README's twenty-two-repo table was checked against a committed
 receipt. **Fifteen claims, fourteen backed, one fabricated.**
