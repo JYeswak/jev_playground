@@ -13,9 +13,12 @@ exists, vs 0.159 always inventing (n=138 locked questions)
 
 That aggregate **inverts on the slice that matters**. On the 16 questions
 that claim something is missing ("no such field", "undefined", …),
-digging scores 0.500 vs 0.250 inventing — twice as bad. The hits exist and
-answer nothing; each wrong dig costs double. The pooled win was carried by
-the other 122 questions, where digging was nearly perfect.
+digging scores 0.500 vs 0.250 inventing — twice as bad **if you price a wrong
+dig at twice a wrong invention, which is our assumption, not a measurement**.
+Price them equally and the slice is a tie. What survives either pricing is the
+direction: on these questions digging never beats inventing. The hits exist and
+answer nothing. The pooled win was carried by the other 122 questions, where
+digging was nearly perfect.
 
 The obvious fix was built and **refused**: a rule that skips digging on
 suspicious questions caught 2 of the 4 empty hits but killed 2 good digs
@@ -47,7 +50,19 @@ demand evidence in the hit that it answers, or invent.**
 
 - `Y` (which digs were "right") is a **mechanical proxy** — receipt-shaped
   text / wrong-selector traces — not human labels.
-- > Pane-3 review status: PENDING — if it overturns the inversion, the arc above changes.
+- > **Pane-3 non-author review: LANDED, and it WEAKENS the headline.** Both numbers
+  > recompute exactly, but the inversion is **fragile in two measured ways**, each
+  > reproduced independently ([review](./mines-nonauthor-review-20260920.md)):
+  > **(a) the "twice as bad" is a chosen constant.** A wrong dig is scored at 2× a wrong
+  > invention. At a 1:1 cost the slice is an exact **tie** (0.250 vs 0.250), not a loss.
+  > The *direction* — digging never beats inventing here — holds at every cost ≥1; the
+  > magnitude does not exist without the 2.
+  > **(b) the inversion hangs on ≤2 proxy labels.** Flip one mechanical `Y` zero to one
+  > and digging still loses (0.375 vs 0.3125); flip two and **digging wins** (0.250 vs
+  > 0.375). Sixteen rows decided by four labels from an uncalibrated proxy.
+  > Snippets are not in the export, so human calibration is impossible from the pinned
+  > file — that grading is the load-bearing next step, and until it exists **read the
+  > takeaway below as a caution, not a measured law.**
 - Practical warning, reproduced: the mail DB timestamps are in
   **microseconds**, the archive DB's in **milliseconds**. Compare them raw
   and every time-window join silently returns zero — the same zero a real
