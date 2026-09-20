@@ -76,6 +76,38 @@ find /tmp -name x.pem -exec cp {} /tmp/y \;
 That is **copying a private key** — secret staging, precisely what the rule exists to see.
 **The shipped rule was right and the broader control written to check it was wrong.**
 
+### Real danger: 1/814 against commands dcg actually blocked
+
+The NO-CLAIM above said recall was untested by real danger. It is now tested, against commands
+a guard on this machine genuinely refused
+([receipt](../../docs/demos/upstream-repro/harm-recall-dcg-blocks-20260919.md),
+`dcg-recall.mjs`, self-contained, no network):
+
+```
+bridge rows scanned       218,404 allow + 1,309 block   (~1,759 session logs, whole machine)
+block commands recovered  814 / 1,309  (62%)
+recall, shipped extension   1 / 814  = 0.001
+false positives, real allow 0 / 500   (deterministic every-100th sample)
+```
+
+**Read both, and read the second one first.** `0/500` on real allow traffic is the first
+false-positive evidence here that is not probe-based — 80 benign commands became 500 real
+ones and it still never fired.
+
+**The `1/814` is not "the rule misses real danger".** dcg's block policy is a *superset*: 204
+of the 814 are approval-gated bulk deletions on build dirs, caches and fixtures — routine, and
+deliberately outside the four harm classes. The two policies barely overlap by design, so this
+denominator measures **policy overlap, not harm recall**.
+
+**What it does establish, and it is uncomfortable:** across a month of real machine traffic,
+almost nothing that actually got stopped looked like our four classes. The `12/12` headline
+was measured on a constructed corpus, and real-danger recall for those classes remains
+essentially untested — **n≈2 in the wild**. The rule is precise and narrow; how often its
+narrow window is the one that matters is still unknown.
+
+The 495 unrecovered blocks all carry `js-bash-*` ids — the namespace seam in `GATES.md`. The
+full miss list is withheld: they are real commands and some carry secrets.
+
 ### Why this one held when five others did not
 
 Five hand-built results failed to transfer to real data in the same session: `route` 8/9 →
