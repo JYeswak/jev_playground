@@ -68,3 +68,16 @@ SECTION 5b WHY THIS SECTION EXISTS, demonstrated — the arsenal audit in
 `commit-learnings-20260920.md` listed `jsm` as owned-with-zero-refs. One search, five seconds, and
 it found that a queued 8–10-pass authoring job may be re-deriving a skill we already own. That is
 the entire thesis of "search before invent", and it was a miss until this section ran.
+
+## Wave C add-on, registered (Joshua, 2026-09-20)
+
+Cursor agents are deep-mining skillranker PROCESS to mirror into omp/Jev; two-plus agents on
+`jev_playground`; direct `Dicklesworthstone/skillranker` blocked pending GitHub access. When those
+PRs land, treat as a Wave C add-on with three named deliverables: **skill-router abstention**,
+**eval gate >=0.90**, **JSONL export**. Overlaps section 12 (usage-router-active) and section 15
+(score-register export sweep) directly — the register already emits JSONL with a replay that makes
+zero API calls (`8e2d533`), so the export half may be satisfied on arrival rather than built.
+
+NO-CLAIM: no skillranker PR has landed or been read; this is a registered intent, not evidence.
+Our clone is 217 commits behind `origin/main ba5da08` (bead `jev-0bp`, closed by pane 3 as
+Linux-only with rank quality unrun).
