@@ -2366,3 +2366,31 @@ around exactly when output is large.
 Recording this because the refusal was PREDICTED IN THE DISPATCH by me and then
 returned agreed. Same-origin agreement counts once, so I checked the premise
 instead of banking the confirmation — and one leg was wrong. Trigger unchanged.
+
+## R51 — DROPPED: pipe-exit class from guard-rule (wallpaper + precondition-not-defect)
+
+**Recorded:** 2026-09-20 · **Level:** `[receipt]` · Measured on 78,242 real
+commands (`real-allowed.json`), plus the seeded-100 FP sample
+(`guard-fp-rate-20260920.md`: 3/57 FP looked safe — the wrong test).
+
+Fires on 43,185/78,242 = **55.2%** of all commands (conductor measured
+18.4% on a 4,000 subset; same conclusion at both scales). A warning on
+every second command is wallpaper within the hour; low FP does not save
+it because the cost is attention, not correctness. Worse: of piped
+commands, ~91% show no rc read — the class detects the PRECONDITION
+(a pipeline exists), not the DEFECT (reading its exit as the producer's).
+Mention-vs-use, instance 29, inside the guard built to stop it.
+Narrowing fails measured: entire-command + last-stage-head/tail +
+no-pipefail still fires 6.0% AND drops all 4 strong positives (each has
+`; echo` tails reporting the rc — the only catches that mattered). Moving
+to tool_result fails: the read happens in the agent's head or a later
+call; joining needs session-state machinery plus side-effectful producer
+re-runs for a 4-instance class. grep-as-proof (0/10 FP, 10% rate) and the
+two unfired classes are unaffected.
+
+**Trigger (overturn condition):** a surface where the rc READ is
+observable — harness per-stage pipeline exit metadata, or a
+tool_result+isError join exhibiting producer-failed-but-reported-success
+— then build the class there, with the 4 strong positives
+(`echo exit=$?` rows) as trigger arms and the 6.0% narrowed set as the
+FP ceiling it must beat.

@@ -19,7 +19,8 @@ const DECISION_TYPE = 'com.zeststream.omp-guard-rule.decision.v1';
 const DIAG_TYPE = 'com.zeststream.omp-guard-rule.diagnostic.v1';
 
 export function classify(command) {
-  if (command.includes('| head') || command.includes('| tail')) return { cls: 'pipe-exit' };
+  // pipe-exit DROPPED under R51 (55.2% fire rate is wallpaper; detects the
+  // precondition, not the defect). Do not re-add by pattern-matching.
   if (command.includes('git add -A') || command.includes('git add .')) return { cls: 'stage-all' };
   if (command.includes('git commit') && command.includes('-m') && command.includes('`')) return { cls: 'commit-backtick' };
   if (command.includes('grep -c') || command.includes('grep -q')) return { cls: 'grep-as-proof' };
@@ -27,9 +28,7 @@ export function classify(command) {
 }
 
 export default function guardRule(pi, deps = {}) {
-  // Testability seam ONLY (same shape as harm-rule's): production always uses
-  // the frozen classify above. Lets the negative arm prove a throwing
-  // classifier becomes guard_error, never guard_pass.
+  // Testability seam ONLY: production always uses the frozen classify above.
   const classifyFn = deps.classify ?? classify;
   pi.on('tool_call', async (event, ctx) => {
     try {
