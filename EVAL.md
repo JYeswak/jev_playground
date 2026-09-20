@@ -739,3 +739,31 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   (global withhold until #4 fixed). Level `[live]` (doctrine proven by N=2 live decisions).
 - **Boundary:** no new live calls (0 this unit); skillranker/ untouched; `.beads` rows
   (jev-jwr/jev-osh) flushed to JSONL, commit deferred — sibling rows present, not mine to carry.
+
+## P2 fh-doctrine mine: 3 refusals, 0 shipped (2026-09-20)
+
+- **Lane:** offline. fh STALE (`ledger_age_hours≈307` — freshness of the
+  refresh cron only; rows and citations stable, no recency claim). Rows read
+  via `fh search` + `fh why`: **C71** (search the crate before patching the
+  caller; cited `local@4bcb1844:src/search.rs:1321`) and **C60** (truncated
+  denominator / exit-124 / empty-as-finding; cited
+  `frankengit@25537a1:scripts/verify.sh:55-60`).
+- **Corpora (neither authored by the scorer):** bash harvest
+  `work/toolcall-judge-v3/real-allowed.json`, N=78,242 (`tool=bash` throughout,
+  structurally blind to prose); assistant-text turns N=45,220 over 1,839
+  session JSONL under `~/.omp`, walked 2026-09-20T22:04:21Z (brief said
+  1,842/45,108 — drift during the day, quoted hour is the measurement's).
+- **Measured:** `workaround`+upstream-vocab 89 (0.1968%), FP 0.95 (n=20, seed
+  20260920, one labeller, single TRUE at msg `30f09953` "took the workaround
+  six times"); bare empty-narration 218 (0.4821%), FP 1.00 (fires land on
+  compliant writeups: exit codes named, conclusions withheld); empty+timeout
+  conjunction 27 (0.0597%, below the 50 floor), FP 1.00; `timeout`-led bash
+  commands 247 (0.3157%, legitimate bounded probes).
+- **Verdict:** REFUSE all three — **R56/R57/R58**. No rule files touched, no
+  selftest arms added (a rule with no test is a rule nobody has seen fire,
+  and these earned no rule). `scripts/selftest-ttsr-rules.sh` re-run as
+  regression: 51 ok / 0 failed, no drift.
+- **Boundary:** one labeller; prose predicates only — the C71 tell lives in
+  written code content, which no current TTSR scope observes (see R56 retry);
+  corpus drifts (fleet sessions write during measurement); `fh` STALE so
+  nothing said about recent movement; /tmp evidence not committed.

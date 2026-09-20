@@ -2629,3 +2629,111 @@ enclosing script rather than one tool call.
 
 **Evidence:** measurement above; `scripts/selftest-ttsr-rules.sh` compile-guard
 RED arms; commit `51edc23`.
+
+## R56 — REFUSE: C71 `workaround` + upstream-vocab as a TTSR class (FP 0.95)
+
+**Hypothesis:** fh C71 ("a defect you diagnose and work around may already be
+fixed in your pinned dependency — search the crate before you patch your
+caller", cited `local@4bcb1844c884220042b0d6110a2ddd18a1a8c7c2:src/search.rs:1321`
+`SECONDARY_SOURCE_WEIGHT`) is detectable in prose as `workaround` next to
+crate/upstream/dependency vocabulary, shippable as a ROUTING rule (fires once,
+points at the adoption: grep the dependency's source before committing the
+correction).
+
+**Measured 2026-09-20** on 45,220 assistant-text turns over 1,839 session JSONL
+under `~/.omp` (walked 2026-09-20T22:04:21Z; corpus drifts while measured).
+fh ledger STALE (`ledger_age_hours≈307`) — freshness only, rows and citations
+stable, no recency claim made.
+
+| predicate | hits | rate | verdict |
+|---|---:|---:|---|
+| `workaround` (bare) | 147 | 0.3251% | clears both bars, and is wrong (below) |
+| `workaround` + `crate\|upstream\|dependenc\|librar\|pinned\|vendored\|third.party` | 89 | 0.1968% | clears both bars, **FP 0.95** |
+
+**Labelling:** n=20, seed `20260920`, one labeller. TRUE=1, FALSE=19.
+The 19 falses are process/doctrine discussion where a "go grep the crate"
+paragraph adds nothing: meta-talk about workarounds (S1L4Src: "a workaround
+that works is the most effective way to stop investigating"), turns already
+demonstrating C71-compliant behavior (S1L3Obs: corrected from the wrapper's
+own words; GradeParity: re-derived at source), and closings where `upstream`
+means the upstream *repo* (jeff-issue-chain filings), not a pinned crate —
+in this fleet `upstream` is fleet-idiosyncratic vocabulary, which is what the
+conjunction mostly matches. The single TRUE (2026-09-02, omp-orchestrator
+session `01a05669`, msg `30f09953`): "I took the workaround six times" while
+"my exact error string was already a row in [the skill's] symptom index" —
+the C71 moment in prose, and a routing paragraph would have been worth it
+there. One true fire in 89 is not a rule.
+
+**Why refused despite clearing the bar:** at FP 0.95 the rule nags 19
+compliant or irrelevant turns per useful one — the `does not exist` nuisance
+lesson repeating. Narrowing the predicate to the admission shape ("took the
+workaround N times") fits it to the single hit, which is cherry-picking, not
+a bar. The true fire is documented above for a future predicate.
+
+**Retry-condition:** reopen only if (1) a predicate names the *admission of a
+repeated workaround* plus the *upstream artifact left unchecked* and holds
+FP ≤ 0.30 at n≥20 on a corpus the scorer did not author, or (2) a TTSR scope
+appears that matches *written code content* (the C71 tell is a comment
+explaining a primitive's failure mode — no current scope sees file content,
+only paths and command strings), or (3) `astCondition` over edit/write
+digests is shown firing on a planted workaround-comment RED arm.
+
+**Evidence:** `/tmp/fhmine_hits.json`, `/tmp/fhmine_sample_A2.json`, seed
+`20260920`; bead `jev-m4r` CLOSED REFUSED.
+
+## R57 — REFUSE: C60 bare empty-output narration as a DEFECT class (FP 1.00)
+
+**Hypothesis:** fh C60 ("a bounded timeout around a slow tool produces output
+indistinguishable from no output, and the caller records the second", cited
+`frankengit@25537a174bf6f965e7a5bd43e1d3a2648bf41eff:scripts/verify.sh:55-60`)
+yields a DEFECT rule firing when a turn narrates empty/null output as a
+finding: `returned nothing|found nothing|no relevant|reclaimed nothing|came
+back empty|\bno output\b|nothing there|empty (result|output|response)`.
+
+**Measured 2026-09-20**, same corpus as R56: **218 fires, 0.4821%** over 63
+files (top file 25/218 = 11%, no concentration pathology).
+
+**Labelling:** n=20, seed `20260920`, one labeller. TRUE=0, FALSE=20 —
+FP 1.00. The predicate fires overwhelmingly on the *desired* behavior:
+turns that name the exit code (`du` with `DU_RC=0`; "Leg B produced no
+output. Inspecting the actual file state before proceeding"), quantify the
+denominator (7675/8057 coverage; seven-run CI proof), check the instrument
+before doubting the world ("two of my probes came back empty, and I'm
+checking my instrument"), or explicitly withhold the conclusion ("No output
+at all — the loop exhausted, so the probe itself needs diagnosing before I
+can cite it"). A rule that nags exemplary writeups is worse than wallpaper.
+This is also the shape the absence rule's REFUSED data-tier already covers
+from the other side: emptiness narration without a capability claim.
+
+**Retry-condition:** reopen only if a labelled sample on a fresh corpus shows
+≥5 TRUE fires (actual findings drawn from uninterrupted emptiness) at FP ≤
+0.30, n≥20, same seed protocol; mere rate growth without new TRUEs is the
+fleet writing more compliant writeups, not a new defect.
+
+**Evidence:** `/tmp/fhmine_sample_B0.json`; bead `jev-m4r` CLOSED REFUSED.
+
+## R58 — REFUSE: C60 empty+timeout conjunction (27 hits, below floor, FP 1.00)
+
+**Hypothesis:** the honest narrowing of R57 — empty-claim AND
+`timeout|timed out|124|didn't run|never ran|seconds` in the same turn —
+catches exactly C60's tell (exit 124, timeout-bounded query presented as
+completed).
+
+**Measured 2026-09-20**, same corpus: **27 fires, 0.0597%** over 16 files —
+**below the 50-occurrence floor**, so it is refused on count before precision
+is even reached. Labelled anyway (n=20 of 27, seed `20260920`): TRUE=0 —
+fires land on compliant turns again ("exit 0 with no output means my block
+never ran. Debugging:"; `DIRECT_EXIT_CODE=0` recorded beside the sha).
+
+**Bash-side paper trail** (same day, `real-allowed.json` N=78,242):
+`timeout`-led commands are 247 (0.3157%) and the sample is legitimate bounded
+probes that capture `PIPESTATUS` — the form is correct, the defect would be
+downstream interpretation, which no string scan sees. That is R55's argument
+repeating, so no bash-scope variant is proposed either.
+
+**Retry-condition:** reopen only if the conjunction reaches ≥50 on a fresh
+45k-turn-scale corpus AND labels at FP ≤ 0.30; or if whole-script corpora
+(where the timeout bound and the finding-claim are visible together) show the
+class at shippable density.
+
+**Evidence:** `/tmp/fhmine_sample_B1.json`; bead `jev-m4r` CLOSED REFUSED.
