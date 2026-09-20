@@ -1226,3 +1226,57 @@ nearly filed a false defect against a pane's correct work** — the same shape a
 'arm'` miscount two hours ago. The pattern is stable and worth stating plainly: I am reliable at
 ruling on evidence and unreliable at the greps I use to fetch it, so every negative finding I
 produce against someone else's artifact gets re-derived a second way before it leaves my hands.
+
+## Joshua asked why we were not hardening our own mistakes. He was right, and here is the count
+
+The answer was measurable, so I measured it before agreeing:
+
+```
+GATED classes, recurrences tonight    TESTS.md 1 · numerals 0 · readme-counts 3 caught
+UNGATED classes                       selector/silent-zero 26 · denominator drift 8
+bare grep-as-proof sites in tooling   35
+```
+
+**Classes we turned into code stopped recurring. Classes we turned into prose did not.** This
+session carries a 200-line tick file warning about the selector defect in three places and it
+still happened 26 times — twice in the last two hours, both while I was auditing a pane's
+*correct* work.
+
+Two guards now exist, both **wired** rather than hand-run — stage 80 discovers
+`scripts/selftest-*.sh` by glob, so neither needed a new stage and instruments stay frozen:
+
+| guard | fires on | arms |
+|---|---|---:|
+| `scripts/vgrep.sh` | a proof-grep matching zero lines exits 3, never 0 or 1 | 8 |
+| `scripts/pinned-denominator.sh` | a claimed count disagreeing with its regeneration command | 11 |
+
+Verified on real history, not just planted arms:
+
+```
+pinned-denominator 138  <regen>  -> agree (138)
+pinned-denominator 77767 <regen> -> rc=3  "the sentence is wrong even though nobody edited it"
+```
+
+That message is the defect stated exactly: **a share whose denominator moved is wrong although no
+one touched the sentence.**
+
+### And my own verification broke twice more while checking them
+
+I invoked `pinned-denominator.sh` with a shell *string* when it takes argv, read `rc=127` as a
+tool defect, and nearly reported it. Then I read `true_rc=0` off a piped invocation — **tail's
+exit status**, the trap this repo documents and I have now hit three times in one night. Both
+were my selector, not their tool. **Twenty-seventh instance.**
+
+The one *real* boundary I found after invoking it correctly: it refuses `wc -l file` because the
+output carries the filename alongside the count. Fail-closed and defensible, worth knowing.
+
+### The census says what is still only prose
+
+Pane 2's ranked remainder puts **staged-file exposure at rank 1 with 4 recurrences** — the class
+that lost two files today and clobbered a third. That is now its Unit 3: guard it, or write the
+R18-style refusal with a trigger. Rank 2 is live numbers quoted without pinned inputs (5), rank 3
+is callback sha omission (4).
+
+**The honest limit on all of this, in the pane's own words:** *wired means a command exits
+nonzero, not that the class is eradicated.* vgrep closes one of the three selector failures I
+replayed through it, and its header says so.
