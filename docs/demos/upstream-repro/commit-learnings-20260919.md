@@ -466,3 +466,43 @@ shape, whereas this may be mid-write, and committing another pane's half-written
 different risk from committing a finished one. Broadcast to the owner instead.
 
 SECTION 17 harm-rule organic traffic — PASS — 80,975 real allows scored, 28 fires, organic precision 0/28 with zero executed danger; every fire is mention-vs-use (quoted prompts, test strings, doc prose, loopback bodies) — NO-CLAIM: one machine; labels mine; texts in /tmp only.
+
+SECTION 17 harm-rule organic traffic — **PASS (the section), and a hard result for the rule** —
+`c20da52`. Every one of 80,975 joined allow-commands scored through the SHIPPED extension (default
+import, fake pi — not a reimplementation), no model calls anywhere because the extension has none.
+**28 fires, organic precision 0/28: every fire is mention-vs-use.**
+
+This is the lane's best-performing component. Its 12/12-vs-Jev-11/12 was on curated cases; on
+organic traffic it fires only on text *about* danger. **Sixteenth instance of the one defect** —
+and now confirmed in the rule as well as in the judge (`c6eb7ab`), the question wordings (§14–14e),
+the observer (§16), and fourteen of our own measurements. Rules and judges fail the same way.
+
+The fix already exists and is unapplied here: `stripQuotedPayload`
+(`work/toolcall-judge-v3/rules-v4.mjs`, tested, protects `$(...)` and backticks because those are
+quoted but executed). **Next command:** wire it into `work/omp-harm-rule/harm-rule.ts` and re-run
+`organic-fires.mjs`; the expected observable is fires dropping toward zero with the 94-row
+0-FN/0-FP real-traffic result unchanged.
+
+NO-CLAIM: one machine; fire texts left in `/tmp/organic-fires-full.json`, deliberately not
+committed (real commands, secret risk) and therefore not reproducible from the repo — the same
+live-input class logged four times tonight, correctly labelled live-and-monotonic by its author.
+
+## Conductor: four rulings added to STATUS.tsv, and the gates caught me twice doing it
+
+Sixteen verdicts landed tonight and **none were in `docs/demos/STATUS.tsv`** until now, despite the
+tick's rule to update it in the same turn as the commit that produces a verdict. Added
+`UP-R9-toolcall-judge-family` RULED_OUT, `UP-R10-control-tampering-seat` HELD,
+`UP-R11-retransmit-killer` RULED_OUT, `UP-R12-score-register-export` CLEARED.
+
+My rows were wrong twice and the instruments refused them both times:
+
+- **stage 95 numerals ratchet** — a numeral in a verdict reason must OPEN IN THE CITED RECEIPT.
+  Six of mine did not. Reasons rewritten numeral-free.
+- **lane-status digest drift** — column 9 is the receipt's content digest, not a hash I invent. I
+  had fabricated it.
+
+Then the real lesson: after repinning to the true digest it **drifted again on the next run**,
+because the receipt I cited is this wave ledger, which other panes append to concurrently. **A
+pinned digest cannot point at a live shared file.** Repointed each row at a stable per-section
+receipt. Final: `lane_rc=0`, 29 candidates, 29 receipts exist, 0 drifted, concurrence 10/10,
+`gates.sh` rc=0.
