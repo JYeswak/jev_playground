@@ -680,3 +680,23 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Negative:** `NEGATIVE_EVIDENCE.md` R52.
 - **Boundary:** no Jev call, no morph (session predates MCP mount), no ee
   source, home store untouched. Morph is MCP at `.omp/mcp.json`, not missing.
+
+## P2 sr-advise — verified=0 ruled, manifest eligibility 0→10, doctrine mined (2026-09-20)
+
+- Receipt: `docs/demos/upstream-repro/sr-advise-20260920.md`. Level `[test]` (offline only).
+- **U1:** `roster verified=0` is by-design inspection reporting
+  (`skillranker@abf909d` discovery.rs:627-630, cli.rs:1978-1979). Rank advises nothing via
+  global withhold (resolution.rs:530-540), tripped by entry-limit (23,100 files vs 10,000
+  DISCOVERY_FILES, limits.rs:296-297) AND by symlinked dirs (50 store + jev
+  `.claude/skills/typesafe-ai`). Plus alias-guard false positive on `Bash(*)` globs
+  (frontmatter.rs:354-363) behind 14 malformed-metadata. Controls: clean-HOME rank from
+  neutral cwd → eligible 3 (exit 11 cache-miss); from jev/ → exit 5 (project symlink).
+- **U2:** `--roster` manifest (10 real-dir skills) → dry-run exit 0, wide stage with 10
+  candidates + `__none__`. Rows judged (3 USEFUL / 3 PLAUSIBLE / 4 WRONG); best answers
+  (ripwire-*, socraticode, jsm) unimportable. `demo --case none` → abstain (synthetic).
+  Live NOT_RUN: no key (auth exit 4), 0 calls spent of ≤4 stated.
+- **U3:** wide (3 Noul gates + which + phase + optional stuck) → gate-mean (0.30) → rerank
+  (choice + fits:: Nouls, fits floor 0.30, must-beat-none); 25-kind refusal taxonomy
+  (output/mod.rs:126-156); replay-case + ledger tables mined with file:line.
+- **Boundary:** one machine, one roster, 0 live calls, morph unused (session predates mount),
+  skillranker/ untouched. State: **PROBED** (live rank + save-case/replay pending key).
