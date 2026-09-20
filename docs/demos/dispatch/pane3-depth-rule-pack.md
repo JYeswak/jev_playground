@@ -54,9 +54,12 @@ produced in one day.**
    - `work/toolcall-judge-v3/real-allowed.json` — **78,242 real commands** (50 MB, gitignored,
      moving — quote your count and the date, it drifted 77,767 → 78,242 inside one hour).
    - `fh search "<mechanism>"` over the mirror — the **doctrine** rows (`C71`-style) are the alpha.
-     `fh why <row>` for provenance. **Caveat measured today: `fh doctor` reports
-     `STALE ledger_age_hours=305.7 threshold=26`. Say so in the receipt; a stale ledger is still
-     evidence, it is just not fresh evidence.**
+     `fh why <row>` for provenance. **`fh` is a first-class corpus here, not a fallback.**
+     `fh doctor` reports `STALE ledger_age_hours=305.7 threshold=26` — that is a **freshness
+     signal about the refresh cron, not a discount on the evidence.** Mined doctrine from a
+     221-repo corpus does not rot in 12 days; a defect Jeffrey paid for in June is still a defect.
+     Record the age as metadata. Staleness only invalidates a claim about **movement** (what
+     changed upstream lately), so do not use `fh` alone to assert recency.
    - `NEGATIVE_EVIDENCE.md` — 50+ refutations we paid for. **A rule derived from an R-number is
      the highest-grade rule we can write**: the defect is already proven, the cost already paid.
    - `docs/demos/upstream-repro/` — 225 receipts.
@@ -115,14 +118,26 @@ with pane 2 before you build it; do not duplicate their work.
 
 ## Standing orders
 
-- `ripwire` before reading files one at a time. `ast-grep` for structure, `rg` for literals.
-  **You are writing rules about tool discipline — use the tools.**
+- **Four retrieval tools, and the rule you write about them must match how they actually differ.**
+  This is derived from Jeffrey's own corpus (`84 of 113` repos reference `warp_grep`; the clearest
+  statement is `dicklesworthstone-mirror/chat_shared_conversation_to_file/AGENTS.md:308`):
+  **`morph codebase_search`** for broad *"how does X work / where does this data flow"* questions;
+  **`rg`** when you already know the identifier; **`ast-grep`/`sg`** for structural match and
+  rewrite; **`ripwire`** to rank and map a tree cold, before opening files one at a time.
+  **You are writing rules about tool discipline — use the tools, and encode that split.**
 - Exit codes from an **unpiped** run. Report every TTSR interrupt you receive, with the rule name:
   you are dogfooding the leg you are building.
 - Never `git add -A`. Stage explicit paths. `.omp/rules/` and `scripts/selftest-ttsr-rules.sh` are
   shared — reserve them, and tell pane 1 before you touch `selftest-ttsr-rules.sh`.
-- **`morph` is NOT installed on this machine** (measured: `command -v morph` → MISSING). Do not
-  write a rule or a doc that assumes it.
+- **`morph` IS live — I wired it during this dispatch and proved it.** It is an MCP server, not a
+  binary, so `command -v morph` is the wrong probe and my first packet was wrong. Now registered
+  at **project scope** in `jev/.omp/mcp.json`, so it loads under every profile in this repo.
+  Six tools: `codebase_search`, `github_codebase_search`, `reflex_{list,predict,summary,traces}`.
+  **`edit_file` is force-disabled and the npm version is pinned at `0.8.212`** — morph is
+  **RETRIEVAL ONLY** here, deliberately: two editors racing one worktree nearly cost 660
+  uncommitted lines on 2026-09-08. Proof: a fresh `omp -p` session returned `MORPH-OK`.
+  **Your session started BEFORE this landed, so you do not have it yet** — MCP mounts at session
+  start. Use `/mcp` to reload, or note that you worked without it.
 
 **Callback:**
 `ntm --robot-send=jev --panes=1 --msg="CALLBACK-P3-<UNIT>-<DONE|BLOCKED|REFUSE>: <receipt path> <sha>. SHIPPED <n> REFUSED <n>. NEXT <unit>. NO-CLAIM <limit>."`

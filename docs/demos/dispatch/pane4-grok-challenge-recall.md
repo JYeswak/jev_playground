@@ -35,9 +35,15 @@ Do **not** read P3's predicate and re-run it. That is the same origin counted tw
 3. Report: does your rate agree to the unit? Does your FP agree? **If your predicate and theirs
    disagree by more than a labelling error, one of them is wrong and you must say which.**
 
-`ast-grep`/`sg` for structural predicates, `rg` for literals, `ripwire` before opening files.
-`fh search` + `fh why <row>` when you need the mirror's precedent — and note `fh doctor` currently
-reports `STALE ledger_age_hours=305.7 threshold=26`.
+**Tool split, derived from Jeffrey's own corpus** (`84 of 113` repos reference `warp_grep`;
+`dicklesworthstone-mirror/chat_shared_conversation_to_file/AGENTS.md:308`): **`morph
+codebase_search`** for broad *"how does X work"* questions, **`rg`** when you know the identifier,
+**`ast-grep`/`sg`** for structural predicates, **`ripwire`** to rank a tree before opening files.
+`fh search` + `fh why <row>` for the mirror's precedent — **`fh` is a first-class corpus, not a
+fallback.** `fh doctor` reports `STALE ledger_age_hours=305.7 threshold=26`: that is a freshness
+signal about the refresh cron, **not a discount on the evidence.** Doctrine mined from 221 repos
+does not rot in 12 days. Record the age as metadata; staleness only bars a claim about **recent
+movement**.
 
 ## Unit 2 — close or kill the RECALL leg
 
@@ -100,7 +106,14 @@ challenge:
   you. **Report every interrupt with its rule name** — your fires are the nuisance-rate data
   nobody has collected yet, and P3's rules cannot retire without it.
 - Never `git add -A`. Stage explicit paths.
-- `morph` is **not installed** here (measured). Do not plan around it.
+- **`morph` IS live, and my first packet was wrong** — it is an MCP server, not a binary, so
+  `command -v morph` was the wrong probe. Wired at project scope in `jev/.omp/mcp.json`; six
+  retrieval tools; `edit_file` force-disabled; npm pinned `0.8.212`; proven by a fresh `omp -p`
+  returning `MORPH-OK`. **RETRIEVAL ONLY by design** — two editors on one worktree nearly cost
+  660 uncommitted lines on 2026-09-08. MCP mounts at session start, so **your session does not
+  have it yet**; `/mcp` to reload or note you worked without it.
+  **This correction is itself an audit target: I asserted MISSING from one probe. Check whether
+  any other capability claim in these three packets rests on a single command.**
 - Message pane 2 and pane 3 directly when you need their artifact; do not wait on pane 1 to relay.
 
 **Callback:**

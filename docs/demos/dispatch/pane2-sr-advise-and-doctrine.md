@@ -98,6 +98,15 @@ that is the whole point of having it.
   and will interrupt you; comply, do not route around it. A fire is data: **report every TTSR
   interrupt you receive, with the rule name.** You are dogfooding the SUGGEST leg by working.
 - Never `git add -A` (dcg denies it). Stage explicit paths. Reserve before editing shared files.
+- **`morph codebase_search` is now live in this repo** (project-scoped `jev/.omp/mcp.json`, wired
+  and proven mid-dispatch with a fresh `omp -p` returning `MORPH-OK`; six retrieval tools,
+  `edit_file` force-disabled, npm pinned `0.8.212`). It is the **right first tool for "how does
+  `sr` build its Jev request"** — a broad cross-file question, which is exactly what it is for
+  (derived: `84 of 113` of Jeffrey's repos reference it;
+  `dicklesworthstone-mirror/chat_shared_conversation_to_file/AGENTS.md:308`). Split: `morph` for
+  broad flow questions, `ripwire` to rank the tree cold, `rg` once you know the identifier,
+  `ast-grep` for structure. **MCP mounts at session start, so your session does not have it yet** —
+  `/mcp` to reload, or say you worked without it.
 
 **Callback:**
 `ntm --robot-send=jev --panes=1 --msg="CALLBACK-P2-<UNIT>-<DONE|BLOCKED|REFUSE>: <receipt path> <sha>. VERDICT <...>. NEXT <unit>. NO-CLAIM <limit>."`
