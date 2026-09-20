@@ -218,3 +218,30 @@ near-threshold band, per-row fire/no-fire here is especially unstable. "Benign" 
 regex classification, not ground truth.
 
 SECTION 6 jev-eval-honesty — PASS — "LIVE matched=15557 unmatched=0 zeroHit=false presence=PRESENT prevalence=0.5351(8324/15557)" + REFUSE exit 2 twice + 19/19 tests — NO-CLAIM: tooling only, no judge scored; kind baselines describe skew, not quality.
+
+## Wave B
+
+SECTION 6 jev-eval-honesty — PASS — `90a480a`, verified by me: 19/19 tests re-run green
+(co-presence 5, outcome-join 8, random-judge 6), and `node work/jev-eval-honesty/pipeline-run.mjs`
+produces a live row over real session logs:
+`"LIVE matched=15618 unmatched=0 zeroHit=false presence=PRESENT top3=[dcg_allow:8354,lane_allow:7155,dcg_block:109] prevalence=0.5349(8354/15618,label='dcg_allow') ownConstant=0.5349 randomBaseline=0.4996 [kind-as-label skew baselines only, NOT judge quality] files=40"`
+— NO-CLAIM, theirs and correct: tooling only, no judge scored; the baselines describe kind-label
+skew, not quality. Built as the RESCOPE directed — three mechanisms only, everything else
+delegated to the adopted `evaluation-framework` skill.
+
+Two things in it worth carrying:
+
+- **P4 found the join matching ZERO and printed the keys before claiming anything.** 15,499
+  decision rows inventoried; live rows carry `{kind,toolCallId}`, not `{outcome,error}`. That is
+  the twelfth instance of the selector class tonight, and the first one caught *by a mechanism
+  built for it* rather than by someone noticing. The zero-hit guard is the product.
+- **P9 proved a real bug in their own code**: a `keyOf` shape bug made `PRESENT` unreachable;
+  fixed, regression test added, `presence=PRESENT` live after the fix. A planted negative that
+  finds a genuine defect in the thing it guards is the strongest form of P11.
+
+SECTION 6b A QUOTED LIVE ROW IS NOT REPRODUCIBLE HERE, and it is nobody's error — the receipt
+quotes `matched=15525` in P6 and `matched=15557` in its ledger line; my re-run produced
+**15618**. All three are correct: the denominator is real session logs, which grow while we work.
+Same class as `c6eb7ab`'s corpus drift (77,767 → 78,242), and the same fix applies — **quote the
+row AND pin the inputs**, or state explicitly that the denominator is live and monotonic. A number
+that cannot be reproduced tomorrow needs to say so today.
