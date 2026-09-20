@@ -1,16 +1,23 @@
 # laya-mlx probe — 2026-09-20
 
-**Verdict:** NTM dogfood **GO** (one pane, one classify harness). **promoted=0.**
-Not a TypeSafe Jev replacement. Not a measured 50× vs Jev. Metal / published-weight /
-Snake-on-M3 numbers are **NOT_RUN** on this host.
+**Verdict:** NTM **GO for a disposable test pane smoke** (one classify harness
+or `laya-snake` offline after `hf download`). **promoted=0.** Not a TypeSafe
+Jev replacement until a labelled parity eval. Not a measured 50× vs Jev.
 
 Pinned clone: [mizorewww/laya-mlx](https://github.com/mizorewww/laya-mlx) `@fc1df62`
 (`fc1df62828a3fedf4d8229fdac1cbd85f1cdf337`), Apache-2.0, PyPI `laya-mlx==0.1.0`.
 Upstream weights and prompt/schema: [NandhaKishorM/laya](https://github.com/NandhaKishorM/laya)
 `@6a58191`. Independent MLX port, not an official Convai or TypeSafe release.
 
-Probe host: Linux x86_64 (`Linux-6.12.94+`, Python 3.12.3). Not Apple Silicon.
-No Metal. No NTM spawn. No live TypeSafe call.
+Two hosts, two lanes — do not mix them:
+
+| host | what ran | mlx |
+|---|---|---|
+| **Joshs-Mac-Studio**, Apple M3 Ultra, arm64 | parent LIVE classify, `aac6fef/laya-mlx`, `Device(gpu, 0)` | **live** — numbers below, not re-run here |
+| Cloud Linux x86_64 (this receipt's author) | tiny-checkpoint unit tests only | advertised Metal/`Device(gpu)` **NOT_RUN**; default `pip install -e .` does not import `mlx` |
+
+No NTM spawn. No live TypeSafe call. Peak RSS on Studio: **pending** (parent
+measuring; do not invent).
 
 ---
 
@@ -40,15 +47,17 @@ the same three primitives Jev ships.
 | Joshua's claim | Where it lives | This probe |
 |---|---|---|
 | "~50× faster than Jev", on-device | **Not in this repo.** Convai marketing ([laya.convaiinnovations.com](https://laya.convaiinnovations.com/)) says **6–8×** vs third-party Jev P50 **236–276 ms**, Laya T4 **32.8 ms**; batched 10-q **~20×**. laya-mlx itself compares MLX vs **upstream PyTorch MPS on the same Mac**, and says the tables "are not comparisons with … third-party API figures" (`BENCHMARKS.md:5`). | **NOT_RUN as a Jev comparison.** Do not cite 50×. Closest published (unreproduced here) number is ~7.8× T4 vs those Jev P50s. This lane's Jev smoke (~1.2 s, `EVAL.md:9`) ÷ 13.4 ms ≈ 89× is an invalid mix of network RTT + different questions + different models. |
-| Max ~1G memory | README table (`README.md:57`): FP16 peak MLX allocation, **one short question**: English **943.6 MiB**, multilingual **687.6 MiB**. Ten full-context questions: **1502–1833 MiB** (`BENCHMARKS.md:57-61`). | **UNMEASURED here** (no published checkpoint). "~1G" matches the English *short-question peak allocation*, not process RSS, and not the long/batched case. |
-| Open-source classification **similar to Jev**, based on **text output probabilities** | Similar schema: yes. "Text output probabilities": **no**. Laya is a bidirectional encoder + decision heads. "0 output tokens"; "without token-by-token decoding" (`README.md:7, 65`). Next-token logit scoring is `simple-jev` / LocalJev, a different object. | Schema analogue **holds**. Token-logit story **does not**. |
-| Ported to **MLX** with perf opts | `laya_mlx/model.py` reimplements ModernBERT + heads. Opt-in `compile=True`, `pad_to_multiple=16`, `cache_prompts=True` (`README.md:146`, `docs/SNAKE_OPTIMIZATION.md`). Measured Snake gain on M3 Max: **75.40 vs 70.82 moves/s (~6.5%)** over 2,400 moves. | Port **holds** (code + CI on `macos-26`). Perf opts **documented**; M3 numbers **NOT_RUN** here. |
+| Max ~1G memory | README table (`README.md:57`): FP16 peak MLX allocation, **one short question**: English **943.6 MiB**, multilingual **687.6 MiB**. Ten full-context questions: **1502–1833 MiB** (`BENCHMARKS.md:57-61`). | Studio process RSS **pending** (parent measuring). "~1G" is still their English *short-question peak allocation*, not RSS. |
+| Open-source classification **similar to Jev**, based on **text output probabilities** | Similar schema: yes. "Text output probabilities": **no**. Laya is a bidirectional encoder + decision heads. "0 output tokens"; "without token-by-token decoding" (`README.md:7, 65`). Next-token logit scoring is `simple-jev` / LocalJev, a different object. | Schema analogue **holds** (Studio sample: `choice=billing`, named-option probs). Token-logit story **does not**. |
+| Ported to **MLX** with perf opts | `laya_mlx/model.py` reimplements ModernBERT + heads. Opt-in `compile=True`, `pad_to_multiple=16`, `cache_prompts=True` (`README.md:146`, `docs/SNAKE_OPTIMIZATION.md`). Measured Snake gain on M3 Max: **75.40 vs 70.82 moves/s (~6.5%)** over 2,400 moves. | Port **holds**. Studio parent: `pip install -e .` → mlx **0.32.2** `Device(gpu, 0)`. Opt-in compile path still **NOT_RUN**. |
 | Snake on M3 Max at **~60 decisions/sec** | Uncapped eager campaign: **63.61 moves/s** over 2,400 steps (per-seed 46.32–76.37) (`docs/SNAKE_BENCHMARKS.md:5`). Optimized complete loop: **75.40**. One TTY recording: **64.77** in 20.01 s. Default play is **paced 12 FPS**. | Ballpark for *uncapped* is right. Default demo is 12. **NOT_RUN** here. Feature-assisted: planner + cycle shield (`docs/SNAKE_DEMO.md:80-82`). |
 
-**Oracle for published M3 numbers:** their checked-in JSON under `benchmarks/results/`
-plus the method in `BENCHMARKS.md`. **Oracle for "similar to Jev":** this file's
-table, citing `laya_mlx/agent.py` and `docs/demos/SDK-SURFACE.md`. **Oracle for
-this host:** the pytest / tiny-forward commands below.
+**Oracle for Studio latency:** parent run on Joshs-Mac-Studio (M3 Ultra),
+baked below — this file does not re-time it. **Oracle for published M3 Max
+tables:** their `benchmarks/results/` JSON + `BENCHMARKS.md` (different chip).
+**Oracle for "similar to Jev":** this file's table, citing `laya_mlx/agent.py`
+and `docs/demos/SDK-SURFACE.md`. **Oracle for cloud x86_64:** unit tests only;
+Metal **NOT_RUN**.
 
 ---
 
@@ -104,120 +113,92 @@ validator that rejects unknown keys.
 
 ## Install and run
 
-### This host (Linux x86_64) — what actually ran
+### Studio LIVE — Joshs-Mac-Studio, Apple M3 Ultra, arm64
 
-`laya-mlx` installs **without** `mlx` on Linux: the dep is gated
-`sys_platform == 'darwin' and platform_machine == 'arm64'`
-(`pyproject.toml:21`). Bare `pip install mlx==0.32.2` yields a wheel whose
-`.so` needs `libmlx.so` (**import fail**: `libmlx.so: cannot open shared
-object file`). `pip install 'mlx[cpu]==0.32.2'` pulls `mlx-cpu==0.32.2` and
-CPU device `Device(cpu, 0)` works.
+Parent ran this. **Baked as-is. This receipt does not invent a second
+measurement.**
 
 ```text
-# measured 2026-09-20T15:56Z, this VM
-import mlx.core as mx          5.13 ms, then Device(cpu, 0)
-import laya_mlx as laya        240.19 ms, rss 61_500 KB
-laya.__version__               0.1.0
+python3.12 venv
+pip install -e .          # clone of laya-mlx
+→ mlx 0.32.2  Device(gpu, 0)
+checkpoint: aac6fef/laya-mlx
+timed after load (load_s ≈ 0.47 once cached)
+n=30 predicts, same billing Choice as the README quickstart
 ```
 
-Unit tests, tiny random checkpoint, `LAYA_MLX_TEST_DEVICE=cpu`:
+| | parent LIVE |
+|---|---|
+| lane | live-mlx-gpu, published English checkpoint |
+| host | Joshs-Mac-Studio, Apple M3 Ultra, arm64 |
+| load_s | ≈ 0.47 (cached) |
+| N | 30 |
+| **p50_ms** | **8.739** |
+| p95_ms | 9.777 |
+| min / max | 8.153 / 9.996 |
+| peak RSS | **pending** — parent measuring; not filled here |
+
+Sample answer (one of the 30; same Choice as README):
+
+```text
+choice=billing
+probabilities  billing 0.8897 / technical 0.0832 / sales 0.0271
+confidence 0.628
+act_probability 1.0
+```
+
+That is a typed `choice` over named options with a probability vector — the
+Jev-like surface. README also documents `score` and `noul`; Studio timed the
+billing Choice only. 8.739 ms on M3 Ultra is the same order as the README's
+M3 Max English P50 13.42 ms; different chip, different N, not a claim that
+the published table was reproduced.
+
+### Cloud Linux x86_64 — advertised mlx NOT_RUN
+
+`laya-mlx` does not depend on `mlx` on this platform
+(`pyproject.toml:21`: `sys_platform == 'darwin' and platform_machine == 'arm64'`).
+`pip install -e .` then `import mlx` is the **NOT_RUN** path: the advertised
+Apple Metal runtime is not here, and `Device(gpu, 0)` cannot exist.
+
+Default / Metal / published-weight / Snake-on-device: **NOT_RUN** on cloud.
+
+What *did* run here is only the tiny-checkpoint unit suite, after a separate
+`mlx[cpu]` extra that is **not** the Studio runtime and **not** a pass of
+the README numbers:
 
 ```bash
 cd /tmp/laya-probe/laya-mlx    # clone @fc1df62
 python3 -m pip install -e .
+# advertised import mlx: NOT_RUN (no Darwin-arm64 mlx)
 python3 -m pip install 'mlx[cpu]==0.32.2' pytest 'Pillow>=12,<13' 'rich>=15,<16'
 LAYA_MLX_TEST_DEVICE=cpu TOKENIZERS_PARALLELISM=false \
   python3 -m pytest -q tests/test_runtime.py tests/test_snake.py
 # 46 passed in 0.74s
 ```
 
-`tests/test_model.py` (Transformers / upstream DecisionModel parity): **SKIPPED**
-— no `torch`/`transformers`, no `.upstream` clone. pytest collect = 1 skipped,
-exit 5. Not a fail of the port.
+`tests/test_model.py`: **SKIPPED** (no `torch`/`transformers`, no `.upstream`).
+Toy-net CPU `predict` on this VM was a schema smoke only; do not average it
+with the Studio 8.739 ms.
 
-One `Agent.predict` on the **same tiny random 64-d / 3-layer** fixture the
-unit tests build (20 timed calls after 1 warmup, CPU):
+### Disposable NTM pane (Mac) — after the Studio smoke
 
-| | value |
-|---|---|
-| lane | offline-cpu-tiny-random-weights |
-| load | 2.12 ms |
-| N | 20 |
-| P50 / P95 | **10.597 / 11.310 ms** |
-| usage | `input_tokens=77`, `output_tokens=0` |
-| peak RSS | **75_100 KB** (~73 MiB) |
-| `model` | `laya-rl-agent` |
-
-Returned shape (random weights ⇒ near-uniform; this is a **schema smoke**,
-not a quality number):
-
-```json
-{
-  "topic": {"type":"choice","choice":"a","confidence":0.0,
-            "probabilities":{"a":0.3353,"b":0.3333,"c":0.3314},
-            "action":{"act_probability":0.5382}},
-  "level": {"type":"score","score":0.494,"confidence":0.0001,
-            "legend":{"0":"low","1":"high"},
-            "probabilities":{"0":0.506,"1":0.494},
-            "action":{"act_probability":0.539}},
-  "yes":   {"type":"noul","noul":0.4994,"confidence":0.5006,
-            "action":{"act_probability":0.5256}}
-}
-```
-
-**These 10 ms are not the README's 7–13 ms.** The published figures are
-322M–421M FP16 on M3 Max Metal. This is a toy CPU net. Do not average them.
-
-Published-weight forward, Metal, Snake TTY, Hub download of `aac6fef/laya-*`:
-**NOT_RUN** (no Apple GPU; no 800 MiB weight pull on this probe).
-
-### Apple Silicon / Studio / M3 — commands for a real smoke
-
-Requires macOS 14+, Python 3.11+, Apple Silicon. Measured upstream env:
-macOS 27.2, Python 3.12.13, MLX 0.32.2, M3 Max 40-core / 128 GiB.
+The classify latency is already on the board. A pane should not re-benchmark
+it. Smallest remaining smoke:
 
 ```bash
-# 1. Classify harness (recommended NTM ticket)
-python3 -m pip install 'laya-mlx[demo]'          # or: uv sync --extra demo
-hf download aac6fef/laya-mlx --local-dir models/laya-mlx
-# offline after this:
-HF_HUB_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 \
-python3 - <<'PY'
-import json, time, resource, laya_mlx as laya
-t0 = time.perf_counter()
-agent = laya.load("models/laya-mlx", dtype="float16", device="gpu")
-print("load_s", round(time.perf_counter() - t0, 3))
-state = json.load(open("examples/state.json"))      # if cwd is the clone
-questions = json.load(open("examples/questions.json"))
-agent.predict(state, questions)  # warmup
-times = []
-for _ in range(20):
-    t = time.perf_counter()
-    out = agent.predict(state, questions)
-    times.append((time.perf_counter() - t) * 1000)
-times.sort()
-print("p50_ms", round(times[9], 3), "p95_ms", round(times[18], 3))
-print("rss_kb", resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
-print(json.dumps(out, indent=2)[:800])
-PY
+# classify (already proven LIVE on Studio; replay only if the pane must see it)
+python3.12 -m venv .venv && source .venv/bin/activate
+pip install -e .
+# checkpoint cached from parent: aac6fef/laya-mlx  →  Device(gpu, 0)
 
-# 2. Optional: Snake, only if the pane's job is the demo
+# or Snake, offline after one download
 hf download aac6fef/laya-multilingual-mlx --local-dir models/hub/laya-multilingual-mlx
-laya-snake --headless --steps 120 --max-speed --model models/hub/laya-multilingual-mlx
-# interactive: terminal ≥ 104×35; default is paced 12 FPS, not 60
-# laya-snake --optimize --max-speed
+HF_HUB_OFFLINE=1 HF_HUB_DISABLE_TELEMETRY=1 \
+  laya-snake --headless --steps 120 --max-speed --model models/hub/laya-multilingual-mlx
 ```
 
-CLI equivalent of (1), from a clone:
-
-```bash
-laya-mlx predict --model models/laya-mlx --device gpu \
-  --state-file examples/state.json --questions examples/questions.json
-```
-
-Do not run a live TypeSafe call in the same ticket unless the ticket's
-acceptance is a **paired** latency/quality table. This probe does not
-authorize that spend.
+Do not run a live TypeSafe call in the same ticket unless acceptance is a
+**paired** labelled table. This probe does not authorize that spend.
 
 ---
 
@@ -240,12 +221,16 @@ No red-flag secrets or exfil. Treat first-load Hub as the only network surface.
 
 ## NTM go / no-go
 
-**GO** — all three gates hold:
+Studio recommendation, adopted: **GO for a disposable test pane smoke.**
+Not a replacement for TypeSafe Jev until a labelled parity eval.
+**promoted=0.**
 
-1. **API is wrap-clear.** `system_one(state, questions)` / `predict`; three
-   primitives; fields line up enough to write an adapter in one file.
-2. **Local Mac path exists.** `pip install laya-mlx` + `hf download` +
-   `device="gpu"`. Commands above. This VM cannot execute that path.
+The three wrap gates still hold, and Studio already proved (2):
+
+1. **API is wrap-clear.** Typed `choice` → named-option probabilities;
+   `score` / `noul` per README. Fields line up enough for an adapter.
+2. **Local Mac path exists and ran.** `python3.12` venv, `pip install -e .`,
+   mlx 0.32.2 `Device(gpu, 0)`, `aac6fef/laya-mlx`, P50 **8.739 ms** (n=30).
 3. **No secret/exfil red flag.** Apache-2.0, Hub download, Snake already
    offline.
 
@@ -254,24 +239,16 @@ claiming Snake "reasons about the board" (planner + shield).
 
 ### Smallest NTM ticket (one pane)
 
-**One classify harness on Joshua's M3 / Studio Mac.** Not Snake first.
+**Disposable smoke, one pane.** Classify *or* `laya-snake` offline after
+`hf download`. Do not re-time the 8.739 ms unless the pane is checking
+install drift.
 
-- Install `laya-mlx`, download `aac6fef/laya-mlx` once, run the 20-call
-  script in the Apple Silicon section against `examples/state.json` +
-  `examples/questions.json`.
-- Record: load s, P50/P95 ms, RSS, `answers` field set, MLX version, chip.
-- Acceptance: schema matches the table (choice/score/noul + `output_tokens=0`);
-  P50 is in the same *order of magnitude* as 7–14 ms **or** the pane writes
-  why not (thermal, CPU fallback, first-compile).
-- Planted negative: `Agent._to_internal({"type":"choice","instructions":"x","criteria":[]})`
-  raises; a finite-logits check already exists.
-- **NO-CLAIM:** not a Jev substitute; no paired quality number; no `__none__`;
-  no live TypeSafe spend unless a later ticket adds a paired table.
+- Acceptance: pane starts, `Device(gpu, 0)` or Snake prints a finite
+  `steps_per_second` / `mean_inference_ms`; known-missing checkpoint fails
+  closed without a network connect.
+- **NO-CLAIM:** not a Jev substitute; no labelled parity; no `__none__`;
+  no live TypeSafe spend; Studio peak RSS still **pending**.
 - **promoted=0.**
-
-Snake (`laya-snake --headless --steps 120 --max-speed`) is a **second**
-ticket if the classify harness lands. It tests the planner loop, not the
-wrap.
 
 Do not invent STOP-LIVE. Do not spawn NTM from this probe.
 
@@ -279,15 +256,19 @@ Do not invent STOP-LIVE. Do not spawn NTM from this probe.
 
 ## Boundary
 
-- No TypeSafe / Jev HTTP call.
-- No published 322M/421M checkpoint loaded.
-- No Metal, no M3, no TTY Snake, no `laya-snake --optimize`.
+- No TypeSafe / Jev HTTP call on either host.
+- Cloud did **not** load `aac6fef/laya-mlx` and **cannot** import advertised
+  `mlx` / `Device(gpu)`.
+- Studio LIVE is **one billing Choice**, n=30, after cached load. Not
+  `score`, not `noul`, not Snake, not `--optimize`.
+- Studio peak RSS: **not in this receipt** (parent still measuring).
+- This file does **not** re-run or average the Studio timings.
 - No `tests/test_model.py` encoder-vs-Transformers run.
 - No Convai T4 32.8 ms / Jev 236–276 ms pair reproduced.
 - Weights and `docs-mirror/typesafe/` were not refreshed; Jev field names
   are from `docs/demos/SDK-SURFACE.md` (v0.6.0, 2026-09-19).
-- Clone lived at `/tmp/laya-probe/laya-mlx` (read-only eval). Not vendored
-  into this repo.
+- Cloud clone lived at `/tmp/laya-probe/laya-mlx` (read-only eval). Not
+  vendored into this repo.
 
 ---
 
@@ -295,12 +276,11 @@ Do not invent STOP-LIVE. Do not spawn NTM from this probe.
 
 | capability | state | reason |
 |---|---|---|
-| Laya-MLX as local typed-decision runtime | **PROBED** (CPU toy + source) | 46/46 offline tests; schema smoke; Mac path documented |
+| Laya-MLX local classify (English ckpt) | **live-verified (N=30)** on Studio | parent: p50 **8.739 ms**, `Device(gpu, 0)`, `aac6fef/laya-mlx`. Cloud Metal **NOT_RUN** |
 | "~50× faster than Jev" | **ZERO** | not in repo; no paired run; Convai's own figure is ~7.8× T4 vs published Jev P50 |
-| M3 Snake ~60/s | **EXPLORED** | their JSON + docs; not executed here |
-| Jev replacement | **ZERO** | different model, different confidence, no `__none__`, no live quality pair |
-| omp / NTM dogfood | **not started** | ticket above; this probe does not spawn it |
+| M3 Snake ~60/s | **EXPLORED** | their JSON + docs; not executed on Studio or cloud |
+| Jev replacement | **ZERO** | no labelled parity; different confidence; no `__none__` |
+| omp / NTM dogfood | **not started** | GO for a disposable pane smoke only; this probe does not spawn it |
 
-**Next lever:** one M3 pane, classify harness, write the latency/RSS line
-into a follow-up receipt. Then decide whether a wrap belongs in
-`work/jev-client` as an injected asker — only after those numbers exist.
+**Next lever:** bake parent peak RSS when it arrives. Then a disposable
+NTM pane (classify replay or offline Snake) — not a Jev-replacement eval.
