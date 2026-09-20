@@ -16,7 +16,7 @@ Two hosts, two lanes — do not mix them:
 | **Joshs-Mac-Studio**, Apple M3 Ultra, arm64 | parent LIVE classify, `aac6fef/laya-mlx`, `Device(gpu, 0)` | **live** — numbers below, not re-run here |
 | Cloud Linux x86_64 (this receipt's author) | tiny-checkpoint unit tests only | advertised Metal/`Device(gpu)` **NOT_RUN**; default `pip install -e .` does not import `mlx` |
 
-No NTM spawn. No live TypeSafe call. Peak RSS on Studio: **pending** (parent
+No NTM spawn. No live TypeSafe call. Peak RSS on Studio: **986,644,480 bytes (~941 MiB)** durable-install retest; earlier run **978,403,328 (~933 MiB)** (parent
 measuring; do not invent).
 
 ---
@@ -47,7 +47,7 @@ the same three primitives Jev ships.
 | Joshua's claim | Where it lives | This probe |
 |---|---|---|
 | "~50× faster than Jev", on-device | **Not in this repo.** Convai marketing ([laya.convaiinnovations.com](https://laya.convaiinnovations.com/)) says **6–8×** vs third-party Jev P50 **236–276 ms**, Laya T4 **32.8 ms**; batched 10-q **~20×**. laya-mlx itself compares MLX vs **upstream PyTorch MPS on the same Mac**, and says the tables "are not comparisons with … third-party API figures" (`BENCHMARKS.md:5`). | **NOT_RUN as a Jev comparison.** Do not cite 50×. Closest published (unreproduced here) number is ~7.8× T4 vs those Jev P50s. This lane's Jev smoke (~1.2 s, `EVAL.md:9`) ÷ 13.4 ms ≈ 89× is an invalid mix of network RTT + different questions + different models. |
-| Max ~1G memory | README table (`README.md:57`): FP16 peak MLX allocation, **one short question**: English **943.6 MiB**, multilingual **687.6 MiB**. Ten full-context questions: **1502–1833 MiB** (`BENCHMARKS.md:57-61`). | Studio process RSS **pending** (parent measuring). "~1G" is still their English *short-question peak allocation*, not RSS. |
+| Max ~1G memory | README table (`README.md:57`): FP16 peak MLX allocation, **one short question**: English **943.6 MiB**, multilingual **687.6 MiB**. Ten full-context questions: **1502–1833 MiB** (`BENCHMARKS.md:57-61`). | Studio process RSS **~941 MiB** (986644480) on durable-install retest — under ~1G short-question claim; not the long/batched 1.5–1.8 GiB case. |
 | Open-source classification **similar to Jev**, based on **text output probabilities** | Similar schema: yes. "Text output probabilities": **no**. Laya is a bidirectional encoder + decision heads. "0 output tokens"; "without token-by-token decoding" (`README.md:7, 65`). Next-token logit scoring is `simple-jev` / LocalJev, a different object. | Schema analogue **holds** (Studio sample: `choice=billing`, named-option probs). Token-logit story **does not**. |
 | Ported to **MLX** with perf opts | `laya_mlx/model.py` reimplements ModernBERT + heads. Opt-in `compile=True`, `pad_to_multiple=16`, `cache_prompts=True` (`README.md:146`, `docs/SNAKE_OPTIMIZATION.md`). Measured Snake gain on M3 Max: **75.40 vs 70.82 moves/s (~6.5%)** over 2,400 moves. | Port **holds**. Studio parent: `pip install -e .` → mlx **0.32.2** `Device(gpu, 0)`. Opt-in compile path still **NOT_RUN**. |
 | Snake on M3 Max at **~60 decisions/sec** | Uncapped eager campaign: **63.61 moves/s** over 2,400 steps (per-seed 46.32–76.37) (`docs/SNAKE_BENCHMARKS.md:5`). Optimized complete loop: **75.40**. One TTY recording: **64.77** in 20.01 s. Default play is **paced 12 FPS**. | Ballpark for *uncapped* is right. Default demo is 12. **NOT_RUN** here. Feature-assisted: planner + cycle shield (`docs/SNAKE_DEMO.md:80-82`). |
@@ -136,7 +136,7 @@ n=30 predicts, same billing Choice as the README quickstart
 | **p50_ms** | **8.739** |
 | p95_ms | 9.777 |
 | min / max | 8.153 / 9.996 |
-| peak RSS | **pending** — parent measuring; not filled here |
+| peak RSS | **986644480 (~941 MiB)** durable install retest; also **978403328 (~933 MiB)** earlier |
 
 Sample answer (one of the 30; same Choice as README):
 
@@ -247,7 +247,7 @@ install drift.
   `steps_per_second` / `mean_inference_ms`; known-missing checkpoint fails
   closed without a network connect.
 - **NO-CLAIM:** not a Jev substitute; no labelled parity; no `__none__`;
-  no live TypeSafe spend; Studio peak RSS still **pending**.
+  no live TypeSafe spend; Studio peak RSS **~941 MiB**.
 - **promoted=0.**
 
 Do not invent STOP-LIVE. Do not spawn NTM from this probe.
@@ -291,4 +291,3 @@ Install: `~/.local/share/laya-mlx/venv` + `~/.local/bin/laya-mlx`; repo `@fc1df6
 Pytest: `test_runtime` **18 passed**, `test_snake` **28 passed**.
 Predict retest: p50 **8.194 ms**, p95 9.667; peak RSS **986,644,480 (~941 MiB)**.
 NTM: not dispatched.
-
