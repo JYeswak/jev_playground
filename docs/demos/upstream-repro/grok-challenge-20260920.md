@@ -64,7 +64,27 @@ Public URL `https://omp.sh/docs/ttsr` resolved to the omp marketing homepage, no
 ## U1 — independent predicates, then P3's exact regex
 
 
-Corpus: `work/toolcall-judge-v3/real-allowed.json`, **N=78242**, `harvestedAt=2026-09-20T05:22:11.742Z`, mtime `2026-09-20T05:22:11Z`, keys `{command,seen,tool}`, **tool=bash 78242/78242**. Session-burst `read`, assistant-text claim verbs, and skill-routing are **UNMEASURABLE** here.
+Corpus: `work/toolcall-judge-v3/real-allowed.json`, **N=78242**, `harvestedAt=2026-09-20T05:22:11.742Z`, mtime `2026-09-20T05:22:11Z`, keys `{command,seen,tool}`, **tool=bash 78242/78242**. On **that** harvest, session-burst `read`, assistant-text claim verbs, and skill-routing are unmeasurable. **That is not a property of the questions.**
+
+### The text corpus (re-derived, not reused)
+
+Walked `~/.omp/**/*.jsonl`. **1842 files**, 1,719,353 lines. `type==message` + `role==assistant` + ≥1 `content[].type==text`: **45,108–45,111 turns** this session (P1: 1,841 files / 45,103; live-monotonic). Not all 480,965 `type=text` blocks (those include user/toolResult).
+
+**cass:** do not wait. P1: `cass index --full` hit Quill `doc_freq` cap 2^22 at commit (4,490,351 > 4,194,304), `retryable=true` is wrong, last good index 2026-08-21. Not re-run here.
+
+**Claim-verb class** (P3 description: `verified`/`confirmed`/`works` in assistant text with no preceding command in the turn). Own op: since last user message, any `toolCall` counts as a preceding command; then `\b(verified|confirmed|works)\b` / strict without `works`.
+
+| predicate | n | / 45111 | |
+|---|---|---|---|
+| any claim verb | 7191 | 15.94% | wallpaper if unscoped |
+| any, no prior cmd | 364 | 0.807% | |
+| strict (verified\|confirmed) | 6663 | 14.77% | |
+| **strict, no prior cmd** | **329** | **0.729%** | n≥50, <5% |
+
+**REFUSE as a fleet TTSR rule anyway.** 329 hits live in **49 files**, and **one session dir** (`omp-orchestrator/2026-09-10T23-03-57-*`) holds ~73% of them. Seed `20260920P4c` n=24: **23/24 from that session**. Labels (proof-class inflation = TP): **2 TP / 22 FP**. Almost all are closeout jargon (`verified per-row`, `SHA-256 verified`, quoting "verified claim"). Same named-vs-shape split: the word is present; the defect (untested assertion) is not.
+
+Read-bursts / skill-routing: JSONL has 416,485 `toolCall` parts — now measurable. **Not measured this tick.**
+
 
 Bar copied from the packet (preregistered before labelling): wallpaper ≳5%; n<50 too rare for a rule.
 
@@ -144,14 +164,19 @@ Nuisance-rate for shipped TTSR: **1 `bash-glob-silenced` fire** this session (wa
 
 | morph missing (`command -v`) | **OVERTURN of the packet** (MCP; this session unwired) |
 | `fh` STALE discounts doctrine | **OVERTURN of the packet** |
+| prose classes UNMEASURABLE (ever) | **OVERTURN** — that was the bash harvest; JSONL has 45k assistant-text turns |
+| claim-verb TTSR on no-prior-cmd | **REFUSE** (0.729%, session-dominated, 2/22 TP/FP) |
+| P1 1841/45103 | **CONFIRM** within live drift (1842/45108) |
+| cass as next corpus | **DO NOT WAIT** (commit-cap, retryable lie) |
 
 ## NO-CLAIM
 
 - Did not run `foundation/gates.sh`. Did not `/mcp` reload morph.
-- Did not call Jev. The key is in Infisical (`projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba`); `/tmp/.tskey` absent is not absence. This amendment did not need a live call (choice, not a constraint).
-- Did not wrap `diag tripwire`. Did not file upstream.
-- P3 FP labels are one reader, n=48. Hook still does not call `ee preflight check` at tool_call.
-- Corpus still bash-only for U1.
+- Did not call Jev (Infisical; choice). Did not file cass or sr upstream (Joshua).
+- Did not measure read-bursts or skill-routing on the 416,485 toolCall parts.
+- Claim-verb labels: one reader, n=24, seed `20260920P4c`.
+- P3 FP labels n=48 as before. No preflight hook at tool_call.
+
 
 ## Next
 

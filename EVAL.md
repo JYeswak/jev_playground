@@ -676,7 +676,12 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   memories including `mem_01M30A8VERE22V7WFGAYJRTMH7`. Control empty.
   Tripwire shim still refused. R53. Key is Infisical, not missing; no live
   Jev this tick (choice).
-- **U1:** P3 rate CONFIRM 304; FP OVERTURN 62.5/70.8.
+- **U1:** P3 rate CONFIRM 304; FP OVERTURN 62.5/70.8. Bash harvest UNMEASURABLE
+  for prose was corpus-specific. Re-derived `~/.omp` JSONL: 1842 files,
+  45108 assistant-text turns. Claim-verb no-prior-cmd 329/45111=0.729%;
+  **REFUSE** (73% one session; seed 20260920P4c n=24 → 2 TP / 22 FP). cass dead
+  (Quill 2^22 doc_freq); not waited on.
+
 - **Negative:** R52 (narrowed) + R52-CORRECTION + R53.
 - **Boundary:** no preflight hook at tool_call. Morph MCP unwired here.
 
