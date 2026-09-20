@@ -217,3 +217,21 @@ never share an identity.
 Test 1 encodes the measured jevcache defect directly: `{"command_id":"rm -rf --no-preserve-root /"}`
 and `{"command_id":"echo hello"}` shared a fingerprint there and it served the benign answer for
 the destructive command. Here they must differ.
+
+## `work/jev-eval-honesty/outcome-join.test.mjs` — 6 tests
+
+Run: `node --test work/jev-eval-honesty/outcome-join.test.mjs` (no API key; pure local join).
+
+Guards the outcome-join mechanism — one of the three absent from the `evaluation-framework` skill
+we adopt for everything else. The zero-hit guard is the load-bearing one: a join that silently
+matches nothing is the defect this package exists to prevent.
+
+1. mixed Shape-A/Shape-B rows both match
+2. row missing an expected field lands in selectorReport, never dropped
+3. unparseable line is skipped and counted
+4. non-decision and keyless decision rows land in unmatched
+5. empty input returns zeroHit:true
+6. readRow accepts already-parsed objects (Shape A object form)
+
+Registered by the conductor when the files were found STAGED-BUT-UNCOMMITTED during a peer
+branch switch; the author's own registry entry supersedes this one if it differs.
