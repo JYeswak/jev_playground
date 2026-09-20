@@ -744,3 +744,46 @@ NO-CLAIM, the author's and correct: turns are self-authored, so the corpus is no
 the person who knows what the traps are testing; no computed label exists for
 heavyweight/mechanical — they looked for an oracle and found none, and said so rather than
 inventing one.
+
+## jev-vbh.4 — REFUSED live action, against a favourable aggregate
+
+`vbh4-shadow-20260920.md`. Policy v1 pre-registered and committed **before** measuring; 32
+recorded eww scores reused, **0 new Jev calls**; 5/5 tests. Recomputed by me from the per-class
+rows rather than the summary:
+
+```
+class sums     correct 20  wrong 5  abstain 7  total 32     (matches the stated 20/5/7)
+shadow         correct-minus-wrong +15
+always-abstain 0
+argmax-always  22-10 = +12
+ALL FIVE WRONG ANSWERS SIT IN trap-short                    True
+```
+
+**This is a refusal against a number that favours shipping.** On correct-minus-wrong the shadow
+(+15) beats both always-abstain (0) and argmax (+12) — the bar I set in the dispatch, and it
+cleared it. A lane optimising for a green metric ships here.
+
+It refused anyway, for the right reason: **all five errors are in `trap-short`**, where the
+policy routes wrong nearly every time and abstains once in six. So
+
+> the abstention band does not catch the hard class; it catches the cautious middle.
+
+Nothing in the scores distinguishes a `trap-short` turn from an easy one *ex ante*, which means
+**any live action fires hardest exactly where the judge is worst**. Aggregate lift bought by easy
+cases cannot pay for concentrated failure on hard ones, because production does not serve you the
+easy ones first.
+
+RULING: ship shadow-only — log the tier, act on nothing. `action` is NOT honoured live.
+`promoted` stays 0.
+
+REVERSAL TRIGGER, recorded by its author: `trap-short` routed-correct-or-abstained ≥5/6 on a
+fresh pinned set.
+
+NO-CLAIM: recorded scores, not a fresh run; nothing active; the turn set remains self-authored,
+so the traps are not independent of the person who designed them.
+
+**Pattern worth naming, because it is the third time tonight:** a named subset overturned an
+aggregate. §21's `drop-largest` looked best on savings and lost a third of reuse; `eww`'s
+DISCRIMINATES was carried by clear cases; here a +15 lift is entirely easy-case. **Pooled numbers
+have been wrong in the optimistic direction every time this session, and the named subset caught
+it every time.**
