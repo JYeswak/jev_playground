@@ -82,6 +82,20 @@ other repo silently disagree. Edit both, or the suite fails.
 
 ## TRAPS MEASURED TODAY — each one cost real time
 
+- **STATE YOUR DENOMINATOR IN THE SAME SENTENCE AS YOUR NUMBER.** Three of pane 1's claims died
+  this way in one day, and every one was caught by Joshua rather than by the author. The worst:
+  I measured file types over **three days in this one repo**, got `md 1261 / mjs 292 / … py 56`,
+  concluded *"we barely write Rust, so his Rust doctrine is not our leverage"*, and steered two
+  panes on it. Re-measured across every git repo under `~/Developer` over 30 days:
+  **`json 17,915 · rs 17,416 · md 17,287 · sh 7,199 · ts 6,538 · toml 3,470`** — Rust is
+  **top-two**, with `omp-orchestrator` 2,782, `franken-harvest` 1,267, `frankenmermaid` 1,195,
+  `zeststream-cast` 1,153, `uds` 494. The conclusion was not merely imprecise, it was **inverted**:
+  Jeffrey's corpus is overwhelmingly Rust and so is much of ours, which makes that overlap the
+  highest-leverage thread rather than the one to skip. The other two were the same shape — a
+  one-second timestamp gap read as "this worker is missing rules", and a QUIET probe read as
+  absence. **A measurement of one repo is a claim about one repo.** This is deliberately NOT a
+  TTSR rule: the error is in the generalisation, not in any string a scan can see, and three
+  classes were refused today for less.
 - **A QUIET TTSR probe is ambiguous, so it is not evidence of absence.** `repeatMode` defaults to
   **`once`** (`omp://ttsr-injection-lifecycle.md`), and four of our five system-wide rules are
   `once` — two declare it, two inherit it. A rule that already fired earlier in your session is
