@@ -866,3 +866,43 @@ else's audit.
 
 **The page is true as written.** That is worth stating plainly because it is the artifact most
 likely to be read by someone who was never in this lane.
+
+## Stage-97: SCOPE IT, and the reviewer found the escape I did not name
+
+`stage97-scope-ruling-20260920.md`. I tripped this gate, fixed the README, and refused to touch
+the gate myself — self-approving a widening of the check you just walked past is the move this
+lane refuses. Handed all three options to a non-author and said I leaned SCOPE and was probably
+wrong about something.
+
+**Ruled SCOPE IT, on the gate's own criterion.** WIDEN false-positives by construction (a README
+legitimately says "12" about other things); REFUSE would leave the exact escape open. Both stale
+facts have an *exact machine source* — the `gates.d` glob and `STATUS.tsv` — which is precisely
+what the gate's own "derivable in one command" line already uses to separate a checkable fact
+from prose. The scope is fixed-noun exact equality, never "does this number appear", and free
+prose is out of scope permanently.
+
+**What I missed:** the breakdown parenthetical `(8 cleared, 13 held, 12 ruled out)` is the same
+fact family with the same machine source, so it now rides along **instead of waiting for its own
+escape**. I had scoped two patterns; there were three.
+
+Verified rather than accepted:
+
+| check | result |
+|---|---|
+| plant the exact defect that escaped (`13`→`12 gate stages`) | **RED**, `rc=1`, names both sides: *"README says '12 gate stages' but foundation/gates.d holds 13"* |
+| restore | PASS `rc=0`, tree clean |
+| the false-positive the ruling turns on — a sentence with an unrelated "12", "25" and "33" | **PASS `rc=0`**, no fire |
+| `--selftest` | `rc=0`, **5 arms**, including `stale numerals under matching word -> RED` |
+| full suite | `rc=0`, 13 stages, no arm-count inflation |
+
+The fourth arm is the important one: it replays the exact shape of the escape — **numerals stale
+*underneath* a correct spelled-out word**, which is what let three lines through 13 green stages.
+
+**And I got the arm count wrong while checking their arm count.** `grep -c 'arm'` returned 1
+against their claimed 5; the word appears once, in the summary line, while the five arms are
+listed as `ok …` rows. Reading the file settled it in their favour. **Twenty-fifth instance of the
+selector defect this session, and the third time in two hours that my verification of someone
+else's work was the thing that was broken.**
+
+The retirement condition is the right one: when the counts are *generated into* the README, this
+stage is deleted rather than kept.
