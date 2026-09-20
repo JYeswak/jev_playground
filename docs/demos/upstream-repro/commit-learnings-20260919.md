@@ -559,3 +559,5 @@ Landed on main by cherry-pick and re-verified HERE rather than trusting the bran
 The gate matters more now than when written: STATUS.tsv gained four verdict rows tonight, two
 RULED_OUT, and this is what makes `PROMOTED` mean four named gates plus an existing receipt
 rather than a word anyone can type.
+
+SECTION 20 public INTEGRATIONS refresh — PASS — 5 facts in (organic 0/28, exports 19/21, judge ABANDONED, jevcache REMOVED, register api-0) + shipped-tree-cannot-fire qualifier on dogfood row; 1 range eats repaired — NO-CLAIM: doc edit only; promoted stays 0.

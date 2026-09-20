@@ -38,7 +38,7 @@ benign cases never committed).
 The FP column is **not** a like-for-like comparison. Only recall (12/12 vs 11/12 vs 5/12)
 still compares cleanly. Jev's miss is r3 (`git push --force origin main`). **Jev was not
 bad** — 11/12 is strong in isolation. This is a cost-benefit kill, not a capability kill.
-Ship the classifier; drop Jev from this surface.
+Ship the classifier; drop Jev from this surface. The Jev tool-call judge family tried beside it is **ABANDONED**: three wordings (53.75% → 48.25%), all near-constant, half the verdicts made by the 0.50 threshold — [`commit-learnings-20260919.md` §14–14e](demos/upstream-repro/commit-learnings-20260919.md). Not "needs another pass".
 
 ### Five-link chain (receipts on this tip)
 
@@ -48,7 +48,7 @@ Ship the classifier; drop Jev from this surface.
 | 2 | **registered** | `extensions:` list; loader globs `*.{ts,js}`; lab `jev-lab`. [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md). |
 | 3 | **fires (lab)** | Both directions on luna and sol in lab. [`harm-rule-shipped-20260919.md`](demos/upstream-repro/harm-rule-shipped-20260919.md). On this tip the shipped file writes `toolCallId` (`work/omp-harm-rule/harm-rule.ts`). |
 | 4 | **fires correctly (lab)** | **0/17** unique-command divergence vs the frozen scorer. [`harm-rule-conformance-20260919.md`](demos/upstream-repro/harm-rule-conformance-20260919.md) (`bb4fa4f`). Lab shapes ≠ every profile. |
-| 5 | **working-profile dogfood — NOT VERIFIABLE / OPEN** | [`harm-rule-promoted-20260919.md`](demos/upstream-repro/harm-rule-promoted-20260919.md) (`6c9c8fc`) **exists on this tip**. It is one driven first-contact probe, not multi-row live logger traffic on a working profile. **Do not publish RUNS ON REAL WORK.** Organic precision is unmeasured — 4/4 fires were driven probes. [`harm-rule-realtraffic-20260919.md`](demos/upstream-repro/harm-rule-realtraffic-20260919.md). |
+| 5 | **working-profile dogfood — NOT VERIFIABLE / OPEN** | [`harm-rule-promoted-20260919.md`](demos/upstream-repro/harm-rule-promoted-20260919.md) (`6c9c8fc`) **exists on this tip**. It is one driven first-contact probe, not multi-row live logger traffic on a working profile. **Do not publish RUNS ON REAL WORK.** Organic precision now measured: **0/28** over 80,975 real allow commands, every fire mention-vs-use (quoted prompts, test strings, doc prose, loopback bodies) — [`waved-s17-organic-precision-20260920.md`](demos/upstream-repro/waved-s17-organic-precision-20260920.md). The earlier "4/4 driven probes" line is superseded. [`harm-rule-realtraffic-20260919.md`](demos/upstream-repro/harm-rule-realtraffic-20260919.md). |
 
 Source: `work/omp-harm-rule/harm-rule.ts`. Observe-only. Every path returns `undefined`.
 dcg remains the only blocker. Zero model calls in the shipped path.
@@ -272,11 +272,14 @@ and is not re-run here.
 | tool_call / harm-rule | RULE WINS; four regexes, **no Jev call**; links 1–4 lab/corpus; link 5 **NOT VERIFIABLE** as working-dogfood | rule 12/12, FP **0/38** committed corpus; Jev 11/12 / dumb 5/12, historical FP 0/40 unreproducible (R34); first-contact `6c9c8fc` ≠ multi-row live logger; cost-benefit kill | no |
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
-| dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1 lab** (`a2e2035`); working-profile dogfood **OPEN**; lab only. First-contact harm-rule receipt does not close this row | no |
+| dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` — ALL from the deployed variant, which differs from the shipped tree | **partial, qualified** — co-presence MET on the deployed copy; the shipped `work/omp-jev-observer/src/observer.mjs` **cannot fire** (calls undefined `safeAppend`, deterministic silence — [`waved-s16-observer-dogfood-20260920.md`](demos/upstream-repro/waved-s16-observer-dogfood-20260920.md)). Do not read this row as "the tree works." Working-profile dogfood **OPEN** | no |
 | taste-loop (`omp-jev-{default,field,firstlook,fork,heat,heckle,jargon,promise,skip,uncanny,undo}`) | WIP / UNPROMOTED; observe-only scaffold | not wired to working profiles; not validated on live traffic; see `work/taste-loop/CONTRACT.md` | no |
 | skillranker process mirror (`omp-jev-route` slice) | WIP / UNPROMOTED; offline decide/gate CLI | abstain + JSON log + copied 0/1/2 gate; not working-dogfood; not their corpus | no |
 
 | skill-router eval-contract mirror (`work/skillranker-eval/`) | WIP / UNPROMOTED; process mirror of skillranker `tests/eval` @ `bb52b8f25` | offline controls + planted RED; ≥0.90 is a hard FAIL; JSONL eval export; **not** an `sr` product measurement | no |
+| score exports (Jev-derived) | **19 of 21** packages export scores; NOT-APPLICABLE: `preaction`, `harm-rule` (rows without model calls) | supersedes the "1 of 21" in `commit-learnings-20260920.md` | n/a |
+| `jevcache` | **REMOVED and disqualified** | `8fe44b2` removal + `f717ba3` correction; nothing routes through a cache (identical answers make drift invisible) | n/a |
+| score register replay | pinned fixture `c4e0e7c4…`, 55 rows | replays with **`api calls made: 0`** (`work/jev-score-register/replay.mjs` does not import the client) | n/a |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (do not read as working/production dogfood), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
