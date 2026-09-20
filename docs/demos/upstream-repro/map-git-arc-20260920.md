@@ -53,6 +53,15 @@ git rev-list --left-right --count origin/main...HEAD            #   0 19
 for b in $(git for-each-ref --format='%(refname:short)' refs/heads/); do
   git rev-list --left-right --count main...$b; done
 
+# The three-way level-ladder split in §3. Discovered by the pre-commit hook printing
+# "verification-level PASS level=receipt" for a level mine.mjs cannot see.
+sed -n 34p githooks/commit-msg-verification-level.sh   # LEVELS=(pending receipt selftest test mutation oracle live)
+sed -n 18p work/commit-mine/mine.mjs                   # const LEVELS = ['pending',...,'live'];  <- no receipt
+scripts/vgrep.sh -n -- 'pending|selftest|test|mutation|oracle|live' \
+  docs/demos/BEAD-TEMPLATE.md docs/demos/tick.md      # rc=0, both say six
+git log --format='%ad %h %s' --date=format:'%m-%d %H:%M' -- work/commit-mine/mine.mjs  # 10:30
+git log --format='%ad %h %s' --date=format:'%m-%d %H:%M' -1 742a2dc                    # 10:38
+
 # The §4 diagram is not hand-waved — it was extracted and rendered.
 node -e "const t=require('fs').readFileSync('docs/demos/upstream-repro/map-git-arc-20260920.md','utf8');
          require('fs').writeFileSync('/tmp/arc.mmd', [...t.matchAll(/\`\`\`mermaid\n([\s\S]*?)\`\`\`/g)][0][1]);"
@@ -116,11 +125,24 @@ as emitted by `mine.mjs` (path-based, per its own F3 note at line 26).
   name. `test` at 499 commits is the default label, not a claim: 38.5% of `[test]` commits are
   markdown-only.
 
-### Defect found in `work/commit-mine/mine.mjs` (reported, not fixed)
+### The `receipt` level: a three-way split in the ladder, 8 minutes wide
 
-`mine.mjs:18` lists six levels and omits `receipt`. 29 commits carry `[receipt]` — all of them
-today, 10:39→12:12. The miner bins **26 of them as `null`** and **misattributes 3** through its
-`\bbareword\b` fallback at line 22:
+There are three definitions of the verification ladder in this repo and **they do not agree**.
+Committing this very file surfaced it: the pre-commit hook printed `verification-level PASS
+level=receipt` for a level `mine.mjs` cannot see.
+
+| source | levels | `receipt`? | last changed |
+|---|---|---|---|
+| `githooks/commit-msg-verification-level.sh:34` — **the enforcing gate** | 7 | **yes** | `742a2dc`, 2026-09-20 **10:38** |
+| `work/commit-mine/mine.mjs:18` — **the measuring instrument** | 6 | no | `3324c2a`, 2026-09-20 **10:30** |
+| `docs/demos/BEAD-TEMPLATE.md:94` and `docs/demos/tick.md:156` — **the written convention** | 6 | no | never updated |
+
+The miner was committed at 10:30 and the hook widened the ladder at 10:38. **The instrument has
+been eight minutes behind the gate it measures for two hours**, and the docs have never caught up.
+
+Consequence, measured: 29 commits carry `[receipt]`, all today 10:39→12:12 — i.e. every single one
+landed after the miner froze. `mine.mjs` bins **26 of them as `null`** and **misattributes 3**
+through its `\bbareword\b` fallback at line 22:
 
 | subject | true level | miner says |
 |---|---|---|
@@ -128,13 +150,20 @@ today, 10:39→12:12. The miner bins **26 of them as `null`** and **misattribute
 | `docs(guard): [receipt] live fire proven plus per-tool denominator` | receipt | `live` |
 | `feat(ruling): [receipt] rung-demotion reporter plus selftest` | receipt | `selftest` |
 
-The miner is not wrong about the *convention*: `docs/demos/BEAD-TEMPLATE.md:94` and
-`docs/demos/tick.md:156` both define exactly `pending|selftest|test|mutation|oracle|live`.
-`receipt` is an **undocumented seventh level invented today and already used 29 times**. That is a
-live convention/practice drift, and the miner is the instrument that makes it visible only by
-failing. ALIGN: either document `receipt` and add it to `mine.mjs:18`, or stop emitting it.
-The bare-word fallback is the same class of defect `scripts/vgrep.sh` was built for — a selector
-that silently produces a plausible-looking wrong answer.
+The hook's own header (lines 20–24) says `receipt` was added *"2026-09-20 after the level mine
+showed docs-only oracle|live on 183 commits and the hook itself refused '[receipt-candidate]': the
+vocabulary had no word, so prose borrowed one."* So the sequence is: the miner produced a finding →
+the finding changed the gate → **nobody changed the miner or the docs**. My re-run puts the same
+figure at 79 + 113 = **192** docs-only `oracle|live` commits, up from 183, so the finding has held
+and grown across the 58 commits since.
+
+**ALIGN (do not DISCARD):** add `receipt` to `mine.mjs:18` and to both doc definitions, or retire
+it from the hook. Separately, the bare-word fallback at `mine.mjs:22` should go: it is the exact
+failure `scripts/vgrep.sh`'s own header documents — a selector that silently returns a
+plausible-looking wrong answer instead of refusing.
+
+A note on provenance: the original mine (`3324c2a`, 10:30, over 1040 commits) is the source of the
+`oracle`-touches-a-test-0% claim I was asked to confirm or refute. **It holds at 1098 commits: 0/98.**
 
 ---
 
@@ -395,7 +424,9 @@ looking at a 114-commit-stale view of the project.
 
 | path | what it is | verdict | reason |
 |---|---|---|---|
-| `work/commit-mine/mine.mjs` | the miner this slice ran | **ALIGN** | Correct and fast (14.2s/1098 commits), but `LEVELS` at line 18 omits `receipt` → 26 commits binned `null` + 3 misattributed by the bare-word fallback at line 22. Fix the list or drop the fallback. |
+| `work/commit-mine/mine.mjs` | the miner this slice ran | **ALIGN** | Correct and fast (14.2s / 1098 commits) and its headline finding holds. But `LEVELS` at line 18 froze at 10:30 today, 8 minutes before `githooks/commit-msg-verification-level.sh:34` added `receipt` → 26 of today's 29 `[receipt]` commits bin as `null`, 3 are misattributed by the bare-word fallback at line 22. Add `receipt`; drop the fallback. |
+| `githooks/commit-msg-verification-level.sh` | the enforcing level gate | **KEEP, and make it the single source** | 7 levels incl. `receipt`, added today 10:38 *because* the miner's finding demanded it. It is the only one of the three ladder definitions that is current. `mine.mjs:18`, `BEAD-TEMPLATE.md:94`, `tick.md:156` should read from it or be regenerated against it. |
+| `docs/demos/BEAD-TEMPLATE.md:94`, `docs/demos/tick.md:156` | the written level convention | **ALIGN** | Both still say six levels. 29 commits have already shipped a seventh. A convention doc that the enforcing hook contradicts is worse than none — it reads authoritative while being wrong (the exact argument `gates.d/70`'s own header makes about `TESTS.md`). |
 | `docs/demos/duel-2/` (231 files) | dead tournament's output | **ALIGN, not DISCARD** | 49h silent, but `lane-status.sh:87` reads `runs/receipt-other-reasons.json` as the default sidecar and gates 80/90/95 cite four `runs/*.json` as authorisation. Extract the 5 live files, archive the rest. |
 | `docs/demos/duel-1/` (53 files) | duelist A's output | **DISCARD** | 65h silent. Only two code refs: `lane-status.sh:281` (a `for d in` file count) and `publish-export.sh:76` (an `--exclude`). Neither reads content. Removing it changes one count and one exclude. |
 | `docs/demos/contracts/` (7 files) | 5 demo specs written in 7 minutes on 09-17 | **DISCARD** | 64h silent. Referenced only by `lane-status.sh:281`/`:288`, both file counts. The demos they spec are themselves cold (§6.3). |
