@@ -1931,6 +1931,46 @@ distinguisher, proven at 81k scale, currently wired as a filter. Moving it insid
 `REPRODUCIBLE`, and `rules-v4.test.mjs` green. Measured on the shipped rule with no filter in the
 harness, because a census that filters cannot testify about what ships.
 
+### R44 — DEFEATED IN THE PRODUCT 2026-09-20. Trigger retired.
+
+The revised trigger named a property of the shipped artifact rather than commands to run. That
+property now holds. Verified by me, on the shipped rule, with no filter anywhere in the harness:
+
+```
+shipped rule, DATA literal      node -e "const cmd = 'chmod -R 777 /etc/x'; ..."   harm_pass 0.01
+shipped rule, EXECUTED literal  node -e "require('child_process').execSync(...)"   harm_fire 0.96
+organic-fires.mjs --no-filter   81,382 scored                                      fires 0
+verify-claim.mjs (control)      VERDICT: REPRODUCIBLE COMMITTED CORPUS             12/12, FP 0/38
+rules-v4.test.mjs 14/14 · omp-harm-rule 5/5
+grep -c 'no-filter' organic-fires.mjs                                              0
+```
+
+The last line matters as much as the first: **the filter is out of the census**, so the 0 is a
+statement about what ships, not about what we chose to count. That was the whole defect in leg 1.
+
+**What the distinguisher does:** inside an interpreter program, a dangerous string that is merely
+a data literal no longer fires, while the same string passed to an exec-family call still does.
+That is the executed-vs-passed-as-data distinction the trigger asked for, and it closes the
+twentieth instance of the mention-vs-use defect — the one that had retreated from shell quoting
+into program literals rather than dying.
+
+**Journey, recorded because the shape is the lesson:** organic fires went 28 → 5 → 0 across three
+attempts. The first (mine) was reverted for costing a true positive. The second cleared the
+census but not the rule, and its author said so plainly in the receipt rather than letting the
+number stand. The third moved the mechanism into the product. **Two honest partials preceded the
+fix, and both were only useful because they were labelled as partials.**
+
+**NO-CLAIM, carried from its author and unchanged: this is a textual heuristic.** It reads program
+text; it does not parse. A dangerous literal reaching `exec` through a variable, a template, or
+any indirection will not be caught, and a genuinely executed string the heuristic misreads as data
+becomes a false negative — which is the dangerous direction. It is not proven safe, it is proven
+to separate these two shapes at 81k scale. Composition order is recorded in the receipt.
+
+Precision remains **0 by construction** on this corpus, because it contains no real danger
+(`jev-m7r`): 0 fires on 81,382 commands is the correct answer to a corpus with nothing to find,
+not evidence the rule works. **An empty confusion matrix is still not a failing one, and still
+not a passing one.**
+
 ### R44 numbering — an ID collision found during the merge, and it is not only mine
 
 My entry was written as **R41** and a peer had concurrently written a different R41
