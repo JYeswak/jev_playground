@@ -18,9 +18,16 @@ infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
 ```
 
 **`jevcache serve` reads its backend from its OWN environment at startup**, and a client cannot
-supply it per-request. Started bare it silently falls back to a local model at
-`127.0.0.1:8080`, so every `/decide` returns a 404 that *reads like a broken model* and is
-actually an unconfigured server. That cost us two restarts before anyone noticed.
+supply it per-request. Started bare it falls back to a local model at `127.0.0.1:8080`, so every
+`/decide` returns a 502 whose first line is a 404 against an address you never configured. That
+cost us two restarts before anyone noticed.
+
+An earlier version of this file called that message one that "reads like a broken model". That
+was unfair and is corrected: the full body does name the fix
+(`set JEVCACHE_BACKEND=jev (with JEV_API_KEY), or =mock to try it out`). What holds is narrower —
+the banner says `backend: local` where nobody looks, and `/health` answers `{"ok":true}` while
+the server cannot decide anything. See
+[`docs/demos/upstream-repro/jevcache-upstream-reports-20260920.md`](../../docs/demos/upstream-repro/jevcache-upstream-reports-20260920.md).
 
 The launcher also maps `TYPESAFE_API_KEY` → `JEV_API_KEY` (jevcache uses a different name),
 fails loudly if the key is absent, and prints only the key's length.
@@ -65,12 +72,28 @@ treats it as secondary to cost.
 
 ## Upstream defects found
 
-1. The documented `/decide` example does not run — `schema.id` and `schema.version` are both
+Six, written up with reproductions in
+[`docs/demos/upstream-repro/jevcache-upstream-reports-20260920.md`](../../docs/demos/upstream-repro/jevcache-upstream-reports-20260920.md);
+one is filed as [jevcache#1](https://github.com/hyperspaceai/jevcache/issues/1) and five are
+drafted. Reproductions are `repro-1` … `repro-6` in this directory, all key-free and offline.
+
+1. `state_preview` writes raw state to a 0644 ledger — PII redacted, credentials not. **Filed.**
+2. Any `*_id` field is dropped **before** hashing, so different states collide on one
+   fingerprint and get each other's cached answers. Measured live: after deciding `echo hello`,
+   `rm -rf --no-preserve-root /` comes back `noul 0.01`, cached, from `jev-1.13.0`. This is the
+   serious one.
+3. One global append-only ledger with **no per-process isolation** — concurrent agents silently
+   share a cache, and unlocked concurrent appends corrupt it and lose written decisions.
+   `JEVCACHE_DIR` scopes it, but by convention only.
+4. `serve` prints the *requested* port, not the bound one: `--port 0` prints `:0` while
+   listening on an ephemeral port. `--port abc` is silently discarded.
+5. The installer's checksum is soft — a failed `.sha256` fetch installs anyway, rc=0.
+6. The documented `/decide` example does not run — `schema.id` and `schema.version` are both
    required as separate fields, revealed one error at a time. `harm.v1` is rejected as an id.
-2. `serve --port 9000` prints "port 0" on startup while binding 9000 correctly. Cosmetic, but
-   it is what made us think the bind had failed.
-3. One global append-only ledger at `~/.jevcache/ledger.log` with **no per-process isolation** —
-   concurrent agents silently share a cache. `JEVCACHE_DIR` scopes it, but by convention only.
+
+**Retracted:** an earlier version of this list claimed `serve --port 9000` prints "port 0" on
+startup. It does not; that was inferred from an `lsof` reading and never observed. Item 4 is the
+real defect in that line, and it needs `--port 0` to trigger.
 
 ## NO-CLAIM
 
