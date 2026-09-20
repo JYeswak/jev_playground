@@ -659,7 +659,7 @@ PASS 97-readme-counts (0s)
 gates: ALL GREEN
 ```
 
-Twelve stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
+Thirteen stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
 because a gate that cannot fail is not a gate. Re-derive the count from `foundation/gates.d/`; a
 number written here goes stale silently, and this one already did once, when it claimed seven
 stages and nine existed.
