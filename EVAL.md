@@ -629,3 +629,20 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Boundary:** no harness, no JSONL, no hook install, no STATUS.tsv row, no live inbox
   export. `am inbox` remains independently recorded as dead transport elsewhere; that is
   not re-measured here.
+
+## frozen toolcall corpus scorer — real n=7846, not a 10-case design (2026-09-20)
+
+- **Studio numbers (baked, not reinvented):** n=7846, GOOD=1665, BAD=6181,
+  always-abstain **0.212210043** (1665/7846), isError-only **1.495284221**
+  (11732/7846). Mapping: GOOD→allow; BAD→abstain/block. Loss: correct=0,
+  abstain on GOOD=1, allow on BAD=2.
+- **Command:** `python3 work/jev-real-corpus-eval/jev_real_corpus_eval.py work/p3-calibration/toolcall-corpus-frozen.jsonl`
+  reprints those strings (exit 0). `node work/jev-real-corpus-eval/run.mjs`
+  same fractions + planted RED. Tests **10/10**.
+- **Finding:** isError-only **loses** to always-abstain. A useful Jev judge
+  must beat **0.212** mean loss on this split.
+- Receipt: `docs/demos/upstream-repro/frozen-toolcall-scorer-20260920.md`.
+  Tag **`[pending]` / promoted=0**.
+- **Negative:** `NEGATIVE_EVIDENCE.md` R44.
+- **Boundary:** no TYPESAFE, no Jev call, no omp seam, no CASS / agent-mail
+  (this VM cannot reach those volumes). Lane: offline. Claim: `[test]`.
