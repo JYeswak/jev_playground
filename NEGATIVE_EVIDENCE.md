@@ -2264,3 +2264,26 @@ repo-wide, OR all panes route branch-switches through one wrapper for 50
 switches with zero losses AND zero false refusals — then build the
 overlap-check as the guard, with the 50-switch log as its satisfying
 witness.
+
+## R47 — REFUSED: wiring a guard against callback sha omission (4 instances)
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Census unit, no new instrument.
+Instances: 9b three consecutive + 18b receipt/sha landing split. The packet
+contract (receipt path + sha on every callback) is prose, and stays prose:
+a callback is an `ntm --robot-send` runtime string, not a file — no repo
+hook ever sees it (`ntm` is an external binary; the send happens inside a
+tool call, not a commit). The two buildable shapes both fail:
+(a) a send wrapper requiring sha-shaped tokens is opt-in, the R46 shape —
+prose with a script, unwired for anyone who calls `ntm` directly;
+(b) a presence-check false-positives by construction, because BLOCKED
+callbacks legitimately carry no sha (`<SHA|BLOCKED>`), so the check would
+need the full contract grammar reimplemented in regex — and would still
+see nothing, for the reason above. Receiver-side verification already
+exists and works: the conductor caught all four omissions socially.
+Automating the catcher buys nothing the catcher does not already do.
+
+**Trigger (overturn condition):** `ntm` gains a send-time contract check
+(receipt path + sha-or-BLOCKED grammar enforced by the sender), OR
+callbacks move to a file-backed outbox a hook can read — then wire the
+grammar check there, with the four historical omissions as trigger arms
+and BLOCKED-format callbacks as the satisfying witness.
