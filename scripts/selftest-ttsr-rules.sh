@@ -49,15 +49,82 @@ arm "$C" fire  "callsite-exclusion: callers piped past a fn def"      "grep -rn 
 arm "$C" quiet "callsite-exclusion: no exclusion at all"              "grep -rn 'is_silent(' crates/ --include='*.rs'"
 arm "$C" quiet "callsite-exclusion: exclusion is not a def"           "grep -rn 'is_silent(' crates/ | grep -v 'test'"
 
+arm_text() { # arm_text <rule-file> <expect fire|quiet> <label> <prose>
+  local f="$1" want="$2" label="$3" txt="$4" got
+  if omp ttsr test --rule "$f" --source text "$txt" 2>&1 | grep -qE '^Triggered \([1-9]'; then got=fire; else got=quiet; fi
+  if [ "$got" = "$want" ]; then note ok "$label ($want)"; pass=$((pass+1))
+  else note FAIL "$label — wanted $want, got $got: $txt"; fail=$((fail+1)); fi
+}
+
+K=.omp/rules/jev-key-canonical-source.md
+# ROUTING rule: fires on topic contact, not on a defect. The bar is "is the injected text worth
+# one paragraph", not precision. Four agents reported this key missing and all four were wrong.
+arm "$K" fire  "jev-key: bash touches the key name"          'echo $TYPESAFE_API_KEY | head -c 4'
+arm "$K" fire  "jev-key: bash touches the endpoint"          'curl -s https://api.typesafe.ai/v1/systemone'
+arm "$K" quiet "jev-key: unrelated bash"                     'node work/jev-client/test/client.test.mjs'
+
+A=.omp/rules/absence-from-one-probe.md
+# INVARIANT rule. The fire arms are the five REAL false-absence claims made on 2026-09-20; the
+# quiet arms are absence claims about DATA, which is the FP class that killed the first predicate.
+arm_text "$A" fire  "absence: capability declared not installed" 'morph is not installed on this machine'
+arm_text "$A" fire  "absence: SCREAMING_CASE credential missing" 'the TYPESAFE_API_KEY is missing'
+arm_text "$A" fire  "absence: bare does-not-exist"               'the cass index does not exist'
+arm_text "$A" fire  "absence: probe output quoted as MISSING"    'command -v morph returned MISSING'
+arm_text "$A" quiet "absence: DATA missing, not a capability"    'the ranking is missing three rows from the table'
+arm_text "$A" quiet "absence: already downgraded to UNMEASURED"  'UNMEASURED (probe: command -v morph); a second probe is required'
+arm_text "$A" quiet "absence: two probes already run"            'I verified it with two probes and the binary is present'
+
+# COMPILE GUARD. TTSR conditions are JavaScript RegExp: a PCRE inline flag like (?i) is invalid.
+# omp ttsr test REPORTS that, but a live session does NOT — omp://ttsr-injection-lifecycle.md says
+# an invalid condition is "logged as a warning and ignored", so the rule loads, never fires, and
+# looks installed. Every arm above could pass while a sixth rule is silently dead. Measured
+# 2026-09-20: the first draft of absence-from-one-probe shipped exactly this defect.
+# NOTE: capture first, match second. `omp ttsr test | grep -q` is WRONG under `set -o pipefail`:
+# omp exits 1 when nothing triggers, so the pipeline reports 1 even when grep DID match, and the
+# check silently inverts. That is this repo's own `bash-pipe-exit` class biting the selftest that
+# guards TTSR rules — measured here 2026-09-20, and it made both RED arms below read as green.
+for rf in .omp/rules/*.md; do
+  [ -e "$rf" ] || { note FAIL ".omp/rules/*.md expanded to nothing"; fail=$((fail+1)); break; }
+  out=$(omp ttsr test --rule "$rf" --source text 'zzzz_cannot_exist_9c42' 2>&1 || true)
+  case $out in
+    *'no usable TTSR condition'*)
+      note FAIL "compile: $(basename "$rf") has no usable condition — it would load and NEVER fire"; fail=$((fail+1)) ;;
+    *)
+      note ok "compile: $(basename "$rf") condition compiles"; pass=$((pass+1)) ;;
+  esac
+done
+
+# The guard's own RED arm, assembled at runtime, because a guard that has only ever gone green is
+# indistinguishable from a guard that cannot fire. Two genuine known-bads, both measured against
+# omp 2026-09-20. NOTE the near-miss: a LEADING (?i) is ACCEPTED (omp lifts it to the `i` flag) —
+# only an EMBEDDED inline flag breaks. The first plant tried here was a leading (?i) and it was
+# legal, which is why this arm names the exact shapes instead of "any (?i)".
+red_dir=/tmp/ttsr-redarm; mkdir -p "$red_dir"
+printf -- '---\ncondition: %s\nscope: text\n---\nplanted known-bad\n' "'foo|(?i)bar'"  > "$red_dir/embedded-flag.md"
+printf -- '---\ncondition: %s\nscope: text\n---\nplanted known-bad\n' "'foo[unclosed'" > "$red_dir/unbalanced.md"
+printf -- '---\ncondition: %s\nscope: text\n---\nplanted known-GOOD near-miss\n' "'(?i)leading_is_legal'" > "$red_dir/leading-flag.md"
+for plant in embedded-flag unbalanced; do
+  out=$(omp ttsr test --rule "$red_dir/$plant.md" --source text 'zzzz_cannot_exist_9c42' 2>&1 || true)
+  case $out in
+    *'no usable TTSR condition'*) note ok "compile RED arm: planted $plant is caught"; pass=$((pass+1)) ;;
+    *) note FAIL "compile RED arm: planted $plant was NOT caught — the guard cannot fire"; fail=$((fail+1)) ;;
+  esac
+done
+out=$(omp ttsr test --rule "$red_dir/leading-flag.md" --source text 'zzzz_cannot_exist_9c42' 2>&1 || true)
+case $out in
+  *'no usable TTSR condition'*) note FAIL "compile near-miss: a LEADING (?i) was rejected — guard is over-strict"; fail=$((fail+1)) ;;
+  *) note ok "compile near-miss: leading (?i) accepted, not flagged"; pass=$((pass+1)) ;;
+esac
+
 # Every project rule must own at least one arm above — a rule file with no test is a rule nobody
 # has ever seen fire. An empty scan set is not a pass (RULE 1).
 n_rules=$(ls -1 .omp/rules/*.md 2>/dev/null | wc -l | tr -d ' ')
 if [ "$n_rules" -eq 0 ]; then
   note FAIL ".omp/rules/*.md matched nothing — an empty scan set is NOT a pass"; fail=$((fail+1))
-elif [ "$n_rules" -eq 4 ]; then
+elif [ "$n_rules" -eq 6 ]; then
   note ok "every project rule ($n_rules) has arms here"; pass=$((pass+1))
 else
-  note FAIL "$n_rules project rules but only 4 are tested — add arms for the new one"; fail=$((fail+1))
+  note FAIL "$n_rules project rules but only 6 are tested — add arms for the new one"; fail=$((fail+1))
 fi
 
 echo "scripts/selftest-ttsr-rules.sh: $pass ok, $fail failed"
