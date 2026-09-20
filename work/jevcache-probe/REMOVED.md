@@ -68,3 +68,31 @@ five unfiled defect bodies. Reinstalling is a deliberate act:
 ```bash
 curl -fsSL https://jevcache.sh/install | sh   # NOT recommended; see above
 ```
+
+## Correction: the respawn, and what actually killed it
+
+The section above claimed the server and "one orphaned older supervisor" were removed. That was
+wrong, and the error is worth keeping because it is a general lesson about this harness.
+
+After committing the removal, `pgrep` still matched a live pair — and killing it produced a NEW
+pair with a new PID, three times running. The binary was already deleted from `~/.local/bin`, yet
+`jevcache serve` kept appearing.
+
+It was not a stray shell loop. Tracing pid -> ppid found the parent was
+`__omp_worker_daemon_broker` under an `omp` session: jevcache had been started as a **hub-supervised
+process with a restart policy**, so every `kill` was answered by the supervisor doing its job.
+
+```
+hub ps
+- jevcache: restarting exit=1 uptime=992ms restarts=8
+- jevcache-probe-9137 / jevcache-eval-jev / jevcache-eval-serve / jevcache9111 / jevcache9100
+```
+
+`hub stop jevcache` ended it in one call. After it: 0 matching processes, port 9000 free, all six
+entries `exited` or `failed`.
+
+**The lesson, which outlives jevcache:** a hub-supervised process cannot be removed with `kill`,
+and `pgrep` showing a new PID after a kill is the signature. Check `hub ps` before concluding
+anything about whether a service is gone. Four separate "it's stopped now" claims were made in
+this session before the supervisor was found; each was true about the PID and false about the
+service.
