@@ -138,3 +138,14 @@ cannot promote.
 
 **Next:** a Studio pane runs A02 and prints the four prevalence numbers.
 Until that receipt exists, state is **EXPLORED**, not `PROBED`.
+
+## Live Studio measurements (2026-09-20)
+
+### A02 / importance prevalence (n=6510 all messages)
+- elevated (high+urgent)=752 → always-abstain mean loss **0.115514593**
+- always-elevated mean loss **1.768970814** LOSE
+
+### A05 Ack-SLA (n=3135 ack_required=1)
+- any_acked=58 (π≈0.0185) → always-abstain **0.018500797**
+- B0 predict-acked iff elevated → **0.289633174** LOSE
+- Receipt: `exports/ack-sla-receipt.txt`

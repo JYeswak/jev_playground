@@ -1,0 +1,17 @@
+# A05 Ack-SLA — Studio live 2026-09-20
+DB: ~/.local/share/mcp-agent-mail-rust-live/storage.sqlite3
+Population: messages.ack_required=1
+Y: any message_recipients.ack_ts IS NOT NULL
+Actions: predict_acked vs abstain
+Loss: abstain-on-acked=1; predict-on-unacked=2; else 0
+
+n=3135
+acked=58
+elevated_among=506
+pi_acked=0.01850079744816587
+always_abstain_mean_loss=0.01850079744816587
+b0_elevated_mean_loss=0.2896331738437002
+b0_beats_abstain=false
+
+FINDING: almost nobody acks (1.85%). Always-abstain wins hard. Elevating chase by importance loses.
+NO-CLAIM: not a promotion; mapping is chase-vs-abstain not send authority.
