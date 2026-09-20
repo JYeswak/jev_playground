@@ -464,3 +464,5 @@ is staged with zero commit history. I found it only because it surfaced in my
 **I did NOT rescue this one**: the previous rescue (`c824304`) had a green suite and a finished
 shape, whereas this may be mid-write, and committing another pane's half-written file is a
 different risk from committing a finished one. Broadcast to the owner instead.
+
+SECTION 17 harm-rule organic traffic — PASS — 80,975 real allows scored, 28 fires, organic precision 0/28 with zero executed danger; every fire is mention-vs-use (quoted prompts, test strings, doc prose, loopback bodies) — NO-CLAIM: one machine; labels mine; texts in /tmp only.
