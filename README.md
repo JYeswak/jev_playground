@@ -130,9 +130,20 @@ a retraction to learn.
 
 - **The measurement is the asset, not the model's prior.** Given a measured usage shape in its
   state, Jev derives the consequence that follows from it. Withhold that shape and ask the same two
-  questions, and the verdict flips: `router_pays` moves from 0.21 to 0.59 and the lever it picks
-  drops from 0.75 to 0.49 confidence. **Apply it by spending the effort on the measurement and
-  giving Jev the state; a judgment model does not discover the lever for you.**
+  questions, and the verdict flips. **Re-measured 2026-09-20, 10 paired calls per arm**
+  (`scripts/measure-framing-flip.mjs`, run it yourself):
+
+  | arm | `router_pays` min / median / max | `top_lever` |
+  |---|---|---|
+  | **with** the measured shape | 0.32 / **0.37** / 0.41 | `fewer_turns` 10/10 |
+  | **without** it | 0.69 / **0.71** / 0.72 | `cheaper_model` 10/10 |
+
+  **The two distributions do not overlap, and the chosen lever flips on every single call.** The
+  direction we published holds and is stronger than we knew; the *points* we published — 0.21 to
+  0.59 — do not reproduce: 0 of 10 with-arm calls reached 0.21, and every without-arm call cleared
+  0.59. They were a single pair of samples from one run, quoted ever since as if they were the
+  effect. **Apply it by spending the effort on the measurement and giving Jev the state; a judgment
+  model does not discover the lever for you — and quote the direction, not two decimals.**
 - **Framing leaks through the criteria, not just the state.** A criterion worded
   *"reduce the number of turns, since each re-sends the whole context"* teaches while it asks. The
   answer then tracks your implication rather than the evidence. **Apply it by stripping rationale
