@@ -72,5 +72,10 @@ demand evidence in the hit that it answers, or invent.**
   and every time-window join silently returns zero — the same zero a real
   disjointness finding produces. Normalize first.
 - Nothing here cleared; no promotion. n=138 with 30 near-duplicate probe
-  rows, one recent 120k-message window, no full-index search (index
-  rebuilding at measurement time).
+  rows, measured on an id-window of 120k messages that is **measured
+  unrepresentative** ([sampling frame](./cass-sampling-frame-20260920.md)):
+  925 conversations (1.5%) across 168 workspaces whose top-3 do not overlap
+  the whole's; messages 4.6× longer than average (3,544 vs 764 chars);
+  median conversation sliced to 4 messages; and the "recent" window spans
+  the full era, so time-varying effects are uncontrolled. No full-index
+  search (index rebuilding at measurement time).
