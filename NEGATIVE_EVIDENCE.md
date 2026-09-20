@@ -1791,3 +1791,32 @@ decision, and their frozen 0/1/2 gate with the always-abstain control. Landed in
 one turn, *and* a measured miss that a second Jev pass recovers and a local `__none__` gate
 does not. Until both are true, one bounded Choice plus local eligibility is the slice.
 
+## R42 — REJECTED: treating Jev-on-their-corpus as a SkillRanker product measurement
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` then `[test]` on the harness PR.
+
+`work/skillranker-eval/oracle.mjs` (the 2026-09-19 live receipt) scored **Jev Choice** on
+skillranker's 12 labelled cases under their loss table and reported mean loss 0.167 / top-1
+0.800. That is a real measurement of **Jev on their corpus**. It is not a measurement of
+`sr`. Their ranker adds roster validation, retrieval, and prompt construction that this
+harness never runs.
+
+Rejected design this pass: keep a one-shot live script and let a later reader cite 0.800 as
+"skillranker measured." The replacement is a reusable process (`work/skillranker-eval/`)
+whose every export row carries `measured_product: false` unless an `sr` binary path is
+actually invoked. This harness never invokes one.
+
+Second rejected design: a soft printed "DOES NOT clear their gate" that still exits 0. The
+≥0.90 bar is now exit 2 on `--score` / `--live`. Controls are expected to miss it and do
+not use that exit.
+
+Finding that came with the process: `synthetic-overflow-retrieval-paraphrase` has
+`Y=['testing-fuzzing']` and an empty exported `visible_roster`. A judge that only sees
+installable/exported skills cannot pick the skill the contract wants
+(`installableNotOffered`). That is the eval-side form of the installable≠exportable hole.
+
+**Retry condition:** reopen the product-measurement claim only when `sr rank` (or equivalent)
+is invoked on this corpus, the binary path is recorded on the export row, and
+`measured_product` is set from that invocation — not from a Jev Choice wrapper. Reopen the
+overflow hole only if a later contract revision exports the overflow shortlist into
+`visible_roster`.
