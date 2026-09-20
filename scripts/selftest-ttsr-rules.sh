@@ -106,6 +106,37 @@ if [ -e "$R" ]; then
 else
   note FAIL "system-wide rule missing: $R"; fail=$((fail+1))
 fi
+# FILETYPE-DOCTRINE rules (P2, 2026-09-20). Same fire/quiet shape as the
+# ft-rs block above, separate helper and separate rule vars so neither lane
+# touches the other's lines. ft-sh: single-entry scripts, wrapper-verdicts,
+# capture-first. ft-md: equal-or-weaker, no-claim boundaries.
+armt() { # armt <rule> <expect fire|quiet> <label> <tool> <path-or-empty> <payload>
+  local rule="$1" want="$2" label="$3" tool="$4" path="$5" txt="$6" got out
+  if [ -n "$path" ]; then
+    out=$(omp ttsr test --rule "$rule" --source tool --tool "$tool" --path "$path" "$txt" 2>&1)
+  else
+    out=$(omp ttsr test --rule "$rule" --source tool --tool "$tool" "$txt" 2>&1)
+  fi
+  case "$out" in
+    *'No rules triggered'*) got=quiet ;;
+    *Triggered*) got=fire ;;
+    *) got=quiet ;;
+  esac
+  if [ "$got" = "$want" ]; then note ok "$label ($want)"; pass=$((pass+1))
+  else note FAIL "$label — wanted $want, got $got"; fail=$((fail+1)); fi
+}
+SH="$HOME/.agents/rules/ft-sh-doctrine.md"
+MD="$HOME/.agents/rules/ft-md-doctrine.md"
+if [ -e "$SH" ] && [ -e "$MD" ]; then
+  armt "$SH" fire  "ft-sh: fire on .sh edit"  edit  /tmp/probe.sh 'echo hi'
+  armt "$SH" quiet "ft-sh: quiet on .md edit" edit  /tmp/probe.md '# notes'
+  armt "$SH" quiet "ft-sh: quiet on bash"     bash  ''            'grep -rl x probe.sh'
+  armt "$MD" fire  "ft-md: fire on .md edit"  edit  /tmp/probe.md '# notes'
+  armt "$MD" quiet "ft-md: quiet on .sh edit" edit  /tmp/probe.sh 'echo hi'
+  armt "$MD" quiet "ft-md: quiet on bash"     bash  ''            'cat probe.md'
+else
+  note FAIL "system-wide filetype rules missing: $SH $MD"; fail=$((fail+1))
+fi
 
 # COMPILE GUARD. TTSR conditions are JavaScript RegExp: a PCRE inline flag like (?i) is invalid.
 # omp ttsr test REPORTS that, but a live session does NOT — omp://ttsr-injection-lifecycle.md says
