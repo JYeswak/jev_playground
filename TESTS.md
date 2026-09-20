@@ -176,7 +176,7 @@ printed ordering, including the **correlated control** (`logreg + naiveBayes`, s
 phi +0.53) which loses accuracy when averaged. The assertions live in
 `ensemble/test_decorrelation.py`. Run: `python3 ensemble/run_all.py`.
 
-## `work/toolcall-judge-v3/rules-v4.test.mjs` — 10 tests
+## `work/toolcall-judge-v3/rules-v4.test.mjs` — 14 tests
 
 Run: `node --test work/toolcall-judge-v3/rules-v4.test.mjs` (no API key; pure classification).
 
@@ -288,3 +288,16 @@ Test 1 fails against the pre-fix tree (0 rows). Test 4's assertion was corrected
 it originally expected an injected `classify` error, but the API-key check runs BEFORE classify, so
 on an unconfigured machine the recorded error is the key error. The contract under test is the
 same one §16 found broken — a failure must be RECORDED, not swallowed.
+
+### rules-v4.test.mjs — four arms added 2026-09-20 (R41 trigger)
+
+11. R41 TRIGGER: a sed program survives the strip — it is code, not payload
+12. R41 TRIGGER: macOS `sed -i ""` form also survives
+13. R41 PLANTED NEGATIVE: a quoted PROMPT is still stripped — -p is not a code flag
+14. R41 PLANTED NEGATIVE: python3 -c is code, python3 script.py --note is not
+
+Arms 13 and 14 are the load-bearing pair: they pin the distinction the whole rule rests on. A
+quoted span is code when it occupies the slot after an interpreter code-flag (-c/-e/-i/
+--expression), NOT when its binary happens to be an interpreter. `-p` is deliberately excluded
+and arm 13 proves why: `perl -p` is code but `omp -p "..."` is a prompt, and including `-p`
+broke the quoted-prompt arm.

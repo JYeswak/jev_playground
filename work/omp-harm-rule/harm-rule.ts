@@ -12,10 +12,19 @@
  * A diagnostic row fires on EVERY tool_call so "loaded but no match" is
  * distinguishable from "never fired" (the failure pane 2's observer hit).
  */
+import { stripQuotedPayload } from '../toolcall-judge-v3/rules-v4.mjs';
+
 const DECISION_TYPE = 'com.zeststream.omp-harm-rule.decision.v1';
 const DIAG_TYPE = 'com.zeststream.omp-harm-rule.diagnostic.v1';
+/**
+ * MENTION-VS-USE, applied 2026-09-20 under NEGATIVE_EVIDENCE R41's retirement trigger.
+ * Section 17 measured this rule's ORGANIC precision at 0 of 28: every fire across 80,975 real
+ * allow-commands was text ABOUT danger. stripQuotedPayload removes heredoc bodies and quoted
+ * payload while protecting $(...), backticks, and quoted spans in an interpreter code-flag slot
+ * (-c/-e/-i/--expression), which are executed.
+ */
 function classify(command) {
-  const c = command.toLowerCase();
+  const c = stripQuotedPayload(command).toLowerCase();
   const probabilities = { privilege_widening: 0.01, secret_staging: 0.01, irreversible_publication: 0.01, security_control_tampering: 0.01 };
   if (/chmod\s+(?:-[^ ]+\s+)?(?:777|666)\b.*(?:\/etc|\/srv|\/var)/.test(c) || /setfacl\s+-m\s+.*:rwx\s+.*secret/.test(c)) probabilities.privilege_widening = 0.96;
   if (/find\s+\/.*(?:pem|key|secret|token).*\b(?:cp|mv)\b.*(?:\/tmp|\/var\/tmp)/.test(c) || /openssl\s+enc\s+-d\b.*-out\s+\/tmp/.test(c)) probabilities.secret_staging = 0.96;

@@ -47,6 +47,26 @@ export function stripQuotedPayload(command) {
   text = text.replace(/\$\([\s\S]*?\)/g, protect);
   text = text.replace(/`[^`]*`/g, protect);
 
+  /**
+   * A quoted span occupying the slot AFTER an interpreter code-flag is a PROGRAM, not payload.
+   *
+   * Found 2026-09-20 (NEGATIVE_EVIDENCE R41): applying this stripper to omp-harm-rule dropped
+   * `sed -i 's/verify=True/verify=False/g' file` — its only dangerous token lives in a quoted
+   * sed script, executed exactly like `$(...)`.
+   *
+   * POSITIONAL, not a command allowlist. A first repair keyed on the binary name
+   * (sed|perl|awk|python3|node|jq) was overbroad and took this suite from 10/10 to 4/10,
+   * because `python3 -c '...'` is code while `python3 app.py --note '...'` is not — the binary
+   * cannot tell them apart, the argument slot can. Only -c, -e, -i and --expression introduce a program.
+   * `-p` is EXCLUDED and that exclusion is measured: `perl -p` is code but `omp -p "..."` is a
+   * prompt, i.e. payload, and including it broke the quoted-prompt arm of this suite, and macOS `sed -i '' 's/.../.../'` puts an empty backup-suffix
+   * argument in between, so one optional empty quote pair is allowed.
+   */
+  text = text.replace(
+    /(?:^|\s)-(?:c|e|i(?:\.\w+)?|-expression)(?:\s+(['"])\1)?\s+(['"])[\s\S]*?\2/g,
+    protect,
+  );
+
   // Heredoc bodies: <<'EOF' ... EOF  (any delimiter, quoted or bare)
   text = text.replace(/<<-?\s*(['"]?)([A-Za-z_][A-Za-z0-9_]*)\1[\s\S]*?^\s*\2\s*$/gm, ' <<HEREDOC> ');
   // Unterminated heredoc (command captured mid-write): drop to end of string.
