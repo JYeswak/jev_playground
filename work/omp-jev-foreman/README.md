@@ -31,3 +31,13 @@ infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
 ```bash
 node --test work/omp-jev-foreman/test/*.test.mjs
 ```
+## Measure the questions
+
+Use the sanctioned Jev client and the frozen constructed windows:
+
+~~~bash
+infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --   node --experimental-strip-types work/omp-jev-foreman/measure.mjs
+~~~
+
+The measurement is a hand-built n=8 smoke test, not a supervision accuracy claim. Receipt:
+`docs/demos/upstream-repro/omp-jev-foreman-measure-20260920.md`
