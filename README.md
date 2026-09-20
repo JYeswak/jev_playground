@@ -103,7 +103,7 @@ always-abstain control 5× on their own corpus
 ([receipt](docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md)).
 
 **Scoreboard, present tense:** 33 verdict rows (8 cleared, 13 held, 12 ruled out, **0 promoted**),
-31 dead-end ledger entries each with a reopen condition, 13 gate stages green. Tool_call
+50 dead-end ledger entries each with a reopen condition, 13 gate stages green. Tool_call
 **RULE WINS** — ship the classifier, drop Jev (cost-benefit). Observer (B)
 mechanism MET at n=1 lab; working-profile dogfood **OPEN**. Proven vs WIP seams:
 [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). The product is the
@@ -785,7 +785,7 @@ Runtimes, measured on an M3 Ultra: `foundation/gates.sh` about 16 s, of which st
 
 **Nothing has been promoted.** 33 verdict rows (8 cleared, 13 held, 12 ruled out, **0 promoted**).
 That is the deliverable rather than a shortfall, and every reason lives in
-[`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 31 entries, each carrying the condition that would
+[`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 50 entries, each carrying the condition that would
 reopen it. One candidate died there because an MIT-licensed tool already ships its surface, which
 is a reason to stop building and not a reason to build faster.
 
@@ -828,7 +828,7 @@ pointed at another shape reports zero turns, which is a visible result rather th
 supervision cleared its bar on authored vignettes (AUC 1.000 twice), then scored 0.750 on 186,449
 real windows and was moved off rung 5 by its author. The retraction is the system working, not
 failing. Verdicts and receipts: `docs/demos/STATUS.tsv`; reopen conditions:
-`NEGATIVE_EVIDENCE.md` (31 entries).
+`NEGATIVE_EVIDENCE.md` (50 entries).
 
 **Open questions, honestly.** Class-D (does the agent's answer change?) is unmeasured: the
 ablate-and-rerun harness is built and frozen, its model arms pending a quiet window. Two verdicts
