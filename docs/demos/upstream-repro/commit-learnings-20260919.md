@@ -529,3 +529,5 @@ was preparing the rescue when the owner committed both themselves. No action tak
 because the exposure was real. The callback also **omitted its sha**, which the packet contract
 requires; I located the work by path. A missing sha is how a receipt and its cited artifact drift
 apart, so it is noted rather than silently compensated.
+
+SECTION 19 taste-loop contracts — PASS — 20 packages: zero fetch/block, all 19 suites green (dispatch has none); deviations filed (timeouts 3000/4000/absent, route absolute import, dispatch thinnest); promoted=0, earned by nothing here — NO-CLAIM: static+offline only; 85 gate file absent so bars are dispatch-text.
