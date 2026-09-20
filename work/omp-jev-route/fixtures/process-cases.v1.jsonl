@@ -1,0 +1,6 @@
+{"case_id":"positive-correct","y":["rust-test-triage"],"roster":[{"skill_id":"rust-test-triage"},{"skill_id":"beads-workflow"}],"scores":{"__none__":0.1,"rust-test-triage":0.7,"beads-workflow":0.2},"fit":{"rust-test-triage":0.8,"beads-workflow":0.5}}
+{"case_id":"no-match-abstain","y":[],"roster":[{"skill_id":"rust-test-triage"},{"skill_id":"beads-workflow"}],"scores":{"__none__":0.6,"rust-test-triage":0.3,"beads-workflow":0.1},"fit":{"rust-test-triage":0.8,"beads-workflow":0.5}}
+{"case_id":"false-abstain","y":["rust-test-triage"],"roster":[{"skill_id":"rust-test-triage"}],"scores":{"__none__":0.7,"rust-test-triage":0.3},"fit":{"rust-test-triage":0.8}}
+{"case_id":"wrong-pick","y":["beads-workflow"],"roster":[{"skill_id":"rust-test-triage"},{"skill_id":"beads-workflow"}],"scores":{"__none__":0.1,"rust-test-triage":0.7,"beads-workflow":0.2},"fit":{"rust-test-triage":0.8,"beads-workflow":0.5}}
+{"case_id":"needless","y":[],"roster":[{"skill_id":"rust-test-triage"}],"scores":{"__none__":0.1,"rust-test-triage":0.8},"fit":{"rust-test-triage":0.8}}
+{"case_id":"empty-roster","y":["anything"],"roster":[]}

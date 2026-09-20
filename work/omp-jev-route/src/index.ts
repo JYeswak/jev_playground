@@ -22,6 +22,7 @@ const MAX_PROMPT = 4000;
 // keeps the single source of truth (no forked fetch) at the cost of
 // machine-specificity, stated in the receipt. Do not "fix" by vendoring.
 import { askJev } from "/Users/josh/Developer/jev/work/jev-client/src/index.ts";
+import { appendProcessDecision } from "./process.mjs";
 /**
  * Frozen questions. Routing advice only; the scores predict nothing until a
  * later unit measures them against outcomes, and this file says so.
@@ -82,6 +83,7 @@ export default function ompJevRoute(pi) {
       }
       const prompt = promptText(event);
       const toolCallId = typeof event?.toolCallId === "string" ? event.toolCallId : null;
+      await appendProcessDecision(pi.appendEntry.bind(pi), event);
       if (prompt === undefined) return undefined;
       const r = await askJev({ state: { prompt }, questions: QUESTIONS });
       if (!r.ok) {
