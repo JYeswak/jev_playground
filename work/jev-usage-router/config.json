@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "mode": "shadow",
+  "model": "jev-1.13.0",
+  "confidenceFloor": 0.55,
+  "logDir": "logs",
+  "comment": "mode=shadow logs the route but does not bind the caller. mode=active returns the route for the caller to honor. enabled=false or BYPASS_JEV=1 skips Jev entirely."
+}

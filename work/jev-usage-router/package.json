@@ -1,0 +1,8 @@
+{
+  "name": "jev-usage-router",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shadow-first GrokBot usage router: Jev Choice decides local|research|browser|bypass; logs every decision; kill switch via config",
+  "bin": { "jev-route": "./src/cli.mjs" }
+}
