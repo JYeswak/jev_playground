@@ -202,6 +202,25 @@ on the `createObserver` gate path.
 
 **Where a probabilistic judge belongs.** Only on what regex cannot express. Measured on this surface: the classifier wins and Jev is dropped ([`toolcall-headtohead-20260919.md`](demos/upstream-repro/toolcall-headtohead-20260919.md)). The dcg prior is on this tip: [`docs/demos/upstream-repro/dcg-block-rate-prior-20260919.md`](demos/upstream-repro/dcg-block-rate-prior-20260919.md) — 49,661 allow / 488 block = **0.97%**.
 
+## WIP / UNPROMOTED: taste-loop packages — observe-only scaffold
+
+Eleven `work/omp-jev-*` product-taste packages landed in
+[#16](https://github.com/JYeswak/jev_playground/pull/16). Shared kit:
+[`work/taste-loop/README.md`](../work/taste-loop/README.md). The binding contract is
+[`work/taste-loop/CONTRACT.md`](../work/taste-loop/CONTRACT.md).
+
+**Claim level: observe-only scaffold.** Not wired to working profiles. Not validated
+on live traffic. Not working-dogfood. **Not promoted.** Do not copy into `~/.omp` —
+imports are repo-relative (`work/jev-client`, `work/taste-loop`).
+
+Names from the tree: `omp-jev-default`, `omp-jev-field`, `omp-jev-firstlook`,
+`omp-jev-fork`, `omp-jev-heat`, `omp-jev-heckle`, `omp-jev-jargon`,
+`omp-jev-promise`, `omp-jev-skip`, `omp-jev-uncanny`, `omp-jev-undo`. Heat is
+attention leftover, not taste.
+
+**NO-CLAIM.** Offline tests and frozen questions only. `measure.mjs` is a harness,
+not a result. No live accuracy. Ledger stays **0 promoted**.
+
 ## Scoreboard
 
 | Surface | State | Claim | Promoted? |
@@ -210,6 +229,7 @@ on the `createObserver` gate path.
 | tool_call ground-truth corpus | OPEN; 216k decisions, zero API | 3.95% isError on allowed (frozen 4.01%); 40× the 0.1% kill line; join yield 36.8% | no |
 | `jev-compact` / `install-jev-compact.sh` | ships; fires in real `/compact` | L3 measurement; does **not** prune | no |
 | dogfood / observe-and-log | `jev-lab`: observer **28** decision / **55** diagnostic rows; bridge **27**; **10** sessions co-present; **1** join by `toolCallId` | **partial** — co-presence MET; id-join **mechanism MET at n=1 lab** (`a2e2035`); working-profile dogfood **OPEN**; lab only. First-contact harm-rule receipt does not close this row | no |
+| taste-loop (`omp-jev-{default,field,firstlook,fork,heat,heckle,jargon,promise,skip,uncanny,undo}`) | WIP / UNPROMOTED; observe-only scaffold | not wired to working profiles; not validated on live traffic; see `work/taste-loop/CONTRACT.md` | no |
 | STATUS ledger (`docs/demos/STATUS.tsv`) | 0 `PROMOTED` rows | rulings, not products | **0** |
 
 Further receipts: `docs/demos/omp-seam-live-20260918.md`, `docs/demos/omp-seam-fqo-20260919.md`, `docs/demos/upstream-repro/dogfood-logger-20260919.md`, `docs/demos/upstream-repro/omp-jev-observer-20260919.md` (do not read as working/production dogfood), `docs/demos/upstream-repro/toolcall-headtohead-20260919.md`, `docs/demos/STATUS.tsv`, `NEGATIVE_EVIDENCE.md` R21 / R31.
