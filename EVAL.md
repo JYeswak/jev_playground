@@ -594,3 +594,19 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   against a fake asker; cass hit schema cited from upstream SKILL.md, not a
   local introspect. Unpromoted. Ledger stays **0 promoted**. Honest state:
   **EXPLORED**, not PROBED.
+
+## jev-task-tests-beads design (2026-09-20) — `[pending]`, not a run
+
+- Receipt: `docs/demos/upstream-repro/jev-task-tests-beads-20260920.md`.
+  Fixtures: `work/jev-beads-eval/{policy.v1.json,cases.v1.jsonl}` (10 cases,
+  always-abstain mean 0.800, `split: diagnostic_synthetic`).
+- Tip census, not memory: `.beads/issues.jsonl` **n=48** at `5dfaba1`
+  (26 closed / 11 open / 5 in_progress / 6 blocked; 6 P0 all `jev-publish-*`;
+  7/26 `close_reason=done`; 12 parent-child deps; 0 cycles on a key scan;
+  Muse children `jev-vbh` + `.1`–`.5`).
+- `br` / `bv` **not executed** (absent from PATH here). No Jev call. No omp
+  registration. **promoted=0.**
+- Rejected designs: `NEGATIVE_EVIDENCE.md` R43.
+- **Boundary:** this is an unpromoted design. The 10 cases were authored by the
+  same pass that wrote the questions (R28). Clearing any later bar on this
+  split licenses an observe-only CLI, not a working-profile advisor.

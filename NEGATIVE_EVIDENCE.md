@@ -1840,3 +1840,35 @@ The planted negative is now a kit check: `emissionOnlyLoss` makes always-abstain
 (compaction keep-everything is the opposite — withhold is expensive) *and* the table is
 declared that way in the file before the first score. Do not recover emission-only as a
 default advisory gate.
+
+## R43 — REJECTED: Jev-as-`bv` over the beads DAG; fail-closed `br close`; cycle detector; STOP-LIVE
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Design only
+(`docs/demos/upstream-repro/jev-task-tests-beads-20260920.md`).
+
+Four designs this pass killed before a scorer existed, from the tip store itself
+(`.beads/issues.jsonl`, n=48 at `5dfaba1`):
+
+1. **Replace `bv --robot-triage` with Jev Choice over the whole DAG.** 12 dependency
+   rows, all `parent-child`, **0 cycles**. Graph reachability is already exact.
+   Jev's wedge is semantic (ACCEPTANCE quality, thin `done`, ceremony, comment-blocked
+   "ready"), not "what's next on the DAG." Cost: a paid call per tick plus a ranker
+   we would then stop comparing to `bv`. Defect class it would not catch: blocked-by
+   edges, which `br ready` already hides.
+2. **Fail-closed `.omp/hooks/pre` on `br close`.** Acting on a
+   `diagnostic_synthetic` split the question-author labelled. R28 is the retry
+   condition for *any* act.
+3. **Jev dep-cycle detector.** Prevalence ~0. `br dep cycles` / `bv --robot-insights`
+   is the oracle. A score here is a ceremony metric.
+4. **STOP-LIVE / deferred registration / quiet-window-as-science-gate** as a reason
+   not to register an observe-only scorer later. Already retracted at
+   `docs/INTEGRATIONS.md:174`. Not re-invented.
+
+**What we kept:** skillranker 0/1/2 loss, always-abstain mean **0.800** on the 10-case
+sketch, `__none__`, noul-never-a-Choice-gate, roster+eligibility, observe-only CLI
+then omp tool, JSONL export. `diagnostic_synthetic` cannot promote.
+
+**Retry condition:** (1) a week of real `br ready --json` exports whose human claim
+log disagrees with `bv --robot-next` on ≥10 rows *and* Jev mean loss beats both
+baselines; (2) SHIP-OMP-ADVICE bar in the design file plus L3 on C5 *and* C6,
+fail-open first; (3) `br dep cycles` non-empty on a store we own; (4) none.

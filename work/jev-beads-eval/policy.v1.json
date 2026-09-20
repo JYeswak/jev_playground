@@ -1,0 +1,62 @@
+{
+  "schema": "jev-beads-eval-policy/v1",
+  "status": "deterministic_contract_examples_not_measured_results",
+  "split_note": "This battery is split=diagnostic_synthetic. It cannot promote. Stolen from skillranker expected_values.v1.json wording.",
+  "source_beads": {
+    "jsonl": ".beads/issues.jsonl",
+    "n_at_design": 48,
+    "head": "5dfaba1",
+    "date": "2026-09-20"
+  },
+  "loss": {
+    "choice": {
+      "correct_recommendation_on_positive": 0,
+      "correct_no_match_abstention": 0,
+      "false_abstention_on_positive": 1,
+      "incorrect_recommendation_on_positive": 2,
+      "needless_recommendation_on_no_match": 2
+    },
+    "noul": {
+      "threshold": 0.5,
+      "abstain_band": [0.4, 0.6],
+      "correct_side": 0,
+      "abstain_when_labelled": 1,
+      "wrong_side": 2
+    },
+    "score": {
+      "levels": [0, 1, 2],
+      "exact": 0,
+      "off_by_one": 1,
+      "off_by_two": 2,
+      "abstain_when_labelled": 1,
+      "confidence_floor": 0.55
+    }
+  },
+  "always_abstain_mean_loss": 0.8,
+  "always_abstain_derivation": "C1=1 C2=0 C3=1 C4=1 C5=1 C6=1 C7=1 C8=1 C9=1 C10=0 → 8/10",
+  "none_token": "__none__",
+  "noul_is_diagnostic_never_a_choice_gate": true,
+  "promotion": {
+    "mean_loss_lt_always_abstain": true,
+    "mean_loss_lt_heuristic": true,
+    "choice_top1_on_positives_ge": 0.9,
+    "feasibility_cases": ["bt-accept-looks-right", "bt-ready-honesty-open-blocked"],
+    "feasibility_bar": 0.8,
+    "diagnostic_synthetic_cannot_promote": true
+  },
+  "arms": ["jev", "bv_robot_next", "dumb_heuristic"],
+  "dumb_heuristic": {
+    "choice": "lowest priority among status in {open,in_progress}, then oldest created_at; else __none__",
+    "noul_ready": "status==open => yes",
+    "noul_close_ok": "close_reason nonempty => yes",
+    "score_accept": "description contains ACCEPTANCE => 2",
+    "score_inflation": "priority<=1 => 0 else 2"
+  },
+  "sdk": {
+    "cite": "docs/demos/SDK-SURFACE.md",
+    "choice_fields": ["choice", "confidence", "probabilities"],
+    "noul_fields": ["noul"],
+    "score_fields": ["score", "confidence", "probabilities", "legend"],
+    "forbidden_fields": [".probability", ".distribution"]
+  }
+}
