@@ -677,3 +677,30 @@ defines what promotion would require (stage 85, four gates) is itself wired and 
 5. **The ceiling argument is the cheapest strong result available.** §21 rejected compaction with
    **zero model calls** by giving the job to an omniscient judge and finding it 19 points short.
    Any decision with a computable upper bound has that shape.
+
+## Conductor correction: the panes were RATE-LIMITED, not unresponsive
+
+Last tick I reported "both panes idle ~760s with no callback on either dispatch — the transport is
+dead, so I work myself". **That diagnosis was wrong.** `ntm --robot-agent-health=jev`, which the
+tick instructions name as the tool to use:
+
+```
+1  omp-claude  working  safe_to_dispatch False  rate_limited True   WAIT_FOR_RESET
+2  omp-claude  idle     safe_to_dispatch True   rate_limited True   WAIT_FOR_RESET
+3  omp-muse    idle     safe_to_dispatch True   rate_limited False  HEALTHY
+```
+
+Two panes are out of quota and one is healthy. "Dead transport" and "out of quota" call for
+opposite responses — the first says stop dispatching, the second says dispatch the pane that can
+still receive and wait for the others. I did the right thing by accident (worked the frontier
+myself) for the wrong reason, and I would have kept blaming `robot-send` indefinitely.
+
+**The instrument existed, the tick told me to use it, and I inferred from silence instead.** That
+is the same shape as the nineteen mention-vs-use instances: *absence of a signal read as evidence
+about its cause.* Twentieth instance, and the first where the silence was a peer's budget rather
+than a selector.
+
+Also worth recording because it changes how the fleet should be read: `safe_to_dispatch` is
+**false for pane 1 and true for pane 2** despite both being rate-limited, because pane 1 is
+mid-turn. The flag answers "can this pane accept input now", not "will it do useful work" —
+reading it as the latter is how a dispatch disappears into a throttled agent.
