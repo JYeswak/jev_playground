@@ -197,3 +197,15 @@ test('needless suggestion on a no-match is loss 2 (the other expensive error)', 
   const abstain = scoreDecision({ y: [], pick: NONE });
   assert.equal(abstain.loss, 0);
 });
+
+test('invented helpful noul gate is refused (selector ≡ claim)', async () => {
+  await assert.rejects(
+    () => judgeSkillPick({
+      roster: [],
+      task: 'x',
+      ask: async () => ({ ok: true }),
+      helpfulNoul: 0.07,
+    }),
+    /invented noul gate/,
+  );
+});

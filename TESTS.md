@@ -18,8 +18,8 @@ claim nobody can check:
   (the `--mode json` stream) and `message` (the on-disk SessionEntry), which must produce
   identical messages, plus a planted negative that an unknown envelope still yields nothing.
   Gated by `foundation/gates.d/40-omp-compact-replay.sh`.
-- `work/oracle-kit/test.mjs` — the shared scorer's self-test, **10 checks, every case a defect
-  this lane actually shipped on 2026-09-19**: a constant score must be flagged rather than
+- `work/oracle-kit/test.mjs` — the shared scorer's self-test, **every case a defect
+  this lane actually shipped**: a constant score must be flagged rather than
   returned as a clean `0.500` (three bogus router runs), a degenerate label must throw rather
   than yield `NaN` (the gate's feasibility arm), and a field name absent from the SDK must throw
   rather than score silence (`.distribution` / `.probability`). Plus positive observables: AUC
@@ -29,7 +29,22 @@ claim nobody can check:
   record's own key list in the error, and `inspectKey` returns that list alongside the lookup —
   written after the eighth wrong-selector failure in one session, the only one that reached a
   published receipt.
-  Run: `node work/oracle-kit/test.mjs` (13 checks).
+  Plus **§4(a) `decisionLoss`**: always-abstain mean loss equals nPos/n on the skillranker
+  10/12 identity (0.833); false abstain costs 1, wrong/needless cost 2; a table that
+  omits `false_abstention_on_positive` lets always-abstain win (planted negative).
+  Plus **§4(d) selector≡claim**: `{noul:0.9}` scored as `probabilities` throws;
+  `assertSdkSelector` refuses `.distribution` / an invented `helpfulNoul`;
+  `refuseInventedNoulGate` refuses a second noul on a Choice pick.
+  Run: `node work/oracle-kit/test.mjs` (22 checks).
+- `work/oracle-kit/prevalence_threshold.py` — t*(π) on frozen priors 30/186449 and 488/50149.
+  Run: `python3 work/oracle-kit/prevalence_threshold.py` (exit 0; prints the 1:2300 identity).
+- `work/oracle-kit/selector-guard.mjs` — scorers cannot silently read `.distribution` / `.probability`.
+  Run: `node work/oracle-kit/selector-guard.mjs` and `--selftest` (planted `answer.distribution` RED).
+- `work/oracle-kit/voi_harm_rule.py` — VOI of paid Jev vs free regex on the frozen harm-rule corpus.
+  Run: `python3 work/oracle-kit/voi_harm_rule.py` (exit 0; VOI ≤ 0; NO-CLAIM).
+- `scripts/promotion-four-gates.py` — four-gate VIEW over existing receipts; empty evidence fails.
+  Run: `python3 scripts/promotion-four-gates.py --selftest` (exit 0) and
+  `python3 scripts/promotion-four-gates.py UP-R5-jev-toolcall-gate` (exit 1 today; STATUS not written).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
@@ -48,7 +63,7 @@ claim nobody can check:
 - `work/jev-client/test/client.test.mjs` — the ONLY sanctioned systemOne caller: asserts the exact wire shape (`model` + `state` + `questions` as an object of `{type:'noul',instructions}`), unset key -> `unconfigured` with the infisical fix in the error, HTTP 400 surfaced with the server body, `.probability`/`.distribution` rejected, non-JSON, transport throw, partial answers, and empty questions refused before any network call. Also the MULTICLASS caller `askJevChoice`: `{type:'choice',instructions,criteria}` with `criteria` a MAP (the SDK refuses a list), a degenerate class set refused before any network call, and five plausible-looking 200s — a label never offered, no `choice`, `.distribution` instead of `.probabilities`, a label missing from `probabilities`, non-numeric `confidence` — each refused rather than read, because a scorer that shrugs at a missing field fabricates a finding instead of crashing. Also `readRow`, which handles BOTH omp session row shapes (`customType` as an object with nested `data`, and `customType` as a string with top-level `data`) — a reader that handles one silently reports "no rows" on the other, which is the root cause of R33 and R41. Run: `node --experimental-strip-types --test work/jev-client/test/client.test.mjs` (14 tests, 21 including subtests).
 - `work/jev-client/test/uncertain.test.mjs` — uncertainty-ranked selection, deterministic random audit sampling, coarse score buckets, and no-near-threshold negative. Run: `node --test work/jev-client/test/uncertain.test.mjs` (4 tests).
 - `work/jev-client/test/measure-kit.test.mjs` — the standard verdict arithmetic, offline with a fake asker: a planted constant (6/7 correct, same verdict everywhere) comes back DEGENERATE, a planted one-item margin with a near-threshold decider comes back WEAK (the 010dd96 correction encoded), a clear separator DISCRIMINATES, and the driver counts drift flips and transport errors. Run: `node --test work/jev-client/test/measure-kit.test.mjs` (4 tests).
-- `work/skillranker-eval/test/contract.test.mjs` — offline mirror of skillranker's EVAL CONTRACT: frozen 0/1/2 loss vs pulled `evaluation_policy.v1.json`, `expected_values.v1.json` recomputed, always-abstain 10/12=0.833, coin-flip worse than abstain, planted wrong-pick scores 2 and REDs if weakened, ≥0.90 gate is a hard FAIL at 0.800 and still not promotable at 0.900 on `diagnostic_synthetic`, overflow case flagged as installable≠offered, JSONL export rows are not a product claim, judge shape is one Choice plus `__none__` with no second noul. Run: `node --test work/skillranker-eval/test/contract.test.mjs` (11 tests).
+- `work/skillranker-eval/test/contract.test.mjs` — offline mirror of skillranker's EVAL CONTRACT: frozen 0/1/2 loss vs pulled `evaluation_policy.v1.json`, `expected_values.v1.json` recomputed, always-abstain 10/12=0.833, coin-flip worse than abstain, planted wrong-pick scores 2 and REDs if weakened, ≥0.90 gate is a hard FAIL at 0.800 and still not promotable at 0.900 on `diagnostic_synthetic`, overflow case flagged as installable≠offered, JSONL export rows are not a product claim, judge shape is one Choice plus `__none__` with no second noul, invented `helpfulNoul` gate refused. Loss numbers come from `oracle-kit/decisionLoss` (reuse, not a second table). Run: `node --test work/skillranker-eval/test/contract.test.mjs` (12 tests).
 - `work/omp-jev-failure/test/failure.test.mjs` — planted errored-tool arms for the MULTICLASS classifier: `failure_classified` carries one class plus its full distribution at `schemaVersion: 2` and no longer carries `scores`, the call itself is ONE choice question over the three mutually-exclusive classes (`classes`, never a question map) — the shape that took the committed eleven cases from 9/11 with two structurally impossible answers per run to 11/11 with none, `failure_error` without a class, non-error ignored, and fail-open append/classifier failures. Run: `node --experimental-strip-types --test work/omp-jev-failure/test/failure.test.mjs` (5 tests).
 - `work/omp-jev-foreman/test/foreman.test.mjs` — local-trigger progress observer: healthy window no trigger, repeated-command score, classifier error without scores, and fail-open host. Run: `node --test work/omp-jev-foreman/test/*.test.mjs` (4 tests).
 - `work/omp-jev-route/test/route.test.mjs` — pre-staged peer route observer tests. Run: `node --experimental-strip-types --test work/omp-jev-route/test/route.test.mjs`.
@@ -92,7 +107,7 @@ Everything else under this root is a **vendored clone** and its tests belong to 
 | `foundation/gates.sh --selftest` | `cd foundation && ./gates.sh --selftest` | **every stage proves it can go RED** on a planted bad input | **8/8 PASS** at `a503b9a`; same stale-count correction |
 | `githooks/commit-msg-verification-level.sh --selftest` | as written | the commit-edge hook refuses a level-less subject and accepts a level-carrying one | 4 known-bad refused, 4 known-good passed, 1 prose-not-claim refused |
 | `compaction/` (sibling-owned) | see that directory's own scripts | the omp transcript adapter and its known-bad (a trailing `toolResult` must be kept) | gate `40-omp-compact-replay.sh` PASS |
-| `work/skillranker-eval/test/contract.test.mjs` | `node --test work/skillranker-eval/test/contract.test.mjs` | skillranker EVAL CONTRACT process: frozen loss, always-abstain 0.833, coin-flip worse, planted wrong-pick RED at loss 2, ≥0.90 hard FAIL, JSONL export, judge shape | 11/11, this PR |
+| `work/skillranker-eval/test/contract.test.mjs` | `node --test work/skillranker-eval/test/contract.test.mjs` | skillranker EVAL CONTRACT process: frozen loss via oracle-kit `decisionLoss`, always-abstain 0.833, coin-flip worse, planted wrong-pick RED at loss 2, ≥0.90 hard FAIL, JSONL export, judge shape, invented noul gate refused | 12/12, this PR |
 
 **Rule:** a green here is the only green we may call *ours*.
 

@@ -1,5 +1,9 @@
 // oracle-kit self-test. Every case is a defect this lane actually shipped today.
-import { auc, requireBoth, field, feasibility, ece, eProcess, requireKey, inspectKey } from './index.mjs';
+import {
+  auc, requireBoth, field, feasibility, ece, eProcess, requireKey, inspectKey,
+  decisionLoss, meanDecisionLoss, emissionOnlyLoss, refuseInventedNoulGate,
+  assertSdkSelector, SDK_ANSWER_FIELDS,
+} from './index.mjs';
 import assert from 'node:assert/strict';
 
 let pass = 0;
@@ -74,4 +78,66 @@ check('requireKey returns the value when present, and inspectKey reports evidenc
 
 throws('requireKey refuses a non-object rather than reporting a false absence',
   () => requireKey(undefined, 'command', 'decision'), /not an object/);
+
+// §4(a) math-and-next-level-20260919.md — skillranker 0/1/2 as a proper *decision* score.
+// Always-abstain mean loss = nPos/n = 10/12 = 0.833. A table that only charges wrong
+// *emissions* lets silence win; that planted negative must fail the proper table.
+const SKILLRANKER_12 = [
+  ...Array(10).fill({ yNonEmpty: true, abstained: true, pickInY: false }),
+  ...Array(2).fill({ yNonEmpty: false, abstained: true, pickInY: false }),
+];
+
+check('always-abstain mean loss equals nPos/n on the skillranker 10/12 identity (0.833)', () => {
+  const mean = meanDecisionLoss(SKILLRANKER_12, decisionLoss);
+  assert.equal(mean, 10 / 12);
+  assert.equal(mean.toFixed(3), '0.833');
+});
+
+check('false abstention costs 1; wrong pick costs 2; needless costs 2', () => {
+  assert.equal(decisionLoss({ yNonEmpty: true, abstained: true, pickInY: false }), 1);
+  assert.equal(decisionLoss({ yNonEmpty: true, abstained: false, pickInY: false }), 2);
+  assert.equal(decisionLoss({ yNonEmpty: false, abstained: false, pickInY: false }), 2);
+  assert.equal(decisionLoss({ yNonEmpty: true, abstained: false, pickInY: true }), 0);
+  assert.equal(decisionLoss({ yNonEmpty: false, abstained: true, pickInY: false }), 0);
+});
+
+check('planted negative: a table that omits false_abstention_on_positive makes always-abstain win', () => {
+  const aaProper = meanDecisionLoss(SKILLRANKER_12, decisionLoss);
+  const aaEmission = meanDecisionLoss(SKILLRANKER_12, emissionOnlyLoss);
+  assert.equal(aaEmission, 0, 'emission-only charges silence nothing, so always-abstain scores 0');
+  assert.ok(aaProper > aaEmission, 'proper table must charge false abstain, else silence wins');
+  // A judge that emits a wrong pick on every positive: emission-only = 2*10/12, proper = same.
+  const wrongEmit = SKILLRANKER_12.map((r) => (
+    r.yNonEmpty ? { yNonEmpty: true, abstained: false, pickInY: false } : r
+  ));
+  const emitProper = meanDecisionLoss(wrongEmit, decisionLoss);
+  const emitEmission = meanDecisionLoss(wrongEmit, emissionOnlyLoss);
+  assert.ok(aaEmission < emitEmission, 'under emission-only, always-abstain beats a wrong emitter');
+  assert.ok(aaProper < emitProper, 'under the proper table, false-abstain (1) still beats wrong pick (2)');
+  // THE GATE: a harness that only charges wrong emissions must be refused.
+  assert.notEqual(aaEmission, aaProper, 'if these are equal the false-abstain cell was dropped');
+});
+
+// §4(d) selector ≡ claim. Scorers cannot silently read .distribution or invent a noul gate.
+throws('planted: a fixture answer {noul:0.9} scored as probabilities must throw',
+  () => field({ noul: 0.9 }, 'probabilities'), /no 'probabilities'/);
+
+throws('assertSdkSelector refuses .distribution and .probability',
+  () => assertSdkSelector('distribution'), /no \.probability or \.distribution/);
+
+throws('assertSdkSelector refuses an invented selector',
+  () => assertSdkSelector('helpfulNoul'), /not a declared SDK answer field/);
+
+check('assertSdkSelector admits only the SDK-SURFACE answer fields', () => {
+  for (const k of SDK_ANSWER_FIELDS) assertSdkSelector(k);
+});
+
+throws('refuseInventedNoulGate: a second noul cannot override a choice pick',
+  () => refuseInventedNoulGate({ pick: 'rust-test-triage', helpfulNoul: 0.07 }),
+  /invented noul gate/);
+
+check('refuseInventedNoulGate is silent when no second noul is supplied', () => {
+  assert.equal(refuseInventedNoulGate({ pick: 'rust-test-triage' }), undefined);
+});
+
 console.log(`\noracle-kit: ${pass}/${pass} checks passed`);

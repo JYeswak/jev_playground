@@ -128,3 +128,69 @@ export function inspectKey(record, key) {
   const keys = (record && typeof record === 'object') ? Object.keys(record).sort() : [];
   return { present: keys.includes(key), value: record?.[key], keys };
 }
+
+/**
+ * Skillranker 0/1/2 decision loss. A scoring rule for {recommend, abstain}:
+ *   correct pick / correct abstain → 0
+ *   false abstain on a positive    → 1
+ *   wrong pick / needless pick     → 2
+ *
+ * Lifted from work/skillranker-eval (their frozen evaluation_policy.v1.json).
+ * Always-abstain mean loss equals nPos/n; without the false-abstain cell, silence wins.
+ */
+export function decisionLoss({ yNonEmpty, abstained, pickInY }) {
+  if (yNonEmpty && abstained) return 1;
+  if (yNonEmpty && pickInY) return 0;
+  if (yNonEmpty) return 2;
+  if (abstained) return 0;
+  return 2;
+}
+
+/** Mean of decisionLoss (or a substitute table) over rows. */
+export function meanDecisionLoss(rows, lossFn = decisionLoss) {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    throw new Error('meanDecisionLoss: empty rows — an empty scan set is not a measurement');
+  }
+  let total = 0;
+  for (const row of rows) total += lossFn(row);
+  return total / rows.length;
+}
+
+/**
+ * PLANTED-INVALID table: charges only wrong *emissions*. Silence costs 0.
+ * Always-abstain then scores 0 and "wins". A gate that uses this table is broken.
+ */
+export function emissionOnlyLoss({ yNonEmpty, abstained, pickInY }) {
+  if (abstained) return 0;
+  if (yNonEmpty && pickInY) return 0;
+  return 2;
+}
+
+/** Answer fields the installed SDK actually declares. See docs/demos/SDK-SURFACE.md. */
+export const SDK_ANSWER_FIELDS = Object.freeze([
+  'noul', 'choice', 'confidence', 'probabilities', 'score', 'legend', 'type',
+]);
+
+export const FORBIDDEN_SELECTORS = Object.freeze(['distribution', 'probability']);
+
+/** Refuse a selector the SDK does not declare. Silent defaulting is how AUC 0.500 was fabricated. */
+export function assertSdkSelector(kind) {
+  if (FORBIDDEN_SELECTORS.includes(kind)) {
+    throw new Error(`selector '${kind}' is not in the SDK — there is no .probability or .distribution`);
+  }
+  if (!SDK_ANSWER_FIELDS.includes(kind)) {
+    throw new Error(`selector '${kind}' is not a declared SDK answer field`);
+  }
+  return kind;
+}
+
+/**
+ * A Choice decision must not be overridden by a second noul.
+ * The skillranker `helpful` ≥ 0.5 gate moved mean loss 0.750 → 0.167 by forcing abstention
+ * (math-and-next-level-20260919.md §1.1 / §4(d)). That is a selector bug, not a model result.
+ */
+export function refuseInventedNoulGate(opts = {}) {
+  if (opts && Object.prototype.hasOwnProperty.call(opts, 'helpfulNoul')) {
+    throw new Error('invented noul gate: a choice decision must not be overridden by a second noul (SDK-SURFACE / skillranker second-gate defect)');
+  }
+}

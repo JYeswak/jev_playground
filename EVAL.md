@@ -536,3 +536,35 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
 - **Boundary:** no STATUS rewrite, no new gate stage, no crate import, no key. Inventory
   remains `franken-crate-alpha-20260919.md`. **promoted=0 untouched.**
 - Lane: offline. Claim: `[oracle]` (public HEAD + committed receipts).
+
+---
+
+## §4 product ticks — decisionLoss / t*(π) / four-gate VIEW / selector≡claim (2026-09-20)
+
+Landed the ranked ticks from `docs/demos/upstream-repro/math-and-next-level-20260919.md` §4
+as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema change.
+
+- **(a)** `decisionLoss({ yNonEmpty, abstained, pickInY })` in `work/oracle-kit/index.mjs`.
+  `node work/oracle-kit/test.mjs` → **22/22**, including always-abstain `10/12 = 0.833`,
+  false-abstain=1 / wrong=2 / needless=2, and the planted emission-only table that lets
+  always-abstain win. `work/skillranker-eval/score.mjs` reuses the kit (does not duplicate
+  the 0/1/2 numbers). `node --test work/skillranker-eval/test/contract.test.mjs` → **12/12**.
+  `node work/skillranker-eval/run.mjs --control always-abstain` mean loss **0.833**.
+- **(b)** `python3 work/oracle-kit/prevalence_threshold.py` exit **0**. Frozen priors
+  `30/186449` and `488/50149`. Prints `FP/TP = 55791/24 = 2324.625` (~1:2300),
+  `t*(foreman, L_FP=L_FN=1) = 0.99983910`, dcg `L_FN ∈ {1,10,100}`, planted `π=0.5 → 0.500`,
+  planted `π=0` refuses. Shipped 0.80/0.50 are not Bayes under the signed triples.
+- **(c)** `python3 scripts/promotion-four-gates.py UP-R5-jev-toolcall-gate` exit **1**
+  (all four bits fail: 12/12≠11/12, block⊈observe-only, 15% vs 0.97%, adversarial
+  unmeasured). `--selftest` exit **0**: empty evidence ≠ pass; STATUS.tsv digest unchanged.
+- **(d)** kit planted `{noul:0.9}` as `probabilities` throws; `assertSdkSelector` /
+  `refuseInventedNoulGate`; `node work/oracle-kit/selector-guard.mjs` exit **0** (no silent
+  readers under `work/` `scripts/`); `--selftest` catches a planted silent reader.
+  Closed a live fallback in `work/omp-jev-observer/src/classify-systemone.mjs`
+  (`a?.probability ?? a?.noul` → `field(a, 'noul')`). Observer tests **8/8**.
+- **(e)** `python3 work/oracle-kit/voi_harm_rule.py` exit **0**. Declared
+  `L_miss=1, L_fp=10, c_call=0.01`. `VOI(jev vs regex) = -1.5200` on the frozen 12/12 vs
+  11/12 identities. NO-CLAIM: planted harms, not incidents; FP dens. not like-for-like (R34).
+- **Boundary:** no STATUS rewrite, no new `foundation/gates.sh` stage, no key, no
+  working-dogfood claim. Negative: `NEGATIVE_EVIDENCE.md` R43 (emission-only loss).
+- Lane: offline. Claim: `[test]`.
