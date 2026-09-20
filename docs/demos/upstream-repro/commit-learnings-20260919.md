@@ -425,3 +425,42 @@ anything clear this bar" has an answer that does not depend on the candidate.** 
 a computable upper bound has that shape, and we spent calls all night on questions that did not.
 
 SECTION 16 omp-jev-observer live dogfood — FAIL — shipped observer.mjs calls undefined safeAppend (4 sites), 0 rows vs 3 bridge rows on omp-test; deployed lab copy fires (2 rows); next: define helper + handler-invoking test, redeploy, re-run — NO-CLAIM: 4 sessions, one machine; fix not applied to sibling package.
+
+## Wave D section 16 — FAIL, and the defect is fixed
+
+SECTION 16 omp-jev-observer live dogfood — **FAIL** (`11ff17b`), defect **FIXED** by me
+(`TESTS.md` + `observer.mjs` + `emits-rows.test.mjs`, 5/5 new, 13/13 package, gates rc=0).
+
+Verified before touching anything: `safeAppend` is called at
+`work/omp-jev-observer/src/observer.mjs:61,71,88,91` and
+`grep -rnE 'function safeAppend|const safeAppend|safeAppend\s*='` over the package returns
+**zero definitions**. First `tool_call` → ReferenceError → outer catch → `undefined`.
+**Deterministic total silence; the shipped tree has never emitted a row.** The lab's n=1 claim ran
+against the older deployed copy. Dogfood evidence: bridge 3 rows, observer **0**; control with the
+deployed copy, 2 rows; `-e` and `.mjs` loading both proven working by separate probes.
+
+**Why it survived: all 13 pre-existing tests asserted the handler DOES NOT THROW, and a handler
+that swallows everything does not throw.** The new suite asserts the opposite — that rows ARE
+produced. Test 1 fails against the pre-fix tree.
+
+This package was already known to lack an `omp.extensions` entry, so it was counted as an
+installable extension all session while being **neither installable nor functional**.
+
+**This is the "silence read as a result" defect in its purest form** — an observer whose failure
+mode is indistinguishable from working quietly, guarded by tests that could not tell the
+difference. Fifteenth instance tonight, and the **first where the silence was in the product
+rather than in our measurement of it**.
+
+My own correction inside the fix: test 4's assertion was wrong first and I fixed the TEST, not the
+code — it expected an injected `classify` error, but the API-key check runs before `classify`.
+
+NO-CLAIM: unit-proven against a stubbed host, **not re-dogfooded live**. §16's FAIL stands until
+the 4-session dogfood is re-run; co-presence and id-join remain unmeasured; the missing
+`omp.extensions` entry is unaddressed, so the package is still not installable as shipped.
+
+SECTION 16b THIRD STAGED-FILE EXPOSURE — `work/omp-harm-rule/organic-fires.mjs` (§17, in flight)
+is staged with zero commit history. I found it only because it surfaced in my
+`git diff --cached --stat` while committing something else; `--only` correctly excluded it.
+**I did NOT rescue this one**: the previous rescue (`c824304`) had a green suite and a finished
+shape, whereas this may be mid-write, and committing another pane's half-written file is a
+different risk from committing a finished one. Broadcast to the owner instead.
