@@ -189,3 +189,26 @@ regex's fires on 77,767 real commands were mention-not-use.
 Tests 6 and 7 FAILED on first run and caught a real bug: `"$(...)"` and backticks are quoted but
 EXECUTED, so stripping them hid real token capture. Command substitutions are now protected
 before quote removal and restored after.
+
+## `work/jev-score-register/register.test.mjs` — 10 tests
+
+Run: `node --test work/jev-score-register/register.test.mjs` (no API key; pure local I/O).
+
+Guards the two properties jevcache got wrong, which is why they are planted negatives rather than
+happy paths: the raw input must be unrecoverable from the register, and two different inputs must
+never share an identity.
+
+1. PLANTED NEGATIVE: the jevcache collision cannot happen here
+2. PLANTED NEGATIVE: no field is dropped, whatever it is called
+3. PLANTED NEGATIVE: the raw input is not recoverable from the register
+4. register file is created 0600, not 0644
+5. identity is stable across key order
+6. rows round-trip, and a torn final line does not lose the rest
+7. a failed call is recorded as a gap, never as a passing score
+8. recording() does not change the wrapped answer
+9. recording() records a failure without inventing a score
+10. recordScore refuses a row it cannot attribute
+
+Test 1 encodes the measured jevcache defect directly: `{"command_id":"rm -rf --no-preserve-root /"}`
+and `{"command_id":"echo hello"}` shared a fingerprint there and it served the benign answer for
+the destructive command. Here they must differ.

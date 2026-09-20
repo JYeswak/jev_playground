@@ -87,3 +87,5 @@ awesome-typesafe/
 # Most are our own synthetic probes, but we cannot vouch for all 77,767, and the
 # file is deterministically regenerable, so it never enters git.
 work/toolcall-judge-v3/real-allowed.json
+
+work/jev-score-register/scores.jsonl
