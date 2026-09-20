@@ -10,21 +10,19 @@ infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- omp   # see ..
 
 Mined from `jev-rerank-bench` (RUN; headline reproduces from its committed cache).
 
-## One question, because measurement killed the other two
+## Three questions after holdout rescue
 
-The first draft asked three questions. `measure.mjs` ran them against four cases whose answers
-we know by construction — definition first, definition buried, mostly noise, all noise:
+The original `definitional` and `noise` questions were degenerate on the tuning cases. Pane3 re-tested the rescued wording on fresh holdout cases at `c6b77b8`: `noise` 8/8, spread 0.67; `definitional` 6/8, spread 0.92. The definitional misses are boundary cases where the definition sits at index 3, outside the first three. Overfit is not ruled out.
 
-| question | behaviour across 4 cases | verdict |
-|---|---|---|
-| `definitional` | said **no** every time, including when the definition was hit #1 | constant — cut |
-| `noise` | said **yes** every time, including on a list with zero irrelevant hits | constant — cut |
-| `ordered` | 4/4 correct, scores moved 0.90 / 0.11 / 0.96 / 0.23 with the actual ordering | kept |
+Our committed four-case rerun after the rescue scored 12/12, but that is a same-case smoke result, not a generalization claim:
 
-Total agreement was 8/12 against a coin-flip baseline of 6 — which looks like weak signal until
-you split it, and then two of the three questions turn out not to depend on their input at all.
-**A question whose answer does not change with the input is not a cheap signal; it is noise with
-a confidence attached.**
+| question | committed-case result | holdout result | verdict |
+|---|---|---|---|
+| `definitional` | 4/4 | 6/8; boundary misses | discriminates, holdout-sensitive |
+| `noise` | 4/4 | 8/8 | discriminates; overfit not ruled out |
+| `ordered` | 4/4 | existing shipped question | retained |
+
+The extension scores but never reorders agent output. No adoption or traffic accuracy claim is made.
 
 Reproduce:
 

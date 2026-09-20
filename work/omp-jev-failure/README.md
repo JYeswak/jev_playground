@@ -18,40 +18,23 @@ For a live proof with the configured Jev key:
 infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- omp --profile=jev-lab -p 'run exactly: false'
 ```
 
-## All three questions survived measurement — but they are not equal
+## Three questions after holdout rescue
 
-These scores were logged for a day before anyone checked one against a known answer. `measure.mjs`
-now checks them against eleven tool failures whose cause is known by construction: three
-transient, four argument, four bug. Nine spell their class in the error text. Two are
-**adversarial** — the misleading keyword leads and the disambiguating evidence follows, both
-readable from `state` alone (an `ECONNREFUSED` that is really our own code computing an undefined
-port; a `TypeError` that is really a missing required CLI option, every frame in `node_modules`).
+The failure questions were re-tested on fresh holdout cases at `c6b77b8`. The rescued `argument` wording scored 6/7 with spread 0.83; its single miss tied a stale-hash rejection to the invocation. The nine-case/11-case committed measurement rerun scored `argument` 8/11, with the same boundary instability. `transient` and `bug` remain unchanged. Overfit is not ruled out.
 
-The sibling `omp-jev-rerank` measurement deleted 2 of its 3 questions for being constants. None
-of these three is a constant, so **nothing was cut.** Three runs:
+| question | committed rerun | holdout result | verdict |
+|---|---|---|---|
+| `transient` | 11/11 | existing stable result | retained |
+| `bug` | 11/11 | existing stable result | retained |
+| `argument` | 8/11; near-threshold misses | 6/7; one stale-hash boundary miss | discriminates, unstable boundary |
 
-| question | correct (3 runs) | its own always-no constant | score spread | verdict |
-|---|---|---|---|---|
-| `transient` | 9/9, 11/11, 11/11 | 8/11 | 0.77 | discriminates, stable |
-| `bug` | 9/9, 11/11, 11/11 | 7/11 | 0.74 | discriminates, stable |
-| `argument` | 9/9, 8/11, 9/11 | 7/11 | 0.90 | discriminates, **but barely beats its constant and is run-unstable** |
+The extension emits scores only; it never acts on them. No accuracy or production failure-prediction claim is made.
 
-Totals were 27/27, 30/33, 31/33 against a coin-flip baseline of 16.5.
+## Measure
 
-**The pooled total is the least interesting number here.** Classes are mutually exclusive, so
-each question is false on most cases and a question that always said "no" would already score
-7-8 of 11. The bar is not the coin flip; it is each question's own constant. `transient` and
-`bug` clear it by 3-4 items and were perfect on every run, including the adversarial arms —
-`bug` scored 0.74 on the `ECONNREFUSED` trap that reads as pure network flake.
-
-`argument` clears its constant by **one to two items out of eleven**, and its verdicts are not
-reproducible: `permission-denied-system-path` scored 0.50 / 0.48 / 0.47 on three consecutive runs
-of the identical input, flipping HIT → MISS → MISS at the 0.5 threshold. All three of its misses
-sit within 0.10 of the threshold. It is kept because it is not a constant and it does separate
-the clear cases hard (0.97 / 0.89 / 0.95 on real argument errors vs 0.07 / 0.10 / 0.19 on
-transient ones). But an `argument` score near 0.5 carries no information, and nothing downstream
-should ever treat it as a verdict. `measure.mjs` prints the near-threshold verdicts on every run
-for exactly this reason.
+~~~bash
+infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- node --experimental-strip-types work/omp-jev-failure/measure.mjs
+~~~
 
 Reproduce:
 

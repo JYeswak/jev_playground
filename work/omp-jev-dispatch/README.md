@@ -27,7 +27,10 @@ impossible-acceptance case landed for the right reason.
 
 Worst single result: the scorer gave **0.17 destructive** to the exact packet that deleted five
 receipt-backed README rows — the failure this extension was built to catch.
-
+The attempted rescued destructive wording ("name a check-first step") was re-tested on the fresh
+question-shape holdout c6b77b8 and collapsed to a base-rate answer: 6/7 correct while saying NO
+on all seven packets, including the one true case (0.32). It is not shipped and must not be retried
+as a wording rescue. unverifiable and leading remain bad questions.
 ## Why it is kept
 
 The code is the harness, and the failure is the finding. It is the fourth extension whose

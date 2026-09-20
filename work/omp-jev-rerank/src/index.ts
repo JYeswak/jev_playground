@@ -93,17 +93,11 @@ export default function ompJevRerank(pi: Host) {
       const candidates = hits.slice(0, MAX_HITS).map((line, index) => `${index}: ${line.slice(0, MAX_LINE)}`);
       const result = await askJev({
         state: { intent, pattern, candidates },
-        // ONE question, because measurement killed the other two.
-        // measure.mjs over 4 ground-truth cases (ordered / buried / mostly-noise / all-noise):
-        //   definitional  said "no" on ALL FOUR, including the two where the definition was
-        //                 hit #1 — a constant, not a judgement
-        //   noise         said "yes" on ALL FOUR, including a list with zero irrelevant hits
-        //   ordered       4/4 correct, and it MOVED: 0.90 / 0.11 / 0.96 / 0.23 tracking the
-        //                 actual ordering
-        // A question whose answer does not depend on its input is not a cheap signal, it is
-        // noise with a confidence attached. Keeping the one that discriminates.
+        // Question-shape holdout c6b77b8 rescued noise and definitional; ordered remains shipped.
         questions: {
           ordered: "Are these candidates already ordered with the most relevant to the stated intent first?",
+          noise: "Does any entry fail to show a code line with the term?",
+          definitional: "Do any of the first three show a definition signature?",
         },
         timeoutMs: 3000,
       });

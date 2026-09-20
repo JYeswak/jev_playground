@@ -26,7 +26,7 @@ import { askJev } from '../jev-client/src/index.ts';
 
 const QUESTIONS = {
   transient: 'Is this failure most consistent with a transient environment or dependency failure?',
-  argument: 'Is this failure most consistent with a wrong argument, path, or invocation?',
+  argument: "Does this error tie to the invocation's own arguments, path, or command rather than the environment?",
   bug: 'Is this failure most consistent with a genuine bug in the code under edit?',
 };
 
