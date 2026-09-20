@@ -52,3 +52,35 @@ there isn't one — the `turn_start` era wrote zero scored rows, and the twin se
 diagnostics only.
 
 Against the 8/9 hand-built measurement, real traffic says: **correct once, stable always.**
+
+## Ten distinct turns: 7/10 per question, and the traps are the finding
+
+The `n=1` problem above is closed: ten distinct turns were driven through the registered
+extension, **labelled from the prompt before the scores were read**
+([receipt](../../docs/demos/upstream-repro/route-ten-turns-20260919.md)).
+
+| | precision | recall |
+|---|---|---|
+| `needs_heavyweight` | 4/6 (0.67) | 4/5 (0.80) |
+| `mechanical` | 4/6 (0.67) | 4/5 (0.80) |
+
+**7/10 per question, against 8/9 on hand-built cases.** The degradation is the expected shape
+and it is the fifth time tonight a hand-built score failed to survive contact with real input.
+
+### What the traps showed
+
+| trap | shape | result |
+|---|---|---|
+| `bump-version` | short, heavy by construction | **MISS / MISS** — 0.09–0.11 heavy |
+| `auth-grace` | short, heavy | HIT / MISS |
+| `verbose-typo` | long, trivial | HIT / HIT |
+| `verbose-rename` | long, trivial | **MISS** — 0.64–0.73 leaked into heavyweight |
+
+**The scorer reads content first and length second — but length leaks.** `verbose-typo` proves
+length alone does not doom a turn; `verbose-rename`, the same trap shape, leaks into
+heavyweight anyway. And `bump-version` — the short prompt hiding real work — misses on both
+questions, which is the failure mode that matters most for routing: *the cheap-looking turn
+that isn't.*
+
+This is why the extension **routes nothing**. A router acting on these scores would send the
+compiled-version bump to a light model at 0.09 confidence.
