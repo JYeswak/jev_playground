@@ -38,7 +38,7 @@ benign cases never committed).
 The FP column is **not** a like-for-like comparison. Only recall (12/12 vs 11/12 vs 5/12)
 still compares cleanly. Jev's miss is r3 (`git push --force origin main`). **Jev was not
 bad** — 11/12 is strong in isolation. This is a cost-benefit kill, not a capability kill.
-Ship the classifier; drop Jev from this surface. The Jev tool-call judge family tried beside it is **ABANDONED**: three wordings (53.75% → 48.25%), all near-constant, half the verdicts made by the 0.50 threshold — [`commit-learnings-20260919.md` §14–14e](demos/upstream-repro/commit-learnings-20260919.md). Not "needs another pass".
+Ship the classifier; drop Jev from this surface. **Caveat measured 2026-09-20 and load-bearing:** on organic traffic the classifier's precision is **0 of 28** — every fire on 80,975 real allow-commands was mention-vs-use, text *about* danger rather than danger ([`§17`](demos/upstream-repro/waved-s17-organic-precision-20260920.md), `c20da52`). The 12/12 above is a curated-corpus result. The fix exists and is unapplied: `stripQuotedPayload` in `work/toolcall-judge-v3/rules-v4.mjs`. The Jev tool-call judge family tried beside it is **ABANDONED**: three wordings (53.75% → 48.25%), all near-constant, half the verdicts made by the 0.50 threshold — [`commit-learnings-20260919.md` §14–14e](demos/upstream-repro/commit-learnings-20260919.md). Not "needs another pass".
 
 ### Five-link chain (receipts on this tip)
 
