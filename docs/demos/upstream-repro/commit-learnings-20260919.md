@@ -980,3 +980,47 @@ was two sources.
 NO-CLAIM: part 2 covers the remainder and is unstarted. **Five claims are left standing as
 UNVERIFIABLE rather than quietly dropped** — the honest disposition when a denominator is lost or
 a key is absent.
+
+## Front door, part 2 — and a false UNVERIFIABLE I could run myself
+
+`readme-claim-sweep-part2-20260920.md` (9af3a05). **One stale claim in the whole second half**
+(compaction `32/32` → `38/38`, verified here at `# pass 38 # fail 0`, exit 0). Weighted exactly as
+dispatched — scope claims, self-contradictions, reader paths — and found the page largely honest
+once the counts were fixed. **Thirteen stale of roughly sixty across both halves.**
+
+The most careful line in the receipt is a partial disagreement with our own prose: the
+foreign-shape sentence says `shape.mjs` *"reports zero turns"* on non-session JSONL, and it
+actually exits 3 with `ERROR EMPTY_SCAN_SET`. The reviewer recorded that the sentence
+**understates** while the load-bearing half — *never a silent zero* — holds. That is the right
+grain: the claim is imprecise, not wrong, and saying so beats either defending it or deleting it.
+
+### The finding I owed the sweep
+
+The sweep left *"infisical live call"* as **UNVERIFIABLE (key/machine-gated)**. It is not
+unverifiable on this machine — **I hold the key.** Ran the documented command: `HTTP 200 in
+1158 ms`, `jev-1.13.0`.
+
+1158 ms is outside the README's published *"743 to 773 ms per call"*, so I took ten calls rather
+than treat one sample as a refutation — this page's own bullet, two lines above, says a handful of
+calls characterises nothing.
+
+```
+n=10   min 484 ms   median 1,034 ms   max 2,291 ms
+inside the published 743-773 ms band: 0 of 10
+```
+
+**A 30 ms band that nothing reproduces**, against a real 4.7× spread. The page was making the
+exact mistake it warns about, in the bullet directly below the warning. The advice changed with
+the evidence: budget for the tail, not the median, and measure your own network before promising
+a latency to anyone.
+
+**A false UNVERIFIABLE is worse than a stale number.** "Needs a key" was true of the reviewer and
+false of the lane, so the claim sat unchecked because the person who *could* run it was not the
+person auditing it. The rule that follows: when a sweep hands back a deferral, **ask who can run
+it, not whether the reviewer could.**
+
+### The queue callback was also right
+
+Pane 3 declined to claim `jev-vbh.5` again after re-checking both skill roots, and said so
+instead of manufacturing progress. **Refusing to claim unadvancable work is the correct callback**,
+and it is the second time tonight that pane has chosen an honest idle over a busy-looking one.
