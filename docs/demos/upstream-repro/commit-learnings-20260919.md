@@ -1550,3 +1550,41 @@ a slice we published as "one recent 120k-message window" when it was neither rec
 the refutation strengthened the lane's published claim.** Four times a named subset overturned a
 pooled number optimistically; this time a better frame overturned my expectation pessimistically
 — against us on the reasoning, for us on the result.
+
+## Coverage, end of the arc: two corpora at 100%, one honestly characterised
+
+`corpus-coverage-20260920.md`. Four links, all verified to resolve (with the *correct* selector
+this time — my first link-checker tonight stripped the dot in `.md` and reported 4 of 4 missing).
+
+| corpus | size | mined | what it told us |
+|---|---|---|---|
+| this repo's commits | ~1,067 | **100%** | the verification level is decorative — `oracle` never touched a test file |
+| agent-mail | 6,510 | **100%** | **58 of 3,135 ack-required messages were ever acked — 1.85%** |
+| CASS | 5,181,931 | 2.32% window **+ n=1,000 replication** | dig beats invent overall, loses badly on absence-claims |
+
+We began the night at CASS 2.32%, mail 4.4%, commits **0%**.
+
+**The page leads with advice, not status**, which is the bar I set for it. The sharpest line is
+about us: *"A flag that fires 1.85% of the time is not a handshake; it is a log line."* Either
+enforce the ack or design for unacked mail — but do not keep asking for something the fleet
+almost never sends.
+
+### Live-monotonic, now measurable as a rate
+
+The commit corpus across one session: **1,040 → 1,043 → 1,046 → 1,067 → 1,110.**
+
+Every one of those is correct as-of its moment, and any of them quoted bare next week is wrong.
+That is the entire case for the as-of labels, demonstrated on the corpus we control most tightly
+— and it is why the published `78,455` from yesterday is unrecoverable rather than merely stale.
+
+### What the guards did to their author tonight
+
+Shipped four, and they fired on me **seven** times: five `vgrep` catches on my own greps, the
+`STATUS_TSV`-as-env-var misread, and stage 97 going RED one tick after I dispatched the scope
+change that made it able to see numerals — because I added seven rows and left the README
+scoreboard stale.
+
+**Every one was a verification error, not a judgment error.** The rulings I made held up; the
+commands I used to check other people's work were what broke. That asymmetry is the most useful
+thing I learned about myself tonight, and it is why the guards belong in the repo rather than in
+a doctrine file: the doctrine had warned about all seven.
