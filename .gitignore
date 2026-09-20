@@ -76,3 +76,6 @@ dist/
 .test-dist/
 jev-benchmark/
 awesome-typesafe/
+
+# jevcache writes plaintext state previews to its ledger; never commit them
+.jevcache-ledger/
