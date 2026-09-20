@@ -3025,3 +3025,36 @@ See also R66 (P3, .rs lane, landed concurrently — renumbered from R65 to
 resolve the collision, no content lost either side): same zero from the
 other lane, plus the exposure-constraint conclusion that outranks the
 rule question. The two entries corroborate; neither re-litigates.
+
+## R67 — CLOSED: proxy-vs-quantity has no detectable signal; review owns the class
+
+**NEEDS #3 acceptance was binary:** a rule clearing 50 occurrences + 20%
+bind on hand-labelled real turns, or a written refusal with the
+denominator. Refusal, with denominators (corpus 1,873 files, seed 20260920):
+
+| proxy | occurrences | sessions touched | bind (n=20) |
+|---|---:|---|---:|
+| bare count, no denominator token (P1) | 2,315 turns | 159/864 sessions-with-text (18.40%), top1 11.5% | **0/20** |
+| `wc -l` / `grep -c` commands (P2) | 671 payloads + 10,982 harvest | 155/1,780 sessions (8.71%), top1 18.8% | **0/20** |
+| fleet-scoped words (P3) | 2,009 turns | 141/864 (16.32%), top1 13.3% | **0/20** |
+
+Every proxy clears the occurrence floor by 10–40× and every bind sample
+comes back zero. The proxies are abundant; the defect is absent. Several
+sampled rows show explicit ANTI-defect practice — controls quoted beside
+counts (P2-21), verification-before-writing (P2-37), self-correction of a
+literal-grep zero (P2-34), contamination caveats on a 1.000 (P1-8) — so the
+text shapes are used correctly far more often than not, and the defect
+lives in the inference, never in a string. No condition can see it: same
+close as oracle-per-domain.
+
+**Boundary:** this is the hard limit on "encode every junior mistake as a
+rule". The five NEEDS-#3 instances were all caught by review, and this
+measurement says that is where they will keep being caught. The next agent
+to propose a proxy-shaped rule starts here, not from scratch.
+
+**Retry-condition:** a predicate clearing 50 occurrences AND bind ≥20% on
+fresh hand-labelled turns with context. Do not re-derive these three
+proxies; they are measured.
+
+**Evidence:** P3 artifacts `8e5094a` (sampler, 60 samples with file:line
+context, labels, `exposure-check --text`); NEEDS #3 table.

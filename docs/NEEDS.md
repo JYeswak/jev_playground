@@ -14,13 +14,35 @@ get built (AGENTS.md phase boundary).
 
 > Validate Jev → build tools from what survives → **liven omp surfaces** → **dogfood** → **share**.
 
-| # | NEED | Inverts | Consumer | Stage |
-|---|---|---|---|---|
-| 1 | `exposure-check` | R64, R65, R66, R14, R15 | every rule/skill wiring decision | build |
-| 2 | `consumer-check` | R63, R10 | every instrument before it ships | build |
-| 3 | proxy-vs-quantity guard | R2, R4, R26, R29, + 5 today | every claim carrying a number | dogfood |
-| 4 | Jev-necessity gate | R15, R19, + 3 killed seats | every proposed Jev integration | validate |
-| 5 | publish the arc | stage 5 has shipped once | strangers | share |
+| # | NEED | Inverts | Status as of 2026-09-20, measured |
+|---|---|---|---|
+| 1 | `exposure-check` | R64, R65, R66, R14, R15 | **SHIPPED.** `scripts/exposure-check.sh` + RED arm, verified independently by pane 1: `unsafe` raw 855 → real 314, sessions 5.67%, VERDICT WALLPAPER. Would have killed the 818 in one command |
+| 2 | `consumer-check` | R63, R10 | **SHIPPED WITH A DEFECT.** `ee preflight` → ZERO CONSUMERS correctly, and it found a third `ee` caller nobody had. But `ee orient` **also** returns ZERO CONSUMERS and that is FALSE — the ambient extension invokes it from an args array, so the literal never appears. Under-detection **retires live wiring**, worse than the error it prevents. `ee orient` mandated as a RED arm |
+| 3 | proxy-vs-quantity guard | R2, R4, R26, R29, + 5 today | **CLOSED — UNDETECTABLE.** Proxies abundant (2,315 turns / 671 payloads + 10,982 harvest / 2,009 turns), bind **0/20 on all three**; the same shapes are used correctly far more often than not, so the defect is in the inference, not the text. **Review owns this class** |
+| 4 | Jev-necessity gate | R15, R19, + 3 killed seats | partial — the baseline test has ruled 4 times; `advisory-veto.mjs` never blocks; the earned seat's own interval is [0.118, 0.882] at n=6 |
+| 5 | publish the arc | stage 5 has fired once | in progress |
+| **6** | **interval + power + family discipline** | **today's ships** | **NEW, from measurement.** See below |
+
+## 6. Every rate carries an interval, every bar-decision states its power
+
+**Added because the numbers said so, not because it was derived from a refusal.** Exact
+Clopper-Pearson intervals (mine, independently reproduced by P4 with scipy 1.18.1 + statsmodels
+0.15.0 Wilson — **no overturn on any of the seven**) show we **refused with adequate power and
+shipped with inadequate power**:
+
+| decision | obs | exact 95% CI | bar | verdict |
+|---|---|---:|---|---|
+| `ft-rs` / `ft-md` bind | 0/25 | [0.000, 0.137] | ≥0.20 | kill is **sound** |
+| `absence-from-one-probe` FP | 4/20 | [0.057, **0.437**] | ≤0.30 | **cannot certify** — needs **n=77** |
+| `bash-structural-def-search` FP | 4/20 | [0.057, **0.437**] | ≤0.30 | **cannot certify** — needs **n=77** |
+| `bash-callsite-grep-exclusion` FP | 6/20 | [0.119, **0.543**] | ≤0.30 | **n=∞ — p̂ IS the bar. DISABLED 2026-09-20** |
+
+Benjamini-Hochberg across the family (m=17, q=0.05, max_i=11): **no decision changes** — kills
+still reject, ship-certifications still retain H0. FDR did not bite because nothing survived.
+
+**The standing rule:** every rate we report carries an exact interval; every bar-decision states
+whether n could reject the bar; the family size is declared. Cheap, mechanical, and it would have
+flagged all three ships before they went system-wide.
 
 ---
 
