@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from 'node:crypto';
+import { createSystemOneClassify } from './classify-systemone.mjs';
 
 const SCHEMA_VERSION = 1;
 const DECISION_TYPE = 'com.zeststream.omp-jev-observer.decision.v1';
@@ -41,9 +42,22 @@ export function createObserver({ logger, dcg, classify, enabled = true, timeoutM
     } catch { return undefined; }
   };
 }
-export function installObserver(pi, options = {}) {
+export async function installObserver(pi, options = {}) {
   const endpoint = options.endpoint ?? process.env.JEV_OBSERVER_ENDPOINT;
-  const classify = options.classify ?? (async ({ command }) => { if (!endpoint) throw new Error('JEV_OBSERVER_ENDPOINT is not configured'); const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ command }), signal: AbortSignal.timeout(options.timeoutMs ?? 750) }); if (!response.ok) throw new Error(`Jev HTTP ${response.status}`); return response.json(); });
+  let classify = options.classify;
+  if (!classify) {
+    if (process.env.TYPESAFE_API_KEY) {
+      classify = await createSystemOneClassify({ apiKey: process.env.TYPESAFE_API_KEY, model: process.env.JEV_OBSERVER_MODEL });
+    } else if (endpoint) {
+      classify = async ({ command }) => {
+        const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ command }), signal: AbortSignal.timeout(options.timeoutMs ?? 750) });
+        if (!response.ok) throw new Error(`Jev HTTP ${response.status}`);
+        return response.json();
+      };
+    } else {
+      classify = async () => { throw new Error('TYPESAFE_API_KEY (preferred) or JEV_OBSERVER_ENDPOINT is not configured'); };
+    }
+  }
   const observer = createObserver({ enabled: options.enabled ?? process.env.OMP_JEV_OBSERVER_DISABLED !== '1', timeoutMs: options.timeoutMs ?? 750, classify, dcg: options.dcg ?? (async (_e, context) => context.dcgVerdict), logger: options.logger ?? { append: (record) => safeAppend(pi, DECISION_TYPE, record) }, diagnostic: options.diagnostic ?? ((data) => safeAppend(pi, DIAGNOSTIC_TYPE, data)) });
   pi.on('tool_call', observer);
 }
@@ -60,10 +74,19 @@ export default function ompJevObserver(pi) {
       const started = performance.now();
       let error = null;
       try {
-        if (!endpoint) throw new Error('JEV_OBSERVER_ENDPOINT is not configured');
-        const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ command }), signal: AbortSignal.timeout(750) });
-        if (!response.ok) throw new Error(`Jev HTTP ${response.status}`);
-        await response.json();
+        let result;
+        if (process.env.TYPESAFE_API_KEY) {
+          const classify = await createSystemOneClassify({ apiKey: process.env.TYPESAFE_API_KEY, model: process.env.JEV_OBSERVER_MODEL });
+          result = await classify({ command });
+        } else if (endpoint) {
+          const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ command }), signal: AbortSignal.timeout(750) });
+          if (!response.ok) throw new Error(`Jev HTTP ${response.status}`);
+          result = await response.json();
+        } else {
+          throw new Error('TYPESAFE_API_KEY (preferred) or JEV_OBSERVER_ENDPOINT is not configured');
+        }
+        await safeAppend(pi, DECISION_TYPE, { ...makeRecord(command, null, context, performance.now() - started, event?.toolCallId, result.costUsd), questionSet: result.questionSet, probabilities: result.probabilities });
+        return undefined;
       } catch (caught) { error = String(caught); }
       await safeAppend(pi, DECISION_TYPE, makeRecord(command, error, context, performance.now() - started, event?.toolCallId));
       return undefined;
