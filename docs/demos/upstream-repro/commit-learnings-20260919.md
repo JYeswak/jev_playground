@@ -1024,3 +1024,40 @@ it, not whether the reviewer could.**
 Pane 3 declined to claim `jev-vbh.5` again after re-checking both skill roots, and said so
 instead of manufacturing progress. **Refusing to claim unadvancable work is the correct callback**,
 and it is the second time tonight that pane has chosen an honest idle over a busy-looking one.
+
+## A11 mail→cass join: HELD, and the honest half is the zero it refused to claim
+
+`a11-join-yield-20260920.md` (3a065f5). Verified rather than accepted.
+
+**The falsifier really did land first.** Rule 3 of `docs/RULES.md` says commit what would prove
+you wrong before the first call. Checked by commit timestamp, not by trusting the sentence:
+falsifier `6b0d404` at `1789917966`, scorer added in `3a065f5` at `1789918051` — **85 seconds
+earlier.** Tight, and real.
+
+**The privacy constraint holds.** `score_a11_join.py` has exactly one occurrence of
+`body_md|subject`, and it is the line *asserting* the exclusion, not a read. Zero
+`INSERT/UPDATE/DELETE/DROP`. Read-only against both live DBs.
+
+**Result, and the distinction that makes it worth keeping:**
+
+| key | outcome |
+|---|---|
+| K1 project↔workspace | **20 id-join paths** (mail-only 133, cass-only 772) |
+| K2 thread_id↔cass tokens | **0 of 4,508** — measured, single-pass intersect over 59,807 conversations |
+| K3 reservation-path↔cass file | **UNMEASURED, not zero** — needs FTS, which is index-busy |
+
+**K3 is the good part.** It would have been easy to write "0" and bank a third clean row. The
+receipt says `UNMEASURED via sqlite, not yield-0`, because `conversations.source_path` is the
+session file rather than the repo file and the real test needs an index that is mid-repair. **An
+unmeasured cell reported as a zero is the silent-zero defect** — this lane has hit it five times
+tonight, including a hook that emitted nothing while thirteen tests passed. Naming it instead is
+the whole discipline.
+
+**HELD is the right verdict, not CLEARED**: cheap exact string-match on paths covers every
+id-join, so there is no Jev seat here. A mine that yields a usable join and no model seat is a
+real answer — it gates A18 and costs nothing to keep.
+
+**The rejection was also correct.** A08/A24 needed fresh CASS queries; `cass search` returns
+index-busy with a repair in flight, and the standing constraint forbids a second rebuild. The
+pane named what it rejected and why instead of running the wedged path — and said so in a
+supplement without being asked.
