@@ -423,3 +423,5 @@ That is the page's own standard being applied against a rule its author wanted t
 And the ceiling argument extends one step further than I put it: it worked because **"could
 anything clear this bar" has an answer that does not depend on the candidate.** Any decision with
 a computable upper bound has that shape, and we spent calls all night on questions that did not.
+
+SECTION 16 omp-jev-observer live dogfood — FAIL — shipped observer.mjs calls undefined safeAppend (4 sites), 0 rows vs 3 bridge rows on omp-test; deployed lab copy fires (2 rows); next: define helper + handler-invoking test, redeploy, re-run — NO-CLAIM: 4 sessions, one machine; fix not applied to sibling package.
