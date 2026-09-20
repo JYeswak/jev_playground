@@ -508,3 +508,24 @@ receipt. Final: `lane_rc=0`, 29 candidates, 29 receipts exist, 0 drifted, concur
 `gates.sh` rc=0.
 
 SECTION 18 jev-compact reality — PASS — big-fixture replay 13->8 reproduces keyed (1 req, 6/6 invariants, sha-pinned input); no session prune exists or is claimed; hook has zero telemetry; receipt lacks model version (next: add it) — NO-CLAIM: transcript replay only, 3 runs.
+
+SECTION 18 jev-compact reality — **PASS** — `2b0bcb9`. 13→8 messages reproduces with pinned
+inputs across 3 runs, 1 request, 871–1610ms, 6/6 invariant checks, 0 failures — identical to the
+2026-09-17 receipt. **But that is a reduce of a RECORDED transcript through the live model — the
+instrument working as designed, not a session prune.** The receipt states plainly that **no live
+session prune has ever been observed**: the installed hook yields `undefined` by design and
+`compaction/src/omp-binding.ts` makes no hook firing observable at all. That is exactly the wave
+plan's bar for this section — never claim prune until a live reduce — met by refusing the
+inference the reproduced numbers invite.
+
+NO-CLAIM, the author's: replay only, and **the model is unrecorded in the run artifact**, so the
+13→8 cannot be attributed to a specific model version from the repo alone.
+
+SECTION 18b FOURTH STAGED EXPOSURE, resolved by its owner — the receipt and the
+`compaction/runs/rerun-20260920.json` it cites for `transcript_sha256` were both staged and
+uncommitted when the callback arrived; they had to land together or the receipt would cite a
+digest absent from the repo. I verified the runs file parses and carries `transcript_sha256`, and
+was preparing the rescue when the owner committed both themselves. No action taken, recorded
+because the exposure was real. The callback also **omitted its sha**, which the packet contract
+requires; I located the work by path. A missing sha is how a receipt and its cited artifact drift
+apart, so it is noted rather than silently compensated.
