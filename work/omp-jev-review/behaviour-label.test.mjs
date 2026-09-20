@@ -20,9 +20,21 @@ test('the label is deterministic — same commit, same answer', () => {
 });
 
 test('PLANTED NEGATIVE: a docs-only commit is not behaviour-changing', () => {
-  const sha = sh("git log --format=%H -40 --no-merges -- docs/ ':!work/' | head -1");
-  if (!sha) return; // no such commit in range; not a failure of the rule
-  const row = labelCommit(sha);
+  // SELECTOR DEFECT, fixed 2026-09-20 after the non-author review made it fail:
+  // `git log -- docs/ ':!work/'` selects commits that MENTION docs/, not commits touching
+  // ONLY docs/. The first matching commit also touched work/jev-score-register/, so the
+  // premise ("this commit is docs-only") was false and the assertion was testing nothing.
+  // It passed for hours purely by luck of which commit was newest — a live-history query in
+  // a test is a moving target, the same defect class as quoting an unpinned denominator.
+  // Now the premise is VERIFIED rather than assumed: scan recent commits and use the first
+  // whose file list is genuinely all-docs, and skip honestly if none exists.
+  const shas = sh('git log --format=%H -60 --no-merges').split('\n').filter(Boolean);
+  const docsOnly = shas.find((s) => {
+    const files = sh(`git show --name-only --format= ${s}`).split('\n').filter(Boolean);
+    return files.length > 0 && files.every((f) => f.startsWith('docs/'));
+  });
+  if (!docsOnly) return; // genuinely none in range; not a failure of the rule
+  const row = labelCommit(docsOnly);
   assert.equal(row.behaviour, false, `docs-only commit ${row.sha} must not be behaviour-changing`);
 });
 

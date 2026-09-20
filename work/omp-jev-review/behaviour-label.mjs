@@ -17,12 +17,24 @@
  *
  * Decidable inputs only: the changed paths, whether any OTHER file names them, and whether
  * they are registered as an entry point (package.json omp.extensions / bin / scripts,
+ * .omp/hooks/*, foundation/gates.d/*, .git/hooks/*). The `scripts` and `.omp/hooks` arms were
+ * ADDED 2026-09-20 after a non-author review found the header claimed `scripts` coverage the
+ * code did not implement -- the doc/code mismatch class this lane kills.
  * foundation/gates.d/*, .git/hooks/*).
  *
  * WHAT IT DELIBERATELY DOES NOT DO: judge whether the edit is semantically meaningful. A
  * comment-only edit to an imported file still counts as reachable. That is a known
  * over-count and it is stated rather than hidden — but it is a SMALLER over-count than
  * "every source edit", and it is the half that is computable.
+ *
+ * MEASURED LIMIT, from the non-author review (review-two-artifacts-20260920.md). My own
+ * NO-CLAIM guessed basename collisions were "a couple". They are not: 11 basenames collide,
+ * `index.ts` x20 and `measure.mjs` x17. For any colliding basename this rule DEGENERATES TO THE
+ * MECHANICAL PROXY IT REPLACES -- touched implies referenced -- because the grep cannot tell
+ * which `index.ts` a referrer imports. The 4-of-40 disagreements survive (they were verified
+ * individually), but TRUE verdicts on colliding basenames are unreliable and the agreements were
+ * never audited. Fixing this needs import resolution, not a grep; until then the rule is honest
+ * only about its FALSE verdicts.
  *
  * Run: node work/omp-jev-review/behaviour-label.mjs [N]
  */
@@ -53,6 +65,11 @@ function entryPoints() {
         const dir = line.replace(/package\.json$/, '');
         for (const e of pkg?.omp?.extensions ?? []) set.add((dir + e.replace(/^\.\//, '')).replace(/\/+/g, '/'));
         for (const b of Object.values(pkg?.bin ?? {})) set.add((dir + String(b).replace(/^\.\//, '')).replace(/\/+/g, '/'));
+        for (const s of Object.values(pkg?.scripts ?? {})) {
+          for (const m of String(s).matchAll(/([\w./-]+\.(?:mjs|js|ts|sh))/g)) {
+            set.add((dir + m[1].replace(/^\.\//, '')).replace(/\/+/g, '/'));
+          }
+        }
       } catch {
         /* a malformed package.json is not an entry point claim */
       }
@@ -83,7 +100,9 @@ function referencedElsewhere(path) {
   const by = out
     .split('\n')
     .filter((f) => f && f !== path && !TEST_OR_DOC.test(f) && !f.endsWith('.md') && SOURCE.test(f));
-  return { referenced: by.length > 0, by: by.slice(0, 3) };
+  // Full list, not a slice: a truncated attribution cannot be audited, and the review could
+  // not tell which referencer carried a verdict.
+  return { referenced: by.length > 0, by };
 }
 
 /** The computed label for one commit. */
