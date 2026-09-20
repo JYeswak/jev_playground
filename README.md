@@ -104,7 +104,8 @@ always-abstain control 5× on their own corpus
 ([receipt](docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md)).
 
 **Scoreboard, present tense:** 40 verdict rows (8 cleared, 17 held, 15 ruled out, **0 promoted**),
-55 dead-end ledger entries each with a reopen condition, 13 gate stages green. Tool_call
+56 dead-end ledger entries each with a reopen condition (`grep -cE '^## R[0-9]+' NEGATIVE_EVIDENCE.md`
+— re-derive it; this count moves and no gate pins it), 13 gate stages green. Tool_call
 **RULE WINS** — ship the classifier, drop Jev (cost-benefit). Observer (B)
 mechanism MET at n=1 lab; working-profile dogfood **OPEN**. Proven vs WIP seams:
 [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). The product is the
@@ -275,7 +276,8 @@ returned a reproducible finding in ten minutes.
 ## What you can run
 
 Each tool takes one command, reads your own logs, and writes a receipt that states its denominator
-before any share. No API key. No network.
+before any share. No API key. No network. **Two exceptions, both named where they appear:**
+`scripts/jev-probe.mjs` without `--replay`, and `compaction`'s `npm run replay`.
 
 ## The omp extensions
 
@@ -378,10 +380,17 @@ judged, so a fire is always quotable — we learned that the hard way and
 Installed is not firing. After some real work:
 
 ```bash
-grep -rho '"kind":"harm_[a-z]*"' ~/.omp/profiles/default/agent/sessions/ | sort | uniq -c
+# every profile, because `default` is a placeholder: omp names profiles whatever you named them,
+# and there is no `default` directory on the machine this was measured on.
+for p in ~/.omp/profiles/*/agent/sessions ~/.omp/agent/sessions; do [ -d "$p" ] || continue
+  grep -rho '"kind":"harm_[a-z]*"' "$p"          # rc UNPIPED: a bad path here exits 2, and a
+done | sort | uniq -c                            # pipeline would have reported sort's 0 instead
 ```
 
-You will see three kinds, and the third one exists because of a defect we shipped:
+Three kinds are defined. You will see **two**: measured 2026-09-20 across all 12 profiles on the
+author's machine, `harm_pass` 116 and `harm_fire` 14, and **zero** `harm_error` — the third has
+never fired here, which is the same thing the audit two paragraphs down says. The third kind
+exists because of a defect we shipped:
 
 | kind | meaning |
 |---|---|
@@ -398,8 +407,10 @@ assuming it: **54 rows audited, 0 contaminated**; on the working profile, 32 dec
 `harm_error` separately — it is neither a pass nor a fire.
 
 On our own machine the live fires so far are **all self-generated probe shapes**
-(`chmod -R 777 /etc/nonexistent-*`), so we claim no precision figure from live traffic yet: n=16
-with our own test commands in it supports no interval in either direction.
+(`chmod -R 777 /etc/nonexistent-*`), so we claim no precision figure from live traffic yet: the
+command above counts **n=14** fires on 2026-09-20 and that supports no interval in either
+direction. A previously published **n=16** does not reproduce and its derivation was not
+recorded; the smaller number is the one the command prints.
 
 ### `ensemble/` — should you average two scorers, or just use the better one?
 
@@ -408,9 +419,12 @@ python3 ensemble/run_all.py
 ```
 
 Runs in about a second. Needs one upstream clone first, because this repo does not redistribute
-their 5.7 MB of scores, and the script prints the exact `git clone` if it is missing. Averaging
-two scorers is folk wisdom;
-these four pairs show when it pays and when it costs you:
+their 5.7 MB of scores, and the script prints the exact `git clone` if it is missing (a genuinely
+fresh clone gets exactly that: rc=2 and the fetch line, verified 2026-09-20). Averaging
+two scorers is folk wisdom; these four pairs show when it pays and when it costs you. **The
+command prints three of them** — rows 1, 2 and 4. Row 3 is `jev-sec-bench`'s context ablation
+([receipt](docs/demos/upstream-repro/jev-sec-bench-20260918.md)), which `run_all.py` does not
+compute and whose scores are in a different upstream repo:
 
 | pair | phi (error correlation) | accuracy gap | averaging gained |
 |---|---|---|---|
@@ -450,10 +464,16 @@ settings: **1,415 (86%)** have at least one call the hook could ask about, **98 
 entirely pinned, **87 (5%)** exceed Jev's state budget. Six sessions is a sample, not a
 distribution.
 
-Run it against your own history:
+Run it against your own history. **This one is the exception to "no key": replay makes live Jev
+calls and exits 2 with `TYPESAFE_API_KEY is not set.` without one** (`compaction/README.md:29`
+says the same; the root page did not, until a stranger-retest caught it on 2026-09-20). The
+`**` below needs `shopt -s globstar` in bash — it is not on by default and the unexpanded glob
+reaches `tsx` as a literal path:
 
 ```bash
-npm --prefix compaction run replay -- ~/.omp/**/agent/sessions/**/<a session>.jsonl
+shopt -s globstar   # bash only; zsh recurses without it
+infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=prod -- \
+  npm --prefix compaction run replay -- ~/.omp/**/agent/sessions/**/<a session>.jsonl
 ```
 
 **The hook has never reduced a live session.** Every firing in a running omp has returned
@@ -501,8 +521,14 @@ cd demos/routing-backtest
 npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out runs/try.json
 ```
 
-On 30 classifiable turns it measured **0.0447%** savings, and the candidate was **ruled out**. The
-verdict is scoped on purpose: it answers *same-turn price substitution*, not turn elimination.
+That command runs the **6-turn** committed excerpt and prints its denominator, not a savings
+share: `{"denominator":{"sessions":1,"turns":6,"classifiableTurns":6,...},"failures":0}`. The
+headline came from a different, larger run — **30 classifiable turns of 30 seen across 2
+sessions, 0.0447% saved** (`$0.0034228/7.658096908`), committed at
+`demos/routing-backtest/runs/derivation-0447-20260918T134500Z.json` and derived in
+[`demos/routing-backtest/README.md`](demos/routing-backtest/README.md). The candidate was
+**ruled out**. The verdict is scoped on purpose: it answers *same-turn price substitution*, not
+turn elimination.
 
 29 tests, and **7/7 planted mutations caught**. Three of those were real holes found under a suite
 that was already green, one of them directly beneath the published figure. Reproduce that claim with
@@ -529,7 +555,8 @@ cd jev_playground
 ./scripts/sync-docs.sh --check  # verifies every mirrored byte against MANIFEST.tsv
 ~~~
 
-No API key needed to install, and none to run any tool above.
+No API key needed to install, and none to run any tool above **except `compaction`'s
+`npm run replay`**, which calls live Jev and exits 2 without `TYPESAFE_API_KEY`.
 
 ## What it does
 
@@ -633,9 +660,12 @@ a field the answer depends on exits 1 rather than printing a branch it did not m
 ./scripts/quickstart.sh --mine /path/to/logs
 ```
 
-Nothing is uploaded and no key is used. On the author's machine that is 4,626 session files, and the
-shape answer comes back personal: **4,619 sessions, 488,724 billed turns, 98.9% of tokens
-retransmitted context, a mean 341,496 retransmitted tokens per turn, 0 unparsable lines.**
+Nothing is uploaded and no key is used. On the author's machine on **2026-09-18** that was 4,626
+session files, and the shape answer came back personal: **4,619 sessions, 488,724 billed turns,
+98.9% of tokens retransmitted context, a mean 341,496 retransmitted tokens per turn, 0 unparsable
+lines.** Re-run **2026-09-20** on the same machine: **4,519 files, 4,512 sessions, 488,021 billed
+turns, 98.9%, mean 341,907, 0 unparsable.** The corpus *shrank* — Claude Code prunes its own
+session logs — so this figure is dated on purpose and yours will not match either.
 
 **It exposed a limit we would never have found on the fixture, and then we fixed it.** The router
 backtest *could not answer* on a real Claude Code corpus: it returned `EMPTY_CLASSIFIABLE_SET`,
@@ -776,6 +806,20 @@ missing prerequisites we never told a reader about; one was a genuine defect in 
 proof. Receipt:
 [`fresh-clone-readme-commands-20260919.md`](docs/demos/upstream-repro/fresh-clone-readme-commands-20260919.md).
 
+**Re-tested 2026-09-20 from a genuinely fresh `git clone` at `6eee6ab`, and three of those rows
+are now wrong.** Publishing the correction the same way:
+
+| row | what the table says | what a fresh clone did on 2026-09-20 |
+|---|---|---|
+| `foundation/gates.sh` | rc 1, fix with `br sync --import-only` | rc 1, but stage **50-house-gates PASSED** — the beads hole is gone. The RED is **80-lane-instrument-selftests**: `selftest-denominator-sweep.sh` 2 ok / 1 failed, because `denominator-sweep.sh`'s `locked-dig-138` check reads `work/cass-mail-mines/exports/cass-dig-rows.jsonl`, which `.gitignore:95` excludes. A guard added on 2026-09-20 to stop published counts drifting is itself unrunnable from a clone. **`br sync --import-only` does not fix this row.** |
+| `compaction/install-jev-compact.sh --check` | rc 1, fix with `./scripts/bootstrap-compaction.sh` | rc 1 **before and after** the bootstrap — it printed `already ready` and the check stayed RED. The two do different jobs: bootstrap fetches the sibling and `node_modules`; `--check` verifies a hook *installed into a target repo*. The real fix is `compaction/install-jev-compact.sh <target>`, after which `--check <target>` is rc 0. |
+| — (missing rows) | — | `python3 ensemble/run_all.py` is **rc 2** on a fresh clone (upstream scores not redistributed; it prints the `git clone`), and `npm --prefix compaction run replay` is **rc 2** without `TYPESAFE_API_KEY`. Neither was in the table. |
+
+Passing unchanged on the 2026-09-20 clone: `quickstart.sh`, `verify-claim.mjs`, the observe-only
+grep, `jev-probe.mjs --replay`, `lane-status.sh` (40 candidates), `usage-shape`, the routing
+backtest, `npm test` (29), and `npm run mutate` (7/7). Receipt:
+[`readme-stranger-retest-20260920.md`](docs/demos/upstream-repro/readme-stranger-retest-20260920.md).
+
 
 ## Mistakes we made
 
@@ -799,10 +843,11 @@ on offer here — only receipts.
 - **A dead build was narrated as running, twice.** A backgrounded `cargo build` died with its
   parent shell while its stale log line looked like progress
   ([R29](NEGATIVE_EVIDENCE.md)). Rule since: check the process, not the log.
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
-
+|---|---|---|
 | `SyntaxError` or `Cannot find module` on any tool | node older than 20, or missing | `node --version`, then install node >= 20 |
 | `gates.sh` red on `40-omp-compact-replay` | missing sibling clone or `compaction/node_modules` | `./scripts/bootstrap-compaction.sh` |
 | `gates.sh` red on `50-house-gates` | no Beads database, only the tracked JSONL | `br sync --import-only` |
@@ -810,21 +855,27 @@ on offer here — only receipts.
 | `shape.mjs` reports 0 turns | logs are not a Claude Code or omp shape | check one file has `message.usage` keys |
 | `jev-probe.mjs` exits 2 | no `TYPESAFE_API_KEY` in the environment | run it under a secret manager, or use `--replay` |
 | `ERROR at least one session JSONL is required` | no input path given | pass a file or a directory |
+| `gates.sh` red on `80-lane-instrument-selftests` from a clone | `denominator-sweep.sh`'s `locked-dig-138` reads a gitignored export | maintainer-only check; not fixable from a clone today |
+| `TYPESAFE_API_KEY is not set.` from `npm run replay` | the compaction replay makes live Jev calls | run it under a secret manager, or use the offline tools |
 
 ## What you'll need
 
 - `bash`, `git`, `curl`, `python3`, preinstalled on macOS and most Linux
 - **`node` >= 20**, required by all three tools. Their `package.json` files declare it, and a
   machine without node fails every one of them, so check `node --version` first
-- A `TYPESAFE_API_KEY` **only** for the one live call. Everything else runs without one
+- A `TYPESAFE_API_KEY` for exactly two commands — `scripts/jev-probe.mjs` without `--replay`, and
+  `compaction`'s `npm run replay`. Everything else runs without one
 
-Runtimes, measured 2026-09-20 on an M3 Ultra: `foundation/gates.sh` about 24 s; `usage-shape` about 19 s over 4,626 files. Nothing here is instant and nothing here needs a network.
+Runtimes, re-measured 2026-09-20 on an M3 Ultra with five agents running: `foundation/gates.sh`
+**32 s** (55 s for `--selftest`); `usage-shape` **20 s** over 4,519 files; `quickstart.sh` 8 s;
+`--mine` 23 s. An earlier "about 24 s" was taken on an idle machine. Nothing here is instant and
+nothing here needs a network.
 
 ## Limitations
 
 **Nothing has been promoted.** 40 verdict rows (8 cleared, 17 held, 15 ruled out, **0 promoted**).
 That is the deliverable rather than a shortfall, and every reason lives in
-[`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 50 entries, each carrying the condition that would
+[`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 56 entries, each carrying the condition that would
 reopen it. One candidate died there because an MIT-licensed tool already ships its surface, which
 is a reason to stop building and not a reason to build faster.
 
@@ -867,7 +918,7 @@ pointed at another shape reports zero turns, which is a visible result rather th
 supervision cleared its bar on authored vignettes (AUC 1.000 twice), then scored 0.750 on 186,449
 real windows and was moved off rung 5 by its author. The retraction is the system working, not
 failing. Verdicts and receipts: `docs/demos/STATUS.tsv`; reopen conditions:
-`NEGATIVE_EVIDENCE.md` (50 entries).
+`NEGATIVE_EVIDENCE.md` (56 entries).
 
 **Open questions, honestly.** Class-D (does the agent's answer change?) is unmeasured: the
 ablate-and-rerun harness is built and frozen, its model arms pending a quiet window. Two verdicts
