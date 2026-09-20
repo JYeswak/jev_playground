@@ -561,3 +561,34 @@ RULED_OUT, and this is what makes `PROMOTED` mean four named gates plus an exist
 rather than a word anyone can type.
 
 SECTION 20 public INTEGRATIONS refresh — PASS — 5 facts in (organic 0/28, exports 19/21, judge ABANDONED, jevcache REMOVED, register api-0) + shipped-tree-cannot-fire qualifier on dogfood row; 1 range eats repaired — NO-CLAIM: doc edit only; promoted stays 0.
+
+SECTION 8 prevalence-first — PASS — verdicts by rule on re-run tallies (DEGENERATE/WEAK/WEAK) + 48eecdf omits 0.49 MISS->0.50 HIT flip + bv base 20/50 live — NO-CLAIM: tooling + one re-run; rows move, verdicts held.
+
+## Wave B section 8 — prevalence-first, and two findings bigger than the package
+
+SECTION 8 jev-prevalence-first — **PASS** — `df05971`. `work/jev-prevalence-first/` ships SPEC.md,
+`prevalence-check.mjs` (near count → own-constant bar → verdict, **order enforced in code** and
+asserted per test arm), 3/3 tests, `p3-commit-31.mjs`, BASE-RATES.md. Order enforced in code is
+the right reading of §14e: the near-threshold count is not a column you remember to check, it is
+a precondition of the verdict.
+
+**Finding 1 — transcribed scores rot.** The first P3 transcription matched neither the Unit-2 run
+nor the re-run (omits near 2 vs 4 vs 4; yes 2 vs 2 vs 4). Corrected from a 31-call live re-run.
+
+**Finding 2 — the emblematic row flipped.** `48eecdf`, the swept-package case I have quoted all
+session as "omits 0.49, MISS by 0.01", re-runs as **0.50, HIT**. Verdicts hold
+(DEGENERATE/WEAK/WEAK), but the single most-quoted row in the lane inverted on threshold noise.
+**§14e biting our own receipt**: near-threshold rows must be re-measured, never quoted.
+
+I have cited that 0.01 miss repeatedly as the sharpest illustration that the commit judge fails
+where it matters. The verdict it supported survives; **the illustration does not** and I am
+retiring it from my own summaries.
+
+SECTION 8b THE BASE RATE IS ITSELF A MOVING TARGET — three readings of `bv --robot-triage`
+actionable, hours apart, same 50 issues: **23/50 (mine, earlier tonight) → 20/50 (theirs,
+07:04:54Z) → 19/50 (mine, just now)**. Nobody is wrong; the graph changes as beads close. A
+prevalence cell computed from a live tool is live-and-monotonic-ish and must carry its timestamp,
+which BASE-RATES.md does. **Fifth instance of the live-denominator class tonight, and the first
+where the drifting number is the CONTROL rather than the measurement.**
+
+NO-CLAIM, theirs: one re-run; rows move.
