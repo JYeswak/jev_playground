@@ -137,6 +137,17 @@ if [ -e "$SH" ] && [ -e "$MD" ]; then
 else
   note FAIL "system-wide filetype rules missing: $SH $MD"; fail=$((fail+1))
 fi
+PY="$HOME/.agents/rules/ft-py-doctrine.md"
+if [ -e "$PY" ]; then
+  armt "$PY" fire  "ft-py: fire on .py edit"   edit  /tmp/probe.py 'x = 1'
+  armt "$PY" fire  "ft-py: fire on .py write"  write /tmp/probe.py 'x = 1'
+  armt "$PY" quiet "ft-py: quiet on .sh edit"  edit  /tmp/probe.sh 'echo hi'
+  armt "$PY" quiet "ft-py: quiet on .md edit"  edit  /tmp/probe.md 'text'
+  armt "$PY" quiet "ft-py: quiet on bash run"  bash  ''            'python3 probe.py'
+  armt "$PY" quiet "ft-py: quiet on bash pip"  bash  ''            'pip install foo'
+else
+  note FAIL "system-wide filetype rule missing: $PY"; fail=$((fail+1))
+fi
 
 # COMPILE GUARD. TTSR conditions are JavaScript RegExp: a PCRE inline flag like (?i) is invalid.
 # omp ttsr test REPORTS that, but a live session does NOT — omp://ttsr-injection-lifecycle.md says

@@ -928,3 +928,49 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Lane:** offline. No rule files touched; selftest untouched at 51/0.
 - **Boundary:** one labeller throughout; essay is prose synthesis over
   ledgered measurements (R56–R62), not new data.
+
+## P2 ft-sh-doctrine + ft-md-doctrine rules written (2026-09-20)
+
+- **Files (system-wide ONLY, no second copy):**
+  `~/.agents/rules/ft-sh-doctrine.md`,
+  `~/.agents/rules/ft-md-doctrine.md`. Contract per dispatch:
+  condition `\S`, scope `tool:edit(*.EXT), tool:write(*.EXT)`,
+  interruptMode never, repeatMode once. P3 owns ft-rs; untouched.
+- **Threads:** .sh — single entry (88/221 mirror repos ship zero .sh,
+  measured over 221 repos), wrapper-verdict
+  (frankengraphdb@a3c2bec22…:scripts/check.sh:24, verbatim),
+  capture-first (lane-owned); .md — equal-or-weaker
+  (frankengraphdb@a3c2bec22…:registries/constitution.toml:25, maps onto
+  our commit-msg hook), no-claim boundaries
+  (asimposium.org@4d8d6cc0b…:AGENTS.md:413). 12-line budget held; every
+  line names a tool, command, or check.
+- **Predicate proof (offline, `omp ttsr test`):** sh fires on sh-edit,
+  quiet on md-edit, quiet on bash; md fires on md-edit, quiet on
+  sh-edit, quiet on bash — 6/6 as contracted.
+- **Boundary:** this session predates both files, so no live-fire claim
+  from here — live proof needs a fresh session (ruleproof-style).
+  Selftest arms HELD: P3 lands 4 rs arms first (agreed over ntm);
+  worktree shows their edit in progress, so the shared file is untouched
+  until their commit.
+
+## P2 ft-py-doctrine shipped (2026-09-20)
+
+- **Surfaces searched:** doc-index all 390,739 records (py-path pool
+  32,314; uv-only 52/17 repos, ruff 123/18, py-version 52/10);
+  techniques (all 7 Rust-crate — nothing py); rigor/oracles
+  (D4 NetworkX, D5 pandas-2.2.3, D8 NumPy, D9 SciPy — oracles, not
+  authoring threads); doctrine-history on bio_inspired_nanochat
+  (508/226/363) and frankenpandas (328/65/56); omp builtins (27 —
+  zero py-scoped, verified from `omp ttsr list` output, not memory).
+- **Shipped** `~/.agents/rules/ft-py-doctrine.md` (system-wide only):
+  uv-only (bio_inspired_nanochat@1e4b475cb…:AGENTS.md:34, added
+  2026-01-09 + rewritten — lived-in), ruff/ty/pytest gates
+  (bio:640 + 3 repos same shape; removed once, restored — churned,
+  retained), live-pandas oracle
+  (frankenpandas@debdf374…:TESTING_CONVENTION.md:52; history-blind,
+  non-AGENTS file — stated). Vendored third-party skill artifacts
+  inside pi_agent_rust fixtures explicitly NOT cited as doctrine.
+- **Proof:** 6/6 `omp ttsr test` probes green; 6 arms appended post-P3
+  commits with own block; full suite **71 ok / 0 failed**.
+- **Boundary:** session predates the file — live-fire NOT_RUN from
+  here; needs a fresh session.
