@@ -1103,3 +1103,45 @@ positives, so the harness was not silently blocked.
 **HELD, resting on n=16.** The pane said so plainly instead of leaning on three winning slices,
 and its NEXT is the right consequence: ship the local refusal on exactly that slice — dig only
 when hits exist *and* something is Y-eligible.
+
+## A12 REFUSED — the refusal I warned them about is the one they built, and they killed it
+
+`a12-refusal-result-20260920.md` (966e52b). One tick earlier I told pane 2 that the thing which
+would decide whether A12 ships is *whether the refusal fires on the CONDITION (hits exist AND
+nothing Y-eligible) or on the SLICE REGEX* — and that a regex-keyed rule is fitted to the 16 rows
+that motivated it, the mention-vs-use defect in policy form. **It fired on the regex, and the
+pane refused it on exactly that ground without being asked twice.**
+
+It also failed its own pre-registered falsifier:
+
+```
+refused empty (of 4)          2   no such field, no such key
+refused Y1 (good digs killed) 2   field does not exist, missing field
+F1: refused-Y1 2 >= refused-empty 2  -> FIRE
+```
+
+**A 2-for-2 trade is not a policy, it is a coin.** The rule kills as many good digs as bad ones,
+and the `0.154 vs 0.308` improvement on the absence slice is bought entirely from rows that
+defined the slice. Ordering verified again by timestamp: falsifier `60bc0ce` at `1789918292`,
+scorer at `1789918359` — **67 seconds ahead.**
+
+Three consecutive mines today, three honest non-wins: A11 `HELD` (join works, no Jev seat), the
+subset breakdown `HELD` (pooled BEAT inverts at n=16), A12 `REFUSE` (fitted and coin-flip). **The
+lane's dig-vs-invent story is now: digging wins on easy queries, loses on the hard ones, and the
+obvious fix does not generalise.** That is a more useful result than the 0.058 headline we
+started the day with.
+
+## And the skillranker build is genuinely blocked upstream
+
+`skillranker-build-20260920.md` (ca2afdb). Verified at source rather than from the receipt:
+`src/lib.rs:27-28` reads `#[cfg(target_os = "linux")] pub mod storage`, while `install.sh:158`
+serves `Darwin/aarch64` and `README.md:267` claims *"Linux and macOS"*. **The installer promises
+a platform the build cannot produce** — `E0433 cannot find storage in the crate root`.
+
+The pane's strongest move was the experiment it *reverted*: ungating produced 20 further errors
+on `nix::sys::statfs` BTRFS/EXT4/TMPFS/XFS magics, which proves the code is genuinely
+Linux-specific and that "just remove the cfg" would waste a maintainer's time. **Knowing which
+fix is wrong is worth more in an upstream report than the bug itself.**
+
+`BLOCKED` with no binary, no demo, no tests and no live rank is the correct callback. A green
+report that skipped the binary would have been the failure.
