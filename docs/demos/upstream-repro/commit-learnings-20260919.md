@@ -1780,3 +1780,51 @@ The wiring is small: on a fire, the hook queries `ee preflight check` and inject
 memory — the past instance and the corrected command — instead of a generic sentence. And every
 confirmed defect writes one memory back, which is the part that makes each call **feed** the
 system rather than merely be judged by it.
+
+## The guard is live in a real working pane, and hooks bind ONLY at session start
+
+Pane 2, started with bare `omp`, fresh session
+`~/.omp/agent/sessions/-Developer-jev/2026-09-20T18-14-18…jsonl`:
+
+```json
+"kind":"guard_pass","command":"echo $PI_CODING_AGENT_DIR ; echo $OMP_PROFILE ; pwd",
+  "toolCallId":"call_01a0c0092135…","error":null,"model":"none-deterministic-regex-guard-v1"
+
+"kind":"guard_fire","class":"grep-as-proof",
+  "command":"grep -c guard /Users/josh/Developer/jev/README.md",
+  "toolCallId":"call_01a0c009227f…","error":null
+```
+
+**Both classifications are correct**: the env probe carries no class and passes; the `grep -c`
+fires `grep-as-proof`, the one class still live after `pipe-exit` was dropped under R51. Real
+`toolCallId`s, quotable commands, `error:null`, and a `model` field that says out loud there is
+no model call.
+
+### The finding that matters more than the guard
+
+**Hooks bind at session start and a resumed session never rebinds.** Proven on the one case I
+fully control: I ran the identical `grep -c` in **my own** session — started 2026-09-17, with
+`guard-rule.ts` installed 12:05 today — and got **zero** decision rows. Pane 2 ran the same
+command in a session started **after** the install and got a row.
+
+So an install is inert in every pane that predates it, and this applies to **every** hook, not
+just ours. A fleet of long-running panes is a fleet where hook installs silently do nothing.
+
+### Three wrong targets before the right one
+
+1. `~/.omp/profiles/default/` — **does not exist**; the default profile is `~/.omp/agent/`.
+2. `~/.omp/profiles/claude/` — correct for *this* session, useless for pane 2.
+3. `~/.omp/profiles/muse/` — **`muse` is a MODEL, not a profile.** Starting with bare `omp` and
+   switching model writes to the default agent dir regardless of the model chosen.
+
+The profile directory names (`muse`, `codex`, `grok`, `claude`) read like the agents we run,
+which is exactly why I assumed a pane using the muse model wrote to the muse profile. It does
+not. **A directory named after a thing is not evidence that the thing uses it** — the same
+mention-versus-use shape, this time in a filesystem layout.
+
+### And one more instance, in my own verification
+
+Checking my live session I grepped `guard_[a-z]*`, got **41 matches**, and nearly reported the
+hook working. They were **my own prose** — the word `guard_fire` typed into messages. The precise
+selector `"kind":"guard_…"` returns zero. **Instance 30, inside the check for a guard built to
+catch this class.**
