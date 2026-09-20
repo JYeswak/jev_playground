@@ -626,3 +626,54 @@ SECTION 9 SDK-surface field traps — PASS — recording() misfiles a 0.91-confi
 SECTION 10 random-judge + outcome-join — PASS — join 4 + TRAP-LEAK t1 + constant 2/3 + chance 1/3, demo + 3/3 tests — NO-CLAIM: toy mechanics; adopted pattern unjudged here.
 SECTION 23 dcg explain-before-override — PASS — rm-rf-root-home denial quoted + explicit single-file alternative quoted + 3/3 tests — NO-CLAIM: 5 conductor cases on stated provenance; rule is prose, not enforcement.
 SECTION 24 infisical placeholder cleanup — PASS — 2/2 leftovers replaced (jev-probe.mjs:38, README.md:700), error path exit 2 with working one-liner — NO-CLAIM: tree-wide grep only; corpus literals untouched by design.
+
+SECTION 10 random-judge + outcome-join — **PASS (ADOPT)** — `wavee-s10-persona-20260920.md`.
+Adopted `persona-clone`'s separate-judge pattern rather than authoring it, as directed.
+NO-CLAIM, theirs: toy mechanics; pattern unjudged.
+
+SECTION 23 dcg explain-before-override — **PASS** — `wavee-s23-override-20260920.md`.
+NO-CLAIM, theirs: conductor cases on stated provenance.
+
+SECTION 24 infisical placeholder cleanup — **PASS** — `wavee-s24-cleanup-20260920.md`. Two live
+`projectId=<id>` defects found at `scripts/jev-probe.mjs:38` and `README.md:700`.
+NO-CLAIM, theirs: tree grep; corpus untouched.
+
+SECTION 24b I CHECKED THEIR SCOPE AND THEY WERE RIGHT — my broader grep found `projectId=<id>` in
+**four** files against their stated two, and I nearly filed a discrepancy. Three of the four are
+`docs/essays/dont-give-up*.md`, which *teach* not to leave the placeholder: **zero occurrences in
+executable context** (`--include='*.mjs' --include='*.sh' --include='*.ts'` returns nothing).
+**Mention-vs-use, one last time, in the placeholder hunt itself** — the same defect that broke the
+regex judge, the model judge, the harm rule, the observer, and fourteen of our own measurements.
+Seventeenth instance, and it nearly made me contradict a correct report.
+
+---
+
+# THE 24-SECTION WAVE PROGRAM IS CLOSED
+
+All 24 sections have a verdict. Waves A–E complete.
+
+| outcome | sections |
+|---|---|
+| PASS | 2 is the only FAIL-by-blocker; 3, 4, 5, 6, 7, 8, 9, 10, 15, 17, 18, 19, 20, 21, 22, 23, 24 |
+| FAIL with next command | 2 (cass index repairing), 14 (family abandoned), 16 (observer never fired — fixed) |
+| REJECT / ABANDON | 14 (verification-weakening family), 21 (retransmit-killer, ceiling below bar) |
+
+**promoted = 0 throughout.** Nothing in this repo is promoted, and the promotion gate that now
+defines what promotion would require (stage 85, four gates) is itself wired and green.
+
+## What the program actually established
+
+1. **One question survives out of seven tested.** `security_control_tampering`, on 8 rows from a
+   uniform-random control stratum no hand-drawn surface would have selected. Provisional.
+2. **Seven hand-built or hand-tuned results failed to transfer to real traffic.** Curated n is a
+   ceiling, never an estimate.
+3. **One defect, seventeen instances.** Mention-vs-use / silence-read-as-result, found in the
+   regex judge, the model judge, the harm rule (organic precision 0/28), the observer (never
+   emitted a row), the placeholder hunt, and fourteen of our own measurement selectors. **The only
+   reliable guard is asserting presence, not absence of failure.**
+4. **Five reproducibility defects, one shape:** we quote live numbers without pinning inputs.
+   Fixed at source — `replay.mjs` prints the log's sha256, and a pinned fixture reproduces the
+   table from a clean clone.
+5. **The ceiling argument is the cheapest strong result available.** §21 rejected compaction with
+   **zero model calls** by giving the job to an omniscient judge and finding it 19 points short.
+   Any decision with a computable upper bound has that shape.
