@@ -1366,3 +1366,99 @@ result: **fourth pipe-exit-code misread tonight**, in the check verifying the gu
 misreads.
 
 The guards are now catching their author faster than their author is making the mistakes count.
+
+## Mining every commit: the answer to "are we actually using our corpora"
+
+Measured, because the honest answer was not flattering:
+
+| corpus | size | touched before tonight |
+|---|---:|---|
+| CASS messages | 5,181,931 | 120,000 recent-window — **2.32%** |
+| agent-mail messages | 6,510 | 287, one project — **4.4%** |
+| this repo's commits | 1,071 | **0 systematically** |
+
+So I mined the one that was complete, local, free and finite: **all 1,040 non-merge commits**,
+falsifier committed first.
+
+**F1 fired at +9.3pp against my own ±10pp bar** — `live|oracle` runnable-rate 0.190 vs `pending`
+0.097. I honoured the bar rather than the result. **The temptation lives exactly at 0.7 of a
+point**, and moving a pre-registered line after seeing the data is the failure this lane exists
+to catch. Verdict: decorative, or weakly informative at best.
+
+**The finding I did not predict:**
+
+```
+oracle    n=97   touches a test 0.000   docs-only 0.804
+live      n=209  touches a test 0.120   docs-only 0.502
+selftest  n=30   touches a script 0.667 docs-only 0.233
+```
+
+**Our strongest word has never once touched a test file.** The levels grade the prose we wrote
+about the work, not the work.
+
+**No Jev call was made.** The falsifier granted a model seat only if the mechanical pass survived
+F1–F3. F1 fired, so the question was not asked — spending calls after the gate fires is shopping
+for a second opinion.
+
+### The fix, and the half of it that was already wrong
+
+Drafted a hook rule and measured it before anyone built it:
+
+```
+oracle|live on docs-only        -> would refuse 183 (17.6%)
+test|selftest with no code path -> would refuse 404 (38.9%)
+TOTAL                              587 = 56.5% of all history
+```
+
+**A gate that fires on 56.5% of history is a gate that fires on everything.** And the 38.9% arm
+is wrong *by construction*: in this repo `[test]` has always meant *"I verified this by running
+the tests"*, not *"this commit changes a test"*. **My draft misread our own vocabulary — the word
+describes the verification performed, not the paths touched.** That is the mention-vs-use
+confusion appearing in a new place, this time in my own proposed remedy.
+
+Killed that arm before pane 2 could implement it. What survives is narrower and honest: we have
+**no word for the most common thing we commit** — a receipt recording a result. The hook proved
+it live by **refusing my own commit** when I tried to tag a dispatch `[receipt-candidate]`.
+
+The load-bearing deliverable is therefore the confusion matrix, not the hook: how much of history
+a corrected vocabulary would reclassify. If it moves more than ~40%, it is a rewrite of the past
+rather than a fix for the future, and only the forward-binding half should ship.
+
+## The level fix: two independent mappings disagreed on the number and agreed on the verdict
+
+Pane 2's confusion matrix: **558 of 1,043 commits move = 53.5%.** I recomputed with my own
+mapping and got **656 of 1,042 = 63.0%.**
+
+**The gap is real and it does not matter**, which is the useful part. The two mappings differ in
+how they classify a commit that touches a fixture but no test, so the *numbers* disagree by ten
+points — and **both are far above the 40% line I set in advance for "this is a rewrite of the
+past rather than a fix for the future."** A conclusion that survives two different
+operationalisations is worth more than either number; had one landed at 38% and the other at
+63%, the threshold would have been doing the deciding rather than the data.
+
+Verdict stands: **the corrected vocabulary binds forward only.** No history is relabelled.
+
+## And the refusal would have been 100% wrong
+
+Pane 2 sampled 15 of the 183 docs-only `oracle|live` commits, seeded, and read each one:
+**15 of 15 are genuine receipts that simply lack a word for what they are.** So the rule I
+drafted — refuse `oracle|live` on a docs-only diff — would have fired **100% false positives on
+the sample**, blocking correct commits to enforce a vocabulary that has no term for the most
+common thing we produce.
+
+Final shape, after both corrections killed half of my draft: **add a `receipt` level, have the
+hook SUGGEST it, refuse nothing.** The `test|selftest` arm stays dropped because `[test]` in this
+repo means *"verified by running the tests"*, not *"touches a test file"*.
+
+**My draft rule went from two arms to zero refusals in three measurements**, each done before
+anything was wired: 56.5%-of-history fires, the by-construction misreading of our own vocabulary,
+and now 15/15 false positives. That is the Creation Gate working exactly as intended — the
+cheapest possible time to discover a gate is wrong is before it exists.
+
+## Live-monotonic, demonstrated again
+
+My mine read **1,043** commits; re-running it thirty minutes later read **1,046**. The commit
+corpus is live-monotonic exactly like the harvest family, so every count derived from it needs
+an as-of label. Pane 2's denominator (1,043) and my earlier one (1,040) differ for this reason
+and neither is wrong — they are measurements at different times, which is precisely the
+distinction the as-of work established tonight.
