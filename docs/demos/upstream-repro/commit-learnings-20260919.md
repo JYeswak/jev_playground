@@ -1185,3 +1185,44 @@ evidence.
 **Not filing is the better outcome.** A duplicate issue costs a maintainer attention and teaches
 them to discount the reporter; a comment that adds tip-freshness, true blast radius, and a ruled-
 out fix makes the existing issue more actionable. The dedup check came first, unprompted.
+
+## The CASS mountain, as one page a stranger can read
+
+`cass-mountain-findings-20260920.md` (109f926). Four rulings that existed only as four separate
+receipts are now one 57-line page that opens with the question and ends with advice.
+
+Verified rather than accepted: **all four links resolve**, and every headline number reproduces
+from the locked export —
+
+```
+n=138   always-invent 0.159   dig-iff-count>0 0.058   slice n=16   other 122
+```
+
+**The takeaway earns the page:**
+
+> *Dig by default, but never dig an absence-claim on hit-count alone — demand evidence in the hit
+> that it answers, or invent.*
+
+That is actionable by someone who will never read this repo, and it is derived from the loss, not
+from the win. The arc it rests on is the honest one: digging wins in aggregate, **inverts on the
+16 questions that claim something is missing**, and the obvious fix was built and refused as a
+coin fitted to those same 16 rows.
+
+Three things the page does that I would have had to ask for:
+
+- The mechanical-`Y` caveat is **prominent, not buried**, with a one-line pending-review block —
+  so if pane 3's review overturns the inversion, the page changes in one edit rather than a
+  rewrite. Written to be falsified.
+- The unit trap is published as **practical advice for the reader**, not as our war story:
+  microseconds vs milliseconds, *"compare them raw and every time-window join silently returns
+  zero — the same zero a real disjointness finding produces."*
+- `n=138 with 30 near-duplicate probe rows` is disclosed in the caveats. The page weakens its own
+  denominator where a marketing instinct would have left it at 138.
+
+**My own check was the broken instrument again.** My link-verifier used `tr -d '](.)'`, which
+stripped the dot inside `.md` and reported **4 of 4 links missing**. The links were fine; my
+selector deleted the extension. **Twenty-sixth instance tonight, and the second time I have
+nearly filed a false defect against a pane's correct work** — the same shape as the `grep -c
+'arm'` miscount two hours ago. The pattern is stable and worth stating plainly: I am reliable at
+ruling on evidence and unreliable at the greps I use to fetch it, so every negative finding I
+produce against someone else's artifact gets re-derived a second way before it leaves my hands.
