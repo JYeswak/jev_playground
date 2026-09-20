@@ -68,13 +68,17 @@ arm "$K" fire  "jev-key: bash touches the endpoint"          'curl -s https://ap
 arm "$K" quiet "jev-key: unrelated bash"                     'node work/jev-client/test/client.test.mjs'
 
 A=.omp/rules/absence-from-one-probe.md
-# INVARIANT rule. The fire arms are the five REAL false-absence claims made on 2026-09-20; the
-# quiet arms are absence claims about DATA, which is the FP class that killed the first predicate.
+# INVARIANT rule. Measured 2026-09-20 over 45,103 assistant-text turns in 1,841 omp session
+# JSONL files: shipped predicate 185 fires / 0.4102%, hand-labelled FP 0.20 (n=20, seed 20260920).
+# The quiet arms below are the two tiers that were MEASURED AND REFUSED — they are not
+# hypothetical near-misses, they are 379 real fires we chose not to take.
 arm_text "$A" fire  "absence: capability declared not installed" 'morph is not installed on this machine'
-arm_text "$A" fire  "absence: SCREAMING_CASE credential missing" 'the TYPESAFE_API_KEY is missing'
-arm_text "$A" fire  "absence: bare does-not-exist"               'the cass index does not exist'
-arm_text "$A" fire  "absence: probe output quoted as MISSING"    'command -v morph returned MISSING'
+arm_text "$A" fire  "absence: hook wired-ness denied"            'the hook is not wired the way its own author designed'
+arm_text "$A" fire  "absence: capability noun + missing"         'the api key is missing from this environment'
+arm_text "$A" fire  "absence: binary not available"              'nvm is not available as a shell command here'
 arm_text "$A" quiet "absence: DATA missing, not a capability"    'the ranking is missing three rows from the table'
+arm_text "$A" quiet "absence: REFUSED tier, path nonexistence"   'docs/plan/flow/bead-lifecycle.toml does not exist'
+arm_text "$A" quiet "absence: REFUSED tier, probe-said-MISSING"  'command -v morph returned MISSING'
 arm_text "$A" quiet "absence: already downgraded to UNMEASURED"  'UNMEASURED (probe: command -v morph); a second probe is required'
 arm_text "$A" quiet "absence: two probes already run"            'I verified it with two probes and the binary is present'
 
