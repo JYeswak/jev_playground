@@ -199,6 +199,9 @@ The Python clone is the control arm that turns "async timeouts are hard" into "t
 Thirteen files, one conclusion. Start at the map; the four `[historical]` rows are superseded by upstream commits, not by each other, and are kept as dated observations only.
 | receipt | what it settles |
 |---|---|
+| [`skillranker-user-roots-20260920.md`](skillranker-user-roots-20260920.md) | Corrects the user-roots verdict: collections rank, skill directories do not. |
+| [`skillranker-use-process-20260920.md`](skillranker-use-process-20260920.md) | The use-process pass: three tasks run against the installed `sr`. |
+| [`skillranker-closeout-20260920.md`](skillranker-closeout-20260920.md) | Closeout for the skillranker program. |
 | [`map-skillranker-20260920.md`](map-skillranker-20260920.md) | **The fork is not worth keeping.** Three independent measurements: it was obsolete 11m17s before it was committed; 21 of 27 touched files are dead (7 superseded workarounds, 6 tests that pin the defect as contract, 1 unexplained `inventory_partial` regression); the durable artifact is a comment on upstream issue #3. Supersedes the disposition of every other row in this group. |
 | [`skillranker-20260919.md`](skillranker-20260919.md) | First upstream run @`3fe85c4`: blocked natively, then ran via Docker. **[historical]** — superseded as a state report by upstream `9c52a64`; see the map. |
 | [`skillranker-origin-main-20260919.md`](skillranker-origin-main-20260919.md) | Build + corpus read at `ba5da08` (217 commits forward): builds, reads corpus, keyed rank blocked. **[historical]** — pinned three tips back; valid as a dated observation. |
@@ -356,6 +359,7 @@ The one finished stranger-readable question in the corpus. Every mine here is pr
 The instruments built because prose rules did not stop the defect recurring.
 | receipt | what it settles |
 |---|---|
+| [`suggest-leg-mining-20260920.md`](suggest-leg-mining-20260920.md) | The SUGGEST leg: four defect classes mined from the 78,242-command `dcg_allow` harvest. Two ship at ~1% (`glob-silenced` 820, `count-as-verdict` 1,486), two REFUSED (14 hits is too rare to be a rule; `shasum \| cut` is not a defect). The first predicate was 67% false positives and only hand-labelling caught it — it fired at 3.53%, inside the bar. |
 | [`hardening-20260920.md`](hardening-20260920.md) | One session produced 26 silent-zero greps, 8 moved denominators, 4 lost-file branch switches and 4 pipeline exit-status misreads. **Classes turned into code stopped recurring; classes turned into prose did not.** The page that turned the mechanizable ones into commands. |
 | [`hardening-stranger-grade-20260920.md`](hardening-stranger-grade-20260920.md) | Author grading their own hardening page with every runnable command executed and exit codes unpiped — no BROKEN, no runs-but-does-not-demonstrate. |
 | [`hardening-census-20260920.md`](hardening-census-20260920.md) | Census of wired vs prose-only hardening, re-derived after both new guards landed. |
