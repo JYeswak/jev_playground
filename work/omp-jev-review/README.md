@@ -78,3 +78,44 @@ Never blocks. Never throws into the host. Returns `undefined` on every path.
 ```bash
 node --experimental-strip-types --test test/review.test.mjs   # 7/7
 ```
+
+## Real commits: `behaviour` does not beat its own constant
+
+`measure-realdiffs.mjs` scores the last 14 **real commits of this repository**, with labels
+**computed from the diff, not typed by a human**:
+
+- `behaviour` = the diff modifies a non-test source file
+- `boundary` = a changed line matches a key/auth/permission/secret pattern
+
+```
+behaviour  8/14 | said-yes 3/14 | truth-yes 9/14 | best constant 9/14 | NO BETTER THAN ITS CONSTANT
+boundary   9/14 | said-yes 2/14 | truth-yes 7/14 | best constant 7/14 | DISCRIMINATES (+2, 0 near-threshold)
+```
+
+**`behaviour` scored 6/7 on hand-built diffs and does not beat always-yes on real ones.**
+
+**But the misses are ambiguous and the ambiguity is mine.** The model answered `false` on
+commits that added a sampler, a measurement script, and a hold-out harness. My label calls any
+non-test source edit behaviour-changing; a reasonable reviewer would say adding a new
+standalone script changes no existing caller's behaviour. **On those rows the model is
+plausibly right and the label is blunt.**
+
+So this result is *not* "the question is bad". It is:
+
+1. the hand-built 6/7 **did not transfer** to real commits under any labelling, and
+2. **our labelling proxy is the weak link**, which is itself the finding — the first
+   real-traffic measurement in this lane produced an ambiguous verdict because nobody had
+   built ground truth that survives contact with real diffs.
+
+`boundary` clears its constant by 2 with zero near-threshold verdicts and a 0.85 spread. Thin,
+but the only question here with real-traffic support.
+
+Reproduce (set `REVIEW_MEASURE_N` for a different window):
+
+```bash
+infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
+  node --experimental-strip-types work/omp-jev-review/measure-realdiffs.mjs
+```
+
+**Nothing is cut on this evidence.** Cutting `behaviour` because a crude label disagreed with
+it would be the same error as keeping a question because a tuned set flattered it.
