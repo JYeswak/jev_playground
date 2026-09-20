@@ -179,3 +179,129 @@ Stages 95, 96 and 97 re-run after the edit: all `PASS`.
 - **No claim** that the fixes in this commit are complete: five defects were fixed, four more
   (the `137 of 114` fraction, the self-install RED, the gitignored sweep pin, the four undisclosed
   packages) are reported and left to their owners.
+
+---
+
+# Addendum — second pass, 2026-09-20: a stranger's `gates.sh` is green, and two of my own claims were wrong
+
+## Retraction first: "the beads hole is gone" was false
+
+The first pass reported `foundation/gates.sh` rc 1 on a clone with "stage **50-house-gates
+PASSED** — the beads hole is gone", and blamed stage 80 alone. **Wrong.** That clone had already
+been handed a `.beads/beads.db` by an earlier command in the same sweep — `.br-db-openers-*.lock`,
+`.br-db-write-*.lock` and `.br-jsonl-write-*.lock` were sitting in its `.beads/` — because
+`lane-status.sh`, `sync-docs.sh --check` and the quickstart all ran before `gates.sh` did.
+
+Measured on a clone with **nothing run in it**, first command after `cd`:
+
+```
+RED  foundation gates require an imported Beads database under …/.beads/*.db
+     Fresh clone fix: run 'br sync --import-only' from the repository root, then rerun …
+```
+
+It does not reach stage 10. The 2026-09-19 table row was right; my retraction of it was not. A
+clone you have run anything else in is not a fresh clone, and this is the second time that exact
+error has been made on this page today.
+
+## The Quick start was a three-command list that could not complete
+
+`br sync --import-only` was never in it. Every stranger hit a RED as their third command. README
+now lists four steps with the import's real output, and `br` is named in *What you'll need*.
+
+## A stranger's gates.sh is GREEN — measured in an untouched clone, in order
+
+Clone of `work/cass-dig-vs-invent` at `2344ab0` into a fresh `mktemp -d`. Proof of untouched,
+taken before anything ran: `.beads/` held only `config.yaml issues.jsonl metadata.json` — **no
+`*.db`** — and `compaction/node_modules` did not exist. Then, in order, only the four documented
+commands:
+
+| step | command | rc | evidence |
+|---|---|---|---|
+| 1 | `git clone --branch work/cass-dig-vs-invent … && cd` | 0 | `2344ab0` |
+| 2 | `./scripts/quickstart.sh` | **0** | `5 of 5 questions answered.`; `.beads/*.db` still absent afterwards |
+| 3 | `br sync --import-only` | **0** | `Imported from JSONL (via automatic recovery): Created: 50 issues` |
+| 4 | `bash foundation/gates.sh` | **0** | 13 `PASS`, **`gates: ALL GREEN`**, 55 s |
+
+This is the first run in which a stranger's `gates.sh` has been green from a clone that had
+nothing else done to it. It took `190668d` (absent ≠ broken), `2e76a29` (the selftest arm that was
+green locally and RED for every stranger) and the Quick-start step above.
+
+**Arm 1, not arm 4, was the second blocker.** After the beads import at `190668d`, stage 80 was
+still RED: `selftest-denominator-sweep.sh: 3 ok, 1 failed`, the failure being
+`FAIL sweep did not agree: rc=0` at `selftest-denominator-sweep.sh:21`, which required the literal
+string `ALL-AGREE` while the honest clone verdict is `AGREE-WITH-1-SKIPPED`. The new SKIP branch
+(arm 4) passed. The seam is why it hid: `JEV_SWEEP_FORCE_ABSENT=1` drives arm 4 only, while arm 1
+runs the real sweep, whose absent-source state is the **default on a clone and never the case
+locally**. A test seam that covers the new branch can leave the old branch environment-dependent,
+and no local run can see it.
+
+## The other seven sweep checks, audited (Main's question)
+
+**None depends on installed demos.** All seven report `ok` in a clone where
+`demos/routing-backtest`, `demos/usage-shape` and `work/jev-score-register` have **no
+`node_modules` at all** (verified by `ls -d …/node_modules` → absent for each, immediately before
+running the sweep). The two file-backed sources are tracked and present:
+`work/jev-score-register/fixtures/scores-pinned-20260920.jsonl` and
+`work/p3-calibration/toolcall-corpus-frozen.jsonl` — `git ls-files --error-unmatch` succeeds and
+`git check-ignore` returns nothing for both. `locked-dig-138` was the only absent-source check.
+
+**Without `node`, the three node-backed checks fail loudly and correctly.** With a `node` shim
+that exits 127 on PATH:
+
+```
+ERROR pinned-replay-55 (rc=2) — the check itself is broken, NOT a drift finding
+ERROR pinned-replay-api0 (rc=2) — the check itself is broken, NOT a drift finding
+ERROR backtest-29 (rc=2) — the check itself is broken, NOT a drift finding
+```
+
+Not silent, not misclassified as DRIFT. That shape is right.
+
+**But two of the seven are live-monotonic, which the sweep's own header forbids.**
+`census-packages-21` is `ls -d work/omp-jev-* work/omp-harm-rule | wc -l` and `export-yes-19`
+counts qualifying packages the same way. The header says: *"Do NOT add live-monotonic claims here
+— a moving target wired as an agree-check REDs forever (the nag class R46/R47 refused)."* Proven,
+not argued — in the clone, creating one `work/omp-jev-zzprobe/src/` directory:
+
+```
+  DRIFT census-packages-21
+scripts/denominator-sweep.sh: DRIFT-FOUND      (rc=1, taken unpiped)
+```
+
+which REDs stage 80 and therefore `gates.sh` for everyone. This repo ships eleven unpromoted taste
+packages under `work/` and is still adding them, so this fires on the next one. **Reported, not
+fixed** — it is the sweep's owner's call whether the count is pinned, derived, or dropped.
+
+## My own fix taught the defect it fixed
+
+The first pass replaced the `~/.omp/profiles/default/…` census with a loop whose comment read
+`# rc UNPIPED: a bad path here exits 2`. That is false: `done | sort | uniq -c` still reports
+`uniq`'s status. Measured both arms — dead path with the guard and dead path without it — and
+`rc_after_pipeline=0` in **both**. The `-d` guard, not an exit-code read, was doing the work. The
+block now says exactly that and emits a `scanned <dir>` line per directory to stderr, so zero rows
+with zero scanned lines cannot be read as "read everything, found none" (good arm: 13 scanned,
+`116 harm_pass` / `14 harm_fire`; dead arm: 0 scanned, empty). A page that gets the rc discipline
+wrong inside its own proof command has no standing to teach it.
+
+`awk` over every fenced `bash` block in README.md now returns three `|` lines: the two in this
+corrected census, and the `&&`/`||` observe-only proof, which consumes `grep -q`'s status directly
+and never pipes it. **No remaining fenced command in README.md reads an exit code through a pipe.**
+
+## Still shipping wrong to the public (unresolved, owner action)
+
+`git ls-remote --symref origin HEAD` → `refs/heads/main`, `6eee6ab`. `main` is **60 commits**
+behind the working branch and `git merge-base --is-ancestor origin/main HEAD` succeeds, so
+publishing is a fast-forward; there is no open PR for `work/cass-dig-vs-invent`. Until it merges,
+a reader of the public page today gets: the observer row saying **3,339 rows** "not attributable
+to this package alone" instead of 89; **"50 entries"** twice for a ledger holding 56; the dead
+`~/.omp/profiles/default/` census; `npm run replay` presented as keyless; the three-command Quick
+start that cannot complete; and a `gates.sh` that REDs on `locked-dig-138`. **Not actioned here:**
+merging 60 commits to a public default branch is a repository-owner decision, not a subagent's.
+
+## NO-CLAIM, addendum
+
+- The green `gates.sh` is **one** clone, on **one** machine, at `2344ab0`. It is not a claim about
+  a machine without `br`, without `node`, or without network for stage 40's bootstrap.
+- The `node`-absent result used a shim exiting 127, not a machine genuinely lacking node.
+- The live-monotonic hazard was proven by creating one directory in a throwaway clone. **No claim**
+  about which of the two checks should change, or whether the count should exist at all.
+- **No claim** that the public page is fixed. It is not. Nothing in this addendum touches `main`.
