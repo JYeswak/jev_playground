@@ -1145,3 +1145,43 @@ fix is wrong is worth more in an upstream report than the bug itself.**
 
 `BLOCKED` with no binary, no demo, no tests and no live rank is the correct callback. A green
 report that skipped the binary would have been the failure.
+
+## A18: unmeasurable, reproduced to the day — and a unit trap worth stealing
+
+`a18-offbus-result-20260920.md` (887b344). REFUSE, and the pane's own framing is the correct one:
+**UNMEASURED on this pair, not yield-0.**
+
+I re-derived the disjointness from the two live DBs rather than reading the table, and the
+reproduction turned up the detail that makes it credible:
+
+```
+cass ws 617   started_at 1781710335548        MILLIseconds -> 2026-06-17 .. 2026-07-27
+mail proj 66  created_ts 1788163552858574     MICROseconds -> 2026-08-31 .. 2026-09-01
+gap: 35 days
+```
+
+**The two stores keep time in different units**, and the pane caught that before the receipt
+rather than after. Had it gone unnoticed, the mail timestamps read as milliseconds would land in
+the year **58,600** and every ±24h window would be empty — producing exactly the same `0` the
+honest answer produces, for entirely the wrong reason. **A silent zero and a real zero are
+indistinguishable in the output; only the unit check separates them.**
+
+That is why `0 of 287` is reported as unmeasurable: the eras never meet under *any* window, so
+the probe has no opportunity to succeed or fail. Widening ±24h would not help; it would take five
+weeks of window to make the corpora touch.
+
+**And it generalises**, which is the part that closes the approach rather than one cell: all 20
+K1 pairs are time-disjoint, so A18's in-window join is unmeasurable on every pair available
+tonight — not just on the rich `clutterfreespaces.ios` cell I warned them to treat as a single
+cell. They treated it as one cell *and* checked the other nineteen.
+
+## Upstream filing: they found the duplicate first
+
+`skillranker-issue-filed-20260920.md`. The pane did not file — `Dicklesworthstone/skillranker#3`
+already covers the macOS gate, OPEN, verified by me via `gh`. It posted corroboration instead:
+still broken at `abf909d`, blast radius **7 files not 1**, and the ungating-is-not-the-fix
+evidence.
+
+**Not filing is the better outcome.** A duplicate issue costs a maintainer attention and teaches
+them to discount the reporter; a comment that adds tip-freshness, true blast radius, and a ruled-
+out fix makes the existing issue more actionable. The dedup check came first, unprompted.
