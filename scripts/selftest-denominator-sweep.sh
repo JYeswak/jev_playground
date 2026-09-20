@@ -15,11 +15,19 @@ pass=0
 
 note() { printf '  %-4s %s\n' "$1" "$2"; }
 
-# Arm 1: the sweep passes on a clean tree and says ALL-AGREE (an exit-0 that
-# stays silent would be an empty success — require the verdict line).
+# Arm 1: the sweep passes and SAYS SO (an exit-0 that stays silent would be an empty success —
+# require a verdict line).
+#
+# ENVIRONMENT-DEPENDENT GREEN, FIXED 2026-09-20. This arm pinned the literal "ALL-AGREE", which
+# is only reachable where every pinned source is present. On a fresh clone the honest verdict is
+# "AGREE-WITH-1-SKIPPED" (cass-dig-rows.jsonl is gitignored by design), so this arm failed for
+# strangers and passed for us: 4 ok locally, 3 ok 1 failed from a clone. Found by a real clone,
+# not by reasoning. The seam is exactly why it hid — JEV_SWEEP_FORCE_ABSENT=1 drives arm 4, while
+# arm 1 runs the real sweep, whose absent-source state is the DEFAULT on a clone and never the
+# case here. Both verdicts are accepted now; the rc=0 conjunct and the no-silence rule stand.
 out=$("$S" 2>&1); rc=$?
-if [ "$rc" -eq 0 ] && grep -q "ALL-AGREE" <<<"$out"; then
-  note ok "sweep ALL-AGREE (rc=0)"; pass=$((pass + 1));
+if [ "$rc" -eq 0 ] && grep -qE 'ALL-AGREE|AGREE-WITH-[0-9]+-SKIPPED' <<<"$out"; then
+  note ok "sweep agreed and said so (rc=0)"; pass=$((pass + 1));
 else
   note FAIL "sweep did not agree: rc=$rc"; printf '%s\n' "$out"; fail=$((fail + 1));
 fi
