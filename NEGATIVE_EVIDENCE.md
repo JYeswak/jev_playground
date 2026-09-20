@@ -2240,3 +2240,27 @@ n=10 batteries as a substitute for a real corpus. This catalog is EXPLORED.
 this pane did not author, prints always-abstain + cheap baseline +
 prevalence, identity-locks sha256, and a non-author confirms. Until then
 `promoted = 0`.
+
+## R46 — REFUSED: wiring a guard against staged-file exposure (branch-switch loss)
+
+**Recorded:** 2026-09-20 · **Level:** `[pending]` · Census unit, no new instrument.
+Receipt: `docs/demos/upstream-repro/hardening-census-20260920.md` (rank 1,
+4 instances: 16b THIRD, 18b FOURTH, "lost twice today").
+
+The defect is real and top-ranked, and a guard for it is refused anyway:
+git has no hook point that runs *before* a checkout (post-checkout is after
+the loss), so nothing can interpose at the losing action. The two
+buildable shapes both fail the gate-that-fires-on-everything test:
+(a) refuse checkout on any dirty tree — dirty is the steady state of a
+three-pane worktree (this tree held live peer edits most of tonight), so
+the guard would nag every legitimate switch until uninstalled;
+(b) an overlap-check wrapper (uncommitted paths ∩ inter-branch diff) is
+computable but opt-in — enforcement would need every pane to route
+checkouts through it, which is prose with a script, not a wired guard.
+Commit-on-create stays a rule, not an instrument.
+
+**Trigger (overturn condition):** git gains a pre-checkout hook adopted
+repo-wide, OR all panes route branch-switches through one wrapper for 50
+switches with zero losses AND zero false refusals — then build the
+overlap-check as the guard, with the 50-switch log as its satisfying
+witness.
