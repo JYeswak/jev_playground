@@ -245,3 +245,49 @@ quotes `matched=15525` in P6 and `matched=15557` in its ledger line; my re-run p
 Same class as `c6eb7ab`'s corpus drift (77,767 → 78,242), and the same fix applies — **quote the
 row AND pin the inputs**, or state explicitly that the denominator is live and monotonic. A number
 that cannot be reproduced tomorrow needs to say so today.
+
+## Wave C section 15 — export sweep: 19 of 21, and a defect in the register I shipped
+
+SECTION 15 score-register export sweep — **PASS** — `ad1f8b9` [test] + `6ff34bc` [live], verified
+by me. **Census corrects `bf12406`'s "1 of 21": 19 of 21 export, 2 NOT-APPLICABLE, 0 unwired.**
+Replay re-run by me, quoted verbatim:
+
+```
+rows 55 | api calls made : 0 | models seen : jev-1.13.0
+extensions : live-record, omp-jev-commit, omp-jev-route | distinct inputs : 46
+```
+
+**A REAL DEFECT IN THE REGISTER I SHIPPED, found by the sweep.** `recording()` is actively WRONG
+for the four `askJevChoice` packages: `askJevChoice` returns `{choice, confidence, probabilities}`
+and **no `scores`**, so `recording()` falls to its else branch and files every SUCCESSFUL call as
+`ok:false`. Four extensions' good calls would have entered the register as errors, silently, and
+I would have been the one quoting that register later. `recordingChoice` added: one row per label
+plus a `<q>:__choice__` row carrying the confidence, so the distribution survives and not just the
+argmax. **Test 12 is a planted negative asserting the OLD wrapper misfiles it**, so the reason for
+the new wrapper cannot rot. 13/13 tests re-run green by me.
+
+My "one-line change each" held for 13 of 19. Three needed judgement and were correctly not forced:
+
+- **observer** calls the SDK's `systemOne` directly, so neither wrapper applies; it records inline
+  in a try/catch, because an unwritable register must never break an observer.
+- **failure** and **foreman** take `ask` as an injectable default and were wired **at the default,
+  not the call site** — wiring the call site would have recorded test stubs into the real register
+  and made every offline test write rows.
+
+NOT-APPLICABLE (2), with reasons rather than silence: **omp-jev-preaction** (`src/index.ts:4`:
+"Never calls Jev on this arm (cost-benefit: regexes beat the model here)") and **omp-harm-rule**
+(no model call at all — which is exactly why it went 12/12 against Jev's 11/12 at zero cost).
+Wrapping a client a package does not have would be theatre.
+
+SECTION 15b MY CENSUS PROBE WAS WRONG AND THEIRS WAS RIGHT — I counted **18** wired and was about
+to correct their 19. My probe read only `src/index.ts`; `omp-jev-observer` is wired in
+`src/classify-systemone.mjs`. **Thirteenth wrong-selector instance tonight, and the first where it
+would have made me overwrite a correct number with a wrong one.** The rule earns another restating:
+the selector IS the claim, and a narrower selector manufactures a confident absence.
+
+SECTION 15c self-reported by its author, and the fourth reproducibility defect tonight:
+`work/jev-score-register/scores.jsonl` is gitignored, so the 55-row state above is local and the
+quoted replay is not reproducible from a fresh clone. Same class as the `real-allowed.json` drift
+and the live-growing `matched=` denominator. Open question, not yet ruled: commit a small pinned
+sample, or state the log as local-and-monotonic. Gitignoring a growing append log is probably
+right; quoting it in a receipt without saying so is not.
