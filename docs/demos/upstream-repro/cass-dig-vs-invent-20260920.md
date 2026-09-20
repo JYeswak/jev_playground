@@ -27,3 +27,14 @@ On this recent window, **digging when any hit exists beats always-invent** (0.05
 
 ## NO-CLAIM
 Not full-index cass search; not human edit-delta labels; not a promotion. Rebuild still wedged — re-run when FTS virtual table returns.
+
+<!-- MERGE NOTE 2026-09-20 (conductor, resolving a concurrent-branch conflict):
+     The other side of this conflict replaced everything above with a pointer reading
+     "Canonical receipt moved to cass-dig-vs-invent-mine-20260920.md". That file EXISTS but its
+     results section is still a stub -- line 47 reads
+       "(n / prevalence / always-abstain / always-open-top1 / dig-iff-path-in-query -- TBD)"
+     and it contains NONE of the numbers above (grep for 0.159420290 / 0.057971014 -> 0 hits).
+     Accepting the pointer would have deleted the only copy of a live measurement and redirected
+     readers to a TBD. Kept the data here. The sibling file is a DIFFERENT, unfinished mine, not a
+     newer home for this one -- if it is later filled in and supersedes this, move the numbers
+     first and make the pointer second. -->
