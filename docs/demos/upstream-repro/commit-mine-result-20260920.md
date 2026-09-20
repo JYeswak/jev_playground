@@ -67,5 +67,3 @@ different runnable-path definition could move this either way — which is itsel
 lean on the number.
 
 Reproduce: `node work/commit-mine/mine.mjs > /tmp/commits.jsonl` (~12s, read-only).
-
-<!-- suggestion probe 1789922333 -->
