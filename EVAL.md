@@ -767,3 +767,74 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   written code content, which no current TTSR scope observes (see R56 retry);
   corpus drifts (fleet sessions write during measurement); `fh` STALE so
   nothing said about recent movement; /tmp evidence not committed.
+
+## P4 Jev rule-class triage vs deterministic baseline (2026-09-20)
+
+- **Lane:** live. Model requested `jev-latest` → **jev-1.13.0**. Calls=19.
+  Receipt `work/jev-triage/runs/2026-09-20T221149741Z.json`. Pattern: Choice
+  over five verdicts (`docs-mirror/typesafe/primitives/choice.md`). Client:
+  `work/jev-client` `askJevChoice`.
+- **Gold:** 19 hand rulings from the dispatch (SHIP 6 / TOO_RARE 7 / NUISANCE 2
+  / LOW_PRECISION 2 / UNDERPOWERED 2). State is numbers only — no class name.
+- **Baseline (offline, 10/10 tests):** ship iff hits≥50 AND rate≤5% AND
+  (FP≤0.30 OR unlabelled) AND concentration<0.5. 5-way **15/19**. Binary
+  SHIP-vs-rest **17/19** (TP=6 FP=2 TN=11 FN=0). The two extra ships are
+  digest-truncation and path-nonexistence (numeric bars pass, gold is
+  not-a-defect / nuisance).
+- **Jev 5-way 6/19.** Binary 13/19 (TP=0 FN=6 — never chose SHIP or NUISANCE;
+  13/19 mass on UNDERPOWERED). **SEAT NOT-EARNED.**
+- **Disagreements vs baseline: 15.** Jev beat baseline on two gold-UNDERPOWERED
+  rows (v2-files, claim-verb) and lost every SHIP. Calibration: every call
+  with conf≥0.64 is WRONG; first correct is conf=0.510. Acting above a high
+  threshold would ship nothing and still be wrong on the confident refusals.
+- **Boundary:** gold maps concentration→UNDERPOWERED and not-a-defect→NUISANCE
+  (the five options have no sixth); count-as-verdict gold is the dispatch SHIP
+  not the later depth-pack overturn; n=19 one set, not a hold-out; tmux-untargeted
+  N taken as the bash harvest.
+
+
+## P2 doc-index denominator + mechanizable split (2026-09-20)
+
+- **Denominator (reported first, per dispatch):** `fh doc-index` envelope
+  `franken-harvest.doc-index.v1`, generation `08457a25`: **36,692 rules
+  indexed** (27,289 AGENTS.md + 9,403 CONTRACT.md), 207/224 mirror repos read,
+  390,739 chunks. Direct record count with AGENTS/CONTRACT path filter:
+  **33,380 rule records across 117 repos** (envelope vs direct differ on rule
+  granularity; both quoted). Two citations was thin — the vein is 36k deep.
+- **Split (n=60 hand-classified, seed 20260920, one labeller):** unmarked pool
+  29,176 records (87.4%) → **0/30 mechanizable** (process prescriptions,
+  invariants, tables, status); marked pool 4,204 (12.6%,
+  command-mentioning) → **3/30 mechanizable-shape** (M-2 never-deploy-direct,
+  M-10 shell-backtick-substitution, M-15 no-branches), of which **1/30
+  universal-content** (M-10; M-2/M-15 are project-local conventions).
+  Stratified projection: ~1.3% mechanizable-shape, ~0.4% universal. **Most
+  doctrine is not mechanizable — now with a number behind it.**
+- **Converted:** M-10 measured (broad 1,417 dominated by fence extraction;
+  narrow 12, below floor, residuals deliberate probes) → **R59**. Rejected
+  surface: 23,151 candidates, 0 reasoned → **R60**. SHIPPED 0.
+- **Lane:** offline. No rule files touched; selftest untouched at 51/0 (no
+  regression run needed — nothing it covers changed; stating so instead of
+  burning a run).
+- **Boundary:** single labeller; marker-filter recall estimated on the same
+  n=60 (not independently proven); techniques/rigor/oracles/
+  doctrine-history unsearched — doctrine-history (rules added after
+  incidents) is the named next vein; `fh` ledger STALE throughout.
+
+## P4 Jev triage fair re-run — semantics vs arithmetic (2026-09-20)
+
+- **Lane:** live. `jev-latest` → **jev-1.13.0**. Calls=19 (Choice+Noul parallel).
+  Receipt `work/jev-triage/runs/2026-09-20T221837415Z.json`. State = name +
+  description + predicate + 3 corpus examples + numbers. Mapping choice
+  (stated, not gold): not-a-defect→REFUSE_NUISANCE, concentration→UNDERPOWERED.
+  count-as-verdict gold = dispatch-time SHIP.
+- **Baseline Choice 14/19.** SHIPS all 3 semantic rows (digest-truncation,
+  path-nonexistence, pipefail-masked 227). Noul: **UNANSWERABLE**.
+- **Jev Choice 7/19** overall (still loses arithmetic). **Semantic Choice 3/3**
+  — all three REFUSE_NUISANCE, which the numbers cannot produce.
+- **Jev Noul semantic 2/3:** digest 0.09 false, path 0.24 false, pipefail 0.51
+  true (miss at the 0.5 line). Arithmetic noul 11/16.
+- **SEAT:** earned on the semantic question the regex cannot ask. Not earned
+  as a replacement for the numeric Choice.
+- **Boundary:** git-add-A harvest had no executed `git add -A` (dcg denies);
+  two of its examples are the class shape not harvest hits. Text-class
+  examples from the measured predicate arms, not a fresh JSONL walk.

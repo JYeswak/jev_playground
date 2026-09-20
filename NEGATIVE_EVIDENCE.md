@@ -2737,3 +2737,61 @@ repeating, so no bash-scope variant is proposed either.
 class at shippable density.
 
 **Evidence:** `/tmp/fhmine_sample_B1.json`; bead `jev-m4r` CLOSED REFUSED.
+
+## R59 — REFUSE: shell backtick-substitution in inline record bodies as TTSR class
+
+**Hypothesis:** the one universal-content hit from the doc-index split below
+(M-10: `franken_lean@a562bc88d` AGENTS.md:678-685 — a backticked field name
+inside a double-quoted `br` body was command-substituted by the shell before
+`br` saw it, bead `fln-qpkj`) is a junior mistake any project can make, with
+a string-visible shape: a backtick pair inside a quoted `--reason`/`--title`/`-m`
+argument.
+
+**Measured 2026-09-20** on `real-allowed.json`, N=78,242:
+
+| predicate | hits | rate | verdict |
+|---|---:|---:|---|
+| backtick pair inside any quoted span | 1,417 | 1.8110% | clears the rate bar, **and is wrong** |
+| backtick pair inside a quoted `--reason\|--title\|--message\|-m` arg to `br\|gh\|git` | **12** | **0.0153%** | **below the 50 floor** |
+
+The broad form is dominated by triple-backtick fence extraction (`sed -n
+'/^\x60\x60\x60bash$/…'` over contract docs — the fleet's own gate-extraction
+idiom), not command substitution; shipping it would nag the writeup norm. The
+narrow form's 12 residuals are worse than rare: several are the fleet's own
+*deliberate* backtick-injection probes (omp-orchestrator trap demonstrations,
+`git commit --allow-empty -m "fix: verify backtick injectio…"`) plus escaped
+`` \` `` literals that never substitute. The fleet already knows this defect
+well enough to plant it.
+
+**Retry-condition:** reopen only if a whole-script corpus (where the quoted
+body and the damaged record are visible together) shows the accidental form
+≥50, or if a write/edit content scope appears (the defect is in argument
+*content*, which no current TTSR scope observes — same wall as R56).
+
+**Evidence:** `/tmp/fhmine_brbody.json`; bead `jev-m4r` line (antecedent);
+this unit's bead below.
+
+## R60 — REFUSE: the fh rejected surface as a TTSR rule-source (23,151 reasonless)
+
+**Hypothesis:** `fh rejected` (pinned approaches reverted/removed/rejected/
+superseded across 213 repos) is 221 repos of proven-cost negative evidence,
+hence the highest-grade rule source available.
+
+**Measured 2026-09-20:** `candidates_before_limit=23,151`, all 23,151 rows
+fetched (`rows_truncated=0`): **22,742 removed-module commits, 366 reverts,
+42 closed records, 1 superseded design — with `reason_state=present` on
+ZERO rows and `reopen_condition_state=present` on ZERO rows.** A removed
+module is usually a rename or refactor, not a proven defect; a revert without
+a reason is a direction change, not a cost already priced. The grade is not
+in the surface — it would have to be recovered per-row from commit
+messages/diffs in the read-only mirror, which is a different (much larger)
+unit than "read the rejected list".
+
+**Retry-condition:** reopen only via a sampled pass over the 366 revert
+commits that reads each message+diff and keeps only rows with a stated defect
+and a mechanizable shape; or if reason-carrying fields appear on the surface.
+`doctrine-history` (rules ADDED after incidents — the earned-rule signal) is
+still unsearched and is the better next vein.
+
+**Evidence:** `/tmp/fh_rejected_all.json` (13.9 MB, 23,151 rows), triage
+counts above.
