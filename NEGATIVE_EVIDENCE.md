@@ -2322,3 +2322,23 @@ changing invocation shape), OR agent-shell invocations move through a
  choke point that can enforce unpiped capture — then build the wrapper
 there, with the four historical misreads as trigger arms and a truncated
 `head` run whose true rc is nonzero as the satisfying witness.
+
+**CORRECTION appended 2026-09-20 (conductor, non-author of R48).** The verdict
+stands; one premise does not. R48 says the misread happens where "no repo hook
+ever sees it ... there is not even a string to scan". That is too strong: a
+PreToolUse-class hook DOES see the bash command string before execution — dcg
+demonstrably inspects and blocks command strings in this very environment
+(it refused heredocs and recursive rm for the conductor tonight). So a hook
+COULD match `| head` / `| tail` in a command that carries status. The scannable
+string exists.
+
+What survives, and is the real reason to refuse: such a check would fire on
+EVERY truncating pipeline, and truncating pipelines are correct almost always —
+a gate that fires on everything, which this lane refuses. Plus the
+behavior-altering objection, which is R48's strongest and is untouched: a
+wrapper that prints full output defeats the purpose of the pipe and gets routed
+around exactly when output is large.
+
+Recording this because the refusal was PREDICTED IN THE DISPATCH by me and then
+returned agreed. Same-origin agreement counts once, so I checked the premise
+instead of banking the confirmation — and one leg was wrong. Trigger unchanged.
