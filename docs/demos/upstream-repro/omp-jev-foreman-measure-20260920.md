@@ -39,3 +39,39 @@ These are eight hand-built windows authored for this measurement, one Jev model 
 runs, and no production labels. The results do not establish supervision accuracy, calibration,
 real-traffic precision, or a deployment threshold. The existing real-observation Foreman ruling
 remains AUC 0.750 below the 0.90 bar.
+
+---
+
+## Conductor correction, 2026-09-20 — the verdict is WEAK, not DISCRIMINATES
+
+Re-ran by the conductor, data confirmed (receipt sha matches; rows real; 0.97/0.11/0.86 on
+`same-failing-command`, 0.56 MISS on `twenty-reads-no-writes/progress`). **The measurement is
+sound. The verdict word is not.**
+
+| question | correct | own best constant | edge |
+|---|---|---|---|
+| `repeating` | 7/8 | 6/8 | **+1** |
+| `progress` | 6/8 | 5/8 | **+1** |
+| `stuck` | 6/8 | 5/8 | **+1** |
+
+**A one-item edge on n=8 is indistinguishable from one case flipping.** `progress` already has
+two verdicts inside 0.10 of the threshold, so a single re-run could erase its entire margin —
+which is exactly what happened to `argument` in the failure measurement (HIT→MISS→MISS on
+byte-identical input).
+
+Contrast the set that genuinely passed: `route` scored **bimodally**, 0.9x against 0.1x, spread
+0.83–0.91, one near-threshold cell out of eighteen. Foreman's scores do not separate that way.
+
+**Standing rule from here, applied to every future question measurement:**
+
+> `DISCRIMINATES` requires beating the question's own best constant by **more than the number of
+> near-threshold verdicts**, so a margin that a single flip can erase does not earn the word.
+> Otherwise the verdict is `WEAK — insufficient n`, and the question ships only with that label.
+
+Nothing is cut: weak is not degenerate, and cutting a question that varies with its input would
+be a fabricated finding. Foreman's three questions stand, labelled **WEAK**, and no threshold
+may be set on them.
+
+**What would settle it:** the same 8 windows are not enough. Either 30+ constructed windows, or
+— better — labelled real windows through `jev-align`, which is the tool for exactly this and is
+under evaluation.
