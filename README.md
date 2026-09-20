@@ -58,8 +58,9 @@ path. Residual: `createObserver` / `installObserver` still defaults
 OPEN.** Do not publish working-dogfood
 ([`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md)).
 
-**22 Jev repos appeared in launch week. We ran all of them; everything passed, and that proved
-nothing.** Substituting a well-formed RANDOM judge left 254 of 305 tests green (83%)
+**24 third-party repos sit in this tree. We ran eleven of the twelve in the census table below
+(plus a smoke run); everything passed, and that proved nothing.** Substituting a well-formed
+RANDOM judge left 254 of 305 tests green (83%)
 ([receipt](docs/demos/upstream-repro/random-judge-substitution-20260919.md)), and exactly one
 test across six repos scores Jev against a label it did not supply (same receipt). A suite that
 passes a coin flip is plumbing, not validation.
@@ -161,7 +162,7 @@ a retraction to learn.
 The full retraction, with both sides of the framing test, is in
 [`docs/demos/jev-probe/NOTE-framing-leak.md`](docs/demos/jev-probe/NOTE-framing-leak.md).
 
-### The twenty-two upstream Jev repos: what each one tests, and where we are
+### The twenty-four upstream Jev repos: what each one tests, and where we are
 
 These are cloned in this tree and gitignored. They are **not ours**: they are TypeSafe's and the
 community's, and each already asks a question we would otherwise re-ask badly. Derive the list with
@@ -225,7 +226,7 @@ own domain.
 [`docs/demos/upstream-repro/README.md`](docs/demos/upstream-repro/README.md)**: one line per repo,
 each linked to the receipt that produced it.
 
-**Four of twenty-two are now run, and running them produced things we could not have produced
+**Four more of the twenty-four are now run, and running them produced things we could not have produced
 ourselves.** `jev-rerank-bench`'s headline reproduces from its committed cache (Jev rubric 0.692
 against Cohere Pro 0.691, inside noise at p=.910), while a fresh `nevir_eval` over 1,383 pairs gives
 Jev **+4.2 points at p=.002**: one benchmark, one result inside noise and one real. Its
@@ -252,14 +253,14 @@ measurement rather than preference.
 
 | extension | mined from | offline tests | live-proven | calls Jev? |
 |---|---|---|---|---|
-| [`omp-harm-rule`](work/omp-harm-rule/) | the tool_call corpus | 12/12 recall, 0/38 FP | yes, working profile | **no** — four regexes beat it 12/12 to 11/12 |
+| [`omp-harm-rule`](work/omp-harm-rule/) | the tool_call corpus | 12/12 recall, 0/38 FP | yes, `jev-lab`; working profile OPEN | **no** — four regexes beat it 12/12 to 11/12 |
 | [`omp-jev-preaction`](work/omp-jev-preaction/) | `preaction-abstention` policy | 6/6 incl. a false-positive arm | yes, `jev-lab` | **no** — deterministic patterns only |
 | [`omp-jev-observer`](work/omp-jev-observer/) | the observe-and-log seam | 13/13 (8 seam + 5 emits-rows) | yes, `jev-lab` — but it emits the generic `tool_call_observed`, which other writers also emit, so its 3,339 rows are **not attributable to this package alone** | yes |
 | [`omp-jev-review`](work/omp-jev-review/) | `jev-review` | 13/13 (7 review + 6 behaviour-label) | **ran live, never scored** — 3 `diff_command_observed`, 3 `review_error` (HTTP 400), **0 `review_scored`** on this machine | yes — no regex for "this refactor changed a default" |
 | [`omp-jev-rerank`](work/omp-jev-rerank/) | `jev-rerank-bench` | 7/7 | **no live rows** — it emits `search_result_observed` and this machine has 0 | yes, **one** question — measurement killed the other two |
 | [`omp-jev-failure`](work/omp-jev-failure/) | `jev-agent-failure-benchmark` | 5/5 | yes — 2 live `failure_scored` rows (the README said `failure_classified`, a kind that does not exist) | yes, **one** multiclass question — chosen for coherence, NOT accuracy: on 9 fresh hold-out cases both framings tied 8/9 and the impossible-answer defect did not reappear |
 
-Eleven more `omp-jev-*` taste packages exist under [`work/taste-loop/`](work/taste-loop/) as
+Eleven more `omp-jev-*` taste packages exist under [`work/`](work/) as
 **unpromoted observe-only scaffolds**. They are not in the table above: not wired to working
 profiles, not live-proven, not promoted. See [Status](#status).
 
@@ -470,7 +471,7 @@ npm run backtest -- fixtures/real-excerpt-t1-t6.jsonl --out runs/try.json
 On 30 classifiable turns it measured **0.0447%** savings, and the candidate was **ruled out**. The
 verdict is scoped on purpose: it answers *same-turn price substitution*, not turn elimination.
 
-21 tests, and **7/7 planted mutations caught**. Three of those were real holes found under a suite
+29 tests, and **7/7 planted mutations caught**. Three of those were real holes found under a suite
 that was already green, one of them directly beneath the published figure. Reproduce that claim with
 `npm run mutate`: it plants seven named mutations one at a time, requires the baseline green first,
 restores every file and compares by sha256, and exits non-zero if any mutation survives.
@@ -650,15 +651,16 @@ bash foundation/gates.sh
 
 ```
 PASS 10-fixture-integrity (0s)
-PASS 20-receipt-freshness (1s)
+PASS 20-receipt-freshness (0s)
 PASS 30-no-secrets (0s)
-PASS 40-omp-compact-replay (0s)
+PASS 40-omp-compact-replay (1s)
 PASS 50-house-gates (1s)
-PASS 60-staged-deletion-lane (3s)
-PASS 70-tests-registry-sync (0s)
-PASS 80-lane-instrument-selftests (17s)
+PASS 60-staged-deletion-lane (2s)
+PASS 70-tests-registry-sync (1s)
+PASS 80-lane-instrument-selftests (18s)
+PASS 85-promotion-contract (0s)
 PASS 90-sidecar-verifier-wrapper (0s)
-PASS 95-numerals-ratchet (0s)
+PASS 95-numerals-ratchet (1s)
 PASS 96-verdict-status-agreement (0s)
 PASS 97-readme-counts (0s)
 gates: ALL GREEN
@@ -693,7 +695,7 @@ you are describing.
 | `bash scripts/verify-frozen.sh [ref]` | runs the suites in a clone pinned to a commit | no |
 | `./scripts/lane-status.sh` | renders `docs/demos/STATUS.tsv`, verifies every cited receipt | no |
 | `node demos/usage-shape/bin/shape.mjs <dir>` | lever census over session logs | no |
-| `cd demos/routing-backtest && npm test` | 21 tests | no |
+| `cd demos/routing-backtest && npm test` | 29 tests | no |
 | `cd demos/routing-backtest && npm run mutate` | 7 planted mutations, restore and compare | no |
 | `node scripts/jev-probe.mjs --replay` | decodes a recorded Jev response, no network | no |
 | `node scripts/jev-probe.mjs` | one live Jev call | **yes** |
@@ -783,8 +785,7 @@ on offer here — only receipts.
   machine without node fails every one of them, so check `node --version` first
 - A `TYPESAFE_API_KEY` **only** for the one live call. Everything else runs without one
 
-Runtimes, measured on an M3 Ultra: `foundation/gates.sh` about 16 s, of which stage 80 alone is 12 s;
-`usage-shape` about 19 s over 4,626 files. Nothing here is instant and nothing here needs a network.
+Runtimes, measured 2026-09-20 on an M3 Ultra: `foundation/gates.sh` about 24 s; `usage-shape` about 19 s over 4,626 files. Nothing here is instant and nothing here needs a network.
 
 ## Limitations
 
@@ -839,7 +840,7 @@ failing. Verdicts and receipts: `docs/demos/STATUS.tsv`; reopen conditions:
 ablate-and-rerun harness is built and frozen, its model arms pending a quiet window. Two verdicts
 are unsafe pending the same window. Everything else above ran.
 
-**22 of 22 upstream Jev repositories have been run**, not read. That sweep produced the one
+**Eleven of twelve census rows have been run**, not read (plus a smoke run; 24 third-party clones in the tree). That sweep produced the one
 shipped-code defect on this page (a `typesafe-sdk-js` timeout that kills a default Node process)
 and retracted four claims of our own, including a fabricated benchmark score and a "documented but
 unbuilt CLI" that was really a 103-commit-stale clone.
@@ -848,7 +849,7 @@ unbuilt CLI" that was really a 103-commit-stale clone.
 halves are load-bearing: 98% and 95% on long real transcripts through the replay harness, and
 every firing inside a running omp has returned passthrough.
 
-Twelve gates run on every commit and are green. This repository is public and its history is
+Thirteen gates run on every commit and are green. This repository is public and its history is
 published as written, including local filesystem paths.
 
 ### Process doctrine, and eleven unpromoted taste packages
