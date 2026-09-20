@@ -1061,3 +1061,45 @@ real answer — it gates A18 and costs nothing to keep.
 index-busy with a repair in flight, and the standing constraint forbids a second rebuild. The
 pane named what it rejected and why instead of running the wedged path — and said so in a
 supplement without being asked.
+
+## The dig BEAT does not survive its slices — fourth pooled number to fall, and I predicted it
+
+`dig-subset-breakdown-20260920.md` (5fb54b7). One tick earlier I told pane 2 to *expect the 0.058
+BEAT to weaken on at least one slice, because named subsets have overturned pooled numbers 3 for
+3 in this lane, always optimistically*. **It is now 4 for 4.**
+
+Recomputed independently from the locked export rather than read off the table:
+
+```
+S_wrong_selector  n=16  y_dig=4  always-invent 0.250  dig-iff 0.500
+```
+
+Exact match. **On the wrong-selector slice, digging costs twice what inventing costs** — hits
+exist (`count>0`) and answer nothing (`Y=0`), at loss 2 each. That is precisely the failure mode
+G6 names, and it is invisible in the pooled 0.058.
+
+| slice | n | always-invent | dig-iff | |
+|---|---:|---:|---:|---|
+| S_wrong_selector | 16 | 0.250 | **0.500** | LOSE |
+| S_lexical_trap | 20 | 0.150 | 0.000 | win |
+| S_topical | 82 | 0.183 | 0.000 | win |
+| S_control | 2 | 0.000 | 0.000 | **UNDERPOWERED** |
+| S_pass_probes | 30 | 0.000 | 0.000 | **UNDERPOWERED** |
+
+**The aggregate was carried by the two easy slices** (82 + 20 rows where dig is perfect) and the
+one slice that matters operationally is the one where it loses. A pooled mean over unequal slices
+is a weighted average of "easy" and "hard", and publishing it alone would have shipped a policy
+that doubles loss on the queries most likely to be asked in anger.
+
+**Two cells say UNDERPOWERED and report no direction** — `S_control` at n=2, and `S_pass_probes`
+with zero positives, where the two policies are identical *by construction* and a tie means
+nothing. Refusing to read a direction out of a structural tie is the same discipline as A11's
+`UNMEASURED` K3 one tick ago.
+
+Ordering verified again by timestamp: falsifier `ffef6d7` at `1789918109`, scorer added at
+`1789918198` — **89 seconds ahead.** Control check clean: `zzzz` count=0, y=0, no control-slice
+positives, so the harness was not silently blocked.
+
+**HELD, resting on n=16.** The pane said so plainly instead of leaning on three winning slices,
+and its NEXT is the right consequence: ship the local refusal on exactly that slice — dig only
+when hits exist *and* something is Y-eligible.
