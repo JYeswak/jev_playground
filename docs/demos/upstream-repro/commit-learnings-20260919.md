@@ -176,3 +176,43 @@ NO-CLAIM, and the author set this bound themselves: **it is 1 row in 50.** That 
 one sentence and not one more. It cuts against what the same agent wrote four hours ago, which is
 why it is in the ledger — a correction against one's own prior finding is worth more than a
 consistent story.
+
+## Wave C section 14 — CLOSED. The verification-weakening family is abandoned.
+
+SECTION 14e consequence rewrite — **FAIL, and the family is dead** — `61e953b`, harness committed
+at `beb45d5` BEFORE any call, so the falsifier was on record ahead of the result and not fitted to
+it. 400 calls, 0 errors, same corpus 78,242, same seed, same slice 12000..12400, same control,
+only the question changed. Re-verified by me via `consequence-threshold-check.py`.
+
+```
+jev 193 (48.25%) | rule 51 (12.75%) | both 40 | JEV-ONLY 153 | RULE-ONLY 11
+min 0.09  p10 0.24  p50 0.49  p90 0.69  max 0.85
+```
+
+**The falsifier I named fired.** Does it still fire on `br show … 2>&1 | head`, where no check was
+deciding anything? **Yes — 58 of 130 benign-truncation rows, 44.6%, against 50.0% on every other
+row.** A 5.4-point gap is not a distinction. The rewrite existed to stop answering the same way
+whether or not a check was deciding, and it answers the same way.
+
+**THE FINDING THAT GENERALISES PAST THIS QUESTION — half the verdicts are made by the threshold,
+not the model.** 197 of 400 rows (49.2%) sit within ±0.10 of the 0.50 line; p50 = 0.49. Verified:
+`within 0.10 of the 0.50 threshold : 197 (49.2%)`. Prevalence alone would have called this
+"near-constant"; the **near-threshold count says something sharper** — the fire/no-fire decision
+is being made by our threshold rather than by Jev. This lane's own rule already refuses a question
+with a near-threshold count that size, and we should be reading that column first, not second.
+
+Three wordings, two of them deliberate repairs of the prior failure, all three near-constant:
+53.75% → 48.25%. **A complete rewrite moved the answer rate five points.** Jointly: on this corpus,
+verification-weakening questions answer at 48–54% regardless of wording, and the surface feature
+they latch onto is present in roughly a third of all traffic.
+
+RULING: **the family is abandoned.** Not "needs another pass". The 145 `| head` adversarial set is
+NOT run — it was conditional on this surviving, and the author correctly refused it as "measuring
+how a dead question dies". A refusal with a stated trigger outranks another pass.
+
+What survives section 14 is the cheap rule (12.75–14.00% fire, inspectable, free) and the
+control-stratum evidence from 14d, which is about a *different* class entirely.
+
+NO-CLAIM: one slice, one run per command, no stability re-run — and with 49.2% of rows inside the
+near-threshold band, per-row fire/no-fire here is especially unstable. "Benign" is the author's own
+regex classification, not ground truth.
