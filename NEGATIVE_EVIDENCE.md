@@ -2552,3 +2552,45 @@ grep-c memories with no toml).
 
 **Evidence:** this commit; `cli/mod.rs:25807`; `preflight_guard.rs:2204-2278`
 (parse `[[rules]]` id/pattern/action/message).
+
+## R54 — WITHDRAW: isolated cass 0.8.0 4.2M ingest does not hit Quill posting cap
+
+**Recorded:** 2026-09-20 · **Level:** `[receipt]`
+**Hypothesis:** P1/`grok-challenge` "cass index --full hit Quill `doc_freq`
+cap 2^22 at commit (4,490,351 > 4,194,304)" is a stranger-reproducible cass
+0.8.0 ingest failure, so a frankensearch `PostingLimitExceeded` (code 9)
+issue can be filed from a clean `--data-dir`.
+**Minimal-repro:** isolated HOME + `CASS_DATA_DIR` + `CASS_OMP_DATA_ROOT`;
+42 JSONL files, 4,200,000 unique assistant messages `zwpostingcap N`;
+`cass index --data-dir … --full --json --no-progress-events`.
+**Expected-signal:** index rc≠0, or JSON `success:false`, or stderr/stdout
+containing `PostingLimitExceeded` / `4194304` / code 9.
+**Result (measured, inline):**
+- `cass` `/Users/josh/.local/bin/cass` **0.8.0** (2026-09-10).
+- generate 11.9 s; index **rc=0** `success:true` `elapsed_ms:148068`
+  `conversations:42` `messages:4200000` `documents:4200000`
+  `live_documents:4200000` fingerprint `content-v1:42:42:4200000`.
+- Status: FTS shadow **dropped** (`CASS_FTS_SHADOW_MAX_MESSAGES=100000`,
+  cites GH #413); **"Quill lexical search is unaffected"**.
+- Unique late phrase `zwpostingcap 4199999` → `total_matches:1` score ~29.6
+  `part041.jsonl`. Mid `2099978` same. The corpus is searchable.
+- Bare term `zwpostingcap` (present in every doc) → `total_matches` ~50
+  with `--limit 50`, hits only `part000` lines 1–N, scores ~5e-7. That is
+  IDF/ranking of a ubiquitous token, **not** a posting-list error and
+  **not** silent truncation of unique docs.
+- Live ZestData archive (P1's 4,490,351 df) was **not** re-opened.
+
+**Verdict:** WITHDRAW / VEIN-EXHAUSTED for filing cass/frankensearch from
+this synthetic shape. Isolated 4.2M unique-token ingest on cass 0.8.0 does
+not produce code 9. Do not ship a draft.
+
+**Retry-condition:** reopen only if **all** hold: (1) cass ≥ 0.8.0 on a
+clean `--data-dir` **this process created**; (2) index or a subsequent
+concat-merge commit reports `PostingLimitExceeded` / code 9 / declared
+`doc_freq` > 4,194,304; (3) the corpus is not the live ZestData archive
+(that path is a different machine state). A ubiquitous-term
+`total_matches` ≪ `documents` with unique phrases still hitting is **not**
+this retry.
+
+**Evidence:** `/tmp/cass-repro-cap.ix7l2y1n`; bead `jev-w6u` CLOSED
+WITHDRAW; this receipt amendment.

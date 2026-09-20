@@ -708,3 +708,17 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Boundary:** one machine, 10-skill manifest (full store unrunnable), live N=2, variance +
   57-candidate scale untested, morph unused, skillranker/ untouched. State: **VALIDATED**
   (offline ladder + live decisions; omp-seam wiring explicitly out of scope).
+
+## P4 cass posting-cap stranger-repro WITHDRAWN (2026-09-20)
+
+- **Lane:** offline. cass **0.8.0**. Isolated `/tmp/cass-repro-cap.ix7l2y1n`.
+- **Claim tested:** 4.2M unique messages sharing token `zwpostingcap` make
+  `cass index --full` hit Quill posting validation (`doc_freq` > 4,194,304,
+  code 9).
+- **Measured:** index rc=0, `success:true`, 4,200,000 documents in 148 s.
+  Unique late/mid phrases search-hit. Bare ubiquitous term `total_matches≈50`
+  is IDF, not a cap error.
+- **Verdict:** WITHDRAW. Do not file. **R54.** Bead `jev-w6u` closed.
+- **Boundary:** did not reopen the live ZestData archive whose 4.49M df was
+  P1's original observation. FTS shadow dropped at 100k (cass GH #413) —
+  Quill path still served unique phrases.

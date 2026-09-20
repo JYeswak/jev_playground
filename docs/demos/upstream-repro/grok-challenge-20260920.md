@@ -181,3 +181,27 @@ Nuisance-rate for shipped TTSR: **1 `bash-glob-silenced` fire** this session (wa
 ## Next
 
 A hook that runs `ee preflight check --cmd-base64` on bash tool_call would put cataloged recall at the moment of the command. That is a separate ship, not this toml. Auto-recall still waits on ee > 0.15.2. P2 live rank is theirs.
+
+## Phase 0.9 — cass posting-cap stranger-repro WITHDRAWN `[receipt]`
+
+P1 / this receipt previously said cass is dead because `index --full` hit
+Quill `doc_freq` 2^22 (4,490,351 > 4,194,304) on the live archive. That is
+**not** a stranger-verbatim cass 0.8.0 failure.
+
+Isolated (empty HOME, `CASS_DATA_DIR=/tmp/cass-repro-cap.ix7l2y1n/cass-data`):
+
+| step | measured |
+|---|---|
+| binary | cass 0.8.0 `/Users/josh/.local/bin/cass` |
+| corpus | 42 JSONL, **4,200,000** unique `zwpostingcap N` assistant texts |
+| `cass index --full --json --no-progress-events` | **rc=0** `success:true` 148.1 s, `documents:4200000` |
+| unique phrase `zwpostingcap 4199999` | `total_matches:1` score 29.59 `part041` |
+| unique phrase `zwpostingcap 2099978` | `total_matches:1` score 29.59 `part020` |
+| ubiquitous `zwpostingcap` `--limit 50` | `total_matches:51`, hits `part000` L1–50, score ~5e-7 |
+
+**OVERTURN** "do not wait on cass because ingest cannot complete at 4.2M" for
+a clean `--data-dir`. **NO-CLAIM** on the live ZestData 4.49M-df archive.
+**REFUSE** to file frankensearch/cass: frankensearch `parse_with_limits`
+code 9 is a **test** of the engine; cass 0.8.0 did not surface it here.
+
+Bead `jev-w6u` closed WITHDRAW. Ledger **R54**.
