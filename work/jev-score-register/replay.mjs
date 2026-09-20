@@ -14,6 +14,8 @@
  * Run: node --experimental-strip-types work/jev-score-register/replay.mjs [registerPath]
  *   (no API key needed, and that is the point — if it needs one, it is broken)
  */
+import { createHash } from 'node:crypto';
+import { readFileSync, existsSync, statSync } from 'node:fs';
 import { readRegister } from './register.mjs';
 
 const path = process.argv[2] ?? 'work/jev-score-register/scores.jsonl';
@@ -30,13 +32,33 @@ for (const row of rows) {
   byQuestion.get(row.questionKey).push(row);
 }
 
+/**
+ * PIN THE INPUT AT QUOTE TIME. Four times tonight a live number was quoted without
+ * its input pinned, and a later reader could not tell whether they were looking at
+ * the same data: real-allowed.json grew 77,767 -> 78,242 between two runs of one
+ * harness; a matched= denominator moved 15,525 -> 15,557 -> 15,618 mid-session;
+ * c6eb7ab's corpus drifted under a committed receipt; and this register is
+ * gitignored, so a quoted replay is not reproducible from a fresh clone.
+ *
+ * The fix is NOT to commit the log — a growing append log does not belong in git.
+ * The fix is that every quoted table carries the identity of the log it came from,
+ * so "is this the same data?" is decided by comparing one line instead of guessing.
+ */
+const digest = existsSync(path) ? createHash('sha256').update(readFileSync(path)).digest('hex') : null;
+const bytes = existsSync(path) ? statSync(path).size : 0;
+
 const FIRE = 0.5;
 console.log(`register        : ${path}`);
+console.log(`register sha256 : ${digest ?? 'ABSENT'}`);
+console.log(`register bytes  : ${bytes}`);
 console.log(`rows            : ${rows.length}${malformed ? ` (${malformed} malformed, skipped)` : ''}`);
 console.log(`api calls made  : 0   <- this script cannot call Jev; it does not import the client`);
 console.log(`models seen     : ${[...new Set(rows.map((r) => r.model).filter(Boolean))].join(', ') || 'none recorded'}`);
 console.log(`extensions      : ${[...new Set(rows.map((r) => r.extension).filter(Boolean))].join(', ') || 'none recorded'}`);
 console.log(`distinct inputs : ${new Set(rows.map((r) => r.identity)).size}`);
+console.log('');
+console.log('QUOTE THIS TABLE ONLY WITH THE sha256 AND ROW COUNT ABOVE. The register is an append');
+console.log('log and is gitignored: without them a later reader cannot tell it is the same data.');
 console.log('');
 console.log('question                       n    fired   fire%   mean   errors');
 
