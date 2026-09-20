@@ -120,6 +120,7 @@ Everything else under this root is a **vendored clone** and its tests belong to 
 | `work/skillranker-eval/test/contract.test.mjs` | `node --test work/skillranker-eval/test/contract.test.mjs` | skillranker EVAL CONTRACT process: frozen loss via oracle-kit `decisionLoss`, always-abstain 0.833, coin-flip worse, planted wrong-pick RED at loss 2, ≥0.90 hard FAIL, JSONL export, judge shape, invented noul gate refused | 12/12, this PR |
 | `work/jev-real-corpus-eval/test/score.test.mjs` | `node --test work/jev-real-corpus-eval/test/score.test.mjs` | frozen toolcall corpus (n=7846): Studio 0.212210043 / 1.495284221 reprinted, isError-only loses, planted RED | 10/10, this PR |
 | `work/omp-guard-rule/guard-rule.test.mjs` | `node --test work/omp-guard-rule/guard-rule.test.mjs` | the omp `tool_call` guard classifies the live class (`grep-as-proof`) and stays observe-only: every path returns `undefined`, `guard_error` exists so a throw is never scored as a pass, and `pipe-exit` is absent — dropped under R51 for a 55.2% fire rate | 5/5, this PR |
+| `scripts/selftest-lane-status-pipe.sh` | as written | the lane's honesty signal survives a pipe: good-path in-band line matches the real rc, and a PLANTED missing receipt yields rc=3 both unpiped and through `| tail` — the exact shape that read this gate 223 times in the dcg harvest | 3/3, mutation-proven (delete the in-band printf and 2 of 3 arms go RED) |
 
 **Rule:** a green here is the only green we may call *ours*.
 

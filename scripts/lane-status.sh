@@ -423,4 +423,11 @@ if [ "$FP_BEFORE" != "$FP_AFTER" ]; then
   printf 'The second attempt'"'"'s verdict is accepted whatever it says; instability cannot launder a RED.\n'
   exec env JEV_TRANSIENT_ATTEMPT=2 "$0" "$@"
 fi
+# PIPE-SURVIVAL (2026-09-20). This script's rc IS the lane's honesty signal: rc=3 means a STATUS
+# row cites a receipt that does not exist. Harvested from 78,242 dcg-allow commands: this script
+# was invoked through a pipe 223 times, e.g. `./scripts/lane-status.sh 2>&1 | tail -16; echo
+# "EXIT=$?"` — which reports TAIL's status, not ours. Confirmed live: `bash -c 'exit 3' | head -1`
+# yields rc=0. So the number is emitted in-band, as the final line, where no tail can cut it and
+# no $? can misread it. RETIRE when a 30-day harvest window shows no piped invocation.
+printf 'LANE-STATUS-VERDICT rc=%s (in-band; $? after a pipe reports the pipe, not this script)\n' "$rc"
 exit "$rc"
