@@ -119,19 +119,21 @@ Replace current playbook E (the list that says `e.g. product
 
    https://omp.sh/docs/extension-authoring
 
-   Confirm the ship shape on that page:
-   - `export default function (pi: ExtensionAPI) { pi.on(...) }`
+   Confirm the ship shape on that page, then match it to *this* repo:
+   - default export + `pi.on` — copy
+     `work/omp-harm-rule/harm-rule.ts:27-32` /
+     `work/omp-jev-observer/src/observer.mjs:50-53`
    - `package.json` `"omp": { "extensions": ["./src/index.ts"] }`
-     (legacy `"pi.extensions"` still accepted)
+     (legacy `"pi.extensions"` still accepted) — copy
+     `work/omp-jev-review/package.json:8-9`
+     (`observer` / `harm-rule` are single-file default exports and
+     do **not** carry this key)
    - install: `omp plugin install <path|git|npm>`
      or `omp --extension /absolute/path`
    Native/configured directory scan is `*.{ts,js}` only.
 
 2. Copy one working package in *this* repo, not a remembered
-   factory:
-   - `work/omp-harm-rule/harm-rule.ts:27-32`
-   - `work/omp-jev-observer/src/observer.mjs:50-53`
-   Manifest points at entry; default export registers `pi.on`.
+   factory. Do not ask one file to prove both shapes.
 
 3. **Neighbour co-presence before “zero events.”**
    Same session, same profile: a known-firing neighbour
@@ -147,7 +149,9 @@ Replace current playbook E (the list that says `e.g. product
        infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
          omp --profile=jev-lab --no-extensions \
              --extension=$HOME/.omp/profiles/jev-lab/agent/extensions/omp-jev-observer.ts \
-             -p 'run exactly: echo observer-live-proof' </dev/null
+             -p 'run exactly: echo observer-minimal-actual' </dev/null
+       # receipt: docs/demos/upstream-repro/omp-jev-observer-20260919.md:58
+       # sibling nonce on :59 is echo observer-dead-port
 
    Then offline arms with planted negatives, then **one live row**.
 
@@ -245,7 +249,7 @@ name the command that would have caught the miss.
 These are the queries `AGENTS.md:890,1410-1412` already publishes.
 Do not invent `--workspace <project>`. `--robot` or `--json` only.
 If `cass` is off `PATH`, steal the query from `AGENTS.md` and keep
-digging in `docs/demos/upstream-repro/` / `cass` is not a blocker.
+digging in `docs/demos/upstream-repro/`. Missing `cass` is not a blocker.
 
 **Goldmine principle:** repeated prompts are your best prompts. Mine
 history before inventing a new approach.
@@ -333,8 +337,9 @@ this shared tree. Override is a human step, last resort.
 
 Do not cite frozen-corpus `dcg test` rows from other sessions
 (`work/p3-calibration/toolcall-corpus-frozen.jsonl`) as *this* lane’s
-worked example — that is the selector hole. Do not confuse CLI `dcg`
-with the omp `dcg-guard` hook (`docs/INTEGRATIONS.md:88-90`).
+worked example — that is the selector hole. CLI `dcg` is the
+`git add -A` blocker (`AGENTS.md:249`). The omp `dcg-guard` hook’s
+fail-open cite is `docs/INTEGRATIONS.md:88-90` — a different tool.
 ```
 
 ### Patch 6.9 — Playbook I jsm (replace the command block)
@@ -393,6 +398,6 @@ Add to **What not to do**:
 | Pre-commit bug scan | `ubs <ts/py/rs files>` — exit 3 on docs-only is **not** a pass |
 | Skill lookup | `jsm search` if on PATH; else `docs/INTEGRATIONS.md:191` + in-tree default export |
 | Secret / unlinked dir | `infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- <cmd>` |
-| omp extension shape | https://omp.sh/docs/extension-authoring + `harm-rule.ts:27-32` |
+| omp extension shape | https://omp.sh/docs/extension-authoring + `harm-rule.ts:27-32` + `work/omp-jev-review/package.json:8-9` |
 | Absence claim | `requireKey` / `readRow` before “0 rows” |
 ```
