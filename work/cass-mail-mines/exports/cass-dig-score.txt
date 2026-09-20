@@ -1,0 +1,9 @@
+MINE cass-dig-vs-invent  store=cass  n=138  y_dig=22  prevalence=0.159420290
+  empty_success_rows (count>0 & y=0) = 4
+CONTROL always-invent            mean_loss=0.159420290
+BASELINE dig-iff-count>0         mean_loss=0.057971014  vs_control=BEAT
+BASELINE dig-iff-BM25/rank-hit   mean_loss=0.057971014  vs_control=BEAT
+Y  mechanical receipt-shaped / wrong-selector evidence (cass_dig_y.py) — not human edit-delta
+LOSS  invent-on-y1=1  dig-on-y0=2  else=0
+NO-CLAIM  [pending] promoted=0  no Jev call  no cass rebuild started
+EXIT 0  (count>0 baseline BEATs always-invent; rank baseline BEATs)

@@ -1,42 +1,29 @@
-# CASS dig-vs-invent live mine — 2026-09-20
+# CASS dig-vs-invent live mine — 2026-09-20 `[pending]`
 
-**Level:** `[pending]` · **promoted=0**  
-**Store:** CASS `/Volumes/ZestData/cass-data/agent_search.db`  
-**machineId:** `439e8c39-3223-4273-9ce4-4263468cbba7`  
-**Do not** start a cass rebuild. Muse skillranker pane 3 untouched.
+promoted=0. Studio live. No second cass rebuild.
 
-## Measure
-
-```bash
-CASS_TIMEOUT_SEC=60 CASS_LIMIT=10 \
-  python3 work/cass-mail-mines/scripts/run_cass_dig_live.py
-python3 work/cass-mail-mines/scripts/score_cass_dig.py \
-  work/cass-mail-mines/exports/cass-dig-rows.jsonl
-```
-
-- Queries: `work/cass-mail-mines/scripts/cass_dig_queries.txt` (n≥100; dig-vs-invent + wrong-selector + lexical-trap + `zzzz_cannot_exist_9c42`)
-- Export: `exports/cass-dig-rows.jsonl` (≥100 query rows) + `exports/cass-dig-hits.jsonl`
-- If `cass search --robot` times out 3× (60s each) → read-only sqlite sample (schema introspected; no invented tables)
-
-## Y / loss (mechanical)
-
-See `scripts/cass_dig_y.py`. Receipt-shaped hit (source_path + line, not AGENTS/SKILL doctrine basename) or wrong-selector evidence. **Not** human edit-delta (A04 full Y). Independent of raw `count>0` so empty-success can RED.
-
-| outcome | loss |
-|---|---:|
-| correct | 0 |
-| invent when y_dig=1 | 1 |
-| dig when y_dig=0 | 2 |
+## Store / mode
+- DB: `/Volumes/ZestData/cass-data/agent_search.db` (5,181,931 messages)
+- `cass search` hung under rebuild; `fts_messages` virtual table absent (shadow tables only)
+- Mode: **sqlite recent-window** — last **120,000** message ids, in-memory token AND-match, limit 10 hits/query
+- Queries: 138 from `work/cass-mail-mines/scripts/cass_dig_queries.txt`
 
 ## Measured
+| | |
+|---|---|
+| n | **138** |
+| y_dig | **22** |
+| prevalence | **0.159420290** |
+| always-invent mean loss | **0.159420290** |
+| dig-iff-count>0 | **0.057971014** **BEAT** |
+| dig-iff-BM25/rank-hit | **0.057971014** **BEAT** |
+| empty_success (count>0 & y=0) | 4 |
+| n_hits exported | 192 |
 
-**LIVE: AWAITING Studio ExternalShell** for this commit. Box-scoped sand has no `cass` / no `/Volumes/ZestData`. Parent: run `PARENT_CASS_EXTERNALSHELL.md`, then numbers land in `exports/cass-dig-score.txt` and this section is replaced.
+Loss: invent-on-y1=1, dig-on-y0=2, else=0. Y from `cass_dig_y.py` (mechanical receipt-shaped / wrong-selector).
 
-```text
-(n / prevalence / always-invent / dig-iff-count>0 / dig-iff-BM25 — TBD from Studio)
-```
+## Finding
+On this recent window, **digging when any hit exists beats always-invent** (0.058 vs 0.159). CASS mountain has dig-vs-invent alpha under Jeff controls — unlike mail ack/importance where abstain won.
 
 ## NO-CLAIM
-
-- Mechanical Y proxy ≠ pane edit-delta usefulness.
-- No Jev call. No rebuild. Not a promotion.
+Not full-index cass search; not human edit-delta labels; not a promotion. Rebuild still wedged — re-run when FTS virtual table returns.
