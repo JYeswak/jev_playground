@@ -520,3 +520,19 @@ is unchanged from `docs/demos/omp-seam-live-20260918.md`.
   abstentions) remains
   `docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md` and was
   not re-run. n=12 diagnostic_synthetic cannot promote.
+
+---
+
+## math-and-next-level @ asupersync c80b20609 / franken_engine fc37f2dec / skillranker bb52b8f25 (2026-09-20)
+
+- Receipt: `docs/demos/upstream-repro/math-and-next-level-20260919.md`.
+- Re-derived identities only: always-abstain \(10/12=0.833\), Jev mean loss \(2/12=0.167\),
+  STATUS census 7 CLEARED / 10 HELD / 8 RULED_OUT / **0 PROMOTED**. No live Jev.
+- Unused Franken math cited at `file:line`: Bayes \(E[L|a]=\sum_s\pi(s)L(s,a)\), four AND-gates
+  (empty evidence fails), dominance fraction, conformal \(\alpha=0.10\), e-process reject at
+  \(e\ge 20\).
+- Next ticks ranked: (a) `decisionLoss` in oracle-kit, (b) \(t^\star(\pi)\) on frozen priors,
+  (c) four-gate *view* over existing receipts, (d) selector≡claim, (e) VOI / NP / regret.
+- **Boundary:** no STATUS rewrite, no new gate stage, no crate import, no key. Inventory
+  remains `franken-crate-alpha-20260919.md`. **promoted=0 untouched.**
+- Lane: offline. Claim: `[oracle]` (public HEAD + committed receipts).
