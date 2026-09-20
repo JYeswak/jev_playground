@@ -301,3 +301,22 @@ quoted span is code when it occupies the slot after an interpreter code-flag (-c
 --expression), NOT when its binary happens to be an interpreter. `-p` is deliberately excluded
 and arm 13 proves why: `perl -p` is code but `omp -p "..."` is a prompt, and including `-p`
 broke the quoted-prompt arm.
+
+## `work/omp-jev-review/behaviour-label.test.mjs` — 6 tests
+
+Run: `node --test work/omp-jev-review/behaviour-label.test.mjs` (no API key; reads git only).
+
+Guards the COMPUTED behaviour label built for jev-fzw. The incumbent label was a mechanical
+proxy — any non-test source edit counts — which called a MISS when the model correctly said a new
+standalone script changes no caller behaviour. The label was the bottleneck, not the score.
+
+1. the label is deterministic — same commit, same answer
+2. PLANTED NEGATIVE: a docs-only commit is not behaviour-changing
+3. PLANTED NEGATIVE: a .md mention is not a caller
+4. a registered entry point counts as reachable even with zero importers
+5. the row always carries a reason — a bare verdict is not a label
+6. mechanical and computed are both reported, so disagreement stays visible
+
+Test 3 pins a defect found in this rule on its first run: it reported "referenced by README.md"
+and counted a documentation mention as a caller — mention-vs-use, inside the rule written to fix
+a bad label.
