@@ -38,6 +38,7 @@ SCORE = OUT / "cass-dig-score.txt"
 DB = os.environ.get("CASS_DB", "/Volumes/ZestData/cass-data/agent_search.db")
 TIMEOUT = int(os.environ.get("CASS_TIMEOUT_SEC", "60"))
 LIMIT = int(os.environ.get("CASS_LIMIT", "10"))
+MAX_QUERIES = int(os.environ.get("CASS_MAX_QUERIES", "0"))  # 0 = all
 
 
 def log(meta: list[str], msg: str) -> None:
@@ -226,10 +227,13 @@ def main() -> int:
         for ln in QUERIES.read_text().splitlines()
         if ln.strip() and not ln.startswith("#")
     ]
-    log(meta, f"n_queries={len(queries)}")
-    if len(queries) < 100:
+    if MAX_QUERIES > 0:
+        queries = queries[:MAX_QUERIES]
+    log(meta, f'n_queries={len(queries)} max_queries={MAX_QUERIES or "all"}')
+    if len(queries) < 2:
         print(f"REFUSE: only {len(queries)} queries", file=sys.stderr)
         return 2
+    # n<100 ok when CASS_MAX_QUERIES set (timed subset)
 
     mode = "cass"
     results: list[tuple[str, dict]] = []
@@ -267,8 +271,12 @@ def main() -> int:
 
     write_outputs(results, mode, meta)
     # update score_cass_dig import path by running as subprocess for cleanliness
+    score_cmd = [sys.executable, str(SCRIPTS / "score_cass_dig.py")]
+    if len(results) < 100:
+        score_cmd.append("--allow-small")
+    score_cmd.append(str(ROWS))
     p = subprocess.run(
-        [sys.executable, str(SCRIPTS / "score_cass_dig.py"), str(ROWS)],
+        score_cmd,
         capture_output=True,
         text=True,
     )

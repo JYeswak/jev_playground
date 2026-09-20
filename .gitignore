@@ -98,3 +98,4 @@ work/cass-mail-mines/exports/*.jsonl
 !work/cass-mail-mines/exports/*-score.txt
 !work/cass-mail-mines/exports/*-meta.txt
 !work/cass-mail-mines/exports/cass-dig-sqlite-schema.json
+!work/cass-mail-mines/exports/cass-probe-*.json
