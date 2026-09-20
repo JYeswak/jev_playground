@@ -2458,3 +2458,46 @@ Also corrected while verifying: the shipped-code state this entry describes
 was uncommitted when written — HEAD carried `pipe-exit` live and no R51
 until `e26b10f`. Installed code was ahead of committed code, which no gate
 here checks for.
+
+## R52 — KILL: ee 0.15.2 preflight RECALL cannot close; tripwires do not feed it
+
+**Recorded:** 2026-09-20 · **Level:** `[receipt]` · Clean-room
+`/private/tmp/ee-p4-recall-20260920` plus `--workspace /Users/josh/Developer/jev`.
+Receipt: `docs/demos/upstream-repro/grok-challenge-20260920.md`.
+
+**Hypothesis:** WRITE-BACK (`ee remember --kind risk`) or a directly created
+tripwire reaches `ee preflight check`, so the learning loop can close on 0.15.2.
+
+**Minimal repro:** explicit `--workspace` every call. `ee remember --kind risk`
+naming `grep -c`; `ee preflight check --cmd 'grep -c foo bar'`. Then
+`ee diag tripwire` with `task_contains_any("grep")`; `ee tripwire check` (triggered);
+repeat preflight check; `ee preflight run --check-tripwires`.
+
+**Expected signal (if true):** `matchedMemories` or `matches` nonempty for
+`grep -c` after remember and/or after a triggered tripwire.
+
+**Result (measured, inline):**
+- jev store: doctor `ok`/`healthy`; `tripwire list` `total_count: 0`; grep-c
+  preflight `matches []` `matchedMemories []` `degraded []` rc=0.
+- remember risk about grep-c: memory id minted; preflight still empty triple.
+- remember risk about `rm -rf`: preflight `matchedMemories` 1 — **builtin gate**,
+  not a general recall path.
+- `ee tripwire` verbs: `list`, `check` only. Sole writer: `ee diag tripwire`
+  (fixture seeder). Quoted condition triggers `tripwire check`; unquoted
+  `task_contains_any(grep)` is a parse error.
+- Triggered armed tripwire: preflight check still empty; `preflight run
+  --check-tripwires` `tripwires_set: 0` `tripwires []`.
+
+**Verdict:** VEIN-EXHAUSTED on 0.15.2. TTSR already occupies the tool-call
+injection slot (`omp://ttsr-injection-lifecycle.md`); it does not recall
+`ee remember`. Do not shim `diag tripwire`.
+
+**Retry-condition:** `ee tripwire` grows a non-`diag` writer **and**
+`ee preflight check` surfaces an armed tripwire that `tripwire check` already
+marks `triggered` **and** that path fires for a command outside the builtin
+destructive set (witness `grep -c`).
+
+**Evidence:** receipt above; clean-room memories
+`mem_01M309988RE1XT4VJWP16190AM` (grep, invisible) /
+`mem_01M3099H34EFB8W4KB8AD0V1YT` (rm, visible); tripwire
+`tw_grok_p4_grep_quoted`.

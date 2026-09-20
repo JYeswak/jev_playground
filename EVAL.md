@@ -666,3 +666,17 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - **Negative:** `NEGATIVE_EVIDENCE.md` R45.
 - **Boundary:** no harness, no export, no Jev call, no omp seam, no
   STATUS.tsv row. Authored catalog ≠ measurement. State: **EXPLORED**.
+
+## P4 grok-challenge — RECALL kill + independent class rates (2026-09-20)
+
+- Receipt: `docs/demos/upstream-repro/grok-challenge-20260920.md`. Level `[receipt]`.
+- **U2:** ee 0.15.2 `preflight check` does not consume `ee remember` for
+  non-builtin commands, nor an armed tripwire that `tripwire check` marks
+  `triggered`. KILL; retry in R52. TTSR supersedes the tool-call slot only.
+- **U1:** corpus N=78242 `harvestedAt=2026-09-20T05:22:11.742Z`. Own
+  structural-grep rate 965/78242 = 1.2334%; seed `20260920P4` n=24 strict
+  labels 5 TP / 19 FP (79% FP). git-add-all n=1. P3 receipt not shipped.
+- **U3:** `sr-advise-*` absent → UNDERPOWERED.
+- **Negative:** `NEGATIVE_EVIDENCE.md` R52.
+- **Boundary:** no Jev call, no morph (session predates MCP mount), no ee
+  source, home store untouched. Morph is MCP at `.omp/mcp.json`, not missing.
