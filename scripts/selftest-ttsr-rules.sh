@@ -19,7 +19,11 @@ pass=0; fail=0
 note() { printf '  %-4s %s\n' "$1" "$2"; }
 
 fires() { # fires <rule-file> <command-string>  -> 0 if the rule triggered
-  omp ttsr test --rule "$1" --source tool --tool bash "$2" 2>&1 | grep -qE '^Triggered \([1-9]'
+  # Capture first, match second: `omp … | grep -q` under `set -o pipefail` reports omp's
+  # exit (1 on no-trigger) instead of grep's match — the pipe-exit class inside its own guard.
+  local out
+  out=$(omp ttsr test --rule "$1" --source tool --tool bash "$2" 2>&1)
+  grep -qE '^Triggered \([1-9]' <<<"$out"
 }
 
 arm() { # arm <rule-file> <expect fire|quiet> <label> <command>
