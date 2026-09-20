@@ -1005,3 +1005,19 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   Read-once owns them. **R65.**
 - **Boundary:** payload cap 20 KB; concentration MD1 top-share 0.49
   (closest to reconsideration, still short on both axes).
+
+## P2 exposure-ranked census, no rules (2026-09-20)
+
+- **Deliverables:** `docs/essays/exposure-census-20260920.md` (ranked
+  17 rows) + `work/exposure-census-20260920.tsv` (machine table for
+  P3's exposure-check.sh: label, pattern, not/path patterns, hits, N,
+  sessions, top1, detectable, verdict, evidence).
+- **Top 5 by exposure:** backtick-quotes 1,417; glob-silenced 820
+  (shipped); pipe-exit 807 (shipped); destructive 258 (dcg-redundant);
+  timeout-led 247 (form-correct). Detectable 5/5 — detectability was
+  never the constraint.
+- **Handed class:** number-without-denominator, 5 today + MD1-adjacent;
+  undetectable as single-string predicate (MD1 FP 1.00), already
+  containered as `scripts/denominator-sweep.sh` — REDIRECT, not refuse.
+- **Boundary:** harvest classes lack session attribution (stated per
+  row); one labeller; patterns recorded for rerun, not asserted final.

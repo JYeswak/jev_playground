@@ -1,0 +1,17 @@
+label	pattern	not_pattern	path_pattern	hits	N	sessions_touched	top1_share	detectable_in_payload	verdict	evidence
+grep-glob-silenced	grep[^|;&]*\*[^|;&]*2>/dev/null			820	78242	unknown	unknown	bash	SHIPPED	selftest-ttsr-rules.sh
+pipe-exit-tail-head	\|\s*(head|tail)\b[^;&|]*[;&]\s*[^;]*\$\?			807	78242	unknown	unknown	bash	SHIPPED	selftest-ttsr-rules.sh
+backtick-in-quotes	("[^"\n]*`[^`\n]*`[^"\n]*")|('[^'\n]*`[^`\n]*`[^'\n]*')			1417	78242	unknown	unknown	bash	REFUSE-fence	R59
+destructive-list	git\s+reset\s+--hard|git\s+clean\s+-fd|(?<![\w-])rm\s+-rf?\b			258	78242	unknown	unknown	bash	REFUSE-redundant-dcg	R61-dispositions
+timeout-led	^\s*(command |/usr/bin/)?timeout\b			247	78242	unknown	unknown	bash	REFUSE-form-correct	R55-analog
+empty-as-finding-B0	returned nothing|found nothing|no relevant|reclaimed nothing|came back empty|\bno output\b|nothing there|empty (result|output|response)			218	45220	63 files	0.11	text	REFUSE-FP1.00	R57
+workaround-talk-A1	workaround			147	45220	52 files	0.10	text	discussion-not-defect	R56
+foreign-pm	(?<![\w-])(pnpm|yarn)\b|(?<![\w-])bun\s+(install|add)\b			110	78242	unknown	unknown	bash	REFUSE-FP1.00	R62
+pipe-status-in-edit-SH2	\|[^|\n]*[;&\n][^\n]*\$\?		\.sh$	95	416	30 sessions	0.21	edit	REFUSE-FP1.00	R65
+workaround-upstream-A2	workaround AND crate|upstream|dependenc|librar|pinned|vendored|third.party			89	45220	40 files	0.10	text	REFUSE-FP0.95	R56
+number-no-prov-MD1	\d+(\.\d+)?%?|\b\d{2,}\b WITHOUT lane|N=|20\d\d|model|test|oracle|live|seed		\.md$	37	3588	9 sessions	0.49	edit	REFUSE-FP1.00-floor	R65
+empty-timeout-B1	B0 AND timeout|timed out|124|didn't run|never ran|seconds			27	45220	16 files	0.15	text	REFUSE-floor-FP	R58
+record-body-backtick	(br|gh|git)\b[^|\n;]*?(--reason|--title|--message|-m)\s+"[^"\n]*`[^`\n]+`			12	78242	unknown	unknown	bash	REFUSE-floor	R59
+absent-shapes	branch-create|vercel-direct|bun-test|secrets-true			0-4	78242	unknown	unknown	bash	REFUSE-absent	R61-R62
+number-without-denominator	handed-5-today; MD1-adjacent			5+37	mixed	unknown	unknown	text-NO-tool-YES	REDIRECT-denominator-sweep	dispatch-20260920
+refused-guard-instances	R47-R48			4 each	case-files	unknown	unknown	case-specific	exposure-only	R47-R48
