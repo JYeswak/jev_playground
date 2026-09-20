@@ -1,0 +1,12 @@
+{
+  "name": "omp-jev-promise",
+  "version": "0.1.0",
+  "description": "Observe-only headline-vs-CTA scorer. Exact verb match is a regex; Jev scores the paraphrase remainder.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["omp-plugin", "omp-extension", "pi-package", "jev", "taste"],
+  "omp": { "extensions": ["./src/index.ts"] },
+  "pi": { "extensions": ["./src/index.ts"] },
+  "files": ["src", "README.md"],
+  "scripts": { "test": "node --experimental-strip-types --test test/" }
+}
