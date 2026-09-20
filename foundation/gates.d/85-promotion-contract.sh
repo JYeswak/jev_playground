@@ -3,7 +3,10 @@
 #
 # CREATION GATE, answered (this lane refuses instruments that cannot answer all four):
 #   1. CONSUMER  — foundation/gates.sh, and any human reading docs/demos/STATUS.tsv.
-#   2. GATE      — no STATUS row may carry verdict PROMOTED without four proven gates.
+#   2. GATE      — no STATUS row may carry verdict PROMOTED without NAMING four gates and
+#                  citing a receipt that exists. See MEASURED BOUNDARY below: this is a
+#                  presence check, not a proof check. It said "four proven gates" until
+#                  2026-09-20, which overstated what the code does.
 #   3. DEFECT    — observed: the lane has run at promoted=0 all session with NO definition
 #                  of what promotion would require. "Promoted" was unreachable because it was
 #                  undefined, not because the bar was high. An undefined bar cannot be cleared
@@ -23,6 +26,22 @@
 # Usage:
 #   foundation/gates.d/85-promotion-contract.sh [STATUS_TSV]
 #   foundation/gates.d/85-promotion-contract.sh --selftest     # planted negatives; must fire RED
+#
+# MEASURED BOUNDARY (2026-09-20, conductor, on this gate which the conductor wrote):
+#   A row named JUNK-nothing-was-done, whose reason field reads
+#   "equivalence-capability-performance-adversarial-are-just-words-i-typed" and whose receipt
+#   points at docs/RULES.md, PROMOTES GREEN through this gate. Reproduce:
+#     head -1 docs/demos/STATUS.tsv > /tmp/j.tsv
+#     printf 'JUNK\t5\t0\tPROMOTED\tpane1\tdocs/RULES.md\tequivalence capability performance adversarial\t\tx\tmeasurement\n' >> /tmp/j.tsv
+#     foundation/gates.d/85-promotion-contract.sh /tmp/j.tsv     # -> OK, exit 0
+#   So this stage enforces VOCABULARY AND A LIVE RECEIPT PATH, nothing more. The substantive
+#   bar — rungs 1-4 each cleared by a non-author, a non-conductor owner, a kill criterion —
+#   lives in docs/demos/PLAN.md and is enforced by PEOPLE. No code checks it.
+#   Do not read a green here as "promotion earned". Read it as "the row is well-formed".
+#   NOT FIXED BY DESIGN: a keyword check cannot verify that a gate was run, and a stricter
+#   string rule would only move the same mention-vs-use defect one level deeper. The honest
+#   fix is this disclosure. RETIRE THIS NOTE when a promoted row must cite a per-gate receipt
+#   that lane-status.sh integrity-checks, at which point the check becomes real.
 set -uo pipefail
 
 # Stages are invoked by foundation/gates.sh from an arbitrary cwd; anchor to the repo root.
