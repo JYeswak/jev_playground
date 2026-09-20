@@ -3,13 +3,20 @@
 Inventory only, no code touched. Every count below was measured 2026-09-20
 ~18:38–18:55Z from live session JSONL and live binaries, exit codes unpiped.
 
-**Headline, and it overturns a committed verdict:** `ee` is **not** dead.
+**Headline 1, and it overturns a committed verdict:** `ee` is **not** dead.
 `ee-repair-blocked-20260920.md` measured the **home** store. A *second*,
 **healthy** store exists at `jev/.ee/` (created 12:22 today) and the full
 `remember → search → preflight` surface returns rc=0 against it. The loop's
 real blocker is not `ee`; it is that **the two extensions that would close
 the loop already exist, already live in a loaded surface, and have never
 run in this repo.**
+
+**Headline 2, and it changes how every claim in this map must be read:**
+**extension loading is pinned at session start.** A muse session with 5,737
+tool calls was still appending 47 minutes after guard-rule was installed and
+carries **zero** guard-rule rows; meanwhile it still emits rows from
+extensions that are installed nowhere today. **Install ≠ active, uninstall ≠
+inactive**, and a zero-row install may be untested rather than broken.
 
 ---
 
@@ -58,6 +65,15 @@ rg -l 'pretooluse-advise' ~/.omp/config.yml ~/.omp/profiles/*/config.yml \
 
 # ambient-recall extension footprint
 find ~/Developer ~/.ee -maxdepth 4 -name hook-state -type d
+
+# session-pinning: is a zero-row install untested, or actually inert?
+for p in ~/.omp/profiles/*/; do
+  echo "$p $(find "$p/agent/sessions" -name '*.jsonl' -newermt '2026-09-20 11:05:00' | wc -l)"
+done
+f=~/.omp/profiles/muse/agent/sessions/-Developer-jev/2026-09-17T22-29-58-828Z_*.jsonl
+grep -c tool_execution_start "$f"        # 5737
+grep -o 'com\.zeststream\.[a-z0-9.-]*\.\(decision\|diagnostic\|event\)\.v1' "$f" \
+  | sed 's/com\.zeststream\.//' | sort | uniq -c | sort -rn   # no omp-guard-rule
 ```
 
 ---
@@ -111,10 +127,16 @@ flowchart TB
   CMP -.-> EXT
   GP -.-> GR
 
+  PIN["LOADING PINNED AT SESSION START<br/>muse session: 5,737 tool calls,<br/>still appending 47min post-install,<br/>0 guard-rule rows<br/>install != active, uninstall != inactive"]:::caveat
+  PIN -.-> GR
+  PIN -.-> AMB
+  PIN -.-> N11
+
   classDef live fill:#123d1c,stroke:#3fbf5f,color:#e8ffe8
   classDef dead fill:#3d1212,stroke:#e05050,color:#ffe8e8,stroke-dasharray:5 3
   classDef broken fill:#4a1d00,stroke:#ff9040,color:#fff0e0
   classDef partial fill:#3d3612,stroke:#d4c04a,color:#fffbe8
+  classDef caveat fill:#1c2b45,stroke:#6f9ed8,color:#e8f0ff
 ```
 
 ---
@@ -139,7 +161,8 @@ including it inflates every emitter name by ~2 and `omp-guard-rule` to 223.
 | path | what it is | KEEP/DISCARD/ALIGN | reason |
 |---|---|---|---|
 | `~/.omp/agent/hooks/pre/guard-rule.ts` | canonical (sha `f10f7e16…`) | KEEP | fired: 61 pass + 1 fire |
-| `~/.omp/profiles/{claude,codex,glm,grok,muse,omp-1,omp-2,omp-3}/…/guard-rule.ts` | 8 installs, all canonical `f10f7e16…` | KEEP | claude fired 1 `guard_pass`; codex 10 diag rows; **glm/grok/muse/omp-1/omp-2/omp-3 = installed, 0 rows, never fired** (those profiles have no sessions) |
+| `~/.omp/profiles/{claude,codex,glm,grok,muse,omp-1,omp-2,omp-3}/…/guard-rule.ts` | 8 installs, all canonical `f10f7e16…` | KEEP | claude fired 1 `guard_pass`; codex 10 diag rows. **glm / grok / omp-1 / omp-2 / omp-3 = installed, 0 rows, UNTESTED** — `find … -newermt '2026-09-20 11:05'` returns 0 sessions since install (last activity 2026-09-05, 2026-09-14, and 2026-08-21 ×3). Not "never fired"; never given a chance. **muse = installed, 0 rows, and DID run** — see the session-pinning row below |
+| **(finding) hook loading is pinned at session start** | `muse/…/-Developer-jev/2026-09-17T22-29-58-828Z_…jsonl` — 48MB, **5,737 tool calls**, still being appended at 18:52Z, 47 min after the 18:05Z install | **ALIGN — changes how every install in this map is verified** | That one session emits 3,740 dcg-bridge + 3,647 rch-lane-bind + 54 harm-rule + 36 jev-route + observer/review/commit/preaction rows, and **zero guard-rule rows**. A session started 2026-09-17 carries the extension set resolved at *its* start: a hook installed mid-flight is invisible to it, and extensions since **removed** keep firing (muse has no `agent/extensions/` dir today, yet the session still emits `omp-jev-commit`). **Install ≠ active, and uninstall ≠ inactive. Only a session started after the install tests the install** |
 | `~/.omp/profiles/jev-lab/…/guard-rule.ts` | **DRIFTED** — sha `d26727a0…`, receipt pins src `e2479f1` vs others `3108697` | **ALIGN (defect)** | `diff` shows it still carries `if (command.includes('\| head') …) return { cls: 'pipe-exit' }` — the class **dropped under R51**. The one live profile is running the one stale copy, and it is the copy that fires a retired class |
 | `~/.omp/agent/extensions/dcg-guard.ts` | 27KB blocker, `pi.on("tool_call")` | KEEP | **emits zero `appendEntry` rows** — `rg -c appendEntry` = 0. It blocks but is invisible in the ledger. The 219,108 `omp-dcg-bridge` rows come from `omp-extensions/dcg-tool-bridge.ts`, a different file |
 | `~/.omp/omp-extensions/dcg-tool-bridge.ts` | 219,108 rows (`dcg_allow` 222,277 / `dcg_block` 1,355 by kind) | KEEP | largest emitter in the system |
@@ -237,11 +260,12 @@ Each step names its blocker. Steps 1–5 need nothing from a broken `ee`.
 
 | # | step | blocker | `ee`-broken? |
 |---|---|---|---|
-| **1** | **Re-install `guard-rule.ts` into `jev-lab` from canonical source.** `bash work/omp-guard-rule/install-guard-rule.sh jev-lab`; then `shasum -a 256` must equal `f10f7e16f9375c41ff25ad5d4c84265fedf13b4512a444e4c41be3611050a38f` across all 10 installs. | **None.** One command. The only live profile is running the only stale copy, and it fires `pipe-exit`, retired under R51. | no |
+| **0** | **Adopt one verification rule before any of the below: a hook install is unproven until a session started *after* it emits a row.** Measured: the muse session with 5,737 tool calls was still appending 47 min after the install and shows 0 guard-rule rows, because its extension set was resolved at its 2026-09-17 start. | **None — a rule, not code.** Without it, steps 1/4/5/6 will each be "verified" against a long-running session that cannot see them, and will each read as failure. This is also why 5 packages (failure, dispatch, foreman, rerank, commit) hold rows while being installed nowhere today. | no |
+| **1** | **Re-install `guard-rule.ts` into `jev-lab` from canonical source, then start a NEW session to verify.** `bash work/omp-guard-rule/install-guard-rule.sh jev-lab`; `shasum -a 256` must equal `f10f7e16f9375c41ff25ad5d4c84265fedf13b4512a444e4c41be3611050a38f` across all 10 installs; a fresh session must then emit a `guard_pass`. | **None.** One command plus one fresh session (step 0). The only profile with post-install sessions running jev work is on the only stale copy, and it fires `pipe-exit`, retired under R51. | no |
 | **2** | **Reconcile R51 vs `guard-fp-rate-20260920.md` on `pipe-exit`, in one ruling.** Either re-add the class (fp-rate measured 0.053 FP over n=100, disposition KEEP) or amend the fp-rate receipt to record that its KEEP was overturned. | **A decision, not code.** Two committed receipts give opposite verdicts on the same class; step 1 silently enacts one of them. Also touches `hardening-20260920.md` R48. | no |
 | **3** | **Add `--verify` to `install-guard-rule.sh`** — compare installed shasum to `INSTALL-RECEIPT.txt` across all profiles, exit 3 on drift; add it as a `scripts/selftest-*.sh` arm so stage 80's glob picks it up. | **None.** Drift existed for ~7h and was found only by hand-diffing during this mapping run. | no |
 | **4** | **Wire guardpack tier-1, or delete the installed copy.** Point a harness PreToolUse bash hook at `jev/.guardpack/pretooluse-advise.sh`, or `rm -r jev/.guardpack` and stop counting it as installed. | **None.** Currently the worst state: installed, unwired, 2 smoke rows in one second. Its own installer calls this "the default failure". Note: its class list also carries `pipe-exit` → gated on step 2. | no |
-| **5** | **Run `ee orient` once in jev to create `jev/.ee/hook-state`, then confirm `ee-ambient-session-start` fires on the next session_start.** The extension is already in a loaded surface; it has produced `hook-state` in 7 other repos and never in jev. Check `EE_AMBIENT_CONTEXT` is not disabled in the jev lane's env. | **None — this is the single highest-value step and it is unblocked.** The recall leg is *installed and working elsewhere*. Nobody in this repo has noticed, because it emits no `appendEntry` row and every census we run is a row census. | **no — and this is the correction to the "ee is dead" posture** |
+| **5** | **Run `ee orient` once in jev to create `jev/.ee/hook-state`, then start a NEW session and confirm `ee-ambient-session-start` fires.** The extension is already in a loaded surface; it has produced `hook-state` in 7 other repos and never in jev. Check `EE_AMBIENT_CONTEXT` is not disabled in the jev lane's env. Verify by the state file, **not** by a row census — it emits no `appendEntry`. | **None — this is the single highest-value step and it is unblocked.** The recall leg is *installed and working elsewhere*. Nobody here has noticed, because it emits no `appendEntry` row and every census we run is a row census. Needs step 0: a running session will never load it. | **no — and this is the correction to the "ee is dead" posture** |
 | **6** | **Make the write-back land: confirm `ee-failure-journal.ts` produces entries in `jev/.ee/`.** 14,196 `bash_failure` rows, `ee journal list` = `entryCount: 0`. Instrument once (`--json` to a log, or check `EE_BIN` resolution and the `event.details.exitCode` parse) and re-measure. | **Partly `ee`.** In the **jev** store `ee journal append` should work (`remember` proves writes land). In the **home** store it is hard-dead: `EE-E040`. Since the hook passes no `--workspace`, **its behaviour depends entirely on the session cwd** — a jev session writes to the healthy store, any session outside a workspace writes to the broken one. **⚠ `ee`-broken for every non-jev cwd.** | **partly** |
 | **7** | **Close `remember → preflight`, or rule it unclosable.** Today `ee remember --kind risk` does **not** surface in `ee preflight check`. Find the actual rule surface (`ee tripwire`? `ee claim`? workspace rules config?) and prove one authored rule matches one command. | **Not EE-E040 — an unknown surface.** `pane2-ee-feedback-loop.md` Unit 1 names this round trip as the STOP gate for everything downstream, and it fails **in the healthy store**. The blocked receipt attributed this to migration drift; that attribution is wrong. **This is the real Unit-1 blocker and it is newly identified here.** | **no — and the old diagnosis was wrong** |
 | **8** | **Seed 4 command-shaped rules** (pipe-then-read-rc, grep-as-proof, env-vs-argv, digest-pinned-to-live-file), each with a corrected command, per `pane2` Unit 2. Do **not** bulk-import all ~50 `NEGATIVE_EVIDENCE` entries. | **Step 7.** Seeding a surface that does not recall is wallpaper. | no |
@@ -259,7 +283,7 @@ Each step names its blocker. Steps 1–5 need nothing from a broken `ee`.
 - **Row counts are live-monotonic.** As-of 2026-09-20T18:55Z with this session's transcript excluded. Re-running will not reproduce these integers; the *ordering* and the *zero/non-zero* distinctions are the durable content. The 2-row tail entries in an unfiltered census are this session quoting emitter names — I excluded `--private-tmp--` and say so rather than pinning a number I know rots.
 - **I did not run** `foundation/gates.sh`, any selftest, `guard-rule.test.mjs`, `golden.mjs`, the test suite, or `install-guard-rule.sh`. Drift is asserted from `shasum` + `diff` only.
 - **I did not read** the full bodies of `dcg-guard.ts` (27KB), `ee-ambient-session-start.ts` (11KB), `adapter.ts`, or the 8 other `~/.omp/omp-extensions/` extensions — only their hook registration, emit types, constants, and env gating. `ee-ambient-session-start`'s *effect* (what it injects at session_start) is **inferred from its argv** (`ee orient --workspace . --include-primer --fast --json`) and its state-dir footprint, **not observed firing**.
-- **"Never fired" means "no row in `~/.omp/**/agent/sessions`".** An extension that writes only to an external store (exactly `ee-ambient-session-start`) is invisible to that test — which is *why* I checked `hook-state` separately, and why I distrust any row census as a completeness oracle for this slice. There may be other ledger-invisible emitters I did not think to probe.
+- **"Never fired" means "no row in `~/.omp/**/agent/sessions`", and that test has two known blind spots.** (a) An extension that writes only to an external store — exactly `ee-ambient-session-start` — is invisible to it; that is *why* I checked `hook-state` separately, and why I distrust any row census as a completeness oracle here. There may be other ledger-invisible emitters I did not think to probe. (b) Because loading is pinned at session start (§3b), a zero-row install may be **untested** rather than broken. I separated those two only for the 8 guard-rule profile installs (via `find -newermt`); for the 11 never-fired `omp-jev-*` packages I did **not** need to, since they are installed in none of the three surfaces — but I did not verify they were absent from every surface at every past moment, only now.
 - **`ee` store mutations I made** (disclosed, not cleaned up): 2 memories written to `jev/.ee/ee.db` — `mem_01M301TZEGEV5AGHYKC4T9EYP2` and `mem_01M301VMH9E2PVR9ZTZ8D2KN7W`, both prefixed `PROBE map-hook-ee-20260920`. Left in place as evidence; deleting them would be an unreviewed write to a shared store. `~/.ee/` never written.
 - **Step 7's root cause is unknown.** I proved `remember → preflight` does not close; I did **not** find the surface that would close it. `ee tripwire list` = 0 and `ee config show` were the only alternatives probed.
 - **§4 is a reading of one README + one plan at one revision.** I ran none of franken_alignment's tests and did not open the mirror myself; I am reporting the receipt's mapping, and the receipt's own NO-CLAIM says the mapping is "an argument about our practices, not a verified claim about theirs".
