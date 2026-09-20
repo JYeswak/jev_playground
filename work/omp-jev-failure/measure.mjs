@@ -23,6 +23,7 @@
  *     node --experimental-strip-types work/omp-jev-failure/measure.mjs
  */
 import { askJev } from '../jev-client/src/index.ts';
+import { gradeQuestion } from '../jev-client/measure-kit.mjs';
 
 const QUESTIONS = {
   transient: 'Is this failure most consistent with a transient environment or dependency failure?',
@@ -136,7 +137,7 @@ const CASES = [
 
 const THRESHOLD = 0.5;
 const KEYS = Object.keys(QUESTIONS);
-const perQuestion = Object.fromEntries(KEYS.map((key) => [key, { correct: 0, asked: 0, yes: 0, trueCount: 0, scores: [] }]));
+const perQuestion = Object.fromEntries(KEYS.map((key) => [key, { correct: 0, asked: 0, yes: 0, trueCount: 0, scores: [], truths: [] }]));
 let correct = 0;
 let total = 0;
 let advCorrect = 0;
@@ -174,6 +175,7 @@ for (const testCase of CASES) {
     const stat = perQuestion[key];
     stat.asked += 1;
     stat.scores.push(score);
+    stat.truths.push(truth);
     if (said) stat.yes += 1;
     if (truth) stat.trueCount += 1;
     if (hit) stat.correct += 1;
@@ -191,16 +193,13 @@ console.log('\nper question (a question must beat its own constant, not the coin
 for (const key of KEYS) {
   const stat = perQuestion[key];
   if (stat.asked === 0) { console.log(`${key.padEnd(10)} never answered`); continue; }
-  const alwaysNo = stat.asked - stat.trueCount;
-  const alwaysYes = stat.trueCount;
-  const spread = stat.scores.length ? Math.max(...stat.scores) - Math.min(...stat.scores) : 0;
-  const constant = stat.yes === 0 || stat.yes === stat.asked;
+  const g = gradeQuestion(stat.scores.map((s, i) => ({ score: s, truth: stat.truths[i] })), THRESHOLD);
   console.log(
-    `${key.padEnd(10)} ${stat.correct}/${stat.asked} correct | said-yes ${stat.yes}/${stat.asked} | ` +
-    `always-no would score ${alwaysNo}/${stat.asked}, always-yes ${alwaysYes}/${stat.asked} | ` +
-    `score spread ${spread.toFixed(2)} | ${constant ? 'DEGENERATE (same verdict on every case)' : 'discriminates'}`,
+    `${key.padEnd(10)} ${g.correct}/${g.asked} correct | said-yes ${g.yes}/${g.asked} | ` +
+    `always-no would score ${g.alwaysNo}/${g.asked}, always-yes ${g.alwaysYes}/${g.asked} | ` +
+    `score spread ${g.spread.toFixed(2)} | near ${g.near} | ${g.verdict}`,
   );
-  console.log(`${' '.repeat(10)} scores: ${stat.scores.map((s) => s.toFixed(2)).join(' ')}`);
+  console.log(`${' '.repeat(10)} scores: ${g.scores.map((s) => s.toFixed(2)).join(' ')}`);
 }
 
 console.log('\nNO-CLAIM: 11 hand-built failures I wrote knowing the answer. Cases I author cannot');

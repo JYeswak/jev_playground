@@ -29,6 +29,7 @@
  *     node work/jev-client/question-shape-measure.mjs
  */
 import { askJev } from './src/index.ts';
+import { gradeQuestion } from './measure-kit.mjs';
 
 // --- Reference class: the surviving questions, verbatim, NOT run ---------------------------
 const SURVIVING = {
@@ -347,24 +348,15 @@ console.log('\noriginal -> rephrased (same cases; constants recomputed on each l
 for (const u of UNITS) {
   for (const key of u.keys) {
     for (const which of ['orig', 're']) {
-      let correct = 0, asked = 0, yes = 0, trueCount = 0;
-      const all = [];
+      const samples = [];
       for (const c of u.cases) {
         const s = store[q(u.unit, key, which)][c.name][0];
         if (typeof s !== 'number') continue;
-        asked += 1;
-        all.push(s);
-        const said = s >= THRESHOLD;
-        if (said) yes += 1;
-        if (c[which][key]) trueCount += 1;
-        if (said === c[which][key]) correct += 1;
+        samples.push({ score: s, truth: c[which][key] });
       }
-      const alwaysNo = asked - trueCount, alwaysYes = trueCount;
-      const spread = all.length ? Math.max(...all) - Math.min(...all) : 0;
-      const constant = yes === 0 || yes === asked;
-      const verdict = constant ? 'DEGENERATE' : (correct > Math.max(alwaysNo, alwaysYes) ? 'DISCRIMINATES' : 'WEAK');
-      console.log(`${u.unit}/${key}:${which} ${correct}/${asked} | yes ${yes}/${asked} | no-const ${alwaysNo}/${asked} yes-const ${alwaysYes}/${asked} | spread ${spread.toFixed(2)} | ${verdict}`);
-      console.log(`  scores: ${all.map((s) => s.toFixed(2)).join(' ')}`);
+      const g = gradeQuestion(samples, THRESHOLD);
+      console.log(`${u.unit}/${key}:${which} ${g.correct}/${g.asked} | yes ${g.yes}/${g.asked} | no-const ${g.alwaysNo}/${g.asked} yes-const ${g.alwaysYes}/${g.asked} | spread ${g.spread.toFixed(2)} | near ${g.near} | ${g.verdict}`);
+      console.log(`  scores: ${g.scores.map((s) => s.toFixed(2)).join(' ')}`);
     }
   }
 }

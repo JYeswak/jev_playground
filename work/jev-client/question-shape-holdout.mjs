@@ -33,6 +33,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { askJev } from './src/index.ts';
+import { gradeQuestion } from './measure-kit.mjs';
 
 const ORIG = {
   noise: 'Is more than half of this candidate list irrelevant to the stated intent?',
@@ -205,27 +206,17 @@ const TUNED = { noise: '4/4 DISCRIMINATES', definitional: '4/4 DISCRIMINATES', d
 for (const u of UNITS) {
   for (const key of u.keys) {
     for (const which of ['orig', 're']) {
-      let correct = 0, asked = 0, yes = 0, trueCount = 0;
-      const all = [];
+      const samples = [];
       for (const c of u.cases) {
         const id = c.name ?? c.file;
         const s = store[q(u.unit, key, which)][id][0];
         if (typeof s !== 'number') continue;
-        const truth = (which === 'orig' ? c.orig ?? c.labels : c.re ?? c.labels)[key];
-        asked += 1;
-        all.push(s);
-        const said = s >= THRESHOLD;
-        if (said) yes += 1;
-        if (truth) trueCount += 1;
-        if (said === truth) correct += 1;
+        samples.push({ score: s, truth: (which === 'orig' ? c.orig ?? c.labels : c.re ?? c.labels)[key] });
       }
-      const alwaysNo = asked - trueCount, alwaysYes = trueCount;
-      const spread = all.length ? Math.max(...all) - Math.min(...all) : 0;
-      const constant = yes === 0 || yes === asked;
-      const verdict = constant ? 'DEGENERATE' : (correct > Math.max(alwaysNo, alwaysYes) ? 'DISCRIMINATES' : 'WEAK');
+      const g = gradeQuestion(samples, THRESHOLD);
       const drop = which === 're' ? ` (tuned ${TUNED[key]})` : '';
-      console.log(`${u.unit}/${key}:${which} ${correct}/${asked} | yes ${yes}/${asked} | no-const ${alwaysNo}/${asked} yes-const ${alwaysYes}/${asked} | spread ${spread.toFixed(2)} | ${verdict}${drop}`);
-      console.log(`  scores: ${all.map((s) => s.toFixed(2)).join(' ')}`);
+      console.log(`${u.unit}/${key}:${which} ${g.correct}/${g.asked} | yes ${g.yes}/${g.asked} | no-const ${g.alwaysNo}/${g.asked} yes-const ${g.alwaysYes}/${g.asked} | spread ${g.spread.toFixed(2)} | near ${g.near} | ${g.verdict}${drop}`);
+      console.log(`  scores: ${g.scores.map((s) => s.toFixed(2)).join(' ')}`);
     }
   }
 }

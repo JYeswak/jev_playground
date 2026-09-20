@@ -21,6 +21,7 @@
  *     node --experimental-strip-types work/omp-jev-review/measure.mjs
  */
 import { askJev } from '../jev-client/src/index.ts';
+import { gradeQuestion } from '../jev-client/measure-kit.mjs';
 
 /**
  * The THREE questions the extension shipped with. `scope` is kept here on purpose after being
@@ -227,7 +228,7 @@ const THRESHOLD = 0.5;
 const KEYS = Object.keys(QUESTIONS);
 
 /** per-question tallies, so degeneracy is visible rather than averaged away */
-const perQuestion = Object.fromEntries(KEYS.map((k) => [k, { correct: 0, total: 0, saids: [], scores: [] }]));
+const perQuestion = Object.fromEntries(KEYS.map((k) => [k, { correct: 0, total: 0, saids: [], scores: [], truths: [] }]));
 const rows = [];
 const errors = [];
 let correct = 0;
@@ -259,7 +260,7 @@ for (const testCase of CASES) {
     perQuestion[key].total += 1;
     if (hit) perQuestion[key].correct += 1;
     perQuestion[key].saids.push(said);
-    perQuestion[key].scores.push(score);
+    perQuestion[key].truths.push(truth);
     rows.push(
       `${testCase.name.padEnd(18)} ${key.padEnd(10)} score=${score.toFixed(2)} said=${String(said).padEnd(5)} truth=${String(truth).padEnd(5)} ${hit ? 'HIT' : 'MISS'}`,
     );
@@ -277,11 +278,10 @@ for (const key of KEYS) {
     console.log(`${key.padEnd(10)} no scores returned`);
     continue;
   }
-  const allSame = q.saids.every((s) => s === q.saids[0]);
-  const spread = Math.max(...q.scores) - Math.min(...q.scores);
-  if (allSame) degenerate.push(key);
+  const g = gradeQuestion(q.scores.map((s, i) => ({ score: s, truth: q.truths[i] })), THRESHOLD);
+  if (g.verdict === 'DEGENERATE') degenerate.push(key);
   console.log(
-    `${key.padEnd(10)} ${q.correct}/${q.total}  said=[${q.saids.map((s) => (s ? 'Y' : 'n')).join('')}]  scores=[${q.scores.map((s) => s.toFixed(2)).join(' ')}]  spread=${spread.toFixed(2)}  ${allSame ? `DEGENERATE (constant ${q.saids[0]})` : 'discriminates'}`,
+    `${key.padEnd(10)} ${g.correct}/${q.total}  said=[${q.saids.map((s) => (s ? 'Y' : 'n')).join('')}]  scores=[${g.scores.map((s) => s.toFixed(2)).join(' ')}]  spread=${g.spread.toFixed(2)}  near ${g.near}  ${g.verdict}`,
   );
 }
 

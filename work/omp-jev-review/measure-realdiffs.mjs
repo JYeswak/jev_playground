@@ -22,6 +22,7 @@
  */
 import { execFileSync } from 'node:child_process';
 import { askJev } from '../jev-client/src/index.ts';
+import { gradeQuestion } from '../jev-client/measure-kit.mjs';
 
 const COUNT = Number(process.env.REVIEW_MEASURE_N ?? 14);
 const THRESHOLD = 0.5;
@@ -60,7 +61,7 @@ console.log(`real commits scored: ${cases.length}  (labels computed from the dif
 
 const tally = {};
 const misses = [];
-for (const key of Object.keys(QUESTIONS)) tally[key] = { correct: 0, yes: 0, truthYes: 0, scores: [] };
+for (const key of Object.keys(QUESTIONS)) tally[key] = { correct: 0, yes: 0, truthYes: 0, scores: [], truths: [] };
 
 for (const testCase of cases) {
   const result = await askJev({ state: { subject: testCase.subject, diff: testCase.diff }, questions: QUESTIONS, timeoutMs: 8000 });
@@ -74,6 +75,7 @@ for (const testCase of cases) {
     const said = score >= THRESHOLD;
     const truth = testCase.truth[key];
     tally[key].scores.push(score);
+    tally[key].truths.push(truth);
     if (said) tally[key].yes += 1;
     if (truth) tally[key].truthYes += 1;
     if (said === truth) tally[key].correct += 1;
@@ -83,13 +85,9 @@ for (const testCase of cases) {
 
 const n = cases.length;
 for (const [key, t] of Object.entries(tally)) {
-  const alwaysNo = n - t.truthYes;
-  const alwaysYes = t.truthYes;
-  const best = Math.max(alwaysNo, alwaysYes);
-  const spread = t.scores.length ? Math.max(...t.scores) - Math.min(...t.scores) : 0;
-  const near = t.scores.filter((s) => Math.abs(s - THRESHOLD) < 0.1).length;
-  const verdict = t.correct > best + near ? 'DISCRIMINATES' : t.correct > best ? 'WEAK — margin a flip could erase' : 'NO BETTER THAN ITS CONSTANT';
-  console.log(`${key.padEnd(10)} ${t.correct}/${n} | said-yes ${t.yes}/${n} | truth-yes ${t.truthYes}/${n} | best constant ${best}/${n} | spread ${spread.toFixed(2)} | near-threshold ${near} | ${verdict}`);
+  const g = gradeQuestion(t.scores.map((s, i) => ({ score: s, truth: t.truths[i] })), THRESHOLD);
+  const best = g.best, spread = g.spread, near = g.near, verdict = g.verdict;
+  console.log(`${key.padEnd(10)} ${g.correct}/${n} | said-yes ${g.yes}/${n} | truth-yes ${g.trueCount}/${n} | best constant ${best}/${n} | spread ${spread.toFixed(2)} | near-threshold ${near} | ${verdict}`);
 }
 
 if (misses.length) {

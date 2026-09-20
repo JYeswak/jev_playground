@@ -34,6 +34,7 @@
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { askJev } from '../jev-client/src/index.ts';
+import { gradeQuestion } from '../jev-client/measure-kit.mjs';
 
 const MAX = Number(process.argv[2] ?? 40);
 const FIRE = 0.5;
@@ -143,14 +144,11 @@ async function grade(shapeName, shape) {
     rows.push({ ...c, shape: shapeName, jev, said: jev >= FIRE, correct: (jev >= FIRE) === c.behind });
   }
   const scored = rows.filter((r) => r.jev !== null);
-  const correct = scored.filter((r) => r.correct).length;
-  const yes = scored.filter((r) => r.said).length;
-  const trueCount = scored.filter((r) => r.behind).length;
-  const best = Math.max(trueCount, scored.length - trueCount);
-  const near = scored.filter((r) => Math.abs(r.jev - FIRE) < 0.1).length;
-  const constant = yes === 0 || yes === scored.length;
-  const verdict = constant ? 'DEGENERATE' : correct > best + near ? 'DISCRIMINATES' : 'WEAK';
-  return { shape: shapeName, asked: scored.length, correct, yes, trueCount, bestConstant: best, near, verdict, rows };
+  const g = gradeQuestion(scored.map((r) => ({ score: r.jev, truth: r.behind })), FIRE);
+  const { correct, asked } = g;
+  const yes = g.yes, trueCount = g.trueCount, best = g.best, near = g.near;
+  const verdict = g.verdict;
+  return { shape: shapeName, asked, correct, yes, trueCount, bestConstant: best, near, verdict, rows };
 }
 
 const results = [];
