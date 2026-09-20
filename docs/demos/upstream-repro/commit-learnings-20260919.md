@@ -1462,3 +1462,91 @@ corpus is live-monotonic exactly like the harvest family, so every count derived
 an as-of label. Pane 2's denominator (1,043) and my earlier one (1,040) differ for this reason
 and neither is wrong — they are measurements at different times, which is precisely the
 distinction the as-of work established tonight.
+
+## The whole mail corpus, mined: 98.15% of ack-required messages were never acked
+
+`mail-mine-result-20260920.md`. **6,510 of 6,510 rows**, the first corpus we have mined
+exhaustively rather than sampled. Read-only, ids/counts/enums/paths only — no `body_md`, no
+subject text, the A11 precedent held.
+
+Verified independently against the live DB rather than from the receipt:
+
+```
+messages                     6,510   ✓ reproduces
+ack_required = 1             3,135   ✓ reproduces
+acked (ack_ts not null,
+       ack_required = 1)        58   ✓ reproduces
+```
+
+**So 58 of 3,135 = 1.85%.** The coordination protocol this fleet runs on asks for an
+acknowledgement 3,135 times and gets one 58 times. That is a measurement about how our own agents
+actually behave, from a corpus we had touched 4.4% of before tonight, and it is the first thing
+mined here that is about *us* rather than about a model.
+
+One discrepancy found and it is small: threads **4,508** by my count against their **4,509** —
+an off-by-one in how a null thread is counted. Flagged rather than waved through; it changes
+nothing downstream, and the 25% threadless-orphan figure stands either way.
+
+## The pane discounted its own passing result
+
+F1 fired **mechanically at 99.5%** — far above its 10% bar — and pane 2 **refused to bank it**,
+ruling the linkage ambient co-presence rather than action: two things co-occurring in the same
+window is not one causing the other. What survives that audit is small and honest: **7 ack
+linkages and 3 bead linkages**, so the seat is `HELD`, not cleared.
+
+**This is the named-subset lesson applied by the pane without being told.** Four times tonight a
+pooled number looked decisive and a named subset overturned it, always optimistically. Here the
+pane ran the audit on its own headline before anyone asked, and the headline did not survive.
+A 99.5% that gets discounted by its author is worth more than a 99.5% that ships.
+
+## Coverage now
+
+| corpus | size | mined |
+|---|---:|---|
+| this repo's commits | ~1,046 | **100%** |
+| agent-mail messages | 6,510 | **100%** |
+| CASS messages | 5,181,931 | 2.32% — next, and honestly characterised rather than pretended |
+
+## I pre-registered a prediction, the representative sample refuted it, and the finding got stronger
+
+Before the draw I wrote: *"I expect the aggregate direction to hold and the `S_wrong_selector`
+inversion to weaken, because that slice's rows are long receipt-shaped messages and the window
+over-samples long messages by ~4.7×."*
+
+**Half right, and the interesting half was wrong.**
+
+| | rep1000 (n=1,000 convs, seed 421337, sha `f68bccdc`) | window (120k ids) |
+|---|---|---|
+| y prevalence | 0.587 | 0.159 |
+| always-invent | 0.587 | 0.159 |
+| dig-iff | **0.101 BEAT** | 0.058 BEAT |
+| `S_wrong_selector` at 1:2 | **0.875 LOSE** | 0.500 LOSE |
+| `S_wrong_selector` at 1:1 | **1.188 LOSE** | 0.250 tie |
+
+The inversion did not weaken. **It roughly doubled**, and the 1:1 case that was a tie in the
+window and broke slightly toward inventing under human calibration now loses by nearly 5×.
+
+**Why my reasoning failed, which is the part worth keeping.** I predicted from the *sampling
+bias* — long messages, receipt-shaped — and ignored what a representative corpus does to the
+*base rate*: `y` prevalence goes 0.159 → 0.587. When hits usefully answer far more often
+overall, an absence-claim question where hits exist and still answer nothing becomes a *worse*
+bet, not a better one. **The window was hiding how bad digging is on that slice, not
+manufacturing it.**
+
+So the public page **stands unchanged**, and it now stands on a defensible frame rather than on
+a slice we published as "one recent 120k-message window" when it was neither recent nor a window.
+
+## What makes this result usable rather than just favourable
+
+- **Seeded and hashed**: seed 421337, `sample_sha f68bccdc03cc2cb6`, frame justified as the
+  retrieval unit, size declared before results were looked at.
+- **The locked n=138 export was not touched** — the window run survives as the comparison arm
+  rather than being overwritten by the better measurement.
+- **The control anomaly was disclosed, not buried**: a `y=1` in `S_control` is reported as slice
+  over-grouping rather than quietly dropped, with `zzzz` clean.
+- Same 138 questions, same tokeniser, same mechanical `Y`, same loss. **One thing changed.**
+
+**This is the first time tonight a conductor prediction was refuted by a pane's measurement and
+the refutation strengthened the lane's published claim.** Four times a named subset overturned a
+pooled number optimistically; this time a better frame overturned my expectation pessimistically
+— against us on the reasoning, for us on the result.
