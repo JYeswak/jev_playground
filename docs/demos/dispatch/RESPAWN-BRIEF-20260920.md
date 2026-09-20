@@ -104,6 +104,26 @@ other repo silently disagree. Edit both, or the suite fails.
   UNLINKED DIRECTORY, not missing secret. Never print the value. Four agents have reported this key
   missing and all four were wrong.
 
+## HOW TO REPORT — you are not visible to anyone unless you send this
+
+Pane 1 is the conductor and **cannot see your pane**. A result you print locally reaches nobody,
+and a silent pane is indistinguishable from a dead one. Every unit ends with:
+
+```bash
+ntm --robot-send=jev --panes=1 --msg="CALLBACK-P<n>-<UNIT>-<DONE|BLOCKED|REFUSE>: <one line of \
+result>. NEXT <what you are starting>. NO-CLAIM <what you did not measure>."
+```
+
+- **Do NOT use agent-mail.** The `mcp-agent-mail` MCP server is failing to connect in this fleet
+  (visible in every pane banner today), so a message sent there goes nowhere *and you will believe
+  you reported*. `ntm --robot-send` is the working channel.
+- **`BLOCKED` beats silence.** Send the callback with the blocker quoted verbatim.
+- Send when the unit is **DONE, not when it is perfect**.
+- `REFUSE` and `PREPARED-NOT-MEASURED` are real, preferred outcomes over a manufactured number.
+
+This section exists because the first respawn dispatch told three panes what to report and never
+how — my omission, caught by Joshua, not by the panes.
+
 ## STANDING ORDERS
 
 - Never `git add -A` (dcg denies it); stage explicit paths; never amend in this shared tree.
