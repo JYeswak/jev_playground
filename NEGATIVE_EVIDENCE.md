@@ -1915,3 +1915,32 @@ family — both baselines must be scored before a live call is budgeted.
 
 **Retry condition:** a real inbox export in which agent-set `importance=high` is common
 and the overseer force-high path is a minority, labelled after the questions freeze.
+
+---
+
+## R44 — authored diagnostic_synthetic batteries are not a substitute for a labelled real corpus (n=7846)
+
+**Recorded:** 2026-09-20 · **Level:** `[test]` · Corpus:
+`work/p3-calibration/toolcall-corpus-frozen.jsonl` (GOOD=1665 / BAD=6181,
+sha256 `dc90a374bbdb11bb521244be40afdaf096e56344e1c11baffb200bab05741580`).
+
+**Rejected design:** ship another 10-case authored task battery (CASS / beads /
+agent-mail sketches this same day) and treat its always-abstain arithmetic as
+a product tick. Joshua's correction: score the **already-labelled** frozen
+file.
+
+Measured on that file, offline, no key:
+
+- always-abstain mean loss **1665/7846 = 0.212210**
+- isError baseline **1.495284** — uses a real field, **loses** to the control
+- a planted 10-row `diagnostic_synthetic` substitute is **REFUSED** by the
+  identity lock, not scored
+
+R28 already said authored labels inflate. This row names the substitute
+class: a skillranker-shaped 10-case contract is not this corpus. n=12 and
+n=10 are not n=7846.
+
+**Retry condition:** reopen only if a later scorer reads a *different*
+labelled real file (CASS export, agent-mail export) of comparable n, with
+the same identity lock, and states prevalence beside the score. Do not
+reopen by writing ten more authored envelopes.
