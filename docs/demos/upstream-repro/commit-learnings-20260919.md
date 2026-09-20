@@ -592,3 +592,32 @@ which BASE-RATES.md does. **Fifth instance of the live-denominator class tonight
 where the drifting number is the CONTROL rather than the measurement.**
 
 NO-CLAIM, theirs: one re-run; rows move.
+
+SECTION 9 SDK-surface field traps — **PASS** — `b2d8b1f`, verified by me (register suite 13/13).
+Field inventory read from source **then executed**, not asserted:
+
+```
+askJev       -> {ok, scores: {q: p}, confidence?, latencyMs, model}
+askJevChoice -> {ok, choice, confidence, probabilities: {label: p}, ...}   NO `scores`
+```
+
+The `recording()` misfile is demonstrated live rather than recounted: fed a successful
+0.91-confidence choice it writes `questionKey 'q', score null` — a failure-shaped row for a
+success. `recordingChoice()` writes one row per label plus `__choice__` (4 rows for the same
+call). Test 12 at `register.test.mjs:123` plants exactly that negative, so the wrapper cannot be
+deleted without a red test explaining why it exists.
+
+**RULING, and it is the right one: the absence of `.score` on Choice is a correct refusal, not a
+gap.** A singular `.score` would collapse the distribution to its argmax without its margin —
+precisely the information the multiclass conversion was built to preserve (`48f834b`).
+*"Any future `.score` must carry its reduction rule in the name (e.g. `top1`, `margin`), or it
+re-invents the silent null."* That is a design rule worth more than the section: **a scalar that
+hides which reduction produced it is a silent null with better manners.**
+
+NO-CLAIM, theirs: deterministic shapes, no model calls; prevalence UNKNOWN.
+
+SECTION 9b PROCESS NOTE — three consecutive callbacks (§18, §20, §9) omitted their sha, which the
+packet contract requires. I located each by path. Not a blocker and the work was findable every
+time, but a missing sha is exactly how a receipt and its cited artifact drift apart, and this
+lane has logged five drift instances tonight. Noting the pattern rather than compensating
+silently a fourth time.
