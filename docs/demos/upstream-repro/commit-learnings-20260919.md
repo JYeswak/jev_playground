@@ -1723,3 +1723,60 @@ repo.
 Correction sent to pane 2 with the exact API, and I told them to bill any wasted in-flight work
 to me. **The dispatch is committed, so the false premise is on the record** and this entry sits
 beside it rather than replacing it.
+
+## First organic guard fire — and the answer to "how does the system tell us we're doing it wrong"
+
+Verified in a real session, not a probe:
+
+```json
+"kind":"guard_fire","class":"pipe-exit",
+"command":"echo probe-ok | head -1",
+"toolCallId":"bash_1789926557285_1",
+"error":null,
+"model":"none-deterministic-regex-guard-v1"
+```
+
+A real `toolCallId`, a **quotable command** (harm-rule's precedent: a fire nobody can quote is
+not evidence), an explicit `error:null` so a crash can never score as a pass, and a `model` field
+that says out loud there is **no model call** — four regexes, as measured.
+
+It also refutes my own failed test. I reported *"`omp -p` persists no session"*; pane 2 found the
+real causes were **wrong directory plus a quota-dead run**. `-p` does persist. **My diagnosis was
+wrong and the pane corrected it with a row** — the fourth time tonight my verification, not the
+work, was the broken part.
+
+Per-tool denominator on that session: **bash 3/3**. Small, but it is the first honest answer to
+"every tool call measured" — and it is scoped, not claimed universally.
+
+### What is still missing, precisely
+
+The guard now says *"prefer `scripts/vgrep.sh`"*. That is generic advice. It does **not** say
+*"you did this exact thing four times today, here is the corrected command."* The gap is not
+detection any more. It is memory.
+
+`ee` already has the surface, and it is empty:
+
+```
+ee preflight check 'node x.mjs | tail -1' --json
+-> {"matches":[],"matchedMemories":[],"degraded":[]}
+```
+
+**The advisory command-risk store exists, is queryable per command, returns structured matches —
+and we have written zero rules into it in the entire life of this project.** Writing one fails
+today with `EE-E040 migration_drift`, whose error text names its own repair (`ee doctor
+--fix-plan`, 4 of 5 issues fixable). That is the behaviour we are trying to build, shipped by
+someone else, sitting unused.
+
+So the loop is three parts and we have built the first, own the third, and have never connected
+the second:
+
+| part | mechanism | state |
+|---|---|---|
+| detect at the moment | omp `tool_call` hook | **LIVE, proven with a row** |
+| recall past experience | `ee preflight check` | exists, **empty**, DB drifted |
+| suggest the right way | `ee remember --level procedural` | never written to |
+
+The wiring is small: on a fire, the hook queries `ee preflight check` and injects the matched
+memory — the past instance and the corrected command — instead of a generic sentence. And every
+confirmed defect writes one memory back, which is the part that makes each call **feed** the
+system rather than merely be judged by it.
