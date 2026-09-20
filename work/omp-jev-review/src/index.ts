@@ -28,11 +28,17 @@ const MAX_DIFF = 12000;
  * Questions only. The WIRE SHAPE lives in work/jev-client and nowhere else — this extension
  * hand-rolled its own fetch once and got HTTP 400 for inventing `{questions: [...], context}`.
  * If you need a shape the client does not support, extend the client and its tests.
+ *
+ * TWO questions, because measurement killed the third. `measure.mjs` scored all three against
+ * seven diffs whose answers we know by construction. `scope` said **no** on every one of them,
+ * including the 400-line rename sold as "tidy up" that it exists to catch (0.39, twice), and
+ * scored that case BELOW a three-line auth deletion (0.43) — so it is not a threshold problem,
+ * the ordering is wrong too. Its 6/7 was the base rate of a mostly-false label, not judgement.
+ * A question whose verdict does not change with its input is noise with a confidence attached.
  */
 const QUESTIONS = {
   behaviour: "Does this diff alter behaviour that an existing caller depends on?",
   boundary: "Does this diff touch a security, permission, or authentication boundary?",
-  scope: "Is this diff larger or more invasive than a routine change of its kind?",
 };
 
 type ToolCallEvent = { toolName?: unknown; name?: unknown; toolCallId?: unknown; input?: unknown; command?: unknown };

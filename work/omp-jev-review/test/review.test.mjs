@@ -110,3 +110,28 @@ test('a host whose appendEntry throws still returns undefined', async () => {
   ompJevReview({ on: h.pi.on, appendEntry: async () => { throw new Error('log sink down'); } });
   assert.equal(await h.fire(diffCall('git diff')), undefined);
 });
+
+// `scope` was cut after measure.mjs found it constant-false on all seven ground-truth diffs,
+// including the 400-line "tidy up" it existed to catch. This pins the cut: re-adding a question
+// puts it back on the wire, and that must fail here rather than quietly resume logging a score
+// nobody has measured.
+test('asks exactly the two measured questions and no more', async () => {
+  const previous = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  let sent;
+  globalThis.fetch = async (_url, init) => {
+    sent = JSON.parse(init.body);
+    return { ok: true, status: 200, text: async () => JSON.stringify({ answers: { behaviour: { noul: 0.5 }, boundary: { noul: 0.5 } } }) };
+  };
+  try {
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git diff'));
+    assert.deepEqual(Object.keys(sent.questions).sort(), ['behaviour', 'boundary']);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+});
