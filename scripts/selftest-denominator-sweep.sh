@@ -62,6 +62,21 @@ else
   note FAIL "absent source did not SKIP cleanly (rc=$RC4)"; fail=$((fail + 1))
 fi
 
+
+# ARM 5 (2026-09-20): a GROWING set must not RED. census-packages-21 and export-yes-19 count
+# directories under work/, which grows every time the lane ships a package — the live-monotonic
+# nag class this file's own header forbids (R46/R47). Before the floor fix, creating one package
+# produced "DRIFT census-packages-21" -> rc=1 -> stage 80 RED -> gates RED for every reader.
+PROBE="$root/work/omp-jev-zzselftest-probe"
+mkdir -p "$PROBE/src"
+OUT5="$("$S" 2>&1)"; RC5=$?
+rmdir "$PROBE/src" "$PROBE" 2>/dev/null
+if [ "$RC5" -eq 0 ] && printf '%s\n' "$OUT5" | grep -q 'grew, which is not drift'; then
+  note ok "a new package grows the count without REDing (floor, not equality)"; pass=$((pass + 1))
+else
+  note FAIL "a new package RED-ed the sweep (rc=$RC5) — the nag class is back"; fail=$((fail + 1))
+fi
+
 echo "scripts/selftest-denominator-sweep.sh: $pass ok, $fail failed"
 [ "$fail" -eq 0 ] || exit 1
 exit 0
