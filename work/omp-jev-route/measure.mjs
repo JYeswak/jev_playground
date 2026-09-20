@@ -21,7 +21,7 @@
  *   infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=prod --silent -- \
  *     node work/omp-jev-route/measure.mjs
  */
-import { askJev } from '../jev-client/src/index.ts';
+// (askJev reached only through measure-kit now.)
 
 const QUESTIONS = {
   needs_heavyweight:
@@ -46,106 +46,23 @@ const CASES = [
   // (the version string is compiled into three artifacts) but the prompt says none of that.
   { name: 'trap-bump-version', prompt: 'Just bump the version to 2.4.1.', truth: L, trap: true },
 ];
+// Ported to measure-kit (P3-36): same cases, same questions, same trap note, same NO-CLAIM.
+// Only the table arithmetic moved — verdicts now carry the near-threshold penalty.
+import { measure } from '../jev-client/measure-kit.mjs';
 
-const THRESHOLD = 0.5;
-const RUNS = 3;
-const KEYS = Object.keys(QUESTIONS);
+const out = await measure({
+  cases: CASES.map((c) => ({ name: c.name + (c.trap ? ' (trap)' : ''), state: { prompt: c.prompt }, truth: c.truth })),
+  questions: QUESTIONS,
+  runs: 3,
+  threshold: 0.5,
+  timeoutMs: 8000,
+});
 
-const scores = Object.fromEntries(KEYS.map((k) => [k, Object.fromEntries(CASES.map((c) => [c.name, []]))]));
-const rows = [];
-const thin = [];
-let errors = 0;
-
-for (let run = 1; run <= RUNS; run++) {
-  for (const testCase of CASES) {
-    const result = await askJev({
-      state: { prompt: testCase.prompt },
-      questions: QUESTIONS,
-      timeoutMs: 8000,
-    });
-    if (!result.ok) {
-      rows.push(`run${run} ${testCase.name.padEnd(20)} ERROR ${result.reason} ${result.error}`);
-      errors += 1;
-      continue;
-    }
-    for (const key of KEYS) {
-      const score = result.scores[key];
-      if (typeof score !== 'number') continue;
-      scores[key][testCase.name].push(score);
-      if (run === 1) {
-        const said = score >= THRESHOLD;
-        const hit = said === testCase.truth[key];
-        if (Math.abs(score - THRESHOLD) < 0.1) thin.push(`${testCase.name}/${key} @ ${score.toFixed(2)}`);
-        rows.push(`${testCase.name.padEnd(20)} ${key.padEnd(10)} score=${score.toFixed(2)} said=${String(said).padEnd(5)} truth=${String(testCase.truth[key]).padEnd(5)} ${hit ? 'HIT' : 'MISS'}${testCase.trap ? ' (trap)' : ''}`);
-      }
-    }
-  }
-}
-
-console.log(rows.join('\n'));
-
-// Drift: verdict flips and score spread across the three identical runs.
-console.log('\ndrift across 3 identical runs:');
-let flips = 0;
-for (const testCase of CASES) {
-  for (const key of KEYS) {
-    const ss = scores[key][testCase.name];
-    if (ss.length < 2) continue;
-    const spread = Math.max(...ss) - Math.min(...ss);
-    const verdicts = new Set(ss.map((s) => s >= THRESHOLD));
-    if (verdicts.size > 1) flips += 1;
-    console.log(`  ${testCase.name}/${key}: ${ss.map((s) => s.toFixed(2)).join(' ')} spread=${spread.toFixed(2)}${verdicts.size > 1 ? ' FLIP' : ''}`);
-  }
-}
-console.log(`verdict flips: ${flips}`);
-
-// Per-question verdicts on run 1. Rule, stated before running: DEGENERATE = same verdict on
-// every case (a constant wearing a question's clothes). Otherwise it must beat the better of
-// its own always-no / always-yes constants to DISCRIMINATE; beating neither is WEAK.
-console.log('\nper question (must beat its own constant, not the coin flip):');
-const verdicts = {};
-for (const key of KEYS) {
-  let correct = 0;
-  let asked = 0;
-  let yes = 0;
-  let trueCount = 0;
-  const all = [];
-  for (const testCase of CASES) {
-    const s = scores[key][testCase.name][0];
-    if (typeof s !== 'number') continue;
-    asked += 1;
-    all.push(s);
-    const said = s >= THRESHOLD;
-    if (said) yes += 1;
-    if (testCase.truth[key]) trueCount += 1;
-    if (said === testCase.truth[key]) correct += 1;
-  }
-  const alwaysNo = asked - trueCount;
-  const alwaysYes = trueCount;
-  const spread = all.length ? Math.max(...all) - Math.min(...all) : 0;
-  const constant = yes === 0 || yes === asked;
-  const verdict = constant ? 'DEGENERATE' : (correct > Math.max(alwaysNo, alwaysYes) ? 'DISCRIMINATES' : 'WEAK');
-  verdicts[key] = verdict;
-  console.log(
-    `${key.padEnd(19)} ${correct}/${asked} correct | said-yes ${yes}/${asked} | ` +
-    `always-no ${alwaysNo}/${asked}, always-yes ${alwaysYes}/${asked} | ` +
-    `spread ${spread.toFixed(2)} | ${verdict}`,
-  );
-  console.log(`${' '.repeat(19)} scores: ${all.map((s) => s.toFixed(2)).join(' ')}`);
-}
-
-const total = CASES.length * KEYS.length;
+const total = CASES.length * Object.keys(QUESTIONS).length;
 let hits = 0;
-for (const testCase of CASES) {
-  for (const key of KEYS) {
-    const s = scores[key][testCase.name][0];
-    if (typeof s === 'number' && (s >= THRESHOLD) === testCase.truth[key]) hits += 1;
-  }
-}
+for (const k of Object.keys(QUESTIONS)) hits += out.perQuestion[k].correct;
 console.log(`\npooled agreement: ${hits}/${total} (coin flip: ${(total / 2).toFixed(1)})`);
-console.log(`verdicts decided within 0.10 of ${THRESHOLD}: ${thin.length ? thin.join(', ') : 'none'}`);
-console.log(`transport errors: ${errors}`);
-console.log(`question verdicts: ${KEYS.map((k) => `${k}=${verdicts[k]}`).join(' ')}`);
+console.log(`question verdicts: ${Object.keys(QUESTIONS).map((k) => `${k}=${out.perQuestion[k].verdict}`).join(' ')}`);
 
 console.log('\nNO-CLAIM: 9 hand-built prompts I wrote knowing the answer. Cases I author cannot');
 console.log('establish accuracy on real turn traffic; cannot rule out that my phrasing made the');
