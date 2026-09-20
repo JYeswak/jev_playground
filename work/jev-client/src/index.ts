@@ -25,6 +25,24 @@ export type JevResult =
   | { ok: true; scores: Record<string, number>; latencyMs: number; model: string }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
 
+/**
+ * A MULTICLASS answer: exactly one label out of a fixed set, with the full distribution.
+ * Field names per docs/demos/SDK-SURFACE.md (`ChoiceResponse.choice/.confidence/.probabilities`);
+ * there is no `.distribution`. Confirmed against a live 200 on 2026-09-19:
+ *   {"answers":{"choice":{"type":"choice","choice":"argument","confidence":0.97,
+ *                         "probabilities":{"transient":0.0,"argument":0.98,"bug":0.02}}}}
+ */
+export type JevChoiceResult =
+  | {
+      ok: true;
+      choice: string;
+      confidence: number;
+      probabilities: Record<string, number>;
+      latencyMs: number;
+      model: string;
+    }
+  | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
+
 /** Named failure classes, so a caller can branch without string-matching a message. */
 export type JevFailure = "unconfigured" | "http" | "non-json" | "no-answers" | "transport";
 
@@ -38,10 +56,74 @@ export type AskOptions = {
   apiKey?: string;
 };
 
+export type AskChoiceOptions = {
+  /** The object the question is asked about. Serialised as-is into `state`. */
+  state: Record<string, unknown>;
+  /** The question itself, as text. */
+  instructions: string;
+  /** label -> description of that label. At least two; exactly one label comes back. */
+  classes: Record<string, string>;
+  timeoutMs?: number;
+  model?: string;
+  apiKey?: string;
+};
+
+/** The key the single choice question is filed under. Internal; callers never see it. */
+const CHOICE_KEY = "choice";
+
+type Posted =
+  | { ok: true; answers: object; latencyMs: number }
+  | { ok: false; reason: JevFailure; error: string; latencyMs: number };
+
+/**
+ * The ONE place a systemOne request is built and its envelope validated.
+ * Both askJev and askJevChoice go through here, so a body shape can only be wrong once.
+ */
+async function postSystemOne(
+  apiKey: string,
+  model: string,
+  state: Record<string, unknown>,
+  questions: Record<string, unknown>,
+  timeoutMs: number,
+): Promise<Posted> {
+  const started = Date.now();
+  let response: Response;
+  let text: string;
+  try {
+    response = await fetch(SYSTEMONE_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({ model, state, questions }),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+    text = await response.text();
+  } catch (err) {
+    return { ok: false, reason: "transport", error: String(err), latencyMs: Date.now() - started };
+  }
+
+  const latencyMs = Date.now() - started;
+  let body: unknown;
+  try {
+    body = JSON.parse(text);
+  } catch {
+    return { ok: false, reason: "non-json", error: `non-JSON body (status ${response.status})`, latencyMs };
+  }
+  if (!response.ok) {
+    return { ok: false, reason: "http", error: `systemOne HTTP ${response.status}: ${text.slice(0, 300)}`, latencyMs };
+  }
+  if (!body || typeof body !== "object" || !("answers" in body)) {
+    return { ok: false, reason: "no-answers", error: "response carried no `answers`", latencyMs };
+  }
+  const answers = body.answers;
+  if (!answers || typeof answers !== "object") {
+    return { ok: false, reason: "no-answers", error: "`answers` was not an object", latencyMs };
+  }
+  return { ok: true, answers, latencyMs };
+}
+
 export async function askJev(options: AskOptions): Promise<JevResult> {
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
   const apiKey = options.apiKey ?? process.env.TYPESAFE_API_KEY;
-  const started = Date.now();
 
   // An unset key is a CONFIGURATION state and must never look like an answer.
   // Source it with:
@@ -64,37 +146,9 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
     Object.entries(options.questions).map(([key, instructions]) => [key, { type: "noul", instructions }]),
   );
 
-  let response: Response;
-  let text: string;
-  try {
-    response = await fetch(SYSTEMONE_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({ model, state: options.state, questions }),
-      signal: AbortSignal.timeout(options.timeoutMs ?? 4000),
-    });
-    text = await response.text();
-  } catch (err) {
-    return { ok: false, reason: "transport", error: String(err), latencyMs: Date.now() - started, model };
-  }
-
-  const latencyMs = Date.now() - started;
-  let body: unknown;
-  try {
-    body = JSON.parse(text);
-  } catch {
-    return { ok: false, reason: "non-json", error: `non-JSON body (status ${response.status})`, latencyMs, model };
-  }
-  if (!response.ok) {
-    return { ok: false, reason: "http", error: `systemOne HTTP ${response.status}: ${text.slice(0, 300)}`, latencyMs, model };
-  }
-  if (!body || typeof body !== "object" || !("answers" in body)) {
-    return { ok: false, reason: "no-answers", error: "response carried no `answers`", latencyMs, model };
-  }
-  const answers = body.answers;
-  if (!answers || typeof answers !== "object") {
-    return { ok: false, reason: "no-answers", error: "`answers` was not an object", latencyMs, model };
-  }
+  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000);
+  if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
+  const { answers, latencyMs } = posted;
 
   const scores: Record<string, number> = {};
   const missing: string[] = [];
@@ -122,6 +176,79 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
     };
   }
   return { ok: true, scores, latencyMs, model };
+}
+
+/**
+ * Ask ONE multiclass question: mutually-exclusive labels, exactly one answer.
+ *
+ * Why this exists beside askJev. Three independent binary questions over three classes that are
+ * mutually exclusive by construction let the model answer yes twice, or no three times; nothing
+ * in the call shape forbids it. A choice question forbids it in the protocol. That difference is
+ * what work/omp-jev-failure/measure-multiclass.mjs measures.
+ *
+ * WIRE SHAPE, verified against a live 200 (not inferred):
+ *   { model, state, questions: { choice: { type: "choice", instructions, criteria: {label: desc} } } }
+ *   -> { answers: { choice: { type, choice, confidence, probabilities } } }
+ * `criteria` is a MAP; the SDK itself rejects a list
+ * (@typesafe-ai/sdk dist/index.mjs:339 "Choice criteria must be a map of labels to descriptions").
+ */
+export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoiceResult> {
+  const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
+  const apiKey = options.apiKey ?? process.env.TYPESAFE_API_KEY;
+
+  if (!apiKey) {
+    return {
+      ok: false,
+      reason: "unconfigured",
+      error: "TYPESAFE_API_KEY is not set — see .env.example, use infisical run --projectId=…",
+      latencyMs: 0,
+      model,
+    };
+  }
+  // A one-label choice has no alternative to choose against, and a list is the shape the SDK
+  // refuses outright. Both are caller bugs: refuse before spending a call, never after.
+  if (Array.isArray(options.classes)) {
+    return { ok: false, reason: "no-answers", error: "classes must be a map of label -> description, not a list", latencyMs: 0, model };
+  }
+  const labels = Object.keys(options.classes ?? {});
+  if (labels.length < 2) {
+    return { ok: false, reason: "no-answers", error: `a choice needs at least 2 labels, got ${labels.length}`, latencyMs: 0, model };
+  }
+
+  const questions = {
+    [CHOICE_KEY]: { type: "choice", instructions: options.instructions, criteria: options.classes },
+  };
+  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000);
+  if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
+  const { answers, latencyMs } = posted;
+
+  const answer: unknown = Reflect.get(answers, CHOICE_KEY);
+  if (!answer || typeof answer !== "object") {
+    return { ok: false, reason: "no-answers", error: "`answers.choice` was missing or not an object", latencyMs, model };
+  }
+  // Read only the documented fields, and fail loudly on anything else. A scorer that silently
+  // reads a missing field does not crash — it fabricates a finding (SDK-SURFACE.md, the 0.500 AUC).
+  const chosen: unknown = Reflect.get(answer, "choice");
+  if (typeof chosen !== "string" || !(chosen in options.classes)) {
+    return { ok: false, reason: "no-answers", error: `\`choice\` was not one of the offered labels: ${JSON.stringify(chosen)}`, latencyMs, model };
+  }
+  const rawProbabilities: unknown = Reflect.get(answer, "probabilities");
+  if (!rawProbabilities || typeof rawProbabilities !== "object" || Array.isArray(rawProbabilities)) {
+    return { ok: false, reason: "no-answers", error: "`probabilities` was missing or not an object (there is no `.distribution`)", latencyMs, model };
+  }
+  const probabilities: Record<string, number> = {};
+  for (const label of labels) {
+    const value: unknown = Reflect.get(rawProbabilities, label);
+    if (typeof value !== "number") {
+      return { ok: false, reason: "no-answers", error: `\`probabilities.${label}\` was not a number`, latencyMs, model };
+    }
+    probabilities[label] = value;
+  }
+  const confidence: unknown = Reflect.get(answer, "confidence");
+  if (typeof confidence !== "number") {
+    return { ok: false, reason: "no-answers", error: "`confidence` was not a number", latencyMs, model };
+  }
+  return { ok: true, choice: chosen, confidence, probabilities, latencyMs, model };
 }
 
 /**

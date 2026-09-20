@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { askJev, SYSTEMONE_ENDPOINT } from '../src/index.ts';
+import { askJev, askJevChoice, SYSTEMONE_ENDPOINT } from '../src/index.ts';
 
 const QUESTIONS = { harm: 'is this harmful?' };
 const STATE = { command: 'rm -rf /' };
@@ -102,6 +102,103 @@ test('no questions is refused before any network call', async () => {
     assert.equal(r.ok, false);
     assert.equal(r.reason, 'no-answers');
   } finally { globalThis.fetch = real; }
+});
+
+// --- MULTICLASS -----------------------------------------------------------------------------
+// One question, mutually-exclusive labels, exactly one answer. The wire shape below was read off
+// a live 200 on 2026-09-19, not inferred: an invented body got HTTP 400 earlier the same night.
+const CLASSES = {
+  transient: 'the environment flaked',
+  argument: 'the invocation was wrong',
+  bug: 'the code under edit is broken',
+};
+const CHOICE_OK = {
+  answers: { choice: { type: 'choice', choice: 'argument', confidence: 0.97,
+                       probabilities: { transient: 0, argument: 0.98, bug: 0.02 } } },
+};
+
+test('askJevChoice sends type:"choice" with criteria as a MAP of label -> description', withFetch(
+  async (url, init) => {
+    assert.equal(url, SYSTEMONE_ENDPOINT);
+    const sent = JSON.parse(init.body);
+    assert.equal(typeof sent.model, 'string');
+    assert.deepEqual(sent.state, STATE);
+    assert.deepEqual(sent.questions, {
+      choice: { type: 'choice', instructions: 'which class?', criteria: CLASSES },
+    }, 'ONE question, type "choice", criteria a map — the SDK rejects a list outright');
+    return { ok: true, status: 200, text: async () => JSON.stringify(CHOICE_OK) };
+  },
+  async () => {
+    const r = await askJevChoice({ state: STATE, instructions: 'which class?', classes: CLASSES });
+    assert.equal(r.ok, true);
+    assert.equal(r.choice, 'argument');
+    assert.equal(r.confidence, 0.97);
+    assert.deepEqual(r.probabilities, { transient: 0, argument: 0.98, bug: 0.02 });
+  },
+));
+
+test('askJevChoice refuses a degenerate class set before any network call', async () => {
+  const real = globalThis.fetch;
+  globalThis.fetch = async () => { throw new Error('must not be called'); };
+  try {
+    for (const classes of [{}, { only: 'one label has nothing to choose against' }]) {
+      const r = await askJevChoice({ state: STATE, instructions: 'q', classes, apiKey: 'k' });
+      assert.equal(r.ok, false);
+      assert.equal(r.reason, 'no-answers');
+      assert.match(r.error, /at least 2 labels/);
+    }
+    // A list is the one shape the SDK itself names and refuses (dist/index.mjs:339).
+    const listy = await askJevChoice({ state: STATE, instructions: 'q', classes: ['a', 'b'], apiKey: 'k' });
+    assert.equal(listy.ok, false);
+    assert.match(listy.error, /not a list/);
+  } finally { globalThis.fetch = real; }
+});
+
+test('askJevChoice with no key is unconfigured, never a choice', async () => {
+  const prev = process.env.TYPESAFE_API_KEY;
+  delete process.env.TYPESAFE_API_KEY;
+  try {
+    const r = await askJevChoice({ state: STATE, instructions: 'q', classes: CLASSES });
+    assert.equal(r.ok, false);
+    assert.equal(r.reason, 'unconfigured');
+    assert.match(r.error, /infisical run --projectId/);
+  } finally {
+    if (prev !== undefined) process.env.TYPESAFE_API_KEY = prev;
+  }
+});
+
+// Each of these returns a plausible-looking 200. A reader that shrugs at one of them reports a
+// confident label it never received — the 0.500-AUC failure mode in SDK-SURFACE.md, one layer up.
+test('askJevChoice refuses an answer it cannot read, rather than inventing one', async (t) => {
+  const bad = {
+    'a label that was never offered': { choice: 'flake', confidence: 0.9, probabilities: { flake: 1 } },
+    'no choice field at all': { confidence: 0.9, probabilities: { argument: 1 } },
+    '.distribution instead of .probabilities': { choice: 'argument', confidence: 0.9, distribution: [0, 1, 0] },
+    'a label missing from probabilities': { choice: 'argument', confidence: 0.9, probabilities: { argument: 0.9, bug: 0.1 } },
+    'non-numeric confidence': { choice: 'argument', confidence: 'high', probabilities: { transient: 0, argument: 1, bug: 0 } },
+  };
+  for (const [name, answer] of Object.entries(bad)) {
+    await t.test(name, withFetch(respond(200, { answers: { choice: answer } }), async () => {
+      const r = await askJevChoice({ state: STATE, instructions: 'q', classes: CLASSES });
+      assert.equal(r.ok, false, `${name} must not be read as an answer`);
+      assert.equal(r.reason, 'no-answers');
+    }));
+  }
+});
+
+test('askJevChoice reports HTTP and transport failures the same way askJev does', async (t) => {
+  await t.test('http', withFetch(respond(400, { detail: 'bad shape' }), async () => {
+    const r = await askJevChoice({ state: STATE, instructions: 'q', classes: CLASSES });
+    assert.equal(r.ok, false);
+    assert.equal(r.reason, 'http');
+    assert.match(r.error, /400/);
+    assert.match(r.error, /bad shape/);
+  }));
+  await t.test('transport', withFetch(async () => { throw new Error('connection reset'); }, async () => {
+    const r = await askJevChoice({ state: STATE, instructions: 'q', classes: CLASSES });
+    assert.equal(r.ok, false);
+    assert.equal(r.reason, 'transport');
+  }));
 });
 
 // Both real omp row shapes. A reader that handles one and not the other reports "no rows"
