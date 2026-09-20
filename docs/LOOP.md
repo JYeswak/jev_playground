@@ -1,0 +1,179 @@
+# How this lane gets faster and more honest each turn
+
+Written 2026-09-20 from one session's measured data. Every number here is from a committed
+receipt or a command you can re-run. Where the loop failed, the failure is the entry.
+
+The loop has one shape:
+
+```
+build the smallest thing a stranger can run
+  → measure it against answers you knew before you looked
+    → hold it out on cases nobody tuned it against
+      → keep what survives, publish what dies, mechanise what recurs
+```
+
+Everything below is what each arrow cost to learn.
+
+---
+
+## 1. The turn: what "faster" actually came from
+
+Speed did not come from writing code faster. It came from **three mechanical helpers that
+removed a class of failure entirely**, each built only after a written rule had failed
+repeatedly.
+
+| helper | replaced | built after |
+|---|---|---|
+| `requireKey` | "the field is missing" inferred from a failed lookup | **8** wrong-selector failures |
+| `askJev` / `askJevChoice` | hand-rolled request bodies | every hand-rolled body was wrong at least once, incl. an `HTTP 400` |
+| `readRow` | hand-rolled session-row parsers | omp emits **two** row shapes; a parser for one reports "no rows" on the other |
+
+The pattern: **a rule that has failed twice will fail again; convert it into a function whose
+error message is the thing you forgot.** `requireKey`'s error *is* the key dump:
+
+```
+decision: no 'toolCallId'. Keys present: [command, kind]
+```
+
+Honest limit, recorded at the time: **a helper cannot force its own use.** The commit landing
+`requireKey` predicted "the ninth instance will come from code that never imported it." It did,
+within hours, in my own hands.
+
+---
+
+## 2. The measurement ladder, and the four ways a number lies
+
+Nine extensions were built. Eight question sets were measured. **Four were degenerate, below
+chance, or refuted.** That hit rate is the reason measurement is the loop rather than a step.
+
+Each rung exists because the rung below it was fooled:
+
+| rung | what it catches | what fooled it |
+|---|---|---|
+| does it run? | nothing | an installer that reported GREEN while copying nothing |
+| does it beat a coin flip? | nothing on imbalanced classes | `failure`: an always-no answerer scores 7–8 of 11 |
+| does it beat **its own constant**? | flat questions | `foreman`: +1 of 8 is one case flipping |
+| does it beat it by more than the near-threshold count? | unstable questions | `argument`: HIT→MISS→MISS on **byte-identical input** |
+| does it hold on **fresh cases**? | overfit questions | `destructive`: 6/7 "correct" while answering *no* to all seven |
+
+**Four ways a number looked like a signal and was a base rate:**
+
+1. beating a coin flip when classes are imbalanced
+2. beating your own constant by +1
+3. scoring N−1 of N while being constant
+4. passing on the cases you tuned it against
+
+Each of these fooled someone in this session, including me.
+
+---
+
+## 3. What survived, and the shape of it
+
+| survived | failed |
+|---|---|
+| `needs_heavyweight` 8/9 | `scope` "larger than its message implies" — **inverted ordering** |
+| `mechanical` 8/9 | `noise` "is more than half irrelevant" — constant |
+| `boundary` 7/7 (0.97 vs ≤0.21) | `definitional` "do the first three contain the definition" — constant |
+| `transient`, `bug` 11/11 | `destructive` — 0.17 on the packet that *actually* caused a deletion |
+
+**Questions that ask about a property visible in the text survive. Questions requiring a
+relative or counterfactual comparison fail**, and resist rewriting: `scope` stayed degenerate
+through every rephrasing, because "bigger than implied" has no visible proxy.
+
+Rephrasing to a visible property rescued three of five; a hold-out then killed one of those
+three. Net: **two of five rescues real**.
+
+Surviving questions score **bimodally** (0.9x vs 0.1x). Failing ones sit in the mush near 0.5.
+That is the fastest tell available before running a full measurement.
+
+---
+
+## 4. Where the judge earns its seat — and where it does not
+
+The lane's headline result is a **negative** one, and it is the most useful thing here:
+
+```
+deterministic rule   12/12 recall   0/38 FP     ← shipped
+Jev                  11/12          0/38
+dumb baseline         5/12
+```
+
+Four regexes beat a live model by one recall point at zero cost and zero latency, on a
+held-out, time-ordered split of 216k real tool decisions, scored by a pane that authored none
+of them. **Two of nine extensions therefore contain no model call at all.**
+
+The inverse case is just as real. `omp-jev-commit`, on a message saying *"docs: fix a typo"*
+over a diff removing an auth check:
+
+```
+describes 0.11   omits 0.92
+```
+
+A conventional-commit linter passes that commit. No regex expresses it.
+
+**The product of this lane is the boundary between those two results**, not either one alone.
+
+---
+
+## 5. Honesty mechanics that changed outcomes
+
+- **NO-CLAIM on every artifact.** Not decoration — it is where the next unit comes from. The
+  `0/40` false-positive claim died because a NO-CLAIM forced someone to ask which corpus.
+- **A pane's report is a claim.** Re-executing them caught: a callback citing a commit whose
+  subject described only half its contents, a sha transcribed one character short, and a
+  verdict word (`DISCRIMINATES`) that the evidence did not support.
+- **Refusals with triggers beat gates that fire on everything.** A sentinel checker was refused
+  because no retirement condition could be named — then **overturned by its own trigger within
+  one tick** when a stored sentinel reached a shipped artifact. Both the refusal and its
+  overturning are committed.
+- **Publish the failures.** A dispatch scorer came in **below chance (7/15 vs 7.5)** and is
+  committed with the failure in the README's first line and no install instructions.
+
+---
+
+## 6. The failure modes that cost the most, ranked by damage
+
+1. **Untracked work.** Three separate pieces of live, working code were reported as shipped
+   while never committed — including the first real live Jev call, cited in a tick line and a
+   peer packet. **Untracked files are invisible to every gate.** `git status --short` and read
+   the `??` lines before calling anything done.
+2. **Absence inferred from a failed lookup.** Nine instances. Twice it led to contradicting a
+   peer who was right, once in a published receipt that had to be retracted within the hour.
+3. **Claiming a number without opening its control.** Including a "dropped digit" diagnosis
+   that was false and propagated into two panes' work before it was caught.
+4. **Preference stated without its check.** A packet saying deletion was "preferred" without
+   requiring an `ls` for a receipt deleted five receipt-backed rows. *A preference without a
+   check is an instruction to skip the check.*
+
+---
+
+## 7. The scoreboard that matters
+
+| | |
+|---|---|
+| extensions built | 9 |
+| extensions containing **no** model call, by measurement | 2 |
+| question sets measured | 8 |
+| question sets cut, refuted, or below chance | 4 |
+| rescues that survived hold-out | 2 of 5 |
+| upstream defects found and reproduced | 2 |
+| conductor claims refuted by dispatched agents | 4 |
+| `promoted` in the ledger | **0** |
+
+That last row is deliberate. One artifact runs on a working profile; that is an artifact being
+promoted, not a candidate being promoted, and conflating them would inflate the headline.
+
+---
+
+## 8. What is still not true
+
+- **Nine extensions emit decision rows nobody has ever labelled.** Every measurement here was
+  hand-built at n≈8–11 by the same person who knew the answers.
+- **No extension has a real-traffic accuracy figure.** None acts on its scores; all are
+  observe-only, and that is not caution, it is the honest consequence of the row above.
+- **The multiclass conversion is kept for coherence, not accuracy** — on fresh cases both
+  framings tied 8/9 and the structural defect did not reappear.
+- `jev-align` would close the labelling gap, but its optimizer changed nothing across ~800
+  metric calls for three distinct reasons, one of which is an upstream defect we reproduced.
+
+The next real gain is not a tenth extension. It is **labels on rows we already have**.
