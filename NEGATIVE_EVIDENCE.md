@@ -3020,3 +3020,8 @@ to reconsideration, still short on both axes.
 class files `/tmp/fhgap_class_{pipe,mdnum,rcno}.json`, verdict rows in
 `work/jev-triage/advisory-veto.jsonl` (mine: 23:16:54Z ×3; P3's rs-gap
 rows at 23:15:25Z show the same machinery). Bead below.
+
+See also R66 (P3, .rs lane, landed concurrently — renumbered from R65 to
+resolve the collision, no content lost either side): same zero from the
+other lane, plus the exposure-constraint conclusion that outranks the
+rule question. The two entries corroborate; neither re-litigates.

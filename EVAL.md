@@ -987,3 +987,21 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   full suite **76 ok / 0 failed**. STOP ADDING RULES per dispatch —
   next unit sharpens existing pack pending P3 bind rates.
 - **Boundary:** live-fire NOT_RUN from this session (predates the file).
+
+## P2 gap-condition funnel: 3 in, 0 survive (2026-09-20)
+
+- **Corpus:** 30,041 edit/write toolCalls over 1,817 sessions (args
+  capped 20 KB). Sessions-touched: SH1 1 (0.06%), SH2 30 (1.65%),
+  MD1 9 (0.50%).
+- **Labels (n=20 each, seed 20260920-gap):** SH2 FP 1.00 (fires on
+  correct capture-first idiom); MD1 FP 1.00 (fixtures, dispatch
+  packets, provenanced claims); SH1 below floor, unlabelled.
+- **Advisory:** 3/3 numeric_refuse via advisory-veto.mjs offline
+  (LOW_PRECISION, TOO_RARE ×2); rows appended to
+  work/jev-triage/advisory-veto.jsonl — pane 4's file, left
+  uncommitted by me, disclosed here.
+- **Closed permanently as rules:** SH1/SH2/MD1, single-entry-count,
+  equal-or-weaker-as-gap, wrapper-as-gap, capture-first-in-sh.
+  Read-once owns them. **R65.**
+- **Boundary:** payload cap 20 KB; concentration MD1 top-share 0.49
+  (closest to reconsideration, still short on both axes).
