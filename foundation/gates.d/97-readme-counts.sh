@@ -2,18 +2,30 @@
 # Stage 97 — the README's typed counts must match what the repository actually contains.
 #
 #   CONSUMER            foundation/gates.sh (this stage)
-#   GATE                the stage-count word in README.md equals the gates.d glob; no upstream repo
-#                       is described as "not run" while a receipt for it exists
+#   GATE                the stage-count word in README.md equals the gates.d glob; every numeral
+#                       "<N> gate stages", "<N> verdict rows", and "(A cleared, B held, C ruled out"
+#                       in README.md equals its machine source; no upstream repo is described as
+#                       "not run" while a receipt for it exists
 #   OBSERVED DEFECTS    four in one day, all typed next to something that grows: "not run" for a repo
 #                       run hours earlier, "eight of ten" after an eleventh stage landed, "two of the
 #                       nine gate stages", and a pasted ALL GREEN transcript ten lines long for an
-#                       eleven-stage suite
+#                       eleven-stage suite — plus three more the next day that sailed through 13 green
+#                       stages: numeral "12 gate stages" for 13, and "25 verdict rows (7/9/8)" for 33
+#                       (8/13/12), stated twice plus once more without a breakdown. The spelled-word
+#                       check matched "Thirteen stages"; the numerals lived two lines below it.
 #   RETIREMENT          when these counts are GENERATED into the README rather than typed, this stage
 #                       has nothing left to check and should be deleted rather than kept green
 #
 # WHY A GATE RATHER THAN ANOTHER NOTE. The pattern was named in a commit message last tick and
 # nothing enforced it, which is the definition of process. Every count it checks is derivable in one
 # command, and every one of them was typed by hand anyway.
+#
+# SCOPE, RULED 2026-09-20 (not widened to all prose, not refused): only patterns with an exact
+# machine source are checked — the gates.d glob, STATUS.tsv row and verdict counts. A numeral
+# about anything else is free prose and out of scope for ever, because chasing every restatement
+# of a number through prose false-positives by construction. The check is exact-equality on a
+# fixed noun pattern, never "does this number appear somewhere", so a README that legitimately
+# says "12" about something else cannot trip it.
 #
 # WHAT IT DELIBERATELY DOES NOT CHECK: prose accuracy, the fresh-clone pass figure (which requires
 # building a worktree and is too slow for a per-commit gate), and the pasted transcript's contents.
@@ -55,6 +67,14 @@ if [[ "${1:-}" == "--selftest" ]]; then
   cat "$readme" >> "$tmp/stalerow.md"
   arm "row says not-run but receipt exists -> RED" 1 "$tmp/stalerow.md"
 
+  # The exact escape of 2026-09-20: spelled word matched while the numerals below it
+  # went stale ("12 gate stages" for 13, "25 verdict rows (7/9/8)" for 33 8/13/12).
+  sed -E -e "s/[0-9]+ gate stages/$((n_now - 1)) gate stages/" \
+         -e 's/[0-9]+ verdict rows/25 verdict rows/' \
+         -e 's/\([0-9]+ cleared, [0-9]+ held, [0-9]+ ruled out/(7 cleared, 9 held, 8 ruled out/' \
+         "$readme" > "$tmp/stalenumerals.md"
+  arm "stale numerals under matching word -> RED" 1 "$tmp/stalenumerals.md"
+
   arm "missing README -> refuse" 2 "$tmp/absent.md"
 
   if (( fails > 0 )); then echo "stage 97 selftest: $fails arm(s) FAILED"; exit 1; fi
@@ -74,6 +94,24 @@ elif ! grep -q "$word stages" "$readme"; then
   claimed="$(grep -oE '\b(Eight|Nine|Ten|Eleven|Twelve|Thirteen|Fourteen|Fifteen) stages' "$readme" | head -1)"
   problems="$problems|README says '${claimed:-no stage count}' but foundation/gates.d holds $n_stages ($word)"
 fi
+
+# Numeral forms of the same two machine-sourced facts. Every occurrence must equal the
+# machine count — the escape was a stale numeral two lines below a matching spelled word.
+while IFS= read -r hit; do
+  [[ "$hit" == "$n_stages" ]] || problems="$problems|README says '$hit gate stages' but foundation/gates.d holds $n_stages"
+done < <(grep -oE '[0-9]+ gate stages' "$readme" | grep -oE '^[0-9]+' || true)
+
+n_rows="$(grep -vc '^#\|^candidate\|^$' "$root/docs/demos/STATUS.tsv")"
+n_cleared="$(awk -F'\t' '$4=="CLEARED"' "$root/docs/demos/STATUS.tsv" | grep -c . || true)"
+n_held="$(awk -F'\t' '$4=="HELD"' "$root/docs/demos/STATUS.tsv" | grep -c . || true)"
+n_out="$(awk -F'\t' '$4=="RULED_OUT"' "$root/docs/demos/STATUS.tsv" | grep -c . || true)"
+while IFS= read -r hit; do
+  [[ "$hit" == "$n_rows" ]] || problems="$problems|README says '$hit verdict rows' but STATUS.tsv holds $n_rows"
+done < <(grep -oE '[0-9]+ verdict rows' "$readme" | grep -oE '^[0-9]+' || true)
+while IFS= read -r triple; do
+  want="($n_cleared cleared, $n_held held, $n_out ruled out"
+  [[ "$triple" == "$want" ]] || problems="$problems|README breakdown '$triple)' differs from STATUS.tsv '$want)'"
+done < <(grep -oE '\([0-9]+ cleared, [0-9]+ held, [0-9]+ ruled out' "$readme" || true)
 
 # Any repo row claiming "not run" while docs/demos/upstream-repro holds a receipt naming it.
 while IFS= read -r row; do
