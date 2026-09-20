@@ -2,6 +2,7 @@
  "candidate": "a11-join",
  "rung": 4,
  "verdict": "HELD",
+ "outcome": "DONE",
  "author": "Muse",
  "score": "0",
  "blocked_on": "",
@@ -19,5 +20,5 @@
  },
  "inputs": [],
  "guards": {},
- "emitted_at": "2026-09-20T17:15:43.490Z"
+ "emitted_at": "2026-09-20T17:25:01.275Z"
 }

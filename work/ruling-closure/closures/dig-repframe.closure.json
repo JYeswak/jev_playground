@@ -1,7 +1,8 @@
 {
  "candidate": "dig-repframe",
  "rung": 4,
- "verdict": "DONE",
+ "verdict": "CLEARED",
+ "outcome": "DONE",
  "author": "Muse",
  "score": "0",
  "blocked_on": "",
@@ -29,5 +30,5 @@
   "pin-liveness": 0,
   "pinned-denominator": 0
  },
- "emitted_at": "2026-09-20T17:15:43.670Z"
+ "emitted_at": "2026-09-20T17:25:01.444Z"
 }

@@ -65,12 +65,13 @@ const receipt = get("--receipt");
 const falsifier = get("--falsifier");
 const falsifierSha = get("--falsifier-sha");
 const fired = get("--falsifier-fired");
+const outcome = get("--outcome");
 const outDir = get("--out") ?? "work/ruling-closure/closures";
 
 for (const [name, v] of [["--candidate", candidate], ["--rung", rung],
-    ["--verdict", verdict], ["--author", author], ["--receipt", receipt],
-    ["--falsifier", falsifier], ["--falsifier-sha", falsifierSha],
-    ["--falsifier-fired", fired]]) {
+    ["--verdict", verdict], ["--outcome", outcome], ["--author", author],
+    ["--receipt", receipt], ["--falsifier", falsifier],
+    ["--falsifier-sha", falsifierSha], ["--falsifier-fired", fired]]) {
   if (!v) fail(`missing required ${name}`);
 }
 if (!["yes", "no"].includes(fired)) fail("--falsifier-fired must be yes|no");
@@ -81,6 +82,21 @@ try {
   receiptDigest = normDigest(readFileSync(receipt));
 } catch {
   fail(`receipt unreadable: ${receipt}`);
+}
+// TWO AXES, ruled 2026-09-20 (receipt: verdict-vocabulary-20260920.md): the
+// callback words (DONE|HELD|REFUSE|BLOCKED) and the STATUS words
+// (CLEARED|HELD|RULED_OUT) are NOT one axis. DONE/BLOCKED describe the UNIT
+// (finished vs could-not); CLEARED/HELD/RULED_OUT describe the CLAIM
+// (survived vs held vs ruled out). Merging them loses information: 2 of 3
+// demo closures mistranslate (DONE→? and REFUSE→RULED_OUT-vs-HELD are both
+// ambiguous). So the closure carries BOTH, each enforced to its canonical
+// set; the STATUS projection renders the claim verdict only (schema frozen
+// at 10 columns — the unit outcome lives in JSON, not in the TSV).
+if (!["CLEARED", "HELD", "RULED_OUT"].includes(verdict)) {
+  fail("--verdict must be CLEARED|HELD|RULED_OUT (claim axis)");
+}
+if (!["DONE", "BLOCKED"].includes(outcome)) {
+  fail("--outcome must be DONE|BLOCKED (unit axis)");
 }
 const falsifierDigest = (() => {
   try { return normDigest(readFileSync(falsifier)); } catch { return null; }
@@ -114,7 +130,7 @@ for (const g of getAll("--guard")) {
 }
 
 const closure = {
-  candidate, rung: Number(rung), verdict, author,
+  candidate, rung: Number(rung), verdict, outcome, author,
   score, blocked_on: blockedOn, concur, receipt_type: receiptType,
   receipt: { path: receipt, digest: receiptDigest },
   falsifier: { path: falsifier, commit_sha: falsifierSha, fired: fired === "yes", digest: falsifierDigest },

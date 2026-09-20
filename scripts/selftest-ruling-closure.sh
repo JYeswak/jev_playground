@@ -19,7 +19,7 @@ printf '# test receipt\nbody line\n' > "$tmp/receipt.md"
 printf '# falsifier\n' > "$tmp/fals.md"
 
 # Setup: one honest closure.
-node "$E" --candidate T1 --rung 4 --verdict HELD --author t \
+node "$E" --candidate T1 --rung 4 --verdict HELD --outcome DONE --author t \
   --receipt "$tmp/receipt.md" --falsifier "$tmp/fals.md" \
   --falsifier-sha deadbee --falsifier-fired no \
   --out "$tmp/closures" >/dev/null 2>&1 || { echo "selftest: setup emit failed"; exit 2; }
@@ -32,7 +32,7 @@ else note FAIL "digest disagreement passed"; fail=$((fail + 1)); fi
 printf '# test receipt\nbody line\n' > "$tmp/receipt.md"  # restore
 
 # Arm 2: closure citing a live-monotonic input with no as_of must FIRE.
-node "$E" --candidate T2 --rung 4 --verdict HELD --author t \
+node "$E" --candidate T2 --rung 4 --verdict HELD --outcome DONE --author t \
   --receipt "$tmp/receipt.md" --falsifier "$tmp/fals.md" \
   --falsifier-sha deadbee --falsifier-fired no \
   --live-input /tmp/live.db --out "$tmp/closures" >/dev/null 2>&1 \
@@ -53,6 +53,22 @@ else note FAIL "strict diff passed on dropped row"; fail=$((fail + 1)); fi
 node "$P" --dir "$tmp/closures" --diff "$tmp/status.tsv" >/dev/null 2>&1
 if [ "$?" -eq 0 ]; then note ok "lax diff reports without failing"; pass=$((pass + 1));
 else note FAIL "lax diff failed on reportable delta"; fail=$((fail + 1)); fi
+
+# Arms 5-6: two-axis vocabulary (verdict-vocabulary ruling). Old callback
+# words in --verdict must REFUSE; canonical sets pass.
+node "$E" --candidate TV --rung 4 --verdict DONE --outcome DONE --author t \
+  --receipt "$tmp/receipt.md" --falsifier "$tmp/fals.md" \
+  --falsifier-sha deadbee --falsifier-fired no \
+  --out "$tmp/closures" >/dev/null 2>&1 \
+  && { echo "selftest: FAIL — callback word DONE accepted as claim verdict"; fail=$((fail+1)); } \
+  || { note ok "callback word in verdict slot refuses"; pass=$((pass + 1)); }
+node "$E" --candidate TO --rung 4 --verdict RULED_OUT --outcome BLOCKED --author t \
+  --receipt "$tmp/receipt.md" --falsifier "$tmp/fals.md" \
+  --falsifier-sha deadbee --falsifier-fired no \
+  --out "$tmp/closures" >/dev/null 2>&1 \
+  && { note ok "canonical both-axes accepted"; pass=$((pass + 1)); } \
+  || { echo "selftest: FAIL — canonical verdict+outcome refused"; fail=$((fail+1)); }
+rm -f "$tmp/closures/TV.closure.json" "$tmp/closures/TO.closure.json"
 
 echo "scripts/selftest-ruling-closure.sh: $pass ok, $fail failed"
 [ "$fail" -eq 0 ] || exit 1
