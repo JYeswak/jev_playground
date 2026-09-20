@@ -1,0 +1,16 @@
+{
+ "id": "rs-gap-unsafe",
+ "name": "rs-gap-unsafe",
+ "N": 845,
+ "seed": 20260920,
+ "corpus_is_authored_by_us": false,
+ "is_defect_or_routing": "routing",
+ "hits": 6,
+ "rate": 0.71,
+ "FP": null,
+ "labelled_n": 0,
+ "concentration_top_session_share": 0.333,
+ "description": "rs edit payload contains unsafe; inject forbid-or-audit ladder",
+ "predicate": "whole-word unsafe in .rs edit/write payload",
+ "examples": []
+}

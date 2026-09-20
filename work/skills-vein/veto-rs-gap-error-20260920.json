@@ -1,0 +1,16 @@
+{
+ "id": "rs-gap-error",
+ "name": "rs-gap-error",
+ "N": 845,
+ "seed": 20260920,
+ "corpus_is_authored_by_us": false,
+ "is_defect_or_routing": "routing",
+ "hits": 114,
+ "rate": 13.49,
+ "FP": 1.0,
+ "labelled_n": 20,
+ "concentration_top_session_share": 0.211,
+ "description": "rs edit defines/handles error type; inject thiserror-anyhow selection",
+ "predicate": "new-error-type shape in .rs edit/write payload",
+ "examples": []
+}

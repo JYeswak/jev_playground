@@ -1,0 +1,16 @@
+{
+ "id": "rs-gap-newtype",
+ "name": "rs-gap-newtype",
+ "N": 845,
+ "seed": 20260920,
+ "corpus_is_authored_by_us": false,
+ "is_defect_or_routing": "routing",
+ "hits": 32,
+ "rate": 3.79,
+ "FP": null,
+ "labelled_n": 0,
+ "concentration_top_session_share": 0.125,
+ "description": "rs edit defines tuple struct or PhantomData; inject newtype-typestate",
+ "predicate": "tuple-struct or PhantomData shape in .rs payload",
+ "examples": []
+}

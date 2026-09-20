@@ -1,0 +1,16 @@
+{
+ "id": "rs-gap-oracle",
+ "name": "rs-gap-oracle",
+ "N": 845,
+ "seed": 20260920,
+ "corpus_is_authored_by_us": false,
+ "is_defect_or_routing": "routing",
+ "hits": 5,
+ "rate": 0.59,
+ "FP": null,
+ "labelled_n": 0,
+ "concentration_top_session_share": 0.8,
+ "description": "rs edit path names oracle domain; NO gap signal, topic only",
+ "predicate": "oracle-domain token in .rs edit path",
+ "examples": []
+}
