@@ -257,7 +257,7 @@ measurement rather than preference.
 | [`omp-jev-observer`](work/omp-jev-observer/) | the observe-and-log seam | 7/7 | yes, `jev-lab` | yes |
 | [`omp-jev-review`](work/omp-jev-review/) | `jev-review` | 6/6 | yes, `review_scored` | yes — no regex for "this refactor changed a default" |
 | [`omp-jev-rerank`](work/omp-jev-rerank/) | `jev-rerank-bench` | 7/7 | yes, `{ordered: 0.91}` | yes, **one** question — measurement killed the other two |
-| [`omp-jev-failure`](work/omp-jev-failure/) | `jev-agent-failure-benchmark` | 5/5 | yes, `failure_classified` | yes, **one** multiclass question — three binary ones scored 9/11 and answered two classes true at once |
+| [`omp-jev-failure`](work/omp-jev-failure/) | `jev-agent-failure-benchmark` | 5/5 | yes, `failure_classified` | yes, **one** multiclass question — chosen for coherence, NOT accuracy: on 9 fresh hold-out cases both framings tied 8/9 and the impossible-answer defect did not reappear |
 
 Two of six contain **no model call at all**, and that is the most useful thing this lane has
 produced. The harm gate was decided by putting four regexes, a live model and a dumb baseline on

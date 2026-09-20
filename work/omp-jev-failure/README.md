@@ -39,6 +39,28 @@ comparison between one label and three. Both adversarial arms pass in all six mu
 Across all seven binary runs tonight the score was 9-10/11 and never 11, and the *identity* of the
 missed cases moved between measurement blocks.
 
+### The hold-out refutes the superiority claim — read this before citing the table above
+
+Everything above was measured on the **11 cases the classes were shaped against**. A hold-out
+on **9 fresh failures** nobody tuned for (`measure-multiclass-holdout.mjs`, receipt
+[`failure-multiclass-holdout-20260919.md`](../../docs/demos/upstream-repro/failure-multiclass-holdout-20260919.md))
+found:
+
+| | tuned 11 | fresh 9 |
+|---|---|---|
+| binary, three questions | 9/11, **2 impossible answers per run** | **8/9, ZERO impossible answers** |
+| multiclass, one question | 11/11 ×3 | **8/9** (dropped) |
+
+**Both framings tie on fresh cases, and the structural defect did not reappear.** The
+incoherent `argument`-and-`bug`-both-true rows — the mechanism we called decisive — were a
+property of the tuned set, not of the binary framing in general. Multiclass also dropped
+11/11 → 8/9, which is what tuned-set scores do.
+
+**The conversion stays**, because one label for mutually exclusive classes cannot emit a
+contradiction *by construction* and is simpler to consume. **It is not earned by accuracy, and
+this README no longer claims it is.** Both framings missed the same case (`grep-timeout`,
+called `argument`, multiclass at margin 0.90 — confidently wrong).
+
 The extension emits a class and its distribution only; it never acts on them. No accuracy or
 production failure-prediction claim is made.
 
