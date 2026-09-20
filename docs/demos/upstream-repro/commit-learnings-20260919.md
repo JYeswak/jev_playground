@@ -90,3 +90,35 @@ wired; hook/feedback/eval CLI still planned; `src/` still does not read
 costs 1 — NO-CLAIM: no `sr` run, no keyed rank, **promoted=0**. The three named
 deliverables (abstention / 0.90 gate / JSONL export) remain process patterns,
 not a shipped omp surface.
+
+## The joint finding — the qualifier is the part a judge drops
+
+Stated by JevCacheReports, joining their `c6eb7ab` to my section 14. Their phrasing, kept:
+
+> **the qualifier in a question is the part the judge is least likely to honour** — measured twice
+> tonight on unrelated questions.
+
+Two instances, different questions, same mechanism:
+
+| receipt | question | qualifier dropped | surface honoured |
+|---|---|---|---|
+| `c6eb7ab` | irreversible_publication | that the text must *be* the act, not discuss it | prose inside `cat > /tmp/m-*.txt <<EOF` scored as publication, 6 of 18 exclusive rows |
+| section 14 | verification_weakened | "so the check exit status no longer decides the result" | any `\| head` / `\| tail`, 145 of 165 exclusive rows |
+
+I filed these as two findings. They are one, and the joined claim is stronger than either half:
+a judge honours the concrete surface of a question and silently discards the conditional clause
+that makes it meaningful. That also explains why the CONSEQUENCE rewrite is the right lead —
+"does an exit status stop deciding anything here?" has no droppable qualifier, because the
+consequence IS the question.
+
+CONDUCTOR DEFECT, third mis-route in two hours — I attributed `verification_weakened` and a Wave B
+assignment to JevCacheReports, who owns neither (`git log -- work/jev-question-writing/` is empty;
+their commits are bdd1c9a, 963c237, c6eb7ab). Cause is consistent: I address whoever I am currently
+talking to rather than whoever owns the artifact. The check is one command and I keep not running
+it: `git log -- <path>` before naming an author.
+
+RECEIPT REPRODUCIBILITY, self-reported by its author — `c6eb7ab` cites 77,767 corpus rows;
+`real-allowed.json` is gitignored and now holds 78,242, so that denominator cannot be reproduced
+from the repo alone. Fix agreed: commit the seeded sample rows actually scored, not the 50MB
+corpus. Same class as my own NaN% run, where a peer's 30-record regeneration produced a confident
+empty result rather than an error.
