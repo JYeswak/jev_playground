@@ -685,7 +685,7 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 
 ## P2 sr-advise — verified=0 ruled, manifest eligibility 0→10, doctrine mined (2026-09-20)
 
-- Receipt: `docs/demos/upstream-repro/sr-advise-20260920.md`. Level `[test]` (offline only).
+- Receipt: `docs/demos/upstream-repro/sr-advise-20260920.md`. Level `[live]` (N=2 decisions).
 - **U1:** `roster verified=0` is by-design inspection reporting
   (`skillranker@abf909d` discovery.rs:627-630, cli.rs:1978-1979). Rank advises nothing via
   global withhold (resolution.rs:530-540), tripped by entry-limit (23,100 files vs 10,000
@@ -693,12 +693,15 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   `.claude/skills/typesafe-ai`). Plus alias-guard false positive on `Bash(*)` globs
   (frontmatter.rs:354-363) behind 14 malformed-metadata. Controls: clean-HOME rank from
   neutral cwd → eligible 3 (exit 11 cache-miss); from jev/ → exit 5 (project symlink).
-- **U2:** `--roster` manifest (10 real-dir skills) → dry-run exit 0, wide stage with 10
-  candidates + `__none__`. Rows judged (3 USEFUL / 3 PLAUSIBLE / 4 WRONG); best answers
-  (ripwire-*, socraticode, jsm) unimportable. `demo --case none` → abstain (synthetic).
-  Live NOT_RUN: no key (auth exit 4), 0 calls spent of ≤4 stated.
+- **U2 LIVE 2026-09-20** (key via infisical, 4 requests of ≤4 stated, jev-1.13.0): task rank
+  → skill-search-mcp alone at 1.0 (HIT; 4/4 wrongs at 0.0; honest MISS research-scout 0.0).
+  Seat verdict: paid call earns it (offline admits, only live cuts). Negative "what time is
+  it" → abstain/low-fit/none_p 1.0 after full 2-stage pass (judgement abstention measured).
+  Both cases saved (0600) + replayed offline exit 0. Reportable defect (NOT filed):
+  `sr-withhold-defect-20260920.md`. P3 warned off sr routing directly.
 - **U3:** wide (3 Noul gates + which + phase + optional stuck) → gate-mean (0.30) → rerank
   (choice + fits:: Nouls, fits floor 0.30, must-beat-none); 25-kind refusal taxonomy
   (output/mod.rs:126-156); replay-case + ledger tables mined with file:line.
-- **Boundary:** one machine, one roster, 0 live calls, morph unused (session predates mount),
-  skillranker/ untouched. State: **PROBED** (live rank + save-case/replay pending key).
+- **Boundary:** one machine, 10-skill manifest (full store unrunnable), live N=2, variance +
+  57-candidate scale untested, morph unused, skillranker/ untouched. State: **VALIDATED**
+  (offline ladder + live decisions; omp-seam wiring explicitly out of scope).
