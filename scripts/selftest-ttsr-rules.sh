@@ -136,6 +136,25 @@ else
   note ok "rule roots scanned: project=$n_project systemwide=$n_system"; pass=$((pass+1))
 fi
 
+# DRIFT GUARD. A rule promoted to ~/.agents/rules also exists here, and name-based dedup means
+# the project copy WINS (measured 2026-09-20: 35 rules in this repo, zero duplicate names, the
+# five promoted all resolve to [native]). So a double-fire is impossible — but editing one copy
+# and forgetting the other is not. Then this repo behaves one way and every OTHER repo on the
+# machine behaves another, with nothing to say so. That silent divergence is the reason the two
+# copies are tolerable at all, so it has to be RED, not a comment.
+drift=0
+for pf in .omp/rules/*.md; do
+  [ -e "$pf" ] || continue
+  sf="$HOME/.agents/rules/$(basename "$pf")"
+  [ -e "$sf" ] || continue
+  if cmp -s "$pf" "$sf"; then
+    note ok "no drift: $(basename "$pf") identical in both roots"; pass=$((pass+1))
+  else
+    note FAIL "DRIFT: $(basename "$pf") differs between project and ~/.agents — this repo and every other disagree"; fail=$((fail+1)); drift=$((drift+1))
+  fi
+done
+[ "$drift" -eq 0 ] || note FAIL "$drift rule(s) drifted across roots"
+
 # The guard's own RED arm, assembled at runtime, because a guard that has only ever gone green is
 # indistinguishable from a guard that cannot fire. Two genuine known-bads, both measured against
 # omp 2026-09-20. NOTE the near-miss: a LEADING (?i) is ACCEPTED (omp lifts it to the `i` flag) —
