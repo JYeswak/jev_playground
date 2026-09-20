@@ -17,9 +17,9 @@
 import { askJev } from '../jev-client/src/index.ts';
 
 const QUESTIONS = {
-  definitional: 'Do the first three candidates contain the definition or primary implementation, rather than call sites and tests?',
+  definitional: 'Do any of the first three show a definition signature?',
   ordered: 'Are these candidates already ordered with the most relevant to the stated intent first?',
-  noise: 'Is more than half of this candidate list irrelevant to the stated intent?',
+  noise: 'Does any entry fail to show a code line with the term?',
 };
 
 const DEF = 'work/jev-client/src/index.ts:41: export async function askJev(options: AskOptions): Promise<JevResult> {';
