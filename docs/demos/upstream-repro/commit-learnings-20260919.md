@@ -942,3 +942,41 @@ Three held:
 for longer than any of them, in the sentence immediately beside the ones I corrected, and I
 walked past it twice while editing that exact line. That is the adjacent-text defect demonstrating
 itself inside the commit that was supposed to be about adjacent-text defects.
+
+## The front-door sweep, part 1: 9 stale of ~60 checkable claims
+
+`readme-claim-sweep-20260920.md` (226ccdf). Lines 1–488 plus Status. **The headline is the
+product**: a reader can now say how much of our front door was wrong, which nobody had ever
+measured. Roughly one claim in seven.
+
+**The worst one is not a number, it is a boast.** The README said *"22 of 22 have been run"*.
+Derived here, independently: **24 clones on disk, and 11 of the census rows marked RUN.** So the
+sentence overstated both the denominator and the work. It now reads "eleven of twelve census
+rows have been run (plus a smoke run; 24 clones)" — smaller, and true.
+
+Two more of the nine are the same shape as the live-proven column I fixed an hour earlier:
+
+- The harm-rule row claimed `live-proven: yes, working profile`, and **its own receipt says
+  "lab runs ≠ working profile"**. The artifact contradicted the table that advertised it.
+- The taste-loop link pointed at `work/taste-loop/`, which holds contract and src; the packages
+  a reader would install are at `work/omp-jev-*`. **A wrong path in the one place we tell people
+  where to look.**
+
+And the timing instruction produced the right outcome: gates "about 16 s" was refreshed to a
+measured 24 s, and the **stage-80 sub-number was deleted rather than refreshed** — a pasted
+per-machine runtime is a claim a stranger cannot check, so deleting beats resetting the clock.
+
+**Collision handled well.** The sweep clobbered my uncommitted-looking observer/review rows, the
+pane noticed in its own diff, restored them verbatim, and then **re-derived both counts rather
+than just keeping them** (5 emits + 8 seam = 13; 7 review + 6 behaviour-label = 13). That is the
+distinction between restoring text and confirming a fact. My rows were already committed, so
+nothing was ever at risk — but the pane could not know that from the working tree, and it took
+the safe path.
+
+**Corroborated before it landed:** routing 21 → 29. I summed the per-file runs independently
+(8 + 5 + 6 + …) and got 29 before the pane committed it. Same-origin agreement counts once; this
+was two sources.
+
+NO-CLAIM: part 2 covers the remainder and is unstarted. **Five claims are left standing as
+UNVERIFIABLE rather than quietly dropped** — the honest disposition when a denominator is lost or
+a key is absent.
