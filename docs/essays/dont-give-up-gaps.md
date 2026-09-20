@@ -270,6 +270,11 @@ rg -n $'\tPROMOTED\t|^[^#].*PROMOTED' docs/demos/STATUS.tsv
 
 which infisical; which omp
 # BOTH empty on this VM. Live inject+lab command NOT_RUN.
+
+# Offline observer suite on this tip (historical P2-13 quote is 5/5):
+node --test work/omp-jev-observer/test/observer.test.mjs
+# 8/8 pass on 7f28d54 (includes "missing gate and session context stay
+# absent without blocking" — the R38 omit arm). Not a live row.
 ```
 
 ### G7 — Invented `dcgVerdict: "unknown"` (default looks measured)
