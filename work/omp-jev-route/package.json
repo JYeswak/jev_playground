@@ -1,0 +1,12 @@
+{
+  "name": "omp-jev-route",
+  "version": "0.1.0",
+  "description": "Observe-only routing advice for omp: asks Jev whether a turn needs a heavyweight model. Never routes anything.",
+  "license": "MIT",
+  "type": "module",
+  "keywords": ["omp-plugin", "omp-extension", "pi-package", "jev", "routing"],
+  "omp": { "extensions": ["./src/index.ts"] },
+  "pi": { "extensions": ["./src/index.ts"] },
+  "files": ["src", "README.md"],
+  "scripts": { "test": "node --test test/" }
+}
