@@ -974,3 +974,16 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   commits with own block; full suite **71 ok / 0 failed**.
 - **Boundary:** session predates the file — live-fire NOT_RUN from
   here; needs a fresh session.
+
+## P2 ft-json-doctrine shipped, one clause (2026-09-20)
+
+- **Shipped** `~/.agents/rules/ft-json-doctrine.md` (system-wide only,
+  exact contract): ONE clause — no real customer state (rg check named).
+  Cut: schema_version envelope (1,040 hits/57 repos — real thread, but
+  no per-write check; schemaless fixtures are usually fine) and
+  errors-as-data (architecture, belongs in a skill/AGENTS.md, not a
+  write-moment injection).
+- **Proof:** 4/4 probes green; 4 arms appended to a clean shared file;
+  full suite **76 ok / 0 failed**. STOP ADDING RULES per dispatch —
+  next unit sharpens existing pack pending P3 bind rates.
+- **Boundary:** live-fire NOT_RUN from this session (predates the file).

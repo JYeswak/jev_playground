@@ -148,6 +148,15 @@ if [ -e "$PY" ]; then
 else
   note FAIL "system-wide filetype rule missing: $PY"; fail=$((fail+1))
 fi
+JS="$HOME/.agents/rules/ft-json-doctrine.md"
+if [ -e "$JS" ]; then
+  armt "$JS" fire  "ft-json: fire on .json edit"  edit  /tmp/probe.json '{"a":1}'
+  armt "$JS" fire  "ft-json: fire on .json write" write /tmp/probe.json '{"a":1}'
+  armt "$JS" quiet "ft-json: quiet on .py edit"   edit  /tmp/probe.py 'x = 1'
+  armt "$JS" quiet "ft-json: quiet on bash"       bash  ''            'cat probe.json'
+else
+  note FAIL "system-wide filetype rule missing: $JS"; fail=$((fail+1))
+fi
 
 # COMPILE GUARD. TTSR conditions are JavaScript RegExp: a PCRE inline flag like (?i) is invalid.
 # omp ttsr test REPORTS that, but a live session does NOT — omp://ttsr-injection-lifecycle.md says
