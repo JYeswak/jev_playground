@@ -787,3 +787,50 @@ aggregate. §21's `drop-largest` looked best on savings and lost a third of reus
 DISCRIMINATES was carried by clear cases; here a +15 lift is entirely easy-case. **Pooled numbers
 have been wrong in the optimistic direction every time this session, and the named subset caught
 it every time.**
+
+## Non-author review of the conductor's own artifacts — MIXED, and it earned its dispatch
+
+`review-two-artifacts-20260920.md`. I dispatched this under dry-queue rung 1 because everything I
+shipped tonight had been verified by me and graded by nobody. **Finding a defect was the success
+condition**; it found four.
+
+### behaviour-label.mjs — my own estimate was the worst defect
+
+| attack | outcome |
+|---|---|
+| 4/40 disagreements | **CONFIRMED**, re-ran, same count, the four are genuine |
+| basename collisions | **REFUTED my "a couple"** — 11 collide, `index.ts` ×20, `measure.mjs` ×17 |
+| entry-point completeness | **REFUTED** — `.omp/hooks/*` missing, and the header claimed `scripts` coverage the code never implemented |
+| a fourth defect? | **FOUND two** — the doc/code mismatch, and `by.slice(0,3)` truncating attribution so a verdict cannot be audited |
+
+Verified the collision count myself: 11 colliding basenames. **For any colliding basename the
+rule degenerates into the mechanical proxy it replaces.** Fixed what was fixable (both entry-point
+arms, full attribution list); recorded the collision as a MEASURED LIMIT rather than pretending a
+grep can resolve imports.
+
+And the review exposed a defect in **my own test** by landing a commit that made it fail:
+`git log -- docs/ ':!work/'` selects commits that *mention* docs, not commits touching *only*
+docs, so the premise was false and the assertion tested nothing. It had passed for hours by luck
+of which commit was newest. **Twenty-first instance of the selector defect, and the second inside
+code written to fix a different instance of it.**
+
+### jev-score-register — held, and got better
+
+| attack | outcome |
+|---|---|
+| canonicalise collisions | **CONFIRMED unbroken** over JSON values; BigInt/circular throw rather than collide — fail-closed |
+| a third asker shape misfiling | **FIXED** — both wrappers now emit `shape-mismatch` for an `ok:true` wrong-shape result, distinct from a transport failure |
+| concurrent appends | **CONFIRMED SAFE** — and I re-ran it myself: 4 processes × 25 rows → `lines parsed 100 malformed 0` |
+
+Attack 2 is the improvement I asked for and did not expect to get: the wrapper now **refuses an
+unknown shape instead of guessing**, which is the general fix for the `askJevChoice` misfile
+rather than a patch for that one asker. 13 → 15 tests, all green.
+
+**Concurrency was the claim I had never tested**, in a register that 19 packages write to while
+concurrent panes run. It holds at these row sizes, with the caveat pinned in the test.
+
+### What still stands against my artifact
+
+The review's Attack 1 verdict: **the rule is computable, not right.** Interface-compatible
+refactors count as behaviour changes; runtime-read JSON configs are invisible to it. Unaddressed,
+and recorded rather than argued away.
