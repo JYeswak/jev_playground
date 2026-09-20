@@ -259,6 +259,10 @@ measurement rather than preference.
 | [`omp-jev-rerank`](work/omp-jev-rerank/) | `jev-rerank-bench` | 7/7 | yes, `{ordered: 0.91}` | yes, **one** question — measurement killed the other two |
 | [`omp-jev-failure`](work/omp-jev-failure/) | `jev-agent-failure-benchmark` | 5/5 | yes, `failure_classified` | yes, **one** multiclass question — chosen for coherence, NOT accuracy: on 9 fresh hold-out cases both framings tied 8/9 and the impossible-answer defect did not reappear |
 
+Eleven more `omp-jev-*` taste packages exist under [`work/taste-loop/`](work/taste-loop/) as
+**unpromoted observe-only scaffolds**. They are not in the table above: not wired to working
+profiles, not live-proven, not promoted. See [Status](#status).
+
 Two of six contain **no model call at all**, and that is the most useful thing this lane has
 produced. The harm gate was decided by putting four regexes, a live model and a dumb baseline on
 the same held-out split and reading the result: the regexes won by one recall point at zero cost
@@ -841,6 +845,28 @@ every firing inside a running omp has returned passthrough.
 
 Twelve gates run on every commit and are green. This repository is public and its history is
 published as written, including local filesystem paths.
+
+### Process doctrine, and eleven unpromoted taste packages
+
+These two landings are **not** Jev capability claims and **not** promotions. Ledger stays
+**0 promoted.**
+
+**Process doctrine for agents** — not a result about Jev.
+[The Ban Nobody Issued](docs/essays/dont-give-up.md) records that this lane invented
+STOP-LIVE / deferred-registration / quiet-window-as-science-gate as reasons not to work.
+Joshua did not issue that ban. Supporting:
+[`dont-give-up-gaps.md`](docs/essays/dont-give-up-gaps.md),
+[`dont-give-up-skill-patches.md`](docs/essays/dont-give-up-skill-patches.md).
+
+**Eleven unpromoted observe-only product-taste packages.** Index
+[`work/taste-loop/README.md`](work/taste-loop/README.md); contract
+[`work/taste-loop/CONTRACT.md`](work/taste-loop/CONTRACT.md). They log whether an artifact
+would feel usable to a client. They are **not** promoted, **not** working-dogfood, **not**
+registered in any working profile, **not** validated on live traffic. Names from the tree:
+`omp-jev-default`, `omp-jev-field`, `omp-jev-firstlook`, `omp-jev-fork`, `omp-jev-heat`,
+`omp-jev-heckle`, `omp-jev-jargon`, `omp-jev-promise`, `omp-jev-skip`, `omp-jev-uncanny`,
+`omp-jev-undo`. Heat is attention leftover, not taste; it is in the set because session
+JSONL can label it.
 
 ## About Contributions
 
