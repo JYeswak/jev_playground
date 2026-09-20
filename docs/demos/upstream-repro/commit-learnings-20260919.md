@@ -2032,3 +2032,73 @@ corrected in place to say only what is true; 8/8 still green, gates rc=0.
 
 **36 of 50 instruments have no retirement condition**, including every gate stage. An instrument
 that cannot say when it should be deleted is one nobody will ever delete.
+
+## The hook/ee slice overturned four of my conclusions. All four were mine.
+
+`map-hook-ee-20260920.md` (`125eeff`, `af6d50e`). I verified every claim below myself before
+writing it down.
+
+### 1. "ee is dead" — WRONG. It is healthy here.
+
+```
+ee doctor --json            (from jev)  -> posture "ok",      healthy true
+ee doctor --workspace ~     (home)      -> posture "blocked", healthy false
+```
+
+**`EE-E040 migration_drift` is a property of the HOME store, not of `ee`.** I ran the probe in a
+context that resolved to home, read "the recall half is dead", and committed that verdict to the
+ledger. `ee remember --level procedural` from this repo returns **rc=0** and writes into
+`jev/.ee/ee.db`. Pane 2's `BLOCKED` was correct about what it observed and **wrong about the
+cause**, and I propagated the wrong cause.
+
+Worse, `ee migrate status` on the home store reports `upToDate:true, pendingCount:0` while
+`doctor` reports blocked — **a surface that disagrees with its own health check**, which is the
+exact two-surfaces-disagree shape the issue-chain doc warns about.
+
+### 2. A THIRD install surface exists, and the ee integration is already written
+
+`~/.omp/omp-extensions/` — **22 files, 11 extensions + 11 tests**, in no jev receipt. It is the
+source of **323,575 of ~328k decision rows**, and it already contains:
+
+- `ee-ambient-session-start.ts` — **the recall leg**
+- `ee-failure-journal.ts` — **the write-back leg**
+
+**Every receipt of mine saying "the ee integration must be built" is wrong. It is built, loaded,
+and running.** I dispatched three units to construct a loop that already exists because I
+enumerated two install surfaces and there are three.
+
+### 3. The real blocker is not EE-E040
+
+Stored a procedural memory naming `grep -c`, then:
+
+```
+ee preflight check --cmd 'grep -c foo bar'  ->  matches 0, matchedMemories 0
+ee tripwire list                            ->  total_count 0
+```
+
+**remember → preflight does not close, in the HEALTHY store.** So the loop's broken link is the
+*matching* step, not the database. My attribution cost a unit of pane 2's time chasing a
+migration.
+
+### 4. My live-fire proof came from a stale copy
+
+`jev-lab`'s `guard-rule.ts` hashed `d26727a0…` against the canonical `f10f7e16…` on the other
+nine installs, and the stale copy still carried `if (command.includes('| head') …) return
+{ cls: 'pipe-exit' }` — **the class DROPPED under R51.** The one profile doing live work ran the
+one stale build, and `guard-dogfood-20260920.md`'s live-fire proof quotes `class: "pipe-exit"`.
+**The dogfood proof and the drifted install are the same artifact.** Reconciled: all 10 installs
+now hash `f10f7e16…`.
+
+### And a contradiction nothing in the tree resolves
+
+`guard-fp-rate-20260920.md` rules pipe-exit **KEEP** (FP 0.053, 67 hand-labelled). `R51` rules it
+**DROPPED** (55.2% fire rate). `R48` refuses a guard for the same class. Shipped code follows
+R51; two installs followed the fp-rate receipt. **Three rulings, one class, no reconciliation** —
+and the drift was the mechanism by which the disagreement became executable.
+
+### The honest re-statement
+
+Extension loading is **pinned at session start**: install ≠ active, uninstall ≠ inactive. The
+muse session still appending 47 minutes after the guard install emits 3,740 dcg-bridge rows and
+**zero** guard rows. Every naive zero-row read I made tonight — including the one I nearly
+reported as "installed but not firing" — is invalidated by that alone.
