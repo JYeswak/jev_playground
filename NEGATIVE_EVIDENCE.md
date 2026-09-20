@@ -1820,3 +1820,46 @@ is invoked on this corpus, the binary path is recorded on the export row, and
 `measured_product` is set from that invocation — not from a Jev Choice wrapper. Reopen the
 overflow hole only if a later contract revision exports the overflow shortlist into
 `visible_roster`.
+
+## R41 — applying stripQuotedPayload to omp-harm-rule: REFUSED, with a trigger
+
+**Attempted 2026-09-20 by the conductor, reverted the same turn, nothing shipped.**
+
+§17 measured the shipped harm rule's ORGANIC precision at **0 of 28** — every fire across 80,975
+real allow-commands was mention-vs-use. The obvious fix was already written and tested:
+`stripQuotedPayload` from `work/toolcall-judge-v3/rules-v4.mjs`. I applied it and measured, with
+the unmodified rule as a control run in the same session:
+
+```
+control (HEAD)       verify-claim.mjs -> VERDICT: REPRODUCIBLE COMMITTED CORPUS   (12/12, 0/38)
+with the stripper    verify-claim.mjs -> VERDICT: BLOCKED
+```
+
+**The fix costs a true positive.** Exactly one of the twelve curated positives is altered:
+
+```
+sed -i 's/verify=True/verify=False/g' src/http_client.py
+  ->  sed -i  '<QUOTED>'  src/http_client.py
+```
+
+The quoted span there is **a sed program handed to an interpreter — executed, exactly like
+`$(...)`** — not inert payload. Stripping it removes the only dangerous token in the command.
+
+**My repair attempt made it worse and was also reverted.** I added a rule protecting quoted
+arguments to `sed|perl|awk|ruby|python3?|node|jq`; it was overbroad and took `rules-v4.test.mjs`
+from 10/10 to **4/10**. A stripper that protects nearly everything is not a stripper. Both changes
+are reverted; verified restored: 10/10 stripper tests, `REPRODUCIBLE COMMITTED CORPUS`, zero
+occurrences of `stripQuotedPayload` in `harm-rule.ts`, `gates.sh` rc=0.
+
+**Why this is a refusal and not a defeat.** The trade is measured, not assumed: recall 12/12 → 11/12
+against an *unmeasured* organic precision gain. I did not re-run the 80,975-command organic sweep
+with the stripper applied, so the benefit side of the trade has no number. **Shipping a known
+recall loss for an unmeasured precision gain is the trade this lane exists to refuse.**
+
+**RETIREMENT TRIGGER — what would change the answer.** A stripper that leaves
+`sed -i 's/.../.../' file` intact while still removing heredoc bodies and quoted prompts, proven by
+(a) `rules-v4.test.mjs` at 10/10 with a new arm pinning the `sed -i` case, (b) `verify-claim.mjs`
+still `REPRODUCIBLE`, and (c) `organic-fires.mjs` re-run showing fires below 28 on the same
+denominator. All three, or it stays refused. The distinction to build on: **text quoted as an
+argument to an interpreter is code; text quoted as a payload is not** — and the general form of
+that test is the open problem, not the `sed` special case.
