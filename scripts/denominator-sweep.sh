@@ -8,27 +8,41 @@
 # (harvest family) keep as-of labels + regen commands in their receipts, per
 # docs/demos/upstream-repro/harvest-asof-20260920.md.
 #
+# LOCATION SAFETY: the sentinel below refuses when the script is copied
+# elsewhere (e.g. /tmp re-anchors $0, every relative path resolves to
+# nothing, and eight confident DRIFTs would all be false — worse than no
+# report). An empty scan set is never a pass.
+#
 # Claims and their regeneration commands (see denominator-audit-20260920.md):
 #   138 locked dig questions — grep -c over the locked export
 #   21  census packages — ls -d piped to wc -l (never `wc -l file`)
 #   55  pinned replay rows — replay.mjs over the pinned fixture + awk field
 #   0   pinned replay api calls — same run, value field
 #   7846 frozen corpus rows — wc -l over stdin redirect
-#   315 frozen isError — python count over the frozen file
+#   315 frozen isError — grep -c over the frozen file
 #   29  routing-backtest tests — npm test TAP summary
 #   19  export-YES packages — per-dir model+persist grep rule (export-resweep receipt)
 set -uo pipefail
 root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd -P)
 cd "$root" || exit 1
+[ -x "$root/scripts/pinned-denominator.sh" ] || {
+  echo "denominator-sweep: REFUSE — not anchored at a repo root (missing scripts/pinned-denominator.sh under $root)." >&2
+  exit 2
+}
 P="$root/scripts/pinned-denominator.sh"
 fail=0
 
 check() { # check <label> <expected> <cmd...>
   local label="$1" expected="$2"; shift 2
-  if "$P" "$expected" "$@" >/dev/null 2>&1; then
+  "$P" "$expected" "$@" >/dev/null 2>&1
+  local got=$?
+  if [ "$got" -eq 0 ]; then
     printf '  ok   %s\n' "$label"
+  elif [ "$got" -eq 3 ]; then
+    printf '  DRIFT %s\n' "$label"
+    fail=1
   else
-    printf '  DRIFT %s (rc=%s)\n' "$label" "$?"
+    printf '  ERROR %s (rc=%s) — the check itself is broken, NOT a drift finding\n' "$label" "$got"
     fail=1
   fi
 }
