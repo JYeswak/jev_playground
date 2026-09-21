@@ -3178,3 +3178,47 @@ sense.
 
 **NO-CLAIM.** This does not assert the shipped rules are wrong; it asserts we cannot currently
 demonstrate they are right. Nothing here re-opens R64/R65/R66/R67, whose labels did persist.
+
+## R71 — a 3.6× labelling discrepancy we cannot diagnose, because R70
+
+**Refuted:** that the original n=20 FP samples were merely underpowered.
+
+Two rules were relabelled today at n=77 with persisted row identities. One agreed with its
+original sample. **One did not, by a margin that excludes chance.**
+
+| rule | n=20 FP | n=77 FP | P(n=20 result given n=77 rate) |
+|---|---|---|---|
+| `absence-from-one-probe` | 4/20 = 0.200 | 21/77 = 0.2727 | **0.328** — consistent, merely underpowered |
+| `bash-structural-def-search` | 4/20 = 0.200 | **55/77 = 0.7143** | **2.7 × 10⁻⁶** |
+
+The reverse tail, P(X≥55 | n=77, p=0.20), underflows below 1e-14. **The two `structural-def`
+samples cannot come from the same population.** This is not sampling noise; one of them is wrong
+about the world.
+
+**The candidate causes are exactly three, and we cannot distinguish them:**
+
+1. the original 20 were mislabelled under a looser reading of "false positive";
+2. the two draws came from different frames (P3's frame: 185 fires over 1,877 files, seed
+   `2026092105`; the original frame was never recorded);
+3. the rule's condition changed between labellings.
+
+**We cannot tell which, and that is the finding.** R70 recorded that the original FP rows were
+never persisted. This is what that costs, made concrete: a 3.6× discrepancy in a rule that was
+**live system-wide**, and the evidence needed to diagnose it does not exist. We can act — the
+rule is retired — but we cannot learn.
+
+**What it means for the other kills.** `absence` agreeing at 0.328 is genuine reassurance that
+the original labelling process was not uniformly broken. The failure is **specific**, not
+systemic — which makes it worse in one way: a systemic bias could be corrected with an offset,
+whereas a rule-specific one means any single unpersisted number may be off by 3.6× with no
+signal that it is.
+
+**Acted same day.** `bash-structural-def-search` disabled and verified by enumeration in both
+scopes (project 0, global 0; 33 rules). All eight rules shipped today are now disabled by their
+own statistics.
+
+**Retry condition.** Reopen structural-def only from a fresh preregistered draw whose frame and
+seed are recorded in-file, per R70. The original 4/20 may never be cited again for any purpose.
+
+**NO-CLAIM.** This does not establish which of the three causes holds, and no claim here should
+be read as one. `absence`'s consistency is evidence about `absence` only.
