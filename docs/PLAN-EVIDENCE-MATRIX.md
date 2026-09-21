@@ -1,8 +1,25 @@
-# PLAN v1 — the evidence matrix: make a coverage claim a thing a validator can refuse
+# PLAN v4 — the evidence matrix: make a coverage claim a thing a validator can refuse
 
-**Status:** v1, pre-review. Written by pane 1 from grounded evidence (Axes A, C, D committed;
-Axis B in flight). Per `skill://planning-workflow`, this document is self-contained — a fresh
-agent who has never seen this lane can implement from it without asking.
+**Status:** v4, post-review-round-1. Grounded in Axes A/B/C/D (all committed). Reviewed
+adversarially by pane 4 (Grok, cross-model) and validated for implementability by pane 3;
+both review artifacts are cited inline where they changed a decision. Per
+`skill://planning-workflow`, this document is self-contained — a fresh agent who has never seen
+this lane can implement from it without asking.
+
+**What round 1 changed, because two of these were errors and not preferences:**
+
+- **The dual bar was vacuous.** v2/v3 set `bar_point = bar_interval = 0.30`. If `upper ≤ 0.30`
+  then `p̂ ≤ 0.30` follows automatically, so the point leg never binds — pane 4: *"POINT refuses
+  none."* His bars are **distinct** (point 0.90, interval-lower 0.80) precisely so both bite.
+  Rewritten in §4.1.
+- **§4 cited the wrong event.** It quoted 0.381 and 0.605, which are the **n=77 relabel**
+  numbers — measured *after* the ships. Ship-time evidence was 4/20. §4.2 was correct; the prose
+  was not. Fixed.
+- **`k` was unbound** — the reward hack pane 4 named. Fixed in §3.
+- **`scope-disagreement` was fatal as a commit-time check** (environment-dependent). Demoted to a
+  runtime check in §4.
+- **T6 wrongly depended on T4**, and the ASCII picture disagreed with the `Depends:` lines. Both
+  reviewers flagged it independently; split into T6a/T6b in §5.
 
 ---
 
@@ -88,10 +105,13 @@ label_rows = "work/skills-vein/glob-labels-20260921.json"          # REQUIRED fo
 # THE CLAIM, with its scope, its assumptions, and its control
 # Method name carries its assumption, per his eval policy (:247-249):
 #   two_sided_95_wilson_with_one_primary_case_per_independent_family
+# The two bars MUST differ — see §4.1. A point bar equal to the interval bar is vacuous.
 rate = { kind = "fp", k = 4, n = 77,
          method = "two_sided_95_wilson_independent_rows",
-         bar_point = 0.30, bar_interval = 0.30 }   # DUAL bar, see §4.1
-negative_control = { name = "always_quiet", must_lose = true }
+         bar_point = 0.20,          # p̂ must clear this — the STRICTER leg
+         bar_interval = 0.30 }      # upper bound must clear this — the LOOSER leg
+label_rows_sha256 = "e3b0c442…"     # BOUND. k is derived from these rows, never declared free
+negative_control = { name = "always_quiet", loss_evidence = "work/…/control-20260921.json" }
 non_claims = ["not a live measurement",
               "single labeller",
               "rows not independent across one session"]
@@ -102,9 +122,18 @@ status = "planned"                     # planned | executed | passed | failed | 
 
 `authority.toml` holds the same rows with the **bound fields** frozen. Bound set for this lane:
 `owner_bead, kind, title, red_arm, rate.method, rate.bar_point, rate.bar_interval, rate.n,
-negative_control, scopes, rung`. The working matrix may move `status`, `k`, and add evidence
-refs; **it may not move a bar, a method, an n, a control, a scope, or a rung without an authority
-edit.**
+label_rows_sha256, negative_control, scopes, rung`.
+
+**Why `k` is not in that list, and why that is not a hole.** Pane 4's review named `k` as the
+reward hack: if the numerator is free, an agent moves it until the bar clears. Binding `k`
+directly would be wrong — `k` is a *measurement outcome*, and freezing an outcome in a reviewed
+file means the reviewer is setting the result. Instead we bind **`label_rows_sha256`** and
+require the validator to **recompute `k` from the rows** (`unpersisted-rate` already demands the
+file). `k` therefore cannot be moved without changing the labelled rows, and changing the rows
+changes a bound field. **The outcome stays free; its evidence is frozen.**
+
+The working matrix may move `status` and add evidence refs; **it may not move a bar, a method,
+an n, a control, a scope, a rung, or the label-row hash without an authority edit.**
 
 **Who holds the second key.** Joshua. An authority edit is a reviewed change; the matrix is ours.
 This is the mechanism that would have stopped F3, because I could not have both set the bar and
@@ -125,22 +154,28 @@ Fail-closed, fixed diagnostic codes, no content in logs.
 | `red_arm` present and is one of `selftest_cases` | `missing-red-arm` | untested gates |
 | any `rate` present ⇒ `label_rows` exists and has ≥ n keys | `unpersisted-rate` | **R70/R71 exactly** |
 | `status = passed` ⇒ **both** bars clear (see §4.1) | `uncertified-pass` | NEED #6 exactly |
-| `kind = rule` ⇒ enumeration in every declared scope agrees with `status` | `scope-disagreement` | **F5 exactly** |
+| `kind = rule` ⇒ enumeration in every declared scope agrees with `status` | `scope-disagreement` | **F5** — *runtime only, see below* |
 | every non-epic `jev-*` bead is covered by ≥1 boundary | `uncovered-bead` | untracked work |
 | `rate.method` names its independence assumption | `unstated-assumption` | silent iid assumption |
 | ≥3 `non_claims`, and they name labeller count and independence | `missing-non-claims` | a fixture quietly becoming a claim |
-| `negative_control.must_lose` ⇒ evidence that it loses | `control-not-beaten` | a rule that beats nothing |
+| `negative_control.loss_evidence` resolves and shows the control losing | `control-not-beaten` | a rule that beats nothing |
 | every semantic field has a corrupt-it-must-fail twin | `no-mutation-twin` | untested validator |
+| `k` recomputed from `label_rows` matches declared `k` | `k-drift` | **moving the numerator** |
 
 `uncertified-pass` is the rule that makes this pay for itself: **a boundary cannot say `passed`
-while its own interval admits a value above its bar.** Applied to 2026-09-20 it refuses
-`absence-from-one-probe` (upper 0.381 > 0.30), `bash-structural-def-search` (lower 0.605 > 0.30),
-and `bash-callsite-grep-exclusion` (p̂ = bar). All three shipped anyway. **The validator would
-have refused all three before they went system-wide.**
+while either leg of its bar fails.** Scored at **ship time** — 4/20 for all three, the evidence
+we actually had on 2026-09-20 — every one of them is refused by the interval leg: Wilson upper
+**0.416** (Clopper-Pearson 0.437) against a 0.30 bar. All three shipped anyway.
 
-`scope-disagreement` is the F5 fix: the matrix declares scopes, the validator *enumerates* them
-(`omp ttsr list | grep -c`) rather than probing, so "reported disabled but still live" becomes
-impossible to commit.
+*(v2 wrongly cited 0.381 and 0.605 here. Those are the **n=77 relabel** results, measured after
+the ships — pane 4's review caught the wrong-event error. §4.2 always had it right.)*
+
+**`scope-disagreement` is a runtime check, not a commit gate.** It must shell out to
+`omp ttsr list`, which makes it environment-dependent and non-deterministic in a clean checkout
+— pane 4 called it *"fatal as a commit check"* and is right. It therefore runs in
+`foundation/gates.sh` where an omp is present, and is **skipped-with-a-named-reason**, never
+silently, when `omp` is absent. A skip is reported as `scope-unverified`, which is a distinct
+state from pass — the absent-key lesson from AGENTS.md's offline/live split.
 
 ### 4.1 The dual bar, the stated assumption, and the control — adopted from his eval policy
 
@@ -148,11 +183,28 @@ Axis B (`docs/demos/upstream-repro/axis-b-validators-20260921.md` §2) found tha
 `validate_eval_policy.py` already solves NEED #6, and more stringently than I proposed. Four
 mechanisms, adopted:
 
-**1. A dual bar, not a single one.** His top-one precision requires rate ≥ 0.90 **AND** Wilson
-lower ≥ 0.80 (`:263`). A point estimate and an interval bound are different claims and he makes
-both mandatory. Today we used only one, which is how `structural-def` passed at 4/20 = 0.20 and
-then measured 0.714 at n=77. Our matrix therefore carries `bar_point` and `bar_interval`, and
-`uncertified-pass` fires if **either** fails.
+**1. A dual bar with DISTINCT thresholds.** His top-one precision requires rate ≥ 0.90 **AND**
+Wilson lower ≥ 0.80 (`:263`). The two numbers differ *on purpose*: the point bar is strict, the
+interval bar is looser, and each can bite where the other does not.
+
+v2/v3 of this plan set `bar_point = bar_interval = 0.30` and called it a dual bar. **It was
+not.** For an upper-bounded FP rate, `upper ≤ 0.30` implies `p̂ ≤ 0.30`, so the point leg could
+never fire — pane 4's review: *"Dual 0.30/0.30 is NEED 6 renamed… POINT refuses none."* Correct,
+and the error is instructive: I adopted the *shape* of his mechanism without the property that
+made it work, which is exactly the failure mode Rule 12 invites if adoption is uncritical.
+
+**The corrected bars for an FP rate: `bar_point = 0.20`, `bar_interval = 0.30`.** Both must
+clear. The point leg now refuses a rule whose *central estimate* is mediocre even when its
+sample is large enough to bound it; the interval leg refuses a rule whose estimate looks fine
+but whose sample cannot support it. On 2026-09-20 the three ships fail the interval leg at
+4/20 (upper 0.416); under the corrected point bar `absence` at n=77 (p̂ 0.273) **also** fails the
+point leg, which single-bar scoring would have let through. The two legs catch different rules.
+
+**How the thresholds themselves are justified, since a bar is also a claim.** `bar_interval`
+= 0.30 is the pre-existing preregistered FP bar for TTSR rules. `bar_point` = 0.20 is set at
+two-thirds of it by the same reasoning he uses (0.80 is ~89% of 0.90): the point bar is the
+operating target, the interval bar is the refutation threshold. **Both live in
+`authority.toml`** — neither may be tuned by the party being measured.
 
 **2. The method name carries its assumption.**
 `two_sided_95_wilson_with_one_primary_case_per_independent_family` (`:247-249`) — the
