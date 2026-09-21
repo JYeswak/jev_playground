@@ -259,6 +259,7 @@ for (const testCase of CASES) {
     if (hit) correct += 1;
     perQuestion[key].total += 1;
     if (hit) perQuestion[key].correct += 1;
+    perQuestion[key].scores.push(score);
     perQuestion[key].saids.push(said);
     perQuestion[key].truths.push(truth);
     rows.push(

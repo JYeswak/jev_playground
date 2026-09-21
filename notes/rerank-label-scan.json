@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-09-21T19:02:39Z",
+  "parser_version": 3,
+  "corpus_path": "~/Developer/jev/notes/rerank-labelled-pairs.jsonl",
+  "unlabelled_path": "~/Developer/jev/notes/rerank-unlabelled-pairs.jsonl",
+  "session_files_scanned": 1821,
+  "grep_results_seen": 3453,
+  "grep_results_ge10_lines": 2540,
+  "read_calls_seen": 16419,
+  "candidate_header_forms": {
+    "bracket": 793,
+    "hdr2": 5743,
+    "colon": 10
+  },
+  "grep_then_read_pairs": 660,
+  "labelled_pairs": 219,
+  "unlabelled_pairs": 441,
+  "label_yield_pct": 33.18,
+  "rows_with_query": 219,
+  "rows_with_intent": 219,
+  "candidates_per_grep_median": 5,
+  "candidates_per_grep_max": 20,
+  "grep_order_top1_pct": 26.48,
+  "grep_order_top3_pct": 64.38,
+  "chosen_rank_median": 2,
+  "chosen_rank_mean": 4.05,
+  "random_baseline_pct": 24.79,
+  "baseline_note": "grep_order_top1_pct is the deterministic baseline a reranker must beat, measured on the SAME rows persisted in corpus_path",
+  "label_is_proxy": "label = file the agent read next, NOT a relevance judgment. unlabelled_pairs are NOT negatives."
+}
