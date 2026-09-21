@@ -3058,3 +3058,43 @@ proxies; they are measured.
 
 **Evidence:** P3 artifacts `8e5094a` (sampler, 60 samples with file:line
 context, labels, `exposure-check --text`); NEEDS #3 table.
+
+## R68 — "ZERO CONSUMERS" is false for anything a selftest invokes, and the string says otherwise
+
+**Refuted:** that `consumer-check` output can be read as an instrument-retirement signal.
+
+**How it surfaced.** Dogfooding the tool on our own inventory (mission stage 4, and the
+AGENTS.md phase-boundary check for unconsumed instruments), pane 1 ran `consumer-check` over all
+**19** non-selftest shell instruments in `scripts/`. Result: **19 of 19 ZERO CONSUMERS.** A
+uniform result across a heterogeneous population is the signature of a broken instrument, not a
+finding, so it was checked directly rather than reported.
+
+**The direct probe refutes it in two cases immediately:**
+
+- `denominator-sweep.sh` ← `scripts/selftest-denominator-sweep.sh:11`, whose own header says it
+  is *"discovered automatically by foundation/gates.d/80"*.
+- `exposure-check.sh` ← `scripts/selftest-ttsr-rules.sh:309`, invoked with real arguments.
+
+**Cause, at `scripts/consumer-check.sh:46`:** `# Tests and docs are MENTION tier, never
+consumers.` The classification is defensible for "is this used in production", but the emitted
+string is not: **"ZERO CONSUMERS — nothing invokes X" is literally false** when a selftest
+invokes X. And the real path is transitive — `gates.d/80 → selftest-X.sh → X.sh` — so the tool
+stops at tier 1 and labels the middle link of a live gate chain a mention.
+
+**Why this is the dangerous direction, twice in one day.** This is the second false-negative
+class in the same tool (the first: `ee orient`, invoked from an args array, R-adjacent entry in
+`docs/NEEDS.md` #2). A tool built to stop us shipping into a surface nothing reads will instead
+make us **retire live wiring**. Acting on this run would have retired 19 instruments, several of
+them gate-wired.
+
+**What held:** the proxy-vs-quantity discipline (R67's own class) — a uniform result was treated
+as a symptom rather than a quantity. Sixth time today that check changed an outcome.
+
+**Retry condition.** Reinstate the audit once `consumer-check` (a) emits a tier-accurate verdict
+— `NO NON-TEST CONSUMER` rather than `nothing invokes` — and (b) resolves one transitive hop, so
+`gates.d → selftest → instrument` reads as consumed. Until then no retirement decision may cite
+it, and `denominator-sweep.sh` + `exposure-check.sh` are mandated RED arms.
+
+**NO-CLAIM.** Only 2 of the 19 were verified consumed by direct probe; the remaining 17 are
+**unknown**, not confirmed-unconsumed. Nothing here says the instrument inventory is healthy —
+it says the measurement of it is not yet trustworthy.
