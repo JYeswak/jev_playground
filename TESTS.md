@@ -122,6 +122,7 @@ Everything else under this root is a **vendored clone** and its tests belong to 
 | `work/omp-guard-rule/guard-rule.test.mjs` | `node --test work/omp-guard-rule/guard-rule.test.mjs` | the omp `tool_call` guard classifies the live class (`grep-as-proof`) and stays observe-only: every path returns `undefined`, `guard_error` exists so a throw is never scored as a pass, and `pipe-exit` is absent — dropped under R51 for a 55.2% fire rate | 5/5, this PR |
 | `scripts/selftest-lane-status-pipe.sh` | as written | the lane's honesty signal survives a pipe: good-path in-band line matches the real rc, and a PLANTED missing receipt yields rc=3 both unpiped and through `| tail` — the exact shape that read this gate 223 times in the dcg harvest | 3/3, mutation-proven (delete the in-band printf and 2 of 3 arms go RED) |
 | `scripts/selftest-ttsr-rules.sh` | as written | every project TTSR rule fires on its known-bad and stays QUIET on a near-miss differing by one element of the defect (no glob / stderr visible / no pipe); plus an arm that fails if a rule file exists with no test | 7/7, and `bash-glob-silenced` verified firing live in a fresh session as a blocking `<system-interrupt>` |
+| `scripts/selftest-ttsr-assert-disabled.sh` | as written | a claimed TTSR disable is proven by enumeration in both scopes, never by probe silence: RED arm a live rule exits 1 and names project/global; GREEN arm `absence-from-one-probe` is absent both; no-args exits 2 | 4/4, 2026-09-20 |
 
 **Rule:** a green here is the only green we may call *ours*.
 

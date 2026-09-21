@@ -1,0 +1,6 @@
+CALLBACK P4 DONE [op-id=p4-ttsr-assert-disabled-20260920]
+Did NOT re-set ttsr.disabledRules.
+scripts/ttsr-assert-disabled.sh enumerates omp ttsr list --json in project + /tmp/ttsr-assert-disabled-scope (refuses if that dir has .omp). Exact name match. Exit 1 names the scope. Never omp ttsr test.
+selftest 4/4: RED live bash-callsite-grep-exclusion exit 1 + named scope; GREEN absence-from-one-probe absent both (0/0, matching your enumeration); usage exit 2.
+Wire: 80-lane globs scripts/selftest-*.sh; EXPECTED_DISABLED=(absence-from-one-probe) is the disable contract.
+n=77 persisted work/skills-vein/absence-n77-labels-20260920.json — 77 keys profile||<sessions-relpath>||line → TP|FP. FP=21 TP=56. Replacement sample, not stacked on the unpersisted 20.

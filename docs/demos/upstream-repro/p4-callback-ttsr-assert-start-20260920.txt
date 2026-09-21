@@ -1,0 +1,2 @@
+CALLBACK P4 START [op-id=p4-ttsr-assert-disabled-20260920]
+Correction accepted. Arithmetic stands; disable execution failed; probe-silence was the documented trap. Will NOT re-set ttsr.disabledRules. Building scripts/ttsr-assert-disabled.sh (enumeration both scopes, RED arm on a live rule). Then persist n=77 row identities in skills-vein key form per R70.

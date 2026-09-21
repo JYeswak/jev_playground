@@ -1088,3 +1088,28 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   surface. Mid-unit self-inflicted: a stray `:` in the harness
   heredoc silenced tier 4 for 10 runs (caught by probe, all
   re-run); sed/python used for two micro-edits instead of edit tool.
+
+## P4 ttsr-assert-disabled (CALLBACK-P1-CORRECTION, 2026-09-20)
+
+- **Defect:** disable of `absence-from-one-probe` was reported via
+  `omp config set` + `omp ttsr test` silence. Config set replaced the
+  list (rule stayed live in project scope). Probe silence under
+  `repeatMode once` cannot distinguish DISABLED from
+  ALREADY-FIRED-THIS-SESSION. Joshua appended correctly; this unit
+  does not re-set `ttsr.disabledRules`.
+- **Instrument:** `scripts/ttsr-assert-disabled.sh <rule>` enumerates
+  `omp ttsr list --json` in project cwd and in an outside-repo cwd
+  (`/tmp/ttsr-assert-disabled-scope`, refuse if that dir has `.omp`).
+  Exact `name` field match. Exit 1 names the scope and count. Never
+  `omp ttsr test`.
+- **Selftest 4/4:** RED live `bash-callsite-grep-exclusion` exit 1 +
+  named scope; GREEN `absence-from-one-probe` absent both scopes
+  (project 0, global 0, matching Joshua's enumeration); usage no-args
+  exit 2. Wire: `foundation/gates.d/80` globs `scripts/selftest-*.sh`;
+  EXPECTED_DISABLED in the selftest is the disable contract.
+- **n=77 identities persisted** (R70):
+  `work/skills-vein/absence-n77-labels-20260920.json` — 77 keys
+  `profile||<path-after-sessions/>||line` → TP|FP. FP=21 TP=56.
+  Replacement sample, not stacked on the unpersisted original 20.
+- **Boundary:** full 80-lane suite not re-run this unit (glob wire
+  only); no live Jev call; files of the retired rule not deleted.
