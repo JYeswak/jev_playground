@@ -496,3 +496,83 @@ n=7 same-author rows would be R28 in the cut direction.
 scan off by 73×, the always-DEGENERATE grader, and a lexical baseline I drew too narrow. Each was
 caught by checking the instrument against its own output before reporting. That is the only reason
 any number in this file is worth reading.
+
+---
+
+## 12. The regime — what a Jev seat actually requires, named at last
+
+My 7 research scouts wedged at 45 minutes and produced nothing, so I ran the breadth census
+directly. Of 24 clones only **five** carry committed data: `jev-rerank-bench` (16 files),
+**`jev-spam-eval` (19 files, 9 result dirs)**, `jev-benchmark` (3),
+`jev-agent-failure-benchmark` (1), `skillranker` (3). The rest are code or catalogues.
+
+`jev-spam-eval@76ef183` is the strongest application evidence in the tree and appears **nowhere in
+`EVAL.md`**.
+
+### Zero-shot Jev vs TF-IDF trained on the target's own labels
+
+| in-distribution | Jev (0 labels) | TF-IDF |
+|---|---|---|
+| email-dataset | 98.3% | 98.4% (14,800 labels) |
+| Ling-Spam | 98.6% | **99.4%** (2,300 labels) |
+| 3-class + phishing | 94.2% | **98.7%** (4,600 labels) |
+
+| out-of-distribution | Jev | TF-IDF | gap |
+|---|---|---|---|
+| Ling-Spam, 2000 | **98.6%** | 73.0% | **+25.6** |
+| phishing, 2024–25 | **91.0–93.6%** | 70.3% | **+21–23** |
+| modern mail, 2026 | **97.3%** | 72.5% | **+24.8** |
+
+Four questions over 19,528 emails cost **$1.12**. (`OUT_OF_DISTRIBUTION.md:16-18`, per-prediction
+JSONL under `results/`.)
+
+### The cleanest statement of the regime, on one dataset
+
+Verifying pane 2's edge at `OUT_OF_DISTRIBUTION.md:28-41` — it is sharper than they put it. On
+**Ling-Spam**, the identical method:
+
+| | accuracy |
+|---|---|
+| TF-IDF trained on Ling-Spam's **own** labels | **0.9857** |
+| **Jev, plain question, zero labels** | **0.9857** |
+| TF-IDF trained on email-dataset (wrong distribution) | 0.7298 |
+
+**An exact tie when the baseline has right-distribution labels; +25.6 points when it does not.**
+The failure mode is legible: TF-IDF flagged **745 of 2,408** legitimate posts (31%) as spam,
+because academic list mail looks nothing like the business mail it learned "legitimate" from.
+
+### Applying B5, the regime falls out
+
+- **Bit 1, in-distribution:** TF-IDF *is* the lexical baseline — word frequency — at 98.4%.
+  **YES → no seat.**
+- **Bit 1, out-of-distribution:** the same lexical baseline collapses to 70–73%. **NO → seat.**
+
+**The seat is not "spam." It is distribution shift and cold start** — any task where labels
+resembling what you will actually see cannot be obtained. New abuse campaigns, novel phishing,
+emerging failure modes, day-one classification. **None of our five surfaces were in that regime.**
+
+### Pane 2's counter-edge, verified and it holds
+
+The detailed-criteria question scored **0.9701** against the plain question's **0.9857** on this
+OOD set (`:32-33`) — yet detailed criteria was the *winner* in-distribution (98.3% vs 96.0%).
+**Question tuning overfits the distribution it was tuned on and moves points both ways.** OOD
+stability therefore reads as a *model* property, not a question property. That strengthens the
+regime claim rather than weakening it.
+
+### What this does to our own verdict
+
+It **reframes, it does not overturn.** All five of our tasks had a stable distribution and a
+writable rule; the cheap thing won and shipping it was right. And we already wrote this finding
+ourselves at `RULING-authored-vs-real-20260919.md:99-102` — *"it ties a classifier trained on
+~14,800 labels while using **zero**"* — the same zero-shot-parity result, filed as a loss because
+our distribution never shifted.
+
+**We measured the one regime where a judge cannot win, five times, and generalised from it.**
+That is the answer to "how can we not find one application."
+
+**Boundary.** I re-ran nothing here; every number is read from committed files. The repo states
+its own limit: *"exploratory experiments, not benchmarks,"* run once, one model version
+(`jev-1.13.0`). OOD sets are small — 2,876 / 853 / 633. The 98.3% used a question written *after*
+reading mistakes in 1,000 sampled emails. Pane 4 notes the 97.3/72.5 pair in the modern-mail row
+is the accuracy column, not the "legitimate called legitimate" column — my summary used accuracy,
+which holds. `EVAL.md` citation is pane 4's to make; I have not touched that file.
