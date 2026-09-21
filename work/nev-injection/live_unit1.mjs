@@ -52,7 +52,14 @@ if (!process.env.TYPESAFE_API_KEY) {
 const pairs = [];
 for (const [i, line] of readFileSync(join(HERE, "pairs.jsonl"), "utf8").split("\n").entries()) {
   if (i % 33 !== 0 || !line.trim()) continue;
-  pairs.push(JSON.parse(line));
+  let row;
+  try {
+    row = JSON.parse(line);
+  } catch {
+    console.log(`CORRUPT pairs.jsonl line ${i}, refusing to score a partial slice`);
+    process.exit(1);
+  }
+  pairs.push(row);
 }
 if (pairs.length < 20) {
   console.log(`INCOMPLETE slice has ${pairs.length} rows, need 20`);

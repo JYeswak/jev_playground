@@ -48,14 +48,22 @@ if (!process.env.TYPESAFE_API_KEY) {
   process.exit(2);
 }
 
+function parseRow(line, where) {
+  try {
+    return JSON.parse(line);
+  } catch {
+    console.log(`CORRUPT ${where}, refusing to score a partial slice`);
+    process.exit(1);
+  }
+}
 const used = new Set(
   readFileSync(join(HERE, "live-rows.jsonl"), "utf8").split("\n")
-    .filter((l) => l.trim()).map((l) => JSON.parse(l).id));
+    .filter((l) => l.trim()).map((l) => parseRow(l, "live-rows.jsonl").id));
 const pairs = [];
 const lines = readFileSync(join(HERE, "pairs.jsonl"), "utf8").split("\n");
 for (let i = 5; i < lines.length; i += 11) {
   if (!lines[i].trim()) continue;
-  const p = JSON.parse(lines[i]);
+  const p = parseRow(lines[i], `pairs.jsonl line ${i}`);
   if (used.has(p.id)) {
     console.log(`OVERLAP-REFUSED ${p.id}`);
     process.exit(1);

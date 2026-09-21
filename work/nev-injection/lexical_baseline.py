@@ -80,7 +80,9 @@ def main():
         with open(SRC) as fh:
             data = json.load(fh)
         samples = data["samples"]
-    except Exception as exc:
+    except (json.JSONDecodeError, OSError, KeyError) as exc:
+        # Narrow: unreadable file, bad JSON, or missing key fail closed here.
+        # This is NOT shape validation of samples rows below.
         print(f"NOT_RUN corpus unreadable: {exc}")
         return 2
 
