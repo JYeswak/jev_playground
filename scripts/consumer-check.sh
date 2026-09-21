@@ -53,9 +53,49 @@ cmd_hits=$($RG -n --no-messages "${XCL[@]}" --glob '!*.test.*' --glob '!*.md' \
   "(^${QPAT}|^[^#\\n]*[;&|]\\s*${QPAT}|\\$\\(\\s*${QPAT})([\\s\\-]|$)" "${ROOTS[@]}" 2>/dev/null || true)
 path_hits=""
 if [ -z "$SUB" ]; then
-  path_hits=$($RG -n --no-messages "${XCL[@]}" --glob '!*.test.*' --glob '!*.md' \
+  path_hits=$($RG -n --no-messages "${XCL[@]}" --glob '!*.test.*' --glob '!*.md' --glob '!selftest*' \
     "/[\\w./-]*bin/${F}([\"']|$)" "${ROOTS[@]}" 2>/dev/null || true)
 fi
+# Relative script-path form (`./scripts/X.sh`, `$root/scripts/X.mjs`): the
+# `.sh` suffix broke the bare-token boundary, so tier 1 never saw
+# script-to-script calls. Non-test files only; selftests are tier 4.
+relpath_hits=$($RG -n --no-messages "${XCL[@]}" --glob '!*.test.*' --glob '!*.md' --glob '!selftest*' \
+  -e "(^|[[:space:];\"'\`\$\\(])[\\w./\$\"'{}-]*${F}\\.(sh|mjs|py)([[:space:]\"';]|$)" "${ROOTS[@]}" 2>/dev/null | grep -vE ":[0-9]+[:-][[:space:]]*(#|//|\\*|<!--)" | grep -vE "/${F}\\.(sh|mjs|py):[0-9]+" | head -10 || true)
+# TIER 4 — test-harness callers (R68): a selftest invoking the instrument is
+# NOT a consumer, but it is also not nothing. Literal invocation, or
+# var-bound (`S=".../X.sh"` + `"$S"`), in *test*/selftest* files. Each caller
+# resolves one hop up: a foundation gate stage naming it, or UNGATED.
+harness=""
+while read -r hf; do
+  hev=$($RG -n --no-messages \
+    -e "(^|[^a-zA-Z0-9_.-])${QPAT}([[:space:]\\-]|$)" \
+    -e "(^|[[:space:];\"'\`\$\\(])[\\w./\$\"'{}-]*${F}\\.(sh|mjs|py)([[:space:]\"';]|$)" \
+    "$hf" 2>/dev/null | head -4 || true)
+  # Var-bound form ALWAYS resolves too: the assignment line alone does not
+  # prove execution; a `"$VAR"` use does. (`S=".../X.sh"` + `"$S"`.)
+  for bv in $($RG -o --no-messages --no-filename -N -e "^[A-Z_]+=\"[^\"]*${F}\\.(sh|mjs|py)\"" -r '$0' "$hf" 2>/dev/null | sed 's/=.*//' | sort -u || true); do
+    if $RG -q --no-messages "\\\$${bv}[\\s\"'/)}\\}]" "$hf" 2>/dev/null; then
+      hev=$(printf '%s\n%s' "$hev" "$($RG -n --no-messages -e "\\\$${bv}" "$hf" 2>/dev/null | head -3 || true)")
+    fi
+  done
+  hev=$(printf '%s' "$hev" | grep -v '^$' | head -6)
+  [ -z "$hev" ] && continue
+  hb=$(basename "$hf")
+  stage=$($RG -l --no-messages "$hb" "$REPO/foundation/gates.d" "$REPO/foundation/gates.sh" 2>/dev/null | head -2 || true)
+  if [ -z "$stage" ]; then
+    # Glob-discovered suites never name the file: a stage globbing
+    # selftest-*.sh is a chain link, not a miss.
+    stage=$($RG -l --no-messages -e 'selftest-\\\*\\.sh' -e 'selftest-\*\.sh' "$REPO/foundation/gates.d" 2>/dev/null | head -1 || true)
+    [ -n "$stage" ] && stage="$stage (glob)"
+  fi
+  if [ -n "$stage" ]; then
+    harness=$(printf '%s\nchain: %s -> %s -> '"'"'%s'"'"'\n%s' "$harness" "$(basename "$stage" | head -1)" "$hb" "$Q" "$hev")
+  else
+    harness=$(printf '%s\nUNGATED harness caller %s -> '"'"'%s'"'"' (no gate stage references it):\n%s' "$harness" "$hb" "$Q" "$hev")
+  fi
+done <<EOF
+$($RG -l --no-messages "${XCL[@]}" --glob '*test*' --glob 'selftest*' -e "${F}" "${ROOTS[@]}" "$REPO/scripts" 2>/dev/null | sort -u || true)
+EOF
  argv_hits=""
 if [ -n "$SUB" ]; then
   # argv-array form: the binary (CONST_BIN, /bin/<name>) and the subcommand
@@ -70,13 +110,12 @@ if [ -n "$SUB" ]; then
     ev1=$($RG --with-filename -n --no-messages -e "${FBIN}" -e "/[\\w./-]*bin/${F}([\"']|$)" "$f" 2>/dev/null | grep -vE ':[0-9]+[:-][[:space:]]*(//|#|\*|<!--)' | head -3 || true)
     [ -z "$ev1" ] && continue
     ev2=$($RG --with-filename -n --no-messages -e "\"${SUB}\"" -e "'${SUB}'" "$f" 2>/dev/null | grep -vE ':[0-9]+[:-][[:space:]]*(//|#|\*|<!--)' | head -3 || true)
-    [ -z "$ev2" ] && continue
     argv_hits=$(printf '%s\n%s\n%s' "$argv_hits" "$ev1" "$ev2")
   done <<EOF
 $($RG -l --no-messages "${XCL[@]}" --glob '!*.test.*' --glob '!*.md' -e "\"${SUB}\"" -e "'${SUB}'" "${ROOTS[@]}" 2>/dev/null | grep -vE '(consumer-check|selftest-consumer-check)\.' || true)
 EOF
 fi
-consumers=$(printf '%s\n%s\n%s' "$cmd_hits" "$path_hits" "$argv_hits" | grep -v '^$' | sort -u)
+consumers=$(printf '%s\n%s\n%s\n%s' "$cmd_hits" "$path_hits" "$relpath_hits" "$argv_hits" | grep -v '^$' | grep -vE "/${F}\\.[a-z0-9]+:[0-9]+" | sort -u)
 
 # Mentions (classified, never counted): docs + tests touching the query.
 mentions=$($RG -l --no-messages --glob '*.md' --glob '*.test.*' \
@@ -89,7 +128,13 @@ if [ -n "$consumers" ]; then
   [ -n "$mentions" ] && { echo "mentions (not consumers):"; printf '%s\n' "$mentions"; }
   exit 0
 fi
-echo "ZERO CONSUMERS — nothing invokes '$Q' on the surfaces above."
+echo "NO NON-TEST CONSUMER — nothing outside the test harness invokes '$Q' on the surfaces above."
+if [ -n "$harness" ]; then
+  echo "TEST-HARNESS CALLERS (wired, not production — verify the chain):"
+  printf '%s\n' "$harness" | head -20
+else
+  echo "no test-harness caller either: UNKNOWN, not healthy (R68)."
+fi
 if [ -n "$SUB" ]; then
   # Sibling subcommands of the same binary: shell form (`ee orient`),
   # path-const form (`EE_BIN, "journal"`), or array form

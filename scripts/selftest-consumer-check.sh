@@ -6,7 +6,11 @@
 # 'ee orient' must EXIT 0 — the args-array form (EE_BIN + COMMAND_ARGS spread)
 # fooled v1 into ZERO, the dangerous direction (retires live wiring).
 # ARM2 is the live arm: 'dcg' must exit 0 naming dcg-tool-bridge.ts.
-# separate unpiped runs (this lane's own bash-pipe-exit class).
+# ARM3/ARM4 are the transitive-chain arms (R68 2026-09-21): denominator-sweep
+# and exposure-check must refuse (exit 1, no NON-TEST consumer) AND show the
+# gate-80 -> selftest -> instrument chain. A missing chain is the failure.
+# Capture-first throughout: exit codes come from separate unpiped runs
+# (this lane's own bash-pipe-exit class).
 set -uo pipefail
 root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd -P)
 cd "$root" || exit 1
@@ -15,11 +19,11 @@ note() { printf '  %-4s %s\n' "$1" "$2"; }
 
 out1=""; rc1=""
 out1=$(./scripts/consumer-check.sh "ee preflight" 2>&1); rc1=$?
-if [ "$rc1" -eq 1 ]; then note ok "ee-preflight exits 1 (ZERO)"; pass=$((pass+1));
+if [ "$rc1" -eq 1 ]; then note ok "ee-preflight exits 1 (refusal)"; pass=$((pass+1));
 else note FAIL "ee-preflight exit=$rc1, want 1"; fail=$((fail+1)); fi
 case "$out1" in
-  *ZERO\ CONSUMERS*) note ok "ee-preflight says ZERO CONSUMERS"; pass=$((pass+1));;
-  *) note FAIL "ee-preflight missing ZERO CONSUMERS"; fail=$((fail+1));;
+  *NO\ NON-TEST\ CONSUMER*) note ok "ee-preflight says NO NON-TEST CONSUMER (R68 wording)"; pass=$((pass+1));;
+  *) note FAIL "ee-preflight missing R68 verdict"; fail=$((fail+1));;
 esac
 case "$out1" in
   *ee-ambient-session-start.ts*orient*) note ok "names ambient-start + orient"; pass=$((pass+1));;
@@ -46,6 +50,24 @@ else note FAIL "dcg exit=$rc2, want 0"; fail=$((fail+1)); fi
 case "$out2" in
   *dcg-tool-bridge.ts*) note ok "names dcg-tool-bridge.ts"; pass=$((pass+1));;
   *) note FAIL "missing dcg-tool-bridge.ts"; fail=$((fail+1));;
+esac
+
+out3=""; rc3=""
+out3=$(./scripts/consumer-check.sh denominator-sweep 2>&1); rc3=$?
+if [ "$rc3" -eq 1 ]; then note ok "denominator-sweep exits 1 (no non-test consumer)"; pass=$((pass+1));
+else note FAIL "denominator-sweep exit=$rc3, want 1"; fail=$((fail+1)); fi
+case "$out3" in
+  *80-lane-instrument-selftests.sh*glob*denominator-sweep*) note ok "denominator chain: gate80 -> selftest -> instrument"; pass=$((pass+1));;
+  *) note FAIL "denominator chain missing"; fail=$((fail+1));;
+esac
+
+out4=""; rc4=""
+out4=$(./scripts/consumer-check.sh exposure-check 2>&1); rc4=$?
+if [ "$rc4" -eq 1 ]; then note ok "exposure-check exits 1 (no non-test consumer)"; pass=$((pass+1));
+else note FAIL "exposure-check exit=$rc4, want 1"; fail=$((fail+1)); fi
+case "$out4" in
+  *80-lane-instrument-selftests.sh*glob*exposure-check*) note ok "exposure chain: gate80 -> selftest -> instrument"; pass=$((pass+1));;
+  *) note FAIL "exposure chain missing"; fail=$((fail+1));;
 esac
 
 echo "scripts/selftest-consumer-check.sh: $pass ok, $fail failed"

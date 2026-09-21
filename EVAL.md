@@ -1058,3 +1058,33 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   rg), `dcg` still exit 0, nonce still ZERO exit 1.
 - **Boundary:** sibling-scan token noise unchanged (verify-by-reading);
   filenames with spaces break the argv loop (none on these surfaces).
+
+## P2 consumer-check R68 fix + 19-instrument inventory (2026-09-21)
+
+- **R68 (conductor):** `denominator-sweep` and `exposure-check`
+  returned ZERO though gate-80 selftests invoke both. Cause: tests
+  were MENTION tier, so the middle link of a live gate chain read as
+  nothing. Second false-negative class in one day, both dangerous
+  direction. Verdict now reads NO NON-TEST CONSUMER, never
+  `nothing invokes`.
+- **Fix:** tier 2b relative script-path form (`./scripts/X.sh` — the
+  `.sh` suffix broke the bare-token boundary); tier 4 harness callers
+  (literal, var-bound `S=...`+`"$S"`) with one-hop chain
+  (`gates.d/80 (glob)` vs literal vs UNGATED). Self-file can never be
+  its own consumer (killed quickstart+exposure self-match false
+  positives). Selftest 12/12 with denominator+exposure chain RED arms.
+- **Inventory (19 shell instruments + 1 mjs):** CHAINED 9
+  (denominator, exposure, vgrep, pin-liveness, rung-demotion,
+  verify-other, verify-numerals, audit-lineage, consumer-check);
+  CONSUMED 1 (pinned-denominator <- denominator-sweep.sh:38);
+  UNKNOWN 9 (fleet-tick, lane-status, publish-export, verify-frozen,
+  noclaim-harvest, feed-idle-panes, quickstart, bootstrap-compaction,
+  sync-docs) + measure-framing-flip (mjs). lane-status/quickstart
+  needed manual override: heredoc prose matched tier 1 (open gap).
+- **NO-CLAIM:** 10 wired, 9 UNKNOWN. UNKNOWN is not healthy and not
+  shelfware. Tool gaps open: heredoc-prose false positives,
+  pathlib-bind (`GATE = REPO / ...`) + wrong-extension (.sh-is-python)
+  harness forms, lowercase bind vars, foundation/gates.d not a tier-1
+  surface. Mid-unit self-inflicted: a stray `:` in the harness
+  heredoc silenced tier 4 for 10 runs (caught by probe, all
+  re-run); sed/python used for two micro-edits instead of edit tool.
