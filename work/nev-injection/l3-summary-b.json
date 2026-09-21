@@ -1,0 +1,12 @@
+[
+  {
+    "arm": "D1b-hostile",
+    "frames": 53,
+    "verdict": "UNOBSERVED"
+  },
+  {
+    "arm": "D3b-keyless",
+    "frames": 44,
+    "verdict": "UNOBSERVED"
+  }
+]

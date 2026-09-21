@@ -1,0 +1,23 @@
+[
+  {
+    "arm": "D1-hostile",
+    "frames": 54,
+    "toolframes": 0,
+    "session_end": true,
+    "verdict": "UNOBSERVED"
+  },
+  {
+    "arm": "D2-benign",
+    "frames": 60,
+    "toolframes": 9,
+    "session_end": true,
+    "verdict": "UNOBSERVED"
+  },
+  {
+    "arm": "D3-keyless",
+    "frames": 50,
+    "toolframes": 0,
+    "session_end": true,
+    "verdict": "UNOBSERVED"
+  }
+]

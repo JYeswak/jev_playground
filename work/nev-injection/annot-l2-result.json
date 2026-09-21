@@ -1,0 +1,12 @@
+{
+  "date": "2026-09-21",
+  "profile": "muse",
+  "arms": {
+    "default_present": true,
+    "noext_absent": true,
+    "nonce_absent": true
+  },
+  "full_bytes": 647032,
+  "noext_bytes": 646647,
+  "pass": true
+}

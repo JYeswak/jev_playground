@@ -1,0 +1,14 @@
+[
+  {
+    "arm": "D1c-hostile",
+    "frames": 106,
+    "host_served": 1,
+    "verdict": "FLAG"
+  },
+  {
+    "arm": "D3c-keyless",
+    "frames": 139,
+    "host_served": 1,
+    "verdict": "NOTRUN"
+  }
+]

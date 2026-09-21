@@ -62,3 +62,7 @@ compaction:
 # working and makes it redundant.
 extensions:
   - ./.omp/extensions/jev-rerank.ts
+  - ./.omp/extensions/jev-flag.ts
+#   jev-flag entry added 2026-09-21 (pane 3): same loader path as rerank; L2 proven
+#   per-probe (xd://jev_flag_ext_probe + nonce + --no-extensions arms), see
+#   work/nev-injection/annot-l2-receipt.json. Retire with the tool.
