@@ -244,22 +244,24 @@ Wilson two-sided 95%, computed by pane 1.
 
 | boundary | p̂ | 95% CI | point | interval | verdict | what we did |
 |---|---:|---|:--:|:--:|---|---|
-| `absence-from-one-probe` n=20 | 0.200 | [0.081, **0.416**] | ok | **NO** | REFUSE | **shipped** |
-| `absence-from-one-probe` n=77 | 0.273 | [0.186, **0.381**] | ok | **NO** | REFUSE | retired |
-| `bash-structural-def-search` n=20 | 0.200 | [0.081, **0.416**] | ok | **NO** | REFUSE | **shipped** |
-| `bash-structural-def-search` n=77 | 0.714 | [0.605, 0.803] | NO | NO | REFUSE | retired |
-| `bash-callsite-grep-exclusion` n=20 | 0.300 | [0.145, **0.519**] | ok | **NO** | REFUSE | **shipped** |
-| `ft-rs` bind | 0.000 | [0.000, 0.133] | NO | NO | REFUSE | killed ✓ |
-| `ft-md` bind | 0.000 | [0.000, 0.133] | NO | NO | REFUSE | killed ✓ |
-| `ft-sh` bind | 0.040 | [0.007, 0.195] | NO | NO | REFUSE | killed ✓ |
+| `absence-from-one-probe` n=20 *(ship-time)* | 0.200 | [0.081, 0.416] | ok | **NO** | REFUSE | **shipped** |
+| `absence-from-one-probe` n=77 *(relabel)* | 0.273 | [0.186, 0.381] | **NO** | **NO** | REFUSE | retired |
+| `bash-structural-def-search` n=20 *(ship-time)* | 0.200 | [0.081, 0.416] | ok | **NO** | REFUSE | **shipped** |
+| `bash-structural-def-search` n=77 *(relabel)* | 0.714 | [0.605, 0.803] | **NO** | **NO** | REFUSE | retired |
+| `bash-callsite-grep-exclusion` n=20 *(ship-time)* | 0.300 | [0.145, 0.519] | **NO** | **NO** | REFUSE | **shipped** |
+| `ft-rs` / `ft-md` bind | 0.000 | [0.000, 0.133] | **NO** | **NO** | REFUSE | killed ✓ |
+| `ft-sh` bind | 0.040 | [0.007, 0.195] | **NO** | **NO** | REFUSE | killed ✓ |
 
-**All three ships pass the point leg and fail the interval leg.** `callsite` at p̂ = 0.300 would
-have *passed* a naive `p̂ ≤ 0.30` check outright — it is refused only because its upper bound is
-0.519. The dual bar is the entire difference between what we did and what we should have done.
+**Both legs now bite, and they bite different rows — which is the evidence the corrected bars
+are real rather than cosmetic.** At ship time `absence` and `structural-def` (p̂ = 0.200) clear
+the 0.20 point bar and are caught *only* by the interval leg; `callsite` (p̂ = 0.300) fails
+**both**. At the n=77 relabel, `absence` (p̂ = 0.273) now fails the **point** leg too — under
+v3's vacuous 0.30/0.30 it would have been caught only by its interval, and under a naive
+single point bar of 0.30 it would have **passed outright**.
 
 For the `bind` rows, REFUSE is the desired verdict: the validator agrees with every kill we made.
-So across eight rate-bearing decisions the matrix reproduces our five correct outcomes and
-reverses our three wrong ones, **a day earlier and without a relabel.**
+Across eight rate-bearing decisions the matrix reproduces our five correct outcomes and reverses
+our three wrong ones, **a day earlier and without a relabel.**
 
 Method note: §6 previously cited upper 0.137 for 0/25 from Clopper-Pearson; Wilson gives 0.133.
 Both clear the 0.20 bar. `rate.method` exists precisely so this distinction is never silent.
@@ -268,21 +270,38 @@ Both clear the 0.20 bar. `rate.method` exists precisely so this distinction is n
 
 ## 5. Tasks and dependency graph
 
+**Edges are normative; there is deliberately no ASCII picture.** Pane 3's validation found the
+v2 drawing disagreed with the `Depends:` lines — it merged T5 into the T2→T4 edge and T3 into
+T4→T6, so an agent following the picture builds the wrong order. A single representation
+removes the contradiction.
+
 ```
-T1 schema ──┬── T2 validator core ──┬── T4 backfill ── T6 orphan ── T7 gate ── T8 arc
-            │                       ├── T3 red arms ───┘
-            └── T5 authority ───────┘
+T1 → T2      T1 → T5      T2 → T3      T2 → T4      T2 → T6a
+T5 → T2*     T3 → T7      T4 → T6b     T6a → T6b    T6b → T7    T7 → T8
 ```
+
+`T5 → T2*` is a **runtime** dependency, not a build order: T2's checks read `authority.toml`, so
+T5 must *exist* before T2 can run green, though T2 can be written first. Pane 3 found T5
+graph-orphaned in v2 — *"runtime-required but order-invisible"* — which would have let a
+scheduler build T2 before the file it reads existed. Marked, not hidden.
+
+Parallelizable after T1: **{T2, T5}**, then **{T3, T4, T6a}**.
 
 **T1 — Define the schema.** `evidence/SCHEMA.md` + a commented empty `matrix.toml`. Encodes §3.
 *Blocks:* everything. *Acceptance:* a fresh agent writes a valid boundary from the doc alone.
 *Rationale:* his matrix header carries its own rules; ours must too, or the first contributor
 invents a second dialect.
 
-**T2 — Validator core.** `scripts/validate-evidence-matrix.py`, stdlib only (`tomllib`, py≥3.11 —
-note `python3` here is older; pin `python3.12` as he pins his toolchain). Implements the first six
-codes in §4. *Depends:* T1. *Acceptance:* each code fires on a planted violation; `selftest-*`
-covers all six.
+**T2 — Validator core.** `scripts/validate-evidence-matrix.py`, stdlib only. **Interpreter:
+`python3.12`** — verified present at `/opt/homebrew/bin/python3.12` (3.12.13); system `python3`
+is 3.9.6 with **no `tomllib`**, so the pin is load-bearing, exactly as he pins
+`nightly-2026-08-31`. Implements these **eight** structural codes (pane 3: *"the first six" is
+six of thirteen, mapping unstated — a fresh agent guesses*): `boundary-coverage`,
+`authority-<field>`, `unresolved-evidence`, `missing-red-arm`, `unpersisted-rate`,
+`uncertified-pass`, `k-drift`, `uncovered-bead`. The remaining five — `orphan-case` (T6a),
+`scope-disagreement` (runtime), `unstated-assumption`, `missing-non-claims`, `control-not-beaten`
+— land in T6a and T3. *Depends:* T1; needs T5's file present to run green.
+*Acceptance:* each of the eight fires on a planted violation.
 *Rationale:* zero-dependency mirrors his choice and keeps the validator runnable in any pane.
 
 **T3 — RED arm per code.** Every check ships a planted-violation fixture.
@@ -302,13 +321,32 @@ AGENTS.md that bars, n, scopes, and rungs move only by Joshua's edit.
 *Depends:* T1. *Acceptance:* a matrix edit that moves a bar fails `authority-rate.bar`.
 *Rationale:* this is the second key. Without it we have a nicer spreadsheet, not a control.
 
-**T6 — Orphan check.** Walk every `selftest-*.sh` case and `*.test.mjs` and require registration.
-*Depends:* T4 (needs a populated matrix to be meaningful). *Acceptance:* deleting a boundary row
-whose case still exists fails `orphan-case`.
-*Rationale:* the gap Axis A found in his tree; the cheapest place we can exceed upstream.
+**T6a — Case identity and the walker.** Both reviewers hit the same wall: *"walk every
+`selftest-*.sh` case — what is a case?"* Our selftests emit `ok <label>` / `FAIL <label>` to
+stdout and **no case IDs exist anywhere**, so the task as written in v2 was unimplementable.
+
+**Define it first, then walk it.** A *case* is a labelled assertion a selftest can be asked to
+enumerate without executing: each `selftest-*.sh` gains a `--list-cases` mode printing one
+stable `<script-basename>::<label>` per line, where `<label>` is the existing `ok <label>`
+string. Identity is the label, so no renaming is required and existing output is unchanged.
+**Scope, named explicitly:** `scripts/selftest-*.sh` plus `*.test.mjs` under `work/*/test/` —
+and *only* those two; other trees are out of scope until a boundary claims them.
+*Depends:* T1, T2 — **not** T4. Runs parallel with backfill.
+*Acceptance:* `--list-cases` on every in-scope file yields a unique, stable id set.
+*Rationale:* Axis A `:143-144` — his validator resolves matrix→source but nothing checks the
+reverse. This is the cheapest place we exceed upstream, and it cannot be built until "case"
+means something.
+
+**T6b — Enforce registration.** Every enumerated case must appear in some boundary.
+*Depends:* T6a, T4 (needs ≥1 populated row to be meaningful — pane 3 established that a *full*
+backfill is not required, so only this half is gated).
+*Acceptance:* against a **temporary fixture matrix in `mktemp -d`**, removing a row whose case
+still exists exits `orphan-case`. Pane 3 flagged v2's acceptance as destructive — it directed a
+fresh agent to delete a live boundary row with no restore instruction. No test in this program
+mutates the real matrix.
 
 **T7 — Wire into `foundation/gates.sh`.** New stage, per AGENTS.md gate thrift: extend `80` rather
-than add a stage if it fits. *Depends:* T3, T6. *Acceptance:* `gates.sh --selftest` green;
+than add a stage if it fits. *Depends:* T3, T6b. *Acceptance:* `gates.sh --selftest` green;
 matrix violation turns the gate red.
 *Rationale:* an unwired validator is an unconsumed instrument (R68) — the phase boundary forbids
 adding another.
