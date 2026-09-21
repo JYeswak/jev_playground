@@ -85,17 +85,26 @@ selftest_cases = ["scripts/selftest-ttsr-rules.sh::glob_silenced_fires",
 red_arm = "scripts/selftest-ttsr-rules.sh::glob_silenced_fires"   # REQUIRED, see §4
 label_rows = "work/skills-vein/glob-labels-20260921.json"          # REQUIRED for any rate
 
-# THE CLAIM, with its scope
-rate = { kind = "fp", k = 4, n = 77, bar = 0.30, interval = "wilson" }
+# THE CLAIM, with its scope, its assumptions, and its control
+# Method name carries its assumption, per his eval policy (:247-249):
+#   two_sided_95_wilson_with_one_primary_case_per_independent_family
+rate = { kind = "fp", k = 4, n = 77,
+         method = "two_sided_95_wilson_independent_rows",
+         bar_point = 0.30, bar_interval = 0.30 }   # DUAL bar, see §4.1
+negative_control = { name = "always_quiet", must_lose = true }
+non_claims = ["not a live measurement",
+              "single labeller",
+              "rows not independent across one session"]
 scopes = ["project", "global"]
 rung = "L3"                            # L0..L4 from AGENTS.md
 status = "planned"                     # planned | executed | passed | failed | retired
 ```
 
 `authority.toml` holds the same rows with the **bound fields** frozen. Bound set for this lane:
-`owner_bead, kind, title, red_arm, rate.bar, rate.n, scopes, rung`. The working matrix may move
-`status`, `k`, and add evidence refs; **it may not move a bar, an n, a scope, or a rung without
-an authority edit.**
+`owner_bead, kind, title, red_arm, rate.method, rate.bar_point, rate.bar_interval, rate.n,
+negative_control, scopes, rung`. The working matrix may move `status`, `k`, and add evidence
+refs; **it may not move a bar, a method, an n, a control, a scope, or a rung without an authority
+edit.**
 
 **Who holds the second key.** Joshua. An authority edit is a reviewed change; the matrix is ours.
 This is the mechanism that would have stopped F3, because I could not have both set the bar and
@@ -115,9 +124,13 @@ Fail-closed, fixed diagnostic codes, no content in logs.
 | **every selftest case in the tree is registered** | `orphan-case` | **the reverse check he lacks** |
 | `red_arm` present and is one of `selftest_cases` | `missing-red-arm` | untested gates |
 | any `rate` present ⇒ `label_rows` exists and has ≥ n keys | `unpersisted-rate` | **R70/R71 exactly** |
-| `status = passed` ⇒ interval upper bound clears `bar` | `uncertified-pass` | NEED #6 exactly |
+| `status = passed` ⇒ **both** bars clear (see §4.1) | `uncertified-pass` | NEED #6 exactly |
 | `kind = rule` ⇒ enumeration in every declared scope agrees with `status` | `scope-disagreement` | **F5 exactly** |
 | every non-epic `jev-*` bead is covered by ≥1 boundary | `uncovered-bead` | untracked work |
+| `rate.method` names its independence assumption | `unstated-assumption` | silent iid assumption |
+| ≥3 `non_claims`, and they name labeller count and independence | `missing-non-claims` | a fixture quietly becoming a claim |
+| `negative_control.must_lose` ⇒ evidence that it loses | `control-not-beaten` | a rule that beats nothing |
+| every semantic field has a corrupt-it-must-fail twin | `no-mutation-twin` | untested validator |
 
 `uncertified-pass` is the rule that makes this pay for itself: **a boundary cannot say `passed`
 while its own interval admits a value above its bar.** Applied to 2026-09-20 it refuses
@@ -128,6 +141,46 @@ have refused all three before they went system-wide.**
 `scope-disagreement` is the F5 fix: the matrix declares scopes, the validator *enumerates* them
 (`omp ttsr list | grep -c`) rather than probing, so "reported disabled but still live" becomes
 impossible to commit.
+
+### 4.1 The dual bar, the stated assumption, and the control — adopted from his eval policy
+
+Axis B (`docs/demos/upstream-repro/axis-b-validators-20260921.md` §2) found that
+`validate_eval_policy.py` already solves NEED #6, and more stringently than I proposed. Four
+mechanisms, adopted:
+
+**1. A dual bar, not a single one.** His top-one precision requires rate ≥ 0.90 **AND** Wilson
+lower ≥ 0.80 (`:263`). A point estimate and an interval bound are different claims and he makes
+both mandatory. Today we used only one, which is how `structural-def` passed at 4/20 = 0.20 and
+then measured 0.714 at n=77. Our matrix therefore carries `bar_point` and `bar_interval`, and
+`uncertified-pass` fires if **either** fails.
+
+**2. The method name carries its assumption.**
+`two_sided_95_wilson_with_one_primary_case_per_independent_family` (`:247-249`) — the
+independence assumption is in the identifier, so it cannot be forgotten at read time. Our rows
+labelled 20 fires drawn from overlapping sessions and silently treated them as independent.
+`unstated-assumption` requires the method name to say what it assumes.
+
+**3. Non-claims are load-bearing, validated fields.** His policy `status` must literally equal
+`frozen_contract_not_evidence` (`:195`), and ≥4 non-claims must contain the phrases *"not an
+evaluator"*, *"not a 300-family"*, *"synthetic"*, *"no live"* (`:197-200`). **The fixture cannot
+silently become a claim.** Our `missing-non-claims` requires ≥3, naming labeller count and
+independence — the two NO-CLAIMs we kept writing in prose and never enforced.
+
+**4. A frozen negative control that must be proven to lose.** `always_abstain` plus six
+baselines (`:250-253`), and the expected-values fixture must **prove always-abstain loses**
+(`:429`). Our analogue is `always_quiet`: a rule must beat doing nothing, demonstrated, not
+assumed. Note what this does to our own history — a rule with FP 0.714 does *not* beat
+`always_quiet`, and this check would have said so without any labelling at all.
+
+**5. Mutation twins.** `test_eval_policy.py` is 43 mutation tests: corrupt one semantic field,
+require `SystemExit` (Axis B §1). Named failure modes include *false abstention scored correct*,
+*coverage ≠ recall*, *averages hiding loss*, *unstarted cases disappearing*. `no-mutation-twin`
+requires every semantic field of our matrix to have one. This is the discipline that makes the
+validator itself trustworthy rather than merely present.
+
+**What this costs us in credibility, stated plainly:** four of the five mechanisms above are
+things this lane argued for in prose today and failed to enforce. He enforces them in 521 lines
+of stdlib Python with 43 mutation tests. That gap is the honest measure of the distance.
 
 ---
 
