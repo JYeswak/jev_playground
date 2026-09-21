@@ -1,0 +1,10 @@
+# Native-surface exemptions: repo-relative path + reason, one per line.
+# Format: EXEMPT <path> | <reason>. A path with no reason is refused by the parser.
+# Add here when a direct call is deliberate; never a silent skiplist.
+EXEMPT work/jev-client/src/index.ts | sanctioned single chokepoint; SDK migration unscoped as of 2026-09-21
+EXEMPT work/jev-client/question-shape-measure.mjs | shape-measurement probe; collapse decision owned by P4 cruft sweep 2026-09-21
+EXEMPT work/p2-localjev/scripts/eval/run.ts | collapse decision owned by P4 cruft sweep 2026-09-21
+EXEMPT work/p2-localjev/src/engine.ts | collapse decision owned by P4 cruft sweep 2026-09-21
+EXEMPT work/p2-localjev/scripts/eval/data.ts | collapse decision owned by P4 cruft sweep 2026-09-21
+EXEMPT work/jevcache-probe/repro-1-inline-schema-rejected.sh | server-rejection repro; an SDK call would not reproduce it
+EXEMPT scripts/selftest-ttsr-rules.sh | canary input string for tripwire-rule selftest (tests the jev-key rule fires on endpoint contact); quoted test data, never executed as a call
