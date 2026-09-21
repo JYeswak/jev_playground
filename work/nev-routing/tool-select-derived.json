@@ -1,0 +1,12 @@
+{
+  "rows": 137063,
+  "unlabelled_not_in_this_file": 1745,
+  "distinct_labels": 34,
+  "salt": "jev-tool-select-v1",
+  "hash": "sha256(salt + NUL + context utf-8)",
+  "fields": ["id", "label", "prev_tool", "n_candidates", "context_len", "context_sha256"],
+  "omitted": "context text, commands, intents, session paths beyond the basename in id",
+  "why": "The 66MB labelled file is session context. Committing it is a privacy write. This file is the auditable substitute.",
+  "bar": "work/nev-routing/tool-select-bar.md",
+  "scored": false
+}

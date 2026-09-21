@@ -1,0 +1,62 @@
+{
+  "generated_at": "2026-09-21T20:28:27Z",
+  "session_files_scanned": 1822,
+  "tool_calls_seen": 138808,
+  "labelled_pairs": 137063,
+  "unlabelled_rows": 1745,
+  "distinct_labels": 34,
+  "top_labels": [
+    [
+      "eval",
+      51757
+    ],
+    [
+      "bash",
+      41807
+    ],
+    [
+      "read",
+      16023
+    ],
+    [
+      "edit",
+      8329
+    ],
+    [
+      "hub",
+      6731
+    ],
+    [
+      "write",
+      3822
+    ],
+    [
+      "grep",
+      3470
+    ],
+    [
+      "yield",
+      2483
+    ],
+    [
+      "todo",
+      1378
+    ],
+    [
+      "glob",
+      718
+    ],
+    [
+      "web_search",
+      353
+    ],
+    [
+      "task",
+      139
+    ]
+  ],
+  "nonce_absent": true,
+  "labelled_path": "/Users/josh/Developer/jev/work/nev-routing/tool-select-labelled.jsonl",
+  "unlabelled_path": "/Users/josh/Developer/jev/work/nev-routing/tool-select-unlabelled.jsonl",
+  "note": "unlabelled rows are contexts with no following tool call. They are not negatives."
+}
