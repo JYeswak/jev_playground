@@ -1,0 +1,2 @@
+CALLBACK P4 START [op-id=p4-plan-review-r2-v41-29038ab]
+Round 2 on PLAN v4.1 @29038ab. Will re-derive §4.2 replay under 0.20/0.30, check k-drift/sha256, re-run reward hacks, look for fix-round breakage. Artifact under docs/demos/upstream-repro/.

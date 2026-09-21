@@ -1,0 +1,3 @@
+CALLBACK P4 DONE [op-id=p4-plan-review-r2-v41-29038ab]
+Artifact: docs/demos/upstream-repro/plan-review-r2-v41-29038ab.md
+Table cells match Wilson 0.20/0.30. Header 4.2 still says p̂≤0.30 — vacuous dual in the copy site. bar_point 0.20 = 4/20, 2/3≠8/9, reverse-engineered. k-drift closes transcription not labeller. §6 accepts 0/25, table refuses. T6b still Depends T4. Example hash is empty SHA-256.

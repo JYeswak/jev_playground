@@ -1150,3 +1150,16 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   `always_quiet` without a loss table. Dual story inverted.
 - **Boundary:** pane-1 start-callback rejected (`tmux not in a mode`).
   Did not edit the plan. Did not run his eval-policy script.
+
+## P4 PLAN REVIEW R2 of v4.1 @29038ab (2026-09-20)
+
+- **Artifact:** `docs/demos/upstream-repro/plan-review-r2-v41-29038ab.md`.
+- **Table:** every Wilson cell matches; ft-sh is 1/25. Header `:241`
+  still scores FP at `p̂ ≤ 0.30` — vacuous dual restored in the copy
+  site. §6 still *accepts* 0/25; table *refuses* it.
+- **bar_point 0.20** = 4/20. Ratio 2/3 ≠ his 8/9. Reverse-engineered
+  so n=20 is interval-only. Do not freeze.
+- **k-drift/sha256** closes transcription, not the labeller (R71).
+  Example hash `e3b0c442` is SHA-256("").
+- **T6b still Depends T4** despite mktemp acceptance.
+- **Boundary:** did not edit the plan. Round 2 of ≥4.
