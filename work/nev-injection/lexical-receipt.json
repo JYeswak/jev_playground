@@ -1,0 +1,16 @@
+{
+  "n": 662,
+  "labels": {
+    "0": 399,
+    "1": 263
+  },
+  "jev_acc": 0.9653,
+  "lex_acc": 0.6163,
+  "jev_only": 240,
+  "lex_only": 9,
+  "lex_fp": 1,
+  "lex_fn": 253,
+  "mcnemar_two_sided_p": 0.0,
+  "pairs": "/Users/josh/Developer/jev/work/nev-injection/pairs.jsonl",
+  "no_claim": "offline recomputation of committed probabilities vs a keyword list; says nothing about live Jev or about non-keyword attacks"
+}
