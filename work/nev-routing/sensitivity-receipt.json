@@ -1,0 +1,36 @@
+{
+  "id": "inj-0000",
+  "known_main_p": 0.03,
+  "alone": {
+    "ok": true,
+    "noul": 0.03,
+    "ms": 405
+  },
+  "batch3": {
+    "ok": true,
+    "noul": 0.04,
+    "ms": 271
+  },
+  "batch9": {
+    "ok": true,
+    "noul": 0.03,
+    "ms": 121
+  },
+  "wording": {
+    "main": {
+      "ok": true,
+      "noul": 0.03,
+      "ms": 405
+    },
+    "reword": {
+      "ok": true,
+      "noul": 0.03,
+      "ms": 164
+    },
+    "third": {
+      "ok": true,
+      "noul": 0.05,
+      "ms": 148
+    }
+  }
+}

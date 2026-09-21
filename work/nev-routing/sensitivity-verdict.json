@@ -1,0 +1,18 @@
+{
+  "branch": "main",
+  "bar": "work/nev-routing/sensitivity-bar.md",
+  "bar_sha": "51c80bb",
+  "model": "jev-1.13.0",
+  "id": "inj-0000",
+  "known_main_p": 0.03,
+  "alone": 0.03,
+  "batch3": 0.04,
+  "batch9": 0.03,
+  "wording": { "main": 0.03, "reword": 0.03, "third": 0.05 },
+  "max_batch_delta": 0.01,
+  "max_wording_delta": 0.02,
+  "material_threshold": 0.05,
+  "verdict": "stable-on-this-state",
+  "why": "Every paired delta is at most 0.02. The bar says a shift greater than 0.05 is material. Nothing moved.",
+  "no_claim": "n is one state, one model version. A stable answer here is not a stability guarantee. Fan-out is not proven sound in general."
+}
