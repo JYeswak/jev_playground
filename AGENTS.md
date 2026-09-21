@@ -581,11 +581,33 @@ Rules:
 | `awesome-jev-by-typesafe` | decision policies: routing, confidence gates, composite scoring, filter thresholds |
 | `probes/` | our own black-box assertions against a fake Jev — the one suite we own end to end |
 
-### Live Call Budget Gate
+### Live Call Budget Gate — LIFTED 2026-09-21 by Joshua
 
-Before any live run, state in the session: **which tree, which lane, how many calls, why offline
-was insufficient.** Then run it once. A live suite that needs to be run repeatedly to produce a
-stable claim is evidence about variance — record that, don't average it away silently.
+Joshua, 2026-09-21: *"i give blanket approval to build jev systems that work - we can use the api -
+i do not limit spending on it."* RULE 0. **The cost gate is gone. Do not ask, do not ration, do not
+shrink an n to save money.** If 662 rows answer the question better than 60, run 662. If three
+models make the comparison honest, run three.
+
+**What was lifted, and what was NOT.** Offline-first rested on two separate justifications and only
+one of them was cost:
+
+- **LIFTED — the cost argument.** "Prove it offline because live calls are expensive" is dead.
+  Underpowered n is now a choice, not a constraint, and an underpowered result is a defect we chose.
+- **STANDING — the testability argument.** Inject the asker anyway. Our policy, thresholds, tie-
+  breaks, fail-safe direction and validator must still be provable **without** calling Jev, because
+  a probabilistic dependency cannot be unit-tested through the network. That was never about money.
+- **STANDING — preregistration.** Bar in a committed file before the first call. Cost was never why
+  that rule exists; it exists because a bar set after seeing data is not a bar.
+- **STANDING — no unattended live loops.** A retry loop nobody is reading is a defect, not a budget
+  decision. An unbounded loop against a metered endpoint is still an incident.
+- **STANDING — say what you spent.** Not for permission. Cost per result is a reportable property
+  of a method, and "Jev ties an LLM at 1/100th the cost" is a claim we can only make if we measured
+  both sides.
+
+**The failure mode this creates, named in advance:** spending freely on measurements that answer
+nothing. The gate that replaces the budget gate is *"what question does this call answer, and what
+would each outcome change?"* Unlimited spend removes the excuse for a small n; it does not create a
+reason to run anything twice.
 
 ---
 
