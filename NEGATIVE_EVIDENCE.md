@@ -3294,3 +3294,23 @@ Exit: unaskable or corpus-absent. That is not an admission path.
 **Retry condition.** This entry is wrong if a candidate is admitted and certified without any labelled corpus existing at entry. That would mean an admission path existed and this trace missed it.
 
 **NO-CLAIM.** A gap in the admission rule is not a seat. Jevify was not run against a product.
+
+---
+
+## R76 — REFUTED: comparing Jev to the cheapest baseline is a fair test
+
+**Recorded:** 2026-09-21 · **Level:** `[test]` · The largest error this lane has made. Found by Joshua, not by us.
+
+**The premise, held for four days and never written down:** that a candidate dies honestly when a regex, a constant, or BM25 beats Jev on it. Forty-one rulings rest on it. It is wrong, and the reason it is wrong was sitting in our own tree the entire time.
+
+**What was on disk, unexecuted.** Four first-party TypeSafe repositories under `upstream/typesafe-ai/`, 239 files, **zero of them ever run.** `system-one-adapter-python` is a drop-in replacement for the client: same `state`, same `questions`, routed to OpenAI, Anthropic, or any OpenAI-compatible endpoint. Its README states its purpose — *"comparing TypeSafe against an LLM on cost/speed/intelligence."* Its keyless suite: **187 passed in 5.41s**, first run 2026-09-21T23:0xZ.
+
+**The defect, stated precisely.** A floor and an incumbent answer different questions. `always-bash 0.297` and BM25 `2.24%` establish that a task is *trivial*. Neither establishes whether a tool is *worth buying*. "Jev ties gpt-4o-mini at a fraction of the cost and latency" is the product claim, and **we produced zero measurements of it across 41 candidates** while publishing kills that read as verdicts on Jev.
+
+**Four more omissions found the same hour**, each a first-party capability we reimplemented or ignored: no `Score` support at all (one of three primitives); `Noul` sent instructions-only, never with `criteria {true,false}`; a hand-rolled retry where the SDK ships `RetryPolicy`; `usage.billing_units` tracked nowhere. And `docs-mirror/typesafe/concepts/use-case-map.md` — five categories, seventeen industries, ten decision shapes — unopened, while all five surfaces we tested came from a single category.
+
+**Why our rigor did not catch it.** Every instrument we built asks *"is this number real?"* None asks *"is this the right comparison?"* R28 made us demand unauthored corpora; preregistration made us fix bars before scoring; R74 made us control our counts. A kill measured against a floor passes all three and is still uninformative. **Rigor about the arm you ran is not rigor about the arm you omitted.**
+
+**Retry condition.** None — this does not reopen; it is a standing obligation, now `AGENTS.md` RULE 14. Any verdict citing only a deterministic comparator is INCOMPLETE and may not be cited as a ruling on Jev until an LLM arm is run on the same rows. Revisit only if the vendor withdraws the adapter.
+
+**NO-CLAIM.** This says our kills were incomplete. It does NOT say any of them were wrong: a task beaten by a regex may still be a task with no seat. What is unknown is how many of the 41 would survive an incumbent comparison, and that number is zero-measured, not zero.

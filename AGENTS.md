@@ -45,6 +45,10 @@ clone's own toolchain (`npm run typecheck` / `ruff`), never imposed across them.
 12. **When Jeffrey does it, default to ADOPT.** He is this lane's mentor. The burden of proof sits
     on NOT adopting, never on adopting.
     [§ RULE 12](#rule-12---adopt-from-the-mentor-by-default)
+13. **The native repo is the incumbent.** Four first-party TypeSafe repos are vendored here and we
+    ran none of them for four days. Read the SDK before writing a client; run the LLM arm before
+    publishing a verdict; locate every proposal on the use-case map.
+    [§ RULE 14](#rule-14---the-native-repo-is-the-incumbent-and-we-ignored-it-for-four-days)
 
 Gate inventory and every RED arm: [`GATES.md`](GATES.md). Refuted hypotheses and rejected
 designs, read before starting one: [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md).
@@ -56,6 +60,61 @@ designs, read before starting one: [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md
 If I tell you to do something, even if it goes against what follows below, YOU MUST LISTEN TO ME. I AM IN CHARGE, NOT YOU.
 
 ---
+
+## RULE 14 - THE NATIVE REPO IS THE INCUMBENT, AND WE IGNORED IT FOR FOUR DAYS
+
+Joshua, 2026-09-21, on discovering it: *"we have the native fucking repo cloned - make sure we have
+latest and that we compare and use every single thing we do against THIS repo."*
+
+**Four first-party TypeSafe repositories are vendored under `upstream/typesafe-ai/`. 239 files. As
+of 2026-09-21 we had never executed a single one of them.** Not one test, not one example. We spent
+four days hand-rolling a client, a retry policy, a validator and a confidence metric against a wire
+contract transcribed into this file, while the vendor's typed, tested implementations of all four
+sat unread in our own tree.
+
+### What the omission cost, measured the hour we found it
+
+- **`system-one-adapter-python` is a drop-in differential oracle** — same `state`, same `questions`,
+  routed to OpenAI, Anthropic, or any OpenAI-compatible endpoint including xAI. Its own README says
+  it exists *"for comparing TypeSafe against an LLM on cost/speed/intelligence."* **187 tests pass
+  keyless in 5.4s.** The comparison it makes trivial is the one our entire gauntlet never ran once.
+- **Every comparator in 41 rulings was a FLOOR, never an INCUMBENT.** `always-bash 0.297`. BM25
+  `2.24%`. A two-line domain regex. We asked "does the cheapest possible thing beat Jev?" and often
+  it did, so we killed the seat. We never asked "does an LLM beat Jev on the same state, and at what
+  cost and latency?" **A floor tells you a task is trivial. An incumbent tells you a tool is worth
+  buying.** We measured the first 41 times and the second zero times.
+- **We have no `Score` support at all** — one of the three primitives, never used here.
+- **We never use `Noul`'s `criteria {true,false}` outcome descriptions.** Every Noul we send is
+  instructions-only.
+- The SDK ships `RetryPolicy` (3 retries, 10s timeout, `{429,500,502,503,504}`, backoff 0.5 doubling
+  to 5.0 with 0.25 jitter) and `usage.billing_units`. We reimplemented the first and track none of
+  the second.
+- `docs-mirror/typesafe/concepts/use-case-map.md` — **five categories, seventeen industries, ten
+  decision shapes — sat on disk unopened.** All five surfaces we tested were Harness Engineering,
+  one category of five, and the narrowest: a harness is our own code, so anything Jev could judge
+  there we had already written a regex for. We sampled the single cell where a cheap baseline is
+  guaranteed to exist and concluded the tool had no application.
+
+### The rule, and it binds every future claim
+
+1. **Before writing any client code, read the SDK.** `typesafe-sdk-python` and `typesafe-sdk-js` are
+   the authority on question shapes, validation, retries and usage accounting. If we are writing it
+   and they ship it, we stop and use theirs.
+2. **Before publishing any verdict, run the incumbent arm.** A kill that compares Jev only to a
+   regex, a constant, or BM25 is INCOMPLETE and may not be cited as a ruling on Jev. Run the same
+   state and questions through `system-one-adapter-python` against at least one LLM, and report
+   accuracy, cost and latency for both arms.
+3. **Before proposing a surface, open the use-case map.** Name which of the five categories and
+   which of the ten decision shapes it is. A proposal that cannot be located on that map is a
+   proposal we invented rather than found.
+4. **Keep the four repos current and record every SHA move.** Moving a pin invalidates measurements
+   taken against it; the moving pane re-runs and says so. Moved 2026-09-21 under Joshua's order:
+   `system-one-adapter-python 0bb819b -> adffc2e` (v0.1.5, v0.2.0),
+   `typesafe-sdk-python 420ef4f -> 0ffd094` (v0.7.0, v0.7.1); `typesafe-sdk-js 66880cc` and
+   `skills 65a39f3` were already current.
+
+**Retirement condition: none.** This is a standing obligation. It retires only if the vendor stops
+publishing first-party code, which would be a different problem.
 
 ## RULE 12 - ADOPT FROM THE MENTOR BY DEFAULT
 
