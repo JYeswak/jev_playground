@@ -3222,3 +3222,33 @@ seed are recorded in-file, per R70. The original 4/20 may never be cited again f
 
 **NO-CLAIM.** This does not establish which of the three causes holds, and no claim here should
 be read as one. `absence`'s consistency is evidence about `absence` only.
+
+---
+
+## R72 — REFUTED: profile extension config explains why Codex drops the project tool
+
+**Recorded:** 2026-09-21 · **Level:** `[test]` · Two hypotheses, both killed by construction.
+
+**Coarse claim:** a profile that has its own `extensions:` array drops the project `.omp/config.yml` registration. Refuted: muse has that array and `xd://jev_rerank_ext_probe` is present.
+
+**Narrow claim, pane 1's:** a profile-local path under `~/.omp/profiles/<name>/agent/extensions/` drops the project registration. Refuted on scratch profile `jev-scratch-p4`, which nobody should delete until Joshua says so. Phase 1, no local path: project probes present. Phase 2, local path added and placed first: project probes still present, and the local probe loaded too.
+
+Codex and jev-lab remain unexplained. The installer wording "measured ABSENT, mechanism unexplained" stays.
+
+**Retry condition.** Reopen only if a seventh profile fails the same way and gives a second positive, or if `omp://extension-loading.md` gains a sentence that names a replace-not-merge rule this construction did not hit. Do not rebuild the scratch profile to re-fit the dead story.
+
+**NO-CLAIM.** Six fleet profiles plus one scratch construction. This rules two stories out. It is not a statement about omp in general.
+
+---
+
+## R73 — RETRACTED: name-match recall 0.0148 meant the tool-selection seat was live
+
+**Recorded:** 2026-09-21 · **Level:** `[test]` · Reported, then withdrawn the same day. Superseded receipt: `work/nev-routing/tool-select-score-correction.json` (`da25ad3`).
+
+**What was reported:** `SEAT_LIVE`, because a name-match router scored 666/44963 = 0.0148 on rows where `label != prev_tool`, below the preregistered 0.10 live line.
+
+**What was wrong:** that router is below uniform random over 34 labels (0.0294). A broken instrument is not a failing baseline. On the same 44963 rows, always predicting `bash` scores 13353/44963 = 0.297, which clears the preregistered 0.25 kill line. Bit 2 is YES. No seat. The comparison to always-repeating the previous tool was empty by construction on switch rows and is withdrawn.
+
+**Retry condition.** Before claiming a seat from a router that "fails," compute the trivial baselines on the same rows: uniform random, frequency-weighted random, and always-predict-most-common. A router below uniform random is a defective instrument and is unused for the verdict. Do not reopen this seat by building a better router unless that constant no longer clears 0.25.
+
+**NO-CLAIM.** A constant clears the line. This does not say a learned router would also clear it. Not a Jev score.
