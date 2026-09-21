@@ -310,6 +310,22 @@ request body in this repo was wrong at least once (`{questions: […], context}`
 [`.env.example`](.env.example) for the exact command, because "the key is missing" was reported
 three times and was wrong three times.
 
+### `work/nev-injection/` — one paired live win since the above, plus the kill beside it
+
+Since the sections above were written: on 2026-09-21 a prompt-injection flag
+beat a keyword baseline 58/60 to 37/60 on held-out rows neither pane authored
+(exact McNemar p=0.0000057, bar predating the spend, framing delta 0.00) —
+[full writeup](docs/demos/INJECTION-FLAG-RESULT.md). Install with
+[work/nev-injection/install-jev-flag.sh](work/nev-injection/install-jev-flag.sh)
+(`--check` first; muse/grok measured, codex refused). Zero certified seats
+still: a paired win on 60 rows, single run, one model version, not validated
+on real traffic (L4 unmeasured).
+
+Killed the same day on 44,963 real rows: skill/tool selection as a Jev seat —
+a constant always-bash policy (0.2970) cleared the preregistered 0.25 kill
+line. If you are deciding whether to spend on this, the kill is the more
+useful of the two results.
+
 ### `work/omp-harm-rule/` — the model lost, so we shipped the regexes
 
 ```bash
