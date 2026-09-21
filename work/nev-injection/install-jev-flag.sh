@@ -18,6 +18,7 @@
 # WHAT IT VERIFIES  files present, entry present exactly once, probe
 #   xd://jev_flag_ext_probe in get_state.systemPrompt under the profile,
 #   absent under --no-extensions, nonce absent.
+# LIMIT  counts EXACT-line matches: a duplicate differing by whitespace or quoting is invisible.
 # WHAT IT NEVER CLAIMS  that it fired usefully. L4 organic precision is
 #   unmeasured; only decision rows in real sessions prove anything.
 #
@@ -56,8 +57,13 @@ case "$profile" in
   *) fail "profile '$profile' never measured — supported: muse grok" ;;
 esac
 
-entry_present=0
-if grep -qFx -- "$entry" "$cfg"; then entry_present=1; fi
+# Count, never test existence: grep -qFx is blind to duplicates and once
+# printed "exactly once" over two lines. A count the message did not measure
+# is the false-claim shape this lane refuses.
+entry_count=$(grep -cFx -- "$entry" "$cfg" 2>/dev/null || true)
+case "$entry_count" in
+  ''|*[!0-9]*) fail "cannot count entries in $cfg" ;;
+esac
 
 # Probe listing via a throwaway rpc session. Output to a file first so the
 # exit code below belongs to grep alone, never to a pipeline.
@@ -73,25 +79,35 @@ if grep -qF -- "$nonce" "$tmp_full"; then nonce_absent=0; fi
 
 if [ "$mode" = "check" ]; then
   say "PLAN for profile '$profile' (nothing written):"
-  if [ "$entry_present" = "1" ]; then say "  entry: present exactly once (no change)"; else say "  entry: MISSING — install would append one line to .omp/config.yml"; fi
+  if [ "$entry_count" -eq 0 ]; then say "  entry: MISSING (count 0) — install would append one line to .omp/config.yml";
+  elif [ "$entry_count" -eq 1 ]; then say "  entry: present exactly once (count 1, no change)";
+  else say "  entry: present $entry_count times — this installer never creates that state; refusing to bless it"; fi
   if [ "$probe_present" = "1" ]; then say "  probe: $probe PRESENT"; else say "  probe: $probe ABSENT"; fi
   if [ "$noext_absent" = "1" ]; then say "  negative arm (--no-extensions): absent, discriminates"; else say "  negative arm: PRESENT — oracle suspect, stop"; fi
   if [ "$nonce_absent" = "1" ]; then say "  nonce control: absent, matcher honest"; else say "  nonce control: PRESENT — matcher broken, stop"; fi
   say "  key: keyless returns NOT_RUN, never silently passes"
-  if [ "$entry_present" = "1" ] && [ "$probe_present" = "1" ] && [ "$noext_absent" = "1" ] && [ "$nonce_absent" = "1" ]; then
-    say "GREEN: installed and listed"; exit 0
+  # >1 exits non-zero by decision: --check certifies only states this installer
+  # understands. An exit-0-with-report would ask strangers to interpret a state
+  # we cannot explain; fail-closed puts human eyes on it instead.
+  if [ "$entry_count" -eq 1 ] && [ "$probe_present" = "1" ] && [ "$noext_absent" = "1" ] && [ "$nonce_absent" = "1" ]; then
+    say "GREEN: installed and listed (entry count 1)"; exit 0
+  elif [ "$entry_count" -gt 1 ]; then
+    say "RED: entry count $entry_count, installer creates at most one"; exit 1
   else
     say "YELLOW: not fully installed (see plan above)"; exit 1
   fi
 fi
 
-# Install mode. Entry guard is exact-line match: a second run changes nothing.
-if [ "$entry_present" = "0" ]; then
+# Install mode. Append only when count is 0; never duplicate, never repair a
+# hand-made duplicate (a checker that edits config is a different tool).
+if [ "$entry_count" -eq 0 ]; then
   if [ ! -f "$cfg.bak" ]; then cp "$cfg" "$cfg.bak" || fail "cannot back up $cfg"; fi
   printf '%s\n' "$entry" >> "$cfg" || fail "cannot append entry"
   say "appended registration to .omp/config.yml (backup at .omp/config.yml.bak)"
-else
+elif [ "$entry_count" -eq 1 ]; then
   say "entry already present exactly once — no duplicate written"
+else
+  say "entry present $entry_count times (not created here) — leaving config untouched"
 fi
 
 sha=$(git -C "$repo" rev-parse --short HEAD 2>/dev/null || echo unknown)
