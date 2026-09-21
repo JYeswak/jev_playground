@@ -299,7 +299,7 @@ removes the contradiction.
 
 ```
 T1 → T2      T1 → T5      T2 → T3      T2 → T4      T2 → T6a
-T5 → T2*     T3 → T7      T4 → T6b     T6a → T6b    T6b → T7    T7 → T8
+T5 → T2*     T3 → T7      T6a → T6b    T6b → T7     T7 → T8
 ```
 
 `T5 → T2*` is a **runtime** dependency, not a build order: T2's checks read `authority.toml`, so
@@ -313,6 +313,26 @@ Parallelizable after T1: **{T2, T5}**, then **{T3, T4, T6a}**.
 *Blocks:* everything. *Acceptance:* a fresh agent writes a valid boundary from the doc alone.
 *Rationale:* his matrix header carries its own rules; ours must too, or the first contributor
 invents a second dialect.
+
+**T1 also carries two shapes that were dropped by accident.** Pane 3's round-3 completeness
+audit found that their own Axis A recommended **three** portable shapes and the plan adopted
+only the third. The other two were lost between artifact and plan — not refused, not scoped
+out, simply missing, which is the silent-debt failure Rule 12 exists to prevent. Restored here
+because they cost almost nothing and both are conventions the schema doc is the right place to
+state:
+
+- **P1 — required-behavior header + numbered scenarios.** Every test file opens with its
+  boundary id and the behaviors under proof; multi-case tests number their scenarios
+  (`// 1. … // 2. …`), as `context_contract.rs:163,243,286,330,454,485` does. Cost ~30 lines of
+  convention plus minutes per new file. Deficit: it organizes, it does not verify. Lose by
+  refusing: spec drift — tests that no longer prove anything stated.
+- **P2 — contract-phrased assertions.** `.expect("absent first file must succeed as
+  prompt_only")` rather than a bare comparison; `panic!("expected IneligibleAlternative, got
+  {other:?}")`. Cost: a reviewer checklist line and one pass over existing suites (~2h).
+  Deficit: wrong-but-well-described behavior. Lose by refusing: unactionable failures.
+
+Both are conventions rather than checks, so neither gets a validator code — and saying that
+explicitly is what stops them being dropped a second time.
 
 **T2 — Validator core.** `scripts/validate-evidence-matrix.py`, stdlib only. **Interpreter:
 `python3.12`** — verified present at `/opt/homebrew/bin/python3.12` (3.12.13); system `python3`
