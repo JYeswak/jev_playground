@@ -106,11 +106,13 @@ label_rows = "work/skills-vein/glob-labels-20260921.json"          # REQUIRED fo
 # Method name carries its assumption, per his eval policy (:247-249):
 #   two_sided_95_wilson_with_one_primary_case_per_independent_family
 # The two bars MUST differ — see §4.1. A point bar equal to the interval bar is vacuous.
+# NEITHER bar is set here. Both live in authority.toml, set by the key-holder BEFORE data.
 rate = { kind = "fp", k = 4, n = 77,
-         method = "two_sided_95_wilson_independent_rows",
-         bar_point = 0.20,          # p̂ must clear this — the STRICTER leg
-         bar_interval = 0.30 }      # upper bound must clear this — the LOOSER leg
-label_rows_sha256 = "e3b0c442…"     # BOUND. k is derived from these rows, never declared free
+         method = "two_sided_95_wilson_independent_rows" }
+#        bar_point    <- authority.toml, NOT author-chosen  (see §4.1)
+#        bar_interval <- authority.toml, NOT author-chosen
+label_rows_sha256 = "9f2c…"          # BOUND, real digest of the rows file. k is RECOMPUTED
+                                     # from those rows, never declared free. Scope: §4.1(6).
 negative_control = { name = "always_quiet", loss_evidence = "work/…/control-20260921.json" }
 non_claims = ["not a live measurement",
               "single labeller",
@@ -193,18 +195,29 @@ never fire — pane 4's review: *"Dual 0.30/0.30 is NEED 6 renamed… POINT refu
 and the error is instructive: I adopted the *shape* of his mechanism without the property that
 made it work, which is exactly the failure mode Rule 12 invites if adoption is uncritical.
 
-**The corrected bars for an FP rate: `bar_point = 0.20`, `bar_interval = 0.30`.** Both must
-clear. The point leg now refuses a rule whose *central estimate* is mediocre even when its
-sample is large enough to bound it; the interval leg refuses a rule whose estimate looks fine
-but whose sample cannot support it. On 2026-09-20 the three ships fail the interval leg at
-4/20 (upper 0.416); under the corrected point bar `absence` at n=77 (p̂ 0.273) **also** fails the
-point leg, which single-bar scoring would have let through. The two legs catch different rules.
+**The corrected bars are NOT stated in this plan, and that is the point.** v4.1 proposed
+`bar_point = 0.20, bar_interval = 0.30` and justified 0.20 as *"two-thirds of the interval bar
+by the same reasoning he uses (0.80 is ~89% of 0.90)"*. Pane 4's round 2 demolished that in one
+line: **`2/3 ≠ 8/9`**, so the analogy is false; and **0.20 is exactly 4/20**, the observed rate
+the bar was meant to judge.
 
-**How the thresholds themselves are justified, since a bar is also a claim.** `bar_interval`
-= 0.30 is the pre-existing preregistered FP bar for TTSR rules. `bar_point` = 0.20 is set at
-two-thirds of it by the same reasoning he uses (0.80 is ~89% of 0.90): the point bar is the
-operating target, the interval bar is the refutation threshold. **Both live in
-`authority.toml`** — neither may be tuned by the party being measured.
+**I picked a threshold equal to my own data and then justified it by a ratio that does not
+match.** That is the named failure this whole document exists to prevent, committed by its
+author, in the section describing the prevention. It is left in the record rather than quietly
+corrected.
+
+**The rule that follows, and it is stronger than any number I could have chosen:** *the party
+being measured does not set the bar, and a bar derived from the measurement is not a bar.*
+Both `bar_point` and `bar_interval` are **authority-only fields with no default**, set by the
+key-holder before data exists. The validator emits `bar-unset` if a boundary carries a `rate`
+whose bars are absent from `authority.toml`, and `bar-equals-observed` if a bar exactly equals
+the `k/n` it scores — a cheap, mechanical check for the exact thing I just did.
+
+`bar_interval = 0.30` has standing as the pre-existing preregistered TTSR FP bar and carries in
+unchanged. `bar_point` has **no justified value yet** and is therefore **unset**: the program
+can be built, and boundaries registered, with the point leg disabled and every such row marked
+`point-leg-unset` in its non-claims. A disabled leg that is visible beats an invented threshold
+that is not.
 
 **2. The method name carries its assumption.**
 `two_sided_95_wilson_with_one_primary_case_per_independent_family` (`:247-249`) — the
@@ -239,7 +252,11 @@ of stdlib Python with 43 mutation tests. That gap is the honest measure of the d
 ### 4.2 The replay — computed, not asserted
 
 Every rate-bearing decision of 2026-09-20, scored by the dual bar (FP must satisfy
-`p̂ ≤ 0.30` **and** `upper ≤ 0.30`; bind must satisfy `p̂ ≥ 0.20` **and** `lower ≥ 0.20`).
+`p̂ ≤ bar_point` **and** `upper ≤ 0.30`; bind must satisfy `p̂ ≥ bar_point` **and** `lower ≥ 0.20`).
+Rows below are scored with the **illustrative** `bar_point = 0.20` that §4.1 now refuses to
+adopt — they show what a point leg *would* do, and are not a certification. Pane 4 caught this
+header still carrying the vacuous `p̂ ≤ 0.30` after the bars were corrected: **the copy site
+outlived the fix**, which is why §4.1's rule is that bars live in exactly one file.
 Wilson two-sided 95%, computed by pane 1.
 
 | boundary | p̂ | 95% CI | point | interval | verdict | what we did |
@@ -263,8 +280,13 @@ For the `bind` rows, REFUSE is the desired verdict: the validator agrees with ev
 Across eight rate-bearing decisions the matrix reproduces our five correct outcomes and reverses
 our three wrong ones, **a day earlier and without a relabel.**
 
-Method note: §6 previously cited upper 0.137 for 0/25 from Clopper-Pearson; Wilson gives 0.133.
-Both clear the 0.20 bar. `rate.method` exists precisely so this distinction is never silent.
+Method note, and it is the best illustration of why `rate.method` exists. Pane 3 flagged that
+0.137 for 0/25 *"matches neither Wilson nor CP"*. It matches CP exactly — as the **two-sided**
+95% Clopper-Pearson upper, which for k=0 has the closed form `1 − α^(1/n)`:
+`1 − 0.025^(1/25) = 0.1372`. Wilson two-sided gives **0.1332**; CP **one-sided** gives
+**0.1129**. Three genuinely different numbers for one sample. The flag was right to fire and
+the number was not wrong — it was **underspecified**, which is precisely the defect
+`unstated-assumption` exists to catch.
 
 ---
 
@@ -360,8 +382,10 @@ means something. **The measurement above is why the plan is worth writing:** the
 free and is four hours.
 
 **T6b — Enforce registration.** Every enumerated case must appear in some boundary.
-*Depends:* T6a, T4 (needs ≥1 populated row to be meaningful — pane 3 established that a *full*
-backfill is not required, so only this half is gated).
+*Depends:* **T6a only.** v4.1 kept `T4` on this task; pane 4's round 2 caught that it is still
+false — the acceptance runs against a `mktemp -d` fixture matrix, so it needs **no real
+backfill at all**. The edge survived a round of being questioned because I weakened it instead
+of removing it, which is its own lesson about fix rounds.
 *Acceptance:* against a **temporary fixture matrix in `mktemp -d`**, removing a row whose case
 still exists exits `orphan-case`. Pane 3 flagged v2's acceptance as destructive — it directed a
 fresh agent to delete a live boundary row with no restore instruction. No test in this program
@@ -381,10 +405,15 @@ guard fails when a figure and the matrix disagree.
 
 ## 6. Acceptance for the whole program
 
-- `python3.12 scripts/validate-evidence-matrix.py` exits 0, and exits nonzero with the right code
-  for each of the nine planted violations.
-- Replaying 2026-09-20 through it **refuses all three uncertified ships** and **accepts the
-  0/25 kills** (CI upper 0.137 < 0.20 bar).
+- `python3.12 scripts/validate-evidence-matrix.py` exits 0 on a clean tree, and exits nonzero
+  with the correct code for each of the **fifteen** planted violations in §4 (thirteen codes
+  plus `bar-unset` and `bar-equals-observed`).
+- Replaying 2026-09-20 through it **refuses all three ships**, and **refuses the three
+  `ft-*` bind rows too — which is the correct outcome, because for a bind rate REFUSE *is* the
+  kill.** v4.1's wording said the program "accepts the 0/25 kills", which reads as PASS and
+  contradicts the §4.2 table; pane 4 caught the contradiction. The single consistent statement:
+  **the validator reproduces all five decisions we got right and reverses the three we got
+  wrong.**
 - Every rate in the tree either points at persisted rows or is explicitly `unpersisted` and
   cannot be `passed`.
 - `evidence/authority.toml` differs from `matrix.toml` only in ways the validator permits.
