@@ -443,6 +443,25 @@ guard fails when a figure and the matrix disagree.
 
 ## 7. What we refuse, with the Rule 12 cost/defect/loss stated
 
+*Round-3 completeness audit (pane 3, `0b0e225`) surfaced four unpaid debts — items the axis
+evidence documented that this plan neither adopted nor refused. Drafts at
+`docs/PLAN-DEBTS-DRAFT-20260921.md`, all four ruled ADOPT-as-drafted by pane 1. Three are
+adoptions (§2/T6a); the refusal below is the fourth.*
+
+**Full platform-boundary matrix** (real Darwin + Linux build matrix with probe crates per
+target). *Cost:* days, plus build hosts we do not have — local builds are denied here and the
+workers are Linux-only. *Defect class it would not catch:* **none of F1–F6** — every one is a
+declaration or provenance failure, not a platform failure. *What we lose:* nothing today.
+**Retry when a boundary needs a platform to prove.** This is scope creep, not rigor.
+
+*But the cheap half is adopted, not refused.* **Refusal-of-simulation** (§2): a check that
+refuses to *certify* platform-dependent behavior from simulated evidence — ambient
+`RUSTFLAGS`/cross flags present, or the running host mismatching the claimed target, fails
+loudly rather than passing quietly. ~1h, deterministic, no builds. It cannot catch broken
+platform behavior; **it refuses to judge, which is the point.** Directly relevant: today's `sr`
+repro was cross-built on Linux and executed on macOS, and the comment that went public did not
+say where it ran until I asked. This check is that omission made mechanical.
+
 **Real-process e2e harness** (his `scripts/e2e`, SQLite + spawned processes). *Cost:* a
 spawn-and-reap harness we do not have; `hub` processes are the analogue and are unproven for it —
 est. 2–3 days. *Defect class it would not catch:* none of F1–F6; all six are declaration and
@@ -462,8 +481,27 @@ portable form.
 
 ## 8. Boundary — what this plan does not claim
 
-Axis B (the other ten validators, `validate_eval_policy.py`, the p3/p4 gate internals, the no-CI
-run order) is **in flight**; §4's check list may grow when it lands. `cargo test` was never run
+**Scope, stated once so it is not re-raised as debt.** The matrix program covers evidence
+*about* rules, instruments, refutations, and seams. It does **not** cover Jev-client plumbing —
+consent-before-key, live-ignore discipline, retry classification, injected transport, named
+negative controls — which Axis C found upstream carries in 2,529 lines. That track ships its
+own gates, measured separately. **Silence here is scope, stated once, not debt.** (Pane 3's D4:
+leaving it silent costs a re-raise at the next completeness audit, which is churn with no
+information.)
+
+**Two further adoptions from the round-3 audit, recorded here because they change §2 and T6a
+rather than this section.** *Docs-consistency validator* — port his `validate_public_contracts.py`
+shape (heading anchors, link resolution, embedded JSON/TOML re-parsed strictly: duplicate keys
+rejected, non-finite floats rejected) **with the adversarial test file his tree lacks**; ~5h,
+1 script + 1 test. Axis B found docs-consistency is one of two things in *his* tree with no
+adversarial test, so this is the second place we exceed upstream. *Trusted evidence
+entrypoints* — his `TRUSTED_CHECK_ENTRYPOINTS` frozenset, with the reason *"any other plain
+function is a helper, not test evidence"*; folded into T6a as one predicate on the walker
+output, ~1h. Without it a passing suite can be composed of helpers that assert nothing.
+
+Axis B **landed** (`f6c5a0a`) and its eval-policy findings are folded into §4.1; the v1 text
+here said it was "in flight" and survived four revisions — **a fourth instance of the copy site
+outliving the fix**, found by re-reading rather than by a reviewer. `cargo test` was never run
 against skillranker, so nothing here claims his suite passes. The 2026-09-20 replay in §6 is
 computed from recorded intervals, not re-measured. No claim is made that a matrix improves rule
 quality — it constrains what may be *claimed* about a rule, which is a different and smaller
