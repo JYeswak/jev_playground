@@ -1,0 +1,4 @@
+CALLBACK P4 DONE [op-id=p4-axis-c-skillranker-jev-harness-20260920]
+Artifact: docs/demos/upstream-repro/axis-c-skillranker-jev-harness-20260920.md
+Pin skillranker@abf909d. His 2500 lines certify the wire, not the judge.
+Q1 schema/numeric only, no accuracy. Q2 ignore+fail-closed, not skip-as-pass; live smoke accepts apple|carrot|__none__. Q3 retry 429/500/502/503/504/529 cap 4 loopback TLS. Q4 P1 codec P2 roster P3 context P4 mocked Jev; no p5-p9 gates. Q5 no Jev-vs-baseline executed; his eval README says not benchmark results; reality-check row 20 UNPROVEN. R69 stands. Adopt plumbing, not the seat.

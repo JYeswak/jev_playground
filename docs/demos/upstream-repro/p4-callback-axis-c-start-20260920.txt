@@ -1,0 +1,2 @@
+CALLBACK P4 START [op-id=p4-axis-c-skillranker-jev-harness-20260920]
+AXIS C deep-dig: skillranker's Jev harness vs our R69 retirement. Evidence only, file:line. Will not re-open R69 on taste. Artifact will land under docs/demos/upstream-repro/.

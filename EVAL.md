@@ -1113,3 +1113,22 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   Replacement sample, not stacked on the unpersisted original 20.
 - **Boundary:** full 80-lane suite not re-run this unit (glob wire
   only); no live Jev call; files of the retired rule not deleted.
+
+## P4 AXIS C — skillranker Jev harness is plumbing, not accuracy (2026-09-20)
+
+- **Pin:** `skillranker@abf909d`. Offline read. His suite not executed.
+  Artifact: `docs/demos/upstream-repro/axis-c-skillranker-jev-harness-20260920.md`.
+- **Q1:** `tests/jev_contract.rs` (718) decodes hand-built JSON. Sum/argmax/
+  nonfinite/duplicate-key. No gold labels. No accuracy.
+- **Q2:** `jev_smoke.rs` live arms are `#[ignore]`. Forced live without
+  consent/key **fails** (`explicitly_selected_live_test_cannot_pass_without_consent_or_key`).
+  Not skip-as-pass. Live smoke accepts `food_class ∈ {apple,carrot,__none__}`.
+- **Q3:** `jev_retry.rs` (864) loopback TLS. Retry `{429,500,502,503,504,529}`,
+  cap 4, delay 100..=850ms, deterministic `Retry-After`. Not hammering.
+- **Q4:** P1 transport/codec, P2 roster, P3 context/privacy, P4 ranking on
+  `GateMockTransport`. P5–P9 have no `p*_gate.rs`. `adapter_contract.rs` is
+  Claude/cass, not Jev.
+- **Q5:** Named baselines in `tests/eval/` are frozen policy, *"not benchmark
+  results"* and contain no live Jev. His reality-check row 20: usefulness
+  UNPROVEN. **R69 stands.** Adopt client discipline, not the seat.
+- **Boundary:** no live Jev; clone read-only; R69 not reopened.
