@@ -325,17 +325,39 @@ AGENTS.md that bars, n, scopes, and rungs move only by Joshua's edit.
 `selftest-*.sh` case — what is a case?"* Our selftests emit `ok <label>` / `FAIL <label>` to
 stdout and **no case IDs exist anywhere**, so the task as written in v2 was unimplementable.
 
-**Define it first, then walk it.** A *case* is a labelled assertion a selftest can be asked to
-enumerate without executing: each `selftest-*.sh` gains a `--list-cases` mode printing one
-stable `<script-basename>::<label>` per line, where `<label>` is the existing `ok <label>`
-string. Identity is the label, so no renaming is required and existing output is unchanged.
+**Define it first, then walk it.** A *case* is a labelled assertion a selftest can enumerate
+without executing: each in-scope file gains a `--list-cases` mode printing one stable
+`<script-basename>::<case-id>` per line.
+
+**v4.1 claimed "identity is the label, so no renaming is required." That was an unverified
+assertion about our own codebase, and measurement refutes it on three counts** (pane 1,
+2026-09-21, across all 14 `scripts/selftest-*.sh`):
+
+| assumed | measured |
+|---|---|
+| every selftest shares one idiom | **9 of 14** use `note ok "…"`; **5 have no idiom at all** — `selftest-{lane-status-integrity,lane-status-pipe,other-reasons,reason-numerals,score-lineage}.sh` |
+| labels are static strings | **16 of 46** ok-labels contain `$interpolation` — not stable identities |
+| labels are unique per file | `selftest-ttsr-rules.sh` has **5 duplicate labels** — identity collisions |
+
+Worse, pass and fail branches carry *different* strings and the FAIL one interpolates
+(`note ok "ee-preflight exits 1 (refusal)"` vs `note FAIL "ee-preflight exit=$rc1, want 1"`),
+so "the label" was never a single thing.
+
+**Corrected design and corrected cost.** Case identity is an **explicit static id**, not a
+scraped label: `note ok` gains a leading id argument, and `--list-cases` prints the ids. Work
+the plan previously assumed away: normalize **5** files to the idiom, assign explicit ids to
+**46** cases of which **16** currently interpolate, and disambiguate **5** collisions. Estimate
+revised from "walk the labels" to **~4h**, and it is now the largest single task in the program.
+
 **Scope, named explicitly:** `scripts/selftest-*.sh` plus `*.test.mjs` under `work/*/test/` —
 and *only* those two; other trees are out of scope until a boundary claims them.
 *Depends:* T1, T2 — **not** T4. Runs parallel with backfill.
-*Acceptance:* `--list-cases` on every in-scope file yields a unique, stable id set.
+*Acceptance:* `--list-cases` on every in-scope file yields a **unique** id set, and the union
+contains no `$`.
 *Rationale:* Axis A `:143-144` — his validator resolves matrix→source but nothing checks the
 reverse. This is the cheapest place we exceed upstream, and it cannot be built until "case"
-means something.
+means something. **The measurement above is why the plan is worth writing:** the task looked
+free and is four hours.
 
 **T6b — Enforce registration.** Every enumerated case must appear in some boundary.
 *Depends:* T6a, T4 (needs ≥1 populated row to be meaningful — pane 3 established that a *full*
