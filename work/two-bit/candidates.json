@@ -1,0 +1,23 @@
+[
+  {
+    "name": "tool-call-harm",
+    "bit1": "YES",
+    "bit2": "NO",
+    "evidence": "docs/demos/upstream-repro/toolcall-headtohead-20260919.md",
+    "note": "RED arm: label is in the tokens. Jev 11/12 vs shipped regex 12/12. Bit1=YES refuses the seat."
+  },
+  {
+    "name": "compaction-keep",
+    "bit1": "NO",
+    "bit2": "YES",
+    "evidence": "docs/demos/upstream-repro/RULING-authored-vs-real-20260919.md",
+    "note": "RED arm: keep-everything beats every pruner 12/4/13 vs 82/91/81. Bit2=YES refuses the seat."
+  },
+  {
+    "name": "nevir-rerank",
+    "bit1": "NO",
+    "bit2": "NO",
+    "evidence": "work/nev-rerank/live-receipt.json",
+    "note": "GREEN arm: BM25 scores 0.0224 on NevIR negation, no constant policy answers which-passage. Admitted to measurement, not certified."
+  }
+]
