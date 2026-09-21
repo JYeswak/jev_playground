@@ -231,3 +231,71 @@ promoted, not a candidate being promoted, and conflating them would inflate the 
 
 The next real gain is not a tenth extension. It is **ground truth that survives contact with
 real data** — the `review` run showed our labels are now the bottleneck, not the scores.
+
+---
+
+## 9. The execution loop — the one that was switched off for a day
+
+Written 2026-09-21 after Joshua asked why all four panes were idle. §1–8 describe how the lane
+*learns*. This section describes what makes it *run*, and it was missing — which is exactly why
+it could be disabled and forgotten.
+
+### What actually happened
+
+Nothing was wrong with the protocol. **The tick source was commented out.**
+
+```
+# DISABLED 2026-09-20 (Joshua, to run the TTSR proof uninterrupted):
+#   */20 * * * *  ntm --robot-send=jev --panes=1 --msg-file=docs/demos/tick.md
+# DISABLED 2026-09-20 (Joshua, TTSR proof):
+#   8,18,28,... *  fleet-idle-monitor --report-only
+```
+
+Disabled for a good reason, never restored. For the following day every pane ran as a
+request/response handoff: finish a slice, send a callback, block. Roughly fifteen such handoffs
+occurred in one session with **10–11 beads sitting `br ready`** the whole time. `AGENTS.md`
+already forbids this — *"a tick that ends with a question to Joshua and no dispatch is a wasted
+tick"* — and the rule held in prose while the mechanism was off.
+
+**A protocol with no tick source is a suggestion.** That is the same Meadows shape as
+`skill://loop-enforcement`: a rule nothing enforces is ignored.
+
+### The three legs
+
+One leg was never enough, and two still are not. `fleet-idle-monitor` runs `--report-only`: it
+*detects* an idle worker and does nothing about it.
+
+| leg | schedule | what it does | failure it closes |
+|---|---|---|---|
+| conductor tick | `*/20` | wakes **pane 1 only** with `docs/demos/tick.md` | conductor never wakes |
+| idle monitor | `8,18,28,38,48,58` | reports idle panes to a log | no visibility |
+| **idle feeder** | `5,15,25,35,45,55` | **wakes ONE idle worker** when `br ready` is non-empty | **workers 2–4 starve between conductor dispatches** |
+
+The third leg is `scripts/feed-idle-panes.sh`. It was written 2026-09-19 *for this exact
+failure* — its header cites `br ready` hitting empty twice in ninety minutes while panes sat
+idle — and it was **never scheduled**. Wired 2026-09-21.
+
+It is safe by construction, and the refusals are the design: it never pushes into a working
+pane, never claims or closes a bead, sends nothing when the frontier is empty, and sends to at
+most one pane per run.
+
+### The standing clauses
+
+1. **A CLOSE is not permission to idle.** When your queue drains, run `br ready`, claim the
+   highest bead **you did not author** that passes the regime test, start it, call back pane 1.
+2. **`QUEUE DRY` while `br ready` is non-empty is wrong** and is a reportable defect.
+3. **Claim beads you did not author.** Self-authored work is how a lane grades its own homework.
+4. **Regime test before any new Jev seat** (§12 of `notes/rc-pane1-phase1.md`): a seat exists
+   only under distribution shift or cold start, where a baseline trained on *this* distribution
+   collapses. In-distribution lexical wins are not seats.
+5. **Callback pane 1 either way** — claim or challenge. Silence is indistinguishable from wedged.
+
+### Honest limits
+
+- **Working-vs-idle is a heuristic** on the rendered footer, and `fleet-tick.sh` says so in its
+  own header. Measured today: a pane showing a bare `╰─` prompt was genuinely mid-`Write`, so the
+  heuristic was *right* and a suspected defect was withdrawn. It can still be wrong the other way.
+- **Cron wakes a pane; it cannot make it think.** The feeder points at `br ready`; the pane
+  self-claims. Nothing here prevents a woken pane from idling again.
+- **`fleet-idle-monitor` has four recorded defects** (`PLAN.md` §6) and stays `--report-only`
+  for that reason. The feeder, not the monitor, is what actually moves a worker.
