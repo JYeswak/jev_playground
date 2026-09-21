@@ -1132,3 +1132,21 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   results"* and contain no live Jev. His reality-check row 20: usefulness
   UNPROVEN. **R69 stands.** Adopt client discipline, not the seat.
 - **Boundary:** no live Jev; clone read-only; R69 not reopened.
+
+## P4 PLAN REVIEW R1 of v2 @680d11e (2026-09-20)
+
+- **Artifact:** `docs/demos/upstream-repro/plan-review-r1-v2-680d11e.md`.
+  Grok vs Opus. Round 1 of ≥4. No beads.
+- **Dual bar:** `bar_point=bar_interval=0.30` is NEED #6 renamed, not his
+  0.90/0.80 split. Ship-time CP (`NEEDS.md:35-38`): 4/20 upper 0.437,
+  6/20 upper 0.543. INTERVAL refuses all three ships; POINT refuses none.
+  Plan's 0.381/0.605 are n=77 relabels, wrong event. 0/25 kill still
+  accepted (CP upper 0.137 < 0.20).
+- **k unbound** remains the hole that eats `uncertified-pass`.
+- **scope-disagreement** fatal as a commit check; live doctor already
+  exists (`ttsr-assert-disabled.sh`).
+- **T6 depending on T4** is a false edge. T4 must wait on T5.
+- **4.1:** adopt mutation twins. Refuse phrase `non_claims` and
+  `always_quiet` without a loss table. Dual story inverted.
+- **Boundary:** pane-1 start-callback rejected (`tmux not in a mode`).
+  Did not edit the plan. Did not run his eval-policy script.

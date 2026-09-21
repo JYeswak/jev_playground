@@ -1,0 +1,2 @@
+CALLBACK P4 START [op-id=p4-plan-review-r1-evidence-matrix-20260920]
+Adversarial review round 1 of PLAN-EVIDENCE-MATRIX.md @662154d. Cross-model arbiter (Grok vs Opus). Will verify uncertified-pass arithmetic against recorded intervals. Artifact under docs/demos/upstream-repro/.

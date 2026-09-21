@@ -1,0 +1,2 @@
+CALLBACK P4 START [op-id=p4-plan-review-r1-v2-680d11e]
+Review target moved: PLAN-EVIDENCE-MATRIX.md @680d11e (v2, Axis B landed), not 662154d. Six attacks stand; seventh added (wholesale 4.1 adopt). Dual-bar arithmetic on the three ships. Artifact under docs/demos/upstream-repro/.
