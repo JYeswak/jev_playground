@@ -3139,3 +3139,42 @@ author — arrival rate > 0/week — **and** a preregistered pilot shows p̂ ≥
 **NO-CLAIM.** This says nothing about Jev in general, and nothing about Jev on corpora unlike
 ours. It says: **at this fleet's exposure profile and labelling rate, no Jev seat we tested can
 be certified here.** Zero certified seats out of the candidates evaluated.
+
+## R70 — our kills are auditable, our ships are not: the FP samples were never persisted
+
+**Refuted:** that today's shipped-rule decisions rest on reproducible evidence.
+
+**How it surfaced.** Pane 4, starting the n=77 relabel of `absence-from-one-probe`, reported that
+the additional 57 rows **cannot stack on the original 20 — those row identities were not
+persisted.** Pane 1 checked whether that was universal.
+
+**It is not universal, and the asymmetry is the finding.**
+
+- **Kills are auditable.** `work/skills-vein/proxy-bind-labels-20260920.json` keys every judgement
+  as `pane||session-file||line-offset → label`. A third party can re-open the exact rows behind
+  R67's 0/20s. Same for the other `skills-vein` label files.
+- **Ships are not.** No artifact anywhere carries the FP labels for `absence-from-one-probe`
+  (4/20), `bash-structural-def-search` (4/20), or `bash-callsite-grep-exclusion` (6/20). The rows
+  called false-positive cannot be re-examined by anyone, including us.
+
+**What this costs.** Three rules went **live system-wide** on numbers nobody can audit, and a
+fourth was **DISABLED** on one. The disable is in the fail-safe direction so the action stands,
+but the evidence behind it is now unrecoverable — we cannot show a reviewer which six calls we
+judged wrong, and we cannot re-label them under a corrected rubric.
+
+**The second instance of one pattern, on an independent dimension.** NEEDS #6 found we *refused
+with adequate power and shipped with inadequate power*. R70 finds we *killed with persisted
+evidence and shipped with none*. Two different axes, same direction: **rigor was applied where it
+blocked action and relaxed where it permitted action.** That is the bias worth naming, because it
+is invisible from inside a single decision — every individual call looked reasonable.
+
+**Standing requirement.** Any labelled sample that supports a ship, a disable, or a bar-decision
+MUST persist row identities in the `skills-vein` key form before the verdict is written. A rate
+without recoverable rows is a claim, not a receipt.
+
+**Consequence accepted.** The n=77 for `absence-from-one-probe` is a **replacement sample**, not
+an extension. The original 20 are not lost evidence — they were never evidence in the auditable
+sense.
+
+**NO-CLAIM.** This does not assert the shipped rules are wrong; it asserts we cannot currently
+demonstrate they are right. Nothing here re-opens R64/R65/R66/R67, whose labels did persist.
