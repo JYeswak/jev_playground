@@ -3098,3 +3098,44 @@ it, and `denominator-sweep.sh` + `exposure-check.sh` are mandated RED arms.
 **NO-CLAIM.** Only 2 of the 19 were verified consumed by direct probe; the remaining 17 are
 **unknown**, not confirmed-unconsumed. Nothing here says the instrument inventory is healthy —
 it says the measurement of it is not yet trustworthy.
+
+## R69 — the last Jev seat is retired on arithmetic, not on taste
+
+**Refuted:** that the low-noul veto on semantic rows is a candidate worth carrying.
+
+**The bar was preregistered before the numbers** (pane 4, receipt
+`docs/demos/upstream-repro/jev-seat-power-20260920.md`, commit `2a29d9d`):
+WEAK = Wilson 95% lower on semantic accuracy ≥ 0.50 (*"not a coin"*); STRONG = lower ≥ 0.70.
+
+**Required n to certify, at the observed 3/6:** **WEAK = ∞. STRONG = ∞.**
+
+Verified independently by pane 1 rather than accepted: at p̂ = 0.50 the Wilson lower bound
+converges to 0.50 **from below** and never reaches it — n=6 → 0.1876, n=500 → 0.4563,
+n=100,000 → **0.4969**. If p̂ rose to 0.60 the WEAK bar needs **n=91** (reproduced exactly), but
+we have no evidence of 0.60.
+
+**The right test, and it also fails.** McNemar's χ² is invalid here (n_d = 5 and 3; expected
+cell < 5). The exact conditional binomial is required: aggregate b=3 c=2 → p=1.0 (already
+retracted); semantic vs always-wrong baseline b=3 c=0 → **p=0.25** (reproduced exactly). Not
+significant at any conventional level.
+
+**Growth is the coffin.** The semantic stock is **6 rows**, all already scored, and R66 exhausted
+doctrine mining as a source. Honest arrival rate of new labelled meaning-rows: **0 per week.**
+An n of 91 at 0 per week is not a plan.
+
+**VERDICT: retire the seat.** The necessity *gate* survives as process — a deterministic baseline
+on identical rows, which has now ruled four times. `work/jev-triage/advisory-veto.mjs` may keep
+logging; **logging is not a seat.**
+
+**The structural pattern, now seen twice in one day.** `bash-callsite-grep-exclusion` had FP
+6/20 = exactly its 0.30 bar; this seat had 3/6 = exactly its 0.50 bar. **When the observed rate
+lands on the bar, no sample size rescues it** — the only honest moves are a better mechanism or
+a differently-justified bar, and moving a bar to admit our own artifact is forbidden. Both were
+retired the same day on that arithmetic.
+
+**Retry condition.** Reopen only if a source of labelled semantic rows appears that we did not
+author — arrival rate > 0/week — **and** a preregistered pilot shows p̂ ≥ 0.60 before n is spent.
+
+**NO-CLAIM.** This says nothing about Jev in general, and nothing about Jev on corpora unlike
+ours. It says: **at this fleet's exposure profile and labelling rate, no Jev seat we tested can
+be certified here.** Zero certified seats out of the candidates evaluated.
