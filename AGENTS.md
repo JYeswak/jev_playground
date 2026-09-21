@@ -26,29 +26,32 @@ clone's own toolchain (`npm run typecheck` / `ruff`), never imposed across them.
    [§ Irreversible actions](#irreversible-git--filesystem-actions--do-not-ever-break-glass)
 4. **Never push, PR, or commit inside a vendored clone.** They are upstream trees under
    evaluation. [§ Vendored clones](#vendored-upstream-clones--read-mostly-pinned-never-pushed)
-5. **`main` only; save only your work, every commit** — reserve paths in Agent Mail
+5. **The native repo is the incumbent — read it before you build, measure against it before you
+   rule.** Four first-party TypeSafe repos are vendored here and we ran none of them for four
+   days while hand-rolling their client. Read the SDK before writing a client; run the LLM arm
+   through `system-one-adapter-python` before publishing any verdict; locate every proposal on
+   `docs-mirror/typesafe/concepts/use-case-map.md`. A kill measured only against a regex, a
+   constant, or BM25 is INCOMPLETE and may not be cited as a ruling on Jev.
+   [§ RULE 14](#rule-14---the-native-repo-is-the-incumbent-and-we-ignored-it-for-four-days)
+6. **Read the vendored primary sources from disk, not from memory.** Rule 5's passive half.
+   [§ Primary sources](#primary-sources--vendored-locally-read-these-first)
+7. **`main` only; save only your work, every commit** — reserve paths in Agent Mail
    before editing, stage explicit paths, read back the index, never amend in this
    shared tree (`dcg` denies `git add -A`); every commit subject names its
    verification level. [§ Git](#git-branch-only-use-main-never-master)
-6. **The key never enters the tree, a log, a fixture, or a message.**
+8. **The key never enters the tree, a log, a fixture, or a message.**
    [§ Secrets](#secrets-and-the-paid-surface-critical)
-7. **Edit in place; no `_v2` files; never patch upstream to make a demo pass.**
+9. **Edit in place; no `_v2` files; never patch upstream to make a demo pass.**
    [§ Code editing discipline](#code-editing-discipline)
-8. **Offline lane first; a live call is budgeted and stated.**
-   [§ Testing](#testing)
-9. **Name the oracle, and name your claim level.** No bare "verified".
-   [§ The Jev Oracle](#the-jev-oracle) · [§ Claim discipline](#claim-discipline)
-10. **Read the vendored primary sources from disk, not from memory.**
-    [§ Primary sources](#primary-sources--vendored-locally-read-these-first)
-11. **Done means §4 below** — not compiling, not demoed once.
+10. **Offline lane first; a live call is budgeted and stated.**
+    [§ Testing](#testing)
+11. **Name the oracle, and name your claim level.** No bare "verified".
+    [§ The Jev Oracle](#the-jev-oracle) · [§ Claim discipline](#claim-discipline)
+12. **Done means §4 below** — not compiling, not demoed once.
     [§4 Definition of Done](#4-definition-of-done--the-acceptance-bar)
-12. **When Jeffrey does it, default to ADOPT.** He is this lane's mentor. The burden of proof sits
+13. **When Jeffrey does it, default to ADOPT.** He is this lane's mentor. The burden of proof sits
     on NOT adopting, never on adopting.
     [§ RULE 12](#rule-12---adopt-from-the-mentor-by-default)
-13. **The native repo is the incumbent.** Four first-party TypeSafe repos are vendored here and we
-    ran none of them for four days. Read the SDK before writing a client; run the LLM arm before
-    publishing a verdict; locate every proposal on the use-case map.
-    [§ RULE 14](#rule-14---the-native-repo-is-the-incumbent-and-we-ignored-it-for-four-days)
 
 Gate inventory and every RED arm: [`GATES.md`](GATES.md). Refuted hypotheses and rejected
 designs, read before starting one: [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md).
