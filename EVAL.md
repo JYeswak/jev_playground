@@ -1163,3 +1163,19 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   Example hash `e3b0c442` is SHA-256("").
 - **T6b still Depends T4** despite mktemp acceptance.
 - **Boundary:** did not edit the plan. Round 2 of ≥4.
+
+## P4 PLAN REVIEW R4 of v5.1 @931c872 (2026-09-20)
+
+- **Artifact:** `docs/demos/upstream-repro/plan-review-r4-v51-931c872.md`.
+- **NOT-YET beads.** Blocker: `uncertified-pass` = both bars (`:158`)
+  vs `bar_point` unset (`:217`); T2 eight codes vs §6 fifteen plants;
+  k has no gold field. §3 still "not a hole" — transcription≠R71 did
+  not land. §4.1(6) missing. Title still v4/round-1.
+- **T4→T6b edge gone.** Copy-site class remains in predicates.
+- **Point UNSET** is rigor if the program is interval-only; evasion
+  while §4.2 still uses 0.20 to prove dual legs.
+- **Q7:** interval 0.30 ours keep; dual shape without a second number
+  refuse; Joshua-as-key refuse; phrase non-claims refuse; mutation
+  twins adopt; sha256 checksum not R71.
+- **Boundary:** did not edit the plan. Round 4. v5.2 of three sentences
+  then beads.

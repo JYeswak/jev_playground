@@ -1,0 +1,3 @@
+CALLBACK P4 DONE [op-id=p4-plan-review-r4-v51-931c872]
+Artifact: docs/demos/upstream-repro/plan-review-r4-v51-931c872.md
+NOT-YET. Blocker: uncertified-pass both-bars vs point unset; T2 8 vs §6 15; k gold unspecified. k-drift honesty did not land (§3 still not-a-hole). T4→T6b edge gone; copy-site class lives in predicates. Point UNSET is rigor iff interval-only; §4.2 0.20 demo is evasion. Q7: keep interval 0.30; refuse dual-shape, Joshua-key, phrase non-claims; adopt mutation twins and sha256-as-checksum.

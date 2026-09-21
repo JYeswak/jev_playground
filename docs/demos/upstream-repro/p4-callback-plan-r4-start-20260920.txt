@@ -1,0 +1,2 @@
+CALLBACK P4 START [op-id=p4-plan-review-r4-v51-931c872]
+Final review round on PLAN v5.1 @931c872. Will re-verify six R2 fixes, hunt copy-site leftovers, rule BEADS-READY or NOT-YET, answer Q7 on authority vs evidence. Artifact under docs/demos/upstream-repro/.
