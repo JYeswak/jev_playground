@@ -31,3 +31,34 @@
 # tight, this repo is in the keep-everything / handoff regime and reordering buys nothing.
 compaction:
   methodOrder: [shake, snapcompact, handoff, remote, soft]
+
+# Added 2026-09-21 (pane 1, conductor). PROJECT-SCOPED registration — this file is in the repo and
+# is reviewable in git. It is NOT a write under ~/.omp, which pane 4 correctly refused as a
+# substrate change.
+#
+# WHY this key and not the bare directory. omp://extension-loading.md lists <cwd>/.omp/extensions
+# as a native auto-discovery root, but native auto-discovery globs with `gitignore: true` and
+# `hidden: false`. Explicitly configured paths take a different loader.ts code path that "does not
+# apply gitignore filtering", and <cwd>/.omp/config.yml is a documented project settings source.
+#
+# PROVEN 2026-09-21, and this key is what makes it true:
+#   grok  xd://jev_rerank_ext_probe present
+#   muse  present
+#   codex ABSENT  (open: codex is the only profile whose own array carries a profile-local
+#                  extensions/ path; correlation, not mechanism)
+#   --no-extensions  ABSENT  <- negative arm, so the probe discriminates
+#
+# DO NOT USE dumpTools AS THE ORACLE. `get_state.dumpTools` reports BUILT-INS ONLY and is blind to
+# extension-registered tools. Demonstrated with a planted positive control: a minimal extension
+# with no imports, registering one trivial tool via the documented pi.registerTool API, loaded by
+# explicit absolute -e path, is ALSO absent from dumpTools. An earlier revision of this comment
+# named dumpTools as the acceptance; that was the false-ZERO trap this lane spent the afternoon on.
+#
+# ACCEPTANCE (L2, listed): get_state.systemPrompt contains xd://jev_rerank_ext_probe, with a
+# --no-extensions run as the negative arm. Grepping for `jev_rerank` alone proves NOTHING — that
+# name comes from the .omp/tools catalog and survives --no-extensions.
+# L3 (fires) is invocation, both directions, and is NOT claimed here.
+# RETIRE: delete this key if the tool is withdrawn, or if native .omp/extensions discovery starts
+# working and makes it redundant.
+extensions:
+  - ./.omp/extensions/jev-rerank.ts
