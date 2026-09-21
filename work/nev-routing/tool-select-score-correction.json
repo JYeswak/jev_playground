@@ -1,0 +1,19 @@
+{
+  "branch": "main",
+  "supersedes": "work/nev-routing/tool-select-score.json verdict SEAT_LIVE",
+  "verified_from": "work/nev-routing/tool-select-derived.jsonl",
+  "switch_n": 44963,
+  "always_bash": "13353/44963",
+  "always_bash_recall": 0.297,
+  "uniform_random": 0.0294,
+  "frequency_weighted_random": 0.1716,
+  "name_match_recall": 0.0148,
+  "name_match_status": "DEFECTIVE_INSTRUMENT",
+  "why_defective": "0.0148 is below uniform random over 34 labels (0.0294). A router below a coin is not a baseline.",
+  "bar": "recall on label != prev_tool, >= 0.25 kills the seat",
+  "verdict": "NO_SEAT",
+  "ground": "BIT_2_YES",
+  "why": "A constant, always predict bash, scores 0.297 on the same 44963 switch rows. That clears the 0.25 kill line. The name-match router is unused for this verdict.",
+  "discordants_note": "Comparing the router to always-prev on switch rows is tautological. always-prev is 0 by construction there. The comparator is always-bash.",
+  "no_claim": "Not a claim that a competent learned router would also clear 0.25. A constant already does. Not a Jev score. Not a certified seat."
+}
