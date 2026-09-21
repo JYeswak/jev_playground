@@ -1,0 +1,77 @@
+{"rank": 0, "gold": "TP", "reason": "capability absence"}
+{"rank": 1, "gold": "FP", "reason": "text spacing not on disk \u2014 data"}
+{"rank": 2, "gold": "TP", "reason": "capability absence"}
+{"rank": 3, "gold": "TP", "reason": "capability absence"}
+{"rank": 4, "gold": "TP", "reason": "capability absence"}
+{"rank": 5, "gold": "TP", "reason": "capability absence"}
+{"rank": 6, "gold": "FP", "reason": "files not present in current read \u2014 data"}
+{"rank": 7, "gold": "TP", "reason": "capability absence"}
+{"rank": 8, "gold": "TP", "reason": "capability absence"}
+{"rank": 9, "gold": "TP", "reason": "capability absence"}
+{"rank": 10, "gold": "TP", "reason": "capability absence"}
+{"rank": 11, "gold": "TP", "reason": "capability absence"}
+{"rank": 12, "gold": "TP", "reason": "capability absence"}
+{"rank": 13, "gold": "TP", "reason": "capability absence"}
+{"rank": 14, "gold": "TP", "reason": "capability absence"}
+{"rank": 15, "gold": "FP", "reason": "conditional when daemon is absent \u2014 design"}
+{"rank": 16, "gold": "TP", "reason": "capability absence"}
+{"rank": 17, "gold": "FP", "reason": "conditional when daemon is absent \u2014 design"}
+{"rank": 18, "gold": "TP", "reason": "capability absence"}
+{"rank": 19, "gold": "TP", "reason": "capability absence"}
+{"rank": 20, "gold": "TP", "reason": "capability absence"}
+{"rank": 21, "gold": "TP", "reason": "capability absence"}
+{"rank": 22, "gold": "FP", "reason": "quoting README false-report of key missing"}
+{"rank": 23, "gold": "TP", "reason": "capability absence"}
+{"rank": 24, "gold": "TP", "reason": "capability absence"}
+{"rank": 25, "gold": "TP", "reason": "capability absence"}
+{"rank": 26, "gold": "FP", "reason": "inferred .git/index absent \u2014 unmeasured path"}
+{"rank": 27, "gold": "TP", "reason": "capability absence"}
+{"rank": 28, "gold": "FP", "reason": "test expected-copy mismatch \u2014 data"}
+{"rank": 29, "gold": "FP", "reason": "correction not present in matrix \u2014 data row"}
+{"rank": 30, "gold": "TP", "reason": "capability absence"}
+{"rank": 31, "gold": "TP", "reason": "capability absence"}
+{"rank": 32, "gold": "TP", "reason": "capability absence"}
+{"rank": 33, "gold": "TP", "reason": "capability absence"}
+{"rank": 34, "gold": "TP", "reason": "capability absence"}
+{"rank": 35, "gold": "TP", "reason": "capability absence"}
+{"rank": 36, "gold": "FP", "reason": "nothing is missing \u2014 negated claim"}
+{"rank": 37, "gold": "TP", "reason": "capability absence"}
+{"rank": 38, "gold": "TP", "reason": "capability absence"}
+{"rank": 39, "gold": "TP", "reason": "capability absence"}
+{"rank": 40, "gold": "TP", "reason": "capability absence"}
+{"rank": 41, "gold": "FP", "reason": "meta writeup of the regex itself"}
+{"rank": 42, "gold": "FP", "reason": "approval payload files not present \u2014 data"}
+{"rank": 43, "gold": "FP", "reason": "teaching BINARY_ABSENT trap \u2014 quoting"}
+{"rank": 44, "gold": "TP", "reason": "capability absence"}
+{"rank": 45, "gold": "TP", "reason": "capability absence"}
+{"rank": 46, "gold": "TP", "reason": "capability absence"}
+{"rank": 47, "gold": "FP", "reason": "if the binary is missing \u2014 conditional"}
+{"rank": 48, "gold": "FP", "reason": "insight I was missing \u2014 idiom not capability"}
+{"rank": 49, "gold": "TP", "reason": "capability absence"}
+{"rank": 50, "gold": "TP", "reason": "capability absence"}
+{"rank": 51, "gold": "TP", "reason": "capability absence"}
+{"rank": 52, "gold": "TP", "reason": "capability absence"}
+{"rank": 53, "gold": "TP", "reason": "capability absence"}
+{"rank": 54, "gold": "FP", "reason": "spacing artifacts not present \u2014 data"}
+{"rank": 55, "gold": "TP", "reason": "capability absence"}
+{"rank": 56, "gold": "TP", "reason": "capability absence"}
+{"rank": 57, "gold": "FP", "reason": "git commit not present \u2014 data"}
+{"rank": 58, "gold": "TP", "reason": "capability absence"}
+{"rank": 59, "gold": "TP", "reason": "capability absence"}
+{"rank": 60, "gold": "TP", "reason": "capability absence"}
+{"rank": 61, "gold": "TP", "reason": "capability absence"}
+{"rank": 62, "gold": "TP", "reason": "capability absence"}
+{"rank": 63, "gold": "TP", "reason": "capability absence"}
+{"rank": 64, "gold": "FP", "reason": "when sibling corpus is absent \u2014 skip design"}
+{"rank": 65, "gold": "TP", "reason": "capability absence"}
+{"rank": 66, "gold": "TP", "reason": "capability absence"}
+{"rank": 67, "gold": "FP", "reason": "if it is missing \u2014 conditional"}
+{"rank": 68, "gold": "TP", "reason": "capability absence"}
+{"rank": 69, "gold": "FP", "reason": "skill missing a finding \u2014 data in a file"}
+{"rank": 70, "gold": "TP", "reason": "capability absence"}
+{"rank": 71, "gold": "TP", "reason": "capability absence"}
+{"rank": 72, "gold": "FP", "reason": "defect class not present here \u2014 data"}
+{"rank": 73, "gold": "TP", "reason": "capability absence"}
+{"rank": 74, "gold": "TP", "reason": "capability absence"}
+{"rank": 75, "gold": "FP", "reason": "when the binary is absent \u2014 UNRUN design"}
+{"rank": 76, "gold": "TP", "reason": "capability absence"}
