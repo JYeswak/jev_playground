@@ -1,0 +1,2 @@
+CALLBACK P4 START [op-id=p4-plan-review-r5-v7-b34d3f8]
+Confirming round on PLAN v7 @b34d3f8. Will verify three R4 blockers closed not reworded, sweep v5→v7 for silent deletions, rule BEADS-READY or NOT-YET. Artifact under docs/demos/upstream-repro/.

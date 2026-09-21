@@ -1179,3 +1179,15 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
   twins adopt; sha256 checksum not R71.
 - **Boundary:** did not edit the plan. Round 4. v5.2 of three sentences
   then beads.
+
+## P4 PLAN REVIEW R5 of v7 @b34d3f8 (2026-09-20)
+
+- **Artifact:** `docs/demos/upstream-repro/plan-review-r5-v7-b34d3f8.md`.
+- **NOT-YET.** Table has **17** codes; plan claims **16**. T2 still names
+  eight plus leftover `unstated-assumption`/`missing-non-claims`.
+- `uncertified-pass` cell is interval-only; prose `:176` still either-leg;
+  §4.2 still 0.20 dual demo. `k_gold` in authority **landed**; R71 honesty
+  landed. `unpersisted-rate` still says R70/R71 exactly.
+- Silent-loss: new codes in table not in T2 list. scope/uncovered stayed
+  in tables v5–v7.
+- **Boundary:** did not edit the plan. Count is the blocker.

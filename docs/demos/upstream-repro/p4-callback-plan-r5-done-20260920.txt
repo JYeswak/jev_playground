@@ -1,0 +1,3 @@
+CALLBACK P4 DONE [op-id=p4-plan-review-r5-v7-b34d3f8]
+Artifact: docs/demos/upstream-repro/plan-review-r5-v7-b34d3f8.md
+NOT-YET. Table 17 codes, claim 16. T2 still lists 8 + dead names. uncertified-pass cell OK; prose either-leg and §4.2 0.20 remain. k_gold + R71 honesty landed. New table codes omitted from T2 (deletion-by-omission).
