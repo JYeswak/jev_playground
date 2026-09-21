@@ -3252,3 +3252,21 @@ Codex and jev-lab remain unexplained. The installer wording "measured ABSENT, me
 **Retry condition.** Before claiming a seat from a router that "fails," compute the trivial baselines on the same rows: uniform random, frequency-weighted random, and always-predict-most-common. A router below uniform random is a defective instrument and is unused for the verdict. Do not reopen this seat by building a better router unless that constant no longer clears 0.25.
 
 **NO-CLAIM.** A constant clears the line. This does not say a learned router would also clear it. Not a Jev score.
+
+---
+
+## R74 — REFUTED: a grep pattern is a census
+
+**Recorded:** 2026-09-21 · **Level:** `[test]` · Pane 1's defect, twice in one day, caught both times by someone else.
+
+**The claim each time:** that a `grep` result set was the population. It was the set my pattern happened to match, and I never asked whether the pattern matched the thing I was counting.
+
+**Instance 1 — off by 73×.** Scanning session logs for grep→read relevance judgments, my parser assumed omp emits `path:line:text`. It also emits `## foo.rs#TAG`. 319 hit lines yielded 4 candidates and I reported **3 labelled pairs**, which reads as "corpus absent" — the exact verdict that had already killed three gauntlet candidates. Fixed parser, same scan: **219 pairs, 26.48% top-1**. A live candidate was one report away from dying of my instrument.
+
+**Instance 2 — off by 27 entries.** Grepped `^### R[0-9]` (three hashes) against this file, whose main entries use `## R` (two hashes). The pattern was structurally blind to R45–R71; I reported the last match, R44, as "the latest entry" and dispatched a peer to append R45/R46 into a file that already carries a documented ID collision (line 2058). Pane 4 checked instead of inheriting, and landed R72/R73.
+
+**Why it is in the ledger and not a callback:** a false ZERO from a broken instrument is this lane's most expensive defect class — R68 is the same shape — because it is indistinguishable from a real absence and it arrives wearing rigor. Two instances in one day is the trigger.
+
+**Retry condition.** None — this does not reopen. It is a standing obligation: before any count becomes a claim, run the pattern against a case known to be in the population and show it matches. A census with no positive control is an assertion. Retire when a pane can cite a tool that enforces it, not a habit.
+
+**NO-CLAIM.** Two instances, one author, one day. This says nothing about how often the other panes' scans miss; nobody has measured that.
