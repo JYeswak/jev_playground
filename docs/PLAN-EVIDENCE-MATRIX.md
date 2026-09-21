@@ -184,6 +184,36 @@ of stdlib Python with 43 mutation tests. That gap is the honest measure of the d
 
 ---
 
+### 4.2 The replay — computed, not asserted
+
+Every rate-bearing decision of 2026-09-20, scored by the dual bar (FP must satisfy
+`p̂ ≤ 0.30` **and** `upper ≤ 0.30`; bind must satisfy `p̂ ≥ 0.20` **and** `lower ≥ 0.20`).
+Wilson two-sided 95%, computed by pane 1.
+
+| boundary | p̂ | 95% CI | point | interval | verdict | what we did |
+|---|---:|---|:--:|:--:|---|---|
+| `absence-from-one-probe` n=20 | 0.200 | [0.081, **0.416**] | ok | **NO** | REFUSE | **shipped** |
+| `absence-from-one-probe` n=77 | 0.273 | [0.186, **0.381**] | ok | **NO** | REFUSE | retired |
+| `bash-structural-def-search` n=20 | 0.200 | [0.081, **0.416**] | ok | **NO** | REFUSE | **shipped** |
+| `bash-structural-def-search` n=77 | 0.714 | [0.605, 0.803] | NO | NO | REFUSE | retired |
+| `bash-callsite-grep-exclusion` n=20 | 0.300 | [0.145, **0.519**] | ok | **NO** | REFUSE | **shipped** |
+| `ft-rs` bind | 0.000 | [0.000, 0.133] | NO | NO | REFUSE | killed ✓ |
+| `ft-md` bind | 0.000 | [0.000, 0.133] | NO | NO | REFUSE | killed ✓ |
+| `ft-sh` bind | 0.040 | [0.007, 0.195] | NO | NO | REFUSE | killed ✓ |
+
+**All three ships pass the point leg and fail the interval leg.** `callsite` at p̂ = 0.300 would
+have *passed* a naive `p̂ ≤ 0.30` check outright — it is refused only because its upper bound is
+0.519. The dual bar is the entire difference between what we did and what we should have done.
+
+For the `bind` rows, REFUSE is the desired verdict: the validator agrees with every kill we made.
+So across eight rate-bearing decisions the matrix reproduces our five correct outcomes and
+reverses our three wrong ones, **a day earlier and without a relabel.**
+
+Method note: §6 previously cited upper 0.137 for 0/25 from Clopper-Pearson; Wilson gives 0.133.
+Both clear the 0.20 bar. `rate.method` exists precisely so this distinction is never silent.
+
+---
+
 ## 5. Tasks and dependency graph
 
 ```
