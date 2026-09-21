@@ -3272,3 +3272,25 @@ Codex and jev-lab remain unexplained. The installer wording "measured ABSENT, me
 **NO-CLAIM.** Two instances, one author, one day. This says nothing about how often the other panes' scans miss; nobody has measured that.
 
 **Grader's sourcing caveat, appended 2026-09-21 at pane 3's finding.** The `27` is fully sourced: R45 at L2212 through R71 at L3182 are `##`-form, and `^###` matches only the R44 sub-heads. The `73×` is half-sourced — the fixed side (219 pairs, 26.48%) is verified from the committed scan JSON, and `319 → 4` is recoverable from the v2 script's own header recount, **but the `3` itself rests on the author's testimony with no surviving v1 receipt.** The broken script was overwritten in place by the fix, and `notes/` is outside the tracked allowlist, so there is nothing to re-read. An entry whose subject is uncontrolled counts should not contain one: that number is testimony, marked as such, and it is the smallest claim here. The defect class does not depend on it.
+
+---
+
+## R75 — NO-PATH: a capability with no label cannot enter this gauntlet
+
+**Recorded:** 2026-09-21 · **Level:** `[test]` · Mechanism ruling, not a seat.
+
+**Trace, reconstructable.** A candidate with no label and no baseline today takes this path and exits:
+
+1. Bit 1 asks whether the label is a function of the literal tokens, or whether a trained-on-this-distribution baseline already wins. No label, no bit 1. `EVAL.md` records the regime as "bit 1 is NO under shift." Shift still needs a labelled corpus. `jev-spam-eval` OOD and the injection flag (`docs/demos/INJECTION-FLAG-RESULT.md`) both had labels before they entered.
+2. Bit 2 asks whether a constant policy scores well. That score needs the same labels. The tool-selection kill was always-bash 0.297 on 44,963 labelled rows (`work/nev-routing/tool-select-score-correction.json`). Without those rows the kill could not have been computed, and neither could a pass.
+3. R28, the authored-corpus entry in this file, says a corpus written by the pane that wrote the questions is not evidence. The missing labels cannot be authored to create an entrance. The retries we have used are "find an unauthored labelled set." A capability we do not attempt has no such set.
+
+Exit: unaskable or corpus-absent. That is not an admission path.
+
+**Scope.** This is a property of our gate, NOT evidence that a new-capability seat exists.
+
+**Pilot rung, PROPOSED, not adopted.** Admit to measurement only when the behavior is not currently attempted, the go/no-go metric is a label the running system emits after ship (accept, reject, next action), the bar is written before any score, and the first ship is observe-only. No certified seat until accrued rows beat a constant computed on those same rows. Adoption needs a non-author ruling on one question this entry does not answer: does waiting for a product to emit labels avoid R28, or does choosing which emitted field counts as the label reintroduce authorship?
+
+**Retry condition.** This entry is wrong if a candidate is admitted and certified without any labelled corpus existing at entry. That would mean an admission path existed and this trace missed it.
+
+**NO-CLAIM.** A gap in the admission rule is not a seat. Jevify was not run against a product.
