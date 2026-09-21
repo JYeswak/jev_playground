@@ -1,0 +1,24 @@
+{
+  "branch": "main",
+  "bar": "work/nev-routing/tool-select-bar.md",
+  "bar_unchanged": true,
+  "scorer": "name-match overlap of context tokens against candidate tool names; zero overlap abstains",
+  "n_all": 137063,
+  "top1_hits": 2675,
+  "accuracy": 0.0195,
+  "switch_n": 44963,
+  "switch_hits": 666,
+  "recall_on_label_ne_prev": 0.0148,
+  "denominator": "44963 rows where label != prev_tool. Not 137063.",
+  "abstain": 121999,
+  "nonce_predicted": 0,
+  "empty_candidates_prediction": null,
+  "verdict": "SEAT_LIVE",
+  "why": "Recall 0.0148 is below 0.10. The preregistered bar says the seat is live. It is not between, and it is not a kill.",
+  "discordants_vs_always_prev_on_switch": {
+    "router_only": 666,
+    "prev_only": 0,
+    "note": "On a switch row, predicting prev_tool cannot hit. b-c = 666. Not a p-value."
+  },
+  "no_claim": "Called-next is a proxy for correct. Name collisions inflate. Yield is only over calls followed by another call. This is not a Jev score and not a certified seat."
+}
