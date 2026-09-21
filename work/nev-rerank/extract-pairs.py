@@ -86,52 +86,57 @@ def session_files():
 
 def events_of(path):
     events, pend = [], {}
-    for line in open(path, errors="replace"):
-        if '"toolCall"' not in line and '"toolResult"' not in line:
-            continue
-        try:
-            o = json.loads(line)
-        except Exception:
-            continue
-        if o.get("type") != "message":
-            continue
-        msg = o.get("message") or {}
-        content = msg.get("content")
-        if not isinstance(content, list):
-            continue
-        for it in content:
-            if not isinstance(it, dict):
+    with open(path, encoding="utf-8", errors="replace") as handle:
+        for line in handle:
+            if '"toolCall"' not in line and '"toolResult"' not in line:
                 continue
-            if it.get("type") == "toolCall":
-                name, tid = it.get("name"), it.get("id")
-                if name == "grep" and tid:
-                    args = it.get("arguments") or {}
-                    if isinstance(args, str):
-                        try:
-                            args = json.loads(args)
-                        except Exception:
-                            args = {}
-                    pend[tid] = args if isinstance(args, dict) else {}
-                elif name == "read":
-                    args = it.get("arguments") or {}
-                    if isinstance(args, str):
-                        try:
-                            args = json.loads(args)
-                        except Exception:
-                            args = {}
-                    events.append(
-                        (
-                            "read",
-                            base(args.get("path") if isinstance(args, dict) else ""),
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if obj.get("type") != "message":
+                continue
+            msg = obj.get("message") or {}
+            content = msg.get("content")
+            if not isinstance(content, list):
+                continue
+            for item in content:
+                if not isinstance(item, dict):
+                    continue
+                if item.get("type") == "toolCall":
+                    name, tid = item.get("name"), item.get("id")
+                    if name == "grep" and tid:
+                        args = item.get("arguments") or {}
+                        if isinstance(args, str):
+                            try:
+                                args = json.loads(args)
+                            except json.JSONDecodeError:
+                                args = {}
+                        pend[tid] = args if isinstance(args, dict) else {}
+                    elif name == "read":
+                        args = item.get("arguments") or {}
+                        if isinstance(args, str):
+                            try:
+                                args = json.loads(args)
+                            except json.JSONDecodeError:
+                                args = {}
+                        events.append(
+                            (
+                                "read",
+                                base(
+                                    args.get("path") if isinstance(args, dict) else ""
+                                ),
+                            )
                         )
+                else:
+                    tid = (
+                        msg.get("toolCallId")
+                        or item.get("toolCallId")
+                        or obj.get("toolCallId")
                     )
-            else:
-                tid = (
-                    msg.get("toolCallId") or it.get("toolCallId") or o.get("toolCallId")
-                )
-                if tid and tid in pend:
-                    args = pend.pop(tid)
-                    events.append(("g", it.get("text") or "", args))
+                    if tid and tid in pend:
+                        args = pend.pop(tid)
+                        events.append(("g", item.get("text") or "", args))
     return events
 
 
