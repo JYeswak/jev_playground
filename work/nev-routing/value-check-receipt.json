@@ -1,0 +1,9 @@
+{
+  "branch": "main",
+  "bead": "jev-6u0",
+  "current_pass": "JEV_STATUS fixture, digest matches, score 60, receipt value 21, lane-status.sh BEFORE the edit exited 0",
+  "new_fail": "same fixture AFTER the edit exited 12, VALUE DISAGREE expect=60 receipt=21",
+  "live_file": "docs/demos/STATUS.tsv still exits 0. No production receipt has a top-level value key, so this check does not fire on them.",
+  "not_the_digest_case": "digest matched in the fixture. Drift was not the signal.",
+  "no_claim": "This gates one arithmetic agreement on a JSON value key. It cannot detect a wrong expectation, a corpus the author also chose, or the wrong metric. It does not yet require every STATUS row to carry an expectation, because score 967 is not the same quantity as main_correct 58 and a blind compare would false-RED the live file."
+}

@@ -165,7 +165,7 @@ printf '%s\n' "-----------------------------------------------------------------
 # ---------------------------------------------------------------- gauntlet state
 printf '\nGAUNTLET (state of record: %s)\n' "$STATUS"
 printf '  %-30s %-4s %-5s %-10s %-6s %s\n' CANDIDATE RUNG SCORE VERDICT AUTHOR BLOCKED_ON
-missing=0; rows=0; with_receipt=0; pinned=0; drifted=0; unpinned=0
+missing=0; rows=0; with_receipt=0; pinned=0; drifted=0; unpinned=0; value_bad=0
 ruled_out=0; concur_missing=0; schema_bad=0; type_bad=0
 # SCHEMA WIDTH IS VALIDATED EXACTLY, and this is a PREREQUISITE, not a nicety. Pane 2,
 # verify-exit-disaggregation-20260918T102000Z.json (a915e11), non-author, asked the question I had
@@ -233,6 +233,26 @@ while IFS= read -r raw; do
       pinned=$((pinned+1)); have=$(norm_digest "$receipt")
       if [ "$have" != "$digest" ]; then
         mark="  <<< DIGEST DRIFT want=$digest have=$have"; drifted=$((drifted+1))
+      else
+        # Value check, not an integrity check. Digest match proves the bytes. It does not
+        # prove the number. A JSON receipt with a top-level "value" must equal the score
+        # column, which is the expectation recorded in STATUS, not in the receipt.
+        # NO-CLAIM: this gates that one arithmetic agreement. It cannot detect a wrong
+        # expectation, a corpus the author also chose, or the wrong metric.
+        got=$(python3 -c 'import json,sys
+try:
+    d=json.load(open(sys.argv[1]))
+except Exception:
+    print("SKIP"); raise SystemExit
+if not isinstance(d, dict) or "value" not in d:
+    print("SKIP"); raise SystemExit
+v=d["value"]
+if isinstance(v, bool) or not isinstance(v, (int, float)) or isinstance(v, float) and v != int(v):
+    print("BAD"); raise SystemExit
+print(int(v))' "$receipt" 2>/dev/null || echo SKIP)
+        if [ "$got" != SKIP ] && [ "$got" != "$score" ]; then
+          mark="$mark  <<< VALUE DISAGREE expect=$score receipt=$got"; value_bad=$((value_bad+1))
+        fi
       fi
     else
       unpinned=$((unpinned+1))
@@ -331,6 +351,11 @@ if [ "$drifted" -gt 0 ]; then
   printf 'Content changed beyond terminal whitespace. Re-pin deliberately or explain the change.\n'
   fails=$((fails+1))
 fi
+if [ "$value_bad" -gt 0 ]; then
+  printf 'FAIL: %d receipt(s) exist, match their digest, and disagree with the score column.\n' "$value_bad"
+  printf 'Existence and byte-identity are not agreement. The score is the expectation; the receipt value is not.\n'
+  fails=$((fails+1))
+fi
 # Schema is reported LAST but ranks FIRST in the exit code: a row of the wrong width makes every
 # other counter on that row untrustworthy, so it must not be masked by a downstream class.
 if [ "$schema_bad" -gt 0 ]; then
@@ -366,7 +391,7 @@ elif [ "$fails" -gt 1 ]; then
   printf 'FAIL: %d distinct failure classes fired. Exit %d.\n' "$fails" "$rc"
 elif [ "$missing" -gt 0 ]; then rc=3
 elif [ "$drifted" -gt 0 ]; then rc=4
-else rc=5
+elif [ "$value_bad" -gt 0 ]; then rc=12
 fi
 
 # ---------------------------------------------------- TRANSIENT_UNSTABLE check (pane 2 Q92, 185ccdd)
