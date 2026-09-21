@@ -102,44 +102,45 @@ selftest_cases = ["scripts/selftest-ttsr-rules.sh::glob_silenced_fires",
 red_arm = "scripts/selftest-ttsr-rules.sh::glob_silenced_fires"   # REQUIRED, see §4
 label_rows = "work/skills-vein/glob-labels-20260921.json"          # REQUIRED for any rate
 
-# THE CLAIM, with its scope, its assumptions, and its control
-# Method name carries its assumption, per his eval policy (:247-249):
-#   two_sided_95_wilson_with_one_primary_case_per_independent_family
-# The two bars MUST differ — see §4.1. A point bar equal to the interval bar is vacuous.
-# NEITHER bar is set here. Both live in authority.toml, set by the key-holder BEFORE data.
+# THE CLAIM, with its scope, its assumptions, and its control.
+# Assumptions are TYPED FIELDS, not a magic method string — see §4.1(2).
 rate = { kind = "fp", k = 4, n = 77,
-         method = "two_sided_95_wilson_independent_rows" }
-#        bar_point    <- authority.toml, NOT author-chosen  (see §4.1)
-#        bar_interval <- authority.toml, NOT author-chosen
-label_rows_sha256 = "9f2c…"          # BOUND, real digest of the rows file. k is RECOMPUTED
-                                     # from those rows, never declared free. Scope: §4.1(6).
-negative_control = { name = "always_quiet", loss_evidence = "work/…/control-20260921.json" }
-non_claims = ["not a live measurement",
-              "single labeller",
-              "rows not independent across one session"]
+         estimator = "wilson", sides = 2, conf = 0.95,
+         iid_claimed = false }         # our fires overlap sessions; say so in a checkable field
+#        bar_interval <- authority.toml, frozen BEFORE data exists (see §4.1)
+#        bar_point    <- ABSENT. No justified value. Rows carry point_leg = "unset".
+label_rows = "work/skills-vein/glob-labels-20260921.json"
+label_rows_sha256 = "9f2c…"            # checksum: detects drift, does NOT prevent mislabelling
+k_gold = 4                             # the AUTHORITY's count for these rows; k above must equal
+                                       # the value recomputed from label_rows. See `k-drift`.
+labeller_count = 1                     # typed, not prose. Was a NO-CLAIM we never enforced.
+rows_independent = false               # typed. Was a NO-CLAIM we never enforced.
+live_measurement = false               # typed.
 scopes = ["project", "global"]
 rung = "L3"                            # L0..L4 from AGENTS.md
 status = "planned"                     # planned | executed | passed | failed | retired
+point_leg = "unset"                    # unset | <bar>  — visible, never implied
 ```
 
-`authority.toml` holds the same rows with the **bound fields** frozen. Bound set for this lane:
-`owner_bead, kind, title, red_arm, rate.method, rate.bar_point, rate.bar_interval, rate.n,
-label_rows_sha256, negative_control, scopes, rung`.
+`authority.toml` holds the same rows with the **bound fields** frozen: `owner_bead, kind, title,
+red_arm, rate.estimator, rate.sides, rate.conf, rate.iid_claimed, rate.bar_interval, rate.n,
+k_gold, label_rows_sha256, scopes, rung`.
 
-**Why `k` is not in that list, and why that is not a hole.** Pane 4's review named `k` as the
-reward hack: if the numerator is free, an agent moves it until the bar clears. Binding `k`
-directly would be wrong — `k` is a *measurement outcome*, and freezing an outcome in a reviewed
-file means the reviewer is setting the result. Instead we bind **`label_rows_sha256`** and
-require the validator to **recompute `k` from the rows** (`unpersisted-rate` already demands the
-file). `k` therefore cannot be moved without changing the labelled rows, and changing the rows
-changes a bound field. **The outcome stays free; its evidence is frozen.**
+**The control is a time-freeze, not a person.** v5 said *"Joshua holds the second key."* Pane 4's
+round 4 refused that: **F3 was the same party setting and scoring, and he is that party** — he
+directs this lane. Naming a person as the control re-creates the defect with a longer loop.
+**The mechanism is the files plus the ordering: a bar is valid only if it was written before the
+measurement existed, and `bar-equals-observed` catches the degenerate case mechanically.**
+Steward ≠ scorer is a property of *when*, not of *who*.
 
-The working matrix may move `status` and add evidence refs; **it may not move a bar, a method,
-an n, a control, a scope, a rung, or the label-row hash without an authority edit.**
-
-**Who holds the second key.** Joshua. An authority edit is a reviewed change; the matrix is ours.
-This is the mechanism that would have stopped F3, because I could not have both set the bar and
-scored against it.
+**`k` and what the hash actually buys.** `k` is a measurement outcome, so freezing it in the
+authority would make the reviewer set the result. Instead the authority carries **`k_gold`** and
+the validator recomputes `k` from `label_rows`; disagreement is `k-drift`.
+**What this does NOT do, stated plainly because v5 implied otherwise:** the hash detects
+*transcription* drift — someone editing a number — and is **powerless against mislabelling.**
+**R71's 3.6× discrepancy was a labeller failure, and none of this would have caught it.** The
+only thing that closes that gap is a second labeller with measured agreement, which this program
+does not include. `labeller_count = 1` exists so the weakness is visible in every row.
 
 ---
 
@@ -155,14 +156,22 @@ Fail-closed, fixed diagnostic codes, no content in logs.
 | **every selftest case in the tree is registered** | `orphan-case` | **the reverse check he lacks** |
 | `red_arm` present and is one of `selftest_cases` | `missing-red-arm` | untested gates |
 | any `rate` present ⇒ `label_rows` exists and has ≥ n keys | `unpersisted-rate` | **R70/R71 exactly** |
-| `status = passed` ⇒ **both** bars clear (see §4.1) | `uncertified-pass` | NEED #6 exactly |
-| `kind = rule` ⇒ enumeration in every declared scope agrees with `status` | `scope-disagreement` | **F5** — *runtime only, see below* |
-| every non-epic `jev-*` bead is covered by ≥1 boundary | `uncovered-bead` | untracked work |
-| `rate.method` names its independence assumption | `unstated-assumption` | silent iid assumption |
-| ≥3 `non_claims`, and they name labeller count and independence | `missing-non-claims` | a fixture quietly becoming a claim |
-| `negative_control.loss_evidence` resolves and shows the control losing | `control-not-beaten` | a rule that beats nothing |
+| `status = passed` ⇒ the **interval** leg clears; point leg only if `point_leg ≠ "unset"` | `uncertified-pass` | NEED #6 |
+| `bar_interval` absent from `authority.toml` | `bar-unset` | an unbarred claim |
+| a bar exactly equals the `k/n` it scores | `bar-equals-observed` | **setting the bar to your data** |
+| `iid_claimed = true` while rows share a session | `iid-unsupported` | silent independence assumption |
+| `labeller_count`, `rows_independent`, `live_measurement` all present and typed | `missing-typed-caveat` | prose caveats nobody enforces |
+| `negative_control` present ⇒ a **loss table** exists and the control loses under it | `control-not-beaten` | a rule that beats nothing |
 | every semantic field has a corrupt-it-must-fail twin | `no-mutation-twin` | untested validator |
 | `k` recomputed from `label_rows` matches declared `k` | `k-drift` | **moving the numerator** |
+| `kind = rule` ⇒ enumeration in every declared scope agrees with `status` | `scope-disagreement` | F5 — *runtime only* |
+| every non-epic `jev-*` bead is covered by ≥1 boundary | `uncovered-bead` | untracked work |
+| platform-dependent claim + simulated evidence | `simulated-platform` | certifying a cross-build as native |
+
+**Sixteen codes.** This count is the single source of truth: T2 implements the **thirteen**
+deterministic ones, T6a adds `orphan-case`, and `scope-disagreement` plus `simulated-platform`
+are **runtime** checks that report `…-unverified` rather than pass when their environment is
+absent. v5 said "eight" in T2 and "fifteen" in §6 — pane 4's blocker — and both were guesses.
 
 `uncertified-pass` is the rule that makes this pay for itself: **a boundary cannot say `passed`
 while either leg of its bar fails.** Scored at **ship time** — 4/20 for all three, the evidence
@@ -234,8 +243,11 @@ independence — the two NO-CLAIMs we kept writing in prose and never enforced.
 **4. A frozen negative control that must be proven to lose.** `always_abstain` plus six
 baselines (`:250-253`), and the expected-values fixture must **prove always-abstain loses**
 (`:429`). Our analogue is `always_quiet`: a rule must beat doing nothing, demonstrated, not
-assumed. Note what this does to our own history — a rule with FP 0.714 does *not* beat
-`always_quiet`, and this check would have said so without any labelling at all.
+assumed. **v4 claimed this would have killed the FP-0.714 rule "without any labelling at all." That is
+false** — pane 4, round 4. Ranking a rule against `always_quiet` requires a loss function, and
+we have none; he pairs his control with an exact 0/1/2 loss table (Axis B `:231-244`). Without
+one, "beats doing nothing" is an intuition, not a computation. `control-not-beaten` therefore
+requires a **declared loss table**, and until one exists the control field is not usable.
 
 **5. Mutation twins.** `test_eval_policy.py` is 43 mutation tests: corrupt one semantic field,
 require `SystemExit` (Axis B §1). Named failure modes include *false abstention scored correct*,
@@ -337,8 +349,8 @@ explicitly is what stops them being dropped a second time.
 **T2 — Validator core.** `scripts/validate-evidence-matrix.py`, stdlib only. **Interpreter:
 `python3.12`** — verified present at `/opt/homebrew/bin/python3.12` (3.12.13); system `python3`
 is 3.9.6 with **no `tomllib`**, so the pin is load-bearing, exactly as he pins
-`nightly-2026-08-31`. Implements these **eight** structural codes (pane 3: *"the first six" is
-six of thirteen, mapping unstated — a fresh agent guesses*): `boundary-coverage`,
+`nightly-2026-08-31`. Implements the **thirteen deterministic codes** of §4 (the sixteen minus `orphan-case`,
+which is T6a, and the two runtime checks): `boundary-coverage`,
 `authority-<field>`, `unresolved-evidence`, `missing-red-arm`, `unpersisted-rate`,
 `uncertified-pass`, `k-drift`, `uncovered-bead`. The remaining five — `orphan-case` (T6a),
 `scope-disagreement` (runtime), `unstated-assumption`, `missing-non-claims`, `control-not-beaten`
@@ -426,8 +438,8 @@ guard fails when a figure and the matrix disagree.
 ## 6. Acceptance for the whole program
 
 - `python3.12 scripts/validate-evidence-matrix.py` exits 0 on a clean tree, and exits nonzero
-  with the correct code for each of the **fifteen** planted violations in §4 (thirteen codes
-  plus `bar-unset` and `bar-equals-observed`).
+  with the correct code for each of the **sixteen** planted violations in §4 — one per code,
+  no more and no fewer, so the count cannot drift from the table again.
 - Replaying 2026-09-20 through it **refuses all three ships**, and **refuses the three
   `ft-*` bind rows too — which is the correct outcome, because for a bind rate REFUSE *is* the
   kill.** v4.1's wording said the program "accepts the 0/25 kills", which reads as PASS and
