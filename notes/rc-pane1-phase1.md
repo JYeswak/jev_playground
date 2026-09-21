@@ -576,3 +576,28 @@ its own limit: *"exploratory experiments, not benchmarks,"* run once, one model 
 reading mistakes in 1,000 sampled emails. Pane 4 notes the 97.3/72.5 pair in the modern-mail row
 is the accuracy column, not the "legitimate called legitimate" column — my summary used accuracy,
 which holds. `EVAL.md` citation is pane 4's to make; I have not touched that file.
+
+### Provenance — the clone is dirty, and one dirty file moves a published number
+
+Pane 4 flagged two modified files before citing anything. Checked: `results/ood_modern.jsonl` and
+`results/ood_tfidf_predictions.jsonl`, both OOD. Row counts identical (633 / 4362) but 619 and 566
+rows differ in content at the same index — a re-run or re-sample, not a reformat. **Docs are clean
+against `HEAD`**, so every number quoted above came from clean bytes.
+
+Scoring `ood_modern.jsonl` both ways (`label` vs `choices.choice`, ham/legitimate collapsed):
+
+| question | HEAD | working tree |
+|---|---|---|
+| `category` | 614/633 = 97.00% | 97.00% |
+| `category_names_only` | 624/633 = 98.58% | 98.58% |
+| **`category_urgency_authority`** | **616/633 = 97.31%** | **612/633 = 96.68%** |
+
+The README headline *"97.3% (with urgency and authority)"* is the **HEAD** value. **Anyone
+replaying this working tree gets 96.68% and would conclude the repo overclaimed — it did not, our
+checkout drifted.** Cite `jev-spam-eval@76ef183` **at HEAD**, and disclose that the modern-mail
+per-prediction file is locally modified; otherwise the next agent files a false overclaim against
+an upstream repo, which this lane already did once this week.
+
+Conclusion unchanged: 96.68% vs TF-IDF 72.5% is still **+24.2**, and Ling-Spam (98.6/73.0) and
+phishing (91.0–93.6/70.3) are untouched by the drift. I did not clean, stash, or check out
+anything in that clone — **the drift is disclosed, not repaired.**
