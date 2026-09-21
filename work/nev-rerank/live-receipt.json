@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-09-21T19:04:00Z",
+  "lane": "live",
+  "model": "jev-1.13.0",
+  "requests": 219,
+  "failed": 0,
+  "query_field": "intent",
+  "intent_present": 219,
+  "corpus": "work/nev-rerank/pairs.jsonl",
+  "committed_corpus": "notes/rerank-labelled-pairs.jsonl",
+  "committed_at": "0ee3d2e",
+  "corpus_note": "Scored the working extract. The committed file matches on label, intent, and rank multisets (219/219). Not byte-identical. Unlabelled 441 are not negatives.",
+  "scores": "work/nev-rerank/scores.jsonl",
+  "extract_reconciled_with_v2": {
+    "labelled_pairs": 219,
+    "grep_order_top1_pct": 26.48,
+    "header_forms": {"bracket": 793, "hdr2": 5734, "colon": 3}
+  },
+  "random_floor_pct": 24.79,
+  "all": {
+    "n": 219,
+    "jev_top1_pct": 35.62,
+    "grep_top1_pct": 26.48,
+    "jev_only": 60,
+    "grep_only": 40,
+    "paired_diff": 0.0913,
+    "bootstrap_ci95": [0.0046, 0.1781],
+    "ci_excludes_zero": true,
+    "mcnemar_two_sided_p": 0.0569,
+    "mcnemar_clears_0.05": false
+  },
+  "with_snippet": {
+    "n": 155,
+    "jev_top1_pct": 36.13,
+    "grep_top1_pct": 20.0,
+    "paired_diff": 0.1613,
+    "bootstrap_ci95": [0.0581, 0.2645],
+    "ci_excludes_zero": true
+  },
+  "filename_only": {
+    "n": 64,
+    "jev_top1_pct": 34.38,
+    "grep_top1_pct": 42.19,
+    "paired_diff": -0.0781,
+    "bootstrap_ci95": [-0.25, 0.0938],
+    "ci_excludes_zero": false
+  },
+  "seed": 0,
+  "bootstrap_draws": 10000,
+  "challenges_accepted": {
+    "snippet_split": "post-hoc. Three looks, no family correction, not preregistered. Not a seat. Needs a fresh sample before anyone claims it.",
+    "label": "next read, not relevance. A hit can mean Jev predicts what the agent opens, not which file answers the question.",
+    "cost_on_219": "not recorded. latencyMs was discarded. The 219 cannot be priced after the fact.",
+    "fragility": "net +20 pairs. CI lower bound 0.46 pp. One flip from including zero. McNemar p=0.057 does not clear 0.05."
+  },
+  "cost_sample": {
+    "n": 8,
+    "note": "same wire path, first snippet-bearing rows. Not the 219.",
+    "model_returned": "jev-1.13.0",
+    "latency_ms_min": 115,
+    "latency_ms_median": 137,
+    "latency_ms_max": 313,
+    "input_tokens": 8954,
+    "output_tokens": 587,
+    "price": "$0.042/MTok input, output free, jev-rerank-bench/common.py",
+    "cost_usd": 0.000376,
+    "cost_per_1k_requests": 0.047
+  },
+  "no_claim": "Proxy labels. Pooled interval bar met by a hair; exact McNemar does not clear 0.05. Snippet split is an observation, not a claim. Cost of the 219 is unknown. Not a certified seat. Not evidence the omp tool improves a session."
+}
