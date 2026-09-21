@@ -168,13 +168,16 @@ Fail-closed, fixed diagnostic codes, no content in logs.
 | every non-epic `jev-*` bead is covered by ≥1 boundary | `uncovered-bead` | untracked work |
 | platform-dependent claim + simulated evidence | `simulated-platform` | certifying a cross-build as native |
 
-**Sixteen codes.** This count is the single source of truth: T2 implements the **thirteen**
-deterministic ones, T6a adds `orphan-case`, and `scope-disagreement` plus `simulated-platform`
-are **runtime** checks that report `…-unverified` rather than pass when their environment is
-absent. v5 said "eight" in T2 and "fifteen" in §6 — pane 4's blocker — and both were guesses.
+**The table above is the only enumeration in this document. No count is stated anywhere,
+including here.** v5 said "eight" in T2 and "fifteen" in §6; v7 said "sixteen" when the table
+held seventeen — I miscounted with a regex that missed `authority-<field>`, and pane 4 caught it.
+**Three wrong counts in three revisions** is sufficient evidence that a hand-maintained count is
+not maintainable: implementations and acceptance criteria **derive** the set from this table.
+`orphan-case` belongs to T6a; `scope-disagreement` and `simulated-platform` are runtime checks
+reporting `…-unverified` rather than passing when their environment is absent.
 
-`uncertified-pass` is the rule that makes this pay for itself: **a boundary cannot say `passed`
-while either leg of its bar fails.** Scored at **ship time** — 4/20 for all three, the evidence
+`uncertified-pass` is the rule that makes this pay for itself: **a boundary cannot say `passed` while its
+**interval** leg fails.** The point leg is `unset` and does not participate (§4.1). Scored at **ship time** — 4/20 for all three, the evidence
 we actually had on 2026-09-20 — every one of them is refused by the interval leg: Wilson upper
 **0.416** (Clopper-Pearson 0.437) against a 0.30 bar. All three shipped anyway.
 
@@ -232,12 +235,18 @@ that is not.
 `two_sided_95_wilson_with_one_primary_case_per_independent_family` (`:247-249`) — the
 independence assumption is in the identifier, so it cannot be forgotten at read time. Our rows
 labelled 20 fires drawn from overlapping sessions and silently treated them as independent.
-`unstated-assumption` requires the method name to say what it assumes.
+`iid-unsupported` fires when `iid_claimed = true` while the rows share a session. **Note the
+departure from his design:** he encodes the assumption in a method *string*; we use a typed
+boolean, because pane 4 ruled the string is adopted on authority — a magic name is not checkable
+and ours would be a different family anyway.
 
 **3. Non-claims are load-bearing, validated fields.** His policy `status` must literally equal
 `frozen_contract_not_evidence` (`:195`), and ≥4 non-claims must contain the phrases *"not an
 evaluator"*, *"not a 300-family"*, *"synthetic"*, *"no live"* (`:197-200`). **The fixture cannot
-silently become a claim.** Our `missing-non-claims` requires ≥3, naming labeller count and
+silently become a claim.** We **refused** his phrase-matching: required phrases are gameable, and the example
+non-claims I wrote in v4 *were themselves the bypass* — an agent copies them verbatim and the
+check passes with nothing said. `missing-typed-caveat` instead requires typed fields
+(`labeller_count`, `rows_independent`, `live_measurement`), which name labeller count and
 independence — the two NO-CLAIMs we kept writing in prose and never enforced.
 
 **4. A frozen negative control that must be proven to lose.** `always_abstain` plus six
@@ -298,7 +307,8 @@ Method note, and it is the best illustration of why `rate.method` exists. Pane 3
 `1 − 0.025^(1/25) = 0.1372`. Wilson two-sided gives **0.1332**; CP **one-sided** gives
 **0.1129**. Three genuinely different numbers for one sample. The flag was right to fire and
 the number was not wrong — it was **underspecified**, which is precisely the defect
-`unstated-assumption` exists to catch.
+the typed `estimator`/`sides`/`conf` fields exist to catch — 0.137 is two-sided CP, 0.1332 is
+Wilson, 0.1129 is one-sided CP, and a bare "CP" names none of them.
 
 ---
 
@@ -349,13 +359,20 @@ explicitly is what stops them being dropped a second time.
 **T2 — Validator core.** `scripts/validate-evidence-matrix.py`, stdlib only. **Interpreter:
 `python3.12`** — verified present at `/opt/homebrew/bin/python3.12` (3.12.13); system `python3`
 is 3.9.6 with **no `tomllib`**, so the pin is load-bearing, exactly as he pins
-`nightly-2026-08-31`. Implements the **thirteen deterministic codes** of §4 (the sixteen minus `orphan-case`,
-which is T6a, and the two runtime checks): `boundary-coverage`,
-`authority-<field>`, `unresolved-evidence`, `missing-red-arm`, `unpersisted-rate`,
-`uncertified-pass`, `k-drift`, `uncovered-bead`. The remaining five — `orphan-case` (T6a),
-`scope-disagreement` (runtime), `unstated-assumption`, `missing-non-claims`, `control-not-beaten`
-— land in T6a and T3. *Depends:* T1; needs T5's file present to run green.
-*Acceptance:* each of the eight fires on a planted violation.
+`nightly-2026-08-31`.
+
+**Scope is defined by reference, never by a second list.** T2 implements **every code in the §4
+table except** `orphan-case` (which is T6a) and the two marked *runtime only*
+(`scope-disagreement`, `simulated-platform`). v5 said "eight", v7 said "thirteen", and both
+re-listed the codes by name — so when v7 replaced `unstated-assumption` and
+`missing-non-claims` with `iid-unsupported` and `missing-typed-caveat`, T2 kept naming the dead
+ones. **That is the sixth instance of one defect: a fact with two homes.** The list is deleted
+rather than corrected; §4's table is the only enumeration in this document, and any count stated
+anywhere else is a bug.
+
+*Depends:* T1; needs T5's file present to run green.
+*Acceptance:* every non-`orphan-case`, non-runtime code in §4 fires on a planted violation —
+count derived from the table at implementation time, not quoted here.
 *Rationale:* zero-dependency mirrors his choice and keeps the validator runnable in any pane.
 
 **T3 — RED arm per code.** Every check ships a planted-violation fixture.
@@ -438,8 +455,8 @@ guard fails when a figure and the matrix disagree.
 ## 6. Acceptance for the whole program
 
 - `python3.12 scripts/validate-evidence-matrix.py` exits 0 on a clean tree, and exits nonzero
-  with the correct code for each of the **sixteen** planted violations in §4 — one per code,
-  no more and no fewer, so the count cannot drift from the table again.
+  with the correct code for **each row of the §4 table** — one planted violation per code, the
+  set derived from the table at test-writing time and never transcribed.
 - Replaying 2026-09-20 through it **refuses all three ships**, and **refuses the three
   `ft-*` bind rows too — which is the correct outcome, because for a bind rate REFUSE *is* the
   kill.** v4.1's wording said the program "accepts the 0/25 kills", which reads as PASS and
