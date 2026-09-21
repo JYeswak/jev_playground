@@ -19,7 +19,7 @@ get built (AGENTS.md phase boundary).
 | 1 | `exposure-check` | R64, R65, R66, R14, R15 | **SHIPPED.** `scripts/exposure-check.sh` + RED arm, verified independently by pane 1: `unsafe` raw 855 → real 314, sessions 5.67%, VERDICT WALLPAPER. Would have killed the 818 in one command |
 | 2 | `consumer-check` | R63, R10 | **SHIPPED WITH A DEFECT.** `ee preflight` → ZERO CONSUMERS correctly, and it found a third `ee` caller nobody had. But `ee orient` **also** returns ZERO CONSUMERS and that is FALSE — the ambient extension invokes it from an args array, so the literal never appears. Under-detection **retires live wiring**, worse than the error it prevents. `ee orient` mandated as a RED arm |
 | 3 | proxy-vs-quantity guard | R2, R4, R26, R29, + 5 today | **CLOSED — UNDETECTABLE.** Proxies abundant (2,315 turns / 671 payloads + 10,982 harvest / 2,009 turns), bind **0/20 on all three**; the same shapes are used correctly far more often than not, so the defect is in the inference, not the text. **Review owns this class** |
-| 4 | Jev-necessity gate | R15, R19, + 3 killed seats | partial — the baseline test has ruled 4 times; `advisory-veto.mjs` never blocks; the earned seat's own interval is [0.118, 0.882] at n=6 |
+| 4 | Jev-necessity gate | R15, R19, + 3 killed seats | **SEAT RETIRED.** Low-noul veto cannot certify: WEAK bar (Wilson lower ≥ 0.50) is ∞ at 3/6; semantic stock is 6 and spent. Gate-as-process (baseline on identical rows) stays. Receipt: `docs/demos/upstream-repro/jev-seat-power-20260920.md` |
 | 5 | publish the arc | stage 5 has fired once | in progress |
 | **6** | **interval + power + family discipline** | **today's ships** | **NEW, from measurement.** See below |
 
@@ -102,14 +102,16 @@ a written refusal with the denominator. No third branch.
 killed model seats (harm-rule, tool-call judge, and the numeric half of triage).
 
 The test that has decided every Jev question correctly: **run the deterministic baseline on the
-same rows.** If a regex matches Jev, the paid call has not earned its seat. Applied honestly it
-also *earned* one — the low-noul veto survives at 3/6 on semantic rows where the baseline is
-structurally incapable, while its aggregate advantage was retracted at McNemar p=1.0.
+same rows.** If a regex matches Jev, the paid call has not earned its seat. The low-noul veto
+that looked like the remaining seat is **not certified**: preregistered WEAK bar (Wilson 95%
+lower ≥ 0.50) is unreachable at 3/6; exact McNemar on discordant pairs is p=1.0 aggregate /
+p=0.25 vs a structurally-zero baseline; semantic stock is 6 and spent. Receipt:
+`docs/demos/upstream-repro/jev-seat-power-20260920.md`.
 
 **Acceptance:** a gate that refuses a Jev integration proposal lacking (a) a deterministic
 baseline scored on identical rows, (b) a stated asymmetric-loss posture, (c) prevalence of the
-positive class. `work/jev-triage/advisory-veto.mjs` already exists and never blocks — it is the
-dogfood path that grows the semantic set past n=6 from real classes instead of authored ones.
+positive class. That gate does not require a certified model. `advisory-veto.mjs` may keep
+logging; logging is not a seat.
 
 ## 5. Publish the arc
 
