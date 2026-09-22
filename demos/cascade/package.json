@@ -1,0 +1,17 @@
+{
+  "name": "jev-cascade",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless extraction cascade. Escalates a field the verify battery calls wrong. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-cascade": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs",
+    "verify.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
