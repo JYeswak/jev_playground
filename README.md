@@ -4,6 +4,17 @@ An experimental lab for [Jev](https://docs.typesafe.ai). You ask a typed questio
 
 ![A typed judgment, not a paragraph](visual/hero.jpg)
 
+## The thing to run
+
+A message guard, riffed from the official cookbook. One command. No key. A refund passes, a jailbreak blocks, a dosage request goes to review, a crisis line goes to support.
+
+```bash
+node demos/guard/demo.mjs
+```
+
+The policy is [`demos/guard/policy.mjs`](demos/guard/policy.mjs). The questions and thresholds are the ones in [`docs-mirror/typesafe/cookbooks/llm_guardrails.md`](docs-mirror/typesafe/cookbooks/llm_guardrails.md). The default lane uses recorded assessments so the routing is visible without spending. `--live` calls Jev through `askJevBundle` and needs `TYPESAFE_API_KEY`.
+
+
 ## TL;DR
 
 Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
