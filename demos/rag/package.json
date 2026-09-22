@@ -1,0 +1,17 @@
+{
+  "name": "jev-rag",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless RAG passage filter. Keep or drop. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-rag": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs",
+    "fixture.json"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
