@@ -92,7 +92,7 @@ An entity alignment, riffed from the official cookbook. One command. No key. Ide
 node demos/entity/demo.mjs
 ```
 
-The score plus three Nouls are inline in [`demos/entity/demo.mjs`](demos/entity/demo.mjs) (one Score with three level-descriptions plus name/maker/style questions from [`docs-mirror/typesafe/cookbooks/entity_alignment.md`](docs-mirror/typesafe/cookbooks/entity_alignment.md); the nearest level names the outcome, no threshold constant). The default lane uses recorded answers so the routing is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture alignment is not a live match.
+The score plus three Nouls are inline in [`demos/entity/demo.mjs`](demos/entity/demo.mjs) (one Score with three level-descriptions plus name/maker/style questions from [`docs-mirror/typesafe/cookbooks/entity_alignment.md`](docs-mirror/typesafe/cookbooks/entity_alignment.md); the nearest level names the outcome, no threshold constant). The default lane uses recorded answers so the routing is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Four live bundles (`jev-1.13.0`) are in [`demos/entity/live-receipt.json`](demos/entity/live-receipt.json): same-pair asserted sameAs, diff-pair left unlinked, fruit-variant and style-words went to the curator queue. A fixture alignment is not a live match.
 
 A hierarchical classification, riffed from the official cookbook. One command. No key. Greedy takes the top child and cannot recover; beam search keeps two paths by geometric-mean probability and repairs the early mistake.
 
