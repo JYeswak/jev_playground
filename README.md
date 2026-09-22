@@ -44,7 +44,7 @@ A job router, riffed from Movez's Jev Engineering guide step 4. One command. No 
 node demos/chief/demo.mjs
 ```
 
-The choice and the confidence gate live in [`demos/chief/demo.mjs`](demos/chief/demo.mjs) (research/write/review classes, 0.85 gate, review fallback). The 0.85 bar is the guide author's number, not measured here. The default lane uses recorded verdicts so the routing is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. A fixture route is not a live handoff.
+The choice and the confidence gate live in [`demos/chief/demo.mjs`](demos/chief/demo.mjs) (research/write/review classes, 0.85 gate, review fallback). The 0.85 bar is the guide author's number, not measured here. The default lane uses recorded verdicts so the routing is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. Four live jobs (`jev-1.13.0`) are in [`demos/chief/live-receipt.json`](demos/chief/live-receipt.json): three agree with the fixture, vague-ask diverged (research live, review fixture), gate not retuned. A fixture route is not a live handoff.
 
 Instant context compaction, riffed from Movez's Jev Engineering guide step 5. One command. No key. A stale Glob is dropped with its result, a verbose Read keeps its call but loses its tail, failure evidence stays verbatim — nothing is summarized.
 
