@@ -156,7 +156,7 @@ Self-consistency over a borderline claim, riffed from the official cookbook. One
 node demos/consistency-noul/demo.mjs
 ```
 
-The review band is inline in [`demos/consistency-noul/demo.mjs`](demos/consistency-noul/demo.mjs) (no below 0.30, uncertain 0.30-0.70 inclusive, yes above, from [`docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md)). The default lane uses recorded nouls so the band is visible without spending. A fixture noul check is not a live probability.
+The review band is inline in [`demos/consistency-noul/demo.mjs`](demos/consistency-noul/demo.mjs) (no below 0.30, uncertain 0.30-0.70 inclusive, yes above, from [`docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md)). The default lane uses recorded nouls so the band is visible without spending. Three live bundles (`jev-1.13.0`) are in [`demos/consistency-noul/live-receipt.json`](demos/consistency-noul/live-receipt.json): 4 of 14 questions hold a non-uncertain plurality, uncertain band 0.30 to 0.70. A fixture noul check is not a live probability.
 
 Pre-parsed value extraction, riffed from the official cookbook. One command. No key. Regexes over-find the candidate spans, recorded picks choose the receipt address, the mobile, the total and the credit, and code copies each verbatim into a normalized form.
 
