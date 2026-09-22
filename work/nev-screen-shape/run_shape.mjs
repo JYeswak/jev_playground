@@ -9,9 +9,8 @@
  * re-run spends only on missing rows. Refuses without TYPESAFE_API_KEY.
  */
 import { readFileSync, appendFileSync, existsSync } from "node:fs";
-import { dirname, join } from "node:path";
+import jevScreenTool from "../../.omp/tools/jev-screen.ts";
 import { fileURLToPath } from "node:url";
-import jevScreenTool from "../.omp/tools/jev-screen.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const BENCH = "/Users/josh/Developer/jev/jev-sec-bench/results/injection.json";
