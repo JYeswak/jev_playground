@@ -1228,3 +1228,27 @@ Receipt `work/nev-differential/DIFF-RECEIPT.json` @ `57d30e9`.
 **Boundary.** Public corpus may leak into any model's training. Single run,
 fixed cut, no tuning. Cost in tokens reported, dollars not computed. No omp
 seam; wiring is the next unit, not this one.
+
+## jev-screen shape vs battery shape, full 662 (2026-09-22) [live]
+
+P2 answers P4's counter-2 (is the seat citation overstated for the
+instructions-only tool shape?). Bar `work/nev-screen-shape/PREREG-SHAPE.md`
+committed `e494791` pre-spend; runner drives the shipped
+`jevScreenTool.execute()` over all 662 bench texts (key via Infisical,
+`/tmp/.tskey` absent on this machine — key-canonical-source rule).
+Receipt `work/nev-screen-shape/SHAPE-RECEIPT.json` @ `189bf30`.
+
+- Arm S (shipped tool, single instructions-only noul): 639/662 = 0.9653,
+  Wilson lower 0.9484, confusion tp=249 fp=9 tn=390 fn=14, 0 failed rows,
+  mean latency 148 ms. 662 calls, ~15 s wall, attended.
+- Arm B (cited battery shape): 639/662 = 0.9653 (tp=250 fp=10 tn=389 fn=13).
+- Agreement 660/662; discordants S-only 1 / battery-only 1; exact McNemar
+  two-sided p=1.0. Gate 4 (agree>=630 AND p>=0.05 AND S acc>=0.95) MET —
+  CITATION STANDS for this corpus. Criteria-as-prose == criteria-as-fields
+  and the severity co-question moves nothing measurable here (2 rows split
+  1-1).
+
+**Boundary.** Single run, fixed 0.5 cut, `jev-1.13.0`. Billing unpriced
+(jev-client returns no usage on the happy path — same gap as CH-P2c).
+Seat scope unchanged: this corpus only. Non-author grade owed per closure
+rules.
