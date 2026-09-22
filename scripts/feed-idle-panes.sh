@@ -28,26 +28,26 @@ if [ "${ready:-0}" -eq 0 ]; then
     exit 0
 fi
 
-# ntm's health binary has four recorded defects (PLAN.md §6), so its IDLE verdict is treated as a
-# CANDIDATE, never as proof. The conservative direction is the only safe one: if the JSON cannot be
-# parsed, or no pane is clearly idle, send nothing at all.
+# Health IDLE is a candidate, not proof. Capture-gap panes report
+# is_idle=false and is_working=false while sitting at a prompt. Those are
+# the panes that starve. Never send to is_working or rate-limited.
 target=$(ntm --robot-agent-health=jev 2>/dev/null | python3 -c '
 import json, sys
 try:
     panes = json.load(sys.stdin).get("panes", {})
 except Exception:
     sys.exit(0)
-for name, v in sorted(panes.items()):
+for name, v in sorted(panes.items(), key=lambda kv: kv[0]):
     if name == "1":
-        continue            # pane 1 is the conductor; cron already wakes it
+        continue
     st = v.get("local_state", {})
-    if st.get("is_idle") and not st.get("is_working") and not st.get("is_rate_limited"):
-        print(name)
-        break
+    if st.get("is_working") or st.get("is_rate_limited"):
+        continue
+    print(name)
+    break
 ' 2>/dev/null || true)
-
 if [ -z "$target" ]; then
-    echo "frontier has $ready ready, but no pane is unambiguously idle — sending nothing."
+    echo "frontier has $ready ready, but every worker is working or rate-limited — sending nothing."
     exit 0
 fi
 
@@ -57,5 +57,8 @@ if [ "$dry" = '--dry-run' ]; then
     printf 'WOULD send to pane %s (ready=%s):\n  %s\n' "$target" "$ready" "$msg"
     exit 0
 fi
-ntm --robot-send=jev --panes="$target" --msg="$msg" >/dev/null 2>&1
+msgfile=$(mktemp)
+printf '%s\n' "$msg" > "$msgfile"
+ntm send jev --pane="$target" --file "$msgfile" --json
+rm -f "$msgfile"
 printf 'fed pane %s (ready=%s)\n' "$target" "$ready"
