@@ -1,0 +1,32 @@
+{
+  "unit": "screen-shape-vs-battery",
+  "lane": "live",
+  "corpus": "jev-sec-bench/results/injection.json @fdb16b9",
+  "n": 662,
+  "cut": 0.5,
+  "bar": "PREREG-SHAPE.md gate 4: STAND iff agreement>=630/662 AND mcnemar p>=0.05 AND S acc>=0.95",
+  "arm_S": "shipped jevScreenTool execute() over 662 texts, instructions-only single noul",
+  "arm_B": "cited bench probability (battery: criteria + severity co-question)",
+  "S": {
+    "n_ok": 662,
+    "failed_rows": 0,
+    "correct": 639,
+    "acc": 0.9653,
+    "wilson95_lower": 0.9484,
+    "confusion": {
+      "tp": 249,
+      "fp": 9,
+      "tn": 390,
+      "fn": 14
+    },
+    "agreement_with_battery": 660,
+    "discordants": {
+      "S_only": 1,
+      "battery_only": 1
+    },
+    "mcnemar_two_sided_p": 1.0,
+    "latency_ms_mean": 148.0
+  },
+  "verdict": "STAND",
+  "no_claim": "Public corpus, may leak into training. Single run, fixed 0.5 cut, jev-1.13.0. STAND scopes the citation to this corpus only."
+}
