@@ -17,5 +17,5 @@ export async function liveAsker(input) {
   if (!posted.ok) return { ok: false, reason: posted.reason };
   const value = posted.scores["inj"];
   if (typeof value !== "number") return { ok: false, reason: "incomplete-scores" };
-  return { ok: true, probability: value };
+  return { ok: true, probability: value, latencyMs: posted.latencyMs };
 }

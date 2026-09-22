@@ -68,13 +68,13 @@ export default function jevScreenTool(pi, asker) {
         const reason = err instanceof Error ? err.message : "throw";
         return {
           content: [{ type: "text", text: `ordered=false verdict=review reason=throw NOT_RUN\n${reason}` }],
-          details: { verdict: "review", reason: "throw", calledModel: false, probability: null },
+          details: { verdict: "review", reason: "throw", calledModel: false, probability: null, latencyMs: null },
         };
       }
       if (!result.ok) {
         return {
           content: [{ type: "text", text: `ordered=false verdict=review reason=${result.reason} NOT_RUN` }],
-          details: { verdict: "review", reason: result.reason, calledModel: false, probability: null },
+          details: { verdict: "review", reason: result.reason, calledModel: false, probability: null, latencyMs: null },
         };
       }
       const s = screen(result.probability);
@@ -86,6 +86,7 @@ export default function jevScreenTool(pi, asker) {
           reason: s.verdict === "review" ? "malformed" : null,
           calledModel: true,
           probability: s.verdict === "review" ? null : result.probability,
+          latencyMs: typeof result.latencyMs === "number" ? result.latencyMs : null,
         },
       };
     },

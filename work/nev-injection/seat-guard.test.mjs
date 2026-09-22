@@ -82,3 +82,15 @@ test('screen() pure thresholds', () => {
   assert.equal(screen('0.9').verdict, 'review');
   assert.equal(screen(undefined).verdict, 'review');
 });
+
+test('latencyMs propagates when present, null otherwise', async () => {
+  const timed = factory(pi, async () => ({ ok: true, probability: 0.9, latencyMs: 418 }));
+  const r1 = await timed.execute('l', { text: HOSTILE });
+  assert.equal(r1.details.latencyMs, 418);
+  const untimed = factory(pi, async () => ({ ok: true, probability: 0.9 }));
+  const r2 = await untimed.execute('l', { text: HOSTILE });
+  assert.equal(r2.details.latencyMs, null);
+  const failed = factory(pi, async () => ({ ok: false, reason: 'unconfigured' }));
+  const r3 = await failed.execute('l', { text: HOSTILE });
+  assert.equal(r3.details.latencyMs, null);
+});
