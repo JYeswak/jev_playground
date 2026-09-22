@@ -76,7 +76,7 @@ A passage re-rank, riffed from the official cookbook. One command. No key. A wor
 node demos/rerank/demo.mjs
 ```
 
-The shortlist and the per-pair scores are inline in [`demos/rerank/demo.mjs`](demos/rerank/demo.mjs) (the shortlist-then-Noul shape from [`docs-mirror/typesafe/cookbooks/rerank_typesafe.md`](docs-mirror/typesafe/cookbooks/rerank_typesafe.md)). The default lane uses recorded nouls so the reorder is visible without spending. `--live` scores through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture ranking is not a live search score.
+The shortlist and the per-pair scores are inline in [`demos/rerank/demo.mjs`](demos/rerank/demo.mjs) (the shortlist-then-Noul shape from [`docs-mirror/typesafe/cookbooks/rerank_typesafe.md`](docs-mirror/typesafe/cookbooks/rerank_typesafe.md)). The default lane uses recorded nouls so the reorder is visible without spending. `--live` scores through `askJevBundle` and needs `TYPESAFE_API_KEY`. Ten live pair calls (`jev-1.13.0`) are in [`demos/rerank/live-receipt.json`](demos/rerank/live-receipt.json): both queries ranked the wanted document first. A fixture ranking is not a live search score.
 
 A date extraction, riffed from the official cookbook. One command. No key. Six short documents resolve to calendar dates, a missing date stays empty, and anything under confidence 0.60 goes to review.
 
