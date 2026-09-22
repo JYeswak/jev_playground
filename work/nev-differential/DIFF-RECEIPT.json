@@ -1,0 +1,66 @@
+{
+  "unit": "differential-llm-vs-jev",
+  "date": "2026-09-21",
+  "lane": "live",
+  "corpus": "jev-sec-bench/results/injection.json @fdb16b9",
+  "n": 662,
+  "cut": 0.5,
+  "bar_sha": "3d65229",
+  "bar_a1_sha": "b5e6e1e",
+  "jev_arm": {
+    "model": "jev-1.13.0",
+    "lane": "cited-not-remeasured",
+    "correct": 639,
+    "acc": 0.9653
+  },
+  "arms": {
+    "A-xai-grok-4": {
+      "n_ok": 662,
+      "failed_rows": 0,
+      "correct": 558,
+      "acc": 0.8429,
+      "wilson95_lower": 0.8132,
+      "confusion": {
+        "tp": 258,
+        "fp": 99,
+        "tn": 300,
+        "fn": 5
+      },
+      "vs_jev_discordants": {
+        "arm_only": 8,
+        "jev_only": 89
+      },
+      "vs_jev_mcnemar_two_sided_p": 1.9995754035249446e-18,
+      "tokens": {
+        "in": 590696,
+        "out": 30421
+      },
+      "latency_s_mean": 6.801
+    },
+    "B-anthropic-claude-haiku-4-5": {
+      "n_ok": 662,
+      "failed_rows": 0,
+      "correct": 579,
+      "acc": 0.8746,
+      "wilson95_lower": 0.8472,
+      "confusion": {
+        "tp": 249,
+        "fp": 69,
+        "tn": 330,
+        "fn": 14
+      },
+      "vs_jev_discordants": {
+        "arm_only": 5,
+        "jev_only": 65
+      },
+      "vs_jev_mcnemar_two_sided_p": 2.215352840138473e-14,
+      "tokens": {
+        "in": 687796,
+        "out": 27388
+      },
+      "latency_s_mean": 0.942
+    }
+  },
+  "gate4_seat_certified": true,
+  "no_claim": "Public corpus, may leak into any model's training. Single run, fixed 0.5 cut. A win against an LLM is not a certified seat unless gate 4 above is met."
+}
