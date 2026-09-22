@@ -148,7 +148,7 @@ Self-consistency over a borderline post, riffed from the official cookbook. One 
 node demos/consistency/demo.mjs
 ```
 
-The gate is inline in [`demos/consistency/demo.mjs`](demos/consistency/demo.mjs) (argmax with abstain below 0.60 from [`docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md)). The default lane uses recorded distributions so the wobble is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture consistency check is not a live agreement score.
+The gate is inline in [`demos/consistency/demo.mjs`](demos/consistency/demo.mjs) (argmax with abstain below 0.60 from [`docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md)). The default lane uses recorded distributions so the wobble is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Three live bundles (`jev-1.13.0`) are in [`demos/consistency/live-receipt.json`](demos/consistency/live-receipt.json): 8 of 8 questions hold a gated plurality, gate 0.60 is the cookbook's number. A fixture consistency check is not a live agreement score.
 
 Self-consistency over a borderline claim, riffed from the official cookbook. One command. No key. Fourteen Nouls repeat five times; `covered` crosses 0.50 yet never leaves review, while two questions each flip once at an outer edge.
 
