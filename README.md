@@ -22,6 +22,14 @@ node demos/rag/demo.mjs
 
 The policy is inline in [`demos/rag/demo.mjs`](demos/rag/demo.mjs) (thresholds + first-match `route()`). The questions and recorded assessments are the ones in [`docs-mirror/typesafe/cookbooks/classifying_rag_passages.md`](docs-mirror/typesafe/cookbooks/classifying_rag_passages.md). The default lane uses recorded assessments so the routing is visible without spending. `--live` scores through `askJevBundle` and needs `TYPESAFE_API_KEY`.
 
+A citation check, riffed from the official cookbook. One command. No key. A supported claim stands, a contradicted or unsupported one goes to review, a fabricated quote is dropped.
+
+```bash
+node demos/citation/demo.mjs
+```
+
+The verdicts are inline in [`demos/citation/demo.mjs`](demos/citation/demo.mjs) (string-match locate, then the Choice from [`docs-mirror/typesafe/cookbooks/citation_check.md`](docs-mirror/typesafe/cookbooks/citation_check.md) with the 0.8 stand-or-review gate). The default lane uses recorded relations so the check is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. Fixture labels are not a live citation score.
+
 ## TL;DR
 
 Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
