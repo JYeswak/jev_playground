@@ -1,0 +1,16 @@
+{
+  "name": "jev-hierarchy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless hierarchical classifier. Greedy versus beam over a small tree. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-hierarchy": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
