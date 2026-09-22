@@ -1,0 +1,16 @@
+{
+  "name": "jev-chief",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless job router. Research, write, or review. Low confidence goes to review. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-chief": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}

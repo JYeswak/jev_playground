@@ -13,7 +13,8 @@ mkdir -p /tmp/jev-guard && npm install --prefix /tmp/jev-guard "$PWD/demos/guard
 /tmp/jev-guard/node_modules/.bin/jev-guard
 ```
 
-The package is private. It is not on the npm registry.
+The package is private. It is not on the npm registry. `jev-chief` installs the same way from `demos/chief`. Private. Not on the registry.
+
 
 
 ```bash
