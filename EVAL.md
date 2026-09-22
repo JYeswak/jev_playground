@@ -1252,3 +1252,21 @@ Receipt `work/nev-screen-shape/SHAPE-RECEIPT.json` @ `189bf30`.
 (jev-client returns no usage on the happy path — same gap as CH-P2c).
 Seat scope unchanged: this corpus only. Non-author grade owed per closure
 rules.
+
+## jev-screen L2 listed + L3 fires, both directions (2026-09-22) [live keyless + offline]
+
+L2 (`61f8fc0`): extension `.omp/extensions/jev-screen.ts` registered via
+`.omp/config.yml` project scope; headless `omp --mode=rpc get_state`
+shows `xd://jev_screen_ext_probe` in `data.systemPrompt[0]` by default,
+absent under `--no-extensions`, nonce absent. `dumpTools` (11 built-ins)
+confirmed blind to extension tools — not used as oracle. Zero model calls.
+L3 (`65e34df`): D1 real muse session via host-tool data path (inline hostile
+died in harness safety filter first — recorded): `tool_execution_end`
+`ordered=false verdict=review reason=unconfigured NOT_RUN`,
+`calledModel=false`, 90 frames, served 1. D2 loaded tool + injected asker
+p=0.97: FLAG, fetch armed to throw, keys deleted. Zero live Jev calls.
+Provisional L4 separately at `31c2eda` (3 keyed calls, flag + 2xpass-silent).
+
+**Boundary.** NOT re-run: the RPC sessions, the driver model calls, the L4
+keyed calls. Listed is not firing; L3 is not L4; seat is this corpus only.
+Closes `jev-xio`.
