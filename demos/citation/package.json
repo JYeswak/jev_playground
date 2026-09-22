@@ -1,0 +1,16 @@
+{
+  "name": "jev-citation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless citation check. Supports, contradicts, or missing from the source. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-citation": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
