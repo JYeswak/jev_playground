@@ -30,6 +30,22 @@ node demos/citation/demo.mjs
 
 The verdicts are inline in [`demos/citation/demo.mjs`](demos/citation/demo.mjs) (string-match locate, then the Choice from [`docs-mirror/typesafe/cookbooks/citation_check.md`](docs-mirror/typesafe/cookbooks/citation_check.md) with the 0.8 stand-or-review gate). The default lane uses recorded relations so the check is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. Fixture labels are not a live citation score.
 
+A skill suggestion, riffed from the official cookbook. One command. No key. Two tasks get a skill, the third gets nothing — abstention is first-class.
+
+```bash
+node demos/skill-suggest/demo.mjs
+```
+
+The two-stage suggest with its gate lives in [`demos/skill-suggest/suggest.mjs`](demos/skill-suggest/suggest.mjs), following [`docs-mirror/typesafe/cookbooks/skill_suggestion.md`](docs-mirror/typesafe/cookbooks/skill_suggestion.md) (rank the roster, verify the top three, suggest nothing below gate). The default lane uses fixture overlap scores so the shape is visible without spending. Fixture suggestions are not a live ranking.
+
+A skill suggestion, riffed from the official cookbook. One command. No key. A fixture roster stands in for the skill catalog, and recorded overlap scores stand in for the two TypeSafe calls.
+
+```bash
+node demos/skill-suggest/demo.mjs
+```
+
+The roster and scores are inline in [`demos/skill-suggest/demo.mjs`](demos/skill-suggest/demo.mjs) (the rank-then-verify shape from [`docs-mirror/typesafe/cookbooks/skill_suggestion.md`](docs-mirror/typesafe/cookbooks/skill_suggestion.md)). Nothing here calls Jev; fixture suggestions are not a live ranking.
+
 ## TL;DR
 
 Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
