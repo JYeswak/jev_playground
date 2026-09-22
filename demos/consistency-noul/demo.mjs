@@ -9,8 +9,8 @@
 // `no`, above 0.70 is `yes`, both boundaries inclusive `uncertain` and routed
 // to human review — application logic over the returned probability, no new
 // question, no second call).
-//
-// NO-CLAIM: a fixture noul check is not a live probability.
+// `node demos/consistency-noul/demo.mjs --live` repeats the 14-Noul battery
+// through work/jev-client, model jev-1.13.0.
 
 const LOW = 0.30;
 const HIGH = 0.70;
@@ -108,8 +108,8 @@ function run(repeats) {
   });
 }
 
-function show(rows) {
-  console.log(`consistency-noul demo [fixture — recorded nouls, no key, no network] — 14 Nouls x ${REPEATS.length} repeats, band ${LOW.toFixed(2)}-${HIGH.toFixed(2)}\n`);
+function show(rows, lane) {
+  console.log(`consistency-noul demo [${lane}] — 14 Nouls x ${rows[0].nouls.length} repeats, band ${LOW.toFixed(2)}-${HIGH.toFixed(2)}\n`);
   console.log(`${'question'.padEnd(16)}${'nouls'.padEnd(36)}${'decisions'.padEnd(52)}plurality  agree`);
   for (const r of rows) {
     console.log(
@@ -128,6 +128,43 @@ function check(rows) {
   }
 }
 
-const rows = run(REPEATS);
-check(rows);
-show(rows);
+const live = process.argv.includes('--live');
+if (!live) {
+  const rows = run(REPEATS);
+  check(rows);
+  show(rows, 'fixture — recorded nouls, no key, no network');
+  process.exit(0);
+}
+
+const { askJevBundle } = await import('../../work/jev-client/src/index.ts');
+const NOUL_QUESTIONS = Object.fromEntries(
+  Object.entries(QUESTIONS).map(([key, instructions]) => [key, { type: 'noul', instructions }]),
+);
+const liveRepeats = [];
+for (let i = 0; i < 3; i++) {
+  const r = await askJevBundle({
+    state: { claim_id: 'CLM-55029', uid: `consistency-noul-demo-${Date.now()}-${i}` },
+    questions: NOUL_QUESTIONS,
+    model: 'jev-1.13.0',
+    timeoutMs: 20000,
+  });
+  if (!r.ok) {
+    if (r.reason === 'unconfigured') {
+      console.log('live lane: NOT_RUN — TYPESAFE_API_KEY is not set (see .env.example)');
+      process.exit(0);
+    }
+    console.error(`live call failed: ${r.reason} ${r.error}`);
+    process.exit(1);
+  }
+  const dist = {};
+  for (const key of Object.keys(QUESTIONS)) {
+    const a = r.answers[key];
+    if (!a || typeof a.noul !== 'number') {
+      console.error(`live call malformed: answer ${key} has no noul`);
+      process.exit(1);
+    }
+    dist[key] = a.noul;
+  }
+  liveRepeats.push(dist);
+}
+show(run(liveRepeats), 'live');
