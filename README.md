@@ -36,7 +36,7 @@ A skill suggestion, riffed from the official cookbook. One command. No key. Two 
 node demos/skill-suggest/demo.mjs
 ```
 
-The two-stage suggest with its gate lives in [`demos/skill-suggest/suggest.mjs`](demos/skill-suggest/suggest.mjs), following [`docs-mirror/typesafe/cookbooks/skill_suggestion.md`](docs-mirror/typesafe/cookbooks/skill_suggestion.md) (rank the roster, verify the top three, suggest nothing below gate). The default lane uses fixture overlap scores so the shape is visible without spending. Fixture suggestions are not a live ranking.
+The two-stage suggest with its gate lives in [`demos/skill-suggest/suggest.mjs`](demos/skill-suggest/suggest.mjs), following [`docs-mirror/typesafe/cookbooks/skill_suggestion.md`](docs-mirror/typesafe/cookbooks/skill_suggestion.md) (rank the roster, verify the top three, suggest nothing below gate). The default lane uses fixture overlap scores so the shape is visible without spending. Six live calls (`jev-1.13.0`) are in [`demos/skill-suggest/live-receipt.json`](demos/skill-suggest/live-receipt.json): music-video and screencast-redact suggested, mastodon abstained, same three outcomes as the fixture. Fixture suggestions are not a live ranking.
 
 A job router, riffed from Movez's Jev Engineering guide step 4. One command. No key. A confident pick goes to research or write; anything unsure goes to review, never to a worker.
 
