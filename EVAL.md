@@ -1284,3 +1284,23 @@ with residual — per-call latency/tokens not propagated by the tool
 
 **Boundary.** One session, three calls, one model version. Provisional only:
 not fleet proof, not healthy-traffic silence at scale. Billing unpriced.
+
+## foundation calibration transport onto vendored SDK (2026-09-22) [live]
+
+P2 `jev-cp2` file 2 (`measure-framing-flip.mjs` verified already routed,
+zero fetch matches). `run_calibration.py` urllib wire replaced by
+`typesafe_sdk` (`TypeSafeClient`, `Noul`/`Choice` builders, `RetryPolicy`
+mirroring MAX_RETRIES=2) at `81a1daa`; metrics, bins, sweeps, receipt
+schema untouched; model default pinned `jev-latest` → `jev-1.13.0`.
+Bar `foundation/PREREG-CALIB-SDK.md` @ `e66058b` pre-spend. Migrated run
+`foundation/runs/20260922T020843Z.json`: 80/80 rows, 0 errors, ECE 0.0607,
+Brier 0.0188, choice 19/20, thresholds ≥0.75 → 1.0 at 95% coverage.
+Agreement vs cited `20260917T224444Z` receipt: 80/80 same verdict class,
+fixture sha identical — the wire was NOT shaping results (AGREE).
+Gate 20 freshness green on the new receipt; gates aggregate red only on
+pre-existing unrelated stages (70 registry drift ×3, 80 lane-status arm).
+Runner now requires the SDK clone venv python; `attempts` is SDK-opaque
+(1 success, policy max+1 by construction on error).
+
+**Boundary.** Single run, one SDK pin (`0ffd094`), one model id. Billing
+unpriced. Non-author grade owed.
