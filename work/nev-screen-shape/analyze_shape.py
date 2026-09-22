@@ -13,7 +13,9 @@ import os
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-JEV_SRC = "/Users/josh/Developer/jev/jev-sec-bench/results/injection.json"
+JEV_SRC = os.path.normpath(
+    os.path.join(HERE, "..", "..", "jev-sec-bench", "results", "injection.json")
+)
 ROWS = os.path.join(HERE, "rows-S-screen.jsonl")
 CUT = 0.5
 AGREE_BAR = 630
@@ -49,6 +51,9 @@ def main():
         bench[f"inj-{i:04d}"] = {"label": int(s["label"]), "p": float(s["probability"])}
 
     rec = {}
+    if not os.path.exists(ROWS):
+        print("SHORT: 0/662 (no rows file)")
+        return 2
     with open(ROWS) as f:
         for line in f:
             line = line.strip()
