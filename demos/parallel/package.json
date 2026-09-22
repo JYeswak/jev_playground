@@ -1,0 +1,17 @@
+{
+  "name": "jev-parallel",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless parallel briefing. Four questions, one request, printed together. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-parallel": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs",
+    "brief.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
