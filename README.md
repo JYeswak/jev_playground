@@ -38,13 +38,13 @@ node demos/skill-suggest/demo.mjs
 
 The two-stage suggest with its gate lives in [`demos/skill-suggest/suggest.mjs`](demos/skill-suggest/suggest.mjs), following [`docs-mirror/typesafe/cookbooks/skill_suggestion.md`](docs-mirror/typesafe/cookbooks/skill_suggestion.md) (rank the roster, verify the top three, suggest nothing below gate). The default lane uses fixture overlap scores so the shape is visible without spending. Fixture suggestions are not a live ranking.
 
-A skill suggestion, riffed from the official cookbook. One command. No key. A fixture roster stands in for the skill catalog, and recorded overlap scores stand in for the two TypeSafe calls.
+A passage re-rank, riffed from the official cookbook. One command. No key. A word-overlap shortlist misorders both queries; recorded nouls put the right passage first.
 
 ```bash
-node demos/skill-suggest/demo.mjs
+node demos/rerank/demo.mjs
 ```
 
-The roster and scores are inline in [`demos/skill-suggest/demo.mjs`](demos/skill-suggest/demo.mjs) (the rank-then-verify shape from [`docs-mirror/typesafe/cookbooks/skill_suggestion.md`](docs-mirror/typesafe/cookbooks/skill_suggestion.md)). Nothing here calls Jev; fixture suggestions are not a live ranking.
+The shortlist and the per-pair scores are inline in [`demos/rerank/demo.mjs`](demos/rerank/demo.mjs) (the shortlist-then-Noul shape from [`docs-mirror/typesafe/cookbooks/rerank_typesafe.md`](docs-mirror/typesafe/cookbooks/rerank_typesafe.md)). The default lane uses recorded nouls so the reorder is visible without spending. `--live` scores through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture ranking is not a live search score.
 
 ## TL;DR
 
