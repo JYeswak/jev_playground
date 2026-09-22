@@ -66,3 +66,16 @@ Both corpora are public and may have leaked into any model's training (bench
 README caveats). Single run, fixed 0.5 cut, one adapter/SDK pair. A PASS
 certifies this seat only (prompt-injection guard on this corpus), never Jev
 in general. A win against an LLM is not a certified seat until THIS bar says so.
+
+## Amendment A1 (committed before any xAI call; OpenAI evidence already on disk)
+
+- Arm A as written (`openai`/`gpt-4o-mini`) FAILED every attempt with
+  TypeSafeAuthenticationError 401 (2/2 smoke, deterministic, not transient):
+  the Infisical OPENAI_API_KEY is rejected by api.openai.com. Evidence:
+  `rows-A-openai-gpt-4o-mini.jsonl` error rows, committed with the receipt.
+- Substitute Arm A → `AsyncOpenAIProvider("grok-4",
+  base_url="https://api.x.ai/v1", api_key=XAI_API_KEY)` — the vendor README's
+  own documented custom-endpoint shape, same adapter, same state, same
+  battery, same 0.5 cut, same failure rule. Arm renamed `A-xai-grok-4`.
+- Bar gates unchanged; gate 3 pairs Jev-vs-grok-4 and Jev-vs-haiku. The dead
+  OpenAI arm is reported INVALID (credential), never silently dropped.
