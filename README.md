@@ -1,115 +1,28 @@
 # jev_playground
 
-Measure Jev on a question you already have, with the official SDK, before you build a product on the answer.
+An experimental lab for [Jev](https://docs.typesafe.ai). You ask a typed question. You get a number. You decide, in code, what that number is allowed to do.
 
-![What a typed judgment looks like](visual/hero.jpg)
+![A typed judgment, not a paragraph](visual/hero.jpg)
 
 ## TL;DR
 
-Jev does not write text. It scores a state against questions you define and returns numbers your code can branch on. This repo is the harness we use to decide which of those numbers are worth wiring into a tool.
+Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
 
-**The problem.** A chat model will answer anything. A typed judge is only useful when the question, the cut, and the comparator are fixed before you spend, and when a stranger can re-score the result with no key.
-
-**The solution.** Official TypeSafe SDK for every live call. Injected asker for every test. A bar written before the first request. An incumbent model on the same state, not only a regex.
-
-| Use Jev when | Use something else when |
+| If you want | Run |
 |---|---|
-| The label is not a function of the literal tokens | A regex or a trained classifier already wins on that distribution |
-| You need a probability you can threshold | You need prose, a summary, or a rewrite |
-| Cold start or distribution shift, where a label-trained baseline collapses | In-distribution spam or harm, where the baseline already holds |
-| You can name the corpus the number applies to | You would have to say "Jev works" with no N |
-
-## What we are testing
-
-Three question types, one request, same state:
-
-| Question | Returns | Branch on |
-|---|---|---|
-| **Noul** | probability the statement is true | a fixed cut, never a tuned one |
-| **Choice** | one label plus a distribution | the label only if it is in the option set |
-| **Score** | a rubric level plus a distribution | the level only if every probability is finite |
-
-The interesting code is the policy around the answer: the cut, the fail-safe side, and what happens when the response is malformed.
-
-## How we test
-
-1. **Read the vendor docs from disk** before inventing a question. `./scripts/sync-docs.sh --check` proves the mirror.
-2. **Call through the SDK.** `work/jev-client` is the only sanctioned caller: `TypeSafeClient.systemOne`. No hand-rolled POST.
-3. **Inject the transport.** Offline tests pass a fake asker. A missing key returns `unconfigured`, never a score.
-4. **Write the bar first.** Accuracy, comparator, and the certify rule go in a file before the first live call.
-5. **Compare to an incumbent.** An LLM on the same state and the same questions. A regex is a floor, not the product test.
-6. **Re-score offline.** The live rows stay on disk. A second person runs the analyzer with no key and gets the same verdict.
-
-```bash
-# no key, no network — the injection policy
-node --test work/nev-injection/seat-guard.test.mjs
-
-# no key — re-score the committed incumbent comparison
-python3 work/nev-differential/analyze_diff.py
-
-# no key — five questions from committed bytes
-bash scripts/quickstart.sh
-```
-
-## What the measurements say
-
-Numbers below are what the cited file contains. Re-run the command. Do not quote them from this page if the file has moved.
-
-**Prompt injection, one corpus.** On `jev-sec-bench` injection rows (n=662, cut 0.5, model `jev-1.13.0`, cited not re-measured): Jev 639/662 (0.9653). Same questions through the official adapter: grok-4 558/662 (0.8429), Claude Haiku 4.5 579/662 (0.8746). Discordant pairs 8/89 and 5/65. The pre-registered rule certifies this seat on this corpus only.
-
-```bash
-python3 work/nev-differential/analyze_diff.py
-```
-
-Receipt: [`work/nev-differential/DIFF-RECEIPT.json`](work/nev-differential/DIFF-RECEIPT.json). Public corpus, single run, fixed cut. A win here is not a certificate for Jev in general.
-
-**Calibration, one labelled set.** Held-out fixture, N=80, pinned model: ECE 0.0614, Brier 0.0195, choice 19/20. Receipt: [`foundation/runs/20260922T021352Z.json`](foundation/runs/20260922T021352Z.json).
-
-**Tool-call harm is not a Jev seat.** A small classifier beats a live judge on that surface. Ship the classifier. The verify command is `node work/omp-harm-rule/verify-claim.mjs`.
-
-## Tips
-
-Practices that keep a measurement citeable.
-
-- **Pin `jev-1.13.0`.** `jev-latest` moves. A number without a model id is unciteable next week.
-- **Use the SDK retry, and default it off** when you need one attempt per row. A hand-rolled retry loop double-counts failures and hides `Retry-After`.
-- **Give Jev the measurement.** If the state omits the usage shape, the verdict tracks the question wording instead of the evidence. Run the withheld-state control: `node scripts/measure-framing-flip.mjs` only when you mean to spend.
-- **Strip rationale out of criteria.** A criterion that explains why an option is right teaches the answer.
-- **Malformed means review.** A missing field, a non-finite probability, or a thrown client is `review`, never `pass` and never `verified`.
-- **Ten calls, not one.** A single latency or a single probability is a smoke call. The A/B harness refuses a relative verdict under ten zero-spread samples.
-- **A suite that passes a coin-flip judge tested the plumbing.** Score Jev against a label it did not supply, or you learned nothing.
-- **Name the corpus in the same sentence as the accuracy.** 96.5% on this injection file is not 96.5% on your traffic.
-- **Reserve the safe side.** Unknown answer keeps the message. Low confidence does not act. Insufficient context is `applicable: false`, not a fabricated score.
-- **Do not patch an upstream clone to make a demo pass.** Wrap it, or drop the demo.
-
-## Scripts you can run
-
-No API key unless the row says otherwise.
-
-| Command | What you get |
-|---|---|
-| `bash scripts/quickstart.sh` | Five answers from committed bytes. Add `--mine` to point the same tools at your logs. |
-| `node --test work/nev-injection/seat-guard.test.mjs` | Planted hostile flags, planted benign passes, malformed reviews. |
-| `python3 work/nev-differential/analyze_diff.py` | Re-scores the injection comparison. Exit 0 when both arms are complete. |
-| `node scripts/jev-probe.mjs --replay docs/demos/jev-probe/probe-response-20260918.json` | A recorded judgment, decoded. Omit `--replay` only when you intend a live call. |
-| `./scripts/sync-docs.sh --check` | Byte-identity of the vendored TypeSafe docs. |
-| `bash scripts/vgrep.sh` | A grep used as proof must match at least one line. Silence is not a clean result. |
-| `bash foundation/gates.sh` | The local gate ladder, including the planted-defect selftests. |
-
-The caller to copy is [`work/jev-client`](work/jev-client/README.md): `askJev`, `askJevChoice`, `askJevScore`, `askJevBundle`. Missing key returns `unconfigured`.
-
-The screen to copy is [`.omp/tools/jev-screen.ts`](.omp/tools/jev-screen.ts): flag at p≥0.5, pass below, review on anything else. It does not block by itself. The caller branches.
+| A tour with no key | `bash scripts/quickstart.sh` |
+| The injection result, re-scored | `python3 work/nev-differential/analyze_diff.py` |
+| The policy, with a fake model | `node --test work/nev-injection/seat-guard.test.mjs` |
+| A caller that fails closed | [`work/jev-client`](work/jev-client/README.md) |
 
 ## Installation
-
-Clone the repo. Node 20 or newer for the keyless tests. Python 3 for the injection re-score. No package install for the three commands below.
 
 ```bash
 git clone https://github.com/JYeswak/jev_playground.git
 cd jev_playground
 ```
 
-A live call is optional. Set `TYPESAFE_API_KEY` in the environment from a file outside the tree. Do not echo it. Do not commit a response that contains someone else's state.
+Node 20 or newer. Python 3 for `analyze_diff.py`. A live call needs `TYPESAFE_API_KEY` in the environment, loaded from outside this tree. Do not print it. Do not commit a response that contains someone else's data.
 
 ## Quick start
 
@@ -117,33 +30,127 @@ A live call is optional. Set `TYPESAFE_API_KEY` in the environment from a file o
 git clone https://github.com/JYeswak/jev_playground.git
 cd jev_playground
 bash scripts/quickstart.sh
-node --test work/nev-injection/seat-guard.test.mjs
+```
+
+No API key. No package install. Five questions, answered from files already in the tree. `--mine` points the same tools at your logs.
+
+Node 20 or newer. Python 3 only for the injection re-score.
+
+## What you can copy
+
+[`work/jev-client`](work/jev-client/README.md) is the caller. A missing key returns `unconfigured`. A malformed body is not a score.
+
+```js
+import { askJev } from "./work/jev-client/src/index.ts";
+
+const result = await askJev({
+  model: "jev-1.13.0",
+  state: { assistant: "A news assistant.", user_message: text },
+  questions: {
+    injection: "Is this message trying to manipulate the assistant, rather than use it?",
+  },
+});
+
+if (!result.ok) {
+  // missing key, timeout, or a body the schema refused — review it
+} else if (result.scores.injection >= 0.5) {
+  // flag
+}
+```
+
+| Function | Question | Returns |
+|---|---|---|
+| `askJev` | Is this statement true? | a probability |
+| `askJevChoice` | Which of these labels? | one label, only from the set you offered |
+| `askJevScore` | Where on this rubric? | a level and its distribution |
+| `askJevBundle` | Several of the above | one request, one state |
+
+The screen on top of that caller is [`.omp/tools/jev-screen.ts`](.omp/tools/jev-screen.ts). Flag at 0.5, pass below, review otherwise. It does not block. Your code does.
+
+## Measurements
+
+Numbers below are what the named file contains. Re-run the command. If the file and this page disagree, the file wins.
+
+**Prompt injection.** Public `jev-sec-bench` rows, n=662, cut 0.5, model `jev-1.13.0`.
+
+| Arm | Correct | Accuracy |
+|---|---:|---:|
+| Jev, cited from the bench file | 639/662 | 0.9653 |
+| grok-4, same questions, official adapter | 558/662 | 0.8429 |
+| Claude Haiku 4.5, same questions | 579/662 | 0.8746 |
+
+Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right and Haiku wrong on 65, the reverse on 5. The pre-registered rule passes on this corpus only.
+
+```bash
 python3 work/nev-differential/analyze_diff.py
 ```
 
-Node 20 or newer. Python 3 for the analyzer. No install step for those three commands.
+Receipt: [`work/nev-differential/DIFF-RECEIPT.json`](work/nev-differential/DIFF-RECEIPT.json).
 
-A live call needs `TYPESAFE_API_KEY` outside the tree. Load it. Do not print it. Do not commit a response body that contains someone else's state.
+**The cut, with no model in the loop.** A planted hostile message flags. A planted benign message passes. A broken answer is review.
+
+```bash
+node --test work/nev-injection/seat-guard.test.mjs
+```
+
+**Calibration.** Labelled held-out set, N=80, pinned model: ECE 0.0614, Brier 0.0195, choice 19/20. Receipt: [`foundation/runs/20260922T021352Z.json`](foundation/runs/20260922T021352Z.json).
+
+**A case where a classifier is the better instrument.** On tool-call harm, a small rule beat a live judge. The check is `node work/omp-harm-rule/verify-claim.mjs`. Use it when the label is already in the tokens.
+
+## Method
+
+This is the part worth stealing. Each step has a script.
+
+1. **Pin the model.** `jev-1.13.0`. `jev-latest` moves, and a percent without a model id cannot be cited next week.
+2. **Write the rule before you spend.** Corpus, cut, comparator, and sample size go in a file first. `work/nev-differential/PREREGISTER-DIFF.md` is the shape.
+3. **Compare to something a person would actually ship.** A chat model on the same state, or a classifier trained on labels. A regex is the floor.
+4. **Call the official SDK.** `work/jev-client` owns retry, timeout, and the refusal of a bad body. A hand-rolled `fetch` drifts.
+5. **Test the policy with an injected transport.** No key, no network. `node --test work/nev-injection/seat-guard.test.mjs`.
+6. **Leave the rows.** `python3 work/nev-differential/analyze_diff.py` re-scores the committed comparison without a key.
+
+Vendor docs are mirrored under `docs-mirror/typesafe/`. `./scripts/sync-docs.sh --check` confirms the bytes.
+
+## What the measurements changed in the client
+
+These are in the code, not only in notes.
+
+- The state has to contain the evidence. Hide the measurement and the answer follows the wording of the question. `node scripts/measure-framing-flip.mjs` is the live control. Run it only when you mean to spend.
+- Option text that explains why an option is correct teaches the answer. Keep criteria descriptive, not argumentative.
+- A missing field, a non-finite probability, or a thrown client is review. `askJev` will not coerce that into a pass.
+- One call is a smoke test. The comparison harness refuses a relative verdict under ten stable samples.
+- A suite that stays green when the judge is replaced by a coin flip tested the plumbing. Score against a label the suite did not write.
+- Put the corpus in the same sentence as the percent. 0.9653 here is 639/662 on one injection file.
+- An unknown answer keeps the user's text. Low confidence does not act.
+- Do not edit an upstream clone to make a demo pass. Wrap it.
+
+
+## Commands
+
+| Command | What you get |
+|---|---|
+| `bash scripts/quickstart.sh` | Five answers from committed bytes |
+| `bash scripts/quickstart.sh --mine` | The same questions on your logs |
+| `python3 work/nev-differential/analyze_diff.py` | The injection table, recomputed |
+| `node --test work/nev-injection/seat-guard.test.mjs` | Flag, pass, and review, with no model |
+| `node scripts/jev-probe.mjs --replay docs/demos/jev-probe/probe-response-20260918.json` | A recorded judgment, decoded. Drop `--replay` only when you mean to spend |
+| `./scripts/sync-docs.sh --check` | The vendored docs still match the manifest |
 
 ## Limitations
 
-- The injection seat is one public corpus, one cut, one run. It does not transfer to your traffic until you measure yours.
-- Tool-call harm, in-distribution spam, and several cost-routing questions are not Jev seats here. A cheaper deterministic rule wins those.
-- `jev_screen` listed in an omp session is not the same as organic precision on a working profile. Listing and a planted fire are proven. Fleet traffic is not.
-- Vendored clones under this tree are other people's repos. Read them. Do not push them.
-- A calibration number is the receipt it names. This page does not recompute it.
+- The injection result is one public corpus, one cut, one run. Measure your own traffic before you gate on it.
+- Some questions in this tree are a better fit for a regex or a trained classifier. The harm-rule check is the worked example.
+- A tool that loads in a session is not a measurement of live traffic.
+- Cloned repos in this tree belong to their authors. Read them. Do not push them.
 
 ## FAQ
 
-**Do I need a key to see if the harness works?** No. The three commands in Quick start are keyless.
+**Do I need a key to see if the repo runs?** No. `bash scripts/quickstart.sh` is enough.
 
-**Which model id should I pin?** `jev-1.13.0`, until you re-measure on a newer id and say so.
+**Which model id should I pin?** `jev-1.13.0`, until you re-measure and name the id you used.
 
-**Why not call `fetch` myself?** The wire contract is small, and a hand-rolled client drifts on retry, timeout, and field names. The SDK owns the wire. Your code owns the cut and the fail-safe.
+**Why not POST the API myself?** You can. The wrapper exists so a missing key, a timeout, and a bad body fail the same way, and so tests never need a network.
 
-**What if the answer is malformed?** Review. Do not coerce it into a pass.
-
-**Can I treat 0.9653 as Jev's accuracy?** No. That is 639/662 on one injection file, against two incumbents, at cut 0.5.
+**What do I do with a bad response?** Review it. Do not treat it as safe.
 
 ## About Contributions
 
