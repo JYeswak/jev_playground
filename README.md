@@ -20,7 +20,7 @@ A RAG passage filter, riffed from the official cookbook. One command. No key. An
 node demos/rag/demo.mjs
 ```
 
-The policy is inline in [`demos/rag/demo.mjs`](demos/rag/demo.mjs) (thresholds + first-match `route()`). The questions and recorded assessments are the ones in [`docs-mirror/typesafe/cookbooks/classifying_rag_passages.md`](docs-mirror/typesafe/cookbooks/classifying_rag_passages.md). The default lane uses recorded assessments so the routing is visible without spending. `--live` scores through `askJevBundle` and needs `TYPESAFE_API_KEY`.
+The policy is inline in [`demos/rag/demo.mjs`](demos/rag/demo.mjs) (thresholds + first-match `route()`). The questions and recorded assessments are the ones in [`docs-mirror/typesafe/cookbooks/classifying_rag_passages.md`](docs-mirror/typesafe/cookbooks/classifying_rag_passages.md). The default lane uses recorded assessments so the routing is visible without spending. `--live` scores through `askJevBundle` and needs `TYPESAFE_API_KEY`. Five live calls (`jev-1.13.0`) are in [`demos/rag/live-receipt.json`](demos/rag/live-receipt.json): all five dropped, fixture had kept sessions-01 as conflicting evidence, policy not retuned.
 
 A citation check, riffed from the official cookbook. One command. No key. A supported claim stands, a contradicted or unsupported one goes to review, a fabricated quote is dropped.
 
