@@ -18,7 +18,7 @@
 // "did this prompt mention a file path" -- which is near-deterministic from the text. If that
 // arm does not clear 0.80, the harness is blind and NO verdict about the router is reported.
 import { readFileSync } from 'node:fs';
-import { TypeSafeClient, choice, score, noul } from '@typesafe-ai/sdk';
+import { TypeSafeClient, choice, score, noul } from '../sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs';
 import { auc as kitAuc, field } from '../oracle-kit/index.mjs';
 
 const HARD_CALLS = 5, EASY_CALLS = 2, AUC_BAR = 0.70, MARGIN_BAR = 0.05, ARM_BAR = 0.80;

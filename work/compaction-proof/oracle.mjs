@@ -1,7 +1,7 @@
 // Does Jev's keep/drop survive contact with what the agent ACTUALLY needed next?
 // Live decisions (not replayed), scored against the transcript's own future, vs 4 baselines.
 import { readFileSync } from 'node:fs';
-import { TypeSafeClient, noul } from '@typesafe-ai/sdk';
+import { TypeSafeClient, noul } from '../sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs';
 import { auc as kitAuc, field } from '../oracle-kit/index.mjs';
 
 const WINDOW = 6;              // messages always pinned, matching the upstream default

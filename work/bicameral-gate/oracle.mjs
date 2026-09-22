@@ -19,7 +19,7 @@
 // FEASIBILITY ARM: the same pipeline scores "does this command write to a file", which is close
 // to deterministic from the text. Below 0.80 the harness is blind and NO verdict is reported.
 import { readFileSync } from 'node:fs';
-import { TypeSafeClient, noul } from '@typesafe-ai/sdk';
+import { TypeSafeClient, noul } from '../sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs';
 import { auc as kitAuc, feasibility, field } from '../oracle-kit/index.mjs';
 
 const AUC_BAR = 0.90, FP_BAR = 1, ARM_BAR = 0.80;
