@@ -150,6 +150,14 @@ node demos/consistency/demo.mjs
 
 The gate is inline in [`demos/consistency/demo.mjs`](demos/consistency/demo.mjs) (argmax with abstain below 0.60 from [`docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md)). The default lane uses recorded distributions so the wobble is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture consistency check is not a live agreement score.
 
+Self-consistency over a borderline claim, riffed from the official cookbook. One command. No key. Fourteen Nouls repeat five times; `covered` crosses 0.50 yet never leaves review, while two questions each flip once at an outer edge.
+
+```bash
+node demos/consistency-noul/demo.mjs
+```
+
+The review band is inline in [`demos/consistency-noul/demo.mjs`](demos/consistency-noul/demo.mjs) (no below 0.30, uncertain 0.30-0.70 inclusive, yes above, from [`docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md)). The default lane uses recorded nouls so the band is visible without spending. A fixture noul check is not a live probability.
+
 Pre-parsed value extraction, riffed from the official cookbook. One command. No key. Regexes over-find the candidate spans, recorded picks choose the receipt address, the mobile, the total and the credit, and code copies each verbatim into a normalized form.
 
 ```bash
