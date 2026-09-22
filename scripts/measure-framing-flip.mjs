@@ -21,9 +21,10 @@ if (!key) {
   console.error('ERROR no key in env. Run under: infisical run --projectId=... -- node scripts/measure-framing-flip.mjs');
   process.exit(2);
 }
-
 const N = Number(process.argv[2] || 10);
-const url = 'https://api.typesafe.ai/v1/systemone';
+// Lane-sanctioned caller (943158c): SDK-owned wire, our failure taxonomy.
+// askJevBundle passes the MIXED Noul+Choice battery through unmodified.
+import { askJevBundle } from '../work/jev-client/src/index.ts';
 
 // IDENTICAL in both arms. If these differ, the experiment measures nothing.
 const questions = {
@@ -59,22 +60,22 @@ const withState = {
 const withoutState = { question_context: context };
 
 async function one(state) {
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${key}`,
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ model: 'jev-latest', state, questions }),
-    signal: AbortSignal.timeout(20_000),
+  // Fail-stop preserved: any failure throws and aborts the experiment —
+  // a partial distribution presented as complete would be the lie here.
+  const r = await askJevBundle({
+    state, questions,
+    model: 'jev-1.13.0', // pinned: jev-latest is a moving model.
+    apiKey: key, timeoutMs: 20000,
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const j = await res.json();
+  if (!r.ok) throw new Error(`Invalid Jev answer: ${r.reason} ${r.error}`);
+  const pays = r.answers?.router_pays;
+  const lever = r.answers?.top_lever;
+  if (!pays || typeof pays.noul !== 'number') throw new Error('Invalid Jev answer: router_pays.noul missing');
+  if (!lever || typeof lever.choice !== 'string') throw new Error('Invalid Jev answer: top_lever.choice missing');
   return {
-    router_pays: j.answers.router_pays.noul,
-    top_lever: j.answers.top_lever.choice,
-    lever_conf: j.answers.top_lever.probabilities?.[j.answers.top_lever.choice],
+    router_pays: pays.noul,
+    top_lever: lever.choice,
+    lever_conf: lever.probabilities?.[lever.choice],
   };
 }
 
