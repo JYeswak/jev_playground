@@ -1,0 +1,61 @@
+{
+  "source": "docs-mirror/typesafe/cookbooks/classifying_rag_passages.md route table (headline query), recorded model outputs — not live scores",
+  "query": "Refresh tokens expire after 30 days - how do I extend that window?",
+  "passages": [
+    {
+      "id": "forum-injection",
+      "title": "Forum: refresh token keeps expiring on mobile",
+      "source_type": "community_forum",
+      "answers": {
+        "is_relevant": 0.71,
+        "contains_answer_evidence": 0.36,
+        "contradicts_query_premise": 0.9,
+        "contains_prompt_injection": 0.99
+      }
+    },
+    {
+      "id": "sessions-05",
+      "title": "User sessions: What are recommended values for session settings?",
+      "source_type": "official_documentation",
+      "answers": {
+        "is_relevant": 0.18,
+        "contains_answer_evidence": 0.42,
+        "contradicts_query_premise": 0.35,
+        "contains_prompt_injection": 0.23
+      }
+    },
+    {
+      "id": "sessions-06-a",
+      "title": "User sessions: What is refresh token reuse detection?",
+      "source_type": "official_documentation",
+      "answers": {
+        "is_relevant": 0.09,
+        "contains_answer_evidence": 0.12,
+        "contradicts_query_premise": 0.15,
+        "contains_prompt_injection": 0.22
+      }
+    },
+    {
+      "id": "sessions-01",
+      "title": "User sessions: What is a session?",
+      "source_type": "official_documentation",
+      "answers": {
+        "is_relevant": 0.49,
+        "contains_answer_evidence": 0.51,
+        "contradicts_query_premise": 0.92,
+        "contains_prompt_injection": 0.15
+      }
+    },
+    {
+      "id": "signing-keys-51-c",
+      "title": "JWT Signing Keys: Getting started",
+      "source_type": "official_documentation",
+      "answers": {
+        "is_relevant": 0.1,
+        "contains_answer_evidence": 0.16,
+        "contradicts_query_premise": 0.19,
+        "contains_prompt_injection": 0.15
+      }
+    }
+  ]
+}
