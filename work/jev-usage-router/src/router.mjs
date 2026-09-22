@@ -2,16 +2,20 @@
  * jev-usage-router — one Choice call, typed result, append-only JSONL log.
  * Field names from SDK-SURFACE.md: ChoiceResponse.{choice,confidence,probabilities}
  * Kill switch: config.enabled=false OR process.env.BYPASS_JEV=1 OR process.env.JEV_USAGE_ROUTER=0
+ *
+ * Routed via work/jev-client askJevChoice (single-attempt, timeout, unconfigured
+ * handling owned there). askJevChoice refuses an off-label choice and a
+ * non-numeric confidence instead of coercing either — both surface here as a
+ * transport row with action bypass (fail-safe: never act on an unreadable answer).
  */
-import { createRequire } from 'node:module';
 import { appendFile, mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
+import { askJevChoice } from '../../jev-client/src/index.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const SDK_PKG = path.resolve(ROOT, '../sdk/package.json');
 
 const CRITERIA = {
   local: 'Answerable from local context, files, or memory without network.',
@@ -19,12 +23,6 @@ const CRITERIA = {
   browser: 'Needs interactive browser, booking UI, or live page actions.',
   bypass: 'Unclear, irreversible, or should stay with a human / full agent.',
 };
-
-function loadSdk() {
-  const require = createRequire(SDK_PKG);
-  return require('@typesafe-ai/sdk');
-}
-
 export async function loadConfig(configPath = path.join(ROOT, 'config.json')) {
   const raw = JSON.parse(await readFile(configPath, 'utf8'));
   return raw;
@@ -79,8 +77,7 @@ export async function routeUsage(input) {
     return row;
   }
 
-  const { TypeSafeClient, choice } = loadSdk();
-  const client = new TypeSafeClient({ apiKey });
+  const classes = CRITERIA;
   const state = {
     goal: input.goal,
     completed_work: input.completedWork ?? 'Nothing yet.',
@@ -88,26 +85,18 @@ export async function routeUsage(input) {
   };
 
   try {
-    const r = await client.systemOne({
-      model: config.model ?? 'jev-1.13.0',
+    const r = await askJevChoice({
       state,
-      questions: {
-        route: choice(
-          'Choose the cheapest adequate next action for this job. Prefer local when possible. Use bypass when unclear or irreversible.',
-          CRITERIA,
-        ),
-      },
+      instructions:
+        'Choose the cheapest adequate next action for this job. Prefer local when possible. Use bypass when unclear or irreversible.',
+      classes,
+      model: config.model ?? 'jev-1.13.0',
+      apiKey,
     });
-    const a = r.answers?.route;
-    if (!a || a.type !== 'choice' || typeof a.choice !== 'string') {
-      throw new Error('ChoiceResponse missing choice (see SDK-SURFACE.md — not .distribution)');
-    }
-    if (!a.probabilities || typeof a.probabilities !== 'object') {
-      throw new Error('ChoiceResponse missing probabilities — refuse silent null scoring');
-    }
+    if (!r.ok) throw new Error(`Invalid Jev answer: ${r.reason} ${r.error}`);
     const floor = config.confidenceFloor ?? 0.55;
-    let action = a.choice;
-    if (typeof a.confidence === 'number' && a.confidence < floor) action = 'bypass';
+    let action = r.choice;
+    if (r.confidence < floor) action = 'bypass';
 
     const row = {
       id,
@@ -116,9 +105,9 @@ export async function routeUsage(input) {
       ok: true,
       bypassed: false,
       action,
-      rawChoice: a.choice,
-      confidence: a.confidence,
-      probabilities: a.probabilities,
+      rawChoice: r.choice,
+      confidence: r.confidence,
+      probabilities: r.probabilities,
       latencyMs: Date.now() - started,
       model: config.model ?? 'jev-1.13.0',
       goal: input.goal,
