@@ -84,7 +84,7 @@ A date extraction, riffed from the official cookbook. One command. No key. Six s
 node demos/date/demo.mjs
 ```
 
-The parts and the calendar math are inline in [`demos/date/demo.mjs`](demos/date/demo.mjs) (seven Choice questions plus code assembly from [`docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md`](docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md), pinned TODAY so relative dates reproduce). The default lane uses recorded part answers so the assembly is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture date is not a live extraction.
+The parts and the calendar math are inline in [`demos/date/demo.mjs`](demos/date/demo.mjs) (seven Choice questions plus code assembly from [`docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md`](docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md), pinned TODAY so relative dates reproduce). The default lane uses recorded part answers so the assembly is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Six live bundles (`jev-1.13.0`) are in [`demos/date/live-receipt.json`](demos/date/live-receipt.json): four dates matched, kickoff assembled 2026-08-14 at 0.33 and stayed under review, fixture had left it unassembled, policy not retuned, demo exit 1 on that row. A fixture date is not a live extraction.
 
 An entity alignment, riffed from the official cookbook. One command. No key. Identical products merge, different ones stay unlinked, and close variants go to a curator.
 
