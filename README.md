@@ -116,7 +116,7 @@ A parallel briefing, riffed from the official cookbook. One command. No key. One
 node demos/parallel/demo.mjs
 ```
 
-The briefing lives in [`demos/parallel/brief.mjs`](demos/parallel/brief.mjs), following [`docs-mirror/typesafe/cookbooks/parallel_questions.md`](docs-mirror/typesafe/cookbooks/parallel_questions.md) (batching changes cost and speed, not answers). The default lane uses recorded answers so the briefing is visible without spending. A fixture briefing is not a live judgment.
+The briefing lives in [`demos/parallel/brief.mjs`](demos/parallel/brief.mjs), following [`docs-mirror/typesafe/cookbooks/parallel_questions.md`](docs-mirror/typesafe/cookbooks/parallel_questions.md) (batching changes cost and speed, not answers). The default lane uses recorded answers so the briefing is visible without spending. One live bundle (`jev-1.13.0`) is in [`demos/parallel/live-receipt.json`](demos/parallel/live-receipt.json): all four answers present, same answers as the fixture within noise. A fixture briefing is not a live judgment.
 
 A line-by-line search, riffed from the official cookbook. One command. No key. One query points at its line, another reads as unanswered — the exists check tells them apart.
 
