@@ -85,6 +85,8 @@ export type AskChoiceOptions = {
 
 /** The key the single choice question is filed under. Internal; callers never see it. */
 const CHOICE_KEY = "choice";
+/** The key the single score question is filed under. Internal; callers never see it. */
+const SCORE_KEY = "score";
 
 type Posted =
   | { ok: true; answers: object; latencyMs: number; resolvedModel: string }
@@ -273,9 +275,101 @@ export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoice
   return { ok: true, choice: chosen, confidence, probabilities, latencyMs, model };
 }
 
+export type AskScoreOptions = {
+  /** The object the question is asked about. Serialised as-is into `state`. */
+  state: Record<string, unknown>;
+  /** The question itself, as text. */
+  instructions: string;
+  /** Ordered rubric, one description per score from zero. At least two. */
+  criteria: string[];
+  timeoutMs?: number;
+  model?: string;
+  apiKey?: string;
+  /** Transport override for offline tests. Defaults to globalThis.fetch, read at call time. */
+  fetchImpl?: typeof fetch;
+};
+
+export type JevScoreResult =
+  | {
+      ok: true;
+      score: number;
+      confidence: number;
+      legend: Record<string, string>;
+      probabilities: Record<string, number>;
+      latencyMs: number;
+      model: string;
+    }
+  | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
+
+/**
+ * Ask ONE score question: an ordered rubric, exactly one level comes back.
+ * The SDK refuses a criteria list shorter than two; we refuse before spending
+ * a call, with the same no-answers verdict a malformed answer earns.
+ */
+export async function askJevScore(options: AskScoreOptions): Promise<JevScoreResult> {
+  const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
+  const apiKey = options.apiKey ?? process.env.TYPESAFE_API_KEY;
+
+  if (!apiKey) {
+    return {
+      ok: false,
+      reason: "unconfigured",
+      error: "TYPESAFE_API_KEY is not set — see .env.example, use infisical run --projectId=…",
+      latencyMs: 0,
+      model,
+    };
+  }
+  if (!Array.isArray(options.criteria) || options.criteria.length < 2) {
+    return { ok: false, reason: "no-answers", error: `score needs a criteria list of at least 2, got ${Array.isArray(options.criteria) ? options.criteria.length : "non-list"}`, latencyMs: 0, model };
+  }
+  const questions = {
+    [SCORE_KEY]: { type: "score", instructions: options.instructions, criteria: options.criteria },
+  };
+  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch);
+  if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
+  const { answers, latencyMs } = posted;
+
+  const answer: unknown = Reflect.get(answers, SCORE_KEY);
+  if (!answer || typeof answer !== "object") {
+    return { ok: false, reason: "no-answers", error: "`answers.score` was missing or not an object", latencyMs, model };
+  }
+  const score: unknown = Reflect.get(answer, "score");
+  if (typeof score !== "number") {
+    return { ok: false, reason: "no-answers", error: "`score` was not a number", latencyMs, model };
+  }
+  const confidence: unknown = Reflect.get(answer, "confidence");
+  if (typeof confidence !== "number") {
+    return { ok: false, reason: "no-answers", error: "`confidence` was not a number", latencyMs, model };
+  }
+  const legend: unknown = Reflect.get(answer, "legend");
+  if (!legend || typeof legend !== "object" || Array.isArray(legend)) {
+    return { ok: false, reason: "no-answers", error: "`legend` was missing or not an object", latencyMs, model };
+  }
+  const rawProbabilities: unknown = Reflect.get(answer, "probabilities");
+  if (!rawProbabilities || typeof rawProbabilities !== "object" || Array.isArray(rawProbabilities)) {
+    return { ok: false, reason: "no-answers", error: "`probabilities` was missing or not an object", latencyMs, model };
+  }
+  const probabilities: Record<string, number> = {};
+  for (const key of Object.keys(options.criteria)) {
+    const value: unknown = Reflect.get(rawProbabilities, key);
+    if (typeof value !== "number") {
+      return { ok: false, reason: "no-answers", error: `\`probabilities.${key}\` was not a number`, latencyMs, model };
+    }
+    probabilities[key] = value;
+  }
+  const legendOut: Record<string, string> = {};
+  for (const key of Object.keys(options.criteria)) {
+    const value: unknown = Reflect.get(legend, key);
+    if (typeof value !== "string") {
+      return { ok: false, reason: "no-answers", error: `\`legend.${key}\` was not a string`, latencyMs, model };
+    }
+    legendOut[key] = value;
+  }
+  return { ok: true, score, confidence, legend: legendOut, probabilities, latencyMs, model };
+}
+
 export type AskBundleOptions = {
   state: Record<string, unknown>;
-  /** Already-typed question objects (`type: noul|choice|score`). */
   questions: Record<string, unknown>;
   timeoutMs?: number;
   model?: string;

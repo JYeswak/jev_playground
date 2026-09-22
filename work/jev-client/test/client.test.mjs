@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { askJev, askJevChoice, askJevBundle, SYSTEMONE_ENDPOINT } from '../src/index.ts';
+import { askJev, askJevChoice, askJevBundle, askJevScore, SYSTEMONE_ENDPOINT } from '../src/index.ts';
 
 const QUESTIONS = { harm: 'is this harmful?' };
 const STATE = { command: 'rm -rf /' };
@@ -258,3 +258,49 @@ test('readRow handles BOTH omp row shapes, and rejects neither-shaped input', as
   assert.equal(readRow({ noCustomType: true }), undefined);
   assert.equal(readRow({ customType: 'x', data: 'not-an-object' }), undefined);
 });
+
+// --- SCORE ------------------------------------------------------------------
+// Rubric question type the wrapper did not ship until now. Same contract as
+// Choice: typed answers read strictly, degenerate input refused pre-network.
+
+test('askJevScore sends type:"score" with a criteria LIST and reads score+legend', withFetch(
+  async (url, init) => {
+    assert.equal(url, SYSTEMONE_ENDPOINT);
+    const sent = JSON.parse(init.body);
+    assert.deepEqual(sent.questions, {
+      score: { type: 'score', instructions: 'how bad?', criteria: ['none', 'bad', 'severe'] },
+    }, 'ONE question, type "score", criteria a list — the SDK rejects a map outright');
+    return { ok: true, status: 200, headers: fakeHeaders(), body: null, clone() { return this; }, text: async () => JSON.stringify({
+      answers: { score: { type: 'score', score: 2, confidence: 0.88, legend: { 0: 'none', 1: 'bad', 2: 'severe' }, probabilities: { 0: 0.02, 1: 0.1, 2: 0.88 } } },
+    }) };
+  },
+  async () => {
+    const r = await askJevScore({ state: STATE, instructions: 'how bad?', criteria: ['none', 'bad', 'severe'] });
+    assert.equal(r.ok, true);
+    assert.equal(r.score, 2);
+    assert.equal(r.confidence, 0.88);
+    assert.deepEqual(r.legend, { 0: 'none', 1: 'bad', 2: 'severe' });
+    assert.deepEqual(r.probabilities, { 0: 0.02, 1: 0.1, 2: 0.88 });
+  },
+));
+
+test('askJevScore refuses a one-element criteria list BEFORE any network call', async () => {
+  const real = globalThis.fetch;
+  let called = 0;
+  globalThis.fetch = async () => { called += 1; throw new Error('must not be called'); };
+  try {
+    // apiKey present so the refusal tested is the criteria gate, not the key gate.
+    const r = await askJevScore({ state: STATE, instructions: 'how bad?', criteria: ['only'], apiKey: 'k' });
+    assert.equal(r.ok, false);
+    assert.equal(r.reason, 'no-answers');
+    assert.equal(called, 0, 'planted negative: no fetch may fire');
+  } finally { globalThis.fetch = real; }
+});
+
+test('askJevScore refuses an answer it cannot read', withFetch(
+  respond(200, { answers: { score: { score: 'high', confidence: 0.9 } } }), async () => {
+    const r = await askJevScore({ state: STATE, instructions: 'how bad?', criteria: ['none', 'bad'] });
+    assert.equal(r.ok, false);
+    assert.equal(r.reason, 'no-answers');
+  },
+));
