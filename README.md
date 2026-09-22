@@ -46,6 +46,14 @@ node demos/function-call/demo.mjs
 
 The spec and dispatcher live in [`demos/function-call/dispatch.mjs`](demos/function-call/dispatch.mjs), following [`docs-mirror/typesafe/cookbooks/function_calling.md`](docs-mirror/typesafe/cookbooks/function_calling.md) (one Choice picks the function, each argument gets a Choice plus a stated Noul, call confidence is the least-certain judgment). The default lane uses fixture overlap scores so the dispatch is visible without spending. A fixture dispatch is not a live tool call.
 
+A confidence-gated classification, riffed from the official cookbook. One command. No key. A sure filing reports its group, two unsure ones report the parent division — nothing is dropped.
+
+```bash
+node demos/classify/demo.mjs
+```
+
+The two-level taxonomy and gate live in [`demos/classify/classify.mjs`](demos/classify/classify.mjs), following [`docs-mirror/typesafe/cookbooks/classification_using_confidence.md`](docs-mirror/typesafe/cookbooks/classification_using_confidence.md) (one Choice over groups, report the group when sure else the division). The default lane uses fixture overlap margins so the gate is visible without spending. A fixture class is not a live label.
+
 A passage re-rank, riffed from the official cookbook. One command. No key. A word-overlap shortlist misorders both queries; recorded nouls put the right passage first.
 
 ```bash
