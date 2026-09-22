@@ -168,7 +168,7 @@ The find-and-take shape is inline in [`demos/preparsed/demo.mjs`](demos/preparse
 
 The live-smoke index is [`demos/LIVE.md`](demos/LIVE.md) — read it; it runs nothing. One row per `live-receipt.json`, with calls, model, and what the live lane did differently from the fixture.
 
-New here? [`demos/START.md`](demos/START.md) is the three-command version of this section: guard, chief, then the live-smoke index.
+New here? [`demos/START.md`](demos/START.md) is the short version: guard, chief, the live-smoke index, and the injection re-score.
 
 ## TL;DR
 

@@ -1,4 +1,4 @@
-# Start here — three commands, no key
+# Start here — four commands, no key
 
 ```bash
 node demos/guard/demo.mjs
@@ -22,6 +22,6 @@ One row per `live-receipt.json`, with calls, model, and what the live lane did d
 python3 work/nev-differential/analyze_diff.py
 ```
 
-Re-scores the injection seat from its rows; the receipt is `work/nev-differential/DIFF-RECEIPT.json` and the number is that file's, not Jev in general.
+Re-scores the injection comparison. On this file, Jev is 639/662. grok-4 is 558/662. Haiku is 579/662. Cut 0.5, model `jev-1.13.0`, n=662. That number is this corpus, not Jev in general.
 
 NO-CLAIM: a start page is not a new result.
