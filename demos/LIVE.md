@@ -7,18 +7,18 @@ One row per `demos/*/live-receipt.json`. Each receipt is a single `--live` run t
 | autoformat | `node demos/autoformat/demo.mjs --live` | 2 | jev-1.13.0 | Fixture joins 2 and renders all markers; live joined 1, classified no headings/code/callouts, all six must-markers missing. ([receipt](autoformat/live-receipt.json)) |
 | cascade | `node demos/cascade/demo.mjs --live` | 1 | jev-1.13.0 | Fixture escalates location (0.71); live escalates registration_open_date (0.76) and passes location (0.18). ([receipt](cascade/live-receipt.json)) |
 | chief | `node demos/chief/demo.mjs --live` | 4 | jev-1.13.0 | Agrees on 3 of 4 jobs; vague-ask routes research live vs review fixture. ([receipt](chief/live-receipt.json)) |
-| citation | `node demos/citation/demo.mjs --live` | 4 | jev-1.13.0 | not recorded ([receipt](citation/live-receipt.json)) |
+| citation | `node demos/citation/demo.mjs --live` | 4 | jev-1.13.0 | Two verified, two contradicted and sent to review; power_ten never reached the model (missing from source). ([receipt](citation/live-receipt.json)) |
 | compact | `node demos/compact/demo.mjs --live` | 1 | jev-1.13.0 | Fixture kept t3 call and dropped its tail; live dropped all three calls. ([receipt](compact/live-receipt.json)) |
-| consistency | `node demos/consistency/demo.mjs --live` | 3 | jev-1.13.0 | not recorded ([receipt](consistency/live-receipt.json)) |
-| consistency-noul | `node demos/consistency-noul/demo.mjs --live` | 3 | jev-1.13.0 | not recorded ([receipt](consistency-noul/live-receipt.json)) |
+| consistency | `node demos/consistency/demo.mjs --live` | 3 | jev-1.13.0 | 8 of 8 questions hold a gated plurality at gate 0.60. ([receipt](consistency/live-receipt.json)) |
+| consistency-noul | `node demos/consistency-noul/demo.mjs --live` | 3 | jev-1.13.0 | 4 of 14 questions hold a non-uncertain plurality; band 0.30-0.70. ([receipt](consistency-noul/live-receipt.json)) |
 | date | `node demos/date/demo.mjs --live` | 6 | jev-1.13.0 | Fixture leaves kickoff unassembled (none); live assembled 2026-08-14 at 0.33 under review. ([receipt](date/live-receipt.json)) |
-| entity | `node demos/entity/demo.mjs --live` | 4 | jev-1.13.0 | not recorded ([receipt](entity/live-receipt.json)) |
-| guard | not recorded | 4 | jev-1.13.0 | not recorded ([receipt](guard/live-receipt.json)) |
+| entity | `node demos/entity/demo.mjs --live` | 4 | jev-1.13.0 | Same-pair asserted sameAs, diff-pair left unlinked, fruit-variant and style-words to the curator queue. ([receipt](entity/live-receipt.json)) |
+| guard | not recorded | 4 | jev-1.13.0 | Dosage blocked live (severity 2.1 over block 2); fixture had it under review. ([receipt](guard/live-receipt.json)) |
 | hierarchy | `node demos/hierarchy/demo.mjs --live` | 10 | jev-1.13.0 | Fixture root split tech-first and beam repaired to pie; live root went food-first and beam kept tech/gadgets. ([receipt](hierarchy/live-receipt.json)) |
 | parallel | `node demos/parallel/demo.mjs --live` | 1 | jev-1.13.0 | Same answers live as fixture within noise. ([receipt](parallel/live-receipt.json)) |
 | preparsed | `node demos/preparsed/demo.mjs --live` | 4 | jev-1.13.0 | Same extractions live as fixture; all verbatim and normalization checks held. ([receipt](preparsed/live-receipt.json)) |
 | rag | `node demos/rag/demo.mjs --live` | 5 | jev-1.13.0 | Fixture kept sessions-01 as conflicting_evidence; live drops all five. ([receipt](rag/live-receipt.json)) |
-| rerank | `node demos/rerank/demo.mjs --live` | 10 | jev-1.13.0 | not recorded ([receipt](rerank/live-receipt.json)) |
+| rerank | `node demos/rerank/demo.mjs --live` | 10 | jev-1.13.0 | Both queries ranked the wanted document first. ([receipt](rerank/live-receipt.json)) |
 | semantic-find | `node demos/semantic-find/demo.mjs --live` | 2 | jev-1.13.0 | Both checks held live. ([receipt](semantic-find/live-receipt.json)) |
 | skill-suggest | `node demos/skill-suggest/demo.mjs --live` | 6 | jev-1.13.0 | Same three outcomes live as fixture. ([receipt](skill-suggest/live-receipt.json)) |
 
