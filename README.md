@@ -108,7 +108,7 @@ A structure recovery, riffed from the official cookbook. One command. No key. Wr
 node demos/autoformat/demo.mjs
 ```
 
-The stitch and classify rules live in [`demos/autoformat/recover.mjs`](demos/autoformat/recover.mjs), following [`docs-mirror/typesafe/cookbooks/autoformat.md`](docs-mirror/typesafe/cookbooks/autoformat.md) (per-pair mid-sentence Nouls, then per-block Choice). The default lane uses deterministic rules so the recovery is visible without spending. A fixture format is not a live rewrite.
+The stitch and classify rules live in [`demos/autoformat/recover.mjs`](demos/autoformat/recover.mjs), following [`docs-mirror/typesafe/cookbooks/autoformat.md`](docs-mirror/typesafe/cookbooks/autoformat.md) (per-pair mid-sentence Nouls, then per-block Choice). The default lane uses deterministic rules so the recovery is visible without spending. Two live bundles (`jev-1.13.0`) are in [`demos/autoformat/live-receipt.json`](demos/autoformat/live-receipt.json): joined 1 of 2 fixture joins, classified no headings or callouts, 0 of 6 must-markers present, policy not retuned, demo exit 1. A fixture format is not a live rewrite.
 
 A parallel briefing, riffed from the official cookbook. One command. No key. One document, four questions of three types, all answered from a single fixture request object.
 
