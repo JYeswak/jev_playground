@@ -1,0 +1,17 @@
+{
+  "name": "jev-skill-suggest",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless skill suggester. Suggests a roster skill or abstains under the cookbook gate. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-skill-suggest": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs",
+    "suggest.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
