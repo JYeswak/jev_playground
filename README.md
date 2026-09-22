@@ -46,6 +46,14 @@ node demos/chief/demo.mjs
 
 The choice and the confidence gate live in [`demos/chief/demo.mjs`](demos/chief/demo.mjs) (research/write/review classes, 0.85 gate, review fallback). The 0.85 bar is the guide author's number, not measured here. The default lane uses recorded verdicts so the routing is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. A fixture route is not a live handoff.
 
+Instant context compaction, riffed from Movez's Jev Engineering guide step 5. One command. No key. A stale Glob is dropped with its result, a verbose Read keeps its call but loses its tail, failure evidence stays verbatim — nothing is summarized.
+
+```bash
+node demos/compact/demo.mjs
+```
+
+The transcript and the recorded keep/drop probabilities live in [`demos/compact/demo.mjs`](demos/compact/demo.mjs), executed through the vendored clone's own `compact(messages, asker, options)` (`fast-jev-compaction@6e1da50`, read-only). The default lane uses a fixture asker so the compaction is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture keep/drop is not a live compaction.
+
 A function dispatcher, riffed from the official cookbook. One command. No key. Three commands dispatch to typed calls, one leaving an argument out so the default applies.
 
 ```bash
@@ -93,6 +101,30 @@ node demos/hierarchy/demo.mjs
 ```
 
 The tree and the per-node distributions are inline in [`demos/hierarchy/demo.mjs`](demos/hierarchy/demo.mjs) (one Choice per sibling set plus greedy-and-beam traversal from [`docs-mirror/typesafe/cookbooks/hierarchical_classification.md`](docs-mirror/typesafe/cookbooks/hierarchical_classification.md)). The default lane uses recorded distributions so the recovery is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. A fixture class is not a live label.
+
+A structure recovery, riffed from the official cookbook. One command. No key. Wrapped lines stitch, blocks classify to heading/code/warning/list, and the memo renders as markdown.
+
+```bash
+node demos/autoformat/demo.mjs
+```
+
+The stitch and classify rules live in [`demos/autoformat/recover.mjs`](demos/autoformat/recover.mjs), following [`docs-mirror/typesafe/cookbooks/autoformat.md`](docs-mirror/typesafe/cookbooks/autoformat.md) (per-pair mid-sentence Nouls, then per-block Choice). The default lane uses deterministic rules so the recovery is visible without spending. A fixture format is not a live rewrite.
+
+A parallel briefing, riffed from the official cookbook. One command. No key. One document, four questions of three types, all answered from a single fixture request object.
+
+```bash
+node demos/parallel/demo.mjs
+```
+
+The briefing lives in [`demos/parallel/brief.mjs`](demos/parallel/brief.mjs), following [`docs-mirror/typesafe/cookbooks/parallel_questions.md`](docs-mirror/typesafe/cookbooks/parallel_questions.md) (batching changes cost and speed, not answers). The default lane uses recorded answers so the briefing is visible without spending. A fixture briefing is not a live judgment.
+
+An ontology gate, two rules from EvoOntology (arXiv:2609.15779). One command. No key. Query the term instead of pasting the layer; ship a candidate only if it beats its parent.
+
+```bash
+node demos/ontology-gate/demo.mjs
+```
+
+The rules are inline in [`demos/ontology-gate/demo.mjs`](demos/ontology-gate/demo.mjs). The paper's numbers stay the paper's (+20 and +8.8 Traj-Wise are theirs, not ours); this file only shows the decision rules on fixtures. A fixture gate is not their benchmark.
 
 ## TL;DR
 
