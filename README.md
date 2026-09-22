@@ -168,6 +168,8 @@ The find-and-take shape is inline in [`demos/preparsed/demo.mjs`](demos/preparse
 
 The live-smoke index is [`demos/LIVE.md`](demos/LIVE.md) — read it; it runs nothing. One row per `live-receipt.json`, with calls, model, and what the live lane did differently from the fixture.
 
+New here? [`demos/START.md`](demos/START.md) is the three-command version of this section: guard, chief, then the live-smoke index.
+
 ## TL;DR
 
 Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
