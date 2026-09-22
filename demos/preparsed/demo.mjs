@@ -3,6 +3,9 @@
 // default: recall-tuned regexes find the candidates, recorded picks stand in
 // for the Choice answers, and code copies the picked span verbatim.
 // `node demos/preparsed/demo.mjs` (no key, no network).
+// `node demos/preparsed/demo.mjs --live` runs the pick/classify/Noul calls
+// through work/jev-client, model jev-1.13.0. Live picks flow through the same
+// verbatim and normalization checks below.
 //
 // Official shape: docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md
 // (find over-finds with a regex, TypeSafe picks one span or none, code copies
@@ -86,6 +89,67 @@ const FIXTURE = {
   },
 };
 
+const live = process.argv.includes("--live");
+if (live) {
+  const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+  const pickQ = (instructions, spans) => ({
+    type: "choice",
+    instructions,
+    criteria: Object.fromEntries([...spans.map((s) => [s, null]), [NONE, "None of these is the requested value."]]),
+  });
+  const call = async (state, questions) => {
+    const r = await askJevBundle({ model: "jev-1.13.0", state, questions, timeoutMs: 20000 });
+    if (!r.ok) {
+      console.error(`live call failed: ${r.reason} ${r.error}`);
+      process.exit(2);
+    }
+    return r.answers;
+  };
+  const emailsLive = find(EMAIL_RE, EMAIL_DOC);
+  const e = await call(EMAIL_DOC, {
+    receipt: pickQ("Which email address does the sender want their receipt sent to?", emailsLive),
+    sender: pickQ("Which email address did this message come from (the From line)?", emailsLive),
+  });
+  FIXTURE.emails.receipt = { choice: e.receipt.choice, confidence: e.receipt.confidence };
+  FIXTURE.emails.sender = { choice: e.sender.choice, confidence: e.sender.confidence };
+  const phonesLive = find(PHONE_RE, PHONE_DOC);
+  const p = await call(PHONE_DOC, {
+    mobile: pickQ("Which of these is the direct mobile / cell number?", phonesLive),
+    region: {
+      type: "choice",
+      instructions: "In what country is this office located?",
+      criteria: { US: null, GB: null, DE: null, FR: null, CA: null, AU: null },
+    },
+  });
+  FIXTURE.phones.mobile = { choice: p.mobile.choice, confidence: p.mobile.confidence };
+  FIXTURE.phones.region = { choice: p.region.choice, confidence: p.region.confidence };
+  const amountsLive = find(MONEY_RE, MONEY_DOC);
+  const m = await call(MONEY_DOC, {
+    currency: {
+      type: "choice",
+      instructions: "What currency are these amounts in?",
+      criteria: { USD: null, EUR: null, GBP: null, JPY: null, CAD: null },
+    },
+    total: pickQ("Which amount is the total the customer must pay?", amountsLive),
+    credit: pickQ("Which amount is the courtesy credit that was applied?", amountsLive),
+  });
+  FIXTURE.money.currency = { choice: m.currency.choice, confidence: m.currency.confidence };
+  const totalChoice = m.total.choice;
+  const creditChoice = m.credit.choice;
+  const k = await call(MONEY_DOC, {
+    total_is_credit: {
+      type: "noul",
+      instructions: `Is the amount ${totalChoice} a credit or refund to the customer, not a charge?`,
+    },
+    credit_is_credit: {
+      type: "noul",
+      instructions: `Is the amount ${creditChoice} a credit or refund to the customer, not a charge?`,
+    },
+  });
+  FIXTURE.money.total = { choice: totalChoice, confidence: m.total.confidence, pCredit: k.total_is_credit.noul };
+  FIXTURE.money.credit = { choice: creditChoice, confidence: m.credit.confidence, pCredit: k.credit_is_credit.noul };
+}
+
 let failed = 0;
 function check(name, actual, expected) {
   const ok = JSON.stringify(actual) === JSON.stringify(expected);
@@ -145,5 +209,5 @@ console.log("");
 console.log(`total due : ${FIXTURE.money.total.choice} -> ${toDecimal(FIXTURE.money.total.choice)} ${FIXTURE.money.currency.choice} (${kind(FIXTURE.money.total.pCredit)}, P(credit)=${FIXTURE.money.total.pCredit.toFixed(2)})`);
 console.log(`credit    : ${FIXTURE.money.credit.choice} -> ${toDecimal(FIXTURE.money.credit.choice)} ${FIXTURE.money.currency.choice} (${kind(FIXTURE.money.credit.pCredit)}, P(credit)=${FIXTURE.money.credit.pCredit.toFixed(2)})`);
 console.log("");
-console.log("fixture lane: regex find is live code, picks are recorded. No API call, no key.");
+console.log(live ? "live lane: regex find is live code, picks asked through askJevBundle." : "fixture lane: regex find is live code, picks are recorded. No API call, no key.");
 process.exit(failed ? 1 : 0);
