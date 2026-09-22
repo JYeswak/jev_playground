@@ -103,9 +103,9 @@ prompt injection with context
 always-abstain control 5× on their own corpus
 ([receipt](docs/demos/upstream-repro/skillranker-corpus-measured-20260919.md)).
 
-**Scoreboard, present tense:** 40 verdict rows (8 cleared, 17 held, 15 ruled out, **0 promoted**),
-56 dead-end ledger entries each with a reopen condition (`grep -cE '^## R[0-9]+' NEGATIVE_EVIDENCE.md`
-— re-derive it; this count moves and no gate pins it), 13 gate stages green. Tool_call
+**Scoreboard, present tense:** 41 verdict rows (9 cleared, 17 held, 15 ruled out, **0 promoted**),
+82 dead-end ledger entries each with a reopen condition (`grep -cE '^## R[0-9]+' NEGATIVE_EVIDENCE.md`
+— re-derive it; this count moves and no gate pins it), 14 gate stages green. Tool_call
 **RULE WINS** — ship the classifier, drop Jev (cost-benefit). Observer (B)
 mechanism MET at n=1 lab; working-profile dogfood **OPEN**. Proven vs WIP seams:
 [`docs/INTEGRATIONS.md`](docs/INTEGRATIONS.md). The product is the
@@ -758,7 +758,7 @@ PASS 97-readme-counts (0s)
 gates: ALL GREEN
 ```
 
-Thirteen stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
+Fourteen stages. Each has a planted bad input that turns it red, listed in [`GATES.md`](GATES.md),
 because a gate that cannot fail is not a gate. Re-derive the count from `foundation/gates.d/`; a
 number written here goes stale silently, and this one already did once, when it claimed seven
 stages and nine existed.
@@ -904,9 +904,9 @@ nothing here needs a network.
 
 ## Limitations
 
-**Nothing has been promoted.** 40 verdict rows (8 cleared, 17 held, 15 ruled out, **0 promoted**).
+**Nothing has been promoted.** 41 verdict rows (9 cleared, 17 held, 15 ruled out, **0 promoted**).
 That is the deliverable rather than a shortfall, and every reason lives in
-[`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 56 entries, each carrying the condition that would
+[`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md), 82 entries, each carrying the condition that would
 reopen it. One candidate died there because an MIT-licensed tool already ships its surface, which
 is a reason to stop building and not a reason to build faster.
 
@@ -945,11 +945,11 @@ pointed at another shape reports zero turns, which is a visible result rather th
 
 ## Status
 
-**40 verdict rows, 0 promoted, with one promotion awarded and retracted the same day.** Foreman
+**41 verdict rows, 0 promoted, with one promotion awarded and retracted the same day.** Foreman
 supervision cleared its bar on authored vignettes (AUC 1.000 twice), then scored 0.750 on 186,449
 real windows and was moved off rung 5 by its author. The retraction is the system working, not
 failing. Verdicts and receipts: `docs/demos/STATUS.tsv`; reopen conditions:
-`NEGATIVE_EVIDENCE.md` (56 entries).
+`NEGATIVE_EVIDENCE.md` (82 entries).
 
 **Open questions, honestly.** Class-D (does the agent's answer change?) is unmeasured: the
 ablate-and-rerun harness is built and frozen, its model arms pending a quiet window. Two verdicts
@@ -964,7 +964,7 @@ unbuilt CLI" that was really a 103-commit-stale clone.
 halves are load-bearing: 98% and 95% on long real transcripts through the replay harness, and
 every firing inside a running omp has returned passthrough.
 
-Thirteen gates run on every commit and are green. This repository is public and its history is
+Fourteen gates run on every commit and are green. This repository is public and its history is
 published as written, including local filesystem paths.
 
 ### Process doctrine, and eleven unpromoted taste packages
