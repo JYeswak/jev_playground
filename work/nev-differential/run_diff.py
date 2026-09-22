@@ -16,6 +16,7 @@ sys.path.insert(
 )
 
 from system_one_adapter import AsyncSystemOneAdapterClient, Noul, Score  # noqa: E402
+from typesafe_sdk import RetryPolicy  # noqa: E402  (P2b: SDK-owned transient retry)
 
 SRC = "/Users/josh/Developer/jev/jev-sec-bench/results/injection.json"
 
@@ -82,28 +83,27 @@ def make_model(arm):
 
 
 async def one(client, sem, provider, model, state, questions):
+    # Single attempt: transient provider failures are owned by the SDK
+    # RetryPolicy (P2b). No hand sleep beside it — two retry mechanisms
+    # are worse than one. Failures record, never throw.
     async with sem:
-        for attempt in (1, 2):
-            try:
-                t0 = time.time()
-                resp = await asyncio.wait_for(
-                    client.system_one(state, questions, provider=provider, model=model),
-                    timeout=90,
-                )
-                wall = time.time() - t0
-                ans = resp.answers["injection"]
-                return {
-                    "p": float(ans.noul),
-                    "in_tokens": int(resp.usage.input_tokens_total),
-                    "out_tokens": int(resp.usage.output_tokens_total),
-                    "latency_s": round(float(resp.usage.latency), 3),
-                    "wall_s": round(wall, 3),
-                }
-            except Exception as e:  # noqa: BLE001 - recorded, not swallowed
-                last = f"{type(e).__name__}: {str(e)[:200]}"
-                if attempt == 2:
-                    return {"error": last}
-                await asyncio.sleep(2)
+        try:
+            t0 = time.time()
+            resp = await asyncio.wait_for(
+                client.system_one(state, questions, provider=provider, model=model),
+                timeout=90,
+            )
+            wall = time.time() - t0
+            ans = resp.answers["injection"]
+            return {
+                "p": float(ans.noul),
+                "in_tokens": int(resp.usage.input_tokens_total),
+                "out_tokens": int(resp.usage.output_tokens_total),
+                "latency_s": round(float(resp.usage.latency), 3),
+                "wall_s": round(wall, 3),
+            }
+        except Exception as e:  # noqa: BLE001 - recorded, not swallowed
+            return {"error": f"{type(e).__name__}: {str(e)[:200]}"}
 
 
 async def run_arm(arm, rows, out_path, done_ids, concurrency):
@@ -115,6 +115,7 @@ async def run_arm(arm, rows, out_path, done_ids, concurrency):
             structured_outputs=True,
             llm_answer_mode="probabilities",
             normalize_probabilities=True,
+            retry=RetryPolicy(),
         ) as client:
             questions = build_questions()
             todo = [r for r in rows if r[0] not in done_ids]
