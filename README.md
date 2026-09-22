@@ -164,7 +164,9 @@ Pre-parsed value extraction, riffed from the official cookbook. One command. No 
 node demos/preparsed/demo.mjs
 ```
 
-The find-and-take shape is inline in [`demos/preparsed/demo.mjs`](demos/preparsed/demo.mjs) (recall-tuned regex, Choice-over-spans with a `none` hatch, verbatim copy plus code-side normalization from [`docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md`](docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md)). The default lane runs the regexes for real and uses recorded picks so the shape is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Fixture picks are not live extraction judgments.
+The find-and-take shape is inline in [`demos/preparsed/demo.mjs`](demos/preparsed/demo.mjs) (recall-tuned regex, Choice-over-spans with a `none` hatch, verbatim copy plus code-side normalization from [`docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md`](docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md)). The default lane runs the regexes for real and uses recorded picks so the shape is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Four live bundles (`jev-1.13.0`) are in [`demos/preparsed/live-receipt.json`](demos/preparsed/live-receipt.json): same extractions as the fixture, verbatim and normalization checks held. Fixture picks are not live extraction judgments.
+
+The live-smoke index is [`demos/LIVE.md`](demos/LIVE.md) — read it; it runs nothing. One row per `live-receipt.json`, with calls, model, and what the live lane did differently from the fixture.
 
 ## TL;DR
 
