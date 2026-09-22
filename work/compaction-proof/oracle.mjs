@@ -1,7 +1,7 @@
 // Does Jev's keep/drop survive contact with what the agent ACTUALLY needed next?
 // Live decisions (not replayed), scored against the transcript's own future, vs 4 baselines.
 import { readFileSync } from 'node:fs';
-import { TypeSafeClient, noul } from '../sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs';
+import { askJevBundle } from '../jev-client/src/index.ts';
 import { auc as kitAuc, field } from '../oracle-kit/index.mjs';
 
 const WINDOW = 6;              // messages always pinned, matching the upstream default
@@ -63,12 +63,16 @@ const needed = scored.map(c => {
 });
 
 // LIVE Jev decisions, one call per tool call, batched.
-const client = new TypeSafeClient({ apiKey: process.env.TYPESAFE_API_KEY });
+if (!process.env.TYPESAFE_API_KEY) {
+  console.error('unconfigured: TYPESAFE_API_KEY is not set — no network call made');
+  process.exit(2);
+}
 const jev = [];
 for (let i = 0; i < scored.length; i += 12) {
   const batch = scored.slice(i, i + 12);
-  const qs = Object.fromEntries(batch.map((c, k) => [`keep_${k}`, noul(`Will the FULL verbatim output of tool call "${c.name}" (input: ${c.input}) still be needed later in this session?`)]));
-  const r = await client.systemOne({ state: { transcript_excerpt: batch.map(c => `${c.name}: ${c.result.slice(0, 600)}`).join('\n---\n') }, questions: qs });
+  const qs = Object.fromEntries(batch.map((c, k) => [`keep_${k}`, { type: 'noul', instructions: `Will the FULL verbatim output of tool call "${c.name}" (input: ${c.input}) still be needed later in this session?` }]));
+  const r = await askJevBundle({ state: { transcript_excerpt: batch.map(c => `${c.name}: ${c.result.slice(0, 600)}`).join('\n---\n') }, questions: qs, model: 'jev-1.13.0', timeoutMs: 10000, apiKey: process.env.TYPESAFE_API_KEY });
+  if (!r.ok) throw new Error(`Invalid Jev answer: ${r.reason} ${r.error}`);
   batch.forEach((_, k) => jev.push(Number(field(r.answers[`keep_${k}`], 'noul'))));
   process.stderr.write(`.`);
 }
