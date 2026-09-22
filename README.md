@@ -132,7 +132,7 @@ A verify cascade, riffed from the official cookbook. One command. No key. A sche
 node demos/cascade/demo.mjs
 ```
 
-The per-field battery lives in [`demos/cascade/verify.mjs`](demos/cascade/verify.mjs), following [`docs-mirror/typesafe/cookbooks/sde_cascade.md`](docs-mirror/typesafe/cookbooks/sde_cascade.md) (cheap extract, then Noul heads where true means escalate). The default lane uses recorded Nouls so the escalation is visible without spending. A fixture cascade is not a live verification.
+The per-field battery lives in [`demos/cascade/verify.mjs`](demos/cascade/verify.mjs), following [`docs-mirror/typesafe/cookbooks/sde_cascade.md`](docs-mirror/typesafe/cookbooks/sde_cascade.md) (cheap extract, then Noul heads where true means escalate). The default lane uses recorded Nouls so the escalation is visible without spending. One live bundle (`jev-1.13.0`) is in [`demos/cascade/live-receipt.json`](demos/cascade/live-receipt.json): escalated registration_open_date at 0.76, location passed at 0.18, fixture had escalated location, policy not retuned, demo exit 1. A fixture cascade is not a live verification.
 
 An ontology gate, two rules from EvoOntology (arXiv:2609.15779). One command. No key. Query the term instead of pasting the layer; ship a candidate only if it beats its parent.
 
