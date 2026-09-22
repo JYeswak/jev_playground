@@ -100,6 +100,29 @@ test('partial answers still succeed on what came back',
     assert.equal('b' in r.scores, false);
   }));
 
+test('usage passes through when the response carries it',
+  withFetch(respond(200, { answers: { harm: { noul: 0.7 } }, usage: { input_tokens: 100, output_tokens: 20 }, model: 'jev-1.13.0' }), async () => {
+    const r = await askJev({ state: STATE, questions: QUESTIONS });
+    assert.equal(r.ok, true);
+    assert.deepEqual(r.usage, { input_tokens: 100, output_tokens: 20 });
+  }));
+
+test('usage is absent, never invented, when the response omits it',
+  withFetch(respond(200, { answers: { harm: { noul: 0.7 } } }), async () => {
+    const r = await askJev({ state: STATE, questions: QUESTIONS });
+    assert.equal(r.ok, true);
+    assert.equal(r.scores.harm, 0.7);
+    assert.equal('usage' in r, false, 'a missing field must not be zero-filled');
+  }));
+
+test('malformed usage is dropped while scores stand',
+  withFetch(respond(200, { answers: { harm: { noul: 0.7 } }, usage: { input_tokens: 'lots' } }), async () => {
+    const r = await askJev({ state: STATE, questions: QUESTIONS });
+    assert.equal(r.ok, true);
+    assert.equal(r.scores.harm, 0.7);
+    assert.equal('usage' in r, false);
+  }));
+
 test('no questions is refused before any network call', async () => {
   const real = globalThis.fetch;
   globalThis.fetch = async () => { throw new Error('must not be called'); };

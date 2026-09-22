@@ -32,8 +32,9 @@ export const SYSTEMONE_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 export const DEFAULT_MODEL = "jev-1.13.0";
 
 /** Discriminated result. There is no "empty success": a caller cannot mistake failure for a clean score. */
+export type JevUsage = { input_tokens: number; output_tokens: number };
 export type JevResult =
-  | { ok: true; scores: Record<string, number>; latencyMs: number; model: string }
+  | { ok: true; scores: Record<string, number>; latencyMs: number; model: string; usage?: JevUsage }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
 
 /**
@@ -89,7 +90,7 @@ const CHOICE_KEY = "choice";
 const SCORE_KEY = "score";
 
 type Posted =
-  | { ok: true; answers: object; latencyMs: number; resolvedModel: string }
+  | { ok: true; answers: object; latencyMs: number; resolvedModel: string; usage?: JevUsage }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number };
 
 /**
@@ -145,7 +146,20 @@ async function postSystemOne(
   }
   const resolvedModel =
     "model" in result && typeof result.model === "string" ? result.model : model;
-  return { ok: true, answers, latencyMs, resolvedModel };
+  // Usage passthrough, never invented: field names per the installed SDK
+  // declarations (work/sdk/.../index.d.mts:120-126 — input_tokens and
+  // output_tokens; there is NO cost field). Absent or malformed usage is
+  // omitted, and the scores stand without it.
+  const rawUsage: unknown = "usage" in result ? result.usage : undefined;
+  const usage: JevUsage | undefined =
+    rawUsage !== null && typeof rawUsage === "object" &&
+    typeof Reflect.get(rawUsage, "input_tokens") === "number" &&
+    Number.isFinite(Reflect.get(rawUsage, "input_tokens")) &&
+    typeof Reflect.get(rawUsage, "output_tokens") === "number" &&
+    Number.isFinite(Reflect.get(rawUsage, "output_tokens"))
+      ? { input_tokens: Reflect.get(rawUsage, "input_tokens") as number, output_tokens: Reflect.get(rawUsage, "output_tokens") as number }
+      : undefined;
+  return { ok: true, answers, latencyMs, resolvedModel, ...(usage ? { usage } : {}) };
 }
 
 export async function askJev(options: AskOptions): Promise<JevResult> {
@@ -202,7 +216,7 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
       model,
     };
   }
-  return { ok: true, scores, latencyMs, model };
+  return { ok: true, scores, latencyMs, model, ...(posted.usage ? { usage: posted.usage } : {}) };
 }
 
 /**
