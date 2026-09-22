@@ -150,6 +150,14 @@ node demos/consistency/demo.mjs
 
 The gate is inline in [`demos/consistency/demo.mjs`](demos/consistency/demo.mjs) (argmax with abstain below 0.60 from [`docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md)). The default lane uses recorded distributions so the wobble is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture consistency check is not a live agreement score.
 
+Pre-parsed value extraction, riffed from the official cookbook. One command. No key. Regexes over-find the candidate spans, recorded picks choose the receipt address, the mobile, the total and the credit, and code copies each verbatim into a normalized form.
+
+```bash
+node demos/preparsed/demo.mjs
+```
+
+The find-and-take shape is inline in [`demos/preparsed/demo.mjs`](demos/preparsed/demo.mjs) (recall-tuned regex, Choice-over-spans with a `none` hatch, verbatim copy plus code-side normalization from [`docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md`](docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md)). The default lane runs the regexes for real and uses recorded picks so the shape is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Fixture picks are not live extraction judgments.
+
 ## TL;DR
 
 Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
