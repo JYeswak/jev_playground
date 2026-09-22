@@ -124,7 +124,7 @@ A line-by-line search, riffed from the official cookbook. One command. No key. O
 node demos/semantic-find/demo.mjs
 ```
 
-The ranking plus existence check live in [`demos/semantic-find/find.mjs`](demos/semantic-find/find.mjs), following [`docs-mirror/typesafe/cookbooks/semantic_find.md`](docs-mirror/typesafe/cookbooks/semantic_find.md) (Choice over line IDs plus an independent Noul). The default lane uses fixture overlap scores so the search is visible without spending. A fixture find is not a live search.
+The ranking plus existence check live in [`demos/semantic-find/find.mjs`](demos/semantic-find/find.mjs), following [`docs-mirror/typesafe/cookbooks/semantic_find.md`](docs-mirror/typesafe/cookbooks/semantic_find.md) (Choice over line IDs plus an independent Noul). The default lane uses fixture overlap scores so the search is visible without spending. Two live bundles (`jev-1.13.0`) are in [`demos/semantic-find/live-receipt.json`](demos/semantic-find/live-receipt.json): the refund question answered from L03, the holiday question returned no answer. A fixture find is not a live search.
 
 A verify cascade, riffed from the official cookbook. One command. No key. A schema-valid extraction still gets escalated when a per-field head fires; the overall head is displayed, never gating.
 
