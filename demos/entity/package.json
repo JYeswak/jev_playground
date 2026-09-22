@@ -1,0 +1,16 @@
+{
+  "name": "jev-entity",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless entity alignment. Assert same, leave unlinked, or send to a curator. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-entity": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
