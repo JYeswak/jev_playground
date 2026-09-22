@@ -100,7 +100,7 @@ A hierarchical classification, riffed from the official cookbook. One command. N
 node demos/hierarchy/demo.mjs
 ```
 
-The tree and the per-node distributions are inline in [`demos/hierarchy/demo.mjs`](demos/hierarchy/demo.mjs) (one Choice per sibling set plus greedy-and-beam traversal from [`docs-mirror/typesafe/cookbooks/hierarchical_classification.md`](docs-mirror/typesafe/cookbooks/hierarchical_classification.md)). The default lane uses recorded distributions so the recovery is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. A fixture class is not a live label.
+The tree and the per-node distributions are inline in [`demos/hierarchy/demo.mjs`](demos/hierarchy/demo.mjs) (one Choice per sibling set plus greedy-and-beam traversal from [`docs-mirror/typesafe/cookbooks/hierarchical_classification.md`](docs-mirror/typesafe/cookbooks/hierarchical_classification.md)). The default lane uses recorded distributions so the recovery is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. Ten live calls (`jev-1.13.0`) are in [`demos/hierarchy/live-receipt.json`](demos/hierarchy/live-receipt.json): both docs went food-first at the root, beam kept tech/gadgets, pie-recipe missed, fixture beam had repaired that path, policy not retuned, demo exit 1. A fixture class is not a live label.
 
 A structure recovery, riffed from the official cookbook. One command. No key. Wrapped lines stitch, blocks classify to heading/code/warning/list, and the memo renders as markdown.
 
