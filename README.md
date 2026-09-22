@@ -142,6 +142,14 @@ node demos/ontology-gate/demo.mjs
 
 The rules are inline in [`demos/ontology-gate/demo.mjs`](demos/ontology-gate/demo.mjs). The paper's numbers stay the paper's (+20 and +8.8 Traj-Wise are theirs, not ours); this file only shows the decision rules on fixtures. A fixture gate is not their benchmark.
 
+Self-consistency over a borderline post, riffed from the official cookbook. One command. No key. Eight Choices repeat five times; the action flips twice and one repeat abstains, but every plurality holds above the gate.
+
+```bash
+node demos/consistency/demo.mjs
+```
+
+The gate is inline in [`demos/consistency/demo.mjs`](demos/consistency/demo.mjs) (argmax with abstain below 0.60 from [`docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md)). The default lane uses recorded distributions so the wobble is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture consistency check is not a live agreement score.
+
 ## TL;DR
 
 Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
