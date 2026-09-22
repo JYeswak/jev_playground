@@ -10,6 +10,14 @@
  * Do not construct a systemOne request anywhere else. If you need a shape this does not
  * support, extend this file and its tests — do not fork the fetch.
  *
+ * TRANSPORT: the network goes through the vendored first-party SDK
+ * (upstream/typesafe-ai/typesafe-sdk-js @ 66880cc, loaded from
+ * work/sdk/node_modules/@typesafe-ai/sdk) and nothing else. Imported by
+ * relative path so no install step can drift it; never edit upstream/.
+ * Our code owns the failure taxonomy, the field guards, and the fail-safe
+ * direction — the SDK owns the wire. Single-attempt semantics are preserved
+ * (SDK retry disabled per call); our 4 s default timeout is passed through.
+ *
  * CONTRACT, verified against a working live call:
  *   POST https://api.typesafe.ai/v1/systemone
  *   { model, state, questions: { <key>: { type: "noul", instructions } } }
@@ -17,6 +25,9 @@
  * Field names per docs/demos/SDK-SURFACE.md (`NoulResponse.noul`, `ChoiceResponse.probabilities`;
  * there is no `.probability` and no `.distribution`).
  */
+import { TypeSafeClient, APIError, APIConnectionError, APITimeoutError, APIUserAbortError } from "../../sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs";
+
+/** The endpoint the SDK targets by default. No fetch() is constructed beside it. */
 export const SYSTEMONE_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 export const DEFAULT_MODEL = "jev-1.13.0";
 
@@ -54,6 +65,8 @@ export type AskOptions = {
   timeoutMs?: number;
   model?: string;
   apiKey?: string;
+  /** Transport override for offline tests. Defaults to globalThis.fetch, read at call time. */
+  fetchImpl?: typeof fetch;
 };
 
 export type AskChoiceOptions = {
@@ -66,6 +79,8 @@ export type AskChoiceOptions = {
   timeoutMs?: number;
   model?: string;
   apiKey?: string;
+  /** Transport override for offline tests. Defaults to globalThis.fetch, read at call time. */
+  fetchImpl?: typeof fetch;
 };
 
 /** The key the single choice question is filed under. Internal; callers never see it. */
@@ -85,41 +100,46 @@ async function postSystemOne(
   state: Record<string, unknown>,
   questions: Record<string, unknown>,
   timeoutMs: number,
+  fetchImpl: typeof fetch,
 ): Promise<Posted> {
   const started = Date.now();
-  let response: Response;
-  let text: string;
+  // One client per call: no shared mutable transport, and the injected fetch
+  // is read at call time so offline tests can swap it per case. Construction
+  // is inside the try so a config rejection degrades to transport, never throws.
+  let result: { answers: unknown; usage?: unknown; model?: unknown };
   try {
-    response = await fetch(SYSTEMONE_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({ model, state, questions }),
-      signal: AbortSignal.timeout(timeoutMs),
+    const client = new TypeSafeClient({
+      apiKey,
+      fetch: fetchImpl,
+      timeout: timeoutMs,
+      retry: { maxRetries: 0 },
     });
-    text = await response.text();
+    result = await client.systemOne({ state, questions, model });
   } catch (err) {
-    return { ok: false, reason: "transport", error: String(err), latencyMs: Date.now() - started };
+    const latencyMs = Date.now() - started;
+    if (err instanceof APIError) {
+      return { ok: false, reason: "http", error: `systemOne HTTP ${err.status}: ${err.message}`, latencyMs };
+    }
+    if (err instanceof APIConnectionError || err instanceof APITimeoutError || err instanceof APIUserAbortError) {
+      return { ok: false, reason: "transport", error: String(err.message), latencyMs };
+    }
+    return { ok: false, reason: "transport", error: String(err instanceof Error ? err.message : err), latencyMs };
   }
-
   const latencyMs = Date.now() - started;
-  let body: unknown;
-  try {
-    body = JSON.parse(text);
-  } catch {
-    return { ok: false, reason: "non-json", error: `non-JSON body (status ${response.status})`, latencyMs };
+  // The SDK resolves non-JSON bodies as raw text (parseBody is lenient by
+  // design). Text where answers belong means the server did not answer JSON.
+  if (typeof result === "string") {
+    return { ok: false, reason: "non-json", error: "response carried text, not an `answers` object", latencyMs };
   }
-  if (!response.ok) {
-    return { ok: false, reason: "http", error: `systemOne HTTP ${response.status}: ${text.slice(0, 300)}`, latencyMs };
-  }
-  if (!body || typeof body !== "object" || !("answers" in body)) {
+  if (!result || typeof result !== "object" || !("answers" in result)) {
     return { ok: false, reason: "no-answers", error: "response carried no `answers`", latencyMs };
   }
-  const answers = body.answers;
+  const answers: unknown = result.answers;
   if (!answers || typeof answers !== "object") {
     return { ok: false, reason: "no-answers", error: "`answers` was not an object", latencyMs };
   }
   const resolvedModel =
-    "model" in body && typeof body.model === "string" ? body.model : model;
+    "model" in result && typeof result.model === "string" ? result.model : model;
   return { ok: true, answers, latencyMs, resolvedModel };
 }
 
@@ -148,7 +168,7 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
     Object.entries(options.questions).map(([key, instructions]) => [key, { type: "noul", instructions }]),
   );
 
-  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000);
+  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch);
   if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
   const { answers, latencyMs } = posted;
 
@@ -220,7 +240,7 @@ export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoice
   const questions = {
     [CHOICE_KEY]: { type: "choice", instructions: options.instructions, criteria: options.classes },
   };
-  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000);
+  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch);
   if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
   const { answers, latencyMs } = posted;
 
@@ -260,6 +280,8 @@ export type AskBundleOptions = {
   timeoutMs?: number;
   model?: string;
   apiKey?: string;
+  /** Transport override for offline tests. Defaults to globalThis.fetch, read at call time. */
+  fetchImpl?: typeof fetch;
 };
 
 export type JevBundleResult =
@@ -292,7 +314,7 @@ export async function askJevBundle(options: AskBundleOptions): Promise<JevBundle
   if (keys.length === 0) {
     return { ok: false, reason: "no-answers", error: "no questions supplied", latencyMs: 0, model };
   }
-  const posted = await postSystemOne(apiKey, model, options.state, options.questions, options.timeoutMs ?? 4000);
+  const posted = await postSystemOne(apiKey, model, options.state, options.questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch);
   if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
   return {
     ok: true,

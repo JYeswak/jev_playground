@@ -19,8 +19,14 @@ function withFetch(impl, body) {
     }
   };
 }
+// Fake Responses must be Response-shaped: the SDK transport reads headers and
+// buffers via clone().body (real Responses always carry both; the old fakes
+// predated the SDK delegation and omitted them).
+const fakeHeaders = () => ({ get: (name) => name.toLowerCase() === 'content-type' ? 'application/json' : null });
 const respond = (status, payload) => async () => ({
-  ok: status < 400, status, text: async () => JSON.stringify(payload),
+  ok: status < 400, status, headers: fakeHeaders(), body: null,
+  clone() { return this; },
+  text: async () => JSON.stringify(payload),
 });
 
 test('sends the EXACT wire shape that works, not an invented one', withFetch(
@@ -33,7 +39,7 @@ test('sends the EXACT wire shape that works, not an invented one', withFetch(
     assert.deepEqual(sent.state, STATE, 'payload goes in `state`, not `context`');
     assert.deepEqual(sent.questions, { harm: { type: 'noul', instructions: 'is this harmful?' } },
       'questions is an OBJECT of {type,instructions}, never an array of strings');
-    return { ok: true, status: 200, text: async () => JSON.stringify({ answers: { harm: { noul: 0.91 } } }) };
+    return { ok: true, status: 200, headers: fakeHeaders(), body: null, clone() { return this; }, text: async () => JSON.stringify({ answers: { harm: { noul: 0.91 } } }) };
   },
   async () => {
     const r = await askJev({ state: STATE, questions: QUESTIONS });
@@ -72,7 +78,7 @@ test('.probability and .distribution are NOT accepted as answers',
   }));
 
 test('a non-JSON body is non-json, not a crash',
-  withFetch(async () => ({ ok: true, status: 200, text: async () => '<html>502</html>' }), async () => {
+  withFetch(async () => ({ ok: true, status: 200, headers: { get: () => 'text/html' }, body: null, clone() { return this; }, text: async () => '<html>502</html>' }), async () => {
     const r = await askJev({ state: STATE, questions: QUESTIONS });
     assert.equal(r.ok, false);
     assert.equal(r.reason, 'non-json');
@@ -126,7 +132,7 @@ test('askJevChoice sends type:"choice" with criteria as a MAP of label -> descri
     assert.deepEqual(sent.questions, {
       choice: { type: 'choice', instructions: 'which class?', criteria: CLASSES },
     }, 'ONE question, type "choice", criteria a map — the SDK rejects a list outright');
-    return { ok: true, status: 200, text: async () => JSON.stringify(CHOICE_OK) };
+    return { ok: true, status: 200, headers: fakeHeaders(), body: null, clone() { return this; }, text: async () => JSON.stringify(CHOICE_OK) };
   },
   async () => {
     const r = await askJevChoice({ state: STATE, instructions: 'which class?', classes: CLASSES });
@@ -147,6 +153,7 @@ test('askJevBundle sends Choice and Noul in ONE request against the same state',
     return {
       ok: true,
       status: 200,
+      headers: fakeHeaders(), body: null, clone() { return this; },
       text: async () => JSON.stringify({
         model: 'jev-1.13.0',
         answers: {
