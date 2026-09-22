@@ -34,9 +34,10 @@ test('Jev error returns undefined and records the error without cost', async () 
   const { observer, records } = setup({ classify: async () => { throw new Error('synthetic Jev failure'); } });
   const result = await observer(event, context);
   assert.equal(result, undefined);
-  assert.equal(records.length, 1);
   assert.match(records[0].error, /synthetic Jev failure/);
   assert.equal('costUsd' in records[0], false);
+  assert.equal(records[0].probabilities.flag, null);
+  assert.equal(records[0].probabilities.pass, null);
 });
 
 test('missing classifier cost is absent rather than zero', async () => {

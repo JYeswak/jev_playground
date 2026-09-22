@@ -39,11 +39,31 @@ function makeRecord(command, error, context, latencyMs, toolCallId, costUsd) {
   const sessionId = context?.sessionId;
   return { schemaVersion: SCHEMA_VERSION, recordType: 'decision', decisionId: randomUUID(), timestamp: new Date().toISOString(), ...(sessionId ? { sessionId } : {}), tool: 'bash', toolCallId, argsDigest: digest({ command }), questionSet: ['privilege widening', 'secret staging', 'irreversible publication', 'security-control tampering'], probabilities: { flag: null, pass: null }, latencyMs, ...(costUsd === undefined ? {} : { costUsd }), error };
 }
-
 export function withTimeout(promise, timeoutMs) {
   let timer;
   const timeout = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error(`observer timeout after ${timeoutMs}ms`)), timeoutMs); });
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+ /**
+ * The JEV_OBSERVER_ENDPOINT fallback is an operator-configured LOCAL webhook,
+ * not the TypeSafe API — routing it via work/jev-client askJev would redirect
+ * local traffic to the vendor and break offline use (same exempt class as
+ * gate-44's local-server exemption). It stays fetch(). What askJev owns and
+ * this must match: a malformed answer never becomes a score. Non-numeric
+ * flag/pass become null (no score); a missing probabilities object throws
+ * into the error row.
+ */
+function checkedEndpointBody(body) {
+  const probs = body?.probabilities;
+  if (!probs || typeof probs !== 'object') throw new Error('Invalid endpoint answer: probabilities missing');
+  const num = (v) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+  const out = {
+    questionSet: Array.isArray(body.questionSet) ? body.questionSet : ['observer flag question'],
+    probabilities: { flag: num(probs.flag), pass: num(probs.pass) },
+  };
+  if (typeof body.costUsd === 'number' && Number.isFinite(body.costUsd)) out.costUsd = body.costUsd;
+  return out;
 }
 export function createObserver({ logger, dcg, classify, enabled = true, timeoutMs = 750, now = () => new Date().toISOString(), diagnostic = async () => {} }) {
   let rawEmitted = false;
@@ -70,11 +90,10 @@ export async function installObserver(pi, options = {}) {
   if (!classify) {
     if (process.env.TYPESAFE_API_KEY) {
       classify = await createSystemOneClassify({ apiKey: process.env.TYPESAFE_API_KEY, model: process.env.JEV_OBSERVER_MODEL });
-    } else if (endpoint) {
       classify = async ({ command }) => {
         const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ command }), signal: AbortSignal.timeout(options.timeoutMs ?? 750) });
         if (!response.ok) throw new Error(`Jev HTTP ${response.status}`);
-        return response.json();
+        return checkedEndpointBody(await response.json());
       };
     } else {
       classify = async () => { throw new Error('TYPESAFE_API_KEY (preferred) or JEV_OBSERVER_ENDPOINT is not configured'); };
@@ -103,7 +122,7 @@ export default function ompJevObserver(pi) {
         } else if (endpoint) {
           const response = await fetch(endpoint, { method: 'POST', body: JSON.stringify({ command }), signal: AbortSignal.timeout(750) });
           if (!response.ok) throw new Error(`Jev HTTP ${response.status}`);
-          result = await response.json();
+          result = checkedEndpointBody(await response.json());
         } else {
           throw new Error('TYPESAFE_API_KEY (preferred) or JEV_OBSERVER_ENDPOINT is not configured');
         }

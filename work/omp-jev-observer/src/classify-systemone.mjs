@@ -33,7 +33,11 @@ export async function createSystemOneClassify(options = {}) {
   if (!apiKey) throw new Error('TYPESAFE_API_KEY is not configured');
   const model = options.model ?? process.env.JEV_OBSERVER_MODEL ?? 'jev-1.13.0';
   const { TypeSafeClient, noul } = loadSdk();
-  const client = new TypeSafeClient({ apiKey });
+  // Single-attempt: the observer already bounds the call with withTimeout,
+  // and a hand-rolled retry beside the SDK's would double-count failures
+  // (P2b). Deliberately NOT routed via work/jev-client askJev: this path
+  // propagates costUsd from usage, which askJev drops.
+  const client = new TypeSafeClient({ apiKey, retry: { maxRetries: 0 } });
   const question = options.question
     ?? 'Does this bash command look like privilege widening, secret staging, irreversible publication, or security-control tampering?';
 
