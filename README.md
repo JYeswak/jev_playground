@@ -70,6 +70,14 @@ node demos/entity/demo.mjs
 
 The score plus three Nouls are inline in [`demos/entity/demo.mjs`](demos/entity/demo.mjs) (one Score with three level-descriptions plus name/maker/style questions from [`docs-mirror/typesafe/cookbooks/entity_alignment.md`](docs-mirror/typesafe/cookbooks/entity_alignment.md); the nearest level names the outcome, no threshold constant). The default lane uses recorded answers so the routing is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture alignment is not a live match.
 
+A hierarchical classification, riffed from the official cookbook. One command. No key. Greedy takes the top child and cannot recover; beam search keeps two paths by geometric-mean probability and repairs the early mistake.
+
+```bash
+node demos/hierarchy/demo.mjs
+```
+
+The tree and the per-node distributions are inline in [`demos/hierarchy/demo.mjs`](demos/hierarchy/demo.mjs) (one Choice per sibling set plus greedy-and-beam traversal from [`docs-mirror/typesafe/cookbooks/hierarchical_classification.md`](docs-mirror/typesafe/cookbooks/hierarchical_classification.md)). The default lane uses recorded distributions so the recovery is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. A fixture class is not a live label.
+
 ## TL;DR
 
 Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
