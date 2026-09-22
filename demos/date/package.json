@@ -1,0 +1,16 @@
+{
+  "name": "jev-date",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless date extractor. Reads date parts, assembles a calendar date, sends low confidence to review. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-date": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
