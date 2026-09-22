@@ -6,13 +6,13 @@ An experimental lab for [Jev](https://docs.typesafe.ai). You ask a typed questio
 
 ## The thing to run
 
-A message guard, riffed from the official cookbook. One command. No key. A refund passes, a jailbreak blocks, a dosage request goes to review, a crisis line goes to support.
+A message guard, riffed from the official cookbook. One command. No key. A refund passes, a jailbreak blocks, a crisis line goes to support.
 
 ```bash
 node demos/guard/demo.mjs
 ```
 
-The policy is [`demos/guard/policy.mjs`](demos/guard/policy.mjs). The questions and thresholds are the ones in [`docs-mirror/typesafe/cookbooks/llm_guardrails.md`](docs-mirror/typesafe/cookbooks/llm_guardrails.md). The default lane uses recorded assessments so the routing is visible without spending. `--live` calls Jev through `askJevBundle` and needs `TYPESAFE_API_KEY`.
+The policy is [`demos/guard/policy.mjs`](demos/guard/policy.mjs). The questions and thresholds are the ones in [`docs-mirror/typesafe/cookbooks/llm_guardrails.md`](docs-mirror/typesafe/cookbooks/llm_guardrails.md). The default lane uses recorded assessments so the routing is visible without spending. `--live` calls Jev through `askJevBundle` and needs `TYPESAFE_API_KEY`. A four-message live smoke is in [`demos/guard/live-receipt.json`](demos/guard/live-receipt.json): pass, block, block, support. N=4 is not a certification.
 
 A RAG passage filter, riffed from the official cookbook. One command. No key. An injection is dropped, a premise-denier is kept as conflicting evidence, the merely irrelevant are dropped.
 
