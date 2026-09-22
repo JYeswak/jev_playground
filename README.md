@@ -38,6 +38,14 @@ node demos/skill-suggest/demo.mjs
 
 The two-stage suggest with its gate lives in [`demos/skill-suggest/suggest.mjs`](demos/skill-suggest/suggest.mjs), following [`docs-mirror/typesafe/cookbooks/skill_suggestion.md`](docs-mirror/typesafe/cookbooks/skill_suggestion.md) (rank the roster, verify the top three, suggest nothing below gate). The default lane uses fixture overlap scores so the shape is visible without spending. Fixture suggestions are not a live ranking.
 
+A function dispatcher, riffed from the official cookbook. One command. No key. Three commands dispatch to typed calls, one leaving an argument out so the default applies.
+
+```bash
+node demos/function-call/demo.mjs
+```
+
+The spec and dispatcher live in [`demos/function-call/dispatch.mjs`](demos/function-call/dispatch.mjs), following [`docs-mirror/typesafe/cookbooks/function_calling.md`](docs-mirror/typesafe/cookbooks/function_calling.md) (one Choice picks the function, each argument gets a Choice plus a stated Noul, call confidence is the least-certain judgment). The default lane uses fixture overlap scores so the dispatch is visible without spending. A fixture dispatch is not a live tool call.
+
 A passage re-rank, riffed from the official cookbook. One command. No key. A word-overlap shortlist misorders both queries; recorded nouls put the right passage first.
 
 ```bash
