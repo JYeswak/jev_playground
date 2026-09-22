@@ -391,6 +391,7 @@ elif [ "$fails" -gt 1 ]; then
   printf 'FAIL: %d distinct failure classes fired. Exit %d.\n' "$fails" "$rc"
 elif [ "$missing" -gt 0 ]; then rc=3
 elif [ "$drifted" -gt 0 ]; then rc=4
+elif [ "$concur_missing" -gt 0 ]; then rc=5
 elif [ "$value_bad" -gt 0 ]; then rc=12
 fi
 
