@@ -103,18 +103,21 @@ async function postSystemOne(
   questions: Record<string, unknown>,
   timeoutMs: number,
   fetchImpl: typeof fetch,
+  retry?: { maxRetries?: number },
 ): Promise<Posted> {
   const started = Date.now();
   // One client per call: no shared mutable transport, and the injected fetch
   // is read at call time so offline tests can swap it per case. Construction
   // is inside the try so a config rejection degrades to transport, never throws.
+  // Retry is SDK-owned: callers pass maxRetries explicitly; absent means 0
+  // (single attempt), preserving the fail-fast row semantics runners rely on.
   let result: { answers: unknown; usage?: unknown; model?: unknown };
   try {
     const client = new TypeSafeClient({
       apiKey,
       fetch: fetchImpl,
       timeout: timeoutMs,
-      retry: { maxRetries: 0 },
+      retry: { maxRetries: retry?.maxRetries ?? 0 },
     });
     result = await client.systemOne({ state, questions, model });
   } catch (err) {
@@ -369,15 +372,18 @@ export async function askJevScore(options: AskScoreOptions): Promise<JevScoreRes
 }
 
 export type AskBundleOptions = {
+  /** The object the questions are asked about. Serialised as-is into `state`. */
   state: Record<string, unknown>;
+  /** Already-typed question objects (`type: noul|choice|score`). */
   questions: Record<string, unknown>;
   timeoutMs?: number;
   model?: string;
   apiKey?: string;
   /** Transport override for offline tests. Defaults to globalThis.fetch, read at call time. */
   fetchImpl?: typeof fetch;
+  /** Retry owned by the SDK. Absent means maxRetries 0: one attempt per call. */
+  retry?: { maxRetries?: number };
 };
-
 export type JevBundleResult =
   | {
       ok: true;
@@ -408,7 +414,7 @@ export async function askJevBundle(options: AskBundleOptions): Promise<JevBundle
   if (keys.length === 0) {
     return { ok: false, reason: "no-answers", error: "no questions supplied", latencyMs: 0, model };
   }
-  const posted = await postSystemOne(apiKey, model, options.state, options.questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch);
+  const posted = await postSystemOne(apiKey, model, options.state, options.questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch, options.retry);
   if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
   return {
     ok: true,

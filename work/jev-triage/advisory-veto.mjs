@@ -93,7 +93,7 @@ async function main() {
       const r = await askJev({
         state: toState(c),
         questions: { defect: NOUL_INSTRUCTIONS },
-        model: "jev-latest",
+        model: "jev-1.13.0",
         timeoutMs: 20000,
       });
       if (r.ok) noul = r.scores.defect;

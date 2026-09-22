@@ -59,7 +59,7 @@ async function fillNoul() {
     const r = await askJev({
       state: toState(c),
       questions: NOUL_Q,
-      model: "jev-latest",
+      model: "jev-1.13.0",
       timeoutMs: 20000,
     });
     if (!r.ok) {

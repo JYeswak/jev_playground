@@ -59,16 +59,11 @@ function noulPred(noul) {
   return noul >= 0.5;
 }
 
-async function askWithRetry(opts, attempts = 3) {
-  let last;
-  for (let i = 0; i < attempts; i++) {
-    last = await askJevBundle(opts);
-    if (last.ok) return last;
-    const retryable = /HTTP (429|503|529)/.test(last.error ?? "");
-    if (!retryable || i === attempts - 1) return last;
-    await new Promise((r) => setTimeout(r, 500 * 2 ** i));
-  }
-  return last;
+// Single attempt per row. Retry is SDK-owned (askJevBundle `retry` option,
+// default maxRetries 0); the hand-rolled 429/503/529 regex loop is deleted.
+// A failed row records FAIL and the run continues — per-row isolation kept.
+async function askOnce(opts) {
+  return askJevBundle(opts);
 }
 
 const live = process.argv.includes("--live");
@@ -120,17 +115,12 @@ const questions = {
 const liveRows = [];
 let resolvedModel = null;
 for (const row of scored) {
-  const result = await askWithRetry({
+  const result = await askOnce({
     state: row.state,
     questions,
-    model: "jev-latest",
+    model: "jev-1.13.0",
     timeoutMs: 20000,
   });
-  if (!result.ok) {
-    console.log(`FAIL ${row.id} reason=${result.reason} error=${result.error}`);
-    liveRows.push({ ...row, ok: false, reason: result.reason });
-    continue;
-  }
   resolvedModel = result.resolvedModel;
   const verdictAns = result.answers.verdict;
   const defectAns = result.answers.defect;
@@ -221,7 +211,7 @@ function printBinary(title, b) {
 
 const receipt = {
   at: new Date().toISOString(),
-  requested_model: "jev-latest",
+  requested_model: "jev-1.13.0",
   resolved_model: resolvedModel,
   calls: jevOk.length,
   budget: BUDGET,

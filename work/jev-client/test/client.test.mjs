@@ -304,3 +304,18 @@ test('askJevScore refuses an answer it cannot read', withFetch(
     assert.equal(r.reason, 'no-answers');
   },
 ));
+
+test('askJevBundle defaults to a single attempt: a 503 is reported, not retried', async () => {
+  const real = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async () => {
+    calls += 1;
+    return { ok: false, status: 503, headers: fakeHeaders(), body: null, clone() { return this; }, text: async () => JSON.stringify({ detail: 'overloaded' }) };
+  };
+  try {
+    const r = await askJevBundle({ state: STATE, questions: { a: { type: 'noul', instructions: 'q' } }, apiKey: 'k' });
+    assert.equal(r.ok, false);
+    assert.equal(r.reason, 'http');
+    assert.equal(calls, 1, 'default retry is maxRetries 0: the SDK owns retry, the runner owns rows');
+  } finally { globalThis.fetch = real; }
+});
