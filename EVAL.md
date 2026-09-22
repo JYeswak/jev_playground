@@ -1310,3 +1310,19 @@ unpriced.
 the run above, ECE 0.0614, Brier 0.0195, choice 19/20, 0 errors, pinned
 model. Two independent live runs plus the cited receipt all agree —
 migration graded by replication, owed grade satisfied.
+
+## jev-screen logging observer (2026-09-22) [live]
+
+P2 `jev-v6j`: thin `work/omp-jev-screen-log/screen-log.mjs`
+(`screenRecord` + `recordingScreen` wrapper) appending via dogfood-logger's
+`JsonlDecisionLog` (0600, rotation, sha256 digest) — no new append
+mechanics. Offline suite
+`work/omp-jev-observer/test/screen-log.test.mjs` 4/4 (schema/hash-only,
+identical-reference passthrough, malformed→review). Live proof
+`proof-session.mts` over H1/B1/B2 (3 keyed calls): 3/3 rows, verdicts
+flag p=0.99 / pass / pass, zero verdict changes, latencyMs present.
+Privacy: text hashes only, never text (header note). Non-goals honored:
+observes only, no blocking, no thresholds.
+
+**Boundary.** One driven session, pinned model. Live log stays in /tmp,
+never committed. Non-author grade owed.
