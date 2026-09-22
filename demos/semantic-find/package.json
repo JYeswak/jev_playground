@@ -1,0 +1,17 @@
+{
+  "name": "jev-semantic-find",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless semantic finder. Answers from a passage or abstains. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-semantic-find": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs",
+    "find.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
