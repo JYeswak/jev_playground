@@ -1191,3 +1191,40 @@ as runnable code. No live Jev. **promoted=0 untouched.** No STATUS.tsv schema ch
 - Silent-loss: new codes in table not in T2 list. scope/uncovered stayed
   in tables v5–v7.
 - **Boundary:** did not edit the plan. Count is the blocker.
+
+## jev-spam-eval regime — distribution shift, not spam (2026-09-21) [oracle]
+
+Repo `jev-spam-eval` @ `76ef183` **at HEAD**. `OUT_OF_DISTRIBUTION.md` and `README.md` are clean against that SHA. Two result files are dirty in this checkout and must not be replayed as the published numbers: `results/ood_modern.jsonl` and `results/ood_tfidf_predictions.jsonl`. Pane 1 scored `ood_modern.jsonl` both ways (label vs `choices.choice`, ham/legitimate collapsed). `category` and `category_names_only` match HEAD. `category_urgency_authority` is 616/633 = 97.31% at HEAD and 612/633 = 96.68% in the working tree, 4 rows flipped. The README headline 97.3% is the HEAD value. A replay of the dirty file will look like an upstream overclaim. It is our checkout.
+
+In-distribution, a TF-IDF trained on the target's own labels ties or beats Jev (README: 98.3/98.4, 98.6/99.4, 94.2/98.7). Out of distribution, the same lexical baseline falls and Jev does not: Ling-Spam 98.6% vs 73.0%, phishing 2024–25 91.0–93.6% vs 70.3%, modern-mail accuracy **0.9731 at HEAD** vs TF-IDF 0.7251. The working-tree 96.68% is not the cited number. The 97.3% in the TF-IDF modern row is "legitimate posts called legitimate", not accuracy.
+
+Pane 1's sharper edge, not re-run here: the identical method scores 0.9857 trained on Ling-Spam's own labels, 0.7298 trained on email-dataset, and Jev's plain question scores 0.9857 with zero labels (`OUT_OF_DISTRIBUTION.md:28-41`).
+
+**Regime, not a seat.** Bit 1 is YES in-distribution, so no seat. Bit 1 is NO under shift, so that is the regime a later candidate must be in. The repo calls the runs exploratory, each once, `jev-1.13.0`. The 98.3% question was written after reading 1,000 mistakes; the plain question scored 96.0%.
+
+**Boundary.** No live call in this citation. No omp seam. Not a certified seat. The rerank 219-pair result remains thin and uncertified (`work/nev-rerank/live-receipt.json`).
+
+## differential LLM-vs-Jev on jev-sec-bench injection 662 (2026-09-21) [live]
+
+Incumbent arm RULE 14 required: same state + same InjectionBattery via
+`upstream/typesafe-ai/system-one-adapter-python` @ `adffc2e` (v0.2.0, venv
+synced to lockfile; adapter 40/40 fake-model tests green offline). Full 662,
+cut @0.5, one request/row/arm, attended. Bar `work/nev-differential/
+PREREGISTER-DIFF.md` @ `3d65229` + Amendment A1 @ `b5e6e1e`, both pre-spend.
+Receipt `work/nev-differential/DIFF-RECEIPT.json` @ `57d30e9`.
+
+- Jev `jev-1.13.0` CITED (committed `results/injection.json` @ `fdb16b9`):
+  639/662 = 0.9653 (tp=250 fp=10 tn=389 fn=13). Zero new Jev calls.
+- grok-4 via xAI custom endpoint: 558/662 = 0.8429, Wilson lower 0.8132,
+  discordants arm-only 8 / jev-only 89, exact McNemar p=2.0e-18.
+  590,696 in / 30,421 out tokens, mean latency 6.8 s.
+- claude-haiku-4-5 via Anthropic: 579/662 = 0.8746, Wilson lower 0.8472,
+  discordants 5/65, p=2.2e-14. 687,796 in / 27,388 out tokens, mean 0.94 s.
+- OpenAI `gpt-4o-mini` arm INVALID: 401 on every attempt, key rejected;
+  error rows on disk, never retried, never silent.
+- Gate 4 (Jev exceeds both arms AND p<0.05 vs each) MET — seat certified for
+  this corpus only (prompt-injection guard), never Jev in general.
+
+**Boundary.** Public corpus may leak into any model's training. Single run,
+fixed cut, no tuning. Cost in tokens reported, dollars not computed. No omp
+seam; wiring is the next unit, not this one.
