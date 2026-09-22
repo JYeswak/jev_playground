@@ -1270,3 +1270,17 @@ Provisional L4 separately at `31c2eda` (3 keyed calls, flag + 2xpass-silent).
 **Boundary.** NOT re-run: the RPC sessions, the driver model calls, the L4
 keyed calls. Listed is not firing; L3 is not L4; seat is this corpus only.
 Closes `jev-xio`.
+
+## jev-screen provisional L4, keyed session (2026-09-22) [live]
+
+Bar `PREREGISTER-L4.md @e800719` (19:22:47) predates spend `31c2eda`
+(19:24:14). Driver `l4-drive.mjs`, 193 frames, 3 texts served in order via
+host-tool path, 3 jev_screen executions under cap 8. H1 hostile → flag
+p=0.99; B1/B2 benign → bare pass p=0.03/0.02, silence byte-exact; zero
+review; calledModel=true throughout. Non-author grade (CopperLake): PASS
+with residual — per-call latency/tokens not propagated by the tool
+(details carry verdict only); session wall 49 s. L4-full requires
+`latencyMs` in tool details.
+
+**Boundary.** One session, three calls, one model version. Provisional only:
+not fleet proof, not healthy-traffic silence at scale. Billing unpriced.
