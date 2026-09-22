@@ -6,6 +6,16 @@ node demos/guard/demo.mjs
 
 A refund passes, a jailbreak blocks, a dosage request goes to review, a crisis line goes to support.
 
+From a clone:
+
+```bash
+mkdir -p /tmp/jev-guard && npm install --prefix /tmp/jev-guard "$PWD/demos/guard"
+/tmp/jev-guard/node_modules/.bin/jev-guard
+```
+
+The package is private. It is not on the npm registry.
+
+
 ```bash
 node demos/chief/demo.mjs
 ```

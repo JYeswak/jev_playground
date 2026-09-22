@@ -1,0 +1,17 @@
+{
+  "name": "jev-guard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless message guard. Flag, pass, review, or support. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-guard": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs",
+    "policy.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
