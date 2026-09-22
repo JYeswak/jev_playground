@@ -52,7 +52,7 @@ Instant context compaction, riffed from Movez's Jev Engineering guide step 5. On
 node demos/compact/demo.mjs
 ```
 
-The transcript and the recorded keep/drop probabilities live in [`demos/compact/demo.mjs`](demos/compact/demo.mjs), executed through the vendored clone's own `compact(messages, asker, options)` (`fast-jev-compaction@6e1da50`, read-only). The default lane uses a fixture asker so the compaction is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture keep/drop is not a live compaction.
+The transcript and the recorded keep/drop probabilities live in [`demos/compact/demo.mjs`](demos/compact/demo.mjs), executed through the vendored clone's own `compact(messages, asker, options)` (`fast-jev-compaction@6e1da50`, read-only). The default lane uses a fixture asker so the compaction is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. One live bundle (`jev-1.13.0`) is in [`demos/compact/live-receipt.json`](demos/compact/live-receipt.json): 1169 chars to 287, all three calls dropped, fixture had kept the Bash call, policy not retuned. A fixture keep/drop is not a live compaction.
 
 A function dispatcher, riffed from the official cookbook. One command. No key. Three commands dispatch to typed calls, one leaving an argument out so the default applies.
 
