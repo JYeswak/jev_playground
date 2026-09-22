@@ -5,28 +5,22 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { judgePair } from './judge.mjs';
+// Lane-sanctioned caller (943158c): SDK-owned wire, our failure taxonomy.
+// askJevBundle passes questions through UNMODIFIED, preserving the Noul
+// criteria {true,false} judgePair builds — askJev (instructions-only) would
+// silently drop them.
+import { askJevBundle } from '../../../work/jev-client/src/index.ts';
 
-// Minimal live asker (same refusal semantics as the lane's Jev clients).
+// Live asker via the lane client. Same refusal semantics: throw on any
+// failure (transport, unconfigured, malformed) and judgePair records
+// uncertain/asker-malformed. Never returns a fabricated score.
 function liveAsker(apiKey, model) {
   if (!apiKey) throw new Error('TYPESAFE_API_KEY is not configured');
   return {
     async ask(state, questions) {
-      const res = await fetch('https://api.typesafe.ai/v1/systemone', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, state, questions }),
-      });
-      const text = await res.text();
-      let body;
-      try {
-        body = JSON.parse(text);
-      } catch {
-        throw new Error(`Invalid Jev answer: non-JSON (status ${res.status})`);
-      }
-      if (!res.ok || !body || typeof body.answers !== 'object') {
-        throw new Error(`Invalid Jev answer: status ${res.status}`);
-      }
-      return body;
+      const r = await askJevBundle({ state, questions, model, apiKey, timeoutMs: 20000 });
+      if (!r.ok) throw new Error(`Invalid Jev answer: ${r.reason} ${r.error}`);
+      return { answers: r.answers };
     },
   };
 }
