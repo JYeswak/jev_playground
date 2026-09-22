@@ -62,6 +62,14 @@ node demos/date/demo.mjs
 
 The parts and the calendar math are inline in [`demos/date/demo.mjs`](demos/date/demo.mjs) (seven Choice questions plus code assembly from [`docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md`](docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md), pinned TODAY so relative dates reproduce). The default lane uses recorded part answers so the assembly is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture date is not a live extraction.
 
+An entity alignment, riffed from the official cookbook. One command. No key. Identical products merge, different ones stay unlinked, and close variants go to a curator.
+
+```bash
+node demos/entity/demo.mjs
+```
+
+The score plus three Nouls are inline in [`demos/entity/demo.mjs`](demos/entity/demo.mjs) (one Score with three level-descriptions plus name/maker/style questions from [`docs-mirror/typesafe/cookbooks/entity_alignment.md`](docs-mirror/typesafe/cookbooks/entity_alignment.md); the nearest level names the outcome, no threshold constant). The default lane uses recorded answers so the routing is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture alignment is not a live match.
+
 ## TL;DR
 
 Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
