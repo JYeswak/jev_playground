@@ -10,7 +10,8 @@
  */
 import { readFileSync, appendFileSync, existsSync } from "node:fs";
 import { dirname, join } from "node:path";
-import jevScreenTool from "../../.omp/tools/jev-screen.ts";
+import jevScreenToolMod from "../../.omp/tools/jev-screen.ts";
+const jevScreenTool = jevScreenToolMod.default ?? jevScreenToolMod;
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
