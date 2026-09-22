@@ -118,6 +118,22 @@ node demos/parallel/demo.mjs
 
 The briefing lives in [`demos/parallel/brief.mjs`](demos/parallel/brief.mjs), following [`docs-mirror/typesafe/cookbooks/parallel_questions.md`](docs-mirror/typesafe/cookbooks/parallel_questions.md) (batching changes cost and speed, not answers). The default lane uses recorded answers so the briefing is visible without spending. A fixture briefing is not a live judgment.
 
+A line-by-line search, riffed from the official cookbook. One command. No key. One query points at its line, another reads as unanswered — the exists check tells them apart.
+
+```bash
+node demos/semantic-find/demo.mjs
+```
+
+The ranking plus existence check live in [`demos/semantic-find/find.mjs`](demos/semantic-find/find.mjs), following [`docs-mirror/typesafe/cookbooks/semantic_find.md`](docs-mirror/typesafe/cookbooks/semantic_find.md) (Choice over line IDs plus an independent Noul). The default lane uses fixture overlap scores so the search is visible without spending. A fixture find is not a live search.
+
+A verify cascade, riffed from the official cookbook. One command. No key. A schema-valid extraction still gets escalated when a per-field head fires; the overall head is displayed, never gating.
+
+```bash
+node demos/cascade/demo.mjs
+```
+
+The per-field battery lives in [`demos/cascade/verify.mjs`](demos/cascade/verify.mjs), following [`docs-mirror/typesafe/cookbooks/sde_cascade.md`](docs-mirror/typesafe/cookbooks/sde_cascade.md) (cheap extract, then Noul heads where true means escalate). The default lane uses recorded Nouls so the escalation is visible without spending. A fixture cascade is not a live verification.
+
 An ontology gate, two rules from EvoOntology (arXiv:2609.15779). One command. No key. Query the term instead of pasting the layer; ship a candidate only if it beats its parent.
 
 ```bash
