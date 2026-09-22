@@ -1,0 +1,17 @@
+{
+  "name": "jev-autoformat",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless structure recovery. Stitches lines and prints markdown. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-autoformat": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs",
+    "recover.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
