@@ -1303,4 +1303,10 @@ Runner now requires the SDK clone venv python; `attempts` is SDK-opaque
 (1 success, policy max+1 by construction on error).
 
 **Boundary.** Single run, one SDK pin (`0ffd094`), one model id. Billing
-unpriced. Non-author grade owed.
+unpriced.
+
+**Replication (PearlAnchor, independent live run
+`foundation/runs/20260922T021352Z.json`):** 80/80 same verdict class vs
+the run above, ECE 0.0614, Brier 0.0195, choice 19/20, 0 errors, pinned
+model. Two independent live runs plus the cited receipt all agree —
+migration graded by replication, owed grade satisfied.
