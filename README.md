@@ -28,7 +28,7 @@ A citation check, riffed from the official cookbook. One command. No key. A supp
 node demos/citation/demo.mjs
 ```
 
-The verdicts are inline in [`demos/citation/demo.mjs`](demos/citation/demo.mjs) (string-match locate, then the Choice from [`docs-mirror/typesafe/cookbooks/citation_check.md`](docs-mirror/typesafe/cookbooks/citation_check.md) with the 0.8 stand-or-review gate). The default lane uses recorded relations so the check is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. Fixture labels are not a live citation score.
+The verdicts are inline in [`demos/citation/demo.mjs`](demos/citation/demo.mjs) (string-match locate, then the Choice from [`docs-mirror/typesafe/cookbooks/citation_check.md`](docs-mirror/typesafe/cookbooks/citation_check.md) with the 0.8 stand-or-review gate). The default lane uses recorded relations so the check is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. Four live calls (`jev-1.13.0`) are in [`demos/citation/live-receipt.json`](demos/citation/live-receipt.json): two verified, two contradicted and sent to review, one claim never reached the model because the source did not contain it. Fixture labels are not a live citation score.
 
 A skill suggestion, riffed from the official cookbook. One command. No key. Two tasks get a skill, the third gets nothing — abstention is first-class.
 
