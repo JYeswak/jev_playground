@@ -38,6 +38,14 @@ node demos/skill-suggest/demo.mjs
 
 The two-stage suggest with its gate lives in [`demos/skill-suggest/suggest.mjs`](demos/skill-suggest/suggest.mjs), following [`docs-mirror/typesafe/cookbooks/skill_suggestion.md`](docs-mirror/typesafe/cookbooks/skill_suggestion.md) (rank the roster, verify the top three, suggest nothing below gate). The default lane uses fixture overlap scores so the shape is visible without spending. Fixture suggestions are not a live ranking.
 
+A job router, riffed from Movez's Jev Engineering guide step 4. One command. No key. A confident pick goes to research or write; anything unsure goes to review, never to a worker.
+
+```bash
+node demos/chief/demo.mjs
+```
+
+The choice and the confidence gate live in [`demos/chief/demo.mjs`](demos/chief/demo.mjs) (research/write/review classes, 0.85 gate, review fallback). The 0.85 bar is the guide author's number, not measured here. The default lane uses recorded verdicts so the routing is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. A fixture route is not a live handoff.
+
 A function dispatcher, riffed from the official cookbook. One command. No key. Three commands dispatch to typed calls, one leaving an argument out so the default applies.
 
 ```bash
