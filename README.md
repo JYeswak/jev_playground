@@ -46,6 +46,14 @@ node demos/rerank/demo.mjs
 
 The shortlist and the per-pair scores are inline in [`demos/rerank/demo.mjs`](demos/rerank/demo.mjs) (the shortlist-then-Noul shape from [`docs-mirror/typesafe/cookbooks/rerank_typesafe.md`](docs-mirror/typesafe/cookbooks/rerank_typesafe.md)). The default lane uses recorded nouls so the reorder is visible without spending. `--live` scores through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture ranking is not a live search score.
 
+A date extraction, riffed from the official cookbook. One command. No key. Six short documents resolve to calendar dates, a missing date stays empty, and anything under confidence 0.60 goes to review.
+
+```bash
+node demos/date/demo.mjs
+```
+
+The parts and the calendar math are inline in [`demos/date/demo.mjs`](demos/date/demo.mjs) (seven Choice questions plus code assembly from [`docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md`](docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md), pinned TODAY so relative dates reproduce). The default lane uses recorded part answers so the assembly is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. A fixture date is not a live extraction.
+
 ## TL;DR
 
 Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
