@@ -1,0 +1,1275 @@
+{
+ "schema": "jev-foundation.calibration-report.v1",
+ "started_at": "2026-09-22T02:13:52.628505+00:00",
+ "interrupted": false,
+ "model": "jev-1.13.0",
+ "fixture": {
+  "name": "calibration-v1.jsonl",
+  "rows": 80,
+  "sha256": "0b3c4d3775740808316d71f4a0a725e3381c2f0a767f9a9fbbb40f79d576e320"
+ },
+ "config": {
+  "timeout_s": 30,
+  "max_retries": 2,
+  "thresholds": [
+   0.25,
+   0.5,
+   0.75,
+   0.8,
+   0.9
+  ]
+ },
+ "items": [
+  {
+   "id": "spam-01",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.91,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 330.8,
+   "attempts": 1
+  },
+  {
+   "id": "spam-02",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 116.6,
+   "attempts": 1
+  },
+  {
+   "id": "spam-03",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.37,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 229.1,
+   "attempts": 1
+  },
+  {
+   "id": "spam-04",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 177.7,
+   "attempts": 1
+  },
+  {
+   "id": "spam-05",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.95,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 98.9,
+   "attempts": 1
+  },
+  {
+   "id": "spam-06",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.0,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 126.5,
+   "attempts": 1
+  },
+  {
+   "id": "spam-07",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.92,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 106.0,
+   "attempts": 1
+  },
+  {
+   "id": "spam-08",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.06,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 194.9,
+   "attempts": 1
+  },
+  {
+   "id": "spam-09",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.97,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 105.5,
+   "attempts": 1
+  },
+  {
+   "id": "spam-10",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 135.8,
+   "attempts": 1
+  },
+  {
+   "id": "spam-11",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.83,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 100.6,
+   "attempts": 1
+  },
+  {
+   "id": "spam-12",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.0,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 180.7,
+   "attempts": 1
+  },
+  {
+   "id": "spam-13",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.89,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 164.9,
+   "attempts": 1
+  },
+  {
+   "id": "spam-14",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.03,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 144.4,
+   "attempts": 1
+  },
+  {
+   "id": "spam-15",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.38,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 113.2,
+   "attempts": 1
+  },
+  {
+   "id": "spam-16",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 112.6,
+   "attempts": 1
+  },
+  {
+   "id": "spam-17",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.85,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 161.1,
+   "attempts": 1
+  },
+  {
+   "id": "spam-18",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 97.3,
+   "attempts": 1
+  },
+  {
+   "id": "spam-19",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.5,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 255.0,
+   "attempts": 1
+  },
+  {
+   "id": "spam-20",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 146.0,
+   "attempts": 1
+  },
+  {
+   "id": "inj-01",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.98,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 125.0,
+   "attempts": 1
+  },
+  {
+   "id": "inj-02",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 116.0,
+   "attempts": 1
+  },
+  {
+   "id": "inj-03",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.99,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 133.6,
+   "attempts": 1
+  },
+  {
+   "id": "inj-04",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.03,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 110.2,
+   "attempts": 1
+  },
+  {
+   "id": "inj-05",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.98,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 188.2,
+   "attempts": 1
+  },
+  {
+   "id": "inj-06",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 229.9,
+   "attempts": 1
+  },
+  {
+   "id": "inj-07",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.98,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 146.0,
+   "attempts": 1
+  },
+  {
+   "id": "inj-08",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 150.5,
+   "attempts": 1
+  },
+  {
+   "id": "inj-09",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.89,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 256.5,
+   "attempts": 1
+  },
+  {
+   "id": "inj-10",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.03,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 145.9,
+   "attempts": 1
+  },
+  {
+   "id": "inj-11",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.99,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 127.7,
+   "attempts": 1
+  },
+  {
+   "id": "inj-12",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 220.5,
+   "attempts": 1
+  },
+  {
+   "id": "inj-13",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.94,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 130.3,
+   "attempts": 1
+  },
+  {
+   "id": "inj-14",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 116.0,
+   "attempts": 1
+  },
+  {
+   "id": "inj-15",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.97,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 152.4,
+   "attempts": 1
+  },
+  {
+   "id": "inj-16",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 125.6,
+   "attempts": 1
+  },
+  {
+   "id": "inj-17",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.95,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 90.0,
+   "attempts": 1
+  },
+  {
+   "id": "inj-18",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 114.5,
+   "attempts": 1
+  },
+  {
+   "id": "inj-19",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.98,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 142.1,
+   "attempts": 1
+  },
+  {
+   "id": "inj-20",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 176.9,
+   "attempts": 1
+  },
+  {
+   "id": "fact-01",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.99,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 127.5,
+   "attempts": 1
+  },
+  {
+   "id": "fact-02",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 128.1,
+   "attempts": 1
+  },
+  {
+   "id": "fact-03",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.96,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 104.9,
+   "attempts": 1
+  },
+  {
+   "id": "fact-04",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 164.2,
+   "attempts": 1
+  },
+  {
+   "id": "fact-05",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.98,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 124.2,
+   "attempts": 1
+  },
+  {
+   "id": "fact-06",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 110.5,
+   "attempts": 1
+  },
+  {
+   "id": "fact-07",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.99,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 287.6,
+   "attempts": 1
+  },
+  {
+   "id": "fact-08",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.04,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 117.8,
+   "attempts": 1
+  },
+  {
+   "id": "fact-09",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.94,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 102.8,
+   "attempts": 1
+  },
+  {
+   "id": "fact-10",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 180.9,
+   "attempts": 1
+  },
+  {
+   "id": "fact-11",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.99,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 122.5,
+   "attempts": 1
+  },
+  {
+   "id": "fact-12",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 124.4,
+   "attempts": 1
+  },
+  {
+   "id": "fact-13",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.98,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 113.2,
+   "attempts": 1
+  },
+  {
+   "id": "fact-14",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 128.3,
+   "attempts": 1
+  },
+  {
+   "id": "fact-15",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.92,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 158.6,
+   "attempts": 1
+  },
+  {
+   "id": "fact-16",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.02,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 123.0,
+   "attempts": 1
+  },
+  {
+   "id": "fact-17",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.99,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 117.2,
+   "attempts": 1
+  },
+  {
+   "id": "fact-18",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 114.2,
+   "attempts": 1
+  },
+  {
+   "id": "fact-19",
+   "kind": "noul",
+   "expected": {
+    "p": 1
+   },
+   "predicted": 0.91,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 173.7,
+   "attempts": 1
+  },
+  {
+   "id": "fact-20",
+   "kind": "noul",
+   "expected": {
+    "p": 0
+   },
+   "predicted": 0.01,
+   "confidence": null,
+   "error_kind": null,
+   "latency_ms": 132.9,
+   "attempts": 1
+  },
+  {
+   "id": "intent-01",
+   "kind": "choice",
+   "expected": {
+    "choice": "refund",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "refund",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 123.7,
+   "attempts": 1
+  },
+  {
+   "id": "intent-02",
+   "kind": "choice",
+   "expected": {
+    "choice": "technical_help",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "technical_help",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 116.9,
+   "attempts": 1
+  },
+  {
+   "id": "intent-03",
+   "kind": "choice",
+   "expected": {
+    "choice": "information",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "information",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 147.5,
+   "attempts": 1
+  },
+  {
+   "id": "intent-04",
+   "kind": "choice",
+   "expected": {
+    "choice": "technical_help",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "other",
+   "confidence": 0.79,
+   "error_kind": null,
+   "latency_ms": 98.8,
+   "attempts": 1
+  },
+  {
+   "id": "intent-05",
+   "kind": "choice",
+   "expected": {
+    "choice": "refund",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "refund",
+   "confidence": 0.98,
+   "error_kind": null,
+   "latency_ms": 110.1,
+   "attempts": 1
+  },
+  {
+   "id": "intent-06",
+   "kind": "choice",
+   "expected": {
+    "choice": "information",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "information",
+   "confidence": 0.98,
+   "error_kind": null,
+   "latency_ms": 118.0,
+   "attempts": 1
+  },
+  {
+   "id": "intent-07",
+   "kind": "choice",
+   "expected": {
+    "choice": "technical_help",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "technical_help",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 208.8,
+   "attempts": 1
+  },
+  {
+   "id": "intent-08",
+   "kind": "choice",
+   "expected": {
+    "choice": "refund",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "refund",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 146.4,
+   "attempts": 1
+  },
+  {
+   "id": "intent-09",
+   "kind": "choice",
+   "expected": {
+    "choice": "information",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "information",
+   "confidence": 0.76,
+   "error_kind": null,
+   "latency_ms": 110.7,
+   "attempts": 1
+  },
+  {
+   "id": "intent-10",
+   "kind": "choice",
+   "expected": {
+    "choice": "technical_help",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "technical_help",
+   "confidence": 0.98,
+   "error_kind": null,
+   "latency_ms": 131.7,
+   "attempts": 1
+  },
+  {
+   "id": "intent-11",
+   "kind": "choice",
+   "expected": {
+    "choice": "refund",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "refund",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 146.9,
+   "attempts": 1
+  },
+  {
+   "id": "intent-12",
+   "kind": "choice",
+   "expected": {
+    "choice": "information",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "information",
+   "confidence": 0.99,
+   "error_kind": null,
+   "latency_ms": 122.7,
+   "attempts": 1
+  },
+  {
+   "id": "intent-13",
+   "kind": "choice",
+   "expected": {
+    "choice": "technical_help",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "technical_help",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 107.2,
+   "attempts": 1
+  },
+  {
+   "id": "intent-14",
+   "kind": "choice",
+   "expected": {
+    "choice": "refund",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "refund",
+   "confidence": 0.99,
+   "error_kind": null,
+   "latency_ms": 174.9,
+   "attempts": 1
+  },
+  {
+   "id": "intent-15",
+   "kind": "choice",
+   "expected": {
+    "choice": "information",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "information",
+   "confidence": 0.69,
+   "error_kind": null,
+   "latency_ms": 113.2,
+   "attempts": 1
+  },
+  {
+   "id": "intent-16",
+   "kind": "choice",
+   "expected": {
+    "choice": "technical_help",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "technical_help",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 125.2,
+   "attempts": 1
+  },
+  {
+   "id": "intent-17",
+   "kind": "choice",
+   "expected": {
+    "choice": "refund",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "refund",
+   "confidence": 0.99,
+   "error_kind": null,
+   "latency_ms": 121.2,
+   "attempts": 1
+  },
+  {
+   "id": "intent-18",
+   "kind": "choice",
+   "expected": {
+    "choice": "information",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "information",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 142.6,
+   "attempts": 1
+  },
+  {
+   "id": "intent-19",
+   "kind": "choice",
+   "expected": {
+    "choice": "technical_help",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "technical_help",
+   "confidence": 0.99,
+   "error_kind": null,
+   "latency_ms": 117.5,
+   "attempts": 1
+  },
+  {
+   "id": "intent-20",
+   "kind": "choice",
+   "expected": {
+    "choice": "refund",
+    "options": {
+     "refund": "The customer wants money returned.",
+     "technical_help": "The customer needs a bug fixed.",
+     "information": "The customer asks for information only.",
+     "other": "None of the above fits."
+    }
+   },
+   "predicted": "refund",
+   "confidence": 1.0,
+   "error_kind": null,
+   "latency_ms": 115.7,
+   "attempts": 1
+  }
+ ],
+ "metrics": {
+  "n": 60,
+  "errors": {},
+  "ece": 0.0614,
+  "brier": 0.0195,
+  "bins": [
+   {
+    "bin": [
+     0.0,
+     0.1
+    ],
+    "n": 30,
+    "mean_p": 0.018,
+    "accuracy": 0.0,
+    "ci95": [
+     0.0,
+     0.114
+    ]
+   },
+   {
+    "bin": [
+     0.1,
+     0.2
+    ],
+    "n": 0,
+    "mean_p": 0.15,
+    "accuracy": 0.0,
+    "ci95": [
+     0.0,
+     1.0
+    ]
+   },
+   {
+    "bin": [
+     0.2,
+     0.3
+    ],
+    "n": 0,
+    "mean_p": 0.25,
+    "accuracy": 0.0,
+    "ci95": [
+     0.0,
+     1.0
+    ]
+   },
+   {
+    "bin": [
+     0.3,
+     0.4
+    ],
+    "n": 2,
+    "mean_p": 0.375,
+    "accuracy": 1.0,
+    "ci95": [
+     0.342,
+     1.0
+    ]
+   },
+   {
+    "bin": [
+     0.4,
+     0.5
+    ],
+    "n": 0,
+    "mean_p": 0.45,
+    "accuracy": 0.0,
+    "ci95": [
+     0.0,
+     1.0
+    ]
+   },
+   {
+    "bin": [
+     0.5,
+     0.6
+    ],
+    "n": 1,
+    "mean_p": 0.5,
+    "accuracy": 1.0,
+    "ci95": [
+     0.207,
+     1.0
+    ]
+   },
+   {
+    "bin": [
+     0.6,
+     0.7
+    ],
+    "n": 0,
+    "mean_p": 0.65,
+    "accuracy": 0.0,
+    "ci95": [
+     0.0,
+     1.0
+    ]
+   },
+   {
+    "bin": [
+     0.7,
+     0.8
+    ],
+    "n": 0,
+    "mean_p": 0.75,
+    "accuracy": 0.0,
+    "ci95": [
+     0.0,
+     1.0
+    ]
+   },
+   {
+    "bin": [
+     0.8,
+     0.9
+    ],
+    "n": 4,
+    "mean_p": 0.865,
+    "accuracy": 1.0,
+    "ci95": [
+     0.51,
+     1.0
+    ]
+   },
+   {
+    "bin": [
+     0.9,
+     1.0
+    ],
+    "n": 23,
+    "mean_p": 0.963,
+    "accuracy": 1.0,
+    "ci95": [
+     0.857,
+     1.0
+    ]
+   }
+  ],
+  "thresholds": [
+   {
+    "threshold": 0.25,
+    "decided": 60,
+    "coverage": 1.0,
+    "accuracy": 0.967
+   },
+   {
+    "threshold": 0.5,
+    "decided": 60,
+    "coverage": 1.0,
+    "accuracy": 0.967
+   },
+   {
+    "threshold": 0.75,
+    "decided": 57,
+    "coverage": 0.95,
+    "accuracy": 1.0
+   },
+   {
+    "threshold": 0.8,
+    "decided": 57,
+    "coverage": 0.95,
+    "accuracy": 1.0
+   },
+   {
+    "threshold": 0.9,
+    "decided": 53,
+    "coverage": 0.883,
+    "accuracy": 1.0
+   }
+  ],
+  "choice_accuracy": 0.95
+ }
+}
