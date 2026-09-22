@@ -18,7 +18,10 @@
 // "did this prompt mention a file path" -- which is near-deterministic from the text. If that
 // arm does not clear 0.80, the harness is blind and NO verdict about the router is reported.
 import { readFileSync } from 'node:fs';
-import { TypeSafeClient, choice, score, noul } from '../sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs';
+// Lane-sanctioned caller (943158c): askJevBundle passes the MIXED
+// Choice+Score+Noul battery through unmodified. No hand-rolled POST,
+// no private client.
+import { askJevBundle } from '../jev-client/src/index.ts';
 import { auc as kitAuc, field } from '../oracle-kit/index.mjs';
 
 const HARD_CALLS = 5, EASY_CALLS = 2, AUC_BAR = 0.70, MARGIN_BAR = 0.05, ARM_BAR = 0.80;
@@ -58,20 +61,27 @@ const hasPath = sample.map(t => /[\w-]+\/[\w./-]+|\.\w{2,4}\b/.test(t.prompt)); 
 
 const auc = (scores, labels) => kitAuc(scores, labels).value;
 
-const client = new TypeSafeClient({ apiKey: process.env.TYPESAFE_API_KEY });
 const TIERS = { mechanical: 'Mechanical and local: a rename, a small edit, a lookup.',
                 ordinary: 'Ordinary engineering: a normal feature or fix.',
                 hard: 'Hard or high-stakes: design, debugging, or something risky.' };
 const tierRank = [], armScore = [];
 for (const t of sample) {
-  const r = await client.systemOne({
+  const r = await askJevBundle({
+    model: 'jev-1.13.0', // pinned: the previous code sent no model (SDK default moves).
     state: { task: t.prompt },
     questions: {
-      tier: choice('How hard is this task?', TIERS),
-      effort: score('How much step-by-step reasoning does this need?', ['none', 'a little', 'a lot', 'extensive']),
-      mentions_file: noul('Does this task text mention a specific file or path?'),
+      tier: { type: 'choice', instructions: 'How hard is this task?', criteria: TIERS },
+      effort: { type: 'score', instructions: 'How much step-by-step reasoning does this need?', criteria: ['none', 'a little', 'a lot', 'extensive'] },
+      mentions_file: { type: 'noul', instructions: 'Does this task text mention a specific file or path?' },
     },
+    apiKey: process.env.TYPESAFE_API_KEY,
+    timeoutMs: 20000,
   });
+  if (!r.ok && r.reason === 'unconfigured') {
+    console.log('SKIP: unconfigured (TYPESAFE_API_KEY unset) — no network attempted');
+    process.exit(2);
+  }
+  if (!r.ok) throw new Error(`Invalid Jev answer: ${r.reason} ${r.error}`);
   // The field is `probabilities`, NOT `distribution`. Using the wrong name yields a constant 0
   // score and therefore an all-ties AUC of exactly 0.500 -- which is what three bogus REJECT runs
   // reported before this was caught. Fail loudly instead of scoring silence.
