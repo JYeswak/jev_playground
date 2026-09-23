@@ -13,6 +13,13 @@ mechanism we claim is present has a receipt showing it fired in a live jev pane 
 and stayed silent on a known-good one, and every mechanism we decline has a Rule 12 refusal with
 cost, missed defect class, and loss.
 
+> **Why this drive exists (Joshua, 2026-09-22):** "we have like 24 repos in here to use towards
+> optimizing or learning how to enhance our jev understanding and awareness, as well as
+> optimization. My goal is to learn as much about jev and start applying it to our own systems.
+> that is the goal of this repo." The census is 28 clones (24 at the root plus 4 first-party under
+> `upstream/typesafe-ai/`). W7 is that goal made into packets; W1–W6 are the rigor that keeps what
+> W7 learns honest and the omp surfaces that carry it into our systems.
+
 > **Mission (AGENTS.md, verbatim):** Validate Jev → build tools from what survives → **liven omp
 > surfaces with them** → **dogfood them in our own systems** → **share the process, the updates and
 > the findings publicly** as we go. This plan serves stages three, four and five.
@@ -141,8 +148,11 @@ not merely present on disk? Anchor: Problem items 1–3. Target: `notes/deep/omp
 (pane, pid, profile, launch dir, start time, rules discovered, disabled rules, ttsr.repeatMode and
 repeatGap as that profile resolves them, kit-guard listed in `get_available_commands`). Oracle:
 `tests/doctor.sh` from the kit run with the pane's own `--profile`, plus `omp --profile <p> ttsr list`;
-a fresh `--mode=rpc --max-time` session per profile is the loaded-at-start proxy, and the pane's
-start time vs the install commit is the live-pane answer. Fixture: happy = pane 1 (started after the
+a fresh `--mode=rpc --max-time` session per profile proves a *new* session would load the kit and
+says nothing about a live pane (`--mode=rpc` spawns, never attaches). The live-pane answer is the
+pane's start time vs the install commit (omp loads rules, settings and extensions at session start,
+https://omp.sh/docs/ttsr), plus a mechanism observed from inside that pane where one is available.
+Every setting column is split into `_fresh` and `_live`. Fixture: happy = pane 1 (started after the
 rules commit); edge = a profile with `ttsr.disabledRules` (grok disables `absence-from-one-probe`,
 muse disables `bash-structural-def-search`); adversarial = launch one probe from `jev/notes/` to
 confirm the subdirectory trap. Risk: `--mode=rpc` spawns a session per call; bound with `--max-time`.
@@ -157,7 +167,13 @@ HOME, mock model, no key. Fixture: the kit's own `ttsr-cases.tsv` (25) and scena
 the kit's planted-failure arm (remove one rule, disable the guard block, expect 4/10 to fail).
 Risk: `e2e-live.sh` launches the real `omp` binary; isolated HOME means it cannot touch a pane.
 Acceptance: four exit codes and counts, plus the planted-failure count. A suite that could not run
-is `NOT_RUN` with the error, never omitted.
+is `NOT_RUN` with the error, never omitted. A 0/10 whose every line is "omp never called the model"
+is an environment failure, not a kit result: record `OMP_PROFILE`, `PI_PROFILE`,
+`PI_CODING_AGENT_DIR` and the `models.yml` path omp actually read. Measured (46a4d02): an inherited
+`OMP_PROFILE=grok` sent omp to `profiles/grok/agent/models.yml` (`main.ts:2304`); unset, 10/10, and
+the author's planted arm fails 4/10 as documented. The omp-continue suite's "initial commit failed"
+was our own global template hook (`~/.git-templates/hooks/commit-msg-verification-level.sh:63`)
+refusing the subject `init`.
 
 **W1.3 jev false-positive / false-negative corpus (wave 1).** Goal: the cases the kit author could
 not know. Target: `notes/deep/kit-guard-jev-cases.tsv` in the kit's `ttsr-cases.tsv` column shape
@@ -179,7 +195,12 @@ is the number W1.4 must drive to zero, and each mismatch names the regex respons
 **W1.4 kit-guard rebuilt config-driven (wave 3, after W1.3).** Goal: one guard whose protected set
 is this repo's real gate set. Anchor: W1.3 mismatches. Target: `.omp/extensions/kit-guard/{index,policy}.ts`
 and a new `.omp/kit-guard.json` (`gatePaths`, `hookDir` resolved from `git config --get core.hooksPath`
-at session start, `requiredPatterns`, `reanchorFiles`, `readOnlyBashAllow`). Oracle: the W1.3 table
+at session start, `requiredPatterns`, `reanchorFiles`, `readOnlyBashAllow`). `readOnlyBashAllow`
+exempts `git config --get` and `git config --list` (the live pane-1 false positive, reproduced on the
+installed `bashVerdict`). `hookDir` is `githooks`, no leading dot. `gatePaths` includes
+`foundation/gates.sh`, `foundation/gates.d/*.exemptions`, `.omp/config.yml` (its
+`ttsr.disabledRules` is the documented off switch) and `.omp/rules/kit-*.md` — measured 10 mismatches
+on the installed function (46a4d02), not the 8 first reported. Oracle: the W1.3 table
 at 0 mismatches, `bun test` of a jev port of `kit-guard.test.ts`, and the kit's own 39 tests still
 green where they apply. Fixture: W1.3 rows. Risk: the guard file itself must be in `gatePaths`, or
 an agent can widen its own allowlist — and then the rebuild needs `KIT_GATE_EDIT=1`, which only a
@@ -191,7 +212,10 @@ from a non-`KIT_GATE_EDIT` session is blocked.
 and the pattern check names patterns we hold. Decision (Rule 12, adopt by default): add the three
 missing names to AGENTS.md's reward-hacking list with jev definitions — `close-pump abuse` is
 Problem item 6 in our own tree, `scope-splitting` and `bench-path hardcoding` have no jev instance
-yet and get one line each. `reanchorFiles` = `AGENTS.md` (§4 Definition of Done), the bead, and
+yet and get one line each. One list, one file: AGENTS.md holds all twelve names verbatim (it is the
+file every pane loads at session start), and `.omp/kit-guard.json` `requiredPatterns` points at it
+rather than copying the names. A separate kit file (review R1-4) would hold a doctrine no agent has
+in its system prompt. `reanchorFiles` = `AGENTS.md` (§4 Definition of Done), the bead, and
 `GATES.md`. No second DoD file (no proliferation). Anchor: Problem items 4–5. Target: `AGENTS.md`
 (reserve first), `.omp/kit-guard.json`. Oracle: `/kit-guard` command reports `12/12 present`;
 a planted AGENTS.md edit that deletes one name returns the A9 `isError` frame. Acceptance: both
@@ -209,15 +233,20 @@ script).
 panes 2–6. One pane at a time, only while idle, each resumed onto its own session (`omp --resume`
 with its existing profile), each followed by W1.1's census row for that pane. Risk: a restart loses
 unflushed in-context state; mitigate by requiring the pane to write its handoff to its bead before
-restart. Acceptance: census shows kit-guard loaded in 6/6, and one planted violation per pane
+restart. Acceptance: census shows kit-guard loaded in every pane whose omp process started after the
+install commit — after this wave, all six; a pane started earlier is NOT_LOADED, not a failed
+install — and one planted violation per pane
 (the `--no-verify` bash call is cheapest) is interrupted and recorded with the pane's frame.
 
-**W1.8 `/loop --while` dogfooded (wave 5).** Goal: the kit's continuation gate driving real work.
-One pane runs `/loop --while 'sh scripts/omp-continue.sh'` on the Phase-D bead queue. Oracle:
-`.omp/loop-state` shows iterations; the loop stops on `.omp/STOP`, on 3 stalled iterations, and on
-a red claim gate — each stop observed once. Risk: the kit README marks `ntm send` delivery of a slash
-command untested; deliver `/loop` by typing in the pane, then record whether `ntm send` works as a
-separate finding. Acceptance: three stop reasons observed with `.omp/loop-state` and the stop line.
+**W1.8 `/loop --while` trial, bounded (wave 5, earliest).** Goal: learn whether the kit's
+continuation gate can drive one real bead. One pane types `/loop --while 'sh scripts/omp-continue.sh'`
+by hand on one bead and watches for the three stop reasons (`.omp/STOP`, 3 stalled iterations, red
+claim gate). Precondition: our `scripts/omp-continue.sh` distinguishes a `br` error from an empty
+ready list — upstream reads `br ready` exit 7 as "no work" (`omp-continue.sh:30`, 5/6 upstream
+scenarios fail with `br` on PATH); fixed in our copy under pane 2's U2 (error → exit 2, empty → exit
+1). The `ntm send` delivery of a slash command is a single census row, not part of this packet
+(review R1-1: a packet that both needs and tests its own delivery path cannot fail cleanly).
+Acceptance: three stop reasons observed once each, with `.omp/loop-state` and the stop line.
 
 ### W2 — starter-kit completion (owner of record: pane 6, QuietHarbor)
 
@@ -240,12 +269,15 @@ and `kit-close-needs-evidence` already fire on the bad shape.
 **W2.3 Claim-coverage ratchet (wave 3).** Stage `foundation/gates.d/18-claim-coverage.sh`: coverage
 fraction from W2.1(b) as a floor that may only rise; `--selftest` plants an unregistered numeric
 README sentence and requires RED naming it. Ratchet, not a target: the first floor is whatever W2.1
-measured.
+measured. Landing certifies the selftest only; the ratchet is proven the first time the floor rises
+on a real measurement or goes RED on a real regression, and the §5 row stays `planned` until then.
 
 **W2.4 Ledger resurrection (wave 3).** `scripts/ledger-resurrect.sh`: lists NEGATIVE_EVIDENCE rows
 whose SHA/version predicate is now satisfied; cadence = every `foundation/gates.sh` run, advisory
-(non-blocking) until one resurrection has been acted on. `--selftest` plants a row whose pinned SHA
-moved in a fixture manifest.
+(non-blocking) until one resurrection has been acted on. While non-blocking it cannot fail, so it
+lands `PREPARED-NOT-MEASURED`: each run appends its candidate count to a census line the next
+honesty census reconciles, so silence is visible rather than green. `--selftest` plants a row whose
+pinned SHA moved in a fixture manifest.
 
 **W2.5 Pre-commit canary (wave 3).** `githooks/pre-commit` gains lane 0: run
 `foundation/kit/check-claim-discipline.sh` against a canary false claim and require RED before any
@@ -267,7 +299,11 @@ evidence(path:line or command), executes(yes|no|unknown), smallest_honest_versio
 defect_class_it_catches, falsification_experiment(adapted from the synthesis)`. The `executes`
 column is the point: synthesis finding 2 is "mechanism existence is systematically ahead of
 execution", and that is a claim about us until measured. Oracle: the file on disk and a command run
-now; a HAVE without an `executes=yes` receipt is PARTIAL. Acceptance: every source row present
+now; a HAVE without an `executes=yes` receipt is PARTIAL. Method: one subagent per source list (five
+lists), each running the selftest or command behind every HAVE it scores; the owning pane re-runs
+each decisive command before a row lands. Review R1-6 proposed splitting the 88 rows across waves
+on capacity grounds; Joshua's depth directive ("with agents of their own") removes the capacity
+constraint, so the scope stays whole and the method changes. Acceptance: every source row present
 (count them), no HAVE without evidence, every GAP carries a Rule 12 adoption line or a refusal with
 all three fields.
 
@@ -338,7 +374,48 @@ green; (d) a cold read by a pane on a different model (wave 2) answers "what is 
 run" correctly without opening another file. Fixture: the current README as the known-bad input —
 the rewrite is measured against it, not against taste alone. Risk: README counts are gated by stage
 97 and a numerals ratchet (stage 95); a rewrite that deletes a counted numeral must update the
-registry in the same commit, never loosen the gate. Acceptance: (a)–(c) observed, (d) in round 1.
+registry in the same commit, never loosen the gate. Acceptance: (a)–(c) observed, (d) in round 1. Entry: stage 97 green at the rewrite's base, or fixed
+in the same commit (review R1-2). Landed at `35629b2`/`01eded0`: (a) 20/20 demo commands exit 0 with
+no key; (c) stage 97 green, and its selftest 5/5 after the stale-numerals arm was made to always
+plant; `readme-gate.py` passes; (b) and (d) open — (d) is dispatched to pane 5 as a one-file cold read.
+
+### W7 — learn Jev from the 28 clones and apply it (the repo's goal; owners assigned as panes free)
+
+Joshua's purpose for this repo (header quote). Rule 13 already says it: run the upstream question
+before writing our own. Census at plan time (`for d in */; do [ -d "$d/.git" ] ...` plus
+`upstream/typesafe-ai/*`): 28 clones; 8 have no receipt under `docs/demos/upstream-repro/`
+(`awesome-typesafe`, `jev-agent-failure-benchmark`, `jev-codex-router`, `jev-phishing-bench`,
+`jev-router`, `pi-subagents`, `typesafe-ai-benchmark`, and the first-party `typesafe-sdk-js`), and
+`skillranker` alone holds 21 of the receipts.
+
+**W7.1 Clone ledger.** `notes/deep/clone-ledger.tsv`, one row per clone: `repo, sha, owner, license,
+jev_surface (choice|score|noul; SDK or hand-rolled POST), what_it_decides, own_suite_command,
+run_status (receipt path or never), incumbent_arm (Rule 14: what a person would ship instead, and
+whether the clone measured it), what_it_teaches_about_jev (one sentence, cited file:line),
+transferable_mechanism, application_in_our_systems (named omp surface or product path), action`.
+Sources: the clone trees, `EVAL.md`, `docs/demos/upstream-repro/`. Oracle: each teaching sentence
+cites a line in the clone or a receipt; an uncited teaching is dropped, not softened. Acceptance: 28
+rows, every `run_status=never` row has an owner in W7.2.
+
+**W7.2 Run the unrun.** Every clone without a receipt runs its own suite or demo, keyless first,
+live where its question needs the model (key in Infisical; state the spend; the cost gate is
+lifted, the testability rule is not). Rust clones (`s1-rs`, `commit-miner`, `skillranker`) build and
+test on Contabo through RCH — `RCH_VISIBILITY=verbose rch exec -- cargo test -j 2 ...`, never a local
+cargo build; a result counts only with `Selected worker`, `Remote command finished: exit=0` and the
+tool's own result line (`skill://zeststream-rch`). Receipt per clone in
+`docs/demos/upstream-repro/<clone>-<date>.md`, `Boundary` line included. Depth rule applies: a
+clone that will not run gets the four earned-label fields.
+
+**W7.3 What the clones teach, stated once.** From W7.1, a short README section a stranger reads:
+which question shapes Jev answered well, against which incumbent, on whose data, and where a regex or
+a constant won. Every sentence traces to a ledger row. It replaces nothing already measured in
+README "Measurements"; it adds the breadth the 28 clones give.
+
+**W7.4 Apply the top three.** Rank W7.1's `application_in_our_systems` rows by AGENTS.md's selection
+rule (ground truth exists today; prevalence of the positive class; cost to measure; decision
+leverage). The top three become beads, each landing on an omp surface in this repo (tool, rule,
+hook, extension, or MCP) or a named product path, each with a preregistered bar and a planted
+negative before its first live call. Candidates are chosen by the ranking, not assumed here.
 
 ### W0 — orchestration (owner: pane 1, AmberWillow)
 
@@ -477,6 +554,11 @@ graph TD
   W51[W5.1 self-assessment] --> W52[W5.2 cold read]
   W51 --> W23
   W22 --> W18
+  W71[W7.1 clone ledger] --> W72[W7.2 run the unrun]
+  W72 --> W73[W7.3 README: what the clones teach]
+  W72 --> W74[W7.4 apply top three]
+  W31 --> W74
+  W17 --> W74
 ```
 
 Wave 1 has no internal edges: W1.1, W1.2, W1.3, W2.1, W3.1, W4.1+W4.2, W5.1 run in parallel.
@@ -516,3 +598,5 @@ beginning `CALLBACK-P<N>-<packet>-DONE` or `-BLOCKED`, plus Agent Mail to AmberW
 | 0 | AmberWillow | claude-opus-5-5 | draft | — | — | — |
 | 0.5 | Joshua | — | W6 (GitHub current, README rewrite); read omp TTSR docs; depth directive | all | — | — |
 | 1 | SunnyTiger | Muse Spark 1.3 | R1-1..R1-6 (`notes/deep/review-r1-p5.md`) | R1-1, R1-2, R1-3, R1-5 | R1-4 (single source = AGENTS.md, not a new file), R1-6 (keep 88 rows; subagents, not a wave split) | — |
+| 1 | RedMaple | grok-4.7 | 6 (`notes/deep/review-r1-p2.md`): W1.2 env-failure rule, W1.7 acceptance limited to restarted panes, W1.4 read-vs-write + 4 gate paths, scan only edit/write-scoped rules, W1.8 `br` exit 7 | all 6 | — | — |
+| 1.5 | Joshua | — | W7 (learn Jev from the clones; apply to our systems); RCH on Contabo for Rust clones | all | — | — |
