@@ -1,6 +1,6 @@
 CALLBACK-P2-DEPTH-DONE
 Part B was not started.
-commit: will be the commit that lands this callback's artifacts. Prior earned commit 313f029.
+commit: 46a4d02
 before → after:
 - census row 2 ABSENT → pid 61381, profile grok, model grok-4.7, started Mon Sep 21 12:18:16. Command: ps -p 61381 -o pid,ppid,lstart,command=
 - model UNMEASURED 6/6 → status lines: pane 1 Opus 5.5, pane 2 grok-4.7, panes 3-6 Muse Spark 1.3. Command: tmux capture-pane -p -t jev:0.N
