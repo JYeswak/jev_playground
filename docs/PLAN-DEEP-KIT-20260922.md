@@ -255,32 +255,47 @@ Acceptance: three stop reasons observed once each, with `.omp/loop-state` and th
 
 **W2.1 Honesty census (wave 1).** Goal: the three GAP rows (B11, B12, B13) as numbers, not prose.
 Target: `notes/deep/honesty-census.md` + `notes/deep/false-close-census.tsv`. Measure: (a) B13 —
-all 68 closed beads: `close_reason` length, whether it names a command, a commit that
+all closed beads **at the pinned commit** (70 at `83300a1`, and moving; review R1-17): `close_reason` length, whether it names a command, a commit that
 `git cat-file -e` resolves, or a receipt path that exists; classify REPAIRABLE (evidence exists
-elsewhere, name it) / NO-EVIDENCE / OK; also the 13 in_progress and 14 blocked rows with their last
-update age. (b) B12 — README.md claim sentences (numerals, "verified", "passes", "beats") vs rows in
+elsewhere, name it) / NO-EVIDENCE / OK; also the in_progress and blocked rows at the same pin (18 + 14 at `83300a1`) with their
+last-update age. (b) B12 — README.md claim sentences (numerals, "verified", "passes", "beats") vs rows in
 `foundation/kit/claims.tsv`: coverage fraction with the sentence list. (c) B11 — NEGATIVE_EVIDENCE.md
 retry predicates that name a pinned SHA, version, or file: how many have their trigger observably
 satisfied today (e.g. `upstream/MANIFEST.tsv` shows the pin moved). Oracle: the files; no judgment
 model. Acceptance: three numbers, each with its denominator and the rows behind it.
 
-**W2.2 False-close repair (wave 3).** Repair every REPAIRABLE close through `br` with the evidence
-W2.1 named; reopen every NO-EVIDENCE close with a comment. The three existing repair beads fold in.
+**W2.2 False-close repair (wave 3).** Type the evidence before repairing (review R1-13): 12 of the
+30 REPAIRABLE rows cite `work/nev-routing/tool-select-labelled.jsonl`, the corpus those beads
+produced, which is provenance and not proof. Re-run the evidence pass separating fix-type evidence
+(the commit that IS the fix, the receipt that IS the proof, a resolving `file:line`) from
+mention-type (an id in a corpus, a commit message, a dispatch doc). Repair the 11 bare-`done` rows
+and the fix-type rows through `br`; mention-only rows go back through comment-reading arms before
+their status changes. Done 2026-09-23: `jev-0bp` re-closed SUPERSEDED, `jev-hwa` re-closed with its
+receipt, `jev-vbh.6` reopened PARTIAL, repair beads `jev-qex`/`jev-6fo`/`jev-lqz` closed.
 Oracle: rerun W2.1(a) → 0 closed rows under 20 chars that are not reopened. Guard: `kit-jsonl-close`
 and `kit-close-needs-evidence` already fire on the bad shape.
 
 **W2.3 Claim-coverage ratchet (wave 3).** Stage `foundation/gates.d/18-claim-coverage.sh`: coverage
-fraction from W2.1(b) as a floor that may only rise; `--selftest` plants an unregistered numeric
-README sentence and requires RED naming it. Ratchet, not a target: the first floor is whatever W2.1
+fraction from W2.1(b) as a floor that may only rise, computed by the SAME unitizer the census used
+(one shared script; the stage refuses to run if the unitizer's hash differs), because the
+denominator moved 32/35/37 with the sentence splitter (review R1-14). `--selftest` plants an
+unregistered numeric README sentence, asserts the plant counts as a candidate first, then requires
+RED naming it. Ratchet, not a target: the first floor is whatever W2.1
 measured. Landing certifies the selftest only; the ratchet is proven the first time the floor rises
 on a real measurement or goes RED on a real regression, and the §5 row stays `planned` until then.
 
 **W2.4 Ledger resurrection (wave 3).** `scripts/ledger-resurrect.sh`: lists NEGATIVE_EVIDENCE rows
-whose SHA/version predicate is now satisfied; cadence = every `foundation/gates.sh` run, advisory
+whose predicate is now satisfied, covering the classes the census found live (corpus-date, git-log
+recency, grep-count, script-run; zero SHA-move predicates exist in the ledger today, review R1-15);
+cadence = every `foundation/gates.sh` run over rows touched since the last run (`git log` on the
+ledger), with the full pass on the honesty-census cadence (review R1-19), advisory
 (non-blocking) until one resurrection has been acted on. While non-blocking it cannot fail, so it
 lands `PREPARED-NOT-MEASURED`: each run appends its candidate count to a census line the next
 honesty census reconciles, so silence is visible rather than green. `--selftest` plants a row whose
-pinned SHA moved in a fixture manifest.
+pinned SHA moved in a fixture manifest and a grep-count instance that must list R38. The instrument
+it leans on is repaired first (review R1-18): `scripts/selftest-pin-liveness.sh`'s hot-file arm
+counts trailing-24h commits (`scripts/pin-liveness.sh:57`), so 27.4 h of quiet turned its RED arm
+green; repoint it at a synthetic hot file that does not decay, in a commit that changes nothing else.
 
 **W2.5 Pre-commit canary (wave 3).** `githooks/pre-commit` gains lane 0: run
 `foundation/kit/check-claim-discipline.sh` against a canary false claim and require RED before any
@@ -549,6 +564,10 @@ control: local `gates.sh` receipt at the same commit).
 No phase exit may cite a result whose dependency closure contains an unresolved item from an
 earlier phase.
 
+Census rule, all waves (review R1-16): every census number cites the blob or file revision it
+counted — a commit SHA for tracked files, mtime plus HEAD for live-tree reads. A rerun that cannot
+name its pin is not a rerun, and a reconciliation compares pins before numbers.
+
 ## 11. Independent review
 <!-- CHECK: REVIEW -->
 
@@ -651,3 +670,4 @@ beginning `CALLBACK-P<N>-<packet>-DONE` or `-BLOCKED`, plus Agent Mail to AmberW
 | 1 | RedMaple | grok-4.7 | 6 (`notes/deep/review-r1-p2.md`): W1.2 env-failure rule, W1.7 acceptance limited to restarted panes, W1.4 read-vs-write + 4 gate paths, scan only edit/write-scoped rules, W1.8 `br` exit 7 | all 6 | — | — |
 | 1.5 | Joshua | — | W7 (learn Jev from the clones; apply to our systems); RCH on Contabo for Rust clones | all | — | — |
 | 1 | TopazRaven | Muse Spark 1.3 | R1-7..R1-12 (`notes/deep/review-r1-p3.md`) | R1-7, R1-8, R1-10, R1-11, R1-12 | — | R1-9: the two cold reads cannot merge; each must be read by a model other than its document's author, and the authors differ (README by claude, read by Muse; assessment by Muse, read by grok) |
+| 1 | QuietHarbor | Muse Spark 1.3 | R1-13..R1-19 (`notes/deep/review-r1-p6.md`) | all 7 | — | — |
