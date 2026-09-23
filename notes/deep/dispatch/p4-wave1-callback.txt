@@ -1,0 +1,8 @@
+CALLBACK-P4-jev-deep-kit-8q7.3-DONE
+Artifacts: notes/deep/mechanism-transfer.tsv, notes/deep/mechanism-transfer.md
+Commit: d64c2f1 (artifacts; this callback file lands in the follow-up commit)
+Headline: 88 rows + header (14 C + 23 G + 12 K + 11 P + 14 A + 14 B); 31 HAVE / 41 PARTIAL / 15 GAP / 1 NA; zero unknown. Exits run now: checkers 0/0, stages 15/16/17 0, seat-guard 9/9 x3, adapter 40/40, hook fire 0, 97-live 0, beads 107 (70/18/14/5), thin 11 with ids, ledger 83 R / 97 retry.
+Planted negative: /tmp/p4-plant unmatched enforce=yes row -> check-claim-discipline exit 1 naming p4-plant-row. Instrument measures execution.
+Depth corrections: 3 (not 2) kit patterns absent; P4 instance repaired mid-pass, replaced with live kit-gap-B5 instance; P7 assessment exists (W5.1 landed); B7 gate-commits exist; A10 1/107 has acceptance_criteria; 70 GREEN now (073372f); gates.sh 17/17 ALL GREEN (second worker, 239s); 97-selftest exit flaky 1,1,0x5+0, root cause open; G7/K1 demoted back to PARTIAL on dissent (live arm keyed).
+Sweep note: d64c2f1 also carries docs/demos/upstream-repro/fast-jev-compaction-w70-20260922.md, staged by its author before my commit ran; content intact, attribution noisy — pane 1, reassign as you see fit.
+NO-CLAIM: live head-to-head receipted 2026-09-21, not re-run (keyed); 97 flake root cause open; counts recounted at d64c2f1 on a moving tree. Part B waits per directive — not started.
