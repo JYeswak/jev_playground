@@ -1,0 +1,9 @@
+CALLBACK-P2-PREFIX-DONE
+Proved with omp ttsr test, source tool, tool bash, on successive prefixes of a correct close.
+hit: br close
+hit: br close jev-x
+hit: br close jev-x --reason
+miss: br close jev-x --reason[space]
+miss: br close jev-x --reason done
+Arm added: kit-close: streamed prefix before --reason, expects fire until the check moves to bashVerdict. policy.ts:15-37 does not check br close. That move is not done. It needs the guard edit session.
+NO-CLAIM: a whole-sample miss is not proof the rule is quiet while the command is still streaming.

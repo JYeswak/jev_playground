@@ -48,3 +48,15 @@ e2e-live root cause: this pane's `OMP_PROFILE=grok` makes omp read the profile m
 The GREEN arm failed when `OMP_PROFILE` was unset: `absence-from-one-probe still present in project (count=1)` and `in global (count=1)`. It passed in this grok pane because the disable is `~/.omp/profiles/grok/agent/config.yml:28-30`, not a project setting. The both-scopes script cannot go green from a project disable alone: `~/.agents/rules/absence-from-one-probe.md` is still discovered outside the repo. The arm now checks the project list with the profile vars unset. The project list hides the rule because `.omp/config.yml` `ttsr.disabledRules` names it. That is a stale premise in the arm, not a config regression.
 
 Stage 80 re-run after the arm change: `bash foundation/gates.d/80-lane-instrument-selftests.sh` exited 0. 14 instrument suites and 15 stage selftests PASS, including `selftest-ttsr-assert-disabled.sh`, `selftest-ttsr-rules.sh`, and `selftest-pin-liveness.sh`. Pin-liveness is not the remaining red. There is no remaining red in that stage.
+
+## Streamed prefix — kit-close-needs-evidence
+
+Pane 1 was interrupted live while streaming a `br close` whose final form carried `--reason`. `omp ttsr test` on successive prefixes of `br close jev-x --reason done`, source tool, tool bash:
+
+- `br close` hit
+- `br close jev-x` hit
+- `br close jev-x --reason` hit
+- `br close jev-x --reason ` miss
+- `br close jev-x --reason done` miss
+
+The negative lookahead is applied to the accumulated stream (`https://omp.sh/docs/ttsr` matching section). A prefix that ends before `--reason` plus whitespace matches. The whole-sample quiet arm passed and did not see this. `bashVerdict` in `policy.ts:15-37` does not check `br close` at all, so moving the check there is not done. The selftest arm `kit-close: streamed prefix before --reason` expects fire until that move lands. W1.4 should retire or soften this TTSR rule and block only the complete command.

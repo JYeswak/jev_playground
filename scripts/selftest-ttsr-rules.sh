@@ -334,6 +334,8 @@ arm_at() { # rule expect label source tool path snippet
   else note FAIL "$label — wanted $want, got $got"; fail=$((fail+1)); fi
 }
 arm_at .omp/rules/kit-close-needs-evidence.md fire  "kit-close: br close without reason" tool bash "" "br close jev-x"
+arm_at .omp/rules/kit-close-needs-evidence.md fire  "kit-close: streamed prefix before --reason" tool bash "" "br close jev-x --reason"
+
 arm_at .omp/rules/kit-close-needs-evidence.md quiet "kit-close: br close with reason"    tool bash "" "br close jev-x --reason done"
 arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: commit --no-verify" tool bash "" "git commit --no-verify -m x"
 arm_at .omp/rules/kit-no-verify.md quiet "kit-no-verify: git status"          tool bash "" "git status -sb"
