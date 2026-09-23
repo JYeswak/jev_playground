@@ -1371,3 +1371,26 @@ receipt-file mtime.
 **Boundary.** No browser driven live; no production action; confidences
 uncalibrated at N=10; gpt-4o-mini is a same-state probe, not the
 browser-use incumbent.
+
+## jev-align under W7.0 (2026-09-23) [live]
+
+QuietHarbor, plan W7.2 (group seat/benchmark). `sutro-sh/jev-align` @
+`49753df`, unmodified (`git status` clean at close). T4 bar committed first
+(`notes/deep/dispatch/p6-w70-t4bars.md` @ `070efe6`, ~6 min before first
+live call). Corpus: UCI SMS Spam v.1, seed-7 stratified 20+20 (N=40,
+prevalence 50% constructed, 13.4% natural); clone bundles ship unlabelled.
+Fresh: pytest 127/127 + ruff clean; /tmp plant (precision off-by-one)
+turns core tests RED 2 failures. T4 specified binary question 39/40 =
+0.975 vs majority 0.500 (conjunct HOLDS) but ambiguity check fails
+(top-quartile err 0.000 vs base 0.025; sole error confident-wrong p=0.02,
+sampler would not resample it) → bar verdict REFUSED. Floors: majority
+0.500, lexical rule 0.925 — neither ties. T6 vague question 0.750 vs
+1.000 paired, McNemar b=5/c=0 (wording moves 0.25). T7 bins with counts
+(middle empty). T8 0/10 flips either kind. T9 NA (official SDK path).
+Spend: 101 Jev calls of 120 cap, p50 0.179s / p95 0.494s, jev-1.13.0 on
+101/101 records. Verdict: REFUSED, class INCUMBENT, tier no-seat. Receipt
+[`docs/demos/upstream-repro/jev-align-w70-20260923.md`](docs/demos/upstream-repro/jev-align-w70-20260923.md).
+Pane-6 verification: suite re-run 127 green; clone state confirmed.
+
+**Boundary.** GEPA never run (no reflection spend); multilabel/gateway
+paths code-present only; sampler application unproven beyond these 40 rows.
