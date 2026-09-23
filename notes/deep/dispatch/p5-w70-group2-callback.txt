@@ -1,0 +1,10 @@
+CALLBACK-P5-W70-GROUP2-DONE
+Receipts committed as 3eda61f (bars: v1 fec3f95 + Amendment A fcbb050, both pre-data, unmoved).
+- jevcal live: T4 PASS (ok x3; held-out 96.88/97.38/96.10% clear target-0.02; 400 req/392 answered, 8x 520 unretried). Thresholds fit on t001-t200 (0.75/0.61/0.88) TRANSFER to t201-t400 (within 0.02 of full-run, same bar arithmetic clears). T8 stable (0 flips urgent/dept). Spend 560 req $0.0113. Direct learn-Jev answer: per-question thresholds fit on our own 400-row split at 0.73-0.87 and transfer across halves.
+- janus live: T4 PASS both arms (A 393/500=78.60% in [72.8,82.8]; B 108/200=54.00% in [49.5,59.5]; prompt_hash matches; 940/940 answered, $0.1274, 6.4% of ceiling). Floors beaten (lexical B 47.50% sits 6.5pts under — recorded, no tie-refusal). T7 monotone, T8 stable. Seat holds; no transfer claim.
+- awesome-jev: catalogue PASS (17/17 entries; 4 shared pointers, 4 mirror rows, 9 catalogue-only; openjev + smart-home flags for owner).
+- awesome-jev-by-typesafe: T1+T3 PASS (11/11 suite x3 runners; plant RED; 8/8 entries).
+- typesafe-skills: catalogue PASS (1 skill, 13 blocks, 0 runnable checks; 9 verifiable-but-unverified, 4 guidance-only).
+- pi-subagents: T1 FAIL (pre-existing M package-lock.json dirt) / T2 PASS (3321 tests, 25 pre-existing fails; plant RED) / T3 PASS / T4 PROPOSED (typed-gate swap bar verbatim) / T9 PASS / T10 SELF. Clone untouched.
+EVAL.md append still blocked (reservation held elsewhere); sections for all six plus the prior seven live in the agents' returned eval texts — say where to collect them or release EVAL.md and I append within the hour.
+NO-CLAIM: single runs at stated N; jevcal corpus is generator-trivial (floors 100/87.5/100), so its bar tests threshold validity, not discrimination.
