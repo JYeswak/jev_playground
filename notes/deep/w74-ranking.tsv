@@ -1,4 +1,4 @@
-repo	ground_truth	prev_num	prev_den	prev_pct	cost	class	w70_class	leverage	rank	reason
+repo	ground_truth	prev_num	prev_den	prev_pct	cost	w70_class	leverage	rank	reason
 jev-review	ours: 669 non-merge commits on disk, thin fraction measurable keyless today	64	669	9.6	KEYLESS (13 tests + our draw)	SELF	act (gate blocks thin-diff scores)	1	top: only candidate that ACTS on our systems with ground truth on disk today and keyless cost; source seat SELF (13/13 + shipped applicability noul)
 jev-phishing-bench	public labelled 2000 (1000/2000)	1000	2000	50.0	KEYLESS reproduce on committed results	SELF	act-enabler (helper improves every threshold we fit)	2	highest legit prevalence + public ground truth + keyless + SELF; cross-cutting leverage
 jev-spam-eval	public labelled 19528 (8752 spam)	8752	19528	44.8	KEYLESS analyze on committed results	SELF	act (question-writing variant)	3	high prevalence + public ground truth + keyless + SELF; acts on our question quality
