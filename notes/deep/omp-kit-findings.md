@@ -1,0 +1,28 @@
+# W1 findings
+
+HEAD `33fe6ae`. Installed policy: `.omp/extensions/kit-guard/policy.ts`. Harness: `bun /tmp/jev-rc-p1/w13/run.mjs` importing that file. 12 layout rows. 8 MISMATCH, 4 MATCH. Denominator 12.
+
+## Mismatches
+
+1. `githooks/pre-commit` write expected block, observed pass. Regex: `GATE_PATHS` matches `.githooks/`, not `githooks/`. Planted negative. It came back MISMATCH, so the harness is exercising the installed copy.
+2. `rm githooks/commit-msg` expected block, observed pass. Same hole, bash form.
+3. `chmod -x githooks/pre-commit` expected block, observed pass. Same hole.
+4. `foundation/gates.sh` expected block, observed pass. The added regex covers `foundation/gates.d/[0-9].*.sh`, not the aggregator.
+5. `foundation/gates.d/44-native-surface.exemptions` expected block, observed pass. The regex requires a `.sh` suffix.
+6. `git config --get core.hooksPath` expected pass, observed block. `core\.hooksPath` has no read exemption. This is the live pane-1 false positive, reproduced on the installed function.
+7. `git commit -m "document the -n flag"` expected pass, observed block. `\s-[a-zA-Z]*n` matches ` -n` inside the message.
+8. `upstream/typesafe-ai/skills/templates/x.md` expected pass, observed block. `(^|/)templates/` blocks every templates directory, including vendored clones.
+
+## Subdirectory plant
+
+From `jev/notes`, `omp ttsr list` discovered 0 of the 6 project kit rule names and 3 `~/.agents/rules` kit rules. A method that reports 6 project rules from that directory would be blind. This one reported 0.
+
+## Live load
+
+All five running omp processes started before `572e3eb` (2026-09-22 20:07:38 -0600). Pane 2 has no omp child. kit-guard is not loaded in any live pane. Fresh rpc sessions for default, grok, and muse from the repo root did list kit-guard. `omp://ttsr-injection-lifecycle.md` registers rules at session startup and restores eligibility on reload. `omp ttsr list` is a CLI read of the launch directory, not the live session's registered set.
+
+## W1.4
+
+Not overbuilt. Eight mismatches are a path list and a read-versus-write distinction. That is what `.omp/kit-guard.json` was specified to hold (`gatePaths`, `hookDir` from `core.hooksPath`, `readOnlyBashAllow`). A one-line regex patch would miss the next path. The first edit still needs `KIT_GATE_EDIT=1`.
+
+NO-CLAIM: the 8/12 figure is the pure function on 12 strings, not a live pane frame. e2e-live was 0/10 because omp never called the model. The planted-failure arm of that suite was not run.

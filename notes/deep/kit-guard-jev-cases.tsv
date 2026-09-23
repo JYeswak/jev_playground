@@ -1,0 +1,31 @@
+expect	rule	source	tool	path	snippet	kit_guard_expect	observed_ttsr	observed_kitguard	regex_responsible
+block	kit-guard	tool	write	githooks/pre-commit	write	block	n/a	pass	GATE_PATHS matches .githooks/ not githooks/
+block	kit-guard	tool	bash	-	rm githooks/commit-msg	block	n/a	pass	BASH rm/chmod regex requires .githooks/ or .git/hooks/
+block	kit-guard	tool	bash	-	chmod -x githooks/pre-commit	block	n/a	pass	BASH rm/chmod regex requires .githooks/ or .git/hooks/
+block	kit-guard	tool	write	foundation/gates.sh	edit	block	n/a	pass	GATE_PATHS has gates.d/[0-9].*.sh not gates.sh
+block	kit-guard	tool	write	foundation/gates.d/44-native-surface.exemptions	edit	block	n/a	pass	GATE_PATHS requires .sh suffix
+block	kit-guard	tool	bash	-	git config core.hooksPath /dev/null	block	n/a	block	core\.hooksPath
+block	kit-guard	tool	bash	-	git commit --no-verify -m x	block	n/a	block	--no-verify
+pass	kit-guard	tool	bash	-	git config --get core.hooksPath	pass	n/a	block	core\.hooksPath has no read exemption
+pass	kit-guard	tool	bash	-	git config --list | grep hooksPath	pass	n/a	pass	-
+pass	kit-guard	tool	bash	-	git commit -m "document the -n flag"	pass	n/a	block	\s-[a-zA-Z]*n matches " -n" inside the message
+pass	kit-guard	tool	write	upstream/typesafe-ai/skills/templates/x.md	edit	pass	n/a	block	(^|/)templates/
+pass	kit-guard	tool	write	notes/deep/x.md	edit	pass	n/a	pass	-
+miss	absence-from-one-probe	text	-	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
+hit	absence-from-one-probe	text	-	-	the daemon is not installed	n/a	hit	n/a	-
+miss	bash-callsite-grep-exclusion	tool	bash	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
+hit	bash-callsite-grep-exclusion	tool	bash	-	see /tmp/jev-rc-p1/w13/hits.json	n/a	hit	n/a	-
+miss	bash-glob-silenced	tool	bash	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
+hit	bash-glob-silenced	tool	bash	-	see /tmp/jev-rc-p1/w13/hits.json	n/a	hit	n/a	-
+miss	bash-pipe-exit	tool	bash	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
+hit	bash-pipe-exit	tool	bash	-	see /tmp/jev-rc-p1/w13/hits.json	n/a	hit	n/a	-
+miss	bash-structural-def-search	tool	bash	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
+hit	bash-structural-def-search	tool	bash	-	see /tmp/jev-rc-p1/w13/hits.json	n/a	hit	n/a	-
+miss	jev-key-canonical-source	tool	bash	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
+hit	jev-key-canonical-source	tool	bash	-	see /tmp/jev-rc-p1/w13/hits.json	n/a	hit	n/a	-
+miss	kit-gate-must-name-the-plant	text	-	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
+hit	kit-gate-must-name-the-plant	text	-	-	see /tmp/jev-rc-p1/w13/hits.json	n/a	hit	n/a	-
+miss	kit-relative-path-not-cwd	tool	bash	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
+hit	kit-relative-path-not-cwd	tool	bash	-	see /tmp/jev-rc-p1/w13/hits.json	n/a	hit	n/a	-
+miss	kit-structure-not-truth	text	-	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
+hit	kit-structure-not-truth	text	-	-	see /tmp/jev-rc-p1/w13/hits.json	n/a	hit	n/a	-
