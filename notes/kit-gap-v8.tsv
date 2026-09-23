@@ -1,0 +1,29 @@
+id	prior_status	status	evidence_path	note
+A1	GAP	HAVE	foundation/kit/packet.md	packet section 2 Non-goals is non-empty with named exclusions (no prod seat, no re-tune, no invented rows)
+A2	PARTIAL	HAVE	foundation/kit/packet.md	packet section 3 SOTA pins cutover 943158c, score-path 118185e, rerank c84d562, SDK 66880cc, fixture and receipt
+A3	GAP	HAVE	foundation/kit/packet.md	packets F1/F2 carry goal, anchor, target, oracle, fixture, risk, acceptance; foundation/kit/check-readiness.sh scores the markers
+A4	HAVE	HAVE	foundation/kit/claims.tsv	enforced official-sdk row plus ported checker; packet section 5 requires planned-before-cited
+A5	PARTIAL	PARTIAL	NEGATIVE_EVIDENCE.md	ledger with retry predicates stands, but no init.sh seeding and no per-commit row lint exist
+A6	GAP	HAVE	foundation/kit/demotion-rules.md	pane 3 landed the rules file: D1 lattice, D2 P0 blocks, D3 two-direction gate changes, D4 always-demote, retired-id tombstoning
+A7	GAP	HAVE	foundation/kit/packet.md	packet section 10 names Phase A/B entry and exit proofs plus the no-OPEN-dependency closure rule
+A8	PARTIAL	PARTIAL	AGENTS.md	DoD with command evidence lives in AGENTS.md section 4 and packet acceptances name artifacts; no docs/definition-of-done.md exists
+A9	PARTIAL	PARTIAL	AGENTS.md	10 adapted patterns named, not the 12 verbatim; packet adds nothing to this item
+A10	PARTIAL	PARTIAL	AGENTS.md	dispatch-packet shape (positive, planted negative, NO-CLAIM) is convention; bead acceptance lines not enforced
+A11	PARTIAL	HAVE	foundation/kit/packet.md	packet section 8 declares admissible proofs and an explicit non-proof list
+A12	PARTIAL	PARTIAL	AGENTS.md	BUILD/HOLD/AUDIT boundary plus packet gate-thrift rule; artifacts still lack per-item deletion conditions
+A13	PARTIAL	HAVE	foundation/kit/packet.md	packet section 11 records the solo attestation: reviewer, draft, what changed, residual risk accepted 2026-09-23
+A14	GAP	HAVE	foundation/kit/packet.md	packet section 9 states RED/proof/secret blocks, waiver four fields with expiry, and non-waivable clauses
+B1	HAVE	HAVE	.beads/issues.jsonl	graph is the plan of record; no parallel prose tracker
+B2	PARTIAL	PARTIAL	.beads/issues.jsonl	closed beads carry evidence-citing close reasons in spot check; full 66-row census not run
+B3	PARTIAL	PARTIAL	foundation/kit/packet.md	packet section 6 binds receipts to model version and forbids host claims; receipts still lack commit/host/worker fields
+B4	HAVE	HAVE	NEGATIVE_EVIDENCE.md	falsified rows carry retry predicates; reopening needs a new fact
+B5	PARTIAL	PARTIAL	githooks/pre-commit	core.hooksPath=githooks (.git/config:8), so .git/hooks/* is inert; githooks/pre-commit runs the staged-deletion and autofix-check lanes and githooks/commit-msg the verification-level check; no claim-discipline canary, so B5's self-test is still absent (corrected 2026-09-22 AmberWillow: the prior row cited the inert .git/hooks copy and said no pre-commit hook)
+B6	HAVE	HAVE	foundation/kit/check-claim-discipline.sh	ported checker sees the enforce=yes row; one README claim enforced
+B7	GAP	PARTIAL	foundation/kit/demotion-rules.md	D3 states the two-direction rule but no gate-changing commit has exercised it yet; review-enforced
+B8	GAP	PARTIAL	foundation/gates.d/17-kit-demotion.sh	pane 3 landed the gate executing the mechanical slice with RED selftest; full scheduled-cadence demotion unproven
+B9	GAP	PARTIAL	foundation/kit/packet.md	waiver rules written in packet section 9; no waiver has been executed or recorded yet
+B10	HAVE	HAVE	AGENTS.md	Landing the Plane ritual adopted; review-enforced
+B11	GAP	GAP	NONE	no resurrection cadence and no VOID rows
+B12	GAP	GAP	NONE	no claim-coverage audit; the process audit is not claim coverage
+B13	GAP	GAP	NONE	no false-closure repair sweep
+B14	PARTIAL	PARTIAL	foundation/gates.d/10-fixture-integrity.sh	stages carry RED arms and the packet demands them, but no break-test artifact was produced in this pass

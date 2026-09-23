@@ -1,0 +1,30 @@
+claim	file	verdict
+ECE 0.061 (v1 answer)	foundation/CALIBRATION.md	MATCH
+Brier 0.020 (v1 answer)	foundation/CALIBRATION.md	MATCH
+80-row fixture; receipt 80/80, 0 errors	foundation/CALIBRATION.md	MATCH
+model jev-1.13.0 (jev-latest resolved 2026-09-17)	foundation/CALIBRATION.md	MATCH
+thresholds 0.75 block / 0.8 auto-accept; t=0.75,0.8 acc 1.0 at 95% coverage	foundation/CALIBRATION.md	MATCH
+cutover commit 943158c	work/jev-client/README.md	MATCH
+score-path commit 118185e	work/jev-client/README.md	MATCH
+rerank-rewire commit c84d562	work/jev-client/README.md	MATCH
+vendored SDK at commit 66880cc	work/jev-client/README.md	MATCH
+receipt runs/20260917T224444Z.json on disk; started_at date = v1 date 2026-09-17	foundation/runs/20260917T224444Z.json	MATCH
+claims.tsv holds exactly one enforced row (official-sdk, enforce yes)	foundation/kit/claims.tsv	MATCH
+proof path work/jev-client/src/index.ts exists; contains expected_substr new TypeSafeClient	work/jev-client/src/index.ts	MATCH
+receipts record started_at, model, fixture sha256; no host/worker keys present	foundation/runs/20260917T224444Z.json	MATCH
+gates.sh resolves HEAD once per run; appends one line per stage per run to gate-outcomes.tsv	foundation/gates.sh	MATCH
+twelve CHECK markers present in packet	foundation/kit/packet.md	MATCH
+L8 correction sentence (score-path is 118185e, not 118180e)	work/jev-client/README.md	MATCH
+section ordinal 2 (packet.md:24 '## 2. Non-goals') is the template's section 2	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 2; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 3 (packet.md:33 '## 3. State-of-the-art survey') is the template's section 3	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 3; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 4 (packet.md:44 '## 4. Work packets') is the template's section 4	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 4; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 5 (packet.md:57 '## 5. Claim inventory') is the template's section 5	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 5; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 6 (packet.md:65 '## 6. Evidence design') is the template's section 6	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 6; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 7 (packet.md:74 '## 7. Honesty machinery') is the template's section 7	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 7; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 8 (packet.md:83 '## 8. Proof taxonomy') is the template's section 8	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 8; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 9 (packet.md:92 '## 9. Release gate') is the template's section 9	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 9; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 10 (packet.md:100 '## 10. Phase exit criteria') is the template's section 10	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 10; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 11 (packet.md:110 '## 11. Independent review') is the template's section 11	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 11; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+section ordinal 12 (packet.md:118 '## 12. Execution sign-off') is the template's section 12	franken-assessments-44-v8.zip@70628b1f starter-kit/templates/planning-packet.md heading 12; paste-compare of all 12 headings, 12/12 MATCH (AmberWillow 2026-09-22)	MATCH
+'Pane 5 drafted notes/foundation-packet-p5.md' (packet.md:112; token 5)	notes/foundation-packet-p5.md exists on disk but is untracked: git ls-files empty; git status '?? notes/foundation-packet-p5.md'; git log --all has 0 commits for it. A fresh clone cannot open the file this line cites.	MISS
+'Signed as draft: conductor, 2026-09-23' (packet.md:122; token 23)	git log a53190f: 2026-09-22T18:52:22-06:00 = 2026-09-23 00:52 UTC. The day is the UTC date, not the local one.	MATCH
