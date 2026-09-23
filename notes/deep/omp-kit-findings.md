@@ -37,4 +37,4 @@ Two more layout mismatches, 10/14 now: `.omp/config.yml` and `.omp/rules/kit-no-
 
 `scripts/selftest-ttsr-rules.sh` now has hit and miss arms for the six kit rules. Re-run: 105 ok, 0 failed. The old check required exactly 6 project rules; there are 12. The expected count is 12 because the arms exist, not because the check was weakened.
 
-e2e-live and omp-continue root causes are still open. Part B is paused.
+e2e-live root cause: this pane's `OMP_PROFILE=grok` makes omp read the profile models file. The suite writes the default agent models file. `main.ts:2304` exits. Unsetting `OMP_PROFILE`, `PI_PROFILE`, and `PI_CODING_AGENT_DIR` makes the suite 10/10. Planted arm then fails 4/10. omp-continue line 8 fails because the git template commit-msg hook refuses subject `init` (`commit-msg-verification-level.sh:63`), not because identity is unset. With `br` on PATH the script never falls through to JSONL (`omp-continue.sh:30`, `br ready` exit 7). Part B is still paused until the depth callback is sent.

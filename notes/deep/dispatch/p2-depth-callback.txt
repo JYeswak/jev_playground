@@ -1,0 +1,11 @@
+CALLBACK-P2-DEPTH-DONE
+Part B was not started.
+commit: will be the commit that lands this callback's artifacts. Prior earned commit 313f029.
+before → after:
+- census row 2 ABSENT → pid 61381, profile grok, model grok-4.7, started Mon Sep 21 12:18:16. Command: ps -p 61381 -o pid,ppid,lstart,command=
+- model UNMEASURED 6/6 → status lines: pane 1 Opus 5.5, pane 2 grok-4.7, panes 3-6 Muse Spark 1.3. Command: tmux capture-pane -p -t jev:0.N
+- ttsr_repeatMode after-gap was fresh only. Live panes started before 572e3eb load once/10. https://omp.sh/docs/ttsr:107 and :192. Project ttsr does not clobber profile disabledRules (R77).
+- e2e 0/10 NOT_RUN → Model "mock/mock" not found. OMP_PROFILE=grok. Suite writes $HOME/.omp/agent/models.yml. omp reads profiles/grok/agent/models.yml. main.ts:2304. Second route: unset OMP_PROFILE PI_PROFILE PI_CODING_AGENT_DIR → 10/10, log0.jsonl 3 lines in tmp.lSXUAgIMMB. Planted arm 4/10 fail, 10 logs in tmp.wQDzTg3hSl.
+- continue initial commit failed → not missing identity. ~/.git-templates/hooks/commit-msg-verification-level.sh:63 refuses subject init. Second route: isolated HOME, commit exits 0. With br on PATH, omp-continue.sh:30 treats br ready exit 7 as no work (5/6 fail). br off PATH: 11/11.
+scan: kit-test-skip 7 matches / 1644 files; kit-jsonl-close 1 match / 1 file; kit-weasel-retry 0 matches / 1 file; bash-scoped kit-close and kit-no-verify and text-scoped kit-unverified-done scanned 0 files (no file scope).
+NO-CLAIM: I did not personally re-run the 10-scenario or 11-scenario suites. I re-opened their kept transcripts and the hook line. kit-no-verify already-fired on pane 1 was not re-observed.
