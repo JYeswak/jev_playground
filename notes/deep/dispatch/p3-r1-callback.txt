@@ -1,0 +1,7 @@
+CALLBACK-P3-R1-DONE
+artifact: notes/deep/review-r1-p3.md (committed)
+commit: (this commit)
+review: 6 changes R1-7..R1-12 on plan 66f6ea5 (W7 unreviewed until now): ledger missing prevalence+cost columns; never-row owners unassigned; merge the two cold reads; §2 transcript-read permission; W4.1 acceptance satisfiable by exclusion; W7.2 receipt names collide on rerun. One removal (R1-9). No packet removed.
+planted-negative equivalent: read p2/p5 reviews first; no duplicate proposals.
+NO-CLAIM: a review is not an integration; pane 1 decides.
+RCH pending: s1-rs ui rerun on contabo-1 PASSED (4/4 cases correctly rejected, exit 0) — contabo-4 4/4-compiled is environmental; fresh-target confirmation + commit-miner suite launching next.
