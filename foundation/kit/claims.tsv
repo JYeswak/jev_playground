@@ -1,0 +1,2 @@
+label	readme_pattern	capability_key	expected_substr	proof_path	enforce	notes
+official-sdk	Call the official SDK.	jev-client	new TypeSafeClient	work/jev-client/src/index.ts	yes	README line. Proof is the vendored TypeSafeClient constructor. Fixture bins are not this claim.
