@@ -2,7 +2,7 @@
 
 Jev answers typed questions about a state with calibrated numbers. This repo is where we find out which of those numbers deserve to drive code, and where a regex or a constant does the job better.
 
-__omp_shell("[A typed judgment, not a paragraph](visual/hero.jpg)")
+![A typed judgment, not a paragraph](visual/hero.jpg)
 
 ## TL;DR
 

@@ -83,6 +83,12 @@ if [[ "${1:-}" == "--selftest" ]]; then
     >> "$tmp/stalenumerals.md"
   arm "stale numerals under matching word -> RED" 1 "$tmp/stalenumerals.md"
 
+  # The escape of 2026-09-22: a README generated through the Python eval kernel, whose `!` line
+  # escape rewrote the hero line `![...](visual/hero.jpg)` into `__omp_shell("[...]")`.
+  printf '__omp_shell("[hero](visual/hero.jpg)")\n' > "$tmp/harness.md"
+  cat "$readme" >> "$tmp/harness.md"
+  arm "harness markup in README -> RED" 1 "$tmp/harness.md"
+
   arm "missing README -> refuse" 2 "$tmp/absent.md"
 
   if (( fails > 0 )); then echo "stage 97 selftest: $fails arm(s) FAILED"; exit 1; fi
@@ -129,6 +135,11 @@ while IFS= read -r row; do
     problems="$problems|row for '$repo' says not run, but a receipt for it exists in docs/demos/upstream-repro"
   fi
 done < <(grep -E '^\|`[a-z0-9-]+`.*not run' "$readme" || true)
+
+# Harness markup that leaked into the public page instead of the Markdown it replaced.
+while IFS= read -r hit; do
+  problems="$problems|README line ${hit%%:*} carries harness markup instead of Markdown: ${hit#*:}"
+done < <(grep -nE '__omp_shell\(|get_ipython\(\)' "$readme" | cut -c1-90 || true)
 
 if [[ -n "$problems" ]]; then
   echo "FAIL  stage 97 readme counts            a typed count no longer matches the repository."
