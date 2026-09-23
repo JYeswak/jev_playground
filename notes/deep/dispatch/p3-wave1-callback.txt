@@ -1,0 +1,7 @@
+CALLBACK-P3-jev-deep-kit-8q7.2-DONE
+artifacts: notes/deep/franken-deps.tsv (13 cols, 39 data rows, awk-validated), notes/deep/franken-deps.md
+commit: (this commit; HEAD run at 33fe6ae)
+numbers: 2316 rg lines over tracked files; 5 work/nev-*.jsonl excluded; 39 TSV rows; 8 not-assessed origins; 1 planted-negative (franken_remote, 0 files); feasibility frankensearch 81 lines incl AGENTS.md:642
+planted negative: franken_remote returns zero as required; stage-85 example answered in-tree (shape-only header) and confirmed by packet (engine CI red, quality/perf zero runs)
+NO-CLAIM: transcript invocation counts unmeasured (scope block); a citation audited against a packet is not an execution proof; rider facts are quotes, not a legal conclusion.
+Part B: starting review round 1 next (notes/deep/review-r1-p3.md).
