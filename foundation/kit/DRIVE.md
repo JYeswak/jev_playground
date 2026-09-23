@@ -83,6 +83,7 @@ Pick up here, in order:
 1. Read each pane's `CALLBACK-P<N>-PAUSED` and its bead handoff comment.
 2. `jev-deep-kit-8q7.6` (TopazRaven): run the bead's metric on the 669-commit draw (thin gate keyless; noul gate live on substantial diffs; any substantial refusal fails the bar as written), then L3 from the session `.jsonl` custom rows.
 3. `.7` (SunnyTiger, `work/oracle-kit` uncommitted at pause) and `.8` (MistyTurtle, must run `skill://prevalence-first` before its first live call).
+3b. `jev-deep-kit-8q7.9`: ten popular Jev projects Joshua shared were cloned and read (ledger rows 29-38, all 200 citations resolve). Seven get W7.0 runs by the `run_owner` in each row. Look first at Canny (a done-claim is blocked unless a verify command passed after the last edit; Jev may only relax it, which is our close-pump problem) and jev-drone (decide in code when to ask, cache by scene fingerprint, cap calls, drop stale answers, fall back to a safe default on error). jev-trader's advertised ~81 ms is its mock's `Bun.sleep(80)`, not a Jev latency.
 4. W2.6 CI (QuietHarbor): `.github/workflows/gates.yml`, typed SKIPs for the omp stages, green and planted-RED run URLs.
 5. uds (RedMaple): from `reconcile-wip`, get `cargo test -j 2 -p uds` green via RCH (`caam` exception is DROPPED), commit per uds `AGENTS.md`, then pane 1 pushes uds `main`.
 6. Plan: round 3 review (a Muse pane) on `docs/PLAN-DEEP-KIT-20260922.md`, then §12 sign-off and Phase C beads for the packets without beads.
