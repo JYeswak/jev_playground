@@ -1,0 +1,6 @@
+claim	path	verdict
+guard fixture: refund passes; jailbreak blocks; dosage reviews; crisis supports	demos/guard/demo.mjs	MATCH
+date fixture: 6 docs resolve; missing stays empty; under 0.60 to review	demos/date/demo.mjs	MATCH
+preparsed fixture: regexes over-find; recorded picks choose; verbatim copy plus normalization	demos/preparsed/demo.mjs	MATCH
+injection: n=662 cut 0.5 jev-1.13.0; Jev 639/662 0.9653; grok-4 0.8429; Haiku 0.8746	work/nev-differential/DIFF-RECEIPT.json	MATCH
+calibration: N=80 pinned model, ECE 0.0614, Brier 0.0195, choice 19/20	foundation/runs/20260922T021352Z.json	MATCH
