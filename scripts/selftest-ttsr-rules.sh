@@ -318,15 +318,44 @@ case "$out" in
   *) note FAIL "exposure RED arm: wrong verdict — a raw-only tool would say WALLPAPER"; fail=$((fail+1)) ;;
 esac
 
+# KIT RULES landed at b947da1. Same fire/quiet shape. Snippets proven with
+# `omp ttsr test --json` before this edit (W1.3, jev-deep-kit-8q7.1).
+arm_at() { # rule expect label source tool path snippet
+  local f="$1" want="$2" label="$3" src="$4" tool="$5" pth="$6" txt="$7" got out
+  if [ "$src" = text ]; then
+    out=$(omp ttsr test --rule "$f" --source text "$txt" 2>&1)
+  elif [ -n "$pth" ]; then
+    out=$(omp ttsr test --rule "$f" --source tool --tool "$tool" --path "$pth" "$txt" 2>&1)
+  else
+    out=$(omp ttsr test --rule "$f" --source tool --tool "$tool" "$txt" 2>&1)
+  fi
+  if grep -qE '^Triggered \([1-9]' <<<"$out"; then got=fire; else got=quiet; fi
+  if [ "$got" = "$want" ]; then note ok "$label ($want)"; pass=$((pass+1))
+  else note FAIL "$label — wanted $want, got $got"; fail=$((fail+1)); fi
+}
+arm_at .omp/rules/kit-close-needs-evidence.md fire  "kit-close: br close without reason" tool bash "" "br close jev-x"
+arm_at .omp/rules/kit-close-needs-evidence.md quiet "kit-close: br close with reason"    tool bash "" "br close jev-x --reason done"
+arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: commit --no-verify" tool bash "" "git commit --no-verify -m x"
+arm_at .omp/rules/kit-no-verify.md quiet "kit-no-verify: git status"          tool bash "" "git status -sb"
+arm_at .omp/rules/kit-unverified-done.md fire  "kit-unverified: should now pass" text "" "" "the tests should now pass"
+arm_at .omp/rules/kit-unverified-done.md quiet "kit-unverified: a receipt sha"   text "" "" "the receipt is at cead414"
+arm_at .omp/rules/kit-test-skip.md fire  "kit-skip: it.skip" tool edit t.ts "it.skip('x')"
+arm_at .omp/rules/kit-test-skip.md quiet "kit-skip: it("     tool edit t.ts "it('x')"
+arm_at .omp/rules/kit-jsonl-close.md fire  "kit-jsonl: closed without a long reason" tool edit .beads/issues.jsonl '{"status": "closed"}'
+arm_at .omp/rules/kit-jsonl-close.md quiet "kit-jsonl: closed with a 20-char reason" tool edit .beads/issues.jsonl '{"status": "closed", "close_reason": "01234567890123456789"}'
+arm_at .omp/rules/kit-weasel-retry.md fire  "kit-weasel: retry predicate later" tool edit NEGATIVE_EVIDENCE.md "retry predicate: later"
+arm_at .omp/rules/kit-weasel-retry.md quiet "kit-weasel: retry predicate names a receipt" tool edit NEGATIVE_EVIDENCE.md "retry predicate: a new receipt lands"
+
+
 # Every project rule must own at least one arm above — a rule file with no test is a rule nobody
 # has ever seen fire. An empty scan set is not a pass (RULE 1).
 n_rules=$(ls -1 .omp/rules/*.md 2>/dev/null | wc -l | tr -d ' ')
 if [ "$n_rules" -eq 0 ]; then
   note FAIL ".omp/rules/*.md matched nothing — an empty scan set is NOT a pass"; fail=$((fail+1))
-elif [ "$n_rules" -eq 6 ]; then
+elif [ "$n_rules" -eq 12 ]; then
   note ok "every project rule ($n_rules) has arms here"; pass=$((pass+1))
 else
-  note FAIL "$n_rules project rules but only 6 are tested — add arms for the new one"; fail=$((fail+1))
+  note FAIL "$n_rules project rules but only 12 are tested — add arms for the new one"; fail=$((fail+1))
 fi
 
 echo "scripts/selftest-ttsr-rules.sh: $pass ok, $fail failed"

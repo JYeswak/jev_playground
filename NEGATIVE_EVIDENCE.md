@@ -3314,3 +3314,17 @@ Exit: unaskable or corpus-absent. That is not an admission path.
 **Retry condition.** None — this does not reopen; it is a standing obligation, now `AGENTS.md` RULE 14. Any verdict citing only a deterministic comparator is INCOMPLETE and may not be cited as a ruling on Jev until an LLM arm is run on the same rows. Revisit only if the vendor withdraws the adapter.
 
 **NO-CLAIM.** This says our kills were incomplete. It does NOT say any of them were wrong: a task beaten by a regex may still be a task with no seat. What is unknown is how many of the 41 would survive an incumbent comparison, and that number is zero-measured, not zero.
+
+---
+
+## R77 — REFUTED: the project ttsr block clobbers profile disabledRules
+
+**Recorded:** 2026-09-22 · **Level:** `[test]` · Hypothesis named by pane 1 in `notes/deep/dispatch/p2-wave1-addendum.md`.
+
+**Claim:** adding `ttsr:` to `.omp/config.yml` replaced profile `disabledRules`, so `absence-from-one-probe` came back.
+
+**Measured:** from `/Users/josh/Developer/jev`, `omp --profile grok config get ttsr.disabledRules` is `["absence-from-one-probe"]` and `omp --profile muse config get ttsr.disabledRules` is `["bash-structural-def-search"]`. `./scripts/ttsr-assert-disabled.sh absence-from-one-probe` exits 0: absent in project (0) and global (0). `bash scripts/selftest-ttsr-assert-disabled.sh` exits 0, 4 ok, 0 failed. The earlier RED is not reproduced at this HEAD.
+
+**Retry condition.** Re-run `scripts/selftest-ttsr-assert-disabled.sh` from a subdirectory of this repo, or from a tree whose `.omp/config.yml` has no `ttsr.disabledRules`, and get exit 1 naming a scope. Until that happens, do not explain a disable miss as the project block clobbering the profile.
+
+**NO-CLAIM.** This does not say stage 80 was never red. It says the clobber explanation is false on the commands above.

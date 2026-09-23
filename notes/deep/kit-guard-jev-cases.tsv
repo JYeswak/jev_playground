@@ -10,6 +10,8 @@ pass	kit-guard	tool	bash	-	git config --get core.hooksPath	pass	n/a	block	core\.
 pass	kit-guard	tool	bash	-	git config --list | grep hooksPath	pass	n/a	pass	-
 pass	kit-guard	tool	bash	-	git commit -m "document the -n flag"	pass	n/a	block	\s-[a-zA-Z]*n matches " -n" inside the message
 pass	kit-guard	tool	write	upstream/typesafe-ai/skills/templates/x.md	edit	pass	n/a	block	(^|/)templates/
+block	kit-guard	tool	write	.omp/config.yml	add kit rule to ttsr.disabledRules	block	n/a	pass	GATE_PATHS does not include .omp/config.yml
+block	kit-guard	tool	write	.omp/rules/kit-no-verify.md	delete or edit	block	n/a	pass	GATE_PATHS does not include .omp/rules/
 pass	kit-guard	tool	write	notes/deep/x.md	edit	pass	n/a	pass	-
 miss	absence-from-one-probe	text	-	-	zzzz_cannot_exist_9c42	n/a	miss	n/a	-
 hit	absence-from-one-probe	text	-	-	the daemon is not installed	n/a	hit	n/a	-

@@ -26,3 +26,15 @@ All five running omp processes started before `572e3eb` (2026-09-22 20:07:38 -06
 Not overbuilt. Eight mismatches are a path list and a read-versus-write distinction. That is what `.omp/kit-guard.json` was specified to hold (`gatePaths`, `hookDir` from `core.hooksPath`, `readOnlyBashAllow`). A one-line regex patch would miss the next path. The first edit still needs `KIT_GATE_EDIT=1`.
 
 NO-CLAIM: the 8/12 figure is the pure function on 12 strings, not a live pane frame. e2e-live was 0/10 because omp never called the model. The planted-failure arm of that suite was not run.
+
+## Addendum
+
+Census row 2 was wrong. `pgrep -P 1427` missed child `61381`, `omp --profile grok`, started Mon Sep 21 12:18:16. That row is corrected. Models are from `tmux capture-pane` status lines, not titles.
+
+Two more layout mismatches, 10/14 now: `.omp/config.yml` and `.omp/rules/kit-no-verify.md` are not in `GATE_PATHS` (`policy.ts:44-53`). Editing either to disable a kit rule passes the guard.
+
+`.omp/config.yml` lines 79-80 are orphaned comments under the kit-guard list entry. `572e3eb` removed the jev-screen comment anchor. They do not attach to a key.
+
+`scripts/selftest-ttsr-rules.sh` now has hit and miss arms for the six kit rules. Re-run: 105 ok, 0 failed. The old check required exactly 6 project rules; there are 12. The expected count is 12 because the arms exist, not because the check was weakened.
+
+e2e-live and omp-continue root causes are still open. Part B is paused.
