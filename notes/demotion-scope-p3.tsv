@@ -1,0 +1,8 @@
+rule	executed_by_checker	evidence
+D1	NO	check-demotion.sh branches only on $6 == "yes" (awk line 80); no advisory/authoritative tagging exists in claims.tsv and no claim-effect (no_change/block_upgrade/downgrade_required/upgrade_eligible) appears in the script.
+D2	NO	no P0/open-issue tracking, no release-readiness concept, and no bead/issue lookup anywhere in the script; the only inputs are claims.tsv and root.
+D3	NO	no threshold, counter, or gate-semantics comparison in the script; the selftest plants data rows, never a gate-parameter change.
+D4	NO	the script never writes to NEGATIVE_EVIDENCE.md or any ledger and demotes only enforce=yes rows with missing proofs; any-agent demotion on counter-evidence has no code path.
+D5	NO	no retired-id handling: rows are skipped only on blank/comment/header lines; a retired marker in notes would be ignored, never tombstoned or protected from reuse.
+D6	NO	no date field is read (only $1 label, $5 proof, $6 enforce) and no age arithmetic exists; expiry cannot be computed from the current 7-column schema.
+D7	NO	the rule's trigger is hash-mismatch but the only artifact test is `test -s` (line 89: exists and non-empty); no sha256/hash comparison code path exists, so a bit-rotted proof of correct size is HELD.
