@@ -55,3 +55,19 @@ observable. T8 flips ~2.4%, reword agree ~0.80. Pane-4 re-runs: status,
 corpus count, committed metrics, raw tallies (1259/2000, 1257/2000,
 haiku 299/400), analyzer (T4/T5/T6 lines reproduced keyless).
 Boundary: one transient 520 row; public-corpus leakage caveat.
+
+## jev-spam-eval W7.0 (2026-09-23) [test]
+
+Clone `jev-spam-eval @ 76ef183` (bitnovus, MIT). jev HEADs: bar `9e8199b`,
+run 2026-09-23. Receipt
+`docs/demos/upstream-repro/jev-spam-eval-w70-20260923.md`. Status: 2
+pre-existing M results files only. No suite; /tmp plants (silent-degradation
+finding + numpy RED). T4 4,878 rows $0.2474, all jev-1.13.0: S1 0.9780, S2
+0.9848 (tp479), S4 0.9132, S5 0.9731 (tp296) — all recomputed by pane 4
+from /tmp/w70 rows. Floors same rows: S1/S2 ties (p=0.31/0.91), S3/S4/S5
+Jev wins (S3 floor cross-checked 0.7298 vs 0.7311). T6: S1/S5 ties, S2 grok
+loses, S4 BOTH LLMs beat Jev (haiku 807/853 recomputed). T7 bins counted;
+S4 single-class not-observable. T8 <=2.58% (pane-4 S1 recompute 3/500 vs
+runner 2/500, same order). Verdicts: S1+S2 TIE/REFUSED, S3+S5 SEAT-vs-floor,
+S4 INCUMBENT/REFUSED. NOT-RUN: phish 3-way (routes in receipt). ~$1.24
+total. Boundary: single runs, public corpora, S1 500-sample, 17 dups.
