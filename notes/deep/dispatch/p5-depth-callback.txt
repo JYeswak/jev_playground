@@ -1,0 +1,9 @@
+CALLBACK-P5-DEPTH-DONE
+Artifact: notes/deep/jev-assessment.md v2 (depth pass; pin 33fe6ae kept; no gate, hook, .omp, or AGENTS.md change).
+Reopened cells, before → after:
+- gates 14/3: RE-DERIVED in clean /tmp/jev-pin-33fe6ae worktree. 70 RED (DRIFT screen-log.test.mjs unnamed, 70-tests-registry-sync.sh:42-44) → fixed at 35629b2, recorded. 97 RED (no spelled form for 17 stages, 97-readme-counts.sh:91-92; missing form, not stale numeral) → fixed at 35629b2, recorded. 80 RED at pin (pin-liveness 7ok/1fail, ttsr-assert-disabled 3ok/2fail, ttsr-rules 92ok/1fail) → live diagnosis cited to panes 2/6 per pane-1 order, not duplicated (Stage80Diag subagent cancelled mid-run for the same reason).
+- calibration NOT_RUN keyless (four fields: env -u run exits 1, verbatim "TYPESAFE_API_KEY is not set", root cause run_calibration.py:133-135, routes: repeat run + source read) → REPRODUCED with Infisical key via SDK venv python: 80/80 rows, 0 errors, ECE 0.062 vs 0.0614, Brier 0.0194 vs 0.0195, choice_acc 0.95, receipt foundation/runs/20260923T024148Z.json (left untracked). Claims 4 and 6 upgraded to demonstrated (harm-rule verify-claim rc=0: recall 12/12, FP 0/38).
+- keyless sweep: 17/17 demos + diff + seat-guard (9/9) + harm-rule + sync-docs CHECK PASS 114, all rc=0 (subagent KeylessReruns, decisive lines re-read by me).
+Labels still standing: stage-80 live diagnosis (panes 2/6 own it); 16/1 post-fix suite state is pane-1-reported, not re-derived here; Part B (efff421) landed before the depth directive arrived — paused per directive, will revise if depth evidence changes it.
+NO-CLAIM: depth closes earned labels, not the packet. W5.2 cold read still owns sign-off.
+Key spend: one calibration repro (~80 rows) via Infisical; all else keyless.
