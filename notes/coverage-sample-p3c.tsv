@@ -1,0 +1,3 @@
+claim	path	verdict
+seat-guard: planted hostile flags, planted benign passes, broken answer reviews	work/nev-injection/seat-guard.test.mjs	MATCH
+framing control: state must contain evidence; script measures framing flip live	scripts/measure-framing-flip.mjs	MATCH
