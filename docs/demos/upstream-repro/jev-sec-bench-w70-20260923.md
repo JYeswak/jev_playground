@@ -27,3 +27,10 @@ Jev lower-CI ≥ 0.70 AND > floors, per battery.
 ## Boundary
 
 Public corpora may leak into any model's training. Single runs, fixed 0.5 cut, one adapter/SDK pair for T6. Certifies the injection-guard seat on these 662 rows only; code absolute 71.0% below bar. No Rust in clone (RCH note n/a).
+
+## Re-score without a key
+
+`work/nev-differential/fresh-20260923/` holds the 662 Jev rows and 662
+Haiku rows (public corpus, no key material — 30-no-secrets PASS).
+`python3 work/nev-differential/fresh-20260923/score.py` exits 0 printing
+`jev 640/662 haiku 584/662 discordants 61/5 mcnemar-p 2.63e-13`.
