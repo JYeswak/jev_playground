@@ -1326,3 +1326,24 @@ observes only, no blocking, no thresholds.
 
 **Boundary.** One driven session, pinned model. Live log stays in /tmp,
 never committed. Non-author grade owed.
+
+## s1-rs own suite on Contabo via RCH (2026-09-23) [test]
+
+AmberWillow, plan W7.2 (`jev-deep-kit-8q7`). `AbdelStark/s1-rs` @ `b916897`,
+unmodified. `env -u TYPESAFE_API_KEY RCH_VISIBILITY=verbose rch exec --
+cargo test -j 2 --workspace` from `s1-rs/`: RCH selected `contabo-4`,
+`Remote command finished: exit=101`. 27 tests pass across five binaries;
+the trybuild `ui` test fails because all 4 compile-fail cases
+(`bool_without_noul`, `choice_fields`, `duplicate_labels`,
+`too_few_variants`) compiled. The derive emits those errors in source
+(`s1-derive/src/choice.rs:32`, `:105`; `questions.rs:87`) with
+`MIN_CHOICE_OPTIONS = 2`, so four simultaneous misses point at the
+environment (trybuild's nested `cargo check` under RCH's source mirror)
+more than at s1-rs; undecided. Receipt
+[`docs/demos/upstream-repro/s1-rs-rch-20260922.md`](docs/demos/upstream-repro/s1-rs-rch-20260922.md).
+First run of the crate's test suite in this lane; the 2026-09-18 run
+covered its two examples only.
+
+**Boundary.** Keyless; no example, no live call, no local build. The
+owner of the trybuild miss (s1-rs vs RCH) is dispatched to pane 3 as a
+second-worker rerun plus one direct compile-fail case.
