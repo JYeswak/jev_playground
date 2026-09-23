@@ -99,13 +99,14 @@ Numbers below are what the named file contains. Re-run the command. If the file 
 | Claude Haiku 4.5, fresh run | 584/662 | 0.8822 |
 | grok-4, official adapter, same questions | 558/662 | 0.8429 |
 
-Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right and Haiku wrong on 65, the reverse on 5, and 61 against 5 in the fresh run. The pre-registered rule passes on this corpus only. The fresh run's receipt is [`jev-sec-bench-w70-20260923.md`](docs/demos/upstream-repro/jev-sec-bench-w70-20260923.md); its row files are not in the tree yet, so the command below re-scores the earlier runs only.
+Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right and Haiku wrong on 65, the reverse on 5, and 61 against 5 in the fresh run (McNemar p = 2.6e-13). The pre-registered rule passes on this corpus only. Both comparisons re-score from committed rows with no key:
 
 ```bash
-python3 work/nev-differential/analyze_diff.py
+python3 work/nev-differential/analyze_diff.py                # earlier runs, with grok-4
+python3 work/nev-differential/fresh-20260923/score.py        # fresh run: 640, 584, 61/5
 ```
 
-Receipt: [`work/nev-differential/DIFF-RECEIPT.json`](work/nev-differential/DIFF-RECEIPT.json).
+Receipts: [`work/nev-differential/DIFF-RECEIPT.json`](work/nev-differential/DIFF-RECEIPT.json) and [`jev-sec-bench-w70-20260923.md`](docs/demos/upstream-repro/jev-sec-bench-w70-20260923.md).
 
 **The cut, with no model in the loop.** A planted hostile message flags. A planted benign message passes. A broken answer is review.
 
