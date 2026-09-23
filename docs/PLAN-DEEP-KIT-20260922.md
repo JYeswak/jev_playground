@@ -426,9 +426,9 @@ dropped cases stated), AGENTS.md Rule 14 (incumbent arm) and the mining order.
 | id | test | passes when | applies to |
 |---|---|---|---|
 | T1 | Pin and environment | full SHA, date, license, clean `git status` before and after; `OMP_PROFILE`, `PI_*`, runtime versions, worker/host recorded | all |
-| T2 | Own suite, fresh | exit code and pass/fail/**skip** counts now; skips listed by reason; then one defect planted in a `/tmp` copy must turn it RED, or the suite is recorded as unable to fail | all with a suite |
+| T2 | Own suite, fresh | exit code and pass/fail/**skip** counts now; skips listed by reason; if the unmodified suite exits 0, one defect planted in a `/tmp` copy must turn it RED, or the suite is recorded as unable to fail; if it already exits non-zero, record that exit and the fail count, and the plant arm is NOT-APPLICABLE until a clean run exits 0 | all with a suite |
 | T3 | Claim inventory | at least 5 of the clone's own claims about Jev, each demonstrated / partial / aspirational / disproven / stale, with the file:line that decides it | all |
-| T4 | Live Jev on its own question | pinned `jev-1.13.0`; data we did not author (the clone's own corpus, or a public labelled set); N, positive-class prevalence, cost and p50/p95 latency stated; bar written in the receipt **before** the first call | seat / benchmark / tool clones |
+| T4 | Live Jev on its own question | pinned `jev-1.13.0`; data we did not author (the clone's own corpus, or a public labelled set); N and cost stated; prevalence stated, or NOT-APPLICABLE when there is no labelled positive class; p50/p95 only when N ≥ 5, otherwise "not observable" (a percentile from one call fails T4); bar written in the receipt **before** the first call | seat / benchmark; tool clones only when their own source contains a Jev client |
 | T5 | Floor arms | always-majority constant and the cheapest lexical rule (regex / keyword / BM25) on the same rows; if a floor ties Jev, the task is class A or B and the seat is refused | seat / benchmark |
 | T6 | Incumbent arm | same state and questions through `upstream/typesafe-ai/system-one-adapter-python` against at least one LLM; accuracy, cost, latency for both arms; paired test (McNemar or bootstrap CI) | seat / benchmark |
 | T7 | Calibration | reliability bins **with counts**; a table where most rows sit in one bin is reported as "calibration not observable at this N" | seat / benchmark |
@@ -438,8 +438,9 @@ dropped cases stated), AGENTS.md Rule 14 (incumbent arm) and the mining order.
 
 Class profiles: **seat/benchmark** clones run T1–T8 + T10; **SDK/transport** clones (the two SDKs,
 `system-one-adapter`, `s1-rs`'s client, `work/jev-client` itself) run T1–T3 + T9 + T10;
-**tool/integration** clones (MCP servers, hooks, routers, compaction) run T1–T4 + T9 + T10 and then
-the omp L0–L4 ladder when ported; **catalogues** (`awesome-*`, `upstream/typesafe-ai/skills`) run T1
+**tool/integration** clones (MCP servers, hooks, routers, compaction) run T1–T3 + T9 + T10, plus T4
+when the clone's own source contains a Jev client (otherwise T4 is NOT-APPLICABLE with the file:line
+that shows no client), and then the omp L0–L4 ladder when ported; **catalogues** (`awesome-*`, `upstream/typesafe-ai/skills`) run T1
 + T3 over their entries and produce clone candidates, cloned at a pinned SHA before any claim.
 Receipt: `docs/demos/upstream-repro/<clone>-<date>[-<worker>[-<outcome>]].md`, a table with one row
 per test id, and the `Boundary` line.
@@ -471,14 +472,23 @@ so the miss is the worker environment, not s1-rs — an RCH worker returning a p
 compile-fail tests is itself a finding for `skill://zeststream-rch`. Depth rule applies: a
 clone that will not run gets the four earned-label fields.
 
-**W7.3 What the clones teach, stated once.** From W7.1, a short README section a stranger reads:
+**W7.3 What the clones teach, stated once.** From W7.0 receipts only (a ledger lead is not a
+sentence), a short README section a stranger reads:
 which question shapes Jev answered well, against which incumbent, on whose data, and where a regex or
 a constant won. Every sentence traces to a ledger row. It replaces nothing already measured in
-README "Measurements"; it adds the breadth the 28 clones give.
+README "Measurements"; it adds the breadth the 28 clones give. Acceptance fails on an empty section:
+with zero T6 receipts the packet stays blocked rather than publishing a blank "what we learned".
+Landed 2026-09-23 as README "What other Jev projects taught us" (`66bbfb1`), from
+`notes/deep/w73-what-clones-teach.md`.
 
-**W7.4 Apply the top three.** Rank W7.1's `application_in_our_systems` rows by AGENTS.md's selection
-rule (ground truth exists today; prevalence of the positive class; cost to measure; decision
-leverage). The top three become beads, each landing on an omp surface in this repo (tool, rule,
+**W7.4 Apply the top three.** Rank only `application_in_our_systems` rows whose W7.0 receipt exists,
+by a score written before the sort (review R2): lexicographic on ground_truth (1 if the receipt names
+a labelled corpus, else 0), prevalence (a fraction, 0 if unknown), cost (2 keyless, 1 live-key,
+0 rch-worker), leverage (1 if the row names an omp surface that can block or rewrite a tool call,
+else 0), then the source seat's W7.0 result class (a FLOOR seat is refused unless the application
+changes the task). Ranking: `notes/deep/w74-ranking.tsv`; bars `notes/deep/w74-bars.md`; beads
+`jev-deep-kit-8q7.6` (applicability pre-gate, omp-jev-review), `.7` (select-on-A/report-on-B helper,
+oracle-kit), `.8` (structured criteria variant). The top three become beads, each landing on an omp surface in this repo (tool, rule,
 hook, extension, or MCP) or a named product path, each with a preregistered bar and a planted
 negative before its first live call. Candidates are chosen by the ranking, not assumed here.
 
@@ -557,7 +567,9 @@ control: local `gates.sh` receipt at the same commit).
 - **Phase B — review (waves 2–3 of planning).** Entry: Phase A exit. Exit: at least two review rounds
   by panes on two different model families, each producing git-diff style revisions integrated here
   with an agree/partly/disagree ledger (§11); round-to-round diff is wording, not structure.
-- **Phase C — beads.** Entry: Phase B exit and §12 signed. Exit: every packet in §4 is a bead with
+- **Phase C — beads.** Entry: Phase B exit and §12 signed. Not beads (review R2): W7.0 is a gate on
+  W7.2, W0 is the conductor's loop, and W1.4 is created only as blocked on the human-launched
+  `KIT_GATE_EDIT=1` session. Exit: every other packet in §4 is a bead with
   WHAT/WHY/ACCEPTANCE, dependencies declared, `br dep cycles` empty, `br ready` non-empty.
 - **Phase D — build and prove (waves 3–5 of work).** Entry: Phase C exit. Exit: every §5 claim at
   `enforce=yes` or explicitly dropped with a NEGATIVE_EVIDENCE row.
@@ -671,3 +683,4 @@ beginning `CALLBACK-P<N>-<packet>-DONE` or `-BLOCKED`, plus Agent Mail to AmberW
 | 1.5 | Joshua | — | W7 (learn Jev from the clones; apply to our systems); RCH on Contabo for Rust clones | all | — | — |
 | 1 | TopazRaven | Muse Spark 1.3 | R1-7..R1-12 (`notes/deep/review-r1-p3.md`) | R1-7, R1-8, R1-10, R1-11, R1-12 | — | R1-9: the two cold reads cannot merge; each must be read by a model other than its document's author, and the authors differ (README by claude, read by Muse; assessment by Muse, read by grok) |
 | 1 | QuietHarbor | Muse Spark 1.3 | R1-13..R1-19 (`notes/deep/review-r1-p6.md`) | all 7 | — | — |
+| 2 | RedMaple | grok-4.7 | 6 (`notes/deep/review-r2-p2.md`): tool-clone T4 only with a Jev client, no percentile below N=5, T2 plant N/A on a red suite, W7.3 empty-section fail, W7.4 written score, Phase C exclusions | all 6 | — | — |
