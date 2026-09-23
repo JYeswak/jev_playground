@@ -12,7 +12,7 @@ __omp_shell("[A typed judgment, not a paragraph](visual/hero.jpg)")
 - **A client.** [`work/jev-client`](work/jev-client/README.md) wraps the official SDK so a missing key, a timeout and a malformed answer all fail the same way, toward review.
 - **Measurements.** Each has a rule written before any spend, a comparator someone would actually ship, and committed rows you can re-score.
 
-The strongest result: on 662 public prompt-injection rows, Jev is right on 639 (0.9653), a count read from the benchmark's own file. On the same questions, run here, grok-4 is right on 558 and Claude Haiku 4.5 on 579. That is one corpus at one cut. The clearest loss: on tool-call harm, a small rule beat the judge, because the label was already in the tokens.
+The strongest result: on 662 public prompt-injection rows, Jev is right on 639 by the benchmark's own count and on 640 in a fresh live run here. Asked the same questions through TypeSafe's own LLM adapter, Claude Haiku 4.5 is right on 579 and on 584 across two runs, and grok-4 on 558. That is one public corpus at one cut. The clearest loss: on tool-call harm, a small rule beat the judge, because the label was already in the tokens.
 
 ## Quick start
 
@@ -93,11 +93,13 @@ Numbers below are what the named file contains. Re-run the command. If the file 
 
 | Arm | Correct | Accuracy |
 |---|---:|---:|
-| Jev, cited from the bench file | 639/662 | 0.9653 |
-| grok-4, same questions, official adapter | 558/662 | 0.8429 |
-| Claude Haiku 4.5, same questions | 579/662 | 0.8746 |
+| Jev, the bench file's own count | 639/662 | 0.9653 |
+| Jev, fresh live run | 640/662 | 0.9668 |
+| Claude Haiku 4.5, official adapter, same questions | 579/662 | 0.8746 |
+| Claude Haiku 4.5, fresh run | 584/662 | 0.8822 |
+| grok-4, official adapter, same questions | 558/662 | 0.8429 |
 
-Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right and Haiku wrong on 65, the reverse on 5. The pre-registered rule passes on this corpus only.
+Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right and Haiku wrong on 65, the reverse on 5, and 61 against 5 in the fresh run. The pre-registered rule passes on this corpus only. The fresh run's receipt is [`jev-sec-bench-w70-20260923.md`](docs/demos/upstream-repro/jev-sec-bench-w70-20260923.md); its row files are not in the tree yet, so the command below re-scores the earlier runs only.
 
 ```bash
 python3 work/nev-differential/analyze_diff.py
@@ -114,6 +116,17 @@ node --test work/nev-injection/seat-guard.test.mjs
 **Calibration.** Labelled held-out set, N=80, pinned model: ECE 0.0614, Brier 0.0195, choice 19/20. Receipt: [`foundation/runs/20260922T021352Z.json`](foundation/runs/20260922T021352Z.json).
 
 **A case where a classifier is the better instrument.** On tool-call harm, a small rule beat a live judge. The check is `node work/omp-harm-rule/verify-claim.mjs`. Use a rule when the label is already in the tokens.
+
+## What other Jev projects taught us
+
+This repo carries 28 other Jev projects ([`notes/deep/clone-ledger.tsv`](notes/deep/clone-ledger.tsv)). Each was re-run from scratch against one standard: its own tests, a planted defect those tests must catch, live Jev on the project's own data, the cheapest rule on the same rows, and an LLM asked the same questions. Receipts are under [`docs/demos/upstream-repro/`](docs/demos/upstream-repro/) with `w70` in the name. Every result below is one run at the stated size.
+
+- **A cheap rule often ties or beats the model, and then the seat is refused.** On tool-call risk triage a keyword rule scored 58/60 against live Jev's 52/60 ([receipt](docs/demos/upstream-repro/jev-benchmark-w70-2026-09-23.md)). On phishing, a regex at 91.65% and Haiku both beat Jev's 62.98% ([receipt](docs/demos/upstream-repro/jev-phishing-bench-w70-20260923.md)).
+- **Where Jev held up.** Prompt injection (above). Passage re-ranking: Jev put the right passage first on 15 of 30 queries against BM25's 10, and tied Cohere's re-ranker ([receipt](docs/demos/upstream-repro/jev-rerank-bench-w70-2026-09-23.md)). Agent-failure attribution: 28 of 35 against grok's 23, too few rows to call ([receipt](docs/demos/upstream-repro/jev-agent-failure-benchmark-w70-2026-09-23.md)).
+- **A threshold carries within one dataset, not across two.** Per-question thresholds fit on the first 200 support tickets held on the next 200, within 0.02 ([receipt](docs/demos/upstream-repro/jevcal-live-w70-2026-09-23.md)). A routing threshold fit the same way moved from 0.67 to 0.37 when the dataset changed, and the routing decision flipped ([receipt](docs/demos/upstream-repro/janus-w70-2026-09-23.md)). Fit thresholds on your own labelled rows and re-check them when the data changes.
+- **Calibration is only readable with rows in every bin.** On injection the error across ten bins was 0.068; on a seven-row set, or one where every answer sits in the top bin, it cannot be read at all.
+- **The official JavaScript SDK can end a Node process on a timeout.** Its own suite passes 189 tests and still exits 1 on unhandled aborts ([receipt](docs/demos/upstream-repro/typesafe-sdk-js-w70-20260923.md)). [`work/jev-client`](work/jev-client/README.md) now owns the timeout; 30 of 30 timed-out requests left the host running on Node and on Bun ([receipt](docs/demos/upstream-repro/jev-client-w70-20260923.md)).
+- **It is cheap to measure.** 940 requests cost $0.13 in one run; 560 cost $0.011 of input in another.
 
 ## Method
 
