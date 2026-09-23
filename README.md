@@ -134,11 +134,12 @@ This repo carries 28 other Jev projects ([`notes/deep/clone-ledger.tsv`](notes/d
 This is the part worth stealing. Each step has a script.
 
 1. **Pin the model.** `jev-1.13.0`. `jev-latest` moves, and a percent without a model id cannot be cited next week.
-2. **Write the rule before you spend.** Corpus, cut, comparator, and sample size go in a file first. `work/nev-differential/PREREGISTER-DIFF.md` is the shape.
-3. **Compare to something a person would actually ship.** A chat model on the same state, or a classifier trained on labels. A regex is the floor.
-4. **Call the official SDK.** `work/jev-client` owns retry, timeout, and the refusal of a bad body. A hand-rolled `fetch` drifts.
-5. **Test the policy with an injected transport.** No key, no network. `node --test work/nev-injection/seat-guard.test.mjs`.
-6. **Leave the rows.** `python3 work/nev-differential/analyze_diff.py` re-scores the committed comparison without a key.
+2. **Score the constant first.** Before any question is judged, compute what always answering the majority label scores on the same rows: `node work/jev-prevalence-first/prevalence-check.mjs rows.jsonl --truth label`. On real command traffic here, always answering `BAD` is right 78.8% of the time; that is the bar. The same check refused Jev's tool routing (192 of 400 right against 252 for always `bash`) and exits 3 when a question does not beat its constant.
+3. **Write the rule before you spend.** Corpus, cut, comparator, and sample size go in a file first. `work/nev-differential/PREREGISTER-DIFF.md` is the shape.
+4. **Compare to something a person would actually ship.** A chat model on the same state, or a classifier trained on labels. A regex is the floor.
+5. **Call the official SDK.** `work/jev-client` owns retry, timeout, and the refusal of a bad body. A hand-rolled `fetch` drifts.
+6. **Test the policy with an injected transport.** No key, no network. `node --test work/nev-injection/seat-guard.test.mjs`.
+7. **Leave the rows.** `python3 work/nev-differential/analyze_diff.py` re-scores the committed comparison without a key.
 
 Vendor docs are mirrored under `docs-mirror/typesafe/`. `./scripts/sync-docs.sh --check` confirms the bytes.
 
