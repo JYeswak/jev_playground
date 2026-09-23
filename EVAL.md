@@ -1622,3 +1622,23 @@ Appended by pane 5 as sole EVAL writer. Source: notes/deep/w70-eval-sections-p6.
 - T4 (prereg §commit-miner, jev-1.13.0): N=20 unauthored commits (Anil-matcha/awesome-jev-by-typesafe @d57f5ce, SHAs recorded, pre-labelled all-negative BEFORE first call; prevalence 0/20) → 0 FP (20/20 Metadata review, max p 0.14 @0.65) AND $0.00332 ≤ $0.0128 bar; p50 0.40s p95 0.71s over 52 paid calls (cap 60). Controls (disclosed-authored, ≥2-commit): SQLi→Security fix CWE-89 exact, XSS→Security fix CWE-79 exact.
 - T5 prefix floor 1 FP (loses); T6 always-majority ties 0/20 (vacuous at prevalence 0); T7 single-bin → calibration not observable; T8 0/30 flips (max |Δp| 0.030); T9 refuses on timeout/429/malformed/key-absent (suite fresh-pass + live 403 in 0.2s), host survives.
 - Verdict class SELF, seat NO-GO on this evidence: prevalence-0 draw cannot separate Jev from always-majority; adoption needs a mixed-prevalence public set. NO-CLAIM beyond the 20-SHA window + 2 disclosed fixtures. Clone untouched (porcelain empty, no commit).
+
+## W7.0 batch — pane 4 MistyTurtle, spam section (2026-09-23) [test]
+
+Appended by pane 5 as sole EVAL writer. Source: pane-4 message (phishing already landed; foreman + sec-bench in 675ea42).
+
+## jev-spam-eval W7.0 (2026-09-23) [test]
+
+Clone `jev-spam-eval @ 76ef183` (bitnovus, MIT). jev HEADs: bar `9e8199b`,
+run 2026-09-23. Receipt
+`docs/demos/upstream-repro/jev-spam-eval-w70-20260923.md`. Status: 2
+pre-existing M results files only. No suite; /tmp plants (silent-degradation
+finding + numpy RED). T4 4,878 rows $0.2474, all jev-1.13.0: S1 0.9780, S2
+0.9848 (tp479), S4 0.9132, S5 0.9731 (tp296) — all recomputed by pane 4
+from /tmp/w70 rows. Floors same rows: S1/S2 ties (p=0.31/0.91), S3/S4/S5
+Jev wins (S3 floor cross-checked 0.7298 vs 0.7311). T6: S1/S5 ties, S2 grok
+loses, S4 BOTH LLMs beat Jev (haiku 807/853 recomputed). T7 bins counted;
+S4 single-class not-observable. T8 <=2.58% (pane-4 S1 recompute 3/50 0 vs
+runner 2/500, same order). Verdicts: S1+S2 TIE/REFUSED, S3+S5 SEAT-vs-floor,
+S4 INCUMBENT/REFUSED. NOT-RUN: phish 3-way (routes in receipt). ~$1.24
+total. Boundary: single runs, public corpora, S1 500-sample, 17 dups.
