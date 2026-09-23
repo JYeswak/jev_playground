@@ -1,0 +1,6 @@
+CALLBACK-P2-R2-DONE
+artifact: notes/deep/review-r2-p2.md
+plan pin: e106eb7
+One removal: blanket T4 on tool/integration clones. pi-subagents has no Jev client, so two panes will not record the same T4 row.
+W7.3 acceptance cannot fail if the section is empty. W7.4 cannot become a Phase C bead until the three targets are named by a written score.
+NO-CLAIM: the plan was not edited. Pane 1 integrates.
