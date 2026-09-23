@@ -397,6 +397,38 @@ clone has never been exercised in any form (`awesome-typesafe`, a catalogue); fo
 run (`s1-rs` second worker, `jev-sec-bench` `go test -race`, `typesafe-ai-benchmark` `npm test`,
 `jev-benchmark` regex-floor arm). 14 of 28 rows recommend `apply`. `skillranker` holds 21 receipts.
 
+**W7.0 How to test a Jev system properly — the standard every W7 run meets.** Joshua,
+2026-09-22: "past receipts do not mean we went deep enough - we proved nothing with past receipts
+except that we didn't know how to test this system properly." So: every receipt written before this
+standard is a **lead, not evidence**, including every `run_status` in the W7.1 ledger and every
+conclusion drawn from one. Each clone gets a fresh run under the tests below; the ledger keeps its
+code-cited description of what the clone *is* and nothing else counts until re-run. Sources: the
+FrankenSuite RULEBOOK §4.3/§4.5 (claim inventory; maintainer vs independent numbers), synthesis
+concepts 7 (name worker, harness, both estimators, replicate before quoting), 8 (result class:
+SELF / FLOOR / INCUMBENT), 9 (typed skips: green-with-skips is not green) and 13 (full funnel with
+dropped cases stated), AGENTS.md Rule 14 (incumbent arm) and the mining order.
+
+| id | test | passes when | applies to |
+|---|---|---|---|
+| T1 | Pin and environment | full SHA, date, license, clean `git status` before and after; `OMP_PROFILE`, `PI_*`, runtime versions, worker/host recorded | all |
+| T2 | Own suite, fresh | exit code and pass/fail/**skip** counts now; skips listed by reason; then one defect planted in a `/tmp` copy must turn it RED, or the suite is recorded as unable to fail | all with a suite |
+| T3 | Claim inventory | at least 5 of the clone's own claims about Jev, each demonstrated / partial / aspirational / disproven / stale, with the file:line that decides it | all |
+| T4 | Live Jev on its own question | pinned `jev-1.13.0`; data we did not author (the clone's own corpus, or a public labelled set); N, positive-class prevalence, cost and p50/p95 latency stated; bar written in the receipt **before** the first call | seat / benchmark / tool clones |
+| T5 | Floor arms | always-majority constant and the cheapest lexical rule (regex / keyword / BM25) on the same rows; if a floor ties Jev, the task is class A or B and the seat is refused | seat / benchmark |
+| T6 | Incumbent arm | same state and questions through `upstream/typesafe-ai/system-one-adapter-python` against at least one LLM; accuracy, cost, latency for both arms; paired test (McNemar or bootstrap CI) | seat / benchmark |
+| T7 | Calibration | reliability bins **with counts**; a table where most rows sit in one bin is reported as "calibration not observable at this N" | seat / benchmark |
+| T8 | Stability | the same rows asked 3 times (flip rate) and once with the question reworded but the state identical (framing flip) | seat / benchmark |
+| T9 | Fault behaviour | timeout, 429/5xx, malformed body, missing key: the client refuses rather than coerces, and the host process survives | SDK / client / tool clones |
+| T10 | Verdict | result class (SELF / FLOOR / INCUMBENT), RULEBOOK tier per claim, the NO-CLAIM line, and the four earned-label fields for anything not run | all |
+
+Class profiles: **seat/benchmark** clones run T1–T8 + T10; **SDK/transport** clones (the two SDKs,
+`system-one-adapter`, `s1-rs`'s client, `work/jev-client` itself) run T1–T3 + T9 + T10;
+**tool/integration** clones (MCP servers, hooks, routers, compaction) run T1–T4 + T9 + T10 and then
+the omp L0–L4 ladder when ported; **catalogues** (`awesome-*`, `upstream/typesafe-ai/skills`) run T1
++ T3 over their entries and produce clone candidates, cloned at a pinned SHA before any claim.
+Receipt: `docs/demos/upstream-repro/<clone>-<date>[-<worker>[-<outcome>]].md`, a table with one row
+per test id, and the `Boundary` line.
+
 **W7.1 Clone ledger.** `notes/deep/clone-ledger.tsv`, one row per clone: `repo, sha, owner, license,
 jev_surface (choice|score|noul; SDK or hand-rolled POST), what_it_decides, own_suite_command,
 run_status (receipt path or never), incumbent_arm (Rule 14: what a person would ship instead, and
@@ -405,7 +437,8 @@ transferable_mechanism, application_in_our_systems (named omp surface or product
 prevalence_of_positive_class (with denominator, or unknown + why), cost_to_measure
 (keyless | live-key | rch-worker, with a rough call or row count), action` — the last two carry
 W7.4's ranking inputs as data, so the ranking is computed, not argued (review R1-7).
-Sources: the clone trees, `EVAL.md`, `docs/demos/upstream-repro/`. Oracle: each teaching sentence
+Sources: the clone trees, `EVAL.md`, `docs/demos/upstream-repro/`. After W7.0: the ledger's `run_status` column records prior receipts as **leads**, never as a
+pass; a clone counts as tested only by a W7.0 receipt. Oracle: each teaching sentence
 cites a line in the clone or a receipt; an uncited teaching is dropped, not softened. Acceptance: 28
 rows, and every `run_status=never` row names its W7.2 run owner (a pane) at ledger time; a row
 without one stays open and the conductor assigns it before Phase C (review R1-8).
