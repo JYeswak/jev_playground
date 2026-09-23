@@ -1,0 +1,5 @@
+CALLBACK-P2-R1-DONE
+artifact: notes/deep/review-r1-p2.md
+depth commit: 46a4d02
+Part B started only after the depth callback. Two shrinks: do not cite e2e 0/10 as a kit failure, and do not require 6/6 live loads from panes that started before the install. One removal of a false measurement: file-scan zeros on bash-scoped rules.
+NO-CLAIM: the review does not edit the plan. Pane 1 integrates.
