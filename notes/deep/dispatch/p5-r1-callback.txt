@@ -1,0 +1,5 @@
+CALLBACK-P5-R1-DONE
+Artifacts: notes/deep/review-r1-p5.md (Part B round 1; plan untouched, pane 1 integrates).
+Commit: see git log (this file's commit).
+Changes proposed: 6 (R1-1 REMOVE W1.8 dogfood → bounded trial; R1-2 W6.2 entry gated on stage 97; R1-3 flag W2.3 floor + W2.4 advisory as unfailable; R1-4 single-source the 12 pattern names; R1-5 RPC proxy cannot observe live panes; R1-6 split W3.1 88 rows across waves). Required removal present (R1-1). Unfailable acceptances flagged (R1-3). Packets needing no change named (W2.1, W2.2, W2.5, W2.6 with caveat, W4.1/W4.2, W5.2, W6.1).
+NO-CLAIM: a review is not a measurement; the W3.1 session-rate math is inference from the W5.1 rate.
