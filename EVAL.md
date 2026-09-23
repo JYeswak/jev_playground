@@ -1611,3 +1611,14 @@ observable. T8 flips ~2.4%, reword agree ~0.80. Pane-4 re-runs: status,
 corpus count, committed metrics, raw tallies (1259/2000, 1257/2000,
 haiku 299/400), analyzer (T4/T5/T6 lines reproduced keyless).
 Boundary: one transient 520 row; public-corpus leakage caveat.
+
+## W7.0 batch — pane 6 QuietHarbor, commit-miner section (2026-09-23) [live]
+
+Appended by pane 5 as sole EVAL writer. Source: notes/deep/w70-eval-sections-p6.md (skillranker still pending from pane 6).
+## commit-miner — PENDING EVAL LANDING (receipt committed; section below for pane 5)
+
+### commit-miner @977617e (W7.2 fresh, 2026-09-23)
+- Seat (T1-T8+T10+T9): T2 full suite via RCH 37 pass/0 fail — tests.rs:799 failure from W7.1 (exit 101 on contabo-3+contabo-4) now PASSES on contabo-4 (full), contabo-2 (targeted, second-worker confirmation) and contabo-2 again (pane-6 unpinned rerun, exit=0); root cause was worker /dev/null poisoning, not the clone. Pinned contabo-1 attempts refused RCH-I001 (nothing ran). T2-plant NOT-RUN (earned four fields; RUSTFLAGS --cfg neutral, exit 0).
+- T4 (prereg §commit-miner, jev-1.13.0): N=20 unauthored commits (Anil-matcha/awesome-jev-by-typesafe @d57f5ce, SHAs recorded, pre-labelled all-negative BEFORE first call; prevalence 0/20) → 0 FP (20/20 Metadata review, max p 0.14 @0.65) AND $0.00332 ≤ $0.0128 bar; p50 0.40s p95 0.71s over 52 paid calls (cap 60). Controls (disclosed-authored, ≥2-commit): SQLi→Security fix CWE-89 exact, XSS→Security fix CWE-79 exact.
+- T5 prefix floor 1 FP (loses); T6 always-majority ties 0/20 (vacuous at prevalence 0); T7 single-bin → calibration not observable; T8 0/30 flips (max |Δp| 0.030); T9 refuses on timeout/429/malformed/key-absent (suite fresh-pass + live 403 in 0.2s), host survives.
+- Verdict class SELF, seat NO-GO on this evidence: prevalence-0 draw cannot separate Jev from always-majority; adoption needs a mixed-prevalence public set. NO-CLAIM beyond the 20-SHA window + 2 disclosed fixtures. Clone untouched (porcelain empty, no commit).
