@@ -40,3 +40,18 @@ REFUSED (absolute 0.70 bar). Pane-4 re-runs: suite, plant, `ls cmd`
 T3: 5 demonstrated, 1 partial, 1 disproven (`-bench all` runner absent).
 NOT-RUN: code LLM arm; live ablation; RunAudit e2e (retries in receipt).
 Boundary: public-corpus leakage caveat; single runs; fixed 0.5 cut.
+
+## jev-phishing-bench W7.0 (2026-09-23) [test]
+
+Clone `upstream/anisselbd/jev-phishing-bench @ 1d56e8c` (no LICENSE). jev
+HEADs: bar `9e8199b`, run 2026-09-23T03:38Z. Receipt
+`docs/demos/upstream-repro/jev-phishing-bench-w70-20260923.md`. Corpus 2000
+rows recounted. Status clean before/after. No committed suite; /tmp plant
+(`registered_domain`->'') drops floor 0.9165->0.6055. T4 full 2000 calls
+(1999 ok): verdict 0.6298 CI [0.6084, 0.6507], p50 195ms, $0.0769. Floor
+same rows 0.9165 CI [0.9035, 0.9278] -> REFUSED class A. T6 haiku-4-5
+400 shared rows 0.7475, McNemar p=1.3e-5 (incumbent better). T7 ECE 0.1611
+observable. T8 flips ~2.4%, reword agree ~0.80. Pane-4 re-runs: status,
+corpus count, committed metrics, raw tallies (1259/2000, 1257/2000,
+haiku 299/400), analyzer (T4/T5/T6 lines reproduced keyless).
+Boundary: one transient 520 row; public-corpus leakage caveat.
