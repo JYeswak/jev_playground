@@ -3328,3 +3328,33 @@ Exit: unaskable or corpus-absent. That is not an admission path.
 **Retry condition.** Re-run `scripts/selftest-ttsr-assert-disabled.sh` from a subdirectory of this repo, or from a tree whose `.omp/config.yml` has no `ttsr.disabledRules`, and get exit 1 naming a scope. Until that happens, do not explain a disable miss as the project block clobbering the profile.
 
 **NO-CLAIM.** This does not say stage 80 was never red. It says the clobber explanation is false on the commands above.
+
+## R78 — REFUTED: an RCH receipt with worker, remote-finished and test-result lines is a true verdict
+
+**Recorded:** 2026-09-23 · **Level:** `[live]` · Pane 1 (AmberWillow), bead `jev-pkd`.
+
+**Claim:** a result that carries `Selected worker`, `Remote command finished` and the tool's own
+`test result` line (the proof `skill://zeststream-rch` requires) reports what the code did.
+
+**Measured:** `s1-rs@b916897` trybuild `ui` on contabo-4 printed all three lines and reported 4/4
+compile-fail cases as compiling; contabo-1 rejected all 4 on the same source and rustc 1.98.0.
+Cause: `/dev/null` on contabo-2, -3 and -4 was a 0644 regular file. contabo-4's was born
+2026-09-19T16:56:36Z, 0.18 s after UDS's transport probe
+(`printf 'fn main() {}' | rustc --emit=metadata -o /dev/null -`,
+`uds/crates/uds/src/main.rs:2185`) ran there as root; rustc >= 1.64 moves `-o` output through a temp
+dir beside the path (rust-lang/rust#111157), and as root in `/dev` that replaces the device.
+trybuild's inner cargo then read garbage from stdin `/dev/null`, died before compiling, printed no
+JSON, and trybuild reads missing JSON as success. Repaired 03:33–03:36Z (drain, `mknod -m 666
+/dev/null c 1 3`, poisoned `.rustc_info.json` removed); the same suite then rejected 4/4 on
+contabo-4, remote exit 0. contabo-2 and -3 were broken the same way; their trigger is unattributed
+(no RCH build or UDS receipt at their births, 2026-09-19T23:30:49Z and 23:39:39Z).
+
+**Retry condition.** Trust a negative-test verdict from a single worker only when `stat -c %F
+/dev/null` on that worker prints `character special file` in the same run, or when a second worker
+agrees. Revisit this row when UDS's probe no longer writes to `/dev/null` (pane 2, fix wave) and a
+fleet-wide `/dev/null` check runs in `skill://zeststream-rch` "First 60 seconds" for 30 days
+without a regular file.
+
+**NO-CLAIM.** This does not say RCH is unreliable in general; plain compile errors failed
+correctly on contabo-4 the whole time. It says one kind of verdict — "the thing that should fail
+did not" — can be produced by a broken worker, and the proof lines cannot tell you which.

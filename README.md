@@ -183,7 +183,7 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 
 As of 2026-09-22. Reproducible from this tree with no key: the injection comparison, the calibration receipt, the twenty demos and their seventeen live receipts. In progress: applying the omp-kit (stream rules, the kit-guard extension, and the `/loop` continuation gate) and the FrankenSuite assessment protocol to this repository, including an assessment of this repo under the same rulebook. The plan is [`docs/PLAN-DEEP-KIT-20260922.md`](docs/PLAN-DEEP-KIT-20260922.md).
 
-Sixteen of the seventeen gate stages pass. Stage 80 is red on three instrument selftests: one rule selftest fails because six new stream rules landed without test arms, a second reports a disabled rule as still active (cause under diagnosis), and one pin-liveness arm no longer fires on its plant. None is waived.
+All seventeen gate stages pass (`bash foundation/gates.sh`, rc 0). The three instrument selftests that were red earlier in the day were fixed at their cause, not waived.
 
 ## About Contributions
 
