@@ -1347,3 +1347,27 @@ covered its two examples only.
 **Boundary.** Keyless; no example, no live call, no local build. The
 owner of the trybuild miss (s1-rs vs RCH) is dispatched to pane 3 as a
 second-worker rerun plus one direct compile-fail case.
+
+## jev-ultrafast under W7.0 (2026-09-23) [live]
+
+QuietHarbor, plan W7.2 (group seat/benchmark). `browser-use/jev-ultrafast` @
+`452c1ad`, unmodified (`git status` clean at close). T4 bar committed first
+(`notes/deep/dispatch/p6-w70-t4bars.md` @ `070efe6`, before first live call).
+Fresh: `uv run pytest` 31/31; `check_guards.py` 21/21 vs real headless
+Chrome; /tmp plant (validate_choice raise→pass) turns suite RED 7/24. T4
+N=10 disclosed-authored states (prevalence 0.5): 8/10 correct, 0 invalid
+executions, p50 193 ms / p95 ~386 ms; floors random ~0.20, majority 0.50,
+keyword rule 0.50. T6 gpt-4o-mini arm 6/10 on the same states. T7 bins
+reported with counts (directional only at N=10). T8 0 flips, one stably
+wrong row over 5 exposures. T9 7/7 refuse incl. live-observed HTTP 520.
+Spend: 32 Jev calls vs 25 cap (breach disclosed: unguarded T4 import in the
+T8 harness re-ran T4; no further calls) + 10 gpt-4o-mini. Verdict:
+BAR-PASS AT FLOOR, class SELF, SEAT HOLD (stable false advance on a
+dead-end progress-like link; synthetic-only evidence). Receipt
+[`docs/demos/upstream-repro/jev-ultrafast-w70-20260923.md`](docs/demos/upstream-repro/jev-ultrafast-w70-20260923.md).
+Pane-6 verification: suite + guards re-run green; bar timing confirmed via
+receipt-file mtime.
+
+**Boundary.** No browser driven live; no production action; confidences
+uncalibrated at N=10; gpt-4o-mini is a same-state probe, not the
+browser-use incumbent.
