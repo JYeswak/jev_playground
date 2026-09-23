@@ -71,6 +71,13 @@ Joshua, 2026-09-22 local: apply `omp-kit (1).zip` to our systems and `franken-as
 
 State at pause: jev `main` = `origin/main` (GitHub `JYeswak/jev_playground`), suite 17/17. uds `main` is **not** pushed (HEAD `1eb19ef` does not compile); its work-in-progress is on GitHub as `refs/backup/save-20260923/reconcile-wip` (`c2572e5`), with `worktree` (`f800cab`) and `stale-index` (`5b7b548`) beside it.
 
+Unfinished work is saved, not merged (Joshua: "make sure that everything is saved - even if its not done"). The Muse panes ran out of tokens before committing, so pane 1 snapshotted their working trees; the files are also still in place for them to resume.
+
+- jev, public-safe: `refs/backup/pause-20260923/jev-wip-public` (`73db6d6`) on GitHub — every uncommitted tracked edit (pane 5's `.7` in `work/oracle-kit`, older 09-20/21 edits incl. an unreviewed `ARC.md` −53 lines) and 113 untracked files. Restore one file with `git show refs/backup/pause-20260923/jev-wip-public:<path>`.
+- jev, all 131 files including 9 with cross-project session data (`work/nev-routing/tool-select-{,un}labelled.jsonl`, `work/nev-injection/l3-frames-*.jsonl`): local ref `refs/backup/pause-20260923/jev-wip` (`8aefece`) and the verified bundle `/Volumes/ZestData/zeststream-offload-20260609/jev-backups/jev-wip-all-20260923.bundle`. **Never push these to the public repo.** An earlier ref that contained them was pushed and deleted within minutes on 2026-09-23.
+- uds (private repo): `refs/backup/save-20260923/{worktree,stale-index,reconcile-wip}` on `JYeswak/uds`; its source files match `reconcile-wip` exactly at pause.
+- Skills `zeststream-rch` and `rch` (private `JYeswak/josh-claude-config`): `refs/backup/skills-20260923` (`5c6880b`); `~/.claude`'s checked-out branch was left untouched.
+
 Pick up here, in order:
 1. Read each pane's `CALLBACK-P<N>-PAUSED` and its bead handoff comment.
 2. `jev-deep-kit-8q7.6` (TopazRaven): run the bead's metric on the 669-commit draw (thin gate keyless; noul gate live on substantial diffs; any substantial refusal fails the bar as written), then L3 from the session `.jsonl` custom rows.
