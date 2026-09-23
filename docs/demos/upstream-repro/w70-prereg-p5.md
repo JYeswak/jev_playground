@@ -14,3 +14,38 @@ Committed before the first live call of this group. Bars below decide PASS/FAIL 
 ## Standing rules for all seven runs
 
 T1 pin+env recorded. T2 own suite fresh with skip counts; planted defect in /tmp copy must turn it RED. T5 floors on the same rows (majority constant + cheapest lexical rule); a floor tie refuses the seat. T7 bins with counts or "not observable". T8: 3× repeat + one reword (applies to live arms; fixture-only arms report n/a with reason). Receipts: `docs/demos/upstream-repro/<clone>-w70-2026-09-23.md` (T1–T10 table + verdict + Boundary). Prior receipts are leads, never passes.
+
+## Amendment A (committed before any jevcal/Janus live call, 2026-09-23)
+
+> T4 bar (jevcal, proposed 2026-09-23, no live call yet): corpus = the clone's own
+> bundled `src/jevcal/examples/support/tickets.jsonl` (N=400 rows, labeled by
+> construction, generator seed 20260918; prevalence is_urgent-true 147/400 = 36.8%,
+> department sales/billing/technical 136/134/130, frustration 0/1/2 = 125/214/61);
+> questions = `support/questions.yaml` with the model pinned to `jev-1.13.0` at call
+> time (the file names `jev-latest`; the pin is recorded in the run receipt, the file
+> is not edited); command `jevcal run --provider typesafe` over all 400 rows, one
+> request per row with all 3 questions per request (cost ceiling: 400 Jev calls).
+> Record N, prevalence, call count, total cost, and p50/p95 per-request latency.
+> PASS iff `compile` reports status `ok` (not `holdout_miss`, not `no_threshold`) on
+> all three questions AND each question's held-out accepted accuracy >= its target
+> minus 0.02 (targets: is_urgent 0.97, department 0.95, frustration 0.95).
+> Accuracy-vs-floor is explicitly NOT the bar.
+
+> **T4 bar — Janus:** live `jev-1.13.0` re-asked on the clone's own frozen corpora,
+> protocol frozen here before the first call. Arm A: full `data/banking77_500.jsonl`
+> (N=500; gold prevalence: top class `pending_top_up` 12/500 = 2.4%, 77 classes,
+> 1–12 rows/label). Arm B: seeded subsample of `data/wos_500.jsonl` — ids sorted
+> ascending, `random.Random(7).sample(ids, 200)` (sha16 `d81755532e0f93e`; first ids
+> 212, 512, 1276, …; committed-cache Jev accuracy on these 200: 109/200 = 54.50%;
+> subsample majority `MAE/Materials Engineering` 5/200 = 2.5%). Same prompt build as
+> the clone's runners (`experiments/run_jev.py` + `experiments/tasks.py` question
+> assembly) at pinned `jev-1.13.0`; no DeepSeek calls (T4 is the Jev arm only).
+> Record per arm: N, gold prevalence, per-row cost (input/output tokens → USD at the
+> API's answered rates), total cost, p50/p95 decision latency. Cost ceiling: $2.00
+> (expected ≈ $0.15 at the clone's measured rates). PASS iff live Jev accuracy lands
+> within ±5 pts of committed cache on BOTH arms: Arm A in [72.8, 82.8]%
+> (committed 77.80%) AND Arm B in [49.5, 59.5]% (committed 54.50%). Otherwise FAIL.
+> Floors computable keylessly on the same rows (T5, no API): always-majority constant
+> (Arm A 2.40%, Arm B 2.50% — computed 2026-09-23 from committed gold labels) plus a
+> token-overlap lexical rule over `data/*.labels.json` descriptions; a floor tie refuses
+> the seat per W7.0 T5. Stability (T8: same rows ×3 + one reword) rides on the same live calls.
