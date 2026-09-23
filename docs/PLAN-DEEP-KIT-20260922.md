@@ -28,7 +28,12 @@ checkers and demotion rules and installed omp-kit into `.omp/`. It left the harn
    Panes 2–6 started 2026-09-21 (pane 2 at 12:18:16, panes 3–6 at 21:57:19–21:57:33) and omp loads
    extensions at session start. Pane 2's own screen says so: "Already-open panes will not see the
    extension until they restart." Command: `ps -p <omp-pid> -o lstart=` per pane vs
-   `git log -1 --format=%ci 572e3eb`.
+   `git log -1 --format=%ci 572e3eb`. The same holds for rules and `ttsr` settings — omp's TTSR docs
+   (https://omp.sh/docs/ttsr, linked by Joshua): "Project and user rules are discovered when a
+   session starts. Start a new session after adding or changing a file." So the six kit rules
+   (`b947da1`, 19:54) and `after-gap/0` are not live in panes 2–6 either; pane 1 (started 20:02:33)
+   has the rules but `repeatMode: once`, and "fired state is saved with the session", so
+   `kit-no-verify` is spent there after one false positive.
 2. **kit-guard protects the wrong paths in this repo.** `core.hooksPath` is
    `/Users/josh/Developer/jev/githooks` (read from `.git/config:8`). The guard's `GATE_PATHS`
    matches `.githooks/` (with a dot) and `.git/hooks/`, so `githooks/pre-commit` and
@@ -67,6 +72,14 @@ checkers and demotion rules and installed omp-kit into `.omp/`. It left the harn
    RULEBOOK has never been pointed at jev, the 14 concepts have never been scored against jev, and
    the jev claims that cite franken repos as prior art (`AGENTS.md:642`, `85-promotion-contract.sh:17`)
    have never been checked against what the packets say those repos actually execute.
+10. **The kit install turned the suite red and nobody ran it.** `foundation/gates.sh` at `33fe6ae`:
+    14 PASS, 3 RED. Stage 70: a tracked test missing from `TESTS.md`. Stage 97: `num_word()` spelled
+    8–15 while `gates.d` holds 17, and its "stale numerals" selftest arm planted nothing when the
+    README stated the count in words. Stage 80: `selftest-ttsr-rules.sh` ("12 project rules but only
+    6 are tested" — the kit rules landed without arms), `selftest-ttsr-assert-disabled.sh` (a
+    disabled rule reported active; the project-`ttsr:`-block-clobbers-profile hypothesis is
+    refuted), `selftest-pin-liveness.sh` (hot-file plant no longer fires). 70 and 97 fixed at
+    `35629b2` with both directions shown; 80 is open under W1 and W2.1.
 
 The single most important outcome: **a stranger can open one receipt per mechanism and see it fire
 on a planted bad input in a live jev pane.** Everything else is secondary.
@@ -379,7 +392,10 @@ mistaken for proof in this lane: a file present in `.omp/` (installed is not loa
 `doctor.sh` exit 0 from a fresh launch (proves a new session would load it, not that a live pane
 did); a green `--selftest` (proves the stage can go red, not that production data is clean); a
 callback that says DONE; a hash compare between two archives; a count copied from a synthesis
-document instead of recounted.
+document instead of recounted; and — Joshua, 2026-09-22, "your agents are marking things uncited
+easily" — an UNMEASURED / NOT_RUN / ABSENT / BLOCKED label that lacks any of: the exact command, the
+verbatim failing output, a root cause at `file:line`, and two independent routes tried
+(`notes/deep/dispatch/DEPTH-DIRECTIVE.md`). Such a label is a defect in the artifact, not an outcome.
 
 ## 9. Release gate
 <!-- CHECK: RELEASE-GATE -->
@@ -498,3 +514,5 @@ beginning `CALLBACK-P<N>-<packet>-DONE` or `-BLOCKED`, plus Agent Mail to AmberW
 | round | reviewer | model | changes proposed | agreed | partly | disagreed |
 |---|---|---|---|---|---|---|
 | 0 | AmberWillow | claude-opus-5-5 | draft | — | — | — |
+| 0.5 | Joshua | — | W6 (GitHub current, README rewrite); read omp TTSR docs; depth directive | all | — | — |
+| 1 | SunnyTiger | Muse Spark 1.3 | R1-1..R1-6 (`notes/deep/review-r1-p5.md`) | R1-1, R1-2, R1-3, R1-5 | R1-4 (single source = AGENTS.md, not a new file), R1-6 (keep 88 rows; subagents, not a wave split) | — |
