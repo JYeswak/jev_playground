@@ -17,6 +17,7 @@
  * A failed call records `review_error`, never a pass — NEGATIVE_EVIDENCE R40: a crashed
  * classifier recording a pass is indistinguishable from a clean result.
  */
+import { execFile } from "node:child_process";
 import { askJev } from "../../jev-client/src/index.ts";
 
 import { recording } from "../../jev-score-register/register.mjs";
@@ -52,12 +53,72 @@ const QUESTIONS = {
   boundary: "Does this diff touch a security, permission, or authentication boundary?",
 };
 
+/**
+ * Applicability pre-gate (jev-review `transform.ts`: noul >= 0.5 applies).
+ * Thin diffs never reach Jev: fewer than 10 added+removed code lines, or no
+ * `@@` hunks at all, is not worth a reviewer's (or a model's) attention.
+ * Bar (notes/deep/w74-bars.md): thin → applicable:false; a >100-line diff
+ * still scores. The gray zone goes to the noul below.
+ */
+export function isThinDiff(diff: string): boolean {
+  if (!/^@@ /m.test(diff)) return true;
+  let changed = 0;
+  for (const line of diff.split("\n")) {
+    if (line.startsWith("+") && !line.startsWith("+++")) changed++;
+    else if (line.startsWith("-") && !line.startsWith("---")) changed++;
+    if (changed >= 10) return false;
+  }
+  return true;
+}
+
+const APPLICABILITY = {
+  applicability: "Does this diff contain code changes worth a reviewer's attention?",
+};
+
+
+/** A clean `git diff|show` argv, or null if the string is not safe to exec. */
+export function gitArgv(command: string): string[] | null {
+  if (/[;&|`$<>\\\n]/.test(command) || command.includes("$(")) return null;
+  const tokens = command.trim().split(/\s+/).filter(Boolean);
+  if (tokens.length < 2 || tokens[0] !== "git") return null;
+  if (tokens[1] !== "diff" && tokens[1] !== "show") return null;
+  return tokens;
+}
+
+type DiffRun = (argv: string[]) => Promise<string>;
+
+const defaultDiffRun: DiffRun = (argv) =>
+  new Promise((resolve, reject) => {
+    execFile(argv[0], argv.slice(1), { timeout: 3000, maxBuffer: 200_000, encoding: "utf8" }, (err, stdout) => {
+      if (err) reject(err);
+      else resolve(stdout);
+    });
+  });
+
+let diffRun: DiffRun = defaultDiffRun;
+
+/** Tests inject a runner. Production uses execFile. Passing null restores the default. */
+export function setDiffRunner(next: DiffRun | null): void {
+  diffRun = next ?? defaultDiffRun;
+}
+
+export async function readDiff(command: string): Promise<{ ok: true; diff: string } | { ok: false; reason: string }> {
+  const argv = gitArgv(command);
+  if (!argv) return { ok: false, reason: "unsafe-command" };
+  try {
+    const stdout = await diffRun(argv);
+    if (!stdout.trim()) return { ok: false, reason: "empty-diff" };
+    return { ok: true, diff: stdout.slice(0, MAX_DIFF) };
+  } catch {
+    return { ok: false, reason: "diff-exec" };
+  }
+}
+
 type ToolCallEvent = { toolName?: unknown; name?: unknown; toolCallId?: unknown; input?: unknown; command?: unknown };
 type Host = {
   on: (event: string, handler: (event: ToolCallEvent) => Promise<undefined>) => void;
   appendEntry: (type: string, data: Record<string, unknown>) => Promise<unknown>;
 };
-
 export default function ompJevReview(pi: Host) {
   pi.on("tool_call", async (event) => {
     try {
@@ -79,9 +140,64 @@ export default function ompJevReview(pi: Host) {
           timestamp: new Date().toISOString(),
         });
       } catch {}
+      const loaded = await readDiff(command);
+      if (!loaded.ok) {
+        try {
+          await pi.appendEntry(DECISION, {
+            schemaVersion: 1,
+            kind: "review_error",
+            command: command.slice(0, 2000),
+            toolCallId,
+            error: loaded.reason,
+            failure: loaded.reason,
+            timestamp: new Date().toISOString(),
+          });
+        } catch {}
+        return undefined;
+      }
+
+      const notApplicable = async (reason: string, noul?: number) => {
+        try {
+          await pi.appendEntry(DECISION, {
+            schemaVersion: 1,
+            kind: "review_not_applicable",
+            applicable: false,
+            command: command.slice(0, 2000),
+            toolCallId,
+            reason,
+            ...(noul === undefined ? {} : { noul }),
+            timestamp: new Date().toISOString(),
+          });
+        } catch {
+          /* observability must never break the session */
+        }
+        return undefined;
+      };
+
+      if (isThinDiff(loaded.diff)) {
+        return notApplicable("thin-diff");
+      }
+
+      // The gate refuses ONLY on an explicit low noul. A gate failure
+      // (unconfigured key, transport throw, malformed answer) falls through
+      // to the legacy scoring path, which reproduces the tested error
+      // contract below — a gate that converts errors into refusals would
+      // make "applicable:false" read as a silent pass.
+      const gate = await ask({
+        state: { diff: loaded.diff },
+        questions: APPLICABILITY,
+        timeoutMs: 2500,
+      });
+      if (gate.ok) {
+        const noul = gate.scores?.applicability;
+        if (typeof noul === "number" && noul < 0.5) {
+          return notApplicable("low-applicability", noul);
+        }
+      }
+
 
       const result = await ask({
-        state: { diff: command.slice(0, MAX_DIFF) },
+        state: { diff: loaded.diff },
         questions: QUESTIONS,
         timeoutMs: 2500,
       });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import ompJevReview from '../src/index.ts';
+import ompJevReview, { setDiffRunner, isThinDiff } from '../src/index.ts';
 
 function host() {
   const rows = [];
@@ -16,6 +16,27 @@ function host() {
 }
 const decisions = (h) => h.rows.filter((r) => r.type.endsWith('decision.v1'));
 const diffCall = (command) => ({ toolName: 'bash', toolCallId: 'tc-1', input: { command } });
+const stubDiff = (body = 'diff --git a/a b/a\n+changed\n') => setDiffRunner(async () => body);
+// A diff the gate must let through: @@ hunks with 12 changed lines.
+const SUBSTANTIAL = 'diff --git a/a.ts b/a.ts\n@@ -1,6 +1,6 @@\n' +
+  Array.from({ length: 12 }, (_, i) => `+added line ${i}`).join('\n') + '\n';
+// The bar's planted negative: >100 changed lines must still score.
+const BIG = 'diff --git a/big.ts b/big.ts\n@@ -1,60 +1,60 @@\n' +
+  Array.from({ length: 120 }, (_, i) => `+added line ${i}`).join('\n') + '\n';
+// One fetch stub serving both calls: the gate reads `applicability`, the
+// scorer reads the rest. Omit a key to simulate that answer missing.
+// Responses are clone()-capable: the SDK buffers via response.clone().body
+// (same requirement work/jev-client/test documents for its fakes).
+const answersFetch = (answers) => {
+  const mk = () => ({
+    ok: true,
+    status: 200,
+    headers: { get: () => 'application/json' },
+    text: async () => JSON.stringify({ answers }),
+    clone: () => mk(),
+  });
+  return async () => mk();
+};
 
 test('ignores every tool call that is not a git diff or show', async () => {
   const h = host();
@@ -32,6 +53,7 @@ test('an unset API key records review_error, never a scored pass', async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   delete process.env.TYPESAFE_API_KEY;
   try {
+    stubDiff(SUBSTANTIAL);
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff HEAD~1'));
@@ -51,6 +73,7 @@ test('a throwing transport records review_error and never breaks the session', a
   process.env.TYPESAFE_API_KEY = 'test-key';
   globalThis.fetch = async () => { throw new Error('connection reset'); };
   try {
+    stubDiff(SUBSTANTIAL);
     const h = host();
     ompJevReview(h.pi);
     assert.equal(await h.fire(diffCall('git show abc123')), undefined);
@@ -69,8 +92,9 @@ test('a real score is recorded as review_scored with its probabilities', async (
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
-  globalThis.fetch = async () => ({ ok: true, status: 200, text: async () => JSON.stringify({ answers: { behaviour: { noul: 0.82 }, boundary: { noul: 0.18 } } }) });
+  globalThis.fetch = answersFetch({ applicability: { noul: 0.91 }, behaviour: { noul: 0.82 }, boundary: { noul: 0.18 } });
   try {
+    stubDiff(SUBSTANTIAL);
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff --cached'));
@@ -90,8 +114,13 @@ test('a 200 with no probabilities is an error, not a silent pass', async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
-  globalThis.fetch = async () => ({ ok: true, status: 200, text: async () => JSON.stringify({ unexpected: true }) });
+  const mk = (body) => ({
+    ok: true, status: 200, headers: { get: () => 'application/json' },
+    text: async () => JSON.stringify(body), clone: () => mk(body),
+  });
+  globalThis.fetch = async () => mk({ unexpected: true });
   try {
+    stubDiff(SUBSTANTIAL);
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff'));
@@ -119,16 +148,153 @@ test('asks exactly the two measured questions and no more', async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
-  let sent;
+  const calls = [];
+  const mk = (answers) => ({
+    ok: true, status: 200, headers: { get: () => 'application/json' },
+    text: async () => JSON.stringify({ answers }), clone: () => mk(answers),
+  });
   globalThis.fetch = async (_url, init) => {
-    sent = JSON.parse(init.body);
-    return { ok: true, status: 200, text: async () => JSON.stringify({ answers: { behaviour: { noul: 0.5 }, boundary: { noul: 0.5 } } }) };
+    const sent = JSON.parse(init.body);
+    calls.push(sent);
+    return mk({ applicability: { noul: 0.9 }, behaviour: { noul: 0.5 }, boundary: { noul: 0.5 } });
   };
   try {
+    stubDiff(SUBSTANTIAL);
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff'));
-    assert.deepEqual(Object.keys(sent.questions).sort(), ['behaviour', 'boundary']);
+    assert.equal(calls.length, 2, 'gate call then scoring call');
+    assert.deepEqual(Object.keys(calls[0].questions), ['applicability']);
+    assert.deepEqual(Object.keys(calls[1].questions).sort(), ['behaviour', 'boundary']);
+    assert.equal(calls[1].state.diff.includes('added line 0'), true);
+    assert.equal(calls[1].state.diff.includes('git diff'), false);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+});
+
+test('an empty diff is an error and does not call Jev', async () => {
+  const previous = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  let called = 0;
+  globalThis.fetch = async () => { called += 1; return { ok: true, status: 200, text: async () => '{}' }; };
+  try {
+    stubDiff('   \n');
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git diff'));
+    const [row] = decisions(h);
+    assert.equal(row.data.failure, 'empty-diff');
+    assert.equal(called, 0);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+});
+
+test('a shell metacharacter is not executed and not scored', async () => {
+  const previous = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  let called = 0;
+  let ran = 0;
+  globalThis.fetch = async () => { called += 1; return { ok: true, status: 200, text: async () => '{}' }; };
+  try {
+    setDiffRunner(async () => { ran += 1; return 'should not run'; });
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git diff; echo pwned'));
+    const [row] = decisions(h);
+    assert.equal(row.data.failure, 'unsafe-command');
+    assert.equal(ran, 0);
+    assert.equal(called, 0);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+});
+
+test('isThinDiff boundary: hunks, line counts, headers', () => {
+  assert.equal(isThinDiff('diff --git a/a b/a\n+one\n'), true, 'no hunks is thin');
+  assert.equal(isThinDiff(''), true, 'empty is thin');
+  const hunk = (n) =>
+    'diff --git a/a b/a\n@@ -1 +1 @@\n' + '+x\n'.repeat(n) + '-y\n'.repeat(n);
+  assert.equal(isThinDiff(hunk(4)), true, '8 changed lines is thin');
+  assert.equal(isThinDiff(hunk(5)), false, '10 changed lines scores');
+  assert.equal(
+    isThinDiff('diff --git a/a b/a\n--- a/a\n+++ b/a\n@@ -1 +1 @@\n context\n'),
+    true,
+    'headers and context never count; 0 changed lines is thin',
+  );
+});
+
+test('a thin diff records applicable:false and never calls Jev', async () => {
+  const previous = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  let called = 0;
+  globalThis.fetch = async () => { called += 1; throw new Error('must not be called'); };
+  try {
+    stubDiff('diff --git a/a.ts b/a.ts\n+one line\n');
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git diff'));
+    const [row] = decisions(h);
+    assert.equal(row.data.kind, 'review_not_applicable');
+    assert.equal(row.data.applicable, false);
+    assert.equal(row.data.reason, 'thin-diff');
+    assert.equal(called, 0, 'thin path spends zero Jev calls');
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+});
+
+test('a low applicability noul refuses without scoring', async () => {
+  const previous = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  let calls = 0;
+  globalThis.fetch = answersFetch({ applicability: { noul: 0.31 } });
+  const counting = globalThis.fetch;
+  globalThis.fetch = async (...a) => { calls += 1; return counting(...a); };
+  try {
+    stubDiff(SUBSTANTIAL);
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git diff'));
+    const [row] = decisions(h);
+    assert.equal(row.data.kind, 'review_not_applicable');
+    assert.equal(row.data.applicable, false);
+    assert.equal(row.data.reason, 'low-applicability');
+    assert.equal(row.data.noul, 0.31);
+    assert.equal(calls, 1, 'gate call only; the scorer never runs');
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+});
+
+test('planted negative: a >100-line diff with a high noul still scores', async () => {
+  const previous = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  globalThis.fetch = answersFetch({ applicability: { noul: 0.88 }, behaviour: { noul: 0.7 }, boundary: { noul: 0.2 } });
+  try {
+    stubDiff(BIG);
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git diff --stat'));
+    const [row] = decisions(h);
+    assert.equal(row.data.kind, 'review_scored');
+    assert.deepEqual(row.data.probabilities, { behaviour: 0.7, boundary: 0.2 });
   } finally {
     globalThis.fetch = realFetch;
     if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
