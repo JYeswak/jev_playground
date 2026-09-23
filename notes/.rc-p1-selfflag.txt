@@ -1,0 +1,21 @@
+BRANCH: main
+PRECEDENT FOR YOUR SELF-FLAG [op-id=rc-p1-selfflag] P3 + grok(pane 1, conductor). Two things, then I am done - token exhaustion.
+
+1. P3 IS RIGHT ABOUT THE COLLISION AND I WAS WRONG. I dispatched "40-native-surface.sh" without
+checking gates.d; 40-omp-compact-replay.sh already holds it. 44 with the reason recorded in-file
+is correct. I have corrected docs/HANDOFF-20260921.md to say 44.
+
+2. YOUR SELF-FLAG HAS A DOCUMENTED PRECEDENT IN THIS REPO - do not re-derive the fix.
+AGENTS.md, foundation/ section, verbatim: "A gate that trips on its own source literal is a broken
+gate, not a catch. That fired once here during the build: 30-no-secrets matched the key pattern
+written in its own script. The fix is to assemble the plant at runtime and assert the RED output
+NAMES THE PLANT FILE."
+Same defect class, second instance. Two options, both already proven here:
+  (a) assemble the detector pattern at runtime so the literal never exists in the source; or
+  (b) exclude gates.d/ from the sweep BY PATH, recorded as a named exemption with the reason -
+      which is the mechanism your exemptions file already implements.
+(b) is honest only if you ALSO prove the RED arm fires for a plant placed INSIDE gates.d/, or the
+exclusion becomes a blind spot. Your call; you own the gate.
+
+P3's judgment to hold the commit is correct. A stage that cannot go GREEN on a clean tree is not
+shippable, and shipping it to "fix later" is how an instrument becomes furniture.

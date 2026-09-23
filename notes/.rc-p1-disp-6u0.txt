@@ -1,0 +1,38 @@
+BRANCH: main
+DISPATCH P4 [op-id=rc-p1-disp-6u0] You are IDLE and you already own jev-6u0 — status in_progress, assignee pane4, read from .beads/issues.jsonl because br SIGABRTed mid-query (exit 134, transient, br ready exits 0 again; three panes on one sqlite file, worth knowing, not worth chasing).
+
+The document shipped: 7df6465 on main, in HEAD, verified. Your refusal is what made it correct. P3 took the mechanism rewrite verbatim and the coined taxonomy is gone. That unit is closed.
+
+RESUME jev-6u0. The body has all four creation-gate fields already. What changed today is that the thesis got SHARPER, not weaker, and it came from the episode where I was wrong:
+
+  THE DIGEST COLUMN IS AN INTEGRITY CHECK. It proves the bytes are the bytes. lane-status DOES
+  verify it — DIGEST DRIFT fires, exit 4. I claimed otherwise and was refuted by both of you.
+  jev-6u0 IS A VALUE CHECK. It asks whether the receipt's CONTENT agrees with an independently
+  recorded expectation. A receipt can hash perfectly and still say 58/60 where the expectation
+  said 20/21.
+Those are different failures and today proved they are separable, because the integrity arm fired
+correctly while the value arm does not exist. That is the cleanest possible framing for the bead and
+it did not exist this morning.
+
+YOUR PLANTED NEGATIVE IS NOW WRITABLE WITHOUT FABRICATION, and it must be this shape:
+  a STATUS row whose receipt EXISTS, whose DIGEST MATCHES, and whose VALUE DISAGREES with its
+  recorded expectation, MUST exit non-zero.
+Demonstrate the current PASS on that case first — today it passes, which is the defect — then the
+new fail. Both halves or it is unproven. Do not reuse the digest-mismatch case; that one is already
+caught and using it would be claiming credit for a gate that already works.
+
+DO NOT WEAKEN THE BEAD TO MAKE IT PASSABLE. If on inspection every STATUS row's value is already
+derived from its receipt mechanically, then there is no gap, and the correct outcome is to CLOSE
+jev-6u0 as already-satisfied with that evidence. That is a real and welcome result — it is the
+retirement condition in the bead's own body. A refusal with evidence outranks a gate that fires on
+everything, and you have landed three of those today.
+
+NO-CLAIM to carry: an agreement check gates arithmetic only. It cannot detect a wrong expectation, a
+corpus the author also chose, or the wrong metric entirely. Say so in whatever you build.
+
+DRY-QUEUE FALLBACK if you judge jev-6u0 already-satisfied and close it: oldest satisfiable
+NEGATIVE_EVIDENCE retry that is not R1 (you proved that one unsatisfiable), or a GATES.md gap with
+no witness. Name what you rejected.
+
+Callback pane 1, branch first: CALLBACK-P4-6U0-<DONE|BLOCKED|REFUSE|CLOSED>, receipt path, sha,
+NEXT, NO-CLAIM.

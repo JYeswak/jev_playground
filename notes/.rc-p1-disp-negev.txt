@@ -1,0 +1,44 @@
+BRANCH: main
+DISPATCH P3 + P4 [op-id=rc-p1-negev] P3: graded PASS, commit and push. P4: your queue is not dry — I measured a standing obligation that nobody discharged today, and both entries are yours to write.
+
+P3 — SHIP THE FRONT DOOR. P4 confirmed the hunk is an insert at old line 310 only, TL;DR and tables
+outside it, both keyword hits are denials, kill pointer present with numbers matching the committed
+correction. Commit explicit paths, verification level in subject, push.
+
+P4 — THE GAP, MEASURED AGAINST NEGATIVE_EVIDENCE.md ON DISK:
+  latest entry is R44, dated 2026-09-20
+  grep "codex.*extension|profile-local|jev-scratch"  -> 0 hits
+  grep "seat_live|always-prev|44963"                 -> 0 hits
+Today's two hardest results exist ONLY in ntm callbacks. AGENTS.md Definition of Done: "a refuted
+hypothesis or a rejected design from this pass is written to NEGATIVE_EVIDENCE.md WITH ITS RETRY
+CONDITION." A callback is transport. The ledger is memory. In a week the only thing that stops
+someone re-running your scratch construction is the entry you have not written.
+
+Both are YOUR work, so this is self-report, not self-review, and AGENTS.md asks for exactly that.
+
+UNIT 1 — the codex/jev-lab mechanism. Two hypotheses killed BY CONSTRUCTION, not by argument:
+  coarse ("profile has its own extensions array") — refuted: muse has one and loads.
+  narrow, mine ("profile-local extensions path drops project registration") — refuted by your
+  scratch profile, phase 1 no local path -> probes PRESENT, phase 2 local path placed FIRST ->
+  probes STILL PRESENT.
+  Record BOTH, record that the narrow one was mine, and record the construction so nobody rebuilds
+  it. RETRY CONDITION is the load-bearing field: name what would make this worth reopening. My
+  suggestion, take it or better it: a seventh profile appears that fails the same way, giving a
+  second positive instead of one-in-six.
+
+UNIT 2 — the SEAT_LIVE retraction. A router scoring 0.0148 against always-bash 0.2970 on 44,963
+real rows, below uniform random over 34 labels, withdrawn after it had been reported. The retry
+condition is not "try a better router" — it is the measurement discipline that caught it: computing
+the trivial baseline on the SAME rows before claiming a seat. Write what the defect actually was.
+
+MECHANICS, and the second one has bitten three panes today:
+  RESERVE FIRST. NEGATIVE_EVIDENCE.md is a shared root artifact and AGENTS.md names it explicitly.
+  Agent Mail's DB is busy, so announce on ntm to panes 1,3 before you append and I will hold off.
+  APPEND, NEVER INSERT. Line-number pointers into that file are live. Append at the tail.
+  Re-read the tail immediately before the write — a stale snapshot tag destroyed two ARC.md rows in
+  this tree on 2026-09-20.
+
+ACCEPTANCE: both entries land with a retry condition each; grep for your own entry IDs afterward and
+report the line numbers. NO-CLAIM: recording a refutation is not re-proving it.
+
+Callback pane 1, branch first: CALLBACK-P4-NEGEV-<DONE|BLOCKED>.

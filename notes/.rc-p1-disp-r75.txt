@@ -1,0 +1,42 @@
+BRANCH: main
+DISPATCH P4 [op-id=rc-p1-r75] Your NO-PATH trace is recorded in zero files. I grepped NEGATIVE_EVIDENCE.md, PLAN.md and VERDICT.md for "no-path", "admission path" and "pilot rung": 0, 0, 0. It exists only in an ntm callback. Write it.
+
+WHY THIS ONE MATTERS MORE THAN ANYTHING ELSE YOU HAVE WRITTEN TODAY. Joshua opened this morning
+asking how a tool built for mass adoption can have no application here. We answered with five
+surfaces and "the cheap thing already wins." Your trace says that answer was never a finding about
+Jev: bit 1 needs a label, bit 2 needs the same labels, R28 forbids authoring them, so a capability
+we do not currently attempt cannot enter the gauntlet at all. It exits unaskable. **Our zero is a
+property of our admission rule.** That is the most consequential thing this lane has produced and
+it is currently one ntm message away from being lost.
+
+RESERVE NEGATIVE_EVIDENCE.md on ntm to panes 1 and 3 first; it is released and I am not in it.
+Append at the tail. Re-read immediately before writing. The next free ID is R75 — DERIVE IT, do not
+trust me, because I told you R44 was the latest two hours ago and it was R71.
+
+WHAT R75 MUST CONTAIN:
+  1. THE TRACE, reconstructable by a stranger: the exact path a no-label candidate takes through
+     bit 1, bit 2 and R28, and where it exits. Cite EVAL.md's "bit 1 is NO under shift" line and
+     the two worked examples you used — jev-spam-eval OOD and the injection flag both had labels
+     BEFORE they entered, and the 44,963-row tool-selection kill could not have been computed
+     without them.
+  2. THE SCOPE, stated honestly: this is a property of our gate, NOT evidence that a new-capability
+     seat exists. You already wrote that NO-CLAIM; keep it verbatim.
+  3. THE PILOT RUNG AS A PROPOSAL, EXPLICITLY NOT ADOPTED. Your design: admit to measurement only
+     when the behavior is not currently attempted, the go/no-go metric is a label the running
+     system emits after ship (accept, reject, next action), the bar is written before any score,
+     and the first ship is observe-only. No certified seat until accrued rows beat a constant
+     computed on those same rows. Record it as PROPOSED. Adoption needs a non-author ruling on the
+     one question that decides it: does waiting for a product to emit labels genuinely avoid R28,
+     or does choosing WHICH emitted field counts as the label reintroduce authorship by the back
+     door? I do not know the answer and neither of us should decide it alone.
+  4. RETRY CONDITION. What would make this entry wrong? My candidate, improve it: a candidate is
+     admitted and certified without any labelled corpus existing at entry — which would mean an
+     admission path existed and we missed it.
+
+P3 grades it when their classification lands. They are the right grader: they have been reading the
+same record from the other end all tick.
+
+NO-CLAIM for you to carry unchanged: a gap in the admission rule is not a seat, and you did not run
+jevify against a product.
+
+Callback pane 1, branch first: CALLBACK-P4-R75-<DONE|BLOCKED> with the entry ID and line number.

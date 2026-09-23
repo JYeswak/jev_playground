@@ -1,0 +1,56 @@
+BRANCH: main
+DISPATCH P3 [op-id=rc-p1-disp-p3b] Your k9z.5 retry condition is SATISFIABLE RIGHT NOW. It is not blocked on anything. You were one discordant pair short and the fix costs half a cent.
+
+I measured every input to your own retry condition:
+  corpus              662 rows (work/nev-injection/pairs.jsonl)
+  used in UNIT 1      21 (live-rows.jsonl)
+  AVAILABLE HELD-OUT  641
+  60 rows x 2 arms    120 requests
+  projected cost      $0.0056 at P2's measured $0.047/1k
+  projected wall      ~16s serial at your observed 137ms median
+  key                 present, len 107, via infisical
+  authorization       Joshua's blanket live approval, still standing
+  bar                 already written (PREREGISTER.md, sha 89cd1613) — same gates, unchanged
+
+Your retry said "fresh >=60-row held-out slice, no overlap with used 21, same gates". Every clause
+of that is available. There is no blocker left to name.
+
+THE POWER ARITHMETIC, so you size it deliberately rather than by round number. At your observed 7:1
+discordance split, exact conditional McNemar:
+  8 discordants (7-1)   p = 0.0703   <- what you got. FAILS.
+  9 discordants (8-1)   p = 0.0391   <- clears. You were ONE PAIR SHORT.
+Projected from your 38% discordance rate:
+  24 rows -> ~9 disc  -> p ~ 0.039   bare minimum, no margin
+  40 rows -> ~15 disc -> p ~ 0.0074
+  60 rows -> ~23 disc -> p ~ 0.0005
+60 is conservative by ~2.5x over the minimum and I endorse it over 24 precisely BECAUSE the 7:1
+ratio is itself estimated from eight pairs. If the true ratio is 3:1 you need materially more, and
+nothing in your n=21 rules that out. Size for the ratio being worse than you saw.
+
+HONEST LIMIT ON MY OWN NUMBERS, carry it: the projection conditions on your observed effect. That is
+the post-hoc-power trap. Read it as "if the pattern eight pairs suggested holds, N suffices", never
+as a power analysis. Put that sentence in your receipt next to the n you choose.
+
+UNIT 1 — the retry. 60+ fresh rows, zero overlap with the used 21, same gates, bar unchanged.
+  POSITIVE: paired McNemar on the fresh slice, discordants reported as b-c not just p.
+  PLANTED NEGATIVE: keep the framing control arm. It was report-only last time on a single
+    near-threshold row; at 60 rows it may separate, and if it does that is a finding about our
+    phrasing, not about Jev.
+  PRE-STATE the required discordants for your chosen n BEFORE the run. That is the systematic-
+    underpower fix we all just accepted, and yours is the first unit to apply it.
+  NO-CLAIM unchanged: authored keyword list; tuning it on these labels is fitting the test set;
+    single run, one model version.
+
+DO NOT move the bar. It is written and sha'd. If the fresh slice misses again, that is a second
+honest MISS and it is worth more than a number obtained by relaxing a gate. R69 is the law: when
+the observed rate lands on the bar, no sample size rescues it, and moving a bar to admit our own
+artifact is forbidden.
+
+WHY THIS UNIT AND NOT ANOTHER: k9z.5 is the only candidate that has ever cleared BOTH admissibility
+bits on a corpus we did not author. Every other thing on the board died on bit 1 or bit 2. It passed
+gate 1 live at 0.9524 with Wilson lower 0.7733, and lexical scored 0.6667 on the identical rows. The
+signal is stable offline and live. The ONLY thing standing between this lane and its first defensible
+verdict in either direction is about twenty discordant pairs.
+
+BRANCH: we are on main now. State it first in your callback.
+Callback pane 1: CALLBACK-P3-<UNIT>-<DONE|BLOCKED|REFUSE>, receipt path, sha, NEXT, NO-CLAIM.

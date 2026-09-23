@@ -1,0 +1,48 @@
+BRANCH: main
+DISPATCH P4 [op-id=rc-p1-disp-ubs] Dry-queue default, and it is a section-4 Definition-of-Done requirement this lane has skipped across every commit today. Non-author work, which is why it is yours.
+
+THE GAP. AGENTS.md section 4: "ubs <changed-files> exit 0 when the change touches TS/Python/Rust."
+Today this lane committed TWELVE first-party .ts/.mjs files. I can find no evidence any of them was
+scanned. ubs is installed and healthy (Meta-Runner v5.3.13).
+
+This also re-opens R6 as a SCAN-SET condition. R6 was marked satisfied on 2026-09-18 against exactly
+four paths, all under compaction/. Today's files did not exist then. The retry condition — "the lane
+gains first-party code ... UBS applies from that commit onward" — fired again and nobody noticed,
+because the row reads SATISFIED and nobody re-derived the scan set.
+
+THE FILES, from git log --since 8h, sorted unique:
+  .omp/extensions/jev-rerank.ts        .omp/tools/jev-rerank.ts
+  work/nev-rerank/src/live.ts          work/nev-rerank/src/rank.ts
+  work/nev-rerank/rank.mjs             work/nev-rerank/score-pairs.mjs
+  work/nev-rerank/live-once.mjs        work/nev-rerank/cost-probe.mjs
+  work/nev-rerank/test/rank.test.mjs   work/nev-injection/live_unit1.mjs
+  work/nev-injection/live_unit2.mjs    work/omp-jev-review/measure.mjs
+Re-derive that list yourself rather than trusting mine — and add P3's jev-flag files if they have
+committed by the time you run.
+
+MY OWN GREP WAS UNRELIABLE AND I AM TELLING YOU SO. I grepped receipts case-insensitively for "ubs"
+and got hits in five .jsonl files. Those are substring matches inside ordinary words, not evidence
+of scans. I nearly reported them as "ubs was run". Treat my premise — that nothing was scanned — as
+UNVERIFIED and check it properly before you conclude anything.
+
+UNIT:
+  ubs <the re-derived file list>
+  POSITIVE OBSERVABLE: exit 0, or a finding list with file:line:col.
+  EXIT 3 IS NOT A PASS. R6 exists because "nothing was checked" was nearly cited as green once. If
+    ubs reports no supported languages, that is an EMPTY SCAN SET and it is a defect in the
+    invocation, not a clean bill.
+  FIX WHAT IT FINDS, at root cause, then re-run to exit 0. Always-fix classes per AGENTS.md: a
+    secret or key in any file, an unvalidated response field used in a branch, a swallowed
+    exception around a paid call, an unbounded retry loop. We have live-calling code in this list.
+  If a finding is in P3's or my code, REPORT it, do not fix it silently — same ownership rule you
+    have applied correctly three times today.
+
+WHY THIS AND NOT A RETRY: br ready is empty, R1 is unsatisfiable and you proved it, and this is a
+standing DoD obligation with twelve unscanned files behind it. Section 3's dry-queue order puts a
+GATES/DoD gap with no witness above a QUEUE DRY callback.
+
+P3 is mid-L3 and their frames are landing — l3-frames-D1-hostile.jsonl and l3-frames-D2-benign.jsonl
+both exist on disk. Both directions. Do not touch those files.
+
+Callback pane 1, branch first: CALLBACK-P4-UBS-<DONE|BLOCKED|REFUSE>, exit code, finding count,
+NEXT, NO-CLAIM.

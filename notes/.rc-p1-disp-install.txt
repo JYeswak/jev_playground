@@ -1,0 +1,46 @@
+BRANCH: main
+DISPATCH P3 + P4 [op-id=rc-p1-install] This tick's shipped line is NONE for an outside reader. e28209e hardened our own harness — real work, but a stranger cannot use it. Two NONEs in a row is a stop condition, so this tick owes something consumable, and there is an obvious one.
+
+THE GAP: jev-k9z.5 now has measurement (58/60, p=0.0000057), listing (L2 on muse, negative arm and
+nonce control), and firing (L3, all three directions in real sessions). It has NO WAY FOR ANYONE
+ELSE TO INSTALL IT. That is the whole distance between a proven seam and a product, and section 0
+is explicit: a ruling is only a product when someone outside this lane can install, run, or read it.
+
+THE PRECEDENT EXISTS AND YOU SHOULD COPY IT, NOT INVENT: work/omp-harm-rule/install-harm-rule.sh.
+Its shape, from the README:
+  install-harm-rule.sh --check default    verify without writing
+  install-harm-rule.sh default            install into an omp profile
+Same two modes. Read it before writing anything; the lane already paid for its edge cases.
+
+P3 — WRITE IT. You own jev-flag.
+  work/nev-injection/install-jev-flag.sh (or your preferred path under the unit).
+  MUST:
+    * --check mode that writes NOTHING and reports what it would do. That mode is the one a
+      stranger runs first and the one that makes the installer safe to publish.
+    * take a profile argument. The tool resolves under muse and grok and NOT under codex — that is
+      measured, unexplained, and the installer must not pretend otherwise. If a profile is
+      unsupported, say so and exit non-zero rather than installing something that will not load.
+    * be idempotent. Running it twice must not duplicate a registration in .omp/config.yml.
+    * PROJECT SCOPE ONLY. The registration that works is an extensions: entry in the in-repo
+      .omp/config.yml. Do NOT write under ~/.omp — P4 refused that correctly this morning and the
+      refusal turned out to be unnecessary only because project scope works, not because the
+      substrate write became acceptable.
+    * state the key requirement honestly: keyless returns NOT_RUN, it does not silently pass.
+  ACCEPTANCE: --check on a clean profile prints a plan and writes nothing (prove with git status
+  before and after); install on muse makes xd://jev_flag_ext_probe appear in systemPrompt;
+  --no-extensions still absent. Positive, planted negative, and the idempotence arm.
+  NO-CLAIM: installable is not useful. L4 organic precision is unmeasured and the README of this
+  unit must say so in its first paragraph, the way INJECTION-FLAG-RESULT.md leads with its miss.
+
+P4 — GRADE IT, non-author, and RUN --check YOURSELF on a profile P3 did not use.
+  You are the one who proved the codex/muse divergence matters. Hunt for: an installer that claims
+  success on a profile where the tool will not load; a --check that writes; a second run that
+  duplicates a config entry; and any sentence implying the flag is validated on real traffic.
+  REFUSE blocks the commit, as it did for the document. You refused once today and the artifact got
+  better for it.
+
+WHY NOT SOMETHING ELSE: br ready is empty, L4 needs a Joshua decision, the macOS gap needs a Joshua
+decision, and the expectation-field mandate needs a doctrine decision. This is the only remaining
+unit that is both dispatchable and USER-class.
+
+Callback pane 1, branch first. P3: CALLBACK-P3-INSTALL-<DONE|BLOCKED>. P4: CALLBACK-P4-INSTALLGRADE-<PASS|REFUSE>.

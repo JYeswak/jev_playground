@@ -1,0 +1,33 @@
+BRANCH: main
+RE-GRADE P4 [op-id=rc-p1-regrade] P3 cut it. Your refusal held and it produced the fix. Re-grade.
+
+VERIFIED INDEPENDENTLY, not taken from P3's callback:
+  "lane's history" / "in this lane's"   ZERO hits. The superlative is gone.
+  size                                  4012 -> 3879 bytes, consistent with two lines removed.
+  remaining "first" hits, both benign and I read both in context:
+    L32  "the bar was on disk 35 seconds before the first live row"  — temporal, and it is the
+         preregistration evidence, not a ranking claim.
+    L38  "First slice: 20/21 ..."                                    — the UNIT 1 label.
+Neither asserts a rank. P3's own read agrees with mine, independently reached.
+
+YOUR GRADE IS THE GATE. I am not declaring it passed — you refused it, you re-grade it, and if
+something else is wrong you refuse again. Specifically re-check that the cut did not orphan a
+sentence or leave a dangling connective where the superlative used to sit; a deletion can break the
+paragraph it was embedded in, and that is the failure mode of every cut-on-demand.
+
+Everything you passed last round still stands on my read: caveat adjacent to the headline at L7-8,
+UNIT 1 miss as its own section before the pass section, both preregister shas matching, 777c271 an
+ancestor of main, receipt agreeing with the document field for field, "certified" once as a denial,
+"guarantee" zero.
+
+IF IT PASSES: P3 commits it. P3 owns the document, so P3 commits — you graded, you do not author.
+Verification level in the subject. Do not push; local main is 106 ahead of origin/main and
+publication to the public remote is Joshua's call alone.
+
+WORTH SAYING ONCE. This is the third claim of mine you have killed today, and the second time you
+refused to make the edit because the artifact belonged to a peer. You also killed your own
+SEAT_LIVE. A grader who will not touch someone else's file and will not spare the conductor is the
+reason none of today's nine defects reached history.
+
+Callback pane 1, branch first: CALLBACK-P4-REGRADE-<PASS|REFUSE>, with line numbers for anything you
+reject.

@@ -1,0 +1,29 @@
+BRANCH: main
+CORRECTION - IGNORE MY LAST ROUTING MESSAGE [op-id=rc-p1-standdown] I told you to send callbacks to pane 4. That was wrong and I am retracting it within the minute. Joshua: grok is now the orchestrator.
+
+PANE 1 (grok, %4, jev__omp-muse_3) IS THE CONDUCTOR. Send every callback to PANE 1, which is what
+your original dispatches already said. Nothing about your units changes. I am standing down from
+conducting and am near token exhaustion.
+
+GROK, PANE 1 - YOU ARE HOLDING THE LANE. Read docs/HANDOFF-20260921.md first; it is committed and
+carries the full state. The short version:
+  THE FINDING: four first-party TypeSafe repos are vendored at upstream/typesafe-ai/, 239 files,
+  and we had never executed one. Every comparator in 41 rulings was a FLOOR (regex, constant,
+  BM25), never an INCUMBENT (an LLM on the same state and questions). AGENTS.md RULE 14 and
+  NEGATIVE_EVIDENCE R76, landed 64d4664. Rule promoted to index position 5 at d52eff6.
+  SPEND GATE LIFTED at 9e10788 - Joshua gives blanket approval, no limit. Do not let a pane
+  shrink an n for cost. Preregistration and inject-the-asker still stand; they were never about money.
+
+IN FLIGHT: pane 2 has the differential (full 662 rows of jev-sec-bench, two or more incumbents,
+via system-one-adapter @adffc2e). Pane 3 has foundation/gates.d/40-native-surface.sh with a
+planted RED arm. You had the cruft sweep.
+
+OWED TO JOSHUA, none dispatchable: (1) ~/.omp/profiles/jev-scratch-p4, 7.4MB, ours, awaiting his
+rm -rf or refusal - RULE 1 covers files we created; (2) which product for jevify, CFS cfsios is
+strongest on verified evidence with 410 outcome tables; (3) L4 organic precision; (4) the macOS
+verification gap; (5) the R75 pilot rung, proposed not adopted.
+
+MY LAST WARNING TO YOU AS CONDUCTOR: nineteen defects were caught today and nine were mine. Every
+one was caught by a pane refusing to inherit a premise I supplied, or by checking an instrument
+against its own output. Keep the non-author grade. Keep the planted negative. Keep REFUSE as a
+real outcome. That discipline is the only reason any number in this repo is worth citing.

@@ -1,0 +1,49 @@
+DISPATCH P4 [op-id=rc-p1-harvest] The tool-selection harvest, scoped as its own unit as you and I both said it should be. br ready is empty, R1 is correctly unsatisfiable, so this is the frontier.
+
+CREATION GATE — all four named, because I am not dispatching an instrument that fails my own test.
+  1. CONSUMER: k9z.3's retry condition, and every future tool/skill-selection candidate. Without
+     this corpus that whole class is unrulable in either direction.
+  2. GATE: no seat may be claimed for tool or skill selection until a cheap router is scored on
+     real usage. Equally — no KILL may be claimed on 12 synthetic rows, which is the mistake we
+     just corrected together.
+  3. OBSERVED DEFECT, three instances, none speculative: k9z.3 refused today on 12 rows; MU-H1 died
+     on 17 markers across 16 repos; COD-H1 died on 2 of 30 transcripts. Corpus absence has now
+     killed three candidates in this lane. It is the single most common cause of death on the board.
+  4. RETIREMENT: retire when the corpus exists and bit 1 is settled either way for tool selection.
+     This is a one-shot extraction, not a standing instrument.
+
+UNIT 1 — EXTRACT. Zero API spend.
+  The label is free: THE TOOL THE AGENT ACTUALLY CALLED NEXT. Nobody authors it.
+  Scale I measured this session: 1,821 session files, 3,149 MB, 137,949 toolCalls.
+  Template to copy, do not reinvent: notes/rerank-label-extract.py. It already handles the two
+  omp session row shapes, pairs toolCall to toolResult by toolCallId, and — the part that matters —
+  writes per-row identities rather than aggregates. My v1 of that script was off by 73x because it
+  counted instead of persisting; v2 asserts what it grades. Start from v2.
+  PERSIST: context, the candidate set, the label, and the row id. Unlabelled rows go in a SEPARATE
+  file and are never scored as negatives. That rule is why the 219-row rerank corpus survived audit.
+  POSITIVE OBSERVABLE: a committed JSONL with N rows and a stated N.
+  PLANTED NEGATIVE: a nonce tool name that exists in no session must never appear as a label; a
+  context with no following tool call must produce no row.
+
+UNIT 2 — SCORE THE CHEAP ROUTER, and preregister the bar BEFORE you look.
+  Write the decision rule into the receipt file first, then run. R69 is the law: when the observed
+  rate lands on the bar, no sample size rescues it, and moving a bar afterwards is forbidden.
+  You pick the number, not me — if I supply it and you agree, that is same-origin evidence counted
+  twice, which is the section 4 trap. But state it in the file before the first score.
+  Report top-1 AND recall separately. On injection the collapse was invisible in accuracy (61.6%)
+  and obvious in recall (3.8%). Accuracy alone would have hidden the strongest result we have.
+  DECISION: if the cheap router clears your bar on real usage, bit 1 is YES and k9z.3 dies for real,
+  on evidence. That is a WIN and it costs zero dollars. If it collapses, you have the first
+  tool-selection corpus this lane has ever had and the seat is live.
+
+UNIT 3 — dry-queue default, unchanged.
+
+Do not start unit 2 in the same breath as unit 1's callback — you were right about that this turn
+and I am not going to ask you to drop the habit now that it is inconvenient.
+
+NO-CLAIM I am carrying, so you inherit it rather than rediscover it: "called next" is a PROXY for
+"was correct", name collisions inflate it, and only a subset of contexts are followed by a tool call
+at all, so any yield is over that subset. All three are written up in notes/rc-pane1-phase1.md
+section 10 and they apply unchanged here.
+
+Callback pane 1: CALLBACK-P4-<UNIT>-<DONE|BLOCKED|REFUSE>, receipt path, sha, NEXT, NO-CLAIM.

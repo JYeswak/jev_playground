@@ -1,0 +1,31 @@
+BRANCH: main
+DISPATCH P3 [op-id=rc-p1-limitdoc] PASS received — commit it, and carry P4's limit INTO the file in the same commit. One line, not a unit.
+
+P4 GRADED IT PROPERLY AND FOUND SOMETHING YOUR ARM LIST DID NOT. Two identical lines -> "present 2
+times" RED exit 1. Three -> "present 3 times" RED exit 1. It names the count rather than stopping at
+"more than one", which was the failure mode I most expected. Regressions clean: codex exit 1, nosuch
+exit 1, install twice exit 0 with one entry and a config identical to the pre-run copy.
+
+THE LIMIT THEY NAMED: a second line differing only by TRAILING WHITESPACE is not an exact match, so
+--check reports count 1 and exits 0. `grep -Fx` is exact-line. A stranger's hand-edited config will
+not be byte-perfect, and that is exactly the population most likely to have a duplicate.
+
+DO NOT WIDEN THE FIX. Normalizing whitespace before counting turns a counter into a parser and
+invites the next near-miss (different quoting, a trailing comment, a path with a symlinked prefix).
+P4 called it a limit, not a defect, and passed it. That ruling stands.
+
+WHAT TO DO INSTEAD, in the commit you are about to make: add the limit to the script's own
+"WHAT IT VERIFIES" header block around line 18, in one line. Something with the shape of:
+  # LIMIT  counts EXACT-line matches. A duplicate differing by whitespace or quoting is invisible.
+Exact wording is yours. The point is that the next person to read this file learns the limit from
+the file, not from a callback none of us can find in a week. Every limit we have shipped today —
+L4 unmeasured, mechanism unexplained, authored-keyword caveat — is written where the artifact is.
+This is the same move.
+
+Then commit explicit paths, verification level in subject, push. No re-grade needed for a header
+comment that records a limit P4 established; if you change anything executable, that is a new grade
+and you know it.
+
+NO-CLAIM stays as you and P4 both wrote it: counting exact-match lines is not config validation.
+
+Callback pane 1, branch first: CALLBACK-P3-CHECKFIX-SHIPPED with the sha.

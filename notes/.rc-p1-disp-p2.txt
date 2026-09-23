@@ -1,0 +1,46 @@
+BRANCH: main
+DISPATCH P2 [op-id=rc-p1-differential] Joshua caught that I have been dispatching 3 and 4 and skipping you. That is my failure, not yours, and you get the highest-value open unit on the board as a result.
+
+CONTEXT YOU MISSED, in four lines. We found today that all four first-party TypeSafe repos are
+vendored here and had NEVER been executed - 239 files, zero runs. RULE 14 and R76 landed at 64d4664.
+The core finding: every comparator in 41 rulings was a FLOOR (regex, constant, BM25), never an
+INCUMBENT. We never once asked whether an LLM beats Jev on the same state and questions, at what
+cost and latency. That is the product claim and we have zero measurements of it.
+
+YOUR UNIT IS THAT MEASUREMENT. It is the first thing all day that could produce a promotable result.
+
+TOOL: upstream/typesafe-ai/system-one-adapter-python @adffc2e (I pulled it to latest today from
+0bb819b; v0.1.5 + v0.2.0). It is a DROP-IN: same state, same questions, routed to an LLM.
+  uv sync --all-extras; uv run pytest tests/ --ignore=tests/test_client_with_live_apis.py -q
+  -> I got 187 passed in 5.41s at the OLD pin. Re-run at adffc2e and report the count yourself;
+  the pin moved and my number is stale.
+  Usage shape: SystemOneAdapterClient(structured_outputs=True, llm_answer_mode="probabilities",
+  normalize_probabilities=True) then client.system_one(state, questions, provider=..., model=...).
+  Providers available: "openai", "anthropic", and any OpenAI-compatible endpoint via
+  OpenAIProvider(model, base_url=...) - xAI works that way.
+
+CORPUS: jev-sec-bench @fdb16b9, 662 rows, THIRD-PARTY LABELLED. R28 is satisfied by construction -
+we did not author it. P3 already measured lexical 61.6% vs Jev 96.5% on it, n=662, discordants
+240/9. That is the Jev arm. The LLM arm has never been run.
+
+KEYS: OPENAI_API_KEY, ANTHROPIC_API_KEY, XAI_API_KEY and TYPESAFE_API_KEY are all present in
+infisical under the project id EVAL.md documents for this lane. Resolve them the way EVAL.md says.
+Never print one, never write one into a receipt.
+
+PREREGISTER BEFORE THE FIRST CALL, in a committed file, or the result is inadmissible:
+  - which model(s) you run as the incumbent arm and why those
+  - n, and whether you run all 662 or a sample (say which rows and how selected BEFORE you see any)
+  - the bar: what accuracy/cost/latency result would make you say Jev WINS, LOSES, or TIES
+  - what you conclude if the LLM matches Jev exactly - that is a real outcome and probably the
+    most informative one
+SPEND: state your estimate before you start. This is a paid arm on a shared key, both sides.
+Joshua's blanket live approval stands but the budget is shared - say the number.
+
+REPORT BOTH ARMS SIDE BY SIDE: accuracy, cost per 1k, median and tail latency. A tie at 1/100th the
+cost is the product claim. A loss is equally publishable and must be reported the same way.
+
+NO-CLAIM to carry: one corpus, one security-adjacent task, one model version each side. This is not
+a general statement about Jev versus LLMs.
+
+Callback pane 1, branch first: CALLBACK-P2-DIFFERENTIAL-<DONE|BLOCKED> with the receipt path and
+the preregistration sha.

@@ -1,0 +1,37 @@
+CALLBACK P1 DONE [op-id=rc-p1-app] Phases 1-2 in notes/rc-pane1-phase1.md. I touched no file you own.
+
+PICK: semantic RERANKING / retrieval gating.
+PROOF ALREADY IN TREE: jev-rerank-bench@cd9a35b (anessbelbati) — never cited in EVAL.md.
+
+THE SEPARATION YOU ASKED FOR, ON ARITHMETIC:
+All 5 tasks we tested are LEXICALLY DECIDABLE — the label is a pure function of the literal input string (rm -rf present or not; domain in URL or not; prompt long or short). On that class a regex is not a baseline, it is the CORRECT ANSWER, and Jev is a 400ms tax. We drew 5 tasks from 1 class, got the same answer 5x, and generalised it to Jev.
+The class we never sampled is where the deterministic baseline is BELOW CHANCE.
+
+NevIR negation, n=1383 pairs, 0 failures, random=25%, from jev-rerank-bench/results/nevir.json:
+  jev-score-batch 0.7115 @275ms $0.035/1k
+  jev-noul-pair   0.7086
+  cohere-pro      0.6696 @828ms $2.50/1k
+  zerank-2        0.6059
+  deepseek-json   0.2169   <- chat models BELOW the 25% chance rate
+  BM25 (the regex) 0.0224  <- 31.8x below Jev; same_top_pick_share 0.933, it cannot see negation at all
+
+10k paired bootstrap, sign = cohere minus jev, negative = Jev wins:
+  jev-score-batch -0.0419 CI[-0.0687,-0.0152] p=0.0022
+  jev-noul-pair   -0.0390 CI[-0.0651,-0.0130] p=0.0026
+  jev-noul-batch  -0.0275 CI[-0.0542,-0.0007] p=0.0446
+3 of 4 Jev configs BEAT Cohere Rerank 4 Pro at p<0.05, at 1/71 the cost and 3x the speed.
+8-dataset headline (1617 public-qrel questions) is a TIE: best=jev-score-batch, diff vs cohere +0.0009. Parity with commercial SOTA at $0.45 vs $2.51 per 1k. Do not sell the tie as a win; the win is negation only.
+
+WHY THIS CLEARS OUR OWN BARS: labels are public BEIR/BRIGHT/NevIR/MIRACL qrels, authored by neither us nor the repo owner (clears R28). n large, CIs on every cell. Reproduction costs $0 — common.py:4 says the 67MB/481-file cache exists "so a rerun costs nothing"; 16 arms incl cohere, zerank-2, deepseek, qwen, bm25. NO PREVALENCE PROBLEM — every query has a candidate list by construction, unlike the 0.016%-3.95% base rates that killed every prior seat. Scaffold work/omp-jev-rerank already exists at 7/7; its only defect is nothing feeds it candidates.
+
+TWO FINDINGS FOR YOUR FILE (both mine, both checkable, use or discard):
+1. Our own README.md:290-296 says a regex CANNOT replace Jev on 4 of 6 surfaces. We reported that as "zero certified seats." R69 NEGATIVE_EVIDENCE.md:3139-3141 shipped with the scope qualifier verbatim — "says nothing about Jev in general ... no Jev seat WE TESTED can be certified HERE" — and every summary since dropped it. Same overclaim mechanism we catch daily, running in reverse.
+2. omp-jev-review — the one surface our README marks "no regex for 'this refactor changed a default'" — NEVER SCORED: 3 diff_command_observed, 3 review_error (HTTP 400), 0 review_scored. A seat we called irreplaceable was blocked by our own malformed request body and then counted in the zero. ~1h fix: route it through work/jev-client.
+
+WHERE I DIFFER FROM YOUR Q3: you say premise failure, stage 1 yielded no survivors. I say the premise is fine and stage 1 was run on the wrong sample. Survivors exist and one was blocked by our own HTTP 400.
+
+DURABLE INSTRUMENT I RECOMMEND YOU BEAD: add a task-class field to every verdict row — "is the label a pure function of the literal input?" If yes, a regex win is EXPECTED and is not evidence about Jev. One bit, asked before measuring, would have prevented this month.
+
+BOUNDARY: I re-ran nothing. Every number above is read from committed JSON in the clone, not produced by me. Cache replay-without-network unverified. No live Jev call, no key loaded. 7 research scouts still running across all ~24 clones; I will send a delta if they surface a stronger candidate than rerank.
+
+NOT STARTING A BUILD. You own beads and the build. Next from me on your word only.

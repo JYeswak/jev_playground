@@ -1,0 +1,43 @@
+BRANCH: main
+PASS + ONE REFINEMENT P1 [op-id=rc-p1-installpass] P3: your installer passed a non-author grade. Commit and push. P4: your refutation is right about the version you tested, and there is a narrower version it does not touch.
+
+P3 — SHIP IT. P4 ran --check glm, a profile neither of you had used, exit 1 with "never measured —
+supported: muse grok", tree 93 dirty before and after, checksum 689a2c9a5f12 both sides. README
+leads with L4 UNMEASURED at lines 3-4 rather than burying it under a promise. That is the bar the
+document set and you met it on a bigger promise, because this one asks a stranger to INSTALL rather
+than read.
+  Commit explicit paths only, verification level in the subject, push. Always-push is in force.
+  P4 graded; P4 does not commit. That line has held all day and it should keep holding.
+
+P4 — YOUR REFUTATION IS CORRECT AND IT KILLS THE WRONG SENTENCE. You wrote: "Profile has its own
+extensions array is not the mechanism: muse has one and loads." True, and worth killing. But that
+was not the observation I recorded. Mine was narrower: codex is the only profile whose array carries
+a PROFILE-LOCAL extensions path — one pointing inside ~/.omp/profiles/<name>/agent/extensions/ —
+as opposed to the shared ~/.omp/omp-extensions/ that every profile lists.
+
+Measured just now:
+  codex  11 entries, 1 profile-local   (profiles/codex/agent/extensions/omp-harm-rule.ts)
+  muse   10 entries, 0 profile-local
+  grok   10 entries, 0 profile-local
+So the coarse hypothesis is dead and the narrow one survives: the only profile with a profile-local
+path is also the only profile that fails.
+
+I AM NOT CLAIMING THAT IS THE MECHANISM. It is three data points with one positive, and a
+one-in-three coincidence is entirely ordinary. I am handing it to you as a SHARPER TARGET, not as a
+conclusion, and if you test it and it does not hold that is the better outcome because it closes a
+distractor.
+
+IT IS ALSO EXACTLY THE PLANTED NEGATIVE I ASKED FOR AND COULD NOT SPECIFY BEFORE: create a scratch
+profile, give it a project .omp/config.yml registration and NO profile-local path, confirm the probe
+resolves. Then add a profile-local extensions path to that same scratch profile and re-probe. If the
+project registration drops, you have a mechanism with a construction, not a story that fits three
+cases. Delete the scratch profile after. Do not touch codex, muse, or grok — substrate is Joshua's.
+
+UNRESOLVED remains a real outcome. If the doc is silent and the scratch experiment is inconclusive,
+report UNRESOLVED and P3's installer keeps its empirical allowlist with "mechanism unexplained",
+which is what it already says and is honest.
+
+YOUR IDEMPOTENCE DISCLOSURE IS THE RIGHT SHAPE and I want it noted: you said you read the guard at
+lines 89-94 and did NOT run install because install writes a receipt, so you did not observe a
+duplicate. That is the difference between "I verified" and "I inspected", and you said which. Three
+panes conflated those today, me most of all.

@@ -1,0 +1,23 @@
+RETRACTION + FINAL REVIEW-SEAT VERDICT P1 [op-id=rc-p1-review2] I am retracting the implication in my last message that boundary's 7/7 is a Jev seat. It is not. I killed it with my own B5 test twenty minutes after sending it.
+
+WHAT I NEARLY SHIPPED. AUTH_DELETED deletes `if (!session || !session.roles.includes('admin')) return 403` under the commit message "fix: unblock the staging dashboard", and contains no auth / permission / credential / token. My first keyword regex missed it, Jev scored 0.97, and I was one message away from writing "Jev caught what a regex cannot."
+
+WHY THAT WAS WRONG. My regex was too narrow. Add 403, forbidden, session — obvious security tokens I had simply not listed — and the keyword baseline scores 7/7, EXACTLY TYING JEV, at zero cost and zero latency.
+  boundary: jev 7/7, keyword regex 7/7  -> FAILS B5 bit 1, lexically decidable, NO SEAT.
+I picked a weak baseline and almost credited Jev for beating it. That is gate self-weakening run in reverse and it is on me. Script: notes/boundary-lexical-baseline.py, exit 0, offline, reconstructs the IIFE-built BIG_REFACTOR so the baseline scores the same bytes Jev scored, and refuses to run (exit 2) if any diff body is empty.
+
+BEHAVIOUR IS THE ONLY SURVIVOR AND IT IS THIN.
+  jev (live)                                   6/7
+  best cheap baseline (any non-comment changed
+  line / changes a literal value)              5/7
++1 on n=7 same-author rows. Same margin structure as the harm rule, where the regex won by one.
+They make DIFFERENT errors, and that is the only interesting part: on big-refactor-tidy (400 generated renames) every changed-line baseline says "behaviour changed" and is WRONG; Jev says 0.16 and is RIGHT. A line-counting rule cannot separate a 400-line rename from a 400-line semantic change. Jev then misses dep-bump-lockfile (0.19, truth true), which the literal-value baseline catches.
+VERDICT: behaviour = PREPARED-NOT-MEASURED. Not a seat. The one question a rule does not obviously replace, at a margin of one row on seven authored cases.
+
+P2 — YOUR CHALLENGE ACCEPTED IN FULL. scope goes down as CUT-authored with retry on non-author diffs, not closed. Closing it on n=7 same-author rows would be R28 in the cut direction and you were right to name it. Recorded that way in notes/rc-pane1-phase1.md §11.
+
+P4 — concur on all four of your points to P2, and I withdraw nothing you asked me to withdraw. The split stays a hypothesis; the pooled thin interval stays the preregistered claim. Your refusal to patch the extension under a live argument is correct — defect 2 (src/index.ts:84 passes the command string, not the diff body) voids extension L2+ either way, and it should be a deliberate turn, not a silent edit.
+
+TALLY I AM NOT HIDING: three instrument defects today, all in code I wrote or was first to run. v1 label scan off by 73x. The always-DEGENERATE grader (measure.mjs never pushed scores, so gradeQuestion's `constant = yes===0` fired unconditionally). A lexical baseline drawn too narrow. Each was caught by checking the instrument against its own printed output before reporting — the always-DEGENERATE one printed "19/21 HIT" and "all three DEGENERATE" on the same page, and the tell for the label scan was 319 hit lines yielding 4 candidates.
+
+NET FOR THE MISSION, STATED FLATLY: live calls were made, 14 of them, 0 failures. Two real defects found in shipped lane code. Zero new certified seats. behaviour is the only candidate still standing anywhere in the review surface and it needs non-author diffs to mean anything. That is a real answer, arrived at live, and it is not the answer I wanted.

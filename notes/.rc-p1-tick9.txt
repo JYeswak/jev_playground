@@ -1,0 +1,41 @@
+BRANCH: main
+DISPATCH P3 + P4 [op-id=rc-p1-tick9] R74 is on disk and public. P3 grades it. P4 closes the one disclosed gap in the thing we shipped to strangers.
+
+P3 — UNIT: grade R74, line 3258, committed 8340ed5, already public. Same four-point bar you just
+applied to R72/R73. Two things specific to this one:
+  a) It is MINE, so a REFUSE costs me a correction commit and costs you nothing. Use it.
+  b) Its retirement condition says "retire when a pane can cite a TOOL that enforces it, not a
+     habit." Judge whether that is a real retirement or a wish. I wrote it and I am not sure.
+  c) Check the two instance counts against their sources rather than against my prose — 73x and 27
+     are both mine, and R74 exists because I assert counts I have not controlled.
+
+P4 — UNIT: verify installer idempotence for real. You graded it honestly and said so: you READ the
+guard at lines 89-94 and did NOT run install, so you did not observe a duplicate. That distinction
+is the best thing in your grade and it is also the last unverified claim in a PUBLIC, INSTALLABLE
+artifact at 9eb7157. A stranger runs install, not --check.
+  RUN IT: ./work/nev-injection/install-jev-flag.sh install muse, twice.
+  POSITIVE OBSERVABLE: second run exits 0, .omp/config.yml has EXACTLY ONE entry for the tool, and
+  the receipt is coherent after two runs rather than doubled.
+  PLANTED NEGATIVE: hand-add a second duplicate entry, run --check, and show it detects the state
+  it would have created if the guard were broken. If --check cannot see a duplicate it did not
+  write, say so — that is a finding about the checker, not a failure of the unit.
+  STATE DISCIPLINE: this writes to the in-repo .omp/config.yml, which is project scope and visible
+  in git. Capture `git diff` before and after, restore the file to its committed state when done,
+  and report the restored diff as empty. Do NOT write outside the repo. Do NOT touch
+  ~/.omp/profiles/jev-scratch-p4 — still held pending Joshua.
+  IF IT IS NOT IDEMPOTENT: that is a real defect in a shipped artifact and it outranks everything
+  else on the board. Callback immediately, do not fix it yourself — P3 authored it.
+
+HONESTY PASS, 17 commits since 9f5ee78, my classification for you to dispute:
+  USER 3      291601b front door · 9eb7157 installer · 7df6465 published writeup
+  ENABLER 9   8eaee81 L3 · 777c271 paired win · da25ad3 retraction · e28209e + 240cf3e ubsfix ·
+              002fe75 two-bit gate · 6f9990e digest test · f5168d8 router recall · d73df8b ids
+  PROCESS 3   ce0536c + 8340ed5 ledger · 72cf677 always-push doctrine
+  UNKNOWN 2   two merges
+Against the 2026-09-18 baseline USER 0 / ENABLER 5 / PROCESS 17 -> DRIFTING: PROCESS fell 17 to 3
+and USER went 0 to 3. NOT DRIFTING. Dispute the classification if you think I flattered us — I
+classified my own ledger entries as PROCESS deliberately, and someone should check that I did not
+quietly promote anything of mine into USER.
+
+Callback pane 1, branch first. P3: CALLBACK-P3-R74GRADE-<PASS|REFUSE>. P4: CALLBACK-P4-IDEM-
+<DONE|DEFECT|BLOCKED> with the before/after diffs.

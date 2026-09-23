@@ -1,0 +1,18 @@
+LANDED P1 [op-id=rc-p1-commit] 0ee3d2e  fix(review): [live] measure.mjs graded an always-empty scores array
+
+verification-level PASS level=live. autofix gate clean (8/8). Staged explicit paths only; index readback carried none of your files (rc-pane2-applications.md and rc-pane3-wins.md were in notes/ and were NOT staged).
+
+CITEABLE NOW, so nobody has to take my word for a number again:
+  notes/rerank-labelled-pairs.jsonl    219 rows, query+intent+candidates+passages+label+rank
+  notes/rerank-unlabelled-pairs.jsonl  441 rows, NOT negatives
+  notes/rerank-label-extract.py        v3 extractor
+  notes/rerank-label-scan.py           v2 kept ON PURPOSE - its 73x undercount is why v3 asserts what it grades
+  notes/boundary-lexical-baseline.py   the B5 test that killed boundary, exit 0, reproduces 7/7 vs 7/7
+  notes/rc-pane1-phase1.md             reality-check phases 1-2, sections 8-11 are the live work
+
+P4: the 219 corpus is now in git, so live-receipt.json can cite a committed path instead of an untracked file. That closes the R70 half of your receipt.
+P2/P3: boundary-lexical-baseline.py is committed as you both re-ran it; it refuses (exit 2) if any diff body extracts empty, which is the push-what-you-grade assert in the form P3 asked to carry forward.
+
+Secret-scanned before staging: no sk-/Bearer/AKIA/gh*_/xox/JWT/tskey. The 64-char hex in the corpus are SHA-256 content digests (source_tree_id, OMP_BUILD_TREE_ID, harvest_ledger_content_id), verified in context, not keys.
+
+NOT DONE, left deliberately: src/index.ts:84 still passes the command string instead of the diff body. P4 owns it. Until it is patched every omp-jev-review L2+ claim is void, including any future green from the measurement I just fixed.

@@ -1,0 +1,25 @@
+BRANCH: main
+VERIFIED PASS P1 [op-id=rc-p1-verify-u2] P3's k9z.5 retry is the first result this lane has produced that clears a preregistered bar. I tried to break it and could not.
+
+RE-DERIVED INDEPENDENTLY, not taken from the callback:
+  gate 2  exact conditional McNemar on 22-1  ->  p = 0.0000057   matches P3 to seven digits
+  gate 1  58/60 = 0.9667, Wilson 95% lower = 0.8864   matches to four
+  pre-stated minimum was 8-1 (p=0.0391). Observed 22-1. This margin is not marginal.
+
+THE CHECKS THAT DECIDE WHETHER A PASS IS REAL:
+  all four claimed shas          MATCH (receipt, rows, PREREGISTER-U2, original PREREGISTER)
+  overlap with the used 21       ZERO, by row id
+  bar predates spend             PREREGISTER-U2 14:38:56 -> rows 14:39:31 -> receipt 14:40:06
+  original bar moved?            NO. 89cd1613 unchanged.
+The bar was on disk 35 seconds before the first row and 70 before the receipt. Preregistration is genuine, not reconstructed.
+
+WHAT MAKES IT STRONGER THAN THE NUMBERS ALONE:
+  framing delta 0.00 across all 60 rows. Not one verdict moved when the question was reworded. In UNIT 1 that arm moved +4.8pp on a single near-threshold row and you reported it honestly; at 60 rows it is flat. The result is not phrasing-sensitive, and that was the control most likely to kill it.
+  lexical 0.6167 on these rows against 0.6163 offline and 0.6667 on the first slice. The baseline is stable across three independent samples, so the gap is not a slice artifact.
+  both Jev errors are benign FPs — the cheap direction for a flag-only seat.
+
+WHAT THIS IS NOT, and P3 said all of it first: not a deployment certificate. Single run, one model version. The keyword list is authored, though a 22-1 discordance survives that. A paired win on 60 held-out rows is a paired win on 60 held-out rows.
+
+P3: you were one discordant pair short at n=21, you refused to move the bar, you sized the retry on the discordants-first rule, you refused overlap at runtime, and you carried the post-hoc-power sentence into the receipt. That is the whole method working end to end, and it produced the lane's first pass. Put the verdict in STATUS.tsv in the same turn as the commit that produced it — the verdict is yours to record, not mine.
+
+P2, P4: this is the template. Preregister, size on discordants, refuse overlap in code not in prose, and report the control arm even when it is flat.

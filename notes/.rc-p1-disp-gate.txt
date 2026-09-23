@@ -1,0 +1,47 @@
+BRANCH: main
+DISPATCH P3 + P4 [op-id=rc-p1-nativegate] Joshua: "native typesafe scripts and processes as part of our gates - nothing we build for jev should ever pass unless it's using native vendor reported docs/surfaces" and "use ast-grep, ripwire, ripgrep and fh to make sure we have a proper gated environment with no cruft." RULE 0. Doctrine landed at 64d4664 (RULE 14 + R76).
+
+THE CREATION GATE IS SATISFIED AND HERE ARE ALL FOUR, so this gets built:
+  1. CONSUMER: foundation/gates.sh - every Definition-of-Done already runs it.
+  2. GATE: no Jev-calling code ships that bypasses the vendor SDK without a recorded exemption;
+     no verdict ships citing only a deterministic comparator.
+  3. OBSERVED DEFECT CLASS, measured by me just now with ast-grep and rg, not speculative:
+       ast-grep -l ts -p 'fetch($URL, $$$ARGS)' over work/ and .omp/ ->
+         work/p2-localjev/scripts/eval/run.ts   3 sites
+         work/p2-localjev/src/engine.ts         1
+         work/p2-localjev/scripts/eval/data.ts  1
+         work/jev-client/src/index.ts           1
+       rg "api\.typesafe\.ai" in OUR code -> work/jev-client/src/index.ts,
+         work/jev-client/question-shape-measure.mjs, work/jevcache-probe/repro-1-*.sh
+       AND THE PART THAT STINGS: the official SDKs are ALREADY INSTALLED in this tree at
+         work/pysdk/.venv/.../typesafe_sdk/ and work/sdk/node_modules/@typesafe-ai/sdk/.
+       We pip-installed and npm-installed the vendor client, then hand-rolled our own next to it.
+  4. RETIREMENT: none. Standing obligation under RULE 14.
+
+P3 - UNIT: build foundation/gates.d/40-native-surface.sh.
+  Use AST-GREP for the detection, not rg - a direct POST is a structural fact and a comment
+  mentioning the endpoint is not a violation. rg is for the literal endpoint sweep only.
+  MUST DO: an EXEMPTION mechanism with a recorded reason, because some of those sites are
+  deliberate (jevcache-probe reproduces a server-side rejection; a probe that used the SDK would
+  not reproduce it). An exemption is a line in the gate file naming the path AND why - never a
+  silent skiplist.
+  RED ARM IS MANDATORY AND MUST BE PROVEN: plant a file that POSTs the endpoint directly with no
+  exemption, show the stage goes RED and NAMES THE PLANTED FILE, remove it, show GREEN. A stage
+  that has only ever gone green is unproven - that is already written in AGENTS.md.
+  GATE THRIFT: read AGENTS.md on extending a stage before adding one. If this rides an existing
+  stage better than it stands alone, say so and do that instead.
+  ALSO GATE FRESHNESS: the four native repos must be behind=0 in upstream/MANIFEST.tsv. All four
+  are current as of 64d4664 (adffc2e, 0ffd094, 66880cc, 65a39f3). A stale pin is a RED.
+
+P4 - UNIT: the cruft sweep, with the tools named.
+  ripwire work --quality-delta and ripwire work --exemplar="call the jev api" - find the ONE call
+  site that should be canonical, and report every duplicate of it. ripwire exits rc=2 on
+  duplication; that exit code is the finding.
+  fh search "gate" and fh suggest for precedent on gate shape - it may be stale, Joshua said use it
+  anyway; report staleness rather than skipping it.
+  DELIVERABLE: a list of which of those call sites should COLLAPSE into the vendor SDK, which are
+  legitimately exempt and why, and which are dead cruft nobody runs. Do NOT delete anything -
+  RULE 1, and half of these are probes with historical value. Name them; Joshua decides.
+
+BOTH: nothing in upstream/typesafe-ai/* gets edited, committed or pushed. Ever.
+Callback pane 1, branch first. P3: CALLBACK-P3-NATIVEGATE-<DONE|BLOCKED>. P4: CALLBACK-P4-CRUFT-<DONE|BLOCKED>.

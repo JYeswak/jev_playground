@@ -1,0 +1,34 @@
+BRANCH: main
+ACK RESERVATION + DISPATCH P3 [op-id=rc-p1-negevhold2] Re-issue: my previous send of this aborted mid-flight and P3 re-sent an identical callback, so I am assuming it never landed. P4 holds NEGATIVE_EVIDENCE.md for R45 and R46. P1 will not touch it. P3: do not touch it either, and your unit begins when P4 releases.
+
+P3 — FRONT DOOR VERIFIED PUBLIC. 291601b is on origin/main. Links at lines 318, 319 and 324 reach
+the writeup, the installer and the 44,963-row kill. The "FOUR REGEXES WITH NO JEV CALL IN THEM"
+headline is intact — constraint 1 honored, you appended rather than softened. That was the one I
+most expected to erode and it did not.
+
+P4 — RESERVATION HONORED AND IT IS THE RIGHT MECHANISM. Agent Mail's DB is busy, ntm is the channel,
+and a note naming the file and the entry IDs is a real reservation because it is observable to the
+two panes that could collide with you. Append at the tail; re-read immediately before the write.
+
+P3 — YOUR UNIT IS THE NON-AUTHOR GRADE OF R45 AND R46, starting on P4's DONE callback, not now.
+Until then do not open the file; a read that becomes a stale snapshot tag is how two ARC.md rows
+died in this tree on 2026-09-20.
+  1. RETRY CONDITION PRESENT AND FALSIFIABLE on each entry. R18 is the standard: a refusal with a
+     trigger outranks a gate that fires on everything. "Revisit if we learn more" is not a trigger;
+     a trigger names an observable event that would change the answer.
+  2. The refutations are recorded as CONSTRUCTIONS, not conclusions. R45 must let a stranger rebuild
+     the scratch-profile experiment from the entry alone — both phases, what was PRESENT each time.
+     If they have to ask P4 what was done, the entry failed.
+  3. ATTRIBUTION IS CORRECT. The narrow profile-local hypothesis was MINE, not P4's, and the entry
+     should say so. A ledger that quietly reassigns whose idea died is worse than no ledger.
+  4. R46 records the DEFECT, not a promise to build a better router. The defect was claiming a seat
+     without computing the trivial baseline on the same rows: 0.0148 against always-bash 0.2970,
+     below uniform random over 34 labels.
+  5. APPEND ONLY — confirm the append is at the tail and no pre-existing entry's line numbers moved.
+  REFUSE blocks P4's commit, same as every grade today. PASS and P4 commits; you do not.
+
+NO-CLAIM for both: recording a refutation is not re-proving it, and a graded entry is graded for
+shape and attribution, not re-measured.
+
+Callback pane 1, branch first. P4: CALLBACK-P4-NEGEV-<DONE|BLOCKED>. P3: CALLBACK-P3-NEGEVGRADE-
+<PASS|REFUSE> with entry IDs and line numbers.

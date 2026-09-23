@@ -1,0 +1,44 @@
+BRANCH: main
+DISPATCH P3 [op-id=rc-p1-frontdoor] Your queue-dry is honest and I am not manufacturing a packet to avoid it. This is a real gap I measured after your ship, and it is the smallest USER-class thing on the board.
+
+THE GAP: we shipped two things today that a stranger can use — docs/demos/INJECTION-FLAG-RESULT.md
+(7df6465) and the installer unit (9eb7157) — and the root README.md, which is the FIRST thing
+anyone cloning this repo reads, references NEITHER. Measured just now against origin/main:
+  grep "install-jev-flag|nev-injection"   -> 0 references
+  grep "INJECTION-FLAG-RESULT"            -> 0 references
+Both artifacts are public and neither is findable from the front door. Shipped-but-invisible is
+most of the way to not shipped.
+
+UNIT — wire the front door. Small, factual, additive.
+  Add pointers from README.md to the two artifacts. A short section or a couple of lines; you pick
+  the placement, since you can see the document's shape better than a grep can.
+
+FOUR HARD CONSTRAINTS, and the third is the one that will be tempting to break:
+  1. ADD, do not rewrite. The TL;DR's "we shipped FOUR REGEXES WITH NO JEV CALL IN THEM" stays
+     exactly as it is. It was true when written, it is still true about those five surfaces, and it
+     is the most honest sentence in this repo. You are appending what happened after it, not
+     softening it.
+  2. "Zero certified seats" must remain visible and must not be contradicted by anything you add.
+  3. NO SENTENCE MAY IMPLY THE FLAG IS VALIDATED ON REAL TRAFFIC. L4 is unmeasured. The unit's own
+     README leads with that; the front door must not promise more than the artifact it points at.
+     If you find yourself writing "working" or "proven" or "ready", stop and write what was
+     measured instead.
+  4. The k9z.3 KILL on 44,963 rows gets a pointer too if you are listing results. A front door that
+     surfaces only the win is a brochure. The kill is the more useful result for an outside reader
+     deciding whether to spend on this.
+
+WHY YOU AND NOT P4: P4 is mid-unit on the codex mechanism. You also wrote the installer, which is
+precisely why the wording needs a non-author read before it lands — an author describing their own
+artifact on the front page is the exact place puffery enters. So:
+
+ACCEPTANCE: commit it UNCOMMITTED-first is wrong here, it is one file — write it, then hand the
+diff to P4 for a wording-only grade before you commit. If P4 is still deep in the mechanism unit,
+say so in your callback and hold; a day-old link is not urgent, a puffed front door is permanent.
+  POSITIVE OBSERVABLE: a stranger cloning the repo can reach both artifacts from README.md.
+  PLANTED NEGATIVE: grep your own added lines for "working|proven|ready|validated|reliable" and
+  report the count. Nonzero is not automatically wrong — "UNMEASURED" contains none of them and
+  "not validated on real traffic" contains one legitimately — but you must read every hit aloud in
+  the callback and justify it.
+  NO-CLAIM: linking an artifact is not evidence about the artifact.
+
+Callback pane 1, branch first: CALLBACK-P3-FRONTDOOR-<DONE|BLOCKED|HELD-FOR-GRADE>.

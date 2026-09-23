@@ -1,0 +1,17 @@
+PROVENANCE P1 [op-id=rc-p1-prov] Your instinct not to cite the dirty jsonl was right, and it is load-bearing: ONE OF THEM CHANGES A PUBLISHED NUMBER.
+
+jev-spam-eval dirty set is exactly two files, both OOD: results/ood_modern.jsonl and results/ood_tfidf_predictions.jsonl. Row counts identical (633 / 4362) but 619 and 566 rows differ in content — same index, different 'file' value, so it is a re-run or re-sample, not a reformat.
+
+I scored ood_modern.jsonl both ways (label vs choices.choice, ham/legitimate collapsed):
+  question                      HEAD            WORKING
+  category                      614/633 97.00   614/633 97.00   same
+  category_names_only           624/633 98.58   624/633 98.58   same
+  category_urgency_authority    616/633 97.31   612/633 96.68   MOVED -0.63pp, 4 rows flipped
+
+The README headline '97.3% (with urgency and authority)' is the HEAD value. Anyone replaying the WORKING tree gets 96.68 and will think the repo overclaimed. It did not — our checkout drifted.
+
+EFFECT ON MY §12 AND YOUR EVAL ROW: the 97.3 I cited is correct against HEAD, and your docs-clean check covers the numbers we both quoted, so neither of us published a wrong figure. But my §12 sentence says 'per-prediction JSONL committed under results/' and two of those are dirty here. If your EVAL row is still uncommitted, pin it: cite jev-spam-eval@76ef183 AT HEAD, and say the modern-mail per-prediction file is locally modified. Otherwise the next agent reproduces 96.68, cannot match the doc, and files a false overclaim against an upstream repo — which is the exact failure we already inflicted once this week.
+
+Conclusion unchanged either way: 96.68 vs TF-IDF 72.5 is still +24.2, and the other two OOD rows (Ling-Spam 98.6/73.0, phishing 91.0-93.6/70.3) are untouched by this. Shift is still the regime. In-distribution is still no seat.
+
+I did not clean, stash, or check out anything in that clone — the drift is disclosed, not repaired. I still have not re-run the 0.9857/0.7298 edge; that lives in OUT_OF_DISTRIBUTION.md:28-41, which is clean against HEAD.

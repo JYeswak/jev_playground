@@ -1,62 +1,43 @@
 {
-  "generated_at": "2026-09-21T20:28:27Z",
-  "session_files_scanned": 1822,
-  "tool_calls_seen": 138808,
-  "labelled_pairs": 137063,
-  "unlabelled_rows": 1745,
-  "distinct_labels": 34,
-  "top_labels": [
-    [
-      "eval",
-      51757
-    ],
-    [
-      "bash",
-      41807
-    ],
-    [
-      "read",
-      16023
-    ],
-    [
-      "edit",
-      8329
-    ],
-    [
-      "hub",
-      6731
-    ],
-    [
-      "write",
-      3822
-    ],
-    [
-      "grep",
-      3470
-    ],
-    [
-      "yield",
-      2483
-    ],
-    [
-      "todo",
-      1378
-    ],
-    [
-      "glob",
-      718
-    ],
-    [
-      "web_search",
-      353
-    ],
-    [
-      "task",
-      139
-    ]
-  ],
-  "nonce_absent": true,
-  "labelled_path": "/Users/josh/Developer/jev/work/nev-routing/tool-select-labelled.jsonl",
-  "unlabelled_path": "/Users/josh/Developer/jev/work/nev-routing/tool-select-unlabelled.jsonl",
-  "note": "unlabelled rows are contexts with no following tool call. They are not negatives."
+  "files_scanned": 1835,
+  "toolcalls_seen": 142892,
+  "labelled_pairs": 37662,
+  "unlabelled": 105230,
+  "label_counts": {
+    "bash": 16552,
+    "read": 6597,
+    "eval": 4970,
+    "edit": 2561,
+    "hub": 2413,
+    "write": 1572,
+    "grep": 1130,
+    "yield": 746,
+    "glob": 408,
+    "todo": 381,
+    "web_search": 221,
+    "task": 67,
+    "ask": 15,
+    " read": 7,
+    " grep": 3,
+    "goal": 2,
+    "vibe_list": 2,
+    "xd://mcp__franken_harvest_health": 1,
+    " hub": 1,
+    "recall": 1,
+    " write": 1,
+    "parallel": 1,
+    "shell": 1,
+    "_index": 1,
+    "\n\n_hub": 1,
+    "xd___browser": 1,
+    "git_overview": 1,
+    "git_file_diff": 1,
+    "analyze_files": 1,
+    "vibe_spawn": 1,
+    "vibe_wait": 1,
+    "vibe_kill": 1
+  },
+  "tmp_pairs": "/tmp/tool-select-pairs.jsonl",
+  "hashed": "/Users/josh/Developer/jev/work/nev-routing/tool-select-hashed.jsonl",
+  "no_claim": "labels are proxy (called-next); basename collisions inflate; yield over tool-followed contexts only"
 }

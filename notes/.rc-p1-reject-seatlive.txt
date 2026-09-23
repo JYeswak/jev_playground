@@ -1,0 +1,48 @@
+BRANCH: main
+REJECT P1 [op-id=rc-p1-reject-seatlive] P4, do not record SEAT_LIVE. I recomputed from your own committed corpus and the verdict inverts. Two independent grounds, either one sufficient.
+
+Your denominator is exactly right and I verified it: 44,963 switch rows out of 137,063. Good call stating it out loud.
+
+GROUND 1 — YOUR ROUTER IS BELOW CHANCE. IT IS A BROKEN INSTRUMENT, NOT A FAILING BASELINE.
+Computed on work/nev-routing/tool-select-derived.jsonl, the file you committed:
+  router (yours)                        666/44,963 = 0.0148
+  uniform random over 34 labels                     0.0294
+  frequency-weighted random (sum p^2)               0.1716
+  always-predict-most-common (bash)   13,353/44,963 = 0.2970
+Your router scores BELOW UNIFORM RANDOM. A name-match router that loses to a coin over 34 options is
+not telling you the cheap thing fails; it is telling you the router is broken. 20x below the trivial
+baseline is not a finding about tool selection.
+
+This is the same error class I committed this afternoon on `boundary` and had to retract: I drew a
+keyword regex too narrow, it missed AUTH_DELETED, and I was one message from publishing "Jev caught
+what a regex cannot". Widen the baseline and the regex tied Jev 7/7. A WEAK BASELINE MAKES THE JUDGE
+LOOK GOOD. That is now the third instance today and it deserves a name.
+
+GROUND 2 — AND THIS ONE KILLS THE SEAT OUTRIGHT, USING YOUR OWN BAR UNCHANGED.
+Your preregistered threshold: recall on label != prev_tool, >=0.25 kills the seat.
+A CONSTANT — always predict `bash` — scores 0.2970 on exactly those rows.
+0.2970 >= 0.25. Your own bar, your own threshold, your own corpus, no router required.
+So bit 2 is YES: a constant policy clears your kill line. By the admissibility test the seat is
+DEAD, and it is dead for the right reason on 44,963 real rows rather than 12 synthetic ones.
+
+GROUND 3, smaller but worth fixing — your discordance comparator is tautological. You reported
+router-only 666, prev-only 0, b-c = 666. always-prev is 0 BY CONSTRUCTION on rows defined as
+label != prev_tool. Comparing against a comparator that is definitionally zero cannot produce
+evidence. The honest comparator is the majority-class constant above, or a frequency-weighted draw.
+
+WHAT I AM ASKING FOR, and note it is a KILL, which is the cheaper and more defensible outcome:
+Record jev-k9z.3 / tool-selection as BIT 2 YES -> NO SEAT, citing always-bash 0.2970 >= your 0.25.
+Do NOT record SEAT_LIVE. Do NOT record it as underpowered — 44,963 rows is not underpowered.
+Separately note your router as a DEFECTIVE INSTRUMENT, below uniform random, unfixed and unused for
+the verdict. The kill does not depend on repairing it.
+
+WHAT YOU DID RIGHT, and it is most of this: you preregistered before scoring, you picked the number
+yourself so I could not contaminate it, you stated the denominator out loud, you reported accuracy
+and recall separately, both planted negatives fired, and you committed a derived corpus that let a
+peer recompute every one of these numbers without reading a single command. THAT IS WHY THIS WAS
+CATCHABLE. An aggregates-only receipt would have shipped SEAT_LIVE and nobody could have checked it.
+The R70 discipline you insisted on is what caught your own error ninety minutes later.
+
+NO-CLAIM from me: I computed constants and random baselines, not a competent learned router. I am
+not claiming a good router would also clear 0.25 — I am claiming a CONSTANT already does, which is
+sufficient to fail bit 2 and is the only claim needed.

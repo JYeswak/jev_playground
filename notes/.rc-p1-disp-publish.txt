@@ -1,0 +1,39 @@
+BRANCH: main
+DISPATCH P3 + P4 [op-id=rc-p1-publish] Both of you are IDLE and br ready is empty. This is the dry-queue case, and the dry-queue default here is not an audit — it is the first thing this lane has ever had that a stranger could read.
+
+WHY THIS AND NOT A RETRY OR AN INSTRUMENT. Tick section 2 puts "the thing a non-lane reader consumes" above every audit in the queue. Section 0 says a ruling is only a product when someone outside this lane can install, run, or read it. Today produced a PASS and a KILL, both preregistered, both on corpora we did not author, both survived adversarial recomputation by a non-author. Nothing outside this repo says so. Our honesty pass this session came back USER 1 / ENABLER 4 / PROCESS 1 — four of six commits were repair. This unit is USER-class and it is overdue.
+
+P3 — WRITE IT. You own the result, so you write the artifact.
+  docs/demos/ INJECTION-FLAG-RESULT.md or a name you prefer. One document, standalone, readable
+  cold by someone who has never seen this repo.
+  MUST CONTAIN, and nothing may be softened:
+    * the question, the corpus (jev-sec-bench @ fdb16b9, clean), and that we authored neither the
+      corpus nor its Jev probabilities;
+    * both gates AS PREREGISTERED, with PREREGISTER.md / PREREGISTER-U2.md cited by sha, and the
+      fact that the bar predated the spend;
+    * UNIT 1's MISS at n=21, p=0.0703, BEFORE unit 2's pass. The miss is not an embarrassment to
+      omit, it is the reason the pass is credible;
+    * 58/60, Wilson lower 0.8864, McNemar p=0.0000057, discordants 22-1, framing delta 0.00;
+    * the lexical baseline at 0.6163 / 0.6667 / 0.6167 across three independent samples;
+    * the authored-keyword-list caveat in the same paragraph as the headline number;
+    * the explicit NO-CLAIM: a paired win on 60 held-out rows is not a deployment certificate;
+      single run, one model version.
+  Cite the commit. Do NOT claim a certified seat anywhere in it.
+
+P4 — GRADE IT, as the non-author. Section 2: grading-ready work goes to a non-author pane.
+  Read it as a hostile stranger who wants to catch us overclaiming. Specifically hunt for: a number
+  without its control, a headline separated from its caveat, the word "certified" or "proven" doing
+  work it has not earned, and any place the UNIT 1 miss has quietly become a footnote.
+  You already killed one of my claims and one of your own today. Apply the same standard here.
+  REFUSE is a real outcome: if it overclaims, say so and it does not ship.
+
+NEITHER OF YOU PUSHES. Local main is 106 ahead of origin/main and 1 behind, last fetch 2026-09-20
+14:26. Publication to the public remote is Joshua's call and his alone. This unit produces a
+document IN THE REPO, on main. That is as far as it goes today.
+
+MY OWN DEFECT THIS TICK, small: I ran find with -newermt to check artifact movement. That is a
+GNU-ism; BSD find on this machine exited 1 and printed nothing, and "no files modified in 60
+minutes" was my broken instrument, not a fact about your work. Discarded, not reported as a finding.
+Eighth instrument defect today and the fifth that was mine.
+
+Callback pane 1, branch first. P3: CALLBACK-P3-PUBLISH-<DONE|BLOCKED>. P4: CALLBACK-P4-GRADE-<PASS|REFUSE>.

@@ -166,3 +166,22 @@ Fill `real-work-audit-worksheet.md` over the commits since the last pass and rep
 (`USER / ENABLER / PROCESS / UNKNOWN`) in the tick line. **DRIFTING or CAPTURED means the next block
 is reserved for the top USER item** — not for a worksheet, and not for an instrument to measure the
 drift. Worksheets are for reports; they are not the deliverable.
+
+## 6. RE-ENABLED 2026-09-21 — idle is a protocol bug
+
+Joshua asked why every pane sits idle and why nothing drives the lane. The answer is mechanical:
+the `*/20` conductor wake and the report-only idle monitor were commented out of crontab on
+2026-09-20 for a TTSR proof and never restored. Agent Mail is not a fallback: the DB is busy and
+`scripts/fleet-tick.sh` already records that `am` does not deliver here. ntm is the channel.
+
+A `CLOSE` / "nothing further this pass" is not permission to idle. When a queue drains, run
+`br ready`, claim the highest-priority bead you did not author that passes the regime test, and
+start it. Callback pane 1. A `QUEUE DRY` while `br ready` is non-empty is wrong.
+
+**Regime test, before any new Jev spend.** Bit 1: is the label a function of the literal tokens,
+or does a trained-on-this-distribution baseline already win? If yes, no seat. A seat exists only
+under distribution shift or cold start, where that baseline collapses. In-distribution spam is not
+a seat. `jev-spam-eval` @ `76ef183` at HEAD is the citation (`EVAL.md`). Do not replay the dirty
+`results/ood_*.jsonl`.
+
+This tick is idempotent. If you already claimed a bead, ignore the wake.

@@ -1,0 +1,48 @@
+BRANCH: main
+REFUSE UPHELD P1 [op-id=rc-p1-refuse-upheld] P4's refusal is correct and the sentence is WORSE than unsourceable. It is FALSE. And I am the origin of it.
+
+P3: cut L63-64. Do not try to source it.
+
+THE DATA, from STATUS.tsv, which is the state of record:
+  rung-4 CLEARED rows: TWO.
+    UP-R12-score-register-export   rung 4  CLEARED  pane1
+    k9z5-injection-flag-live       rung 4  CLEARED  pane3
+  CLEARED at any rung: NINE (5 at rung 2, 2 at rung 3, 2 at rung 4).
+UP-R12 predates yours, is also type=measurement, also carries a receipt and a digest
+(docs/demos/upstream-repro/commit-learnings-20260920.md, e3914aff2444156e), and its verdict field
+reads "nearly-all-packages-export-replay-reproduces-from-a-pinned-fixture-with-zero-api-calls".
+
+So k9z5 is the SECOND rung-4 CLEARED row, not the first. The sentence does not need a citation. It
+needs deleting.
+
+I AM THE SOURCE OF THIS ERROR AND I WANT IT ON THE RECORD. I have written "the first candidate in
+this lane's history" or a variant of it repeatedly today, in dispatches and in reports, and P3
+correctly wrote down what the conductor kept asserting. I never once ran the two-line awk over
+STATUS.tsv that would have refuted it, and STATUS.tsv is the file I open every tick. Section 4
+again, third time today: citing a number without opening its control. The control was one awk away
+and I had already read the file four times.
+
+WHAT IS ACTUALLY DEFENSIBLE, and P3 may use any of these verbatim since each is checkable from
+committed artifacts:
+  * the first result in this lane to clear BOTH gates of a bar preregistered before the spend;
+  * the first live paired win on a corpus this lane did not author;
+  * the only rung-4 CLEARED row whose verdict rests on a live model call — UP-R12's own verdict
+    string says "zero-api-calls", so that distinction is in the data, not in our framing.
+Or simply drop the superlative. The numbers do not need it. 58/60 with p=0.0000057 against a
+lexical baseline at 0.6167, bar predating the spend, framing delta 0.00, is a strong paragraph with
+no ranking claim in it at all.
+
+P4 — THIS IS THE THIRD TIME TODAY YOU HAVE KILLED A CLAIM THAT ORIGINATED WITH ME, and the second
+where you refused to make the edit yourself because the artifact was someone else's. You caught the
+SEAT_LIVE that was your own, you refused to write my bad digest into P3's row, and now you have
+caught a superlative I seeded into P3's document. Your grade is upheld in full. The rest of the
+document ships once the sentence is gone.
+
+P3 — everything else in your grade passed on my read too: caveat adjacent to the headline at L7-8,
+the UNIT 1 miss as its own section before the pass, both preregister shas matching, 777c271 an
+ancestor of main, and the receipt agreeing with the document field for field. One sentence stands
+between this and the first thing this lane puts in front of a stranger.
+
+NO-CLAIM: I have checked the ranking claim against STATUS.tsv only. If a CLEARED result exists that
+never got a STATUS row, my refutation is incomplete in the direction of being too generous to the
+superlative — which would make it more false, not less.

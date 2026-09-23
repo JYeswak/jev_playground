@@ -1,0 +1,45 @@
+BRANCH: main
+DISPATCH P3 + P4 [op-id=rc-p1-upstream] Joshua switched all gears to Jev's own repos. We have four first-party trees vendored under upstream/typesafe-ai/ and we have NEVER RUN ONE OF THEM. 239 files. RULE 13 clause 1 says upstream first and we skipped it for four days. One repo each, mine is the adapter.
+
+HARD RULES FOR ALL THREE OF US - these are somebody else's trees:
+  NEVER commit, push, or amend inside upstream/typesafe-ai/*. Not once, not to fix a test.
+  A failing upstream test is a FINDING ABOUT THAT TREE, not a task to fix by editing it.
+  npm install / uv sync are allowed (they write node_modules and .venv). Anything else that dirties
+  the tree must be reported in your callback with `git -C <repo> status --porcelain`.
+  Pin what you ran: report the repo's short SHA from `git -C <repo> rev-parse --short HEAD`.
+  OFFLINE LANE FIRST. Live tests spend money on a shared key. Run the keyless suites, report
+  counts, and STOP before anything named live/integration - callback first and I will authorize.
+
+P3 - UNIT: upstream/typesafe-ai/typesafe-sdk-python @420ef4f (114 files).
+  uv sync, then the full test suite. Report: how many tests, how many pass, how many SKIP and WHY
+  they skip. A suite that silently skips without a key is the defect AGENTS.md names; if it skips
+  cleanly and says so, that is the correct design and worth recording as a pattern we should copy.
+  Read src/typesafe_sdk/_core/questions.py and question_types.py and tell me the EXACT question
+  shapes the SDK supports - every field, every option, including ones we have never used. That is
+  the real deliverable: we have been hand-rolling requests against a wire contract in AGENTS.md
+  while a typed SDK sat unread in this tree.
+  Do NOT run anything that hits the network without calling back first.
+
+P4 - UNIT: upstream/typesafe-ai/typesafe-sdk-js @66880cc (54 files).
+  npm install, then npm test (or whatever package.json declares - read it, do not assume).
+  Then examples/demo.ts: READ it and report what it demonstrates, do NOT run it yet if it calls the
+  API. scripts/check-package.mjs and check-version.mjs are keyless - run those.
+  Same deliverable as P3 but for TS: src/questions.ts and src/types.ts - the exact typed question
+  surface, every option. Compare it against what our own work/jev-client does and name anything we
+  reimplemented that the SDK already ships.
+
+P1 (me) - upstream/typesafe-ai/system-one-adapter-python @0bb819b, the differential oracle. It has
+tests/test_client_with_fake_model.py (keyless) and tests/test_client_with_live_apis.py (spends).
+This is the tree that answers "is Jev better than an LLM at the same questions", which is the
+comparison our entire gauntlet never ran.
+
+WHY THIS OUTRANKS THE QUEUE: Joshua's question was why we keep trying a million things and failing.
+Part of the answer landed already - we tested one of five doc categories. The other part is that we
+never read or ran the vendor's own code. Every request shape we invented, every retry policy we
+wrote, every validator - there is a first-party version of it sitting in this tree, unexecuted.
+
+ACCEPTANCE each: repo SHA, exact commands, test counts pass/fail/skip with skip reasons, tree
+cleanliness, and the question-surface inventory. NO-CLAIM: running a vendor suite green is evidence
+about their code, never about ours.
+
+Callback pane 1, branch first. P3: CALLBACK-P3-SDKPY-<DONE|BLOCKED>. P4: CALLBACK-P4-SDKJS-<DONE|BLOCKED>.

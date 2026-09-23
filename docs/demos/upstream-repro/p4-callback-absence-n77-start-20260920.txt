@@ -1,0 +1,2 @@
+CALLBACK P4 START [op-id=p4-absence-n77-20260920]
+NEED unfinished half: absence-from-one-probe to n=77. Sampling frame and seed will be written BEFORE the draw. Additional 57 cannot stack on the original 20 — those row identities were not persisted. Replacement sample n=77, real transcripts only. Then Wilson at n=77: CERTIFIED if upper<=0.30 else RETIRED.

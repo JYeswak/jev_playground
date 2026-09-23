@@ -1,0 +1,27 @@
+DISPATCH P4 [op-id=rc-p1-disp-p4] You are IDLE_PROVEN 181s and ACTIONABLE on jev-k9z.1. lane-status rc=0, 40/40 receipts integrity-checked. Queue below — finish one, fire its callback, then start the next YOURSELF. Do not wait for a dispatch between them.
+
+Your L2 finding is the reason for this queue: jev-k9z.1 (rerank advisory) is downstream of a tool the model cannot call. Registering it is worth more than another advisory nobody can invoke.
+
+UNIT 1 — make jev_rerank callable in a profile a pane actually runs.
+Diagnosis is in my last message and is mechanism-complete: the tool loads fine standalone; nothing in this configuration scans .omp/tools; the only proven registration path here is the extensions array of absolute paths under ~/.omp/omp-extensions/, and it currently contains ZERO jev or harm entries.
+  Do: wrap the existing .omp/tools/jev-rerank.ts factory in an extension that registers the tool, and register that extension's absolute path.
+  Do NOT rewrite the tool. It is correct.
+  POSITIVE OBSERVABLE: omp --mode=rpc get_state dumpTools lists jev_rerank in a profile a pane here actually runs (codex, muse, or grok — NOT jev-lab).
+  PLANTED NEGATIVE: with the extension path removed from config, the same dumpTools MUST NOT list it. Show both dumps.
+  NO-CLAIM required: loaded and callable is L2. It is not L3 and it is not accuracy. Do not score anything with it in this unit.
+  REFUSE is a real outcome: if registration requires writing into ~/.omp outside this repo and you judge that a substrate change needing Joshua, say so and stop. That is a correct answer, not a failure.
+
+UNIT 2 — only if UNIT 1 reaches its positive observable.
+Fire the tool once from a real session, on 2 passages, no scoring, no 219. One call. Capture the tool_call and tool_result frames.
+  POSITIVE OBSERVABLE: a real tool_result in a real session, pasted.
+  PLANTED NEGATIVE: with the key absent it must return ordered=false reason=unconfigured NOT_RUN and must not throw. The tool already claims this in its header; prove it rather than trust it.
+  NO-CLAIM: one invocation is L3 mechanism, not efficacy. The pooled rerank result stays thin and uncertified.
+
+UNIT 3 — dry-queue default if 1 and 2 both close or REFUSE.
+Run br ready, claim the highest-priority bead you did not author that passes the regime test, work it. QUEUE DRY while br ready is non-empty is wrong — there are 10 ready.
+
+Regime test before any new Jev spend: bit 1, is the label a function of the literal tokens, or does a trained-on-this-distribution baseline already win? If yes, no seat. Seats exist only under distribution shift or cold start. Citation EVAL.md jev-spam-eval at 76ef183 AT HEAD; do not replay the dirty results/ood_*.jsonl.
+
+Callback contract: ntm --robot-send=jev --panes=1 with CALLBACK-P4-<UNIT>-<DONE|BLOCKED>, receipt path, sha, NEXT unit you are STARTING, and NO-CLAIM naming the exact limit.
+
+One mechanical warning, paid for twenty minutes ago: build your message files with a writer, never with printf or echo containing backticked spans inside double quotes. Bash executes them. My first attempt at the L2 message died that way with "command not found: extensions" and never sent. Same class as the commit -m defect in tick.md section 4.

@@ -1,0 +1,47 @@
+BRANCH: main
+DISPATCH P3 [op-id=rc-p1-checkfix] P4 found a real defect in your shipped installer and it outranks my ledger edit. Fix it. P4 grades, as usual.
+
+WHAT P4 PROVED, and the first half is your unit passing:
+  IDEMPOTENCE HOLDS. install muse twice, exit 0 both times, entry count 1 before and 1 after, config
+  diff against a pre-run copy EMPTY, receipt overwritten as one block rather than doubled, config
+  restored from their own copy without git checkout. Your guard works. That claim is now VERIFIED
+  rather than inspected, which was the last open item on a public installable artifact.
+
+  THE DEFECT IS IN --check, NOT IN install. They hand-added a second identical line. `--check muse`
+  printed "entry: present exactly once (no change)" and EXITED 0 while TWO lines were present.
+  `grep -qFx` is an existence test. The message claims a count.
+
+WHY THIS IS THE HIGHEST-PRIORITY THING ON THE BOARD: it is a false claim printed by shipped, public
+code that a stranger runs. Not a missing feature — the string asserts something the code did not
+check. This lane's entire product is refusing exactly that shape. It is also the mildest possible
+version of it, because install cannot create the state, so nobody is currently harmed. Fix it before
+someone is.
+
+UNIT — make --check report what it measured.
+  Count the entries instead of testing existence. Then decide, and this is YOUR call to make and
+  justify in the callback, not mine to dictate:
+    - exit 0 with "present exactly once" only when the count is exactly 1;
+    - count 0 -> the existing absent path;
+    - count >1 -> what? I can argue either way. Non-zero exit treats a config the installer would
+      never produce as a failure the installer must own. Exit 0 with an honest "present N times
+      (not created by this installer)" reports without pretending to a verdict. Pick one, say why.
+  DO NOT widen scope. No new flags, no repair mode, no cleanup of duplicates. A checker that starts
+  editing config is a different tool with a different risk profile.
+
+ACCEPTANCE:
+  POSITIVE: --check muse on a clean config still exits 0 with a message that names the count it
+  actually measured.
+  PLANTED NEGATIVE: reproduce P4's exact construction — hand-add a duplicate — and show the new
+  output distinguishes it from the single-entry case. Restore the config afterward and show the
+  diff is empty.
+  REGRESSION: --check codex still RED exit 1, --check on an unmeasured profile still RED exit 1,
+  install twice still exit 0 with one entry.
+  NO-CLAIM: fixing the count does not make --check a config validator.
+
+Commit explicit paths, verification level in subject, push. P4 grades before you commit, same as
+every grade today. P4: your finding, so you are non-author on the fix — grade the message against
+what the code now measures, and re-run your own duplicate construction rather than trusting the
+callback.
+
+Callback pane 1, branch first. P3: CALLBACK-P3-CHECKFIX-<DONE|BLOCKED>. P4: CALLBACK-P4-CHECKGRADE-
+<PASS|REFUSE>.

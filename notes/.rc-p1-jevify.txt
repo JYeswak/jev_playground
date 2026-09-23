@@ -1,0 +1,50 @@
+BRANCH: main
+DISPATCH P3 + P4 [op-id=rc-p1-jevify] Joshua handed us prior art: github.com/ryana/jevify — a single-file prompt, 39 stars, for investigating what Jev makes possible in an EXISTING project. Reading it exposes a structural hole in our gauntlet that may be the whole reason this lane has zero seats. Two independent angles. Do not coordinate; I want two derivations.
+
+WHAT JEVIFY ASKS THAT WE NEVER DID. It splits opportunity into three kinds — direct savings, better
+outcomes, and NEW CAPABILITIES — and says give the third "substantial attention": evaluate every
+event instead of sampling, assess many candidates at once, react while a user interacts,
+continuously reassess changing state. It also says, flatly: "Do not assume the project needs
+existing LLM calls to benefit."
+
+MY HYPOTHESIS, AND I WANT IT ATTACKED, NOT CONFIRMED: our regime test can only ever KILL. It asks
+"is the label a function of the literal tokens, or does a trained-on-this-distribution baseline
+already win?" That question PRESUPPOSES a label and a baseline — i.e. presupposes we already do the
+task. A capability we do not currently attempt has neither, so it cannot enter the gauntlet at all;
+it exits as unaskable or corpus-absent. If that is right, then "Jev has no application" is a
+property of our admission criteria, not a finding about Jev.
+
+NUMBERS I HAVE, STATED AT THEIR REAL STRENGTH BECAUSE R74 IS ONE HOUR OLD:
+  STATUS.tsv verdicts: 17 HELD, 15 RULED_OUT, 9 CLEARED, 0 PROMOTED. That is a row count.
+  "unaskable" appears 42 times across VERDICT.md and PLAN.md; "corpus absent" twice. Those are
+  OCCURRENCE counts in prose, NOT candidate counts, and zero rows carry UNASKABLE as a verdict.
+  Do not repeat those figures as candidate counts. Derive your own.
+
+P3 — UNIT: classify the record. For every candidate in STATUS.tsv, decide from its receipt whether
+it was a REPLACEMENT (something we already do, by regex, by an existing call, or by hand) or a NEW
+CAPABILITY (something we do not attempt at all today). Report the split and list any new-capability
+candidate by id. If even one exists, my hypothesis is weakened and I want to know it. If the split
+is lopsided, say by how much and name the three closest calls, because the classification is a
+judgment and a lopsided result from a single judge is exactly what this lane refuses.
+  NO-CLAIM: classifying intent from a receipt is not reading the author's mind.
+
+P4 — UNIT: rule on the mechanism, independently, WITHOUT P3's classification. Read jevify's prompt
+text and our regime test as written in the conductor tick and in EVAL.md. Answer one question: can
+our gauntlet, as constructed, ever ADMIT a candidate for which no baseline and no labelled corpus
+exists today? Trace the actual path a such candidate would take through bit 1, bit 2, and the
+corpus requirement from R28. If there is an admission path, name it and my hypothesis dies. If
+there is not, name the smallest change that would create one WITHOUT reopening the authored-corpus
+hole R28 closed — that is the hard part and I do not have an answer.
+  NO-CLAIM: a gap in an admission criterion is not evidence that a new-capability seat exists.
+
+WHY THIS OUTRANKS EVERYTHING ELSE ON THE BOARD: Joshua opened today asking how we can have zero
+applications. We answered with five surfaces, all of which were replacements, and the honest
+finding was "the cheap thing already wins." If our admission criteria structurally exclude the one
+category jevify says matters most, then that answer was never a finding about Jev at all. That is
+worth knowing before we spend another dollar or write another ruling.
+
+NOT A UNIT AND DO NOT START IT: actually running jevify against a real product. That needs a target
+project and that is Joshua's call, not ours. Establish the mechanism first.
+
+Callback pane 1, branch first. P3: CALLBACK-P3-CLASSIFY-DONE with the split. P4: CALLBACK-P4-ADMIT-
+<PATH-EXISTS|NO-PATH> with the trace.

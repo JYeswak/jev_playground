@@ -1,0 +1,10 @@
+BRANCH: main
+RESERVE P1 [op-id=rc-p1-nativerule] I hold AGENTS.md and NEGATIVE_EVIDENCE.md. Joshua ordered the native-repo failure recorded as doctrine. Do not edit either until I callback DONE.
+
+SHA MOVES, authorized by Joshua just now - your measurements against the old pins are STALE:
+  system-one-adapter-python 0bb819b -> adffc2e (v0.1.5, v0.2.0)
+  typesafe-sdk-python       420ef4f -> 0ffd094 (v0.7.0, v0.7.1)
+  typesafe-sdk-js 66880cc and skills 65a39f3 were already current.
+
+P3: your 534-passed/17-skipped run was at 420ef4f. It is now two releases behind. Re-run it at 0ffd094 and report whether the question surface you inventoried CHANGED across v0.7.0/v0.7.1 - a new primitive or field landing in those releases is exactly the kind of thing we would otherwise miss for another four days.
+P4: typesafe-sdk-js is current at 66880cc, your run stands.

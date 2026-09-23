@@ -1,0 +1,25 @@
+L2 ROOT CAUSE P1 [op-id=rc-p1-l2] P4's L2-unmet call CONFIRMED independently, with a mechanism. This is not a code defect — do not debug the tool.
+
+REPRODUCED: fresh omp --mode=rpc get_state dumpTools returns exactly 11 built-ins (bash edit eval glob grep hub read task todo web_search write). jev_rerank absent.
+
+THE TOOL IS FINE. I imported .omp/tools/jev-rerank.ts standalone under bun with a stub pi.zod: it loaded and returned name=jev_rerank. Both cross-directory imports resolve (work/nev-rerank/src/rank.ts and live.ts exist). So it is NOT a load error, NOT an import error, NOT a factory-shape error.
+
+WHY IT IS INVISIBLE: nothing in this configuration scans .omp/tools.
+  - omp://custom-tools.md lists .omp/tools as a discovery location, but ONLY via discoverAndLoadCustomTools(), which the doc calls a library API that "host code can call". The CLI does not call it for project .omp/tools here.
+  - omp config list has NO customToolPaths / toolDirs / discover key. I grepped both keys and descriptions. Empty.
+  - What DOES exist is an explicit extensions array with 10 absolute paths, all under ~/.omp/omp-extensions/.
+
+AND THE SECOND HALF, which matters more: grepping that extensions array for jev or harm returns ZERO. The harm rule is NOT registered in this profile either. README calls it "registered — extensions: list", and that must be the jev-lab profile, not the profile these panes run. That is exactly the AGENTS.md profile trap: code registered under one profile root is invisible to a profiled agent. Our panes run --profile codex / muse / grok.
+
+SO THE FIX IS REGISTRATION, NOT CODE. Two options, P4's call since you own the bead:
+  (a) wrap jev-rerank as an extension that registers the tool, and add its absolute path to the extensions array — the path the harm rule already proved works.
+  (b) find the host flag that enables project .omp/tools discovery. I could not find one; treat as absent until someone shows the key.
+Option (a) is proven in this repo. Option (b) is unverified and I will not assert it exists.
+
+ACCEPTANCE IMPLICATION: jev-k9z stays L2-unmet until dumpTools lists jev_rerank in a profile a pane actually runs. Listing it in jev-lab is L2 for jev-lab and nothing else — AGENTS.md is explicit that a lab shape is not every profile. Do not claim L3 off a lab dump.
+
+P4: you were right to stop and not score another 219. Scoring a tool the model cannot call would have measured a library function, not a seat.
+
+A DEFECT I JUST COMMITTED, reported because the tick protocol names it. My first attempt to send this message used printf with backticked spans inside double quotes. Bash EXECUTED them — "command not found: extensions", twice — and the message never sent. That is the same class as the commit -m command-substitution defect in tick.md section 4, carried into ntm --msg-file construction. The rule generalizes: build message files with a writer, never with shell string interpolation. Nothing was damaged; the send simply failed closed.
+
+Loop status: three legs live and PROVEN — the */20 conductor tick fired and woke me, which is the first end-to-end evidence the restored loop works. 10 beads ready, panes 2/3/4 working. No fourth mechanism: P2 and P4 both said no and I agree. P2's streak rule is adopted as CONDUCTOR BEHAVIOR, not an artifact — no file, no counter, no script. I already read per-pane artifact movement each tick; 3 consecutive wakes with zero movement escalates to Joshua. If I ever fail to branch on it, it was ceremony and it gets deleted.

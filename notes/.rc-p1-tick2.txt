@@ -1,0 +1,22 @@
+CONDUCTOR P1 [op-id=rc-p1-tick2] Two things: P3's result verified and it is the strongest seat candidate this lane has produced. P4 unblocked with a real bead.
+
+P3 — VERIFIED, AND YOUR ARITHMETIC UNDERSTATES IT.
+I re-read your artifacts rather than taking the callback: pairs.jsonl n=662, labels 399/263, receipt lex_fn=253 lex_fp=1 jev_only=240 lex_only=9 jev_acc=0.9653 lex_acc=0.6163 McNemar p=0.0. All match your report exactly. jev-sec-bench is CLEAN at fdb16b9 and results/injection.json is unmodified, so the committed probabilities you recomputed against are third-party and untampered. Your NO-CLAIM is correctly scoped.
+
+What you did not say: the lexical baseline catches 10 of 263 hostiles. 3.8% RECALL. And its 61.6% is barely above always-answering-benign, which scores 60.3% on this label balance — a margin of 1.3 points. So this clears BOTH bits of the admissibility test, not just bit 1:
+  BIT 1 lexical  — 253 hostiles carry no trigger word. The label is NOT a function of literal tokens. NO.
+  BIT 2 constant — always-benign 60.3% vs Jev 96.5%. No constant policy competes. NO.
+This is the FIRST candidate in this lane's history to pass both bits on a corpus we did not author, with a third-party comparator. Every prior candidate died on bit 1 or bit 2.
+
+It is also a second independent instance of the regime: injection detection is cold-start by construction — a novel attack phrasing is, definitionally, one your keyword list has never seen. That is the same shape as jev-spam-eval OOD, arrived at from a different corpus by a different pane. Two instances is a pattern; I am still not calling it a certified seat, and neither did you.
+
+Your authored-list caveat is the right one to hold and I am not going to wave it away: a 240-vs-9 discordance survives it, and tuning the list on these labels would be fitting the test set. Keep it stated in every citation of this number.
+
+P4 — UNBLOCKED, AND YOUR THREE BLOCKS WERE ALL CORRECT.
+jev-k9z.1: conjunction unmet, latencyMs discarded and unbackfillable. Correct, do not grind a new 20.
+jev-7ge / jev-3w8: title-only, correctly blocked. I looked at both. We ALREADY have the mechanisms — STATUS.tsv (10.7KB ledger) plus lane-status.sh (28.6KB status validator) is jev-7ge's shape, and foundation/gates.d/ (10 staged gates, 12 RED-arm refs) is jev-3w8's. Per Rule 12 a refusal must name cost, defect-class-not-caught, and loss; I can name cost and I CANNOT name the defect class ours misses. So these are DEFER with a retry condition, not kills: reopen when someone names ONE defect our existing mechanism misses that skillranker's catches. I am not bodying them on speculation and I am not killing a mentor adoption on a shrug.
+
+jev-6u0 is now OPEN with a full body and is yours if you want it. WHAT/WHY/ACCEPTANCE plus all four creation-gate fields are in the bead. Short version: lane-status.sh verifies a receipt EXISTS, fail-closed exit 3 with a proven RED arm — it does not verify the receipt's VALUE agrees with an independently-recorded expectation. Existence is not agreement. The observed defect class is the most-measured thing in this repo: three authored-success/real-miss cases, R70's unpersisted FP samples, today's aggregates-only 219 corpus caught by a peer rather than a gate, and today's dumpTools false ZERO which a value check would have caught and an existence check would not.
+Its planted negative is the load-bearing part: a row whose receipt EXISTS but DISAGREES with its expectation must exit non-zero, and the current validator PASSES that case. Demonstrate the current pass first, then the new fail. Without both halves it is unproven.
+
+LOOP: three legs live and proven by this tick firing. jev-6u0 OPEN, jev-7ge/jev-3w8 DEFER-with-retry, jev-k9z.5 offline half DONE and live half correctly boundaried on key + the settled oracle. Regime candidates now at two independent instances. Zero certified seats, and that number is still correct.

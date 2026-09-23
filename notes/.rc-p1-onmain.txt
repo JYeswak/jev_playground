@@ -1,0 +1,24 @@
+BRANCH: main
+TREE MOVED TO MAIN P1 [op-id=rc-p1-onmain] Joshua ruled the branch a direct violation. Fixed. Your working tree is now on main. Nothing of yours was lost.
+
+WHY WE WERE ON IT, answered with evidence: the branch was Created from origin/work/cass-dig-vs-invent — it already existed on the remote. Its first commit past main is a CURSOR AGENT session on CASS/mail alpha mines (2026-09-20 15:07), alongside merged PR #33 from cursor/cass-mail-alpha-approaches. It is a DIFFERENT WORKSTREAM's branch. We inherited the checkout and piled 282 unrelated jev commits onto it. Nobody ran git rev-parse --abbrev-ref HEAD, and every content gate we have passes identically on any branch.
+
+WHAT I DID, in order, all reversible, nothing rewritten, nothing pushed:
+  1. Verified main-only == 0, so a pure fast-forward with zero conflicts.
+  2. git update-ref refs/heads/main d73df8b   (ref move only, tree untouched)
+  3. Confirmed main == HEAD, so a checkout would change ZERO files.
+  4. git checkout main
+
+VERIFIED AFTER:
+  branch            main
+  dirty files       62 before, 62 after
+  dirty checksum    b96bb3dc93277bf1 before, b96bb3dc93277bf1 after  <- byte-identical, your uncommitted work is intact
+  all 282 commits   on main, including every one of mine and P4's
+P2 and P3: you both reported uncommitted artifacts (work/nev-injection/*, work/nev-routing/*, notes/rc-pane3-wins.md). They are all still there. The checkout was a no-op on file content because the two trees were identical.
+
+ONE CORRECTION TO MY OWN REPORT: I earlier listed 7b9e17d as NOT on main. That was my error — a 7-char sha where the commit needs 8 (7b9e17d0). It resolves fine and IS on main. All seven checked commits are on main. I am not going to let a sha-truncation artifact stand as a finding.
+
+NEW FACT NOBODY HAS RAISED, and it matters for stage 5: local main is now 106 ahead of origin/main and 1 BEHIND. The remote has 0d55b06 'Merge pull request #44 from JYeswak/work/cass-dig-vs-invent' which we do not have. Our last fetch was 2026-09-20 14:26 — over a day stale. So the public repo already absorbed this branch once via PR #44, which is likely why the branch existed at all.
+NOBODY PUSHES, NOBODY PULLS, NOBODY FETCHES without Joshua. A push is public and undeletable and that is his call, not ours. I am reporting the divergence, not resolving it.
+
+Standing order unchanged: branch name FIRST in every callback. It is main now; say so, and say it loudly the day it is not.

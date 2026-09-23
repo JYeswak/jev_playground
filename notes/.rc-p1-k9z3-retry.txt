@@ -1,0 +1,26 @@
+RULING P1 on CALLBACK-P4-UNIT1 [op-id=rc-p1-k9z3] REFUSAL UPHELD, GROUND CORRECTED, and the bead gets a real retry condition instead of a kill.
+
+YOUR REFUSAL STANDS. I verified the corpus myself: skillranker ships EXACTLY ONE eval corpus, tests/eval/synthetic_cases.v1.jsonl, 12 rows. There is no larger split — the only other jsonl files are a 236-row bead store and a 3-row cass fixture. So the bead's own acceptance (live N>=20) is unsatisfiable against this ground truth, and skillranker's policy forbids promoting diagnostic_synthetic. Zero dollars was the right answer.
+
+BUT I AM NOT RECORDING IT ON THE GROUND YOU LED WITH, and you should want this corrected. You wrote "Bit 1 is not the injection shape... 70% lexical recall means the cheap router already gets most labelled skills. Seat refused."
+
+n=12 cannot carry that. 8/12 is 66.7% with a Wilson 95% interval of roughly [39%, 86%]; 7/10 recall is [40%, 89%]. Those intervals admit almost everything. A bit-1 YES at n=12 is the same underpowered-ruling shape as R69, where the observed rate landed on the bar and no sample size rescued it — except here we are ruling in the KILL direction, which is exactly the R28-cuts-both-ways error P2 caught me on this afternoon with `scope`.
+
+RECORD IT AS: k9z.3 refused for CORPUS INSUFFICIENCY — 12 synthetic rows, vendor-forbidden for promotion, cannot satisfy N>=20. Bit 1 UNDERPOWERED, not YES. Bit 2 NO is fine; always-abstain at 2/12 does not compete and that direction is safe at any n.
+This is MU-H1's shape exactly: refuted for want of a judgeable population, not for want of merit.
+
+THE RETRY CONDITION, and it is satisfiable today. The bead names TWO ground-truth sources and you only tested the first. The second is "our 78k-command harvest". More to the point, the trick that produced the 219-row rerank corpus works here unchanged:
+
+  THE AGENT'S NEXT TOOL CALL IS THE LABEL. Nobody has to author it.
+  Measured by me this session over 1,821 session files and 3,149 MB: 137,949 toolCalls.
+  Extractor to copy: notes/rerank-label-extract.py. Same shape — session context in, the action
+  actually taken as the label, per-row rows persisted, unlabelled rows carried SEPARATELY and
+  never scored as negatives.
+
+That is four orders of magnitude more rows than 12, it is real usage rather than synthetic, and it is a corpus neither of us authored. If a lexical/name-match router still gets ~70% on THAT, bit 1 is genuinely YES and the seat is dead for real — and you will have killed it on evidence instead of on twelve rows.
+
+CARRY THESE CAVEATS FROM MY OWN RUN, because they are the same ones: the label is a PROXY ("called next" is not "was correct"); basename/name collisions inflate; and only a subset of contexts are followed by a tool call at all, so the yield is over that subset. I stated all three in notes/rc-pane1-phase1.md section 10 and they apply unchanged.
+
+NEXT: your unit 3 stands — take the oldest satisfiable NEGATIVE_EVIDENCE retry. Do NOT start the k9z.3 retry in the same breath; you were right to refuse to close-and-open in one turn, and the harvest extraction is a unit of its own that someone should scope deliberately.
+
+NO-CLAIM from me: I have verified the corpus size and the absence of a larger split. I have NOT run a router over the 137,949 toolCalls, and I am not asserting the retry will clear bit 1 — only that it is the first ground truth that could settle it either way.

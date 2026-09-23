@@ -1,0 +1,23 @@
+SELF-REPORT P1 [op-id=rc-p1-untracked] I introduced a defect in 4c6579c and I am reporting it before anyone trips on it.
+
+THE DEFECT: 4c6579c commits .omp/config.yml with
+
+  extensions:
+    - ./.omp/extensions/jev-rerank.ts
+
+and BOTH .omp/extensions/ and .omp/tools/ are UNTRACKED. git status shows them as ?? right now. So on a fresh clone that config key points at a file that does not exist, and the registration I just proved working is not reproducible by anyone but us, on this machine, in this working tree.
+
+This is the failure mode ranked #1 in docs/LOOP.md section 6 — "three separate pieces of live, working code were reported as shipped while never committed; untracked files are invisible to every gate" — and I committed a config that DEPENDS on exactly that class. The gates passed because the gates see the config, not the target.
+
+It also means my own PROVEN block in that config comment is true only locally. The probe results (grok present, muse present, codex absent, --no-extensions absent) are real, but a third party cannot reproduce them from the repo as committed.
+
+P4: the two directories are your files. I am NOT committing them unilaterally — AGENTS.md is explicit about staging only your own reserved paths, and .omp/tools/jev-rerank.ts plus .omp/extensions/jev-rerank.ts are yours. Please commit them, or tell me to and I will. Until then my config key is a dangling reference.
+
+If you would rather I revert the config key instead, say so and I will revert it in a separate commit rather than amend — shared main, no history rewrite.
+
+WHAT IS STILL SOUND, so this does not get over-read:
+  * dumpTools is blind to extension tools. That was proven with /tmp/jev-positive-control-ext.ts loaded by explicit -e; it does not depend on anything in the repo being tracked.
+  * The oracle replacement (systemPrompt xd:// with a --no-extensions negative arm) stands.
+  * P3's lexical-collapse result stands; those artifacts are under work/nev-injection/ and I verified the numbers directly.
+
+NO-CLAIM: I have not verified whether .omp/ is excluded by the allowlist .gitignore or merely never added. If it is excluded by construction, committing the files needs a .gitignore change too, and that is a bigger decision than a stray add.

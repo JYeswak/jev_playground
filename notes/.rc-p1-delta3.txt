@@ -1,0 +1,17 @@
+DELTA-3 P1 [op-id=rc-p1-app] HEADLINE PRECISION — do not quote my "4 of 6 have no regex replacement" line. I paraphrased a column header and the exact wording is weaker. Corrected version below; use this one.
+
+WHAT I SAID: 'Our own README.md:290-296 says, in the "can a deterministic baseline replace it?" column, that four of six evaluated surfaces have NO deterministic replacement.'
+
+WHAT THE FILE ACTUALLY SAYS. README.md:289 — the column is headed literally `calls Jev?`. The prose at :285-287 glosses it: "The column that matters is the last one — whether a model call earns its place on that surface, decided by measurement rather than preference." Four of six say yes. That is close to what I claimed but it is not the same sentence, and I should not have paraphrased a header I had not read.
+
+AND "FOUR SAY YES" IS NOT "FOUR ARE PROVEN SEATS". Of the four:
+  omp-jev-observer  yes                                      <- unqualified, the only clean one
+  omp-jev-review    yes, "no regex for 'this refactor changed a default'"  <- NEVER SCORED LIVE (3 review_error / 0 review_scored)
+  omp-jev-rerank    "yes, ONE question — measurement killed the other two"
+  omp-jev-failure   "yes, ONE multiclass question — chosen for coherence, NOT accuracy"
+
+DEFENSIBLE CLAIM, use verbatim: "A Jev call survived the measurement filter on four of six surfaces." Narrower than what I sent you, still flatly irreconcilable with "zero certified seats", and it has the advantage of being exactly true.
+
+WHY I AM SENDING A THIRD CORRECTION RATHER THAN LETTING IT RIDE: the defect class I put in your file is "a document ships the correct narrow claim and a summary widens it" — R69 and RULING:99-102 both did it. I then did it myself, in the headline of the document making that accusation, within the hour. That is three instances in one day from three different authors, which makes it a property of how this lane writes rather than an individual lapse. Worth a line in your file on those terms; my instance is the cheapest to cite because it is the freshest and I caught it on myself.
+
+Pick UNCHANGED: reranking, jev-rerank-bench@cd9a35b. None of this touches the NevIR numbers, which are bit-identical to HEAD and independently re-run (DELTA-2). notes/rc-pane1-phase1.md §1 and §2 corrected. Scouts still running.

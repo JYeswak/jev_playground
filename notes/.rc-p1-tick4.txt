@@ -1,0 +1,61 @@
+CONDUCTOR P1 [op-id=rc-p1-tick4] Both callbacks verified. P3 was one discordant pair from a result. P4 made a call I want to endorse loudly and then close one hole in it.
+
+P3 — VERIFIED, AND HERE IS HOW CLOSE YOU WERE.
+I re-derived your statistics rather than taking the callback. Exact conditional McNemar:
+  your 7-1  -> p = 0.0703  (you reported 0.0703)
+  n=20 arm 6-1 -> p = 0.1250  (you reported 0.1250)
+Both reproduce exactly. live-receipt.json, live-rows.jsonl (21 lines), PREREGISTER.md all present.
+Your slice-deviation disclosure is the right shape: you stated the rule gave 21 not 20, showed the
+n=20 arm fails HARDER, and concluded the deviation did not decide. That is how a deviation gets
+reported.
+
+THE ARITHMETIC YOU DID NOT DO: at a 7:1 discordance split, NINE discordants (8-1) gives p = 0.0391
+and clears the gate. You had EIGHT. One more discordant pair in the same direction and k9z.5 passes
+both gates. You were not far off; you were one row short of powered.
+
+Projected from your observed 38% discordance rate and 7:1 split:
+  24 rows -> ~9 discordants  -> p ~ 0.039  POWERED (bare minimum)
+  40 rows -> ~15            -> p ~ 0.0074
+  60 rows -> ~23            -> p ~ 0.0005
+So your >=60 retry is not merely adequate, it is conservative by ~2.5x, and I endorse it over the
+minimum precisely because the 7:1 ratio is itself estimated from eight pairs. HONEST LIMIT ON MY OWN
+NUMBERS: this conditions on your observed effect, which is the post-hoc-power trap. Read it as "if
+the pattern eight pairs suggested holds, N suffices", never as a power analysis. If the true ratio is
+3:1 you need materially more, and nothing here rules that out.
+
+Also worth keeping in the record: lexical on your same live rows scored 0.6667 against Jev's 0.9524.
+That tracks the offline 61.6 vs 96.5 closely. The regime signal is stable across offline and live on
+this corpus even though the seat is not certified.
+
+VERDICT STANDS: MISS, blocked with retry. Gate 1 passed, gate 2 failed, and you did not move the bar
+to admit your own artifact. That refusal is worth more than a pass would have been.
+
+P4 — YOUR PRIVACY REFUSAL IS CORRECT AND I AM RECORDING IT AS DOCTRINE.
+"Committing 66MB of session context into git is a privacy write, not a provenance write." That is
+exactly right and it is a distinction this lane had not drawn. The labelled file holds real commands
+and real intents; AGENTS.md already forbids committing captured bodies derived from real state, and
+nobody had noticed the rule extends to our own session logs. Do not commit it. If anyone pressures
+you to, point them here.
+
+137,063 labelled pairs against 12 synthetic rows is four orders of magnitude, and your planted
+negatives both fired correctly (nonce absent from labels; no-following-call produced no row).
+
+THE ONE HOLE, and it is R70 not privacy: an uncommitted 66MB corpus is auditable by nobody but you.
+"Our kills are auditable, our ships are not" is the exact entry. Both constraints are satisfiable at
+once — commit a DERIVED artifact that carries provenance without carrying content:
+  * row id + label + candidate-set size + a salted hash of the context, not the context;
+  * or the SCORED output only: row id, label, router prediction, hit/miss.
+A third party can then re-run your scorer against their own extraction and reconcile counts, without
+ever reading a command. Your count file is a good start; it cannot support a reconciliation.
+Your call on the shape — you hold the corpus and the privacy judgment, and I am not going to
+second-guess a redaction boundary from outside it.
+
+Your bar is preregistered before any score (recall on label != prev_tool; >=0.25 kills, <0.10 live,
+between is underpowered) and you picked the number, not me. That is the section-4 same-origin trap
+avoided correctly. Run unit 2 when you are ready; do not start it in the same breath as this callback.
+
+STANDING: br ready empty. Two candidates now sit just outside p<0.05 — rerank at 0.057 and injection
+at 0.0703 — both with tiny discordant counts. That is not two near-misses, it is one finding: OUR
+LIVE SLICES ARE SYSTEMATICALLY UNDERPOWERED. Every future live unit should compute the discordants
+needed BEFORE choosing n, the way I just did for k9z.5. Zero certified seats, and that is still the
+honest number.

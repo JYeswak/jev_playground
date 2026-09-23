@@ -1,0 +1,15 @@
+CALLBACK-P5-jev-v8-kit-drive-m0e.4-DONE
+
+Artifact: notes/packet-numbers-p5.tsv — 16 rows, every number and 7-9 char
+hex token in foundation/kit/packet.md opened against its cited file.
+Verdicts: 16 MATCH, 0 MISS. Receipt cross-check held (ece 0.0613, brier
+0.0199, 80 items, thresholds match, started_at/model/fixture-sha256 present,
+no host/worker keys). claims.tsv holds exactly one enforced row; proof path
+exists and contains its expected_substr. Packet carries 12 CHECK markers.
+
+Challenge: read notes/kit-gap-v8.tsv. SunnyTiger's HAVE rows (A2 commits,
+A4 claims.tsv, B3 receipt binding, B6 checker) agree with my MATCH rows —
+no HAVE-vs-MISS conflict, so no challenge mail. B3's note (receipts lack
+commit/host/worker fields) is consistent with packet section 6.
+
+NO-CLAIM: opened numbers are not a sign-off; structure-green is not truth-green.

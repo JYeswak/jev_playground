@@ -1,0 +1,33 @@
+{
+  "generated_at": "2026-09-21T20:20:00Z",
+  "lane": "offline",
+  "corpus": "skillranker/tests/eval/synthetic_cases.v1.jsonl",
+  "n": 12,
+  "split": "diagnostic_synthetic",
+  "decision_rule_before_scores": "If either bit is YES, not a seat. Bit 1 YES if a name-match router recalls the labelled skill on most nonempty rows. Bit 2 YES if a constant policy competes.",
+  "lexical": {
+    "accuracy": "8/12",
+    "accuracy_pct": 0.667,
+    "nonempty_y": 10,
+    "recall": "7/10",
+    "recall_pct": 0.7,
+    "misses": [
+      "synthetic-planning-explanation-skill",
+      "synthetic-overflow-retrieval-paraphrase",
+      "synthetic-operational-semantics"
+    ]
+  },
+  "always_abstain": {
+    "accuracy": "2/12",
+    "accuracy_pct": 0.167
+  },
+  "bit_1": "NOT a collapse. Name-match recall 70% on nonempty Y. Not the 3.8% injection shape.",
+  "bit_2": "NO. Always-abstain is 2/12. A constant does not compete.",
+  "seat": "NO",
+  "reason": "Bit 1 does not clear the collapse bar that admitted injection. Corpus is n=12 diagnostic_synthetic, which skillranker's own policy forbids promoting. The 5x-vs-abstain figure is a weak constant, not a lexical failure, and was not re-derived as a live Jev score this pass.",
+  "planted": {
+    "nonce_not_in_roster": "lexical arm only returns a roster id or null",
+    "empty_context_abstains": "zero token overlap returns null"
+  },
+  "no_claim": "Does not rescore Jev. Does not say Jev cannot beat 8/12. Says this corpus does not admit a seat."
+}

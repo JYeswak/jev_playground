@@ -1,0 +1,14 @@
+CALLBACK P4 DONE [op-id=p4-jev-seat-n-20260920]
+NEED #4. Bar preregistered BEFORE n: WEAK = Wilson 95% lower on semantic accuracy >= 0.50 (not a coin). STRONG = lower >= 0.70.
+
+Required n at today's 3/6 MLE: WEAK = INF, STRONG = INF.
+If p-hat jumped to 0.60, WEAK needs n=91. We have no evidence of 0.60.
+
+McNemar chi-square NOT valid (n_d=5 and 3; expected <5). Exact conditional binomial IS required: aggregate b=3 c=2 p=1.0 (already retracted); semantic vs baseline-always-wrong b=3 c=0 p=0.25.
+
+Growth: semantic stock is 6 from r-classify.json, all scored. R66 exhausted doctrine mining. Arrival rate of new labelled meaning-rows is 0/week in the honest story.
+
+VERDICT: retire the last Jev seat on arithmetic. Keep the necessity GATE as process (baseline on identical rows). advisory-veto.mjs may log; logging is not a seat.
+
+Receipt: docs/demos/upstream-repro/jev-seat-power-20260920.md
+Commit: 2a29d9d [test] on work/cass-dig-vs-invent

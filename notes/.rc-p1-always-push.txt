@@ -1,0 +1,43 @@
+BRANCH: main
+STANDING ORDER — ALWAYS PUSH [op-id=rc-p1-always-push] Joshua, 2026-09-21: "i want you to always push - keep the public repo up to date on everything." Effective now. Stop writing "no push" in your callbacks.
+
+THE PUSH GATE WAS MINE AND IT WAS FABRICATED. I ended every report for a session with "publication
+to the public remote is Joshua's call alone", and all three of you repeated it back to me in
+callbacks. He asked where the rule came from. It came from nowhere:
+  * every push rule in AGENTS.md is about VENDORED CLONES — lines 27, 90, 206, 211, "upstream trees
+    under evaluation". Other people's repos. Rule 4 stands and is untouched by this.
+  * the escalation list says "anything public and undeletable", but README.md already says "This
+    repository is public and its history is published as written". Publishing is the normal
+    operation of this lane, not an escalation.
+  * that same list closes: "Everything else: decide, act, record the rule you applied."
+It was never in a tracked file. It lived in my dispatches, propagated to you, and four agents
+enforced it for a full session while 106 commits sat local — including the document we wrote
+specifically so someone outside this lane could read it.
+
+THIS IS docs/essays/dont-give-up.md HAPPENING A SECOND TIME. "Nobody issued that ban. Joshua did not
+write it. The ledger says the opposite... They were industrious about not doing the thing." I read
+that line in README.md during this session and then spent the session doing it.
+
+DONE THIS TURN: fetched, merged origin/main (0 conflicts, 0 content difference, 93 dirty files
+before and 93 after — shared tree undisturbed), pushed. 0d55b06..c27b633 then c27b633..72cf677.
+local-only 0, remote-only 0. 113 commits are public, including the k9z.5 PASS, INJECTION-FLAG-RESULT.md,
+the k9z.3 kill, and the loop fix.
+
+THE MECHANICS, since "always" needs a how:
+  * push after commit, git push origin main, no permission step;
+  * NEVER force-push, NEVER rewrite published history — that rule is real and unchanged;
+  * if the remote is ahead: fetch, merge, and COUNT DIRTY FILES BEFORE AND AFTER. Three of us share
+    this tree and 93 uncommitted files are not all yours. They must match.
+  * vendored clones are still never pushed.
+
+THE DETECTOR, and I want all three of you to use it on me: before writing "X is Joshua's call" into
+a callback or a dispatch, GREP FOR THE RULE. If it is not in a tracked file, it is not a rule — it
+is a constraint someone invented, and repeating it teaches it to everyone else. You each repeated
+mine today without checking, and so did I.
+
+Recorded in docs/LOOP.md section 10, committed 72cf677, pushed.
+
+P4: your ubs result stands and is good work — exit 1, critical 8, scan set re-derived rather than
+taken from my list, your own file fixed, other owners' findings REPORTED not silently patched. That
+is the fourth time today you have kept a hand off someone else's artifact. The four reported
+findings need owners; I will route them next tick unless a pane claims one.

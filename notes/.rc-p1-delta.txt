@@ -1,0 +1,24 @@
+DELTA P1 [op-id=rc-p1-app] PROVENANCE VERIFIED — my rerank numbers survive a tamper check. Read this before you build on them.
+
+I nearly handed you a fooled certificate. Before claiming the $0 reproduction I ran git status on the clone: THE TREE IS DIRTY. results/{nevir,significance,summary}.json, summary.md, runs.jsonl, calibration_nq.png all modified. Every number in my callback had come from a locally modified file.
+
+I diffed HEAD vs working before going further. THE VALUES ARE BIT-IDENTICAL:
+  bm25            0.022415039768618944  ==  0.022415039768618944
+  cohere-pro      0.6695589298626174    ==  0.6695589298626174
+  jev-score-batch 0.7114967462039046    ==  0.7114967462039046
+  and all four bootstraps match on diff, p AND both CI bounds (seed=0 in significance.json).
+The 27,193-line diff is JSON re-serialisation plus a re-rendered matplotlib PNG (176454 -> 176447 bytes). No measured value moved.
+
+WHO AND WHAT IT COST: runs.jsonl gained 3 rows dated 2026-09-18T19:00-19:01Z — a sibling pane ran a scifact slice three days ago. One row reads "calls": 300, "cost_usd": 0.166619 next to "new_this_run": 0, which LOOKS like $0.17 of shared budget. It is not. run.py:50-60 — `done` (-> new_this_run) increments ONLY inside the as_completed(futures) fetch loop; `calls` and `cost_usd` sum over all_rows, read from cache.rows, i.e. the whole cache replayed. new_this_run:0 = zero fetches = zero fresh spend. The dollar figure is replayed historical accounting.
+
+NET EFFECT ON MY PICK: STRENGTHENED, not weakened.
+- "$0 to reproduce" is now VERIFIED rather than asserted — a sibling already replayed a slice from cache at zero fresh cost and the accounting fields prove it.
+- The values are stable across an independent re-run, on a different day, by a different pane. That is better provenance than "read from a committed file", which is all I had an hour ago.
+
+Two operational notes for your build:
+1. The clone is dirty. If you cite it, cite HEAD (cd9a35b) values, or commit nothing and say you read the working tree after diffing it. Do not let the dirty state go unreported in EVAL.md — AGENTS.md is explicit that an undisclosed local edit poisons every number measured against the tree.
+2. A sibling pane is or was active in jev-rerank-bench. Before you run anything there, check with them — two panes running the scorer in one clone is a self-inflicted flake, and the .venv is already built.
+
+BOUNDARY UNCHANGED AND TIGHTENED: I did not execute the scorer myself; I diffed a re-run a sibling had already performed. Full-corpus offline replay still unexecuted; uv sync not run by me. 8-dataset headline is a TIE (+0.0009), not a win. The win is negation only, and whether negation-sensitivity occurs at a measurable rate in OUR retrieval traffic is unestablished — that is the B3 measurement and it can still kill the seat.
+
+Detail in notes/rc-pane1-phase1.md §8. Still not building. 7 scouts running; further delta only if they beat rerank.

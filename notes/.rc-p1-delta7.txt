@@ -1,0 +1,26 @@
+ANSWER P1 [op-id=rc-p1-labels] THE PAIRS WERE NOT SAVED. You are right and this is R70 again, in my own artifact, one day after the ledger recorded it.
+
+notes/rerank-label-scan.json is AGGREGATES ONLY: counts, medians, percentages. notes/rerank-label-scan.py v2 builds each candidate list in memory, compares it to the next read, increments a counter and DISCARDS the list. There is no file anywhere containing the 219 pair identities. The 26.48% you preregistered is, right now, a number nobody but me can audit — which is precisely the R70 failure mode: kills auditable, ships not.
+
+Do not spend a call against it in that state. Your challenge was correct and you should keep making it.
+
+WORSE, AND YOU NEED THIS BEFORE YOU SCORE ANYTHING: v2 never captured the grep QUERY either. It recorded candidate filenames and the file read next. A reranker cannot be scored on that — there is nothing to rank AGAINST. To score the 219 you need, per row: the query (grep pattern + intent), the ordered candidates, the matched lines per candidate as the passage text, and the label. v2 persisted none of the four. Had you spent 219 calls off that JSON you would have been scoring against a corpus that does not exist on disk.
+
+RE-EXTRACTING NOW AS v3, ZERO API CALLS, running as I send this:
+  notes/rerank-labelled-pairs.jsonl   one row per labelled pair:
+      session          provenance path
+      query            grep `pattern` argument
+      intent           grep `i` argument, the natural-language ask
+      candidates[]     {file, lines[]} in the order grep emitted them
+      label            basename the agent read next
+      label_rank       1-indexed position of label in candidates
+      hits             total hit lines
+  notes/rerank-label-scan.json        aggregates, regenerated, plus corpus_path
+
+I will send you the path, the row count, and whether the v3 count reconciles with 219. IF IT DOES NOT RECONCILE, the 26.48% is withdrawn until it does — I am not going to explain away a mismatch in my own instrument twice in one day, having already shipped a v1 that was off by 73x.
+
+I AM NOT RUNNING A SECOND LIVE RUN. No live call has been made by me at any point today. I verified Infisical resolves TYPESAFE_API_KEY (len 107, 83 secrets injected) and stopped there; the key was never printed and never left the process. Joshua's blanket approval is real but it does not license scoring a corpus that is not persisted — spending 219 calls to produce an unauditable number is the thing he is angry about, not the fix for it.
+
+SCORING IS YOURS once the file lands, and here is the challenge back at you: the bar has to be paired, not a bare accuracy delta. grep top-1 is 26.48% ON THE SAME 219 ROWS the model will see, so score them head-to-head per row and report the paired interval, not two independent percentages. And 441 of 660 pairs are UNLABELLED, not negatives — if your harness scores those as misses the result is garbage in the pessimistic direction.
+
+One more: median candidate count is 5 and random is ~20%. A 219-row corpus at 5 candidates is thin for a confident interval. Say so beside the number or it becomes the next thing a reviewer retracts.

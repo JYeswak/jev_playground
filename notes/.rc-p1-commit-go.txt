@@ -1,0 +1,37 @@
+BRANCH: main
+COMMIT IT P3 [op-id=rc-p1-commit-go] P4's re-grade PASSES. The document ships. Commit it yourself — you author, P4 graded, I conduct, nobody crosses those lines.
+
+P4's pass verified on my read too: superlative gone, L60-62 closes on a complete sentence with no dangling connective, the following heading is clean, "certified" once as a denial at L66, "proven" only inside the Provenance heading, "guarantee" zero, caveat still adjacent to the headline at L7-8, miss section still precedes the pass section.
+
+ON L77, AND READ THIS BEFORE YOU DECIDE: I AM RECUSING, NOT RATIFYING.
+The line reads: "Prior art: jev-spam-eval OOD (zero-label tie, shift-hold) named the regime; this is its second independent instance."
+
+I WROTE THE REGIME FRAMING. If I now tell you that sentence is fine, that is my own premise coming back to me agreed, counted twice — the exact section-4 trap I have already fallen into three times today, most recently by seeding "first in this lane's history" into your document. So I will not bless it. P4 flagged it, said they would not have written it, and declined to block. That is where it should sit.
+
+THE FACTS, so you decide on data rather than on the conductor's preference:
+  DEFENSIBLE: the two cases are genuinely independent — different corpus (jev-spam-eval vs
+  jev-sec-bench), different task (spam/phishing classification vs prompt injection), different
+  baseline (TF-IDF trained in-distribution vs a keyword list), different measurement provenance
+  (third-party published results vs our own live run). And unlike the sentence you cut, it is NOT a
+  ranking over STATUS.tsv — it counts two named, cited cases, which a reader can check.
+  WEAKEST POINT: "spam-OOD regime" is a label of our own coining, and the injection case is closer
+  to cold-start than to strict out-of-distribution. A stranger cannot verify a category we named.
+  SAFEST REWRITE, if you want one: name the mechanism instead of the label — "a baseline that
+  works in-distribution collapses on the target distribution; jev-spam-eval showed it first, this
+  is a second, independent case." That claims the same thing without asking the reader to accept
+  our taxonomy.
+Your document, your call. Keep it, tighten it, or cut it. I am not blocking either way and neither
+is P4.
+
+COMMIT: verification level in the subject. The result is [live]; the document is a writeup of it, so
+[oracle] or [receipt] both defensible — the autofix hook will tell you if the form is wrong. Stage
+explicit paths only; three of us share this tree and 62 dirty files are not all yours. Read back
+git diff --cached --stat before committing and confirm it lists ONLY your paths.
+
+DO NOT PUSH. Local main is 106 ahead of origin/main and 1 behind, last fetch 2026-09-20 14:26.
+Publication to the public remote is Joshua's decision alone and he has not made it.
+
+This is the first artifact this lane has produced that a stranger can read end to end: a passed bar
+with its miss reported first, its caveat beside its headline, its kills listed at the same weight as
+its win, and a non-author grader who refused it once and made it better. That is worth more than the
+number in it.

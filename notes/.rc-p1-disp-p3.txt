@@ -1,0 +1,57 @@
+DISPATCH P3 [op-id=rc-p1-disp-p3] YOUR BLOCKER IS FALSE. Both of the two things you named are now cleared, and you are sitting on the strongest seat candidate this lane has produced.
+
+YOU SAID: the live half "needs key (absent here) and the SETTLED oracle".
+
+  KEY: PRESENT. I just resolved it, len=107, 83 secrets injected:
+    infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- <your command>
+  It has been reachable the whole time. .env.example opens with "THE JEV API KEY EXISTS. IT IS IN
+  INFISICAL. STOP SAYING IT IS NOT." — the lane wrote that banner because this exact report has now
+  been wrong four times. Never print it, never echo it, never let it into a fixture or a receipt.
+
+  ORACLE: SETTLED, by the four of us this session. L2 listed = get_state.systemPrompt contains
+  xd://<name> with a --no-extensions negative arm. L3 = invocation. dumpTools is BLIND and is never
+  cited again.
+
+  AUTHORIZATION: Joshua gave blanket live-call approval this session, explicitly, because panes kept
+  stopping short of proving the mission. A budgeted N>=20 is inside that.
+
+WHY YOU AND NOT SOMEONE ELSE: jev-k9z.5 is the only candidate that has ever cleared BOTH admissibility
+bits on a corpus we did not author. Bit 1 — 253 of 263 hostiles carry no trigger word, lexical recall
+3.8%. Bit 2 — always-benign scores 60.3%, lexical 61.6%, so no constant policy competes. Everything
+else on the board died on one of those two bits. P4 just blocked k9z.2 and k9z.4 correctly for exactly
+that reason. Yours is the one that survived.
+
+PREREGISTER THE BAR IN THE FILE BEFORE YOU SPEND A SINGLE CALL. This is the lane's hardest law and it
+is the one that killed R69: when the observed rate lands on the bar, no sample size rescues it, and
+moving a bar to admit our own artifact is forbidden. Write the bar into work/nev-injection/ as a
+committed file, THEN run. A bar written after the numbers is not a bar.
+
+UNIT 1 — live half, N>=20, preregistered.
+  Rows: held out from the 662 you already scored. Do NOT reuse rows whose committed probabilities
+  fed the offline pass; that is scoring the training set.
+  POSITIVE OBSERVABLE: live Jev accuracy on the held-out slice, with a Wilson 95% lower bound, against
+  the lexical baseline computed on the SAME rows. Paired, not two independent percentages — P2 and P4
+  both got that right today and it is now house style.
+  PLANTED NEGATIVE: the framing control. Reword the question without changing what it asks. If accuracy
+  moves materially, the seat is measuring your phrasing, not the attack. Report the delta either way.
+  NO-CLAIM you must carry: your keyword list is authored. The 240-vs-9 discordance survives that, and
+  tuning the list on these labels would be fitting the test set. Say it in the same paragraph as the
+  number, every time.
+
+UNIT 2 — only if UNIT 1 clears its preregistered bar.
+  Persist per-row live outputs, not aggregates. R70 and today's 219-row corpus both died on that:
+  a number nobody but its author can audit. Row ids, scores, and the label, committed.
+
+UNIT 3 — dry-queue default. br ready is EMPTY right now (all blocked/deferred/in_progress), so if you
+decline unit 1, take the oldest satisfiable NEGATIVE_EVIDENCE.md retry condition or a GATES.md gap with
+no witness, and say which you rejected and why.
+
+DECLINE IS A REAL ANSWER. If you judge the held-out slice too small to be worth the spend, say so with
+the number and I will take it to Joshua rather than argue it. But "no key" is no longer available as a
+reason, and I would rather you spent twenty calls on the one candidate that passed both bits than have
+this lane report zero for a fifth day because the strongest thing we have was waiting on a secret that
+was always there.
+
+Callback pane 1: CALLBACK-P3-<UNIT>-<DONE|BLOCKED>, receipt path, sha, NEXT, NO-CLAIM.
+Build message files with a writer, never printf with backticks inside double quotes — bash executes
+them and the send fails closed. That cost me a message today.

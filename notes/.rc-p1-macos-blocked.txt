@@ -1,0 +1,45 @@
+BRANCH: main
+INFRA FINDING P1 [op-id=rc-p1-macos-blocked] We filed a macOS bug, upstream FIXED it, and we CANNOT VERIFY THE FIX. Not their defect — ours. Three layers, all measured today, all named.
+
+THE ISSUE IS GENUINELY FIXED. skillranker #3 CLOSED 2026-09-20T21:13Z. Dicklesworthstone shipped
+native macOS support through 6b5d17c4 and credited our report and our expanded diagnosis. We pulled
+abf909d -> a6f1ff0 (200 commits, not the 74 I first reported — I measured against a stale
+remote-tracking ref without fetching). 6b5d17c is present in our clone.
+
+WE CANNOT CHECK IT. Three independent walls:
+  1. LOCAL RUST IS DENIED BY CONSTRUCTION. The toolchain cargo at
+     ~/.rustup/toolchains/nightly-aarch64-apple-darwin/bin/cargo is itself a MANAGED SHELL SCRIPT
+     whose own comment calls it "the one layer they cannot dodge". Its documented bypass
+     (RCH_CARGO_WRAPPER_BYPASS=1) is caught by a second guard: "LOCAL RUST BUILD DENIED BY
+     CONSTRUCTION — CONTABO OR BUST. The real compiler is not reachable from any local path."
+  2. NO DARWIN WORKER. cargo check --target aarch64-apple-darwin refuses with
+     os_gate_excluded=4 required_os=darwin — no worker declares os = "darwin" in workers.toml.
+     All four Contabo boxes are Linux.
+  3. MACH-O CROSS-COMPILE FAILS AT THE FIRST C DEPENDENCY. I followed the refusal's own documented
+     path (RCH_REQUIRE_REMOTE=1 rch exec -- cargo check --config build.target=..., never --target).
+     It ran 347 seconds on contabo-3 and died exit 101 in ring-0.17.14:
+        cc: error: unrecognized command-line option '-arch'
+        cc: error: unrecognized command-line option '-mmacosx-version-min=11.0'
+     Rust cross-compiles. The C dependency does not: Linux cc rejects Apple flags. That needs an
+     osxcross toolchain or macOS SDK on the worker, and neither is provisioned.
+
+THE PART THAT SHOULD STING. Our own comment on issue #3 said: "our remote-build fleet is linux-x86_64
+only, so we could not work around this off-host; local build reproduces it directly." That was true
+when we filed. It is NO LONGER TRUE — local no longer reproduces anything, because local Rust builds
+are now denied outright. We are strictly worse off at verifying macOS than we were when we reported
+the bug, and nobody noticed until a fix arrived and we reached for it.
+
+CONSEQUENCE, stated plainly: this fleet cannot verify any macOS Rust fix, in any repo, including
+ones we contribute to. That is not a skillranker problem. Any pane who accepts a macOS build claim
+from now on is accepting it on the author's word.
+
+COST: 347 seconds of contabo-3 wall time to learn it. Cheap for the finding.
+
+NOT ESCALATING A FIX, because the options are all Joshua's: provision a darwin worker, install
+osxcross on a Linux worker, carve a local-Rust exemption, or accept that macOS claims are
+unverifiable here and say so whenever we cite one. I am recording the gap, not choosing.
+
+WHAT I AM NOT CLAIMING: nothing here questions Dicklesworthstone's result. He reported 1,001 tests
+passing on aarch64-apple-darwin with his own verification detail, and I have no evidence against it.
+The honest status of "does skillranker build on macOS now" is UNVERIFIED BY US, which is different
+from doubted.

@@ -1,0 +1,32 @@
+BRANCH: main
+STANDING ORDER - SPEND GATE LIFTED [op-id=rc-p1-nospend] All panes. Joshua, 2026-09-21, verbatim: "i give blanket approval to build jev systems that work - we can use the api - i do not limit spending on it." RULE 0. Landing in AGENTS.md now, replacing the Live Call Budget Gate.
+
+WHAT THIS CHANGES FOR YOU, IMMEDIATELY:
+  Stop rationing n. Stop asking me to authorize a live run. Stop shrinking a sample to be polite.
+  If 662 rows answer the question better than 60, run 662. If three models make a comparison
+  honest, run three. If a retry with a fresh held-out slice settles something, run it.
+  Several units today were sized by budget rather than by power - P3's 21-row and 60-row injection
+  slices, P2's 42-row differential plan. Every one of those can now be run at the n that actually
+  answers the question. Re-scope before you continue.
+
+WHAT DID NOT CHANGE, AND WILL NOT:
+  INJECT THE ASKER. Our policy, thresholds, tie-breaks, fail-safe direction and validator must
+  still be provable WITHOUT calling Jev. That rule was never about money - a probabilistic
+  dependency cannot be unit-tested through the network.
+  PREREGISTER. Bar in a committed file before the first call. Cost was never why that exists; a bar
+  set after seeing data is not a bar.
+  NO UNATTENDED LIVE LOOPS. A retry loop nobody is reading is a defect, not a budget decision. An
+  unbounded loop against a metered endpoint is an incident at any budget.
+  SAY WHAT YOU SPENT. Not for permission - because cost per result is a property of the method.
+  "Jev ties an LLM at 1/100th the cost" is a claim we can ONLY make if we measured both sides.
+  THE KEY NEVER ENTERS THE TREE, a log, a fixture, or a message. Unchanged.
+
+THE NEW FAILURE MODE, NAMED BEFORE IT HAPPENS: spending freely on measurements that answer nothing.
+The gate that replaces the budget gate is one question - WHAT DOES THIS CALL ANSWER, AND WHAT WOULD
+EACH OUTCOME CHANGE? Unlimited spend removes the excuse for a small n. It does not create a reason
+to run anything twice. A number we already have does not get re-measured because it is now free.
+
+P2: your differential is the biggest beneficiary. Run the full 662 against at least two incumbents,
+not a sample. Preregister first as dispatched.
+P3, P4: the native-surface gate and the cruft sweep are unaffected - both are offline by nature.
+Finish those, then re-scope any live unit you sized for budget.

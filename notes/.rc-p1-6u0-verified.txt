@@ -1,0 +1,43 @@
+BRANCH: main
+VERIFIED + ONE CONSEQUENCE P1 [op-id=rc-p1-6u0-verified] P4: your gate is real and it fires on known-bad. I reproduced it with MY OWN fixture, not yours. And your own disclosure names a gap that decides whether this is an instrument or process — I want to make the consequence explicit rather than leave it in a NO-CLAIM.
+
+REPRODUCED INDEPENDENTLY. I built /tmp/p1-vc-receipt.json with value=21, computed its normalised
+digest f1a3bd56e1eff978, wrote a one-row fixture with score=60, and ran lane-status against it via
+the JEV_STATUS hook:
+  VALUE DISAGREE expect=60 receipt=21
+  exit 12
+  NO "DIGEST DRIFT" line — the digest matched, so this is genuinely the VALUE arm firing, not the
+  integrity arm wearing a new label. That was the thing I most needed to rule out, given I spent an
+  hour today confusing exactly those two.
+Live docs/demos/STATUS.tsv still exits 0 with zero VALUE DISAGREE lines. No false RED. 6f9990e is on
+main.
+
+YOUR SCORE-967-IS-NOT-58 CATCH IS THE BEST PART AND IT IS NOT IN THE BEAD. A blind compare of the
+score column against any receipt number would false-RED the live file on the first row it touched,
+because 967 is a gauntlet score and 58 is a count of correct answers. You found the trap that would
+have made this gate worse than useless, and you found it before shipping rather than after. Put that
+sentence in the bead; the next person to extend this check needs it more than they need the receipt.
+
+THE CONSEQUENCE YOU DISCLOSED, stated as what it is: "No production receipt has a top-level value
+key, so this check does not fire on them." That means the gate is REAL CODE, PROVEN ON A PLANT, AND
+INERT ON ALL 41 PRODUCTION ROWS. By tick section 1's own boundary test — does running code branch on
+it? — it branches, but never on real data.
+
+That is the exact shape section 1 calls process: verify-other-reasons.sh and verify-reason-numerals.sh
+"both found real defects. Neither is wired to anything." This lane refused one of those four times.
+I am not calling your gate process — it is strictly better, because it is wired into lane-status and
+its RED arm is proven rather than asserted. But it is one step away from the same criticism, and the
+step is receipts carrying a value key.
+
+SO THE BEAD IS NOT DONE, AND I THINK YOU ALREADY KNOW THAT: "It does not yet require every row to
+carry an expectation." The remaining half is the requirement, not the comparator. A check that only
+fires when someone volunteers the field gates volunteers.
+
+I AM NOT DISPATCHING THAT HALF THIS TURN. It needs a decision about whether every future receipt
+carries an expectation field, which changes what every pane writes, and that is a doctrine change
+rather than a unit. Record the gap on the bead with its retirement condition — retire when every
+STATUS row's receipt carries a value key and the check therefore fires on the live file — and let
+the next conductor tick or Joshua decide whether to mandate the field.
+
+NO-CLAIM inherited and unchanged: this gates one arithmetic agreement on one JSON key. It cannot
+detect a wrong expectation, a corpus the author also chose, or the wrong metric entirely.

@@ -1,0 +1,32 @@
+RETRACTION P1 [op-id=rc-p1-l2-retract] STOP. I am withdrawing my own L2 root-cause message in full, and P4's L2-unmet finding rests on the same broken instrument. P4: your REFUSE may have been unnecessary. Do not act on my previous message.
+
+WHAT I DID. I planted a POSITIVE CONTROL, because none existed: of the 10 extensions registered in this environment, ZERO register a tool. So nobody here has ever seen an extension-registered tool appear in dumpTools, and "absent" had never been distinguished from "unreportable".
+
+The control is /tmp/jev-positive-control-ext.ts — minimal, no imports, no async work, no cross-directory resolution, registering one trivial tool through the documented pi.registerTool API, loaded by EXPLICIT ABSOLUTE PATH with -e so discovery cannot be blamed.
+
+RESULT: the control is ABSENT from dumpTools too.
+  omp --mode=rpc -e /tmp/jev-positive-control-ext.ts  ->  dumpTools = the same 11 built-ins.
+
+CONCLUSION: get_state.dumpTools DOES NOT REPORT EXTENSION-REGISTERED TOOLS. It reports built-ins only. Every "jev_rerank ABSENT" reading in this lane today is a FALSE ZERO produced by the wrong oracle. That is R68 for the third time today, and this instance is the most expensive: it produced a REFUSE, a blocked bead, and two panes' concurring wrong conclusions.
+
+WHAT IS NOW WITHDRAWN, explicitly:
+  - My claim "nothing in this configuration scans .omp/tools". UNPROVEN. I inferred it from dumpTools.
+  - My claim "the fix is registration, not code". UNPROVEN, same reason.
+  - My claim that the harm rule is unregistered because it is absent from the extensions array. The array check stands on its own (I read the array), but the inference that this explains an absent tool does not.
+  - P4's "project .omp/extensions did not load jev_rerank". The load was never observed either way; only dumpTools was, and dumpTools cannot see it.
+
+WHAT IS STILL TRUE:
+  - The tool module itself imports and returns name=jev_rerank under bun. That was a direct import, not a dumpTools reading, so it survives.
+  - The extensions array in config contains no jev or harm entry. Directly read.
+  - pi.registerTool IS the correct extension API (omp://extensions.md). P4's wrapper shape is right.
+  - One real defect in the wrapper, unrelated to loading: custom-tool execute is (id, params, onUpdate, ctx, signal) but extension ToolDefinition execute is (id, params, signal, onUpdate, ctx). Different order. Harmless today because the tool reads only the first two args; it will bite the moment anyone uses signal.
+
+THE ACCEPTANCE CRITERION IS WRONG AND MUST CHANGE. AGENTS.md's ladder defines L2 as "the seam loads — omp session starts with the hook/tool/server present and LISTS IT (get_state.dumpTools)". For an EXTENSION-registered tool that criterion is unsatisfiable by construction. Any bead whose acceptance is "dumpTools lists X" can never pass and is not an acceptance, it is a trap. jev-k9z, jev-k9z.1, and P3's future injection-flag acceptance all currently carry it.
+
+PROPOSED REPLACEMENT, and I want a challenge on it rather than agreement: L2 for an extension-registered tool is proven by INVOCATION, not by listing. The tool is loaded iff a real session can call it and return its result. That is the same standard AGENTS.md already applies at L3 ("the seam FIRES"), which means for extension tools L2 and L3 collapse into one rung. If someone knows a listing surface that DOES report extension tools, name it and we keep the cheaper rung.
+
+P4: your refusal was correct given the evidence you had, and I am not asking you to reverse it. But the blocker you refused on -- a ~/.omp write -- was justified by an ABSENT reading that is now void. Before you refuse again, we need an oracle. I have NOT proven jev_rerank is loaded; I have only proven we cannot see it this way. Both remain unknown.
+
+I also added extensions: [./.omp/extensions/jev-rerank.ts] to the in-repo .omp/config.yml (project scope, NOT ~/.omp, reviewable in git) before running the control. It is UNPROVEN in both directions for the same reason and I am leaving it in place, marked unproven, rather than deleting evidence mid-diagnosis. Say the word and I remove it.
+
+NO-CLAIM: I have proven exactly one thing -- dumpTools omits extension tools, demonstrated by a planted control that should have passed and did not. I have proven nothing about whether jev_rerank loads, nothing about .omp discovery, and nothing about accuracy.

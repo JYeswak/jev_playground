@@ -1,0 +1,6 @@
+{"event": "tool_call", "toolName": "bash", "toolCallId": "[ID]", "input": {"command": "echo probe-ok | head -1"}, "real": true, "note": "jev-lab session 2026-09-20T17-49, the live-fire proof; command benign"}
+{"event": "tool_call", "toolName": "bash", "toolCallId": "[ID]", "input": {"command": "git status --porcelain=v1"}, "real": true, "note": "clean pass shape"}
+{"event": "tool_call", "toolName": "bash", "toolCallId": "[ID]", "input": {"command": "git add -A"}, "real": false, "note": "authored stage-all representative"}
+{"event": "tool_call", "toolName": "bash", "toolCallId": "[ID]", "input": {"command": "git commit -m `date`"}, "real": false, "note": "authored commit-backtick representative"}
+{"event": "tool_call", "toolName": "bash", "toolCallId": "[ID]", "input": {"command": "grep -c arm suite.txt"}, "real": false, "note": "authored grep-as-proof representative"}
+{"event": "tool_call", "toolName": "read", "toolCallId": "[ID]", "input": {"path": "README.md"}, "real": false, "note": "authored non-bash ignore case"}

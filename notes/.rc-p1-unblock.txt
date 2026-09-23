@@ -1,0 +1,42 @@
+BRANCH: main
+DISPATCH P3 + P4 [op-id=rc-p1-unblock] The judge tool is broken. THE JEV API IS NOT. I measured it: one minimal POST returned http 200 in 0.72s, model jev-1.13.0, noul 0.98, 281 input tokens. Your block was correct and its blocker is narrower than it looked.
+
+P3 - YOUR ROW COUNT IS WRONG AND HERE IS THE COMMAND. Recounted from source:
+  awk -F'\t' 'NR>1 && NF>3 && $4 ~ /^(CLEARED|HELD|RULED_OUT|UNASKABLE|PROMOTED|RECUSED)$/ {n++} END{print n}' docs/demos/STATUS.tsv
+  -> 41 verdict rows, 41 distinct candidate ids. Not 42. Re-run it; if you get 42 you are counting a
+  row whose column 4 is not a verdict, and I want to know which one because that would be a real
+  defect in the file. Derive it either way - do not take my 41 on my word. I have been wrong twice
+  today on exactly this kind of count.
+
+P3 - UNIT, and it is better than the one you were blocked on: redo the classification with DIRECT
+JEV CALLS instead of judge(). Your rubric is already frozen and your units partitioned; keep both
+unchanged, because a rubric that moves after seeing data invalidates every prior verdict. Post to
+the documented systemone endpoint, model pinned "jev-1.13.0" and never jev-latest, key resolved the
+way EVAL.md already documents for this lane. One Choice question per candidate: replacement vs
+new_capability vs mixed vs unclear. 41 requests at roughly 281 input tokens each - trivial spend,
+Joshua's blanket approval stands.
+  WHY THIS IS THE RIGHT MOVE AND NOT A WORKAROUND: it is the first time this lane has used Jev to do
+  a piece of its own work rather than to be measured. That is stage 4. Record it as such.
+  Truncate states at 6000 chars as you already did and report the truncation count.
+  NO-CLAIM: using Jev to classify is not evidence Jev is good at classifying. You are not scoring
+  it; there is no answer key. Report the split AND say plainly that it is Jev's opinion, unvalidated
+  - a hypothesis generator, not a finding.
+
+P4 - UNIT: the two sensitivity tests jevify names and we have never run. Both are at literal zero in
+our own files; I grepped with a positive control (McNemar 42 present, nonce 0).
+  1. BATCH COMPOSITION. Take a state and a question whose answer you know from a prior receipt. Send
+     it ALONE. Then send it alongside 3, then 9 unrelated questions on the SAME state. Does the
+     answer move? This is load-bearing: if answers shift with batch composition then every fan-out
+     design is unsound, and fan-out is the mechanism the entire "evaluate every event" thesis rests
+     on. Nobody here has ever checked it.
+  2. QUESTION WORDING. Same state, same intent, three phrasings a competent engineer would consider
+     equivalent. Report the spread.
+  PREREGISTER THE BAR IN A COMMITTED FILE BEFORE THE FIRST CALL. My proposal, sharpen it: a shift
+  greater than 0.05 in noul, or a changed choice label, is material. Say what you will conclude for
+  EACH outcome before you see any number - including the outcome where nothing moves, which is the
+  boring result and the most likely one.
+  NO-CLAIM: n small, one model version, our states. A stable answer on our corpus is not a stability
+  guarantee.
+
+Both: pin jev-1.13.0 explicitly. Receipts under work/, full repo-relative paths in the callback.
+Callback pane 1, branch first. P3: CALLBACK-P3-CLASSIFY-<DONE|BLOCKED>. P4: CALLBACK-P4-SENS-<DONE|BLOCKED>.

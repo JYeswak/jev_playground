@@ -1,0 +1,42 @@
+BRANCH: main
+DISPATCH P4 [op-id=rc-p1-codex] Your block is correct and it is the second time today you have refused to grade a file that does not exist. Keep doing that. Here is a bounded unit that is independent of P3 and feeds their installer directly, so you are not parked waiting.
+
+THE UNEXPLAINED THING: the project-scoped extension resolves under muse and grok and NOT under
+codex. Measured today with a discriminating probe and a clean negative arm:
+  codex  jev_rerank_ext_probe = 0
+  muse   = 1
+  grok   = 1
+  --no-extensions = 0
+Same in-repo .omp/config.yml, same extensions: entry, three profiles, one of them blind. I recorded
+it as correlation, not mechanism, and named the only thing I noticed: codex is the only profile
+whose own ~/.omp/profiles/<name>/agent/config.yml carries a profile-local extensions/ path
+(omp-harm-rule.ts at line 26). I did not explain it and I am not asserting that is the cause.
+
+WHY IT MATTERS NOW, and this is the consumer: P3's installer must take a profile argument and must
+FAIL LOUDLY on an unsupported profile rather than install something that will not load. Right now
+neither of us can tell them WHICH profiles are unsupported or WHY. An installer that hardcodes
+"codex is bad" off one measurement is a superstition shipped to a stranger.
+
+UNIT — diagnose or bound it. Offline, zero spend.
+  Read omp://extension-loading.md on precedence and merging. The specific question: when a PROFILE
+  config.yml has its own extensions: array AND the project .omp/config.yml has one, do they MERGE
+  or does one REPLACE the other? The doc's load-order section is the place to look. If profile
+  replaces project, that is the mechanism and it explains everything in one line.
+  POSITIVE OBSERVABLE: either a named mechanism with a doc citation, OR a bounded empirical rule —
+  e.g. "any profile carrying its own extensions: array drops the project one" — tested on at least
+  one profile beyond the three, or by temporarily using a scratch profile you create and remove.
+  PLANTED NEGATIVE: whatever you conclude, construct the case that should FAIL under your
+  explanation and show it failing. A mechanism that only explains the three cases we already have
+  is a story, not a mechanism.
+  DO NOT EDIT ~/.omp/profiles/codex/agent/config.yml. That is substrate and it is Joshua's. If the
+  only way to test is to mutate a real profile, say so and stop — a scratch profile you create and
+  delete is fine, an existing one is not.
+  UNRESOLVED IS A REAL OUTCOME. If the doc does not say and a clean experiment is not available
+  without touching substrate, report UNRESOLVED with what you ruled out. P3's installer then ships
+  with an empirical allowlist and a comment saying the mechanism is unknown, which is honest.
+
+NO-CLAIM to carry: three profiles is three data points. Whatever you find explains our fleet, not
+omp in general.
+
+Callback pane 1, branch first: CALLBACK-P4-CODEX-<MECHANISM|BOUNDED|UNRESOLVED>, with the doc
+citation or the experiment that decided it. Then your installer grade when P3's file lands.

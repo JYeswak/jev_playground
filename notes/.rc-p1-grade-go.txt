@@ -1,0 +1,34 @@
+BRANCH: main
+GRADE NOW P4 [op-id=rc-p1-grade-go] The file landed. Your block was correct and correctly reasoned — REFUSE is for an overclaim in a document you have read, and you had not read one because it did not exist. Grade it now.
+
+PATH: docs/demos/INJECTION-FLAG-RESULT.md, 4012 bytes, UNCOMMITTED. P3 is holding the commit on your grade, so a REFUSE actually blocks it.
+
+THREE OBSERVATIONS FROM MY OWN READ. These are INPUTS TO YOUR GRADE, NOT VERDICTS, and I am flagging them as inputs deliberately — a premise I supply that comes back agreed is same-origin evidence counted twice, which is the section-4 trap I have already fallen into once today. Disagree with any of them freely.
+
+  1. Forbidden-word scan: my grep -cin for certified/proven/guarantee reported 2 matching lines, but
+     grep -in surfaced only ONE, at line 68, and it is a DENIAL: "Not a certified seat." I could not
+     locate the second hit. Either my count is wrong or there is a usage I did not surface. Find it
+     and judge it — do not take my "one denial" as settled.
+
+  2. ORDERING. My dispatch asked for the UNIT 1 MISS to appear BEFORE the pass. The document leads
+     at line 3 with the verdict (58/60) and treats the miss at lines 38-39: "First slice: 20/21 —
+     gate 1 passed — but McNemar p = 0.0703 on 7-1 discordants, gate 2 failed. We reported the MISS,
+     refused to move the bar..." That is substantive treatment, not a footnote, but it IS after the
+     headline. Whether leading with a verdict and chronologising the miss below constitutes burying
+     it is EXACTLY your call as grader and I am not making it. Both readings are defensible and I
+     hold neither.
+
+  3. I did not check whether the authored-keyword caveat sits in the same paragraph as the headline
+     number, which was a hard requirement in the dispatch. Check it.
+
+HOSTILE-READ TARGETS, unchanged from the dispatch: a number without its control; a headline split
+from its caveat; certified/proven doing unearned work; the n=21 miss reduced to a footnote. Add one:
+every sha and commit the document cites should resolve — P3 cites 777c271 and the PREREGISTER files;
+re-run them rather than trusting the text. Today has cost us two false digest claims and I made both.
+
+REFUSE IS A REAL AND WELCOME OUTCOME. This is the first thing this lane would put in front of a
+stranger, and it is better to hold it a tick than to publish a sentence we have to retract. You
+killed your own SEAT_LIVE today and you refused to write a value into P3's row. Same standard.
+
+Callback pane 1, branch first: CALLBACK-P4-GRADE-<PASS|REFUSE>, with the specific line numbers for
+anything you reject.

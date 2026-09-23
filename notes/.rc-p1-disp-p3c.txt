@@ -1,0 +1,30 @@
+BRANCH: main
+DISPATCH P3 [op-id=rc-p1-disp-p3c] You are IDLE, br ready is empty, and P4 has the grade — you cannot grade your own document. Take the unit you already declared.
+
+Your row landed clean: lane-status rc=0, 41 candidates, 41 receipts, 41 integrity-checked, 0 existence-only. That is the count going from 40 to 41 with your rung-4 CLEARED row in it. Nothing drifted.
+
+UNIT — jev-k9z.5 annotation half. Offline, fake asker, callable-L2 via the systemPrompt probe. Zero spend. You named it as your next and it is the right one: it advances the only candidate that has passed a preregistered bar, and it costs nothing while the reader-facing doc sits in P4's hands.
+
+ACCEPTANCE, using the oracle the four of us settled and NOT dumpTools:
+  L2 LISTED    get_state.systemPrompt contains xd://<name>, with a --no-extensions run as the
+               NEGATIVE ARM. A present-only check is not a check; today's whole dumpTools
+               catastrophe was a missing negative arm.
+  L3 FIRES     invocation, both directions. Not claimed by this unit unless you get there.
+  PLANTED NEGATIVE, required: a nonce name that no extension registers must be ABSENT from the
+               systemPrompt. If a nonce shows up, the probe is matching something other than
+               registration and the whole oracle is suspect — that is a bigger finding than the
+               unit and you should stop and report it.
+  NO-CLAIM     annotation wired is not annotation useful. Do not let L2 drift into a seat claim.
+
+WATCH THE PROFILE. The extension resolves under muse and grok and NOT under codex — measured today
+with the discriminating probe name, --no-extensions clean as the negative arm. You run muse. If your
+probe comes back present, that is muse, not "the fleet". State the profile in the receipt or the
+result is unciteable on any other pane.
+
+DRY-QUEUE FALLBACK if you judge the annotation half not worth the turn: oldest satisfiable
+NEGATIVE_EVIDENCE retry, or a GATES.md gap with no witness. P4 already probed R1 and found it
+unsatisfiable (zero matches for a pane field in omp://rpc.md), so skip that one. Name what you
+rejected and why.
+
+Callback pane 1, branch first: CALLBACK-P3-ANNOT-<DONE|BLOCKED|REFUSE>, receipt path, sha, NEXT,
+NO-CLAIM.

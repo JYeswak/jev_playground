@@ -1,0 +1,25 @@
+FINDING P1 [op-id=rc-p1-ood] I ran the breadth survey my scouts failed to deliver. jev-spam-eval@76ef183 is the strongest application evidence in this tree and nobody has cited it. It also NAMES THE REGIME where a Jev seat exists, which is the thing we have been unable to state for a month.
+
+ZERO-SHOT JEV vs TF-IDF TRAINED ON THE TARGET'S OWN LABELS, four public collections 2000-2026:
+  IN-DISTRIBUTION (TF-IDF trained and tested on the same mail)
+    email-dataset   jev 98.3%  tfidf 98.4% (14,800 labels)   -> tie, jev used ZERO labels
+    Ling-Spam       jev 98.6%  tfidf 99.4% (2,300 labels)    -> tfidf wins
+    3-class+phish   jev 94.2%  tfidf 98.7% (4,600 labels)    -> tfidf wins
+  OUT-OF-DISTRIBUTION (same TF-IDF, mail from a different source or era)
+    Ling-Spam 2000        jev 98.6%      tfidf 73.0%   +25.6
+    phishing 2024-25      jev 91.0-93.6% tfidf 70.3%   +21 to +23
+    modern 2026 mail      jev 97.3%      tfidf 72.5%   +24.8
+Cost: four questions over all 19,528 emails = $1.12. Source OUT_OF_DISTRIBUTION.md:16-18, per-prediction JSONL committed under results/.
+
+APPLY B5 AND THE REGIME FALLS OUT EXACTLY:
+  Bit 1 in-distribution: TF-IDF IS the lexical baseline (word frequency) and it scores 98.4%. YES -> NO SEAT.
+  Bit 1 out-of-distribution: the same lexical baseline collapses to 70-73%. NO -> SEAT.
+THE SEAT IS NOT 'SPAM'. THE SEAT IS DISTRIBUTION SHIFT AND COLD START - any task where you cannot obtain labels that resemble what you will actually see. That is a large real category (new abuse campaigns, novel phishing, emerging failure modes, day-one classification) and it is precisely the regime none of our five surfaces were in.
+
+THIS REFRAMES OUR OWN RESULT RATHER THAN OVERTURNING IT. Every one of our five tasks had a STABLE distribution and an available rule, so the cheap thing won and we were right to ship it. And we already had this finding in our own words at RULING-authored-vs-real-20260919.md:99-102 - 'it ties a classifier trained on ~14,800 labels while using ZERO' - which is the same zero-shot-parity result, recorded as a loss because our distribution never shifted. We measured the one regime where Jev cannot win and generalised from it.
+
+CAVEATS, THE REPO'S OWN AND MINE: it says explicitly 'exploratory experiments, not benchmarks', each run once, one model version (jev-1.13.0). OOD sets are small: 2,876 Ling-Spam / 853 phishing / 633 modern. The 98.3% came from a question written AFTER reading mistakes in 1,000 sampled emails; the plain question scored 96.0%. I have re-run nothing - these are committed numbers read from OUT_OF_DISTRIBUTION.md and results/*.jsonl.
+
+NOT PROPOSING A BUILD. P4 owns the queue and rerank is mid-flight. What I am proposing is that the NEXT candidate be selected by the regime test above rather than by interest, and that this repo be cited in EVAL.md, where it currently does not appear.
+
+Breadth census of all 24 clones: only jev-rerank-bench (16 data files), jev-spam-eval (19 files, 9 result dirs), jev-benchmark (3), jev-agent-failure-benchmark (1) and skillranker (3) carry committed data. The other 19 are code or catalogues.

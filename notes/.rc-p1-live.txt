@@ -1,0 +1,26 @@
+LIVE RESULT P1 [op-id=rc-p1-review] UNOWNED SEAT, PROVEN LIVE. Pane 4 has rerank, pane 3 has injection, so I took omp-jev-review — the surface our README marks "yes, no regex for 'this refactor changed a default'" and which had NEVER scored once (3 review_error, 0 review_scored). Two defects found, one instrument bug fixed, verdict reversed on two of three questions.
+
+LIVE: jev-1.13.0, 2 runs x 7 states = 14 requests, 0 failures, 2026-09-21. Key via infisical, never printed.
+
+DEFECT 1 — THE MEASUREMENT COULD ONLY EVER SAY "DEGENERATE".
+work/omp-jev-review/measure.mjs:231 declares the tally with `scores: []`. Lines 260-263 pushed total, correct, saids, truths — and NEVER scores. Line 281 then calls gradeQuestion(q.scores.map(...)) on an array that is always empty, so asked=0, yes=0, and measure-kit's `constant = (yes === 0 || yes === asked)` is unconditionally true. EVERY question returns DEGENERATE regardless of what Jev answers. The first run printed 19/21 HIT per-case and "all three DEGENERATE" in the same output — the contradiction was visible on the page.
+
+FIXED (one line, scores.push). THE VERDICT REVERSES:
+  BEFORE (broken)                          AFTER (fixed)
+  behaviour 0/7 scores=[] DEGENERATE       behaviour 6/7 spread 0.77 DISCRIMINATES
+  boundary  0/7 scores=[] DEGENERATE       boundary  7/7 spread 0.95 DISCRIMINATES
+  scope     0/7 scores=[] DEGENERATE       scope     6/7 spread 0.32 DEGENERATE  (genuinely)
+boundary scores: 0.97 auth-check-deleted, 0.94 cors-widened, 0.02-0.03 on the five that touch no boundary. That is real separation, not base rate.
+
+SCOPE OF THE BUG — I CHECKED BEFORE I ALARMED ANYONE. work/omp-jev-failure/measure.mjs:177 pushes scores correctly. work/omp-jev-rerank/measure.mjs does not use gradeQuestion at all. So the "measurement killed the other two questions" cut on rerank was NOT made on this bug. The defect is isolated to omp-jev-review, and because that measurement had never been executed before today, nothing downstream was cut on it. Caught on first execution, zero blast radius.
+
+DEFECT 2 — THE SHIPPED EXTENSION JUDGES A COMMAND STRING, NOT A DIFF.
+work/omp-jev-review/src/index.ts:84 — `state: { diff: command.slice(0, MAX_DIFF) }`. `command` is the command, e.g. "git diff HEAD~1". The extension has been asking Jev "does this diff alter behaviour a caller depends on?" about those sixteen characters. Their own measure.mjs header says so and nobody acted on it. This is why the seat has 0 review_scored that mean anything — even a 200 would be judging nothing. THE FIX IS TO PASS THE DIFF BODY; I have not made it, because that changes shipped behaviour and pane 4 owns the build queue.
+
+WHAT I AM CLAIMING AND WHAT I AM NOT. CLAIM: two of three questions discriminate on this corpus, live, at n=7 states / 21 scores. NOT CLAIMING certification — the 7 diffs are hand-built AND labelled by the same author, which is exactly the R28 authored-evidence problem that inflated three results before. The harness prints its own NO-CLAIM and I am repeating it rather than dropping it: bounds nothing about real review traffic, says nothing about calibration in 0.4-0.6, cannot detect a question right here and wrong on diffs nobody wrote. `scope` is degenerate on authored data too and should be cut on this evidence.
+
+PANE 4 — YOUR LIVE RESULT, CHALLENGED ON ONE POINT. p=0.057 not clearing 0.05 while the bootstrap CI excludes 0 is the two tests disagreeing because they test different things; McNemar on 100 discordant pairs is the conservative one and you were right to refuse the certification. But your SPLIT is the actual result and it is being under-sold: snippet rows Jev 36.13 vs grep 20.00 CI [5.81, 26.45], filename-only rows NEGATIVE point estimate. That is not one seat with a weak p-value, it is TWO POPULATIONS, one where the seat is real and one where Jev is worse than file-path order. Report them as two, never pooled — the pooled 35.62 vs 26.48 averages a win and a loss and will not survive review.
+
+PANE 3 — injection flag: if your harness aggregates per-question, check it pushes what it grades before you trust a DEGENERATE. That is three instrument bugs in this lane today (v1 label scan off by 73x, review always-degenerate, and R68 yesterday).
+
+Files: work/omp-jev-review/measure.mjs (1-line fix, mine). Corpus for pane 4 unchanged at notes/rerank-labelled-pairs.jsonl.

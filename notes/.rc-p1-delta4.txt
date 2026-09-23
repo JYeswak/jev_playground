@@ -1,0 +1,32 @@
+DELTA-4 P1 [op-id=rc-p1-app] PREVALENCE MEASURED ON OUR OWN TRAFFIC — the number that killed every prior seat. Read before you build; it both de-risks and RE-SCOPES the pick.
+
+Applying the lane's own standing law (VERDICT.md:46 "price the top rung before building the middle ones"), I measured the rerank opportunity in our real traffic instead of assuming it. Zero API calls, read-only over session logs.
+
+CORPUS: 1,821 session JSONL files, 3,149 MB, across 7 omp profiles + default. 137,949 toolCalls.
+
+OPPORTUNITY RATE:
+  retrieval calls   4,528 / 137,949 = 3.28% of all tool calls
+                    = 2.49 retrieval calls per session
+  breakdown         grep 3,452 | glob 717 | web_search 359 | codebase_search 2
+Compare the base rates that killed prior seats: foreman supervision 0.016% (dead), tool_call error 3.95%. Retrieval at 3.28% is in the live range, and unlike those it is NOT a rare-event detection problem — a reranker fires on every retrieval and reorders; there is no alarm, so there is no false-positive-rate cliff. That is the structural reason this seat does not die the way the others did.
+
+CANDIDATE-LIST SIZE — is there anything to rerank:
+  tool          n     median   p75   p90    max   >=10 lines   >=30 lines
+  grep       3,452      40     157   373   1,452     73.6%       55.6%
+  glob         723      10      59   197     407     50.1%       32.6%
+  web_search   359      67     112   155     268     86.1%       64.3%
+
+55.6% of greps return >=30 candidate lines. ~1,919 greps in this corpus have >=30 results. jev-rerank-bench's setting is literally THIRTY BM25 candidates cut to 2,000 chars each. Our median grep is 40 lines, p75 157. The shapes match.
+
+AND OUR BASELINE IS WEAKER THAN THE BENCHMARK'S. In the benchmark the thing Jev beats is BM25 at 0.486 nDCG@10 — a real relevance ranker. grep does not rank at all: results come back in file-path order, which carries ZERO relevance signal. The deterministic baseline on our surface is weaker than the one Jev already beats by 20 points.
+
+THE RE-SCOPE, AND THIS IS THE PART THAT MATTERS. codebase_search fires TWICE in 137,949 calls. Our retrieval is 92% LEXICAL (grep+glob), not semantic. The benchmark measures natural-language-query -> passage relevance. A grep query is a REGEX. So:
+  - The opportunity structure (many candidates, no relevance order) TRANSFERS, at high prevalence.
+  - The specific NevIR negation win DOES NOT transfer. Negation-sensitivity is a property of semantic queries; a regex has no negation to miss.
+Build the rerank seat on "which of these 40 grep hits matters for the current task", NOT on "Jev is better at negation." The negation result is why the CLASS is live; it is not evidence for OUR surface. If you cite NevIR in the artifact, cite it as class evidence with that boundary stated, or a reviewer will correctly call it the authored-vs-real pattern again.
+
+NO-CLAIM, explicit: I have shown the OPPORTUNITY exists at measurable prevalence with large candidate lists and a null-signal baseline. I have NOT shown that reranking those hits improves any agent outcome. That is rung 3+ and is unmeasured. This is demand evidence, measured on real traffic we did not author — which is more than any of the 17 gauntlet candidates had at rung 1.
+
+METHOD/BOUNDARY: toolCall/toolResult pairing by toolCallId within each session file; result size measured in LINES of the result text, which overcounts multi-line single hits and undercounts truncated results. Files >25 MB skipped. 1,821 of 1,875 files scanned (54 skipped: oversize or unreadable). Counts are tool CALLS, not unique queries. No API calls, no key, nothing written outside notes/.
+
+Pick UNCHANGED, now with a measured demand number instead of an assumption. Still not building.

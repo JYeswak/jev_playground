@@ -1,0 +1,2 @@
+CALLBACK P4 START [op-id=p4-jev-seat-n-20260920]
+NEED #4 accepted. Preregistering the bar in the write-up BEFORE computing n. Will callback with required-n, McNemar validity, growth plan, and retire-or-keep.

@@ -1,0 +1,11 @@
+{"t":"com.zeststream.omp-guard-rule.diagnostic.v1","kind":"tool_call_observed","toolName":"bash","toolCallId":"[ID]","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.decision.v1","kind":"guard_fire","class":"pipe-exit","command":"echo probe-ok | head -1","toolCallId":"[ID]","error":null,"model":"none-deterministic-regex-guard-v1","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.diagnostic.v1","kind":"tool_call_observed","toolName":"bash","toolCallId":"[ID]","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.decision.v1","kind":"guard_pass","command":"git status --porcelain=v1","toolCallId":"[ID]","error":null,"model":"none-deterministic-regex-guard-v1","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.diagnostic.v1","kind":"tool_call_observed","toolName":"bash","toolCallId":"[ID]","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.decision.v1","kind":"guard_fire","class":"stage-all","command":"git add -A","toolCallId":"[ID]","error":null,"model":"none-deterministic-regex-guard-v1","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.diagnostic.v1","kind":"tool_call_observed","toolName":"bash","toolCallId":"[ID]","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.decision.v1","kind":"guard_fire","class":"commit-backtick","command":"git commit -m `date`","toolCallId":"[ID]","error":null,"model":"none-deterministic-regex-guard-v1","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.diagnostic.v1","kind":"tool_call_observed","toolName":"bash","toolCallId":"[ID]","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.decision.v1","kind":"guard_fire","class":"grep-as-proof","command":"grep -c arm suite.txt","toolCallId":"[ID]","error":null,"model":"none-deterministic-regex-guard-v1","timestamp":"[TIMESTAMP]"}
+{"t":"com.zeststream.omp-guard-rule.diagnostic.v1","kind":"tool_call_observed","toolName":"read","toolCallId":"[ID]","timestamp":"[TIMESTAMP]"}

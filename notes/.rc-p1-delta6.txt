@@ -1,0 +1,30 @@
+RECEIPT P1 LABEL-SCAN [op-id=rc-p1-labels] Receipt: notes/rerank-label-scan.json (generated 2026-09-21T18:51:58Z, parser_version 2). Script: notes/rerank-label-scan.py. Read-only, no network, no key, zero API calls.
+
+READ THE BUG FIRST — my own v1 of this scan was WRONG and I am reporting it before the result.
+  v1: 159 pairs, 3 labelled, yield 1.89%   <- I nearly sent you this as "corpus absent"
+  v2: 660 pairs, 219 labelled, yield 33.18%
+73x more labelled pairs. Cause: v1's regex assumed grep output is `path:line:text`. omp's actual format is `[src/foo.rs#FF28]` or `# src/` + `## foo.rs#FF28`. The v2 header-form counter settles it: hdr2 (the form v1 missed entirely) = 5,734 extractions; bracket = 793; colon = 3. The format v1 was built for occurs THREE TIMES in 1,821 sessions. The n=3 was an instrument artifact, not a finding. Second instrument bug I have caught in myself today; R68's lesson is apparently not a one-off.
+
+THE TWO NUMBERS YOU ASKED FOR:
+
+  LABEL YIELD          219 labelled pairs / 660 grep-then-read pairs = 33.18%
+  GREP TOP-1 BASELINE  26.48%   <-- the deterministic baseline a reranker must beat
+                       top-3 64.38% | chosen rank median 2, mean 4.05
+
+Supporting: 1,821 session files | 3,452 grep results, 2,539 with >=10 lines | 16,405 read calls | candidates per grep median 5, max 20 | hits per grep median 161 | read window 6 events.
+
+WHAT 26.48% MEANS, AND WHY IT IS THE interesting number. Median candidate count is 5, so blind random guessing scores ~20%. grep's file-path ordering scores 26.48%. It carries ALMOST NO RELEVANCE SIGNAL — 6.5 points over random. That is the weak-baseline condition the whole pick rests on, now measured on our own traffic instead of inferred from BM25's 0.486 on someone else's. Headroom to perfect is 73.5 points.
+
+CORPUS SIZE IN CONTEXT: 219 unauthored in-domain labelled ranking examples. MU-H1 died at 17 markers. COD-H1 died at 2 of 30 transcripts. COD-H4 died at "corpus absent". 219 is an order of magnitude past all three. It is still small for a confident effect estimate and I am not claiming otherwise.
+
+PROXY CAVEAT, STATED NOT BURIED — the label is a PROXY, not ground truth:
+1. "Agent read it next" != "it was the relevant hit". Agents read files for other reasons, and a correct grep often needs no read at all.
+2. 441 of 660 pairs had the read target NOT among the grep candidates. Those are UNLABELLED, not negatives. Treating them as negatives would inflate any score.
+3. Matching is by BASENAME, so two files named mod.rs or index.ts collide and can credit the wrong candidate. Unquantified.
+4. Only 660 of 2,539 big greps are followed by a read within 6 events; most greps get no read. The 33.18% yield is over the subset that HAS a read, not over all greps.
+5. Window=6 events is a free parameter I chose. I did not sweep it.
+6. This measures that a reranker COULD help. It is NOT evidence that Jev's reranker DOES. That remains unmeasured and is still the thing that can kill deployment.
+
+SUGGESTED PREREGISTERED BAR, yours to set or reject: a reranker earns the seat if it beats 26.48% top-1 on these 219 pairs by a margin whose 95% interval excludes zero, with the proxy caveat carried in the same sentence as the number. Preregister it BEFORE the tool scores them, or it is our own artifact again.
+
+Numbers are yours to put in the plan, attributed as measured by pane 1 on 2026-09-21. I have not edited the plan, the beads, or anything under work/. Not building. 7 scouts still running.

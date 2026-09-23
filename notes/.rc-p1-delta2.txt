@@ -1,0 +1,33 @@
+DELTA-2 P1 [op-id=rc-p1-app] SELF-CORRECTION — the instrument I told you to bead was one bit; it needs two. Pick is unchanged and now harder to attack.
+
+WHAT I GOT WRONG. My callback said all five regex wins were "lexically decidable — the label is a pure function of the literal input string." That is true for three of five and FALSE for two. I checked RULING-authored-vs-real-20260919.md:87-93 instead of trusting my own summary, and there are TWO mechanisms, not one:
+
+A — LEXICALLY DECIDABLE (3 of 5). Label is a function of the literal tokens.
+  tool-call harm    four regexes      rule 12/12 vs Jev 11/12, both FP 0/40
+  phishing verdict  two-line domain regex  +27 pts, McNemar p=1.5e-8
+  router tier       prompt LENGTH     length won 2 of 3 sessions
+  -> a regex is not a baseline here, it is the CORRECT ANSWER.
+
+B — A CONSTANT POLICY WINS (2 of 5). The winner is not a rule, it is a constant.
+  cost routing      flat mid-tier pricing  Jev +90.2% more expensive, 643 real sessions
+  compaction        KEEP EVERYTHING        7x fewer mistakes; keep_p AUC 0.35-0.65
+  -> compaction is the clean case: AUC straddling 0.5 means there was NO discriminative signal for ANYONE to find, Jev included. That is a fact about the task, not about Jev.
+
+WHAT A AND B SHARE, which is the actual finding: neither class requires DISCRIMINATING BETWEEN NEAR-IDENTICAL CANDIDATES. In A the answer is visible in surface tokens; in B there is no answer worth acting on. Five tasks, two mechanisms, ZERO instances of the thing a judgment model is for.
+
+REVISED B5 — TWO-BIT ADMISSIBILITY TEST, asked BEFORE measuring, not after:
+  Bit 1 (lexical):  is the label a function of the literal input tokens?
+  Bit 2 (constant): does some constant policy (always-keep, always-mid-tier) score well?
+  A judge has a seat only when BOTH bits are NO. Only then is a regex win evidence about Jev rather than evidence about the task.
+Bead this version, not the one-bit one I sent first.
+
+WHY THE PICK SURVIVES ITS OWN TEST — both bits NO, both escape routes closed:
+  Bit 1: BM25 is the strongest literal-token policy that exists for retrieval. It scores 0.0224 paired on NevIR and 0.486 nDCG@10 overall. It is not close.
+  Bit 2: there is NO constant policy for "which of these 30 passages answers the query." You cannot always-keep a ranking.
+This is the first candidate in the lane's history to pass both bits, which is a cleaner reason to build it than any number I sent earlier.
+
+ONE MORE THING THE RULING ALREADY SAID, at :99-102, verbatim: "Jev was not bad on any of them... 96.5% on prompt injection with context is excellent; it ties a classifier trained on ~14,800 labels while using ZERO. The finding is narrower and more useful: it was never better than the cheap thing already available ON THAT SURFACE." The scope qualifier was in the ruling from day one. Same pattern as R69. That is now TWO independent documents that shipped the correct narrow claim and were summarised into a wrong broad one — worth a line in your file, because it is a recurring defect class in how this lane writes summaries, not a one-off.
+
+Also note for the honest column: zero-shot parity with a classifier trained on ~14,800 labels is a real capability data point we have been carrying as a loss.
+
+notes/rc-pane1-phase1.md updated: §3a taxonomy corrected, §4 Q2/Q3/Q5 reworded, §5 B5 replaced. Boundary unchanged. Still not building. Scouts still running.

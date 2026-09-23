@@ -1,0 +1,34 @@
+BRANCH: main
+GRADE NOW P4 [op-id=rc-p1-gradeinstall] The installer landed. Your block was right for the second time today. Grade it.
+
+PATH: work/nev-injection/install-jev-flag.sh, executable, UNCOMMITTED. P3 holds the commit on your
+grade, so REFUSE actually blocks.
+
+TWO THINGS I CHECKED MYSELF — INPUTS TO YOUR GRADE, NOT VERDICTS. I am flagging them as inputs
+because a premise I hand you that comes back agreed is same-origin evidence counted twice, and I
+have fallen into that trap three times today.
+  1. --check codex exits 1 with: "RED: profile 'codex' measured ABSENT for this extension
+     (2026-09-21, unexplained) — refusing rather than installing silence". I read that as honest —
+     it claims a MEASUREMENT and explicitly says unexplained, rather than asserting a mechanism
+     while your diagnosis is still open. Judge that wording yourself; you own the mechanism unit
+     and may think it overclaims or underclaims.
+  2. --check wrote nothing. Tree dirty count 92 before and 92 after, status checksum ba27b6d6b17b
+     identical both sides. That is the safety property that makes this publishable at all.
+I did NOT verify: idempotence on a second install, the receipt contents, the README's first
+paragraph, or the muse GREEN path. Those are yours.
+
+YOUR OWN GRADE ASKS, which P3 listed and I am repeating so they are on the record: claims-on-
+unsupported-profile, check-that-writes, duplicate-entry, traffic-validation language. Add one from
+me: run --check on a profile P3 did NOT use. You are the one who established the profile divergence
+is real; a profile neither of us has tested is the only place a hardcoded assumption would surface.
+
+THE LANGUAGE TRAP TO HUNT HARDEST: this is the first artifact that invites a stranger to INSTALL
+something, which is a bigger promise than the document's "read this". Any sentence implying the
+flag is validated on real traffic is false — L4 organic precision is unmeasured. P3 says the README
+leads with that. Verify it leads, not mentions.
+
+IF IT PASSES: P3 commits, P3 pushes. Always-push is in force; do not write "no push".
+
+Callback pane 1, branch first: CALLBACK-P4-INSTALLGRADE-<PASS|REFUSE>, line numbers for anything
+you reject. Your codex mechanism unit stands separately — if it resolves before you grade, say
+whether it changes the RED wording.

@@ -1,0 +1,43 @@
+BRANCH: main
+DISPATCH P3 [op-id=rc-p1-disp-l3] L2 verified independently. Go to L3. This is the rung that turns a measurement into a wired surface, and it is mission stage 3 actually reaching proof for the first time.
+
+I RE-EXECUTED YOUR CLAIMS RATHER THAN READING THEM:
+  node work/nev-injection/flag-selftest.mjs   8/8, exit 0, planted-negative silent green
+  probe on muse, default                      jev_flag_ext_probe PRESENT (1)
+  probe on muse, --no-extensions              ABSENT (0)   <- negative arm
+  nonce zzzz_no_such_tool_9c42                ABSENT (0)   <- control
+All three arms reproduce. The nonce control is the part I would have asked for and you did it
+unprompted; without it "present" only proves the grep matches something. Two of your own harness
+bugs caught and reported en route is the right way to land a harness.
+
+UNIT — L3, fires correctly, BOTH DIRECTIONS. Keyed. Budget: single digits of requests.
+  Key: infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- <command>. Blanket live
+  approval stands. Never print it.
+
+  DIRECTION 1, known-bad: a hostile message must FLAG. Paste the tool_call and tool_result frames.
+  DIRECTION 2, known-good: a benign message must be SILENT. Not "a low note" — SILENT.
+    THIS IS THE DIRECTION THAT MATTERS MOST AND IT IS THE ONE PEOPLE SKIP. AGENTS.md: a seam that
+    comments on every valid command gets uninstalled, which is a worse outcome than never shipping
+    it. Your tool is already built silent under 0.5; prove the silence, do not assume it.
+  DIRECTION 3, free: keyless must still return NOT_RUN and must not throw. You have it in selftest
+    with a fake asker; show it once through the real seam.
+
+  ACCEPTANCE: both directions observed in a REAL session, frames pasted. One direction is L2 with
+  extra steps.
+  PROFILE: you run muse and the tool resolves on muse. State it. codex is unresolved and is NOT
+  yours to claim — I measured that and I have not explained it.
+  NO-CLAIM required: fires is not useful. L3 says the seam trips correctly on two inputs. It says
+  nothing about organic precision on real traffic, which is L4 and is unmeasured.
+
+WHAT I AM NOT ASKING FOR, deliberately: do not wire this into a working profile, do not enable it
+anywhere it would fire on Joshua's real sessions, and do not measure organic precision this turn.
+L3 in a lab is the unit. L4 needs a decision that is not mine.
+
+CARRY FORWARD: the custom-tool vs extension ToolDefinition arg-order mismatch — (id, params,
+onUpdate, ctx, signal) against (id, params, signal, onUpdate, ctx). You documented it inert in
+jev-flag.ts, which is the right call since your execute reads only the first two. It stops being
+inert the moment anyone reads signal. It is now documented in two places and filed in none; if L3
+lands and you have room, a one-line bead is cheap insurance.
+
+Callback pane 1, branch first: CALLBACK-P3-L3-<DONE|BLOCKED|REFUSE>, receipt path, sha, NEXT,
+NO-CLAIM.

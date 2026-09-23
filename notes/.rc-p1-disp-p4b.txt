@@ -1,0 +1,36 @@
+DISPATCH P4 [op-id=rc-p1-disp-p4b] You are IDLE and jev-k9z.3 is the last ready bead. Unlike k9z.2 and k9z.4, which you correctly blocked, this one has a real body: WHAT/WHY/ACCEPTANCE, planted negatives, prevalence, and third-party ground truth. P3 released it at 20:18 to avoid double-holding against k9z.5, and left you a half-built offline probe at work/nev-routing/ (lexical_baseline.py + pairs).
+
+Finish one unit, fire its callback, then start the next YOURSELF. Do not wait for a dispatch between them.
+
+UNIT 1 — REGIME TEST FIRST, OFFLINE, ZERO SPEND. This is the order that worked for P3 and the order that would have saved the calls we nearly burned on k9z.2.
+The bead ASSERTS both bits are NO, citing "skillranker corpus where Jev beats always-abstain 5x on their own data". Do not take that on trust — it is a number in a bead body and section 4 of the tick says open the control before repeating any number, including a pane's. I have not verified it and neither should you.
+  Do: compute BOTH baselines on the skillranker corpus, same rows, paired.
+    BIT 1 lexical: a wide keyword/name-match router over the skill roster. P3's injection run is the
+      template — 40+ phrases, word-boundary, and report recall separately from accuracy, because
+      that is where the collapse showed (3.8% recall behind a 61.6% accuracy).
+    BIT 2 constant: always-abstain, and any other constant that competes.
+  POSITIVE OBSERVABLE: both baselines scored on the same rows, with the discordant counts, not two
+    independent percentages.
+  PLANTED NEGATIVE: a nonce skill name that exists in no roster must never be suggested by either
+    arm; empty context must abstain. The bead already names both — use them.
+  DECISION RULE, write it before you look: if EITHER bit is YES, this is not a seat and you close it
+    like you closed k9z.2 and k9z.4. That is a win, not a failure, and it costs zero dollars.
+
+UNIT 2 — ONLY IF BOTH BITS ARE NO. Live N>=20, and the bar goes in a committed file BEFORE the first
+call. R69 is the law here: when the observed rate lands on the bar, no sample size rescues it, and
+moving a bar to admit our own artifact is forbidden.
+  Key: infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- <command>. It is present,
+  len 107. Joshua gave blanket live approval this session. Never print it.
+  Persist PER-ROW outputs, not aggregates. R70 and today's 219-row corpus both died on that.
+
+UNIT 3 — dry-queue default. After k9z.3 the frontier is empty. Take the oldest satisfiable
+NEGATIVE_EVIDENCE.md retry condition or a GATES.md gap with no witness, and name what you rejected.
+
+ONE UNFILED THING I WOULD LIKE SOMEONE TO CARRY, your call whether it is yours: the execute
+arg-order mismatch. Custom-tool execute is (id, params, onUpdate, ctx, signal); extension
+ToolDefinition execute is (id, params, signal, onUpdate, ctx). Inert today because the wrapped tool
+reads only the first two args. It breaks silently the moment anyone uses signal. P3 flagged it, I
+confirmed it against omp://extensions.md and omp://custom-tools.md, and it is still only in a bead
+comment. A one-line comment in .omp/extensions/jev-rerank.ts naming the hazard would be enough.
+
+Callback pane 1: CALLBACK-P4-<UNIT>-<DONE|BLOCKED|REFUSE>, receipt path, sha, NEXT, NO-CLAIM.

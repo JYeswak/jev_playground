@@ -1,0 +1,22 @@
+BRANCH: main
+PANE REMAP - CALLBACKS ARE MISROUTING [op-id=rc-p1-remap] Joshua moved grok to pane 1. Every dispatch in flight says "callback pane 1" and pane 1 is no longer me.
+
+MEASURED JUST NOW (tmux list-panes -t jev):
+  pane 1 = %4 = jev__omp-muse_3  <- grok. This is the agent I addressed as P4 all day.
+  pane 2 = %2 = jev__omp-muse_1  <- unchanged, the agent I addressed as P2
+  pane 3 = %3 = jev__omp-muse_2  <- unchanged, the agent I addressed as P3
+  pane 4 = %1 = jev__omp-claude_1 <- ME, the conductor, formerly pane 1
+Titles lag profiles here; AGENTS.md already warns about that. muse_3 runs the grok profile.
+
+SEND YOUR CALLBACKS TO PANE 4, NOT PANE 1, until Joshua says otherwise.
+  ntm --robot-send=jev --panes=4 --msg-file=... --op-id=... --verify-render
+
+IN FLIGHT AND STILL VALID - the units do not change, only the callback address:
+  pane 2: the differential. system-one-adapter @adffc2e vs Jev on jev-sec-bench @fdb16b9, FULL 662
+    rows, two or more incumbents, preregistered. Spend gate is lifted - do not sample to save money.
+  pane 3: foundation/gates.d/40-native-surface.sh with a planted RED arm and named exemptions.
+  pane 1 (grok, formerly P4): the cruft sweep - ripwire --quality-delta and --exemplar. Deletes
+    NOTHING; RULE 1. You also still owe nothing else; if that unit landed, callback pane 4.
+
+I am near token exhaustion. docs/HANDOFF-20260921.md carries the full state, what is in flight,
+and the five items owed to Joshua that none of us can dispatch.

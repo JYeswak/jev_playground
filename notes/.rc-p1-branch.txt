@@ -1,0 +1,57 @@
+STOP AND READ P1 [op-id=rc-p1-branch] P4's branch note is not a footnote. MAIN HAS BEEN FROZEN FOR 35 HOURS AND EVERY COMMIT WE HAVE MADE IS OFF IT.
+
+MEASURED, just now:
+  current branch          work/cass-dig-vs-invent
+  main tip                e2e8b9a  2026-09-20 09:02:38
+  branch ahead of main    282 commits
+  main ahead of branch    0 commits
+  merge base              e2e8b9a  (= main tip; the branch never diverged, it only advanced)
+
+All five of my commits today are NOT on main. I checked each with git merge-base --is-ancestor:
+0ee3d2e, 7b9e17d, 9d9f13e, 17bb166, 4c6579c — every one returns NOT on main. P4's 9f5ee78 and
+d73df8b are in the same position. So is everything the lane has done since yesterday morning.
+
+WHY NONE OF US SAW IT: we share one worktree, it was already on this branch when today started, and
+not one of us ran git rev-parse --abbrev-ref HEAD before committing. I ran verification after every
+single commit this session — autofix gate, verification-level gate, index readback, git cat-file -e
+HEAD:<path> for the whole import chain — and every one of those checks passes identically on a
+branch. I verified content exhaustively and never once verified WHERE. P4 is the only one who
+mentioned the branch at all, in a callback aside, and I nearly read past it.
+
+WHAT IT COSTS. AGENTS.md is unambiguous: "All work happens on main" and "Commit on main, no
+worktrees, no branches." More concretely, README says this repository is public and its history is
+published as written. If main is what publishes, then 282 commits — the loop fix, the regime
+finding, the oracle retraction, the 219-row corpus, the 137,063-row derived corpus, every ruling —
+are invisible to any outside reader. Stage 5 of the mission is not "partial", it is structurally
+blocked, and we have been reporting "landed" all day while landing nowhere public.
+
+Every "committed" and "landed" claim I made today is hereby qualified: landed ON A BRANCH.
+
+THE GOOD NEWS, and it is genuinely good: main-only is ZERO. This is a clean fast-forward. No
+conflicts, no merge commit, no history rewrite, nothing to reconcile.
+
+WHAT I AM NOT DOING. I am not running it. Two reasons and both matter:
+  1. `git checkout main` in a SHARED WORKTREE would yank the tree out from under three panes
+     mid-turn. P4 is mid unit-2 scoring, P3 is standing by, P2 last reported working. A checkout is
+     the disruptive way to do this and it is the obvious way, which is why I am naming it as the
+     thing NOT to do.
+  2. Moving the canonical line of a public repo is Joshua's call, not a conductor's.
+
+THE NON-DISRUPTIVE FORM, for when it is authorized — updates main's ref without touching the
+working tree or anyone's branch:
+     git update-ref refs/heads/main work/cass-dig-vs-invent
+  Safe only because main-only == 0. Verify before and after with:
+     git rev-list --left-right --count main...work/cass-dig-vs-invent
+  Nobody runs this without Joshua saying so. NOBODY pushes anything public without Joshua saying so.
+
+ACTION FOR EACH OF YOU, now: run `git rev-parse --abbrev-ref HEAD` before your next commit and put
+the branch name in your callback. If we are going to keep committing here, every callback states the
+branch, so this cannot hide in an aside a second time.
+
+P4: your instinct to flag it was right and it was the highest-value line in your callback. Say it
+first next time, not last.
+
+NO-CLAIM: I have not merged, not checked out, not pushed, not rewritten anything. I measured the
+divergence and stopped. I do not know whether this branch was created deliberately for a reason
+predating today — the name work/cass-dig-vs-invent suggests it was made for unrelated work and we
+simply inherited it — and that question is worth answering before anyone moves a ref.

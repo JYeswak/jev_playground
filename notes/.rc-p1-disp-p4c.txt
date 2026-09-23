@@ -1,0 +1,44 @@
+BRANCH: main
+DISPATCH P4 [op-id=rc-p1-disp-p4c] You are IDLE and unit 2 is scoped, barred, and free. Go.
+
+I verified your unit-1 output landed and is reconcilable by a third party:
+  work/nev-routing/tool-select-derived.jsonl   IN main, 137,063 rows
+  fields: context_len, context_sha256, id, label, n_candidates, prev_tool  — no context text
+  work/nev-routing/tool-select-bar.md          IN main
+That is R70 closed properly: someone who never sees a command can still re-extract, re-hash with
+salt jev-tool-select-v1, and reconcile every count and label against you. It is the first corpus
+this lane has shipped that is simultaneously auditable and non-disclosing, and it is the shape every
+future session-derived corpus should copy.
+
+UNIT 2 — score the cheap router. Zero API spend.
+Your bar, written before any score and unchanged: recall on label != prev_tool. >=0.25 kills the
+seat, <0.10 means the seat is live, between is UNDERPOWERED. You chose those numbers, not me, which
+is the section-4 same-origin trap correctly avoided.
+
+  POSITIVE OBSERVABLE: recall reported against the bar, with the denominator (how many rows have
+    label != prev_tool) stated. That subset size is the real n, not 137,063 — say it out loud,
+    because a recall over an unstated denominator is the shape that produced our 73x and 3.8%
+    confusions today.
+  REPORT ACCURACY AND RECALL SEPARATELY. On injection the collapse was invisible in accuracy
+    (61.6%) and obvious in recall (3.8%). Accuracy alone would have hidden the single strongest
+    result this lane has. Do not let it hide this one.
+  PLANTED NEGATIVE: the nonce must never be predicted; a row with no candidates must produce no
+    prediction. You already proved both fire at extraction — prove them again at scoring, because a
+    scorer is a different instrument than an extractor and today taught us instruments lie
+    independently.
+  DISCORDANTS: if you compare arms, report b-c, not just p. Two candidates already sit just outside
+    p<0.05 with tiny discordant counts; we are not adding a third by reporting a bare p-value.
+
+EITHER OUTCOME IS A RESULT, and I want you to feel free to land the kill:
+  >=0.25  -> bit 1 is YES on real usage. k9z.3 dies for real, on 137,063 rows instead of 12, and the
+             whole tool-selection class is closed for zero dollars. That is a WIN and it is probably
+             the most valuable thing available today.
+  <0.10   -> the seat is live and you have the first tool-selection corpus this lane has ever had.
+  between -> UNDERPOWERED, and you say so rather than picking the nearer edge. That is exactly the
+             correction we just applied to your k9z.3 bit-1 call.
+
+NO-CLAIM to carry, yours from unit 1, unchanged: called-next is a proxy for correct; name collisions
+inflate; yield is only over calls followed by another call.
+
+Callback pane 1, branch first: CALLBACK-P4-UNIT2-<DONE|BLOCKED|REFUSE>, receipt path, sha, NEXT,
+NO-CLAIM. Do not start unit 3 in the same breath.

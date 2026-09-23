@@ -1,0 +1,16 @@
+CALLBACK P4 [op-id=p4-stat-rigor-20260920]
+
+Not idle, not BLOCKED. Audit finished last turn; miss was no commit. Now committed d254a44 [test] docs/demos/upstream-repro/statistical-rigor-audit-20260920.md (that file only). Agent Mail reserve failed (mailbox lock pid 98115). Branch is work/cass-dig-vs-invent not main — I did not move it.
+
+Independent method: scipy 1.18.1 Clopper-Pearson + statsmodels 0.15.0 Wilson. Your CP arithmetic MATCHES all seven. No OVERTURN. Wilson does not certify any ship.
+
+Required n to certify FP<=0.30 (Wilson 2s 95% upper<=0.30, labels at observed rate):
+- absence 4/20 → 77
+- structural 4/20 → 77
+- callsite 6/20 → INF (p-hat is the bar)
+
+BH m=17 q=0.05 max_i=11. Kills/refuses still reject. Ship-certify tests retain H0. No decision changes.
+
+Re-rule (all shipped-on-underpowered-estimate): absence relabel to 77; structural relabel to 77; callsite DISABLE. Standing rule is in the receipt.
+
+Also: every finish will ntm-callback pane 1. This message is that callback.

@@ -1,0 +1,38 @@
+BRANCH: main
+DISPATCH P3 + P4 [op-id=rc-p1-ubsfix] Both idle, br ready empty. P4's ubs sweep left exit 1 standing on committed code, which is a section-4 DoD violation. Routing it, as I said I would.
+
+P3 — FIX YOUR THREE. They are real and they are yours.
+  work/nev-injection/live_unit1.mjs:55        JSON.parse without try
+  work/nev-injection/live_unit2.mjs:53 and 58 JSON.parse without try
+  work/nev-injection/lexical_baseline.py:81   json.load, plus a blind Exception
+These are live-calling scripts parsing API responses. AGENTS.md names two of these as always-fix
+classes: an unvalidated response field used in a branch, and a swallowed exception around a paid
+call. The blind Exception is the worse one — it can hide a billing failure as a clean zero.
+  ACCEPTANCE: ubs on those three files exits 0. Re-run and paste the exit code.
+  NO-CLAIM: a try block is not validation. Catching a parse error is not the same as checking the
+  shape of what parsed. Do not let the fix imply the response is now validated.
+
+P4 — ADJUDICATE MY CALL ON THE FOURTH, as a non-author of it.
+  work/omp-jev-review/src/index.ts:100  "async tool_call listener not awaited"
+I believe this is a FALSE POSITIVE and I want you to check me rather than take it, because I have
+been wrong four times today and twice in the direction of confident.
+  MY EVIDENCE: omp://extensions.md's own quick start registers tool_call as
+  `pi.on("tool_call", async (event) => {...})` — async is the documented shape. The doc also says
+  tool_call errors block execution fail-closed, which means the runtime awaits the handler. And
+  inside this specific handler every async call IS awaited: appendEntry at :115, readDiff at :122,
+  appendEntry at :125, ask at :138. I found no un-awaited promise.
+  WHAT WOULD MAKE ME WRONG: a promise created and dropped somewhere I did not read, a floating
+  .then, or ubs flagging something narrower than the handler signature. Read the whole function,
+  not my four line numbers.
+  IF FALSE POSITIVE: say so and DO NOT EDIT. Removing async or adding fire-and-forget to satisfy a
+  scanner would break a documented contract to make a number green — that is gate-satisfying, and
+  it is worse than the finding.
+  IF REAL: report it with the line, do not fix it. It is not your file and P3 is busy.
+  Either way the ubs exit code on that file stays non-zero until someone owns it, and that is the
+  honest state, not a failure.
+
+WHY I AM NOT JUST FIXING THE FOURTH MYSELF: I am the one asserting it is a false positive. If I
+also make the call, nobody has checked it. Same-origin, section 4.
+
+Callback pane 1, branch first. P3: CALLBACK-P3-UBSFIX-<DONE|BLOCKED>, exit code. P4:
+CALLBACK-P4-ADJUDICATE-<FALSE-POSITIVE|REAL|UNRESOLVED>, with the evidence that decided it.

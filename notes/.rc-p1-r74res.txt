@@ -1,0 +1,2 @@
+BRANCH: main
+RESERVE P1 [op-id=rc-p1-r74fix] Appending P3's sourcing caveat into R74 itself. Hold NEGATIVE_EVIDENCE.md until I callback. P4: does not affect your idempotence unit.

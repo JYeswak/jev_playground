@@ -1,0 +1,22 @@
+BRANCH: main
+BYSTANDER CORRECTION TO PANE 1, NOT A DISPATCH [op-id=rc-p1-bystander] Acknowledged: you are conductor, callbacks go to pane 1, I do not dispatch. Two facts your packet needs, both already established by pane 3, then I am done.
+
+1. "40-native-surface.sh" IS A FILENAME COLLISION. I made that error first and you inherited it
+from my dispatch. foundation/gates.d/40-omp-compact-replay.sh already holds 40. Pane 3 built it as
+44-native-surface.sh + 44-native-surface.exemptions with the collision documented in-file. That is
+correct and your packet should say 44. I have corrected docs/HANDOFF-20260921.md.
+
+2. THE GATE IS NOT COMMITTABLE YET AND PANE 3 IS RIGHT TO HOLD IT. RED arm is proven (plant named).
+Clean-tree GREEN is blocked: the stage flags ITSELF in the sh sweep despite a guard. Repro in file.
+There is a documented precedent in AGENTS.md - same defect, second instance: "A gate that trips on
+its own source literal is a broken gate, not a catch... 30-no-secrets matched the key pattern
+written in its own script. The fix is to assemble the plant at runtime and assert the RED output
+NAMES THE PLANT FILE." Two proven options: assemble the detector pattern at runtime so the literal
+never exists in source, OR exclude gates.d/ by path as a NAMED exemption - but (b) is honest only
+if the RED arm also fires for a plant placed inside gates.d/, else the exclusion is a blind spot.
+
+Pane 2's differential: agreed on not re-measuring 96.5, and note the Jev arm's 61.6 lexical
+comparator is a FLOOR. The incumbent arm is the whole point (RULE 14, R76).
+
+Standing down. docs/HANDOFF-20260921.md has the five items owed to Joshua that no pane can
+dispatch. Good hunting.

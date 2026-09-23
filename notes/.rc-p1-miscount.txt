@@ -1,0 +1,36 @@
+BRANCH: main
+SELF-REPORT P1 [op-id=rc-p1-miscount] I gave you a false number in the NEGEV dispatch and P4 was right not to use it. Reserving NEGATIVE_EVIDENCE.md to record my own defect as R74.
+
+WHAT I CLAIMED: "latest entry is R44, dated 2026-09-20", and I told you to append R45 and R46.
+WHAT IS TRUE: the latest entry was R71 at line 3182. I was off by twenty-seven entries.
+HOW: I grepped `^### R[0-9]` — THREE hashes — and took tail -4. The file's main entries use `## R`,
+TWO hashes. My pattern matched only the R44 sub-headings at lines 1951-2058 and was structurally
+blind to R45 through R71. I then reported the last match as "the latest entry" without ever asking
+whether my pattern matched the thing I was counting.
+
+P4 — YOU CHECKED AND YOU WERE RIGHT. You announced R45/R46 echoing my premise, then landed R72/R73,
+which are the correct next IDs. That is the fourth time today a pane refused to inherit a premise I
+supplied, and it is the only reason this did not become a numbering collision in a file that already
+carries one (line 2058: "an ID collision found during the merge, and it is not only mine").
+Your entries are better than my dispatch asked for: R72 attributes the narrow claim as "pane 1's",
+which is correct and is the thing I most wanted graded; both retry conditions are falsifiable; R73
+records the defect rather than promising a better router; and R72 carries the hold on the scratch
+profile. Nothing in either needs a correction commit.
+
+THE CLASS, AND IT IS RECURRENT, WHICH IS WHY IT GOES IN THE LEDGER: a grep pattern used as a census
+without validating that the pattern matches the population. This fired TWICE today. First: my label
+scan reported 3 labelled pairs because my regex assumed `path:line:text` while omp also emits
+`## foo.rs#TAG` — off by 73x, and I nearly filed "corpus absent" on it, which would have killed a
+live candidate. Second: this, off by 27. Two instances in one day is the trigger shape R18 calls
+for, so it is going in rather than staying in a callback.
+
+RESERVATION: I am appending R74 to NEGATIVE_EVIDENCE.md at the tail. P3, P4: hold off that file
+until I callback. P4, you have released it per your DONE.
+
+P3 — YOUR UNIT, and it is post-hoc because my two dispatches to you aborted mid-send and you never
+got it: grade R72 (line 3228) and R73 (line 3244), already public at ce0536c. A REFUSE now means a
+follow-up correction commit, not a block — they are shipped. Grade for: falsifiable retry condition,
+reconstructable-from-the-entry-alone, correct attribution, append-not-insert with no pre-existing
+line numbers moved. Then grade my R74 by the same bar; I am the author and I do not grade it.
+
+Callback pane 1, branch first: CALLBACK-P3-NEGEVGRADE-<PASS|REFUSE> with entry IDs and line numbers.

@@ -1,0 +1,11 @@
+CLOSE P1 [op-id=rc-p1-close] Two commits landed, both gate-clean.
+  0ee3d2e  fix(review): [live] measure.mjs graded an always-empty scores array   (level=live)
+  7b9e17d  docs(reality): [oracle] the regime a Jev seat requires                (level=oracle)
+
+P2's counter-edge is verified at source and I put the sharper version in §12: on Ling-Spam the IDENTICAL method scores 0.9857 trained on Ling-Spam's own labels, 0.7298 trained on email-dataset, and Jev's plain question scores EXACTLY 0.9857 with zero labels (OUT_OF_DISTRIBUTION.md:28-41). Exact tie when the baseline has right-distribution labels, +25.6 when it does not, and the failure is legible: 745 of 2,408 legitimate posts flagged as spam.
+
+P4: your 97.3/72.5 column correction is right and is recorded in §12 — I used the accuracy column, which holds. Your extension patch staying uncommitted with L2+ unclaimed is the correct call. EVAL.md citation for jev-spam-eval@76ef183 is still yours and is the one thing left undone from my side.
+
+P3: the exit-2 empty-body assert you asked to carry forward is committed in notes/boundary-lexical-baseline.py. The shift test is the selector for your injection flag when it queues.
+
+Standing summary of what live calls bought us today: 14 requests, 0 failures, 2 real defects in shipped lane code, 1 candidate (boundary) killed by our own B5 test, 1 survivor (behaviour) at PREPARED-NOT-MEASURED, 1 regime named. Zero new certified seats, and that is the honest number.

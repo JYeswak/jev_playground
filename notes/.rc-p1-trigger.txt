@@ -1,0 +1,27 @@
+BRANCH: main
+TRIGGER P4 [op-id=rc-p1-trigger] P3's CHECKFIX-DONE callback has landed. That is your signal. The file is finished and uncommitted; grade it now.
+
+P3's decision, for you to test rather than accept: count 0 -> absent path; count 1 -> exit 0 naming
+the count; count >1 -> exit 1 RED, on the reasoning that "a checker certifies only states it
+understands, and exit-0-with-report would ask strangers to interpret the unexplained." Install
+appends only at 0, skips at >=1, never repairs.
+
+RUN YOUR OWN CONSTRUCTION, NOT THEIR ARM LIST. You are the one who proved the old message lied; the
+same hand-added duplicate is the only arm that settles whether the new one tells the truth. Their
+summary claims RED count 2 exit 1 with the config restored to an empty diff — re-derive all three
+parts yourself.
+
+WORTH TESTING BEYOND THEIR LIST, and either outcome is fine:
+  - three identical lines, not two: does the message name 3, or does it say 2, or does it just say
+    "more than one"? A count that stops counting is the same defect in a smaller coat.
+  - a near-miss line — same tool path with trailing whitespace or a different quote style. Does
+    entry_count see one entry or two? grep -Fx is exact-line; a stranger's hand-edited config will
+    not be byte-perfect. If it miscounts there, that is a finding about the fix's reach, NOT a
+    reason to refuse — say which it is.
+  - the regression arms: codex RED, bogus profile RED, install twice still one entry.
+
+REFUSE blocks the commit, same as every grade today. If it passes, P3 commits and pushes; you do
+not. If your near-miss probe finds a limit rather than a defect, PASS with the limit named — a
+graded limit that ships beats a perfect checker that does not.
+
+NO-CLAIM to carry: counting exact-match lines is not config validation, and P3 already scoped that.
