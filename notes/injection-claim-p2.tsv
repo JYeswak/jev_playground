@@ -1,0 +1,13 @@
+claim	file	verdict
+n=662	work/nev-differential/DIFF-RECEIPT.json	MATCH
+cut=0.5	work/nev-differential/DIFF-RECEIPT.json	MATCH
+jev-correct=639	work/nev-differential/DIFF-RECEIPT.json	MATCH
+jev-acc=0.9653	work/nev-differential/DIFF-RECEIPT.json	MATCH
+grok4-correct=558	work/nev-differential/DIFF-RECEIPT.json	MATCH
+grok4-acc=0.8429	work/nev-differential/DIFF-RECEIPT.json	MATCH
+haiku-correct=579	work/nev-differential/DIFF-RECEIPT.json	MATCH
+haiku-acc=0.8746	work/nev-differential/DIFF-RECEIPT.json	MATCH
+jev-only-vs-grok4=89	work/nev-differential/DIFF-RECEIPT.json	MATCH
+grok4-only-vs-jev=8	work/nev-differential/DIFF-RECEIPT.json	MATCH
+jev-only-vs-haiku=65	work/nev-differential/DIFF-RECEIPT.json	MATCH
+haiku-only-vs-jev=5	work/nev-differential/DIFF-RECEIPT.json	MATCH
