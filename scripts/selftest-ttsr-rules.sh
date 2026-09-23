@@ -217,13 +217,27 @@ fi
 # by loading a canary from /tmp, where `omp ttsr list` showed it as `[agents]`. That root is where
 # a junior-mistake rule has to live to be system-wide, so it needs the same compile guard: a
 # silently-dead rule there is dead in EVERY repo on the machine, not just this one.
+# alwaysApply rules have no stream condition by design: omp puts them in the system prompt instead
+# of watching the stream (e.g. ~/.agents/rules/kit-standing-law.md, 2026-09-22). Only a rule WITHOUT
+# alwaysApply and without a usable condition is dead. One classifier serves the real loop and the
+# planted arms below, so the exemption cannot drift away from what the arms test.
+compile_verdict() { # compile_verdict <rule.md>  ->  alwaysapply | dead | ok
+  if awk 'NR==1 && $0=="---" {f=1; next} f && $0=="---" {exit} f' "$1" | grep -qE '^alwaysApply:[[:space:]]*true[[:space:]]*$'; then
+    echo alwaysapply; return
+  fi
+  case $(omp ttsr test --rule "$1" --source text 'zzzz_cannot_exist_9c42' 2>&1 || true) in
+    *'no usable TTSR condition'*) echo dead ;;
+    *) echo ok ;;
+  esac
+}
 for rf in .omp/rules/*.md "$HOME"/.agents/rules/*.md; do
   [ -e "$rf" ] || continue
-  out=$(omp ttsr test --rule "$rf" --source text 'zzzz_cannot_exist_9c42' 2>&1 || true)
   scope=project; case $rf in "$HOME"/.agents/*) scope=systemwide;; esac
-  case $out in
-    *'no usable TTSR condition'*)
+  case $(compile_verdict "$rf") in
+    dead)
       note FAIL "compile[$scope]: $(basename "$rf") has no usable condition — loads and NEVER fires"; fail=$((fail+1)) ;;
+    alwaysapply)
+      note ok "compile[$scope]: $(basename "$rf") is alwaysApply (system prompt, not a stream rule)"; pass=$((pass+1)) ;;
     *)
       note ok "compile[$scope]: $(basename "$rf") compiles"; pass=$((pass+1)) ;;
   esac
@@ -264,6 +278,8 @@ red_dir=/tmp/ttsr-redarm; mkdir -p "$red_dir"
 printf -- '---\ncondition: %s\nscope: text\n---\nplanted known-bad\n' "'foo|(?i)bar'"  > "$red_dir/embedded-flag.md"
 printf -- '---\ncondition: %s\nscope: text\n---\nplanted known-bad\n' "'foo[unclosed'" > "$red_dir/unbalanced.md"
 printf -- '---\ncondition: %s\nscope: text\n---\nplanted known-GOOD near-miss\n' "'(?i)leading_is_legal'" > "$red_dir/leading-flag.md"
+printf -- '---\ndescription: planted known-bad, no condition and no alwaysApply\n---\nplanted\n' > "$red_dir/conditionless.md"
+printf -- '---\ndescription: planted known-good\nalwaysApply: true\n---\nplanted\n' > "$red_dir/always.md"
 for plant in embedded-flag unbalanced; do
   out=$(omp ttsr test --rule "$red_dir/$plant.md" --source text 'zzzz_cannot_exist_9c42' 2>&1 || true)
   case $out in
@@ -275,6 +291,14 @@ out=$(omp ttsr test --rule "$red_dir/leading-flag.md" --source text 'zzzz_cannot
 case $out in
   *'no usable TTSR condition'*) note FAIL "compile near-miss: a LEADING (?i) was rejected — guard is over-strict"; fail=$((fail+1)) ;;
   *) note ok "compile near-miss: leading (?i) accepted, not flagged"; pass=$((pass+1)) ;;
+esac
+case $(compile_verdict "$red_dir/conditionless.md") in
+  dead) note ok "compile RED arm: planted rule with no condition and no alwaysApply is dead"; pass=$((pass+1)) ;;
+  *) note FAIL "compile RED arm: a conditionless non-alwaysApply rule was NOT flagged — the exemption swallows dead rules"; fail=$((fail+1)) ;;
+esac
+case $(compile_verdict "$red_dir/always.md") in
+  alwaysapply) note ok "compile near-miss: alwaysApply rule with no condition is exempt"; pass=$((pass+1)) ;;
+  *) note FAIL "compile near-miss: an alwaysApply rule was flagged — guard is over-strict"; fail=$((fail+1)) ;;
 esac
 
 # EXPOSURE RED ARM. The 818-class error counted forbid(unsafe_code) churn as
@@ -333,8 +357,14 @@ arm_at() { # rule expect label source tool path snippet
   if [ "$got" = "$want" ]; then note ok "$label ($want)"; pass=$((pass+1))
   else note FAIL "$label — wanted $want, got $got"; fail=$((fail+1)); fi
 }
-arm_at .omp/rules/kit-close-needs-evidence.md fire  "kit-close: br close without reason" tool bash "" "br close jev-x"
-arm_at .omp/rules/kit-close-needs-evidence.md fire  "kit-close: streamed prefix before --reason" tool bash "" "br close jev-x --reason"
+# The live matcher sees the command inside the tool call's JSON arguments, so the closing `"` of
+# the command string is what ends a bare `br close <id>`; the CLI tester passes raw text, so the
+# fire arms name a terminator explicitly. The streamed-prefix arm is QUIET since 2026-09-23: the
+# old pattern fired on `br close jev-x --reason` before the reason arrived (proven by pane 2, fe819d3);
+# the pattern adopted from ~/.agents waits for the command to end.
+arm_at .omp/rules/kit-close-needs-evidence.md fire  "kit-close: br close without reason (JSON-quoted)" tool bash "" '{"command":"br close jev-x"}'
+arm_at .omp/rules/kit-close-needs-evidence.md fire  "kit-close: br close without reason, then another command" tool bash "" "br close jev-x; br list"
+arm_at .omp/rules/kit-close-needs-evidence.md quiet "kit-close: streamed prefix before --reason stays quiet" tool bash "" "br close jev-x --reason"
 
 arm_at .omp/rules/kit-close-needs-evidence.md quiet "kit-close: br close with reason"    tool bash "" "br close jev-x --reason done"
 arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: commit --no-verify" tool bash "" "git commit --no-verify -m x"

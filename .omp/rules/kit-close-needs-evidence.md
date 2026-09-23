@@ -1,7 +1,7 @@
 ---
 description: "Kit B2 / forbidden pattern 7: close beads only with cited evidence"
 condition:
-  - '\b(br|bd)\s+close\b(?![^\n]*(--reason|-r)\s)'
+  - '\b(?:br|bd)\s+close\b(?:(?!--reason\b|-r\b)[^;&|"\\])*(?:["'';&|]|\\n)'
 scope: "tool:bash"
 interruptMode: always
 ---
