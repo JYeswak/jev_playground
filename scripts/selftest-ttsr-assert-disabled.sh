@@ -55,13 +55,22 @@ else
 fi
 
 for r in "${EXPECTED_DISABLED[@]}"; do
-  out2=""; rc2=0
-  out2=$("$S" "$r" 2>&1) || rc2=$?
-  if [ "$rc2" -eq 0 ]; then note ok "GREEN: $r absent both scopes"; pass=$((pass+1))
-  else note FAIL "GREEN: $r exit=$rc2 (still present — disable did not take)"; fail=$((fail+1)); fi
-  case "$out2" in
-    *'still present'*) note FAIL "GREEN: $r output claims present"; fail=$((fail+1)) ;;
-  esac
+  # Premise was stale. The disable lived only in the grok profile
+  # (~/.omp/profiles/grok/agent/config.yml:28-30). This script used to call
+  # ttsr-assert-disabled.sh, which also counts an outside-repo scope. That
+  # scope still lists ~/.agents/rules/absence-from-one-probe.md, and a project
+  # config cannot hide it. The lane disable is now .omp/config.yml
+  # ttsr.disabledRules. Check that list with the profile vars unset, so a
+  # grok shell cannot make the arm look green.
+  out2=$(env -u OMP_PROFILE -u PI_PROFILE -u PI_CODING_AGENT_DIR omp ttsr list --json)
+  n2=$(printf '%s\n' "$out2" | python3 -c '
+import json, sys
+name = sys.argv[1]
+rules = json.loads(sys.stdin.read())
+print(sum(1 for r in rules if isinstance(r, dict) and r.get("name") == name))
+' "$r")
+  if [ "$n2" -eq 0 ]; then note ok "GREEN: $r absent from project list"; pass=$((pass+1))
+  else note FAIL "GREEN: $r still in project list (count=$n2)"; fail=$((fail+1)); fi
 done
 
 out3=""; rc3=0

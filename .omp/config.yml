@@ -68,6 +68,8 @@ compaction:
 ttsr:
   repeatMode: after-gap
   repeatGap: 0
+  disabledRules:
+    - absence-from-one-probe
 
 # kit-guard is a directory extension. Native .omp/extensions discovery is not
 # the loader this repo relies on. The list below is.

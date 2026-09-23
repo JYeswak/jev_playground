@@ -19,7 +19,16 @@ mkdir -p "$(dirname "$STATE")"
 if [ -e .omp/STOP ]; then say "found .omp/STOP; stopping"; exit 1; fi
 
 if command -v br >/dev/null 2>&1; then
-  ready=$(br ready --json 2>/dev/null | grep -o '"id"[[:space:]]*:' | wc -l | tr -d ' ')
+  br_err=$(mktemp)
+  br_out=$(br ready --json 2>"$br_err")
+  br_rc=$?
+  if [ "$br_rc" -ne 0 ]; then
+    say "br ready failed exit $br_rc: $(tr '\n' ' ' < "$br_err") $(printf '%s' "$br_out" | tr '\n' ' ')"
+    rm -f "$br_err"
+    exit 2
+  fi
+  rm -f "$br_err"
+  ready=$(printf '%s' "$br_out" | grep -o '"id"[[:space:]]*:' | wc -l | tr -d ' ')
   src="br ready"
 elif [ -f .beads/issues.jsonl ]; then
   ready=$(grep -Ec '"status"[[:space:]]*:[[:space:]]*"(open|in_progress)"' .beads/issues.jsonl)

@@ -349,7 +349,8 @@ arm_at .omp/rules/kit-weasel-retry.md quiet "kit-weasel: retry predicate names a
 
 # Every project rule must own at least one arm above — a rule file with no test is a rule nobody
 # has ever seen fire. An empty scan set is not a pass (RULE 1).
-n_rules=$(ls -1 .omp/rules/*.md 2>/dev/null | wc -l | tr -d ' ')
+rules_dir=${RULES_DIR:-.omp/rules}
+n_rules=$(ls -1 "$rules_dir"/*.md 2>/dev/null | wc -l | tr -d ' ')
 if [ "$n_rules" -eq 0 ]; then
   note FAIL ".omp/rules/*.md matched nothing — an empty scan set is NOT a pass"; fail=$((fail+1))
 elif [ "$n_rules" -eq 12 ]; then

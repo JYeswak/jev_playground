@@ -38,3 +38,13 @@ Two more layout mismatches, 10/14 now: `.omp/config.yml` and `.omp/rules/kit-no-
 `scripts/selftest-ttsr-rules.sh` now has hit and miss arms for the six kit rules. Re-run: 105 ok, 0 failed. The old check required exactly 6 project rules; there are 12. The expected count is 12 because the arms exist, not because the check was weakened.
 
 e2e-live root cause: this pane's `OMP_PROFILE=grok` makes omp read the profile models file. The suite writes the default agent models file. `main.ts:2304` exits. Unsetting `OMP_PROFILE`, `PI_PROFILE`, and `PI_CODING_AGENT_DIR` makes the suite 10/10. Planted arm then fails 4/10. omp-continue line 8 fails because the git template commit-msg hook refuses subject `init` (`commit-msg-verification-level.sh:63`), not because identity is unset. With `br` on PATH the script never falls through to JSONL (`omp-continue.sh:30`, `br ready` exit 7). Part B is still paused until the depth callback is sent.
+
+## Upstream report candidate — br ready exit 7
+
+`scripts/omp-continue.sh` used to treat any empty id-count as a clean stop. `br ready --json` on a fresh kit project exits 7 with `CONFIG_ERROR` and no `"id"` keys. The count is 0, so the script exits 1 and never reads `.beads/issues.jsonl`. Minimal repro, kit copy not edited: `br ready --json` in a starter-kit project with no valid issues, exit 7. Our copy now exits 2 and prints the error. Empty `[]` still exits 1. Ready work still exits 0.
+
+## Stage 80 disable arm
+
+The GREEN arm failed when `OMP_PROFILE` was unset: `absence-from-one-probe still present in project (count=1)` and `in global (count=1)`. It passed in this grok pane because the disable is `~/.omp/profiles/grok/agent/config.yml:28-30`, not a project setting. The both-scopes script cannot go green from a project disable alone: `~/.agents/rules/absence-from-one-probe.md` is still discovered outside the repo. The arm now checks the project list with the profile vars unset. The project list hides the rule because `.omp/config.yml` `ttsr.disabledRules` names it. That is a stale premise in the arm, not a config regression.
+
+Stage 80 re-run after the arm change: `bash foundation/gates.d/80-lane-instrument-selftests.sh` exited 0. 14 instrument suites and 15 stage selftests PASS, including `selftest-ttsr-assert-disabled.sh`, `selftest-ttsr-rules.sh`, and `selftest-pin-liveness.sh`. Pin-liveness is not the remaining red. There is no remaining red in that stage.
