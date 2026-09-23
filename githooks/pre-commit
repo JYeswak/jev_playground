@@ -27,6 +27,29 @@ set -euo pipefail
 _hookdir=$(unset CDPATH; cd -- "$(dirname -- "$0")" && pwd)
 _repo=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 
+# ── lane 0: one main, one worktree ─────────────────────────────────────────────────────────────
+# Joshua, 2026-09-23: "i have a strict no branch / worktree policy". The rule was in AGENTS.md and
+# nothing enforced it: by that night the repo had 12 local branches, 19 on GitHub and 3 worktrees.
+# A commit made off main is the first step of every one of those, so refuse it here. A detached
+# HEAD is allowed only mid-rebase, mid-merge or mid-cherry-pick on main's own history.
+_gitdir=$(cd "$(git rev-parse --absolute-git-dir)" && pwd -P)
+_common=$(cd "$(git rev-parse --git-common-dir)" && pwd -P)
+if [ "$_gitdir" != "$_common" ]; then
+  printf 'ONE_MAIN_REFUSED reason=linked-worktree path=%s\n  jev keeps one worktree; commit from %s\n' "$_repo" "$(dirname "$_common")" >&2
+  exit 1
+fi
+_branch=$(git symbolic-ref --quiet --short HEAD || true)
+if [ -z "$_branch" ]; then
+  if [ ! -d "$_gitdir/rebase-merge" ] && [ ! -d "$_gitdir/rebase-apply" ] \
+     && [ ! -f "$_gitdir/CHERRY_PICK_HEAD" ] && [ ! -f "$_gitdir/MERGE_HEAD" ]; then
+    printf 'ONE_MAIN_REFUSED reason=detached-head\n  jev commits land on main; check out main first.\n' >&2
+    exit 1
+  fi
+elif [ "$_branch" != "main" ]; then
+  printf 'ONE_MAIN_REFUSED reason=branch branch=%s\n  jev commits land on main only; no branches.\n' "$_branch" >&2
+  exit 1
+fi
+
 # ── lane 1: staged-deletion survival ────────────────────────────────────────────────────────────
 _impl="$_hookdir/pre-commit-staged-deletion-survives.sh"
 if [ ! -x "$_impl" ]; then

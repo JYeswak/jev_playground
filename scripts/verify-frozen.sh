@@ -44,8 +44,19 @@ if [ "$dirty" -ne 0 ]; then
 fi
 
 tmp=$(mktemp -d)
-git -C "$repo" worktree add --quiet --detach "$tmp/frozen" "$sha"
+# A throwaway clone, not `git worktree add`: jev keeps exactly one worktree (Joshua, 2026-09-23:
+# "strict no branch / worktree policy"). The worktree this script used to register was removed only
+# on the success path, so every interrupted run left a stale entry in `git worktree list`. The trap
+# removes the clone on any exit.
+trap 'rm -rf "$tmp"' EXIT
+git clone --quiet --local --no-checkout "$repo" "$tmp/frozen"
+git -C "$tmp/frozen" checkout --quiet --detach "$sha"
 cd "$tmp/frozen"
+# The Beads database is gitignored, so a fresh copy has none, and foundation/gates.sh refuses to run
+# without one. Build it from the committed JSONL, the fix gates.sh itself prescribes for fresh clones.
+if ! br sync --import-only >/dev/null 2>&1; then
+    echo "NOTE  br sync --import-only failed in the frozen clone; foundation/gates.sh will say why"
+fi
 
 echo "FROZEN CLONE of $sha at $tmp/frozen"
 echo
@@ -89,8 +100,6 @@ done < <(git -C "$repo" ls-files 'demos/**/*.mjs' 'scripts/*.sh' 'scripts/*.mjs'
 echo "cmp live-vs-frozen over tracked executables: $differs differ (nonzero is expected on a dirty tree)"
 
 cd "$repo"
-git worktree remove --force "$tmp/frozen"
-rm -rf "$tmp"
 
 if [ "$rc" -ne 0 ]; then
     echo "FROZEN VERIFY FAILED at $sha — do not claim a verification level above [pending]."
