@@ -43,8 +43,10 @@ clone's own toolchain (`npm run typecheck` / `ruff`), never imposed across them.
    [§ Secrets](#secrets-and-the-paid-surface-critical)
 9. **Edit in place; no `_v2` files; never patch upstream to make a demo pass.**
    [§ Code editing discipline](#code-editing-discipline)
-10. **Offline lane first; a live call is budgeted and stated.**
-    [§ Testing](#testing)
+10. **Test our policy offline; learn Jev live.** Our thresholds, validators and fail-safe side are
+    proven without calling Jev. Any question about how Jev behaves is answered with live calls,
+    in the same unit, after the bar is committed. There is no call budget (Joshua, 2026-09-21);
+    state what a run spent. [§ Testing](#testing)
 11. **Name the oracle, and name your claim level.** No bare "verified".
     [§ The Jev Oracle](#the-jev-oracle) · [§ Claim discipline](#claim-discipline)
 12. **Done means §4 below** — not compiling, not demoed once.
