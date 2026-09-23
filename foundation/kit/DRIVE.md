@@ -30,4 +30,4 @@ Callback shape: `ntm send jev --pane=1 --file=...` with `CALLBACK-P<N>-<bead>-DO
 
 ## Callback log
 
-None yet.
+None yet. ntm send reached panes 2, 3, 4, and 5 (exit 0, 2026-09-23T01:29Z). Mail had already reached TopazRaven, MistyTurtle, SunnyTiger, and QuietHarbor. No pane callback has arrived.
