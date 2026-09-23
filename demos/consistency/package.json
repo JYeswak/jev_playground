@@ -1,0 +1,16 @@
+{
+  "name": "jev-consistency",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Keyless consistency guard. Argmax, abstain below 0.60, never invent a label. Live calls need TYPESAFE_API_KEY and --live.",
+  "bin": {
+    "jev-consistency": "./demo.mjs"
+  },
+  "files": [
+    "demo.mjs"
+  ],
+  "engines": {
+    "node": ">=20"
+  }
+}
