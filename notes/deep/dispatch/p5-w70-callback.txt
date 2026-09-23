@@ -1,0 +1,11 @@
+CALLBACK-P5-W70-seat-benchmark-catalogue-DONE
+Receipts committed as ce83fc6 (prereg fec3f95 predates all live calls; bars unmoved, except jevcal/Janus T4 bars which stay PROPOSED — amendment required before their live calls).
+- jev-rerank-bench: T1 PASS T2 PASS T3 7/7 T4 PASS 28/30 T5 PASS T6 tie-p0.45 T7 PASS T8 PASS T9 NA T10 SELF.
+- jev-benchmark: T1 PASS T2 suite-absent+RED-plant T3 8 claims T4 PASS-at-floor 52/60 T5 lexical-58/60-BEATS-Jev T6 Haiku-sub p0.146ns T7 weak T8 1/18 T9 NA T10 FLOOR, seat REFUSED.
+- jev-agent-failure-benchmark: T1 PASS T2 20/0 T3 8 claims T4 PASS LB0.7243>floor0.1942 T5 PASS T6 gpt4-NOT-RUN/grok-sub T7 PASS T8 PASS T9 NA T10 FLOOR.
+- typesafe-ai-benchmark: T1 PASS T2 38+24/0 T3 8 claims T4 PASS 7/7 T5 PASS T6 Cerebras-NOT-RUN T7 not-observable T8 0-flips T9 NA T10 SELF.
+- awesome-typesafe: T1+T3 PASS catalogue (7 candidates + 1 post); T4+ NA. OpenJev stale-link flag recorded.
+- jevcal @ae8f314: T1 PASS T2 24/0+RED-plant T3 8 claims T4 PROPOSED T5-T8 NA T9 5-arms-refuse T10 SELF.
+- janus @9cb66c4: T1 PASS T2 38/0+RED-plant T3 8 claims T4 PROPOSED T5-T8 NOT-RUN T9 NA T10 no-class.
+EVAL sections staged at notes/deep/w70-eval-sections-p5.md (EVAL.md reservation-held by a sibling; pane 1 append). Clone trees untouched (janus clean; jevcal has only its own untracked uv.lock).
+NO-CLAIM: receipts are single runs at stated N, not benchmarks; jevcal/Janus live phases need committed bar amendments first.
