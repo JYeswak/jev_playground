@@ -79,3 +79,4 @@ in general. A win against an LLM is not a certified seat until THIS bar says so.
   battery, same 0.5 cut, same failure rule. Arm renamed `A-xai-grok-4`.
 - Bar gates unchanged; gate 3 pairs Jev-vs-grok-4 and Jev-vs-haiku. The dead
   OpenAI arm is reported INVALID (credential), never silently dropped.
+  Haiku and grok-4 are the incumbents. Beating both is the bar. A third model is not required.

@@ -194,3 +194,129 @@ export function refuseInventedNoulGate(opts = {}) {
     throw new Error('invented noul gate: a choice decision must not be overridden by a second noul (SDK-SURFACE / skillranker second-gate defect)');
   }
 }
+
+/**
+ * Select-on-A / report-on-B, after `jev-phishing-bench/bench/protocol.py`.
+ * The 2 000 emails are cut into two stratified halves at a fixed seed. Everything involving a
+ * choice (best single signal, its threshold, combiner weights) is decided on half A only;
+ * every published number comes from half B. A single-signal input cannot gain from selection:
+ * `selectSingleSignal` returns it with `selected: false`.
+ */
+
+/** Deterministic PRNG so the split is a pure function of the seed. */
+export function mulberry32(seed) {
+  if (!Number.isInteger(seed)) throw new Error('mulberry32: integer seed required');
+  let a = seed >>> 0;
+  return () => {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Stratified halves: each class split in sorted-id order at a seeded permutation. */
+export function stratifiedHalves(ids, labels, seed = 1) {
+  if (ids.length !== labels.length) {
+    throw new Error(`stratifiedHalves: ${ids.length} ids vs ${labels.length} labels`);
+  }
+  requireBoth(labels, 'stratifiedHalves');
+  const rng = mulberry32(seed);
+  const a = [], b = [];
+  for (const cls of [true, false]) {
+    const group = ids.filter((_, i) => labels[i] === cls).sort();
+    const perm = group.map((id) => [rng(), id]).sort((x, y) => x[0] - y[0]).map(([, id]) => id);
+    const half = Math.floor(perm.length / 2);
+    a.push(...perm.slice(0, half));
+    b.push(...perm.slice(half));
+  }
+  return { a, b };
+}
+
+/** Threshold on one score maximising accuracy. Mirrors protocol.py: candidates start at 0.5, ties keep the lowest. */
+export function bestThreshold(y, s) {
+  if (y.length !== s.length || y.length === 0) {
+    throw new Error('bestThreshold: y and s must be non-empty and aligned');
+  }
+  const values = [...new Set(s)].sort((x, y) => x - y);
+  if (values.length === 1) return 0.5;
+  let bestT = 0.5, bestAcc = -1;
+  for (const t of [0.5, ...values.slice(0, -1).map((v, k) => (v + values[k + 1]) / 2)].sort((x, y) => x - y)) {
+    let hit = 0;
+    for (let i = 0; i < y.length; i++) if ((s[i] >= t ? 1 : 0) === y[i]) hit++;
+    const acc = hit / y.length;
+    if (acc > bestAcc) { bestAcc = acc; bestT = t; }
+  }
+  return bestT;
+}
+
+/**
+ * Pick the best single signal by AUROC on A, threshold it on A, report accuracy/AUROC on B.
+ * `rows`: [{id, label: 0|1|bool, feats: {name: number}}]. With one signal there is nothing to
+ * select: returns it with `selected: false` (the planted negative — no gain is possible).
+ */
+export function selectSingleSignal(rows, names, seed = 1) {
+  if (!Array.isArray(names) || names.length === 0) throw new Error('selectSingleSignal: at least one signal name required');
+  for (const r of rows) for (const n of names) {
+    if (typeof r.feats?.[n] !== 'number' || Number.isNaN(r.feats[n])) {
+      throw new Error(`selectSingleSignal: missing score for ${n} on ${r.id} — a missing field scores silence`);
+    }
+  }
+  const ids = rows.map((r) => r.id);
+  const labels = rows.map((r) => Boolean(r.label));
+  const { a, b } = stratifiedHalves(ids, labels, seed);
+  const inA = new Set(a), inB = new Set(b);
+  const yA = rows.filter((r) => inA.has(r.id)).map((r) => Number(r.label));
+  const yB = rows.filter((r) => inB.has(r.id)).map((r) => Number(r.label));
+  const sA = (n) => rows.filter((r) => inA.has(r.id)).map((r) => r.feats[n]);
+  const sB = (n) => rows.filter((r) => inB.has(r.id)).map((r) => r.feats[n]);
+  let feature = names[0], bestAuc = -1;
+  const aucA = {};
+  for (const n of names) {
+    const v = auc(sA(n), rows.filter((r) => inA.has(r.id)).map((r) => Boolean(r.label))).value;
+    aucA[n] = v;
+    if (v > bestAuc) { bestAuc = v; feature = n; }
+  }
+  const t = bestThreshold(yA, sA(feature));
+  const predB = sB(feature).map((s) => (s >= t ? 1 : 0));
+  const accB = predB.filter((p, i) => p === yB[i]).length / yB.length;
+  const accA = sA(feature).filter((s, i) => (s >= t ? 1 : 0) === yA[i]).length / yA.length;
+  return {
+    seed, nA: a.length, nB: b.length, feature, threshold: t, selected: names.length > 1,
+    accuracyA: accA, accuracyB: accB, aurocB: auc(sB(feature), rows.filter((r) => inB.has(r.id)).map((r) => Boolean(r.label))).value, aucA,
+  };
+}
+
+/** Sigmoid. */
+export function sigmoid(z) { return 1 / (1 + Math.exp(-z)); }
+
+/**
+ * Logistic combiner fit on A (bias term included, zero init, fixed schedule — deterministic).
+ * Mirrors protocol.py's fit-weights-on-A step for small feature counts. Returns weights with bias first.
+ */
+export function fitLogistic(XA, yA, { iters = 2000, lr = 0.5 } = {}) {
+  if (XA.length === 0) throw new Error('fitLogistic: empty training set');
+  const d = XA[0].length;
+  const w = new Array(d + 1).fill(0);
+  for (let it = 0; it < iters; it++) {
+    const grad = new Array(d + 1).fill(0);
+    for (let i = 0; i < XA.length; i++) {
+      let z = w[0];
+      for (let j = 0; j < d; j++) z += w[j + 1] * XA[i][j];
+      const err = sigmoid(z) - yA[i];
+      grad[0] += err;
+      for (let j = 0; j < d; j++) grad[j + 1] += err * XA[i][j];
+    }
+    for (let j = 0; j <= d; j++) w[j] -= (lr * grad[j]) / XA.length;
+  }
+  return w;
+}
+
+/** Score rows with weights from fitLogistic (bias first). */
+export function scoreLogistic(w, X) {
+  return X.map((row) => {
+    let z = w[0];
+    for (let j = 0; j < row.length; j++) z += w[j + 1] * row[j];
+    return sigmoid(z);
+  });
+}

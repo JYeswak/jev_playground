@@ -2,7 +2,8 @@
 import {
   auc, requireBoth, field, feasibility, ece, eProcess, requireKey, inspectKey,
   decisionLoss, meanDecisionLoss, emissionOnlyLoss, refuseInventedNoulGate,
-  assertSdkSelector, SDK_ANSWER_FIELDS,
+  assertSdkSelector, SDK_ANSWER_FIELDS, mulberry32, stratifiedHalves, bestThreshold,
+  selectSingleSignal, sigmoid, fitLogistic, scoreLogistic,
 } from './index.mjs';
 import assert from 'node:assert/strict';
 
@@ -138,6 +139,71 @@ throws('refuseInventedNoulGate: a second noul cannot override a choice pick',
 
 check('refuseInventedNoulGate is silent when no second noul is supplied', () => {
   assert.equal(refuseInventedNoulGate({ pick: 'rust-test-triage' }), undefined);
+});
+
+// SELECT-ON-A / REPORT-ON-B (jev-phishing-bench/bench/protocol.py port).
+const splitRows = (n) => {
+  const rows = [];
+  for (let i = 0; i < n; i++) {
+    const label = i % 2;
+    rows.push({
+      id: `m${String(i).padStart(3, '0')}`,
+      label,
+      feats: { good: label ? 0.9 : 0.1, bad: (i * 37) % 10 / 10 },
+    });
+  }
+  return rows;
+};
+
+check('stratifiedHalves is deterministic and stratified', () => {
+  const ids = ['a', 'b', 'c', 'd', 'e', 'f'];
+  const labels = [true, true, true, false, false, false];
+  const r1 = stratifiedHalves(ids, labels, 7);
+  const r2 = stratifiedHalves(ids, labels, 7);
+  assert.deepEqual(r1, r2);
+  assert.equal(r1.a.filter((id) => labels[ids.indexOf(id)]).length, 1);
+  assert.equal(r1.b.filter((id) => !labels[ids.indexOf(id)]).length, 2);
+  assert.deepEqual([...r1.a, ...r1.b].sort(), [...ids].sort());
+});
+
+throws('stratifiedHalves refuses a degenerate label',
+  () => stratifiedHalves(['a', 'b'], [true, true]), /degenerate label/);
+
+check('bestThreshold mirrors protocol.py: ties keep the lowest, single value gives 0.5', () => {
+  assert.equal(bestThreshold([0, 0, 1, 1], [0.1, 0.2, 0.8, 0.9]), 0.5);
+  assert.equal(bestThreshold([0, 1], [0.4, 0.4]), 0.5);
+  assert.equal(bestThreshold([0, 0, 1, 1], [0.1, 0.35, 0.4, 0.9]), 0.375);
+});
+
+check('selectSingleSignal picks the best-A feature on A and reports on B', () => {
+  const r = selectSingleSignal(splitRows(8), ['good', 'bad'], 3);
+  assert.equal(r.feature, 'good');
+  assert.equal(r.selected, true);
+  assert.equal(r.accuracyB, 1);
+  assert.equal(r.nA + r.nB, 8);
+});
+
+// PLANTED NEGATIVE: one signal cannot gain from selection. The helper must say
+// so (selected: false) instead of dressing a trivial pick as a discovery.
+check('single-signal input returns the single with selected:false', () => {
+  const r = selectSingleSignal(splitRows(8), ['good'], 3);
+  assert.equal(r.feature, 'good');
+  assert.equal(r.selected, false);
+  assert.equal(r.accuracyB, 1);
+});
+
+throws('selectSingleSignal refuses a missing score instead of scoring silence', () => {
+  const rows = [{ id: 'm000', label: 1, feats: {} }, { id: 'm001', label: 0, feats: { good: 0.1 } }];
+  return selectSingleSignal(rows, ['good']);
+}, /missing score/);
+
+check('fitLogistic separates separable data deterministically', () => {
+  const XA = [[0.1], [0.2], [0.8], [0.9]];
+  const yA = [0, 0, 1, 1];
+  const w1 = fitLogistic(XA, yA);
+  const w2 = fitLogistic(XA, yA);
+  assert.deepEqual(w1, w2);
+  assert.equal(auc(scoreLogistic(w1, XA), [false, false, true, true]).value, 1);
 });
 
 console.log(`\noracle-kit: ${pass}/${pass} checks passed`);

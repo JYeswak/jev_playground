@@ -1,3 +1,3 @@
-jev_flag installed 2026-09-21T22:04:35Z profile=muse sha=e28209e
+jev_flag installed 2026-09-21T22:27:52Z profile=muse sha=6a4eef5
 entry:   - ./.omp/extensions/jev-flag.ts
 rollback: remove the entry line from .omp/config.yml (backup .omp/config.yml.bak)

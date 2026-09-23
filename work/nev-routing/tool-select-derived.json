@@ -1,12 +1,1 @@
-{
-  "rows": 137063,
-  "unlabelled_not_in_this_file": 1745,
-  "distinct_labels": 34,
-  "salt": "jev-tool-select-v1",
-  "hash": "sha256(salt + NUL + context utf-8)",
-  "fields": ["id", "label", "prev_tool", "n_candidates", "context_len", "context_sha256"],
-  "omitted": "context text, commands, intents, session paths beyond the basename in id",
-  "why": "The 66MB labelled file is session context. Committing it is a privacy write. This file is the auditable substitute.",
-  "bar": "work/nev-routing/tool-select-bar.md",
-  "scored": false
-}
+{"unit":"k9z.3-harvest-baseline","date":"2026-09-22","lane":"offline, zero API calls","corpus":{"files_scanned":1835,"toolcalls_seen":142892,"labelled_pairs":37662,"unlabelled_separate":105230,"tools":32},"baselines":{"name_match_acc":0.0063,"always_bash_acc":0.4395},"bit1_lexical":"COLLAPSED (0.63%) — contexts essentially never name the tool; description-enriched variant untested","bit2_constant":"always-bash 0.4395 — substantial; no preregistered kill line for this seat","artifacts":{"full_text_pairs":"/tmp/tool-select-pairs.jsonl (local only, never committed)","hashed_rows":"work/nev-routing/tool-select-hashed.jsonl","extract_receipt":"work/nev-routing/tool-select-extract.json"},"next":"paired Jev-vs-constant measurement with preregistered bar (needs live spend + doctrine on which constant line applies)","no_claim":"Proxy labels (called-next); no Jev measured here; name-match is the weakest lexical shape, not the best"}
