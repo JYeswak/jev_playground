@@ -60,9 +60,79 @@ All four held. Verdicts below are re-runnable by the quoted command.
   `EVAL.md:526,750,941,963,970,799`, `NEGATIVE_EVIDENCE.md:1196,1333,
   2561,2583,2688,2744`, `docs/demos/upstream-repro/*` essays,
   `docs/essays/*`, `.beads/issues.jsonl` (8 hits, bookkeeping),
-  `notes/deep/dispatch/p*-wave1.md` + `docs/PLAN-DEEP-KIT-20260922.md`
+  `notes/deep/dispatch/p*-wave1.md`, `docs/PLAN-DEEP-KIT-20260922.md`
   (21 hits, bookkeeping).
+- Wired tools: `.omp/mcp.json:6` (`morph-mcp.sh`), `fh` over the mirror
+  (see `tool-invocation` TSV rows for measured use).
+## Depth update (DEPTH-DIRECTIVE, 2026-09-23): transplant counts measured, scope misread corrected
 
+The directive is right: the packet allows the jev panes' own session
+transcripts, and the session dirs are named for the launch cwd, so
+`~/.omp/profiles/<profile>/agent/sessions/-Developer-jev/` and
+`~/.omp/agent/sessions/-Developer-jev/` are in-scope. The BLOCKED label
+below is withdrawn and replaced by counts.
+
+Method (two independent routes, both re-runnable): (1) segment-start
+count — every bash `toolCall.arguments.command` split on `;||newline|&`,
+first token of each segment counted (python3 json parse over the three
+corpora); (2) anyword match with manual classification of every rare hit
+(log-filter strings, message-string prose, presence-probe loop, own
+countermeasure strings — all excluded from invocation counts, listed so a
+re-runner sees what was rejected and why). Four scout subagents fanned
+out in parallel for independent corroboration; their results amend this
+note if they disagree.
+
+Denominators: grok 967 + muse 5872 + default 1035 = **7874 bash calls**.
+Invocations (segment-start): br 691 (48/496/147), fh 39 (2/35/2), cass
+34 (0/1/33), ntm 705, am 568, bv 14 (0/7/7), ripwire 8 (2/2/4).
+**Zero functional invocations** in all three corpora: ft, ftts, fsqlite,
+fmd, fsw, morph. All six directive binaries exist on PATH
+(`which`: fh/ft/ftts/fmd/fsw in ~/.local/bin, fsqlite in ~/.cargo/bin).
+Source evidence: fh is a symlink to franken-harvest and prints
+`franken-harvest 0.1.0+...`; ft's strings carry
+`cargo install --git https://github.com/Dicklesworthstone/frankenterm.git`;
+ftts's strings carry `"repo": "Dicklesworthstone/franken_tts"`; fmd's
+strings carry `franken_markdown`; fsqlite's strings carry the engine's
+FSQLITE/FTS5/RaptorQ markers; fsw's source repo is unidentified from
+binary evidence (no packet either). morph has no binary: hits are prose
+inside ntm message strings and one ttsr test string.
+TSV rows `tool-invocation` (11 rows) carry the per-binary table.
+
+## The eight not-assessed origins: why no packet covers each
+
+All seven repos below ARE franken repos (all in the 44). Nine TSV rows
+(the directive says eight; the ninth is the frankensearch doctrine row —
+counted here, not hidden).
+
+1. frankensearch RULE 0.5 (doctrine row): the packet READ the file —
+   `AGENTS.md (48 KB ... treated as repo-fact source only)`
+   (frankensearch-assessment.md:5) — but assesses engine behavior
+   (quill-gauntlet, tantivy oracle). `0.5` hits in the packet are
+   `asupersync 0.5.0` versions, never the rule. Doctrine content outside
+   the behavior scope.
+2-4. frankenfs readiness-action-autopilot §4, tracker-hygiene.md,
+   MODULARITY_RUNBOOK (D1–D3): analyst read README, LICENSE, CHANGELOG
+   head, NEGATIVE_EVIDENCE head (frankenfs-assessment.md:59). The
+   `docs/` runbooks were never opened. Scope cut, not oversight denied —
+   the read list says what was read.
+5. frankenredis GATE_VALIDITY.md (D3): read list is manifests, LICENSE,
+   README, CHANGELOG, beads, BENCH_METHODOLOGY (frankenredis-
+   assessment.md:5). `docs/` validity files outside it; the packet
+   praises the NEGATIVE_EVIDENCE ledger instead.
+6. frankensim MATURITY_LEVELS.md (D4): no code executed; claims rest on
+   artifacts (frankensim-assessment.md:212). Packet verifies
+   capability-maturity.json instead — a different file governing the
+   same idea, which is why the miss is easy to misread as coverage.
+7. franken_tts metamorphic_invariants.rs:315-505: analyst read README,
+   LICENSE, AGENTS.md, NEGATIVE_EVIDENCE; ran no tests
+   (franken_tts-assessment.md:55,208). Test files outside read+run scope.
+8. frankenlibc memcpy_strict_conformance_test.rs: no build, no
+   benchmarks, no fuzzers run (frankenlibc-assessment.md:11).
+   Conformance-test content unassessed by construction.
+9. frankenpandas TESTING_CONVENTION: sparse checkout (crates, scripts,
+   docs, .github, .beads, artifacts/perf) with zero hits for the
+   convention in any spelling (frankenpandas-assessment.md).
+   Convention prose outside the assessed claims.
 ## W4.1 headline: the stage-85 example, quoted both ways
 
 jev does **not** cite the shape as proven. Stage 85's header
@@ -90,20 +160,13 @@ procedural except D7's proof-exists slice, so nothing enforced rests on an
 unverified origin — but the citations claim a provenance the assessment
 pack does not confirm. Action `monitor` throughout.
 
-## Transplant binary counts: BLOCKED (scope)
+## Transplant binary counts: WITHDRAWN (see Depth update above)
 
-Packet step 2 asks for franken-derived binary invocation counts from
-transcripts "under the jev panes' profile session dirs". Those dirs are
-`~/.omp/profiles/*/agent/sessions/` (verified present for `grok` and
-`muse`), which the dispatch scope forbids: "Do not read … under
-`~/.omp/agent/` or `~/.omp/profiles/*/agent/`", allowing only read-only
-reads of profile *config*. Scope is Joshua's order and wins over the
-packet step. Measurable proxy delivered instead: wired-tool rows
-(`mcp-tool`, `cli-tool`) name what the tree wires (`morph-mcp.sh`, `fh`
-over the mirror); no franken-repo binary is executed by any tracked jev
-file — `br`/`bv`/`fh`/`ripwire` origins are beads_rust, franken-harvest,
-and ripwire, all outside the 44. A pane with transcript access can lift
-this block; until then invocation counts are unmeasured, not zero.
+The BLOCKED label this section carried is withdrawn by the DEPTH-DIRECTIVE
+correction: the jev panes' own `-Developer-jev` session dirs are in-scope,
+and the counts now live in the Depth update section and the TSV
+`tool-invocation` rows. This stub remains so the section history reads
+in order.
 
 ## Planted negative and feasibility arm
 

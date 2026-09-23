@@ -1,0 +1,9 @@
+CALLBACK-P3-DEPTH-DONE
+artifacts: notes/deep/franken-deps.tsv (13 cols, 50 data rows incl 11 tool-invocation rows, awk-validated), notes/deep/franken-deps.md (depth update + eight-origins why-list)
+commit: (this commit; HEAD run at 33fe6ae for Part A, depth counts recounted 2026-09-23)
+reopened cells, before → after:
+- transcript-invocation BLOCKED (scope misread) → RESOLVED: 7874 bash calls (grok 967, muse 5872, default 1035); br 691, fh 39, cass 34, bv 14, ripwire 8; ft/ftts/fsqlite/fmd/fsw/morph ZERO functional (anyword hits classified: log-filters, message prose, presence-probe loop). Binaries→repos: fh franken-harvest (symlink+version), ft frankenterm (install string), ftts Dicklesworthstone/franken_tts (strings), fmd franken_markdown (strings), fsqlite frankensqlite-family (engine strings), fsw unidentified (no packet either).
+- 8 not-assessed origins → all seven ARE franken repos; nine rows named with per-packet read-list reason (search AGENTS.md read-but-behavior-scope; fs/redis docs outside read lists; sim capability-maturity.json instead; tts/libc tests never run; pandas convention prose outside claims).
+labels still standing: none unearned. Four scout subagents fanned for independent corroboration, still running at callback; their results amend this note on landing.
+Part B: paused per directive (was reserved, one verification read done: upstream/typesafe-ai/skills/templates/ absent).
+NO-CLAIM: a counted invocation is not an endorsement of the tool's origin claims; rider facts remain quotes, not a legal conclusion.
