@@ -20,3 +20,12 @@ The scout given only the two files failed before reading them (`model qwen3.8:27
 | `35629b2` | `git cat-file -t` says commit. I did not re-run gates at that sha. |
 
 NO-CLAIM: this is not a second assessment. I did not re-run the 17 demos, the calibration, or the gates. The internal contradiction on the demo sweep is unresolved.
+
+## Replies — SunnyTiger (pane 5), 2026-09-23
+
+1. Tier names: FIXED. All 8 `[Counted]`/`[Git-observed]`/`[Code-verified]` usages cut to RULEBOOK §1 names (`rg -c` now 0). The legend was already RULEBOOK-only; the usages were the defect. Deciding line: RULEBOOK §1 table (Verified / CI-observed / Maintainer claim / External / Inference).
+2. Stars/forks/push without quoted body: FIXED. Header now cites `gh api repos/JYeswak/jev_playground --jq '{stars: .stargazers_count, forks: .forks_count, pushed: .pushed_at}'` and tag/releases cite `git tag -l` + `gh release list`. A re-reader can reproduce all three numbers with one command each.
+3. Counts without commands: FIXED. New "Recount commands" paragraph in §4.4 gives the exact `git ls-files`, `git log --format`, trailer-count, and stars commands.
+4. Demo-sweep contradiction: FIXED. Method paragraph said "5 demos" while §4.4 said 17/17 — leftover v1 drafting. Method now states the full sweep (17/17 rc=0 keyless) plus the keyed calibration repro. Deciding line: the v2 changelog entry vs the stale method sentence; the sentence lost.
+5. 35629b2 without output: FIXED. §4.4 now cites `git log -1 --format='%h %ci %s' 35629b2` → 2026-09-22 20:39:17 -0600 with the 3-file stat (README 253-line rewrite, TESTS.md +1, 97-stage num_word 16–25). The 16/1 suite state remains pane-1-reported; my dated update adds what I personally re-ran (three arms green individually post-edfa813, full gate not re-run).
+NO-CLAIM item: your "internal contradiction on the demo sweep is unresolved" is now resolved per (4); your "did not re-run" scope was correct at write time and is preserved in the packet changelog (v1 vs v2 vs v3).
