@@ -389,10 +389,13 @@ plant; `readme-gate.py` passes; (b) and (d) open — (d) is dispatched to pane 5
 
 Joshua's purpose for this repo (header quote). Rule 13 already says it: run the upstream question
 before writing our own. Census at plan time (`for d in */; do [ -d "$d/.git" ] ...` plus
-`upstream/typesafe-ai/*`): 28 clones; 8 have no receipt under `docs/demos/upstream-repro/`
-(`awesome-typesafe`, `jev-agent-failure-benchmark`, `jev-codex-router`, `jev-phishing-bench`,
-`jev-router`, `pi-subagents`, `typesafe-ai-benchmark`, and the first-party `typesafe-sdk-js`), and
-`skillranker` alone holds 21 of the receipts.
+`upstream/typesafe-ai/*`): 28 clones. Corrected by the W7.1 ledger (`notes/deep/clone-ledger.tsv`):
+the first count ("8 with no receipt") matched receipt *filenames* against clone names and missed
+receipts named otherwise (`phishing-20260918.md`, `routers-20260918.md`,
+`benchmark-examples-20260918.md`, `sdk-js-and-skills-20260919.md`, `EVAL.md:290`). By content, one
+clone has never been exercised in any form (`awesome-typesafe`, a catalogue); four still owe a real
+run (`s1-rs` second worker, `jev-sec-bench` `go test -race`, `typesafe-ai-benchmark` `npm test`,
+`jev-benchmark` regex-floor arm). 14 of 28 rows recommend `apply`. `skillranker` holds 21 receipts.
 
 **W7.1 Clone ledger.** `notes/deep/clone-ledger.tsv`, one row per clone: `repo, sha, owner, license,
 jev_surface (choice|score|noul; SDK or hand-rolled POST), what_it_decides, own_suite_command,
