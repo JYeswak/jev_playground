@@ -99,7 +99,10 @@ on a planted bad input in a live jev pane.** Everything else is secondary.
 - It does **not** write to `~/.omp/agent/` or any `~/.omp/profiles/<name>/agent/` path. Project
   scope (`jev/.omp/`) reaches every jev pane regardless of profile because every jev pane launches
   in the repo root (verified per pane in W1.1). A profile-root write is a substrate change and is
-  out of scope unless W1.1 proves project scope does not reach a pane.
+  out of scope unless W1.1 proves project scope does not reach a pane. Reading the jev panes' own
+  session transcripts (`~/.omp/profiles/<profile>/agent/sessions/-Developer-jev/`,
+  `~/.omp/agent/sessions/-Developer-jev/`) is in scope: the directory is named for the jev launch
+  cwd (review R1-10). Any other profile path stays out.
 - It does **not** run `starter-kit/scripts/init.sh`. It would install a second pre-commit hook over
   `githooks/`, seed 28 duplicate beads, and create `docs/`, `registries/`, `templates/` layouts that
   collide with `foundation/`. Decided in the first drive; restated so nobody re-litigates it.
@@ -328,7 +331,10 @@ under the jev launch dir); skills the jev panes load that wrap franken repos. Ta
 packet_CI_class, packet_release_class, claim_we_rely_on, packet_status_of_that_claim, rider(yes/no/none),
 action(keep|re-tier|pin|monitor|drop)`). Oracle: the packet text quoted with its tier. Acceptance:
 every citation found by `rg -n 'franken|asupersync' <tracked jev files>` has a row or a stated
-reason it is not a dependency.
+reason it is not a dependency, and the artifact states its relied-upon row count beside its
+excluded-line count; an audit with zero relied-upon rows is a census, not an audit (review R1-11).
+Measured at depth: only `fh` is a franken-derived tool in runtime use across 7,874 jev bash calls
+(39 calls); `ft`, `ftts`, `fsqlite`, `fmd`, `fsw` have zero functional invocations.
 
 **W4.2 Rider exposure, facts only (wave 1, same pane).** Quote the rider verbatim from one packet
 that reads the LICENSE (not from the synthesis summary). State facts: which jev panes run models
@@ -392,10 +398,14 @@ before writing our own. Census at plan time (`for d in */; do [ -d "$d/.git" ] .
 jev_surface (choice|score|noul; SDK or hand-rolled POST), what_it_decides, own_suite_command,
 run_status (receipt path or never), incumbent_arm (Rule 14: what a person would ship instead, and
 whether the clone measured it), what_it_teaches_about_jev (one sentence, cited file:line),
-transferable_mechanism, application_in_our_systems (named omp surface or product path), action`.
+transferable_mechanism, application_in_our_systems (named omp surface or product path),
+prevalence_of_positive_class (with denominator, or unknown + why), cost_to_measure
+(keyless | live-key | rch-worker, with a rough call or row count), action` — the last two carry
+W7.4's ranking inputs as data, so the ranking is computed, not argued (review R1-7).
 Sources: the clone trees, `EVAL.md`, `docs/demos/upstream-repro/`. Oracle: each teaching sentence
 cites a line in the clone or a receipt; an uncited teaching is dropped, not softened. Acceptance: 28
-rows, every `run_status=never` row has an owner in W7.2.
+rows, and every `run_status=never` row names its W7.2 run owner (a pane) at ledger time; a row
+without one stays open and the conductor assigns it before Phase C (review R1-8).
 
 **W7.2 Run the unrun.** Every clone without a receipt runs its own suite or demo, keyless first,
 live where its question needs the model (key in Infisical; state the spend; the cost gate is
@@ -403,7 +413,11 @@ lifted, the testability rule is not). Rust clones (`s1-rs`, `commit-miner`, `ski
 test on Contabo through RCH — `RCH_VISIBILITY=verbose rch exec -- cargo test -j 2 ...`, never a local
 cargo build; a result counts only with `Selected worker`, `Remote command finished: exit=0` and the
 tool's own result line (`skill://zeststream-rch`). Receipt per clone in
-`docs/demos/upstream-repro/<clone>-<date>.md`, `Boundary` line included. Depth rule applies: a
+`docs/demos/upstream-repro/<clone>-<date>[-<worker>[-<outcome>]].md`, so a rerun lands beside the
+first receipt and never over it (review R1-12), `Boundary` line included. First case: `s1-rs` on
+`contabo-4` compiled all 4 trybuild compile-fail cases; pane 3's rerun on `contabo-1` rejected all 4,
+so the miss is the worker environment, not s1-rs — an RCH worker returning a pass-shaped result for
+compile-fail tests is itself a finding for `skill://zeststream-rch`. Depth rule applies: a
 clone that will not run gets the four earned-label fields.
 
 **W7.3 What the clones teach, stated once.** From W7.1, a short README section a stranger reads:
@@ -600,3 +614,4 @@ beginning `CALLBACK-P<N>-<packet>-DONE` or `-BLOCKED`, plus Agent Mail to AmberW
 | 1 | SunnyTiger | Muse Spark 1.3 | R1-1..R1-6 (`notes/deep/review-r1-p5.md`) | R1-1, R1-2, R1-3, R1-5 | R1-4 (single source = AGENTS.md, not a new file), R1-6 (keep 88 rows; subagents, not a wave split) | — |
 | 1 | RedMaple | grok-4.7 | 6 (`notes/deep/review-r1-p2.md`): W1.2 env-failure rule, W1.7 acceptance limited to restarted panes, W1.4 read-vs-write + 4 gate paths, scan only edit/write-scoped rules, W1.8 `br` exit 7 | all 6 | — | — |
 | 1.5 | Joshua | — | W7 (learn Jev from the clones; apply to our systems); RCH on Contabo for Rust clones | all | — | — |
+| 1 | TopazRaven | Muse Spark 1.3 | R1-7..R1-12 (`notes/deep/review-r1-p3.md`) | R1-7, R1-8, R1-10, R1-11, R1-12 | — | R1-9: the two cold reads cannot merge; each must be read by a model other than its document's author, and the authors differ (README by claude, read by Muse; assessment by Muse, read by grok) |
