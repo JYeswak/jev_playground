@@ -11,8 +11,9 @@ cannot be made.
 
 Why this exists, measured in this repo:
 
-- The commit judge said `describes` yes on 31 of 31 commits. Always answering yes also scored 30 of
-  31. The question was degenerate, and it had already been quoted as a result.
+- The commit judge answered yes to `describes` on all 31 commits, which scored 30 of 31. Always
+  answering yes also scores 30 of 31. The question was degenerate, and it had already been quoted as
+  a result.
 - Jev's tool-select routing got 192 of 400 right. Always answering `bash` got 252.
 - On the real command corpus, always answering `BAD` is right on 6,181 of 7,846 rows (78.8%). Any
   question on that set must beat that number before it is worth a key.
