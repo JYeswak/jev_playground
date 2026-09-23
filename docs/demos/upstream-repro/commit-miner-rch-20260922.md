@@ -43,3 +43,12 @@ Single-test rerun on contabo-4: identical failure at the same line
 Did not run anything live (no key). Did not build locally. Did not modify
 the clone. The 22 passing tests are the crate's offline suite; they say
 nothing about Jev's answers.
+
+## Correction after worker repair (2026-09-23T03:38Z): NOT the clone's fault
+
+Re-ran the single test on repaired contabo-4: exit 0, 1 passed. The owner
+above is withdrawn — the failure was the same `/dev/null`-regular-file
+poisoning (pane 1, bead `jev-pkd`; `git` reads config from `/dev/null`),
+not a commit-miner test assumption. Verdict corrected to environment,
+owner RCH worker (repaired). The per-line analysis (tests.rs:799,
+git.rs:162) stands as the failure path, not the fault.

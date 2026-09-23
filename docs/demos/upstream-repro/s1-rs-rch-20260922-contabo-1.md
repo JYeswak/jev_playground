@@ -46,3 +46,13 @@ Did not run anything live (no key). Did not build locally. Did not modify
 the clone. Did not run `examples/`. The `--job`-rail direct scratch-crate
 check was refused remotely (retries exhausted) — the worker split above is
 the decisive experiment, not the direct case.
+
+## Repair confirmation (2026-09-23T03:37Z)
+
+Re-ran `cargo test -j 2 -p s1 --test ui` on contabo-4 after pane 1's
+worker repair: exit 0, 1 passed. Root cause (pane 1, bead `jev-pkd`):
+`/dev/null` was a 0644 regular file on contabo-2/3/4 (rustc ≥1.64 writes
+`-o` output via a temp dir and moves it into place, replacing the device
+when run as root in `/dev`) plus 3 poisoned trybuild `.rustc_info.json`
+caches on contabo-4. The "RCH worker environment" owner above is now
+precisely this. s1-rs stands exonerated.

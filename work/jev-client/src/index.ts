@@ -97,6 +97,45 @@ type Posted =
  * The ONE place a systemOne request is built and its envelope validated.
  * Both askJev and askJevChoice go through here, so a body shape can only be wrong once.
  */
+/**
+ * The SDK's internal timeout abort leaks an unobserved AbortError rejection
+ * (dist/index.mjs `Timeout._onTimeout` → `AbortController.abort`; the
+ * half-received response's abandoned stream branch rejects where neither the
+ * SDK nor a fetch-level catch can observe it). On a default Node host one
+ * such rejection kills the process (W7.0 T9: ~1/3 of timed-out requests
+ * did; a fetch-promise catch was proven insufficient by the regression
+ * test). So we own the timeout: our deadline fires strictly before the
+ * SDK's, we abort OUR controller, and we throw the SDK's own
+ * APITimeoutError — same class the SDK would throw, so the `reason:
+ * "transport"` contract below is unchanged and the SDK's timer is cleared
+ * in its `finally` before it can ever fire. Nothing here edits the
+ * vendored SDK.
+ */
+function guardedFetch(fetchImpl: typeof fetch, timeoutMs: number): typeof fetch {
+  return (async (...args: Parameters<typeof fetch>) => {
+    const [url, init] = args;
+    const controller = new AbortController();
+    const forward = () => controller.abort(init?.signal?.reason);
+    if (init?.signal?.aborted) forward();
+    else init?.signal?.addEventListener("abort", forward, { once: true });
+    // Strictly inside the SDK's own deadline so ours always wins the race.
+    const timer = setTimeout(() => controller.abort(), Math.max(1, timeoutMs - 25));
+    try {
+      const p = fetchImpl(url, { ...init, signal: controller.signal });
+      p.catch(() => {}); // our fetch promise never escapes unobserved either
+      return await p;
+    } catch (err) {
+      if (controller.signal.aborted && err instanceof DOMException && err.name === "AbortError") {
+        throw new APITimeoutError(timeoutMs, { cause: err });
+      }
+      throw err;
+    } finally {
+      clearTimeout(timer);
+      init?.signal?.removeEventListener("abort", forward);
+    }
+  }) as typeof fetch;
+}
+
 async function postSystemOne(
   apiKey: string,
   model: string,
@@ -116,7 +155,7 @@ async function postSystemOne(
   try {
     const client = new TypeSafeClient({
       apiKey,
-      fetch: fetchImpl,
+      fetch: guardedFetch(fetchImpl, timeoutMs),
       timeout: timeoutMs,
       retry: { maxRetries: retry?.maxRetries ?? 0 },
     });
