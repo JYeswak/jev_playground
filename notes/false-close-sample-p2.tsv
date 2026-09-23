@@ -1,0 +1,6 @@
+id	close_reason	verdict
+jev-0bp	done	THIN
+jev-compact-ab-l6f	Receipt compaction/runs/ab-20260917.json; live verdict B wins (A 1/3, B 3/3), four live calls, commit e763fa3.	OK
+jev-hwa	done	THIN
+jev-vbh.6	done	THIN
+jev-v8-kit-drive-m0e.2	VERDICT: DONE. 3 paths landed in commit 8d99b9d. Stage 17 --selftest exits 0 with RED naming the plant file; checker --selftest exits 0; real enforce=yes row official-sdk HELD exit 0.	OK
