@@ -7,7 +7,7 @@ One sentence per finding, each backed by a receipt path and line. A finding seen
 - Rerank: Jev ties Cohere Pro, McNemar b=5/c=2 p=0.4531 at N=30 — one run, no winner either way (`jev-rerank-bench-w70-2026-09-23.md:22`).
 - Risk triage: Jev-live 52/60 vs Haiku 49/60, McNemar p=0.146 n.s. — one run, direction only (`jev-benchmark-w70-2026-09-23.md:51`).
 - Agent attribution: Jev 28/35 vs grok substitute 23/35, p=0.13 n.s. — one run, underpowered (`jev-agent-failure-benchmark-w70-2026-09-23.md:20`).
-- Injection: Jev beats Haiku 584/662 with McNemar p=2.6e-13 — one run, certified these-662-only (`jev-sec-bench-w70-20260923.md:34`).
+- Injection: fresh Jev 640/662 beats fresh Haiku 584/662, discordants 61 Jev-only / 5 Haiku-only, McNemar p=2.6e-13 — one run, certified these-662-only (`jev-sec-bench-w70-20260923.md:20` for 640/662, `:22` for 584/662 and the discordants).
 - Spam wording: specified question 20/20 beats a vague hand-written one 15/20, McNemar b=5/c=0 — one run, wording moves 0.25 (`jev-align-w70-20260923.md:29`).
 
 ## Where a floor tied or beat it (T5) — the refused seats
