@@ -656,6 +656,15 @@ Adapted from the suite-wide list the mirror repos bind themselves to
 9. **Dependency smuggling** — pulling a framework in to "enable" a demo that is an HTTP POST.
 10. **Commit-stream pumping / document pumping** — activity in this directory is not output.
     The output is a landed diff in a product repo.
+11. **Close-pump abuse** — closing a bead on a word ("done", "fixed") instead of evidence. Measured
+    2026-09-23: 14 of 68 closed beads here closed on reasons under 20 characters, and `jev-0bp`
+    closed "done" while its pinned target could not build. A close names the command and its
+    output, the commit, or the receipt.
+12. **Scope-splitting** — cutting a failing unit into smaller beads so each piece closes green while
+    the original acceptance never runs. A parent closes only when its own acceptance is re-run.
+13. **Bench-path hardcoding** — a gate, test or benchmark that passes because it reads a fixed path,
+    fixture or recorded answer instead of the thing it claims to measure. A selftest arm whose
+    plant never reached the file is the same defect (stage 97's stale-numerals arm, 2026-09-22).
 
 Two corollaries worth stating flat:
 
