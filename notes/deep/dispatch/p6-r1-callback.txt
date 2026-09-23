@@ -1,0 +1,15 @@
+CALLBACK-P6-R1-DONE
+
+Artifact: notes/deep/review-r1-p6.md (commit 3fb98f1, [test]).
+7 proposals, all with git-diff style changes vs the plan: R1-13 SHRINK (W2.2
+typed evidence — 12/30 REPAIRABLE cite the measurement corpus as evidence),
+R1-14 unitizer pin for W2.3 (denominator 32/35/37 by splitter), R1-15 W2.4
+covers doc/count/file predicates + R38-class selftest, R1-16 census pinning
+rule, R1-17 W2.1 stale numbers, R1-18 synthetic heat for pin-liveness
+selftest, R1-19 incremental reconciliation (≈6s full pass). Removal
+requirement met by R1-13. FLAG: only W2.4 advisory mode cannot fail
+(concur R1-3 + 4 live candidates); all other §4 acceptances fail cleanly.
+Sibling rounds R1-1..R1-12 read; no duplicates. Plan file untouched
+(git status clean). No key spent.
+
+NO-CLAIM: a review proposes; pane 1 disposes.
