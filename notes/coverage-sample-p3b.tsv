@@ -1,0 +1,6 @@
+claim	path	verdict
+harm-rule: small rule beat live judge on tool-call harm; use when label in tokens	work/omp-harm-rule/verify-claim.mjs	MATCH
+framing control: state must contain evidence; script measures framing flip live	scripts/measure-framing-flip.mjs	MATCH
+seat-guard: planted hostile flags, planted benign passes, broken answer reviews	work/nev-injection/seat-guard.test.mjs	MATCH
+pin jev-1.13.0; jev-latest moves; percent without model id uncitable	work/jev-client/src/index.ts	MATCH
+wrapper unifies missing-key, timeout, bad-body failures; tests never need network	work/jev-client/src/index.ts	MATCH
