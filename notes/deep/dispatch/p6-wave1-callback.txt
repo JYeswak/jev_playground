@@ -1,0 +1,57 @@
+CALLBACK-P6-jev-deep-kit-8q7.5-DONE
+CALLBACK-P6-DEPTH-DONE (W2.1 Part A + depth reopen list)
+
+Artifacts: notes/deep/honesty-census.md, notes/deep/false-close-census.tsv
+(70 rows, spec columns).
+Commit: 62355af (main; [test]; bead in subject). Bead census pinned at
+83300a1 (blob-extracted, deterministic); other checks ran live 2026-09-22/23.
+No key spent. No gate/hook/.omp/AGENTS.md touched.
+
+Headline numbers with denominators:
+- B13: 70 closed at 83300a1 → 40 OK / 30 REPAIRABLE / 0 NO-EVIDENCE.
+  Short reasons 11/70, all bare 'done'. Repair beads cover 3 rows: 0bp
+  re-closed SUPERSEDED (332), hwa re-closed OK with receipt, vbh.6 REOPENED
+  PARTIAL (open); qex/6fo/lqz closed with evidence (all OK).
+  Open at 83300a1: 18 in_progress + 14 blocked with ages (table in census).
+- B12: 0 covered (0/35 mine on current README; 0/32 independent block-route;
+  earlier 0/37 was the pre-rewrite tree). Registered sentence
+  ('Call the official SDK.', now README:125) matches neither NUM_RE nor
+  WORD_RE — outside the denominator by rule; floor starts at 0.
+- B11: 48 unique predicate rows; 36 observable; 4 triggers satisfied NOW:
+  R16 (09-21 corpus lacks three-arm procedure), R37 (commands changed, no
+  fresh-clone rerun), R38 (7 `?? 'unknown'` code instances), R68
+  (consumer-check tier verdicts + hop resolution). Resolved/consumed: 5
+  (R6,R12,R25,R26,R28a). R73 gate HOLDS (constant 0.3776 ≥ 0.25, n=137063).
+
+Planted negatives (all three hold):
+- (a) synthetic closed row, reason 'done', /tmp JSONL → NO-EVIDENCE.
+- (b) `The new gate exits 0 on all 99 rows.` in /tmp README copy → candidate,
+  uncovered.
+- (c) synthetic R999 (moves past deadbee123 vs manifest a1b2c3d) →
+  SATISFIED-planted; real ledger zero SHA-move hits.
+
+Depth reopen list, before → after:
+- Census read live tree while peers committed → re-pinned to 83300a1 blob,
+  counts re-derived (68→70 closed). No label carried across the move.
+- Recount caught instrument reading its own TSV as evidence (g3i/g8p
+  flipped REPAIRABLE on my output file) → evidence scope excludes the
+  census's own two files, recounted, caveat recorded for reruns.
+- g3i/g8p NO-EVIDENCE overturned by B13 verifier with comment/receipt
+  evidence; decisive commands re-run here (same blobs, commits resolve,
+  jev-v6j closed) → both REPAIRABLE with named artifacts. Census 40/30/0.
+- B12 denominator disagreed (37 vs 32) → traced to README rewrite mid-count
+  + splitter choice; re-ran on current tree (35), all routes agree numerator
+  0, variance stated.
+- Labels still standing: none unearned. (c) rows ruled unsatisfied each name
+  their deciding command; live re-runs behind g3i/g8p stated unverifiable
+  offline (prohibited), not counted.
+- Pin-liveness addendum: diagnosed (hot file cooled 27.4h past the 24h
+  window; second route confirms; selftest comment false), script untouched,
+  zero impact on (c) verdicts.
+
+NO-CLAIM: census counts are not enforcement; satisfied triggers are
+resurrection candidates, not reopened rows; the pin-liveness diagnosis is
+not a fix.
+
+Next: starting Part B (planning review round 1, review-r1-p6.md) unless
+redirected; W7.0 queued behind it.
