@@ -1,0 +1,40 @@
+CALLBACK-P6-W70-seat-benchmark-DONE
+
+Group: jev-align, commit-miner, skillranker, bicameral, jev-ultrafast.
+T4 bars committed [pending] at 070efe6 before all live calls in the group.
+One subagent per clone; every decisive output re-verified by pane 6
+(suite reruns, status/SHA checks, bar timing, hole mechanism read in-tree).
+EVAL sections: 3 landed in EVAL.md before the sole-writer rule, all 5 in
+notes/deep/w70-eval-sections-p6.md for pane 5 (sent). No key printed; no
+clone modified (all status-clean at close, verified).
+
+- jev-align @49753df: T1 P, T2 P (127 + plant RED), T3 P, T4 REFUSED (39/40
+  but ambiguity conjunct fails), T5 P, T6 P (McNemar b=5/c=0), T7 reported,
+  T8 P, T9 NA, T10 INCUMBENT/REFUSED. Receipt
+  docs/demos/upstream-repro/jev-align-w70-20260923.md (a4f3451). 101 calls.
+- commit-miner @977617e: T1 P, T2 P 37/37 (tests.rs:799 passes c4+c2+c2
+  post-repair; plant NOT-RUN earned), T3 P, T4 PASS both bars (0 FP,
+  $0.00332), T5 P, T6 tie-vacuous, T7 not-observable, T8 P, T9 refuse-ok,
+  T10 SELF/NO-GO (prevalence-0). Receipt
+  docs/demos/upstream-repro/commit-miner-w70-20260923.md (6e7353f). 52+1.
+- skillranker @a6f1ff0: T1 P, T2 FAIL build-RED (RCH transfer gap, 2-worker
+  confirmed) + 78 pass fixture-free, plant NOT-RUN, T3 P, T4 rate-PASS
+  (0.800/loss 0.167) + gate-FAIL (0.90 standing gate), T5 P, T6 P (BM25),
+  T7 reported, T8 P, T9 P, T10 SELF/gate-FAIL. Receipt
+  docs/demos/upstream-repro/skillranker-w70-20260923.md (3240718). 39 calls.
+- bicameral @3bea244: T1 P, T2 P (41 + plant RED), T3 P, T4 SELF-char
+  (AUC 1.000 on N=36, tuned-on-test), T5 P, T6 P, T7 P, T8 P, T9 PARTIAL
+  (fail-open hole: malformed-200 → allow, recorded unpatched), T10
+  SELF/char-only. Receipt
+  docs/demos/upstream-repro/bicameral-w70-20260923.md (38d85d7). 93 calls.
+- jev-ultrafast @452c1ad: T1 P, T2 P (31 + 21 guards + plant RED), T3 P,
+  T4 floor-pass (8/10, 0 invalid), T5 P, T6 measured (6/10 LLM), T7
+  reported, T8 P (1 stable miss), T9 7/7 refuse, T10 SELF/HOLD. Receipt
+  docs/demos/upstream-repro/jev-ultrafast-w70-20260923.md (25aef69).
+  32 calls (cap disclosed) + 10 LLM.
+
+Total group spend: ~317 Jev calls + 20 small-LLM calls. Result classes:
+1 INCUMBENT refusal, 1 prevalence-0 NO-GO, 1 SELF gate-FAIL, 1 SELF
+characterization with hole, 1 SELF hold. Zero seats certified.
+
+NO-CLAIM: fresh runs characterize; none certifies a seat or a product.
