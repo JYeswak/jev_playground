@@ -1,0 +1,6 @@
+CALLBACK-P5-jev-deep-kit-8q7.4-DONE
+Artifacts: notes/deep/jev-assessment.md (only measurement write; no gate, hook, .omp, or AGENTS.md change).
+Commit: 8b09086 (assessment; this callback file follows in a second commit per no-amend rule).
+Headline numbers with denominators: pin 33fe6ae (dispatch pin 572e3eb moved — recorded); 1508 tracked files (docs 658, work 459, demos 178); 5/5 cheapest README commands rc=0 keyless; analyze_diff.py rc=0 (639/662 Jev, 558 grok-4, 579 Haiku); seat-guard 9/9; claim inventory 12 rows; gates.sh FAILING (85/90/95/96 PASS, 97-readme-counts RED rc=1 silent); bus factor 1 (Josh 1419, Joshua Nowak 33, Cursor Agent 27; 0 Co-Authored-By); stars 1, forks 0, 1 tag, 0 releases; verdict TRL 4, ring Explore.
+Planted negative: §8 checklist run against a /tmp copy with §4.12 deleted — 7 boxes PASS, the §4.12 box FAIL. The checklist bites; copy uncommitted.
+NO-CLAIM: a self-assessment is [Maintainer claim] until the W5.2 cold read; stage 97 RED observed, not diagnosed; calibration runner not re-executed.
