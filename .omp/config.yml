@@ -60,10 +60,21 @@ compaction:
 # L3 (fires) is invocation, both directions, and is NOT claimed here.
 # RETIRE: delete this key if the tool is withdrawn, or if native .omp/extensions discovery starts
 # working and makes it redundant.
+
+
+# omp-kit (1).zip, installed 2026-09-23. Global ttsr.repeatMode is once, which
+# the kit author measured as catching 1 of 6 back-to-back violations. after-gap
+# with gap 0 caught all 6 on omp 18.2.10. Project config overrides the global.
+ttsr:
+  repeatMode: after-gap
+  repeatGap: 0
+
+# kit-guard is a directory extension. Native .omp/extensions discovery is not
+# the loader this repo relies on. The list below is.
 extensions:
   - ./.omp/extensions/jev-rerank.ts
   - ./.omp/extensions/jev-flag.ts
   - ./.omp/extensions/jev-screen.ts
-#   jev-screen entry added 2026-09-21 (pane 4): same loader path; L2 per-probe
+  - ./.omp/extensions/kit-guard
 #   (xd://jev_screen_ext_probe + nonce + --no-extensions arms), see
 #   work/nev-injection/screen-l2-receipt.json. Retire with the tool.

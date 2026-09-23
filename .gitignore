@@ -71,6 +71,8 @@ upstream/*
 .beads/dag-graph-*.txt
 .DS_Store
 *.log
+.omp/loop-state
+.omp/STOP
 
 # Language caches and build output, wherever they appear under a first-party path.
 node_modules/
