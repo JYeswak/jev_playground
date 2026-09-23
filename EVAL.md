@@ -1394,3 +1394,27 @@ Pane-6 verification: suite re-run 127 green; clone state confirmed.
 
 **Boundary.** GEPA never run (no reflection spend); multilabel/gateway
 paths code-present only; sampler application unproven beyond these 40 rows.
+
+## bicameral under W7.0 (2026-09-23) [live]
+
+QuietHarbor, plan W7.2 (group tool; T4+T9). `AbdelStark/bicameral` @
+`3bea244`, unmodified (`git status` clean at close). T4 bar committed first
+(`notes/deep/dispatch/p6-w70-t4bars.md` @ `070efe6`, before 21:41:48 smoke).
+Fresh: pnpm vitest 13 files 41/41; /tmp plant (forced-allow) turns gate
+tests 3-fail RED. T4 N=40 authored corpus (DISCLOSED, questions tuned on it
+→ SELF at best): 4 overt-exfil rows WAF-blocked at edge (deterministic,
+all dangerous); scored N=36 (prevalence 0.444): Jev AUC 1.000, 0 FP/0 FN
+vs regex 0.667 / majority 0.556 (McNemar b=12/c=0, p=0.0005). T7 bins
+perfectly separated with counts. T8 0/10 flips both arms. T9: degrade path
+proven for timeout/throw/429/key-absent, host survives — but malformed-200
++ high-risk degrades to ALLOW (answers.ts:3-10 coerces missing to 0): a
+genuine fail-open hole, recorded unpatched (upstream tree). Spend 93/100
+calls, p50 188ms/p95 420ms, $ unmeasured. Verdict: characterization only;
+transferable piece is the degrade-to-pattern fallback, holed as noted.
+Receipt
+[`docs/demos/upstream-repro/bicameral-w70-20260923.md`](docs/demos/upstream-repro/bicameral-w70-20260923.md).
+Pane-6 verification: suite re-run 41 green; hole mechanism read in-tree;
+bar timing via row-file mtime.
+
+**Boundary.** Authored clear-case discrimination only; adversarial phrasing,
+heldout re-run, H-benches, $ cost, Pi-extension e2e all untested.
