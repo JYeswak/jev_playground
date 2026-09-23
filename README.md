@@ -1,206 +1,58 @@
 # jev_playground
 
-An experimental lab for [Jev](https://docs.typesafe.ai). You ask a typed question. You get a number. You decide, in code, what that number is allowed to do.
+Jev answers typed questions about a state with calibrated numbers. This repo is where we find out which of those numbers deserve to drive code, and where a regex or a constant does the job better.
 
-![A typed judgment, not a paragraph](visual/hero.jpg)
-
-## The thing to run
-
-A message guard, riffed from the official cookbook. One command. No key. A refund passes, a jailbreak blocks, a crisis line goes to support.
-
-```bash
-node demos/guard/demo.mjs
-```
-
-The policy is [`demos/guard/policy.mjs`](demos/guard/policy.mjs). The questions and thresholds are the ones in [`docs-mirror/typesafe/cookbooks/llm_guardrails.md`](docs-mirror/typesafe/cookbooks/llm_guardrails.md). The default lane uses recorded assessments so the routing is visible without spending. `--live` calls Jev through `askJevBundle` and needs `TYPESAFE_API_KEY`. A four-message live smoke is in [`demos/guard/live-receipt.json`](demos/guard/live-receipt.json): pass, block, block, support. N=4 is not a certification.
-
-A RAG passage filter, riffed from the official cookbook. One command. No key. An injection is dropped, a premise-denier is kept as conflicting evidence, the merely irrelevant are dropped.
-
-```bash
-node demos/rag/demo.mjs
-```
-
-The policy is inline in [`demos/rag/demo.mjs`](demos/rag/demo.mjs) (thresholds + first-match `route()`). The questions and recorded assessments are the ones in [`docs-mirror/typesafe/cookbooks/classifying_rag_passages.md`](docs-mirror/typesafe/cookbooks/classifying_rag_passages.md). The default lane uses recorded assessments so the routing is visible without spending. `--live` scores through `askJevBundle` and needs `TYPESAFE_API_KEY`. Five live calls (`jev-1.13.0`) are in [`demos/rag/live-receipt.json`](demos/rag/live-receipt.json): all five dropped, fixture had kept sessions-01 as conflicting evidence, policy not retuned.
-
-A citation check, riffed from the official cookbook. One command. No key. A supported claim stands, a contradicted or unsupported one goes to review, a fabricated quote is dropped.
-
-```bash
-node demos/citation/demo.mjs
-```
-
-The verdicts are inline in [`demos/citation/demo.mjs`](demos/citation/demo.mjs) (string-match locate, then the Choice from [`docs-mirror/typesafe/cookbooks/citation_check.md`](docs-mirror/typesafe/cookbooks/citation_check.md) with the 0.8 stand-or-review gate). The default lane uses recorded relations so the check is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. Four live calls (`jev-1.13.0`) are in [`demos/citation/live-receipt.json`](demos/citation/live-receipt.json): two verified, two contradicted and sent to review, one claim never reached the model because the source did not contain it. Fixture labels are not a live citation score.
-
-A skill suggestion, riffed from the official cookbook. One command. No key. Two tasks get a skill, the third gets nothing — abstention is first-class.
-
-```bash
-node demos/skill-suggest/demo.mjs
-```
-
-The two-stage suggest with its gate lives in [`demos/skill-suggest/suggest.mjs`](demos/skill-suggest/suggest.mjs), following [`docs-mirror/typesafe/cookbooks/skill_suggestion.md`](docs-mirror/typesafe/cookbooks/skill_suggestion.md) (rank the roster, verify the top three, suggest nothing below gate). The default lane uses fixture overlap scores so the shape is visible without spending. Six live calls (`jev-1.13.0`) are in [`demos/skill-suggest/live-receipt.json`](demos/skill-suggest/live-receipt.json): music-video and screencast-redact suggested, mastodon abstained, same three outcomes as the fixture. Fixture suggestions are not a live ranking.
-
-A job router, riffed from Movez's Jev Engineering guide step 4. One command. No key. A confident pick goes to research or write; anything unsure goes to review, never to a worker.
-
-```bash
-node demos/chief/demo.mjs
-```
-
-The choice and the confidence gate live in [`demos/chief/demo.mjs`](demos/chief/demo.mjs) (research/write/review classes, 0.85 gate, review fallback). The 0.85 bar is the guide author's number, not measured here. The default lane uses recorded verdicts so the routing is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. Four live jobs (`jev-1.13.0`) are in [`demos/chief/live-receipt.json`](demos/chief/live-receipt.json): three agree with the fixture, vague-ask diverged (research live, review fixture), gate not retuned. A fixture route is not a live handoff.
-
-Instant context compaction, riffed from Movez's Jev Engineering guide step 5. One command. No key. A stale Glob is dropped with its result, a verbose Read keeps its call but loses its tail, failure evidence stays verbatim — nothing is summarized.
-
-```bash
-node demos/compact/demo.mjs
-```
-
-The transcript and the recorded keep/drop probabilities live in [`demos/compact/demo.mjs`](demos/compact/demo.mjs), executed through the vendored clone's own `compact(messages, asker, options)` (`fast-jev-compaction@6e1da50`, read-only). The default lane uses a fixture asker so the compaction is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. One live bundle (`jev-1.13.0`) is in [`demos/compact/live-receipt.json`](demos/compact/live-receipt.json): 1169 chars to 287, all three calls dropped, fixture had kept the Bash call, policy not retuned. A fixture keep/drop is not a live compaction.
-
-A function dispatcher, riffed from the official cookbook. One command. No key. Three commands dispatch to typed calls, one leaving an argument out so the default applies.
-
-```bash
-node demos/function-call/demo.mjs
-```
-
-The spec and dispatcher live in [`demos/function-call/dispatch.mjs`](demos/function-call/dispatch.mjs), following [`docs-mirror/typesafe/cookbooks/function_calling.md`](docs-mirror/typesafe/cookbooks/function_calling.md) (one Choice picks the function, each argument gets a Choice plus a stated Noul, call confidence is the least-certain judgment). The default lane uses fixture overlap scores so the dispatch is visible without spending. A fixture dispatch is not a live tool call.
-
-A confidence-gated classification, riffed from the official cookbook. One command. No key. A sure filing reports its group, two unsure ones report the parent division — nothing is dropped.
-
-```bash
-node demos/classify/demo.mjs
-```
-
-The two-level taxonomy and gate live in [`demos/classify/classify.mjs`](demos/classify/classify.mjs), following [`docs-mirror/typesafe/cookbooks/classification_using_confidence.md`](docs-mirror/typesafe/cookbooks/classification_using_confidence.md) (one Choice over groups, report the group when sure else the division). The default lane uses fixture overlap margins so the gate is visible without spending. A fixture class is not a live label.
-
-A passage re-rank, riffed from the official cookbook. One command. No key. A word-overlap shortlist misorders both queries; recorded nouls put the right passage first.
-
-```bash
-node demos/rerank/demo.mjs
-```
-
-The shortlist and the per-pair scores are inline in [`demos/rerank/demo.mjs`](demos/rerank/demo.mjs) (the shortlist-then-Noul shape from [`docs-mirror/typesafe/cookbooks/rerank_typesafe.md`](docs-mirror/typesafe/cookbooks/rerank_typesafe.md)). The default lane uses recorded nouls so the reorder is visible without spending. `--live` scores through `askJevBundle` and needs `TYPESAFE_API_KEY`. Ten live pair calls (`jev-1.13.0`) are in [`demos/rerank/live-receipt.json`](demos/rerank/live-receipt.json): both queries ranked the wanted document first. A fixture ranking is not a live search score.
-
-A date extraction, riffed from the official cookbook. One command. No key. Six short documents resolve to calendar dates, a missing date stays empty, and anything under confidence 0.60 goes to review.
-
-```bash
-node demos/date/demo.mjs
-```
-
-The parts and the calendar math are inline in [`demos/date/demo.mjs`](demos/date/demo.mjs) (seven Choice questions plus code assembly from [`docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md`](docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md), pinned TODAY so relative dates reproduce). The default lane uses recorded part answers so the assembly is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Six live bundles (`jev-1.13.0`) are in [`demos/date/live-receipt.json`](demos/date/live-receipt.json): four dates matched, kickoff assembled 2026-08-14 at 0.33 and stayed under review, fixture had left it unassembled, policy not retuned, demo exit 1 on that row. A fixture date is not a live extraction.
-
-An entity alignment, riffed from the official cookbook. One command. No key. Identical products merge, different ones stay unlinked, and close variants go to a curator.
-
-```bash
-node demos/entity/demo.mjs
-```
-
-The score plus three Nouls are inline in [`demos/entity/demo.mjs`](demos/entity/demo.mjs) (one Score with three level-descriptions plus name/maker/style questions from [`docs-mirror/typesafe/cookbooks/entity_alignment.md`](docs-mirror/typesafe/cookbooks/entity_alignment.md); the nearest level names the outcome, no threshold constant). The default lane uses recorded answers so the routing is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Four live bundles (`jev-1.13.0`) are in [`demos/entity/live-receipt.json`](demos/entity/live-receipt.json): same-pair asserted sameAs, diff-pair left unlinked, fruit-variant and style-words went to the curator queue. A fixture alignment is not a live match.
-
-A hierarchical classification, riffed from the official cookbook. One command. No key. Greedy takes the top child and cannot recover; beam search keeps two paths by geometric-mean probability and repairs the early mistake.
-
-```bash
-node demos/hierarchy/demo.mjs
-```
-
-The tree and the per-node distributions are inline in [`demos/hierarchy/demo.mjs`](demos/hierarchy/demo.mjs) (one Choice per sibling set plus greedy-and-beam traversal from [`docs-mirror/typesafe/cookbooks/hierarchical_classification.md`](docs-mirror/typesafe/cookbooks/hierarchical_classification.md)). The default lane uses recorded distributions so the recovery is visible without spending. `--live` asks through `askJevChoice` and needs `TYPESAFE_API_KEY`. Ten live calls (`jev-1.13.0`) are in [`demos/hierarchy/live-receipt.json`](demos/hierarchy/live-receipt.json): both docs went food-first at the root, beam kept tech/gadgets, pie-recipe missed, fixture beam had repaired that path, policy not retuned, demo exit 1. A fixture class is not a live label.
-
-A structure recovery, riffed from the official cookbook. One command. No key. Wrapped lines stitch, blocks classify to heading/code/warning/list, and the memo renders as markdown.
-
-```bash
-node demos/autoformat/demo.mjs
-```
-
-The stitch and classify rules live in [`demos/autoformat/recover.mjs`](demos/autoformat/recover.mjs), following [`docs-mirror/typesafe/cookbooks/autoformat.md`](docs-mirror/typesafe/cookbooks/autoformat.md) (per-pair mid-sentence Nouls, then per-block Choice). The default lane uses deterministic rules so the recovery is visible without spending. Two live bundles (`jev-1.13.0`) are in [`demos/autoformat/live-receipt.json`](demos/autoformat/live-receipt.json): joined 1 of 2 fixture joins, classified no headings or callouts, 0 of 6 must-markers present, policy not retuned, demo exit 1. A fixture format is not a live rewrite.
-
-A parallel briefing, riffed from the official cookbook. One command. No key. One document, four questions of three types, all answered from a single fixture request object.
-
-```bash
-node demos/parallel/demo.mjs
-```
-
-The briefing lives in [`demos/parallel/brief.mjs`](demos/parallel/brief.mjs), following [`docs-mirror/typesafe/cookbooks/parallel_questions.md`](docs-mirror/typesafe/cookbooks/parallel_questions.md) (batching changes cost and speed, not answers). The default lane uses recorded answers so the briefing is visible without spending. One live bundle (`jev-1.13.0`) is in [`demos/parallel/live-receipt.json`](demos/parallel/live-receipt.json): all four answers present, same answers as the fixture within noise. A fixture briefing is not a live judgment.
-
-A line-by-line search, riffed from the official cookbook. One command. No key. One query points at its line, another reads as unanswered — the exists check tells them apart.
-
-```bash
-node demos/semantic-find/demo.mjs
-```
-
-The ranking plus existence check live in [`demos/semantic-find/find.mjs`](demos/semantic-find/find.mjs), following [`docs-mirror/typesafe/cookbooks/semantic_find.md`](docs-mirror/typesafe/cookbooks/semantic_find.md) (Choice over line IDs plus an independent Noul). The default lane uses fixture overlap scores so the search is visible without spending. Two live bundles (`jev-1.13.0`) are in [`demos/semantic-find/live-receipt.json`](demos/semantic-find/live-receipt.json): the refund question answered from L03, the holiday question returned no answer. A fixture find is not a live search.
-
-A verify cascade, riffed from the official cookbook. One command. No key. A schema-valid extraction still gets escalated when a per-field head fires; the overall head is displayed, never gating.
-
-```bash
-node demos/cascade/demo.mjs
-```
-
-The per-field battery lives in [`demos/cascade/verify.mjs`](demos/cascade/verify.mjs), following [`docs-mirror/typesafe/cookbooks/sde_cascade.md`](docs-mirror/typesafe/cookbooks/sde_cascade.md) (cheap extract, then Noul heads where true means escalate). The default lane uses recorded Nouls so the escalation is visible without spending. One live bundle (`jev-1.13.0`) is in [`demos/cascade/live-receipt.json`](demos/cascade/live-receipt.json): escalated registration_open_date at 0.76, location passed at 0.18, fixture had escalated location, policy not retuned, demo exit 1. A fixture cascade is not a live verification.
-
-An ontology gate, two rules from EvoOntology (arXiv:2609.15779). One command. No key. Query the term instead of pasting the layer; ship a candidate only if it beats its parent.
-
-```bash
-node demos/ontology-gate/demo.mjs
-```
-
-The rules are inline in [`demos/ontology-gate/demo.mjs`](demos/ontology-gate/demo.mjs). The paper's numbers stay the paper's (+20 and +8.8 Traj-Wise are theirs, not ours); this file only shows the decision rules on fixtures. A fixture gate is not their benchmark.
-
-Self-consistency over a borderline post, riffed from the official cookbook. One command. No key. Eight Choices repeat five times; the action flips twice and one repeat abstains, but every plurality holds above the gate.
-
-```bash
-node demos/consistency/demo.mjs
-```
-
-The gate is inline in [`demos/consistency/demo.mjs`](demos/consistency/demo.mjs) (argmax with abstain below 0.60 from [`docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md)). The default lane uses recorded distributions so the wobble is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Three live bundles (`jev-1.13.0`) are in [`demos/consistency/live-receipt.json`](demos/consistency/live-receipt.json): 8 of 8 questions hold a gated plurality, gate 0.60 is the cookbook's number. A fixture consistency check is not a live agreement score.
-
-Self-consistency over a borderline claim, riffed from the official cookbook. One command. No key. Fourteen Nouls repeat five times; `covered` crosses 0.50 yet never leaves review, while two questions each flip once at an outer edge.
-
-```bash
-node demos/consistency-noul/demo.mjs
-```
-
-The review band is inline in [`demos/consistency-noul/demo.mjs`](demos/consistency-noul/demo.mjs) (no below 0.30, uncertain 0.30-0.70 inclusive, yes above, from [`docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md`](docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md)). The default lane uses recorded nouls so the band is visible without spending. Three live bundles (`jev-1.13.0`) are in [`demos/consistency-noul/live-receipt.json`](demos/consistency-noul/live-receipt.json): 4 of 14 questions hold a non-uncertain plurality, uncertain band 0.30 to 0.70. A fixture noul check is not a live probability.
-
-Pre-parsed value extraction, riffed from the official cookbook. One command. No key. Regexes over-find the candidate spans, recorded picks choose the receipt address, the mobile, the total and the credit, and code copies each verbatim into a normalized form.
-
-```bash
-node demos/preparsed/demo.mjs
-```
-
-The find-and-take shape is inline in [`demos/preparsed/demo.mjs`](demos/preparsed/demo.mjs) (recall-tuned regex, Choice-over-spans with a `none` hatch, verbatim copy plus code-side normalization from [`docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md`](docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md)). The default lane runs the regexes for real and uses recorded picks so the shape is visible without spending. `--live` asks through `askJevBundle` and needs `TYPESAFE_API_KEY`. Four live bundles (`jev-1.13.0`) are in [`demos/preparsed/live-receipt.json`](demos/preparsed/live-receipt.json): same extractions as the fixture, verbatim and normalization checks held. Fixture picks are not live extraction judgments.
-
-The live-smoke index is [`demos/LIVE.md`](demos/LIVE.md) — read it; it runs nothing. One row per `live-receipt.json`, with calls, model, and what the live lane did differently from the fixture.
-
-New here? [`demos/START.md`](demos/START.md) is the short version: guard, chief, the live-smoke index, and the injection re-score.
+__omp_shell("[A typed judgment, not a paragraph](visual/hero.jpg)")
 
 ## TL;DR
 
-Jev does not write prose. It scores a state you supply and returns a probability, a choice, or a rubric level. This repo keeps the questions we have actually measured, the scripts that reproduce them, and the caller you can copy so you do not rebuild the client, the cut, or the comparison from scratch.
+[Jev](https://docs.typesafe.ai) (TypeSafe's System One model, pinned here as `jev-1.13.0`) does not generate text. You send a state and typed questions (true or false, pick one, place on a rubric) and get back probabilities and a confidence. The engineering is the code around the answer: the threshold, the side it fails toward, and what happens when the answer is malformed.
 
-| If you want | Run |
-|---|---|
-| A tour with no key | `bash scripts/quickstart.sh` |
-| The injection result, re-scored | `python3 work/nev-differential/analyze_diff.py` |
-| The policy, with a fake model | `node --test work/nev-injection/seat-guard.test.mjs` |
-| A caller that fails closed | [`work/jev-client`](work/jev-client/README.md) |
+- **Demos.** Twenty patterns as one-command programs, seventeen of them from TypeSafe's official cookbooks. They run on recorded answers with no key; `--live` makes the real call.
+- **A client.** [`work/jev-client`](work/jev-client/README.md) wraps the official SDK so a missing key, a timeout and a malformed answer all fail the same way, toward review.
+- **Measurements.** Each has a rule written before any spend, a comparator someone would actually ship, and committed rows you can re-score.
 
-## Installation
-
-```bash
-git clone https://github.com/JYeswak/jev_playground.git
-cd jev_playground
-```
-
-Node 20 or newer. Python 3 for `analyze_diff.py`. A live call needs `TYPESAFE_API_KEY` in the environment, loaded from outside this tree. Do not print it. Do not commit a response that contains someone else's data.
+The strongest result: on 662 public prompt-injection rows, Jev is right on 639 (0.9653), a count read from the benchmark's own file. On the same questions, run here, grok-4 is right on 558 and Claude Haiku 4.5 on 579. That is one corpus at one cut. The clearest loss: on tool-call harm, a small rule beat the judge, because the label was already in the tokens.
 
 ## Quick start
 
 ```bash
 git clone https://github.com/JYeswak/jev_playground.git
 cd jev_playground
-bash scripts/quickstart.sh
+node demos/guard/demo.mjs       # a message guard: pass, block, or send to support
+bash scripts/quickstart.sh      # five questions answered from files already in the tree
 ```
 
-No API key. No package install. Five questions, answered from files already in the tree. `--mine` points the same tools at your logs.
+Node 20 or newer. Python 3 only for the injection re-score. No key and no package install. To make real calls, put `TYPESAFE_API_KEY` in the environment from outside this tree and add `--live` to a demo.
 
-Node 20 or newer. Python 3 only for the injection re-score.
+## Demos
+
+Each demo is one recipe from TypeSafe's cookbooks (mirrored under [`docs-mirror/typesafe/cookbooks/`](docs-mirror/typesafe/cookbooks/)), a public guide, or a paper, with the policy in plain code next to it. Without `--live`, the questions go to recorded answers, so you can read the routing before you spend anything. Recorded answers are fixtures. They show the policy. They do not show the model.
+
+| Run | What it shows | Recipe | Live smoke |
+|---|---|---|---|
+| `node demos/guard/demo.mjs` | A message guard. A refund passes, a jailbreak blocks, a crisis goes to support. | [llm_guardrails](docs-mirror/typesafe/cookbooks/llm_guardrails.md) | [4 calls, differs](demos/guard/live-receipt.json) |
+| `node demos/rag/demo.mjs` | A RAG passage filter. Injections and noise drop; contrary evidence is kept and labelled. | [classifying_rag_passages](docs-mirror/typesafe/cookbooks/classifying_rag_passages.md) | [5 calls, differs](demos/rag/live-receipt.json) |
+| `node demos/citation/demo.mjs` | A citation check. A supported claim stands, a contradicted one goes to review, a fabricated quote is dropped. | [citation_check](docs-mirror/typesafe/cookbooks/citation_check.md) | [4 calls, not compared](demos/citation/live-receipt.json) |
+| `node demos/skill-suggest/demo.mjs` | Skill suggestion that can abstain. Two tasks get a skill; the third gets nothing. | [skill_suggestion](docs-mirror/typesafe/cookbooks/skill_suggestion.md) | [6 calls, same](demos/skill-suggest/live-receipt.json) |
+| `node demos/chief/demo.mjs` | A job router. A confident pick goes to research or write; anything under 0.85 goes to review. | Movez, Jev Engineering guide step 4 | [4 calls, 3 of 4 same](demos/chief/live-receipt.json) |
+| `node demos/compact/demo.mjs` | Context compaction. Stale calls drop, verbose ones are truncated, failure evidence stays verbatim. Nothing is summarized. | Movez guide step 5, run through `fast-jev-compaction@6e1da50` | [1 call, differs](demos/compact/live-receipt.json) |
+| `node demos/function-call/demo.mjs` | Typed function dispatch. Each argument gets its own judgment; a missing one takes its default. | [function_calling](docs-mirror/typesafe/cookbooks/function_calling.md) | none |
+| `node demos/classify/demo.mjs` | Confidence-gated classification. Report the group when sure, the parent division when not. | [classification_using_confidence](docs-mirror/typesafe/cookbooks/classification_using_confidence.md) | none |
+| `node demos/rerank/demo.mjs` | A passage re-rank. Word overlap misorders both queries; per-pair scores put the right passage first. | [rerank_typesafe](docs-mirror/typesafe/cookbooks/rerank_typesafe.md) | [10 calls, same](demos/rerank/live-receipt.json) |
+| `node demos/date/demo.mjs` | Date extraction. Parts are judged, code does the calendar math, anything under 0.60 goes to review. | [date_extraction](docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md) | [6 calls, differs](demos/date/live-receipt.json) |
+| `node demos/entity/demo.mjs` | Entity alignment. Identical products merge, different ones stay apart, close variants go to a curator. | [entity_alignment](docs-mirror/typesafe/cookbooks/entity_alignment.md) | [4 calls, not compared](demos/entity/live-receipt.json) |
+| `node demos/hierarchy/demo.mjs` | Hierarchical classification. Greedy cannot recover from an early mistake; beam search can. | [hierarchical_classification](docs-mirror/typesafe/cookbooks/hierarchical_classification.md) | [10 calls, differs](demos/hierarchy/live-receipt.json) |
+| `node demos/autoformat/demo.mjs` | Structure recovery. Wrapped lines stitch and blocks classify into headings, code, warnings and lists. | [autoformat](docs-mirror/typesafe/cookbooks/autoformat.md) | [2 calls, differs](demos/autoformat/live-receipt.json) |
+| `node demos/parallel/demo.mjs` | Parallel questions. Four questions of three types answered from one request. | [parallel_questions](docs-mirror/typesafe/cookbooks/parallel_questions.md) | [1 call, same](demos/parallel/live-receipt.json) |
+| `node demos/semantic-find/demo.mjs` | Line search with an existence check, so "not in this document" is an answer. | [semantic_find](docs-mirror/typesafe/cookbooks/semantic_find.md) | [2 calls, same](demos/semantic-find/live-receipt.json) |
+| `node demos/cascade/demo.mjs` | A verify cascade. A schema-valid extraction still escalates when a per-field check fires. | [sde_cascade](docs-mirror/typesafe/cookbooks/sde_cascade.md) | [1 call, differs](demos/cascade/live-receipt.json) |
+| `node demos/ontology-gate/demo.mjs` | Two decision rules from EvoOntology: query the term instead of pasting the layer; ship a candidate only if it beats its parent. | arXiv:2609.15779 | none |
+| `node demos/consistency/demo.mjs` | Self-consistency over repeated choices, abstaining below 0.60. | [consistency_choice](docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md) | [3 calls, not compared](demos/consistency/live-receipt.json) |
+| `node demos/consistency-noul/demo.mjs` | Self-consistency over repeated true/false judgments, with a 0.30 to 0.70 review band. | [consistency_noul](docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md) | [3 calls, not compared](demos/consistency-noul/live-receipt.json) |
+| `node demos/preparsed/demo.mjs` | Pre-parsed extraction. Regexes over-find spans, a judgment picks one, code copies it verbatim. | [pre_parsed_value_extraction](docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md) | [4 calls, same](demos/preparsed/live-receipt.json) |
+
+Seventeen demos have a live smoke: one small `--live` run, recorded. On 8 of the 17, the live model routed at least one item differently from the recorded fixture; on 5 it matched; 4 were not compared item by item. [`demos/LIVE.md`](demos/LIVE.md) says what differed in each. A smoke of 1 to 10 calls is a direction, not a benchmark. The disagreements are why both lanes stay in the tree. [`demos/START.md`](demos/START.md) is the short tour.
 
 ## What you can copy
 
@@ -218,7 +70,7 @@ const result = await askJev({
 });
 
 if (!result.ok) {
-  // missing key, timeout, or a body the schema refused — review it
+  // missing key, timeout, or a body the schema refused: review it
 } else if (result.scores.injection >= 0.5) {
   // flag
 }
@@ -231,7 +83,7 @@ if (!result.ok) {
 | `askJevScore` | Where on this rubric? | a level and its distribution |
 | `askJevBundle` | Several of the above | one request, one state |
 
-The screen on top of that caller is [`.omp/tools/jev-screen.ts`](.omp/tools/jev-screen.ts). Flag at 0.5, pass below, review otherwise. It does not block. Your code does.
+The screen built on that caller is [`.omp/tools/jev-screen.ts`](.omp/tools/jev-screen.ts): flag at 0.5, pass below, review otherwise. It does not block. Your code does.
 
 ## Measurements
 
@@ -261,7 +113,7 @@ node --test work/nev-injection/seat-guard.test.mjs
 
 **Calibration.** Labelled held-out set, N=80, pinned model: ECE 0.0614, Brier 0.0195, choice 19/20. Receipt: [`foundation/runs/20260922T021352Z.json`](foundation/runs/20260922T021352Z.json).
 
-**A case where a classifier is the better instrument.** On tool-call harm, a small rule beat a live judge. The check is `node work/omp-harm-rule/verify-claim.mjs`. Use it when the label is already in the tokens.
+**A case where a classifier is the better instrument.** On tool-call harm, a small rule beat a live judge. The check is `node work/omp-harm-rule/verify-claim.mjs`. Use a rule when the label is already in the tokens.
 
 ## Method
 
@@ -289,6 +141,11 @@ These are in the code, not only in notes.
 - An unknown answer keeps the user's text. Low confidence does not act.
 - Do not edit an upstream clone to make a demo pass. Wrap it.
 
+## How the repo checks itself
+
+Seventeen stages run in `bash foundation/gates.sh`. Each is a script under [`foundation/gates.d/`](foundation/gates.d/) with a `--selftest` that plants a bad input and must go red; a stage that has only ever passed is unproven. Every commit subject names the level of evidence behind it (`[pending]`, `[selftest]`, `[test]`, `[oracle]`, `[live]`), and [`githooks/commit-msg`](githooks/commit-msg) refuses one that does not. Refuted ideas stay in [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md) with the condition under which they are worth retrying. [`GATES.md`](GATES.md) lists every stage and what it catches.
+
+The agent harness this lane runs in is [omp](https://omp.sh). Its project surfaces live in [`.omp/`](.omp/): the Jev tools (screen, flag, rerank), rules that interrupt a model mid-response when it starts a known-bad move, and the kit-guard extension, which is meant to block edits to gate files and is being refitted to this repo's layout.
 
 ## Commands
 
@@ -296,27 +153,37 @@ These are in the code, not only in notes.
 |---|---|
 | `bash scripts/quickstart.sh` | Five answers from committed bytes |
 | `bash scripts/quickstart.sh --mine` | The same questions on your logs |
+| `node demos/<name>/demo.mjs` | Any demo in the table above, keyless |
 | `python3 work/nev-differential/analyze_diff.py` | The injection table, recomputed |
 | `node --test work/nev-injection/seat-guard.test.mjs` | Flag, pass, and review, with no model |
 | `node scripts/jev-probe.mjs --replay docs/demos/jev-probe/probe-response-20260918.json` | A recorded judgment, decoded. Drop `--replay` only when you mean to spend |
+| `bash foundation/gates.sh` | Every repository gate, with its own selftest |
 | `./scripts/sync-docs.sh --check` | The vendored docs still match the manifest |
 
 ## Limitations
 
 - The injection result is one public corpus, one cut, one run. Measure your own traffic before you gate on it.
+- Demos without `--live` replay recorded answers. They show the policy, not the model, and the live smokes are 1 to 10 calls each.
 - Some questions in this tree are a better fit for a regex or a trained classifier. The harm-rule check is the worked example.
+- The gates run locally. There is no CI yet, so a commit made with `--no-verify` is caught by nothing.
 - A tool that loads in a session is not a measurement of live traffic.
 - Cloned repos in this tree belong to their authors. Read them. Do not push them.
 
 ## FAQ
 
-**Do I need a key to see if the repo runs?** No. `bash scripts/quickstart.sh` is enough.
+**Do I need a key to see if the repo runs?** No. `bash scripts/quickstart.sh` and every demo in the table run without one.
 
 **Which model id should I pin?** `jev-1.13.0`, until you re-measure and name the id you used.
 
 **Why not POST the API myself?** You can. The wrapper exists so a missing key, a timeout, and a bad body fail the same way, and so tests never need a network.
 
 **What do I do with a bad response?** Review it. Do not treat it as safe.
+
+## Status
+
+As of 2026-09-22. Reproducible from this tree with no key: the injection comparison, the calibration receipt, the twenty demos and their seventeen live receipts. In progress: applying the omp-kit (stream rules, the kit-guard extension, and the `/loop` continuation gate) and the FrankenSuite assessment protocol to this repository, including an assessment of this repo under the same rulebook. The plan is [`docs/PLAN-DEEP-KIT-20260922.md`](docs/PLAN-DEEP-KIT-20260922.md).
+
+Sixteen of the seventeen gate stages pass. Stage 80 is red: two rule selftests broke when six new stream rules landed without test arms, and one pin-liveness arm no longer fires on its plant. Both are being diagnosed, not waived.
 
 ## About Contributions
 

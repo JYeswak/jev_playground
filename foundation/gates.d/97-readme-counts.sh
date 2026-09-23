@@ -41,7 +41,10 @@ readme="${JEV_README:-README.md}"
 num_word() {
   case "$1" in
     8) echo Eight ;; 9) echo Nine ;; 10) echo Ten ;; 11) echo Eleven ;; 12) echo Twelve ;;
-    13) echo Thirteen ;; 14) echo Fourteen ;; 15) echo Fifteen ;; *) echo "" ;;
+    13) echo Thirteen ;; 14) echo Fourteen ;; 15) echo Fifteen ;; 16) echo Sixteen ;;
+    17) echo Seventeen ;; 18) echo Eighteen ;; 19) echo Nineteen ;; 20) echo Twenty ;;
+    21) echo Twenty-one ;; 22) echo Twenty-two ;; 23) echo Twenty-three ;; 24) echo Twenty-four ;;
+    25) echo Twenty-five ;; *) echo "" ;;
   esac
 }
 
@@ -69,10 +72,15 @@ if [[ "${1:-}" == "--selftest" ]]; then
 
   # The exact escape of 2026-09-20: spelled word matched while the numerals below it
   # went stale ("12 gate stages" for 13, "25 verdict rows (7/9/8)" for 33 8/13/12).
+  # The sed rewrites numerals the README already carries; the appended lines guarantee the
+  # plant exists when the README states the count only in words (a sed over absent text
+  # plants nothing, and this arm then passed vacuously on 2026-09-22).
   sed -E -e "s/[0-9]+ gate stages/$((n_now - 1)) gate stages/" \
          -e 's/[0-9]+ verdict rows/25 verdict rows/' \
          -e 's/\([0-9]+ cleared, [0-9]+ held, [0-9]+ ruled out/(7 cleared, 9 held, 8 ruled out/' \
          "$readme" > "$tmp/stalenumerals.md"
+  printf '\n%s gate stages, 25 verdict rows (7 cleared, 9 held, 8 ruled out).\n' "$((n_now - 1))" \
+    >> "$tmp/stalenumerals.md"
   arm "stale numerals under matching word -> RED" 1 "$tmp/stalenumerals.md"
 
   arm "missing README -> refuse" 2 "$tmp/absent.md"
@@ -91,7 +99,7 @@ word="$(num_word "$n_stages")"
 if [[ -z "$word" ]]; then
   problems="$problems|no spelled form for $n_stages stages; extend num_word rather than skipping"
 elif ! grep -q "$word stages" "$readme"; then
-  claimed="$(grep -oE '\b(Eight|Nine|Ten|Eleven|Twelve|Thirteen|Fourteen|Fifteen) stages' "$readme" | head -1)"
+  claimed="$(grep -oE '\b(Eight|Nine|Ten|Eleven|Twelve|Thirteen|Fourteen|Fifteen|Sixteen|Seventeen|Eighteen|Nineteen|Twenty(-[a-z]+)?) stages' "$readme" | head -1)"
   problems="$problems|README says '${claimed:-no stage count}' but foundation/gates.d holds $n_stages ($word)"
 fi
 
