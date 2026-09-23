@@ -47,7 +47,7 @@ Non-goals:
 > tested demos wired into the omp harness. Jev is the only judgment engine; it returns typed
 > verdicts with probabilities, and it **judges — it does not extract, generate, or summarize.**
 >
-> **Effects are bounded.** Offline lane first. Live calls are budgeted and stated in the receipt.
+> **Effects are bounded.** Claims about Jev come from live calls; the receipt states the calls made and what they cost.
 > The API key lives only in the environment as `TYPESAFE_API_KEY` and its value is never recorded
 > in any artifact — names are expected, values are not.
 >

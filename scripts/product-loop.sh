@@ -45,7 +45,7 @@ fi
 
 msgfile=$(mktemp)
 cat > "$msgfile" <<EOF
-PRODUCT-LOOP. Claim $bead. Build $demo from $cookbook. Keyless. node $demo must exit 0. Name that command in README.md in the same commit. Do not spend a key. Fixture lane is not a live score. Then br ready.
+PRODUCT-LOOP. Claim $bead. Build $demo from $cookbook. node $demo must exit 0 on its recorded answers, and node $demo --live must run against the API (pinned jev-1.13.0, key via infisical) with its receipt committed. Name both commands in README.md in the same commit. A fixture run shows the policy; only the live run proves Jev. Then br ready.
 EOF
 ntm send jev --pane="$pane" --file "$msgfile" --json
 rm -f "$msgfile"

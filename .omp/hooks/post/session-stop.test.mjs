@@ -16,10 +16,14 @@ test("a set of missing demos is one continuation, not one file", () => {
   assert.match(result.additionalContext, /demos\/b\/demo\.mjs/);
 });
 
-test("ready work continues with the mission", () => {
+test("ready work continues with the mission, which sends the pane to the API", () => {
   const result = decideStop({ stop_hook_active: false }, { ...quiet, readyCount: 3 });
   assert.match(result.additionalContext, /3 item/);
   assert.match(result.additionalContext, /Mission:/);
+  // Joshua, 2026-09-23: "this repo needs to PROVE jev work - and we can only do that by using the API".
+  // The old text told every pane not to spend a key, which kept all night's work keyless.
+  assert.match(result.additionalContext, /live calls/);
+  assert.doesNotMatch(result.additionalContext, /not spend|keyless/i);
 });
 
 test("a stand-down continues even when the file list is complete", () => {

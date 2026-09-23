@@ -15,8 +15,9 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 export const MISSION =
-  "Mission: validate Jev, build tools from what survives, liven an omp surface, dogfood it, keep the README a stranger can run. " +
-  "Do not stop on a single demo. Do not spend a key unless the unit says live. Do not write a ruling.";
+  "Mission: prove Jev with the API. A claim about Jev comes only from live calls (pinned jev-1.13.0) on data we did not write, " +
+  "against a bar committed before the first call, with the spend stated. Build tools from what survives, liven an omp surface, " +
+  "dogfood it, keep the README a stranger can run. Do not stop on a single demo. Do not write a ruling.";
 
 const STAND_DOWN = /standing by|queue dry|nothing further|no further action/i;
 
@@ -49,7 +50,9 @@ export function decideStop(
   if (world.readyCount <= 0 && world.missing.length === 0 && !standingDown) return undefined;
   const parts = [MISSION];
   if (world.readyCount > 0) {
-    parts.push(`br ready has ${world.readyCount} item(s). Claim the highest you did not author.`);
+    parts.push(
+      `br ready has ${world.readyCount} item(s). Claim the highest-priority unassigned one; another pane verifies it before it closes.`,
+    );
   }
   if (world.missing.length > 0) {
     parts.push(

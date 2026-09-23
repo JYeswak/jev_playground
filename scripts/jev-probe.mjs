@@ -12,9 +12,9 @@
 //   skillranker/src/jev/client.rs:148          (Authorization header, Accept: application/json)
 //   skillranker/src/jev/codec.rs:67-149        (Request{model,state,questions}, Question::Noul|Choice)
 //   skillranker/src/config.rs:25               (model "jev-latest")
-// OFFLINE LANE FIRST, per AGENTS.md §8. --replay decodes a recorded response and makes NO network
-// call, so the probe's decode path is exercised with no key and the live lane is an explicit choice
-// rather than the only mode. The fixture is a real captured response with no credential in it.
+// --replay decodes a recorded response with no network call, so the decode path can be checked
+// without a key. It proves the decoder, not Jev: a claim about Jev comes from the live run (the
+// default mode). The fixture is a real captured response with no credential in it.
 const replay = process.argv.includes('--replay');
 if (replay) {
   const { readFileSync } = await import('node:fs');

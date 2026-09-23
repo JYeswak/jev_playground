@@ -459,9 +459,9 @@ cites a line in the clone or a receipt; an uncited teaching is dropped, not soft
 rows, and every `run_status=never` row names its W7.2 run owner (a pane) at ledger time; a row
 without one stays open and the conductor assigns it before Phase C (review R1-8).
 
-**W7.2 Run the unrun.** Every clone without a receipt runs its own suite or demo, keyless first,
-live where its question needs the model (key in Infisical; state the spend; the cost gate is
-lifted, the testability rule is not). Rust clones (`s1-rs`, `commit-miner`, `skillranker`) build and
+**W7.2 Run the unrun.** Every clone without a receipt runs its own suite and then its own question
+live against the API in the same unit (key in Infisical; bar committed before the first call; state
+the spend). A suite run alone proves the clone's code, never Jev. Rust clones (`s1-rs`, `commit-miner`, `skillranker`) build and
 test on Contabo through RCH — `RCH_VISIBILITY=verbose rch exec -- cargo test -j 2 ...`, never a local
 cargo build; a result counts only with `Selected worker`, `Remote command finished: exit=0` and the
 tool's own result line (`skill://zeststream-rch`). Receipt per clone in
