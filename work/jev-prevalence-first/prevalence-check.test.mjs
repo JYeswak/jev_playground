@@ -144,3 +144,12 @@ test('CLI exit codes: 0 discriminates, 3 weak, 2 unlabeled, 64 usage', () => {
   assert.equal(run([unlabeled, '--truth', 'label']), 2);
   assert.equal(run([good, '--score', 'p', '--choice', 'c', '--truth', 'y']), 64);
 });
+
+test('JSON array inside a .jsonl file reads as rows, not one unlabelled row', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'prevalence-'));
+  const p = join(dir, 'arr.jsonl');
+  writeFileSync(p, JSON.stringify([{ label: 'spam' }, { label: 'ham' }, { label: 'ham' }]));
+  const { ret, lines } = capture(() => runSet({ file: p, truth: 'label' }));
+  assert.equal(ret.verdict, 'DEFERRED');
+  assert.ok(lines.some((l) => l.includes('labelled=3')), lines.join('\n'));
+});

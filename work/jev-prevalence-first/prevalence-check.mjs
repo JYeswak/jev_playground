@@ -150,14 +150,18 @@ export function parseArgs(argv) {
   return opts;
 }
 
-/** JSONL, a JSON array, or a JSON object carrying a `records` array (harvest-allowed.mjs output). */
+/** Content-sniffed rows: a JSON array (any extension), a JSON object carrying
+ * a `records` array (harvest-allowed.mjs output), else JSONL one object per
+ * line. Extension-sniffing read a `.jsonl` file holding an array as one
+ * unlabelled row (SPEC pass-8 gap, reproduced in-test). */
 function readRows(path) {
   const text = readFileSync(path, 'utf8');
-  if (path.endsWith('.json')) {
+  try {
     const parsed = JSON.parse(text);
     if (Array.isArray(parsed)) return parsed;
     if (parsed && Array.isArray(parsed.records)) return parsed.records;
-    throw new Error(`${path}: JSON is neither an array nor an object with a 'records' array`);
+  } catch {
+    // not whole-file JSON: fall through to JSONL
   }
   return text.split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l));
 }
