@@ -24,6 +24,7 @@
 !/TESTS.md
 !/.fh-agents.toml
 !/githooks/
+!/.github/
 !/scripts/
 !/probes/
 !/foundation/

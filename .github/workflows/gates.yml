@@ -1,0 +1,111 @@
+name: gates
+
+# W2.6 public CI backstop (moves jev out of RULEBOOK class C4). Runs every
+# foundation gate keyless on ubuntu on push to main, plus every stage's
+# --selftest RED arm. omp is NOT installed here: stages that need the omp
+# binary degrade to typed SKIP lines (selftest-ttsr-*.sh say so themselves);
+# the verdict step counts SKIP lines separately from PASS. A run with skips
+# is "green with N typed skips", never plain green. A planted defect must
+# turn a run RED (proven live, see the W2.6 receipt); a green run that never
+# saw RED is unproven.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      plant_red:
+        description: "Plant a defect in the runner checkout only (nothing committed): 'fixture' appends garbage to the calibration fixture so stage 10 must RED naming it; 'none' runs clean."
+        required: false
+        default: "none"
+        type: choice
+        options: [none, fixture]
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      JEV_GATE_LOG: "0"
+    steps:
+      - name: "Checkout (full history: gate stages read git log)"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Plant defect in runner checkout only (dispatch input; never committed)
+        if: inputs.plant_red == 'fixture'
+        run: |
+          set -u
+          printf 'NOT-JSON-PLANTED-DEFECT-W26\n' >> foundation/fixtures/calibration-v1.jsonl
+          echo "PLANTED: garbage line appended to foundation/fixtures/calibration-v1.jsonl; stage 10 must RED naming it"
+
+      - name: Toolchain proof line
+        run: |
+          set -u
+          git --version
+          python3 --version
+          node --version || true
+
+      - name: Node 20 (stage 40 transcript adapter)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Rust stable (br bead store, pinned 0.2.17)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: ripgrep (stage 44 and friends scan with rg)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ripgrep
+
+      - name: Install br 0.2.17 and import the bead store
+        run: |
+          set -u
+          cargo install beads_rust --version 0.2.17 --locked
+          test -x ~/.cargo/bin/br
+          br sync --import-only
+          ls .beads/*.db
+      - name: Run all gates (keyless; no key in env by construction)
+        id: gates
+        run: |
+          set -u
+          ./foundation/gates.sh > /tmp/gates-run.txt 2>&1; echo "rc=$?" > /tmp/gates-rc.txt
+          cat /tmp/gates-run.txt
+
+      - name: "Run every stage --selftest (RED arms; mirrors gates.sh: skips non-executables)"
+        id: selftests
+        run: |
+          set -u
+          : > /tmp/selftest-run.txt; : > /tmp/selftest-rc.txt
+          fail=0
+          for stage in foundation/gates.d/[0-9]*-*.sh; do
+            [ -x "$stage" ] || continue
+            name=$(basename "$stage" .sh)
+            out=$("$stage" --selftest 2>&1); code=$?
+            printf '### %s (rc=%s)\n%s\n' "$name" "$code" "$out" >> /tmp/selftest-run.txt
+            echo "$name $code" >> /tmp/selftest-rc.txt
+            [ "$code" -eq 0 ] || fail=1
+          done
+          echo "fail=$fail" | tee /tmp/selftest-fail.txt
+          exit 0
+
+      - name: Verdict (RED fails; SKIP counted apart from PASS, never as PASS)
+        run: |
+          set -u
+          gates_rc=$(cut -d= -f2 /tmp/gates-rc.txt)
+          selftest_fail=$(cut -d= -f2 /tmp/selftest-fail.txt)
+          echo "===== gates.sh ====="; cat /tmp/gates-run.txt
+          echo "===== selftests ====="; cat /tmp/selftest-run.txt
+          echo "===== typed skips (not passes) ====="
+          grep -h "SKIP" /tmp/gates-run.txt /tmp/selftest-run.txt 2>/dev/null || true
+          skips=$(grep -h "SKIP" /tmp/gates-run.txt /tmp/selftest-run.txt 2>/dev/null | wc -l | tr -d ' ')
+          echo "skip_lines=$skips"
+          if [ "$gates_rc" != "0" ] || [ "$selftest_fail" != "0" ]; then
+            echo "VERDICT: RED (gates_rc=$gates_rc selftest_fail=$selftest_fail)"
+            exit 1
+          fi
+          if [ "$skips" != "0" ]; then
+            echo "VERDICT: GREEN WITH $skips TYPED SKIPS (omp-absent arms; see lines above)"
+            exit 0
+          fi
+          echo "VERDICT: ALL GREEN"
