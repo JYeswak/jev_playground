@@ -174,15 +174,7 @@ def run_haiku(rows, path, qdef):
     from system_one_adapter import AsyncSystemOneAdapterClient
 
     names = list(qdef["RISK"])
-    questions = {
-        name: {
-            "type": "noul",
-            "instructions": q["instructions"],
-            "criteria": q["criteria"],
-        }
-        for name, q in qdef["RISK"].items()
-    }
-    questions["mentions_git"] = {"type": "noul", "instructions": GIT_Q}
+    questions, _names = nouls_for(qdef)
     done = done_ids(path)
     todo = [r for r in rows if r["i"] not in done]
     print(f"haiku: {len(todo)} to run, {len(done)} resumed", flush=True)
@@ -208,21 +200,28 @@ def run_haiku(rows, path, qdef):
                             "context": qdef["STATE_CONTEXT"],
                         },
                         questions,
+                        model="claude-haiku-4-5",
                     )
                     elapsed = int((time.perf_counter() - started) * 1000)
-                    scores = {name: response.nouls[name].noul for name in names}
-                    scores["mentions_git"] = response.nouls["mentions_git"].noul
+                    scores = {}
+                    for name in names + ["mentions_git"]:
+                        ans = response.answers[name]
+                        scores[name] = ans.noul if hasattr(ans, "noul") else ans["noul"]
                     risk = max(scores[name] for name in names)
+                    usage = getattr(response, "usage", None)
                     row = {
                         "i": item["i"],
                         "label": item["label"],
                         "in_place": item["in_place"],
-                        "model": "claude-haiku-4-5",
+                        "model": getattr(response, "model", "claude-haiku-4-5"),
                         "latencyMs": elapsed,
                         "scores": scores,
                         "risk": risk,
                         "flag": risk > CUT,
-                        "usage": usage_of(response),
+                        "usage": {
+                            "input_tokens": getattr(usage, "input_tokens", 0) or 0,
+                            "output_tokens": getattr(usage, "output_tokens", 0) or 0,
+                        },
                     }
                     ok += 1
                 except Exception as exc:
