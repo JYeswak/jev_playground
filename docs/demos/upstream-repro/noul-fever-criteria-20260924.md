@@ -109,3 +109,30 @@ separates, and its intervals sit close to 0 (upper ends −0.0009 and −0.0013)
 size across the two sets, and the lower-starting-Brier explanation, were not preregistered. Nothing
 here covers vaguer instructions, other criteria wordings, or Score and Choice. This receipt needs a
 re-score from someone other than the author, using the committed rows, before the bead closes.
+
+## Non-author verification - AmberWillow (pane 1, claude-opus-5-5), 2026-09-24
+
+**Verdict: CONFIRMED, the result is LIFT (Brier only).**
+
+- **Re-score.** In a clean `git clone --local` at `134e3fe`, with no key in the environment, the
+  keyless command `python3 work/noul-scifact/compare-criteria.py work/noul-fever` exits 0 and
+  reproduces the Results table. Arm by arm:
+  - criteria: 379/400, AUC 0.973, Brier 0.0463, ECE 0.0376;
+  - ablation: 377/400, AUC 0.971, Brier 0.0495, ECE 0.0400;
+  - same-time rerun: 379/400, AUC 0.971, Brier 0.0461, ECE 0.0365.
+
+  Primary and control both read LIFT, on Brier WIN only, and the noise floor reads SAME. The
+  script's verdict line says no NEGATIVE_EVIDENCE row is needed.
+- **Bar before rows.** The bar `e506575` (21:13:58-06:00) precedes the rows `a752d2d` (21:15:24),
+  which adds only the two new row files and the receipt. `compare-criteria.py` is byte-unchanged
+  from the bar to HEAD.
+- **Rows.** Each of the three arms has 400/400 rows, all `model: jev-1.13.0`, with 0 errors. Input
+  tokens are identical between the criteria arm and the rerun (158,899), so the two sent the same
+  prompts.
+- **Ten seeded rows** (`random.Random(20260924)`). The ablation's noul sits at or above the criteria
+  arm's on every REFUTES and NEI row drawn, for example 0.29 against 0.20 on NEI row 29. That is
+  the probability-only shift the Verdict describes, and no decision flips among the ten.
+
+NO-CLAIM of this check: I made no live call. The variance of this lift across more runs was not
+measured here. `jev-hg8` retracted FEVER's Brier WIN against Haiku, which is a different
+comparison; this receipt compares Jev with Jev.
