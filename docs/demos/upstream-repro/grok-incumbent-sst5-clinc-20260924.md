@@ -145,3 +145,20 @@ Yelp, Haiku's run-to-run variance alone was enough to flip a verdict (`jev-91u`)
 margins (sign 168 vs 101, McNemar 44 vs 16) are far wider than one row, but that is an
 observation, not a variance measurement. Two families are not all LLMs. The OpenAI lineage is
 untested. A non-author spot-check is still pending before close.
+
+## Non-author verification — VerifySST5
+
+VerifySST5 (background agent of pane 1; not the author), 2026-09-24, keyless, from a fresh full
+`git clone --local` at `e8096c9`. No live call was made; spend $0.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `python3 work/second-incumbent/score_n4j.py` with no key | HOLDS. Exit 0. Both Haiku self-checks reproduce (SST-5 273 / 251, sign 109 vs 75; CLINC 688 vs 681, handled 685 vs 650). SST-5 vs grok: accuracy 142 / 96, p = 0.00345, WIN; MAE sign 168 / 101, p = 5.27e-05, WIN; PASS; MAE WIN HOLDS. CLINC vs grok: overall 35 / 15, p = 0.0066, WIN; handled at 0.60 44 / 16, p = 0.000394, WIN, identical in all three readings; feasibility met; PASS; gated WIN HOLDS. Row sha256 prefixes `287dea63` and `a0701551` match the receipt. |
+| 2 | Independent recompute from the rows (not through any scorer) | HOLDS. Labels, samples and Jev rows were read with `git show` from `ae161b6` / `576e60e` and `e0950ce` / `2842340`. SST-5 grok: 227/500, MAE 0.624, discordant 142 / 96 and 168 / 101, same p-values. On 500/500 rows the stored `score` equals the probability-weighted index within 0.011. CLINC grok: 668 overall, 657 handled, in-scope 373/450, 327 "none" answers, discordant 35 / 15 and 44 / 16. `choice` = argmax on 750/750, 0 flat distributions, 16 options with `oos` last. |
+| 3 | Identical question and state | HOLDS. `run.py` (at `975cf81`) loads each unit's runner and sample with `git show` at the pinned commit and uses its `QUESTION` / labels as they are. The SST-5 rows' raw text answers the `sentiment` question with keys 0–4. |
+| 4 | Zero-mass | HOLDS. 0 rows with `probabilityError`, 0 raw sums of 0, and 0 flat SST-5 distributions, so all readings coincide. |
+| 5 | Bar before data | HOLDS. `975cf81` (21:41:41 −0600) is an ancestor of `492d8d6` (21:45:19 −0600) and has no rows. The receipt diff only replaces "Pending the live run." under Result. `run.py` and `score_n4j.py` are unchanged from `975cf81` to HEAD. |
+
+Verdict: both HOLDs and both PASSes reproduce from committed files under an unedited bar. Re-score:
+`python3 work/second-incumbent/score_n4j.py`. NO-CLAIM: this re-scores committed rows; no grok
+re-run, and grok's run-to-run variance is not measured (bead `jev-wu6v` is filed for it).
