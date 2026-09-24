@@ -356,17 +356,27 @@ sync_repos() {
   record_repo ripwire "$rw_path"   # provenance is not optional for the checkout we actually read
 
   # Full org inventory, so nothing in the org is silently outside the allow-list above.
+  # Built in a temp file and swapped in only when gh answered with at least one row: a logged-out
+  # gh used to leave the committed inventory truncated to its header (jev-xq2f).
   if command -v gh >/dev/null 2>&1; then
-    printf 'repo\tis_fork\tpushed_at\tmirrored\tdescription\n' > "$ORG_INVENTORY"
+    local tmp_inv; tmp_inv="$(mktemp)"
+    printf 'repo\tis_fork\tpushed_at\tmirrored\tdescription\n' > "$tmp_inv"
+    local inv_ok=1
     gh repo list "$ORG" --limit 100 --json name,isFork,pushedAt,description 2>/dev/null \
       | jq -r --arg allow "${ORG_REPOS[*]}" '
           ($allow | split(" ")) as $a
           | .[] | [.name, (.isFork|tostring), .pushedAt,
                    (if (.name|IN($a[])) then "yes" else "no" end),
                    ((.description // "-") | gsub("\t"; " "))] | @tsv' \
-      | sed 's/[[:space:]]*$//' >> "$ORG_INVENTORY" \
-      || echo "   warn: org inventory unavailable"
-    echo "   org inventory → $ORG_INVENTORY"
+      | sed 's/[[:space:]]*$//' >> "$tmp_inv" \
+      || inv_ok=0
+    if [ "$inv_ok" = 1 ] && [ "$(wc -l < "$tmp_inv")" -gt 1 ]; then
+      mv -f "$tmp_inv" "$ORG_INVENTORY"
+      echo "   org inventory → $ORG_INVENTORY"
+    else
+      rm -f -- "$tmp_inv" 2>/dev/null || true   # our own temp file, never the committed inventory
+      echo "   warn: org inventory unavailable (gh not logged in?) — kept previous"
+    fi
   fi
 
   # ripwire's docs + the installed binary's own help are the ripwire reading surface.
