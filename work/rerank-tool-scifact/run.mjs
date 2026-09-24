@@ -28,6 +28,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { rerank } from "../nev-rerank/src/rank.ts";
 import { liveAsker, LIVE_MODEL } from "../nev-rerank/src/live.ts";
+import { requireSdkInstalled } from "../sdk/require-installed.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 export const CANDIDATES = join(HERE, "..", "rerank-scifact", "candidates.jsonl");
@@ -225,6 +226,9 @@ async function live(run) {
 }
 
 async function selftest() {
+  // Arm 4 runs the shipped liveAsker through the SDK. A missing install is the named
+  // prerequisite (npm ci --prefix work/sdk) that run-registered-suites.py reads as SKIP.
+  requireSdkInstalled();
   const bad = [];
   const check = (ok, msg) => {
     if (!ok) bad.push(msg);
