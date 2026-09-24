@@ -112,9 +112,65 @@ unchanged above `## Result`.
 
 ## Result
 
-**Jev: BLOCKED-until-credits. Not FAIL. Not run.** The three Jev arms were not called.
-The 402 above has stood since 04:19Z. No `NEGATIVE_EVIDENCE.md` row: there is no
-measurement of Jev against BM25.
+Bar commit `6203f00` (pushed) is an ancestor of this results commit. Nothing above
+`## Result` changed. Jev was not called.
 
-**grok: NOT_RUN at the bar commit.** The three grok arms start only after this file is
-committed. Re-score, no key: `python3 work/rerank-scifact/score.py`.
+**Jev: BLOCKED-until-credits. Not FAIL. Not run.** No Jev rows. No
+`NEGATIVE_EVIDENCE.md` row, because Jev was not measured against BM25. The verbatim
+402 is in the bar. When credits return, `run.py jev`, `jev-run2`, and `jev-run3`
+under this same bar.
+
+**grok, live, 2026-09-24T07:26:40Z to 07:51:07Z.** Three runs, 6,000 pairs each,
+model `xai/grok-4.20-0309-non-reasoning` on every success row. Input tokens are
+5,294,469 on each run, so the prompts matched. One unscored smoke call before the
+bulk (qid 1, doc 34386619, noul 0.0, 935 in / 7 out, 966 ms) is not in the rows;
+the bulk asked that pair again.
+
+| Arm | nDCG@10 | Recall@10 | answered | distinct nouls | p50/p95 pair ms | tokens in/out |
+|---|---:|---:|---:|---:|---|---|
+| BM25 order | 0.6762 | 0.8013 | | | | |
+| grok | 0.7012 | 0.8091 | 6000/6000 | 12 | 557/805 | 5,294,469 / 52,127 |
+| grok-run2 | 0.6997 | 0.8158 | 6000/6000 | 12 | 554/794 | 5,294,469 / 52,262 |
+| grok-run3 | 0.6969 | 0.8214 | 6000/6000 | 12 | 541/766 | 5,294,469 / 52,183 |
+| oracle top-20 | 0.8492 | 0.8454 | | | | ceiling, not an arm |
+
+Run 1 wrote one `TypeSafePermissionDeniedError: 403 I can't help with that request`
+(qid 115, doc 33872649) and the resume pass answered it. Run 2 wrote one
+`TypeSafeInternalServerError: 502` (qid 1359, doc 13619127) and the resume pass
+answered it. Run 3 was clean on the first pass. Those error lines remain in the
+files; the scorer skips an error line when a success exists for the pair. Failed
+pairs after resume: 0.
+
+**grok vs BM25, the 3 pairings** (bootstrap as frozen; Jev pairings not scored):
+
+| Metric | grok | grok-run2 | grok-run3 | all-pairings |
+|---|---|---|---|---|
+| nDCG@10 | +0.0250 [+0.0008, +0.0519] WIN (47/39/214) | +0.0235 [+0.0002, +0.0486] WIN (47/38/215) | +0.0207 [−0.0057, +0.0477] TIE (46/52/202) | WIN RETRACTED 2/3 |
+| Recall@10 | +0.0078 [−0.0089, +0.0258] TIE (8/4/288) | +0.0144 [+0.0042, +0.0283] WIN (7/0/293) | +0.0201 [+0.0062, +0.0376] WIN (10/1/289) | WIN RETRACTED 2/3 |
+
+No grok run is a LOSE to BM25 on either metric. The nDCG@10 win does not stand:
+run 3's interval includes 0. Direction favours grok on nDCG@10 in all three runs
+(point estimates +0.021 to +0.025, against an oracle headroom of 0.173). Twelve
+distinct noul values across 6,000 pairs: the adapter's probability mode is coarse
+here. That is descriptive, not a pass-rule claim.
+
+**Unit verdict: BLOCKED**, not PASS and not FAIL. The pass rule needs the three
+Jev runs.
+
+**Spend.** 18,000 scored grok calls plus 2 retried failures plus 1 unscored smoke.
+Recorded success-row tokens: 15,883,407 input / 156,572 output. xAI list price is
+not applied here (same boundary as `grok-variance-20260924.md`). No Jev calls.
+
+**Rows** (sha256): `rows-grok.jsonl`
+`16fe9d822f90c07a9583ad21457d2fce158656e381ea89166554ce1470364b3f`,
+`rows-grok-run2.jsonl`
+`3184ed06e777ea76c9ac332eb3cb4ea6bcb225dcfcd54e4ea13893b6169f6025`,
+`rows-grok-run3.jsonl`
+`805a0e76c7710a4f8e4daefd05eed17371824afc2109ad43c2715cee332a7db1`.
+No query or passage text in the rows.
+
+Re-score, no key: `python3 work/rerank-scifact/score.py`.
+
+**NO-CLAIM.** This does not say Jev beats or loses to BM25 or to grok. It does not
+say grok beats BM25: that WIN is retracted at 2/3. Three grok runs, one wording,
+one shortlist, one afternoon.
