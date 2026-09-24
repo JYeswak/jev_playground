@@ -79,9 +79,14 @@ jobs:
         # db is throwaway: gates.sh requires .beads/*.db to EXIST, and no
         # stage reads it — so a verified official br binary is sufficient and
         # deterministic. If this ever changes, this step fails loudly.
+        # GH_TOKEN: unauthenticated `gh release download` shares the runner IP's API quota and got
+        # HTTP 403 (rate limit) on every run 08:03-08:29Z 2026-09-24; with `set +e` the step still
+        # reported success and the next step died on `br: command not found`. Install is not a
+        # gate stage, so any failure here stops the job at this step.
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          set -u; set +e  # runner uses bash -e; stages report codes, never abort
-          cd /tmp
+          set -euo pipefail
           gh release download v0.6.0 --repo Dicklesworthstone/beads_rust \
             --pattern 'br-0.6.0-linux_amd64.tar.gz*' --dir /tmp/br-dl
           cd /tmp/br-dl
