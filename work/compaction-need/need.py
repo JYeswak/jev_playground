@@ -29,6 +29,15 @@ LABELS = [
 DECISIONS = os.path.join(HERE, "decisions.jsonl")
 PASS = os.path.join(HERE, "decisions-pass.json")
 ALLOWED = {"needed", "not-needed", "undecidable"}
+EXCLUDED_FILE = os.path.join(HERE, "excluded.json")
+
+
+def excluded():
+    """Sessions left out of labels, replay and scoring, with the reason (amendment A1)."""
+    if not os.path.exists(EXCLUDED_FILE):
+        return {}
+    with open(EXCLUDED_FILE, encoding="utf-8") as fh:
+        return json.load(fh)
 
 
 def read_jsonl(path):
@@ -53,10 +62,13 @@ def committed(path):
 
 
 def calls():
+    """Prefix calls of the included sessions, keyed (session, tool_use_id)."""
+    out = excluded()
     with open(CALLS, encoding="utf-8") as fh:
         return {
             (s["session"], c["tool_use_id"]): c
             for s in json.load(fh)
+            if s["session"] not in out
             for c in s["calls"]
         }
 
@@ -66,8 +78,11 @@ def labels(path, keys):
     if not os.path.exists(path):
         return {}
     got = {}
+    out = excluded()
     for row in read_jsonl(path):
         key = (row.get("session"), row.get("tool_use_id"))
+        if key[0] in out:
+            continue  # amendment A1: kept in the file, not counted
         if key not in keys:
             return f"{os.path.basename(path)}: {key} is not a prefix call in calls.json"
         if row.get("label") not in ALLOWED:
@@ -118,6 +133,8 @@ def status():
         f"calls.json: {len(keys)} prefix calls in {len(per)} sessions: "
         + ", ".join(f"{s} {n}" for s, n in sorted(per.items()))
     )
+    for s, why in excluded().items():
+        print(f"excluded (amendment A1): {s}: {why[:120]}")
     for path in LABELS[:2]:
         got = labels(path, keys)
         if isinstance(got, str):

@@ -1,0 +1,3 @@
+{
+  "01a0c085": "Rider-covered source (AGENTS.md 'Rider-Covered Repos'): the session read skillranker/src, so its packet holds skillranker Rust source; a restricted-lab pane must not analyze it and the replay would send it to Jev in an evaluation. Amendment A1, decided before any Jev call or outcome."
+}

@@ -92,3 +92,46 @@ is made.
 **NO-CLAIM.** Six sessions of one project, one cut point per session, a 40-message horizon (need
 beyond the horizon is not counted), labels from packet text that is itself truncated, and one model
 pin.
+
+## Amendment A1: session `01a0c085` excluded (decided before any Jev call or outcome)
+
+**What.** Session `01a0c085` is excluded from labels, the live replay and scoring. **200 prefix calls
+in 5 sessions remain:** `01a0c086`, `01a0c530`, `01a0d151`, `01a0d161` and `01a0d269`, 40 calls each.
+
+**Why: the rider, not the data.** That session read `skillranker/src`, so its packet holds
+skillranker Rust source. Pane 1 counted 97 mentions and 48 Rust-source sections; the author did not
+open the packet.
+- skillranker is a rider-covered repo (AGENTS.md "Rider-Covered Repos").
+- A pane on an OpenAI or Anthropic model does not analyze or copy from such a repo.
+- The live replay would send that source to Jev inside an evaluation.
+
+**When.** Decided on 2026-09-24 at about 17:35 UTC, after both label files were committed
+(`898d1d5`, `c8bb9cd`) and before any adjudication, any Jev call or any decision existed. No
+outcome was seen, so the exclusion cannot follow from one. The other five packets name skillranker
+only in passing (a `git rev-parse`, a file name), per pane 1.
+
+**Disclosed breach.** Both labellers were Anthropic subagents that pane 1 spawned, and they read
+that packet. The breach is disclosed on `jev-x86y`. Excluding the session keeps its content out of
+the evaluation. It does not undo the reading.
+
+**How it is enforced.** `work/compaction-need/excluded.json` names the session and the reason, and
+both scripts read it:
+- `need.py` drops the session from `calls()`. It skips that session's label rows without counting
+  them in `status`, `disagreements`, `ready` or `score`, and prints the exclusion in `status`.
+- `need.ts` drops it from `sessions()`, so `replay` never reads or sends the file.
+- `packets` now refuses to run because the call set is fixed, so `calls.json` cannot be rewritten.
+
+Nothing is deleted. The packet under `/tmp`, the session's 41 rows in `calls.json` and its label
+rows stay as they are, uncounted.
+
+**Counts after A1** (`need.py status`, keyless):
+
+| | needed | not-needed | undecidable |
+|---|---:|---:|---:|
+| labeller 1 | 60 | 133 | 7 |
+| labeller 2 | 54 | 140 | 6 |
+
+32 disagreements remain for pane 1 to adjudicate, down from 35 before A1. `need.py ready` refuses
+until the adjudication is committed.
+
+**NO-CLAIM.** Five sessions now, not six. The metrics, bar and replay are unchanged.

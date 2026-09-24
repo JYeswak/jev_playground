@@ -109,14 +109,18 @@ function select() {
   return 0;
 }
 
+/** The sampled sessions minus excluded.json's (amendment A1); an excluded file is never read. */
 function sessions() {
   const s = JSON.parse(readFileSync(SESSIONS, "utf8"));
-  for (const x of s.sessions) {
+  const excludedFile = join(HERE, "excluded.json");
+  const excluded: Record<string, string> = existsSync(excludedFile) ? JSON.parse(readFileSync(excludedFile, "utf8")) : {};
+  const kept = s.sessions.filter((x: { id: string }) => !(x.id in excluded));
+  for (const x of kept) {
     const bytes = readFileSync(untilde(x.path));
     const got = createHash("sha256").update(bytes).digest();
     if (!timingSafeEqual(got, Buffer.from(x.sha256, "hex"))) throw new Error(`REFUSED: ${x.path} changed since it was sampled`);
   }
-  return s.sessions;
+  return kept;
 }
 
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n)} …[${s.length - n} more chars]` : s);
@@ -130,6 +134,10 @@ function render(m: Message): string {
 }
 
 function packets() {
+  if (existsSync(join(HERE, "calls.json"))) {
+    console.log("REFUSED: calls.json exists; the call set is fixed (labels refer to it)");
+    return 1;
+  }
   mkdirSync(PACKETS, { recursive: true });
   const index = [];
   for (const s of sessions()) {
