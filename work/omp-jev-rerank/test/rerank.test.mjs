@@ -34,7 +34,11 @@ function withFetch(impl, body) {
     }
   };
 }
-const answers = (payload) => async () => ({ ok: true, status: 200, text: async () => JSON.stringify(payload) });
+const jsonResponse = (body) => new Response(body, {
+  status: 200,
+  headers: { 'content-type': 'application/json' },
+});
+const answers = (payload) => async () => jsonResponse(JSON.stringify(payload));
 
 test('ignores tools that are not searches, and errored results', async () => {
   const h = host();

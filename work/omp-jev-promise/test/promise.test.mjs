@@ -2,6 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import ompJevPromise, { QUESTIONS } from "../src/index.ts";
 
+const jsonResponse = (body) => new Response(body, {
+  status: 200,
+  headers: { "content-type": "application/json" },
+});
+
 function host() {
   const rows = [];
   let handler;
@@ -39,7 +44,7 @@ test("no headline or no CTA records 0 rows", async () => {
   const realFetch = globalThis.fetch;
   globalThis.fetch = async () => {
     called += 1;
-    return { ok: true, status: 200, text: async () => "{}" };
+    return jsonResponse("{}");
   };
   try {
     const h = host();
@@ -61,7 +66,7 @@ test("exact verb match records promise_regex and does not call Jev", async () =>
   const realFetch = globalThis.fetch;
   globalThis.fetch = async () => {
     called += 1;
-    return { ok: true, status: 200, text: async () => "{}" };
+    return jsonResponse("{}");
   };
   try {
     const h = host();
@@ -127,11 +132,7 @@ test("a real score is recorded as promise_scored with its probabilities", async 
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = "test-key";
-  globalThis.fetch = async () => ({
-    ok: true,
-    status: 200,
-    text: async () => JSON.stringify({ answers: { keeps_promise: { noul: 0.81 } } }),
-  });
+  globalThis.fetch = async () => jsonResponse(JSON.stringify({ answers: { keeps_promise: { noul: 0.81 } } }));
   try {
     const h = host();
     ompJevPromise(h.pi);
@@ -152,11 +153,7 @@ test("a 200 with no probabilities is an error, not a silent pass", async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = "test-key";
-  globalThis.fetch = async () => ({
-    ok: true,
-    status: 200,
-    text: async () => JSON.stringify({ unexpected: true }),
-  });
+  globalThis.fetch = async () => jsonResponse(JSON.stringify({ unexpected: true }));
   try {
     const h = host();
     ompJevPromise(h.pi);
@@ -196,11 +193,7 @@ test("asks exactly the measured question and no more", async () => {
   let sent;
   globalThis.fetch = async (_url, init) => {
     sent = JSON.parse(init.body);
-    return {
-      ok: true,
-      status: 200,
-      text: async () => JSON.stringify({ answers: { keeps_promise: { noul: 0.5 } } }),
-    };
+    return jsonResponse(JSON.stringify({ answers: { keeps_promise: { noul: 0.5 } } }));
   };
   try {
     const h = host();

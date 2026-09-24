@@ -2,6 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import ompJevHeat, { CHOICE } from "../src/index.ts";
 
+const jsonResponse = (body) => new Response(body, {
+  status: 200,
+  headers: { "content-type": "application/json" },
+});
+
 function host() {
   const rows = [];
   let handler;
@@ -105,11 +110,7 @@ test("a real choice is recorded as heat_scored with all five labels", async () =
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = "test-key";
-  globalThis.fetch = async () => ({
-    ok: true,
-    status: 200,
-    text: async () => JSON.stringify(CHOICE_200),
-  });
+  globalThis.fetch = async () => jsonResponse(JSON.stringify(CHOICE_200));
   try {
     const h = host();
     ompJevHeat(h.pi);
@@ -139,11 +140,7 @@ test("a 200 with no probabilities is an error, not a silent pass", async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = "test-key";
-  globalThis.fetch = async () => ({
-    ok: true,
-    status: 200,
-    text: async () => JSON.stringify({ unexpected: true }),
-  });
+  globalThis.fetch = async () => jsonResponse(JSON.stringify({ unexpected: true }));
   try {
     const h = host();
     ompJevHeat(h.pi);
@@ -184,11 +181,7 @@ test("asks exactly the measured choice and no more", async () => {
   let sent;
   globalThis.fetch = async (_url, init) => {
     sent = JSON.parse(init.body);
-    return {
-      ok: true,
-      status: 200,
-      text: async () => JSON.stringify(CHOICE_200),
-    };
+    return jsonResponse(JSON.stringify(CHOICE_200));
   };
   try {
     const h = host();

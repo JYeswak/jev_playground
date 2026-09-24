@@ -2,6 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import ompJevUncanny, { QUESTIONS } from "../src/index.ts";
 
+const jsonResponse = (body) => new Response(body, {
+  status: 200,
+  headers: { "content-type": "application/json" },
+});
+
 function host() {
   const rows = [];
   let handler;
@@ -79,11 +84,7 @@ test("a real score is recorded as uncanny_scored with its probabilities", async 
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = "test-key";
-  globalThis.fetch = async () => ({
-    ok: true,
-    status: 200,
-    text: async () => JSON.stringify({ answers: { watching: { noul: 0.81 } } }),
-  });
+  globalThis.fetch = async () => jsonResponse(JSON.stringify({ answers: { watching: { noul: 0.81 } } }));
   try {
     const h = host();
     ompJevUncanny(h.pi);
@@ -104,11 +105,7 @@ test("a 200 with no probabilities is an error, not a silent pass", async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = "test-key";
-  globalThis.fetch = async () => ({
-    ok: true,
-    status: 200,
-    text: async () => JSON.stringify({ unexpected: true }),
-  });
+  globalThis.fetch = async () => jsonResponse(JSON.stringify({ unexpected: true }));
   try {
     const h = host();
     ompJevUncanny(h.pi);
@@ -148,11 +145,7 @@ test("asks exactly the measured question and no more", async () => {
   let sent;
   globalThis.fetch = async (_url, init) => {
     sent = JSON.parse(init.body);
-    return {
-      ok: true,
-      status: 200,
-      text: async () => JSON.stringify({ answers: { watching: { noul: 0.5 } } }),
-    };
+    return jsonResponse(JSON.stringify({ answers: { watching: { noul: 0.5 } } }));
   };
   try {
     const h = host();
