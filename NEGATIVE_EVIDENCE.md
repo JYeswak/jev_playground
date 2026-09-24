@@ -3855,3 +3855,57 @@ and do not change the wording after seeing these answers.
 
 Receipt: `docs/demos/upstream-repro/noul-toxicity-20260924.md`. Re-score:
 `python3 work/noul-toxicity/score.py`.
+
+## R94 — DROPPED: kit-guard and the six kit rules are loaded in all six jev panes
+
+**Claim (plan section 5, `kit-loaded`):** kit-guard and the six kit rules are loaded in all six
+jev panes.
+
+**Measured 2026-09-24, `tmux list-panes -t jev`.** Three omp panes, not six. Pane 0 is the user
+shell. Pane 1 is `omp --auto-approve`, started 2026-09-22 20:02:34, before the six rule files
+(mtime 2026-09-23 21:24). Rules load at session start, so that pane does not have them. Pane 2
+(`omp --profile grok`, started 2026-09-23 21:29:16) does: `omp ttsr list` names
+`kit-close-needs-evidence`, `kit-jsonl-close`, `kit-no-verify`, `kit-test-skip`,
+`kit-unverified-done`, and `kit-weasel-retry`. Pane 3 started 2026-09-24 02:51:31; its loaded
+set was not dumped. kit-guard's load was not dumped in any pane. A file under `.omp/` is not a
+load.
+
+**Retry condition.** Reopen when `tmux list-panes -t jev` shows six omp panes and a loaded-rule
+dump from each names those six rules, and an extension dump from each names kit-guard. The
+sentence must use the live pane count, not six, if six panes are not up.
+
+## R95 — DROPPED: each kit mechanism fired in a live jev pane
+
+**Claim (plan section 5, `kit-trips`):** each kit mechanism fired on a planted bad input and
+stayed silent on a known-good one in a live jev pane.
+
+**Measured 2026-09-24.** No committed frame names pane id, pid, profile, model, and time for
+a plant that fired and a known-good input that stayed silent, for each of the six rules and
+kit-guard. A TTSR selftest and a file on disk are not that frame (plan section 6).
+
+**Retry condition.** Reopen when one committed frame per mechanism has those five fields, the
+plant text, and the silent control, from a pane whose session started after the rule file.
+
+## R96 — DROPPED: the omp-kit end-to-end suite runs on every gates run
+
+**Claim (plan section 5, `kit-e2e`):** the omp-kit end-to-end suite runs against jev's layout
+on every gates run.
+
+**Measured 2026-09-24.** `foundation/gates.d/` has no e2e stage. `scripts/` has no e2e script.
+`gates.yml` runs `bash foundation/gates.sh --portable`. A stage that does not exist cannot
+run on every push.
+
+**Retry condition.** Reopen when `foundation/gates.d/` has a stage that invokes the omp-kit
+e2e suite against jev's layout, and a `gates.yml` log shows that stage PASS.
+
+## R97 — DROPPED: no closed bead closes on a reason shorter than 20 characters
+
+**Claim (plan section 5, `false-close-zero`):** no closed bead in jev closes on a reason
+shorter than 20 characters.
+
+**Measured 2026-09-24, `.beads/issues.jsonl`.** 164 closed. 11 have `close_reason` `done`
+(4 characters): `jev-0c6`, `jev-cz0`, `jev-eww`, `jev-gou`, `jev-kma`, `jev-kqf`,
+`jev-publish-readme-ho1`, `jev-vbh.1`, `jev-vbh.2`, `jev-vbh.3`, `jev-vbh.4`.
+
+**Retry condition.** Reopen when a recount of `.beads/issues.jsonl` finds zero closed rows
+whose `close_reason` is shorter than 20 characters.
