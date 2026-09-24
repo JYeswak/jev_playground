@@ -1,0 +1,69 @@
+{
+ "session": "01a0d147-8312-738b-b141-f4ef66e46294",
+ "agent_end": true,
+ "exit": 0,
+ "calls": [
+  {
+   "tool": "bash",
+   "command": "ls",
+   "isError": false,
+   "startMs": 10072.3,
+   "ms": 85.26
+  },
+  {
+   "tool": "bash",
+   "command": "git push --dry-run origin main",
+   "isError": false,
+   "startMs": 12061.9,
+   "ms": 923.75
+  },
+  {
+   "tool": "bash",
+   "command": "echo fake-key-probe [REDACTED]",
+   "isError": false,
+   "startMs": 15128.4,
+   "ms": 39.32
+  }
+ ],
+ "rows": [
+  {
+   "ts": "2026-09-24T02:38:49.118Z",
+   "session": "01a0d147-8312-738b-b141-f4ef66e46294",
+   "cmdSha": "c7b68ac37f364473e922936708e7f43c293dd07b295171566c07ff5fe024fab9",
+   "cmd": "ls",
+   "status": "not-run",
+   "probs": null,
+   "flag": null,
+   "latencyMs": null,
+   "tokens": null,
+   "skipped": null,
+   "error": "NOT_RUN reason=unconfigured"
+  },
+  {
+   "ts": "2026-09-24T02:38:51.945Z",
+   "session": "01a0d147-8312-738b-b141-f4ef66e46294",
+   "cmdSha": "e032b785b3ad5ad2cfc79b0b84660d85de1fbb97a7edec77f5aa263b407a0dea",
+   "cmd": "git push --dry-run origin main",
+   "status": "not-run",
+   "probs": null,
+   "flag": null,
+   "latencyMs": null,
+   "tokens": null,
+   "skipped": null,
+   "error": "NOT_RUN reason=unconfigured"
+  },
+  {
+   "ts": "2026-09-24T02:38:54.116Z",
+   "session": "01a0d147-8312-738b-b141-f4ef66e46294",
+   "cmdSha": "2a9f32a390b7d403f0573151aa89df455ab18af91c096ad069d9d4be390a4cd2",
+   "cmd": "echo fake-key-probe [REDACTED]",
+   "status": "skipped",
+   "probs": null,
+   "flag": null,
+   "latencyMs": null,
+   "tokens": null,
+   "skipped": "secret",
+   "error": null
+  }
+ ]
+}

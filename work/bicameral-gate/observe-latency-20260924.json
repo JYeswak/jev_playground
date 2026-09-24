@@ -1,0 +1,1365 @@
+{
+ "arms": [
+  {
+   "arm": "off",
+   "order": 0,
+   "session": "01a0d142-6733-77e4-8382-ee3d0ffbb644",
+   "agent_end": true,
+   "exit": 0,
+   "calls": [
+    {
+     "tool": "bash",
+     "command": "true #01",
+     "isError": false,
+     "startMs": 10329.0,
+     "ms": 196.5
+    },
+    {
+     "tool": "bash",
+     "command": "true #02",
+     "isError": false,
+     "startMs": 14028.5,
+     "ms": 21.55
+    },
+    {
+     "tool": "bash",
+     "command": "true #03",
+     "isError": false,
+     "startMs": 16069.7,
+     "ms": 4.86
+    },
+    {
+     "tool": "bash",
+     "command": "true #04",
+     "isError": false,
+     "startMs": 18124.2,
+     "ms": 4.48
+    },
+    {
+     "tool": "bash",
+     "command": "true #05",
+     "isError": false,
+     "startMs": 20024.6,
+     "ms": 11.03
+    },
+    {
+     "tool": "bash",
+     "command": "true #06",
+     "isError": false,
+     "startMs": 22202.2,
+     "ms": 9.25
+    },
+    {
+     "tool": "bash",
+     "command": "true #07",
+     "isError": false,
+     "startMs": 24123.5,
+     "ms": 4.75
+    },
+    {
+     "tool": "bash",
+     "command": "true #08",
+     "isError": false,
+     "startMs": 26227.4,
+     "ms": 2.76
+    },
+    {
+     "tool": "bash",
+     "command": "true #09",
+     "isError": false,
+     "startMs": 28267.6,
+     "ms": 3.86
+    },
+    {
+     "tool": "bash",
+     "command": "true #10",
+     "isError": false,
+     "startMs": 30082.5,
+     "ms": 3.86
+    },
+    {
+     "tool": "bash",
+     "command": "true #11",
+     "isError": false,
+     "startMs": 32155.3,
+     "ms": 4.49
+    },
+    {
+     "tool": "bash",
+     "command": "true #12",
+     "isError": false,
+     "startMs": 34042.2,
+     "ms": 16.39
+    }
+   ],
+   "rows": []
+  },
+  {
+   "arm": "on",
+   "order": 1,
+   "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+   "agent_end": true,
+   "exit": 0,
+   "calls": [
+    {
+     "tool": "bash",
+     "command": "true #01",
+     "isError": false,
+     "startMs": 7699.7,
+     "ms": 148.17
+    },
+    {
+     "tool": "bash",
+     "command": "true #02",
+     "isError": false,
+     "startMs": 9846.4,
+     "ms": 3.56
+    },
+    {
+     "tool": "bash",
+     "command": "true #03",
+     "isError": false,
+     "startMs": 11727.7,
+     "ms": 4.15
+    },
+    {
+     "tool": "bash",
+     "command": "true #04",
+     "isError": false,
+     "startMs": 14511.1,
+     "ms": 3.45
+    },
+    {
+     "tool": "bash",
+     "command": "true #05",
+     "isError": false,
+     "startMs": 16473.9,
+     "ms": 3.63
+    },
+    {
+     "tool": "bash",
+     "command": "true #06",
+     "isError": false,
+     "startMs": 19108.7,
+     "ms": 3.11
+    },
+    {
+     "tool": "bash",
+     "command": "true #07",
+     "isError": false,
+     "startMs": 21717.4,
+     "ms": 3.35
+    },
+    {
+     "tool": "bash",
+     "command": "true #08",
+     "isError": false,
+     "startMs": 24641.2,
+     "ms": 4.97
+    },
+    {
+     "tool": "bash",
+     "command": "true #09",
+     "isError": false,
+     "startMs": 26747.6,
+     "ms": 5.11
+    },
+    {
+     "tool": "bash",
+     "command": "true #10",
+     "isError": false,
+     "startMs": 28959.9,
+     "ms": 18.72
+    },
+    {
+     "tool": "bash",
+     "command": "true #11",
+     "isError": false,
+     "startMs": 31182.7,
+     "ms": 4.75
+    },
+    {
+     "tool": "bash",
+     "command": "true #12",
+     "isError": false,
+     "startMs": 33207.5,
+     "ms": 3.72
+    }
+   ],
+   "rows": [
+    {
+     "ts": "2026-09-24T02:33:56.494Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "48bc1eca602f77718ff596baa0d41caf7429bcdc87d8f5adbcdca5b9a6d8770d",
+     "cmd": "true #01",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.01,
+      "destructive": 0.02,
+      "privilege": 0.02,
+      "irreversible_publish": 0.01,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 323,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:33:58.497Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "638021799eba0c280b99687d95963d047152479ce08f26027eba25e4fd48dcde",
+     "cmd": "true #02",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 150,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:00.378Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "386c9a18124efac0a0664dca91716cef819ae791d9264288fe9c2f7c20f74f09",
+     "cmd": "true #03",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 377,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:03.169Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "9e671acccd7fd2acf1aa2f8ac8e27213e993879212c39e18f051afaae07b8aeb",
+     "cmd": "true #04",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 146,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:05.133Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "eb2f009a9531f2797e8270125f3538fc8f5acf90f7f20aa8fe2a7f08549d9237",
+     "cmd": "true #05",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 388,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:07.767Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "4498f92a87f394214394861fca5aa47c4259d5131b08d569bccb985f4172daa8",
+     "cmd": "true #06",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.01,
+      "privilege": 0.02,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 249,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:10.375Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "0a5520f59d50ee6e4e4a70c2ee17cbd721f4b61826c1f4953e70a915d14b2bb9",
+     "cmd": "true #07",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 104,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:13.293Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "dd31a3cb83a1d8fa7949ae9cf29f98a73452497f218f8f0a48a22a70b9b2d2d9",
+     "cmd": "true #08",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 151,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:15.411Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "ed0911eb8511e96d41bb32993c97e927005cbe4752e92a22984060b7c17519e9",
+     "cmd": "true #09",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.04,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 153,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:17.622Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "5eba270e424b239e296699f7ec6a1f73fb1c33c7c9c38b477066956c2b89078a",
+     "cmd": "true #10",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 253,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:19.834Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "06810342660416c4f5399ebf0b7cd3dd49bd9733a3027c2337d391d6369610de",
+     "cmd": "true #11",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 183,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:34:21.858Z",
+     "session": "01a0d143-1521-7522-ac3f-25ee13ec386a",
+     "cmdSha": "79c2ac7d11e539f1231fe225a7ece048a0368b5209932705bff2e724c3f18b56",
+     "cmd": "true #12",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 154,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    }
+   ]
+  },
+  {
+   "arm": "off",
+   "order": 2,
+   "session": "01a0d143-c086-73f7-aa81-9caad6093f35",
+   "agent_end": true,
+   "exit": 0,
+   "calls": [
+    {
+     "tool": "bash",
+     "command": "true #01",
+     "isError": false,
+     "startMs": 8900.1,
+     "ms": 86.39
+    },
+    {
+     "tool": "bash",
+     "command": "true #02",
+     "isError": false,
+     "startMs": 10857.8,
+     "ms": 14.22
+    },
+    {
+     "tool": "bash",
+     "command": "true #03",
+     "isError": false,
+     "startMs": 12895.8,
+     "ms": 4.24
+    },
+    {
+     "tool": "bash",
+     "command": "true #04",
+     "isError": false,
+     "startMs": 14985.9,
+     "ms": 3.05
+    },
+    {
+     "tool": "bash",
+     "command": "true #05",
+     "isError": false,
+     "startMs": 17520.9,
+     "ms": 6.55
+    },
+    {
+     "tool": "bash",
+     "command": "true #06",
+     "isError": false,
+     "startMs": 20413.4,
+     "ms": 3.52
+    },
+    {
+     "tool": "bash",
+     "command": "true #07",
+     "isError": false,
+     "startMs": 22628.0,
+     "ms": 5.96
+    },
+    {
+     "tool": "bash",
+     "command": "true #08",
+     "isError": false,
+     "startMs": 24787.5,
+     "ms": 23.11
+    },
+    {
+     "tool": "bash",
+     "command": "true #09",
+     "isError": false,
+     "startMs": 26584.2,
+     "ms": 5.73
+    },
+    {
+     "tool": "bash",
+     "command": "true #10",
+     "isError": false,
+     "startMs": 29305.1,
+     "ms": 4.82
+    },
+    {
+     "tool": "bash",
+     "command": "true #11",
+     "isError": false,
+     "startMs": 31217.3,
+     "ms": 5.26
+    },
+    {
+     "tool": "bash",
+     "command": "true #12",
+     "isError": false,
+     "startMs": 33971.5,
+     "ms": 8.25
+    }
+   ],
+   "rows": []
+  },
+  {
+   "arm": "on",
+   "order": 3,
+   "session": "01a0d144-72ed-70a9-a246-1549257093da",
+   "agent_end": true,
+   "exit": 0,
+   "calls": [
+    {
+     "tool": "bash",
+     "command": "true #01",
+     "isError": false,
+     "startMs": 9161.5,
+     "ms": 150.66
+    },
+    {
+     "tool": "bash",
+     "command": "true #02",
+     "isError": false,
+     "startMs": 11038.7,
+     "ms": 3.44
+    },
+    {
+     "tool": "bash",
+     "command": "true #03",
+     "isError": false,
+     "startMs": 12966.6,
+     "ms": 2.4
+    },
+    {
+     "tool": "bash",
+     "command": "true #04",
+     "isError": false,
+     "startMs": 15368.1,
+     "ms": 4.01
+    },
+    {
+     "tool": "bash",
+     "command": "true #05",
+     "isError": false,
+     "startMs": 18295.8,
+     "ms": 3.61
+    },
+    {
+     "tool": "bash",
+     "command": "true #06",
+     "isError": false,
+     "startMs": 20599.9,
+     "ms": 3.22
+    },
+    {
+     "tool": "bash",
+     "command": "true #07",
+     "isError": false,
+     "startMs": 22666.8,
+     "ms": 3.16
+    },
+    {
+     "tool": "bash",
+     "command": "true #08",
+     "isError": false,
+     "startMs": 24593.5,
+     "ms": 2.49
+    },
+    {
+     "tool": "bash",
+     "command": "true #09",
+     "isError": false,
+     "startMs": 27038.5,
+     "ms": 7.56
+    },
+    {
+     "tool": "bash",
+     "command": "true #10",
+     "isError": false,
+     "startMs": 29011.1,
+     "ms": 4.82
+    },
+    {
+     "tool": "bash",
+     "command": "true #11",
+     "isError": false,
+     "startMs": 31016.7,
+     "ms": 10.45
+    },
+    {
+     "tool": "bash",
+     "command": "true #12",
+     "isError": false,
+     "startMs": 32825.1,
+     "ms": 14.22
+    }
+   ],
+   "rows": [
+    {
+     "ts": "2026-09-24T02:35:27.326Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "48bc1eca602f77718ff596baa0d41caf7429bcdc87d8f5adbcdca5b9a6d8770d",
+     "cmd": "true #01",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.02,
+      "irreversible_publish": 0.01,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 191,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:29.055Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "638021799eba0c280b99687d95963d047152479ce08f26027eba25e4fd48dcde",
+     "cmd": "true #02",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 124,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:30.989Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "386c9a18124efac0a0664dca91716cef819ae791d9264288fe9c2f7c20f74f09",
+     "cmd": "true #03",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.01,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 128,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:33.386Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "9e671acccd7fd2acf1aa2f8ac8e27213e993879212c39e18f051afaae07b8aeb",
+     "cmd": "true #04",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 480,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:36.313Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "eb2f009a9531f2797e8270125f3538fc8f5acf90f7f20aa8fe2a7f08549d9237",
+     "cmd": "true #05",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.01,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 106,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:38.616Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "4498f92a87f394214394861fca5aa47c4259d5131b08d569bccb985f4172daa8",
+     "cmd": "true #06",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 125,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:40.690Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "0a5520f59d50ee6e4e4a70c2ee17cbd721f4b61826c1f4953e70a915d14b2bb9",
+     "cmd": "true #07",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 117,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:42.617Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "dd31a3cb83a1d8fa7949ae9cf29f98a73452497f218f8f0a48a22a70b9b2d2d9",
+     "cmd": "true #08",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 246,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:45.059Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "ed0911eb8511e96d41bb32993c97e927005cbe4752e92a22984060b7c17519e9",
+     "cmd": "true #09",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.04,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 87,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:47.029Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "5eba270e424b239e296699f7ec6a1f73fb1c33c7c9c38b477066956c2b89078a",
+     "cmd": "true #10",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 134,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:49.040Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "06810342660416c4f5399ebf0b7cd3dd49bd9733a3027c2337d391d6369610de",
+     "cmd": "true #11",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 213,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:35:50.852Z",
+     "session": "01a0d144-72ed-70a9-a246-1549257093da",
+     "cmdSha": "79c2ac7d11e539f1231fe225a7ece048a0368b5209932705bff2e724c3f18b56",
+     "cmd": "true #12",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 398,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    }
+   ]
+  },
+  {
+   "arm": "off",
+   "order": 4,
+   "session": "01a0d145-1d7a-73d7-9e64-3d0cc24e6a87",
+   "agent_end": true,
+   "exit": 0,
+   "calls": [
+    {
+     "tool": "bash",
+     "command": "true #01",
+     "isError": false,
+     "startMs": 6734.6,
+     "ms": 74.96
+    },
+    {
+     "tool": "bash",
+     "command": "true #02",
+     "isError": false,
+     "startMs": 8695.2,
+     "ms": 4.84
+    },
+    {
+     "tool": "bash",
+     "command": "true #03",
+     "isError": false,
+     "startMs": 11027.9,
+     "ms": 2.22
+    },
+    {
+     "tool": "bash",
+     "command": "true #04",
+     "isError": false,
+     "startMs": 13025.0,
+     "ms": 4.58
+    },
+    {
+     "tool": "bash",
+     "command": "true #05",
+     "isError": false,
+     "startMs": 15390.5,
+     "ms": 3.11
+    },
+    {
+     "tool": "bash",
+     "command": "true #06",
+     "isError": false,
+     "startMs": 17485.2,
+     "ms": 2.88
+    },
+    {
+     "tool": "bash",
+     "command": "true #07",
+     "isError": false,
+     "startMs": 19625.7,
+     "ms": 2.85
+    },
+    {
+     "tool": "bash",
+     "command": "true #08",
+     "isError": false,
+     "startMs": 21720.9,
+     "ms": 3.04
+    },
+    {
+     "tool": "bash",
+     "command": "true #09",
+     "isError": false,
+     "startMs": 23446.1,
+     "ms": 4.98
+    },
+    {
+     "tool": "bash",
+     "command": "true #10",
+     "isError": false,
+     "startMs": 25781.3,
+     "ms": 4.28
+    },
+    {
+     "tool": "bash",
+     "command": "true #11",
+     "isError": false,
+     "startMs": 27976.1,
+     "ms": 4.23
+    },
+    {
+     "tool": "bash",
+     "command": "true #12",
+     "isError": false,
+     "startMs": 29881.2,
+     "ms": 4.73
+    }
+   ],
+   "rows": []
+  },
+  {
+   "arm": "on",
+   "order": 5,
+   "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+   "agent_end": true,
+   "exit": 0,
+   "calls": [
+    {
+     "tool": "bash",
+     "command": "true #01",
+     "isError": false,
+     "startMs": 10546.6,
+     "ms": 165.44
+    },
+    {
+     "tool": "bash",
+     "command": "true #02",
+     "isError": false,
+     "startMs": 12773.8,
+     "ms": 35.69
+    },
+    {
+     "tool": "bash",
+     "command": "true #03",
+     "isError": false,
+     "startMs": 14697.9,
+     "ms": 54.13
+    },
+    {
+     "tool": "bash",
+     "command": "true #04",
+     "isError": false,
+     "startMs": 16737.4,
+     "ms": 6.1
+    },
+    {
+     "tool": "bash",
+     "command": "true #05",
+     "isError": false,
+     "startMs": 18825.3,
+     "ms": 6.7
+    },
+    {
+     "tool": "bash",
+     "command": "true #06",
+     "isError": false,
+     "startMs": 20947.4,
+     "ms": 4.75
+    },
+    {
+     "tool": "bash",
+     "command": "true #07",
+     "isError": false,
+     "startMs": 22803.2,
+     "ms": 4.29
+    },
+    {
+     "tool": "bash",
+     "command": "true #08",
+     "isError": false,
+     "startMs": 26350.8,
+     "ms": 3.29
+    },
+    {
+     "tool": "bash",
+     "command": "true #09",
+     "isError": false,
+     "startMs": 29833.1,
+     "ms": 3.75
+    },
+    {
+     "tool": "bash",
+     "command": "true #10",
+     "isError": false,
+     "startMs": 31968.9,
+     "ms": 2.35
+    },
+    {
+     "tool": "bash",
+     "command": "true #11",
+     "isError": false,
+     "startMs": 34549.0,
+     "ms": 3.94
+    },
+    {
+     "tool": "bash",
+     "command": "true #12",
+     "isError": false,
+     "startMs": 36257.1,
+     "ms": 3.2
+    }
+   ],
+   "rows": [
+    {
+     "ts": "2026-09-24T02:36:54.100Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "48bc1eca602f77718ff596baa0d41caf7429bcdc87d8f5adbcdca5b9a6d8770d",
+     "cmd": "true #01",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.01,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 548,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:36:56.196Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "638021799eba0c280b99687d95963d047152479ce08f26027eba25e4fd48dcde",
+     "cmd": "true #02",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 110,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:36:58.138Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "386c9a18124efac0a0664dca91716cef819ae791d9264288fe9c2f7c20f74f09",
+     "cmd": "true #03",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.04,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 110,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:37:00.130Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "9e671acccd7fd2acf1aa2f8ac8e27213e993879212c39e18f051afaae07b8aeb",
+     "cmd": "true #04",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 158,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:37:02.218Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "eb2f009a9531f2797e8270125f3538fc8f5acf90f7f20aa8fe2a7f08549d9237",
+     "cmd": "true #05",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.01,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 146,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:37:04.348Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "4498f92a87f394214394861fca5aa47c4259d5131b08d569bccb985f4172daa8",
+     "cmd": "true #06",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 139,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:37:06.194Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "0a5520f59d50ee6e4e4a70c2ee17cbd721f4b61826c1f4953e70a915d14b2bb9",
+     "cmd": "true #07",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 169,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:37:09.747Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "dd31a3cb83a1d8fa7949ae9cf29f98a73452497f218f8f0a48a22a70b9b2d2d9",
+     "cmd": "true #08",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.01,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 287,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:37:13.223Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "ed0911eb8511e96d41bb32993c97e927005cbe4752e92a22984060b7c17519e9",
+     "cmd": "true #09",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.04,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 147,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:37:15.357Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "5eba270e424b239e296699f7ec6a1f73fb1c33c7c9c38b477066956c2b89078a",
+     "cmd": "true #10",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 107,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:37:17.939Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "06810342660416c4f5399ebf0b7cd3dd49bd9733a3027c2337d391d6369610de",
+     "cmd": "true #11",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 138,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    },
+    {
+     "ts": "2026-09-24T02:37:19.653Z",
+     "session": "01a0d145-c415-74e0-9a69-c2b0a7527b35",
+     "cmdSha": "79c2ac7d11e539f1231fe225a7ece048a0368b5209932705bff2e724c3f18b56",
+     "cmd": "true #12",
+     "status": "scored",
+     "probs": {
+      "exfiltration": 0.02,
+      "destructive": 0.02,
+      "privilege": 0.03,
+      "irreversible_publish": 0.02,
+      "secret_staging": 0.02
+     },
+     "flag": false,
+     "latencyMs": 132,
+     "tokens": {
+      "input_tokens": 746,
+      "output_tokens": 96
+     },
+     "skipped": null,
+     "error": null
+    }
+   ]
+  }
+ ],
+ "restored_identical": true,
+ "copy_kept_at": "/var/folders/d0/09qgt_0n1m1ff8nyzbxppx9c0000gn/T/gate-observe-j6khz3rg/orig.ts"
+}

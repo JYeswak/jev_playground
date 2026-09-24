@@ -85,6 +85,8 @@ if (!result.ok) {
 
 The screen built on that caller is [`.omp/tools/jev-screen.ts`](.omp/tools/jev-screen.ts): flag at 0.5, pass below, review otherwise. It does not block. Your code does.
 
+The tool-call gate runs as [`.omp/hooks/post/jev-gate-observe.ts`](.omp/hooks/post/jev-gate-observe.ts): after every `bash` call it asks the five gate questions and appends one redacted row to `~/.local/state/jev/gate-observe.jsonl`. It never blocks and skips commands that carry a secret without sending them ([receipt](docs/demos/upstream-repro/gate-observe-hook-20260924.md)).
+
 ## Measurements
 
 Numbers below are what the named file contains. Re-run the command. If the file and this page disagree, the file wins.
