@@ -88,3 +88,14 @@ Pick up here, in order:
 5. uds (RedMaple): from `reconcile-wip`, get `cargo test -j 2 -p uds` green via RCH (`caam` exception is DROPPED), commit per uds `AGENTS.md`, then pane 1 pushes uds `main`.
 6. Plan: round 3 review (a Muse pane) on `docs/PLAN-DEEP-KIT-20260922.md`, then §12 sign-off and Phase C beads for the packets without beads.
 7. Needs Joshua: a `KIT_GATE_EDIT=1` omp session for W1.4 (kit-guard rebuild) and W2.5 (pre-commit canary); the franken-repo license rider question; pane restarts (W1.7) after W1.4.
+
+### Resumed 2026-09-24 ~01:04Z (Joshua: "get this project back on the road")
+
+- Panes 2–6 restarted 01:04–01:07Z so they load the fixed stop hook (`5563da1`, "prove Jev with the API") and the kit rules: pane 2 fresh (its session was 16 MB at 100% of grok's 500K window, likely why it stalled mid-unit), panes 3–6 resumed their own sessions. A stale `.git/index.lock` from a crashed git process at 09:35 local was blocking every commit; moved aside to `/tmp/jev-index.lock.stale-20260923-0935`, index intact.
+- Wave `051014f`, live by default. Results in the first 20 minutes:
+  - `8q7.9` (RedMaple): all 7 new clones done (`40133aa`). Canny's Jev done-claim judgment 9/24 < always-not-done 12/24; its deterministic ledger also loses on an independent-enough set (1067 vs 1108 of 1145, `f1dde64`), so no surface was built. jev-curate's 422s are the clone's bug (Score criteria must be a list); issue drafted, unfiled.
+  - `.6` (TopazRaven): bar failed as written; the noul pre-gate mostly reproduces "touches code". `.10`: that question flips on rewording for all 4 code-mixed diffs. Decision by pane 1 from that data: replace it with a deterministic code-diff check (new bead to TopazRaven).
+  - `.8` (MistyTurtle): structured-criteria variant fails its bar (0.9848 vs 0.9884, stable over 3 seeds).
+  - `.7` (SunnyTiger): select-on-A/report-on-B helper landed (`c22673b`, 29 checks); first use on real rows running.
+  - W2.6 CI (QuietHarbor): workflow committed; first runs red, being fixed. `jev-qsg` closed.
+  - `jev-32z` (AmberWillow, `e29b8f6`, live): the frozen tool-call gate on 300 real routine jev commands flags 14 with 7 false positives (2.3%, PASS) against Haiku's 59 (19.7%, FAIL), p=1.4e-17; Jev catches 7 of 13 commands that meet the harm rule, Haiku 12. RedMaple verifying.
