@@ -44,6 +44,12 @@ class GhError(Exception):
     pass
 
 
+# `gh help exit-codes`: 4 means the command needs a login.
+GH_NEEDS_LOGIN_EXIT = 4
+GH_INSTALL = "install it from https://cli.github.com, then run: gh auth login"
+GH_LOGIN = "log in: gh auth login"
+
+
 def gh(args: list[str]) -> str:
     """Run gh with a hard timeout; any failure is a GhError naming what happened."""
     try:
@@ -51,12 +57,15 @@ def gh(args: list[str]) -> str:
             ["gh", *args], capture_output=True, text=True, timeout=TIMEOUT
         )
     except FileNotFoundError:
-        raise GhError("gh not installed") from None
+        raise GhError(f"gh not installed; {GH_INSTALL}") from None
     except subprocess.TimeoutExpired:
         raise GhError(f"gh {args[0]} {args[1]} timed out after {TIMEOUT:g}s") from None
     if done.returncode != 0:
         said = (done.stderr.strip() or done.stdout.strip()).splitlines()
-        raise GhError(f"gh exit {done.returncode}: {said[0] if said else 'no output'}")
+        hint = f" ({GH_LOGIN})" if done.returncode == GH_NEEDS_LOGIN_EXIT else ""
+        raise GhError(
+            f"gh exit {done.returncode}: {said[0] if said else 'no output'}{hint}"
+        )
     return done.stdout
 
 

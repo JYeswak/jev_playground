@@ -184,13 +184,18 @@ class Cli(unittest.TestCase):
             )
             return done, time.monotonic() - started
 
-    def test_gh_missing_is_not_run(self):
+    def test_gh_missing_is_not_run_and_names_the_install(self):
         done, _ = self.run_cli()
         self.assertEqual(
-            (done.stdout, done.returncode), ("CI main NOT_RUN gh not installed\n", 2)
+            (done.stdout, done.returncode),
+            (
+                "CI main NOT_RUN gh not installed; install it from https://cli.github.com,"
+                " then run: gh auth login\n",
+                2,
+            ),
         )
 
-    def test_gh_unauthenticated_is_not_run(self):
+    def test_gh_unauthenticated_is_not_run_and_names_the_login(self):
         # stderr and exit code of gh 2.94.0 with an empty GH_CONFIG_DIR and no GH_TOKEN, 2026-09-24.
         done, _ = self.run_cli(
             "echo 'gh: To use GitHub CLI in automation, set the GH_TOKEN environment variable.' >&2\nexit 4\n"
@@ -198,7 +203,15 @@ class Cli(unittest.TestCase):
         self.assertEqual(done.returncode, 2)
         self.assertEqual(
             done.stdout,
-            "CI main NOT_RUN gh exit 4: gh: To use GitHub CLI in automation, set the GH_TOKEN environment variable.\n",
+            "CI main NOT_RUN gh exit 4: gh: To use GitHub CLI in automation, set the GH_TOKEN"
+            " environment variable. (log in: gh auth login)\n",
+        )
+
+    def test_gh_other_failure_gets_no_login_hint(self):
+        done, _ = self.run_cli("echo 'HTTP 502: Bad Gateway' >&2\nexit 1\n")
+        self.assertEqual(
+            (done.stdout, done.returncode),
+            ("CI main NOT_RUN gh exit 1: HTTP 502: Bad Gateway\n", 2),
         )
 
     def test_gh_hang_hits_the_timeout(self):
