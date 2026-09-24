@@ -1,11 +1,11 @@
 ---
 description: "Kit B5 / forbidden pattern 1: never bypass the pre-commit honesty gate"
 condition:
-  - '\bgit\s+(?:-[cC]\s+[^\s"\\;&|]+\s+)*commit\b(?:\s+(?:[^\s"''\\;&|]|\\?["''][^"''\\]*\\?["''])+)*?\s+(?:--no-verify|-[a-zA-Z]*n[a-zA-Z]*)(?=[\s;&|"]|\\n)'
-  - '\bgit\s+(?:-[cC]\s+[^\s"\\;&|]+\s+)*push\b(?:\s+(?:[^\s"''\\;&|]|\\?["''][^"''\\]*\\?["''])+)*?\s+--no-verify(?=[\s;&|"]|\\n)'
-  - '\bgit\s+config\b(?:(?!--get|--list|-l\b)[^;&|"\\])*?\score\.hooksPath\s+(?![0-9]*[<>])(?:[^\s;&|"\\<>]|\\["''])+(?=[\s;&|"]|\\n)'
-  - '\bgit\s+config\b[^;&|"\\]*?\s--unset(?:-all)?\s+core\.hooksPath\b'
-  - '\bgit\b[^;&|"\\]*?\s-c\s*core\.hooksPath='
+  - '(?<!\b(?:e?grep|fgrep|rg|ag|ack)\b(?:[^;&|''"\n\\]|\\(?!n))*[''"][^''"\n;&\\]*)\bgit\s+(?:-[cC]\s+[^\s"\\;&|]+\s+)*commit\b(?:\s+(?:[^\s"''\\;&|]|\\?["''][^"''\\]*\\?["''])+)*?\s+(?:--no-verify|-[a-zA-Z]*n[a-zA-Z]*)(?=[\s;&|"]|\\n)'
+  - '(?<!\b(?:e?grep|fgrep|rg|ag|ack)\b(?:[^;&|''"\n\\]|\\(?!n))*[''"][^''"\n;&\\]*)\bgit\s+(?:-[cC]\s+[^\s"\\;&|]+\s+)*push\b(?:\s+(?:[^\s"''\\;&|]|\\?["''][^"''\\]*\\?["''])+)*?\s+--no-verify(?=[\s;&|"]|\\n)'
+  - '(?<!\b(?:e?grep|fgrep|rg|ag|ack)\b(?:[^;&|''"\n\\]|\\(?!n))*[''"][^''"\n;&\\]*)\bgit\s+config\b(?:(?!--get|--list|-l\b)[^;&|"\\])*?\score\.hooksPath\s+(?![0-9]*[<>])(?:[^\s;&|"\\<>]|\\["''])+(?=[\s;&|"]|\\n)'
+  - '(?<!\b(?:e?grep|fgrep|rg|ag|ack)\b(?:[^;&|''"\n\\]|\\(?!n))*[''"][^''"\n;&\\]*)\bgit\s+config\b[^;&|"\\]*?\s--unset(?:-all)?\s+core\.hooksPath\b'
+  - '(?<!\b(?:e?grep|fgrep|rg|ag|ack)\b(?:[^;&|''"\n\\]|\\(?!n))*[''"][^''"\n;&\\]*)\bgit\b[^;&|"\\]*?\s-c\s*core\.hooksPath='
 scope: "tool:bash"
 interruptMode: always
 ---
