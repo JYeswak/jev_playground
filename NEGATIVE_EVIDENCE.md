@@ -3981,8 +3981,26 @@ later turn needs while still compacting:
 
 **This is not a ruling on Jev.** It refutes three keep rules on four sessions.
 
-**Retry condition.** Reopen with a preregistered keep signal that separates needed from not-needed
-calls better than AUC 0.65 on a labelled development set that is not the test set. For example, a
-question that names the next turn's goal from the horizon's first user message, or a per-call state
-that shows the call's result. It must then meet this bar on fresh, rider-screened sessions labelled
-blind the same way.
+**Measured after (jev-al06, jev-5720, development data only, no new call).**
+- `jev-al06` (`9094427`): Jev's `keepCall` was the one signal above AUC 0.65 on both development
+  sets, at 0.689 (x86y) and 0.714 (jec6). That met the original retry condition below, and
+  `jev-5720` preregistered C3 = keep when `keepCall ≥ 0.36` (`e485ce5`).
+- On the pooled development data (62 needed, 211 not-needed), the `keepCall` tradeoff never reaches
+  the bar:
+  - at `t = 0.30`: 57/62 needed kept, Wilson lower bound 0.825, but only 63/211 (30%) not-needed
+    dropped;
+  - at `t = 0.36`: 49/62 kept, lower bound 0.674, with 110/211 (52%) dropped;
+  - at every cut that drops at least half the not-needed calls, the lower bound tops out at 0.674;
+  - the largest cut that keeps a lower bound of 0.80 is 0.31, dropping 34%.
+- AUC 0.69–0.71 was therefore not enough. Pane 1 closed `jev-5720` as NOT RUN rather than label a
+  held-out set for a rule that fails on its own development data. Its sample (`e7304e4`) stays
+  committed for a future signal.
+
+**Retry condition (tightened).** Reopen only with a preregistered keep signal whose development
+tradeoff curve **reaches the bar at some cut** on a labelled development set that is not the test
+set. The bar: a needed-kept Wilson lower bound of at least 0.80 while at least 50% of not-needed
+results are dropped. AUC above 0.65 alone does not qualify.
+- Candidates, for example: a question that names the next turn's goal from the horizon's first user
+  message, or a per-call state that shows the call's result.
+- The cut is fixed from that curve, and the signal must then meet the same bar on fresh,
+  rider-screened sessions labelled blind the same way.
