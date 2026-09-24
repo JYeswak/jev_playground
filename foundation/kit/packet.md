@@ -109,7 +109,7 @@ unresolved OPEN item.
 
 ## 11. Independent review
 <!-- CHECK: REVIEW -->
-Independent review: not performed. Pane 5 drafted notes/foundation-packet-p5.md.
+Independent review: not performed. An untracked planning draft informed this working copy; the three sentences it got wrong are recorded with their corrections in this file's header (lines 3-10), so no untracked path is cited here.
 This working copy changed three sentences after that draft, because those
 sentences did not match the files named. Nothing else was independently
 changed. Residual risk accepted until a non-author reads this file against
