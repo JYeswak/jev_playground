@@ -1671,3 +1671,35 @@ Lane: live where a call was made. Model pin jev-1.13.0 unless noted. Key via Inf
 Ledger port stopped, not built: python3 extract of 1145 labelled turns, ledger 1067/1145 loses to always-not-done 1108/1145, prevalence-check exit 3 WEAK. Receipt docs/demos/upstream-repro/canny-ledger-stop-20260924.md. Spend 0.
 
 Boundary: nothing here is an omp L3 firing. Canny was not installed. prism had no wallet. mario had no ROM. jev-trader was not run. jev-curate upstream issue draft stays unfiled.
+
+## W7.0 batch — pane 4 MistyTurtle, 8q7.8 + k9z.1 sections (2026-09-24) [test]
+
+Appended by pane 5 as sole EVAL writer. Source: pane-4 message (earlier sections already landed).
+
+## jev-deep-kit-8q7.8 structured criteria (2026-09-23) [test]
+
+Variant `spam_structured_focus` vs incumbent `spam_generic_criteria`,
+held-out lingspam parts 9+10 (580 rows, 97 spam), pinned jev-1.13.0, 580
+bundle calls + 2 smoke. OOF AUROC (5-fold StratifiedKFold on logit,
+3 fold seeds): current 0.9884, variant 0.9848, gap -0.0035 stable.
+Focus-free negative (plain+focus minus plain): -0.0068, no gain. Accuracy
+variant 0.9190 vs current 0.8741 (order disagrees with AUROC). Post-run
+prevalence verdicts both WEAK (exit 3). Bar FAIL (any regression fails);
+bead stays OPEN. Latency p50 169 / p95 415ms; cost unstated (no usage
+captured). Receipt
+`docs/demos/upstream-repro/jev-question-writing-w74-20260923.md`.
+Boundary: one split, single run, author-overlap caveat (shapes fixed
+verbatim, zero fitting here).
+
+## jev-k9z.1 live rerank (2026-09-24) [test]
+
+Rerank advisory, 219 transcript-mined rows, pinned jev-1.13.0, 2 full runs
+(219 rows + 1660 passage-calls each). 219/219 ordered, top-1 75/219 =
+0.3425, Wilson lower 0.2828 < lexical floor 0.3242 (71/219 recomputed
+keyless) → bar FAIL; McNemar vs lexical 38/34 n.s. Latency p50 1073 / p95
+5189 / max 7278ms. Tokens/dollars unpriced (JevScoreResult carries no
+usage). L3 keyed: ordered=true 0.917/0.457 changed order; bad input
+refused-no-throw at schema validation. Non-author re-score (TopazRaven):
+75/219 confirmed, 0 mismatches. Bead stays OPEN. Receipt
+`docs/demos/upstream-repro/nev-rerank-live-20260924.md`.
+Boundary: one narrow corpus, single model, no TF-IDF ranker exists.
