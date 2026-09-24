@@ -3358,3 +3358,26 @@ without a regular file.
 **NO-CLAIM.** This does not say RCH is unreliable in general; plain compile errors failed
 correctly on contabo-4 the whole time. It says one kind of verdict — "the thing that should fail
 did not" — can be produced by a broken worker, and the proof lines cannot tell you which.
+
+## R79 — REFUTED (seat claim): Jev rerank beats lexical order on transcript-mined passages
+
+**Claim:** the `jev_rerank` advisory (Score-bucket rubric) outranks zero-API
+lexical order on RAG passage rows, justifying more than advisory status.
+
+**Measured:** 219 rows (`work/nev-rerank/pairs.jsonl`), pinned jev-1.13.0, 2
+full runs: Jev top-1 75/219 = 0.3425, Wilson lower 0.2828 < lexical floor
+0.3242 (71/219, recomputed keyless); paired McNemar jev-only 38 /
+lex-only 34, n.s. Non-author re-score (TopazRaven): 75/219 confirmed, 0
+mismatches. Receipt
+`docs/demos/upstream-repro/nev-rerank-live-20260924.md`. The advisory stays
+advisory.
+
+**Retry condition.** Rerun the same 219 rows if `rank.ts` (rubric, questions,
+or expected-level reduction) changes; if a TF-IDF/BM25 incumbent is measured
+on identical rows; or on pools shaped unlike these (p50 5 here) where lexical
+overlap degrades. Do not retry on a bigger N of the same shape — the paired
+test already says the gap is noise.
+
+**NO-CLAIM.** This does not say Jev cannot rank; injection-guard ranking
+(640/662) is a different seat. It says this rubric on these rows is
+lexical-plus-noise.
