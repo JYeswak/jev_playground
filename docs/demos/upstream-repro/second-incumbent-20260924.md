@@ -86,4 +86,82 @@ is stated in tokens.
 
 ## Result
 
-Pending the live run.
+Bar committed at `a2a4c7a` before any call to the second model. Smoke 2/2 accepted (strict
+`json_schema` on Chat Completions, `finish_reason` `stop`, the provider reported model id
+`grok-4.20-0309-non-reasoning`). Run 2026-09-24, finishing 02:49Z. Both sets answered 400/400 on the
+first pass: 0 error rows, 0 transient retries, 0 corrective retries, every `finish_reason` `stop`
+(so the v0.2.0 #38 gap did not fire). Rows: `work/second-incumbent/rows-scifact-grok.jsonl`,
+`rows-banking77-grok.jsonl`. Re-score: `python3 work/second-incumbent/score.py`.
+
+### SciFact (`[live]`, N=400 per arm; Jev and Haiku rows are the committed jev-9er rows)
+
+| Arm | Correct at >0.5 | Accuracy | Wilson 95% | AUC | Brier | ECE | p50 / p95 ms | Tokens in / out |
+|---|---:|---:|---|---:|---:|---:|---|---|
+| Jev `jev-1.13.0` | 361/400 | 90.2% | 86.9–92.8% | 0.962 | 0.0709 | 0.0431 | 140 / 219 | 293,734 / 8,000 |
+| Haiku 4.5 (jev-9er) | 351/400 | 87.8% | 84.2–90.6% | 0.934 | 0.1002 | 0.0854 | 765 / 1,275 | 373,346 / 4,981 |
+| **Grok 4.20 non-reasoning** | **330/400** | **82.5%** | 78.5–85.9% | **0.875** | **0.1443** | **0.1363** | 614 / 894 | 336,369 / 3,513 |
+
+| Jev vs | Jev-only | Other-only | McNemar p | Accuracy | AUC diff 95% | AUC | Brier diff 95% | Brier | ECE diff 95% | ECE |
+|---|---:|---:|---:|---|---|---|---|---|---|---|
+| Haiku (as published) | 19 | 9 | 0.087 | TIE | +0.008 to +0.053 | WIN | −0.047 to −0.012 | WIN | −0.065 to −0.007 | WIN |
+| **Grok** | 46 | 15 | 8.8e-5 | **WIN** | +0.054 to +0.122 | **WIN** | −0.102 to −0.046 | **WIN** | −0.122 to −0.051 | **WIN** |
+
+**SciFact verdict: PASS**, under the preregistered rule. Grok does not significantly win on any of
+the four metrics. Jev wins all four, including accuracy, which was only a TIE against Haiku. Grok's
+probabilities are coarse: 9 distinct noul values, 211 of 400 exactly 0.0 and 69 exactly 1.0.
+
+### Banking77 10-intent (`[live]`, N=400 per arm; Jev and Haiku rows are the committed jev-k3k rows)
+
+| Arm | Correct | Accuracy | Wilson 95% | p50 / p95 ms | Tokens in / out |
+|---|---:|---:|---|---|---|
+| Jev `jev-1.13.0` | 384/400 | 96.0% | 93.6–97.5% | 139 / 328 | 154,744 / 47,571 |
+| Haiku 4.5 (jev-k3k) | 362/400 | 90.5% | 87.2–93.0% | 1,053 / 1,972 | 360,861 / 41,400 |
+| **Grok 4.20 non-reasoning** | **366/400** | **91.5%** | 88.4–93.9% | 1,127 / 1,561 | 272,639 / 33,008 |
+| Constant always-`activate_my_card` | 40/400 | 10.0% | | | |
+
+Grok's probability maps, from the adapter's `debug`: 84/400 rows had a sum error above 1e-6 and
+were renormalized. **22/400 were zero-mass**: the raw map summed to 0, every value `0`, the same
+text shape as Haiku's. All 22 came back as `activate_my_card` at confidence 0. One of them is truly
+`activate_my_card` and scores "correct" through the tie rule, not through an answer. Jev is correct
+on 16 of the 22. They cluster on `beneficiary_not_allowed` (11) and `card_about_to_expire` (5), and 8
+are the same rows Haiku zeroed in jev-k3k. The other 62 flagged rows had raw sums between 0.05 and
+0.99.
+
+| Scoring (k3k rule, grok in Haiku's place) | Rows | Jev | Grok | Jev-only | Grok-only | McNemar p | Verdict |
+|---|---:|---:|---:|---:|---:|---:|---|
+| **as returned (preregistered primary)** | 400 | 384 | 366 | 24 | 6 | 0.0014 | **WIN** (+4.5 pp) |
+| zero-mass rows dropped from both arms | 378 | 368 | 365 | 8 | 5 | 0.58 | NON-INFERIOR (+0.8 pp) |
+| zero-mass rows scored wrong for grok | 400 | 384 | 365 | 24 | 5 | 0.00055 | WIN (+4.8 pp) |
+
+**Banking77 verdict: WIN**, on the preregistered primary. **Anyone citing it needs the
+sensitivity.** On the 378 rows where grok returned a real distribution, Jev and grok are
+statistically indistinguishable: 368 vs 365, 8 vs 5 discordant, p = 0.58. Against grok, the whole
+significant margin is the 22 rows where the incumbent returned no probability mass. The same cut
+against Haiku leaves a gap: with Haiku's 14 zero-mass rows dropped, Jev is 374 and Haiku 362 of 386,
+15 vs 3 discordant, p ≈ 0.0075 (computed here, descriptive). Haiku vs grok on the same 400 rows:
+14 vs 18 discordant, p = 0.60, no difference.
+
+### What the pair says
+
+- **SciFact:** not Haiku-specific. A second lab's model does worse than Haiku did, and Jev beats it
+  on every metric (`[live]`, N=400, one run).
+- **Banking77:** Jev still wins against grok, but the win comes from Jev answering where the LLM
+  returned an all-zero map. On the rows the LLM did answer, grok is within the 3 pp margin of Jev.
+  The fair one-liner: "Jev never abstains by accident; on answered rows it ties Grok". Not "Jev
+  routes better than LLMs".
+- No preregistered FAIL, so no `NEGATIVE_EVIDENCE.md` row is triggered.
+
+### Spend
+
+802 xAI calls (2 smoke + 800 scored): 609,008 input + 36,521 output tokens on the scored rows, plus
+1,211 / 101 on the smoke. xAI prices were not read, so no dollar figure. 0 Jev calls, 0 Haiku calls.
+
+### NO-CLAIM
+
+- One extra model (`grok-4.20-0309-non-reasoning`), one run per set; grok's run-to-run variance is
+  not measured.
+- The OpenAI lineage is untested: its key returns 401.
+- Grok ran through the Chat Completions path and Haiku through the native Anthropic path. The
+  provider surface differs by construction; prompts and schema are identical.
+- Jev and Haiku rows are the committed ones and were not re-run.
+- A non-author re-score is still owed before the bead closes.
