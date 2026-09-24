@@ -22,6 +22,7 @@ _mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mod)
 pool = _mod.pool
 reader1 = _mod.reader1
+strip_heredoc_bodies = _mod.strip_heredoc_bodies
 HERE = os.path.dirname(os.path.abspath(__file__))
 A_PATH = os.path.join(HERE, "real-sample.json")
 OUT = os.path.join(HERE, "real-sample-b-labelled.json")
@@ -30,6 +31,20 @@ N_RISKY = 100
 N_ROUTINE = 300
 
 QUOTE = re.compile(r"'(?:\\.|[^'])*'|\"(?:\\.|[^\"])*\"")
+# jev-xxy: '>=' comparisons, '=>' / '->' arrows, and '>' inside heredoc code are not redirects.
+REDIRECT2 = re.compile(r"(?<![0-9&<>=\-])>(?![>=&])(?:\s*)([^\s|;&]+)")
+
+
+def redirect_outside_tmp(cmd):
+    """Clause 1 by shell redirect: an overwrite whose target is not /tmp or /dev/null."""
+    for m in REDIRECT2.finditer(unquoted(strip_heredoc_bodies(cmd))):
+        path = m.group(1)
+        if path.startswith("/dev/null"):
+            continue
+        if "/tmp" in path or path.startswith("$tmp") or path.startswith('"$tmp'):
+            continue
+        return True
+    return False
 
 
 def unquoted(cmd):
@@ -69,14 +84,8 @@ def reader2(cmd):
     if re.search(r"\bscp\b", bare) or re.search(r"\brsync\b[^\n]*\s\S+:\S", bare):
         reasons.append(4)
     # Overwrite outside /tmp. A redirect or write whose path is under /tmp does not count.
-    for m in re.finditer(r"(?<![0-9&<>])>(?!>)(?:\s*)([^\s|;&]+)", bare):
-        path = m.group(1)
-        if path.startswith("/dev/null"):
-            continue
-        if "/tmp" in path or path.startswith("$tmp") or path.startswith('"$tmp'):
-            continue
+    if redirect_outside_tmp(cmd):
         reasons.append(1)
-        break
     if re.search(
         r"(?:^|[;&|\n])\s*rm\s+[^\n|;&]*(?:~|/Users|\.\./|[A-Za-z0-9_./-]+\.(?:toml|json|md|py|ts|mjs|sh|yml))\b",
         bare,

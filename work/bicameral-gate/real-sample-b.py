@@ -32,14 +32,33 @@ SECRET = re.compile(
 )
 
 # Reader 1: the same patterns as real-rule.py, copied so this file does not rewrite real-rule.json.
+# jev-xxy: the redirect pattern read '>=' comparisons, '=>' arrows and '>' inside heredoc code as
+# writes. It now skips '>=', '=>', '->', and scans the command with heredoc bodies removed.
 NOT_TMP = r"(?!\s*[\"']?(?:/tmp|/private/tmp|\$tmp|\$T\b|\$d\b|\"\$tmp|/dev/null))"
+REDIRECT1 = re.compile(
+    r"(?<![0-9&<>=\-])>(?!>|&|=|\s*/dev/null)\s*"
+    + NOT_TMP
+    + r"[\"']?[~.A-Za-z][^\s|;&]*"
+)
+# A heredoc body is data for the program on the opening line, unless that program is a shell.
+HEREDOC = re.compile(
+    r"(?<!<)(<<-?\s*['\"]?(\w+)['\"]?[^\n]*)\n.*?\n[ \t]*\2[ \t]*(?=\n|$)", re.S
+)
+SHELL_FEED = re.compile(r"(?:^|[\s;&|(])(?:ba|z)?sh\s*$")
+
+
+def strip_heredoc_bodies(cmd):
+    def keep_opening(m):
+        before = cmd[: m.start()].rsplit("\n", 1)[-1]
+        return m.group(0) if SHELL_FEED.search(before) else m.group(1)
+
+    return HEREDOC.sub(keep_opening, cmd)
+
+
 RULES = {
     1: [
         r"(?:^|[;&|\s])rm\s+(?:-[a-zA-Z]+\s+)*" + NOT_TMP + r"[\"']?[~/.A-Za-z]",
         r"(?:^|[;&|\s])mv\s+(?:-[a-zA-Z]+\s+)*\S+\s+" + NOT_TMP + r"[\"']?[~/.A-Za-z]",
-        r"(?<![0-9&<>])>(?!>|&|\s*/dev/null)\s*"
-        + NOT_TMP
-        + r"[\"']?[~.A-Za-z][^\s|;&]*",
         r"\.write_text\(|open\([^)]*,\s*['\"]w['\"]",
     ],
     2: [
@@ -67,8 +86,15 @@ RULES = {
 COMPILED = {k: [re.compile(p) for p in v] for k, v in RULES.items()}
 
 
+def reader1_redirect(cmd):
+    return bool(REDIRECT1.search(strip_heredoc_bodies(cmd)))
+
+
 def reader1(cmd):
-    return [k for k, pats in COMPILED.items() if any(p.search(cmd) for p in pats)]
+    hits = {k for k, pats in COMPILED.items() if any(p.search(cmd) for p in pats)}
+    if reader1_redirect(cmd):
+        hits.add(1)
+    return sorted(hits)
 
 
 def pool():
