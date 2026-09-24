@@ -38,23 +38,13 @@ def tracked_tests(repo):
     return [line for line in out.stdout.splitlines() if TRACKED.search(line)]
 
 
-def run_command_for(registry, path):
-    text = Path(registry).read_text(encoding="utf-8", errors="replace")
-    for match in re.finditer(r"Run: `([^`]+)`", text):
-        if path in match.group(1):
-            return match.group(1)
-    idx = text.find(f"`{path}`")
-    if idx >= 0:
-        match = re.search(r"Run: `([^`]+)`", text[idx : idx + 800])
-        if match:
-            return match.group(1)
-    for block in re.split(r"\n(?=- )", text):
-        if f"`{path}`" not in block[:400]:
-            continue
-        match = re.search(r"Run: `([^`]+)`", block)
-        if match:
-            return match.group(1)
+def default_command(repo, path):
     if path.endswith(".py"):
+        parent = Path(path).parent
+        text = (Path(repo) / path).read_text(encoding="utf-8", errors="replace")[:2000]
+        for mod in re.findall(r"(?m)^from ([A-Za-z_][A-Za-z0-9_]*) import", text):
+            if (Path(repo) / parent / f"{mod}.py").is_file():
+                return f"cd {parent} && python3 -m unittest {Path(path).stem}"
         return f"python3 -m unittest {path}"
     if path.endswith((".mjs", ".js", ".cjs")):
         return f"node --test {path}"
@@ -63,6 +53,14 @@ def run_command_for(registry, path):
     if path.endswith(".ts"):
         return f"bun test ./{path}"
     return ""
+
+
+def run_command_for(registry, path):
+    text = Path(registry).read_text(encoding="utf-8", errors="replace")
+    for match in re.finditer(r"Run: `([^`]+)`", text):
+        if path in match.group(1):
+            return match.group(1)
+    return default_command(Path(registry).parent, path)
 
 
 SDK_IMPORT = re.compile(
@@ -113,6 +111,12 @@ def suite_imports_sdk(repo, path):
 
 
 def missing_signature(output):
+    if "fast-jev-compaction" in output and (
+        "Cannot find package" in output
+        or "Cannot find module" in output
+        or "ERR_MODULE_NOT_FOUND" in output
+    ):
+        return "./scripts/bootstrap-compaction.sh"
     if "response.clone" in output:
         return ""
     if "prerequisite missing" in output and "npm ci --prefix work/sdk" in output:
@@ -181,12 +185,6 @@ def prerequisite(repo, path, command):
     repo = Path(repo)
     if path.endswith(".ts") and node_major() is not None and node_major() < 22:
         return "Node 22.18+ (README.md:26); this node is older"
-    if path.startswith("compaction/") or "bootstrap-compaction" in command:
-        if (
-            not (repo / "compaction/node_modules").is_dir()
-            and not (repo / "compaction/dist").is_dir()
-        ):
-            return "./scripts/bootstrap-compaction.sh"
     if command.startswith("bun ") or " bun " in command:
         if (
             subprocess.run(
@@ -213,13 +211,8 @@ def prerequisite(repo, path, command):
         if not (repo / binary).is_file():
             clone = repo / "upstream/typesafe-ai/system-one-adapter-python"
             if not clone.is_dir():
-                return "vendored clone upstream/typesafe-ai/system-one-adapter-python absent"
+                return "./scripts/sync-docs.sh --repos-only"
             return "uv sync --directory upstream/typesafe-ai/system-one-adapter-python"
-    if (
-        suite_imports_path(repo, path, "fast-jev-compaction/")
-        and not (repo / "fast-jev-compaction").exists()
-    ):
-        return "vendored clone fast-jev-compaction (not in a fresh clone)"
     return ""
 
 
@@ -349,11 +342,18 @@ def selftest():
     venv.write_text(
         "import unittest\nclass T(unittest.TestCase):\n    def test_ok(self):\n        self.assertTrue(True)\n"
     )
+    borrowed = tmp / "work/plant/borrowed_test.py"
+    borrowed.write_text(
+        "import unittest\nclass T(unittest.TestCase):\n"
+        "    def test_planted(self):\n        self.fail('planted in this suite')\n"
+    )
     (tmp / "TESTS.md").write_text(
         "- `work/plant/fail_test.py` — planted. Run: `python3 -m unittest work/plant/fail_test.py` (1 test).\n"
         "- `work/plant/mention_test.py` — mentions typesafe in a comment. Run: `python3 -m unittest work/plant/mention_test.py`.\n"
         "- `demos/nopkg/ok.test.mjs` — no package.json. Run: `cd demos/nopkg && npm test`.\n"
         "- `work/plant/venv_test.py` — missing adapter venv. Run: `upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python -m unittest work/plant/venv_test.py`.\n"
+        "- `work/plant/borrowed_test.py` — no Run line of its own.\n"
+        "- `work/plant/next.mjs` — the next row. Run: `true`.\n"
         "- `.omp/extensions/kit-guard/kit-guard.test.ts` — bun path. Run: `bun test .omp/extensions/kit-guard/kit-guard.test.ts`.\n"
     )
     if (
@@ -372,6 +372,7 @@ def selftest():
             "work/plant/fail_test.py",
             "work/plant/mention_test.py",
             "work/plant/venv_test.py",
+            "work/plant/borrowed_test.py",
             "demos/nopkg/ok.test.mjs",
         ],
         cwd=tmp,
@@ -381,8 +382,14 @@ def selftest():
     rows = survey(tmp)
     by = {row["path"]: row for row in rows}
     failed = [row["path"] for row in rows if row["status"] == "FAIL"]
-    if failed != ["work/plant/fail_test.py"]:
+    if sorted(failed) != ["work/plant/borrowed_test.py", "work/plant/fail_test.py"]:
         print(f"SELFTEST FAIL: {failed}", file=sys.stderr)
+        return 1
+    if by["work/plant/borrowed_test.py"]["status"] != "FAIL":
+        print(
+            f"SELFTEST FAIL: borrowed next-row command {by['work/plant/borrowed_test.py']}",
+            file=sys.stderr,
+        )
         return 1
     if by["work/plant/mention_test.py"]["status"] != "PASS":
         print("SELFTEST FAIL: typesafe comment was skipped", file=sys.stderr)
@@ -396,7 +403,7 @@ def selftest():
     venv_row = by["work/plant/venv_test.py"]
     if (
         venv_row["status"] != "SKIP"
-        or "system-one-adapter-python" not in venv_row["prerequisite"]
+        or venv_row["prerequisite"] != "./scripts/sync-docs.sh --repos-only"
     ):
         print(f"SELFTEST FAIL: venv row {venv_row}", file=sys.stderr)
         return 1
