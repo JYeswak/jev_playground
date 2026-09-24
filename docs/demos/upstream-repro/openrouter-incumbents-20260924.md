@@ -255,3 +255,50 @@ comparisons" (`1cc7876`) makes it the rule: comparators are `:free` OpenRouter m
   not touch `run.py`.
 - The free arm is unchanged: its qualification, pacing, order and caps are as in Amendment 2.
   `dots` SST-5 was running when this was committed and continues.
+
+## Free arm, SST-5 × `dots-studio/dots-3-note-preview:free`: NOT-SCORED (live, 2026-09-24)
+
+**Sessions.** All ran under Amendment 2, attended, one process at a time, 18:58Z to 22:32Z:
+- the 16-row probe: 16/16 answered, structured, so no prompted fallback;
+- four main-pass chunks of 130, 130, 112 and 100 rows, and a last chunk of 12;
+- the one preregistered resume pass: 23 of the 29 failed rows answered.
+
+Chunks 4 onward ran `jev-lbgk`'s `80d327f`, which changed only `run_free`'s guard line
+(`require_free_comparator`). Chunk 4's first rows answered normally, 9 of the first 10.
+
+**Outcome.** Of 500 rows, **494 answered and 6 failed** after the resume pass. The failures, with
+row ids:
+- 3 × `TypeSafeAPITimeoutError` at the 120 s attempt limit: rows 161, 210 and 278;
+- 2 × `OpenAI chat completion did not complete: content_filter`: rows 168 and 247;
+- 1 × `TypeSafeBadRequestError: 400 Provider returned error`: row 323.
+
+The bar's ceiling is 1%, 5 rows on SST-5, so **the cell is NOT-SCORED (unreliable) and has no
+verdict.** `score.py` prints `NOT-SCORED (failed rows over 1%) | 494 / 6 / 0`. There is no
+NEGATIVE_EVIDENCE row: an unreliable cell is not a comparator win or tie.
+
+**Descriptive, not a verdict.**
+- 8 of the 494 answers are zero-mass, all-zero raw maps. Run 2 had 0 in 50.
+- Answered latency: p50 17.9 s, p95 33.7 s.
+- Tokens: 76,250 in and 912,789 out, mostly reasoning.
+
+**Harness facts.**
+- 529 HTTP requests, all to the one `:free` id.
+- 0 responses were 429, so no 429 wait was taken, and the pacer never held a request.
+- Every failure is a timeout, an upstream content filter or an upstream 400, not rate limiting.
+
+**Spend.** `usage_daily` read 0.016185 at every one of 8 reads (18:58Z to 22:32Z), and `usage`
+stayed 100.176529287, so the cost was $0. The account's `free_model_daily_requests` went from 381
+to 906 used, a rise of 525 while this arm sent 529 requests; the counter is account-wide and lags.
+
+**Gap found.** The rows' `provider` field holds the adapter's provider label
+(`openrouter_provider.PacedProvider`), not the upstream provider OpenRouter reports, which the bar
+says each row records. `modelReported` and `rawText` are recorded. Run 2's rows got the upstream
+provider through `run_sst5.trace()`. This arm's later sets should record it the same way.
+
+**What the rest costs.** At SST-5's 529 requests for 500 rows, dots' other five sets (3,450 rows) and
+nex-n2.5-mini's and lfm-2.5's six each (3,950 rows each) need about 12,000 more free requests. At
+1,000 a day, account-wide, that is at least 12 days.
+
+**Rows.** `work/openrouter-incumbents/rows-sst5-dots-studio__dots-3-note-preview_free.jsonl`: 529
+records, one per attempt. It holds each row's id, the answer and probabilities, the raw map, the
+model's raw JSON text, tokens, latency, and the wait and request counts. It holds no SST-5 text.
