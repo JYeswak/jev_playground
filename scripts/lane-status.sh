@@ -314,6 +314,15 @@ elif [ "$STATUS" = "docs/demos/STATUS.tsv" ]; then
   printf '  <<< TRACE MISSING %s\n' "$TRACE"
 fi
 if [ "$join_trace" = 1 ] && [ -f "$TRACE" ]; then
+  class_rc=0
+  class_out=$(python3 work/sr-adopt/matrix_status.py --column class --enum CITED,OTHER_RECEIPT,DERIVED,NOT_FOUND "$TRACE") || class_rc=$?
+  if [ "$class_rc" -ne 0 ]; then
+    trace_bad=$((trace_bad + 1))
+    value_bad=$((value_bad + 1))
+    printf '  <<< TRACE CLASS %s\n' "$class_out"
+  fi
+fi
+if [ "$join_trace" = 1 ] && [ -f "$TRACE" ]; then
   while IFS=$'\037' read -r kind cid detail; do
     case "$kind" in
       EXPECTED) trace_expected=$cid ;;
