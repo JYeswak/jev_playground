@@ -23,7 +23,7 @@ node demos/guard/demo.mjs       # a message guard: pass, block, or send to suppo
 bash scripts/quickstart.sh      # five questions answered from files already in the tree
 ```
 
-Node 20 or newer. Python 3 only for the injection re-score. No key and no package install, except the compaction demo, which fetches and builds its upstream first. To make real calls, run `npm ci --prefix work/sdk` once (it installs the pinned TypeSafe SDK), put `TYPESAFE_API_KEY` in the environment from outside this tree, and add `--live` to a demo.
+Node 22.18 or newer: the tests and the client import TypeScript files directly, which Node 20 refuses. Python 3 only for the injection re-score. No key and no package install, except the compaction demo, which fetches and builds its upstream first. To make real calls, run `npm ci --prefix work/sdk` once (it installs the pinned TypeSafe SDK), put `TYPESAFE_API_KEY` in the environment from outside this tree, and add `--live` to a demo.
 
 ## Demos
 
