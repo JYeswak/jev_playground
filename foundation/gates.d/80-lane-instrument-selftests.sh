@@ -55,7 +55,28 @@ if [ "${1:-}" = '--selftest' ]; then
   printf '%s\n' "$out2" | grep -q 'ABSENT.*mode-dropped' && {
     echo "80-lane-instrument-selftests --selftest: FAILED — mode drop reported as ABSENT (the conflation)"; exit 1; }
 
-  echo "80-lane-instrument-selftests --selftest: OK (2 arms: missing REDs as ABSENT, mode-dropped REDs as UNEXEC)"
+  # ARM 3 — omp absent is not a pass (jev-80lj). Default mode must RED and name it.
+  # Under --portable the same scripts must SKIP, exit 8, with the prerequisite named.
+  # PATH=/usr/bin:/bin hides omp on this machine; the scripts only need a shell builtin
+  # to reach the branch, so the arm does not run the TTSR suite.
+  for s in selftest-ttsr-rules.sh selftest-ttsr-assert-disabled.sh; do
+    out=$(PATH=/usr/bin:/bin "$root/scripts/$s" 2>&1); code=$?
+    if [ "$code" -eq 0 ]; then
+      echo "80-lane-instrument-selftests --selftest: FAILED — $s exited 0 with omp hidden (silent pass)"
+      exit 1
+    fi
+    printf '%s\n' "$out" | grep -q '^RED: omp not on PATH' || {
+      echo "80-lane-instrument-selftests --selftest: FAILED — $s did not name RED with omp hidden"; exit 1; }
+    outp=$(JEV_GATES_PORTABLE=1 PATH=/usr/bin:/bin "$root/scripts/$s" 2>&1); codep=$?
+    if [ "$codep" -ne 8 ]; then
+      echo "80-lane-instrument-selftests --selftest: FAILED — $s portable exit=$codep, want 8"
+      exit 1
+    fi
+    printf '%s\n' "$outp" | grep -q '^SKIP (missing prerequisite: omp,' || {
+      echo "80-lane-instrument-selftests --selftest: FAILED — $s portable skip unnamed"; exit 1; }
+  done
+
+  echo "80-lane-instrument-selftests --selftest: OK (3 arms: missing REDs as ABSENT, mode-dropped REDs as UNEXEC, omp-absent REDs unless --portable)"
   exit 0
 fi
 
