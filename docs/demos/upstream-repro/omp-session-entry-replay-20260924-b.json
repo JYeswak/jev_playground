@@ -1,0 +1,25 @@
+{
+  "transcript": "~/.omp/profiles/claude/agent/sessions/-Developer-jev/2026-09-24T13-42-19-003Z_01a0d3a7-1a7b-750b-8dbd-77efbcee0808.jsonl",
+  "transcript_sha256": "5f05860a3d191ba7e1e04611b1bce13f53c03c7b65958c3f46f3400b5f27dea7",
+  "eventsIn": 324,
+  "messagesIn": 126,
+  "thinkingCharsDropped": 72476,
+  "resultsPaired": 68,
+  "resultsTrailing": 0,
+  "lib": {
+    "messagesBefore": 58,
+    "messagesAfter": 9,
+    "charsBefore": 230316,
+    "charsAfter": 8149,
+    "calls": 68,
+    "kept": 0,
+    "resultsDropped": 0,
+    "callsDropped": 63,
+    "pinned": 5,
+    "stateTokens": 16684,
+    "stateStage": "full",
+    "requests": 1,
+    "ms": 439
+  },
+  "failures": []
+}

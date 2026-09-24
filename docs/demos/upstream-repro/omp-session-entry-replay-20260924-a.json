@@ -1,0 +1,25 @@
+{
+  "transcript": "~/.omp/agent/sessions/-Developer-jev/2026-09-19T01-08-23-196Z_01a0b735-101c-759f-91d7-93551257caa5.jsonl",
+  "transcript_sha256": "4c3db5bc5e602456d3394d4a6785011f5dc0d45cb83926ca751cbf5ba40f1f2c",
+  "eventsIn": 21,
+  "messagesIn": 11,
+  "thinkingCharsDropped": 142,
+  "resultsPaired": 1,
+  "resultsTrailing": 0,
+  "lib": {
+    "messagesBefore": 9,
+    "messagesAfter": 9,
+    "charsBefore": 1815,
+    "charsAfter": 1521,
+    "calls": 1,
+    "kept": 0,
+    "resultsDropped": 0,
+    "callsDropped": 1,
+    "pinned": 0,
+    "stateTokens": 888,
+    "stateStage": "full",
+    "requests": 1,
+    "ms": 356
+  },
+  "failures": []
+}
