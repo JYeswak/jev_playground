@@ -289,12 +289,24 @@ def sst_report(bar_only):
             f"{'yes, verdict cannot move' if lf < h_mae else 'no, decided by the test'} |"
         )
     if len(done) == 3:
-        unstable = sum(
-            1 for a, b, c in zip(*(e for _, e in done)) if not (a[0] == b[0] == c[0])
+        idx = [
+            j
+            for j, (a, b, c) in enumerate(zip(*(e for _, e in done)))
+            if not (a[0] == b[0] == c[0])
+        ]
+        print(
+            f"\nRows whose level is not identical in all three runs: {pct(len(idx), n)}"
         )
         print(
-            f"\nRows whose level is not identical in all three runs: {pct(unstable, n)}"
+            "| i | Truth | Haiku level | Levels run 1 / 2 / 3 | Raw scores run 1 / 2 / 3 |"
         )
+        print("|---:|---:|---:|---|---|")
+        for j in idx:
+            lv = " / ".join(str(e[j][0]) for _, e in done)
+            raw = " / ".join(f"{e[j][3]:.3f}" for _, e in done)
+            print(
+                f"| {sample[j]['i']} | {sample[j]['label']} | {haiku[j][0]} | {lv} | {raw} |"
+            )
     return per_run, h_mae
 
 
@@ -381,14 +393,21 @@ def b77_report(bar_only):
             f"{'yes, verdict cannot move' if cf < h_win else 'no, decided by the test'} |"
         )
     if len(done) == 3:
-        unstable = sum(
-            1
-            for a, b2, c2 in zip(*(e for _, e in done))
+        idx = [
+            j
+            for j, (a, b2, c2) in enumerate(zip(*(e for _, e in done)))
             if not (a[0] == b2[0] == c2[0])
-        )
+        ]
         print(
-            f"\nRows whose choice is not identical in all three runs: {pct(unstable, n)}"
+            f"\nRows whose choice is not identical in all three runs: {pct(len(idx), n)}"
         )
+        print("| i | Truth | Haiku | Choice run 1 / 2 / 3 |")
+        print("|---:|---|---|---|")
+        for j in idx:
+            ch = " / ".join(e[j][0] for _, e in done)
+            print(
+                f"| {subset[j]['i']} | {subset[j]['intent']} | {haiku[j][0]} | {ch} |"
+            )
     return per_run, h_win
 
 
