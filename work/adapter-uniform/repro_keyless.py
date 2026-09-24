@@ -20,7 +20,7 @@ sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
 
-from typesafe_sdk import Choice  # noqa: E402
+from typesafe_sdk import Choice, Score  # noqa: E402
 
 from system_one_adapter import SystemOneAdapterClient  # noqa: E402
 from system_one_adapter.providers.base import ProviderResult  # noqa: E402
@@ -35,27 +35,31 @@ class FixedProvider:
 
     def __init__(self, text):
         self.text = text
+        self.calls = 0
 
     def request(self, messages, *, schema, structured):
+        self.calls += 1
         return ProviderResult(text=self.text, input_tokens=0, output_tokens=0)
 
     def translate_error(self, error):
         raise error
 
 
-def run(values, normalize):
+def run(values, normalize, n_retry_malformed_structure=0):
     payload = json.dumps({"answers": {"q": dict(zip(LABELS, values))}})
     q = {
         "q": Choice(
             instructions="Which label?", criteria={label: None for label in LABELS}
         )
     }
+    provider = FixedProvider(payload)
     with SystemOneAdapterClient(
         structured_outputs=True,
         llm_answer_mode="probabilities",
         normalize_probabilities=normalize,
+        n_retry_malformed_structure=n_retry_malformed_structure,
     ) as client:
-        resp = client.system_one({"text": "x"}, q, model=FixedProvider(payload))
+        resp = client.system_one({"text": "x"}, q, model=provider)
     ans = resp.answers["q"]
     debug = {
         k: resp.debug[k]
@@ -67,10 +71,33 @@ def run(values, normalize):
     return {
         "model_payload": payload,
         "normalize_probabilities": normalize,
+        "n_retry_malformed_structure": n_retry_malformed_structure,
+        "provider_calls": provider.calls,
         "choice": ans.choice,
         "confidence": ans.confidence,
         "probabilities": ans.probabilities,
         "debug": debug,
+    }
+
+
+def run_score(normalize):
+    """Score twin: an all-zero distribution over 3 levels."""
+    payload = json.dumps({"answers": {"s": {"0": 0.0, "1": 0.0, "2": 0.0}}})
+    q = {"s": Score(instructions="How severe?", criteria=["none", "some", "severe"])}
+    with SystemOneAdapterClient(
+        structured_outputs=True,
+        llm_answer_mode="probabilities",
+        normalize_probabilities=normalize,
+    ) as client:
+        resp = client.system_one({"text": "x"}, q, model=FixedProvider(payload))
+    ans = resp.answers["s"]
+    return {
+        "model_payload": payload,
+        "normalize_probabilities": normalize,
+        "score": ans.score,
+        "confidence": ans.confidence,
+        "probabilities": ans.probabilities,
+        "probability_errors": resp.debug.get("probability_errors"),
     }
 
 
@@ -110,6 +137,33 @@ def main():
         )
         ok &= holds
         print(json.dumps({"case": name, "expectation_holds": holds, **out}))
+    # A zero-sum distribution is schema-valid, so the corrective-retry allowance never fires.
+    out = run(zeros, True, n_retry_malformed_structure=2)
+    holds = out["provider_calls"] == 1 and out["choice"] == "alpha"
+    ok &= holds
+    print(
+        json.dumps(
+            {
+                "case": "all-zero, n_retry_malformed_structure=2",
+                "expectation_holds": holds,
+                **out,
+            }
+        )
+    )
+    # Score twin: the expected value of the substituted uniform is the middle level, both settings.
+    for normalize in (True, False):
+        out = run_score(normalize)
+        holds = abs(out["score"] - 1.0) < 1e-9 and abs(out["confidence"]) < 1e-9
+        ok &= holds
+        print(
+            json.dumps(
+                {
+                    "case": f"Score all-zero, normalize={normalize}",
+                    "expectation_holds": holds,
+                    **out,
+                }
+            )
+        )
     return 0 if ok else 1
 
 

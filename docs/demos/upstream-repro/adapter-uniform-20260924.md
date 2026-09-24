@@ -47,7 +47,8 @@ The only signal separating path 1 from path 5 is in `response.debug`:
 
 `work/adapter-uniform/repro_keyless.py` injects a caller-owned fake provider (the adapter's documented
 `model=<provider instance>` seam) that returns a fixed raw payload, and runs the adapter's real
-decode/normalize/confidence code on it. Four cases, 4/4 expectations hold (exit 0):
+decode/normalize/confidence code on it. Seven cases, 7/7 expectations hold (exit 0; the last three
+were added after the bar commit and before the result, to check two workarounds and the Score twin):
 
 | Raw model payload (4 labels) | `normalize_probabilities` | Adapter `choice` | `confidence` | `probabilities` | `debug.probability_errors` |
 |---|---|---|---|---|---|
@@ -55,6 +56,9 @@ decode/normalize/confidence code on it. Four cases, 4/4 expectations hold (exit 
 | all 0.0 | False | `alpha` (first) | 0.0 | 0.0 each | `{"q": 1.0}` |
 | 0.25 each (model-asserted) | True | `alpha` (first) | 0.0 | 0.25 each | `{}` |
 | one-hot on `gamma` | True | `gamma` | 1.0 | one-hot | `{}` |
+| all 0.0, `n_retry_malformed_structure=2` | True | `alpha` (first), **1 provider call** | 0.0 | 0.25 each | `{"q": 1.0}` |
+| Score, 3 levels all 0.0 | True | `score=1.0` (middle level) | 0.0 | 1/3 each | `{"s": 1.0}` |
+| Score, 3 levels all 0.0 | False | `score=1.0` (middle level) | 0.0 | 0.0 each | `{"s": 1.0}` |
 
 Rows 1 and 3 have identical `answers`. That is the mechanism; it does not yet say which path the 14
 live rows took.
@@ -99,4 +103,80 @@ vendored clone is not edited), and parsed independently of the adapter.
 
 ## Result
 
-Pending the live run.
+Run 2026-09-24 02:34 UTC, live lane, `claude-haiku-4-5` via `AsyncAnthropicProvider`, adapter at
+`adffc2e`, 140/140 calls answered, 0 errors, every captured response `stop_reason = end_turn`, one
+provider attempt per call. Rows: `work/adapter-uniform/live-raw.jsonl`.
+
+| Arm | Calls | Adapter answer uniform | …raw all-zero | …raw model-asserted uniform | Rows with ≥1 uniform |
+|---|---|---|---|---|---|
+| Target (the 14 jev-k3k uniform rows) | 70 | **58/70** | 58/58 | 0/58 | 13/14 |
+| Control (14 same-intent rows) | 70 | 1/70 | 1/1 | 0/1 | 1/14 (`i=208`) |
+
+All 59 uniform answers are `choice = activate_my_card` (criterion #1) at confidence 0. The only
+target row that never went uniform, `i=214`, is the one whose text names a beneficiary directly
+("What are the rules for transferring to a beneficiary?"). One raw response, verbatim (`i=229`):
+
+```json
+{"answers":{"intent":{"activate my card":0,"age limit":0,"apple pay or google pay":0,"atm support":0,"automatic top up":0,"balance not updated after bank transfer":0,"balance not updated after cheque or cash deposit":0,"beneficiary not allowed":0,"cancel transfer":0,"card about to expire":0}}}
+```
+
+**Verdict under the preregistered rules: ADAPTER-FABRICATES-UNIFORM (path 1) CONFIRMED LIVE.**
+Level `[live]` N=140 for the recurrence, `[test]` for the mechanism (keyless, 7/7).
+
+Split of responsibility, each stated at its evidence level:
+- **Provider behaviour** `[live, N=140]`: Haiku 4.5 returns an all-zero map, against the adapter's
+  system prompt ("make the probabilities sum to 1", `_client.py:70-77`), and does so repeatably on
+  specific inputs (58/70 on the target rows vs 1/70 on controls). Why these inputs is not measured
+  here; the texts (crypto purchase, transfer timing, card delivery abroad) read as poor fits for all
+  ten option names `[INFERENCE]`.
+- **Adapter defect** `[test]`: a probability map with no mass is returned as a successful answer
+  naming criterion #1, in both `normalize_probabilities` modes, schema-valid so the corrective retry
+  never fires, and indistinguishable in `answers` from a model-asserted uniform. Score's twin
+  reports the middle level. The only signal is `debug.probability_errors` = 1.0. Same class as the
+  maintainers' own accepted #38 (incomplete output returned as a successful evaluation).
+- **Our misuse** `[test]`: no documented setting turns the case into an error (keyless rows 2 and
+  5), so the configuration was not the cause. What we did wrong is discard `debug`:
+  `work/choice-banking77/run.py` at `3709ee6` kept `answers` only, so jev-k3k scored 14 "no answer"
+  rows as Haiku picking `activate_my_card`. Any Haiku arm through this adapter must record
+  `debug.probability_errors` (jev-4jf's runner now records `normError`/`rawSum`, per its author).
+
+Effect on jev-k3k, stated and not re-scored: its Haiku 362/400 counts these 14 as wrong answers;
+they are non-answers. Whether that changes the WIN verdict is for that bead's owner to rule on.
+
+## Stranger repro and upstream draft
+
+- `work/adapter-uniform/stranger_repro.py`: standalone, no key, no path hacks. Ran clean-room
+  against the published wheel: `uv run --no-project --with system-one-adapter==0.2.1 python
+  stranger_repro.py` in a `mktemp -d`, `typesafe-sdk` 0.7.1 resolved; output matches the draft.
+- Pin gap: vendored `adffc2e` (v0.2.0) vs upstream `e1d4cc9` (v0.2.1). Every cited line was
+  re-located in the v0.2.1 sources fetched with `gh api`; only `_decode_or_correct` moved
+  (`216-225` to `222-231`). Behaviour is the same on the v0.2.1 wheel (repro above, plus the Score
+  twin run on the wheel).
+- Dedup (Phase −1, 2026-09-24T02:35Z): `gh issue list --state all --search` for `uniform`,
+  `zero probabilities`, `normalize`, `all zero`, `rescale`, `confidence 0`, `probability sum`, plus
+  the full lists (8 issues, 32 PRs): no duplicate. Nearest is #38 (different mechanism).
+- Draft body: `work/adapter-uniform/issue-draft.md`; proposed title *"An all-zero probability map
+  returns option #1 as a successful answer"* (68 chars). Report Test: the draft's bash block was
+  executed verbatim and its output matched the draft's expected block byte-for-byte.
+- Rubric: `python3 ~/Developer/flywheel/.flywheel/scripts/jeff-issue.py rubric --draft
+  work/adapter-uniform/issue-draft.md --tracking-bead jev-mly --json` → `status: pass`,
+  `decision: auto_post`, 7/7 axes high, ledger `rubric-a362057f2126`. Two honest edits were needed
+  to get there: the model id `claude-haiku-4-5` tripped the internal-id leak patterns (a false
+  positive; written as "Claude Haiku 4.5" instead, pattern not touched), and the body was trimmed
+  under the 1,200-word tone limit. A pass certifies form only; the Report Test above is the
+  substance check.
+- **Not posted.** Posting is Joshua's call.
+
+## Spend
+
+140 Haiku calls, 126,560 input + 14,545 output tokens, about $0.20 at $1 / $5 per MTok list price
+`[INFERENCE: price not read from a bill]`. Zero Jev calls.
+
+## NO-CLAIM
+
+- No claim about why Haiku zeroes these inputs, or its rate on any other question, label set or
+  model; N is one question, 28 rows, 5 repeats.
+- No claim about the hosted TypeSafe API's behaviour on a zero-mass answer; not tested.
+- `llm_answer_mode="discrete"` and `structured_outputs=False` not exercised.
+- The jev-k3k verdict is not re-scored here.
+- The live run used the vendored v0.2.0; v0.2.1 was checked keyless only.
