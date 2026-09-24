@@ -7,6 +7,7 @@ work/noul-fever), each committed before its first call.
   jev            -> official typesafe_sdk AsyncTypeSafeClient, model pinned jev-1.13.0 (TYPESAFE_API_KEY)
   jev-nocriteria -> same client and instructions, criteria removed (the jev-k2q ablation)
   jev-rerun      -> the jev question again, run beside jev-nocriteria (jev-k2q noise control)
+  jev-run2/3     -> the jev question again, into its own rows file (jev-hg8 Jev variance)
   haiku          -> system-one-adapter-python, anthropic/claude-haiku-4-5, probabilities mode (ANTHROPIC_API_KEY)
   haiku-run2/3   -> the haiku arm again, same call, into its own rows file (jev-x5k Haiku variance)
 Run (venv python has both packages):
@@ -46,7 +47,16 @@ QUESTION = Noul(
 )
 # jev-k2q ablation, frozen with its bar: identical instructions, no outcome criteria.
 QUESTION_NO_CRITERIA = Noul(instructions=QUESTION.instructions)
-ARMS = ("jev", "jev-nocriteria", "jev-rerun", "haiku", "haiku-run2", "haiku-run3")
+ARMS = (
+    "jev",
+    "jev-nocriteria",
+    "jev-rerun",
+    "jev-run2",
+    "jev-run3",
+    "haiku",
+    "haiku-run2",
+    "haiku-run3",
+)
 
 
 DATA = HERE
