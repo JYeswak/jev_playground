@@ -81,3 +81,29 @@ ReadmeStrangerRun.
 **NO-CLAIM.** The search found path citations, not paraphrases of a page. One snapshot of
 docs.typesafe.ai at 04:15Z. The confidence-formula match is on committed rows, descriptive, with no
 new call.
+
+## After `6982002` (Main's FETCH_HEAD fix), re-checked 2026-09-24 07:43Z
+
+The refresh at `4f3e295` ran with the script from before `6982002`. That script read `upstream_sha`
+from FETCH_HEAD's first line, which after a full fetch on a detached pin can be any branch.
+
+**The refreshed rows were not affected.** In the main worktree, FETCH_HEAD's first line equals the
+default branch's line for every row that moved or that `6982002` names:
+
+| Repo | Default branch | Line 1 | Default branch's line |
+|---|---|---|---|
+| system-one-adapter-python | origin/main | e1d4cc9 | e1d4cc9 |
+| typesafe-sdk-js | origin/main | 66880cc | 66880cc |
+| typesafe-sdk-python | origin/main | 0ffd094 | 0ffd094 |
+| ripwire | origin/main | 60b65f0 | 60b65f0 |
+
+**A stranger's fresh clone, `[oracle]`.** `git clone` of `c99310d` into `/tmp/claimcheck-verify-tssx`,
+which contains both `4f3e295` and `6982002`:
+- Sync run 1: rc 0, `git status` 0 lines.
+- Sync run 2, with typesafe-sdk-js FETCH_HEAD line 1 now `codex/npm-bootstrap` (0098f35), the trap
+  state: rc 0, `git status` 0 lines. The row stays `66880cc/66880cc/0`. `--check` PASS 114/23.
+- The pre-`6982002` script as run 3 rewrites that row to `66880cc/0098f35/1`, so the fix is what
+  holds the tree clean.
+
+An earlier single-sync stranger check, at `d20ba4e` before `6982002`, was also clean, but run 1
+alone never reaches the trap.
