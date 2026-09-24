@@ -10,6 +10,8 @@
 #   - IDEMPOTENT. Re-running overwrites mirrored bytes and rewrites the manifests. Nothing else.
 #   - NEVER DESTRUCTIVE. No rm -rf, no git reset, no git clean, no checkout of an existing clone.
 #     An existing clone is only ever `git fetch`ed; a SHA move is REPORTED, never performed.
+#     A FRESH first-party clone is checked out (detached) at its committed upstream/MANIFEST.tsv
+#     pin, so a stranger's first sync reads the adapter/SDK SHA the receipts name, not upstream tip.
 #   - FAIL-CLOSED. An empty page set, a failed fetch, or a hash mismatch is an ERROR (nonzero),
 #     never a silent pass. "Never fetched" must not read like "up to date".
 #   - NO SECRETS. This script makes no authenticated API calls and never reads $TYPESAFE_API_KEY.
@@ -81,6 +83,11 @@ need curl; need git; need shasum; need sed; need grep; need sort
 now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
 sha() { shasum -a 256 "$1" | cut -d' ' -f1; }
 bytes() { wc -c <"$1" | tr -d ' '; }
+PINS=""  # the committed upstream/MANIFEST.tsv, loaded by sync_repos before it rewrites the file
+manifest_pin() { # manifest_pin <path> ; first pinned_sha recorded for that path, empty if none
+  # No early `exit`: under pipefail a reader that quits first can SIGPIPE printf and kill the run.
+  printf '%s\n' "$PINS" | awk -F'\t' -v p="$1" 'NR>1 && $2==p && !f {print $3; f=1}'
+}
 
 fetch() { # fetch <url> <dest> ; atomic, retried, fail-closed
   local url="$1" dest="$2"
@@ -124,13 +131,26 @@ if [ "$MODE" = check ]; then
         *)           abs="$ROOT/$path" ;;
       esac
       [ -d "$abs/.git" ] || { echo "MISSING clone $path"; bad=$((bad+1)); continue; }
-      cur="$(git -C "$abs" rev-parse --short HEAD)"
-      [ "$cur" = "$pinned" ] || echo "SHA-MOVED $path  manifest=$pinned head=$cur"
+      # Prefix match on the full SHA: `rev-parse --short` grows past 7 chars as a repo grows, so
+      # comparing short strings would turn a clone that sits exactly on its pin into a FALSE RED.
+      [ -n "$pinned" ] || { echo "NO-PIN $path"; bad=$((bad+1)); continue; }
+      cur="$(git -C "$abs" rev-parse HEAD)"
+      case "$cur" in
+        "$pinned"*) ;;
+        *) case "$abs" in
+             # A clone inside this repo is ours: off-pin means every receipt naming the pin is
+             # unreproducible from this tree, so it FAILS (jev-goa: this used to print SHA-MOVED
+             # and still say CHECK PASS). An operator checkout outside the repo (ripwire at
+             # $HOME) is not the script's to move, so its drift is reported only.
+             "$ROOT"/*) echo "SHA-MOVED $path  manifest=$pinned head=${cur:0:7}"; bad=$((bad+1)) ;;
+             *)         echo "SHA-MOVED $path  manifest=$pinned head=${cur:0:7}  (outside this repo: reported, not failed)" ;;
+           esac ;;
+      esac
     done < "$REPO_MANIFEST"
   fi
   rcount=0
   [ -f "$REPO_MANIFEST" ] && rcount=$(($(wc -l < "$REPO_MANIFEST" | tr -d ' ') - 1))
-  if [ "$bad" -gt 0 ]; then echo "CHECK FAIL  $bad of $n mirrored files missing or drifted ($rcount repo clones pinned)"; rc=1
+  if [ "$bad" -gt 0 ]; then echo "CHECK FAIL  $bad problem(s) across $n mirrored files and $rcount repo clones (missing, drifted, or off-pin)"; rc=1
   else echo "CHECK PASS  $n mirrored files match MANIFEST.tsv ($rcount repo clones pinned)"; fi
   exit $rc
 fi
@@ -208,6 +228,13 @@ sync_community() {
     local owner="${owner_repo%/*}" repo="${owner_repo#*/}"
     local path="upstream/$owner/$repo"
     local abs="$ROOT/$path"
+    # A first-party repo is owned by ORG_REPOS and pinned by the committed MANIFEST (RULE 14
+    # item 4 moves it deliberately). USAGE-MAP's older citation must not check the same clone
+    # back out under it: that was the second, conflicting manifest row in jev-goa.
+    if [ "$owner" = "$ORG" ] && [ -n "$(manifest_pin "$path")" ]; then
+      echo "   $owner_repo: first-party, pinned by upstream/MANIFEST.tsv (USAGE-MAP cites ${full:0:7}); left to the $ORG pass"
+      continue
+    fi
     if [ -d "$abs/.git" ]; then
       git -C "$abs" fetch --quiet origin "$full" 2>/dev/null \
         || echo "   warn: fetch failed for $owner_repo (offline?)"
@@ -235,6 +262,10 @@ sync_community() {
 sync_repos() {
   echo "== github.com/$ORG → upstream/$ORG"
   mkdir -p "$UP_DIR/$ORG"
+  # Pins come from the COMMITTED manifest, read before this run rewrites it. A fresh clone lands
+  # on its pin; before jev-goa it landed on upstream's default-branch tip and then recorded that
+  # tip as the new pin, so a stranger's first sync silently re-pinned the adapter.
+  PINS="$(git -C "$ROOT" show HEAD:upstream/MANIFEST.tsv 2>/dev/null || cat "$REPO_MANIFEST" 2>/dev/null || true)"
   printf 'repo\tpath\tpinned_sha\tupstream_sha\tbehind\tfetched_at\n' > "$REPO_MANIFEST"
 
   for r in "${ORG_REPOS[@]}"; do
@@ -244,8 +275,15 @@ sync_repos() {
       git -C "$abs" fetch --quiet origin 2>/dev/null || echo "   warn: fetch failed for $r (offline?)"
     else
       echo "   cloning $r"
-      git clone --quiet --depth 50 "https://github.com/$ORG/$r.git" "$abs"
+      # Full history: a pin can sit below any shallow window.
+      git clone --quiet "https://github.com/$ORG/$r.git" "$abs"
       git -C "$abs" fetch --quiet origin 2>/dev/null || true
+      local pin; pin="$(manifest_pin "$path")"
+      if [ -n "$pin" ]; then
+        git -C "$abs" checkout --quiet --detach "$pin" \
+          || { echo "FAIL  $r: manifest pin $pin is not in upstream history" >&2; return 1; }
+        echo "   $r: fresh clone checked out at manifest pin $pin"
+      fi
     fi
     record_repo "$r" "$path"
   done
