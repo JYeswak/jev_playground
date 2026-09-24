@@ -77,6 +77,7 @@ extensions:
   - ./.omp/extensions/jev-rerank.ts
   - ./.omp/extensions/jev-flag.ts
   - ./.omp/extensions/jev-screen.ts
+  - ./.omp/extensions/jev-claim-check.ts
   - ./.omp/extensions/kit-guard
 #   (xd://jev_screen_ext_probe + nonce + --no-extensions arms), see
 #   work/nev-injection/screen-l2-receipt.json. Retire with the tool.

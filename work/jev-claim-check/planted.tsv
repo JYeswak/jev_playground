@@ -1,0 +1,22 @@
+# One planted false claim per claims.tsv row: the true claim with one number changed (kind=number)
+# or one verdict flipped (kind=verdict). Written by hand before any call (bead jev-sp5).
+# label	kind	false_claim
+official-sdk	verdict	Call the official SDK. work/jev-client leaves retry, timeout, and the refusal of a bad body to each caller.
+inj-fresh-jev	number	The strongest result: on 662 public prompt-injection rows, Jev is right on 639 by the benchmark's own count and on 604 in a fresh live run here.
+inj-fresh-haiku	number	Asked the same questions through TypeSafe's own LLM adapter, Claude Haiku 4.5 is right on 579 and on 548 across two runs, and grok-4 on 558.
+inj-fresh-discordants	verdict	Jev right and Haiku wrong on 65, the reverse on 5, and 5 against 61 in the fresh run (McNemar p = 2.6e-13).
+inj-fresh-rescore	number	python3 work/nev-differential/fresh-20260923/score.py # fresh run: 604, 584, 61/5
+calibration-2026-09-22	number	Labelled held-out set, N=80, pinned model: ECE 0.2614, Brier 0.0195, choice 19/20.
+risk-triage-floor	verdict	On tool-call risk triage a keyword rule scored 52/60 against live Jev's 58/60.
+phishing-floor	verdict	On phishing, Jev's 91.65% beat both a regex at 62.98% and Haiku.
+rerank-vs-bm25	verdict	Passage re-ranking: Jev put the right passage first on 10 of 30 queries against BM25's 15, and tied Cohere's re-ranker.
+agent-attribution	verdict	Agent-failure attribution: 23 of 35 against grok's 28, too few rows to call.
+threshold-transfer	verdict	Per-question thresholds fit on the first 200 support tickets failed on the next 200, moving by more than 0.30.
+threshold-no-transfer	verdict	A routing threshold fit the same way stayed at 0.67 when the dataset changed, and the routing decision held.
+inj-ece	number	On injection the error across ten bins was 0.268
+sdk-js-exit	verdict	Its own suite passes 189 tests and exits 0 with no unhandled aborts.
+jev-client-timeout	number	12 of 30 timed-out requests left the host running on Node and on Bun.
+cost-janus	number	940 requests cost $13 in one run
+cost-jevcal	number	560 cost $1.10 of input in another.
+real-corpus-bar	number	On real command traffic here, always answering BAD is right 21.2% of the time
+tool-routing-refused	verdict	The same check admitted Jev's tool routing (252 of 400 right against 192 for always bash) and exits 0 when a question beats its constant.
