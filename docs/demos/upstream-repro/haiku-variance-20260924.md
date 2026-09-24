@@ -92,6 +92,80 @@ calls.
 measures run-to-run variance of the incumbent's answers only. Jev's variance is `jev-qbc`'s. Nothing
 here measures variance across days, prompts or adapter versions.
 
-## Result
+## Result (live, 2026-09-24 03:18-03:20 UTC, bar at `af2906b`)
 
-NOT_RUN. Filled in after the six runs.
+Six Haiku runs: 2,600 calls, 2,600 answered, 0 failed, 0 resume passes. Every row reports
+`anthropic/claude-haiku-4-5`. Each rerun's input tokens equal run 1's exactly (SST-5 364,917;
+SciFact 373,346; Banking77 360,861 per run), so the prompts were byte-for-byte the same. New rows
+(sha256 prefixes): `work/score-sst5/rows-haiku-run2.jsonl` `233360b4`, `-run3` `19e13a6a`;
+`work/noul-scifact/rows-haiku-run2.jsonl` `7e3b3c0d`, `-run3` `0bdba594`;
+`work/choice-banking77/rows-haiku-run2.jsonl` `4acd3add`, `-run3` `ce390868`.
+Re-score, no key (about 10 s): `python3 work/haiku-variance/score.py`.
+
+**R1, the verdict on every Haiku run (decides).**
+
+| Verdict | Run 1 | Run 2 | Run 3 | Under the bar |
+|---|---|---|---|---|
+| SST-5 headline: MAE sign test | 109 / 75, p = 0.0148 WIN | 118 / 72, p = 0.0010 WIN | 112 / 72, p = 0.0039 WIN | **HOLDS** |
+| SST-5 accuracy (pass rule: not LOSE) | 89 / 67, p = 0.092 TIE | 98 / 66, p = 0.015 WIN | 97 / 65, p = 0.015 WIN | PASS **HOLDS** |
+| SciFact accuracy (pass rule: not LOSE) | 19 / 9, p = 0.087 TIE | 19 / 10, p = 0.136 TIE | 17 / 8, p = 0.108 TIE | no LOSE |
+| SciFact AUC, Jev minus Haiku, 95% | +0.0080 to +0.0531 WIN | −0.0021 to +0.0393 TIE | +0.0020 to +0.0449 WIN | **RETRACTED** |
+| SciFact Brier, Jev minus Haiku, 95% | −0.0473 to −0.0117 WIN | −0.0401 to −0.0056 WIN | −0.0418 to −0.0071 WIN | **HOLDS** |
+| SciFact ECE, Jev minus Haiku, 95% | −0.0646 to −0.0072 WIN | −0.0558 to −0.0011 WIN | −0.0495 to +0.0050 TIE | **RETRACTED** |
+| SciFact PASS (no Haiku win on any of the four) | yes | yes | yes | **HOLDS** |
+| Banking77 McNemar | 25 / 3, p = 2.7e-5 WIN | 23 / 4, p = 3.1e-4 WIN | 24 / 2, p = 1.1e-5 WIN | **HOLDS** |
+
+**What moves.** Two of SciFact's three calibration-style wins over Haiku do not survive the
+incumbent's re-run: AUC falls to TIE on run 2 and ECE falls to TIE on run 3. In each case Jev is
+still ahead in direction (every interval's midpoint favours Jev), but the bar requires WIN on all
+three runs. Brier WIN holds on all three. SciFact's PASS is untouched: no run gives Haiku a win on
+anything. Everything else holds. SST-5's fragile MAE headline (headroom 4 rows) gets stronger on the
+reruns (p 0.001 and 0.004). Its accuracy comparison, TIE on the committed run, is a Jev WIN on both
+reruns. That is reported, not claimed: the bar only asks whether it ever becomes a LOSE.
+
+**R2, flips between Haiku runs (describes).**
+
+| Unit | What is compared | Run 1 vs 2 | Run 1 vs 3 | Run 2 vs 3 | Headroom |
+|---|---|---:|---:|---:|---|
+| SST-5 (500) | rounded level | 85 | 97 | 80 | MAE WIN 4, accuracy not-LOSE 44 |
+| SciFact (400) | decision at > 0.5 | 11 | 9 | 12 | accuracy not-LOSE 18 |
+| SciFact (400) | noul moved by more than 0.10 (mean abs change) | 44 (0.051) | 41 (0.049) | 41 (0.048) | none (bootstrap verdicts) |
+| Banking77 (400) | chosen intent | 22 | 19 | 23 | WIN 10, not-LOSE 35 |
+
+Haiku changes 16 to 19% of SST-5 levels between runs, 20 to 24 times the MAE headline's headroom.
+`jev-qbc` measured Jev changing 6 to 8 of 500. So R1 alone decided SST-5 and Banking77, and they
+held anyway. Only SciFact's decisions moved less than their headroom.
+
+**R3, spread across the three Haiku runs against the committed gap.** Every Haiku metric's range is
+below the Jev-Haiku gap, so the committed single-run Haiku numbers stand as point estimates:
+SST-5 correct 241-251 (range 10, gap 22), MAE 0.556-0.584 (0.028, gap 0.068); SciFact correct
+351-352 (1, gap 10), AUC 0.934-0.945 (0.011, gap 0.028), Brier 0.0932-0.1002 (0.0069, gap 0.0293),
+ECE 0.0708-0.0854 (0.0145, gap 0.0423); Banking77 correct 362-365 (3, gap 22).
+
+**Adapter debug (runs 2 and 3; run 1 predates the fields).**
+- SST-5 Score and SciFact Noul: 0 rows with `probabilityError` and 0 with `originalProbabilities`
+  in all four runs, so the adapter never renormalized a Haiku map on these two units.
+- Banking77 Choice: 89 and 87 rows had the raw map renormalized (raw sums 0.00 to 1.15, 0 retries).
+  Among them, 11 and 12 rows had `rawSum == 0`, and they are exactly the flat rows the scorer finds
+  (uniform 0.1, `choice` `activate_my_card`, none with that true intent, all scored wrong as shipped).
+  So on `jev-k3k`'s inputs the flat answers are now observed, in the adapter's own debug, to be
+  all-zero maps. That confirms for runs 2 and 3 the mechanism `jev-mly` found and `jev-k3k`'s
+  receipt could only infer for its run 1. The flat rows recur: 16 distinct rows over three runs,
+  8 flat in all three, and 12 of run 1's 14 flat again in run 3.
+
+**Latency and tokens per rerun** (p50 / p95 ms; input / output tokens): SST-5 790 / 1,529 and
+810 / 1,473 (364,917 / 21,961 and 21,945); SciFact 690 / 1,134 and 663 / 1,150 (373,346 / 4,961 and
+4,986); Banking77 1,004 / 1,877 and 1,003 / 1,885 (360,861 / 41,248 and 41,464).
+
+**Negative evidence.** The two retractions are `NEGATIVE_EVIDENCE.md` R89 with a retry condition.
+They are reported to the owner of `jev-9er`, ScoreSST5. The `jev-9er` receipt is not edited.
+
+**Spend.** 2,600 Haiku calls through the adapter: 2,198,248 input / 136,565 output tokens. That is
+about $2.88 at $1 / $5 per million `[INFERENCE: list price, not a bill]`. No Jev calls.
+
+**Boundary (NO-CLAIM).** Three Haiku runs per unit within about three minutes of each other plus the
+original run about 50 minutes earlier. One adapter version (`adffc2e`), one Haiku model, one
+evening. Jev is held at one run per unit here (its variance is `jev-qbc`'s, measured on SST-5 and
+Banking77 only, not SciFact). No Jev-run x Haiku-run cross-pairings were run. The retracted SciFact
+AUC and ECE wins are "not robust to the incumbent's re-run", not "Haiku is as good": the direction
+favours Jev in every run. Awaiting a non-author spot-check before the bead closes.

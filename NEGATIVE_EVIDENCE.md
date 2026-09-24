@@ -3678,3 +3678,33 @@ as the primary test), or when a later Jev model is pinned.
 
 **NO-CLAIM.** Three runs per arm within one hour, one sample, one wording. This does not show that
 Jev and Haiku are equal on Yelp MAE; the direction favoured Jev in all nine pairings.
+
+## R89 — RETRACTED: Jev beats Haiku 4.5 on SciFact claim-verification AUC and ECE
+
+**Claim (`jev-9er`, rows `83a7295`):** on 400 SciFact claim/abstract pairs, one Noul question at
+`jev-1.13.0` has significantly higher AUC (+0.008 to +0.053) and lower ECE (−0.065 to −0.007) than
+Haiku 4.5 via the adapter (paired bootstrap, 2,000 resamples), alongside a Brier WIN and an
+accuracy TIE.
+
+**Measured (2026-09-24, live, bead `jev-x5k`, bar `af2906b` before any rerun call).** Two more
+Haiku runs on the same 400 pairs, same adapter `adffc2e` and settings, 800 calls, 0 failed, input
+tokens identical to run 1. Jev's committed rows held fixed. AUC: WIN, TIE (−0.0021 to +0.0393),
+WIN. ECE: WIN, WIN, TIE (−0.0495 to +0.0050). The bar needed WIN on all three Haiku runs, so both
+wins are retracted. Brier WIN holds on 3/3, accuracy is TIE on 3/3, and no run gives Haiku a win
+on anything, so `jev-9er`'s PASS stands. In every run the direction favours Jev.
+
+Receipt: `docs/demos/upstream-repro/haiku-variance-20260924.md`. Re-score with no key:
+`python3 work/haiku-variance/score.py`.
+
+**Consequence adopted:** state SciFact as "PASS; Brier better than Haiku on three Haiku runs;
+accuracy TIE; AUC and ECE better in direction but not robust to the incumbent's re-run". Do not
+cite `jev-9er`'s single-run AUC or ECE interval as a win. A bootstrap win whose interval sits
+within a few thousandths of 0 needs the incumbent re-run before it is stated.
+
+**Retry condition.** Retry with a repeated-run design fixed in the bar (for example, AUC and ECE
+computed on each arm's per-row noul averaged over k runs, or a bootstrap that resamples runs as
+well as rows), or a larger preregistered sample (the three Haiku runs span AUC 0.934 to 0.945
+against Jev's 0.962), or when a later Jev model or adapter version is pinned.
+
+**NO-CLAIM.** Three Haiku runs within one hour, one sample, one wording, one Jev run (Jev's SciFact
+variance was not measured). This does not show Haiku matches Jev on AUC or ECE.
