@@ -636,21 +636,27 @@ Rules:
 | `awesome-jev-by-typesafe` | decision policies: routing, confidence gates, composite scoring, filter thresholds |
 | `probes/` | our own black-box assertions against a fake Jev — the one suite we own end to end |
 
-### No Anthropic API spend on comparisons — Joshua, 2026-09-24
+### No paid comparisons — Joshua, 2026-09-24
 
-Joshua, 2026-09-24: *"i want us to stop using haiku api credits to compare our systems, i've been
-charged $100 from anthropic since yesterday"*. RULE 0. This narrows the lifted budget gate below:
+Joshua, 2026-09-24, two directives the same day. First: *"i want us to stop using haiku api credits
+to compare our systems, i've been charged $100 from anthropic since yesterday"*. Then: *"we're not
+going to use any of the paid comparisons"*. RULE 0. This narrows the lifted budget gate below:
 
-- **No Haiku arm, and no other Anthropic API model, is run as a comparator.** Do not re-run the
-  Haiku rows the usage cap refused, and do not wait for the cap to reset on 2026-10-01. Beads
-  whose only remaining work was a Haiku run are closed as not planned (`jev-1y19`, `jev-pm3`,
-  `jev-384m`, `jev-rf57`).
-- **Results already committed stand as they are.** A Haiku pairing that never ran is reported as
-  *not run (Anthropic spend stopped)*, not as *blocked until the cap resets*.
-- **Comparators that remain:** grok (xAI) and OpenRouter models, when their balances allow. Pick
-  one of those before proposing any new paid comparator.
-- **Scope:** this is about API-key spend on comparison runs. Agent sessions on a subscription are
-  not affected. If a new surface would bill the Anthropic API key, ask Joshua first.
+- **A comparator is a free OpenRouter model (`:free` id) or nothing.** No Anthropic model (Haiku
+  or other), no grok or other xAI model, no paid OpenRouter model (`gpt-5-nano`,
+  `deepseek-v4-flash`, any id without `:free`). Do not re-run a paid arm a cap or balance refused,
+  and do not wait for a reset or a top-up.
+- **Jev itself is not a comparator.** TypeSafe calls to the system under test continue on the
+  credits Joshua adds; this rule is about the models Jev is compared against.
+- **Results already committed stand as they are.** A paid pairing that never ran is reported as
+  *not run (paid comparisons stopped 2026-09-24)*, never as *blocked until a top-up or reset*.
+  Beads whose only remaining work was a paid arm are closed as not planned (`jev-1y19`, `jev-pm3`,
+  `jev-384m`, `jev-rf57`, `jev-qkvc`, and the paid half of `jev-3e2i`).
+- **Free comparators that qualify today:** `dots-studio/dots-3-note-preview:free` meets the full
+  feasibility bar; `nex-agi/nex-n2.5-mini:free` and `liquid/lfm-2.5-2.6b:free` meet the >=49/50
+  gate only (`openrouter-free-feasibility-2-20260924.md`).
+- **Scope:** API-key spend on comparison runs. Agent sessions on a subscription are not affected.
+  A new surface that would bill any comparator key needs Joshua first.
 
 ### Live Call Budget Gate — LIFTED 2026-09-21 by Joshua
 
