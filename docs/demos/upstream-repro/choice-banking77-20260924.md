@@ -3,7 +3,7 @@
 ChoiceBanking77 (background agent of pane 1), 2026-09-24. Live lane, Jev pinned `jev-1.13.0`.
 Pattern: intent routing (`docs-mirror/typesafe/patterns/intent-routing.md`), the Choice primitive.
 
-## Preregistered (committed before the first call)
+## Preregistered (committed at `a0ed3c1`, before the first call)
 
 **Question.** Our only routing measurement so far (tool selection) lost to always-bash on our own
 traffic. This asks whether one Jev Choice question routes public, human-labelled customer messages
@@ -80,4 +80,73 @@ about the full 77-way task, or about published Banking77 SOTA, which is trained 
 
 ## Results
 
-Pending: no call has been made at the commit that introduces this section.
+Run 2026-09-24T02:2xZ, both arms 400/400 answered on the first pass, 0 failed rows, no resume.
+Rows: `work/choice-banking77/rows-jev.jsonl`, `rows-haiku.jsonl` (each row carries the choice,
+confidence, all ten probabilities, latency, tokens, and the model string the response reported).
+Re-score with no key: `python3 work/choice-banking77/score.py`.
+
+| Arm | Correct | Accuracy | Wilson 95% | p50 / p95 latency | Tokens in / out |
+|---|---:|---:|---|---|---|
+| Jev `jev-1.13.0` (400 of 400 responses report `jev-1.13.0`) | **384/400** | **96.0%** | 93.6-97.5% | 139 / 328 ms | 154,744 / 47,571 |
+| Haiku 4.5 via the official adapter | 362/400 | 90.5% | 87.2-93.0% | 1,053 / 1,972 ms | 360,861 / 41,400 |
+| Constant: always-`activate_my_card` | 40/400 | 10.0% | | | |
+
+**Paired:** both correct 359, Jev-only 25, Haiku-only 3, McNemar exact p = 2.7e-5.
+
+**Confidence-gated coverage, each arm's own `confidence` (thresholds fixed in the bar).** Cell =
+rows at or above the threshold of 400, then accuracy among them.
+
+| Arm | >= 0.5 | >= 0.7 | >= 0.9 |
+|---|---|---|---|
+| Jev | 387 (96.8%), 376/387 = 97.2% | 372 (93.0%), 369/372 = 99.2% | 348 (87.0%), 347/348 = 99.7% |
+| Haiku | 376 (94.0%), 356/376 = 94.7% | 360 (90.0%), 347/360 = 96.4% | 315 (78.8%), 313/315 = 99.4% |
+
+The descriptive table (one formula, `(p_max - 1/10)/(1 - 1/10)`, applied to both arms'
+probabilities) is printed by the scorer. Haiku's rows are identical to the table above, since that
+is the adapter's own formula; Jev's differ by at most one row per cell (388/349 covered at 0.5/0.9).
+So Jev's unpublished confidence behaves like the adapter's formula on this set.
+
+**Where each arm goes wrong** (scorer, top confusions). Jev: `beneficiary_not_allowed` read as
+`balance_not_updated_after_bank_transfer` 9 times, `apple_pay_or_google_pay` as `automatic_top_up`
+3 times. Haiku: `beneficiary_not_allowed` accounts for 18 of its 38 errors, sent to
+`activate_my_card` (7), `cancel_transfer` (6) and `card_about_to_expire` (5). Many of that intent's
+test rows are failed transfers or blocked crypto purchases that name no beneficiary, so both arms
+struggle with them. Jev lands on the nearest transfer intent; Haiku lands on unrelated card intents.
+
+**Descriptive, not preregistered: Haiku's flat answers.** 14 Haiku rows came back as an exactly
+uniform distribution (0.1 on every label, confidence 0.0). The argmax tie falls on the first label,
+`activate_my_card`, and none of the 14 were that intent, so all 14 are scored wrong. [INFERENCE]
+Most likely Haiku returned an all-zero probability map, which `normalize_probabilities=True` turns
+into uniform (`system_one_adapter/_utils/probability_normalization.py:69-72`): in effect, "none of
+these". The rows do not keep the raw provider output, so this is not proven. Neither the verdict
+nor the bar depends on this reading. Sensitivity, computed from the committed rows:
+
+| Treatment of the 14 flat Haiku rows | Jev | Haiku | Jev-only / Haiku-only | McNemar p | Rule would say |
+|---|---:|---:|---|---:|---|
+| As preregistered: scored wrong | 384/400 | 362/400 | 25 / 3 | 2.7e-5 | WIN |
+| Dropped from both arms | 374/386 | 362/386 | 15 / 3 | 0.0075 | WIN |
+| Credited to Haiku as correct (most generous) | 384/400 | 376/400 | 15 / 7 | 0.13 | NON-INFERIOR |
+
+(Jev answered 10 of those 14 rows correctly.) All three treatments pass the bar.
+
+**Verdict: WIN, PASS.** Under the bar committed at `a0ed3c1`, one Choice question with ten
+undescribed intent names routes this public Banking77 subset at 96.0% (384/400), 5.5 points above
+Haiku 4.5 on the same Choice through the vendor's adapter (McNemar p = 2.7e-5), at about 1/8 the
+median latency. Its confidence gate matches the vendor's routing pattern: at 0.7 it auto-routes 93%
+of messages at 99.2% accuracy and sends 28 to a human. At the same 0.7 cut, Haiku auto-routes 90%
+at 96.4%. Most of the accuracy gap comes from one intent (`beneficiary_not_allowed`) plus the 14
+flat Haiku answers. With those credited to Haiku, Jev's lead shrinks to 2.0 points and is no
+longer significant, which is why that row is shown.
+
+**Spend.** 800 requests, 0 retries of failed rows. Jev: 400 calls, 154,744 input / 47,571 output
+tokens. Haiku: 400 adapter calls, 360,861 input / 41,400 output tokens (adapter totals, including
+any provider retries). [INFERENCE] At the cookbook list prices in `docs-mirror/typesafe/llms-full.txt`
+(Haiku 4.5 at $1.00/$5.00 per 1M; Jev listed at $0.042/$0.00 for `jev-1.12`, assumed unchanged for
+1.13), that is about $0.0065 for Jev and $0.57 for Haiku. Not a billing readout.
+
+**Boundary / NO-CLAIM.** One run per arm, one prompt wording, one model version each, ten of 77
+intents chosen by an alphabetical tie-break, not by difficulty. Not measured: the 77-way task,
+options with written descriptions, run-to-run variance, Haiku in `discrete` answer mode, any other
+LLM, calibration beyond the three coverage cuts, and cost from a bill. The flat-answer cause is
+inferred, not observed. The labels are PolyAI's and were not re-adjudicated. A non-author re-score
+from the committed rows is still pending, and the bead stays open until it is done.
