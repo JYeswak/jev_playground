@@ -178,6 +178,23 @@ ordered=false reason=unconfigured NOT_RUN
 - A consumer that branches on `details.calledModel` reads a keyless run as a live one. Filed as
   `jev-t7oq`. Nothing was changed here.
 
+**Fixed at `06cb37e` (`jev-t7oq`), after these sessions.**
+- A failing asker now says whether it sent a request. `rerank()` copies that, and an asker that
+  does not say is reported as `calledModel: false`.
+- `liveAsker` watches its own transport. `calledModel` is true once a request reached `fetch`
+  (an HTTP 402, a timeout, a transport throw). It is false for `unconfigured`, `billing-hold` and
+  `sdk-missing`.
+- Offline tests in `work/nev-rerank/test/` cover the keyless, 402, billing-hold and timeout
+  cases.
+- Keyless re-run: one `omp --profile claude -p --mode json` session, `01a0d5a5-8bca-7102-b8e7-46b54a90c5b2`,
+  with the same flags and unset keys as above. The prompt held three short synthetic passages, not
+  qid 36. It made one `write xd://jev_rerank` call and no Jev request. Result text:
+  `ordered=false reason=unconfigured NOT_RUN`. `details.xdev.inner`:
+
+```
+{"ordered": false, "reason": "unconfigured", "calledModel": false, "truncated": false, "ranking": [{"id": "p01", "index": 0, "score": null}, {"id": "p02", "index": 1, "score": null}, {"id": "p03", "index": 2, "score": null}]}
+```
+
 ### Calls, time and spend
 
 - **20 Jev requests**, all in session 4, one validated `askJevScore` per passage (`live.ts`).
