@@ -25,6 +25,7 @@ redacted it; withheld when it matches PRIVATE or SECRET or holds the home path).
 """
 
 import json
+import math
 import os
 import random
 import sys
@@ -137,7 +138,7 @@ def queue():
 
 def pct(xs, q):
     xs = sorted(xs)
-    return xs[min(len(xs) - 1, max(0, -(-len(xs) * q // 1) - 1))] if xs else None
+    return xs[min(len(xs) - 1, max(0, math.ceil(len(xs) * q) - 1))] if xs else None
 
 
 def score():
@@ -200,7 +201,7 @@ def score():
             cmd = (
                 "(withheld)"
                 if r["cmdWithheld"]
-                else (r["cmd"] or "").replace("|", "\\|")[:120]
+                else (r["cmd"] or "").replace("|", "\\|").replace("\n", " ⏎ ")[:120]
             )
             print(
                 f"| {r['i']} | {kind} | {top} ({r['probs'][top]:.2f}) | {labels[r['i']]['label']} | `{cmd}` |"
