@@ -132,6 +132,8 @@ node --test work/nev-injection/seat-guard.test.mjs
 
 **A second claim set: FEVER.** On 400 FEVER 1.0 dev claims, each paired with its gold evidence, the same Noul question at `jev-1.13.0` got 379/400 right against Claude Haiku 4.5's 376/400, again a tie on accuracy (McNemar 6 vs 3, p = 0.51), with Jev significantly ahead on AUC 0.973 vs 0.957, Brier 0.0463 vs 0.0581 and ECE 0.0376 vs 0.0664 ([receipt](docs/demos/upstream-repro/noul-fever-20260924.md)).
 
+**What an answer costs.** On 150 live calls, 50 each with the SST-5 Score, Banking77 Choice and SciFact Noul questions above, the API reported input and output tokens and no billing units, so at the documented $0.042 per million input tokens with output free, 1,000 Jev answers cost $0.0158, $0.0162 and $0.0287, against $0.9484, $1.4287 and $0.9475 for Claude Haiku 4.5 at its $1 / $5 list price on the same rows: list prices applied to token counts, not an invoice ([receipt](docs/demos/upstream-repro/jev-billing-units-20260924.md)).
+
 Each of these re-scores from committed rows with no key:
 
 ```bash
@@ -144,6 +146,7 @@ python3 work/noul-scifact/score.py work/noul-fever  # FEVER: 379 vs 376, AUC 0.9
 python3 work/second-incumbent/score.py          # vs grok-4.20: SciFact 361 vs 330; Banking77 384 vs 366, 368 vs 365 of 378
 python3 work/bicameral-gate/score-b.py          # gate: 78/100 vs 41/100 at 1/300; Haiku 84/100 at 20/300
 python3 work/bicameral-gate/verify-labels-b.py  # gate, 3 labels corrected: 78/97
+node work/jev-billing-units/measure.mjs         # cost per 1,000 answers: $0.0158 / $0.0162 / $0.0287 vs Haiku list
 ```
 
 **A case where a classifier is the better instrument.** On tool-call harm, a small rule beat a live judge. The check is `node work/omp-harm-rule/verify-claim.mjs`. Use a rule when the label is already in the tokens.
