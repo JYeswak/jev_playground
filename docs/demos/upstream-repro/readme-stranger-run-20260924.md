@@ -203,3 +203,40 @@ PATH cut as described above (live rows under Infisical). Compare the exit code a
 line. A mismatch on `date --live` or `cascade --live` is model variance; see above. Scratch left in
 place for Joshua: `/tmp/rsr-timeout-ab.sh`, `/tmp/rsr-beads.sh`, and the run directories
 `$TMPDIR/readme-stranger-*` and `$TMPDIR/tmp.*` (clones and logs).
+
+## Non-author verification — VerifySST5
+
+VerifySST5 (background agent of pane 1; not the author), 2026-09-24. I did not use this unit's
+runner: my own script (`/tmp/verifysst5.S3Nh/lcf-check.py`, left in place) builds the same stranger
+environment. That is a fresh `mktemp -d`, an empty HOME, and PATH set to a bin dir holding only
+`node`/`npm`/`npx`, then `/usr/bin:/bin:/usr/sbin:/sbin`. Only PATH/HOME/LANG/TERM/TMPDIR/USER are
+passed, plus `TYPESAFE_API_KEY` on the live lane under `infisical run --silent --projectId=…`. Every
+command runs verbatim with `/bin/bash -c` in a `git clone --local` at the row's `sha`.
+
+**Pick.** `random.Random(20260924).sample(pool, 3)` over the 61 pooled rows (39 keyless-postfix, then
+22 live-postfix, in file order) gave keyless row 1, live row 14 and live row 22.
+
+| Row | Command | Receipt rc | Re-run rc | Result |
+|---|---|---:|---:|---|
+| keyless 1 | `git clone https://github.com/JYeswak/jev_playground.git` | 0 | 0 | HOLDS. It cloned GitHub HEAD `43fb3f0`: the remote has moved again, as row 1 already noted for its own run. |
+| live 14 | `node demos/semantic-find/demo.mjs --live` at `5250be4` | 0 | 0 | HOLDS. Last line identical: "live lane: Choice+Noul per query through askJevBundle." |
+| live 22 | `git status --porcelain` after the live pass at `5250be4` | 0 (0 paths) | 0 (0 paths) | HOLDS. To reproduce the state this row describes, all 21 live commands ran first, in row order, in one clone. The snippet row was rebuilt from that clone's README by the same rule. |
+
+**Beyond the pick.** The live pass that live row 22 needed produced exit codes for all 21 live rows at
+`5250be4`. Twenty match the receipt, including `cascade --live` rc 1 ("MISS: wrong location field must
+escalate"), the snippet (`ok=true injection=0.97`) and framing-flip (rc 0). The one mismatch is
+`date --live`: rc 1 here against rc 0 in the receipt. The cause is the same item on the same number
+the receipt names as model variance: "the date of the kickoff call" returned 0.33 and was sent to
+review. That makes this 1 of 4 passes at rc 0 for `date --live` (its receipt row plus the 205f1ee and
+9a08109 passes at rc 1, and this one).
+
+Verdict: 3/3 picked rows reproduce their exit codes, and 20/21 unpicked live rows do too. The one
+exception is the documented `date --live` variance.
+
+**Spend.** One full live pass, about 92 Jev calls by the receipt's per-pass estimate [INFERENCE].
+Not metered.
+
+**NO-CLAIM.** Same machine and Node v22.22.0 as the author. Not re-run: the other 38 keyless rows,
+Node 20, Linux and Windows. The stranger environment is simulated, as in the author's boundary.
+Scratch left in place: `$TMPDIR/lcf-verify-dkfm561o` and `$TMPDIR/lcf-verify-kryf9x6f` (clones and
+per-row logs).
