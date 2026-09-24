@@ -58,7 +58,7 @@ claim nobody can check:
   own stderr), gh hanging past the timeout, no completed run, and a cancelled run all print NOT_RUN
   and exit 2; log rows: gates `RED` stage plus its `FAIL` checks, `RED named`, and the runner's
   echoed script source is not a row. Planting `failure` into GREEN fails 2 tests.
-  Run: `python3 -m unittest work/ci-main-status/test_ci_main_status.py` (13 tests).
+  Run: `python3 -m unittest work/ci-main-status/test_ci_main_status.py` (14 tests).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
