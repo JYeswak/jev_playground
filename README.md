@@ -23,34 +23,34 @@ node demos/guard/demo.mjs       # a message guard: pass, block, or send to suppo
 bash scripts/quickstart.sh      # five questions answered from files already in the tree
 ```
 
-Node 20 or newer. Python 3 only for the injection re-score. No key and no package install. To make real calls, put `TYPESAFE_API_KEY` in the environment from outside this tree and add `--live` to a demo.
+Node 20 or newer. Python 3 only for the injection re-score. No key and no package install, except the compaction demo, which fetches and builds its upstream first. To make real calls, run `npm ci --prefix work/sdk` once (it installs the pinned TypeSafe SDK), put `TYPESAFE_API_KEY` in the environment from outside this tree, and add `--live` to a demo.
 
 ## Demos
 
-Each demo is one recipe from TypeSafe's cookbooks (mirrored under [`docs-mirror/typesafe/cookbooks/`](docs-mirror/typesafe/cookbooks/)), a public guide, or a paper, with the policy in plain code next to it. Without `--live`, the questions go to recorded answers, so you can read the routing before you spend anything. Recorded answers are fixtures. They show the policy. They do not show the model.
+Each demo is one recipe from TypeSafe's cookbooks ([published here](https://docs.typesafe.ai/cookbooks); `docs-mirror/typesafe/` holds a local copy once the docs are synced, see Commands), a public guide, or a paper, with the policy in plain code next to it. Without `--live`, the questions go to recorded answers, so you can read the routing before you spend anything. Recorded answers are fixtures. They show the policy. They do not show the model.
 
 | Run | What it shows | Recipe | Live smoke |
 |---|---|---|---|
-| `node demos/guard/demo.mjs` | A message guard. A refund passes, a jailbreak blocks, a crisis goes to support. | [llm_guardrails](docs-mirror/typesafe/cookbooks/llm_guardrails.md) | [4 calls, differs](demos/guard/live-receipt.json) |
-| `node demos/rag/demo.mjs` | A RAG passage filter. Injections and noise drop; contrary evidence is kept and labelled. | [classifying_rag_passages](docs-mirror/typesafe/cookbooks/classifying_rag_passages.md) | [5 calls, differs](demos/rag/live-receipt.json) |
-| `node demos/citation/demo.mjs` | A citation check. A supported claim stands, a contradicted one goes to review, a fabricated quote is dropped. | [citation_check](docs-mirror/typesafe/cookbooks/citation_check.md) | [4 calls, not compared](demos/citation/live-receipt.json) |
-| `node demos/skill-suggest/demo.mjs` | Skill suggestion that can abstain. Two tasks get a skill; the third gets nothing. | [skill_suggestion](docs-mirror/typesafe/cookbooks/skill_suggestion.md) | [6 calls, same](demos/skill-suggest/live-receipt.json) |
+| `node demos/guard/demo.mjs` | A message guard. A refund passes, a jailbreak blocks, a crisis goes to support. | [llm_guardrails](https://docs.typesafe.ai/cookbooks/llm_guardrails.md) | [4 calls, differs](demos/guard/live-receipt.json) |
+| `node demos/rag/demo.mjs` | A RAG passage filter. Injections and noise drop; contrary evidence is kept and labelled. | [classifying_rag_passages](https://docs.typesafe.ai/cookbooks/classifying_rag_passages.md) | [5 calls, differs](demos/rag/live-receipt.json) |
+| `node demos/citation/demo.mjs` | A citation check. A supported claim stands, a contradicted one goes to review, a fabricated quote is dropped. | [citation_check](https://docs.typesafe.ai/cookbooks/citation_check.md) | [4 calls, not compared](demos/citation/live-receipt.json) |
+| `node demos/skill-suggest/demo.mjs` | Skill suggestion that can abstain. Two tasks get a skill; the third gets nothing. | [skill_suggestion](https://docs.typesafe.ai/cookbooks/skill_suggestion.md) | [6 calls, same](demos/skill-suggest/live-receipt.json) |
 | `node demos/chief/demo.mjs` | A job router. A confident pick goes to research or write; anything under 0.85 goes to review. | Movez, Jev Engineering guide step 4 | [4 calls, 3 of 4 same](demos/chief/live-receipt.json) |
-| `node demos/compact/demo.mjs` | Context compaction. Stale calls drop, verbose ones are truncated, failure evidence stays verbatim. Nothing is summarized. | Movez guide step 5, run through `fast-jev-compaction@6e1da50` | [1 call, differs](demos/compact/live-receipt.json) |
-| `node demos/function-call/demo.mjs` | Typed function dispatch. Each argument gets its own judgment; a missing one takes its default. | [function_calling](docs-mirror/typesafe/cookbooks/function_calling.md) | none |
-| `node demos/classify/demo.mjs` | Confidence-gated classification. Report the group when sure, the parent division when not. | [classification_using_confidence](docs-mirror/typesafe/cookbooks/classification_using_confidence.md) | none |
-| `node demos/rerank/demo.mjs` | A passage re-rank. Word overlap misorders both queries; per-pair scores put the right passage first. | [rerank_typesafe](docs-mirror/typesafe/cookbooks/rerank_typesafe.md) | [10 calls, same](demos/rerank/live-receipt.json) |
-| `node demos/date/demo.mjs` | Date extraction. Parts are judged, code does the calendar math, anything under 0.60 goes to review. | [date_extraction](docs-mirror/typesafe/cookbooks/date_extraction_cookbook.md) | [6 calls, differs](demos/date/live-receipt.json) |
-| `node demos/entity/demo.mjs` | Entity alignment. Identical products merge, different ones stay apart, close variants go to a curator. | [entity_alignment](docs-mirror/typesafe/cookbooks/entity_alignment.md) | [4 calls, not compared](demos/entity/live-receipt.json) |
-| `node demos/hierarchy/demo.mjs` | Hierarchical classification. Greedy cannot recover from an early mistake; beam search can. | [hierarchical_classification](docs-mirror/typesafe/cookbooks/hierarchical_classification.md) | [10 calls, differs](demos/hierarchy/live-receipt.json) |
-| `node demos/autoformat/demo.mjs` | Structure recovery. Wrapped lines stitch and blocks classify into headings, code, warnings and lists. | [autoformat](docs-mirror/typesafe/cookbooks/autoformat.md) | [2 calls, differs](demos/autoformat/live-receipt.json) |
-| `node demos/parallel/demo.mjs` | Parallel questions. Four questions of three types answered from one request. | [parallel_questions](docs-mirror/typesafe/cookbooks/parallel_questions.md) | [1 call, same](demos/parallel/live-receipt.json) |
-| `node demos/semantic-find/demo.mjs` | Line search with an existence check, so "not in this document" is an answer. | [semantic_find](docs-mirror/typesafe/cookbooks/semantic_find.md) | [2 calls, same](demos/semantic-find/live-receipt.json) |
-| `node demos/cascade/demo.mjs` | A verify cascade. A schema-valid extraction still escalates when a per-field check fires. | [sde_cascade](docs-mirror/typesafe/cookbooks/sde_cascade.md) | [1 call, differs](demos/cascade/live-receipt.json) |
+| `./scripts/bootstrap-compaction.sh && node demos/compact/demo.mjs` | Context compaction. Stale calls drop, verbose ones are truncated, failure evidence stays verbatim. Nothing is summarized. The bootstrap fetches and builds the upstream once, over the network. | Movez guide step 5, run through `fast-jev-compaction@6e1da50` | [1 call, differs](demos/compact/live-receipt.json) |
+| `node demos/function-call/demo.mjs` | Typed function dispatch. Each argument gets its own judgment; a missing one takes its default. | [function_calling](https://docs.typesafe.ai/cookbooks/function_calling.md) | none |
+| `node demos/classify/demo.mjs` | Confidence-gated classification. Report the group when sure, the parent division when not. | [classification_using_confidence](https://docs.typesafe.ai/cookbooks/classification_using_confidence.md) | none |
+| `node demos/rerank/demo.mjs` | A passage re-rank. Word overlap misorders both queries; per-pair scores put the right passage first. | [rerank_typesafe](https://docs.typesafe.ai/cookbooks/rerank_typesafe.md) | [10 calls, same](demos/rerank/live-receipt.json) |
+| `node demos/date/demo.mjs` | Date extraction. Parts are judged, code does the calendar math, anything under 0.60 goes to review. | [date_extraction](https://docs.typesafe.ai/cookbooks/date_extraction_cookbook.md) | [6 calls, differs](demos/date/live-receipt.json) |
+| `node demos/entity/demo.mjs` | Entity alignment. Identical products merge, different ones stay apart, close variants go to a curator. | [entity_alignment](https://docs.typesafe.ai/cookbooks/entity_alignment.md) | [4 calls, not compared](demos/entity/live-receipt.json) |
+| `node demos/hierarchy/demo.mjs` | Hierarchical classification. Greedy cannot recover from an early mistake; beam search can. | [hierarchical_classification](https://docs.typesafe.ai/cookbooks/hierarchical_classification.md) | [10 calls, differs](demos/hierarchy/live-receipt.json) |
+| `node demos/autoformat/demo.mjs` | Structure recovery. Wrapped lines stitch and blocks classify into headings, code, warnings and lists. | [autoformat](https://docs.typesafe.ai/cookbooks/autoformat.md) | [2 calls, differs](demos/autoformat/live-receipt.json) |
+| `node demos/parallel/demo.mjs` | Parallel questions. Four questions of three types answered from one request. | [parallel_questions](https://docs.typesafe.ai/cookbooks/parallel_questions.md) | [1 call, same](demos/parallel/live-receipt.json) |
+| `node demos/semantic-find/demo.mjs` | Line search with an existence check, so "not in this document" is an answer. | [semantic_find](https://docs.typesafe.ai/cookbooks/semantic_find.md) | [2 calls, same](demos/semantic-find/live-receipt.json) |
+| `node demos/cascade/demo.mjs` | A verify cascade. A schema-valid extraction still escalates when a per-field check fires. | [sde_cascade](https://docs.typesafe.ai/cookbooks/sde_cascade.md) | [1 call, differs](demos/cascade/live-receipt.json) |
 | `node demos/ontology-gate/demo.mjs` | Two decision rules from EvoOntology: query the term instead of pasting the layer; ship a candidate only if it beats its parent. | arXiv:2609.15779 | none |
-| `node demos/consistency/demo.mjs` | Self-consistency over repeated choices, abstaining below 0.60. | [consistency_choice](docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md) | [3 calls, not compared](demos/consistency/live-receipt.json) |
-| `node demos/consistency-noul/demo.mjs` | Self-consistency over repeated true/false judgments, with a 0.30 to 0.70 review band. | [consistency_noul](docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md) | [3 calls, not compared](demos/consistency-noul/live-receipt.json) |
-| `node demos/preparsed/demo.mjs` | Pre-parsed extraction. Regexes over-find spans, a judgment picks one, code copies it verbatim. | [pre_parsed_value_extraction](docs-mirror/typesafe/cookbooks/pre_parsed_value_extraction_cookbook.md) | [4 calls, same](demos/preparsed/live-receipt.json) |
+| `node demos/consistency/demo.mjs` | Self-consistency over repeated choices, abstaining below 0.60. | [consistency_choice](https://docs.typesafe.ai/cookbooks/consistency_choice_cookbook.md) | [3 calls, not compared](demos/consistency/live-receipt.json) |
+| `node demos/consistency-noul/demo.mjs` | Self-consistency over repeated true/false judgments, with a 0.30 to 0.70 review band. | [consistency_noul](https://docs.typesafe.ai/cookbooks/consistency_noul_cookbook.md) | [3 calls, not compared](demos/consistency-noul/live-receipt.json) |
+| `node demos/preparsed/demo.mjs` | Pre-parsed extraction. Regexes over-find spans, a judgment picks one, code copies it verbatim. | [pre_parsed_value_extraction](https://docs.typesafe.ai/cookbooks/pre_parsed_value_extraction_cookbook.md) | [4 calls, same](demos/preparsed/live-receipt.json) |
 
 Seventeen demos have a live smoke: one small `--live` run, recorded. On 8 of the 17, the live model routed at least one item differently from the recorded fixture; on 5 it matched; 4 were not compared item by item. [`demos/LIVE.md`](demos/LIVE.md) says what differed in each. A smoke of 1 to 10 calls is a direction, not a benchmark. The disagreements are why both lanes stay in the tree. [`demos/START.md`](demos/START.md) is the short tour.
 
@@ -141,7 +141,7 @@ This is the part worth stealing. Each step has a script.
 6. **Test the policy with an injected transport.** No key, no network. `node --test work/nev-injection/seat-guard.test.mjs`.
 7. **Leave the rows.** `python3 work/nev-differential/analyze_diff.py` re-scores the committed comparison without a key.
 
-Vendor docs are mirrored under `docs-mirror/typesafe/`. `./scripts/sync-docs.sh --check` confirms the bytes.
+Vendor docs are mirrored under `docs-mirror/typesafe/` once synced. The bytes are not committed: `./scripts/sync-docs.sh` fetches the docs and every pinned clone (network, about two and a half minutes on a fresh clone), then `./scripts/sync-docs.sh --check` confirms them against the committed manifest.
 
 ## What the measurements changed in the client
 
@@ -158,6 +158,8 @@ These are in the code, not only in notes.
 
 ## How the repo checks itself
 
+A fresh clone needs one `br sync --import-only` before the gates run. It takes the `br` issue tracker (beads_rust) and builds the issue database from the committed `.beads/issues.jsonl`; without it the gates stop at their first check.
+
 Seventeen stages run in `bash foundation/gates.sh`. Each is a script under [`foundation/gates.d/`](foundation/gates.d/) with a `--selftest` that plants a bad input and must go red; a stage that has only ever passed is unproven. Every commit subject names the level of evidence behind it (`[pending]`, `[selftest]`, `[test]`, `[oracle]`, `[live]`), and [`githooks/commit-msg`](githooks/commit-msg) refuses one that does not. Refuted ideas stay in [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md) with the condition under which they are worth retrying. [`GATES.md`](GATES.md) lists every stage and what it catches.
 
 The agent harness this lane runs in is [omp](https://omp.sh). Its project surfaces live in [`.omp/`](.omp/): the Jev tools (screen, flag, rerank), rules that interrupt a model mid-response when it starts a known-bad move, and the kit-guard extension, which is meant to block edits to gate files and is being refitted to this repo's layout.
@@ -173,7 +175,8 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 | `node --test work/nev-injection/seat-guard.test.mjs` | Flag, pass, and review, with no model |
 | `node scripts/jev-probe.mjs --replay docs/demos/jev-probe/probe-response-20260918.json` | A recorded judgment, decoded. Drop `--replay` only when you mean to spend |
 | `bash foundation/gates.sh` | Every repository gate, with its own selftest |
-| `./scripts/sync-docs.sh --check` | The vendored docs still match the manifest |
+| `./scripts/sync-docs.sh` | The vendored docs and pinned clones, fetched (network) |
+| `./scripts/sync-docs.sh --check` | The vendored docs still match the manifest; a fresh clone fails it until the fetch above has run |
 
 ## Limitations
 
