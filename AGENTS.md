@@ -94,10 +94,15 @@ sat unread in our own tree.
   buying.** We measured the first 41 times and the second zero times.
 - **We have no `Score` support at all** — one of the three primitives, never used here.
 - **We never use `Noul`'s `criteria {true,false}` outcome descriptions.** Every Noul we send is
-  instructions-only.
+  instructions-only. *(2026-09-24: first use, measured: criteria raised the tool-call gate's catch
+  from 41/100 to 78/100 at 1/300 false alarms, `jev-deep-kit-8q7.12`; they lowered catch for the
+  context-free injection flag, R82. Criteria are a per-question choice, not a default.)*
 - The SDK ships `RetryPolicy` (3 retries, 10s timeout, `{429,500,502,503,504}`, backoff 0.5 doubling
-  to 5.0 with 0.25 jitter) and `usage.billing_units`. We reimplemented the first and track none of
-  the second.
+  to 5.0 with 0.25 jitter). We reimplemented it. *(Corrected 2026-09-24, `jev-bmn` / R84: this line
+  also said the SDK ships `usage.billing_units`. Neither SDK declares it, the Python SDK's own test
+  asserts it is dropped (`typesafe-sdk-python/tests/test_responses.py:152`), and the live API sent it
+  on 0 of 150 calls. Jev bills input tokens only, at $0.042 per million, output free
+  (`docs-mirror/typesafe/models.md:13,16`); `work/jev-client` now returns `usage` on every answer.)*
 - `docs-mirror/typesafe/concepts/use-case-map.md` — **five categories, seventeen industries, ten
   decision shapes — sat on disk unopened.** All five surfaces we tested were Harness Engineering,
   one category of five, and the narrowest: a harness is our own code, so anything Jev could judge
