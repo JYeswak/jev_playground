@@ -65,9 +65,11 @@ live rows took.
 distribution (path 1, the adapter fabricating a uniform answer from a non-distribution), a
 model-asserted uniform (path 5, provider behaviour), or something else?
 
-**Inputs, byte-identical to jev-k3k.** State, question, labels and client settings are imported from
-`work/choice-banking77/run.py` (`structured_outputs=True`, `llm_answer_mode="probabilities"`,
-`normalize_probabilities=True`, `RetryPolicy()`), model `claude-haiku-4-5`, adapter at `adffc2e`.
+**Inputs, byte-identical to jev-k3k.** State, question, labels and rows are read with `git show`
+from `3709ee6` (the commit that recorded jev-k3k `rows-haiku.jsonl`; `work/choice-banking77/run.py`
+was extended for jev-4jf afterwards at `909278f`, so the working-tree runner is not used). Client
+settings copy that runner: `structured_outputs=True`, `llm_answer_mode="probabilities"`,
+`normalize_probabilities=True`, `RetryPolicy()`; model `claude-haiku-4-5`; adapter at `adffc2e`.
 
 **Rows.** Targets: all 14 jev-k3k Haiku rows with an exactly uniform distribution. Controls: for each
 target, the next subset row by `i` with the same intent that was not uniform in jev-k3k, never

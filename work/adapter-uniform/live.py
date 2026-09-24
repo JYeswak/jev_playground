@@ -3,9 +3,11 @@
 back uniform, plus 14 fixed control rows, 5 repeats each, capturing the raw Anthropic
 response next to the adapter's answer. Bar: docs/demos/upstream-repro/adapter-uniform-20260924.md.
 
-State, question, labels and client settings are imported from work/choice-banking77/run.py
-so they are byte-identical to the jev-k3k Haiku arm. The raw response is captured by wrapping
-the caller-owned provider's SDK `messages.create`; the vendored clone is not edited.
+State, question, labels and client settings come from the jev-k3k runner and rows exactly as
+committed at 3709ee6 (read with `git show`, because work/choice-banking77/run.py has since been
+extended for jev-4jf), so they are byte-identical to the jev-k3k Haiku arm. The raw response is
+captured by wrapping the caller-owned provider's SDK `messages.create`; the vendored clone is not
+edited.
 
 Run (live, needs ANTHROPIC_API_KEY; never prints it):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
@@ -17,12 +19,15 @@ Re-score (keyless, from the committed rows):
 import asyncio
 import json
 import os
+import subprocess
 import sys
 import time
+import types
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 K3K = os.path.join(ROOT, "work/choice-banking77")
+K3K_SHA = "3709ee6"  # the commit that recorded jev-k3k rows-haiku.jsonl
 OUT = os.path.join(HERE, "live-raw.jsonl")
 REPEATS = 5
 CONCURRENCY = 8
@@ -34,6 +39,28 @@ def load_jsonl(path):
         return [json.loads(line) for line in fh if line.strip()]
 
 
+def git_show(relpath):
+    return subprocess.check_output(
+        ["git", "-C", ROOT, "show", f"{K3K_SHA}:{relpath}"], text=True
+    )
+
+
+def k3k_jsonl(name):
+    text = git_show(f"work/choice-banking77/{name}")
+    return [json.loads(line) for line in text.splitlines() if line.strip()]
+
+
+def k3k_runner():
+    """The jev-k3k runner module as committed at K3K_SHA."""
+    module = types.ModuleType("k3k_run")
+    module.__file__ = os.path.join(K3K, "run.py")
+    exec(
+        compile(git_show("work/choice-banking77/run.py"), module.__file__, "exec"),
+        module.__dict__,
+    )  # noqa: S102
+    return module
+
+
 def is_uniform(row):
     probs = row.get("probabilities") or {}
     return bool(probs) and len(set(probs.values())) == 1
@@ -43,8 +70,8 @@ def select_rows():
     """Targets: every jev-k3k Haiku row with an exactly uniform distribution.
     Controls: for each target, the next subset row (by i) with the same intent that was
     NOT uniform in jev-k3k, never reused."""
-    k3k = {r["i"]: r for r in load_jsonl(os.path.join(K3K, "rows-haiku.jsonl"))}
-    subset = sorted(load_jsonl(os.path.join(K3K, "subset.jsonl")), key=lambda r: r["i"])
+    k3k = {r["i"]: r for r in k3k_jsonl("rows-haiku.jsonl")}
+    subset = sorted(k3k_jsonl("subset.jsonl"), key=lambda r: r["i"])
     targets = sorted(i for i, r in k3k.items() if is_uniform(r))
     used, controls = set(targets), []
     for t in targets:
@@ -77,13 +104,12 @@ def run():
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("unconfigured: ANTHROPIC_API_KEY unset, no call made", file=sys.stderr)
         return 2
-    sys.path.insert(0, K3K)
-    import run as k3k_run  # the jev-k3k runner: question(), state(), labels(), load_rows()
+    k3k_run = k3k_runner()  # question(), state(), labels() as committed at K3K_SHA
     from system_one_adapter import AsyncSystemOneAdapterClient
     from system_one_adapter.providers.anthropic import AsyncAnthropicProvider
     from typesafe_sdk import RetryPolicy
 
-    label_map = k3k_run.labels(k3k_run.load_rows())
+    label_map = k3k_run.labels(k3k_jsonl("subset.jsonl"))
     q = k3k_run.question(label_map)
     jobs = [(arm, row, rep) for arm, row in select_rows() for rep in range(REPEATS)]
     print(f"live: {len(jobs)} calls", file=sys.stderr)
