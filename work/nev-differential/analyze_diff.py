@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """DIFF analyzer: offline, no key, no network. Reads committed Jev bench +
-live LLM rows, emits DIFF-RECEIPT.json. Exit 2 on missing/short arms.
+live LLM rows, emits DIFF-RECEIPT.json. Exit 2 on missing/short arms, and exit 2
+with NOT_RUN when the pinned jev-sec-bench clone is absent (it is not committed).
 """
 
 import datetime, json, math, os, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-JEV_SRC = "/Users/josh/Developer/jev/jev-sec-bench/results/injection.json"
+ROOT = os.path.dirname(os.path.dirname(HERE))
+# The bench's own results file lives in the vendored clone at the repo root, not in git.
+JEV_SRC = os.path.join(ROOT, "jev-sec-bench/results/injection.json")
+BENCH_CLONE = (
+    "git clone https://github.com/Gaurav-Gosain/jev-sec-bench jev-sec-bench && "
+    "git -C jev-sec-bench checkout fdb16b9"
+)
 BAR_SHA = "3d65229"
 BAR_A1_SHA = "b5e6e1e"
 ARMS = ["A-xai-grok-4", "B-anthropic-claude-haiku-4-5"]
@@ -50,6 +57,12 @@ def load_rows(arm):
 
 
 def main():
+    if not os.path.isfile(JEV_SRC):
+        print(
+            f"NOT_RUN: Jev source {JEV_SRC} is absent. It lives in the vendored clone, which is not "
+            f"committed here: {BENCH_CLONE}"
+        )
+        return 2
     d = json.load(open(JEV_SRC))
     samples = d["samples"]
     assert len(samples) == 662, f"corpus drift: {len(samples)}"
