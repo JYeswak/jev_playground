@@ -84,6 +84,43 @@ Not measured: options with written descriptions, run-to-run variance (bead `jev-
 this separately), Haiku in discrete mode, other LLMs, and published Banking77 fine-tuned
 state of the art, which trains on the train split.
 
+## Second preregistration: the cap fired (committed before any prompted-mode call)
+
+**What happened under the first bar (`909278f`).** The Jev arm answered 3,080/3,080 with 0 failed
+rows (`rows-full-jev.jsonl`, committed with this section). The scorer was not run on those rows
+before this commit, so Jev's accuracy was not known when this variant was chosen. The Haiku arm
+with native structured outputs was rejected on every request. All 993 requests sent before the
+run was cancelled got the same response, verbatim:
+
+> `TypeSafeBadRequestError: 400 The compiled grammar is too large, which would cause performance
+> issues. Simplify your tool schemas or reduce the number of strict tools.`
+
+(`rows-full-haiku.jsonl`, 993 error rows, kept as the cap's evidence. The run was cancelled because
+the rejection was deterministic.) Under the first bar there is **no single-Choice verdict for the
+structured-output Haiku arm**, as declared.
+
+**Declared deviation from the first bar's fallback.** The first bar named the two-stage
+hierarchical Choice as the fallback. The cap that fired is not an option-count cap: 77 is under the
+vendor's documented 255, and Jev answered every row. It is Anthropic's limit on the compiled
+constrained-decoding grammar for a strict schema with 77 probability properties. A hierarchy would
+change the question for both arms. Turning off native structured output for Haiku alone keeps the
+question identical. This variant is therefore run instead, and hierarchical is not run under this
+bead (see NO-CLAIM).
+
+**The variant.** `work/choice-banking77/run_prompted.py`: same state, same single 77-option
+Choice, same adapter, model and `probabilities` mode, `normalize_probabilities=True`, default
+`RetryPolicy`, 8 concurrent. The only differences are `structured_outputs=False` (the adapter puts
+the output JSON schema in the system prompt and validates the reply) and
+`n_retry_malformed_structure=1` (one corrective retry on malformed output; its tokens are counted).
+Rows: `rows-full-haiku-prompted.jsonl`. A row that is still malformed or failing after that retry
+and one resume pass is scored wrong.
+
+**Bar, unchanged in every other respect.** Jev's rows are the ones committed here, not re-run. The
+pass rule, 3.0 pp margin, McNemar test, 50% feasibility floor, 1% failed-row limit (30), coverage
+thresholds (0.5, 0.7, 0.9) and the declared flat-row sensitivity all apply exactly as in the first
+bar, to Jev vs Haiku-prompted. Score: `python3 work/choice-banking77/score.py --set full-prompted`.
+
 ## Results
 
-Pending: no call has been made at the commit that introduces this section.
+Pending: no prompted-mode Haiku call has been made at the commit that introduces the second
+preregistration.

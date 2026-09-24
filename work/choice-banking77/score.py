@@ -137,8 +137,17 @@ def arm_stats(name, subset, rows):
 
 
 SETS = {
-    "subset": ("subset.jsonl", "rows-{arm}.jsonl"),
-    "full": ("full.jsonl", "rows-full-{arm}.jsonl"),
+    "subset": ("subset.jsonl", {"jev": "rows-jev.jsonl", "haiku": "rows-haiku.jsonl"}),
+    "full": (
+        "full.jsonl",
+        {"jev": "rows-full-jev.jsonl", "haiku": "rows-full-haiku.jsonl"},
+    ),
+    # jev-4jf second preregistration: same Jev rows, Haiku via prompted JSON (run_prompted.py)
+    # because native structured outputs were rejected for the 77-option grammar.
+    "full-prompted": (
+        "full.jsonl",
+        {"jev": "rows-full-jev.jsonl", "haiku": "rows-full-haiku-prompted.jsonl"},
+    ),
 }
 
 
@@ -150,7 +159,7 @@ def is_flat(row):
 
 def main(argv):
     name = argv[argv.index("--set") + 1] if "--set" in argv else "subset"
-    fname, rows_pattern = SETS[name]
+    fname, rows_files = SETS[name]
     subset = load(fname)
     if not subset:
         print(f"no {fname}; run sample.py", file=sys.stderr)
@@ -163,8 +172,8 @@ def main(argv):
     print(f"constant: always-{majority} {const_k}/{n} ({pct(const_k, n)})")
 
     arms = [
-        arm_stats("jev", subset, load(rows_pattern.format(arm="jev"))),
-        arm_stats("haiku", subset, load(rows_pattern.format(arm="haiku"))),
+        arm_stats("jev", subset, load(rows_files["jev"])),
+        arm_stats("haiku", subset, load(rows_files["haiku"])),
     ]
     print()
     print(
