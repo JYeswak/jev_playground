@@ -74,6 +74,11 @@ if (LIVE) {
   asker = {
     async ask(state, questions) {
       const r = await askJevBundle({ state, questions, model: "jev-1.13.0", timeoutMs: 20000 });
+      if (!r.ok && (r.reason === "unconfigured" || r.reason === "sdk-missing")) {
+        // Refuse before compacting anything; a thrown error would read as a crash (jev-6smc).
+        console.log(`live lane: NOT_RUN — ${r.error}`);
+        process.exit(2);
+      }
       if (!r.ok) throw new Error(`live Jev call failed: ${r.reason} ${r.error ?? ""}`);
       return { answers: r.answers };
     },

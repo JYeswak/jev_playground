@@ -163,9 +163,10 @@ for (let i = 0; i < 3; i++) {
     timeoutMs: 20000,
   });
   if (!r.ok) {
-    if (r.reason === 'unconfigured') {
-      console.log('live lane: NOT_RUN — TYPESAFE_API_KEY is not set (see .env.example)');
-      process.exit(0);
+    if (r.reason === 'unconfigured' || r.reason === 'sdk-missing') {
+      // Nothing was measured, so this is not a success: exit 2 (jev-6smc).
+      console.log(`live lane: NOT_RUN — ${r.error}`);
+      process.exit(2);
     }
     console.error(`live call failed: ${r.reason} ${r.error}`);
     process.exit(1);
