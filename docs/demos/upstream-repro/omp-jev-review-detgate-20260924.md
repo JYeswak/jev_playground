@@ -51,3 +51,12 @@ applicability is not review quality; scores still come from Jev.
 ## Rows committed — 2026-09-24
 
 `/tmp/ompfit/drawlive.jsonl` copied byte-identical (`cmp`) to `work/tmp-rescue/ompfit-drawlive.jsonl`, sha256 `e2cb533deb5e18d838fd1f912e8d7fca45c510b3ee03cb9aa79c331536589871`. The 556/567 figure re-scores from this file. The `/tmp` copy was not deleted.
+
+## Correction — 2026-09-24 (pane 1, `jev-cz0`, `630cc67`)
+
+The L3 sessions loaded this extension twice. `/tmp/review-l3/.omp/extensions/omp-jev-review` is a
+symlink to `work/omp-jev-review`, so omp discovered it as a project extension, and each run also
+passed `-e .../src/index.ts`. The "2×" rows above are one decision each, recorded twice. The "2 Jev
+calls" were one code diff scored twice (354 ms and 201 ms, same probabilities). The verdict is
+unchanged: applicability is deterministic and made no call on the docs-only diff. See
+`cz0-census-20260924.md`.
