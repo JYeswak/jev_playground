@@ -56,7 +56,10 @@ COMMUNITY_REPOS=(
 "tamaratran/fast-jev-compaction 6e1da50d064cc06aa08e720b534b4d873e2bb0b6"
 "typesafe-ai/system-one-adapter-python 0bb819b85d67a98c736d7c3004eae95f49f3daa3"
 )
-RIPWIRE_LOCAL="${RIPWIRE_LOCAL:-$HOME/Developer/ripwire}"
+# Opt-in only. The default checkout is upstream/ripwire at its MANIFEST pin, so the manifest row is
+# the same on every machine (jev-27mx: defaulting to $HOME/Developer/ripwire meant a stranger, who
+# has no such checkout, cloned ripwire tip into upstream/ and rewrote the committed row).
+RIPWIRE_LOCAL="${RIPWIRE_LOCAL:-}"
 UA="OpenAI File Downloader, XaiImageApiFetch/1.0"
 
 MIRROR="$ROOT/docs-mirror"
@@ -321,16 +324,34 @@ sync_repos() {
 
   sync_community
 
-  # ripwire: reuse the existing local checkout when present; never clone twice.
+  # ripwire: the default checkout is upstream/ripwire at its manifest pin, cloned like the org repos
+  # above so the row reads the same on every machine; RIPWIRE_LOCAL is an explicit opt-in. Blobless
+  # clone: full commit history (the pin sits hundreds of commits below tip, past any --depth
+  # window) without every blob; checkout fetches only the pinned tree. Never clone twice.
   local rw_path rw_abs
-  if [ -d "$RIPWIRE_LOCAL/.git" ]; then
+  if [ -n "$RIPWIRE_LOCAL" ] && [ -d "$RIPWIRE_LOCAL/.git" ]; then
     rw_abs="$RIPWIRE_LOCAL"; rw_path="$RIPWIRE_LOCAL"
     git -C "$rw_abs" fetch --quiet origin 2>/dev/null || echo "   warn: fetch failed for ripwire (offline?)"
-    echo "   ripwire: using existing checkout at $RIPWIRE_LOCAL"
+    echo "   ripwire: using RIPWIRE_LOCAL checkout at $RIPWIRE_LOCAL (row records that path)"
   else
     rw_abs="$ROOT/upstream/ripwire"; rw_path="upstream/ripwire"
-    [ -d "$rw_abs/.git" ] || { echo "   cloning ripwire"; git clone --quiet --depth 50 "$RIPWIRE_URL" "$rw_abs"; }
-    git -C "$rw_abs" fetch --quiet origin 2>/dev/null || true
+    if [ -d "$rw_abs/.git" ]; then
+      git -C "$rw_abs" fetch --quiet origin 2>/dev/null || echo "   warn: fetch failed for ripwire (offline?)"
+    else
+      echo "   cloning ripwire"
+      git clone --quiet --filter=blob:none --no-checkout "$RIPWIRE_URL" "$rw_abs" \
+        || { echo "FAIL  clone ripwire" >&2; return 1; }
+      # A clone writes no FETCH_HEAD; without one record_repo would state upstream = pin, 0 behind.
+      git -C "$rw_abs" fetch --quiet origin 2>/dev/null || true
+      local rw_pin; rw_pin="$(manifest_pin "$rw_path")"
+      if [ -n "$rw_pin" ]; then
+        git -C "$rw_abs" checkout --quiet --detach "$rw_pin" \
+          || { echo "FAIL  ripwire: manifest pin $rw_pin is not in upstream history" >&2; return 1; }
+        echo "   ripwire: fresh clone checked out at manifest pin $rw_pin"
+      else
+        git -C "$rw_abs" checkout --quiet --detach origin/HEAD
+      fi
+    fi
   fi
   record_repo ripwire "$rw_path"   # provenance is not optional for the checkout we actually read
 
