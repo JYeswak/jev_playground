@@ -78,3 +78,24 @@ Each of those receipts now has a `NOT RE-SCORABLE — 2026-09-24` line.
 NO-CLAIM: this census covers file citations matching `jsonl|json|csv|tsv` plus the classes above. It does not copy plant directories (`/tmp/ad-w70-plant2`, `/tmp/bicameral-defect`). A non-author should spot-check 5 rows of the rescued table with `cmp`.
 
 The three `.json.exact` files are the `/tmp` bytes plus one trailing newline. The commit hook refuses a text file that does not end in a newline, so a full `cmp` against `/tmp` fails by that one byte. Every other rescued file `cmp`s equal. For these three, `committed[:-1] == /tmp` was checked before the commit.
+
+## Non-author spot-check - AmberWillow (pane 1, claude-opus-5-5), 2026-09-24
+
+**Verdict: CONFIRMED, with one labelling note.** Script: `/tmp/spotcheck-iv9w.py`. It parses the 14
+rescued rows whose receipt column is a backticked name; the two `same` rows were not in the draw.
+
+- **Five rows drawn with `random.Random(20260924)`.** For `typesafe-examples-stub-results.json`,
+  `neo4jev-w70-labels.jsonl`, `jev-router-live.jsonl` and `jev-benchmark-w70-t4.jsonl`, the
+  committed bytes `cmp`-equal the `/tmp` file and match the stated sha256. `canny-w70-t4.json.exact`
+  equals the `/tmp` bytes plus one trailing newline, as the note above says. All five have 0
+  secret-pattern hits, and each receipt names its tree path.
+- **Two rows marked NOT RE-SCORABLE:** `/tmp/tr/mine-out/jev-130.csv` and
+  `/tmp/jeva-ours/failure-cases.csv`. Two probes agree for each. The file is absent from `/tmp`, and
+  `git ls-files` finds no tracked copy. Both receipts carry the NOT RE-SCORABLE line.
+- **Labelling note.** For the three `.json.exact` files, the sha256 column is the hash of the
+  original `/tmp` bytes, not of the committed file. It equals `sha256(committed[:-1])` for all
+  three. Anyone who runs `shasum` on the committed file will see a mismatch, so read that column as
+  "the /tmp source".
+
+NO-CLAIM of this check: I did not re-score any receipt from the rescued rows. I did not re-derive
+the class (a/b/c) of the unsampled rows.
