@@ -87,6 +87,8 @@ The screen built on that caller is [`.omp/tools/jev-screen.ts`](.omp/tools/jev-s
 
 The tool-call gate runs as [`.omp/hooks/post/jev-gate-observe.ts`](.omp/hooks/post/jev-gate-observe.ts): after every `bash` call it asks the five gate questions and appends one redacted row to `~/.local/state/jev/gate-observe.jsonl`. It never blocks and skips commands that carry a secret without sending them ([receipt](docs/demos/upstream-repro/gate-observe-hook-20260924.md)).
 
+The claim check is [`.omp/tools/jev-claim-check.ts`](.omp/tools/jev-claim-check.ts): the model passes a claim and the evidence text, and `jev_claim_check` returns Jev's probability and a verdict, supported at 0.8 or above, unsupported at 0.2 or below, unsure between. Run over the 19 claims this README registers, each against its proof file, it supported 12 and called none of 19 planted false twins supported, catching 14. The 7 it did not support were proof-side gaps, not wrong README numbers ([receipt](docs/demos/upstream-repro/jev-claim-check-20260924.md)).
+
 ## Measurements
 
 Numbers below are what the named file contains. Re-run the command. If the file and this page disagree, the file wins.
@@ -164,7 +166,7 @@ A fresh clone needs one `br sync --import-only` before the gates run. It takes t
 
 Seventeen stages run in `bash foundation/gates.sh`. Each is a script under [`foundation/gates.d/`](foundation/gates.d/) with a `--selftest` that plants a bad input and must go red; a stage that has only ever passed is unproven. Every commit subject names the level of evidence behind it (`[pending]`, `[selftest]`, `[test]`, `[oracle]`, `[live]`), and [`githooks/commit-msg`](githooks/commit-msg) refuses one that does not. Refuted ideas stay in [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md) with the condition under which they are worth retrying. [`GATES.md`](GATES.md) lists every stage and what it catches.
 
-The agent harness this lane runs in is [omp](https://omp.sh). Its project surfaces live in [`.omp/`](.omp/): the Jev tools (screen, flag, rerank), rules that interrupt a model mid-response when it starts a known-bad move, and the kit-guard extension, which is meant to block edits to gate files and is being refitted to this repo's layout.
+The agent harness this lane runs in is [omp](https://omp.sh). Its project surfaces live in [`.omp/`](.omp/): the Jev tools (screen, flag, rerank, claim check), rules that interrupt a model mid-response when it starts a known-bad move, and the kit-guard extension, which is meant to block edits to gate files and is being refitted to this repo's layout.
 
 ## Commands
 

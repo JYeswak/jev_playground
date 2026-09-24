@@ -84,3 +84,79 @@ suite with `CLAIM_CHECK_TOOL=<mutant>`. Every mutant turns at least one test red
 | failure paths return verdict `unsupported` | keyless; asker failure and thrower |
 | empty-input check removed | empty claim or evidence is refused |
 | confidence = p | confidence is max(p, 1-p) |
+
+## L2 (loaded)
+
+`omp --profile=muse --mode=rpc` `get_state` from the repo root, 2026-09-24: `xd://jev_claim_check` and
+`xd://jev_claim_check_ext_probe` both present in `systemPrompt`. Listed, not working; L3 below is the
+working proof.
+
+## Results
+
+Bar committed at `ae01091` before any call. Dogfood run 2026-09-24T02:43Z, 38/38 answered on the first
+pass, 0 `not_run`, 0 `refused`. Rows: `work/jev-claim-check/rows.jsonl`. Re-score with no key:
+`python3 work/jev-claim-check/score.py` (exit 0 = PASS). `build.py --check` reproduces `cases.jsonl`
+from README.md and claims.tsv as they stood at `ae01091`; later README edits change the build input,
+never the committed labels.
+
+| Set | supported | unsure | unsupported |
+|---|---:|---:|---:|
+| 19 true README claims | 12 | 5 | 2 |
+| 19 planted false claims | 0 | 5 | 14 |
+
+| Metric | Tool | always `supported` | always `unsupported` | Bar | Met |
+|---|---:|---:|---:|---|---|
+| (a) planted called `supported` | **0/19** | 19/19 | 0/19 | <= 1 | yes |
+| (b) catch-rate | **14/19** | 0/19 | 19/19 | >= 14 | yes, at the floor |
+| (c) supported-rate | **12/19** | 19/19 | 0/19 | >= 12 | yes, at the floor |
+| (d) AUC of p | **0.953** | 0.5 | 0.5 | >= 0.80 | yes |
+
+**PASS** (`[live]`, N=38, `jev-1.13.0`). Catch by plant kind: number changed 7/9, verdict flipped 7/10;
+the other 5 plants landed `unsure` (p 0.23–0.68), none `supported`. Two of the four criteria passed at
+exactly their floor, so the margin is zero on both; one more `unsure` in either set would have failed
+the bar.
+
+**Every true claim the tool did not support, read** (descriptive; labels and bar unchanged):
+
+| Claim | p | Verdict | What the evidence holds | Class |
+|---|---:|---|---|---|
+| `inj-fresh-haiku` | 0.19 | unsupported | 579 and 584 are in `jev-sec-bench-w70-20260923.md`; **grok-4's 558 is not** | registry: proof file holds part of the sentence |
+| `calibration-2026-09-22` | 0.19 | unsupported | ECE and Brier are in the window; `rows: 80` sits in the file header and choice appears as `choice_accuracy: 0.95`, outside the tail window | evidence-window miss (README is right: 80 rows, 0.95 = 19/20) |
+| `official-sdk` | 0.37 | unsure | TypeScript client source; shows `retry`, `timeout`, `new TypeSafeClient` | code proof, stated risk before the run |
+| `inj-fresh-discordants` | 0.69 | unsure | 61/5 and p = 2.6e-13 present; **65 and "the reverse on 5" are not** | registry: proof file holds part of the sentence |
+| `agent-attribution` | 0.67 | unsure | 28/35 vs 23/35 present; "too few rows to call" is our reading, not stated | tool: interpretive clause not in evidence |
+| `real-corpus-bar` | 0.74 | unsure | `always-BAD 6,181 (78.8%)` in a table row; "real command traffic" not said in the window | tool: context not stated in window |
+| `tool-routing-refused` | 0.27 | unsure | 192 and 252 present in the JSON; "exits 3" is not | registry: proof file holds part of the sentence |
+
+**No README error found.** Every non-supported true claim traces to the proof side, not to a wrong
+README number. The finding the tool did surface is about `foundation/kit/claims.tsv`: for three rows
+(`inj-fresh-haiku`, `inj-fresh-discordants`, `tool-routing-refused`) the registered proof file holds
+the registered substring but not the whole README sentence. Stage 15 checks the substring, so it cannot
+see this; `jev_claim_check` can. The missing numbers (grok-4 558, Haiku-wrong 65, `exits 3`) exist in
+other receipts; this run did not check which.
+
+**L3** (`[live]`, `wired-and-proven-to-trip`), fresh `omp --profile=muse --mode=rpc --max-time=420`
+from the repo root, key from Infisical, 2026-09-24, driven by `work/jev-claim-check/l3-drive.mjs`. The
+model (`claude-opus-5-5`) read the receipt and called the tool through the `xd://jev_claim_check` write
+bridge twice, evidence = the file's full text (2,054 characters, the tool trims the trailing newline).
+Both `tool_execution_end` frames, evidence elided here and verbatim in `work/jev-claim-check/l3-frames.jsonl`
+lines 237 and 390:
+
+```json
+{"type":"tool_execution_end","toolCallId":"toolu_01LC8xwbirsUEgzZXdwjTcav","toolName":"write","result":{"content":[{"type":"text","text":"calledModel=true verdict=supported p=0.910 confidence=0.910 cuts=0.8/0.2 model=jev-1.13.0"}],"details":{"xdev":{"tool":"jev_claim_check","mode":"execute","args":{"claim":"Its own suite passes 189 tests and still exits 1 on unhandled aborts.","evidence":"<2054 chars>"},"tier":"exec","inner":{"verdict":"supported","reason":null,"calledModel":true,"probability":0.91,"confidence":0.91,"latencyMs":184,"usage":{"input_tokens":1105,"output_tokens":20}}}}},"isError":false}
+{"type":"tool_execution_end","toolCallId":"toolu_01Bo8R5pdBpnQppHPydpexNU","toolName":"write","result":{"content":[{"type":"text","text":"calledModel=true verdict=unsupported p=0.050 confidence=0.950 cuts=0.8/0.2 model=jev-1.13.0"}],"details":{"xdev":{"tool":"jev_claim_check","mode":"execute","args":{"claim":"Its own suite passes 189 tests and exits 0 with no unhandled aborts.","evidence":"<2054 chars>"},"tier":"exec","inner":{"verdict":"unsupported","reason":null,"calledModel":true,"probability":0.05,"confidence":0.95,"latencyMs":162,"usage":{"input_tokens":1105,"output_tokens":20}}}}},"isError":false}
+```
+
+Opposite verdicts, as the bar requires: **L3 BAR MET.** Negative direction also covered: the keyless
+path returns `not_run` (L0, real asker, key deleted).
+
+**Spend.** 40 Jev calls: 38 dogfood (74,352 input / 760 output tokens reported by the API, p50 130 ms,
+p95 271 ms) and 2 in L3 (2,210 / 40). The L3 session's own model reported $1.62 across its turns
+(647,218 input tokens including cache reads, 3,003 output), almost all of it the session's system
+prompt read from cache. Jev's billed units were not read and are not stated.
+
+**Boundary.** One run, one wording (renamed from SciFact's and not re-measured there), one Jev version,
+19 claims, plants written by the scorer's author. The pass sits at the floor on two criteria. L3 is one
+scratch session, not a working one (L4 not claimed). The tool is advisory and wired into nothing that
+blocks. Awaiting a non-author re-score from the committed rows before the bead closes. Scratch left in
+place: `/tmp/claimcheck-mut/` (five mutants).
