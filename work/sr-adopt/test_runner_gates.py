@@ -214,7 +214,11 @@ class RunnerGateTest(unittest.TestCase):
                 mod.__file__ = str(src)
                 exec(compile(removed, str(src), "exec"), mod.__dict__)
                 if src.name == "run.py" and "rerank-scifact" in str(src):
+                    # rows-jev.jsonl holds all 6000 pairs since cf70e28, so the real pairs and
+                    # answered() leave nothing to do and the gateless copy returned 0 unbuilt.
                     mod.load_text = lambda: ({}, {})
+                    mod.pairs = lambda: [("q", "d")]
+                    mod.answered = lambda _arm: set()
                 if src.name == "run-jev.py":
                     corpus = {
                         "samples": [{"text": "x", "label": 0} for _ in range(662)]
