@@ -120,3 +120,20 @@ hook, gate or close-time check is built on it.**
 **Boundary.** One run, one wording, one Jev version, 34 closes by this lane's own agents on two days.
 One of them, `jev-sp5`, closes my own previous unit. The plants are mechanical one-digit changes.
 The diagnostic is post hoc and n = 4. Awaiting a non-author re-score from the committed rows.
+
+## Non-author verification — VerifySST5
+
+VerifySST5 (background agent of pane 1; not the author), 2026-09-24, keyless, from a fresh
+`git clone --local` at `5839235` into a temp dir. No live call made; spend $0.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `env -u TYPESAFE_API_KEY python3 work/jev-claim-check/score-close.py` in the clone | HOLDS. Exit 1 (`FAIL`). Scored 34 real, 31 planted, 31 pairs, 65/65 answered. (a) 4/31 planted `supported`, (b) catch 0/31, (c) AUC 0.598, (d) paired 20/31; real supported 8/34; `without evidence (not sent) 2: jev-pkd:real jev-pkd:planted`. Split by whether the original number sits in the evidence: 0/25 caught (3 `supported`) and 0/6 caught (1 `supported`), which matches 25 + 7 of 32 plants once jev-pkd's plant is removed. |
+| 2 | Bar before data | HOLDS. `a10c0a3` was committed 2026-09-23 20:57:52 −0600 (02:57:52Z). The 65 rows in `close-rows.jsonl` carry `at` from 02:57:59.511Z to 02:58:08.616Z, all after it. `a10c0a3` adds the receipt through line 57, `check-close.mjs`, `score-close.py` and `close-cases.jsonl` (sha256 `dfb00d97…9e55`, matches). From `a10c0a3` to `66964d7` the receipt diff only adds text after line 57 (no line removed or changed), and those three files are byte-unchanged to HEAD. The receipt and rows are unchanged after `66964d7`. |
+| 3 | The 4 plants called `supported` each change a number the evidence states | HOLDS, 4/4. Real and planted cases share identical evidence, and each claim differs in exactly one token. `jev-k9z.1`: `75/219` → `35/219`; the evidence states `75/219` 3 times (`Jev top-1 \| 75/219 = 0.3425`, "Jev 75/219 does not clear lexical 71/219"). `jev-deep-kit-8q7.7`: `0.6846` → `0.2846`; stated once, the single-verdict row of the table. `jev-hwa`: `189/189+8` → `689/189+8`; `189/189` stated 4 times ("189/189 passing beside 8 unhandled rejections"). `jev-deep-kit-8q7.6`: `442/567` → `942/567`; the literal `442/567` is absent (as the receipt says), but the evidence states both parts: "substantial, live gate \| 567: **442 refused, 125 scored**", and the e7580ef message "442 substantial refusals". So the plant contradicts a stated number. In none of the four does the planted number appear in the evidence. |
+| 4 | jev-pkd's exclusion follows the preregistered rule | HOLDS. The rule, committed at `a10c0a3` (`check-close.mjs:12-24`, unchanged since): evidence is git-tracked text files (by path, or by base name when exactly one tracked file has it) and resolvable 7–40-hex commits; "A reason that resolves no part has no evidence and is not sent (counted, never scored)." jev-pkd's reason has one path-like token, `uds/crates/uds/src/main.rs`: it is not tracked, and no tracked file at `a10c0a3` is named `main.rs` (0). It has no hex token. Its case records `refs: []` and 0 evidence characters for both twins. The bar text at `a10c0a3` already named this exclusion before any call, and the scorer reports it rather than dropping it silently. |
+
+Verdict: the FAIL reproduces from committed files under an unedited bar, and the four approved plants
+are real errors the evidence contradicts. Re-score: `python3 work/jev-claim-check/score-close.py`
+(exit 1). NO-CLAIM: this re-scores committed rows. I did not re-run the model or the 8-call post-hoc
+diagnostic, and I did not re-check the 26 `unsure` real reasons against their evidence.
