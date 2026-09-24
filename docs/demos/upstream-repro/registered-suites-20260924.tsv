@@ -1,0 +1,88 @@
+path	rc	count	seconds	prerequisite	status
+.omp/extensions/kit-guard/kit-guard.test.ts			0.03	npm ci --prefix work/sdk	SKIP
+.omp/hooks/post/jev-gate-observe.test.mjs	0	19	0.22		PASS
+.omp/hooks/post/session-stop.test.mjs	0	11	0.17		PASS
+compaction/test/ab-verdict.test.ts			0.03	./scripts/bootstrap-compaction.sh	SKIP
+compaction/test/adapter.test.ts			0.03	./scripts/bootstrap-compaction.sh	SKIP
+compaction/test/hindsight.test.ts			0.03	./scripts/bootstrap-compaction.sh	SKIP
+compaction/test/hook-compact.test.ts			0.03	./scripts/bootstrap-compaction.sh	SKIP
+compaction/test/omp-binding.test.ts			0.03	./scripts/bootstrap-compaction.sh	SKIP
+demos/doc-drift/test/judge.test.mjs			0.00	npm ci in demos/preaction-abstention	SKIP
+demos/preaction-abstention/test/gate.test.mjs			0.00	npm ci in demos/preaction-abstention	SKIP
+demos/retransmit-whatif/test/whatif.test.mjs			0.00	npm ci in demos/retransmit-whatif	SKIP
+demos/routing-backtest/src/counterfactual.test.mjs			0.00	npm ci in demos/routing-backtest	SKIP
+demos/routing-backtest/test/adapt-claude.test.mjs			0.00	npm ci in demos/routing-backtest	SKIP
+demos/routing-backtest/test/hostile-input.test.mjs			0.00	npm ci in demos/routing-backtest	SKIP
+demos/routing-backtest/test/reader.test.mjs			0.00	npm ci in demos/routing-backtest	SKIP
+demos/test/live-refusal.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+demos/test/live-state.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+demos/usage-shape/test/shape-bin.test.mjs			0.00	npm ci in demos/usage-shape	SKIP
+ensemble/test_decorrelation.py	0	5	0.04		PASS
+probes/fast-jev-probe.mts			0.00	vendored clone fast-jev-compaction (not in a fresh clone)	SKIP
+work/bicameral-gate/test_redirect_readers.py	0	4	0.05		PASS
+work/dogfood-logger/test/logger.test.mjs	0	4	0.16		PASS
+work/jev-billing-units/measure.test.mjs	0	3	0.19		PASS
+work/jev-claim-check/claim-check.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/jev-claim-check/cli-guard.test.mjs	0	6	0.69		PASS
+work/jev-claim-check/numeric-choice.test.mjs	0	5	0.19		PASS
+work/jev-claim-check/numeric-v2.test.mjs	0	7	0.19		PASS
+work/jev-client/test/client.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/jev-client/test/measure-kit.test.mjs	0	4	0.17		PASS
+work/jev-client/test/timeout-leak.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/jev-client/test/uncertain.test.mjs	0	4	0.17		PASS
+work/jev-dcg-override/override.test.mjs	0	3	0.14		PASS
+work/jev-eval-honesty/co-presence.test.mjs	0	23	0.26		PASS
+work/jev-eval-honesty/judge-run.test.mjs	0	23	0.26		PASS
+work/jev-eval-honesty/outcome-join.test.mjs	0	23	0.26		PASS
+work/jev-eval-honesty/random-judge.test.mjs	0	23	0.25		PASS
+work/jev-exec-data/exec-data.test.mjs	0	11	0.14		PASS
+work/jev-persona-eval/adopt.test.mjs	0	3	0.14		PASS
+work/jev-prevalence-first/prevalence-check.test.mjs	0	10	0.50		PASS
+work/jev-question-writing/trial-labels.test.mjs	0	7	0.17		PASS
+work/jev-real-corpus-eval/test/score.test.mjs	0	10	0.23		PASS
+work/jev-retransmit-killer/adopt-gate.test.mjs	0	5	0.45		PASS
+work/jev-score-register/register.test.mjs	0	15	0.20		PASS
+work/jev-triage/advisory-veto.test.mjs	0	6	0.24		PASS
+work/jev-triage/baseline.test.mjs	0	14	0.14		PASS
+work/nev-injection/seat-guard.test.mjs	0	9	0.17		PASS
+work/nev-rerank/test/live.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/nev-rerank/test/rank.test.mjs	0	7	0.11		PASS
+work/omp-guard-rule/guard-rule.test.mjs	0	5	0.16		PASS
+work/omp-harm-rule/harm-error.test.mjs	0	2	0.15		PASS
+work/omp-harm-rule/harm-exec-data.test.mjs	0	3	0.16		PASS
+work/omp-jev-commit/test/commit.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-default/test/default.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-failure/test/failure.test.mjs	0	5	0.17		PASS
+work/omp-jev-field/test/field.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-firstlook/test/firstlook.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-foreman/test/foreman.test.mjs	0	4	0.17		PASS
+work/omp-jev-fork/test/fork.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-heat/test/heat.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-heckle/test/heckle.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-jargon/test/jargon.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-observer/test/emits-rows.test.mjs	0	5	0.17		PASS
+work/omp-jev-observer/test/observer.test.mjs	0	8	0.17		PASS
+work/omp-jev-observer/test/screen-log.test.mjs	0	4	0.14		PASS
+work/omp-jev-preaction/test/preaction.test.mjs	0	6	0.16		PASS
+work/omp-jev-promise/test/promise.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-rerank/test/rerank.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-review/behaviour-label.test.mjs	0	6	1.03		PASS
+work/omp-jev-review/test/review.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-route/shadow-32.test.mjs	0	5	0.13		PASS
+work/omp-jev-route/test/gate.test.mjs	0	5	0.14		PASS
+work/omp-jev-route/test/process.test.mjs	0	14	0.14		PASS
+work/omp-jev-route/test/route.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-route/turns-32.test.mjs	0	3	0.17		PASS
+work/omp-jev-skip/test/skip.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-uncanny/test/uncanny.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/omp-jev-undo/test/undo.test.mjs			0.00	npm ci --prefix work/sdk	SKIP
+work/openrouter-incumbents/test_run.py			0.00	npm ci --prefix work/sdk	SKIP
+work/openrouter/test_provider.py			0.00	npm ci --prefix work/sdk	SKIP
+work/skillranker-eval/test/contract.test.mjs	0	12	0.15		PASS
+work/sr-adopt/test_matrix_status.py	0	6	0.18		PASS
+work/sr-adopt/test_phase_gate.py	0	2	0.05		PASS
+work/sr-adopt/test_prereg.py			0.00	npm ci --prefix work/sdk	SKIP
+work/sr-adopt/test_runner_gates.py			0.00	npm ci --prefix work/sdk	SKIP
+work/taste-loop/test/detect.test.mjs	0	9	0.14		PASS
+work/toolcall-judge-v3/rules-v4.test.mjs	0	14	0.14		PASS
+work/two-bit/test/two-bit.test.mjs	0	5	0.31		PASS
