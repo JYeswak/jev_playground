@@ -46,7 +46,7 @@ import { appendFileSync, existsSync, readFileSync, realpathSync, writeFileSync }
 import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
 import { askJev } from "../jev-client/src/index.ts";
-import { classify } from "../../.omp/tools/jev-claim-check.ts";
+import { classify, numberTokens as numberTokensV2 } from "../../.omp/tools/jev-claim-check.ts";
 import { references } from "./check-close.mjs";
 import { QUESTION, clauseAt, mulberry32 } from "./numeric.mjs";
 
@@ -67,31 +67,9 @@ export const STOPWORDS = new Set(("with from that this than into were have been 
 
 const lines = (url) => readFileSync(url, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
 
-const NUM = String.raw`\d[\d,.]*(?:[eE][-+]?\d+)?`;
-const CHUNK = new RegExp(String.raw`(?<![A-Za-z0-9_.])(?<![A-Za-z]-)${NUM}(?:-${NUM})?(?:\/${NUM})*%?`, "g");
-const THOUSANDS = /^\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:[eE][-+]?\d+)?%?$/;
-
-export function numberTokensV2(blanked) {
-  const out = [];
-  for (const m of blanked.matchAll(CHUNK)) {
-    const text = m[0].replace(/[.,]+$/, "");
-    const at = m.index;
-    const after = blanked[at + text.length] ?? "";
-    if (/[A-Za-z0-9_]/.test(after)) continue;
-    if (/^\d+\.\d+\.\d+/.test(text) && !text.includes("/")) continue;
-    const parts = text.split(/\/|-(?=\d)/);
-    if (parts.every((p) => !p.includes(",") || THOUSANDS.test(p))) {
-      out.push({ text, at });
-      continue;
-    }
-    let offset = 0;
-    for (const piece of text.split(",")) {
-      if (/\d/.test(piece)) out.push({ text: piece, at: at + offset });
-      offset += piece.length + 1;
-    }
-  }
-  return out.filter((t) => !/\d{8,}/.test(t.text));
-}
+// numberTokensV2 lives in the tool (bead jev-5cz) so the tool's numeric-scope refusal and this
+// runner share one tokenizer; the code moved unchanged.
+export { numberTokensV2 };
 
 function contentWords(text) {
   return [...new Set((text.toLowerCase().match(/[a-z][a-z_-]{3,}/g) ?? []).filter((w) => !STOPWORDS.has(w)))];

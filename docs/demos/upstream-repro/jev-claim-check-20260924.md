@@ -198,3 +198,58 @@ runs at `ae01091`.
 Verdict: PASS reproduces from committed files under an unedited bar. The mutation arm and L3 hold as
 written. Scratch left in place: `/tmp/k9z5-verify-dsu`, `/tmp/k9z5-verify-sp5-ae`,
 `/tmp/k9z5-verify-sp5-mut/`.
+
+## Numeric scope: the tool now refuses numeric claims (bead `jev-5cz`, 2026-09-24)
+
+Three designs for checking a number against its evidence failed their preregistered bars. That
+record is `NEGATIVE_EVIDENCE.md` R83:
+- jev-10t: a sentence-level Noul caught 0/31 changed numbers.
+- jev-2mp / jev-h8s: an exact-value Noul, per number, confirmed plants whose value sits in the
+  evidence in another role.
+- jev-25r: a masked-value Choice confirmed 20/30 and 35/69 true numbers, below its bars.
+
+So `jev_claim_check` now puts that limit in the tool. A claim containing any number is refused before
+any call: verdict `refused`, reason `numeric-out-of-scope`, `calledModel=false`, text `numeric claims
+are out of scope (R83: 3 designs failed)`, plus the numbers it found. The tool's description says so,
+so a calling model sees it before calling. "Contains a number" is the jev-h8s exact tokenizer, now in
+the tool as `numberTokens()` and imported from there by `numeric-v2.mjs`; the move is unchanged,
+and both case-file shas rebuild identically. Dates, times, versions (`1.13.0`) and names (`SST-5`)
+do not count. Qualitative claims behave exactly as before.
+
+**What this changes in the table above.** The dogfood above scored numeric README claims, and it
+stands as a record of that run. 18 of those 19 claims contain a number and would now be refused
+rather than answered. Re-running `run.mjs` today reproduces the refusals, not the rows. The same
+holds for `l3-drive.mjs`, whose true claim contains `189`, and for `check-close.mjs`: nearly every
+close reason contains a number. Their committed rows and frames record the tool as it was then.
+
+- **L0** (`[test]`): `node --test work/jev-claim-check/claim-check.test.mjs` passes 10/10. New in
+  this bead:
+  - The 18 numeric README claims of this receipt, plus `75/219`, `2.6e-13` and `96.0%`, refuse and
+    never reach the asker.
+  - 19 qualitative README sentences plus `official-sdk` reach the asker and get a verdict. They are
+    the first 19 README prose sentences of at least 6 words with no number, excluding tables,
+    headings and code.
+  - Versions, names and dates are not numbers.
+  - The description names the limit.
+  The earlier fixtures that used a numeric claim now use a qualitative one.
+- **Mutation** (`[mutation]`): the refusal line was removed from `.omp/tools/jev-claim-check.ts`
+  in place (sha256 `a43934e2…ddf81` -> `bb319564…78e9f8c`). Test 8 went red (9/10, exit 1). The file
+  was restored from a copy (sha256 `a43934e2…ddf81`, byte-identical), and the suite is back to
+  10/10.
+- **L3** (`[live]`): a fresh `omp --mode=rpc --max-time=420` session from the repo root with **no
+  `--profile` flag** (session model `grok-4.7`), key from Infisical, driven by
+  `work/jev-claim-check/l3-scope-drive.mjs`. The model read `typesafe-sdk-js-w70-20260923.md` and
+  called the tool twice with its full text (2,055 characters) as evidence. Frames are in
+  `work/jev-claim-check/l3-scope-frames.jsonl` at lines 139 and 143, evidence elided here:
+
+```json
+{"type":"tool_execution_end","toolName":"write","result":{"content":[{"type":"text","text":"calledModel=false verdict=refused reason=numeric-out-of-scope\nREFUSED: no verdict. numeric claims are out of scope (R83: 3 designs failed). Numbers in the claim: 189, 1. Compare each against its source directly."}],"details":{"xdev":{"tool":"jev_claim_check","args":{"claim":"Its own suite passes 189 tests and still exits 1 on unhandled aborts.","evidence":"<2055 chars>"},"inner":{"verdict":"refused","reason":"numeric-out-of-scope","calledModel":false,"probability":null}}}},"isError":false}
+{"type":"tool_execution_end","toolName":"write","result":{"content":[{"type":"text","text":"calledModel=true verdict=supported p=0.860 confidence=0.860 cuts=0.8/0.2 model=jev-1.13.0"}],"details":{"xdev":{"tool":"jev_claim_check","args":{"claim":"The clone was left untouched, and every probe and defect lived in /tmp.","evidence":"<2055 chars>"},"inner":{"verdict":"supported","reason":null,"calledModel":true,"probability":0.86,"latencyMs":171}}}},"isError":false}
+```
+
+  Numeric claim refused, qualitative claim answered: **L3 BAR MET**. Spend: 1 Jev call (1,100 input /
+  20 output tokens); the session model reported $0.19.
+
+**NO-CLAIM.** The refusal is a scope rule, not a measurement. It over-refuses qualitative sentences
+that happen to mention a number ("Seventeen stages", spelled out, pass; "17 stages" refuses).
+`.omp/config.yml` was not touched.

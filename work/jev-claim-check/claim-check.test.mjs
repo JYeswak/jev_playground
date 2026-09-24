@@ -9,6 +9,9 @@
  * - asker failure / thrower: not_run, never one of the three verdicts.
  * - malformed answer (string, NaN, null, missing, 1.2, -0.1): refused, probability null.
  * - empty claim or evidence: refused before the asker is called.
+ * - numeric scope (bead jev-5cz): any claim with a number refuses with numeric-out-of-scope and
+ *   never reaches the asker (75/219, 2.6e-13, 96.0%, and the 18 numeric README claims of jev-sp5);
+ *   19 qualitative README sentences still reach the asker and get a verdict.
  * CLAIM_CHECK_TOOL=<path> points the suite at a mutated copy (mutation arm in the receipt).
  *
  * NO-CLAIM: green here proves policy and the fail-safe direction, not that any verdict is
@@ -25,8 +28,8 @@ const mod = await import(target);
 const factory = typeof mod.default === "function" ? mod.default : mod.default.default;
 const pi = { zod: { object: (s) => s, string: () => ({ min: () => ({}) }) } };
 const THREE = new Set(["supported", "unsupported", "unsure"]);
-const CLAIM = "a keyword rule scored 58/60 against live Jev's 52/60";
-const EVIDENCE = "Keyword rule: 58/60. Jev live: 52/60.";
+const CLAIM = "A cheap keyword rule beat the live judge on tool-call risk triage.";
+const EVIDENCE = "Tool-call risk triage: the keyword rule scored higher than live Jev.";
 const fixed = (probability) => factory(pi, async () => ({ ok: true, probability, latencyMs: 140 }));
 
 test("cuts are inclusive at 0.8 and 0.2, unsure strictly between", async () => {
@@ -101,4 +104,45 @@ test("empty claim or evidence is refused without calling the asker", async () =>
     assert.equal(r.details.reason, "empty-input");
     assert.equal(r.details.calledModel, false);
   }
+});
+
+const { readFileSync } = await import("node:fs");
+const neverAsk = async () => { throw new Error("the asker must not be called for a numeric claim"); };
+
+test("numeric claims refuse as out of scope and never reach the asker", async () => {
+  const readmeNumeric = readFileSync(new URL("./cases.jsonl", import.meta.url), "utf8").trim().split("\n")
+    .map((l) => JSON.parse(l)).filter((c) => c.truth && c.label !== "official-sdk").map((c) => c.claim);
+  assert.equal(readmeNumeric.length, 18);
+  const tool = factory(pi, neverAsk);
+  for (const claim of ["Live 75/219 top-1", "McNemar p = 2.6e-13", "Coverage reached 96.0% on main.", ...readmeNumeric]) {
+    const r = await tool.execute("n", { claim, evidence: EVIDENCE });
+    assert.equal(r.details.verdict, "refused", claim);
+    assert.equal(r.details.reason, "numeric-out-of-scope", claim);
+    assert.equal(r.details.calledModel, false);
+    assert.equal(r.details.probability, null);
+    assert.match(r.content[0].text, /numeric claims are out of scope \(R83: 3 designs failed\)/);
+    assert.doesNotMatch(r.content[0].text, /verdict=(supported|unsupported|unsure)/);
+  }
+});
+
+test("versions, names and dates are not numbers; qualitative README sentences still get verdicts", async () => {
+  assert.deepEqual(mod.claimNumbers("Pinned jev-1.13.0 on SST-5 top-1, run 2026-09-24T02:57Z."), []);
+  const sentences = readFileSync(new URL("../../README.md", import.meta.url), "utf8").split("\n")
+    .filter((l) => l.trim() && !/^\s*(\||#|```|<|!\[)/.test(l))
+    .flatMap((l) => l.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[*`]/g, "").split(/(?<=[.!?])\s+/))
+    .map((s) => s.replace(/^\s*(?:[-*]|\d+\.)\s+/, "").trim())
+    .filter((s) => s.split(/\s+/).length >= 6 && mod.claimNumbers(s).length === 0)
+    .slice(0, 19);
+  assert.equal(sentences.length, 19);
+  let asked = 0;
+  const tool = factory(pi, async () => { asked += 1; return { ok: true, probability: 0.9, latencyMs: 1 }; });
+  for (const claim of [...sentences, "Call the official SDK. work/jev-client owns retry, timeout, and the refusal of a bad body."]) {
+    const r = await tool.execute("q", { claim, evidence: EVIDENCE });
+    assert.equal(r.details.verdict, "supported", claim);
+  }
+  assert.equal(asked, 20);
+});
+
+test("the description tells a calling model the numeric limit before it calls", () => {
+  assert.match(factory(pi).description, /OUT OF SCOPE: a claim containing any number/);
 });
