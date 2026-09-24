@@ -34,6 +34,17 @@ Not committed. `git -C ~/Developer/uds diff --stat -- crates/uds/src/main.rs` is
 
 NOT_RUN. The packet says run the probe through RCH only after pane 1 reports the workers repaired. That report has not arrived. Before/after `stat` of `/dev/null` is therefore not measured.
 
-## Draft upstream note — do not file
+## Draft upstream note — WITHDRAWN, not filed (jeff-issue-chain Phase −1, 2026-09-24T01:50Z)
+
+Dedup probe: `gh issue view 111157 -R rust-lang/rust` → CLOSED 2024-06-04 by triage (Enselic):
+"close as works as designed/wont fix". bjorn3's reason on the thread: rustc writes temporaries into
+the output directory so the final rename is atomic on the same filesystem. Replacing `/dev/null`
+when the output directory is `/dev` and the process is root follows from that same design, so it is
+the documented contract, not a new defect. Four follow-up searches (`"/dev/null" rename regular
+file`, `dev null replaced root rustc`, `-o /dev/null root`, `emit metadata /dev/null`) found no
+open issue on the root case. Our fix stays on our side (`--out-dir` of a fresh `mktemp -d`). Reopen
+only if rustc's documented behaviour for `-o` changes, or a maintainer asks for root-case reports.
+
+Original draft, kept for the record:
 
 rust-lang/rust#111157. rustc 1.64+ writes `-o PATH` by creating a temporary file beside `PATH` and renaming it into place. `rustc --emit=metadata -o /dev/null` run as root in `/dev` replaces the `/dev/null` device node with a regular file. Measured here: contabo-2, -3, and -4 have `/dev/null` as mode 0644. contabo-4's file was created 2026-09-19T16:56:36Z, 0.18 s after this probe ran there as root. Reproduction is the command above. The fix on our side is `--out-dir` of a fresh `mktemp -d`, not `-o /dev/null`. This note is a draft. It was not filed.

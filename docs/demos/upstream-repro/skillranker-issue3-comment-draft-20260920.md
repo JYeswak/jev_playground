@@ -1,4 +1,11 @@
-# DRAFT (NOT POSTED): issue #3 follow-up comment — residual macOS gaps at 0e61cc6
+# WITHDRAWN 2026-09-24 (never posted): issue #3 follow-up comment — residual macOS gaps at 0e61cc6
+
+> Withdrawn under jeff-issue-chain Phase −1 and Joshua's standing rule. #3 closed 2026-09-20T21:13Z
+> after Jeffrey landed native macOS support (`6b5d17c`); upstream tip is `2a16486` (2026-09-24), so
+> every finding below is from a stale build. skillranker still has no releases (`gh release list`
+> empty, 2026-09-24T01:50Z), so the rule that skillranker findings come only from native binary
+> downloads still blocks a source-build report. Reopen only if a native macOS release exists and a
+> gap below reproduces from it.
 
 > Status: draft only. Posting needs Joshua's explicit approval: his rule
 > allows skillranker findings ONLY from native binary downloads, and no
