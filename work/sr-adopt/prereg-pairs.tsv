@@ -69,3 +69,7 @@ score-stsb-20260924	docs/demos/upstream-repro/score-stsb-20260924.md	8e4bda9	wor
 score-yelp-20260924	docs/demos/upstream-repro/score-yelp-20260924.md	52d94c2	work/score-yelp/rows-haiku.jsonl
 score-yelp-20260924	docs/demos/upstream-repro/score-yelp-20260924.md	52d94c2	work/score-yelp/rows-jev.jsonl
 second-incumbent-20260924	docs/demos/upstream-repro/second-incumbent-20260924.md	a2a4c7a	work/second-incumbent/rows-scifact-grok.jsonl
+jev-vxx1	work/nev-differential/PREREGISTER-DIFF.md	3d65229	work/nev-differential/rows-A-xai-grok-4.jsonl
+jev-vxx1	work/nev-differential/PREREGISTER-DIFF.md	3d65229	work/nev-differential/rows-B-anthropic-claude-haiku-4-5.jsonl
+jev-vxx1	docs/demos/upstream-repro/jev-k9z5-flag-20260924.md	eb4efd2	work/jev-injection-flag/rows-jev-withheld.jsonl
+jev-vxx1	docs/demos/upstream-repro/choice-banking77-20260924.md	a0ed3c1	work/choice-banking77/rows-haiku.jsonl

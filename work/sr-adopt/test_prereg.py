@@ -138,7 +138,7 @@ class AuditTest(unittest.TestCase):
             text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("ok 70", result.stdout)
+        self.assertIn("ok 74", result.stdout)
 
     def test_reversed_pair_in_tmp_fails(self):
         tmp = tempfile.mkdtemp(prefix="prereg-rev-", dir="/tmp")

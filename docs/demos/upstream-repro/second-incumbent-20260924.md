@@ -185,3 +185,14 @@ Verdict: the SciFact PASS and the Banking77 WIN reproduce from committed files u
 and so does the zero-mass sensitivity (NON-INFERIOR, p 0.58). The receipt's "What the pair says"
 follows from the rows. Scratch left in place: `/tmp/k9z5-verify-dsu`,
 `/tmp/k9z5-verify-dsu-check.py`, `/tmp/k9z5-verify-dsu-grok-*.bak`.
+
+## Reused paths (added 2026-09-24, jev-vxx1)
+
+This receipt does not name these four files. They are the committed Jev and Haiku
+rows the scorer loads. They are not this receipt's runs.
+
+- `work/noul-scifact/rows-jev.jsonl` and `work/noul-scifact/rows-haiku.jsonl`, from
+  `noul-scifact-20260924.md`, bar `15b0371`.
+- `work/choice-banking77/rows-jev.jsonl` and `work/choice-banking77/rows-haiku.jsonl`,
+  from `choice-banking77-20260924.md`, bar `a0ed3c1`, first-add of both rows files
+  `3709ee6`.

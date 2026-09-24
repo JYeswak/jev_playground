@@ -16,12 +16,12 @@ grok-incumbent-fever-yelp-b77-20260924.md	6164a11	work/choice-banking77/full.jso
 grok-incumbent-fever-yelp-b77-20260924.md	6164a11	work/noul-fever/sample.jsonl	input or not an output rows file
 injection-variance-20260924.md	142fd5d	work/nev-differential/fresh-20260923/haiku-injection-662.jsonl	input or not an output rows file
 injection-variance-20260924.md	142fd5d	work/nev-differential/fresh-20260923/jev-injection-662.jsonl	input or not an output rows file
-injection-variance-20260924.md	142fd5d	work/nev-differential/rows-A-xai-grok-4.jsonl	reused prior-run cell; no audited bar; first-add 57d30e9; no receipt states 57d30e9 as a bar; reusing receipt names the path at line 26 as committed, and marks the new runs separately
-injection-variance-20260924.md	142fd5d	work/nev-differential/rows-B-anthropic-claude-haiku-4-5.jsonl	reused prior-run cell; no audited bar; first-add 57d30e9; no receipt states 57d30e9 as a bar; reusing receipt names the path at line 23 as committed
+injection-variance-20260924.md	142fd5d	work/nev-differential/rows-A-xai-grok-4.jsonl	reused prior-run cell; origin bar 3d65229 work/nev-differential/PREREGISTER-DIFF.md:52; reusing receipt names the path at line 26
+injection-variance-20260924.md	142fd5d	work/nev-differential/rows-B-anthropic-claude-haiku-4-5.jsonl	reused prior-run cell; origin bar 3d65229 work/nev-differential/PREREGISTER-DIFF.md:52; reusing receipt names the path at line 23
 jev-benchmark-w70-2026-09-23.md	fec3f95	work/tmp-rescue/jev-benchmark-w70-t4.jsonl	input or not an output rows file
 jev-claim-check-20260924.md	ae01091	work/jev-claim-check/l3-frames.jsonl	input or not an output rows file
 jev-claim-check-20260924.md	ae01091	work/jev-claim-check/l3-scope-frames.jsonl	input or not an output rows file
-jev-toolout-flag-20260924.md	845addd	work/jev-injection-flag/rows-jev-withheld.jsonl	reused prior-run cell; no audited bar; first-add 888efbe; no receipt states 888efbe as a bar; reusing receipt discloses the reuse by path at lines 29-30
+jev-toolout-flag-20260924.md	845addd	work/jev-injection-flag/rows-jev-withheld.jsonl	reused prior-run cell; origin bar eb4efd2 docs/demos/upstream-repro/jev-k9z5-flag-20260924.md:12; reusing receipt names the path at lines 29-30
 jev-toolout-flag-20260924.md	845addd	work/nev-injection/pairs.jsonl	input or not an output rows file
 noul-fever-20260924.md	834a569	work/noul-fever/sample.jsonl	input or not an output rows file
 noul-fever-criteria-20260924.md	e506575	work/noul-fever/rows-jev.jsonl	reused prior-run cell; audited under noul-fever-20260924.md bar 834a569; reusing receipt names the path at line 24 as the committed criteria arm
@@ -34,7 +34,7 @@ score-sst5-20260924.md	ae161b6	work/score-sst5/sample.jsonl	input or not an outp
 score-stsb-20260924.md	8e4bda9	work/score-stsb/labels.jsonl	input or not an output rows file
 score-yelp-20260924.md	52d94c2	work/score-yelp/sample.jsonl	input or not an output rows file
 score-yelp-20260924.md	52d94c2	work/score-yelp/texts.jsonl	input or not an output rows file
-second-incumbent-20260924.md	a2a4c7a	work/choice-banking77/rows-haiku.jsonl	reused prior-run cell; no audited bar; first-add 3709ee6; no receipt states 3709ee6 as a bar; reusing receipt does not name this path
+second-incumbent-20260924.md	a2a4c7a	work/choice-banking77/rows-haiku.jsonl	reused prior-run cell; origin bar a0ed3c1 docs/demos/upstream-repro/choice-banking77-20260924.md:53; reusing receipt does not name this path
 second-incumbent-20260924.md	a2a4c7a	work/choice-banking77/rows-jev.jsonl	reused prior-run cell; audited under choice-banking77-20260924.md bar a0ed3c1; reusing receipt does not name this path
 second-incumbent-20260924.md	a2a4c7a	work/choice-banking77/subset.jsonl	input or not an output rows file
 second-incumbent-20260924.md	a2a4c7a	work/choice-clinc150/subset.jsonl	input or not an output rows file
