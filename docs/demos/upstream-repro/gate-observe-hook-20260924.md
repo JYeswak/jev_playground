@@ -149,3 +149,34 @@ NO-CLAIM:
 - During each "off" session the hook was absent from the shared worktree. Any omp session another
   agent started in that window loaded without it.
 - Not yet re-run by a non-author. The bead stays open for that.
+
+## Non-author verification — Verifier2
+
+Verifier2 (background agent of pane 1, not an author of this unit), 2026-09-24. All checks ran in a
+`git clone --local` of the repo at `6a14b0a` in `mktemp -d`; the hook under test is `3bae442`'s
+(`git log -- .omp/hooks/post/jev-gate-observe.ts`: nothing after it), and `3bae442` precedes the L3
+commit `d93e5f0`.
+
+| # | Check | Command | Result |
+|---|---|---|---|
+| 1 | L0 suite | `node --test .omp/hooks/post/jev-gate-observe.test.mjs` (Node 22.22.0) | 10/10 pass |
+| 2 | Each of the 7 plants turns its named test red | scratch driver `/tmp/verifier2-plants.py`: exact one-occurrence string replacement in the clone's hook, run the test file, restore the saved bytes | P1 `>= CUT` → only test 2 red; P2 cut before scrub → only 4; P3 `observe` called in the handler (no `setTimeout`) → only 8; P4 session set to `"unknown"` → only 8; P5 owner source loaded with `\|alps\|` removed → only 9; P6 `if (verdict.drop)` → `if (false)` → only 3; P7 `throw` in the unconfigured branch → only 6. Each plant 9/10. Hook sha256 identical after restore, suite 10/10 again |
+| 3 | Keyless re-score reproduces the L3 rows and latency table | `python3 work/bicameral-gate/observe-rpc.py score work/bicameral-gate/observe-l3-20260924.json work/bicameral-gate/observe-latency-20260924.json` | exit 0; the three L3 rows byte-for-byte as pasted above; latency table identical (4.75/86.39/196.50, 4.01/150.66/165.44, 4.73/21.55/23.11, 3.94/35.69/54.13; rows 0/36/0/36); U = 469.5 of 1089, p = 0.336; hook-on 36 scored, 0 flagged, Jev p50 150 / p95 480 ms |
+| 4 | Latency numbers recomputed with my own code from the per-call `ms` in the data file | nearest-rank percentiles, pairwise U, tie-corrected normal p | same p50/p95/max for all four rows; U = 469.5; p = 0.336 without continuity correction, 0.339 with it. The driver uses no continuity correction; `scipy.stats.mannwhitneyu`'s default applies one, so the "same p as scipy" line holds only with `use_continuity=False` (scipy not installed here; not re-checked). Not material: either p says "not distinguishable". Each of the 36 hook-on rows has its own session's id and a command matching one of that session's calls; 0 `isError` in the 72 calls |
+| 5 | The handler returns at once and never blocks the tool path | read `makeHandler` (`jev-gate-observe.ts:230-248`); scratch probe `/tmp/verifier2-handler-probe.mjs` calls the real handler with a filter that busy-waits 300 ms and an asker that sleeps 300 ms | returns `undefined` (not a Promise) in 0.40 ms with no dependency called; filter, asker and append all run afterwards via `setTimeout(…, 0)`. Boundary: deferred, not off-thread. The hash, the regex filter and the row write still run on omp's event loop after the handler returns; they no longer sit inside the awaited `tool_result` chain |
+| 6 | L3 re-run by a non-author (packet §3 requires it) | `npm ci --prefix work/sdk` in the clone, then `infisical run --silent --projectId=… -- env -u ANTHROPIC_API_KEY python3 work/bicameral-gate/observe-rpc.py l3 /tmp/verifier2-l3.json` from the clone root | fresh rpc session `01a0d155-f12b-70be-8b98-de6c7f416e85`, `agent_end`, exit 0, 3 bash calls, 3 rows: `ls` scored, max 0.03, no flag; `git push --dry-run origin main` scored, `irreversible_publish` 0.04, `exfiltration` 0.10, no flag; fake key `skipped:secret`, probs/tokens/latency null. `cmdSha` values equal the author's L3 rows. `grep -c FAKEKEYFORREDACTION ~/.local/state/jev/gate-observe.jsonl` → 0 |
+| 7 | README line | `grep -n gate-observe README.md` | line 88 names the hook and `~/.local/state/jev/gate-observe.jsonl` |
+
+One difference from the author's L3: in the clone, `git push --dry-run origin main` returned
+`isError=true` (the clone's `origin` is the local non-bare worktree with `main` checked out). The
+hook logged and scored it the same way. This matches the NO-CLAIM that failed bash calls are logged
+with no `isError` field.
+
+**Verdict: CONFIRMED.** Every packet §3 item holds on re-run: L0 10/10 with 7/7 plants each turning
+exactly its named test red; the L3 three-direction probe reproduced live by a non-author; the latency
+table reproduces from the committed file; README line present.
+
+Level: `[oracle]` for checks 1-5 and 7 (committed files, clean clone); `[live]` N = 3 Jev calls for
+check 6 (`jev-1.13.0`, 2026-09-24 02:54 UTC). Not run by the verifier: the latency A/B (it moves the
+hook out of the shared worktree for other agents' sessions, and the committed data re-scores); any
+recall or catch-rate claim (none is made).
