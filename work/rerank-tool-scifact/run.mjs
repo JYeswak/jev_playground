@@ -234,7 +234,7 @@ async function selftest() {
   const corpus = new Map();
   for (const c of cands) for (const [d] of c.cands) corpus.set(d, { title: `T${d}`, text: `body ${d}` });
   const text = { corpus, queries: new Map(cands.map((c) => [c.qid, `query ${c.qid}`])) };
-  const savedKey = process.env.TYPESAFE_API_KEY;
+  const prev = process.env.TYPESAFE_API_KEY;
   delete process.env.TYPESAFE_API_KEY;
   const origFetch = globalThis.fetch;
   let netCalls = 0;
@@ -284,7 +284,7 @@ async function selftest() {
     check(rows3.length >= 1 && rows3.every((r) => r.ordered === false && r.reason === "unconfigured" && r.calls === 0), "missing key: ordered=false reason=unconfigured, zero HTTP calls");
     check(r3?.stopped?.startsWith("unconfigured"), "missing key: dispatch stops");
     // 4. Shipped liveAsker through a fake transport: counts 20 calls and usage per query.
-    process.env.TYPESAFE_API_KEY = "selftest-not-a-key";
+    process.env.TYPESAFE_API_KEY = "test-key";
     const answer = JSON.stringify({
       answers: { score: { type: "score", score: 3, confidence: 0.9, legend: { 0: "a", 1: "b", 2: "c", 3: "d" }, probabilities: { 0: 0.1, 1: 0.1, 2: 0.2, 3: 0.6 } } },
       usage: { input_tokens: 7, output_tokens: 1 },
@@ -302,8 +302,8 @@ async function selftest() {
     check(netCalls === 0, "no real network call");
   } finally {
     globalThis.fetch = origFetch;
-    if (savedKey === undefined) delete process.env.TYPESAFE_API_KEY;
-    else process.env.TYPESAFE_API_KEY = savedKey;
+    if (prev === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = prev;
   }
   for (const b of bad) console.log(`SELFTEST RED: ${b}`);
   console.log(bad.length ? "SELFTEST FAIL" : "SELFTEST PASS: fake asker 2 queries, id->doc mapping, no text in rows, one resume per failure, missing key = ordered=false/unconfigured with 0 calls and no throw, fake transport counts 20 calls and usage");
