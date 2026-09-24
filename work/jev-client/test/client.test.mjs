@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { askJev, askJevChoice, askJevBundle, askJevScore, BILLING_HOLD_MS, resetBillingHold, SYSTEMONE_ENDPOINT } from '../src/index.ts';
+import { askJev, askJevChoice, askJevBundle, askJevScore, BILLING_HOLD_MS, observedFetch, resetBillingHold, SYSTEMONE_ENDPOINT } from '../src/index.ts';
 
 const QUESTIONS = { harm: 'is this harmful?' };
 const STATE = { command: 'rm -rf /' };
@@ -489,4 +489,17 @@ test('a 429 and a 503 do not start a hold: the next call inside the window still
     globalThis.fetch = real;
     resetBillingHold();
   }
+});
+
+test('observedFetch marks transport entry and forwards the request', async () => {
+  let observed = 0;
+  let forwarded;
+  const wrapped = observedFetch(() => { observed += 1; }, async (input, init) => {
+    forwarded = { input, init };
+    return new Response('{}', { status: 200 });
+  });
+  const init = { method: 'POST', body: 'payload' };
+  await wrapped('https://example.test/systemone', init);
+  assert.equal(observed, 1);
+  assert.deepEqual(forwarded, { input: 'https://example.test/systemone', init });
 });

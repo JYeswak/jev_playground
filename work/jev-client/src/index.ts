@@ -90,6 +90,19 @@ export type JevChoiceResult =
  * missing key.
  */
 export type JevFailure = "unconfigured" | "sdk-missing" | "http" | "non-json" | "no-answers" | "transport" | "billing-hold";
+/**
+ * Wrap the transport and report when a request reaches it. Callers use this
+ * to distinguish a failure before dispatch (no key, billing hold, missing
+ * SDK) from a response or transport failure after a request was sent.
+ */
+export function observedFetch(onRequest: () => void, fetchImpl: typeof fetch = globalThis.fetch): typeof fetch {
+  return ((input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+    onRequest();
+    return fetchImpl(input, init);
+  }) as typeof fetch;
+}
+
+
 
 export type AskOptions = {
   /** The object the questions are asked about. Serialised as-is into `state`. */

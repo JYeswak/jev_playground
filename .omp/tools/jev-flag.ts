@@ -51,7 +51,7 @@ export default function jevFlagTool(pi, asker) {
         if (!result.ok) {
           return {
             content: [{ type: "text", text: `ordered=false reason=${result.reason} NOT_RUN` }],
-            details: { level: "unknown", reason: result.reason, calledModel: false, probability: null },
+            details: { level: "unknown", reason: result.reason, calledModel: result.calledModel === true, probability: null },
           };
         }
         const a = annotate(result.probability);

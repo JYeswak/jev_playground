@@ -18,6 +18,7 @@
  * right. That is the live dogfood in docs/demos/upstream-repro/jev-claim-check-20260924.md.
  */
 import test from "node:test";
+import { resetBillingHold } from "../../work/jev-client/src/index.ts";
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
 
@@ -161,4 +162,22 @@ test("versions, names and dates are not numbers; qualitative README sentences st
 
 test("the description tells a calling model the numeric limit before it calls", () => {
   assert.match(factory(pi).description, /OUT OF SCOPE: a claim containing any number/);
+});
+
+test("HTTP 402 after send reports calledModel", async () => {
+  const previousKey = process.env.TYPESAFE_API_KEY;
+  const previousFetch = globalThis.fetch;
+  resetBillingHold();
+  process.env.TYPESAFE_API_KEY = "test-key";
+  globalThis.fetch = async () => new Response(JSON.stringify({ error: "insufficient credits" }), { status: 402, headers: { "content-type": "application/json" } });
+  try {
+    const refused = await factory(pi).execute("402", { claim: CLAIM, evidence: EVIDENCE });
+    assert.equal(refused.details.reason, "http");
+    assert.equal(refused.details.calledModel, true);
+  } finally {
+    resetBillingHold();
+    globalThis.fetch = previousFetch;
+    if (previousKey === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previousKey;
+  }
 });

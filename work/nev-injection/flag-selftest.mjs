@@ -6,6 +6,7 @@
  * Exit 0 all green, 1 any failure.
  */
 import mod, { annotate } from "../../.omp/tools/jev-flag.ts";
+import { resetBillingHold } from "../../work/jev-client/src/index.ts";
 
 const pi = { zod: { object: (s) => s, string: () => ({ min: () => ({}) }) } };
 let failed = 0;
@@ -55,8 +56,25 @@ check("unconfigured NOT_RUN", r7.details.reason === "unconfigured" && r7.details
 
 check("annotate pure thresholds", annotate(0.8).level === "flag" && annotate(0.799).level === "note" && annotate(0.499).level === "silent" && annotate("x").level === "unknown", "");
 
+{
+  const previousKey = process.env.TYPESAFE_API_KEY;
+  const previousFetch = globalThis.fetch;
+  resetBillingHold();
+  process.env.TYPESAFE_API_KEY = "test-key";
+  globalThis.fetch = async () => new Response(JSON.stringify({ error: "insufficient credits" }), { status: 402, headers: { "content-type": "application/json" } });
+  try {
+    const live = await factory(pi).execute("t402", { text: "x" });
+    check("HTTP 402 after send reports calledModel", live.details.calledModel === true && live.details.reason === "http", JSON.stringify(live.details));
+  } finally {
+    resetBillingHold();
+    globalThis.fetch = previousFetch;
+    if (previousKey === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previousKey;
+  }
+}
+
 if (failed > 0) {
   console.log(`${failed} FAILURES`);
   process.exit(1);
 }
-console.log("SELFTEST 8/8");
+console.log("SELFTEST 9/9");

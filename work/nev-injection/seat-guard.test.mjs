@@ -15,6 +15,7 @@
  * that any judgment is correct. The seat is the corpus in DIFF-RECEIPT.json.
  */
 import test from 'node:test';
+import { resetBillingHold } from '../../work/jev-client/src/index.ts';
 import assert from 'node:assert/strict';
 import mod, { screen, SEAT_CUT } from '../../.omp/tools/jev-screen.ts';
 
@@ -93,4 +94,23 @@ test('latencyMs propagates when present, null otherwise', async () => {
   const failed = factory(pi, async () => ({ ok: false, reason: 'unconfigured' }));
   const r3 = await failed.execute('l', { text: HOSTILE });
   assert.equal(r3.details.latencyMs, null);
+});
+
+test('HTTP 402 after send reports calledModel, unlike a billing hold', async () => {
+  const previousKey = process.env.TYPESAFE_API_KEY;
+  const previousFetch = globalThis.fetch;
+  resetBillingHold();
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  globalThis.fetch = async () => new Response(JSON.stringify({ error: 'insufficient credits' }), { status: 402, headers: { 'content-type': 'application/json' } });
+  try {
+    const tool = factory(pi);
+    const refused = await tool.execute('402', { text: HOSTILE });
+    assert.equal(refused.details.reason, 'http');
+    assert.equal(refused.details.calledModel, true);
+  } finally {
+    resetBillingHold();
+    globalThis.fetch = previousFetch;
+    if (previousKey === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previousKey;
+  }
 });

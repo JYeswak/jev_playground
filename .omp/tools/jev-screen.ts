@@ -74,7 +74,7 @@ export default function jevScreenTool(pi, asker) {
       if (!result.ok) {
         return {
           content: [{ type: "text", text: `ordered=false verdict=review reason=${result.reason} NOT_RUN` }],
-          details: { verdict: "review", reason: result.reason, calledModel: false, probability: null, latencyMs: null },
+          details: { verdict: "review", reason: result.reason, calledModel: result.calledModel === true, probability: null, latencyMs: null },
         };
       }
       const s = screen(result.probability);

@@ -32,7 +32,7 @@
  * numberTokens() skips on purpose. Versions (1.13.0), names (SST-5, top-1),
  * bead ids (jev-384m), commit shas (3b0c1d2) and 8+ digit runs do not count.
  */
-import { askJev } from "../../work/jev-client/src/index.ts";
+import { askJev, observedFetch } from "../../work/jev-client/src/index.ts";
 
 export const MODEL = "jev-1.13.0";
 export const SUPPORTED_AT = 0.8;
@@ -93,9 +93,8 @@ export const QUESTION = {
 export type Verdict = "supported" | "unsupported" | "unsure";
 export type AskerResult =
   | { ok: true; probability: unknown; latencyMs?: number; usage?: { input_tokens: number; output_tokens: number } }
-  | { ok: false; reason: string };
+  | { ok: false; reason: string; calledModel: boolean };
 export type Asker = (input: { claim: string; evidence: string }) => Promise<AskerResult>;
-
 /** Pure policy. Returns null for anything that is not a probability. */
 export function classify(probability: unknown): { verdict: Verdict; confidence: number } | null {
   if (typeof probability !== "number" || !Number.isFinite(probability) || probability < 0 || probability > 1) {
@@ -107,14 +106,17 @@ export function classify(probability: unknown): { verdict: Verdict; confidence: 
   return { verdict: "unsure", confidence };
 }
 
-export const liveAsker: Asker = async ({ claim, evidence }) => {
+export const liveAsker: Asker = async ({ claim, evidence }, fetchImpl?: typeof fetch) => {
+  let sent = false;
+  const transport = observedFetch(() => { sent = true; }, fetchImpl ?? globalThis.fetch);
   const posted = await askJev({
     state: { claim, evidence },
     questions: { supports: QUESTION },
     model: MODEL,
     timeoutMs: TIMEOUT_MS,
+    fetchImpl: transport,
   });
-  if (!posted.ok) return { ok: false, reason: posted.reason };
+  if (!posted.ok) return { ok: false, reason: posted.reason, calledModel: sent };
   return { ok: true, probability: posted.scores["supports"], latencyMs: posted.latencyMs, usage: posted.usage };
 };
 
@@ -122,10 +124,10 @@ type ToolHost = {
   zod: { object: (shape: Record<string, unknown>) => unknown; string: () => { min: (n: number) => unknown } };
 };
 
-function notRun(reason: string, detail?: string) {
+function notRun(reason: string, calledModel = false, detail?: string) {
   return {
-    content: [{ type: "text", text: `calledModel=false verdict=not_run reason=${reason} NOT_RUN${detail ? `\n${detail}` : ""}` }],
-    details: { verdict: "not_run", reason, calledModel: false, probability: null, confidence: null, latencyMs: null, usage: null },
+    content: [{ type: "text", text: `calledModel=${calledModel} verdict=not_run reason=${reason} NOT_RUN${detail ? `\n${detail}` : ""}` }],
+    details: { verdict: "not_run", reason, calledModel, probability: null, confidence: null, latencyMs: null, usage: null },
   };
 }
 
@@ -158,10 +160,10 @@ export default function jevClaimCheckTool(pi: ToolHost, asker?: Asker) {
       try {
         result = await ask({ claim, evidence });
       } catch (err) {
-        return notRun("throw", err instanceof Error ? err.message : String(err));
+        return notRun("throw", false, err instanceof Error ? err.message : String(err));
       }
       if (!result || result.ok !== true) {
-        return notRun(result && "reason" in result && typeof result.reason === "string" ? result.reason : "unknown");
+        return notRun(result && "reason" in result && typeof result.reason === "string" ? result.reason : "unknown", result?.calledModel === true);
       }
       const c = classify(result.probability);
       if (!c) return refused("malformed", true);

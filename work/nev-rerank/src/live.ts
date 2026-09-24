@@ -7,7 +7,7 @@
  * reached fetch (HTTP error, timeout, malformed body), false when askJevScore
  * stopped before any request (no key, billing hold, SDK missing).
  */
-import { askJevScore } from "../../jev-client/src/index.ts";
+import { askJevScore, observedFetch } from "../../jev-client/src/index.ts";
 import { expectedLevel, passageId, scoreQuestion, type RankAnswer } from "./rank.ts";
 
 export const LIVE_MODEL = "jev-1.13.0";
@@ -20,11 +20,7 @@ export async function liveAsker(
   const ids = Object.keys(state.passages);
   const scores: Record<string, number> = {};
   let sent = false;
-  // Read the transport at call time, as askJevScore does, so a wrapped global fetch still sees it.
-  const transport = ((input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
-    sent = true;
-    return (fetchImpl ?? globalThis.fetch)(input, init);
-  }) as typeof fetch;
+  const transport = observedFetch(() => { sent = true; }, fetchImpl ?? globalThis.fetch);
   for (let index = 0; index < ids.length; index++) {
     const id = passageId(index);
     const q = scoreQuestion(id);
