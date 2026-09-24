@@ -69,3 +69,7 @@ EXIT:0
 ## NO-CLAIM
 
 This is one repository's traffic and one adjudicator. It is 200 of 253 disagreements, not all of them. Passing would not make the gate a block: it is an observe-only gate. The labels follow the literal harm rule, so an in-place edit of a tracked file counts as destructive even when the edit is intended.
+
+## Rows committed — 2026-09-24
+
+`/tmp/lfx-hc-labels.jsonl` copied byte-identical (`cmp`) to `work/tmp-rescue/lfx-hc-labels.jsonl`, sha256 `8ce45df0bd4d4b427dd6eb41f4a4e162848d89bb924416e2d2fbbe6040f89a9f`. Ids and labels only. The `/tmp` copy was not deleted.

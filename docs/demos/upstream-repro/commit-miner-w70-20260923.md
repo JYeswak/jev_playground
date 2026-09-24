@@ -58,3 +58,11 @@
 - tests.rs:799 third run by pane 6, unpinned scheduler → contabo-2: `test ... ok`, `test result: ok. 1 passed`, `Remote command finished: exit=0` (log /tmp/jev-w1/cm-unpinned-rerun.log). Passes on c4 (full) + c2 (targeted ×2). Two pinned contabo-1 attempts refused with RCH-I001 queue_timeout (nothing ran — not verdicts; log /tmp/jev-w1/cm-c1-rerun2.log). c1 probe status=ok, rustc 1.100.0-nightly (recorded, not outcome-relevant here).
 - T2-plant NOT-RUN accepted as earned (routes documented; no clone-safe plant exists).
 - Bar timing: corpus.json mtime 21:44 (after bar commit 070efe6 21:38:26).
+
+## Rows committed — 2026-09-24
+
+Copied byte-identical (`cmp`). The `/tmp` copies were not deleted.
+
+- `/tmp/cm-w72/results.jsonl` → `work/tmp-rescue/cm-w72-results.jsonl`, sha256 `3285458b3a0bb5b36e8d6309cd6ee44830624732a82d1ece74b8956f1a4c54c8`
+- `/tmp/cm-w72/corpus.json` → `work/tmp-rescue/cm-w72-corpus.json.exact`, sha256 `267181e3616100085a8cd737784afa5850a57f78ec49fb228e88b350b3cebdf8`
+- `/tmp/cm-w72/t8set.json` → `work/tmp-rescue/cm-w72-t8set.json.exact`, sha256 `6eba80ff6109499622c913a7fd333ec9c51e77ebd3614ac1ad6fbcb662c096f3`

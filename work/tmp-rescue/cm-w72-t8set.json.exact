@@ -1,0 +1,42 @@
+[
+ {
+  "sha8": "d57f5ce8",
+  "reword": "Swap: delete files that do not belong"
+ },
+ {
+  "sha8": "5552028d",
+  "reword": "Swap: bring tests/test_decision_policies.py over from the Jev material"
+ },
+ {
+  "sha8": "3c3bb84a",
+  "reword": "Swap: bring images/banner.svg over from the Jev material"
+ },
+ {
+  "sha8": "6e6aa302",
+  "reword": "Swap: bring examples/typescript/quickstart.ts over from the Jev material"
+ },
+ {
+  "sha8": "82560963",
+  "reword": "Swap: bring examples/typescript/README.md over from the Jev material"
+ },
+ {
+  "sha8": "a29e7e93",
+  "reword": "Swap: bring examples/python/workflows.py over from the Jev material"
+ },
+ {
+  "sha8": "7375191d",
+  "reword": "Swap: bring examples/python/requirements.txt over from the Jev material"
+ },
+ {
+  "sha8": "b1e702c1",
+  "reword": "Swap: bring examples/python/quickstart.py over from the Jev material"
+ },
+ {
+  "sha8": "2972d8dd",
+  "reword": "Swap: bring examples/python/decision_policies.py over from the Jev material"
+ },
+ {
+  "sha8": "d77d2876",
+  "reword": "Swap: bring examples/python/README.md over from the Jev material"
+ }
+]

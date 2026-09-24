@@ -1,0 +1,3 @@
+{"id": "free_text_google_competitor", "truth": "yes", "mode": "free_text"}
+{"id": "target_node_microsoft", "truth": "yes", "mode": "target_node"}
+{"id": "path_intent_article", "truth": "yes", "mode": "path_intent"}

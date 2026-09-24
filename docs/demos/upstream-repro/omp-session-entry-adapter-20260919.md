@@ -28,3 +28,7 @@ The replay receipt was written outside the repository at `/tmp/jev-0c6-real-repl
 successful compaction or false green is claimed. The acceptance boundary is currently unobtainable
 without implementing the second `SessionEntry`/`type: message` adapter shape; the existing stream
 path remains untouched.
+
+## NOT RE-SCORABLE — 2026-09-24
+
+`/tmp/jev-0c6-real-replay.json` is gone. The receipt said the replay receipt was written only there. README claims that cite this receipt: none found.

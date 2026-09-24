@@ -44,3 +44,7 @@ live run above: the single-verdict arm reports `selected:false`, no gain claimed
 One 2000-row run on a public corpus at a fixed cut; not a claim that the
 combination generalizes, and not a claim about any other model version.
 Per-row live rows live in `/tmp` (uncommitted scratch), not in this tree.
+
+## Rows committed — 2026-09-24
+
+`/tmp/jev-8q77-rows.jsonl` copied byte-identical (`cmp`) to `work/tmp-rescue/jev-8q77-rows.jsonl`, sha256 `b895bf95d1dbe735aca7dfc8c24bbd7b47e1fd2557bae66f15082de0f8b0a7f2`. The `/tmp` copy was not deleted.

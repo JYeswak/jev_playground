@@ -1,0 +1,302 @@
+[
+ {
+  "sha": "d57f5ce8002cc7cadc2c744b34a45933507e0508",
+  "parents": [
+   "5552028df114f3401cad93d452bac88df85e970b"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:38:24+05:30",
+  "subject": "Swap: remove unrelated files",
+  "body": "Swap: remove unrelated files\n",
+  "files": [
+   "images/banner.png"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "5552028df114f3401cad93d452bac88df85e970b",
+  "parents": [
+   "3c3bb84a8334bff053bcc142e41766e5eba2dd08"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:38:13+05:30",
+  "subject": "Swap: transfer tests/test_decision_policies.py from Jev content",
+  "body": "Swap: transfer tests/test_decision_policies.py from Jev content\n",
+  "files": [
+   "tests/test_decision_policies.py"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "3c3bb84a8334bff053bcc142e41766e5eba2dd08",
+  "parents": [
+   "6e6aa302bd451936ff60242bf185f8ad6d9d6cf1"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:38:11+05:30",
+  "subject": "Swap: transfer images/banner.svg from Jev content",
+  "body": "Swap: transfer images/banner.svg from Jev content\n",
+  "files": [
+   "images/banner.svg"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "6e6aa302bd451936ff60242bf185f8ad6d9d6cf1",
+  "parents": [
+   "8256096320296ad6b759a779a831f0dc9899c9b5"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:38:09+05:30",
+  "subject": "Swap: transfer examples/typescript/quickstart.ts from Jev content",
+  "body": "Swap: transfer examples/typescript/quickstart.ts from Jev content\n",
+  "files": [
+   "examples/typescript/quickstart.ts"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "8256096320296ad6b759a779a831f0dc9899c9b5",
+  "parents": [
+   "a29e7e93a2d472d384c163bec5d2c92fcb5b71bc"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:38:08+05:30",
+  "subject": "Swap: transfer examples/typescript/README.md from Jev content",
+  "body": "Swap: transfer examples/typescript/README.md from Jev content\n",
+  "files": [
+   "examples/typescript/README.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "a29e7e93a2d472d384c163bec5d2c92fcb5b71bc",
+  "parents": [
+   "7375191df4d013a861bd5a16199ae87125a1f100"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:38:06+05:30",
+  "subject": "Swap: transfer examples/python/workflows.py from Jev content",
+  "body": "Swap: transfer examples/python/workflows.py from Jev content\n",
+  "files": [
+   "examples/python/workflows.py"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "7375191df4d013a861bd5a16199ae87125a1f100",
+  "parents": [
+   "b1e702c19a63f8b6e2faf22d47562f8675d172e2"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:38:04+05:30",
+  "subject": "Swap: transfer examples/python/requirements.txt from Jev content",
+  "body": "Swap: transfer examples/python/requirements.txt from Jev content\n",
+  "files": [
+   "examples/python/requirements.txt"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "b1e702c19a63f8b6e2faf22d47562f8675d172e2",
+  "parents": [
+   "2972d8dd19fbb317e10f7325c70252aab1826e83"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:38:03+05:30",
+  "subject": "Swap: transfer examples/python/quickstart.py from Jev content",
+  "body": "Swap: transfer examples/python/quickstart.py from Jev content\n",
+  "files": [
+   "examples/python/quickstart.py"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "2972d8dd19fbb317e10f7325c70252aab1826e83",
+  "parents": [
+   "d77d287608ad45e8653635e7776cd0bf07824f5f"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:38:01+05:30",
+  "subject": "Swap: transfer examples/python/decision_policies.py from Jev content",
+  "body": "Swap: transfer examples/python/decision_policies.py from Jev content\n",
+  "files": [
+   "examples/python/decision_policies.py"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "d77d287608ad45e8653635e7776cd0bf07824f5f",
+  "parents": [
+   "497ba63530be796f7fd89fdecf62ad81aab0bdb4"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:37:59+05:30",
+  "subject": "Swap: transfer examples/python/README.md from Jev content",
+  "body": "Swap: transfer examples/python/README.md from Jev content\n",
+  "files": [
+   "examples/python/README.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "497ba63530be796f7fd89fdecf62ad81aab0bdb4",
+  "parents": [
+   "270699bc786f1be85c5aa08b651f84449de4f2d2"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:37:57+05:30",
+  "subject": "Swap: transfer docs/repository-metadata.md from Jev content",
+  "body": "Swap: transfer docs/repository-metadata.md from Jev content\n",
+  "files": [
+   "docs/repository-metadata.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "270699bc786f1be85c5aa08b651f84449de4f2d2",
+  "parents": [
+   "2d529ea23cff3e7582dc713bc7294150ed06cb4f"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:37:55+05:30",
+  "subject": "Swap: transfer docs/jev-use-case-playbook.md from Jev content",
+  "body": "Swap: transfer docs/jev-use-case-playbook.md from Jev content\n",
+  "files": [
+   "docs/jev-use-case-playbook.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "2d529ea23cff3e7582dc713bc7294150ed06cb4f",
+  "parents": [
+   "328839d5718eeeaeebf9b91d72a78aafd582f342"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:37:53+05:30",
+  "subject": "Swap: transfer docs/coding-agent-use-cases.md from Jev content",
+  "body": "Swap: transfer docs/coding-agent-use-cases.md from Jev content\n",
+  "files": [
+   "docs/coding-agent-use-cases.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "328839d5718eeeaeebf9b91d72a78aafd582f342",
+  "parents": [
+   "773b18a3d053745793c9f9e28275fea19e43f702"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:37:51+05:30",
+  "subject": "Swap: transfer LICENSE from Jev content",
+  "body": "Swap: transfer LICENSE from Jev content\n",
+  "files": [
+   "LICENSE"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "773b18a3d053745793c9f9e28275fea19e43f702",
+  "parents": [
+   "fca8e6f2753a66334ea80b43160caffa3232c4ff"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:37:49+05:30",
+  "subject": "Swap: transfer .gitignore from Jev content",
+  "body": "Swap: transfer .gitignore from Jev content\n",
+  "files": [
+   ".gitignore"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "fca8e6f2753a66334ea80b43160caffa3232c4ff",
+  "parents": [
+   "8f7f57245482824a27874e19f8621dbcdc6c1fd0"
+  ],
+  "author": "Anil Chandra Naidu Matcha",
+  "date": "2026-09-18T01:37:35+05:30",
+  "subject": "Swap: replace README content",
+  "body": "Swap: replace README content\n",
+  "files": [
+   "README.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "f4c14374c3ec9bcbbffa01b3a1d066050781ac2d",
+  "parents": [
+   "38ba488c9d127191b2157c1569b0792f153bafc6"
+  ],
+  "author": "Anil-matcha",
+  "date": "2026-09-04T02:47:16+05:30",
+  "subject": "Add contextual GPT-6 Astra backlinks",
+  "body": "Add contextual GPT-6 Astra backlinks\n\n",
+  "files": [
+   "README.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "38ba488c9d127191b2157c1569b0792f153bafc6",
+  "parents": [
+   "e550347d3fbfb929605a95ed5ca3bff29253186b"
+  ],
+  "author": "Anil-matcha",
+  "date": "2026-09-02T00:24:48+05:30",
+  "subject": "Add cross-links to related projects",
+  "body": "Add cross-links to related projects\n\n",
+  "files": [
+   "README.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "8d9c285d8b2d0696538eae1f99339e0adf79e994",
+  "parents": [
+   "e550347d3fbfb929605a95ed5ca3bff29253186b"
+  ],
+  "author": "Dessalines39394",
+  "date": "2026-08-14T08:32:39Z",
+  "subject": "Fix broken star history chart",
+  "body": "Fix broken star history chart\n\nThe star history chart in the README is currently not rendering due to GitHub API restrictions. This change points the chart to a working host so the project's stargazer history is visible again.\n\n",
+  "files": [
+   "README.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ },
+ {
+  "sha": "e550347d3fbfb929605a95ed5ca3bff29253186b",
+  "parents": [
+   "b2d03d301286cda653d9e5c795771f41f8e65453"
+  ],
+  "author": "Anil Matcha",
+  "date": "2026-07-03T10:23:24+05:30",
+  "subject": "Add 6 new cases (89-94): Bedrock/Harvey launches, GPT-5.5 comparison, export-control redeploy story",
+  "body": "Add 6 new cases (89-94): Bedrock/Harvey launches, GPT-5.5 comparison, export-control redeploy story\n\n",
+  "files": [
+   "README.md"
+  ],
+  "label_bug": false,
+  "label_security": false
+ }
+]

@@ -239,3 +239,7 @@ NO-CLAIM:
 - Not a non-author re-run. The earlier rpc L3 in this file is a different session and a different
   question (dry-run push, which was not flagged).
 - Only `bash` is observed. This section does not repeat the latency A/B.
+
+## Rows committed — 2026-09-24
+
+`/tmp/verifier2-l3.json` copied byte-identical (`cmp`) to `work/tmp-rescue/verifier2-l3.json`, sha256 `8dd87b454c7c16266e0a341ad2779888daa1c1f036803962483e2cddd6647d65`. The `/tmp` copy was not deleted.

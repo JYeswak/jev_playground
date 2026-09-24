@@ -164,3 +164,7 @@ That command uses the clone's CLI, the clone's `poc/tasks.json`, and the pin. N=
 ## Boundary
 
 Clone not edited. `git status --porcelain` was empty before and after (`0` lines). `EVAL.md` not edited. No secret printed. User `~/.codex/codex-router` kill switch, decision log, and caller secret were not read or written; the handler drive used `HOME=/tmp/w70-codex-home`. No Codex router on `:4202` was called. `OMP_PROFILE`, `PI_PROFILE`, and `PI_CODING_AGENT_DIR` were unset; omp was not invoked. T5 T6 T7 T8 were out of this assignment. The 237-turn classifier was not re-run. The server path cannot name `jev-1.13.0` without an edit, so it was not the live caller.
+
+## Rows committed — 2026-09-24
+
+`/tmp/w70-codex-home/.codex/codex-router/jev-router-live.jsonl` copied byte-identical (`cmp`) to `work/tmp-rescue/jev-router-live.jsonl`, sha256 `f7570c73694bb52705923401cd105007f280fe4bc32734e69f1ede3ff483b1d7`. The `/tmp` copy was not deleted.

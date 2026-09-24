@@ -47,3 +47,7 @@ Live spend: 2 Jev calls (the code-diff scoring; the refusal spent none),
 model `jev-1.13.0`, key via infisical. The retired noul gate's 98.1%
 agreement is measured on the draw, not asserted. NO-CLAIM: deterministic
 applicability is not review quality; scores still come from Jev.
+
+## Rows committed — 2026-09-24
+
+`/tmp/ompfit/drawlive.jsonl` copied byte-identical (`cmp`) to `work/tmp-rescue/ompfit-drawlive.jsonl`, sha256 `e2cb533deb5e18d838fd1f912e8d7fca45c510b3ee03cb9aa79c331536589871`. The 556/567 figure re-scores from this file. The `/tmp` copy was not deleted.

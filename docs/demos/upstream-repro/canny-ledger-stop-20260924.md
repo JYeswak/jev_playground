@@ -52,3 +52,7 @@ The ledger does not beat always-not-done on the set the packet named (1145 label
 ## Boundary
 
 NO-CLAIM: this does not say a completion-claim reminder is useless. That is a different predicate (message claims done, and no verify after the last edit). It was not the gate. This does not re-measure Jev. Spend: 0 calls. The 24-row 24/24 figure is `[Invalid]` as a win and `[test]` as a count on those rows. The 1145-row WEAK is `[test]`, lane offline, date 2026-09-24, model not called.
+
+## Rows committed — 2026-09-24
+
+`/tmp/canny-ledger-measure/scored.jsonl` copied byte-identical (`cmp`) to `work/tmp-rescue/canny-ledger-scored.jsonl`, sha256 `be928b7f52c622bb86cdb3f03af16ffc27f1f40ff8b2cfd19f8f4c0e062db595`. Re-score that file. The `/tmp` copy was not deleted.

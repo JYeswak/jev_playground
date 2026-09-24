@@ -1,0 +1,62 @@
+{
+  "mode": "synthetic-stub",
+  "model": "qwen-3.8-27b",
+  "generatedAt": "2026-09-23T03:32:04.375Z",
+  "plannedCalls": 3,
+  "conservativeCostUsd": 0.02549355,
+  "results": [
+    {
+      "id": "E1",
+      "name": "ticket triage",
+      "status": 200,
+      "elapsedMs": 34.1,
+      "result": {
+        "model": "qwen-3.8-27b",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "billing",
+            "probabilities": {
+              "billing": 1,
+              "other": 0,
+              "technical": 0
+            },
+            "confidence": 1
+          },
+          "refund_requested": {
+            "type": "noul",
+            "noul": 0.95
+          },
+          "urgency": {
+            "type": "score",
+            "score": 2,
+            "legend": {
+              "0": "No deadline.",
+              "1": "Soon, without a deadline.",
+              "2": "A named deadline."
+            },
+            "probabilities": {
+              "0": 0,
+              "1": 0,
+              "2": 1
+            },
+            "confidence": 1
+          }
+        },
+        "usage": {
+          "input_tokens": 300,
+          "output_tokens": 30
+        }
+      },
+      "decision": {
+        "action": "route_to_team",
+        "team": "billing",
+        "refundReview": true
+      },
+      "usage": {
+        "input_tokens": 300,
+        "output_tokens": 30
+      }
+    }
+  ]
+}

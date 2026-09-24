@@ -39,3 +39,7 @@ Static + offline suites only; no live per-package measure in this section;
 adversarial arms spot-checked by rule text, not re-fired. Dispatch's "11
 packages" not reconciled — 20 dirs exist; all 20 audited instead of guessing
 which 11.
+
+## NOT RE-SCORABLE — 2026-09-24
+
+`/tmp/taste-audit.json` is gone. The receipt pointed the full conformance table at that file. README claims that cite this receipt: none found.

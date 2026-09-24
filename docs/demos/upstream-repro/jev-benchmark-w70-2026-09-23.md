@@ -53,3 +53,7 @@ RULEBOOK tiers: claims 1, 2, 3, 6, 8 are maintainer numbers independently reprod
 ## Boundary
 
 Live spend: 128 Jev `jev-1.13.0` calls + 62 Haiku calls; clone tree untouched (`git status` clean before/after at `daf02b3`); all defects planted and all live drivers lived in `/tmp/w70jb/` (`bench_copy.py`, `live_run.py`, `t6_grok.py`, `t6_haiku.py`, `floors.py`, `analyze_live.py`, `*.jsonl`); exactly one file written by this run: this receipt. Harness-rule touches: `ft-py-doctrine`'s uv/pytest gates are N/A (stdlib-only clone, no pyproject; scratch scripts in /tmp; assignment skips formatters/linters); pipe-exit rule honored (exit codes from unpiped runs); key-canonical-source rule honored throughout (lengths only, `~/.local/bin` infisical 0.43.84, upgrade nag declined).
+
+## Rows committed — 2026-09-24
+
+`/tmp/w70jb/t4.jsonl` copied byte-identical (`cmp`) to `work/tmp-rescue/jev-benchmark-w70-t4.jsonl`, sha256 `110d22d9fbaf35694e520b87e9cca655436463d1d172b82d3e4db18270e0ed57`. README's 58/60 vs 52/60 claim re-scores from this file. The `/tmp` copy was not deleted.

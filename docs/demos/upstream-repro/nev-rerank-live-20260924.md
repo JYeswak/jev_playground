@@ -76,3 +76,7 @@ is lexical by construction. Dollars unpriced (no usage object). No Rust.
 
 Non-author re-score (TopazRaven, pane 3): Jev top-1 75/219 (two methods,
 0 mismatches), lexical 71/219 re-ran. Expectations met; bar FAILED stands.
+
+## Rows committed — 2026-09-24
+
+`/tmp/k9z1-scores.jsonl` copied byte-identical (`cmp`) to `work/tmp-rescue/k9z1-scores.jsonl`, sha256 `c1bc3f6ba680172eb4da91e89ea2b0cc941a8f60796a67eb8703d02c1b166413`. The `/tmp` copy was not deleted.

@@ -39,3 +39,7 @@ because `node_modules/` was never installed. Reproduction: delete
   `packages/api/examples/README.md` alongside the existing CLI instructions.
 - **Not a code defect:** after install, 7/7 green. The code is fine; the on-ramp
   is missing its first step.
+
+## Rows committed — 2026-09-24
+
+`/tmp/typesafe-examples-stub-results.json` copied byte-identical (`cmp`) to `work/tmp-rescue/typesafe-examples-stub-results.json`, sha256 `95182972a287f0160954e6b7398be31162ad839500138105522e220ac20710dc`. The `/tmp` copy was not deleted.

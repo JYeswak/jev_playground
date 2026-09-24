@@ -48,3 +48,7 @@ axes, so no direct contradiction was possible, and none occurred. Where they mee
 Conventional-commit prefixes are cheap talk and the classifier knows it — the
 stage-95 catch proves body-reading beats prefix-reading. Any lane-side
 commit lint should grade bodies, not prefixes.
+
+## NOT RE-SCORABLE — 2026-09-24
+
+`/tmp/tr/mine-out/jev-130.csv` is gone. The receipt said the raw CSV lived only there. README claims that cite this receipt: none found.
