@@ -161,3 +161,22 @@ output tokens. The refused attempts have no usage object. Grok's dollar cost is 
 exact-level TIE is a failure to separate, not parity. Row 457 is one refusal, not a measurement
 of what the text says. Awaiting a non-author re-score from the committed rows before the bead
 closes.
+
+## Non-author verification — VerifySST5
+
+VerifySST5 (background agent of pane 1; not the author), 2026-09-24, keyless, from a fresh full
+`git clone --local` at `b0b029e`. No model call was made; spend $0.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `python3 work/score-stsb/score.py --bar` and `python3 work/score-stsb/score.py` with no key | HOLDS. `floors_match: true` (mean 2.363908, mode 3, 266 / 353 exact, MAE 1.293179 / 1.339955). The full score reproduces every number in the Result tables: per-run Spearman, MAE and exact; all 12 floor tests WIN; the nine pairings with their intervals and p-values. `WIN pairings {spearman: 9, mae: 9, exact: 0}`, 0 LOSE. |
+| 2 | `python3 work/score-stsb/sample.py` | HOLDS. It re-fetched the pinned file (sha256 checked by the script) and rebuilt `labels.jsonl` byte-identical (`cmp`). |
+| 3 | Independent recompute (own Spearman with average ranks, MAE, exact levels, sign and McNemar counts) | HOLDS. Jev 0.9072 / 0.9072 / 0.9069, grok 0.8799 / 0.8845 / 0.8850. Every pairing's MAE and exact counts and p match. Spearman point differences run from 0.0219 to 0.0273. My own bootstrap on the thinnest pairing (J3 x G2, 500 resamples, a different seed, 424242) gives 0.0110 to 0.0353, with a minimum of 0.0057 over the 500. |
+| 4 | Row 457 and the failure rule | HOLDS. It is the only failed row, in all three grok runs, with the verbatim 403 refusal recorded twice per run (first call plus the one resume pass). Gold is 0.0, so the preregistered rule scores it at 5, exact-level wrong. Sensitivity: without row 457, the thinnest MAE pairing (J2 x G1, 784 / 705, p = 0.0432) would be 783 / 705, p = 0.0459, still WIN. |
+| 5 | No sentence text committed | HOLDS. No row file has a `sentence1`, `sentence2`, `text` or `state` key. `labels.jsonl` holds `i` and `label` only. |
+| 6 | Bar before data | HOLDS. `8e4bda9` (21:52:28 −0600) is an ancestor of `d6d39e3` (22:06:20 −0600) and has no rows. The receipt diff only replaces the `NOT_RUN` line under Result. `run.py`, `score.py`, `sample.py` and `labels.jsonl` are unchanged from the bar to HEAD. Row sha256 prefixes match the receipt, all six. |
+
+Verdict: PASS, Spearman WIN 9/9 and MAE WIN 9/9 reproduce from committed files under an unedited bar;
+exact-level is TIE 9/9. The incumbent is grok, not the Haiku the bead first named: the Anthropic
+cap was stated in the bar before any call. Re-score: `python3 work/score-stsb/score.py`. NO-CLAIM:
+this re-scores committed rows; no model re-run.
