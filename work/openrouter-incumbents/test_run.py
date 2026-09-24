@@ -163,6 +163,9 @@ class FreeArmAmendment2(unittest.TestCase):
                     raise action
                 resp = mock.Mock()
                 resp.usage = Usage()
+                resp.debug = {
+                    "llm_attempts": [{"llm_response": {"provider": "AtlasCloud"}}]
+                }
                 return resp
 
         with (
@@ -191,8 +194,13 @@ class FreeArmAmendment2(unittest.TestCase):
         )
         self.assertEqual(code, 0)
         self.assertEqual(
-            (rows[0]["score"], rows[0]["rateLimitWaits"], rows[0]["requests"]),
-            (3, 2, 3),
+            (
+                rows[0]["score"],
+                rows[0]["rateLimitWaits"],
+                rows[0]["requests"],
+                rows[0]["upstream"],
+            ),
+            (3, 2, 3, "AtlasCloud"),
         )
 
     def test_fourth_provider_429_fails_the_row(self):

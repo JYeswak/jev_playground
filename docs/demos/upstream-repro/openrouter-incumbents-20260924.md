@@ -293,7 +293,9 @@ to 906 used, a rise of 525 while this arm sent 529 requests; the counter is acco
 **Gap found.** The rows' `provider` field holds the adapter's provider label
 (`openrouter_provider.PacedProvider`), not the upstream provider OpenRouter reports, which the bar
 says each row records. `modelReported` and `rawText` are recorded. Run 2's rows got the upstream
-provider through `run_sst5.trace()`. This arm's later sets should record it the same way.
+provider through `run_sst5.trace()`. Fixed before any later set: `run_free` now adds an `upstream`
+field from `run_sst5.trace()`, and `test_run.py`'s answered-row test asserts it. The SST-5 rows
+above are unchanged and carry no upstream field.
 
 **What the rest costs.** At SST-5's 529 requests for 500 rows, dots' other five sets (3,450 rows) and
 nex-n2.5-mini's and lfm-2.5's six each (3,950 rows each) need about 12,000 more free requests. At

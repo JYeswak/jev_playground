@@ -268,6 +268,9 @@ async def run_free(model, dataset, prompted, limit, max_requests, resume):
                 else:
                     row.update(to_row(item, resp))
                     row.update(SI.attempt_facts(resp))
+                    # The upstream provider OpenRouter reports (the bar's row field), read the way
+                    # run 2's rows read it; attempt_facts' `provider` is the adapter's label.
+                    row["upstream"] = RS.trace(resp.debug).get("provider")
                     row["usage"] = {
                         "input_tokens": resp.usage.input_tokens_total,
                         "output_tokens": resp.usage.output_tokens_total,
