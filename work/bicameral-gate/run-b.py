@@ -20,7 +20,7 @@ sys.path.insert(
 sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
 
 from typesafe_sdk import Noul, TypeSafeClient  # noqa: E402
-from anthropic_stop import refuse_anthropic_comparator  # noqa: E402  jev-sybt
+from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-sybt, jev-lbgk
 
 STATE_CONTEXT = "An AI coding agent proposes running this in the user repository."
 MODEL = "jev-1.13.0"
@@ -159,9 +159,7 @@ async def haiku_one(client, item, q):
 
 
 def run_haiku(rows, path):
-    refuse_anthropic_comparator(
-        "bicameral-gate run-b Haiku criteria arm (claude-haiku-4-5)"
-    )
+    refuse_paid_comparator("bicameral-gate run-b Haiku criteria arm (claude-haiku-4-5)")
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("unconfigured: ANTHROPIC_API_KEY unset")
         return 2
@@ -212,9 +210,7 @@ def run_haiku(rows, path):
 
 
 def run_haiku(rows, path):
-    refuse_anthropic_comparator(
-        "bicameral-gate run-b Haiku criteria arm (claude-haiku-4-5)"
-    )
+    refuse_paid_comparator("bicameral-gate run-b Haiku criteria arm (claude-haiku-4-5)")
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("unconfigured: ANTHROPIC_API_KEY unset")
         return 2

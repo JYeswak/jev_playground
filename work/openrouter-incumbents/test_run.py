@@ -61,23 +61,35 @@ class Stsb(unittest.TestCase):
 
 
 class Models(unittest.TestCase):
-    def test_refuses_unapproved_paid_model(self):
-        env = {"OPENROUTER_API_KEY": "x"}
-        with mock.patch.dict(os.environ, env), self.assertRaises(ValueError):
-            run.provider_for("openai/gpt-5")
+    def test_refuses_every_paid_id_before_any_client(self):
+        from anthropic_stop import PaidComparisonStopped
 
-    def test_approved_models_build_on_openrouter(self):
+        built = mock.Mock(side_effect=AssertionError("client constructed"))
+        with (
+            mock.patch.dict(os.environ, {"OPENROUTER_API_KEY": "x"}),
+            mock.patch.object(run.OR, "AsyncOpenAIProvider", built),
+        ):
+            for model in (
+                "openai/gpt-5",
+                "openai/gpt-5-nano",
+                "deepseek/deepseek-v4-flash",
+            ):
+                with self.assertRaises(PaidComparisonStopped):
+                    run.provider_for(model)
+                with self.assertRaises(PaidComparisonStopped):
+                    run.main([model, "sst5", "--max-requests", "10"])
+        built.assert_not_called()
+
+    def test_free_model_builds_on_openrouter(self):
         with mock.patch.dict(os.environ, {"OPENROUTER_API_KEY": "x"}):
-            for model in run.PAID + ("nex-agi/nex-n2.5-pro:free",):
-                p = run.provider_for(model)
-                self.assertEqual(p.api, "chat_completions")
-                self.assertEqual(str(p._client.base_url).rstrip("/"), run.BASE_URL)
+            p = run.provider_for("nex-agi/nex-n2.5-pro:free")
+            self.assertEqual(p.api, "chat_completions")
+            self.assertEqual(str(p._client.base_url).rstrip("/"), run.OR.BASE_URL)
 
     def test_missing_key_refuses(self):
         with mock.patch.dict(os.environ, {}, clear=True):
-            for model in run.PAID + ("nex-agi/nex-n2.5-pro:free",):
-                with self.assertRaises(RuntimeError):
-                    run.provider_for(model)
+            with self.assertRaises(RuntimeError):
+                run.provider_for("nex-agi/nex-n2.5-pro:free")
 
 
 class FreeArmAmendment2(unittest.TestCase):

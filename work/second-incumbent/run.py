@@ -35,6 +35,9 @@ import types
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
+from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-lbgk
+
 MODEL = "grok-4.20-0309-non-reasoning"
 BASE_URL = "https://api.x.ai/v1"
 CONCURRENCY = 8
@@ -170,6 +173,7 @@ def setup(dataset):
 
 
 async def run(dataset):
+    refuse_paid_comparator(f"second-incumbent {dataset} ({MODEL})")
     from system_one_adapter import AsyncSystemOneAdapterClient
     from system_one_adapter.providers.openai import AsyncOpenAIProvider
     from typesafe_sdk import RetryPolicy
@@ -230,6 +234,7 @@ async def run(dataset):
 
 async def smoke():
     """Feasibility, not scored: one synthetic state per question shape; prints the answer shape."""
+    refuse_paid_comparator(f"second-incumbent smoke ({MODEL})")
     from system_one_adapter import AsyncSystemOneAdapterClient
     from system_one_adapter.providers.openai import AsyncOpenAIProvider
     from typesafe_sdk import RetryPolicy

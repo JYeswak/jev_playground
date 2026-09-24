@@ -31,8 +31,10 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(0, HERE)
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
 
 import provider  # noqa: E402
+from anthropic_stop import require_free_comparator  # noqa: E402  jev-lbgk
 
 _spec = importlib.util.spec_from_file_location(
     "sst5_run", os.path.join(ROOT, "work/score-sst5/run.py")
@@ -177,7 +179,7 @@ async def bounded(coro, limit_s, pacer):
 
 async def run_model_paced(model, pacer):
     """One paced pass over the first N_ROWS rows. Returns False when the request cap stopped it."""
-    provider.require_free(model)
+    require_free_comparator(model, "openrouter run_sst5 paced")
     path = rows_path(model, "-run2")
     sample = [
         json.loads(line)
@@ -311,7 +313,7 @@ if __name__ == "__main__":
     if unknown:
         raise SystemExit(f"not in the allowed list: {unknown}")
     for m in chosen:
-        provider.require_free(m)
+        require_free_comparator(m, "openrouter run_sst5")
     if not os.environ.get(provider.KEY_ENV):
         raise SystemExit(f"unconfigured: {provider.KEY_ENV} is not set, no call made")
     sys.exit(asyncio.run(main_paced(chosen) if paced else main(chosen)))

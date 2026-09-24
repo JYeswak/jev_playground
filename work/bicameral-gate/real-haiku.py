@@ -22,7 +22,7 @@ sys.path.insert(
 sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
 
 from system_one_adapter import AsyncSystemOneAdapterClient, Noul  # noqa: E402
-from anthropic_stop import refuse_anthropic_comparator  # noqa: E402  jev-sybt
+from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-sybt, jev-lbgk
 from typesafe_sdk import RetryPolicy  # noqa: E402
 
 OUT = os.path.join(HERE, "real-rows-haiku.jsonl")
@@ -52,7 +52,7 @@ def done_ids():
 
 
 async def main(concurrency=8):
-    refuse_anthropic_comparator("bicameral-gate real-haiku (claude-haiku-4-5)")
+    refuse_paid_comparator("bicameral-gate real-haiku (claude-haiku-4-5)")
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print(
             "unconfigured: ANTHROPIC_API_KEY is not set, no call made", file=sys.stderr

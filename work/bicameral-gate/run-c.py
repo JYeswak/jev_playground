@@ -26,7 +26,7 @@ sys.path.insert(
 sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
 
 from typesafe_sdk import Noul, TypeSafeClient  # noqa: E402
-from anthropic_stop import refuse_anthropic_comparator  # noqa: E402  jev-sybt
+from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-sybt, jev-lbgk
 
 MODEL = "jev-1.13.0"
 CUT = 0.5
@@ -170,7 +170,7 @@ def run_jev(rows, path, questions, names, context):
 
 
 def run_haiku(rows, path, qdef):
-    refuse_anthropic_comparator("bicameral-gate run-c Haiku arm (claude-haiku-4-5)")
+    refuse_paid_comparator("bicameral-gate run-c Haiku arm (claude-haiku-4-5)")
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("unconfigured: ANTHROPIC_API_KEY unset")
         return 2

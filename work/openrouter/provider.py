@@ -6,7 +6,8 @@ instance is passed as `model=` to `AsyncSystemOneAdapterClient.system_one`, whic
 documents as a caller-owned provider (`_client.py`, "model name or caller-owned provider instance").
 
 The key comes from OPENROUTER_API_KEY (lane Infisical project) and is never printed or written.
-Free models only in this lane: every id in FREE_STRUCTURED ends in ':free'.
+Free models only in this lane: every id in FREE_STRUCTURED ends in ':free', and any other id is
+refused by work/anthropic-stop's require_free_comparator before a client exists (jev-lbgk).
 """
 
 import asyncio
@@ -19,8 +20,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
 
 from system_one_adapter.providers.openai import AsyncOpenAIProvider  # noqa: E402
+from anthropic_stop import require_free_comparator  # noqa: E402  jev-lbgk
 from typesafe_sdk import TypeSafeAPITimeoutError  # noqa: E402
 
 BASE_URL = "https://openrouter.ai/api/v1"
@@ -51,16 +54,9 @@ FREE_STRUCTURED_RUN2 = (
 )
 
 
-def require_free(model):
-    if not model.endswith(":free"):
-        raise ValueError(
-            f"not a free model: {model!r} (this lane sends public rows to :free only)"
-        )
-
-
 def openrouter_provider(model, api_key=None):
     """An adapter provider for one OpenRouter model. Refuses a paid model and a missing key."""
-    require_free(model)
+    require_free_comparator(model, "openrouter provider")
     key = api_key if api_key is not None else os.environ.get(KEY_ENV)
     if not key:
         raise RuntimeError(f"unconfigured: {KEY_ENV} is not set, no call made")
@@ -122,7 +118,7 @@ class PacedProvider:
         self.model_name = inner.model_name
 
     async def request(self, messages, *, schema, structured):
-        require_free(self.model_name)
+        require_free_comparator(self.model_name, "openrouter paced request")
         await self.pacer.acquire()
         try:
             return await asyncio.wait_for(

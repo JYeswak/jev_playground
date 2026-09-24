@@ -18,6 +18,8 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
+from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-lbgk
 
 GROK_MODEL = "grok-4.20-0309-non-reasoning"
 GROK_URL = "https://api.x.ai/v1"
@@ -95,6 +97,9 @@ async def main(set_name, run, concurrency=8, bar_path=None, repo=None):
     )
 
     call_after_bar(bar, lambda: None, repo=repo or ROOT)
+    # The bar gate stays first so work/sr-adopt/test_prereg.py still proves a dirty bar panics
+    # through this runner; the refusal follows it, before any adapter import or provider (jev-lbgk).
+    refuse_paid_comparator(f"grok-incumbent-3 {set_name} {run} ({GROK_MODEL})")
 
     from system_one_adapter import AsyncSystemOneAdapterClient
     from system_one_adapter.providers.openai import AsyncOpenAIProvider

@@ -23,6 +23,8 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
+from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-lbgk
 
 URL = (
     "https://raw.githubusercontent.com/PhilipMay/stsb-multi-mt/"
@@ -92,6 +94,8 @@ def row_from(answer, model, usage):
 
 
 async def main(arm, concurrency=8):
+    if not arm.startswith("jev"):
+        refuse_paid_comparator(f"score-stsb {arm} ({GROK_MODEL})")
     from system_one_adapter import AsyncSystemOneAdapterClient
     from system_one_adapter.providers.openai import AsyncOpenAIProvider
     from typesafe_sdk import AsyncTypeSafeClient, RetryPolicy, Score

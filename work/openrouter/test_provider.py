@@ -11,6 +11,7 @@ import unittest
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import provider  # noqa: E402
+from anthropic_stop import PaidComparisonStopped  # noqa: E402  (on sys.path via provider)
 
 
 class ProviderConstruction(unittest.TestCase):
@@ -27,7 +28,7 @@ class ProviderConstruction(unittest.TestCase):
         )  # retries belong to the adapter's RetryPolicy
 
     def test_paid_model_is_refused_before_any_client_exists(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(PaidComparisonStopped):
             provider.openrouter_provider(
                 "anthropic/claude-haiku-4.5", api_key="test-not-a-key"
             )
@@ -84,7 +85,7 @@ class PacedProviderGuards(unittest.TestCase):
 
     def test_paid_id_is_refused_before_pacing_or_any_request(self):
         inner, pacer = FakeInner("anthropic/claude-haiku-4.5"), provider.Pacer()
-        with self.assertRaises(ValueError):
+        with self.assertRaises(PaidComparisonStopped):
             self.call(provider.PacedProvider(inner, pacer))
         self.assertEqual((inner.calls, pacer.requests), (0, 0))
 

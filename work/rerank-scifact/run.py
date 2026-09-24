@@ -27,8 +27,10 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
 
 from typesafe_sdk import Noul, RetryPolicy  # noqa: E402
+from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-lbgk
 
 JEV_MODEL = "jev-1.13.0"
 GROK_MODEL = "grok-4.20-0309-non-reasoning"
@@ -172,6 +174,8 @@ def billing_block(message):
 
 
 async def run_arm(arm, bar_path=None, repo=None):
+    if not arm.startswith("jev"):
+        refuse_paid_comparator(f"rerank-scifact {arm} ({GROK_MODEL})")
     sys.path.insert(0, os.path.join(ROOT, "work/sr-adopt"))
     from phase_gate import call_after_bar
 

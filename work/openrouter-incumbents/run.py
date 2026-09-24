@@ -4,10 +4,10 @@ whose Jev wins survived their checks. Bar: docs/demos/upstream-repro/openrouter-
 (committed before any call).
 
 Provider: system-one-adapter's own AsyncOpenAIProvider(base_url=https://openrouter.ai/api/v1,
-api="chat_completions"), passed as the caller-owned `model=` (no adapter code edited). Free models go
-through work/openrouter/provider.py (jev-14qk's helper, which refuses any id without ':free'); the two
-cheap paid models are built here and refused unless the id is in PAID. The key is OPENROUTER_API_KEY
-from the lane Infisical project; only its length is ever checked.
+api="chat_completions"), passed as the caller-owned `model=` (no adapter code edited), built by
+work/openrouter/provider.py (jev-14qk's helper). Free models only: any id without ':free' refuses
+before a client exists (work/anthropic-stop, jev-lbgk; AGENTS.md 'No paid comparisons'). The key is
+OPENROUTER_API_KEY from the lane Infisical project; only its length is ever checked.
 
 Inputs are the exact questions, states and rows of each unit, read with `git show` at the commits the
 unit's incumbent arm used (work/second-incumbent/run.py PINS, plus FEVER here):
@@ -20,7 +20,7 @@ normalize_probabilities=True, RetryPolicy(). --prompted switches that cell to th
 
 Pacing (Amendment 2): free models run exactly as jev-3e2i's paced run 2 (run_sst5.py --paced): one in
 flight, at most 15 request starts per 60 s at the provider seam, 120 s per attempt, runner-owned 429
-waits, a quota stop, a 5-row streak stop and a per-session --max-requests cap. Paid: 8 in flight.
+waits, a quota stop, a 5-row streak stop and a per-session --max-requests cap.
 
 Run (live):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
@@ -43,6 +43,9 @@ sys.path.insert(0, os.path.join(ROOT, "upstream/typesafe-ai/typesafe-sdk-python/
 sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
+
+from anthropic_stop import require_free_comparator  # noqa: E402  jev-lbgk
 
 
 def _load(name, relpath):
@@ -57,8 +60,6 @@ OR = _load("openrouter_provider", "openrouter/provider.py")
 # Run 2's paced settings and helpers, imported so the free arm runs exactly as run 2 did (Amendment 2).
 RS = _load("openrouter_run_sst5", "openrouter/run_sst5.py")
 
-BASE_URL = "https://openrouter.ai/api/v1"
-PAID = ("openai/gpt-5-nano", "deepseek/deepseek-v4-flash")
 DATASETS = ("sst5", "banking77", "clinc150", "scifact", "fever", "stsb")
 FEVER_PIN = {
     "runner": ("834a569", "work/noul-scifact/run.py"),
@@ -68,8 +69,6 @@ FEVER_PIN = {
 # sha256-pinned public CSV and never written to a row (their licenses do not allow committing them).
 STSB_PIN = ("8e4bda9", "work/score-stsb/run.py")
 STSB_INSTRUCTIONS = "How similar in meaning are these two sentences?"
-PAID_INFLIGHT = 8
-TIMEOUT_PAID_S = 90
 MAX_REQUESTS_CEILING = 599
 
 
@@ -117,19 +116,9 @@ def answered(path):
 
 
 def provider_for(model):
-    """Free ids through jev-14qk's guarded helper; paid ids only from PAID."""
-    if model.endswith(":free"):
-        return OR.openrouter_provider(model)
-    if model not in PAID:
-        raise ValueError(f"not an approved paid model: {model!r} (allowed: {PAID})")
-    from system_one_adapter.providers.openai import AsyncOpenAIProvider
-
-    key = os.environ.get(OR.KEY_ENV)
-    if not key:
-        raise RuntimeError(f"unconfigured: {OR.KEY_ENV} is not set, no call made")
-    return AsyncOpenAIProvider(
-        model, base_url=BASE_URL, api_key=key, api="chat_completions"
-    )
+    """A :free id through jev-14qk's helper; any other id refuses before a client exists."""
+    require_free_comparator(model, "openrouter-incumbents")
+    return OR.openrouter_provider(model)
 
 
 def setup_stsb():
@@ -189,72 +178,6 @@ def setup(dataset):
     return sample, {qname: runner.QUESTION}, runner.state, to_row
 
 
-async def run(model, dataset, prompted, limit):
-    """The paid path (8 in flight, 90 s per call). :free models run through run_free()."""
-    from system_one_adapter import AsyncSystemOneAdapterClient
-    from typesafe_sdk import RetryPolicy
-
-    provider = provider_for(model)
-    sample, questions, state, to_row = setup(dataset)
-    path = out_path(dataset, model, prompted)
-    have = answered(path)
-    todo = [s for s in sample if s["i"] not in have][:limit]
-    mode = "prompted" if prompted else "structured"
-    print(
-        f"{model} {dataset} {mode}: {len(todo)} to run, {len(have)} resumed",
-        file=sys.stderr,
-    )
-    sem = asyncio.Semaphore(PAID_INFLIGHT)
-    timeout = TIMEOUT_PAID_S
-    extra = {"n_retry_malformed_structure": 1} if prompted else {}
-    ok = failed = 0
-    async with AsyncSystemOneAdapterClient(
-        structured_outputs=not prompted,
-        llm_answer_mode="probabilities",
-        normalize_probabilities=True,
-        retry=RetryPolicy(),
-        **extra,
-    ) as client:
-
-        async def one(item):
-            async with sem:
-                t0 = time.perf_counter()
-                row = {"i": item["i"], "model": model, "mode": mode}
-                try:
-                    resp = await asyncio.wait_for(
-                        client.system_one(state(item), questions, model=provider),
-                        timeout=timeout,
-                    )
-                    row.update(to_row(item, resp))
-                    row.update(SI.attempt_facts(resp))
-                    row["usage"] = {
-                        "input_tokens": resp.usage.input_tokens_total,
-                        "output_tokens": resp.usage.output_tokens_total,
-                    }
-                    row["nRetries"] = resp.usage.n_retries
-                    row["nRetriesMalformed"] = resp.usage.n_retries_malformed_structure
-                except Exception as exc:  # noqa: BLE001 - recorded, scored by the bar's rules
-                    row["error"] = f"{type(exc).__name__}: {str(exc)[:500]}"
-                row["latencyMs"] = int((time.perf_counter() - t0) * 1000)
-                return row
-
-        with open(path, "a", encoding="utf-8") as fh:
-            for coro in asyncio.as_completed([one(s) for s in todo]):
-                row = await coro
-                fh.write(json.dumps(row, ensure_ascii=False) + "\n")
-                fh.flush()
-                failed += "error" in row
-                ok += "error" not in row
-                if (ok + failed) % 50 == 0:
-                    print(
-                        f"  {ok + failed}/{len(todo)} ok={ok} failed={failed}",
-                        file=sys.stderr,
-                    )
-    await provider.aclose()
-    print(f"{model} {dataset} {mode} done: ok={ok} failed={failed}", file=sys.stderr)
-    return 3 if failed else 0
-
-
 def free_todo(sample, path, resume):
     """Main pass: rows with no record, or whose last record is a quota row. Resume pass: rows whose
     only record is one non-quota failure (the bar's single resume)."""
@@ -289,7 +212,7 @@ async def run_free(model, dataset, prompted, limit, max_requests, resume):
     from system_one_adapter import AsyncSystemOneAdapterClient
     from typesafe_sdk import TypeSafeRateLimitError
 
-    OR.require_free(model)
+    require_free_comparator(model, "openrouter-incumbents run_free")
     sample, questions, state, to_row = setup(dataset)
     path = out_path(dataset, model, prompted)
     todo = free_todo(sample, path, resume)[:limit]
@@ -414,22 +337,20 @@ def main(argv):
         )
     model, dataset = argv
     try:
-        provider_for(model)  # refuses an unapproved id or a missing key before any work
-    except (ValueError, RuntimeError) as exc:
+        provider_for(model)  # refuses a paid id or a missing key before any work
+    except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
         return 2
     limit = int(limit) if limit else None
-    if model.endswith(":free"):
-        if not max_requests or not 0 < int(max_requests) <= MAX_REQUESTS_CEILING:
-            print(
-                f"refused: a :free session needs --max-requests between 1 and {MAX_REQUESTS_CEILING} (Amendment 2: remaining - 20)",
-                file=sys.stderr,
-            )
-            return 2
-        return asyncio.run(
-            run_free(model, dataset, prompted, limit, int(max_requests), resume)
+    if not max_requests or not 0 < int(max_requests) <= MAX_REQUESTS_CEILING:
+        print(
+            f"refused: a :free session needs --max-requests between 1 and {MAX_REQUESTS_CEILING} (Amendment 2: remaining - 20)",
+            file=sys.stderr,
         )
-    return asyncio.run(run(model, dataset, prompted, limit))
+        return 2
+    return asyncio.run(
+        run_free(model, dataset, prompted, limit, int(max_requests), resume)
+    )
 
 
 if __name__ == "__main__":

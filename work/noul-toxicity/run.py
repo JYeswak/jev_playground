@@ -18,6 +18,8 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
+from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-lbgk
 
 JEV_MODEL = "jev-1.13.0"
 GROK_MODEL = "grok-4.20-0309-non-reasoning"
@@ -51,6 +53,8 @@ def answered(arm):
 
 
 async def main(arm, concurrency=8):
+    if not arm.startswith("jev"):
+        refuse_paid_comparator(f"noul-toxicity {arm} ({GROK_MODEL})")
     from system_one_adapter import AsyncSystemOneAdapterClient
     from system_one_adapter.providers.openai import AsyncOpenAIProvider
     from typesafe_sdk import AsyncTypeSafeClient, Noul, RetryPolicy

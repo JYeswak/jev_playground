@@ -31,6 +31,9 @@ import time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
+from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-lbgk
+
 ADAPTER = os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python")
 QUESTIONS_PATH = os.path.join(HERE, "questions.mjs")
 RUN_B_PATH = os.path.join(HERE, "run-b.py")
@@ -257,6 +260,9 @@ def selftest():
 
 
 async def main(kind, run, concurrency=8):
+    refuse_paid_comparator(
+        f"bicameral-gate run-grok-criteria {kind} run{run} ({GROK_MODEL})"
+    )
     why = check_pins()
     if why:
         return refuse(why)
