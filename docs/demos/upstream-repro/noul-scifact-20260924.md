@@ -166,6 +166,16 @@ The rest held. Brier was a WIN on 3/3 runs, accuracy was a TIE on 3/3, and no ru
 so the PASS stands. The direction favoured Jev on every run. The claim that holds up is: Jev is better
 on Brier and not worse on anything. The AUC and ECE margins are within Haiku's run-to-run spread.
 
+**Both arms' variance** (VerifySST5, bead `jev-hg8`, bar `5167fe8`, result `3c006e2`). VerifySST5
+crossed four Jev runs with three Haiku runs, giving 12 pairings. The four Jev runs are the committed
+run, the same-time criteria rerun from `jev-k2q`, and two new runs; the rerun ran beside that bead's
+ablation, not at an independent time. Across the 12 pairings:
+- Brier is a Jev WIN in 12 of 12.
+- AUC is a WIN in 8 of 12 and ECE in 5 of 12, so both stay retracted under R89.
+- The PASS stands.
+
+Brier is the one probability claim that survives variance in both models.
+
 ## Non-author verification — VerifySST5
 
 VerifySST5 (background agent of pane 1; not the author), 2026-09-24, keyless, from a fresh
