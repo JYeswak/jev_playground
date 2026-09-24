@@ -1,11 +1,11 @@
 name: gates
 
 # W2.6 public CI backstop (moves jev out of RULEBOOK class C4). Runs every
-# foundation gate keyless on ubuntu on push to main, plus every stage's
-# --selftest RED arm. omp is NOT installed here: stages that need the omp
-# binary degrade to typed SKIP lines (selftest-ttsr-*.sh say so themselves);
-# the verdict step counts SKIP lines separately from PASS. A run with skips
-# is "green with N typed skips", never plain green. A planted defect must
+# foundation gate keyless on ubuntu on push to main. The verdict is
+# `bash foundation/gates.sh --portable` (and the same flag on --selftest),
+# the command a stranger runs. A missing prerequisite is that script's own
+# SKIP row (exit 8), counted, never remapped here. A run with skips is
+# "green with N typed skips", never plain green. A planted defect must
 # turn a run RED (proven live, see the W2.6 receipt); a green run that never
 # saw RED is unproven.
 
@@ -95,37 +95,25 @@ jobs:
           set -u
           br sync --import-only
           ls .beads/*.db
-      - name: Run all gates (keyless; no key in env by construction)
+      - name: Run all gates (keyless; --portable, the stranger's command)
         id: gates
         run: |
           set -u; set +e  # runner uses bash -e; gates.sh reports rc, never aborts
-          ./foundation/gates.sh > /tmp/gates-run.txt 2>&1; echo "rc=$?" > /tmp/gates-rc.txt
+          bash foundation/gates.sh --portable > /tmp/gates-run.txt 2>&1; echo "rc=$?" > /tmp/gates-rc.txt
           cat /tmp/gates-run.txt
 
-      - name: "Run every stage --selftest (RED arms; mirrors gates.sh: skips non-executables)"
+      - name: "Run gates.sh --selftest --portable (same SKIP rule as the run)"
         id: selftests
         run: |
-          set -u; set +e  # runner uses bash -e; stages report codes, never abort
-          : > /tmp/selftest-run.txt; : > /tmp/selftest-rc.txt
-          fail=0
-          for stage in foundation/gates.d/[0-9]*-*.sh; do
-
-            [ -x "$stage" ] || continue
-            name=$(basename "$stage" .sh)
-            out=$("$stage" --selftest 2>&1); code=$?
-            printf '### %s (rc=%s)\n%s\n' "$name" "$code" "$out" >> /tmp/selftest-run.txt
-            echo "$name $code" >> /tmp/selftest-rc.txt
-            [ "$code" -eq 0 ] || fail=1
-          done
-          echo "fail=$fail" | tee /tmp/selftest-fail.txt
+          set -u; set +e  # runner uses bash -e; gates.sh reports rc, never aborts
+          bash foundation/gates.sh --selftest --portable > /tmp/selftest-run.txt 2>&1; echo "rc=$?" > /tmp/selftest-rc.txt
+          cat /tmp/selftest-run.txt
           exit 0
 
-      - name: Diagnose RED stages with full output (only reruns stages gates marked RED)
-        # gates.sh truncates stage output to 300 chars; the typed-SKIP mapping
-        # below needs full outputs, so RED stages among the three
-        # environment-sensitive ones are rerun here. A rerun that goes green
-        # means flake (stays RED); a rerun with the same environmental
-        # signature feeds the mapping. This step never changes a verdict.
+      - name: Diagnose RED stages with full output (log only; does not change the verdict)
+        # A RED row already names the failing sub-check. This rerun is a log of
+        # the three environment-sensitive stages when they are RED. It does not
+        # remap a RED into a SKIP; --portable already did that, or it did not.
         run: |
           set -u; set +e
           for st in 50-house-gates 60-staged-deletion-lane 80-lane-instrument-selftests; do
@@ -136,79 +124,26 @@ jobs:
               echo "$st not-red-in-gates" | tee -a /tmp/diag-rc.txt
             fi
           done
-          echo "--- machine facts for mapping ---" | tee /tmp/diag-facts.txt
-          command -v omp >/dev/null 2>&1 && echo "omp present" | tee -a /tmp/diag-facts.txt || echo "omp absent" | tee -a /tmp/diag-facts.txt
-          test -f "$HOME/.omp/omp-extensions/ee-ambient-session-start.ts" && echo "home-ee present" | tee -a /tmp/diag-facts.txt || echo "home-ee absent" | tee -a /tmp/diag-facts.txt
+          echo "diagnose is a log; the verdict does not read it"
           exit 0
 
-      - name: Verdict (RED fails; SKIP counted apart from PASS, never as PASS)
+      - name: Verdict (RED fails; SKIP is gates.sh's own row, never remapped)
         run: |
           set -u; set +e  # runner uses bash -e; verdict computes, never aborts early
           gates_rc=$(cut -d= -f2 /tmp/gates-rc.txt)
-          selftest_fail=$(cut -d= -f2 /tmp/selftest-fail.txt)
-          echo "===== gates.sh ====="; cat /tmp/gates-run.txt
-          echo "===== selftests ====="; cat /tmp/selftest-run.txt
+          selftest_rc=$(cut -d= -f2 /tmp/selftest-rc.txt)
+          echo "===== gates.sh --portable ====="; cat /tmp/gates-run.txt
+          echo "===== gates.sh --selftest --portable ====="; cat /tmp/selftest-run.txt
           echo "===== typed skips (not passes) ====="
-          grep -h "SKIP" /tmp/gates-run.txt /tmp/selftest-run.txt 2>/dev/null || true
-          skips=$(grep -h "SKIP" /tmp/gates-run.txt /tmp/selftest-run.txt 2>/dev/null | wc -l | tr -d ' ')
+          grep -h "^SKIP " /tmp/gates-run.txt /tmp/selftest-run.txt 2>/dev/null || true
+          skips=$(grep -hc "^SKIP " /tmp/gates-run.txt /tmp/selftest-run.txt 2>/dev/null | awk '{s+=$1} END{print s+0}')
           echo "skip_lines=$skips"
-          # ---- typed-SKIP mapping (environment-blocked stages) ----
-          # Each rule needs ALL of: the stage RED, the exact environmental
-          # signature in its full-output rerun, and the machine fact.
-          # Anything else RED stays RED. Rules live here (reviewed workflow),
-          # never in a gate. No gate file was touched for CI.
-          skip_extra=0
-          # 50: loop-kit is a private-repo instrument; exit 3 + exact message.
-          if grep -q "^RED  50-house-gates " /tmp/gates-run.txt 2>/dev/null \
-            && grep -q "50-house-gates diag_rc=3" /tmp/diag-rc.txt 2>/dev/null \
-            && grep -q "house gates unreachable" /tmp/diag-50-house-gates.txt 2>/dev/null; then
-            echo "SKIP stage-50 (run): loop-kit private instrument absent (exit 3, exact message)"
-            skip_extra=$((skip_extra+1)); map50run=1
-          fi
-          # 80: EVERY failing suite is selftest-consumer-check.sh (needs $HOME
-          # ee/dcg tooling, absent) and omp is absent (TTSR SKIPs prove it).
-          if grep -q "^RED  80-lane-instrument-selftests " /tmp/gates-run.txt 2>/dev/null \
-            && [ -f /tmp/diag-80-lane-instrument-selftests.txt ] \
-            && grep -q "^home-ee absent$" /tmp/diag-facts.txt 2>/dev/null \
-            && grep -q "^omp absent$" /tmp/diag-facts.txt 2>/dev/null; then
-            red_total=$(awk '/^  RED /{n++} END{print n+0}' /tmp/diag-80-lane-instrument-selftests.txt)
-            red_other=$(awk '/^  RED / && !/selftest-consumer-check\.sh/{n++} END{print n+0}' /tmp/diag-80-lane-instrument-selftests.txt)
-            if [ "$red_total" != "0" ] && [ "$red_other" = "0" ]; then
-              echo "SKIP stage-80 (run): only selftest-consumer-check.sh fails; needs absent \$HOME tooling"
-              skip_extra=$((skip_extra+1)); map80run=1
-            fi
-          fi
-          # 50-selftest: same instrument, same signature in its recorded section.
-          if grep -q "^50-house-gates 3$" /tmp/selftest-rc.txt 2>/dev/null \
-            && grep -q "house gates unreachable" /tmp/selftest-run.txt 2>/dev/null; then
-            echo "SKIP stage-50 (selftest): loop-kit private instrument absent"
-            skip_extra=$((skip_extra+1)); map50self=1
-          fi
-          # Effective verdict: RED unless every RED is mapped and selftests clean-or-mapped.
-          [ -s /tmp/gates-run.txt ] || unmapped=1
-          unmapped=${unmapped:-0}
-          for st in $(grep "^RED  " /tmp/gates-run.txt 2>/dev/null | awk '{print $2}' || true); do
-            case "$st" in
-              50-house-gates) [ "${map50run:-0}" = "1" ] || unmapped=1 ;;
-              80-lane-instrument-selftests) [ "${map80run:-0}" = "1" ] || unmapped=1 ;;
-              *) unmapped=1 ;;
-            esac
-          done
-          [ -s /tmp/selftest-rc.txt ] || selftest_bad=1
-          selftest_bad=${selftest_bad:-0}
-          for row in $(awk '{print $1":"$2}' /tmp/selftest-rc.txt 2>/dev/null || true); do
-            nm=${row%%:*}; rc=${row##*:}
-            case "$nm" in
-              50-house-gates) if [ "${map50self:-0}" != "1" ]; then [ "$rc" = "0" ] || selftest_bad=1; fi ;;
-              *) [ "$rc" = "0" ] || selftest_bad=1 ;;
-            esac
-          done
-          if [ "$unmapped" != "0" ] || [ "$selftest_bad" != "0" ]; then
-            echo "VERDICT: RED (unmapped_red=$unmapped selftest_bad=$selftest_bad)"
+          if [ "$gates_rc" != "0" ] || [ "$selftest_rc" != "0" ]; then
+            echo "VERDICT: RED (gates_rc=$gates_rc selftest_rc=$selftest_rc)"
             exit 1
           fi
-          if [ "$skips" != "0" ] || [ "$skip_extra" != "0" ]; then
-            echo "VERDICT: GREEN WITH $((skips + skip_extra)) TYPED SKIPS (see SKIP lines above; never plain green)"
+          if [ "$skips" != "0" ]; then
+            echo "VERDICT: GREEN WITH $skips TYPED SKIPS (gates.sh --portable; never plain green)"
             exit 0
           fi
           echo "VERDICT: ALL GREEN"
