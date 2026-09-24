@@ -43,8 +43,23 @@ function loadSdk(): Promise<Sdk | undefined> {
 export const SYSTEMONE_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 export const DEFAULT_MODEL = "jev-1.13.0";
 
-/** Discriminated result. There is no "empty success": a caller cannot mistake failure for a clean score. */
-export type JevUsage = { input_tokens: number; output_tokens: number };
+/**
+ * Usage exactly as the server reported it; never invented, never zero-filled.
+ * `input_tokens`/`output_tokens` are the fields both SDKs declare (typesafe-sdk-js
+ * src/types.ts:127-132; typesafe-sdk-python _schemas/models.py:151-160, where input tokens
+ * are "billable" and output tokens "currently free of charge"). `billing_units` is declared by
+ * NEITHER SDK: the Python SDK drops it (tests/test_responses.py:143,152), while the JS SDK
+ * returns the parsed body untouched (dist/index.mjs:571-574), so it survives to here.
+ * `billing_units: null` means the usage object carried no finite number under that name —
+ * absent, and reported as absent. `extra` holds every other finite numeric usage field verbatim
+ * (for example `reasoning_tokens`), `{}` when there are none.
+ */
+export type JevUsage = {
+  input_tokens: number;
+  output_tokens: number;
+  billing_units: number | null;
+  extra: Record<string, number>;
+};
 export type JevResult =
   | { ok: true; scores: Record<string, number>; latencyMs: number; model: string; usage?: JevUsage }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
@@ -64,6 +79,7 @@ export type JevChoiceResult =
       probabilities: Record<string, number>;
       latencyMs: number;
       model: string;
+      usage?: JevUsage;
     }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
 
@@ -165,7 +181,7 @@ function guardedFetch(fetchImpl: typeof fetch, timeoutMs: number, APITimeoutErro
 async function postSystemOne(
   apiKey: string,
   model: string,
-  state: Record<string, unknown>,
+  state: string | Record<string, unknown>,
   questions: Record<string, unknown>,
   timeoutMs: number,
   fetchImpl: typeof fetch,
@@ -222,20 +238,31 @@ async function postSystemOne(
   }
   const resolvedModel =
     "model" in result && typeof result.model === "string" ? result.model : model;
-  // Usage passthrough, never invented: field names per the installed SDK
-  // declarations (work/sdk/.../index.d.mts:120-126 — input_tokens and
-  // output_tokens; there is NO cost field). Absent or malformed usage is
-  // omitted, and the scores stand without it.
-  const rawUsage: unknown = "usage" in result ? result.usage : undefined;
-  const usage: JevUsage | undefined =
-    rawUsage !== null && typeof rawUsage === "object" &&
-    typeof Reflect.get(rawUsage, "input_tokens") === "number" &&
-    Number.isFinite(Reflect.get(rawUsage, "input_tokens")) &&
-    typeof Reflect.get(rawUsage, "output_tokens") === "number" &&
-    Number.isFinite(Reflect.get(rawUsage, "output_tokens"))
-      ? { input_tokens: Reflect.get(rawUsage, "input_tokens") as number, output_tokens: Reflect.get(rawUsage, "output_tokens") as number }
-      : undefined;
+  const usage = readUsage("usage" in result ? result.usage : undefined);
   return { ok: true, answers, latencyMs, resolvedModel, ...(usage ? { usage } : {}) };
+}
+
+/**
+ * Read `usage` field by field; never invent one. The whole object is absent (undefined) when the
+ * response carries no usage object or no finite `input_tokens`/`output_tokens` pair — the scores
+ * stand without it. `billing_units` is reported as `null` when absent or non-finite, never as 0.
+ */
+function readUsage(raw: unknown): JevUsage | undefined {
+  if (raw === null || typeof raw !== "object" || Array.isArray(raw)) return undefined;
+  const finite = (key: string): number | null => {
+    const value: unknown = Reflect.get(raw, key);
+    return typeof value === "number" && Number.isFinite(value) ? value : null;
+  };
+  const input_tokens = finite("input_tokens");
+  const output_tokens = finite("output_tokens");
+  if (input_tokens === null || output_tokens === null) return undefined;
+  const extra: Record<string, number> = {};
+  for (const key of Object.keys(raw)) {
+    if (key === "input_tokens" || key === "output_tokens" || key === "billing_units") continue;
+    const value = finite(key);
+    if (value !== null) extra[key] = value;
+  }
+  return { input_tokens, output_tokens, billing_units: finite("billing_units"), extra };
 }
 
 export async function askJev(options: AskOptions): Promise<JevResult> {
@@ -373,7 +400,7 @@ export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoice
   if (typeof confidence !== "number") {
     return { ok: false, reason: "no-answers", error: "`confidence` was not a number", latencyMs, model };
   }
-  return { ok: true, choice: chosen, confidence, probabilities, latencyMs, model };
+  return { ok: true, choice: chosen, confidence, probabilities, latencyMs, model, ...(posted.usage ? { usage: posted.usage } : {}) };
 }
 
 export type AskScoreOptions = {
@@ -399,6 +426,7 @@ export type JevScoreResult =
       probabilities: Record<string, number>;
       latencyMs: number;
       model: string;
+      usage?: JevUsage;
     }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
 
@@ -466,12 +494,12 @@ export async function askJevScore(options: AskScoreOptions): Promise<JevScoreRes
     }
     legendOut[key] = value;
   }
-  return { ok: true, score, confidence, legend: legendOut, probabilities, latencyMs, model };
+  return { ok: true, score, confidence, legend: legendOut, probabilities, latencyMs, model, ...(posted.usage ? { usage: posted.usage } : {}) };
 }
 
 export type AskBundleOptions = {
-  /** The object the questions are asked about. Serialised as-is into `state`. */
-  state: Record<string, unknown>;
+  /** What the questions are asked about: text (sent as a string) or an object. Serialised as-is into `state`. */
+  state: string | Record<string, unknown>;
   /** Already-typed question objects (`type: noul|choice|score`). */
   questions: Record<string, unknown>;
   timeoutMs?: number;
@@ -489,6 +517,7 @@ export type JevBundleResult =
       latencyMs: number;
       model: string;
       resolvedModel: string;
+      usage?: JevUsage;
     }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
 
@@ -520,6 +549,7 @@ export async function askJevBundle(options: AskBundleOptions): Promise<JevBundle
     latencyMs: posted.latencyMs,
     model,
     resolvedModel: posted.resolvedModel,
+    ...(posted.usage ? { usage: posted.usage } : {}),
   };
 }
 

@@ -123,12 +123,60 @@ test('partial answers still succeed on what came back',
     assert.equal('b' in r.scores, false);
   }));
 
-test('usage passes through when the response carries it',
-  withFetch(respond(200, { answers: { harm: { noul: 0.7 } }, usage: { input_tokens: 100, output_tokens: 20 }, model: 'jev-1.13.0' }), async () => {
+// billing_units is on the wire but declared by NEITHER SDK (typesafe-sdk-python
+// tests/test_responses.py:143 carries it and :152 proves the Python SDK drops it). The JS SDK
+// passes the parsed body through, so this client is where it is kept or lost.
+test('usage passes through with billing_units and every other numeric field when the response carries them',
+  withFetch(respond(200, { answers: { harm: { noul: 0.7 } }, usage: { input_tokens: 100, output_tokens: 20, billing_units: 3, reasoning_tokens: 9, note: 'text is not a count' }, model: 'jev-1.13.0' }), async () => {
     const r = await askJev({ state: STATE, questions: QUESTIONS });
     assert.equal(r.ok, true);
-    assert.deepEqual(r.usage, { input_tokens: 100, output_tokens: 20 });
+    assert.deepEqual(r.usage, { input_tokens: 100, output_tokens: 20, billing_units: 3, extra: { reasoning_tokens: 9 } });
   }));
+
+test('usage without billing_units reports billing_units null, never a zero-filled count',
+  withFetch(respond(200, { answers: { harm: { noul: 0.7 } }, usage: { input_tokens: 100, output_tokens: 20 } }), async () => {
+    const r = await askJev({ state: STATE, questions: QUESTIONS });
+    assert.equal(r.ok, true);
+    assert.strictEqual(r.usage.billing_units, null);
+    assert.deepEqual(r.usage.extra, {});
+  }));
+
+// Every answer shape carries usage, and a response with no usage never throws on any of them.
+const USAGE = { input_tokens: 381, output_tokens: 18, billing_units: 1 };
+const YES_NO = { yes: 'it is', no: 'it is not' };
+const SHAPES = {
+  noul: { answers: { harm: { noul: 0.7 } }, ask: () => askJev({ state: STATE, questions: QUESTIONS }) },
+  choice: {
+    answers: { choice: { type: 'choice', choice: 'yes', confidence: 0.9, probabilities: { yes: 0.9, no: 0.1 } } },
+    ask: () => askJevChoice({ state: STATE, instructions: 'q', classes: YES_NO }),
+  },
+  score: {
+    answers: { score: { type: 'score', score: 1, confidence: 0.9, legend: { 0: 'none', 1: 'bad' }, probabilities: { 0: 0.1, 1: 0.9 } } },
+    ask: () => askJevScore({ state: STATE, instructions: 'how bad?', criteria: ['none', 'bad'] }),
+  },
+  // A text state, as work/score-sst5 sends it: the bundle forwards a string unchanged.
+  bundle: { answers: { a: { type: 'noul', noul: 0.4 } }, ask: () => askJevBundle({ state: 'plain text state', questions: { a: { type: 'noul', instructions: 'q' } } }) },
+};
+
+test('every answer shape returns billing_units when the response carries usage', async (t) => {
+  for (const [shape, { answers, ask }] of Object.entries(SHAPES)) {
+    await t.test(shape, withFetch(respond(200, { answers, usage: USAGE, model: 'jev-1.13.0' }), async () => {
+      const r = await ask();
+      assert.equal(r.ok, true, `${shape} answered`);
+      assert.deepEqual(r.usage, { ...USAGE, extra: {} });
+    }));
+  }
+});
+
+test('every answer shape answers without throwing and reports usage absent when the response has none', async (t) => {
+  for (const [shape, { answers, ask }] of Object.entries(SHAPES)) {
+    await t.test(shape, withFetch(respond(200, { answers, model: 'jev-1.13.0' }), async () => {
+      const r = await ask();
+      assert.equal(r.ok, true, `${shape}: a missing usage object must not fail the answer`);
+      assert.equal('usage' in r, false, `${shape}: absent usage must not be invented or zero-filled`);
+    }));
+  }
+});
 
 test('usage is absent, never invented, when the response omits it',
   withFetch(respond(200, { answers: { harm: { noul: 0.7 } } }), async () => {
