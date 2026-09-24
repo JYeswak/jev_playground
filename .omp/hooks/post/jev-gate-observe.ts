@@ -17,13 +17,23 @@
  * module scope. If the source cannot be read or parsed, every command is
  * skipped `filter-error`: a filter failure fails safe toward skip.
  *
+ * Full-command sidecar (bead jev-izhc, R92 retry): the log above keeps a
+ * 200-char redacted prefix, but Jev scores the whole command, so a flag cannot
+ * be relabelled or re-scored from the log. Every command that passes the
+ * filters is also appended verbatim — the exact text sent as `state.command`,
+ * no HOME rewrite — to `~/.local/state/jev/gate-observe-full.jsonl`, one row
+ * `{ts, session, cmdSha, cmd}` joined to the log by `cmdSha`. A command the
+ * filters drop (secret or filter-error) writes nothing there. The file is
+ * created and re-asserted mode 600 on every append, lives outside every repo,
+ * and must never be copied into a committed extract.
+ *
  * No key: one row `NOT_RUN reason=unconfigured`, no throw. Any throw anywhere
  * in this module is caught: the tool path never sees us.
  */
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { appendFile, mkdir } from "node:fs/promises";
+import { appendFile, mkdir, open } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -33,6 +43,11 @@ import { CUT, RISK, STATE_CONTEXT } from "../../../work/bicameral-gate/questions
 export const MODEL = "jev-1.13.0";
 export const MAX_PREFIX = 200;
 export const LOG_REL = "state/jev/gate-observe.jsonl";
+export const SIDECAR_REL = "state/jev/gate-observe-full.jsonl";
+export const SIDECAR_MODE = 0o600;
+export const SIDECAR_KEYS = ["ts", "session", "cmdSha", "cmd"] as const;
+/** Local-only; `cmd` is the full scored command. Never commit one. */
+export type SidecarRow = Pick<ObserveRow, "ts" | "session" | "cmdSha" | "cmd">;
 export const INFISICAL_BIN = join(homedir(), ".local", "bin", "infisical");
 export const INFISICAL_PROJECT = "42b194c3-89d7-4ebb-895f-dd77ddf005ba";
 const KEY_TIMEOUT_MS = 8000;
@@ -186,9 +201,11 @@ export interface ObserveDeps {
     latencyMs?: number;
     usage?: { input_tokens: number; output_tokens: number };
   }>;
-  filter?: (command: string) => { drop: boolean; reason?: string };
   append?: (path: string, line: string) => Promise<void>;
   logPath?: string;
+  /** Full-command sidecar writer; the default forces mode 600. */
+  appendSidecar?: (path: string, line: string) => Promise<void>;
+  sidecarPath?: string;
   now?: () => string;
   /** omp session id, read from the hook ctx by `makeHandler`. */
   session?: string;
@@ -214,8 +231,27 @@ async function defaultAppend(path: string, line: string): Promise<void> {
   await appendFile(path, line + "\n");
 }
 
+/**
+ * Opens for append with mode 600 and re-asserts 600 before writing, so a file
+ * that pre-exists with wider bits is narrowed before it gets a new command.
+ */
+export async function defaultSidecarAppend(path: string, line: string): Promise<void> {
+  await mkdir(dirname(path), { recursive: true, mode: 0o700 });
+  const fh = await open(path, "a", SIDECAR_MODE);
+  try {
+    await fh.chmod(SIDECAR_MODE);
+    await fh.appendFile(line + "\n");
+  } finally {
+    await fh.close();
+  }
+}
+
 export function defaultLogPath(): string {
   return join(homedir(), ".local", LOG_REL);
+}
+
+export function defaultSidecarPath(): string {
+  return join(homedir(), ".local", SIDECAR_REL);
 }
 
 /**
@@ -247,6 +283,13 @@ export async function observe(
     if (verdict.drop) {
       await write({ ...base, status: "skipped", probs: null, flag: null, latencyMs: null, tokens: null, skipped: verdict.reason === "filter-error" ? "filter-error" : "secret", error: null });
       return undefined;
+    }
+    // Past the filters only. The text is exactly what `state.command` carries below.
+    try {
+      const full: SidecarRow = { ts: base.ts, session: base.session, cmdSha: base.cmdSha, cmd: command };
+      await (deps.appendSidecar ?? defaultSidecarAppend)(deps.sidecarPath ?? defaultSidecarPath(), JSON.stringify(full));
+    } catch {
+      /* best-effort like the log; the tool path never sees us */
     }
     let answer;
     try {
