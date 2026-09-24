@@ -50,6 +50,51 @@ elif [ "$_branch" != "main" ]; then
   exit 1
 fi
 
+# ── lane 0b: claim-discipline canary (fail-closed in the guarded tree) ──────────
+# Frankentui CHECKLIST B5: a checker that goes blind must not read as passing.
+# Run foundation/kit/check-claim-discipline.sh against a canary FALSE claim and
+# require RED before any real check runs. Fail closed when the checker is absent
+# or not executable, when it says GREEN on the false claim, or when its RED does
+# not name the plant. Silent on the healthy path (a passing canary prints nothing).
+#
+# NOT-guarded-tree skip: stage 60's hermetic fixtures copy ONLY the pre-commit
+# pair into a scratch hooks dir (60-staged-deletion-lane.sh:49-56), so no
+# foundation/ exists there. Refusing there would fail every witness of a gate
+# that predates this lane. Agents cannot remove foundation/kit or
+# .omp/kit-guard.json without KIT_GATE_EDIT=1 (both are gate paths), so inside
+# the guarded tree the skip is unreachable and fail-closed holds.
+if [ ! -d "$_repo/foundation/kit" ] && [ ! -e "$_repo/.omp/kit-guard.json" ]; then
+  printf 'CANARY_SKIPPED reason=not-guarded-tree repo=%s\n  claim-discipline canary applies to the guarded tree only; continuing to the real lanes.\n' "$_repo" >&2
+else
+  _checker="$_repo/foundation/kit/check-claim-discipline.sh"
+  if [ ! -x "$_checker" ]; then
+    printf 'CANARY_REFUSED reason=checker-missing path=%s\n  claim-discipline checker absent or not executable; refusing commit (fail-closed).\n' "$_checker" >&2
+    exit 1
+  fi
+  _canary=$(mktemp -d "${TMPDIR:-/tmp}/kit-claim-canary.XXXXXX") || {
+    printf 'CANARY_REFUSED reason=tmpdir\n  cannot create canary temp dir; refusing commit (fail-closed).\n' >&2
+    exit 1
+  }
+  printf 'hello\n' > "$_canary/readme.md"
+  printf 'new TypeSafeClient\n' > "$_canary/proof.txt"
+  printf 'label\treadme_pattern\tcapability_key\texpected_substr\tproof_path\tenforce\tnotes\n' > "$_canary/bad.tsv"
+  printf 'planted-miss\tTHIS PATTERN IS NOT IN THE README\tcap\tnew TypeSafeClient\t%s\tyes\tcanary\n' "$_canary/proof.txt" >> "$_canary/bad.tsv"
+  if _canary_out=$("$_checker" "$_canary/bad.tsv" "$_canary/readme.md" "$_canary" 2>&1); then
+    printf 'CANARY_REFUSED reason=checker-blind\n  claim-discipline checker said GREEN on a false canary claim; refusing commit.\n%s\n' "$_canary_out" >&2
+    rm -rf "$_canary"
+    exit 1
+  fi
+  case "$_canary_out" in
+    *planted-miss*) ;;
+    *)
+      printf 'CANARY_REFUSED reason=checker-blind\n  canary RED did not name planted-miss; refusing commit.\n%s\n' "$_canary_out" >&2
+      rm -rf "$_canary"
+      exit 1
+      ;;
+  esac
+  rm -rf "$_canary"
+fi
+
 # ── lane 1: staged-deletion survival ────────────────────────────────────────────────────────────
 _impl="$_hookdir/pre-commit-staged-deletion-survives.sh"
 if [ ! -x "$_impl" ]; then
