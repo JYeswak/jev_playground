@@ -23,7 +23,7 @@ cd "$root" || exit 1
 # Default mode is RED. Exit 0 here was an empty scan set wearing a PASS (jev-80lj).
 if ! command -v omp >/dev/null 2>&1; then
   if [ -n "${JEV_GATES_PORTABLE:-}" ]; then
-    echo "SKIP (missing prerequisite: omp, install: the omp coding agent on PATH)"
+    echo "SKIP (missing prerequisite: omp, install: bun add -g @oh-my-pi/pi-coding-agent@18.3.0)"
     exit 8
   fi
   echo "RED: omp not on PATH — empty scan set is not a pass (selftest-ttsr-assert-disabled.sh)"
@@ -81,6 +81,21 @@ print(sum(1 for r in rules if isinstance(r, dict) and r.get("name") == name))
   if [ "$n2" -eq 0 ]; then note ok "GREEN: $r absent from project list"; pass=$((pass+1))
   else note FAIL "GREEN: $r still in project list (count=$n2)"; fail=$((fail+1)); fi
 done
+
+# CI SCOPE (jev-hjzz). The global leg of ttsr-assert-disabled.sh lists rules from outside this repo:
+# omp's builtin defaults plus ~/.agents/rules, which a CI runner does not have. ARM1's live rule is
+# a project rule, so there only the project leg ever goes RED. This arm plants a rule in a throwaway
+# HOME's ~/.agents/rules and requires the tool to name the GLOBAL scope, so the global leg is
+# proven on any machine. The real HOME is never written.
+gh=$(mktemp -d "${TMPDIR:-/tmp}/ttsr-global-home.XXXXXX")
+mkdir -p "$gh/.agents/rules"
+printf -- '---\ncondition: %s\nscope: text\n---\nplanted global rule\n' "'zzzz_planted_global_9c42'" \
+  > "$gh/.agents/rules/planted-global-9c42.md"
+out4=""; rc4=0
+out4=$(env -u OMP_PROFILE -u PI_PROFILE -u PI_CODING_AGENT_DIR HOME="$gh" "$S" planted-global-9c42 2>&1) || rc4=$?
+if [ "$rc4" -eq 1 ] && grep -q 'still present in global' <<<"$out4"; then
+  note ok "GLOBAL: a rule planted in a throwaway HOME is named in global scope"; pass=$((pass+1))
+else note FAIL "GLOBAL: planted global rule exit=$rc4, global scope not named"; fail=$((fail+1)); fi
 
 out3=""; rc3=0
 out3=$("$S" 2>&1) || rc3=$?

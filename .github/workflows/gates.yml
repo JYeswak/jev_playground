@@ -15,11 +15,11 @@ on:
   workflow_dispatch:
     inputs:
       plant_red:
-        description: "Plant a defect in the runner checkout only (nothing committed): 'fixture' appends garbage to the calibration fixture so stage 10 must RED naming it; 'suite' appends a failing test so the registered-suite job must RED naming that file; 'runonly' writes a real Jev-answer .probability read so the Run:-only row work/oracle-kit/selector-guard.mjs must RED; 'hook' makes the commit-msg hook accept a level-less subject so its --selftest row must RED; 'none' runs clean."
+        description: "Plant a defect in the runner checkout only (nothing committed): 'fixture' appends garbage to the calibration fixture so stage 10 must RED naming it; 'suite' appends a failing test so the registered-suite job must RED naming that file; 'runonly' writes a real Jev-answer .probability read so the Run:-only row work/oracle-kit/selector-guard.mjs must RED; 'hook' makes the commit-msg hook accept a level-less subject so its --selftest row must RED; 'ttsr' makes the bash-pipe-exit rule's condition unmatchable so its known-bad stops firing and scripts/selftest-ttsr-rules.sh must RED; 'none' runs clean."
         required: false
         default: "none"
         type: choice
-        options: [none, fixture, suite, runonly, hook]
+        options: [none, fixture, suite, runonly, hook, ttsr]
 
 jobs:
   gates:
@@ -190,6 +190,17 @@ jobs:
           bun --version
           upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python --version
 
+      - name: omp 18.3.0 (the two TTSR selftests call `omp ttsr test`, a local regex match)
+        # Pinned to the lane's omp. Their TESTS.md Run: commands start with `env -i`, so the
+        # selftests see HOME and PATH only: no API key can reach them.
+        run: |
+          set -euo pipefail
+          bun add -g @oh-my-pi/pi-coding-agent@18.3.0
+          bin="$(bun pm bin -g)"
+          echo "$bin" >> "$GITHUB_PATH"
+          "$bin/omp" --version
+          grep -oE 'env -i HOME=[^|]*selftest-ttsr-[a-z-]*[.]sh' TESTS.md
+
       - name: Plant a suite defect in the runner checkout only
         if: inputs.plant_red == 'suite'
         run: |
@@ -230,6 +241,24 @@ jobs:
           grep -n 'PLANTED' githooks/commit-msg-verification-level.sh
           echo "PLANTED: githooks/commit-msg-verification-level.sh (row 'githooks/commit-msg-verification-level.sh --selftest' must FAIL)"
 
+      - name: Plant a TTSR rule defect in the runner checkout only
+        # bash-pipe-exit's condition becomes unmatchable, so its known-bad arm stops firing and
+        # scripts/selftest-ttsr-rules.sh must FAIL. The step fails unless the condition line is found once.
+        if: inputs.plant_red == 'ttsr'
+        run: |
+          set -euo pipefail
+          python3 - .omp/rules/bash-pipe-exit.md <<'EOF'
+          import sys
+          p = sys.argv[1]
+          lines = open(p).read().split("\n")
+          hits = [i for i, l in enumerate(lines) if l.startswith("condition:")]
+          assert len(hits) == 1, hits
+          lines[hits[0]] = "condition: 'zzzz_planted_never_matches_9c42'"
+          open(p, "w").write("\n".join(lines))
+          EOF
+          grep -n '^condition:' .omp/rules/bash-pipe-exit.md
+          echo "PLANTED: .omp/rules/bash-pipe-exit.md (row scripts/selftest-ttsr-rules.sh must FAIL)"
+
       - name: Run registered suites
         env:
           PLANT: ${{ inputs.plant_red }}
@@ -243,6 +272,7 @@ jobs:
             suite) row=work/sr-adopt/test_prereg.py ;;
             runonly) row=work/oracle-kit/selector-guard.mjs ;;
             hook) row="githooks/commit-msg-verification-level.sh --selftest" ;;
+            ttsr) row=scripts/selftest-ttsr-rules.sh ;;
             *) exit "$rc" ;;
           esac
           # Exact first column: the selector-guard scan row must not match its --selftest row.

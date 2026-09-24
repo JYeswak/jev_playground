@@ -244,6 +244,9 @@ def failure_tail(output, limit=30):
     return "\n".join(lines[-limit:])
 
 
+TYPED_SKIP = re.compile(r"(?m)^SKIP \(missing prerequisite: (.+)\)\s*$")
+
+
 def run_one(repo, path, command):
     started = time.monotonic()
     command = normalize_command(repo, path, command)
@@ -270,6 +273,11 @@ def run_one(repo, path, command):
         status = "PASS" if proc.returncode == 0 else "FAIL"
         rc = str(proc.returncode)
         signature = missing_signature(output) if status == "FAIL" else ""
+        # The lane's typed skip (gates.sh --portable): exit 8 AND a named prerequisite line. Exit 8
+        # without the line stays a FAIL, so a bare 8 cannot buy a skip.
+        typed = TYPED_SKIP.search(output) if proc.returncode == 8 else None
+        if typed:
+            signature = typed.group(1)
         if signature:
             return {
                 "path": path,
@@ -435,6 +443,11 @@ def selftest():
         ),
         ("table.sh", "exit 0\n"),
         ("dup.sh", "exit 0\n"),
+        (
+            "typed_skip.sh",
+            "echo 'SKIP (missing prerequisite: planted-tool, install: nowhere)'\nexit 8\n",
+        ),
+        ("bare8.sh", "echo 'no prerequisite named'\nexit 8\n"),
     ):
         (tmp / "work/plant" / name).write_text(body)
     (tmp / "TESTS.md").write_text(
@@ -454,6 +467,8 @@ def selftest():
         "  Run: `sh work/plant/two.sh --selftest`; `sh work/plant/two.sh --other` is prose.\n"
         "| `work/plant/table.sh` | Run: `sh work/plant/table.sh --selftest` | table row | 1/1 |\n"
         "- `work/plant/dup.sh` — two commands, one label. Run: `sh work/plant/dup.sh` and Run: `bash work/plant/dup.sh`.\n"
+        "- `work/plant/typed_skip.sh` — the lane's typed skip. Run: `sh work/plant/typed_skip.sh`.\n"
+        "- `work/plant/bare8.sh` — exit 8, no prerequisite named. Run: `sh work/plant/bare8.sh`.\n"
     )
     if (
         normalize_command(
@@ -479,6 +494,8 @@ def selftest():
             "work/plant/two.sh",
             "work/plant/table.sh",
             "work/plant/dup.sh",
+            "work/plant/typed_skip.sh",
+            "work/plant/bare8.sh",
         ],
         cwd=tmp,
         check=True,
@@ -488,6 +505,7 @@ def selftest():
     by = {row["path"]: row for row in rows}
     failed = [row["path"] for row in rows if row["status"] == "FAIL"]
     if sorted(failed) != [
+        "work/plant/bare8.sh",
         "work/plant/borrowed_test.py",
         "work/plant/fail_test.py",
         "work/plant/runonly.sh",
@@ -545,6 +563,13 @@ def selftest():
         if by.get(label, {}).get("status") != "PASS":
             print(f"SELFTEST FAIL: {label} {by.get(label)}", file=sys.stderr)
             return 1
+    skip_row = by.get("work/plant/typed_skip.sh", {})
+    if (
+        skip_row.get("status") != "SKIP"
+        or skip_row.get("prerequisite") != "planted-tool, install: nowhere"
+    ):
+        print(f"SELFTEST FAIL: exit 8 typed skip {skip_row}", file=sys.stderr)
+        return 1
     for absent in (
         "work/plant/borrow.sh",
         "work/plant/untracked.sh",

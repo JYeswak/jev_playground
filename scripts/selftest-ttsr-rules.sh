@@ -18,14 +18,35 @@ cd "$root" || exit 1
 # Default mode is RED. Exit 0 here was an empty scan set wearing a PASS (jev-80lj).
 if ! command -v omp >/dev/null 2>&1; then
   if [ -n "${JEV_GATES_PORTABLE:-}" ]; then
-    echo "SKIP (missing prerequisite: omp, install: the omp coding agent on PATH)"
+    echo "SKIP (missing prerequisite: omp, install: bun add -g @oh-my-pi/pi-coding-agent@18.3.0)"
     exit 8
   fi
   echo "RED: omp not on PATH — empty scan set is not a pass (selftest-ttsr-rules.sh)"
   exit 1
 fi
-pass=0; fail=0
+pass=0; fail=0; na=0
 note() { printf '  %-4s %s\n' "$1" "$2"; }
+
+# CI SCOPE (jev-hjzz). The system-wide root is per machine. A CI runner or a stranger's clone has no
+# ~/.agents/rules, so the arms for rules that live only there have nothing to test. They are stated
+# and counted as n/a, never as ok. A machine that HAS the root but lost one of those rules is RED.
+SYS_ROOT="$HOME/.agents/rules"
+sys_rule_state() { # sys_rule_state <root> <file> -> present | missing | out-of-scope
+  if [ ! -d "$1" ]; then echo out-of-scope
+  elif [ -e "$1/$2" ]; then echo present
+  else echo missing; fi
+}
+na_note() { note n/a "$1 (no $SYS_ROOT on this machine: system-wide rules are out of scope here)"; na=$((na+1)); }
+scope_dir=$(mktemp -d "${TMPDIR:-/tmp}/ttsr-scope.XXXXXX")
+mkdir -p "$scope_dir/root"
+for want in "out-of-scope:$scope_dir/absent" "missing:$scope_dir/root"; do
+  got=$(sys_rule_state "${want#*:}" planted.md)
+  if [ "$got" = "${want%%:*}" ]; then note ok "scope classifier: ${want%%:*} root reads $got"; pass=$((pass+1))
+  else note FAIL "scope classifier: wanted ${want%%:*}, got $got"; fail=$((fail+1)); fi
+done
+: > "$scope_dir/root/planted.md"
+if [ "$(sys_rule_state "$scope_dir/root" planted.md)" = present ]; then note ok "scope classifier: present rule reads present"; pass=$((pass+1))
+else note FAIL "scope classifier: present rule not read as present"; fail=$((fail+1)); fi
 
 fires() { # fires <rule-file> <command-string>  -> 0 if the rule triggered
   # Capture first, match second: `omp … | grep -q` under `set -o pipefail` reports omp's
@@ -99,13 +120,17 @@ arm_text "$A" quiet "absence: two probes already run"            'I verified it 
 # ~/Developer/omp-kit/retired/REASONS.tsv. So the arm is inverted: a retired rule REAPPEARING in the
 # global root is the defect, because it would fire in every repo on the machine with a bind rate
 # already measured at ~1%.
-for ft in ft-rs-doctrine ft-sh-doctrine ft-md-doctrine ft-py-doctrine ft-json-doctrine; do
-  if [ -e "$HOME/.agents/rules/$ft.md" ]; then
-    note FAIL "retired rule is back in ~/.agents/rules: $ft.md (R64; omp-kit retired/REASONS.tsv)"; fail=$((fail+1))
-  else
-    note ok "retired rule absent from ~/.agents/rules: $ft.md"; pass=$((pass+1))
-  fi
-done
+if [ "$(sys_rule_state "$SYS_ROOT" ft-rs-doctrine.md)" = out-of-scope ]; then
+  na_note "retired ft-*-doctrine pack absence"
+else
+  for ft in ft-rs-doctrine ft-sh-doctrine ft-md-doctrine ft-py-doctrine ft-json-doctrine; do
+    if [ -e "$SYS_ROOT/$ft.md" ]; then
+      note FAIL "retired rule is back in ~/.agents/rules: $ft.md (R64; omp-kit retired/REASONS.tsv)"; fail=$((fail+1))
+    else
+      note ok "retired rule absent from ~/.agents/rules: $ft.md"; pass=$((pass+1))
+    fi
+  done
+fi
 
 # COMPILE GUARD. TTSR conditions are JavaScript RegExp: a PCRE inline flag like (?i) is invalid.
 # omp ttsr test REPORTS that, but a live session does NOT — omp://ttsr-injection-lifecycle.md says
@@ -121,8 +146,9 @@ done
 # system itself: an EMBEDDED inline flag makes a rule load and never fire, and only `omp ttsr
 # test` says so — a live session logs-and-ignores. The near-miss arm is load-bearing, because a
 # LEADING (?i) is legal (omp lifts it to the `i` flag) and flagging it would be over-strict.
-F="$HOME/.agents/rules/ttsr-embedded-inline-flag.md"
-if [ -e "$F" ]; then
+F="$SYS_ROOT/ttsr-embedded-inline-flag.md"
+case $(sys_rule_state "$SYS_ROOT" ttsr-embedded-inline-flag.md) in
+present)
   armw() { # armw <expect> <label> <payload>
     local want="$1" label="$2" txt="$3" got
     if omp ttsr test --rule "$F" --source tool --tool write --path /tmp/probe.md "$txt" 2>&1 \
@@ -134,14 +160,16 @@ if [ -e "$F" ]; then
   armw quiet "inline-flag: LEADING (?i) is legal"              "condition: '(?i)leading_is_legal'"
   armw quiet "inline-flag: ordinary condition"                 "condition: 'grep[^|;&]*2>/dev/null'"
   armw quiet "inline-flag: prose mentioning (?i)"              "the docs say (?i) is invalid here"
-else
-  note FAIL "system-wide rule missing: $F"; fail=$((fail+1))
-fi
+  ;;
+missing) note FAIL "system-wide rule missing: $F"; fail=$((fail+1)) ;;
+*) na_note "ttsr-embedded-inline-flag arms" ;;
+esac
 # GAP-CONDITIONED ROUTER (P4, 2026-09-20). Survives R64 because the trigger IS the gap:
 # `unsafe` inside a .rs edit/write. Injection is skill names + a working jsm query, not
 # doctrine. jsm search hit rate on 15 natural queries was 6/15; the 5-term UB query is 0.
-U="$HOME/.agents/rules/rs-unsafe-added-router.md"
-if [ -e "$U" ]; then
+U="$SYS_ROOT/rs-unsafe-added-router.md"
+case $(sys_rule_state "$SYS_ROOT" rs-unsafe-added-router.md) in
+present)
   armu() { # armu <expect fire|quiet> <label> <tool> <path> <payload>
     local want="$1" label="$2" tool="$3" path="$4" txt="$5" got out
     out=$(omp ttsr test --rule "$U" --source tool --tool "$tool" --path "$path" "$txt" 2>&1 || true)
@@ -158,9 +186,10 @@ if [ -e "$U" ]; then
   armu quiet "unsafe-router: quiet on .rs without unsafe"     edit  /tmp/probe.rs 'fn main() {}'
   armu quiet "unsafe-router: quiet on .md containing unsafe"  edit  /tmp/probe.md 'unsafe fn f() {}'
   armu quiet "unsafe-router: quiet on bash even with .rs path" bash  /tmp/probe.rs 'unsafe fn f() {}'
-else
-  note FAIL "system-wide rule missing: $U"; fail=$((fail+1))
-fi
+  ;;
+missing) note FAIL "system-wide rule missing: $U"; fail=$((fail+1)) ;;
+*) na_note "rs-unsafe-added-router arms" ;;
+esac
 # BOTH ROOTS. Project rules apply only in this repo; `~/.agents/rules/*.md` is the `agents`
 # provider (priority 70) and is PROFILE-INDEPENDENT and PROJECT-INDEPENDENT — proven 2026-09-20
 # by loading a canary from /tmp, where `omp ttsr list` showed it as `[agents]`. That root is where
@@ -349,5 +378,6 @@ else
   note FAIL "$n_rules project rules but only 12 are tested — add arms for the new one"; fail=$((fail+1))
 fi
 
-echo "scripts/selftest-ttsr-rules.sh: $pass ok, $fail failed"
+[ "$na" -eq 0 ] || echo "SCOPE: project rules only; $na system-wide arm group(s) n/a because $SYS_ROOT does not exist here"
+echo "scripts/selftest-ttsr-rules.sh: $pass ok, $fail failed, $na n/a"
 [ "$fail" -eq 0 ]
