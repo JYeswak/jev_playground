@@ -165,7 +165,7 @@ printf '%s\n' "-----------------------------------------------------------------
 # ---------------------------------------------------------------- gauntlet state
 printf '\nGAUNTLET (state of record: %s)\n' "$STATUS"
 printf '  %-30s %-4s %-5s %-10s %-6s %s\n' CANDIDATE RUNG SCORE VERDICT AUTHOR BLOCKED_ON
-missing=0; rows=0; with_receipt=0; pinned=0; drifted=0; unpinned=0; value_bad=0
+missing=0; rows=0; with_receipt=0; pinned=0; drifted=0; unpinned=0; value_bad=0; value_checked=0
 ruled_out=0; concur_missing=0; schema_bad=0; type_bad=0
 # SCHEMA WIDTH IS VALIDATED EXACTLY, and this is a PREREQUISITE, not a nicety. Pane 2,
 # verify-exit-disaggregation-20260918T102000Z.json (a915e11), non-author, asked the question I had
@@ -250,8 +250,11 @@ v=d["value"]
 if isinstance(v, bool) or not isinstance(v, (int, float)) or isinstance(v, float) and v != int(v):
     print("BAD"); raise SystemExit
 print(int(v))' "$receipt" 2>/dev/null || echo SKIP)
-        if [ "$got" != SKIP ] && [ "$got" != "$score" ]; then
-          mark="$mark  <<< VALUE DISAGREE expect=$score receipt=$got"; value_bad=$((value_bad+1))
+        if [ "$got" != SKIP ]; then
+          value_checked=$((value_checked+1))
+          if [ "$got" != "$score" ]; then
+            mark="$mark  <<< VALUE DISAGREE expect=$score receipt=$got"; value_bad=$((value_bad+1))
+          fi
         fi
       fi
     else
@@ -274,6 +277,11 @@ printf '\nRECEIPT VERIFICATION (existence and integrity are SEPARATE claims — 
 printf '  existence_checked: %-4d missing:  %d\n' "$with_receipt" "$missing"
 printf '  integrity_checked: %-4d drifted:  %d   (content-normalised sha256; terminal whitespace stripped)\n' "$pinned" "$drifted"
 printf '  NOT integrity-checked (no pinned digest): %d   <- existence proven, bytes unverified\n' "$unpinned"
+# The value check only fires on a receipt with a top-level numeric "value". Say how many did, so a
+# green run cannot be read as "every row's number agrees with its receipt" (jev-6u0: at 40cb421 it
+# was 0 of 41; no receipt has a top-level "value", and none of the 7 JSON receipts holds its row's
+# score as any numeric field).
+printf '  value_checked: %-4d disagree: %d   (of %d integrity-checked; the rest have no top-level numeric "value", so their score is NOT checked)\n' "$value_checked" "$value_bad" "$pinned"
 printf '\nKILL CONCURRENCE (§3c rule 3, demoted to guidance — checked mechanically, not by a volunteer)\n'
 printf '  ruled_out rows: %-4d missing kill_concurrence: %d\n' "$ruled_out" "$concur_missing"
 printf '\nSCHEMA (exact width — a row of the wrong width makes every other counter on it unreliable)\n'
