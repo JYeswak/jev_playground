@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 # gates.sh -- aggregate gate for the Jev workspace. Runs every stage in
 # foundation/gates.d/, one line per stage, nonzero exit on any RED.
-# Usage: ./gates.sh [--selftest] [--portable]   (--selftest runs each stage's planted-bad
-# check instead: every stage must prove it can go RED, or the gate is decoration.)
+# Usage: ./gates.sh [--selftest] [--portable] [--red-row-selftest]
+#   --selftest runs each stage's planted-bad check, and proves a RED row names
+#   the failing sub-check rather than the head of its log. --red-row-selftest
+#   is that proof alone.
 #
 # --portable (jev-fmy): for a stranger's clone. Four stages need tools this machine has and a
 # fresh clone does not (ast-grep/rg, the private foundry loop-kit, an omp install). Under
@@ -21,14 +23,76 @@ set -uo pipefail
 here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 mode=run
 portable=""
+red_row_only=""
 for arg in "$@"; do
     case "$arg" in
         --selftest) mode=--selftest ;;
         --portable) portable=1 ;;
-        *) echo "gates.sh: unknown argument '$arg' (usage: gates.sh [--selftest] [--portable])" >&2; exit 2 ;;
+        --red-row-selftest) red_row_only=1 ;;
+        *) echo "gates.sh: unknown argument '$arg' (usage: gates.sh [--selftest] [--portable] [--red-row-selftest])" >&2; exit 2 ;;
     esac
 done
 if [ -n "$portable" ]; then export JEV_GATES_PORTABLE=1; else unset JEV_GATES_PORTABLE; fi
+
+# A RED row names the failing sub-check and prints its last lines, never only
+# the head. Stage 80 prints many PASS lines and then one RED; head -c 300 kept
+# the PASS lines, so the failing arm was never named (jev-80lj).
+red_detail() {
+    local out="$1" names tail
+    names=$(printf '%s\n' "$out" | grep -E '(^|[[:space:]])(RED|ABSENT|UNEXEC|FAIL|FAILED|ERROR|SELFTEST_FAIL|DRIFT)([[:space:]:]|$)' || true)
+    tail=$(printf '%s\n' "$out" | tail -n 12)
+    if [ -n "$names" ]; then
+        printf 'failing:\n%s\n--- last lines ---\n%s\n' "$names" "$tail"
+    else
+        printf 'failing: unnamed\n--- last lines ---\n%s\n' "$tail"
+    fi
+}
+prove_red_detail() {
+    local i planted excerpt head_only
+    planted=""
+    for i in 1 2 3 4 5 6 7 8; do
+        planted="${planted}  PASS    early-noise-line-that-must-not-be-the-only-evidence-$i"$'\n'
+    done
+    planted="${planted}  RED     scripts/selftest-planted-late.sh  FAIL planted-arm-9c42"$'\n'
+    for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+        planted="${planted}  PASS    later-noise-$i"$'\n'
+    done
+    planted="${planted}  PASS    tail-nonce-3e91"$'\n'
+    head_only=$(printf '%s' "$planted" | head -c 300)
+    case "$head_only" in
+        *planted-arm-9c42*)
+            echo "RED-ROW SELFTEST FAIL: plant is inside the first 300 bytes; the arm cannot fail"
+            return 1 ;;
+    esac
+    case "$(printf '%s\n' "$planted" | tail -n 12)" in
+        *planted-arm-9c42*)
+            echo "RED-ROW SELFTEST FAIL: plant is inside the last 12 lines; a tail-only formatter would pass"
+            return 1 ;;
+    esac
+    excerpt=$(red_detail "$planted")
+    case "$excerpt" in
+        *selftest-planted-late.sh*) ;;
+        *) echo "RED-ROW SELFTEST FAIL: late failing name not printed"; printf '%s\n' "$excerpt"; return 1 ;;
+    esac
+    case "$excerpt" in
+        *planted-arm-9c42*) ;;
+        *) echo "RED-ROW SELFTEST FAIL: failing arm nonce not printed"; printf '%s\n' "$excerpt"; return 1 ;;
+    esac
+    case "$excerpt" in
+        *tail-nonce-3e91*) ;;
+        *) echo "RED-ROW SELFTEST FAIL: last lines were dropped"; printf '%s\n' "$excerpt"; return 1 ;;
+    esac
+    excerpt=$(red_detail $'RED: missing fixture: short-fixture-name-7f3a\n')
+    case "$excerpt" in
+        *short-fixture-name-7f3a*) ;;
+        *) echo "RED-ROW SELFTEST FAIL: short RED did not keep its name"; printf '%s\n' "$excerpt"; return 1 ;;
+    esac
+    echo "RED-ROW SELFTEST PASS: late name printed (head-300 and tail-12 both miss it); short RED still named"
+}
+if [ "$mode" = "--selftest" ] || [ -n "$red_row_only" ]; then
+    prove_red_detail || exit 1
+    if [ -n "$red_row_only" ]; then exit 0; fi
+fi
 rc=0
 unmeasured=0
 skipped=0
@@ -64,7 +128,7 @@ for stage in "$here"/gates.d/[0-9]*-*.sh; do
         # An exit 8 that names nothing falls through to RED: a skip nobody can act on is a defect.
         echo "SKIP $name (${ms}s): $skipline"
         skipped=$(( skipped + 1 ))
-    elif [ "$code" -eq 0 ]; then echo "PASS $name (${ms}s)"; else echo "RED  $name (exit=$code, ${ms}s): $(printf '%s' "$out" | head -c 300)"; rc=1; fi
+    elif [ "$code" -eq 0 ]; then echo "PASS $name (${ms}s)"; else echo "RED  $name (exit=$code, ${ms}s)"; printf '%s\n' "$(red_detail "$out")"; rc=1; fi
     # RECORD THE OUTCOME VECTOR. Until 2026-09-19 this loop persisted nothing, so "do two of our
     # twelve gates fail on the same commits?" was unanswerable — and that question decides whether
     # a gate earns its slot or is a second copy of one we already run (RECIPES.md recipe 4: two
