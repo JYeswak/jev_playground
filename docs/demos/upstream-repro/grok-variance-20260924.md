@@ -153,8 +153,8 @@ ones got, and none moves. The following can be stated with grok named beside Hai
 **Spend.** 4,100 grok calls: 2,925,626 input / 267,424 output tokens (adapter totals). xAI list
 prices are not read here. No Jev or Haiku calls.
 
-**Boundary / NO-CLAIM.** Three grok runs per set: the two reruns within about 10 minutes on 2026-09-24 (
-sequentially) plus run 1 earlier that night. One grok model id (non-reasoning), one adapter version
+**Boundary / NO-CLAIM.** Three grok runs per set: the two reruns within about 10 minutes on 2026-09-24,
+run sequentially, plus run 1 earlier that night. One grok model id (non-reasoning), one adapter version
 (`adffc2e`). Jev's runs are the committed ones from other times. A STANDS says the verdict is
 robust to grok's sampling on these rows. It does not cover other grok versions, reasoning mode, or
 other sets. A non-author spot-check is still pending before close.
