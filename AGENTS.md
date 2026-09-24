@@ -92,7 +92,8 @@ sat unread in our own tree.
   it did, so we killed the seat. We never asked "does an LLM beat Jev on the same state, and at what
   cost and latency?" **A floor tells you a task is trivial. An incumbent tells you a tool is worth
   buying.** We measured the first 41 times and the second zero times.
-- **We have no `Score` support at all** — one of the three primitives, never used here.
+- **We have no `Score` support at all** — one of the three primitives, never used here. *(2026-09-24:
+  first measured use, SST-5 vs Haiku, a narrow MAE win that held on 3 runs, `jev-zui`, `jev-qbc`.)*
 - **We never use `Noul`'s `criteria {true,false}` outcome descriptions.** Every Noul we send is
   instructions-only. *(2026-09-24: first use, measured: criteria raised the tool-call gate's catch
   from 41/100 to 78/100 at 1/300 false alarms, `jev-deep-kit-8q7.12`; they lowered catch for the
