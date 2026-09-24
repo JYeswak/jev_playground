@@ -1,0 +1,7 @@
+registered-suites	Run registered suites	2026-09-24T13:01:39.3934757Z work/omp-harm-rule/verify-claim.mjs	0		0.06		PASS
+registered-suites	Run registered suites	2026-09-24T13:01:39.3935178Z work/omp-harm-rule/install-harm-rule.sh --selftest	0		0.20		PASS
+registered-suites	Run registered suites	2026-09-24T13:01:39.3935626Z githooks/commit-msg-verification-level.sh --selftest	0		0.52		PASS
+registered-suites	Run registered suites	2026-09-24T13:01:39.3936118Z scripts/selftest-ttsr-rules.sh	1		34.59		FAIL
+registered-suites	Run registered suites	2026-09-24T13:01:39.3936465Z scripts/selftest-ttsr-assert-disabled.sh	0		3.92		PASS
+registered-suites	Run registered suites	2026-09-24T13:01:39.3936868Z RED named scripts/selftest-ttsr-rules.sh
+registered-suites	Run registered suites	2026-09-24T13:01:39.3945163Z ##[error]Process completed with exit code 1.

@@ -1,0 +1,16 @@
+{
+ "jobs": [
+  {
+   "name": "registered-suites",
+   "status": "completed",
+   "conclusion": "failure",
+   "databaseId": 107835455981
+  },
+  {
+   "name": "gates",
+   "status": "completed",
+   "conclusion": "success",
+   "databaseId": 107835456258
+  }
+ ]
+}

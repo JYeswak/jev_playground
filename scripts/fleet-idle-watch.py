@@ -9,7 +9,9 @@ Why: 2026-09-24, 4 of 6 worker panes sat at their prompts for most of an hour an
 conductor only looked when a callback arrived. Joshua: "dont let that happen again."
 
   python3 scripts/fleet-idle-watch.py            # run forever (start it under hub)
-  python3 scripts/fleet-idle-watch.py --once     # one poll; exit 1 if any worker is idle
+  python3 scripts/fleet-idle-watch.py --once     # one poll, then the CI-on-main line from
+                                                 # scripts/ci-main-status.py (informational);
+                                                 # exit 1 if any worker is idle
   python3 scripts/fleet-idle-watch.py --selftest # classifier on real status lines
 """
 
@@ -90,6 +92,23 @@ def alert(index: int, since: float, words: str) -> None:
     print(f"{time.strftime('%H:%M:%SZ', time.gmtime())} alerted: {message}", flush=True)
 
 
+def ci_lines() -> list[str]:
+    """scripts/ci-main-status.py's output (bead jev-bfku). Informational: never sets our exit code."""
+    script = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "ci-main-status.py"
+    )
+    try:
+        done = subprocess.run(
+            [sys.executable, script], capture_output=True, text=True, timeout=90
+        )
+    except subprocess.TimeoutExpired:
+        return ["CI main NOT_RUN scripts/ci-main-status.py timed out after 90s"]
+    lines = done.stdout.splitlines()
+    return lines or [
+        f"CI main NOT_RUN scripts/ci-main-status.py printed nothing (exit {done.returncode})"
+    ]
+
+
 def selftest() -> int:
     # Status lines captured from the jev session, 2026-09-24T02:0xZ.
     cases = [
@@ -126,6 +145,8 @@ def main() -> int:
         states = poll()
         for index, (state, words) in sorted(states.items()):
             print(f"pane {index}: {state}  {words}")
+        for line in ci_lines():
+            print(line)
         return 1 if any(state != "working" for state, _ in states.values()) else 0
     streak: dict[int, int] = {}
     idle_since: dict[int, float] = {}

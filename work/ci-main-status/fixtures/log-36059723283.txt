@@ -1,0 +1,36 @@
+registered-suites	Run registered suites	2026-09-24T21:11:22.0295052Z ^[[36;1m# Exact first column: the selector-guard scan row must not match its --selftest row.^[[0m
+registered-suites	Run registered suites	2026-09-24T21:11:22.0295375Z ^[[36;1mif awk -F'\t' -v r="$row" '$1 == r && $NF == "FAIL" { f = 1 } END { exit !f }' /tmp/suites.tsv; then^[[0m
+registered-suites	Run registered suites	2026-09-24T21:11:22.0295626Z ^[[36;1m  echo "RED named $row"^[[0m
+registered-suites	Run registered suites	2026-09-24T21:11:22.0295761Z ^[[36;1m  exit 1^[[0m
+registered-suites	Run registered suites	2026-09-24T21:11:22.0295871Z ^[[36;1mfi^[[0m
+registered-suites	Run registered suites	2026-09-24T21:11:22.0295991Z ^[[36;1mecho "PLANT DID NOT FAIL $row"^[[0m
+registered-suites	Run registered suites	2026-09-24T21:11:22.0296136Z ^[[36;1mexit 1^[[0m
+registered-suites	Run registered suites	2026-09-24T21:13:25.8046209Z # FAIL work/sr-adopt/test_runner_gates.py
+registered-suites	Run registered suites	2026-09-24T21:13:25.8047037Z unconfigured: TYPESAFE_API_KEY is not set, no call made
+registered-suites	Run registered suites	2026-09-24T21:13:25.8047511Z unconfigured: TYPESAFE_API_KEY unset, no call made
+registered-suites	Run registered suites	2026-09-24T21:13:25.8047860Z unconfigured: TYPESAFE_API_KEY is not set, no call made
+registered-suites	Run registered suites	2026-09-24T21:13:25.8051772Z jev: 0 to run, 6000 resumed
+registered-suites	Run registered suites	2026-09-24T21:13:25.8051902Z F.
+registered-suites	Run registered suites	2026-09-24T21:13:25.8052061Z ======================================================================
+registered-suites	Run registered suites	2026-09-24T21:13:25.8052477Z FAIL: test_deleting_each_gate_fails_in_a_tmp_copy (work.sr-adopt.test_runner_gates.RunnerGateTest.test_deleting_each_gate_fails_in_a_tmp_copy)
+registered-suites	Run registered suites	2026-09-24T21:13:25.8052860Z ----------------------------------------------------------------------
+registered-suites	Run registered suites	2026-09-24T21:13:25.8053069Z Traceback (most recent call last):
+registered-suites	Run registered suites	2026-09-24T21:13:25.8053452Z   File "/home/runner/work/jev_playground/jev_playground/work/sr-adopt/test_runner_gates.py", line 226, in test_deleting_each_gate_fails_in_a_tmp_copy
+registered-suites	Run registered suites	2026-09-24T21:13:25.8053801Z     with self.assertRaises(AssertionError):
+registered-suites	Run registered suites	2026-09-24T21:13:25.8053993Z AssertionError: AssertionError not raised
+registered-suites	Run registered suites	2026-09-24T21:13:25.8054096Z
+registered-suites	Run registered suites	2026-09-24T21:13:25.8054215Z ----------------------------------------------------------------------
+registered-suites	Run registered suites	2026-09-24T21:13:25.8054402Z Ran 3 tests in 71.253s
+registered-suites	Run registered suites	2026-09-24T21:13:25.8054477Z
+registered-suites	Run registered suites	2026-09-24T21:13:25.8054535Z FAILED (failures=1)
+registered-suites	Run registered suites	2026-09-24T21:13:25.8054664Z # 98 pass, 0 skip, 1 fail
+registered-suites	Run registered suites	2026-09-24T21:13:25.8100846Z path	rc	count	seconds	prerequisite	status
+registered-suites	Run registered suites	2026-09-24T21:13:25.8101513Z .omp/extensions/kit-guard/kit-guard.test.ts	0	79	0.02		PASS
+registered-suites	Run registered suites	2026-09-24T21:13:25.8101894Z .omp/hooks/post/jev-gate-observe.test.mjs	0	19	0.17		PASS
+registered-suites	Run registered suites	2026-09-24T21:13:25.8137961Z work/sr-adopt/test_matrix_status.py	0	6	0.11		PASS
+registered-suites	Run registered suites	2026-09-24T21:13:25.8138156Z work/sr-adopt/test_phase_gate.py	0	2	0.03		PASS
+registered-suites	Run registered suites	2026-09-24T21:13:25.8138343Z work/sr-adopt/test_prereg.py	0	6	4.07		PASS
+registered-suites	Run registered suites	2026-09-24T21:13:25.8138540Z work/sr-adopt/test_runner_gates.py	1	3	71.31		FAIL
+registered-suites	Run registered suites	2026-09-24T21:13:25.8138745Z work/taste-loop/test/detect.test.mjs	0	9	0.06		PASS
+registered-suites	Run registered suites	2026-09-24T21:13:25.8139093Z work/toolcall-judge-v3/rules-v4.test.mjs	0	14	0.06		PASS
+registered-suites	Run registered suites	2026-09-24T21:13:25.8147339Z ##[error]Process completed with exit code 1.

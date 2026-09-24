@@ -1,0 +1,20 @@
+registered-suites	Run registered suites	2026-09-24T21:11:10.8641036Z work/sr-adopt/test_matrix_status.py	0	6	0.18		PASS
+registered-suites	Run registered suites	2026-09-24T21:11:10.8641420Z work/sr-adopt/test_phase_gate.py	0	2	0.05		PASS
+registered-suites	Run registered suites	2026-09-24T21:11:10.8641787Z work/sr-adopt/test_prereg.py	0	6	5.91		PASS
+registered-suites	Run registered suites	2026-09-24T21:11:10.8642177Z work/sr-adopt/test_runner_gates.py	1	3	124.77		FAIL
+registered-suites	Run registered suites	2026-09-24T21:11:10.8658438Z ##[error]Process completed with exit code 1.
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1937941Z ===== gates.sh --portable =====
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1946521Z PASS 10-fixture-integrity (0s)
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1947180Z RED  15-kit-claim (exit=1, 0s)
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1947656Z failing:
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1948693Z FAIL  inj-var-haiku-blocked: proof AGENTS.md lacks expected text: A Haiku pairing that never ran is reported as
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1950271Z FAIL  limits-haiku-two-runs: proof AGENTS.md lacks expected text: Do not re-run the
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1951022Z --- last lines ---
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1958374Z check-claim-discipline: 315 passed, 2 failed, 0 skipped (317 enforced)
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1959038Z PASS 16-kit-readiness (1s)
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1968128Z gates: FAILING (see RED rows)
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1968447Z ===== gates.sh --selftest --portable =====
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1969128Z RED-ROW SELFTEST PASS: late name printed; a PASS line that mentions RED is not the failing sub-check; short RED still named
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.1982223Z gates: GREEN WITH 2 SKIPPED, 0 UNMEASURED (portable) — not all stages issued a verdict
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.2002398Z VERDICT: RED (gates_rc=1 selftest_rc=0)
+gates	Verdict (RED fails; SKIP is gates.sh's own row, never remapped)	2026-09-24T21:09:56.2014596Z ##[error]Process completed with exit code 1.

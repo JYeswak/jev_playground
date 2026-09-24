@@ -50,6 +50,15 @@ claim nobody can check:
 - `scripts/promotion-four-gates.py` — four-gate VIEW over existing receipts; empty evidence fails.
   Run: `python3 scripts/promotion-four-gates.py --selftest` (exit 0) and
   `python3 scripts/promotion-four-gates.py UP-R5-jev-toolcall-gate` (exit 1 today; STATUS not written).
+- `work/ci-main-status/test_ci_main_status.py` — `scripts/ci-main-status.py` (jev-bfku) against
+  trimmed real gh output in `work/ci-main-status/fixtures/`, no network: green is one line and exit
+  0 with no log fetch; the ff8316d red run (36059723283) names `registered-suites` and its
+  `test_runner_gates.py … FAIL` row, exit 1, and stays exit 1 when the log fetch fails; a green with
+  newer unfinished pushes gets a STALE line; gh failing, gh absent, gh unauthenticated (gh 2.94.0's
+  own stderr), gh hanging past the timeout, no completed run, and a cancelled run all print NOT_RUN
+  and exit 2; log rows: gates `RED` stage plus its `FAIL` checks, `RED named`, and the runner's
+  echoed script source is not a row. Planting `failure` into GREEN fails 2 tests.
+  Run: `python3 -m unittest work/ci-main-status/test_ci_main_status.py` (13 tests).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
