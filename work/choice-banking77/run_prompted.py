@@ -11,7 +11,8 @@ validates the reply. One corrective retry is allowed for malformed output
 (n_retry_malformed_structure=1). Every other setting matches run.py.
 
 Bar: docs/demos/upstream-repro/choice-banking77-full-20260924.md, "Second preregistration".
-Rows: rows-full-haiku-prompted.jsonl. Resumes rows that already have a choice.
+Rows: rows-full-haiku-prompted.jsonl, or --out <path> (repeat runs, bead jev-384m). Resumes rows
+that already have a choice.
 Run:
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
     upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/choice-banking77/run_prompted.py
@@ -30,7 +31,11 @@ from typesafe_sdk import RetryPolicy  # noqa: E402
 OUT = os.path.join(run.HERE, "rows-full-haiku-prompted.jsonl")
 
 
-def main():
+def main(argv):
+    # --out replaces the rows path for repeat runs (bead jev-384m), as run.py --out does.
+    out = OUT
+    if "--out" in argv:
+        out = os.path.abspath(argv[argv.index("--out") + 1])
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("unconfigured: ANTHROPIC_API_KEY unset, no call made", file=sys.stderr)
         return 2
@@ -39,7 +44,7 @@ def main():
     rows = run.load_rows("full.jsonl")
     label_map = run.labels(rows)
     q = run.question(label_map)
-    have = run.done_ids(OUT)
+    have = run.done_ids(out)
     todo = [r for r in rows if r["i"] not in have]
     print(f"haiku prompted: {len(todo)} to run, {len(have)} resumed", file=sys.stderr)
 
@@ -90,7 +95,7 @@ def main():
 
             for coro in asyncio.as_completed([one(item) for item in todo]):
                 row = await coro
-                run.record(OUT, row)
+                run.record(out, row)
                 if "error" in row:
                     failed += 1
                 else:
@@ -107,4 +112,4 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))
