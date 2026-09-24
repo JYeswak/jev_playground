@@ -74,7 +74,13 @@ function runLive(name) {
   const requests = existsSync(capture)
     ? readFileSync(capture, 'utf8').trim().split('\n').filter(Boolean).map((l) => JSON.parse(l))
     : [];
-  assert.equal(r.status, 0, `exit ${r.status}: ${r.stderr.slice(-400)}`);
+  // The live lane loads the TypeSafe SDK from work/sdk/node_modules, which a fresh clone lacks: the
+  // client then refuses as sdk-missing before any request, so nothing is captured. Say that plainly
+  // instead of failing on an empty capture.
+  if (requests.length === 0 && /sdk-missing|@typesafe-ai\/sdk is not installed/.test(`${r.stdout}\n${r.stderr}`)) {
+    assert.fail('prerequisite missing: the TypeSafe SDK is not installed. Run `npm ci --prefix work/sdk` once, then re-run this test.');
+  }
+  assert.equal(r.status, 0, `exit ${r.status}: ${`${r.stdout}\n${r.stderr}`.slice(-400)}`);
   assert.equal(requests.length, 3, 'three repeats, one request each');
   return requests;
 }
