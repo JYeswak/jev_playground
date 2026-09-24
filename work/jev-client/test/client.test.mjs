@@ -454,30 +454,37 @@ test('a 402 then N calls inside the window makes 1 network call and N billing-ho
   }
 });
 
-test('429, 503 and transport never start a hold', async () => {
+test('a 429 and a 503 do not start a hold: the next call inside the window still reaches the network', async () => {
+  // postSystemOne passes maxRetries 0 when the caller omits retry. The SDK's
+  // default would retry 429/503 and sleep; that default is not used here.
   resetBillingHold();
   const real = globalThis.fetch;
+  const headers = {
+    get: (name) => String(name).toLowerCase() === 'content-type' ? 'application/json' : null,
+    has: (name) => String(name).toLowerCase() === 'content-type',
+  };
   try {
     for (const status of [429, 503]) {
       let calls = 0;
       globalThis.fetch = async () => {
         calls += 1;
-        return { ok: false, status, headers: fakeHeaders(), body: null, clone() { return this; }, text: async () => JSON.stringify({ detail: 'no' }) };
+        return { ok: false, status, headers, body: null, clone() { return this; }, text: async () => JSON.stringify({ detail: 'no' }) };
       };
-      const a = await askJev({ state: STATE, questions: QUESTIONS, apiKey: 'k', nowMs: () => 5_000_000 });
-      const b = await askJev({ state: STATE, questions: QUESTIONS, apiKey: 'k', nowMs: () => 5_000_001 });
-      assert.notEqual(a.reason, 'billing-hold', String(status));
-      assert.notEqual(b.reason, 'billing-hold', String(status));
-      assert.equal(calls, 2, String(status));
+      const clock = 8_000_000;
+      const first = await askJev({ state: STATE, questions: QUESTIONS, apiKey: 'k', nowMs: () => clock });
+      const second = await askJev({ state: STATE, questions: QUESTIONS, apiKey: 'k', nowMs: () => clock + 1 });
+      assert.notEqual(first.reason, 'billing-hold', String(status));
+      assert.notEqual(second.reason, 'billing-hold', String(status));
+      assert.equal(calls, 2, `status ${status}: the second call inside the window must reach the network`);
       resetBillingHold();
     }
-    let calls = 0;
-    globalThis.fetch = async () => { calls += 1; throw new Error('socket hang up after 4020 ms'); };
-    const a = await askJev({ state: STATE, questions: QUESTIONS, apiKey: 'k', nowMs: () => 6_000_000 });
-    const b = await askJev({ state: STATE, questions: QUESTIONS, apiKey: 'k', nowMs: () => 6_000_001 });
+    let thrown = 0;
+    globalThis.fetch = async () => { thrown += 1; throw new Error('socket hang up after 4020 ms'); };
+    const a = await askJev({ state: STATE, questions: QUESTIONS, apiKey: 'k', nowMs: () => 9_000_000 });
+    const b = await askJev({ state: STATE, questions: QUESTIONS, apiKey: 'k', nowMs: () => 9_000_001 });
     assert.equal(a.reason, 'transport');
     assert.equal(b.reason, 'transport');
-    assert.equal(calls, 2);
+    assert.equal(thrown, 2);
   } finally {
     globalThis.fetch = real;
     resetBillingHold();
