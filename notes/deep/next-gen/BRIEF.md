@@ -163,3 +163,33 @@ For each of your top ideas:
 8. **Nearest dead relative:** the NEGATIVE_EVIDENCE row or losing result it resembles, and why it is
    different.
 9. **First build:** the smallest thing that would run, and whether it could become an omp surface.
+
+## 9. FOCUS CHANGE (supersedes sections 1 and 8 where they conflict), bead `jev-jy7t.1`
+
+Joshua, 2026-09-24, verbatim, three messages in a row:
+- *"i want a cluster of truly novel ideas that jev can be used for - computer use, game use, with
+  examples that we run locally - anything we can come up with that is truly novel in its approach -
+  must shatter any sota approaches we find."*
+- *"do deep online research to back this up - what are people using classifier models like jev
+  for"*
+- *"make sure that this exercise is backed with latest research and guidance"*
+
+**Scope now:** computer use (browsers, desktop apps, GUIs, terminals) and games (real-time and
+turn-based). Environments run on this Mac (M3 Ultra, arm64 macOS); Jev is called through the
+TypeSafe API. No local LLM, no paid comparator.
+
+**"Shatter" must be checkable.** Every idea names the benchmark or environment, the metric, and the
+best published number it must beat, with the source URL and date. Metrics may be success rate,
+score, or success per second or per dollar, but the metric is fixed before any run and compared
+like for like (same benchmark version, same task split). Where LLM agents fail for latency reasons
+(real-time play), say so and cite the number.
+
+**Backed by current research.** Cite 2025-2026 work where it exists, with dates. Four research files
+are landing in this directory (pane 1's agents): `research-classifier-uses.md`,
+`research-sota.md`, `research-guidance.md`, `local-env-probe.md`. Read whichever exist before you
+finalize, and do your own searches too: independent grounding is part of the duel.
+
+**Add to each idea (section 8 fields still apply):**
+10. **Novel mechanism:** the thing no published approach does, and the closest published work.
+11. **SOTA to beat:** benchmark, metric, number, source URL and date.
+12. **Local example:** the environment, its install command, and the first runnable demo.
