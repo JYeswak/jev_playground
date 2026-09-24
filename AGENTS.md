@@ -636,6 +636,22 @@ Rules:
 | `awesome-jev-by-typesafe` | decision policies: routing, confidence gates, composite scoring, filter thresholds |
 | `probes/` | our own black-box assertions against a fake Jev — the one suite we own end to end |
 
+### No Anthropic API spend on comparisons — Joshua, 2026-09-24
+
+Joshua, 2026-09-24: *"i want us to stop using haiku api credits to compare our systems, i've been
+charged $100 from anthropic since yesterday"*. RULE 0. This narrows the lifted budget gate below:
+
+- **No Haiku arm, and no other Anthropic API model, is run as a comparator.** Do not re-run the
+  Haiku rows the usage cap refused, and do not wait for the cap to reset on 2026-10-01. Beads
+  whose only remaining work was a Haiku run are closed as not planned (`jev-1y19`, `jev-pm3`,
+  `jev-384m`, `jev-rf57`).
+- **Results already committed stand as they are.** A Haiku pairing that never ran is reported as
+  *not run (Anthropic spend stopped)*, not as *blocked until the cap resets*.
+- **Comparators that remain:** grok (xAI) and OpenRouter models, when their balances allow. Pick
+  one of those before proposing any new paid comparator.
+- **Scope:** this is about API-key spend on comparison runs. Agent sessions on a subscription are
+  not affected. If a new surface would bill the Anthropic API key, ask Joshua first.
+
 ### Live Call Budget Gate — LIFTED 2026-09-21 by Joshua
 
 Joshua, 2026-09-21: *"i give blanket approval to build jev systems that work - we can use the api -
