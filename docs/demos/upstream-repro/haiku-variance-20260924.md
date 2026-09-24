@@ -169,3 +169,20 @@ evening. Jev is held at one run per unit here (its variance is `jev-qbc`'s, meas
 Banking77 only, not SciFact). No Jev-run x Haiku-run cross-pairings were run. The retracted SciFact
 AUC and ECE wins are "not robust to the incumbent's re-run", not "Haiku is as good": the direction
 favours Jev in every run. Awaiting a non-author spot-check before the bead closes.
+
+## Non-author verification — ConfidenceCascade
+
+ConfidenceCascade (background agent of pane 1; not the author), 2026-09-24, keyless, from a fresh
+`git clone --local` at `abe14d9` into `/tmp/cc-x5k.pyvi9j/jev`. No live call, $0 spend.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `env -u TYPESAFE_API_KEY -u ANTHROPIC_API_KEY python3 work/haiku-variance/score.py` in the clone | HOLDS, exit 0. Run 1 reproduces 9/9 committed checks. Every per-run cell of the R1, R2 and R3 tables above reproduces, including SciFact AUC on run 2 (−0.0021 to +0.0393, TIE) and ECE on run 3 (−0.0495 to +0.0050, TIE). R1 prints HOLDS for SST-5 MAE, SST-5 PASS, SciFact Brier, SciFact PASS and Banking77, and RETRACTED for SciFact AUC and ECE. |
+| 2 | Input tokens per rerun equal run 1's (summed from the rows) | HOLDS. SST-5 364,917 on all three runs; SciFact 373,346 on all three; Banking77 360,861 on all three. Output tokens differ (SST-5 22,004 / 21,961 / 21,945; SciFact 4,981 / 4,961 / 4,986; Banking77 41,400 / 41,248 / 41,464). Every row reports `anthropic/claude-haiku-4-5`. |
+| 3 | Banking77 renormalized-map rows with `rawSum == 0` are the flat rows | HOLDS. Run 2: 11 flat rows (every probability equal) and 11 with `rawSum == 0`, the same set. Run 3: 12 and 12, the same set. All have `probabilityError` 1.0 and `choice` `activate_my_card`, and none has that true intent. Rows with `probabilityError` set: 89 and 87. |
+| 4 | Bar before data | HOLDS. `af2906b` (21:18:08 −0600) is an ancestor of `752b38b` (21:22:27 −0600). `af2906b` adds no rerun row files. Between them, `work/haiku-variance/score.py` and the three runners are byte-unchanged. The receipt changes only from `## Result` down. The runner diffs at `af2906b` add debug keys to the rows and the SciFact `haiku-run2/3` arm names; the Haiku call itself is unchanged. |
+| 5 | 10 rerun rows, `random.Random(20260925).sample` over all 2,600 rerun rows | HOLDS on 10/10. SST-5 run 3 i=243, run 2 i=498, run 3 i=123: `score` = Σ k·p_k exactly (1.75, 2.99, 0.33), probabilities sum to 1.0, rounded levels 2 / 3 / 0 against labels 1 / 4 / 1 (all scored wrong, consistent with the scorer). SciFact run 2 i=10 noul 0.95 with gold SUPPORT, and run 3 i=116 noul 0.0 with gold NEI (both correct at > 0.5). Banking77 run 2 i=339, i=44 and run 3 i=19, i=383, i=157: `choice` is the argmax, `confidence` equals `(p_max − 1/10)/(1 − 1/10)` (1.0 / 1.0 / 1.0 / 0.7778 / 1.0), and the probabilities sum to 1.0. i=19 was renormalized from `rawSum` 0.1. All five match their true intents. |
+
+Verdict: the receipt's numbers, its two retractions (R89) and its flat-row finding reproduce from
+committed files, and the bar was not edited after data. NO-CLAIM: this re-scores committed rows; it
+does not re-run Haiku or check the bootstrap seeds beyond the scorer's own output.
