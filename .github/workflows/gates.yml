@@ -15,11 +15,11 @@ on:
   workflow_dispatch:
     inputs:
       plant_red:
-        description: "Plant a defect in the runner checkout only (nothing committed): 'fixture' appends garbage to the calibration fixture so stage 10 must RED naming it; 'suite' appends a failing test so the registered-suite job must RED naming that file; 'none' runs clean."
+        description: "Plant a defect in the runner checkout only (nothing committed): 'fixture' appends garbage to the calibration fixture so stage 10 must RED naming it; 'suite' appends a failing test so the registered-suite job must RED naming that file; 'runonly' writes a real Jev-answer .probability read so the Run:-only row work/oracle-kit/selector-guard.mjs must RED; 'none' runs clean."
         required: false
         default: "none"
         type: choice
-        options: [none, fixture, suite]
+        options: [none, fixture, suite, runonly]
 
 jobs:
   gates:
@@ -203,19 +203,32 @@ jobs:
           EOF
           echo "PLANTED: work/sr-adopt/test_prereg.py"
 
+      - name: Plant a Run:-only defect in the runner checkout only
+        # A read of a Jev answer's .probability, a field the SDK does not have. selector-guard.mjs is
+        # a TESTS.md entry the filename pattern misses; its row must FAIL and its tail name this file.
+        if: inputs.plant_red == 'runonly'
+        run: |
+          set -euo pipefail
+          printf 'const answer = body.answers.harm;\nexport const p = answer.probability;\n' > work/oracle-kit/planted-silent-read.mjs
+          echo "PLANTED: work/oracle-kit/planted-silent-read.mjs (row work/oracle-kit/selector-guard.mjs must FAIL)"
+
       - name: Run registered suites
+        env:
+          PLANT: ${{ inputs.plant_red }}
         run: |
           set -u
           set +e
           python3 scripts/run-registered-suites.py > /tmp/suites.tsv
           rc=$?
           cat /tmp/suites.tsv
-          if [ "${{ inputs.plant_red }}" = "suite" ]; then
-            if grep -F $'work/sr-adopt/test_prereg.py\t' /tmp/suites.tsv | grep -q $'\tFAIL$'; then
-              echo "RED named work/sr-adopt/test_prereg.py"
-              exit 1
-            fi
-            echo "PLANT DID NOT FAIL work/sr-adopt/test_prereg.py"
+          case "$PLANT" in
+            suite) row=work/sr-adopt/test_prereg.py ;;
+            runonly) row=work/oracle-kit/selector-guard.mjs ;;
+            *) exit "$rc" ;;
+          esac
+          if grep -F "$row"$'\t' /tmp/suites.tsv | grep -q $'\tFAIL$'; then
+            echo "RED named $row"
             exit 1
           fi
-          exit "$rc"
+          echo "PLANT DID NOT FAIL $row"
+          exit 1

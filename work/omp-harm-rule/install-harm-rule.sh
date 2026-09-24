@@ -2,8 +2,10 @@
 # install-harm-rule.sh — install the omp harm-rule extension into an omp profile.
 #
 # Usage: install-harm-rule.sh [--check] [profile-name]
+#        install-harm-rule.sh --selftest
 #   profile-name defaults to "default". --check verifies an existing install
-#   without writing anything.
+#   without writing anything. --selftest runs the TESTS.md arms against a
+#   throwaway OMP_HOME under the temp dir; no real profile is read or written.
 #
 # WHAT THIS IS
 #   Four regular expressions that flag destructive-shaped bash commands, logged
@@ -33,6 +35,49 @@ set -u
 
 here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 src="$here/harm-rule.ts"
+
+if [ "${1:-}" = "--selftest" ]; then
+  t=$(mktemp -d "${TMPDIR:-/tmp}/harm-rule-selftest.XXXXXX") || { echo "RED: mktemp failed" >&2; exit 1; }
+  case "$t" in ""|"$HOME"/.omp*) echo "RED: refusing OMP_HOME=$t" >&2; exit 1 ;; esac
+  self="$here/install-harm-rule.sh"
+  bad=0
+  arms=0
+  # arm <name> <want-exit> <args...>: one unpiped run of this installer under the throwaway OMP_HOME.
+  arm() {
+    name=$1; want=$2; shift 2
+    arms=$((arms + 1))
+    OMP_HOME="$t" sh "$self" "$@" > "$t/$name.log" 2>&1
+    got=$?
+    if [ "$got" = "$want" ]; then echo "  ok   $name (exit $got)"
+    else echo "  FAIL $name: exit $got, want $want (log $t/$name.log)"; bad=$((bad + 1)); fi
+  }
+  expect() { # expect <name> <command...>: a check on the files the arms left behind.
+    name=$1; shift
+    arms=$((arms + 1))
+    if "$@"; then echo "  ok   $name"; else echo "  FAIL $name"; bad=$((bad + 1)); fi
+  }
+  profile_with() { mkdir -p "$t/profiles/$1/agent" && printf '%b' "$2" > "$t/profiles/$1/agent/config.yml"; }
+  listed_once() { [ "$(grep -cE '^[[:space:]]*-[[:space:]]*harm-rule[[:space:]]*$' "$t/profiles/$1/agent/config.yml")" = 1 ]; }
+
+  profile_with tp 'extensions:\n  - other\n'
+  arm check-before-install 1 --check tp
+  arm install 0 tp
+  arm check-after-install 0 --check tp
+  arm reinstall-idempotent 0 tp
+  expect "listed once after reinstall" listed_once tp
+  profile_with empty 'extensions:\n'
+  arm empty-block-list 0 empty
+  arm empty-block-list-check 0 --check empty
+  profile_with inline 'extensions: [other]\n'
+  cp "$t/profiles/inline/agent/config.yml" "$t/inline-before.yml"
+  arm inline-list-refused 1 inline
+  expect "inline config unmodified" cmp -s "$t/inline-before.yml" "$t/profiles/inline/agent/config.yml"
+  arm missing-profile-refused 1 nosuch
+
+  if [ "$bad" -eq 0 ]; then echo "install-harm-rule --selftest: PASS ($arms arms, OMP_HOME=$t)"; exit 0; fi
+  echo "install-harm-rule --selftest: RED ($bad of $arms arms failed, OMP_HOME=$t)"
+  exit 1
+fi
 
 mode="install"
 profile="default"

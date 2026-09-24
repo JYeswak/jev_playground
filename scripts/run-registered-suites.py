@@ -4,6 +4,8 @@
   python3 scripts/run-registered-suites.py
   python3 scripts/run-registered-suites.py --selftest
 
+Two sources, one row each: every tracked file the test-file pattern matches, and every
+TESTS.md entry the pattern misses whose own Run: command names its own path (run verbatim).
 Prints one TSV row per suite: path, rc, count, seconds, prerequisite, status.
 A missing prerequisite is SKIP, never a pass. Exit 0 only when every row is
 PASS or SKIP. --selftest plants a failing assertion in /tmp and requires the
@@ -28,14 +30,18 @@ TRACKED = re.compile(
 TIMEOUT = 180
 
 
-def tracked_tests(repo):
+def tracked_files(repo):
     out = subprocess.run(
         ["git", "-C", repo, "ls-files"],
         capture_output=True,
         text=True,
         check=True,
     )
-    return [line for line in out.stdout.splitlines() if TRACKED.search(line)]
+    return out.stdout.splitlines()
+
+
+def tracked_tests(repo):
+    return [line for line in tracked_files(repo) if TRACKED.search(line)]
 
 
 def default_command(repo, path):
@@ -286,13 +292,53 @@ def run_one(repo, path, command):
     }
 
 
+ENTRY = re.compile(r"^(?:-|\|)\s*`([^`]+)`")
+
+
+def run_only_entries(repo):
+    """(path, command) for each TESTS.md entry the pattern misses whose own Run: names it.
+
+    An entry is a `- `path`` bullet or `| `path` |` row plus its indented continuation lines.
+    A Run: in another entry never counts, so a fixture path in a demo's command is not run.
+    """
+    registry = Path(repo) / "TESTS.md"
+    if not registry.is_file():
+        return []
+    tracked = set(tracked_files(repo))
+    entries, current = [], None
+    for line in registry.read_text(encoding="utf-8", errors="replace").splitlines():
+        match = ENTRY.match(line)
+        if match:
+            current = [match.group(1), line]
+            entries.append(current)
+        elif current is not None and line[:1] in (" ", "\t") and line.strip():
+            current[1] += "\n" + line
+        else:
+            current = None
+    found = {}
+    for path, body in entries:
+        if path in found or path not in tracked or TRACKED.search(path):
+            continue
+        for command in re.findall(r"Run: `([^`]+)`", body):
+            if path in command:
+                found[path] = command
+                break
+    return list(found.items())
+
+
 def survey(repo):
     registry = Path(repo) / "TESTS.md"
-    return [
+    rows = [
         run_one(repo, path, run_command_for(registry, path))
         for path in tracked_tests(repo)
         if (Path(repo) / path).exists()
     ]
+    rows += [
+        run_one(repo, path, command)
+        for path, command in run_only_entries(repo)
+        if (Path(repo) / path).exists()
+    ]
+    return rows
 
 
 def emit(rows):
@@ -359,6 +405,16 @@ def selftest():
         "import unittest\nclass T(unittest.TestCase):\n"
         "    def test_planted(self):\n        self.fail('planted in this suite')\n"
     )
+    # Run:-only entries: shell files the pattern never matches. One fails, one passes, one names
+    # another file in its Run: (no row), one is untracked (no row). The failing one's Run: sits on
+    # a continuation line, as scripts/promotion-four-gates.py's does in the real TESTS.md.
+    for name, body in (
+        ("runonly.sh", "echo planted runonly\nexit 1\n"),
+        ("runonly_ok.sh", "exit 0\n"),
+        ("borrow.sh", "exit 1\n"),
+        ("untracked.sh", "exit 1\n"),
+    ):
+        (tmp / "work/plant" / name).write_text(body)
     (tmp / "TESTS.md").write_text(
         "- `work/plant/fail_test.py` — planted. Run: `python3 -m unittest work/plant/fail_test.py` (1 test).\n"
         "- `work/plant/mention_test.py` — mentions typesafe in a comment. Run: `python3 -m unittest work/plant/mention_test.py`.\n"
@@ -367,6 +423,11 @@ def selftest():
         "- `work/plant/borrowed_test.py` — no Run line of its own.\n"
         "- `work/plant/next.mjs` — the next row. Run: `true`.\n"
         "- `.omp/extensions/kit-guard/kit-guard.test.ts` — bun path. Run: `bun test .omp/extensions/kit-guard/kit-guard.test.ts`.\n"
+        "- `work/plant/runonly.sh` — Run:-only, planted failure.\n"
+        "  Run: `sh work/plant/runonly.sh` (exit 1).\n"
+        "- `work/plant/runonly_ok.sh` — Run:-only, passes. Run: `sh work/plant/runonly_ok.sh`.\n"
+        "- `work/plant/borrow.sh` — its Run: names another file. Run: `sh work/plant/runonly_ok.sh`.\n"
+        "- `work/plant/untracked.sh` — never added. Run: `sh work/plant/untracked.sh`.\n"
     )
     if (
         normalize_command(
@@ -386,6 +447,9 @@ def selftest():
             "work/plant/venv_test.py",
             "work/plant/borrowed_test.py",
             "demos/nopkg/ok.test.mjs",
+            "work/plant/runonly.sh",
+            "work/plant/runonly_ok.sh",
+            "work/plant/borrow.sh",
         ],
         cwd=tmp,
         check=True,
@@ -394,7 +458,11 @@ def selftest():
     rows = survey(tmp)
     by = {row["path"]: row for row in rows}
     failed = [row["path"] for row in rows if row["status"] == "FAIL"]
-    if sorted(failed) != ["work/plant/borrowed_test.py", "work/plant/fail_test.py"]:
+    if sorted(failed) != [
+        "work/plant/borrowed_test.py",
+        "work/plant/fail_test.py",
+        "work/plant/runonly.sh",
+    ]:
         print(f"SELFTEST FAIL: {failed}", file=sys.stderr)
         return 1
     if by["work/plant/borrowed_test.py"]["status"] != "FAIL":
@@ -422,7 +490,26 @@ def selftest():
     ):
         print(f"SELFTEST FAIL: venv row {venv_row}", file=sys.stderr)
         return 1
-    print("SELFTEST PASS planted failing assertion named work/plant/fail_test.py")
+    if "planted runonly" not in by["work/plant/runonly.sh"].get("tail", ""):
+        print("SELFTEST FAIL: Run:-only failure tail missing", file=sys.stderr)
+        return 1
+    if by.get("work/plant/runonly_ok.sh", {}).get("status") != "PASS":
+        print(
+            f"SELFTEST FAIL: Run:-only pass {by.get('work/plant/runonly_ok.sh')}",
+            file=sys.stderr,
+        )
+        return 1
+    for absent in ("work/plant/borrow.sh", "work/plant/untracked.sh"):
+        if absent in by:
+            print(
+                f"SELFTEST FAIL: {absent} ran without its own tracked Run:",
+                file=sys.stderr,
+            )
+            return 1
+    print(
+        "SELFTEST PASS planted failing assertion named work/plant/fail_test.py; "
+        "Run:-only failure named work/plant/runonly.sh"
+    )
     return 0
 
 
