@@ -3,7 +3,7 @@
 ChoiceBanking77 (background agent of pane 1), 2026-09-24. Offline lane: no calls. Everything is
 computed from rows already committed by `jev-4jf`.
 
-## Preregistered (committed before the scorer is first run on the real rows)
+## Preregistered (committed at `644a179`, before the scorer was first run on the real rows)
 
 **Question.** At 77 intents, flat Jev picks the right intent first 80.1% of the time (`jev-4jf`).
 No confidence cut made unattended routing safe, and a keyword hierarchy was worse (`jev-5fm`, R85).
@@ -53,5 +53,54 @@ the curve, and how actual reviewers behave.
 
 ## Results
 
-Pending: the scorer has not been run on the committed rows at the commit that introduces this
-section.
+Offline, 2026-09-24, 0 calls. Re-score: `python3 work/choice-banking77/score_topk.py`. There are 4
+zero-mass Haiku rows (ids 453, 1698, 2197, 3058).
+
+| k | Jev recall (Wilson 95%) | Haiku recall (Wilson 95%) | Jev-only / Haiku-only | Holm p |
+|---:|---|---|---|---:|
+| 1 | 2,465 (80.0%, 78.6-81.4) | 2,231 (72.4%, 70.8-74.0) | 354 / 120 | 1.5e-27 |
+| 2 | 2,708 (87.9%, 86.7-89.0) | 2,523 (81.9%, 80.5-83.2) | 255 / 70 | 7.5e-26 |
+| 3 | **2,804 (91.0%, 90.0-92.0)** | 2,602 (84.5%, 83.2-85.7) | 245 / 43 | 5.1e-35 |
+| 5 | 2,879 (93.5%, 92.5-94.3) | 2,660 (86.4%, 85.1-87.5) | 265 / 46 | 5.9e-38 |
+
+Dropping the 4 zero-mass rows from both arms (N = 3,076) moves no recall by more than 0.1 point and
+changes no conclusion; that table is printed by the scorer. Jev's lead holds at every k.
+
+**Top-1 under the tie rule vs the committed pick.**
+- Jev: 2,465 vs 2,467. Only 4 Jev rows have a tied top probability.
+- Haiku: 2,231 vs 2,267. On 113 Haiku rows the top probability is tied (the model tends to write
+  round numbers). The pessimistic rule counts the 36 rows where Haiku's committed pick won a tie
+  against the truth as misses.
+
+**Why no list reaches 95% (descriptive, printed by the scorer after the bar).** Jev puts exactly
+0 probability on the true intent in 181 of 3,080 rows (5.9%). Haiku does so in 352 (11.4%). Under
+the tie rule those rows are ranked last, so no probability-ranked list shorter than all 77 can
+reach them. Jev's ceiling is therefore 2,899/3,080 (94.1%), and its top 5 already reaches 2,879.
+
+**Short-list curve** (top-1 if the arm's `confidence` >= t, otherwise its top 3 goes to a human;
+the human branch assumes the human picks the truth when it is shown). Selected rows; the scorer
+prints all 16.
+
+| Arm | t | Auto-routed (accuracy) | Wrong auto-routes | To human (truth in list) | Total success |
+|---|---:|---|---:|---|---:|
+| Jev | 0 (always auto) | 3,080 (80.0%) | 615 | 0 | 80.0% |
+| Jev | 0.9 | 2,094 (92.5%) | 157 | 986 (81.5%) | 89.0% |
+| Jev | 0.95 | 1,855 (94.8%) | 96 | 1,225 (83.0%) | 90.1% |
+| Jev | 0.99 | 1,383 (97.0%) | 42 | 1,697 (85.7%) | 90.7% |
+| Jev | 1.01 (always list) | 0 | 0 | 3,080 (91.0%) | 91.0% |
+| Haiku | 0.9 | 1,911 (86.4%) | 259 | 1,169 (74.6%) | 81.9% |
+| Haiku | 0.95 | 980 (90.5%) | 93 | 2,100 (81.6%) | 84.4% |
+| Haiku | 1.01 (always list) | 0 | 0 | 3,080 (84.5%) | 84.5% |
+
+**Decision: NOT SUFFICIENT** (fixed rule: Jev top-3 recall >= 95%; measured 91.0%). A top-3 list
+catches 91 of 100 messages, and at 77 intents no probability-ranked list can reach 95%, because Jev
+gives the truth zero mass on 5.9% of messages. What the curve does support: at t = 0.99, Jev
+auto-routes 45% of messages at 97.0% accuracy (42 wrong) and hands the rest to a human with a top-3
+list that contains the truth 85.7% of the time. Haiku is worse at every k and at every threshold.
+With the same list, its best total success is 84.5% versus Jev's 91.0%.
+
+**Boundary / NO-CLAIM.** Offline over one run per arm, one wording, undescribed options. The human
+branch is modeled as perfect picking from a shown list, not observed. The zero-truth-mass and tie
+counts are descriptive and were added to the scorer after the bar; the bar's tables are unchanged by
+that addition (the output diffs clean apart from the new lines). A non-author re-score is pending,
+and the bead stays open.

@@ -152,6 +152,25 @@ def main():
     all_ids = [item["i"] for item in subset]
     zero = sorted(i for i, r in arms["haiku"]["final"].items() if r.get("rawSum") == 0)
     print(f"Haiku zero-mass rows (rawSum == 0): {len(zero)} {zero}")
+    # Descriptive, added after the bar: why recall saturates below 95%.
+    for a, arm in arms.items():
+        fin = arm["final"]
+        zt = sum(
+            1
+            for i in all_ids
+            if "choice" in fin[i] and fin[i]["probabilities"][fin[i]["intent"]] == 0
+        )
+        tied = sum(
+            1
+            for i in all_ids
+            if "choice" in fin[i]
+            and sorted(fin[i]["probabilities"].values())[-2]
+            == max(fin[i]["probabilities"].values())
+        )
+        print(
+            f"{a}: truth given exactly 0 probability on {zt}/{len(all_ids)} rows "
+            f"(recall ceiling below k=77: {len(all_ids) - zt}); top probability tied on {tied} rows"
+        )
     main_rows = report("All rows", all_ids, arms)
     kept = [i for i in all_ids if i not in set(zero)]
     report("Zero-mass Haiku rows dropped from both arms", kept, arms)
