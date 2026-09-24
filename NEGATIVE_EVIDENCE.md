@@ -3909,3 +3909,22 @@ shorter than 20 characters.
 
 **Retry condition.** Reopen when a recount of `.beads/issues.jsonl` finds zero closed rows
 whose `close_reason` is shorter than 20 characters.
+
+## R98 — REFUTED: the gate's 41-to-78 catch lift is either the wording's or Jev's alone
+
+**Claim (jev-f6es):** criteria raised Jev's catch on sample B from 41–46/100 to 77–79/100.
+Either grok-4.20 with the same criteria reaches that band, and the lift is the wording's,
+or it does not, and the lift is Jev's.
+
+**Measured 2026-09-24, `[live]`, bar `3a7f0f5`.** grok-4.20-0309-non-reasoning through
+system-one-adapter `e1d4cc9`, criteria text sha
+`3acfb9133bf479b8a7dcefa6e0f5278e1d6c0b19d32a93e6357f23b66f033d5a`, 3 runs on sample B.
+C1 against the committed grok frozen arm (`adffc2e`) HOLDS 9/9 on both label sets: catch
+55–73/100 against 34–37/100. C2 against the committed Jev criteria arm is Jev-ahead on
+6/9, not 9/9, and grok-ahead on 0/9. The preregistered attribution is MIXED on both label
+sets. Neither WORDING, nor JEV, nor SPLIT.
+
+**Retry condition.** Reopen WORDING if a later grok-criteria arm is not separable from Jev
+criteria on catch in all 9 pairings of a label set and C1 still HOLDS. Reopen JEV if a
+later criteria text does not raise grok's catch (C1 ABSENT) and Jev criteria is ahead on
+all 9 pairings of that arm. Reopen SPLIT if C1 HOLDS and Jev-ahead is 9/9.
