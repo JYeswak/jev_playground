@@ -212,7 +212,9 @@ def prerequisite(repo, path, command):
             clone = repo / "upstream/typesafe-ai/system-one-adapter-python"
             if not clone.is_dir():
                 return "./scripts/sync-docs.sh --repos-only"
-            return "uv sync --directory upstream/typesafe-ai/system-one-adapter-python"
+            # --all-extras: the suites import system_one_adapter.providers.openai, an optional
+            # extra; a bare sync builds a venv they fail to import in (CI d68d104, jev-g4bm).
+            return "uv sync --locked --all-extras --directory upstream/typesafe-ai/system-one-adapter-python"
     return ""
 
 

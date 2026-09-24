@@ -179,13 +179,14 @@ jobs:
           enable-cache: false
 
       - name: Install the prerequisites the suite command names
-        # --locked: the vendored clone's uv.lock is installed as pinned, never re-resolved.
+        # uv sync is the runner's own hint (run-registered-suites.py prerequisite): --locked installs
+        # the vendored uv.lock as pinned; --all-extras because the suites import the openai provider.
         run: |
           set -euo pipefail
           npm ci --prefix work/sdk
           ./scripts/bootstrap-compaction.sh
           ./scripts/sync-docs.sh --repos-only
-          uv sync --locked --directory upstream/typesafe-ai/system-one-adapter-python
+          uv sync --locked --all-extras --directory upstream/typesafe-ai/system-one-adapter-python
           bun --version
           upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python --version
 
