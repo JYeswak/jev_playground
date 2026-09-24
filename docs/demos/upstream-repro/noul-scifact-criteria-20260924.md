@@ -118,3 +118,22 @@ specific. The ECE differences are not significant in either pair. Nothing here s
 are inert) on vaguer instructions, on other sets, or on Score and Choice. The "no gate-sized effect"
 reading is a comparison across two different tasks and was not preregistered. Awaiting a non-author
 re-score from the committed rows before the bead closes.
+
+## Non-author verification — VerifySST5
+
+VerifySST5 (background agent of pane 1; not the author), 2026-09-24, keyless, from fresh
+`git clone --local` copies at HEAD `1d0e1ad` and at the results commit `6ac0092`. No live call made;
+spend $0.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `python3 work/noul-scifact/compare-criteria.py` with no key, at `1d0e1ad` and at `6ac0092` | HOLDS. Both exit 0 with byte-identical output. `score.py` changed after the results (`834a569`, jev-wx5 data-dir support), and the output did not move. Every number in both tables and the gold-label table reproduces. Primary: TIE (3 vs 4, p=1), AUC WIN +0.0007 to +0.0072, Brier WIN −0.0107 to −0.0021, ECE TIE, LIFT. Control: Brier WIN only, LIFT. Noise floor: SAME. `NEGATIVE_EVIDENCE row required: NO`. Row sha256 prefixes `8ee29bdb` (ablation) and `608ecc64` (rerun) match the receipt. |
+| 2 | Independent recompute from the rows (not through `score.py`) | HOLDS. Accuracy at > 0.5, all-pairs AUC (ties ½) and Brier: committed 361, 0.9622, 0.0709; ablation 362, 0.9584, 0.0774; rerun 361, 0.9610, 0.0711. 400/400 rows per arm, all `model` = `jev-1.13.0`, noul in [0.01, 0.99]. Decisions differ on 7 rows between committed and ablation, and on 0 between committed and rerun. |
+| 3 | Each arm asked the question the bar says | HOLDS. `run.py` at `30eb285` builds `QUESTION_NO_CRITERIA = Noul(instructions=QUESTION.instructions)`, and `QUESTION`'s text is unchanged from `15b0371`. The rows confirm it. Every ablation row reports exactly 44 fewer input tokens than its committed twin (the criteria text; 400/400 rows, one constant delta). Every rerun row reports the same input tokens as its committed twin (400/400). |
+| 4 | Bar before data | HOLDS. `30eb285` (2026-09-23 20:37:06 −0600) is an ancestor of `6ac0092` (20:38:45 −0600). It contains the bar, `compare-criteria.py` and the `run.py` arms, and neither new rows file. Both rows files are first added in `6ac0092` (`git log --diff-filter=A`). The receipt diff between the two only replaces "Pending the live run." under Results. `compare-criteria.py` and the three rows files are unchanged from then to HEAD. The rows carry no timestamps, so the 02:37:15Z start is the author's statement; the commit order is what is checked. |
+| 5 | The rule applied as written | HOLDS. `compare-criteria.py:62-68` returns HURT on any LOSE, LIFT on any WIN otherwise, and NO EFFECT on all TIE, matching "a mix of WIN and LOSE counts as HURT". The control agrees with the primary, so the "not robust to run timing" branch does not apply. The NEGATIVE_EVIDENCE trigger (HURT or NO EFFECT) did not fire. |
+
+Verdict: LIFT reproduces from committed files under an unedited bar, and it is robust to the scorer
+change after the results. Re-score: `python3 work/noul-scifact/compare-criteria.py`. NO-CLAIM: this
+re-scores committed rows; it does not re-run any arm or measure run-to-run variance beyond the
+author's rerun control.
