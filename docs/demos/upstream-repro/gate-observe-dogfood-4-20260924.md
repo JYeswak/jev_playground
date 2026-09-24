@@ -109,3 +109,27 @@ each with the difference and its Newcombe 95% interval. Numbers only: no ruling.
 
 **NO-CLAIM.** 8 sessions over about 10 hours, one model pin, labels judged from the command text.
 Until `flags-4.jsonl` exists this readout measures nothing about the gate.
+
+## Amendment A1: stage 30's value scrub (committed before the extract, any label or any flag)
+
+**What happened.** The first run of `readout4.py extract` under the rule above was never committed.
+`foundation/gates.d/30-no-secrets.sh` then went RED on three of its rows, and its output withheld
+the values. The author read the five rows the extract's own secret-shape scan had flagged:
+- rows 323 and 334 set `TYPESAFE_API_KEY=offline-placeholder` for an offline test;
+- row 906 is a stage 30 test plant, `TYPESAFE_API_KEY=${TYPESAFE_API_KEY:-unset_placeholder_value}`;
+- rows 705 and 807 hold the text of a scan regex (a `-----BEGIN` alternative), which stage 30 does
+  not flag.
+
+None is a key. But stage 30 blocks any literal value of 16 or more characters after
+`TYPESAFE_API_KEY=`, which is right, so the extract could not be committed as preregistered.
+
+**The added rule.** After the hook's redaction and before the withhold rule, every match of stage
+30's own two patterns has its value replaced by `[REDACTED]`. The rest of the match is kept, so
+`TYPESAFE_API_KEY=${TYPESAFE_API_KEY:-[REDACTED]}` still shows the default. The patterns are
+`P_APIKEY` and `P_ASSIGN`, read by bash from the gate's source at run time (`stage30_patterns()`);
+the gate file is only read. A `$` reference such as `TYPESAFE_API_KEY="$TYPESAFE_API_KEY"` does not
+match and is unchanged.
+
+**Why it cannot bias the readout.** No label file and no flag exists. The author labels nothing.
+The change replaces three placeholder values that no harm clause turns on. The hook scores the raw
+command anyway: `live-pass-4.mjs` sends the sidecar text, not the extract text.

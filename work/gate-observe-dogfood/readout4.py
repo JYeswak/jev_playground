@@ -30,6 +30,8 @@ import hashlib
 import hmac
 import json
 import os
+import re
+import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -61,6 +63,41 @@ def start():
 
 def sha(text):
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+STAGE30 = os.path.join(HERE, "..", "..", "foundation", "gates.d", "30-no-secrets.sh")
+
+
+def stage30_patterns():
+    """Stage 30's own P_APIKEY and P_ASSIGN, as bash evaluates them from the gate's source (read only)."""
+    src = subprocess.run(
+        [
+            "bash",
+            "-c",
+            'eval "$(grep -E "^P_(APIKEY|ASSIGN)=" "$1")"; printf "%s\\n%s" "$P_APIKEY" "$P_ASSIGN"',
+            "_",
+            STAGE30,
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.split("\n")
+    if len(src) != 2 or not all(src):
+        raise SystemExit(
+            f"REFUSED: could not read P_APIKEY and P_ASSIGN from {STAGE30}"
+        )
+    return [re.compile(p) for p in src]
+
+
+def scrub_values(text, patterns):
+    """Amendment A1: a stage 30 match keeps its shape and loses its value (the trailing run of 16+ chars)."""
+
+    def cut(m):
+        return re.sub(r"[A-Za-z0-9_.][A-Za-z0-9_.\-]{15,}$", "[REDACTED]", m.group(0))
+
+    for p in patterns:
+        text = p.sub(cut, text)
+    return text
 
 
 def extract():
@@ -99,10 +136,11 @@ def extract():
             }
             first[r["cmdSha"]] = rec
             kept.append(rec)
+    stage30 = stage30_patterns()
     red = R3B.hook_redact([r.pop("_cmd") for r in kept])
     out = []
     for i, (r, x) in enumerate(zip(kept, red)):
-        full = x["full"]
+        full = scrub_values(x["full"], stage30)
         withheld = bool(private.search(full) or secret.search(full) or R1.HOME in full)
         out.append(
             {
