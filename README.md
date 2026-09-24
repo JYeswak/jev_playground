@@ -105,14 +105,14 @@ Numbers below are what the named file contains. Re-run the command. If the file 
 
 Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right and Haiku wrong on 65, the reverse on 5, and 61 against 5 in the fresh run (McNemar p = 2.6e-13). The pre-registered rule passes on this corpus only.
 
-Re-run, the grok-4 win holds: across three Jev runs (639, 640, 639) and three grok-4 runs (558, 554, 555), Jev wins all 9 pairings, the weakest at p = 2.0e-18, so the 558 in the table is grok-4's best of three; verified by a non-author. The Haiku win is provisional: it held in all 6 pairings that exist (weakest p = 4.9e-13), but the third Haiku run is blocked by the Anthropic account's spend cap until 2026-10-01, so 3 of the 9 pairings are missing (bead `jev-1y19`) ([variance](docs/demos/upstream-repro/injection-variance-20260924.md)).
+Re-run, the grok-4 win holds: across three Jev runs (639, 640, 639) and three grok-4 runs (558, 554, 555), Jev wins all 9 pairings, the weakest at p = 2.0e-18, so the 558 in the table is grok-4's best of three; verified by a non-author. Against Haiku, with two Haiku runs, it held in all 6 pairings that exist (weakest p = 4.9e-13); the third Haiku run was not run (Anthropic API spend stopped 2026-09-24), so the Haiku win rests on 6 pairings, not 9 ([variance](docs/demos/upstream-repro/injection-variance-20260924.md)).
 
 These re-score with no key. The fresh run reads only committed rows. The other two also read the public bench's own results file, which is not committed here, so clone it at its pinned commit first; without it both say `NOT_RUN` and exit 2:
 
 ```bash
 git clone https://github.com/Gaurav-Gosain/jev-sec-bench jev-sec-bench && git -C jev-sec-bench checkout fdb16b9
 python3 work/nev-differential/fresh-20260923/score.py        # fresh run: 640, 584, 61/5
-python3 work/nev-differential/variance-20260924/variance.py  # three runs: grok-4 9/9, Haiku 6/6 (third run blocked)
+python3 work/nev-differential/variance-20260924/variance.py  # three runs: grok-4 9/9, Haiku 6/6 (third Haiku run not run)
 python3 work/nev-differential/analyze_diff.py                # earlier runs, with grok-4
 ```
 
@@ -143,7 +143,7 @@ Adding outcome criteria to that question, compared with the same instructions wi
 
 **Rating review stars: Yelp.** On 500 Yelp reviews, Jev's star ratings beat xAI's grok-4.20 on both exact level and MAE in all 9 pairings of three Jev runs with three grok runs (grok exact 265 to 269 of 500, MAE 0.526 to 0.530). This is a win over grok only. Against Claude Haiku 4.5 the Yelp MAE win did not survive Haiku's re-runs and was retracted to a tie (R88) ([grok](docs/demos/upstream-repro/grok-incumbent-fever-yelp-b77-20260924.md)).
 
-**Rating similarity: STS-B.** On all 1,500 STS Benchmark English dev pairs, one Score question at `jev-1.13.0` rated similarity closer to the human scores than xAI's grok-4.20 through the official adapter, over three runs of each (9 run pairings): Spearman 0.907 on every Jev run against 0.880 to 0.885 for grok, and MAE 0.513 to 0.514 against 0.586 to 0.599, both wins in 9/9 pairings (weakest MAE sign test p = 0.0432), while exact-level accuracy, 784 to 788 against 748 to 756 of 1,500, tied in all 9. Every Jev run beat the always-mean and always-mode constants. Claude Haiku 4.5 was not run: the Anthropic account had hit its spend cap. Grok refused one pair, row 457, in all three runs, and the preregistered rule counts it against grok; without that row the thinnest MAE pairing is still a win, p = 0.0459 ([receipt](docs/demos/upstream-repro/score-stsb-20260924.md)).
+**Rating similarity: STS-B.** On all 1,500 STS Benchmark English dev pairs, one Score question at `jev-1.13.0` rated similarity closer to the human scores than xAI's grok-4.20 through the official adapter, over three runs of each (9 run pairings): Spearman 0.907 on every Jev run against 0.880 to 0.885 for grok, and MAE 0.513 to 0.514 against 0.586 to 0.599, both wins in 9/9 pairings (weakest MAE sign test p = 0.0432), while exact-level accuracy, 784 to 788 against 748 to 756 of 1,500, tied in all 9. Every Jev run beat the always-mean and always-mode constants. Claude Haiku 4.5 was not run (Anthropic API spend stopped 2026-09-24). Grok refused one pair, row 457, in all three runs, and the preregistered rule counts it against grok; without that row the thinnest MAE pairing is still a win, p = 0.0459 ([receipt](docs/demos/upstream-repro/score-stsb-20260924.md)).
 
 **What an answer costs.** On 150 live calls, 50 each with the SST-5 Score, Banking77 Choice and SciFact Noul questions above, the API reported input and output tokens and no billing units, so at the documented $0.042 per million input tokens with output free, 1,000 Jev answers cost $0.0158, $0.0162 and $0.0287, against $0.9484, $1.4287 and $0.9475 for Claude Haiku 4.5 at its $1 / $5 list price on the same rows, 33 to 88 times as much: list prices applied to token counts, not an invoice ([receipt](docs/demos/upstream-repro/jev-billing-units-20260924.md)).
 
@@ -256,7 +256,7 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 
 ## Limitations
 
-- The injection result is one public corpus at one cut: three runs of Jev and grok-4, two of Haiku so far. Measure your own traffic before you gate on it.
+- The injection result is one public corpus at one cut: three runs of Jev and grok-4, two of Haiku; a third Haiku run was not run (Anthropic API spend stopped 2026-09-24). Measure your own traffic before you gate on it.
 - Demos without `--live` replay recorded answers. They show the policy, not the model, and the live smokes are 1 to 10 calls each.
 - Some questions in this tree are a better fit for a regex or a trained classifier. The harm-rule check is the worked example.
 - CI runs only the portable gates, so a stage the runner skips is checked on the author's machine alone.
