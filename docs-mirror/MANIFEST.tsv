@@ -1,7 +1,7 @@
 kind	source	local_path	bytes	sha256	fetched_at
 index	https://docs.typesafe.ai/llms.txt	docs-mirror/typesafe/llms.txt	16019	3bad966207794ce900ebc81759fd48185cd2d1f287df13a08ae4d601e96450fd	2026-09-24T04:15:17Z
-index	https://docs.typesafe.ai/llms-full.txt	docs-mirror/typesafe/llms-full.txt	910292	ba478b4b21f2fbb6de2f4ad01e3188b1548763b62e9ef05fa51ccd0c87329996	2026-09-24T04:15:17Z
-index	https://docs.typesafe.ai/sitemap.xml	docs-mirror/typesafe/sitemap.xml	15616	71b4cd96c86aca161a1306a9b111f56aa2fb28789fcd179bbb09c50ac6bf65a1	2026-09-24T04:15:17Z
+index	https://docs.typesafe.ai/llms-full.txt	docs-mirror/typesafe/llms-full.txt	910288	278de4c82484f1535f332c4b6bf0056b39f48aa434431ccdf963230a5f9ec566	2026-09-24T22:22:11Z
+index	https://docs.typesafe.ai/sitemap.xml	docs-mirror/typesafe/sitemap.xml	15616	43a239b272d037c8f77973375ede649b48f6e180623bf14a5e5030ef73725a9f	2026-09-24T22:22:11Z
 page	https://docs.typesafe.ai/agent-skill.md	docs-mirror/typesafe/agent-skill.md	5798	5ed8f74a133760523a67674f0feaac6ac88d9f1d242574ce3c9c4965f6e037c4	2026-09-17T22:50:07Z
 page	https://docs.typesafe.ai/api.md	docs-mirror/typesafe/api.md	11772	7ea1c82d9d16bd06e3d38885a5292548293f91e6d1ade4682c27398ced51a9e5	2026-09-24T04:15:18Z
 page	https://docs.typesafe.ai/concepts/how-to-build-with-system-one.md	docs-mirror/typesafe/concepts/how-to-build-with-system-one.md	40921	d9f4d34c1349bf5acb55c99d6a1651eacfc481ad8d1f78ccb8776769da729a49	2026-09-24T04:15:18Z
@@ -34,7 +34,7 @@ page	https://docs.typesafe.ai/introduction.md	docs-mirror/typesafe/introduction.
 page	https://docs.typesafe.ai/introduction/coding-agents.md	docs-mirror/typesafe/introduction/coding-agents.md	5150	e61ec46260302e87e21ca65fe2a1d67ae6c2741a4a586645ace5dd7d9f501175	2026-09-24T04:15:30Z
 page	https://docs.typesafe.ai/introduction/machine-learning-primer.md	docs-mirror/typesafe/introduction/machine-learning-primer.md	6580	45e6a22bc175f2ce1c404271dd26559179a6f6a83bde2dfcdbd963dbc1649551	2026-09-17T22:50:32Z
 page	https://docs.typesafe.ai/introduction/quickstart.md	docs-mirror/typesafe/introduction/quickstart.md	7053	c30183944985b269c49939140272f9eec885895df346f19d76cf9b04e18073d2	2026-09-24T04:15:31Z
-page	https://docs.typesafe.ai/legal.md	docs-mirror/typesafe/legal.md	1059	4141ec2e7efad5a2965e56273216300ee3ece1e8d85024f0d0692efa08afcf5c	2026-09-17T22:50:34Z
+page	https://docs.typesafe.ai/legal.md	docs-mirror/typesafe/legal.md	1055	2d4a97a13e7b06b469bcd2c2fdcbf8b6c3aa0e56949eac67e8897ba5633aed7d	2026-09-24T22:22:24Z
 page	https://docs.typesafe.ai/model-jaggedness/jev-1.13.md	docs-mirror/typesafe/model-jaggedness/jev-1.13.md	11588	e69329bd32e91ac08f0bd2681ceb4aacc34923b9190e29c15c8f75d8e22950e2	2026-09-24T04:15:32Z
 page	https://docs.typesafe.ai/models.md	docs-mirror/typesafe/models.md	7245	9d20bb3c90a0147532d0b20ddc4c64579391be7842e965543b27bad684eeb4d6	2026-09-24T04:15:33Z
 page	https://docs.typesafe.ai/patterns.md	docs-mirror/typesafe/patterns.md	2020	3c810e35f9587e0432c0fae4448961e54233ecbe51a4ba091721d55a0e5bc107	2026-09-17T22:50:37Z
