@@ -132,3 +132,22 @@ shippable bar in jev-qw8 (misroute ≤ 2% at ≥ 80% coverage), and this unit do
 run-to-run stability comparison is descriptive and was not preregistered. JevVariance's jev-pm3
 full-CLINC150 files were not read, touched or measured. Before close, this needs a keyless re-score
 from a fresh clone and a spot-check by someone other than the author.
+
+## Non-author verification — Verifier3
+
+Verifier3 (background agent of pane 1, Anthropic model), 2026-09-24. Not the author. Everything ran
+in a fresh `git clone --local` of `035aa8f` under `/tmp`. No call was made.
+
+| Check | Command | Result |
+|---|---|---|
+| Bar precedes rows | `git show --stat d2f1b2a 0516464`; `stat -f %SB` on the live worktree's rerun files | bar, `variance.py` and `run-variance.py` are at `d2f1b2a` (21:41:27 −0600). The four rerun files were born 21:41:42 to 21:43:41, all after it, and committed at `0516464` (21:46:26). |
+| Bar text unedited | `git diff d2f1b2a 0516464 -- <receipt>` | the only removed line is `Pending the live runs.` |
+| Same prompt despite a changed `run.py` | per-row comparison of input tokens | `run.py` was refactored after `2842340` for jev-pm3 (`--set`, `haiku-prompted`), and this unit did not edit it. Per-row input tokens are identical to the committed run on 750/750 rows for J2, J3, H2 and H3, so the subset prompt and options are unchanged. Every row reports the pinned model. |
+| Re-score reproduces | `python3 work/choice-clinc150/variance.py` (rc 0, no key) | step 1 re-derives J1 × H1 (NON-INFERIOR 688/681, 21 vs 14; WIN 685/650, 47 vs 12, p = 5.13e-06), with headroom 17 / 30. Every number in the per-run and 9-pairing tables matches, as do the flip table (Jev 2–4 answers, Haiku 36–45). Verdicts: **handled WIN 9/9 STANDS, overall NON-INFERIOR 9/9 STANDS, PASS STANDS**. |
+| Independent recompute | own script, `choice == intent` per run | overall correct J1–J3 688/688/689 and H1–H3 681/680/687, identical. |
+| 10 seeded rows by hand | `random.Random(24)`: 171, 173, 186, 198, 223, 392, 596, 686, 698, 729 | Jev's three runs agree on the label for all 10, with peaks within 0.03. Haiku changes its label on 198 (`schedule_maintenance` → `last_maintenance` → `schedule_maintenance`, peaks 0.34/0.39/0.75) and on 729 (`oos` at 0.85, then `current_location` at 0.50, then `oos` at 0.95). On 198 Jev says `oos` at 0.58 in all three runs. That is below the 0.60 gate, so it is abstained in all three. All hand reads agree with the stored rows. |
+| Zero-mass handling | scorer output and row fields | every Haiku rerun row records `probabilityError`/`rawSum`, and the scorer reports 0 zero-mass rows in all six runs. The two Haiku readings therefore coincide, as the receipt states. |
+| NO-CLAIM vs what ran | receipt vs rows | one domain, 15 intents plus OOS, 3 runs per arm, one question. The jev-pm3 full set was not touched here. The receipt says the stability comparison was not preregistered. No retraction, so no NE row, which is correct. |
+
+**Verdict: CONFIRMED** (clean-clone keyless re-score, `[oracle]`). Both jev-qw8 verdicts stand on
+9/9 pairings. Scratch left at `/tmp/v3-kvw.UIPq` (not deleted).
