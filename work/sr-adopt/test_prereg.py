@@ -24,10 +24,14 @@ def git(repo, *args):
 
 
 def load_runner():
-    path = ROOT / "work/grok-incumbent-3/run.py"
+    path = Path(os.environ.get("GROK_RUN_PATH", ROOT / "work/grok-incumbent-3/run.py"))
     spec = importlib.util.spec_from_file_location("grok_run", path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
+    # A deleted gate used to die here on a missing typesafe_sdk import inside
+    # the fever loader, before the provider existed. The stub makes that plant
+    # fail on "provider constructed" under plain python3 too.
+    mod.LOADERS = {"fever": lambda: [(0, {"text": "x"}, {"q": {"type": "noul"}})]}
     return mod
 
 

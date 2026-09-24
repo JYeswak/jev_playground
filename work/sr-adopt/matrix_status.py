@@ -1,6 +1,10 @@
 """Status validator for a matrix-row ledger.
 
-The status column is found by header name. The enum is a parameter.
+Keeps skillranker's four-string enum (validate_contract_matrix.py:38),
+found by header name. skillranker also checks that a non-planned row names
+resolvable unit tests (validate_contract_matrix.py:361-364). This file does
+not. In jev that evidence check is lane-status.sh's trace join.
+
 An unknown status or an empty ledger exits 1. A missing file or a missing
 column exits 2. Exit 1 is never a traceback.
 """

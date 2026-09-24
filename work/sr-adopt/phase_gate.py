@@ -1,8 +1,11 @@
-"""One function. An attempt before its phase panics.
+"""Require a committed bar before a provider call.
 
-Adopted from skillranker@a6f1ff0 src/adapter.rs:569 `planned`, which
-composes a command with the PhaseGate it waits for. The negative arm is
-the panic in tests/ledger_attempt_rows.rs:136 when the attempt is not Ready.
+skillranker@a6f1ff0 src/adapter.rs:124 PhaseGate and :569 planned gave the
+name. Those lines store an earliest phase. They do not compare an attempt
+to it. The cited panics at tests/ledger_attempt_rows.rs:136 and
+tests/ledger_attempt_ownership_contract.rs:110 are ledger-open Ready, not
+an attempt before its phase. The comparison below is ours. require_bar is
+the mechanism a runner consumes.
 """
 
 
@@ -11,7 +14,11 @@ class AttemptPanic(Exception):
 
 
 def composed_phase_gate(earliest, attempt):
-    """Return ready, or panic. earliest and attempt are ints, P0 = 0."""
+    """Return ready, or panic. No caller outside test_phase_gate.py.
+
+    The comparison is ours. skillranker's planned() only stores the phase.
+    earliest and attempt are ints, P0 = 0.
+    """
     if attempt < earliest:
         raise AttemptPanic(f"attempt {attempt} before phase {earliest}")
     return "ready"
