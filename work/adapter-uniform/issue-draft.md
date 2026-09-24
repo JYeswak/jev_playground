@@ -163,6 +163,6 @@ ask is only that `choice` not name an option the model gave zero probability.
 
 Searched this repo with `gh issue list --repo typesafe-ai/system-one-adapter-python --state all
 --search` for `uniform`, `zero probabilities`, `normalize`, `all zero`, `rescale`,
-`confidence 0`, and `probability sum`, and read the full issue and PR lists (8 issues, 32 PRs,
-2026-09-24). No duplicate found; the nearest is #38 (truncated output accepted as success), a
+`confidence 0`, and `probability sum`, and read the full issue and PR lists (8 issues and
+32 PRs as of 2026-09-24). No duplicate found; the nearest is #38 (truncated output accepted as success), a
 different mechanism in the provider layer.
