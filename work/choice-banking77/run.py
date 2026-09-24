@@ -12,7 +12,8 @@ Same state, same question, same labels in both arms. Resumes rows that already h
 Run:
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
     upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python \
-    work/choice-banking77/run.py [--set full] [jev|haiku]
+    work/choice-banking77/run.py [--set full] [--out rows.jsonl] [jev|haiku]
+--out replaces the rows path (repeat runs, bead jev-qbc) and needs exactly one arm.
 Never prints a key.
 """
 
@@ -245,13 +246,21 @@ def main(argv):
         at = argv.index("--set")
         name = argv[at + 1]
         del argv[at : at + 2]
+    out = None
+    if "--out" in argv:
+        at = argv.index("--out")
+        out = os.path.abspath(argv[at + 1])
+        del argv[at : at + 2]
     fname, rows_pattern = SETS[name]
     rows = load_rows(fname)
     label_map = labels(rows)
     arms = argv or ["jev", "haiku"]
+    if out and len(arms) != 1:
+        print("--out needs exactly one arm", file=sys.stderr)
+        return 64
     code = 0
     for arm in arms:
-        path = os.path.join(HERE, rows_pattern.format(arm=arm))
+        path = out or os.path.join(HERE, rows_pattern.format(arm=arm))
         if arm == "jev":
             code = run_jev(rows, label_map, path) or code
         elif arm == "haiku":
