@@ -239,9 +239,29 @@ def count_from(output):
     return ""
 
 
+FAILURE_MARKER = re.compile(r"\bFAIL\b|\bnot ok\b|AssertionError|Error:|Traceback")
+MARKER_CAP = 20
+
+
 def failure_tail(output, limit=30):
+    """The last `limit` lines, preceded by the failure-marker lines above them (capped).
+
+    A suite that prints its failing arm early and many passing lines after it would otherwise
+    reach the log as a count with no named failure (jev-v5l5, dispatch run 36001507176).
+    """
     lines = (output or "").splitlines()
-    return "\n".join(lines[-limit:])
+    above, tail = lines[:-limit], lines[-limit:]
+    marked = [line for line in above if FAILURE_MARKER.search(line)]
+    if not marked:
+        return "\n".join(tail)
+    shown = marked[:MARKER_CAP]
+    capped = f", first {MARKER_CAP} shown" if len(marked) > MARKER_CAP else ""
+    return "\n".join(
+        [f"# {len(marked)} failure-marker line(s) above the last {limit}{capped}:"]
+        + shown
+        + [f"# last {limit} lines:"]
+        + tail
+    )
 
 
 TYPED_SKIP = re.compile(r"(?m)^SKIP \(missing prerequisite: (.+)\)\s*$")
@@ -448,6 +468,18 @@ def selftest():
             "echo 'SKIP (missing prerequisite: planted-tool, install: nowhere)'\nexit 8\n",
         ),
         ("bare8.sh", "echo 'no prerequisite named'\nexit 8\n"),
+        # A failing arm printed before 40 passing lines, and 25 failing arms before 40 passing
+        # lines: the first must reach the tail output, the second must be capped at MARKER_CAP.
+        (
+            "deep_fail.sh",
+            "echo '  FAIL planted deep arm'\n"
+            'i=1; while [ "$i" -le 40 ]; do echo "  ok passing line $i"; i=$((i+1)); done\nexit 1\n',
+        ),
+        (
+            "many_fail.sh",
+            'i=1; while [ "$i" -le 25 ]; do echo "  FAIL many $i"; i=$((i+1)); done\n'
+            'i=1; while [ "$i" -le 40 ]; do echo "  ok passing line $i"; i=$((i+1)); done\nexit 1\n',
+        ),
     ):
         (tmp / "work/plant" / name).write_text(body)
     (tmp / "TESTS.md").write_text(
@@ -469,6 +501,8 @@ def selftest():
         "- `work/plant/dup.sh` — two commands, one label. Run: `sh work/plant/dup.sh` and Run: `bash work/plant/dup.sh`.\n"
         "- `work/plant/typed_skip.sh` — the lane's typed skip. Run: `sh work/plant/typed_skip.sh`.\n"
         "- `work/plant/bare8.sh` — exit 8, no prerequisite named. Run: `sh work/plant/bare8.sh`.\n"
+        "- `work/plant/deep_fail.sh` — failing arm above 40 passing lines. Run: `sh work/plant/deep_fail.sh`.\n"
+        "- `work/plant/many_fail.sh` — 25 failing arms above 40 passing lines. Run: `sh work/plant/many_fail.sh`.\n"
     )
     if (
         normalize_command(
@@ -496,6 +530,8 @@ def selftest():
             "work/plant/dup.sh",
             "work/plant/typed_skip.sh",
             "work/plant/bare8.sh",
+            "work/plant/deep_fail.sh",
+            "work/plant/many_fail.sh",
         ],
         cwd=tmp,
         check=True,
@@ -507,7 +543,9 @@ def selftest():
     if sorted(failed) != [
         "work/plant/bare8.sh",
         "work/plant/borrowed_test.py",
+        "work/plant/deep_fail.sh",
         "work/plant/fail_test.py",
+        "work/plant/many_fail.sh",
         "work/plant/runonly.sh",
         "work/plant/two.sh --selftest",
     ]:
@@ -569,6 +607,24 @@ def selftest():
         or skip_row.get("prerequisite") != "planted-tool, install: nowhere"
     ):
         print(f"SELFTEST FAIL: exit 8 typed skip {skip_row}", file=sys.stderr)
+        return 1
+    deep = by["work/plant/deep_fail.sh"].get("tail", "")
+    if "  FAIL planted deep arm" not in deep or not deep.startswith(
+        "# 1 failure-marker line(s) above the last 30:"
+    ):
+        print(
+            f"SELFTEST FAIL: early failing arm not in the output: {deep[:200]}",
+            file=sys.stderr,
+        )
+        return 1
+    many = by["work/plant/many_fail.sh"].get("tail", "")
+    if (
+        not many.startswith(
+            f"# 25 failure-marker line(s) above the last 30, first {MARKER_CAP} shown:"
+        )
+        or many.count("  FAIL many ") != MARKER_CAP
+    ):
+        print(f"SELFTEST FAIL: marker cap not applied: {many[:200]}", file=sys.stderr)
         return 1
     for absent in (
         "work/plant/borrow.sh",
