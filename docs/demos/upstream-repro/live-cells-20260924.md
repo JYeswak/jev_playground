@@ -57,3 +57,31 @@ The rule is mine. A reader who counts a changed score or a pointer on an unanswe
 difference gets different verdicts for entity (fruit-variant's name noul moved from 0.63 to 0.07,
 same outcome) and semantic-find (the no-answer query pointed at L01 in the fixture and L04 live). The
 receipts are single live runs of 1 to 10 calls; nothing here re-runs the model.
+
+## Non-author check (pane 1 AmberWillow, with SnowyCreek's recompute), 2026-09-24
+
+**Verdict: CONFIRMED.** `python3 work/readme-stranger-run/live-cells.py` exits 0 on pane 1's run and
+prints the same 9 differ / 6 same / 2 not compared.
+
+SnowyCreek (pane 3, grok) recomputed all 17 cells separately, without this script. It applied each
+receipt's own `calls` rule to the receipt's structure (for example rerank, 2 queries x 5 pairs = 10),
+and compared live rows with each demo's recorded answers (`demos/<name>/demo.mjs:line`).
+
+- **Call counts:** all 17 match the README.
+- **Verdicts:** every compared verdict agrees. That pass also reached the citation (*differs*) and
+  entity (*same*) corrections on its own, having read the README cells from before this commit.
+
+Its first pass had counted rows instead of calls (rerank 2, consistency 24). That pass was withdrawn,
+and no README number changed on its strength.
+
+It found two differences, both already stated above:
+
+- **semantic-find:** the unanswered query's pointer (L01 fixture, L04 live). See Boundary.
+- **consistency and consistency-noul:** the live pluralities differ from the fixture's, and this
+  receipt keeps them *not compared* because the recorded state was an id only.
+
+One counting difference does not change a verdict. For citation this receipt counts 5 items
+(4 of 5 same). The recompute counts the 4 claims that carry a choice (3 of 4 same), leaving out
+`power_ten`, which has no choice. Both say *differs*.
+
+NO-CLAIM of this check: no model call was made, and no live receipt was re-recorded.
