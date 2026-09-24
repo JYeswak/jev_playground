@@ -9,7 +9,7 @@ condition:
 scope: "tool:bash"
 interruptMode: always
 ---
-**Blocked before it ran.** Your last `bash` call bypasses or re-points the pre-commit hook. That command did not execute. Do not re-issue it unchanged.
+**Blocked before it ran.** The `bash` call you were in the middle of writing bypasses or re-points the pre-commit hook. It was cut off while you wrote it, so it is not in your transcript: the last `bash` call you can see ran normally and is not the blocked one. The blocked call did not execute. Do not re-issue it unchanged.
 
 STOP. You were about to bypass or re-point the pre-commit honesty gate (CHECKLIST.md B5; AGENTS.md forbidden pattern 1, "gate self-weakening").
 
