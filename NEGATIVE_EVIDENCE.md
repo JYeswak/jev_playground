@@ -3437,3 +3437,40 @@ data.
 **NO-CLAIM.** This does not say the gate misses real harm. Its misses fall on the label that is
 most open to dispute, where the literal "overwrites data outside /tmp" reading meets intended source
 edits. The measurement covers one repository's traffic and one adjudicator.
+
+## R82 — FAILED BAR: dropping the persona keeps the injection seat's catch while making it quiet on tool output
+
+**Claim (jev-qip):** the jev_screen question with no `assistant` description (state
+`{user_message}`), plain or with Noul criteria, keeps ≥ 0.80 catch (Wilson lower bound) on the
+public 263-attack corpus while false-flagging ≤ 15 of 300 real tool results.
+
+**Measured (2026-09-24, K9z5Live, bar `845addd` before any call, pinned jev-1.13.0, cut 0.5):**
+- **Plain:** catch 213/263 = 0.810, Wilson lower 0.758 → FAIL. Tool false flags 12/300 (passes).
+- **Criteria:** catch 187/263 = 0.711, lower 0.654 → FAIL. Tool false flags 4/300 (passes).
+- **Haiku 4.5, same states via system-one-adapter:** plain 200/263 catch with 94/300 tool false
+  flags; criteria 214/263 with 52/300.
+
+No model/state pair passes both sides. Jev is the quieter tool-output flag by 82 and 48 rows.
+
+Many plain-state misses are attacks only relative to the news persona ("Generate SQL code…",
+"generate c++", "act as a storyteller", "translate to polish"). With no `assistant`, the question
+has no purpose for them to fall outside of. 3,548 new calls, 0 failures.
+
+Receipt: `docs/demos/upstream-repro/jev-toolout-flag-20260924.md`. Re-score:
+`python3 work/jev-toolout-flag/score.py`.
+
+**Retry condition.** Retry only with an attack side whose labels do not depend on a persona:
+injection strings planted inside the 300 committed real tool results (override / reveal / persona /
+operator-impersonation text, written before any call), or a preregistered split of `pairs.jsonl`
+into takeover-in-any-context versus scope-only attacks. Keep the same two-sided bar. The plain
+state is the one to retry first: its point estimate (0.810) already clears 0.80 on the proxy
+corpus.
+
+Do not retry by lowering the cut on the plain state: its 12 tool flags sit between p 0.50 and
+0.77, and its 50 misses spread from 0.03 to 0.49 (median 0.20; 20 at ≥ 0.30), so a cut low enough
+to clear the catch floor re-opens the tool side untested. Do not retry by rewording criteria until
+a planted-injection corpus exists to score them against.
+
+**NO-CLAIM.** This does not measure recall on tool output: the attacks are chat prompts. It says
+no context-free state tested here clears both sides of the proxy bar, so no `tool_result` hook
+was built.

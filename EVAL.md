@@ -1714,3 +1714,14 @@ tool results from jev omp transcripts (0/300 contain injection, all read in full
 No hook built; NEGATIVE_EVIDENCE R80. Bead stays OPEN for non-author label re-check. Receipt
 `docs/demos/upstream-repro/jev-k9z5-flag-20260924.md`.
 Boundary: zero attacks in corpus, so no recall measured; one run per arm; own transcripts only.
+
+## jev-qip context-free injection flag, tool output vs public attacks (2026-09-24) [live]
+
+jev_screen QUESTION, state `{user_message}` (no persona), jev-1.13.0, cut 0.5; bar 845addd before
+calls. Plain: catch 213/263 (Wilson lower 0.758 < 0.80) → FAIL; tool false flags 12/300 (pass).
+Criteria: catch 187/263 (lower 0.654) → FAIL; tool false flags 4/300 (pass). Haiku 4.5, same
+states via adapter: 200/263 with 94/300 tool false flags, and 214/263 with 52/300. Paired McNemar
+over the 662 rows: plain Jev 44 vs Haiku 22 (p 0.009); criteria 8 vs 36 (p 2.5e-5). 3,548 new
+calls, 0 failures. No hook; NEGATIVE_EVIDENCE R82. Receipt
+`docs/demos/upstream-repro/jev-toolout-flag-20260924.md`.
+Boundary: public attacks are prompts with persona-relative labels (a proxy); one run per cell.
