@@ -167,12 +167,27 @@ jobs:
         with:
           node-version: '22.18'
 
+      - name: Bun (6 suites run `bun test`, kit-guard and 5 compaction/test/*.test.ts)
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.0'
+
+      - name: uv (2 suites run under the adapter venv, work/openrouter*)
+        # No cache: the adapter's uv.lock does not exist until sync-docs clones it below.
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          enable-cache: false
+
       - name: Install the prerequisites the suite command names
+        # --locked: the vendored clone's uv.lock is installed as pinned, never re-resolved.
         run: |
           set -euo pipefail
           npm ci --prefix work/sdk
           ./scripts/bootstrap-compaction.sh
           ./scripts/sync-docs.sh --repos-only
+          uv sync --locked --directory upstream/typesafe-ai/system-one-adapter-python
+          bun --version
+          upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python --version
 
       - name: Plant a suite defect in the runner checkout only
         if: inputs.plant_red == 'suite'
