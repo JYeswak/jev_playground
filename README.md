@@ -211,7 +211,7 @@ This is the part worth stealing. Each step has a script.
 6. **Test the policy with an injected transport.** No key, no network. `node --test work/nev-injection/seat-guard.test.mjs`.
 7. **Leave the rows.** `python3 work/nev-differential/fresh-20260923/score.py` re-scores the committed injection comparison without a key or a network.
 
-Vendor docs are mirrored under `docs-mirror/typesafe/` once synced. The bytes are not committed: `./scripts/sync-docs.sh` fetches the docs and every pinned clone (network, about two and a half minutes on a fresh clone), then `./scripts/sync-docs.sh --check` confirms them against the committed manifest.
+Vendor docs are mirrored under `docs-mirror/typesafe/` once synced. The bytes are not committed: `./scripts/sync-docs.sh` fetches the docs and every pinned clone (network, about two and a half minutes on a fresh clone), then `./scripts/sync-docs.sh --check` confirms them against the committed manifest. When the live docs or an upstream repo have moved since the committed fetch, the sync rewrites `docs-mirror/MANIFEST.tsv` and `upstream/MANIFEST.tsv` to record it, so the `git diff` it leaves is the drift report; `--check` is still the pass or fail.
 
 ## What the measurements changed in the client
 
