@@ -118,8 +118,11 @@ uniform distribution (0.1 on every label, confidence 0.0). The argmax tie falls 
 `activate_my_card`, and none of the 14 were that intent, so all 14 are scored wrong. [INFERENCE]
 Most likely Haiku returned an all-zero probability map, which `normalize_probabilities=True` turns
 into uniform (`system_one_adapter/_utils/probability_normalization.py:69-72`): in effect, "none of
-these". The rows do not keep the raw provider output, so this is not proven. Neither the verdict
-nor the bar depends on this reading. Sensitivity, computed from the committed rows:
+these". These rows do not keep the raw provider output. **Follow-up, `jev-mly` (`80a499f`,
+`adapter-uniform-20260924.md`):** re-asking these inputs with raw output captured, 58 of 70 target
+calls came back as all-zero maps, against 1 of 70 control calls. So these are non-answers that the
+adapter turned into a pick, not wrong picks. Neither the verdict nor the bar depends on this
+reading. Sensitivity, computed from the committed rows:
 
 | Treatment of the 14 flat Haiku rows | Jev | Haiku | Jev-only / Haiku-only | McNemar p | Rule would say |
 |---|---:|---:|---|---:|---|
