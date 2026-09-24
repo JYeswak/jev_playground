@@ -1,0 +1,35 @@
+| Model | Answered | Failed | Zero-mass | Flat | Renormalized | p50 / p95 ms (answered) | Upstream providers | Exact / MAE (descriptive) |
+|---|---:|---:|---:|---:|---:|---|---|---|
+| `dots-studio/dots-3-note-preview:free` | 50/50 | 0 | 0 | 0 | 1 | 21493 / 35643 | AtlasCloud 50 | 15/50, 1.34 |
+| `nex-agi/nex-n2.5-pro:free` | 29/50 | 21 | 1 | 2 | 2 | 58959 / 108306 | Nex AGI 29 | 7/29, 1.28 |
+| `nvidia/nemotron-3-super-120b-a12b:free` | 12/50 | 38 | 2 | 4 | 4 | 6607 / 53991 | Nvidia 12 | 3/12, 1.25 |
+| `nex-agi/nex-n2.5-mini:free` | 50/50 | 0 | 2 | 3 | 6 | 4060 / 26290 | Nex AGI 50 | 8/50, 1.60 |
+| `liquid/lfm-2.5-2.6b:free` | 49/50 | 1 | 4 | 6 | 14 | 29676 / 71240 | Liquid 49 | 16/49, 1.24 |
+| `qwen/qwen3.8-27b:free` | 0/50 | 50 | 0 | 0 | 0 | None / None |  | n/a |
+| `google/gemma-4-31b-it:free` | 0/50 | 50 | 0 | 0 | 0 | None / None |  | n/a |
+| `google/gemma-4-26b-a4b-it:free` | 0/50 | 50 | 0 | 0 | 0 | None / None |  | n/a |
+
+Failures by verbatim class, and adapter retries (all rows, answered or not)
+- dots-studio/dots-3-note-preview:free
+- nex-agi/nex-n2.5-pro:free
+    failed 21: TypeSafeAPITimeoutError: Request timed out (timeout=120.0).
+- nvidia/nemotron-3-super-120b-a12b:free
+    failed 22: TypeSafeAPITimeoutError: Request timed out (timeout=120.0).
+    failed 14: TypeError: 'NoneType' object is not subscriptable
+    failed 1: TypeSafeAPIResponseValidationError: 200 Invalid response data at 'answers'.
+    failed 1: TypeSafeError: Expecting value: line 11 column 1 (char 55)
+- nex-agi/nex-n2.5-mini:free
+- liquid/lfm-2.5-2.6b:free
+    failed 1: TypeSafeError: OpenAI chat completion did not complete: length.
+- qwen/qwen3.8-27b:free
+    failed 45: not attempted
+    failed 5: TypeSafeRateLimitError: 429 Provider returned error
+- google/gemma-4-31b-it:free
+    failed 39: not attempted
+    failed 9: TypeSafeRateLimitError: 429 Provider returned error
+    failed 2: TypeSafeAPIResponseValidationError: 200 Invalid response data at 'answers'.
+- google/gemma-4-26b-a4b-it:free
+    failed 45: not attempted
+    failed 5: TypeSafeRateLimitError: 429 Provider returned error
+
+A model can carry a 500-row arm only if it answers 50/50 here (the 1% bar allows 5 of 500) with 0 zero-mass rows.
