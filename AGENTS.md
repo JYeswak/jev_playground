@@ -54,6 +54,10 @@ clone's own toolchain (`npm run typecheck` / `ruff`), never imposed across them.
 13. **When Jeffrey does it, default to ADOPT.** He is this lane's mentor. The burden of proof sits
     on NOT adopting, never on adopting.
     [§ RULE 12](#rule-12---adopt-from-the-mentor-by-default)
+14. **A pane on an OpenAI or Anthropic model stays out of rider-covered repos.** No indexing,
+    testing, benchmarking, analyzing or executing them, `fh` over the mirror included; route
+    that work to a pane on another lab's model.
+    [§ Rider-covered repos](#rider-covered-repos--restricted-lab-panes-stay-out)
 
 Gate inventory and every RED arm: [`GATES.md`](GATES.md). Refuted hypotheses and rejected
 designs, read before starting one: [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md).
@@ -409,6 +413,38 @@ leak. This section is as load-bearing as the deletion rule.
   to contain someone's data.
 - **Budget discipline:** offline first (see the lane split). If a change can be proven against a
   fake asker, proving it live is waste, not rigor.
+
+---
+
+## Rider-Covered Repos — Restricted-Lab Panes Stay Out
+
+**Fact** (`notes/deep/franken-deps.md` §W4.2, quoting the franken-assessment packets): 38 of the
+44 assessed Dicklesworthstone repos ship an MIT license with an "OpenAI/Anthropic Rider". It grants
+no rights to OpenAI, Anthropic, their affiliates, or anyone acting for them, and its restricted
+"Use" names copying, executing, **benchmarking, testing, analyzing, indexing**, and incorporating
+the software into any evaluation harness or ML pipeline.
+
+**Decision** — Joshua, 2026-09-24, on the question of whether any jev activity should change:
+*"approval on all"*. This lane takes the most conservative operational reading. It is not a legal
+opinion, and Joshua can widen it.
+
+- **Restricted-lab pane** = a pane whose model comes from OpenAI or Anthropic. Resolve the model
+  from the process and its profile config, never from the pane title
+  (see [Profiles](#profiles--the-trap-that-fires-in-this-session)). Today that is pane 1 only.
+- A restricted-lab pane does **not** index, test, benchmark, analyze, execute, or copy from a
+  rider-covered repo. That covers `fh` over `/Volumes/ZestData/dicklesworthstone-mirror`,
+  `ripwire`/`rg`/`ast-grep` over those clones, and running their suites or binaries.
+- It **may** read third-party assessment packets (they are not the repos), read results another
+  pane reports, and dispatch the work to a pane on another lab's model (today: pane 2 on xAI,
+  panes 3-6 on Meta).
+- Out of scope of the rider by the packets' own census: `br`, `bv`, `fh` and `ripwire` as tools,
+  and the one plain-MIT repo (`franken_agent_detection`). Running a tool is not indexing a
+  rider-covered repo; pointing it at one is.
+- Files already in jev that reimplement a mechanism described in a rider-covered repo are left
+  as they are. This rule governs what a restricted-lab pane does from now on, not history.
+
+**Reversal condition:** Joshua says otherwise, or a legal reading he accepts says the rider does
+not reach a model working for a third party.
 
 ---
 
@@ -1582,7 +1618,9 @@ A packet missing any of them is defective, and `BLOCKED` is the correct response
 
 1. **The mission line above**, so the pane knows which stage its unit serves.
 2. **The tools, by name, with what each is for** — not "use our tools":
-   - `fh` over `/Volumes/ZestData/dicklesworthstone-mirror` (306 ledger rows, 102 bead repos) for
+   - `fh` over `/Volumes/ZestData/dicklesworthstone-mirror` (306 ledger rows, 102 bead repos),
+     **only on a pane outside the rider**
+     ([§ Rider-covered repos](#rider-covered-repos--restricted-lab-panes-stay-out)), for
      *design* precedent: the e-process, the seven oracle shapes and the ratchet pattern were all
      read out of `asupersync`, `franken_ocr`, `franken_engine` and `frankensearch` rather than
      invented here.
