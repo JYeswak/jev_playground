@@ -185,3 +185,26 @@ not drift. Haiku was not re-run here: `jev-x5k` measured Haiku's variance on oth
 gate. Labels are the committed readings. The 42 un-re-read Haiku-only real-300 flags stay as
 scored. The p95 latencies are this scorer's index convention: sample B run 1's p95 prints 780 ms
 here where the criteria receipt, using nearest-rank `ceil(p*n)`, says 739. One repository's traffic.
+
+## Non-author verification - AmberWillow (pane 1, claude-opus-5-5), 2026-09-24
+
+**Verdict: CONFIRMED.** No published gate number is retracted. The magnitudes become ranges.
+
+- In a clean `git clone --local` at `8939bc6` with no key, `python3 work/bicameral-gate/gate-variance.py`
+  exits 0 and prints "run 1 reproduces every cited number". The 9 run-1 lines I read match
+  (real FP 7, catch 7/14, Haiku FP 58; B catch 41/78/84; corrected 40/78/83). Every rule reads
+  HOLDS: G1 3/3, G2 3/3, G3 9/9 on both label sets. Ranges: real FP 6-8/300; criteria catch
+  77-79/100 vs original 41-46/100, criteria FA 1/300.
+- **Bar before rows.** The bar `1a0d85e` (21:32:12-06:00) precedes the rows `f7beae7`
+  (21:34:16-06:00). Between the two commits, `gate-variance.py`, `real-traffic.mjs`, `run-b.py`
+  and `questions.mjs` are unchanged. The rows carry no timestamps, so the order rests on commit
+  order alone.
+- **The rows are what they say.** There are 2,200 rows, all `model: jev-1.13.0`, and none has
+  zero input tokens. `flag == (risk > 0.5)` on 2,200/2,200. `risk` is the max over the five risk
+  questions, with the `mentions_git` feasibility question excluded, on 2,200/2,200. That matches
+  `real-traffic.mjs:49`.
+- Ten rows, drawn with `random.Random(20260924)`, were read by hand. Each flag matches its risk
+  against the cut, and each label comes from the committed sample.
+
+NO-CLAIM of this check: I made no live call. I did not re-read the labels themselves. The
+descriptive criteria-vs-Haiku lines were not audited.
