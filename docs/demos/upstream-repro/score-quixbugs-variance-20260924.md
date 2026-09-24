@@ -116,3 +116,22 @@ result, not a trend. A non-author spot-check is needed before the bead closes.
 `/tmp/claimcheck-qb-clone`, with `TYPESAFE_API_KEY` and `ANTHROPIC_API_KEY` unset.
 `python3 work/score-quixbugs/variance.py` exits 0 and prints the verdicts above (DOWNGRADED 8/9, AUC
 TIE stands, PASS 9/9). `score.py` still prints `jev-2wc`'s committed run-1 result (12 vs 2 WIN, PASS).
+
+## Non-author verification — Verifier3
+
+Verifier3 (background agent of pane 1, Anthropic model), 2026-09-24. Not the author. Everything ran
+in a fresh `git clone --local` of `71edf02` under `/tmp`. No call was made.
+
+| Check | Command | Result |
+|---|---|---|
+| Bar precedes rows | `git show --stat 431a2fc 505701b`; `stat -f %SB` on the live worktree's rerun files | bar, scorer and the `run.py` change are at `431a2fc` (21:41:25 −0600). The four rerun files were born 21:41:46 to 21:42:20, all after it, and committed at `505701b` (21:43:50). The `run.py` diff only threads an output path through `answered()`, `main()` and the append. `QUESTION`, the clients and the call are untouched. |
+| Bar text unedited | `git diff 431a2fc 505701b -- <receipt>`; `git diff 431a2fc HEAD --stat -- run.py variance.py score.py` | receipt additions only, with no line removed from the bar. The scripts are unchanged after the bar. |
+| Re-score reproduces | `python3 work/score-quixbugs/variance.py` (rc 0, 17 s, no key) | run 1 × run 1 reproduces `jev-2wc` (38/2/0, 28/10/2, 12 vs 2 WIN, AUC TIE, PASS). Every number in both Result tables matches: per-run W/L/T, sign p and AUC, all 9 pairings' discordant counts, p, AUC intervals and pass, and the R2 flips. The verdicts are **pair ordering DOWNGRADED (8/9, the J3 × H3 pairing TIE at 8 vs 2, p = 0.109), AUC TIE stands (3/9 WIN, 0 LOSE), PASS 9/9**. |
+| Input tokens per rerun | own script, per row | input tokens are identical to run 1 on 80/80 rows for Jev runs 2 and 3 and for Haiku runs 2 and 3, and every row reports the pinned model. |
+| Independent recompute | own script, W/L/T per run from the stored scores | J1–J3 38/2/0, 38/2/0, 37/1/2; H1–H3 28/10/2, 25/13/2, 31/8/1. J3 × H3 is Jev-only 8, Haiku-only 2. All identical. |
+| 10 seeded pairs by hand | `random.Random(24)` over the 40 names: find_first_in_sorted, get_factors, hanoi, is_valid_parenthesization, kheapsort, knapsack, pascal, possible_change, sqrt, to_base | Jev ranks correct above buggy on all 10 in all three runs, and its scores move by at most 0.05. Haiku's order flips across runs on knapsack (2.57>2.22, then 2.10<2.63, then 2.18>2.04), pascal (2.10>2.03, 2.95>2.06, then 1.95<2.28), sqrt (1.93<2.05, 1.96<2.01, then 2.31>1.35) and is_valid_parenthesization (1.92<1.93, 2.16>2.05, then a 2.05 tie). This agrees with R2: Haiku's variance, not Jev's, decides the TIE pairing. |
+| Zero-mass handling | row fields | adapter debug recorded on 80/80 rows of each Haiku rerun, 0 set. The "without zero-mass" column correctly equals the main one. |
+| NO-CLAIM vs what ran | receipt vs rows | 3 runs per arm, 40 pairs, one wording, one pin and one Haiku configuration. Only the primary arms were re-run, as stated. `NEGATIVE_EVIDENCE.md` R91 exists with a retry condition. |
+
+**Verdict: CONFIRMED** (clean-clone keyless re-score, `[oracle]`): DOWNGRADED 8/9, AUC TIE stands,
+PASS 9/9. Scratch left at `/tmp/v3-kz50.q27Z` (not deleted).
