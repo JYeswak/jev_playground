@@ -103,11 +103,16 @@ Numbers below are what the named file contains. Re-run the command. If the file 
 | Claude Haiku 4.5, fresh run | 584/662 | 0.8822 |
 | grok-4, official adapter, same questions | 558/662 | 0.8429 |
 
-Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right and Haiku wrong on 65, the reverse on 5, and 61 against 5 in the fresh run (McNemar p = 2.6e-13). The pre-registered rule passes on this corpus only. Both comparisons re-score from committed rows with no key:
+Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right and Haiku wrong on 65, the reverse on 5, and 61 against 5 in the fresh run (McNemar p = 2.6e-13). The pre-registered rule passes on this corpus only.
+
+Re-run, the grok-4 win holds: across three Jev runs (639, 640, 639) and three grok-4 runs (558, 554, 555), Jev wins all 9 pairings, the weakest at p = 2.0e-18, so the 558 in the table is grok-4's best of three; verified by a non-author. The Haiku win is provisional: it held in all 6 pairings that exist (weakest p = 4.9e-13), but the third Haiku run is blocked by the Anthropic account's spend cap until 2026-10-01, so 3 of the 9 pairings are missing (bead `jev-1y19`) ([variance](docs/demos/upstream-repro/injection-variance-20260924.md)).
+
+These comparisons re-score from committed rows with no key:
 
 ```bash
 python3 work/nev-differential/analyze_diff.py                # earlier runs, with grok-4
 python3 work/nev-differential/fresh-20260923/score.py        # fresh run: 640, 584, 61/5
+python3 work/nev-differential/variance-20260924/variance.py  # three runs: grok-4 9/9, Haiku 6/6 (third run blocked)
 ```
 
 Receipts: [`work/nev-differential/DIFF-RECEIPT.json`](work/nev-differential/DIFF-RECEIPT.json) and [`jev-sec-bench-w70-20260923.md`](docs/demos/upstream-repro/jev-sec-bench-w70-20260923.md).
