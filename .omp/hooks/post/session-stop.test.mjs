@@ -66,6 +66,19 @@ test("a worker's second stop is silent, so the idle message cannot loop", () => 
   assert.equal(decideStop({ stop_hook_active: true }, { ...quiet, paneIndex: 4 }), undefined);
 });
 
+// Measured 2026-09-24: an `omp --mode=rpc` probe launched from pane 7 inherited TMUX_PANE, was
+// treated as a worker, and was steered into bead work instead of the one write it was sent to plant.
+test("a non-interactive probe session is never continued, even from a worker pane with ready work", () => {
+  assert.equal(
+    decideStop({ stop_hook_active: false }, { ...quiet, readyCount: 3, paneIndex: 7, interactive: false }),
+    undefined,
+  );
+  assert.equal(
+    decideStop({ stop_hook_active: false }, { ...quiet, missing: ["demos/a/demo.mjs"], interactive: false }),
+    undefined,
+  );
+});
+
 test("an aborted settle stays silent", () => {
   assert.equal(
     decideStop({ stop_hook_active: false, signal: { aborted: true } }, { readyCount: 2, missing: [], lastText: "" }),

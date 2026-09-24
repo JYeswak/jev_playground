@@ -48,9 +48,19 @@ export function assistantText(message: unknown): string {
 
 export function decideStop(
   event: { stop_hook_active?: boolean; signal?: { aborted?: boolean } },
-  world: { readyCount: number; missing: string[]; lastText: string; paneIndex?: number },
+  world: {
+    readyCount: number;
+    missing: string[];
+    lastText: string;
+    paneIndex?: number;
+    interactive?: boolean;
+  },
 ): { continue: true; additionalContext: string } | undefined {
   if (event.stop_hook_active || event.signal?.aborted) return undefined;
+  // A probe session (--mode=rpc/json, -p) inherits its parent pane's TMUX_PANE. Continuing it
+  // hijacks the probe into bead work: measured 2026-09-24, three no-flag rpc sessions meant to
+  // plant one write went to br ready instead, so the guard's L3 frame was never produced.
+  if (world.interactive === false) return undefined;
   const standingDown = STAND_DOWN.test(world.lastText);
   const worker = typeof world.paneIndex === "number" && world.paneIndex >= 2;
   if (!worker && world.readyCount <= 0 && world.missing.length === 0 && !standingDown) return undefined;
@@ -127,6 +137,9 @@ export default function sessionStopHook(pi: {
         missing,
         lastText: assistantText(typed.last_assistant_message),
         paneIndex: paneIndex(),
+        interactive:
+          Boolean(process.stdin.isTTY) &&
+          !process.argv.some((arg) => arg.startsWith("--mode") || arg === "-p" || arg === "--print"),
       });
     } catch {
       return undefined;
