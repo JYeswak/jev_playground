@@ -15,11 +15,11 @@ on:
   workflow_dispatch:
     inputs:
       plant_red:
-        description: "Plant a defect in the runner checkout only (nothing committed): 'fixture' appends garbage to the calibration fixture so stage 10 must RED naming it; 'none' runs clean."
+        description: "Plant a defect in the runner checkout only (nothing committed): 'fixture' appends garbage to the calibration fixture so stage 10 must RED naming it; 'suite' appends a failing test so the registered-suite job must RED naming that file; 'none' runs clean."
         required: false
         default: "none"
         type: choice
-        options: [none, fixture]
+        options: [none, fixture, suite]
 
 jobs:
   gates:
@@ -152,3 +152,52 @@ jobs:
             exit 0
           fi
           echo "VERDICT: ALL GREEN"
+
+  registered-suites:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node 22.18+ (README.md:26)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.18'
+
+      - name: Install the prerequisites the suite command names
+        run: |
+          set -euo pipefail
+          npm ci --prefix work/sdk
+          ./scripts/bootstrap-compaction.sh
+          ./scripts/sync-docs.sh --repos-only
+
+      - name: Plant a suite defect in the runner checkout only
+        if: inputs.plant_red == 'suite'
+        run: |
+          set -euo pipefail
+          cat >> work/sr-adopt/test_prereg.py << 'EOF'
+
+          import unittest
+          class PlantedSuiteDefect(unittest.TestCase):
+              def test_planted(self):
+                  self.fail("planted")
+          EOF
+          echo "PLANTED: work/sr-adopt/test_prereg.py"
+
+      - name: Run registered suites
+        run: |
+          set -u
+          set +e
+          python3 scripts/run-registered-suites.py > /tmp/suites.tsv
+          rc=$?
+          cat /tmp/suites.tsv
+          if [ "${{ inputs.plant_red }}" = "suite" ]; then
+            if grep -F $'work/sr-adopt/test_prereg.py\t' /tmp/suites.tsv | grep -q $'\tFAIL$'; then
+              echo "RED named work/sr-adopt/test_prereg.py"
+              exit 1
+            fi
+            echo "PLANT DID NOT FAIL work/sr-adopt/test_prereg.py"
+            exit 1
+          fi
+          exit "$rc"
