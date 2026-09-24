@@ -174,3 +174,78 @@ Re-score, no key: `python3 work/rerank-scifact/score.py`.
 **NO-CLAIM.** This does not say Jev beats or loses to BM25 or to grok. It does not
 say grok beats BM25: that WIN is retracted at 2/3. Three grok runs, one wording,
 one shortlist, one afternoon.
+
+## Result, Jev arms (CopperHeron, pane at index 2)
+
+This supersedes the BLOCKED verdict above. TypeSafe credits returned (`jev-1gdi` closed on pane
+1's HTTP 200 probe). The bar and everything above `## Result` are unchanged from `6203f00`. The bar
+file was clean at `ef1aadc` when each arm ran, so the `jev-8ec2` gate (`call_after_bar`) passed.
+
+**Runs, live, 2026-09-24.** Each arm was run in the foreground with
+`upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/rerank-scifact/run.py <arm>`
+under `infisical run`, with `typesafe_sdk` 0.7.0, `AsyncTypeSafeClient(model="jev-1.13.0",
+retry=RetryPolicy())` and `RERANK_CONCURRENCY` at its default of 16. `ANTHROPIC_API_KEY` and
+`OPENAI_API_KEY` were unset for the process.
+
+| Arm | Window (UTC) | Pairs answered | Failed | Model on every row |
+|---|---|---:|---:|---|
+| jev | 15:13:53 to 15:15:10 | 6000/6000 | 0 | `jev-1.13.0` |
+| jev-run2 | 15:16:08 to 15:17:24 | 6000/6000 | 0 | `jev-1.13.0` |
+| jev-run3 | 15:17:24 to 15:18:35 | 6000/6000 | 0 | `jev-1.13.0` |
+
+There was no smoke call, no 402 and no resume pass. Pane 1's readout 4 live pass used the same key
+at the same time.
+
+**Scores** (`python3 work/rerank-scifact/score.py`, keyless, rc 0):
+
+| Arm | nDCG@10 | Recall@10 | distinct nouls | p50/p95 pair ms | tokens in/out |
+|---|---:|---:|---:|---|---|
+| BM25 order | 0.6762 | 0.8013 | | | |
+| **jev** | **0.7623** | **0.8421** | 99 | 162/416 | 4,738,937 / 132,000 |
+| **jev-run2** | **0.7641** | **0.8421** | 99 | 179/375 | 4,738,937 / 132,000 |
+| **jev-run3** | **0.7637** | **0.8421** | 99 | 163/334 | 4,738,937 / 132,000 |
+| grok | 0.7012 | 0.8091 | 12 | 557/805 | 5,294,469 / 52,127 |
+| grok-run2 | 0.6997 | 0.8158 | 12 | 554/794 | 5,294,469 / 52,262 |
+| grok-run3 | 0.6969 | 0.8214 | 12 | 541/766 | 5,294,469 / 52,183 |
+| oracle top-20 | 0.8492 | 0.8454 | | | ceiling, not an arm |
+
+**Jev vs BM25**, the 3 pairings (frozen bootstrap, 2,000 resamples, `random.Random(20260924)`):
+
+| Metric | jev | jev-run2 | jev-run3 | all-pairings |
+|---|---|---|---|---|
+| nDCG@10 | +0.0862 [+0.0616, +0.1117] WIN (77/18/205) | +0.0879 [+0.0636, +0.1140] WIN (77/18/205) | +0.0875 [+0.0640, +0.1141] WIN (77/16/207) | **WIN STANDS 3/3** |
+| Recall@10 | +0.0408 [+0.0215, +0.0628] WIN (17/0/283) | +0.0408 [+0.0215, +0.0628] WIN (17/0/283) | +0.0408 [+0.0215, +0.0628] WIN (17/0/283) | **WIN STANDS 3/3** |
+
+**Jev vs grok**, the 9 pairings:
+- nDCG@10: WIN in all 9. The differences run from +0.0612 to +0.0672, and the lowest interval
+  bound is +0.0385. **WIN STANDS 9/9.**
+- Recall@10: WIN in all 9. The differences run from +0.0207 to +0.0330, the lowest bound is
+  +0.0073, and in no pairing is a query worse for Jev. **WIN STANDS 9/9.**
+- No Jev-vs-grok pairing is a LOSE on either metric.
+
+**Unit verdict under the frozen pass rule: PASS.** (1) Jev's nDCG@10 is WIN vs BM25 in all 3 runs.
+(2) No Jev-vs-grok pairing is LOSE on nDCG@10 or Recall@10. Jev closes about half the headroom
+between BM25 and the oracle reorder (+0.086 of 0.173). No `NEGATIVE_EVIDENCE.md` row, because Jev
+beat BM25.
+
+**Spend, from the SDK usage fields.** Every success row carries `resp.usage.input_tokens` and
+`output_tokens`. Jev bills input tokens only, at $0.042 per million, and output is free
+(`docs-mirror/typesafe/models.md`).
+- Each arm: 4,738,937 input tokens, **$0.199**.
+- Three arms: 14,216,811 input tokens across 18,000 calls, **$0.597**.
+- There were no failed calls and no retried rows. The runner records no retries the SDK made
+  internally.
+- The grok arms' cost is not applied here, as in the grok section above.
+
+**Rows** (sha256), no query or passage text; fields `qid, doc, arm, model, noul, latencyMs, usage`:
+- `rows-jev.jsonl` `40289951dcafcabbb1a7e4b2f03d989542aa99c4302165aa5b9a41d83f5af93b`
+- `rows-jev-run2.jsonl` `afd9eb3c5b7c0702f16f497cf13367821e6229ea4291a82a30e058199f0288de`
+- `rows-jev-run3.jsonl` `52c1a252da9ade744c4472a7b87fb39cd43c30dbf97c40c18345a58cf27431f7`
+
+**NO-CLAIM.**
+- One public benchmark: BEIR SciFact, 300 queries, a BM25 top-20 shortlist.
+- One question wording, one model pin (`jev-1.13.0`), three runs in one five-minute window.
+- The claim is reranking the top 20 on this corpus, not retrieval, and not other domains.
+- The incumbent is grok-4.20 in the adapter's probability mode: 12 distinct nouls, against 99 for
+  Jev. A stronger reranker, or grok in another mode, may do better.
+- Recall@10 is identical across the three Jev runs; nDCG@10 moves by at most 0.0018.
