@@ -1,0 +1,36 @@
+| Model | Answered | Failed | Zero-mass | Flat | Renormalized | p50 / p95 ms (answered) | Upstream providers | Exact / MAE (descriptive) |
+|---|---:|---:|---:|---:|---:|---|---|---|
+| `google/gemma-4-31b-it:free` | 0/50 | 50 | 0 | 0 | 0 | None / None |  | n/a |
+| `qwen/qwen3.8-27b:free` | 0/50 | 50 | 0 | 0 | 0 | None / None |  | n/a |
+| `nvidia/nemotron-3-super-120b-a12b:free` | 18/50 | 32 | 4 | 4 | 5 | 6128 / 47124 | Nvidia 18 | 5/18, 1.22 |
+| `nex-agi/nex-n2.5-pro:free` | 41/50 | 9 | 1 | 2 | 3 | 64304 / 151582 | Nex AGI 41 | 13/41, 1.17 |
+| `dots-studio/dots-3-note-preview:free` | 48/50 | 2 | 1 | 2 | 3 | 19142 / 31853 | AtlasCloud 48 | 11/48, 1.35 |
+| `google/gemma-4-26b-a4b-it:free` | 0/50 | 50 | 0 | 0 | 0 | None / None |  | n/a |
+
+Failures by verbatim class, and adapter retries (all rows, answered or not)
+- google/gemma-4-31b-it:free
+    failed 31: TypeSafeRateLimitError: 429 Rate limit exceeded: free-models-per-min.
+    failed 19: TypeSafeRateLimitError: 429 Provider returned error
+    retried 67: provider_error: 429 Rate limit exceeded: free-models-per-min.
+    retried 33: provider_error: 429 Provider returned error
+- qwen/qwen3.8-27b:free
+    failed 34: TypeSafeRateLimitError: 429 Rate limit exceeded: free-models-per-min.
+    failed 16: TypeSafeRateLimitError: 429 Provider returned error
+    retried 70: provider_error: 429 Rate limit exceeded: free-models-per-min.
+    retried 30: provider_error: 429 Provider returned error
+- nvidia/nemotron-3-super-120b-a12b:free
+    failed 19: TimeoutError:
+    failed 6: TypeSafeAPIResponseValidationError: 200 Invalid response data at 'answers'.
+    failed 6: TypeError: 'NoneType' object is not subscriptable
+    failed 1: TypeSafeError: Expecting value: line 75 column 1 (char 407)
+- nex-agi/nex-n2.5-pro:free
+    failed 9: TimeoutError:
+- dots-studio/dots-3-note-preview:free
+    failed 2: TypeSafeAPIResponseValidationError: 200 Invalid response data at 'answers'.
+- google/gemma-4-26b-a4b-it:free
+    failed 33: TypeSafeRateLimitError: 429 Rate limit exceeded: free-models-per-min.
+    failed 17: TypeSafeRateLimitError: 429 Provider returned error
+    retried 71: provider_error: 429 Rate limit exceeded: free-models-per-min.
+    retried 29: provider_error: 429 Provider returned error
+
+A model can carry a 500-row arm only if it answers 50/50 here (the 1% bar allows 5 of 500) with 0 zero-mass rows.
