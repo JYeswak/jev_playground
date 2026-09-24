@@ -201,3 +201,10 @@ level 0; truth is level 4. The preregistered rule uses the score, so nothing cha
 `jev-1.13.0` vs Haiku 4.5, 2026-09-24): PASS, accuracy TIE, MAE WIN with one row of headroom. Not
 checked: no live call was repeated, so the recorded answers are taken as the API's; the latency,
 token and calibration tables were not recomputed.
+
+**Run-to-run variance, measured afterwards** (bead `jev-91u`,
+[`score-yelp-variance-20260924.md`](score-yelp-variance-20260924.md)). Two more runs of each arm gave
+MAE WIN in only 3 of 9 Jev x Haiku pairings, all three against this receipt's Haiku run, which was
+Haiku's worst of three. Under that bar the MAE headline above is **RETRACTED to TIE**
+(`NEGATIVE_EVIDENCE.md` R88). The PASS stands in all nine pairings. This section is added after the
+fact; nothing above it is changed.

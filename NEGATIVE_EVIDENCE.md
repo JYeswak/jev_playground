@@ -3648,3 +3648,33 @@ the twelve new false alarms sit between 0.53 and 0.69.
 
 **NO-CLAIM.** One repository. The in-place rows are a marker plus a read, not a random sample of
 edits. This does not say a narrower question cannot pass.
+
+## R88 — RETRACTED to TIE: Jev beats Haiku 4.5 on Yelp review-star MAE
+
+**Claim (`jev-76o`, rows `df13f17`):** on 500 Yelp test reviews, one Score question at `jev-1.13.0`
+has significantly lower absolute error than Haiku 4.5 via the adapter (sign test 67 vs 45,
+p = 0.047), with one row of headroom.
+
+**Measured (2026-09-24, live, bead `jev-91u`, bar `d29397c` before any rerun call).** Two more runs
+of each arm on the same 500 rows, 2,000 calls, 0 failed. MAE WIN in 3 of the 9 Jev-run x Haiku-run
+pairings, all three against Haiku's first run. The other 6 are TIE (sign p 0.156 to 0.180). The bar
+needed 9/9 to hold and at least 5/9 to downgrade, so the headline is retracted to TIE. Jev's MAE
+is lower in every pairing (0.346 to 0.348 against Haiku's 0.370 to 0.384). Jev changes 5 to 7
+levels per re-run; Haiku changes 45 to 52. The pass rule (beats both constants, never loses to
+Haiku) holds in 9/9.
+
+Receipt: `docs/demos/upstream-repro/score-yelp-variance-20260924.md`. Re-score with no key:
+`python3 work/score-yelp/variance.py`.
+
+**Consequence adopted:** state the Yelp result as "PASS, accuracy TIE, MAE lower in direction but
+not reliably significant at N = 500". Do not cite `jev-76o`'s single-run p = 0.047 as a win. Any
+Jev-vs-LLM Score headline with a few rows of headroom needs re-runs of both arms before it is
+stated, because the incumbent's run-to-run spread (here about 8 times Jev's) can decide it alone.
+
+**Retry condition.** Retry with a larger preregistered sample (the three-run averages, 0.347 vs
+0.375, suggest N of about 1,500 or more for a stable single-run sign test [INFERENCE]), or with a
+repeated-run design fixed in the bar (for example, per-row error averaged over k runs of each arm
+as the primary test), or when a later Jev model is pinned.
+
+**NO-CLAIM.** Three runs per arm within one hour, one sample, one wording. This does not show that
+Jev and Haiku are equal on Yelp MAE; the direction favoured Jev in all nine pairings.
