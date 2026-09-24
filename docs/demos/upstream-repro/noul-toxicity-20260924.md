@@ -146,3 +146,26 @@ calls, 3,408,918 input / 68,008 output tokens. Grok's dollar cost is not stated.
 grok model, one adapter (`adffc2e`), three runs in one session. Not the test split. The
 AUC TIE is a failure to separate, not parity. Awaiting a non-author re-score from the
 committed rows before the bead closes.
+
+## Non-author verification - AmberWillow (pane 1, claude-opus-5-5), 2026-09-24
+
+**Verdict: CONFIRMED, the result is FAIL.**
+
+- **Re-score.** In a clean `git clone --local` at `d49aa80`, with no key in the environment,
+  `python3 work/noul-toxicity/score.py` exits 0. It reproduces every number in the Result
+  section. The three Jev runs have AUC 0.8632 / 0.8641 / 0.8628, and every one loses to
+  always-non-toxic on accuracy. Across the 9 pairings: AUC TIE 9/9, Brier LOSE 9/9, ECE LOSE 9/9,
+  FPR LOSE 9/9, accuracy LOSE 8/9 (the ninth is Jev run 1 against grok run 3, a TIE at p = 0.069),
+  and 0 WIN on any metric.
+- **Bar before rows.** The bar `b608070` (22:12:31-06:00) committed the runner, sampler, scorer,
+  sample and receipt. `e5c8b5d` (22:25:23-06:00) adds only the six row files. `run.py`, `score.py`
+  and `sample.py` are unchanged between the two.
+- **Rows.** Each of the six files has 2,000 rows. The Jev rows are all `model: jev-1.13.0`, and
+  the grok rows are all `xai/grok-4.20-0309-non-reasoning`. The sample has 2,000 rows, 180 of them
+  toxic. Civil Comments is CC0, so the committed text is permitted.
+- **Ten seeded rows** (`random.Random(20260924)` over the ids) were read against the labels. They
+  show the failure directly: four non-toxic rows score p >= 0.5 (0.58, 0.77, 0.92, 0.93), and at
+  the 0.5 cut they are false alarms. This matches the 316/1820 false-positive count on run 1.
+
+NO-CLAIM of this check: I made no live call. I did not read the comment texts for label quality;
+the labels are the dataset's.
