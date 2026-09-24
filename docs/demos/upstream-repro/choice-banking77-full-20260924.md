@@ -196,3 +196,26 @@ Latencies are client wall clock under 8 concurrent requests. Jev ran at the same
 rejected structured-output Haiku run, not the prompted one. The labels are PolyAI's and were not re-adjudicated. Not compared against
 fine-tuned Banking77 models. A non-author re-score from the committed rows is pending, and the bead
 stays open until then.
+
+## Non-author verification — Verifier2
+
+Verifier2 (background agent of pane 1, not an author of this unit), 2026-09-24. Clean
+`git clone --local` at `5839235` in `mktemp -d`; no model call.
+
+| # | Check | Command | Result |
+|---|---|---|---|
+| 1 | Bar order | `git merge-base --is-ancestor` 909278f → 3c473ae → 5839235 | first bar `909278f` (02:31:48Z) before the Jev rows, which are first committed in `3c473ae` (02:34:07Z); second bar `3c473ae` before the prompted Haiku rows `5839235` |
+| 2 | Bar text not edited after it was committed | `git diff 909278f 3c473ae` and `git diff 3c473ae 5839235` on this receipt | `3c473ae` only appends the second preregistration and rewords the Pending line; `5839235` only replaces that Pending line with Results. Lines 1-121 are unchanged since their commits |
+| 3 | Scorer change at the second bar | `git diff 909278f 3c473ae -- work/choice-banking77/score.py` | only adds the `full-prompted` set (same Jev file, Haiku file `rows-full-haiku-prompted.jsonl`); no rule, margin or test changed; untouched in `5839235` |
+| 4 | Prompted variant differs only as declared | read `run_prompted.py` against `run.py` | imports `run` for labels, instructions, model and concurrency; adapter call has `structured_outputs=False` and `n_retry_malformed_structure=1`, otherwise `probabilities` mode, `normalize_probabilities=True`, `RetryPolicy()`, as declared |
+| 5 | Rows rebuild | `python3 work/choice-banking77/sample.py --set full --check` | "check: identical", 3080 rows, 77 intents x 40 |
+| 6 | Re-score reproduces every headline number | `python3 work/choice-banking77/score.py --set full-prompted` | exit 0; Jev 2467/3080 (80.1%, 78.7-81.5), Haiku 2267/3080 (73.6%, 72.0-75.1), 0 failed each; p50/p95 153/299 and 3967/7074 ms; tokens as in the table; both 2141, Jev-only 326, Haiku-only 126, p = 1.71e-21; coverage tables as printed above (own vs formula differ by at most 9 rows: 2930/2939); 5 flat Haiku rows, dropped p = 2.47e-21, credited p = 2.45e-20; verdict WIN, PASS |
+| 7 | My own recompute from the row files | correct = `choice == intent`, joined on `i`; exact binomial McNemar | 3080 unique ids per arm, 0 error rows, models `jev-1.13.0` and `anthropic/claude-haiku-4-5` only; 2467 vs 2267, 326 vs 126, p = 1.71e-21. Structured run: 993 rows, all errors, one distinct message (the grammar-cap 400 quoted above) |
+| 8 | Row hand-check | 8 rows by `random.Random(20260924)` (i = 62, 594, 2238, 2288, 2329, 2584, 2706, 2873), both arms | every stored `choice` is the argmax of that row's stored map and maps back to the source intent id; stored confidence tracks the top probability; `Refund_not_showing_up` rows (1760, 1761) come back as the original id in both arms. Rows 62 ("I found my card, I would like to reactivate it", label `card_linking`) and 2706 (label `balance_not_updated_after_bank_transfer`) are wrong in both arms, both picking the same near-synonym |
+
+**Verdict: CONFIRMED** at `[oracle]` level (committed rows, clean clone, N = 3080 per arm,
+`jev-1.13.0` vs Haiku 4.5 prompted, 2026-09-24): WIN, PASS under the second bar `3c473ae`, with
+the first bar's structured Haiku arm correctly left without a verdict. Not checkable from files: the
+claim that the scorer was not run on the Jev rows before the second bar was chosen (commit order
+allows it; nothing records it), and the prompted run's start time (rows carry no timestamps). No
+live call repeated; the hierarchical fallback was not run by anyone.
