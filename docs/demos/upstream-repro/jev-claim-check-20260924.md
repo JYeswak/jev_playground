@@ -292,3 +292,23 @@ so it needs a decision.
 Verdict: every listed check holds. The bead is **left open** on the under-refusal above; see the
 bead comment. I also saw the over-refusal the receipt's NO-CLAIM names (`Rule 14 in AGENTS.md`
 refuses). NO-CLAIM: keyless probes and re-runs only, no live call, and no L3 re-run.
+
+**Re-verification of the fix `71edf02` (VerifySST5, non-author; Main made the fix).** Keyless, from
+a fresh full `git clone --local` at `0516464`. The tool and tests are unchanged since `71edf02`.
+- `node --test work/jev-claim-check/claim-check.test.mjs`: 11/11.
+- My probe, re-run: 75/219, 2.6e-13 and 96.0% still refuse with the asker never called. Dates,
+  `1.13.0`, `jev-1.13`, `SST-5` and `top-1` still get a verdict. My five unit-glued claims now refuse
+  (`7.7x`, `26x`, `130ms`, `10k`, `25v3`), and so do `12s`, `2GB`, `90ms`/`200ms` and `5min`.
+  Commit shas `3b0c1d2`, `2c59e18`, `12s4abc`, `5167fe8`, `3c006e2`, bead ids `jev-384m`/`jev-k9z`,
+  `2x2`, `v2` and a timestamp give no number. The unit letters are all outside hex `[a-f]`, and the
+  unit must end the token, so a lowercase sha cannot match.
+- My planted regression was different from Main's. I made `claimNumbers()` return only
+  `numberTokens()` (dropping `...glued`; sha256 `0c8c6dea…` → `fb19599a…`), and test 9 went red
+  (10/11, exit 1). I restored it from a byte copy (`0c8c6dea…`, blob equal to HEAD), and it is back
+  to 11/11.
+- `numberTokens()` is byte-identical to `4fcd20c`. `numeric-v2-cases` rebuilds to sha256
+  `f2a82e45…` and `numeric-choice-cases` to `5dbf534e…`, both unchanged. Built from a full checkout.
+
+Verdict: the under-refusal is fixed, the frozen case files are untouched, and **jev-5cz closes**.
+What remains is the over-refusal the NO-CLAIM already names (`Rule 14`, `17 stages`). NO-CLAIM:
+keyless only, no live call, and no L3 re-run of the fix.
