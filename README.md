@@ -205,7 +205,7 @@ These are in the code, not only in notes.
 
 ## How the repo checks itself
 
-The gates run on the author's machine, not yet on yours. A fresh clone needs one `br sync --import-only` first (the `br` issue tracker, beads_rust, builds the issue database from the committed `.beads/issues.jsonl`; without it the gates stop at their first check). Even then the native-surface, house-gates, staged-deletion and instrument-selftest stages go red elsewhere, because they call `ast-grep`, the author's foundry `loop-kit` (`LOOP_KIT`), and a local omp install. Bead `jev-fmy` tracks making them portable.
+The gates run fully on the author's machine. A fresh clone needs one `br sync --import-only` first (the `br` issue tracker, beads_rust, builds the issue database from the committed `.beads/issues.jsonl`; without it the gates stop at their first check). Then run `bash foundation/gates.sh --portable`: a stage whose prerequisite is missing prints `SKIP (missing prerequisite: <name>, install: <how>)` instead of going red, and the summary counts the skips rather than calling the run all green. The prerequisites are `ast-grep` and `rg` for the native-surface stage (`brew install ast-grep ripgrep`), the foundry `loop-kit` (`LOOP_KIT`) for the house gates and the autofix half of the staged-deletion stage (foundry is a private repo, so a stranger skips these), and omp with its ee and dcg extensions for part of the instrument selftests. Without `--portable` a missing prerequisite stays red.
 
 Seventeen stages run in `bash foundation/gates.sh`. Each is a script under [`foundation/gates.d/`](foundation/gates.d/) with a `--selftest` that plants a bad input and must go red; a stage that has only ever passed is unproven. Every commit subject names the level of evidence behind it (`[pending]`, `[selftest]`, `[test]`, `[oracle]`, `[live]`), and [`githooks/commit-msg`](githooks/commit-msg) refuses one that does not. Refuted ideas stay in [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md) with the condition under which they are worth retrying. [`GATES.md`](GATES.md) lists every stage and what it catches.
 
@@ -222,6 +222,7 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 | `node --test work/nev-injection/seat-guard.test.mjs` | Flag, pass, and review, with no model |
 | `node scripts/jev-probe.mjs --replay docs/demos/jev-probe/probe-response-20260918.json` | A recorded judgment, decoded. Drop `--replay` only when you mean to spend |
 | `bash foundation/gates.sh` | Every repository gate, with its own selftest |
+| `bash foundation/gates.sh --portable` | The same gates on a fresh clone; a missing prerequisite is a named SKIP, not a red |
 | `./scripts/sync-docs.sh` | The vendored docs and pinned clones, fetched (network) |
 | `./scripts/sync-docs.sh --check` | The vendored docs still match the manifest; a fresh clone fails it until the fetch above has run |
 

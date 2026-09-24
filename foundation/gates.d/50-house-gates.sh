@@ -33,6 +33,13 @@ GATES="dag-validate-gate.sh close-evidence-gate.sh commit-evidence-lint.sh"
 
 for g in $GATES; do
     if [ ! -x "$KIT/$g" ]; then
+        # PORTABLE (jev-fmy): loop-kit lives in foundry, a PRIVATE repo, so a stranger cannot fetch
+        # it. Under `gates.sh --portable` that is a named SKIP, exit 8. This check precedes the
+        # selftest branch, so --selftest skips the same way. Default mode: exit 3, unchanged.
+        if [ -n "${JEV_GATES_PORTABLE:-}" ]; then
+            echo "SKIP (missing prerequisite: loop-kit $g, install: foundry is private (JYeswak/foundry); with access, clone it and set LOOP_KIT=<clone>/loop-kit)"
+            exit 8
+        fi
         echo "ERROR: $KIT/$g missing or not executable — house gates unreachable (set LOOP_KIT)" >&2
         exit 3
     fi

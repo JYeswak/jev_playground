@@ -26,7 +26,8 @@
 # every new repo and would refuse this fixture's plain commit subjects at fixture-setup time.
 # Measured 2026-09-17 — the same trap that broke commit-evidence-lint.sh --selftest.
 #
-# Exit: 0 proven · 1 a witness failed · 3 the hook files are missing (instrument error).
+# Exit: 0 proven · 1 a witness failed · 3 the hook files are missing (instrument error) · 8 SKIP,
+# deletion lane proven but loop-kit absent, only under gates.sh --portable.
 
 set -uo pipefail
 
@@ -77,6 +78,16 @@ run_commit() { # run_commit <args...> ; echoes combined output, returns git's co
 }
 
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
+# PORTABLE (jev-fmy): without loop-kit (foundry, private) the wrapper refuses every commit unless
+# JEV_ALLOW_MISSING_AUTOFIX=1, the hook authors' own escape (CI sets it for the same reason,
+# .github/workflows/gates.yml). Under `gates.sh --portable` this stage sets it, so the deletion lane
+# still runs its trigger and five healthy witnesses for real; only the autofix lane is skipped, and
+# the verdict says so with exit 8. Default mode never sets it: a missing loop-kit stays RED.
+autofix_skip=""
+if [ -n "${JEV_GATES_PORTABLE:-}" ] && [ ! -x "${LOOP_KIT:-$HOME/Developer/foundry/loop-kit}/autofix-precommit.sh" ]; then
+    export JEV_ALLOW_MISSING_AUTOFIX=1
+    autofix_skip=1
+fi
 
 # ---------------------------------------------------------------- trigger witness
 new_fixture
@@ -156,6 +167,11 @@ else
 fi
 
 # ---------------------------------------------------------------- verdict
+if [ "$fails" -eq 0 ] && [ -n "$autofix_skip" ]; then
+    echo "60-staged-deletion-lane: deletion lane proven — 1 trigger + 5 satisfying witnesses; autofix lane not run"
+    echo "SKIP (missing prerequisite: loop-kit autofix-precommit.sh, install: foundry is private (JYeswak/foundry); with access, clone it and set LOOP_KIT=<clone>/loop-kit)"
+    exit 8
+fi
 if [ "$fails" -eq 0 ]; then
     echo "60-staged-deletion-lane: pre-commit wrapper proven — 2 triggers + 6 satisfying witnesses"
     exit 0

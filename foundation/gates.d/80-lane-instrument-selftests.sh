@@ -59,6 +59,25 @@ if [ "${1:-}" = '--selftest' ]; then
   exit 0
 fi
 
+# PORTABLE (jev-fmy). A suite or stage selftest may exit 8 with `SKIP (missing prerequisite: …)`,
+# and ONLY under `gates.sh --portable` (JEV_GATES_PORTABLE=1). Here that is a SKIP row, collected so
+# the stage can end with its own named SKIP; an exit 8 in the default mode, or one that names no
+# prerequisite, is RED like any other nonzero exit.
+skipped=()
+record() { # record <label> <exit code> <output>
+  local label="$1" code="$2" out="$3" line
+  if [ "$code" -eq 0 ]; then
+    printf '  PASS    %-44s %s\n' "$label" "$(printf '%s\n' "$out" | tail -1)"
+  elif [ "$code" -eq 8 ] && [ -n "${JEV_GATES_PORTABLE:-}" ] \
+       && line=$(printf '%s\n' "$out" | grep -m1 '^SKIP (missing prerequisite: '); then
+    printf '  SKIP    %-44s %s\n' "$label" "$line"
+    line=${line#SKIP (missing prerequisite: }; skipped+=("${line%%,*}")
+  else
+    printf '  RED     %-44s %s\n' "$label" "$(printf '%s\n' "$out" | tail -1)"
+    rc=1
+  fi
+}
+
 # GLOB, NOT A LIST — pane 3, audit-stage80-20260918T112921Z.json (71183c0):
 #   "Suites enumerated literally; A 4TH SELFTEST LANDS SILENTLY UNRUN (the inverse of the guarded
 #    missing-suite case: unlisted-new vs listed-missing). Recommend glob scripts/selftest-*.sh."
@@ -99,12 +118,8 @@ for s in "${suites[@]}"; do
     rc=1
     continue
   fi
-  if out=$(cd "$root" && "$p" 2>&1); then
-    printf '  PASS    %-44s %s\n' "$s" "$(printf '%s\n' "$out" | tail -1)"
-  else
-    printf '  RED     %-44s %s\n' "$s" "$(printf '%s\n' "$out" | tail -1)"
-    rc=1
-  fi
+  out=$(cd "$root" && "$p" 2>&1); code=$?
+  record "$s" "$code" "$out"
 done
 # SECOND SCAN SET — the stages' OWN selftests, which nothing invoked until now.
 #
@@ -136,12 +151,8 @@ if [ "${#stage_selftests[@]}" -eq 0 ]; then
 else
   for p in "${stage_selftests[@]}"; do
     n="gates.d/$(basename "$p")"
-    if out=$(cd "$root" && bash "$p" --selftest 2>&1); then
-      printf '  PASS    %-44s %s\n' "$n --selftest" "$(printf '%s\n' "$out" | tail -1)"
-    else
-      printf '  RED     %-44s %s\n' "$n --selftest" "$(printf '%s\n' "$out" | tail -1)"
-      rc=1
-    fi
+    out=$(cd "$root" && bash "$p" --selftest 2>&1); code=$?
+    record "$n --selftest" "$code" "$out"
   done
 fi
 
@@ -151,5 +162,11 @@ fi
 # other count this session got wrong.
 # BOTH counts, because reporting only the first made the line WRONG the moment the second scan set
 # landed: it printed "4 suites PASS" while eleven had run. Same class as the literal it replaced.
+if [ "$rc" -eq 0 ] && [ "${#skipped[@]}" -gt 0 ]; then
+  # Portable only: every non-PASS was a named prerequisite skip. Report it as the stage's own SKIP
+  # line (gates.sh prints it), never as a PASS count.
+  printf 'SKIP (missing prerequisite: %s, install: see the SKIP rows above)\n' "$(printf '%s\n' "${skipped[@]}" | sort -u | paste -sd '/' -)"
+  exit 8
+fi
 [ "$rc" -eq 0 ] && printf '80-lane-instrument-selftests: %d instrument suite(s) + %d stage selftest(s) PASS (hermetic; no shared state written)\n' "${#suites[@]}" "${#stage_selftests[@]}"
 exit "$rc"

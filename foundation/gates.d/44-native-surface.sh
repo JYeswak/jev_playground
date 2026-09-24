@@ -25,7 +25,8 @@
 # FRESHNESS: the four native repos must read behind=0 in upstream/MANIFEST.tsv
 # (first match wins; surrounding whitespace stripped).
 #
-# Exit: 0 green · 1 RED · 3 instrument error (ast-grep/rg missing, ledger missing).
+# Exit: 0 green · 1 RED · 3 instrument error (ast-grep/rg missing, ledger missing) · 8 SKIP, named
+# missing scanner, only under gates.sh --portable.
 # --selftest plants a direct-POST .ts file with no exemption, requires RED that
 # NAMES THE PLANT, removes it, requires GREEN.
 set -uo pipefail
@@ -44,6 +45,14 @@ _EP_A="https://api."
 _EP_B="typesafe.ai"
 EP_FULL="${_EP_A}${_EP_B}"
 EP_PAT="api\\.typesafe\\.ai"
+
+# PORTABLE (jev-fmy): under `gates.sh --portable` a missing scanner is a named SKIP, exit 8, and
+# it comes BEFORE the selftest branch so the stage-80 selftest skips too instead of reading the
+# skip as "RED, but not on the plant". Default mode is untouched: the checks below exit 3.
+if [ -n "${JEV_GATES_PORTABLE:-}" ]; then
+    command -v ast-grep >/dev/null 2>&1 || { echo "SKIP (missing prerequisite: ast-grep, install: brew install ast-grep, or npm install -g @ast-grep/cli and link its sg as ast-grep)"; exit 8; }
+    command -v rg >/dev/null 2>&1 || { echo "SKIP (missing prerequisite: rg, install: brew install ripgrep)"; exit 8; }
+fi
 
 if [ "${1:-}" = "--selftest" ]; then
     plant="$root/work/.selftest-plant-native.ts"

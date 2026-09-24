@@ -8,6 +8,7 @@ A gate that has only ever been observed green is decoration.
 ```bash
 cd foundation && ./gates.sh              # all stages against the real tree
 cd foundation && ./gates.sh --selftest   # every stage against its PLANTED BAD input
+cd foundation && ./gates.sh --portable   # stranger clone: a missing prerequisite is a named SKIP (stage exit 8), counted, never PASS
 ```
 
 `--selftest` is the load-bearing mode: a stage passes there only by **correctly going RED** on a

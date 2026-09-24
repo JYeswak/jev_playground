@@ -19,7 +19,12 @@
 set -uo pipefail
 root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd -P)
 cd "$root" || exit 1
-command -v omp >/dev/null 2>&1 || { echo "  SKIP omp not on PATH — NOT counted as agreement"; echo "scripts/selftest-ttsr-assert-disabled.sh: skipped"; exit 0; }
+# omp absent: under `gates.sh --portable` a named SKIP, exit 8, so the aggregate counts it (jev-fmy).
+# Default mode keeps the old exit-0 skip line; stage 80 then reports PASS for it.
+if ! command -v omp >/dev/null 2>&1; then
+  [ -n "${JEV_GATES_PORTABLE:-}" ] && { echo "SKIP (missing prerequisite: omp, install: the omp coding agent on PATH)"; exit 8; }
+  echo "  SKIP omp not on PATH — NOT counted as agreement"; echo "scripts/selftest-ttsr-assert-disabled.sh: skipped"; exit 0
+fi
 pass=0; fail=0
 note() { printf '  %-4s %s\n' "$1" "$2"; }
 

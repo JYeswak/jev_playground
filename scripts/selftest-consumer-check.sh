@@ -14,6 +14,16 @@
 set -uo pipefail
 root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd -P)
 cd "$root" || exit 1
+# PORTABLE (jev-fmy): the arms read real consumers that live in an omp install ($HOME/.omp/
+# omp-extensions: ee-ambient-session-start.ts, ee-failure-journal.ts, dcg-tool-bridge.ts) and need
+# rg. A stranger's clone has neither, and every arm then fails for a reason that is not the tool's.
+# Under `gates.sh --portable` that is a named SKIP, exit 8; default mode runs the arms and REDs.
+if [ -n "${JEV_GATES_PORTABLE:-}" ]; then
+  command -v rg >/dev/null 2>&1 || { echo "SKIP (missing prerequisite: rg, install: brew install ripgrep)"; exit 8; }
+  for f in ee-ambient-session-start.ts ee-failure-journal.ts dcg-tool-bridge.ts; do
+    [ -f "$HOME/.omp/omp-extensions/$f" ] || { echo "SKIP (missing prerequisite: omp extension \$HOME/.omp/omp-extensions/$f, install: an omp install carrying the ee and dcg extensions)"; exit 8; }
+  done
+fi
 pass=0; fail=0
 note() { printf '  %-4s %s\n' "$1" "$2"; }
 
