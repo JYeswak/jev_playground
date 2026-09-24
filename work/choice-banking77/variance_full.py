@@ -49,8 +49,24 @@ FAIL_LIMIT = (
 )  # jev-4jf: more than 1% failed rows (30) and the run is not scored
 
 
+# The bar applies NOT-SCORED only "after resuming". Rows refused by the provider's account usage
+# cap cannot be resumed until the cap lifts (Anthropic: "You have reached your specified API usage
+# limits"), so such a run is BLOCKED, i.e. pending, and carries no verdict. Added after the first
+# rerun calls, when the cap fired (2026-09-24); it changes no rule for runs that completed.
+CAP_MESSAGE = "You have reached your specified API usage limits"
+
+
+def blocked(s):
+    errs = [r for r in s["final"].values() if "choice" not in r]
+    return len(errs) > FAIL_LIMIT and all(
+        CAP_MESSAGE in str(r.get("error", "")) for r in errs
+    )
+
+
 def verdict(jv, hv, b, c, p):
     """jev-4jf's rule, as score.py applies it: feasibility, constant, 3.0 pp margin, McNemar."""
+    if blocked(jv) or blocked(hv):
+        return "BLOCKED"
     if jv["failed"] > FAIL_LIMIT or hv["failed"] > FAIL_LIMIT:
         return "NOT-SCORED"
     if not (jv["acc"] >= m.FEASIBLE and hv["acc"] >= m.FEASIBLE):
@@ -99,18 +115,19 @@ def headroom_win(b, c, both_wrong):
 
 
 def flips(finals):
+    """Rows whose chosen intent differs, counted over ids answered in both runs."""
     have = [(n, f) for n, f in finals if f is not None]
     out = []
     for x in range(len(have)):
         for y in range(x + 1, len(have)):
             (nx, fx), (ny, fy) = have[x], have[y]
-            n = sum(
-                1
+            both = [
+                it["i"]
                 for it in FULL
-                if (fx.get(it["i"], {}).get("choice"))
-                != (fy.get(it["i"], {}).get("choice"))
-            )
-            out.append((nx, ny, n))
+                if "choice" in fx.get(it["i"], {}) and "choice" in fy.get(it["i"], {})
+            ]
+            n = sum(1 for i in both if fx[i]["choice"] != fy[i]["choice"])
+            out.append((nx, ny, n, len(both)))
     return out
 
 
@@ -200,14 +217,18 @@ def main(argv):
             (k + 1, stats[n]["final"] if stats[n] else None)
             for k, n in enumerate(names)
         ]
-        for x, y, n in flips(finals):
-            print(f"  {arm} run {x} vs run {y}: {n} of {len(FULL)}")
+        for x, y, n, both in flips(finals):
+            print(f"  {arm} run {x} vs run {y}: {n} of {both} answered in both")
 
     wins = verdicts.count("WIN")
     pending = verdicts.count("PENDING")
+    held = verdicts.count("BLOCKED")
     bad = [x for x in verdicts if x in ("LOSE", "NOT-SCORED")]
-    if pending:
-        headline = f"PENDING ({pending} of 9 pairings not yet scorable)"
+    if pending or held:
+        headline = (
+            f"PENDING, no verdict ({held} pairing(s) BLOCKED-until-cap, {pending} not run; "
+            f"WIN so far in {wins} of {9 - held - pending} scorable)"
+        )
     elif bad:
         headline = (
             f"PASS RETRACTED ({len(bad)} pairing(s) {', '.join(sorted(set(bad)))})"

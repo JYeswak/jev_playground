@@ -70,6 +70,62 @@ adapter version, one wording and undescribed options. The Haiku arm is the promp
 not native structured output, which Anthropic rejects for this grammar. HOLDS would show the win is
 stable across these runs, not that it transfers to other prompts or models.
 
-## Results
+## Results (partial, 2026-09-24): Jev complete, Haiku BLOCKED until the provider cap lifts
 
-Pending the live runs.
+**Status: no verdict.** All four runs started together at 03:43Z, after the bar `eed9fc3`.
+- **Jev, runs 2 and 3:** finished, 3,080/3,080 answered each, 0 failed.
+- **Haiku-prompted, runs 2 and 3:** stopped after 290 and 284 answers. Every later request
+  returned, verbatim: `TypeSafeBadRequestError: 400 You have reached your specified API usage
+  limits. You will regain access on 2026-10-01 at 00:00 UTC.` That is Anthropic's account-level
+  spend cap, fleet-wide, and not a Haiku or harness failure. It refused 2,790 rows (run 2) and
+  2,796 rows (run 3). Each refused row is recorded in the row file as an `error` row carrying that
+  message, which marks the row NOT_RUN.
+- **Nothing retried, nothing rerouted.** No other provider stood in for Haiku (the `jev-r3b`
+  precedent). Raising the cap is Joshua's call.
+- **Resuming:** once access returns, the same two commands (`run_prompted.py --out
+  …-run{2,3}.jsonl`) resume exactly the refused ids. The runners skip ids that already have an
+  answer.
+
+**Scorer change after data, declared.** The bar applies NOT-SCORED to a run with more than 30
+failed rows "after resuming". These runs cannot resume yet. As first run, the scorer would still
+have read them as NOT-SCORED and printed "PASS RETRACTED", which is wrong for a run that was
+refused before it could finish. `variance_full.py` now marks a pairing **BLOCKED** when an arm's
+failed rows exceed the limit and every one of them carries the cap message. Any BLOCKED pairing
+makes the whole unit PENDING, with no verdict. R2 flips are now counted over ids answered in both
+runs. No rule changes for completed runs, and run 1 x run 1 still reproduces `jev-4jf` exactly.
+
+**Per run** (`python3 work/choice-banking77/variance_full.py`, keyless). Latency is client wall
+clock with four runs going at once.
+
+| Run | Arm | Answered | Failed | Correct | Accuracy | p50 / p95 ms | Tokens in / out |
+|---|---|---:|---:|---:|---:|---|---|
+| 1 (`jev-4jf`) | Jev | 3,080 | 0 | 2,467 | 80.1% | 153 / 299 | 2,943,330 / 2,323,516 |
+| 2 | Jev | 3,080 | 0 | 2,472 | 80.3% | 179 / 398 | 2,943,330 / 2,323,504 |
+| 3 | Jev | 3,080 | 0 | 2,455 | 79.7% | 168 / 375 | 2,943,330 / 2,323,505 |
+| 1 (`jev-4jf`) | Haiku-prompted | 3,080 | 0 | 2,267 | 73.6% | 3,967 / 7,074 | 6,400,493 / 3,020,130 |
+| 2 | Haiku-prompted | 290 | 2,790 cap-refused | (partial) | | 3,976 / 7,135 | 601,682 / 282,144 |
+| 3 | Haiku-prompted | 284 | 2,796 cap-refused | (partial) | | 3,978 / 7,182 | 588,789 / 278,956 |
+
+**Pairings scorable now: 3 of 9, all against Haiku run 1, all WIN** under `jev-4jf`'s rule:
+
+| Jev run | Haiku run | Jev | Haiku | McNemar | p | verdict |
+|---|---|---:|---:|---|---:|---|
+| 1 | 1 | 2,467 | 2,267 | 326 / 126 | 1.7e-21 | WIN |
+| 2 | 1 | 2,472 | 2,267 | 328 / 123 | 1.4e-22 | WIN |
+| 3 | 1 | 2,455 | 2,267 | 315 / 127 | 1.6e-19 | WIN |
+
+With Haiku's 5 flat rows dropped or credited, each of the three stays WIN (largest p 2.1e-18).
+The other 6 pairings are BLOCKED. The scorer prints their McNemar counts, but those counts score
+cap-refused rows as wrong and mean nothing.
+
+**R2, Jev.** Chosen intent differs between Jev runs on 40, 44 and 48 of 3,080 rows, against the
+151-row headroom. Jev's accuracy spans 2,455 to 2,472. The Haiku flips (19 of 290 and 24 of 284
+answered in both with run 1) are too partial to read.
+
+**Spend so far.** 6,160 Jev calls: 5,886,660 input / 4,647,009 output tokens. 574 answered Haiku
+calls: 1,190,471 input / 561,100 output tokens (adapter totals). [INFERENCE] At list price that is
+about $4 for Haiku and $0.25 for Jev. The 5,586 cap-refused calls returned no tokens.
+
+**NO-CLAIM.** No verdict on `jev-384m`. What the three scorable pairings show is only that Jev's
+own run-to-run variance does not threaten the WIN against Haiku's committed run 1. They say nothing
+about Haiku's variance, which is the half the cap blocked. The bead stays open, blocked on the cap.
