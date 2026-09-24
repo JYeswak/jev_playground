@@ -122,5 +122,77 @@ bar, to Jev vs Haiku-prompted. Score: `python3 work/choice-banking77/score.py --
 
 ## Results
 
-Pending: no prompted-mode Haiku call has been made at the commit that introduces the second
-preregistration.
+Run 2026-09-24, 02:4x to 03:0xZ. Jev: 3,080/3,080 answered on the first pass under `909278f`, with
+0 failed rows. Haiku (prompted JSON, second bar `3c473ae`): 3,080/3,080 answered, 0 failed rows.
+The run was resumed several times after the harness stopped earlier processes (558 rows were done
+before the final supervised process), and each id appears once. Rows: `rows-full-jev.jsonl` and
+`rows-full-haiku-prompted.jsonl`. Re-score with no key:
+`python3 work/choice-banking77/score.py --set full-prompted`.
+
+| Arm | Correct | Accuracy | Wilson 95% | p50 / p95 latency | Tokens in / out |
+|---|---:|---:|---|---|---|
+| Jev `jev-1.13.0` (3,080 of 3,080 responses report it) | **2,467/3,080** | **80.1%** | 78.7-81.5% | 153 / 299 ms | 2,943,330 / 2,323,516 |
+| Haiku 4.5, adapter, prompted JSON | 2,267/3,080 | 73.6% | 72.0-75.1% | 3,967 / 7,074 ms | 6,400,493 / 3,020,130 |
+| Haiku 4.5, adapter, native structured output | 0 answered: 993/993 rejected with the grammar cap above | | | | |
+| Constant: always-`activate_my_card` | 40/3,080 | 1.3% | | | |
+
+**Paired (Jev vs Haiku-prompted):** both correct 2,141, Jev-only 326, Haiku-only 126, McNemar exact
+p = 1.7e-21.
+
+**Confidence-gated coverage, each arm's own `confidence` (thresholds fixed in the first bar).**
+Cell = rows at or above the threshold, of 3,080, then accuracy among them.
+
+| Arm | >= 0.5 | >= 0.7 | >= 0.9 |
+|---|---|---|---|
+| Jev | 2,930 (95.1%), 82.6% | 2,581 (83.8%), 87.4% | 2,094 (68.0%), 92.5% |
+| Haiku-prompted | 2,595 (84.3%), 78.7% | 2,450 (79.5%), 80.3% | 1,911 (62.0%), 86.4% |
+
+The descriptive single-formula table (`(p_max - 1/77)/(1 - 1/77)`), printed by the scorer, differs
+from Jev's own by at most 9 rows per cell, and Haiku's rows are identical. So Jev's unpublished
+confidence again behaves like the adapter's formula. At 77 intents, no threshold is a hands-off
+gate: even at 0.9, Jev is wrong on 157 of the 2,094 rows it would auto-route (7.5%).
+
+**Declared sensitivity.** 5 Haiku rows came back flat. In 4 of them Haiku's raw map summed to 0,
+observed here via `rawSum` rather than inferred; the fifth was a model-asserted uniform. Dropping
+those 5 rows: 2,466 vs 2,267 of 3,075, p = 2.5e-21. Crediting them to Haiku: 2,467 vs 2,272,
+p = 2.5e-20. Both are WIN. Jev returned no flat rows.
+
+**Adapter behaviour, observed.** Haiku's raw probability map needed renormalizing on 706 of 3,080
+rows (raw sums from 0 to 1.95). 4 rows used the one corrective retry for malformed JSON, and 0
+rows had a transient retry.
+
+**Where each arm goes wrong** (scorer, top confusions). Both arms mostly confuse near-synonymous
+intents. Jev: `get_physical_card` read as `change_pin` 31 times, `order_physical_card` as
+`get_physical_card` 26, `reverted_card_payment?` as `declined_card_payment` 16,
+`beneficiary_not_allowed` as `failed_transfer` 15, `why_verify_identity` as `verify_my_identity` 13.
+Haiku: `get_physical_card` read as `passcode_forgotten` 26 times, `card_arrival` as
+`card_delivery_estimate` 16, `card_swallowed` as `atm_support` 16.
+
+**Verdict: WIN, PASS (second bar, `3c473ae`).** On the full public Banking77 test split, one Jev
+Choice over 77 undescribed intent names routes 80.1% of 3,080 messages correctly: 6.5 points above
+Haiku 4.5 answering the same Choice through the vendor's adapter (73.6%), McNemar p = 1.7e-21, at
+about 1/26 of Haiku's median latency. Two findings qualify the headline:
+- The single 77-option Choice does not run at all through the adapter's native structured-output
+  mode for Haiku. Anthropic rejects the grammar, so the incumbent needed the prompted-JSON variant,
+  a deviation declared in the second bar before any prompted call.
+- Accuracy falls from 96.0% at 10 intents (`jev-k3k`) to 80.1% at 77. The gap to Haiku holds
+  (+5.5 then +6.5 points), but 77-way routing is not accurate enough to act on without a gate or
+  better-described options.
+
+Under the first bar, the structured-output Haiku arm has no verdict, as declared.
+
+**Spend.** Jev: 3,080 calls, 2,943,330 input / 2,323,516 output tokens. Haiku: 993 structured
+calls rejected with a 400 (no tokens were returned; [INFERENCE] not billed), then 3,080 prompted
+calls, 6,400,493 input / 3,020,130 output tokens (adapter totals, including the 4 corrective
+retries). [INFERENCE] At the cookbook list prices in `docs-mirror/typesafe/llms-full.txt` (Haiku 4.5
+$1.00/$5.00 per 1M; Jev listed at $0.042/$0.00 for `jev-1.12`, assumed unchanged for 1.13), that is
+about $0.12 for Jev and $21.50 for Haiku. This is not a billing readout.
+
+**Boundary / NO-CLAIM.** One run per arm (`jev-qbc` measured Jev run-to-run variance on the
+10-intent set only), one model version each, one prompt wording, undescribed options. The Haiku
+comparison uses prompted JSON, not native structured output. That setting may help or hurt Haiku,
+and that effect is unmeasured. The hierarchical fallback named in the first bar was not run.
+Latencies are client wall clock under 8 concurrent requests. Jev ran at the same time as the
+rejected structured-output Haiku run, not the prompted one. The labels are PolyAI's and were not re-adjudicated. Not compared against
+fine-tuned Banking77 models. A non-author re-score from the committed rows is pending, and the bead
+stays open until then.
