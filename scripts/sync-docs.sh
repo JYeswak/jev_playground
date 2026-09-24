@@ -88,6 +88,19 @@ manifest_pin() { # manifest_pin <path> ; first pinned_sha recorded for that path
   # No early `exit`: under pipefail a reader that quits first can SIGPIPE printf and kill the run.
   printf '%s\n' "$PINS" | awk -F'\t' -v p="$1" 'NR>1 && $2==p && !f {print $3; f=1}'
 }
+# fetched_at records when a row's CONTENT was last seen to change, not when this run happened.
+# Stamping every row with now() rewrote both tracked manifests on every run, so a stranger's
+# bootstrap left a dirty tree with no byte changed (jev-tssx). A row whose content columns match
+# the baseline row keeps the baseline's stamp; any content change gets now().
+OLD_DOCS=""  # docs-mirror/MANIFEST.tsv as it stood before this run
+docs_stamp() { # docs_stamp <local_path> <bytes> <sha256>
+  local s; s="$(printf '%s\n' "$OLD_DOCS" | awk -F'\t' -v p="$1" -v b="$2" -v h="$3" 'NR>1 && $3==p && $4==b && $5==h && !f {print $6; f=1}')"
+  printf '%s' "${s:-$(now)}"
+}
+repo_stamp() { # repo_stamp <repo> <path> <pinned> <upstream_sha> <behind> ; baseline is PINS
+  local s; s="$(printf '%s\n' "$PINS" | awk -F'\t' -v r="$1" -v p="$2" -v a="$3" -v u="$4" -v n="$5" 'NR>1 && $1==r && $2==p && $3==a && $4==u && $5==n && !f {print $6; f=1}')"
+  printf '%s' "${s:-$(now)}"
+}
 
 fetch() { # fetch <url> <dest> ; atomic, retried, fail-closed
   local url="$1" dest="$2"
@@ -173,10 +186,12 @@ sync_docs() {
   echo "   llms.txt lists $count pages"
 
   local tmp_manifest; tmp_manifest="$(mktemp)"
+  OLD_DOCS="$(cat "$DOCS_MANIFEST" 2>/dev/null || true)"
   printf 'kind\tsource\tlocal_path\tbytes\tsha256\tfetched_at\n' > "$tmp_manifest"
   for f in llms.txt llms-full.txt sitemap.xml; do
+    local b h; b="$(bytes "$TS_DIR/$f")"; h="$(sha "$TS_DIR/$f")"
     printf 'index\t%s\t%s\t%s\t%s\t%s\n' "$DOCS_HOST/$f" "docs-mirror/typesafe/$f" \
-      "$(bytes "$TS_DIR/$f")" "$(sha "$TS_DIR/$f")" "$(now)" >> "$tmp_manifest"
+      "$b" "$h" "$(docs_stamp "docs-mirror/typesafe/$f" "$b" "$h")" >> "$tmp_manifest"
   done
 
   local ok=0 fail=0
@@ -185,8 +200,9 @@ sync_docs() {
     local rel dest; rel="${url#"$DOCS_HOST"/}"; dest="$TS_DIR/$rel"
     if fetch "$url" "$dest"; then
       ok=$((ok+1))
+      local b h; b="$(bytes "$dest")"; h="$(sha "$dest")"
       printf 'page\t%s\t%s\t%s\t%s\t%s\n' "$url" "docs-mirror/typesafe/$rel" \
-        "$(bytes "$dest")" "$(sha "$dest")" "$(now)" >> "$tmp_manifest"
+        "$b" "$h" "$(docs_stamp "docs-mirror/typesafe/$rel" "$b" "$h")" >> "$tmp_manifest"
     else
       fail=$((fail+1))
     fi
@@ -213,7 +229,8 @@ record_repo() { # record_repo <name> <path>   ; path may be workspace-relative o
   pinned="$(git -C "$abs" rev-parse --short HEAD)"
   upstream_sha="$(git -C "$abs" rev-parse --short FETCH_HEAD 2>/dev/null || echo "$pinned")"
   behind="$(git -C "$abs" rev-list --count "HEAD..FETCH_HEAD" 2>/dev/null || echo 0)"
-  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$name" "$rec" "$pinned" "$upstream_sha" "$behind" "$(now)" >> "$REPO_MANIFEST"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$name" "$rec" "$pinned" "$upstream_sha" "$behind" \
+    "$(repo_stamp "$name" "$rec" "$pinned" "$upstream_sha" "$behind")" >> "$REPO_MANIFEST"
   if [ "${behind:-0}" -gt 0 ]; then
     echo "   $name @ $pinned  ** $behind commit(s) behind $upstream_sha — SHA move is a human decision, not this script's **"
   else
@@ -311,7 +328,8 @@ sync_repos() {
           ($allow | split(" ")) as $a
           | .[] | [.name, (.isFork|tostring), .pushedAt,
                    (if (.name|IN($a[])) then "yes" else "no" end),
-                   ((.description // "-") | gsub("\t"; " "))] | @tsv' >> "$ORG_INVENTORY" \
+                   ((.description // "-") | gsub("\t"; " "))] | @tsv' \
+      | sed 's/[[:space:]]*$//' >> "$ORG_INVENTORY" \
       || echo "   warn: org inventory unavailable"
     echo "   org inventory → $ORG_INVENTORY"
   fi
