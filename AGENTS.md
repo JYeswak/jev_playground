@@ -127,6 +127,17 @@ sat unread in our own tree.
    `system-one-adapter-python 0bb819b -> adffc2e` (v0.1.5, v0.2.0),
    `typesafe-sdk-python 420ef4f -> 0ffd094` (v0.7.0, v0.7.1); `typesafe-sdk-js 66880cc` and
    `skills 65a39f3` were already current.
+   Moved 2026-09-24 (pane 1, bead `jev-ygl7`): `system-one-adapter-python adffc2e -> e1d4cc9`
+   (v0.2.1). The re-run:
+   - The keyless adapter suite passes 424/424.
+   - `work/adapter-pin/finish-audit.py` reports 0 of 6,257 committed answered rows whose recorded
+     stop reason would raise under 0.2.1.
+   - Three keyless re-scores (`score-grok-gate.py`, `grok_variance.py`, `haiku-variance/score.py`)
+     reproduce their committed numbers.
+   - The all-zero repro still reproduces: the #45 defect is unfixed in 0.2.1.
+
+   v0.2.1 changes only failure handling, so no committed verdict moves. Rows committed before the
+   move carry `adffc2e`.
 
 **Retirement condition: none.** This is a standing obligation. It retires only if the vendor stops
 publishing first-party code, which would be a different problem.
