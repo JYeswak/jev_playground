@@ -35,7 +35,12 @@ claim nobody can check:
   Plus **§4(d) selector≡claim**: `{noul:0.9}` scored as `probabilities` throws;
   `assertSdkSelector` refuses `.distribution` / an invented `helpfulNoul`;
   `refuseInventedNoulGate` refuses a second noul on a Choice pick.
-  Run: `node work/oracle-kit/test.mjs` (22 checks).
+  Plus **select-on-A/report-on-B** (`protocol.py` port): stratified halves are
+  deterministic, `bestThreshold` keeps the lowest on ties, `selectSingleSignal`
+  picks the best-A feature and reports on B, a single-signal input returns
+  `selected:false` (planted `selected:true` fails `true !== false`), and a
+  fitted logistic separates separable data deterministically.
+  Run: `node work/oracle-kit/test.mjs` (29 checks).
 - `work/oracle-kit/prevalence_threshold.py` — t*(π) on frozen priors 30/186449 and 488/50149.
   Run: `python3 work/oracle-kit/prevalence_threshold.py` (exit 0; prints the 1:2300 identity).
 - `work/oracle-kit/selector-guard.mjs` — scorers cannot silently read `.distribution` / `.probability`.
