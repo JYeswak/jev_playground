@@ -89,7 +89,7 @@ export type JevChoiceResult =
  * clone before `npm ci --prefix work/sdk`). Distinct so a demo never reports a missing SDK as a
  * missing key.
  */
-export type JevFailure = "unconfigured" | "sdk-missing" | "http" | "non-json" | "no-answers" | "transport";
+export type JevFailure = "unconfigured" | "sdk-missing" | "http" | "non-json" | "no-answers" | "transport" | "billing-hold";
 
 export type AskOptions = {
   /** The object the questions are asked about. Serialised as-is into `state`. */
@@ -101,6 +101,8 @@ export type AskOptions = {
   apiKey?: string;
   /** Transport override for offline tests. Defaults to globalThis.fetch, read at call time. */
   fetchImpl?: typeof fetch;
+  /** Wall clock in ms for the billing hold. Tests inject it. Defaults to Date.now. */
+  nowMs?: () => number;
 };
 
 export type AskChoiceOptions = {
@@ -115,6 +117,7 @@ export type AskChoiceOptions = {
   apiKey?: string;
   /** Transport override for offline tests. Defaults to globalThis.fetch, read at call time. */
   fetchImpl?: typeof fetch;
+  nowMs?: () => number;
 };
 
 /** The key the single choice question is filed under. Internal; callers never see it. */
@@ -177,6 +180,31 @@ function guardedFetch(fetchImpl: typeof fetch, timeoutMs: number, APITimeoutErro
     }
   }) as typeof fetch;
 }
+/**
+ * After an HTTP 402 (no TypeSafe credits) this process stops calling for this
+ * long and returns reason `billing-hold`. 429, 5xx and transport do not start
+ * it. Pinned literal: a test asserts this exact number, so a 1 ms window fails.
+ * Measured 2026-09-24: without a hold, 233 calls hit a 402 over 4.5 h (jev-nhv9).
+ */
+export const BILLING_HOLD_MS = 15 * 60 * 1000;
+let billingHoldUntil = 0;
+
+/** Test seam. The live process keeps its hold for the window. */
+export function resetBillingHold(): void {
+  billingHoldUntil = 0;
+}
+
+/** The hold end if `nowMs` is still inside it, otherwise null. */
+export function billingHoldActive(nowMs: number): number | null {
+  return nowMs < billingHoldUntil ? billingHoldUntil : null;
+}
+
+/** Only an HTTP 402 starts the hold. A 402 buried in another error does not. */
+export function noteBillingRefusal(answer: { reason?: string; error?: string }, nowMs: number): void {
+  if (answer.reason === "http" && /\bHTTP 402\b/.test(answer.error ?? "")) {
+    billingHoldUntil = nowMs + BILLING_HOLD_MS;
+  }
+}
 
 async function postSystemOne(
   apiKey: string,
@@ -186,7 +214,17 @@ async function postSystemOne(
   timeoutMs: number,
   fetchImpl: typeof fetch,
   retry?: { maxRetries?: number },
+  nowMs: () => number = Date.now,
 ): Promise<Posted> {
+  const until = billingHoldActive(nowMs());
+  if (until !== null) {
+    return {
+      ok: false,
+      reason: "billing-hold",
+      error: `billing-hold until=${new Date(until).toISOString()}`,
+      latencyMs: 0,
+    };
+  }
   const sdk = await loadSdk();
   if (!sdk) {
     return {
@@ -216,6 +254,7 @@ async function postSystemOne(
   } catch (err) {
     const latencyMs = Date.now() - started;
     if (err instanceof APIError) {
+      if (err.status === 402) billingHoldUntil = nowMs() + BILLING_HOLD_MS;
       return { ok: false, reason: "http", error: `systemOne HTTP ${err.status}: ${err.message}`, latencyMs };
     }
     if (err instanceof APIConnectionError || err instanceof APITimeoutError || err instanceof APIUserAbortError) {
@@ -298,7 +337,7 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
     }),
   );
 
-  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch);
+  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch, undefined, options.nowMs);
   if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
   const { answers, latencyMs } = posted;
 
@@ -370,7 +409,7 @@ export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoice
   const questions = {
     [CHOICE_KEY]: { type: "choice", instructions: options.instructions, criteria: options.classes },
   };
-  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch);
+  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch, undefined, options.nowMs);
   if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
   const { answers, latencyMs } = posted;
 
@@ -415,6 +454,7 @@ export type AskScoreOptions = {
   apiKey?: string;
   /** Transport override for offline tests. Defaults to globalThis.fetch, read at call time. */
   fetchImpl?: typeof fetch;
+  nowMs?: () => number;
 };
 
 export type JevScoreResult =
@@ -454,7 +494,7 @@ export async function askJevScore(options: AskScoreOptions): Promise<JevScoreRes
   const questions = {
     [SCORE_KEY]: { type: "score", instructions: options.instructions, criteria: options.criteria },
   };
-  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch);
+  const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch, undefined, options.nowMs);
   if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
   const { answers, latencyMs } = posted;
 
@@ -507,6 +547,7 @@ export type AskBundleOptions = {
   apiKey?: string;
   /** Transport override for offline tests. Defaults to globalThis.fetch, read at call time. */
   fetchImpl?: typeof fetch;
+  nowMs?: () => number;
   /** Retry owned by the SDK. Absent means maxRetries 0: one attempt per call. */
   retry?: { maxRetries?: number };
 };
@@ -541,7 +582,7 @@ export async function askJevBundle(options: AskBundleOptions): Promise<JevBundle
   if (keys.length === 0) {
     return { ok: false, reason: "no-answers", error: "no questions supplied", latencyMs: 0, model };
   }
-  const posted = await postSystemOne(apiKey, model, options.state, options.questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch, options.retry);
+  const posted = await postSystemOne(apiKey, model, options.state, options.questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch, options.retry, options.nowMs);
   if (!posted.ok) return { ok: false, reason: posted.reason, error: posted.error, latencyMs: posted.latencyMs, model };
   return {
     ok: true,

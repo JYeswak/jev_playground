@@ -37,7 +37,8 @@ import { appendFile, mkdir, open } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { askJev } from "../../../work/jev-client/src/index.ts";
+import { askJev, BILLING_HOLD_MS, billingHoldActive, noteBillingRefusal, resetBillingHold } from "../../../work/jev-client/src/index.ts";
+export { BILLING_HOLD_MS, resetBillingHold };
 import { CUT, RISK, STATE_CONTEXT } from "../../../work/bicameral-gate/questions.mjs";
 
 export const MODEL = "jev-1.13.0";
@@ -61,23 +62,7 @@ export function resetKeyCache(): void {
   keyOnce = undefined;
 }
 
-/**
- * After an HTTP 402 (no TypeSafe credits) the hook stops calling for this long
- * and writes `NOT_RUN reason=billing-hold` instead; then it tries one call again.
- * Measured 2026-09-24: without a hold, 233 calls hit a 402 over 4.5 h, one per
- * bash command, an unattended loop against a metered endpoint (jev-nhv9).
- */
-export const BILLING_HOLD_MS = 15 * 60 * 1000;
-let billingHoldUntil = 0;
 
-/** Test seam; the live process keeps its hold for the hold window. */
-export function resetBillingHold(): void {
-  billingHoldUntil = 0;
-}
-
-export function isBillingRefusal(answer: { reason?: string; error?: string }): boolean {
-  return answer.reason === "http" && /\bHTTP 402\b/.test(answer.error ?? "");
-}
 
 /** stdout only. stderr is discarded. The value is never logged. */
 export function defaultKeyResolver(): Promise<string> {
@@ -311,9 +296,10 @@ export async function observe(
     } catch {
       /* best-effort like the log; the tool path never sees us */
     }
-    const nowMs = deps.nowMs ?? Date.now;
-    if (nowMs() < billingHoldUntil) {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `NOT_RUN reason=billing-hold until=${new Date(billingHoldUntil).toISOString()}` });
+    const now = (deps.nowMs ?? Date.now)();
+    const until = billingHoldActive(now);
+    if (until !== null) {
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `NOT_RUN reason=billing-hold until=${new Date(until).toISOString()}` });
       return undefined;
     }
     let answer;
@@ -333,6 +319,7 @@ export async function observe(
         model: MODEL,
         timeoutMs: 20000,
         apiKey,
+        nowMs: () => now,
       });
     } catch (err) {
       await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `ask-threw: ${err instanceof Error ? err.message : String(err)}` });
@@ -341,8 +328,10 @@ export async function observe(
     if (!answer.ok) {
       if (answer.reason === "unconfigured") {
         await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=unconfigured" });
+      } else if (answer.reason === "billing-hold") {
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `NOT_RUN reason=${answer.error}` });
       } else {
-        if (isBillingRefusal(answer)) billingHoldUntil = nowMs() + BILLING_HOLD_MS;
+        noteBillingRefusal(answer, now);
         await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `${answer.reason ?? "unknown"}: ${answer.error ?? ""}` });
       }
       return undefined;
