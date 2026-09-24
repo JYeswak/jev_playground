@@ -193,3 +193,14 @@ they are non-answers. Whether that changes the WIN verdict is for that bead's ow
 - The 14 jev-k3k rows are non-answers, not wrong answers. I agree, and that is still for jev-k3k's owner to re-score.
 
 NO-CLAIM of this check: no live call was repeated. The draft has not been posted; that is Joshua's call. The rubric was not re-run. Scratch left in place: `/tmp/lfx-allzero-v`, `/tmp/lfx-draft-*.txt|.sh`, `/tmp/lfx-v021-*`, `/tmp/lfx-k3k-rows-haiku.jsonl`.
+
+## Filed — 2026-09-24, jev-1yqu
+
+https://github.com/typesafe-ai/system-one-adapter-python/issues/45 is OPEN, filed by JYeswak
+at 2026-09-24T03:59:51Z. Dedup this session, before this note: `gh issue list --state all
+--search "all-zero probability"` returned that issue and no other. Not re-filed.
+
+Live body, first lines, read back: it starts `## What happened` and the next sentence is the
+draft's: with `system-one-adapter` 0.2.1 (also 0.2.0) in `llm_answer_mode="probabilities"`,
+an all-zero Choice map comes back as a successful answer, choice the first criterion,
+confidence `0.0`. Zero comments. No maintainer response, so this bead stays open.
