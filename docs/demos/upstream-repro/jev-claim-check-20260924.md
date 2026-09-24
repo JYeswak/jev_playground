@@ -160,3 +160,18 @@ prompt read from cache. Jev's billed units were not read and are not stated.
 scratch session, not a working one (L4 not claimed). The tool is advisory and wired into nothing that
 blocks. Awaiting a non-author re-score from the committed rows before the bead closes. Scratch left in
 place: `/tmp/claimcheck-mut/` (five mutants).
+
+## Follow-up: the three partial-proof rows, registered (`[test]`, stage 15)
+
+Each missing number was found in a committed file and registered as its own `claims.tsv` row (one
+proof per row), so the original rows stay as they were:
+
+| README span | Proof file | Substring |
+|---|---|---|
+| `and grok-4 on 558` | `work/nev-differential/DIFF-RECEIPT.json` | `"correct": 558,` (arm `A-xai-grok-4`) |
+| `Jev right and Haiku wrong on 65` | `work/nev-differential/DIFF-RECEIPT.json` | `"jev_only": 65` (arm `B-anthropic-claude-haiku-4-5`) |
+| `the reverse on 5, and 61` | `work/nev-differential/DIFF-RECEIPT.json` | `"arm_only": 5,` (same arm) |
+| `exits 3 when a question does not beat its constant` | `work/jev-prevalence-first/prevalence-check.mjs` | `WEAK: 3, DEGENERATE: 3` (the CLI's `EXIT` map) |
+
+`bash foundation/gates.d/15-kit-claim.sh`: 25/25 enforced rows pass, coverage 13/47 at floor 13/47;
+`--selftest` SELFTEST_OK. No README number was left unproven, so README.md is unchanged.
