@@ -64,4 +64,57 @@ Choice.
 
 ## Results
 
-Pending the live run.
+Bar committed at `30eb285` (2026-09-24T02:37:06Z). Both new arms started at 02:37:15Z, 400/400
+answered each, 0 error rows. Rows: `work/noul-scifact/rows-jev-nocriteria.jsonl` (sha256
+`8ee29bdb…ea50f2e`), `work/noul-scifact/rows-jev-rerun.jsonl` (sha256 `608ecc64…4545a8041`), plus the
+committed `rows-jev.jsonl`. Re-score with no key (about 20 s): `python3 work/noul-scifact/compare-criteria.py`.
+
+| Arm | Correct at >0.5 | Accuracy | AUC | Brier | ECE | p50 / p95 latency | Tokens in / out |
+|---|---:|---:|---:|---:|---:|---|---|
+| criteria, committed | 361/400 | 90.2% | 0.962 | 0.0709 | 0.0431 | 140 / 219 ms | 293,734 / 8,000 |
+| **no criteria (ablation)** | 362/400 | 90.5% | 0.958 | 0.0774 | 0.0612 | 165 / 363 ms | 276,134 / 8,000 |
+| criteria, same-time rerun | 361/400 | 90.2% | 0.961 | 0.0711 | 0.0440 | 159 / 379 ms | 293,734 / 8,000 |
+
+Paired, first arm minus second (WIN = the criteria arm is significantly better):
+
+| Pair | Accuracy (McNemar) | AUC diff 95% | Brier diff 95% | ECE diff 95% | Reading |
+|---|---|---|---|---|---|
+| **primary**: committed criteria vs ablation | TIE (3 vs 4, p = 1) | **WIN** (+0.0007 to +0.0072) | **WIN** (−0.0107 to −0.0021) | TIE (−0.0331 to +0.0023) | **LIFT** |
+| **control**: same-time rerun vs ablation | TIE (3 vs 4, p = 1) | TIE (−0.0004 to +0.0060) | **WIN** (−0.0107 to −0.0017) | TIE (−0.0335 to +0.0036) | **LIFT** |
+| noise floor: committed vs rerun | TIE (0 vs 0) | TIE (−0.0004 to +0.0031) | TIE (−0.0017 to +0.0011) | TIE (−0.0119 to +0.0091) | same |
+
+**Pass rule applied.** Primary reads LIFT (two WINs, no LOSE); the control also reads LIFT, so the
+verdict is robust to run timing. The noise floor is flat: the same question an hour apart gave the
+same 361 correct and moved no metric significantly. No `NEGATIVE_EVIDENCE.md` row: the trigger (HURT
+or NO EFFECT) did not fire.
+
+By SciFact gold label (correct at >0.5 / mean noul), descriptive:
+
+| Gold | Rows | Criteria, committed | No criteria | Criteria, rerun | McNemar committed vs ablation |
+|---|---:|---|---|---|---|
+| SUPPORT | 146 | 131 (89.7%) / 0.843 | 134 (91.8%) / 0.849 | 131 (89.7%) / 0.843 | 1 vs 4, p = 0.375 |
+| CONTRADICT | 93 | 89 (95.7%) / 0.086 | 88 (94.6%) / 0.101 | 89 (95.7%) / 0.085 | 1 vs 0, p = 1 |
+| NEI | 161 | 141 (87.6%) / 0.168 | 140 (87.0%) / 0.215 | 141 (87.6%) / 0.169 | 1 vs 0, p = 1 |
+
+**Verdict** (`[live]`, N=400 per arm, 2026-09-24). By the preregistered rule, the outcome criteria
+**lift** claim verification here. The lift is real but small, and it is a lift in probability quality,
+not in decisions. Brier improves by about 0.0065 (8% relative) in both the primary and the control;
+AUC improves by 0.004 in the primary only. At the 0.5 cut the two questions make almost the same calls:
+7 of 400 rows differ, 3 against 4. The mechanism is visible in the gold-label table. The `false`
+description names "does not address what the claim asserts", and with it Jev's mean probability on
+the NOT ENOUGH INFO rows drops from 0.215 to 0.168 without changing which side of 0.5 they fall on.
+
+So the direction of the gate result carries over, and its size does not. On the tool-call gate,
+criteria nearly doubled the catch rate (41 to 78 of 100). On SciFact, whose instructions already
+name the task precisely, they sharpen the probabilities and leave the decisions alone. The gate-sized
+effect is not general on this evidence; a small calibration effect is.
+
+**Spend.** 800 live Jev calls, 0 errors: ablation 276,134 input / 8,000 output tokens, rerun 293,734 /
+8,000. The criteria add about 44 input tokens per call (17,600 over 400). No Haiku calls. Jev's billed
+units were not read.
+
+**Boundary.** One set, one wording of criteria, one model version, and instructions that were already
+specific. The ECE differences are not significant in either pair. Nothing here says criteria help (or
+are inert) on vaguer instructions, on other sets, or on Score and Choice. The "no gate-sized effect"
+reading is a comparison across two different tasks and was not preregistered. Awaiting a non-author
+re-score from the committed rows before the bead closes.
