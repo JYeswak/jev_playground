@@ -222,11 +222,13 @@ live = {
 }
 out["cascade"] = (r["call_count"], {k: (f[k], live[k]) for k in live})
 
-for d in ("consistency", "consistency-noul"):
-    r = rc(d)
-    src = (ROOT / f"demos/{d}/demo.mjs").read_text()
-    st = re.search(r"state: (\{[^}]*\})", src).group(1)
-    out[d] = (r["call_count"], None, st)
+# Their committed receipts come from runs whose live state was the id alone (post_id / claim_id),
+# so those rows judged no content and cannot be compared with the fixture. The demos now send the
+# cookbook text (jev-s0f1); drop a demo from this map once its receipt is re-recorded (jev-fbhe)
+# and add an item-by-item comparison for it above.
+ID_ONLY_RECEIPTS = {"consistency": "post_id", "consistency-noul": "claim_id"}
+for d, key in ID_ONLY_RECEIPTS.items():
+    out[d] = (rc(d)["call_count"], None, key)
 
 lines = [
     "| demo | calls | verdict | items that differ (fixture -> live) |",
@@ -240,7 +242,7 @@ for d, v in out.items():
     if items is None:
         tally["not compared"] += 1
         lines.append(
-            f"| {d} | {calls} | not compared | live state is `{v[2].split(',')[0]} }}` only: the post or claim text the fixture judged is never sent |"
+            f"| {d} | {calls} | not compared | the recorded run's state was `{v[2]}` only, so it judged none of the text the fixture was recorded on; the demo now sends it, re-record pending (jev-fbhe) |"
         )
         continue
     diff = {k: p for k, p in items.items() if p[0] != p[1]}

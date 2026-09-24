@@ -32,8 +32,8 @@ receipt defines as one Jev request.
 | compact | 1 | differs, 1 of 3 same | t2: drop_result -> drop_call; t3: keep -> drop_call |
 | parallel | 1 | same, 3 of 3 | - |
 | cascade | 1 | differs, 1 of 3 same | location: escalate -> pass; registration_open_date: pass -> escalate |
-| consistency | 3 | not compared | live state is `{ post_id: 'P-88213' }` only: the post or claim text the fixture judged is never sent |
-| consistency-noul | 3 | not compared | live state is `{ claim_id: 'CLM-55029' }` only: the post or claim text the fixture judged is never sent |
+| consistency | 3 | not compared | the recorded run's state was `post_id` only, so it judged none of the text the fixture was recorded on; the demo now sends it, re-record pending (jev-fbhe) |
+| consistency-noul | 3 | not compared | the recorded run's state was `claim_id` only, so it judged none of the text the fixture was recorded on; the demo now sends it, re-record pending (jev-fbhe) |
 
 Recomputed here: 17 demos, 9 differ, 6 same, 2 not compared; call counts range 1 to 10 calls.
 
@@ -45,8 +45,10 @@ Recomputed here: 17 demos, 9 differ, 6 same, 2 not compared; call counts range 1
 - **entity:** the cell said *not compared*. All four outcomes match the fixture (assert sameAs,
   leave unlinked, curator queue twice). Now *same*.
 - **consistency and consistency-noul stay *not compared*,** for a reason the README did not give:
-  their live lane sends only an id (`post_id`, `claim_id`) and never the post or claim text the
-  fixture's answers were recorded on, so the live answers are judgements of no content.
+  the runs behind their receipts sent only an id (`post_id`, `claim_id`), never the post or claim
+  text the fixture's answers were recorded on, so those live answers judged no content. The demos
+  now send the cookbook text (jev-s0f1, `demos/test/live-state.test.mjs`); the re-record that would
+  let them be compared waits on credits (jev-fbhe).
 - The table legend moves from 8 differ / 5 same / 4 not compared to 9 / 6 / 2.
 
 ## Boundary

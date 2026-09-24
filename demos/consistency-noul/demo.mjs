@@ -40,6 +40,50 @@ const QUESTIONS = {
   subrogation: 'Is there a potentially at-fault third party the insurer could pursue for subrogation recovery?',
 };
 
+// The cookbook's borderline claim, verbatim from its "The state" section
+// (docs-mirror/typesafe/cookbooks/consistency_noul_cookbook.md). The recorded REPEATS below
+// are assessments of THIS claim, so the live lane must send it: before jev-s0f1 the live state
+// was the id alone and every live answer judged an empty claim.
+const CLAIM = {
+  policy: {
+    policy_id: 'AP-77413',
+    policyholder: 'Dana M.',
+    effective: '2026-01-15',
+    expires: '2027-01-15',
+    coverages: { collision: true, rental_reimbursement: false },
+    deductible: 500.0,
+    per_incident_limit: 10000.0,
+    listed_drivers: ['Dana M.', 'Sam M.'],
+    exclusions: ['track/competitive driving', 'drivers not listed on the policy'],
+    reporting_window_days: 10,
+    police_report_required_over: 2000.0,
+  },
+  claim: {
+    claim_id: 'CLM-55029',
+    incident_date: '2026-06-28',
+    reported_date: '2026-07-04',
+    driver: 'Sam M.',
+    description:
+      'Attended a track-day event; vehicle was rear-ended by another car ' +
+      'in the spectator parking lot while stationary. Not on the circuit.',
+    amount_claimed: 3250.0,
+    line_items: [
+      { item: 'rear bumper replacement', cost: 1700.0 },
+      { item: 'paint + refinish', cost: 800.0 },
+      { item: 'parking-sensor recalibration', cost: 450.0 },
+      { item: 'rental car (6 days)', cost: 300.0 },
+    ],
+    documentation: ['repair estimate (PDF)', '8 damage photos'],
+  },
+  adjuster_notes: [
+    {
+      author: 'auto-triage',
+      note: 'Collision coverage active. Approved. Pay full amount $3,250 to policyholder, 5-10 business days.',
+    },
+  ],
+  claim_history: { claims_last_12mo: 2, prior_denied: 0 },
+};
+
 // Recorded repeated Noul assessments of the cookbook's borderline claim
 // (CLM-55029): 5 repeats x 14 questions. Run-to-run wobble is kept in on
 // purpose: `covered` crosses 0.50 every which way yet never leaves `uncertain`
@@ -143,7 +187,7 @@ const NOUL_QUESTIONS = Object.fromEntries(
 const liveRepeats = [];
 for (let i = 0; i < 3; i++) {
   const r = await askJevBundle({
-    state: { claim_id: 'CLM-55029', uid: `consistency-noul-demo-${Date.now()}-${i}` },
+    state: { ...CLAIM, uid: `consistency-noul-demo-${Date.now()}-${i}` },
     questions: NOUL_QUESTIONS,
     model: 'jev-1.13.0',
     timeoutMs: 20000,

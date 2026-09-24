@@ -33,6 +33,31 @@ const QUESTIONS = {
   severity: ['None', 'Low', 'Medium', 'High'],
 };
 
+// The cookbook's borderline post, verbatim from its "The state" section
+// (docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md). The recorded REPEATS below
+// are assessments of THIS post, so the live lane must send it: before jev-s0f1 the live state
+// was the id alone and every live answer judged an empty post.
+const POST = {
+  post_id: 'P-88213',
+  author: { user_id: 'u/4471', account_age_days: 38, prior_strikes: 1, followers: 210 },
+  context: {
+    surface: 'public reply',
+    in_reply_to: 'another user defending a game patch',
+    community: 'r/gamedebates',
+  },
+  content: {
+    text:
+      'Are you seriously this dense? Anyone who defends that patch is a complete clown and ' +
+      "should be embarrassed to even post here. People like you are what's ruining this " +
+      "community and honestly you need to be dealt with. Come say it to my face, invite's " +
+      "right here. Keep it up and I'll end your whole channel.",
+    has_link: true,
+    link_domain: 'discord.gg',
+    language: 'en',
+  },
+  reports: { user_reports: 4, report_reasons: ['harassment', 'spam', 'threat'] },
+};
+
 // Recorded repeated assessments of the cookbook's borderline post (P-88213):
 // 5 repeats × 8 questions, per-label probabilities. Run-to-run wobble is kept
 // in on purpose: `action` flips Remove/Escalate and one `link_handling` repeat
@@ -157,7 +182,7 @@ const CHOICE_QUESTIONS = Object.fromEntries(
 const liveRepeats = [];
 for (let i = 0; i < 3; i++) {
   const r = await askJevBundle({
-    state: { post_id: 'P-88213', uid: `consistency-demo-${Date.now()}-${i}` },
+    state: { ...POST, uid: `consistency-demo-${Date.now()}-${i}` },
     questions: CHOICE_QUESTIONS,
     model: 'jev-1.13.0',
     timeoutMs: 20000,
