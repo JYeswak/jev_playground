@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Scorer for bead jev-qw8 (CLINC150 with out-of-scope rows). Stdlib only, no key, no network.
+"""Scorer for beads jev-qw8 and jev-pm3 (CLINC150 with out-of-scope rows). Stdlib only, no key.
 
-Run: python3 work/choice-clinc150/score.py
-Reads subset.jsonl and rows-{jev,haiku}.jsonl beside this file. Rules frozen in
-docs/demos/upstream-repro/choice-clinc150-20260924.md:
+Run: python3 work/choice-clinc150/score.py [--set full]
+subset (jev-qw8): subset.jsonl, rows-{jev,haiku}.jsonl; rules in choice-clinc150-20260924.md.
+full (jev-pm3): full.jsonl, rows-full-jev.jsonl, and the Haiku file chosen by the rule in
+choice-clinc150-full-20260924.md: rows-full-haiku-prompted.jsonl if any row of the structured
+probe (rows-full-haiku.jsonl) was rejected with Anthropic's grammar cap, else rows-full-haiku.jsonl.
+An arm with more than 1% failed rows is NOT-SCORED on the full set. Rules shared by both:
   prediction   = the chosen option mapped back to its dataset label ("none of the above" -> "oos");
                  last answered row per id; a row with no answer is wrong everywhere
   Haiku        = scored twice: as shipped, and with every zero-mass row (adapter debug rawSum == 0,
@@ -17,6 +20,7 @@ docs/demos/upstream-repro/choice-clinc150-20260924.md:
 import json
 import math
 import os
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OOS = "oos"
@@ -29,6 +33,25 @@ CONF_GATES = (0.5, 0.7, 0.9)
 SHIP_MISROUTE = 0.02
 SHIP_COVERAGE = 0.80
 RANK = {"NOT-SCORED": -1, "LOSE": 0, "NON-INFERIOR": 1, "WIN": 2}
+GRAMMAR_CAP = "compiled grammar is too large"
+FAIL_LIMIT = 0.01  # full set only
+
+
+def set_files(name):
+    """(rows file, jev rows, haiku rows, note on which Haiku run is scored)."""
+    if name == "subset":
+        return "subset.jsonl", "rows-jev.jsonl", "rows-haiku.jsonl", "structured"
+    probe = load("rows-full-haiku.jsonl")
+    capped = sum(1 for r in probe if GRAMMAR_CAP in r.get("error", ""))
+    if capped:
+        note = f"prompted JSON (structured probe: {capped}/{len(probe)} rows rejected with the grammar cap)"
+        return (
+            "full.jsonl",
+            "rows-full-jev.jsonl",
+            "rows-full-haiku-prompted.jsonl",
+            note,
+        )
+    return "full.jsonl", "rows-full-jev.jsonl", "rows-full-haiku.jsonl", "structured"
 
 
 def load(name):
@@ -150,16 +173,21 @@ def arm_table(name, subset, p, rows):
     )
 
 
-def main():
-    subset = load("subset.jsonl")
+def main(argv):
+    set_name = argv[argv.index("--set") + 1] if "--set" in argv else "subset"
+    fname, jev_file, haiku_file, haiku_note = set_files(set_name)
+    subset = load(fname)
     n = len(subset)
     n_oos = sum(1 for it in subset if it["intent"] == OOS)
     n_in = n - n_oos
-    rows = {"jev": load("rows-jev.jsonl"), "haiku": load("rows-haiku.jsonl")}
-    print(f"rows: {n} ({n_in} in-scope over 15 intents, {n_oos} out-of-scope)")
+    n_intents = len({it["intent"] for it in subset if it["intent"] != OOS})
+    rows = {"jev": load(jev_file), "haiku": load(haiku_file)}
+    print(f"rows: {n} ({n_in} in-scope over {n_intents} intents, {n_oos} out-of-scope)")
     print(
         f"constant always-none: overall {pct(n_oos, n)}, in-scope 0/{n_in}, OOS recall {n_oos}/{n_oos}"
     )
+    if set_name != "subset":
+        print(f"Haiku rows scored: {haiku_file}, {haiku_note}")
 
     arms = {"jev": preds(subset, rows["jev"])}
     arms["haiku (as shipped)"] = preds(subset, rows["haiku"])
@@ -309,6 +337,21 @@ def main():
                 f"| {measure} | {reading} | {jk} | {hk} | {b} | {c} | {p:.3g} | {lab} |"
             )
 
+    failed = {
+        arm: sum(1 for pr in arms[k] if pr[0] is None)
+        for arm, k in (("jev", "jev"), ("haiku", "haiku (as shipped)"))
+    }
+    if set_name != "subset":
+        over = [a for a, f in failed.items() if f > FAIL_LIMIT * n]
+        print(
+            f"\nFailed rows: jev {failed['jev']}, haiku {failed['haiku']} "
+            f"(limit {int(FAIL_LIMIT * n)}){'; over the limit: ' + ', '.join(over) if over else ''}"
+        )
+        if over:
+            finals = {m: ["NOT-SCORED"] for m in finals}
+        by_domain(subset, arms)
+        versus_subset(subset, arms)
+
     print("\nVerdicts (the worse for Jev over the two Haiku readings):")
     for measure, labs in finals.items():
         worst = min(labs, key=RANK.__getitem__)
@@ -320,5 +363,54 @@ def main():
     return 0
 
 
+def by_domain(subset, arms):
+    """Descriptive: in-scope accuracy per CLINC domain, each arm (Haiku as shipped)."""
+    doms = sorted({it["domain"] for it in subset if it["intent"] != OOS})
+    print("\nDescriptive: in-scope accuracy by domain (450 rows each)")
+    print("| Domain | Jev | Haiku |")
+    print("|---|---:|---:|")
+    for d in doms:
+        idx = [i for i, it in enumerate(subset) if it.get("domain") == d]
+        cells = []
+        for k in ("jev", "haiku (as shipped)"):
+            ok = correct(subset, arms[k])
+            cells.append(pct(sum(ok[i] for i in idx), len(idx)))
+        print(f"| {d} | {cells[0]} | {cells[1]} |")
+
+
+def versus_subset(subset, arms):
+    """Descriptive: the 750 jev-qw8 rows (matched by text; CLINC texts are unique), answered with
+    16 options there and 151 here. The instructions differ too (car-and-commute vs virtual
+    assistant), so this is the whole question changing, not the option count alone."""
+    small = load("subset.jsonl")
+    if not small:
+        return
+    at = {it["text"]: i for i, it in enumerate(subset)}
+    idx = [at[it["text"]] for it in small]
+    big_items = [subset[i] for i in idx]
+    print("\nDescriptive: the 750 jev-qw8 rows, 16 options (qw8) vs 151 options (here)")
+    print(
+        "| Arm | Overall correct, 16 / 151 | In-scope correct, 16 / 151 | OOS said none, 16 / 151 | Handled at peak >= 0.60, 16 / 151 |"
+    )
+    print("|---|---|---|---|---|")
+    for arm, key, small_file in (
+        ("jev", "jev", "rows-jev.jsonl"),
+        ("haiku", "haiku (as shipped)", "rows-haiku.jsonl"),
+    ):
+        sp = preds(small, load(small_file))
+        bp = [arms[key][i] for i in idx]
+        cells = []
+        for items, p in ((small, sp), (big_items, bp)):
+            ok = correct(items, p)
+            ins = [ok[i] for i, it in enumerate(items) if it["intent"] != OOS]
+            oos = [ok[i] for i, it in enumerate(items) if it["intent"] == OOS]
+            h = handled(items, gate(items, p, PRIMARY_GATE, "peak"))
+            cells.append((sum(ok), sum(ins), sum(oos), sum(h)))
+        a, b = cells
+        print(
+            f"| {arm} | {a[0]} / {b[0]} | {a[1]} / {b[1]} of 450 | {a[2]} / {b[2]} of 300 | {a[3]} / {b[3]} |"
+        )
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))

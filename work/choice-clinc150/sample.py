@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Row set for bead jev-qw8: CLINC150 with out-of-scope rows, one domain of 15 intents.
+"""Row sets for beads jev-qw8 (one domain of 15 intents) and jev-pm3 (all 150) on CLINC150.
 
 Source: clinc/oos-eval @ 828f8093932c8fe6ca7936c3d2e52903b1c523de (Larson et al. 2019, CC-BY-3.0),
 data/data_full.json (test: 4,500 in-scope rows, 30 per intent; oos_test: 1,000 out-of-scope rows)
@@ -12,8 +12,12 @@ Rule (preregistered in docs/demos/upstream-repro/choice-clinc150-20260924.md):
   oos rows      = oos_test rows at sorted(rng.sample(range(1000), 300)), in file order (300)
 One row per line: i, text, intent (an intent name, or "oos"). 750 rows.
 
-Run: python3 work/choice-clinc150/sample.py           (fetch, check sha256, write subset.jsonl)
-     python3 work/choice-clinc150/sample.py --check   (rebuild, diff vs committed)
+--set full (jev-pm3, preregistered in choice-clinc150-full-20260924.md): every test row (4,500, 150
+intents x 30) then every oos_test row (1,000), in file order, no sampling; each row also carries
+its domain from domains.json ("oos" for out-of-scope). 5,500 rows -> full.jsonl.
+
+Run: python3 work/choice-clinc150/sample.py [--set full]           (fetch, check sha256, write)
+     python3 work/choice-clinc150/sample.py [--set full] --check   (rebuild, diff vs committed)
 Stdlib only. No model call.
 """
 
@@ -57,9 +61,20 @@ def build(data, domains):
     return domain, intents, rows
 
 
+def build_full(data, domains):
+    domain_of = {c: d for d, cs in domains.items() for c in cs}
+    rows = [
+        {"i": i, "text": t, "intent": lab, "domain": domain_of.get(lab, "oos")}
+        for i, (t, lab) in enumerate(data["test"] + data["oos_test"])
+    ]
+    return "all", sorted(domain_of), rows
+
+
 def main(argv):
-    out_path = os.path.join(HERE, "subset.jsonl")
-    domain, intents, rows = build(fetch("data_full.json"), fetch("domains.json"))
+    full = "--set" in argv and argv[argv.index("--set") + 1] == "full"
+    out_path = os.path.join(HERE, "full.jsonl" if full else "subset.jsonl")
+    builder = build_full if full else build
+    domain, intents, rows = builder(fetch("data_full.json"), fetch("domains.json"))
     n_oos = sum(1 for r in rows if r["intent"] == "oos")
     print(
         f"domain: {domain}; intents ({len(intents)}): {sorted(intents)}",

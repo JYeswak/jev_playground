@@ -1,19 +1,25 @@
 #!/usr/bin/env python3
-"""Live arms for bead jev-qw8: one Choice with a "none of the above" option on CLINC150.
+"""Live arms for beads jev-qw8 (15 intents) and jev-pm3 (all 150): one Choice with "none of the above".
 
-Bar: docs/demos/upstream-repro/choice-clinc150-20260924.md (committed before any call).
-Rows: subset.jsonl (auto_and_commute's 15 intents, 450 rows, plus 300 out-of-scope rows).
+Bars: docs/demos/upstream-repro/choice-clinc150-20260924.md (--set subset, the default) and
+choice-clinc150-full-20260924.md (--set full), each committed before its first call.
+Rows: subset -> subset.jsonl, rows-{arm}.jsonl; full -> full.jsonl, rows-full-{arm}.jsonl.
 Arms, same state, same question, same labels:
-  jev    typesafe-sdk-python TypeSafeClient, model pinned jev-1.13.0          -> rows-jev.jsonl
-  haiku  system-one-adapter-python, anthropic/claude-haiku-4-5, probabilities -> rows-haiku.jsonl
-         (also records the adapter's debug: raw sum and normalization error, so an all-zero map
-         the adapter turned into a uniform answer is visible; see adapter-uniform-20260924.md)
+  jev             typesafe-sdk-python TypeSafeClient, model pinned jev-1.13.0
+  haiku           system-one-adapter-python, anthropic/claude-haiku-4-5, probabilities mode, native
+                  structured outputs
+  haiku-prompted  the same with structured_outputs=False (the adapter puts the JSON schema in the
+                  prompt and validates the reply) and one corrective retry on malformed output; the
+                  fallback jev-4jf needed when Anthropic rejected a 77-option strict grammar
+Haiku rows also record the adapter's debug (probability_errors, raw sum), so an all-zero map the
+adapter turned into a uniform answer is visible; see adapter-uniform-20260924.md.
+--limit N runs only the first N rows still to do (the full set's structured-output probe).
 Resumes rows that already have a choice.
 
 Run:
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
     upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python \
-    work/choice-clinc150/run.py [jev|haiku]
+    work/choice-clinc150/run.py [--set full] [--limit N] [jev|haiku|haiku-prompted]
 Never prints a key.
 """
 
@@ -31,20 +37,33 @@ sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
 
-from typesafe_sdk import Choice, RetryPolicy, TypeSafeClient  # noqa: E402
+from typesafe_sdk import Choice, RetryPolicy, TypeSafeClient
 
 JEV_MODEL = "jev-1.13.0"
 HAIKU_MODEL = "claude-haiku-4-5"
 QNAME = "intent"
-INSTRUCTIONS = "The intent of this request to a car and commute assistant"
 NONE_LABEL = "none of the above"
 NONE_TEXT = "A request that fits none of the above"  # docs-mirror/typesafe/primitives/choice.md:388
 OOS = "oos"
-CONCURRENCY = 8
+# set -> (rows file, rows-file pattern, instructions, concurrency)
+SETS = {
+    "subset": (
+        "subset.jsonl",
+        "rows-{arm}.jsonl",
+        "The intent of this request to a car and commute assistant",
+        8,
+    ),
+    "full": (
+        "full.jsonl",
+        "rows-full-{arm}.jsonl",
+        "The intent of this request to a virtual assistant",
+        16,
+    ),
+}
 
 
-def load_rows():
-    with open(os.path.join(HERE, "subset.jsonl"), encoding="utf-8") as fh:
+def load_rows(fname="subset.jsonl"):
+    with open(os.path.join(HERE, fname), encoding="utf-8") as fh:
         return [json.loads(line) for line in fh if line.strip()]
 
 
@@ -57,10 +76,10 @@ def labels(rows):
     return out
 
 
-def question(label_map):
+def question(label_map, instructions=SETS["subset"][2]):
     criteria = {label: None for label in label_map if label != NONE_LABEL}
     criteria[NONE_LABEL] = NONE_TEXT
-    return {QNAME: Choice(instructions=INSTRUCTIONS, criteria=criteria)}
+    return {QNAME: Choice(instructions=instructions, criteria=criteria)}
 
 
 def state(row):
@@ -114,6 +133,9 @@ def adapter_debug(resp):
     original = (debug.get("original_probabilities") or {}).get(QNAME)
     return {
         "nRetries": int(getattr(resp.usage, "n_retries", 0) or 0),
+        "nRetriesMalformed": int(
+            getattr(resp.usage, "n_retries_malformed_structure", 0) or 0
+        ),
         "probabilityError": float(
             (debug.get("probability_errors") or {}).get(QNAME, 0.0)
         ),
@@ -121,15 +143,14 @@ def adapter_debug(resp):
     }
 
 
-def run_jev(rows, label_map, path):
+def run_jev(rows, label_map, path, q, concurrency, limit=None):
     if not os.environ.get("TYPESAFE_API_KEY"):
         print("unconfigured: TYPESAFE_API_KEY unset, no call made", file=sys.stderr)
         return 2
     have = done_ids(path)
-    todo = [r for r in rows if r["i"] not in have]
+    todo = [r for r in rows if r["i"] not in have][:limit]
     print(f"jev: {len(todo)} to run, {len(have)} resumed", file=sys.stderr)
     client = TypeSafeClient(timeout=30.0)
-    q = question(label_map)
 
     def one(item):
         t0 = time.perf_counter()
@@ -142,7 +163,7 @@ def run_jev(rows, label_map, path):
         return answer_row(item, label_map, resp.answers[QNAME], resp.model, ms, usage)
 
     ok = failed = 0
-    with ThreadPoolExecutor(max_workers=CONCURRENCY) as pool:
+    with ThreadPoolExecutor(max_workers=concurrency) as pool:
         futs = {pool.submit(one, item): item for item in todo}
         for fut in as_completed(futs):
             try:
@@ -156,25 +177,27 @@ def run_jev(rows, label_map, path):
     return 3 if failed else 0
 
 
-def run_haiku(rows, label_map, path):
+def run_haiku(rows, label_map, path, q, concurrency, limit=None, prompted=False):
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("unconfigured: ANTHROPIC_API_KEY unset, no call made", file=sys.stderr)
         return 2
     from system_one_adapter import AsyncSystemOneAdapterClient
 
     have = done_ids(path)
-    todo = [r for r in rows if r["i"] not in have]
-    print(f"haiku: {len(todo)} to run, {len(have)} resumed", file=sys.stderr)
-    q = question(label_map)
+    todo = [r for r in rows if r["i"] not in have][:limit]
+    mode = "prompted" if prompted else "structured"
+    print(f"haiku {mode}: {len(todo)} to run, {len(have)} resumed", file=sys.stderr)
+    extra_opts = {"n_retry_malformed_structure": 1} if prompted else {}
 
     async def go():
         ok = failed = 0
-        sem = asyncio.Semaphore(CONCURRENCY)
+        sem = asyncio.Semaphore(concurrency)
         async with AsyncSystemOneAdapterClient(
-            structured_outputs=True,
+            structured_outputs=not prompted,
             llm_answer_mode="probabilities",
             normalize_probabilities=True,
             retry=RetryPolicy(),
+            **extra_opts,
         ) as client:
 
             async def one(item):
@@ -185,7 +208,7 @@ def run_haiku(rows, label_map, path):
                             client.system_one(
                                 state(item), q, provider="anthropic", model=HAIKU_MODEL
                             ),
-                            timeout=90,
+                            timeout=120 if prompted else 90,
                         )
                         ms = int((time.perf_counter() - t0) * 1000)
                         usage = {
@@ -211,22 +234,41 @@ def run_haiku(rows, label_map, path):
                     failed += 1
                 else:
                     ok += 1
-        print(f"haiku done ok={ok} failed={failed}", file=sys.stderr)
+        print(f"haiku {mode} done ok={ok} failed={failed}", file=sys.stderr)
         return 3 if failed else 0
 
     return asyncio.run(go())
 
 
+def take(argv, flag):
+    if flag not in argv:
+        return None
+    at = argv.index(flag)
+    value = argv[at + 1]
+    del argv[at : at + 2]
+    return value
+
+
 def main(argv):
-    rows = load_rows()
+    argv = list(argv)
+    name = take(argv, "--set") or "subset"
+    limit = take(argv, "--limit")
+    limit = int(limit) if limit else None
+    fname, pattern, instructions, concurrency = SETS[name]
+    rows = load_rows(fname)
     label_map = labels(rows)
+    q = question(label_map, instructions)
     code = 0
     for arm in argv or ["jev", "haiku"]:
-        path = os.path.join(HERE, f"rows-{arm}.jsonl")
+        path = os.path.join(HERE, pattern.format(arm=arm))
         if arm == "jev":
-            code = run_jev(rows, label_map, path) or code
-        elif arm == "haiku":
-            code = run_haiku(rows, label_map, path) or code
+            code = run_jev(rows, label_map, path, q, concurrency, limit) or code
+        elif arm in ("haiku", "haiku-prompted"):
+            prompted = arm == "haiku-prompted"
+            code = (
+                run_haiku(rows, label_map, path, q, concurrency, limit, prompted)
+                or code
+            )
         else:
             print(f"unknown arm {arm!r}", file=sys.stderr)
             return 64
