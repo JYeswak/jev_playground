@@ -1,17 +1,20 @@
 #!/usr/bin/env python3
-"""Live arms for beads jev-9er and jev-k2q: one Noul question per SciFact claim/abstract pair.
+"""Live arms for beads jev-9er, jev-k2q and jev-wx5: one Noul question per claim/evidence pair.
 
-Bars: docs/demos/upstream-repro/noul-scifact-20260924.md (jev, haiku) and
-noul-scifact-criteria-20260924.md (jev-nocriteria), each committed before its first call.
+Bars: docs/demos/upstream-repro/noul-scifact-20260924.md (jev, haiku),
+noul-scifact-criteria-20260924.md (jev-nocriteria) and noul-fever-20260924.md (jev, haiku on
+work/noul-fever), each committed before its first call.
   jev            -> official typesafe_sdk AsyncTypeSafeClient, model pinned jev-1.13.0 (TYPESAFE_API_KEY)
   jev-nocriteria -> same client and instructions, criteria removed (the jev-k2q ablation)
   jev-rerun      -> the jev question again, run beside jev-nocriteria (jev-k2q noise control)
   haiku          -> system-one-adapter-python, anthropic/claude-haiku-4-5, probabilities mode (ANTHROPIC_API_KEY)
 Run (venv python has both packages):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
-    upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/noul-scifact/run.py <arm>
-Appends to work/noul-scifact/rows-<arm>.jsonl; rows that already hold an answer are skipped, so a
-rerun retries only failed rows. Never prints a key.
+    upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/noul-scifact/run.py <arm> [data_dir]
+data_dir (default: this directory) holds sample.jsonl; rows go to <data_dir>/rows-<arm>.jsonl. Rows
+that already hold an answer are skipped, so a rerun retries only failed rows. Never prints a key.
+Haiku rows also record the adapter's debug.probability_errors and debug.original_probabilities for
+the question (jev-mly: the adapter can return a fabricated answer that only debug reveals).
 """
 
 import asyncio
@@ -45,8 +48,11 @@ QUESTION_NO_CRITERIA = Noul(instructions=QUESTION.instructions)
 ARMS = ("jev", "jev-nocriteria", "jev-rerun", "haiku")
 
 
+DATA = HERE
+
+
 def out_path(arm):
-    return os.path.join(HERE, f"rows-{arm}.jsonl")
+    return os.path.join(DATA, f"rows-{arm}.jsonl")
 
 
 def answered(arm):
@@ -71,7 +77,7 @@ async def main(arm, concurrency=8):
         return 2
     sample = [
         json.loads(line)
-        for line in open(os.path.join(HERE, "sample.jsonl"))
+        for line in open(os.path.join(DATA, "sample.jsonl"))
         if line.strip()
     ]
     have = answered(arm)
@@ -107,6 +113,7 @@ async def main(arm, concurrency=8):
             resp = await client.system_one(
                 state(s), {QNAME: QUESTION}, provider=HAIKU[0], model=HAIKU[1]
             )
+            debug = resp.debug or {}
             return {
                 "noul": float(resp.answers[QNAME].noul),
                 "model": "/".join(HAIKU),
@@ -114,6 +121,10 @@ async def main(arm, concurrency=8):
                     "input_tokens": int(resp.usage.input_tokens_total),
                     "output_tokens": int(resp.usage.output_tokens_total),
                 },
+                "probabilityError": (debug.get("probability_errors") or {}).get(QNAME),
+                "originalProbabilities": (
+                    debug.get("original_probabilities") or {}
+                ).get(QNAME),
             }
 
     async with client:
@@ -147,6 +158,8 @@ async def main(arm, concurrency=8):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] not in ARMS:
-        raise SystemExit("usage: run.py " + "|".join(ARMS))
+    if len(sys.argv) not in (2, 3) or sys.argv[1] not in ARMS:
+        raise SystemExit("usage: run.py " + "|".join(ARMS) + " [data_dir]")
+    if len(sys.argv) == 3:
+        DATA = os.path.abspath(sys.argv[2])
     sys.exit(asyncio.run(main(sys.argv[1])))

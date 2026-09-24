@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Scorer for bead jev-9er (SciFact, Jev Noul vs Haiku). Stdlib only, no key, no network.
+"""Scorer for beads jev-9er (SciFact) and jev-wx5 (FEVER): Jev Noul vs Haiku. Stdlib only, no key.
 
-Run: python3 work/noul-scifact/score.py
-Reads sample.jsonl and rows-{jev,haiku}.jsonl beside this file and prints the receipt tables.
+Run: python3 work/noul-scifact/score.py [data_dir]
+Reads sample.jsonl and rows-{jev,haiku}.jsonl in data_dir (default: this directory) and prints
+the receipt tables. Haiku rows whose adapter debug shows a rescaled or zero-mass distribution
+(jev-mly) are counted, and when there are any the whole comparison is printed again without them.
 Rules frozen in docs/demos/upstream-repro/noul-scifact-20260924.md:
   decision   = noul > 0.5 means "supports"
   failed row = counted incorrect for accuracy; noul 0.5 for AUC, Brier and ECE
@@ -118,12 +120,16 @@ def correct(p, row, truth):
     return row is not None and (p > CUT) == truth
 
 
-def main():
-    sample = load_jsonl(os.path.join(HERE, "sample.jsonl"))
+def main(data=HERE, exclude=frozenset()):
+    sample = [
+        s
+        for s in load_jsonl(os.path.join(data, "sample.jsonl"))
+        if s["i"] not in exclude
+    ]
     y = [1 if s["truth"] else 0 for s in sample]
     n = len(y)
     prev = sum(y) / n
-    print(f"sample: {n} pairs, true (SUPPORT) {sum(y)}, prevalence {prev:.4f}")
+    print(f"sample: {n} pairs, true {sum(y)}, prevalence {prev:.4f}")
 
     const = {
         "constant: always no (0)": [0.0] * n,
@@ -131,7 +137,7 @@ def main():
     }
     arms = {}
     for arm, label in (("jev", "Jev jev-1.13.0"), ("haiku", "Haiku 4.5 via adapter")):
-        rows = load_jsonl(os.path.join(HERE, f"rows-{arm}.jsonl"))
+        rows = load_jsonl(os.path.join(data, f"rows-{arm}.jsonl"))
         preds = arm_probs(sample, rows)
         if not any(preds):
             continue
@@ -271,17 +277,43 @@ def main():
             g[0] += 1
             g[1] += ok
             g[2] += pp
-        print(f"\nBy SciFact gold label, {arm}")
+        print(f"\nBy gold label, {arm}")
         print("| Gold | Rows | Correct | Mean noul |")
         print("|---|---:|---:|---:|")
-        for g in ("SUPPORT", "CONTRADICT", "NEI"):
-            if g in by_gold:
-                r = by_gold[g]
-                print(
-                    f"| {g} | {r[0]} | {r[1]} ({r[1] / r[0]:.1%}) | {r[2] / r[0]:.3f} |"
-                )
+        true_golds = {s["gold"] for s in sample if s["truth"]}
+        for g in sorted(by_gold, key=lambda g: (g not in true_golds, g)):
+            r = by_gold[g]
+            print(f"| {g} | {r[0]} | {r[1]} ({r[1] / r[0]:.1%}) | {r[2] / r[0]:.3f} |")
+
+    if "haiku" in arms and not exclude:
+        got = [r for r in arms["haiku"]["preds"] if r is not None]
+        recorded = [r for r in got if "probabilityError" in r]
+        rescaled = {r["i"] for r in recorded if r["probabilityError"] is not None}
+        zero = {
+            r["i"]
+            for r in recorded
+            if isinstance(r.get("originalProbabilities"), dict)
+            and sum(r["originalProbabilities"].values()) == 0
+        }
+        print(
+            f"\nHaiku adapter debug (jev-mly): recorded on {len(recorded)}/{len(got)} answered rows; "
+            f"probability_errors set on {len(rescaled)}; zero-mass (original sum 0) on {len(zero)}"
+        )
+        if rescaled | zero:
+            print(
+                f"\n=== Re-scored without the {len(rescaled | zero)} rescaled or zero-mass Haiku rows (both arms) ==="
+            )
+            main(data, frozenset(rescaled | zero))
+        elif len(recorded) < len(got):
+            print(
+                f"Debug was not recorded on {len(got) - len(recorded)} rows: zero-mass is not ruled out for them."
+            )
+        else:
+            print(
+                "Re-score without them: identical to the tables above (0 rows to drop)."
+            )
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE))
