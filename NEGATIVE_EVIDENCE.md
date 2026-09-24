@@ -3520,6 +3520,24 @@ question as it stands.
 **NO-CLAIM.** Says nothing about whether any close reason is wrong: the tool called none unsupported
 and passed four wrong numbers, so its silence is not evidence either way.
 
+**Retry 1 (jev-2mp, 2026-09-24, bar `8210e02` before any call): still FAILED.** This retry did what
+the retry condition asked: one check per number, with a question that asks whether the evidence states
+exactly `value`. Fresh plants were one-digit changes from seed 20260925, 314 checks, jev-1.13.0.
+- Planted numbers called supported: **0/18 README, 0/31 close**, down from 4/31. That includes
+  `75/219 -> 79/219` at p 0.08.
+- Catch: **10/18 README** (bar 11) and **8/31 close** (bar 19). 31 of 49 plants landed unsure, p
+  0.21–0.71.
+- Original numbers confirmed: 14/18 README, 12/31 close (bar 19).
+
+The approval failure is fixed on these plants; the catch is not. Receipt:
+`docs/demos/upstream-repro/claim-check-numeric-20260924.md`; re-score
+`python3 work/jev-claim-check/score-numeric.py`.
+**Next retry condition:** a catch rule that treats `unsure` on an exact-value check as "not
+confirmed". That is a new bar, preregistered; do not re-read this run under it. Or evidence
+narrowed to the cited number's own line/row before the call. The number rule must also keep
+scientific notation whole (`2.6e-13`), because it currently checks `2`. Do not ship a numeric mode
+until one set clears catch >= 60% with zero wrongly supported.
+
 ## R84 — REFUTED: the Jev API reports `usage.billing_units`, so a client can record billed units
 
 **Claim (AGENTS.md RULE 14, `AGENTS.md:98-100`; bead jev-bmn):** the SDK ships

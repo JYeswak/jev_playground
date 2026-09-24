@@ -56,3 +56,61 @@ this result. The question, cuts and clause rule are not retuned after an answer.
 **NO-CLAIM.** One wording, one Jev version, one run, plants from a one-digit rule. The close set's
 labels assume the reasons are right; a real check called unsupported is read, not scored as an
 error. The numberTokens rule reads `3.0e-09` as `3`, and such checks stay in as built.
+
+## Results
+
+Bar committed at `8210e02` (03:11:31Z) before any call. Calls ran 2026-09-24T03:11:41.585Z–2026-09-24T03:12:53.050Z, 314/314 checks
+answered on the first pass, 0 failures. Rows: `work/jev-claim-check/numeric-rows.jsonl`. Re-score with
+no key: `python3 work/jev-claim-check/score-numeric.py` (exit 1 = FAIL).
+
+| Set | (a) planted number called supported | (b) planted number called unsupported | (c) original number called supported |
+|---|---:|---:|---:|
+| readme (n=18) | **0/18** (bar <= 1, met) | **10/18** (bar >= 11, **missed by 1**) | **14/18** (bar >= 11, met) |
+| close (n=31) | **0/31** (bar <= 3, met) | **8/31** (bar >= 19, **missed**) | **12/31** (bar >= 19, **missed**) |
+
+**FAIL** (`[live]`, N=314 checks, `jev-1.13.0`). Both sets must pass and neither did.
+
+**What moved against R83.** The question approved **none of 49** changed numbers (0/18 readme,
+0/31 close), against 4/31 for the sentence-level question. That includes plants closer to the
+original than R83's: `75/219 -> 79/219` unsupported at p 0.08 (the original supported at 0.97),
+`189 -> 184` at 0.07, `0.068 -> 0.063` at 0.18. It still misses the catch floor: 31 of the 49 plants
+landed `unsure` (p 0.21–0.71), and `unsure` is not a catch. On the close set the original number
+itself is confirmed on only 12 of 31. In 6 of those 31 plants it is absent from the resolved
+evidence (all 6 unconfirmed).
+
+**Whole claims (descriptive).** readme real: 11 supported, 4 unsure, 3 unsupported, 1 without a
+number; readme planted: 0 supported, 8 unsure, 10 unsupported. close real: 5 supported, 13 unsure, 14
+unsupported, 2 without a number; close planted: 0 / 14 / 17.
+
+**Every real claim unsupported as a whole, read.** A check was classed by whether its value occurs
+literally in the claim's evidence.
+- **readme, 3 claims, 6 checks.** `inj-fresh-haiku` 558: absent from the evidence, which is correct.
+  It is the registry gap jev-sp5 found; 087bd32 registered DIFF-RECEIPT.json for it, and this case
+  file predates that. `calibration-2026-09-22` 80 and 19/20: absent from the tail window, which is
+  correct, the jev-sp5 window miss. The same claim's `0.0614` and `0.0195` are present as JSON
+  (`"ece": 0.0614, "brier": 0.0195`) and were called unsupported at p 0.11 and 0.12. That is a
+  **tool miss**. `inj-fresh-discordants` "2" comes from `p = 2.6e-13`: the number rule reads
+  scientific notation as its leading digit, a **tokenizer artifact**, stated before the run.
+  **No README number is wrong.**
+- **close, 14 claims, 43 checks.** 32 values are absent from the resolved evidence: re-run outputs,
+  reviewer tallies and `/tmp` checks that no cited committed file holds, which the method cannot
+  adjudicate. 11 are present. Most are small integers the tokenizer lifted out of a larger form
+  (`1` from `Wilson 1.1-4.7%`, `2` from `p=2.74e-05`, `4` from `4.1e-10`, `0` from `rc=0`,
+  `30` from "stage 30"). The rest are context misses: `28 discordant rows spot-read`, `0.5` in
+  "flipped across 0.5". **No close reason was shown to contradict its evidence.**
+
+**Descriptive safety number.** Of the 93 real checks whose value does not occur literally in the
+evidence, 10 were called supported. Some are legitimate restatements (a percent of a stated
+fraction); none was read one by one.
+
+**Outcome.** No numeric mode is added to `jev_claim_check`. `NEGATIVE_EVIDENCE.md` R83 is updated
+with this retry. The rows and cases stay for a non-author re-score. `numeric.mjs` stays as the
+reproducer.
+
+**Spend.** 314 Jev calls: 1,025,280 input / 6,280 output tokens reported by the API, p50 166 ms, p95
+449 ms. Jev's billed units were not read and are not stated.
+
+**Boundary.** One wording, one Jev version, one run, one-digit plants from a seeded rule. The
+tokenizer artifacts count against the real-claim numbers here but do not touch (a)–(c), whose values
+are the plants' own tokens. Close-set labels assume the reasons are right. Awaiting a non-author
+re-score.
