@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import {
   MAX_PREFIX, REAL_SAMPLE, ROW_KEYS, buildRow, defaultFilter, loadFilters, makeFilter, makeHandler, observe, redact,
+  resetKeyCache,
 } from "./jev-gate-observe.ts";
 const wrote = [];
 const memAppend = async (path, line) => { wrote.push({ path, row: JSON.parse(line) }); };
@@ -133,4 +134,86 @@ test("a drifted or unreadable owner changes behaviour and fails toward skip", ()
   assert.throws(() => loadFilters("PRIVATE = 1\n"));
   assert.deepEqual(makeFilter(null)("ls"), { drop: true, reason: "filter-error" });
   assert.equal(redact(`echo ${fakeKey}`, "/home/x", null), "[filter-unavailable]");
+});
+
+test("env key wins over the resolver and is not written", async () => {
+  reset();
+  resetKeyCache();
+  const planted = "sk-" + "envkeyplant".repeat(2);
+  const prev = process.env.TYPESAFE_API_KEY;
+  process.env.TYPESAFE_API_KEY = planted;
+  let resolverCalls = 0;
+  let seen;
+  const asker = async (args) => { seen = args.apiKey; return scoredAsker(); };
+  try {
+    await observe({ toolName: "bash", input: { command: "ls" } }, {
+      asker,
+      keyResolver: async () => { resolverCalls++; throw new Error("must not run"); },
+      append: memAppend, logPath: "/tmp/x.jsonl", now,
+    });
+    assert.equal(resolverCalls, 0);
+    assert.equal(seen, planted);
+    assert.equal(process.env.TYPESAFE_API_KEY, planted);
+    assert.equal(JSON.stringify(wrote).includes(planted), false);
+  } finally {
+    if (prev === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = prev;
+    resetKeyCache();
+  }
+});
+
+test("resolver runs once across tool calls and the value is not logged", async () => {
+  reset();
+  resetKeyCache();
+  const prev = process.env.TYPESAFE_API_KEY;
+  delete process.env.TYPESAFE_API_KEY;
+  const planted = "sk-" + "resolverplant".repeat(2);
+  let calls = 0;
+  const asker = async (args) => { assert.equal(args.apiKey, planted); return scoredAsker(); };
+  try {
+    const deps = {
+      asker,
+      keyResolver: async () => { calls++; return planted; },
+      append: memAppend, logPath: "/tmp/x.jsonl", now,
+    };
+    for (let i = 0; i < 3; i++) {
+      await observe({ toolName: "bash", input: { command: "git status" } }, deps);
+    }
+    assert.equal(calls, 1);
+    assert.equal(process.env.TYPESAFE_API_KEY, undefined);
+    assert.equal(JSON.stringify(wrote).includes(planted), false);
+    assert.equal(wrote.length, 3);
+  } finally {
+    if (prev === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = prev;
+    resetKeyCache();
+  }
+});
+
+test("resolver failure is cached, logged not-run, and does not throw", async () => {
+  reset();
+  resetKeyCache();
+  const prev = process.env.TYPESAFE_API_KEY;
+  delete process.env.TYPESAFE_API_KEY;
+  let calls = 0;
+  try {
+    const deps = {
+      asker: async () => { throw new Error("asker must not run"); },
+      keyResolver: async () => { calls++; throw new Error("boom"); },
+      append: memAppend, logPath: "/tmp/x.jsonl", now,
+    };
+    const a = await observe({ toolName: "bash", input: { command: "ls" } }, deps);
+    const b = await observe({ toolName: "bash", input: { command: "pwd" } }, deps);
+    assert.equal(a, undefined);
+    assert.equal(b, undefined);
+    assert.equal(calls, 1);
+    assert.equal(wrote.length, 2);
+    assert.equal(wrote[0].row.status, "not-run");
+    assert.match(wrote[0].row.error, /NOT_RUN reason=unconfigured key-source=infisical-failed/);
+    assert.equal(JSON.stringify(wrote).includes("boom"), false);
+  } finally {
+    if (prev === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = prev;
+    resetKeyCache();
+  }
 });

@@ -20,6 +20,7 @@
  * No key: one row `NOT_RUN reason=unconfigured`, no throw. Any throw anywhere
  * in this module is caught: the tool path never sees us.
  */
+import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { appendFile, mkdir } from "node:fs/promises";
@@ -32,6 +33,62 @@ import { CUT, RISK, STATE_CONTEXT } from "../../../work/bicameral-gate/questions
 export const MODEL = "jev-1.13.0";
 export const MAX_PREFIX = 200;
 export const LOG_REL = "state/jev/gate-observe.jsonl";
+export const INFISICAL_BIN = join(homedir(), ".local", "bin", "infisical");
+export const INFISICAL_PROJECT = "42b194c3-89d7-4ebb-895f-dd77ddf005ba";
+const KEY_TIMEOUT_MS = 8000;
+
+export type KeySource = { ok: true; apiKey: string } | { ok: false; note: string };
+
+let keyOnce: Promise<KeySource> | undefined;
+
+/** Test seam. The live process keeps one resolution for its whole life. */
+export function resetKeyCache(): void {
+  keyOnce = undefined;
+}
+
+/** stdout only. stderr is discarded. The value is never logged. */
+export function defaultKeyResolver(): Promise<string> {
+  const { promise, resolve, reject } = Promise.withResolvers<string>();
+  const child = spawn(INFISICAL_BIN, [
+    "secrets", "get", "TYPESAFE_API_KEY",
+    `--projectId=${INFISICAL_PROJECT}`,
+    "--plain", "--silent",
+  ], { stdio: ["ignore", "pipe", "ignore"] });
+  const chunks: Buffer[] = [];
+  const timer = setTimeout(() => {
+    child.kill();
+    reject(new Error("timeout"));
+  }, KEY_TIMEOUT_MS);
+  child.stdout.on("data", (buf: Buffer) => { chunks.push(buf); });
+  child.on("error", (err) => { clearTimeout(timer); reject(err); });
+  child.on("close", (code) => {
+    clearTimeout(timer);
+    if (code !== 0) { reject(new Error("exit")); return; }
+    resolve(Buffer.concat(chunks).toString("utf8").trim());
+  });
+  return promise;
+}
+
+/**
+ * Env wins. Otherwise the resolver runs once per process, success or failure.
+ * Never writes process.env.
+ */
+export function resolveApiKey(resolver: () => Promise<string> = defaultKeyResolver): Promise<KeySource> {
+  if (!keyOnce) {
+    keyOnce = (async () => {
+      const fromEnv = process.env.TYPESAFE_API_KEY;
+      if (fromEnv) return { ok: true, apiKey: fromEnv };
+      try {
+        const apiKey = await resolver();
+        if (!apiKey) return { ok: false, note: "key-source=infisical-failed" };
+        return { ok: true, apiKey };
+      } catch {
+        return { ok: false, note: "key-source=infisical-failed" };
+      }
+    })();
+  }
+  return keyOnce;
+}
 export const REAL_SAMPLE = fileURLToPath(new URL("../../../work/bicameral-gate/real-sample.py", import.meta.url));
 
 export interface Filters {
@@ -120,6 +177,7 @@ export interface ObserveDeps {
     questions: typeof RISK;
     model: string;
     timeoutMs: number;
+    apiKey?: string;
   }) => Promise<{
     ok: boolean;
     reason?: string;
@@ -134,6 +192,8 @@ export interface ObserveDeps {
   now?: () => string;
   /** omp session id, read from the hook ctx by `makeHandler`. */
   session?: string;
+  /** Injected for tests. Absent on the live path, which uses defaultKeyResolver. */
+  keyResolver?: () => Promise<string>;
 }
 
 export function makeFilter(filters: Filters | null): (command: string) => { drop: boolean; reason?: string } {
@@ -190,11 +250,21 @@ export async function observe(
     }
     let answer;
     try {
+      let apiKey: string | undefined;
+      if (!deps.asker || deps.keyResolver) {
+        const resolved = await resolveApiKey(deps.keyResolver);
+        if (!resolved.ok) {
+          await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `NOT_RUN reason=unconfigured ${resolved.note}` });
+          return undefined;
+        }
+        apiKey = resolved.apiKey;
+      }
       answer = await (deps.asker ?? askJev)({
         state: { command, context: STATE_CONTEXT },
         questions: RISK,
         model: MODEL,
         timeoutMs: 20000,
+        apiKey,
       });
     } catch (err) {
       await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `ask-threw: ${err instanceof Error ? err.message : String(err)}` });

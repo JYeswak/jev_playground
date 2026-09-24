@@ -82,81 +82,21 @@ arm_text "$A" quiet "absence: REFUSED tier, probe-said-MISSING"  'command -v mor
 arm_text "$A" quiet "absence: already downgraded to UNMEASURED"  'UNMEASURED (probe: command -v morph); a second probe is required'
 arm_text "$A" quiet "absence: two probes already run"            'I verified it with two probes and the binary is present'
 
-# FILE-TYPE rule, lives ONLY in ~/.agents/rules (universal root). No drift
-# pair exists on purpose: the drift guard skips basenames present in one
-# root only. armf mirrors armw but varies tool+path: scope matching is on
-# the tool call shape, so the arms must vary it, not the payload text.
-R="$HOME/.agents/rules/ft-rs-doctrine.md"
-if [ -e "$R" ]; then
-  armf() { # armf <expect fire|quiet> <label> <tool> <path-or-empty> <payload>
-    local want="$1" label="$2" tool="$3" path="$4" txt="$5" got out
-    if [ -n "$path" ]; then
-      out=$(omp ttsr test --rule "$R" --source tool --tool "$tool" --path "$path" "$txt" 2>&1)
-    else
-      out=$(omp ttsr test --rule "$R" --source tool --tool "$tool" "$txt" 2>&1)
-    fi
-    if grep -qE '^Triggered \([1-9]' <<<"$out"; then got=fire; else got=quiet; fi
-    if [ "$got" = "$want" ]; then note ok "$label ($want)"; pass=$((pass+1))
-    else note FAIL "$label — wanted $want, got $got"; fail=$((fail+1)); fi
-  }
-  armf fire  "ft-rs: fire on .rs edit"    edit  /tmp/probe.rs 'fn main() {}'
-  armf fire  "ft-rs: fire on .rs write"   write /tmp/probe.rs 'fn main() {}'
-  armf quiet "ft-rs: quiet on .md edit"   edit  /tmp/probe.md '# notes'
-  armf quiet "ft-rs: quiet on bash cargo" bash  ''            'cargo test -p foo'
-else
-  note FAIL "system-wide rule missing: $R"; fail=$((fail+1))
-fi
-# FILETYPE-DOCTRINE rules (P2, 2026-09-20). Same fire/quiet shape as the
-# ft-rs block above, separate helper and separate rule vars so neither lane
-# touches the other's lines. ft-sh: single-entry scripts, wrapper-verdicts,
-# capture-first. ft-md: equal-or-weaker, no-claim boundaries.
-armt() { # armt <rule> <expect fire|quiet> <label> <tool> <path-or-empty> <payload>
-  local rule="$1" want="$2" label="$3" tool="$4" path="$5" txt="$6" got out
-  if [ -n "$path" ]; then
-    out=$(omp ttsr test --rule "$rule" --source tool --tool "$tool" --path "$path" "$txt" 2>&1)
+# RETIRED FILE-TYPE DOCTRINE PACK. The five ft-*-doctrine rules used to live in ~/.agents/rules and
+# this block demanded they exist. They were retired on this lane's own evidence: NEGATIVE_EVIDENCE.md
+# R64 (line 2896) measured the pack binding 1 time in 75 real edits against a preregistered 20% bar
+# (ft-md 0/25, ft-rs 0/25, ft-sh 1/25); ft-py and ft-json went with the pack for the same refuted
+# mechanism (fires on file type, not on the gap). Source of record for the global root:
+# ~/Developer/omp-kit/retired/REASONS.tsv. So the arm is inverted: a retired rule REAPPEARING in the
+# global root is the defect, because it would fire in every repo on the machine with a bind rate
+# already measured at ~1%.
+for ft in ft-rs-doctrine ft-sh-doctrine ft-md-doctrine ft-py-doctrine ft-json-doctrine; do
+  if [ -e "$HOME/.agents/rules/$ft.md" ]; then
+    note FAIL "retired rule is back in ~/.agents/rules: $ft.md (R64; omp-kit retired/REASONS.tsv)"; fail=$((fail+1))
   else
-    out=$(omp ttsr test --rule "$rule" --source tool --tool "$tool" "$txt" 2>&1)
+    note ok "retired rule absent from ~/.agents/rules: $ft.md"; pass=$((pass+1))
   fi
-  case "$out" in
-    *'No rules triggered'*) got=quiet ;;
-    *Triggered*) got=fire ;;
-    *) got=quiet ;;
-  esac
-  if [ "$got" = "$want" ]; then note ok "$label ($want)"; pass=$((pass+1))
-  else note FAIL "$label — wanted $want, got $got"; fail=$((fail+1)); fi
-}
-SH="$HOME/.agents/rules/ft-sh-doctrine.md"
-MD="$HOME/.agents/rules/ft-md-doctrine.md"
-if [ -e "$SH" ] && [ -e "$MD" ]; then
-  armt "$SH" fire  "ft-sh: fire on .sh edit"  edit  /tmp/probe.sh 'echo hi'
-  armt "$SH" quiet "ft-sh: quiet on .md edit" edit  /tmp/probe.md '# notes'
-  armt "$SH" quiet "ft-sh: quiet on bash"     bash  ''            'grep -rl x probe.sh'
-  armt "$MD" fire  "ft-md: fire on .md edit"  edit  /tmp/probe.md '# notes'
-  armt "$MD" quiet "ft-md: quiet on .sh edit" edit  /tmp/probe.sh 'echo hi'
-  armt "$MD" quiet "ft-md: quiet on bash"     bash  ''            'cat probe.md'
-else
-  note FAIL "system-wide filetype rules missing: $SH $MD"; fail=$((fail+1))
-fi
-PY="$HOME/.agents/rules/ft-py-doctrine.md"
-if [ -e "$PY" ]; then
-  armt "$PY" fire  "ft-py: fire on .py edit"   edit  /tmp/probe.py 'x = 1'
-  armt "$PY" fire  "ft-py: fire on .py write"  write /tmp/probe.py 'x = 1'
-  armt "$PY" quiet "ft-py: quiet on .sh edit"  edit  /tmp/probe.sh 'echo hi'
-  armt "$PY" quiet "ft-py: quiet on .md edit"  edit  /tmp/probe.md 'text'
-  armt "$PY" quiet "ft-py: quiet on bash run"  bash  ''            'python3 probe.py'
-  armt "$PY" quiet "ft-py: quiet on bash pip"  bash  ''            'pip install foo'
-else
-  note FAIL "system-wide filetype rule missing: $PY"; fail=$((fail+1))
-fi
-JS="$HOME/.agents/rules/ft-json-doctrine.md"
-if [ -e "$JS" ]; then
-  armt "$JS" fire  "ft-json: fire on .json edit"  edit  /tmp/probe.json '{"a":1}'
-  armt "$JS" fire  "ft-json: fire on .json write" write /tmp/probe.json '{"a":1}'
-  armt "$JS" quiet "ft-json: quiet on .py edit"   edit  /tmp/probe.py 'x = 1'
-  armt "$JS" quiet "ft-json: quiet on bash"       bash  ''            'cat probe.json'
-else
-  note FAIL "system-wide filetype rule missing: $JS"; fail=$((fail+1))
-fi
+done
 
 # COMPILE GUARD. TTSR conditions are JavaScript RegExp: a PCRE inline flag like (?i) is invalid.
 # omp ttsr test REPORTS that, but a live session does NOT — omp://ttsr-injection-lifecycle.md says
@@ -369,6 +309,15 @@ arm_at .omp/rules/kit-close-needs-evidence.md quiet "kit-close: streamed prefix 
 arm_at .omp/rules/kit-close-needs-evidence.md quiet "kit-close: br close with reason"    tool bash "" "br close jev-x --reason done"
 arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: commit --no-verify" tool bash "" "git commit --no-verify -m x"
 arm_at .omp/rules/kit-no-verify.md quiet "kit-no-verify: git status"          tool bash "" "git status -sb"
+# jev-sx9: the hook-pointer condition used to be the bare key, so it interrupted on READS of it
+# (4 false interrupts, 0 bypasses, gate-edit session 1). The omp-kit version exempts the read forms.
+# Two directions, or it is a nag or a hole: reads and searches QUIET, every write form FIRES. The
+# value-set arm is JSON-quoted because the pattern waits for the value to end (live tool args).
+arm_at .omp/rules/kit-no-verify.md quiet "kit-no-verify: read the hook pointer (--get)" tool bash "" "git config --get core.hooksPath"
+arm_at .omp/rules/kit-no-verify.md quiet "kit-no-verify: text search for the key"      tool bash "" "rg -n core.hooksPath .omp scripts"
+arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: set the hook pointer"         tool bash "" '{"command":"git config core.hooksPath /dev/null"}'
+arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: -c override of the pointer"   tool bash "" "git -c core.hooksPath=/tmp commit -m x"
+arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: --unset the pointer"          tool bash "" "git config --unset core.hooksPath"
 arm_at .omp/rules/kit-unverified-done.md fire  "kit-unverified: should now pass" text "" "" "the tests should now pass"
 arm_at .omp/rules/kit-unverified-done.md quiet "kit-unverified: a receipt sha"   text "" "" "the receipt is at cead414"
 arm_at .omp/rules/kit-test-skip.md fire  "kit-skip: it.skip" tool edit t.ts "it.skip('x')"
