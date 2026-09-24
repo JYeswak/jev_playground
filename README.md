@@ -120,6 +120,22 @@ node --test work/nev-injection/seat-guard.test.mjs
 
 **Calibration.** Labelled held-out set, N=80, pinned model: ECE 0.0614, Brier 0.0195, choice 19/20. Receipt: [`foundation/runs/20260922T021352Z.json`](foundation/runs/20260922T021352Z.json).
 
+**Rating on a scale: SST-5.** On 500 public SST-5 test sentences, one Score question at `jev-1.13.0` had lower absolute error than Claude Haiku 4.5 through the official adapter, MAE 0.488 vs 0.556 (sign test p = 0.015), while the gap in exact accuracy, 273 vs 251 of 500, was not significant (McNemar p = 0.092): a narrow win that held on three Jev runs at sign p 0.015, 0.040 and 0.019 ([receipt](docs/demos/upstream-repro/score-sst5-20260924.md), [variance](docs/demos/upstream-repro/jev-variance-20260924.md)).
+
+**Picking one intent: Banking77.** On a 400-query, ten-intent subset of public Banking77, one Choice question at `jev-1.13.0` routed 384/400 against Claude Haiku 4.5's 362/400 through the official adapter (McNemar p = 2.7e-5), and the win holds with the 14 Haiku rows dropped that the adapter had turned from all-zero answers into picks: 374 vs 362 of 386, p = 0.0075 ([receipt](docs/demos/upstream-repro/choice-banking77-20260924.md), [adapter finding](docs/demos/upstream-repro/adapter-uniform-20260924.md)).
+
+**Flagging risky commands: the tool-call gate.** On 400 held-out real commands from this repo's agent sessions (100 risky, 300 routine), adding outcome criteria to the five gate questions raised Jev's catch from 41/100 to 78/100 at 1/300 false alarms (McNemar p = 3.0e-09), where Claude Haiku 4.5 with the same criteria caught 84/100 at 20/300, and a non-author's 3-label correction gives 78/97 ([receipt](docs/demos/upstream-repro/bicameral-gate-criteria-20260924.md)).
+
+All three re-score from committed rows with no key:
+
+```bash
+python3 work/score-sst5/score.py                # SST-5: MAE 0.488 vs 0.556, 273 vs 251
+python3 work/jev-variance/score.py              # SST-5 and Banking77 across three Jev runs
+python3 work/choice-banking77/score.py          # Banking77: 384 vs 362, and 374 vs 362 of 386
+python3 work/bicameral-gate/score-b.py          # gate: 78/100 vs 41/100 at 1/300; Haiku 84/100 at 20/300
+python3 work/bicameral-gate/verify-labels-b.py  # gate, 3 labels corrected: 78/97
+```
+
 **A case where a classifier is the better instrument.** On tool-call harm, a small rule beat a live judge. The check is `node work/omp-harm-rule/verify-claim.mjs`. Use a rule when the label is already in the tokens.
 
 ## What other Jev projects taught us
