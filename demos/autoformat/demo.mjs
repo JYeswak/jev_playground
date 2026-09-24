@@ -50,9 +50,12 @@ if (live) {
   const q2 = {};
   blocks.forEach((b, i) => {
     if (b.text === "") return;
-    q2[`type_B${String(i).padStart(3, "0")}`] = {
+    const id = `B${String(i).padStart(3, "0")}`;
+    q2[`type_${id}`] = {
       type: "choice",
-      instructions: `What kind of content is this block?`,
+      // Name the block: every question sees the whole state, so an unnamed "this block" was the
+      // same question N times and got one answer for all blocks (jev-lcf).
+      instructions: `What kind of content is block ${id}?`,
       criteria: {
         heading: "a short title naming a section",
         paragraph: "ordinary running prose",
