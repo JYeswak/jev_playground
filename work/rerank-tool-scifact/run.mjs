@@ -24,7 +24,7 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { rerank } from "../nev-rerank/src/rank.ts";
 import { liveAsker, LIVE_MODEL } from "../nev-rerank/src/live.ts";
@@ -104,15 +104,14 @@ export function wrapFetch() {
   };
 }
 
-export async function scoreQuery(cand, text, run, attempt, asker) {
-  const docs = cand.cands.map(([d]) => d);
-  const passages = docs.map((d) => passageString(text.corpus.get(d)));
+/** One rerank() over `passages` (in `docs` order) with the HTTP accounting. work/rerank-nevir reuses it. */
+export async function scoreRanked({ qid, query, docs, passages }, run, attempt, asker) {
   const ctx = { calls: 0, status: {}, inputTokens: 0, models: new Set() };
   const t0 = performance.now();
-  const res = await ctxStore.run(ctx, () => rerank(text.queries.get(cand.qid), passages, asker));
+  const res = await ctxStore.run(ctx, () => rerank(query, passages, asker));
   const wallMs = Math.round(performance.now() - t0);
   return {
-    qid: cand.qid,
+    qid,
     run,
     attempt,
     ordered: res.ordered,
@@ -129,8 +128,14 @@ export async function scoreQuery(cand, text, run, attempt, asker) {
   };
 }
 
+export async function scoreQuery(cand, text, run, attempt, asker) {
+  const docs = cand.cands.map(([d]) => d);
+  const passages = docs.map((d) => passageString(text.corpus.get(d)));
+  return scoreRanked({ qid: cand.qid, query: text.queries.get(cand.qid), docs, passages }, run, attempt, asker);
+}
+
 /** Drop one trailing partial line left by a crash. Never deletes the file. */
-function repairTail(path) {
+export function repairTail(path) {
   if (!existsSync(path)) return;
   const text = readFileSync(path, "utf8");
   if (text === "" || text.endsWith("\n")) return;
@@ -159,12 +164,21 @@ async function pool(items, worker, stop) {
  * queries whose attempt-1 row is ordered=false and that have no attempt-2 row.
  * `write(row)` persists; `existing` is the rows already on disk.
  */
-export async function runAll({ run, cands, text, asker, write, existing = [], log = () => {} }) {
+export async function runAll({
+  run,
+  cands,
+  text,
+  asker,
+  write,
+  existing = [],
+  log = () => {},
+  score = (cand, attempt) => scoreQuery(cand, text, run, attempt, asker),
+}) {
   const has = (attempt) => new Set(existing.filter((r) => r.attempt === attempt).map((r) => r.qid));
   let stopped = null;
   const stop = () => stopped !== null;
   const worker = (attempt) => async (cand) => {
-    const row = await scoreQuery(cand, text, run, attempt, asker);
+    const row = await score(cand, attempt);
     write(row);
     existing.push(row);
     if (STOP_REASONS.has(row.reason) || row.status["402"]) stopped ??= `${row.reason ?? "http"} at qid ${row.qid}`;
@@ -184,7 +198,7 @@ export async function runAll({ run, cands, text, asker, write, existing = [], lo
   return { stopped };
 }
 
-function summarize(rows) {
+export function summarize(rows) {
   const latest = new Map();
   for (const r of rows) if (!latest.has(r.qid) || r.attempt > latest.get(r.qid).attempt) latest.set(r.qid, r);
   const unordered = [...latest.values()].filter((r) => !r.ordered).map((r) => r.qid);
@@ -314,10 +328,13 @@ async function selftest() {
   return bad.length ? 1 : 0;
 }
 
-const arg = process.argv[2];
-if (arg === "--selftest") process.exitCode = await selftest();
-else if (arg) process.exitCode = await live(arg);
-else {
-  console.error("usage: run.mjs --selftest | tool | tool-run2 | tool-run3");
-  process.exitCode = 2;
+// Imported by work/rerank-nevir/tool.mjs: dispatch only when run as the script.
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const arg = process.argv[2];
+  if (arg === "--selftest") process.exitCode = await selftest();
+  else if (arg) process.exitCode = await live(arg);
+  else {
+    console.error("usage: run.mjs --selftest | tool | tool-run2 | tool-run3");
+    process.exitCode = 2;
+  }
 }
