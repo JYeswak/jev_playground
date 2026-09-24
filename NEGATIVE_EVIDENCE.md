@@ -3743,3 +3743,36 @@ against Jev's 0.962), or when a later Jev model or adapter version is pinned.
 
 **NO-CLAIM.** Three Haiku runs within one hour, one sample, one wording, one Jev run (Jev's SciFact
 variance was not measured). This does not show Haiku matches Jev on AUC or ECE.
+
+## R90 — RETRACTED: Jev beats Haiku 4.5 on FEVER claim-verification AUC and Brier
+
+**Claim (`jev-wx5`, rows `aadd4d8`):** on 400 FEVER claim/evidence pairs, one Noul question at
+`jev-1.13.0` has significantly higher AUC (+0.003 to +0.031) and lower Brier (−0.023 to −0.002)
+than Haiku 4.5 via the adapter (paired bootstrap, 2,000 resamples), alongside an ECE WIN and an
+accuracy TIE.
+
+**Measured (2026-09-24, live, bead `jev-hg8`, bar `5167fe8` before any new call).** Two more Jev
+runs and two more Haiku runs on the same 400 pairs, plus the committed Jev rerun (`jev-5jp`), give
+4 Jev runs x 3 Haiku runs = 12 pairings. There were 1,600 new calls and 0 failed, with input tokens
+identical to run 1 per arm. AUC is WIN in 4/12 pairings and Brier in 9/12; the bar needed 12/12,
+so both are retracted. ECE is WIN in 12/12 and holds. Accuracy is TIE in 12/12, and no pairing
+gives Haiku a win, so `jev-wx5`'s PASS stands. Haiku's re-runs drive most of the change: Brier is
+TIE against its best run, H3. Jev's own variance alone retracts AUC (J2 x H1 TIE). Every
+pairing's direction favours Jev. The same unit re-confirms R89 (SciFact AUC 8/12, ECE 5/12) and
+holds SciFact Brier at 12/12.
+
+Receipt: `docs/demos/upstream-repro/noul-variance-20260924.md`. Re-score with no key:
+`python3 work/noul-variance/score.py`.
+
+**Consequence adopted:** state Noul against Haiku as "accuracy tied on both sets; better Brier on
+SciFact and better ECE on FEVER across 12 run pairings each; AUC on both sets, ECE on SciFact and
+Brier on FEVER favour Jev in direction but are not robust to re-runs". Do not cite `jev-wx5`'s
+single-run AUC or Brier interval as a win.
+
+**Retry condition.** Retry with a repeated-run design fixed in the bar (per-row noul averaged over
+k runs of each arm, or a bootstrap that resamples runs as well as rows), with a larger
+preregistered FEVER sample (Jev AUC 0.969 to 0.973 against Haiku 0.957 to 0.962), or when a
+later Jev model or adapter version is pinned.
+
+**NO-CLAIM.** Four Jev runs (one not at an independent time) and three Haiku runs within about an
+hour, one sample, one wording. This does not show Haiku matches Jev on FEVER AUC or Brier.
