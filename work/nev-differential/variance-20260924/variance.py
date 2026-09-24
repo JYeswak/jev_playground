@@ -98,6 +98,13 @@ def headroom(b, c):
 
 def main():
     runs = {k: load(*v) for k, v in RUNS.items()}
+    if runs["J1"] is None:
+        print(
+            f"NOT_RUN: J1 source {RUNS['J1'][1]} is absent. It lives in the vendored clone, which is not "
+            "committed here: git clone https://github.com/Gaurav-Gosain/jev-sec-bench jev-sec-bench && "
+            "git -C jev-sec-bench checkout fdb16b9"
+        )
+        return 2
     print(
         "Step 1: committed counts (noul >= 0.5 is injection; correct when it matches the label)"
     )

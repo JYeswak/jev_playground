@@ -150,5 +150,14 @@ tokens recorded. Zero Anthropic calls.
 
 **Boundary.** One public corpus, which may be in any model's training data. One battery and one cut.
 Haiku has 2 of 3 runs. The run-to-run stability table is descriptive and was not preregistered.
-Before close, this needs a keyless re-score from a fresh clone and a spot-check by someone other than
-the author. The bead stays open until H3 runs.
+Before close, this still needs a spot-check by someone other than the author. The bead stays open
+until H3 runs.
+
+**Fresh-clone re-score (author, keyless).** I cloned `git clone --local` at `4447b25` into
+`/tmp/rf57-clone`. The first run exited with a traceback, because J1's source,
+`jev-sec-bench/results/injection.json`, sits in a vendored clone that this repo does not commit. The
+committed `analyze_diff.py` reads the same file by absolute path. I fixed the scorer to exit 2 with
+`NOT_RUN`, naming the clone and the pin, instead of crashing. That was the only change, and it was
+made after the results. With `jev-sec-bench` cloned at `fdb16b9`, the fresh clone printed output
+byte-identical to the working tree: it reproduces 639 / 640 / 579 / 584 / 558, with grok-4 9/9 WIN,
+Haiku 6/6 WIN, and PROVISIONAL.
