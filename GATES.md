@@ -73,7 +73,9 @@ another agent is refused by `value-bearing-gates`. Wire it the day this lane get
 which is the same day `p12-loop-integrity` stops being N/A.
 
 Plus `commit-msg-verification-level.sh` on the commit edge and `sync-docs.sh --check` on the
-citation edge.
+citation edge. `githooks/pre-push` → `pre-push-ci-red-warning.sh` sits on the push edge and warns
+without blocking: a push to `main` while CI on main is RED prints the failing row from
+`scripts/ci-main-status.py` and asks for a fix or a named reason (`--selftest`, 5 arms, jev-rt33).
 
 | Gate | Edge it blocks | RED arm (the planted bad) | Wired where |
 |---|---|---|---|

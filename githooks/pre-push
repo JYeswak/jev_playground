@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# pre-push — warn, never block, when CI on main is RED (bead jev-rt33).
+#
+# Same resolution rule as githooks/commit-msg (measured there, bead cp-hfei): git invokes this
+# wrapper by the path it resolved from core.hooksPath, so dirname "$0" is always the githooks/
+# directory git actually chose, and the impl is its sibling by construction.
+#
+# Unlike commit-msg this wrapper FAILS OPEN, because it is a warning and not a gate: a missing impl
+# prints one NOT_RUN line, so the absent check is visible, and the push goes through.
+_hookdir=$(unset CDPATH; cd -- "$(dirname -- "$0")" && pwd)
+_impl="$_hookdir/pre-push-ci-red-warning.sh"
+if [ ! -x "$_impl" ]; then
+  printf 'CI status NOT_RUN: pre-push impl missing at %s\n' "$_impl" >&2
+  exit 0
+fi
+exec "$_impl" "$@"
