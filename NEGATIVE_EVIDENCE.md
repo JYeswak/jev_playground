@@ -3598,3 +3598,30 @@ flat is not available.
 **NO-CLAIM.** One grouping, depth 2, K = 3, one run, one wording, and parents described only by
 member-name lists. Flat's rows come from a separate earlier run, and run-to-run variance at 77-way
 is unmeasured. That no hierarchy can beat flat here is not shown.
+
+## R86 — FAILED BAR: a top-3 short list from Jev covers the true Banking77 intent at least 95% of the time
+
+**Claim (bead `jev-zfn`, bar `644a179`):** at 77 intents, showing a human Jev's top 3 is enough of a
+fallback, measured as top-3 recall >= 95% on all 3,080 test rows.
+
+**Measured (2026-09-24, offline, 0 calls, from the committed `jev-4jf` rows, `jev-1.13.0`).** Jev's
+top-3 recall is 2,804/3,080 = 91.0% (Wilson 90.0-92.0%), so the bar fails. Recall at other k: top-5
+93.5%, top-2 87.9%. Jev gives the true intent exactly 0 probability on 181 rows (5.9%), so no
+probability-ranked list shorter than all 77 can exceed 94.1%. Jev still beats Haiku at every k
+(top-3: 91.0% vs 84.5%, Holm p = 5e-35).
+
+Receipt: `docs/demos/upstream-repro/choice-banking77-topk-20260924.md`. Re-score:
+`python3 work/choice-banking77/score_topk.py`.
+
+**Consequence adopted:** do not build a 77-way router whose only safety net is "show the top 3".
+About 1 message in 11 has the truth missing from that list, and most of those have zero mass on the
+truth, so a longer list cannot recover them. The measured workable shape is: auto-route at
+confidence >= 0.99 (45% of messages at 97.0%), show the rest a top-3 list (85.7% contain the truth).
+
+**Retry condition.** Retry when a later Jev model is pinned, when the options carry written
+descriptions, or when a list is built from something other than Jev's probability ranking (for
+example, adding labels that frequently co-occur with the pick in confusions). Re-run
+`score_topk.py` on the new rows.
+
+**NO-CLAIM.** One run, one wording, undescribed options. Human picking from the list is modeled, not
+observed. This does not show that 95% is unreachable with a different model or prompt.
