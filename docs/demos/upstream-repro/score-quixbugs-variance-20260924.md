@@ -56,3 +56,58 @@ verdict. At the bar commit it does: 38/2/0, 28/10/2, 12 vs 2 WIN, AUC TIE, PASS.
 **NO-CLAIM.** Three runs per arm on one small public set (40 pairs), one question wording, one Jev
 version, one Haiku configuration, all within one hour. This measures sampling variance of the served
 models, not drift across days or versions.
+
+## Result
+
+Bar at `431a2fc`, committed before the first rerun call. Live, 2026-09-24, `[live]`. Four reruns in
+sequence: 320 calls, 320 answered, 0 failed, 0 resume passes. Every Jev row reports `jev-1.13.0`;
+every Haiku row reports `anthropic/claude-haiku-4-5`. Adapter debug was recorded on all 160 rerun
+Haiku rows: 0 had `probability_errors` set, 0 were zero-mass. Row files (sha256 prefixes):
+`rows-jev-run2.jsonl` `d9daeb65f467c059`, `rows-jev-run3.jsonl` `1e2b9c17e2dfc7dc`,
+`rows-haiku-run2.jsonl` `86b546749023a105`, `rows-haiku-run3.jsonl` `aa88356924029930`. Re-score with
+no key: `python3 work/score-quixbugs/variance.py`.
+
+| Arm | Run | W / L / T | Sign p | AUC | Tokens in / out |
+|---|---:|---|---:|---:|---|
+| Jev | 1 (`jev-2wc`) | 38 / 2 / 0 | 1.5e-09 | 0.739 | 35,623 / 1,440 |
+| Jev | 2 | 38 / 2 / 0 | 1.5e-09 | 0.724 | 35,623 / 1,440 |
+| Jev | 3 | 37 / 1 / 2 | 2.8e-10 | 0.731 | 35,623 / 1,440 |
+| Haiku | 1 (`jev-2wc`) | 28 / 10 / 2 | 0.0051 | 0.668 | 65,796 / 3,812 |
+| Haiku | 2 | 25 / 13 / 2 | 0.073 | 0.634 | 65,796 / 3,786 |
+| Haiku | 3 | 31 / 8 / 1 | 0.00029 | 0.683 | 65,796 / 3,749 |
+
+**R1, all 9 pairings.** Each pairing was scored on all pairs and with that Haiku run's zero-mass pairs
+dropped. There were none, so both columns agree.
+
+| Jev run | Haiku run | Pair ordering: Jev-only / Haiku-only, McNemar p | Ordering | AUC diff [95%] | AUC | Pass |
+|---:|---:|---|---|---|---|---|
+| 1 | 1 | 12 / 2, 0.013 | **WIN** | +0.070 [−0.003, +0.156] | TIE | PASS |
+| 1 | 2 | 14 / 1, 0.00098 | **WIN** | +0.105 [+0.023, +0.201] | WIN | PASS |
+| 1 | 3 | 8 / 1, 0.039 | **WIN** | +0.056 [−0.032, +0.159] | TIE | PASS |
+| 2 | 1 | 12 / 2, 0.013 | **WIN** | +0.056 [−0.018, +0.141] | TIE | PASS |
+| 2 | 2 | 13 / 0, 0.00024 | **WIN** | +0.090 [+0.013, +0.177] | WIN | PASS |
+| 2 | 3 | 8 / 1, 0.039 | **WIN** | +0.042 [−0.044, +0.140] | TIE | PASS |
+| 3 | 1 | 11 / 2, 0.023 | **WIN** | +0.063 [−0.008, +0.146] | TIE | PASS |
+| 3 | 2 | 13 / 1, 0.0018 | **WIN** | +0.097 [+0.021, +0.184] | WIN | PASS |
+| 3 | 3 | 8 / 2, 0.109 | TIE | +0.048 [−0.036, +0.145] | TIE | PASS |
+
+**Verdicts, per published metric:**
+- **Pair ordering WIN: DOWNGRADED.** WIN in 8 of 9 pairings, TIE in 1 (Jev run 3 vs Haiku run 3,
+  8 vs 2, p = 0.109), no LOSE. The headline becomes: Jev orders more QuixBugs pairs correctly than
+  Haiku in every pairing, significantly in 8 of 9. `NEGATIVE_EVIDENCE.md` R91.
+- **AUC TIE: stands.** WIN in 3 of 9 pairings (all three against Haiku run 2, Haiku's weakest), TIE
+  in 6, no LOSE. The direction favours Jev in all 9 (+0.042 to +0.105).
+- **PASS: holds, 9/9.** Every Jev run separates correct from buggy (37/1/2 to 38/2/0, AUC 0.724 to
+  0.739, every AUC CI above 0.5), and no pairing is a LOSE.
+
+**R2, flips.** Jev changes 2 to 4 pair outcomes and 1 to 4 rounded levels between runs. Haiku
+changes 13 to 15 pair outcomes and 20 to 24 rounded levels. In pair outcomes, Haiku's run-to-run
+spread is 3 to 7 times Jev's, and against a 1-pair headroom it decides the result alone: Haiku's
+separation ranges from 25/13 (p = 0.073, not significant on its own) to 31/8.
+
+**Spend.** 320 calls: Jev 160 (71,246 input / 2,880 output tokens), Haiku 160 (131,592 input / 7,535
+output). [INFERENCE] The Haiku arm is about $0.17 at list price.
+
+**Boundary.** Three runs per arm within minutes, 40 pairs, one wording, one Jev version, one Haiku
+configuration. The one TIE pairing is the pairing of both arms' third runs, so this is a sampling
+result, not a trend. A non-author spot-check is needed before the bead closes.

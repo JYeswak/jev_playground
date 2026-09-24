@@ -3776,3 +3776,31 @@ later Jev model or adapter version is pinned.
 
 **NO-CLAIM.** Four Jev runs (one not at an independent time) and three Haiku runs within about an
 hour, one sample, one wording. This does not show Haiku matches Jev on FEVER AUC or Brier.
+
+## R91 — DOWNGRADED: Jev orders QuixBugs correct/buggy pairs significantly better than Haiku 4.5
+
+**Claim (`jev-2wc`, rows `a2bee8b`):** over the 40 QuixBugs Python pairs, the jev-curate
+`code_quality` Score at `jev-1.13.0` orders more correct-vs-buggy pairs correctly than Haiku 4.5 via
+the adapter (Jev-only 12 vs Haiku-only 2, McNemar p = 0.013, WIN). There was 1 pair of headroom.
+
+**Measured (2026-09-24, live, bead `jev-kz50`, bar `431a2fc` before any rerun call).** Two more runs
+of each arm on the same 80 programs, 320 calls, 0 failed. Pair ordering: WIN in 8 of the 9 Jev-run x
+Haiku-run pairings, and TIE in one (both arms' third runs, 8 vs 2, p = 0.109). There is no LOSE, and
+Jev is ahead in all 9. The bar needed 9/9 to hold, and 5 to 8 means DOWNGRADED. The AUC TIE stands
+(WIN 3/9, all against Haiku run 2). PASS holds 9/9. Jev changes 2 to 4 pair outcomes between runs;
+Haiku changes 13 to 15.
+
+Receipt: `docs/demos/upstream-repro/score-quixbugs-variance-20260924.md`. Re-score with no key:
+`python3 work/score-quixbugs/variance.py`.
+
+**Consequence adopted:** state QuixBugs as "PASS; Jev orders more pairs correctly than Haiku in all
+nine run pairings, significantly in eight". Do not cite `jev-2wc`'s single-run p = 0.013 as an
+unconditional win.
+
+**Retry condition.** Retry with a repeated-run design fixed in the bar (for example, per-program
+score averaged over k runs of each arm before pairing), or with more pairs (QuixBugs has 40 Python
+pairs; its Java half, or another correct/buggy corpus, would add rows), or when a later Jev model is
+pinned.
+
+**NO-CLAIM.** Three runs per arm within minutes, one small public set, one wording. This does not
+show Jev and Haiku are equal at ordering pairs; the direction favours Jev in every pairing.
