@@ -78,4 +78,70 @@ generalize to every LLM.
 
 ## Result
 
-Pending the live run.
+Bar at `975cf81`, committed before any grok call. Live, 2026-09-24, `[live]`. Grok made 1,250
+calls, all answered, with 0 failed rows and 0 resume passes. Every row's provider-reported model is
+`grok-4.20-0309-non-reasoning`, with finish reason `stop`, one attempt and 0 transient retries.
+Rows: `work/second-incumbent/rows-sst5-grok.jsonl` (sha256 `287dea63…752d8b`) and
+`rows-clinc150-grok.jsonl` (sha256 `a0701551…569470`). Re-score with no key:
+`python3 work/second-incumbent/score_n4j.py`. Its Haiku self-checks reproduce on both units.
+
+**Adapter zero-mass: 0 rows on both units.** `probability_errors` was set on 0 of 500 SST-5 rows
+and 0 of 750 CLINC rows. No raw map summed to 0, and no SST-5 answer was a flat distribution. So
+the "zero-mass dropped" and "zero-mass = none" readings are identical to the as-shipped tables
+below, and the scorer prints all three.
+
+### SST-5 Score, N = 500 (Jev rows @ `576e60e`, `jev-1.13.0`)
+
+| Arm | Exact correct | MAE | p50 / p95 | Tokens in / out |
+|---|---:|---:|---|---|
+| Jev | 273/500 (54.6%) | 0.488 | (committed run) | |
+| grok-4.20 via adapter | 227/500 (45.4%) | 0.624 | 750 / 994 ms | 295,333 / 17,994 |
+| Haiku 4.5 via adapter, for reference (`jev-zui`) | 251/500 (50.2%) | 0.556 | 855 / 1,785 ms | 364,917 / 22,004 |
+
+| Jev vs grok | Jev-only / grok-only | p | Verdict |
+|---|---|---:|---|
+| Accuracy (McNemar) | 142 / 96 | 0.0035 | **WIN** |
+| MAE (sign test on per-row error) | 168 / 101 | 5.3e-5 | **WIN** |
+
+Pass rule: Jev beats both constants (unchanged from `jev-zui`), and grok wins neither test:
+**PASS**. **The MAE WIN holds against grok**, on all rows and with zero-mass rows dropped (0
+dropped). Accuracy, a TIE against Haiku, is a WIN against grok.
+
+### CLINC150 15 intents + out-of-scope, N = 750 (Jev rows @ `2842340`)
+
+| Arm | Overall correct | In-scope | OOS recall | OOS precision | p50 / p95 | Tokens in / out |
+|---|---|---:|---:|---:|---|---|
+| Jev | 688/750 (91.7%) | 395/450 | 293/300 | 293/310 | (committed run) | |
+| grok-4.20 via adapter | 668/750 (89.1%) | 373/450 | 295/300 | 295/327 | 1,066 / 1,467 ms | 558,472 / 79,912 |
+| Haiku 4.5, for reference (`jev-qw8`) | 681/750 (90.8%) | 389/450 | 292/300 | 292/310 | 1,260 / 2,155 ms | 800,996 / 81,445 |
+
+| Primary (constant 300) | Jev / grok | Jev-only / grok-only | McNemar p | Verdict |
+|---|---|---|---:|---|
+| Overall correct | 688 / 668 | 35 / 15 | 0.0066 | **WIN** |
+| Handled at peak >= 0.60 | 685 / 657 | 44 / 16 | 0.00039 | **WIN** |
+
+All three readings give the same numbers: as shipped, zero-mass = none, and zero-mass dropped.
+Feasibility is met, with in-scope accuracy 87.8% for Jev and 82.9% for grok. **PASS.** **The gated
+WIN holds against grok** under the unit's rule and with zero-mass rows dropped. Overall
+correctness, NON-INFERIOR against Haiku, is a WIN against grok. Grok refuses a little more than
+Haiku: out-of-scope recall is 295/300, but it answers "none" on 327 rows, 32 of them in-scope. It
+routes 22 fewer in-scope rows correctly than Jev.
+
+**Verdict** (`[live]`, grok N = 500 + 750, 2026-09-24, Jev rows as committed). Both wins that held
+against Haiku also hold against a second LLM family: xAI's `grok-4.20-0309-non-reasoning`, asked
+the identical question through the identical adapter. SST-5 MAE: WIN, p = 5.3e-5. CLINC150 handled
+at 0.60: WIN, p = 0.00039. Neither verdict leans on zero-mass rows, because grok produced none on
+these two sets. Against grok the margins are wider than against Haiku, and both units'
+second measures (SST-5 accuracy, CLINC overall) also become WINs. No `NEGATIVE_EVIDENCE.md` row
+is due. The README's "an LLM" wording for these two wins can now name two families: Haiku 4.5 and
+grok-4.20.
+
+**Spend.** 1,250 grok calls: 853,805 input / 97,906 output tokens (adapter totals). xAI's list
+price is not read here, so no dollar figure is given. No Jev or Haiku calls were made.
+
+**Boundary / NO-CLAIM.** One grok model (non-reasoning), one run per unit, one adapter version
+(`adffc2e`), Jev's single committed run per unit. Grok's run-to-run variance is not measured. On
+Yelp, Haiku's run-to-run variance alone was enough to flip a verdict (`jev-91u`). Here the grok
+margins (sign 168 vs 101, McNemar 44 vs 16) are far wider than one row, but that is an
+observation, not a variance measurement. Two families are not all LLMs. The OpenAI lineage is
+untested. A non-author spot-check is still pending before close.
