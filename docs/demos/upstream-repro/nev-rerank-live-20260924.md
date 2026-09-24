@@ -25,6 +25,51 @@ only; not a blocking filter.
 n=219 lexical-top1=71 (0.3242) random-expect=54.3. A Jev number below 71
 ties a word-count.
 
-## Results
 
-TBD — live run below.
+## Results (2026-09-24, model jev-1.13.0, 219 rows, 2 full runs)
+
+Runner `/tmp/k9z1-run.mjs` (score-pairs logic, OUT /tmp, concurrency 6).
+Run 1 untimed + run 2 with row latencies; tallies from run 2
+(`/tmp/k9z1-scores.jsonl`, recomputed by pane 4).
+
+| measure | value |
+|---|---|
+| rows ordered | 219/219, zero failures/throws |
+| Jev top-1 | 75/219 = 0.3425, Wilson 95% CI lower 0.2828 |
+| bar (lower-CI > 0.3242) | **FAIL** (0.2828 < 0.3242; +4 rows over lexical, noise) |
+| paired McNemar vs lexical | jev-only 38 / lex-only 34, n.s. — confirms the CI verdict |
+| latency per row | p50 1073ms / p95 5189ms / max 7278ms / min 223ms |
+| calls | 1660 passage-Score calls per run × 2 runs = 3320 |
+| tokens / dollars | NOT surfaced (`JevScoreResult`, index.ts:348-358, carries no usage field) — calls + latency stated instead |
+
+## L3 in real omp sessions
+
+Keyless direction: `ordered=false reason=unconfigured NOT_RUN`, input order
+returned (observed live in a fresh `--print` session; tool header comment
+states the contract).
+
+Keyed positive (`infisical run ... -- omp -p ... --print`, real session):
+
+```
+ordered=true calledModel=true
+1. [p01 0.917] This runtime frees memory by explicit ownership with no collector.
+2. [p02 0.457] This runtime uses a garbage collector to reclaim memory automatically.
+```
+
+Keyed negative (single passage; empty array behaves the same): schema
+validation refuses without throwing (exit 0, error frame, no exception):
+`passages must be at least length 2`. The tool-level `nothing-to-rank`
+path is unit-covered (`rank.test.mjs`, one passage never calls the model)
+but unreachable through the tool schema — refusal happens one layer out.
+
+## Verdict: bar FAILED, seat not claimed
+
+Jev 75/219 does not clear lexical 71/219 at 95% confidence; paired test
+agrees (38/34). The advisory stays advisory, which is what it already is.
+The bar is not moved.
+
+## Boundary
+
+One corpus (agent transcripts, unauthored but narrow), one model version,
+two full runs Tallied from run 2 only. No TF-IDF ranker exists — incumbent
+is lexical by construction. Dollars unpriced (no usage object). No Rust.
