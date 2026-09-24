@@ -110,4 +110,62 @@ reliable in general. No quality comparison with Jev or Haiku is made or implied.
 
 ## Results
 
-Pending the live run.
+Live lane. N = 50 rows per model. 2026-09-24, from 14:52 to 18:44 UTC (3 h 51 m, one process,
+`run_sst5.py --paced`). Model ids as in the table. Upstream providers are the ones OpenRouter
+reported. The table below is the output of `python3 work/openrouter/score_feasibility.py --run2`
+(`work/openrouter/score-feasibility-run2.txt`). The requests and 429-wait columns are summed from
+the row files' `requests` and `rateLimitWaits` fields.
+
+| Model | Answered | Failed, by verbatim class | Zero-mass | p50 / p95 ms (answered) | Upstream | Requests | 429 waits |
+|---|---:|---|---:|---|---|---:|---:|
+| `dots-studio/dots-3-note-preview:free` | 50/50 | 0 | 0 | 21493 / 35643 | AtlasCloud 50 | 50 | 0 |
+| `nex-agi/nex-n2.5-pro:free` | 29/50 | 21 `TypeSafeAPITimeoutError: Request timed out (timeout=120.0).` | 1 | 58959 / 108306 | Nex AGI 29 | 50 | 0 |
+| `nvidia/nemotron-3-super-120b-a12b:free` | 12/50 | 22 `TypeSafeAPITimeoutError` (120 s); 14 `TypeError: 'NoneType' object is not subscriptable`; 1 `TypeSafeAPIResponseValidationError: 200 Invalid response data at 'answers'.`; 1 `TypeSafeError: Expecting value: line 11 column 1 (char 55)` | 2 | 6607 / 53991 | Nvidia 12 | 50 | 0 |
+| `nex-agi/nex-n2.5-mini:free` | 50/50 | 0 | 2 | 4060 / 26290 | Nex AGI 50 | 50 | 0 |
+| `liquid/lfm-2.5-2.6b:free` | 49/50 | 1 `TypeSafeError: OpenAI chat completion did not complete: length.` | 4 | 29676 / 71240 | Liquid 49 | 51 | 1 (row 42, then answered) |
+| `qwen/qwen3.8-27b:free` | 0/50 | 5 `TypeSafeRateLimitError: 429 Provider returned error` (3 waits each); 45 not attempted (stopped: 5 consecutive) | 0 | none | not reported | 20 | 15 |
+| `google/gemma-4-31b-it:free` | 0/50 | 9 `TypeSafeRateLimitError: 429 Provider returned error`; 2 `TypeSafeAPIResponseValidationError: 200 Invalid response data at 'answers'.` (upstream Google AI Studio); 39 not attempted (stopped: 5 consecutive 429) | 0 | none | Google AI Studio on the 2 non-429 rows | 41 | 30 |
+| `google/gemma-4-26b-a4b-it:free` | 0/50 | 5 `TypeSafeRateLimitError: 429 Provider returned error` (3 waits each); 45 not attempted (stopped: 5 consecutive) | 0 | none | not reported | 20 | 15 |
+
+Flat and renormalized counts, and exact/MAE on the answered rows, are in the scorer output. They are
+descriptive only.
+
+**Against the preregistered bar (counts only).**
+
+- **50/50 answered and 0 zero-mass** (carries a 500-row arm):
+  `dots-studio/dots-3-note-preview:free`.
+- **>=49/50 answered** (the `jev-3e2i` gate): `dots-studio/dots-3-note-preview:free` (50, 0
+  zero-mass), `nex-agi/nex-n2.5-mini:free` (50, 2 zero-mass), `liquid/lfm-2.5-2.6b:free` (49, 4
+  zero-mass).
+- **>=49/50 answered and 0 zero-mass:** `dots-studio/dots-3-note-preview:free` only.
+
+**Harness facts observed.**
+
+- 332 HTTP requests in total, under the 599 cap. Every row file's `model` is a `:free` id (0 non-free
+  across 271 rows). The only request path is `PacedProvider.request`, which calls `require_free`
+  first.
+- The 15/min pacer never held a request: `pacerWaitMs` is 0 on every row, so no 60 s window ever
+  reached 15 request starts.
+- No row's stored error or retry reason carries `free-models-per-min`, the dominant class in
+  `jev-14qk`. The text of the waited 429s is not stored (see the next item).
+- 80 responses were 429: 61 were waited out and 19 failed their row. All 19 row-failing 429s
+  read `429 Provider returned error`. The text of a waited 429 is not stored. Of the 61 waits, 60
+  were the 60 s default because no `Retry-After` or `retry-after-ms` was sent. The exception is
+  lfm row 42: its 429 asked for 1 s, the row waited 1 s, and it then answered.
+- No adapter 408/5xx retry fired: requests equal rows plus 429 re-sends on every model.
+- The public model list read before the prereg lists the two gemma ids with `response_format` but
+  not `structured_outputs`. They ran as preregistered.
+- The account's `free_model_daily_requests` counter read `used` 144 (limit 1000) before and 381
+  after. It is the whole account's counter, not this process's alone.
+
+**Spend.** `GET /api/v1/key` `usage_daily` was **0.016185 before** (14:52:51Z) and **0.016185
+after** (18:44:56Z), a change of $0. `usage` stayed at 100.176529287.
+
+**Commits.** Prereg `d2cf882` (this file, before any call). Paced mode and guards `db6e4a7`
+(provider tests 9/9, with the planted guard removal turning red). Rows and scorer output `8c45cf4`.
+Results: the commit that adds this section.
+
+**Not run / not claimed.** No row was re-run, and no model was run a second time. 45 qwen, 39
+gemma-4-31b and 45 gemma-4-26b rows were never attempted, because the preregistered 5-consecutive
+stop fired. No accuracy comparison with Jev or Haiku was run. The 50-row numbers are one paced pass
+on one day, through shared free endpoints.
