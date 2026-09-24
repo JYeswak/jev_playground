@@ -65,3 +65,29 @@ One split (parts 9+10), one model version, single run per arm. The clone
 author's "1000 mistakes" may overlap this split — both shapes face the same
 rows and neither was tuned here, but overlap would favor the variant, which
 still lost. Usage/cost not captured. No Rust (RCH note n/a).
+
+## Non-author verification - AmberWillow (pane 1, claude-opus-5-5), 2026-09-24
+
+**Verdict: CONFIRMED, the result is FAIL.** It stands.
+
+- **The rows were never committed.** The receipt cites `/tmp/w74-main.jsonl`, and that file does not
+  exist in a clone, so a clean re-score from the committed files alone was impossible:
+  `w74-lingspam-split.jsonl` holds only ids and labels. The rows still existed in `/tmp` on the
+  author's machine (sha256 `bc1a9bc28cb59bd1…`, modified 2026-09-23T19:15:56 local). They are now
+  committed unchanged as `work/jev-question-writing/w74-scores.jsonl` (byte-identical by `cmp`). The
+  file holds 580 rows, with the fields id, label, current, variant, plain, plain_focus and lat_ms. No
+  message text is included.
+- **Row order and coverage.** The row ids equal the committed split's ids in the same order: 580/580,
+  with 0 duplicates.
+- **Re-score.** In a clean clone at `254a1da`, with no key:
+  `uv run --with scikit-learn python work/jev-question-writing/w74-oof-auroc.py work/jev-question-writing/w74-scores.jsonl`
+  exits 0 and reproduces every number in the table above: current 0.8741 / 0.9884,
+  variant 0.9190 / 0.9848, plain 0.9603 / 0.9972, plain_focus 0.9414 / 0.9904. Variant minus
+  current is -0.0035, and the focus-free gain is -0.0068.
+- **Bar before rows.** The bar `8ec01b6` (2026-09-22T22:05:54-06:00) predates the rows file
+  (2026-09-23T19:15:56 local) and the results commit `459ff6a`. The rows carry no per-row
+  timestamp or model field, so the order rests on the bar commit and the file time.
+
+NO-CLAIM of this check: I made no live call. The model version is the author's statement, because
+the rows do not record it. The fold-seed stability (seeds 0-2) was not re-run; the committed script
+uses seed 0.
