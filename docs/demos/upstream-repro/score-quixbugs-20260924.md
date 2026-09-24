@@ -165,3 +165,26 @@ real code has both. The as-shipped arm shows that matters. The 3.0-floor reading
 tool keeps comparing against the API's 0-based scale. QuixBugs is public and in both versions, so it
 may be in either model's training data. Nothing was tuned after the answers came back. The bead waits
 for a non-author re-score from the committed rows.
+
+## Non-author verification — Verifier3
+
+Verifier3 (background agent of pane 1, Anthropic model), 2026-09-24. Not the author of any row,
+script or bar text here. Everything ran in a fresh `git clone --local` of `743036f` under `/tmp`.
+No Jev or Haiku call was made. One public network fetch was made: the sampler's QuixBugs tarball,
+to rebuild the sample.
+
+| Check | Command | Result |
+|---|---|---|
+| Bar precedes data | `git show --stat 6ee168c a2bee8b` | bar `6ee168c` (21:05:09 −0600) holds sampler, runner, scorer, `sample.jsonl`; rows first appear in `a2bee8b` (21:06:48). In the live worktree the four `rows-*.jsonl` files were born 21:05:17 to 21:05:37 (`stat -f %SB`), after the bar commit. Rows carry no per-call timestamps. |
+| Bar text unedited | `git diff 6ee168c a2bee8b -- <receipt>`; `git diff a2bee8b 743036f -- <receipt> work/score-quixbugs` | the only hunk replaces the `## Results` placeholder line. Lines 1–93 are byte-identical, and nothing changed after `a2bee8b`. |
+| Re-score reproduces | `python3 work/score-quixbugs/score.py` (rc 0, no key) | every headline number matches the Results tables: Jev 38/2/0, sign p 1.49e-09, AUC 0.739 [0.683–0.812]; Haiku 28/10/2, p 0.0051, AUC 0.668; flat 35/3/2; as-shipped 26/12/2; McNemar 12 vs 2, p 0.0129 WIN; AUC diff +0.070 [−0.003, +0.156] TIE; overall PASS. The latency, token and distinct-score tables match. Row sha256s match the receipt's prefixes. |
+| Sample rebuilds | `python3 work/score-quixbugs/sample.py` (Python 3.9.6, tarball sha-checked) | `sample.jsonl` sha256 `89e4fc0b…ca099a1`, byte-identical to the committed file |
+| Truth labels | independent read of `sample.jsonl` | 40 `(truth=True, variant=correct)` and 40 `(False, buggy)`; each pair's canonical texts differ in exactly one changed or added line (`difflib`, max 2 `+/-` lines) |
+| 10 rows by hand | own script over `rows-jev.jsonl` / `rows-haiku.jsonl` | gcd 2.00>1.92 / 2.13>1.95; mergesort 1.98<1.99 / 2.89>2.17; next_palindrome 1.42<1.44 / 1.85>1.43; bitcount 1.99>1.96 / 2.06<2.10; quicksort 2.01>1.76 / 1.90<2.10; lis 1.02>1.01 / 1.90>1.30; sqrt 1.86>1.71 / 1.93<2.05; hanoi 1.93>1.82 / 2.82>2.63; flatten 1.99>0.99 / 2.95>1.10 (the buggy one yields `flatten(x)`); to_base 1.81>1.56 / 2.12>1.93. Jev's only two losses are mergesort and next_palindrome, by 0.01 and 0.02, as stated. Haiku's 10 losses have margins 0.01, 0.01, 0.04 … 0.25, so "8 of 10 by 0.04 to 0.25" holds. Returned `score` equals Σ level·p within 0.011 on 159/160 rows. Jev row 47 is off by 0.02 (1.23 vs 1.21) because the API's probabilities are rounded. The scorer uses the returned `score`, as the bar says. |
+| Zero-mass handling | adapter `upstream/typesafe-ai/system-one-adapter-python` @ `adffc2e` (the receipt's pin), `_client.py:311` and `_utils/probability_normalization.py:41,103` | debug is attached to every successful response. A zero-mass map has error 1.0 > tolerance, so it would appear in `probability_errors`. Here `probabilityError` is null on 80/80 Haiku rows and `originalProbabilities` is null on 80/80 (no rescale happened), so both "without" scorings correctly drop 0 pairs, as the bar requires. |
+| Constant arm | `node work/jev-prevalence-first/prevalence-check.mjs work/score-quixbugs/sample.jsonl --truth truth` | always-true 40/80, DEFERRED, as stated |
+| Spend arithmetic | row sums | Jev 35,623+34,930+43,511 = 114,064 in, 3×1,440 = 4,320 out; Haiku 65,796 / 3,812 |
+| NO-CLAIM vs what ran | receipt vs rows | one wording, one `jev-1.13.0` run and one Haiku run per arm, 40 pairs. The Boundary section names every limit that applies, and nothing in the rows goes beyond them. |
+
+**Verdict: CONFIRMED** (clean-clone keyless re-score, `[oracle]`). The PASS stands as written.
+Scratch left at `/tmp/v3-2wc.KhMZ` (not deleted).
