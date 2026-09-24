@@ -1,0 +1,51 @@
+{
+  "seed": 20260925,
+  "cutoff": "2026-09-24T17:45:00Z",
+  "eligible": 6,
+  "skipped": {
+    "used in jev-x86y or jev-0c6": 12,
+    "size outside 200KB-3MB": 79,
+    "written after CUTOFF": 2,
+    "fewer than 50 paired tool calls": 15
+  },
+  "screened_out_rider": [
+    {
+      "id": "01a0d38e",
+      "rider_path_calls": 5
+    },
+    {
+      "id": "01a0c006",
+      "rider_path_calls": 16
+    }
+  ],
+  "sessions": [
+    {
+      "path": "~/.omp/profiles/grok/agent/sessions/-Developer-jev/2026-09-24T01-05-33-538Z_01a0d0f2-4562-73cb-892b-a38587a9456c.jsonl",
+      "id": "01a0d0f2",
+      "bytes": 2677787,
+      "calls": 270,
+      "sha256": "d9b66b60130ab3354e52f27889c8cfeaf999ba0840a4bf7f041083384899ca89"
+    },
+    {
+      "path": "~/.omp/profiles/grok/agent/sessions/-Developer-jev/2026-09-24T07-11-56-859Z_01a0d241-b5bb-739a-8677-7822dd63c6ef.jsonl",
+      "id": "01a0d241",
+      "bytes": 2423905,
+      "calls": 132,
+      "sha256": "04d49d829451fbc5df245b9d982a9fde0718f2b85c122cb08c883f974af55ac6"
+    },
+    {
+      "path": "~/.omp/profiles/grok/agent/sessions/-Developer-jev/2026-09-24T08-29-10-856Z_01a0d288-6b48-73ad-992a-2ebb9b01382c.jsonl",
+      "id": "01a0d288",
+      "bytes": 2483839,
+      "calls": 114,
+      "sha256": "8e187915131a9332f5a84b357170780a5ec062a20f40e1806deef3e70b74cbe6"
+    },
+    {
+      "path": "~/.omp/profiles/muse/agent/sessions/-Developer-jev/2026-09-24T01-51-14-679Z_01a0d11c-18f7-7148-ae2e-c24c396a4201.jsonl",
+      "id": "01a0d11c",
+      "bytes": 1717733,
+      "calls": 133,
+      "sha256": "85b00d0eea579a1d87ce02ce246f8ca094880cd5e28280c42bf663fc84d5debf"
+    }
+  ]
+}
