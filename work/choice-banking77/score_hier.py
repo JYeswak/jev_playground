@@ -179,6 +179,11 @@ def main():
     for arm in ("flat", "beam"):
         top = ", ".join(f"{t}->{g} x{k}" for (t, g), k in conf[arm].most_common(5))
         print(f"top confusions {arm}: {top}")
+        cross = sum(
+            k for (t, g), k in conf[arm].items() if parent_of[t] != parent_of[g]
+        )
+        within = sum(conf[arm].values()) - cross
+        print(f"  {arm} errors: {cross} cross parents, {within} within the true parent")
 
     print()
     b, c, p = results["beam"]

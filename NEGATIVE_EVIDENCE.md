@@ -3545,3 +3545,38 @@ field list, or `models.md`'s price line names billing units, or when any row wri
 
 **NO-CLAIM.** One key, one model version, one night. That the field is never sent on any plan or
 endpoint is not shown.
+
+## R85 — REFUTED: a two-stage hierarchical Choice routes Banking77's 77 intents better than one flat Choice
+
+**Claim (bead `jev-5fm`):** following the vendor's hierarchical-classification cookbook (parent
+Choice, then child Choice, beam K=3) beats flat 77-way Jev routing (80.1%, `jev-4jf`).
+
+**Measured (2026-09-24, live, `jev-1.13.0`, N = 3,080, bar `60241f6` committed before any call).**
+Eight parents from a fixed keyword rule over the intent names (`work/choice-banking77/hierarchy.json`).
+
+| Route | Correct | Calls/query | Tokens in/out per query | p50/p95 ms |
+|---|---:|---:|---|---|
+| Flat | 2,467 (80.1%) | 1 | 956 / 754 | 153 / 299 |
+| Beam K=3 | 2,387 (77.5%) | 4 | 1,877 / 427 | 432 / 844 |
+| Greedy | 2,369 (76.9%) | 2 | 1,119 / 208 | 389 / 789 |
+
+- **Beam vs flat:** beam-only 72, flat-only 152, McNemar p = 9.6e-8. **WORSE THAN FLAT.**
+- The parent step ranks the true parent first on 89.8% of rows and in the top 3 on 97.3%.
+- Beam still loses on both kinds of error. It makes 297 errors that cross parents, against flat's
+  264, and 396 within the right parent, against flat's 349.
+
+Receipt: `docs/demos/upstream-repro/choice-banking77-hier-20260924.md`. Re-score with no key:
+`python3 work/choice-banking77/score_hier.py`.
+
+**Consequence adopted:** for a 77-label routing set, keep a single flat Choice (the vendor documents
+up to 255 options). Do not add a keyword hierarchy to raise accuracy: it costs 4x the calls and about
+3x the median latency, and it routes fewer rows correctly.
+
+**Retry condition.** Retry when either: a grouping that is not a name-keyword rule (for example, a
+semantic taxonomy written by someone other than the scorer, or clusters from the train split) is
+preregistered; or a later Jev model is pinned. Also retry if the label set grows past 255, where
+flat is not available.
+
+**NO-CLAIM.** One grouping, depth 2, K = 3, one run, one wording, and parents described only by
+member-name lists. Flat's rows come from a separate earlier run, and run-to-run variance at 77-way
+is unmeasured. That no hierarchy can beat flat here is not shown.
