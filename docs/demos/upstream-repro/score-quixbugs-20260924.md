@@ -93,4 +93,75 @@ training data, and the correct and buggy versions are both published.
 
 ## Results
 
-Pending: filled in after the arms run.
+The bar was committed at `6ee168c` before any arm made a call. All four arms ran on 2026-09-24
+between 03:05 and 03:06 UTC. Each answered 80/80 on the first pass with 0 error rows. Rows (sha256):
+`rows-jev.jsonl` `627c7b5c…4d8be3`, `rows-haiku.jsonl` `2e609be0…281b0cf`, `rows-jev-flat.jsonl`
+`695eac83…4820690e`, `rows-jev-asis.jsonl` `f85d9236…17296d3`, all under `work/score-quixbugs/`.
+Re-score with no key, in about 2 s: `python3 work/score-quixbugs/score.py`.
+
+| Arm | Pairs | W / L / T | Win rate | Sign p | AUC (80 programs) | AUC 95% | Mean score correct / buggy | Clears 3.0 correct / buggy |
+|---|---:|---|---:|---:|---:|---|---|---|
+| constant | 40 | 0 / 0 / 40 | 0.500 | 1 | 0.500 | — | — | — |
+| **Jev `jev-1.13.0`** (primary) | 40 | **38 / 2 / 0** | **0.950** | 1.5e-09 | **0.739** | 0.683–0.812 | 1.730 / 1.480 | 0 / 0 |
+| **Haiku 4.5 via adapter** (primary) | 40 | 28 / 10 / 2 | 0.725 | 0.0051 | 0.668 | 0.589–0.752 | 2.095 / 1.766 | 0 / 0 |
+| Jev, `jev-curate` line-trimmed text (descriptive) | 40 | 35 / 3 / 2 | 0.900 | 6.7e-08 | 0.715 | 0.652–0.790 | 1.650 / 1.417 | 0 / 0 |
+| Jev, files as shipped (descriptive) | 40 | 26 / 12 / 2 | 0.675 | 0.034 | 0.622 | 0.556–0.697 | 1.728 / 1.592 | 0 / 0 |
+
+| Arm | Answered | Model reported | p50 / p95 latency | Tokens in / out | Score range | Distinct scores |
+|---|---:|---|---|---|---|---:|
+| Jev | 80/80 | `jev-1.13.0` (all rows) | 147 / 534 ms | 35,623 / 1,440 | 0.87–2.01 | 56 |
+| Haiku | 80/80 | `anthropic/claude-haiku-4-5` | 903 / 3,253 ms | 65,796 / 3,812 | 0.37–2.95 | 44 |
+| Jev flat | 80/80 | `jev-1.13.0` | 127 / 432 ms | 34,930 / 1,440 | 0.79–1.96 | 56 |
+| Jev as shipped | 80/80 | `jev-1.13.0` | 137 / 332 ms | 43,511 / 1,440 | 0.82–2.07 | 49 |
+
+**Jev vs Haiku, same 40 pairs.** On pairs ordered correctly, Jev alone got 12 and Haiku alone got 2,
+McNemar p = 0.013: **WIN**. The AUC difference was +0.070, with a 95% interval of −0.003 to +0.156:
+**TIE**.
+
+**Adapter zero-mass check (jev-mly).** `debug` was recorded on 80/80 Haiku rows. `probability_errors`
+was set on 0 and zero-mass on 0, so both "without" scorings drop 0 pairs and are identical to the
+table above.
+
+**Pass rule applied.** (1) W 38 > L 2, sign p = 1.5e-09, AUC interval 0.683–0.812, entirely above 0.5:
+Jev separates. (2) No significant Haiku win: pair ordering is a Jev WIN and AUC is a TIE. Both
+scorings are identical. **PASS.** The preregistered `NEGATIVE_EVIDENCE.md` trigger did not fire.
+
+**What the numbers say, and what they do not.**
+- **Within a pair, the Score works.** Given the same program with and without its one-line bug, Jev
+  scores the correct one higher on 38 of 40 pairs. Its two misses are by 0.01 and 0.02 (`mergesort`
+  1.98 vs 1.99, `next_palindrome` 1.42 vs 1.44). Haiku gets 28, and 8 of its 10 misses score the
+  buggy version higher by 0.04 to 0.25.
+- **Across programs, the Score is a weak filter.** AUC over all 80 programs is 0.739. Scores sit in a
+  narrow band (Jev 0.87 to 2.01), and which program is scored matters more than whether it has its
+  bug. The score ranks a fix above its bug far better than it sets an absolute bar.
+- **`jev-curate`'s floor would reject everything.** The preset keeps a row only when `code_quality`
+  is at least 3.0. Read on the 0-based scale the API returns, 0 of 80 programs clear it on either arm,
+  correct ones included: Jev's highest score is 2.01 and Haiku's is 2.95. Fixing the request shape
+  (the upstream issue) is necessary but not sufficient. The floor also needs re-reading, as the issue
+  draft already warns.
+- **The tool's own preprocessing costs a little.** `jev-curate` strips every line's indentation
+  before sending. On that flattened text Jev still orders 35 of 40 pairs (3 losses, 2 ties),
+  against 38 of 40 on the indented text. Descriptive, one run.
+- **Documentation dominates the raw files.** Sent as shipped, where the buggy files carry a spec
+  docstring and some correct files carry alternative solutions, Jev orders only 26 of 40. The spec
+  docstring makes a buggy file look more complete. A filter fed raw repository files is measuring
+  documentation as much as correctness.
+
+**Verdict** (`[live]`, N=40 pairs / 80 programs per arm, 2026-09-24). `jev-curate`'s `code_quality`
+Score, sent in the list shape the API accepts, at `jev-1.13.0`, puts the correct QuixBugs program
+above its one-line-buggy twin on 38 of 40 pairs (sign p = 1.5e-09; AUC 0.739 over 80 programs,
+interval above 0.5). It beats Claude Haiku 4.5 on pair ordering, 12 vs 2 discordant (p = 0.013), and
+ties it on AUC. As shipped, the tool's 3.0 floor would still reject all 80 programs.
+
+**Spend.** 320 live calls. Jev: 240 calls, 114,064 input / 4,320 output tokens as the API reported
+(80 primary, 160 descriptive); at the $0.042 per 1M input rate stated in `jev-curate`'s README that is
+about $0.005. Haiku: 80 calls, 65,796 input / 3,812 output (adapter totals); [INFERENCE] about $0.09
+at $1 / $5 per million input / output tokens. Neither figure is an invoice.
+
+**Boundary.** 40 textbook algorithms, one bug each; one question wording (the tool's); one run per
+arm, so run-to-run variance was not measured, and it matters where Jev's losses and several wins are
+hundredths apart. The canonicalization is ours: `ast.unparse` removes comments and docstrings, and
+real code has both. The as-shipped arm shows that matters. The 3.0-floor reading assumes the fixed
+tool keeps comparing against the API's 0-based scale. QuixBugs is public and in both versions, so it
+may be in either model's training data. Nothing was tuned after the answers came back. The bead waits
+for a non-author re-score from the committed rows.
