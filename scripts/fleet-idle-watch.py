@@ -24,6 +24,13 @@ INTERVAL = int(os.environ.get("IDLE_INTERVAL", "60"))
 POLLS = int(os.environ.get("IDLE_POLLS", "2"))
 REALERT = int(os.environ.get("IDLE_REALERT", "600"))
 SPINNER = re.compile(r"^\s*[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]")
+# Comma list of pane indexes to watch; empty = every worker (index >= 2). Set it when some panes
+# are down for a known reason (2026-09-24: the five Muse panes hit a quota that resets 09-28).
+WATCH = {
+    int(p)
+    for p in os.environ.get("JEV_WATCH_PANES", "").split(",")
+    if p.strip().isdigit()
+}
 STATUS = re.compile(r"[◒◕]")  # the omp status line carries the model marker
 
 
@@ -62,7 +69,7 @@ def poll() -> dict[int, tuple[str, str]]:
     states = {}
     for row in out.splitlines():
         index, _, command = row.partition(" ")
-        if not index.isdigit() or int(index) < 2:
+        if not index.isdigit() or int(index) < 2 or (WATCH and int(index) not in WATCH):
             continue
         screen = subprocess.run(
             ["tmux", "capture-pane", "-p", "-t", f"{SESSION}:0.{index}"],
