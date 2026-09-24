@@ -235,16 +235,22 @@ fi
 # machine behaves another, with nothing to say so. That silent divergence is the reason the two
 # copies are tolerable at all, so it has to be RED, not a comment.
 drift=0
-for pf in .omp/rules/*.md; do
-  [ -e "$pf" ] || continue
-  sf="$HOME/.agents/rules/$(basename "$pf")"
-  [ -e "$sf" ] || continue
-  if cmp -s "$pf" "$sf"; then
-    note ok "no drift: $(basename "$pf") identical in both roots"; pass=$((pass+1))
-  else
-    note FAIL "DRIFT: $(basename "$pf") differs between project and ~/.agents — this repo and every other disagree"; fail=$((fail+1)); drift=$((drift+1))
-  fi
-done
+if [ "$(sys_rule_state "$SYS_ROOT" x.md)" = out-of-scope ]; then
+  # No system-wide copies exist to compare, so the guard has nothing to check: say so (jev-hjzz
+  # left this silent, and the SCOPE line undercounted by one group).
+  na_note "drift guard (project rules vs their ~/.agents/rules copies)"
+else
+  for pf in .omp/rules/*.md; do
+    [ -e "$pf" ] || continue
+    sf="$SYS_ROOT/$(basename "$pf")"
+    [ -e "$sf" ] || continue
+    if cmp -s "$pf" "$sf"; then
+      note ok "no drift: $(basename "$pf") identical in both roots"; pass=$((pass+1))
+    else
+      note FAIL "DRIFT: $(basename "$pf") differs between project and ~/.agents — this repo and every other disagree"; fail=$((fail+1)); drift=$((drift+1))
+    fi
+  done
+fi
 [ "$drift" -eq 0 ] || note FAIL "$drift rule(s) drifted across roots"
 
 # The guard's own RED arm, assembled at runtime, because a guard that has only ever gone green is
