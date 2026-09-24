@@ -84,7 +84,19 @@ def answered(path):
     return ids
 
 
-async def main(set_name, run, concurrency=8):
+async def main(set_name, run, concurrency=8, asker=None, bar_path=None, repo=None):
+    # Preregistration is the phase. A dirty or untracked bar panics here,
+    # before the provider exists, so the asker is never called.
+    sys.path.insert(0, os.path.join(ROOT, "work/sr-adopt"))
+    from phase_gate import call_after_bar
+
+    bar = bar_path or os.path.join(
+        ROOT, "docs/demos/upstream-repro/grok-incumbent-fever-yelp-b77-20260924.md"
+    )
+    if asker is not None:
+        return call_after_bar(bar, asker, repo=repo or ROOT)
+    call_after_bar(bar, lambda: None, repo=repo or ROOT)
+
     from system_one_adapter import AsyncSystemOneAdapterClient
     from system_one_adapter.providers.openai import AsyncOpenAIProvider
 
