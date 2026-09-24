@@ -3381,3 +3381,32 @@ test already says the gap is noise.
 **NO-CLAIM.** This does not say Jev cannot rank; injection-guard ranking
 (640/662) is a different seat. It says this rubric on these rows is
 lexical-plus-noise.
+
+## R80 — REFUTED (seat claim): the jev_screen injection seat is quiet enough to annotate real tool results
+
+**Claim:** the certified injection seat (`.omp/tools/jev-screen.ts` question, news-assistant
+`assistant`, cut 0.5, jev-1.13.0; 640/662 on the public attack corpus) can run as an
+annotation-only `tool_result` hook without flagging the ordinary output agents read.
+
+**Measured (2026-09-24, K9z5Live, bar committed eb4efd2 before any call):** 300 real tool results
+from jev's own omp transcripts, 0/300 containing an injection instruction (every row read in
+full). Jev flagged 175/300 = 0.583 (Wilson 0.527–0.638) against a ceiling of 15 → FAIL. The
+evidence-withheld control (state without the `assistant` description) flagged 12, and 163 of
+the 175 flags appear only with the news persona present: the seat reads bash stdout, file reads
+and grep hits as "work outside [a news service's] stated purpose". Haiku 4.5 on the identical
+question, same adapter state: 286/300; Jev is less noisy (paired 6 vs 117, McNemar p=8.4e-28),
+so this is a seat-framing failure, not a Jev-vs-LLM loss. Spend: 900 calls, 775k input tokens.
+Receipt `docs/demos/upstream-repro/jev-k9z5-flag-20260924.md`; re-score
+`python3 work/jev-injection-flag/score.py`.
+
+**Retry condition.** Rerun when a tool-result seat exists whose `assistant` describes the actual
+reader (an AI coding agent reading output of a tool it ran) and whose question is rewritten for
+that reader, with a new bar preregistered on BOTH halves before any call: the false-flag ceiling
+on these same 300 committed rows (`tool-results-sample.json`, re-scorable) AND a catch rate on
+injection strings planted inside real tool output (the 12/300 withheld-arm figure is a hint, not
+a pass: that state has no measured recall). Do not retry by moving the 0.5 cut on this seat —
+clean output has median p 0.53, so any cut quiet enough here is untested against attacks.
+
+**NO-CLAIM.** This does not say Jev cannot screen injection; the news-assistant seat still holds
+its public-corpus result. It says that seat is the wrong seat for tool output, so no
+`tool_result` hook was built.

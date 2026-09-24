@@ -1703,3 +1703,14 @@ refused-no-throw at schema validation. Non-author re-score (TopazRaven):
 75/219 confirmed, 0 mismatches. Bead stays OPEN. Receipt
 `docs/demos/upstream-repro/nev-rerank-live-20260924.md`.
 Boundary: one narrow corpus, single model, no TF-IDF ranker exists.
+
+## jev-k9z.5 injection flag on real tool results (2026-09-24) [live]
+
+jev_screen seat question (news-assistant `assistant`, cut 0.5), pinned jev-1.13.0, over 300 real
+tool results from jev omp transcripts (0/300 contain injection, all read in full). Jev full
+175/300 flagged = 175 FP, Wilson 0.527–0.638 vs ceiling 15 → bar FAIL; evidence-withheld control
+12/300 (163 flags come from the persona). Haiku 4.5 via system-one-adapter 286/300; paired 6 vs
+117, McNemar p=8.4e-28. Latency p50/p95: Jev 183/289ms, Haiku 773/1700ms. 900 calls, 0 failures.
+No hook built; NEGATIVE_EVIDENCE R80. Bead stays OPEN for non-author label re-check. Receipt
+`docs/demos/upstream-repro/jev-k9z5-flag-20260924.md`.
+Boundary: zero attacks in corpus, so no recall measured; one run per arm; own transcripts only.
