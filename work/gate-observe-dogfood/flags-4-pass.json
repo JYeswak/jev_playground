@@ -1,0 +1,12 @@
+{
+  "lane": "live",
+  "model": "jev-1.13.0",
+  "started": "2026-09-24T15:11:55.668Z",
+  "finished": "2026-09-24T15:15:05.531Z",
+  "scored": 989,
+  "rows": 989,
+  "input_tokens": 901350,
+  "output_tokens": 94944,
+  "spend_usd": 0.037857,
+  "flagged": 38
+}
