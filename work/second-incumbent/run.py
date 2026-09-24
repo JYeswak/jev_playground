@@ -11,11 +11,15 @@ llm_answer_mode="probabilities", normalize_probabilities=True, RetryPolicy().
 Inputs are read with `git show` from the commits the Haiku arms used, so they are byte-identical:
   scifact    work/noul-scifact/run.py @ 30eb285 (QUESTION, state), sample.jsonl @ 83a7295
   banking77  work/choice-banking77/run.py @ 3709ee6 (question, labels, state), subset.jsonl @ 3709ee6
+  sst5       work/score-sst5/run.py @ ae161b6 (QUESTION; state = the sentence), sample.jsonl @ ae161b6
+             (bead jev-n4j)
+  clinc150   work/choice-clinc150/run.py @ e0950ce (labels, question, state), subset.jsonl @ e0950ce
+             (bead jev-n4j)
 
 Run (live, needs XAI_API_KEY; never prints it):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
     upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python \
-    work/second-incumbent/run.py {smoke|scifact|banking77}
+    work/second-incumbent/run.py {smoke|scifact|banking77|sst5|clinc150}
 Resumes rows that already have an answer. Score with work/second-incumbent/score.py (keyless).
 """
 
@@ -41,6 +45,14 @@ PINS = {
     "banking77": {
         "runner": ("3709ee6", "work/choice-banking77/run.py"),
         "sample": ("3709ee6", "work/choice-banking77/subset.jsonl"),
+    },
+    "sst5": {
+        "runner": ("ae161b6", "work/score-sst5/run.py"),
+        "sample": ("ae161b6", "work/score-sst5/sample.jsonl"),
+    },
+    "clinc150": {
+        "runner": ("e0950ce", "work/choice-clinc150/run.py"),
+        "sample": ("e0950ce", "work/choice-clinc150/subset.jsonl"),
     },
 }
 
@@ -74,7 +86,7 @@ def answered(dataset):
         with open(out_path(dataset), encoding="utf-8") as fh:
             for line in fh:
                 r = json.loads(line) if line.strip() else {}
-                if "noul" in r or "choice" in r:
+                if "noul" in r or "choice" in r or "score" in r:
                     ids.add(r["i"])
     return ids
 
@@ -108,6 +120,26 @@ def setup(dataset):
             return {"noul": float(resp.answers[qname].noul)}
 
         return sample, questions, runner.state, to_row
+
+    if dataset == "sst5":
+        qname = runner.QNAME
+        questions = {qname: runner.QUESTION}
+
+        def to_row(item, resp):
+            ans = resp.answers[qname]
+            debug = resp.debug or {}
+            probs = {str(int(k)): float(v) for k, v in ans.probabilities.items()}
+            return {
+                "score": float(ans.score),
+                "confidence": float(ans.confidence),
+                "probabilities": dict(sorted(probs.items(), key=lambda kv: int(kv[0]))),
+                "probabilityError": (debug.get("probability_errors") or {}).get(qname),
+                "originalProbabilities": (
+                    debug.get("original_probabilities") or {}
+                ).get(qname),
+            }
+
+        return sample, questions, (lambda item: item["text"]), to_row
 
     label_map = runner.labels(sample)
     questions = runner.question(label_map)
@@ -253,8 +285,14 @@ async def smoke():
 
 
 def main(argv):
-    if len(argv) != 1 or argv[0] not in ("smoke", "scifact", "banking77"):
-        raise SystemExit("usage: run.py smoke|scifact|banking77")
+    if len(argv) != 1 or argv[0] not in (
+        "smoke",
+        "scifact",
+        "banking77",
+        "sst5",
+        "clinc150",
+    ):
+        raise SystemExit("usage: run.py smoke|scifact|banking77|sst5|clinc150")
     if not os.environ.get("XAI_API_KEY"):
         print("unconfigured: XAI_API_KEY is not set, no call made", file=sys.stderr)
         return 2
