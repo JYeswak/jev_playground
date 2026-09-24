@@ -591,8 +591,19 @@ changes. The change log lives in Appendix E.
 ## 12. Execution sign-off
 <!-- CHECK: SIGN-OFF -->
 
-Not signed. Phase A (measurement) may run on this draft because it writes only `notes/deep/` and
-changes no gate. Phases C and D wait for a sign-off line here dated after round 2.
+Signed 2026-09-24 by AmberWillow (pane 1, claude-opus-5-5), after two review rounds on other
+models. Round 1 had four reviewers on grok-4.7 and Muse Spark 1.3. Round 2 was RedMaple on
+grok-4.7, integrated at `789c17e`. Appendix E lists every change and its disposition.
+
+This sign-off is late, and it does not authorise work retroactively. Phases C and D (the kit-guard
+rebuild, the gate-path edits in `jev-80lj`, and the CI change) ran under Joshua's direct instruction
+on 2026-09-24 ("approval on all"), before this line existed. Each landed with its own non-author
+check, recorded on its bead.
+
+What it closes: the plan is execution-ready. `foundation/gates.sh` passes 17/17 locally at
+`9da0e2b`, and CI run 35978128518 at `9da0e2b` concluded success. The section 5 claims are still
+unregistered; each will be registered at enforce=yes or dropped with a NEGATIVE_EVIDENCE row
+(bead `jev-deep-kit-8q7`, RedMaple).
 
 ---
 
