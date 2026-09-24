@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""Live arms for bead jev-k3k: one Choice question over 10 Banking77 intents, two models.
+"""Live arms for beads jev-k3k (10 intents) and jev-4jf (all 77): one Choice, two models.
 
-Bar: docs/demos/upstream-repro/choice-banking77-20260924.md (committed before any call).
+Bars: docs/demos/upstream-repro/choice-banking77-20260924.md (--set subset, the default) and
+choice-banking77-full-20260924.md (--set full), each committed before its first call.
 Arms:
-  jev    typesafe-sdk-python TypeSafeClient, model pinned jev-1.13.0  -> rows-jev.jsonl
-  haiku  system-one-adapter-python, anthropic/claude-haiku-4-5,
-         llm_answer_mode="probabilities"                              -> rows-haiku.jsonl
+  jev    typesafe-sdk-python TypeSafeClient, model pinned jev-1.13.0
+  haiku  system-one-adapter-python, anthropic/claude-haiku-4-5, llm_answer_mode="probabilities"
+Rows: subset -> rows-{jev,haiku}.jsonl; full -> rows-full-{jev,haiku}.jsonl.
 Same state, same question, same labels in both arms. Resumes rows that already have a choice.
 
-Run (both arms):
+Run:
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
-    upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/choice-banking77/run.py [jev|haiku]
+    upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python \
+    work/choice-banking77/run.py [--set full] [jev|haiku]
 Never prints a key.
 """
 
@@ -34,16 +36,25 @@ JEV_MODEL = "jev-1.13.0"
 HAIKU_MODEL = "claude-haiku-4-5"
 INSTRUCTIONS = "The primary intent of this customer banking message"
 CONCURRENCY = 8
-FAIL_LIMIT = 4
+SETS = {
+    "subset": ("subset.jsonl", "rows-{arm}.jsonl"),
+    "full": ("full.jsonl", "rows-full-{arm}.jsonl"),
+}
 
 
-def load_rows():
-    with open(os.path.join(HERE, "subset.jsonl"), encoding="utf-8") as fh:
+def load_rows(fname):
+    with open(os.path.join(HERE, fname), encoding="utf-8") as fh:
         return [json.loads(line) for line in fh if line.strip()]
 
 
+def fail_limit(rows):
+    """More failed rows than 1% of the set is a failed run (4 of 400, 30 of 3080)."""
+    return len(rows) // 100
+
+
 def humanize(intent):
-    return intent.replace("_", " ")
+    """Underscores to spaces, lowercased (the source spells one intent Refund_not_showing_up)."""
+    return intent.replace("_", " ").lower()
 
 
 def labels(rows):
@@ -81,7 +92,7 @@ def record(path, row):
         fh.write(json.dumps(row, ensure_ascii=False) + "\n")
 
 
-def answer_row(item, label_map, ans, model, elapsed_ms, usage):
+def answer_row(item, label_map, ans, model, elapsed_ms, usage, extra=None):
     return {
         "i": item["i"],
         "intent": item["intent"],
@@ -93,14 +104,36 @@ def answer_row(item, label_map, ans, model, elapsed_ms, usage):
         },
         "latencyMs": elapsed_ms,
         "usage": usage,
+        **(extra or {}),
     }
 
 
-def run_jev(rows, label_map):
+def error_row(item, exc):
+    """Kept verbatim up to 1,000 chars so an option-count or schema cap is recorded as sent."""
+    return {
+        "i": item["i"],
+        "intent": item["intent"],
+        "error": f"{type(exc).__name__}: {str(exc)[:1000]}",
+    }
+
+
+def haiku_diagnostics(resp):
+    """What the adapter did to Haiku's raw map: retries, and the raw sum when it renormalized."""
+    debug = getattr(resp, "debug", None) or {}
+    if not isinstance(debug, dict):
+        debug = dict(debug) if hasattr(debug, "keys") else {}
+    original = (debug.get("original_probabilities") or {}).get("intent")
+    return {
+        "nRetries": int(getattr(resp.usage, "n_retries", 0) or 0),
+        "normError": float(debug.get("max_error", 0.0) or 0.0),
+        "rawSum": None if original is None else float(sum(original.values())),
+    }
+
+
+def run_jev(rows, label_map, path):
     if not os.environ.get("TYPESAFE_API_KEY"):
         print("unconfigured: TYPESAFE_API_KEY unset, no call made", file=sys.stderr)
         return 2
-    path = os.path.join(HERE, "rows-jev.jsonl")
     have = done_ids(path)
     todo = [r for r in rows if r["i"] not in have]
     print(f"jev: {len(todo)} to run, {len(have)} resumed", file=sys.stderr)
@@ -128,11 +161,7 @@ def run_jev(rows, label_map):
                 row = fut.result()
                 ok += 1
             except Exception as exc:  # noqa: BLE001 - recorded, scored as wrong
-                row = {
-                    "i": item["i"],
-                    "intent": item["intent"],
-                    "error": f"{type(exc).__name__}: {str(exc)[:200]}",
-                }
+                row = error_row(item, exc)
                 failed += 1
             record(path, row)
             if (ok + failed) % 50 == 0:
@@ -140,16 +169,15 @@ def run_jev(rows, label_map):
                     f"  jev {ok + failed}/{len(todo)} failed={failed}", file=sys.stderr
                 )
     print(f"jev done ok={ok} failed={failed}", file=sys.stderr)
-    return 3 if failed > FAIL_LIMIT else 0
+    return 3 if failed > fail_limit(rows) else 0
 
 
-def run_haiku(rows, label_map):
+def run_haiku(rows, label_map, path):
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("unconfigured: ANTHROPIC_API_KEY unset, no call made", file=sys.stderr)
         return 2
     from system_one_adapter import AsyncSystemOneAdapterClient
 
-    path = os.path.join(HERE, "rows-haiku.jsonl")
     have = done_ids(path)
     todo = [r for r in rows if r["i"] not in have]
     print(f"haiku: {len(todo)} to run, {len(have)} resumed", file=sys.stderr)
@@ -187,13 +215,10 @@ def run_haiku(rows, label_map):
                             f"anthropic/{HAIKU_MODEL}",
                             ms,
                             usage,
+                            haiku_diagnostics(resp),
                         )
                     except Exception as exc:  # noqa: BLE001 - recorded, scored as wrong
-                        return {
-                            "i": item["i"],
-                            "intent": item["intent"],
-                            "error": f"{type(exc).__name__}: {str(exc)[:200]}",
-                        }
+                        return error_row(item, exc)
 
             for coro in asyncio.as_completed([one(item) for item in todo]):
                 row = await coro
@@ -208,21 +233,29 @@ def run_haiku(rows, label_map):
                         file=sys.stderr,
                     )
         print(f"haiku done ok={ok} failed={failed}", file=sys.stderr)
-        return 3 if failed > FAIL_LIMIT else 0
+        return 3 if failed > fail_limit(rows) else 0
 
     return asyncio.run(go())
 
 
 def main(argv):
-    rows = load_rows()
+    argv = list(argv)
+    name = "subset"
+    if "--set" in argv:
+        at = argv.index("--set")
+        name = argv[at + 1]
+        del argv[at : at + 2]
+    fname, rows_pattern = SETS[name]
+    rows = load_rows(fname)
     label_map = labels(rows)
     arms = argv or ["jev", "haiku"]
     code = 0
     for arm in arms:
+        path = os.path.join(HERE, rows_pattern.format(arm=arm))
         if arm == "jev":
-            code = run_jev(rows, label_map) or code
+            code = run_jev(rows, label_map, path) or code
         elif arm == "haiku":
-            code = run_haiku(rows, label_map) or code
+            code = run_haiku(rows, label_map, path) or code
         else:
             print(f"unknown arm {arm!r}", file=sys.stderr)
             return 64

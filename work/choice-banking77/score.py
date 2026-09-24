@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Scorer for bead jev-k3k. Stdlib only, no key, no network.
+"""Scorer for beads jev-k3k (--set subset, default) and jev-4jf (--set full). Stdlib only.
 
 Reads subset.jsonl, rows-jev.jsonl, rows-haiku.jsonl (the last row per id that carries a
 choice wins; an id with no such row is a failed row and is scored wrong). Prints every number
 the receipt docs/demos/upstream-repro/choice-banking77-20260924.md reports, and the verdict
 under the bar preregistered there.
 
-Run: python3 work/choice-banking77/score.py
+Run: python3 work/choice-banking77/score.py [--set full]
 """
 
 import json
@@ -131,25 +131,40 @@ def arm_stats(name, subset, rows):
         "models": dict(models),
         "cov": cov,
         "per_i": correct,
+        "final": fin,
         "confusions": confusions,
     }
 
 
-def main():
-    subset = load("subset.jsonl")
+SETS = {
+    "subset": ("subset.jsonl", "rows-{arm}.jsonl"),
+    "full": ("full.jsonl", "rows-full-{arm}.jsonl"),
+}
+
+
+def is_flat(row):
+    """A returned distribution with every label at the same probability (confidence 0)."""
+    vals = list(row.get("probabilities", {}).values())
+    return bool(vals) and max(vals) - min(vals) < 1e-9
+
+
+def main(argv):
+    name = argv[argv.index("--set") + 1] if "--set" in argv else "subset"
+    fname, rows_pattern = SETS[name]
+    subset = load(fname)
     if not subset:
-        print("no subset.jsonl; run sample.py", file=sys.stderr)
+        print(f"no {fname}; run sample.py", file=sys.stderr)
         return 2
     counts = Counter(r["intent"] for r in subset)
     majority = sorted(counts, key=lambda c: (-counts[c], c.casefold(), c))[0]
     const_k = counts[majority]
     n = len(subset)
-    print(f"corpus: {n} rows, {len(counts)} intents")
+    print(f"corpus: {fname}, {n} rows, {len(counts)} intents")
     print(f"constant: always-{majority} {const_k}/{n} ({pct(const_k, n)})")
 
     arms = [
-        arm_stats("jev", subset, load("rows-jev.jsonl")),
-        arm_stats("haiku", subset, load("rows-haiku.jsonl")),
+        arm_stats("jev", subset, load(rows_pattern.format(arm="jev"))),
+        arm_stats("haiku", subset, load(rows_pattern.format(arm="haiku"))),
     ]
     print()
     print(
@@ -172,7 +187,7 @@ def main():
         ("confidence", "Coverage by each arm's returned `confidence` (preregistered)"),
         (
             "peak",
-            "Coverage by one formula for both arms, (p_max - 1/10)/(1 - 1/10) (descriptive)",
+            f"Coverage by one formula for both arms, (p_max - 1/{len(counts)})/(1 - 1/{len(counts)}) (descriptive)",
         ),
     ):
         print()
@@ -199,6 +214,42 @@ def main():
     print(
         f"paired: both correct {both}, jev-only {b}, haiku-only {c}, McNemar exact p = {p:.3g}"
     )
+
+    # Descriptive sensitivity (declared in both bars): rows an arm answered with a flat
+    # distribution, dropped from both arms, then credited to that arm as correct.
+    for a, other in ((haiku, jev), (jev, haiku)):
+        flat = {i for i, r in a["final"].items() if is_flat(r)}
+        seen = [i for i in flat if "rawSum" in a["final"][i]]
+        raw0 = sum(1 for i in seen if a["final"][i]["rawSum"] == 0)
+        raw = (
+            f"raw map summed to 0 in {raw0} of {len(seen)} recorded"
+            if seen
+            else "raw sum not recorded"
+        )
+        print(
+            f"flat {a['name']} rows: {len(flat)} ({raw}; "
+            f"{other['name']} correct on {sum(other['per_i'][i] for i in flat)} of them)"
+        )
+        if not flat:
+            continue
+        keep = [i for i in a["per_i"] if i not in flat]
+        jk = sum(jev["per_i"][i] for i in keep)
+        hk = sum(haiku["per_i"][i] for i in keep)
+        db = sum(1 for i in keep if jev["per_i"][i] and not haiku["per_i"][i])
+        dc = sum(1 for i in keep if haiku["per_i"][i] and not jev["per_i"][i])
+        print(
+            f"  dropped from both: jev {jk}/{len(keep)}, haiku {hk}/{len(keep)}, "
+            f"jev-only {db}, haiku-only {dc}, p = {mcnemar_exact(db, dc):.3g}"
+        )
+        credited = {i: (True if i in flat else a["per_i"][i]) for i in a["per_i"]}
+        jc = credited if a is jev else jev["per_i"]
+        hc = credited if a is haiku else haiku["per_i"]
+        cb = sum(1 for i in jc if jc[i] and not hc[i])
+        cc = sum(1 for i in jc if hc[i] and not jc[i])
+        print(
+            f"  credited to {a['name']}: jev {sum(jc.values())}/{n}, haiku {sum(hc.values())}/{n}, "
+            f"jev-only {cb}, haiku-only {cc}, p = {mcnemar_exact(cb, cc):.3g}"
+        )
 
     for a in arms:
         top = ", ".join(
@@ -229,4 +280,4 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))
