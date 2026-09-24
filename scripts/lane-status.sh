@@ -463,7 +463,9 @@ printf '\n%s\n' "---------------------------------------------------------------
 # REPORTED, and the exit code names which classes fired rather than which one was checked first.
 #   3 = missing receipt (alone)      6 = missing receipt AND missing concurrence
 #   4 = digest drift (alone)         7 = any other combination of two or more classes
-#   5 = missing concurrence (alone)
+#   5 = missing concurrence (alone)  12 = trace/value disagreement alone
+# A cited-line edit also drifts a pinned digest, so that plant is two classes and
+# exits 7. Both lines are still printed. 12 does not outrank 7 (jev-sjl8).
 fails=0
 if [ "$missing" -gt 0 ]; then
   printf 'FAIL: %d of %d STATUS rows cite a receipt that does not exist.\n' "$missing" "$rows"
@@ -481,8 +483,17 @@ if [ "$drifted" -gt 0 ]; then
   fails=$((fails+1))
 fi
 if [ "$value_bad" -gt 0 ]; then
-  printf 'FAIL: %d receipt(s) exist, match their digest, and disagree with the score column.\n' "$value_bad"
-  printf 'Existence and byte-identity are not agreement. The score is the expectation; the receipt value is not.\n'
+  if [ "$trace_bad" -gt 0 ]; then
+    if [ "$drifted" -gt 0 ]; then
+      printf 'FAIL: %d score(s) disagree with the trace, and %d receipt digest(s) also drifted.\n' "$value_bad" "$drifted"
+    else
+      printf 'FAIL: %d score(s) disagree with the trace.\n' "$value_bad"
+    fi
+  fi
+  if [ "$value_bad" -gt "$trace_bad" ]; then
+    printf 'FAIL: %d receipt(s) exist, match their digest, and disagree with the score column.\n' "$((value_bad - trace_bad))"
+    printf 'Existence and byte-identity are not agreement. The score is the expectation; the receipt value is not.\n'
+  fi
   fails=$((fails+1))
 fi
 # Schema is reported LAST but ranks FIRST in the exit code: a row of the wrong width makes every

@@ -226,9 +226,101 @@ else
   printf 'FAIL  %-48s rc=%s (want 11) or no UNSTABLE-SELF line\n' 'ARM 18 UNSTABLE-SELF' "$rc"
   fail=$((fail+1))
 fi
+
+# ARMS 19-25 — the trace join (jev-sjl8). Arms 1-18 use FIX-1, which shares no
+# candidate with the live trace, so they never enter the join. These fixtures
+# set JEV_TRACE and overlap it. A regression that skips the join, matches a
+# substring, or reports a trace miss as a digest-matched receipt stays green
+# without them.
+digest_of() { perl -0777 -pe 's/\s+\z//' "$1" | shasum -a 256 | cut -c1-16; }
+status_row() { # $1=id $2=score $3=receipt $4=digest
+  printf '%s\t2\t%s\tCLEARED\tCOD\t%s\t-\t\t%s\tmeasurement\n' "$1" "$2" "$3" "$4"
+}
+trace_row() { # $1=id $2=score $3=class $4=source
+  printf '%s\t%s\t%s\t%s\tnote\n' "$1" "$2" "$3" "$4"
+}
+trun() { JEV_STATUS="$TMP/status.tsv" JEV_TRACE="$TMP/trace.tsv" "$LS" 2>/dev/null; }
+texpect() { # $1=arm $2=want_rc $3=must-have pattern $4=must-not pattern (optional) $5=note
+  out=$(trun); rc=$?
+  ok=1
+  [ "$rc" = "$2" ] || ok=0
+  printf '%s\n' "$out" | grep -q "$3" || ok=0
+  if [ -n "${4:-}" ] && printf '%s\n' "$out" | grep -q "$4"; then ok=0; fi
+  if [ "$ok" = 1 ]; then
+    printf 'PASS  %-48s rc=%s %s\n' "$1" "$rc" "$5"
+  else
+    printf 'FAIL  %-48s rc=%s (want %s) pattern=%s\n' "$1" "$rc" "$2" "$3"
+    fail=$((fail+1))
+  fi
+}
+
+# ARM 19 — join green. One overlapping row, line contains the score, digest matches.
+printf 'the score is 900 here\n' > "$TMP/cited.txt"
+d=$(digest_of "$TMP/cited.txt")
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-G 900 "$TMP/cited.txt" "$d" >> "$TMP/status.tsv"
+printf 'candidate\tscore\tclass\tsource\tnote\n' > "$TMP/trace.tsv"
+trace_row ARM-G 900 CITED "$TMP/cited.txt:1" >> "$TMP/trace.tsv"
+texpect 'ARM 19 trace join green' 0 'value_checked: 1 of 1' 'disagree with the trace' '1 of 1, no trace FAIL'
+
+# ARM 20 — score edited. Receipt still says 900 and its digest matches; the score column is 901.
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-G 901 "$TMP/cited.txt" "$d" >> "$TMP/status.tsv"
+texpect 'ARM 20 score edited' 12 '<<< TRACE ARM-G' 'match their digest' 'rc 12, trace named, digest sentence absent'
+
+# ARM 21 — missing trace row, with another row overlapping so the join cannot skip.
+printf 'the score is 900 here\n' > "$TMP/other.txt"
+od=$(digest_of "$TMP/other.txt")
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-G 900 "$TMP/cited.txt" "$d" >> "$TMP/status.tsv"
+status_row ARM-MISS 900 "$TMP/other.txt" "$od" >> "$TMP/status.tsv"
+printf 'candidate\tscore\tclass\tsource\tnote\n' > "$TMP/trace.tsv"
+trace_row ARM-G 900 CITED "$TMP/cited.txt:1" >> "$TMP/trace.tsv"
+texpect 'ARM 21 missing trace row, overlap' 12 'missing trace row' 'match their digest' 'rc 12, the other row kept the join on'
+
+
+# ARM 22 — cited line edited, digest not re-pinned. Two classes: drift and trace. Exit 7, both lines.
+printf 'the score is 900.\n' > "$TMP/cited.txt"
+d=$(digest_of "$TMP/cited.txt")
+printf 'the score is 901.\n' > "$TMP/cited.txt"
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-G 900 "$TMP/cited.txt" "$d" >> "$TMP/status.tsv"
+printf 'candidate\tscore\tclass\tsource\tnote\n' > "$TMP/trace.tsv"
+trace_row ARM-G 900 CITED "$TMP/cited.txt:1" >> "$TMP/trace.tsv"
+out=$(trun); rc=$?
+if [ "$rc" = 7 ] && printf '%s\n' "$out" | grep -q 'drifted from their pinned digest' \
+  && printf '%s\n' "$out" | grep -q '<<< TRACE ARM-G'; then
+  printf 'PASS  %-48s rc=7 both drift and TRACE lines\n' 'ARM 22 line edited, digest stale'
+else
+  printf 'FAIL  %-48s rc=%s (want 7) or a required line is missing\n' 'ARM 22 line edited, digest stale' "$rc"
+  fail=$((fail+1))
+fi
+
+# ARM 23 — same line edit, digest re-pinned. Trace disagreement alone. Exit 12.
+d=$(digest_of "$TMP/cited.txt")
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-G 900 "$TMP/cited.txt" "$d" >> "$TMP/status.tsv"
+texpect 'ARM 23 line edited, digest re-pinned' 12 '<<< TRACE ARM-G' 'drifted from their pinned digest' 'rc 12, drift line absent'
+
+# ARM 24 — whole-number boundary. The line says 9001. Score 900 must not match inside it.
+printf 'the score is 9001.\n' > "$TMP/cited.txt"
+d=$(digest_of "$TMP/cited.txt")
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-G 900 "$TMP/cited.txt" "$d" >> "$TMP/status.tsv"
+texpect 'ARM 24 900 vs 9001' 12 '<<< TRACE ARM-G' '' 'substring 900 inside 9001 is not a match'
+
+# ARM 25 — DERIVED recompute red. round(1/2*1000)=500, status says 900.
+printf '%s\n' '{"main_correct": 1, "n": 2}' > "$TMP/derived.json"
+d=$(digest_of "$TMP/derived.json")
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-D 900 "$TMP/derived.json" "$d" >> "$TMP/status.tsv"
+printf 'candidate\tscore\tclass\tsource\tnote\n' > "$TMP/trace.tsv"
+trace_row ARM-D 900 DERIVED "$TMP/derived.json:/main_correct,/n" >> "$TMP/trace.tsv"
+texpect 'ARM 25 DERIVED recompute red' 12 '<<< TRACE ARM-D' 'match their digest' 'rc 12, formula did not yield 900'
+
 printf '\n%s\n' '----------------------------------------------------------------------'
 if [ "$fail" = 0 ] && [ "$transient" = 0 ]; then
-  printf 'OK: all four gates discriminate on all 18 arms.\n'; exit 0
+  printf 'OK: all four gates discriminate on all 25 arms.\n'; exit 0
 fi
 if [ "$fail" = 0 ]; then
   printf 'TRANSIENT: %d arm(s) could not be verified — HEAD moved during both attempts.\n' "$transient"
