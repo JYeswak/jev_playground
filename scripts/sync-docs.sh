@@ -225,10 +225,24 @@ record_repo() { # record_repo <name> <path>   ; path may be workspace-relative o
     "$HOME"/*) rec="\$HOME/${abs#"$HOME"/}" ;;
     *)         rec="$abs" ;;
   esac
-  local pinned upstream_sha behind
+  local pinned upstream_sha behind up_ref=FETCH_HEAD def fh line
   pinned="$(git -C "$abs" rev-parse --short HEAD)"
-  upstream_sha="$(git -C "$abs" rev-parse --short FETCH_HEAD 2>/dev/null || echo "$pinned")"
-  behind="$(git -C "$abs" rev-list --count "HEAD..FETCH_HEAD" 2>/dev/null || echo 0)"
+  # A full `git fetch origin` writes EVERY branch to FETCH_HEAD, all `not-for-merge` on a
+  # detached pin, so line 1 is whichever branch sorts first, not upstream. Measured 2026-09-24:
+  # typesafe-sdk-js recorded branch 'codex/npm-bootstrap' (0098f35, behind 1) as its upstream
+  # while main sat at the pin, so a second sync rewrote the row. Take the default branch's line.
+  # A single-SHA fetch (community clones) has no `branch '...'` line and keeps FETCH_HEAD.
+  # Both lookups legitimately find nothing (no origin/HEAD; a single-SHA fetch has no branch
+  # line), and under `set -euo pipefail` a failing $(...) assignment kills the whole sync.
+  def="$(git -C "$abs" symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || true)"
+  fh="$(git -C "$abs" rev-parse --git-path FETCH_HEAD 2>/dev/null || true)"
+  case "$fh" in /*) ;; *) fh="$abs/$fh" ;; esac
+  if [ -n "$def" ] && [ -f "$fh" ]; then
+    line="$(grep -F -m1 "branch '${def#origin/}' of " "$fh" 2>/dev/null || true)"
+    if [ -n "$line" ]; then up_ref="${line%%[[:space:]]*}"; fi
+  fi
+  upstream_sha="$(git -C "$abs" rev-parse --short "$up_ref" 2>/dev/null || echo "$pinned")"
+  behind="$(git -C "$abs" rev-list --count "HEAD..$up_ref" 2>/dev/null || echo 0)"
   printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$name" "$rec" "$pinned" "$upstream_sha" "$behind" \
     "$(repo_stamp "$name" "$rec" "$pinned" "$upstream_sha" "$behind")" >> "$REPO_MANIFEST"
   if [ "${behind:-0}" -gt 0 ]; then
