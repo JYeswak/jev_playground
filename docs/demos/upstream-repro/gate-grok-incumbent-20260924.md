@@ -82,4 +82,77 @@ measure sampling variance, not drift. T5 is not a same-question comparison.
 
 ## Results
 
-NOT_RUN. No grok call has been made.
+The bar was committed at `f1e0759` (2026-09-24 02:40:02 -0600) before any call. The first
+call started at 08:40:31Z. The six row files were written between 02:41:01 and 02:43:58
+-0600. 2,100 xAI calls, 0 failed, 0 refusals, no resume pass. No Jev call. Every scored
+row is `model: xai/grok-4.20-0309-non-reasoning`, `adapter_sha: adffc2e`,
+`variant: frozen`, and the pinned questions sha. `probabilityErrors` and
+`originalProbabilities` are empty on all 2,100 rows.
+
+Rows (sha256 prefix), all under `work/bicameral-gate/`: `grok-rows-real-run1.jsonl`
+`14560c591194`, `-run2` `07392b61524b`, `-run3` `abbfc6e205c2`, `grok-rows-b-run1.jsonl`
+`ed6ce120ecb8`, `-run2` `08d4e38f057a`, `-run3` `70b0e2acbf12`. Re-score with no key:
+`python3 work/bicameral-gate/score-grok-gate.py`. It first re-derives every cited run-1
+number.
+
+### Real 300, frozen questions
+
+| Run | FP /300 | Wilson 95% | Catch of 14 | git AUC | p50 / p95 ms |
+|---|---:|---|---:|---:|---|
+| grok 1 | 7 | 1.1–4.7% | 5 | 0.998 | 748 / 1,023 |
+| grok 2 | 5 | 0.7–3.8% | 4 | 1.000 | 769 / 1,081 |
+| grok 3 | 2 | 0.2–2.4% | 7 | 0.998 | 734 / 958 |
+| Jev 1–3 (committed, not re-run) | 7, 8, 6 | — | 7, 6, 6 | 1.000 | — |
+| Haiku 1 (committed, not re-run) | 58 | — | 13 | 0.998 | — |
+
+- **T1, grok passes the ≤ 15/300 nag bar: HOLDS (3/3).** FP is 7, 5 and 2.
+- **T2, grok flags more routine commands than Jev: ABSENT (0/9).** Grok-only vs Jev-only
+  on the 286 non-meeting commands runs from 1 vs 7 to 5 vs 5. No pairing has grok-only
+  greater and p < 0.05. The largest p the other way is 0.070 (1 vs 7).
+- **T3, the Haiku one-in-five trade: TRADE-ABSENT.** FP 2–7/300 is under both the 29 floor
+  and the 15 bar. Catch of the 14 is 4–7, under the 10 floor and in Jev's 6–7 band, not
+  Haiku's 13. Grok does not flag one routine command in five.
+
+### Sample B, frozen questions, both label sets
+
+| Run | Catch /100 | FA /300 | Catch /97 | FA /303 | p50 / p95 ms |
+|---|---:|---:|---:|---:|---|
+| grok 1 | 37 | 4 | 37 | 4 | 739 / 1,030 |
+| grok 2 | 35 | 3 | 35 | 3 | 717 / 1,037 |
+| grok 3 | 34 | 2 | 33 | 3 | 739 / 1,000 |
+| Jev frozen 1–3 (committed) | 41–46 | 2 | 40–46 | 2–3 | — |
+| Jev criteria 1–3 (committed) | 77–79 | 1 | 77–79 | 1 | — |
+| Haiku criteria 1 (committed, not this question set) | 84 | 20 | 83 | 21 | — |
+
+p50/p95 use the scorer's index convention (`int(0.5*n)`, `int(0.95*n)`), the same one
+`gate-variance.py` uses.
+
+- **T4, same frozen questions, catch-up: ABSENT (0/9) on both label sets.** Jev-only
+  catches exceed grok-only in every pairing (23 vs 27 up to 19 vs 32) and none of those
+  reverse differences reach p < 0.05 either (smallest 0.092). Nag: ABSENT (0/9) on both
+  label sets. Grok FA is 2–4/300 against Jev frozen 2/300.
+- **T5, CROSS-WORDING, grok frozen vs Jev criteria, catch-up: ABSENT (0/9) on both label
+  sets.** The other direction is large: Jev-criteria-only catches are 45–48 against
+  grok-only 2–5, every pairing p ≤ 4.2e-09. That is not a claim that criteria would
+  raise grok's catch. Grok was not sent criteria. Nag: ABSENT (0/9). Grok FA 2–4 against
+  Jev criteria FA 1, no pairing significant.
+
+### Verdict
+
+`[live]`, 2026-09-24, grok-4.20-0309-non-reasoning through system-one-adapter `adffc2e`,
+3 runs per set, 9 pairings against each committed Jev arm. **The published Haiku trade
+does not hold for this second family.** Haiku's committed real-300 arm flags 58/300
+routine commands and catches 13/14. Grok flags 2–7/300 and catches 4–7/14, inside the
+nag bar Jev passed and not separable from Jev's frozen arm on false alarms. On sample B
+the frozen-question grok catch is 34–37/100 at 2–4/300 false alarms, against Jev frozen
+41–46/100 at 2/300. The criteria comparison is cross-wording and is not a grok win.
+
+**Spend.** 2,100 xAI calls, 0 failed. Input 1,948,509 / output 91,604 tokens (adapter
+totals). xAI list price is not in this tree, so no dollar figure, the same boundary as
+`grok-variance-20260924.md`. No Jev call. No resume call.
+
+**Boundary.** The row-457 refusal path was not observed: zero 403s, so the one-resume
+rule was not exercised live. It is in the runner that was committed before the calls.
+Haiku was not re-run. Labels were not re-read. T5 is not evidence about criteria on an
+LLM. One repository's traffic. Three runs within about three minutes on one pin measure
+sampling variance, not drift.
