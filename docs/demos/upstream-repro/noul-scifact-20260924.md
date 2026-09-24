@@ -154,3 +154,21 @@ not equality. The binary collapse of CONTRADICT and NEI into "false" is ours; Sc
 label and rationale selection were not measured. The pairs are public and may be in either model's
 training data. Nothing was tuned after the answers came back. Awaiting a non-author re-score from the
 committed rows before the bead closes.
+
+## Non-author verification — VerifySST5
+
+VerifySST5 (background agent of pane 1; not the author), 2026-09-24, keyless, from a fresh
+`git clone --local` at `590f9c7` into a temp dir. No live call made; spend $0.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `env -u TYPESAFE_API_KEY -u ANTHROPIC_API_KEY python3 work/noul-scifact/score.py` in the clone | HOLDS. Jev 361/400, AUC 0.962, Brier 0.0709, ECE 0.0431; Haiku 351/400, AUC 0.934, Brier 0.1002, ECE 0.0854; constants 254/400. Seeded bootstrap intervals reproduce every cell of both tables: Jev AUC 0.942–0.979, Haiku 0.906–0.959; vs Haiku AUC +0.0080 to +0.0531, Brier −0.0473 to −0.0117, ECE −0.0646 to −0.0072; McNemar 19 vs 9, p = 0.0872 (TIE); `overall: PASS`. Row sha256 prefixes `120971ed` (jev) and `e04b0e8a` (haiku) match the receipt. The rows, `score.py` and this receipt are unchanged after `83a7295`; only `run.py` changed later, for the jev-k2q arms. |
+| 2 | `python3 work/noul-scifact/sample.py 400 20260924` | HOLDS. Tarball sha256 accepted, 1,259 pairs, rebuilt `sample.jsonl` sha256 `424caf18…88ed33`, identical to the committed file. |
+| 3 | Truth mapping | HOLDS. `sample.py:52-73`: gold is the pair's single rationale label (mixed labels are refused), NEI when there is no evidence entry, and `truth = gold == "SUPPORT"`. All 400 rows satisfy `truth == (gold == "SUPPORT")`: 146 SUPPORT true, 93 CONTRADICT and 161 NEI false. |
+| 4 | AUC ties | HOLDS. `score.py:35-52` assigns the average rank to each tie group (Mann-Whitney). An independent all-pairs count (ties count ½) gives 0.9622 (Jev) and 0.9336 (Haiku), matching 0.962 and 0.934. Ties matter here: Jev has 68 distinct values over 400 rows, Haiku 20. |
+| 5 | The one Haiku row at exactly 0.500 | HOLDS. It is the only one: i = 57, gold NEI (truth false). The bar's decision is `noul > 0.5`, so it counts as "no", which is correct; recounting with `> 0.5` gives 351/400 for Haiku, as reported. Jev has no row at 0.500. |
+| 6 | Bar before data | HOLDS. `15b0371` (20:31:02 −0600) is an ancestor of `83a7295` (20:33:27 −0600) and has no `rows-*.jsonl`. `run.py`, `score.py`, `sample.py` and `sample.jsonl` are byte-unchanged between the two, and the receipt diff only replaces "Pending the live run." under Results. |
+
+Verdict: the PASS reproduces from committed files under an unedited bar. Re-score:
+`python3 work/noul-scifact/score.py` (about 20 s). NO-CLAIM: this re-scores committed rows; it does not
+re-run either model, measure run-to-run variance, or re-adjudicate SciFact's labels.
