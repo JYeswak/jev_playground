@@ -150,3 +150,21 @@ options with written descriptions, run-to-run variance, Haiku in `discrete` answ
 LLM, calibration beyond the three coverage cuts, and cost from a bill. The flat-answer cause is
 inferred, not observed. The labels are PolyAI's and were not re-adjudicated. A non-author re-score
 from the committed rows is still pending, and the bead stays open until it is done.
+
+## Non-author verification — VerifySST5
+
+VerifySST5 (background agent of pane 1; not the author), 2026-09-24, keyless, from a fresh
+`git clone --local` at `9519e94` into a temp dir. No live call made; spend $0.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `env -u TYPESAFE_API_KEY -u ANTHROPIC_API_KEY python3 work/choice-banking77/score.py` in the clone | HOLDS. Jev 384/400 (96.0%, Wilson 93.6–97.5%), Haiku 362/400 (90.5%), constant 40/400; 0 failed rows either arm; paired both-correct 359, Jev-only 25, Haiku-only 3, McNemar exact p = 2.74e-05; `verdict: WIN`, `pass: PASS`. Both coverage tables, latency, tokens and top confusions match the Results section cell for cell. |
+| 2 | `python3 work/choice-banking77/sample.py --check` | HOLDS. Pinned source verified (3,080 rows, 77 intents, 40 each), same ten intents, `subset rows=400`, `check: identical`. |
+| 3 | Bar before data | HOLDS. `a0ed3c1` (20:23:53 −0600) is an ancestor of `3709ee6` (20:26:50 −0600); `a0ed3c1` has no `rows-*.jsonl`. `run.py`, `score.py`, `sample.py`, `subset.jsonl` are byte-unchanged between the two. The receipt diff changes one bar line, the heading ("committed before the first call" → "committed at `a0ed3c1`, before the first call"), and replaces the "Pending" line under Results; subset rule, arms, primary measure, McNemar, pass rule, 3.0 pp margin and coverage thresholds are unchanged. |
+| 4 | Spot-read of the 28 discordant rows (independent recount from the rows, not via `score.py`) | HOLDS. 28 = 25 Jev-only + 3 Haiku-only. Every row's `intent` equals `subset.jsonl`; every stored `choice` equals the first argmax of its `probabilities` in criteria order (400/400 each arm). 10 of the 25 Jev-only rows are flat Haiku rows (below). The other 15 are mostly `beneficiary_not_allowed` messages about blocked transfers or crypto buys that Haiku sent to `cancel_transfer`/`card_about_to_expire`, plus `age_limit` (i = 45, 58) read as `card_about_to_expire`. The 3 Haiku-only rows (i = 216, 225, 394) are Jev picking the neighbouring transfer or top-up intent. Some PolyAI labels are debatable (i = 214 "What are the rules for transferring to a beneficiary?" is labelled `beneficiary_not_allowed`), as the receipt says; labels were not re-adjudicated here either. |
+| 5 | The 14 flat Haiku rows | HOLDS. Exactly 14 Haiku rows have all ten probabilities equal (0.1), `confidence` 0.0, and stored `choice` `activate_my_card`: the first label in criteria order (`sorted(..., key=casefold)`), the adapter's `max(answers, key=probabilities.__getitem__)` tie result. None has truth `activate_my_card`, so all 14 score wrong. That follows the bar's rule: top-1 of an answered row, where only unanswered rows count as Failed. Jev is right on 10 of the 14 and has 0 flat rows. The sensitivity table re-derives exactly: dropped 374/386 vs 362/386, 15/3, p = 0.0075; credited 384/400 vs 376/400, 15/7, p = 0.134. |
+
+Verdict: the WIN/PASS reproduces from committed files under an unedited bar. Re-score:
+`python3 work/choice-banking77/score.py`. NO-CLAIM: this re-scores committed rows; it does not re-run
+either model, measure run-to-run variance, or re-adjudicate PolyAI's labels. The cause of the flat rows
+is still the receipt's [INFERENCE], not checked here.
