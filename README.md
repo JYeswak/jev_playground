@@ -107,7 +107,7 @@ Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right 
 
 Re-run, the grok-4 win holds: across three Jev runs (639, 640, 639) and three grok-4 runs (558, 554, 555), Jev wins all 9 pairings, the weakest at p = 2.0e-18, so the 558 in the table is grok-4's best of three; verified by a non-author. The Haiku win is provisional: it held in all 6 pairings that exist (weakest p = 4.9e-13), but the third Haiku run is blocked by the Anthropic account's spend cap until 2026-10-01, so 3 of the 9 pairings are missing (bead `jev-1y19`) ([variance](docs/demos/upstream-repro/injection-variance-20260924.md)).
 
-These re-score with no key. The fresh run reads only committed rows. The other two also read the public bench's own results file, which is not committed here, so clone it at its pinned commit first; `variance.py` says `NOT_RUN` and exits 2 without it. `analyze_diff.py` currently reads that file from a fixed path on the author's machine, so on yours it fails until that is fixed (bead `jev-x2kv`):
+These re-score with no key. The fresh run reads only committed rows. The other two also read the public bench's own results file, which is not committed here, so clone it at its pinned commit first; without it both say `NOT_RUN` and exit 2:
 
 ```bash
 git clone https://github.com/Gaurav-Gosain/jev-sec-bench jev-sec-bench && git -C jev-sec-bench checkout fdb16b9
