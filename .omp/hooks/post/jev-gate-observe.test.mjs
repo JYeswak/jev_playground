@@ -6,7 +6,7 @@ import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  BILLING_HOLD_MS, MAX_PREFIX, REAL_SAMPLE, ROW_KEYS, SIDECAR_KEYS, buildRow, defaultFilter, defaultSidecarAppend,
+  MAX_PREFIX, REAL_SAMPLE, ROW_KEYS, SIDECAR_KEYS, buildRow, defaultFilter, defaultSidecarAppend,
   loadFilters, makeFilter, makeHandler, observe, redact, resetBillingHold, resetKeyCache,
 } from "./jev-gate-observe.ts";
 const wrote = [];
@@ -281,7 +281,7 @@ test("resolver failure is cached, logged not-run, and does not throw", async () 
 });
 
 // jev-nhv9: 233 calls hit HTTP 402 over 4.5 h, one per bash command.
-test("a 402 holds further calls for the hold window, then exactly one call is made", async () => {
+test("a 402 holds further calls for 15 minutes, then exactly one call is made", async () => {
   resetBillingHold();
   let clock = 1_000_000;
   let calls = 0;
@@ -292,11 +292,13 @@ test("a 402 holds further calls for the hold window, then exactly one call is ma
     await observe({ toolName: "bash", input: { command: "ls" } }, { ...deps, asker: refused });
     assert.equal(calls, 1);
     assert.equal(wrote[0].row.status, "error");
-    clock += BILLING_HOLD_MS - 1;
+    // Literal 15 min, not the imported constant: a shorter window must fail here (ReadmeStrangerRun, 4a54bcb).
+    clock += 15 * 60 * 1000 - 1;
     await observe({ toolName: "bash", input: { command: "pwd" } }, { ...deps, asker: refused });
     assert.equal(calls, 1, "no call inside the hold");
     assert.equal(wrote[1].row.status, "not-run");
     assert.match(wrote[1].row.error, /^NOT_RUN reason=billing-hold until=/);
+    assert.equal(wrote[1].row.error, `NOT_RUN reason=billing-hold until=${new Date(1_000_000 + 15 * 60 * 1000).toISOString()}`);
     clock += 1;
     await observe({ toolName: "bash", input: { command: "date" } }, { ...deps, asker: scoredAsker });
     assert.equal(wrote[2].row.status, "scored", "the hold ends at the window");
