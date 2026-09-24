@@ -1,0 +1,33 @@
+{
+  "$schema": "https://jev.local/schemas/kit-guard.json",
+  "$comment": "W1.4 config-driven guard (plan docs/PLAN-DEEP-KIT-20260922.md:198). hookDir resolved at session start; here it is githooks, no leading dot. gatePaths lists this repo's real gate set, including this file itself (otherwise an agent can widen its own allowlist) and .git/hooks (defense in depth: the git-internal hook dir must stay blocked too). readOnlyBashAllow exempts the live pane-1 false positive (reproduced on the installed bashVerdict).",
+  "hookDir": "githooks",
+  "gatePaths": [
+    "foundation/gates.sh",
+    "foundation/gates.d/*",
+    "foundation/gates.d/*.exemptions",
+    "foundation/kit/check-*.sh",
+    "githooks/*",
+    ".git/hooks/*",
+    ".omp/config.yml",
+    ".omp/rules/kit-*.md",
+    ".omp/extensions/kit-guard/*",
+    ".omp/kit-guard.json"
+  ],
+  "requiredPatterns": [
+    "gate self-weakening",
+    "proof-class inflation",
+    "golden regeneration reflex",
+    "commit-stream pumping",
+    "tautological tests",
+    "easy-lever cherry-picking",
+    "close-pump abuse",
+    "scope-splitting",
+    "spec-editing as progress",
+    "conformance metastasis",
+    "dependency smuggling",
+    "bench-path hardcoding"
+  ],
+  "reanchorFiles": ["AGENTS.md", "GATES.md", ".beads/issues.jsonl"],
+  "readOnlyBashAllow": ["git config --get", "git config --list"]
+}

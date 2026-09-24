@@ -2,6 +2,11 @@
  * kit-guard: omp extension that makes the starter kit's honesty rules mechanical.
  * Install: copy this directory to <project>/.omp/extensions/kit-guard/ (or ~/.omp/agent/extensions/).
  * Written against @oh-my-pi/pi-coding-agent 18.2.10.
+ *
+ * W1.4: config-driven (plan docs/PLAN-DEEP-KIT-20260922.md:198). The protected
+ * set comes from `.omp/kit-guard.json`; a missing or malformed config fails
+ * closed (block and say why, never allow). KIT_GATE_EDIT=1 still only opens
+ * the B7 path gate; the B5 honesty gate (bash) has no override.
  */
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -9,10 +14,12 @@ import type { ExtensionAPI } from "@oh-my-pi/pi-coding-agent";
 import {
   agentsChangedMessage,
   bashVerdict,
+  buildReanchorMessage,
+  loadGuardConfig,
   missingPatterns,
   pathVerdict,
-  REANCHOR_AFTER_COMPACTION,
   targetPaths,
+  type GuardConfig,
 } from "./policy";
 
 function mtimeMs(path: string): number | undefined {
@@ -34,6 +41,15 @@ export function projectRoot(start: string): string {
   }
 }
 
+function loadConfigFor(root: string): { ok: true; cfg: GuardConfig } | { ok: false; reason: string } {
+  try {
+    return { ok: true, cfg: loadGuardConfig(root) };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return { ok: false, reason: `${msg}. Refusing to allow (fail-closed). A human with KIT_GATE_EDIT=1 must restore it.` };
+  }
+}
+
 export default function kitGuard(pi: ExtensionAPI) {
   pi.setLabel("kit-guard");
   const allowGateEdit = process.env.KIT_GATE_EDIT === "1";
@@ -43,16 +59,19 @@ export default function kitGuard(pi: ExtensionAPI) {
   pi.registerCommand("kit-guard", {
     description: "Show kit-guard status (gate-edit mode, AGENTS.md pattern check)",
     handler: async (_args, ctx) => {
+      const r = projectRoot(ctx.cwd);
       let missing: string[] = [];
       try {
-        missing = missingPatterns(readFileSync(join(projectRoot(ctx.cwd), "AGENTS.md"), "utf8"));
+        missing = missingPatterns(readFileSync(join(r, "AGENTS.md"), "utf8"));
       } catch {
         missing = ["(AGENTS.md not found)"];
       }
+      const cfg = loadConfigFor(r);
       ctx.ui.notify(
         `kit-guard: gate files ${allowGateEdit ? "WRITABLE (KIT_GATE_EDIT=1)" : "read-only"}; ` +
-          `AGENTS.md patterns ${missing.length === 0 ? "12/12 present" : `missing: ${missing.join(", ")}`}`,
-        missing.length === 0 ? "info" : "warning",
+          `AGENTS.md patterns ${missing.length === 0 ? "12/12 present" : `missing: ${missing.join(", ")}`}; ` +
+          `config ${cfg.ok ? "ok" : `MISSING (${cfg.reason})`}`,
+        missing.length === 0 && cfg.ok ? "info" : "warning",
       );
     },
   });
@@ -61,16 +80,29 @@ export default function kitGuard(pi: ExtensionAPI) {
     root = projectRoot(ctx.cwd);
     agentsSeenMtime = mtimeMs(join(root, "AGENTS.md"));
     if (allowGateEdit) ctx.ui.notify("kit-guard: KIT_GATE_EDIT=1, gate files are writable this session", "warning");
+    const cfg = loadConfigFor(root);
+    if (!cfg.ok) ctx.ui.notify(`kit-guard: ${cfg.reason}`, "warning");
   });
 
   pi.on("tool_call", async event => {
+    const cfg = loadConfigFor(root);
+    if (!cfg.ok) return { block: true as const, reason: cfg.reason };
     if (event.toolName === "bash") {
-      const v = bashVerdict(String((event.input as { command?: unknown }).command ?? ""));
+      const input = event.input;
+      let command = "";
+      if (input && typeof input === "object" && "command" in input && typeof input.command === "string") {
+        command = input.command;
+      }
+      const v = bashVerdict(String(command ?? ""), cfg.cfg);
       if (v) return v;
     }
     if (event.toolName === "edit" || event.toolName === "write") {
-      for (const p of targetPaths(event.input as Record<string, unknown>)) {
-        const v = pathVerdict(p, allowGateEdit);
+      const input = event.input;
+      const paths = targetPaths(
+        input && typeof input === "object" ? (input as Record<string, unknown>) : {},
+      );
+      for (const p of paths) {
+        const v = pathVerdict(p, allowGateEdit, cfg.cfg);
         if (v) return v;
       }
     }
@@ -80,7 +112,10 @@ export default function kitGuard(pi: ExtensionAPI) {
   // A9: after any edit to AGENTS.md, check the 12 forbidden patterns survived.
   pi.on("tool_result", async event => {
     if (event.toolName !== "edit" && event.toolName !== "write") return undefined;
-    const paths = targetPaths(event.input);
+    const input = event.input;
+    const paths = targetPaths(
+      input && typeof input === "object" ? (input as Record<string, unknown>) : {},
+    );
     if (!paths.some(p => p.replace(/\\/g, "/").endsWith("AGENTS.md"))) return undefined;
     let text = "";
     try {
@@ -89,7 +124,8 @@ export default function kitGuard(pi: ExtensionAPI) {
       return undefined;
     }
     agentsSeenMtime = mtimeMs(join(root, "AGENTS.md")); // the agent just wrote it; it knows the content
-    const missing = missingPatterns(text);
+    const cfg = loadConfigFor(root);
+    const missing = missingPatterns(text, cfg.ok ? cfg.cfg : undefined);
     if (missing.length === 0) return undefined;
     return {
       isError: true,
@@ -105,8 +141,13 @@ export default function kitGuard(pi: ExtensionAPI) {
 
   // Compaction is where process gets forgotten: re-anchor on the next turn.
   pi.on("session_compact", async () => {
+    const cfg = loadConfigFor(root);
     pi.sendMessage(
-      { customType: "kit-guard", content: REANCHOR_AFTER_COMPACTION, display: true },
+      {
+        customType: "kit-guard",
+        content: cfg.ok ? buildReanchorMessage(cfg.cfg) : "kit-guard: context was just compacted. Re-read AGENTS.md, GATES.md, and your bead before your next action.",
+        display: true,
+      },
       { deliverAs: "nextTurn" },
     );
   });
