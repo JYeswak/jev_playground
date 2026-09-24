@@ -9,7 +9,8 @@ and one row for every other `Run: `cmd`` in a TESTS.md entry (bullet or table ro
 names the entry's own tracked path, run verbatim and labelled `<path><rest of cmd>`, e.g.
 `work/oracle-kit/selector-guard.mjs --selftest`. A backticked command without `Run:` is prose.
 Prints one TSV row per command: path, rc, count, seconds, prerequisite, status.
-A missing prerequisite is SKIP, never a pass. Exit 0 only when every row is
+A missing prerequisite is SKIP, never a pass. A tool is probed with shutil.which on the PATH
+the suite command itself runs under, never a login shell. Exit 0 only when every row is
 PASS or SKIP. --selftest plants a failing assertion in /tmp and requires the
 command to exit nonzero and name that file.
 
@@ -17,7 +18,9 @@ Does not edit a gate. The stage to extend is 70-tests-registry-sync.
 """
 
 import json
+import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -193,27 +196,19 @@ def prerequisite(repo, path, command):
     repo = Path(repo)
     if path.endswith(".ts") and node_major() is not None and node_major() < 22:
         return "Node 22.18+ (README.md:26); this node is older"
-    if command.startswith("bun ") or " bun " in command:
-        if (
-            subprocess.run(
-                ["bash", "-lc", "command -v bun"], capture_output=True
-            ).returncode
-            != 0
-        ):
-            return "bun"
+    # shutil.which reads the PATH the suite command inherits. A login shell (`bash -lc`) re-derives
+    # PATH from /etc/profile (macOS path_helper adds /opt/homebrew/bin), finds a bun the suite
+    # cannot, and turns SKIP bun into six rc-127 FAILs for a stranger without bun (jev-zf6b).
+    uses_bun = command.startswith("bun ") or " bun " in command
+    if uses_bun and shutil.which("bun") is None:
+        return "bun"
     install = npm_install_need(repo, command)
     if install:
         return install
     if (command.startswith("node") or " node " in command) and node_major() is None:
         return "node"
-    if command.startswith("python"):
-        if (
-            subprocess.run(
-                ["bash", "-lc", "command -v python3"], capture_output=True
-            ).returncode
-            != 0
-        ):
-            return "python3"
+    if command.startswith("python") and shutil.which("python3") is None:
+        return "python3"
     if ".venv/bin/python" in command:
         binary = command.split()[0]
         if not (repo / binary).is_file():
@@ -512,6 +507,50 @@ def selftest():
     ):
         print("SELFTEST FAIL: bun path was not prefixed", file=sys.stderr)
         return 1
+    # A stranger's PATH with bash and sh but no bun or python3 (jev-zf6b): both rows must SKIP by
+    # name. The same PATH plus a planted bun and python3 must run them, so the probe reads the PATH
+    # the suite runs under rather than reporting absence. A login-shell probe finds
+    # /opt/homebrew/bin through path_helper here and the row FAILs rc 127.
+    stranger, planted = tmp / "stranger-bin", tmp / "planted-bin"
+    stranger.mkdir()
+    planted.mkdir()
+    for tool in ("bash", "sh"):
+        found = shutil.which(tool)
+        if found:
+            (stranger / tool).symlink_to(found)
+    for tool in ("bun", "python3"):
+        (planted / tool).write_text(f"#!/bin/sh\necho planted {tool}\nexit 0\n")
+        (planted / tool).chmod(0o755)
+    probes = (
+        ("work/plant/absent.test.ts", "bun test ./work/plant/absent.test.ts", "bun"),
+        (
+            "work/plant/absent_test.py",
+            "python3 -m unittest work/plant/absent_test.py",
+            "python3",
+        ),
+    )
+    saved = os.environ.get("PATH")
+    try:
+        for search, expect in (
+            (str(stranger), "SKIP"),
+            (f"{planted}{os.pathsep}{stranger}", "PASS"),
+        ):
+            os.environ["PATH"] = search
+            for path, command, tool in probes:
+                row = run_one(tmp, path, command)
+                if row["status"] != expect or (
+                    expect == "SKIP" and row["prerequisite"] != tool
+                ):
+                    print(
+                        f"SELFTEST FAIL: {tool} on PATH={search}: {row}",
+                        file=sys.stderr,
+                    )
+                    return 1
+    finally:
+        if saved is None:
+            os.environ.pop("PATH", None)
+        else:
+            os.environ["PATH"] = saved
     subprocess.run(
         [
             "git",
@@ -640,7 +679,8 @@ def selftest():
     print(
         "SELFTEST PASS planted failing assertion named work/plant/fail_test.py; "
         "Run:-only failure named work/plant/runonly.sh; "
-        "second Run: failure named work/plant/two.sh --selftest"
+        "second Run: failure named work/plant/two.sh --selftest; "
+        "PATH without bun or python3 SKIPs both by name, with them runs both"
     )
     return 0
 
