@@ -112,3 +112,7 @@ work/cass-mail-mines/exports/*.jsonl
 !work/cass-mail-mines/exports/*-meta.txt
 !work/cass-mail-mines/exports/cass-dig-sqlite-schema.json
 !work/cass-mail-mines/exports/cass-probe-*.json
+
+# STS-B sentence text is not ours to commit (mixed source licenses; see
+# docs/demos/upstream-repro/score-stsb-20260924.md). Labels and scores only.
+work/score-stsb/*.csv
