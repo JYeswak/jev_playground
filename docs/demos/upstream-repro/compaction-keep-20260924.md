@@ -124,3 +124,11 @@ seen a packet, no Jev call had been made, and no score existed.
   them, and `index.json` lists only the four.
 
 **NO-CLAIM.** Four sessions, not six. The rules, metrics and bar above are unchanged.
+
+**Disclosure: quoted source lines in `01a0d11c`** (pane 1's check against `rider-repos.txt`, before
+dispatch, recorded on `jev-jec6`).
+- Session `01a0d11c` passes the tool-input screen. It reads a jev file that quotes two single source
+  lines, one from `frankengraphdb` and one from `frankensim`, each with repo@sha provenance.
+- AGENTS.md allows reading another pane's report, so the session stays in.
+- The labellers' packet for it therefore contains those two quoted lines, and the replay will send
+  them to Jev inside that file's result.
