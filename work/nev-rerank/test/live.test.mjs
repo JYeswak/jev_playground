@@ -7,6 +7,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { liveAsker } from '../src/live.ts';
+import { requireSdkInstalled } from '../../sdk/require-installed.mjs';
+
+requireSdkInstalled();
 
 const fakeHeaders = () => ({ get: (n) => String(n).toLowerCase() === 'content-type' ? 'application/json' : null });
 const scoreAnswer = (top) => ({

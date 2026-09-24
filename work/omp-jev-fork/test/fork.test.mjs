@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import ompJevFork, { CHOICE } from "../src/index.ts";
+import { requireSdkInstalled } from "../../sdk/require-installed.mjs";
+
+requireSdkInstalled();
 
 const jsonResponse = (body) => new Response(body, {
   status: 200,

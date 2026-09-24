@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import ompJevReview, { setDiffRunner, isThinDiff, touchesCodeFile } from '../src/index.ts';
+import { requireSdkInstalled } from '../../sdk/require-installed.mjs';
+
+requireSdkInstalled();
 
 function host() {
   const rows = [];

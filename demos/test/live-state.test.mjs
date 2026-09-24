@@ -6,6 +6,7 @@ import { mkdtempSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { SDK_PREREQ } from '../../work/sdk/require-installed.mjs';
 
 // jev-s0f1 and jev-t6yt. The consistency demos' recorded answers judge a cookbook post and a cookbook
 // claim under the cookbooks' rubrics, so their --live lane must send that post / claim, in the
@@ -78,7 +79,7 @@ function runLive(name) {
   // client then refuses as sdk-missing before any request, so nothing is captured. Say that plainly
   // instead of failing on an empty capture.
   if (requests.length === 0 && /sdk-missing|@typesafe-ai\/sdk is not installed/.test(`${r.stdout}\n${r.stderr}`)) {
-    assert.fail('prerequisite missing: the TypeSafe SDK is not installed. Run `npm ci --prefix work/sdk` once, then re-run this test.');
+    assert.fail(SDK_PREREQ);
   }
   assert.equal(r.status, 0, `exit ${r.status}: ${`${r.stdout}\n${r.stderr}`.slice(-400)}`);
   assert.equal(requests.length, 3, 'three repeats, one request each');

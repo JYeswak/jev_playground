@@ -64,3 +64,14 @@ Measured survey time with prerequisites installed: 35.42s of suite time,
 
 The earlier table `registered-suites-20260924.tsv` is the `768fcd9` text-skip
 run. Pane 1 did not close on it. These two tables replace that measurement.
+
+## Named prerequisite (jev-w1js)
+
+The 13 suites call `work/sdk/require-installed.mjs`. A fresh clone of that
+tree: 62 pass, 25 skip, 0 fail, exit 0. Those 13 are SKIP
+`npm ci --prefix work/sdk`. Table:
+`docs/demos/upstream-repro/registered-suites-named-prereq-20260924.tsv`
+
+With the SDK installed, the same 13 pass (102 tests, 0 fail). A planted
+`assert.equal` regression in `default.test.mjs` with the SDK installed was
+FAIL, not SKIP (runner exit 1, that file rc 1). The plant was only in /tmp.
