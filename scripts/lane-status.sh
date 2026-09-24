@@ -273,15 +273,136 @@ print(int(v))' "$receipt" 2>/dev/null || echo SKIP)
   printf '  %-30s %-4s %-5s %-10s %-6s %s%s\n' "$cand" "$rung" "$score" "$verdict" "$author" "$blocked" "$mark"
 done < <(tr '\t' '\037' < "$STATUS")
 
+# Trace join (jev-6u0). The score column is a demand score. The independent
+# expectation is docs/demos/upstream-repro/status-score-trace-20260924.tsv, not
+# a new STATUS column. CITED and OTHER_RECEIPT: the cited line must still
+# contain the score as a whole number. DERIVED: recompute round(a/b*1000) from
+# the JSON pointers. A nonzero score with no trace row, or a line that no longer
+# matches, is a disagreement (exit 12, via value_bad). Score 0 is not checked.
+# A STATUS file that shares no candidate with the trace is a synthetic fixture
+# (the integrity selftests use FIX-1). Those skip the join. The live file, and
+# any copy of it, do not.
+TRACE="${JEV_TRACE:-docs/demos/upstream-repro/status-score-trace-20260924.tsv}"
+trace_checked=0
+trace_expected=0
+trace_bad=0
+join_trace=0
+if [ -f "$TRACE" ]; then
+  overlap=$(python3 -c '
+import sys
+ids=set()
+for line in open(sys.argv[2]):
+    if line.startswith("candidate") or not line.strip():
+        continue
+    ids.add(line.split("\t", 1)[0])
+hit=0
+for line in open(sys.argv[1]):
+    if line.startswith("#") or line.startswith("candidate"):
+        continue
+    if line.split("\t", 1)[0] in ids:
+        hit=1
+        break
+print(hit)
+' "$STATUS" "$TRACE")
+  if [ "$STATUS" = "docs/demos/STATUS.tsv" ] || [ "$overlap" = 1 ]; then
+    join_trace=1
+  fi
+elif [ "$STATUS" = "docs/demos/STATUS.tsv" ]; then
+  join_trace=1
+  trace_bad=1
+  value_bad=$((value_bad+1))
+  printf '  <<< TRACE MISSING %s\n' "$TRACE"
+fi
+if [ "$join_trace" = 1 ] && [ -f "$TRACE" ]; then
+  while IFS=$'\037' read -r kind cid detail; do
+    case "$kind" in
+      EXPECTED) trace_expected=$cid ;;
+      CHECKED) trace_checked=$cid ;;
+      BAD)
+        trace_bad=$((trace_bad+1))
+        value_bad=$((value_bad+1))
+        printf '  <<< TRACE %s\n' "$detail"
+        ;;
+    esac
+  done < <(python3 -c '
+import json, re, sys
+status, trace = sys.argv[1], sys.argv[2]
+rows = {}
+for line in open(trace):
+    if not line.strip() or line.startswith("candidate"):
+        continue
+    c = line.rstrip("\n").split("\t")
+    rows[c[0]] = {"cls": c[2], "source": c[3], "note": c[4] if len(c) > 4 else ""}
+
+def whole(text, score):
+    return re.search(r"(?<![\d.])%s(?![\d.])" % score, text) is not None
+
+expected = checked = 0
+for line in open(status):
+    if line.startswith("#") or line.startswith("candidate"):
+        continue
+    c = line.rstrip("\n").split("\t")
+    if len(c) < 3:
+        continue
+    try:
+        score = int(c[2])
+    except ValueError:
+        continue
+    if score == 0:
+        continue
+    expected += 1
+    cid = c[0]
+    t = rows.get(cid)
+    if t is None:
+        print("BAD\037%s\037%s missing trace row" % (cid, cid))
+        continue
+    checked += 1
+    src = t["source"]
+    if ":" not in src:
+        print("BAD\037%s\037%s trace source has no locator" % (cid, cid))
+        continue
+    path, loc = src.rsplit(":", 1)
+    ok = False
+    why = t["cls"]
+    try:
+        if t["cls"] in ("CITED", "OTHER_RECEIPT"):
+            lines = open(path, encoding="utf-8").read().splitlines()
+            n = int(loc)
+            text = lines[n - 1] if 1 <= n <= len(lines) else ""
+            ok = whole(text, score)
+            why = "%s %s:%s" % (t["cls"], path, loc)
+        elif t["cls"] == "DERIVED":
+            data = json.load(open(path, encoding="utf-8"))
+            ptrs = [p.strip().lstrip("/") for p in loc.split(",") if p.strip()]
+            vals = [data[p] for p in ptrs]
+            got = round(vals[0] / vals[1] * 1000)
+            ok = got == score
+            why = "DERIVED round(%s/%s*1000)=%s" % (vals[0], vals[1], got)
+        else:
+            why = "class %s does not source score %s" % (t["cls"], score)
+    except Exception as exc:
+        why = "%s %s" % (t["cls"], exc)
+    if not ok:
+        print("BAD\037%s\037%s %s" % (cid, cid, why))
+print("EXPECTED\037%d\037" % expected)
+print("CHECKED\037%d\037" % checked)
+' "$STATUS" "$TRACE")
+fi
+
 printf '\nRECEIPT VERIFICATION (existence and integrity are SEPARATE claims — do not read one as the other)\n'
 printf '  existence_checked: %-4d missing:  %d\n' "$with_receipt" "$missing"
 printf '  integrity_checked: %-4d drifted:  %d   (content-normalised sha256; terminal whitespace stripped)\n' "$pinned" "$drifted"
 printf '  NOT integrity-checked (no pinned digest): %d   <- existence proven, bytes unverified\n' "$unpinned"
-# The value check only fires on a receipt with a top-level numeric "value". Say how many did, so a
-# green run cannot be read as "every row's number agrees with its receipt" (jev-6u0: at 40cb421 it
-# was 0 of 41; no receipt has a top-level "value", and none of the 7 JSON receipts holds its row's
-# score as any numeric field).
-printf '  value_checked: %-4d disagree: %d   (of %d integrity-checked; the rest have no top-level numeric "value", so their score is NOT checked)\n' "$value_checked" "$value_bad" "$pinned"
+# Coverage is the trace join, not a top-level JSON "value" key. That key is
+# absent from every production receipt, so counting it made a green run look
+# like agreement (jev-6u0). Score 0 is the unscored value and is not checked.
+if [ "$join_trace" = 1 ]; then
+  printf '  value_checked: %d of %d value-checked, disagree: %d   (trace join on nonzero scores; score 0 is not checked)\n' \
+    "$trace_checked" "$trace_expected" "$trace_bad"
+else
+  printf '  value_checked: %-4d disagree: %d   (of %d integrity-checked; fixture has no trace overlap, so the trace join did not run)\n' \
+    "$value_checked" "$value_bad" "$pinned"
+fi
 printf '\nKILL CONCURRENCE (§3c rule 3, demoted to guidance — checked mechanically, not by a volunteer)\n'
 printf '  ruled_out rows: %-4d missing kill_concurrence: %d\n' "$ruled_out" "$concur_missing"
 printf '\nSCHEMA (exact width — a row of the wrong width makes every other counter on it unreliable)\n'
