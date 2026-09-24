@@ -19,3 +19,10 @@ any gain.
 Bar: {what,includes}+focus variant matches-or-beats the current shape on
 the held-out lingspam split by logreg OOF AUROC (no regression vs
 current). Fails on any regression or on gain in the focus-free negative.
+
+## jev-deep-kit-8q7.10 — framing stability on 4 code-touching refusals
+
+Bar: re-ask applicability on f0fcf328, 66fa05d9, 35f86884, 7ddb7ded with
+reworded question, same state, jev-1.13.0. If >=2 of 4 flip across 0.5,
+the gate is framing-unstable on code-mixed diffs (recommend revision);
+else stable. 8 live calls max.
