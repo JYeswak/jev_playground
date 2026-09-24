@@ -1,1 +1,223 @@
-{"automatic":"4/14 questions hold a non-uncertain plurality","band":[0.3,0.7],"call_count":3,"calls":"one askJevBundle per repeat (14 Noul questions each)","command":"node demos/consistency-noul/demo.mjs --live","date":"2026-09-22","lane":"live","model":"jev-1.13.0","questions":{"covered":{"agree":"100%","nouls":[0.39,0.39,0.39],"plurality":"uncertain"},"deductible":{"agree":"100%","nouls":[0.58,0.6,0.59],"plurality":"uncertain"},"docs_sufficient":{"agree":"100%","nouls":[0.15,0.14,0.14],"plurality":"no"},"exclusion":{"agree":"100%","nouls":[0.32,0.32,0.33],"plurality":"uncertain"},"fraud_flag":{"agree":"100%","nouls":[0.27,0.26,0.29],"plurality":"no"},"human_review":{"agree":"100%","nouls":[0.37,0.36,0.37],"plurality":"uncertain"},"line_items_sum":{"agree":"100%","nouls":[0.45,0.45,0.45],"plurality":"uncertain"},"manual_review":{"agree":"100%","nouls":[0.46,0.45,0.46],"plurality":"uncertain"},"on_circuit":{"agree":"100%","nouls":[0.28,0.27,0.28],"plurality":"no"},"rental_eligible":{"agree":"100%","nouls":[0.39,0.38,0.39],"plurality":"uncertain"},"reported_timely":{"agree":"100%","nouls":[0.55,0.55,0.55],"plurality":"uncertain"},"subrogation":{"agree":"100%","nouls":[0.28,0.27,0.27],"plurality":"no"},"within_limit":{"agree":"100%","nouls":[0.55,0.54,0.56],"plurality":"uncertain"},"within_window":{"agree":"100%","nouls":[0.59,0.59,0.6],"plurality":"uncertain"}},"repeats_run":3}
+{
+ "automatic": "10/14 questions hold a non-uncertain plurality",
+ "band": [
+  0.3,
+  0.7
+ ],
+ "call_count": 3,
+ "call_count_basis": "measured: a fetch-capturing preload counted 3 systemOne requests, 3 HTTP 200; one askJevBundle per repeat",
+ "calls": "one askJevBundle per repeat (14 Noul questions each, the cookbook's)",
+ "command": "node demos/consistency-noul/demo.mjs --live",
+ "date": "2026-09-24",
+ "demo_sha": "e537422",
+ "lane": "live",
+ "model": "jev-1.13.0",
+ "model_resolved": {
+  "jev-1.13.0": 3
+ },
+ "questions": {
+  "covered": {
+   "agree": "100%",
+   "decisions": [
+    "uncertain",
+    "uncertain",
+    "uncertain"
+   ],
+   "nouls": [
+    0.49,
+    0.46,
+    0.44
+   ],
+   "plurality": "uncertain"
+  },
+  "deductible": {
+   "agree": "100%",
+   "decisions": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "nouls": [
+    0.78,
+    0.79,
+    0.77
+   ],
+   "plurality": "yes"
+  },
+  "docs_sufficient": {
+   "agree": "67%",
+   "decisions": [
+    "uncertain",
+    "no",
+    "uncertain"
+   ],
+   "nouls": [
+    0.32,
+    0.29,
+    0.3
+   ],
+   "plurality": "uncertain"
+  },
+  "exclusion": {
+   "agree": "100%",
+   "decisions": [
+    "uncertain",
+    "uncertain",
+    "uncertain"
+   ],
+   "nouls": [
+    0.55,
+    0.55,
+    0.56
+   ],
+   "plurality": "uncertain"
+  },
+  "fraud_flag": {
+   "agree": "100%",
+   "decisions": [
+    "uncertain",
+    "uncertain",
+    "uncertain"
+   ],
+   "nouls": [
+    0.41,
+    0.43,
+    0.44
+   ],
+   "plurality": "uncertain"
+  },
+  "human_review": {
+   "agree": "100%",
+   "decisions": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "nouls": [
+    0.87,
+    0.86,
+    0.86
+   ],
+   "plurality": "yes"
+  },
+  "line_items_sum": {
+   "agree": "100%",
+   "decisions": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "nouls": [
+    0.91,
+    0.9,
+    0.91
+   ],
+   "plurality": "yes"
+  },
+  "manual_review": {
+   "agree": "100%",
+   "decisions": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "nouls": [
+    0.82,
+    0.84,
+    0.84
+   ],
+   "plurality": "yes"
+  },
+  "on_circuit": {
+   "agree": "100%",
+   "decisions": [
+    "no",
+    "no",
+    "no"
+   ],
+   "nouls": [
+    0.03,
+    0.03,
+    0.03
+   ],
+   "plurality": "no"
+  },
+  "rental_eligible": {
+   "agree": "100%",
+   "decisions": [
+    "no",
+    "no",
+    "no"
+   ],
+   "nouls": [
+    0.06,
+    0.05,
+    0.05
+   ],
+   "plurality": "no"
+  },
+  "reported_timely": {
+   "agree": "100%",
+   "decisions": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "nouls": [
+    0.93,
+    0.93,
+    0.95
+   ],
+   "plurality": "yes"
+  },
+  "subrogation": {
+   "agree": "100%",
+   "decisions": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "nouls": [
+    0.83,
+    0.83,
+    0.85
+   ],
+   "plurality": "yes"
+  },
+  "within_limit": {
+   "agree": "100%",
+   "decisions": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "nouls": [
+    0.98,
+    0.98,
+    0.98
+   ],
+   "plurality": "yes"
+  },
+  "within_window": {
+   "agree": "100%",
+   "decisions": [
+    "yes",
+    "yes",
+    "yes"
+   ],
+   "nouls": [
+    0.97,
+    0.96,
+    0.97
+   ],
+   "plurality": "yes"
+  }
+ },
+ "repeats_run": 3,
+ "state": "cookbook CLAIM as {uid, claim}; questions are the cookbook's 14 Noul instructions (jev-s0f1, jev-t6yt)",
+ "supersedes": "a73d4d4 (2026-09-22): that run's state was {claim_id, uid} only, so it judged no claim",
+ "usage": {
+  "input_tokens": 3234,
+  "output_tokens": 765
+ }
+}

@@ -37,6 +37,9 @@ receipt defines as one Jev request.
 
 Recomputed here: 17 demos, 9 differ, 6 same, 2 not compared; call counts range 1 to 10 calls.
 
+The table above is the first pass. Its two *not compared* rows are superseded by the re-record at
+the end of this file (jev-fbhe).
+
 ## What changed in the README
 
 - **citation:** the cell said *not compared*. The receipt rows do compare: `shipping_free` was
@@ -85,3 +88,53 @@ One counting difference does not change a verdict. For citation this receipt cou
 `power_ten`, which has no choice. Both say *differs*.
 
 NO-CLAIM of this check: no model call was made, and no live receipt was re-recorded.
+
+## Re-record of the two consistency demos (jev-fbhe), 2026-09-24
+
+ReadmeStrangerRun. The two consistency demos now send the cookbook's post and claim in the cookbook's
+state shape, with the cookbook's questions (jev-s0f1, jev-t6yt), so their live lanes were run again:
+`node demos/consistency/demo.mjs --live` and `node demos/consistency-noul/demo.mjs --live`, model
+`jev-1.13.0`, Jev calls only. A fetch-capturing preload counted 3 systemOne requests per demo, all
+HTTP 200, every response resolving to `jev-1.13.0`; tokens 4,683 in / 1,244 out and 3,234 in / 765 out.
+The new receipts (`demos/consistency/live-receipt.json`, `demos/consistency-noul/live-receipt.json`)
+carry every repeat's distribution or noul; each was cross-checked against the demo's printed live
+table before it was written. The old receipts are in git history and named in each `supersedes`.
+
+`live-cells.py` now compares both item by item: each question's plurality in the recorded lane
+against the live receipt's. The printed plurality can run into the last decision in the recorded
+table, so the script splits it where the suffix equals the row's most common decision, the demos'
+own `agreement()` rule, and stops if that split is not unique.
+
+| demo | calls | verdict | items that differ (fixture -> live) |
+|---|---:|---|---|
+| guard | 4 | differs, 3 of 4 same | dosage: review -> block |
+| rag | 5 | differs, 4 of 5 same | sessions-01: ('conflicting_evidence', 'keep') -> ('exclude', 'drop') |
+| citation | 4 | differs, 4 of 5 same | shipping_free: ('says_nothing', 'unsupported', 'review') -> ('contradicts', 'contradicted', 'review') |
+| skill-suggest | 6 | same, 3 of 3 | - |
+| chief | 4 | differs, 3 of 4 same | vague-ask: ('review', 'write') -> ('research', 'research') |
+| rerank | 10 | same, 2 of 2 | - |
+| date | 6 | differs, 5 of 6 same | kickoff call: none -> 2026-08-14 |
+| entity | 4 | same, 4 of 4 | - |
+| hierarchy | 10 | differs, 1 of 2 same | pie-recipe: ('tech/gadgets', 'food/recipes/pie') -> ('food/recipes/pie', 'food/recipes/pie') |
+| autoformat | 2 | differs, 0 of 1 same | joins,blocks: (2, 9) -> (1, 10) |
+| semantic-find | 2 | same, 2 of 2 | - |
+| preparsed | 4 | same, 7 of 7 | - |
+| compact | 1 | differs, 1 of 3 same | t2: drop_result -> drop_call; t3: keep -> drop_call |
+| parallel | 1 | same, 3 of 3 | - |
+| cascade | 1 | differs, 1 of 3 same | location: escalate -> pass; registration_open_date: pass -> escalate |
+| consistency | 3 | differs, 2 of 8 same | action: Remove -> Strike; category: Harass -> Violence; link_handling: RmLink -> uncertain; primary_risk: Harassment -> uncertain; queue: General -> Threat; severity: Medium -> High |
+| consistency-noul | 3 | differs, 13 of 14 same | docs_sufficient: no -> uncertain |
+
+Recomputed here: 17 demos, 11 differ, 6 same; call counts range 1 to 10 calls.
+
+- **consistency:** differs on 6 of 8. Given the post's text, Jev reads the threat ("Come say it to
+  my face ... I'll end your whole channel") as violence: category Violence, action Strike, queue
+  Threat, severity High, where the fixture had harassment, Remove, General and Medium. Two questions
+  fall below the 0.60 gate and go to review (primary_risk, link_handling). Target and review path
+  match.
+- **consistency-noul:** differs on 1 of 14. `docs_sufficient` is *uncertain* live (nouls 0.32, 0.29,
+  0.30; 2 of 3 in the band) where the fixture said *no*. The other 13 pluralities match.
+- The README tally moves from 9 differ / 6 same / 2 not compared to 11 differ / 6 same.
+
+NO-CLAIM: one live run of 3 calls per demo, a direction, not a benchmark. The fixture's recorded
+answers were not re-derived; they are what the demo ships.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Recompute every README live-smoke cell (calls, same / differs / not compared) from each demo's
+"""Recompute every README live-smoke cell (calls, same / differs) from each demo's
 committed live-receipt.json rows against the demo's recorded lane, which this script runs keyless.
 
     python3 work/readme-stranger-run/live-cells.py            # print the table
@@ -7,7 +7,7 @@ committed live-receipt.json rows against the demo's recorded lane, which this sc
 
 Rule: an item differs when any categorical decision the demo prints for it differs between the
 lanes (route, action, verdict, pick, label); probabilities and scores alone never count. A demo is
-"same" when no item differs, and "not compared" when the two lanes did not judge the same input.
+"same" when no item differs; for the two consistency demos an item is a question's plurality.
 Keyless and offline: the recorded lane makes no API call. Written for jev-lcf's successor unit;
 it reads receipts, it never edits them."""
 
@@ -222,29 +222,61 @@ live = {
 }
 out["cascade"] = (r["call_count"], {k: (f[k], live[k]) for k in live})
 
-# Their committed receipts come from runs whose live state was the id alone (post_id / claim_id),
-# so those rows judged no content and cannot be compared with the fixture. The demos now send the
-# cookbook text (jev-s0f1); drop a demo from this map once its receipt is re-recorded (jev-fbhe)
-# and add an item-by-item comparison for it above.
-ID_ONLY_RECEIPTS = {"consistency": "post_id", "consistency-noul": "claim_id"}
-for d, key in ID_ONLY_RECEIPTS.items():
-    out[d] = (rc(d)["call_count"], None, key)
+
+def fixture_pluralities(text, n_repeats):
+    """Plurality per question from a consistency demo's recorded table. The printed plurality can
+    run into the last decision ('...| HarassmentHarassment100%'), so split the last cell where the
+    suffix equals the most common decision of the row, the demos' own agreement() rule."""
+    rows = {}
+    for line in text.splitlines():
+        m = re.match(r"^(\w+)\s+(.*?)\s*(\d+)%$", line)
+        if not m or " | " not in m.group(2):
+            continue
+        cells = m.group(2).split(" | ")
+        if len(cells) != n_repeats:
+            continue
+        head, last = cells[:-1], cells[-1]
+        head[0] = head[0].split()[
+            -1
+        ]  # the noul demo prints the probabilities before the decisions
+        found = []
+        for k in range(1, len(last)):
+            d_last, pl = last[:k].rstrip(), last[k:].lstrip()
+            if not d_last or not pl:
+                continue
+            decisions = head + [d_last]
+            top = max(
+                decisions, key=lambda x: (decisions.count(x), -decisions.index(x))
+            )
+            if pl == top:
+                found.append(pl)
+        if len(set(found)) != 1:
+            raise SystemExit(
+                f"cannot split the plurality of {m.group(1)!r} in the recorded table"
+            )
+        rows[m.group(1)] = found[0]
+    return rows
+
+
+r = rc("consistency")
+f = fixture_pluralities(fx("consistency"), 5)
+live = {k: v["plurality"] for k, v in r["questions"].items()}
+out["consistency"] = (r["call_count"], {k: (f[k], live[k]) for k in live})
+
+r = rc("consistency-noul")
+f = fixture_pluralities(fx("consistency-noul"), 5)
+live = {k: v["plurality"] for k, v in r["questions"].items()}
+out["consistency-noul"] = (r["call_count"], {k: (f[k], live[k]) for k in live})
 
 lines = [
     "| demo | calls | verdict | items that differ (fixture -> live) |",
     "|---|---:|---|---|",
 ]
-tally = {"differs": 0, "same": 0, "not compared": 0}
+tally = {"differs": 0, "same": 0}
 counts = []
 for d, v in out.items():
     calls, items = v[0], v[1]
     counts.append(calls)
-    if items is None:
-        tally["not compared"] += 1
-        lines.append(
-            f"| {d} | {calls} | not compared | the recorded run's state was `{v[2]}` only, so it judged none of the text the fixture was recorded on; the demo now sends it, re-record pending (jev-fbhe) |"
-        )
-        continue
     diff = {k: p for k, p in items.items() if p[0] != p[1]}
     n = len(items)
     if diff:
@@ -259,7 +291,7 @@ for d, v in out.items():
     lines.append(f"| {d} | {calls} | {verdict} | {note or '-'} |")
 lines.append("")
 lines.append(
-    f"Recomputed here: {len(out)} demos, {tally['differs']} differ, {tally['same']} same, {tally['not compared']} not compared; call counts range {min(counts)} to {max(counts)} calls."
+    f"Recomputed here: {len(out)} demos, {tally['differs']} differ, {tally['same']} same; call counts range {min(counts)} to {max(counts)} calls."
 )
 text = "\n".join(lines) + "\n"
 print(text, end="")

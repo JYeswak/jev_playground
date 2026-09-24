@@ -1,1 +1,273 @@
-{"automatic":"8/8 questions hold a gated plurality","call_count":3,"calls":"one askJevBundle per repeat (8 Choice questions each)","command":"node demos/consistency/demo.mjs --live","date":"2026-09-22","gate":0.6,"gate_note":"the cookbook's number","lane":"live","model":"jev-1.13.0","questions":{"action":{"agree":"100%","decisions":["Allow","Allow","Allow"],"plurality":"Allow"},"category":{"agree":"100%","decisions":["None","None","None"],"plurality":"None"},"link_handling":{"agree":"100%","decisions":["Allow","Allow","Allow"],"plurality":"Allow"},"primary_risk":{"agree":"100%","decisions":["LowRisk","LowRisk","LowRisk"],"plurality":"LowRisk"},"queue":{"agree":"100%","decisions":["General","General","General"],"plurality":"General"},"review_path":{"agree":"100%","decisions":["Auto","Auto","Auto"],"plurality":"Auto"},"severity":{"agree":"100%","decisions":["None","None","None"],"plurality":"None"},"target":{"agree":"100%","decisions":["None","None","None"],"plurality":"None"}},"repeats_run":3,"repeats_note":"demo header prints '5 repeats' (fixture shape); live loop runs 3"}
+{
+ "automatic": "6/8 questions hold a gated plurality",
+ "call_count": 3,
+ "call_count_basis": "measured: a fetch-capturing preload counted 3 systemOne requests, 3 HTTP 200; one askJevBundle per repeat",
+ "calls": "one askJevBundle per repeat (8 Choice questions each, the cookbook's rubric)",
+ "command": "node demos/consistency/demo.mjs --live",
+ "date": "2026-09-24",
+ "demo_sha": "e537422",
+ "gate": 0.6,
+ "gate_note": "the cookbook's number",
+ "lane": "live",
+ "model": "jev-1.13.0",
+ "model_resolved": {
+  "jev-1.13.0": 3
+ },
+ "questions": {
+  "action": {
+   "agree": "100%",
+   "decisions": [
+    "Strike",
+    "Strike",
+    "Strike"
+   ],
+   "plurality": "Strike",
+   "probabilities": [
+    {
+     "Allow": 0,
+     "Escalate": 0.12,
+     "Remove": 0.01,
+     "Strike": 0.87,
+     "Warn": 0
+    },
+    {
+     "Allow": 0,
+     "Escalate": 0.12,
+     "Remove": 0.01,
+     "Strike": 0.87,
+     "Warn": 0
+    },
+    {
+     "Allow": 0,
+     "Escalate": 0.12,
+     "Remove": 0.01,
+     "Strike": 0.87,
+     "Warn": 0
+    }
+   ]
+  },
+  "category": {
+   "agree": "100%",
+   "decisions": [
+    "Violence",
+    "Violence",
+    "Violence"
+   ],
+   "plurality": "Violence",
+   "probabilities": [
+    {
+     "Harass": 0.3,
+     "Hate": 0,
+     "None": 0,
+     "Sexual": 0,
+     "Spam": 0,
+     "Violence": 0.7
+    },
+    {
+     "Harass": 0.31,
+     "Hate": 0,
+     "None": 0,
+     "Sexual": 0,
+     "Spam": 0,
+     "Violence": 0.69
+    },
+    {
+     "Harass": 0.32,
+     "Hate": 0,
+     "None": 0,
+     "Sexual": 0,
+     "Spam": 0,
+     "Violence": 0.68
+    }
+   ]
+  },
+  "link_handling": {
+   "agree": "100%",
+   "decisions": [
+    "uncertain",
+    "uncertain",
+    "uncertain"
+   ],
+   "plurality": "uncertain",
+   "probabilities": [
+    {
+     "Allow": 0,
+     "Brigade": 0.42,
+     "Escalate": 0.11,
+     "RmLink": 0.47
+    },
+    {
+     "Allow": 0,
+     "Brigade": 0.5,
+     "Escalate": 0.09,
+     "RmLink": 0.41
+    },
+    {
+     "Allow": 0,
+     "Brigade": 0.48,
+     "Escalate": 0.1,
+     "RmLink": 0.42
+    }
+   ]
+  },
+  "primary_risk": {
+   "agree": "100%",
+   "decisions": [
+    "uncertain",
+    "uncertain",
+    "uncertain"
+   ],
+   "plurality": "uncertain",
+   "probabilities": [
+    {
+     "AccountHistory": 0,
+     "Harassment": 0.51,
+     "LinkAbuse": 0.01,
+     "LowRisk": 0,
+     "Violence": 0.48
+    },
+    {
+     "AccountHistory": 0,
+     "Harassment": 0.49,
+     "LinkAbuse": 0.01,
+     "LowRisk": 0,
+     "Violence": 0.5
+    },
+    {
+     "AccountHistory": 0,
+     "Harassment": 0.5,
+     "LinkAbuse": 0.01,
+     "LowRisk": 0,
+     "Violence": 0.49
+    }
+   ]
+  },
+  "queue": {
+   "agree": "100%",
+   "decisions": [
+    "Threat",
+    "Threat",
+    "Threat"
+   ],
+   "plurality": "Threat",
+   "probabilities": [
+    {
+     "Auto": 0,
+     "General": 0.02,
+     "Spam": 0,
+     "TSLead": 0.04,
+     "Threat": 0.93
+    },
+    {
+     "Auto": 0,
+     "General": 0.02,
+     "Spam": 0,
+     "TSLead": 0.04,
+     "Threat": 0.93
+    },
+    {
+     "Auto": 0,
+     "General": 0.02,
+     "Spam": 0,
+     "TSLead": 0.06,
+     "Threat": 0.92
+    }
+   ]
+  },
+  "review_path": {
+   "agree": "100%",
+   "decisions": [
+    "Human",
+    "Human",
+    "Human"
+   ],
+   "plurality": "Human",
+   "probabilities": [
+    {
+     "Auto": 0.01,
+     "Human": 0.8,
+     "Legal": 0.01,
+     "Senior": 0.18
+    },
+    {
+     "Auto": 0.01,
+     "Human": 0.79,
+     "Legal": 0.01,
+     "Senior": 0.19
+    },
+    {
+     "Auto": 0.01,
+     "Human": 0.76,
+     "Legal": 0.01,
+     "Senior": 0.22
+    }
+   ]
+  },
+  "severity": {
+   "agree": "100%",
+   "decisions": [
+    "High",
+    "High",
+    "High"
+   ],
+   "plurality": "High",
+   "probabilities": [
+    {
+     "High": 0.97,
+     "Low": 0,
+     "Medium": 0.03,
+     "None": 0
+    },
+    {
+     "High": 0.97,
+     "Low": 0,
+     "Medium": 0.03,
+     "None": 0
+    },
+    {
+     "High": 0.96,
+     "Low": 0,
+     "Medium": 0.04,
+     "None": 0
+    }
+   ]
+  },
+  "target": {
+   "agree": "100%",
+   "decisions": [
+    "Person",
+    "Person",
+    "Person"
+   ],
+   "plurality": "Person",
+   "probabilities": [
+    {
+     "Group": 0.01,
+     "None": 0,
+     "Person": 0.99,
+     "Platform": 0
+    },
+    {
+     "Group": 0.01,
+     "None": 0,
+     "Person": 0.99,
+     "Platform": 0
+    },
+    {
+     "Group": 0.01,
+     "None": 0,
+     "Person": 0.99,
+     "Platform": 0
+    }
+   ]
+  }
+ },
+ "repeats_note": "demo header prints '5 repeats' (fixture shape); live loop runs 3",
+ "repeats_run": 3,
+ "state": "cookbook POST as {uid, post}; questions are the cookbook's 8 Choice(instructions, criteria) (jev-s0f1, jev-t6yt)",
+ "supersedes": "b2ff15c (2026-09-22): that run's state was {post_id, uid} only and its questions a generic label prompt, so it judged no post",
+ "usage": {
+  "input_tokens": 4683,
+  "output_tokens": 1244
+ }
+}
