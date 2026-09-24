@@ -104,3 +104,21 @@ branch is modeled as perfect picking from a shown list, not observed. The zero-t
 counts are descriptive and were added to the scorer after the bar; the bar's tables are unchanged by
 that addition (the output diffs clean apart from the new lines). A non-author re-score is pending,
 and the bead stays open.
+
+## Non-author verification — Verifier3
+
+Verifier3 (background agent of pane 1, Anthropic model), 2026-09-24. Not the author. Everything ran
+in a fresh `git clone --local` of `a128796` under `/tmp`. No call was made.
+
+| Check | Command | Result |
+|---|---|---|
+| Rows predate the bar; bar predates scoring | `git log --format='%h %ad' --` rows, scorer, receipt | both row files are unchanged since `5839235` (Haiku) and `3c473ae` (Jev frozen), 21:02 −0600. Bar and scorer came at `644a179` (21:15:03), results at `2a70fd1` (21:16:04). The rows were public before the bar, so "bar before scoring" rests on the author's statement and on the next check. |
+| Bar and scorer unedited in substance | `git diff 644a179 2a70fd1`; the `644a179` scorer run on the same rows and its output diffed against HEAD's | the bar lost only its `Pending` line and got its commit id in the heading. The scorer gained 19 lines of descriptive printout. The bar version's output differs from HEAD's by exactly the two added lines (zero-truth-mass and tie counts): every preregistered table is byte-identical. |
+| Re-score reproduces | `python3 work/choice-banking77/score_topk.py` (rc 0, no key) | every Results number matches. Recall at 1/2/3/5: Jev 2,465 / 2,708 / 2,804 / 2,879, Haiku 2,231 / 2,523 / 2,602 / 2,660. Discordant counts 354/120, 255/70, 245/43, 265/46, with Holm p 1.5e-27, 7.5e-26, 5.1e-35 and 5.9e-38. The zero-mass-dropped table moves nothing by more than 0.1 point. There are 181 and 352 zero-truth rows and 4 and 113 tied rows. All 16 curve rows match. **NOT SUFFICIENT** (91.0% < 95%). |
+| Independent recompute | own script: pessimistic rank = 1 + #others with p ≥ p(truth) | recall at k is identical on both arms. At t = 0.99, Jev auto-routes 1,383 (1,341 correct, 42 wrong), and 1,697 go to a human with the truth in the list on 1,454, total 2,795. Haiku gives 944 / 854 / 90 / 2,136 / 1,748 / 2,602. All identical. |
+| 10 seeded rows by hand | `random.Random(24)` over the 3,080 ids: 685, 693, 747, 795, 894, 1568, 2387, 2747, 2792, 2917 | on 8 rows both arms rank the truth first. i 894: Jev gives `supported_cards_and_currencies` 0.0, so rank 77 (a zero-mass-truth row), and Haiku gives it 0.05, rank 3. i 2917: Jev's truth is at 0.01, tied with `transaction_charged_twice`, so the pessimistic rule gives rank 3, not 2. Haiku ranks it 1 at 0.85. Each hand rank agrees with the scorer's rule. |
+| Zero-mass handling | scorer output | the 4 Haiku `rawSum == 0` rows (453, 1698, 2197, 3058) are reported, and every table is shown with and without them, as the bar and bead require. |
+| NO-CLAIM vs what ran | receipt vs rows | one run per arm and one wording, offline. The human branch is modeled as perfect picking, and the receipt says so. The post-bar descriptive lines are disclosed. `NEGATIVE_EVIDENCE.md` R86 exists with a retry condition. |
+
+**Verdict: CONFIRMED** (clean-clone keyless re-score, `[oracle]`). NOT SUFFICIENT stands. Jev's recall
+is higher than Haiku's at every k. Scratch left at `/tmp/v3-zfn.cA9b` (not deleted).
