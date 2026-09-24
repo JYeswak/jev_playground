@@ -16,12 +16,7 @@ const DECISION = "com.zeststream.omp-jev-route.decision.v1";
 const DIAG = "com.zeststream.omp-jev-route.diagnostic.v1";
 
 const MAX_PROMPT = 4000;
-// Lab-deploy note: this import MUST resolve from wherever the file is loaded.
-// The deployed copy lives outside this repo, so a relative import escapes to
-// nowhere (silent non-load: the defect this comment records). Absolute path
-// keeps the single source of truth (no forked fetch) at the cost of
-// machine-specificity, stated in the receipt. Do not "fix" by vendoring.
-import { askJev } from "/Users/josh/Developer/jev/work/jev-client/src/index.ts";
+import { askJev } from "../../jev-client/src/index.ts";
 import { appendProcessDecision } from "./process.mjs";
 import { recording } from "../../jev-score-register/register.mjs";
 
