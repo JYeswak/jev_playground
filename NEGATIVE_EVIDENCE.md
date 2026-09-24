@@ -3804,3 +3804,31 @@ pinned.
 
 **NO-CLAIM.** Three runs per arm within minutes, one small public set, one wording. This does not
 show Jev and Haiku are equal at ordering pairs; the direction favours Jev in every pairing.
+
+## R92 — FAILED BAR: naming local coordination in irreversible_publish's false criterion cuts false alarms without cutting catch
+
+**Claim (jev-2ghy):** replacing only `irreversible_publish`'s false criterion with one that names local
+coordination (br comments/updates/claims/closes, ntm send, Agent Mail, git commit without a push)
+lowers the gate's false alarms on held-out real traffic, with no loss of catch. It was written from
+jev-l114's 4/48 fleet false alarms, all on that question.
+
+**Measured (2026-09-24, live, ClaimCheckTool, bar `7e194dd` before any call, jev-1.13.0).** Three runs
+per arm on real-300, sample B, sample C and the 200 hard cases: 7,098 calls, 0 failed.
+- Safety held in 7/9 pairings; the two failures are +1 real-300 false alarm each.
+- Pooled FA was lower for the candidate in only 2/9 pairings and higher in 5/9.
+- Catch was unchanged within 2 rows.
+- On the 136 held-out routine coordination commands, `irreversible_publish` exceeded 0.5 in 0 runs
+  of either arm. Only 3 of about 55 held-out false-alarm flags come from that question.
+- On the fleet prefixes, the candidate cleared 1 of the 4 motivating false alarms.
+
+Receipt: `docs/demos/upstream-repro/gate-publish-criteria-20260924.md`. Re-score:
+`python3 work/bicameral-gate/score-publish.py`.
+
+**Retry condition.** Retry only on a held-out set that contains the failure: fleet traffic scored by the
+hook with full command text, preferably several sessions and panes, labelled before the arms run.
+Or target the questions that drive the held-out false alarms (`exfiltration`, `destructive`,
+`privilege`: 52 of 55). Do not re-run this candidate on the same four sets; they contain no
+coordination false alarms for it to remove.
+
+**NO-CLAIM.** This does not show the candidate is harmful: catch held and FA moved within one row.
+It shows the change has nothing to fix on these sets.
