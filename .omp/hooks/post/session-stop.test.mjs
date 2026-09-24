@@ -41,8 +41,29 @@ test("stop_hook_active never continues", () => {
   );
 });
 
-test("a finished turn with nothing queued stays silent", () => {
+test("the conductor's finished turn with nothing queued stays silent", () => {
   assert.equal(decideStop({ stop_hook_active: false }, quiet), undefined);
+  assert.equal(decideStop({ stop_hook_active: false }, { ...quiet, paneIndex: 1 }), undefined);
+});
+
+// Measured 2026-09-24: br ready was empty, this hook returned nothing, and 4 of 6
+// worker panes sat idle at their prompts until Joshua noticed.
+test("a worker with nothing queued is told to finish its own bead or report idle to pane 1", () => {
+  const result = decideStop({ stop_hook_active: false }, { ...quiet, paneIndex: 5 });
+  assert.equal(result.continue, true);
+  assert.match(result.additionalContext, /finish the bead you have in progress/);
+  assert.match(result.additionalContext, /ntm send jev --pane=1 "IDLE pane 5:/);
+  assert.doesNotMatch(result.additionalContext, /br ready has/);
+});
+
+test("a worker with ready work gets both the claim and the idle fallback", () => {
+  const result = decideStop({ stop_hook_active: false }, { ...quiet, readyCount: 2, paneIndex: 3 });
+  assert.match(result.additionalContext, /br ready has 2 item/);
+  assert.match(result.additionalContext, /IDLE pane 3:/);
+});
+
+test("a worker's second stop is silent, so the idle message cannot loop", () => {
+  assert.equal(decideStop({ stop_hook_active: true }, { ...quiet, paneIndex: 4 }), undefined);
 });
 
 test("an aborted settle stays silent", () => {

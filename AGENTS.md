@@ -1710,3 +1710,24 @@ mine (fh over the mirror · ripwire · ast-grep · rg · jsm skills)
 **A tick that ends with a question to Joshua and no dispatch is a wasted tick.** If the answer is
 computable, compute it. If a pane is idle and the queue is empty, the selection rules above name
 the next unit — run them rather than asking which.
+
+### NO IDLE WORKERS — four mechanisms, all required
+
+Measured 2026-09-24: 4 of 6 worker panes sat at their prompts for most of an hour. `br ready` was
+empty, the stop hook returned nothing on an empty queue, one pane stalled between steps of its own
+bead, and the conductor looked only when a callback arrived. Joshua: *"dont let that happen again."*
+
+1. **The stop hook speaks to workers.** `.omp/hooks/post/session-stop.ts` gives every worker pane
+   (index >= 2) one continuation: finish your own in-progress bead, then claim from `br ready`, and
+   if nothing is claimable send `IDLE pane N: ...` to pane 1. Hooks load at session start, so a
+   pane restarted before this rule does not have it.
+2. **A watcher alerts the conductor.** `fleet-idle-watch` (a `hub` process running
+   `scripts/fleet-idle-watch.py`) polls every 60 s and sends `IDLE pane N` to pane 1 after two
+   idle polls, then every 10 minutes while a pane stays idle. If `hub op:ps` does not show it
+   running while the fleet is up, restarting it is the conductor's first action.
+3. **The queue has a floor.** `br ready` holds at least three unassigned live units at all times.
+   A dispatch that drains it below three files the next units in the same turn, each with
+   WHAT / WHY / ACCEPTANCE.
+4. **No conductor turn ends with an idle worker.** Before yielding, pane 1 runs
+   `python3 scripts/fleet-idle-watch.py --once`; exit 1 means a pane gets a unit before the turn
+   ends. An `IDLE pane N` message is answered with a dispatch, never with an acknowledgement.
