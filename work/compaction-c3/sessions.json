@@ -1,0 +1,74 @@
+{
+  "seed": 20260926,
+  "cutoff": "2026-09-24T18:00:00Z",
+  "size": [
+    200000,
+    12000000
+  ],
+  "eligible": 12,
+  "skipped": {
+    "used by a development set or jev-0c6": 18,
+    "size outside 200KB-12MB": 67,
+    "written after CUTOFF": 2,
+    "fewer than 50 paired tool calls": 15
+  },
+  "screened_out_rider": [],
+  "sessions": [
+    {
+      "path": "~/.omp/agent/sessions/-Developer-jev/2026-09-22T00-34-05-024Z_01a0c688-bc60-711a-bbfa-35b16f38f529.jsonl",
+      "id": "01a0c688-bc60",
+      "bytes": 3376279,
+      "calls": 338,
+      "sha256": "450166548b7a24c27ab01203e4788d1ca75916aee3216466fbb330ea3ffec7a0"
+    },
+    {
+      "path": "~/.omp/agent/sessions/-Developer-jev/2026-09-22T03-57-19-871Z_01a0c742-d07f-747c-ba60-ad293454f054.jsonl",
+      "id": "01a0c742-d07f",
+      "bytes": 6984544,
+      "calls": 657,
+      "sha256": "ff4814b7bb201b5bd547ef64fa7256e32d5b12b9a7e72f0c372b754ff7080b4f"
+    },
+    {
+      "path": "~/.omp/agent/sessions/-Developer-jev/2026-09-22T03-57-24-749Z_01a0c742-e38d-70ce-b246-69a20bde2b72.jsonl",
+      "id": "01a0c742-e38d",
+      "bytes": 5156175,
+      "calls": 522,
+      "sha256": "0f2a32c4673ac159c722b7b97b6a09c6a9ea69fa0cd23c885c6da83c7e92a0f4"
+    },
+    {
+      "path": "~/.omp/profiles/grok/agent/sessions/-Developer-jev/2026-09-24T08-51-32-152Z_01a0d29c-e2b8-76ad-ab5f-20dbf57ca34f.jsonl",
+      "id": "01a0d29c-e2b8",
+      "bytes": 7719340,
+      "calls": 722,
+      "sha256": "a38d08bd475968e2bc40b6f59708d2b2915b577b3b94c7a2f9eb4098fc121c99"
+    },
+    {
+      "path": "~/.omp/profiles/muse/agent/sessions/-Developer-jev/2026-09-20T21-35-17-987Z_01a0c0be-b1e3-709f-8689-64eb182c804f.jsonl",
+      "id": "01a0c0be-b1e3",
+      "bytes": 6602948,
+      "calls": 484,
+      "sha256": "b14c388054587dbe8d582e55e38b422bdfe42f454a9c923e111670fab69e9495"
+    },
+    {
+      "path": "~/.omp/profiles/muse/agent/sessions/-Developer-jev/2026-09-22T00-17-08-901Z_01a0c679-3b25-732c-bd7d-3d9cb57257c0.jsonl",
+      "id": "01a0c679-3b25",
+      "bytes": 7139684,
+      "calls": 697,
+      "sha256": "fdb5a44198fa401dc893de472a645936dc09c470770d6c088ac0f0625c38753c"
+    },
+    {
+      "path": "~/.omp/profiles/muse/agent/sessions/-Developer-jev/2026-09-22T03-57-27-623Z_01a0c742-eec7-74ca-9fe2-05a0d8c40369.jsonl",
+      "id": "01a0c742-eec7",
+      "bytes": 7460485,
+      "calls": 795,
+      "sha256": "ad62dd34b6b4154aa1aacb33a7eb2591f06293f43bee340d5897f9a1af70c654"
+    },
+    {
+      "path": "~/.omp/profiles/muse/agent/sessions/-Developer-jev/2026-09-22T03-57-33-894Z_01a0c743-0746-771b-a3f6-46f61f526d15.jsonl",
+      "id": "01a0c743-0746",
+      "bytes": 5824816,
+      "calls": 517,
+      "sha256": "197a929245fb8a9a7b0ab6164e39cb314f62818c8de5f76718f9bc5bca8d1a9f"
+    }
+  ]
+}

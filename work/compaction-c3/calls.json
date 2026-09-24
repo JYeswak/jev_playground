@@ -1,0 +1,1655 @@
+[
+  {
+    "session": "01a0c688-bc60",
+    "horizon_messages": 40,
+    "calls": [
+      {
+        "tool_use_id": "call_01a0c6a61ce7775ea5873c6b750e2531|fc_01a0c6a61ce7775ea5873c6b750e2531",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a628b5735fbff23b2b65ef2473|fc_01a0c6a628b5735fbff23b2b65ef2473",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a62b98752d89d7bb87fc05e32d|fc_01a0c6a62b98752d89d7bb87fc05e32d",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a62e397720bc92c4f9f42e8af0|fc_01a0c6a62e397720bc92c4f9f42e8af0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a6313d7595822e6d9557a035a0|fc_01a0c6a6313d7595822e6d9557a035a0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a6625a708b882599981eb85bfd|fc_01a0c6a6625a708b882599981eb85bfd",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a6653f7468aee965c94d63227a|fc_01a0c6a6653f7468aee965c94d63227a",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a6ad2d70fc97f2f6c29e271f01|fc_01a0c6a6ad2d70fc97f2f6c29e271f01",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a6aef87624b4d5d532e81ce686|fc_01a0c6a6aef87624b4d5d532e81ce686",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a6d612707eb42af7cf071b2957|fc_01a0c6a6d612707eb42af7cf071b2957",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a714f272c6b7a20c7b34806903|fc_01a0c6a714f272c6b7a20c7b34806903",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a74ca7708bb80027ba04055ec9|fc_01a0c6a74ca7708bb80027ba04055ec9",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a75e7c73aeb678a3ad43ac21b2|fc_01a0c6a75e7c73aeb678a3ad43ac21b2",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a7728d741c85c50a0267ac32c6|fc_01a0c6a7728d741c85c50a0267ac32c6",
+        "tool": "hub",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a7867a72b38051fb31117060d3|fc_01a0c6a7867a72b38051fb31117060d3",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a7a39273a18936db0249467d29|fc_01a0c6a7a39273a18936db0249467d29",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a7b8397634bc645a9b2ee88cc1|fc_01a0c6a7b8397634bc645a9b2ee88cc1",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a7ce8f74ea9ee503f120d0275e|fc_01a0c6a7ce8f74ea9ee503f120d0275e",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6a7d935737ca551fb35329b6705|fc_01a0c6a7d935737ca551fb35329b6705",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b16164757d88add2df43bd9531|fc_01a0c6b16164757d88add2df43bd9531",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b162f670d6941bd16245583ccb|fc_01a0c6b162f670d6941bd16245583ccb",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b166367136a10f2ac5f8adca6d|fc_01a0c6b166367136a10f2ac5f8adca6d",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b1d644719ba799bbbd6a44a072|fc_01a0c6b1d644719ba799bbbd6a44a072",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b1dc597774888923497998212b|fc_01a0c6b1dc597774888923497998212b",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b1e0007185ac079e6b2e5b50d7|fc_01a0c6b1e0007185ac079e6b2e5b50d7",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b24c2a740c998e40fb9d338377|fc_01a0c6b24c2a740c998e40fb9d338377",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b24db37261b824198130c5bbef|fc_01a0c6b24db37261b824198130c5bbef",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b24f7a71d1a59981519de75320|fc_01a0c6b24f7a71d1a59981519de75320",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b250fa752180d322e4b0876ca4|fc_01a0c6b250fa752180d322e4b0876ca4",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c6b2805172299ecdb4d4a7569dd8|fc_01a0c6b2805172299ecdb4d4a7569dd8",
+        "tool": "write",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b285de7128b58bb624dfeeafd2|fc_01a0c6b285de7128b58bb624dfeeafd2",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b2891475439e59d00658ff3b42|fc_01a0c6b2891475439e59d00658ff3b42",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b2a9a97396b5e20c99028147e3|fc_01a0c6b2a9a97396b5e20c99028147e3",
+        "tool": "write",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b2cbcf734181ea54856bfada09|fc_01a0c6b2cbcf734181ea54856bfada09",
+        "tool": "write",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b37079748a940d4b6e7865547e|fc_01a0c6b37079748a940d4b6e7865547e",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b3722574d8858f1e447967b1b1|fc_01a0c6b3722574d8858f1e447967b1b1",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b3740274ebbce77bb1a4a6568c|fc_01a0c6b3740274ebbce77bb1a4a6568c",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b39b5f74ae89c52924bf01669f|fc_01a0c6b39b5f74ae89c52924bf01669f",
+        "tool": "write",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b39e087744bf98cae86c6f5c7c|fc_01a0c6b39e087744bf98cae86c6f5c7c",
+        "tool": "write",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b4226973459299593dc1021fc0|fc_01a0c6b4226973459299593dc1021fc0",
+        "tool": "grep",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c6b426a772e28e9ed3adbdf1b81e|fc_01a0c6b426a772e28e9ed3adbdf1b81e",
+        "tool": "hub",
+        "pinned": true
+      }
+    ]
+  },
+  {
+    "session": "01a0c742-d07f",
+    "horizon_messages": 40,
+    "calls": [
+      {
+        "tool_use_id": "call_01a0c74463647437b926961b41c835fc|fc_01a0c74463647437b926961b41c835fc",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74465127343ab1875522d0eef45|fc_01a0c74465127343ab1875522d0eef45",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74476a9740d81a37b01dd386d0b|fc_01a0c74476a9740d81a37b01dd386d0b",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74477d5733fb5e41a4ddd0b254c|fc_01a0c74477d5733fb5e41a4ddd0b254c",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c744792b7787852374151f1f4d85|fc_01a0c744792b7787852374151f1f4d85",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74480da72d3b5a87313762498bb|fc_01a0c74480da72d3b5a87313762498bb",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c744823b75fea0a2c240d12860d9|fc_01a0c744823b75fea0a2c240d12860d9",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7449f10773ca245296b679af902|fc_01a0c7449f10773ca245296b679af902",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c744dd3d73b899c0d53a84c2aa76|fc_01a0c744dd3d73b899c0d53a84c2aa76",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74550ba77d491c28302b48b4e81|fc_01a0c74550ba77d491c28302b48b4e81",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7456d2473b1a446939113117423|fc_01a0c7456d2473b1a446939113117423",
+        "tool": "edit",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74574ac7773810f209e2d1162c6|fc_01a0c74574ac7773810f209e2d1162c6",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74588b370c8be340de048d75b78|fc_01a0c74588b370c8be340de048d75b78",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7459d2975419a2ca0b91bb460bf|fc_01a0c7459d2975419a2ca0b91bb460bf",
+        "tool": "edit",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745ae9f77af959a0fbd6d1c7755|fc_01a0c745ae9f77af959a0fbd6d1c7755",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745ba1d75989f2af82bfadcf3ec|fc_01a0c745ba1d75989f2af82bfadcf3ec",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745e02c7154b30a47f98e739bd8|fc_01a0c745e02c7154b30a47f98e739bd8",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745e6b7744eaaef90b6a1581bc9|fc_01a0c745e6b7744eaaef90b6a1581bc9",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7460c01769486235ca4af81410d|fc_01a0c7460c01769486235ca4af81410d",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7463ba572fabd5b88c57afcf134|fc_01a0c7463ba572fabd5b88c57afcf134",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7464aab744bbbf71b90a00dbef6|fc_01a0c7464aab744bbbf71b90a00dbef6",
+        "tool": "edit",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74657307670a8cc6ec931a727c5|fc_01a0c74657307670a8cc6ec931a727c5",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe0b500778cba98a06bc6e01026|fc_01a0cbe0b500778cba98a06bc6e01026",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe13847747eb8e41e9fea1db490|fc_01a0cbe13847747eb8e41e9fea1db490",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe1d83273fe8f66b47f1734cc17|fc_01a0cbe1d83273fe8f66b47f1734cc17",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe270ac7236acb5d133b01dea90|fc_01a0cbe270ac7236acb5d133b01dea90",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe32a65705a85904757c59d7884|fc_01a0cbe32a65705a85904757c59d7884",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe3f2837033a606f4a7dcd925fc|fc_01a0cbe3f2837033a606f4a7dcd925fc",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe3f76576d5adf82463a5dd7015|fc_01a0cbe3f76576d5adf82463a5dd7015",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe4484e70beb8a9b199fd4b1a54|fc_01a0cbe4484e70beb8a9b199fd4b1a54",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe44e1874c9a03bab79ffeb69a1|fc_01a0cbe44e1874c9a03bab79ffeb69a1",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe4e5f37501bc80b036ae22a1e6|fc_01a0cbe4e5f37501bc80b036ae22a1e6",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe4e852716e8133f482b6ec3f34|fc_01a0cbe4e852716e8133f482b6ec3f34",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe5181575dab5470ef731bccc61|fc_01a0cbe5181575dab5470ef731bccc61",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe5641e75cb848a061b0afec8fe|fc_01a0cbe5641e75cb848a061b0afec8fe",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe5d7f277a98628320ba7241df3|fc_01a0cbe5d7f277a98628320ba7241df3",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe65d6973d5b6f1444591d95a7a|fc_01a0cbe65d6973d5b6f1444591d95a7a",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe6d7dd70bbba7f39739026065f|fc_01a0cbe6d7dd70bbba7f39739026065f",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe6d9c372258cfabc73cb3a63cf|fc_01a0cbe6d9c372258cfabc73cb3a63cf",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe76c8d7753aa13b00b1dd52186|fc_01a0cbe76c8d7753aa13b00b1dd52186",
+        "tool": "read",
+        "pinned": true
+      }
+    ]
+  },
+  {
+    "session": "01a0c742-e38d",
+    "horizon_messages": 40,
+    "calls": [
+      {
+        "tool_use_id": "call_01a0c744ecc274408953a28d83bccae2|fc_01a0c744ecc274408953a28d83bccae2",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c744ee6a717cb77cc4b795f2727a|fc_01a0c744ee6a717cb77cc4b795f2727a",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c744efab7785b5d5d8103c0d3b4b|fc_01a0c744efab7785b5d5d8103c0d3b4b",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c744fee371029738d3e3de3e5dbf|fc_01a0c744fee371029738d3e3de3e5dbf",
+        "tool": "glob",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745007a71d19dcceeb756b378b1|fc_01a0c745007a71d19dcceeb756b378b1",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74501b6745e80019dafec1557c5|fc_01a0c74501b6745e80019dafec1557c5",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74534fd76f381f8172ee4d03f69|fc_01a0c74534fd76f381f8172ee4d03f69",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745372c77a284c279d44835f012|fc_01a0c745372c77a284c279d44835f012",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745389b77258ef8f8168c48fb81|fc_01a0c745389b77258ef8f8168c48fb81",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74550c07168ac439beca4ce2b0a|fc_01a0c74550c07168ac439beca4ce2b0a",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74552617620b3129edea2261a2c|fc_01a0c74552617620b3129edea2261a2c",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7455cc27609ab3b39bded7e8e87|fc_01a0c7455cc27609ab3b39bded7e8e87",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7455f487188bf7fb4d4a14be4ac|fc_01a0c7455f487188bf7fb4d4a14be4ac",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745a27b7560a9d51d437f24feab|fc_01a0c745a27b7560a9d51d437f24feab",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745a3f874fab4b0c0af72cef199|fc_01a0c745a3f874fab4b0c0af72cef199",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745d08476e68e771a120f2a5221|fc_01a0c745d08476e68e771a120f2a5221",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7461bee7150b03f735f3c96b5e9|fc_01a0c7461bee7150b03f735f3c96b5e9",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7462c2277f6a565f2e5f18070c6|fc_01a0c7462c2277f6a565f2e5f18070c6",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7466f73769f94197f74dc3093af|fc_01a0c7466f73769f94197f74dc3093af",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74698c2754b914cd5616d924820|fc_01a0c74698c2754b914cd5616d924820",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c746ab0f74aa955b93d39f7f9ff2|fc_01a0c746ab0f74aa955b93d39f7f9ff2",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c746bf2e758f8ea6ee3480ccd758|fc_01a0c746bf2e758f8ea6ee3480ccd758",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c746de837196943b15c44a62dcb1|fc_01a0c746de837196943b15c44a62dcb1",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7474460728c9705060a6719ccd2|fc_01a0c7474460728c9705060a6719ccd2",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c747800574069a2542f5e51b910d|fc_01a0c747800574069a2542f5e51b910d",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c747ab4b70e7b62b20fd55d7b1bb|fc_01a0c747ab4b70e7b62b20fd55d7b1bb",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c747dc9f716580cef05b82b680bb|fc_01a0c747dc9f716580cef05b82b680bb",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0cbe147c8733e983063fe0a52f20e|fc_01a0cbe147c8733e983063fe0a52f20e",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe1492e70c8adaaa1225ac49596|fc_01a0cbe1492e70c8adaaa1225ac49596",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe14a4574899cffd7ba24891b95|fc_01a0cbe14a4574899cffd7ba24891b95",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe1b05375d9823a76183d2219db|fc_01a0cbe1b05375d9823a76183d2219db",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe1b3887065bf2a908b52676cf2|fc_01a0cbe1b3887065bf2a908b52676cf2",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe2282c700589d0945b6f309481|fc_01a0cbe2282c700589d0945b6f309481",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe22a287783a5b27ed845603157|fc_01a0cbe22a287783a5b27ed845603157",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe22b5f717f9ba8908e42c2379b|fc_01a0cbe22b5f717f9ba8908e42c2379b",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe2e4bc7189a04934738b589b4e|fc_01a0cbe2e4bc7189a04934738b589b4e",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe2e5b472f088424bf59afab926|fc_01a0cbe2e5b472f088424bf59afab926",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe2e6c972098311145b73981600|fc_01a0cbe2e6c972098311145b73981600",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe35a08700daabf86fda81c11b1|fc_01a0cbe35a08700daabf86fda81c11b1",
+        "tool": "write",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0cbe3d1bf77c7b750c1d9ce37f5f2|fc_01a0cbe3d1bf77c7b750c1d9ce37f5f2",
+        "tool": "write",
+        "pinned": true
+      }
+    ]
+  },
+  {
+    "session": "01a0d29c-e2b8",
+    "horizon_messages": 40,
+    "calls": [
+      {
+        "tool_use_id": "call-93f3f410-a964-4632-97ab-3c3339ce8f1f-0|fc_af0d9abd-0667-979f-882d-9fd43b34d2f8_0",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-93f3f410-a964-4632-97ab-3c3339ce8f1f-1|fc_af0d9abd-0667-979f-882d-9fd43b34d2f8_1",
+        "tool": "todo",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-162fed98-105f-4c75-b1ed-ee3f34296c57-2|fc_b6fdba60-c645-95ba-a1e7-0d34f07d85d9_0",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-162fed98-105f-4c75-b1ed-ee3f34296c57-3|fc_b6fdba60-c645-95ba-a1e7-0d34f07d85d9_1",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-162fed98-105f-4c75-b1ed-ee3f34296c57-4|fc_b6fdba60-c645-95ba-a1e7-0d34f07d85d9_2",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-23fd1dcd-d21a-4ac3-a5a1-93020122a364-5|fc_5c28ed8f-81ce-9b79-8afd-815da5455e7d_0",
+        "tool": "glob",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-23fd1dcd-d21a-4ac3-a5a1-93020122a364-6|fc_5c28ed8f-81ce-9b79-8afd-815da5455e7d_1",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-23fd1dcd-d21a-4ac3-a5a1-93020122a364-7|fc_5c28ed8f-81ce-9b79-8afd-815da5455e7d_2",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-0e098b6f-ac95-4454-837e-291845d6cda2-8|fc_0a10e5b4-185e-9b02-a9a7-ac77a73f153a_0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-0e098b6f-ac95-4454-837e-291845d6cda2-9|fc_0a10e5b4-185e-9b02-a9a7-ac77a73f153a_1",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-0e098b6f-ac95-4454-837e-291845d6cda2-10|fc_0a10e5b4-185e-9b02-a9a7-ac77a73f153a_2",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-3a4972a1-b0e9-48dd-b645-243fc9040691-11|fc_7c47bfe8-6813-9b43-a11e-f837089efb46_0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-3a4972a1-b0e9-48dd-b645-243fc9040691-12|fc_7c47bfe8-6813-9b43-a11e-f837089efb46_1",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-3a4972a1-b0e9-48dd-b645-243fc9040691-13|fc_7c47bfe8-6813-9b43-a11e-f837089efb46_2",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-78e6cf5f-bdc9-488e-a0ba-b99f2e27d807-14|fc_d425b932-b7cd-9910-8946-1d14a0436c3f_0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-78e6cf5f-bdc9-488e-a0ba-b99f2e27d807-15|fc_d425b932-b7cd-9910-8946-1d14a0436c3f_1",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-78e6cf5f-bdc9-488e-a0ba-b99f2e27d807-16|fc_d425b932-b7cd-9910-8946-1d14a0436c3f_2",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-5a0d943b-7471-43bd-8266-f31c03c34415-17|fc_b773aefe-c02f-9628-8600-ed0e54e36950_0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-5a0d943b-7471-43bd-8266-f31c03c34415-18|fc_b773aefe-c02f-9628-8600-ed0e54e36950_1",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-5a0d943b-7471-43bd-8266-f31c03c34415-19|fc_b773aefe-c02f-9628-8600-ed0e54e36950_2",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-b485ff9a-285d-4388-bf88-14d375571a03-20|fc_6b4e3bd0-3647-9e0b-8641-a9ba9b7c75c8_0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-b485ff9a-285d-4388-bf88-14d375571a03-21|fc_6b4e3bd0-3647-9e0b-8641-a9ba9b7c75c8_1",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-b485ff9a-285d-4388-bf88-14d375571a03-22|fc_6b4e3bd0-3647-9e0b-8641-a9ba9b7c75c8_2",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-0fd2c302-fffc-4f2f-a630-4007ff7f46dd-23|fc_6fa2badd-7a1c-9d9b-b8f4-c7d83e4d1fa3_0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-0fd2c302-fffc-4f2f-a630-4007ff7f46dd-24|fc_6fa2badd-7a1c-9d9b-b8f4-c7d83e4d1fa3_1",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-0fd2c302-fffc-4f2f-a630-4007ff7f46dd-25|fc_6fa2badd-7a1c-9d9b-b8f4-c7d83e4d1fa3_2",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-18c0c051-4ebd-4c0e-a41e-9b8f8d820762-26|fc_79ecabe6-b395-98fd-ad20-68f2ce25488f_0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-18c0c051-4ebd-4c0e-a41e-9b8f8d820762-27|fc_79ecabe6-b395-98fd-ad20-68f2ce25488f_1",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-18c0c051-4ebd-4c0e-a41e-9b8f8d820762-28|fc_79ecabe6-b395-98fd-ad20-68f2ce25488f_2",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call-56ebccdb-834a-4ebb-b70a-c291db440c08-29|fc_cbfca356-b459-91c1-a60d-26d3c1d9ec60_0",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-56ebccdb-834a-4ebb-b70a-c291db440c08-30|fc_cbfca356-b459-91c1-a60d-26d3c1d9ec60_1",
+        "tool": "grep",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-56ebccdb-834a-4ebb-b70a-c291db440c08-31|fc_cbfca356-b459-91c1-a60d-26d3c1d9ec60_2",
+        "tool": "grep",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-5061c929-6933-4d7c-9387-f164b428fbb7-32|fc_fd466812-49d3-94a8-9eee-3a398bc450b1_0",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-5061c929-6933-4d7c-9387-f164b428fbb7-33|fc_fd466812-49d3-94a8-9eee-3a398bc450b1_1",
+        "tool": "grep",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-5061c929-6933-4d7c-9387-f164b428fbb7-34|fc_fd466812-49d3-94a8-9eee-3a398bc450b1_2",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-c53f4d2f-6bab-4ac7-855d-1a2c0de2f7c8-35|fc_43bd1bbb-b0ba-9563-ab19-935782a47d93_0",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-c53f4d2f-6bab-4ac7-855d-1a2c0de2f7c8-36|fc_43bd1bbb-b0ba-9563-ab19-935782a47d93_1",
+        "tool": "grep",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-c53f4d2f-6bab-4ac7-855d-1a2c0de2f7c8-37|fc_43bd1bbb-b0ba-9563-ab19-935782a47d93_2",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-9d6a6dbb-6cf7-43cd-82e6-6dd6366f2dae-38|fc_1c3419a0-c7d8-9bbe-965f-2c69e747bb56_0",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call-9d6a6dbb-6cf7-43cd-82e6-6dd6366f2dae-39|fc_1c3419a0-c7d8-9bbe-965f-2c69e747bb56_1",
+        "tool": "todo",
+        "pinned": true
+      }
+    ]
+  },
+  {
+    "session": "01a0c0be-b1e3",
+    "horizon_messages": 40,
+    "calls": [
+      {
+        "tool_use_id": "call_01a0c0c7abdb76948b10f2278ab97b04|fc_01a0c0c7abdb76948b10f2278ab97b04",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c7b6bb77c483c7635bfbcc7eb4|fc_01a0c0c7b6bb77c483c7635bfbcc7eb4",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c7b8157197a0167b3aa75af454|fc_01a0c0c7b8157197a0167b3aa75af454",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c7b94777d0920241acaf7c8824|fc_01a0c0c7b94777d0920241acaf7c8824",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c7d51f72cebef3ab2763b13e72|fc_01a0c0c7d51f72cebef3ab2763b13e72",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c7d8af7359acd5313bba020cf5|fc_01a0c0c7d8af7359acd5313bba020cf5",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c7da2577178b2eee5774577ec1|fc_01a0c0c7da2577178b2eee5774577ec1",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c865d3700b989e25e9930da3fb|fc_01a0c0c865d3700b989e25e9930da3fb",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c8684d70b584bc9741b0a79fe7|fc_01a0c0c8684d70b584bc9741b0a79fe7",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c87e85737ebdb95987f3e7e789|fc_01a0c0c87e85737ebdb95987f3e7e789",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c87f7a739988223978d2fc7a8f|fc_01a0c0c87f7a739988223978d2fc7a8f",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c8a82e71f28e2a9895849752b4|fc_01a0c0c8a82e71f28e2a9895849752b4",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c8acf3709e9301d3cde0fde0fe|fc_01a0c0c8acf3709e9301d3cde0fde0fe",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c8d6b7773d9fe6228dcdb269d4|fc_01a0c0c8d6b7773d9fe6228dcdb269d4",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c8fbaa758f8574ff66ae7c0c46|fc_01a0c0c8fbaa758f8574ff66ae7c0c46",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c9247672ad8ab2e3e771353450|fc_01a0c0c9247672ad8ab2e3e771353450",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c987d274b2934a8f352c068130|fc_01a0c0c987d274b2934a8f352c068130",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c9e8cd70fe8c574e510ed6983e|fc_01a0c0c9e8cd70fe8c574e510ed6983e",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0c9febb70d6bfbd59ad56fdf893|fc_01a0c0c9febb70d6bfbd59ad56fdf893",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cb2932703a811aac9642e358a8|fc_01a0c0cb2932703a811aac9642e358a8",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cb9e59761da5462dd5b53c006b|fc_01a0c0cb9e59761da5462dd5b53c006b",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cbcc1e715fa0bb630870e54a60|fc_01a0c0cbcc1e715fa0bb630870e54a60",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cbdb7372bf8ffdc57086bb0b77|fc_01a0c0cbdb7372bf8ffdc57086bb0b77",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cbfe2477b689df92fb637accf5|fc_01a0c0cbfe2477b689df92fb637accf5",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cc2dd17439b79b491a5f7ddddd|fc_01a0c0cc2dd17439b79b491a5f7ddddd",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cf2d3c70cea6252251de1bc924|fc_01a0c0cf2d3c70cea6252251de1bc924",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cf57cb7160bd1fa39cf2b5bace|fc_01a0c0cf57cb7160bd1fa39cf2b5bace",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cf66b47189831e90b82037e715|fc_01a0c0cf66b47189831e90b82037e715",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0cf88967287afe284a5292bf6c5|fc_01a0c0cf88967287afe284a5292bf6c5",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0d0f7d476b6b573dcfb34241ce4|fc_01a0c0d0f7d476b6b573dcfb34241ce4",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0d123f6721db1f1f971ec64a3df|fc_01a0c0d123f6721db1f1f971ec64a3df",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0d1429b74fd8a9ae875f557833f|fc_01a0c0d1429b74fd8a9ae875f557833f",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0d81b3673f5a1ffa96353d8cac9|fc_01a0c0d81b3673f5a1ffa96353d8cac9",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0d81c1d70a4819fd78719db385e|fc_01a0c0d81c1d70a4819fd78719db385e",
+        "tool": "glob",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c0d85a6c7655800e53808b2ac940|fc_01a0c0d85a6c7655800e53808b2ac940",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c0d86ccd76c6b841cd6becf77d8e|fc_01a0c0d86ccd76c6b841cd6becf77d8e",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c0d88c7e70bfa2c61711c377d50b|fc_01a0c0d88c7e70bfa2c61711c377d50b",
+        "tool": "read",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c0d8d89974caa28b920d7369e5a4|fc_01a0c0d8d89974caa28b920d7369e5a4",
+        "tool": "write",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c0d913de7019ae9828ecf3192e00|fc_01a0c0d913de7019ae9828ecf3192e00",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c0da2ce4707fb06e20a5bdcefeb8|fc_01a0c0da2ce4707fb06e20a5bdcefeb8",
+        "tool": "write",
+        "pinned": true
+      }
+    ]
+  },
+  {
+    "session": "01a0c679-3b25",
+    "horizon_messages": 40,
+    "calls": [
+      {
+        "tool_use_id": "call_01a0c67a0d617285807895a9fcd34455|fc_01a0c67a0d617285807895a9fcd34455",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a1ac37016ab161ed11f6f9b5a|fc_01a0c67a1ac37016ab161ed11f6f9b5a",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a1cde71559d84f3ae2f5649e3|fc_01a0c67a1cde71559d84f3ae2f5649e3",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a1e6576c69c580beed5876fe9|fc_01a0c67a1e6576c69c580beed5876fe9",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a34397485bb30480624ac2a8d|fc_01a0c67a34397485bb30480624ac2a8d",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a35987108962401bbd23231af|fc_01a0c67a35987108962401bbd23231af",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a365274108954702466a0a4c5|fc_01a0c67a365274108954702466a0a4c5",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a466f711ab57c4880cb607e6c|fc_01a0c67a466f711ab57c4880cb607e6c",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a47067561ad89385851f412bf|fc_01a0c67a47067561ad89385851f412bf",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a47937405b4f8514aafd05ce0|fc_01a0c67a47937405b4f8514aafd05ce0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a480373d79a9fc8282ce013b1|fc_01a0c67a480373d79a9fc8282ce013b1",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a572e7611a638b1973c688a0a|fc_01a0c67a572e7611a638b1973c688a0a",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a57d470efa9b43355547b85f2|fc_01a0c67a57d470efa9b43355547b85f2",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a58a472fa9d12c53dab01d88b|fc_01a0c67a58a472fa9d12c53dab01d88b",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a5962764482996ed15d6c6fc0|fc_01a0c67a5962764482996ed15d6c6fc0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a6db674edac8fff4d046cc63e|fc_01a0c67a6db674edac8fff4d046cc63e",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a6e6f7168800300676d1ecba0|fc_01a0c67a6e6f7168800300676d1ecba0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a6f5d76d4a919875b766619a2|fc_01a0c67a6f5d76d4a919875b766619a2",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a8978742dba22121787478242|fc_01a0c67a8978742dba22121787478242",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a8a31706ca27636ecc64707b8|fc_01a0c67a8a31706ca27636ecc64707b8",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67a8ef674d7913a739f5418c5b0|fc_01a0c67a8ef674d7913a739f5418c5b0",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67ab1a775afbadbcf988738ce8a|fc_01a0c67ab1a775afbadbcf988738ce8a",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67ab4fc75f89b263cc3c5f55e18|fc_01a0c67ab4fc75f89b263cc3c5f55e18",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67ab5d0752da3d5e1ff3b5cab4a|fc_01a0c67ab5d0752da3d5e1ff3b5cab4a",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67ae05174f292cf0d42d9a703df|fc_01a0c67ae05174f292cf0d42d9a703df",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67ae32f762b8bde72cd488e90cd|fc_01a0c67ae32f762b8bde72cd488e90cd",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67aefaa71a69e5dfa647d9d68d0|fc_01a0c67aefaa71a69e5dfa647d9d68d0",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67af0667771aacb7fcd2266a045|fc_01a0c67af0667771aacb7fcd2266a045",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67afe0876cfb18f225f1744f92f|fc_01a0c67afe0876cfb18f225f1744f92f",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67afec57208a7eaf531146f5d58|fc_01a0c67afec57208a7eaf531146f5d58",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67b2339712ab45b7508ce77f6c3|fc_01a0c67b2339712ab45b7508ce77f6c3",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c67b2ee87714aacd19a4742520b0|fc_01a0c67b2ee87714aacd19a4742520b0",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c67b305f73b68a2fb9407a4edb53|fc_01a0c67b305f73b68a2fb9407a4edb53",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c67b63257740aa781f5f8032ed9c|fc_01a0c67b63257740aa781f5f8032ed9c",
+        "tool": "hub",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c67b639572ceab2899422f208a5a|fc_01a0c67b639572ceab2899422f208a5a",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c67c75317068aae01c566d0f7fbb|fc_01a0c67c75317068aae01c566d0f7fbb",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c67c967170dd856c36566172607a|fc_01a0c67c967170dd856c36566172607a",
+        "tool": "hub",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c67c9751740b835b30b310e96863|fc_01a0c67c9751740b835b30b310e96863",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c67ca7c573e68cd05b33df1183dc|fc_01a0c67ca7c573e68cd05b33df1183dc",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c67cbafa71f78ff38ca6a65e0382|fc_01a0c67cbafa71f78ff38ca6a65e0382",
+        "tool": "bash",
+        "pinned": true
+      }
+    ]
+  },
+  {
+    "session": "01a0c742-eec7",
+    "horizon_messages": 40,
+    "calls": [
+      {
+        "tool_use_id": "call_01a0c74553c8711d905789613a2a9a39|fc_01a0c74553c8711d905789613a2a9a39",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7455f8e74e2ab89d2018235f9c0|fc_01a0c7455f8e74e2ab89d2018235f9c0",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745840a714f8fb42da41a326339|fc_01a0c745840a714f8fb42da41a326339",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74584d870dc8bab364dc35f8806|fc_01a0c74584d870dc8bab364dc35f8806",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74592ed76cbb7f8d01e7eb5dbfa|fc_01a0c74592ed76cbb7f8d01e7eb5dbfa",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745938f7727b5fc0bb9a450f743|fc_01a0c745938f7727b5fc0bb9a450f743",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745a0dc720f8151a5d1673330e6|fc_01a0c745a0dc720f8151a5d1673330e6",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745a16f75589cba667c78dd656a|fc_01a0c745a16f75589cba667c78dd656a",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745b627744da743f354db9bdf97|fc_01a0c745b627744da743f354db9bdf97",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745b6c17789836ac3b63ae3e366|fc_01a0c745b6c17789836ac3b63ae3e366",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745d107744687bdb22b9a23ef53|fc_01a0c745d107744687bdb22b9a23ef53",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745f09e73e49e2efeefa7a87745|fc_01a0c745f09e73e49e2efeefa7a87745",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c746043f767b8c56fd47b150c63d|fc_01a0c746043f767b8c56fd47b150c63d",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74626da75dea0f01590f0b683a5|fc_01a0c74626da75dea0f01590f0b683a5",
+        "tool": "edit",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7462e657660bb0dd55588427d19|fc_01a0c7462e657660bb0dd55588427d19",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74641eb75e9961a0c61bc79aa56|fc_01a0c74641eb75e9961a0c61bc79aa56",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7465572705499a6406db242bada|fc_01a0c7465572705499a6406db242bada",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7466f97773ca19fea8a17e30c32|fc_01a0c7466f97773ca19fea8a17e30c32",
+        "tool": "hub",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c746701a775997d4817969461584|fc_01a0c746701a775997d4817969461584",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c74681c770268e2e028d069b4dd6|fc_01a0c74681c770268e2e028d069b4dd6",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c758fc707018bbdcde7f89ba31a3|fc_01a0c758fc707018bbdcde7f89ba31a3",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c75908c3703d8ede29d017c1ffd1|fc_01a0c75908c3703d8ede29d017c1ffd1",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7591fc573e387d7f8f6c27d3eb4|fc_01a0c7591fc573e387d7f8f6c27d3eb4",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c759383b725da6b9e4bb5ae0f769|fc_01a0c759383b725da6b9e4bb5ae0f769",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c759457d7008ab84a746a042aa25|fc_01a0c759457d7008ab84a746a042aa25",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c75954c77694ac04ac99bc77dfb0|fc_01a0c75954c77694ac04ac99bc77dfb0",
+        "tool": "glob",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c759701f7053ac8e106659f551b0|fc_01a0c759701f7053ac8e106659f551b0",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7597c93744ba5f58e798406a0ae|fc_01a0c7597c93744ba5f58e798406a0ae",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c759a08273c4bf13db8ee0233c45|fc_01a0c759a08273c4bf13db8ee0233c45",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c759b05c76809d69db1a01739f96|fc_01a0c759b05c76809d69db1a01739f96",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77d7b577106827e99a1f6de69be|fc_01a0c77d7b577106827e99a1f6de69be",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77d94f17768993034efe823faf2|fc_01a0c77d94f17768993034efe823faf2",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77da67e725da2e3ff9bcf21a91e|fc_01a0c77da67e725da2e3ff9bcf21a91e",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77db6dc720c9371be43c77ebcf8|fc_01a0c77db6dc720c9371be43c77ebcf8",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77dca1673c1a43bcb0c5385896a|fc_01a0c77dca1673c1a43bcb0c5385896a",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77dd55370449dfb1313cc8d42f1|fc_01a0c77dd55370449dfb1313cc8d42f1",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77de43d75d4831dcfd07e7a9831|fc_01a0c77de43d75d4831dcfd07e7a9831",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c790e868711096856e14e6088297|fc_01a0c790e868711096856e14e6088297",
+        "tool": "grep",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c790f7b975e5887aa2afafb9c486|fc_01a0c790f7b975e5887aa2afafb9c486",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c791134570a1b0a86d054e3b5984|fc_01a0c791134570a1b0a86d054e3b5984",
+        "tool": "write",
+        "pinned": true
+      }
+    ]
+  },
+  {
+    "session": "01a0c743-0746",
+    "horizon_messages": 40,
+    "calls": [
+      {
+        "tool_use_id": "call_01a0c745d24470699b92d0822c8cb366|fc_01a0c745d24470699b92d0822c8cb366",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745d2e87591bd6bba923698bec7|fc_01a0c745d2e87591bd6bba923698bec7",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745df3d701885f6198294da0e85|fc_01a0c745df3d701885f6198294da0e85",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745dff7717ba2eb6955a0676777|fc_01a0c745dff7717ba2eb6955a0676777",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745e0a77589aef2f1581cb54fec|fc_01a0c745e0a77589aef2f1581cb54fec",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745edfa70799b17b9cea408a1e3|fc_01a0c745edfa70799b17b9cea408a1e3",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745eeac773dbcb554c36848607e|fc_01a0c745eeac773dbcb554c36848607e",
+        "tool": "glob",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745ef8b70708567e401b47afe83|fc_01a0c745ef8b70708567e401b47afe83",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c745fd4d7031a2cb01a5118a0e0b|fc_01a0c745fd4d7031a2cb01a5118a0e0b",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7460f607254b02070c870cab39d|fc_01a0c7460f607254b02070c870cab39d",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7463f4e733f985dbbbc0f69b9a4|fc_01a0c7463f4e733f985dbbbc0f69b9a4",
+        "tool": "write",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7465b9471b5bdf3e41ee80a3c4a|fc_01a0c7465b9471b5bdf3e41ee80a3c4a",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7467433708eb9b37bc2a315741b|fc_01a0c7467433708eb9b37bc2a315741b",
+        "tool": "edit",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7468b14757d8ff795bcfb692a48|fc_01a0c7468b14757d8ff795bcfb692a48",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c746a7247247834576e47f64198b|fc_01a0c746a7247247834576e47f64198b",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c746b5df75238ec5e173044a0d85|fc_01a0c746b5df75238ec5e173044a0d85",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c746da3377ed932e318ef27aee33|fc_01a0c746da3377ed932e318ef27aee33",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7597a457475be40bb077e64aa9f|fc_01a0c7597a457475be40bb077e64aa9f",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7598b43759e948518c94e0bfed0|fc_01a0c7598b43759e948518c94e0bfed0",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77dfc3f72dcb3bd7c6fbd0ad35a|fc_01a0c77dfc3f72dcb3bd7c6fbd0ad35a",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77dfcd271968126705cf5a79ea2|fc_01a0c77dfcd271968126705cf5a79ea2",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77e0986705b9e6b5cf6a6940746|fc_01a0c77e0986705b9e6b5cf6a6940746",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c77e1a67735086daaa05a6e48022|fc_01a0c77e1a67735086daaa05a6e48022",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7916b4d706db41edfcc7a5335d6|fc_01a0c7916b4d706db41edfcc7a5335d6",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7916bd277c7a51d09fc9a64e375|fc_01a0c7916bd277c7a51d09fc9a64e375",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c79180dc73acbe51d5e0308961a6|fc_01a0c79180dc73acbe51d5e0308961a6",
+        "tool": "edit",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c79196f374dbabbb49fb70400ee4|fc_01a0c79196f374dbabbb49fb70400ee4",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7a38bba713194b2d4b700427377|fc_01a0c7a38bba713194b2d4b700427377",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7a38c9674b9b36918f89d48fb2a|fc_01a0c7a38c9674b9b36918f89d48fb2a",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7a3bab0732c87fe46732ac96db7|fc_01a0c7a3bab0732c87fe46732ac96db7",
+        "tool": "edit",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7a3d16f71ab83c6528f700deed2|fc_01a0c7a3d16f71ab83c6528f700deed2",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7a3e47873b380b922eb58ff0a82|fc_01a0c7a3e47873b380b922eb58ff0a82",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7b53f7f72b6a136144ce8015577|fc_01a0c7b53f7f72b6a136144ce8015577",
+        "tool": "read",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7b540127435ba31a4faf6efd324|fc_01a0c7b540127435ba31a4faf6efd324",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7b54d3b774f94d63eb728aa3efb|fc_01a0c7b54d3b774f94d63eb728aa3efb",
+        "tool": "grep",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7b55da07315b9b538dc766b2c79|fc_01a0c7b55da07315b9b538dc766b2c79",
+        "tool": "bash",
+        "pinned": false
+      },
+      {
+        "tool_use_id": "call_01a0c7b56dd57427b1ca543a6c5a8394|fc_01a0c7b56dd57427b1ca543a6c5a8394",
+        "tool": "edit",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c7b581617097bc38105df03999d1|fc_01a0c7b581617097bc38105df03999d1",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c7c7467476cda6e97e7f01963280|fc_01a0c7c7467476cda6e97e7f01963280",
+        "tool": "bash",
+        "pinned": true
+      },
+      {
+        "tool_use_id": "call_01a0c7c7769075998a3fa0c910699564|fc_01a0c7c7769075998a3fa0c910699564",
+        "tool": "grep",
+        "pinned": true
+      }
+    ]
+  }
+]
