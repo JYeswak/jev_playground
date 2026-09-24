@@ -222,6 +222,18 @@ function hookDirAlternatives(hookDir: string): string {
   return `(\\.git\\/hooks\\/|\\.githooks\\/|${h}\\/)`;
 }
 
+/** True when `-n` is a flag of `git commit`, not a shell test in another segment. */
+function commitSegmentHasShortN(stripped: string): boolean {
+  // `[ -n "$x" ] && git commit -m …` used to fire: the -n regex scanned the whole
+  // command. -n bypasses hooks only on the commit segment (jev-80lj). stripQuotes
+  // has already removed -m "…", so a message that mentions -n does not match.
+  for (const seg of stripped.split(/[\n;&|]+/)) {
+    if (!/\bgit\s+commit\b/.test(seg)) continue;
+    if (/\s-[a-zA-Z]*n[a-zA-Z]*\b/.test(seg)) return true;
+  }
+  return false;
+}
+
 export function bashVerdict(command: string, cfg?: GuardConfig | unknown): Verdict {
   const r = configOrBlock(cfg);
   if (!r.ok) return { block: true, reason: r.reason };
@@ -234,9 +246,9 @@ export function bashVerdict(command: string, cfg?: GuardConfig | unknown): Verdi
         "kit-guard B5: `git commit --no-verify` bypasses the pre-commit honesty gate. Read the hook's stderr, fix the cause, and commit normally.",
     };
   }
-  if (/\bgit\s+commit\b/.test(stripped) && /\s-[a-zA-Z]*n[a-zA-Z]*\b/.test(stripped)) {
-    // The -n short flag, outside quotes (stripQuotes already removed -m "…").
-    // `git push -n` is a dry run and stays allowed; only commit -n bypasses the hook.
+  if (/\bgit\s+commit\b/.test(stripped) && commitSegmentHasShortN(stripped)) {
+    // The -n short flag on the commit segment, outside quotes.
+    // `git push -n` is a dry run and stays allowed; `[ -n "$x" ]` beside a commit is not a bypass.
     return {
       block: true,
       reason:

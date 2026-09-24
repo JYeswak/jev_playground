@@ -79,6 +79,9 @@ describe("kit bash rules kept (jev-applicable)", () => {
     "git push origin main --no-verify",
     "git config core.hooksPath /dev/null",
     "git -c core.hooksPath=/tmp commit -m x",
+    "git config --unset core.hooksPath",
+    'git commit -n -m x',
+    '[ -n "$x" ] && git commit -n -m "still a bypass" -- path',
     "rm .git/hooks/pre-commit",
     "echo 'exit 0' > foundation/gates.sh",
     "cat patch | tee foundation/kit/check-claim-discipline.sh",
@@ -91,6 +94,7 @@ describe("kit bash rules kept (jev-applicable)", () => {
     "sh foundation/kit/check-claim-discipline.sh --selftest",
     "cat githooks/pre-commit",
     "br close bd-1 --reason 'cargo test -> 41 passed; commit abc1234'",
+    '[ -n "$x" ] && git commit -m "msg" -- path',
   ];
   for (const c of allowed) test(`allows: ${c}`, () => expect(bashVerdict(c, cfg)).toBeNull());
   test("br close is NOT in bashVerdict (stays a TTSR rule)", () =>
