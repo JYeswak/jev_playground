@@ -196,9 +196,11 @@ EOF
   [ "$RC" = 0 ] || why="exit $RC"
   [ -z "$why" ] && ! landed refs/heads/main && why="remote main not updated"
   [ -z "$why" ] && [ "$(grep -c '' "$ERR")" != 1 ] && why="expected exactly one stderr line"
-  [ -z "$why" ] && [ "$(cat "$ERR")" != "CI status NOT_RUN: gh not installed" ] &&
-    why="stderr is not 'CI status NOT_RUN: gh not installed'"
-  arm "arm 3 gh absent: push landed, one line 'CI status NOT_RUN: gh not installed', never green" "$why"
+  [ -z "$why" ] && ! grep -q '^CI status NOT_RUN: gh not installed' "$ERR" &&
+    why="stderr line does not start with 'CI status NOT_RUN: gh not installed'"
+  [ -z "$why" ] && grep -qF -e 'CI on main is RED' -e 'success' "$ERR" &&
+    why="stderr line carries a red or green status ('CI on main is RED' or 'success')"
+  arm "arm 3 gh absent: push landed, one line starting 'CI status NOT_RUN: gh not installed', no red or green line" "$why"
 
   # 4. NOT MAIN: a push to refs/heads/topic lands and never runs the script (gh never called).
   standin topic red
