@@ -18,8 +18,8 @@ set -uo pipefail
 # these SAFE-TO-HARDEN and behaviour-neutral TODAY. Its qualifier is the load-bearing half and
 # is reproduced here rather than left in a receipt: neutrality holds ONLY because this file does
 # not `set -e`. IF `set -e` IS EVER ADDED, RE-AUDIT — pipefail+errexit aborts on a middle-stage
-# failure, and every pipe then existing needs explicit handling (see 30-no-secrets.sh:21, whose
-# `grep … | head` is the feared shape and is already neutralised with `|| true`).
+# failure, and every pipe then existing needs explicit handling (30-no-secrets.sh's scan pipeline
+# is one; it reads the pipeline's status explicitly: 0 hit, 1 none, anything else no verdict).
 here=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd -P)
 mode=run
 portable=""
