@@ -128,6 +128,8 @@ node --test work/nev-injection/seat-guard.test.mjs
 
 **Checking a claim against its evidence: SciFact.** On 400 public SciFact claim-abstract pairs, one Noul question at `jev-1.13.0` got 361/400 right against Claude Haiku 4.5's 351/400 through the official adapter, a tie on accuracy (McNemar 19 vs 9, p = 0.087), while Jev's probabilities were significantly better on all three probability measures: AUC 0.962 vs 0.934, Brier 0.0709 vs 0.1002, ECE 0.0431 vs 0.0854. Against xAI's grok-4.20 (non-reasoning) on the same pairs, Jev wins all four, accuracy included: 361 vs 330 right, 46 vs 15 discordant, p = 8.8e-5 ([receipt](docs/demos/upstream-repro/noul-scifact-20260924.md), [second incumbent](docs/demos/upstream-repro/second-incumbent-20260924.md)).
 
+**A second claim set: FEVER.** On 400 FEVER 1.0 dev claims, each paired with its gold evidence, the same Noul question at `jev-1.13.0` got 379/400 right against Claude Haiku 4.5's 376/400, again a tie on accuracy (McNemar 6 vs 3, p = 0.51), with Jev significantly ahead on AUC 0.973 vs 0.957, Brier 0.0463 vs 0.0581 and ECE 0.0376 vs 0.0664 ([receipt](docs/demos/upstream-repro/noul-fever-20260924.md)).
+
 Each of these re-scores from committed rows with no key:
 
 ```bash
@@ -135,6 +137,7 @@ python3 work/score-sst5/score.py                # SST-5: MAE 0.488 vs 0.556, 273
 python3 work/jev-variance/score.py              # SST-5 and Banking77 across three Jev runs
 python3 work/choice-banking77/score.py          # Banking77: 384 vs 362; 374 vs 362 of 386; credited 384 vs 376
 python3 work/noul-scifact/score.py              # SciFact: 361 vs 351, AUC 0.962 vs 0.934
+python3 work/noul-scifact/score.py work/noul-fever  # FEVER: 379 vs 376, AUC 0.973 vs 0.957
 python3 work/second-incumbent/score.py          # vs grok-4.20: SciFact 361 vs 330; Banking77 384 vs 366, 368 vs 365 of 378
 python3 work/bicameral-gate/score-b.py          # gate: 78/100 vs 41/100 at 1/300; Haiku 84/100 at 20/300
 python3 work/bicameral-gate/verify-labels-b.py  # gate, 3 labels corrected: 78/97
