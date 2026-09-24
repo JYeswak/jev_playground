@@ -37,9 +37,9 @@ export const EXCLUDE = ["01a0d3a7", "01a0b735"];
 export const OPTIONS = { keepThreshold: 0.5, maxStateTokens: 20000, truncateHeadChars: 500, preserveRecentMessages: 6, model: "jev-1.13.0" };
 export const CUTOFF = "2026-09-24T17:00:00Z"; // only files last written before this are eligible (a still-open session is not)
 
-const untilde = (p: string) => p.replace(/^~/, HOME);
+export const untilde = (p: string) => p.replace(/^~/, HOME);
 
-function sessionFiles(): string[] {
+export function sessionFiles(): string[] {
   const roots = [join(HOME, ".omp/agent/sessions/-Developer-jev")];
   const profiles = join(HOME, ".omp/profiles");
   if (existsSync(profiles)) {
@@ -53,7 +53,7 @@ function sessionFiles(): string[] {
   return out.sort();
 }
 
-function load(file: string) {
+export function load(file: string) {
   const events = readFileSync(file, "utf8").split("\n").filter((l) => l.trim()).map((l) => JSON.parse(l));
   return adaptOmpTranscript(events).messages;
 }
@@ -69,7 +69,7 @@ export function cut(messages: readonly Message[]) {
 }
 
 // A small seeded generator (mulberry32) so the sample can be re-drawn from the committed seed.
-function rng(seed: number) {
+export function rng(seed: number) {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) >>> 0;
@@ -123,9 +123,9 @@ function sessions() {
   return kept;
 }
 
-const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n)} …[${s.length - n} more chars]` : s);
+export const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n)} …[${s.length - n} more chars]` : s);
 
-function render(m: Message): string {
+export function render(m: Message): string {
   const parts = [`### ${m.role}`];
   if (m.text) parts.push(clip(m.text, 2000));
   for (const u of m.toolUses ?? []) parts.push(`TOOL CALL ${u.tool_use_id} ${u.tool}: ${clip(JSON.stringify(u.input), 800)}`);
@@ -229,6 +229,9 @@ async function replay() {
   return 0;
 }
 
-const mode = process.argv[2];
-const code = mode === "select" ? select() : mode === "packets" ? packets() : mode === "replay" ? await replay() : (console.log("usage: need.ts select|packets|replay --live"), 64);
-process.exit(code);
+// Run only as a script, so work/compaction-keep/keep.ts can import the helpers above.
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  const mode = process.argv[2];
+  const code = mode === "select" ? select() : mode === "packets" ? packets() : mode === "replay" ? await replay() : (console.log("usage: need.ts select|packets|replay --live"), 64);
+  process.exit(code);
+}
