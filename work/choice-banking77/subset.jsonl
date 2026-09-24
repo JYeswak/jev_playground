@@ -1,0 +1,400 @@
+{"i": 0, "text": "When traveling, can I auto top-up my card at certain times?", "intent": "automatic_top_up"}
+{"i": 1, "text": "Is there a limit when using auto top-up?", "intent": "automatic_top_up"}
+{"i": 2, "text": "Will it automatically top-up or do I need to do that manually if there isn't much cash left?", "intent": "automatic_top_up"}
+{"i": 3, "text": "I'm running out of money, can I  auto top up?", "intent": "automatic_top_up"}
+{"i": 4, "text": "How do I use auto top up?", "intent": "automatic_top_up"}
+{"i": 5, "text": "Can it automatically top-up money if there isn't much left?", "intent": "automatic_top_up"}
+{"i": 6, "text": "If there isn't much money left can it automatically top-up?", "intent": "automatic_top_up"}
+{"i": 7, "text": "I read about the auto-top up function, but can't find it in the app.", "intent": "automatic_top_up"}
+{"i": 8, "text": "Can I have it add money at certain time intervals when I travel?", "intent": "automatic_top_up"}
+{"i": 9, "text": "I'm going to be away for awhile, can I have it add money automatically in certain intervals?", "intent": "automatic_top_up"}
+{"i": 10, "text": "Where can I find the \"auto-top\" feature?", "intent": "automatic_top_up"}
+{"i": 11, "text": "I just activated auto top-up, but it is not letting me enable it. Why not?", "intent": "automatic_top_up"}
+{"i": 12, "text": "Is there an auto top-up option?", "intent": "automatic_top_up"}
+{"i": 13, "text": "where is theft-top option?", "intent": "automatic_top_up"}
+{"i": 14, "text": "Are there limits on auto top-up?", "intent": "automatic_top_up"}
+{"i": 15, "text": "can you assist me with the auto top up ?", "intent": "automatic_top_up"}
+{"i": 16, "text": "Do you have any limit on the auto top-up?", "intent": "automatic_top_up"}
+{"i": 17, "text": "Why are there limits on auto top-up?", "intent": "automatic_top_up"}
+{"i": 18, "text": "How can I top up automatically?", "intent": "automatic_top_up"}
+{"i": 19, "text": "How do I make sure I don't run out of money on my card while traveling?", "intent": "automatic_top_up"}
+{"i": 20, "text": "What's the limit on automatic top-up?", "intent": "automatic_top_up"}
+{"i": 21, "text": "If I will be traveling, is there a way to auto top-up my card on certain days?", "intent": "automatic_top_up"}
+{"i": 22, "text": "Where is the auto top-up option?", "intent": "automatic_top_up"}
+{"i": 23, "text": "Can I have a auto top-up when my account is short?", "intent": "automatic_top_up"}
+{"i": 24, "text": "Do you have an auto top-up option?", "intent": "automatic_top_up"}
+{"i": 25, "text": "Can I space out how often money is transferred along my travels?", "intent": "automatic_top_up"}
+{"i": 26, "text": "Will it automatically top-up money if there isn't a lot left?", "intent": "automatic_top_up"}
+{"i": 27, "text": "Can I have it add money automatically in certain intervals?", "intent": "automatic_top_up"}
+{"i": 28, "text": "Can I set up an automatic top-up for travel.", "intent": "automatic_top_up"}
+{"i": 29, "text": "I've tried looking for the auto-top up option on your website and I can't seem to find it. Can you help me?", "intent": "automatic_top_up"}
+{"i": 30, "text": "how do I top up my money automatically", "intent": "automatic_top_up"}
+{"i": 31, "text": "Can I be topped up once I hit a certain balance?", "intent": "automatic_top_up"}
+{"i": 32, "text": "Will it automatically top-up if there isn't much money left?", "intent": "automatic_top_up"}
+{"i": 33, "text": "Is there any way to Auto top-up?", "intent": "automatic_top_up"}
+{"i": 34, "text": "Can you explain where I can find the auto-top option?", "intent": "automatic_top_up"}
+{"i": 35, "text": "What is the auto top up function and where can I find that at?", "intent": "automatic_top_up"}
+{"i": 36, "text": "Is there a way to top-up automatically?", "intent": "automatic_top_up"}
+{"i": 37, "text": "Is there a top-up feature, if there isn't a lot of money left?", "intent": "automatic_top_up"}
+{"i": 38, "text": "What is the highest limit for Auto Top?", "intent": "automatic_top_up"}
+{"i": 39, "text": "How do I enable auto-top up?", "intent": "automatic_top_up"}
+{"i": 40, "text": "how old do i need to be to get an account for myself", "intent": "age_limit"}
+{"i": 41, "text": "How young can I be to open my own account?", "intent": "age_limit"}
+{"i": 42, "text": "How old do I have to be?", "intent": "age_limit"}
+{"i": 43, "text": "Can I open an account for a child?", "intent": "age_limit"}
+{"i": 44, "text": "How old do we have to be?", "intent": "age_limit"}
+{"i": 45, "text": "How do I go about setting up an account for my daughter?", "intent": "age_limit"}
+{"i": 46, "text": "Is there an age minimum?", "intent": "age_limit"}
+{"i": 47, "text": "What is the youngest age in order to have an account?", "intent": "age_limit"}
+{"i": 48, "text": "What age do I have to be?", "intent": "age_limit"}
+{"i": 49, "text": "Can my daughter open an account?", "intent": "age_limit"}
+{"i": 50, "text": "What is the minimum age to open an account?", "intent": "age_limit"}
+{"i": 51, "text": "What is the minimum age?", "intent": "age_limit"}
+{"i": 52, "text": "I am only 17. Can I make an account?", "intent": "age_limit"}
+{"i": 53, "text": "Could I open an account for my children?", "intent": "age_limit"}
+{"i": 54, "text": "What is the age to open an account?", "intent": "age_limit"}
+{"i": 55, "text": "How do I open up an account for my child?", "intent": "age_limit"}
+{"i": 56, "text": "Can I open a bank account for my newborn baby?", "intent": "age_limit"}
+{"i": 57, "text": "How old do I have to be to open an account?", "intent": "age_limit"}
+{"i": 58, "text": "Do you offer services for children to have money saving experience?", "intent": "age_limit"}
+{"i": 59, "text": "If my kids wanted to use your service how old would they have to be?", "intent": "age_limit"}
+{"i": 60, "text": "Can my 19 year old daughter open a savings account at the bank?", "intent": "age_limit"}
+{"i": 61, "text": "How old do you have to be to get an account?", "intent": "age_limit"}
+{"i": 62, "text": "What's the minimum age for opening an account?", "intent": "age_limit"}
+{"i": 63, "text": "I would like an account for my children, how do I go about doing this?", "intent": "age_limit"}
+{"i": 64, "text": "Can my children have their own account?", "intent": "age_limit"}
+{"i": 65, "text": "Is it possible to open an account for my children?", "intent": "age_limit"}
+{"i": 66, "text": "Do my kids have to be a certain age to use this service?", "intent": "age_limit"}
+{"i": 67, "text": "How old do you have to be to be able to open an account?", "intent": "age_limit"}
+{"i": 68, "text": "Is there an age limit?", "intent": "age_limit"}
+{"i": 69, "text": "What are the age requirements for opening an account?", "intent": "age_limit"}
+{"i": 70, "text": "will i be able to open an account for my daughter", "intent": "age_limit"}
+{"i": 71, "text": "How old do I need to be to open an account?", "intent": "age_limit"}
+{"i": 72, "text": "What age can sign up for services?", "intent": "age_limit"}
+{"i": 73, "text": "How old do my kids have to be to use your service?", "intent": "age_limit"}
+{"i": 74, "text": "What age do my kids need to be to use your service?", "intent": "age_limit"}
+{"i": 75, "text": "How old do my children need to be to open an account?", "intent": "age_limit"}
+{"i": 76, "text": "How old does my kids need to be to open an account?", "intent": "age_limit"}
+{"i": 77, "text": "How young can someone be in order to open an account?", "intent": "age_limit"}
+{"i": 78, "text": "What is the youngest someone can be to open an account?", "intent": "age_limit"}
+{"i": 79, "text": "How old does one have to be to have an account with the bank?", "intent": "age_limit"}
+{"i": 80, "text": "I made a transaction this morning and would like to revert it.", "intent": "cancel_transfer"}
+{"i": 81, "text": "Can i cancel a charge?", "intent": "cancel_transfer"}
+{"i": 82, "text": "Can I cancel my transaction?", "intent": "cancel_transfer"}
+{"i": 83, "text": "I made a transaction but did it to the wrong account.", "intent": "cancel_transfer"}
+{"i": 84, "text": "Tell me how to cancel a transfer.", "intent": "cancel_transfer"}
+{"i": 85, "text": "I need you to cancel a transfer that I made.  It is the wrong account number and the app won't let me stop the transaction.  Please stop it!", "intent": "cancel_transfer"}
+{"i": 86, "text": "I need to cancel my recent transfer immediately, I made a mistake there, please help quickly before it goes through", "intent": "cancel_transfer"}
+{"i": 87, "text": "I would like to revert a transaction I did this morning", "intent": "cancel_transfer"}
+{"i": 88, "text": "If I make a transaction can I cancel it?", "intent": "cancel_transfer"}
+{"i": 89, "text": "How can I cancel a transfer?", "intent": "cancel_transfer"}
+{"i": 90, "text": "Is there any way to cancel a transfer?", "intent": "cancel_transfer"}
+{"i": 91, "text": "I accidentally made a transaction to the wrong account.", "intent": "cancel_transfer"}
+{"i": 92, "text": "I want to cancel a transfer right away! Can you help?", "intent": "cancel_transfer"}
+{"i": 93, "text": "Help me cancel my transaction", "intent": "cancel_transfer"}
+{"i": 94, "text": "This is URGENT, I typed the wrong payment information for a payment I needed to make and have clicked send, I need to reverse the transaction immediately.", "intent": "cancel_transfer"}
+{"i": 95, "text": "Can I cancel a transfer", "intent": "cancel_transfer"}
+{"i": 96, "text": "I want to reverse my transaction from earlier", "intent": "cancel_transfer"}
+{"i": 97, "text": "Is there a way to revert my transaction from this morning?", "intent": "cancel_transfer"}
+{"i": 98, "text": "I'd like to cancel a transfer", "intent": "cancel_transfer"}
+{"i": 99, "text": "Can I cancel a transfer if is already processed?", "intent": "cancel_transfer"}
+{"i": 100, "text": "I transferred the wrong amount and would like to cancel the transaction.", "intent": "cancel_transfer"}
+{"i": 101, "text": "I made a mistake when I did a transfer so now what can I do to fix that?", "intent": "cancel_transfer"}
+{"i": 102, "text": "I need to cancel an incorrect transaction.", "intent": "cancel_transfer"}
+{"i": 103, "text": "How do I cancel my transfer?", "intent": "cancel_transfer"}
+{"i": 104, "text": "I made a mistake with a transaction!", "intent": "cancel_transfer"}
+{"i": 105, "text": "I submitted a transaction to the incorrect account.", "intent": "cancel_transfer"}
+{"i": 106, "text": "The transfer I just made needs to be cancelled right now. It was my mistake. Please help me cancel it before it goes through!", "intent": "cancel_transfer"}
+{"i": 107, "text": "I want to go back on what I did this morning", "intent": "cancel_transfer"}
+{"i": 108, "text": "Can a transaction be cancelled?", "intent": "cancel_transfer"}
+{"i": 109, "text": "How do i cancel my transaction?", "intent": "cancel_transfer"}
+{"i": 110, "text": "My transaction needs to be canceled.", "intent": "cancel_transfer"}
+{"i": 111, "text": "I need to make an immediate cancellation related to a transfer. This was a mistake. Please assist quickly so this does not actually go through.", "intent": "cancel_transfer"}
+{"i": 112, "text": "I made a mistake and need to cancel a transaction", "intent": "cancel_transfer"}
+{"i": 113, "text": "I made an error in payment yesterday and I need it fixed asap because it's for my rent tomorrow.", "intent": "cancel_transfer"}
+{"i": 114, "text": "Cancel my last transfer", "intent": "cancel_transfer"}
+{"i": 115, "text": "My recent transfer needs to be cancelled immediately; it was a mistake, please can you cancel it before it goes through?", "intent": "cancel_transfer"}
+{"i": 116, "text": "I need help cancelling a transaction.", "intent": "cancel_transfer"}
+{"i": 117, "text": "I don't want the transaction to go through now", "intent": "cancel_transfer"}
+{"i": 118, "text": "Can I change the amount I made on a payment that I made to the payment is correct.", "intent": "cancel_transfer"}
+{"i": 119, "text": "Please help me!  I need to cancel a transaction.", "intent": "cancel_transfer"}
+{"i": 120, "text": "I tried making an update to my balance using cheque just yesterday but it doesn't appear to have worked. Should this not be a faster process? I need you to please check over my account because something has went wrong.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 121, "text": "How come I don't see my deposit in my account yet?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 122, "text": "Is there a reason why my account isn't updating because I used a check to  balance my account?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 123, "text": "I don't know why the deposit I made a week ago still hasn't showed up, I really need the money now.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 124, "text": "I made a cash deposit almost a week ago but it's still not there!! please sort this out asap I need the money", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 125, "text": "Where is my cash deposit?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 126, "text": "How can I get the cash deposit to show up on my account?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 127, "text": "When will I see the cash I deposited this morning as available?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 128, "text": "cash from this morning has not deposited", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 129, "text": "Where is the cash from my cheque I recently deposited?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 130, "text": "Cash deposit to my account but it has not appeared.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 131, "text": "When I deposit cheques and cash, my balance does not update.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 132, "text": "I made a deposit this morning but it is still pending?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 133, "text": "cash deposit to my account has shown a red flag.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 134, "text": "I have paid money into my account but it doesn't show.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 135, "text": "The balance on my account wasn't updated after I made a depost.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 136, "text": "Are cheques accepted to my account? Mine didn't seem to work.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 137, "text": "I deposited a check but my balance is still the same.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 138, "text": "IM still waiting for my account to update from a cash deposit?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 139, "text": "I Submitted a cheque couple days ago, nothing happened to my account yet.Would you please check What could be the possible issue?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 140, "text": "Where is my deposit?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 141, "text": "My bank statement doesn't show the cash deposit I made recently.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 142, "text": "My cash deposit from a week ago hasn't shown up. I need the money - how quickly can you sort this out?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 143, "text": "Why didn't my balance update after my cash or checque deposit?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 144, "text": "Why is the cash deposit not showing up in my account?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 145, "text": "I made a deposit of cash and check that has not been added to my balance.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 146, "text": "Why hasn't my balance increased after depositing a check?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 147, "text": "Why does my account not accept cash deposits?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 148, "text": "What happened to the cash that I tried to deposit into my account? It's gone!", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 149, "text": "I had a cheque deposited, but I still haven't seen the cash.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 150, "text": "A cheque deposit hasn't posted to my account, when will my balance update?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 151, "text": "I submitted a cash deposit to my account but it hasn't posted yet.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 152, "text": "I sent a cheque  a few days ago and nothing has happened to my account yet. Can you please check on this for me?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 153, "text": "Has the check I deposited cleared to I can get the cash?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 154, "text": "How long does it take to process cheque deposits?", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 155, "text": "How come my cash deposit is not showing up. This can't be right. There must be some mistake. Where did my cash go. You better not have lost it as I need this money asap.", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 156, "text": "I deposited cash this morning and I am still waiting", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 157, "text": "Balance hasn't been updated following a cheque or cash deposit", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 158, "text": "I tired to deposit some cash into my account but it's not there", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 159, "text": "I sent you a cheque couple days ago, nothing happened to my account yet! This is unacceptable, where is my money??", "intent": "balance_not_updated_after_cheque_or_cash_deposit"}
+{"i": 160, "text": "Do all ATMs take this card?", "intent": "atm_support"}
+{"i": 161, "text": "Which ATMs accept this card?", "intent": "atm_support"}
+{"i": 162, "text": "Where is the closest Mastercard ATM?", "intent": "atm_support"}
+{"i": 163, "text": "Is there a list of ATM machines?", "intent": "atm_support"}
+{"i": 164, "text": "Are there any specific ATMs that this card can be used at?", "intent": "atm_support"}
+{"i": 165, "text": "How do I know which ATMs will accept this card?", "intent": "atm_support"}
+{"i": 166, "text": "Which ATM's accept my card?", "intent": "atm_support"}
+{"i": 167, "text": "Is there any nearby ATM's?", "intent": "atm_support"}
+{"i": 168, "text": "Where are the locations of ATMs that accept this card?", "intent": "atm_support"}
+{"i": 169, "text": "Which ATMs accept this placard ?", "intent": "atm_support"}
+{"i": 170, "text": "Help me locate the nearest ATM.", "intent": "atm_support"}
+{"i": 171, "text": "What ATMs is the card okay to use at?", "intent": "atm_support"}
+{"i": 172, "text": "How can I find the nearest ATM?", "intent": "atm_support"}
+{"i": 173, "text": "What kind of ATM's can I use?", "intent": "atm_support"}
+{"i": 174, "text": "How can I withdraw money?", "intent": "atm_support"}
+{"i": 175, "text": "How many miles away is the ATM?", "intent": "atm_support"}
+{"i": 176, "text": "From where can I withdraw?", "intent": "atm_support"}
+{"i": 177, "text": "Which ATM's will accept my card?", "intent": "atm_support"}
+{"i": 178, "text": "At what ATMS am I able to use the card?", "intent": "atm_support"}
+{"i": 179, "text": "Can I use my card at any ATMs?", "intent": "atm_support"}
+{"i": 180, "text": "Can I get cash with this card anywhere?", "intent": "atm_support"}
+{"i": 181, "text": "\nWhich ATMs accept this card?", "intent": "atm_support"}
+{"i": 182, "text": "Can someone please assist me with finding my nearest ATM?", "intent": "atm_support"}
+{"i": 183, "text": "Are there any ATM machines near me?", "intent": "atm_support"}
+{"i": 184, "text": "Where is the nearest bank machine?", "intent": "atm_support"}
+{"i": 185, "text": "What type of ATMs accept this card?", "intent": "atm_support"}
+{"i": 186, "text": "Where can I use this card at an ATM?", "intent": "atm_support"}
+{"i": 187, "text": "If I have this card, which ATMs can I go to?", "intent": "atm_support"}
+{"i": 188, "text": "What ATMs can I withdraw money from?", "intent": "atm_support"}
+{"i": 189, "text": "I want to withdraw money, where can I go?", "intent": "atm_support"}
+{"i": 190, "text": "Where can I withdrawal my money?", "intent": "atm_support"}
+{"i": 191, "text": "What are the ATMs that will accept this card?", "intent": "atm_support"}
+{"i": 192, "text": "What ATMs will accept this type of card?", "intent": "atm_support"}
+{"i": 193, "text": "Where can I find an ATM to use this card?", "intent": "atm_support"}
+{"i": 194, "text": "At which ATMs can I use this card?", "intent": "atm_support"}
+{"i": 195, "text": "Are there certain ATMs that I can use this card at?", "intent": "atm_support"}
+{"i": 196, "text": "Do you know the closest ATM?", "intent": "atm_support"}
+{"i": 197, "text": "Can I use this card at an ATM?", "intent": "atm_support"}
+{"i": 198, "text": "Is there places where I can't withdraw money?", "intent": "atm_support"}
+{"i": 199, "text": "locations to withdraw money", "intent": "atm_support"}
+{"i": 200, "text": "I've tried numerous times to submit a transfer of funds. Why isn't it going through?", "intent": "beneficiary_not_allowed"}
+{"i": 201, "text": "I've transferred money before without issue but now I am encountering an error stating that it isn't possible. Why is that?", "intent": "beneficiary_not_allowed"}
+{"i": 202, "text": "I am not able to do a transfer to an account", "intent": "beneficiary_not_allowed"}
+{"i": 203, "text": "I was unable to make a transfer to another account.", "intent": "beneficiary_not_allowed"}
+{"i": 204, "text": "I had a transfer blocked", "intent": "beneficiary_not_allowed"}
+{"i": 205, "text": "Can you please help me with this exchange?  I am trying to get crypto and the app won't let me.", "intent": "beneficiary_not_allowed"}
+{"i": 206, "text": "How do I do a successful transfer to an account?", "intent": "beneficiary_not_allowed"}
+{"i": 207, "text": "Why did I get a message saying that my transfer is not possible?  I have done this before no problem.  Please fix.", "intent": "beneficiary_not_allowed"}
+{"i": 208, "text": "Hey I want to buy some crypto but the app doesn't allow me to! What's the issue, I really want to exchange this", "intent": "beneficiary_not_allowed"}
+{"i": 209, "text": "I tried to transfer money but it said it wasn't possible? I've done this before and it worked why isn't it working now?", "intent": "beneficiary_not_allowed"}
+{"i": 210, "text": "Why can't I transfer to a beneficiary?", "intent": "beneficiary_not_allowed"}
+{"i": 211, "text": "I am having problems transferring to a beneficiary.", "intent": "beneficiary_not_allowed"}
+{"i": 212, "text": "What's the deal with no cryptocurrency on your app?", "intent": "beneficiary_not_allowed"}
+{"i": 213, "text": "Why isn't my transfer not going through? I keep getting an error message.", "intent": "beneficiary_not_allowed"}
+{"i": 214, "text": "What are the rules for transferring to a beneficiary?", "intent": "beneficiary_not_allowed"}
+{"i": 215, "text": "Can I transfer money to a beneficiery?", "intent": "beneficiary_not_allowed"}
+{"i": 216, "text": "I have tried transferring money numerous times.  All I keep getting is an error message.  Can you tell me what is going on and how this van be fixed?", "intent": "beneficiary_not_allowed"}
+{"i": 217, "text": "I have a cryptocurrency exchange that won't go through. Please help me process it.", "intent": "beneficiary_not_allowed"}
+{"i": 218, "text": "Why wasn't I able to transfer to another account?", "intent": "beneficiary_not_allowed"}
+{"i": 219, "text": "The money would not transfer to a beneficiary.", "intent": "beneficiary_not_allowed"}
+{"i": 220, "text": "How come I'm not allowed to transfer funds right now? I just keep getting an error message.", "intent": "beneficiary_not_allowed"}
+{"i": 221, "text": "I couldn't do a transfer to an account", "intent": "beneficiary_not_allowed"}
+{"i": 222, "text": "A transfer to an account was not allowed", "intent": "beneficiary_not_allowed"}
+{"i": 223, "text": "Why did I receive an error message saying that my transfer was not possible?", "intent": "beneficiary_not_allowed"}
+{"i": 224, "text": "Explain why I can't do a transfer to a beneficiary.", "intent": "beneficiary_not_allowed"}
+{"i": 225, "text": "My transfer to beneficiary didn't go through", "intent": "beneficiary_not_allowed"}
+{"i": 226, "text": "Why isn't my transfer going through? I get a message saying it's not possible. I've had no issues in the past.", "intent": "beneficiary_not_allowed"}
+{"i": 227, "text": "I couldn't make a transfer to a beneficiary!", "intent": "beneficiary_not_allowed"}
+{"i": 228, "text": "My beneficiary has been denied, is this normal?", "intent": "beneficiary_not_allowed"}
+{"i": 229, "text": "I am trying to exchange crypto and it's not working. Tell me how to fix this.", "intent": "beneficiary_not_allowed"}
+{"i": 230, "text": "The account transfer I was trying to do failed.", "intent": "beneficiary_not_allowed"}
+{"i": 231, "text": "My beneficiary is not allowed, please may I have answer as to why this is?", "intent": "beneficiary_not_allowed"}
+{"i": 232, "text": "Why couldn't I do a transfer to a beneficiary?", "intent": "beneficiary_not_allowed"}
+{"i": 233, "text": "Why would i not be able to do a transfer to a beneficiary?", "intent": "beneficiary_not_allowed"}
+{"i": 234, "text": "I want to transfer money to a beneficiery. Why can't I?", "intent": "beneficiary_not_allowed"}
+{"i": 235, "text": "Can you help with a transfer to an account", "intent": "beneficiary_not_allowed"}
+{"i": 236, "text": "why isnt my account allowing transfers", "intent": "beneficiary_not_allowed"}
+{"i": 237, "text": "I want to buy cryptocurrency, but your app doesn't let me. Why?", "intent": "beneficiary_not_allowed"}
+{"i": 238, "text": "i tried to make a transfer to a beneficiary and it didn't go through", "intent": "beneficiary_not_allowed"}
+{"i": 239, "text": "Why was a transfer to an account not allowed?", "intent": "beneficiary_not_allowed"}
+{"i": 240, "text": "I made a transfer a few hours ago from a UK banking account.  I do not yet see the transfer.  Please check on this for me.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 241, "text": "the balance on my account didnt change when i transferred money", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 242, "text": "How long will it take for my transferred money to show up?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 243, "text": "Why didn't my balance change after I transferred some money?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 244, "text": "When will my balance update after a transfer?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 245, "text": "How long does it take for an international transfer into my account?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 246, "text": "The amount of time that transfers usually take from a UK account is what?I just completed a transfer and it is not showing up at all. I'm wondering at this point if everything is actually okay.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 247, "text": "When will my transfer be available in my account.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 248, "text": "I didn't get the money I transferred", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 249, "text": "I just completed a bank transfer and the balance didn't update", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 250, "text": "I transferred some money but I think it has gotten lost somewhere.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 251, "text": "How long does a UK transfer take?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 252, "text": "Hello I made a bank transfer couple hours ago from my UK account but it doesn't show up yet. Can you please check if everything is alright with it?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 253, "text": "I made a transfer and am still waiting.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 254, "text": "I made an out of country transfer and it hasn't went through yet.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 255, "text": "After the transfer, the balance did not update.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 256, "text": "Could you please check one of my transfer which i made few hours ago from my UK bank account, as its not showing yet.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 257, "text": "I had cash transferred but the balance did not change.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 258, "text": "I can't see my latest bank transfer", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 259, "text": "My bank transfer is still not showing up in my account.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 260, "text": "I made a transfer and it doesnt' show up in my account.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 261, "text": "I transferred some money but it is yet to arrive.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 262, "text": "Why is my balance the same?  I processed a transfer.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 263, "text": "Why don't I have my transfer?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 264, "text": "Why isn't the transfer on my account showing up?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 265, "text": "The  money I transferred does not show in the balance.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 266, "text": "I have completed a transfer but it is not showing up.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 267, "text": "I did a transfer to my account but it doesn't show up", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 268, "text": "How long until my transfer will be available to me", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 269, "text": "Why doesn't it show that I did a balance transfer?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 270, "text": "I made a bank transfer a couple of hours ago from my UK account.  It hasn't appeared, can you check to make sure it went through?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 271, "text": "My transfer is pending.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 272, "text": "Hey, I try to make a bank transfer from my UK account a few hours ago, but it haven't show up yet. Please check my account to make sure everything alright with it?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 273, "text": "Where is my transfer from [country]?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 274, "text": "I made a bank transfer and my account balance did not show it.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 275, "text": "Where is my money? I transfered it and it isn't in my account.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 276, "text": "I need to know the time frame that is typical for a transfer from a UK account. I just made a transfer and it doesn't appear. I want to make sure everything is okay.", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 277, "text": "Why doesn't my balance reflect my transfer", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 278, "text": "My account balance has not gone up even though I just transferred money into it", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 279, "text": "When will I see my new balance after making my bank transfer?", "intent": "balance_not_updated_after_bank_transfer"}
+{"i": 280, "text": "Could you please activate my card", "intent": "activate_my_card"}
+{"i": 281, "text": "I need to activate my card can you do that now?", "intent": "activate_my_card"}
+{"i": 282, "text": "What do I need to do to activate my new card?", "intent": "activate_my_card"}
+{"i": 283, "text": "Tell me how to go about activating my new card?", "intent": "activate_my_card"}
+{"i": 284, "text": "How can I activate my card so I can start using it?", "intent": "activate_my_card"}
+{"i": 285, "text": "How long will it take to activate my new card?", "intent": "activate_my_card"}
+{"i": 286, "text": "What's the right way to activate my card?", "intent": "activate_my_card"}
+{"i": 287, "text": "I received my new card, how is it activated?", "intent": "activate_my_card"}
+{"i": 288, "text": "Is there a way my new card can be renewed?", "intent": "activate_my_card"}
+{"i": 289, "text": "How do I activate a card I received?", "intent": "activate_my_card"}
+{"i": 290, "text": "Why can't I activate my card?", "intent": "activate_my_card"}
+{"i": 291, "text": "What is the process of card activation?", "intent": "activate_my_card"}
+{"i": 292, "text": "WHAT CAN I DO AFTER THE CARD MISSING", "intent": "activate_my_card"}
+{"i": 293, "text": "I got my new card where do I go to activate it?", "intent": "activate_my_card"}
+{"i": 294, "text": "Would like to use my card and need to activate it first.  Can you help me do this?", "intent": "activate_my_card"}
+{"i": 295, "text": "I need help activating my new card.", "intent": "activate_my_card"}
+{"i": 296, "text": "how to activate card?", "intent": "activate_my_card"}
+{"i": 297, "text": "Please, activate my card", "intent": "activate_my_card"}
+{"i": 298, "text": "I tried activating my bill of fare and it didn't workplace", "intent": "activate_my_card"}
+{"i": 299, "text": "I just got my card and want to use it, how do I activate my card?", "intent": "activate_my_card"}
+{"i": 300, "text": "I have a new card and I want to activate it", "intent": "activate_my_card"}
+{"i": 301, "text": "Assist me please with card activation.", "intent": "activate_my_card"}
+{"i": 302, "text": "I need help with activating my card", "intent": "activate_my_card"}
+{"i": 303, "text": "How can I start using my card?", "intent": "activate_my_card"}
+{"i": 304, "text": "Activating my card", "intent": "activate_my_card"}
+{"i": 305, "text": "When will my card be activated?", "intent": "activate_my_card"}
+{"i": 306, "text": "How can I activate my card>", "intent": "activate_my_card"}
+{"i": 307, "text": "What are the steps in order to activate my new card?", "intent": "activate_my_card"}
+{"i": 308, "text": "How do I go about activating my new card?", "intent": "activate_my_card"}
+{"i": 309, "text": "What is the activation process on my new card?", "intent": "activate_my_card"}
+{"i": 310, "text": "I would like to get help from someone with activating my card.", "intent": "activate_my_card"}
+{"i": 311, "text": "What is the process for activating my card?", "intent": "activate_my_card"}
+{"i": 312, "text": "How do I use my new card?", "intent": "activate_my_card"}
+{"i": 313, "text": "I got my new card but I am not sure if it need s activated and how?", "intent": "activate_my_card"}
+{"i": 314, "text": "What are the steps to activating a new card?", "intent": "activate_my_card"}
+{"i": 315, "text": "I would like to activate my card to use now, can you help me?", "intent": "activate_my_card"}
+{"i": 316, "text": "How do I activate a new card?", "intent": "activate_my_card"}
+{"i": 317, "text": "I just got this card & I don't know how to activate it.", "intent": "activate_my_card"}
+{"i": 318, "text": "I got my new card. How do I activate it?", "intent": "activate_my_card"}
+{"i": 319, "text": "What do I need to do to activate my card?", "intent": "activate_my_card"}
+{"i": 320, "text": "Am I able to order a new card and have it sent to me in China?", "intent": "card_about_to_expire"}
+{"i": 321, "text": "Will you be able to send the new card to China?", "intent": "card_about_to_expire"}
+{"i": 322, "text": "When my card expires what happens to my account?", "intent": "card_about_to_expire"}
+{"i": 323, "text": "What do I do when my card expires?", "intent": "card_about_to_expire"}
+{"i": 324, "text": "The expiration date on my card is coming up", "intent": "card_about_to_expire"}
+{"i": 325, "text": "My card's expiring, what happens now?", "intent": "card_about_to_expire"}
+{"i": 326, "text": "My card is about to expire. What do I need to do?", "intent": "card_about_to_expire"}
+{"i": 327, "text": "how long and how much does it cost for new card", "intent": "card_about_to_expire"}
+{"i": 328, "text": "What do I do if my card is expiring soon?", "intent": "card_about_to_expire"}
+{"i": 329, "text": "How much does it cost to get a new card?  Mine is almost expired.  How fast does it come?", "intent": "card_about_to_expire"}
+{"i": 330, "text": "Since my card is about to expire, what do I do to get a new one?", "intent": "card_about_to_expire"}
+{"i": 331, "text": "My card is about to expire and I need to know how much it costs and how long it takes to get a new one.", "intent": "card_about_to_expire"}
+{"i": 332, "text": "When my card expires do you send a new card?", "intent": "card_about_to_expire"}
+{"i": 333, "text": "What is the next step if my card is about to expire.", "intent": "card_about_to_expire"}
+{"i": 334, "text": "Once my card expires, what should I do?", "intent": "card_about_to_expire"}
+{"i": 335, "text": "I need a new card, my current card is nearly expired.", "intent": "card_about_to_expire"}
+{"i": 336, "text": "It appears my card expires next month, can I order a new one?", "intent": "card_about_to_expire"}
+{"i": 337, "text": "My card is about to expire. How much does it cost to order a new one and how fast will I get it?", "intent": "card_about_to_expire"}
+{"i": 338, "text": "What do I do when my card is about to expire?", "intent": "card_about_to_expire"}
+{"i": 339, "text": "I will need to get a new card soon, how do I order?", "intent": "card_about_to_expire"}
+{"i": 340, "text": "going to need a new card what are the fees and time it takes", "intent": "card_about_to_expire"}
+{"i": 341, "text": "Will I need to order a new card since mine expires next month?", "intent": "card_about_to_expire"}
+{"i": 342, "text": "When my card expires, will I get a new one mailed to me?", "intent": "card_about_to_expire"}
+{"i": 343, "text": "Do you have to order a new card before your current card expires?", "intent": "card_about_to_expire"}
+{"i": 344, "text": "Since my card is about to expire, I need a new one.", "intent": "card_about_to_expire"}
+{"i": 345, "text": "My card is very close to expiring. When can I order a new one and how do I do so?", "intent": "card_about_to_expire"}
+{"i": 346, "text": "I need to order a  new card, mine is about to expire and I need to know how much it will cost and how long until I receive it.", "intent": "card_about_to_expire"}
+{"i": 347, "text": "How do I order a new card before It expires?", "intent": "card_about_to_expire"}
+{"i": 348, "text": "Can I receive a new card while I am in China?", "intent": "card_about_to_expire"}
+{"i": 349, "text": "Next month my card will expire, do I need to order a new one?", "intent": "card_about_to_expire"}
+{"i": 350, "text": "The expiration date of my card is approaching .", "intent": "card_about_to_expire"}
+{"i": 351, "text": "How can I get a new card ASAP to replace an old, soon to expire one?", "intent": "card_about_to_expire"}
+{"i": 352, "text": "I need a new card since my old one is about to expire.", "intent": "card_about_to_expire"}
+{"i": 353, "text": "My card is about to expire.", "intent": "card_about_to_expire"}
+{"i": 354, "text": "My card is expiring shortly.  How much will it cost for a replacement, and how soon can I get it?", "intent": "card_about_to_expire"}
+{"i": 355, "text": "What would the price be for an expired card replacement and how long will it take me to get it?", "intent": "card_about_to_expire"}
+{"i": 356, "text": "in china, need new card", "intent": "card_about_to_expire"}
+{"i": 357, "text": "If my card is about to expire, do I need to order a new one?", "intent": "card_about_to_expire"}
+{"i": 358, "text": "My card is about to expire. How do I get a new one?", "intent": "card_about_to_expire"}
+{"i": 359, "text": "I need to know the cost and when I will receive a new card to replace an old one.", "intent": "card_about_to_expire"}
+{"i": 360, "text": "Is the top up feature available on the Apple Watch?", "intent": "apple_pay_or_google_pay"}
+{"i": 361, "text": "Can I use the system Google Pay for top-ups?", "intent": "apple_pay_or_google_pay"}
+{"i": 362, "text": "My top-up for Google Pay isn't working", "intent": "apple_pay_or_google_pay"}
+{"i": 363, "text": "Can I add money with Apple Pay?", "intent": "apple_pay_or_google_pay"}
+{"i": 364, "text": "Can I use my Apple Watch to to top up?", "intent": "apple_pay_or_google_pay"}
+{"i": 365, "text": "Does Apple Pay give the option to top up?", "intent": "apple_pay_or_google_pay"}
+{"i": 366, "text": "Top up on my Google Pay isn't working.", "intent": "apple_pay_or_google_pay"}
+{"i": 367, "text": "Is it possible to top up with Apple Pay?", "intent": "apple_pay_or_google_pay"}
+{"i": 368, "text": "do i have to setup apple pay to use it", "intent": "apple_pay_or_google_pay"}
+{"i": 369, "text": "Can I use Apple Pay to top up?", "intent": "apple_pay_or_google_pay"}
+{"i": 370, "text": "How can I top up my Google Pay?", "intent": "apple_pay_or_google_pay"}
+{"i": 371, "text": "Does Google Play have an app to Top up?", "intent": "apple_pay_or_google_pay"}
+{"i": 372, "text": "I received my American Express card, but I am having problems making it work with Apple pay.  Can you help me with this problem?", "intent": "apple_pay_or_google_pay"}
+{"i": 373, "text": "is apple pay eligible for top up", "intent": "apple_pay_or_google_pay"}
+{"i": 374, "text": "Why can't I use my American Express with Apple Pay to top up my account?", "intent": "apple_pay_or_google_pay"}
+{"i": 375, "text": "how do i add money with my apple watch", "intent": "apple_pay_or_google_pay"}
+{"i": 376, "text": "If I want to top up, can I use Apple Pay?", "intent": "apple_pay_or_google_pay"}
+{"i": 377, "text": "can i top up with apple pay", "intent": "apple_pay_or_google_pay"}
+{"i": 378, "text": "My American express is experiencing a problem with apple play with top up, can you fix it?", "intent": "apple_pay_or_google_pay"}
+{"i": 379, "text": "My top up is not working in Apple Pay.", "intent": "apple_pay_or_google_pay"}
+{"i": 380, "text": "Is Apple Pay a possible top up option?", "intent": "apple_pay_or_google_pay"}
+{"i": 381, "text": "I don't know how to top up my Google pay.", "intent": "apple_pay_or_google_pay"}
+{"i": 382, "text": "Can I top up from my Apple Watch?", "intent": "apple_pay_or_google_pay"}
+{"i": 383, "text": "Can I use my American Express stored in Apple Pay to top up?", "intent": "apple_pay_or_google_pay"}
+{"i": 384, "text": "is apple pay costly?", "intent": "apple_pay_or_google_pay"}
+{"i": 385, "text": "How can I top up with Google Pay?", "intent": "apple_pay_or_google_pay"}
+{"i": 386, "text": "I can't top up my account using my American Express with Apple Pay.", "intent": "apple_pay_or_google_pay"}
+{"i": 387, "text": "I got my American Express in Apple Pay, why is top up not working?", "intent": "apple_pay_or_google_pay"}
+{"i": 388, "text": "I got my American Express in Apple Bay but top up is not working", "intent": "apple_pay_or_google_pay"}
+{"i": 389, "text": "How do I top up? Can I use my apple watch?", "intent": "apple_pay_or_google_pay"}
+{"i": 390, "text": "Is it possible to use Apple Pay to put money in my account?", "intent": "apple_pay_or_google_pay"}
+{"i": 391, "text": "My American Express is in my Apple Pay and the top up is failing, why?", "intent": "apple_pay_or_google_pay"}
+{"i": 392, "text": "How can I top-ff my account using my Apple Watch?", "intent": "apple_pay_or_google_pay"}
+{"i": 393, "text": "can google pay be used to make a top-up", "intent": "apple_pay_or_google_pay"}
+{"i": 394, "text": "How do I get the Top Up feature on my apple watch working?", "intent": "apple_pay_or_google_pay"}
+{"i": 395, "text": "How do I troubleshoot Google pay top up?", "intent": "apple_pay_or_google_pay"}
+{"i": 396, "text": "How do I top up with Apple Pay?", "intent": "apple_pay_or_google_pay"}
+{"i": 397, "text": "Why isn't my top up working using my saved American Express in ApplePay?", "intent": "apple_pay_or_google_pay"}
+{"i": 398, "text": "How do I use the top up app with my apple watch?", "intent": "apple_pay_or_google_pay"}
+{"i": 399, "text": "Google pay and top up, I want it, can I get it?", "intent": "apple_pay_or_google_pay"}
