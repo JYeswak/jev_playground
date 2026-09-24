@@ -18,13 +18,14 @@ normalize_probabilities=True, RetryPolicy(). --prompted switches that cell to th
 (structured_outputs=False, n_retry_malformed_structure=1) and writes a separate -prompted file.
 --limit N runs only the first N rows still to do (the 16-row structured probe).
 
-Pacing: free models share OpenRouter's account-wide caps (20 requests/minute, 1,000/day), so free calls
-start at most FREE_RPM per minute, 2 in flight; paid models run 8 in flight.
+Pacing (Amendment 2): free models run exactly as jev-3e2i's paced run 2 (run_sst5.py --paced): one in
+flight, at most 15 request starts per 60 s at the provider seam, 120 s per attempt, runner-owned 429
+waits, a quota stop, a 5-row streak stop and a per-session --max-requests cap. Paid: 8 in flight.
 
 Run (live):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
     upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python \
-    work/openrouter-incumbents/run.py <model id> <sst5|banking77|clinc150|scifact|fever> [--prompted] [--limit N]
+    work/openrouter-incumbents/run.py <model id> <dataset> [--prompted] [--limit N] [--max-requests N] [--resume]
 Rows: work/openrouter-incumbents/rows-<dataset>-<slug>[-prompted].jsonl. Resumes rows with an answer.
 """
 
@@ -53,6 +54,8 @@ def _load(name, relpath):
 
 SI = _load("second_incumbent_run", "second-incumbent/run.py")
 OR = _load("openrouter_provider", "openrouter/provider.py")
+# Run 2's paced settings and helpers, imported so the free arm runs exactly as run 2 did (Amendment 2).
+RS = _load("openrouter_run_sst5", "openrouter/run_sst5.py")
 
 BASE_URL = "https://openrouter.ai/api/v1"
 PAID = ("openai/gpt-5-nano", "deepseek/deepseek-v4-flash")
@@ -65,11 +68,31 @@ FEVER_PIN = {
 # sha256-pinned public CSV and never written to a row (their licenses do not allow committing them).
 STSB_PIN = ("8e4bda9", "work/score-stsb/run.py")
 STSB_INSTRUCTIONS = "How similar in meaning are these two sentences?"
-FREE_RPM = 15
-FREE_INFLIGHT = 2
 PAID_INFLIGHT = 8
-TIMEOUT_FREE_S = 180
 TIMEOUT_PAID_S = 90
+MAX_REQUESTS_CEILING = 599
+
+
+def _score_tuple(name):
+    """A module-level tuple from score.py (QUOTA), read without importing its scorers."""
+    import ast
+
+    with open(os.path.join(HERE, "score.py"), encoding="utf-8") as fh:
+        for node in ast.parse(fh.read()).body:
+            if (
+                isinstance(node, ast.Assign)
+                and getattr(node.targets[0], "id", "") == name
+            ):
+                return tuple(ast.literal_eval(node.value))
+    raise SystemExit(f"{name} not found in score.py")
+
+
+QUOTA = _score_tuple("QUOTA")
+
+
+def is_quota(message):
+    """A daily-cap refusal, by score.py's own markers: such a row is a quota row, not a failure."""
+    return any(t in message for t in QUOTA)
 
 
 def slug(model):
@@ -167,10 +190,10 @@ def setup(dataset):
 
 
 async def run(model, dataset, prompted, limit):
+    """The paid path (8 in flight, 90 s per call). :free models run through run_free()."""
     from system_one_adapter import AsyncSystemOneAdapterClient
     from typesafe_sdk import RetryPolicy
 
-    free = model.endswith(":free")
     provider = provider_for(model)
     sample, questions, state, to_row = setup(dataset)
     path = out_path(dataset, model, prompted)
@@ -181,10 +204,8 @@ async def run(model, dataset, prompted, limit):
         f"{model} {dataset} {mode}: {len(todo)} to run, {len(have)} resumed",
         file=sys.stderr,
     )
-    sem = asyncio.Semaphore(FREE_INFLIGHT if free else PAID_INFLIGHT)
-    pace = asyncio.Lock()
-    last_start = [0.0]
-    timeout = TIMEOUT_FREE_S if free else TIMEOUT_PAID_S
+    sem = asyncio.Semaphore(PAID_INFLIGHT)
+    timeout = TIMEOUT_PAID_S
     extra = {"n_retry_malformed_structure": 1} if prompted else {}
     ok = failed = 0
     async with AsyncSystemOneAdapterClient(
@@ -197,12 +218,6 @@ async def run(model, dataset, prompted, limit):
 
         async def one(item):
             async with sem:
-                if free:
-                    async with pace:
-                        wait = last_start[0] + 60.0 / FREE_RPM - time.monotonic()
-                        if wait > 0:
-                            await asyncio.sleep(wait)
-                        last_start[0] = time.monotonic()
                 t0 = time.perf_counter()
                 row = {"i": item["i"], "model": model, "mode": mode}
                 try:
@@ -240,6 +255,142 @@ async def run(model, dataset, prompted, limit):
     return 3 if failed else 0
 
 
+def free_todo(sample, path, resume):
+    """Main pass: rows with no record, or whose last record is a quota row. Resume pass: rows whose
+    only record is one non-quota failure (the bar's single resume)."""
+    records = {}
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as fh:
+            for line in fh:
+                if line.strip():
+                    r = json.loads(line)
+                    records.setdefault(r["i"], []).append(r)
+
+    def answered_row(r):
+        return "noul" in r or "choice" in r or "score" in r
+
+    out = []
+    for s in sample:
+        rs = records.get(s["i"], [])
+        if any(answered_row(r) for r in rs):
+            continue
+        failures = [r for r in rs if not is_quota(r.get("error", ""))]
+        last_quota = bool(rs) and is_quota(rs[-1].get("error", ""))
+        if resume:
+            if len(failures) == 1 and not last_quota:
+                out.append(s)
+        elif not rs or (last_quota and not failures):
+            out.append(s)
+    return out
+
+
+async def run_free(model, dataset, prompted, limit, max_requests, resume):
+    """One paced session for a :free model, exactly run 2's paced mode (Amendment 2)."""
+    from system_one_adapter import AsyncSystemOneAdapterClient
+    from typesafe_sdk import TypeSafeRateLimitError
+
+    OR.require_free(model)
+    sample, questions, state, to_row = setup(dataset)
+    path = out_path(dataset, model, prompted)
+    todo = free_todo(sample, path, resume)[:limit]
+    mode = "prompted" if prompted else "structured"
+    pacer = OR.Pacer(RS.PACED_PER_MIN, max_requests)
+    prov = OR.PacedProvider(OR.openrouter_provider(model), pacer, RS.PACED_ATTEMPT_S)
+    extra = {"n_retry_malformed_structure": 1} if prompted else {}
+    print(
+        f"{model} {dataset} {mode} paced: {len(todo)} to run{' (resume pass)' if resume else ''}, cap {max_requests} requests",
+        file=sys.stderr,
+    )
+    ok = failed = 0
+    streak_class, streak, stop = None, 0, None
+    async with AsyncSystemOneAdapterClient(
+        structured_outputs=not prompted,
+        llm_answer_mode="probabilities",
+        normalize_probabilities=True,
+        retry=RS.PACED_RETRY,
+        **extra,
+    ) as client:
+        for item in todo:
+            row = {"i": item["i"], "model": model, "mode": mode}
+            req0, waits, wait_s = pacer.requests, 0, 0.0
+            while True:
+                t0, w0 = time.perf_counter(), pacer.waited_s()
+                try:
+                    resp = await RS.bounded(
+                        client.system_one(state(item), questions, model=prov),
+                        RS.PACED_CALL_S,
+                        pacer,
+                    )
+                except OR.RequestCapReached:
+                    stop = (
+                        f"request cap {max_requests} reached; row {item['i']} not sent"
+                    )
+                    break
+                except TypeSafeRateLimitError as e:
+                    message = f"{type(e).__name__}: {str(e)[:500]}"
+                    if not is_quota(message) and waits < RS.PACED_429_WAITS:
+                        delay = (
+                            e.retry_after_ms / 1000
+                            if e.retry_after_ms is not None
+                            else RS.PACED_429_DEFAULT_S
+                        )
+                        waits, wait_s = waits + 1, wait_s + delay
+                        await asyncio.sleep(delay)
+                        continue
+                    row["error"] = message
+                    if is_quota(message):
+                        stop = f"daily quota at row {item['i']}"
+                except Exception as exc:  # noqa: BLE001 - recorded, scored by the bar's rules
+                    row["error"] = f"{type(exc).__name__}: {str(exc)[:500]}"
+                else:
+                    row.update(to_row(item, resp))
+                    row.update(SI.attempt_facts(resp))
+                    row["usage"] = {
+                        "input_tokens": resp.usage.input_tokens_total,
+                        "output_tokens": resp.usage.output_tokens_total,
+                    }
+                    row["nRetries"] = resp.usage.n_retries
+                    row["nRetriesMalformed"] = resp.usage.n_retries_malformed_structure
+                pacer_ms = int((pacer.waited_s() - w0) * 1000)
+                row["latencyMs"] = int((time.perf_counter() - t0) * 1000) - pacer_ms
+                break
+            if stop and "error" not in row:
+                break  # the request cap: nothing was sent for this row, so nothing is written
+            row.update(
+                rateLimitWaits=waits,
+                waitMs=int(wait_s * 1000),
+                pacerWaitMs=pacer_ms,
+                requests=pacer.requests - req0,
+            )
+            with open(path, "a", encoding="utf-8") as fh:
+                fh.write(json.dumps(row, ensure_ascii=False) + "\n")
+            if "error" in row:
+                failed += 1
+                cls = RS.error_class(row["error"])
+                streak = streak + 1 if cls == streak_class else 1
+                streak_class = cls
+            else:
+                ok += 1
+                streak_class, streak = None, 0
+            if (ok + failed) % 25 == 0:
+                print(
+                    f"  {ok + failed}/{len(todo)} ok={ok} failed={failed} requests={pacer.requests}",
+                    file=sys.stderr,
+                )
+            if stop:
+                break
+            if streak >= RS.PACED_STOP_AFTER:
+                stop = f"{streak} consecutive failures of: {streak_class}"
+                break
+    await prov.aclose()
+    print(
+        f"{model} {dataset} {mode} paced done: ok={ok} failed={failed} requests={pacer.requests}"
+        + (f"; STOPPED: {stop}" if stop else ""),
+        file=sys.stderr,
+    )
+    return 3 if failed or stop else 0
+
+
 def take(argv, flag, has_value):
     if flag not in argv:
         return None if has_value else False
@@ -253,11 +404,13 @@ def main(argv):
     argv = list(argv)
     prompted = take(argv, "--prompted", False)
     limit = take(argv, "--limit", True)
+    max_requests = take(argv, "--max-requests", True)
+    resume = take(argv, "--resume", False)
     if len(argv) != 2 or argv[1] not in DATASETS:
         raise SystemExit(
             "usage: run.py <model id> <"
             + "|".join(DATASETS)
-            + "> [--prompted] [--limit N]"
+            + "> [--prompted] [--limit N] [--max-requests N] [--resume]"
         )
     model, dataset = argv
     try:
@@ -265,7 +418,18 @@ def main(argv):
     except (ValueError, RuntimeError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
-    return asyncio.run(run(model, dataset, prompted, int(limit) if limit else None))
+    limit = int(limit) if limit else None
+    if model.endswith(":free"):
+        if not max_requests or not 0 < int(max_requests) <= MAX_REQUESTS_CEILING:
+            print(
+                f"refused: a :free session needs --max-requests between 1 and {MAX_REQUESTS_CEILING} (Amendment 2: remaining - 20)",
+                file=sys.stderr,
+            )
+            return 2
+        return asyncio.run(
+            run_free(model, dataset, prompted, limit, int(max_requests), resume)
+        )
+    return asyncio.run(run(model, dataset, prompted, limit))
 
 
 if __name__ == "__main__":

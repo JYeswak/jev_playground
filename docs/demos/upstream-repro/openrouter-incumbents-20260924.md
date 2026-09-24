@@ -175,3 +175,68 @@ and were not deleted. Spend is not stated: the 402s returned no usage object.
 The bar froze "no max-tokens setting." Lowering `max_tokens` so the account can afford
 the request would be a new bar, not this run. Retry when the OpenRouter key can afford
 the adapter's default max, or when a bar committed before the next call sets one.
+
+## Amendment 2: the free arm (CopperHeron, 2026-09-24; committed before any free comparator call)
+
+Made after the Result above and before any `:free` comparator call on any set. No free comparator
+row exists. Everything above holds except the four points below. Paid arms stay BLOCKED on
+`jev-qkvc`.
+
+**(a) Qualification source: run-2 rows.**
+- The bar above reads qualification from `jev-14qk`'s run-1 rows (`rows-sst5-<model>.jsonl`). There
+  `dots-3-note-preview:free` answered 48/50, and pacing caused the failures.
+- `jev-3e2i`'s own paced run 2 re-measured the free models on the same 50 SST-5 rows, question and
+  adapter settings, under a preregistration committed before any call (`d2cf882`; rows `8c45cf4`,
+  results `41251dd`, checked by CopperHeron).
+- The source is now **run 2's rows**: `work/openrouter/rows-sst5-<model>-run2.jsonl` for the ids in
+  `FREE_STRUCTURED_RUN2`.
+- The threshold is unchanged: at least **49/50 answered**. `score.py`'s `comparators()` applies it
+  to those files.
+- By those rows, three models qualify:
+  - `dots-studio/dots-3-note-preview:free`: 50/50, 0 zero-mass;
+  - `nex-agi/nex-n2.5-mini:free`: 50/50, 2 zero-mass;
+  - `liquid/lfm-2.5-2.6b:free`: 49/50, 4 zero-mass.
+- Zero-mass stays a scoring reading, as the bar says, not a qualification rule.
+
+**(b) Free-model pacing: run 2's paced mode, exactly.** It replaces "15 a minute, 2 in flight,
+180 s per call". The runner imports run 2's constants and helpers (`work/openrouter/run_sst5.py`,
+`work/openrouter/provider.py`) rather than restating them:
+- one request in flight;
+- at most 15 request starts in any 60 s window, counted at the provider seam, so adapter retries and
+  429 re-sends count;
+- 120 s per attempt, and 420 s per call with pacer holds excluded;
+- 429 is removed from the adapter's `RetryPolicy`. On a 429 the runner waits `Retry-After` or
+  `retry-after-ms`, or 60 s when neither is sent, at most 3 times per row, and a 4th 429 fails the
+  row;
+- every request passes `require_free` first.
+
+Reason: under these settings `dots` answered 50/50 with no 429 wait and no pacer hold, while run 1's
+settings produced its per-minute 429 failures. Choosing the proven settings over faster ones keeps
+the 1% failed-row ceiling (5 rows on SST-5) from being spent on rate limits.
+
+Two stops are added, both leaving rows unrun, so the cell reads INCOMPLETE and resumes:
+- **Daily quota.** A 429 whose text carries one of `score.py`'s `QUOTA` markers (for example
+  `free-models-per-day`) is recorded as a quota row, not waited on, and stops that model.
+- **Streak.** 5 consecutive failed rows of one error class stop that model, as in run 2.
+
+A resume pass re-sends only rows whose single record is a non-quota failure, once, as the bar says.
+Quota rows are re-sent in any later session.
+
+**(c) Order.** Models: `dots`, then `nex-n2.5-mini`, then `lfm-2.5`. Sets, as the bar: SST-5,
+Banking77, SciFact, FEVER, CLINC150, then STS-B last. Each model × set starts with the 16-row
+structured probe and the declared prompted fallback.
+
+**(d) The daily cap.**
+- OpenRouter allows 1,000 free-model requests a day on this account. At 18:48Z today the key endpoint
+  read `free_model_daily_requests` 381 used and 619 remaining; the count is account-wide.
+- Each session first reads the key endpoint (`work/openrouter/usage_daily.py`) and runs with a
+  process request cap of **remaining − 20**, never above 599 (`--max-requests`).
+- When the cap is reached, no further request is sent and the rows stay unrun. Rows the daily cap
+  refuses are quota rows, and they resume after the 00:00 UTC reset, as the bar says.
+- `usage_daily` is read before and after every session and must stay $0.
+
+**Keyless checks before this commit.** `test_run.py` adds two tests:
+- `comparators()` returns the three qualifying models in this order, then the paid ones;
+- a real daily-cap 429 is a quota error and a provider 429 is not.
+
+`score.py --selfcheck` still reproduces every committed headline.

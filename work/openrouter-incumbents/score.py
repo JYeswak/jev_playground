@@ -35,22 +35,20 @@ NV = _load("noul_variance", "noul-variance/score.py")
 ST = _load("stsb_score", "score-stsb/score.py")
 
 
-def _free_structured():
-    """jev-14qk's FREE_STRUCTURED tuple, read from its source without importing the adapter."""
+def _provider_tuple(name):
+    """A module-level tuple from work/openrouter/provider.py, read without importing the adapter."""
     import ast
 
     with open(os.path.join(WORK, "openrouter", "provider.py"), encoding="utf-8") as fh:
         tree = ast.parse(fh.read())
     for node in tree.body:
-        if (
-            isinstance(node, ast.Assign)
-            and getattr(node.targets[0], "id", "") == "FREE_STRUCTURED"
-        ):
+        if isinstance(node, ast.Assign) and getattr(node.targets[0], "id", "") == name:
             return tuple(ast.literal_eval(node.value))
-    raise SystemExit("FREE_STRUCTURED not found in work/openrouter/provider.py")
+    raise SystemExit(f"{name} not found in work/openrouter/provider.py")
 
 
-FREE_STRUCTURED = _free_structured()
+# Amendment 2: free models qualify on jev-3e2i's paced run 2 (prereg d2cf882, rows 8c45cf4).
+FREE_STRUCTURED_RUN2 = _provider_tuple("FREE_STRUCTURED_RUN2")
 
 PAID = ("openai/gpt-5-nano", "deepseek/deepseek-v4-flash")
 # USD per token, OpenRouter /api/v1/models, 2026-09-24 (listing sha256 in the receipt)
@@ -58,7 +56,9 @@ PRICE = {
     "openai/gpt-5-nano": (0.00000005, 0.0000004),
     "deepseek/deepseek-v4-flash": (0.000000088606, 0.000000177212),
 }
-FREE_MIN_ANSWERED = 49  # of jev-14qk's 50 SST-5 rows (pane 1, 2026-09-24)
+FREE_MIN_ANSWERED = (
+    49  # of run 2's 50 SST-5 rows (pane 1's threshold, source per Amendment 2)
+)
 FAIL_CEILING = 0.01
 PROBE = 16
 NONTRANSIENT = (
@@ -124,10 +124,12 @@ def slug(model):
 
 
 def comparators():
-    """Free models jev-14qk found answering >= 49/50 SST-5 rows, in its order, then the paid ones."""
+    """Free models whose run-2 rows answer >= 49/50 SST-5 rows, in run 2's order, then the paid ones."""
     out = []
-    for model in FREE_STRUCTURED:
-        rows = load(os.path.join(WORK, "openrouter", f"rows-sst5-{slug(model)}.jsonl"))
+    for model in FREE_STRUCTURED_RUN2:
+        rows = load(
+            os.path.join(WORK, "openrouter", f"rows-sst5-{slug(model)}-run2.jsonl")
+        )
         if rows is None:
             continue
         got = {r["i"] for r in rows if "score" in r}
@@ -404,7 +406,7 @@ def main(argv):
     models = comparators()
     print(f"\nComparators: {', '.join(models)}")
     print(
-        f"(free models kept when jev-14qk's rows show >= {FREE_MIN_ANSWERED}/50 answered)\n"
+        f"(free models kept when run 2's rows show >= {FREE_MIN_ANSWERED}/50 answered, Amendment 2)\n"
     )
     print(
         "| Model | Set | Mode | State | Answered / failed / quota / zero-mass | Win under test vs every Jev run | Pass rule vs every Jev run |"
