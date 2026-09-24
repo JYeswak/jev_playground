@@ -1651,3 +1651,23 @@ Appended by pane 5 as sole EVAL writer. Source: notes/deep/w70-eval-sections-p6.
 ### skillranker W7.2 (ROOT @a6f1ff0, 2026-09-23) — SELF, rate-PASS vs floors, gate-FAIL
 
 Fresh run under the W7.0 standard (prior receipts as leads). T4 (N=12 existing synthetic cases, prevalence 10/12 = 83.3%, model jev-1.13.0, 39/40 calls, p50/p95 212/366ms): Jev wide-Choice top-1 8/10 = 0.800, mean loss 0.167 (2 false abstentions, 0 wrong picks) vs always-abstain 0.833/0.000 and lexical BM25-approx 0.583/0.600 — beats both floors beyond the prereg deltas (Δacc +0.200, Δloss −0.416 vs lexical). T8: 0/10 repeat flips, 0/10 reword flips. T7 bins with counts (n=11 asked). T9: codec 15/15 + contract 8/8; key-absent/malformed/timeout all refuse, host survives. T2: full suite build-RED exit 101 on contabo-1 AND contabo-3 (second-worker-confirmed; cause = RCH-synced tree missing tracked tests/fixtures/jev-tls pem/key, present locally and at HEAD — transfer gap, not code defect); fixture-free 8 targets 78 pass/0 fail/4 ignored (live-consent skips with reasons); plant NOT-RUN (RCH refuses /tmp projects). T3: 6 claims (2 demonstrated, 4 partial). Class SELF; promotion FAIL (0.800 < 0.90 sourced lane gate; synthetic split; n=10 positives). NO-CLAIM: not an sr product measurement; bar rate-PASS does not promote. Clones untouched.
+
+## W7.0 batch — pane 2 RedMaple, new-clone section (2026-09-24) [live]
+
+Appended by RedMaple from notes/deep/w70-eval-sections-p2-new10.md. Receipts at 40133aa. Ledger stop at f1dde64.
+
+Lane: live where a call was made. Model pin jev-1.13.0 unless noted. Key via Infisical, never printed.
+
+| clone | SHA | result class | live N | cost | receipt |
+|---|---|---|---|---|---|
+| Canny | f2c5e53 | FLOOR | 24 scored stops; receipt spend 96 Jev calls, 65800 in / 2016 out. usage.cost absent | not invented | docs/demos/upstream-repro/Canny-w70-20260923.md |
+| neo4jev | d157bbe | FLOOR | 3 goals, 2/3; instrumented 10 hops, 168124 in / 4103 out | not invented | docs/demos/upstream-repro/neo4jev-w70-20260923.md |
+| prism-liquidity-agent | f503db1 | withheld | smoke N=1, 4 calls, 2818 in / 388 out. Not re-run | not invented | docs/demos/upstream-repro/prism-liquidity-agent-w70-20260923.md |
+| jev-curate | d1a3a05 | FLOOR | binary 422s. Corrected list shape: 30/30 HTTP 200, scores 0.98-2.03, clone rule still rejects 30/30. This session 32 calls, measured 18054 in / 1209 out | $0.000758 at README input rate, arithmetic, not an invoice | docs/demos/upstream-repro/jev-curate-w70-20260923.md |
+| agent-desktop | a4a695f | withheld | smoke N=4, no execute | not an accuracy | docs/demos/upstream-repro/agent-desktop-w70-20260923.md |
+| jev-drone | c0efd03 | FLOOR | 287 Jev calls; prevalence exit 2; no accuracy claim | disclosed-rate arithmetic in the receipt | docs/demos/upstream-repro/jev-drone-w70-20260923.md |
+| typesafe-mario | ca22449 | UNEARNED | N=0. No ROM. Not downloaded | $0 | docs/demos/upstream-repro/typesafe-mario-w70-20260923.md |
+
+Ledger port stopped, not built: python3 extract of 1145 labelled turns, ledger 1067/1145 loses to always-not-done 1108/1145, prevalence-check exit 3 WEAK. Receipt docs/demos/upstream-repro/canny-ledger-stop-20260924.md. Spend 0.
+
+Boundary: nothing here is an omp L3 firing. Canny was not installed. prism had no wallet. mario had no ROM. jev-trader was not run. jev-curate upstream issue draft stays unfiled.
