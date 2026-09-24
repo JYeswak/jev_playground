@@ -158,3 +158,32 @@ run sequentially, plus run 1 earlier that night. One grok model id (non-reasonin
 (`adffc2e`). Jev's runs are the committed ones from other times. A STANDS says the verdict is
 robust to grok's sampling on these rows. It does not cover other grok versions, reasoning mode, or
 other sets. A non-author spot-check is still pending before close.
+
+## Non-author verification (BillingUnits, 2026-09-24, zero model calls)
+
+Oracle: committed rows, re-scored without a key in a clean clone. Clone: `git clone --local` →
+`/tmp/bu-wu6v-clone` @ `5f382c3`.
+
+- **Bar before calls.** The bar landed inside `5dbfa23`, a sweep commit whose author and committer
+  times are both 21:51:34 -0600. That commit also adds the `run2|run3` tag to `run.py`, so the
+  committed runner could not write rerun files before it. The rerun files were created on disk
+  (`stat -f %SB`, main worktree) from 21:52:06 (`rows-sst5-grok-run2.jsonl`, the earliest) to
+  22:00:14 (`rows-banking77-grok-run3.jsonl`). Every one was created after the bar commit. The
+  earliest was created 32 s after it, and a file is created only when its first answer is appended.
+  I found no evidence of a grok rerun call before `5dbfa23`. `[INFERENCE]` An uncommitted runner
+  could in principle have called earlier without writing these files; nothing on disk suggests it.
+- **Scorer and runner unchanged** between `5dbfa23` and `8374fd4` (`git diff --stat` is empty for
+  `run.py` and `grok_variance.py`).
+- **Re-score.** `env -u TYPESAFE_API_KEY -u XAI_API_KEY -u ANTHROPIC_API_KEY python3
+  work/second-incumbent/grok_variance.py` exits 0. All 21 verdict lines read STANDS: SST-5 9/9,
+  CLINC150 9/9, SciFact 12/12 on accuracy, AUC, Brier and ECE, and Banking77 9/9, with and without
+  zero-mass rows as the bar specifies.
+- **Rows.** All 8 rerun files hold one row per id (500 / 750 / 400 / 400 per set), 0 error rows,
+  and one model, `xai/grok-4.20-0309-non-reasoning`.
+- **Independent recount, SST-5 MAE** (my own script: level = floor(score + 0.5), exact sign test,
+  over the committed `work/score-sst5/rows-jev{,-run2,-run3}.jsonl` and the three grok files). All 9
+  pairings are WIN. The splits run from 156/99 to 169/103, and the (1,1) split of 168/101,
+  p 5.27e-05, matches the scorer's table line. CLINC150, SciFact and Banking77 were checked through
+  the scorer only.
+
+**Verdict:** reproduced. No retraction is due.
