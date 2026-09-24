@@ -57,4 +57,42 @@ Not a new Jev measurement.
 
 ## Result
 
-NOT_RUN.
+Bar committed at `6164a11` and pushed before any call. Live window 2026-09-24
+07:31:59Z to 08:53:30Z. No Jev call. No OpenRouter call. Every answered row reports
+`xai/grok-4.20-0309-non-reasoning`.
+
+**Which row counted.** The bar does not say which line counts when an id appears
+twice. The other units' failed-row rule counts the first attempt, so that is what
+was scored. Eight of the nine files have one line per id. `rows-b77-run2.jsonl`
+has 3,081 lines and 3,080 ids. `i=1294` appears twice: first
+`TypeSafeInternalServerError: 502`, then an ok answer from the one resume. The
+502 counted. That run is 3,079 answered and 1 failed, under the 30-row ceiling,
+so the cell is scored. The later ok answer was not counted.
+
+Grok Choice rows store the criteria key (`exchange rate`). The Jev writer maps
+that key to the intent slug before storing `choice`. Scoring applied
+`work/choice-banking77/run.py` `labels()` at score time. The row files were not
+rewritten.
+
+| Set | Grok answered | Point | Pairings | Verdict |
+|---|---|---|---|---|
+| FEVER ECE | 400/400 x 3 | grok ECE 0.267, 0.271, 0.252 | 12/12 WIN, 0 TIE, 0 LOSE | README ECE WIN **HOLDS** |
+| Yelp exact / MAE | 500/500 x 3 | exact 267, 265, 269 of 500; MAE 0.530, 0.526, 0.530 | accuracy 9/9 WIN; MAE 9/9 WIN | no README WIN to retract |
+| Banking77 accuracy | 3080, 3079, 3080 of 3080 | correct 2128, 2130, 2120 | 9/9 WIN all rows; 9/9 WIN with flat maps dropped (7-10 ids) | README accuracy WIN **HOLDS** |
+
+Thinnest FEVER ECE interval is J3 x grok run 3, [-0.2561, -0.1639]. Thinnest
+Banking77 all-rows pairing is J3 x grok run 1, 466/139, p=3.4e-42. No pairing
+was a TIE or a LOSE. No `NEGATIVE_EVIDENCE.md` row: grok did not beat or tie a
+README WIN.
+
+Row sha256 prefixes: fever `ce7a1aa4c213c437`, `17aefa540df26fc8`,
+`77b3c1621f283c6a`; yelp `38b6b831a14a37ae`, `e2794fc6afbcc863`,
+`121c456b62cfa5af`; b77 `53791b8a04684a69`, `ac20d01e970b2d29`,
+`c03a4506e98826f3`.
+
+**Spend.** 11,941 grok calls (11,940 plus the one resume of `i=1294`). Input
+tokens 19,745,750. Output tokens 4,941,438, almost all of it the 77-way Banking77
+maps. Dollar cost is not stated. Jev spend $0.
+
+**Boundary.** One grok model, one adapter, three runs. Yelp's 9/9 is not a README
+claim. Awaiting a non-author re-score before the bead closes.
