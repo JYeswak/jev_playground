@@ -83,7 +83,7 @@ function resolveCommit(raw) {
 }
 
 /** Ordered references plus the reason with their spans blanked (for number extraction). */
-function references(reason) {
+export function references(reason) {
   const refs = [];
   let blanked = reason;
   for (const m of reason.matchAll(/\S+/g)) {
@@ -239,13 +239,15 @@ async function run() {
   return failed ? 3 : 0;
 }
 
-const args = process.argv.slice(2);
-let code;
-if (args[0] === "--build") code = build(args.slice(1));
-else if (args[0] === "--run") code = await run();
-else if (args[0] && !args[0].startsWith("--")) code = await checkOne(args[0], args.includes("--dry"));
-else {
-  console.error("usage: check-close.mjs <bead-id> [--dry] | --build <YYYY-MM-DD>... | --run");
-  code = 64;
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const args = process.argv.slice(2);
+  let code;
+  if (args[0] === "--build") code = build(args.slice(1));
+  else if (args[0] === "--run") code = await run();
+  else if (args[0] && !args[0].startsWith("--")) code = await checkOne(args[0], args.includes("--dry"));
+  else {
+    console.error("usage: check-close.mjs <bead-id> [--dry] | --build <YYYY-MM-DD>... | --run");
+    code = 64;
+  }
+  process.exit(code);
 }
-process.exit(code);
