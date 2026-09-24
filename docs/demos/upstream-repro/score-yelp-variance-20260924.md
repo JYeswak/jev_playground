@@ -128,3 +128,38 @@ about an hour on 2026-09-24. The three-run average is descriptive and was not a 
 (`jev-qbc`) re-ran only Jev against one Haiku run, so its "3/3 WIN" answers a narrower question
 than the 9-pairing rule here; this receipt does not re-judge it. A non-author spot-check is still
 pending.
+
+## Non-author verification (BillingUnits, 2026-09-24, zero model calls)
+
+Oracle: committed rows, re-scored without a key in a clean clone. Clone:
+`git clone --local` → `/tmp/bu-91u-clone` @ `abe14d9`. `work/score-yelp/` is unchanged between
+`1b94085` and that HEAD.
+
+- **Order.** The bar `d29397c` (21:16:49) is an ancestor of the rows commit `1b94085` (21:20:58).
+- **Runner diff.** `git diff 52d94c2 d29397c -- work/score-yelp/run.py` changes only the output
+  path: an `OUT` global, `out_path` returning `OUT or rows-<arm>.jsonl`, and argv accepting an
+  optional third argument. The question, the state, the model pin and the retry policy are
+  untouched. `run.py` has no later commit.
+- **Scorer.** `env -u TYPESAFE_API_KEY -u ANTHROPIC_API_KEY python3 work/score-yelp/variance.py`
+  exits 0. It reproduces run 1 (Jev 341/500 MAE 0.348, Haiku 323/500 MAE 0.384), MAE WIN in 3/9
+  pairings (every WIN is against Haiku run 1), pass rule PASS in 9/9, 0 pairings with a LOSE,
+  headline `RETRACTED to 'MAE TIE with Haiku'`. Accuracy is TIE in all 9 pairings.
+- **Independent recount** (my own script, not `variance.py`: level = floor(score + 0.5), clamped;
+  exact sign test). Exact correct per file: Jev 341 / 342 / 341, Haiku 323 / 328 / 330. MAE 0.348 /
+  0.346 / 0.346 and 0.384 / 0.372 / 0.370. Every one of the 9 sign-test splits matches the table:
+  67/45 p 0.0467, 66/50, 62/47, 67/45 p 0.0467, 64/48, 61/46, 68/46 p 0.0487, 64/48, 60/45. That
+  gives WIN 3/9. All 6 files hold 500/500 answered rows, one model each (`jev-1.13.0`,
+  `anthropic/claude-haiku-4-5`), and every probability map sums to 1 within 0.05.
+- **Row hashes.** sha256 of the four rerun files matches the prefixes and suffixes quoted above.
+- **Ten rows by hand** (seed 20260924, three each from Jev runs 2 and 3 and Haiku run 2, one from
+  Haiku run 3). The score, the rounded level and the sample label agree with the scorer's reading in
+  all ten: Jev run 2 rows 7 (4→4), 419 (2 vs 2.83→3), 480 (1→1); Jev run 3 rows 338 (0→0),
+  467 (3→3), 279 (2 vs 3.78→4); Haiku run 2 rows 323 (2→2), 359 (1→1), 74 (0→0); Haiku run 3 row
+  286 (2→2).
+- **One observation, not a defect.** Jev's returned `score` differs from the expected value of its
+  own 2-decimal `probabilities` by up to 0.03 on 4 / 7 / 9 rows per run. On exactly 1 row per run,
+  rounding the recomputed value would pick a different level. The prereg names the returned score as
+  primary, so the verdict is unaffected. A reader who recomputes from `probabilities` will see
+  1-row differences.
+
+**Verdict:** reproduced. The retraction to TIE stands under the committed rule.
