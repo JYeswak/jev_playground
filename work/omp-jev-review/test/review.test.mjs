@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import ompJevReview, { setDiffRunner, isThinDiff } from '../src/index.ts';
+import ompJevReview, { setDiffRunner, isThinDiff, touchesCodeFile } from '../src/index.ts';
 
 function host() {
   const rows = [];
@@ -92,9 +92,8 @@ test('a real score is recorded as review_scored with its probabilities', async (
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
-  globalThis.fetch = answersFetch({ applicability: { noul: 0.91 }, behaviour: { noul: 0.82 }, boundary: { noul: 0.18 } });
+  globalThis.fetch = answersFetch({ behaviour: { noul: 0.82 }, boundary: { noul: 0.18 } });
   try {
-    stubDiff(SUBSTANTIAL);
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff --cached'));
@@ -156,18 +155,17 @@ test('asks exactly the two measured questions and no more', async () => {
   globalThis.fetch = async (_url, init) => {
     const sent = JSON.parse(init.body);
     calls.push(sent);
-    return mk({ applicability: { noul: 0.9 }, behaviour: { noul: 0.5 }, boundary: { noul: 0.5 } });
+    return mk({ behaviour: { noul: 0.5 }, boundary: { noul: 0.5 } });
   };
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff'));
-    assert.equal(calls.length, 2, 'gate call then scoring call');
-    assert.deepEqual(Object.keys(calls[0].questions), ['applicability']);
-    assert.deepEqual(Object.keys(calls[1].questions).sort(), ['behaviour', 'boundary']);
-    assert.equal(calls[1].state.diff.includes('added line 0'), true);
-    assert.equal(calls[1].state.diff.includes('git diff'), false);
+    assert.equal(calls.length, 1, 'one scoring call, no gate call');
+    assert.deepEqual(Object.keys(calls[0].questions).sort(), ['behaviour', 'boundary']);
+    assert.equal(calls[0].state.diff.includes('added line 0'), true);
+    assert.equal(calls[0].state.diff.includes('git diff'), false);
   } finally {
     globalThis.fetch = realFetch;
     if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
@@ -256,25 +254,25 @@ test('a thin diff records applicable:false and never calls Jev', async () => {
   }
 });
 
-test('a low applicability noul refuses without scoring', async () => {
+test('a docs-only diff records applicable:false and never calls Jev', async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
-  let calls = 0;
-  globalThis.fetch = answersFetch({ applicability: { noul: 0.31 } });
-  const counting = globalThis.fetch;
-  globalThis.fetch = async (...a) => { calls += 1; return counting(...a); };
+  let called = 0;
+  globalThis.fetch = async () => { called += 1; throw new Error('must not be called'); };
   try {
-    stubDiff(SUBSTANTIAL);
+    stubDiff(
+      'diff --git a/README.md b/README.md\n@@ -1,6 +1,6 @@\n' +
+        Array.from({ length: 12 }, (_, i) => `+doc line ${i}`).join('\n') + '\n',
+    );
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_not_applicable');
     assert.equal(row.data.applicable, false);
-    assert.equal(row.data.reason, 'low-applicability');
-    assert.equal(row.data.noul, 0.31);
-    assert.equal(calls, 1, 'gate call only; the scorer never runs');
+    assert.equal(row.data.reason, 'non-code-diff');
+    assert.equal(called, 0, 'deterministic refusal spends zero Jev calls');
   } finally {
     globalThis.fetch = realFetch;
     if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
@@ -282,11 +280,11 @@ test('a low applicability noul refuses without scoring', async () => {
   }
 });
 
-test('planted negative: a >100-line diff with a high noul still scores', async () => {
+test('planted negative: a >100-line code diff still scores', async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
-  globalThis.fetch = answersFetch({ applicability: { noul: 0.88 }, behaviour: { noul: 0.7 }, boundary: { noul: 0.2 } });
+  globalThis.fetch = answersFetch({ behaviour: { noul: 0.7 }, boundary: { noul: 0.2 } });
   try {
     stubDiff(BIG);
     const h = host();
@@ -300,4 +298,22 @@ test('planted negative: a >100-line diff with a high noul still scores', async (
     if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
     else process.env.TYPESAFE_API_KEY = previous;
   }
+});
+
+test('touchesCodeFile: draw-derived extensions only', () => {
+  const f = (name) => `diff --git a/${name} b/${name}\n@@ -1 +1 @@\n+x\n`;
+  assert.equal(touchesCodeFile(f('a.ts')), true);
+  assert.equal(touchesCodeFile(f('dir/b.mjs')), true);
+  assert.equal(touchesCodeFile(f('c.py')), true);
+  assert.equal(touchesCodeFile(f('bin/run.sh')), true);
+  assert.equal(touchesCodeFile(f('README.md')), false);
+  assert.equal(touchesCodeFile(f('data.json')), false);
+  assert.equal(touchesCodeFile(f('githooks/pre-commit')), false, 'extensionless is not code by extension');
+  assert.equal(touchesCodeFile(f('pkg/package.json')), false);
+  assert.equal(touchesCodeFile('no diff headers at all'), false);
+  assert.equal(
+    touchesCodeFile(f('doc.md') + f('src/x.ts')),
+    true,
+    'one code file among docs is applicable',
+  );
 });

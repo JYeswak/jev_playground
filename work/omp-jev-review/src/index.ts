@@ -54,11 +54,22 @@ const QUESTIONS = {
 };
 
 /**
- * Applicability pre-gate (jev-review `transform.ts`: noul >= 0.5 applies).
+ * Deterministic applicability (bead jev-deep-kit-8q7.11, decided by pane 1
+ * on the 686-commit draw): a diff is applicable iff it is not thin AND it
+ * touches at least one code file. The extension set is derived from the
+ * draw's file inventory (.md 608, .json 231, .sh 101, .mjs 85, .tsv 67,
+ * .ts 38, .jsonl 28, .py 22, …) — the only executable/source extensions
+ * observed there are .sh/.mjs/.ts/.py. This matched the noul gate on
+ * 556/567 substantial diffs (98.1%), costs zero calls, and cannot flip on
+ * wording. The 11 disagreements are listed in the draw receipt; 7 are
+ * config/docs the gate scored (e.g. extensionless githooks/pre-commit,
+ * package.json), 4 are code-mixed diffs the gate refused — all applicable
+ * here. The Jev applicability question is retired for this tool (NO-CLAIM
+ * in the bead); Jev still does the review scoring itself.
+ */
+/**
  * Thin diffs never reach Jev: fewer than 10 added+removed code lines, or no
  * `@@` hunks at all, is not worth a reviewer's (or a model's) attention.
- * Bar (notes/deep/w74-bars.md): thin → applicable:false; a >100-line diff
- * still scores. The gray zone goes to the noul below.
  */
 export function isThinDiff(diff: string): boolean {
   if (!/^@@ /m.test(diff)) return true;
@@ -71,10 +82,15 @@ export function isThinDiff(diff: string): boolean {
   return true;
 }
 
-const APPLICABILITY = {
-  applicability: "Does this diff contain code changes worth a reviewer's attention?",
-};
+const CODE_EXTENSIONS = [".ts", ".mjs", ".py", ".sh"];
 
+export function touchesCodeFile(diff: string): boolean {
+  for (const line of diff.split("\n")) {
+    const m = /^diff --git a\/(.+) b\/\1$/.exec(line);
+    if (m && CODE_EXTENSIONS.some((ext) => m[1].endsWith(ext))) return true;
+  }
+  return false;
+}
 
 /** A clean `git diff|show` argv, or null if the string is not safe to exec. */
 export function gitArgv(command: string): string[] | null {
@@ -156,7 +172,7 @@ export default function ompJevReview(pi: Host) {
         return undefined;
       }
 
-      const notApplicable = async (reason: string, noul?: number) => {
+      const notApplicable = async (reason: string) => {
         try {
           await pi.appendEntry(DECISION, {
             schemaVersion: 1,
@@ -165,7 +181,6 @@ export default function ompJevReview(pi: Host) {
             command: command.slice(0, 2000),
             toolCallId,
             reason,
-            ...(noul === undefined ? {} : { noul }),
             timestamp: new Date().toISOString(),
           });
         } catch {
@@ -177,25 +192,9 @@ export default function ompJevReview(pi: Host) {
       if (isThinDiff(loaded.diff)) {
         return notApplicable("thin-diff");
       }
-
-      // The gate refuses ONLY on an explicit low noul. A gate failure
-      // (unconfigured key, transport throw, malformed answer) falls through
-      // to the legacy scoring path, which reproduces the tested error
-      // contract below — a gate that converts errors into refusals would
-      // make "applicable:false" read as a silent pass.
-      const gate = await ask({
-        state: { diff: loaded.diff },
-        questions: APPLICABILITY,
-        timeoutMs: 2500,
-      });
-      if (gate.ok) {
-        const noul = gate.scores?.applicability;
-        if (typeof noul === "number" && noul < 0.5) {
-          return notApplicable("low-applicability", noul);
-        }
+      if (!touchesCodeFile(loaded.diff)) {
+        return notApplicable("non-code-diff");
       }
-
-
       const result = await ask({
         state: { diff: loaded.diff },
         questions: QUESTIONS,
@@ -210,7 +209,6 @@ export default function ompJevReview(pi: Host) {
           kind: probabilities ? "review_scored" : "review_error",
           command: command.slice(0, 2000),
           toolCallId,
-          // absent, never defaulted: a missing score must not read as a clean review
           ...(probabilities ? { probabilities } : {}),
           ...(error === undefined ? {} : { error }),
           latencyMs: result.latencyMs,
