@@ -10,8 +10,9 @@ Bar: docs/demos/upstream-repro/score-quixbugs-20260924.md (committed before the 
 Run (venv python has both packages):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
     upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/score-quixbugs/run.py <arm>
-Appends to work/score-quixbugs/rows-<arm>.jsonl; rows that already hold an answer are skipped, so a
-rerun retries only failed rows. Never prints a key.
+Appends to work/score-quixbugs/rows-<arm>.jsonl, or to the optional second argument (a new row file,
+bead jev-kz50 variance runs); rows that already hold an answer are skipped, so a rerun retries only
+failed rows. Never prints a key.
 """
 
 import asyncio
@@ -51,10 +52,10 @@ def out_path(arm):
     return os.path.join(HERE, f"rows-{arm}.jsonl")
 
 
-def answered(arm):
+def answered(path):
     ids = set()
-    if os.path.exists(out_path(arm)):
-        with open(out_path(arm)) as f:
+    if os.path.exists(path):
+        with open(path) as f:
             for line in f:
                 if line.strip() and "score" in (r := json.loads(line)):
                     ids.add(r["i"])
@@ -72,14 +73,14 @@ def row_from(answer, model, usage):
     }
 
 
-async def main(arm, concurrency=8):
+async def main(arm, path, concurrency=8):
     need = "ANTHROPIC_API_KEY" if arm == "haiku" else "TYPESAFE_API_KEY"
     if not os.environ.get(need):
         print(f"unconfigured: {need} is not set, no call made", file=sys.stderr)
         return 2
     with open(os.path.join(HERE, "sample.jsonl")) as f:
         sample = [json.loads(line) for line in f if line.strip()]
-    have = answered(arm)
+    have = answered(path)
     todo = [s for s in sample if s["i"] not in have]
     print(f"{arm}: {len(todo)} to run, {len(have)} resumed", file=sys.stderr)
     sem = asyncio.Semaphore(concurrency)
@@ -137,7 +138,7 @@ async def main(arm, concurrency=8):
 
         for coro in asyncio.as_completed([one(s) for s in todo]):
             row = await coro
-            with open(out_path(arm), "a") as f:
+            with open(path, "a") as f:
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
             failed += "error" in row
             ok += "error" not in row
@@ -146,6 +147,9 @@ async def main(arm, concurrency=8):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] not in ARMS:
-        raise SystemExit("usage: run.py " + "|".join(ARMS))
-    sys.exit(asyncio.run(main(sys.argv[1])))
+    if len(sys.argv) not in (2, 3) or sys.argv[1] not in ARMS:
+        raise SystemExit("usage: run.py " + "|".join(ARMS) + " [out.jsonl]")
+    arm = sys.argv[1]
+    sys.exit(
+        asyncio.run(main(arm, sys.argv[2] if len(sys.argv) == 3 else out_path(arm)))
+    )
