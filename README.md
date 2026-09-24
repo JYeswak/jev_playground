@@ -226,6 +226,10 @@ The gates run fully on the author's machine. A fresh clone needs one `br sync --
 
 Seventeen stages run in `bash foundation/gates.sh`. Each is a script under [`foundation/gates.d/`](foundation/gates.d/) with a `--selftest` that plants a bad input and must go red; a stage that has only ever passed is unproven. Every commit subject names the level of evidence behind it (`[pending]`, `[selftest]`, `[test]`, `[oracle]`, `[live]`), and [`githooks/commit-msg`](githooks/commit-msg) refuses one that does not. Refuted ideas stay in [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md) with the condition under which they are worth retrying. [`GATES.md`](GATES.md) lists every stage and what it catches.
 
+jev's gates run in public CI at every push to `main` ([workflow](.github/workflows/gates.yml)); the verdict at 196e124 is green with 5 typed skips, not plain green: CI runs `bash foundation/gates.sh --portable`, and the stages whose prerequisites the runner lacks are skipped by name ([run](https://github.com/JYeswak/jev_playground/actions/runs/35978286566)).
+
+50 of 84 README claim sentences are registered in [`foundation/kit/claims.tsv`](foundation/kit/claims.tsv), each tied to the file that holds its number; stage 15 fails if that count drops below the floor in [`foundation/kit/claim-coverage.floor`](foundation/kit/claim-coverage.floor).
+
 The agent harness this lane runs in is [omp](https://omp.sh). Its project surfaces live in [`.omp/`](.omp/): the Jev tools (screen, flag, rerank, claim check), rules that interrupt a model mid-response when it starts a known-bad move, and the kit-guard extension, which is meant to block edits to gate files and is being refitted to this repo's layout.
 
 ## Commands
@@ -248,7 +252,7 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 - The injection result is one public corpus at one cut: three runs of Jev and grok-4, two of Haiku so far. Measure your own traffic before you gate on it.
 - Demos without `--live` replay recorded answers. They show the policy, not the model, and the live smokes are 1 to 10 calls each.
 - Some questions in this tree are a better fit for a regex or a trained classifier. The harm-rule check is the worked example.
-- The gates run locally. There is no CI yet, so a commit made with `--no-verify` is caught by nothing.
+- CI runs only the portable gates, so a stage the runner skips is checked on the author's machine alone.
 - A tool that loads in a session is not a measurement of live traffic.
 - Cloned repos in this tree belong to their authors. Read them. Do not push them.
 
@@ -264,7 +268,7 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 
 ## Status
 
-As of 2026-09-22. Reproducible from this tree with no key: the injection comparison (after cloning the public bench, see Measurements), the calibration receipt, the twenty demos and their seventeen live receipts. In progress: applying the omp-kit (stream rules, the kit-guard extension, and the `/loop` continuation gate) and the FrankenSuite assessment protocol to this repository, including an assessment of this repo under the same rulebook. The plan is [`docs/PLAN-DEEP-KIT-20260922.md`](docs/PLAN-DEEP-KIT-20260922.md).
+As of 2026-09-22. Reproducible from this tree with no key: the injection comparison (after cloning the public bench, see Measurements), the calibration receipt, the twenty demos and their seventeen live receipts. jev has been assessed with the FrankenSuite RULEBOOK v1.0 ([assessment](notes/deep/jev-assessment.md), [cold read](notes/deep/jev-assessment-coldread-p2.md)). In progress: applying the omp-kit (stream rules, the kit-guard extension, and the `/loop` continuation gate) to this repository. The plan is [`docs/PLAN-DEEP-KIT-20260922.md`](docs/PLAN-DEEP-KIT-20260922.md).
 
 All seventeen gate stages pass on the author's machine (`bash foundation/gates.sh`, rc 0); on a fresh clone, `--portable` passes with 4 stages skipped for missing prerequisites. The three instrument selftests that were red earlier in the day were fixed at their cause, not waived.
 
