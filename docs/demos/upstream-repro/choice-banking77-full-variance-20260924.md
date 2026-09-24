@@ -129,3 +129,25 @@ about $4 for Haiku and $0.25 for Jev. The 5,586 cap-refused calls returned no to
 **NO-CLAIM.** No verdict on `jev-384m`. What the three scorable pairings show is only that Jev's
 own run-to-run variance does not threaten the WIN against Haiku's committed run 1. They say nothing
 about Haiku's variance, which is the half the cap blocked. The bead stays open, blocked on the cap.
+
+## Non-author verification (Jev side only) — Verifier3
+
+Verifier3 (background agent of pane 1, Anthropic model), 2026-09-24. Not the author. Scope was set
+by pane 1: the two Jev reruns, Jev's run-to-run stability, and the bar-before-rows order. The Haiku
+side is BLOCKED-until-cap (`jev-1y19`) and is not verified here. Everything ran in a fresh
+`git clone --local` of `8ab637a` under `/tmp`. No call was made.
+
+| Check | Command | Result |
+|---|---|---|
+| Bar precedes rows | `git show --stat eed9fc3 c7ae42d`; `stat -f %SB` on the live worktree's rerun files | bar and scorer are at `eed9fc3` (21:42:56 −0600). All four rerun files were born 21:43:20 to 21:43:24, and the Jev files were last written at 21:44:38 and 21:44:43. Rows were committed at `c7ae42d` (21:50:30). |
+| Bar text unedited; scorer change | `git diff eed9fc3 c7ae42d` | the only removed receipt lines are `## Results` / `Pending the live runs.` The scorer change after data is declared. It adds a BLOCKED state, taken only when every failed row carries the cap message, and counts R2 flips over ids answered in both runs. Neither change can alter a pairing whose runs completed, and all three Jev × H1 pairings match an independent recompute. |
+| Re-score reproduces (Jev side) | `python3 work/choice-banking77/variance_full.py` (rc 0, no key) | run 1 × run 1 reproduces `jev-4jf` (2,467 vs 2,267, 326/126, p = 1.7e-21, WIN), with headroom 151. Jev runs 2 and 3 are 2,472 and 2,455 of 3,080, with 0 failed. Jev × H1 is 328/123 (p = 1.4e-22) and 315/127 (p = 1.6e-19), both WIN, and each stays WIN with H1's 5 flat rows dropped or credited. The unit verdict line reads **PENDING, no verdict (6 BLOCKED, WIN in 3 of 3 scorable)**, as the receipt states. |
+| Input tokens per Jev rerun | own script, per row | identical to run 1 on 3,080/3,080 rows for runs 2 and 3, and every row reports `jev-1.13.0`. |
+| Independent recompute | own script, `choice == intent` | Jev correct: 2,467 / 2,472 / 2,455. Against H1: 326/126, 328/123, 315/127. Chosen-intent flips between Jev runs are 40, 44 and 48 of 3,080. All identical to the receipt, and every flip count is well under the 151-row headroom. |
+| 10 seeded rows by hand | `random.Random(24)`: 685, 693, 747, 795, 894, 1568, 2387, 2747, 2792, 2917 | all three Jev runs choose the same intent on all 10, with confidences within 0.06. i 894 (`supported_cards_and_currencies`) and i 2917 (`cash_withdrawal_charge`) are wrong the same way in all three runs, so the errors are stable too. |
+| Cap-refused rows recorded as NOT_RUN | own count | Haiku run 2 has 2,790 error rows and run 3 has 2,796. Every one carries the verbatim cap message, and each file covers all 3,080 ids exactly once. No retry and no substitute provider, as stated. |
+| NO-CLAIM vs what ran | receipt | no verdict on `jev-384m`. The three scorable pairings only show that Jev's own variance does not threaten the WIN against Haiku's committed run 1. That matches the rows. |
+
+**Verdict (Jev side): CONFIRMED** (clean-clone keyless re-score, `[oracle]`). The unit is correctly
+PENDING. The bead stays open until the Haiku reruns can resume. Scratch left at `/tmp/v3-384m.itSx`
+(not deleted).
