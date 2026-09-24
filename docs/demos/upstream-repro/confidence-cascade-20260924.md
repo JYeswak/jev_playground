@@ -237,3 +237,23 @@ per-intent thresholds, run-to-run variance of the cascade (bead `jev-qbc` measur
 variance), and cost from a bill. The dollar column is [INFERENCE] from list prices. Policy B's
 +8 on 77 intents is descriptive and untested out of fold. A non-author re-score is pending, and
 the bead stays open for it.
+
+## Non-author verification — Verifier2
+
+Verifier2 (background agent of pane 1, not an author of this unit), 2026-09-24. Offline lane, no
+model call. Clean `git clone --local` at `3d018c2` in `mktemp -d`.
+
+| # | Check | Command | Result |
+|---|---|---|---|
+| 1 | Bar before scorer and before either result | `git merge-base --is-ancestor cc559c6 7ded8bd` and `… cc559c6 684b4c3` | yes; bar 02:37:15Z, 10-intent scorer and results 02:39:23Z, full-77 results 03:04:32Z. The prompted Haiku rows first appear in `5839235` (03:02:59Z), after the bar, as it required |
+| 2 | Bar text not edited | `git diff cc559c6 7ded8bd` and `git diff 7ded8bd 684b4c3` on this receipt | the first diff only replaces the scorer Pending line with Results; the second diff starts at line 158 (the full-77 Pending text). Lines 1-89 are unchanged since the bar |
+| 3 | Scorer change in `684b4c3` | `git diff 7ded8bd 684b4c3 -- work/confidence-cascade/cascade.py` | adds `spread()` and uses it in one "Why" print line; no routing, grid, verdict or 2-fold logic changed |
+| 4 | Both sets re-score byte-identically | `python3 work/confidence-cascade/cascade.py \| diff - work/confidence-cascade/out-subset.txt`; `… --set full \| diff - work/confidence-cascade/out-full.txt` | both exit 0, both diffs empty |
+| 5 | 10 intents, my own code | policy A over the committed `jev-k3k` rows | 14 flat Haiku rows (Jev right on 10); t = 0 / 0.30 / 0.50 / 0.70 / 0.90 / 1.00 / always → 384 / 383 / 381 / 377 / 372 / 362 / 362 of 400; Haiku alone 362; the Haiku-only rows have Jev confidence 0.46 / 0.61 / 0.74; 2-fold out-of-fold 384 = Jev alone (+0); flat rows dropped: Jev alone 374, best escalating point 373 |
+| 6 | 77 intents, my own code | same rule over `full.jsonl`, `rows-full-jev.jsonl`, `rows-full-haiku-prompted.jsonl`; cap 770; ties go to the lower escalation | Jev alone 2467; t = 0.45 gives 2473 with 78 escalated (the best point within the cap), cascade-only 16 vs Jev-only 10, p = 0.327; the 2-fold picks are t = 0.65 (even) and 0.30 (odd), out of fold 2454 vs 2467 (-13); t = 0.50 / 0.70 / 0.90 → 2462 / 2448 / 2402 |
+
+**Verdict: CONFIRMED** at `[test]` level (offline arithmetic on committed rows, N = 400 and
+N = 3,080, `jev-1.13.0` vs Haiku 4.5, 2026-09-24): NOT USEFUL on both sets, as reported. The +6
+in-sample gain on 77 intents does not survive the preregistered 2-fold check. Not checked: the
+latency, token and dollar columns beyond the byte-identical re-score, and Policy B, which is
+descriptive. No live call repeated.
