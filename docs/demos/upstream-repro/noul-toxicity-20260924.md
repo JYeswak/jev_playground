@@ -165,7 +165,12 @@ committed rows before the bead closes.
   toxic. Civil Comments is CC0, so the committed text is permitted.
 - **Ten seeded rows** (`random.Random(20260924)` over the ids) were read against the labels. They
   show the failure directly: four non-toxic rows score p >= 0.5 (0.58, 0.77, 0.92, 0.93), and at
-  the 0.5 cut they are false alarms. This matches the 316/1820 false-positive count on run 1.
+  the 0.5 cut they are false alarms; three of them (0.77, 0.92, 0.93) are also above the receipt's
+  0.70 operating point.
+- **Correction (same day, pane 1).** An earlier version of this section said the four rows "match
+  the 316/1820 false-positive count". That was wrong. 316/1820 is the count at the 0.70 operating
+  point, as the receipt's "FPR at 0.70" column says (`score.py:18`, `OP = 0.70`). At the 0.5 cut,
+  run 1 flags 518/1820 non-toxic rows. Recounted from `rows-jev.jsonl`. ReadmeStrangerRun caught it.
 
 NO-CLAIM of this check: I made no live call. I did not read the comment texts for label quality;
 the labels are the dataset's.
