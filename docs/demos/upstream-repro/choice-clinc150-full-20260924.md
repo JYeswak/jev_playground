@@ -199,3 +199,37 @@ in the six killed or cancelled launches `[unmeasured]`.
 - One run per arm; no variance.
 - CLINC's labels were not re-adjudicated; the near-synonym pairs above are the dataset's
   distinctions.
+
+## Non-author verification (BillingUnits, 2026-09-24, zero model calls)
+
+Oracle: committed rows, re-scored without a key in a clean clone. Clone:
+`git clone --local` → `/tmp/bu-pm3-clone` @ `4a0c0c4`.
+
+- **Order.** The bar `defed49` is an ancestor of the Jev rows `5025e45` and of the Haiku rows and
+  result `3ab9605`. `run.py` is unchanged between `defed49` and `3ab9605`.
+- **Scorer change after the bar** (`git diff defed49 3ab9605 -- work/choice-clinc150/score.py`).
+  It adds three things: a `USAGE_CAP` string, a label that reads `NOT-SCORED (Haiku BLOCKED-until-cap)`
+  when every failed Haiku row carries that message, and the descriptive `both_answered` table. The
+  preregistered rules are untouched: the 1% failed-row limit still voids both primaries, and the
+  gates, the shippable thresholds and the verdict rule are unchanged. The change relabels the
+  NOT-SCORED outcome. It cannot turn a result into a pass.
+- **Scorer.** `env -u TYPESAFE_API_KEY -u ANTHROPIC_API_KEY python3 work/choice-clinc150/score.py --set full`
+  exits 0. Its output matches every figure in the Result section: Jev 4,960/5,500, in-scope
+  4,087/4,500, OOS recall 873/1,000, precision 873/1,004. Gate rows at 0.60/0.80/0.90 are
+  3,953/203/95, 3,622/144/58 and 3,364/114/42, none shippable. Haiku failed 1,637 (limit 55), all
+  carrying the usage-limit message. The 3,863 both-answered rows give 3,459 vs 3,300, 295/136. The
+  750-row carry-over gives Jev 688 → 646. `pass: BLOCKED`.
+- **Independent recount** (my own script, not `score.py`). `full.jsonl` has 5,500 rows, 4,500
+  in-scope and 1,000 OOS. The Jev file has 5,500 answers, all `jev-1.13.0`: 4,960 correct, 4,087
+  in-scope, 873 of 1,000 OOS said none, 1,004 said none overall. The Haiku prompted file has 5,504
+  lines (3,863 answered, plus 1,637 unanswered, plus the 4 resume-probe rows). Every unanswered row
+  reads `400 You have reached your specified API usage limits`, split 1,341 in-scope and 296 OOS. The
+  structured probe is 16/16 `compiled grammar is too large`. On the 3,863 both-answered rows: Jev
+  3,459, Haiku 3,300. Jev gate counts match at all three thresholds.
+- **Definition check.** The bar defines misroute rate as misrouted over all rows (2.0% = 110 of
+  5,500), and the scorer implements that. Over routed rows instead, Jev's rate would be 7.0% / 5.3% /
+  4.4%, which is also above 2%. "Not shippable at any fixed gate" holds under either denominator.
+
+**Verdict:** reproduced. BLOCKED-until-cap is the correct reading of the committed bar. The Jev
+arm's numbers stand. The primaries stay NOT-SCORED until the Haiku rerun. The bead stays open, so it
+is not closed here.
