@@ -1,0 +1,8 @@
+{
+  "name": "sdk",
+  "private": true,
+  "description": "Pins the TypeSafe JS SDK that work/jev-client loads by relative path. Materialize with: npm ci --prefix work/sdk",
+  "dependencies": {
+    "@typesafe-ai/sdk": "0.6.0"
+  }
+}

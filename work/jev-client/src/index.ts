@@ -12,8 +12,12 @@
  *
  * TRANSPORT: the network goes through the vendored first-party SDK
  * (upstream/typesafe-ai/typesafe-sdk-js @ 66880cc, loaded from
- * work/sdk/node_modules/@typesafe-ai/sdk) and nothing else. Imported by
- * relative path so no install step can drift it; never edit upstream/.
+ * work/sdk/node_modules/@typesafe-ai/sdk, pinned by work/sdk/package-lock.json;
+ * `npm ci --prefix work/sdk` materializes it) and nothing else. Imported by
+ * relative path; never edit upstream/. The import is LAZY: a fresh clone has no
+ * node_modules, and the keyless paths (unconfigured key, injected askers,
+ * measure-kit) must load without it. A missing SDK on a real call is
+ * `unconfigured`, never a crash and never a score.
  * Our code owns the failure taxonomy, the field guards, and the fail-safe
  * direction — the SDK owns the wire. Single-attempt semantics are preserved
  * (SDK retry disabled per call); our 4 s default timeout is passed through.
@@ -25,7 +29,15 @@
  * Field names per docs/demos/SDK-SURFACE.md (`NoulResponse.noul`, `ChoiceResponse.probabilities`;
  * there is no `.probability` and no `.distribution`).
  */
-import { TypeSafeClient, APIError, APIConnectionError, APITimeoutError, APIUserAbortError } from "../../sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs";
+import type * as SdkModule from "../../sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs";
+type Sdk = typeof SdkModule;
+const SDK_PATH = "../../sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs";
+let sdkLoad: Promise<Sdk | undefined> | undefined;
+/** Cached; resolves undefined when the SDK is not installed (fresh clone). */
+function loadSdk(): Promise<Sdk | undefined> {
+  sdkLoad ??= import(SDK_PATH).then((m) => m as Sdk, () => undefined);
+  return sdkLoad;
+}
 
 /** The endpoint the SDK targets by default. No fetch() is constructed beside it. */
 export const SYSTEMONE_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
@@ -111,7 +123,7 @@ type Posted =
  * in its `finally` before it can ever fire. Nothing here edits the
  * vendored SDK.
  */
-function guardedFetch(fetchImpl: typeof fetch, timeoutMs: number): typeof fetch {
+function guardedFetch(fetchImpl: typeof fetch, timeoutMs: number, APITimeoutError: Sdk["APITimeoutError"]): typeof fetch {
   return (async (...args: Parameters<typeof fetch>) => {
     const [url, init] = args;
     const controller = new AbortController();
@@ -145,6 +157,17 @@ async function postSystemOne(
   fetchImpl: typeof fetch,
   retry?: { maxRetries?: number },
 ): Promise<Posted> {
+  const sdk = await loadSdk();
+  if (!sdk) {
+    return {
+      ok: false,
+      reason: "unconfigured",
+      error: "@typesafe-ai/sdk is not installed: run `npm ci --prefix work/sdk` once",
+      latencyMs: 0,
+    };
+  }
+  const { TypeSafeClient, APIError, APIConnectionError, APITimeoutError, APIUserAbortError } = sdk;
+  // Clock starts after the load so latencyMs measures the call, as before the import went lazy.
   const started = Date.now();
   // One client per call: no shared mutable transport, and the injected fetch
   // is read at call time so offline tests can swap it per case. Construction
@@ -155,7 +178,7 @@ async function postSystemOne(
   try {
     const client = new TypeSafeClient({
       apiKey,
-      fetch: guardedFetch(fetchImpl, timeoutMs),
+      fetch: guardedFetch(fetchImpl, timeoutMs, APITimeoutError),
       timeout: timeoutMs,
       retry: { maxRetries: retry?.maxRetries ?? 0 },
     });
