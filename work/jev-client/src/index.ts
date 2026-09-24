@@ -61,8 +61,8 @@ export type JevFailure = "unconfigured" | "http" | "non-json" | "no-answers" | "
 export type AskOptions = {
   /** The object the questions are asked about. Serialised as-is into `state`. */
   state: Record<string, unknown>;
-  /** key -> instructions. Keys come back as the score keys. */
-  questions: Record<string, string>;
+  /** key -> instructions, or a noul body with optional criteria. Keys come back as the score keys. */
+  questions: Record<string, string | { instructions: string; criteria?: { true: string; false: string } }>;
   timeoutMs?: number;
   model?: string;
   apiKey?: string;
@@ -223,7 +223,15 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
   }
 
   const questions = Object.fromEntries(
-    Object.entries(options.questions).map(([key, instructions]) => [key, { type: "noul", instructions }]),
+    Object.entries(options.questions).map(([key, value]) => {
+      if (typeof value === "string") return [key, { type: "noul", instructions: value }];
+      const body: { type: "noul"; instructions: string; criteria?: { true: string; false: string } } = {
+        type: "noul",
+        instructions: value.instructions,
+      };
+      if (value.criteria) body.criteria = value.criteria;
+      return [key, body];
+    }),
   );
 
   const posted = await postSystemOne(apiKey, model, options.state, questions, options.timeoutMs ?? 4000, options.fetchImpl ?? globalThis.fetch);
