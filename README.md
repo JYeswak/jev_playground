@@ -126,13 +126,16 @@ node --test work/nev-injection/seat-guard.test.mjs
 
 **Flagging risky commands: the tool-call gate.** On 400 held-out real commands from this repo's agent sessions (100 risky, 300 routine), adding outcome criteria to the five gate questions raised Jev's catch from 41/100 to 78/100 at 1/300 false alarms (McNemar p = 3.0e-09), where Claude Haiku 4.5 with the same criteria caught 84/100 at 20/300, and a non-author's 3-label correction gives 78/97 ([receipt](docs/demos/upstream-repro/bicameral-gate-criteria-20260924.md)).
 
-All three re-score from committed rows with no key:
+**Checking a claim against its evidence: SciFact.** On 400 public SciFact claim-abstract pairs, one Noul question at `jev-1.13.0` got 361/400 right against Claude Haiku 4.5's 351/400 through the official adapter, a tie on accuracy (McNemar 19 vs 9, p = 0.087), while Jev's probabilities were significantly better on all three probability measures: AUC 0.962 vs 0.934, Brier 0.0709 vs 0.1002, ECE 0.0431 vs 0.0854. Against xAI's grok-4.20 (non-reasoning) on the same pairs, Jev wins all four, accuracy included: 361 vs 330 right, 46 vs 15 discordant, p = 8.8e-5 ([receipt](docs/demos/upstream-repro/noul-scifact-20260924.md), [second incumbent](docs/demos/upstream-repro/second-incumbent-20260924.md)).
+
+Each of these re-scores from committed rows with no key:
 
 ```bash
 python3 work/score-sst5/score.py                # SST-5: MAE 0.488 vs 0.556, 273 vs 251
 python3 work/jev-variance/score.py              # SST-5 and Banking77 across three Jev runs
 python3 work/choice-banking77/score.py          # Banking77: 384 vs 362; 374 vs 362 of 386; credited 384 vs 376
-python3 work/second-incumbent/score.py          # Banking77 vs grok-4.20: 384 vs 366; 368 vs 365 of 378
+python3 work/noul-scifact/score.py              # SciFact: 361 vs 351, AUC 0.962 vs 0.934
+python3 work/second-incumbent/score.py          # vs grok-4.20: SciFact 361 vs 330; Banking77 384 vs 366, 368 vs 365 of 378
 python3 work/bicameral-gate/score-b.py          # gate: 78/100 vs 41/100 at 1/300; Haiku 84/100 at 20/300
 python3 work/bicameral-gate/verify-labels-b.py  # gate, 3 labels corrected: 78/97
 ```
