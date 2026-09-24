@@ -83,14 +83,13 @@ class Models(unittest.TestCase):
 class FreeArmAmendment2(unittest.TestCase):
     """Amendment 2: qualification from run 2's rows, and run 2's paced loop for :free models."""
 
-    def test_comparators_are_run2_qualifiers_in_order_then_paid(self):
+    def test_comparators_are_run2_qualifiers_in_order_and_no_paid_model(self):
         self.assertEqual(
             score.comparators(),
             [
                 "dots-studio/dots-3-note-preview:free",
                 "nex-agi/nex-n2.5-mini:free",
                 "liquid/lfm-2.5-2.6b:free",
-                *score.PAID,
             ],
         )
 

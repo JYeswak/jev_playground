@@ -240,3 +240,18 @@ structured probe and the declared prompted fallback.
 - a real daily-cap 429 is a quota error and a provider 429 is not.
 
 `score.py --selfcheck` still reproduces every committed headline.
+
+## Amendment 3: the paid arms are dropped, not blocked (2026-09-24, before the next free set)
+
+Joshua, 2026-09-24: *"we're not going to use any of the paid comparisons"*. AGENTS.md "No paid
+comparisons" (`1cc7876`) makes it the rule: comparators are `:free` OpenRouter models only.
+- **`openai/gpt-5-nano` and `deepseek/deepseek-v4-flash` are dropped** from this unit. The Result's
+  402 cells read *not run (paid comparisons stopped 2026-09-24)*, not BLOCKED until a top-up.
+  `jev-qkvc` is closed, and this bead no longer waits on it.
+- `score.py`'s `comparators()` now returns only the three `:free` models of Amendment 2: dots,
+  nex-n2.5-mini, lfm-2.5. The paid price table is removed, and spend prints $0 (free).
+  `test_run.py` pins the list with no paid id.
+- The refusal of non-`:free` ids in `run.py` belongs to `jev-lbgk` (PaidStop); this amendment does
+  not touch `run.py`.
+- The free arm is unchanged: its qualification, pacing, order and caps are as in Amendment 2.
+  `dots` SST-5 was running when this was committed and continues.

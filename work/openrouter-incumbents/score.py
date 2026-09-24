@@ -50,12 +50,7 @@ def _provider_tuple(name):
 # Amendment 2: free models qualify on jev-3e2i's paced run 2 (prereg d2cf882, rows 8c45cf4).
 FREE_STRUCTURED_RUN2 = _provider_tuple("FREE_STRUCTURED_RUN2")
 
-PAID = ("openai/gpt-5-nano", "deepseek/deepseek-v4-flash")
-# USD per token, OpenRouter /api/v1/models, 2026-09-24 (listing sha256 in the receipt)
-PRICE = {
-    "openai/gpt-5-nano": (0.00000005, 0.0000004),
-    "deepseek/deepseek-v4-flash": (0.000000088606, 0.000000177212),
-}
+# Amendment 3 (2026-09-24, AGENTS.md "No paid comparisons"): the paid arms are dropped, not blocked.
 FREE_MIN_ANSWERED = (
     49  # of run 2's 50 SST-5 rows (pane 1's threshold, source per Amendment 2)
 )
@@ -124,7 +119,8 @@ def slug(model):
 
 
 def comparators():
-    """Free models whose run-2 rows answer >= 49/50 SST-5 rows, in run 2's order, then the paid ones."""
+    """Free models whose run-2 rows answer >= 49/50 SST-5 rows, in run 2's order. No paid model
+    (Amendment 3: paid comparisons dropped)."""
     out = []
     for model in FREE_STRUCTURED_RUN2:
         rows = load(
@@ -135,7 +131,7 @@ def comparators():
         got = {r["i"] for r in rows if "score" in r}
         if len(got) >= FREE_MIN_ANSWERED:
             out.append(model)
-    return out + list(PAID)
+    return out
 
 
 def is_answer(r):
@@ -364,17 +360,15 @@ def score_cell(dataset, crows_path):
     }
 
 
-def spend(model, paths):
+def spend(paths):
+    """Input and output tokens over a model's row files; every comparator is :free, so $0."""
     tin = tout = 0
     for p in paths:
         for r in load(p) or []:
             u = r.get("usage") or {}
             tin += u.get("input_tokens") or 0
             tout += u.get("output_tokens") or 0
-    usd = None
-    if model in PRICE:
-        usd = tin * PRICE[model][0] + tout * PRICE[model][1]
-    return tin, tout, usd
+    return tin, tout
 
 
 def selfcheck():
@@ -442,9 +436,9 @@ def main(argv):
                     details.append(
                         f"| {model} | {dataset} | {jf} | {rname} | {v['detail']} |"
                     )
-        tin, tout, usd = spend(model, sorted(set(paths)))
+        tin, tout = spend(sorted(set(paths)))
         print(
-            f"|   spend {model} | | | | tokens {tin:,} in / {tout:,} out | {f'${usd:.4f} at list' if usd is not None else '$0 (free)'} | |"
+            f"|   spend {model} | | | | tokens {tin:,} in / {tout:,} out | $0 (free) | |"
         )
     print("\nPer Jev run and reading")
     print("| Model | Set | Jev run | Reading | Tests |")
