@@ -139,3 +139,21 @@ independent time slot. One wording, one Jev version, one adapter version (`adffc
 model. The retracted metrics are "not robust to re-runs", not "Haiku is as good": every pairing's
 direction favours Jev. What survives is one calibration metric per set, SciFact Brier and FEVER
 ECE. Awaiting a non-author spot-check before the bead closes.
+
+## Non-author verification — Verifier3
+
+Verifier3 (background agent of pane 1, Anthropic model), 2026-09-24. Not the author. Everything ran
+in a fresh `git clone --local` of `9a067ae` under `/tmp`. No call was made.
+
+| Check | Command | Result |
+|---|---|---|
+| Bar precedes rows | `git show --stat 5167fe8 3c006e2`; `stat -f %SB` on the live worktree's six new row files | bar, scorer and the runner's new `jev-run2/3` arms are at `5167fe8` (21:28:13 −0600). The six new files were born 21:28:28 to 21:29:07, all after it, and committed at `3c006e2` (21:32:36). `QUESTION` in `run.py` is unchanged since `15b0371`. The bar commit only added arm names. |
+| Bar text unedited | `git diff 5167fe8 3c006e2 -- <receipt>`; `git diff 5167fe8 HEAD --stat -- work/noul-variance work/noul-scifact/{score,run}.py` | the only removed lines are the `## Result` / `NOT_RUN` placeholder. The scorer and runner are unchanged after the bar. |
+| Re-score reproduces | `python3 work/noul-variance/score.py` (rc 0, 2 min 18 s, no key) | both committed J1 × H1 pairings reproduce (6/6 checks per set). Every number in the receipt matches the output: all 24 pairing intervals, the per-run tables, the flip and spread lines and headroom 18 / 9. The verdicts are SciFact Brier HOLDS 12/12, AUC 8/12 and ECE 5/12 RETRACTED; FEVER ECE HOLDS 12/12, AUC 4/12 and Brier 9/12 RETRACTED. Accuracy is TIE 12/12 on both sets, PASS HOLDS on both, and there are 0 LOSE. Each prose claim was checked against the table: which pairings are TIE, the thinnest WIN (J2 × H3 FEVER Brier, upper −0.0000), the least-good held intervals (−0.0393 to −0.0050; −0.0345 to −0.0019), and "with Haiku at H1, only FEVER AUC J2 × H1 turns TIE". All hold. |
+| Independent recompute | own script: accuracy at > 0.5 and Brier per run, decision flips | SciFact accuracy J1/JR/J2/J3 361/361/362/360 and H1/H2/H3 351/352/352; Brier 0.0709/0.0711/0.0715/0.0710 and 0.1002/0.0932/0.0950. FEVER 379/379/378/379 and 376/375/378; Brier 0.0463/0.0461/0.0461/0.0464 and 0.0581/0.0582/0.0556. Decision flips J1-J2 1, J2-J3 2, H1-H2 11, H2-H3 12 (SciFact) and 1, 1, 5, 7 (FEVER). All identical to the scorer. The row sha256 prefixes match the receipt. |
+| 10 seeded rows by hand | `random.Random(24)`, rows 93, 111, 196, 298, 364 in each set, all 7 runs | on SciFact all 5 are decided the same way by every run; Jev's four runs sit within 0.05 of each other, Haiku's within 0.17 (i 196: 0.75/0.92/0.92). On FEVER i 93 (truth false), Jev is 0.29 to 0.32 in all four runs, while Haiku moves 0.15 → 0.70 → 0.35 and so flips its decision in H2. That row shows where the variance lives. The other four rows agree across all runs. |
+| Zero-mass handling | row fields | FEVER H1–H3 and SciFact H2–H3 record adapter debug, with 0 rows flagged, so FEVER's second scoring correctly never triggered. **Gap not stated in the receipt:** SciFact H1 (committed by `jev-9er`) has no `probabilityError` field, so its zero-mass rows cannot be checked. It holds one row at exactly 0.5. Dropping one row moves a mean Brier difference by at most about 0.25/399 ≈ 0.0006, and SciFact Brier's H1 pairing intervals end at −0.0113 or below, so the one verdict that HOLDS cannot turn on it. |
+| NO-CLAIM vs what ran | receipt vs rows | 4 Jev runs (JR disclosed as not an independent time slot) × 3 Haiku runs per set, one wording, one pin, one adapter. That matches the rows. R90 exists with a retry condition. The receipt correctly says the retracted metrics are "not robust", not "Haiku is as good": every interval's midpoint favours Jev. |
+
+**Verdict: CONFIRMED** (clean-clone keyless re-score, `[oracle]`), with the one-line SciFact H1
+debug gap noted above. It changes no verdict. Scratch left at `/tmp/v3-hg8.6o4n` (not deleted).
