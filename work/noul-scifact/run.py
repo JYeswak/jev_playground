@@ -30,8 +30,10 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
 
 from system_one_adapter import AsyncSystemOneAdapterClient  # noqa: E402
+from anthropic_stop import refuse_anthropic_comparator  # noqa: E402  jev-sybt
 from typesafe_sdk import AsyncTypeSafeClient, Noul, RetryPolicy  # noqa: E402
 
 JEV_MODEL = "jev-1.13.0"
@@ -82,6 +84,8 @@ def state(s):
 
 
 async def main(arm, concurrency=8):
+    if arm.startswith("haiku"):
+        refuse_anthropic_comparator(f"noul-scifact {arm} (claude-haiku-4-5)")
     need = "ANTHROPIC_API_KEY" if arm.startswith("haiku") else "TYPESAFE_API_KEY"
     if not os.environ.get(need):
         print(f"unconfigured: {need} is not set, no call made", file=sys.stderr)

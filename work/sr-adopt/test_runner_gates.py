@@ -3,6 +3,10 @@
 Deleting the production call_after_bar line makes that runner's test fail.
 The deleted source is executed from /tmp with the original path, so the
 production file is not edited.
+
+The banking77 Haiku arms (run_haiku, run_prompted) are not here: since jev-sybt
+they refuse before the bar is read, which work/anthropic-stop/test_anthropic_stop.py
+tests.
 """
 
 import asyncio
@@ -25,7 +29,6 @@ KEYS = ("TYPESAFE_API_KEY", "XAI_API_KEY", "ANTHROPIC_API_KEY")
 GATES = (
     "    call_after_bar(bar, lambda: None, repo=repo or ROOT)\n",
     "    call_after_bar(bar, lambda: None, repo=repo or root)\n",
-    "    call_after_bar(bar, lambda: None, repo=repo or run.ROOT)\n",
 )
 
 
@@ -119,14 +122,6 @@ class RunnerGateTest(unittest.TestCase):
                 mod.run_jev(
                     [], {}, "/tmp/unused.jsonl", bar_path="bar.md", repo=self.tmp
                 )
-            elif which == "b77-haiku":
-                mod = load(ROOT / "work/choice-banking77/run.py", "b77_run_h")
-                mod.run_haiku(
-                    [], {}, "/tmp/unused.jsonl", bar_path="bar.md", repo=self.tmp
-                )
-            elif which == "b77-prompted":
-                mod = load(ROOT / "work/choice-banking77/run_prompted.py", "b77_prompt")
-                mod.main([], bar_path="bar.md", repo=self.tmp)
             elif which == "rf57":
                 mod = load(
                     ROOT / "work/nev-differential/variance-20260924/run-jev.py",
@@ -144,8 +139,6 @@ class RunnerGateTest(unittest.TestCase):
             "rerank",
             "clinc",
             "b77-jev",
-            "b77-haiku",
-            "b77-prompted",
             "rf57",
         ):
             with self.subTest(which=which):
@@ -163,11 +156,6 @@ class RunnerGateTest(unittest.TestCase):
             self.assertEqual(asyncio.run(rerank.run_arm("jev")), 2)
             b77 = load(ROOT / "work/choice-banking77/run.py", "b77_clean")
             self.assertEqual(b77.run_jev([], {}, "/tmp/unused.jsonl"), 2)
-            self.assertEqual(b77.run_haiku([], {}, "/tmp/unused.jsonl"), 2)
-            prompted = load(
-                ROOT / "work/choice-banking77/run_prompted.py", "b77_p_clean"
-            )
-            self.assertEqual(prompted.main([]), 2)
             rf57 = load(
                 ROOT / "work/nev-differential/variance-20260924/run-jev.py",
                 "rf57_clean",
@@ -190,13 +178,6 @@ class RunnerGateTest(unittest.TestCase):
                 ROOT / "work/choice-banking77/run.py",
                 "run_jev",
                 ([], {}, "/tmp/unused.jsonl"),
-                {"bar_path": "bar.md", "repo": self.tmp},
-                False,
-            ),
-            (
-                ROOT / "work/choice-banking77/run_prompted.py",
-                "main",
-                ([],),
                 {"bar_path": "bar.md", "repo": self.tmp},
                 False,
             ),

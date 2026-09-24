@@ -26,6 +26,9 @@ import types
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
+from anthropic_stop import refuse_anthropic_comparator  # noqa: E402  jev-sybt
+
 K3K = os.path.join(ROOT, "work/choice-banking77")
 K3K_SHA = "3709ee6"  # the commit that recorded jev-k3k rows-haiku.jsonl
 OUT = os.path.join(HERE, "live-raw.jsonl")
@@ -101,6 +104,7 @@ def raw_distribution(text):
 
 
 def run():
+    refuse_anthropic_comparator("adapter-uniform live (claude-haiku-4-5)")
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("unconfigured: ANTHROPIC_API_KEY unset, no call made", file=sys.stderr)
         return 2

@@ -30,8 +30,10 @@ sys.path.insert(0, os.path.join(ROOT, "upstream/typesafe-ai/typesafe-sdk-python/
 sys.path.insert(
     0, os.path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python/src")
 )
+sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
 
 from typesafe_sdk import Choice, RetryPolicy, TypeSafeClient  # noqa: E402
+from anthropic_stop import refuse_anthropic_comparator  # noqa: E402  jev-sybt
 
 JEV_MODEL = "jev-1.13.0"
 HAIKU_MODEL = "claude-haiku-4-5"
@@ -182,6 +184,7 @@ def run_jev(rows, label_map, path, bar_path=None, repo=None):
 
 
 def run_haiku(rows, label_map, path, bar_path=None, repo=None):
+    refuse_anthropic_comparator("choice-banking77 Haiku arm (claude-haiku-4-5)")
     sys.path.insert(0, os.path.join(ROOT, "work/sr-adopt"))
     from phase_gate import call_after_bar
 

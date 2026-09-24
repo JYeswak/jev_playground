@@ -28,10 +28,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import run  # noqa: E402  (also puts the vendored SDK and adapter on sys.path)
 from typesafe_sdk import RetryPolicy  # noqa: E402
 
+sys.path.insert(0, os.path.join(run.ROOT, "work", "anthropic-stop"))
+from anthropic_stop import refuse_anthropic_comparator  # noqa: E402  jev-sybt
+
 OUT = os.path.join(run.HERE, "rows-full-haiku-prompted.jsonl")
 
 
 def main(argv, bar_path=None, repo=None):
+    refuse_anthropic_comparator(
+        "choice-banking77 run_prompted Haiku arm (claude-haiku-4-5)"
+    )
     sys.path.insert(0, os.path.join(run.ROOT, "work/sr-adopt"))
     from phase_gate import call_after_bar
 

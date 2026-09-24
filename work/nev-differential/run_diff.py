@@ -14,8 +14,10 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(
     0, "/Users/josh/Developer/jev/upstream/typesafe-ai/system-one-adapter-python/src"
 )
+sys.path.insert(0, os.path.join(HERE, "..", "anthropic-stop"))
 
 from system_one_adapter import AsyncSystemOneAdapterClient, Noul, Score  # noqa: E402
+from anthropic_stop import refuse_anthropic_comparator  # noqa: E402  jev-sybt
 from typesafe_sdk import RetryPolicy  # noqa: E402  (P2b: SDK-owned transient retry)
 
 SRC = "/Users/josh/Developer/jev/jev-sec-bench/results/injection.json"
@@ -79,6 +81,7 @@ def make_model(arm):
             base_url="https://api.x.ai/v1",
             api_key=os.environ["XAI_API_KEY"],
         )
+    refuse_anthropic_comparator(f"nev-differential {arm}")
     return "anthropic", "claude-haiku-4-5"
 
 
