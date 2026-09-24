@@ -257,6 +257,7 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 ## Limitations
 
 - The injection result is one public corpus at one cut: three runs of Jev and grok-4, two of Haiku; a third Haiku run was not run (Anthropic API spend stopped 2026-09-24). Measure your own traffic before you gate on it.
+- No Anthropic model is run as a comparator any more. Every Haiku or other Anthropic-API comparator runner refuses before it creates a client, exits nonzero with `REFUSED: ... no longer runs` quoting the directive, and has no override; `work/anthropic-stop/test_anthropic_stop.py` fails if a tracked runner that names a Claude model skips the refusal, and it runs in CI (push run [36013342389](https://github.com/JYeswak/jev_playground/actions/runs/36013342389), 99 pass, 0 skip, 0 fail). Haiku numbers above were measured before the stop and stand.
 - Demos without `--live` replay recorded answers. They show the policy, not the model, and the live smokes are 1 to 10 calls each.
 - Some questions in this tree are a better fit for a regex or a trained classifier. The harm-rule check is the worked example.
 - CI runs only the portable gates, so a stage the runner skips is checked on the author's machine alone.
