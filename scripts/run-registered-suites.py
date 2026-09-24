@@ -4,9 +4,11 @@
   python3 scripts/run-registered-suites.py
   python3 scripts/run-registered-suites.py --selftest
 
-Two sources, one row each: every tracked file the test-file pattern matches, and every
-TESTS.md entry the pattern misses whose own Run: command names its own path (run verbatim).
-Prints one TSV row per suite: path, rc, count, seconds, prerequisite, status.
+Two sources: one row for every tracked file the test-file pattern matches (its suite command),
+and one row for every other `Run: `cmd`` in a TESTS.md entry (bullet or table row) whose cmd
+names the entry's own tracked path, run verbatim and labelled `<path><rest of cmd>`, e.g.
+`work/oracle-kit/selector-guard.mjs --selftest`. A backticked command without `Run:` is prose.
+Prints one TSV row per command: path, rc, count, seconds, prerequisite, status.
 A missing prerequisite is SKIP, never a pass. Exit 0 only when every row is
 PASS or SKIP. --selftest plants a failing assertion in /tmp and requires the
 command to exit nonzero and name that file.
@@ -295,11 +297,16 @@ def run_one(repo, path, command):
 ENTRY = re.compile(r"^(?:-|\|)\s*`([^`]+)`")
 
 
-def run_only_entries(repo):
-    """(path, command) for each TESTS.md entry the pattern misses whose own Run: names it.
+def entry_commands(repo):
+    """(label, path, command) for each own Run: of a TESTS.md entry not already its file's suite.
 
     An entry is a `- `path`` bullet or `| `path` |` row plus its indented continuation lines.
-    A Run: in another entry never counts, so a fixture path in a demo's command is not run.
+    Its own commands are the `Run: `cmd`` spans in that entry whose cmd names the entry's path;
+    a Run: in another entry never counts, so a fixture path in a demo's command is not run, and a
+    backticked command without `Run:` is prose. A pattern-matched file's suite command is already
+    its row, so only its other commands are here. The label is the path plus whatever follows it
+    in the command (`work/oracle-kit/selector-guard.mjs --selftest`); a label already taken gets
+    the whole command appended, so no command is ever dropped for sharing a label.
     """
     registry = Path(repo) / "TESTS.md"
     if not registry.is_file():
@@ -315,15 +322,24 @@ def run_only_entries(repo):
             current[1] += "\n" + line
         else:
             current = None
-    found = {}
+    out, labels, seen = [], set(), set()
     for path, body in entries:
-        if path in found or path not in tracked or TRACKED.search(path):
+        if path not in tracked:
             continue
+        suite = None
+        if TRACKED.search(path):
+            suite = run_command_for(registry, path)
+            labels.add(path)
         for command in re.findall(r"Run: `([^`]+)`", body):
-            if path in command:
-                found[path] = command
-                break
-    return list(found.items())
+            if path not in command or command == suite or (path, command) in seen:
+                continue
+            seen.add((path, command))
+            label = path + command.split(path, 1)[1].rstrip()
+            if label in labels:
+                label = f"{path} ({command})"
+            labels.add(label)
+            out.append((label, path, command))
+    return out
 
 
 def survey(repo):
@@ -333,11 +349,11 @@ def survey(repo):
         for path in tracked_tests(repo)
         if (Path(repo) / path).exists()
     ]
-    rows += [
-        run_one(repo, path, command)
-        for path, command in run_only_entries(repo)
-        if (Path(repo) / path).exists()
-    ]
+    for label, path, command in entry_commands(repo):
+        if (Path(repo) / path).exists():
+            row = run_one(repo, path, command)
+            row["path"] = label
+            rows.append(row)
     return rows
 
 
@@ -413,6 +429,12 @@ def selftest():
         ("runonly_ok.sh", "exit 0\n"),
         ("borrow.sh", "exit 1\n"),
         ("untracked.sh", "exit 1\n"),
+        (
+            "two.sh",
+            '[ "${1:-}" = --selftest ] && { echo planted two selftest; exit 1; }\nexit 0\n',
+        ),
+        ("table.sh", "exit 0\n"),
+        ("dup.sh", "exit 0\n"),
     ):
         (tmp / "work/plant" / name).write_text(body)
     (tmp / "TESTS.md").write_text(
@@ -428,6 +450,10 @@ def selftest():
         "- `work/plant/runonly_ok.sh` — Run:-only, passes. Run: `sh work/plant/runonly_ok.sh`.\n"
         "- `work/plant/borrow.sh` — its Run: names another file. Run: `sh work/plant/runonly_ok.sh`.\n"
         "- `work/plant/untracked.sh` — never added. Run: `sh work/plant/untracked.sh`.\n"
+        "- `work/plant/two.sh` — a scan and its selftest. Run: `sh work/plant/two.sh` and\n"
+        "  Run: `sh work/plant/two.sh --selftest`; `sh work/plant/two.sh --other` is prose.\n"
+        "| `work/plant/table.sh` | Run: `sh work/plant/table.sh --selftest` | table row | 1/1 |\n"
+        "- `work/plant/dup.sh` — two commands, one label. Run: `sh work/plant/dup.sh` and Run: `bash work/plant/dup.sh`.\n"
     )
     if (
         normalize_command(
@@ -450,6 +476,9 @@ def selftest():
             "work/plant/runonly.sh",
             "work/plant/runonly_ok.sh",
             "work/plant/borrow.sh",
+            "work/plant/two.sh",
+            "work/plant/table.sh",
+            "work/plant/dup.sh",
         ],
         cwd=tmp,
         check=True,
@@ -462,6 +491,7 @@ def selftest():
         "work/plant/borrowed_test.py",
         "work/plant/fail_test.py",
         "work/plant/runonly.sh",
+        "work/plant/two.sh --selftest",
     ]:
         print(f"SELFTEST FAIL: {failed}", file=sys.stderr)
         return 1
@@ -499,7 +529,27 @@ def selftest():
             file=sys.stderr,
         )
         return 1
-    for absent in ("work/plant/borrow.sh", "work/plant/untracked.sh"):
+    if "planted two selftest" not in by.get("work/plant/two.sh --selftest", {}).get(
+        "tail", ""
+    ):
+        print(
+            "SELFTEST FAIL: second Run: command not run or not named", file=sys.stderr
+        )
+        return 1
+    for label in (
+        "work/plant/two.sh",
+        "work/plant/table.sh --selftest",
+        "work/plant/dup.sh",
+        "work/plant/dup.sh (bash work/plant/dup.sh)",
+    ):
+        if by.get(label, {}).get("status") != "PASS":
+            print(f"SELFTEST FAIL: {label} {by.get(label)}", file=sys.stderr)
+            return 1
+    for absent in (
+        "work/plant/borrow.sh",
+        "work/plant/untracked.sh",
+        "work/plant/two.sh --other",
+    ):
         if absent in by:
             print(
                 f"SELFTEST FAIL: {absent} ran without its own tracked Run:",
@@ -508,7 +558,8 @@ def selftest():
             return 1
     print(
         "SELFTEST PASS planted failing assertion named work/plant/fail_test.py; "
-        "Run:-only failure named work/plant/runonly.sh"
+        "Run:-only failure named work/plant/runonly.sh; "
+        "second Run: failure named work/plant/two.sh --selftest"
     )
     return 0
 

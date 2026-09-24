@@ -15,11 +15,11 @@ on:
   workflow_dispatch:
     inputs:
       plant_red:
-        description: "Plant a defect in the runner checkout only (nothing committed): 'fixture' appends garbage to the calibration fixture so stage 10 must RED naming it; 'suite' appends a failing test so the registered-suite job must RED naming that file; 'runonly' writes a real Jev-answer .probability read so the Run:-only row work/oracle-kit/selector-guard.mjs must RED; 'none' runs clean."
+        description: "Plant a defect in the runner checkout only (nothing committed): 'fixture' appends garbage to the calibration fixture so stage 10 must RED naming it; 'suite' appends a failing test so the registered-suite job must RED naming that file; 'runonly' writes a real Jev-answer .probability read so the Run:-only row work/oracle-kit/selector-guard.mjs must RED; 'hook' makes the commit-msg hook accept a level-less subject so its --selftest row must RED; 'none' runs clean."
         required: false
         default: "none"
         type: choice
-        options: [none, fixture, suite, runonly]
+        options: [none, fixture, suite, runonly, hook]
 
 jobs:
   gates:
@@ -212,6 +212,24 @@ jobs:
           printf 'const answer = body.answers.harm;\nexport const p = answer.probability;\n' > work/oracle-kit/planted-silent-read.mjs
           echo "PLANTED: work/oracle-kit/planted-silent-read.mjs (row work/oracle-kit/selector-guard.mjs must FAIL)"
 
+      - name: Plant a commit-msg hook defect in the runner checkout only
+        # The hook accepts a subject that names no verification level. Its --selftest is a Run: in
+        # TESTS.md's table row, so its row must FAIL. The step fails unless the anchor line is found once.
+        if: inputs.plant_red == 'hook'
+        run: |
+          set -euo pipefail
+          python3 - githooks/commit-msg-verification-level.sh <<'EOF'
+          import sys
+          p = sys.argv[1]
+          lines = open(p).read().split("\n")
+          hits = [i for i, l in enumerate(lines) if "REFUSE reason=no-level" in l]
+          assert len(hits) == 1, hits
+          lines.insert(hits[0], "  return 0  # PLANTED: a level-less subject is accepted")
+          open(p, "w").write("\n".join(lines))
+          EOF
+          grep -n 'PLANTED' githooks/commit-msg-verification-level.sh
+          echo "PLANTED: githooks/commit-msg-verification-level.sh (row 'githooks/commit-msg-verification-level.sh --selftest' must FAIL)"
+
       - name: Run registered suites
         env:
           PLANT: ${{ inputs.plant_red }}
@@ -224,9 +242,11 @@ jobs:
           case "$PLANT" in
             suite) row=work/sr-adopt/test_prereg.py ;;
             runonly) row=work/oracle-kit/selector-guard.mjs ;;
+            hook) row="githooks/commit-msg-verification-level.sh --selftest" ;;
             *) exit "$rc" ;;
           esac
-          if grep -F "$row"$'\t' /tmp/suites.tsv | grep -q $'\tFAIL$'; then
+          # Exact first column: the selector-guard scan row must not match its --selftest row.
+          if awk -F'\t' -v r="$row" '$1 == r && $NF == "FAIL" { f = 1 } END { exit !f }' /tmp/suites.tsv; then
             echo "RED named $row"
             exit 1
           fi

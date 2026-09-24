@@ -44,7 +44,7 @@ claim nobody can check:
 - `work/oracle-kit/prevalence_threshold.py` — t*(π) on frozen priors 30/186449 and 488/50149.
   Run: `python3 work/oracle-kit/prevalence_threshold.py` (exit 0; prints the 1:2300 identity).
 - `work/oracle-kit/selector-guard.mjs` — scorers cannot silently read `.distribution` / `.probability`.
-  Run: `node work/oracle-kit/selector-guard.mjs` and `--selftest` (planted `answer.distribution` RED).
+  Run: `node work/oracle-kit/selector-guard.mjs` and Run: `node work/oracle-kit/selector-guard.mjs --selftest` (7 planted real answer reads RED, tool-details reads pass; jev-56o4 made the selftest its own row).
 - `work/oracle-kit/voi_harm_rule.py` — VOI of paid Jev vs free regex on the frozen harm-rule corpus.
   Run: `python3 work/oracle-kit/voi_harm_rule.py` (exit 0; VOI ≤ 0; NO-CLAIM).
 - `scripts/promotion-four-gates.py` — four-gate VIEW over existing receipts; empty evidence fails.
@@ -139,10 +139,10 @@ Everything else under this root is a **vendored clone** and its tests belong to 
 | Suite | Command | What it proves | Count at last run |
 |---|---|---|---|
 | `probes/fast-jev-probe.mts` | `npx tsx probes/fast-jev-probe.mts` | black-box behavior of the compaction library against a **fake** Jev: verbatim text preservation, message order, truncation-to-head+note on drop, unknown-answer-key ⇒ keep (the fail-safe direction) | 8/8, reduction ratio 0.91 |
-| `foundation/run_calibration.py` | `cd foundation && python3 run_calibration.py` | our thresholds against the labelled held-out set; emits a receipt under `foundation/runs/` | ECE 0.061, Brier 0.020, Noul 58/60, Choice 19/20 (receipt `20260917T224444Z.json`) |
+| `foundation/run_calibration.py` | `cd foundation && python3 run_calibration.py` (**LIVE**: needs `TYPESAFE_API_KEY` and makes one Jev call per fixture row through the SDK's `system_one`, so no keyless CI step runs it; stage 20 checks that a committed receipt covers the fixture sha, jev-56o4) | our thresholds against the labelled held-out set; emits a receipt under `foundation/runs/` | ECE 0.061, Brier 0.020, Noul 58/60, Choice 19/20 (receipt `20260917T224444Z.json`) |
 | `foundation/gates.sh` | `cd foundation && ./gates.sh` | **every** wired stage against the real tree — the suite globs `gates.d/[0-9]*-*.sh`, so the stage count is derived, never fixed here | **8/8 PASS** at `a503b9a`; this row said `4/4` and `the four gate stages` for four stages' worth of additions (pane 2, `3e198bb`) |
 | `foundation/gates.sh --selftest` | `cd foundation && ./gates.sh --selftest` | **every stage proves it can go RED** on a planted bad input; the aggregator also proves a RED row names a failing sub-check that is past the first 300 bytes and outside the last 12 lines (`--red-row-selftest`) | **8/8 PASS** at `a503b9a`; same stale-count correction; red-row arm added jev-80lj |
-| `githooks/commit-msg-verification-level.sh --selftest` | as written | the commit-edge hook refuses a level-less subject and accepts a level-carrying one | 4 known-bad refused, 4 known-good passed, 1 prose-not-claim refused |
+| `githooks/commit-msg-verification-level.sh` | Run: `bash githooks/commit-msg-verification-level.sh --selftest` | the commit-edge hook refuses a level-less subject and accepts a level-carrying one; hermetic temp repos, never the real index | 4 known-bad refused, 4 known-good passed, 1 prose-not-claim refused, 3 receipt/suggestion arms |
 | `compaction/` (sibling-owned) | see that directory's own scripts | the omp transcript adapter and its known-bad (a trailing `toolResult` must be kept) | gate `40-omp-compact-replay.sh` PASS |
 | `work/skillranker-eval/test/contract.test.mjs` | `node --test work/skillranker-eval/test/contract.test.mjs` | skillranker EVAL CONTRACT process: frozen loss via oracle-kit `decisionLoss`, always-abstain 0.833, coin-flip worse, planted wrong-pick RED at loss 2, ≥0.90 hard FAIL, JSONL export, judge shape, invented noul gate refused | 12/12, this PR |
 | `work/jev-real-corpus-eval/test/score.test.mjs` | `node --test work/jev-real-corpus-eval/test/score.test.mjs` | frozen toolcall corpus (n=7846): Studio 0.212210043 / 1.495284221 reprinted, isError-only loses, planted RED | 10/10, this PR |
