@@ -96,13 +96,28 @@ export const PRICES = {
            note: 'consistency_choice_cookbook.md:90 "claude-haiku-4-5": (1.00, 5.00), $ per 1M tokens, "prices + model ids as of 2026-07" (:89) — list price, not an invoice' },
 };
 
-function checkPrices() {
-  for (const [name, p] of Object.entries(PRICES)) {
-    const line = readFileSync(join(ROOT, p.file), 'utf8').split('\n')[p.line - 1] ?? '';
-    if (!line.includes(p.needle)) {
-      throw new Error(`price source moved: ${name} expects ${JSON.stringify(p.needle)} at ${p.file}:${p.line}, found ${JSON.stringify(line)}`);
-    }
+export const SYNC_DOCS = './scripts/sync-docs.sh';
+
+/**
+ * Check each cited price line against the mirror. The mirror is gitignored (only
+ * docs-mirror/MANIFEST.tsv is tracked; `./scripts/sync-docs.sh` fetches it), so a fresh clone
+ * has none: that is NOT_RUN, never a pass and never a crash. A file that is present but no longer
+ * says what we quote is a mismatch, and the scorer fails on it.
+ * Returns { status: 'ok' | 'not_run' | 'mismatch', detail }.
+ */
+export function checkPrices(mirrorRoot = ROOT) {
+  const missing = [...new Set(Object.values(PRICES).map((p) => p.file))].filter((f) => !existsSync(join(mirrorRoot, f)));
+  if (missing.length) {
+    return { status: 'not_run', detail: `price check NOT_RUN: mirror absent (${missing.join(', ')}); fetch it with ${SYNC_DOCS}, then re-score` };
   }
+  const moved = [];
+  for (const [name, p] of Object.entries(PRICES)) {
+    const line = readFileSync(join(mirrorRoot, p.file), 'utf8').split('\n')[p.line - 1] ?? '';
+    if (!line.includes(p.needle)) moved.push(`${name} expects ${JSON.stringify(p.needle)} at ${p.file}:${p.line}, found ${JSON.stringify(line)}`);
+  }
+  return moved.length
+    ? { status: 'mismatch', detail: `price source moved: ${moved.join('; ')}` }
+    : { status: 'ok', detail: 'price check: every cited price line still reads as quoted' };
 }
 
 function priorRows() {
@@ -166,8 +181,8 @@ const counts = (xs) => Object.entries(xs.reduce((m, x) => ((m[x] = (m[x] ?? 0) +
   .sort((a, b) => Number(a[0]) - Number(b[0])).map(([k, v]) => `${k}×${v}`).join(', ');
 
 /** Score the committed rows. Returns { text, failures } so a caller can gate on a malformed file. */
-export function score(rows = priorRows()) {
-  checkPrices();
+export function score(rows = priorRows(), { mirrorRoot = ROOT } = {}) {
+  const prices = checkPrices(mirrorRoot);
   const lines = [];
   const failures = [];
   const attempts = rows.length;
@@ -218,8 +233,11 @@ export function score(rows = priorRows()) {
   lines.push('');
   lines.push(`Jev price: ${PRICES.jev.note}. Haiku price: ${PRICES.haiku.note}.`);
   lines.push('Price per billing unit: none stated in docs-mirror/typesafe or either SDK; billing_units are reported as counts only.');
+  // A mismatch is a failure and prints under FAILURES; ok and NOT_RUN print their own line.
+  if (prices.status === 'mismatch') failures.push(prices.detail);
+  else lines.push(prices.detail);
   lines.push(failures.length ? `FAILURES: ${failures.join('; ')}` : 'scorer checks: 50/50 answered per shape, model pinned, client usage == wire usage, 50/50 Haiku rows per shape');
-  return { text: lines.join('\n'), failures };
+  return { text: lines.join('\n'), failures, prices: prices.status };
 }
 
 const mode = process.argv[2] ?? 'score';

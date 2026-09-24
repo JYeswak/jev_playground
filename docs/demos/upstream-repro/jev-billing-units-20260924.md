@@ -116,8 +116,14 @@ receipt does not edit AGENTS.md.
 **Spend.** 151 Jev calls (150 planned plus 1 header probe), 0 failures, 72,820 input tokens:
 \$0.0031 at \$0.042 per million. Zero Haiku calls; the Haiku column prices rows already committed.
 
-**Re-score:** `node work/jev-billing-units/measure.mjs` (no key, no network). It exits 1 if any check
-fails or a cited price line has moved.
+**Re-score:** `node work/jev-billing-units/measure.mjs` (no key, no network). The row checks run from
+committed files on any clone. The price-line check needs the docs mirror, which is gitignored (only
+`docs-mirror/MANIFEST.tsv` is tracked): run `./scripts/sync-docs.sh` first. Without the mirror the
+scorer prints `price check NOT_RUN` with that command and exits 0 on the rows alone. The dollar
+columns are then the constants quoted above, not re-read from disk. It exits 1 if a row check fails
+or a mirrored price line no longer says what is quoted. Offline test of all three paths (mirror
+absent, price line moved, price line intact): `node --test work/jev-billing-units/measure.test.mjs`.
+Added after ReadmeStrangerRun's fresh-clone re-score hit ENOENT on `models.md`.
 
 ## NO-CLAIM
 
