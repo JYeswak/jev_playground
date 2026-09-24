@@ -91,4 +91,90 @@ carry adjacent ratings.
 
 ## Results
 
-Pending the live run.
+Bar committed at `52d94c2` before either arm made a call. Run 2026-09-24 (live, `[live]`), both
+arms 500/500 answered on the first pass, 0 error rows, no resume needed. Rows:
+`work/score-yelp/rows-jev.jsonl` (sha256 `2921a926…343c43`) and `work/score-yelp/rows-haiku.jsonl`
+(sha256 `4ab83aaf…ca76a3`). The rows hold no review text. Re-score with no key:
+`python3 work/score-yelp/score.py`.
+
+| Arm | Exact correct | Accuracy | Wilson 95% | MAE (levels) |
+|---|---:|---:|---|---:|
+| constant: majority (always 0, 1 star) | 117/500 | 23.4% | 19.9–27.3% | 1.842 |
+| constant: middle (always 2, 3 stars) | 100/500 | 20.0% | 16.7–23.7% | 1.206 |
+| **Jev `jev-1.13.0`** (rounded expected, primary) | **341/500** | **68.2%** | 64.0–72.1% | **0.348** |
+| Jev (argmax, descriptive) | 338/500 | 67.6% | 63.4–71.6% | 0.360 |
+| **Haiku 4.5 via adapter** (rounded expected, primary) | **323/500** | **64.6%** | 60.3–68.7% | **0.384** |
+| Haiku (argmax, descriptive) | 316/500 | 63.2% | 58.9–67.3% | 0.412 |
+
+| Arm | Answered | Model reported | p50 / p95 latency | Tokens in / out | MAE of raw expected score |
+|---|---:|---|---|---|---:|
+| Jev | 500/500 | `jev-1.13.0` (all rows) | 231 / 502 ms | 280,986 / 8,500 | 0.369 |
+| Haiku | 500/500 | `anthropic/claude-haiku-4-5` | 932 / 1,819 ms | 465,525 / 22,783 | 0.423 |
+
+Paired on the same 500 rows (primary levels):
+
+| Jev vs | Jev-only correct | Other-only correct | McNemar exact p | Accuracy | Jev lower error | Other lower error | Sign test p | MAE |
+|---|---:|---:|---:|---|---:|---:|---:|---|
+| always 0 | 244 | 20 | 3.9e-50 | WIN | 344 | 22 | 1.7e-75 | WIN |
+| always 2 | 297 | 56 | 8.9e-41 | WIN | 320 | 61 | 1.7e-43 | WIN |
+| Haiku | 59 | 41 | 0.089 | TIE | 67 | 45 | 0.047 | WIN |
+
+**Adapter zero-mass check (`jev-mly`).** `probabilityError` and `originalProbabilities` were
+recorded on 500/500 Haiku rows and are `null` on all 500. The adapter always builds
+`debug.probability_errors` and adds a question only when its raw map was off by more than the
+tolerance (`system_one_adapter/_utils/probability_normalization.py:36-54` at `adffc2e`; wired in
+`_client.py:311-313`). So no Haiku row was rescaled and none was zero-mass. The two required
+passes (all rows; zero-mass rows dropped, 0 dropped) and the descriptive third pass are the same
+table, and all three print PASS. One Haiku row (`i = 367`) is an exactly uniform 0.2 map at
+confidence 0.0 with no `probability_errors`. That is Haiku asserting uniform, not the adapter
+filling a zero map. It rounds to the middle level, which matches the label (3 stars); Jev gives
+1.97 on the same row, also 3 stars.
+
+**Pass rule applied:** (1) Jev beats both constants on accuracy and MAE: yes. (2) Jev does not lose
+to Haiku on either metric: yes (accuracy TIE, MAE WIN). (3) The same holds with zero-mass rows
+dropped (0 such rows). **PASS.** No `NEGATIVE_EVIDENCE.md` row: the preregistered trigger did not
+fire.
+
+**How narrow the MAE win is (descriptive).** Sign test 67 vs 45 gives p = 0.0467. Moving a single
+row from "Jev lower error" to a tie gives 66 vs 45, p = 0.057, a TIE. So the MAE WIN has a
+headroom of one row, narrower than SST-5's four (`jev-qbc`). Run-to-run variance on Yelp was not
+measured, and on SST-5 Jev changed 6 to 8 of 500 levels between runs. A repeat run could plausibly
+land on either side of 0.05.
+
+**Descriptive, not preregistered.** Coverage by returned confidence: Jev's top 25% / 50% / 75% of
+rows are 88.0% / 81.6% / 75.2% exact; Haiku's are 85.6% / 72.8% / 68.5%. Unlike SST-5, where
+Haiku's confidence carried almost no ranking signal, both arms' confidence ranks here. Jev's
+ranks more steeply in the top half. Confusions (`score.py` prints them): both arms err mostly by
+one level. Jev reads truth 4 stars as 5 stars 40 times, and 3 stars as 4 stars 33 times. Haiku
+reads 4 stars as 5 stars 40 times, and **2 stars as 1 star 48 times** (Jev: 21). That is where
+most of Haiku's exact-accuracy gap comes from.
+
+**Verdict** (`[live]`, N = 500 per arm, 2026-09-24). On 500 Yelp test reviews, one Score question
+at `jev-1.13.0` beats both constants by a wide margin: 68.2% exact against 23.4% and 20.0%, MAE
+0.348 against 1.842 and 1.206. It does not lose to Haiku 4.5 asked the identical question through
+TypeSafe's adapter: 3.6 points higher on exact accuracy, not significant (McNemar p = 0.089), and
+lower absolute error, significant by one row (sign test p = 0.047). This matches SST-5 (4.4 points,
+p = 0.092; MAE p = 0.015), on a second public ordinal set with review-length text. **PASS**, with
+the same shape and the same narrowness. The answer to the bead's question: the direction carries
+to a second set, but the MAE margin is as thin here as on SST-5 or thinner, so neither set alone
+separates Jev from Haiku with room to spare. Jev answered at 231 ms p50 against Haiku's 932 ms.
+
+**Spend.** 1,000 live calls, 0 retries of failed rows. Jev: 500 calls, 280,986 input / 8,500 output
+tokens as reported by the API. Haiku: 500 calls, 465,525 input / 22,783 output (adapter totals).
+[INFERENCE] At Haiku 4.5's list price ($1 / $5 per million) the Haiku arm is about $0.58. The Jev
+arm's billed units were not read and are not stated.
+
+**Scratch left in place** (Joshua deletes): `/tmp/yelp-test.parquet` (the pinned parquet, fetched
+once to take its sha256), `/tmp/yelp-smoke/` (scorer smoke copy with SST-5 rows and synthetic
+debug fields), `/tmp/sst5-score-restore.py` (a byte-identical copy of the committed
+`work/score-sst5/score.py`, used to undo one mistaken edit to that file before anything was
+committed), `/tmp/yelp-score.txt`. `work/score-yelp/texts.jsonl` is gitignored review text that
+the sampler rebuilds.
+
+**Boundary / NO-CLAIM.** One run per arm, one question wording, one Jev version, one Haiku
+configuration. Run-to-run variance on this set was not measured, and the MAE WIN has one row of
+headroom. The TIE on accuracy is a failure to separate, not proof of equality. The star labels are
+the reviewers' own and were not re-adjudicated. The descriptive tables were not preregistered, and
+no threshold was chosen from them. No review text is published; the numbers can be re-derived
+from committed rows plus the pinned public file. A non-author re-score is still pending, and the
+bead stays open until it is done.
