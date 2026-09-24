@@ -125,6 +125,22 @@ test("numeric claims refuse as out of scope and never reach the asker", async ()
   }
 });
 
+// Found by VerifySST5 on jev-5cz: numberTokens() skips a number followed by a letter, so these
+// reached the model although the description says every number is refused.
+test("numbers glued to a unit refuse; commit shas and bead ids do not", async () => {
+  const tool = factory(pi, neverAsk);
+  for (const claim of ["Jev is 7.7x faster.", "Haiku costs 26x more per call", "p50 is 130ms on this box",
+    "the sample holds 10k rows", "McNemar 25v3 favours Jev"]) {
+    const r = await tool.execute("u", { claim, evidence: EVIDENCE });
+    assert.equal(r.details.reason, "numeric-out-of-scope", claim);
+    assert.equal(r.details.calledModel, false, claim);
+  }
+  for (const claim of ["Landed in 3b0c1d2 and verified at 2c59e18.", "jev-384m and jev-k9z are open",
+    "a 2x2 table and file 12s4 stay qualitative"]) {
+    assert.deepEqual(mod.claimNumbers(claim), [], claim);
+  }
+});
+
 test("versions, names and dates are not numbers; qualitative README sentences still get verdicts", async () => {
   assert.deepEqual(mod.claimNumbers("Pinned jev-1.13.0 on SST-5 top-1, run 2026-09-24T02:57Z."), []);
   const sentences = readFileSync(new URL("../../README.md", import.meta.url), "utf8").split("\n")

@@ -28,7 +28,9 @@
  * jev-25r), so the tool says so instead of guessing. "Contains a number" is
  * numberTokens() below (the exact tokenizer of jev-h8s, unit-tested in
  * work/jev-claim-check/numeric-v2.test.mjs) over the claim with dates and times
- * blanked. Versions (1.13.0), names (SST-5, top-1) and 8+ digit runs do not count.
+ * blanked, plus numbers glued to a unit suffix (7.7x, 130ms, 10k, 25v3), which
+ * numberTokens() skips on purpose. Versions (1.13.0), names (SST-5, top-1),
+ * bead ids (jev-384m), commit shas (3b0c1d2) and 8+ digit runs do not count.
  */
 import { askJev } from "../../work/jev-client/src/index.ts";
 
@@ -42,6 +44,13 @@ const NUM = String.raw`\d[\d,.]*(?:[eE][-+]?\d+)?`;
 const CHUNK = new RegExp(String.raw`(?<![A-Za-z0-9_.])(?<![A-Za-z]-)${NUM}(?:-${NUM})?(?:\/${NUM})*%?`, "g");
 const THOUSANDS = /^\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:[eE][-+]?\d+)?%?$/;
 const DATE_TIME = /\d{4}-\d{2}-\d{2}(T[\d:.]+Z?)?|\b\d{1,2}:\d{2}(:\d{2})?Z?/g;
+// A number glued to a unit. The suffix letters are outside [a-f], so a hex commit sha never
+// matches, and the suffix must end the token, so "12s4" or "2x2" stay out. Bead ids are
+// excluded by the same lookbehinds as CHUNK (jev-384m, jev-k9z).
+const UNIT_GLUED = new RegExp(
+  String.raw`(?<![A-Za-z0-9_.])(?<![A-Za-z]-)${NUM}(?:x|×|ms|min|s|h|m|k|K|M|B|GB|MB|KB|v\d+)(?![A-Za-z0-9_])`,
+  "g",
+);
 
 /** Exact number tokens: 2.6e-13, 0.0614, 75/219, 1,145, 96.0%, 1.1-4.7% whole; lists split at commas. */
 export function numberTokens(blanked: string): Array<{ text: string; at: number }> {
@@ -68,7 +77,9 @@ export function numberTokens(blanked: string): Array<{ text: string; at: number 
 
 /** The numbers a claim asserts, dates and times excluded. Any at all puts the claim out of scope. */
 export function claimNumbers(claim: string): string[] {
-  return numberTokens(claim.replace(DATE_TIME, (s) => " ".repeat(s.length))).map((t) => t.text);
+  const blanked = claim.replace(DATE_TIME, (s) => " ".repeat(s.length));
+  const glued = [...blanked.matchAll(UNIT_GLUED)].map((m) => m[0]).filter((t) => !/\d{8,}/.test(t));
+  return [...numberTokens(blanked).map((t) => t.text), ...glued];
 }
 
 export const QUESTION = {
