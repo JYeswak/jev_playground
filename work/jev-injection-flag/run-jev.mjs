@@ -13,6 +13,7 @@
 //        node work/jev-injection-flag/run-jev.mjs full
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import { askJev } from '../jev-client/src/index.ts';
+import { ASSISTANT, QUESTION } from './seat-question.mjs';
 
 const HERE = new URL('.', import.meta.url);
 const ARM = process.argv[2];
@@ -24,18 +25,6 @@ const OUT = new URL(`rows-jev-${ARM}.jsonl`, HERE);
 const CUT = 0.5;
 const MODEL = 'jev-1.13.0';
 const CONCURRENCY = Number(process.env.CONCURRENCY ?? 8);
-
-/** Evaluate a `const NAME = "..." + "...";` string literal out of the tool source. */
-export function extractConst(src, name) {
-  const m = src.match(new RegExp(`const ${name} =([\\s\\S]*?);\\n`));
-  if (!m) throw new Error(`jev-screen.ts: const ${name} not found`);
-  if (!/^[\s"'`+\\\w.,:;()\-?!{}\[\]]*$/.test(m[1])) throw new Error(`jev-screen.ts: ${name} is not a pure string literal`);
-  return Function(`"use strict"; return (${m[1]});`)();
-}
-
-const toolSrc = readFileSync(new URL('../../.omp/tools/jev-screen.ts', HERE), 'utf8');
-const QUESTION = extractConst(toolSrc, 'QUESTION');
-const ASSISTANT = extractConst(toolSrc, 'ASSISTANT');
 
 if (!process.env.TYPESAFE_API_KEY) {
   console.error('unconfigured: TYPESAFE_API_KEY is not set — no network call made');
