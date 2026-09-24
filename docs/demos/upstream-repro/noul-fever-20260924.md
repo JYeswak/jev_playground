@@ -191,3 +191,52 @@ of those 62 claims also has a row with text. Checked after the run, and the samp
 FEVER dev is public and may be in either model's training data.
 Nothing was tuned after the answers came back. The bead waits for a non-author re-score from the
 committed rows before it closes.
+
+## Non-author re-check (AdapterUniform, 2026-09-24, keyless)
+
+Done in a fresh `git clone` of `main` at `d5ef746` (`/tmp/jev-wx5-verify`), with
+`TYPESAFE_API_KEY` and `ANTHROPIC_API_KEY` unset. No live call.
+
+- **Bar before rows.** `834a569` (bar, sampler, sample, generalized runner and scorer) is an ancestor
+  of `aadd4d8` (rows). `sample.jsonl`, `run.py` and `score.py` are unchanged between the two
+  commits. Row files hash to the receipt's values: `rows-jev.jsonl` `8de7c43a…4c706acd7`,
+  `rows-haiku.jsonl` `c6035a30…abe072bdb`.
+- **FEVER table reproduces.** `python3 work/noul-scifact/score.py work/noul-fever` exits 0.
+  - Jev 379/400 (94.8%), AUC 0.973, Brier 0.0463, ECE 0.0376.
+  - Haiku 376/400 (94.0%), AUC 0.957, Brier 0.0581, ECE 0.0664.
+  - Per-arm intervals: Jev AUC 0.954–0.989, Brier 0.0296–0.0646, ECE 0.0254–0.0619. Haiku 0.935–0.976,
+    0.0381–0.0802, 0.0474–0.0920.
+  - Paired vs Haiku: 6/3, p = 0.508 TIE. AUC +0.0030 to +0.0306, Brier −0.0231 to −0.0020, ECE
+    −0.0413 to −0.0081: all WIN.
+  - Vs constants: 140/15, p = 1.33e-26.
+  - `bar 1 PASS`, `bar 2 loses to incumbent: NO`, `overall: PASS`.
+  - Every number matches the receipt to its printed precision.
+- **SciFact unchanged under the generalized scorer.** The `15b0371` scorer (bar commit for jev-9er)
+  and the current generalized scorer, both run on `work/noul-scifact`, print identical numbers in
+  every table. The diff is four text lines only: the header `true (SUPPORT)` became `true`, the two
+  `By SciFact gold label` headings became `By gold label`, and a new adapter-debug line reads
+  "recorded on 0/400". The old jev-9er Haiku rows predate the debug fields, so zero-mass is
+  correctly reported as not ruled out.
+- **QUESTION.** The `QUESTION = Noul(...)` block in `work/noul-scifact/run.py` is byte-identical to
+  `15b0371`.
+- **Sample rebuild (network).** `python3 work/noul-fever/sample.py 400 20260924` exits 0. It reads
+  a 9,835-claim pool (62 rows skipped for empty evidence text) and writes a file with sha256
+  `7f9f03cc4049861720f20730c579329d2b8d0c794f5117af10e01f835a7734d6`, byte-identical (`cmp`) to the
+  committed `sample.jsonl`.
+- **Spot-check, 10 rows.**
+  - The five Haiku answers of exactly 0.5 are rows 29, 141, 160, 202 and 358. All five are gold NEI
+    (truth false), so they score "no" at the >0.5 cut. Jev answered 0.20, 0.19, 0.06, 0.38 and 0.12
+    on them.
+  - Five seeded others: 7 and 327 (REFUTES), 283 and 364 (NEI), 342 (SUPPORTS). Jev 0.02, 0.02,
+    0.02, 0.03, 0.97 against Haiku 0.0, 0.0, 0.0, 0.1, 1.0. All agree with gold at the cut.
+  - Counts match the receipt: Haiku exactly 0.0 on 205/400; Jev 0.0 or 0.5 on 0/400.
+- **Debug fields.** All 400 Haiku rows carry `probabilityError` and `originalProbabilities`, both
+  `null` on all 400. The runner writes `debug.probability_errors.get("supports")`
+  (`work/noul-scifact/run.py:124-126`). `null` means the adapter made no normalization entry, which
+  is expected: a Noul answer never goes through normalization
+  (`system_one_adapter/_client.py:125-127`). The "0 rescaled, 0 zero-mass" result is therefore true
+  by construction for Noul, and the scorer's 0-row drop is correct.
+- Re-check verdict: **CONFIRMED**. PASS stands as written.
+
+Scratch left in place: `/tmp/jev-wx5-verify` (clone, including an untracked copy of the `15b0371`
+scorer at `work/noul-scifact/score_old_verify.py`) and `/tmp/jev-wx5-verify-*.txt|.py|.jsonl`.
