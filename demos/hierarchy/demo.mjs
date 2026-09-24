@@ -57,7 +57,9 @@ function extend(candidate, label, probabilities) {
   };
 }
 
-function greedy(childrenFn, scoreFn) {
+// scoreFn may be async (the live lane asks Jev); await it so a pending call is never read as
+// probabilities. Before jev-lcf the live lane read a Promise and routed on undefined scores.
+async function greedy(childrenFn, scoreFn) {
   let path = [];
   for (let i = 0; i < MAX_DEPTH; i++) {
     const children = childrenFn(path);
@@ -66,13 +68,13 @@ function greedy(childrenFn, scoreFn) {
       path = [...path, children[0]];
       continue;
     }
-    const probs = scoreFn(path);
+    const probs = await scoreFn(path);
     path = [...path, children.reduce((a, b) => (probs[a] >= probs[b] ? a : b))];
   }
   return path;
 }
 
-function beam(childrenFn, scoreFn, width = BEAM_WIDTH) {
+async function beam(childrenFn, scoreFn, width = BEAM_WIDTH) {
   let beam = [{ path: [], product: 1.0, decisions: 0, score: 1.0 }];
   for (let i = 0; i < MAX_DEPTH; i++) {
     const expandable = beam.filter((c) => childrenFn(c.path).length > 0);
@@ -84,7 +86,7 @@ function beam(childrenFn, scoreFn, width = BEAM_WIDTH) {
     const next = [...finished];
     for (const candidate of expandable) {
       const children = childrenFn(candidate.path);
-      const probs = children.length === 1 ? { [children[0]]: 1.0 } : scoreFn(candidate.path);
+      const probs = children.length === 1 ? { [children[0]]: 1.0 } : await scoreFn(candidate.path);
       for (const label of children) next.push(extend(candidate, label, probs));
     }
     next.sort((a, b) => b.score - a.score);
@@ -123,8 +125,8 @@ for (const doc of DOCS) {
     ? (path) => askLive(doc, path)
     : (path) => doc.recorded[path.join("/")] ?? doc.recorded[""];
   const childrenFn = (path) => childrenOf(path);
-  const g = greedy(childrenFn, scoreFn);
-  const b = beam(childrenFn, scoreFn);
+  const g = await greedy(childrenFn, scoreFn);
+  const b = await beam(childrenFn, scoreFn);
   const gLeaf = g[g.length - 1], bLeaf = b.path[b.path.length - 1];
   const mark = bLeaf === EXPECT[doc.id] ? "OK  " : "MISS";
   if (mark === "MISS") failed = 1;
