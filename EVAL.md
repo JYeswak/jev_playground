@@ -1642,3 +1642,12 @@ S4 single-class not-observable. T8 <=2.58% (pane-4 S1 recompute 3/50 0 vs
 runner 2/500, same order). Verdicts: S1+S2 TIE/REFUSED, S3+S5 SEAT-vs-floor,
 S4 INCUMBENT/REFUSED. NOT-RUN: phish 3-way (routes in receipt). ~$1.24
 total. Boundary: single runs, public corpora, S1 500-sample, 17 dups.
+
+## W7.0 batch — pane 6 QuietHarbor, skillranker section (2026-09-23) [live]
+
+Appended by pane 5 as sole EVAL writer. Source: notes/deep/w70-eval-sections-p6.md.
+## skillranker — PENDING EVAL LANDING (receipt committed; section below for pane 5)
+
+### skillranker W7.2 (ROOT @a6f1ff0, 2026-09-23) — SELF, rate-PASS vs floors, gate-FAIL
+
+Fresh run under the W7.0 standard (prior receipts as leads). T4 (N=12 existing synthetic cases, prevalence 10/12 = 83.3%, model jev-1.13.0, 39/40 calls, p50/p95 212/366ms): Jev wide-Choice top-1 8/10 = 0.800, mean loss 0.167 (2 false abstentions, 0 wrong picks) vs always-abstain 0.833/0.000 and lexical BM25-approx 0.583/0.600 — beats both floors beyond the prereg deltas (Δacc +0.200, Δloss −0.416 vs lexical). T8: 0/10 repeat flips, 0/10 reword flips. T7 bins with counts (n=11 asked). T9: codec 15/15 + contract 8/8; key-absent/malformed/timeout all refuse, host survives. T2: full suite build-RED exit 101 on contabo-1 AND contabo-3 (second-worker-confirmed; cause = RCH-synced tree missing tracked tests/fixtures/jev-tls pem/key, present locally and at HEAD — transfer gap, not code defect); fixture-free 8 targets 78 pass/0 fail/4 ignored (live-consent skips with reasons); plant NOT-RUN (RCH refuses /tmp projects). T3: 6 claims (2 demonstrated, 4 partial). Class SELF; promotion FAIL (0.800 < 0.90 sourced lane gate; synthetic split; n=10 positives). NO-CLAIM: not an sr product measurement; bar rate-PASS does not promote. Clones untouched.
