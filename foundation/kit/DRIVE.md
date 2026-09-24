@@ -107,3 +107,17 @@ Pick up here, in order:
 - Live results (receipts under `docs/demos/upstream-repro/*-20260924.md`): gate criteria 78/100 vs 41/100 at 1/300 FA (verified by pane 1, `8q7.12` closed); SST-5 Score MAE win, narrow (verified); Banking77 Choice 384 vs 362 (held 3/3 runs); SciFact Noul AUC/Brier/ECE wins; gate observe hook L3 + no latency cost; injection seat on tool output FAILED (R80); gate hard cases FAILED catch floor (R81); adapter all-zero -> fabricated uniform answer confirmed (`jev-mly`, issue drafted, unposted).
 - **Process defect, recorded per AGENTS.md "DO NOT EVER BREAK GLASS" §5.** Before pane 1 broadcast the no-delete rule, three background agents ran `rm -rf` on `/tmp` scratch directories they had created or were about to create: AdapterUniform (`/tmp/allzero`), ScoreSST5 (`/tmp/nsf-smoke`, `/tmp/k2q-smoke`, each immediately before `mkdir`), LabelFixT2u (`/tmp/lfx-old`, `/tmp/lfx-score`, `/tmp/lfx-clone`, `/tmp/lfx-v`). No repo path and no file another agent owned was touched. No user text authorized these commands. Cause: pane 1's task contexts omitted RULE NUMBER 1; fixed by a broadcast to all 19 agents at ~02:58Z and by the rule's presence in every task context written since.
   - Later disclosure, same class: ObserveHookL3's planted-regression loop (gate-observe unit, before the rule) called `shutil.rmtree(ignore_errors=True)` on `/tmp/gate-plant` subdirectories it was about to create. No repo path touched.
+
+### Closed 2026-09-24 ~09:30Z (`jev-deep-kit-8q7`)
+
+- **Acceptance, measured at `037a807`.**
+  - Section 5 claims: three landed at enforce=yes (claim-coverage 50 of 84, ci-pin, self-assessed). Four were dropped with R94-R97.
+  - Section 12 signed (`2c5a1d6`, READY 12/12).
+  - `gates.sh` passes 17/17. CI is green with typed SKIPs (run 35978286566).
+- **Blockers that shaped the rest of the drive.** None is an engineering fault; each needs Joshua.
+  - TypeSafe credits: every Jev call has returned 402 since 04:19Z (`jev-1gdi`). The gate hook now pauses calls for 15 minutes after a 402 (`jev-nhv9`) instead of calling on every command.
+  - The Anthropic spend cap (`jev-1y19`) blocks the Haiku arms until 10-01.
+  - The OpenRouter balance is about $0.005 (`jev-qkvc`).
+  - Measurement moved to grok-4.20 as the incumbent (`jev-n4j`, `jev-wu6v`, `jev-iwhh`, `jev-ze4z`) and to keyless verification.
+- **Adapter pin moved** `adffc2e -> e1d4cc9` (v0.2.1, `9da0e2b`, `jev-ygl7`). The adapter suite passes 424/424; 0 of 6,257 committed answers would raise under v0.2.1.
+- **Upstream filed** under Joshua's standing approval: `jev-curate#4` (fixed and released as v0.1.1 upstream within the hour; our dogfood of the fix is blocked on credits) and `system-one-adapter-python#45` (open; a third party confirmed it).
