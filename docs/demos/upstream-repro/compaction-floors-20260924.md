@@ -51,3 +51,61 @@ seen no floor value. The author knows Jev's AUC on both sets: 0.691 / 0.689 on x
 
 **Numbers only.** No floor or combination is ruled on here. Choosing a signal for a new held-out test
 is a separate, preregistered step on fresh sessions.
+
+## Results (development sets, keyless, 2026-09-24)
+
+Definitions were committed at `6669620` before any floor was computed. The run was
+`node --experimental-strip-types work/compaction-floors/floors.ts`, which re-read the 9 sampled
+session files, all sha-matched, and wrote `features-x86y.jsonl` (200 calls) and
+`features-jec6.jsonl` (161). Both files hold ids and five numbers per call, no session text. Then
+`python3 work/compaction-floors/floors.py`, which runs on committed files only. **Nothing here is
+held out.**
+
+**x86y** (32 needed, 126 not-needed):
+
+| signal | kind | AUC | bootstrap 95% | needed kept at a 40% not-needed drop | actual drop |
+|---|---|---:|---|---:|---:|
+| keepResult | Jev | 0.691 | 0.582–0.797 | 28/32 | 32% |
+| keepCall | Jev | 0.689 | 0.585–0.780 | 30/32 | 40% |
+| position | floor | 0.499 | 0.379–0.618 | 20/32 | 38% |
+| tool_class | floor | 0.578 | 0.470–0.674 | 29/32 | 12% |
+| result_chars | floor | 0.665 | 0.573–0.754 | 28/32 | 39% |
+| later_overlap | floor | 0.465 | 0.356–0.585 | 22/32 | 21% |
+| horizon_overlap | reference, uses the horizon | 0.555 | 0.437–0.675 | 24/32 | 24% |
+
+**jec6** (30 needed, 85 not-needed):
+
+| signal | kind | AUC | bootstrap 95% | needed kept at a 40% not-needed drop | actual drop |
+|---|---|---:|---|---:|---:|
+| keepResult | Jev | 0.633 | 0.517–0.747 | 25/30 | 40% |
+| keepCall | Jev | 0.714 | 0.605–0.823 | 24/30 | 40% |
+| need | Jev | 0.654 | 0.532–0.767 | 25/30 | 39% |
+| position | floor | 0.515 | 0.385–0.642 | 14/30 | 38% |
+| tool_class | floor | 0.426 | 0.329–0.521 | 21/30 | 16% |
+| result_chars | floor | 0.358 | 0.238–0.483 | 12/30 | 40% |
+| later_overlap | floor | 0.477 | 0.355–0.597 | 15/30 | 36% |
+| horizon_overlap | reference, uses the horizon | 0.556 | 0.435–0.668 | 30/30 | 0% |
+
+**What the numbers show.**
+- **No floor is above 0.65 on both sets.**
+  - `result_chars` is 0.665 on x86y and 0.358 on jec6. It ranks the wrong way there, and is left
+    unflipped as preregistered.
+  - `position` is 0.499 and 0.515.
+  - `later_overlap` is below 0.5 on both sets.
+  - `tool_class` is 0.578 and 0.426. Its three values tie heavily, so its "40% drop" cut drops only
+    12% and 16%.
+- **Jev's scores are above every floor on both sets.** `keepCall` is above 0.65 on both, at 0.689 and
+  0.714. `keepResult` is 0.691 and 0.633, and `need` is 0.654 on jec6. Their bootstrap intervals
+  overlap the best floor's on x86y.
+- **At a 40% not-needed drop,** Jev's scores keep 28–30 of 32 needed calls on x86y and 24–25 of 30 on
+  jec6. The floors keep 12–22 of 30 on jec6.
+- **The reference `horizon_overlap` is 0.555 and 0.556.** Shared identifiers with the horizon explain
+  little of the need label as the labellers applied it. On jec6 its 40th-percentile cut is 0, so it
+  drops nothing.
+
+**Against R100's retry condition** (a keep signal with AUC above 0.65 on a development set):
+`keepCall` meets it on both development sets. The library does not use `keepCall` for the verbatim
+keep; it uses it only to decide whether to drop a call whole. No floor meets it on both sets. That
+is a development-set fact, not a held-out result, and nothing here chooses a signal.
+
+**Re-score, keyless:** `python3 work/compaction-floors/floors.py`, from committed files only.
