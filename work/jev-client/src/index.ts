@@ -111,6 +111,15 @@ type Posted =
   | { ok: false; reason: JevFailure; error: string; latencyMs: number };
 
 /**
+ * When guardedFetch aborts a request that has not yet delivered headers:
+ * 25 ms inside the SDK's `timeoutMs`, never below 1 ms. Exported so the
+ * timeout-leak test derives its latency floor from the real deadline.
+ */
+export function guardDeadlineMs(timeoutMs: number): number {
+  return Math.max(1, timeoutMs - 25);
+}
+
+/**
  * The ONE place a systemOne request is built and its envelope validated.
  * Both askJev and askJevChoice go through here, so a body shape can only be wrong once.
  */
@@ -136,7 +145,7 @@ function guardedFetch(fetchImpl: typeof fetch, timeoutMs: number, APITimeoutErro
     if (init?.signal?.aborted) forward();
     else init?.signal?.addEventListener("abort", forward, { once: true });
     // Strictly inside the SDK's own deadline so ours always wins the race.
-    const timer = setTimeout(() => controller.abort(), Math.max(1, timeoutMs - 25));
+    const timer = setTimeout(() => controller.abort(), guardDeadlineMs(timeoutMs));
     try {
       const p = fetchImpl(url, { ...init, signal: controller.signal });
       p.catch(() => {}); // our fetch promise never escapes unobserved either
