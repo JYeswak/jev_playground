@@ -114,3 +114,33 @@ reproducer.
 tokenizer artifacts count against the real-claim numbers here but do not touch (a)–(c), whose values
 are the plants' own tokens. Close-set labels assume the reasons are right. Awaiting a non-author
 re-score.
+
+## Non-author verification — MaintFixes
+
+MaintFixes (background agent of pane 1, not an author of this unit), 2026-09-24. Keyless, no model
+call. Clean `git clone --local` in `mktemp -d` (`/tmp/maintfixes-2mp.CFzCIP/jev`) at `d29397c`.
+
+| # | Check | Command | Result |
+|---|---|---|---|
+| 1 | Bar before rows, text unchanged | `git diff 8210e02 f3b924e` on this receipt; `git diff --stat 8210e02 HEAD -- work/jev-claim-check/{numeric.mjs,score-numeric.py,numeric-cases.jsonl,check-close.mjs}` | 0 lines removed from the receipt (Results only appended); the four files have no diff. Bar 03:11:31Z; row `at` runs 03:11:41.585Z–03:12:53.050Z |
+| 2 | Cases rebuild | `node work/jev-claim-check/numeric.mjs --build` | sha256 `dbaafe7f…9ca379`, 314 checks, no git diff |
+| 3 | Keyless re-score | `python3 work/jev-claim-check/score-numeric.py` | rc 1 FAIL: readme (a) 0/18, (b) 10/18, (c) 14/18; close (a) 0/31, (b) 8/31, (c) 12/31 |
+| 4 | Own recompute | `/tmp/maintfixes-2mp-recompute.py` | 314 rows cover the 314 needed checks exactly, 0 extra; verdict equals the cuts on p for 314/314; (a), (b), (c) match in both sets. Every plant is the real claim with only the planted token changed (18/18, 31/31). `inEvidence` agrees with literal occurrence in 49/49. Whole-claim counts and "93 absent, 10 supported" match |
+| 5 | Sources verbatim, plants fresh | ids joined to `cases.jsonl` (`:true`) and `close-cases.jsonl` (`:real`) | claim + evidence identical on 19/19 and 34/34. No plant claim equals any earlier plant claim (0/49). The digit rule checks out on every plant I read |
+| 6 | 10 rows by hand | `random.Random(2)` over row indices: 18, 28, 43, 46, 86, 108, 128, 157, 184, 310 | 5 real values stated in the evidence, all called supported, correctly. 2 plants (27 for grok's 23, and 19 GAP) called unsure: not approved and not caught, as the receipt counts them. 3 real values unsure where the evidence does not state the value (1067/1145, 0.953, a count of 0) |
+
+Two findings, neither of which changes the verdict:
+- `inEvidence` is literal token occurrence, not "the evidence states this quantity". In
+  `jev-deep-kit-8q7.3` the original `15` (GAP) is present only as an unrelated table cell, and the
+  evidence carries no GAP tally at all. So "25 with the original in the evidence" overstates how
+  many originals the evidence actually states, which is one reason (c) is low on the close set.
+- `8210e02` changed the CLI guard in `check-close.mjs` (and `numeric.mjs` uses the same one) to
+  `import.meta.url === \`file://${process.argv[1]}\``. Called through a symlinked absolute path
+  (`/tmp` resolves to `/private/tmp` on macOS), the CLI now does nothing and exits 0. With no
+  arguments, `check-close.mjs` exited 64 before this commit and 0 after it. A relative path or the
+  realpath still works. Reported to the author.
+
+**Verdict: CONFIRMED** at `[oracle]` level (offline re-score and recompute of committed rows, N = 314
+checks, `jev-1.13.0`, 2026-09-24): FAIL, with 0/49 plants approved and the catch floor missed in both
+sets. `NEGATIVE_EVIDENCE.md` R83 retry 1 states the same numbers. Not checked: no live call was
+repeated, and the per-claim reading of the 17 real claims called unsupported was spot-checked, not redone.

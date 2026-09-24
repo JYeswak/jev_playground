@@ -178,3 +178,26 @@ the reviewers' own and were not re-adjudicated. The descriptive tables were not 
 no threshold was chosen from them. No review text is published; the numbers can be re-derived
 from committed rows plus the pinned public file. A non-author re-score is still pending, and the
 bead stays open until it is done.
+
+## Non-author verification — MaintFixes
+
+MaintFixes (background agent of pane 1, not an author of this unit), 2026-09-24. Keyless, no model
+call. Clean `git clone --local` in `mktemp -d` (`/tmp/maintfixes-76o.sWS4jh/jev`), checked out at `df13f17`.
+
+| # | Check | Command | Result |
+|---|---|---|---|
+| 1 | Bar before rows, text unchanged | `diff` of lines 1-91 at `52d94c2` vs `df13f17`; `git diff --stat 52d94c2 df13f17 -- work/score-yelp/{run,score,sample}.py work/score-yelp/sample.jsonl` | lines 1-91 byte-identical; the four files have no diff. Bar 21:10:39 -0600, rows first appear in `df13f17` at 21:13:52 |
+| 2 | Sample rebuilds | `uv run --no-project --python 3.12 --with pyarrow==21.0.0 python work/score-yelp/sample.py 500 20260924 --check` | `check: identical`; `sample.jsonl` sha256 `c2b9fd85…971b58`. A non-check build rewrites it with no git diff, and all 500 texts match `text_sha256`. `--check` does not write `texts.jsonl` (`sample.py:80-83` returns first); only the non-check build writes it |
+| 3 | Keyless re-score | `python3 work/score-yelp/score.py` | rc 0: Jev 341/500 MAE 0.348, Haiku 323/500 MAE 0.384, McNemar 59v41 p = 0.0886 TIE, sign 67v45 p = 0.0467 WIN, constants 117 (1.842) / 100 (1.206), PASS on all three passes |
+| 4 | Own recompute from rows + `sample.jsonl` only | `/tmp/maintfixes-76o-recompute.py` | every number in row 3 matches. Moving one sign row to Haiku (66v46) gives p = 0.072: one row of headroom, as stated |
+| 5 | Zero-mass count is real, not an empty field | adapter source at `adffc2e` | `debug.probability_errors` is always returned (`_client.py:311`, `probability_normalization.py:41`, tolerance 1e-6), so null on 500/500 means no raw map was rescaled. Haiku probabilities sum to 1.0 on 500/500. `i = 367` (uniform 0.2, confidence 0) is model-asserted, as disclosed above |
+| 6 | 10 rows by hand | `random.Random(76)` over the ids: 27, 102, 152, 189, 199, 214, 237, 431, 465, 486, with texts rebuilt in scratch | star label plausible for the text 10/10; level `floor(score + 0.5)` matches 10/10; Jev exact 6/10, Haiku 7/10. Jev's worst row, `i = 214`, is a short positive review scored 1 star (p0 = 0.77) |
+
+Also observed: on 6/500 Jev rows the returned `score` differs from E[probabilities] by more than
+0.01 (the probabilities are rounded). On one of them, `i = 214`, E gives level 1 and the score gives
+level 0; truth is level 4. The preregistered rule uses the score, so nothing changes.
+
+**Verdict: CONFIRMED** at `[oracle]` level (offline re-score and recompute of committed rows, N = 500,
+`jev-1.13.0` vs Haiku 4.5, 2026-09-24): PASS, accuracy TIE, MAE WIN with one row of headroom. Not
+checked: no live call was repeated, so the recorded answers are taken as the API's; the latency,
+token and calibration tables were not recomputed.
