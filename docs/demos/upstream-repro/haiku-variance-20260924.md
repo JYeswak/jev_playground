@@ -186,3 +186,62 @@ ConfidenceCascade (background agent of pane 1; not the author), 2026-09-24, keyl
 Verdict: the receipt's numbers, its two retractions (R89) and its flat-row finding reproduce from
 committed files, and the bar was not edited after data. NO-CLAIM: this re-scores committed rows; it
 does not re-run Haiku or check the bootstrap seeds beyond the scorer's own output.
+
+## Cross-pairings (9 per unit) — descriptive, added afterwards
+
+MaintFixes, 2026-09-24. `[oracle]` level: offline arithmetic on committed rows, with no call made.
+**Descriptive: the `jev-x5k` bar above did not preregister cross-pairings.** Nothing above this
+section changes. `jev-qbc` re-ran Jev twice (`rows-jev-run2/-run3.jsonl`) against Haiku run 1, and
+this unit re-ran Haiku twice against Jev run 1. That covers 5 of the 9 Jev-run x Haiku-run pairings
+per unit. The other four were computed here from those committed rows. `R88` (Yelp) is the case
+where a crossing decided the verdict, with 3 of 9 pairings WIN.
+
+Re-score, no key: `python3 work/haiku-variance/cross-pairings.py`. It imports each unit's own
+`score.py` (`paired` and `verdict` for SST-5; `arm_stats`, `mcnemar_exact` and the unit's verdict
+rule for Banking77). It exits 1 unless the 5 pairings already committed reproduce their receipt's
+verdict, counts where stated, and p within rounding. A plant that makes 6 wrong Haiku run-1
+Banking77 rows correct turns it red with rc 1, on the three pairings with Haiku run 1.
+
+**SST-5 (500).** MAE uses an exact sign test on per-row absolute error, counted as Jev lower / Haiku
+lower. Accuracy uses McNemar exact.
+
+| Jev run | Haiku run | MAE sign test | p | verdict | accuracy McNemar | p | verdict | already committed |
+|---|---|---|---:|---|---|---:|---|---|
+| 1 | 1 | 109 / 75 | 0.0148 | WIN | 89 / 67 | 0.092 | TIE | yes |
+| 1 | 2 | 118 / 72 | 0.0010 | WIN | 98 / 66 | 0.015 | WIN | yes |
+| 1 | 3 | 112 / 72 | 0.0039 | WIN | 97 / 65 | 0.015 | WIN | yes |
+| 2 | 1 | 108 / 79 | 0.0403 | WIN | 89 / 71 | 0.179 | TIE | yes |
+| 2 | 2 | 116 / 75 | 0.0037 | WIN | 97 / 69 | 0.036 | WIN | no |
+| 2 | 3 | 110 / 75 | 0.0122 | WIN | 96 / 68 | 0.035 | WIN | no |
+| 3 | 1 | 110 / 77 | 0.0190 | WIN | 91 / 69 | 0.097 | TIE | yes |
+| 3 | 2 | 118 / 73 | 0.0014 | WIN | 99 / 67 | 0.016 | WIN | no |
+| 3 | 3 | 112 / 73 | 0.0051 | WIN | 98 / 66 | 0.015 | WIN | no |
+
+MAE WIN in 9/9 pairings (sign p 0.0010 to 0.0403). Accuracy is never LOSE (0/9).
+
+**Banking77, 10 intents (400).** McNemar counts Jev-only correct / Haiku-only correct. The verdict
+rule is the unit's own.
+
+| Jev run | Haiku run | Jev | Haiku | McNemar | p | verdict | already committed |
+|---|---|---:|---:|---|---:|---|---|
+| 1 | 1 | 384 | 362 | 25 / 3 | 2.7e-05 | WIN | yes |
+| 1 | 2 | 384 | 365 | 23 / 4 | 3.1e-04 | WIN | yes |
+| 1 | 3 | 384 | 362 | 24 / 2 | 1.0e-05 | WIN | yes |
+| 2 | 1 | 384 | 362 | 25 / 3 | 2.7e-05 | WIN | yes |
+| 2 | 2 | 384 | 365 | 23 / 4 | 3.1e-04 | WIN | no |
+| 2 | 3 | 384 | 362 | 24 / 2 | 1.0e-05 | WIN | no |
+| 3 | 1 | 386 | 362 | 26 / 2 | 3.0e-06 | WIN | yes |
+| 3 | 2 | 386 | 365 | 24 / 3 | 4.9e-05 | WIN | no |
+| 3 | 3 | 386 | 362 | 25 / 1 | 8.0e-07 | WIN | no |
+
+McNemar WIN in 9/9 pairings (p 8.0e-07 to 3.1e-04).
+
+**Rounding note.** For 24 / 2 the exact McNemar p is 704 / 2^26 = 1.049e-5. The Result table above
+(line 116) shows it as 1.1e-5, rounded from the scorer's printed 1.05e-05. At two significant figures
+it is 1.0e-5. The verdict is unaffected.
+
+**NO-CLAIM.** Three runs per arm, one sample per unit, one wording, one evening. These are the same
+committed rows, re-paired; no new call was made. Because the bar did not preregister them, these
+pairings can support a statement that the two headlines held across every committed run
+combination. They do not extend this unit's verdicts. SciFact is not crossed here: Jev's SciFact
+variance was never measured.
