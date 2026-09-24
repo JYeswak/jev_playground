@@ -229,6 +229,11 @@ def count_from(output):
     return ""
 
 
+def failure_tail(output, limit=30):
+    lines = (output or "").splitlines()
+    return "\n".join(lines[-limit:])
+
+
 def run_one(repo, path, command):
     started = time.monotonic()
     command = normalize_command(repo, path, command)
@@ -274,6 +279,7 @@ def run_one(repo, path, command):
         "count": count_from(output),
         "seconds": f"{time.monotonic() - started:.2f}",
         "prerequisite": "",
+        "tail": failure_tail(output) if status == "FAIL" else "",
         "status": status,
     }
 
@@ -305,6 +311,10 @@ def emit(rows):
         )
         if row["status"] == "FAIL":
             failed.append(row["path"])
+            print(f"# FAIL {row['path']}", file=sys.stderr)
+            tail = row.get("tail", "")
+            if tail:
+                print(tail, file=sys.stderr)
     print(
         f"# {sum(1 for r in rows if r['status']=='PASS')} pass, "
         f"{sum(1 for r in rows if r['status']=='SKIP')} skip, "
@@ -390,6 +400,9 @@ def selftest():
             f"SELFTEST FAIL: borrowed next-row command {by['work/plant/borrowed_test.py']}",
             file=sys.stderr,
         )
+        return 1
+    if "planted" not in by["work/plant/fail_test.py"].get("tail", ""):
+        print("SELFTEST FAIL: fail tail missing the assertion", file=sys.stderr)
         return 1
     if by["work/plant/mention_test.py"]["status"] != "PASS":
         print("SELFTEST FAIL: typesafe comment was skipped", file=sys.stderr)
