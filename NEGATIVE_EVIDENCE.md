@@ -3956,3 +3956,33 @@ applied.
 **Retry condition (`jev-jec6`).** Reopen if a preregistered change to the cut, the keep questions,
 or both meets a stated recall bar on needed calls. It must be tested on fresh sessions not used in
 `jev-x86y`, labelled blind the same way, with the current rule scored on the same calls.
+
+## R100 — REFUTED: a lower keep cut or a reworded keep question makes Jev compaction keep needed tool results
+
+**Claim (jev-jec6, the retry of R99):** at least one of these keep rules keeps the tool results a
+later turn needs while still compacting:
+- C1, `fast-jev-compaction`'s keep questions at `keepResult ≥ 0.15`;
+- C2, a reworded keep noul with outcome criteria at `need ≥ 0.5`.
+
+**Measured 2026-09-24, `[live]`, prereg `0b74c55` + A1 `1d7476a`.**
+- 4 fresh jev sessions, not used in `jev-x86y`, rider-screened on tool inputs before any packet.
+- `jev-x86y`'s cut and label. Two fresh labellers plus pane 1's adjudication: kappa 0.866; 30
+  needed and 85 not-needed unpinned calls.
+- One replay, 8 requests on `jev-1.13.0`, $0.0031.
+- The bar, per rule: a recall lower bound of at least 0.80 on needed calls, and at least 50% of
+  not-needed results dropped. **No rule meets it.**
+  - C0 (the current 0.5 cut): 0/30 kept (Wilson 0.000–0.114).
+  - C1: 25/30 kept (0.664–0.927), but only 34/85 not-needed results dropped (40%).
+  - C2: 6/30 kept (0.095–0.373), and 79/85 dropped.
+- The same holds under either labeller alone.
+- Descriptive: both scores rank need weakly, with AUC 0.633 for `keepResult` and 0.654 for `need`.
+
+**Nothing lost live.** The installed hook still only yields.
+
+**This is not a ruling on Jev.** It refutes three keep rules on four sessions.
+
+**Retry condition.** Reopen with a preregistered keep signal that separates needed from not-needed
+calls better than AUC 0.65 on a labelled development set that is not the test set. For example, a
+question that names the next turn's goal from the horizon's first user message, or a per-call state
+that shows the call's result. It must then meet this bar on fresh, rider-screened sessions labelled
+blind the same way.

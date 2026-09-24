@@ -132,3 +132,84 @@ dispatch, recorded on `jev-jec6`).
 - AGENTS.md allows reading another pane's report, so the session stays in.
 - The labellers' packet for it therefore contains those two quoted lines, and the replay will send
   them to Jev inside that file's result.
+
+## Results (live, 2026-09-24)
+
+**Order in history:**
+1. `0b74c55`: preregistration.
+2. `1d7476a`: amendment A1.
+3. `45c34a3`: the sample.
+4. `81a00fd`: the 01a0d11c disclosure.
+5. `a3d6204`: labeller 1.
+6. `8ac6297`: labeller 2.
+7. `9a4df90`: pane 1's adjudication of 18 disagreements. The file holds 10 not-needed, 3 needed and
+   5 undecidable; the commit subject's counts are wrong, as recorded on `jev-jec6`.
+8. The commit carrying this section.
+
+`keep.py ready` exited 0 before the one live run. The run was
+`infisical run … node --experimental-strip-types work/compaction-keep/keep.ts replay --live` at
+18:12:13Z–18:12:16Z, with `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` unset.
+
+**Spend.** 8 requests on `jev-1.13.0`: 4 library compaction batches and 4 C2 batches. Input was
+72,649 tokens, which is **$0.0031**.
+
+**Labels.**
+- Final: 161 calls.
+- Exact agreement 143/161. Cohen's kappa on needed vs not-needed 0.866 over 151 rows.
+- 42 calls are pinned and always kept, in no rate: 19 needed, 21 not-needed, 2 undecidable.
+- That leaves **119 unpinned calls: 30 needed, 85 not-needed, 4 undecidable.** Every call received
+  a C2 `need` score.
+
+**The three rules, final labels.** Each is counted over unpinned calls.
+
+| Rule | needed kept verbatim | Wilson 95% | not-needed results dropped | Wilson 95% | bar |
+|---|---:|---|---:|---|---|
+| C0 current, `keepResult ≥ 0.5` | 0/30 | 0.000–0.114 | 85/85 | 0.957–1.000 | NOT MET |
+| C1 lower cut, `keepResult ≥ 0.15` | **25/30** | 0.664–0.927 | 34/85 (40%) | 0.302–0.506 | NOT MET |
+| C2 reworded, `need ≥ 0.5` | 6/30 | 0.095–0.373 | 79/85 | 0.854–0.967 | NOT MET |
+
+**Against the bar** (recall lower bound of at least 0.80, and at least 50% of not-needed results
+dropped), no rule meets it:
+- C1 comes closest. It fails both parts: its recall lower bound is 0.664, and it drops 40% of
+  not-needed results.
+- C0 keeps nothing.
+- C2 compacts hard but keeps 6/30 needed results.
+
+**One labeller's labels alone.** Same outcome: no rule meets the bar.
+
+| Labels | needed / not-needed | C0 kept | C1 kept | C1 dropped | C2 kept | C2 dropped |
+|---|---|---|---|---|---|---|
+| final | 30 / 85 | 0/30 | 25/30 (0.664–0.927) | 34/85 | 6/30 | 79/85 |
+| labeller 1 alone | 31 / 83 | 0/31 | 26/31 (0.674–0.929) | 35/83 | 6/31 | 77/83 |
+| labeller 2 alone | 32 / 84 | 0/32 | 26/32 (0.647–0.911) | 34/84 | 6/32 | 78/84 |
+
+**Per session.** Pane 1 notes that most of `01a0d0f2`'s prefix results are shaken, which is why 4
+of its 7 disputed rows went to undecidable.
+
+| session | unpinned | needed | not-needed | undecidable | C0 kept needed | C1 kept needed | C2 kept needed | C0 dropped nn | C1 dropped nn | C2 dropped nn |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 01a0d0f2 | 26 | 12 | 11 | 3 | 0 | 10 | 1 | 11 | 7 | 11 |
+| 01a0d11c | 34 | 8 | 26 | 0 | 0 | 7 | 4 | 26 | 4 | 25 |
+| 01a0d241 | 28 | 8 | 20 | 0 | 0 | 6 | 0 | 20 | 8 | 20 |
+| 01a0d288 | 31 | 2 | 28 | 1 | 0 | 2 | 1 | 28 | 15 | 23 |
+
+Disputed rows by session: `01a0d0f2` 7, `01a0d11c` 4, `01a0d241` 4, `01a0d288` 3.
+
+**Descriptive, not preregistered.**
+
+| Score | mean on needed | mean on not-needed | max | AUC needed vs not-needed |
+|---|---:|---:|---:|---:|
+| `keepResult` | 0.175 | 0.159 | 0.23 | 0.633 |
+| C2 `need` | 0.354 | 0.287 | 0.67 | 0.654 |
+
+Both scores rank need weakly and sit in a narrow band. A cut low enough to keep most needed results
+also keeps most unneeded ones.
+
+**Rows.** `decisions.jsonl` holds per call: session, `tool_use_id`, pinned, `keepCall`, `keepResult`
+and `need`. It holds no session text. Re-score, keyless: `python3 work/compaction-keep/keep.py score`.
+
+**NO-CLAIM.**
+- Four sessions of one project, one cut point each, a 40-message horizon, one model pin.
+- C1's cut and C2's wording were chosen with knowledge of `jev-x86y`'s aggregates, as disclosed.
+- The result says these three rules do not meet the bar here. It says nothing about other wordings
+  or other models.
