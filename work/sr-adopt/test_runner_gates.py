@@ -7,6 +7,7 @@ production file is not edited.
 
 import asyncio
 import importlib.util
+import json
 import os
 import subprocess
 import sys
@@ -231,6 +232,15 @@ class RunnerGateTest(unittest.TestCase):
                 mod = types.ModuleType(f"deleted_{src.stem}")
                 mod.__file__ = str(src)
                 exec(compile(removed, str(src), "exec"), mod.__dict__)
+                if src.name == "run.py" and "rerank-scifact" in str(src):
+                    mod.load_text = lambda: ({}, {})
+                if src.name == "run-jev.py":
+                    corpus = {
+                        "samples": [{"text": "x", "label": 0} for _ in range(662)]
+                    }
+                    planted = Path(self.tmp) / "injection.json"
+                    planted.write_text(json.dumps(corpus))
+                    mod.RD.SRC = str(planted)
                 target = getattr(mod, fn)
                 with self.assertRaises(AssertionError):
                     if is_async:
