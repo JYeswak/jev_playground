@@ -4004,3 +4004,39 @@ results are dropped. AUC above 0.65 alone does not qualify.
   message, or a per-call state that shows the call's result.
 - The cut is fixed from that curve, and the signal must then meet the same bar on fresh,
   rider-screened sessions labelled blind the same way.
+
+## R101 — REFUTED: `jev_rerank` can switch to run.py's one-passage Noul without losing on negation
+
+**Claim (jev-k9z.9):** `work/rerank-scifact/run.py`'s one-passage Noul ("Does this passage contain
+evidence relevant to the query?", with criteria) is not worse than the shipped `jev_rerank`
+rubric on NevIR. It tied the rubric on BEIR SciFact (`jev-k9z.7`, 9/9 TIE) at 1/10.7 of the input
+tokens.
+
+**Measured 2026-09-24, `[live]`, prereg `4cb97ed`.**
+- NevIR test, 1,383 negation pairs and 2,766 questions (`jev-rerank-bench@cd9a35b` candidates, HF
+  revision `6263585`). Strict paired accuracy (`nevir_eval.py`), `jev-1.13.0`.
+- 3 runs per arm, 33,192 requests, 0 failures, $0.89.
+- **Noul:** 927, 929 and 918 of 1,383 pairs.
+- **Rubric, through the shipped `rerank()` + `liveAsker`:** 968, 984 and 989. Upstream's committed
+  `jev-score-batch` has 984, which the scorer reproduces.
+- Paired bootstrap (2,000 resamples, seed 20260924): **LOSE in all 12 pairings.** The differences
+  run −0.028 to −0.051, and every upper bound is below −0.005.
+- The fixed rule says WORSE, so no switch.
+
+**Beside the rule.**
+- The token saving is small here: 1,100 input tokens a question against 1,456 (0.76×), because a
+  NevIR pair has 2 passages.
+- The Noul does not collapse on negation: question accuracy is 0.80–0.81 against 0.84–0.85. It
+  loses by 3 to 5 points, not by the collapse the preregistration predicted.
+
+**This is not a ruling on Jev.** It refutes one wording as a replacement. Upstream's
+`jev-noul-pair` wording ("Does the passage contain the information needed to answer or verify
+the query?") scored 980/1,383 on the same set on 2026-09-16, on its own unpaired run.
+
+**Retry condition.** Reopen only with a preregistered one-passage question that meets both of
+these, with 3 runs a side on `jev-1.13.0` or a named later pin:
+- no LOSE against the shipped rubric on NevIR, paired on the same 2,766 questions;
+- no LOSE on SciFact against `jev-k9z.7`'s rows.
+
+`jev-noul-pair`'s wording is the obvious candidate. A cheaper tool is the only reason to switch, so
+the retry must also report input tokens per call on both sets.

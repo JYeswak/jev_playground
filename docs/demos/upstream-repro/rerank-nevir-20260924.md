@@ -120,3 +120,94 @@ infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- $PY w
 infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- node --experimental-strip-types work/rerank-nevir/tool.mjs tool
 python3 work/rerank-nevir/nevir.py score      # keyless; refuses until all six row files exist
 ```
+
+
+## Results (live, 2026-09-24, `jev-1.13.0`): **WORSE, no switch**
+
+The preregistration was committed at `4cb97ed` before the first call. The runs went in this order,
+one at a time, attended, 23:04:32Z to 23:26:17Z: `noul`, `tool`, `noul-run2`, `tool-run2`,
+`noul-run3`, `tool-run3`.
+- Each run made 5,532 requests, all HTTP 200 on `jev-1.13.0`.
+- No request failed, so the resume pass had nothing to retry, and no question failed.
+
+This is `python3 work/rerank-nevir/nevir.py score`'s output, keyless, from the committed rows:
+
+| arm | pairs right / 1383 | paired accuracy | question accuracy | same top pick | failed questions | requests | input tokens / question |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| noul | 927 | 0.6703 | 0.8077 | 0.2726 | 0 | 5532 | 1100 |
+| noul-run2 | 929 | 0.6717 | 0.8087 | 0.2675 | 0 | 5532 | 1100 |
+| noul-run3 | 918 | 0.6638 | 0.8040 | 0.2711 | 0 | 5532 | 1100 |
+| tool | 968 | 0.6999 | 0.8377 | 0.2777 | 0 | 5532 | 1456 |
+| tool-run2 | 984 | 0.7115 | 0.8467 | 0.2697 | 0 | 5532 | 1456 |
+| tool-run3 | 989 | 0.7151 | 0.8456 | 0.2625 | 0 | 5532 | 1456 |
+| committed | 984 | 0.7115 | 0.8474 | 0.2697 | 0 | - | - |
+
+- **f1 PASS.** The scorer gives the committed `jev-score-batch` 984/1,383.
+- **f2 PASS.** The tool runs score 968, 984 and 989.
+- No run is over the 27-question ceiling.
+
+| Noul run | vs | diff (Noul - rubric) | 95% interval | verdict |
+|---|---|---:|---|---|
+| noul | tool | -0.0296 | [-0.0521, -0.0065] | LOSE |
+| noul | tool-run2 | -0.0412 | [-0.0636, -0.0202] | LOSE |
+| noul | tool-run3 | -0.0448 | [-0.0665, -0.0224] | LOSE |
+| noul | committed | -0.0412 | [-0.0629, -0.0195] | LOSE |
+| noul-run2 | tool | -0.0282 | [-0.0513, -0.0051] | LOSE |
+| noul-run2 | tool-run2 | -0.0398 | [-0.0629, -0.0188] | LOSE |
+| noul-run2 | tool-run3 | -0.0434 | [-0.0658, -0.0210] | LOSE |
+| noul-run2 | committed | -0.0398 | [-0.0622, -0.0174] | LOSE |
+| noul-run3 | tool | -0.0362 | [-0.0600, -0.0130] | LOSE |
+| noul-run3 | tool-run2 | -0.0477 | [-0.0701, -0.0253] | LOSE |
+| noul-run3 | tool-run3 | -0.0513 | [-0.0752, -0.0282] | LOSE |
+| noul-run3 | committed | -0.0477 | [-0.0709, -0.0246] | LOSE |
+
+**Outcome by the fixed rule: WORSE.**
+- The Noul LOSEs all 9 re-run pairings, and all 3 against the committed rubric as well.
+- It is 0.028 to 0.051 below the rubric in paired accuracy, and every interval's upper bound is
+  below −0.005.
+- No switch bead is filed. `NEGATIVE_EVIDENCE.md` R101 records the refuted claim.
+
+**Beside the rule.**
+- **Cost.** On NevIR the Noul uses 1,100 input tokens a question against the rubric's 1,456: 0.76×,
+  not SciFact's 1/10.7. A pair has 2 passages, so the rubric's all-passages state is small here.
+  - Requests are equal: 2 per question in each arm.
+  - Latency: Noul requests p50 126–148 ms and p95 276–326 ms. Tool questions, 2 requests in series,
+    p50 249–276 ms and p95 459–538 ms.
+- **My prediction was half wrong.** I expected run.py's Noul to call both negation variants relevant
+  and score them close together. It still separates most pairs:
+  - question accuracy 0.804–0.809, against the rubric's 0.838–0.847;
+  - same top pick for both questions 0.268–0.273, against 0.263–0.278;
+  - in run 1, the median |noul(d1) − noul(d2)| is 0.09, and 7.8% of questions tie exactly (a tie
+    scores wrong).
+
+  It loses, but by 3 to 5 points, not by the collapse I predicted.
+- **Run-to-run spread.** The rubric scored 968 to 989 pairs right and the Noul 918 to 929. On
+  identical inputs, each arm's input tokens were identical across its three runs.
+- **The shipped path reproduces the published figure.** `tool-run2`'s 984/1,383 matches upstream's
+  one-request, two-question `jev-score-batch` exactly. Splitting it into one request per passage,
+  as `live.ts` does, cost nothing measurable on NevIR.
+
+**Spend.**
+- 33,192 Jev requests, 0 failed.
+- 21,211,278 input tokens: 3 × 3,042,878 Noul and 3 × 4,027,548 rubric, read from the server's
+  `usage`. That is **$0.89** at $0.042 per million, with output free.
+- No comparator model, and no other provider.
+
+**What this means for `jev_rerank`.**
+- Keep the rubric.
+- On SciFact the two questions tie (`jev-k9z.7`), and on negation the rubric wins. So the Noul's
+  SciFact token saving would cost 3 to 5 points of NevIR paired accuracy.
+- A cheaper tool would need a question that keeps the rubric's negation result: for example,
+  upstream's `jev-noul-pair` wording, at 980/1,383 on 2026-09-16. That would be a new
+  preregistered unit, not this one.
+
+**Rows.** `work/rerank-nevir/rows-{noul,noul-run2,noul-run3}.jsonl` hold one row per (question,
+passage): ids, the noul, tokens and latency. `rows-{tool,tool-run2,tool-run3}.jsonl` hold one row
+per question: ids, scores, calls, statuses and tokens. No query or passage text is committed.
+
+**NO-CLAIM.**
+- One dataset: negation pairs.
+- One model pin.
+- run.py's wording only.
+- It says nothing about other one-passage wordings, or about rerank quality outside NevIR and
+  SciFact.

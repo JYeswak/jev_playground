@@ -1739,3 +1739,14 @@ reworded). Keyless: `ordered=false reason=unconfigured NOT_RUN`, input order, bu
 `calledModel: true` (jev-t7oq). 20 Jev requests, 0 failed, ~$0.002 estimated (tokens not surfaced).
 Rung L3. Receipt `docs/demos/upstream-repro/jev-rerank-l3-scifact-20260924.md`.
 Boundary: one query, one run, truncated passages; MAX_PASSAGES truncation unreachable and untested; no L4, no latency.
+
+## jev-k9z.9 rerank question on NevIR: run.py's one-passage Noul vs the shipped rubric (2026-09-24) [live]
+
+Prereg `4cb97ed` before calls. NevIR test (1,383 pairs, 2,766 questions; `jev-rerank-bench@cd9a35b`
+candidates, HF `6263585`), strict paired accuracy, jev-1.13.0, 3 runs per arm. Noul
+(`work/rerank-nevir/nevir.py`, run.py's QUESTION imported): 927/929/918. Rubric through the shipped
+`rerank()`+`liveAsker` (`tool.mjs`): 968/984/989; the upstream committed score-batch 984 reproduced
+keyless (f1). LOSE in all 12 paired-bootstrap pairings (−0.028 to −0.051) → WORSE, no switch,
+NEGATIVE_EVIDENCE R101. Tokens/question 1,100 vs 1,456 (0.76×). 33,192 requests, 0 failed, $0.89.
+Receipt `docs/demos/upstream-repro/rerank-nevir-20260924.md`.
+Boundary: one negation set, one pin, run.py's wording only; upstream's `jev-noul-pair` wording not re-run.
