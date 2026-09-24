@@ -6,8 +6,8 @@ import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  MAX_PREFIX, REAL_SAMPLE, ROW_KEYS, SIDECAR_KEYS, buildRow, defaultFilter, defaultSidecarAppend, loadFilters,
-  makeFilter, makeHandler, observe, redact, resetKeyCache,
+  BILLING_HOLD_MS, MAX_PREFIX, REAL_SAMPLE, ROW_KEYS, SIDECAR_KEYS, buildRow, defaultFilter, defaultSidecarAppend,
+  loadFilters, makeFilter, makeHandler, observe, redact, resetBillingHold, resetKeyCache,
 } from "./jev-gate-observe.ts";
 const wrote = [];
 const full = [];
@@ -277,5 +277,53 @@ test("resolver failure is cached, logged not-run, and does not throw", async () 
     if (prev === undefined) delete process.env.TYPESAFE_API_KEY;
     else process.env.TYPESAFE_API_KEY = prev;
     resetKeyCache();
+  }
+});
+
+// jev-nhv9: 233 calls hit HTTP 402 over 4.5 h, one per bash command.
+test("a 402 holds further calls for the hold window, then exactly one call is made", async () => {
+  resetBillingHold();
+  let clock = 1_000_000;
+  let calls = 0;
+  const refused = async () => { calls++; return { ok: false, reason: "http", error: "systemOne HTTP 402: 402 no available TypeSafe API credits", latencyMs: 90 }; };
+  const deps = { ...mem, nowMs: () => clock };
+  try {
+    reset();
+    await observe({ toolName: "bash", input: { command: "ls" } }, { ...deps, asker: refused });
+    assert.equal(calls, 1);
+    assert.equal(wrote[0].row.status, "error");
+    clock += BILLING_HOLD_MS - 1;
+    await observe({ toolName: "bash", input: { command: "pwd" } }, { ...deps, asker: refused });
+    assert.equal(calls, 1, "no call inside the hold");
+    assert.equal(wrote[1].row.status, "not-run");
+    assert.match(wrote[1].row.error, /^NOT_RUN reason=billing-hold until=/);
+    clock += 1;
+    await observe({ toolName: "bash", input: { command: "date" } }, { ...deps, asker: scoredAsker });
+    assert.equal(wrote[2].row.status, "scored", "the hold ends at the window");
+    await observe({ toolName: "bash", input: { command: "ls" } }, { ...deps, asker: scoredAsker });
+    assert.equal(wrote[3].row.status, "scored", "a success does not start a hold");
+  } finally {
+    resetBillingHold();
+  }
+});
+
+test("only a 402 starts a hold; other http and transport errors do not", async () => {
+  resetBillingHold();
+  let calls = 0;
+  const deps = { ...mem, nowMs: () => 5_000_000 };
+  try {
+    for (const answer of [
+      { ok: false, reason: "http", error: "systemOne HTTP 429: rate limited", latencyMs: 1 },
+      { ok: false, reason: "http", error: "systemOne HTTP 503: unavailable", latencyMs: 1 },
+      { ok: false, reason: "transport", error: "socket hang up after 4020 ms", latencyMs: 1 },
+    ]) {
+      reset();
+      await observe({ toolName: "bash", input: { command: "ls" } }, { ...deps, asker: async () => { calls++; return answer; } });
+      await observe({ toolName: "bash", input: { command: "ls" } }, { ...deps, asker: async () => { calls++; return answer; } });
+      assert.deepEqual(wrote.map((w) => w.row.status), ["error", "error"], answer.error);
+    }
+    assert.equal(calls, 6);
+  } finally {
+    resetBillingHold();
   }
 });

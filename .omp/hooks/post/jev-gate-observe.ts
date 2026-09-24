@@ -61,6 +61,24 @@ export function resetKeyCache(): void {
   keyOnce = undefined;
 }
 
+/**
+ * After an HTTP 402 (no TypeSafe credits) the hook stops calling for this long
+ * and writes `NOT_RUN reason=billing-hold` instead; then it tries one call again.
+ * Measured 2026-09-24: without a hold, 233 calls hit a 402 over 4.5 h, one per
+ * bash command, an unattended loop against a metered endpoint (jev-nhv9).
+ */
+export const BILLING_HOLD_MS = 15 * 60 * 1000;
+let billingHoldUntil = 0;
+
+/** Test seam; the live process keeps its hold for the hold window. */
+export function resetBillingHold(): void {
+  billingHoldUntil = 0;
+}
+
+export function isBillingRefusal(answer: { reason?: string; error?: string }): boolean {
+  return answer.reason === "http" && /\bHTTP 402\b/.test(answer.error ?? "");
+}
+
 /** stdout only. stderr is discarded. The value is never logged. */
 export function defaultKeyResolver(): Promise<string> {
   const { promise, resolve, reject } = Promise.withResolvers<string>();
@@ -211,6 +229,8 @@ export interface ObserveDeps {
   session?: string;
   /** Injected for tests. Absent on the live path, which uses defaultKeyResolver. */
   keyResolver?: () => Promise<string>;
+  /** Wall clock in ms for the billing hold; tests inject it. */
+  nowMs?: () => number;
 }
 
 export function makeFilter(filters: Filters | null): (command: string) => { drop: boolean; reason?: string } {
@@ -291,6 +311,11 @@ export async function observe(
     } catch {
       /* best-effort like the log; the tool path never sees us */
     }
+    const nowMs = deps.nowMs ?? Date.now;
+    if (nowMs() < billingHoldUntil) {
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `NOT_RUN reason=billing-hold until=${new Date(billingHoldUntil).toISOString()}` });
+      return undefined;
+    }
     let answer;
     try {
       let apiKey: string | undefined;
@@ -317,6 +342,7 @@ export async function observe(
       if (answer.reason === "unconfigured") {
         await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=unconfigured" });
       } else {
+        if (isBillingRefusal(answer)) billingHoldUntil = nowMs() + BILLING_HOLD_MS;
         await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `${answer.reason ?? "unknown"}: ${answer.error ?? ""}` });
       }
       return undefined;
