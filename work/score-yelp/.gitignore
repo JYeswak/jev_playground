@@ -1,0 +1,3 @@
+# Yelp review text is under the Yelp dataset licence; this repository is public. sample.py
+# rebuilds it from the pinned parquet, and sample.jsonl carries each text's sha256.
+texts.jsonl
