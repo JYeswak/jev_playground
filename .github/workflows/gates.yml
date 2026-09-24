@@ -47,10 +47,10 @@ jobs:
           printf 'NOT-JSON-PLANTED-DEFECT-W26\n' >> foundation/fixtures/calibration-v1.jsonl
           echo "PLANTED: garbage line appended to foundation/fixtures/calibration-v1.jsonl; stage 10 must RED naming it"
 
-      - name: Node 20 (stage 40 transcript adapter)
+      - name: Node 22.18+ (README.md:26; the client and tests import .ts directly)
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '22.18'
 
       - name: ast-grep binary as `ast-grep` (stage 44 structural scan)
         # @ast-grep/cli ships prebuilt `sg`; stage 44 calls `ast-grep`.
