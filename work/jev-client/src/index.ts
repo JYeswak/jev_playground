@@ -17,7 +17,7 @@
  * relative path; never edit upstream/. The import is LAZY: a fresh clone has no
  * node_modules, and the keyless paths (unconfigured key, injected askers,
  * measure-kit) must load without it. A missing SDK on a real call is
- * `unconfigured`, never a crash and never a score.
+ * `sdk-missing` (not `unconfigured`, which means no key), never a crash and never a score.
  * Our code owns the failure taxonomy, the field guards, and the fail-safe
  * direction — the SDK owns the wire. Single-attempt semantics are preserved
  * (SDK retry disabled per call); our 4 s default timeout is passed through.
@@ -67,8 +67,13 @@ export type JevChoiceResult =
     }
   | { ok: false; reason: JevFailure; error: string; latencyMs: number; model: string };
 
-/** Named failure classes, so a caller can branch without string-matching a message. */
-export type JevFailure = "unconfigured" | "http" | "non-json" | "no-answers" | "transport";
+/**
+ * Named failure classes, so a caller can branch without string-matching a message.
+ * `unconfigured` = no key; `sdk-missing` = key present but work/sdk/node_modules absent (fresh
+ * clone before `npm ci --prefix work/sdk`). Distinct so a demo never reports a missing SDK as a
+ * missing key.
+ */
+export type JevFailure = "unconfigured" | "sdk-missing" | "http" | "non-json" | "no-answers" | "transport";
 
 export type AskOptions = {
   /** The object the questions are asked about. Serialised as-is into `state`. */
@@ -161,7 +166,7 @@ async function postSystemOne(
   if (!sdk) {
     return {
       ok: false,
-      reason: "unconfigured",
+      reason: "sdk-missing",
       error: "@typesafe-ai/sdk is not installed: run `npm ci --prefix work/sdk` once",
       latencyMs: 0,
     };

@@ -61,6 +61,29 @@ test('an unset key is unconfigured, never a score', async () => {
   }
 });
 
+test('a key with no installed SDK is sdk-missing, not unconfigured, and makes no call', async () => {
+  // A fresh clone has no work/sdk/node_modules. Rebuild that layout: the client file alone, at
+  // the same relative depth, with no SDK beside it.
+  const { mkdtempSync, mkdirSync, copyFileSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const { pathToFileURL, fileURLToPath } = await import('node:url');
+  const root = mkdtempSync(join(tmpdir(), 'jev-client-nosdk-'));
+  mkdirSync(join(root, 'work/jev-client/src'), { recursive: true });
+  const copy = join(root, 'work/jev-client/src/index.ts');
+  copyFileSync(fileURLToPath(new URL('../src/index.ts', import.meta.url)), copy);
+  const bare = await import(pathToFileURL(copy).href);
+  let called = false;
+  const r = await bare.askJev({
+    state: STATE, questions: QUESTIONS, apiKey: 'test-key',
+    fetchImpl: async () => { called = true; throw new Error('must not be reached'); },
+  });
+  assert.equal(r.ok, false);
+  assert.equal(r.reason, 'sdk-missing');
+  assert.match(r.error, /npm ci --prefix work\/sdk/);   // the fix is IN the error
+  assert.equal(called, false);
+});
+
 test('HTTP 400 is reported as http with the body, not swallowed',
   withFetch(respond(400, { detail: 'bad shape' }), async () => {
     const r = await askJev({ state: STATE, questions: QUESTIONS });
