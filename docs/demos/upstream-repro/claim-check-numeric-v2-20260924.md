@@ -128,3 +128,40 @@ code.
 of the 33 close-set originals are not in their narrowed evidence: 8 were never in the full evidence,
 and lexical narrowing dropped 5. (c) and (d) exclude them by construction, and m/n reports it.
 Awaiting a non-author re-score.
+
+## Non-author verification - AmberWillow (pane 1, claude-opus-5-5), 2026-09-24
+
+**Verdict: CONFIRMED, the result is FAIL.** Every number above reproduces, and so does the author's
+account of the four confirmed plants.
+
+- Clean `git clone --local` at `84e466f`, no key in the environment.
+  - `node work/jev-claim-check/numeric-v2.mjs --build` rebuilt `numeric-v2-cases.jsonl`
+    byte-identical (sha256 `f2a82e45e222b2d5…`, the value this receipt states). The build
+    asserts that each planted check and its original get identical evidence, and it passed.
+  - `node --test work/jev-claim-check/numeric-v2.test.mjs` passed 7/7.
+  - `python3 work/jev-claim-check/score-numeric-v2.py` exited 1 and printed `FAIL`. Readme set:
+    (a) 2/18 against a bar of at most 1, missed; (b) 16/18; (c) 16/18; (d) 16/18. Close set:
+    (a) 2/33; (b) 31/33; (c) 11/20 against a bar of 14, missed; (d) 19/20. Six of eight criteria
+    met.
+- **Bar before rows.** The bar commit `3738322` is at 03:21:42Z, and the first row is stamped
+  03:21:56.973Z. There are 327 rows, 0 failed, and every row's check exists in the committed cases.
+  Between `3738322` and HEAD, the receipt only gained 58 lines. The cases, runner and scorer are
+  unchanged.
+- **Evidence narrowing never uses the checked value.** `contentWords` keeps letters only, so no
+  number is ever a word anchor. Number anchors exclude the token at the checked position
+  (`numeric-v2.mjs:120`). The build assertion (`:187`) is the enforcement, and it held on rebuild.
+- **Fresh plants.** None of the 51 planted claim texts repeats any of the 102 earlier plants in
+  `numeric-cases.jsonl` (jev-2mp), `close-cases.jsonl` (jev-10t) or `planted.tsv` (jev-sp5).
+- **The four confirmed plants, hand-read against their narrowed evidence:**
+
+  | Plant | Evidence | Kind of error |
+  |---|---|---|
+  | `threshold-transfer` 200->400 | "400" is the total row count ("400 requests", "t201–t400"), not the fit half | role confusion |
+  | `cost-janus` 940->240 | "240" is the T8 arm inside "500 + 200 + 240 = 940" | role confusion |
+  | `jev-y97` 6 | "6 claims" is in the evidence; the clause says "6 receipts" | role confusion |
+  | `jev-deep-kit-8q7.6` 886/119/567 | the triple occurs 0 times in the narrowed evidence | unsupported confirmation |
+
+  These are exactly the author's three plus one.
+
+NO-CLAIM of this check: no live call was repeated. I read the four confirmed plants and the
+narrowing code, but not the other 47 plant verdicts.
