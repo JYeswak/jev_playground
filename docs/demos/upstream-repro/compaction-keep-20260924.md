@@ -92,3 +92,35 @@ commit with a non-author check. The installed hook yields today and stays that w
 **NO-CLAIM.** At most six sessions of one project, one cut point each, a 40-message horizon, and one
 model pin. C1's cut and C2's wording were written with knowledge of `jev-x86y`'s aggregate results,
 disclosed above. The test of both is these fresh sessions.
+
+## Amendment A1: the rider screen covers every Dicklesworthstone repository (before any labeller)
+
+**What happened.** The first `select` run, never committed, used the preregistered name list and
+screened out nothing. The author then counted rider-name lines in the six packets (counts only) and
+printed the first 110 characters of each tool input in the blocks that matched, but no result text.
+That showed session `01a0c006` reading `eidetic_engine_cli`, a Dicklesworthstone repository the list
+did not name, by `ls`, `cat`, `git -C` and `gh issue view --repo Dicklesworthstone/…`. No labeller had
+seen a packet, no Jev call had been made, and no score existed.
+
+**The added rule.**
+- `RIDER_PATH` is built from `work/compaction-keep/rider-repos.txt`: the 215 public repository names
+  of github.com/Dicklesworthstone, from `gh repo list Dicklesworthstone --limit 1000 --json name`,
+  which is metadata, not the software. `skillranker-tip` and `dicklesworthstone-mirror` are added.
+- A session is screened out when a tool input has a path component equal to one of those names, a
+  `git -C` or `cd` into one, or any `Dicklesworthstone/` (a `gh --repo`, a URL).
+- No name in the list equals a path component of any file jev tracks, so jev's own paths do not trip
+  it. A tool named like a repo but run as a command (`ntm send`, `bun test`, `br`) does not trip it
+  either.
+- `select` and `packets` now refuse only when their output is committed, so this uncommitted draft
+  was re-drawn by the same deterministic command.
+
+**Result of the re-draw** (`sessions.json`). The seeded order is unchanged.
+- Two sessions are screened out: `01a0c006` (16 calls into Dicklesworthstone repositories) and
+  `01a0d38e` (5).
+- **4 sessions pass, 161 prefix calls:** `01a0d0f2` (41), `01a0d11c` (40), `01a0d241` (40) and
+  `01a0d288` (40).
+- That is fewer than 6 and at least 3, so the readout runs on four sessions, as preregistered.
+- The screened-out packets in `/tmp/jec6-packets/` were overwritten with a line saying not to label
+  them, and `index.json` lists only the four.
+
+**NO-CLAIM.** Four sessions, not six. The rules, metrics and bar above are unchanged.

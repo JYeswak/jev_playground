@@ -30,10 +30,22 @@ export const SEED = 20260925;
 export const SAMPLE = 6;
 // A tool call whose input points into a rider-covered checkout reads its content (AGENTS.md
 // "Rider-Covered Repos"): the session is screened out before any labeller sees its packet.
-// Also `git -C <repo>` and `cd <repo>`, which run commands inside the checkout (conservative: a
-// name-only `git -C skillranker rev-parse` screens a session out too).
-export const RIDER_PATH =
-  /(?:(?:^|[\s"'`=:(])(?:[\w.~-]*\/)*(?:skillranker(?:-tip)?|dicklesworthstone-mirror|franken[\w-]*|asupersync)\/|(?:-C|\bcd)\s+["']?(?:[\w.~-]*\/)*(?:skillranker(?:-tip)?|dicklesworthstone-mirror|franken[\w-]*|asupersync)\b)/i;
+// Amendment A1: the names are every public repository of github.com/Dicklesworthstone
+// (rider-repos.txt, from `gh repo list`, metadata only), plus the local mirror and skillranker-tip.
+// A path component equal to one of them, a `git -C` or `cd` into one, or any `Dicklesworthstone/`
+// (a gh --repo, a URL) screens the session out. Conservative: a name-only reference counts.
+const RIDER_NAMES = [
+  ...readFileSync(join(dirname(fileURLToPath(import.meta.url)), "rider-repos.txt"), "utf8")
+    .split("\n")
+    .filter((l) => l.trim() && !l.startsWith("#")),
+  "skillranker-tip",
+  "dicklesworthstone-mirror",
+].map((n) => n.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+const NAMES = `(?:${RIDER_NAMES.join("|")})`;
+export const RIDER_PATH = new RegExp(
+  `(?:(?:^|[\\s"'\`=:(/])${NAMES}/|(?:-C|\\bcd)\\s+["']?(?:[\\w.~-]*/)*${NAMES}(?![\\w-])|dicklesworthstone/)`,
+  "i",
+);
 
 /** The reworded keep question for rule C2, one noul per candidate call. */
 export function needQuestions(batch: readonly ToolCall[]) {
@@ -63,9 +75,16 @@ function riderHits(prefix: readonly Message[], horizon: readonly Message[]): num
   return hits;
 }
 
+/** True when `path` is tracked and unmodified: a committed sample or call set is never redrawn. */
+function committed(path: string): boolean {
+  const rel = path.slice(ROOT.length + 1);
+  const logged = spawnSync("git", ["-C", ROOT, "log", "-1", "--format=%h", "--", rel], { encoding: "utf8" }).stdout.trim();
+  return Boolean(logged) && spawnSync("git", ["-C", ROOT, "diff", "--quiet", "HEAD", "--", rel]).status === 0;
+}
+
 function select() {
-  if (existsSync(SESSIONS)) {
-    console.log("REFUSED: sessions.json exists; the sample is fixed");
+  if (existsSync(SESSIONS) && committed(SESSIONS)) {
+    console.log("REFUSED: sessions.json is committed; the sample is fixed");
     return 1;
   }
   const used = usedSessions();
@@ -112,8 +131,8 @@ function sessions() {
 }
 
 function packets() {
-  if (existsSync(CALLS)) {
-    console.log("REFUSED: calls.json exists; the call set is fixed (labels refer to it)");
+  if (existsSync(CALLS) && committed(CALLS)) {
+    console.log("REFUSED: calls.json is committed; the call set is fixed (labels refer to it)");
     return 1;
   }
   mkdirSync(PACKETS, { recursive: true });
