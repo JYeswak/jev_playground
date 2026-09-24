@@ -157,7 +157,17 @@ def main():
         "Public corpus, may leak into any model's training. Single run, fixed 0.5 cut. "
         "A win against an LLM is not a certified seat unless gate 4 above is met."
     )
-    with open(os.path.join(HERE, "DIFF-RECEIPT.json"), "w") as f:
+    path = os.path.join(HERE, "DIFF-RECEIPT.json")
+    # A re-score of unchanged rows must not dirty the committed receipt: keep its
+    # date unless a number actually moved (fresh-clone run, jev-lcf).
+    try:
+        with open(path) as f:
+            prior = json.load(f)
+        if {**prior, "date": out["date"]} == out:
+            out["date"] = prior["date"]
+    except (OSError, ValueError):
+        pass
+    with open(path, "w") as f:
         f.write(json.dumps(out, indent=2) + "\n")
     print(json.dumps({a: out["arms"].get(a, {}) for a in ARMS}, indent=2)[:2000])
     print("gate4_seat_certified =", g4)
