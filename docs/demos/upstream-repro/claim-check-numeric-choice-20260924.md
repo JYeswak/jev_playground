@@ -121,3 +121,48 @@ were not read and are not stated.
 **Boundary.** One wording, one Jev version, one run, 32 role plants and 51 digit plants from one
 seed. m excludes numbers the narrowing dropped or the 60-option cap cut (11 README checks hit the
 cap). Awaiting a non-author re-score.
+
+## Non-author verification — ConfidenceCascade
+
+ConfidenceCascade (background agent of pane 1; not the author), 2026-09-24, keyless, from a fresh
+`git clone --local` at `3c98ee6` into `/tmp/cc-25r.j8U64F/jev`. Node v22.22.0. No live call, $0.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `node work/jev-claim-check/numeric-choice.mjs --build` in the clone, `TYPESAFE_API_KEY` unset | HOLDS. It prints the bar's counts (readme 46 checks, m 30, 18 digit / 14 role plants, 11 capped; close 197, m 69, 33 / 18, 8 not askable; 235 + 8 calls). `numeric-choice-cases.jsonl` is rebuilt byte-identical (`cmp` clean, sha256 `5dbf534e…b5e6ea`). |
+| 2 | `node --test work/jev-claim-check/numeric-choice.test.mjs` | HOLDS: 5 pass, 0 fail. |
+| 3 | `python3 work/jev-claim-check/score-numeric-choice.py` | HOLDS, exit 1 (FAIL). Feasibility 8/8. Role plants confirmed 1/14 and 1/18. Digit plants 0/18 and 0/33. True numbers confirmed 20/30 and 35/69. The miss split (readme: not_stated 2, another number 8; close: 15, 19) and both role-plant tables match the Results above. |
+| 4 | A plant and its original get byte-identical state | HOLDS. For all 83 plants, the claim differs from its original only in the value span. The masked clause equals the original clause with exactly that value replaced by `[N]` (83/83). The plant's `call` equals the original check's `call` (83/83). That `call` recomputes as sha256(set, masked clause, evidence) on the 80 askable plants; the 3 remaining digit plants sit on checks with no options and have no call, like their originals. The runner sends `{clause: masked, evidence}` with the check's options (`numeric-choice.mjs:193`), so the claimed value is never in the question. The rows hold 243 distinct calls: 235 corpus, 0 missing, plus 8 feasibility. On 4 plants the planted string also occurs elsewhere in the masked clause (for example `…([N]:9` for `16 -> 9`). The original gets the same text, so this is not a leak. |
+| 5 | Seed 20260927 plants repeat none from jev-10t, jev-2mp or jev-h8s | HOLDS. There are 132 earlier plant claims (every `truth: false` claim in `close-cases.jsonl`, `numeric-cases.jsonl` and `numeric-v2-cases.jsonl`, each file at every committed revision, one each) and 83 new plant claims, with 0 overlap. 0 plants needed a redraw, and no plant equals a real claim. |
+| 6 | Timing | `993414f` is committed at 03:29:43Z. The first row is appended at 03:29:51.995Z (`feasibility-0`, latency 341 ms), so the first call started at about 03:29:51.65Z, after the bar. |
+
+**Hand-read: the 2 confirmed role plants.** Both come from the tool choosing the wrong quantity for
+the true claim too. Neither is a correct reading of the plant.
+- `cost-janus`, `940 -> 0.1274`: for `[N] requests cost $0.13 in one run` the model put 0.98 on
+  `0.1274` (the dollar cost) and 0.01 on `940` ("= **940 requests, 940 answered**").
+- `jev-publish-hero-ulo`, `16 -> 9`: the masked clause is `visual/hero.jpg 1920x1080 ([N]:9`. It
+  keeps the `:9`, and the model put 0.77 on `9` and 0.19 on `16` (both options quote
+  `"aspect": "16:9"`). A partner number left in the clause steers the pick. This is a masking
+  artifact on top of the role confusion.
+
+**Hand-read: 5 true-number misses (README).**
+- `cost-jevcal` 560, `[N] cost $0.011 of input in another.`: chose `0.0113` (p 0.86), the cost,
+  over `560` ("560 live calls", p 0.04). Wrong quantity, same pattern as `cost-janus`.
+- `tool-routing-refused` 400, `192 of [N] right against 252 …`: chose `192` (p 0.99), a number
+  already visible in the clause, over `400` (`"n":400`, p 0). Wrong quantity.
+- `inj-fresh-discordants` 61, `and [N] against 5 in the fresh run`: chose `640/662` (p 0.44) over
+  `61` ("Discordants jev-only 61 / llm-only 5", p 0.13). Wrong quantity.
+- `inj-fresh-rescore` 640, `…score.py # fresh run: [N]`: chose `not_stated` (p 0.58) although the
+  evidence has "Exit 0 iff 640 (Jev)" (p 0.10). A miss.
+- `agent-attribution` 23, `… 28 of 35 against grok's [N]`: chose `35` (p 0.5), which is wrong. **Finding:**
+  the option that counts as "right" (`n13`, `23`) is described at its first occurrence, "dylan
+  23", an unrelated count. Grok's figure is the separate token `23/35` (`n49`), which
+  `equalsValue` does not match to `23`. So this check is in m only through a coincidental token.
+  Removing it gives readme 20/29 against the same bar of 21, and (c) still fails. The receipt's
+  "every README number that was not confirmed is present among its options" holds by value, but
+  not always as the same quantity. m counts value matches, not role matches.
+
+**Verdict: FAIL reproduces.** Every number in the Results, the byte-identical rebuild, 5/5 tests,
+the no-leak property and the plant novelty hold from committed files. The one finding
+(`agent-attribution`'s m match is coincidental) does not change the verdict. NO-CLAIM: this re-scores
+committed rows; it does not re-run Jev, and it hand-reads 7 cases (2 confirmed role plants, 5 of the 44 true-number misses), not all.
