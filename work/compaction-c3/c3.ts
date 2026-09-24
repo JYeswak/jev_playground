@@ -59,13 +59,20 @@ function select() {
   const skip = (why: string) => (skipped[why] = (skipped[why] ?? 0) + 1);
   for (const f of sessionFiles()) {
     const st = statSync(f);
-    const id = basename(f).split("_")[1]?.slice(0, 8) ?? "";
-    if (used.has(id)) { skip("used by a development set or jev-0c6"); continue; }
+    // 13 characters (two uuid groups): the 8-character form jev-x86y and jev-jec6 used collides here
+    // (three sessions started within 8 s share 01a0c742). The development sets' ids are 8 characters.
+    const id = basename(f).split("_")[1]?.slice(0, 13) ?? "";
+    if (used.has(id.slice(0, 8))) { skip("used by a development set or jev-0c6"); continue; }
     if (st.mtime.toISOString() >= CUTOFF) { skip("written after CUTOFF"); continue; }
     if (st.size < SIZE[0] || st.size > SIZE[1]) { skip("size outside 200KB-12MB"); continue; }
     const calls = collectToolCalls(load(f), 0).length;
     if (calls < MIN_CALLS) { skip(`fewer than ${MIN_CALLS} paired tool calls`); continue; }
     eligible.push({ path: f.replace(HOME, "~"), id, bytes: st.size, calls, sha256: createHash("sha256").update(readFileSync(f)).digest("hex") });
+  }
+  const ids = eligible.map((e) => e.id);
+  if (new Set(ids).size !== ids.length) {
+    console.log(`REFUSED: two eligible sessions share an id: ${ids.filter((x, i) => ids.indexOf(x) !== i)}`);
+    return 1;
   }
   const draw = rng(SEED);
   const pool = [...eligible];

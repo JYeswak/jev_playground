@@ -78,3 +78,37 @@ A NEGATIVE_EVIDENCE row is written if C3 does not meet the bar.
 **NO-CLAIM.** One project, one cut point per session, a 40-message horizon, one model pin, labels
 judged from truncated packets. `T_C3` was chosen on the development sets, whose own numbers at that
 cut fall short of the bar.
+
+## Sample (after the preregistration `e485ce5`, before any labeller)
+
+**Amendment A1, a session-id fix, before any labeller.** The first `select` run was never committed.
+It used `jev-x86y`'s 8-character session id, and three eligible files started within 8 seconds of
+each other on 2026-09-22 share the prefix `01a0c742`. Their packets overwrote one another, and
+`calls.json` merged them.
+- `c3.ts` now uses a 13-character id (two uuid groups) and refuses if two eligible files share one.
+- The exclusion check still compares the first 8 characters with the development sets' ids.
+- The seeded order, the eligibility and the draw are unchanged: the same 8 files were picked.
+- The draft's six 8-character packet files in `/tmp/c3-packets` were overwritten with a line saying
+  not to label them.
+
+**Draw** (`sessions.json`). 12 files were eligible; skipped were:
+- 18 used by a development set or `jev-0c6`;
+- 67 outside 200 KB–12 MB;
+- 15 with fewer than 50 paired calls;
+- 2 written after the cutoff.
+
+The first 8 in seeded order all passed the rider screen, with 0 tool inputs pointing into a
+rider-covered repository: `01a0c0be-b1e3`, `01a0c679-3b25`, `01a0c688-bc60`, `01a0c742-d07f`,
+`01a0c742-e38d`, `01a0c742-eec7`, `01a0c743-0746` and `01a0d29c-e2b8`. **321 prefix calls**
+(40 each, one with 41).
+
+**Name mentions in packet text, counts only, for pane 1's check.** The author counted matches of the
+`rider-repos.txt` names over each packet, and lines shaped like Rust source (`fn …(`, `use …::`,
+`impl`, `#[derive`); no text was read.
+- The largest counts are `ntm`, which is the tool and outside the rider as a tool: 50, 28, 20, 16
+  and 5 across five packets.
+- `frankenfs` appears 7 times in `01a0c742-e38d`, and `frankenterm` 5 times in `01a0c0be-b1e3`.
+  Every other name appears at most 3 times per packet.
+- No packet has a Rust-source-shaped line.
+
+Pane 1 runs its name check before dispatching labellers.
