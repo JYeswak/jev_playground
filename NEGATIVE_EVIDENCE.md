@@ -3928,3 +3928,31 @@ sets. Neither WORDING, nor JEV, nor SPLIT.
 criteria on catch in all 9 pairings of a label set and C1 still HOLDS. Reopen JEV if a
 later criteria text does not raise grok's catch (C1 ABSENT) and Jev criteria is ahead on
 all 9 pairings of that arm. Reopen SPLIT if C1 HOLDS and Jev-ahead is 9/9.
+
+## R99 — REFUTED: Jev compaction at its default keep cut keeps the tool results a later turn needs
+
+**Claim (jev-x86y):** `fast-jev-compaction`'s keep questions at the library's default
+`keepThreshold 0.5` keep the tool results that a later turn reads, cites or depends on.
+
+**Measured 2026-09-24, `[live]`, prereg `108d6bd`, results `290efd7`.**
+- 5 seeded jev sessions (A1 excluded a sixth for rider content).
+- Each session was compacted at its 40th tool call's result, judged against the next 40 messages.
+- Blind labels from two fresh labellers plus pane 1's adjudication: 48 needed, 146 not-needed, 6
+  undecidable of 200 calls; kappa 0.686.
+- One replay, 5 requests on `jev-1.13.0`, $0.0024.
+- On the 32 needed calls outside the always-kept tail, **0/32 results were kept verbatim (Wilson 95%
+  0.000–0.107)**. 4/32 kept the call with a head-cut result (0.050–0.281).
+- The preregistered reference bar was a lower bound of at least 0.80. It is not met, and the result
+  is the same under either labeller alone (0/41, 0/38).
+- No unpinned `keepResult` reached 0.5; the highest was 0.24. The AUC between needed and not-needed
+  was 0.69 on both keep nouls, descriptive only.
+
+**Nothing was lost live.** The installed hook `.omp/hooks/pre/jev-compact.ts` only yields
+(`undefined`), so omp's own summarizer stays in charge. Compaction verdicts are measured, not
+applied.
+
+**This is not a ruling on Jev.** It refutes one keep rule at one cut with one question wording.
+
+**Retry condition (`jev-jec6`).** Reopen if a preregistered change to the cut, the keep questions,
+or both meets a stated recall bar on needed calls. It must be tested on fresh sessions not used in
+`jev-x86y`, labelled blind the same way, with the current rule scored on the same calls.
