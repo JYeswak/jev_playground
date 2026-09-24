@@ -7,8 +7,9 @@ Bar: docs/demos/upstream-repro/score-sst5-20260924.md (committed before the firs
 Run (venv python has both packages):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
     upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/score-sst5/run.py jev|haiku
-Appends to work/score-sst5/rows-<arm>.jsonl; rows that already hold an answer are skipped, so a
-rerun retries only failed rows. Never prints a key.
+Appends to work/score-sst5/rows-<arm>.jsonl (or to the optional second argument, a path, used for
+repeat runs); rows that already hold an answer are skipped, so a rerun retries only failed rows.
+Never prints a key.
 """
 
 import asyncio
@@ -42,8 +43,11 @@ QUESTION = Score(
 )
 
 
+OUT = None  # optional second CLI argument; None keeps the default rows-<arm>.jsonl
+
+
 def out_path(arm):
-    return os.path.join(HERE, f"rows-{arm}.jsonl")
+    return OUT or os.path.join(HERE, f"rows-{arm}.jsonl")
 
 
 def answered(arm):
@@ -144,6 +148,8 @@ async def main(arm, concurrency=8):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] not in ("jev", "haiku"):
-        raise SystemExit("usage: run.py jev|haiku")
+    if len(sys.argv) not in (2, 3) or sys.argv[1] not in ("jev", "haiku"):
+        raise SystemExit("usage: run.py jev|haiku [out.jsonl]")
+    if len(sys.argv) == 3:
+        OUT = os.path.abspath(sys.argv[2])
     sys.exit(asyncio.run(main(sys.argv[1])))
