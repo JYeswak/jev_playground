@@ -154,4 +154,24 @@ existed when this was written. Nothing above changes; this section adds a sixth 
 
 ## Result
 
-NOT_RUN: waiting on jev-14qk's committed table.
+Free table committed at `7840279`
+(`docs/demos/upstream-repro/openrouter-free-feasibility-20260924.md`). None of the six
+`:free` models answered 49/50. No free comparator was called.
+
+Paid cells, 2026-09-24 07:24:18Z to 07:26:04Z, are **BLOCKED**. Zero rows answered on
+either model, on all six sets. No Jev call. No verdict. No `NEGATIVE_EVIDENCE` row: a
+credit refusal is not a comparator win or a tie.
+
+Verbatim, first probe row of each model:
+
+- `openai/gpt-5-nano`: `TypeSafeAPIError: 402 This request requires more credits, or fewer max_tokens. You requested up to 65536 tokens, but can only afford 11735.`
+- `deepseek/deepseek-v4-flash`: the same 402, `65536` tokens affordable `26078` on SST-5 and Banking77, and `131072` tokens affordable `9388` on SciFact, FEVER, and STS-B.
+
+The 16-row probe was all 402s. That is not the bar's 400/422 grammar refusal, so the
+script continued the full set and one resume. Every one of those calls was the same 402.
+Not retried again. The local row files are those 402 lines only. They were not committed
+and were not deleted. Spend is not stated: the 402s returned no usage object.
+
+The bar froze "no max-tokens setting." Lowering `max_tokens` so the account can afford
+the request would be a new bar, not this run. Retry when the OpenRouter key can afford
+the adapter's default max, or when a bar committed before the next call sets one.
