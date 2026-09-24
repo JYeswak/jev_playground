@@ -147,3 +147,34 @@ right intent and one wrong one.
 - The headroom is a lower bound computed by letting every harmful change land where it hurts most;
   it is not a prediction of which rows flip.
 - No claim about the full 77-intent Banking77 set (`jev-4jf`) or any other unit.
+
+## Non-author verification — Verifier2
+
+Verifier2 (background agent of pane 1, not an author of this unit), 2026-09-24. Oracle: the
+committed row files and the fourth oracle (labelled sets we own); no live call. Everything below ran
+in a `git clone --local` of the repo at `888efbe` in `mktemp -d`, not in the shared worktree.
+
+| # | Check | Command | Result |
+|---|---|---|---|
+| 1 | Bar precedes data | `git merge-base --is-ancestor 37e6757 510e804` | yes; bar 02:37:08 UTC, rows 02:40:27 UTC |
+| 2 | Bar text not edited after the bar commit | `git diff 37e6757 510e804 -- <this receipt>`; `git log -- <this receipt>` | lines 1-74 byte-identical; the only hunk replaces the `## Result` NOT_RUN stub; no later commit touches the file |
+| 3 | Scorer rules not edited after the bar | `git diff 37e6757 510e804 -- work/jev-variance/score.py` | +27/-8, reporting only: prints the unstable-row tables; no verdict, headroom or R1-R3 logic changed |
+| 4 | Runners changed only by an output path | `git diff b53a33b^ b53a33b -- work/score-sst5/run.py`; `git diff 8851fcd^ 8851fcd -- work/choice-banking77/run.py` | SST-5: optional 2nd arg sets `OUT`, `out_path` returns `OUT or rows-<arm>.jsonl`; Banking77: `--out` sets `path = out or rows_pattern`, rejects more than one arm (64). With no new argument both behave exactly as before. Neither runner changed again before `510e804` |
+| 5 | Jev call path equal to run 1's | `git log -- work/score-sst5/run.py work/choice-banking77/run.py`; `git diff a0ed3c1 909278f -- work/choice-banking77/run.py` | SST-5: only `b53a33b` after `ae161b6`. Banking77: `909278f` lowercases labels and adds `--set full`; recomputed on `subset.jsonl`, lowercasing changes none of the 10 intents, so the options sent are identical |
+| 6 | Samples rebuild byte-identically | `python3 work/score-sst5/sample.py 500 20260924`; `python3 work/choice-banking77/sample.py --check` | SST-5 sha256 `522bee6e…d903` equals HEAD's; Banking77 subset "check: identical" (fetch from the pinned public sources, sha256-checked) |
+| 7 | Re-score reproduces every headline | `python3 work/jev-variance/score.py` | exit 0; SST-5 273/269/273 exact, MAE 0.488/0.500/0.492, sign p 0.0148/0.0403/0.019, WIN x3, PASS x3; level flips 8/8/6; Banking77 384/384/386, McNemar 2.74e-5/2.74e-5/3.03e-6, WIN x3; choice flips 2/2/2; headroom 4 and 10; 11/500 and 3/400 unstable rows — every number in the Result section |
+| 8 | Run-1 guard fires on a known-bad input | changed row `i=0` of `work/score-sst5/rows-jev.jsonl` from 2.99 to 3.99 in the clone, re-ran the scorer, restored the file byte-identically | exit 1, "SST-5 run 1 does not reproduce the committed receipt: correct 274, jev_better 110"; clone clean after restore |
+| 9 | Row hand-check (own code, not the scorer's) | recomputed the expected value from each stored probability map and the rounded level for SST-5 rows 0, 30, 82, 104, 250, 458, 465, 499 on all 3 runs; checked choice = argmax of the stored map for Banking77 rows 5, 200, 238, 360, 394 | every stored `score` matches its map within 0.02 and rounds to the level the scorer reports; rows 82/465 and 238/360/394 read as the receipt describes; independent flip counts 8/8/6 and 2/2/2, correct counts 384/384/386 |
+| 10 | Spend and run-shape claims | summed `usage` and `latencyMs` over the four new row files | 1,800 rows, 0 `error` rows, all `model` = `jev-1.13.0`; input 2 x 188,506 + 2 x 154,744 = 686,500; output 2 x 9,000 + 2 x 47,575 = 113,150; input per run identical to run 1; summed latency / 8 is about 38 s for the four runs, consistent with "inside about one minute" |
+| 11 | Committed incumbent and run-1 rows untouched | `git log -- work/*/rows-haiku.jsonl work/*/rows-jev.jsonl` | last touched by `576e60e` and `3709ee6` |
+| 12 | NO-CLAIM matches what ran | read against checks 1-11 | Haiku not re-run (no Haiku row file added); runs within minutes on one date; no 77-intent claim |
+
+**Erratum (citation only).** The Runs section says Banking77's `--out` was "added in `9df40c7`".
+The `--out` change is `8851fcd`; `9df40c7` touches only `.beads/issues.jsonl` (bead store: CLINC150,
+FEVER). Check 4 was run on `8851fcd`. No number depends on it.
+
+**Verdict: CONFIRMED.** Both headlines HOLD under the committed bar on the committed rows.
+Level: `[oracle]` clean-clone re-score of committed files (N = 500 SST-5 + 400 Banking77 rows x 3
+runs, `jev-1.13.0`, 2026-09-24). Not run by the verifier: no live call, so no fourth Jev run and no
+Haiku re-run; the check that the live rows came from these runners rests on the committed code,
+matching input-token totals and row shape, not on observing the calls.
