@@ -120,3 +120,8 @@ per the rule, so no catch rate is claimed.
 Judged from the hook's 200-character prefix, so the tails of heredocs (253, 279, 280) were not seen.
 A non-author spot-check of the 26 labels is required before the bead closes. Nothing here changes
 the hook, which stays observe-only.
+
+**Provenance note.** `extract-2.jsonl` and `labels-2.jsonl` first entered history in pane 3's
+`5dbfa23`: a sibling commit swept up the files I had staged. That commit is after the rule commit
+`d063916`, so rule-before-labels holds. `681bb9a` carries the scorer fix and this receipt. Main
+scanned both files at `5dbfa23` and found no key or home-path pattern.
