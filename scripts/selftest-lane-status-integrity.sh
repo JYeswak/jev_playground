@@ -318,9 +318,46 @@ printf 'candidate\tscore\tclass\tsource\tnote\n' > "$TMP/trace.tsv"
 trace_row ARM-D 900 DERIVED "$TMP/derived.json:/main_correct,/n" >> "$TMP/trace.tsv"
 texpect 'ARM 25 DERIVED recompute red' 12 '<<< TRACE ARM-D' 'match their digest' 'rc 12, formula did not yield 900'
 
+# ARM 26 — sentence-final period is a whole number. 900. matches; 900.5 would not.
+printf 'the score is 900.\n' > "$TMP/cited.txt"
+d=$(digest_of "$TMP/cited.txt")
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-G 900 "$TMP/cited.txt" "$d" >> "$TMP/status.tsv"
+printf 'candidate\tscore\tclass\tsource\tnote\n' > "$TMP/trace.tsv"
+trace_row ARM-G 900 CITED "$TMP/cited.txt:1" >> "$TMP/trace.tsv"
+texpect 'ARM 26 sentence-final 900.' 0 'value_checked: 1 of 1' '<<< TRACE' 'period does not hide the score'
+
+# ARM 27 — DERIVED green. round(9/10*1000)=900. Planting got=-1 fails this arm.
+printf '%s\n' '{"main_correct": 9, "n": 10}' > "$TMP/derived.json"
+d=$(digest_of "$TMP/derived.json")
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-D 900 "$TMP/derived.json" "$d" >> "$TMP/status.tsv"
+printf 'candidate\tscore\tclass\tsource\tnote\n' > "$TMP/trace.tsv"
+trace_row ARM-D 900 DERIVED "$TMP/derived.json:/main_correct,/n" >> "$TMP/trace.tsv"
+texpect 'ARM 27 DERIVED recompute green' 0 'value_checked: 1 of 1' '<<< TRACE' 'formula yielded 900'
+
+# ARM 28 — class check. An illegal class exits 12 and must not say a score disagreed.
+# Removing the class call from lane-status leaves this arm green, which is the hole.
+printf 'the score is 900 here\n' > "$TMP/cited.txt"
+d=$(digest_of "$TMP/cited.txt")
+printf '#\tfixture\n' > "$TMP/status.tsv"
+status_row ARM-C 900 "$TMP/cited.txt" "$d" >> "$TMP/status.tsv"
+printf 'candidate\tscore\tclass\tsource\tnote\n' > "$TMP/trace.tsv"
+trace_row ARM-C 900 NOTFOUND "$TMP/cited.txt:1" >> "$TMP/trace.tsv"
+out=$(trun); rc=$?
+if [ "$rc" = 12 ] && printf '%s\n' "$out" | grep -q '<<< TRACE CLASS' \
+  && printf '%s\n' "$out" | grep -q 'trace class invalid' \
+  && ! printf '%s\n' "$out" | grep -q 'score(s) disagree' \
+  && ! printf '%s\n' "$out" | grep -q 'disagree with the score column'; then
+  printf 'PASS  %-48s rc=12 class fail is not a score disagreement\n' 'ARM 28 class invalid'
+else
+  printf 'FAIL  %-48s rc=%s (want 12) or the FAIL line names a score\n' 'ARM 28 class invalid' "$rc"
+  fail=$((fail+1))
+fi
+
 printf '\n%s\n' '----------------------------------------------------------------------'
 if [ "$fail" = 0 ] && [ "$transient" = 0 ]; then
-  printf 'OK: all four gates discriminate on all 25 arms.\n'; exit 0
+  printf 'OK: all four gates discriminate on all 28 arms.\n'; exit 0
 fi
 if [ "$fail" = 0 ]; then
   printf 'TRANSIENT: %d arm(s) could not be verified — HEAD moved during both attempts.\n' "$transient"

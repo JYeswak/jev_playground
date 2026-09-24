@@ -286,6 +286,7 @@ TRACE="${JEV_TRACE:-docs/demos/upstream-repro/status-score-trace-20260924.tsv}"
 trace_checked=0
 trace_expected=0
 trace_bad=0
+class_bad=0
 join_trace=0
 if [ -f "$TRACE" ]; then
   overlap=$(python3 -c '
@@ -317,8 +318,7 @@ if [ "$join_trace" = 1 ] && [ -f "$TRACE" ]; then
   class_rc=0
   class_out=$(python3 work/sr-adopt/matrix_status.py --column class --enum CITED,OTHER_RECEIPT,DERIVED,NOT_FOUND "$TRACE") || class_rc=$?
   if [ "$class_rc" -ne 0 ]; then
-    trace_bad=$((trace_bad + 1))
-    value_bad=$((value_bad + 1))
+    class_bad=$((class_bad + 1))
     printf '  <<< TRACE CLASS %s\n' "$class_out"
   fi
 fi
@@ -344,7 +344,7 @@ for line in open(trace):
     rows[c[0]] = {"cls": c[2], "source": c[3], "note": c[4] if len(c) > 4 else ""}
 
 def whole(text, score):
-    return re.search(r"(?<![\d.])%s(?![\d.])" % score, text) is not None
+    return re.search(r"(?<![\d.])%s(?!\d|\.\d)" % score, text) is not None
 
 expected = checked = 0
 for line in open(status):
@@ -388,7 +388,8 @@ for line in open(status):
             ok = got == score
             why = "DERIVED round(%s/%s*1000)=%s" % (vals[0], vals[1], got)
         else:
-            why = "class %s does not source score %s" % (t["cls"], score)
+            ok = True
+            why = "class check owns %s" % t["cls"]
     except Exception as exc:
         why = "%s %s" % (t["cls"], exc)
     if not ok:
@@ -505,6 +506,10 @@ if [ "$value_bad" -gt 0 ]; then
   fi
   fails=$((fails+1))
 fi
+if [ "$class_bad" -gt 0 ]; then
+  printf 'FAIL: trace class invalid. No score disagreed.\n'
+  fails=$((fails+1))
+fi
 # Schema is reported LAST but ranks FIRST in the exit code: a row of the wrong width makes every
 # other counter on that row untrustworthy, so it must not be masked by a downstream class.
 if [ "$schema_bad" -gt 0 ]; then
@@ -541,7 +546,7 @@ elif [ "$fails" -gt 1 ]; then
 elif [ "$missing" -gt 0 ]; then rc=3
 elif [ "$drifted" -gt 0 ]; then rc=4
 elif [ "$concur_missing" -gt 0 ]; then rc=5
-elif [ "$value_bad" -gt 0 ]; then rc=12
+elif [ "$value_bad" -gt 0 ] || [ "$class_bad" -gt 0 ]; then rc=12
 fi
 
 # ---------------------------------------------------- TRANSIENT_UNSTABLE check (pane 2 Q92, 185ccdd)
