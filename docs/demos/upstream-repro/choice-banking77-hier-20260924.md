@@ -146,3 +146,26 @@ seeing flat's confusions, as disclosed in the bar. Depth 2, K = 3, one run, one 
 described only by member-name lists. Flat's rows come from a separate earlier run, and run-to-run
 variance at 77-way is unmeasured. A semantic taxonomy, parent descriptions in prose, other K, and
 label sets beyond 255 are all untested. A non-author re-score is pending, and the bead stays open.
+
+## Non-author verification — Verifier3
+
+Verifier3 (background agent of pane 1, Anthropic model), 2026-09-24. Not the author. Everything ran
+in a fresh `git clone --local` of `db10cb2` under `/tmp`. No live call and no network fetch was made.
+
+| Check | Command | Result |
+|---|---|---|
+| Bar precedes data | `git log --format='%h %ad' -- <receipt> rows-hier-jev.jsonl` | bar `60241f6` (21:07:34 −0600) holds the grouping, `hierarchy.json`, runner and scorer. The rows first appear in `8af95ac` (21:12:18). In the live worktree `rows-hier-jev.jsonl` was born at 21:07:48 −0600 (`stat -f %SB`), 14 s after the bar commit, and last written at 21:10:52. |
+| Bar text unedited | `git diff 60241f6 8af95ac -- <receipt>` | the bar's substance is unchanged. Two lines moved: the heading now names `60241f6`, and the `Pending` line became Results. After the bar, `score_hier.py` gained only a 3-line printout of cross-parent vs within-parent errors, and no verdict logic changed. `run_hier.py`, `hierarchy.json`, `full.jsonl` and the flat `rows-full-jev.jsonl` (vs `3c473ae`) are unchanged. |
+| Re-score reproduces | `python3 work/choice-banking77/score_hier.py` (rc 0, 0.3 s, no key) | every headline number in Results matches: flat 2,467, beam 2,387, greedy 2,369 of 3,080. The Wilson intervals, per-query calls, tokens and latency match. Beam vs flat is 72 vs 152, p 9.62e-08, **WORSE THAN FLAT, REFUTED**. Greedy vs flat is 73 vs 171, p 3.09e-10. Beam vs greedy is 21 vs 3. The parent step is 2,766 first and 2,998 in the top 3. Error splits are 264/349 flat and 297/396 beam. All eight coverage cells, the top confusions and 12,320 calls all on `jev-1.13.0` also match. |
+| Independent recompute | own script over the stored distributions | beam (max √(p_parent·p_child) over the root's top 3) 2,387, greedy 2,369, flat 2,467, beam-only 72 and flat-only 152, all identical to the scorer. Every row expanded exactly the root's top-3 parents, and every child distribution's label set equals that parent's members in `hierarchy.json` (0 mismatches). Each hier row's `intent` matches `full.jsonl` (0 mismatches). Tokens total 5,779,677 in and 1,316,425 out, as stated. |
+| Sample and grouping rebuild | `sample.py --set full --check`; `run_hier.py --dump` | `check: identical`; `hierarchy.json` regenerated from `GROUP_RULES` is byte-identical (sha256 unchanged). The parent sizes are 10/8/11/6/10/10/16/6, as in the bar table. |
+| 10 rows by hand | seeded draw (`random.Random(3)`) | i 978, 2427, 2228, 1513, 2475, 1941 and 2379: beam and flat are both right. i 527 `pin_blocked`: beam and flat both say `change_pin`. i 2563 `wrong_exchange_rate_for_cash_withdrawal`: both say `exchange_rate`. i 268 `fiat_currency_support`: both say `exchange_via_app`. Each hand read agrees with the stored distributions and the scorer's per-row outcome. |
+| Zero-mass | own count | the bar has no adapter arm, so no adapter debug applies. 0 of 12,320 stored Jev distributions sum to zero. |
+| NO-CLAIM vs what ran | receipt vs rows | one keyword grouping (disclosed as written after seeing flat's confusions), depth 2, K=3, one run, one wording, and no Haiku arm. That matches the rows. `NEGATIVE_EVIDENCE.md` R85 exists with a retry condition. |
+
+One cosmetic discrepancy, not a headline number: Results says the run was at "03:1xZ", but the row
+file's birth and last-write times put it at 03:07:48 to 03:10:52 UTC. The stated 3 min 7 s is
+consistent with those times.
+
+**Verdict: CONFIRMED** (clean-clone keyless re-score, `[oracle]`). REFUTED stands: hierarchical is
+worse than flat. Scratch left at `/tmp/v3-5fm.5EcP` (not deleted).
