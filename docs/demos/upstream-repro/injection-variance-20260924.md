@@ -87,4 +87,68 @@ cut. J3 went over a different transport than J1 and J2. Haiku has two runs until
 
 ## Results
 
-Pending the live runs.
+The bar was committed at `142fd5d` (2026-09-24T03:50:17Z) and the runs started at 03:50:38Z.
+
+- **J3** answered 662/662 on the first pass.
+- **G2 and G3** were each stopped twice by my shell's 300 s deadline and resumed with `run_diff.py`'s
+  own resume path. Each ended at 662/662 with 0 failed rows. The requests in flight at each stop were
+  spent but not recorded, at most 8 per stop and so at most 32 in all [INFERENCE].
+- No Anthropic call was made.
+
+Rows (sha256): `rows-jev-run3.jsonl` `0b63aec7…d531bdd2`, `grok-run2/rows-A-xai-grok-4.jsonl`
+`98d635d3…475bd492`, `grok-run3/rows-A-xai-grok-4.jsonl` `9c7e6953…09443022`. To re-score with no key:
+`python3 work/nev-differential/variance-20260924/variance.py`.
+
+| Run | Correct | Accuracy | Latency p50 / p95 | Tokens in / out |
+|---|---:|---:|---|---|
+| J1 bench (committed) | 639 | 0.9653 | — | — |
+| J2 fresh (committed) | 640 | 0.9668 | — | — |
+| **J3 (new, Python SDK)** | 639 | 0.9653 | 154 / 363 ms | 439,330 / 23,170 |
+| H1 (committed) | 579 | 0.8746 | — | — |
+| H2 (committed) | 584 | 0.8822 | — | — |
+| H3 | BLOCKED | — | — | — |
+| G1 (committed) | 558 | 0.8429 | — | — |
+| **G2 (new)** | 554 | 0.8369 | 7,701 / 10,882 ms | 590,696 / 30,362 |
+| **G3 (new)** | 555 | 0.8384 | 7,799 / 11,194 ms | 590,696 / 30,604 |
+
+**Jev vs grok-4, 9 of 9 pairings.** Every pairing is a WIN. Jev-only runs 89–95 against
+incumbent-only 7–9, and the largest p is 2.0e-18. The published grok-4 run (558) is grok-4's best of
+three.
+
+**Jev vs Haiku 4.5, 6 of 9 pairings.** Every present pairing is a WIN. Jev-only runs 60–66 against
+incumbent-only 5, and the largest p is 4.9e-13. The three J x H3 pairings are BLOCKED by the
+Anthropic spend cap.
+
+**Rule applied.**
+- Jev vs grok-4 WIN: **STANDS** (9/9).
+- Jev vs Haiku WIN: **PROVISIONAL** (6/6 present; H3 blocked until the cap lifts, not a failure).
+- Seat (gate 4): **PROVISIONAL**.
+- No retraction, so no `NEGATIVE_EVIDENCE.md` row.
+- To finish: when the cap lifts, run
+  `run_diff.py --arm B-anthropic-claude-haiku-4-5 --outdir work/nev-differential/variance-20260924/haiku-run3`
+  and re-score. The bar is unchanged. For scale: on the committed J2 x H2 pairing, 36 answers would
+  have to flip against Jev before it stopped being a WIN.
+
+**Descriptive: decisions that differ between runs of the same model** (noul ≥ 0.5, 662 rows):
+
+| Model | Pairs of runs | Decisions that differ |
+|---|---|---:|
+| Jev | J1–J2 / J1–J3 / J2–J3 | 1 / 0 / 1 |
+| Haiku | H1–H2 | 13 |
+| grok-4 | G1–G2 / G1–G3 / G2–G3 | 44 / 53 / 43 |
+
+J3 went over a different transport (Python SDK rather than the Go bench) and matches J1's decisions
+exactly.
+
+**Verdict** (`[live]`, 2026-09-24). The injection headline holds on every pairing that could be run.
+Against grok-4 it is final: Jev wins 9/9, with margins of 81–86 rows. Against Haiku it is provisional
+on the one blocked run: every present pairing is a WIN, with margins of 55–61 rows.
+
+**Spend.** J3: 662 Jev calls, 439,330 input / 23,170 output tokens (Jev's billed units not read).
+G2 and G3: 1,324 recorded grok-4 calls plus at most 32 unrecorded, 1,181,392 input / 60,966 output
+tokens recorded. Zero Anthropic calls.
+
+**Boundary.** One public corpus, which may be in any model's training data. One battery and one cut.
+Haiku has 2 of 3 runs. The run-to-run stability table is descriptive and was not preregistered.
+Before close, this needs a keyless re-score from a fresh clone and a spot-check by someone other than
+the author. The bead stays open until H3 runs.
