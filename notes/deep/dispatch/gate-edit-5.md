@@ -74,6 +74,7 @@ setting itself.
 
 ## 5. Close
 
-Comment on `jev-bfku` with the selftest output, both planted-mutation results, and commit shas.
-Leave it open for a non-author check. Callback `CALLBACK-GATE5-DONE` to pane 1 via
+Comment on `jev-rt33` (the bead for this item; `jev-bfku` is closed) with the selftest output, both
+planted-mutation results, and commit shas. Leave it open for a non-author check. Callback
+`CALLBACK-GATE5-DONE` to pane 1 via
 `ntm send jev --pane=1`, then `/exit`.
