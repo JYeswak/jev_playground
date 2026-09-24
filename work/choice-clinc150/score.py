@@ -34,6 +34,7 @@ SHIP_MISROUTE = 0.02
 SHIP_COVERAGE = 0.80
 RANK = {"NOT-SCORED": -1, "LOSE": 0, "NON-INFERIOR": 1, "WIN": 2}
 GRAMMAR_CAP = "compiled grammar is too large"
+USAGE_CAP = "You have reached your specified API usage limits"
 FAIL_LIMIT = 0.01  # full set only
 
 
@@ -347,10 +348,23 @@ def main(argv):
             f"\nFailed rows: jev {failed['jev']}, haiku {failed['haiku']} "
             f"(limit {int(FAIL_LIMIT * n)}){'; over the limit: ' + ', '.join(over) if over else ''}"
         )
+        blocked = over == ["haiku"] and all(
+            USAGE_CAP in r.get("error", "")
+            for r in final_rows(rows["haiku"]).values()
+            if "choice" not in r
+        )
+        if blocked:
+            print(
+                "Haiku failed rows all carry Anthropic's account usage-limit message: the Haiku arm is "
+                "BLOCKED-until-cap, not a result"
+            )
         if over:
-            finals = {m: ["NOT-SCORED"] for m in finals}
+            label = "NOT-SCORED (Haiku BLOCKED-until-cap)" if blocked else "NOT-SCORED"
+            RANK.setdefault(label, -1)
+            finals = {m: [label] for m in finals}
         by_domain(subset, arms)
         versus_subset(subset, arms)
+        both_answered(subset, arms)
 
     print("\nVerdicts (the worse for Jev over the two Haiku readings):")
     for measure, labs in finals.items():
@@ -359,8 +373,45 @@ def main(argv):
     worst_all = min(
         (lab for labs in finals.values() for lab in labs), key=RANK.__getitem__
     )
-    print(f"pass: {'PASS' if worst_all in ('WIN', 'NON-INFERIOR') else 'FAIL'}")
+    if worst_all.startswith("NOT-SCORED (Haiku BLOCKED"):
+        print("pass: BLOCKED (Haiku arm stopped by Anthropic's usage cap; not a FAIL)")
+    else:
+        print(f"pass: {'PASS' if worst_all in ('WIN', 'NON-INFERIOR') else 'FAIL'}")
     return 0
+
+
+def both_answered(subset, arms):
+    """Descriptive, NOT preregistered, no verdict: only the rows both arms answered (jev-pm3's
+    Haiku arm stopped on Anthropic's account usage limit, so its failed rows are not answers)."""
+    j, h = arms["jev"], arms["haiku (as shipped)"]
+    idx = [i for i in range(len(subset)) if j[i][0] is not None and h[i][0] is not None]
+    if len(idx) == len(subset):
+        return
+    items = [subset[i] for i in idx]
+    jp, hp = [j[i] for i in idx], [h[i] for i in idx]
+    n_in = sum(1 for it in items if it["intent"] != OOS)
+    print(
+        f"\nDescriptive, not preregistered: the {len(idx)} rows both arms answered "
+        f"({n_in} in-scope, {len(idx) - n_in} OOS)"
+    )
+    print("| Measure | Jev | Haiku | Jev-only | Haiku-only | McNemar p |")
+    print("|---|---:|---:|---:|---:|---:|")
+    jc, hc = correct(items, jp), correct(items, hp)
+    jg = handled(items, gate(items, jp, PRIMARY_GATE, "peak"))
+    hg = handled(items, gate(items, hp, PRIMARY_GATE, "peak"))
+    ins = [k for k, it in enumerate(items) if it["intent"] != OOS]
+    oos = [k for k, it in enumerate(items) if it["intent"] == OOS]
+    for label, a, b in (
+        ("overall correct", jc, hc),
+        (f"handled at peak >= {PRIMARY_GATE:.2f}", jg, hg),
+        ("in-scope correct", [jc[k] for k in ins], [hc[k] for k in ins]),
+        ("OOS said none", [jc[k] for k in oos], [hc[k] for k in oos]),
+    ):
+        bb = sum(1 for x, y in zip(a, b) if x and not y)
+        cc = sum(1 for x, y in zip(a, b) if y and not x)
+        print(
+            f"| {label} | {pct(sum(a), len(a))} | {pct(sum(b), len(b))} | {bb} | {cc} | {mcnemar(bb, cc):.3g} |"
+        )
 
 
 def by_domain(subset, arms):

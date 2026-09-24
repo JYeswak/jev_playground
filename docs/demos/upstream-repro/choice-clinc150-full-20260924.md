@@ -103,6 +103,99 @@ output tokens), 151 options is roughly 4,000 in and 1,900 out per call: about 22
 output tokens, on the order of $75 at $1 / $5 per MTok list price `[INFERENCE: an estimate, not a
 bill]`. There is no call budget (AGENTS.md, 2026-09-21); the receipt states what was spent.
 
-## Result
+## Result (live, 2026-09-24 03:17-03:47 UTC, bar at `defed49`)
 
-NOT_RUN. Filled in after the runs.
+**Verdict: BLOCKED-until-cap, not a result and not a FAIL.** Jev's arm is complete. Anthropic's
+account usage limit stopped the Haiku arm at 3,863 of 5,500 rows. Under the bar that is more than
+1% failed rows (1,637 vs 55), so both primaries are NOT-SCORED. The bead stays open until the cap
+lifts, which the provider message dates at 2026-10-01 00:00 UTC; raising it is Joshua's call. No
+NEGATIVE_EVIDENCE entry is due: nothing lost. Re-score (no key, about 3 s):
+`python3 work/choice-clinc150/score.py --set full`.
+
+**What happened, in order.**
+1. Jev: 5,500/5,500 answered, 0 failed, all rows `jev-1.13.0` (committed `5025e45`).
+2. Haiku structured probe: 16/16 rows rejected verbatim with *"400 The compiled grammar is too large,
+   which would cause performance issues. Simplify your tool schemas or reduce the number of strict
+   tools."* (`rows-full-haiku.jsonl`). This is jev-4jf's cap, so the declared prompted-JSON fallback
+   ran.
+3. Haiku prompted JSON: 3,863 rows answered. The first launch ran under a 300 s tool deadline and was
+   killed at 733 rows (no error rows; in-flight calls lost). Five further launches were cancelled
+   within seconds, still under that deadline, and recorded 0 rows; any calls they had in flight
+   were lost and are not counted `[unmeasured]`. The run then resumed under a supervised process
+   (`hub`), which answered 3,130 more rows before every remaining request, 1,637 rows, came back
+   verbatim:
+   > `TypeSafeBadRequestError: 400 You have reached your specified API usage limits. You will regain
+   > access on 2026-10-01 at 00:00 UTC.`
+4. The bar's one resume pass, limited to 4 rows so as not to loop on a dead endpoint (pane 1's
+   fleet order was not to retry), got the same message 4/4. Those 1,637 rows are **NOT_RUN** (1,341
+   in-scope, 296 out-of-scope, spread across the file). The error rows stay in
+   `rows-full-haiku-prompted.jsonl` as the evidence.
+
+**Jev, all 5,500 rows** (measured, `[live]`, N = 5,500):
+
+| Measure | Jev | Always none |
+|---|---:|---:|
+| Overall correct | 4,960 (90.2%, Wilson 89.4-90.9%) | 1,000 (18.2%) |
+| In-scope accuracy | 4,087/4,500 (90.8%) | 0 |
+| OOS recall | 873/1,000 (87.3%) | 1,000 |
+| OOS precision | 873/1,004 (87.0%) | 18.2% |
+| Latency p50 / p95 | 161 / 386 ms | |
+| Tokens in / out | 7,662,132 / 6,866,522 | |
+
+| Jev gate on peak | Routed right | Misrouted (in-scope / OOS) | Misroute rate | In-scope coverage | Handled | Shippable |
+|---:|---:|---|---:|---:|---:|---|
+| 0.60 | 3,953 | 203 / 95 | 5.4% | 87.8% | 4,858 | no |
+| 0.80 | 3,622 | 144 / 58 | 3.7% | 80.5% | 4,564 | no |
+| 0.90 | 3,364 | 114 / 42 | 2.8% | 74.8% | 4,322 | no |
+
+Jev is not shippable under the preregistered bar (misroute <= 2%, coverage >= 80%) at any fixed
+threshold, on peak or on returned `confidence`. Its commonest errors are near-synonym intent
+pairs: `accept_reservations -> restaurant_reservation` x30 and `reminder_update -> reminder` x30
+(every test row of each), `cancel -> none` x19, `distance -> directions` x17. It also routes some
+out-of-scope rows to intents, e.g. `oos -> time` x15. In-scope accuracy by domain runs from 84.0%
+(kitchen_and_dining) to 98.4% (travel).
+
+**From 15 intents to 150, on the same 750 jev-qw8 rows** (descriptive; the instructions changed
+too): Jev overall 688 -> 646, in-scope 395 -> 391 of 450, out-of-scope said none 293 -> 255 of
+300, handled at 0.60 685 -> 640. Almost all of the loss is on out-of-scope rows: with 150
+candidates, Jev finds an intent for more requests that have none.
+
+**Haiku, the 3,863 rows it answered** (`[live]`, partial; no verdict): p50 / p95 6,252 / 11,770 ms,
+12,623,465 input / 6,131,815 output tokens. The adapter renormalized 43 rows
+(`debug.probability_errors` > 0, raw sums 0.51-2.49); 0 zero-mass rows; 0 transient retries; 2
+malformed-structure corrective retries.
+
+**Descriptive, not preregistered, no verdict: the 3,863 rows both arms answered** (3,159 in-scope,
+704 OOS). The NOT_RUN rows are the ones in flight or queued when the cap hit; which rows those are
+depends on timing, not content `[INFERENCE]`, but that is not tested.
+
+| Measure | Jev | Haiku | Jev-only / Haiku-only | McNemar p |
+|---|---:|---:|---|---:|
+| Overall correct | 3,459 (89.5%) | 3,300 (85.4%) | 295 / 136 | 1.4e-14 |
+| Handled at peak >= 0.60 | 3,395 (87.9%) | 3,272 (84.7%) | 297 / 174 | 1.6e-8 |
+| In-scope correct | 2,844/3,159 (90.0%) | 2,733/3,159 (86.5%) | 227 / 116 | 2.1e-9 |
+| OOS said none | 615/704 (87.4%) | 567/704 (80.5%) | 68 / 20 | 2.8e-7 |
+
+The scorer's primary table counts the 1,637 NOT_RUN rows as Haiku errors, per the bar's
+failed-row rule. That is why its Haiku column reads 3,300/5,500 and its paired "WIN" lines show
+p = 0. **Those lines are not a result and must not be cited.** The bar's failed-row limit is what
+voids them.
+
+**To finish after 2026-10-01 00:00 UTC (or when Joshua raises the cap):** rerun
+`run.py --set full haiku-prompted`. It retries only the 1,641 rows without an answer (1,637 plus the
+4 resume-probe rows, same ids). Then re-score. Nothing in the bar changes.
+
+**Spend.** Jev: 5,500 calls, tokens above. Haiku: 16 structured calls rejected (400); 3,863 prompted
+calls answered (12.6M in / 6.1M out, about $43 at $1 / $5 per MTok list `[INFERENCE: not read from
+a bill]`); 1,641 prompted calls rejected with the usage-limit 400; plus any in-flight calls lost
+in the six killed or cancelled launches `[unmeasured]`.
+
+## NO-CLAIM
+
+- No Jev-vs-Haiku verdict on the full set: the Haiku arm is BLOCKED-until-cap.
+- The both-answered comparison was not preregistered and carries no verdict.
+- Haiku ran as prompted JSON (native structured output is capped at this size). Whether that mode
+  helps or hurts it is unmeasured.
+- One run per arm; no variance.
+- CLINC's labels were not re-adjudicated; the near-synonym pairs above are the dataset's
+  distinctions.
