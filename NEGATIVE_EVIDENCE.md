@@ -3507,3 +3507,29 @@ question as it stands.
 
 **NO-CLAIM.** Says nothing about whether any close reason is wrong: the tool called none unsupported
 and passed four wrong numbers, so its silence is not evidence either way.
+
+## R84 — REFUTED: the Jev API reports `usage.billing_units`, so a client can record billed units
+
+**Claim (AGENTS.md RULE 14, `AGENTS.md:98-100`; bead jev-bmn):** the SDK ships
+`usage.billing_units` and the lane tracks none of it.
+
+**Measured (2026-09-24, BillingUnits, plan `6ec2b8d` before any call, pinned jev-1.13.0):** 150 live
+calls through `work/jev-client` (`b1656b3`, which keeps the field if present), 50 each of the exact
+Score (SST-5), Choice (Banking77, 10 intents) and Noul (SciFact) questions. **0/150 carried
+`billing_units`.** Every wire `usage` held only `input_tokens` and `output_tokens`. One extra call's
+response headers carry no billing field either. On disk the field appears only in
+`typesafe-sdk-python/tests/test_responses.py:143`, as an unknown field the Python SDK is asserted to
+drop (`:152`). Neither SDK declares it (`typesafe-sdk-js/src/types.ts:127-132`,
+`_schemas/models.py:151-160`). The billed quantity is input tokens at \$0.042/Mtok, with output free
+(`docs-mirror/typesafe/models.md:13,16`).
+
+Receipt: `docs/demos/upstream-repro/jev-billing-units-20260924.md`. Re-score:
+`node work/jev-billing-units/measure.mjs`.
+
+**Retry condition.** Retry when either SDK's `Usage` type, `docs-mirror/typesafe/api.md`'s usage
+field list, or `models.md`'s price line names billing units, or when any row written by
+`work/jev-client` records `billing_units` other than `null`. Until then, price Jev from
+`input_tokens`.
+
+**NO-CLAIM.** One key, one model version, one night. That the field is never sent on any plan or
+endpoint is not shown.
