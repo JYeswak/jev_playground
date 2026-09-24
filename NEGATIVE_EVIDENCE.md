@@ -3558,6 +3558,21 @@ is stated. Ask for the quantity instead: a Choice over the number tokens in the 
 plus "not stated", keyed to the clause's quantity, then compare the chosen token to the claim in
 code. Do not rerun this Noul with other cuts or other narrowing settings.
 
+**Round 3, a different primitive (jev-25r, 2026-09-24, bar `993414f` before any call): FAILED. The
+thread is closed: `jev_claim_check` is permanently non-numeric.** The claimed number was masked as
+`[N]`, a Jev Choice picked which of the evidence's own number tokens is that quantity (or
+not_stated), and code compared the pick. Fresh digit and role plants, seed 20260927, 243 calls.
+- Feasibility: 8/8.
+- Role plants confirmed 1/14 and 1/18, digit plants 0/18 and 0/33. The role confusion that closed
+  retry 2 is largely gone.
+- True numbers confirmed: 20/30 README (bar 21), 35/69 close (bar 49). The misses pick the wrong
+  quantity from dense receipts (`192 of [N]` -> 192; `[N] requests cost $0.13` -> 0.1274) or answer
+  not_stated.
+Receipt: `docs/demos/upstream-repro/claim-check-numeric-choice-20260924.md`. Re-score:
+`python3 work/jev-claim-check/score-numeric-choice.py`.
+**Retry condition:** none planned. Reopen only with a model version other than jev-1.13.0, or with
+evidence that is structured (a named field per quantity) rather than prose, and only under a new bar.
+
 ## R84 — REFUTED: the Jev API reports `usage.billing_units`, so a client can record billed units
 
 **Claim (AGENTS.md RULE 14, `AGENTS.md:98-100`; bead jev-bmn):** the SDK ships

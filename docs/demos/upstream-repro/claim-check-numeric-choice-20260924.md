@@ -68,3 +68,56 @@ records the tool as permanently non-numeric and the thread stops.
 are inherited from jev-h8s, so m < all real checks. The 60-option cap can cut the right token
 (11 README checks). Role plants are drawn at random from the other options, so many are easy
 (a fraction for a count). The subtle cases are the minority and are listed one by one.
+
+## Results
+
+Bar committed at `993414f` (03:29:43Z) before any call. Calls ran 03:29:52Z–03:30:39Z, 243/243
+answered, 0 failures. Rows: `work/jev-claim-check/numeric-choice-rows.jsonl`. Re-score with no key:
+`python3 work/jev-claim-check/score-numeric-choice.py` (exit 1 = FAIL).
+
+| # | Metric | readme | close |
+|---|---|---:|---:|
+| F | feasibility | **8/8** (bar >= 7, met) | |
+| a | digit plants confirmed | 0/18 (<= 1, met) | 0/33 (<= 3, met) |
+| b | role plants confirmed | **1/14** (<= 1, met) | **1/18** (<= 1, met) |
+| c | real numbers confirmed, of m | **20/30** (>= 21, **missed by 1**) | **35/69** (>= 49, **missed**) |
+
+**FAIL** (`[live]`, N=243, `jev-1.13.0`). The feasibility arm passed and the role problem is largely
+solved, but the tool does not confirm enough true numbers. By the rule written into this bar,
+**`jev_claim_check` is permanently non-numeric and this thread stops.**
+
+**What the Choice fixed.** Role plants, the failure that closed jev-h8s, were confirmed 2 of 32
+times (1/14, 1/18). Digit plants: 0 of 51. The feasibility arm went 8/8: on a clean single-number
+sentence the Choice picks the right token every time, including `2.6e-13`, `1,145` and `96.0%`.
+
+**What it could not do.** It confirms too few true numbers once the evidence is a real receipt: 20
+of 30 README numbers and 35 of 69 close-reason numbers that were among the options. When it missed,
+it chose another evidence number (README 8, close 19) or `not_stated` (2, 15). Read one by one, the
+misses are role confusion in the other direction: the model picks the wrong quantity from a dense
+table.
+- `192 of [N] right against 252` -> chose `192`.
+- `[N] of 400 right against 252` -> chose `400`.
+- `[N] requests cost $0.13` -> chose `0.1274`, the cost. This also produced one of the two confirmed
+  role plants (`940 -> 0.1274`).
+- `Agent-failure attribution: 28 of 35 against grok's [N]` -> chose `35`.
+- `Live [N] top-1` -> chose `71`.
+- `lexical [N]` -> chose `0.2828`.
+
+The close set adds bare `0`/`1` exit codes and counts (`rc=[N]`, `[N] REFUTED`) that its evidence
+states in another form or not at all. The second confirmed role plant, `jev-publish-hero-ulo`,
+`16 -> 9`, took the `9` of `16:9` for the masked `16`.
+
+**No README number or close reason was shown wrong.** Every README number that was not confirmed is
+present among its options and is the registered, correct value, so each miss is a tool miss. The
+close reasons were not adjudicated beyond that.
+
+**Outcome.** No numeric mode. R83 records `jev_claim_check` as permanently non-numeric; the tool stays
+a sentence-level advisory, the thing it passed on in jev-sp5. No further numeric round is planned.
+
+**Spend.** 243 Jev calls: 517,179 input / 44,361 output tokens reported by the API (Choice answers
+carry a probability per option, hence the larger output), p50 169 ms, p95 341 ms. Jev's billed units
+were not read and are not stated.
+
+**Boundary.** One wording, one Jev version, one run, 32 role plants and 51 digit plants from one
+seed. m excludes numbers the narrowing dropped or the 60-option cap cut (11 README checks hit the
+cap). Awaiting a non-author re-score.
