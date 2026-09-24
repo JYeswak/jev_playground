@@ -162,7 +162,7 @@ These are in the code, not only in notes.
 
 ## How the repo checks itself
 
-A fresh clone needs one `br sync --import-only` before the gates run. It takes the `br` issue tracker (beads_rust) and builds the issue database from the committed `.beads/issues.jsonl`; without it the gates stop at their first check.
+The gates run on the author's machine, not yet on yours. A fresh clone needs one `br sync --import-only` first (the `br` issue tracker, beads_rust, builds the issue database from the committed `.beads/issues.jsonl`; without it the gates stop at their first check). Even then the native-surface, house-gates, staged-deletion and instrument-selftest stages go red elsewhere, because they call `ast-grep`, the author's foundry `loop-kit` (`LOOP_KIT`), and a local omp install. Bead `jev-fmy` tracks making them portable.
 
 Seventeen stages run in `bash foundation/gates.sh`. Each is a script under [`foundation/gates.d/`](foundation/gates.d/) with a `--selftest` that plants a bad input and must go red; a stage that has only ever passed is unproven. Every commit subject names the level of evidence behind it (`[pending]`, `[selftest]`, `[test]`, `[oracle]`, `[live]`), and [`githooks/commit-msg`](githooks/commit-msg) refuses one that does not. Refuted ideas stay in [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md) with the condition under which they are worth retrying. [`GATES.md`](GATES.md) lists every stage and what it catches.
 
