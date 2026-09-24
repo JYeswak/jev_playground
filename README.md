@@ -107,12 +107,13 @@ Discordant pairs: Jev right and grok-4 wrong on 89, the reverse on 8. Jev right 
 
 Re-run, the grok-4 win holds: across three Jev runs (639, 640, 639) and three grok-4 runs (558, 554, 555), Jev wins all 9 pairings, the weakest at p = 2.0e-18, so the 558 in the table is grok-4's best of three; verified by a non-author. The Haiku win is provisional: it held in all 6 pairings that exist (weakest p = 4.9e-13), but the third Haiku run is blocked by the Anthropic account's spend cap until 2026-10-01, so 3 of the 9 pairings are missing (bead `jev-1y19`) ([variance](docs/demos/upstream-repro/injection-variance-20260924.md)).
 
-These comparisons re-score from committed rows with no key:
+These re-score with no key. The fresh run reads only committed rows. The other two also read the public bench's own results file, which is not committed here, so clone it at its pinned commit first; `variance.py` says `NOT_RUN` and exits 2 without it. `analyze_diff.py` currently reads that file from a fixed path on the author's machine, so on yours it fails until that is fixed (bead `jev-x2kv`):
 
 ```bash
-python3 work/nev-differential/analyze_diff.py                # earlier runs, with grok-4
+git clone https://github.com/Gaurav-Gosain/jev-sec-bench jev-sec-bench && git -C jev-sec-bench checkout fdb16b9
 python3 work/nev-differential/fresh-20260923/score.py        # fresh run: 640, 584, 61/5
 python3 work/nev-differential/variance-20260924/variance.py  # three runs: grok-4 9/9, Haiku 6/6 (third run blocked)
+python3 work/nev-differential/analyze_diff.py                # earlier runs, with grok-4
 ```
 
 Receipts: [`work/nev-differential/DIFF-RECEIPT.json`](work/nev-differential/DIFF-RECEIPT.json) and [`jev-sec-bench-w70-20260923.md`](docs/demos/upstream-repro/jev-sec-bench-w70-20260923.md).
@@ -197,7 +198,7 @@ This is the part worth stealing. Each step has a script.
 4. **Compare to something a person would actually ship.** A chat model on the same state, or a classifier trained on labels. A regex is the floor.
 5. **Call the official SDK.** `work/jev-client` owns retry, timeout, and the refusal of a bad body. A hand-rolled `fetch` drifts.
 6. **Test the policy with an injected transport.** No key, no network. `node --test work/nev-injection/seat-guard.test.mjs`.
-7. **Leave the rows.** `python3 work/nev-differential/analyze_diff.py` re-scores the committed comparison without a key.
+7. **Leave the rows.** `python3 work/nev-differential/fresh-20260923/score.py` re-scores the committed injection comparison without a key or a network.
 
 Vendor docs are mirrored under `docs-mirror/typesafe/` once synced. The bytes are not committed: `./scripts/sync-docs.sh` fetches the docs and every pinned clone (network, about two and a half minutes on a fresh clone), then `./scripts/sync-docs.sh --check` confirms them against the committed manifest.
 
@@ -229,7 +230,7 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 | `bash scripts/quickstart.sh` | Five answers from committed bytes |
 | `bash scripts/quickstart.sh --mine` | The same questions on your logs |
 | `node demos/<name>/demo.mjs` | Any demo in the table above, keyless |
-| `python3 work/nev-differential/analyze_diff.py` | The injection table, recomputed |
+| `python3 work/nev-differential/fresh-20260923/score.py` | The fresh injection comparison (Jev 640, Haiku 584 of 662), recomputed from committed rows |
 | `node --test work/nev-injection/seat-guard.test.mjs` | Flag, pass, and review, with no model |
 | `node scripts/jev-probe.mjs --replay docs/demos/jev-probe/probe-response-20260918.json` | A recorded judgment, decoded. Drop `--replay` only when you mean to spend |
 | `bash foundation/gates.sh` | Every repository gate, with its own selftest |
@@ -239,7 +240,7 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 
 ## Limitations
 
-- The injection result is one public corpus, one cut, one run. Measure your own traffic before you gate on it.
+- The injection result is one public corpus at one cut: three runs of Jev and grok-4, two of Haiku so far. Measure your own traffic before you gate on it.
 - Demos without `--live` replay recorded answers. They show the policy, not the model, and the live smokes are 1 to 10 calls each.
 - Some questions in this tree are a better fit for a regex or a trained classifier. The harm-rule check is the worked example.
 - The gates run locally. There is no CI yet, so a commit made with `--no-verify` is caught by nothing.
@@ -258,9 +259,9 @@ The agent harness this lane runs in is [omp](https://omp.sh). Its project surfac
 
 ## Status
 
-As of 2026-09-22. Reproducible from this tree with no key: the injection comparison, the calibration receipt, the twenty demos and their seventeen live receipts. In progress: applying the omp-kit (stream rules, the kit-guard extension, and the `/loop` continuation gate) and the FrankenSuite assessment protocol to this repository, including an assessment of this repo under the same rulebook. The plan is [`docs/PLAN-DEEP-KIT-20260922.md`](docs/PLAN-DEEP-KIT-20260922.md).
+As of 2026-09-22. Reproducible from this tree with no key: the injection comparison (after cloning the public bench, see Measurements), the calibration receipt, the twenty demos and their seventeen live receipts. In progress: applying the omp-kit (stream rules, the kit-guard extension, and the `/loop` continuation gate) and the FrankenSuite assessment protocol to this repository, including an assessment of this repo under the same rulebook. The plan is [`docs/PLAN-DEEP-KIT-20260922.md`](docs/PLAN-DEEP-KIT-20260922.md).
 
-All seventeen gate stages pass (`bash foundation/gates.sh`, rc 0). The three instrument selftests that were red earlier in the day were fixed at their cause, not waived.
+All seventeen gate stages pass on the author's machine (`bash foundation/gates.sh`, rc 0); on a fresh clone, `--portable` passes with 4 stages skipped for missing prerequisites. The three instrument selftests that were red earlier in the day were fixed at their cause, not waived.
 
 ## About Contributions
 

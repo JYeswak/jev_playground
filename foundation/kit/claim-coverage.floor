@@ -3,6 +3,6 @@
 # lower it to make a README change pass (AGENTS.md reward-hacking pattern 1). A change to
 # foundation/kit/claim-units.py changes what counts as a candidate: re-derive both numbers and the
 # sha256 together, in one commit, with the before/after in the subject.
-covered=42
-candidates=76
+covered=43
+candidates=77
 unitizer_sha256=fec22a77b8e4222fc8005483a085a61696eff14614d4ed1f6f870f7b534e539d

@@ -12,9 +12,10 @@ Commands are extracted from the clone's own README in page order: every line of 
 (trailing `# comment` stripped), and every inline code span that starts with node/python3/bash/
 ./scripts/git clone/cd/npm/br. Exact repeats run once; every README line they appear on is
 recorded. A command on a line about making "real calls" is live setup: the keyless pass skips it
-(the offline claims must hold without it) and the live pass runs it first. `git clone <url>` runs
-verbatim in its own fresh directory (a real network clone); `cd` runs there too. Everything else
-runs in the local clone.
+(the offline claims must hold without it) and the live pass runs it first. The quick start's
+`git clone` of this repo runs verbatim in its own fresh directory (a real network clone), and its
+`cd` runs there too. Everything else, including a `git clone` of a dependency the README names (the
+pinned injection bench), runs inside the local clone.
 
 The live pass (--live, run under `infisical run --silent --projectId=... --`) runs what the README
 names as spending commands: each demo whose table row carries a live receipt, with `--live`
@@ -215,6 +216,23 @@ def run_one(argv: list[str], cwd: Path, env: dict, log: Path) -> dict:
     }
 
 
+# A number, not a digit run inside a name: "Banking77", "CLINC150", "SST-5", "grok-4.20" are skipped.
+NUM_TOKEN = re.compile(r"(?<![A-Za-z\d.])(?<![A-Za-z]-)\d[\d,]*(?:\.\d+)?(?:e-?\d+)?")
+
+
+def cited_numbers(context: str, output: str) -> dict:
+    """Numbers the README's `# comment` beside a fenced command cites, and which of them the
+    command's output does not contain (commas ignored). A miss is a lead to adjudicate by hand, not
+    a verdict: the output may print the same value in another format."""
+    m = re.search(r"\s#\s(.*)$", context)
+    if not m:
+        return {"cited": [], "cited_missing": []}
+    flat = output.replace(",", "")
+    cited = NUM_TOKEN.findall(m.group(1))
+    missing = [t for t in cited if t not in output and t.replace(",", "") not in flat]
+    return {"cited": cited, "cited_missing": missing}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--ref", default="origin/main")
@@ -296,7 +314,8 @@ def main() -> None:
     rows = []
     for n, item in enumerate(plan, 1):
         cmd = item["cmd"]
-        if cmd.startswith(("git clone ", "cd ")):
+        own_clone = cmd.startswith("git clone ") and "jev_playground" in cmd
+        if own_clone or cmd.startswith("cd "):
             cwd = stranger_dir
         else:
             cwd = clone
@@ -306,7 +325,7 @@ def main() -> None:
             else ["/bin/bash", "-c", cmd]
         )
         res = run_one(argv, cwd, env, logs / f"{n:02d}.log")
-        if cmd.startswith("git clone ") and res["rc"] == 0:
+        if own_clone and res["rc"] == 0:
             cloned = next(stranger_dir.iterdir())
             gh_sha = subprocess.check_output(
                 ["git", "-C", str(cloned), "rev-parse", "HEAD"], text=True
@@ -324,6 +343,7 @@ def main() -> None:
             "cwd": "gh-clone-dir" if cwd == stranger_dir else "clone",
             "sha": sha[:7],
             **res,
+            **cited_numbers(item.get("context", ""), Path(res["log"]).read_text()),
         }
         rows.append(row)
         print(
@@ -382,15 +402,23 @@ def main() -> None:
 def report(path: Path) -> None:
     rows = [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
     print(
-        "| # | README line | command | rc | wall s | first failing line / last line |"
+        "| # | README line | command | rc | wall s | cited numbers found | first failing line / last line |"
     )
-    print("|---|---|---|---:|---:|---|")
+    print("|---|---|---|---:|---:|---|---|")
     for r in rows:
         where = ",".join(f"L{x}" for x in r["readme_lines"]) or "-"
         note = r["first_fail"] or r["last"]
         note = note.replace("|", "\\|")
+        cited = r.get("cited") or []
+        missing = r.get("cited_missing") or []
+        found = (
+            "-"
+            if not cited
+            else f"{len(cited) - len(missing)}/{len(cited)}"
+            + (f" (not in output: {', '.join(missing)})" if missing else "")
+        )
         print(
-            f"| {r['n']} | {where} | `{r['cmd']}` | {r['rc']} | {r['wall_s']} | {note} |"
+            f"| {r['n']} | {where} | `{r['cmd']}` | {r['rc']} | {r['wall_s']} | {found} | {note} |"
         )
     bad = sum(1 for r in rows if r["rc"] != 0)
     print(f"\n{len(rows)} rows, {len(rows) - bad} rc 0, {bad} nonzero ({path})")
