@@ -115,8 +115,10 @@ Until `flags-4.jsonl` exists this readout measures nothing about the gate.
 **What happened.** The first run of `readout4.py extract` under the rule above was never committed.
 `foundation/gates.d/30-no-secrets.sh` then went RED on three of its rows, and its output withheld
 the values. The author read the five rows the extract's own secret-shape scan had flagged:
-- rows 323 and 334 set `TYPESAFE_API_KEY=offline-placeholder` for an offline test;
-- row 906 is a stage 30 test plant, `TYPESAFE_API_KEY=${TYPESAFE_API_KEY:-unset_placeholder_value}`;
+- rows 323 and 334 set the key variable to a 19-character offline placeholder word for an offline
+  test;
+- row 906 is a stage 30 test plant: a `${...:-default}` whose default is a 23-character placeholder
+  literal;
 - rows 705 and 807 hold the text of a scan regex (a `-----BEGIN` alternative), which stage 30 does
   not flag.
 
