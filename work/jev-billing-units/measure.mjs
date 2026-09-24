@@ -90,8 +90,9 @@ export const SHAPES = {
 // Prices, read from the mirrored primary sources and refused if the cited line no longer says it.
 export const PRICES = {
   jev: { file: 'docs-mirror/typesafe/models.md', line: 13, needle: '\\$42 / \\$0.042', inputPerMTok: 0.042, outputPerMTok: 0,
-         note: 'models.md:13 "$42 / $0.042" per Btok / per Mtok for jev-1.13.0; :16 "Charged per input token. Output tokens are free."' },
-  jevOutputFree: { file: 'docs-mirror/typesafe/models.md', line: 16, needle: 'Charged per input token. Output tokens are free.' },
+         note: 'models.md:13 "$42 / $0.042" per Btok / per Mtok for jev-1.13.0; :18 "Charged per input token. Output tokens are free."' },
+  // Was line 16; the 2026-09-24 mirror refresh (jev-j5fo, 4f3e295) moved it to 18.
+  jevOutputFree: { file: 'docs-mirror/typesafe/models.md', line: 18, needle: 'Charged per input token. Output tokens are free.' },
   haiku: { file: 'docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md', line: 90, needle: '"claude-haiku-4-5": (1.00, 5.00)', inputPerMTok: 1.0, outputPerMTok: 5.0,
            note: 'consistency_choice_cookbook.md:90 "claude-haiku-4-5": (1.00, 5.00), $ per 1M tokens, "prices + model ids as of 2026-07" (:89) — list price, not an invoice' },
 };
