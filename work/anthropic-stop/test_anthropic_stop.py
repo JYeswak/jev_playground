@@ -33,7 +33,20 @@ sys.path.insert(0, str(HERE))
 from anthropic_stop import AnthropicSpendStopped, refuse_anthropic_comparator  # noqa: E402
 
 GUARD = "refuse_anthropic_comparator"
-CLAUDE_ID = re.compile(r"claude-(?:haiku|sonnet|opus)|anthropic/claude")
+# Every Claude model id shape, old and new: claude-3-5-sonnet-20241022, claude-3-opus, claude-2.1,
+# claude-instant-1.2, claude-haiku-4-5, anthropic/claude-haiku-4.5. The first version matched only
+# claude-(haiku|sonnet|opus) and would have passed a new runner naming claude-3-5-sonnet (README check
+# of 10706d9).
+CLAUDE_ID = re.compile(
+    r"\bclaude-(?:\d|instant|[\w.-]*(?:haiku|sonnet|opus))|anthropic/claude"
+)
+# An Anthropic client with no id string in the file: the adapter's provider, the SDK, the endpoint,
+# or the adapter's provider name "anthropic" as a string.
+ANTHROPIC_CLIENT = re.compile(
+    r"AnthropicProvider|providers\.anthropic|api\.anthropic\.com|@anthropic-ai/sdk"
+    r"|^\s*(?:import|from)\s+anthropic\b|['\"]anthropic['\"]",
+    re.M,
+)
 CODE = re.compile(r"\.(?:py|mjs|cjs|js|ts|sh)$")
 ANTHROPIC_REF = re.compile(r"haiku|claude|anthropic|SystemOneAdapterClient", re.I)
 
@@ -82,13 +95,15 @@ GUARDED = {
     "work/score-yelp/run.py": ("main", ("haiku",), {}, True),
 }
 
-# Tracked code that names a claude model id and never calls the Anthropic API, with the reason.
+# Tracked code that names a claude model id or an Anthropic client and never calls the Anthropic
+# API, with the reason.
 KEYLESS = {
     "demos/routing-backtest/bin/adapt-claude.mjs": "reads Claude Code session files; price table only",
     "work/jev-billing-units/measure.mjs": "cites a cookbook price line; no call",
     "work/nev-differential/analyze_diff.py": "scores committed rows",
     "work/nev-differential/variance-20260924/variance.py": "scores committed rows",
     "work/openrouter/test_provider.py": "builds an OpenRouter provider offline with a fake key",
+    "work/adapter-pin/finish-audit.py": "audits committed rows; names providers to classify them",
 }
 
 KEYS = ("TYPESAFE_API_KEY", "XAI_API_KEY", "ANTHROPIC_API_KEY", "OPENROUTER_API_KEY")
@@ -262,15 +277,40 @@ class AnthropicStopTest(unittest.TestCase):
         self.assertIn("i've been charged $100 from anthropic", text)
         self.assertIn("There is no override", text)
 
+    def test_census_pattern_knows_every_claude_id_shape(self):
+        for text in (
+            'model="claude-3-5-sonnet-20241022"',
+            'model="claude-3-opus-20240229"',
+            'model="claude-2.1"',
+            'model="claude-instant-1.2"',
+            'model="claude-haiku-4-5"',
+            'model="anthropic/claude-haiku-4.5"',
+        ):
+            self.assertTrue(CLAUDE_ID.search(text), text)
+        for text in (
+            "from system_one_adapter.providers.anthropic import AsyncAnthropicProvider",
+            "import anthropic",
+            'provider, model = "anthropic", MODEL',
+            'fetch("https://api.anthropic.com/v1/messages")',
+        ):
+            self.assertTrue(ANTHROPIC_CLIENT.search(text), text)
+        for text in ("claude-code-session-jsonl", "# about Anthropic's pricing"):
+            self.assertFalse(
+                CLAUDE_ID.search(text) or ANTHROPIC_CLIENT.search(text), text
+            )
+
     def test_census_every_claude_naming_file_is_guarded_or_keyless(self):
         naming = set()
         for rel in tracked():
             if not CODE.search(rel) or rel.startswith("work/anthropic-stop/"):
                 continue
             path = ROOT / rel
-            if path.is_file() and CLAUDE_ID.search(
+            text = (
                 path.read_text(encoding="utf-8", errors="replace")
-            ):
+                if path.is_file()
+                else ""
+            )
+            if CLAUDE_ID.search(text) or ANTHROPIC_CLIENT.search(text):
                 naming.add(rel)
         self.assertEqual(
             sorted(naming - set(GUARDED) - set(KEYLESS)),
