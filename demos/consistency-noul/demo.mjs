@@ -187,7 +187,8 @@ const NOUL_QUESTIONS = Object.fromEntries(
 const liveRepeats = [];
 for (let i = 0; i < 3; i++) {
   const r = await askJevBundle({
-    state: { ...CLAIM, uid: `consistency-noul-demo-${Date.now()}-${i}` },
+    // The cookbook's state shape: {uid, claim}, the claim nested, not spread (jev-t6yt).
+    state: { uid: `consistency-noul-demo-${Date.now()}-${i}`, claim: CLAIM },
     questions: NOUL_QUESTIONS,
     model: 'jev-1.13.0',
     timeoutMs: 20000,

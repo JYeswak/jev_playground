@@ -22,16 +22,92 @@ function decide(distribution) {
   return top >= GATE ? label : 'uncertain';
 }
 
-const QUESTIONS = {
-  category: ['None', 'Harass', 'Hate', 'Violence', 'Spam', 'Sexual'],
-  primary_risk: ['Harassment', 'Violence', 'LinkAbuse', 'AccountHistory', 'LowRisk'],
-  target: ['None', 'Person', 'Group', 'Platform'],
-  action: ['Allow', 'Warn', 'Remove', 'Strike', 'Escalate'],
-  queue: ['Auto', 'General', 'Threat', 'Spam', 'TSLead'],
-  link_handling: ['Allow', 'RmLink', 'Brigade', 'Escalate'],
-  review_path: ['Auto', 'Human', 'Senior', 'Legal'],
-  severity: ['None', 'Low', 'Medium', 'High'],
+// The cookbook's rubric, verbatim from "The rubric: 8 `Choice` questions": per question the
+// instructions and each label's description (its Choice criteria). The live lane sends exactly
+// this; before jev-t6yt it sent "Pick the single most applicable label for <key>." with no label
+// descriptions, so the model saw bare label names like `RmLink` and `TSLead`.
+const RUBRIC = {
+  category: [
+    'What is the single most applicable content-policy category for this post?',
+    {
+      None: 'No policy violation of any kind.',
+      Harass: 'Insults or demeans a person, with no threat of harm and no protected-class attack.',
+      Hate: 'Attacks a person or group over a protected characteristic (race, religion, gender, ...).',
+      Violence: 'Makes a credible threat of harm or incites violence against someone.',
+      Spam: 'Unsolicited promotion or link spam, with no personal attack.',
+      Sexual: 'Sexual or adult content.',
+    },
+  ],
+  primary_risk: [
+    'What is the primary moderation risk that should drive triage for this post?',
+    {
+      Harassment: 'Personal attack or targeted abuse is the main risk.',
+      Violence: 'A threat of harm or intimidation is the main risk.',
+      LinkAbuse: 'External-link or off-platform coordination risk is the main risk.',
+      AccountHistory: 'Prior account history or repeat behavior is the main risk.',
+      LowRisk: 'No meaningful moderation risk is present.',
+    },
+  ],
+  target: [
+    'Who or what is the content primarily directed at?',
+    {
+      None: 'Not directed at anyone in particular.',
+      Person: 'Directed at one specific individual.',
+      Group: 'Directed at a protected group or class.',
+      Platform: 'Directed at the community or platform itself, not a person.',
+    },
+  ],
+  action: [
+    'What enforcement action should be taken on this post?',
+    {
+      Allow: 'Leave the post up with no action.',
+      Warn: 'Leave the post up but attach a warning label.',
+      Remove: 'Remove the post, but do not penalize the account.',
+      Strike: 'Remove the post and add a strike to the account.',
+      Escalate: 'Take no automated action; hold for a human decision.',
+    },
+  ],
+  queue: [
+    'Which single moderation queue should own this post?',
+    {
+      Auto: 'Auto-resolve; no human queue needed.',
+      General: 'General moderation queue.',
+      Threat: 'Threat / violence response queue.',
+      Spam: 'Spam and platform-abuse queue.',
+      TSLead: 'Trust-and-safety lead / senior queue.',
+    },
+  ],
+  link_handling: [
+    'How should any external link or off-platform invite in the post be handled?',
+    {
+      Allow: 'Leave the link in place.',
+      RmLink: 'Strip or disable the link but keep the post.',
+      Brigade: 'Treat the link as coordinated brigading and action it as abuse.',
+      Escalate: 'Send the link to a specialist to assess before acting.',
+    },
+  ],
+  review_path: [
+    'Who should make the final call on this post?',
+    {
+      Auto: 'Automated action; no human review.',
+      Human: 'A frontline human moderator makes the call.',
+      Senior: 'A senior or specialist reviewer is required.',
+      Legal: 'Route to legal or law-enforcement escalation.',
+    },
+  ],
+  severity: [
+    'What is the overall severity of this post?',
+    {
+      None: 'No violation.',
+      Low: 'Rude or dismissive, but essentially harmless.',
+      Medium: 'Personal harassment with no clearly credible threat.',
+      High: 'Harassment together with a threat that could be read as credible.',
+    },
+  ],
 };
+
+// Label sets per question, in the cookbook's order (what the recorded lane checks against).
+const QUESTIONS = Object.fromEntries(Object.entries(RUBRIC).map(([key, [, criteria]]) => [key, Object.keys(criteria)]));
 
 // The cookbook's borderline post, verbatim from its "The state" section
 // (docs-mirror/typesafe/cookbooks/consistency_choice_cookbook.md). The recorded REPEATS below
@@ -173,16 +249,15 @@ if (!live) {
 }
 
 const { askJevBundle } = await import('../../work/jev-client/src/index.ts');
+// The cookbook's system_one call: Choice(instructions, criteria) per rubric question.
 const CHOICE_QUESTIONS = Object.fromEntries(
-  Object.entries(QUESTIONS).map(([key, labels]) => [
-    key,
-    { type: 'choice', instructions: `Pick the single most applicable label for ${key}.`, criteria: Object.fromEntries(labels.map((l) => [l, null])) },
-  ]),
+  Object.entries(RUBRIC).map(([key, [instructions, criteria]]) => [key, { type: 'choice', instructions, criteria }]),
 );
 const liveRepeats = [];
 for (let i = 0; i < 3; i++) {
   const r = await askJevBundle({
-    state: { ...POST, uid: `consistency-demo-${Date.now()}-${i}` },
+    // The cookbook's state shape: {uid, post}, the post nested, not spread (jev-t6yt).
+    state: { uid: `consistency-demo-${Date.now()}-${i}`, post: POST },
     questions: CHOICE_QUESTIONS,
     model: 'jev-1.13.0',
     timeoutMs: 20000,
