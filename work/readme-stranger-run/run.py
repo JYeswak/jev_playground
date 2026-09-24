@@ -50,7 +50,9 @@ RUNNABLE = (
     "git clone ",
     "cd ",
     "npm ",
-    "br ",
+    # Only `br sync` is a setup step the README asks a stranger to run; other `br ...` spans are
+    # quoted examples (e.g. the commands the gate hook flagged), not instructions.
+    "br sync ",
 )
 FAIL_RE = re.compile(
     r"(error|fail|\bred\b|traceback|not found|no such|cannot|refus|missing|unable|denied)",
