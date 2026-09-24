@@ -101,9 +101,31 @@ def scrub_values(text, patterns):
 
 
 def extract():
-    begin = start()
-    have = R1.transcript_sessions()
     seen = {r["cmdSha"] for r in R3.read_jsonl(R3.EXTRACT)}
+    begin = start()
+    out, counts = build_rows(begin, END, seen, "seen in readout 3")
+    write_extract(EXTRACT, out)
+    print(
+        json.dumps(
+            {"extract": EXTRACT, "start": begin, "end": END, "rows": len(out), **counts}
+        )
+    )
+
+
+def write_extract(path, out):
+    with open(path, "w", encoding="utf-8") as fh:
+        for rec in out:
+            fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
+def build_rows(begin, end, seen, seen_label):
+    """The extract rows for sidecar rows stamped in (begin, end], under this readout's rules.
+
+    Fleet rows only, sha-verified, cmdShas in `seen` excluded, documented plants excluded, one row
+    per cmdSha (the first), redacted by the hook's module plus A1, then the withhold rule. Returns
+    (rows, exclusion counts). readout 5 (work/gate-question-gap) reuses it with its own window.
+    """
+    have = R1.transcript_sessions()
     private, secret = R1.filters()
     with open(SIDECAR, encoding="utf-8") as fh:
         side = [json.loads(line) for line in fh if line.strip()]
@@ -111,7 +133,7 @@ def extract():
     counts = collections.Counter()
     kept, first = [], {}
     for r in side:
-        if not (begin < r["ts"] <= END):
+        if not (begin < r["ts"] <= end):
             counts["outside window"] += 1
             continue
         counts["in window"] += 1
@@ -120,7 +142,7 @@ def extract():
         elif not hmac.compare_digest(sha(r["cmd"]), str(r["cmdSha"])):
             counts["excluded: sha mismatch"] += 1
         elif r["cmdSha"] in seen:
-            counts["excluded: seen in readout 3"] += 1
+            counts[f"excluded: {seen_label}"] += 1
         elif r["cmd"].strip() in PLANTS:
             counts["excluded: documented plant"] += 1
         elif r["cmdSha"] in first:
@@ -137,7 +159,7 @@ def extract():
             first[r["cmdSha"]] = rec
             kept.append(rec)
     stage30 = stage30_patterns()
-    red = R3B.hook_redact([r.pop("_cmd") for r in kept])
+    red = R3B.hook_redact([r.pop("_cmd") for r in kept]) if kept else []
     out = []
     for i, (r, x) in enumerate(zip(kept, red)):
         full = scrub_values(x["full"], stage30)
@@ -154,14 +176,7 @@ def extract():
                 "fullLen": len(full),
             }
         )
-    with open(EXTRACT, "w", encoding="utf-8") as fh:
-        for rec in out:
-            fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
-    print(
-        json.dumps(
-            {"extract": EXTRACT, "start": begin, "end": END, "rows": len(out), **counts}
-        )
-    )
+    return out, counts
 
 
 def show(r):
@@ -269,11 +284,13 @@ def disagreements():
     return 0
 
 
-def final_labels(rows):
-    for path in (LABELS_1, LABELS_2):
+def final_labels(rows, paths=None):
+    """Both labellers' labels and the final labels; `paths` = (labels 1, labels 2, adjudicated)."""
+    first, second, adjudicated = paths or (LABELS_1, LABELS_2, ADJUDICATED)
+    for path in (first, second):
         if not os.path.exists(path) or not R3.committed(path):
             return f"REFUSED: {os.path.basename(path)} is not committed and clean"
-    one, two = read_labels(LABELS_1, rows), read_labels(LABELS_2, rows)
+    one, two = read_labels(first, rows), read_labels(second, rows)
     for x in (one, two):
         if isinstance(x, str):
             return f"REFUSED: {x}"
@@ -283,9 +300,9 @@ def final_labels(rows):
     split = [r["i"] for r in rows if one[r["i"]] != two[r["i"]]]
     adj = {}
     if split:
-        if not os.path.exists(ADJUDICATED) or not R3.committed(ADJUDICATED):
-            return f"REFUSED: {len(split)} disagreements and labels-4-adjudicated.jsonl is not committed and clean"
-        adj = read_labels(ADJUDICATED, rows)
+        if not os.path.exists(adjudicated) or not R3.committed(adjudicated):
+            return f"REFUSED: {len(split)} disagreements and {os.path.basename(adjudicated)} is not committed and clean"
+        adj = read_labels(adjudicated, rows)
         if isinstance(adj, str):
             return f"REFUSED: {adj}"
         if any(i not in adj for i in split):
