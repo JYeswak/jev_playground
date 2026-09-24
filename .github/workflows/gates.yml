@@ -36,13 +36,13 @@ jobs:
       - name: Plant defect in runner checkout only (dispatch input; never committed)
         if: inputs.plant_red == 'fixture'
         run: |
-          set -u
+          set -u; set +e  # runner uses bash -e; stages report codes, never abort
           printf 'NOT-JSON-PLANTED-DEFECT-W26\n' >> foundation/fixtures/calibration-v1.jsonl
           echo "PLANTED: garbage line appended to foundation/fixtures/calibration-v1.jsonl; stage 10 must RED naming it"
 
       - name: Toolchain proof line
         run: |
-          set -u
+          set -u; set +e  # runner uses bash -e; stages report codes, never abort
           git --version
           python3 --version
           node --version || true
@@ -64,7 +64,7 @@ jobs:
         # stage reads it — so a verified official br binary is sufficient and
         # deterministic. If this ever changes, this step fails loudly.
         run: |
-          set -u
+          set -u; set +e  # runner uses bash -e; stages report codes, never abort
           cd /tmp
           gh release download v0.6.0 --repo Dicklesworthstone/beads_rust \
             --pattern 'br-0.6.0-linux_amd64.tar.gz*' --dir /tmp/br-dl
@@ -79,10 +79,17 @@ jobs:
           set -u
           br sync --import-only
           ls .beads/*.db
+      - name: Run all gates (keyless; no key in env by construction)
+        id: gates
+        run: |
+          set -u; set +e  # runner uses bash -e; gates.sh reports rc, never aborts
+          ./foundation/gates.sh > /tmp/gates-run.txt 2>&1; echo "rc=$?" > /tmp/gates-rc.txt
+          cat /tmp/gates-run.txt
+
       - name: "Run every stage --selftest (RED arms; mirrors gates.sh: skips non-executables)"
         id: selftests
         run: |
-          set -u
+          set -u; set +e  # runner uses bash -e; stages report codes, never abort
           : > /tmp/selftest-run.txt; : > /tmp/selftest-rc.txt
           fail=0
           for stage in foundation/gates.d/[0-9]*-*.sh; do
@@ -98,7 +105,7 @@ jobs:
 
       - name: Verdict (RED fails; SKIP counted apart from PASS, never as PASS)
         run: |
-          set -u
+          set -u; set +e  # runner uses bash -e; verdict computes, never aborts early
           gates_rc=$(cut -d= -f2 /tmp/gates-rc.txt)
           selftest_fail=$(cut -d= -f2 /tmp/selftest-fail.txt)
           echo "===== gates.sh ====="; cat /tmp/gates-run.txt
