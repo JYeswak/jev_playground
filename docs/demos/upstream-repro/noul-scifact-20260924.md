@@ -155,6 +155,17 @@ label and rationale selection were not measured. The pairs are public and may be
 training data. Nothing was tuned after the answers came back. Awaiting a non-author re-score from the
 committed rows before the bead closes.
 
+**Haiku run-to-run variance, measured afterwards by someone other than the author** (VerifySST5,
+bead `jev-x5k`, bar `af2906b`, result `752b38b`; `NEGATIVE_EVIDENCE.md` R89). Three Haiku runs on the
+same 400 pairs, scored against the committed Jev rows. VerifySST5's preregistered rule counts a win
+only if it holds on all three runs. Under that rule two of the wins above are **retracted**:
+- AUC was a WIN, a TIE (−0.0021 to +0.0393) and a WIN.
+- ECE was a WIN, a WIN and a TIE (−0.0495 to +0.0050).
+
+The rest held. Brier was a WIN on 3/3 runs, accuracy was a TIE on 3/3, and no run was a Haiku win,
+so the PASS stands. The direction favoured Jev on every run. The claim that holds up is: Jev is better
+on Brier and not worse on anything. The AUC and ECE margins are within Haiku's run-to-run spread.
+
 ## Non-author verification — VerifySST5
 
 VerifySST5 (background agent of pane 1; not the author), 2026-09-24, keyless, from a fresh
