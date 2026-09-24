@@ -26,9 +26,12 @@ git -C "$REPO" rev-parse --git-dir >/dev/null 2>&1 || { echo "ERROR: $REPO is no
 
 # The test-file shape this lane recognizes. Vendored clones are gitignored, so `git ls-files`
 # already scopes this to first-party code — that is the whole reason it can be exhaustive.
+# `[cm]?` (2026-09-24, MaintFixes report): the old `\.test\.[tj]s$` skipped every `.test.mjs` outside
+# a test/ directory, and five such suites (two omp hooks among them) went unregistered while this
+# stage stayed green. The reverse-direction regex below had the same hole.
 list_tracked() {
     git -C "$REPO" ls-files \
-      | grep -iE '(^|/)(test|tests)/|\.test\.[tj]s$|\.spec\.[tj]s$|_test\.py$|test_.*\.py$|probe.*\.mts$' \
+      | grep -iE '(^|/)(test|tests)/|\.test\.[cm]?[tj]s$|\.spec\.[cm]?[tj]s$|_test\.py$|test_.*\.py$|probe.*\.mts$' \
       | sort
 }
 
@@ -49,7 +52,7 @@ check() { # check <registry-file>
     while IFS= read -r f; do
         [ -n "$f" ] || continue
         [ -e "$REPO/$f" ] || { echo "  DRIFT  named in TESTS.md but absent from the tree: $f"; stale=$((stale + 1)); }
-    done <<< "$(grep -oE '[A-Za-z0-9_./-]+\.(test|spec)\.[tj]s|[A-Za-z0-9_./-]*probe[A-Za-z0-9_./-]*\.mts' "$reg" | sort -u)"
+    done <<< "$(grep -oE '[A-Za-z0-9_./-]+\.(test|spec)\.[cm]?[tj]s|[A-Za-z0-9_./-]*probe[A-Za-z0-9_./-]*\.mts' "$reg" | sort -u)"
 
     if [ "$missing" -eq 0 ] && [ "$stale" -eq 0 ]; then
         echo "70-tests-registry-sync: $(printf '%s\n' "$tracked" | grep -c .) tracked test file(s), all enumerated"
@@ -69,6 +72,21 @@ if [ "${1:-}" = "--selftest" ]; then
         exit 1
     fi
     echo "  selftest PASS  known-bad (registry with a path removed) went RED"
+    # KNOWN-BAD, .mjs: a registry missing a tracked .test.mjs that lives OUTSIDE any test/ dir must
+    # go RED and name it. Before the [cm]? fix this arm passed silently (the file was never scanned).
+    mjs="work/jev-claim-check/claim-check.test.mjs"
+    git -C "$REPO" ls-files --error-unmatch -- "$mjs" >/dev/null 2>&1 \
+      || { echo "SELFTEST FAIL: plant source $mjs is not tracked; pick another .test.mjs outside test/" >&2; exit 1; }
+    grep -vF "$mjs" "$REG" > "$tmp"
+    if out=$(check "$tmp" 2>&1); then
+        echo "SELFTEST FAIL: a registry missing tracked $mjs passed (the .mjs hole)" >&2
+        exit 1
+    fi
+    case "$out" in
+        *"not named in TESTS.md: $mjs"*) ;;
+        *) echo "SELFTEST FAIL: RED fired, but did not name $mjs" >&2; exit 1 ;;
+    esac
+    echo "  selftest PASS  known-bad (.test.mjs outside test/ removed) went RED and named it"
     # KNOWN-GOOD: the real registry must pass.
     if ! check "$REG" >/dev/null 2>&1; then
         echo "SELFTEST FAIL: the real registry does not pass — fix TESTS.md, not this gate" >&2
