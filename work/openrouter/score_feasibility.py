@@ -7,8 +7,10 @@ with no answered row is failed with its last error. Level and error use jev-zui'
 (work/score-sst5/score.py), and accuracy/MAE are descriptive only: 50 rows decide nothing about
 quality.
 
-Run: python3 work/openrouter/score_feasibility.py
+Run: python3 work/openrouter/score_feasibility.py [--run2]
 Exit 1 when a row file is missing for any model. Stdlib only, no key, no network.
+--run2 (bead jev-3e2i) reads FREE_STRUCTURED_RUN2 and the rows-sst5-<model>-run2.jsonl files of the
+paced run (docs/demos/upstream-repro/openrouter-free-feasibility-2-20260924.md); nothing else changes.
 """
 
 import importlib.util
@@ -33,9 +35,9 @@ def load_mod(name, path):
 
 
 # provider.py imports the adapter; reading its model list must not need it, so parse the tuple.
-def free_models():
+def free_models(name="FREE_STRUCTURED"):
     src = open(os.path.join(HERE, "provider.py")).read()
-    block = src.split("FREE_STRUCTURED = (", 1)[1].split(")", 1)[0]
+    block = src.split(f"\n{name} = (", 1)[1].split(")", 1)[0]
     return [
         line.strip().strip(",").strip('"')
         for line in block.splitlines()
@@ -43,9 +45,10 @@ def free_models():
     ]
 
 
-def rows_path(model):
+def rows_path(model, suffix=""):
     return os.path.join(
-        HERE, "rows-sst5-" + model.replace("/", "__").replace(":", "_") + ".jsonl"
+        HERE,
+        "rows-sst5-" + model.replace("/", "__").replace(":", "_") + suffix + ".jsonl",
     )
 
 
@@ -59,7 +62,7 @@ def error_class(msg):
     return msg.split(" | ")[0][:160]
 
 
-def main():
+def main(run2=False):
     s5 = load_mod("score_sst5", os.path.join(ROOT, "work/score-sst5/score.py"))
     sample = s5.load_jsonl(os.path.join(ROOT, "work/score-sst5/sample.jsonl"))[:N_ROWS]
     label = {s["i"]: s["label"] for s in sample}
@@ -69,8 +72,8 @@ def main():
     )
     print("|---|---:|---:|---:|---:|---:|---|---|---|")
     details = []
-    for model in free_models():
-        path = rows_path(model)
+    for model in free_models("FREE_STRUCTURED_RUN2" if run2 else "FREE_STRUCTURED"):
+        path = rows_path(model, "-run2" if run2 else "")
         if not os.path.exists(path):
             missing.append(model)
             print(f"| `{model}` | not run | | | | | | | |")
@@ -134,4 +137,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(run2="--run2" in sys.argv[1:]))
