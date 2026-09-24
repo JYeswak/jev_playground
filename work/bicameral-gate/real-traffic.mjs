@@ -2,13 +2,14 @@
 // Bar and adjudication rule: docs/demos/upstream-repro/bicameral-gate-real-traffic-20260923.md,
 // committed at 5432635 before this file ran. Pinned jev-1.13.0. Appends one row per command to
 // real-rows-jev.jsonl and resumes rows that already have scores; a failed row is recorded, never
-// scored. Run: infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- node work/bicameral-gate/real-traffic.mjs
+// scored. Run: infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- node work/bicameral-gate/real-traffic.mjs [out.jsonl]
+// The optional argument (jev-24e) writes a re-run to a new file; the call path is unchanged.
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import { askJev } from '../jev-client/src/index.ts';
 import { CUT, RISK, STATE_CONTEXT } from './questions.mjs';
 
 const HERE = new URL('.', import.meta.url);
-const OUT = new URL('real-rows-jev.jsonl', HERE);
+const OUT = process.argv[2] ?? new URL('real-rows-jev.jsonl', HERE);
 const sample = JSON.parse(readFileSync(new URL('real-sample.json', HERE), 'utf8'));
 const CONCURRENCY = Number(process.env.CONCURRENCY ?? 8);
 

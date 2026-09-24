@@ -292,6 +292,10 @@ def run_jev(variant, rows, path):
 
 def main():
     rows = load_rows()
+    # jev-24e re-runs: `run-b.py original|criteria <out.jsonl>` runs one Jev arm into a new file.
+    # Same questions(), jev_one() and client as the three-arm run below.
+    if len(sys.argv) == 3 and sys.argv[1] in ("original", "criteria"):
+        return run_jev(sys.argv[1], rows, sys.argv[2])
     code = run_jev("original", rows, os.path.join(HERE, "real-rows-b-original.jsonl"))
     if code:
         return code
