@@ -100,4 +100,94 @@ not gold. FEVER dev is public and may be in either model's training data.
 
 ## Results
 
-Pending: filled in after both arms run.
+The bar was committed at `834a569` before either arm made a call. Both arms ran on 2026-09-24
+between 02:50 and 02:52 UTC. Each answered 400/400 on the first pass with 0 error rows. Rows:
+`work/noul-fever/rows-jev.jsonl` (sha256 `8de7c43a…4c706acd7`) and
+`work/noul-fever/rows-haiku.jsonl` (sha256 `c6035a30…abe072bdb`). Re-score with no key (about
+20 s): `python3 work/noul-scifact/score.py work/noul-fever`.
+
+| Arm | Correct at >0.5 | Accuracy | Wilson 95% | AUC | Brier | ECE (10 bins) |
+|---|---:|---:|---|---:|---:|---:|
+| constant: always no (0) | 254/400 | 63.5% | 58.7–68.1% | 0.500 | 0.3650 | 0.3650 |
+| constant: base rate (0.365) | 254/400 | 63.5% | 58.7–68.1% | 0.500 | 0.2318 | 0.0000 |
+| **Jev `jev-1.13.0`** | **379/400** | **94.8%** | 92.1–96.5% | **0.973** | **0.0463** | **0.0376** |
+| **Haiku 4.5 via adapter** | **376/400** | **94.0%** | 91.2–95.9% | **0.957** | **0.0581** | **0.0664** |
+
+| Arm | Answered | Model reported | p50 / p95 latency | Tokens in / out | AUC 95% | Brier 95% | ECE 95% | Distinct noul values |
+|---|---:|---|---|---|---|---|---|---:|
+| Jev | 400/400 | `jev-1.13.0` (all rows) | 159 / 378 ms | 158,899 / 8,000 | 0.954–0.989 | 0.030–0.065 | 0.025–0.062 | 47 |
+| Haiku | 400/400 | `anthropic/claude-haiku-4-5` | 678 / 1,251 ms | 231,100 / 4,771 | 0.935–0.976 | 0.038–0.080 | 0.047–0.092 | 17 |
+
+Paired on the same 400 rows. The bootstrap intervals are Jev minus the other arm:
+
+| Jev vs | Jev-only correct | Other-only correct | McNemar p | Accuracy | AUC diff 95% | AUC | Brier diff 95% | Brier | ECE diff 95% | ECE |
+|---|---:|---:|---:|---|---|---|---|---|---|---|
+| always no | 140 | 15 | 1.3e-26 | WIN | +0.454 to +0.489 (vs 0.5) | WIN | −0.371 to −0.269 | WIN | −0.376 to −0.269 | WIN |
+| base rate | 140 | 15 | 1.3e-26 | WIN | same as above | WIN | −0.207 to −0.163 | WIN | n/a (0 by construction) | — |
+| **Haiku** | 6 | 3 | 0.51 | **TIE** | +0.003 to +0.031 | **WIN** | −0.023 to −0.002 | **WIN** | −0.041 to −0.008 | **WIN** |
+
+**Adapter zero-mass check (jev-mly requirement).** `debug` was recorded on 400/400 Haiku rows.
+`probability_errors` was set on 0 and zero-mass (original sum 0) on 0, so the "without them" scoring
+drops 0 rows and is the tables above. This matches the source reading in the bar: a Noul is not
+rescaled. For the record, 205 of Haiku's 400 answers are exactly 0.0 and 5 are exactly 0.5. Those
+are the model's own scalar, not an adapter fill-in, because the adapter has no fill-in path for a
+Noul. Jev returned neither value on any row.
+
+**Pass rule applied.** (1) Accuracy WIN over always-no, AUC interval above 0.5, and Brier WIN over
+the base rate: all yes. (2) No significant Haiku win on any of the four: accuracy TIE, and AUC,
+Brier and ECE all Jev WIN. Both scorings are identical (0 rows dropped). **PASS.** The preregistered
+`NEGATIVE_EVIDENCE.md` trigger did not fire, so no row was written.
+
+**Descriptive, not preregistered.** Calibration by bin (mean noul → fraction true):
+
+| Bin | Jev rows | Jev mean → true | Haiku rows | Haiku mean → true |
+|---|---:|---|---:|---|
+| 0.0–0.1 | 218 | 0.022 → 0.018 | 210 | 0.001 → 0.019 |
+| 0.1–0.2 | 16 | 0.146 → 0.000 | 16 | 0.125 → 0.000 |
+| 0.2–0.3 | 6 | 0.237 → 0.167 | 5 | 0.210 → 0.000 |
+| 0.3–0.4 | 2 | 0.380 → 0.000 | 5 | 0.310 → 0.400 |
+| 0.4–0.5 | 3 | 0.463 → 0.333 | 1 | 0.400 → 0.000 |
+| 0.5–0.6 | 3 | 0.537 → 0.333 | 5 | 0.500 → 0.000 |
+| 0.6–0.7 | 3 | 0.673 → 1.000 | 2 | 0.600 → 0.000 |
+| 0.7–0.8 | 3 | 0.780 → 1.000 | 3 | 0.717 → 0.667 |
+| 0.8–0.9 | 13 | 0.843 → 0.615 | 3 | 0.833 → 1.000 |
+| 0.9–1.0 | 133 | 0.978 → 0.940 | 150 | 0.997 → 0.900 |
+
+By FEVER gold label (correct at >0.5 / mean noul):
+
+| Gold | Rows | Jev | Haiku |
+|---|---:|---|---|
+| SUPPORTS | 146 | 140 (95.9%) / 0.924 | 140 (95.9%) / 0.954 |
+| NEI | 133 | 119 (89.5%) / 0.144 | 117 (88.0%) / 0.159 |
+| REFUTES | 121 | 120 (99.2%) / 0.030 | 119 (98.3%) / 0.022 |
+
+The accuracy gap is small: the two arms disagree on 9 rows, and both miss the same 18. The
+probability gap is where Jev leads. Haiku puts 150 rows at a mean of 0.997, and 90% of them are
+true. Jev puts 133 rows at 0.978, and 94% are true. Jev also spreads its remaining mass over 47
+distinct values against Haiku's 17. As on SciFact, NEI (on-topic evidence that does not settle the
+claim) is the hardest gold label for both arms.
+
+**Verdict** (`[live]`, N=400 per arm, 2026-09-24). On 400 FEVER `paper_dev` claims with their
+evidence sentences, the SciFact Noul, unchanged, at `jev-1.13.0` beats both constants on every
+metric (94.8% vs 63.5%; AUC 0.973; Brier 0.046 vs 0.232 for the fitted base rate). It does not lose
+to Claude Haiku 4.5 on any metric. Accuracy is 0.8 points higher, which is not significant (McNemar
+6 vs 3, p = 0.51). Jev is significantly better on the three probability metrics: AUC +0.016, Brier
+−0.012 and ECE −0.029, all with bootstrap intervals that exclude 0. Jev answered at 159 ms p50,
+Haiku at 678 ms. This is the second public domain (encyclopedic, after biomedical) where the same
+question gives the same result shape: accuracy tied and calibration won. Both scorings, with and
+without rescaled or zero-mass Haiku rows, are the same, because there were none.
+
+**Spend.** 800 live calls. Jev: 400 calls, 158,899 input / 8,000 output tokens as the API reported;
+at the $0.042 per 1M input rate the criteria receipt states, that is about $0.007. Haiku: 400 calls,
+231,100 input / 4,771 output (adapter totals); [INFERENCE] about $0.25 at $1 / $5 per million
+input / output tokens. Neither figure is an invoice. The two arms use different tokenizers.
+
+**Boundary.** One public set (FEVER `paper_dev`, English Wikipedia), one question wording, one Jev
+version, one Haiku version, one run per arm (no run-to-run variance measured). The accuracy TIE is a
+failure to separate, not equality. The binary collapse is ours. NEI evidence comes from one retrieval
+system (Papelo), not gold annotation. 164 dev claims are outside the pool because copenlu does not
+carry them. Correction to the bar text: its 62 empty-evidence NEI rows cost no claim, because each
+of those 62 claims also has a row with text. Checked after the run, and the sample is unaffected.
+FEVER dev is public and may be in either model's training data.
+Nothing was tuned after the answers came back. The bead waits for a non-author re-score from the
+committed rows before it closes.
