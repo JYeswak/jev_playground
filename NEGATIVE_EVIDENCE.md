@@ -3474,3 +3474,36 @@ a planted-injection corpus exists to score them against.
 **NO-CLAIM.** This does not measure recall on tool output: the attacks are chat prompts. It says
 no context-free state tested here clears both sides of the proxy bar, so no `tool_result` hook
 was built.
+
+## R83 — FAILED BAR: jev_claim_check catches a changed number in a bead close reason
+
+**Claim (jev-10t):** the `jev_claim_check` Noul ("Does the evidence support the claim?", cuts 0.8 /
+0.2), asked about a bead's close reason against the files and commits it cites, catches at least
+half of reasons with one number changed. It calls no more than 10% of them supported, reaches
+AUC 0.70, and lowers p on at least 60% of pairs.
+
+**Measured (2026-09-24, ClaimCheckTool, bar `a10c0a3` before any call, pinned jev-1.13.0):** 34 real
+closes from 2026-09-23/24 and 31 planted twins. Catch **0/31**. 4/31 planted called supported,
+among them `75/219 -> 35/219` against evidence that says `75/219` three times (p 0.91) and
+`189/189 -> 689/189`, a fraction over 1 (p 0.83). AUC 0.598. p lower on the plant on 20/31 pairs
+(the only criterion met). Real: 8 supported, 26 unsure, 0 unsupported. A post-hoc check on the
+four approved plants, clause only (n=4, not preregistered), moved two to unsure and left `689/189`
+and `942/567` supported.
+
+Receipt: `docs/demos/upstream-repro/close-reason-check-20260924.md`. Re-score:
+`python3 work/jev-claim-check/score-close.py`.
+
+**Retry condition.** Retry only with claims split into single-number clauses before the call (a
+rule committed with the bar), each checked against a window around that number in its cited file,
+and with plants inside those clauses. Or with a question that names the number and asks whether
+the evidence states that exact value. Keep a paired bar. Retry the long-reason form only after a
+number-exact question clears the clause form. On README sentences (`jev-sp5`), number-changed
+plants were caught 7/9, so the retry should say which of claim length and evidence size carries the
+gap.
+
+Do not retry by lowering the unsupported cut. Planted p ran 0.26–0.91 (median 0.43), real p ran
+0.23–0.93 (median 0.50), so no cut separates them. Do not build a close-time hook or gate on this
+question as it stands.
+
+**NO-CLAIM.** Says nothing about whether any close reason is wrong: the tool called none unsupported
+and passed four wrong numbers, so its silence is not evidence either way.

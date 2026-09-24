@@ -55,3 +55,68 @@ call, so the catch-rate measures this kind of error only. Close reasons bundle s
 (commands run, reviewers, commits); the tool sees one sentence against the resolved evidence, and
 a reason that cites a check run in `/tmp` or recorded only in a bead comment can be true and still
 unsupported by any committed file.
+
+## Results
+
+Bar committed at `a10c0a3` (02:57:52Z) before any call. Calls ran 02:57:59Z–02:58:09Z, 65/65 answered on the first pass,
+0 `not_run`, 0 `refused`. Rows: `work/jev-claim-check/close-rows.jsonl`. Re-score with no key:
+`python3 work/jev-claim-check/score-close.py` (exit 1 = FAIL).
+
+| Set | supported | unsure | unsupported |
+|---|---:|---:|---:|
+| 34 real close reasons | 8 | 26 | **0** |
+| 31 planted twins (one number changed) | **4** | 27 | **0** |
+
+| Metric | Tool | always `supported` | always `unsupported` | Bar | Met |
+|---|---:|---:|---:|---|---|
+| (a) planted called `supported` | 4/31 | 31/31 | 0/31 | <= 3 | **no** |
+| (b) catch-rate | **0/31** | 0/31 | 31/31 | >= 16 | **no** |
+| (c) AUC real vs planted | 0.598 | 0.5 | 0.5 | >= 0.70 | **no** |
+| (d) paired p(planted) < p(real) | 20/31 | 0/31 | 0/31 | >= 19 | yes |
+
+**FAIL** (`[live]`, N=65, `jev-1.13.0`). Three of four criteria missed. The tool called no planted
+reason `unsupported`, including the 25 whose original number sits in the evidence (0/25 caught, 3
+of them called `supported`). The change moves p down a little on most beads (20 of 31 lower, 3
+ties, 8 higher; mean drop 0.055; mean p real 0.559, planted 0.491). That is a weak signal and not
+a verdict.
+
+**Four plants were called `supported`.** Each is a wrong number the tool approved:
+
+| Bead | Changed | Original number in evidence | Plant p |
+|---|---|---|---:|
+| `jev-k9z.1` | `75/219` -> `35/219` | 3 times (`Jev top-1 | 75/219 = 0.3425`) | 0.91 |
+| `jev-deep-kit-8q7.7` | `0.6846` -> `0.2846` | once (the AUROC table) | 0.83 |
+| `jev-hwa` | `189/189` -> `689/189` (a fraction over 1) | 4 times | 0.83 |
+| `jev-deep-kit-8q7.6` | `442/567` -> `942/567` (over 1) | not in the window | 0.87 |
+
+**Real reasons.** None was called `unsupported`, so there is no close reason to read as a
+misstatement: **this run found no wrong close reason, and it could not have**, since the same
+tool passed four wrong numbers. 8 of 34 were called `supported`. 26 were `unsure` (p 0.23–0.75).
+The lowest real p (0.23–0.28: `jev-qbc`, `jev-deep-kit-8q7.3`, `jev-publish-scrub-b94`) are long
+reasons at the 12,000-character cap that list commands, re-runs and reviewers, most of which no
+committed file states. On this corpus, `unsure` is the tool saying the reason bundles more than the
+evidence shows. It is not a finding against any close.
+
+**Post-hoc diagnostic, not preregistered, cannot change the verdict** (8 extra calls,
+`work/jev-claim-check/close-atomic-diagnostic.jsonl`). For the four approved plants, only the clause
+holding the changed number was sent against the same evidence, with the real clause as a control.
+Real clauses: 4/4 `supported` (0.87–0.98). Planted clauses: `jev-k9z.1` 0.63 and `jev-deep-kit-8q7.7`
+0.53 dropped to `unsure`; `jev-hwa` 0.89 (`689/189`) and `jev-deep-kit-8q7.6` 0.82 (`942/567`) stayed
+`supported`. Short claims help, but the Noul still approves a fraction over 1 that contradicts the
+evidence 4 times. This question, at this cut, does not check a number against the evidence.
+
+**Contrast with `jev-sp5`.** On README sentences (one claim each, about 6,000 characters of
+evidence), number-changed plants were caught 7/9. Here the claims are multi-claim close reasons and
+the evidence is up to 12,000 characters. Both runs are one wording and one version. The difference is
+consistent with claim length and evidence size, but this run does not isolate either.
+
+**Negative evidence.** Written as `NEGATIVE_EVIDENCE.md` R83 with its retry condition.
+`check-close.mjs` stays as a keyless evidence resolver (`--dry`) and a live advisory check. **No
+hook, gate or close-time check is built on it.**
+
+**Spend.** 73 Jev calls: 65 scored (230,484 input / 1,300 output tokens reported by the API, p50
+140 ms, p95 227 ms) and 8 diagnostic. Jev's billed units were not read and are not stated.
+
+**Boundary.** One run, one wording, one Jev version, 34 closes by this lane's own agents on two days.
+One of them, `jev-sp5`, closes my own previous unit. The plants are mechanical one-digit changes.
+The diagnostic is post hoc and n = 4. Awaiting a non-author re-score from the committed rows.

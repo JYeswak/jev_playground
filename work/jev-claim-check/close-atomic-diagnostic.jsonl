@@ -1,0 +1,8 @@
+{"bead":"jev-k9z.1","kind":"real","claim":"Live 75/219 top-1 (lower-CI 0.2828 < lexical 0.3242)","verdict":"supported","probability":0.87}
+{"bead":"jev-k9z.1","kind":"planted","claim":"Live 35/219 top-1 (lower-CI 0.2828 < lexical 0.3242)","verdict":"unsure","probability":0.63}
+{"bead":"jev-deep-kit-8q7.7","kind":"real","claim":"use-once re-ran single 0.6846 vs combination 0.9872 (+30.3pts","verdict":"supported","probability":0.96}
+{"bead":"jev-deep-kit-8q7.7","kind":"planted","claim":"use-once re-ran single 0.2846 vs combination 0.9872 (+30.3pts","verdict":"unsure","probability":0.53}
+{"bead":"jev-hwa","kind":"real","claim":"no green-while-throwing vs JS 189/189+8 rejections.","verdict":"supported","probability":0.91}
+{"bead":"jev-hwa","kind":"planted","claim":"no green-while-throwing vs JS 689/189+8 rejections.","verdict":"supported","probability":0.89}
+{"bead":"jev-deep-kit-8q7.6","kind":"real","claim":"VERDICT: bar FAILED as written (442/567 substantial refused)","verdict":"supported","probability":0.98}
+{"bead":"jev-deep-kit-8q7.6","kind":"planted","claim":"VERDICT: bar FAILED as written (942/567 substantial refused)","verdict":"supported","probability":0.82}
