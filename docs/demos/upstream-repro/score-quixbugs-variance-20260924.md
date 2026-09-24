@@ -111,3 +111,8 @@ output). [INFERENCE] The Haiku arm is about $0.17 at list price.
 **Boundary.** Three runs per arm within minutes, 40 pairs, one wording, one Jev version, one Haiku
 configuration. The one TIE pairing is the pairing of both arms' third runs, so this is a sampling
 result, not a trend. A non-author spot-check is needed before the bead closes.
+
+**Keyless fresh-clone re-score** (`[oracle]`, author-run). A `git clone` of `505701b` into
+`/tmp/claimcheck-qb-clone`, with `TYPESAFE_API_KEY` and `ANTHROPIC_API_KEY` unset.
+`python3 work/score-quixbugs/variance.py` exits 0 and prints the verdicts above (DOWNGRADED 8/9, AUC
+TIE stands, PASS 9/9). `score.py` still prints `jev-2wc`'s committed run-1 result (12 vs 2 WIN, PASS).
