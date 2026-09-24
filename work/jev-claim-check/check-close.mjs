@@ -33,7 +33,8 @@
 //   (d+4)%9+1 (1->6, 2->7, ..., 5->1, 9->5), so the value always changes and never gains a leading
 //   zero. A reason with no eligible token gets no plant.
 import { execFileSync } from "node:child_process";
-import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
 import toolMod from "../../.omp/tools/jev-claim-check.ts";
 
@@ -239,7 +240,7 @@ async function run() {
   return failed ? 3 : 0;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   const args = process.argv.slice(2);
   let code;
   if (args[0] === "--build") code = build(args.slice(1));

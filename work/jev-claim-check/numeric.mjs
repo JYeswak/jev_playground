@@ -27,7 +27,8 @@
 //   build refuses a plant equal to any jev-10t plant claim or jev-10t diagnostic clause. A planted
 //   claim's checks whose (clause, value) equal a real check reuse that real answer; only changed
 //   checks are asked.
-import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
 import { askJev } from "../jev-client/src/index.ts";
 import { classify } from "../../.omp/tools/jev-claim-check.ts";
@@ -50,7 +51,7 @@ export const QUESTION = {
 
 const lines = (url) => readFileSync(url, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
 
-function mulberry32(a) {
+export function mulberry32(a) {
   return () => {
     a |= 0;
     a = (a + 0x6d2b79f5) | 0;
@@ -60,7 +61,7 @@ function mulberry32(a) {
   };
 }
 
-function clauseAt(claim, at) {
+export function clauseAt(claim, at) {
   const cuts = [0];
   for (const m of claim.matchAll(/(?<=[.!?])\s+|;\s+|,\s+|\s+\(|\)/g)) cuts.push(m.index, m.index + m[0].length);
   cuts.push(claim.length);
@@ -89,7 +90,7 @@ function checksFor(claim) {
   return out;
 }
 
-function mutate(token) {
+export function mutate(token) {
   const runs = [...token.matchAll(/\d+/g)].filter((m) => /[1-9]/.test(m[0]));
   const run = runs[0];
   const i = run.index + run[0].length - 1;
@@ -166,7 +167,7 @@ async function run() {
   return failed ? 3 : 0;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   const arg = process.argv[2];
   process.exit(arg === "--build" ? build() : arg === "--run" ? await run() : (console.error("usage: numeric.mjs --build | --run"), 64));
 }
