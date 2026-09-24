@@ -1,6 +1,6 @@
 repo	is_fork	pushed_at	mirrored	description
-system-one-adapter-python	false	2026-09-18T10:47:48Z	yes	Drop-in TypeSafeClient replacement backed by LLM APIs
-typesafe-sdk-python	false	2026-09-18T09:11:54Z	yes	The official Python library for the TypeSafe API
+system-one-adapter-python	false	2026-09-22T12:24:32Z	yes	Drop-in TypeSafeClient replacement backed by LLM APIs
+typesafe-sdk-python	false	2026-09-21T15:57:12Z	yes	The official Python library for the TypeSafe API
 typesafe-sdk-js	false	2026-09-15T18:16:49Z	yes	The official TypeScript/JavaScript library for the TypeSafe API
 skills	false	2026-09-12T05:42:06Z	yes	Agent skills for building with TypeSafe's System One API
 daggerverse	false	2026-09-09T10:46:36Z	no	Collection of useful Dagger modules
