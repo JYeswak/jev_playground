@@ -253,3 +253,42 @@ close reason contains a number. Their committed rows and frames record the tool 
 **NO-CLAIM.** The refusal is a scope rule, not a measurement. It over-refuses qualitative sentences
 that happen to mention a number ("Seventeen stages", spelled out, pass; "17 stages" refuses).
 `.omp/config.yml` was not touched.
+
+## Non-author verification of the numeric scope (VerifySST5, 2026-09-24, bead `jev-5cz`)
+
+VerifySST5 (background agent of pane 1; not the author). Keyless, from fresh `git clone --local`
+copies: a partial checkout at `dcf364b` and a full checkout at `31ef8a2`. The tool is unchanged
+since `4fcd20c`. No live call was made; spend $0. My own probe drove `execute()` with a counting
+fake asker (`/tmp/verifysst5.S3Nh/5cz-probe.mjs`, left in place).
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `node --test work/jev-claim-check/claim-check.test.mjs`, no key | HOLDS. 10/10 at `dcf364b` and again at `31ef8a2`. |
+| 2 | My probe: `75/219`, `2.6e-13`, `96.0%` | HOLDS. Each returns `verdict=refused`, `reason=numeric-out-of-scope`, `calledModel=false`, with the asker never called. The text names the number found. |
+| 3 | My probe: dates, versions, names | HOLDS. `2026-09-24 at 03:18Z`, `version 1.13.0`, `jev-1.13`, `SST-5` and `top-1` reach the asker and get a verdict. |
+| 4 | Planted regression in the scratch copy | HOLDS. Deleting the refusal line (sha256 `a43934e2…` → `bb319564…`, the same mutant the author made) turns test 8 red (9/10, exit 1). The copy was restored from a byte copy (`a43934e2…`, equal to `git show HEAD:`) and passes 10/10 again. |
+| 5 | Both case files rebuild after the tokenizer move | HOLDS in a full checkout: `numeric-v2.mjs --build` gives sha256 `f2a82e45…`, blob `5c6a258c`. `numeric-choice.mjs --build` gives `5dbf534e…`, blob `7d65c2b9`. Both equal HEAD and `4fcd20c^`. Note: in a partial checkout they differ (10 and 6 rows), because `references()` blanks only paths that exist in the working tree, so an absent receipt's `:9-15` becomes a number. Rebuild from a full checkout. |
+| 6 | L3 frames at lines 139 and 143 of `l3-scope-frames.jsonl` | HOLDS. Line 139 is `jev_claim_check`: claim "Its own suite passes 189 tests…" → refused, `numeric-out-of-scope`, `calledModel=false`, numbers `189, 1`. Line 143: claim "The clone was left untouched…" → supported, p = 0.86, `calledModel=true`, 1,100 / 20 tokens. Both have evidence of 2,055 characters, as the receipt says. |
+| 7 | The flagged interpretation: 20 qualitative sentences for the "non-numeric README" set | HOLDS as a reading. Of jev-sp5's 19 true README claims, 18 contain a number and test 8 refuses all 18. The only non-numeric one is `official-sdk`, which test 9 keeps. One sentence would barely test "non-numeric sentences still get verdicts", so adding 19 qualitative README sentences is a fair reading. Two limits: (a) the 19 are selected by `claimNumbers() == []`, so the test checks the path after the tokenizer, not the tokenizer's precision; (b) they are read from the live `README.md`, not frozen. Today's set is identical to the one at `4fcd20c` (19/19). |
+
+**One finding the acceptance does not cover: the refusal misses numbers glued to a unit.** The
+tokenizer skips a token followed by a letter, which is how it keeps bead ids and shas out. So these
+claims reach the model and get a verdict:
+- `Jev is 7.7x faster.` (a figure `confidence-cascade-20260924.md:149` reports in this form)
+- `Haiku costs 26x more per call.`
+- `It answered in 130ms.`
+- `About 10k rows.`
+- `Jev won 25v3.`
+
+`855 ms`, `$0.51`, `N=400`, `p<0.05` and `+5.5 pp` do refuse. The model-facing description promises
+that "a claim containing any number (count, score, fraction, percent, p-value) is refused". For
+these forms it is not, so a calling model that trusts the description gets a Noul verdict on
+exactly the kind of claim R83 closed. The bead's WHAT defines "contains a number" as this
+tokenizer, so the letter of the spec is met. Its WHY (the limit should not have to be rediscovered)
+and the description are not. Narrowing the description, or counting a digit run followed by a
+unit suffix, are both small. A tokenizer change would change the frozen jev-h8s/jev-25r case files,
+so it needs a decision.
+
+Verdict: every listed check holds. The bead is **left open** on the under-refusal above; see the
+bead comment. I also saw the over-refusal the receipt's NO-CLAIM names (`Rule 14 in AGENTS.md`
+refuses). NO-CLAIM: keyless probes and re-runs only, no live call, and no L3 re-run.
