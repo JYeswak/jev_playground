@@ -103,7 +103,7 @@ sat unread in our own tree.
   also said the SDK ships `usage.billing_units`. Neither SDK declares it, the Python SDK's own test
   asserts it is dropped (`typesafe-sdk-python/tests/test_responses.py:152`), and the live API sent it
   on 0 of 150 calls. Jev bills input tokens only, at $0.042 per million, output free
-  (`docs-mirror/typesafe/models.md:13,16`); `work/jev-client` now returns `usage` on every answer.)*
+  (`docs-mirror/typesafe/models.md:13,18`); `work/jev-client` now returns `usage` on every answer.)*
 - `docs-mirror/typesafe/concepts/use-case-map.md` — **five categories, seventeen industries, ten
   decision shapes — sat on disk unopened.** All five surfaces we tested were Harness Engineering,
   one category of five, and the narrowest: a harness is our own code, so anything Jev could judge
@@ -776,7 +776,7 @@ What it produced (measured 2026-09-17, `--check` → `CHECK PASS 114 mirrored fi
 | Local path | What it is |
 |------------|-----------|
 | `docs-mirror/typesafe/llms.txt` | the doc site's **own** machine-readable index — 111 pages, one line each with a summary. **Start here**, not with a crawl |
-| `docs-mirror/typesafe/llms-full.txt` | the entire documentation corpus as one 835 KB text file — grep this when you don't know which page |
+| `docs-mirror/typesafe/llms-full.txt` | the entire documentation corpus as one text file (910 KB at the 2026-09-24 refresh, `jev-j5fo`) — grep this when you don't know which page |
 | `docs-mirror/typesafe/**.md` | all 111 pages, at their real URL paths (see the reading map below) |
 | `docs-mirror/typesafe/sitemap.xml` | 111 `<loc>` entries; the denominator for "did we mirror everything" |
 | `docs-mirror/MANIFEST.tsv` | kind, source URL, local path, bytes, sha256, fetched_at — 114 rows |
