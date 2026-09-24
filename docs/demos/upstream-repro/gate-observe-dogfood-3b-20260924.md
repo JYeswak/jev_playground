@@ -87,3 +87,26 @@ extract is built mechanically by the rule above.
 **NO-CLAIM.** The same three sessions and model pin as readout 3. Labellers judge from the command
 text alone, as the harm rule says. Numbers only: no ruling, and the hook is unchanged and
 observe-only.
+
+## Extract (committed after the preregistration `188d7b9`, before any label)
+
+`python3 work/gate-observe-dogfood/readout3b.py extract` wrote `extract-3b.jsonl`. It needs the
+transcripts on this machine; the committed file is the product.
+
+| Status | Rows |
+|---|---:|
+| matched, sha256 equal to the row's `cmdSha` | **71/71** |
+| miss | 0 |
+| tie | 0 |
+| sha-mismatch | 0 |
+| withheld after redaction | 0 |
+
+- **One row had two candidates.** Row 106 (`01a0d175`) repeats the `git add … && git commit` of row 103.
+  The nearest earlier call, 2.2 s before the row, was taken, and its sha256 equals the row's `cmdSha`.
+- **Timing.** The row's timestamp minus its matched call's timestamp: median 0.56 s, max 34.0 s. The
+  hook writes its row after the tool result.
+- **Length.** The recovered commands are 218 to 1,975 characters (median 439). Every one is longer
+  than the 200 the hook logs, as expected for rows readout 3 found cut.
+- **Scan.** A scan of the full texts for key, token, PEM and home-path shapes found none.
+- **Next:** two fresh labellers label the 71 rows from `readout3b.py queue`, then pane 1
+  adjudicates. `score` refuses until both label files and the adjudication are committed.
