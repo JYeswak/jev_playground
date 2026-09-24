@@ -117,6 +117,41 @@ shared with the other lanes, so free cells finish over several UTC days.
 per row, not pinned). A HOLD says the win is not specific to Haiku or grok for that model. It does
 not generalize to every LLM.
 
+## Amendment 1: STS-B added (pane 1, 2026-09-24; committed before any call on any set)
+
+Made after the bar at `97bbad6` and before any comparator call on any set, STS-B included. No row
+existed when this was written. Nothing above changes; this section adds a sixth set.
+
+| Set (unit) | Rows | Wins under test | Committed Jev runs |
+|---|---:|---|---|
+| STS-B dev Score (`jev-jzzs`, pane 2; bar `8e4bda9`, result `d6d39e3`) | 1,500 | Spearman WIN **and** MAE WIN (both held 9/9 against grok) | `rows-jev.jsonl`, `-run2`, `-run3` @ `d6d39e3` |
+
+- **Inputs.** The question is jev-jzzs's: one Score, *"How similar in meaning are these two
+  sentences?"*, with its six SemEval-2015 criteria (`QUESTION_CRITERIA`, read from
+  `work/score-stsb/run.py` @ `8e4bda9`). The state is `{"sentence1", "sentence2"}`. The pairs come
+  from that runner's own `fetch_pairs()`: the public STS-B dev CSV, sha256-pinned, 1,500 rows,
+  refused on mismatch. **Sentence text is never written to a row or committed**, per that unit's
+  license note. Its scorer refuses any row carrying `sentence1`, `sentence2`, `text` or `state`.
+  Public benchmark rows only, as for the other sets. The instruction literal lives inside that
+  runner's `main()`, so the runner restates it. `test_run.py` checks that the literal is present
+  in the pinned source, now 6/6 tests.
+- **Verdict rules: jev-jzzs's own, imported** from `work/score-stsb/score.py`: Spearman by 2,000
+  paired bootstrap resamples (seed 20260924, WIN if the 95% interval is above 0), MAE by exact sign
+  test, exact level by McNemar, and a failed row gets the far endpoint. **Pass:** that Jev run
+  beats both floors (always-mean, always-mode) on MAE and exact level, and no comparator LOSE on
+  Spearman, MAE or exact level. **The win HOLDS** only if Spearman and MAE are both WIN against
+  every Jev run in every reading.
+- **Everything else as above:** zero-mass readings (all rows, and zero-mass rows dropped), the
+  16-row probe and prompted fallback, quota rows as BLOCKED, the 1% failed-row ceiling (15 rows),
+  one resume pass, and NEGATIVE_EVIDENCE for a win that does not hold or any LOSE.
+- **Order.** Paid models run STS-B with the other sets. Free models take STS-B **last**, after
+  CLINC150, because its 1,500 rows are the largest draw on the shared 1,000-a-day free pool.
+- **Self-check, keyless:** `score.py --selfcheck` now also scores jev-jzzs's committed grok run 1
+  as a comparator. It reproduces that unit's J1 x G1 pairing: Spearman WIN; MAE 792 vs 694,
+  p = 0.0118, WIN; exact 343 vs 312, TIE; pass. It still reproduces all five earlier headlines.
+- **Spend, planned, added:** 2 x 1,500 paid calls. With grok's STS-B use (about 640 input tokens a
+  call) plus reasoning output, that is under $1 more across both paid models `[INFERENCE]`.
+
 ## Result
 
 NOT_RUN: waiting on jev-14qk's committed table.

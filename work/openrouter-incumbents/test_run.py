@@ -49,6 +49,14 @@ class Inputs(unittest.TestCase):
         )
 
 
+class Stsb(unittest.TestCase):
+    def test_question_is_the_pinned_runners(self):
+        source = run.SI.git_show(*run.STSB_PIN)
+        self.assertIn(f'instructions="{run.STSB_INSTRUCTIONS}"', source)
+        runner = run.SI.pinned_module("stsb_runner_test", *run.STSB_PIN)
+        self.assertEqual(len(runner.QUESTION_CRITERIA), 6)
+
+
 class Models(unittest.TestCase):
     def test_refuses_unapproved_paid_model(self):
         env = {"OPENROUTER_API_KEY": "x"}

@@ -32,6 +32,7 @@ def _load(name, relpath):
 JV = _load("jev_variance", "jev-variance/score.py")
 C = _load("clinc_score", "choice-clinc150/score.py")
 NV = _load("noul_variance", "noul-variance/score.py")
+ST = _load("stsb_score", "score-stsb/score.py")
 
 
 def _free_structured():
@@ -94,6 +95,12 @@ SETS = {
     ),
     "scifact": ("noul-scifact", "sample.jsonl", tuple(f for _, f in NV.JEV_RUNS)),
     "fever": ("noul-fever", "sample.jsonl", tuple(f for _, f in NV.JEV_RUNS)),
+    # amendment (jev-jzzs): labels only; sentences never enter this repo
+    "stsb": (
+        "score-stsb",
+        "labels.jsonl",
+        tuple(f"rows-{r}.jsonl" for r in ST.JEV_RUNS),
+    ),
 }
 WIN_UNDER_TEST = {
     "sst5": "MAE sign test WIN",
@@ -101,6 +108,7 @@ WIN_UNDER_TEST = {
     "clinc150": "handled at peak >= 0.60 WIN",
     "scifact": "Brier WIN",
     "fever": "ECE WIN",
+    "stsb": "Spearman WIN and MAE WIN",
 }
 
 
@@ -244,6 +252,36 @@ def v_noul(metric):
     return f
 
 
+def v_stsb(sample, jrows, crows, keep):
+    """jev-jzzs's own tests (score-stsb/score.py): Spearman bootstrap, MAE sign test, exact McNemar;
+    pass part 1 (this Jev run beats both floors on MAE and exact) on all rows."""
+    gold = [s["label"] for s in sample]
+    jp, je, _ = ST.arm_preds(sample, jrows)
+    cp, ce, _ = ST.arm_preds(sample, crows)
+    g = [gold[k] for k in keep]
+    j, c = [jp[k] for k in keep], [cp[k] for k in keep]
+    _, _, sv = ST.bootstrap_spearman(j, c, g)
+    ma, mb, mp, mv = ST.sign_test(j, c, g)
+    ea, eb, _, ev = ST.mcnemar([je[k] for k in keep], [ce[k] for k in keep])
+    n = len(gold)
+    floors = []
+    for pred, exact in (
+        ([ST.MEAN] * n, [ST.rounded(x) == ST.rounded(ST.MEAN) for x in gold]),
+        ([float(ST.MODE)] * n, [ST.rounded(x) == ST.MODE for x in gold]),
+    ):
+        floors.append(
+            ST.sign_test(jp, pred, gold)[3] == "WIN"
+            and ST.mcnemar(je, exact)[3] == "WIN"
+        )
+    loses = "LOSE" in (sv, mv, ev)
+    return {
+        "win": sv == "WIN" and mv == "WIN",
+        "lose": loses,
+        "pass": all(floors) and not loses,
+        "detail": f"Spearman {sv}; MAE {ma}/{mb} p={mp:.3g} {mv}; exact {ea}/{eb} {ev}",
+    }
+
+
 # ---------------------------------------------------------------- one cell
 
 
@@ -300,6 +338,8 @@ def score_cell(dataset, crows_path):
                     none_r = v_clinc150(sample, jrows, crows, keep, zero_as_none=True)
                     res["zero-mass = none"] = none_r
                 res[rname] = shipped
+            elif dataset == "stsb":
+                res[rname] = v_stsb(sample, jrows, crows, keep)
             else:
                 res[rname] = {"sst5": v_sst5, "banking77": v_banking77}[dataset](
                     sample, jrows, crows, keep
@@ -336,30 +376,25 @@ def spend(model, paths):
 
 
 def selfcheck():
-    """Committed Haiku rows through this file's code: the committed headline pairing must reproduce."""
-    expect = {
-        "sst5": True,
-        "banking77": True,
-        "clinc150": True,
-        "scifact": True,
-        "fever": True,
-    }
+    """Each unit's committed incumbent run 1 through this file's code (Haiku; grok for STS-B, which
+    never had a Haiku arm): the committed headline pairing must reproduce."""
     good = True
     for dataset in SETS:
         d = SETS[dataset][0]
-        cell = score_cell(dataset, os.path.join(WORK, d, "rows-haiku.jsonl"))
+        inc = "rows-grok.jsonl" if dataset == "stsb" else "rows-haiku.jsonl"
+        cell = score_cell(dataset, os.path.join(WORK, d, inc))
         first = cell["runs"][0][1]["all"] if cell.get("state") == "SCORED" else None
-        ok = first is not None and first["win"] == expect[dataset] and first["pass"]
+        ok = first is not None and first["win"] and first["pass"]
         good = good and ok
         print(
-            f"  {'ok ' if ok else 'BAD'} {dataset}: Jev run 1 x committed Haiku: {first['detail'] if first else cell}"
+            f"  {'ok ' if ok else 'BAD'} {dataset}: Jev run 1 x committed {inc}: {first['detail'] if first else cell}"
         )
     return good
 
 
 def main(argv):
     print(
-        "Self-check: each unit's committed headline (Jev run 1 x Haiku) through this scorer"
+        "Self-check: each unit's committed headline (Jev run 1 x incumbent run 1) through this scorer"
     )
     if not selfcheck():
         print("self-check failed; nothing else is scored")

@@ -56,11 +56,15 @@ OR = _load("openrouter_provider", "openrouter/provider.py")
 
 BASE_URL = "https://openrouter.ai/api/v1"
 PAID = ("openai/gpt-5-nano", "deepseek/deepseek-v4-flash")
-DATASETS = ("sst5", "banking77", "clinc150", "scifact", "fever")
+DATASETS = ("sst5", "banking77", "clinc150", "scifact", "fever", "stsb")
 FEVER_PIN = {
     "runner": ("834a569", "work/noul-scifact/run.py"),
     "sample": ("834a569", "work/noul-fever/sample.jsonl"),
 }
+# STS-B (jev-jzzs, amendment): runner as of its bar; sentences are fetched at run time from the
+# sha256-pinned public CSV and never written to a row (their licenses do not allow committing them).
+STSB_PIN = ("8e4bda9", "work/score-stsb/run.py")
+STSB_INSTRUCTIONS = "How similar in meaning are these two sentences?"
 FREE_RPM = 15
 FREE_INFLIGHT = 2
 PAID_INFLIGHT = 8
@@ -105,11 +109,45 @@ def provider_for(model):
     )
 
 
+def setup_stsb():
+    """jev-jzzs's question and state, rebuilt from its pinned runner (the instructions literal sits
+    inside that runner's main(); test_run.py checks it is the pinned source's string)."""
+    from typesafe_sdk import Score
+
+    runner = SI.pinned_module("stsb_runner", *STSB_PIN)
+    pairs = runner.fetch_pairs()  # refuses a sha256 or row-count mismatch
+    sample = [{"i": i, "s1": s1, "s2": s2} for i, (s1, s2, _) in enumerate(pairs)]
+    qname = runner.QNAME
+    question = Score(instructions=STSB_INSTRUCTIONS, criteria=runner.QUESTION_CRITERIA)
+
+    def state(item):
+        return {"sentence1": item["s1"], "sentence2": item["s2"]}
+
+    def to_row(item, resp):
+        ans = resp.answers[qname]
+        debug = resp.debug or {}
+        return {
+            "score": float(ans.score),
+            "confidence": float(ans.confidence) if ans.confidence is not None else None,
+            "probabilities": {
+                str(int(k)): float(v) for k, v in ans.probabilities.items()
+            },
+            "probabilityError": (debug.get("probability_errors") or {}).get(qname),
+            "originalProbabilities": (debug.get("original_probabilities") or {}).get(
+                qname
+            ),
+        }
+
+    return sample, {qname: question}, state, to_row
+
+
 def setup(dataset):
     """(rows, questions, state fn, answer->row fn), byte-identical to each unit's incumbent arm.
     Noul rows also keep the adapter's debug so zero-mass answers can be dropped in scoring."""
     if dataset in ("sst5", "banking77", "clinc150"):
         return SI.setup(dataset)
+    if dataset == "stsb":
+        return setup_stsb()
     pin = SI.PINS["scifact"] if dataset == "scifact" else FEVER_PIN
     runner = SI.pinned_module(f"{dataset}_runner", *pin["runner"])
     sample = SI.pinned_rows(*pin["sample"])
