@@ -95,4 +95,7 @@ tokens 19,745,750. Output tokens 4,941,438, almost all of it the 77-way Banking7
 maps. Dollar cost is not stated. Jev spend $0.
 
 **Boundary.** One grok model, one adapter, three runs. Yelp's 9/9 is not a README
-claim. Awaiting a non-author re-score before the bead closes.
+claim. Rows were produced at adapter `adffc2e`; the pin later moved to `e1d4cc9`. This
+scorer does not call the adapter.
+
+Re-score, keyless: `python3 work/grok-incumbent-3/score.py`
