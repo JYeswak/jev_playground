@@ -1,10 +1,12 @@
-"""Dirty or untracked bar: zero asker calls. Reversed pair in /tmp fails."""
+"""Dirty or untracked bar: zero provider calls. Reversed pair in /tmp fails."""
 
 import asyncio
 import importlib.util
+import os
 import subprocess
 import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
 
@@ -63,25 +65,51 @@ class RequireBarTest(unittest.TestCase):
             call_after_bar("bar.md", asker, repo=self.tmp)
         self.assertEqual(calls["n"], 0)
 
-    def test_runner_dirty_bar_makes_zero_calls(self):
+    def test_runner_main_dirty_bar_constructs_no_provider(self):
         bar = Path(self.tmp) / "bar.md"
         bar.write_text("bar\n")
         git(self.tmp, "add", "bar.md")
         git(self.tmp, "commit", "-q", "-m", "[test] bar")
         bar.write_text("dirty\n")
-        calls = {"n": 0}
-        runner = load_runner()
+        constructed = {"n": 0}
 
-        def asker():
-            calls["n"] += 1
+        def boom(*_args, **_kwargs):
+            constructed["n"] += 1
+            raise AssertionError("provider constructed")
 
-        with self.assertRaises(AttemptPanic):
-            asyncio.run(
-                runner.main(
-                    "fever", "run1", asker=asker, bar_path="bar.md", repo=self.tmp
+        fake = types.ModuleType("system_one_adapter")
+        fake.AsyncSystemOneAdapterClient = boom
+        openai = types.ModuleType("system_one_adapter.providers.openai")
+        openai.AsyncOpenAIProvider = boom
+        providers = types.ModuleType("system_one_adapter.providers")
+        providers.openai = openai
+        saved = {}
+        for name, mod in (
+            ("system_one_adapter", fake),
+            ("system_one_adapter.providers", providers),
+            ("system_one_adapter.providers.openai", openai),
+        ):
+            saved[name] = sys.modules.get(name)
+            sys.modules[name] = mod
+        previous = os.environ.get("XAI_API_KEY")
+        os.environ["XAI_API_KEY"] = "test-key-not-used"
+        try:
+            runner = load_runner()
+            with self.assertRaises(AttemptPanic):
+                asyncio.run(
+                    runner.main("fever", "run1", bar_path="bar.md", repo=self.tmp)
                 )
-            )
-        self.assertEqual(calls["n"], 0)
+        finally:
+            if previous is None:
+                os.environ.pop("XAI_API_KEY", None)
+            else:
+                os.environ["XAI_API_KEY"] = previous
+            for name, mod in saved.items():
+                if mod is None:
+                    sys.modules.pop(name, None)
+                else:
+                    sys.modules[name] = mod
+        self.assertEqual(constructed["n"], 0)
 
     def test_clean_committed_bar_calls_once(self):
         bar = Path(self.tmp) / "bar.md"
