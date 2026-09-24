@@ -19,8 +19,10 @@ Inputs are read with `git show` from the commits the Haiku arms used, so they ar
 Run (live, needs XAI_API_KEY; never prints it):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
     upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python \
-    work/second-incumbent/run.py {smoke|scifact|banking77|sst5|clinc150}
+    work/second-incumbent/run.py {smoke|scifact|banking77|sst5|clinc150} [run2|run3]
 Resumes rows that already have an answer. Score with work/second-incumbent/score.py (keyless).
+The optional run tag (bead jev-wu6v, grok variance) writes rows-<dataset>-grok-<tag>.jsonl instead of
+rows-<dataset>-grok.jsonl; the call is unchanged.
 """
 
 import asyncio
@@ -76,8 +78,12 @@ def pinned_rows(sha, relpath):
     ]
 
 
+RUN_TAG = None  # optional second CLI argument: run2 | run3 (jev-wu6v)
+
+
 def out_path(dataset):
-    return os.path.join(HERE, f"rows-{dataset}-grok.jsonl")
+    suffix = f"-{RUN_TAG}" if RUN_TAG else ""
+    return os.path.join(HERE, f"rows-{dataset}-grok{suffix}.jsonl")
 
 
 def answered(dataset):
@@ -285,14 +291,23 @@ async def smoke():
 
 
 def main(argv):
-    if len(argv) != 1 or argv[0] not in (
-        "smoke",
-        "scifact",
-        "banking77",
-        "sst5",
-        "clinc150",
+    global RUN_TAG
+    if (
+        not 1 <= len(argv) <= 2
+        or argv[0]
+        not in (
+            "smoke",
+            "scifact",
+            "banking77",
+            "sst5",
+            "clinc150",
+        )
+        or (len(argv) == 2 and argv[1] not in ("run2", "run3"))
     ):
-        raise SystemExit("usage: run.py smoke|scifact|banking77|sst5|clinc150")
+        raise SystemExit(
+            "usage: run.py smoke|scifact|banking77|sst5|clinc150 [run2|run3]"
+        )
+    RUN_TAG = argv[1] if len(argv) == 2 else None
     if not os.environ.get("XAI_API_KEY"):
         print("unconfigured: XAI_API_KEY is not set, no call made", file=sys.stderr)
         return 2
