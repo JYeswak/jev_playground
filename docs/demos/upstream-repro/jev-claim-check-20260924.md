@@ -175,3 +175,26 @@ proof per row), so the original rows stay as they were:
 
 `bash foundation/gates.d/15-kit-claim.sh`: 25/25 enforced rows pass, coverage 13/47 at floor 13/47;
 `--selftest` SELFTEST_OK. No README number was left unproven, so README.md is unchanged.
+
+## Non-author verification (K9z5Live, 2026-09-24, `[oracle]` re-score + `[mutation]` re-run)
+
+Verifier: K9z5Live (background agent of pane 1; not the author ClaimCheckTool). Clean clone of
+`main` at `786c042` into `/tmp/k9z5-verify-dsu`. No API calls; no repo file edited except this
+section.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `env -u TYPESAFE_API_KEY node --test work/jev-claim-check/claim-check.test.mjs` in the clean clone | **HOLDS.** 7/7 pass, 0 fail. |
+| 2 | The 5 mutants, re-made independently: copies in `/tmp/k9z5-verify-sp5-mut/`, only the jev-client import made absolute, each run with `CLAIM_CHECK_TOOL=<copy>` | **HOLDS.** An unmutated control copy passes 7/7. `SUPPORTED_AT = 0.5` → "cuts" red. Malformed guard disabled → "malformed answer is refused" red. Failure paths return `unsupported` → "keyless" and "asker failure and thrower" red. Empty-input check removed → "empty claim or evidence is refused" red. `confidence = p` → "confidence is max(p, 1-p)" red. This is the receipt's table exactly. The shipped `.omp/tools/jev-claim-check.ts` was never written to: its sha256 `98e7653d…` equals `git show HEAD:` (byte-identical). |
+| 3 | `python3 work/jev-claim-check/score.py`, keyless | **HOLDS.** Exit 0, PASS. True claims: supported 12 / unsure 5 / unsupported 2. Planted: 0 / 5 / 14. By kind: number 7/9, verdict 7/10. (a) 0 ≤ 1, (b) 14 ≥ 14, (c) 12 ≥ 12, (d) AUC 0.953 ≥ 0.80. Per-case p values match the Results table. The two floor-level criteria (b, c) have zero margin, as the receipt says. |
+| 4 | Bar precedes rows; labels unchanged | **HOLDS.** `ae01091` is an ancestor of `e24263f`, the commit that adds `rows.jsonl` and `l3-frames.jsonl`. `git log ae01091..HEAD` on `score.py`, `cases.jsonl`, `planted.tsv` and the tool is empty. `cases.jsonl` sha256 is `a5c1e7d0…58d0a0`, as stated. `build.py --check` at `ae01091` prints "cases.jsonl up to date". |
+| 5 | The two L3 frames (`l3-frames.jsonl` lines 237 and 390 of 415) | **HOLDS.** Both are `tool_execution_end` through the `write` bridge with `xdev.tool` `jev_claim_check`, `isError` false, and `calledModel` true. Line 237: the true claim ("…still exits 1 on unhandled aborts.") → `supported`, p 0.91. Line 390: the planted twin ("…exits 0 with no unhandled aborts.") → `unsupported`, p 0.05. Both evidence strings equal `typesafe-sdk-js-w70-20260923.md` at `e24263f` with the trailing newline stripped (2,054 chars), and that file does say "189/189 pass … but exit 1 via 8 unhandled". Opposite verdicts, as the L3 bar requires. |
+
+Note (not a failure of any claim): at HEAD, `build.py --check` exits 1 with "claims.tsv row
+claim-check-cuts has no plant". `claims.tsv` has gained rows since `ae01091`, so the build refuses
+rather than silently rebuilding. The committed labels are unaffected (check 4), but the rebuild only
+runs at `ae01091`.
+
+Verdict: PASS reproduces from committed files under an unedited bar. The mutation arm and L3 hold as
+written. Scratch left in place: `/tmp/k9z5-verify-dsu`, `/tmp/k9z5-verify-sp5-ae`,
+`/tmp/k9z5-verify-sp5-mut/`.

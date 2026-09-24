@@ -165,3 +165,23 @@ against Haiku leaves a gap: with Haiku's 14 zero-mass rows dropped, Jev is 374 a
   provider surface differs by construction; prompts and schema are identical.
 - Jev and Haiku rows are the committed ones and were not re-run.
 - A non-author re-score is still owed before the bead closes.
+
+## Non-author verification (K9z5Live, 2026-09-24, `[oracle]` re-score from committed files)
+
+Verifier: K9z5Live (background agent of pane 1; not the author AdapterUniform). Clean clone of
+`main` at `ff0b672` into `/tmp/k9z5-verify-dsu`. No API calls; no file in the repo edited except
+this section.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | `python3 work/second-incumbent/score.py` in the clean clone | **HOLDS.** Exit 0. Every number in both Result tables reproduces cell for cell. SciFact: grok 330/400, AUC 0.875, Brier 0.1443, ECE 0.1363; vs grok 46/15, p 8.84e-5, WIN on all four metrics, **PASS**; distinct noul values 9. Banking77: grok 366/400. Primary 384 vs 366, 24/6, p 0.00143 **WIN**; dropped 378 rows 368 vs 365, 8/5, p 0.581 NON-INFERIOR; scored-wrong 24/5, p 0.000546 WIN. Haiku vs grok 14/18, p 0.597. |
+| 2 | Bar precedes rows | **HOLDS.** `a2a4c7a` (20:48:09 −0600) is an ancestor of `a8cbf6e` (20:51:23), and `a8cbf6e` is the commit that adds both `rows-*-grok.jsonl`. `a2a4c7a` touches only the receipt, `run.py` and `score.py`. Neither `score.py` nor `run.py` has changed since `a2a4c7a` (`git log a2a4c7a..HEAD` on both paths is empty). In the receipt, the only line removed after the bar is "Pending the live run." |
+| 3 | The scorer imports the pinned original scorers | **HOLDS.** `pinned_module()` loads `work/noul-scifact/score.py` @ `15b0371` and `work/choice-banking77/score.py` @ `3709ee6` via `git show`. `rows_at()` loads the Jev and Haiku rows and the samples at `83a7295` / `3709ee6` the same way. Nothing is read from the working tree except the grok rows. |
+| 4 | It reproduces the Haiku receipts (swap test) | **HOLDS.** In the scratch clone, both `rows-*-grok.jsonl` were replaced with the pinned Haiku rows, `score.py` was run, and the files were restored (`git status` empty afterwards). The "grok" arm then equals Haiku exactly. SciFact: 351/400, AUC 0.934, Brier 0.1002, ECE 0.0854; 19/9, p 8.72e-2, accuracy TIE, AUC/Brier/ECE WIN, PASS. This equals `noul-scifact-20260924.md` lines 89 and 102. Banking77: 362/400, 25/3, p 2.74e-05, WIN. This equals `choice-banking77-20260924.md` line 94. |
+| 5 | Spot-check of 10 grok rows (seed 20260924: SciFact i = 7, 279, 323, 338, 359; Banking77 i = 29, 74, 286, 291, 372) | **HOLDS.** For every row: `rawText` parses to the stored answer, `finishReason` is `stop`, and `modelReported` is `grok-4.20-0309-non-reasoning`. For Banking77, the stored `choice` is the argmax of `probabilities` and the recorded `rawSum` equals the recomputed raw sum. Truths match the pinned samples. The answers read sensibly against the claim/abstract or message: for example, SciFact 338 "Autophagy declines in aged organisms", where the abstract states it, gets noul 1.0. |
+| 6 | The 22 zero-mass rows | **HOLDS.** Recomputed from `rawText`: exactly 22 rows whose raw map sums to 0, the same set as recorded `rawSum == 0`. Every raw value is exactly 0; all 22 are stored as `activate_my_card` at confidence 0 with `finishReason` `stop`. Truths: `beneficiary_not_allowed` 11, `card_about_to_expire` 5, `automatic_top_up` 2, `apple_pay_or_google_pay` 2, `balance_not_updated_after_bank_transfer` 1, `activate_my_card` 1 (i = 292, "correct" only via the tie). Jev is correct on 16 of the 22. 8 overlap Haiku's 14 flat rows. |
+
+Verdict: the SciFact PASS and the Banking77 WIN reproduce from committed files under an unedited bar,
+and so does the zero-mass sensitivity (NON-INFERIOR, p 0.58). The receipt's "What the pair says"
+follows from the rows. Scratch left in place: `/tmp/k9z5-verify-dsu`,
+`/tmp/k9z5-verify-dsu-check.py`, `/tmp/k9z5-verify-dsu-grok-*.bak`.
