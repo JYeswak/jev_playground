@@ -95,4 +95,69 @@ Rounded gold counts: 236 / 241 / 266 / 353 / 276 / 128.
 
 ## Result
 
-NOT_RUN. This section is replaced only after the bar commit, and the bar text above is not edited.
+Bar committed at `8e4bda9` and pushed before any model call. The first launch used system
+Python and died on `ModuleNotFoundError: No module named 'typesafe_sdk'` before a request.
+The calls below used `upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python`. Live
+window 2026-09-24 03:53:39Z to 04:02:26Z. Re-score, no key:
+`python3 work/score-stsb/score.py`.
+
+Jev: 4,500/4,500 answered, 0 failed, 0 resume passes. Every answered row reports
+`jev-1.13.0`. Input tokens are 651,488 on each run, so the prompts matched. Grok: 1,499/1,500
+answered on each run. Row 457, gold 0.0, was refused on the first call and on the one resume
+pass, all three runs, with `TypeSafePermissionDeniedError: 403 I can't help with that request.`
+It is scored by the failure rule (predicted score 5, exact-level incorrect). No third attempt.
+Grok input tokens on the 1,499 answered rows are 960,828 each run. No row file contains
+sentence text. Grok adapter debug: 0 `probabilityError`, 0 `originalProbabilities`.
+
+Row sha256 prefixes: `rows-jev` `940117fe04ba5b5d`, `rows-jev-run2` `b258ca389caf1f4f`,
+`rows-jev-run3` `b2e639c92eeb67c2`, `rows-grok` `8a6b93ee944eacfb`, `rows-grok-run2`
+`e3d2be31f66f2905`, `rows-grok-run3` `cd12b5072c53f733`.
+
+| Arm | Answered | Spearman | MAE | Exact-level | Wilson 95% | p50 / p95 ms | Tokens in / out |
+|---|---:|---:|---:|---:|---|---|---|
+| Jev run 1 | 1500/1500 | 0.9072 | 0.5135 | 786/1500 | 49.9–54.9% | 158 / 318 | 651,488 / 28,500 |
+| Jev run 2 | 1500/1500 | 0.9072 | 0.5136 | 784/1500 | 49.7–54.8% | 161 / 385 | 651,488 / 28,500 |
+| Jev run 3 | 1500/1500 | 0.9069 | 0.5134 | 788/1500 | 50.0–55.1% | 184 / 372 | 651,488 / 28,500 |
+| grok run 1 | 1499/1500 | 0.8799 | 0.5989 | 755/1500 | 47.8–52.9% | 804 / 1150 | 960,828 / 59,735 |
+| grok run 2 | 1499/1500 | 0.8845 | 0.5864 | 756/1500 | 47.9–52.9% | 796 / 1205 | 960,828 / 59,585 |
+| grok run 3 | 1499/1500 | 0.8850 | 0.5975 | 748/1500 | 47.3–52.4% | 885 / 1211 | 960,828 / 59,696 |
+
+Floors, each Jev run (sign test Jev-lower / constant-lower; McNemar Jev-only / constant-only):
+
+| Jev run | vs always-mean MAE | vs always-mean exact | vs always-mode MAE | vs always-mode exact |
+|---|---|---|---|---|
+| 1 | 1192/308, p=1.1e-122 WIN | 632/112, p=8.2e-89 WIN | 1142/357, p=9.4e-96 WIN | 633/200, p=4.2e-53 WIN |
+| 2 | 1185/315, p=1.3e-118 WIN | 628/110, p=6.2e-89 WIN | 1140/357, p=2.2e-95 WIN | 631/200, p=9.6e-53 WIN |
+| 3 | 1187/313, p=8.9e-120 WIN | 633/111, p=1.5e-89 WIN | 1139/357, p=3.3e-95 WIN | 634/199, p=1.3e-53 WIN |
+
+Nine pairings. Spearman interval is Jev minus grok. MAE counts are Jev-lower / grok-lower.
+Exact counts are Jev-only / grok-only.
+
+| Pairing | Spearman 95% | MAE | Exact |
+|---|---|---|---|
+| J1 x G1 | WIN [0.0157, 0.0391] | 792/694, p=0.0118 WIN | 343/312, p=0.241 TIE |
+| J1 x G2 | WIN [0.0108, 0.0354] | 794/692, p=0.0088 WIN | 363/333, p=0.272 TIE |
+| J1 x G3 | WIN [0.0116, 0.0336] | 801/689, p=0.0040 WIN | 359/321, p=0.156 TIE |
+| J2 x G1 | WIN [0.0157, 0.0394] | 784/705, p=0.0432 WIN | 346/317, p=0.277 TIE |
+| J2 x G2 | WIN [0.0108, 0.0356] | 790/695, p=0.0147 WIN | 363/335, p=0.307 TIE |
+| J2 x G3 | WIN [0.0113, 0.0337] | 798/690, p=0.0055 WIN | 361/325, p=0.181 TIE |
+| J3 x G1 | WIN [0.0152, 0.0390] | 793/696, p=0.0128 WIN | 347/314, p=0.213 TIE |
+| J3 x G2 | WIN [0.0104, 0.0352] | 797/690, p=0.0060 WIN | 367/335, p=0.242 TIE |
+| J3 x G3 | WIN [0.0111, 0.0332] | 803/686, p=0.0026 WIN | 365/325, p=0.138 TIE |
+
+**Under the bar.** Part 1 holds: every Jev run beats both constants on MAE and exact-level.
+Part 2 holds: 0 LOSE pairings on Spearman, MAE, and exact-level. **PASS.** Spearman WIN
+stands, 9/9 (thinnest interval 0.0104 to 0.0352). MAE WIN stands, 9/9 (largest p = 0.0432).
+Exact-level is TIE on 9/9, so it is not a win and not a loss. No `NEGATIVE_EVIDENCE.md` row:
+the preregistered trigger did not fire.
+
+**Spend.** 4,500 Jev calls, 1,954,464 input / 85,500 output tokens. At the documented $0.042
+per million input that is about $0.082, arithmetic, not an invoice. Grok: 4,497 answered calls
+plus 6 refused attempts (row 457, twice per run). Answered rows: 2,882,484 input / 179,016
+output tokens. The refused attempts have no usage object. Grok's dollar cost is not stated.
+
+**Boundary.** One dev split, one wording, one Jev version, one grok model, one adapter
+(`adffc2e`), three runs per arm in one session. Not the test split. Not Pearson. The
+exact-level TIE is a failure to separate, not parity. Row 457 is one refusal, not a measurement
+of what the text says. Awaiting a non-author re-score from the committed rows before the bead
+closes.
