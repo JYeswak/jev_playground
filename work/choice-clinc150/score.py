@@ -228,6 +228,41 @@ def main():
                     f"{ab_o}/{n_oos} | {sum(handled(subset, g))}/{n} | {'yes' if ship else 'no'} |"
                 )
 
+    print(
+        "\nDescriptive: peak probability on in-scope rows each arm answered right (why a fixed"
+    )
+    print(
+        "peak gate costs one arm more coverage than the other), and the commonest errors"
+    )
+    print(
+        "| Arm | In-scope right | Peak p25 / median | Right rows with peak < 0.60 | Top 5 errors (truth->answer) |"
+    )
+    print("|---|---:|---|---:|---|")
+    for name, arm in (("jev", "jev"), ("haiku", "haiku")):
+        p = arms["jev" if arm == "jev" else "haiku (as shipped)"]
+        peaks = [
+            pr[1]
+            for it, pr in zip(subset, p)
+            if it["intent"] != OOS and pr[0] == it["intent"]
+        ]
+        errs = {}
+        for it, pr in zip(subset, p):
+            if pr[0] != it["intent"]:
+                key = f"{it['intent']}->{pr[0]}"
+                errs[key] = errs.get(key, 0) + 1
+        top = sorted(errs.items(), key=lambda kv: (-kv[1], kv[0]))[:5]
+        print(
+            f"| {name} | {len(peaks)} | {nearest_rank(peaks, 0.25):.3f} / {nearest_rank(peaks, 0.5):.3f} | "
+            f"{sum(1 for x in peaks if x < PRIMARY_GATE)} | {', '.join(f'{k} x{v}' for k, v in top)} |"
+        )
+    fin = [r for r in final_rows(rows["haiku"]).values() if "choice" in r]
+    sums = [r["rawSum"] for r in fin if r.get("rawSum") is not None]
+    print(
+        f"\nHaiku adapter debug: {len(sums)}/{len(fin)} rows renormalized (raw sum "
+        f"{min(sums, default=float('nan')):.2f}-{max(sums, default=float('nan')):.2f}), "
+        f"{sum(1 for s in sums if s == 0)} zero-mass, {sum(r.get('nRetries', 0) for r in fin)} retries"
+    )
+
     print("\nPaired, Jev vs each Haiku reading (McNemar exact):")
     print(
         "| Measure | Haiku reading | Jev | Haiku | Jev-only | Haiku-only | p | Verdict |"
