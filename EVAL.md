@@ -1725,3 +1725,17 @@ over the 662 rows: plain Jev 44 vs Haiku 22 (p 0.009); criteria 8 vs 36 (p 2.5e-
 calls, 0 failures. No hook; NEGATIVE_EVIDENCE R82. Receipt
 `docs/demos/upstream-repro/jev-toolout-flag-20260924.md`.
 Boundary: public attacks are prompts with persona-relative labels (a proxy); one run per cell.
+
+## jev-k9z.8 jev_rerank L3 on a public SciFact query (2026-09-24) [live]
+
+Seam `.omp/tools/jev-rerank.ts` via project extension `.omp/extensions/jev-rerank.ts`, current tree,
+omp 18.3.0. Five real `omp --profile claude -p --mode json` sessions (claude-sonnet-5 driver, oauth;
+comparator keys unset); the model reaches the tool as `write xd://jev_rerank`. Query by a rule
+committed before any call (25311f1): qid 36, BM25 top-20, abstracts cut to 500 chars. Keyed positive
+(jev-1.13.0): `ordered=true calledModel=true`, the one relevant top-20 doc 11705328 moves from BM25
+7 to 5, all 20 returned texts byte-identical. Keyed 1 and 31 passages: schema refusal, isError, no
+throw, no Jev call (one earlier 31-passage session made no call: the model declined, prompt
+reworded). Keyless: `ordered=false reason=unconfigured NOT_RUN`, input order, but details carry
+`calledModel: true` (jev-t7oq). 20 Jev requests, 0 failed, ~$0.002 estimated (tokens not surfaced).
+Rung L3. Receipt `docs/demos/upstream-repro/jev-rerank-l3-scifact-20260924.md`.
+Boundary: one query, one run, truncated passages; MAX_PASSAGES truncation unreachable and untested; no L4, no latency.
