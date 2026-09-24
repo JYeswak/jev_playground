@@ -1,0 +1,26 @@
+candidate	score	class	source	note
+demo-1-route-backtest	520	OTHER_RECEIPT	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md:41	Cited JSON has the 0.0447% derivation, not 520. The reconciled demand score is in the cross-score sheet.
+demo-2-admission-screen	700	CITED	docs/demos/duel-2/HELD_demo2_demand_COD.md:100	"The prior 700 remains the number."
+demo-3-claim-check-gate	430	OTHER_RECEIPT	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md:39	Cited baseline has no 430. Cross-score sheet has the reconciled 430.
+demo-4-foreman-lite	820	CITED	docs/demos/duel-2/SUPERSESSION_MU_argues_COD-H1.md:12	"Demo-4's scores across four graders: 805, 820 (mine argued)."
+demo-5-fact-ledger	755	CITED	docs/demos/duel-2/RUNG2_JEV_SHAPE_COD.md:4	"Demo-5 fact ledger (755)."
+demo-6-claim-check-notes	330	CITED	docs/demos/duel-2/HELD_demo6_incumbent_COD.md:206	"Demo-6 remains HELD at 330."
+demo-7-signals-starter	560	OTHER_RECEIPT	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md:37	Cited weights JSON has signal weights, not 560. Cross-score sheet has reconciled 560.
+demo-8-credential-screen	100	CITED	docs/demos/duel-2/DEMAND_SCORES_COD_ON_MU.md:43	Reconciled **100**.
+demo-9-review-signal	550	CITED	docs/demos/duel-2/HELD_demo9_build_or_skip_COD.md:5	"original non-author demand score 550." The same line also states a reconciled 700, which is not the STATUS score.
+COD-H1-snapshot-completion	885	OTHER_RECEIPT	docs/demos/duel-2/HUNT_SCORES_MU_ON_COD.md:17	Cited labelfree JSON is UNASKABLE and has no 885. Hunt sheet: H1 885.
+COD-H2-preaction-abstention	905	OTHER_RECEIPT	docs/demos/duel-2/HUNT_SCORES_MU_ON_COD.md:13	Cited mapping JSON has no 905. Hunt sheet: H2 905.
+COD-H3-price-drift-auditor	890	CITED	docs/demos/duel-2/RUNG2_COD-H3_resolved_MU.md:99	"(890), which priced operator pain."
+COD-H4-toolresult-replay	900	OTHER_RECEIPT	docs/demos/duel-2/HUNT_SCORES_MU_ON_COD.md:14	Cited labelfree JSON has no 900. Hunt sheet: H4 900.
+COD-H5-compaction-integrity	895	CITED	docs/demos/duel-2/RUNG2_COD-H5_owned_MU.md:79	"Demand for H5 (rung-1 895)."
+MU-H1-todo-judge	820	OTHER_RECEIPT	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md:30	Cited census JSON has no 820. Hunt sheet non-author score **820**.
+MU-H2-outbound-redaction	430	OTHER_RECEIPT	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md:31	Cited baseline has no 430. Hunt sheet non-author score **430**.
+MU-H3-runtime-redaction	650	OTHER_RECEIPT	docs/demos/duel-2/HUNT_SCORES_COD_ON_MU.md:32	Cited entropy note has no 650. Hunt sheet non-author score **650**.
+UP-R1-tier-routing-for-cost	905	NOT_FOUND	docs/demos/upstream-repro/router-savings-inverts-20260919.md	905 is not in the cited receipt. The same digits are COD-H2's hunt score, not a source for this row.
+UP-R2-commit-security-triage	885	NOT_FOUND	docs/demos/upstream-repro/router-savings-inverts-20260919.md	885 is not in the cited receipt. The same digits are COD-H1's hunt score, not a source for this row.
+UP-R3-worker-supervision	870	NOT_FOUND	docs/demos/upstream-repro/router-savings-inverts-20260919.md	870 is not in the cited receipt and not in another score sheet that names this candidate.
+UP-R4-jev-judged-compaction	930	NOT_FOUND	docs/demos/upstream-repro/compaction-retention-oracle-20260919.md	930 is not in the cited receipt. Other 930 hits do not name this candidate.
+UP-R5-jev-toolcall-gate	940	NOT_FOUND	docs/demos/upstream-repro/bicameral-gate-adoption-20260919.md	940 is not in the cited receipt. The 940 in HUNT_SCORES_MU_ON_COD.md:17 is H1's second grader, not this row.
+UP-R6-commit-miner-adoption	610	CITED	docs/demos/upstream-repro/commit-miner-adoption-test-20260919.md:150	"STATUS score 610, composed and stated: 800 for judgment ..."
+UP-R7-foreman-supervision	610	NOT_FOUND	docs/demos/upstream-repro/foreman-supervision-adoption-20260919.md	610 is not in the cited receipt. The same digits are UP-R6's composed score, not a source for this row.
+k9z5-injection-flag-live	967	DERIVED	work/nev-injection/live-receipt-u2.json:/main_correct,/n	round(main_correct/n*1000)=round(58/60*1000)=967. /main_acc 0.9667 times 1000 rounds to the same 967. The literal 967 is not in the file.
