@@ -84,4 +84,77 @@ here covers these sets and this grok model only.
 
 ## Result
 
-Pending the reruns.
+**Where the bar landed.** The bar went into `5dbfa23` (2026-09-24 03:51:34Z). That is a sibling's
+commit titled "[test] ratify ae01091…". It swept my staged bar files in with its own; I did not make
+it and did not amend it. The three bar files in it (this receipt down to "Pending the reruns",
+`grok_variance.py`, `run.py`) are byte-identical to what I staged. No grok rerun call was made
+before it. The first rerun started after 03:51:34Z.
+
+Live, 2026-09-24, `[live]`. There were eight reruns: two per set, run in sequence. That was 4,100
+grok calls, all answered: 0 failed rows, 0 resume passes, 0 transient retries, 0 rows needing more
+than one attempt. Every finish reason was `stop`, and every row's provider model was
+`grok-4.20-0309-non-reasoning`. Each rerun's input tokens equal run 1's exactly (SST-5 295,333,
+CLINC 558,472, SciFact 336,369, Banking77 272,639 per run), so the prompts were byte-identical.
+Rows (sha256 prefix…suffix): `rows-sst5-grok-run2` `a8de2670…f39cc9`, `-run3`
+`059c36dd…f9a211`; `rows-clinc150-grok-run2` `122b604e…a4595d`, `-run3` `f7f2a809…903326`;
+`rows-scifact-grok-run2` `402b32ae…3ef153`, `-run3` `e75859a5…461052`; `rows-banking77-grok-run2`
+`da50a0d5…e9fb1d`, `-run3` `aea434bd…5f4ca7`. Re-score with no key, about a minute:
+`python3 work/second-incumbent/grok_variance.py`. It prints every pairing's cells.
+
+**Grok across its three runs.**
+
+| Set | Run 1 | Run 2 | Run 3 | Answer flips between runs (1v2, 1v3, 2v3) | Zero-mass rows per run |
+|---|---|---|---|---|---|
+| SST-5 (exact, MAE) | 227, 0.624 | 229, 0.626 | 235, 0.620 | 76, 66, 60 levels | 0, 0, 0 |
+| CLINC150 (overall, handled at 0.60) | 668, 657 | 671, 661 | 669, 662 | 46, 35, 48 choices | 0, 0, 0 |
+| SciFact (correct, AUC, Brier, ECE) | 330, 0.875, 0.1443, 0.1363 | 328, 0.866, 0.1504, 0.1404 | 323, 0.836, 0.1671, 0.1593 | 18, 23, 17 decisions | n/a |
+| Banking77 (correct) | 366 | 368 | 359 | 20, 20, 21 choices | 22, 21, 27 |
+
+Grok's flips exceed several headrooms: SST-5 has 60 to 76 against 17, and CLINC 35 to 48 against
+11. So R1, the all-pairings rule, decided every claim, not the headroom.
+
+**All pairings, verdicts under the bar** (the full grid is in the scorer's output):
+
+| Set | Claim [reading] | Committed | Pairings meeting it | Range across pairings | Under the bar |
+|---|---|---|---:|---|---|
+| SST-5 | MAE sign test [all rows] | WIN | 9/9 | 156–169 vs 93–104, p 1.9e-5 to 4.3e-4 | **STANDS** |
+| SST-5 | MAE [zero-mass dropped: 0 rows] | WIN | 9/9 | same | **STANDS** |
+| SST-5 | accuracy McNemar [both readings] | WIN | 9/9 | 128–144 vs 89–99, p 0.0035 to 0.027 | **STANDS** |
+| SST-5 | PASS [both readings] | PASS | 9/9 | | **STANDS** |
+| CLINC150 | handled at 0.60 [unit rule; zero-mass dropped: 0 rows] | WIN | 9/9 | 34–45 vs 12–18, p 3.9e-4 to 0.0055 | **STANDS** |
+| CLINC150 | overall [both readings] | WIN | 9/9 | 29–35 vs 10–15, p 0.0022 to 0.014 | **STANDS** |
+| CLINC150 | PASS [both readings] | PASS | 9/9 | | **STANDS** |
+| SciFact | accuracy | WIN | 12/12 | 45–55 vs 14–17, p ≤ 1.4e-4 | **STANDS** |
+| SciFact | AUC / Brier / ECE | WIN | 12/12 each | every interval excludes 0 (closest: ECE upper −0.0469) | **STANDS** |
+| SciFact | PASS | PASS | 12/12 | | **STANDS** |
+| Banking77 | McNemar [as returned] | WIN | 9/9 | 21–30 vs 3–7, p ≤ 0.0025 | **STANDS** |
+| Banking77 | McNemar [zero-mass dropped] | NON-INFERIOR | 9/9 | 8/9 NON-INFERIOR (p 0.065 to 0.61), 1/9 WIN (11v2, p 0.023) | **STANDS** |
+| Banking77 | PASS [both readings] | PASS | 9/9 | | **STANDS** |
+
+**Verdict under the bar at `5dbfa23`: every claim STANDS.** Across 39 pairings (9 + 9 + 12 + 9),
+every published Jev-vs-grok verdict meets its committed label in every pairing. This includes
+SciFact's AUC and ECE, the two that Haiku's variance retracted (R89). Against grok they are WINs
+in 12/12, because grok's calibration is far worse than Haiku's and varies (ECE 0.136 to 0.159).
+No retraction, so no `NEGATIVE_EVIDENCE.md` row.
+
+**The one qualifier that carries over unchanged: Banking77.** Grok returns zero-mass maps on every
+run: 22, 21 and 27 of 400 rows, which the adapter ships as `activate_my_card` at confidence 0. The
+as-returned WIN (9/9) rests on those rows. With them dropped, Jev and grok are NON-INFERIOR in 8
+of 9 pairings (one WIN). The fair one-liner from `jev-dsu` still holds across grok's reruns:
+"Jev never abstains by accident; on the rows grok answers, it ties grok."
+
+**For the README (ReadmeStrangerRun told):** each grok comparison now has the 3-run check the Haiku
+ones got, and none moves. The following can be stated with grok named beside Haiku:
+- the SST-5 MAE WIN;
+- the CLINC150 gated WIN;
+- SciFact PASS, with accuracy, AUC, Brier and ECE all WINs against grok;
+- Banking77 WIN as returned, with the zero-mass qualifier.
+
+**Spend.** 4,100 grok calls: 2,925,626 input / 267,424 output tokens (adapter totals). xAI list
+prices are not read here. No Jev or Haiku calls.
+
+**Boundary / NO-CLAIM.** Three grok runs per set: the two reruns within about 10 minutes on 2026-09-24 (
+sequentially) plus run 1 earlier that night. One grok model id (non-reasoning), one adapter version
+(`adffc2e`). Jev's runs are the committed ones from other times. A STANDS says the verdict is
+robust to grok's sampling on these rows. It does not cover other grok versions, reasoning mode, or
+other sets. A non-author spot-check is still pending before close.
