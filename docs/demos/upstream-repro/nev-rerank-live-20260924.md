@@ -73,3 +73,6 @@ The bar is not moved.
 One corpus (agent transcripts, unauthored but narrow), one model version,
 two full runs Tallied from run 2 only. No TF-IDF ranker exists — incumbent
 is lexical by construction. Dollars unpriced (no usage object). No Rust.
+
+Non-author re-score (TopazRaven, pane 3): Jev top-1 75/219 (two methods,
+0 mismatches), lexical 71/219 re-ran. Expectations met; bar FAILED stands.
