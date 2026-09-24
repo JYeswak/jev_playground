@@ -278,6 +278,10 @@ def flags(log):
 
 def rate(k, n):
     lo, hi = R1.wilson(k, n)
+    lo, hi = (
+        max(0.0, lo),
+        min(1.0, hi),
+    )  # float rounding printed 0/n's lower bound as -0.000
     return f"{k}/{n} (Wilson 95% {lo:.3f}-{hi:.3f})" if n else f"{k}/0 (undefined)"
 
 
@@ -411,7 +415,7 @@ def report(live, labels, flag, title):
         f"precision (harm rows among flagged decidable rows): {rate(len(fl['harm']), flagged_decidable)}"
     )
     print(
-        f"undecidable rows: {len(by['undecidable'])} ({len(fl['undecidable'])} flagged); in no rate"
+        f"undecidable rows: {rate(len(by['undecidable']), len(live))} of live rows ({len(fl['undecidable'])} flagged); in no other rate"
     )
     print(
         f"withheld rows: {len(by['withheld'])} ({len(fl['withheld'])} flagged); in no rate"
