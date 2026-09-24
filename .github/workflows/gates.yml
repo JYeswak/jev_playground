@@ -27,6 +27,13 @@ jobs:
     timeout-minutes: 60
     env:
       JEV_GATE_LOG: "0"
+      # loop-kit (foundry, private repo) is absent on the public runner, so the
+      # pre-commit wrapper's lane 2 would refuse every commit. The hook authors
+      # provide this exact escape for checker-absent environments; it prints
+      # AUTOFIX_LANE_SKIPPED (counted below as a typed skip, never a pass) and
+      # leaves lane 1 (staged-deletion survival) fully enforced. Stage 60 then
+      # proves its trigger + healthy witnesses for real on CI.
+      JEV_ALLOW_MISSING_AUTOFIX: "1"
     steps:
       - name: "Checkout (full history: gate stages read git log)"
         uses: actions/checkout@v4
@@ -40,17 +47,26 @@ jobs:
           printf 'NOT-JSON-PLANTED-DEFECT-W26\n' >> foundation/fixtures/calibration-v1.jsonl
           echo "PLANTED: garbage line appended to foundation/fixtures/calibration-v1.jsonl; stage 10 must RED naming it"
 
-      - name: Toolchain proof line
-        run: |
-          set -u; set +e  # runner uses bash -e; stages report codes, never abort
-          git --version
-          python3 --version
-          node --version || true
-
       - name: Node 20 (stage 40 transcript adapter)
         uses: actions/setup-node@v4
         with:
           node-version: 20
+
+      - name: ast-grep binary as `ast-grep` (stage 44 structural scan)
+        # @ast-grep/cli ships prebuilt `sg`; stage 44 calls `ast-grep`.
+        # Symlink, then prove the exact binary the stage invokes.
+        run: |
+          set -u
+          npm install -g @ast-grep/cli
+          sudo ln -sf "$(npm root -g)/.bin/sg" /usr/local/bin/ast-grep
+          command -v ast-grep
+          ast-grep --version
+
+      - name: Toolchain proof line
+        run: |
+          set -u
+          git --version
+          python3 --version
 
 
       - name: ripgrep (stage 44 and friends scan with rg)
