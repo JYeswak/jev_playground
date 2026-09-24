@@ -8,6 +8,7 @@ work/noul-fever), each committed before its first call.
   jev-nocriteria -> same client and instructions, criteria removed (the jev-k2q ablation)
   jev-rerun      -> the jev question again, run beside jev-nocriteria (jev-k2q noise control)
   haiku          -> system-one-adapter-python, anthropic/claude-haiku-4-5, probabilities mode (ANTHROPIC_API_KEY)
+  haiku-run2/3   -> the haiku arm again, same call, into its own rows file (jev-x5k Haiku variance)
 Run (venv python has both packages):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
     upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/noul-scifact/run.py <arm> [data_dir]
@@ -45,7 +46,7 @@ QUESTION = Noul(
 )
 # jev-k2q ablation, frozen with its bar: identical instructions, no outcome criteria.
 QUESTION_NO_CRITERIA = Noul(instructions=QUESTION.instructions)
-ARMS = ("jev", "jev-nocriteria", "jev-rerun", "haiku")
+ARMS = ("jev", "jev-nocriteria", "jev-rerun", "haiku", "haiku-run2", "haiku-run3")
 
 
 DATA = HERE
@@ -71,7 +72,7 @@ def state(s):
 
 
 async def main(arm, concurrency=8):
-    need = "ANTHROPIC_API_KEY" if arm == "haiku" else "TYPESAFE_API_KEY"
+    need = "ANTHROPIC_API_KEY" if arm.startswith("haiku") else "TYPESAFE_API_KEY"
     if not os.environ.get(need):
         print(f"unconfigured: {need} is not set, no call made", file=sys.stderr)
         return 2
@@ -86,7 +87,7 @@ async def main(arm, concurrency=8):
     sem = asyncio.Semaphore(concurrency)
     ok = failed = 0
 
-    if arm != "haiku":
+    if not arm.startswith("haiku"):
         client = AsyncTypeSafeClient(model=JEV_MODEL, retry=RetryPolicy())
         question = QUESTION_NO_CRITERIA if arm == "jev-nocriteria" else QUESTION
 

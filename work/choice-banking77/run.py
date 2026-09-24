@@ -128,6 +128,7 @@ def haiku_diagnostics(resp):
         "nRetries": int(getattr(resp.usage, "n_retries", 0) or 0),
         "normError": float(debug.get("max_error", 0.0) or 0.0),
         "rawSum": None if original is None else float(sum(original.values())),
+        "probabilityError": (debug.get("probability_errors") or {}).get("intent"),
     }
 
 

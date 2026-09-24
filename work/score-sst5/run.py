@@ -115,7 +115,14 @@ async def main(arm, concurrency=8):
                 "input_tokens": int(resp.usage.input_tokens_total),
                 "output_tokens": int(resp.usage.output_tokens_total),
             }
-            return row_from(resp.answers[QNAME], "/".join(HAIKU), u)
+            debug = resp.debug or {}
+            row = row_from(resp.answers[QNAME], "/".join(HAIKU), u)
+            # jev-x5k: what the adapter did to Haiku's raw map (absent = no renormalization).
+            row["probabilityError"] = (debug.get("probability_errors") or {}).get(QNAME)
+            row["originalProbabilities"] = (
+                debug.get("original_probabilities") or {}
+            ).get(QNAME)
+            return row
 
     async with client:
 
