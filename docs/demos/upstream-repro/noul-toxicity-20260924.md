@@ -96,4 +96,53 @@ cookbook's other three hazards. A TIE is a failure to separate.
 
 ## Result
 
-NOT_RUN. This section is replaced only after the bar commit, and the bar text above is not edited.
+Bar committed at `b608070` and pushed before any model call. Live window 2026-09-24
+04:12:46Z to 04:20:03Z. 12,000/12,000 answered, 0 failed, 0 resume passes. Every Jev row
+reports `jev-1.13.0`. Every grok row reports `xai/grok-4.20-0309-non-reasoning`. Input
+tokens are 782,604 on each Jev run and 1,136,306 on each grok run, so the prompts matched.
+No row file contains comment text. Re-score, no key: `python3 work/noul-toxicity/score.py`.
+
+Row sha256 prefixes: `rows-jev` `754b3f92e882c38b`, `rows-jev-run2` `1973ef11cba10c25`,
+`rows-jev-run3` `8d390279ca70bb9e`, `rows-grok` `dba515fcabec5504`, `rows-grok-run2`
+`0dcbae981744d954`, `rows-grok-run3` `1f22ba4bc90ef0cf`.
+
+| Arm | AUC | Brier | ECE | Accuracy | FPR at 0.70 | p50 / p95 ms | Tokens in / out |
+|---|---:|---:|---:|---:|---:|---|---|
+| Jev run 1 | 0.8632 | 0.1846 | 0.2674 | 0.7295 | 316/1820 | 182 / 320 | 782,604 / 42,000 |
+| Jev run 2 | 0.8641 | 0.1842 | 0.2671 | 0.7260 | 316/1820 | 182 / 342 | 782,604 / 42,000 |
+| Jev run 3 | 0.8628 | 0.1846 | 0.2672 | 0.7260 | 311/1820 | 155 / 289 | 782,604 / 42,000 |
+| grok run 1 | 0.8593 | 0.1385 | 0.1969 | 0.7515 | 196/1820 | 534 / 813 | 1,136,306 / 22,943 |
+| grok run 2 | 0.8425 | 0.1399 | 0.1949 | 0.7475 | 183/1820 | 525 / 820 | 1,136,306 / 22,320 |
+| grok run 3 | 0.8445 | 0.1413 | 0.1956 | 0.7455 | 198/1820 | 530 / 798 | 1,136,306 / 22,745 |
+
+Floors. AUC interval is `boot(auc, jev, None, y)`. Accuracy is McNemar, Jev-only /
+always-non-toxic-only.
+
+| Jev run | Accuracy vs always-non-toxic | AUC interval | Above 0.5 |
+|---|---|---|---|
+| 1 | 149/510, p=4.2e-47 LOSE | [0.8371, 0.8887] | yes |
+| 2 | 149/517, p=1.9e-48 LOSE | [0.8380, 0.8895] | yes |
+| 3 | 149/517, p=1.9e-48 LOSE | [0.8365, 0.8882] | yes |
+
+Brier against the base-rate constant is entirely above 0 on every Jev run (run 1
+[0.0869, 0.1191]). Jev's squared error is worse than predicting 0.09 for every row.
+
+Nine pairings. WIN counts: AUC 0, Brier 0, ECE 0, accuracy 0, FPR 0. LOSE counts: AUC 0,
+Brier 9, ECE 9, accuracy 8, FPR 9. AUC is TIE on all 9 (intervals cross 0; the widest
+Jev-favoring bound is +0.0463). Accuracy is TIE on one pairing (J1 x G3, p=0.069) and
+LOSE on the other eight. The thinnest Brier LOSE is [0.0350, 0.0508].
+
+**Under the bar.** Part 1 fails: accuracy loses to always-non-toxic on all three Jev
+runs, and Brier loses to the base-rate constant. AUC above 0.5 holds and does not save
+the part. Part 2 fails: grok LOSE on Brier, ECE, and FPR on all 9 pairings, and on
+accuracy on 8 of 9. **FAIL.** No metric WIN stands. `NEGATIVE_EVIDENCE.md` R93 records
+the retry condition. The wording and the cuts were not changed.
+
+**Spend.** 6,000 Jev calls, 2,347,812 input / 126,000 output tokens. At the documented
+$0.042 per million input that is about $0.099, arithmetic, not an invoice. Grok: 6,000
+calls, 3,408,918 input / 68,008 output tokens. Grok's dollar cost is not stated.
+
+**Boundary.** One validation sample, prevalence 0.09, one wording, one Jev version, one
+grok model, one adapter (`adffc2e`), three runs in one session. Not the test split. The
+AUC TIE is a failure to separate, not parity. Awaiting a non-author re-score from the
+committed rows before the bead closes.

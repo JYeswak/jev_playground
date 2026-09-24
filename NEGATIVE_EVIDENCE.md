@@ -3832,3 +3832,26 @@ coordination false alarms for it to remove.
 
 **NO-CLAIM.** This does not show the candidate is harmful: catch held and FA moved within one row.
 It shows the change has nothing to fix on these sets.
+
+## R93 — FAILED BAR: a toxicity Noul beats the constant floor and does not lose to grok
+
+**Claim (jev-1kv0, bar `b608070`):** on 2,000 Civil Comments validation rows (180 toxic,
+prevalence 0.09), one Noul at `jev-1.13.0` beats always-non-toxic on accuracy, has AUC
+above 0.5, beats the base-rate constant on Brier, and does not lose to
+`grok-4.20-0309-non-reasoning` on AUC, Brier, ECE, accuracy, or FPR at 0.70, on all 9
+pairings of three runs each.
+
+**Measured 2026-09-24, live, N=2000 x 3 x 2, 0 failed calls.** AUC is about 0.863 and the
+interval sits above 0.5 on every Jev run. That is the only floor that holds. Accuracy is
+about 0.73 and loses to always-non-toxic (0.91) on all three runs (149/510, p=4.2e-47).
+Brier is about 0.185 against a base-rate Brier of 0.0819; the difference interval is
+entirely above 0. Against grok: AUC TIE 9/9, Brier LOSE 9/9, ECE LOSE 9/9, accuracy LOSE
+8/9, FPR LOSE 9/9 (Jev 311–316 false positives of 1,820; grok 183–198).
+
+**Retry condition.** Reopen only with a new bar committed before any call, on a sample
+whose positive class is not a 9% minority, or with a calibration map fit on a disjoint
+split and applied to a held-out split. Do not retune the 0.5 or 0.70 cuts on this sample,
+and do not change the wording after seeing these answers.
+
+Receipt: `docs/demos/upstream-repro/noul-toxicity-20260924.md`. Re-score:
+`python3 work/noul-toxicity/score.py`.
