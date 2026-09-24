@@ -1,0 +1,55 @@
+{
+  "seed": 20260924,
+  "cutoff": "2026-09-24T17:00:00Z",
+  "eligible": 12,
+  "skipped": {
+    "excluded id": 2,
+    "size outside 200KB-3MB": 83,
+    "written after CUTOFF": 2,
+    "fewer than 50 paired tool calls": 15
+  },
+  "sessions": [
+    {
+      "path": "~/.omp/agent/sessions/-Developer-jev/2026-09-20T20-33-19-082Z_01a0c085-f2ea-71cc-b6b6-1355d3b5fb6a.jsonl",
+      "id": "01a0c085",
+      "bytes": 2531660,
+      "calls": 217,
+      "sha256": "1683ce98a955fe19f58eaf1fe544f141281824ac437f8b9e27d5bd32baa9be7d"
+    },
+    {
+      "path": "~/.omp/agent/sessions/-Developer-jev/2026-09-20T20-33-26-774Z_01a0c086-10f6-764a-a747-4803b79f30d1.jsonl",
+      "id": "01a0c086",
+      "bytes": 1609639,
+      "calls": 144,
+      "sha256": "61053aac59c023972ab9961d0da49b775bfb467bf1b365c278cf9dfc5f735137"
+    },
+    {
+      "path": "~/.omp/agent/sessions/-Developer-jev/2026-09-24T03-07-26-653Z_01a0d161-dc3d-748c-963c-65cccd4b93b6.jsonl",
+      "id": "01a0d161",
+      "bytes": 1417580,
+      "calls": 142,
+      "sha256": "0b90ffb91cc0e3ae29f36a9d89c1f1aeaba149035964d49a28fe22087bb96dd4"
+    },
+    {
+      "path": "~/.omp/profiles/grok/agent/sessions/-Developer-jev/2026-09-24T02-49-11-017Z_01a0d151-2469-758e-b4f7-dc05eab858a1.jsonl",
+      "id": "01a0d151",
+      "bytes": 2524746,
+      "calls": 199,
+      "sha256": "8a087ce24af964fde97853aef55d6a3308b75a32cf99ef130738a8ac06463952"
+    },
+    {
+      "path": "~/.omp/profiles/grok/agent/sessions/-Developer-jev/2026-09-24T07-55-09-530Z_01a0d269-455a-73f6-8fe3-1136b29ada9f.jsonl",
+      "id": "01a0d269",
+      "bytes": 2094233,
+      "calls": 135,
+      "sha256": "dad86f1db20786d520fe4a8fbe9519b7e09c37d63c8fdeac0712229c32306fb6"
+    },
+    {
+      "path": "~/.omp/profiles/muse/agent/sessions/-Developer-jev/2026-09-21T18-17-33-997Z_01a0c530-062d-7636-89dc-4a906f9c6a41.jsonl",
+      "id": "01a0c530",
+      "bytes": 1267306,
+      "calls": 88,
+      "sha256": "8c8a58946e2ee6384c88d78c7f1763e64acfad9d1788058e6adef281cd0dbda7"
+    }
+  ]
+}
