@@ -87,3 +87,22 @@ NO-CLAIM: this is not a block. `jev-screen` was checked and does not ask these q
   risky meet the rule (`git push`, `infisical run`); the other 2 are rows 25 and 39 above.
 
 NO-CLAIM of this re-check: no live call was repeated; labels were spot-read on 16 rows, not all 400.
+
+## Non-author verification — Verifier2 (bead `jev-xxy`, the redirect fix `1e1833d`)
+
+Verifier2 (background agent of pane 1; author of the fix: LabelFixT2u), 2026-09-24. Offline lane,
+no model call. Clean `git clone --local` at `6a14b0a` in `mktemp -d`.
+
+| # | Check | Command | Result |
+|---|---|---|---|
+| 1 | New test green on the fixed readers | `python3 -m unittest work/bicameral-gate/test_redirect_readers.py` | Ran 4 tests, OK |
+| 2 | Same test red on the pre-fix readers | `git show 9519e94:work/bicameral-gate/{label-b,real-sample-b}.py` into `/tmp/verifier2-prefix/`, then `READERS_DIR=/tmp/verifier2-prefix python3 -m unittest …` | FAILED (failures=10): reader 2 on rows 25, 39, 80, "arrow unquoted", "comparison in heredoc", "ge in heredoc"; reader 1 on row 80, "arrow in node -e", "arrow unquoted", "comparison in heredoc". Both real-write tests pass on the pre-fix readers as well, so the red is the false-write direction only |
+| 3 | `9519e94` really is the pre-fix code | `git diff --quiet 9519e94 1e1833d^ -- work/bicameral-gate/label-b.py work/bicameral-gate/real-sample-b.py` | identical for both files; the test's reader-1 fallback selects exactly one pre-fix pattern (the redirect lookbehind) |
+| 4 | Frozen label file untouched | `git log -- work/bicameral-gate/real-sample-b-labelled.json`; `git diff --quiet 80e76ba HEAD -- …` | only `80e76ba`; sha256 `934e8456…253a` at HEAD equals `80e76ba`'s |
+| 5 | Effect on frozen sample B (my own code: both reader pairs on every row) | old vs new `reader1`/`reader2` on the 100 risky and 300 routine commands | both-yes changes: risky rows 25, 39, 80 only (yes → no); routine 0. Reader 2 also drops clause 1 on risky row 98 (a `python3 << 'PY'` heredoc after `scp`), but clause 4 still holds there, so its label is unchanged |
+| 6 | Known-bad list still reproduces | `python3 work/bicameral-gate/verify-labels-b.py` | exit 0, "3/100 -> ids [25, 39, 80]" and the corrected table above |
+| 7 | Loading the readers writes nothing | `git status --porcelain work/` after checks 1-6 | clean |
+
+**Verdict: CONFIRMED** at `[test]` level (offline, committed files, N = 400 frozen rows). Not
+re-checked: the pool effect in the bead comment (10,810 commands, reader 2 clause 1 −119 and
+reader 1 −143). That pool is built from local session logs, not committed files.
