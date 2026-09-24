@@ -70,3 +70,61 @@ verifying jev-2mp). `numeric.mjs --build` still reproduces sha `dbaafe7f…`.
 **NO-CLAIM.** One wording, one Jev version, one run, one-digit plants from a seeded rule. Close-set
 reasons are not known to be true. Narrowing is lexical. A real number in the evidence that sits on a
 line sharing no word or number with its sentence is dropped, and the coverage counts show how often.
+
+## Results
+
+Bar committed at `3738322` (03:21:42Z) before any call. Calls ran 03:21:57Z–03:22:57Z, 327/327
+answered, 0 failures. Rows: `work/jev-claim-check/numeric-v2-rows.jsonl`. Re-score with no key:
+`python3 work/jev-claim-check/score-numeric-v2.py` (exit 1 = FAIL).
+
+| Set | (a) planted confirmed | (b) planted not confirmed | (c) original confirmed, of m | (d) p lower on plant, of m |
+|---|---:|---:|---:|---:|
+| readme (n=18, m=18) | **2/18** (bar <= 1, **missed**) | 16/18 (>= 15, met) | 16/18 (>= 13, met) | 16/18 (>= 13, met) |
+| close (n=33, m=20) | 2/33 (<= 3, met) | 31/33 (>= 27, met) | **11/20** (>= 14, **missed**) | 19/20 (>= 14, met) |
+
+**FAIL** (`[live]`, N=327, `jev-1.13.0`). Six of eight criteria were met, and one criterion missed in
+each set. By the rule written into this bar, **this design stops here**.
+
+**What the three fixes did.** Against jev-2mp, the not-confirmed rate on plants rose from 10/18
+and 8/31 outright catches to 16/18 and 31/33 not confirmed (unsure now counts). Originals confirmed
+rose from 14/18 to 16/18 on README claims. On close reasons they stayed low: 11 of the 20 whose
+number survived narrowing. The p ordering is strong in both sets: the plant's p is lower than its
+original's on 16/18 and 19/20 pairs.
+
+**The four plants it confirmed, read.** Each approved value occurs in the narrowed evidence **in a
+different role**:
+- `threshold-transfer`, `200 -> 400` ("fit on the first 400 support tickets"), p 0.80: the
+  evidence says "400 requests" and "t201–t400"; 400 is the total, not the fit half.
+- `cost-janus`, `940 -> 240` ("240 requests cost $0.13"), p 0.85: the evidence says `500 (A) + 200
+  (B) + 240 (T8) = 940 requests`; 240 is one arm.
+- `jev-y97`, `4 -> 6` ("6 W7.0 receipts"), p 0.86: the evidence has "6 claims".
+- `jev-deep-kit-8q7.6`, `686/119/567 -> 886/119/567`, p 0.88: neither triple is in the narrowed
+  evidence, and the original was confirmed at 0.89 too. It confirms a number it cannot see.
+
+So the remaining failure is **role**: the question asks whether the evidence states the value "for
+what `clause` says it measures", and in three of the four the model found the value and did not
+check the quantity it belongs to.
+
+**Real checks called unsupported, read.** readme: `558`, `80`, `19/20`. All three are absent from the
+frozen evidence, the gaps jev-sp5 found, so the calls are correct. **No README number is wrong.**
+close: 71 real checks were called unsupported. 61 of their values do not occur anywhere in the
+narrowed evidence. The scorer's in-evidence flag is a substring test, and it marks the other 10
+present. Five of those were read (`28 rows`, `13 appended rows`, `31 HAVE`, `28 discordant rows`,
+`All 4 acceptance legs`): each value occurs only inside a sha, a timestamp or another number, not
+as that quantity. The last five are bare `0`s and one `8` (jev-publish-playground-hog, jev-qbc,
+jev-qip) and were not read one by one. **No close reason was shown to contradict its evidence**:
+the method cannot read re-run outputs, `/tmp` checks or bead comments that no committed file holds.
+
+**Outcome.** No numeric mode is added to `jev_claim_check`. R83 in `NEGATIVE_EVIDENCE.md` records
+retry 2 and closes this design. A fourth round needs a new idea written into a new bar. The candidate
+this run points at: ask about the quantity, not the value ("what number does the evidence give for
+X?", a Choice among the number tokens in the narrowed evidence plus "not stated"), then compare in
+code.
+
+**Spend.** 327 Jev calls: 332,298 input / 6,540 output tokens reported by the API, p50 155 ms, p95
+385 ms. Jev's billed units were not read and are not stated.
+
+**Boundary.** One wording, one Jev version, one run, seeded one-digit plants, 18 + 33 of them. 13
+of the 33 close-set originals are not in their narrowed evidence: 8 were never in the full evidence,
+and lexical narrowing dropped 5. (c) and (d) exclude them by construction, and m/n reports it.
+Awaiting a non-author re-score.

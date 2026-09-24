@@ -3538,6 +3538,26 @@ narrowed to the cited number's own line/row before the call. The number rule mus
 scientific notation whole (`2.6e-13`), because it currently checks `2`. Do not ship a numeric mode
 until one set clears catch >= 60% with zero wrongly supported.
 
+**Retry 2 (jev-h8s, 2026-09-24, bar `3738322` before any call): FAILED. This design is closed.**
+Three changes: an exact tokenizer (2.6e-13 is checked whole; a unit test with a planted-red arm),
+evidence narrowed to the lines matching the number's sentence with the value itself never selecting,
+and unsure counted as not confirmed. Fresh plants from seed 20260926 and a new digit rule; 327
+checks.
+- README: 2/18 plants confirmed (bar <= 1, missed); 16/18 not confirmed; 16/18 originals confirmed;
+  p lower on the plant 16/18.
+- Close: 2/33 plants confirmed; 31/33 not confirmed; 11/20 originals confirmed (bar 14, missed); p
+  lower 19/20.
+
+In 3 of the 4 confirmed plants the value is in the evidence **in another role** (`240` is one arm
+of `940`; `400` is the total, not the fit half; `6 claims` for "6 receipts"). The fourth confirms a
+triple absent from its evidence.
+Receipt: `docs/demos/upstream-repro/claim-check-numeric-v2-20260924.md`. Re-score:
+`python3 work/jev-claim-check/score-numeric-v2.py`.
+**Retry condition (a fourth round needs this new idea in a new bar):** stop asking whether a value
+is stated. Ask for the quantity instead: a Choice over the number tokens in the narrowed evidence
+plus "not stated", keyed to the clause's quantity, then compare the chosen token to the claim in
+code. Do not rerun this Noul with other cuts or other narrowing settings.
+
 ## R84 — REFUTED: the Jev API reports `usage.billing_units`, so a client can record billed units
 
 **Claim (AGENTS.md RULE 14, `AGENTS.md:98-100`; bead jev-bmn):** the SDK ships
