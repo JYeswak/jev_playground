@@ -3,6 +3,9 @@
  * expected-level reduction are rank.ts verbatim (JevScoreBatch, nevir 0.7115).
  * Previously one batched askJevBundle call; now one validated call per passage
  * so every answer passes the SDK-typed guards. Costs N requests instead of 1.
+ * A failure reports calledModel from the transport itself: true once a request
+ * reached fetch (HTTP error, timeout, malformed body), false when askJevScore
+ * stopped before any request (no key, billing hold, SDK missing).
  */
 import { askJevScore } from "../../jev-client/src/index.ts";
 import { expectedLevel, passageId, scoreQuestion, type RankAnswer } from "./rank.ts";
@@ -16,6 +19,12 @@ export async function liveAsker(
 ): Promise<RankAnswer> {
   const ids = Object.keys(state.passages);
   const scores: Record<string, number> = {};
+  let sent = false;
+  // Read the transport at call time, as askJevScore does, so a wrapped global fetch still sees it.
+  const transport = ((input: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+    sent = true;
+    return (fetchImpl ?? globalThis.fetch)(input, init);
+  }) as typeof fetch;
   for (let index = 0; index < ids.length; index++) {
     const id = passageId(index);
     const q = scoreQuestion(id);
@@ -25,11 +34,11 @@ export async function liveAsker(
       criteria: [...q.criteria],
       model: LIVE_MODEL,
       timeoutMs: LIVE_TIMEOUT_MS,
-      ...(fetchImpl ? { fetchImpl } : {}),
+      fetchImpl: transport,
     });
-    if (!r.ok) return { ok: false, reason: r.reason };
+    if (!r.ok) return { ok: false, reason: r.reason, calledModel: sent };
     const level = expectedLevel({ legend: r.legend, probabilities: r.probabilities, score: r.score });
-    if (level === undefined) return { ok: false, reason: "incomplete-scores" };
+    if (level === undefined) return { ok: false, reason: "incomplete-scores", calledModel: sent };
     scores[id] = level;
   }
   return { ok: true, scores };

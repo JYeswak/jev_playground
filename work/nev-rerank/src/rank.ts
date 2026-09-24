@@ -60,9 +60,15 @@ export function expectedLevel(answer: unknown): number | undefined {
   return undefined;
 }
 
+/**
+ * A failed asker says whether it sent a request. `calledModel` is true only when
+ * the asker observed one leave (e.g. an HTTP 402 or a timeout); a failure before
+ * any request (no key, billing hold, SDK missing) is false. An asker that omits
+ * the field did not report a request, and rerank() reports false.
+ */
 export type RankAnswer =
   | { ok: true; scores: Record<string, number> }
-  | { ok: false; reason: string };
+  | { ok: false; reason: string; calledModel?: boolean };
 
 export type Asker = (state: { query: string; passages: Record<string, string> }) => Promise<RankAnswer>;
 
@@ -128,7 +134,7 @@ export async function rerank(query: string, passages: readonly string[], asker: 
   };
   const answer = await asker(state);
   if (!answer.ok) {
-    return { ordered: false, reason: answer.reason, calledModel: true, truncated, ranking: inputOrder };
+    return { ordered: false, reason: answer.reason, calledModel: answer.calledModel === true, truncated, ranking: inputOrder };
   }
   const ranking = orderByScores(slice, answer.scores);
   if (!ranking) {

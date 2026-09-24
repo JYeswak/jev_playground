@@ -32,6 +32,19 @@ test("a failed asker returns the input order and does not claim a ranking", asyn
   assert.equal(result.ranking[1].text, ANSWER);
 });
 
+test("an asker that sent no request is reported as calledModel false (keyless NOT_RUN)", async () => {
+  const result = await rerank(QUERY, [TRAP, ANSWER], async () => ({ ok: false, reason: "unconfigured" }));
+  assert.equal(result.ordered, false);
+  assert.equal(result.calledModel, false);
+});
+
+test("an asker failure after a sent request keeps calledModel true", async () => {
+  const result = await rerank(QUERY, [TRAP, ANSWER], async () => ({ ok: false, reason: "http", calledModel: true }));
+  assert.equal(result.ordered, false);
+  assert.equal(result.reason, "http");
+  assert.equal(result.calledModel, true);
+});
+
 test("a missing score is not filled in as zero", () => {
   assert.equal(orderByScores([TRAP, ANSWER], { p01: 0.9 }), undefined);
 });
