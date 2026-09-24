@@ -27,7 +27,15 @@ _spec.loader.exec_module(R)
 ARMS = ("jev-run2", "jev-run3", "haiku-run2", "haiku-run3")
 
 
-def main(argv):
+def main(argv, bar_path=None, repo=None):
+    root = os.path.dirname(os.path.dirname(HERE))
+    sys.path.insert(0, os.path.join(root, "work/sr-adopt"))
+    from phase_gate import call_after_bar
+
+    bar = bar_path or os.path.join(
+        root, "docs/demos/upstream-repro/choice-clinc150-full-20260924.md"
+    )
+    call_after_bar(bar, lambda: None, repo=repo or root)
     if not argv or any(a not in ARMS for a in argv):
         print("usage: run-variance.py " + " ".join(ARMS), file=sys.stderr)
         return 64

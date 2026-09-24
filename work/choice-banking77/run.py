@@ -132,7 +132,14 @@ def haiku_diagnostics(resp):
     }
 
 
-def run_jev(rows, label_map, path):
+def run_jev(rows, label_map, path, bar_path=None, repo=None):
+    sys.path.insert(0, os.path.join(ROOT, "work/sr-adopt"))
+    from phase_gate import call_after_bar
+
+    bar = bar_path or os.path.join(
+        ROOT, "docs/demos/upstream-repro/choice-banking77-full-variance-20260924.md"
+    )
+    call_after_bar(bar, lambda: None, repo=repo or ROOT)
     if not os.environ.get("TYPESAFE_API_KEY"):
         print("unconfigured: TYPESAFE_API_KEY unset, no call made", file=sys.stderr)
         return 2
@@ -174,7 +181,14 @@ def run_jev(rows, label_map, path):
     return 3 if failed > fail_limit(rows) else 0
 
 
-def run_haiku(rows, label_map, path):
+def run_haiku(rows, label_map, path, bar_path=None, repo=None):
+    sys.path.insert(0, os.path.join(ROOT, "work/sr-adopt"))
+    from phase_gate import call_after_bar
+
+    bar = bar_path or os.path.join(
+        ROOT, "docs/demos/upstream-repro/choice-banking77-full-variance-20260924.md"
+    )
+    call_after_bar(bar, lambda: None, repo=repo or ROOT)
     if not os.environ.get("ANTHROPIC_API_KEY"):
         print("unconfigured: ANTHROPIC_API_KEY unset, no call made", file=sys.stderr)
         return 2

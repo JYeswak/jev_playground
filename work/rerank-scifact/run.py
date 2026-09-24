@@ -171,7 +171,14 @@ def billing_block(message):
     return "402" in message and "credits" in message.lower()
 
 
-async def run_arm(arm):
+async def run_arm(arm, bar_path=None, repo=None):
+    sys.path.insert(0, os.path.join(ROOT, "work/sr-adopt"))
+    from phase_gate import call_after_bar
+
+    bar = bar_path or os.path.join(
+        ROOT, "docs/demos/upstream-repro/rerank-beir-scifact-20260924.md"
+    )
+    call_after_bar(bar, lambda: None, repo=repo or ROOT)
     jev = arm.startswith("jev")
     need = "TYPESAFE_API_KEY" if jev else "XAI_API_KEY"
     if not os.environ.get(need):

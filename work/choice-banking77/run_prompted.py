@@ -31,7 +31,14 @@ from typesafe_sdk import RetryPolicy  # noqa: E402
 OUT = os.path.join(run.HERE, "rows-full-haiku-prompted.jsonl")
 
 
-def main(argv):
+def main(argv, bar_path=None, repo=None):
+    sys.path.insert(0, os.path.join(run.ROOT, "work/sr-adopt"))
+    from phase_gate import call_after_bar
+
+    bar = bar_path or os.path.join(
+        run.ROOT, "docs/demos/upstream-repro/choice-banking77-full-variance-20260924.md"
+    )
+    call_after_bar(bar, lambda: None, repo=repo or run.ROOT)
     # --out replaces the rows path for repeat runs (bead jev-384m), as run.py --out does.
     out = OUT
     if "--out" in argv:

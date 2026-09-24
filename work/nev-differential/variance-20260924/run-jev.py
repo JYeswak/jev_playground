@@ -46,7 +46,15 @@ def done():
     return ids
 
 
-async def main(concurrency=8):
+async def main(concurrency=8, bar_path=None, repo=None):
+    root = os.path.dirname(os.path.dirname(os.path.dirname(HERE)))
+    sys.path.insert(0, os.path.join(root, "work/sr-adopt"))
+    from phase_gate import call_after_bar
+
+    bar = bar_path or os.path.join(
+        root, "docs/demos/upstream-repro/injection-variance-20260924.md"
+    )
+    call_after_bar(bar, lambda: None, repo=repo or root)
     if not os.environ.get("TYPESAFE_API_KEY"):
         print(
             "unconfigured: TYPESAFE_API_KEY is not set, no call made", file=sys.stderr
