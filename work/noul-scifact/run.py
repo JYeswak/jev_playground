@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Both live arms for bead jev-9er: one Noul question per SciFact claim/abstract pair.
+"""Live arms for beads jev-9er and jev-k2q: one Noul question per SciFact claim/abstract pair.
 
-Bar: docs/demos/upstream-repro/noul-scifact-20260924.md (committed before the first call).
-  jev   -> official typesafe_sdk AsyncTypeSafeClient, model pinned jev-1.13.0 (TYPESAFE_API_KEY)
-  haiku -> system-one-adapter-python, anthropic/claude-haiku-4-5, probabilities mode (ANTHROPIC_API_KEY)
+Bars: docs/demos/upstream-repro/noul-scifact-20260924.md (jev, haiku) and
+noul-scifact-criteria-20260924.md (jev-nocriteria), each committed before its first call.
+  jev            -> official typesafe_sdk AsyncTypeSafeClient, model pinned jev-1.13.0 (TYPESAFE_API_KEY)
+  jev-nocriteria -> same client and instructions, criteria removed (the jev-k2q ablation)
+  jev-rerun      -> the jev question again, run beside jev-nocriteria (jev-k2q noise control)
+  haiku          -> system-one-adapter-python, anthropic/claude-haiku-4-5, probabilities mode (ANTHROPIC_API_KEY)
 Run (venv python has both packages):
   infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
-    upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/noul-scifact/run.py jev|haiku
+    upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/noul-scifact/run.py <arm>
 Appends to work/noul-scifact/rows-<arm>.jsonl; rows that already hold an answer are skipped, so a
 rerun retries only failed rows. Never prints a key.
 """
@@ -37,6 +40,9 @@ QUESTION = Noul(
         "false": "The abstract contradicts the claim, or does not address what the claim asserts",
     },
 )
+# jev-k2q ablation, frozen with its bar: identical instructions, no outcome criteria.
+QUESTION_NO_CRITERIA = Noul(instructions=QUESTION.instructions)
+ARMS = ("jev", "jev-nocriteria", "jev-rerun", "haiku")
 
 
 def out_path(arm):
@@ -59,7 +65,7 @@ def state(s):
 
 
 async def main(arm, concurrency=8):
-    need = {"jev": "TYPESAFE_API_KEY", "haiku": "ANTHROPIC_API_KEY"}[arm]
+    need = "ANTHROPIC_API_KEY" if arm == "haiku" else "TYPESAFE_API_KEY"
     if not os.environ.get(need):
         print(f"unconfigured: {need} is not set, no call made", file=sys.stderr)
         return 2
@@ -74,11 +80,12 @@ async def main(arm, concurrency=8):
     sem = asyncio.Semaphore(concurrency)
     ok = failed = 0
 
-    if arm == "jev":
+    if arm != "haiku":
         client = AsyncTypeSafeClient(model=JEV_MODEL, retry=RetryPolicy())
+        question = QUESTION_NO_CRITERIA if arm == "jev-nocriteria" else QUESTION
 
         async def call(s):
-            resp = await client.system_one(state(s), {QNAME: QUESTION})
+            resp = await client.system_one(state(s), {QNAME: question})
             return {
                 "noul": float(resp.nouls[QNAME].noul),
                 "model": resp.model,
@@ -140,6 +147,6 @@ async def main(arm, concurrency=8):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2 or sys.argv[1] not in ("jev", "haiku"):
-        raise SystemExit("usage: run.py jev|haiku")
+    if len(sys.argv) != 2 or sys.argv[1] not in ARMS:
+        raise SystemExit("usage: run.py " + "|".join(ARMS))
     sys.exit(asyncio.run(main(sys.argv[1])))
