@@ -155,5 +155,85 @@ rows than it gains.
 
 ### Full 77 intents, N = 3,080
 
-Pending: waiting for ChoiceBanking77 to commit the finished prompted Haiku run and its score
-(`jev-4jf`). The prompted rows have not been read by this scorer.
+Inputs: `full.jsonl`, `rows-full-jev.jsonl` (frozen at `3c473ae`) and
+`rows-full-haiku-prompted.jsonl` (committed with ChoiceBanking77's results at `5839235`, read here
+only after that commit). Haiku 4.5 through the adapter in prompted-JSON mode, because the
+structured-output arm hit Anthropic's grammar cap (see `choice-banking77-full-20260924.md`).
+Level [test], offline, $0. Full output: `work/confidence-cascade/out-full.txt`. Re-score and
+diff: `python3 work/confidence-cascade/cascade.py --set full | diff - work/confidence-cascade/out-full.txt`.
+
+The scorer reproduces the parent arms: Jev 2,467/3,080, Haiku-prompted 2,267/3,080; Jev-only 326,
+Haiku-only 126. The oracle ceiling is therefore 2,593 (+126 over Jev alone), much higher than on
+10 intents. 5 Haiku rows are flat (Jev right on 1).
+
+**Policy A, primary, all 3,080 rows** (selected points; every point is in the output file).
+
+| t | Correct | Escalated | ms/req | tokens/req | $/1k req | correct per s | correct per 1k tok | Pareto |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| 0.00 to 0.15 (Jev alone) | 2,467 (80.10%) | 0 | 174 | 1,710 | 0.040 | 14,203.0 | 1,442.7 | lat, tok |
+| 0.25 | 2,468 | 2 (0.1%) | 176 | 1,712 | 0.045 | 14,002.4 | 1,441.6 | lat, tok |
+| 0.30 | 2,470 | 10 (0.3%) | 187 | 1,720 | 0.063 | 13,224.0 | 1,436.1 | lat, tok |
+| 0.35 | 2,472 | 25 (0.8%) | 209 | 1,735 | 0.097 | 11,828.3 | 1,424.9 | lat, tok |
+| **0.45** | **2,473 (80.29%)** | 78 (2.5%) | 278 | 1,787 | 0.217 | 8,887.0 | 1,383.5 | lat, tok |
+| 0.50 | 2,462 | 150 (4.9%) | 375 | 1,859 | 0.381 | 6,568.4 | 1,324.4 | |
+| 0.70 | 2,448 | 499 (16.2%) | 857 | 2,206 | 1.174 | 2,855.4 | 1,109.8 | |
+| 0.80 | 2,422 | 700 (22.7%) | 1,129 | 2,407 | 1.634 | 2,146.0 | 1,006.3 | |
+| 0.90 | 2,402 | 986 (32.0%) | 1,518 | 2,692 | 2.286 | 1,581.9 | 892.3 | |
+| 1.00 | 2,310 | 2,001 (65.0%) | 2,909 | 3,700 | 4.586 | 794.2 | 624.3 | |
+| always | 2,267 | 3,080 (100%) | 4,362 | 4,769 | 7.021 | 519.8 | 475.4 | |
+| Haiku alone | 2,267 (73.60%) | (no Jev call) | 4,188 | 3,059 | 6.981 | 541.3 | 741.2 | |
+
+Unlike the 10-intent set, low cuts do buy a few rows in sample: 0.25 to 0.45 add 1 to 6 rows at
+0.1% to 2.5% escalation, and all of them except 0.40 sit on the Pareto frontier. From 0.50 up,
+accuracy falls below Jev alone.
+
+**Why the ceiling is out of reach.** The 126 Haiku-only rows are spread across Jev's confidence
+range (min 0.23, quartiles 0.51 / 0.62 / 0.80, max 0.98), and 283 of the 326 Jev-only rows also
+sit below 1.0. On the rows each cut escalates, Jev is still right more often than Haiku:
+
+| Cut | Rows escalated | Jev right on them | Haiku right on them | Flat Haiku rows among them |
+|---|---:|---:|---:|---:|
+| 0.50 | 150 | 48 | 43 | 1 |
+| 0.70 | 499 | 211 | 192 | 3 |
+| 0.90 | 986 | 530 | 465 | 4 |
+| 1.00 | 2,001 | 1,414 | 1,257 | 5 |
+
+**Checks from the bar.** Best point within the 25% cap (770 rows): `t = 0.45`, 2,473/3,080, 78
+escalated, 6 rows above Jev alone. At that point, cascade-only correct 16 and Jev-only correct
+10, McNemar exact p = 0.33. **2-fold (even/odd `i`): the even fold picks `t = 0.65`, the odd fold
+picks `t = 0.30`, and out of fold the cascade gets 2,454 against Jev alone's 2,467 (-13).** The
+in-sample gain is a threshold picked on the same rows, and it does not transfer between halves.
+
+**Flat Haiku rows dropped (sensitivity, N = 3,075).** Same result: best 2,472 at `t = 0.45`
+against 2,466 for Jev alone (+6, McNemar p = 0.33), 2-fold -13.
+
+**Policy B (descriptive).** Best 2,475/3,080 at `t = 0.45` (+8 over Jev alone). It holds between
+2,464 and 2,475 up to `t = 0.90`, because it keeps Jev's answer whenever Haiku is less confident.
+Not preregistered as a verdict and not cross-validated here.
+
+**Verdict, 77 intents: NOT USEFUL.** Under the bar at `cc559c6`, the best in-sample cut
+(`t = 0.45`) is 6 rows above Jev alone (p = 0.33). The 2-fold check loses 13 rows out of fold, so
+the rule's second condition fails. Even that in-sample point does not beat both arms per unit cost:
+8,887 correct per second of mean latency and 1,383.5 per 1,000 tokens, against 14,203.0 and
+1,442.7 for Jev alone. Haiku alone is at 541.3 and 741.2. Jev alone has 26.2x Haiku's correct rows
+per second and 1.9x per 1,000 tokens.
+
+### Answer to the bead
+
+On both committed Banking77 runs, no Jev-first, Haiku-second confidence cascade beats both
+single arms on accuracy per unit cost. On 10 intents escalation only loses rows. On 77 intents a
+low cut gains up to 6 rows in sample, which is not significant and does not survive the 2-fold
+check. Jev alone is on the Pareto frontier in both sets and has the most correct rows per second
+and per 1,000 tokens of any point in either. The vendor's confidence gate still makes sense, but
+on this task the escalation target should be a human, not Haiku.
+
+**Scratch left in place:** none (the scorer writes only to stdout).
+
+**NO-CLAIM (results).** Offline arithmetic on one recorded run per arm (`jev-1.13.0` and Haiku
+4.5 via `system-one-adapter-python`: probabilities mode, structured on 10 intents, prompted JSON
+on 77). Cascade latency and tokens are sums of separately recorded calls, not a deployed cascade.
+Not run: a Haiku-first cascade, any second model other than Haiku 4.5, Haiku in discrete mode,
+per-intent thresholds, run-to-run variance of the cascade (bead `jev-qbc` measures single-arm
+variance), and cost from a bill. The dollar column is [INFERENCE] from list prices. Policy B's
++8 on 77 intents is descriptive and untested out of fold. A non-author re-score is pending, and
+the bead stays open for it.

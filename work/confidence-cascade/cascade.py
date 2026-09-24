@@ -260,6 +260,15 @@ def verdict(rows, pts, hk):
         )
 
 
+def spread(vals):
+    """The values themselves when few, else min / quartiles / max (nearest rank)."""
+    s = sorted(vals)
+    if len(s) <= 10:
+        return s
+    q = [s[max(0, math.ceil(p * len(s)) - 1)] for p in (0.25, 0.5, 0.75)]
+    return f"min {s[0]}, quartiles {q[0]} / {q[1]} / {q[2]}, max {s[-1]}"
+
+
 def report(rows, title):
     print(
         f"\n## {title}: N = {len(rows)}\n\n### Policy A (primary): escalate, take Haiku\n"
@@ -274,7 +283,7 @@ def report(rows, title):
     ]
     print(
         f"Why: Haiku-only-correct rows {len(hk_only)}, Jev confidence on them "
-        f"{sorted(r['jev'][1] for r in hk_only)}; Jev-only-correct rows {len(jev_only)}, "
+        f"{spread([r['jev'][1] for r in hk_only])}; Jev-only-correct rows {len(jev_only)}, "
         f"of which {sum(1 for r in jev_only if r['jev'][1] < 1.0)} have Jev confidence < 1.0 "
         f"and so escalate somewhere on the grid."
     )
