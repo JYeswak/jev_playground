@@ -135,3 +135,91 @@ rows stay as they are, uncounted.
 until the adjudication is committed.
 
 **NO-CLAIM.** Five sessions now, not six. The metrics, bar and replay are unchanged.
+
+## Results (live, 2026-09-24)
+
+**Order in history:**
+1. `108d6bd`: preregistration.
+2. `a92f5d9`: the sample and the call list.
+3. `898d1d5`: labeller 1.
+4. `c8bb9cd`: labeller 2.
+5. `a8893c1`: amendment A1.
+6. `941c849`: pane 1's adjudication of the 32 disagreements.
+7. The commit carrying this section, with `decisions.jsonl` and `decisions-pass.json`.
+
+`need.py ready` exited 0 before the one live run. The run was
+`infisical run … node --experimental-strip-types work/compaction-need/need.ts replay --live` at
+17:44:30Z–17:44:32Z, with `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` unset.
+
+**Spend.** 5 requests, one `compactMessages` batch per session, all on `jev-1.13.0`. Input was 57,347
+tokens, which is **$0.0024**. The token count comes from the response usage recorded by the
+injected `fetch`.
+
+**Labels.**
+- Final (shared, or adjudicated): 48 needed, 146 not-needed, 6 undecidable across 200 calls.
+- Exact agreement 168/200. Cohen's kappa on needed vs not-needed 0.686 over the 190 rows neither
+  labeller marked undecidable.
+- 36 calls are pinned (the last 6 prefix messages) and always kept: 16 needed and 20 not-needed. They
+  are in no rate. That leaves 164 unpinned calls: 32 needed, 126 not-needed, 6 undecidable.
+
+**What the replay did.** Across all 200 calls it kept only the 36 pinned ones, dropped the result
+and kept the call on 14, and dropped 150 calls whole. Not one unpinned call reached the
+`keepResult ≥ 0.5` needed to keep its result verbatim. The highest `keepResult` was 0.24.
+
+**Recall on the 32 needed unpinned calls:**
+
+| Measure | Count | Wilson 95% |
+|---|---:|---|
+| **result kept verbatim (primary)** | **0/32** | 0.000–0.107 |
+| call kept, result verbatim or cut to its first 500 chars | 4/32 | 0.050–0.281 |
+| not-needed calls dropped whole | 116/126 | 0.860–0.956 |
+| undecidable calls | 6, all dropped whole | in no rate |
+
+**Against the reference bar** (primary recall with a Wilson lower bound of at least 0.80): the lower
+bound is 0.000, so the bar is not met. Numbers only.
+
+**Per session:**
+
+| session | unpinned | needed | needed kept | needed call kept | not-needed | not-needed dropped |
+|---|---:|---:|---:|---:|---:|---:|
+| 01a0c086 | 34 | 14 | 0 | 1 | 20 | 18 |
+| 01a0c530 | 38 | 0 | 0 | 0 | 35 | 34 |
+| 01a0d151 | 34 | 8 | 0 | 1 | 26 | 25 |
+| 01a0d161 | 34 | 6 | 0 | 2 | 27 | 21 |
+| 01a0d269 | 24 | 4 | 0 | 0 | 18 | 18 |
+
+**One labeller's labels alone.** The result does not change.
+
+| Labels | needed / not-needed | kept verbatim | call kept | not-needed dropped |
+|---|---|---|---|---|
+| final | 32 / 126 | 0/32 (0.000–0.107) | 4/32 (0.050–0.281) | 116/126 (0.860–0.956) |
+| labeller 1 alone | 41 / 116 | 0/41 (0.000–0.086) | 6/41 (0.069–0.284) | 109/116 (0.881–0.970) |
+| labeller 2 alone | 38 / 120 | 0/38 (0.000–0.092) | 5/38 (0.058–0.273) | 111/120 (0.864–0.960) |
+
+**The nouls carry some signal below the cut, descriptive only.** Mean `keepResult` is 0.170 on needed
+calls and 0.143 on not-needed ones. Mean `keepCall` is 0.429 and 0.371. The AUC of needed vs
+not-needed is 0.691 for `keepResult` and 0.689 for `keepCall`. The 0.5 threshold sits above every
+`keepResult` Jev returned. The threshold is the library's default. It was preregistered here and
+was not tuned.
+
+**Disclosures.**
+- **Rider exclusion.** Amendment A1 removed session `01a0c085`. Its packet held skillranker source,
+  and both labellers, Anthropic subagents pane 1 spawned, read it before the exclusion. Excluding
+  the session keeps that source out of the evaluation. It does not undo the reading.
+- **Adjudication principle.** Pane 1 adjudicated the 32 disagreements blind to any decision: 25
+  not-needed, 4 needed, 3 undecidable; 10 went with labeller 1 and 22 with labeller 2. One
+  principle was applied: when the same fact reaches the context again from a later prefix call, the
+  later call is its source and the earlier one is not-needed. That extends the preregistered
+  re-obtain clause to restatement. It is the adjudicator's reading, not preregistered text. It makes
+  recall stricter on the earliest source of a fact and easier on its later copies. The labeller-alone
+  rows above give the same 0 kept verbatim either way.
+
+**Rows.** `decisions.jsonl` holds, for each of the 200 calls: session, `tool_use_id`, action, reason,
+`keepCall` and `keepResult`. It holds no session text. `decisions-pass.json` holds lane, model,
+time, requests, input tokens and spend. Re-score, keyless: `python3 work/compaction-need/need.py score`.
+
+**NO-CLAIM.**
+- Five sessions of one project, one cut point each, and a 40-message horizon.
+- The library's default threshold and options, and one model pin.
+- This measures `fast-jev-compaction`'s questions at its default `keepThreshold`. It does not measure
+  Jev's ability to rank tool calls by need at other thresholds or with other wording.
