@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Scorer for bead jev-k2q: do Noul outcome criteria lift claim verification on SciFact?
+"""Scorer for beads jev-k2q (SciFact) and jev-5jp (FEVER): do Noul outcome criteria lift claim
+verification?
 
-Run: python3 work/noul-scifact/compare-criteria.py   (stdlib only, no key, no network)
-Primary pair  : rows-jev.jsonl (criteria, committed at 83a7295) vs rows-jev-nocriteria.jsonl.
+Run: python3 work/noul-scifact/compare-criteria.py [data_dir]   (stdlib only, no key, no network)
+data_dir (default: this directory) holds sample.jsonl and the rows files below.
+Primary pair  : rows-jev.jsonl (criteria, the committed arm) vs rows-jev-nocriteria.jsonl.
 Control pair  : rows-jev-rerun.jsonl (criteria, run beside the ablation) vs rows-jev-nocriteria.jsonl,
                 plus rows-jev vs rows-jev-rerun as the run-to-run noise floor.
 Metric functions, failed-row handling, the 0.5 cut and the bootstrap are imported from score.py,
-so both receipts use the same arithmetic. Rules frozen in
-docs/demos/upstream-repro/noul-scifact-criteria-20260924.md.
+so every receipt uses the same arithmetic. Rules frozen in
+docs/demos/upstream-repro/noul-scifact-criteria-20260924.md and noul-fever-criteria-20260924.md.
 """
 
 import importlib.util
@@ -20,8 +22,8 @@ S = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(S)
 
 
-def arm(sample, name):
-    rows = S.load_jsonl(os.path.join(HERE, f"rows-{name}.jsonl"))
+def arm(sample, name, data):
+    rows = S.load_jsonl(os.path.join(data, f"rows-{name}.jsonl"))
     preds = S.arm_probs(sample, rows)
     p = [r["noul"] if r is not None else 0.5 for r in preds]
     y = [1 if s["truth"] else 0 for s in sample]
@@ -68,19 +70,19 @@ def verdict(v):
     return "NO EFFECT"
 
 
-def main():
-    sample = S.load_jsonl(os.path.join(HERE, "sample.jsonl"))
+def main(data=HERE):
+    sample = S.load_jsonl(os.path.join(data, "sample.jsonl"))
     y = [1 if s["truth"] else 0 for s in sample]
     n = len(y)
     names = {
-        "jev": "criteria (committed 83a7295)",
+        "jev": "criteria (committed)",
         "jev-nocriteria": "no criteria (ablation)",
         "jev-rerun": "criteria (same-time rerun)",
     }
-    arms = {k: arm(sample, k) for k in names}
+    arms = {k: arm(sample, k, data) for k in names}
     arms = {k: v for k, v in arms.items() if any(v["preds"])}
 
-    print(f"sample: {n} pairs, true {sum(y)}")
+    print(f"data: {data}\nsample: {n} pairs, true {sum(y)}")
     print(
         "\n| Arm | Answered | Correct at >0.5 | Accuracy | AUC | Brier | ECE | p50 / p95 ms | Tokens in / out | Distinct values |"
     )
@@ -134,7 +136,7 @@ def main():
         )
 
     print(
-        "\nBy SciFact gold label (correct at >0.5 / mean noul); McNemar criteria vs ablation within label"
+        "\nBy gold label (correct at >0.5 / mean noul); McNemar criteria vs ablation within label"
     )
     print(
         "| Gold | Rows | "
@@ -142,7 +144,10 @@ def main():
         + " | McNemar (committed vs ablation) |"
     )
     print("|---|---:|" + "---|" * len(arms) + "---|")
-    for g in ("SUPPORT", "CONTRADICT", "NEI"):
+    true_golds = {s["gold"] for s in sample if s["truth"]}
+    for g in sorted(
+        {s["gold"] for s in sample}, key=lambda g: (g not in true_golds, g)
+    ):
         idx = [i for i, s in enumerate(sample) if s["gold"] == g]
         cells = []
         for k, a in arms.items():
@@ -167,4 +172,4 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(os.path.abspath(sys.argv[1]) if len(sys.argv) > 1 else HERE))
