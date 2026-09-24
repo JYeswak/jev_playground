@@ -1,85 +1,51 @@
-// Compaction keep rule (bead jev-jec6): does a lower cut or a reworded keep question keep the tool
-// results a later turn needs? Rules are preregistered in docs/demos/upstream-repro/compaction-keep-20260924.md.
+// Held-out test of keep rule C3 (bead jev-5720): keep a tool result when Jev's keepCall >= T_C3,
+// with T_C3 fixed on the development sets (jev-x86y, jev-jec6). Rules are preregistered in
+// docs/demos/upstream-repro/compaction-c3-20260924.md.
 //
-//   node --experimental-strip-types work/compaction-keep/keep.ts select    # seeded sample + rider screen -> sessions.json
-//   node --experimental-strip-types work/compaction-keep/keep.ts packets   # /tmp/jec6-packets (never committed) + calls.json (ids)
-//   node --experimental-strip-types work/compaction-keep/keep.ts replay --live   # after labels are final
+//   node --experimental-strip-types work/compaction-c3/c3.ts select    # seeded sample + rider screen -> sessions.json
+//   node --experimental-strip-types work/compaction-c3/c3.ts packets   # /tmp/c3-packets (never committed) + calls.json (ids)
+//   node --experimental-strip-types work/compaction-c3/c3.ts replay --live   # after labels are final
 //
-// Same cut as jev-x86y (need.ts cut(): prefix through the 40th paired call's result, 40-message
-// horizon). The replay asks, per session, (A) the library's own compaction questions, whose
-// keepResult gives the current rule C0 (cut 0.5) and the lower-cut rule C1 (cut 0.15), and (B) the
-// reworded NEED question below on the same fitted state and batches, which gives rule C2 (cut 0.5).
+// Same cut and label as jev-x86y (need.ts cut()); one library compactMessages call per session, whose
+// per-call keepResult gives C0 and C1 and whose keepCall gives C3.
 import { spawnSync } from "node:child_process";
 import { createHash, timingSafeEqual } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { batchCalls, collectToolCalls, compactMessages, fitState, JevClient, resolveOptions } from "../../fast-jev-compaction/dist/index.js";
-import type { Message, ToolCall } from "../../fast-jev-compaction/dist/index.js";
-import { clip, cut, EXCLUDE, load, MIN_CALLS, OPTIONS, render, rng, SIZE, sessionFiles, untilde } from "../compaction-need/need.ts";
+import { collectToolCalls, compactMessages } from "../../fast-jev-compaction/dist/index.js";
+import type { ToolCall } from "../../fast-jev-compaction/dist/index.js";
+import { riderHits } from "../compaction-keep/keep.ts";
+import { clip, cut, EXCLUDE, load, MIN_CALLS, OPTIONS, render, rng, sessionFiles, untilde } from "../compaction-need/need.ts";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..", "..");
 const HOME = homedir();
 const SESSIONS = join(HERE, "sessions.json");
 const CALLS = join(HERE, "calls.json");
-const PACKETS = "/tmp/jec6-packets";
-export const CUTOFF = "2026-09-24T17:45:00Z";
-export const SEED = 20260925;
-export const SAMPLE = 6;
-// A tool call whose input points into a rider-covered checkout reads its content (AGENTS.md
-// "Rider-Covered Repos"): the session is screened out before any labeller sees its packet.
-// Amendment A1: the names are every public repository of github.com/Dicklesworthstone
-// (rider-repos.txt, from `gh repo list`, metadata only), plus the local mirror and skillranker-tip.
-// A path component equal to one of them, a `git -C` or `cd` into one, or any `Dicklesworthstone/`
-// (a gh --repo, a URL) screens the session out. Conservative: a name-only reference counts.
-const RIDER_NAMES = [
-  ...readFileSync(join(dirname(fileURLToPath(import.meta.url)), "rider-repos.txt"), "utf8")
-    .split("\n")
-    .filter((l) => l.trim() && !l.startsWith("#")),
-  "skillranker-tip",
-  "dicklesworthstone-mirror",
-].map((n) => n.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-const NAMES = `(?:${RIDER_NAMES.join("|")})`;
-export const RIDER_PATH = new RegExp(
-  `(?:(?:^|[\\s"'\`=:(/])${NAMES}/|(?:-C|\\bcd)\\s+["']?(?:[\\w.~-]*/)*${NAMES}(?![\\w-])|dicklesworthstone/)`,
-  "i",
-);
+const PACKETS = "/tmp/c3-packets";
+export const CUTOFF = "2026-09-24T18:00:00Z";
+export const SEED = 20260926;
+export const SAMPLE = 8;
+// The 200KB-3MB jev pool is exhausted by jev-x86y and jev-jec6; the upper bound is raised to 12 MB.
+export const SIZE = [200_000, 12_000_000];
 
-/** The reworded keep question for rule C2, one noul per candidate call. */
-export function needQuestions(batch: readonly ToolCall[]) {
-  return Object.fromEntries(
-    batch.map((call) => [
-      `need_${call.id}`,
-      {
-        type: "noul",
-        instructions: `The output of tool call ${call.id} (${call.tool}, ${call.resultChars} chars) holds information the assistant will read, cite or act on in its next steps, and no later call in the history gives that information again.`,
-        criteria: {
-          true: "A next step would use a value, line, path, error or finding that appears in this output and in no later call's input or output.",
-          false: "The output was exploration the assistant has moved past, or a later call re-read, re-ran or restated what it held.",
-        },
-      },
-    ]),
-  );
-}
-
-function usedSessions(): Set<string> {
-  const x86y = JSON.parse(readFileSync(join(ROOT, "work/compaction-need/sessions.json"), "utf8"));
-  return new Set([...EXCLUDE, ...x86y.sessions.map((s: { id: string }) => s.id)]);
-}
-
-export function riderHits(prefix: readonly Message[], horizon: readonly Message[]): number {
-  let hits = 0;
-  for (const m of [...prefix, ...horizon]) for (const u of m.toolUses ?? []) if (RIDER_PATH.test(JSON.stringify(u.input))) hits += 1;
-  return hits;
-}
-
-/** True when `path` is tracked and unmodified: a committed sample or call set is never redrawn. */
 function committed(path: string): boolean {
   const rel = path.slice(ROOT.length + 1);
   const logged = spawnSync("git", ["-C", ROOT, "log", "-1", "--format=%h", "--", rel], { encoding: "utf8" }).stdout.trim();
   return Boolean(logged) && spawnSync("git", ["-C", ROOT, "diff", "--quiet", "HEAD", "--", rel]).status === 0;
+}
+
+/** Every session id a development set sampled, screened or saw, plus jev-0c6's files A and B. */
+function usedSessions(): Set<string> {
+  const used = new Set<string>(EXCLUDE);
+  for (const rel of ["work/compaction-need/sessions.json", "work/compaction-keep/sessions.json"]) {
+    const s = JSON.parse(readFileSync(join(ROOT, rel), "utf8"));
+    for (const x of s.sessions) used.add(x.id);
+    for (const x of s.screened_out_rider ?? []) used.add(x.id);
+  }
+  return used;
 }
 
 function select() {
@@ -94,14 +60,13 @@ function select() {
   for (const f of sessionFiles()) {
     const st = statSync(f);
     const id = basename(f).split("_")[1]?.slice(0, 8) ?? "";
-    if (used.has(id)) { skip("used in jev-x86y or jev-0c6"); continue; }
+    if (used.has(id)) { skip("used by a development set or jev-0c6"); continue; }
     if (st.mtime.toISOString() >= CUTOFF) { skip("written after CUTOFF"); continue; }
-    if (st.size < SIZE[0] || st.size > SIZE[1]) { skip("size outside 200KB-3MB"); continue; }
+    if (st.size < SIZE[0] || st.size > SIZE[1]) { skip("size outside 200KB-12MB"); continue; }
     const calls = collectToolCalls(load(f), 0).length;
     if (calls < MIN_CALLS) { skip(`fewer than ${MIN_CALLS} paired tool calls`); continue; }
     eligible.push({ path: f.replace(HOME, "~"), id, bytes: st.size, calls, sha256: createHash("sha256").update(readFileSync(f)).digest("hex") });
   }
-  // Seeded order over the eligible list; take sessions in that order until SAMPLE pass the rider screen.
   const draw = rng(SEED);
   const pool = [...eligible];
   const order = [];
@@ -116,7 +81,7 @@ function select() {
     else picked.push(s);
   }
   picked.sort((a, b) => a.path.localeCompare(b.path));
-  writeFileSync(SESSIONS, JSON.stringify({ seed: SEED, cutoff: CUTOFF, eligible: eligible.length, skipped, screened_out_rider: screened, sessions: picked }, null, 2) + "\n");
+  writeFileSync(SESSIONS, JSON.stringify({ seed: SEED, cutoff: CUTOFF, size: SIZE, eligible: eligible.length, skipped, screened_out_rider: screened, sessions: picked }, null, 2) + "\n");
   console.log(JSON.stringify({ eligible: eligible.length, picked: picked.map((p) => `${p.id} ${p.calls}`), screened_out_rider: screened, skipped }));
   return 0;
 }
@@ -163,7 +128,7 @@ async function replay() {
     console.log("NOT_RUN: the replay makes live Jev calls; rerun with --live under `infisical run` once labels are final");
     return 2;
   }
-  const ready = spawnSync("python3", [join(HERE, "keep.py"), "ready"], { encoding: "utf8" });
+  const ready = spawnSync("python3", [join(HERE, "c3.py"), "ready"], { encoding: "utf8" });
   if (ready.status !== 0) {
     console.log(`REFUSED: ${(ready.stdout || ready.stderr).trim()}`);
     return 1;
@@ -185,23 +150,13 @@ async function replay() {
   const out = [];
   for (const s of sessions()) {
     const c = cut(load(untilde(s.path)))!;
-    const a = await compactMessages(c.prefix, { ...OPTIONS, apiKey, fetch: recording });
-    const resolved = resolveOptions(OPTIONS);
-    const calls = collectToolCalls(c.prefix, resolved.preserveRecentMessages);
-    const candidates = calls.filter((x: ToolCall) => !x.pinned);
-    const fitted = fitState(c.prefix, calls, resolved);
-    const client = new JevClient({ apiKey, model: OPTIONS.model, fetch: recording });
-    const need = new Map<string, number>();
-    for (const batch of batchCalls(candidates, fitted.tokens, resolved)) {
-      const { answers } = await client.ask(fitted.state, needQuestions(batch));
-      for (const call of batch) need.set(call.id, Number(answers[`need_${call.id}`]?.noul));
-    }
-    const byId = new Map(calls.map((x: ToolCall) => [x.id, x]));
-    for (const d of a.decisions) {
+    const result = await compactMessages(c.prefix, { ...OPTIONS, apiKey, fetch: recording });
+    const byId = new Map(c.prefixCalls.map((x: ToolCall) => [x.id, x]));
+    for (const d of result.decisions) {
       const call = byId.get(d.id)!;
-      out.push({ session: s.id, tool_use_id: call.tool_use_id, pinned: call.pinned, keepCall: d.keepCall, keepResult: d.keepResult, need: need.get(d.id) ?? null });
+      out.push({ session: s.id, tool_use_id: call.tool_use_id, pinned: call.pinned, action: d.action, keepCall: d.keepCall, keepResult: d.keepResult });
     }
-    console.error(`${s.id}: ${calls.length} calls, ${candidates.length} candidates`);
+    console.error(`${s.id}: ${result.stats.calls} calls, ${result.stats.requests} requests`);
   }
   const input = inputTokens.reduce((x, y) => x + y, 0);
   const requests = inputTokens.length;
@@ -211,9 +166,6 @@ async function replay() {
   return 0;
 }
 
-// Run only as a script, so work/compaction-c3/c3.ts can import RIDER_PATH and riderHits.
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const mode = process.argv[2];
-  const code = mode === "select" ? select() : mode === "packets" ? packets() : mode === "replay" ? await replay() : (console.log("usage: keep.ts select|packets|replay --live"), 64);
-  process.exit(code);
-}
+const mode = process.argv[2];
+const code = mode === "select" ? select() : mode === "packets" ? packets() : mode === "replay" ? await replay() : (console.log("usage: c3.ts select|packets|replay --live"), 64);
+process.exit(code);
