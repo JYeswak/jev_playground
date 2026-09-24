@@ -9,18 +9,20 @@
  * API and filesystem work runs detached, so the tool path waits only for the
  * synchronous slice (measured, see receipt).
  *
- * Secrets: commands matching the private/secret filters in
+ * Secrets: commands matching the PRIVATE/SECRET filters in
  * `work/bicameral-gate/real-sample.py` are never sent to the API — logged
- * `skipped:secret` with a redacted prefix. The patterns live in that file;
- * the copies below are verified against it by the parity test (direct import
- * is refused: importing real-sample.py rewrites its output file at module
- * scope). A filter failure fails safe toward skip.
+ * `skipped:secret` with a redacted prefix. The patterns are compiled from that
+ * file's source at load (`loadFilters`), so there is one owner and no copy to
+ * drift; importing the .py is refused because it rewrites its output file at
+ * module scope. If the source cannot be read or parsed, every command is
+ * skipped `filter-error`: a filter failure fails safe toward skip.
  *
  * No key: one row `NOT_RUN reason=unconfigured`, no throw. Any throw anywhere
  * in this module is caught: the tool path never sees us.
  */
 import { createHash } from "node:crypto";
-import { appendFile, mkdir, readFile } from "node:fs/promises";
+import { readFileSync } from "node:fs";
+import { appendFile, mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -30,12 +32,44 @@ import { CUT, RISK, STATE_CONTEXT } from "../../../work/bicameral-gate/questions
 export const MODEL = "jev-1.13.0";
 export const MAX_PREFIX = 200;
 export const LOG_REL = "state/jev/gate-observe.jsonl";
+export const REAL_SAMPLE = fileURLToPath(new URL("../../../work/bicameral-gate/real-sample.py", import.meta.url));
 
-// Mirrors of work/bicameral-gate/real-sample.py:29-37. Owned there; the
-// parity test (`secret patterns match real-sample.py`) fails if they drift.
-export const PRIVATE_RE = /clutter|cfsios|cfs-|hubspot|phoenix|accountcenter|grokbot|zesttube|alps|control-plane|omp-orchestrator|franken-harvest|josh-claude-config/i;
-export const SECRET_RE = /sk-[A-Za-z0-9_-]{20,}|xai-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|Bearer [A-Za-z0-9._-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY/;
-export const SCRUB_RE = /sk-[A-Za-z0-9_-]{20,}|xai-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|Bearer [A-Za-z0-9._-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY/g;
+export interface Filters {
+  privateRe: RegExp;
+  secretRe: RegExp;
+  scrubRe: RegExp;
+}
+
+/**
+ * Compile real-sample.py's `PRIVATE` and `SECRET` from its source text: the
+ * concatenated r"..." fragments of each `re.compile(...)`, case-insensitive
+ * when the call passes `re.I`. Throws when either is missing.
+ */
+export function loadFilters(src: string): Filters {
+  const grab = (name: string): { source: string; ignoreCase: boolean } => {
+    const call = src.match(new RegExp(`^${name} = re\\.compile\\(([\\s\\S]*?)\\n\\)`, "m"));
+    if (!call) throw new Error(`${name} = re.compile(...) not found`);
+    const parts = [...call[1].matchAll(/r"((?:[^"\\]|\\.)*)"/g)].map((p) => p[1]);
+    if (parts.length === 0) throw new Error(`${name} has no raw-string fragments`);
+    return { source: parts.join(""), ignoreCase: /\bre\.(I|IGNORECASE)\b/.test(call[1]) };
+  };
+  const priv = grab("PRIVATE");
+  const secret = grab("SECRET");
+  return {
+    privateRe: new RegExp(priv.source, priv.ignoreCase ? "i" : ""),
+    secretRe: new RegExp(secret.source, secret.ignoreCase ? "i" : ""),
+    scrubRe: new RegExp(secret.source, secret.ignoreCase ? "gi" : "g"),
+  };
+}
+
+function loadOwnedFilters(): Filters | null {
+  try {
+    return loadFilters(readFileSync(REAL_SAMPLE, "utf8"));
+  } catch {
+    return null;
+  }
+}
+export const FILTERS: Filters | null = loadOwnedFilters();
 
 export const ROW_KEYS = [
   "ts", "session", "cmdSha", "cmd", "status", "probs", "flag",
@@ -57,10 +91,14 @@ export interface ObserveRow {
 }
 
 
-/** Redacted prefix for the log: HOME → ~, first 200 chars, secret shapes scrubbed. */
-export function redact(command: string, home: string = homedir()): string {
-  const short = command.replaceAll(home, "~").trim().slice(0, MAX_PREFIX);
-  return short.replace(SCRUB_RE, "[REDACTED]");
+/**
+ * Redacted prefix for the log: HOME → ~, secret shapes scrubbed, then the
+ * first 200 chars. Scrubbing before the cut matters: a key straddling char 200
+ * would otherwise be cut below the pattern's minimum length and logged raw.
+ */
+export function redact(command: string, home: string = homedir(), filters: Filters | null = FILTERS): string {
+  if (!filters) return "[filter-unavailable]";
+  return command.replaceAll(home, "~").trim().replace(filters.scrubRe, "[REDACTED]").slice(0, MAX_PREFIX);
 }
 
 export function buildRow(init: {
@@ -79,7 +117,7 @@ export function buildRow(init: {
 export interface ObserveDeps {
   asker?: (args: {
     state: unknown;
-    questions: Record<string, string>;
+    questions: typeof RISK;
     model: string;
     timeoutMs: number;
   }) => Promise<{
@@ -94,16 +132,22 @@ export interface ObserveDeps {
   append?: (path: string, line: string) => Promise<void>;
   logPath?: string;
   now?: () => string;
+  /** omp session id, read from the hook ctx by `makeHandler`. */
+  session?: string;
 }
 
-export function defaultFilter(command: string): { drop: boolean; reason?: string } {
-  try {
-    if (PRIVATE_RE.test(command) || SECRET_RE.test(command)) return { drop: true, reason: "secret" };
-    return { drop: false };
-  } catch {
-    return { drop: true, reason: "filter-error" };
-  }
+export function makeFilter(filters: Filters | null): (command: string) => { drop: boolean; reason?: string } {
+  return (command) => {
+    if (!filters) return { drop: true, reason: "filter-error" };
+    try {
+      if (filters.privateRe.test(command) || filters.secretRe.test(command)) return { drop: true, reason: "secret" };
+      return { drop: false };
+    } catch {
+      return { drop: true, reason: "filter-error" };
+    }
+  };
 }
+export const defaultFilter = makeFilter(FILTERS);
 
 async function defaultAppend(path: string, line: string): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
@@ -132,7 +176,7 @@ export async function observe(
   };
   try {
     const command = typeof event.input?.command === "string" ? event.input.command : "";
-    const base = buildRow({ session: "unknown", command, now: deps.now });
+    const base = buildRow({ session: deps.session ?? "unknown", command, now: deps.now });
     const filter = deps.filter ?? defaultFilter;
     let verdict: { drop: boolean; reason?: string };
     try {
@@ -144,12 +188,11 @@ export async function observe(
       await write({ ...base, status: "skipped", probs: null, flag: null, latencyMs: null, tokens: null, skipped: verdict.reason === "filter-error" ? "filter-error" : "secret", error: null });
       return undefined;
     }
-    const questions = Object.fromEntries(Object.entries(RISK).map(([k, q]) => [k, q]));
     let answer;
     try {
       answer = await (deps.asker ?? askJev)({
         state: { command, context: STATE_CONTEXT },
-        questions,
+        questions: RISK,
         model: MODEL,
         timeoutMs: 20000,
       });
@@ -166,8 +209,9 @@ export async function observe(
       return undefined;
     }
     const probs = answer.scores ?? {};
+    // Strictly above the cut, as every measured runner scores it (real-traffic.mjs, real-score.py).
     await write({
-      ...base, status: "scored", probs, flag: Math.max(...Object.values(probs).map(Number)) >= CUT,
+      ...base, status: "scored", probs, flag: Math.max(...Object.values(probs).map(Number)) > CUT,
       latencyMs: answer.latencyMs ?? null, tokens: answer.usage ?? null,
       skipped: null, error: null,
     });
@@ -177,13 +221,34 @@ export async function observe(
   }
 }
 
-export default function hook(pi: {
-  on: (event: string, handler: (event: unknown) => unknown) => void;
-}): void {
-  pi.on("tool_result", (event) => {
-    const e = event as { toolName?: string };
-    if (e.toolName !== "bash") return undefined;
-    void observe(event as Parameters<typeof observe>[0]).catch(() => {});
+/**
+ * The `tool_result` handler. Synchronous by contract: it reads the command and
+ * session id, schedules the observation on a timer, and returns undefined, so
+ * hashing, filtering, the Jev call and the disk write all run after omp's
+ * awaited handler chain has moved on. `deps` is the test seam.
+ */
+export function makeHandler(deps: ObserveDeps = {}) {
+  return (event: unknown, ctx?: { sessionManager?: { getSessionId?: () => string } }): undefined => {
+    try {
+      const e = event as Parameters<typeof observe>[0];
+      if (e?.toolName !== "bash") return undefined;
+      let session = deps.session ?? "unknown";
+      try {
+        session = ctx?.sessionManager?.getSessionId?.() ?? session;
+      } catch {
+        /* a missing session id is logged as unknown */
+      }
+      const seen = { toolName: e.toolName, input: { command: e.input?.command } };
+      setTimeout(() => void observe(seen, { ...deps, session }).catch(() => {}), 0);
+    } catch {
+      /* observe only: the tool path never sees us */
+    }
     return undefined;
-  });
+  };
+}
+
+export default function hook(pi: {
+  on: (event: string, handler: (event: unknown, ctx?: unknown) => unknown) => void;
+}): void {
+  pi.on("tool_result", makeHandler() as (event: unknown, ctx?: unknown) => unknown);
 }
