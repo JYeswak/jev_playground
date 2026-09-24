@@ -60,7 +60,9 @@ if [ "${1:-}" = '--selftest' ]; then
   # PATH=/usr/bin:/bin hides omp on this machine; the scripts only need a shell builtin
   # to reach the branch, so the arm does not run the TTSR suite.
   for s in selftest-ttsr-rules.sh selftest-ttsr-assert-disabled.sh; do
-    out=$(PATH=/usr/bin:/bin "$root/scripts/$s" 2>&1); code=$?
+    # Unset the portable flag. gates.sh --selftest --portable exports it, and
+    # inheriting it made this RED arm see a SKIP (CI 35973892393).
+    out=$(env -u JEV_GATES_PORTABLE PATH=/usr/bin:/bin "$root/scripts/$s" 2>&1); code=$?
     if [ "$code" -eq 0 ]; then
       echo "80-lane-instrument-selftests --selftest: FAILED — $s exited 0 with omp hidden (silent pass)"
       exit 1
@@ -76,7 +78,24 @@ if [ "${1:-}" = '--selftest' ]; then
       echo "80-lane-instrument-selftests --selftest: FAILED — $s portable skip unnamed"; exit 1; }
   done
 
-  echo "80-lane-instrument-selftests --selftest: OK (3 arms: missing REDs as ABSENT, mode-dropped REDs as UNEXEC, omp-absent REDs unless --portable)"
+  # ARM 4 — portable must not swallow an instrument failure, and must not adopt
+  # another stage's --selftest failure as this stage's rc. One run, both directions.
+  extra=$(mktemp)
+  printf '#!/usr/bin/env bash\necho "RED: planted-stage-selftest-9c42"\nexit 1\n' > "$extra"
+  chmod +x "$extra"
+  out4=$(JEV_GATES_PORTABLE=1 JEV_SELFTEST_FAKE_MISSING=1 JEV_SELFTEST_EXTRA_STAGE="$extra" "$0" 2>&1); code4=$?
+  if [ "$code4" -eq 0 ]; then
+    echo "80-lane-instrument-selftests --selftest: FAILED — portable swallowed a missing suite"
+    exit 1
+  fi
+  printf '%s\n' "$out4" | grep -q 'ABSENT' || {
+    echo "80-lane-instrument-selftests --selftest: FAILED — portable missing suite not named ABSENT"; exit 1; }
+  printf '%s\n' "$out4" | grep -q 'planted-stage-selftest-9c42' || {
+    echo "80-lane-instrument-selftests --selftest: FAILED — portable did not name the other stage"; exit 1; }
+  printf '%s\n' "$out4" | grep -q 'NOTE' || {
+    echo "80-lane-instrument-selftests --selftest: FAILED — other stage failure was not a NOTE under portable"; exit 1; }
+
+  echo "80-lane-instrument-selftests --selftest: OK (4 arms: ABSENT, UNEXEC, omp-absent, portable does not adopt another stage)"
   exit 0
 fi
 
@@ -165,6 +184,7 @@ for p in "$root"/foundation/gates.d/*.sh; do
   grep -qE '"\$\{1:-\}"[[:space:]]*(==|=)[[:space:]]*.--selftest' "$p" || continue
   stage_selftests+=("$p")
 done
+[ -n "${JEV_SELFTEST_EXTRA_STAGE:-}" ] && stage_selftests+=("$JEV_SELFTEST_EXTRA_STAGE")
 
 if [ "${#stage_selftests[@]}" -eq 0 ]; then
   echo "  ERROR   no gates.d stage exposes --selftest — an empty scan set is NOT a pass (RULE 1)"
@@ -173,6 +193,15 @@ else
   for p in "${stage_selftests[@]}"; do
     n="gates.d/$(basename "$p")"
     out=$(cd "$root" && bash "$p" --selftest 2>&1); code=$?
+    # Under --portable, another stage's --selftest verdict belongs on that stage's
+    # row. Folding it here made stage 44's pin a second RED row (CI 35973480692),
+    # and the aggregate then looked unnamed. Exit 8 stays a SKIP. An instrument
+    # suite failure above still sets rc. Default mode is unchanged.
+    if [ -n "${JEV_GATES_PORTABLE:-}" ] && [ "$code" -ne 0 ] && [ "$code" -ne 8 ]; then
+      printf '  NOTE    %-44s exit=%s belongs to that stage row under --portable\n' "$n --selftest" "$code"
+      printf '%s\n' "$out" | tail -1 | sed 's/^/          /'
+      continue
+    fi
     record "$n --selftest" "$code" "$out"
   done
 fi

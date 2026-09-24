@@ -39,7 +39,9 @@ if [ -n "$portable" ]; then export JEV_GATES_PORTABLE=1; else unset JEV_GATES_PO
 # the PASS lines, so the failing arm was never named (jev-80lj).
 red_detail() {
     local out="$1" names tail
-    names=$(printf '%s\n' "$out" | grep -E '(^|[[:space:]])(RED|ABSENT|UNEXEC|FAIL|FAILED|ERROR|SELFTEST_FAIL|DRIFT)([[:space:]:]|$)' || true)
+    # Line-start only. A PASS line that mentions the word RED is not the failing sub-check
+    # (CI 35973480692: "claim RED and named" was listed first, so the arm looked unnamed).
+    names=$(printf '%s\n' "$out" | grep -E '^[[:space:]]*(RED|ABSENT|UNEXEC|FAIL|FAILED|ERROR|SELFTEST_FAIL|DRIFT)([[:space:]:]|$)' || true)
     tail=$(printf '%s\n' "$out" | tail -n 12)
     if [ -n "$names" ]; then
         printf 'failing:\n%s\n--- last lines ---\n%s\n' "$names" "$tail"
@@ -53,6 +55,7 @@ prove_red_detail() {
     for i in 1 2 3 4 5 6 7 8; do
         planted="${planted}  PASS    early-noise-line-that-must-not-be-the-only-evidence-$i"$'\n'
     done
+    planted="${planted}  PASS    decoy-pass-mentions-RED and named"$'\n'
     planted="${planted}  RED     scripts/selftest-planted-late.sh  FAIL planted-arm-9c42"$'\n'
     for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
         planted="${planted}  PASS    later-noise-$i"$'\n'
@@ -82,12 +85,18 @@ prove_red_detail() {
         *tail-nonce-3e91*) ;;
         *) echo "RED-ROW SELFTEST FAIL: last lines were dropped"; printf '%s\n' "$excerpt"; return 1 ;;
     esac
+    fail_block=$(printf '%s\n' "$excerpt" | awk '/^failing:$/,/^--- last lines ---$/')
+    case "$fail_block" in
+        *decoy-pass-mentions-RED*)
+            echo "RED-ROW SELFTEST FAIL: a PASS line that mentions RED was counted as the failing sub-check"
+            printf '%s\n' "$excerpt"; return 1 ;;
+    esac
     excerpt=$(red_detail $'RED: missing fixture: short-fixture-name-7f3a\n')
     case "$excerpt" in
         *short-fixture-name-7f3a*) ;;
         *) echo "RED-ROW SELFTEST FAIL: short RED did not keep its name"; printf '%s\n' "$excerpt"; return 1 ;;
     esac
-    echo "RED-ROW SELFTEST PASS: late name printed (head-300 and tail-12 both miss it); short RED still named"
+    echo "RED-ROW SELFTEST PASS: late name printed; a PASS line that mentions RED is not the failing sub-check; short RED still named"
 }
 if [ "$mode" = "--selftest" ] || [ -n "$red_row_only" ]; then
     prove_red_detail || exit 1
