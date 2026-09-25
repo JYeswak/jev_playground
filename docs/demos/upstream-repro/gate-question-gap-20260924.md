@@ -225,3 +225,16 @@ powered result would describe wording behavior on these public command shapes, n
 recall, false alarms, or deployment value on fleet traffic. This amendment records
 the bar and feasibility gate only; extraction, labels, and their hashes follow in
 separate commits.
+
+**Transport correction before extraction.** The first REST metadata request was
+attempted after this amendment but returned GitHub `403 rate limit exceeded` before
+any workflow bytes or command values were read or written. No corpus exists from
+that attempt. The fixed query is therefore executed through Git's public transport:
+`git ls-remote --symref https://github.com/OWNER/REPO.git HEAD` resolves each
+allowlisted repository's default branch and commit, then
+`https://codeload.github.com/OWNER/REPO/tar.gz/COMMIT` is read in memory. The same
+workflow-path and literal-`run:` selection rule above applies. License evidence is
+the pinned archive's `LICENSE`/`COPYING` text plus the pinned GitHub URL; a repository
+is retained only when the detected SPDX license is in the allowlist. This transport
+change preserves the source, pin, selection, and bars and was committed before any
+successful extraction.
