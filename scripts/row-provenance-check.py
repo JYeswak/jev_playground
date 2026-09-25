@@ -3,8 +3,11 @@
 
 Only tracked ``work/**/*.jsonl`` files whose first adding commit is after the
 fixed cutoff are inspected.  Rows are considered experiment rows when they
-carry one of the lane's result keys.  A checked row must carry a full SHA-256
-code hash and an ISO-8601 timestamp with a UTC offset.
+carry one of the lane's result keys, or a ``probabilities`` map (a recorded
+Jev answer; the Emerald and OSWorld live rows of 2026-09-25 carried only that
+and went unchecked).  A checked row must carry a full SHA-256 code hash and an
+ISO-8601 timestamp with a UTC offset.  A line that is not JSON fails the file,
+even when no earlier row was an experiment row.
 
 ``JEV_REPO`` is an offline-test hook; the live invocation uses the repository
 containing this script.  It changes the root only, never the cutoff or the
@@ -23,7 +26,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 CUTOFF = datetime(2026, 9, 25, 9, 0, tzinfo=timezone.utc)
-EXPERIMENT_KEYS = {"won", "success", "reward", "score", "jev_calls", "decisions"}
+EXPERIMENT_KEYS = {
+    "won",
+    "success",
+    "reward",
+    "score",
+    "jev_calls",
+    "decisions",
+    "probabilities",
+}
 CODE_HASH_KEYS = ("code_sha256", "run_py_sha256")
 UTC_FIELD_NAMES = {
     "finished_utc",
@@ -254,7 +265,7 @@ def main() -> int:
                 exempted_decision_rows += decision_rows
             continue
         rows, error, decision_rows = check_file(repo / relative, relative)
-        if rows == 0:
+        if rows == 0 and error is None:
             continue
         checked_files += 1
         checked_rows += rows

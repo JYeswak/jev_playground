@@ -234,6 +234,56 @@ class RowProvenanceCheckerTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("checked 0 experiment row file", result.stdout)
 
+    def commit_raw(self, name: str, text: str) -> None:
+        relative = Path("work/rows") / name
+        (self.repo / relative).write_text(text, encoding="utf-8")
+        env = os.environ.copy()
+        env["GIT_AUTHOR_DATE"] = AFTER
+        env["GIT_COMMITTER_DATE"] = AFTER
+        subprocess.run(
+            ["git", "add", "--", str(relative)], cwd=self.repo, check=True, timeout=30
+        )
+        subprocess.run(
+            ["git", "commit", "-q", "-m", name],
+            cwd=self.repo,
+            env=env,
+            check=True,
+            timeout=30,
+        )
+
+    def test_a_file_whose_first_line_is_not_json_fails(self) -> None:
+        # The shape db038a0 committed: rows joined by the two characters backslash-n on one line.
+        good = json.dumps(
+            {
+                "won": 1,
+                "code_sha256": "a" * 64,
+                "recorded_at_utc": "2026-09-25T12:00:00Z",
+            }
+        )
+        self.commit_raw("joined.jsonl", good + "\\n" + good + "\n")
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn("work/rows/joined.jsonl row 1 invalid JSON", result.stderr)
+
+    def test_a_bare_jev_answer_row_needs_provenance(self) -> None:
+        # Shape of work/pokeagent-emerald/live-results.jsonl and work/osw-bestofn/live_rows_r3.jsonl.
+        answer = {
+            "seed": 0,
+            "button": "RIGHT",
+            "probabilities": {"RIGHT": 0.6, "UP": 0.4},
+            "model": "jev-1.13.0",
+        }
+        self.commit_raw("answers.jsonl", json.dumps(answer) + "\n")
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn(
+            "work/rows/answers.jsonl row 1 missing code_sha256 or run_py_sha256; UTC timestamp",
+            result.stderr,
+        )
+        answer.update(code_sha256="b" * 64, recorded_at_utc="2026-09-25T12:00:00Z")
+        self.commit_raw("answers.jsonl", json.dumps(answer) + "\n")
+        self.assertEqual(self.run_checker().returncode, 0)
+
 
 if __name__ == "__main__":
     unittest.main()
