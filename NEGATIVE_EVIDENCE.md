@@ -4605,3 +4605,23 @@ and `jev-jjwt`.
 **Retry condition:** a clean stranger run again reports `tsc: command not found` during kit prepare, or the package lock no longer installs the pinned compiler.
 
 **Boundary:** this row is about package/workflow portability. It makes no Jev accuracy, model, or spend claim.
+
+## R116 — NO-SHIP: no 100+/day independent rerank seat exists in current tooling
+
+**Hypothesis (`jev-u95h`).** A measured high-frequency ranking decision in our tooling can carry a
+second Jev rerank consumer with a 24-hour paired-use receipt.
+
+**Measured 2026-09-25, keyless.** Captured session tool-call counts found `br` ranking invocations
+5, `cass` search 1, and `fh` search 1. The proposed `feed-idle-panes.sh` path has no cron or
+launchd scheduler, so its shadow hook does not generate a 24-hour stream. OMP's own `find` is a
+real 1,867/day ranking consumer, but it already uses Jev and is not an independent rerank win.
+
+**Verdict.** NO-SHIP for this bead. The `dbfcf434` helper is retained as an explicitly disabled
+optional hook, but it is not evidence of a consumer until a scheduler and paired-use join exist.
+No Jev/API call or spend occurred for this finding.
+
+**Retry condition.** Reopen only when a non-authored ranking stream in our tooling is measured at
+least 100 decisions/day, or when a real scheduler for `feed-idle-panes.sh` is added and its
+paired `opened/used next` join is specified before the shadow starts.
+
+**Evidence.** `dbfcf434`, jev-u95h bead comment, and the captured session tool-call census.
