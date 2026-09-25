@@ -4489,3 +4489,27 @@ supervised partial arm whose offered-switch rate is within ten percentage
 points of the Stage B reference `0.362`. Do not rerun this arm, append rows to
 it, or spend new leaf-Noul calls as a substitute for that gate. Receipt:
 `docs/demos/upstream-repro/loss-depth-pokejev-leaf-c-r4-partial-20250925.md`.
+
+## R111 — NOT MET: usage router one-Choice honours its action on real goals
+
+**Hypothesis.** The usage router's one Choice (`work/jev-usage-router/src/router.mjs`,
+`local | research | browser | bypass`, floor 0.55) routes real goals well enough to act on, by the
+shadow's own reversal rule: short goals that needed the network are routed off local or abstained
+on at least 5 of 6 (0.833).
+
+**Measurement.** jev-vbh.4, preregistered before calls, live 2026-09-25 on `jev-1.13.0`: 188 goals
+from our own omp sessions, labelled by what the agent did (all 94 non-local plus 94 seeded local),
+3 repeats, 564 requests. 0 incoherent, 4 goals drifted. Non-local recall 12/94; local
+false-route 0/94; short non-local 13/19 = 0.684, 11 of the 13 by abstaining. A frozen keyword rule
+got recall 32/94, false-route 11/94, short 4/19. Non-author recount (IvoryCreek) matched every
+figure. Receipt: `docs/demos/upstream-repro/usage-router-trial-choice-prereg-20260925.md`; rows
+`work/jev-usage-router/trial-rows-2026-09-25.jsonl`.
+
+**What it does not refute.** The label is the agent's own behaviour, so this measures agreement
+with the incumbent agent, not what each goal needed. It says nothing about a router asked a
+different question, or about browser goals (5 in the corpus).
+
+**Retry condition.** Reopen the active router, and the `usage-router-active` N=8–10 skill loop that
+depends on it, only with a changed question or policy frozen first and then measured on a fresh
+pinned goal set, where short non-local goals are routed off local or abstained on at least 0.833
+and local false-routes stay at or below the keyword rule's 11/94. Do not re-run this sample.
