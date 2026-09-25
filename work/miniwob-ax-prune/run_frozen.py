@@ -27,6 +27,7 @@ import json
 import logging
 import os
 import re
+import signal
 import subprocess
 import sys
 from pathlib import Path
@@ -139,10 +140,20 @@ def main(argv: list[str]) -> int:
     real_episode = ax.floor.run_episode
     frozen = {rel: sha[:16] for rel, sha in shas.items()}
 
+    stop_first = os.environ.get("AX_PRUNE_STOP_BEFORE_FIRST_EPISODE") == "1"
+    episodes = 0
+
     def guarded_episode(*args, **kwargs):
+        nonlocal episodes
         halted = sorted(s for s in counter.by_status if s in HALT_STATUSES)
         if halted:
             raise SystemExit(f"HALT: HTTP {halted} seen; no further episode started")
+        if stop_first and episodes == 0:
+            # The row file is open and no request has been sent: an operator can lsof
+            # this pid, then `kill -CONT` it.
+            print(f"STOPPED pid={os.getpid()}", file=sys.stderr, flush=True)
+            os.kill(os.getpid(), signal.SIGSTOP)
+        episodes += 1
         row = real_episode(*args, **kwargs)
         row["frozen_sources_sha256_16"] = frozen
         row["frozen_pin_commit"] = PIN_COMMIT
