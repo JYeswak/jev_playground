@@ -78,8 +78,13 @@ class KeyStatusTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             revoked = Path(temp) / "revoked.tsv"
             self.write_revoked(revoked, REVOKED_KEY)
-            python = sys.executable
-            result = subprocess.run(
+            default_venv = (
+                Path(os.sep) / "tmp" / "jev-miniwob-jev" / "venv" / "bin" / "python"
+            )
+            candidate_value = os.environ.get("MINIWOB_TEST_VENV")
+            candidate = Path(candidate_value) if candidate_value else default_venv
+            python = str(candidate) if candidate.exists() else sys.executable
+            result = subprocess.run(  # nosec B603 B607
                 [python, str(PROBE)],
                 cwd=ROOT,
                 env=self.runner_env(revoked, REVOKED_KEY),
@@ -87,7 +92,7 @@ class KeyStatusTests(unittest.TestCase):
                 text=True,
                 timeout=30,
             )
-        if "No module named 'gymnasium'" in result.stderr:
+        if not candidate.exists() and "No module named 'gymnasium'" in result.stderr:
             self.skipTest("prerequisite: gymnasium unavailable for MiniWoB runner")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("KEY: REVOKED", result.stderr)
