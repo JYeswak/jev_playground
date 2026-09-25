@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run every runnable README command from a fresh GitHub clone.
+"""Run every runnable README command from a checkout or a fresh GitHub clone.
 
 The child commands receive a clean HOME and a deliberately small PATH.  The script never
 passes API keys to a child.  It writes a Markdown receipt containing the line-numbered command
@@ -15,6 +15,108 @@ import shutil
 import subprocess
 import time
 from pathlib import Path
+
+EXPECTATION_HEADER = "command\tclass\tcause"
+EXPECTATION_CLASSES = {
+    "0",
+    "NOT_RUN-named-prerequisite",
+    "NOT_RUN-no-key",
+    "expected-nonzero",
+    "TEMPLATE",
+}
+
+
+def actual_expectation_class(row: dict[str, object]) -> str:
+    rc = str(row["rc"])
+    if rc == "0":
+        return "0"
+    if rc == "TEMPLATE":
+        return "TEMPLATE"
+    if str(row["failure_class"]) == "expected nonzero":
+        return "expected-nonzero"
+    lower = str(row["error"]).casefold()
+    if "not_run" in lower:
+        if any(
+            marker in lower
+            for marker in ("no typesafe key", "no jev_api_key", "no key")
+        ):
+            return "NOT_RUN-no-key"
+        return "NOT_RUN-named-prerequisite"
+    if str(row["failure_class"]) == "named prerequisite":
+        return "NOT_RUN-named-prerequisite"
+    return "UNEXPECTED"
+
+
+def load_expectations(path: Path) -> dict[str, tuple[str, str]]:
+    rows: dict[str, tuple[str, str]] = {}
+    for line_number, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not raw or raw.startswith("#"):
+            continue
+        if not rows and raw == EXPECTATION_HEADER:
+            continue
+        fields = raw.split("\t", 2)
+        if len(fields) != 3:
+            raise ValueError(f"{path}:{line_number}: expected command, class, cause")
+        command, expected_class, cause = fields
+        cause = "" if cause == "-" else cause
+        if not command or expected_class not in EXPECTATION_CLASSES:
+            raise ValueError(f"{path}:{line_number}: invalid expectation")
+        if command in rows:
+            raise ValueError(f"{path}:{line_number}: duplicate command: {command}")
+        rows[command] = (expected_class, cause)
+    if not rows:
+        raise ValueError(f"{path}: expectation file is empty")
+    return rows
+
+
+def compare_expectations(
+    rows: list[dict[str, object]], expected: dict[str, tuple[str, str]]
+) -> list[str]:
+    actual = {str(row["command"]): row for row in rows}
+    mismatches: list[str] = []
+    for command, (expected_class, cause) in expected.items():
+        row = actual.get(command)
+        if row is None:
+            mismatches.append(f"missing README command row: {command}")
+            continue
+        actual_class = actual_expectation_class(row)
+        if actual_class != expected_class:
+            mismatches.append(
+                f"row changed class: {command}: expected {expected_class}, got {actual_class}"
+            )
+            continue
+        if cause and cause.casefold() not in str(row["error"]).casefold():
+            mismatches.append(
+                f"row changed cause: {command}: expected error to contain {cause!r}; "
+                f"got {row['error']!r}"
+            )
+    for command in sorted(set(actual) - set(expected)):
+        mismatches.append(f"new README command lacks expectation row: {command}")
+    return mismatches
+
+
+def run_selftest(expect_path: Path) -> int:
+    expected = load_expectations(expect_path)
+    planted_readme = "`python3 work/stranger-planted/untracked-input.py`"
+    planted_commands = readme_commands(planted_readme)
+    planted_command = str(planted_commands[0]["command"])
+    planted_rows = [
+        {
+            "command": planted_command,
+            "rc": 2,
+            "failure_class": "missing tracked input",
+            "error": "work/stranger-planted/untracked-input.py is absent from the fresh clone",
+        }
+    ]
+    mismatches = compare_expectations(planted_rows, expected)
+    expected_message = f"new README command lacks expectation row: {planted_command}"
+    if expected_message not in mismatches:
+        raise AssertionError(
+            "planted README regression did not produce the expected named mismatch"
+        )
+    print(f"SELFTEST PASS: planted README command named: {planted_command}")
+    return 0
+
 
 REPO_URL = "https://github.com/JYeswak/jev_playground.git"
 KEY_NAMES = (
@@ -320,13 +422,14 @@ def render_receipt(
     python_version: str,
     uv_version: str,
     timeout: int,
+    source_description: str,
 ) -> None:
     command_rows = [row for row in rows if row["source"] != "post"]
     failures = [row for row in rows if row["rc"] not in (0, "TEMPLATE")]
     lines = [
         "# README stranger run (2026-09-25)",
         "",
-        "A fresh network clone of [`JYeswak/jev_playground`](https://github.com/JYeswak/jev_playground) was run with no API key and a clean `HOME`.",
+        f"- Source: {source_description}.",
         "",
         "## Source and environment",
         "",
@@ -334,7 +437,7 @@ def render_receipt(
         f"- Tools: `{node_version}`, `{python_version}`, `{uv_version}`.",
         f"- Child command timeout: `{timeout}s` per command.",
         "- Child environment: only PATH, HOME, TMPDIR, LANG, TERM and USER; API-key variables were absent.",
-        "- Regenerate: `env -u TYPESAFE_API_KEY -u JEV_API_KEY python3 scripts/stranger-run-jev-playground.py --out docs/demos/upstream-repro/stranger-run-20260925.md`.",
+        "- Regenerate: `env -u TYPESAFE_API_KEY -u JEV_API_KEY python3 scripts/stranger-run-jev-playground.py --source <checkout> --expect docs/demos/upstream-repro/stranger-run-expected.tsv --out docs/demos/upstream-repro/stranger-run.md`.",
         "",
         "## Command inventory",
         "",
@@ -401,17 +504,29 @@ def render_receipt(
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument("--out", type=Path)
+    parser.add_argument("--expect", type=Path)
+    parser.add_argument(
+        "--source", help="local checkout path or Git URL; default: clone the target URL"
+    )
     parser.add_argument("--timeout", type=int, default=TIMEOUT_DEFAULT)
+    parser.add_argument("--selftest", action="store_true")
     args = parser.parse_args()
     present_keys = [name for name in KEY_NAMES if os.environ.get(name)]
     if present_keys:
         raise SystemExit(f"refusing keyed environment: {', '.join(present_keys)}")
+    if args.selftest:
+        if args.expect is None:
+            parser.error("--selftest requires --expect")
+        return run_selftest(args.expect)
+    if args.out is None:
+        parser.error("--out is required unless --selftest is used")
+    expected = load_expectations(args.expect) if args.expect else None
     repo = Path(__file__).resolve().parents[1]
     scratch = repo / "var" / "agent-tmp" / f"stranger-run-20260925-{os.getpid()}"
     scratch.mkdir(parents=True, exist_ok=False)
     (scratch / ".owner").write_text(
-        f"pid={os.getpid()}\nrepo={repo}\nlabel=jev-e3on-stranger\n"
+        f"pid={os.getpid()}\nrepo={repo}\nlabel=jev-ljle-stranger\n"
     )
     clone = scratch / "clone"
     outside = scratch / "outside"
@@ -420,11 +535,25 @@ def main() -> int:
     logs = scratch / "logs"
     outside.mkdir()
     logs.mkdir()
-    subprocess.run(
-        ["git", "clone", "--quiet", REPO_URL, str(clone)],
-        check=True,
-        timeout=args.timeout,
-    )
+    if args.source is None:
+        subprocess.run(
+            ["git", "clone", "--quiet", REPO_URL, str(clone)],
+            check=True,
+            timeout=args.timeout,
+        )
+        source_description = f"fresh network clone of {REPO_URL}"
+    elif args.source.startswith(("https://", "http://")):
+        subprocess.run(
+            ["git", "clone", "--quiet", args.source, str(clone)],
+            check=True,
+            timeout=args.timeout,
+        )
+        source_description = f"network clone of {args.source}"
+    else:
+        clone = Path(args.source).expanduser().resolve()
+        if not clone.is_dir():
+            raise SystemExit(f"--source is not a directory: {clone}")
+        source_description = f"local checkout {clone}"
     sha = subprocess.check_output(
         ["git", "-C", str(clone), "rev-parse", "HEAD"], text=True, timeout=args.timeout
     ).strip()
@@ -509,8 +638,17 @@ def main() -> int:
         versions["python3"],
         versions["uv"],
         args.timeout,
+        source_description,
     )
     print(f"receipt={args.out} scratch={scratch} clone={sha}")
+    if expected is not None:
+        mismatches = compare_expectations(rows, expected)
+        if mismatches:
+            print("EXPECTATION RED")
+            for mismatch in mismatches:
+                print(f"- {mismatch}")
+            return 1
+        print(f"EXPECTATION PASS rows={len(rows)}")
     return 0
 
 

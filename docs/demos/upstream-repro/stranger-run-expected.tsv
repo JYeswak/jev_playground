@@ -1,0 +1,85 @@
+# Generated from docs/demos/upstream-repro/stranger-run-20260925.md at f2e61b0.
+# Compare classes and cause markers; wall time and clone commit are intentionally not pinned.
+command	class	cause
+git clone https://github.com/JYeswak/jev_playground.git	0	-
+cd jev_playground	0	-
+node demos/guard/demo.mjs	0	-
+bash scripts/quickstart.sh	0	-
+npm ci --prefix work/sdk	0	-
+node demos/rag/demo.mjs	0	-
+node demos/citation/demo.mjs	0	-
+node demos/skill-suggest/demo.mjs	0	-
+node demos/chief/demo.mjs	0	-
+./scripts/bootstrap-compaction.sh && node demos/compact/demo.mjs	0	-
+node demos/function-call/demo.mjs	0	-
+node demos/classify/demo.mjs	0	-
+node demos/rerank/demo.mjs	0	-
+node demos/date/demo.mjs	0	-
+node demos/entity/demo.mjs	0	-
+node demos/hierarchy/demo.mjs	0	-
+node demos/autoformat/demo.mjs	0	-
+node demos/parallel/demo.mjs	0	-
+node demos/semantic-find/demo.mjs	0	-
+node demos/cascade/demo.mjs	0	-
+node demos/ontology-gate/demo.mjs	0	-
+node demos/consistency/demo.mjs	0	-
+node demos/consistency-noul/demo.mjs	0	-
+node demos/preparsed/demo.mjs	0	-
+python3 work/compaction-need/need.py score	0	-
+python3 work/compaction-keep/keep.py score	0	-
+python3 work/loss-depth/compaction/replay.py	0	-
+python3 work/rerank-tool-scifact/score.py --check-receipt docs/demos/upstream-repro/rerank-tool-scifact-20260924.md	0	-
+git clone https://github.com/Gaurav-Gosain/jev-sec-bench jev-sec-bench && git -C jev-sec-bench checkout fdb16b9	0	-
+python3 work/nev-differential/fresh-20260923/score.py	0	-
+python3 work/nev-differential/variance-20260924/variance.py	0	-
+python3 work/nev-differential/analyze_diff.py	0	-
+node --test work/nev-injection/seat-guard.test.mjs	0	-
+python3 work/gate-observe-dogfood/readout3b.py	0	-
+python3 work/gate-observe-dogfood/readout4.py score	0	-
+python3 work/loss-depth/pokejev-components/component_eval.py --heldout	NOT_RUN-named-prerequisite	missing prerequisite
+python3 work/score-sst5/score.py	0	-
+python3 work/jev-variance/score.py	0	-
+python3 work/choice-banking77/score.py	0	-
+python3 work/choice-banking77/score.py --set full-prompted	0	-
+python3 work/choice-clinc150/score.py	0	-
+python3 work/noul-scifact/score.py	0	-
+python3 work/haiku-variance/score.py	0	-
+python3 work/noul-scifact/score.py work/noul-fever	0	-
+python3 work/noul-variance/score.py	0	-
+python3 work/noul-scifact/compare-criteria.py	0	-
+python3 work/noul-scifact/compare-criteria.py work/noul-fever	0	-
+python3 work/second-incumbent/score.py	0	-
+python3 work/second-incumbent/score_n4j.py	0	-
+python3 work/second-incumbent/grok_variance.py	0	-
+python3 work/grok-incumbent-3/score.py	0	-
+python3 work/score-stsb/score.py	0	-
+python3 work/rerank-scifact/score.py	0	-
+python3 work/game-floors/aggregate.py work/game-floors/rows	0	-
+python3 work/miniwob-jev/score.py	0	-
+python3 work/bicameral-gate/score-b.py	0	-
+python3 work/bicameral-gate/verify-labels-b.py	0	-
+python3 work/bicameral-gate/gate-variance.py	0	-
+python3 work/bicameral-gate/score-grok-gate.py	0	-
+python3 work/bicameral-gate/score-grok-criteria.py	0	-
+node work/jev-billing-units/measure.mjs	0	-
+python3 work/bicameral-gate/score-inplace-agree.py	0	-
+python3 work/jev-injection-flag/score.py	0	-
+python3 work/jev-toolout-flag/score.py	0	-
+python3 work/jev-claim-check/score-close.py	expected-nonzero	FAIL
+python3 work/noul-toxicity/score.py	0	-
+node work/omp-harm-rule/verify-claim.mjs	0	-
+node work/jev-prevalence-first/prevalence-check.mjs work/jev-real-corpus-eval/corpus.jsonl --truth outcome	0	-
+./scripts/sync-docs.sh	0	-
+./scripts/sync-docs.sh --check	0	-
+node scripts/measure-framing-flip.mjs	NOT_RUN-no-key	no TypeSafe key
+br sync --import-only	NOT_RUN-named-prerequisite	br: command not found
+bash foundation/gates.sh --portable	NOT_RUN-named-prerequisite	Fresh clone fix
+bash foundation/gates.sh	NOT_RUN-named-prerequisite	Fresh clone fix
+python3 work/sr-adopt/audit_bars.py	0	-
+python3 scripts/run-registered-suites.py	0	-
+python3 scripts/ci-main-status.py	NOT_RUN-named-prerequisite	gh not installed
+python3 work/omp-jev-review/surface-census.py --fleet-line	0	-
+python3 scripts/omp-secret-probe.py	NOT_RUN-named-prerequisite	omp is not on PATH
+bash scripts/quickstart.sh --mine	NOT_RUN-named-prerequisite	no such logs
+node demos/<name>/demo.mjs	TEMPLATE	-
+node scripts/jev-probe.mjs --replay docs/demos/jev-probe/probe-response-20260918.json	0	-
