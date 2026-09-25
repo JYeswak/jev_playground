@@ -1,0 +1,23 @@
+{
+  "name": "jev-kit",
+  "version": "0.0.0",
+  "description": "Small TypeScript-first Jev client, preflights, validators, fake asker, and CLI.",
+  "type": "module",
+  "private": false,
+  "bin": {
+    "jev": "bin/jev.mjs"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "ROBOT.md",
+    "test/fixtures",
+    "package.json"
+  ],
+  "dependencies": {
+    "@typesafe-ai/sdk": "0.6.0"
+  },
+  "scripts": {
+    "prepack": "tsc -p tsconfig.json"
+  }
+}

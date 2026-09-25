@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { askJev, askJevChoice, askJevScore, DEFAULT_MODEL } from "../src/client.ts";
-import { createFakeFetch } from "../src/fake.ts";
+import { askJev, askJevChoice, askJevScore, DEFAULT_MODEL } from "../dist/client.js";
+import { createFakeFetch } from "../dist/fake.js";
 
 const ROOT = new URL("..", import.meta.url);
 
@@ -30,7 +30,11 @@ async function doctor(robot) {
   try {
     await import(sdkPath.href);
   } catch {
-    sdkPresent = false;
+    try {
+      await import(new URL("../node_modules/@typesafe-ai/sdk/dist/index.mjs", import.meta.url).href);
+    } catch {
+      sdkPresent = false;
+    }
   }
   const result = {
     status: keyPresent && sdkPresent ? "READY" : "NOT_RUN",

@@ -1,4 +1,4 @@
-import type * as SdkModule from "../../work/sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs";
+import type * as SdkModule from "@typesafe-ai/sdk";
 import { validateBundleAnswers, validateChoiceAnswer, validateNoulAnswer, validateScoreAnswer } from "./validate.ts";
 declare const process: { env: Record<string, string | undefined> };
 type Sdk = typeof SdkModule;
@@ -6,7 +6,7 @@ const SDK_PATH = "../../work/sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs";
 let sdkLoad: Promise<Sdk | undefined> | undefined;
 /** Cached; resolves undefined when the SDK is not installed (fresh clone). */
 function loadSdk(): Promise<Sdk | undefined> {
-  sdkLoad ??= import(SDK_PATH).then((m) => m as Sdk, () => undefined);
+  sdkLoad ??= import(SDK_PATH).catch(() => import(new URL("../node_modules/@typesafe-ai/sdk/dist/index.mjs", import.meta.url).href)).then((m) => m as Sdk, () => undefined);
   return sdkLoad;
 }
 
