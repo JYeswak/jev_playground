@@ -2,26 +2,39 @@
 """Tell pane 1 when a jev worker pane sits idle.
 
 Worker = tmux pane index >= 2 in the jev session (0 is Joshua's shell, 1 is the conductor).
-Idle   = the omp status line has no working spinner, for POLLS consecutive polls.
-Alert  = `ntm send jev --pane=1 "IDLE pane N ..."`, then again every REALERT seconds while idle.
+State  = from process evidence first, screen second (bead jev-6con):
+           no-agent  the pane's process tree holds no omp process. Screen text never decides this.
+           working   the omp status line shows a spinner, OR omp has a live descendant that is not
+                     one of its own long-lived helpers (OMP_HELPERS), i.e. a tool call is running,
+                     OR a session .jsonl omp holds open was written in the last SESSION_FRESH s.
+           idle      omp is there and none of the above holds.
+         Each state carries the evidence that decided it, e.g. "working (child: docker run ...)".
+Alert  = `ntm send jev --pane=1 "IDLE pane N ..."` after POLLS consecutive non-working polls,
+         then again every REALERT seconds while it stays that way.
 
 Why: 2026-09-24, 4 of 6 worker panes sat at their prompts for most of an hour and the
 conductor only looked when a callback arrived. Joshua: "dont let that happen again."
+Why process evidence: 2026-09-25 the screen-only reading said panes 2 and 5 were 'no-agent'
+while each had omp mid-task (a diff view or todo panel hid the status line), and said pane 2
+was 'idle' while its omp had a docker run live under a bash tool call.
 
   python3 scripts/fleet-idle-watch.py            # run forever (start it under hub)
   python3 scripts/fleet-idle-watch.py --once     # one poll, then the CI-on-main line from
                                                  # scripts/ci-main-status.py and the Jev judge
                                                  # line from surface-census.py --fleet-line
                                                  # (both informational); exit 1 if any worker
-                                                 # is idle
-  python3 scripts/fleet-idle-watch.py --selftest # classifier on real status lines
+                                                 # is not working
+  python3 scripts/fleet-idle-watch.py --selftest # classifier on real status lines and trees
 """
+
+from __future__ import annotations
 
 import os
 import re
 import subprocess
 import sys
 import time
+from typing import NamedTuple
 
 SESSION = os.environ.get("JEV_SESSION", "jev")
 INTERVAL = int(os.environ.get("IDLE_INTERVAL", "60"))
@@ -36,16 +49,62 @@ WATCH = {
     if p.strip().isdigit()
 }
 STATUS = re.compile(r"[◒◕]")  # the omp status line carries the model marker
+# An omp main process: `omp ...`, `bun /…/bin/omp ...`, or bun running the package's cli.js.
+OMP = re.compile(r"(^|[\s/])omp(\s|$)|pi-coding-agent/dist/cli\.js(?!\s+__omp_worker_)")
+# omp's own long-lived children, present under every live omp whether or not it is mid-task
+# (ps under jev panes 1-5, 2026-09-25). A match is not tool work, but its descendants are still
+# walked: a subprocess started from the python or js eval kernel is a running tool.
+OMP_HELPERS = (
+    "__omp_worker_",  # cli.js __omp_worker_{mnemopi_embed,js_eval_process,daemon_broker}
+    "/omp-python-runner/",  # python eval kernel: Python -u $TMPDIR/omp-python-runner/runner-*.py
+    "@morphllm/morphmcp",  # MCP server morph: npm exec @morphllm/morphmcp
+    "/morph-mcp",  # its node child …/.bin/morph-mcp, or the bin/morph-mcp.sh wrapper
+    "franken-harvest serve",  # MCP server franken-harvest
+)
+SESSION_FRESH = int(os.environ.get("IDLE_SESSION_FRESH", "60"))
 
 
-def classify(command: str, screen: str) -> str:
-    """working | idle | no-agent, from the pane's foreground command and its visible screen."""
-    if command in ("zsh", "bash", "sh", "fish"):
-        return "no-agent"
-    lines = [line for line in screen.splitlines() if STATUS.search(line)]
-    if not lines:
-        return "no-agent"
-    return "working" if SPINNER.match(lines[-1]) else "idle"
+class Snapshot(NamedTuple):
+    """What one poll saw of one pane; classify() reads nothing else, so tests need no tmux."""
+
+    command: str  # tmux pane_current_command
+    screen: str  # tmux capture-pane text
+    omp: bool  # an omp process is in the pane's process tree
+    tools: tuple[str, ...] = ()  # non-helper descendants of omp, preorder
+    session_age: float | None = (
+        None  # seconds since omp's open session .jsonl was written
+    )
+
+
+def short(command: str, width: int = 90) -> str:
+    """argv0 cut to its basename, the whole thing cut to width."""
+    head, _, rest = command.partition(" ")
+    text = f"{os.path.basename(head)} {rest}".strip()
+    return text if len(text) <= width else text[: width - 3] + "..."
+
+
+def classify(snap: Snapshot) -> tuple[str, str]:
+    """(working | idle | no-agent, the evidence that decided it)."""
+    if not snap.omp:
+        return (
+            "no-agent",
+            f"no omp in the pane's process tree; foreground {snap.command}",
+        )
+    lines = [line for line in snap.screen.splitlines() if STATUS.search(line)]
+    if lines and SPINNER.match(lines[-1]):
+        return "working", "spinner on the status line"
+    if snap.tools:
+        more = f" (+{len(snap.tools) - 1} more)" if len(snap.tools) > 1 else ""
+        return "working", f"child: {short(snap.tools[-1])}{more}"
+    if snap.session_age is not None and snap.session_age < SESSION_FRESH:
+        return "working", f"session written {snap.session_age:.0f}s ago"
+    seen = "no status line on screen" if not lines else "no spinner"
+    age = (
+        "no open session file"
+        if snap.session_age is None
+        else f"session written {snap.session_age:.0f}s ago"
+    )
+    return "idle", f"{seen}, no tool child, {age}"
 
 
 def last_words(screen: str) -> str:
@@ -56,7 +115,67 @@ def last_words(screen: str) -> str:
     return keep[-1][:140] if keep else ""
 
 
+def parse_ps(text: str) -> dict[int, tuple[int, str]]:
+    """`ps -axo pid=,ppid=,command=` → {pid: (ppid, command)}."""
+    table = {}
+    for row in text.splitlines():
+        parts = row.split(None, 2)
+        if len(parts) == 3 and parts[0].isdigit() and parts[1].isdigit():
+            table[int(parts[0])] = (int(parts[1]), parts[2])
+    return table
+
+
+def omp_processes(
+    table: dict[int, tuple[int, str]], pane_pid: int
+) -> tuple[int | None, list[str]]:
+    """(the first omp pid at or under pane_pid, the commands of its non-helper descendants)."""
+    children: dict[int, list[int]] = {}
+    for pid, (ppid, _) in table.items():
+        children.setdefault(ppid, []).append(pid)
+    queue = [pane_pid]
+    omp = None
+    while queue:
+        pid = queue.pop(0)
+        if pid in table and OMP.search(table[pid][1]):
+            omp = pid
+            break
+        queue.extend(sorted(children.get(pid, [])))
+    if omp is None:
+        return None, []
+    tools = []
+    stack = sorted(children.get(omp, []), reverse=True)
+    while stack:
+        pid = stack.pop()
+        command = table[pid][1]
+        if not any(helper in command for helper in OMP_HELPERS):
+            tools.append(command)
+        stack.extend(sorted(children.get(pid, []), reverse=True))
+    return omp, tools
+
+
+def session_age(omp_pid: int, now: float) -> float | None:
+    """Seconds since the newest session .jsonl omp_pid holds open was written; None if none."""
+    try:
+        out = subprocess.run(
+            ["lsof", "-p", str(omp_pid), "-Fn"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    mtimes = []
+    for line in out.splitlines():
+        if line.startswith("n") and line.endswith(".jsonl"):
+            try:
+                mtimes.append(os.stat(line[1:]).st_mtime)
+            except OSError:
+                pass
+    return max(0.0, now - max(mtimes)) if mtimes else None
+
+
 def poll() -> dict[int, tuple[str, str]]:
+    """{pane index: (state, "(evidence)  last screen line")} for every watched worker pane."""
     out = subprocess.run(
         [
             "tmux",
@@ -64,15 +183,23 @@ def poll() -> dict[int, tuple[str, str]]:
             "-t",
             SESSION,
             "-F",
-            "#{pane_index} #{pane_current_command}",
+            "#{pane_index} #{pane_pid} #{pane_current_command}",
         ],
         capture_output=True,
         text=True,
         timeout=10,
     ).stdout
+    table = parse_ps(
+        subprocess.run(
+            ["ps", "-axo", "pid=,ppid=,command="],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout
+    )
     states = {}
     for row in out.splitlines():
-        index, _, command = row.partition(" ")
+        index, pane_pid, command = (row.split(" ", 2) + ["", ""])[:3]
         if not index.isdigit() or int(index) < 2 or (WATCH and int(index) not in WATCH):
             continue
         screen = subprocess.run(
@@ -81,7 +208,18 @@ def poll() -> dict[int, tuple[str, str]]:
             text=True,
             timeout=10,
         ).stdout
-        states[int(index)] = (classify(command, screen), last_words(screen))
+        omp, tools = (
+            omp_processes(table, int(pane_pid)) if pane_pid.isdigit() else (None, [])
+        )
+        snap = Snapshot(
+            command=command,
+            screen=screen,
+            omp=omp is not None,
+            tools=tuple(tools),
+            session_age=session_age(omp, time.time()) if omp is not None else None,
+        )
+        state, evidence = classify(snap)
+        states[int(index)] = (state, f"({evidence})  {last_words(screen)}")
     return states
 
 
@@ -137,31 +275,29 @@ def judge_lines() -> list[str]:
 
 
 def selftest() -> int:
-    # Status lines captured from the jev session, 2026-09-24T02:0xZ.
+    # Status lines captured from the jev session, 2026-09-24T02:0xZ, each on a pane whose tree
+    # holds omp with no tool child and a session file 10 min old, so only the screen can decide.
+    # Process evidence is covered by work/fleet-idle-watch/test_fleet_idle_watch.py.
     cases = [
-        ("bun", " π > ◒ Grok 4.7 > 📁 …/jev > ⑂ main *9 ?121 > S30.63", "idle"),
-        (
-            "bun",
-            " π · ◕ Muse Spark 1.3 · 📁 …/jev · ⑂ main *13 ?122 · ◫ 67.2%/1M ⟲",
-            "idle",
-        ),
-        ("bun", " ⠋ 14m > ◒ Muse Spark 1.3 Contributor > 📁 …/jev", "working"),
-        ("bun", " ⠇ 8m · ◕ Muse Spark 1.3 · 📁 ~/Developer/jev", "working"),
-        ("zsh", "josh@studio jev %", "no-agent"),
-        ("bun", "loading...", "no-agent"),
+        (" π > ◒ Grok 4.7 > 📁 …/jev > ⑂ main *9 ?121 > S30.63", "idle"),
+        (" π · ◕ Muse Spark 1.3 · 📁 …/jev · ⑂ main *13 ?122 · ◫ 67.2%/1M ⟲", "idle"),
+        (" ⠋ 14m > ◒ Muse Spark 1.3 Contributor > 📁 …/jev", "working"),
+        (" ⠇ 8m · ◕ Muse Spark 1.3 · 📁 ~/Developer/jev", "working"),
+        # no status line on screen is not 'no-agent' when omp is in the tree (jev-6con)
+        ("loading...", "idle"),
         # the spinner line wins over an older idle line higher on the screen
-        (
-            "bun",
-            " π · ◕ Muse Spark 1.3\n some output\n ⠙ 2s · ◕ Muse Spark 1.3",
-            "working",
-        ),
+        (" π · ◕ Muse Spark 1.3\n some output\n ⠙ 2s · ◕ Muse Spark 1.3", "working"),
     ]
-    bad = [
-        (c, s, want, classify(c, s)) for c, s, want in cases if classify(c, s) != want
+    snaps = [
+        (Snapshot("bun", screen, omp=True, session_age=600.0), want)
+        for screen, want in cases
     ]
+    # a shell pane with no omp under it, whatever its screen says
+    snaps.append((Snapshot("zsh", " ⠋ 14m > ◒ Grok 4.7", omp=False), "no-agent"))
+    bad = [(s, want, classify(s)) for s, want in snaps if classify(s)[0] != want]
     for case in bad:
         print("FAIL", case)
-    print(f"selftest: {len(cases) - len(bad)}/{len(cases)} classifications correct")
+    print(f"selftest: {len(snaps) - len(bad)}/{len(snaps)} classifications correct")
     return 1 if bad else 0
 
 
@@ -171,7 +307,7 @@ def main() -> int:
     if "--once" in sys.argv:
         states = poll()
         for index, (state, words) in sorted(states.items()):
-            print(f"pane {index}: {state}  {words}")
+            print(f"pane {index}: {state} {words}")
         for line in ci_lines():
             print(line)
         for line in judge_lines():

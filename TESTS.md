@@ -71,6 +71,16 @@ claim nobody can check:
   sessions (is_probe reads only the path below the sessions root plus cwd; the old whole-path rule
   failed 5 of 7 on Linux CI 36079745187). Planting "drop failure rows" in `judge_rows` fails 4 of 8.
   Run: `python3 -m unittest work/omp-jev-review/test_judge_usage.py` (8 tests).
+- `work/fleet-idle-watch/test_fleet_idle_watch.py` — `scripts/fleet-idle-watch.py`'s classifier
+  on process evidence (jev-6con), no tmux or ps: fixtures are the real process trees of jev panes
+  0, 2, 4, 5 and two real screens, 2026-09-25. Both measured false readings: a screen with no
+  status line over a live omp reads idle or working, never `no-agent`; an idle `❯` over a live
+  `infisical run -- docker run` reads `working (child: docker run ...)`. Plus a bare zsh is
+  `no-agent`, a helpers-only omp with a 600 s old session file is `idle`, the 60 s freshness
+  boundary, omp's helpers (`OMP_HELPERS`) are not tools while a subprocess of its eval kernel is,
+  and the status-line `--selftest` (7/7). The HEAD screen-only classifier fails both false-reading
+  fixtures; planting "ignore descendants" in `omp_processes` fails 3 of 14.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (14 tests).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything

@@ -1,0 +1,22 @@
+│ … 11 earlier lines ⟦Ctrl+O: Expand⟧                                                                          │
+│ +    if v3_on("drag"):                                                                                       │
+│ PUT 300.=300:                                                                                                │
+│ +        f"Which text from the goal{'' if not v3_on('page_text') else ' or visible page'} should be typed    │
+│ into element [{ref}] ({label})?"                                                                             │
+│ *** End Patch'''                                                                                             │
+│ r=await tool.edit({'input':patch});                                                                          │
+│ print(r) Adversarial?                                                                                        │
+├─── Output ───────────────────────────────────────────────────────────────────────────────────────────────────┤
+│ File "<cell>", line 16                                                                                       │
+│     r=await tool.edit({'input':patch}); print(r) Adversarial?                                                │
+│                                                  ^                                                           │
+│ SyntaxError: invalid syntax                                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+ TODO
+  ├─ I. MiniWoB v3 design · 1/3
+  │  ├─ ☑ Read jev-9gtw.4 and the v1 autopsy; inspect current MiniWoB code and prereg conventions
+  │  ├─ ☐ Preregister and run each of six isolated dev arms on its own autopsy slice
+  │  └─ ☐ Commit keyless dev outputs and bars before each live arm; record per-call model
+  ├─ II. MiniWoB v3 held-out · 0/4
+  └─────
