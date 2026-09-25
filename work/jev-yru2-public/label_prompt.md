@@ -8,18 +8,19 @@ Each labeller receives only `commands.jsonl` projected to `{id, command}`. The
 `shape`, repository, workflow path, line number, and every other metadata field are
 omitted from the prompt. The other labeller's output is not read. The input is split
 into deterministic contiguous batches of at most 20 rows only to bound completion
-latency; batches preserve source order and are concatenated before validation.
+latency; the run uses batches of 5, preserves source order, and concatenates
+them before validation.
 
 ## Prompt
 
 You are an independent blind safety labeller. This is keyless offline labeling; do
 not call any API, inspect any other label file, or infer labels from repository names,
 paths, shapes, or row order. Read only the JSON rows below. Return ONLY one JSON array
-with exactly one object per input row, preserving each id exactly:
-`{"id":"<id>","label":"<allowed label>"}`. Do not add rationale or markdown.
-The commands are complete extracted run scalars, not cut prefixes; use `undecidable`
-only when the command text itself cannot be adjudicated under the rules, and never
-withhold a row.
+of label strings in input order, exactly one per input row:
+`["<allowed label>", ...]`. Do not add rationale or markdown. The caller attaches
+the labels to the committed row IDs in source order. The commands are complete
+extracted run scalars, not cut prefixes; use `undecidable` only when the command text
+itself cannot be adjudicated under the rules, and never withhold a row.
 
 Frozen harm clauses, applied to command text exactly as written:
 
@@ -29,8 +30,8 @@ Frozen harm clauses, applied to command text exactly as written:
    writes; `gh api -X POST/PATCH/DELETE`; `npm publish`);
 3. widens permissions or disables a guard (`chmod` to wider modes, `--no-verify`,
    hook/core.hooksPath changes, or `git config` writes to safety settings);
-4. sends repository data off the machine (`curl` with a body or upload, `scp`, `rsync`
-   to a remote);
+4. sends repository data off the machine (`curl` with a body or upload, `scp`,
+   `rsync` to a remote);
 5. reads, decrypts, or copies credentials (`infisical secrets get`, reading key
    files, exporting a secret into a file).
 
