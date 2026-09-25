@@ -30,6 +30,7 @@ ROOT = COMPONENT_DIR.parents[2]
 
 POKE = ROOT / "work" / "poke-jev"
 OUT = BATTLE_DIR / "stage-b"
+LEAF_OUT = COMPONENT_DIR
 ALPHA_PATH = COMPONENT_DIR / "frozen-alpha-v1.json"
 LEAF_MODEL_PATH = COMPONENT_DIR / "leaf-model-v1.json"
 LEAF_MODEL_SHA256 = "16a2b72f6da68bc61049bbaf4c72b7c3e1c330da075c1e5e51f88751df605384"
@@ -593,6 +594,17 @@ def _tag(control: bool, leaf_mode: str | None = None) -> str:
     return "-mix-v1-control" if control else "-mix-v1"
 
 
+def _arm_paths(opponent: str, tag: str):
+    if tag.startswith("-leaf-"):
+        stem = f"{opponent}{tag}"
+        return (
+            str(LEAF_OUT / f"replays-{stem}"),
+            str(LEAF_OUT / f"results-{stem}.jsonl"),
+            str(LEAF_OUT / f"decisions-{stem}.jsonl"),
+        )
+    return stage_b.arm_paths(opponent, tag)
+
+
 def _configure(seed: int) -> None:
     stage_b.PAIR_SEED = seed
     stage_b.OUT = str(OUT)
@@ -632,7 +644,9 @@ async def _run_shard(
         else None
     )
     tag = _tag(control, leaf_mode)
-    replays, results, decisions = stage_b.arm_paths(opp_name, tag)
+    if leaf_mode is not None:
+        LEAF_OUT.mkdir(parents=True, exist_ok=True)
+    replays, results, decisions = _arm_paths(opp_name, tag)
     done = {row["k"] for row in _load_jsonl(Path(results)) if "won" in row}
     mine = [k for k in range(n) if k % workers == worker and k not in done]
     client_factory = stage_b.DisabledJev if control else None
@@ -694,7 +708,7 @@ def _spawn(
         for worker in range(workers)
     ]
     codes = [proc.wait() for proc in procs]
-    _, results, _ = stage_b.arm_paths(opp_name, _tag(control, leaf_mode))
+    _, results, _ = _arm_paths(opp_name, _tag(control, leaf_mode))
     rows = _load_jsonl(Path(results))
     complete = {row["k"] for row in rows if "won" in row and row["k"] < n}
     print(
@@ -867,7 +881,8 @@ def main(argv: list[str]) -> int:
     parser.add_argument("worker_count", nargs="?", type=int)
     parser.add_argument("worker", nargs="?", type=int)
     parser.add_argument("--workers", dest="workers", type=int, default=stage_b.WORKERS)
-    parser.add_argument("--pair-seed", type=int, default=20260926)
+    parser.add_argument("--pair-seed", type=int, default=20260925)
+    parser.add_argument("--control", action="store_true")
     parser.add_argument("--leaf", choices=("code", "code+noul"))
     args = parser.parse_args(argv)
     _configure(args.pair_seed)
