@@ -4027,10 +4027,23 @@ not-needed), `jev-1.13.0`, $0.0397 in total.
 - **What the dev pass shows.** While the re-run premise and the two-condition question stand, every
   `keepResult` sits in 0.07–0.29 whatever the state shows. Without them, the use Noul spreads to
   0.22–0.91 but does not rank need, whether or not the output is visible.
-- **Next retry.** The remaining untested direction is a keep signal outside these Noul wordings, for
-  example the cheap-size and feature baselines an upstream replay reports
-  (`tamaratran/fast-jev-compaction#52`, AUC 0.85 on proxy labels). It must first reach the bar on
-  this development curve. Receipt: `docs/demos/upstream-repro/compaction-replay-20260925.md`.
+- **Non-Noul signals, tested next (keyless, prereg `948521a`, `[test]`).** These were the upstream
+  #52 baselines, run on the same dev curve with our blind labels. None reaches the bar.
+  - Output size (`result_chars`): AUC 0.510, needed kept 28/50 at the dev cut (lower bound 0.423).
+  - A leave-one-session-out logistic regression on 9 prefix-visible features: AUC 0.554, lower bound
+    0.385.
+  - The same regression with Jev's keepCall and keepResult added: AUC 0.611, lower bound 0.462.
+  - Upstream's AUC of 0.85 for output size was on token-reuse proxy labels. [inference] Those labels likely favour long
+    outputs, which simply hold more tokens to reuse. Measured: with blind need labels, size carries no signal.
+- **Retry condition now.** No keep signal tried so far reaches the bar on its own development curve:
+  - three Noul wordings;
+  - output shown in the state;
+  - the task shown in the goal;
+  - output size and simple features, with or without Jev's scores.
+
+  Reopen only with a new signal family that does. One such family is a question that names the next
+  turn's goal, but that needs the horizon, which a compactor does not have. Receipt:
+  `docs/demos/upstream-repro/compaction-replay-20260925.md`.
 
 ## R101 — REFUTED: `jev_rerank` can switch to run.py's one-passage Noul without losing on negation
 

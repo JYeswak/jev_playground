@@ -242,3 +242,42 @@ did not produce a working keep signal on labelled data.
 and 40-message horizon. This rules out these five designs on this curve. It says nothing about keep
 signals outside Jev Nouls, such as the output-size and feature baselines in upstream
 `tamaratran/fast-jev-compaction#52` (proxy labels, AUC 0.84–0.85), or about other models.
+
+## Upstream comment (filed)
+
+The dedupe found the design already reported in #26, #52 and #25, so this went out as a comment on
+#52 rather than a new issue:
+https://github.com/tamaratran/fast-jev-compaction/issues/52#issuecomment-5827141624 (`2682416`). It
+states that the labellers were independent model agents, not humans. The draft and the read-back
+record are in `docs/upstream/fast-jev-compaction-keep-question-labelled-replay.md`. No fork was made,
+because nothing improved.
+
+## Non-Noul signals on the same dev curve (keyless, `[test]`)
+
+`work/loss-depth/compaction/floors_dev.py` was committed with its prereg in the docstring (`948521a`)
+before it first ran. Rows: the 7-session dev slice, 50 needed, 165 not-needed. Higher means keep, and
+every feature is prefix-visible.
+
+| signal | AUC | dev cut | needed kept at dev cut | not-needed dropped | gate |
+|---|---:|---:|---|---:|---|
+| `result_chars` (upstream's "keep the largest outputs") | 0.510 | 2263 | 28/50 (0.423–0.688) | 83/165 | no |
+| `position` | 0.530 | 17 | 25/50 (0.366–0.634) | 84/165 | no |
+| `later_overlap` | 0.487 | 2 | 17/50 (0.224–0.478) | 117/165 | no |
+| `input_chars` | 0.517 | 122 | 26/50 (0.385–0.652) | 83/165 | no |
+| `goal_names_target` | 0.564 | 1 | 7/50 (0.070–0.262) | 163/165 | no |
+| `written_later_in_prefix` | 0.483 | 1 | 1/50 (0.004–0.105) | 156/165 | no |
+| LR, 9 features, leave-one-session-out | 0.554 | 0.211 | 26/50 (0.385–0.652) | 83/165 | no |
+| LR + A0 keepCall/keepResult, same | 0.611 | 0.195 | 30/50 (0.462–0.724) | 83/165 | no |
+
+**No signal reaches the bar, so there is no held-out candidate and no child bead was filed for one.**
+
+Upstream's output-size AUC of 0.847 does not carry over to our blind labels, where it is 0.510. Their
+labels were token-reuse proxies. [inference] Such labels plausibly favour long outputs, since a long
+output holds more tokens to reuse.
+
+The strongest keep signal on this curve is still Jev's own A0 ranking:
+- `keepResult` AUC 0.648–0.661;
+- `keepCall` AUC 0.689;
+- the H2 dev-cut point, 39/50 kept with a lower bound of 0.648.
+
+All of them are below the bar.
