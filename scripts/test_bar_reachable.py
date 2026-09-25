@@ -14,6 +14,7 @@ FLOOR = ROOT / "work" / "osw-bestofn" / "floor_receipt.json"
 MANIFEST = ROOT / "work" / "osw-bestofn" / "heldout_valid_slice.json"
 USED_ROWS = ROOT / "work" / "osw-bestofn" / "live_rows_r3.jsonl"
 R112_SCORE = ROOT / "work" / "osw-bestofn" / "live_score_check_r3.json"
+PREFLIGHT = ROOT / "work" / "osw-bestofn" / "r112_retry_preflight.json"
 
 
 def run_checker(*args: str) -> tuple[int, dict]:
@@ -33,6 +34,8 @@ class BarReachabilityTests(unittest.TestCase):
         code, receipt = run_checker(
             "--floor",
             str(FLOOR),
+            "--preflight",
+            str(PREFLIGHT),
             "--manifest",
             str(MANIFEST),
             "--used-rows",
@@ -51,7 +54,7 @@ class BarReachabilityTests(unittest.TestCase):
         self.assertEqual(receipt["status"], "REACHABLE")
         self.assertEqual(receipt["tasks"], 337)
         self.assertEqual(receipt["comparator_exact"], 289)
-        self.assertEqual(receipt["max_discordant_wins"], 48)
+        self.assertEqual(receipt["max_discordant_wins"], 10)
         self.assertLess(receipt["minimum_attainable_p"], 0.05)
         self.assertEqual(receipt["observed"]["observed_b"], 2)
         self.assertEqual(receipt["observed"]["observed_c"], 8)

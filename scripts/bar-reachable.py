@@ -84,9 +84,27 @@ def _exact(value: Any) -> bool:
         raise ValueError(f"non-numeric official reward: {value!r}") from exc
 
 
+def oracle_exact_from_preflight(path: Path) -> int:
+    receipt = _read_json(path)
+    try:
+        offered = receipt["winning_archive_offered"]
+        winners = int(offered["oracle_winner_tasks"])
+        offered_tasks = int(offered["offered_tasks"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError(f"{path} is missing oracle winner counts") from exc
+    if winners != offered_tasks:
+        raise ValueError(
+            f"{path} reports only {winners}/{offered_tasks} oracle winners offered"
+        )
+    return winners
+
+
 def comparator_exact_from_floor(
-    floor_path: Path, tasks: list[str], archive: str | None
-) -> tuple[int, str]:
+    floor_path: Path,
+    tasks: list[str],
+    archive: str | None,
+    oracle_exact: int | None = None,
+) -> tuple[int, int, str]:
     floor = _read_json(floor_path)
     results = floor.get("results_by_task") if isinstance(floor, dict) else None
     if not isinstance(results, dict):
@@ -94,16 +112,28 @@ def comparator_exact_from_floor(
     comparator = archive or floor.get("best_single_archive")
     if not isinstance(comparator, str) or not comparator:
         raise ValueError("comparator archive is not declared")
-    wins = 0
+    selected = floor.get("selected_archives")
+    candidates = selected if isinstance(selected, list) else []
+    comparator_wins = 0
+    oracle_wins = 0
     for task in tasks:
         row = results.get(task)
         if not isinstance(row, dict) or comparator not in row:
             raise ValueError(f"floor has no {comparator!r} reward for {task}")
-        wins += _exact(row[comparator])
-    return wins, comparator
+        if not candidates:
+            candidates = sorted(row)
+        if not all(isinstance(name, str) and name in row for name in candidates):
+            raise ValueError(f"floor candidate set is incomplete for {task}")
+        comparator_wins += _exact(row[comparator])
+        oracle_wins += any(_exact(row[name]) for name in candidates)
+    if oracle_exact is not None:
+        if not 0 <= oracle_exact <= len(tasks):
+            raise ValueError("preflight oracle exact count is outside the task range")
+        oracle_wins = oracle_exact
+    return comparator_wins, oracle_wins - comparator_wins, comparator
 
 
-def score_receipt_headroom(path: Path) -> tuple[int, dict[str, int | float]]:
+def score_receipt_headroom(path: Path) -> tuple[int, int, dict[str, int | float]]:
     receipt = _read_json(path)
     try:
         tasks = int(receipt["retained_task_count"])
@@ -114,15 +144,24 @@ def score_receipt_headroom(path: Path) -> tuple[int, dict[str, int | float]]:
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError(f"{path} is missing the R112 score fields") from exc
     comparator_exact = selected_exact - observed_b + observed_c
-    if not 0 <= comparator_exact <= tasks:
+    headroom = observed_b + observed_c
+    if (
+        not 0 <= comparator_exact <= tasks
+        or not 0 <= headroom <= tasks - comparator_exact
+    ):
         raise ValueError(
-            f"derived comparator exact count is invalid: {comparator_exact}/{tasks}"
+            f"inconsistent R112 comparator/headroom counts for {tasks} tasks"
         )
-    return comparator_exact, {
-        "observed_b": observed_b,
-        "observed_c": observed_c,
-        "observed_p": float(observed.get("p", math.nan)),
-    }
+    return (
+        comparator_exact,
+        headroom,
+        {
+            "observed_b": observed_b,
+            "observed_c": observed_c,
+            "observed_p": float(observed.get("p", math.nan)),
+            "headroom_source": "observed fixed-candidate discordant pairs",
+        },
+    )
 
 
 def exact_mcnemar_p(discordant_wins: int, discordant_losses: int) -> float:
@@ -138,19 +177,21 @@ def exact_mcnemar_p(discordant_wins: int, discordant_losses: int) -> float:
 
 
 def mcnemar_reachability(
-    tasks: int, comparator_exact: int, alpha: float
+    tasks: int, comparator_exact: int, oracle_headroom: int, alpha: float
 ) -> dict[str, Any]:
     if tasks <= 0 or not 0 <= comparator_exact <= tasks:
         raise ValueError("tasks and comparator_exact are inconsistent")
+    if not 0 <= oracle_headroom <= tasks - comparator_exact:
+        raise ValueError("oracle headroom exceeds the comparator's exact misses")
     if not 0 < alpha < 1:
         raise ValueError("alpha must be between 0 and 1")
-    max_wins = tasks - comparator_exact
-    minimum_p = exact_mcnemar_p(max_wins, 0)
+    minimum_p = exact_mcnemar_p(oracle_headroom, 0)
     return {
         "mode": "mcnemar",
         "tasks": tasks,
         "comparator_exact": comparator_exact,
-        "max_discordant_wins": max_wins,
+        "oracle_headroom": oracle_headroom,
+        "max_discordant_wins": oracle_headroom,
         "best_case_discordant_losses": 0,
         "minimum_attainable_p": minimum_p,
         "alpha": alpha,
@@ -195,6 +236,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--comparator-archive")
     parser.add_argument(
+        "--preflight",
+        type=Path,
+        help="receipt carrying the fixed-candidate oracle winner count",
+    )
+    parser.add_argument(
         "--score-receipt",
         type=Path,
         help="committed score receipt with observed McNemar counts",
@@ -214,9 +260,13 @@ def main(argv: list[str] | None = None) -> int:
             result = rate_reachability(args.trials, args.threshold)
         else:
             if args.score_receipt:
-                comparator_exact, observed = score_receipt_headroom(args.score_receipt)
+                comparator_exact, headroom, observed = score_receipt_headroom(
+                    args.score_receipt
+                )
                 tasks = int(_read_json(args.score_receipt)["retained_task_count"])
-                result = mcnemar_reachability(tasks, comparator_exact, args.alpha)
+                result = mcnemar_reachability(
+                    tasks, comparator_exact, headroom, args.alpha
+                )
                 result["observed"] = observed
             else:
                 if not args.floor or not args.manifest or not args.used_rows:
@@ -224,13 +274,22 @@ def main(argv: list[str] | None = None) -> int:
                         "McNemar floor mode requires --floor, --manifest, and --used-rows"
                     )
                 tasks_list = heldout_tasks(args.manifest, args.used_rows)
-                comparator_exact, archive = comparator_exact_from_floor(
-                    args.floor, tasks_list, args.comparator_archive
+                oracle_exact = (
+                    oracle_exact_from_preflight(args.preflight)
+                    if args.preflight
+                    else None
+                )
+                comparator_exact, headroom, archive = comparator_exact_from_floor(
+                    args.floor, tasks_list, args.comparator_archive, oracle_exact
                 )
                 result = mcnemar_reachability(
-                    len(tasks_list), comparator_exact, args.alpha
+                    len(tasks_list), comparator_exact, headroom, args.alpha
                 )
                 result["comparator_archive"] = archive
+                if args.preflight:
+                    result["oracle_headroom_source"] = (
+                        "committed preflight oracle winner count"
+                    )
     except ValueError as exc:
         print(json.dumps({"status": "ERROR", "error": str(exc)}, sort_keys=True))
         return 2
