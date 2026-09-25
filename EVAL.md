@@ -1935,3 +1935,26 @@ TypeSafe (held-out Nouls came from the cached rows of 45607d3).
 
 Boundary: no scored battle exists for any leaf arm. Winner AUC does not certify action ranking;
 the next battle must check its action-type mix against the reference arm after its first rows.
+
+### r4 supervised code-only battle partial — `NOT-SCORED` (commit `50c30a7`)
+
+The supervised `leaf-c-r4-code` process wrote 991 decision rows and stopped at
+the existing interim marker after the action-mix gate. Stop-time reading by pane
+1 at `2026-09-25T09:39:29Z`: 245 eligible decisions, offered-switch rate
+`0.078` versus the Stage B reference `0.362`, absolute difference `0.284`,
+checker exit `1`. After workers drained, the final 991-row file had 415
+eligible decisions and the keyless checker read switch `0.089` versus `0.362`,
+absolute difference `0.272`, exit `1`; the child footer was `exit_code=1`.
+Both readings fail the preregistered `0.10` band. The arm is `NOT-SCORED`, not
+a battle result. Receipt:
+`docs/demos/upstream-repro/loss-depth-pokejev-leaf-c-r4-partial-20250925.md`.
+
+Keyless autopsy: `work/poke-jev/player.py:248-262` sends both move and switch
+candidates through `leaf.step(orders[a], o_orders[o])`; the simulator switches
+before the opponent action and applies damage to the active Pokémon
+(`pokechamp/poke_env/player/local_simulation.py:440-454,475-482,500-512`).
+`player.py:74-85` and `battle/run.py:447-478` carry both sides' post-action HP
+into the score. The failure is action-mix mismatch, not omitted opponent reply.
+No new leaf Noul calls were made; the prior held-out Noul delta was about
+`-0.003`, so this leaf line is parked. Boundary: no battle win rate, Wilson
+interval, or Jev-vs-battle claim; no continuation of this arm.
