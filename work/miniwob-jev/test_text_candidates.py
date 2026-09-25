@@ -6,6 +6,7 @@ import json
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -60,6 +61,16 @@ class CandidateBuilderTests(unittest.TestCase):
                 max(len(values) for values in candidate_map.values()), OPTION_CAP
             )
             self.assertEqual(by_task[task]["covered"], 1)
+
+    def test_builder_does_not_call_answer_derivation(self) -> None:
+        for task in EXPECTED:
+            record = load_record(OBS / f"{task}.json")
+            baseline = build_candidates(record)
+            with patch(
+                "text_candidates.derive_needed_text",
+                side_effect=AssertionError("grader called"),
+            ):
+                self.assertEqual(build_candidates(record), baseline, task)
 
     def test_selection_tasks_have_no_type_candidate_claim(self) -> None:
         for task in ("text-editor", "highlight-text"):

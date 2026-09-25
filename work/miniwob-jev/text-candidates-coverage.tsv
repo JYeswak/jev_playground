@@ -16,3 +16,10 @@ recorded-page-text-row	miniwob-jev-v3-contaminated-smoke-page-text.s0.jsonl	7	0	
 recorded-page-text-row	miniwob-jev-v3-dev-page-text-exact.s0.jsonl	13	0	NOT_RUN (no observation field)	NOT_RUN	NOT_RUN	NOT_RUN	NOT_RUN
 recorded-page-text-row	miniwob-jev-v3-dev-page-text.s0.jsonl	7	0	NOT_RUN (no observation field)	NOT_RUN	NOT_RUN	NOT_RUN	NOT_RUN
 recorded-page-text-row	miniwob-jev-v3-page_text.s0.jsonl	35	0	NOT_RUN (no observation field)	NOT_RUN	NOT_RUN	NOT_RUN	NOT_RUN
+captured-observation-20	find-word	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	123.5	147
+captured-observation-20	copy-paste	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	107.5	117
+captured-observation-20	read-table	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	73.0	85
+captured-observation-20	scroll-text	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	255.0	255
+captured-observation-20	text-transform	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	54.0	55
+captured-observation-20	copy-paste-2	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	190.0	220
+captured-observation-20	read-table-2	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	96.5	99

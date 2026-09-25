@@ -132,6 +132,29 @@ def utterance_spans(text: str) -> list[str]:
     return out
 
 
+def adjacent_character_runs(es: list[dict]) -> list[str]:
+    runs: list[str] = []
+    index = 0
+    while index < len(es):
+        value = str(es[index].get("text", ""))
+        parent = es[index].get("parent")
+        if len(value) != 1:
+            index += 1
+            continue
+        chars = [value]
+        end = index + 1
+        while end < len(es):
+            candidate = str(es[end].get("text", ""))
+            if es[end].get("parent") != parent or len(candidate) != 1:
+                break
+            chars.append(candidate)
+            end += 1
+        if len(chars) > 1:
+            runs.append("".join(chars))
+        index = end
+    return runs
+
+
 def build_candidates(record: dict, cap: int = OPTION_CAP) -> dict[int, list[str]]:
     """Return type-target ref -> bounded candidate strings from this observation."""
     es = elements(record)
@@ -152,6 +175,8 @@ def build_candidates(record: dict, cap: int = OPTION_CAP) -> dict[int, list[str]
             _add(candidates, seen, span)
         for value in page_values:
             _text_spans(value, candidates, seen)
+        for run in adjacent_character_runs(es):
+            _text_spans(run, candidates, seen)
         if element.get("id") == "captcha":
             _add(candidates, seen, descendant_text(record, int(element["ref"])))
         if element.get("tag") == "input_time":
@@ -159,9 +184,6 @@ def build_candidates(record: dict, cap: int = OPTION_CAP) -> dict[int, list[str]
             if formatted:
                 candidates.insert(0, formatted)
                 seen.add(formatted)
-        needed = derive_needed_text(record)
-        if needed and needed not in seen:
-            candidates.insert(0, needed)
         out[int(element["ref"])] = candidates[:cap]
     return out
 
