@@ -555,3 +555,5 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 | kit/test/fixtures/miniwob-drag-items-grid-one-option.json | covered by node --test kit/test/preflight.test.mjs | Captured MiniWoB seed 100 row and one-option observation provenance | registry-only; source fixture |
 | kit/test/fixtures/fits-state.json | covered by node --test kit/test/preflight.test.mjs | Committed `work/pokeagent-emerald/segment2-request-states.jsonl:1` FITS row; no scratch path | registry-only; source fixture |
 | kit/test/fixtures/recorded-answer-rows.json | covered by node --test kit/test/fake.test.mjs | Captured Choice answer rows from `work/osw-bestofn/live_rows_r3.jsonl` | registry-only; source fixture |
+| kit/test/cli.test.mjs | node --test kit/test/cli.test.mjs | doctor --robot NOT_RUN/no-key exit 2, fake offline ask, invalid robot usage; doctor-always-READY plant fails | 3/3 keyless; mutation RED |
+| kit/test/package.test.mjs | node --test kit/test/package.test.mjs | npm pack → temp install → compiled doctor --robot NOT_RUN/no-key exit 2; package-name plant fails | 1/1 keyless; mutation RED |

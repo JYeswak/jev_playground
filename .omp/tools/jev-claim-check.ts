@@ -32,7 +32,7 @@
  * numberTokens() skips on purpose. Versions (1.13.0), names (SST-5, top-1),
  * bead ids (jev-384m), commit shas (3b0c1d2) and 8+ digit runs do not count.
  */
-import { askJev, observedFetch } from "../../work/jev-client/src/index.ts";
+import { askJev, observedFetch } from "../../kit/src/client.ts";
 import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 
 export const MODEL = "jev-1.13.0";
