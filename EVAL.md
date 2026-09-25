@@ -2195,3 +2195,20 @@ stopped **before Jev**. Receipt:
 Exact preflight command: `python3 var/agent-tmp/osw-bestofn-r3-360/build_states.py`. No API key
 was used, no Jev request or response exists, no rows or bar score were produced, and no task was
 replaced. Boundary: a new input-only amendment is required before any live call can be made.
+
+## jev-9gtw.2 exhaustive OSWorld presence preflight (2026-09-25) [test]
+
+Commit `f256089` supersedes the one-task preflight with one input-only rule over all 360
+effective IDs: in both pinned packages, require a structurally non-empty
+`ouroboros_task_final.json`, structural acting evidence (`loop_outcome.final_text` and a non-empty
+`loop_outcome.trace_refs.tool_call_refs`), and a present `result.txt`; exclude the task if any
+condition is false in either package. `uv run python var/agent-tmp/osw-bestofn-r3-360/exhaustive_preflight.py`
+scanned 360/360 rows with 0 scan failures, excluded 23, and retained 337. Receipt:
+`work/osw-bestofn/live_preflight_presence_r3.json`, SHA-256
+`9f7f5d2e26d3f64f5d11b10e2057a509cf846dcd40401d00b719e8a0063cb153`; retained ID-list
+SHA-256 `c2f320a71b86a6b35ae66dbdb4d2fb9d368aee181b21787f149b48516440aaf2`.
+
+Boundary: the scan read only pinned path metadata and final-file structure needed for presence or
+emptiness booleans; it did not read `result.txt` contents, official outcome values, rewards,
+success/status fields, or any Jev response. Jev calls, scoring, and the bar remain **NOT_RUN**
+pending non-author receipt verification.
