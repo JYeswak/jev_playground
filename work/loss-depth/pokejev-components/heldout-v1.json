@@ -1,0 +1,71 @@
+{
+  "receipt_type": "pokejev-component-heldout-v1",
+  "lane": "offline",
+  "model": "jev-1.13.0",
+  "live_requests": 0,
+  "battle_runs": 0,
+  "split_file": "decision-split-v1.json",
+  "split_sha256": "d10605fa534597820d159c60a723344561a40bf60ed77ff00dedaba4e05d340d",
+  "frozen_alpha_file": "frozen-alpha-v1.json",
+  "frozen_alpha_sha256": "317d596b93b276de9f22663b5f490f54903d6ca136a4add312e26d8cdc80abb8",
+  "logloss_rule": "All rows contribute log-loss; a label outside the candidate support receives probability 1e-6. Coverage records candidate-support membership separately.",
+  "bootstrap": {
+    "replicates": 5000,
+    "confidence": 0.95,
+    "paired_against": "usage_floor",
+    "seeds": {
+      "player": 20260925,
+      "opponent": 20260926
+    }
+  },
+  "results": {
+    "player": {
+      "n": 1000,
+      "coverage": 1.0,
+      "alpha": 0.4,
+      "floor": {
+        "top1": 0.345,
+        "top1_bootstrap95": [0.316, 0.376],
+        "logloss": 1.7455331632037405,
+        "logloss_bootstrap95": [1.681845087476493, 1.8098346531932994]
+      },
+      "mixture": {
+        "top1": 0.415,
+        "top1_bootstrap95": [0.385, 0.447],
+        "logloss": 1.606077748914921,
+        "logloss_bootstrap95": [1.551217091857611, 1.6640540734116958]
+      },
+      "paired_delta_mixture_minus_floor": {
+        "top1": 0.07,
+        "top1_bootstrap95": [0.04299999999999998, 0.09700000000000003],
+        "logloss": -0.13945541428881958,
+        "logloss_bootstrap95": [-0.17805561738453674, -0.10154935022643659]
+      }
+    },
+    "opponent": {
+      "n": 1000,
+      "coverage": 0.975,
+      "alpha": 0.25,
+      "floor": {
+        "top1": 0.177,
+        "top1_bootstrap95": [0.154, 0.201],
+        "logloss": 2.847754179813939,
+        "logloss_bootstrap95": [2.728531721784503, 2.9719860306308505]
+      },
+      "mixture": {
+        "top1": 0.246,
+        "top1_bootstrap95": [0.219, 0.273],
+        "logloss": 2.7385485930856404,
+        "logloss_bootstrap95": [2.619187129405012, 2.8642716157250954]
+      },
+      "paired_delta_mixture_minus_floor": {
+        "top1": 0.069,
+        "top1_bootstrap95": [0.04100000000000001, 0.09600000000000003],
+        "logloss": -0.10920558672829861,
+        "logloss_bootstrap95": [-0.14468213024004806, -0.07820008693432412]
+      }
+    }
+  },
+  "command": "env -u TYPESAFE_API_KEY -u JEV_API_KEY python3 work/loss-depth/pokejev-components/component_eval.py --heldout",
+  "boundary": "This receipt scores existing Stage A Jev answers against a deterministic usage floor. It does not make live requests, run battles, or claim a battle-level win."
+}
