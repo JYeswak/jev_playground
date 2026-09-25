@@ -639,6 +639,7 @@ Rules:
   runs fully and the live lane reports `NOT_RUN`. "Never ran" must never read like "passed".
 - A live run pins `model` explicitly and records the resolved version (`jev-latest` →
   `jev-1.13.0` on 2026-09-17). A number without a model version is unciteable next week.
+- Before scoring a live arm against a reference, run `python3 scripts/arm-sanity.py --arm <rows> --reference <rows>`; exit 1 stops a degenerate mix and exit 2 is `NOT_RUN` for too few eligible rows.
 - Retry/backoff behavior is offline-testable with an injected transport. Test it there, not by
   hammering a paid endpoint.
 

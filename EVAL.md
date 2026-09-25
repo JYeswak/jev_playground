@@ -1895,3 +1895,11 @@ Keyless tests: `python3 -m unittest work.row-provenance-check.test_row_provenanc
 The committed main-tree scan `python3 scripts/row-provenance-check.py` returned exit 0 and reported **5 experiment row files / 94 experiment rows**. It uses the first adding commit after `2026-09-25T09:00:00Z`, accepts either `code_sha256` or `run_py_sha256`, requires a valid ISO-8601 UTC timestamp, and reports the first bad row per file. Commits `fd02991` and `77a4324`.
 
 Boundary: no TypeSafe API call, no paid spend, no model judgment, and no claim about row correctness; this validates only deterministic provenance enforcement and its fail-safe diagnostics.
+
+## jev-5v4s Arm action-mix sanity checker (2026-09-25) [offline-verified]
+
+Keyless tests: `python3 -m unittest work/arm-sanity/test_arm_sanity.py` → **5/5 passed**. Committed fixtures prove PokéJev r3 code vs stage-b mix-v1 exits 1, mix-v1 vs mix-v1-control exits 0, the c7651c4-window MiniWoB rows vs pre-window rows exits 1, and too few eligible rows exits 2. A temporary mutation removing the offered-type filter made the explicit eligible-row test pass with 0 instead of exit 2, so the plant was RED.
+
+Direct keyless commands reported the expected exit sequence `1, 0, 1, 2`; `ruff format --check`, `ruff check`, and `ubs scripts/arm-sanity.py work/arm-sanity/test_arm_sanity.py` were run. No TypeSafe calls or spend were used.
+
+Boundary: no live arm, no model judgment, no comparator, and no Jev API call. TESTS.md registry update and pane-1 non-author verification remain required before bead closure.
