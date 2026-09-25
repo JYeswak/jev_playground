@@ -286,7 +286,7 @@ def build_candidates(
                 "drag",
                 (source_xy, target_xy),
             )
-    if include_none:
+    if include_none or not actions:
         actions[NONE_KEY] = ("none", 0)
     return actions, {r: type_spans[r] for r in types}, truncated
 

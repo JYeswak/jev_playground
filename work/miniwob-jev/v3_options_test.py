@@ -144,6 +144,17 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
                 arm or "v1-default",
             )
 
+    def test_empty_action_space_offers_safe_noop(self):
+        import jev_arm
+
+        actions, text_spans, truncated = jev_arm.build_candidates(
+            "Drag the item.", [], {}, include_none=False
+        )
+
+        self.assertEqual(actions, {jev_arm.NONE_KEY: ("none", 0)})
+        self.assertEqual(text_spans, {})
+        self.assertEqual(truncated, 0)
+
     def test_each_arm_changes_only_its_declared_surface(self):
         base = self.base_state()
         quoted = self.probe("quoted", base)
