@@ -1,0 +1,11 @@
+{
+  "fixture": "jev-1ww3-flip",
+  "mode": "mcnemar",
+  "tasks": 30,
+  "comparator_exact": 20,
+  "oracle_exact": 23,
+  "oracle_headroom": 3,
+  "bar_alpha": 0.05,
+  "expected_status": "UNREACHABLE",
+  "boundary": "A fixed candidate pool has 20 comparator exact wins and only 3 additional oracle wins; tasks-minus-comparator would incorrectly admit 10 wins."
+}

@@ -214,9 +214,29 @@ def rate_reachability(trials: int, threshold: float) -> dict[str, Any]:
     }
 
 
+def flip_fixture_result(path: Path) -> dict[str, Any]:
+    payload = _read_json(path)
+    try:
+        tasks = int(payload["tasks"])
+        comparator_exact = int(payload["comparator_exact"])
+        oracle_headroom = int(payload["oracle_headroom"])
+    except (KeyError, TypeError, ValueError) as exc:
+        raise ValueError(f"{path} is missing flip fixture counts") from exc
+    result = mcnemar_reachability(
+        tasks, comparator_exact, oracle_headroom, float(payload.get("bar_alpha", 0.05))
+    )
+    result["fixture"] = payload.get("fixture", path.name)
+    return result
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=("mcnemar", "rate"), default="mcnemar")
+    parser.add_argument(
+        "--flip-fixture",
+        type=Path,
+        help="committed boundary fixture for the reachability guard",
+    )
     parser.add_argument("--floor", type=Path, help="floor receipt with results_by_task")
     parser.add_argument(
         "--manifest", type=Path, help="manifest containing the full task list"
@@ -244,7 +264,9 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        if args.mode == "rate":
+        if args.flip_fixture:
+            result = flip_fixture_result(args.flip_fixture)
+        elif args.mode == "rate":
             if args.trials is None or args.threshold is None:
                 raise ValueError("rate mode requires --trials and --threshold")
             result = rate_reachability(args.trials, args.threshold)
