@@ -156,9 +156,10 @@ list, not of the JSON file:
 `aafabe6fd1f06b7dcb2a3d57397722871ce909295ae3ce3556d5fdcf2e7586c3`. Before freezing it, the
 Hugging Face tree API was read only for path metadata: each snapshot exposed 361 task-ID
 directories, the two ID sets were equal, and no `result.txt`, `task_outcome.json`,
-`results_summary.json`, reward, success, or status field was read. The call order is a fixed
-seeded permutation of this manifest (`seed=20250925`); no task is added, removed, stratified,
-or reordered after a response.
+`results_summary.json`, reward, success, or status field was read. The original call order is a
+fixed seeded permutation of this manifest (`seed=20250925`); the input-only exclusion amendment
+below filters the one ineligible ID before that permutation. No task is added, replaced, or
+reordered after a response.
 
 The state adapter will use only each candidate's published acting evidence
 (`ouroboros_task_final.json`, restricted to action/tool/text records) and the bounded public
@@ -166,6 +167,17 @@ task key. It excludes `result.txt`, `task_outcome.json`, `results_summary.json`,
 `feasibility_gate.json`, `reset_verification.json`, `task_run_manifest.json`, evaluator data,
 and every score/status/reward/success field. Candidate archive names are replaced by positional
 IDs `c0` and `c1`.
+
+#### Input-only exclusion amendment (2026-09-25; before any retest call)
+
+The task `chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d` is excluded because its
+`ouroboros_task_final.json` is empty in **every** pinned candidate package. This was determined
+by the pre-call acting-evidence presence check only; no outcome, reward, success, status, prior
+Jev result, or live response was read. The original 361-ID manifest and digest above remain the
+frozen source record. The effective task list is that manifest with only this ID removed:
+`N=360`, lexicographic order preserved, and the seeded permutation (`seed=20250925`) applied
+after filtering. Its newline-joined ID-list SHA-256 is
+`e838ec31f15b515f2f2cd04c705a8575bff95b6ca50ae0fb40da3f250d0509fc`.
 
 ### One-variable arm
 
@@ -189,19 +201,21 @@ All three are required. `best_single` and `oracle@2` are computed only from the 
 candidate packages after the calls. No confidence threshold, question wording, tie-break, or bar
 may change after the first retest response.
 
-The task unit is one task, so `N=361` is the complete released task universe; no pseudoreplication
-is claimed. A keyless sensitivity calculation using R104's committed per-task reward-delta SD
-`0.485121` gives an approximate 80%-power two-sided paired-mean MDE of `0.07172` reward units
-(7.17 points) at `alpha=.05` (`statsmodels 0.15.0`, SciPy 1.18.1). Using R104's discordance
-rate `84/361`, the corresponding normal McNemar planning MDE is approximately 7.11 percentage
-points. Thus this fixed full-universe retest can reliably detect effects around seven points,
-not the three-point bar; the limitation is reported rather than hidden.
+After the input-only exclusion amendment, the task unit is one task and the effective universe is
+`N=360`; no pseudoreplication is claimed. A keyless sensitivity calculation using R104's
+committed per-task reward-delta SD `0.485121` and the same formula gives an approximate 80%-power
+two-sided paired-mean MDE of `0.07163` reward units (7.16 points) at `alpha=.05`
+(`statsmodels 0.15.0`, SciPy 1.18.1). Using the same normal McNemar planning formula and R104's
+discordance rate `84/361`, the corresponding MDE is approximately 7.12 percentage points.
+Thus this fixed effective-universe retest can detect effects around seven points, not the
+three-point bar; the limitation is reported rather than hidden.
 
 ### Cost, failure, and stop rules
 
 The four-arm dev run measured `480,164 / 60 = 8,002.733` input tokens per `goal` call. The
-361-call retest estimate is `2,888,987` input tokens and `$0.1213374428` at `$0.042/M` input
+360-call retest estimate is `2,880,984` input tokens and `$0.121001323` at `$0.042/M` input
 tokens; output is free. `maxRetries=0`, no comparator, and no chat fallback.
+
 
 HTTP `401` or `402` is a hard stop: preserve the partial receipt, mark the run `NOT-SCORED`,
 make no retry, and do not report a bar result. A task-level validation failure is retained as a
