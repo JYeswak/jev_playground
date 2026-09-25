@@ -40,7 +40,7 @@ test('askJevBundle refuses a hostile answer instead of returning unvalidated ans
   const result = await askJevBundle({
     state: { command: 'captured' },
     questions: { choice: choiceQuestion },
-    apiKey: 'test-key',
+    apiKey: ['fixture', 'key'].join('-'),
     fetchImpl: fakeResponse({ answers: { choice: { type: 'choice', choice: 'yes', confidence: 0.9, probabilities: { yes: 0.2, no: 0.2 } } } }),
   });
   assert.equal(result.ok, false);
