@@ -52,7 +52,7 @@ def stable_index(task: str, count: int) -> int:
     return int.from_bytes(digest[:8], "big") % count
 
 
-def read_result(archive, member: str, remote=None) -> int:
+def read_result(archive, member: str, remote=None) -> float:
     source = (
         read_member_bytes(archive, remote, member)
         if remote is not None
@@ -63,9 +63,9 @@ def read_result(archive, member: str, remote=None) -> int:
         numeric = float(value)
     except ValueError as exc:
         raise ValueError(f"{member}: unexpected result {value!r}") from exc
-    if numeric not in {0.0, 1.0}:
+    if not 0.0 <= numeric <= 1.0:
         raise ValueError(f"{member}: unexpected result {value!r}")
-    return int(numeric)
+    return numeric
 
 
 def main() -> None:

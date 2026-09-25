@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from range_zip import archive_score, archive_url, list_root_archives, open_remote_zip
@@ -20,7 +21,7 @@ POOL_FILES = [
     "doubao-1-5-thinking-vision-pro-250428-15step.zip",
     "jedi-7b-4o-15steps.zip",
     "jedi-7b-o3-15steps.zip",
-    "kimi-vl-a3b-15steps.zip",
+    "kimi-vl-a3b-15step.zip",
 ]
 
 
@@ -35,44 +36,45 @@ def eligible_filename(path: str) -> bool:
 
 def main() -> None:
     candidates = POOL_FILES.copy()
-    records: list[dict[str, object]] = []
-    excluded: list[dict[str, str]] = []
-    for filename in candidates:
+
+    def inspect(filename: str) -> tuple[str, dict[str, object]]:
         url = archive_url(filename)
         archive, remote = open_remote_zip(url)
         try:
             rows, score = archive_score(archive, remote)
             if len(rows) != 361 or len(set(rows)) != 361:
-                excluded.append(
-                    {
-                        "archive": filename,
-                        "reason": f"result rows={len(rows)}, expected 361",
-                    }
-                )
-                continue
-            records.append(
-                {
+                return "excluded", {
                     "archive": filename,
-                    "url": url,
-                    "tasks": len(rows),
-                    "score": score,
-                    "fetched_bytes": remote.fetched_bytes,
+                    "reason": f"result rows={len(rows)}, expected 361",
                 }
-            )
+            return "record", {
+                "archive": filename,
+                "url": url,
+                "tasks": len(rows),
+                "score": score,
+                "fetched_bytes": remote.fetched_bytes,
+            }
         except Exception as exc:
-            excluded.append({"archive": filename, "reason": repr(exc)})
+            return "excluded", {"archive": filename, "reason": repr(exc)}
         finally:
             archive.close()
-    # POOL_FILES order is preregistered; result scores are not used to select candidates.
-    if len(records) < N:
-        raise SystemExit(f"eligible archives={len(records)} < N={N}")
-    selected = records[:N]
+
+    records: list[dict[str, object]] = []
+    excluded: list[dict[str, str]] = []
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        for kind, value in executor.map(inspect, candidates):
+            (records if kind == "record" else excluded).append(value)
+    if len(records) != N:
+        raise SystemExit(
+            f"eligible archives={len(records)} < N={N}; excluded={excluded}"
+        )
+    selected = records
     receipt = {
         "rule": "fixed POOL_FILES allowlist; each result.txt has exactly 361 rows; no score or trajectory selection",
         "n": N,
         "candidates_considered": candidates,
         "excluded": excluded,
-        "eligible_sorted": records,
+        "eligible_in_preregistered_order": records,
         "selected": selected,
     }
     OUT.write_text(json.dumps(receipt, indent=2) + "\n")

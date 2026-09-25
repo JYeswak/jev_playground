@@ -13,6 +13,8 @@ import json
 import urllib.parse
 import urllib.request
 import zipfile
+import struct
+import zlib
 from pathlib import PurePosixPath
 from typing import Iterable
 
@@ -110,21 +112,44 @@ def read_member_bytes(
     archive: zipfile.ZipFile, remote: HTTPRangeFile, member: str
 ) -> bytes:
     info = archive.getinfo(member)
-    if info.compress_type != zipfile.ZIP_STORED:
+    header = remote.fetch_range(info.header_offset, info.header_offset + 255)
+    (
+        signature,
+        _v,
+        _flags,
+        _method,
+        _time,
+        _date,
+        _crc,
+        _csize,
+        _usize,
+        filename_len,
+        extra_len,
+    ) = struct.unpack_from("<4s5H3I2H", header)
+    if signature != b"PK\x03\x04":
+        raise ValueError(f"{member}: invalid local ZIP header")
+    data_start = info.header_offset + 30 + filename_len + extra_len
+    relative_start = 30 + filename_len + extra_len
+    if relative_start + info.compress_size <= len(header):
+        data = header[relative_start : relative_start + info.compress_size]
+    else:
+        data = remote.fetch_range(data_start, data_start + info.compress_size - 1)
+    if info.compress_type == zipfile.ZIP_STORED:
+        decoded = data
+    elif info.compress_type == zipfile.ZIP_DEFLATED:
+        decoded = zlib.decompress(data, -15)
+    else:
         return archive.read(member)
-    filename_bytes = info.filename.encode("utf-8")
-    data_start = info.header_offset + 30 + len(filename_bytes) + len(info.extra)
-    data = remote.fetch_range(data_start, data_start + info.compress_size - 1)
-    if len(data) != info.file_size:
+    if len(decoded) != info.file_size:
         raise ValueError(
-            f"{member}: stored range length={len(data)} expected={info.file_size}"
+            f"{member}: range length={len(decoded)} expected={info.file_size}"
         )
-    return data
+    return decoded
 
 
 def read_result(
     archive: zipfile.ZipFile, member: str, remote: HTTPRangeFile | None = None
-) -> int:
+) -> float:
     source = (
         read_member_bytes(archive, remote, member)
         if remote is not None
@@ -135,11 +160,11 @@ def read_result(
         numeric = float(value)
     except ValueError as exc:
         raise ValueError(
-            f"{member}: expected official result 0/1, got {value!r}"
+            f"{member}: expected official result in [0,1], got {value!r}"
         ) from exc
-    if numeric not in {0.0, 1.0}:
-        raise ValueError(f"{member}: expected official result 0/1, got {value!r}")
-    return int(numeric)
+    if not 0.0 <= numeric <= 1.0:
+        raise ValueError(f"{member}: expected official result in [0,1], got {value!r}")
+    return numeric
 
 
 def archive_score(

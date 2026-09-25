@@ -47,15 +47,18 @@ for (const line of lines) {
   };
 }
 
-function success(task, choice) {
-  return choice && choice !== "none" && rows[task]?.[floor.selected_archives[Number(choice.slice(1))]] === 1 ? 1 : 0;
+function reward(task, choice) {
+  return choice && choice !== "none" ? Number(rows[task]?.[floor.selected_archives[Number(choice.slice(1))]] ?? 0) : 0;
 }
-function exactMcNemar(jev, baseline) {
+function exact(task, choice) {
+  return reward(task, choice) >= 1.0 ? 1 : 0;
+}
+function exactMcNemar() {
   let b = 0;
   let c = 0;
   for (const task of Object.keys(rows)) {
-    const a = success(task, picks[task]?.choice);
-    const d = rows[task][floor.best_single_archive] ?? 0;
+    const a = exact(task, picks[task]?.choice);
+    const d = Number(rows[task][floor.best_single_archive] ?? 0) >= 1.0 ? 1 : 0;
     if (a === 1 && d === 0) b += 1;
     if (a === 0 && d === 1) c += 1;
   }
@@ -70,10 +73,11 @@ function binomial(n, k) {
   for (let i = 1; i <= k; i += 1) value = (value * (n - i + 1)) / i;
   return value;
 }
-const successful = Object.keys(rows).reduce((sum, task) => sum + success(task, picks[task]?.choice), 0);
-const best = floor.best_single_successes;
-const oracle = floor.oracle_successes;
-const delta = successful / floor.tasks - best / floor.tasks;
+const selectedRewardSum = Object.keys(rows).reduce((sum, task) => sum + reward(task, picks[task]?.choice), 0);
+const selectedExactTasks = Object.keys(rows).reduce((sum, task) => sum + exact(task, picks[task]?.choice), 0);
+const best = Number(floor.best_single_successes);
+const oracle = Number(floor.oracle_successes);
+const delta = selectedRewardSum / floor.tasks - best / floor.tasks;
 const gap = oracle / floor.tasks - best / floor.tasks;
 const receipt = {
   model,
@@ -82,15 +86,16 @@ const receipt = {
   selected_archives: floor.selected_archives,
   calls: lines.length,
   failures,
-  successful_tasks: successful,
-  rate: successful / floor.tasks,
-  best_single_successes: best,
-  best_single_rate: best / floor.tasks,
-  oracle_successes: oracle,
-  oracle_rate: oracle / floor.tasks,
+  selected_reward_sum: selectedRewardSum,
+  selected_mean_reward: selectedRewardSum / floor.tasks,
+  selected_exact_tasks: selectedExactTasks,
+  best_single_reward_sum: best,
+  best_single_mean_reward: best / floor.tasks,
+  oracle_reward_sum: oracle,
+  oracle_mean_reward: oracle / floor.tasks,
   delta_vs_best_single: delta,
   gap_closed: gap === 0 ? null : delta / gap,
-  mcnemar_vs_best_single: exactMcNemar(successful / floor.tasks, best / floor.tasks),
+  mcnemar_vs_best_single: exactMcNemar(),
   usage: { input_tokens: inputTokens, output_tokens: outputTokens },
   latency: { total_ms: latencyMs, mean_ms: latencyMs / Math.max(1, lines.length), wall_ms: Date.now() - started },
   spend_usd_estimate: inputTokens * 0.042 / 1_000_000,
@@ -102,8 +107,9 @@ console.log(JSON.stringify({
   tasks: receipt.tasks,
   calls: receipt.calls,
   failures: receipt.failures,
-  successful_tasks: receipt.successful_tasks,
-  rate: receipt.rate,
+  selected_reward_sum: receipt.selected_reward_sum,
+  selected_mean_reward: receipt.selected_mean_reward,
+  selected_exact_tasks: receipt.selected_exact_tasks,
   delta_vs_best_single: receipt.delta_vs_best_single,
   gap_closed: receipt.gap_closed,
   mcnemar: receipt.mcnemar_vs_best_single,

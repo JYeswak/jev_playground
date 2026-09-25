@@ -23,7 +23,7 @@ claude-sonnet-4-5-20250929_15steps.zip
 doubao-1-5-thinking-vision-pro-250428-15step.zip
 jedi-7b-4o-15steps.zip
 jedi-7b-o3-15steps.zip
-kimi-vl-a3b-15steps.zip
+kimi-vl-a3b-15step.zip
 ```
 
 The allowlist is the first eight names in lexical order among the root `.zip` files containing
@@ -32,6 +32,11 @@ runtime text was used to choose the pool. For each allowlisted archive, `result.
 one official scored row for each of the 361 OSWorld-Verified tasks; otherwise the experiment
 aborts rather than substituting another archive. The eight filenames and their result counts are
 frozen in the keyless oracle receipt before any trajectory or runtime member is read.
+
+Each official `result.txt` row is a finite reward in `[0,1]`, not necessarily an integer. The
+reported rate is the mean reward multiplied by 100 (percentage points). For paired McNemar, an
+exact completion is `result >= 1.0`; partial rewards remain in the mean-rate metric but are not
+counted as exact completions.
 
 This fixed-allowlist rule supersedes the earlier score-ranked draft in commit `7f908b7`; the
 superseding amendment is committed before the keyless floors and before any live call. It is a
@@ -64,23 +69,18 @@ Each floor is computed without Jev, before live calls. The oracle and floors are
 Jev; they establish the task-level prevalence and the attainable ceiling in this released pool.
 
 ## Live bar — fixed before the first live call
-
-One Jev Choice per task over the eight candidate IDs plus `none`, with compact text-only state.
-The official evaluator's success row for the selected candidate is the outcome. No comparator model
-runs.
-
-**PASS:** Jev's selected candidate succeeds on at least 3 percentage points more tasks than
-`best_single`, with paired McNemar p < 0.05, and closes at least 30% of the gap between
-`best_single` and `oracle@8`:
+**PASS:** Jev's selected candidates have a mean official reward at least 3 percentage points higher
+than `best_single`, with paired McNemar p < 0.05 on exact completions, and close at least 30% of
+the mean-reward gap between `best_single` and `oracle@8`:
 
 ```text
-jev_rate - best_single_rate >= 0.03
-mcnemar_exact_p < 0.05
-(jev_rate - best_single_rate) / (oracle_rate - best_single_rate) >= 0.30
+jev_mean_reward - best_single_mean_reward >= 0.03
+mcnemar_exact_p < 0.05  # exact completion means result.txt reward >= 1.0
+(jev_mean_reward - best_single_mean_reward) / (oracle_mean_reward - best_single_mean_reward) >= 0.30
 ```
 
-If `oracle_rate == best_single_rate`, the gap-closure term is vacuous but the +3-point and
-McNemar requirements remain mandatory.
+If `oracle_mean_reward == best_single_mean_reward`, the gap-closure term is vacuous but the
+three-point and McNemar requirements remain mandatory.
 
 **KILL:** Jev is no better than `best_single`, or any required live state cannot be constructed
 from the permitted members, or the official result row cannot be joined unambiguously.
