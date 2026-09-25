@@ -13,7 +13,7 @@
  * Exit: 0 run complete, 2 NOT_RUN (no key), 3 refused (key not OK, corpus hash mismatch, or a
  * 401/402 stop), 1 any other error.
  */
-import { createHash } from 'node:crypto';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -209,7 +209,9 @@ export async function runTrial({ sample, askChoice = askJevChoice, write = () =>
 }
 
 function fmt(x) {
-  return x === null || x === undefined ? '-' : typeof x === 'number' ? x.toFixed(3) : String(x);
+  if (x === null || x === undefined) return '-';
+  if (typeof x === 'number') return x.toFixed(3);
+  return String(x);
 }
 
 async function main() {
@@ -226,7 +228,7 @@ async function main() {
     return 2;
   }
   const { goals, sha } = loadGoals(GOALS);
-  if (sha !== GOALS_SHA256) {
+  if (sha.length !== GOALS_SHA256.length || !timingSafeEqual(Buffer.from(sha), Buffer.from(GOALS_SHA256))) {
     console.log(`REFUSED: ${path.relative(ROOT, GOALS)} sha256 ${sha} != preregistered ${GOALS_SHA256}`);
     return 3;
   }
