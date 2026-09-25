@@ -9,7 +9,7 @@ import { judgePair } from './judge.mjs';
 // askJevBundle passes questions through UNMODIFIED, preserving the Noul
 // criteria {true,false} judgePair builds — askJev (instructions-only) would
 // silently drop them.
-import { askJevBundle } from '../../../work/jev-client/src/index.ts';
+import { askJevBundle } from '../../../kit/src/client.ts';
 
 // Live asker via the lane client. Same refusal semantics: throw on any
 // failure (transport, unconfigured, malformed) and judgePair records

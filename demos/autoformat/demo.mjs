@@ -15,7 +15,7 @@ import { recover } from "./recover.mjs";
 const live = process.argv.includes("--live");
 let r = null;
 if (live) {
-  const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+  const { askJevBundle } = await import("../../kit/src/client.ts");
   const { RAW, render } = await import("./recover.mjs");
   const tag = (i) => `L${String(i).padStart(2, "0")}`;
   const state1 = RAW.map((t, i) => `${tag(i)}| ${t}`).join("\n");

@@ -21,7 +21,7 @@
  * classifier recording a pass is indistinguishable from a clean result.
  */
 import { execFile } from "node:child_process";
-import { askJev } from "../../jev-client/src/index.ts";
+import { askJev } from "../../../kit/src/client.ts";
 
 import { recording } from "../../jev-score-register/register.mjs";
 

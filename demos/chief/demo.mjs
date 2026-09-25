@@ -99,7 +99,7 @@ if (!live) {
   process.exit(0);
 }
 
-const { askJevChoice } = await import('../../work/jev-client/src/index.ts');
+const { askJevChoice } = await import('../../kit/src/client.ts');
 const rows = [];
 for (const job of JOBS) {
   const r = await askJevChoice({

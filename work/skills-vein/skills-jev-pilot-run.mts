@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync, appendFileSync } from "node:fs";
-import { askJev } from "../jev-client/src/index.ts";
+import { askJev } from "../../kit/src/client.ts";
 
 /**
  * skills-jev-pilot-run.mts — Noul skill-relevance pilot.

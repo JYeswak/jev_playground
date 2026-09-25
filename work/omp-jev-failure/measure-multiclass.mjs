@@ -35,7 +35,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { askJev, askJevChoice } from '../jev-client/src/index.ts';
+import { askJev, askJevChoice } from '../../kit/src/client.ts';
 
 const argv = process.argv.slice(2);
 const argOf = (name, fallback) => {

@@ -7,7 +7,7 @@
  *   infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=prod --silent -- \
  *     node work/omp-jev-route/score-32.mjs
  */
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { QUESTIONS } from './src/index.ts';
 import { gradeQuestion } from '../jev-client/measure-kit.mjs';
 import { TURNS } from './turns-32.mjs';

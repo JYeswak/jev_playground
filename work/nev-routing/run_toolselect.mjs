@@ -6,7 +6,7 @@
 // resume skips completed ids. Prints tranche accuracy + McNemar vs bash.
 // Exit 0 tranche complete (or INVALID if >2 failures), exit 2 short.
 import { readFileSync, appendFileSync, existsSync } from "node:fs";
-import { askJevChoice } from "../jev-client/src/index.ts";
+import { askJevChoice } from "../../kit/src/client.ts";
 
 const HASHED = new URL("./tool-select-hashed.jsonl", import.meta.url).pathname;
 const TEXT = "/tmp/tool-select-pairs.jsonl";

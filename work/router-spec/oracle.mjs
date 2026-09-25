@@ -21,7 +21,7 @@ import { readFileSync } from 'node:fs';
 // Lane-sanctioned caller (943158c): askJevBundle passes the MIXED
 // Choice+Score+Noul battery through unmodified. No hand-rolled POST,
 // no private client.
-import { askJevBundle } from '../jev-client/src/index.ts';
+import { askJevBundle } from '../../kit/src/client.ts';
 import { auc as kitAuc, field } from '../oracle-kit/index.mjs';
 
 const HARD_CALLS = 5, EASY_CALLS = 2, AUC_BAR = 0.70, MARGIN_BAR = 0.05, ARM_BAR = 0.80;

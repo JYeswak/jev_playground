@@ -12,7 +12,7 @@
  *        node --experimental-strip-types work/toolcall-judge-v3/scale-run.mjs [n] [concurrency]
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 
 const n = Number(process.argv[2] ?? 500);
 const concurrency = Number(process.argv[3] ?? 16);

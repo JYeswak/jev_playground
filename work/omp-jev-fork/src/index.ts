@@ -8,7 +8,7 @@
  * NEVER blocks. NEVER throws into the host. Returns undefined on every path.
  * A failed call records `fork_error`, never a pass.
  */
-import { askJevChoice } from "../../jev-client/src/index.ts";
+import { askJevChoice } from "../../../kit/src/client.ts";
 import {
   isUserFacingWrite,
   filePathFromEvent,

@@ -14,7 +14,7 @@
  *   infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
  *     node --experimental-strip-types work/omp-jev-rerank/measure.mjs
  */
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 
 const QUESTIONS = {
   definitional: 'Do any of the first three show a definition signature?',

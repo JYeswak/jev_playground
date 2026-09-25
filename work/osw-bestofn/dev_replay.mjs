@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-import { askJevBundle } from "../../work/jev-client/src/index.ts";
+import { askJevBundle } from "../../kit/src/client.ts";
 
 const variant = process.argv[2];
 const allowedVariants = new Set(["original", "goal", "neutral", "noul"]);

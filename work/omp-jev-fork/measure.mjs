@@ -8,7 +8,7 @@
  * Choice package: print planted cases and call askJevChoice. Do not invent a
  * second kit. No key → print unconfigured and exit 0 so CI never runs it.
  */
-import { askJevChoice } from "../jev-client/src/index.ts";
+import { askJevChoice } from "../../kit/src/client.ts";
 import { CHOICE } from "./src/index.ts";
 
 const cases = [

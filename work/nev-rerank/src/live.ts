@@ -7,7 +7,7 @@
  * reached fetch (HTTP error, timeout, malformed body), false when askJevScore
  * stopped before any request (no key, billing hold, SDK missing).
  */
-import { askJevScore, observedFetch } from "../../jev-client/src/index.ts";
+import { askJevScore, observedFetch } from "../../../kit/src/client.ts";
 import { expectedLevel, passageId, scoreQuestion, type RankAnswer } from "./rank.ts";
 
 export const LIVE_MODEL = "jev-1.13.0";

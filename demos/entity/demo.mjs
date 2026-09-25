@@ -79,7 +79,7 @@ checkFixtures();
 const live = process.argv.includes("--live");
 let askLive = null;
 if (live) {
-  const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+  const { askJevBundle } = await import("../../kit/src/client.ts");
   askLive = async (pair) => {
     const r = await askJevBundle({
       model: "jev-1.13.0",

@@ -70,7 +70,7 @@ function fixtureAsker(calls) {
 
 let asker;
 if (LIVE) {
-  const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+  const { askJevBundle } = await import("../../kit/src/client.ts");
   asker = {
     async ask(state, questions) {
       const r = await askJevBundle({ state, questions, model: "jev-1.13.0", timeoutMs: 20000 });

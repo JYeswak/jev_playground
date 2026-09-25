@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { askJevChoice } from '../jev-client/src/index.ts';
+import { askJevChoice } from '../../kit/src/client.ts';
 import { CRITERIA, INSTRUCTIONS, routeState } from './src/router.mjs';
 import { lexicalRoute, majority, MODEL, policyAction, runTrial, sampleGoals, summarize } from './trial-choice.mjs';
 

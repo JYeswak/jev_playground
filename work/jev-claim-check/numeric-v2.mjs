@@ -45,7 +45,7 @@
 import { appendFileSync, existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
-import { askJev } from "../jev-client/src/index.ts";
+import { askJev } from "../../kit/src/client.ts";
 import { classify, numberTokens as numberTokensV2 } from "../../.omp/tools/jev-claim-check.ts";
 import { references } from "./check-close.mjs";
 import { QUESTION, clauseAt, mulberry32 } from "./numeric.mjs";

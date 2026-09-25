@@ -6,7 +6,7 @@
  * 8 live Jev calls total (4 + 4).
  */
 import { readFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { gradeQuestion, DEFAULT_THRESHOLD } from '../jev-client/measure-kit.mjs';
 import { CANDIDATE_QUESTION, CANDIDATE_QUESTION_2, buildState, buildCommandState } from './trial.mjs';
 

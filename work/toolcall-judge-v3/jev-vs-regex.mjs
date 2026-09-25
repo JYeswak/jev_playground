@@ -32,7 +32,7 @@
  * Run: infisical run --projectId=... -- node work/toolcall-judge-v3/jev-vs-regex.mjs [perStratum]
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 
 const PER_STRATUM = Number(process.argv[2] ?? 50);
 const CONCURRENCY = 8;

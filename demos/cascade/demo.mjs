@@ -12,7 +12,7 @@ import { verify, THRESHOLD } from "./verify.mjs";
 const live = process.argv.includes("--live");
 let r = null;
 if (live) {
-  const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+  const { askJevBundle } = await import("../../kit/src/client.ts");
   const { FIELDS } = await import("./verify.mjs");
   const questions = {
     "__overall__::judge": {

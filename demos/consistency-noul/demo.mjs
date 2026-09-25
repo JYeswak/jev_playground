@@ -180,7 +180,7 @@ if (!live) {
   process.exit(0);
 }
 
-const { askJevBundle } = await import('../../work/jev-client/src/index.ts');
+const { askJevBundle } = await import('../../kit/src/client.ts');
 const NOUL_QUESTIONS = Object.fromEntries(
   Object.entries(QUESTIONS).map(([key, instructions]) => [key, { type: 'noul', instructions }]),
 );

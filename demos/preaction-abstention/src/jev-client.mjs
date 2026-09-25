@@ -3,7 +3,7 @@
 // askJevBundle passes questions through UNMODIFIED, preserving the Noul
 // criteria {true,false} gate.mjs builds — askJev (instructions-only) would
 // silently drop them.
-import { askJevBundle } from '../../../work/jev-client/src/index.ts';
+import { askJevBundle } from '../../../kit/src/client.ts';
 
 export class JevClient {
   constructor({ apiKey, model }) {

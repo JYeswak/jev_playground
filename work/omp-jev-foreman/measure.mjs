@@ -4,7 +4,7 @@
  * Three byte-identical runs, eight constructed windows, per-question constant baselines and every
  * near-threshold score. This is a measurement of hand-built cases, not a production accuracy claim.
  */
-import { askJev } from '../../work/jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 
 const QUESTIONS = {
   repeating: 'Is the agent repeating itself or retrying the same obstacle?',

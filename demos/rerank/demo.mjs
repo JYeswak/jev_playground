@@ -85,7 +85,7 @@ console.log("");
 for (const query of QUERIES) {
   let score = scoreFn;
   if (live) {
-    const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+    const { askJevBundle } = await import("../../kit/src/client.ts");
     score = async (q, id) => {
       const passage = CORPUS.find((p) => p.id === id).text;
       const r = await askJevBundle({

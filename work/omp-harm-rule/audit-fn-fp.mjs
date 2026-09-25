@@ -1,4 +1,4 @@
-import { readRow } from '../jev-client/src/index.ts';
+import { readRow } from '../../kit/src/client.ts';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 const files=[]; (function w(d){ for (const e of readdirSync(d,{withFileTypes:true})) { const p=join(d,e.name);

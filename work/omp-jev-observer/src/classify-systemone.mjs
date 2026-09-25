@@ -8,7 +8,7 @@
  * cost field, so usage?.costUsd was always undefined on this path. Dropping
  * the direct client loses nothing observable; askJev surfaces usage tokens.
  */
-import { askJev } from '../../jev-client/src/index.ts';
+import { askJev } from '../../../kit/src/client.ts';
 import { recordScore } from '../../jev-score-register/register.mjs';
 
 const REGISTER = process.env.JEV_SCORE_REGISTER ?? 'work/jev-score-register/scores.jsonl';

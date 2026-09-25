@@ -27,7 +27,7 @@
  *   node --experimental-strip-types work/toolcall-judge-v3/seat-deepen-freshness.mjs [n] [conc]
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 
 const n = Number(process.argv[2] ?? 400);
 const concurrency = Number(process.argv[3] ?? 24);

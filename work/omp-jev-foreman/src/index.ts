@@ -4,7 +4,7 @@
  * Local trigger first: Jev is asked only when the recent execution window repeats a command or
  * accumulates calls without a write/edit. There is no default score and no blocking path.
  */
-import { askJev, readRow, type JevResult } from "../../jev-client/src/index.ts";
+import { askJev, readRow, type JevResult } from "../../../kit/src/client.ts";
 import { recording } from "../../jev-score-register/register.mjs";
 
 /**

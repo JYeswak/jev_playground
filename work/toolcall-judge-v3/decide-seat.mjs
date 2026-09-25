@@ -17,7 +17,7 @@
  *   node --experimental-strip-types work/toolcall-judge-v3/decide-seat.mjs [n] [conc]
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { classifyV3, classifyV4 } from './rules-v4.mjs';
 
 const n = Number(process.argv[2] ?? 2000);

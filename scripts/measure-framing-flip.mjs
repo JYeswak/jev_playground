@@ -24,7 +24,7 @@ if (!key) {
 const N = Number(process.argv[2] || 10);
 // Lane-sanctioned caller (943158c): SDK-owned wire, our failure taxonomy.
 // askJevBundle passes the MIXED Noul+Choice battery through unmodified.
-import { askJevBundle } from '../work/jev-client/src/index.ts';
+import { askJevBundle } from '../kit/src/client.ts';
 
 // IDENTICAL in both arms. If these differ, the experiment measures nothing.
 const questions = {

@@ -248,7 +248,7 @@ if (!live) {
   process.exit(0);
 }
 
-const { askJevBundle } = await import('../../work/jev-client/src/index.ts');
+const { askJevBundle } = await import('../../kit/src/client.ts');
 // The cookbook's system_one call: Choice(instructions, criteria) per rubric question.
 const CHOICE_QUESTIONS = Object.fromEntries(
   Object.entries(RUBRIC).map(([key, [instructions, criteria]]) => [key, { type: 'choice', instructions, criteria }]),

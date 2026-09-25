@@ -60,7 +60,7 @@ const missing = rows.filter((r) => !raw.has(r.cmdSha)).map((r) => r.i);
 if (missing.length) refuse(`REFUSED: ${missing.length} extract rows have no sha-verified sidecar command: ${missing.slice(0, 20)}`, 1);
 
 const { observe, MODEL } = await import("../../.omp/hooks/post/jev-gate-observe.ts");
-const { askJev } = await import("../jev-client/src/index.ts");
+const { askJev } = await import("../../kit/src/client.ts");
 const { ADDED, CUT, STATE_CONTEXT } = await import("./candidate.mjs");
 const done = new Map((existsSync(PARTIAL) ? readJsonl(PARTIAL) : []).map((r) => [r.i, r]));
 const started = new Date().toISOString();

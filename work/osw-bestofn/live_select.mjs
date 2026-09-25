@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
-import { askJevChoice } from "../../work/jev-client/src/index.ts";
+import { askJevChoice } from "../../kit/src/client.ts";
 import { spawnSync } from "node:child_process";
 
 const statePath = process.env.OSW_STATE_FILE ?? "/tmp/jev-osw-bestofn-states.jsonl";

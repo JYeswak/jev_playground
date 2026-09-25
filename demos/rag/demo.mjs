@@ -78,7 +78,7 @@ if (!live) {
   process.exit(0);
 }
 
-const { askJevBundle } = await import('../../work/jev-client/src/index.ts');
+const { askJevBundle } = await import('../../kit/src/client.ts');
 const rows = [];
 for (const passage of fixture.passages) {
   const r = await askJevBundle({

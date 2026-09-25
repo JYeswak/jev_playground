@@ -6,7 +6,7 @@
  * the rule-computed verdict word. 8 live Jev calls total.
  */
 import { readFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { gradeQuestion, DEFAULT_THRESHOLD } from '../jev-client/measure-kit.mjs';
 import { CANDIDATE_QUESTION_2, buildCommandState } from './trial.mjs';
 

@@ -18,7 +18,7 @@
  * caller only (work/jev-client). Model pinned jev-1.13.0.
  */
 import { readFileSync, appendFileSync } from 'node:fs';
-import { askJevBundle } from '../jev-client/src/index.ts';
+import { askJevBundle } from '../../kit/src/client.ts';
 
 const TRUE_GENERIC =
   'Unsolicited bulk or commercial email: advertising, scams, phishing, ' +

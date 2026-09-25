@@ -186,7 +186,7 @@ function dateQuestions(role) {
 }
 
 async function readPartsLive(document, role) {
-  const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+  const { askJevBundle } = await import("../../kit/src/client.ts");
   const r = await askJevBundle({
     model: "jev-1.13.0",
     state: { document, role },

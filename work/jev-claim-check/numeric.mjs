@@ -30,7 +30,7 @@
 import { appendFileSync, existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
-import { askJev } from "../jev-client/src/index.ts";
+import { askJev } from "../../kit/src/client.ts";
 import { classify } from "../../.omp/tools/jev-claim-check.ts";
 import { numberTokens, references } from "./check-close.mjs";
 

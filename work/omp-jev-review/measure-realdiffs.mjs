@@ -21,7 +21,7 @@
  *     node --experimental-strip-types work/omp-jev-review/measure-realdiffs.mjs
  */
 import { execFileSync } from 'node:child_process';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { gradeQuestion } from '../jev-client/measure-kit.mjs';
 
 const COUNT = Number(process.env.REVIEW_MEASURE_N ?? 14);

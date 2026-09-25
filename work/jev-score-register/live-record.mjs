@@ -11,7 +11,7 @@
  *   node --experimental-strip-types work/jev-score-register/live-record.mjs [n]
  */
 import { readFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { recording } from './register.mjs';
 
 const n = Number(process.argv[2] ?? 40);

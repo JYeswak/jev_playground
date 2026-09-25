@@ -10,7 +10,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { askJev } from "../jev-client/src/index.ts";
+import { askJev } from "../../kit/src/client.ts";
 import {
   baseline,
   binaryShipConfusion,

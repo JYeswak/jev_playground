@@ -33,7 +33,7 @@
  */
 import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { gradeQuestion } from '../jev-client/measure-kit.mjs';
 
 const MAX = Number(process.argv[2] ?? 40);

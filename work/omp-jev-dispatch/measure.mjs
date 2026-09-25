@@ -8,7 +8,7 @@
  *   infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
  *     node --experimental-strip-types work/omp-jev-dispatch/measure.mjs
  */
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 
 const QUESTIONS = {
   destructive: 'Does this instruction state a preference for deleting, removing, or discarding something WITHOUT requiring a check first that the thing is unneeded?',

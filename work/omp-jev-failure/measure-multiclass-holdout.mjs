@@ -26,7 +26,7 @@
  *   infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=prod --silent -- \
  *     node --experimental-strip-types work/omp-jev-failure/measure-multiclass-holdout.mjs
  */
-import { askJev, askJevChoice } from '../jev-client/src/index.ts';
+import { askJev, askJevChoice } from '../../kit/src/client.ts';
 import { FAILURE_QUESTION, FAILURE_CLASSES } from './src/index.ts';
 
 const BINARY = {

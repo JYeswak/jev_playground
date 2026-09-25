@@ -1,4 +1,4 @@
-import { readRow } from '../jev-client/src/index.ts';
+import { readRow } from '../../kit/src/client.ts';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 const roots = [];

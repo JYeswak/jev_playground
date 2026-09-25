@@ -120,7 +120,7 @@ if (!live) {
   process.exit(0);
 }
 
-const { askJevChoice } = await import("../../work/jev-client/src/index.ts");
+const { askJevChoice } = await import("../../kit/src/client.ts");
 const classes = {
   supports: "The section states the claim or directly implies that it is true",
   contradicts: "The section states the opposite of the claim or implies it is false",

@@ -9,7 +9,7 @@
  * NEVER blocks. NEVER throws into the host. Returns undefined on every path.
  * A failed call records `promise_error`, never a pass.
  */
-import { askJev } from "../../jev-client/src/index.ts";
+import { askJev } from "../../../kit/src/client.ts";
 import {
   isUserFacingWrite,
   filePathFromEvent,

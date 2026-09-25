@@ -19,7 +19,7 @@
 // FEASIBILITY ARM: the same pipeline scores "does this command write to a file", which is close
 // to deterministic from the text. Below 0.80 the harness is blind and NO verdict is reported.
 import { readFileSync } from 'node:fs';
-import { askJevBundle } from '../jev-client/src/index.ts';
+import { askJevBundle } from '../../kit/src/client.ts';
 import { auc as kitAuc, feasibility, field } from '../oracle-kit/index.mjs';
 import { RISK, STATE_CONTEXT } from './questions.mjs';
 

@@ -15,7 +15,7 @@ const UNANSWERED = "What are the office holiday hours?";
 const live = process.argv.includes("--live");
 let askLive = null;
 if (live) {
-  const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+  const { askJevBundle } = await import("../../kit/src/client.ts");
   const ids = DOC.map((_, i) => `L${String(i + 1).padStart(2, "0")}`);
   const tagged = DOC.map((text, i) => `${ids[i]}: ${text}`).join("\n");
   askLive = async (query) => {

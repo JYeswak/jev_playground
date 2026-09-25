@@ -8,7 +8,7 @@
 import test, { mock } from 'node:test';
 import assert from 'node:assert/strict';
 import { liveAsker, LIVE_TIMEOUT_MS } from '../src/live.ts';
-import { resetBillingHold } from '../../jev-client/src/index.ts';
+import { resetBillingHold } from '../../../kit/src/client.ts';
 import { requireSdkInstalled } from '../../sdk/require-installed.mjs';
 
 requireSdkInstalled();

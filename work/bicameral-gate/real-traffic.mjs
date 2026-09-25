@@ -5,7 +5,7 @@
 // scored. Run: infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- node work/bicameral-gate/real-traffic.mjs [out.jsonl]
 // The optional argument (jev-24e) writes a re-run to a new file; the call path is unchanged.
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { CUT, RISK, STATE_CONTEXT } from './questions.mjs';
 
 const HERE = new URL('.', import.meta.url);

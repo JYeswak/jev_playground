@@ -12,7 +12,7 @@
 import { appendFileSync, mkdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { askJev } from "../jev-client/src/index.ts";
+import { askJev } from "../../kit/src/client.ts";
 import { baseline, hybridVerdict, shipPredicate, toState } from "./baseline.mjs";
 
 export const ADVISORY_T = 0.25;

@@ -9,7 +9,7 @@
  */
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { gradeQuestion } from '../jev-client/measure-kit.mjs';
 
 const labels = JSON.parse(readFileSync(new URL('./labels-31.json', import.meta.url), 'utf8')).commits;

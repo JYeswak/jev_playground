@@ -33,7 +33,7 @@
 import { appendFileSync, existsSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { createHash } from "node:crypto";
-import { askJevChoice } from "../jev-client/src/index.ts";
+import { askJevChoice } from "../../kit/src/client.ts";
 import { mulberry32 } from "./numeric.mjs";
 import { numberTokensV2 } from "./numeric-v2.mjs";
 

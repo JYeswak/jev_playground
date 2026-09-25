@@ -4,7 +4,7 @@
  * Persists per-row outputs to live-rows-u2.jsonl. Key via env, never printed.
  * Exit 0 complete, 2 NOT_RUN/unconfigured, 1 incomplete (>2 failures per arm).
  */
-import { askJev } from "../jev-client/src/index.ts";
+import { askJev } from "../../kit/src/client.ts";
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";

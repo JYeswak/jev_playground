@@ -18,7 +18,7 @@ import { spawnSync } from 'node:child_process';
 import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { askJevChoice } from '../jev-client/src/index.ts';
+import { askJevChoice } from '../../kit/src/client.ts';
 import { CRITERIA, INSTRUCTIONS, routeState } from './src/router.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));

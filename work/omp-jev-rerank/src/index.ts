@@ -19,7 +19,7 @@
  * Never blocks. Never throws into the host. Returns undefined on every path.
  * A failed call records `rerank_error` — never a silent pass (R40).
  */
-import { askJev } from "../../jev-client/src/index.ts";
+import { askJev } from "../../../kit/src/client.ts";
 
 import { recording } from "../../jev-score-register/register.mjs";
 

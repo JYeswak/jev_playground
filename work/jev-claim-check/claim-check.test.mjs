@@ -18,7 +18,7 @@
  * right. That is the live dogfood in docs/demos/upstream-repro/jev-claim-check-20260924.md.
  */
 import test from "node:test";
-import { resetBillingHold, setKeyProvider } from "../../work/jev-client/src/index.ts";
+import { resetBillingHold, setKeyProvider } from "../../kit/src/client.ts";
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
 

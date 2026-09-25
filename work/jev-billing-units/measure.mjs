@@ -16,7 +16,7 @@
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { askJevBundle } from '../jev-client/src/index.ts';
+import { askJevBundle } from '../../kit/src/client.ts';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '..', '..');

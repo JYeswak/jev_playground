@@ -2,7 +2,7 @@
  * Live asker for the injection flag: one Noul per call through work/jev-client.
  * Separated from the tool factory so tests inject a fake without touching network.
  */
-import { askJev, observedFetch } from "../../jev-client/src/index.ts";
+import { askJev, observedFetch } from "../../../kit/src/client.ts";
 
 export const LIVE_MODEL = "jev-1.13.0";
 export const LIVE_TIMEOUT_MS = 20000;

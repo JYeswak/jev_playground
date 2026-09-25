@@ -3,7 +3,7 @@
  * before this file runs. Model jev-1.13.0. Prints numbers only, never the
  * row text or the key.
  */
-import { askJev } from "../jev-client/src/index.ts";
+import { askJev } from "../../kit/src/client.ts";
 import { readFileSync, writeFileSync } from "node:fs";
 
 const ASSISTANT =

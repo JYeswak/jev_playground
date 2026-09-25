@@ -12,7 +12,7 @@
 // Run: infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
 //        node work/jev-injection-flag/run-jev.mjs full
 import { appendFileSync, existsSync, readFileSync } from 'node:fs';
-import { askJev } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 import { ASSISTANT, QUESTION } from './seat-question.mjs';
 
 const HERE = new URL('.', import.meta.url);

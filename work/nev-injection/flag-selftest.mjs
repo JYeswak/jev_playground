@@ -6,7 +6,7 @@
  * Exit 0 all green, 1 any failure.
  */
 import mod, { annotate } from "../../.omp/tools/jev-flag.ts";
-import { resetBillingHold, setKeyProvider } from "../../work/jev-client/src/index.ts";
+import { resetBillingHold, setKeyProvider } from "../../kit/src/client.ts";
 
 // "No key anywhere": pinned so the tool's Infisical fallback never runs in this selftest.
 setKeyProvider(async () => undefined);

@@ -15,7 +15,7 @@
  * that any judgment is correct. The seat is the corpus in DIFF-RECEIPT.json.
  */
 import test from 'node:test';
-import { resetBillingHold, setKeyProvider } from '../../work/jev-client/src/index.ts';
+import { resetBillingHold, setKeyProvider } from '../../kit/src/client.ts';
 import assert from 'node:assert/strict';
 import mod, { screen, SEAT_CUT } from '../../.omp/tools/jev-screen.ts';
 

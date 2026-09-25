@@ -16,7 +16,7 @@
  * Rewording the binary `argument` question did not fix it (that rescue is in this file's history);
  * the shape did. See docs/demos/upstream-repro/multiclass-failure-20260919.md.
  */
-import { askJevChoice, type JevChoiceResult } from "../../jev-client/src/index.ts";
+import { askJevChoice, type JevChoiceResult } from "../../../kit/src/client.ts";
 import { recordingChoice } from "../../jev-score-register/register.mjs";
 
 /**

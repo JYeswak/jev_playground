@@ -9,14 +9,14 @@
  * and is NOT invoked here.
  *
  * Imports (reused, never reimplemented):
- *   askJev             <- ../jev-client/src/index.ts  (sole sanctioned caller)
+ *   askJev             <- ../../kit/src/client.ts  (sole sanctioned caller)
  *   gradeQuestion      <- ../jev-client/measure-kit.mjs (standard arithmetic:
  *                        own-constant bar + near-threshold count + verdict)
  *   stripQuotedPayload <- ../toolcall-judge-v3/rules-v4.mjs (mention-vs-use
  *                        stripper; shared fix, not a fork)
  */
-import { askJev } from '../jev-client/src/index.ts';
-import { askJevChoice } from '../jev-client/src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
+import { askJevChoice } from '../../kit/src/client.ts';
 import { gradeQuestion } from '../jev-client/measure-kit.mjs';
 import { stripQuotedPayload } from '../toolcall-judge-v3/rules-v4.mjs';
 

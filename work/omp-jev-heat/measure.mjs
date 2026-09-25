@@ -6,7 +6,7 @@
  *   infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
  *     node --experimental-strip-types work/omp-jev-heat/measure.mjs
  */
-import { askJevChoice } from "../jev-client/src/index.ts";
+import { askJevChoice } from "../../kit/src/client.ts";
 import { CHOICE } from "./src/index.ts";
 
 const cases = [

@@ -126,7 +126,7 @@ async function runLive(cases) {
     console.log('LIVE: NOT_RUN (TYPESAFE_API_KEY unset). Offline lane is the default; this is not a pass.');
     return { notRun: true, rows: [], summary: null };
   }
-  const { askJevChoice } = await import('../jev-client/src/index.ts');
+  const { askJevChoice } = await import('../../kit/src/client.ts');
   const rows = [];
   for (const c of cases) {
     const judged = await judgeSkillPick({

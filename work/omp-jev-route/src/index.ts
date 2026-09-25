@@ -16,7 +16,7 @@ const DECISION = "com.zeststream.omp-jev-route.decision.v1";
 const DIAG = "com.zeststream.omp-jev-route.diagnostic.v1";
 
 const MAX_PROMPT = 4000;
-import { askJev } from "../../jev-client/src/index.ts";
+import { askJev } from "../../../kit/src/client.ts";
 import { appendProcessDecision } from "./process.mjs";
 import { recording } from "../../jev-score-register/register.mjs";
 

@@ -99,7 +99,7 @@ async function beam(childrenFn, scoreFn, width = BEAM_WIDTH) {
 const live = process.argv.includes("--live");
 let askLive = null;
 if (live) {
-  const { askJevChoice } = await import("../../work/jev-client/src/index.ts");
+  const { askJevChoice } = await import("../../kit/src/client.ts");
   askLive = async (doc, path) => {
     const children = childrenOf(path);
     const classes = Object.fromEntries(children.map((c) => [c, `A document category named ${c}.`]));

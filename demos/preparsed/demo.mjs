@@ -91,7 +91,7 @@ const FIXTURE = {
 
 const live = process.argv.includes("--live");
 if (live) {
-  const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+  const { askJevBundle } = await import("../../kit/src/client.ts");
   const pickQ = (instructions, spans) => ({
     type: "choice",
     instructions,

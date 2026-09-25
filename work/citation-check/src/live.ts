@@ -2,7 +2,7 @@
  * Live asker. The only import of jev-client in this package.
  * Offline tests never load this file.
  */
-import { askJevChoice } from "../../jev-client/src/index.ts";
+import { askJevChoice } from "../../../kit/src/client.ts";
 import { CRITERIA, INSTRUCTIONS, type ChoiceAnswer } from "./check.ts";
 
 export const LIVE_MODEL = "jev-1.13.0";

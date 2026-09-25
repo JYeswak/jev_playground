@@ -14,7 +14,7 @@ let failed = 0;
 const live = process.argv.includes("--live");
 let rows = null;
 if (live) {
-  const { askJevBundle } = await import("../../work/jev-client/src/index.ts");
+  const { askJevBundle } = await import("../../kit/src/client.ts");
   const res = await askJevBundle({ model: "jev-1.13.0", state: { document: DOC }, questions: QUESTIONS, timeoutMs: 30000 });
   if (!res.ok) {
     console.error(`live call failed: ${res.reason} ${res.error}`);
