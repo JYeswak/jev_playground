@@ -91,7 +91,7 @@ def derive_needed_text(record: dict) -> str | None:
     if task == "scroll-text":
         source = element_by_id(record, "text-area")
         value = str(source.get("value", "")) if source else ""
-        return value.split()[-1] if value.split() else None
+        return re.split(r"\s", value)[-1] if source else None
     if task == "text-transform":
         captcha = element_by_id(record, "captcha")
         return descendant_text(record, int(captcha["ref"])) if captcha else None

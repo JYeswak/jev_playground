@@ -19,7 +19,7 @@ recorded-page-text-row	miniwob-jev-v3-page_text.s0.jsonl	35	0	NOT_RUN (no observ
 captured-observation-20	find-word	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	123.5	147
 captured-observation-20	copy-paste	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	107.5	117
 captured-observation-20	read-table	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	73.0	85
-captured-observation-20	scroll-text	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	255.0	255
+captured-observation-20	scroll-text	20	20	JS_SPLIT_EMPTY_FOR_SEEDS_9006_9013	18	0.900	255.0	255
 captured-observation-20	text-transform	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	54.0	55
 captured-observation-20	copy-paste-2	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	190.0	220
 captured-observation-20	read-table-2	20	20	DERIVED_FROM_CAPTURED_DOM	20	1.000	96.5	99

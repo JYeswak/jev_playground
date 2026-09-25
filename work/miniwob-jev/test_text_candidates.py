@@ -22,6 +22,7 @@ from text_candidates import (  # noqa: E402
 
 ROOT = HERE.parents[1]
 OBS = HERE / "observations-real-20250925"
+CAPTURE = HERE / "observations-capture-20250925"
 
 
 def load_record(path: Path) -> dict:
@@ -32,6 +33,19 @@ def load_record(path: Path) -> dict:
     if not isinstance(value, dict):
         raise AssertionError(f"{path}: expected JSON object")
     return value
+
+
+def load_records(path: Path) -> list[dict]:
+    records = []
+    for line_number, line in enumerate(path.read_text().splitlines(), 1):
+        try:
+            value = json.JSONDecoder().decode(line)
+        except json.JSONDecodeError as exc:
+            raise AssertionError(f"{path}:{line_number}: invalid JSON") from exc
+        if not isinstance(value, dict):
+            raise AssertionError(f"{path}:{line_number}: expected JSON object")
+        records.append(value)
+    return records
 
 
 EXPECTED = {
@@ -71,6 +85,19 @@ class CandidateBuilderTests(unittest.TestCase):
                 side_effect=AssertionError("grader called"),
             ):
                 self.assertEqual(build_candidates(record), baseline, task)
+
+    def test_scroll_text_matches_miniwob_js_split(self) -> None:
+        records = load_records(CAPTURE / "scroll-text.jsonl")
+        self.assertEqual(len(records), 20)
+        expected_empty = [
+            derive_needed_text(record)
+            for record in records
+            if record["seed"] in {9006, 9013}
+        ]
+        self.assertEqual(expected_empty, ["", ""])
+        self.assertEqual(
+            sum(bool(derive_needed_text(record)) for record in records), 18
+        )
 
     def test_selection_tasks_have_no_type_candidate_claim(self) -> None:
         for task in ("text-editor", "highlight-text"):

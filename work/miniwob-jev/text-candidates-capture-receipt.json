@@ -1,0 +1,43 @@
+{
+  "bead": "jev-9gtw.4.2",
+  "captured_utc": "2026-09-25",
+  "model_calls": 0,
+  "observation_count": 140,
+  "tasks": {
+    "find-word": 20,
+    "copy-paste": 20,
+    "read-table": 20,
+    "scroll-text": 20,
+    "text-transform": 20,
+    "copy-paste-2": 20,
+    "read-table-2": 20
+  },
+  "seeds": "9000-9019 inclusive per task",
+  "capture_command": "/tmp/jev-miniwob-jev/venv/bin/python - <<'PY' ... import work/game-floors/miniwob/run.py; for task in ('find-word','copy-paste','read-table','scroll-text','text-transform','copy-paste-2','read-table-2'), reset make_env(task, BENCHMARK_WAIT_MS) for seeds 9000..9019, serialize {'task','seed','observation': {'utterance', 'dom_elements': elements_from_obs(obs)}} to JSONL; env.close() ... PY",
+  "source": "BrowserGym MiniWoB environment reset observations; no typed task fixtures",
+  "files": {
+    "copy-paste-2.jsonl": {"sha256": "4dfd0d198a1f002aa2df5512e2139777017829e655da82a22fdd2920a2610bc1", "rows": 20},
+    "copy-paste.jsonl": {"sha256": "fb437722d13bb21e834732c5433b462f6d359a325a81f1832f61f346d47e4080", "rows": 20},
+    "find-word.jsonl": {"sha256": "03d7bb03d5a3a72996fd0a7636d79a86423f8cbe8a5a68280df8121ad7e7191f", "rows": 20},
+    "read-table-2.jsonl": {"sha256": "6267861f72f837d32ffdcb0c171b828612bfb2a1af07df62c2e4fe6ff6eab92f", "rows": 20},
+    "read-table.jsonl": {"sha256": "c68a0d0c4300e8c80b8829efaa256125b8e29c47e3a84b9f043300e083faf166", "rows": 20},
+    "scroll-text.jsonl": {"sha256": "733f90753508b1e57cae7cd084ff1c69c8da57e4e972b7cfda0701522d97af9b", "rows": 20},
+    "text-transform.jsonl": {"sha256": "3d79790ec81f926f27129d9f4877c6c208b48b16032044c4840cb5e66a77ae55", "rows": 20}
+  },
+  "derivation": {
+    "scroll-text": "Read the captured text-area value and follow MiniWoB scroll-text.html:25-26 JavaScript value.split(/[\\s]/).at(-1) semantics. Python re.split(r'\\s', value)[-1] preserves the empty terminal element for values ending in whitespace. Seeds 9006 and 9013 therefore have expected_text='', and the other 18 rows have non-empty expected text.",
+    "copy-paste-2": "Parse the captured utterance ordinal with the task's text-area wording, select that ordinal textarea in captured DOM order, and use its captured value.",
+    "read-table": "Build label/value pairs from captured DOM tr elements with two td children; parse the captured utterance's requested label and use the matching captured value for the text input.",
+    "read-table-2": "Build label/value pairs from captured DOM table rows; for each captured input, use its same-parent label text with the colon removed to select the matching captured table value. Two inputs produce two target fields per observation."
+  },
+  "coverage": {
+    "find-word": "20/20",
+    "copy-paste": "20/20",
+    "read-table": "20/20",
+    "scroll-text": "18/20; seeds 9006 and 9013 are expected-empty under the MiniWoB JavaScript rule",
+    "text-transform": "20/20",
+    "copy-paste-2": "20/20",
+    "read-table-2": "40/40 target fields"
+  },
+  "boundary": "This receipt records keyless feasibility and provenance only; it is not a Jev accuracy result and contains no Jev response or paid API output."
+}
