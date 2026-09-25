@@ -139,6 +139,18 @@ Receipt: `work/osw-bestofn/r112_retry_preflight.json`.
 The sanitized state file SHA-256 is `83480c50df5b86d4b0b4f9fe11d1428340b6c4927d4e061270519de371ee60ea`.
 No Jev call has been made; this receipt is feasibility evidence only.
 
+## Outcome: UNDERPOWERED before live measurement
+
+The keyless floor receipt shows the incumbent best single archive, `autoglm_15steps.zip`,
+exact-completes 22 of the 24 held-out tasks. Jev can therefore create at most two exact
+completion wins over the incumbent, so the McNemar discordant count satisfies `b <= 2`.
+The most favorable possible exact McNemar result is `b=2, c=0`, with two-sided exact
+`p=0.5`; the locked `p < 0.05` requirement is unreachable for every possible Jev output.
+
+**Outcome:** NOT MEASURED; UNDERPOWERED. Do not make a live call or report a Jev result for
+this 24-task retry. Retry only on a new task universe with measured discordant headroom giving
+at least 0.8 power for the locked McNemar bar. This is a feasibility stop, not a model ruling.
+
 ## Live bar, fixed before the first retry call
 
 Score Jev's choices against the official `result.txt` rows after the live receipt is complete.

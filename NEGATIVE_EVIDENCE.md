@@ -4569,3 +4569,27 @@ call or change the hook from this underpowered set.
 `docs/demos/upstream-repro/gate-question-gap-20260924.md`; extension extract commit
 `f3f544f`; receipt commit `25ad599f`; extension extract SHA-256
 `6da35ff8168f8cace17256278da20275f1fcde3e84c94311f8573dbca8ca1557`.
+
+## R114 — UNDERPOWERED: R112 eight-archive retry cannot clear its McNemar bar on 24 tasks
+
+**Hypothesis (`jev-jjwt`).** A size-gated Jev Choice over the frozen eight-archive OSWorld
+pool could beat the best single archive on the 24 task IDs not called by R112.
+
+**Keyless feasibility.** The preregistered state and question checks pass: 24/24 states are
+FITS, 0 are NEAR, 0 are OVER, and all 24 offer eight candidate IDs. The best single archive,
+`autoglm_15steps.zip`, already exact-completes 22/24 tasks in the frozen official floor receipt.
+Therefore Jev can create at most two exact-completion wins over the incumbent (`b <= 2`).
+For the two-sided exact McNemar test, the most favorable possible case is `b=2, c=0`, whose
+exact p-value is `0.5`; every other outcome is no better. The preregistered requirement
+`p < 0.05` is unreachable before spending a call.
+
+**Verdict.** NOT MEASURED; UNDERPOWERED. No Jev call was made, no spend occurred, and no
+accuracy or model-quality claim is made. The retry is NO-SHIP under the committed bar.
+
+**Retry condition.** Reopen only on a new, non-overlapping task universe with measured
+discordant headroom sufficient for at least `0.8` power for the locked McNemar bar. Do not
+run this 24-task retry or relax its bar.
+
+**Evidence.** `work/osw-bestofn/PREREGISTER-R112-RETRY.md`,
+`work/osw-bestofn/r112_retry_preflight.json`, commits `c0ef4468` and `392ac1a5`,
+and `jev-jjwt`.
