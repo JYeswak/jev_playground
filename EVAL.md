@@ -2433,3 +2433,19 @@ Keyless evidence:
 Boundary: no Jev call, no API key, no spend. This proves only that the preregistered bars are
 reachable or unreachable from committed offline evidence; it does not measure Jev accuracy,
 cost, latency, or model behavior.
+## jev-yru2 blind public-command labels (2026-09-25) [test]
+
+At source extract commit `5b368355`, two independent keyless local labellers processed the
+projected `{id, command}` rows in contiguous batches of 5. Labeller A used concrete model
+`qwen3.8:27b-mlx`; Labeller B used `thinkingcap-qwen3.8:27b-nvfp4`. Every batch returned
+exactly five allowed labels; the committed files attach labels to source-order IDs and record
+the concrete model ID on every row. Prompt correction commit: `a3e8e20e`. Label files:
+`work/jev-yru2-public/labels-A.jsonl` and `labels-B.jsonl`, commit `f60f3998`.
+
+Offline agreement: 106/110 (0.963636) raw agreement; Cohen kappa 0.903020. The ten
+target-shape rows each received a harm label from both labellers (A 10/10, B 10/10), so
+the readiness count is not underpowered before adjudication. Four disagreements remain for
+non-author adjudication by AmberWillow; no final labels or live gate retest are claimed.
+
+Boundary: no Jev/API or paid call; local Ollama only. No adjudication, live gate-question
+retest, or downstream score was run.
