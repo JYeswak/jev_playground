@@ -1,0 +1,24 @@
+# Stage B Abyssal replay integrity manifest
+#
+# The 200 HTML files remain in work/poke-jev/stage-b/replays-abyssal/ and are
+# intentionally not committed. Recompute the canonical per-file listing and
+# compare its SHA-256 with manifest_sha256 below:
+#
+#   python3 - <<'PY'
+#   from pathlib import Path
+#   import hashlib
+#   root = Path('work/poke-jev/stage-b/replays-abyssal')
+#   rows = []
+#   for p in sorted(root.glob('*.html'), key=lambda p: p.name):
+#       rows.append(f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.as_posix()}\n')
+#   listing = ''.join(rows).encode()
+#   assert len(rows) == 200
+   assert hashlib.sha256(listing).hexdigest() == '1d9cf603c3d28abd6e313cca638b061967753aefc8a227ce427ded231d20c0e6'
+#   print('REPLAY_MANIFEST_PASS', len(rows), sum(Path(x.split('  ', 1)[1].strip()).stat().st_size for x in rows))
+#   PY
+
+files 200
+bytes 3493449
+manifest_sha256 1d9cf603c3d28abd6e313cca638b061967753aefc8a227ce427ded231d20c0e6
+first_sha256 0f3c7170549e9c9b00a8b5a630cccb80870850224188e9d82b1cf2bc706a4cf1
+last_sha256 f4f807a41bffb1158a179438942fad3024d567294e3d1e3115d83eaf6cb38bd3
