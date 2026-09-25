@@ -569,6 +569,9 @@ def _make_players(opp_name, w, replays, decisions, client_factory=None, cls=None
     )
 
 
+stage_b.make_players = _make_players
+
+
 # Decision/result JSONL rows are emitted by imported Stage B code.  Add provenance at the
 # serialization boundary so every row records precisely which imported source was used.
 _ORIGINAL_JSON_DUMPS = json.dumps
