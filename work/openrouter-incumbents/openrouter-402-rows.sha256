@@ -1,0 +1,16 @@
+# OpenRouter blocked 402 row outputs
+# Recompute with: python3 - <<'PY' ... (see report docs/demos/upstream-repro/untracked-artifacts-20260925.md)
+# files=13 bytes=5489718
+dd24e7968df2300022423ea2f404b5ecb2d2cf21780f91ab6db6a7dc8d7c7930  work/openrouter-incumbents/rows-banking77-deepseek__deepseek-v4-flash.jsonl
+d5b6059510b08bbf5dda6e0c165ae92fb736e11e532a5b9f62a55152e99ba239  work/openrouter-incumbents/rows-banking77-openai__gpt-5-nano.jsonl
+8d5f3115c5ded75bda01b40099f390bac100a2decae2e3bbb141fb486fcaa8c5  work/openrouter-incumbents/rows-clinc150-deepseek__deepseek-v4-flash.jsonl
+ebd0b5c3cccfb9ef178c9172a6623d9b66931d42bca1c596e8e11c33b0a0c72c  work/openrouter-incumbents/rows-clinc150-openai__gpt-5-nano.jsonl
+3093e09329315a506e1a52aecfc19b324f4c1e714b34657c0cc2e2721dfb034c  work/openrouter-incumbents/rows-fever-deepseek__deepseek-v4-flash.jsonl
+cf5763225fc6375e56c3bcf79a3eee5b1a80bf23a122b76bc7d1722bec7c5dfb  work/openrouter-incumbents/rows-fever-openai__gpt-5-nano.jsonl
+cacb81fabaca05ba832f1f9e3de47a2ba34b86d7124a717bd3eca45b204ecd25  work/openrouter-incumbents/rows-scifact-deepseek__deepseek-v4-flash.jsonl
+c282a7c6282c670781a4e8b201d4de9582a2be730532c8b4a3315e123938272c  work/openrouter-incumbents/rows-scifact-openai__gpt-5-nano.jsonl
+e556f606286bebbb27f2567d18b893389d2bda5e3852dd4cc7165291cc558df3  work/openrouter-incumbents/rows-sst5-deepseek__deepseek-v4-flash.jsonl
+d958dccac1ee54a6b72e4e00fff074007ddd6f63eaa9100808ed895fba594df9  work/openrouter-incumbents/rows-sst5-dots-studio__dots-3-note-preview_free.jsonl
+4b1ab8c2b7ccb050df1ecfc8b10aa85fcec5f99c65865a8a64751ae940f62bb2  work/openrouter-incumbents/rows-sst5-openai__gpt-5-nano.jsonl
+767243c174536e43848f7c7db2c277bc618c6cb53a616bde2e6604f9d4f65df8  work/openrouter-incumbents/rows-stsb-deepseek__deepseek-v4-flash.jsonl
+6e6c1cd6e7949ce074c5cac45e8dfcafa80565708d525d9b4575f8712fca47ec  work/openrouter-incumbents/rows-stsb-openai__gpt-5-nano.jsonl

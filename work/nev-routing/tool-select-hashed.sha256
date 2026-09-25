@@ -1,0 +1,4 @@
+# Tool-select hashed corpus named by TOOLSELECT-RECEIPT.json
+# Recompute with: python3 - <<'PY' ... (see report docs/demos/upstream-repro/untracked-artifacts-20260925.md)
+# files=1 bytes=2061082
+fa254fa0c000fd40c8a6f62347ef646ff81703fb0365a9f80e7b24eef3693bd7  work/nev-routing/tool-select-hashed.jsonl

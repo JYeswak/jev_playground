@@ -1,0 +1,6 @@
+# L3 frame outputs named by committed l3-receipt.json
+# Recompute with: python3 - <<'PY' ... (see report docs/demos/upstream-repro/untracked-artifacts-20260925.md)
+# files=3 bytes=5486238
+6fe62282c6a693a4fa185d808f1eff42139b522f47f58a87ffcda48550fe40fe  work/nev-injection/l3-frames-D1c-hostile.jsonl
+199c699c69db873245c8a9fda521b44803bdf548a8ad5a9b4833f36b32ba152a  work/nev-injection/l3-frames-D2-benign.jsonl
+63f2907c51dc0479589996c3e1f74fcae8aae6854b8214b09b95929f92ca80d3  work/nev-injection/l3-frames-D3-keyless.jsonl

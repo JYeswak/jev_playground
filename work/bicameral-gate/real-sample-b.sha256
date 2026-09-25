@@ -1,0 +1,4 @@
+# Bicameral gate sample B named by committed criteria receipt
+# Recompute with: python3 - <<'PY' ... (see report docs/demos/upstream-repro/untracked-artifacts-20260925.md)
+# files=1 bytes=641118
+784592bfb21439aa36c4fb6a09cfa460847acc2638a6be7d7220ac9749c2b80c  work/bicameral-gate/real-sample-b.json

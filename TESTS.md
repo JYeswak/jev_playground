@@ -124,6 +124,12 @@ claim nobody can check:
   12; tail-only leak detection 1; head-only leak detection 1; head OR tail placeholder 1; no quote
   stripping 2; only `$$` heads count 1.
   Run: `python3 -m unittest work/omp-secret-probe/test_omp_secret_probe.py` (12 tests).
+- `work/citation-check/test/check.test.mjs` — citation extraction and fail-safe folding: planted
+  cookbook rows, curly-quote normalization, missing-key review, transport-error review, invalid
+  labels, empty claims without a model call, and README/nonce location behavior. Run:
+  `node --experimental-strip-types --test work/citation-check/test/check.test.mjs` (7 tests).
+- `work/pokeagent-emerald/test_capture_state.py` — offline state-receipt percentile statistics.
+  Run: `python3 -m unittest work/pokeagent-emerald/test_capture_state.py` (1 test).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
