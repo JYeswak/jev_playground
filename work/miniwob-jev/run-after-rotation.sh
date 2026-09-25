@@ -2,7 +2,7 @@
 # Rotation-ready MiniWoB v3 live sheet. Fake mode is keyless and never calls TypeSafe.
 set -euo pipefail
 
-ROOT=$(cd "$(dirname "$0")/../.." && pwd)
+ROOT=${REPO_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}
 ARM="$ROOT/work/miniwob-jev/jev_arm.py"
 FLOOR="$ROOT/work/game-floors/miniwob/run.py"
 KEY_STATUS="$ROOT/scripts/key-status.py"
@@ -11,10 +11,11 @@ RUN_ROOT="${MINIWOB_RUN_ROOT:-/tmp/jev-miniwob-v3-after-rotation-$(date +%Y%m%dT
 PYTHON_BIN="${PYTHON:-}"
 MODE=""
 STEPS="quoted,date_time,page_text,color,drag,none,combined"
+RESUME=0
 
 usage() {
   cat <<'EOF'
-Usage: work/miniwob-jev/run-after-rotation.sh --fake|--live [--steps a,b,c] [--run-root DIR]
+Usage: work/miniwob-jev/run-after-rotation.sh --fake|--live [--steps a,b,c] [--run-root DIR] [--resume]
 
 --fake runs two dev episodes per selected step with FakeAsker and validates provenance.
 --live runs the preregistered isolated slices, then the combined 400-404 held-out command.
@@ -27,6 +28,7 @@ while (($#)); do
     --live) MODE=live; shift ;;
     --steps) STEPS=$2; shift 2 ;;
     --run-root) RUN_ROOT=$2; shift 2 ;;
+    --resume) RESUME=1; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "unknown argument: $1" >&2; usage >&2; exit 2 ;;
   esac
@@ -57,14 +59,14 @@ status_gate() {
 build_plan() {
   local arm=$1
   local output=$2
-  python3 - "$arm" "$output" <<'PY'
+  python3 - "$ROOT" "$arm" "$output" <<'PY'
 import re
 import sys
 from pathlib import Path
 
-arm, output = sys.argv[1:]
+root, arm, output = sys.argv[1:]
 heading = {"date_time": "date time", "page_text": "page text"}.get(arm, arm)
-text = Path("docs/demos/upstream-repro/miniwob-jev-v3-prereg-20260925.md").read_text()
+text = (Path(root) / "docs/demos/upstream-repro/miniwob-jev-v3-prereg-20260925.md").read_text()
 match = re.search(rf"^### {re.escape(heading)}(?: |—).*?$", text, re.M)
 if match is None:
     raise SystemExit(f"missing prereg section: {arm}")
@@ -97,19 +99,23 @@ run_step() {
   local arm=$2
   local plan="$RUN_ROOT/$step.plan.csv"
   local rows="$RUN_ROOT/$step.jsonl"
+  local label="v3-$step"
+  local label_rows="$ROOT/work/miniwob-jev/rows/miniwob-jev-$label.s0.jsonl"
   echo "STEP $step: key-status first"
   status_gate
+  if [[ "$MODE" == live && -e "$label_rows" && "$RESUME" -ne 1 ]]; then
+    echo "STEP $step: refusing existing live output $label_rows; pass --resume" >&2
+    return 4
+  fi
   if [[ "$MODE" == fake ]]; then
-    MINIWOB_V3=1 MINIWOB_V3_ARM="$arm" "$PYTHON_BIN" "$ARM" dev \
-      --fake greedy --tasks click-button --seeds 9000-9001 --out "$rows" \
-      --sanity-reference "$REFERENCE" --sanity-after 200
+    MINIWOB_V3=1 MINIWOB_V3_ARM="$arm" "$PYTHON_BIN" "$ARM" dev --fake greedy --tasks click-button --seeds 9000-9001 --out "$rows" --sanity-reference "$REFERENCE" --sanity-after 200
   else
     build_plan "$arm" "$plan"
     local none_policy=always
     [[ "$arm" == none ]] && none_policy=after-page-change
-    MINIWOB_V3=1 MINIWOB_V3_ARM="$arm" "$PYTHON_BIN" "$ARM" live \
-      --shard 0/1 --plan-file "$plan" --label "v3-$step" \
-      --none-policy "$none_policy" --sanity-reference "$REFERENCE" --sanity-after 200
+    MINIWOB_V3=1 MINIWOB_V3_ARM="$arm" "$PYTHON_BIN" "$ARM" live --shard 0/1 --plan-file "$plan" --label "$label" --none-policy "$none_policy" --sanity-reference "$REFERENCE" --sanity-after 200
+    [[ -s "$label_rows" ]] || { echo "STEP $step: no live label rows" >&2; return 1; }
+    cp "$label_rows" "$rows"
   fi
   [[ -s "$rows" ]] || { echo "STEP $step: no rows" >&2; return 1; }
   echo "STEP $step: $(wc -l < "$rows" | tr -d ' ') rows; provenance:"
