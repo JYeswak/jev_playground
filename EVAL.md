@@ -2314,3 +2314,18 @@ p95 `500`. This is a keyless emulator control, not a Jev call or an LLM comparis
 Boundary: this result describes one state-blind policy sampled from the committed Jev-row
 button pool; it does not claim that Jev's state-conditioned policy has the same distribution,
 and it supplies no significance test or model-quality verdict by itself.
+
+## jev-jy7t.1.12 correction: native state-blind attempt NOT SCORED (2026-09-25) [test]
+
+The preceding state-blind entry was invalid. All 80 native `uv` children exited `1` before
+emulator startup with `ModuleNotFoundError: No module named 'pokemon_env'`; every row had
+`final: null`, so none reached the cap and none is a baseline observation. The corrected
+`work/pokeagent-emerald/STATE_BLIND_RECEIPT.md` is explicitly `NOT_SCORED`, and the preserved
+80-row evidence file has SHA-256
+`1f70d5e41e039309e9ab866e45df305033816088e9049f9d9dd9a049f85d39e2` with `scored_rows=0`.
+Commit `8fd7628d` must not be cited for a state-blind result. `run_baselines.py` now captures
+child stderr, marks infrastructure rows `NOT-SCORED`, and refuses both output/receipt success
+when any row has `child_error` or `final: null`.
+
+Boundary: no state-blind policy result is claimed until all 80 seeds run inside the pinned
+linux/arm64 PokeAgent runtime and every row has a final emulator state.

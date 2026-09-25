@@ -66,6 +66,36 @@ def pooled_metadata(path: Path, buttons: list[str]) -> dict[str, Any]:
     }
 
 
+def invalid_result_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Return rows that cannot support a scored baseline result."""
+    return [
+        row
+        for row in rows
+        if row.get("child_error") is not None or row.get("final") is None
+    ]
+
+
+def write_receipt(
+    path: Path, rows: list[dict[str, Any]], metadata: dict[str, Any]
+) -> None:
+    """Write a receipt only when every row has a final emulator state."""
+    invalid = invalid_result_rows(rows)
+    if invalid:
+        raise ValueError(
+            f"refusing receipt: {len(invalid)} rows are NOT-SCORED due to child_error or null final"
+        )
+    payload = dict(metadata)
+    payload.setdefault("rows", len(rows))
+    payload.setdefault("not_scored", 0)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "# Emerald baseline receipt\n\n```json\n"
+        + json.dumps(payload, indent=2)
+        + "\n```\n",
+        encoding="utf-8",
+    )
+
+
 def _state(env: Any) -> dict[str, Any]:
     reader = env.memory_reader
     coords = reader.read_coordinates()
@@ -166,6 +196,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--rom", required=True)
     parser.add_argument("--output")
+    parser.add_argument("--receipt")
     parser.add_argument("--fixed-sequence", type=int, default=33)
     parser.add_argument("--random", type=int, default=33)
     parser.add_argument("--state-blind", type=int, default=0)
@@ -242,7 +273,13 @@ def main() -> int:
                 "final": None,
                 "timestamp_utc": datetime.now(timezone.utc).isoformat(),
                 "child_error": f"exit_{exc.returncode}",
+                "child_stderr": (exc.stderr or "").strip(),
             }
+        row["scored"] = (
+            not bool(row.get("child_error")) and row.get("final") is not None
+        )
+        if not row["scored"]:
+            row["not_scored_reason"] = "child_error_or_null_final"
         row.update(
             {
                 "code_sha256": code_sha,
@@ -253,22 +290,48 @@ def main() -> int:
         if policy == "state_blind":
             row.update(pool_metadata)
         rows.append(row)
+    invalid = invalid_result_rows(rows)
+    if invalid:
+        print(
+            json.dumps(
+                {
+                    "status": "REFUSED",
+                    "reason": "NOT-SCORED rows cannot be treated as capped failures",
+                    "rows": len(rows),
+                    "not_scored": len(invalid),
+                    "child_errors": [
+                        {
+                            "seed": row.get("seed"),
+                            "child_error": row.get("child_error"),
+                            "child_stderr": row.get("child_stderr"),
+                        }
+                        for row in invalid
+                    ],
+                }
+            ),
+            file=sys.stderr,
+        )
+        return 2
+
     output.write_text(
         "".join(json.dumps(row, separators=(",", ":")) + "\n" for row in rows)
     )
-    print(
-        json.dumps(
-            {
-                "rows": len(rows),
-                "fixed_sequence": args.fixed_sequence,
-                "random": args.random,
-                "state_blind": args.state_blind,
-                "cap": args.cap,
-                "code_sha256": code_sha,
-                **pool_metadata,
-            }
-        )
-    )
+    summary = {
+        "status": "OK",
+        "rows": len(rows),
+        "scored_rows": len(rows),
+        "not_scored": 0,
+        "fixed_sequence": args.fixed_sequence,
+        "random": args.random,
+        "state_blind": args.state_blind,
+        "cap": args.cap,
+        "code_sha256": code_sha,
+        **pool_metadata,
+    }
+    summary["results_sha256"] = hashlib.sha256(output.read_bytes()).hexdigest()
+    if args.receipt:
+        write_receipt(Path(args.receipt), rows, summary)
+    print(json.dumps(summary))
     return 0
 
 

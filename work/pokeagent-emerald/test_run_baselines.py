@@ -2,6 +2,8 @@
 
 import random
 import sys
+import subprocess
+import tempfile
 import unittest
 from collections import Counter
 from pathlib import Path
@@ -82,6 +84,59 @@ class StateBlindBaseline(unittest.TestCase):
 
         self.assertEqual(pressed, ["RIGHT"] * 8)
         self.assertFalse(row["goal_reached"])
+
+    def test_receipt_refuses_child_error_and_null_final(self):
+        writer = getattr(run_baselines, "write_receipt", None)
+        self.assertIsNotNone(writer)
+        invalid_rows = [
+            {
+                "policy": "state_blind",
+                "seed": 0,
+                "child_error": "exit_1",
+                "final": None,
+            }
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            receipt = Path(directory) / "receipt.md"
+            with self.assertRaises(ValueError):
+                writer(receipt, invalid_rows, {"policy": "state_blind"})
+            self.assertFalse(receipt.exists())
+
+    def test_parent_refuses_child_error_without_output_or_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "rows.jsonl"
+            receipt = Path(directory) / "receipt.md"
+            argv = [
+                "run_baselines.py",
+                "--rom",
+                "unused.gba",
+                "--output",
+                str(output),
+                "--fixed-sequence",
+                "0",
+                "--random",
+                "0",
+                "--state-blind",
+                "1",
+                "--pooled-rows",
+                str(Path(__file__).with_name("live-results.jsonl")),
+                "--receipt",
+                str(receipt),
+                "--harness-sha",
+                "harness",
+                "--rom-sha1",
+                "rom",
+            ]
+            failure = subprocess.CalledProcessError(
+                1, ["child"], stderr="ModuleNotFoundError: pokemon_env"
+            )
+            with (
+                patch.object(run_baselines.subprocess, "run", side_effect=failure),
+                patch.object(sys, "argv", argv),
+            ):
+                self.assertEqual(run_baselines.main(), 2)
+            self.assertFalse(output.exists())
+            self.assertFalse(receipt.exists())
 
 
 if __name__ == "__main__":
