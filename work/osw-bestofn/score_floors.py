@@ -1,8 +1,7 @@
 """Compute oracle@N and frozen floors from official result.txt rows.
 
-The only member bytes read are result.txt, traj.jsonl, and runtime.log. Raw member
-text is never printed or written. floor_receipt.json contains task keys and
-candidate IDs/counts only.
+Only result.txt, traj.jsonl and runtime.log members are read. Raw member text is never printed
+or written to the repository; the receipt contains candidate IDs, scores and counts only.
 """
 
 from __future__ import annotations
@@ -10,16 +9,11 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
-from range_zip import (
-    archive_score,
-    open_remote_zip,
-    read_member_bytes,
-    result_members,
-    task_key,
-)
+from range_zip import open_remote_zip, read_member_bytes, task_key
 
 ROOT = Path(__file__).resolve().parent
 POOL = ROOT / "pool.json"
@@ -34,8 +28,7 @@ def member_map(archive) -> dict[str, dict[str, str]]:
     out: dict[str, dict[str, str]] = {}
     for name in archive.namelist():
         if name.endswith("/result.txt"):
-            key = task_key(name)
-            out.setdefault(key, {})["result"] = name
+            out.setdefault(task_key(name), {})["result"] = name
         elif name.endswith("/traj.jsonl"):
             out.setdefault(task_key(name.replace("/traj.jsonl", "/result.txt")), {})[
                 "traj"
@@ -52,13 +45,10 @@ def stable_index(task: str, count: int) -> int:
     return int.from_bytes(digest[:8], "big") % count
 
 
-def read_result(archive, member: str, remote=None) -> float:
-    source = (
-        read_member_bytes(archive, remote, member)
-        if remote is not None
-        else archive.read(member)
+def read_result(archive, remote, member: str) -> float:
+    value = (
+        read_member_bytes(archive, remote, member).decode("utf-8", "replace").strip()
     )
-    value = source.decode("utf-8", "replace").strip()
     try:
         numeric = float(value)
     except ValueError as exc:
@@ -70,79 +60,83 @@ def read_result(archive, member: str, remote=None) -> float:
 
 def main() -> None:
     pool = json.loads(POOL.read_text())
-    selected = [row["archive"] for row in pool["selected"]]
+    selected = pool["selected"]
     runs: dict[str, dict[str, Any]] = {}
-    for archive_name in selected:
-        url = next(
-            row["url"] for row in pool["selected"] if row["archive"] == archive_name
-        )
-        archive, remote = open_remote_zip(url)
-        try:
-            members = member_map(archive)
-            rows = {
-                task: read_result(archive, info["result"], remote)
-                for task, info in members.items()
-                if "result" in info
-            }
-            runs[archive_name] = {
-                "url": url,
-                "rows": rows,
-                "members": members,
-                "fetched_bytes": remote.fetched_bytes,
-                "archive": archive,
-            }
-        except Exception:
-            archive.close()
-            raise
+    for candidate in selected:
+        archive, remote = open_remote_zip(candidate["url"])
+        members = member_map(archive)
+        rows = {
+            task: read_result(archive, remote, info["result"])
+            for task, info in members.items()
+            if "result" in info
+        }
+        runs[candidate["archive"]] = {
+            "url": candidate["url"],
+            "rows": rows,
+            "members": members,
+            "remote": remote,
+            "archive": archive,
+        }
 
+    candidate_names = [str(row["archive"]) for row in selected]
     tasks = sorted(set.intersection(*(set(run["rows"]) for run in runs.values())))
-    candidate_names = sorted(runs)
-    picks: dict[str, dict[str, str | None]] = {}
-    metadata: dict[str, dict[str, Any]] = {
-        name: {"traj_steps": {}, "claims_success": {}} for name in candidate_names
-    }
-    for task in tasks:
-        candidates = []
-        for name in candidate_names:
-            info = runs[name]["members"][task]
-            traj = (
-                runs[name]["archive"].read(info["traj"]).decode("utf-8", "replace")
-                if "traj" in info
-                else ""
-            )
-            runtime = (
-                runs[name]["archive"].read(info["runtime"]).decode("utf-8", "replace")
-                if "runtime" in info
-                else ""
-            )
-            steps = len(traj.splitlines())
-            claims = bool(SUCCESS_RE.search(runtime[-12000:]))
-            metadata[name]["traj_steps"][task] = steps
-            metadata[name]["claims_success"][task] = claims
-            candidates.append((name, runs[name]["rows"][task], steps, claims))
-        shortest = min(candidates, key=lambda x: (x[2], x[0]))[0]
-        claims = sorted(
-            name for name, _result, _steps, has_claim in candidates if has_claim
+    if len(tasks) != 361:
+        raise SystemExit(f"joined tasks={len(tasks)}, expected 361")
+
+    def read_attributes(item: tuple[str, str]) -> tuple[str, str, int, bool]:
+        name, task = item
+        run = runs[name]
+        info = run["members"][task]
+        traj = read_member_bytes(run["archive"], run["remote"], info["traj"])
+        runtime = read_member_bytes(run["archive"], run["remote"], info["runtime"])
+        return (
+            name,
+            task,
+            len(traj.decode("utf-8", "replace").splitlines()),
+            bool(SUCCESS_RE.search(runtime[-12000:].decode("utf-8", "replace"))),
         )
+
+    attributes: dict[tuple[str, str], tuple[int, bool]] = {}
+    requests = [(name, task) for name in candidate_names for task in tasks]
+    with ThreadPoolExecutor(max_workers=64) as executor:
+        for name, task, steps, claims in executor.map(read_attributes, requests):
+            attributes[(name, task)] = (steps, claims)
+
+    picks: dict[str, dict[str, str]] = {}
+    for task in tasks:
+        candidates = [
+            (name, runs[name]["rows"][task], *attributes[(name, task)])
+            for name in candidate_names
+        ]
+        shortest = min(candidates, key=lambda row: (row[2], row[0]))[0]
+        claims = sorted(row[0] for row in candidates if row[3])
         claims_pick = claims[0] if claims else candidate_names[0]
-        random_pick = candidate_names[stable_index(task, len(candidate_names))]
         picks[task] = {
-            "random": random_pick,
+            "random": candidate_names[stable_index(task, len(candidate_names))],
             "shortest": shortest,
             "claims_success": claims_pick,
             "claims_success_candidates": ",".join(claims),
         }
 
-    def rate(pick_key: str) -> float:
-        return sum(runs[picks[t][pick_key]]["rows"][t] for t in tasks) / len(tasks)
+    def floor_stats(pick_key: str) -> dict[str, float]:
+        total = sum(runs[picks[task][pick_key]]["rows"][task] for task in tasks)
+        exact = sum(runs[picks[task][pick_key]]["rows"][task] >= 1.0 for task in tasks)
+        return {
+            "reward_sum": total,
+            "mean_reward": total / len(tasks),
+            "exact_tasks": exact,
+        }
 
-    oracle_success = sum(
-        max(runs[name]["rows"][task] for name in candidate_names) for task in tasks
-    )
+    per_task_oracle = {
+        task: max(runs[name]["rows"][task] for name in candidate_names)
+        for task in tasks
+    }
+    oracle_sum = sum(per_task_oracle.values())
     best_name = max(
         candidate_names,
         key=lambda name: (sum(runs[name]["rows"][task] for task in tasks), name),
     )
+    best_sum = sum(runs[best_name]["rows"][task] for task in tasks)
     receipt = {
         "source": "xlangai/ubuntu_osworld_verified_trajs",
         "n": len(candidate_names),
@@ -153,22 +147,20 @@ def main() -> None:
             name: sum(runs[name]["rows"][task] for task in tasks)
             for name in candidate_names
         },
-        "oracle_successes": oracle_success,
-        "oracle_rate": oracle_success / len(tasks),
+        "oracle_reward_sum": oracle_sum,
+        "oracle_mean_reward": oracle_sum / len(tasks),
+        "oracle_exact_tasks": sum(value >= 1.0 for value in per_task_oracle.values()),
         "best_single_archive": best_name,
-        "best_single_successes": sum(runs[best_name]["rows"][task] for task in tasks),
-        "best_single_rate": rate(best_name)
-        if False
-        else sum(runs[best_name]["rows"][task] for task in tasks) / len(tasks),
+        "best_single_reward_sum": best_sum,
+        "best_single_mean_reward": best_sum / len(tasks),
+        "best_single_exact_tasks": sum(
+            runs[best_name]["rows"][task] >= 1.0 for task in tasks
+        ),
         "floors": {
-            key: {
-                "successes": sum(runs[picks[t][key]]["rows"][t] for t in tasks),
-                "rate": rate(key),
-            }
-            for key in ["random", "shortest", "claims_success"]
+            key: floor_stats(key) for key in ["random", "shortest", "claims_success"]
         },
         "claims_success_no_match_tasks": sum(
-            not picks[t]["claims_success_candidates"] for t in tasks
+            not picks[task]["claims_success_candidates"] for task in tasks
         ),
         "results_by_task": {
             task: {name: runs[name]["rows"][task] for name in candidate_names}
@@ -176,7 +168,8 @@ def main() -> None:
         },
         "picks": picks,
         "trajectory_step_counts": {
-            name: metadata[name]["traj_steps"] for name in candidate_names
+            name: {task: attributes[(name, task)][0] for task in tasks}
+            for name in candidate_names
         },
         "read_boundary": ["traj.jsonl", "runtime.log", "result.txt"],
         "raw_text_committed": False,
@@ -188,16 +181,16 @@ def main() -> None:
     print(
         json.dumps(
             {
-                k: receipt[k]
-                for k in [
-                    "n",
-                    "tasks",
-                    "selected_scores",
-                    "oracle_successes",
-                    "best_single_archive",
-                    "best_single_successes",
-                    "floors",
-                ]
+                "n": receipt["n"],
+                "tasks": receipt["tasks"],
+                "selected_archives": candidate_names,
+                "oracle_mean_reward": receipt["oracle_mean_reward"],
+                "best_single": {
+                    "archive": best_name,
+                    "mean_reward": receipt["best_single_mean_reward"],
+                    "exact_tasks": receipt["best_single_exact_tasks"],
+                },
+                "floors": receipt["floors"],
             },
             indent=2,
         )
