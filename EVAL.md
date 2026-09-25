@@ -2071,3 +2071,20 @@ Boundary: this is keyless/offline CI evidence only; **0 Jev/API requests and $0 
 workflow does not prove the substantive judged results in the README. Earlier RED dispatches
 36131647900 and 36134076882 were retained as regression evidence: they caught a changed failure
 cause and the hard-coded MiniWoB venv before the final green run.
+
+## jev-3e2i STS-B free cell partial (2026-09-25) [live]
+
+`nex-agi/nex-n2.5-mini:free` was run against the public STS-B dev pairs used by the committed
+`jev-jzzs` Jev arm. The cell stopped at the account-wide free-budget reserve after **380/1,500
+unique rows**: 352 answered and 28 failed (24 timeouts, 4 not-found errors); 5 answered rows
+had zero-mass probability maps. Every row carries `run_py_sha256` and `recorded_at_utc`.
+
+The first session hit the 3,600-second command deadline at 210 retained rows. A second main pass
+used the remaining-20 cap and stopped at its 170-request cap. The account counter ended at
+975/1,000 used, 25 remaining; the next reset is **2026-09-26T00:00Z**. Row SHA-256:
+`c4a6d5cae591ea2f9c856e0e74b8dbfd83748bb5bc5fec7737c3d62ad087fece`. Receipt and rows:
+`006aef1`.
+
+**No `score.py` run and no comparator verdict.** This is a PARTIAL cell that must resume after
+the reset until all 1,500 rows exist. Boundary: no other comparator model or set ran in this
+continuation; no paid call was attempted.
