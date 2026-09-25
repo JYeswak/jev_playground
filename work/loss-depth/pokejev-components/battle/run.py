@@ -21,6 +21,7 @@ import re
 import subprocess
 import sys
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -34,6 +35,8 @@ LEAF_OUT = COMPONENT_DIR
 ALPHA_PATH = COMPONENT_DIR / "frozen-alpha-v1.json"
 LEAF_MODEL_PATH = COMPONENT_DIR / "leaf-model-v1.json"
 LEAF_MODEL_SHA256 = "16a2b72f6da68bc61049bbaf4c72b7c3e1c330da075c1e5e51f88751df605384"
+RUN_PY_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+RUN_STARTED_AT_UTC = datetime.now(timezone.utc).isoformat()
 STOP_PATH = OUT / "mix-v1-stop.json"
 
 # Stage B is an import target, not a copied implementation.  It changes cwd while loading
@@ -573,8 +576,13 @@ stage_b.make_players = _make_players
 
 
 # Decision/result JSONL rows are emitted by imported Stage B code.  Add provenance at the
-# serialization boundary so every row records precisely which imported source was used.
+# serialization boundary so every row records precisely which imported source and wrapper
+# revision were used.
 _ORIGINAL_JSON_DUMPS = json.dumps
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 def _dumps_with_provenance(obj, *args, **kwargs):
@@ -582,6 +590,9 @@ def _dumps_with_provenance(obj, *args, **kwargs):
         obj = dict(obj)
         obj["stage_b_import_sha256"] = MODULE_SHA256
         obj["frozen_alpha_sha256"] = FROZEN_ALPHA_SHA256
+        obj["run_py_sha256"] = RUN_PY_SHA256
+        obj["run_started_at_utc"] = RUN_STARTED_AT_UTC
+        obj["row_recorded_at_utc"] = _utc_now()
         if _LEAF_CONFIG is not None:
             obj["leaf_mode"] = _LEAF_CONFIG[0]
             obj["leaf_model_sha256"] = LEAF_MODEL_SHA256
@@ -591,9 +602,10 @@ def _dumps_with_provenance(obj, *args, **kwargs):
 json.dumps = _dumps_with_provenance
 
 
-def _tag(control: bool, leaf_mode: str | None = None) -> str:
+def _tag(control: bool, leaf_mode: str | None = None, run_id: str | None = None) -> str:
     if leaf_mode is not None:
-        return f"-leaf-{leaf_mode.replace('+', '-')}-v1"
+        suffix = f"-{run_id}" if run_id is not None else "-v1"
+        return f"-leaf-{leaf_mode.replace('+', '-')}{suffix}"
     return "-mix-v1-control" if control else "-mix-v1"
 
 
@@ -632,6 +644,7 @@ async def _run_shard(
     worker: int,
     control: bool,
     leaf_mode: str | None = None,
+    run_id: str | None = None,
 ) -> int:
     global _LEAF_CONFIG
     if leaf_mode is not None and control:
@@ -646,7 +659,7 @@ async def _run_shard(
         if leaf_mode is not None
         else None
     )
-    tag = _tag(control, leaf_mode)
+    tag = _tag(control, leaf_mode, run_id)
     if leaf_mode is not None:
         LEAF_OUT.mkdir(parents=True, exist_ok=True)
     replays, results, decisions = _arm_paths(opp_name, tag)
@@ -663,10 +676,12 @@ async def _run_shard(
     for k in mine:
         if not control and STOP_PATH.exists() and STOP_PATH.stat().st_size:
             return 3
+        row_started_at_utc = _utc_now()
         try:
             row = await stage_b.play(me, opp, k, replays)
         except Exception as exc:  # noqa: BLE001 - record each harness failure and continue
             row = {"k": k, "error": f"{type(exc).__name__}: {str(exc)[:300]}"}
+        row["row_started_at_utc"] = row_started_at_utc
         await asyncio.to_thread(_append_jsonl, Path(results), row)
         if not control and STOP_PATH.exists() and STOP_PATH.stat().st_size:
             return 3
@@ -680,6 +695,7 @@ def _spawn(
     control: bool,
     seed: int,
     leaf_mode: str | None = None,
+    run_id: str | None = None,
 ) -> int:
     env = dict(
         os.environ,
@@ -698,6 +714,8 @@ def _spawn(
         "--pair-seed",
         str(seed),
     ]
+    if run_id is not None:
+        base.extend(["--run-id", run_id])
     procs = [
         subprocess.Popen(
             base
@@ -711,7 +729,7 @@ def _spawn(
         for worker in range(workers)
     ]
     codes = [proc.wait() for proc in procs]
-    _, results, _ = _arm_paths(opp_name, _tag(control, leaf_mode))
+    _, results, _ = _arm_paths(opp_name, _tag(control, leaf_mode, run_id))
     rows = _load_jsonl(Path(results))
     complete = {row["k"] for row in rows if "won" in row and row["k"] < n}
     print(
@@ -775,7 +793,11 @@ def selftest() -> int:
         raise AssertionError("row is missing imported module provenance")
     if row.get("frozen_alpha_sha256") != FROZEN_ALPHA_SHA256:
         raise AssertionError("row is missing frozen-alpha provenance")
-    print("WRAPPER SELFTEST PASS 4/4")
+    if row.get("run_py_sha256") != RUN_PY_SHA256:
+        raise AssertionError("row is missing run.py provenance")
+    if row.get("run_started_at_utc") is None or row.get("row_recorded_at_utc") is None:
+        raise AssertionError("row is missing UTC provenance timestamps")
+    print("WRAPPER SELFTEST PASS 5/5")
     return 0
 
 
@@ -887,6 +909,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--pair-seed", type=int, default=20260925)
     parser.add_argument("--control", action="store_true")
     parser.add_argument("--leaf", choices=("code", "code+noul"))
+    parser.add_argument("--run-id")
     args = parser.parse_args(argv)
     _configure(args.pair_seed)
     if args.command == "selftest":
@@ -913,6 +936,7 @@ def main(argv: list[str]) -> int:
             args.control,
             args.pair_seed,
             args.leaf,
+            args.run_id,
         )
     if args.worker_count is None or args.worker is None:
         parser.error("_shard requires worker count and worker index")
@@ -924,6 +948,7 @@ def main(argv: list[str]) -> int:
             args.worker,
             args.control,
             args.leaf,
+            args.run_id,
         )
     )
 
