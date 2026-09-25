@@ -52,6 +52,7 @@ from __future__ import annotations
 
 import json
 import os
+import io
 import re
 import subprocess
 import sys
@@ -61,6 +62,13 @@ from pathlib import Path
 from typing import NamedTuple
 
 SESSION = os.environ.get("JEV_SESSION", "jev")
+SHADOW_ENABLED = os.environ.get("JEV_FLEET_SHADOW") == "1"
+SHADOW_ONLY = os.environ.get("JEV_FLEET_SHADOW_ONLY") == "1"
+SHADOW_MAX_INFLIGHT = int(os.environ.get("JEV_FLEET_SHADOW_MAX_INFLIGHT", "16"))
+SHADOW_LOG = Path(
+    os.environ.get("JEV_FLEET_SHADOW_LOG", "~/.local/state/jev/fleet-jev-shadow.jsonl")
+).expanduser()
+SHADOW_HELPER = Path(__file__).with_name("fleet-jev-shadow.mjs")
 INTERVAL = int(os.environ.get("IDLE_INTERVAL", "60"))
 POLLS = int(os.environ.get("IDLE_POLLS", "2"))
 REALERT = int(os.environ.get("IDLE_REALERT", "600"))
@@ -303,6 +311,88 @@ def session_age(omp_pid: int, now: float) -> float | None:
             except OSError:
                 pass
     return max(0.0, now - max(mtimes)) if mtimes else None
+
+
+def shadow_features(words: str) -> list[str]:
+    """Reduce watcher evidence to safe categorical features; never send screen text."""
+    low = words.lower()
+    features: list[str] = []
+    if "no omp in" in low:
+        features.append("omp_absent")
+    if "wait marker" in low:
+        features.append("wait_marker")
+    if "spinner" in low:
+        features.append("spinner")
+    if "child using cpu" in low:
+        features.append("child_cpu")
+    elif "child alive" in low or "child:" in low:
+        features.append("child_alive")
+    if "session written" in low:
+        features.append("session_fresh_or_stale")
+    if "no tool child" in low:
+        features.append("no_tool_child")
+    return features or ["unclassified_evidence"]
+
+
+class ShadowDispatcher:
+    def __init__(self) -> None:
+        self.children: list[tuple[subprocess.Popen, io.BufferedWriter]] = []
+
+    def reap(self) -> None:
+        live = []
+        for child, stream in self.children:
+            if child.poll() is None:
+                live.append((child, stream))
+            else:
+                child.wait()
+                stream.close()
+        self.children = live
+
+    def submit(self, payload: dict) -> None:
+        if not SHADOW_ENABLED:
+            return
+        self.reap()
+        if len(self.children) >= SHADOW_MAX_INFLIGHT:
+            return
+        stream = None
+        try:
+            SHADOW_LOG.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+            fd = os.open(SHADOW_LOG, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+            stream = os.fdopen(fd, "wb")
+            child = subprocess.Popen(
+                ["node", "--experimental-strip-types", str(SHADOW_HELPER)],
+                stdin=subprocess.PIPE,
+                stdout=stream,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True,
+            )
+            assert child.stdin is not None
+            child.stdin.write(
+                (json.dumps(payload, separators=(",", ":")) + "\n").encode()
+            )
+            child.stdin.close()
+            self.children.append((child, stream))
+        except (OSError, BrokenPipeError):
+            if stream is not None:
+                stream.close()
+
+
+SHADOW_DISPATCHER = ShadowDispatcher()
+
+
+def submit_shadow(states: dict[int, tuple[str, str]]) -> None:
+    if not SHADOW_ENABLED:
+        return
+    worker_count = len(states)
+    for pane_index, (incumbent, evidence) in states.items():
+        SHADOW_DISPATCHER.submit(
+            {
+                "pane_index": pane_index,
+                "worker_panes": worker_count,
+                "incumbent": incumbent,
+                "evidence_features": shadow_features(evidence),
+            }
+        )
 
 
 def poll() -> dict[int, tuple[str, str]]:
@@ -690,6 +780,7 @@ def main() -> int:
         return selftest()
     if "--once" in sys.argv:
         states = poll()
+        submit_shadow(states)
         for index, reading in sorted(states.items()):
             state, words = reading[:2]
             print(f"pane {index}: {state} {words}")
@@ -716,7 +807,12 @@ def main() -> int:
     started = time.time()
     while True:
         now = time.time()
-        for index, reading in poll().items():
+        states = poll()
+        submit_shadow(states)
+        if SHADOW_ONLY:
+            time.sleep(INTERVAL)
+            continue
+        for index, reading in states.items():
             state, words = reading[:2]
             if state == "stalled-wait":
                 match = re.search(r"session idle ([0-9.]+)s", words)

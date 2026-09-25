@@ -519,5 +519,21 @@ class StrangerPager(unittest.TestCase):
         self.assertEqual(self.sent, [])
 
 
+class ShadowFeatures(unittest.TestCase):
+    def test_shadow_features_strip_screen_text_and_preserve_process_signals(self):
+        words = "(child: secret-not-to-send)  user prompt with private text"
+        self.assertEqual(fiw.shadow_features(words), ["child_alive"])
+
+    def test_shadow_features_keep_wait_and_cpu_signals(self):
+        words = "(wait marker, child using CPU: command)  hidden screen line"
+        self.assertEqual(fiw.shadow_features(words), ["wait_marker", "child_cpu"])
+
+    def test_shadow_features_no_evidence_has_safe_marker(self):
+        self.assertEqual(
+            fiw.shadow_features("(no status line on screen)  user text"),
+            ["unclassified_evidence"],
+        )
+
+
 if __name__ == "__main__":
     unittest.main()
