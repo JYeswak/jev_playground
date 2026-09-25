@@ -184,6 +184,7 @@ jobs:
         run: |
           set -euo pipefail
           npm ci --prefix work/sdk
+          npm ci --prefix kit
           ./scripts/bootstrap-compaction.sh
           ./scripts/sync-docs.sh --repos-only
           uv sync --locked --all-extras --directory upstream/typesafe-ai/system-one-adapter-python
