@@ -1766,3 +1766,15 @@ errors. Receipt `docs/demos/upstream-repro/pokejev-stage-b-results-20260925.md`,
 Boundary: this is not a ladder result or calibration claim; no LLM comparator; no Metamon stretch
 run; compact result and decision JSONL are committed for keyless re-score, replay HTML is not.
 The API credit exhaustion occurred during the live arm and is disclosed in the receipt.
+
+## jev-jy7t.1.6 MiniWoB AX observation pruning [prepared-not-measured]
+
+Preregistration `dd04baf` precedes all Jev calls. The four arms (`full`, `code`, `jev`, `random`)
+share the existing MiniWoB v1 planner and differ only in the AX observation passed to it; seeds
+200 (dev) and 300 (held-out) are fixed in the preregistration. Harness selftest and scorer
+selftest passed keyless; `ubs work/miniwob-ax-prune/ax_prune.py work/miniwob-ax-prune/score.py`
+returned exit 0. Offline receipt commits: `9eab0c0` and refreshed `1d500a4`.
+
+Boundary: this is PREPARED-NOT-MEASURED, not a live result. The live arm waits for the pane-5
+MiniWoB v2 dependency. Once rows exist, `work/miniwob-ax-prune/score.py` reports per-arm success
+counts/rates and the number of the 50 tasks succeeding in at least one arm for each split.
