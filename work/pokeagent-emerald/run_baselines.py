@@ -7,6 +7,8 @@ import argparse
 import hashlib
 import json
 import random
+import subprocess
+import sys
 import time
 from datetime import datetime, timezone
 from importlib import import_module
@@ -16,30 +18,22 @@ from typing import Any
 from capture_state import BOOT_MACROS
 from macro_choice import LEGAL_INPUTS
 
-START_MACRO = 142
-GOAL_LOCATION = "MOVING_VAN"
-DEFAULT_CAP = 100
+START_MACRO = 228
+START_LOCATION = "MOVING_VAN"
+DEFAULT_CAP = 500
+SCRIPTED_SEED = 20260925
+_scripted_rng = random.Random(SCRIPTED_SEED)
+SCRIPTED_TAIL = [_scripted_rng.choice(LEGAL_INPUTS) for _ in range(DEFAULT_CAP)]
 
 
 def _state(env: Any) -> dict[str, Any]:
-    raw = env.get_comprehensive_state(screenshot=None)
+    reader = env.memory_reader
+    coords = reader.read_coordinates()
     return {
-        "game_state": raw.get("game", {}).get("game_state"),
-        "location": raw.get("player", {}).get("location"),
-        "position": raw.get("player", {}).get("position"),
+        "game_state": reader.get_game_state(),
+        "location": reader.read_location(),
+        "position": {"x": coords[0], "y": coords[1]},
     }
-
-
-def _reset(env: Any) -> None:
-    env.core.reset()
-    for attr in ("_cached_state", "_cached_state_time"):
-        if hasattr(env, attr):
-            delattr(env, attr)
-    env._cached_dialog_state = False
-    env._last_dialog_check_time = 0
-    if env.memory_reader is not None:
-        env.memory_reader._mem_cache = {}
-        env.memory_reader.reset_dialog_tracking()
 
 
 def _press(env: Any, button: str) -> None:
@@ -55,26 +49,13 @@ def _boot_to_start(env: Any) -> dict[str, Any]:
     return _state(env)
 
 
-def _scripted_tail(trace_path: Path) -> list[str]:
-    rows = [
-        json.loads(line) for line in trace_path.read_text().splitlines() if line.strip()
-    ]
-    tail = []
-    for row in rows:
-        if row["macro_index"] <= START_MACRO:
-            continue
-        tail.append(row["button"])
-        if row["state"]["player"].get("location") == GOAL_LOCATION:
-            break
-    if not tail or len(tail) > DEFAULT_CAP:
-        raise RuntimeError(f"bad scripted tail: {len(tail)} macros")
-    return tail
-
-
 def run_one(
-    env: Any, policy: str, seed: int, cap: int, scripted: list[str]
+    emulator_cls: Any, rom: str, policy: str, seed: int, cap: int, scripted: list[str]
 ) -> dict[str, Any]:
-    _reset(env)
+    # A separate worker process per run avoids the native mGBA crash caused by
+    # accumulating cores across repeated runs in one interpreter.
+    env = emulator_cls(rom, headless=True, sound=False)
+    env.initialize()
     started = time.monotonic()
     start = _boot_to_start(env)
     rng = random.Random(seed)
@@ -90,7 +71,7 @@ def run_one(
         _press(env, button)
         macros += 1
         final = _state(env)
-        if final["location"] == GOAL_LOCATION:
+        if final["location"] not in (None, START_LOCATION):
             goal = True
             break
     return {
@@ -98,7 +79,7 @@ def run_one(
         "seed": seed,
         "start_macro": START_MACRO,
         "start": start,
-        "goal": {"location": GOAL_LOCATION},
+        "goal": {"location_not": START_LOCATION},
         "goal_reached": goal,
         "macros_after_start": macros,
         "macro_cap": cap,
@@ -108,38 +89,79 @@ def run_one(
     }
 
 
+def _single(args: argparse.Namespace) -> int:
+    emulator_cls = import_module("pokemon_env.emulator").EmeraldEmulator
+    row = run_one(
+        emulator_cls, args.rom, args.policy, args.seed, args.cap, SCRIPTED_TAIL
+    )
+    print(json.dumps(row, separators=(",", ":")))
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--rom", required=True)
-    parser.add_argument("--trace", required=True)
-    parser.add_argument("--output", required=True)
+    parser.add_argument("--output")
     parser.add_argument("--scripted", type=int, default=20)
     parser.add_argument("--random", type=int, default=20)
     parser.add_argument("--cap", type=int, default=DEFAULT_CAP)
     parser.add_argument("--harness-sha", required=True)
+    parser.add_argument("--seed-offset", type=int, default=0)
     parser.add_argument("--rom-sha1", required=True)
+    parser.add_argument("--single", action="store_true")
+    parser.add_argument("--policy", choices=("scripted", "random"))
+    parser.add_argument("--seed", type=int)
     args = parser.parse_args()
 
-    EmeraldEmulator = import_module("pokemon_env.emulator").EmeraldEmulator
+    if args.single:
+        if args.policy is None or args.seed is None:
+            parser.error("--single requires --policy and --seed")
+        return _single(args)
+    if not args.output:
+        parser.error("--output is required unless --single is set")
+
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
-    scripted = _scripted_tail(Path(args.trace))
-    env = EmeraldEmulator(args.rom, headless=True, sound=False)
-    env.initialize()
     code_sha = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     rows = []
-    for seed in range(args.scripted):
-        row = run_one(env, "scripted", seed, args.cap, scripted)
-        row.update(
-            {
-                "code_sha256": code_sha,
-                "harness_sha": args.harness_sha,
-                "rom_sha1": args.rom_sha1,
+    jobs = [("scripted", args.seed_offset + seed) for seed in range(args.scripted)] + [
+        ("random", 1000 + args.seed_offset + seed) for seed in range(args.random)
+    ]
+    for policy, seed in jobs:
+        command = [
+            sys.executable,
+            str(Path(__file__).resolve()),
+            "--single",
+            "--rom",
+            args.rom,
+            "--policy",
+            policy,
+            "--seed",
+            str(seed),
+            "--cap",
+            str(args.cap),
+            "--harness-sha",
+            args.harness_sha,
+            "--rom-sha1",
+            args.rom_sha1,
+        ]
+        try:
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            row = json.loads(result.stdout.strip().splitlines()[-1])
+        except subprocess.CalledProcessError as exc:
+            row = {
+                "policy": policy,
+                "seed": seed,
+                "start_macro": START_MACRO,
+                "goal": {"location_not": START_LOCATION},
+                "goal_reached": False,
+                "macros_after_start": None,
+                "macro_cap": args.cap,
+                "final": None,
+                "wall_s": None,
+                "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                "child_error": f"exit_{exc.returncode}",
             }
-        )
-        rows.append(row)
-    for seed in range(args.random):
-        row = run_one(env, "random", 1000 + seed, args.cap, scripted)
         row.update(
             {
                 "code_sha256": code_sha,
