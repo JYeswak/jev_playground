@@ -24,9 +24,11 @@ afterwards on the no-consumer outcome (HOLD on new Jev omp tools).
 **The one thing that is not quiet: the MiniWoB held-out run.** PID `30607` (`infisical run ...
 run-after-rotation.sh --live --steps combined`) and `30641`, run root
 `var/agent-tmp/jev-9gtw-heldout-live-rerun.3921/`. It is a **direct child of pane 5's omp process
-(`3921`)**, so restarting pane 5 kills it. At 17:28Z the keyless baseline had 1,244 of about 1,250
-rows. After that it starts the paid phase: 625 held-out Jev episodes with arms quoted, none and
-color. Jev held-out rows at handoff: 0/625. ETA unknown, over 30 minutes. Restart panes 1-4 freely.
+(`3921`)**, so restarting pane 5 kills it. Its keyless baseline finished at 1,250 rows, and at
+about 17:25Z it started the paid phase: 625 held-out Jev episodes with arms quoted, none and
+color. Update 17:26Z: the paid phase is running (`jev_arm.py
+live`, pid 41736), writing `work/miniwob-jev/rows/miniwob-jev-v3-heldout.s0.jsonl`, untracked: 15
+rows in the first ~80 s, so about an hour for 625 if the rate holds. Restart panes 1-4 freely.
 Restart pane 5 only after the run exits, or after Joshua chooses to stop it. Any later relaunch
 should be a `hub op:start` supervised process (persist), so it survives pane restarts. When it
 exits, pane 5's handoff says what to check: complete 625 rows or record NOT_RUN/incomplete, never
