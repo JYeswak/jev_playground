@@ -321,7 +321,7 @@ def shadow_features(words: str) -> list[str]:
         features.append("omp_absent")
     if "wait marker" in low:
         features.append("wait_marker")
-    if "spinner" in low:
+    if "spinner on the status line" in low:
         features.append("spinner")
     if "child using cpu" in low:
         features.append("child_cpu")

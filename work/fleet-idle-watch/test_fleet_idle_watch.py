@@ -524,6 +524,11 @@ class ShadowFeatures(unittest.TestCase):
         words = "(child: secret-not-to-send)  user prompt with private text"
         self.assertEqual(fiw.shadow_features(words), ["child_alive"])
 
+    def test_shadow_features_do_not_misread_no_spinner(self):
+        self.assertNotIn(
+            "spinner", fiw.shadow_features("(no spinner, no tool child)  hidden screen")
+        )
+
     def test_shadow_features_keep_wait_and_cpu_signals(self):
         words = "(wait marker, child using CPU: command)  hidden screen line"
         self.assertEqual(fiw.shadow_features(words), ["wait_marker", "child_cpu"])
