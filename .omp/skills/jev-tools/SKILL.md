@@ -14,6 +14,17 @@ Choose the tool by the decision you need. These are advisory signals; keep the f
 - screening prompt injection
 - reviewing git diffs
 
+## Organic consumer status (2026-09-25)
+
+No organic trigger is added from this audit. A bounded search of project omp session JSONL files modified in the last 24 hours, excluding probe/smoke/test sessions, found no recurring real-work step that selects passages or checks a qualitative sentence.
+
+The only three matching rerank records were explicit rollout tests, not consumers:
+- `~/.omp/profiles/claude/agent/sessions/-Developer-jev/2026-09-25T15-28-20-163Z_01a0d92e-86c3-72dc-ba29-dbb87f90138d.jsonl:5` — prompt says "Do exactly two things" and calls `jev_rerank`.
+- `~/.omp/profiles/codex/agent/sessions/-Developer-jev/2026-09-25T15-33-44-451Z_01a0d933-7983-7192-9145-8f6a963f6b07.jsonl:5` — same rollout-test shape.
+- `~/.omp/profiles/claude/agent/sessions/-Developer-jev/2026-09-25T15-34-54-984Z_01a0d934-8d08-7228-89ad-3ca2dae9bdb2.jsonl:5` — explicitly says "testing the jev omp tool rollout".
+
+The qualitative-claim search found only the prior L3 test receipt at `~/.omp/profiles/claude/agent/sessions/-Developer-jev/2026-09-24T22-52-06-168Z_01a0d59e-7298-7468-bb25-cf3d166adab7/1.bash.log:153-157`; no non-test claim-check, flag, or screen consumer appeared. These records are evidence of test traffic only, not an organic trigger.
+
 | Tool | Use it when | Measured boundary |
 |---|---|---|
 | `jev_rerank` | A query has candidate passages and you need their relative order before selecting context. Pass 2–30 non-empty passages. | Only passage reranking is measured. The shipped rubric scored 0.7115 paired accuracy on NevIR (984/1,383); its Noul replacement lost all nine paired comparisons. One or 31 passages are schema refusals before a Jev call. Sources: `docs/demos/upstream-repro/jev-rerank-l3-scifact-20260924.md:5-11,31-36`; `docs/demos/upstream-repro/rerank-nevir-20260924.md:90-111,125-168`. |
