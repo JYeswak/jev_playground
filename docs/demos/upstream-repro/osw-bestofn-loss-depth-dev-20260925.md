@@ -126,3 +126,87 @@ trajectory text, official result values, response probabilities, grader output, 
 The live results are limited to this pinned OSWorld failure-class slice and do not claim that any
 other task distribution or workflow will behave the same. The experiment does not measure MiniWoB,
 a chat-model comparator, terminal-status H5, a different step budget, or a deployment policy.
+
+## Valid held-out retest preregistration — PREPARED-NOT-MEASURED (2026-09-25)
+
+This section answers R106's correction. It is committed before any retest call and after reading
+`/Users/josh/.claude/skills/experimental-design/SKILL.md` (randomization, replication at the
+unit of analysis, and no outcome-dependent selection) and
+`/Users/josh/.claude/skills/statistical-power/SKILL.md` (SESOI, sensitivity analysis, and
+reporting the detectable effect). The previous complement is permanently excluded: it was chosen
+from Jev's prior failures and remains `NOT-SCORED`.
+
+### Released run sets and fixed task list
+
+The retest candidate pool is the pair of released, pinned Ouroboros OSWorld-Verified evidence
+packages below. Both are complete 361-task `test_nogdrive` runs with screenshot-only observation,
+one rollout, and a 100-policy-turn budget. This deliberately changes both the released run set and
+step budget from R104's eight 15-step archives; the choice is based on public provenance and
+matching task coverage, not per-task scores:
+
+- `razzant/ouroboros-osworld-verified-sonnet46` at snapshot
+  `0e8ad516a4eeaa586607ead400429885814e7633`, candidate `c0`, Apache-2.0.
+- `razzant/ouroboros-osworld-verified-opus5` at snapshot
+  `f52ebf2248ce0ce0c496db18f5e6edce631304fa`, candidate `c1`, Apache-2.0.
+
+The fixed task manifest is `work/osw-bestofn/heldout_valid_slice.json`. It contains all 361
+domain/task IDs in lexicographic order, with SHA-256
+`aafabe6fd1f06b7dcb2a3d57397722871ce909295ae3ce3556d5fdcf2e7586c3`. Before freezing it, the
+Hugging Face tree API was read only for path metadata: each snapshot exposed 361 task-ID
+directories, the two ID sets were equal, and no `result.txt`, `task_outcome.json`,
+`results_summary.json`, reward, success, or status field was read. The call order is a fixed
+seeded permutation of this manifest (`seed=20250925`); no task is added, removed, stratified,
+or reordered after a response.
+
+The state adapter will use only each candidate's published acting evidence
+(`ouroboros_task_final.json`, restricted to action/tool/text records) and the bounded public
+task key. It excludes `result.txt`, `task_outcome.json`, `results_summary.json`,
+`feasibility_gate.json`, `reset_verification.json`, `task_run_manifest.json`, evaluator data,
+and every score/status/reward/success field. Candidate archive names are replaced by positional
+IDs `c0` and `c1`.
+
+### One-variable arm
+
+Only the `goal` arm runs. Relative to the already-defined `original` state, its sole change is
+adding the public OSWorld task instruction from `xlang-ai/OSWorld@b138d348256078fa634fc3b73567a7337c793e6b`,
+path `evaluation_examples/examples/<domain>/<id>.json`, the already-pinned task source used by R104.
+Candidate evidence, positional IDs, serializer, task order, Jev model, timeout, retry policy,
+question, and validator are unchanged. The instruction is never obtained from the candidate
+trajectory, result, grader, or task outcome.
+
+### Frozen bar and analysis
+
+The R104 bar is unchanged:
+
+1. Jev's mean official reward must exceed the best single candidate's mean by at least `0.03`
+   reward units (three points);
+2. exact-completion McNemar's exact two-sided `p < 0.05` versus that best single candidate; and
+3. Jev must close at least 30% of the per-task `oracle@2 - best_single` mean-reward gap.
+
+All three are required. `best_single` and `oracle@2` are computed only from the two frozen
+candidate packages after the calls. No confidence threshold, question wording, tie-break, or bar
+may change after the first retest response.
+
+The task unit is one task, so `N=361` is the complete released task universe; no pseudoreplication
+is claimed. A keyless sensitivity calculation using R104's committed per-task reward-delta SD
+`0.485121` gives an approximate 80%-power two-sided paired-mean MDE of `0.07172` reward units
+(7.17 points) at `alpha=.05` (`statsmodels 0.15.0`, SciPy 1.18.1). Using R104's discordance
+rate `84/361`, the corresponding normal McNemar planning MDE is approximately 7.11 percentage
+points. Thus this fixed full-universe retest can reliably detect effects around seven points,
+not the three-point bar; the limitation is reported rather than hidden.
+
+### Cost, failure, and stop rules
+
+The four-arm dev run measured `480,164 / 60 = 8,002.733` input tokens per `goal` call. The
+361-call retest estimate is `2,888,987` input tokens and `$0.1213374428` at `$0.042/M` input
+tokens; output is free. `maxRetries=0`, no comparator, and no chat fallback.
+
+HTTP `401` or `402` is a hard stop: preserve the partial receipt, mark the run `NOT-SCORED`,
+make no retry, and do not report a bar result. A task-level validation failure is retained as a
+failed row and does not trigger a replacement call. The run also stops before any call if either
+source snapshot, task-set digest, allowed-member list, or state-leak guard differs from this
+preregistration.
+
+Boundary: this is `PREPARED-NOT-MEASURED`; no retest call, score, bar verdict, or omp wiring is
+claimed here. The external run packages are attributed to Razzhigaev/Ouroboros and OSWorld; their
+published aggregates are not used as Jev outcomes.
