@@ -4385,3 +4385,42 @@ wider/deeper search within the 15-second turn, different team seeds, or Jev gene
 leaf/search-width change has passed its held-out component gate; use fresh battle seeds and
 the same 70% line. Receipts and rows: `71bde42` (control) and `c60edae` (live), under
 `work/loss-depth/pokejev-components/battle/stage-b/`.
+
+## R109 — REFUTED: Leaf C frozen winner model is a safe action-search leaf
+
+**Claim (bead `jev-9gtw.1`, r3 prereg `a8b672b`).** A frozen Leaf C model trained
+to predict the recorded winner could rank live move and switch candidates well
+enough to serve as a search leaf.
+
+**Measured 2026-09-25, live `jev-1.13.0`, r3 code arm.** The arm was stopped
+after 89 persisted battles (`k=0..106`, 28 wins, 61 losses) when the decisions
+rows showed 977 switches on 982 turns where a switch was offered (99.5%). The
+arm was `NOT-SCORED`; no Noul arm ran. Receipt and path-limited rows: commit
+`7ba9742`, `docs/demos/upstream-repro/loss-depth-pokejev-leaf-c-r3-partial-20250925.md`.
+
+The keyless held-out winner-prediction gate was not sufficient: after the r3
+full-team refit, code-only held-out AUC was `0.645815` (N=2,274; below the
+0.65 bar) while code+Noul was `0.717475`. Neither number is an action-ranking
+measurement.
+
+**Autopsy.** `leaf_c.py:237` defines `ko_threat` from the recorded action type
+(`tool.startswith("move ")`) in winner-prediction rows. Live `run.py:453` sets
+the same feature per candidate. The frozen code coefficient is `-0.149221` on
+scale `0.323709`, so `ko_threat=0` gives every switch about `+0.461` standardized
+logit relative to a move before the other features. The other four features
+describe only our side; opponent damage and post-candidate opponent HP are
+absent. This is a design mismatch, not a parser or Jev-response defect. A
+winner classifier can therefore pass AUC while ranking actions incorrectly.
+
+**What it refutes.** Winner prediction plus a held-out AUC gate is not evidence
+that Leaf C is a valid search leaf. The r2/r3 live arms are not comparisons of
+the corrected model's strength.
+
+**Retry condition.** Reopen only with a new preregistered action-ranking design
+that (1) removes the recorded-action-type feature, (2) adds opponent-side
+post-candidate features including opponent HP remaining and HP differential,
+(3) refits on dev and scores held-out once, and (4) passes keyless action-ranking
+gates on recorded turns: switch selection within 10 percentage points of the
+Stage B 41% offered-switch rate, and two move candidates with different
+outcomes receive different scores. No battle arm is authorized before all four
+conditions pass and the new note is committed.
