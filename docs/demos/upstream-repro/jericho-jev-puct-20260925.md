@@ -126,6 +126,13 @@ input_tokens=0 output_tokens=0 spend=USD 0
 This is `offline-verified` for the uniform arm only. It is not a Jev result and does not
 authorize a live call. The output was written under the ignored `var/agent-tmp/` scratch root.
 
+The terminal reason was independently replayed against the same image and action sequence:
+`south` returned reward `-10`, `done=true`, `game_over=true`, and the engine text said
+`A lurking grue ... devoured you` / `You have died`. This was a death/game-over termination,
+not the 35-step cap. The uniform count gives only a provisional projection for the other eight
+planned runs: `8 × 257 = 2,056` prior requests if their traces had the same count; the live Jev
+seed-1 count must replace this proxy before projecting the remaining eight.
+
 ## Live commands
 
 Build the image from this tree with the pinned Dockerfile. Use one foreground invocation at a time;
