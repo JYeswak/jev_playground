@@ -11,6 +11,7 @@
  */
 import { rerank } from "../../work/nev-rerank/src/rank.ts";
 import { liveAsker } from "../../work/nev-rerank/src/live.ts";
+import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 
 type ToolHost = {
   zod: {
@@ -21,6 +22,7 @@ type ToolHost = {
 };
 
 export default function jevRerankTool(pi: ToolHost) {
+  useInfisicalKey();
   return {
     name: "jev_rerank",
     label: "Jev rerank",

@@ -15,9 +15,12 @@
  * that any judgment is correct. The seat is the corpus in DIFF-RECEIPT.json.
  */
 import test from 'node:test';
-import { resetBillingHold } from '../../work/jev-client/src/index.ts';
+import { resetBillingHold, setKeyProvider } from '../../work/jev-client/src/index.ts';
 import assert from 'node:assert/strict';
 import mod, { screen, SEAT_CUT } from '../../.omp/tools/jev-screen.ts';
+
+// "No key anywhere": pinned so the tool's Infisical fallback never runs in tests.
+setKeyProvider(async () => undefined);
 
 const pi = { zod: { object: (s) => s, string: () => ({ min: () => ({}) }) } };
 const factory = (mod && typeof mod.default === 'function') ? mod.default : mod;

@@ -33,6 +33,7 @@
  * bead ids (jev-384m), commit shas (3b0c1d2) and 8+ digit runs do not count.
  */
 import { askJev, observedFetch } from "../../work/jev-client/src/index.ts";
+import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 
 export const MODEL = "jev-1.13.0";
 export const SUPPORTED_AT = 0.8;
@@ -139,6 +140,7 @@ function refused(reason: string, calledModel: boolean, why = "The answer or inpu
 }
 
 export default function jevClaimCheckTool(pi: ToolHost, asker?: Asker) {
+  if (!asker) useInfisicalKey();
   const ask = asker ?? liveAsker;
   return {
     name: "jev_claim_check",

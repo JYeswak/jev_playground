@@ -18,9 +18,13 @@
  * right. That is the live dogfood in docs/demos/upstream-repro/jev-claim-check-20260924.md.
  */
 import test from "node:test";
-import { resetBillingHold } from "../../work/jev-client/src/index.ts";
+import { resetBillingHold, setKeyProvider } from "../../work/jev-client/src/index.ts";
 import assert from "node:assert/strict";
 import { pathToFileURL } from "node:url";
+
+// Real use falls back to the Infisical key (use-infisical-key.ts). These tests mean "no key
+// anywhere", so pin a provider that finds none; the tool never replaces a pinned provider.
+setKeyProvider(async () => undefined);
 
 const target = process.env.CLAIM_CHECK_TOOL
   ? pathToFileURL(process.env.CLAIM_CHECK_TOOL).href

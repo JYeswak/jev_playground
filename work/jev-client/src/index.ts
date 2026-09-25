@@ -219,6 +219,35 @@ export function noteBillingRefusal(answer: { reason?: string; error?: string }, 
   }
 }
 
+/**
+ * Where the key comes from when neither the call nor the environment supplies one. Unset by
+ * default, so scripts stay keyless unless they pass a key. Real omp use (the .omp/tools
+ * factories without an injected asker, and the review extension) installs the Infisical lookup
+ * through use-infisical-key.ts, which keeps the key in this process's memory only: a pane's
+ * shell environment never holds it. Order: explicit option, then TYPESAFE_API_KEY, then this.
+ */
+let keyProvider: (() => Promise<string | undefined>) | undefined;
+
+export function setKeyProvider(provider: (() => Promise<string | undefined>) | undefined): void {
+  keyProvider = provider;
+}
+
+/** Whether a provider is installed; use-infisical-key.ts never replaces one a caller chose. */
+export function keyProviderInstalled(): boolean {
+  return keyProvider !== undefined;
+}
+
+async function resolveApiKey(explicit: string | undefined): Promise<string | undefined> {
+  const fromCall = explicit ?? process.env.TYPESAFE_API_KEY;
+  if (fromCall) return fromCall;
+  if (!keyProvider) return undefined;
+  try {
+    return (await keyProvider()) || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 async function postSystemOne(
   apiKey: string,
   model: string,
@@ -319,7 +348,7 @@ function readUsage(raw: unknown): JevUsage | undefined {
 
 export async function askJev(options: AskOptions): Promise<JevResult> {
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
-  const apiKey = options.apiKey ?? process.env.TYPESAFE_API_KEY;
+  const apiKey = await resolveApiKey(options.apiKey);
 
   // An unset key is a CONFIGURATION state and must never look like an answer.
   // Source it with:
@@ -398,7 +427,7 @@ export async function askJev(options: AskOptions): Promise<JevResult> {
  */
 export async function askJevChoice(options: AskChoiceOptions): Promise<JevChoiceResult> {
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
-  const apiKey = options.apiKey ?? process.env.TYPESAFE_API_KEY;
+  const apiKey = await resolveApiKey(options.apiKey);
 
   if (!apiKey) {
     return {
@@ -490,7 +519,7 @@ export type JevScoreResult =
  */
 export async function askJevScore(options: AskScoreOptions): Promise<JevScoreResult> {
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
-  const apiKey = options.apiKey ?? process.env.TYPESAFE_API_KEY;
+  const apiKey = await resolveApiKey(options.apiKey);
 
   if (!apiKey) {
     return {
@@ -581,7 +610,7 @@ export type JevBundleResult =
  */
 export async function askJevBundle(options: AskBundleOptions): Promise<JevBundleResult> {
   const model = options.model ?? process.env.JEV_MODEL ?? DEFAULT_MODEL;
-  const apiKey = options.apiKey ?? process.env.TYPESAFE_API_KEY;
+  const apiKey = await resolveApiKey(options.apiKey);
   if (!apiKey) {
     return {
       ok: false,

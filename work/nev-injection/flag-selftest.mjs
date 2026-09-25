@@ -6,7 +6,10 @@
  * Exit 0 all green, 1 any failure.
  */
 import mod, { annotate } from "../../.omp/tools/jev-flag.ts";
-import { resetBillingHold } from "../../work/jev-client/src/index.ts";
+import { resetBillingHold, setKeyProvider } from "../../work/jev-client/src/index.ts";
+
+// "No key anywhere": pinned so the tool's Infisical fallback never runs in this selftest.
+setKeyProvider(async () => undefined);
 
 const pi = { zod: { object: (s) => s, string: () => ({ min: () => ({}) }) } };
 let failed = 0;

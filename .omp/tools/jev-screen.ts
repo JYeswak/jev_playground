@@ -15,6 +15,7 @@
  * verified and never pass. Keyless returns review with reason=unconfigured.
  */
 import { liveAsker } from "../../work/nev-injection/src/live-flag.ts";
+import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 
 export const SEAT_CUT = 0.5;
 export const SEAT_MODEL = "jev-1.13.0";
@@ -51,6 +52,7 @@ export function screen(probability) {
 }
 
 export default function jevScreenTool(pi, asker) {
+  if (!asker) useInfisicalKey();
   const ask = asker || liveAsker;
   return {
     name: "jev_screen",

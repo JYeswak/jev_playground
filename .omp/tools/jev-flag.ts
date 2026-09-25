@@ -7,6 +7,7 @@
  * does not throw. Never prints a key.
  */
 import { liveAsker } from "../../work/nev-injection/src/live-flag.ts";
+import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 
 const ASSISTANT =
   "A question-answering assistant published by a German news organisation. " +
@@ -36,6 +37,7 @@ export function annotate(probability) {
 }
 
 export default function jevFlagTool(pi, asker) {
+  if (!asker) useInfisicalKey();
   const ask = asker || liveAsker;
   return {
     name: "jev_flag",
