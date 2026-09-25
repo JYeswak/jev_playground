@@ -569,6 +569,28 @@ class JevPolicy:
         actions, text_spans, truncated = build_candidates(
             utterance, els, options, include_none=allow_none
         )
+        if len(actions) < 2:
+            self.decisions.append(
+                {
+                    "step": self.step,
+                    "n_action_options": len(actions),
+                    "none_allowed": allow_none,
+                    "clicks_truncated": truncated,
+                    "n_text_heads": len(text_spans),
+                    "state_bytes": len(
+                        json.dumps(
+                            state, separators=(",", ":"), ensure_ascii=False
+                        ).encode()
+                    ),
+                    "question_bytes": 0,
+                    "preflight": "action-choice-fewer-than-two",
+                    "action": NONE_KEY,
+                    "action_conf": 1.0,
+                }
+            )
+            self.run.consecutive_failures = 0
+            return "none", 0, None
+
         questions = build_questions(utterance, els, actions, text_spans)
         dec = {
             "step": self.step,

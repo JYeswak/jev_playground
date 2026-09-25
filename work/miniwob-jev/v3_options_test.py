@@ -144,16 +144,42 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
                 arm or "v1-default",
             )
 
-    def test_empty_action_space_offers_safe_noop(self):
+    def test_captured_drag_items_grid_subthreshold_choice_skips_jev(self):
         import jev_arm
 
-        actions, text_spans, truncated = jev_arm.build_candidates(
-            "Drag the item.", [], {}, include_none=False
-        )
+        captured_path = ROOT / "work/game-floors/rows/miniwob.s3.jsonl"
+        with captured_path.open() as stream:
+            captured = next(
+                json.loads(line)
+                for line in stream
+                if json.loads(line).get("task") == "drag-items-grid"
+                and json.loads(line).get("seed") == 17
+                and json.loads(line).get("policy") == "random"
+            )
+        self.assertEqual(captured["utterance"], "Drag Bernetta down by one.")
 
+        actions, text_spans, truncated = jev_arm.build_candidates(
+            captured["utterance"], [], {}, include_none=False
+        )
         self.assertEqual(actions, {jev_arm.NONE_KEY: ("none", 0)})
         self.assertEqual(text_spans, {})
         self.assertEqual(truncated, 0)
+
+        calls = []
+
+        def asker(*args):
+            calls.append(args)
+            raise AssertionError("subthreshold action Choice must not call Jev")
+
+        policy = jev_arm.JevPolicy(
+            asker, jev_arm.RunState(), 10, none_policy="after-page-change"
+        )
+        kind, ref, text = policy.act(captured["utterance"], [], {})
+        self.assertEqual((kind, ref, text), ("none", 0, None))
+        self.assertEqual(calls, [])
+        self.assertEqual(
+            policy.decisions[-1]["preflight"], "action-choice-fewer-than-two"
+        )
 
     def test_each_arm_changes_only_its_declared_surface(self):
         base = self.base_state()
