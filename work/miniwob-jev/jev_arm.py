@@ -713,6 +713,7 @@ def cmd_live(
     none_policy: str = "always",
     tasks_spec: str = "all",
     label: str = "",
+    plan_file: str | None = None,
 ) -> int:
     if not os.environ.get("TYPESAFE_API_KEY", "").strip():
         print(
@@ -739,7 +740,13 @@ def cmd_live(
     if unknown:
         raise ValueError(f"unknown MiniWoW tasks: {unknown}")
     tasks = selected_tasks[k::n]
-    plan = floor.episode_plan(tasks, seeds, floor.benchmark_seeds(all_tasks))
+    if plan_file:
+        plan = []
+        for line in Path(plan_file).read_text().splitlines():
+            task, seed, rep = line.strip().split(",")
+            plan.append((task, int(seed), int(rep)))
+    else:
+        plan = floor.episode_plan(tasks, seeds, floor.benchmark_seeds(all_tasks))
     ROWS_DIR.mkdir(parents=True, exist_ok=True)
     if label:
         filename = f"miniwob-jev-{label}.s{k}.jsonl"
@@ -977,6 +984,7 @@ def main(argv=None) -> int:
     lv.add_argument("--seeds", default="benchmark")
     lv.add_argument("--tasks", default="all")
     lv.add_argument("--label", default="")
+    lv.add_argument("--plan-file")
     lv.add_argument(
         "--none-policy", choices=["always", "after-page-change"], default="always"
     )
@@ -985,8 +993,5 @@ def main(argv=None) -> int:
         return selftest()
     if a.cmd == "dev":
         return cmd_dev(a.fake, a.tasks, a.seeds, a.out, a.max_steps, a.dump_request)
-    return cmd_live(a.shard, a.seeds, a.none_policy, a.tasks, a.label)
-
-
-if __name__ == "__main__":
+    return cmd_live(a.shard, a.seeds, a.none_policy, a.tasks, a.label, a.plan_file)
     sys.exit(main())
