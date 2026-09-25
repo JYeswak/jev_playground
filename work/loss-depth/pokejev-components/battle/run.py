@@ -21,11 +21,12 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-COMPONENT_DIR = Path(__file__).resolve().parents[1]
+BATTLE_DIR = Path(__file__).resolve().parent
+COMPONENT_DIR = BATTLE_DIR.parent
 ROOT = COMPONENT_DIR.parents[2]
 
 POKE = ROOT / "work" / "poke-jev"
-OUT = COMPONENT_DIR / "stage-b"
+OUT = BATTLE_DIR / "stage-b"
 ALPHA_PATH = COMPONENT_DIR / "frozen-alpha-v1.json"
 STOP_PATH = OUT / "mix-v1-stop.json"
 
