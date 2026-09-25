@@ -2178,3 +2178,20 @@ Boundary: this census made **0 Jev/API requests and $0 spend**. The cited PokéJ
 receipt is a separate prior live run; it reports `jev-1.13.0`, 9,334 calls, and 33,273,577
 input tokens. No Metamon stretch battle, paid comparator, ladder run, or skillranker execution
 is claimed here.
+
+## jev-9gtw.2 amended OSWorld Best-of-N retest preflight (2026-09-25) [NOT_RUN]
+
+Verified amendment `c1131b9` before any live call: the effective task universe is `N=360` after
+excluding `chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d`; newline-joined effective-ID SHA-256 is
+`e838ec31f15b515f2f2cd04c705a8575bff95b6ca50ae0fb40da3f250d0509fc`. The pinned-source preflight
+then found an unplanned missing official row: in
+`razzant/ouroboros-osworld-verified-sonnet46@0e8ad516a4eeaa586607ead400429885814e7633`,
+`multi_apps/6d72aad6-187a-4392-a4c4-ed87269c51cf` has neither `ouroboros_task_final.json` nor
+`result.txt`; the c1 directory has `ouroboros_task_final.json` exactly `{}` and `result.txt`.
+Under the committed stop rule, the official result cannot be joined unambiguously, so the run
+stopped **before Jev**. Receipt:
+`work/osw-bestofn/live_preflight_receipt_r3.json`.
+
+Exact preflight command: `python3 var/agent-tmp/osw-bestofn-r3-360/build_states.py`. No API key
+was used, no Jev request or response exists, no rows or bar score were produced, and no task was
+replaced. Boundary: a new input-only amendment is required before any live call can be made.

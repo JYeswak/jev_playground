@@ -1,0 +1,43 @@
+{
+  "status": "NOT_RUN",
+  "bead": "jev-9gtw.2",
+  "prereg_commit": "c1131b9",
+  "model": "jev-1.13.0",
+  "state_arm": "goal",
+  "base_manifest": "work/osw-bestofn/heldout_valid_slice.json",
+  "base_manifest_sha256": "7aa586ed485d48d8f35dde4bac9e6cea0d64705a49f5f041d31d715be897aea8",
+  "effective_tasks": 360,
+  "excluded_task": "chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d",
+  "effective_task_id_sha256": "e838ec31f15b515f2f2cd04c705a8575bff95b6ca50ae0fb40da3f250d0509fc",
+  "seed": 20250925,
+  "sources": [
+    {
+      "candidate": "c0",
+      "dataset": "razzant/ouroboros-osworld-verified-sonnet46",
+      "snapshot": "0e8ad516a4eeaa586607ead400429885814e7633",
+      "license": "Apache-2.0"
+    },
+    {
+      "candidate": "c1",
+      "dataset": "razzant/ouroboros-osworld-verified-opus5",
+      "snapshot": "f52ebf2248ce0ce0c496db18f5e6edce631304fa",
+      "license": "Apache-2.0"
+    }
+  ],
+  "blocker": {
+    "task": "multi_apps/6d72aad6-187a-4392-a4c4-ed87269c51cf",
+    "candidate": "c0",
+    "dataset": "razzant/ouroboros-osworld-verified-sonnet46",
+    "snapshot": "0e8ad516a4eeaa586607ead400429885814e7633",
+    "missing_members": ["ouroboros_task_final.json", "result.txt"],
+    "api_tree_observation": "The pinned task directory exposes feasibility_gate.json, prompt.txt, task_outcome.json, and task_run_manifest.json only."
+  },
+  "cross_check": {
+    "candidate": "c1",
+    "task": "multi_apps/6d72aad6-187a-4392-a4c4-ed87269c51cf",
+    "observation": "The pinned directory has ouroboros_task_final.json exactly 2 bytes ({}) and result.txt."
+  },
+  "live_calls": 0,
+  "spend_usd": 0,
+  "boundary": "No Jev request, response, row, score, or bar verdict was produced. The preregistered hard stop applies because the official result row cannot be joined unambiguously for the effective N=360 universe. No task was replaced and no outcome/member file was substituted. A new input-only amendment would be required before any live call."
+}
