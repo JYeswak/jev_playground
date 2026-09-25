@@ -372,6 +372,12 @@ arm_at .omp/rules/kit-jsonl-close.md fire  "kit-jsonl: old 20-char reason is ins
 arm_at .omp/rules/kit-jsonl-close.md quiet "kit-jsonl: closed with evidence reason" tool edit .beads/issues.jsonl '{"status": "closed", "close_reason": "done at commit 5c065f5, 12/12 tests pass"}'
 arm_at .omp/rules/kit-weasel-retry.md fire  "kit-weasel: retry predicate later" tool edit NEGATIVE_EVIDENCE.md "retry predicate: later"
 arm_at .omp/rules/kit-weasel-retry.md quiet "kit-weasel: retry predicate names a receipt" tool edit NEGATIVE_EVIDENCE.md "retry predicate: a new receipt lands"
+# jev-9gtw.4.2: a second copy of a benchmark scorer (Python split() vs MiniWoB's JS split) scored
+# scroll-text 20/20 where the benchmark's rule gives 18/20. Fire on scorer-copy names under work/,
+# stay quiet on the resume helper `answered` and outside work/.
+arm_at .omp/rules/scorer-reimplementation.md fire  "scorer-copy: derive_needed_text in work/" tool write work/miniwob-jev/x.py "def derive_needed_text(record):"
+arm_at .omp/rules/scorer-reimplementation.md quiet "scorer-copy: answered() resume helper"   tool write work/miniwob-jev/x.py "def answered(path):"
+arm_at .omp/rules/scorer-reimplementation.md quiet "scorer-copy: same name outside work/"    tool write scripts/x.py "def derive_needed_text(record):"
 
 
 # Every project rule must own at least one arm above. Check the arm declarations
