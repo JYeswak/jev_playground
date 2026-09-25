@@ -307,3 +307,10 @@ The first formatter rerun still offered both spoken and native values, and Jev c
 the spoken form (0/5 enter-time). The corrected harness now replaces each v3 `INPUT_TIME` candidate
 with its native 24-hour `HH:MM` value so the model cannot choose the browser-invalid representation.
 The exact ten keys and `>=8/10` bar remain unchanged; both earlier reruns remain recorded.
+
+## Dev amendment: utterance-level time conversion
+
+The second formatter rerun still exposed `4:03` because tokenized spans bypassed the AM/PM
+formatter. The corrected v3 path derives the native `HH:MM` value from the whole utterance and
+removes bare spoken clock values from the INPUT_TIME option set. The same exact ten keys and
+`>=8/10` bar remain fixed; prior results remain in their tracked rows.

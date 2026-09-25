@@ -209,8 +209,12 @@ def build_candidates(
         if e["kind"] in floor.TEXT_INPUT_TAGS:
             candidates = list(dict.fromkeys(spans + page_spans))
             if V3_ENABLED and e["kind"] == "INPUT_TIME":
-                candidates = [format_time_for_input(s) or s for s in candidates]
-            type_spans[r] = list(dict.fromkeys(candidates))
+                formatted = format_time_for_input(utterance)
+                candidates = [
+                    s for s in candidates if not re.fullmatch(r"\d{1,2}:\d{2}", s)
+                ]
+                if formatted:
+                    candidates.insert(0, formatted)
         elif e["kind"] == "SELECT" and r in options:
             opts = {floor._norm(o) for o in options[r]}
             ok = [s for s in spans if floor._norm(s) in opts]
