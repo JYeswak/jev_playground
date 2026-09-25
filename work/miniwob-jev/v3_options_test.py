@@ -10,6 +10,7 @@ import os
 import subprocess
 import sys
 import unittest
+from unittest import mock
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -326,6 +327,79 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
         self.assertEqual(stopped_at, 50)
         assert result is not None
         self.assertEqual(result["exit_code"], 1)
+
+    def test_run_plan_seeds_prior_rows_before_new_eligible_decision(self):
+        import jev_arm
+        import random
+
+        reference = ROOT / "work/arm-sanity/fixtures/difference-only-reference.jsonl"
+        out_path = Path("/tmp/jev-ztp9-run-plan-prior.jsonl")
+        prior_row = {"decisions": [{"n_action_options": 2, "action": "click [2]"}]}
+        out_path.write_text("".join(json.dumps(prior_row) + "\n" for _ in range(150)))
+
+        class FakeEnv:
+            def close(self):
+                pass
+
+        def fake_run_episode(env, task, seed, rep, policy_name, args, *rest):
+            policy = jev_arm.floor.POLICIES[policy_name](random.Random(seed))
+            policy.act(
+                "Click Submit",
+                [
+                    jev_arm._el(1, 0, "input_text"),
+                    jev_arm._el(2, 0, "button", text="Submit"),
+                ],
+                {},
+            )
+            return {
+                "task": task,
+                "seed": seed,
+                "rep": rep,
+                "success": 0.0,
+                "raw_reward": 0.0,
+                "steps": 1,
+                "wall_s": 0.01,
+                "reset_s": 0.0,
+                "error": "",
+            }
+
+        old_policies = jev_arm.floor.POLICIES.copy()
+        try:
+            with (
+                mock.patch.object(
+                    jev_arm.floor, "load_task_list", return_value=["gate"]
+                ),
+                mock.patch.object(
+                    jev_arm.floor,
+                    "benchmark_seeds",
+                    return_value={"gate": list(range(60))},
+                ),
+                mock.patch.object(
+                    jev_arm.floor, "js_seed_for", side_effect=lambda seed: seed
+                ),
+                mock.patch.object(jev_arm.floor, "make_env", return_value=FakeEnv()),
+                mock.patch.object(
+                    jev_arm.floor, "run_episode", side_effect=fake_run_episode
+                ),
+            ):
+                result = jev_arm.run_plan(
+                    [("gate", seed, 0) for seed in range(60)],
+                    jev_arm.FakeAsker("click_only"),
+                    out_path,
+                    max_steps=1,
+                    sanity_reference=reference,
+                    sanity_after=200,
+                )
+        finally:
+            jev_arm.floor.POLICIES.clear()
+            jev_arm.floor.POLICIES.update(old_policies)
+
+        self.assertEqual(result, 5)
+        rows = [json.loads(line) for line in out_path.read_text().splitlines()]
+        self.assertEqual(
+            sum(row.get("row_type") != "arm_sanity_stop" for row in rows), 200
+        )
+        self.assertEqual(rows[-1]["row_type"], "arm_sanity_stop")
 
 
 if __name__ == "__main__":
