@@ -1964,3 +1964,20 @@ interval, or Jev-vs-battle claim; no continuation of this arm.
 Keyless `v3_options_test.py` → **8/8 passed**. A fake click-only Jev reaches four eligible decisions, returns arm-sanity exit 1, and writes an `arm_sanity_stop` row with the checker output and counts. Restarting a stopped output refuses with exit 5 unless a tracked continuation note is supplied. A resumed gate seeded with 150 prior rows triggers at the 50th new row (200 eligible total). `scripts/arm-sanity.py` is loaded in-process from its one source; no logic is copied. The current no-flag selftest stdout/stderr and exit code match the pre-gate `jev_arm.py` at `4ad081d`. Mutations ignoring checker exit, restart refusal, or prior-row seeding are RED.
 
 Boundary: no TypeSafe calls, no Jev spend, no live MiniWoB run, and no claim about model behavior. TESTS.md registry row is updated; pane-1 non-author verification remains pending.
+
+## jev-e3on README stranger run — `JYeswak/jev_playground@108c22c` (2026-09-25) [test]
+
+From a fresh GitHub clone at `108c22c1f97c8affc57696b33d9b25b5232024b9`, the generator
+ran 82 unique commands extracted from README fenced blocks and inline command spans,
+preserving all README line occurrences in
+`docs/demos/upstream-repro/stranger-run-20260925.md`. The child environment had a
+clean `HOME`, only the permitted tool PATH, and no API-key variables. Result: 71
+commands exited 0 and 11 exited nonzero. The table records exit code, wall time,
+same-line quoted-number containment, failure class, and first error line.
+
+Reproduce with:
+`env -u TYPESAFE_API_KEY -u JEV_API_KEY python3 scripts/stranger-run-jev-playground.py --out docs/demos/upstream-repro/stranger-run-20260925.md`.
+
+Boundary: no Jev or comparator request was authorized or sent; README.md was not
+edited; the command-output number check is textual containment, not semantic
+recalculation; nonzero rows are classified in the receipt for pane-1 routing.
