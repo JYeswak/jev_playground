@@ -2001,3 +2001,32 @@ and 2 exempted files. The registered runner suite reports **14 tests, OK**.
 Boundary: no other SST-5 set, comparator model, paid comparator, or TypeSafe call was run in
 this repair pass; no paid comparison was attempted. The six exempted legacy rows remain
 unmodified and are not evidence that future runner output may omit provenance.
+
+## jev-e3on README stranger run — second pass at `JYeswak/jev_playground@ee4f0b3` (2026-09-25) [test]
+
+The fresh-clone rerun recorded in
+`docs/demos/upstream-repro/stranger-run-20260925.md` used clone
+`ee4f0b3051cf340fb0914f9b7431def639141b0d`, a clean `HOME`, and no API-key
+variables. It ran 82 README command rows: **72 exited 0, 9 were nonzero, and
+1 was a TEMPLATE**. The nine nonzero rows are listed below; L193 is the
+README's documented expected-nonzero claim-check bar, and the other eight are
+named prerequisites or keyless `NOT_RUN` rows:
+
+- L160: keyless `NOT_RUN`; `component_eval --heldout` lacks the named
+  `pokechamp@0f84c46` checkout.
+- L193: expected nonzero `FAIL`; `jev-claim-check/score-close.py` is the
+  documented failing-bar command.
+- L224: keyless `NOT_RUN`; `measure-framing-flip.mjs` had no TypeSafe key.
+- L233,262: named prerequisite; `br` was not on PATH.
+- L233,239,262: named prerequisite; portable foundation gates require `br
+  sync --import-only`.
+- L235,261: named prerequisite; normal foundation gates require `br
+  sync --import-only`.
+- L243: named prerequisite; `gh` was not installed.
+- L249,264: named prerequisite; `omp` was not on PATH.
+- L256: named prerequisite; `quickstart.sh --mine` had no session logs.
+
+Boundary: **0 API requests**; no Jev, OpenAI, Anthropic, xAI, or OpenRouter
+request was authorized or sent. The quoted-number check remains textual
+containment, not semantic recomputation. The TEMPLATE command was listed and
+not executed.
