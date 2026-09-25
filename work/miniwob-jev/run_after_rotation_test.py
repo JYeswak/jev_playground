@@ -16,6 +16,24 @@ SHEET = ROOT / "work/miniwob-jev/run-after-rotation.sh"
 FAKE_KEY = f"{'fake'}-{'run'}-{'sheet'}-{'key'}"
 
 
+def arm_names(path: Path) -> list[str]:
+    return [
+        line.strip()
+        for line in path.read_text().splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+
+
+def assert_combined_arm_list(seen_arms: list[str], path: Path) -> None:
+    expected = ",".join(arm_names(path))
+    if not seen_arms:
+        raise AssertionError("stub runner emitted no arm list")
+    if seen_arms[-1] != expected:
+        raise AssertionError(
+            f"combined arms {seen_arms[-1]!r} != committed {expected!r}"
+        )
+
+
 class RotationSheetTests(unittest.TestCase):
     def run_sheet(
         self,
@@ -133,7 +151,10 @@ class RotationSheetTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("ROTATION SHEET COMPLETE", result.stdout)
         self.assertEqual(result.stdout.count("KEY: OK"), 7)
-        self.assertEqual(seen_arms[-1], "quoted,none")
+        arm_list = ROOT / "work/miniwob-jev/v3-combined-arm-list.txt"
+        assert_combined_arm_list(seen_arms, arm_list)
+        with self.assertRaises(AssertionError):
+            assert_combined_arm_list([*seen_arms, "planted-arm-not-in-file"], arm_list)
         self.assertEqual(result.stdout.count("provenance:"), 7)
 
     def test_live_stale_label_requires_resume(self):
