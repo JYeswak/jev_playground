@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { readFile, readdir, stat } from 'node:fs/promises';
 import { basename, join, resolve } from 'node:path';
-import { readRow } from './src/index.ts';
+import { readRow } from '../../kit/src/client.ts';
 
 export function numericScores(data) {
   if (!data || typeof data !== 'object') return [];

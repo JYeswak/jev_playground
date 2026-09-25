@@ -18,7 +18,7 @@
  * Pure core (gradeQuestion) is unit-tested with a fake asker; measure() drives live calls
  * through an injectable ask() defaulting to askJev.
  */
-import { askJev } from './src/index.ts';
+import { askJev } from '../../kit/src/client.ts';
 
 export const DEFAULT_THRESHOLD = 0.5;
 export const NEAR_WINDOW = 0.1;
