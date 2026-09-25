@@ -113,8 +113,12 @@ budget of approximately:
 - code-plus-Noul arm: $1.3975 + $0.1153 = $1.5128;
 - both arms: **$2.9103**, below the fixed **$3.00** cap.
 
-Record actual spend. Stop the live arm immediately on HTTP 402 or credit
-exhaustion; do not retry beyond that stop or silently change models. If the
+Record actual spend. Stop the live arm immediately on HTTP 401 (unauthorized),
+HTTP 402 (billing/credit exhaustion), or key rejection; do not retry beyond
+that stop, silently continue, or silently change models. Joshua may rotate the
+key during a run, but a 401/402-stopped arm is an incomplete partial and is
+`NOT-SCORED`. It may resume only from a new committed preregistration note
+naming the resume `k`; never restart or append under this receipt. If the
 combined projected spend would exceed $3 before both arms have complete rows,
 stop and report an incomplete partial, not a battle verdict.
 
