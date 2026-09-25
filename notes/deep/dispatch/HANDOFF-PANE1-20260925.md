@@ -1,176 +1,266 @@
-# Pane 1 handoff, 2026-09-25 ~17:15Z (AmberWillow, conductor)
+# Pane 1 handoff: restart document (2026-09-25, written ~17:35Z)
 
-Written by pane 1 before Joshua restarts all panes. **Start with "Quiet state and restart"
-directly below**, then `AGENTS.md` (RULE 15 is new today), then the rest of this file. CI green on
-`59808fc` (run 36164482100); nightly README stranger run green (36135948301).
+You are **AmberWillow**, pane 1 (tmux `%18`), the conductor of the `jev` NTM session. Joshua
+restarted every pane after ordering the fleet quiet. This file is everything you need to pick the
+work back up. Read it top to bottom once, then `AGENTS.md` (RULE 15 is new today, and RULE 0:
+Joshua's word overrides everything). Then do "First actions".
 
-## Quiet state and restart (2026-09-25 ~17:30Z)
+State at writing: HEAD `e660d5c4`. CI was RED at `f7fb6c7` (two tests unregistered);
+`e660d5c4` registers them, so the next CI run should be green; confirm it. The nightly README
+stranger run last passed as run 36135948301. No pane has a running process, and no live (paid)
+run is in progress.
 
-Joshua ordered the fleet quiet with no dispatches, then a restart of all panes. Every pane
-replied QUIET and wrote a handoff:
+## First actions, in order
 
-| pane | agent | handoff | sha | resume with |
-|---|---|---|---|---|
-| 2 | CopperHeron | `notes/deep/dispatch/HANDOFF-CopperHeron-20250925.md` | `3de3a195` | `jev-yru2`: two blind labellers on `work/jev-yru2-public/commands.jsonl` (extract `5b368355`), prompt `label_prompt.md` |
-| 3 | IvoryCreek | `notes/deep/dispatch/HANDOFF-IvoryCreek-20250925.md` | `95435c5f` | `jev-9gtw.4.2`: fix in working tree, uncommitted: `text_candidates.py`, `test_text_candidates.py` |
-| 4 | OrangeFrog | `notes/deep/dispatch/HANDOFF-OrangeFrog-20250925.md` | `eac40895` | `jev-jy7t.1.13`: code at `31169ec4`; 160-episode Docker baselines not yet run |
-| 5 | WindyLantern | `notes/deep/dispatch/HANDOFF-WindyLantern-20260925.md` | `d4c94471` | `jev-9gtw.4`: held-out live run still running (below) |
+1. Sync and look:
+   ```bash
+   cd /Users/josh/Developer/jev && git fetch -q origin main && git merge -q --ff-only origin/main
+   br sync --import-only; br ready --json
+   python3 scripts/ci-main-status.py
+   JEV_WATCH_PANES=2,3,4,5 JEV_WATCH_INBOX_ROOT=/nonexistent python3 scripts/fleet-idle-watch.py --once
+   ```
+2. **Ask Joshua whether the quiet order is lifted** before sending any unit. He said: "let all
+   agents go quiet - dont dispatch anymore. once project is quiet we'll restart all panes after a
+   proper handoff is written." Do not assume the restart ended the quiet order.
+3. When he lifts it, send each worker pane one ntm message: its agent name, its handoff path, "read
+   AGENTS.md RULE 15 first", and the next step from the table below. Panes 3-5 restarted at
+   17:26:54-17:27:14Z and have **not** yet been told who they are. `resolve_pane_identity` is stale
+   for `%27` (it answers StormyCondor or MagentaRidge); the table below is right.
+4. Verify the first commit each pane sends, as non-author (method under "How pane 1 works").
 
-Three file names say 2025 instead of 2026; they are today's files. Corrections pane 1 found when
-it read them: CopperHeron's "uncommitted" `label_prompt.md` was committed in `3de3a195`;
-IvoryCreek's "jev-ja32 reopened, do not close" is out of date, because pane 1 closed `jev-ja32`
-afterwards on the no-consumer outcome (HOLD on new Jev omp tools).
+## The fleet
 
-**The one thing that is not quiet: the MiniWoB held-out run.** PID `30607` (`infisical run ...
-run-after-rotation.sh --live --steps combined`) and `30641`, run root
-`var/agent-tmp/jev-9gtw-heldout-live-rerun.3921/`. It is a **direct child of pane 5's omp process
-(`3921`)**, so restarting pane 5 kills it. Its keyless baseline finished at 1,250 rows, and at
-about 17:25Z it started the paid phase: 625 held-out Jev episodes with arms quoted, none and
-color. Update 17:26Z: the paid phase is running (`jev_arm.py
-live`, pid 41736), writing `work/miniwob-jev/rows/miniwob-jev-v3-heldout.s0.jsonl`, untracked: 15
-rows in the first ~80 s, so about an hour for 625 if the rate holds. Restart panes 1-4 freely.
-Restart pane 5 only after the run exits, or after Joshua chooses to stop it. Any later relaunch
-should be a `hub op:start` supervised process (persist), so it survives pane restarts. When it
-exits, pane 5's handoff says what to check: complete 625 rows or record NOT_RUN/incomplete, never
-score a partial set.
+| pane | tmux | agent | launch (from repo root) | handoff | resume with |
+|---|---|---|---|---|---|
+| 1 | %18 | AmberWillow (you) | `omp --auto-approve` | this file | conductor |
+| 2 | %26 | CopperHeron | `omp --profile claude` | `notes/deep/dispatch/HANDOFF-CopperHeron-20250925.md` (`3de3a195`, `7a72bad3`) | `jev-yru2` labels |
+| 3 | %27 | IvoryCreek | `omp --profile codex` | `notes/deep/dispatch/HANDOFF-IvoryCreek-20250925.md` (`95435c5f`) | `jev-9gtw.4.2` fix |
+| 4 | %32 | OrangeFrog | `omp --profile codex` | `notes/deep/dispatch/HANDOFF-OrangeFrog-20250925.md` (`eac40895`) | `jev-jy7t.1.13` baselines |
+| 5 | %29 | WindyLantern | `omp --profile codex` | `notes/deep/dispatch/HANDOFF-WindyLantern-20260925.md` (`d4c94471`) | `jev-9gtw.4` held-out relaunch |
 
-**Restart commands** (from `/Users/josh/Developer/jev`): pane 1 `omp --auto-approve`; pane 2
-`omp --profile claude`; panes 3-5 `omp --profile codex`. After each restart, ntm the pane its agent
-name (the identity file for %27 is stale), its handoff path, and "read AGENTS.md RULE 15 first".
-Supervised processes that keep running across restarts: `fleet-idle-watch`, `p2-mailmon`,
-`p3-mailmon`.
+Three handoff file names say 2025; they are today's. Corrections to them, found when pane 1
+read them:
+- CopperHeron's "uncommitted `label_prompt.md`" was committed in `3de3a195`.
+- IvoryCreek's "jev-ja32 reopened, do not close" is out of date: pane 1 closed `jev-ja32` on the
+  no-consumer outcome (see results).
+- WindyLantern's run is no longer running (next section).
 
-**Tracked files modified in the shared tree with no owner in any handoff** (leave them; do not
-stage, revert or stash): `ARC.md`, `docs/demos/tick.md`,
-`docs/demos/upstream-repro/loss-depth-pokejev-20260925.md`, `notes/deep/next-gen/BRIEF.md`,
-`notes/deep/omp-kit-load-census.tsv`, `notes/deep/omp-kit-upstream-proofs.md`,
-`upstream/MANIFEST.tsv`, `work/jev-question-writing/w74-oof-auroc.py`,
-`work/loss-depth/pokejev/autopsy.py`, `work/nev-differential/DIFF-RECEIPT.json`,
-`work/nev-differential/PREREGISTER-DIFF.md`, `work/nev-injection/INSTALL-RECEIPT.txt`,
-`work/nev-routing/tool-select-derived.json`, `work/nev-routing/tool-select-extract.json`,
-`work/poke-jev/stage-b/receipt.json`, `work/skill-routing/pairs.jsonl`. Plus 167 untracked paths.
-Ask the restarted panes whether any of these are theirs before anyone touches them.
+Helpers that survive restarts (`hub ps`): `fleet-idle-watch` (restart it after changes to
+`scripts/fleet-idle-watch.py` or `work/omp-jev-review/surface-census.py`), `p2-mailmon`,
+`p3-mailmon`. `ReadmeStrangerRun` (the README owner) was a hub helper of the old pane 1 and is
+gone. Re-create one when a result needs the README. It must keep stages 15/95/97, readme-gate
+and the claim-coverage floor. README is 54,824 B (48 B under the limit), and claim coverage is
+114/115, the floor. So new text replaces old text.
 
-## Who is who
+## Per bead: exactly where each unit stopped
 
-| pane | tmux | agent (Agent Mail) | profile | bead(s) now |
-|---|---|---|---|---|
-| 1 | %18 | **AmberWillow** (you) | launched as `omp --auto-approve` | conductor: verify, dispatch, close |
-| 2 | %26 | CopperHeron | claude | `jev-yru2` public command set (prereg stage) |
-| 3 | %27 | IvoryCreek | codex | `jev-9gtw.4.2` page-text candidates (awaiting your check) |
-| 4 | %32 | OrangeFrog | codex | `jev-jy7t.1.13` Emerald segment 2 (keyless design) |
-| 5 | %29 | WindyLantern | codex | `jev-9gtw.4` MiniWoB held-out LIVE run in progress |
+**`jev-9gtw.4` (WindyLantern): MiniWoB v3, P1.**
+- Isolated arms are verified (`47b1eb9`): quoted 16/16 PASS, none 8/11 PASS, date_time 5/10
+  dev-only, page_text 10/35 FAIL, drag 12/87 FAIL. Colour's 0/12 was a harness bug (it read
+  `color`; MiniWoB provides `bg_color`/`fg_color`). The rerun scored 8/12, exactly the PASS line
+  (`858e0cc6`, `00b213e3`).
+- The combined held-out arm list is `quoted,none,color` (`work/miniwob-jev/v3-combined-arm-list.txt`).
+  Comma arms were fixed at `7ff8dac`; the arm-list test at `e65f2cdb`.
+- **The held-out live run ended when pane 5 was restarted** (it was a child of pane 5's omp).
+  Run root `var/agent-tmp/jev-9gtw-heldout-live-rerun.3921/`:
+  - Keyless baseline complete: 1,250 rows.
+  - Paid phase: 20 of 625 rows, 17:25:15Z to 17:27:03Z. 131 Jev calls, 1,021,276 input tokens,
+    all `jev-1.13.0`, code_sha256 `9909a066`.
+  - The rows are in `work/miniwob-jev/rows/miniwob-jev-v3-heldout.s0.jsonl`, untracked, sha256
+    `b424d191...`.
+  - NOT SCORED: a partial set is never scored.
+- **Next:** relaunch with `hub op:start` (persist), never inside a pane's own shell, so a restart
+  cannot kill it. Before relaunching:
+  - The sheet refuses an existing held-out label file unless `--resume`
+    (`run-after-rotation.sh:134`). Decide in a committed note: resume the 20 rows (same code sha,
+    model and arms), or start fresh by moving the file aside. Never delete it (RULE 1).
+  - The combined step always recomputes baselines (`run-after-rotation.sh:141`, about 50 min
+    keyless) unless changed.
+  - Then run it through `infisical run ... work/miniwob-jev/run-after-rotation.sh --live --steps
+    combined --run-root <root> [--resume]`. Spend is approved.
+- When it completes, check each of these yourself:
+  - the keys equal the prereg held-out set;
+  - `jev-1.13.0` on every row;
+  - hashes, noting the gap that rows hash `jev_arm.py`, not `game-floors/miniwob/run.py`;
+  - McNemar against v1 on the same keys, as preregistered.
 
-`resolve_pane_identity` is stale for %27 (says StormyCondor/MagentaRidge); the table above is
-right. All panes 2-5 were restarted today after the rollout (`6b47a96`), so they have the review
-extension, the Infisical key provider and secret redaction. `ReadmeStrangerRun` was a hub subagent
-of pane 1 (README owner); it dies with this session; re-spawn a README owner when a result needs
-the README (it must keep stages 15/95/97, readme-gate and the claim-coverage floor; README is
-54,824 B, 48 B under the limit, coverage 114/115 = floor, so text must be replaced, not added).
+**`jev-9gtw.4.2` (IvoryCreek): page-text candidates, P2.**
+- `026d1230` is DEFECTIVE: `build_candidates` inserted the grader's answer (`derive_needed_text`)
+  at index 0, so coverage was 1.000 by construction.
+- Without that, the generic builder covered 4 of 5 captured tasks. text-transform was not covered.
+- A fix is in IvoryCreek's working tree, uncommitted: `work/miniwob-jev/text_candidates.py` and
+  `test_text_candidates.py`. Its handoff lists them.
+- Still to do:
+  - a test that the output is unchanged when the grader is patched to raise;
+  - a generic rule for adjacent single-character spans;
+  - 20 no-model observations per page-text task (captured through a separate scratch root);
+  - coverage and median index of the needed string;
+  - request size via `scripts/jev-state-size.py`.
+- Registered in `TESTS.md` with the defect stated. **Verify:** keep the grader out of reach and
+  recount coverage yourself.
+- Do not let anyone edit `jev_arm.py` or `run.py` while a MiniWoB live run is alive.
 
-## Do first (pending on you)
+**`jev-yru2` (CopperHeron): public command set for the gate-question retry, P2.**
+- Prereg `b3cfcece`. Repo cohort frozen as a rule: `topic:github-actions` top 10 by stars at
+  17:01:59Z (`20f99ed3`). Extract `5b368355` (bfc19b43 superseded: duplicate row ids).
+- 7 MIT repos, 3 excluded for no license. 110 rows = 10 target-shape + 100 seeded non-target.
+  4 of the target rows come from one repo. States all FITS.
+- Thresholds 70% / +5 / +2.0 pp are PROPOSED (descriptive only).
+- Label prompt `work/jev-yru2-public/label_prompt.md`. Labeller A was started around 17:20Z and
+  stopped unfinished; no label file exists.
+- **Next:** two blind labellers, with the concrete model ids recorded (not just the aliases
+  `smol`/`slow`). Then pane 1 adjudicates the disagreements.
+- Live readiness needs 10 target-HARM rows. With exactly 10 target-shape rows, one no-harm label
+  means UNDERPOWERED, and that is an acceptable reported outcome. No live call in this unit.
 
-1. **`jev-9gtw.4.2`** (IvoryCreek): checked `026d1230` at ~17:20Z, DEFECT (bead comment):
-   `build_candidates` inserted `derive_needed_text` (the answer) at position 0, so coverage was
-   1.000 by construction. Without it the generic builder covers 4 of 5 captured tasks
-   (text-transform not covered). Pane 3 is fixing: builder never reads the grader; generic
-   adjacent-character rule; a test that output is unchanged with the grader patched to raise;
-   20 no-model observations per page-text task; request size. Verify its next commit the same
-   way (remove the grader from reach, recount coverage and needed-string index yourself).
-2. **`jev-yru2`** (CopperHeron): prereg NAME-GAP resolved and extract verified at ~17:25Z
-   (`20f99ed3`, `bfc19b43`): cohort frozen as a rule, MIT-only with per-file license evidence,
-   10 target-shape rows (4 from one repo), thresholds PROPOSED. Next from pane 2: two blind label
-   files, then you adjudicate the disagreements. Live readiness needs 10 target-HARM rows, so one
-   no-harm label makes it UNDERPOWERED; that is an acceptable reported outcome.
-3. **MiniWoB held-out run** (pane 5): pids 30607/30641, `run-after-rotation.sh --live --steps
-   combined`, arms `quoted,none,color` (from `work/miniwob-jev/v3-combined-arm-list.txt`), run root
-   under `var/agent-tmp/`. Do not touch it. When it lands: recount rows, check keys equal the
-   prereg held-out set, model `jev-1.13.0`, code hashes (note: rows hash jev_arm.py, not run.py;
-   gap recorded), then McNemar vs v1 on the same keys as preregistered.
+**`jev-jy7t.1.13` (OrangeFrog): Emerald segment 2, P2.**
+- Code and prereg at `31169ec4`. Segment from recorded rows 299/303 of `states/emerald-boot.jsonl`:
+  alternating x=1/x=2 starts, goal is a position change, cap 50.
+- Baselines: uniform, and state-blind with segment-1 frequencies. `live_segment.py` receipt now
+  writes `key_status`.
+- The first Docker run was refused (all 80 invalid: seed-1 drift). Fixed by trace replay; the
+  seed-1 smoke passed. The full 160-episode Docker run has NOT been run. UBS final status is
+  pending.
+- **Next:** UBS, then both 80-seed policies in the pinned `jev-pokeagent-runtime:20260925` image,
+  then `jev-state-size.py`, then `power_mwu.py --control-policy state_blind --cap 50
+  --fixed-control`, then commit.
+- Acceptance requires the state-blind policy to fail on this goal (goal rate < 50%, or median at
+  least 2x Jev's segment-1 median). Otherwise pick another segment and say why.
+- `test_segment2_baselines.py` is not yet non-author verified.
 
-## Waiting on Joshua (ask once, do not act)
+Other open beads (not active): `jev-3e2i` and `jev-jy7t.1.4` (CopperHeron, parked), `jev-k9z`,
+`jev-9gtw`, `jev-jy7t`, `jev-jy7t.1` (parents, pane 1), `jev-1yqu` (upstream issue #45, no
+maintainer reply), `jev-oxdq` (josh), and the blocked set in "Waiting on Joshua".
 
-- `work/gate-question-gap/extract-5.jsonl` (55d30a4) and `extract-5-extension.jsonl` (f3f544f):
-  raw session commands published to the public repo by pane 2. Scanned: 0 credential-shaped
-  spans, 0 PRIVATE matches. Options: leave, delete from tree, or scrub history (force push).
-  Do not delete without his word (RULE 1).
-- `/never-give-up` skill location (bead `jev-vbh.5`); not found on grokbot, ~/.grok, Brain, GitHub.
-- PokéJev on the public Showdown server needs a bot account (`jev-jy7t.1.10`).
-- Foundry / franken-harvest bugs live in his other repos (blocked beads `jev-foundry-*`, `jev-route-*`,
-  `jev-stampcheck-*`).
+## Waiting on Joshua (ask once each, do not act)
 
-## Today's results (all non-author checked; cite these, not memory)
+1. **Is the quiet order lifted?** (First actions, step 2.)
+2. Two raw session-command files that pane 2 published to the public repo:
+   `work/gate-question-gap/extract-5.jsonl` (`55d30a4`) and `extract-5-extension.jsonl`
+   (`f3f544f`). Scanned: 0 credential-shaped spans, 0 PRIVATE matches. The choices are to leave
+   them, delete them from the tree, or scrub history (force push). Never delete without his word.
+3. Where `/never-give-up` lives (`jev-vbh.5`). It was not on grokbot, `~/.grok`, Brain, or GitHub.
+4. A Showdown bot account (`jev-jy7t.1.10`), and fixes in his other repos (the `jev-foundry-*`,
+   `jev-route-*` and `jev-stampcheck-*` blocked beads).
 
-- **Key rotated 13:14Z**; `scripts/key-status.py` says OK. Leaked key fingerprint in
-  `scripts/key-revoked.tsv`. Panes have no key in their env; omp tools/extensions fetch it from
-  Infisical in-process (`work/jev-client/src/infisical-key.ts`, 10-min cache).
-- **OSWorld Best-of-N** (`jev-9gtw.2`, closed, R112): lost to best single archive on 337 tasks
-  (296.4 vs 303.4, McNemar p=0.109); 12 max_tokens_exceeded refusals were 71% of the loss.
-- **Usage router** (`jev-vbh.4`, closed, R111): short web goals 13/19 < 0.833 bar; stays shadow.
-- **Diff reviewer** (`jev-k9z.2`, closed): advisory line at boundary >= 0.9; loads in every session
-  (`.omp/extensions/jev-review.ts`); compound git commands are not-applicable (`1eb4bf1`).
-- **Gate-question pass** (`jev-pvdp`, closed, R113): UNDERPOWERED, 1 target row in 3,838 fleet
-  commands (0.156/hour); retry via public set = `jev-yru2`.
-- **Emerald segment 1** (`jev-jy7t.1.12`, closed): Jev 80/80 median 62; random 26/33 at 271;
-  state-blind (Jev's pooled button frequencies, Docker `24d9ffff`) 80/80 at 67. Gain is mostly
-  the button prior. README "Where Jev lost" has it (`283aa72a`). Segment 2 = `jev-jy7t.1.13`.
-- **MiniWoB v3 isolated arms** (`47b1eb9`): quoted 16/16 PASS, none 8/11 PASS, date_time 5/10
-  dev-only, page_text 10/35 FAIL, drag 12/87 FAIL; colour 0/12 was a harness bug (read `color`,
-  MiniWoB has `bg_color`), rerun 8/12 = PASS line exactly (`858e0cc6`, `00b213e3`).
-- **Tools built today**: `scripts/jev-state-size.py` (32k limit, band from billed tokens; FITS
-  324/NEAR 10/OVER 3 on OSWorld), `row-provenance-check.py` now fails a non-JSON first line and
-  checks answer rows, fleet line `Jev tools 24h:` (surface-census), nightly stranger line in
-  `ci-main-status.py`, `.omp/skills/jev-tools/SKILL.md`. `jev-ja32` closed: no real-work consumer
-  for the four omp Jev tools; HOLD on new Jev omp tools until one has a consumer. The fleet line
-  says "every tool called" but those calls were rollout/smoke tests, not organic use.
-- **AGENTS.md RULE 15** (Joshua: "derive test patterns instead of creating them"): fixtures
-  captured not typed; assert effects; every bar names EXTERNAL/INCUMBENT/ARITHMETIC/DOCS or is
-  PROPOSED; feasibility before spend. Audit `1de0f39`: 45 bars, 32 UNSOURCED, 0 EXTERNAL.
-  External MiniWoB rates now in `work/miniwob-jev/external-rates.tsv` (CC-Net Table 3, tested).
+## What is true today (cite these, not memory)
 
-## The loop (what pane 1 does every tick)
+- **Key** rotated 13:14Z; `scripts/key-status.py` says OK.
+  - The leaked key's fingerprint is in `scripts/key-revoked.tsv`; runners refuse it.
+  - Panes have no key in their environment. omp tools and extensions fetch it from Infisical in
+    memory (`work/jev-client/src/infisical-key.ts`, 10-min cache, `6b47a96`).
+  - Live scripts use `infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --`.
+- **Rollout** (Joshua: "roll out all features to every pane"): every session loads the four Jev
+  tools (`jev_rerank`, `jev_claim_check`, `jev_flag`, `jev_screen`) and the diff reviewer
+  (`.omp/extensions/jev-review.ts`). The reviewer adds one advisory line at boundary >= 0.9 and
+  never blocks; compound git commands are not-applicable (`1eb4bf1`).
+- **`jev-ja32` closed:** no real-work step calls any of the four tools; every recorded call was a
+  test. HOLD on new Jev omp tools until one has a consumer. The fleet line "every tool called"
+  counts those test calls.
+- **Losses and non-results, each with a NEGATIVE_EVIDENCE row:**
+  - Usage router R111: short web goals 13/19 < 0.833, stays shadow.
+  - OSWorld Best-of-N R112: 296.4 vs 303.4 on 337 tasks, p=0.109. 12 over-limit refusals were
+    71% of the loss.
+  - Gate-question R113: 1 target row in 3,838 fleet commands, UNDERPOWERED.
+- **Emerald segment 1** (`jev-jy7t.1.12`, closed):
+  - Jev 80/80, median 62 macros.
+  - Random 26/33, median 271.
+  - State-blind with Jev's own button frequencies 80/80, median 67 (Docker `24d9ffff`).
+  - So the gain is mostly the button prior. In README "Where Jev lost" (`283aa72a`).
+- **Tools built today:**
+  - `scripts/jev-state-size.py`: 32k documented limit, band from 325 billed calls. On OSWorld:
+    FITS 324 / NEAR 10 / OVER 3, and one answered request was NEAR, so no uniform NEAR rule works.
+  - `scripts/row-provenance-check.py`: fails a non-JSON first line; checks answer rows.
+  - `scripts/key-status.py`.
+  - The fleet-line additions (Jev tools 24h, key exposure, nightly stranger status).
+  - `.omp/skills/jev-tools/SKILL.md`.
+  - `work/miniwob-jev/external-rates.tsv`: CC-Net Table 3 human, CC-Net and aggregated-SotA
+    rates, tested against the PDF.
+- **AGENTS.md RULE 15** (Joshua: "derive the test patterns instead of creating them (making shit
+  up)"):
+  - Fixtures are captured, never typed.
+  - Tests assert effects, not inputs.
+  - Every bar is EXTERNAL / INCUMBENT / ARITHMETIC / DOCS, or it is PROPOSED and cannot gate.
+  - Feasibility comes before spend: the solving action is offered, and the request fits the limit.
+  - Audit `1de0f39`: of 45 bars, 32 are UNSOURCED and 0 EXTERNAL.
 
-```bash
-cd /Users/josh/Developer/jev && git fetch -q origin main && git merge -q --ff-only origin/main
-br sync --import-only; br ready --json            # claim the highest bead you did NOT author
-python3 scripts/ci-main-status.py                  # CI + nightly stranger line
-JEV_WATCH_PANES=2,3,4,5 JEV_WATCH_INBOX_ROOT=/nonexistent python3 scripts/fleet-idle-watch.py --once
-```
+## How pane 1 works (the loop)
 
-- Joshua's standing prompt: "Mission: validate Jev, build tools from what survives, liven an omp
-  surface, dogfood it, keep the README a stranger can run... Claim the highest you did not author."
-  When every ready bead is yours and assigned, verify pane work, unblock, and dispatch.
-- **Verify as non-author** in a fresh `git clone --local` under /tmp: run the test, plant 1-3
-  defects (each must fail a test), restore byte-identical (`cmp`), recount numbers from rows with
-  your own code. Close with a VERDICT reason naming commits; never a placeholder reason.
-- **Dispatch**: `ntm send jev --pane=N '...'` (one line, ~1 KB ok); file beads with WHAT/WHY/
-  ACCEPTANCE, `--actor AmberWillow`, assign the pane's agent name.
-- **Commits**: stage explicit paths, `git commit --only ... -- <paths>`, subject names a level
-  (`[pending]`/`[test]`/`[mutation]`/`[live]`); bead store: `br sync --flush-only` then commit
-  `.beads/issues.jsonl` alone. Before pushing, `git log origin/main..main` and look at other panes'
-  commits (raw session text must never go public).
-- **Shared files** (`TESTS.md`, `EVAL.md`, `NEGATIVE_EVIDENCE.md`, bead store): reserve only for
-  the seconds of the edit (Agent Mail MCP `file_reservation_paths` / `release_file_reservations`,
-  or `am file_reservations reserve|release ~/Developer/jev AmberWillow <paths>`); ask holders by ntm
-  to release. `TESTS.md` Run: commands must be on one line (runner parses them); stage 70
-  (`foundation/gates.d/70-tests-registry-sync.sh`) fails on unregistered tests.
-- **Restarting a pane** (Joshua authorized rollout restarts): only at a unit boundary; Escape,
-  `/exit`, then `cd /Users/josh/Developer/jev && omp --profile <codex|claude>`, then ntm the pane its
-  identity, bead and next step.
-- **Supervised processes** (`hub ps`): `fleet-idle-watch` (restart after watcher/census code
-  changes with `hub op:restart name:fleet-idle-watch`), `p2-mailmon`, `p3-mailmon`.
-- **Live spend is approved** (Joshua, 2026-09-21), but only after a verified prereg and a
-  feasibility check: key via `infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --`,
-  `scripts/key-status.py` first, stop on 401/402.
+- **Joshua's standing prompt:** "Mission: validate Jev, build tools from what survives, liven an
+  omp surface, dogfood it, keep the README a stranger can run... Claim the highest you did not
+  author."
+  - If a ready bead exists that you did not write, claim it.
+  - Otherwise verify pane work, unblock, and dispatch. Dispatch only if not under a quiet order.
+- **Non-author verification**, every time a pane sends a sha:
+  - Work in `git clone --local /Users/josh/Developer/jev /tmp/<x>`.
+  - Run the test. Plant 1-3 defects, each of which must fail a test. Restore byte-identical
+    (`cmp`).
+  - Recount the headline numbers from the rows with your own code.
+  - Hide local-only venvs and untracked clones when a test could depend on them.
+  - Record the result on the bead. Close only with a VERDICT reason that names commits.
+- **Dispatch:**
+  - `ntm send jev --pane=N '<one line>'`.
+  - File beads with WHAT/WHY/ACCEPTANCE, `--actor AmberWillow`, assignee set to the agent name.
+  - Every packet names the mission stage, the tools, and the acceptance shape (AGENTS.md "Every
+    dispatch packet").
+- **Commits:**
+  - Stage explicit paths; use `git commit -q --only -m "[level] ..." -- <paths>`. Levels are
+    pending, test, mutation, live and oracle.
+  - For the bead store: `br sync --flush-only`, then commit `.beads/issues.jsonl` alone.
+  - Before pushing, read `git log origin/main..main` and check other panes' commits. Raw session
+    text must never be pushed.
+- **Shared files** (`TESTS.md`, `EVAL.md`, `NEGATIVE_EVIDENCE.md`, the bead store):
+  - Reserve only for the seconds of the edit: Agent Mail MCP `file_reservation_paths` /
+    `release_file_reservations`, or `am file_reservations reserve|release ~/Developer/jev
+    AmberWillow <paths>`.
+  - Ask holders by ntm to release. Holders who sleep until a lease expires are a known failure.
+  - Every `TESTS.md` `Run:` command must be on one line.
+  - Stage 70 fails CI on any unregistered test. After a pane adds a test, check
+    `bash foundation/gates.d/70-tests-registry-sync.sh`.
+- **Restarting a pane:** only at a unit boundary, and never while it hosts a live run. Send Escape,
+  then `/exit`, then `cd /Users/josh/Developer/jev && omp --profile <p>`. Then ntm the pane its
+  identity and next step.
+- **Live spend is approved** (Joshua, 2026-09-21), but only after a non-author-verified prereg and
+  a keyless feasibility check. Run `scripts/key-status.py` first; stop on 401/402; run as a
+  supervised process.
 
-## Traps that cost time today (do not repeat)
+## Traps that cost time today
 
-- A check that passes only on this Mac: hide local venvs (`/tmp/jev-miniwob-jev/venv`) and
-  untracked clones before closing; CI runners have neither.
-- A `--fake` path that differs from `--live` proves nothing; drive the live path with a stub.
-- Release a held-out/combined step only after reading the dev gates it depends on.
-- A results file where every row has `child_error` / null `final` is a crash, not a result.
-- A pane blocked inside a long foreground command cannot read steering; interrupt it (SIGINT to
-  the run, not the pane) if a wrong run must stop.
-- `br close` with a placeholder reason sticks; reopen and close again if it happens.
-- Never print the key; key checks compare fingerprints (`/tmp/keyreal.py`-style, paths only).
+- A check that passes only on this Mac. CI runners have no `/tmp/jev-miniwob-jev/venv` and no
+  untracked clones.
+- A `--fake` path that differs from `--live`. Drive the live path with a stub runner.
+- A test that asserts the value passed in rather than its effect (the comma arm list).
+- A fixture typed by hand (colour `"color": "red"`).
+- A grader leaking into the thing it grades (`derive_needed_text`).
+- A combined or held-out step released before its dev gates were read.
+- Rows with `child_error` / null `final` treated as a result. That is a crash, not a result.
+- A long run launched inside a pane's own shell. A pane restart kills it, as happened to the
+  MiniWoB held-out run at 20/625.
+- A pane blocked inside a foreground command cannot read steering. Interrupt the run (SIGINT to
+  its pid), not the pane.
+- `br close` with a placeholder reason is permanent until reopened.
+- Never print the key. Key checks compare fingerprints, and scans print paths only.
+
+## Tracked files modified in the shared tree with no owner in any handoff
+
+Leave these alone: no staging, reverting or stashing. Ask the restarted panes whether any is
+theirs:
+
+- `ARC.md`
+- `docs/demos/tick.md`
+- `docs/demos/upstream-repro/loss-depth-pokejev-20260925.md`
+- `notes/deep/next-gen/BRIEF.md`
+- `notes/deep/omp-kit-load-census.tsv`
+- `notes/deep/omp-kit-upstream-proofs.md`
+- `upstream/MANIFEST.tsv`
+- `work/jev-question-writing/w74-oof-auroc.py`
+- `work/loss-depth/pokejev/autopsy.py`
+- `work/nev-differential/DIFF-RECEIPT.json`
+- `work/nev-differential/PREREGISTER-DIFF.md`
+- `work/nev-injection/INSTALL-RECEIPT.txt`
+- `work/nev-routing/tool-select-derived.json`
+- `work/nev-routing/tool-select-extract.json`
+- `work/poke-jev/stage-b/receipt.json`
+- `work/skill-routing/pairs.jsonl`
+
+Also IvoryCreek's two, listed above, and about 167 untracked paths.
