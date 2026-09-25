@@ -95,6 +95,14 @@ class FakeKey(unittest.TestCase):
         self.assertRegex(a, r"^apikey_[a-z0-9]{35}_[a-z0-9]{64}$")
         self.assertNotEqual(a, b)
 
+    def test_fake_key_carries_the_fakefake_marker_the_key_census_skips(self):
+        # jev-9ov4: 15 of 17 files the key-exposure census first counted held this probe's
+        # unmarked fakes. A 35-character segment starting `fakefake` is ours; the census reports
+        # it apart from real exposure and never pages it. The shape still matches .omp/secrets.yml,
+        # so omp still redacts it and the probe still tests redaction.
+        for _ in range(20):
+            self.assertTrue(probe.fake_key().startswith("apikey_fakefake"))
+
 
 if __name__ == "__main__":
     unittest.main()

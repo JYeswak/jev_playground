@@ -34,11 +34,15 @@ import threading
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ALPHABET = string.ascii_lowercase + string.digits
+# Every fake of ours starts its 35-character segment with this (jev-9ov4): the key-exposure census
+# (work/omp-jev-review/surface-census.py) reports such a match apart and never pages it. The shape
+# still matches .omp/secrets.yml, so omp still redacts it and this probe still tests redaction.
+FAKE_MARKER = "fakefake"
 
 
 def fake_key() -> str:
     part = lambda n: "".join(secrets.choice(ALPHABET) for _ in range(n))  # noqa: E731
-    return f"apikey_{part(35)}_{part(64)}"
+    return f"apikey_{FAKE_MARKER}{part(35 - len(FAKE_MARKER))}_{part(64)}"
 
 
 def verdict(answer: str | None, fake: str) -> str:

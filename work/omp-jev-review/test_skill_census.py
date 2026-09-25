@@ -518,7 +518,8 @@ class Cli(unittest.TestCase):
         self.assertEqual(lines[1], want)
         self.assertEqual(
             lines[2],
-            "Key exposure 24h: 0 session files hold a TypeSafe-shaped key (1 scanned)",
+            "Key exposure 24h: 0 session files hold an unmarked TypeSafe-shaped key "
+            "(1 scanned; 0 hold only marked fakes)",
         )
         out = io.StringIO()
         with (

@@ -102,13 +102,17 @@ claim nobody can check:
   keys in one file is one file; `flags: "i"` and `/.../i` literals are honoured; a missing or
   unparsable `secrets.yml` (empty, plain-only, a regex that does not compile, not `key: value`, a
   bad quoted value) and no session files are `NOT_RUN`, never zero; the CLI prints it as the third
-  line. Page: a new path pages pane 1 once (send injected), a second round and a restart (fresh
-  module, same state file) page nothing, a second path pages only itself, a failed send is retried,
-  0 or NOT_RUN pages nothing and writes no state, an unreadable state file is `Key page: NOT_RUN`,
-  and the forever loop pages in its first round. Plants, each restored byte-identical: drop the
-  24h window fails 1 of 18; print the match 11 (0 key-shaped strings in the failure output); page
-  every round 4.
-  Run: `python3 -m unittest work/omp-jev-review/test_key_exposure.py` (18 tests).
+  line. Marked fakes (35-character segment starting `fakefake`, what our tools generate): a file
+  holding only them is not counted and is reported as `M hold only marked fakes`; a marked fake
+  ahead of an unmarked key, on the same line or an earlier one, still counts. Page: a new path
+  pages pane 1 once (send injected), a second round and a restart (fresh module, same state file)
+  page nothing, a second path pages only itself, a failed send is retried, a file holding only
+  marked fakes pages nothing, 0 or NOT_RUN pages nothing and writes no state, an unreadable state
+  file is `Key page: NOT_RUN`, and the forever loop pages in its first round. Plants, each restored
+  byte-identical: drop the 24h window fails 1 of 18; print the match 11 (0 key-shaped strings in
+  the failure output); page every round 4; ignore the marker 2 of 21; only the first match on a
+  line 1 of 21.
+  Run: `python3 -m unittest work/omp-jev-review/test_key_exposure.py` (21 tests).
 - `work/fleet-idle-watch/test_fleet_idle_watch.py` — `scripts/fleet-idle-watch.py`'s classifier
   on process evidence (jev-6con), no tmux or ps: fixtures are the real process trees of jev panes
   0, 2, 4, 5 and two real screens, 2026-09-25. Both measured false readings: a screen with no
@@ -138,11 +142,12 @@ claim nobody can check:
   the non-author check's live `LEN=UNAVAILABLE ...` answer (planted file gone), a `cat:` error
   line, `none`, a missing field, a placeholder with the full 107-character length (also written
   `107.`), a placeholder
-  head with a non-placeholder tail. No answer is NOT_RUN. The fake key has the live shape and
-  differs per run. Plants, each restored byte-identical: REDACTED on the length alone fails 4 of
+  head with a non-placeholder tail. No answer is NOT_RUN. The fake key has the live shape,
+  differs per run, and starts its 35-character segment with the `fakefake` marker the key census
+  skips (jev-9ov4). Plants, each restored byte-identical: REDACTED on the length alone fails 4 of
   12; tail-only leak detection 1; head-only leak detection 1; head OR tail placeholder 1; no quote
-  stripping 2; only `$$` heads count 1.
-  Run: `python3 -m unittest work/omp-secret-probe/test_omp_secret_probe.py` (12 tests).
+  stripping 2; only `$$` heads count 1; an unmarked fake_key() 1 of 13.
+  Run: `python3 -m unittest work/omp-secret-probe/test_omp_secret_probe.py` (13 tests).
 - `work/citation-check/test/check.test.mjs` — citation extraction and fail-safe folding: planted
   cookbook rows, curly-quote normalization, missing-key review, transport-error review, invalid
   labels, empty claims without a model call, and README/nonce location behavior. Run:

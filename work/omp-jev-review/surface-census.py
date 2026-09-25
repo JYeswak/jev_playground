@@ -28,9 +28,13 @@ a pane older than the install) is not a read. It names how many skills in
 ~/.claude/skills/THIRD-PARTY-SKILLS.tsv were read at least once; no ledger is NOT_RUN.
 
 Key exposure (bead jev-9ov4): the third --fleet-line line counts session .jsonl files under both
-session roots modified in the last 24h, probe sessions included, that hold a string matching a
-`type: regex` entry of .omp/secrets.yml (the TypeSafe key shape; read from there, never copied
-here), and names the newest 3 paths with their mtimes. It prints paths only, never the match. A
+session roots modified in the last 24h, probe sessions included, that hold an unmarked string
+matching a `type: regex` entry of .omp/secrets.yml (the TypeSafe key shape; read from there, never
+copied here), and names the newest 3 paths with their mtimes. It prints paths only, never the
+match. A match whose segment after the first `_` starts with FAKE_MARKER (`fakefake`) is a fake
+one of our tools made (scripts/omp-secret-probe.py fake_key()); a file holding only such matches
+is counted apart as "hold only marked fakes" and never pages. Unmarked fakes written before the
+marker existed (2026-09-25) stay in the count until their files age out of the 24h window. A
 missing or unparsable secrets.yml, or no session files, is NOT_RUN. Why: 2026-09-25 05:57Z a pane
 printed the live key into a tool result, omp's session log stored it, and a manual scan found it
 50 minutes later; scripts/fleet-idle-watch.py pages pane 1 once per new path.
@@ -56,6 +60,7 @@ JUDGE_PROVIDER = "typesafe"
 SESSION_ROOTS = "~/.omp/agent/sessions, ~/.omp/profiles/*/agent/sessions"
 SECRETS = REPO / ".omp" / "secrets.yml"
 KEY_NEWEST = 3
+FAKE_MARKER = b"fakefake"
 REGEX_LITERAL = re.compile(r"^/(.+)/([a-z]*)$", re.S)
 REGEX_FLAGS = {"i": re.I, "m": re.M, "s": re.S}
 SKILL_LEDGER = HOME / ".claude" / "skills" / "THIRD-PARTY-SKILLS.tsv"
@@ -642,21 +647,37 @@ def secret_patterns(path):
     return patterns
 
 
-def holds_key(path, patterns):
-    """True at the first line matching any pattern. Streams bytes; never returns the match."""
+def is_marked(match):
+    """A match whose segment after the first `_` starts with FAKE_MARKER: a fake of ours."""
+    parts = match.split(b"_", 2)
+    return len(parts) > 1 and parts[1].lower().startswith(FAKE_MARKER)
+
+
+def key_kind(path, patterns):
+    """ "unmarked" at the first unmarked match, else "marked" if any match, else None.
+
+    Streams bytes line by line and reads every match on a line, so a marked fake ahead of a
+    real key never hides it. Never returns the matched text."""
+    marked = False
     with path.open("rb") as fh:
         for line in fh:
-            if any(p.search(line) for p in patterns):
-                return True
-    return False
+            for pattern in patterns:
+                for match in pattern.finditer(line):
+                    if not is_marked(match.group()):
+                        return "unmarked"
+                    marked = True
+    return "marked" if marked else None
 
 
 def key_exposure_line(files, now, have_sessions, secrets):
-    """'Key exposure 24h: N session files hold a TypeSafe-shaped key (S scanned); newest: ...'.
+    """'Key exposure 24h: N session files hold an unmarked TypeSafe-shaped key (S scanned; M hold
+    only marked fakes); newest: ...'.
 
     Every session file modified in the last 24h, probe sessions included (a key printed in a
-    probe is on disk all the same). The newest KEY_NEWEST paths with their mtimes; never the
-    matched text.
+    probe is on disk all the same). M counts files whose every match carries FAKE_MARKER; they
+    are not in N and not named. Unmarked fakes from before the marker (2026-09-25) stay in N until
+    their files age out of the 24h window. The newest KEY_NEWEST of the N paths with their
+    mtimes; never the matched text.
     """
     head = "Key exposure 24h:"
     try:
@@ -667,23 +688,25 @@ def key_exposure_line(files, now, have_sessions, secrets):
     if not have_sessions:
         return f"{head} NOT_RUN no omp session files under {SESSION_ROOTS}"
     cutoff = now.timestamp() - 24 * 3600
-    exposed, scanned, unreadable = [], 0, 0
+    exposed, scanned, marked, unreadable = [], 0, 0, 0
     for path in files:
         try:
             mtime = path.stat().st_mtime
-            hit = mtime >= cutoff and holds_key(path, patterns)
+            kind = key_kind(path, patterns) if mtime >= cutoff else None
         except OSError:
             unreadable += 1
             continue
         if mtime < cutoff:
             continue
         scanned += 1
-        if hit:
+        if kind == "unmarked":
             exposed.append((mtime, str(path)))
-    note = f", {unreadable} unreadable" if unreadable else ""
+        elif kind == "marked":
+            marked += 1
+    note = f"; {unreadable} unreadable" if unreadable else ""
     line = (
-        f"{head} {len(exposed)} session files hold a TypeSafe-shaped key "
-        f"({scanned} scanned{note})"
+        f"{head} {len(exposed)} session files hold an unmarked TypeSafe-shaped key "
+        f"({scanned} scanned; {marked} hold only marked fakes{note})"
     )
     if not exposed:
         return line

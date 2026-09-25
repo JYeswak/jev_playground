@@ -3,13 +3,16 @@
 Keyless, no model calls. At 2026-09-25T05:57Z a pane printed the live TypeSafe key into a tool
 result; omp's session log stored it and a manual scan found it 50 minutes later. The census line
 counts omp session .jsonl files modified in the last 24h (both session roots, probe sessions
-included) holding a string of the shape in .omp/secrets.yml, and names the newest 3 paths.
+included) holding an unmarked string of the shape in .omp/secrets.yml, and names the newest 3
+paths. A match whose 35-character segment starts with `fakefake` is a fake one of our tools made
+(scripts/omp-secret-probe.py fake_key()); it is reported separately and never pages.
 scripts/fleet-idle-watch.py pages pane 1 once per new path.
 
 Every key here is generated per run with the live shape (apikey_ + 35 + _ + 64 of [a-z0-9]) and
 is never printed: each line is checked for key text before any other assertion, with a message
 that does not quote it, so a planted "print the match" fails without writing a fake key into
-this pane's own session log.
+this pane's own session log. The unmarked ones stand in for a real key, so they cannot carry
+the marker; they never reach any output.
 """
 
 import contextlib
@@ -49,16 +52,16 @@ def fake(n):
     return "".join(random.choice(ALNUM) for _ in range(n))
 
 
-def fake_key(head=35, tail=64):
-    return f"apikey_{fake(head)}_{fake(tail)}"
+def fake_key(head=35, tail=64, marked=False):
+    first = "fakefake" + fake(head - 8) if marked else fake(head)
+    return f"apikey_{first}_{fake(tail)}"
 
 
 def write_session(
     home, name, text, age_s, profile="claude", cwd="/Users/josh/Developer/jev"
 ):
-    """A session file whose one toolResult row holds `text`, last modified `age_s` ago.
-
-    profile None is the default root, ~/.omp/agent/sessions."""
+    """A session file with one toolResult row per text (a str is one row), last modified
+    `age_s` ago. profile None is the default root, ~/.omp/agent/sessions."""
     root = home / ".omp" / "agent" / "sessions"
     if profile is not None:
         root = home / ".omp" / "profiles" / profile / "agent" / "sessions"
@@ -73,14 +76,16 @@ def write_session(
             "timestamp": "2026-09-25T00:00:00Z",
             "cwd": cwd,
         },
+    ] + [
         {
             "type": "message",
             "message": {
                 "role": "toolResult",
                 "toolName": "bash",
-                "content": [{"type": "text", "text": f"env check\n{text}\nexit 0"}],
+                "content": [{"type": "text", "text": f"env check\n{one}\nexit 0"}],
             },
-        },
+        }
+        for one in ([text] if isinstance(text, str) else text)
     ]
     path.write_text("".join(json.dumps(r, separators=(",", ":")) + "\n" for r in rows))
     stamp = time.time() - age_s
@@ -99,8 +104,8 @@ class Keyed(unittest.TestCase):
         self.home.mkdir()
         self.keys = []
 
-    def key(self, head=35, tail=64):
-        made = fake_key(head, tail)
+    def key(self, head=35, tail=64, marked=False):
+        made = fake_key(head, tail, marked)
         self.keys.append(made)
         return made
 
@@ -127,8 +132,8 @@ class KeyExposureLine(Keyed):
         line = self.line()
         self.assertEqual(
             line,
-            "Key exposure 24h: 1 session files hold a TypeSafe-shaped key (2 scanned); "
-            f"newest: {path} ({hhmm(path)}Z)",
+            "Key exposure 24h: 1 session files hold an unmarked TypeSafe-shaped key "
+            f"(2 scanned; 0 hold only marked fakes); newest: {path} ({hhmm(path)}Z)",
         )
 
     def test_a_106_character_near_miss_does_not_count(self):
@@ -139,7 +144,8 @@ class KeyExposureLine(Keyed):
         write_session(self.home, "tail", f'{{"key":"{short_tail}"}}', 60)
         self.assertEqual(
             self.line(),
-            "Key exposure 24h: 0 session files hold a TypeSafe-shaped key (2 scanned)",
+            "Key exposure 24h: 0 session files hold an unmarked TypeSafe-shaped key "
+            "(2 scanned; 0 hold only marked fakes)",
         )
 
     def test_a_file_last_modified_over_24h_ago_is_not_scanned(self):
@@ -147,7 +153,34 @@ class KeyExposureLine(Keyed):
         write_session(self.home, "new", "no key", 60)
         self.assertEqual(
             self.line(),
-            "Key exposure 24h: 0 session files hold a TypeSafe-shaped key (1 scanned)",
+            "Key exposure 24h: 0 session files hold an unmarked TypeSafe-shaped key "
+            "(1 scanned; 0 hold only marked fakes)",
+        )
+
+    def test_a_marked_fake_is_not_counted_and_is_reported_separately(self):
+        write_session(self.home, "probe", f"cat line.txt\n{self.key(marked=True)}", 60)
+        write_session(
+            self.home, "twice", f"{self.key(marked=True)} {self.key(marked=True)}", 60
+        )
+        self.assertEqual(
+            self.line(),
+            "Key exposure 24h: 0 session files hold an unmarked TypeSafe-shaped key "
+            "(2 scanned; 2 hold only marked fakes)",
+        )
+
+    def test_a_marked_fake_ahead_of_an_unmarked_key_still_counts(self):
+        same_line = write_session(
+            self.home, "same", f"{self.key(marked=True)} then {self.key()}", 60
+        )
+        later_line = write_session(
+            self.home, "later", [self.key(marked=True), "later", self.key()], 30
+        )
+        self.assertEqual(len(later_line.read_text().splitlines()), 4)
+        self.assertEqual(
+            self.line(),
+            "Key exposure 24h: 2 session files hold an unmarked TypeSafe-shaped key "
+            "(2 scanned; 0 hold only marked fakes); newest: "
+            f"{later_line} ({hhmm(later_line)}Z), {same_line} ({hhmm(same_line)}Z)",
         )
 
     def test_probe_sessions_and_the_default_root_count(self):
@@ -170,7 +203,8 @@ class KeyExposureLine(Keyed):
         newest = [paths[1], paths[3], paths[0]]
         self.assertEqual(
             self.line(),
-            "Key exposure 24h: 4 session files hold a TypeSafe-shaped key (4 scanned); newest: "
+            "Key exposure 24h: 4 session files hold an unmarked TypeSafe-shaped key "
+            "(4 scanned; 0 hold only marked fakes); newest: "
             + ", ".join(f"{p} ({hhmm(p)}Z)" for p in newest),
         )
 
@@ -247,8 +281,8 @@ class Cli(Keyed):
         self.assertTrue(lines[1].startswith("Skills 24h: "), lines[1])
         self.assertEqual(
             lines[2],
-            "Key exposure 24h: 1 session files hold a TypeSafe-shaped key (1 scanned); "
-            f"newest: {path} ({hhmm(path)}Z)",
+            "Key exposure 24h: 1 session files hold an unmarked TypeSafe-shaped key "
+            f"(1 scanned; 0 hold only marked fakes); newest: {path} ({hhmm(path)}Z)",
         )
 
 
@@ -290,6 +324,12 @@ class KeyPage(Keyed):
             self.round(), "Key page: 0 new paths paged this round, 1 paged total"
         )
         self.assertEqual(len(self.sent), 1)
+
+    def test_a_file_holding_only_marked_fakes_pages_nothing(self):
+        write_session(self.home, "probe", self.key(marked=True), 60, cwd="/tmp/doc7")
+        self.assertIsNone(self.round())
+        self.assertEqual(self.sent, [])
+        self.assertFalse(self.state.exists())
 
     def test_a_restart_with_the_same_state_file_pages_nothing(self):
         write_session(self.home, "leak", self.key(), 60)
