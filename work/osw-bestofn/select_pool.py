@@ -22,6 +22,11 @@ POOL_FILES = [
     "jedi-7b-4o-15steps.zip",
     "jedi-7b-o3-15steps.zip",
     "kimi-vl-a3b-15step.zip",
+    "opencua_agent-opencua_qwen2_7b-cot_l2-action_history-3image-Ubuntu-15step.zip",
+    "qwen2.5-vl-32b-instruct_15step.zip",
+    "results_agent_s2_o3_15steps.zip",
+    "results_agent_s2_gemini_15steps.zip",
+    "results_gbox_15steps.zip",
 ]
 
 

@@ -12,8 +12,9 @@ measurement date. The archive universe is fixed to root files whose names contai
 `15steps`, end in `.zip`, and are not `results_only` artifacts. This is the common 15-step
 OSWorld-Verified setting; no 50/100/300-step archive is eligible.
 
-The pool is fixed by an allowlist before any result, trajectory, or runtime member is read. The
-allowlist is eight lexicographically chosen root archives from the 15-step universe:
+The pool is fixed by an ordered allowlist before any result, trajectory, or runtime member is read.
+The selector tests these root archives in exactly this order and takes the first eight with one
+official result row for each of the 361 OSWorld-Verified tasks:
 
 ```text
 autoglm_15steps.zip
@@ -24,14 +25,18 @@ doubao-1-5-thinking-vision-pro-250428-15step.zip
 jedi-7b-4o-15steps.zip
 jedi-7b-o3-15steps.zip
 kimi-vl-a3b-15step.zip
+opencua_agent-opencua_qwen2_7b-cot_l2-action_history-3image-Ubuntu-15step.zip
+qwen2.5-vl-32b-instruct_15step.zip
+results_agent_s2_o3_15steps.zip
+results_agent_s2_gemini_15steps.zip
+results_gbox_15steps.zip
 ```
 
-The allowlist is the first eight names in lexical order among the root `.zip` files containing
-`15step`/`15steps`, excluding `results_only` files. No score, model label, trajectory content, or
-runtime text was used to choose the pool. For each allowlisted archive, `result.txt` must contain
-one official scored row for each of the 361 OSWorld-Verified tasks; otherwise the experiment
-aborts rather than substituting another archive. The eight filenames and their result counts are
-frozen in the keyless oracle receipt before any trajectory or runtime member is read.
+Each candidate must have exactly 361 result rows; an invalid candidate is recorded as excluded and
+the next preregistered candidate is used. If fewer than eight are valid, the experiment aborts.
+No score, model label, trajectory content, or runtime text selects among valid candidates. The
+selected eight filenames and result counts are frozen in the keyless oracle receipt before any
+trajectory or runtime member is read.
 
 Each official `result.txt` row is a finite reward in `[0,1]`, not necessarily an integer. The
 reported rate is the mean reward multiplied by 100 (percentage points). For paired McNemar, an
