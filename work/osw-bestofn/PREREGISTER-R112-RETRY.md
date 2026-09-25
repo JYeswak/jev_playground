@@ -121,6 +121,24 @@ Before any Jev call:
 This feasibility arm proves only that the proposed requests can represent the frozen candidate
 pool and fit the documented limit. It does not measure Jev.
 
+## Keyless feasibility result (before any live call)
+
+Receipt: `work/osw-bestofn/r112_retry_preflight.json`.
+
+| Check | Result |
+|---|---:|
+| Held-out states | 24 |
+| Candidates per state | 8 |
+| Actual question bytes | 621 |
+| Question-byte budget | 1,886 |
+| FITS | 24 |
+| NEAR | 0 |
+| OVER | 0 |
+| Oracle winner offered | 24/24 |
+
+The sanitized state file SHA-256 is `83480c50df5b86d4b0b4f9fe11d1428340b6c4927d4e061270519de371ee60ea`.
+No Jev call has been made; this receipt is feasibility evidence only.
+
 ## Live bar, fixed before the first retry call
 
 Score Jev's choices against the official `result.txt` rows after the live receipt is complete.

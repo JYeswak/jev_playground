@@ -1,0 +1,51 @@
+{
+  "status": "KEYLESS_FEASIBILITY_PASS",
+  "bead": "jev-jjwt",
+  "prereg_commit": "c0ef4468",
+  "model": "jev-1.13.0",
+  "live_calls": 0,
+  "spend_usd": 0,
+  "source": "xlangai/ubuntu_osworld_verified_trajs",
+  "pool": {
+    "n_candidates": 8,
+    "pool_receipt": "work/osw-bestofn/pool.json",
+    "selection_rule": "fixed preregistered archive allowlist; no score or trajectory selection"
+  },
+  "manifest": "work/osw-bestofn/heldout_valid_slice.json",
+  "manifest_sha256": "7aa586ed485d48d8f35dde4bac9e6cea0d64705a49f5f041d31d715be897aea8",
+  "r112_used_tasks": 337,
+  "r112_used_task_digest": "c2f320a71b86a6b35ae66dbdb4d2fb9d368aee181b21787f149b48516440aaf2",
+  "heldout_tasks": 24,
+  "heldout_task_digest": "97a8053f93b5c19681dd735fd4c23609d687c3d770c92f57165c68ae8157fa7c",
+  "heldout_selection": "sorted manifest task IDs minus task IDs in work/osw-bestofn/live_rows_r3.jsonl",
+  "state_build": {
+    "command": "uv run python work/osw-bestofn/build_states.py --pool work/osw-bestofn/pool.json --out var/agent-tmp/jev-jjwt-raw-states.jsonl --runtime-tail 240",
+    "raw_tasks_built": 361,
+    "runtime_tail_chars": 240,
+    "sanitized_state_file": "var/agent-tmp/jev-jjwt-states.jsonl",
+    "sanitized_state_sha256": "83480c50df5b86d4b0b4f9fe11d1428340b6c4927d4e061270519de371ee60ea",
+    "raw_text_committed": false,
+    "archive_names_removed": true
+  },
+  "request": {
+    "actual_question_bytes": 621,
+    "question_bytes_budget": 1886,
+    "state_limit_tokens": 32768,
+    "candidate_count_per_state": 8,
+    "state_count": 24,
+    "max_compact_state_bytes": 24932
+  },
+  "state_size": {
+    "command": "python3 scripts/jev-state-size.py var/agent-tmp/jev-jjwt-states.jsonl --question-bytes 1886",
+    "FITS": 24,
+    "NEAR": 0,
+    "OVER": 0,
+    "sendable_states": 24
+  },
+  "winning_archive_offered": {
+    "oracle_winner_tasks": 24,
+    "offered_tasks": 24,
+    "rule": "official floor receipt used only for this offline feasibility check; result values are absent from live state and question"
+  },
+  "boundary": "This is keyless request feasibility, not a Jev result. No Jev response, accuracy, bar verdict, comparator, or omp wiring is claimed. Another pane must verify this preregistration and receipt before any live call."
+}
