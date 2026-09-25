@@ -17,6 +17,17 @@ Row shapes are copied from real omp session files, 2026-09-23..25:
   failed read      this pane's own session, 2026-09-25T06:1xZ: `read skill://test-driven-development`
                    in a pane started before the skill was installed answered a toolResult with
                    "isError": true and "Unknown skill: test-driven-development"; that read nothing
+  bash reader      pane 1, default profile, 2026-09-23T03:39Z, verbatim: `git -C ~/.claude/skills ...;
+                   grep -n '^## Fast Triage Order' -A 12 ~/.claude/skills/rch/SKILL.md | head -16; ...`
+  bash message     pane 1, 2026-09-25T06:06:45Z `ntm send jev --pane=3 '...read
+                   /Users/josh/.claude/skills/systematic-debugging/SKILL.md and ...' >/dev/null 2>&1;
+                   echo "p3 rc=$?"` and 06:12:39Z `br comments add ... "..."`: naming a path in a
+                   message is not reading it (pane 1's non-author check of e9d037e found these)
+  eval read        codex 2026-09-24T23-05-43-825Z, 06:11:53Z, python cell
+                   `print(read('/Users/josh/.claude/skills/experimental-design/SKILL.md'))`; codex
+                   2026-09-25T04-00-52-178Z, 06:14:00Z, JS cell
+                   `const r=await tool.read({path:"/Users/josh/.claude/skills/webapp-testing/SKILL.md"}); ...`
+  python -c open   constructed from pane 1's reader list, no real row seen yet
 """
 
 import contextlib
@@ -112,6 +123,20 @@ def failed_result(call_id, name):
 
 def bash(command):
     return tool_call("bash", {"i": "Mapping skill structure", "command": command})
+
+
+def eval_cell(language, code, call_id=None):
+    return tool_call(
+        "eval",
+        {
+            "language": language,
+            "code": code,
+            "title": "Read skill",
+            "timeout": 30,
+            "reset": False,
+        },
+        call_id=call_id,
+    )
 
 
 def skill_prompt(name, timestamp=IN_WINDOW):
@@ -240,6 +265,108 @@ class SkillsLine(unittest.TestCase):
             self.line(),
             "Skills 24h: 1 skill reads in 1 sessions; third-party 1/3 read "
             "(top: systematic-debugging x1); never read 2",
+        )
+
+    def test_bash_naming_a_skill_md_inside_a_message_does_not_count(self):
+        self.real(
+            [
+                bash(
+                    "ntm send jev --pane=3 'From pane 1 to IvoryCreek: Use the two new skills by "
+                    "file path (your running session cannot load them by skill:// until a "
+                    "restart): read /Users/josh/.claude/skills/systematic-debugging/SKILL.md and "
+                    "/Users/josh/.claude/skills/test-driven-development/SKILL.md first.' "
+                    '>/dev/null 2>&1; echo "p3 rc=$?"'
+                ),
+                bash(
+                    "cd /Users/josh/Developer/jev && br sync --import-only >/dev/null 2>&1; "
+                    'br comments add jev-9gtw.1 --actor AmberWillow "NON-AUTHOR CHECK: read '
+                    '/Users/josh/.claude/skills/verification-before-completion/SKILL.md next."'
+                ),
+            ]
+        )
+        self.assertEqual(
+            self.line(),
+            "Skills 24h: 0 skill reads in 0 sessions; third-party 0/3 read; never read 3",
+        )
+
+    def test_bash_reader_arguments_count_once_per_skill_per_call(self):
+        self.real(
+            [
+                bash(
+                    "git -C ~/.claude/skills rev-parse --show-toplevel 2>&1 | head -1; "
+                    "git -C ~/.claude/skills status --porcelain -- rch zeststream-rch 2>&1 | head -5; "
+                    "grep -n '^## Fast Triage Order' -A 12 ~/.claude/skills/rch/SKILL.md | head -16; "
+                    "grep -n 'rch gc --workers <id>   ' ~/.claude/skills/rch/references/DISK_AND_PRESSURE.md"
+                ),
+                bash(
+                    "python3 -c \"print(open('/Users/josh/.claude/skills/"
+                    "test-driven-development/SKILL.md').read()[:400])\""
+                ),
+            ]
+        )
+        self.assertEqual(
+            self.line(),
+            "Skills 24h: 2 skill reads in 1 sessions; third-party 1/3 read "
+            "(top: test-driven-development x1); never read 2",
+        )
+
+    def test_eval_cells_that_read_a_skill_count_and_an_errored_one_does_not(self):
+        self.ledger.write_text(
+            LEDGER
+            + "experimental-design\tK-Dense-AI/scientific-agent-skills\tx\tskills/experimental-design\tMIT\t0\tclean\tx\t2026-09-25\n"
+            + "webapp-testing\tanthropics/skills\tx\tskills/webapp-testing\tApache-2.0\t0\tclean\tx\t2026-09-25\n"
+        )
+        self.real(
+            [
+                eval_cell(
+                    "py",
+                    "print(read('/Users/josh/.claude/skills/experimental-design/SKILL.md'))",
+                ),
+                eval_cell(
+                    "js",
+                    'const r=await tool.read({path:"/Users/josh/.claude/skills/webapp-testing/SKILL.md"}); display(r);',
+                ),
+                eval_cell(
+                    "py",
+                    "print(read('/Users/josh/.claude/skills/systematic-debugging/SKILL.md'))",
+                    call_id="call_KJeP2WMpN3Qze6DusumR8XXn",
+                ),
+                failed_result("call_KJeP2WMpN3Qze6DusumR8XXn", "systematic-debugging"),
+                eval_cell(
+                    "py",
+                    "display('route: /Users/josh/.claude/skills/test-driven-development/SKILL.md')",
+                ),
+            ]
+        )
+        self.assertEqual(
+            self.line(),
+            "Skills 24h: 2 skill reads in 1 sessions; third-party 2/5 read "
+            "(top: experimental-design x1, webapp-testing x1); never read 3",
+        )
+
+    def test_a_python_cell_that_only_quotes_a_read_call_does_not_count(self):
+        # This pane's own prototype cell, 2026-09-25T06:2xZ: the read calls are string literals
+        # handed to the census function under test, so the cell read no skill.
+        self.real(
+            [
+                eval_cell(
+                    "py",
+                    "print(code_skills('const r=await tool.read({path:\"/Users/josh/.claude/skills/"
+                    "test-driven-development/SKILL.md\"}); display(r);'), "
+                    "code_skills(\"print(read('/Users/josh/.claude/skills/systematic-debugging/"
+                    "SKILL.md'))\"))",
+                ),
+                eval_cell(
+                    "py",
+                    "text = await tool.read({'path': '/Users/josh/.claude/skills/"
+                    "verification-before-completion/SKILL.md'})\nprint(text)",
+                ),
+            ]
+        )
+        self.assertEqual(
+            self.line(),
+            "Skills 24h: 1 skill reads in 1 sessions; third-party 1/3 read "
+            "(top: verification-before-completion x1); never read 2",
         )
 
     def test_invocation_header_counts_and_a_tool_result_quoting_it_does_not(self):

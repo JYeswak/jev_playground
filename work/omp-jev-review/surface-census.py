@@ -19,17 +19,22 @@ usage, one row per failed request. So a failure count here is a measurement, not
 
 Skills (bead jev-yy7f): the second --fleet-line line counts skill reads in the same session files,
 probe sessions excluded: a `read` tool call of skill://<name>[/...] or of a path under
-.claude/skills/<name>/ or .agents/skills/<name>/, a `bash` call naming such a SKILL.md, and the
-`skill-prompt` row omp writes when a user invokes /skill:<name>. A call whose toolResult is
-`isError: true` ("Unknown skill" in a pane older than the install) is not a read. It names how many
-skills in ~/.claude/skills/THIRD-PARTY-SKILLS.tsv were read at least once; no ledger is NOT_RUN.
+.claude/skills/<name>/ or .agents/skills/<name>/; a `bash` call where such a file is an argument
+of a file reader (cat, sed, head, grep, ... or `python -c` with open()/read()), never a path that
+only sits inside a message string (ntm send, br comments, git -m); an `eval` cell whose code calls
+read(, tool.read( or open( on a skill path or skill://<name>; and the `skill-prompt` row omp writes
+when a user invokes /skill:<name>. A call whose toolResult is `isError: true` ("Unknown skill" in
+a pane older than the install) is not a read. It names how many skills in
+~/.claude/skills/THIRD-PARTY-SKILLS.tsv were read at least once; no ledger is NOT_RUN.
 
 Exit 0 always. This is a census, not a gate.
 """
 
+import ast
 import json
 import os
 import re
+import shlex
 import sys
 from collections import Counter
 from datetime import datetime, timedelta, timezone
@@ -45,8 +50,97 @@ SKILL_LEDGER = HOME / ".claude" / "skills" / "THIRD-PARTY-SKILLS.tsv"
 SKILL_NAME = r"[A-Za-z0-9._-]+"
 SKILL_URL_RE = re.compile(rf"^skill://({SKILL_NAME})")
 SKILL_DIR_RE = re.compile(rf"/\.(?:claude|agents)/skills/({SKILL_NAME})/")
-SKILL_MD_RE = re.compile(rf"/\.(?:claude|agents)/skills/({SKILL_NAME})/SKILL\.md")
+SKILL_FILE_RE = re.compile(rf"/\.(?:claude|agents)/skills/({SKILL_NAME})/[^/\s]")
+CODE_READ_RE = re.compile(
+    r"""\b(?:read|open)\(\s*(?:\{\s*["']?path["']?\s*:\s*|path\s*=\s*)?(["'`])([^"'`\n]+)\1"""
+)
+BASH_READERS = frozenset(
+    "cat sed head tail less more bat grep egrep fgrep rg awk wc nl".split()
+)
+BASH_WRAPPERS = frozenset("sudo env time command nohup nice".split())
+ASSIGNMENT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 SKILL_PROMPT_RE = re.compile(rf'^\[IMPORTANT: User invoked the "({SKILL_NAME})" skill')
+
+
+def skill_of_path(path):
+    """The skill a read path names: skill://<name>[...] or .claude|.agents/skills/<name>/..."""
+    match = SKILL_URL_RE.match(path)
+    if match is None:
+        match = SKILL_DIR_RE.search(path)
+    return match.group(1) if match else None
+
+
+def code_skills(code, language):
+    """Skills a code cell reads with read(, tool.read( or open( on a literal path.
+
+    Python is parsed, so a read call that only sits inside a string literal is not a read; a
+    cell Python cannot parse (IPython magics) and JS fall back to CODE_READ_RE over the text.
+    """
+    if language == "py":
+        flags = ast.PyCF_ONLY_AST | ast.PyCF_ALLOW_TOP_LEVEL_AWAIT
+        try:
+            tree = compile(code, "<cell>", "exec", flags)
+        except (SyntaxError, ValueError):
+            tree = None
+        if tree is not None:
+            return {n for p in python_read_paths(tree) if (n := skill_of_path(p))}
+    return {n for _q, p in CODE_READ_RE.findall(code) if (n := skill_of_path(p))}
+
+
+def python_read_paths(tree):
+    """Literal paths passed to read(...)/x.read(...)/open(...) calls, incl. read({'path': ...})."""
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        name = getattr(func, "id", None) or getattr(func, "attr", None)
+        if name not in ("read", "open"):
+            continue
+        values = node.args[:1] + [k.value for k in node.keywords if k.arg == "path"]
+        for value in values:
+            if isinstance(value, ast.Dict):
+                value = next(
+                    (
+                        v
+                        for k, v in zip(value.keys, value.values)
+                        if isinstance(k, ast.Constant) and k.value == "path"
+                    ),
+                    None,
+                )
+            if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                yield value.value
+
+
+def bash_skills(command):
+    """Skills whose files are arguments of a file reader in a shell command.
+
+    Words come from shlex, so a quoted message (ntm send '...', br comments add "...") is one
+    argument of a command that is not a reader. Unparseable commands count nothing.
+    """
+    lex = shlex.shlex(command, posix=True, punctuation_chars=";&|()")
+    lex.whitespace = " \t\r"
+    try:
+        words = list(lex)
+    except ValueError:
+        return set()
+    found, simple = set(), []
+    for word in words + [";"]:
+        if word != "\n" and not (word and set(word) <= set(";&|()")):
+            simple.append(word)
+            continue
+        i = 0
+        while i < len(simple) and (
+            simple[i] in BASH_WRAPPERS or ASSIGNMENT_RE.match(simple[i])
+        ):
+            i += 1
+        program = simple[i].rsplit("/", 1)[-1] if i < len(simple) else ""
+        args = simple[i + 1 :]
+        if program in BASH_READERS:
+            found.update(m.group(1) for a in args if (m := SKILL_FILE_RE.search(a)))
+        elif program.startswith("python") and "-c" in args[:-1]:
+            found.update(code_skills(args[args.index("-c") + 1], "py"))
+        simple = []
+    return found
 
 
 def packages():
@@ -385,16 +479,16 @@ def skill_names(row):
             continue
         args = item.get("arguments") if isinstance(item.get("arguments"), dict) else {}
         if item.get("name") == "read":
-            path = str(args.get("path") or "")
-            match = SKILL_URL_RE.match(path)
-            if match is None:
-                match = SKILL_DIR_RE.search(path)
-            if match:
-                names.append((item.get("id"), match.group(1)))
+            name = skill_of_path(str(args.get("path") or ""))
+            if name:
+                names.append((item.get("id"), name))
         elif item.get("name") == "bash":
             command = str(args.get("command") or "")
+            names.extend((item.get("id"), n) for n in sorted(bash_skills(command)))
+        elif item.get("name") == "eval":
+            code, language = str(args.get("code") or ""), args.get("language")
             names.extend(
-                (item.get("id"), n) for n in sorted(set(SKILL_MD_RE.findall(command)))
+                (item.get("id"), n) for n in sorted(code_skills(code, language))
             )
     return names
 
