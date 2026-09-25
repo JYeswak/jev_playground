@@ -1,0 +1,32 @@
+{
+  "model": "jev-1.13.0",
+  "state": {
+    "observation": "kitchen\nyou are in the kitchen of the white house. a table seems to have been used recently for the preparation of food. a passage leads to the west and a dark staircase can be seen leading upward. a dark chimney leads down and to the east is a small window which is open.\non the table is an elongated brown sack, smelling of hot peppers.\na bottle is sitting on the table.\nthe glass bottle contains:\n  a quantity of water\n\n",
+    "look": "kitchen\nyou are in the kitchen of the white house. a table seems to have been used recently for the preparation of food. a passage leads to the west and a dark staircase can be seen leading upward. a dark chimney leads down and to the east is a small window which is open.\non the table is an elongated brown sack, smelling of hot peppers.\na bottle is sitting on the table.\nthe glass bottle contains:\n  a quantity of water\n\n",
+    "inventory": "you are empty-handed.\n\n",
+    "last_actions": [
+      "east",
+      "open window",
+      "west"
+    ],
+    "score": 10
+  },
+  "questions": {
+    "action": {
+      "type": "choice",
+      "instructions": "You are a player in a text-based adventure game. Your task is to evaluate and select actions that are promising based on the given game state. Considering the current state, please select the most promising action.",
+      "criteria": {
+        "jump": null,
+        "east": null,
+        "open sack": null,
+        "open bottle": null,
+        "take sack": null,
+        "take bottle": null,
+        "take all": null,
+        "up": null,
+        "close window": null,
+        "west": null
+      }
+    }
+  }
+}
