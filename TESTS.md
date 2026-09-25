@@ -184,6 +184,13 @@ claim nobody can check:
   pool is derived from all 6,449 committed `live-results.jsonl` button rows, seeded sampling is
   reproducible, and `run_one` uses only pooled buttons.
   Run: `uv run python -m unittest work/pokeagent-emerald/test_run_baselines.py` (3 tests).
+- `work/pokeagent-emerald/test_segment2_baselines.py` — keyless Emerald segment-2 setup
+  (jev-jy7t.1.13): the segment comes from recorded reversible transitions in
+  `states/emerald-boot.jsonl`, seed setup alternates the observed positions by replaying the
+  recorded trace, the goal is a position change from the episode start, state-blind sampling is
+  seeded and uses the segment-1 pool, the live receipt records `key_status`, and the power loader
+  selects state-blind rows. Not yet non-author verified. Typed SKIP on Python < 3.12.
+  Run: `uv run python -m unittest work/pokeagent-emerald/test_segment2_baselines.py` (8 tests).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
@@ -536,3 +543,4 @@ falling back, and a frozen-weight SHA-256 mismatch refuses to start. Run:
 `work/poke-jev/.venv/bin/python -m unittest work/loss-depth/pokejev-components/battle/test_run.py`.
 Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 | work/miniwob-jev/test_external_rates.py | python3 -m unittest work/miniwob-jev/test_external_rates.py | committed Table 3 extraction carries PDF URL and SHA-256; all four projected values match every published row after n/a normalization; one planted book-flight aggregate mismatch fails | 2/2 keyless; mutation RED |
+| work/miniwob-jev/test_text_candidates.py | python3 -m unittest work/miniwob-jev/test_text_candidates.py | page-text candidate builder (jev-9gtw.4.2) on the 7 captured real observations. KNOWN DEFECT at 026d1230, found by pane 1: the builder inserts the grader's answer (`derive_needed_text`) into its own candidates, so the coverage test passes by construction; a fix is in IvoryCreek's working tree, not committed. Registered so the registry is complete, not as evidence | 3/3 keyless; tautological, see jev-9gtw.4.2 |
