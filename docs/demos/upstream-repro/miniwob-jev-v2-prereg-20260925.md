@@ -18,9 +18,17 @@ This is 625 episodes per arm. It is disjoint from the benchmark seeds generated 
 `>=9000`. The same `(task, seed, rep)` episode list is used for random, scripted, v1 and v2.
 
 The floor remains unchanged: MiniWoB 1.1.0, Selenium, 0.5 s wait, 10-step cap, fresh page per
-episode, raw reward > 0 and no harness error is success. Rows are appended to distinct files:
-`work/miniwob-jev/rows/miniwob-floors-v2.s*.jsonl`,
-`miniwob-jev-v1.s*.jsonl`, and `miniwob-jev-v2.s*.jsonl`.
+episode, raw reward > 0 and no harness error is success. The tracked floor receipt is
+`work/miniwob-jev/rows/miniwob-floors-v2.heldout.jsonl` (625 random + 625 scripted rows). The live
+arms write `work/miniwob-jev/rows/miniwob-jev-v1-heldout.s0.jsonl` and
+`work/miniwob-jev/rows/miniwob-jev-v2-heldout.s0.jsonl`; these exact paths are the receipt inputs.
+
+Before any scoring, merge the 23 completed `/tmp/miniwob-floors-v2*.jsonl` sources by key
+`(task, seed, rep, policy)`. Source precedence is `.p*.jsonl` shards, then `.retry.s0.jsonl`, then
+`.s0.jsonl`, then the base file; within a tier, lexical filename order is deterministic. A `.retry`
+row replaces an earlier row with the same key, never an already-selected higher-precedence row.
+Duplicate keys after precedence resolution or anything other than exactly 625 rows per policy is a
+hard failure. The merge writes only the canonical JSONL rows; no browser state is synthesized.
 
 ## Arms
 
