@@ -381,13 +381,18 @@ n_rules=$(ls -1 "$rules_dir"/*.md 2>/dev/null | wc -l | tr -d ' ')
 if [ "$n_rules" -eq 0 ]; then
   note FAIL ".omp/rules/*.md matched nothing — an empty scan set is NOT a pass"; fail=$((fail+1))
 else
+  # An arm is an arm/arm_at/arm_text line whose rule argument is the path itself or a variable
+  # assigned exactly that path. A comment or a bare VAR=path line is not an arm: keeping
+  # A=.omp/rules/absence-from-one-probe.md while deleting every arm_text "$A" line used to pass.
   missing_rules=0
   for rule_path in "$rules_dir"/*.md; do
-    rule_name=${rule_path#"$rules_dir"/}
-    if grep -Fq "$rule_path" "$0"; then
+    vars=$(sed -nE "s|^([A-Za-z_][A-Za-z0-9_]*)=\"?${rule_path//./\\.}\"?[[:space:]]*$|\1|p" "$0")
+    alts="${rule_path//./\\.}"
+    for v in $vars; do alts="$alts|\"?\\\$\{?$v\}?\"?"; done
+    if grep -Eq "^[[:space:]]*arm(_at|_text)?[[:space:]]+($alts)[[:space:]]" "$0"; then
       :
     else
-      note FAIL "$rule_path has no arm declaration"; missing_rules=$((missing_rules+1)); fail=$((fail+1))
+      note FAIL "$rule_path has no arm (no arm/arm_at/arm_text line uses its path or a variable holding it)"; missing_rules=$((missing_rules+1)); fail=$((fail+1))
     fi
   done
   if [ "$missing_rules" -eq 0 ]; then
