@@ -2483,3 +2483,25 @@ Keyless evidence:
 - Exact workflow offline shell smoke → doctor `NOT_RUN`, fake Choice `ok=true, choice=c1`, `clone_to_offline_ms=5972`, under the 300000 ms limit. This local smoke starts from the existing checkout; the committed workflow timer starts before `actions/checkout` and records the checkout-inclusive value in the artifact.
 
 Boundary: no TypeSafe/API request and no spend; the live README command was exercised only keylessly and reported NOT_RUN. GitHub-hosted checkout timing remains to be observed on the workflow run.
+
+## jev-9gtw.4 MiniWoB v3 held-out completion [live-verified (N=625)]
+
+WP-X prereg amendment `e31f9a27` set the fewer-than-two-action-options preflight: no Jev call,
+record `none`, zero usage; correction `9ba2e795` records the pre-amendment partial rerun boundary.
+The implementation/test commit is `b7716840`; pane 1 non-author-verified the planted-red test.
+
+- Exact supervised resume: `jev9gtw4-heldout-final`; log `shard 0/1: 370 to run, 255 resumed`;
+  exit 0; run root `var/agent-tmp/jev-9gtw-heldout-resume.3/`.
+- Receipt/rows commit: `38fb7342`; 625/625 unique task-seed keys; no row error or child_error.
+- Model: `jev-1.13.0` on 620 Jev-call rows; five preregistered drag-items-grid rows used the
+  no-call preflight. Calls **2,571**, input tokens **10,918,175**, output tokens **2,584,664**,
+  estimated input spend **$0.458563** at $0.042/M input tokens, output free.
+- Code SHA ranges are in the receipt: rows 1–255 use `9909a066…`; rows 256–625 use
+  `3df5c5d7…`. Row SHA256: `d5c9d596da822b989ec9ecfbf90976959c82ce1cee2d11bfea9879ad3819f6d3`.
+- Paired v1 score (lexical shard-first selection over 625 unique keys): v3-only 49, v1-only 28,
+  exact McNemar two-sided p **0.022033459**; v3 342/625, v1 321/625. Scripted floor discordance
+  195/7; random floor discordance 265/8.
+
+Boundary: no LLM incumbent comparison in this bead; no omp consumer was wired here. `ubs` on the
+Python files reported pre-existing findings in the test harness and was not a pass. WP-S starts only
+after CopperHeron lands kit K5/K6.
