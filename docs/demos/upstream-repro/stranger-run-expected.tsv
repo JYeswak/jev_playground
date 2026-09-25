@@ -77,7 +77,7 @@ bash foundation/gates.sh --portable	NOT_RUN-named-prerequisite	Fresh clone fix
 bash foundation/gates.sh	NOT_RUN-named-prerequisite	Fresh clone fix
 python3 work/sr-adopt/audit_bars.py	0	-
 python3 scripts/run-registered-suites.py	0	-
-python3 scripts/ci-main-status.py	NOT_RUN-named-prerequisite	gh not installed
+python3 scripts/ci-main-status.py	NOT_RUN-named-prerequisite	CI main NOT_RUN
 python3 work/omp-jev-review/surface-census.py --fleet-line	0	-
 python3 scripts/omp-secret-probe.py	NOT_RUN-named-prerequisite	omp is not on PATH
 bash scripts/quickstart.sh --mine	NOT_RUN-named-prerequisite	no such logs
