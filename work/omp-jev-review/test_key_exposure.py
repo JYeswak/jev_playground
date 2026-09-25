@@ -276,7 +276,7 @@ class Cli(Keyed):
         out = self.clean(done.stdout + done.stderr)
         self.assertEqual(done.returncode, 0, out)
         lines = out.splitlines()
-        self.assertEqual(len(lines), 3, out)
+        self.assertEqual(len(lines), 4, out)
         self.assertTrue(lines[0].startswith("Jev judge 24h: "), lines[0])
         self.assertTrue(lines[1].startswith("Skills 24h: "), lines[1])
         self.assertEqual(
@@ -284,6 +284,7 @@ class Cli(Keyed):
             "Key exposure 24h: 1 session files hold an unmarked TypeSafe-shaped key "
             f"(1 scanned; 0 hold only marked fakes); newest: {path} ({hhmm(path)}Z)",
         )
+        self.assertTrue(lines[3].startswith("Jev tools 24h: "), lines[3])
 
 
 class KeyPage(Keyed):

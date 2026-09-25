@@ -513,7 +513,7 @@ class Cli(unittest.TestCase):
         )
         self.assertEqual(done.returncode, 0, done.stderr)
         lines = done.stdout.splitlines()
-        self.assertEqual(len(lines), 3, done.stdout)
+        self.assertEqual(len(lines), 4, done.stdout)
         self.assertTrue(lines[0].startswith("Jev judge 24h: 0 calls"), lines[0])
         self.assertEqual(lines[1], want)
         self.assertEqual(
@@ -521,6 +521,7 @@ class Cli(unittest.TestCase):
             "Key exposure 24h: 0 session files hold an unmarked TypeSafe-shaped key "
             "(1 scanned; 0 hold only marked fakes)",
         )
+        self.assertTrue(lines[3].startswith("Jev tools 24h: "), lines[3])
         out = io.StringIO()
         with (
             mock.patch.dict(os.environ, {"HOME": str(self.home)}),
@@ -540,7 +541,7 @@ class Cli(unittest.TestCase):
             lines = fiw.judge_lines()
         self.assertEqual(
             [line.split(" NOT_RUN ")[0] for line in lines],
-            ["Jev judge 24h:", "Skills 24h:", "Key exposure 24h:"],
+            ["Jev judge 24h:", "Skills 24h:", "Key exposure 24h:", "Jev tools 24h:"],
         )
 
 

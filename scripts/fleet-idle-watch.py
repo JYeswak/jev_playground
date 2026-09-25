@@ -623,14 +623,20 @@ def ci_lines() -> list[str]:
 def census_not_run(why: str) -> list[str]:
     return [
         f"{head} NOT_RUN {why}"
-        for head in ("Jev judge 24h:", "Skills 24h:", KEY_LINE.rstrip())
+        for head in (
+            "Jev judge 24h:",
+            "Skills 24h:",
+            KEY_LINE.rstrip(),
+            "Jev tools 24h:",
+        )
     ]
 
 
 def judge_lines() -> list[str]:
     """surface-census.py --fleet-line: the Jev judge-role line (jev-xpk1), the skills line
-    (jev-yy7f) and the key exposure line (jev-9ov4). Informational: never sets our exit code.
-    The census prints every line it has; a dead census is NOT_RUN for all three."""
+    (jev-yy7f), the key exposure line (jev-9ov4) and the Jev tools line (jev-x28o).
+    Informational: never sets our exit code. The census prints every line it has; a dead census
+    is NOT_RUN for all four."""
     script = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         "work",

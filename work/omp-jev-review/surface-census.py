@@ -8,7 +8,7 @@ sessions are not real work.
 
     python3 work/omp-jev-review/surface-census.py               # surfaces, then judge-role
     python3 work/omp-jev-review/surface-census.py --judge       # judge-role section only
-    python3 work/omp-jev-review/surface-census.py --fleet-line  # three lines, last 24h
+    python3 work/omp-jev-review/surface-census.py --fleet-line  # four lines, last 24h
 
 Judge role (bead jev-xpk1): omp answers find, auto-thinking, eval judge()/judge_batch() and
 unexpected-stop detection with the `judge` model role, pinned fleet-wide to typesafe/jev-latest
@@ -39,6 +39,13 @@ missing or unparsable secrets.yml, or no session files, is NOT_RUN. Why: 2026-09
 printed the live key into a tool result, omp's session log stored it, and a manual scan found it
 50 minutes later; scripts/fleet-idle-watch.py pages pane 1 once per new path.
 
+Jev tools (bead jev-x28o): the fourth --fleet-line line counts calls, probe sessions excluded, of
+each project Jev tool the repo ships in .omp/tools/jev-*.ts (jev-rerank.ts -> jev_rerank): a `write`
+or `read` tool call whose path is xd://<tool>, or a tool call named <tool>, whose toolResult did
+not come back `isError: true`. Load probes (`<tool>_ext_probe`) are not calls. It names the tools
+with zero calls, so a tool nobody uses shows up every round instead of sitting in .omp/ unseen.
+Why: over 48h before this line existed, jev_rerank had 14 write calls, jev_claim_check 4, and
+jev_flag and jev_screen none (2026-09-25). No .omp/tools/jev-*.ts is NOT_RUN.
 Exit 0 always. This is a census, not a gate.
 """
 
@@ -61,6 +68,8 @@ SESSION_ROOTS = "~/.omp/agent/sessions, ~/.omp/profiles/*/agent/sessions"
 SECRETS = REPO / ".omp" / "secrets.yml"
 KEY_NEWEST = 3
 FAKE_MARKER = b"fakefake"
+TOOLS_DIR = REPO / ".omp" / "tools"
+XD_TOOL_RE = re.compile(r"^xd://(jev_[a-z0-9_]+)")
 REGEX_LITERAL = re.compile(r"^/(.+)/([a-z]*)$", re.S)
 REGEX_FLAGS = {"i": re.I, "m": re.M, "s": re.S}
 SKILL_LEDGER = HOME / ".claude" / "skills" / "THIRD-PARTY-SKILLS.tsv"
@@ -805,6 +814,90 @@ def surfaces(roots, files):
     )
 
 
+def jev_tool_roster(tools_dir):
+    """Project Jev tool names from .omp/tools/jev-*.ts (jev-rerank.ts -> jev_rerank); None if none."""
+    names = sorted(p.stem.replace("-", "_") for p in Path(tools_dir).glob("jev-*.ts"))
+    return names or None
+
+
+def jev_tool_names(row):
+    """(tool call id, tool name) for each project Jev tool call in one assistant row."""
+    message = row.get("message")
+    if not isinstance(message, dict) or message.get("role") != "assistant":
+        return []
+    found = []
+    for item in message.get("content") or []:
+        if not isinstance(item, dict) or item.get("type") != "toolCall":
+            continue
+        name = str(item.get("name") or "")
+        args = item.get("arguments") if isinstance(item.get("arguments"), dict) else {}
+        if name in ("write", "read"):
+            match = XD_TOOL_RE.match(str(args.get("path") or ""))
+            tool = match.group(1) if match else None
+        else:
+            tool = name if name.startswith("jev_") else None
+        if tool:
+            found.append((item.get("id"), tool))
+    return found
+
+
+def jev_tool_calls(files):
+    """(session file, probe, timestamp, tool) per project Jev tool call whose result was not an error."""
+    for path in files:
+        try:
+            fh = path.open(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        pending, failed = [], set()
+        with fh:
+            for line in fh:
+                error = '"isError":true' in line and '"toolResult"' in line
+                if not (error or "jev_" in line):
+                    continue
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if not isinstance(row, dict):
+                    continue
+                message = row.get("message")
+                if isinstance(message, dict) and message.get("role") == "toolResult":
+                    if message.get("isError") is True:
+                        failed.add(message.get("toolCallId"))
+                    continue
+                for call_id, tool in jev_tool_names(row):
+                    pending.append((call_id, row.get("timestamp"), tool))
+        if not pending:
+            continue
+        probe = is_probe(path, session_cwd(path))
+        for call_id, timestamp, tool in pending:
+            if call_id not in failed:
+                yield path, probe, timestamp, tool
+
+
+def jev_tools_line(calls, now, have_sessions, roster):
+    """'Jev tools 24h: jev_rerank 3, ... in S sessions; never called: ...' over the project roster."""
+    if not have_sessions:
+        return f"Jev tools 24h: NOT_RUN no omp session files under {SESSION_ROOTS}"
+    if roster is None:
+        return f"Jev tools 24h: NOT_RUN no .omp/tools/jev-*.ts under {TOOLS_DIR}"
+    since = now - timedelta(hours=24)
+    counts, sessions = Counter(), set()
+    for path, probe, timestamp, tool in calls:
+        when = parse_time(timestamp)
+        if probe or when is None or when < since or when > now or tool not in roster:
+            continue
+        counts[tool] += 1
+        sessions.add(path)
+    ordered = sorted(roster, key=lambda t: (-counts[t], t))
+    line = "Jev tools 24h: " + ", ".join(f"{t} {counts[t]}" for t in ordered)
+    line += f" in {len(sessions)} sessions"
+    idle = [t for t in roster if not counts[t]]
+    return line + (
+        "; never called: " + ", ".join(idle) if idle else "; every tool called"
+    )
+
+
 def main(argv):
     roots, files = session_files()
     if "--fleet-line" in argv:
@@ -821,6 +914,11 @@ def main(argv):
         print(fleet_line(judge_rows(recent), now, bool(files)))
         print(skills_line(skill_reads(recent), now, bool(files), SKILL_LEDGER))
         print(key_exposure_line(files, now, bool(files), SECRETS))
+        print(
+            jev_tools_line(
+                jev_tool_calls(recent), now, bool(files), jev_tool_roster(TOOLS_DIR)
+            )
+        )
         return 0
     if "--judge" not in argv:
         surfaces(roots, files)

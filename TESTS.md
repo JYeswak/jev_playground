@@ -115,6 +115,17 @@ claim nobody can check:
   the failure output); page every round 4; ignore the marker 2 of 21; only the first match on a
   line 1 of 21.
   Run: `python3 -m unittest work/omp-jev-review/test_key_exposure.py` (21 tests).
+- `work/omp-jev-review/test_jev_tool_census.py` — the `Jev tools 24h:` line of
+  `work/omp-jev-review/surface-census.py --fleet-line` (jev-x28o), keyless, on session fixtures in the
+  real row shapes: `write`/`read` calls to `xd://<tool>` and a call made by the tool's own name count
+  per tool of the shipped roster (`.omp/tools/jev-*.ts`, `jev-rerank.ts` -> `jev_rerank`); tools with
+  zero calls are named, or `every tool called`; a call whose `toolResult` is `isError: true`, a probe
+  session (`omp-test` profile, a `/tmp` cwd), a load probe (`<tool>_ext_probe`), a call older than
+  24h and a tool outside the roster do not count; no sessions and no roster are `NOT_RUN`. Plants,
+  each restored byte-identical: count failed calls 1 fails; count probe sessions 1; drop the roster
+  filter 2; drop the 24h window 1. The census CLI now prints four lines, and the watcher's census
+  fallback names all four (`test_skill_census.py`, `test_key_exposure.py`).
+  Run: `python3 -m unittest work/omp-jev-review/test_jev_tool_census.py` (8 tests).
 - `work/fleet-idle-watch/test_fleet_idle_watch.py` — `scripts/fleet-idle-watch.py`'s classifier
   on process evidence (jev-6con), no tmux or ps: fixtures are the real process trees of jev panes
   0, 2, 4, 5 and two real screens, 2026-09-25. Both measured false readings: a screen with no
