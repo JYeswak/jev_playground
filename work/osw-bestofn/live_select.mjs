@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { askJevChoice } from "../../work/jev-client/src/index.ts";
 import { spawnSync } from "node:child_process";
@@ -7,6 +8,37 @@ const floorPath = process.env.OSW_FLOOR_RECEIPT ?? "work/osw-bestofn/floor_recei
 const outputPath = process.env.OSW_LIVE_RECEIPT ?? "work/osw-bestofn/live_receipt.json";
 const rowsPath = process.env.OSW_LIVE_ROWS;
 const model = "jev-1.13.0";
+const EXPECTED_TASK_COUNT = 337;
+const EXPECTED_TASK_DIGEST = "c2f320a71b86a6b35ae66dbdb4d2fb9d368aee181b21787f149b48516440aaf2";
+const EXPECTED_SEED = 20250925;
+const manifestPath = process.env.OSW_MANIFEST ?? "work/osw-bestofn/heldout_valid_slice.json";
+const presencePath = process.env.OSW_PRESENCE_RECEIPT ?? "work/osw-bestofn/live_preflight_presence_r3.json";
+function taskDigest(tasks) {
+  return createHash("sha256").update(`${tasks.join("\n")}\n`).digest("hex");
+}
+function expectedSeedOrder() {
+  const result = spawnSync(
+    "python3",
+    [
+      "-c",
+      String.raw`import json, random, sys
+manifest = json.load(open(sys.argv[1]))
+presence = json.load(open(sys.argv[2]))
+required = tuple(presence["required_fields"])
+table = presence["table"]
+tasks = [task for task in manifest["tasks"] if task in table and all(table[task][candidate][field] for candidate in ("c0", "c1") for field in required)]
+if len(tasks) < 337 or len(tasks) > 337:
+    raise SystemExit(f"retained task count={len(tasks)}")
+random.Random(20250925).shuffle(tasks)
+print("\n".join(tasks))`,
+      manifestPath,
+      presencePath,
+    ],
+    { encoding: "utf8" },
+  );
+  if (result.status !== 0) return { error: (result.stderr || "seed order failed").trim() };
+  return { order: result.stdout.trimEnd().split("\n").filter(Boolean) };
+}
 const keyStatus = spawnSync(
   "python3",
   [new URL("../../scripts/key-status.py", import.meta.url).pathname],
@@ -18,7 +50,46 @@ if (keyStatus.status !== 0) {
 }
 const floor = JSON.parse(await readFile(floorPath, "utf8"));
 const rows = floor.results_by_task;
-const lines = (await readFile(statePath, "utf8")).trim().split("\n").filter(Boolean);
+let lines;
+try {
+  lines = (await readFile(statePath, "utf8")).trim().split("\n").filter(Boolean);
+} catch (error) {
+  console.error(`REFUSED task-set guard: cannot read state file (${error.message})`);
+  process.exit(2);
+}
+let states;
+try {
+  states = lines.map((line) => JSON.parse(line));
+} catch (error) {
+  console.error(`REFUSED task-set guard: malformed state file (${error.message})`);
+  process.exit(2);
+}
+const floorTasks = Object.keys(rows ?? {}).sort();
+const stateTasks = states.map((state) => state.task);
+const stateSorted = [...new Set(stateTasks)].sort();
+const guardErrors = [];
+if (!Object.is(floor.tasks, EXPECTED_TASK_COUNT) || !Object.is(floorTasks.length, EXPECTED_TASK_COUNT)) {
+  guardErrors.push(`floor tasks=${floor.tasks}/${floorTasks.length}`);
+}
+if (!Object.is(stateTasks.length, EXPECTED_TASK_COUNT) || !Object.is(stateSorted.length, EXPECTED_TASK_COUNT)) {
+  guardErrors.push(`state tasks=${stateTasks.length}/${stateSorted.length}`);
+}
+if (!Object.is(taskDigest(floorTasks), EXPECTED_TASK_DIGEST)) guardErrors.push("floor digest mismatch");
+if (!Object.is(taskDigest(stateSorted), EXPECTED_TASK_DIGEST)) guardErrors.push("state digest mismatch");
+const seedCheck = expectedSeedOrder();
+if (seedCheck.error) {
+  guardErrors.push(`seed order unavailable: ${seedCheck.error}`);
+} else if (!Object.is(stateTasks.join("\n"), seedCheck.order.join("\n"))) {
+  guardErrors.push("state order does not match seed=20250925 permutation");
+}
+if (guardErrors.length) {
+  console.error(`REFUSED task-set guard: ${guardErrors.join("; ")}`);
+  process.exit(2);
+}
+if (process.env.OSW_GUARD_ONLY === "1") {
+  console.log(`GUARD_OK tasks=${EXPECTED_TASK_COUNT} digest=${EXPECTED_TASK_DIGEST} seed=${EXPECTED_SEED}`);
+  process.exit(0);
+}
 const classes = Object.fromEntries(
   floor.selected_archives.map((_archive, index) => [`c${index}`, `Candidate ${index + 1}`]),
 );
