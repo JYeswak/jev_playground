@@ -115,8 +115,15 @@ timeout 14400 infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf
 This amendment is committed before any Deephome live call. The Zork1 and Detective runs remain
 foreground and are also not scored if they lack a final `status=ok` row.
 
-## Cache decision
+## Runtime boundary
 
+The arm64 Jericho 3.3.1 development probe found a Frotz segfault on a separate Zork1 inventory
+path; in pool mode that can hang valid-action generation. The watchdog converts a timed-out or
+crashed run into an error/incomplete receipt, never a score. The completed Zork1 seed-1 checkpoint
+did not enter that path. This is a known execution risk for later live rows, not evidence about
+Jev quality.
+
+## Cache decision
 
 A prior cache keyed by `sha256(canonical serialized state + exact valid-action list)` was
 considered. It is **not enabled in this preregistered primary arm**: the first live run is the
