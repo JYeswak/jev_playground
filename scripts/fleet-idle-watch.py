@@ -19,6 +19,12 @@ Mail   = every round, each urgent/high Agent Mail message in the conductor's arc
          recorded and never paged. One `Inbox:` line per round; `Inbox: NOT_RUN <reason>` when
          the inbox or the state file cannot be read. Why: 2026-09-25 an urgent key-leak report
          to AmberWillow sat unread 42 minutes, because pane 1 does not poll Agent Mail.
+Key    = every round, the census's `Key exposure 24h:` line (surface-census.py --fleet-line) is
+         printed, and each session file it names as holding a TypeSafe-shaped key goes to pane 1
+         once as `KEY EXPOSURE: <path> holds a TypeSafe-shaped key (modified <HH:MM>Z); ...`
+         (bead jev-9ov4). Paged paths persist in JEV_WATCH_KEY_STATE, so a restart does not
+         re-page; a first run pages every named path. Paths only, never the key. Why: 2026-09-25
+         05:57Z a pane printed the live key into a tool result and nobody saw it for 50 minutes.
 
 Why: 2026-09-24, 4 of 6 worker panes sat at their prompts for most of an hour and the
 conductor only looked when a callback arrived. Joshua: "dont let that happen again."
@@ -93,6 +99,12 @@ INBOX_LOOKBACK = (
     15 * 60
 )  # with no state file, mail created before start - this is history
 CREATED = re.compile(r"^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(\.\d+)?(Z|\+00:00)$")
+# Key exposure paging (bead jev-9ov4): the census's `Key exposure 24h:` line names up to 3 session
+# files holding a TypeSafe-shaped key; each path is paged once, persisted like the inbox ids.
+KEY_STATE = "~/.local/state/jev/key-exposure-paged.json"
+KEY_LINE = "Key exposure 24h: "
+KEY_COUNT = re.compile(r"^Key exposure 24h: (\d+) session files hold")
+KEY_PATH = re.compile(r"(.+?\.jsonl) \((\d\d:\d\d)Z\)(?:, |$)")
 
 
 class Snapshot(NamedTuple):
@@ -472,6 +484,55 @@ def inbox_round(inbox: Path, state: Path, started: float, send) -> str:
     )
 
 
+def key_state_path() -> Path:
+    """The paged-paths state file for key exposure pages."""
+    return Path(os.environ.get("JEV_WATCH_KEY_STATE") or KEY_STATE).expanduser()
+
+
+def key_round(lines: list[str], state: Path, send) -> str | None:
+    """Page each session file the census's `Key exposure 24h:` line names, once ever.
+
+    None, with nothing paged and no state written, when the line is absent, NOT_RUN or 0. The
+    line names the newest 3 paths; each page carries the count, so a 4th file new in the same
+    round is still visible as a number. `send(message) -> bool`; a False leaves the path
+    unrecorded so the next round retries it. State: save_state's shape, paths in "paged"."""
+    line = next((text for text in lines if text.startswith(KEY_LINE)), "")
+    count = KEY_COUNT.match(line)
+    if not count or count.group(1) == "0":
+        return None
+    try:
+        saved = json.loads(state.read_text()) if state.exists() else {}
+        paged = set(saved.get("paged", []))
+    except (OSError, ValueError, AttributeError, TypeError) as err:
+        return f"Key page: NOT_RUN state file {state} unreadable ({type(err).__name__}: {err})"
+    sent = failed = 0
+    for match in KEY_PATH.finditer(line.partition("; newest: ")[2]):
+        path, hhmm = match.groups()
+        if path in paged:
+            continue
+        message = (
+            f"KEY EXPOSURE: {path} holds a TypeSafe-shaped key (modified {hhmm}Z); "
+            f"{count.group(1)} session files in 24h. Rotate the key; never open that file"
+            " into a pane."
+        )
+        if send(message):
+            paged.add(path)
+            sent += 1
+        else:
+            failed += 1
+    notes = []
+    try:
+        save_state(state, paged, set())
+    except OSError as err:
+        notes.append(f"state NOT saved, next round re-pages ({err})")
+    if failed:
+        notes.append(f"{failed} send failed, retried next round")
+    tail = f" ({'; '.join(notes)})" if notes else ""
+    return (
+        f"Key page: {sent} new paths paged this round, {len(paged)} paged total{tail}"
+    )
+
+
 def ci_lines() -> list[str]:
     """scripts/ci-main-status.py's output (bead jev-bfku). Informational: never sets our exit code."""
     script = os.path.join(
@@ -489,9 +550,17 @@ def ci_lines() -> list[str]:
     ]
 
 
+def census_not_run(why: str) -> list[str]:
+    return [
+        f"{head} NOT_RUN {why}"
+        for head in ("Jev judge 24h:", "Skills 24h:", KEY_LINE.rstrip())
+    ]
+
+
 def judge_lines() -> list[str]:
-    """The Jev judge-role line (jev-xpk1) and the skills line (jev-yy7f). Informational: never
-    sets our exit code. The census prints every line it has; a dead census is NOT_RUN for both."""
+    """surface-census.py --fleet-line: the Jev judge-role line (jev-xpk1), the skills line
+    (jev-yy7f) and the key exposure line (jev-9ov4). Informational: never sets our exit code.
+    The census prints every line it has; a dead census is NOT_RUN for all three."""
     script = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         "work",
@@ -506,11 +575,11 @@ def judge_lines() -> list[str]:
             timeout=60,
         )
     except subprocess.TimeoutExpired:
-        why = "surface-census.py --fleet-line timed out after 60s"
-        return [f"Jev judge 24h: NOT_RUN {why}", f"Skills 24h: NOT_RUN {why}"]
+        return census_not_run("surface-census.py --fleet-line timed out after 60s")
     lines = done.stdout.splitlines()
-    why = f"surface-census.py printed nothing (exit {done.returncode})"
-    return lines or [f"Jev judge 24h: NOT_RUN {why}", f"Skills 24h: NOT_RUN {why}"]
+    return lines or census_not_run(
+        f"surface-census.py printed nothing (exit {done.returncode})"
+    )
 
 
 def selftest() -> int:
@@ -550,8 +619,12 @@ def main() -> int:
             print(f"pane {index}: {state} {words}")
         for line in ci_lines():
             print(line)
-        for line in judge_lines():
+        census = judge_lines()
+        for line in census:
             print(line)
+        note = key_round(census, key_state_path(), page)
+        if note:
+            print(note)
         print(inbox_round(*inbox_paths(), time.time(), page), flush=True)
         return 1 if any(reading[0] != "working" for reading in states.values()) else 0
     streak: dict[int, int] = {}
@@ -592,7 +665,16 @@ def main() -> int:
                 alert(index, idle_since[index], f"[{state}] {words}")
                 alerted_at[index] = now
         inbox_line = inbox_round(*inbox_paths(), started, page)
-        print(f"{time.strftime('%H:%M:%SZ', time.gmtime())} {inbox_line}", flush=True)
+        stamp = time.strftime("%H:%M:%SZ", time.gmtime())
+        print(f"{stamp} {inbox_line}", flush=True)
+        # The census each round (about 2 s on 2026-09-25), so a printed key pages within one round.
+        census = judge_lines()
+        for line in census:
+            if line.startswith(KEY_LINE):
+                print(f"{stamp} {line}", flush=True)
+        note = key_round(census, key_state_path(), page)
+        if note:
+            print(f"{stamp} {note}", flush=True)
         time.sleep(INTERVAL)
 
 

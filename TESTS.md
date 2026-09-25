@@ -84,12 +84,31 @@ claim nobody can check:
   skill" in a pane older than the install) do not; a skill missing from
   `~/.claude/skills/THIRD-PARTY-SKILLS.tsv` counts in the total only; no ledger is
   `third-party NOT_RUN (no ledger)` and no session files is `NOT_RUN`, never zero; the CLI prints
-  the judge line then the skills line, `scripts/fleet-idle-watch.py --once` shows both, and a
-  census timeout is NOT_RUN for both. Plants, each restored byte-identical: drop the absolute-path
+  the judge line, the skills line, then the key exposure line (jev-9ov4),
+  `scripts/fleet-idle-watch.py --once` shows them, and a census timeout is NOT_RUN for all three.
+  Plants, each restored byte-identical: drop the absolute-path
   branch fails 5 of 17; e9d037e's any-mention bash rule 1; drop the bash reader branch 2; drop
   `python -c` 1; drop the eval branch 2; Python cells by regex instead of ast 1; ignore error
   results 2; HEAD's watcher fails the timeout test.
   Run: `python3 -m unittest work/omp-jev-review/test_skill_census.py` (17 tests).
+- `work/omp-jev-review/test_key_exposure.py` — the `Key exposure 24h:` line of
+  `work/omp-jev-review/surface-census.py --fleet-line` and its pane-1 page in
+  `scripts/fleet-idle-watch.py` (jev-9ov4), keyless: every key is generated per run with the live
+  shape (`apikey_` + 35 + `_` + 64 of `[a-z0-9]`, the pattern read from `.omp/secrets.yml`) and
+  each output is checked for key text first, with a message that never quotes it. A session file
+  holding one counts and the line names its path and mtime, never the key; two 106-character near
+  misses (34 before the `_`, 63 after) and a file last modified 25h ago do not count; a `/tmp`
+  probe session under `~/.omp/agent/sessions` does; the newest 3 of 4 paths, newest first; many
+  keys in one file is one file; `flags: "i"` and `/.../i` literals are honoured; a missing or
+  unparsable `secrets.yml` (empty, plain-only, a regex that does not compile, not `key: value`, a
+  bad quoted value) and no session files are `NOT_RUN`, never zero; the CLI prints it as the third
+  line. Page: a new path pages pane 1 once (send injected), a second round and a restart (fresh
+  module, same state file) page nothing, a second path pages only itself, a failed send is retried,
+  0 or NOT_RUN pages nothing and writes no state, an unreadable state file is `Key page: NOT_RUN`,
+  and the forever loop pages in its first round. Plants, each restored byte-identical: drop the
+  24h window fails 1 of 18; print the match 11 (0 key-shaped strings in the failure output); page
+  every round 4.
+  Run: `python3 -m unittest work/omp-jev-review/test_key_exposure.py` (18 tests).
 - `work/fleet-idle-watch/test_fleet_idle_watch.py` — `scripts/fleet-idle-watch.py`'s classifier
   on process evidence (jev-6con), no tmux or ps: fixtures are the real process trees of jev panes
   0, 2, 4, 5 and two real screens, 2026-09-25. Both measured false readings: a screen with no

@@ -487,7 +487,7 @@ class Cli(unittest.TestCase):
     def tearDown(self):
         self.tmp.cleanup()
 
-    def test_fleet_line_prints_the_judge_line_then_the_skills_line_and_the_watch_shows_both(
+    def test_fleet_line_prints_the_judge_skills_and_key_lines_and_the_watch_shows_them(
         self,
     ):
         hour_ago = (datetime.now(timezone.utc) - timedelta(hours=1)).strftime(
@@ -513,9 +513,13 @@ class Cli(unittest.TestCase):
         )
         self.assertEqual(done.returncode, 0, done.stderr)
         lines = done.stdout.splitlines()
-        self.assertEqual(len(lines), 2, done.stdout)
+        self.assertEqual(len(lines), 3, done.stdout)
         self.assertTrue(lines[0].startswith("Jev judge 24h: 0 calls"), lines[0])
         self.assertEqual(lines[1], want)
+        self.assertEqual(
+            lines[2],
+            "Key exposure 24h: 0 session files hold a TypeSafe-shaped key (1 scanned)",
+        )
         out = io.StringIO()
         with (
             mock.patch.dict(os.environ, {"HOME": str(self.home)}),
@@ -529,13 +533,13 @@ class Cli(unittest.TestCase):
         self.assertIn("Jev judge 24h: 0 calls", out.getvalue())
         self.assertIn(want, out.getvalue())
 
-    def test_a_census_timeout_is_not_run_for_both_lines_in_the_watch(self):
+    def test_a_census_timeout_is_not_run_for_every_line_in_the_watch(self):
         timeout = subprocess.TimeoutExpired(["surface-census.py"], 60)
         with mock.patch.object(fiw.subprocess, "run", side_effect=timeout):
             lines = fiw.judge_lines()
         self.assertEqual(
             [line.split(" NOT_RUN ")[0] for line in lines],
-            ["Jev judge 24h:", "Skills 24h:"],
+            ["Jev judge 24h:", "Skills 24h:", "Key exposure 24h:"],
         )
 
 

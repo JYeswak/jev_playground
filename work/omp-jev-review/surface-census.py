@@ -8,7 +8,7 @@ sessions are not real work.
 
     python3 work/omp-jev-review/surface-census.py               # surfaces, then judge-role
     python3 work/omp-jev-review/surface-census.py --judge       # judge-role section only
-    python3 work/omp-jev-review/surface-census.py --fleet-line  # two lines, last 24h
+    python3 work/omp-jev-review/surface-census.py --fleet-line  # three lines, last 24h
 
 Judge role (bead jev-xpk1): omp answers find, auto-thinking, eval judge()/judge_batch() and
 unexpected-stop detection with the `judge` model role, pinned fleet-wide to typesafe/jev-latest
@@ -26,6 +26,14 @@ read(, tool.read( or open( on a skill path or skill://<name>; and the `skill-pro
 when a user invokes /skill:<name>. A call whose toolResult is `isError: true` ("Unknown skill" in
 a pane older than the install) is not a read. It names how many skills in
 ~/.claude/skills/THIRD-PARTY-SKILLS.tsv were read at least once; no ledger is NOT_RUN.
+
+Key exposure (bead jev-9ov4): the third --fleet-line line counts session .jsonl files under both
+session roots modified in the last 24h, probe sessions included, that hold a string matching a
+`type: regex` entry of .omp/secrets.yml (the TypeSafe key shape; read from there, never copied
+here), and names the newest 3 paths with their mtimes. It prints paths only, never the match. A
+missing or unparsable secrets.yml, or no session files, is NOT_RUN. Why: 2026-09-25 05:57Z a pane
+printed the live key into a tool result, omp's session log stored it, and a manual scan found it
+50 minutes later; scripts/fleet-idle-watch.py pages pane 1 once per new path.
 
 Exit 0 always. This is a census, not a gate.
 """
@@ -46,6 +54,10 @@ TYPE_RE = re.compile(r"com\.zeststream\.[A-Za-z0-9_.-]+")
 CREDITS_AFTER = "2026-09-24T04:19:00Z"
 JUDGE_PROVIDER = "typesafe"
 SESSION_ROOTS = "~/.omp/agent/sessions, ~/.omp/profiles/*/agent/sessions"
+SECRETS = REPO / ".omp" / "secrets.yml"
+KEY_NEWEST = 3
+REGEX_LITERAL = re.compile(r"^/(.+)/([a-z]*)$", re.S)
+REGEX_FLAGS = {"i": re.I, "m": re.M, "s": re.S}
 SKILL_LEDGER = HOME / ".claude" / "skills" / "THIRD-PARTY-SKILLS.tsv"
 SKILL_NAME = r"[A-Za-z0-9._-]+"
 SKILL_URL_RE = re.compile(rf"^skill://({SKILL_NAME})")
@@ -569,6 +581,123 @@ def skills_line(reads, now, have_sessions, ledger):
     return line + f"; never read {len(listed) - len(read)}"
 
 
+def yaml_scalar(text, number):
+    """One secrets.yml value: double-quoted (JSON escapes), single-quoted, or plain.
+
+    Errors name the line number only: a `type: plain` value is itself a secret.
+    """
+    if text.startswith('"'):
+        try:
+            value = json.loads(text)
+        except json.JSONDecodeError:
+            raise ValueError(f"line {number}: bad double-quoted value") from None
+        return value if isinstance(value, str) else str(value)
+    if text.startswith("'"):
+        if len(text) < 2 or not text.endswith("'"):
+            raise ValueError(f"line {number}: bad single-quoted value")
+        return text[1:-1].replace("''", "'")
+    return text
+
+
+def secret_patterns(path):
+    """Compiled bytes regexes of the `type: regex` entries of a secrets.yml.
+
+    The omp://secrets.md shape: a list of flat mappings; `flags` or a `/pattern/flags` literal
+    (i, m, s honoured). Raises OSError or ValueError; no message quotes a value. An entry that
+    does not compile is an error here, where omp would skip it: a census that silently drops
+    its only pattern would print 0.
+    """
+    entries = []
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    for number, raw in enumerate(lines, 1):
+        text = raw.strip()
+        if not text or text.startswith("#"):
+            continue
+        if text == "-" or text.startswith("- "):
+            entries.append({})
+            text = text[1:].strip()
+            if not text:
+                continue
+        key, colon, value = text.partition(":")
+        if not entries or not colon or not key.strip().isidentifier():
+            raise ValueError(f"line {number} is not a `key: value` entry of a list")
+        entries[-1][key.strip()] = yaml_scalar(value.strip(), number)
+    patterns = []
+    for index, entry in enumerate(entries, 1):
+        if entry.get("type") != "regex" or not entry.get("content"):
+            continue
+        source, flags = entry["content"], entry.get("flags", "")
+        literal = REGEX_LITERAL.match(source)
+        if literal:
+            source, flags = literal.groups()
+        bits = 0
+        for flag in flags:
+            bits |= REGEX_FLAGS.get(flag, 0)
+        try:
+            patterns.append(re.compile(source.encode(), bits))
+        except re.error as err:
+            raise ValueError(f"entry {index} does not compile ({err.msg})") from None
+    if not patterns:
+        raise ValueError("no `type: regex` entry")
+    return patterns
+
+
+def holds_key(path, patterns):
+    """True at the first line matching any pattern. Streams bytes; never returns the match."""
+    with path.open("rb") as fh:
+        for line in fh:
+            if any(p.search(line) for p in patterns):
+                return True
+    return False
+
+
+def key_exposure_line(files, now, have_sessions, secrets):
+    """'Key exposure 24h: N session files hold a TypeSafe-shaped key (S scanned); newest: ...'.
+
+    Every session file modified in the last 24h, probe sessions included (a key printed in a
+    probe is on disk all the same). The newest KEY_NEWEST paths with their mtimes; never the
+    matched text.
+    """
+    head = "Key exposure 24h:"
+    try:
+        patterns = secret_patterns(secrets)
+    except (OSError, ValueError) as err:
+        why = err.strerror if isinstance(err, OSError) else str(err)
+        return f"{head} NOT_RUN {secrets}: {why}"
+    if not have_sessions:
+        return f"{head} NOT_RUN no omp session files under {SESSION_ROOTS}"
+    cutoff = now.timestamp() - 24 * 3600
+    exposed, scanned, unreadable = [], 0, 0
+    for path in files:
+        try:
+            mtime = path.stat().st_mtime
+            hit = mtime >= cutoff and holds_key(path, patterns)
+        except OSError:
+            unreadable += 1
+            continue
+        if mtime < cutoff:
+            continue
+        scanned += 1
+        if hit:
+            exposed.append((mtime, str(path)))
+    note = f", {unreadable} unreadable" if unreadable else ""
+    line = (
+        f"{head} {len(exposed)} session files hold a TypeSafe-shaped key "
+        f"({scanned} scanned{note})"
+    )
+    if not exposed:
+        return line
+    newest = sorted(exposed, reverse=True)[:KEY_NEWEST]
+    return (
+        line
+        + "; newest: "
+        + ", ".join(
+            f"{path} ({datetime.fromtimestamp(mtime, timezone.utc).strftime('%H:%M')}Z)"
+            for mtime, path in newest
+        )
+    )
+
+
 def surfaces(roots, files):
     pkgs = packages()
     types_by = {p: decision_types(p) for p in pkgs}
@@ -668,6 +797,7 @@ def main(argv):
                 continue
         print(fleet_line(judge_rows(recent), now, bool(files)))
         print(skills_line(skill_reads(recent), now, bool(files), SKILL_LEDGER))
+        print(key_exposure_line(files, now, bool(files), SECRETS))
         return 0
     if "--judge" not in argv:
         surfaces(roots, files)
