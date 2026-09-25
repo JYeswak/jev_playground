@@ -57,3 +57,27 @@ select a winning candidate. The live bar was committed before any live call: mea
 best single by >=0.03, exact-completion McNemar p<0.05, and close >=30% of the mean-reward gap to
 oracle@8. Live state will contain compacted text from the allowed members only; no screenshots,
 raw trajectory text or runtime logs will be committed.
+
+## Live Jev selection
+
+Command:
+
+```text
+infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=prod -- node work/osw-bestofn/live_select.mjs
+```
+
+- Pinned model: `jev-1.13.0`; official SDK path: `work/jev-client` -> `@typesafe-ai/sdk`.
+- Calls: 361; failures: 0; comparator calls: 0.
+- Usage: 2,869,717 input tokens, 32,055 output tokens; estimated Jev spend **$0.120528114**
+  at $0.042/M input tokens, output free.
+- Mean official reward: Jev **0.4825593990** (48.2559 pp), best single **0.4625750296**
+  (46.2575 pp), delta **+0.0199843694** (+1.9984 pp).
+- Oracle mean reward: **0.6749818562**; gap closed **9.4085%**.
+- Exact tasks: Jev 167/361, best single 161/361.
+- McNemar vs best single: b=45, c=39, exact p=0.5856467947.
+- Claims-success floor: mean 0.4846237518; Jev delta **-0.0020643528**; McNemar b=30, c=31,
+  p=1.0. This comparison is reported, not barred.
+
+**Preregistered outcome:** the bar is not met (`+3 pp`, p<0.05, and >=30% gap closure all
+required). This is a measured failed experiment, not a ruling about Jev generally. No raw state,
+trajectory text, runtime log, screenshot, API key, or response body was committed.
