@@ -53,12 +53,12 @@ function reward(task, choice) {
 function exact(task, choice) {
   return reward(task, choice) >= 1.0 ? 1 : 0;
 }
-function exactMcNemar() {
+function exactMcNemar(baselineChoice) {
   let b = 0;
   let c = 0;
   for (const task of Object.keys(rows)) {
     const a = exact(task, picks[task]?.choice);
-    const d = Number(rows[task][floor.best_single_archive] ?? 0) >= 1.0 ? 1 : 0;
+    const d = exact(task, baselineChoice(task));
     if (a === 1 && d === 0) b += 1;
     if (a === 0 && d === 1) c += 1;
   }
@@ -75,10 +75,14 @@ function binomial(n, k) {
 }
 const selectedRewardSum = Object.keys(rows).reduce((sum, task) => sum + reward(task, picks[task]?.choice), 0);
 const selectedExactTasks = Object.keys(rows).reduce((sum, task) => sum + exact(task, picks[task]?.choice), 0);
-const best = Number(floor.best_single_successes);
-const oracle = Number(floor.oracle_successes);
+const best = Number(floor.best_single_reward_sum);
+const oracle = Number(floor.oracle_reward_sum);
+const claims = Number(floor.floors.claims_success.reward_sum);
+const bestChoice = () => floor.best_single_archive;
+const claimsChoice = (task) => floor.picks[task].claims_success;
 const delta = selectedRewardSum / floor.tasks - best / floor.tasks;
 const gap = oracle / floor.tasks - best / floor.tasks;
+const deltaVsClaims = selectedRewardSum / floor.tasks - claims / floor.tasks;
 const receipt = {
   model,
   tasks: floor.tasks,
@@ -95,7 +99,11 @@ const receipt = {
   oracle_mean_reward: oracle / floor.tasks,
   delta_vs_best_single: delta,
   gap_closed: gap === 0 ? null : delta / gap,
-  mcnemar_vs_best_single: exactMcNemar(),
+  mcnemar_vs_best_single: exactMcNemar(bestChoice),
+  claims_success_reward_sum: claims,
+  claims_success_mean_reward: claims / floor.tasks,
+  delta_vs_claims_success: deltaVsClaims,
+  mcnemar_vs_claims_success: exactMcNemar(claimsChoice),
   usage: { input_tokens: inputTokens, output_tokens: outputTokens },
   latency: { total_ms: latencyMs, mean_ms: latencyMs / Math.max(1, lines.length), wall_ms: Date.now() - started },
   spend_usd_estimate: inputTokens * 0.042 / 1_000_000,
@@ -112,7 +120,9 @@ console.log(JSON.stringify({
   selected_exact_tasks: receipt.selected_exact_tasks,
   delta_vs_best_single: receipt.delta_vs_best_single,
   gap_closed: receipt.gap_closed,
-  mcnemar: receipt.mcnemar_vs_best_single,
+  mcnemar_vs_best_single: receipt.mcnemar_vs_best_single,
+  delta_vs_claims_success: receipt.delta_vs_claims_success,
+  mcnemar_vs_claims_success: receipt.mcnemar_vs_claims_success,
   usage: receipt.usage,
   spend_usd_estimate: receipt.spend_usd_estimate,
 }, null, 2));

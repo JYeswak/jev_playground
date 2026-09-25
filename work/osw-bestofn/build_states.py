@@ -1,16 +1,18 @@
-"""Build compact untracked live states from only traj.jsonl/runtime.log/result.txt members.
+"""Build compact untracked live states from allowed OSWorld members.
 
-Output defaults to /tmp so raw trajectory text is never committed. Official result.txt
-is read only for joining and is deliberately excluded from the live state.
+Output defaults to /tmp so raw trajectory text is never committed. Only traj.jsonl,
+runtime.log and result.txt members are touched; result.txt is used for joining and
+is not included in the live state.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from range_zip import open_remote_zip, task_key
+from range_zip import open_remote_zip, read_member_bytes, task_key
 
 
 def member_map(archive) -> dict[str, dict[str, str]]:
@@ -58,40 +60,49 @@ def main() -> None:
     args = parser.parse_args()
     pool = json.loads(Path(args.pool).read_text())
     selected = pool["selected"]
-    by_archive: dict[str, tuple[object, dict[str, dict[str, str]]]] = {}
+    opened: dict[str, tuple[object, object, dict[str, dict[str, str]]]] = {}
     try:
         for candidate in selected:
-            archive, _remote = open_remote_zip(candidate["url"])
-            by_archive[candidate["archive"]] = (archive, member_map(archive))
+            archive, remote = open_remote_zip(candidate["url"])
+            opened[candidate["archive"]] = (archive, remote, member_map(archive))
         tasks = sorted(
             set.intersection(
-                *(set(members) for _archive, members in by_archive.values())
+                *(set(members) for _archive, _remote, members in opened.values())
             )
         )
+
+        def read_one(item: tuple[str, str]) -> tuple[str, str, dict[str, object]]:
+            name, task = item
+            archive, remote, members = opened[name]
+            info = members[task]
+            traj = compact_traj(read_member_bytes(archive, remote, info["traj"]))
+            runtime = read_member_bytes(archive, remote, info["runtime"]).decode(
+                "utf-8", "replace"
+            )
+            return (
+                name,
+                task,
+                {"actions": traj, "runtime_tail": runtime[-args.runtime_tail :]},
+            )
+
+        states: dict[str, dict[str, object]] = {}
+        requests = [
+            (candidate["archive"], task) for task in tasks for candidate in selected
+        ]
+        with ThreadPoolExecutor(max_workers=64) as executor:
+            for name, task, evidence in executor.map(read_one, requests):
+                states.setdefault(task, {})[name] = evidence
+
         with Path(args.out).open("w", encoding="utf-8") as output:
             for task in tasks:
-                candidates = []
-                for index, candidate in enumerate(selected):
-                    archive, members = by_archive[candidate["archive"]]
-                    info = members[task]
-                    traj = (
-                        compact_traj(archive.read(info["traj"]))
-                        if "traj" in info
-                        else []
-                    )
-                    runtime = (
-                        archive.read(info["runtime"]).decode("utf-8", "replace")
-                        if "runtime" in info
-                        else ""
-                    )
-                    candidates.append(
-                        {
-                            "id": f"c{index}",
-                            "archive": candidate["archive"],
-                            "actions": traj,
-                            "runtime_tail": runtime[-args.runtime_tail :],
-                        }
-                    )
+                candidates = [
+                    {
+                        "id": f"c{index}",
+                        "archive": candidate["archive"],
+                        **states[task][candidate["archive"]],
+                    }
+                    for index, candidate in enumerate(selected)
+                ]
                 output.write(
                     json.dumps(
                         {"task": task, "candidates": candidates}, ensure_ascii=False
@@ -99,7 +110,7 @@ def main() -> None:
                     + "\n"
                 )
     finally:
-        for archive, _members in by_archive.values():
+        for archive, _remote, _members in opened.values():
             archive.close()
     print(
         json.dumps({"tasks": len(tasks), "out": args.out, "raw_text_committed": False})
