@@ -1,0 +1,18 @@
+{
+  "status": "NOT_RUN",
+  "bead": "jev-pvdp",
+  "model": "jev-1.13.0",
+  "extract": "work/gate-question-gap/extract-5.jsonl",
+  "extract_commit": "55d30a4",
+  "key_status": "OK (not on the revoked list)",
+  "key_status_command": "infisical run --projectId=<redacted> -- python3 scripts/key-status.py",
+  "live_command_refused_before_api_call": "REFUSED: NOT READY: labels-5-1.jsonl is not committed and clean",
+  "missing_required_files": [
+    "work/gate-question-gap/labels-5-1.jsonl",
+    "work/gate-question-gap/labels-5-2.jsonl",
+    "work/gate-question-gap/labels-5-adjudicated.jsonl"
+  ],
+  "live_calls": 0,
+  "spend_usd": 0,
+  "boundary": "No Jev pass, flags, readout score, or verdict was produced; labels were not authored or inferred."
+}

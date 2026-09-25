@@ -2126,3 +2126,18 @@ Receipt: `work/osw-bestofn/valid_preflight_receipt.json`
 **0 live calls; $0 spend; no rows or bar score.**
 
 Boundary: no Best-of-N selection, official-reward join, comparator, or Jev result is claimed.
+
+## jev-pvdp readout-5 live preflight [live NOT_RUN]
+
+The rotated key preflight passed twice (`KEY: OK (not on the revoked list)`), and the
+frozen extract was committed as `55d30a4` before the live attempt. The exact live command
+then refused before an API call because `readout5.py ready` found
+`labels-5-1.jsonl` not committed and clean. The required label files
+`labels-5-1.jsonl`, `labels-5-2.jsonl`, and `labels-5-adjudicated.jsonl` are absent from
+the workspace; they were not authored or inferred.
+
+Receipt: `work/gate-question-gap/live_preflight_receipt.json`.
+**0 Jev calls; $0 spend; no flags-5 rows, readout5 score, or verdict.**
+
+Boundary: the frozen extract and API-key status are proven, but the preregistered
+non-author labels/power gate remains unmet, so the live pass is not claimed.
