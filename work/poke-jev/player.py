@@ -128,13 +128,14 @@ class PokeJevPlayer(LLMPlayer):
     # ------------------------------------------------------------------ options
     def _our_options(self, battle):
         opts, orders, display = [], {}, {}
-        for m in battle.available_moves:
+        valid_moves = [m for m in battle.available_moves if m.id != "nothing"]
+        for m in valid_moves:
             key = f"move {m.id}"
             opts.append(key)
             orders[key] = self.create_order(m)
             display[key] = pc.move_name(m.id)
         if battle.can_tera:
-            for m in battle.available_moves:
+            for m in valid_moves:
                 key = f"move {m.id}{replay.TERA_SUFFIX}"
                 opts.append(key)
                 orders[key] = self.create_order(m, terastallize=True)
