@@ -12,6 +12,17 @@ ROOT = Path(__file__).resolve().parent
 OUT = ROOT / "pool.json"
 N = 8
 
+POOL_FILES = [
+    "autoglm_15steps.zip",
+    "claude-3-7-sonnet-20250219-15steps.zip",
+    "claude-4-sonnet-20250514-15steps.zip",
+    "claude-sonnet-4-5-20250929_15steps.zip",
+    "doubao-1-5-thinking-vision-pro-250428-15step.zip",
+    "jedi-7b-4o-15steps.zip",
+    "jedi-7b-o3-15steps.zip",
+    "kimi-vl-a3b-15steps.zip",
+]
+
 
 def eligible_filename(path: str) -> bool:
     lower = path.lower()
@@ -23,11 +34,7 @@ def eligible_filename(path: str) -> bool:
 
 
 def main() -> None:
-    candidates = sorted(
-        str(row["path"])
-        for row in list_root_archives()
-        if eligible_filename(str(row["path"]))
-    )
+    candidates = POOL_FILES.copy()
     records: list[dict[str, object]] = []
     excluded: list[dict[str, str]] = []
     for filename in candidates:
@@ -56,12 +63,12 @@ def main() -> None:
             excluded.append({"archive": filename, "reason": repr(exc)})
         finally:
             archive.close()
-    records.sort(key=lambda row: (-int(row["score"]), str(row["archive"])))
+    # POOL_FILES order is preregistered; result scores are not used to select candidates.
     if len(records) < N:
         raise SystemExit(f"eligible archives={len(records)} < N={N}")
     selected = records[:N]
     receipt = {
-        "rule": "root .zip names containing 15step/15steps, excluding results_only; result.txt has exactly 361 rows; sort score descending then filename; take first N=8",
+        "rule": "fixed POOL_FILES allowlist; each result.txt has exactly 361 rows; no score or trajectory selection",
         "n": N,
         "candidates_considered": candidates,
         "excluded": excluded,

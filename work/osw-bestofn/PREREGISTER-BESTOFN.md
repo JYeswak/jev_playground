@@ -12,23 +12,31 @@ measurement date. The archive universe is fixed to root files whose names contai
 `15steps`, end in `.zip`, and are not `results_only` artifacts. This is the common 15-step
 OSWorld-Verified setting; no 50/100/300-step archive is eligible.
 
-The eligible pool is selected mechanically after reading only each candidate archive's official
-`result.txt` member through HTTP Range reads:
+The pool is fixed by an allowlist before any result, trajectory, or runtime member is read. The
+allowlist is eight lexicographically chosen root archives from the 15-step universe:
 
-1. Keep an archive only if `result.txt` contains one official scored row for each of the 361
-   OSWorld-Verified tasks. A missing, duplicate, malformed, or non-361 archive is excluded and the
-   exclusion is recorded by filename and reason.
-2. Compute each archive's official success count from its `result.txt` rows only. A row is success
-   exactly when the official result field is the success value used by that file; no trajectory
-   text, screenshots, runtime logs, task metadata, or model names influence the score.
-3. Sort eligible archives by descending official success count, then ascending filename as the
-   deterministic tie-break. Select the first **N=8** archives.
-4. Freeze the selected filenames and their result counts in the keyless oracle receipt before any
-   trajectory or runtime member is read. No archive can enter because its trajectory looks good.
+```text
+autoglm_15steps.zip
+claude-3-7-sonnet-20250219-15steps.zip
+claude-4-sonnet-20250514-15steps.zip
+claude-sonnet-4-5-20250929_15steps.zip
+doubao-1-5-thinking-vision-pro-250428-15step.zip
+jedi-7b-4o-15steps.zip
+jedi-7b-o3-15steps.zip
+kimi-vl-a3b-15steps.zip
+```
 
-The pool rule is intentionally score-ranked, as the bead permits “top 8 by published score at one
-step budget.” It is a selection-over-public-runs experiment, not an unbiased estimate of a new
-agent's single-run performance. The official `result.txt` is the only ground truth.
+The allowlist is the first eight names in lexical order among the root `.zip` files containing
+`15step`/`15steps`, excluding `results_only` files. No score, model label, trajectory content, or
+runtime text was used to choose the pool. For each allowlisted archive, `result.txt` must contain
+one official scored row for each of the 361 OSWorld-Verified tasks; otherwise the experiment
+aborts rather than substituting another archive. The eight filenames and their result counts are
+frozen in the keyless oracle receipt before any trajectory or runtime member is read.
+
+This fixed-allowlist rule supersedes the earlier score-ranked draft in commit `7f908b7`; the
+superseding amendment is committed before the keyless floors and before any live call. It is a
+selection-over-public-runs experiment, not an unbiased estimate of a new agent's single-run
+performance. The official `result.txt` is the only ground truth.
 
 ## State and privacy boundary
 
