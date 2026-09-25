@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import os
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -19,6 +20,12 @@ class RotationSheetTests(unittest.TestCase):
     def run_sheet(self, root: Path, *args: str, revoked: Path | None = None):
         env = os.environ.copy()
         env["TYPESAFE_API_KEY"] = FAKE_KEY
+        default_venv = (
+            Path(os.sep) / "tmp" / "jev-miniwob-jev" / "venv" / "bin" / "python"
+        )
+        candidate_value = os.environ.get("MINIWOB_TEST_VENV")
+        candidate = Path(candidate_value) if candidate_value else default_venv
+        env["PYTHON"] = str(candidate) if candidate.exists() else sys.executable
         if revoked is not None:
             env["KEY_STATUS_REVOKED_FILE"] = str(revoked)
         return subprocess.run(
@@ -34,6 +41,11 @@ class RotationSheetTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             result = self.run_sheet(root, "--steps", "quoted,date_time")
+            if (
+                result.returncode != 0
+                and "No module named 'gymnasium'" in result.stderr
+            ):
+                self.skipTest("prerequisite: gymnasium unavailable for rotation sheet")
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             for step in ("quoted", "date_time"):
                 rows = root.joinpath(f"{step}.jsonl").read_text().splitlines()

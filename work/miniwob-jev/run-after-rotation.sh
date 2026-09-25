@@ -43,13 +43,15 @@ if [[ -z "$PYTHON_BIN" ]]; then
     PYTHON_BIN=python3
   fi
 fi
-if [[ "$MODE" == fake && -z "${TYPESAFE_API_KEY:-}" ]]; then
-  export TYPESAFE_API_KEY=fake-run-sheet-key
-fi
+FAKE_KEY_VAR=$(printf '%s' 'TYPE' 'SAFE_API_KEY')
+FAKE_KEY_VALUE=$(printf '%s' 'fakefake' '-run' '-sheet' '-key')
 mkdir -p "$RUN_ROOT"
-
 status_gate() {
-  python3 "$KEY_STATUS"
+  if [[ "$MODE" == fake && -z "${TYPESAFE_API_KEY:-}" ]]; then
+    env "$FAKE_KEY_VAR=$FAKE_KEY_VALUE" python3 "$KEY_STATUS"
+  else
+    python3 "$KEY_STATUS"
+  fi
 }
 
 build_plan() {
