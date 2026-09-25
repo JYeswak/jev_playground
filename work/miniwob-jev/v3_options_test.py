@@ -112,7 +112,6 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
                     "top": 10,
                     "width": 20,
                     "height": 20,
-                    "color": "red",
                     "focused": False,
                     "is_leaf": True,
                 },
@@ -129,7 +128,6 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
                     "top": 60,
                     "width": 20,
                     "height": 20,
-                    "color": "blue",
                     "focused": False,
                     "is_leaf": True,
                 },
@@ -156,7 +154,24 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
                 "els": base["els"] + [{**base["els"][1], "ref": 4, "text": "ONPAGE"}],
             },
         )
-        color = self.probe("color", base)
+        import jev_arm
+
+        real = json.loads(
+            (HERE / "observations-real-20250925/click-color.json").read_text()
+        )
+        real_obs = real["observation"]
+        real_els = jev_arm.floor.elements_from_obs(real_obs)
+        for raw_element, element in zip(real_obs["dom_elements"], real_els):
+            element["bg_color"] = raw_element.get("bg_color", [])
+            element["fg_color"] = raw_element.get("fg_color", [])
+        color = self.probe(
+            "color",
+            {
+                "utterance": real_obs["utterance"],
+                "els": real_els,
+                "options": {},
+            },
+        )
         drag = self.probe("drag", base)
         date = self.probe(
             "date_time",
@@ -172,7 +187,7 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
         self.assertTrue(
             any("ONPAGE" in s for values in page["spans"].values() for s in values)
         )
-        self.assertIn('"color"', json.dumps(color["state"]))
+        self.assertIn('"bg_color"', json.dumps(color["state"]))
         self.assertTrue(any(a.startswith("drag [") for a in drag["actions"]))
         self.assertTrue(any(a.startswith("type [") for a in date["actions"]))
         self.assertFalse(any(a.startswith("none:") for a in none["actions"]))
@@ -439,6 +454,48 @@ print(json.dumps({
                 "floor_color": False,
             },
         )
+
+    def test_real_observations_preserve_style_and_offer_step_zero_actions(self):
+        code = """
+import importlib.util, json, os, sys
+os.environ["MINIWOB_V3"] = "1"
+os.environ["MINIWOB_V3_ARM"] = "all"
+sys.path.insert(0, "work/miniwob-jev")
+import jev_arm
+spec = importlib.util.spec_from_file_location("floor", "work/game-floors/miniwob/run.py")
+floor = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(floor)
+expected = {
+  "click-color": "click", "click-shades": "click",
+  "drag-circle": "drag", "drag-shapes": "drag",
+  "highlight-text": "click", "text-editor": "click",
+  "find-word": "type", "copy-paste": "type", "scroll-text": "type",
+  "text-transform": "type", "enter-time": "type",
+}
+result = {}
+for task, wanted in expected.items():
+    raw = json.loads(open(f"work/miniwob-jev/observations-real-20250925/{task}.json").read())
+    obs = raw["observation"]
+    els = floor.elements_from_obs(obs)
+    actions, _, _ = jev_arm.build_candidates(obs["utterance"], els, None, include_none=True)
+    result[task] = {
+        "wanted": wanted,
+        "offered": any(name.split(" ", 1)[0] == wanted for name in actions),
+        "style": any("bg_color" in e and "fg_color" in e for e in els),
+    }
+print(json.dumps(result, sort_keys=True))
+"""
+        result = subprocess.run(
+            ["/tmp/jev-miniwob-jev/venv/bin/python", "-c", code],
+            cwd=HERE.parent.parent,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout.splitlines()[-1])
+        self.assertTrue(all(row["offered"] for row in report.values()), report)
+        self.assertTrue(report["click-color"]["style"], report)
 
 
 if __name__ == "__main__":

@@ -145,25 +145,26 @@ def elements_from_obs(obs) -> list[dict]:
     els = []
     for e in obs["dom_elements"]:
         flags = [int(x) for x in e["flags"]]
-        els.append(
-            {
-                "ref": int(e["ref"]),
-                "parent": int(e["parent"]),
-                "tag": str(e["tag"]),
-                "kind": str(e["tag"]).upper(),
-                "text": str(e["text"]),
-                "value": str(e["value"]),
-                "id": str(e["id"]),
-                "classes": str(e["classes"]),
-                "color": str(e.get("color", "")) if v3_on("color") else "",
-                "left": float(e["left"][0]),
-                "top": float(e["top"][0]),
-                "width": float(e["width"][0]),
-                "height": float(e["height"][0]),
-                "focused": bool(flags[0]),
-                "is_leaf": bool(flags[3]),
-            }
-        )
+        item = {
+            "ref": int(e["ref"]),
+            "parent": int(e["parent"]),
+            "tag": str(e["tag"]),
+            "kind": str(e["tag"]).upper(),
+            "text": str(e["text"]),
+            "value": str(e["value"]),
+            "id": str(e["id"]),
+            "classes": str(e["classes"]),
+            "left": float(e["left"][0]),
+            "top": float(e["top"][0]),
+            "width": float(e["width"][0]),
+            "height": float(e["height"][0]),
+            "focused": bool(flags[0]),
+            "is_leaf": bool(flags[3]),
+        }
+        if v3_on("color"):
+            item["bg_color"] = [float(x) for x in e.get("bg_color", [])]
+            item["fg_color"] = [float(x) for x in e.get("fg_color", [])]
+        els.append(item)
     return els
 
 
@@ -217,8 +218,11 @@ def serialize_state(
             round(e["width"]),
             round(e["height"]),
         ]
-        if v3_on("color") and e.get("color"):
-            d["color"] = e["color"]
+        if v3_on("color"):
+            if e.get("bg_color"):
+                d["bg_color"] = e["bg_color"]
+            if e.get("fg_color"):
+                d["fg_color"] = e["fg_color"]
         if e["focused"]:
             d["focused"] = True
         if options and e["ref"] in options:

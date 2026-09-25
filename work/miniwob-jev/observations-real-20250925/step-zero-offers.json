@@ -1,0 +1,90 @@
+{
+  "click-color": {
+    "action_count": 5,
+    "arm": "color",
+    "elements": 7,
+    "offered": true,
+    "style_fields": 7,
+    "wanted": "click"
+  },
+  "click-shades": {
+    "action_count": 14,
+    "arm": "color",
+    "elements": 16,
+    "offered": true,
+    "style_fields": 16,
+    "wanted": "click"
+  },
+  "copy-paste": {
+    "action_count": 6,
+    "arm": "page_text",
+    "elements": 7,
+    "offered": true,
+    "style_fields": 0,
+    "wanted": "type"
+  },
+  "drag-circle": {
+    "action_count": 33,
+    "arm": "drag",
+    "elements": 6,
+    "offered": true,
+    "style_fields": 0,
+    "wanted": "drag"
+  },
+  "drag-shapes": {
+    "action_count": 97,
+    "arm": "drag",
+    "elements": 10,
+    "offered": true,
+    "style_fields": 0,
+    "wanted": "drag"
+  },
+  "enter-time": {
+    "action_count": 4,
+    "arm": "date_time",
+    "elements": 6,
+    "offered": true,
+    "style_fields": 0,
+    "wanted": "type"
+  },
+  "find-word": {
+    "action_count": 5,
+    "arm": "page_text",
+    "elements": 6,
+    "offered": true,
+    "style_fields": 0,
+    "wanted": "type"
+  },
+  "highlight-text": {
+    "action_count": 3,
+    "arm": "page_text",
+    "elements": 5,
+    "offered": true,
+    "style_fields": 0,
+    "wanted": "click"
+  },
+  "scroll-text": {
+    "action_count": 6,
+    "arm": "page_text",
+    "elements": 6,
+    "offered": true,
+    "style_fields": 0,
+    "wanted": "type"
+  },
+  "text-editor": {
+    "action_count": 12,
+    "arm": "page_text",
+    "elements": 25,
+    "offered": true,
+    "style_fields": 0,
+    "wanted": "click"
+  },
+  "text-transform": {
+    "action_count": 8,
+    "arm": "page_text",
+    "elements": 11,
+    "offered": true,
+    "style_fields": 0,
+    "wanted": "type"
+  }
+}
