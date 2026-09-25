@@ -57,7 +57,7 @@ Source: `work/pokeagent-emerald/PREREG.md`.
 | `:74` | `75`- and `100`-macro shifts; power `0.637` and `0.810`; primary MDE about `100` macros | detectable-effect claim behind `N=80` | ARITHMETIC — `power_mwu.py` calculation recorded in the prereg | — |
 | `:78` | fewer than `5` random goal-reaching runs ⇒ NO-CLAIM | prevents a distribution comparison with a vanishing control success cell | UNSOURCED | Derive the minimum from the intended median/quantile or success-rate confidence interval and freeze it before the next segment. |
 
-**Emerald result:** 9 inventory rows; 5 UNSOURCED, 3 ARITHMETIC, 1 DOCS, 0 EXTERNAL and
+**Emerald result:** 8 inventory rows; 5 UNSOURCED, 2 ARITHMETIC, 1 DOCS, 0 EXTERNAL and
 0 INCUMBENT. The rule “success rate not below random” is an incumbent comparison but has no
 additional numeric value; it is recorded in the row at `:74` rather than silently counted as a
 source for the `p<0.05` bar.
@@ -139,7 +139,7 @@ ARITHMETIC and 0 EXTERNAL. The `14/934` false-alarm figure in the prereg's discl
 
 ## Count and findings
 
-Across the inventory there are **46 numeric gate/cap/pass rows**. A mixed row is counted by the
+Across the inventory there are **45 numeric gate/cap/pass rows**. A mixed row is counted by the
 source class of the gate-bearing value; for example, the omp `125`-diff rates are arithmetic
 observations, but that row is UNSOURCED because its `one in ten` nuisance ceiling is the operative
 design choice.
@@ -148,7 +148,7 @@ design choice.
 |---|---:|
 | EXTERNAL | 0 |
 | INCUMBENT | 2 |
-| ARITHMETIC | 9 |
+| ARITHMETIC | 8 |
 | DOCS | 3 |
 | **UNSOURCED** | **32** |
 
