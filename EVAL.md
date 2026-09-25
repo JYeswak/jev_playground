@@ -1811,3 +1811,34 @@ deferred until after Jericho. Combined spend was `$0.101085348`. Receipt
 `docs/demos/upstream-repro/osw-bestofn-loss-depth-dev-20260925.md`; R106 correction commit
 `28747e4`. Boundary: no valid held-out variant, H5 terminal-status arm, MiniWoB, comparator,
 different step budget, or deployment policy. `ubs work/osw-bestofn/dev_replay.mjs` exit 0.
+
+## jev-9gtw.1 leaf evaluator Arm C (2026-09-25) [live]
+
+Author IvoryCreek (pane 3); row appended by pane 1 at their request, with pane 1's non-author
+recount. Prereg `docs/demos/upstream-repro/loss-depth-pokejev-leaf-c-prereg-20250925.md` @46d09b8
+(before any C fit); dev receipt `work/loss-depth/pokejev-components/leaf-c-dev-v1.{json,md}`
+@9ee47e5; held-out receipt `leaf-c-heldout-v1.{json,md}` @45607d3. Split
+`decision-split-v1.json`, whole battles.
+
+Dev: 95 battles, 2,060 rows. 5-fold GroupKFold AUC: code-only 0.6260 ± 0.0334, code + 3 Jev Nouls
+0.6422 ± 0.0333, per-fold deltas +0.0170, -0.0025, +0.0272, +0.0288, +0.0109. (The dev table's
+0.6652 / 0.6803 are in-sample fits, not dev estimates.)
+
+Held-out, fit once on all dev rows, scored once: 95 battles, 2,274 rows (1,171 won / 1,103 lost;
+172 fallback and 395 unusable rows excluded, 0 missing turns). Row AUC with battle-cluster
+bootstrap (5,000, seed 20260925): A action-prior value 0.5642 [0.5357, 0.5929]; B chosen leaf
+value 0.5663 [0.5264, 0.6075]; C code-only 0.7015 [0.6119, 0.7805]; C code + Nouls 0.7132
+[0.6233, 0.7893]. Both C variants pass the preregistered bar (AUC >= 0.65, lower bound > 0.60).
+Held-out Nouls: 2,274 `jev-1.13.0` calls, 1,439,630 input / 125,070 output tokens,
+`$0.060464460`, 0 failures.
+
+Pane 1 recount (`/tmp/verify-leafc.py`: leaf_c.py for data only, own fit, rank AUC and bootstrap):
+point AUCs reproduce exactly (0.7015, 0.7132). Paired held-out delta, Nouls minus code-only,
++0.0117, 95% [-0.0089, +0.0310], 13.1% of resamples <= 0: **the Jev Nouls' contribution is not
+distinguishable from zero**; the leaf fix comes from the code features. Each Noul alone: ko_now
+0.566, danger_now 0.436, switch_needed 0.410 (the last two point the expected way). The
+held-out features read Stage B replay HTML under `work/poke-jev/stage-b/replays-abyssal/`,
+which is untracked (0 of 200 files in git), so a stranger cannot re-run this from a clone.
+
+Boundary: no battle run; the receipt authorizes a separate battle preregistration only. No
+comparator model, no causal or counterfactual claim, no claim that Jev improves the leaf.
