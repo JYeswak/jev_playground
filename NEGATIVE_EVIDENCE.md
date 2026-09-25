@@ -4198,3 +4198,42 @@ or a declared credit budget sufficient to avoid the measured no-credit fallback 
 must retain a zero-call control, the Random feasibility gate, 200 or more fixed battles, and the
 same KILL/PASS thresholds before the first live call. The Metamon stretch is a separate comparison,
 not a retry of this closed bar.
+
+## R106 — REFUTED: missing task instruction, neutral labels, or per-candidate Nouls rescue this OSWorld loss slice
+
+**Claim (bead `jev-9gtw.2`).** The prior OSWorld Best-of-N loss could be repaired by adding the
+public task instruction, removing label semantics, or replacing one multi-way Choice with
+per-candidate Nouls. The dev arms and the held-out retest were preregistered in
+`docs/demos/upstream-repro/osw-bestofn-loss-depth-dev-20260925.md`; the dev task list and held-out
+complement were committed before their respective calls.
+
+**Measured 2026-09-25, live, `jev-1.13.0`.** The pinned OSWorld source was
+`b138d348256078fa634fc3b73567a7337c793e6b`. All 240 dev calls and all 57 held-out calls returned
+valid rows with the resolved model recorded per call:
+
+| Arm | N | Mean official reward | Exact | Input tokens | Spend |
+|---|---:|---:|---:|---:|---:|
+| Original dev | 60 | 0.0166667 | 1/60 | 477,436 | $0.020052312 |
+| Goal dev | 60 | 0.0166667 | 1/60 | 480,164 | $0.020166888 |
+| Neutral-label dev | 60 | 0.0000000 | 0/60 | 481,756 | $0.020233752 |
+| Noul dev | 60 | 0.0000000 | 0/60 | 511,156 | $0.021468552 |
+| Original held-out | 57 | 0.0093946 | 0/57 | 456,282 | $0.019163844 |
+
+The strict preregistered dev rule required a variant to beat `original`; no variant qualified
+(`goal` tied). The held-out arm therefore remained the preregistered `original`, not a post-hoc
+combination. On held-out, the best single scored 0.3015857 (17/57), oracle@8 scored 0.5263158
+(30/57), and the original arm scored 0.0093946 (0/57): delta −0.2921911, gap closure −130.02%,
+McNemar `b=17`, `c=0`, exact two-sided `p=0.0000152588`. The original +3 pp / p<0.05 / 30% gap
+bar failed.
+
+**What it refutes.** These three preregistered changes did not improve the fixed dev failure slice,
+and the locked selection rule found no reason to carry one forward. This does not test a held-out
+variant because none earned eligibility; it does not refute a different task distribution, a
+different evidence window, H5 terminal-status evidence, a fallback policy, or Jev generally.
+
+**Retry condition.** Reopen only with a new public-task slice and a preregistered change that is
+distinct from these three variables, or with a new H5 arm whose terminal field is extracted only
+from named `traj.jsonl`/`runtime.log` fields. Require the same strict dev-improvement rule and a
+fresh held-out pool before any live call; do not promote the held-out baseline failure into a
+variant result. Receipt: `work/osw-bestofn/dev_live_receipt.json`; report:
+`docs/demos/upstream-repro/osw-bestofn-loss-depth-dev-20260925.md`.
