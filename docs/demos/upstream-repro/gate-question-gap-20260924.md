@@ -238,3 +238,37 @@ the pinned archive's `LICENSE`/`COPYING` text plus the pinned GitHub URL; a repo
 is retained only when the detected SPDX license is in the allowlist. This transport
 change preserves the source, pin, selection, and bars and was committed before any
 successful extraction.
+
+**Allowlist freeze (2026-09-25T17:01:59Z UTC).** Before reading any workflow file,
+the GitHub repository search query was fixed as
+`topic:github-actions archived:false is:public`, sorted by stars descending:
+`https://github.com/search?q=topic%3Agithub-actions+archived%3Afalse+is%3Apublic&type=repositories&s=stars&o=desc`.
+The top ten displayed repositories and displayed stars were frozen, with no
+replacement after workflow inspection:
+
+1. `nektos/act` (72.1k)
+2. `go-gitea/gitea` (58.2k)
+3. `fastapi/full-stack-fastapi-template` (45.8k)
+4. `sdras/awesome-actions` (28.3k)
+5. `goreleaser/goreleaser` (16.1k)
+6. `ubicloud/ubicloud` (12.3k)
+7. `cobusgreyling/loop-engineering` (11.3k)
+8. `Agents365-ai/drawio-skill` (9.7k)
+9. `community/community` (8.8k)
+10. `hect0x7/JMComic-Crawler-Python` (7.4k)
+
+The archive extractor records the pinned commit, license evidence, and any
+allowlist/workflow exclusions for exactly these ten repositories. It does not add a
+repository because its workflow contents look useful.
+
+**Bar-status correction.** Audit `1de0f39` classifies the inherited `70%`, `+5`,
+`+2.0` percentage-point, and `10` target-harm comparison numbers as UNSOURCED. In
+this public-corpus unit, the `>=10` target-shape requirement is a sourced feasibility
+bar from bead `jev-yru2`/R113, and the `1886` state-size bound is sourced from the
+frozen question objects and `scripts/jev-state-size.py`. The `70%`, `+5`, and
+`+2.0` pp comparison thresholds remain **PROPOSED (descriptive only)** here; they
+cannot authorize a live call or a wording change. Before any later live measurement,
+those thresholds must be replaced or promoted by a committed exact paired-power
+calculation at a stated smallest effect, using the exact McNemar implementation
+named above and a recorded label-derived baseline. This unit does not derive power
+from labels that do not yet exist.
