@@ -362,12 +362,34 @@ class HaltRun(BaseException):
     """Escapes the floor's run_episode `except Exception`: the episode row is not written."""
 
 
+class RevokedKey(RuntimeError):
+    pass
+
+
+def require_live_key_status() -> str:
+    result = subprocess.run(
+        ["python3", str(ROOT / "scripts" / "key-status.py")],
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    message = (result.stdout or result.stderr).strip()
+    if result.returncode == 3:
+        raise RevokedKey(message)
+    if result.returncode == 2:
+        raise MissingKey(message or "TYPESAFE_API_KEY unset")
+    if result.returncode != 0:
+        raise RuntimeError(message or "key-status failed")
+    return message
+
+
 class LiveAsker:
     """The official SDK, model pinned; a missing key raises before any client exists."""
 
     def __init__(self):
         if not os.environ.get("TYPESAFE_API_KEY", "").strip():
             raise MissingKey("TYPESAFE_API_KEY unset")
+        require_live_key_status()
         from typesafe_sdk import RetryPolicy, TypeSafeClient
 
         self.client = TypeSafeClient(

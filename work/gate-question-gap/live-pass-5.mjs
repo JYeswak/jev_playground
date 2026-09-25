@@ -39,10 +39,17 @@ function refuse(message, code = 2) {
 if (!process.argv.includes("--live")) {
   refuse("NOT_RUN: readout 5's live pass makes two Jev calls per extract row; rerun with --live under `infisical run` once `readout5.py ready` exits 0");
 }
+const keyStatus = spawnSync(
+  "python3",
+  [join(HERE, "../../scripts/key-status.py")],
+  { encoding: "utf8", env: process.env },
+);
+if (keyStatus.status !== 0) {
+  refuse(keyStatus.stdout.trim() || keyStatus.stderr.trim(), keyStatus.status ?? 2);
+}
 const ready = spawnSync("python3", [join(HERE, "readout5.py"), "ready"], { encoding: "utf8" });
 if (ready.status !== 0) refuse(`REFUSED: ${ready.stdout.trim() || ready.stderr.trim()}`, 1);
 const key = process.env.TYPESAFE_API_KEY;
-if (!key) refuse("NOT_RUN reason=unconfigured: TYPESAFE_API_KEY is not in the environment (run under `infisical run --projectId=...`)");
 
 const rows = readJsonl(EXTRACT);
 const raw = new Map();

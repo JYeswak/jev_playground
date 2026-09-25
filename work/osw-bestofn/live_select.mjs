@@ -1,10 +1,20 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { askJevChoice } from "../../work/jev-client/src/index.ts";
+import { spawnSync } from "node:child_process";
 
 const statePath = process.env.OSW_STATE_FILE ?? "/tmp/jev-osw-bestofn-states.jsonl";
 const floorPath = process.env.OSW_FLOOR_RECEIPT ?? "work/osw-bestofn/floor_receipt.json";
 const outputPath = process.env.OSW_LIVE_RECEIPT ?? "work/osw-bestofn/live_receipt.json";
 const model = "jev-1.13.0";
+const keyStatus = spawnSync(
+  "python3",
+  [new URL("../../scripts/key-status.py", import.meta.url).pathname],
+  { encoding: "utf8", env: process.env },
+);
+if (keyStatus.status !== 0) {
+  console.error((keyStatus.stdout || keyStatus.stderr).trim());
+  process.exit(keyStatus.status ?? 2);
+}
 const floor = JSON.parse(await readFile(floorPath, "utf8"));
 const rows = floor.results_by_task;
 const lines = (await readFile(statePath, "utf8")).trim().split("\n").filter(Boolean);

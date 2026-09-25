@@ -2036,3 +2036,9 @@ not executed.
 Keyless tests: `python3 -m unittest work/row-provenance-check/test_row_provenance_check.py` → **14/14 passed**. Decision/action rows are detected and validated; checker-owned `work/row-provenance-check/fixtures/` is skipped so deliberately failing future fixtures cannot trip the live scan; committed legacy decision logs remain SHA-exempted without rewriting. The live checker exits 0 and reports **4 experiment row files / 3273 rows / 2 decision logs / 4 exempted files**. A mutation skipping decision-log detection turns the suite RED. No TypeSafe calls or spend.
 
 Boundary: no model judgment, no live Jev call, and no row content was rewritten. The TESTS.md registry row needs the 12/12→14/14 count update; pane-1 non-author verification remains pending.
+
+## jev-30q7 Revoked TypeSafe key guard (2026-09-25) [offline-verified]
+
+Keyless fake-key tests: `python3 -m unittest work/key-status/test_key_status.py` → **6/6 passed**. The revoked fingerprint command returns exit 3 without printing the key or full hash; the Best-of-N, gate-question, and MiniWoB live entrypoints all refuse the same fake revoked key before requests. No real key or Infisical invocation was used.
+
+Boundary: no TypeSafe call, no live runner, no spend. TESTS.md rows and pane-1 non-author verification remain pending.
