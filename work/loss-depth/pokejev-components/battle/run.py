@@ -550,6 +550,7 @@ class LeafPlayer(FrozenAlphaPlayer):
 
 
 _LEAF_CONFIG: tuple[str, FrozenLeafModel] | None = None
+_RUN_ID: str | None = None
 
 _ORIGINAL_MAKE_PLAYERS = stage_b.make_players
 
@@ -596,6 +597,8 @@ def _dumps_with_provenance(obj, *args, **kwargs):
         if _LEAF_CONFIG is not None:
             obj["leaf_mode"] = _LEAF_CONFIG[0]
             obj["leaf_model_sha256"] = LEAF_MODEL_SHA256
+        if _RUN_ID is not None:
+            obj["run_id"] = _RUN_ID
     return _ORIGINAL_JSON_DUMPS(obj, *args, **kwargs)
 
 
@@ -646,7 +649,8 @@ async def _run_shard(
     leaf_mode: str | None = None,
     run_id: str | None = None,
 ) -> int:
-    global _LEAF_CONFIG
+    global _LEAF_CONFIG, _RUN_ID
+    _RUN_ID = run_id
     if leaf_mode is not None and control:
         raise ValueError("leaf arms cannot be combined with --control")
     _LEAF_CONFIG = (

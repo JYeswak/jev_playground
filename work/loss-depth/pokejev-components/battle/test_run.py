@@ -158,7 +158,9 @@ class FrozenLeafArmTests(unittest.TestCase):
                     object(),
                 )
                 battle_run.stage_b.play = fake_play
-                result = asyncio.run(battle_run._run_shard("abyssal", 1, 1, 0, True))
+                result = asyncio.run(
+                    battle_run._run_shard("abyssal", 1, 1, 0, True, run_id="unit")
+                )
                 row_path = Path(temp) / "results-abyssal-mix-v1-control.jsonl"
                 row = json.loads(row_path.read_text(encoding="utf-8"))
             finally:
@@ -169,6 +171,7 @@ class FrozenLeafArmTests(unittest.TestCase):
 
         self.assertEqual(result, 0)
         datetime.fromisoformat(row["row_started_at_utc"])
+        self.assertEqual(row["run_id"], "unit")
         datetime.fromisoformat(row["row_recorded_at_utc"])
 
     def test_jsonl_row_records_wrapper_hash_and_utc_timestamp(self):
