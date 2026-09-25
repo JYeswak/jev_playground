@@ -2042,3 +2042,9 @@ Boundary: no model judgment, no live Jev call, and no row content was rewritten.
 Keyless fake-key tests: `python3 -m unittest work/key-status/test_key_status.py` → **6/6 passed**. The revoked fingerprint command returns exit 3 without printing the key or full hash; the Best-of-N, gate-question, and MiniWoB live entrypoints all refuse the same fake revoked key before requests. No real key or Infisical invocation was used.
 
 Boundary: no TypeSafe call, no live runner, no spend. TESTS.md rows and pane-1 non-author verification remain pending.
+
+## jev-9gtw.4.1 MiniWoB v3 post-rotation run sheet (2026-09-25) [offline-verified]
+
+Keyless run: `bash work/miniwob-jev/run-after-rotation.sh --fake --steps quoted,date_time` completed two episodes per selected step and ran row-provenance validation for each output. The revoked-fake plant returned exit 3 at step 1 before writing rows. The `--live` path is wired to the preregistered isolated sections and combined 400-404 held-out command, with `scripts/key-status.py` before every step.
+
+Boundary: no TypeSafe calls, no live runner, no spend. TESTS.md row is registered; pane-1 non-author verification remains pending.
