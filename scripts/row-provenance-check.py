@@ -77,14 +77,14 @@ def first_added_commits(repo: Path) -> dict[str, datetime]:
     for line in output.splitlines():
         if line.startswith("__ROW_PROVENANCE_COMMIT__"):
             raw = line.split("__ROW_PROVENANCE_COMMIT__", 1)[1]
-            commit_date = parse_timestamp(raw)
+            commit_date = parse_timestamp(raw, require_utc=False)
             continue
         if commit_date is not None and line.endswith(".jsonl"):
             first.setdefault(line, commit_date)
     return first
 
 
-def parse_timestamp(value: object) -> datetime | None:
+def parse_timestamp(value: object, *, require_utc: bool = True) -> datetime | None:
     if not isinstance(value, str) or not value.strip():
         return None
     text = value.strip()
@@ -94,7 +94,9 @@ def parse_timestamp(value: object) -> datetime | None:
         parsed = datetime.fromisoformat(text)
     except ValueError:
         return None
-    if parsed.tzinfo is None or parsed.utcoffset() != timezone.utc.utcoffset(None):
+    if parsed.tzinfo is None:
+        return None
+    if require_utc and parsed.utcoffset() != timezone.utc.utcoffset(None):
         return None
     return parsed.astimezone(timezone.utc)
 

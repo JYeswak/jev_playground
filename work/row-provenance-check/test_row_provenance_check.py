@@ -15,9 +15,8 @@ SCRIPT = Path(
     os.environ.get("ROW_PROVENANCE_CHECK", ROOT / "scripts" / "row-provenance-check.py")
 )
 FIXTURES = HERE / "fixtures"
-CUTOFF = "2026-09-25T09:00:00+0000"
-AFTER = "2026-09-25T09:01:00+0000"
-BEFORE = "2026-09-25T08:59:00+0000"
+AFTER = "2026-09-25T03:01:00-0600"
+BEFORE = "2026-09-25T02:59:00-0600"
 
 
 class RowProvenanceCheckerTests(unittest.TestCase):
