@@ -1903,3 +1903,35 @@ Keyless tests: `python3 -m unittest work/arm-sanity/test_arm_sanity.py` → **5/
 Direct keyless commands reported the expected exit sequence `1, 0, 1, 2`; `ruff format --check`, `ruff check`, and `ubs scripts/arm-sanity.py work/arm-sanity/test_arm_sanity.py` were run. No TypeSafe calls or spend were used.
 
 Boundary: no live arm, no model judgment, no comparator, and no Jev API call. The TESTS.md row is now updated; pane-1 non-author verification remains required before bead closure.
+
+## jev-9gtw.1 leaf evaluator Arm C, r2 to r4 (2026-09-25) [oracle]
+
+Supersedes the leaf conclusion of the Arm C row above (7fd80a3), whose code features used an
+HP sum over replay-seen Pokémon that a live battle cannot compute. Author IvoryCreek (pane 3);
+row by pane 1 with its non-author recount (`/tmp/verify-leafc.py`: leaf_c.py for data only, own
+fit, rank AUC, 5,000-resample battle-cluster bootstrap, seed 20260925). Held-out split is the
+same 95 battles, 2,274 rows (1,171 won; 172 fallback and 395 unusable rows excluded).
+
+- **r2 battle (fb0f003), NOT-SCORED harness bug:** `run.py:439` used `r"(\\d+)%"`, which never
+  matches digits, so candidates differed only in the action-type feature; the arm switched on
+  1,518 of 1,532 offered turns (Stage B 41%). Zero Jev calls in the leaf.
+- **r3 (d201a3f prereg, 4af5ce5 refit and held-out, 7ba9742 battle partial):** features a live
+  battle can compute. Held-out code-only 0.6458 [0.544, 0.741], failing the 0.65 bar; code + 3
+  Nouls 0.7175 [0.636, 0.788]; paired Noul gain +0.0717 [+0.0044, +0.1607]. Battle NOT-SCORED:
+  977 of 982 offered turns switched, because one feature was the recorded action type
+  (`leaf_c.py:237`) and none scored the opponent's side (R109).
+- **r4 (c98a9d4 prereg with an action-ranking gate, 9fbe996 refit and held-out):** action type
+  dropped, opponent HP remaining and HP differential added; model sha256 `ad8cd164…73c49b`.
+  Keyless gates: switch rate 33/100 on recorded Stage B turns against the 41% reference (within
+  the 10-point sanity band). Held-out code-only 0.8269 [0.7547, 0.8835], code + Nouls 0.8242
+  [0.7539, 0.8820]; paired Noul delta -0.0027 [-0.0150, +0.0081], 67% of resamples <= 0. Pane 1
+  recount reproduces every figure.
+
+Reading: once the leaf sees both sides' HP, the three Jev Nouls add nothing measurable to
+winner prediction. r4 is the third read of this held-out split (each round preregistered before
+scoring, each change driven by a harness or design defect found in battle, not by held-out
+numbers), so its 0.83 is optimistic by an unknown amount. Spend across r2 to r4: none on
+TypeSafe (held-out Nouls came from the cached rows of 45607d3).
+
+Boundary: no scored battle exists for any leaf arm. Winner AUC does not certify action ranking;
+the next battle must check its action-type mix against the reference arm after its first rows.
