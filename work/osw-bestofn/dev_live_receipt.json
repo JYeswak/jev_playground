@@ -1,0 +1,2766 @@
+{
+  "source_repo": "xlang-ai/OSWorld",
+  "source_sha": "b138d348256078fa634fc3b73567a7337c793e6b",
+  "dev_slice": "work/osw-bestofn/dev_slice.json",
+  "heldout_slice": "work/osw-bestofn/heldout_slice.json",
+  "dev_arms": {
+    "original": {
+      "variant": "original",
+      "model": "jev-1.13.0",
+      "tasks": 60,
+      "calls": 60,
+      "failures": 0,
+      "usage": {
+        "input_tokens": 477436,
+        "output_tokens": 5298
+      },
+      "spend_usd_estimate": 0.020052312000000003,
+      "resolved_models": [
+        "jev-1.13.0"
+      ],
+      "rows": [
+        {
+          "task": "chrome/47543840-672a-467d-80df-8f7c3b9788c9",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7757,
+          "output_tokens": 88,
+          "latency_ms": 579
+        },
+        {
+          "task": "chrome/6c4c23a1-42a4-43cc-9db1-2f86ff3738cc",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8719,
+          "output_tokens": 88,
+          "latency_ms": 286
+        },
+        {
+          "task": "chrome/7f52cab9-535c-4835-ac8c-391ee64dc930",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 10083,
+          "output_tokens": 88,
+          "latency_ms": 153
+        },
+        {
+          "task": "chrome/99146c54-4f37-4ab8-9327-5f3291665e1e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9117,
+          "output_tokens": 88,
+          "latency_ms": 158
+        },
+        {
+          "task": "chrome/da46d875-6b82-4681-9284-653b0c7ae241",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9132,
+          "output_tokens": 88,
+          "latency_ms": 210
+        },
+        {
+          "task": "libreoffice_calc/0326d92d-d218-48a8-9ca1-981cd6d064c7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8709,
+          "output_tokens": 88,
+          "latency_ms": 199
+        },
+        {
+          "task": "libreoffice_calc/035f41ba-6653-43ab-aa63-c86d449d62e5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8551,
+          "output_tokens": 88,
+          "latency_ms": 157
+        },
+        {
+          "task": "libreoffice_calc/04d9aeaf-7bed-4024-bedb-e10e6f00eb7f",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8828,
+          "output_tokens": 88,
+          "latency_ms": 168
+        },
+        {
+          "task": "libreoffice_calc/0a2e43bf-b26c-4631-a966-af9dfa12c9e5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8456,
+          "output_tokens": 88,
+          "latency_ms": 145
+        },
+        {
+          "task": "libreoffice_calc/1de60575-bb6e-4c3d-9e6a-2fa699f9f197",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9019,
+          "output_tokens": 88,
+          "latency_ms": 144
+        },
+        {
+          "task": "libreoffice_calc/30e3e107-1cfb-46ee-a755-2cd080d7ba6a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8469,
+          "output_tokens": 88,
+          "latency_ms": 139
+        },
+        {
+          "task": "libreoffice_calc/347ef137-7eeb-4c80-a3bb-0951f26a8aff",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6898,
+          "output_tokens": 88,
+          "latency_ms": 140
+        },
+        {
+          "task": "libreoffice_calc/51719eea-10bc-4246-a428-ac7c433dd4b3",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8844,
+          "output_tokens": 88,
+          "latency_ms": 153
+        },
+        {
+          "task": "libreoffice_impress/358aa0a7-6677-453f-ae35-e440f004c31e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6400,
+          "output_tokens": 88,
+          "latency_ms": 108
+        },
+        {
+          "task": "libreoffice_impress/4ed5abd0-8b5d-47bd-839f-cacfa15ca37a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8663,
+          "output_tokens": 88,
+          "latency_ms": 219
+        },
+        {
+          "task": "libreoffice_impress/bf4e9888-f10f-47af-8dba-76413038b73c",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9123,
+          "output_tokens": 88,
+          "latency_ms": 142
+        },
+        {
+          "task": "libreoffice_writer/0a0faba3-5580-44df-965d-f562a99b291c",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8576,
+          "output_tokens": 88,
+          "latency_ms": 176
+        },
+        {
+          "task": "libreoffice_writer/adf5e2c3-64c7-4644-b7b6-d2f0167927e7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9707,
+          "output_tokens": 88,
+          "latency_ms": 205
+        },
+        {
+          "task": "multi_apps/0e5303d4-8820-42f6-b18d-daf7e633de21",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7259,
+          "output_tokens": 88,
+          "latency_ms": 136
+        },
+        {
+          "task": "multi_apps/1f18aa87-af6f-41ef-9853-cdb8f32ebdea",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8616,
+          "output_tokens": 88,
+          "latency_ms": 122
+        },
+        {
+          "task": "chrome/2888b4e6-5b47-4b57-8bf5-c73827890774",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8350,
+          "output_tokens": 88,
+          "latency_ms": 138
+        },
+        {
+          "task": "chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8153,
+          "output_tokens": 88,
+          "latency_ms": 137
+        },
+        {
+          "task": "chrome/6766f2b8-8a72-417f-a9e5-56fcaa735837",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9048,
+          "output_tokens": 88,
+          "latency_ms": 159
+        },
+        {
+          "task": "chrome/82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8285,
+          "output_tokens": 88,
+          "latency_ms": 116
+        },
+        {
+          "task": "chrome/ae78f875-5b98-4907-bbb5-9c737fc68c03",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8399,
+          "output_tokens": 88,
+          "latency_ms": 139
+        },
+        {
+          "task": "chrome/fc6d8143-9452-4171-9459-7f515143419a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8368,
+          "output_tokens": 88,
+          "latency_ms": 127
+        },
+        {
+          "task": "gimp/2e6f678f-472d-4c55-99cc-8e7c5c402a71",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9636,
+          "output_tokens": 88,
+          "latency_ms": 156
+        },
+        {
+          "task": "gimp/38f48d40-764e-4e77-a7cf-51dfce880291",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8244,
+          "output_tokens": 88,
+          "latency_ms": 126
+        },
+        {
+          "task": "gimp/58d3eeeb-e9d0-499f-962e-fd0db2a744d8",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 4656,
+          "output_tokens": 88,
+          "latency_ms": 123
+        },
+        {
+          "task": "gimp/5ca86c6f-f317-49d8-b6a7-b527541caae8",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7830,
+          "output_tokens": 88,
+          "latency_ms": 197
+        },
+        {
+          "task": "gimp/dbbf4b99-2253-4b10-9274-45f246af2466",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8736,
+          "output_tokens": 88,
+          "latency_ms": 153
+        },
+        {
+          "task": "libreoffice_impress/7ae48c60-f143-4119-b659-15b8f485eb9a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8631,
+          "output_tokens": 88,
+          "latency_ms": 128
+        },
+        {
+          "task": "libreoffice_impress/8979838c-54a5-4454-a2b8-3d135a1a5c8f",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6862,
+          "output_tokens": 89,
+          "latency_ms": 138
+        },
+        {
+          "task": "libreoffice_writer/3ef2b351-8a84-4ff2-8724-d86eae9b842e",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 4447,
+          "output_tokens": 89,
+          "latency_ms": 142
+        },
+        {
+          "task": "libreoffice_writer/72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5424,
+          "output_tokens": 88,
+          "latency_ms": 143
+        },
+        {
+          "task": "libreoffice_writer/bb8ccc78-479f-4a2f-a71e-d565e439436b",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7175,
+          "output_tokens": 88,
+          "latency_ms": 139
+        },
+        {
+          "task": "multi_apps/36037439-2044-4b50-b9d1-875b5a332143",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8131,
+          "output_tokens": 88,
+          "latency_ms": 150
+        },
+        {
+          "task": "multi_apps/9219480b-3aed-47fc-8bac-d2cffc5849f7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8303,
+          "output_tokens": 88,
+          "latency_ms": 129
+        },
+        {
+          "task": "os/4783cc41-c03c-4e1b-89b4-50658f642bd5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 10800,
+          "output_tokens": 88,
+          "latency_ms": 169
+        },
+        {
+          "task": "os/b3d4a89c-53f2-4d6b-8b6a-541fb5d205fa",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6359,
+          "output_tokens": 88,
+          "latency_ms": 177
+        },
+        {
+          "task": "chrome/59155008-fe71-45ec-8a8f-dc35497b6aa8",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8101,
+          "output_tokens": 89,
+          "latency_ms": 157
+        },
+        {
+          "task": "chrome/93eabf48-6a27-4cb6-b963-7d5fe1e0d3a9",
+          "ok": true,
+          "choice": "c1",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6078,
+          "output_tokens": 89,
+          "latency_ms": 124
+        },
+        {
+          "task": "chrome/9f3f70fc-5afc-4958-a7b7-3bb4fcb01805",
+          "ok": true,
+          "choice": "c5",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8255,
+          "output_tokens": 89,
+          "latency_ms": 239
+        },
+        {
+          "task": "chrome/f0b971a1-6831-4b9b-a50e-22a6e47f45ba",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8388,
+          "output_tokens": 89,
+          "latency_ms": 128
+        },
+        {
+          "task": "gimp/045bf3ff-9077-4b86-b483-a1040a949cff",
+          "ok": true,
+          "choice": "c3",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8500,
+          "output_tokens": 89,
+          "latency_ms": 154
+        },
+        {
+          "task": "gimp/62f7fd55-0687-4a43-b6e1-3eda16fc6252",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8318,
+          "output_tokens": 89,
+          "latency_ms": 116
+        },
+        {
+          "task": "gimp/72f83cdc-bf76-4531-9a1b-eb893a13f8aa",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5244,
+          "output_tokens": 88,
+          "latency_ms": 130
+        },
+        {
+          "task": "gimp/8ea73f6f-9689-42ad-8c60-195bbf06a7ba",
+          "ok": true,
+          "choice": "c4",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8156,
+          "output_tokens": 89,
+          "latency_ms": 124
+        },
+        {
+          "task": "gimp/e19bd559-633b-4b02-940f-d946248f088e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6915,
+          "output_tokens": 88,
+          "latency_ms": 137
+        },
+        {
+          "task": "gimp/f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7416,
+          "output_tokens": 89,
+          "latency_ms": 149
+        },
+        {
+          "task": "gimp/fbb548ca-c2a6-4601-9204-e39a2efc507b",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7447,
+          "output_tokens": 89,
+          "latency_ms": 142
+        },
+        {
+          "task": "libreoffice_calc/01b269ae-2111-4a07-81fd-3fcd711993b0",
+          "ok": true,
+          "choice": "c1",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6967,
+          "output_tokens": 89,
+          "latency_ms": 135
+        },
+        {
+          "task": "libreoffice_calc/0cecd4f3-74de-457b-ba94-29ad6b5dafb6",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8163,
+          "output_tokens": 89,
+          "latency_ms": 150
+        },
+        {
+          "task": "libreoffice_calc/2bd59342-0664-4ccb-ba87-79379096cc08",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8484,
+          "output_tokens": 88,
+          "latency_ms": 213
+        },
+        {
+          "task": "libreoffice_calc/4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+          "ok": true,
+          "choice": "c1",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5952,
+          "output_tokens": 89,
+          "latency_ms": 144
+        },
+        {
+          "task": "libreoffice_calc/7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+          "ok": true,
+          "choice": "c3",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8786,
+          "output_tokens": 89,
+          "latency_ms": 124
+        },
+        {
+          "task": "libreoffice_calc/aa3a8974-2e85-438b-b29e-a64df44deb4b",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7806,
+          "output_tokens": 89,
+          "latency_ms": 147
+        },
+        {
+          "task": "libreoffice_calc/ecb0df7a-4e8d-4a03-b162-053391d3afaf",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7986,
+          "output_tokens": 89,
+          "latency_ms": 121
+        },
+        {
+          "task": "libreoffice_impress/08aced46-45a2-48d7-993b-ed3fb5b32302",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5954,
+          "output_tokens": 88,
+          "latency_ms": 161
+        },
+        {
+          "task": "libreoffice_impress/15aece23-a215-4579-91b4-69eec72e18da",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7757,
+          "output_tokens": 89,
+          "latency_ms": 134
+        }
+      ]
+    },
+    "goal": {
+      "variant": "goal",
+      "model": "jev-1.13.0",
+      "tasks": 60,
+      "calls": 60,
+      "failures": 0,
+      "usage": {
+        "input_tokens": 480164,
+        "output_tokens": 5294
+      },
+      "spend_usd_estimate": 0.020166888000000004,
+      "resolved_models": [
+        "jev-1.13.0"
+      ],
+      "rows": [
+        {
+          "task": "chrome/47543840-672a-467d-80df-8f7c3b9788c9",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7810,
+          "output_tokens": 88,
+          "latency_ms": 372
+        },
+        {
+          "task": "chrome/6c4c23a1-42a4-43cc-9db1-2f86ff3738cc",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8751,
+          "output_tokens": 88,
+          "latency_ms": 392
+        },
+        {
+          "task": "chrome/7f52cab9-535c-4835-ac8c-391ee64dc930",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 10135,
+          "output_tokens": 88,
+          "latency_ms": 164
+        },
+        {
+          "task": "chrome/99146c54-4f37-4ab8-9327-5f3291665e1e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9143,
+          "output_tokens": 88,
+          "latency_ms": 158
+        },
+        {
+          "task": "chrome/da46d875-6b82-4681-9284-653b0c7ae241",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9210,
+          "output_tokens": 88,
+          "latency_ms": 117
+        },
+        {
+          "task": "libreoffice_calc/0326d92d-d218-48a8-9ca1-981cd6d064c7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8788,
+          "output_tokens": 88,
+          "latency_ms": 126
+        },
+        {
+          "task": "libreoffice_calc/035f41ba-6653-43ab-aa63-c86d449d62e5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8648,
+          "output_tokens": 88,
+          "latency_ms": 281
+        },
+        {
+          "task": "libreoffice_calc/04d9aeaf-7bed-4024-bedb-e10e6f00eb7f",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8899,
+          "output_tokens": 88,
+          "latency_ms": 135
+        },
+        {
+          "task": "libreoffice_calc/0a2e43bf-b26c-4631-a966-af9dfa12c9e5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8494,
+          "output_tokens": 88,
+          "latency_ms": 134
+        },
+        {
+          "task": "libreoffice_calc/1de60575-bb6e-4c3d-9e6a-2fa699f9f197",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9059,
+          "output_tokens": 88,
+          "latency_ms": 154
+        },
+        {
+          "task": "libreoffice_calc/30e3e107-1cfb-46ee-a755-2cd080d7ba6a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8569,
+          "output_tokens": 88,
+          "latency_ms": 147
+        },
+        {
+          "task": "libreoffice_calc/347ef137-7eeb-4c80-a3bb-0951f26a8aff",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6955,
+          "output_tokens": 88,
+          "latency_ms": 140
+        },
+        {
+          "task": "libreoffice_calc/51719eea-10bc-4246-a428-ac7c433dd4b3",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8894,
+          "output_tokens": 88,
+          "latency_ms": 152
+        },
+        {
+          "task": "libreoffice_impress/358aa0a7-6677-453f-ae35-e440f004c31e",
+          "ok": true,
+          "choice": "c3",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6457,
+          "output_tokens": 89,
+          "latency_ms": 181
+        },
+        {
+          "task": "libreoffice_impress/4ed5abd0-8b5d-47bd-839f-cacfa15ca37a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8690,
+          "output_tokens": 88,
+          "latency_ms": 136
+        },
+        {
+          "task": "libreoffice_impress/bf4e9888-f10f-47af-8dba-76413038b73c",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9271,
+          "output_tokens": 88,
+          "latency_ms": 217
+        },
+        {
+          "task": "libreoffice_writer/0a0faba3-5580-44df-965d-f562a99b291c",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8646,
+          "output_tokens": 88,
+          "latency_ms": 179
+        },
+        {
+          "task": "libreoffice_writer/adf5e2c3-64c7-4644-b7b6-d2f0167927e7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9838,
+          "output_tokens": 88,
+          "latency_ms": 155
+        },
+        {
+          "task": "multi_apps/0e5303d4-8820-42f6-b18d-daf7e633de21",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7313,
+          "output_tokens": 88,
+          "latency_ms": 123
+        },
+        {
+          "task": "multi_apps/1f18aa87-af6f-41ef-9853-cdb8f32ebdea",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8700,
+          "output_tokens": 88,
+          "latency_ms": 244
+        },
+        {
+          "task": "chrome/2888b4e6-5b47-4b57-8bf5-c73827890774",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8381,
+          "output_tokens": 88,
+          "latency_ms": 144
+        },
+        {
+          "task": "chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8197,
+          "output_tokens": 88,
+          "latency_ms": 133
+        },
+        {
+          "task": "chrome/6766f2b8-8a72-417f-a9e5-56fcaa735837",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9085,
+          "output_tokens": 88,
+          "latency_ms": 128
+        },
+        {
+          "task": "chrome/82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8306,
+          "output_tokens": 89,
+          "latency_ms": 127
+        },
+        {
+          "task": "chrome/ae78f875-5b98-4907-bbb5-9c737fc68c03",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8453,
+          "output_tokens": 88,
+          "latency_ms": 129
+        },
+        {
+          "task": "chrome/fc6d8143-9452-4171-9459-7f515143419a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8394,
+          "output_tokens": 88,
+          "latency_ms": 138
+        },
+        {
+          "task": "gimp/2e6f678f-472d-4c55-99cc-8e7c5c402a71",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9670,
+          "output_tokens": 88,
+          "latency_ms": 131
+        },
+        {
+          "task": "gimp/38f48d40-764e-4e77-a7cf-51dfce880291",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8288,
+          "output_tokens": 88,
+          "latency_ms": 135
+        },
+        {
+          "task": "gimp/58d3eeeb-e9d0-499f-962e-fd0db2a744d8",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 4678,
+          "output_tokens": 88,
+          "latency_ms": 103
+        },
+        {
+          "task": "gimp/5ca86c6f-f317-49d8-b6a7-b527541caae8",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7872,
+          "output_tokens": 88,
+          "latency_ms": 129
+        },
+        {
+          "task": "gimp/dbbf4b99-2253-4b10-9274-45f246af2466",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8759,
+          "output_tokens": 88,
+          "latency_ms": 124
+        },
+        {
+          "task": "libreoffice_impress/7ae48c60-f143-4119-b659-15b8f485eb9a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8668,
+          "output_tokens": 88,
+          "latency_ms": 146
+        },
+        {
+          "task": "libreoffice_impress/8979838c-54a5-4454-a2b8-3d135a1a5c8f",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6884,
+          "output_tokens": 88,
+          "latency_ms": 168
+        },
+        {
+          "task": "libreoffice_writer/3ef2b351-8a84-4ff2-8724-d86eae9b842e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 4467,
+          "output_tokens": 88,
+          "latency_ms": 114
+        },
+        {
+          "task": "libreoffice_writer/72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5472,
+          "output_tokens": 88,
+          "latency_ms": 116
+        },
+        {
+          "task": "libreoffice_writer/bb8ccc78-479f-4a2f-a71e-d565e439436b",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7199,
+          "output_tokens": 88,
+          "latency_ms": 129
+        },
+        {
+          "task": "multi_apps/36037439-2044-4b50-b9d1-875b5a332143",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8157,
+          "output_tokens": 88,
+          "latency_ms": 154
+        },
+        {
+          "task": "multi_apps/9219480b-3aed-47fc-8bac-d2cffc5849f7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8367,
+          "output_tokens": 88,
+          "latency_ms": 150
+        },
+        {
+          "task": "os/4783cc41-c03c-4e1b-89b4-50658f642bd5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 10824,
+          "output_tokens": 88,
+          "latency_ms": 215
+        },
+        {
+          "task": "os/b3d4a89c-53f2-4d6b-8b6a-541fb5d205fa",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6380,
+          "output_tokens": 88,
+          "latency_ms": 123
+        },
+        {
+          "task": "chrome/59155008-fe71-45ec-8a8f-dc35497b6aa8",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8119,
+          "output_tokens": 89,
+          "latency_ms": 127
+        },
+        {
+          "task": "chrome/93eabf48-6a27-4cb6-b963-7d5fe1e0d3a9",
+          "ok": true,
+          "choice": "c1",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6135,
+          "output_tokens": 89,
+          "latency_ms": 149
+        },
+        {
+          "task": "chrome/9f3f70fc-5afc-4958-a7b7-3bb4fcb01805",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8276,
+          "output_tokens": 88,
+          "latency_ms": 136
+        },
+        {
+          "task": "chrome/f0b971a1-6831-4b9b-a50e-22a6e47f45ba",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8430,
+          "output_tokens": 89,
+          "latency_ms": 148
+        },
+        {
+          "task": "gimp/045bf3ff-9077-4b86-b483-a1040a949cff",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8521,
+          "output_tokens": 88,
+          "latency_ms": 134
+        },
+        {
+          "task": "gimp/62f7fd55-0687-4a43-b6e1-3eda16fc6252",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8350,
+          "output_tokens": 88,
+          "latency_ms": 236
+        },
+        {
+          "task": "gimp/72f83cdc-bf76-4531-9a1b-eb893a13f8aa",
+          "ok": true,
+          "choice": "c4",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5261,
+          "output_tokens": 89,
+          "latency_ms": 120
+        },
+        {
+          "task": "gimp/8ea73f6f-9689-42ad-8c60-195bbf06a7ba",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8180,
+          "output_tokens": 88,
+          "latency_ms": 146
+        },
+        {
+          "task": "gimp/e19bd559-633b-4b02-940f-d946248f088e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6935,
+          "output_tokens": 88,
+          "latency_ms": 119
+        },
+        {
+          "task": "gimp/f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7440,
+          "output_tokens": 89,
+          "latency_ms": 142
+        },
+        {
+          "task": "gimp/fbb548ca-c2a6-4601-9204-e39a2efc507b",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7477,
+          "output_tokens": 89,
+          "latency_ms": 118
+        },
+        {
+          "task": "libreoffice_calc/01b269ae-2111-4a07-81fd-3fcd711993b0",
+          "ok": true,
+          "choice": "c1",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7011,
+          "output_tokens": 89,
+          "latency_ms": 117
+        },
+        {
+          "task": "libreoffice_calc/0cecd4f3-74de-457b-ba94-29ad6b5dafb6",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8235,
+          "output_tokens": 89,
+          "latency_ms": 147
+        },
+        {
+          "task": "libreoffice_calc/2bd59342-0664-4ccb-ba87-79379096cc08",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8514,
+          "output_tokens": 88,
+          "latency_ms": 136
+        },
+        {
+          "task": "libreoffice_calc/4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+          "ok": true,
+          "choice": "c1",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5978,
+          "output_tokens": 89,
+          "latency_ms": 165
+        },
+        {
+          "task": "libreoffice_calc/7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+          "ok": true,
+          "choice": "c3",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8842,
+          "output_tokens": 89,
+          "latency_ms": 166
+        },
+        {
+          "task": "libreoffice_calc/aa3a8974-2e85-438b-b29e-a64df44deb4b",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7866,
+          "output_tokens": 88,
+          "latency_ms": 215
+        },
+        {
+          "task": "libreoffice_calc/ecb0df7a-4e8d-4a03-b162-053391d3afaf",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8069,
+          "output_tokens": 89,
+          "latency_ms": 152
+        },
+        {
+          "task": "libreoffice_impress/08aced46-45a2-48d7-993b-ed3fb5b32302",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5975,
+          "output_tokens": 88,
+          "latency_ms": 128
+        },
+        {
+          "task": "libreoffice_impress/15aece23-a215-4579-91b4-69eec72e18da",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7779,
+          "output_tokens": 89,
+          "latency_ms": 128
+        }
+      ]
+    },
+    "neutral": {
+      "variant": "neutral",
+      "model": "jev-1.13.0",
+      "tasks": 60,
+      "calls": 60,
+      "failures": 0,
+      "usage": {
+        "input_tokens": 481756,
+        "output_tokens": 5297
+      },
+      "spend_usd_estimate": 0.020233752,
+      "resolved_models": [
+        "jev-1.13.0"
+      ],
+      "rows": [
+        {
+          "task": "chrome/47543840-672a-467d-80df-8f7c3b9788c9",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7829,
+          "output_tokens": 88,
+          "latency_ms": 461
+        },
+        {
+          "task": "chrome/6c4c23a1-42a4-43cc-9db1-2f86ff3738cc",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8791,
+          "output_tokens": 88,
+          "latency_ms": 352
+        },
+        {
+          "task": "chrome/7f52cab9-535c-4835-ac8c-391ee64dc930",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 10155,
+          "output_tokens": 88,
+          "latency_ms": 138
+        },
+        {
+          "task": "chrome/99146c54-4f37-4ab8-9327-5f3291665e1e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9189,
+          "output_tokens": 88,
+          "latency_ms": 144
+        },
+        {
+          "task": "chrome/da46d875-6b82-4681-9284-653b0c7ae241",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9204,
+          "output_tokens": 88,
+          "latency_ms": 205
+        },
+        {
+          "task": "libreoffice_calc/0326d92d-d218-48a8-9ca1-981cd6d064c7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8781,
+          "output_tokens": 88,
+          "latency_ms": 154
+        },
+        {
+          "task": "libreoffice_calc/035f41ba-6653-43ab-aa63-c86d449d62e5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8623,
+          "output_tokens": 88,
+          "latency_ms": 150
+        },
+        {
+          "task": "libreoffice_calc/04d9aeaf-7bed-4024-bedb-e10e6f00eb7f",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8900,
+          "output_tokens": 88,
+          "latency_ms": 223
+        },
+        {
+          "task": "libreoffice_calc/0a2e43bf-b26c-4631-a966-af9dfa12c9e5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8528,
+          "output_tokens": 88,
+          "latency_ms": 126
+        },
+        {
+          "task": "libreoffice_calc/1de60575-bb6e-4c3d-9e6a-2fa699f9f197",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9091,
+          "output_tokens": 88,
+          "latency_ms": 231
+        },
+        {
+          "task": "libreoffice_calc/30e3e107-1cfb-46ee-a755-2cd080d7ba6a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8541,
+          "output_tokens": 88,
+          "latency_ms": 166
+        },
+        {
+          "task": "libreoffice_calc/347ef137-7eeb-4c80-a3bb-0951f26a8aff",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6970,
+          "output_tokens": 88,
+          "latency_ms": 183
+        },
+        {
+          "task": "libreoffice_calc/51719eea-10bc-4246-a428-ac7c433dd4b3",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8916,
+          "output_tokens": 88,
+          "latency_ms": 147
+        },
+        {
+          "task": "libreoffice_impress/358aa0a7-6677-453f-ae35-e440f004c31e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6472,
+          "output_tokens": 88,
+          "latency_ms": 194
+        },
+        {
+          "task": "libreoffice_impress/4ed5abd0-8b5d-47bd-839f-cacfa15ca37a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8735,
+          "output_tokens": 88,
+          "latency_ms": 145
+        },
+        {
+          "task": "libreoffice_impress/bf4e9888-f10f-47af-8dba-76413038b73c",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9195,
+          "output_tokens": 88,
+          "latency_ms": 164
+        },
+        {
+          "task": "libreoffice_writer/0a0faba3-5580-44df-965d-f562a99b291c",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8648,
+          "output_tokens": 88,
+          "latency_ms": 215
+        },
+        {
+          "task": "libreoffice_writer/adf5e2c3-64c7-4644-b7b6-d2f0167927e7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9779,
+          "output_tokens": 88,
+          "latency_ms": 154
+        },
+        {
+          "task": "multi_apps/0e5303d4-8820-42f6-b18d-daf7e633de21",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7331,
+          "output_tokens": 88,
+          "latency_ms": 198
+        },
+        {
+          "task": "multi_apps/1f18aa87-af6f-41ef-9853-cdb8f32ebdea",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8688,
+          "output_tokens": 88,
+          "latency_ms": 173
+        },
+        {
+          "task": "chrome/2888b4e6-5b47-4b57-8bf5-c73827890774",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8422,
+          "output_tokens": 88,
+          "latency_ms": 155
+        },
+        {
+          "task": "chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8225,
+          "output_tokens": 88,
+          "latency_ms": 137
+        },
+        {
+          "task": "chrome/6766f2b8-8a72-417f-a9e5-56fcaa735837",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9120,
+          "output_tokens": 88,
+          "latency_ms": 228
+        },
+        {
+          "task": "chrome/82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8357,
+          "output_tokens": 88,
+          "latency_ms": 163
+        },
+        {
+          "task": "chrome/ae78f875-5b98-4907-bbb5-9c737fc68c03",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8471,
+          "output_tokens": 88,
+          "latency_ms": 142
+        },
+        {
+          "task": "chrome/fc6d8143-9452-4171-9459-7f515143419a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8440,
+          "output_tokens": 88,
+          "latency_ms": 224
+        },
+        {
+          "task": "gimp/2e6f678f-472d-4c55-99cc-8e7c5c402a71",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9708,
+          "output_tokens": 88,
+          "latency_ms": 155
+        },
+        {
+          "task": "gimp/38f48d40-764e-4e77-a7cf-51dfce880291",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8316,
+          "output_tokens": 88,
+          "latency_ms": 160
+        },
+        {
+          "task": "gimp/58d3eeeb-e9d0-499f-962e-fd0db2a744d8",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 4728,
+          "output_tokens": 88,
+          "latency_ms": 205
+        },
+        {
+          "task": "gimp/5ca86c6f-f317-49d8-b6a7-b527541caae8",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7902,
+          "output_tokens": 88,
+          "latency_ms": 142
+        },
+        {
+          "task": "gimp/dbbf4b99-2253-4b10-9274-45f246af2466",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8808,
+          "output_tokens": 88,
+          "latency_ms": 144
+        },
+        {
+          "task": "libreoffice_impress/7ae48c60-f143-4119-b659-15b8f485eb9a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8703,
+          "output_tokens": 88,
+          "latency_ms": 140
+        },
+        {
+          "task": "libreoffice_impress/8979838c-54a5-4454-a2b8-3d135a1a5c8f",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6934,
+          "output_tokens": 89,
+          "latency_ms": 187
+        },
+        {
+          "task": "libreoffice_writer/3ef2b351-8a84-4ff2-8724-d86eae9b842e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 4519,
+          "output_tokens": 88,
+          "latency_ms": 127
+        },
+        {
+          "task": "libreoffice_writer/72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5496,
+          "output_tokens": 88,
+          "latency_ms": 133
+        },
+        {
+          "task": "libreoffice_writer/bb8ccc78-479f-4a2f-a71e-d565e439436b",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7247,
+          "output_tokens": 88,
+          "latency_ms": 178
+        },
+        {
+          "task": "multi_apps/36037439-2044-4b50-b9d1-875b5a332143",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8203,
+          "output_tokens": 88,
+          "latency_ms": 131
+        },
+        {
+          "task": "multi_apps/9219480b-3aed-47fc-8bac-d2cffc5849f7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8375,
+          "output_tokens": 88,
+          "latency_ms": 171
+        },
+        {
+          "task": "os/4783cc41-c03c-4e1b-89b4-50658f642bd5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 10872,
+          "output_tokens": 88,
+          "latency_ms": 220
+        },
+        {
+          "task": "os/b3d4a89c-53f2-4d6b-8b6a-541fb5d205fa",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6431,
+          "output_tokens": 88,
+          "latency_ms": 159
+        },
+        {
+          "task": "chrome/59155008-fe71-45ec-8a8f-dc35497b6aa8",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8173,
+          "output_tokens": 89,
+          "latency_ms": 139
+        },
+        {
+          "task": "chrome/93eabf48-6a27-4cb6-b963-7d5fe1e0d3a9",
+          "ok": true,
+          "choice": "c1",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6150,
+          "output_tokens": 89,
+          "latency_ms": 226
+        },
+        {
+          "task": "chrome/9f3f70fc-5afc-4958-a7b7-3bb4fcb01805",
+          "ok": true,
+          "choice": "c5",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8327,
+          "output_tokens": 89,
+          "latency_ms": 226
+        },
+        {
+          "task": "chrome/f0b971a1-6831-4b9b-a50e-22a6e47f45ba",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8460,
+          "output_tokens": 89,
+          "latency_ms": 165
+        },
+        {
+          "task": "gimp/045bf3ff-9077-4b86-b483-a1040a949cff",
+          "ok": true,
+          "choice": "c3",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8572,
+          "output_tokens": 89,
+          "latency_ms": 152
+        },
+        {
+          "task": "gimp/62f7fd55-0687-4a43-b6e1-3eda16fc6252",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8390,
+          "output_tokens": 89,
+          "latency_ms": 160
+        },
+        {
+          "task": "gimp/72f83cdc-bf76-4531-9a1b-eb893a13f8aa",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5316,
+          "output_tokens": 88,
+          "latency_ms": 128
+        },
+        {
+          "task": "gimp/8ea73f6f-9689-42ad-8c60-195bbf06a7ba",
+          "ok": true,
+          "choice": "c4",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8228,
+          "output_tokens": 89,
+          "latency_ms": 219
+        },
+        {
+          "task": "gimp/e19bd559-633b-4b02-940f-d946248f088e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6987,
+          "output_tokens": 88,
+          "latency_ms": 127
+        },
+        {
+          "task": "gimp/f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7488,
+          "output_tokens": 89,
+          "latency_ms": 140
+        },
+        {
+          "task": "gimp/fbb548ca-c2a6-4601-9204-e39a2efc507b",
+          "ok": true,
+          "choice": "c2",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7519,
+          "output_tokens": 89,
+          "latency_ms": 128
+        },
+        {
+          "task": "libreoffice_calc/01b269ae-2111-4a07-81fd-3fcd711993b0",
+          "ok": true,
+          "choice": "c1",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7039,
+          "output_tokens": 89,
+          "latency_ms": 143
+        },
+        {
+          "task": "libreoffice_calc/0cecd4f3-74de-457b-ba94-29ad6b5dafb6",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8235,
+          "output_tokens": 89,
+          "latency_ms": 130
+        },
+        {
+          "task": "libreoffice_calc/2bd59342-0664-4ccb-ba87-79379096cc08",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8556,
+          "output_tokens": 88,
+          "latency_ms": 217
+        },
+        {
+          "task": "libreoffice_calc/4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+          "ok": true,
+          "choice": "c1",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6024,
+          "output_tokens": 89,
+          "latency_ms": 168
+        },
+        {
+          "task": "libreoffice_calc/7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+          "ok": true,
+          "choice": "c3",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8858,
+          "output_tokens": 89,
+          "latency_ms": 151
+        },
+        {
+          "task": "libreoffice_calc/aa3a8974-2e85-438b-b29e-a64df44deb4b",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7878,
+          "output_tokens": 89,
+          "latency_ms": 135
+        },
+        {
+          "task": "libreoffice_calc/ecb0df7a-4e8d-4a03-b162-053391d3afaf",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8058,
+          "output_tokens": 89,
+          "latency_ms": 237
+        },
+        {
+          "task": "libreoffice_impress/08aced46-45a2-48d7-993b-ed3fb5b32302",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6026,
+          "output_tokens": 88,
+          "latency_ms": 132
+        },
+        {
+          "task": "libreoffice_impress/15aece23-a215-4579-91b4-69eec72e18da",
+          "ok": true,
+          "choice": "c0",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7829,
+          "output_tokens": 89,
+          "latency_ms": 148
+        }
+      ]
+    },
+    "noul": {
+      "variant": "noul",
+      "model": "jev-1.13.0",
+      "tasks": 60,
+      "calls": 60,
+      "failures": 0,
+      "usage": {
+        "input_tokens": 511156,
+        "output_tokens": 8880
+      },
+      "spend_usd_estimate": 0.021468552,
+      "resolved_models": [
+        "jev-1.13.0"
+      ],
+      "rows": [
+        {
+          "task": "chrome/47543840-672a-467d-80df-8f7c3b9788c9",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8319,
+          "output_tokens": 148,
+          "latency_ms": 516
+        },
+        {
+          "task": "chrome/6c4c23a1-42a4-43cc-9db1-2f86ff3738cc",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9281,
+          "output_tokens": 148,
+          "latency_ms": 304
+        },
+        {
+          "task": "chrome/7f52cab9-535c-4835-ac8c-391ee64dc930",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 10645,
+          "output_tokens": 148,
+          "latency_ms": 209
+        },
+        {
+          "task": "chrome/99146c54-4f37-4ab8-9327-5f3291665e1e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9679,
+          "output_tokens": 148,
+          "latency_ms": 140
+        },
+        {
+          "task": "chrome/da46d875-6b82-4681-9284-653b0c7ae241",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9694,
+          "output_tokens": 148,
+          "latency_ms": 189
+        },
+        {
+          "task": "libreoffice_calc/0326d92d-d218-48a8-9ca1-981cd6d064c7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9271,
+          "output_tokens": 148,
+          "latency_ms": 196
+        },
+        {
+          "task": "libreoffice_calc/035f41ba-6653-43ab-aa63-c86d449d62e5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9113,
+          "output_tokens": 148,
+          "latency_ms": 138
+        },
+        {
+          "task": "libreoffice_calc/04d9aeaf-7bed-4024-bedb-e10e6f00eb7f",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9390,
+          "output_tokens": 148,
+          "latency_ms": 180
+        },
+        {
+          "task": "libreoffice_calc/0a2e43bf-b26c-4631-a966-af9dfa12c9e5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9018,
+          "output_tokens": 148,
+          "latency_ms": 204
+        },
+        {
+          "task": "libreoffice_calc/1de60575-bb6e-4c3d-9e6a-2fa699f9f197",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9581,
+          "output_tokens": 148,
+          "latency_ms": 159
+        },
+        {
+          "task": "libreoffice_calc/30e3e107-1cfb-46ee-a755-2cd080d7ba6a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9031,
+          "output_tokens": 148,
+          "latency_ms": 128
+        },
+        {
+          "task": "libreoffice_calc/347ef137-7eeb-4c80-a3bb-0951f26a8aff",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7460,
+          "output_tokens": 148,
+          "latency_ms": 237
+        },
+        {
+          "task": "libreoffice_calc/51719eea-10bc-4246-a428-ac7c433dd4b3",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9406,
+          "output_tokens": 148,
+          "latency_ms": 146
+        },
+        {
+          "task": "libreoffice_impress/358aa0a7-6677-453f-ae35-e440f004c31e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6962,
+          "output_tokens": 148,
+          "latency_ms": 140
+        },
+        {
+          "task": "libreoffice_impress/4ed5abd0-8b5d-47bd-839f-cacfa15ca37a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9225,
+          "output_tokens": 148,
+          "latency_ms": 293
+        },
+        {
+          "task": "libreoffice_impress/bf4e9888-f10f-47af-8dba-76413038b73c",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9685,
+          "output_tokens": 148,
+          "latency_ms": 128
+        },
+        {
+          "task": "libreoffice_writer/0a0faba3-5580-44df-965d-f562a99b291c",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9138,
+          "output_tokens": 148,
+          "latency_ms": 230
+        },
+        {
+          "task": "libreoffice_writer/adf5e2c3-64c7-4644-b7b6-d2f0167927e7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 10269,
+          "output_tokens": 148,
+          "latency_ms": 166
+        },
+        {
+          "task": "multi_apps/0e5303d4-8820-42f6-b18d-daf7e633de21",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7821,
+          "output_tokens": 148,
+          "latency_ms": 154
+        },
+        {
+          "task": "multi_apps/1f18aa87-af6f-41ef-9853-cdb8f32ebdea",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9178,
+          "output_tokens": 148,
+          "latency_ms": 141
+        },
+        {
+          "task": "chrome/2888b4e6-5b47-4b57-8bf5-c73827890774",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8912,
+          "output_tokens": 148,
+          "latency_ms": 173
+        },
+        {
+          "task": "chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8715,
+          "output_tokens": 148,
+          "latency_ms": 122
+        },
+        {
+          "task": "chrome/6766f2b8-8a72-417f-a9e5-56fcaa735837",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9610,
+          "output_tokens": 148,
+          "latency_ms": 159
+        },
+        {
+          "task": "chrome/82bc8d6a-36eb-4d2d-8801-ef714fb1e55a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8847,
+          "output_tokens": 148,
+          "latency_ms": 243
+        },
+        {
+          "task": "chrome/ae78f875-5b98-4907-bbb5-9c737fc68c03",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8961,
+          "output_tokens": 148,
+          "latency_ms": 126
+        },
+        {
+          "task": "chrome/fc6d8143-9452-4171-9459-7f515143419a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8930,
+          "output_tokens": 148,
+          "latency_ms": 186
+        },
+        {
+          "task": "gimp/2e6f678f-472d-4c55-99cc-8e7c5c402a71",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 10198,
+          "output_tokens": 148,
+          "latency_ms": 210
+        },
+        {
+          "task": "gimp/38f48d40-764e-4e77-a7cf-51dfce880291",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8806,
+          "output_tokens": 148,
+          "latency_ms": 137
+        },
+        {
+          "task": "gimp/58d3eeeb-e9d0-499f-962e-fd0db2a744d8",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5218,
+          "output_tokens": 148,
+          "latency_ms": 105
+        },
+        {
+          "task": "gimp/5ca86c6f-f317-49d8-b6a7-b527541caae8",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8392,
+          "output_tokens": 148,
+          "latency_ms": 131
+        },
+        {
+          "task": "gimp/dbbf4b99-2253-4b10-9274-45f246af2466",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9298,
+          "output_tokens": 148,
+          "latency_ms": 151
+        },
+        {
+          "task": "libreoffice_impress/7ae48c60-f143-4119-b659-15b8f485eb9a",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9193,
+          "output_tokens": 148,
+          "latency_ms": 146
+        },
+        {
+          "task": "libreoffice_impress/8979838c-54a5-4454-a2b8-3d135a1a5c8f",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7424,
+          "output_tokens": 148,
+          "latency_ms": 123
+        },
+        {
+          "task": "libreoffice_writer/3ef2b351-8a84-4ff2-8724-d86eae9b842e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5009,
+          "output_tokens": 148,
+          "latency_ms": 160
+        },
+        {
+          "task": "libreoffice_writer/72b810ef-4156-4d09-8f08-a0cf57e7cefe",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5986,
+          "output_tokens": 148,
+          "latency_ms": 136
+        },
+        {
+          "task": "libreoffice_writer/bb8ccc78-479f-4a2f-a71e-d565e439436b",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7737,
+          "output_tokens": 148,
+          "latency_ms": 136
+        },
+        {
+          "task": "multi_apps/36037439-2044-4b50-b9d1-875b5a332143",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8693,
+          "output_tokens": 148,
+          "latency_ms": 149
+        },
+        {
+          "task": "multi_apps/9219480b-3aed-47fc-8bac-d2cffc5849f7",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8865,
+          "output_tokens": 148,
+          "latency_ms": 199
+        },
+        {
+          "task": "os/4783cc41-c03c-4e1b-89b4-50658f642bd5",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 11362,
+          "output_tokens": 148,
+          "latency_ms": 159
+        },
+        {
+          "task": "os/b3d4a89c-53f2-4d6b-8b6a-541fb5d205fa",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6921,
+          "output_tokens": 148,
+          "latency_ms": 148
+        },
+        {
+          "task": "chrome/59155008-fe71-45ec-8a8f-dc35497b6aa8",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8663,
+          "output_tokens": 148,
+          "latency_ms": 220
+        },
+        {
+          "task": "chrome/93eabf48-6a27-4cb6-b963-7d5fe1e0d3a9",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6640,
+          "output_tokens": 148,
+          "latency_ms": 197
+        },
+        {
+          "task": "chrome/9f3f70fc-5afc-4958-a7b7-3bb4fcb01805",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8817,
+          "output_tokens": 148,
+          "latency_ms": 178
+        },
+        {
+          "task": "chrome/f0b971a1-6831-4b9b-a50e-22a6e47f45ba",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8950,
+          "output_tokens": 148,
+          "latency_ms": 176
+        },
+        {
+          "task": "gimp/045bf3ff-9077-4b86-b483-a1040a949cff",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9062,
+          "output_tokens": 148,
+          "latency_ms": 208
+        },
+        {
+          "task": "gimp/62f7fd55-0687-4a43-b6e1-3eda16fc6252",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8880,
+          "output_tokens": 148,
+          "latency_ms": 158
+        },
+        {
+          "task": "gimp/72f83cdc-bf76-4531-9a1b-eb893a13f8aa",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 5806,
+          "output_tokens": 148,
+          "latency_ms": 161
+        },
+        {
+          "task": "gimp/8ea73f6f-9689-42ad-8c60-195bbf06a7ba",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8718,
+          "output_tokens": 148,
+          "latency_ms": 153
+        },
+        {
+          "task": "gimp/e19bd559-633b-4b02-940f-d946248f088e",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7477,
+          "output_tokens": 148,
+          "latency_ms": 148
+        },
+        {
+          "task": "gimp/f4aec372-4fb0-4df5-a52b-79e0e2a5d6ce",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7978,
+          "output_tokens": 148,
+          "latency_ms": 193
+        },
+        {
+          "task": "gimp/fbb548ca-c2a6-4601-9204-e39a2efc507b",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8009,
+          "output_tokens": 148,
+          "latency_ms": 175
+        },
+        {
+          "task": "libreoffice_calc/01b269ae-2111-4a07-81fd-3fcd711993b0",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 7529,
+          "output_tokens": 148,
+          "latency_ms": 127
+        },
+        {
+          "task": "libreoffice_calc/0cecd4f3-74de-457b-ba94-29ad6b5dafb6",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8725,
+          "output_tokens": 148,
+          "latency_ms": 224
+        },
+        {
+          "task": "libreoffice_calc/2bd59342-0664-4ccb-ba87-79379096cc08",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9046,
+          "output_tokens": 148,
+          "latency_ms": 142
+        },
+        {
+          "task": "libreoffice_calc/4188d3a4-077d-46b7-9c86-23e1a036f6c1",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6514,
+          "output_tokens": 148,
+          "latency_ms": 155
+        },
+        {
+          "task": "libreoffice_calc/7e429b8d-a3f0-4ed0-9b58-08957d00b127",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 9348,
+          "output_tokens": 148,
+          "latency_ms": 221
+        },
+        {
+          "task": "libreoffice_calc/aa3a8974-2e85-438b-b29e-a64df44deb4b",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8368,
+          "output_tokens": 148,
+          "latency_ms": 182
+        },
+        {
+          "task": "libreoffice_calc/ecb0df7a-4e8d-4a03-b162-053391d3afaf",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8548,
+          "output_tokens": 148,
+          "latency_ms": 126
+        },
+        {
+          "task": "libreoffice_impress/08aced46-45a2-48d7-993b-ed3fb5b32302",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 6516,
+          "output_tokens": 148,
+          "latency_ms": 124
+        },
+        {
+          "task": "libreoffice_impress/15aece23-a215-4579-91b4-69eec72e18da",
+          "ok": true,
+          "choice": "none",
+          "resolved_model": "jev-1.13.0",
+          "input_tokens": 8319,
+          "output_tokens": 148,
+          "latency_ms": 219
+        }
+      ]
+    }
+  },
+  "heldout_arm": {
+    "variant": "original",
+    "model": "jev-1.13.0",
+    "tasks": 57,
+    "calls": 57,
+    "failures": 0,
+    "usage": {
+      "input_tokens": 456282,
+      "output_tokens": 5037
+    },
+    "spend_usd_estimate": 0.019163844,
+    "resolved_models": [
+      "jev-1.13.0"
+    ],
+    "rows": [
+      {
+        "task": "libreoffice_impress/2b94c692-6abb-48ae-ab0b-b3e8a19cb340",
+        "ok": true,
+        "choice": "c0",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 5195,
+        "output_tokens": 89,
+        "latency_ms": 1410
+      },
+      {
+        "task": "libreoffice_impress/550ce7e7-747b-495f-b122-acdc4d0b8e54",
+        "ok": true,
+        "choice": "c3",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 6258,
+        "output_tokens": 89,
+        "latency_ms": 517
+      },
+      {
+        "task": "libreoffice_impress/5c1a6c3d-c1b3-47cb-9b01-8d1b7544ffa1",
+        "ok": true,
+        "choice": "c1",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 7394,
+        "output_tokens": 89,
+        "latency_ms": 530
+      },
+      {
+        "task": "libreoffice_impress/73c99fb9-f828-43ce-b87a-01dc07faa224",
+        "ok": true,
+        "choice": "c0",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 5073,
+        "output_tokens": 89,
+        "latency_ms": 527
+      },
+      {
+        "task": "libreoffice_impress/9ec204e4-f0a3-42f8-8458-b772a6797cab",
+        "ok": true,
+        "choice": "c1",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 7880,
+        "output_tokens": 89,
+        "latency_ms": 523
+      },
+      {
+        "task": "libreoffice_impress/ed43c15f-00cb-4054-9c95-62c880865d68",
+        "ok": true,
+        "choice": "c0",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8599,
+        "output_tokens": 89,
+        "latency_ms": 134
+      },
+      {
+        "task": "libreoffice_writer/d53ff5ee-3b1a-431e-b2be-30ed2673079b",
+        "ok": true,
+        "choice": "c2",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 6143,
+        "output_tokens": 89,
+        "latency_ms": 387
+      },
+      {
+        "task": "libreoffice_writer/e246f6d8-78d7-44ac-b668-fcf47946cb50",
+        "ok": true,
+        "choice": "c2",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 7672,
+        "output_tokens": 89,
+        "latency_ms": 524
+      },
+      {
+        "task": "multi_apps/236833a3-5704-47fc-888c-4f298f09f799",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8250,
+        "output_tokens": 88,
+        "latency_ms": 166
+      },
+      {
+        "task": "multi_apps/26150609-0da3-4a7d-8868-0faf9c5f01bb",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8830,
+        "output_tokens": 88,
+        "latency_ms": 271
+      },
+      {
+        "task": "multi_apps/2c1ebcd7-9c6d-4c9a-afad-900e381ecd5e",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8602,
+        "output_tokens": 88,
+        "latency_ms": 145
+      },
+      {
+        "task": "multi_apps/3c8f201a-009d-4bbe-8b65-a6f8b35bb57f",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 9831,
+        "output_tokens": 88,
+        "latency_ms": 133
+      },
+      {
+        "task": "multi_apps/3e3fc409-bff3-4905-bf16-c968eee3f807",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8701,
+        "output_tokens": 88,
+        "latency_ms": 331
+      },
+      {
+        "task": "multi_apps/48c46dc7-fe04-4505-ade7-723cba1aa6f6",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8453,
+        "output_tokens": 88,
+        "latency_ms": 107
+      },
+      {
+        "task": "multi_apps/51f5801c-18b3-4f25-b0c3-02f85507a078",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 9433,
+        "output_tokens": 88,
+        "latency_ms": 227
+      },
+      {
+        "task": "multi_apps/5bc63fb9-276a-4439-a7c1-9dc76401737f",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8399,
+        "output_tokens": 88,
+        "latency_ms": 184
+      },
+      {
+        "task": "multi_apps/5df7b33a-9f77-4101-823e-02f863e1c1ae",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8788,
+        "output_tokens": 88,
+        "latency_ms": 147
+      },
+      {
+        "task": "multi_apps/69acbb55-d945-4927-a87b-8480e1a5bb7e",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 10099,
+        "output_tokens": 88,
+        "latency_ms": 187
+      },
+      {
+        "task": "multi_apps/6d72aad6-187a-4392-a4c4-ed87269c51cf",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8770,
+        "output_tokens": 88,
+        "latency_ms": 194
+      },
+      {
+        "task": "multi_apps/74d5859f-ed66-4d3e-aa0e-93d7a592ce41",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8301,
+        "output_tokens": 88,
+        "latency_ms": 129
+      },
+      {
+        "task": "multi_apps/7e287123-70ca-47b9-8521-47db09b69b14",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8707,
+        "output_tokens": 88,
+        "latency_ms": 201
+      },
+      {
+        "task": "multi_apps/7f35355e-02a6-45b5-b140-f0be698bcf85",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8024,
+        "output_tokens": 88,
+        "latency_ms": 194
+      },
+      {
+        "task": "multi_apps/7ff48d5b-2df2-49da-b500-a5150ffc7f18",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 7290,
+        "output_tokens": 88,
+        "latency_ms": 156
+      },
+      {
+        "task": "multi_apps/81c425f5-78f3-4771-afd6-3d2973825947",
+        "ok": true,
+        "choice": "c5",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8524,
+        "output_tokens": 89,
+        "latency_ms": 172
+      },
+      {
+        "task": "multi_apps/881deb30-9549-4583-a841-8270c65f2a17",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 9396,
+        "output_tokens": 88,
+        "latency_ms": 196
+      },
+      {
+        "task": "multi_apps/98e8e339-5f91-4ed2-b2b2-12647cb134f4",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 9039,
+        "output_tokens": 88,
+        "latency_ms": 119
+      },
+      {
+        "task": "multi_apps/a82b78bb-7fde-4cb3-94a4-035baf10bcf0",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 10184,
+        "output_tokens": 88,
+        "latency_ms": 210
+      },
+      {
+        "task": "multi_apps/c2751594-0cd5-4088-be1b-b5f2f9ec97c4",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8604,
+        "output_tokens": 88,
+        "latency_ms": 197
+      },
+      {
+        "task": "multi_apps/ce2b64a2-ddc1-4f91-8c7d-a88be7121aac",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8367,
+        "output_tokens": 88,
+        "latency_ms": 164
+      },
+      {
+        "task": "multi_apps/d1acdb87-bb67-4f30-84aa-990e56a09c92",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8946,
+        "output_tokens": 88,
+        "latency_ms": 165
+      },
+      {
+        "task": "multi_apps/d9b7c649-c975-4f53-88f5-940b29c47247",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 9418,
+        "output_tokens": 88,
+        "latency_ms": 194
+      },
+      {
+        "task": "multi_apps/dd60633f-2c72-42ba-8547-6f2c8cb0fdb0",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8373,
+        "output_tokens": 88,
+        "latency_ms": 116
+      },
+      {
+        "task": "multi_apps/deec51c9-3b1e-4b9e-993c-4776f20e8bb2",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8840,
+        "output_tokens": 88,
+        "latency_ms": 213
+      },
+      {
+        "task": "multi_apps/df67aebb-fb3a-44fd-b75b-51b6012df509",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8744,
+        "output_tokens": 88,
+        "latency_ms": 199
+      },
+      {
+        "task": "multi_apps/e8172110-ec08-421b-a6f5-842e6451911f",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8694,
+        "output_tokens": 88,
+        "latency_ms": 146
+      },
+      {
+        "task": "multi_apps/f5c13cdd-205c-4719-a562-348ae5cd1d91",
+        "ok": true,
+        "choice": "c1",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 6742,
+        "output_tokens": 89,
+        "latency_ms": 179
+      },
+      {
+        "task": "multi_apps/f8369178-fafe-40c2-adc4-b9b08a125456",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8632,
+        "output_tokens": 88,
+        "latency_ms": 206
+      },
+      {
+        "task": "os/4127319a-8b79-4410-b58a-7a151e15f3d7",
+        "ok": true,
+        "choice": "c0",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 6161,
+        "output_tokens": 89,
+        "latency_ms": 100
+      },
+      {
+        "task": "os/5ced85fc-fa1a-4217-95fd-0fb530545ce2",
+        "ok": true,
+        "choice": "c2",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 6784,
+        "output_tokens": 89,
+        "latency_ms": 115
+      },
+      {
+        "task": "os/a462a795-fdc7-4b23-b689-e8b6df786b78",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 7397,
+        "output_tokens": 88,
+        "latency_ms": 130
+      },
+      {
+        "task": "os/c288e301-e626-4b98-a1ab-159dcb162af5",
+        "ok": true,
+        "choice": "c0",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 6315,
+        "output_tokens": 89,
+        "latency_ms": 164
+      },
+      {
+        "task": "os/fe41f596-a71b-4c2f-9b2f-9dcd40b568c3",
+        "ok": true,
+        "choice": "c3",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8471,
+        "output_tokens": 89,
+        "latency_ms": 136
+      },
+      {
+        "task": "thunderbird/9b7bc335-06b5-4cd3-9119-1a649c478509",
+        "ok": true,
+        "choice": "c1",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8007,
+        "output_tokens": 89,
+        "latency_ms": 211
+      },
+      {
+        "task": "thunderbird/a1af9f1c-50d5-4bc3-a51e-4d9b425ff638",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8803,
+        "output_tokens": 88,
+        "latency_ms": 185
+      },
+      {
+        "task": "vlc/5ac2891a-eacd-4954-b339-98abba077adb",
+        "ok": true,
+        "choice": "c1",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 7108,
+        "output_tokens": 89,
+        "latency_ms": 136
+      },
+      {
+        "task": "vlc/7882ed6e-bece-4bf0-bada-c32dc1ddae72",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 4080,
+        "output_tokens": 88,
+        "latency_ms": 299
+      },
+      {
+        "task": "vlc/8d9fd4e2-6fdb-46b0-b9b9-02f06495c62f",
+        "ok": true,
+        "choice": "c0",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 4594,
+        "output_tokens": 89,
+        "latency_ms": 174
+      },
+      {
+        "task": "vlc/9195653c-f4aa-453d-aa95-787f6ccfaae9",
+        "ok": true,
+        "choice": "c1",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 7021,
+        "output_tokens": 89,
+        "latency_ms": 104
+      },
+      {
+        "task": "vlc/a5bbbcd5-b398-4c91-83d4-55e1e31bbb81",
+        "ok": true,
+        "choice": "c1",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 5366,
+        "output_tokens": 89,
+        "latency_ms": 134
+      },
+      {
+        "task": "vlc/cb130f0d-d36f-4302-9838-b3baf46139b6",
+        "ok": true,
+        "choice": "c1",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 6540,
+        "output_tokens": 89,
+        "latency_ms": 294
+      },
+      {
+        "task": "vlc/fba2c100-79e8-42df-ae74-b592418d54f4",
+        "ok": true,
+        "choice": "c2",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 7690,
+        "output_tokens": 89,
+        "latency_ms": 121
+      },
+      {
+        "task": "vs_code/6ed0a554-cbee-4b44-84ea-fd6c042f4fe1",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8750,
+        "output_tokens": 88,
+        "latency_ms": 212
+      },
+      {
+        "task": "vs_code/7aeae0e2-70ee-4705-821d-1bba5d5b2ddd",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 11283,
+        "output_tokens": 88,
+        "latency_ms": 184
+      },
+      {
+        "task": "vs_code/7c4cc09e-7a92-40dd-8338-b2286535c4ed",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8376,
+        "output_tokens": 88,
+        "latency_ms": 127
+      },
+      {
+        "task": "vs_code/847a96b6-df94-4927-97e6-8cc9ea66ced7",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8422,
+        "output_tokens": 88,
+        "latency_ms": 205
+      },
+      {
+        "task": "vs_code/971cbb5b-3cbf-4ff7-9e24-b5c84fcebfa6",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 9565,
+        "output_tokens": 88,
+        "latency_ms": 195
+      },
+      {
+        "task": "vs_code/dcbe20e8-647f-4f1d-8696-f1c5bbb570e3",
+        "ok": true,
+        "choice": "none",
+        "resolved_model": "jev-1.13.0",
+        "input_tokens": 8354,
+        "output_tokens": 88,
+        "latency_ms": 144
+      }
+    ]
+  }
+}

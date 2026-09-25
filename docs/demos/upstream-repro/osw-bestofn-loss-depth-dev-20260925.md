@@ -86,10 +86,10 @@ successful call. The pre-registered strict-improvement rule selected no variable
 | `neutral` | 0.0000000 | 0/60 | 481,756 | $0.020233752 |
 | `noul` | 0.0000000 | 0/60 | 511,156 | $0.021468552 |
 
-The four-arm total was 1,950,512 input tokens and $0.081921504. The exact per-call resolved model
-and usage rows are retained in the four live receipts. Because `goal` tied `original` rather than
-strictly improving it, no arm was eligible under the locked rule. The held-out arm is therefore
-`original`, with no post hoc prompt or threshold change.
+The four-arm total was 1,950,512 input tokens and $0.081921504. Per-call resolved models and usage
+are retained in `work/osw-bestofn/dev_live_receipt.json`. Because `goal` tied `original` rather
+than strictly improving it, no arm was eligible under the locked rule. The held-out arm is
+therefore `original`, with no post hoc prompt or threshold change.
 
 ## Held-out selection rule
 
@@ -109,9 +109,26 @@ and 23 `wrong_pick`. Its state is rebuilt from the same pinned public task files
 trajectory and runtime members, with a different task set and the same fixed evidence window. The
 held-out arm is scored with the same original bar above.
 
+## Held-out result
+
+The pre-registered `original` held-out arm completed 57/57 calls with no validation failures; every
+successful row resolved to `jev-1.13.0`. It used 456,282 input tokens and cost $0.019163844. The
+combined dev plus held-out spend was $0.101085348.
+
+| Arm | Mean official reward | Exact tasks | Best-single mean | Delta | Oracle mean |
+|---|---:|---:|---:|---:|---:|
+| `original`, N=57 | 0.0093946 | 0/57 | 0.3015857 (17/57) | -0.2921911 | 0.5263158 (30/57) |
+
+McNemar against the best single had `b=17` (Jev wrong, best single exact), `c=0` (Jev exact,
+best single wrong), exact two-sided `p=0.0000152588`. Gap closed was `-130.02%`. The locked bar
+was not met; no variable earned selection and this is not a general ruling about Jev.
+
+The sanitized live accounting receipt is `work/osw-bestofn/dev_live_receipt.json`; it records each
+call's task, choice, resolved model, token usage, latency, and validation status without raw state,
+trajectory text, official result values, response probabilities, grader output, or secrets.
+
 ## Boundary
 
-This preregistration does not claim that any arm is better before live results. It does not measure
-MiniWoB, a chat-model comparator, terminal-status H5, a different step budget, or a deployment
-policy. A TypeSafe API failure stops that arm with an explicit failure receipt; it is not converted
-to a local answer.
+The live results are limited to this pinned OSWorld failure-class slice and do not claim that any
+other task distribution or workflow will behave the same. The experiment does not measure MiniWoB,
+a chat-model comparator, terminal-status H5, a different step budget, or a deployment policy.
