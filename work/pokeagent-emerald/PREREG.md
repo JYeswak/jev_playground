@@ -57,6 +57,7 @@ The committed state trace has 372 rows. The builder's serialized request estimat
 | Estimated input cost at $0.042/M input tokens | $0.0000207 | $0.0000304 |
 
 At the harness normal preset (80 frames/s, 18 frames per macro), the rate is 4.444 macros/s. TypeSafe's 1,200 requests/minute limit is 20 requests/s, so the normal macro loop is not rate-limited. A 200-macro segment takes 45.0 s before any live API latency. No TypeSafe request has been made for this bead.
+**N=80 live budget:** up to 40,000 one-Choice requests (80 seeds × 500 macro cap), p95 input cost about **$1.22** at $0.042/M tokens (40,000 × 724 tokens). At 4.444 macros/s, frame time is 9,000 s = 150 min; using a 130 ms per-request latency assumption stays below the 225 ms macro cadence, so wall time remains about 150 min plus startup. If serial latency exceeds cadence, wall time is 40,000 × latency. The live receipt records actual usage and latency.
 
 ## First live segment, frozen before any call
 
