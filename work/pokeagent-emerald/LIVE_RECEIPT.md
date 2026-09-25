@@ -1,4 +1,7 @@
-# Emerald live segment receipt\n\n```json\n{
+# Emerald live segment receipt
+
+```json
+{
   "model": "jev-1.13.0",
   "key_status": "OK",
   "seed_count": 80,
@@ -113,6 +116,7 @@
     "live-resume.jsonl",
     "LIVE_RECEIPT_RESUME.md",
     "baseline-pilot-v*.jsonl"
-  ]
+  ],
+  "runner_sha256": "8d0b98f8cf549402fb80dc53fa9774bb29f24b57963049b4e8d5ed1d9ca8f5c6"
 }
 ```

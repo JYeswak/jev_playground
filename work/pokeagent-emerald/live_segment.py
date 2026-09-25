@@ -4,19 +4,20 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import random
 import re
 import subprocess
-import sys
 import time
+import sys
+from datetime import datetime, timezone
 from collections.abc import Sequence
 from importlib import import_module
 from pathlib import Path
 from statistics import median
 from typing import Any
-
 from capture_state import BOOT_MACROS
 from macro_choice import LEGAL_INPUTS, build_choice_request
 
@@ -87,7 +88,7 @@ def worker(args: argparse.Namespace) -> int:
     emulator_cls = import_module("pokemon_env.emulator").EmeraldEmulator
     format_state = import_module("utils.state_formatter").format_state_for_llm
     TypeSafeClient = import_module("typesafe_sdk").TypeSafeClient
-
+    runner_sha = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     env = emulator_cls(args.rom, headless=True, sound=False)
     env.initialize()
     for button in BOOT_MACROS[: START_MACRO + 1]:
@@ -124,7 +125,8 @@ def worker(args: argparse.Namespace) -> int:
             _press(env, button)
             after = _raw_state(env)
             row = {
-                "kind": "macro",
+                "runner_sha256": runner_sha,
+                "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
                 "seed": args.seed,
                 "macro_index": macro_index,
                 "button": button,
@@ -225,7 +227,7 @@ def parent(args: argparse.Namespace) -> int:
         )
     receipt = {
         "model": MODEL,
-        "key_status": "OK",
+        "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "seeds": seed_end - args.start_seed,
         "seed_start": args.start_seed,
         "seed_end": seed_end,
