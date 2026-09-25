@@ -154,12 +154,13 @@ The fixed task manifest is `work/osw-bestofn/heldout_valid_slice.json` (file SHA
 are lexicographically ordered; the separate digest below is the SHA-256 of the newline-joined ID
 list, not of the JSON file:
 `aafabe6fd1f06b7dcb2a3d57397722871ce909295ae3ce3556d5fdcf2e7586c3`. Before freezing it, the
-Hugging Face tree API was read only for path metadata: each snapshot exposed 361 task-ID
-directories, the two ID sets were equal, and no `result.txt`, `task_outcome.json`,
-`results_summary.json`, reward, success, or status field was read. The original call order is a
-fixed seeded permutation of this manifest (`seed=20250925`); the input-only exclusion amendment
-below filters the one ineligible ID before that permutation. No task is added, replaced, or
-reordered after a response.
+Hugging Face tree metadata was read for all 361 task-ID directories in both snapshots; the two ID
+sets were equal. The original call order is a fixed seeded permutation of this manifest
+(`seed=20250925`). The input-only exclusion amendment below filters ineligible IDs before that
+permutation. No task is added, replaced, or reordered after a response.
+
+The exhaustive preflight receipt also records the pinned source snapshots and the 360-task
+effective input digest.
 
 The state adapter will use only each candidate's published acting evidence
 (`ouroboros_task_final.json`, restricted to action/tool/text records) and the bounded public
@@ -168,16 +169,24 @@ task key. It excludes `result.txt`, `task_outcome.json`, `results_summary.json`,
 and every score/status/reward/success field. Candidate archive names are replaced by positional
 IDs `c0` and `c1`.
 
-#### Input-only exclusion amendment (2026-09-25; before any retest call)
+#### Exhaustive input-only exclusion amendment (2026-09-25; before any retest call)
 
-The task `chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d` is excluded because its
-`ouroboros_task_final.json` is empty in **every** pinned candidate package. This was determined
-by the pre-call acting-evidence presence check only; no outcome, reward, success, status, prior
-Jev result, or live response was read. The original 361-ID manifest and digest above remain the
-frozen source record. The effective task list is that manifest with only this ID removed:
-`N=360`, lexicographic order preserved, and the seeded permutation (`seed=20250925`) applied
-after filtering. Its newline-joined ID-list SHA-256 is
-`e838ec31f15b515f2f2cd04c705a8575bff95b6ca50ae0fb40da3f250d0509fc`.
+The one-task preflight was not sufficient and is superseded by this exhaustive rule. For every
+task in the 360-task effective list, and independently in both pinned packages, the keyless
+preflight required all three conditions:
+
+1. `ouroboros_task_final.json` is present and structurally non-empty;
+2. acting evidence is structurally present: `loop_outcome.final_text` is non-empty and
+   `loop_outcome.trace_refs.tool_call_refs` is a non-empty list; and
+3. `result.txt` is present. Its contents were not read.
+
+A task is excluded if any condition is false in either pinned package. The presence table is
+`work/osw-bestofn/live_preflight_presence_r3.json`
+(`sha256=9f7f5d2e26d3f64f5d11b10e2057a509cf846dcd40401d00b719e8a0063cb153`): all 360 tasks were
+scanned, 23 were excluded, and 337 remain. The retained newline-joined ID-list SHA-256 is
+`c2f320a71b86a6b35ae66dbdb4d2fb9d368aee181b21787f149b48516440aaf2`. This receipt records only
+path presence, structural emptiness, and structural-key booleans; no result value, reward,
+success, status, score, or Jev response was read or retained.
 
 ### One-variable arm
 
@@ -201,19 +210,19 @@ All three are required. `best_single` and `oracle@2` are computed only from the 
 candidate packages after the calls. No confidence threshold, question wording, tie-break, or bar
 may change after the first retest response.
 
-After the input-only exclusion amendment, the task unit is one task and the effective universe is
-`N=360`; no pseudoreplication is claimed. A keyless sensitivity calculation using R104's
-committed per-task reward-delta SD `0.485121` and the same formula gives an approximate 80%-power
-two-sided paired-mean MDE of `0.07163` reward units (7.16 points) at `alpha=.05`
+After the exhaustive input-only exclusion amendment, the task unit is one task and the effective
+universe is `N=337`; no pseudoreplication is claimed. A keyless sensitivity calculation using
+R104's committed per-task reward-delta SD `0.485121` and the same formula gives an approximate
+80%-power two-sided paired-mean MDE of `0.07404` reward units (7.40 points) at `alpha=.05`
 (`statsmodels 0.15.0`, SciPy 1.18.1). Using the same normal McNemar planning formula and R104's
-discordance rate `84/361`, the corresponding MDE is approximately 7.12 percentage points.
+discordance rate `84/361`, the corresponding MDE is approximately 7.36 percentage points.
 Thus this fixed effective-universe retest can detect effects around seven points, not the
 three-point bar; the limitation is reported rather than hidden.
 
 ### Cost, failure, and stop rules
 
 The four-arm dev run measured `480,164 / 60 = 8,002.733` input tokens per `goal` call. The
-360-call retest estimate is `2,880,984` input tokens and `$0.121001323` at `$0.042/M` input
+337-call retest estimate is `2,696,921` input tokens and `$0.113270688` at `$0.042/M` input
 tokens; output is free. `maxRetries=0`, no comparator, and no chat fallback.
 
 
