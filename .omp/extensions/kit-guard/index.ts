@@ -5,8 +5,8 @@
  *
  * W1.4: config-driven (plan docs/PLAN-DEEP-KIT-20260922.md:198). The protected
  * set comes from `.omp/kit-guard.json`; a missing or malformed config fails
- * closed (block and say why, never allow). KIT_GATE_EDIT=1 still only opens
- * the B7 path gate; the B5 honesty gate (bash) has no override.
+ * closed (block and say why, never allow). KIT_GATE_EDIT=1 opens B7 gate-file
+ * and protected-setting edits; B5 hook bypass/removal has no override.
  */
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -93,7 +93,7 @@ export default function kitGuard(pi: ExtensionAPI) {
       if (input && typeof input === "object" && "command" in input && typeof input.command === "string") {
         command = input.command;
       }
-      const v = bashVerdict(String(command ?? ""), cfg.cfg);
+      const v = bashVerdict(String(command ?? ""), cfg.cfg, allowGateEdit);
       if (v) return v;
     }
     if (event.toolName === "edit" || event.toolName === "write") {

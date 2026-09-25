@@ -353,21 +353,15 @@ arm_at .omp/rules/kit-close-needs-evidence.md quiet "kit-close: streamed prefix 
 arm_at .omp/rules/kit-close-needs-evidence.md quiet "kit-close: br close with reason"    tool bash "" "br close jev-x --reason done"
 arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: commit --no-verify" tool bash "" "git commit --no-verify -m x"
 arm_at .omp/rules/kit-no-verify.md quiet "kit-no-verify: git status"          tool bash "" "git status -sb"
-# jev-sx9: the hook-pointer condition used to be the bare key, so it interrupted on READS of it
-# (4 false interrupts, 0 bypasses, gate-edit session 1). The omp-kit version exempts the read forms.
-# Two directions, or it is a nag or a hole: reads and searches QUIET, every write form FIRES. The
-# value-set arm is JSON-quoted because the pattern waits for the value to end (live tool args).
-arm_at .omp/rules/kit-no-verify.md quiet "kit-no-verify: read the hook pointer (--get)" tool bash "" "git config --get core.hooksPath"
-arm_at .omp/rules/kit-no-verify.md quiet "kit-no-verify: text search for the key"      tool bash "" "rg -n core.hooksPath .omp scripts"
-arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: set the hook pointer"         tool bash "" '{"command":"git config core.hooksPath /dev/null"}'
-arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: -c override of the pointer"   tool bash "" "git -c core.hooksPath=/tmp commit -m x"
-arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: --unset the pointer"          tool bash "" "git config --unset core.hooksPath"
-arm_at .omp/rules/kit-unverified-done.md fire  "kit-unverified: should now pass" text "" "" "the tests should now pass"
-arm_at .omp/rules/kit-unverified-done.md quiet "kit-unverified: a receipt sha"   text "" "" "the receipt is at cead414"
-arm_at .omp/rules/kit-test-skip.md fire  "kit-skip: it.skip" tool edit t.ts "it.skip('x')"
-arm_at .omp/rules/kit-test-skip.md quiet "kit-skip: it("     tool edit t.ts "it('x')"
+# jev-gate7: omp-kit waits for the live tool-argument value to end. JSON-quote
+# --unset like the sibling set arm; retain a chained-command fire direction.
+arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: --unset the pointer"          tool bash "" '{"command":"git config --unset core.hooksPath"}'
+arm_at .omp/rules/kit-no-verify.md fire  "kit-no-verify: --unset then another command" tool bash "" '{"command":"git config --unset core.hooksPath; git status"}'
+# jev-gate7: kit-jsonl-close now requires evidence, not merely a 20-character
+# reason. Keep both directions so the obsolete length-only contract stays RED.
 arm_at .omp/rules/kit-jsonl-close.md fire  "kit-jsonl: closed without a long reason" tool edit .beads/issues.jsonl '{"status": "closed"}'
-arm_at .omp/rules/kit-jsonl-close.md quiet "kit-jsonl: closed with a 20-char reason" tool edit .beads/issues.jsonl '{"status": "closed", "close_reason": "01234567890123456789"}'
+arm_at .omp/rules/kit-jsonl-close.md fire  "kit-jsonl: old 20-char reason is insufficient" tool edit .beads/issues.jsonl '{"status": "closed", "close_reason": "01234567890123456789"}'
+arm_at .omp/rules/kit-jsonl-close.md quiet "kit-jsonl: closed with evidence reason" tool edit .beads/issues.jsonl '{"status": "closed", "close_reason": "done at commit 5c065f5, 12/12 tests pass"}'
 arm_at .omp/rules/kit-weasel-retry.md fire  "kit-weasel: retry predicate later" tool edit NEGATIVE_EVIDENCE.md "retry predicate: later"
 arm_at .omp/rules/kit-weasel-retry.md quiet "kit-weasel: retry predicate names a receipt" tool edit NEGATIVE_EVIDENCE.md "retry predicate: a new receipt lands"
 
