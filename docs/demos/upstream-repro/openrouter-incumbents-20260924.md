@@ -329,3 +329,22 @@ benchmark text committed).
 **Boundary.** Only SST-5 × this one free comparator ran in this cell. The other four sets and
 STS-B for this model, all cells for `liquid/lfm-2.5-2.6b:free`, and every paid comparator arm
 remain NOT RUN; no paid comparison was attempted.
+
+## Free arm, STS-B × `nex-agi/nex-n2.5-mini:free`: PARTIAL 380/1,500 (live, 2026-09-25)
+
+This cell is intentionally **not scored and has no verdict**. The first attended session retained
+210 rows (196 answered, 14 failed) before the 3,600-second command deadline. A second main pass,
+using the remaining-20 request cap, retained 170 more rows and stopped at its 170-request cap.
+The committed partial file therefore contains **380/1,500 unique rows: 352 answered, 28 failed**
+(24 `TypeSafeAPITimeoutError`, 4 `TypeSafeNotFoundError`) and 5 zero-mass answers. Every row
+has `run_py_sha256` and `recorded_at_utc`.
+
+The account-wide free counter was 604 used / 396 remaining before the cell, 810 used / 190
+remaining after the first session, and 975 used / 25 remaining after the second. The row-level
+request total is 380; the provider counter lags and includes retries. OpenRouter spend is $0.
+The daily free budget is now held at the committed reserve boundary; resume after the next reset,
+**2026-09-26T00:00Z**, until all 1,500 rows exist. No `score.py` run and no comparator verdict
+was produced.
+
+**Boundary.** Only the first 380 public STS-B rows were sent for this model. No other comparator
+model or set ran in this continuation, and no paid call was attempted.
