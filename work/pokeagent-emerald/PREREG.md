@@ -78,6 +78,19 @@ At the harness normal preset (80 frames/s, 18 frames per macro), the rate is 4.4
 **Future Jev bar:** after key rotation, Jev success rate must not be below random and the seeded Jev macro-count distribution must beat the fixed-control random baseline by the one-sided Mann-Whitney p<0.05 criterion. If fewer than five random runs reach the goal, the macro-count comparison is NO-CLAIM rather than a fabricated median.
 
 
+## State-blind control (frozen before run)
+
+The state-blind control samples every macro from the empirical button pool in the committed
+`live-results.jsonl` only. The frozen source has 6,449 rows and SHA-256
+`5294ec9a24319ebc7c528cdb3076c11bc381df3e1abbbb4334a6bf36c97c84fa`; its counts are
+`A=531, B=74, DOWN=628, LEFT=591, R=67, RIGHT=1872, SELECT=20, START=293, UP=1649,
+WAIT=724` (unobserved legal labels have zero mass). For each seed `0..79`, use the same
+macro-228 start, 500-macro cap, and `location != MOVING_VAN` goal as the Jev segment. At
+each macro, draw with replacement by uniform choice over the 6,449 observed button entries;
+the seed is the per-run PRNG seed. The emulator state is used only to detect the goal and
+stop, never to select the button. Results land in `state-blind-results.jsonl` with the
+source digest and counts on every row; the run receipt records the runner and harness SHAs.
+
 **Pilot boundary:** seven untracked baseline-pilot-v*.jsonl files remain from pre-final keyless pilots; they are not committed results and are named here rather than silently treated as evidence.
 
-**No-call boundary:** this prereg, builder, and both baselines run with no TypeSafe API key and no model. A live segment may not start until Joshua explicitly confirms the key rotation.
+**No-call boundary:** this prereg, builder, and all baselines run with no TypeSafe API key and no model. A live segment may not start until Joshua explicitly confirms the key rotation.
