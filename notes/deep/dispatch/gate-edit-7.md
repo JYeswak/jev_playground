@@ -26,30 +26,32 @@ every jev session; this unit lands a stricter version built and tested in the om
 
 1. Register with Agent Mail under a fresh name. Reserve `.omp/extensions/kit-guard/policy.ts`,
    `.omp/extensions/kit-guard/index.ts`, `.omp/extensions/kit-guard/kit-guard.test.ts`,
-   `.omp/extensions/kit-guard/kit-guard-w14.test.ts`, `.omp/rules/kit-no-verify.md`,
-   `.omp/rules/kit-close-needs-evidence.md`, `.omp/rules/kit-jsonl-close.md` and `TESTS.md`,
-   reason `gate-edit-7`.
-2. Verify the three base hashes again on the live tree (stop and report if any differs), then save
-   the current test file as the preserved suite before applying:
-   `cp .omp/extensions/kit-guard/kit-guard.test.ts .omp/extensions/kit-guard/kit-guard-w14.test.ts`
-   and `git apply <patch>`. Check the three new hashes.
+   `.omp/rules/kit-no-verify.md`, `.omp/rules/kit-close-needs-evidence.md`,
+   `.omp/rules/kit-jsonl-close.md` and `TESTS.md`, reason `gate-edit-7`.
+2. Verify the three base hashes again on the live tree (stop and report if any differs), then
+   `git apply` the patch pane 1 names in the dispatch message (the revised one, with its sha256).
+   Check the new hashes the dispatch message gives.
 3. Rule shadows: copy only the three that exist in jev, byte for byte, from
    `/Users/josh/Developer/omp-kit/rules/{kit-no-verify,kit-close-needs-evidence,kit-jsonl-close}.md`
    (omp-kit commit `1033ab0`). Their sha256 must equal
    `34c5e3e8e062344aa22e4a0272a203f6e8a09dec2f5f5d12804d65bb79a4e312`,
    `b48eb52d4534b15e691033ca5369bccc2c01ddd6ee95388e17c9af65dbea66ed`,
    `a8bdcd79c987ce5a88a6df35a64412f839ad8a737b5d308ae68dda635c535f37`. Create no other rule file.
-4. TESTS.md: update the kit-guard.test.ts row (its counts and what it covers, from the new file)
-   and add a row for kit-guard-w14.test.ts ("the W1.4 suite kept unchanged: extension wiring,
-   layout rows, config validation; passes against the guard-completion patch"), each with its
-   `Run:` command in the path form the runner matches.
-5. Verify, and paste each result: both test files pass under `bun test`; `bash
-   scripts/selftest-ttsr-rules.sh` and `bash scripts/selftest-ttsr-assert-disabled.sh` (the rule
-   shadows changed); `python3 scripts/run-registered-suites.py` reads 0 fail;
-   `bash foundation/gates.sh --portable` and `--selftest --portable` exit 0 (stage 80 is slow under
-   load; do not time it out). One planted mutation of your own that the new tests must catch (for
-   example, make `bashVerdict` ignore `core.hookspath` in lower case), then restore it byte for
-   byte.
+4. TESTS.md: update the kit-guard.test.ts row (its counts and what it covers, from the new file),
+   with its `Run:` command in the path form the runner matches. No second suite: the patch author
+   (omp-test pane %15) is folding the behavioral checks the old file had (session_start root,
+   agent_end re-read, session_compact re-anchor, path globs, missingPatterns, layout rows) into
+   kit-guard.test.ts itself, and sends a revised test-only patch and hash before this session runs.
+5. Verify, and paste each result: `bun test ./.omp/extensions/kit-guard/kit-guard.test.ts`; jev's
+   previous suite (`git show HEAD:.omp/extensions/kit-guard/kit-guard.test.ts` saved under /tmp)
+   against the patched code; `bash scripts/selftest-ttsr-rules.sh` and `bash
+   scripts/selftest-ttsr-assert-disabled.sh` (the rule shadows changed);
+   `python3 scripts/run-registered-suites.py` reads 0 fail; `bash foundation/gates.sh --portable`
+   and `--selftest --portable` exit 0 (stage 80 is slow under load; do not time it out, and record
+   a timeout as a timeout, never a pass). Planted mutations of your own that the new tests must
+   catch, each restored byte for byte: `bashVerdict` ignoring `core.hookspath` in lower case; the
+   agent_end handler never re-reading AGENTS.md; the session_compact handler not queueing the
+   re-anchor.
 6. Commit path-limited, subject `[mutation] gate-edit-7: omp-kit guard completion (1033ab0) ...`,
    push, confirm `python3 scripts/ci-main-status.py` goes green on the push run.
 
