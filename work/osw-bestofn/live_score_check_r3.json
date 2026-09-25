@@ -16,5 +16,6 @@
   },
   "input_floor_sha256": "3aabbf9d7c8c7c5930b8a7165e81e5bd3e6163f0a057112151bd173b07363e76",
   "boundary": "Recomputed from the 337 row choices and frozen floor results only; no additional Jev call or outcome source was used.",
-  "receipt_sha256": "dc9e7504e0f667de690c94c080c1b8c4c3b59bd8d4ce271493396398568b3094"
+  "receipt_sha256": "7154c9beef9c04f2da76d3101750dd6b3a38460b4c33e05025e76d00d778611f",
+  "max_tokens_failure_count": 12
 }

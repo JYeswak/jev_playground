@@ -2246,3 +2246,19 @@ Boundary: every result above covers the retained `337` tasks after the exhaustiv
 not all `361` base IDs. The 23 rule exclusions plus the initial excluded ID are not silently
 replaced. No paid comparator, second model, significance claim beyond the preregistered exact
 McNemar result, or full-base-universe result is claimed.
+
+## jev-9gtw.2 post-run input-limit audit (2026-09-25) [test]
+
+The updated Rule 15 feasibility checker was run against the exact 337-task state file with the
+484-byte choice question:
+`uv run python scripts/jev-state-size.py var/agent-tmp/osw-bestofn-r3-360/states-goal-337.jsonl --question-bytes 484`.
+It classified 324 requests as `FITS`, 10 as `NEAR`, and 3 as `OVER`. All 12 live failures were
+HTTP 400 `max_tokens_exceeded`; the original live row set was not changed or rescored after this
+audit. The result therefore remains an observed retained-universe run with 12 input-limit
+failures, not a clean 337/337 feasible-request run.
+
+The live receipt was updated with this audit:
+`work/osw-bestofn/live_receipt_r3.json` SHA-256
+`7154c9beef9c04f2da76d3101750dd6b3a38460b4c33e05025e76d00d778611f`; score-check SHA-256
+`d9483cb4d1f35c5223020a409da8d53d8054d14bc039f2c56ed79140d8758a75`. Boundary: this is a
+post-run feasibility audit; no additional Jev call was made.

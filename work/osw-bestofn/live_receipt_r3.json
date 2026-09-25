@@ -5969,7 +5969,7 @@
     }
   },
   "raw_state_committed": false,
-  "status": "LIVE_COMPLETE_INDEPENDENT_SCORE_PASS",
+  "status": "LIVE_COMPLETE_INDEPENDENT_SCORE_PASS_WITH_MAX_TOKEN_FAILURES",
   "base_task_count": 361,
   "excluded_task_count": 24,
   "retained_task_count": 337,
@@ -5979,5 +5979,18 @@
   "floor_sha256": "3aabbf9d7c8c7c5930b8a7165e81e5bd3e6163f0a057112151bd173b07363e76",
   "state_sha256": "eed95fb5e695e538f704807fbc1ac581a4b81c8e596d1c8da99941345a7b59f3",
   "rows_sha256": "66ea5c2c897b8bbeceb897bead74bfa05554486790ada9ddd2d18a39a0e335c0",
-  "boundary": "All results cover the retained 337-task universe after the exhaustive presence rule; they do not cover all 361 base task IDs. Twelve Jev answer calls failed and remain recorded in the rows/receipt."
+  "boundary": "All results cover the retained 337-task universe after the exhaustive presence rule; they do not cover all 361 base task IDs. Twelve Jev answer calls failed and remain recorded in the rows/receipt.",
+  "feasibility_audit": {
+    "question_bytes": 484,
+    "documented_token_limit": 32768,
+    "classification_counts": {
+      "FITS": 324,
+      "NEAR": 10,
+      "OVER": 3
+    },
+    "failed_call_count": 12,
+    "failed_call_error_type": "max_tokens_exceeded",
+    "command": "uv run python scripts/jev-state-size.py var/agent-tmp/osw-bestofn-r3-360/states-goal-337.jsonl --question-bytes 484",
+    "boundary": "This audit ran after the live pass; the original live call set was not changed or rescored."
+  }
 }
