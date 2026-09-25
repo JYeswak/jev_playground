@@ -25,11 +25,14 @@ test('omp install copies tools and hook without overwriting user files', async (
   assert.equal(first.code, 0);
   const result = JSON.parse(first.stdout);
   assert.equal(result.status, 'READY');
-  assert.equal(result.files.length, 20);
-  assert.equal((await readFile(join(repo, '.omp/tools/jev-screen.ts'), 'utf8')).includes('jev-kit'), true);
+  assert.equal(result.files.length, 21);
+  assert.equal((await readFile(join(repo, '.omp/jev-kit-manifest.json'), 'utf8')).includes('jev-screen.ts'), true);
+  const second = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(second.code, 0);
+  assert.equal(JSON.parse(second.stdout).status, 'READY');
 
   await writeFile(join(repo, '.omp/tools/jev-screen.ts'), 'user-owned');
-  const second = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
-  assert.equal(second.code, 1);
-  assert.match(JSON.parse(second.stdout).message, /refusing to overwrite/);
+  const third = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(third.code, 1);
+  assert.match(JSON.parse(third.stdout).message, /user-edited/);
 });

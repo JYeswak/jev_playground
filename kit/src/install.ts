@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 
@@ -24,6 +25,10 @@ export const INSTALL_FILES = {
   "jev-kit/nev-injection/live-flag.ts": "jev-kit/nev-injection/live-flag.ts",
 };
 
+const MANIFEST_PATH = ".omp/jev-kit-manifest.json";
+
+type Manifest = { version: 1; files: Record<string, string> };
+
 export type InstallResult = {
   status: "READY" | "DRY_RUN";
   repo: string;
@@ -39,26 +44,61 @@ async function exists(path: string): Promise<boolean> {
   }
 }
 
+function sha256(content: string): string {
+  return createHash("sha256").update(content, "utf8").digest("hex");
+}
+
+async function readManifest(path: string): Promise<Manifest | undefined> {
+  if (!(await exists(path))) return undefined;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(await readFile(path, "utf8"));
+  } catch {
+    throw new Error(`refusing to overwrite invalid installer manifest: ${relative(process.cwd(), path)}`);
+  }
+  if (!parsed || typeof parsed !== "object" || (parsed as Manifest).version !== 1 || typeof (parsed as Manifest).files !== "object") {
+    throw new Error(`refusing to overwrite invalid installer manifest: ${relative(process.cwd(), path)}`);
+  }
+  return parsed as Manifest;
+}
+
 export async function installOmp(repoDir: string, dryRun = false): Promise<InstallResult> {
   const repo = resolve(repoDir);
   const templateRoot = new URL("../templates/", import.meta.url);
   const files = Object.keys(INSTALL_FILES).map((path) => relative(repo, join(repo, ".omp", path)));
   const destinations = Object.keys(INSTALL_FILES).map((path) => join(repo, ".omp", path));
-  const existing = [];
-  for (const destination of destinations) {
-    if (await exists(destination)) existing.push(relative(repo, destination));
+  const manifestPath = join(repo, MANIFEST_PATH);
+  const manifest = await readManifest(manifestPath);
+  const templates = new Map<string, string>();
+  for (const [destination, template] of Object.entries(INSTALL_FILES)) {
+    templates.set(destination, await readFile(new URL(template, templateRoot), "utf8"));
   }
-  if (existing.length > 0) {
-    throw new Error(`refusing to overwrite existing user files: ${existing.join(", ")}`);
+  const edited = [];
+  const unmanaged = [];
+  for (const [destination] of templates) {
+    const absolute = join(repo, ".omp", destination);
+    if (!(await exists(absolute))) continue;
+    if (!manifest) {
+      unmanaged.push(relative(repo, absolute));
+      continue;
+    }
+    const expected = manifest.files[destination];
+    const actual = sha256(await readFile(absolute, "utf8"));
+    if (!expected || actual !== expected) edited.push(relative(repo, absolute));
   }
+  if (edited.length > 0) throw new Error(`refusing to overwrite user-edited files: ${edited.join(", ")}`);
+  if (unmanaged.length > 0) throw new Error(`refusing to overwrite existing files without installer manifest: ${unmanaged.join(", ")}`);
+  const outputFiles = [...files, relative(repo, manifestPath)];
   if (!dryRun) {
     for (const destination of destinations) await mkdir(resolve(destination, ".."), { recursive: true });
-    for (const [destination, template] of Object.entries(INSTALL_FILES)) {
-      const content = await readFile(new URL(template, templateRoot), "utf8");
+    const hashes: Record<string, string> = {};
+    for (const [destination, content] of templates) {
       await writeFile(join(repo, ".omp", destination), content, { mode: 0o644 });
+      hashes[destination] = sha256(content);
     }
+    await writeFile(manifestPath, `${JSON.stringify({ version: 1, files: hashes }, null, 2)}\n`, { mode: 0o644 });
   }
-  return { status: dryRun ? "DRY_RUN" : "READY", repo, files };
+  return { status: dryRun ? "DRY_RUN" : "READY", repo, files: outputFiles };
 }
 
 export async function ompDiscovery(repoDir: string): Promise<Record<string, unknown>> {
@@ -68,7 +108,9 @@ export async function ompDiscovery(repoDir: string): Promise<Record<string, unkn
     .map((path) => ({ path: `.omp/${path}`, present: true }));
   const hooks = [{ path: ".omp/hooks/post/jev-gate-observe.ts", present: true }];
   for (const row of [...tools, ...hooks]) row.present = await exists(join(repo, row.path));
-  const extensions = Object.keys(INSTALL_FILES).filter((path) => path.startsWith("extensions/")).map((path) => ({ path: `.omp/${path}`, present: true }));
+  const extensions = Object.keys(INSTALL_FILES)
+    .filter((path) => path.startsWith("extensions/"))
+    .map((path) => ({ path: `.omp/${path}`, present: true }));
   for (const row of extensions) row.present = await exists(join(repo, row.path));
-  return { repo, tools, hooks, extensions };
+  return { repo, tools, hooks, extensions, manifest: await exists(join(repo, MANIFEST_PATH)) };
 }
