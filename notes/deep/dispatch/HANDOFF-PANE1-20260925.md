@@ -1,8 +1,53 @@
 # Pane 1 handoff, 2026-09-25 ~17:15Z (AmberWillow, conductor)
 
-Written by pane 1 before Joshua restarts it. Read this, then `AGENTS.md` (RULE 15 is new today),
-then resume the loop at "First ten minutes" below. HEAD at writing: `026d1230`. CI green on
+Written by pane 1 before Joshua restarts all panes. **Start with "Quiet state and restart"
+directly below**, then `AGENTS.md` (RULE 15 is new today), then the rest of this file. CI green on
 `59808fc` (run 36164482100); nightly README stranger run green (36135948301).
+
+## Quiet state and restart (2026-09-25 ~17:30Z)
+
+Joshua ordered the fleet quiet with no dispatches, then a restart of all panes. Every pane
+replied QUIET and wrote a handoff:
+
+| pane | agent | handoff | sha | resume with |
+|---|---|---|---|---|
+| 2 | CopperHeron | `notes/deep/dispatch/HANDOFF-CopperHeron-20250925.md` | `3de3a195` | `jev-yru2`: two blind labellers on `work/jev-yru2-public/commands.jsonl` (extract `5b368355`), prompt `label_prompt.md` |
+| 3 | IvoryCreek | `notes/deep/dispatch/HANDOFF-IvoryCreek-20250925.md` | `95435c5f` | `jev-9gtw.4.2`: fix in working tree, uncommitted: `text_candidates.py`, `test_text_candidates.py` |
+| 4 | OrangeFrog | `notes/deep/dispatch/HANDOFF-OrangeFrog-20250925.md` | `eac40895` | `jev-jy7t.1.13`: code at `31169ec4`; 160-episode Docker baselines not yet run |
+| 5 | WindyLantern | `notes/deep/dispatch/HANDOFF-WindyLantern-20260925.md` | `d4c94471` | `jev-9gtw.4`: held-out live run still running (below) |
+
+Three file names say 2025 instead of 2026; they are today's files. Corrections pane 1 found when
+it read them: CopperHeron's "uncommitted" `label_prompt.md` was committed in `3de3a195`;
+IvoryCreek's "jev-ja32 reopened, do not close" is out of date, because pane 1 closed `jev-ja32`
+afterwards on the no-consumer outcome (HOLD on new Jev omp tools).
+
+**The one thing that is not quiet: the MiniWoB held-out run.** PID `30607` (`infisical run ...
+run-after-rotation.sh --live --steps combined`) and `30641`, run root
+`var/agent-tmp/jev-9gtw-heldout-live-rerun.3921/`. It is a **direct child of pane 5's omp process
+(`3921`)**, so restarting pane 5 kills it. At 17:28Z the keyless baseline had 1,244 of about 1,250
+rows. After that it starts the paid phase: 625 held-out Jev episodes with arms quoted, none and
+color. Jev held-out rows at handoff: 0/625. ETA unknown, over 30 minutes. Restart panes 1-4 freely.
+Restart pane 5 only after the run exits, or after Joshua chooses to stop it. Any later relaunch
+should be a `hub op:start` supervised process (persist), so it survives pane restarts. When it
+exits, pane 5's handoff says what to check: complete 625 rows or record NOT_RUN/incomplete, never
+score a partial set.
+
+**Restart commands** (from `/Users/josh/Developer/jev`): pane 1 `omp --auto-approve`; pane 2
+`omp --profile claude`; panes 3-5 `omp --profile codex`. After each restart, ntm the pane its agent
+name (the identity file for %27 is stale), its handoff path, and "read AGENTS.md RULE 15 first".
+Supervised processes that keep running across restarts: `fleet-idle-watch`, `p2-mailmon`,
+`p3-mailmon`.
+
+**Tracked files modified in the shared tree with no owner in any handoff** (leave them; do not
+stage, revert or stash): `ARC.md`, `docs/demos/tick.md`,
+`docs/demos/upstream-repro/loss-depth-pokejev-20260925.md`, `notes/deep/next-gen/BRIEF.md`,
+`notes/deep/omp-kit-load-census.tsv`, `notes/deep/omp-kit-upstream-proofs.md`,
+`upstream/MANIFEST.tsv`, `work/jev-question-writing/w74-oof-auroc.py`,
+`work/loss-depth/pokejev/autopsy.py`, `work/nev-differential/DIFF-RECEIPT.json`,
+`work/nev-differential/PREREGISTER-DIFF.md`, `work/nev-injection/INSTALL-RECEIPT.txt`,
+`work/nev-routing/tool-select-derived.json`, `work/nev-routing/tool-select-extract.json`,
+`work/poke-jev/stage-b/receipt.json`, `work/skill-routing/pairs.jsonl`. Plus 167 untracked paths.
+Ask the restarted panes whether any of these are theirs before anyone touches them.
 
 ## Who is who
 
