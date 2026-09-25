@@ -1887,3 +1887,11 @@ Keyless command: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watc
 One keyless `env -u TYPESAFE_API_KEY -u JEV_API_KEY python3 scripts/fleet-idle-watch.py --once` poll returned CI, judge, skills, and inbox lines. No `jev` tmux session was available, so no live pane state was observed; the hub watcher was not restarted.
 
 Boundary: no TypeSafe calls, no Jev spend, no live stalled pane, and no hub restart. The remaining live-pane proof requires the fleet session to be present.
+
+## jev-b0b4 New experiment row provenance checker (2026-09-25) [offline-verified]
+
+Keyless tests: `python3 -m unittest work.row-provenance-check.test_row_provenance_check` → **5/5 passed**. The fixtures cover a valid experiment row, a missing code hash, a missing UTC timestamp, a pre-cutoff file, and a non-experiment JSONL file; the missing-hash fixture's first bad row is row 2. A source mutation that replaced the timestamp guard with `if False` made the suite RED. `ubs scripts/row-provenance-check.py work/row-provenance-check/test_row_provenance_check.py` returned exit 0, and `foundation/gates.sh` returned **ALL GREEN**.
+
+The committed main-tree scan `python3 scripts/row-provenance-check.py` returned exit 0 and reported **5 experiment row files / 94 experiment rows**. It uses the first adding commit after `2026-09-25T09:00:00Z`, accepts either `code_sha256` or `run_py_sha256`, requires a valid ISO-8601 UTC timestamp, and reports the first bad row per file. Commits `fd02991` and `77a4324`.
+
+Boundary: no TypeSafe API call, no paid spend, no model judgment, and no claim about row correctness; this validates only deterministic provenance enforcement and its fail-safe diagnostics.
