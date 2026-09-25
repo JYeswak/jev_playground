@@ -7,6 +7,7 @@ ARM="$ROOT/work/miniwob-jev/jev_arm.py"
 FLOOR="$ROOT/work/game-floors/miniwob/run.py"
 KEY_STATUS="$ROOT/scripts/key-status.py"
 REFERENCE="${MINIWOB_SANITY_REFERENCE:-$ROOT/work/miniwob-jev/rows/miniwob-jev-v3-contaminated-smoke-quoted-exact.s0.jsonl}"
+COMBINED_ARM_LIST="${MINIWOB_COMBINED_ARM_LIST:-$ROOT/work/miniwob-jev/v3-combined-arm-list.txt}"
 RUN_ROOT="${MINIWOB_RUN_ROOT:-/tmp/jev-miniwob-v3-after-rotation-$(date +%Y%m%dT%H%M%SZ)}"
 PYTHON_BIN="${PYTHON:-}"
 MODE=""
@@ -125,6 +126,9 @@ run_step() {
 run_combined() {
   echo "STEP combined: key-status first"
   status_gate
+  local combined_arms
+  combined_arms=$(awk '!/^#/ && NF {if (n++) printf ","; printf "%s", $1}' "$COMBINED_ARM_LIST")
+  [[ -n "$combined_arms" ]] || { echo "STEP combined: empty committed arm list" >&2; return 2; }
   local rows="$RUN_ROOT/combined.jsonl"
   local label_rows="$ROOT/work/miniwob-jev/rows/miniwob-jev-v3-heldout.s0.jsonl"
   if [[ "$MODE" == live && -e "$label_rows" && "$RESUME" -ne 1 ]]; then
@@ -132,10 +136,10 @@ run_combined() {
     return 4
   fi
   if [[ "$MODE" == fake ]]; then
-    MINIWOB_V3=1 MINIWOB_V3_ARM=all "$PYTHON_BIN" "$ARM" dev --fake greedy --tasks click-button --seeds 9000-9001 --out "$rows" --sanity-reference "$REFERENCE" --sanity-after 200
+    MINIWOB_V3=1 MINIWOB_V3_ARM="$combined_arms" "$PYTHON_BIN" "$ARM" dev --fake greedy --tasks click-button --seeds 9000-9001 --out "$rows" --sanity-reference "$REFERENCE" --sanity-after 200
   else
-    MINIWOB_V3=1 MINIWOB_V3_ARM=all "$PYTHON_BIN" "$FLOOR" --policy random,scripted --seeds 400,401,402,403,404 --tasks all --out "$RUN_ROOT/heldout-baselines.s0.jsonl"
-    MINIWOB_V3=1 MINIWOB_V3_ARM=all "$PYTHON_BIN" "$ARM" live --shard 0/1 --seeds 400,401,402,403,404 --tasks all --label v3-heldout --none-policy after-page-change --sanity-reference "$REFERENCE" --sanity-after 200
+    MINIWOB_V3=1 MINIWOB_V3_ARM="$combined_arms" "$PYTHON_BIN" "$FLOOR" --policy random,scripted --seeds 400,401,402,403,404 --tasks all --out "$RUN_ROOT/heldout-baselines.s0.jsonl"
+    MINIWOB_V3=1 MINIWOB_V3_ARM="$combined_arms" "$PYTHON_BIN" "$ARM" live --shard 0/1 --seeds 400,401,402,403,404 --tasks all --label v3-heldout --none-policy after-page-change --sanity-reference "$REFERENCE" --sanity-after 200
     [[ -s "$label_rows" ]] || { echo "STEP combined: no live label rows" >&2; return 1; }
     cp "$label_rows" "$rows"
   fi

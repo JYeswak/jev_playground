@@ -84,6 +84,7 @@ class RotationSheetTests(unittest.TestCase):
             sandbox = temp_root / "repo"
             (sandbox / "scripts").mkdir(parents=True)
             (sandbox / "docs/demos/upstream-repro").mkdir(parents=True)
+            (sandbox / "work/miniwob-jev").mkdir(parents=True)
             shutil.copy2(
                 ROOT / "scripts/key-status.py", sandbox / "scripts/key-status.py"
             )
@@ -95,6 +96,10 @@ class RotationSheetTests(unittest.TestCase):
                 ROOT / "docs/demos/upstream-repro/miniwob-jev-v3-prereg-20260925.md",
                 sandbox / "docs/demos/upstream-repro/miniwob-jev-v3-prereg-20260925.md",
             )
+            shutil.copy2(
+                ROOT / "work/miniwob-jev/v3-combined-arm-list.txt",
+                sandbox / "work/miniwob-jev/v3-combined-arm-list.txt",
+            )
             revoked = sandbox / "revoked.tsv"
             revoked.write_text("")
             stub = temp_root / "python-stub"
@@ -102,6 +107,8 @@ class RotationSheetTests(unittest.TestCase):
                 "#!/usr/bin/env python3\n"
                 "import json, pathlib, sys, os\n"
                 "args=sys.argv[1:]\n"
+                "seen=pathlib.Path(os.environ['REPO_ROOT']) / 'seen-arms.txt'\n"
+                "seen.open('a').write(os.environ.get('MINIWOB_V3_ARM','')+'\\n')\n"
                 "if '--out' in args:\n"
                 "    out=pathlib.Path(args[args.index('--out')+1])\n"
                 "else:\n"
@@ -122,9 +129,11 @@ class RotationSheetTests(unittest.TestCase):
                     "KEY_STATUS_REVOKED_FILE": str(revoked),
                 },
             )
+            seen_arms = (sandbox / "seen-arms.txt").read_text().splitlines()
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("ROTATION SHEET COMPLETE", result.stdout)
         self.assertEqual(result.stdout.count("KEY: OK"), 7)
+        self.assertEqual(seen_arms[-1], "quoted,none")
         self.assertEqual(result.stdout.count("provenance:"), 7)
 
     def test_live_stale_label_requires_resume(self):
@@ -160,9 +169,14 @@ class RotationSheetTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as temp:
             sandbox = Path(temp) / "repo"
+            (sandbox / "work/miniwob-jev").mkdir(parents=True)
             (sandbox / "scripts").mkdir(parents=True)
             shutil.copy2(
                 ROOT / "scripts/key-status.py", sandbox / "scripts/key-status.py"
+            )
+            shutil.copy2(
+                ROOT / "work/miniwob-jev/v3-combined-arm-list.txt",
+                sandbox / "work/miniwob-jev/v3-combined-arm-list.txt",
             )
             revoked = sandbox / "revoked.tsv"
             revoked.write_text("")
