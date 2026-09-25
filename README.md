@@ -6,14 +6,26 @@ This repository turns measured Jev behavior into small, runnable tools. The full
 
 ## Quickstart
 
+From a fresh clone:
+
 ```bash
 git clone https://github.com/JYeswak/jev_playground.git
-cd jev_playground
-node demos/guard/demo.mjs
-bash scripts/quickstart.sh
+cd jev_playground/kit
+npm ci
+npx jev doctor
+# Expected without a key: NOT_RUN and exit 2.
+npx jev ask choice --fake --state examples/state.json --question examples/question.json
 ```
 
-The first two commands use recorded answers and require no key. For a live call, install the documented dependencies, set `TYPESAFE_API_KEY` outside the repository, and run the same decision with the live flag. The pinned model is `jev-1.13.0`.
+The example state and Choice question are captured from committed rows: `work/pokeagent-emerald/segment2-request-states.jsonl:1` and `work/pokeagent-emerald/macro_choice.py:73-89`. The fake command uses no network.
+
+For a live call, set `TYPESAFE_API_KEY` outside the repository using the official [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart), then run the same command without `--fake`:
+
+```bash
+npx jev ask choice --state examples/state.json --question examples/question.json
+```
+
+The pinned model is `jev-1.13.0`.
 
 ## What Jev answers
 
