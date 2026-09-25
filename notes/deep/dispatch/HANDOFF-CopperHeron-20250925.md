@@ -28,6 +28,7 @@ The next step was the two blind labelers. `work/jev-yru2-public/label_prompt.md`
 
 - First whole-array attempt launched both completions but failed validation because the pre-fix extract used duplicate command hashes. No label files were written or committed. The extract was then fixed and recommitted at `5b368355`.
 - Second attempt started Labeller A in deterministic 20-row batches with `completion model=smol`; the eval cell was interrupted by the quiet-restart order before any output was written. Labeller B was not completed. No `labels-*` files exist under `work/jev-yru2-public/`.
+- Labeller A was started at approximately `2026-09-25T17:20Z` and stopped unfinished on the quiet-restart order; its partial response remained only in the interrupted eval kernel, no partial label file was written, and no label output is available for commit.
 - No completion/process matching `jev-yru2`, `completion`, or `work/jev-yru2-public` was running at handoff (`NO_MATCHING_PROCESS`).
 
 ## Uncommitted state
