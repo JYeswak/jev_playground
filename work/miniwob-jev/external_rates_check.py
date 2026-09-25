@@ -27,7 +27,9 @@ V3_GLOB = str(ROOT / "work/miniwob-jev/live-20260925/rows/miniwob-jev-v3-*.s0.js
 EXPECTED_FIELDS = {
     "task",
     "human_success_rate",
-    "best_published_agent_success_rate",
+    "cc_net_mean_score",
+    "aggregated_sota_bc_rl",
+    "aggregated_sota_augmented",
     "human_source",
     "best_agent_source",
     "source_version_match",
@@ -82,14 +84,22 @@ def load_rates(task_order: list[str]) -> dict[str, dict[str, str]]:
             raise ValueError(f"duplicate or empty task row: {task!r}")
         by_task[task] = row
         human = row["human_success_rate"]
-        agent = row["best_published_agent_success_rate"]
-        if bool(human) != bool(agent):
+        cc_net = row["cc_net_mean_score"]
+        aggregated_bc_rl = row["aggregated_sota_bc_rl"]
+        aggregated_augmented = row["aggregated_sota_augmented"]
+        if bool(human) != bool(cc_net):
             raise ValueError(
-                f"{task}: human and agent rates must be both blank or present"
+                f"{task}: human and CC-Net rates must be both blank or present"
             )
         if human:
             parse_rate(human, "human_success_rate", task)
-            parse_rate(agent, "best_published_agent_success_rate", task)
+            parse_rate(cc_net, "cc_net_mean_score", task)
+            for field, value in (
+                ("aggregated_sota_bc_rl", aggregated_bc_rl),
+                ("aggregated_sota_augmented", aggregated_augmented),
+            ):
+                if value:
+                    parse_rate(value, field, task)
             for field in ("human_source", "best_agent_source", "metric"):
                 if not row[field]:
                     raise ValueError(f"{task}: published row missing {field}")
@@ -177,7 +187,9 @@ def main() -> int:
     )
     for arm, stats in v3_by_arm.items():
         print(f"\narm={arm}")
-        print("task\thuman\tbest_agent\tv1_success\tv3_success\tversion_match")
+        print(
+            "task\thuman\tcc_net\taggregated_sota_bc_rl\taggregated_sota_augmented\tv1_success\tv3_success\tversion_match"
+        )
         for task in task_order:
             if task not in stats:
                 continue
@@ -187,7 +199,9 @@ def main() -> int:
                     (
                         task,
                         fmt_rate(row, "human_success_rate"),
-                        fmt_rate(row, "best_published_agent_success_rate"),
+                        fmt_rate(row, "cc_net_mean_score"),
+                        fmt_rate(row, "aggregated_sota_bc_rl"),
+                        fmt_rate(row, "aggregated_sota_augmented"),
                         fmt_result(v1_stats, task),
                         fmt_result(stats, task),
                         row["source_version_match"],
