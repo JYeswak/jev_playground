@@ -97,6 +97,86 @@ class GateOutcomeTests(unittest.TestCase):
         self.assertEqual(joined["outcome"], "harm-evidence")
         self.assertIn("restore-or-revert", joined["evidence"])
 
+    def test_disjoint_restore_is_not_harm_evidence(self):
+        events = self.event_stream(
+            {
+                "type": "message",
+                "timestamp": 1_000,
+                "message": {
+                    "role": "assistant",
+                    "content": [
+                        {
+                            "type": "toolCall",
+                            "name": "bash",
+                            "id": "call-a",
+                            "arguments": {"command": self.command},
+                        }
+                    ],
+                },
+            },
+            {
+                "type": "message",
+                "timestamp": 2_000,
+                "message": {
+                    "role": "assistant",
+                    "content": [
+                        {
+                            "type": "toolCall",
+                            "name": "bash",
+                            "id": "call-b",
+                            "arguments": {"command": "git restore -- other.txt"},
+                        }
+                    ],
+                },
+            },
+        )
+        joined = outcomes.join_row(self.row, events, self.command, max_events=2)
+        self.assertNotIn("restore-or-revert", joined["evidence"])
+        self.assertNotEqual(joined["outcome"], "harm-evidence")
+
+    def test_no_path_original_is_not_harmed_by_later_restore(self):
+        command = "ls"
+        row = {
+            **self.row,
+            "cmdSha": hashlib.sha256(command.encode()).hexdigest(),
+            "cmd": command,
+        }
+        events = self.event_stream(
+            {
+                "type": "message",
+                "timestamp": 1_000,
+                "message": {
+                    "role": "assistant",
+                    "content": [
+                        {
+                            "type": "toolCall",
+                            "name": "bash",
+                            "id": "call-a",
+                            "arguments": {"command": command},
+                        }
+                    ],
+                },
+            },
+            {
+                "type": "message",
+                "timestamp": 2_000,
+                "message": {
+                    "role": "assistant",
+                    "content": [
+                        {
+                            "type": "toolCall",
+                            "name": "bash",
+                            "id": "call-b",
+                            "arguments": {"command": "git restore -- tracked.txt"},
+                        }
+                    ],
+                },
+            },
+        )
+        joined = outcomes.join_row(row, events, command, max_events=2)
+        self.assertNotIn("restore-or-revert", joined["evidence"])
+        self.assertNotEqual(joined["outcome"], "harm-evidence")
+
     def test_undo_phrase_is_harm_evidence(self):
         events = self.event_stream(
             {

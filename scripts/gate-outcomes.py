@@ -145,7 +145,14 @@ def normalize_paths(command: str | None) -> set[str]:
     return paths
 
 
-def load_session_events(root: Path) -> dict[str, list[dict[str, Any]]]:
+def load_session_events(
+    root: Path,
+) -> dict[
+    str,
+    tuple[
+        list[dict[str, Any]], dict[str, list[tuple[int, dict[str, Any], str | None]]]
+    ],
+]:
     sessions: dict[str, list[dict[str, Any]]] = {}
     for path in sorted(root.glob("**/sessions/**/*.jsonl")):
         events = parse_jsonl(path)
@@ -158,14 +165,22 @@ def load_session_events(root: Path) -> dict[str, list[dict[str, Any]]]:
                 break
         if session_id:
             sessions.setdefault(session_id, []).extend(events)
-    for events in sessions.values():
+    indexed: dict[
+        str,
+        tuple[
+            list[dict[str, Any]],
+            dict[str, list[tuple[int, dict[str, Any], str | None]]],
+        ],
+    ] = {}
+    for session_id, events in sessions.items():
         events.sort(
             key=lambda event: (
                 timestamp(event.get("timestamp")) or 0,
                 event.get("_line", 0),
             )
         )
-    return sessions
+        indexed[session_id] = (events, _command_index(events))
+    return indexed
 
 
 def _command_index(
@@ -190,7 +205,11 @@ def sidecar_commands(path: Path) -> dict[str, str]:
 
 def join_row(
     row: dict[str, Any],
-    events: list[dict[str, Any]] | None,
+    session: tuple[
+        list[dict[str, Any]], dict[str, list[tuple[int, dict[str, Any], str | None]]]
+    ]
+    | list[dict[str, Any]]
+    | None,
     full_command: str | None,
     max_events: int,
 ) -> dict[str, Any]:
@@ -208,9 +227,13 @@ def join_row(
         "evidence": [],
         "observedEvents": 0,
     }
-    if not events:
+    if session is None:
         return result
-    by_hash = _command_index(events)
+    if isinstance(session, tuple):
+        events, by_hash = session
+    else:
+        events = session
+        by_hash = _command_index(events)
     matches = by_hash.get(str(row.get("cmdSha")), [])
     if not matches:
         return result
@@ -240,7 +263,7 @@ def join_row(
             later_commands.append(command)
             if COMPENSATE_RE.search(command):
                 paths = normalize_paths(command)
-                if not original_paths or not paths or original_paths & paths:
+                if original_paths and paths and original_paths & paths:
                     evidence.append("restore-or-revert")
         if is_error_result(event) and original_tool_id and tool_id == original_tool_id:
             evidence.append("failed-follow-up")
@@ -261,7 +284,13 @@ def join_row(
 def join_rows(
     gate_rows: list[dict[str, Any]],
     sidecar: dict[str, str],
-    sessions: dict[str, list[dict[str, Any]]],
+    sessions: dict[
+        str,
+        tuple[
+            list[dict[str, Any]],
+            dict[str, list[tuple[int, dict[str, Any], str | None]]],
+        ],
+    ],
     max_events: int = 20,
 ) -> list[dict[str, Any]]:
     return [
