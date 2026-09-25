@@ -3,7 +3,7 @@
   "date": "2026-09-25",
   "mode": "live",
   "key_status": "KEY: OK",
-  "model_claim": "not recorded by runner receipt; no model version claim made",
+  "model_claim": "combined held-out rows record model_requested=jev-1.13.0 and model=jev-1.13.0; isolated step rows retain the prior runner receipt limitation",
   "steps": [
     {
       "step": "quoted",
@@ -59,6 +59,42 @@
     "jev_calls": 889,
     "input_tokens": 2199227
   },
-  "combined_heldout": "NOT_RUN (stop after isolated steps; next pane-approved step)",
-  "boundary": "No 401/402 encountered; no model-quality ruling is made."
+  "combined_heldout": {
+    "status": "INCOMPLETE_NOT_SCORED",
+    "expected_rows": 625,
+    "expected_keys": "125 tasks x seeds 400,401,402,403,404",
+    "rows_written": 255,
+    "resumed_rows": 20,
+    "new_rows_written": 235,
+    "unique_task_seed_keys": 255,
+    "key_set_complete": false,
+    "shard": "0/1",
+    "to_run_at_resume": 605,
+    "model_requested": "jev-1.13.0",
+    "resolved_models": ["jev-1.13.0"],
+    "successes": 161,
+    "successes_strict": 148,
+    "done_rows": 212,
+    "truncated_rows": 43,
+    "error_field_rows": 0,
+    "child_error_rows": 0,
+    "jev_calls": 954,
+    "input_tokens": 5580730,
+    "output_tokens": 1006538,
+    "estimated_spend_usd": 0.234391,
+    "spend_basis": "5580730 billed input tokens x $0.042 per million; output free",
+    "jev_ms": 282974,
+    "wall_s_sum": 895.5047,
+    "started_utc": "2026-09-25T17:25:13.207768Z",
+    "last_finished_utc": "2026-09-25T18:57:37.457619Z",
+    "code_sha256": "9909a06663b2065435be32691ffbcba73644822e7fec9ef314dd696b1593ab83",
+    "row_sha256": "bb720db4787e7bcd65377f002413e5b6fc3c245e9690f6361b8d3d3598868b3f",
+    "run_root": "var/agent-tmp/jev-9gtw-heldout-resume.1",
+    "supervisor": "omp named service jev9gtw4-heldout",
+    "exit_code": 1,
+    "failure": "HALT at drag-items-grid seed=400 rep=0 after 3 consecutive failed calls: TypeSafeBadRequestError: POST /v1/systemone: 400 Choice question must have at least one choice: action (episode row not written; resume replays it)",
+    "mcnemar": "NOT_RUN (held-out key set incomplete)",
+    "not_scored": true
+  },
+  "boundary": "Combined held-out run is incomplete and not scored. No 625-key v3 result, McNemar comparison, or model-quality ruling is claimed. The runner halted on the documented 400 malformed Choice question before writing the drag-items-grid seed=400 row; no 401/402 occurred."
 }
