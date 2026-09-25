@@ -707,7 +707,13 @@ def run_plan(
     return 0
 
 
-def cmd_live(shard: str, seeds: str = "benchmark", none_policy: str = "always") -> int:
+def cmd_live(
+    shard: str,
+    seeds: str = "benchmark",
+    none_policy: str = "always",
+    tasks_spec: str = "all",
+    label: str = "",
+) -> int:
     if not os.environ.get("TYPESAFE_API_KEY", "").strip():
         print(
             "unconfigured: TYPESAFE_API_KEY unset, no call made (NOT_RUN)",
@@ -724,10 +730,20 @@ def cmd_live(shard: str, seeds: str = "benchmark", none_policy: str = "always") 
     ask = LiveAsker()
     k, n = (int(x) for x in shard.split("/"))
     all_tasks = floor.load_task_list()
-    tasks = all_tasks[k::n]
+    selected_tasks = (
+        all_tasks
+        if tasks_spec == "all"
+        else [t.strip() for t in tasks_spec.split(",") if t.strip()]
+    )
+    unknown = sorted(set(selected_tasks) - set(all_tasks))
+    if unknown:
+        raise ValueError(f"unknown MiniWoW tasks: {unknown}")
+    tasks = selected_tasks[k::n]
     plan = floor.episode_plan(tasks, seeds, floor.benchmark_seeds(all_tasks))
     ROWS_DIR.mkdir(parents=True, exist_ok=True)
-    if seeds == "benchmark" and none_policy == "always":
+    if label:
+        filename = f"miniwob-jev-{label}.s{k}.jsonl"
+    elif seeds == "benchmark" and none_policy == "always":
         filename = f"miniwob-jev.s{k}.jsonl"
     elif none_policy == "after-page-change":
         filename = f"miniwob-jev-v2.s{k}.jsonl"
@@ -959,6 +975,8 @@ def main(argv=None) -> int:
     lv = sub.add_parser("live")
     lv.add_argument("--shard", default="0/1")
     lv.add_argument("--seeds", default="benchmark")
+    lv.add_argument("--tasks", default="all")
+    lv.add_argument("--label", default="")
     lv.add_argument(
         "--none-policy", choices=["always", "after-page-change"], default="always"
     )
@@ -967,7 +985,7 @@ def main(argv=None) -> int:
         return selftest()
     if a.cmd == "dev":
         return cmd_dev(a.fake, a.tasks, a.seeds, a.out, a.max_steps, a.dump_request)
-    return cmd_live(a.shard, a.seeds, a.none_policy)
+    return cmd_live(a.shard, a.seeds, a.none_policy, a.tasks, a.label)
 
 
 if __name__ == "__main__":
