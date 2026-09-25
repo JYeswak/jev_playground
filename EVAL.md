@@ -1778,3 +1778,36 @@ returned exit 0. Offline receipt commits: `9eab0c0` and refreshed `1d500a4`.
 Boundary: this is PREPARED-NOT-MEASURED, not a live result. The live arm waits for the pane-5
 MiniWoB v2 dependency. Once rows exist, `work/miniwob-ax-prune/score.py` reports per-arm success
 counts/rates and the number of the 50 tasks succeeding in at least one arm for each split.
+
+## jev-9gtw.2 OSWorld Best-of-N loss-depth dev and held-out audit (2026-09-25) [live]
+
+Preregistration `0990712` preceded the four dev arms; the outcome-selected held-out audit manifest
+was committed in `886c0d8`. Pinned OSWorld source `xlang-ai/OSWorld@b138d348256078fa634fc3b73567a7337c793e6b`;
+task manifest `work/osw-bestofn/dev_slice.json` (N=60). Public instructions came from
+`evaluation_examples/examples/<domain>/<id>.json`; result.txt contents, official rewards, and
+grader output were not sent to Jev. Dev command:
+`infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- env
+OSW_STATE_FILE=var/agent-tmp/osw-bestofn-dev-43091/states.jsonl
+OSW_SLICE_FILE=work/osw-bestofn/dev_slice.json
+OSW_DEV_RECEIPT=var/agent-tmp/osw-bestofn-dev-43091/original.json
+node work/osw-bestofn/dev_replay.mjs original`, repeated for each preregistered variant.
+
+Dev live: `original`, `goal`, `neutral`, `noul`, 60 calls each, 0 failures; all 240 successful rows
+resolved `jev-1.13.0`. Mean official reward / exact / input tokens / spend: original
+`0.0166667 / 1/60 / 477,436 / $0.020052312`; goal
+`0.0166667 / 1/60 / 480,164 / $0.020166888`; neutral
+`0 / 0/60 / 481,756 / $0.020233752`; Noul
+`0 / 0/60 / 511,156 / $0.021468552`. `goal` recovered one baseline failure but regressed one
+baseline success; neutral and Noul recovered zero. No variant qualified under the strict
+preregistered improvement rule.
+
+The 57-task held-out audit was the complement inside the original 361-task failure-class union,
+selected from prior Jev picks and floor outcomes; it reuses the R104 pool and is outcome-selected.
+Its `original` run completed 57/57 calls, all `jev-1.13.0`, 456,282 input tokens, `$0.019163844`;
+these numbers are **NOT-SCORED** and are not a held-out retest. A valid retest requires a different
+OSWorld-Verified run set or step budget over all tasks, selected and committed before outcomes;
+deferred until after Jericho. Combined spend was `$0.101085348`. Receipt
+`work/osw-bestofn/dev_live_receipt.json`; report
+`docs/demos/upstream-repro/osw-bestofn-loss-depth-dev-20260925.md`; R106 correction commit
+`28747e4`. Boundary: no valid held-out variant, H5 terminal-status arm, MiniWoB, comparator,
+different step budget, or deployment policy. `ubs work/osw-bestofn/dev_replay.mjs` exit 0.
