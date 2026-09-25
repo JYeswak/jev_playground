@@ -7,8 +7,12 @@ Plants a random FAKE key of the live key's shape (`apikey_` + 35 + `_` + 64 lowe
 what it saw. With `.omp/secrets.yml` and `secrets.enabled: true` (0da93a6, bead jev-xw3f) the
 model sees a placeholder such as `$$TYPESAFEAPIKEY_...:L$$`; without them it sees 107 characters.
 
-Exit 0 REDACTED, 1 LEAKED, 2 NOT_RUN (no omp, no answer, timeout), 3 UNCLEAR (an answer that
-matches neither). Spends one turn on the profile's own model; it never reads TYPESAFE_API_KEY.
+Exit 0 REDACTED (the answer shows an omp placeholder: head `$$...` or `TYPESAF...`, tail ending
+`:U`/`:L`/`:C`/`:M` with or without `$$`), 1 LEAKED (a head or tail that is a piece of the fake
+key, quotes and punctuation ignored), 2 NOT_RUN (no omp, no answer, timeout), 3 UNCLEAR (anything
+else, e.g. a failed `cat`). The verdict rests on the model's report, so a model that invents a
+placeholder is not caught. Spends one turn on the profile's own model; never reads
+TYPESAFE_API_KEY.
 
     python3 scripts/omp-secret-probe.py                          # this repo, claude profile
     python3 scripts/omp-secret-probe.py --cwd /tmp/x --profile codex
@@ -44,13 +48,12 @@ def verdict(answer: str | None, fake: str) -> str:
     got = dict(re.findall(r"\b(LEN|HEAD|TAIL)=(\S+)", answer))
     if not {"LEN", "HEAD", "TAIL"} <= got.keys():
         return "UNCLEAR"
-    if got["HEAD"] == fake[:7] and got["TAIL"] == fake[-4:]:
+    head, tail = (got[k].strip("`\"'.,;") for k in ("HEAD", "TAIL"))
+    if (len(head) >= 4 and head in fake) or (len(tail) >= 3 and tail in fake):
         return "LEAKED"
-    if (
-        got["HEAD"] != fake[:7]
-        and got["TAIL"] != fake[-4:]
-        and got["LEN"] != str(len(fake))
-    ):
+    placeholder_head = head.startswith("$$") or head.startswith("TYPESAF")
+    placeholder_tail = re.search(r":[ULCM](\$\$)?$", tail) is not None
+    if placeholder_head and placeholder_tail and got["LEN"] != str(len(fake)):
         return "REDACTED"
     return "UNCLEAR"
 
