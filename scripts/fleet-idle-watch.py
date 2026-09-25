@@ -11,6 +11,13 @@ State  = from process evidence first, screen second (bead jev-6con):
          Each state carries the evidence that decided it, e.g. "working (child: docker run ...)".
 Alert  = `ntm send jev --pane=1 "IDLE pane N ..."` after POLLS consecutive non-working polls,
          then again every REALERT seconds while it stays that way.
+Mail   = every round, each urgent/high Agent Mail message in the conductor's archive inbox that
+         was never paged goes to pane 1 once as `MAIL <importance> from <from>: <subject> (id <id>,
+         <HH:MM>Z)` (bead jev-lqfm). Paged ids persist in JEV_WATCH_INBOX_STATE, so a restart
+         does not re-page; with no state file, mail created before start - 15 min is history,
+         recorded and never paged. One `Inbox:` line per round; `Inbox: NOT_RUN <reason>` when
+         the inbox or the state file cannot be read. Why: 2026-09-25 an urgent key-leak report
+         to AmberWillow sat unread 42 minutes, because pane 1 does not poll Agent Mail.
 
 Why: 2026-09-24, 4 of 6 worker panes sat at their prompts for most of an hour and the
 conductor only looked when a callback arrived. Joshua: "dont let that happen again."
@@ -20,20 +27,23 @@ was 'idle' while its omp had a docker run live under a bash tool call.
 
   python3 scripts/fleet-idle-watch.py            # run forever (start it under hub)
   python3 scripts/fleet-idle-watch.py --once     # one poll, then the CI-on-main line from
-                                                 # scripts/ci-main-status.py and the Jev judge
+                                                 # scripts/ci-main-status.py, the Jev judge
                                                  # line from surface-census.py --fleet-line
-                                                 # (both informational); exit 1 if any worker
-                                                 # is not working
+                                                 # (both informational) and one mail round;
+                                                 # exit 1 if any worker is not working
   python3 scripts/fleet-idle-watch.py --selftest # classifier on real status lines and trees
 """
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
 import sys
 import time
+from calendar import timegm
+from pathlib import Path
 from typing import NamedTuple
 
 SESSION = os.environ.get("JEV_SESSION", "jev")
@@ -62,6 +72,17 @@ OMP_HELPERS = (
     "franken-harvest serve",  # MCP server franken-harvest
 )
 SESSION_FRESH = int(os.environ.get("IDLE_SESSION_FRESH", "60"))
+# Agent Mail paging (bead jev-lqfm). Paths are read from the env each round, not at import, so a
+# test that points HOME or these at a temp tree never reads or writes the real ones.
+INBOX_ROOT = (
+    "~/.local/share/mcp-agent-mail-rust-live/projects/users-josh-developer-jev/agents"
+)
+INBOX_STATE = "~/.local/state/jev/inbox-paged.json"
+PAGE_IMPORTANCE = ("urgent", "high")
+INBOX_LOOKBACK = (
+    15 * 60
+)  # with no state file, mail created before start - this is history
+CREATED = re.compile(r"^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(\.\d+)?(Z|\+00:00)$")
 
 
 class Snapshot(NamedTuple):
@@ -223,13 +244,127 @@ def poll() -> dict[int, tuple[str, str]]:
     return states
 
 
+def send_pane1(message: str) -> bool:
+    """`ntm send` one line to the conductor; True only when ntm exited 0."""
+    try:
+        done = subprocess.run(
+            ["ntm", "send", SESSION, "--pane=1", message],
+            capture_output=True,
+            timeout=60,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return done.returncode == 0
+
+
 def alert(index: int, since: float, words: str) -> None:
     stamp = time.strftime("%H:%MZ", time.gmtime(since))
     message = f"IDLE pane {index} (since {stamp}), last line: {words}"
-    subprocess.run(
-        ["ntm", "send", SESSION, "--pane=1", message], capture_output=True, timeout=60
-    )
+    send_pane1(message)
     print(f"{time.strftime('%H:%M:%SZ', time.gmtime())} alerted: {message}", flush=True)
+
+
+def page(message: str) -> bool:
+    """The watcher's mail pager: send_pane1 plus a log line saying whether ntm took it."""
+    ok = send_pane1(message)
+    said = "paged" if ok else "page FAILED"
+    print(f"{time.strftime('%H:%M:%SZ', time.gmtime())} {said}: {message}", flush=True)
+    return ok
+
+
+def inbox_paths() -> tuple[Path, Path]:
+    """(the conductor's archive inbox dir, the paged-ids state file)."""
+    root = Path(os.environ.get("JEV_WATCH_INBOX_ROOT") or INBOX_ROOT).expanduser()
+    agent = os.environ.get("JEV_WATCH_INBOX_AGENT") or "AmberWillow"
+    state = Path(os.environ.get("JEV_WATCH_INBOX_STATE") or INBOX_STATE).expanduser()
+    return root / agent / "inbox", state
+
+
+def read_mail(path: Path) -> dict:
+    """An archive file's JSON front matter (between `---json` and `---`), with `created` as epoch
+    seconds. Raises ValueError/KeyError/TypeError for any file not in that shape."""
+    text = path.read_text(encoding="utf-8")
+    if not text.startswith("---json\n"):
+        raise ValueError("no ---json line")
+    head, closed, _ = text[len("---json\n") :].partition("\n---\n")
+    if not closed:
+        raise ValueError("no closing ---")
+    front = json.loads(head)
+    stamp = CREATED.match(front["created"])
+    if not stamp or not isinstance(front["id"], int):
+        raise ValueError("bad created or id")
+    return {
+        "id": front["id"],
+        "from": str(front["from"]),
+        "subject": str(front["subject"]),
+        "importance": str(front["importance"]),
+        "created": timegm(time.strptime(stamp.group(1), "%Y-%m-%dT%H:%M:%S")),
+        "hhmm": stamp.group(1)[11:16],
+    }
+
+
+def save_state(state: Path, paged: set[int], history: set[int]) -> None:
+    """Write the state file atomically: a sibling temp file, then os.replace."""
+    state.parent.mkdir(parents=True, exist_ok=True)
+    tmp = state.with_name(f"{state.name}.{os.getpid()}.tmp")
+    tmp.write_text(
+        json.dumps({"paged": sorted(paged), "history": sorted(history)}) + "\n"
+    )
+    os.replace(tmp, state)
+
+
+def inbox_round(inbox: Path, state: Path, started: float, send) -> str:
+    """Page every urgent/high message not paged before; return this round's `Inbox:` line.
+    `send(message) -> bool`; a False leaves the id unrecorded so the next round retries it.
+    State: {"paged": ids sent, "history": urgent/high ids older than the first-run cutoff}."""
+    if not inbox.is_dir():
+        return f"Inbox: NOT_RUN no inbox dir {inbox}"
+    first_run = not state.exists()
+    try:
+        saved = {} if first_run else json.loads(state.read_text())
+        paged, history = set(saved.get("paged", [])), set(saved.get("history", []))
+    except (OSError, ValueError, AttributeError, TypeError) as err:
+        return f"Inbox: NOT_RUN state file {state} unreadable ({type(err).__name__}: {err})"
+    try:
+        files = sorted(inbox.glob("*/*/*.md"))
+    except OSError as err:
+        return f"Inbox: NOT_RUN cannot list {inbox} ({err})"
+    mails, malformed = [], []
+    for path in files:
+        try:
+            mails.append(read_mail(path))
+        except (OSError, ValueError, KeyError, TypeError):
+            malformed.append(path.name)
+    cutoff = started - INBOX_LOOKBACK if first_run else None
+    sent = failed = 0
+    for mail in sorted(mails, key=lambda m: m["created"]):
+        if mail["importance"] not in PAGE_IMPORTANCE or mail["id"] in paged | history:
+            continue
+        if cutoff is not None and mail["created"] < cutoff:
+            history.add(mail["id"])
+            continue
+        message = (
+            f"MAIL {mail['importance']} from {mail['from']}: {mail['subject']}"
+            f" (id {mail['id']}, {mail['hhmm']}Z)"
+        )
+        if send(message):
+            paged.add(mail["id"])
+            sent += 1
+        else:
+            failed += 1
+    notes = [inbox.parent.name, f"{len(files)} messages"]
+    try:
+        save_state(state, paged, history)
+    except OSError as err:
+        notes.append(f"state NOT saved, next round re-pages ({err})")
+    if malformed:
+        notes.append(f"{len(malformed)} malformed: {', '.join(malformed)}")
+    if failed:
+        notes.append(f"{failed} send failed, retried next round")
+    return (
+        f"Inbox: {sent} urgent/high paged this round, {len(paged)} paged total"
+        f" ({'; '.join(notes)})"
+    )
 
 
 def ci_lines() -> list[str]:
@@ -311,11 +446,13 @@ def main() -> int:
             print(line)
         for line in judge_lines():
             print(line)
+        print(inbox_round(*inbox_paths(), time.time(), page), flush=True)
         return 1 if any(state != "working" for state, _ in states.values()) else 0
     streak: dict[int, int] = {}
     idle_since: dict[int, float] = {}
     alerted_at: dict[int, float] = {}
     print(f"watching {SESSION} worker panes every {INTERVAL}s", flush=True)
+    started = time.time()
     while True:
         now = time.time()
         for index, (state, words) in poll().items():
@@ -330,6 +467,8 @@ def main() -> int:
             if streak[index] >= POLLS and due:
                 alert(index, idle_since[index], f"[{state}] {words}")
                 alerted_at[index] = now
+        inbox_line = inbox_round(*inbox_paths(), started, page)
+        print(f"{time.strftime('%H:%M:%SZ', time.gmtime())} {inbox_line}", flush=True)
         time.sleep(INTERVAL)
 
 
