@@ -15,6 +15,23 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(HERE))
 
 
+def _ensure_miniwob_deps():
+    try:
+        import gymnasium  # noqa: F401
+        import miniwob  # noqa: F401
+    except ModuleNotFoundError:
+        candidate = Path(
+            os.environ.get("MINIWOB_TEST_VENV", "/tmp/jev-miniwob-jev/venv/bin/python")
+        )
+        if candidate.exists() and Path(sys.executable).resolve() != candidate.resolve():
+            os.execv(str(candidate), [str(candidate), *sys.argv])
+        print("SKIP (missing prerequisite: gymnasium)")
+        raise SystemExit(8)
+
+
+_ensure_miniwob_deps()
+
+
 class V3OptionsContract(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
