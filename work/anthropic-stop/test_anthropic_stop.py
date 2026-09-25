@@ -199,6 +199,7 @@ KEYLESS = {
     "work/openrouter/test_provider.py": "offline test: builds a :free provider, a paid id refuses; fake key",
     "work/openrouter/usage_daily.py": "reads the OpenRouter key's usage counter; sends no model request",
     "work/readme-stranger-run/run.py": "names grok-4.20 in a number-parsing comment",
+    "scripts/stranger-run-jev-playground.py": "lists provider key variable names only to strip them from the stranger child env; runs README commands keyless",
     "work/second-incumbent/grok_variance.py": "scores committed grok rows",
     "work/second-incumbent/score_n4j.py": "scores committed grok rows",
     "work/sr-adopt/test_prereg.py": "offline test: fake XAI_API_KEY, providers stubbed",
