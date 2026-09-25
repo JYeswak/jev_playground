@@ -155,6 +155,34 @@ class RotationSheetTests(unittest.TestCase):
         self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
         self.assertIn("refusing existing live output", result.stderr)
 
+    def test_live_stale_heldout_requires_resume(self):
+        import shutil
+
+        with tempfile.TemporaryDirectory() as temp:
+            sandbox = Path(temp) / "repo"
+            (sandbox / "scripts").mkdir(parents=True)
+            shutil.copy2(
+                ROOT / "scripts/key-status.py", sandbox / "scripts/key-status.py"
+            )
+            revoked = sandbox / "revoked.tsv"
+            revoked.write_text("")
+            label = sandbox / "work/miniwob-jev/rows/miniwob-jev-v3-heldout.s0.jsonl"
+            label.parent.mkdir(parents=True)
+            label.write_text("stale\n")
+            result = self.run_sheet(
+                sandbox / "run",
+                "--steps",
+                "combined",
+                mode="live",
+                extra_env={
+                    "REPO_ROOT": str(sandbox),
+                    "PYTHON": "/bin/false",
+                    "KEY_STATUS_REVOKED_FILE": str(revoked),
+                },
+            )
+        self.assertEqual(result.returncode, 4, result.stdout + result.stderr)
+        self.assertIn("refusing existing live output", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

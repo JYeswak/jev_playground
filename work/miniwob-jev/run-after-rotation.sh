@@ -126,18 +126,18 @@ run_combined() {
   echo "STEP combined: key-status first"
   status_gate
   local rows="$RUN_ROOT/combined.jsonl"
+  local label_rows="$ROOT/work/miniwob-jev/rows/miniwob-jev-v3-heldout.s0.jsonl"
+  if [[ "$MODE" == live && -e "$label_rows" && "$RESUME" -ne 1 ]]; then
+    echo "STEP combined: refusing existing live output $label_rows; pass --resume" >&2
+    return 4
+  fi
   if [[ "$MODE" == fake ]]; then
-    MINIWOB_V3=1 MINIWOB_V3_ARM=all "$PYTHON_BIN" "$ARM" dev \
-      --fake greedy --tasks click-button --seeds 9000-9001 --out "$rows" \
-      --sanity-reference "$REFERENCE" --sanity-after 200
+    MINIWOB_V3=1 MINIWOB_V3_ARM=all "$PYTHON_BIN" "$ARM" dev --fake greedy --tasks click-button --seeds 9000-9001 --out "$rows" --sanity-reference "$REFERENCE" --sanity-after 200
   else
-    MINIWOB_V3=1 MINIWOB_V3_ARM=all "$PYTHON_BIN" "$FLOOR" \
-      --policy random,scripted --seeds 400,401,402,403,404 --tasks all \
-      --out "$RUN_ROOT/heldout-baselines.s0.jsonl"
-    MINIWOB_V3=1 MINIWOB_V3_ARM=all "$PYTHON_BIN" "$ARM" live \
-      --shard 0/1 --seeds 400,401,402,403,404 --tasks all --label v3-heldout \
-      --none-policy after-page-change --sanity-reference "$REFERENCE" --sanity-after 200
-    cp "$ROOT/work/miniwob-jev/rows/miniwob-jev-v3-heldout.s0.jsonl" "$rows"
+    MINIWOB_V3=1 MINIWOB_V3_ARM=all "$PYTHON_BIN" "$FLOOR" --policy random,scripted --seeds 400,401,402,403,404 --tasks all --out "$RUN_ROOT/heldout-baselines.s0.jsonl"
+    MINIWOB_V3=1 MINIWOB_V3_ARM=all "$PYTHON_BIN" "$ARM" live --shard 0/1 --seeds 400,401,402,403,404 --tasks all --label v3-heldout --none-policy after-page-change --sanity-reference "$REFERENCE" --sanity-after 200
+    [[ -s "$label_rows" ]] || { echo "STEP combined: no live label rows" >&2; return 1; }
+    cp "$label_rows" "$rows"
   fi
   [[ -s "$rows" ]] || { echo "STEP combined: no rows" >&2; return 1; }
   echo "STEP combined: $(wc -l < "$rows" | tr -d ' ') rows; provenance:"
