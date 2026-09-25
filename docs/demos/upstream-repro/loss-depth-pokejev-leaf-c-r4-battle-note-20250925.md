@@ -8,8 +8,9 @@ and code+Noul reads gave no reason to spend on the Noul leaf arm.
 ## Frozen inputs
 
 - Pairing: `abyssal`, `k=0..199`, 200 battles, 8 workers.
-- Pair seed: `20260925`, the same 200 pairings used by the prior frozen-alpha
-  comparison.
+- Pair seed: `20260925`, the Stage B pairings used by the prior Jev arm
+  (`112/200`) and control (`79/200`); the frozen-alpha `mix-v1` retest used
+  the distinct seed `20260926`.
 - Leaf arm: `--leaf code` only. This uses the frozen code leaf and makes no new
   leaf Noul requests; Jev remains live for the upstream action-prior and
   opponent-model questions already in the Stage B harness.
@@ -46,17 +47,19 @@ that partial arm and the committed Stage B reference:
 
 ```bash
 scripts/arm-sanity.py \
-  --arm work/loss-depth/pokejev-components/decisions-abyssal-leaf-code-r4-code.jsonl \
+  --arm work/loss-depth/pokejev-components/decisions-abyssal-leaf-code-leaf-c-r4-code.jsonl \
   --reference work/poke-jev/stage-b/decisions-abyssal.jsonl \
   --min-rows 200 --max-diff 0.10
 ```
 
 The continuation gate is stricter than the checker's default: the absolute
 switch-rate difference on the first 200 eligible arm decisions MUST be at most
-`0.10` against the Stage B offered-switch reference (`0.41`). Record the arm
-and reference eligible counts, switch counts/rates, absolute difference, and
-checker exit code. If the difference exceeds `0.10`, or the arm is degenerate,
-stop permanently and record `NOT-SCORED`; do not run the remaining battles.
+`0.10` against the Stage B reference file's offered-switch rate `0.362`
+(`n=3396`), so the permitted band is `[0.262, 0.462]`. Record the arm and
+reference eligible counts, switch counts/rates, absolute difference, and checker
+exit code. Paste the checker output verbatim into the final receipt. If the
+difference exceeds `0.10`, or the arm is degenerate, stop permanently and
+record `NOT-SCORED`; do not run the remaining battles.
 If it is within `0.10`, clear only the persisted stop marker, restart the same
 frozen command and `run_id`, and let the runner complete the remaining pairings.
 The runner skips completed `k` values and does not alter their rows.
