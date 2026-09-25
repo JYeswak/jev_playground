@@ -26,6 +26,23 @@ INPUT_PRICE_PER_MILLION = 0.042
 DEFAULT_MACRO_RATE_HZ = 80 / 18
 
 
+def _porymap_ascii(state_text: str) -> str | None:
+    marker = "=== PORYMAP MAP LAYOUT ==="
+    ascii_marker = "ASCII Map:\n"
+    legend_marker = "\n(Legend:"
+    start = state_text.find(marker)
+    if start < 0:
+        return None
+    ascii_start = state_text.find(ascii_marker, start)
+    if ascii_start < 0:
+        return None
+    ascii_start += len(ascii_marker)
+    ascii_end = state_text.find(legend_marker, ascii_start)
+    if ascii_end < 0:
+        return None
+    return state_text[ascii_start:ascii_end].strip()
+
+
 def compact_state(row: dict[str, Any]) -> dict[str, Any]:
     """Return only the JSON projection sent for one macro; excludes state_text/images."""
     source = row.get("state", row)
@@ -49,11 +66,7 @@ def compact_state(row: dict[str, Any]) -> dict[str, Any]:
             "time": source.get("game", {}).get("time"),
             "progress_context": source.get("game", {}).get("progress_context"),
         },
-        "map": {
-            "visual_map": source.get("map", {}).get("visual_map"),
-            "object_events": source.get("map", {}).get("object_events"),
-            "stitched_map_info": source.get("map", {}).get("stitched_map_info"),
-        },
+        "map": {"porymap_ascii": _porymap_ascii(row.get("state_text", ""))},
     }
 
 

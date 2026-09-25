@@ -38,6 +38,22 @@ class MacroChoice(unittest.TestCase):
         self.assertNotIn("state_text", request["state"])
         self.assertNotIn("screenshot_present", request["state"]["visual"])
 
+    def test_request_changes_with_position_and_carries_only_porymap_ascii(self):
+        row1 = self.sample_row()
+        row1["state_text"] = (
+            "=== PORYMAP MAP LAYOUT ===\nLocation: InsideOfTruck\nASCII Map:\n#.P.SD\n(Legend: P=player, D=door)\nMap Data"
+        )
+        row2 = self.sample_row()
+        row2["state_text"] = row1["state_text"].replace("#.P.SD", "#..PSD")
+        row2["state"]["player"]["position"] = {"x": 3, "y": 2}
+
+        request1 = build_choice_request(row1)
+        request2 = build_choice_request(row2)
+
+        self.assertNotEqual(request1["state"], request2["state"])
+        self.assertEqual(request1["state"]["map"]["porymap_ascii"], "#.P.SD")
+        self.assertNotIn("state_text", request1["state"])
+
     def test_budget_reports_rate_time_tokens_and_cost_without_network(self):
         rows = [self.sample_row(), self.sample_row()]
         budget = estimate_budget(rows, macros=200)
