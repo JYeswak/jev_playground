@@ -4435,12 +4435,31 @@ The supervised code-only process wrote 991 decision rows under
 `run_id=leaf-c-r4-code` and stopped at the existing interim marker after the
 first eligible-decision gate. The stop-time reading recorded by pane 1 at
 `2026-09-25T09:39:29Z` was 245 eligible decisions with offered-switch rate
-`0.078` versus the Stage B reference `0.362`, absolute difference `0.284`, and
+`0.078` versus the Stage B reference `0.362`, absolute difference `0.284`,
 checker exit `1`. After workers drained, the same 991-row file contained 415
 eligible decisions; the final keyless read was switch `0.089` versus `0.362`,
-absolute difference `0.272`, and exit `1`. The supervised child footer was
-`exit_code=1`. Both readings fail the preregistered `0.10` action-mix limit.
-The arm is `NOT-SCORED`; no battle win rate or Jev-vs-battle claim is made.
+absolute difference `0.272`, and exit `1`. The r4 result artifact is
+`work/loss-depth/pokejev-components/results-abyssal-leaf-code-leaf-c-r4-code.jsonl`:
+43 partial battle rows, 25 wins, `run_id=leaf-c-r4-code`, first row
+`2026-09-25T09:38:54Z`, results SHA256
+`fd178d6a6a82e1a781d67db9b16e546f67af280b0719cc51cd48f5cd3396b3d6`, and
+leaf-model SHA256 `ad8cd16482eb41e409409c94c968d0b2857f736bd6258b9afd556d785273c49b`.
+The older
+`work/loss-depth/pokejev-components/results-abyssal-leaf-code-v1.jsonl` remains
+tracked as the dead 07:40 v1 partial: 45 rows, 17 wins, no `run_id`, and leaf
+SHA256 `16a2b72f6da68bc61049bbaf4c72b7c3e1c330da075c1e5e51f88751df605384`;
+it is not an r4 result. The supervised child footer was `exit_code=1`.
+Both readings fail the preregistered `0.10` action-mix limit.
+The arm is `NOT-SCORED`; the 25/43 partial wins are descriptive only, not a
+battle win-rate claim.
+
+The stop marker is included in the commit, so a fresh clone starts with it set
+and `run.py` can emit `STOPPED: credit exhaustion marker at ...` when it
+observes the marker. A future, separately preregistered continuation may clear
+it with `: > work/loss-depth/pokejev-components/battle/stage-b/mix-v1-stop.json`;
+the live non-control `battles` entry also truncates it at
+`work/loss-depth/pokejev-components/battle/run.py:959-960`. It remains set for
+this failed arm.
 
 **Autopsy.** The suspected missing-opponent-reply explanation is refuted.
 `work/poke-jev/player.py:248-262` creates a fresh simulator for every

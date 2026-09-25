@@ -16,8 +16,9 @@ continuation.
 ## Partial artifacts
 
 - `work/loss-depth/pokejev-components/decisions-abyssal-leaf-code-leaf-c-r4-code.jsonl`: 991 decision rows, `run_id=leaf-c-r4-code`, `run_py_sha256=3450051c7270106e00fbf148877028d9817e51506cf8f5726f2259efe2ee3209`.
-- `work/loss-depth/pokejev-components/results-abyssal-leaf-code-v1.jsonl`: 45 partial result rows (39 completed rows and 6 error rows at receipt time).
-- `work/loss-depth/pokejev-components/battle/stage-b/mix-v1-stop.json`: `{"reason":"r4 interim gate reached 200 eligible decisions"}`.
+- `work/loss-depth/pokejev-components/results-abyssal-leaf-code-leaf-c-r4-code.jsonl`: 43 partial battle rows, 25 wins, `run_id=leaf-c-r4-code`, leaf-model SHA256 `ad8cd16482eb41e409409c94c968d0b2857f736bd6258b9afd556d785273c49b`, results SHA256 `fd178d6a6a82e1a781d67db9b16e546f67af280b0719cc51cd48f5cd3396b3d6`, first row `2026-09-25T09:38:54Z`.
+- `work/loss-depth/pokejev-components/results-abyssal-leaf-code-v1.jsonl`: retained historical v1 dead-run partial from the earlier 07:40 run; 45 rows, 17 wins, no `run_id`, leaf-model SHA256 `16a2b72f6da68bc61049bbaf4c72b7c3e1c330da075c1e5e51f88751df605384`. It is not an r4 result.
+- `work/loss-depth/pokejev-components/battle/stage-b/mix-v1-stop.json`: `{"reason":"r4 interim gate reached 200 eligible decisions"}`. This marker is now tracked, so a fresh clone starts stopped. `run.py` reports `STOPPED: credit exhaustion marker at ...` (the exact path) when the stop is observed. A future, separately preregistered continuation clears it with `: > work/loss-depth/pokejev-components/battle/stage-b/mix-v1-stop.json`; the live non-control `battles` entry also truncates it at `work/loss-depth/pokejev-components/battle/run.py:959-960`. Do not clear it for this failed arm.
 - The supervised log footer was `exit_code=1`; the child did not clear the gate and the run was not continued.
 
 ## Gate readings
