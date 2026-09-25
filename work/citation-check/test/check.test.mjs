@@ -69,7 +69,7 @@ test("an empty claim does not call the model", async () => {
 
 test("a real sentence in README.md locates, a nonce does not", () => {
   const readme = readFileSync(new URL("../../../README.md", import.meta.url), "utf8");
-  const present = "Jev answers typed questions about a state with calibrated numbers.";
+  const present = "Jev is TypeSafe's System One model for typed judgments.";
   assert.equal(locate(readme, present).status, "found");
   assert.equal(locate(readme, "zzzz_cannot_exist_9c42 quote").status, "missing");
 });
