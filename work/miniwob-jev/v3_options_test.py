@@ -16,6 +16,16 @@ sys.path.insert(0, str(HERE))
 
 
 class V3OptionsContract(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        try:
+            import gymnasium  # noqa: F401
+            import miniwob  # noqa: F401
+        except ModuleNotFoundError as exc:
+            raise unittest.SkipTest(
+                f"SKIP (missing MiniWoB dependency: {exc.name})"
+            ) from exc
+
     def probe(self, arm: str, payload: dict) -> dict:
         code = """
 import json, os, sys
