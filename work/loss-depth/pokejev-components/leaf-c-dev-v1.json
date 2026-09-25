@@ -1,0 +1,258 @@
+{
+  "exclusions": {
+    "fallback": 209,
+    "missing_turn": 0,
+    "unusable": 384
+  },
+  "nouls_cached": 2060,
+  "part": "dev",
+  "results": [
+    {
+      "arm": "A_action_prior",
+      "auc": 0.554629268085238,
+      "auc95": [
+        0.523968613325967,
+        0.5871968996657897
+      ],
+      "battles": 95,
+      "n": 2060,
+      "negative": 868,
+      "positive": 1192
+    },
+    {
+      "arm": "B_leaf_value",
+      "auc": 0.5371123349209785,
+      "auc95": [
+        0.504261790104505,
+        0.5717729498255648
+      ],
+      "battles": 95,
+      "n": 2060,
+      "negative": 868,
+      "positive": 1192
+    },
+    {
+      "arm": "C_code_only",
+      "auc": 0.6652172316209446,
+      "auc95": [
+        0.5933453770715047,
+        0.7367797634047695
+      ],
+      "battles": 95,
+      "boundary": "Dev-fit score only; no held-out result is reported until the frozen dev fit is frozen and run on held-out battles.",
+      "cv_auc_mean": 0.6259519409077751,
+      "cv_auc_std": 0.03337872290204931,
+      "cv_folds": [
+        {
+          "auc": 0.626397423977868,
+          "fold": 1
+        },
+        {
+          "auc": 0.6159946652694753,
+          "fold": 2
+        },
+        {
+          "auc": 0.5769817848783962,
+          "fold": 3
+        },
+        {
+          "auc": 0.6440334922923366,
+          "fold": 4
+        },
+        {
+          "auc": 0.6663523381207989,
+          "fold": 5
+        }
+      ],
+      "features": [
+        "hp_weighted_remaining",
+        "status_count",
+        "hazard_count",
+        "speed_order_rate",
+        "ko_threat"
+      ],
+      "logit_coefficients": {
+        "hazard_count": {
+          "ci95": [
+            -0.365816176284166,
+            -0.17662613028214097
+          ],
+          "estimate": -0.2712211532831535
+        },
+        "hp_weighted_remaining": {
+          "ci95": [
+            0.4022628975771314,
+            0.5987701902763831
+          ],
+          "estimate": 0.5005165439267573
+        },
+        "intercept": {
+          "ci95": [
+            0.25846991252845075,
+            0.4428288870818087
+          ],
+          "estimate": 0.3506493998051297
+        },
+        "ko_threat": {
+          "ci95": [
+            -0.21940304899921326,
+            -0.029406666716146626
+          ],
+          "estimate": -0.12440485785767993
+        },
+        "speed_order_rate": {
+          "ci95": [
+            0.25887900076808307,
+            0.45831222766335217
+          ],
+          "estimate": 0.3585956142157176
+        },
+        "status_count": {
+          "ci95": [
+            0.14724873586892206,
+            0.3413094070908835
+          ],
+          "estimate": 0.24427907147990277
+        }
+      },
+      "n": 2060,
+      "negative": 868,
+      "noul_rows": 0,
+      "positive": 1192
+    },
+    {
+      "arm": "C_code_plus_noul",
+      "auc": 0.6803019554325302,
+      "auc95": [
+        0.6155712080395943,
+        0.745638419551463
+      ],
+      "battles": 95,
+      "boundary": "Dev-fit score only; no held-out result is reported until the frozen dev fit is frozen and run on held-out battles.",
+      "cv_auc_mean": 0.6422369539290448,
+      "cv_auc_std": 0.03328915291681102,
+      "cv_code_only_auc_mean": 0.6259519409077751,
+      "cv_code_only_auc_std": 0.03337872290204931,
+      "cv_folds": [
+        {
+          "auc": 0.6433705979727432,
+          "code_only_auc": 0.626397423977868,
+          "fold": 1,
+          "paired_delta": 0.01697317399487519
+        },
+        {
+          "auc": 0.6135178260973113,
+          "code_only_auc": 0.6159946652694753,
+          "fold": 2,
+          "paired_delta": -0.0024768391721640137
+        },
+        {
+          "auc": 0.6042196669041077,
+          "code_only_auc": 0.5769817848783962,
+          "fold": 3,
+          "paired_delta": 0.027237882025711424
+        },
+        {
+          "auc": 0.6728679161583675,
+          "code_only_auc": 0.6440334922923366,
+          "fold": 4,
+          "paired_delta": 0.028834423866030856
+        },
+        {
+          "auc": 0.677208762512694,
+          "code_only_auc": 0.6663523381207989,
+          "fold": 5,
+          "paired_delta": 0.010856424391895159
+        }
+      ],
+      "cv_paired_delta_mean": 0.016285013021269723,
+      "cv_paired_delta_std": 0.012839424536752912,
+      "cv_paired_deltas": [
+        0.01697317399487519,
+        -0.0024768391721640137,
+        0.027237882025711424,
+        0.028834423866030856,
+        0.010856424391895159
+      ],
+      "features": [
+        "hp_weighted_remaining",
+        "status_count",
+        "hazard_count",
+        "speed_order_rate",
+        "ko_threat",
+        "ko_now",
+        "danger_now",
+        "switch_needed"
+      ],
+      "logit_coefficients": {
+        "danger_now": {
+          "ci95": [
+            -1.3266456547606547,
+            -0.49699668624242743
+          ],
+          "estimate": -0.9118211705015411
+        },
+        "hazard_count": {
+          "ci95": [
+            -0.3915848792313937,
+            -0.1976949188157578
+          ],
+          "estimate": -0.29463989902357574
+        },
+        "hp_weighted_remaining": {
+          "ci95": [
+            0.10735995331517323,
+            0.40171945132488895
+          ],
+          "estimate": 0.2545397023200311
+        },
+        "intercept": {
+          "ci95": [
+            0.26803110836664135,
+            0.4550481615072691
+          ],
+          "estimate": 0.36153963493695523
+        },
+        "ko_now": {
+          "ci95": [
+            0.18827073211837128,
+            0.4834885498424657
+          ],
+          "estimate": 0.3358796409804185
+        },
+        "ko_threat": {
+          "ci95": [
+            0.08762059504647018,
+            0.7886381952641837
+          ],
+          "estimate": 0.43812939515532695
+        },
+        "speed_order_rate": {
+          "ci95": [
+            0.2239219288779914,
+            0.4280719302873777
+          ],
+          "estimate": 0.32599692958268456
+        },
+        "status_count": {
+          "ci95": [
+            0.19482504782698282,
+            0.39423626518292343
+          ],
+          "estimate": 0.29453065650495314
+        },
+        "switch_needed": {
+          "ci95": [
+            -0.11456833718752835,
+            0.19247213876972963
+          ],
+          "estimate": 0.038951900791100634
+        }
+      },
+      "n": 2060,
+      "negative": 868,
+      "noul_rows": 2060,
+      "positive": 1192
+    }
+  ]
+}
