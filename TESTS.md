@@ -444,3 +444,11 @@ Test 3 pins a defect found in this rule on its first run: it reported "reference
 and counted a documentation mention as a caller — mention-vs-use, inside the rule written to fix
 a bad label.
 - `work/poke-jev/test_watch_mode.py` — credential-free owner filter: exact, spaced, hyphenated, empty, spaces-only, and near-miss usernames; no network or Jev calls. Run: `.venv/bin/python -m unittest work/poke-jev/test_watch_mode.py` (6 tests; typed-skip exit 8 on Python <3.12, matching `work/poke-jev/test_player.py`, 3b8cf17).
+
+### `work/loss-depth/pokejev-components/battle/test_run.py` — 4 tests
+
+Offline fake-Jev tests for the frozen leaf arms: the code arm never calls Jev, the
+code+Noul arm makes exactly one asker call per leaf, HTTP 401/402 stops instead of
+falling back, and a frozen-weight SHA-256 mismatch refuses to start. Run:
+`work/poke-jev/.venv/bin/python -m unittest work/loss-depth/pokejev-components/battle/test_run.py`.
+Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.

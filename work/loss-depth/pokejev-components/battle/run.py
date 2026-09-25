@@ -13,11 +13,14 @@ import argparse
 import asyncio
 import contextvars
 import hashlib
+import hmac
 import json
 import math
 import os
+import re
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -28,14 +31,16 @@ ROOT = COMPONENT_DIR.parents[2]
 POKE = ROOT / "work" / "poke-jev"
 OUT = BATTLE_DIR / "stage-b"
 ALPHA_PATH = COMPONENT_DIR / "frozen-alpha-v1.json"
+LEAF_MODEL_PATH = COMPONENT_DIR / "leaf-model-v1.json"
+LEAF_MODEL_SHA256 = "16a2b72f6da68bc61049bbaf4c72b7c3e1c330da075c1e5e51f88751df605384"
 STOP_PATH = OUT / "mix-v1-stop.json"
 
 # Stage B is an import target, not a copied implementation.  It changes cwd while loading
 # PokéChamp, so all paths used by this wrapper are absolute and computed first.
 sys.path.insert(0, str(POKE))
-import stage_b  # noqa: E402
 import player as player_module  # noqa: E402
 import replay  # noqa: E402
+import stage_b  # noqa: E402
 
 
 MODULE_PATHS = {
@@ -53,6 +58,192 @@ PLAYER_ALPHA = float(ALPHA["components"]["player"]["alpha"])
 OPPONENT_ALPHA = float(ALPHA["components"]["opponent"]["alpha"])
 if (PLAYER_ALPHA, OPPONENT_ALPHA) != (0.4, 0.25):
     raise RuntimeError("frozen-alpha-v1.json does not contain the preregistered alphas")
+
+
+@dataclass(frozen=True)
+class FrozenLeafModel:
+    """A hash-pinned logistic leaf model loaded from committed JSON."""
+
+    features: tuple[str, ...]
+    noul_features: tuple[str, ...]
+    intercept: float
+    code_weights: tuple[float, ...]
+    means: tuple[float, ...]
+    scales: tuple[float, ...]
+    noul_intercept: float
+    noul_code_weights: tuple[float, ...]
+    noul_weights: tuple[float, ...]
+    noul_means: tuple[float, ...]
+    noul_scales: tuple[float, ...]
+
+    @classmethod
+    def from_json(cls, path: Path, *, expected_sha256: str) -> FrozenLeafModel:
+        actual_sha256 = hashlib.sha256(path.read_bytes()).hexdigest()
+        if not hmac.compare_digest(actual_sha256, expected_sha256):
+            raise ValueError(
+                f"frozen leaf model sha256 mismatch: expected {expected_sha256}, "
+                f"got {actual_sha256}"
+            )
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if payload.get("format") != "leaf-model-v1":
+            raise ValueError("unsupported frozen leaf model format")
+        features = tuple(str(name) for name in payload["features"])
+        noul_features = tuple(str(name) for name in payload["noul_features"])
+        code_weights = tuple(float(value) for value in payload["code_weights"])
+        noul_weights = tuple(float(value) for value in payload["noul_weights"])
+        means = tuple(float(value) for value in payload["means"])
+        scales = tuple(float(value) for value in payload["scales"])
+        if not features or len(code_weights) != len(features):
+            raise ValueError("frozen leaf code feature/weight shape mismatch")
+        if len(means) != len(features) or len(scales) != len(features):
+            raise ValueError("frozen leaf standardizer shape mismatch")
+        noul_intercept = float(payload["noul_intercept"])
+        noul_code_weights = tuple(
+            float(value) for value in payload["noul_code_weights"]
+        )
+        noul_means = tuple(float(value) for value in payload["noul_means"])
+        noul_scales = tuple(float(value) for value in payload["noul_scales"])
+        if len(noul_code_weights) != len(features):
+            raise ValueError("frozen leaf Noul code feature/weight shape mismatch")
+        if len(noul_means) != len(features) + len(noul_features):
+            raise ValueError("frozen leaf Noul standardizer shape mismatch")
+        if len(noul_scales) != len(noul_means):
+            raise ValueError("frozen leaf Noul scale shape mismatch")
+        all_weights = (*code_weights, *noul_code_weights, *noul_weights)
+        if any(
+            not math.isfinite(value) for value in (*all_weights, *means, *noul_means)
+        ):
+            raise ValueError("frozen leaf model contains a non-finite weight")
+        if any(
+            not math.isfinite(value) or value <= 0 for value in (*scales, *noul_scales)
+        ):
+            raise ValueError("frozen leaf model contains an invalid scale")
+        return cls(
+            features=features,
+            noul_features=noul_features,
+            intercept=float(payload["intercept"]),
+            code_weights=code_weights,
+            means=means,
+            scales=scales,
+            noul_intercept=noul_intercept,
+            noul_code_weights=noul_code_weights,
+            noul_weights=noul_weights,
+            noul_means=noul_means,
+            noul_scales=noul_scales,
+        )
+
+    def score(
+        self,
+        code_values: dict[str, float],
+        noul_values: dict[str, float] | None = None,
+    ) -> float:
+        if noul_values is None:
+            intercept = self.intercept
+            names = self.features
+            weights = self.code_weights
+            means = self.means
+            scales = self.scales
+            values = [code_values[name] for name in names]
+        else:
+            intercept = self.noul_intercept
+            names = (*self.features, *self.noul_features)
+            weights = (*self.noul_code_weights, *self.noul_weights)
+            means = self.noul_means
+            scales = self.noul_scales
+            values = [
+                *(code_values[name] for name in self.features),
+                *(noul_values[name] for name in self.noul_features),
+            ]
+        return intercept + sum(
+            weight * ((float(value) - mean) / scale)
+            for value, weight, mean, scale in zip(
+                values, weights, means, scales, strict=True
+            )
+        )
+
+
+@dataclass(frozen=True)
+class LeafDecision:
+    choice: str
+    used_noul: bool
+    fallback_reason: str | None
+
+
+class LeafArmStopped(RuntimeError):
+    """Raised when a paid leaf arm must stop instead of falling back."""
+
+
+class LeafArm:
+    """Choose a leaf action with frozen code features and optional Noul evidence."""
+
+    def __init__(self, *, mode: str, model: FrozenLeafModel, asker):
+        if mode not in {"code", "code+noul"}:
+            raise ValueError(f"unsupported leaf arm: {mode}")
+        self.mode = mode
+        self.model = model
+        self.asker = asker
+        self.stopped = False
+
+    def choose(
+        self,
+        leaf_state: dict,
+        candidates: list[dict],
+    ) -> LeafDecision:
+        if self.mode != "code+noul":
+            return self.choose_with_values(leaf_state, candidates, None)
+        try:
+            if self.asker is None:
+                raise RuntimeError("Noul asker is not configured")
+            noul_values = self.asker(leaf_state)
+            return self.choose_with_values(leaf_state, candidates, noul_values)
+        except LeafArmStopped:
+            raise
+        except Exception as exc:
+            status = getattr(exc, "status_code", getattr(exc, "status", None))
+            if status in {401, 402}:
+                self.stopped = True
+                raise LeafArmStopped(f"leaf Noul arm stopped on HTTP {status}") from exc
+            return self.choose_with_values(
+                leaf_state,
+                candidates,
+                None,
+                fallback_reason=f"{type(exc).__name__}: {str(exc)[:300]}",
+            )
+
+    def choose_with_values(
+        self,
+        leaf_state: dict,
+        candidates: list[dict],
+        noul_values: dict[str, float] | None,
+        *,
+        fallback_reason: str | None = None,
+    ) -> LeafDecision:
+        del leaf_state
+        if not candidates:
+            raise ValueError("leaf arm received no candidates")
+        if noul_values is not None:
+            if set(noul_values) != set(self.model.noul_features):
+                raise ValueError("Noul answer keys do not match the frozen model")
+            if any(
+                not math.isfinite(float(noul_values[name]))
+                or not 0.0 <= float(noul_values[name]) <= 1.0
+                for name in self.model.noul_features
+            ):
+                raise ValueError("Noul answer is outside [0, 1]")
+        scored = [
+            (
+                self.model.score(candidate["features"], noul_values),
+                index,
+                str(candidate["id"]),
+            )
+            for index, candidate in enumerate(candidates)
+        ]
+        _, _, choice = max(scored, key=lambda row: (row[0], -row[1]))
+        return LeafDecision(
+            choice=choice,
+            used_noul=noul_values is not None,
+            fallback_reason=fallback_reason,
+        )
 
 
 def _calibration_params() -> tuple[float, float]:
@@ -168,7 +359,13 @@ class FrozenAlphaPlayer(_ORIGINAL_PLAYER):
         except Exception as exc:
             text = f"{type(exc).__name__}: {exc}".lower()
             status = getattr(exc, "status_code", getattr(exc, "status", None))
-            if status == 402 or "402" in text or "credit" in text or "billing" in text:
+            if (
+                status in {401, 402}
+                or "401" in text
+                or "402" in text
+                or "credit" in text
+                or "billing" in text
+            ):
                 OUT.mkdir(parents=True, exist_ok=True)
                 STOP_PATH.write_text(
                     json.dumps(
@@ -185,11 +382,182 @@ class FrozenAlphaPlayer(_ORIGINAL_PLAYER):
             raise
 
 
+_LEAF_BATTLE: contextvars.ContextVar[object | None] = contextvars.ContextVar(
+    "pokejev_leaf_battle", default=None
+)
+
+
+class LeafPlayer(FrozenAlphaPlayer):
+    """Frozen-alpha root with a deterministic or one-request leaf arm."""
+
+    def __init__(
+        self,
+        *args,
+        leaf_mode: str | None = None,
+        leaf_model: FrozenLeafModel | None = None,
+        **kwargs,
+    ):
+        if leaf_mode is None or leaf_model is None:
+            if _LEAF_CONFIG is None:
+                raise ValueError("LeafPlayer requires a configured leaf arm")
+            leaf_mode, leaf_model = _LEAF_CONFIG
+        super().__init__(*args, **kwargs)
+        self._leaf_arm = LeafArm(mode=leaf_mode, model=leaf_model, asker=None)
+
+    async def _decide(self, battle, rec, box):
+        token = _LEAF_BATTLE.set(battle)
+        try:
+            return await super()._decide(battle, rec, box)
+        finally:
+            _LEAF_BATTLE.reset(token)
+
+    @staticmethod
+    def _base_features(battle) -> dict[str, float]:
+        team = list(getattr(battle, "team", {}).values())
+        return {
+            "hp_weighted_remaining": sum(
+                max(0.0, min(1.0, float(getattr(mon, "current_hp_fraction", 0.0))))
+                for mon in team
+            )
+            / 6.0,
+            "status_count": sum(bool(getattr(mon, "status", None)) for mon in team)
+            / 6.0,
+            "hazard_count": len(getattr(battle, "side_conditions", {}) or {}) / 4.0,
+            "speed_order_rate": 0.5,
+        }
+
+    @staticmethod
+    def _summary_features(summary: dict, label: str, base: dict[str, float]):
+        lines = [summary.get("your_active", ""), *summary.get("your_bench", [])]
+        hp = [
+            float(match) / 100.0
+            for line in lines
+            for match in re.findall(r"(\\d+)%", str(line))
+        ]
+        statuses = ("burn", "par", "poison", "tox", "sleep", "freeze")
+        return {
+            "hp_weighted_remaining": sum(hp) / 6.0
+            if hp
+            else base["hp_weighted_remaining"],
+            "status_count": sum(
+                any(status in str(line).lower() for status in statuses)
+                for line in lines
+            )
+            / 6.0,
+            "hazard_count": base["hazard_count"],
+            "speed_order_rate": base["speed_order_rate"],
+            "ko_threat": 0.0 if str(label).lower().startswith("switch") else 1.0,
+        }
+
+    async def _leaf_nouls(self, state, rec) -> dict[str, float]:
+        from typesafe_sdk import Noul
+
+        questions = {
+            "ko_now": Noul(
+                instructions="Can our active Pokémon secure a knockout with a legal action this turn?",
+                criteria={
+                    "true": "A legal action can secure a knockout this turn",
+                    "false": "No legal action can secure a knockout this turn",
+                },
+            ),
+            "danger_now": Noul(
+                instructions="Is our active Pokémon in immediate danger of being knocked out this turn?",
+                criteria={
+                    "true": "The active Pokémon is likely to be knocked out this turn",
+                    "false": "The active Pokémon is not likely to be knocked out this turn",
+                },
+            ),
+            "switch_needed": Noul(
+                instructions="Is switching necessary to avoid a materially worse position this turn?",
+                criteria={
+                    "true": "Switching is necessary to avoid a materially worse position",
+                    "false": "Switching is not necessary to avoid a materially worse position",
+                },
+            ),
+        }
+        response = await super()._ask(state, questions, rec)
+        answers = getattr(response, "answers", None)
+        if answers is None:
+            answers = getattr(response, "nouls", None)
+        if answers is None:
+            raise ValueError("Noul response has no answers")
+        values = {}
+        for name in questions:
+            answer = answers[name]
+            value = (
+                answer.get("noul")
+                if isinstance(answer, dict)
+                else getattr(answer, "noul", None)
+            )
+            if value is None:
+                raise ValueError(f"Noul response missing {name}")
+            values[name] = float(value)
+        return values
+
+    async def _ask(self, state, questions, rec):
+        if not questions or not all(
+            name.startswith("best_after_") for name in questions
+        ):
+            return await super()._ask(state, questions, rec)
+        outcomes = state.get("outcomes") if isinstance(state, dict) else None
+        battle = _LEAF_BATTLE.get()
+        if not isinstance(outcomes, dict) or battle is None:
+            raise ValueError("leaf arm requires outcomes and the live battle")
+        base = self._base_features(battle)
+        noul_values = None
+        fallback_reason = None
+        if self._leaf_arm.mode == "code+noul":
+            try:
+                noul_values = await self._leaf_nouls(state, rec)
+            except Exception as exc:
+                status = getattr(exc, "status_code", getattr(exc, "status", None))
+                if status in {401, 402}:
+                    self._leaf_arm.stopped = True
+                    raise LeafArmStopped(
+                        f"leaf Noul arm stopped on HTTP {status}"
+                    ) from exc
+                fallback_reason = f"{type(exc).__name__}: {str(exc)[:300]}"
+                rec["fallback"] = f"leaf-noul: {fallback_reason}"
+        opponent_rows = list(outcomes.values())
+        names = list(questions)
+        candidate_labels = list(next(iter(questions.values())).criteria)
+        answers = {}
+        for index, question_name in enumerate(names):
+            row = opponent_rows[index] if index < len(opponent_rows) else {}
+            candidates = [
+                {
+                    "id": label,
+                    "features": self._summary_features(row.get(label, {}), label, base),
+                }
+                for label in candidate_labels
+            ]
+            decision = self._leaf_arm.choose_with_values(
+                state,
+                candidates,
+                noul_values,
+                fallback_reason=fallback_reason,
+            )
+            probabilities = {
+                label: 1.0 if label == decision.choice else 0.0
+                for label in candidate_labels
+            }
+            answers[question_name] = SimpleNamespace(probabilities=probabilities)
+        return SimpleNamespace(answers=answers)
+
+
+_LEAF_CONFIG: tuple[str, FrozenLeafModel] | None = None
+
 _ORIGINAL_MAKE_PLAYERS = stage_b.make_players
 
 
 def _make_players(opp_name, w, replays, decisions, client_factory=None, cls=None):
-    chosen = FrozenAlphaPlayer if cls is None or cls is _ORIGINAL_PLAYER else cls
+    chosen = (
+        LeafPlayer
+        if _LEAF_CONFIG is not None and (cls is None or cls is _ORIGINAL_PLAYER)
+        else FrozenAlphaPlayer
+        if cls is None or cls is _ORIGINAL_PLAYER
+        else cls
+    )
     return _ORIGINAL_MAKE_PLAYERS(
         opp_name,
         w,
@@ -199,8 +567,6 @@ def _make_players(opp_name, w, replays, decisions, client_factory=None, cls=None
         cls=chosen,
     )
 
-
-stage_b.make_players = _make_players
 
 # Decision/result JSONL rows are emitted by imported Stage B code.  Add provenance at the
 # serialization boundary so every row records precisely which imported source was used.
@@ -212,13 +578,18 @@ def _dumps_with_provenance(obj, *args, **kwargs):
         obj = dict(obj)
         obj["stage_b_import_sha256"] = MODULE_SHA256
         obj["frozen_alpha_sha256"] = FROZEN_ALPHA_SHA256
+        if _LEAF_CONFIG is not None:
+            obj["leaf_mode"] = _LEAF_CONFIG[0]
+            obj["leaf_model_sha256"] = LEAF_MODEL_SHA256
     return _ORIGINAL_JSON_DUMPS(obj, *args, **kwargs)
 
 
 json.dumps = _dumps_with_provenance
 
 
-def _tag(control: bool) -> str:
+def _tag(control: bool, leaf_mode: str | None = None) -> str:
+    if leaf_mode is not None:
+        return f"-leaf-{leaf_mode.replace('+', '-')}-v1"
     return "-mix-v1-control" if control else "-mix-v1"
 
 
@@ -245,8 +616,22 @@ async def _run_shard(
     workers: int,
     worker: int,
     control: bool,
+    leaf_mode: str | None = None,
 ) -> int:
-    tag = _tag(control)
+    global _LEAF_CONFIG
+    if leaf_mode is not None and control:
+        raise ValueError("leaf arms cannot be combined with --control")
+    _LEAF_CONFIG = (
+        (
+            leaf_mode,
+            FrozenLeafModel.from_json(
+                LEAF_MODEL_PATH, expected_sha256=LEAF_MODEL_SHA256
+            ),
+        )
+        if leaf_mode is not None
+        else None
+    )
+    tag = _tag(control, leaf_mode)
     replays, results, decisions = stage_b.arm_paths(opp_name, tag)
     done = {row["k"] for row in _load_jsonl(Path(results)) if "won" in row}
     mine = [k for k in range(n) if k % workers == worker and k not in done]
@@ -263,7 +648,7 @@ async def _run_shard(
             return 3
         try:
             row = await stage_b.play(me, opp, k, replays)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - record each harness failure and continue
             row = {"k": k, "error": f"{type(exc).__name__}: {str(exc)[:300]}"}
         await asyncio.to_thread(_append_jsonl, Path(results), row)
         if not control and STOP_PATH.exists() and STOP_PATH.stat().st_size:
@@ -271,7 +656,14 @@ async def _run_shard(
     return 0
 
 
-def _spawn(opp_name: str, n: int, workers: int, control: bool, seed: int) -> int:
+def _spawn(
+    opp_name: str,
+    n: int,
+    workers: int,
+    control: bool,
+    seed: int,
+    leaf_mode: str | None = None,
+) -> int:
     env = dict(
         os.environ,
         OMP_NUM_THREADS="1",
@@ -291,7 +683,10 @@ def _spawn(opp_name: str, n: int, workers: int, control: bool, seed: int) -> int
     ]
     procs = [
         subprocess.Popen(
-            base + [str(worker)] + (["--control"] if control else []),
+            base
+            + [str(worker)]
+            + (["--control"] if control else [])
+            + (["--leaf", leaf_mode] if leaf_mode is not None else []),
             cwd=str(ROOT),
             stdout=subprocess.DEVNULL,
             env=env,
@@ -299,7 +694,7 @@ def _spawn(opp_name: str, n: int, workers: int, control: bool, seed: int) -> int
         for worker in range(workers)
     ]
     codes = [proc.wait() for proc in procs]
-    _, results, _ = stage_b.arm_paths(opp_name, _tag(control))
+    _, results, _ = stage_b.arm_paths(opp_name, _tag(control, leaf_mode))
     rows = _load_jsonl(Path(results))
     complete = {row["k"] for row in rows if "won" in row and row["k"] < n}
     print(
@@ -473,7 +868,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("worker", nargs="?", type=int)
     parser.add_argument("--workers", dest="workers", type=int, default=stage_b.WORKERS)
     parser.add_argument("--pair-seed", type=int, default=20260926)
-    parser.add_argument("--control", action="store_true")
+    parser.add_argument("--leaf", choices=("code", "code+noul"))
     args = parser.parse_args(argv)
     _configure(args.pair_seed)
     if args.command == "selftest":
@@ -483,6 +878,8 @@ def main(argv: list[str]) -> int:
     if args.opponent not in stage_b.OPPONENTS or args.count is None:
         parser.error("an opponent and battle count are required")
     if args.command == "battles":
+        if args.leaf is not None and args.control:
+            parser.error("--leaf cannot be combined with --control")
         if not args.control and not os.environ.get("TYPESAFE_API_KEY"):
             print(
                 "unconfigured: TYPESAFE_API_KEY unset, no battle played (NOT_RUN)",
@@ -492,13 +889,23 @@ def main(argv: list[str]) -> int:
         if not args.control:
             STOP_PATH.write_text("", encoding="utf-8")
         return _spawn(
-            args.opponent, args.count, args.workers, args.control, args.pair_seed
+            args.opponent,
+            args.count,
+            args.workers,
+            args.control,
+            args.pair_seed,
+            args.leaf,
         )
     if args.worker_count is None or args.worker is None:
         parser.error("_shard requires worker count and worker index")
     return asyncio.run(
         _run_shard(
-            args.opponent, args.count, args.worker_count, args.worker, args.control
+            args.opponent,
+            args.count,
+            args.worker_count,
+            args.worker,
+            args.control,
+            args.leaf,
         )
     )
 
