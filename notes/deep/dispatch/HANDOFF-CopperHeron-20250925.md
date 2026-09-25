@@ -45,3 +45,11 @@ After restart, commit the already-written prompt and this handoff with `git comm
 
 - Pane 1 must adjudicate all disagreements after both blind label files are committed.
 - No paid/live action is pending or authorized in this unit.
+## Fresh run completion — 2026-09-25
+
+- Prompt correction committed before labelling: `a3e8e20e` (`work/jev-yru2-public/label_prompt.md`).
+- Two keyless local Ollama labellers completed the committed `5b368355` extract in 22 contiguous batches of 5 each. Concrete models recorded in every output row: A `qwen3.8:27b-mlx`; B `thinkingcap-qwen3.8:27b-nvfp4`. No Jev/API or paid call.
+- Label files committed: `f60f3998` (`labels-A.jsonl`, `labels-B.jsonl`). Final validation: 110 rows each, source-order IDs, unique IDs, allowed labels, 10 target-shape rows, target harm A=10/B=10. Raw agreement 106/110 (0.963636); Cohen kappa 0.903020.
+- Four disagreements were sent to AmberWillow for non-author adjudication. The label files are not final adjudicated labels yet.
+- Ledger receipt committed: `688865a9` (`EVAL.md`).
+- Current stop point: waiting for pane-1 adjudication; no live gate-question retest started. Reservations released after the current commits.
