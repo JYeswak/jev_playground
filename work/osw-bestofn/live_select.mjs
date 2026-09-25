@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 const statePath = process.env.OSW_STATE_FILE ?? "/tmp/jev-osw-bestofn-states.jsonl";
 const floorPath = process.env.OSW_FLOOR_RECEIPT ?? "work/osw-bestofn/floor_receipt.json";
 const outputPath = process.env.OSW_LIVE_RECEIPT ?? "work/osw-bestofn/live_receipt.json";
+const rowsPath = process.env.OSW_LIVE_ROWS;
 const model = "jev-1.13.0";
 const keyStatus = spawnSync(
   "python3",
@@ -19,13 +20,33 @@ const floor = JSON.parse(await readFile(floorPath, "utf8"));
 const rows = floor.results_by_task;
 const lines = (await readFile(statePath, "utf8")).trim().split("\n").filter(Boolean);
 const classes = Object.fromEntries(
-  floor.selected_archives.map((archive, index) => [`c${index}`, `Candidate ${index + 1}; public archive ${archive}`]),
+  floor.selected_archives.map((_archive, index) => [`c${index}`, `Candidate ${index + 1}`]),
 );
 classes.none = "No candidate has enough evidence of completing the task; abstain.";
 const picks = {};
+const answerRows = [];
 let inputTokens = 0;
 let outputTokens = 0;
 let latencyMs = 0;
+async function writePartial(stop) {
+  if (rowsPath) await writeFile(rowsPath, answerRows.map((row) => JSON.stringify(row)).join("\n") + (answerRows.length ? "\n" : ""));
+  await writeFile(
+    outputPath,
+    JSON.stringify({
+      status: "NOT_SCORED",
+      model,
+      tasks: floor.tasks,
+      n_candidates: floor.n,
+      calls: answerRows.length,
+      failures,
+      stopped: stop,
+      usage: { input_tokens: inputTokens, output_tokens: outputTokens },
+      spend_usd_estimate: inputTokens * 0.042 / 1_000_000,
+      rows: answerRows,
+      raw_state_committed: false,
+    }, null, 2) + "\n",
+  );
+}
 let failures = 0;
 const started = Date.now();
 
@@ -40,14 +61,22 @@ for (const line of lines) {
   });
   if (!result.ok) {
     failures += 1;
-    picks[state.task] = { ok: false, reason: result.reason, error: result.error };
+    const row = { task: state.task, ok: false, reason: result.reason, error: result.error, latencyMs: result.latencyMs };
+    picks[state.task] = row;
+    answerRows.push(row);
+    if (result.reason === "http" && /\bHTTP (401|402)\b/.test(result.error ?? "")) {
+      await writePartial({ task: state.task, reason: result.reason, error: result.error });
+      console.error(`STOPPED on ${result.error}; partial receipt written`);
+      process.exit(1);
+    }
     continue;
   }
   const usage = result.usage ?? {};
   inputTokens += Number(usage.input_tokens ?? 0);
   outputTokens += Number(usage.output_tokens ?? 0);
   latencyMs += result.latencyMs;
-  picks[state.task] = {
+  const row = {
+    task: state.task,
     ok: true,
     choice: result.choice,
     confidence: result.confidence,
@@ -55,6 +84,8 @@ for (const line of lines) {
     latencyMs: result.latencyMs,
     usage: result.usage ?? null,
   };
+  picks[state.task] = row;
+  answerRows.push(row);
 }
 
 function reward(task, choice) {
@@ -89,12 +120,13 @@ const selectedRewardSum = Object.keys(rows).reduce((sum, task) => sum + reward(t
 const selectedExactTasks = Object.keys(rows).reduce((sum, task) => sum + exact(task, picks[task]?.choice), 0);
 const best = Number(floor.best_single_reward_sum);
 const oracle = Number(floor.oracle_reward_sum);
-const claims = Number(floor.floors.claims_success.reward_sum);
+const hasClaimsFloor = Boolean(floor.floors?.claims_success && floor.picks);
+const claims = hasClaimsFloor ? Number(floor.floors.claims_success.reward_sum) : null;
 const bestChoice = () => floor.best_single_archive;
 const claimsChoice = (task) => floor.picks[task].claims_success;
 const delta = selectedRewardSum / floor.tasks - best / floor.tasks;
 const gap = oracle / floor.tasks - best / floor.tasks;
-const deltaVsClaims = selectedRewardSum / floor.tasks - claims / floor.tasks;
+const deltaVsClaims = hasClaimsFloor ? selectedRewardSum / floor.tasks - claims / floor.tasks : null;
 const receipt = {
   model,
   tasks: floor.tasks,
@@ -112,16 +144,19 @@ const receipt = {
   delta_vs_best_single: delta,
   gap_closed: gap === 0 ? null : delta / gap,
   mcnemar_vs_best_single: exactMcNemar(bestChoice),
-  claims_success_reward_sum: claims,
-  claims_success_mean_reward: claims / floor.tasks,
-  delta_vs_claims_success: deltaVsClaims,
-  mcnemar_vs_claims_success: exactMcNemar(claimsChoice),
+  ...(hasClaimsFloor ? {
+    claims_success_reward_sum: claims,
+    claims_success_mean_reward: claims / floor.tasks,
+    delta_vs_claims_success: deltaVsClaims,
+    mcnemar_vs_claims_success: exactMcNemar(claimsChoice),
+  } : {}),
   usage: { input_tokens: inputTokens, output_tokens: outputTokens },
   latency: { total_ms: latencyMs, mean_ms: latencyMs / Math.max(1, lines.length), wall_ms: Date.now() - started },
   spend_usd_estimate: inputTokens * 0.042 / 1_000_000,
   picks,
   raw_state_committed: false,
 };
+if (rowsPath) await writeFile(rowsPath, answerRows.map((row) => JSON.stringify(row)).join("\n") + "\n");
 await writeFile(outputPath, JSON.stringify(receipt, null, 2) + "\n");
 console.log(JSON.stringify({
   tasks: receipt.tasks,
