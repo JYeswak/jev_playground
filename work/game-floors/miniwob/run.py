@@ -75,7 +75,8 @@ TEXT_INPUT_TAGS = {
 }
 
 V3_ACTION_SPACE = os.environ.get("MINIWOB_V3") == "1"
-if V3_ACTION_SPACE:
+V3_ARM = os.environ.get("MINIWOB_V3_ARM", "all")
+if V3_ACTION_SPACE and V3_ARM in {"all", "date_time"}:
     TEXT_INPUT_TAGS.update({"INPUT_DATE", "INPUT_TIME"})
 INTERACTIVE_TAGS = {"BUTTON", "A", "SELECT", "TEXTAREA", "LABEL", "OPTION"}
 BUTTON_TAGS = {"BUTTON", "INPUT_SUBMIT", "INPUT_BUTTON", "INPUT_RESET"}
@@ -147,7 +148,9 @@ def elements_from_obs(obs) -> list[dict]:
                 "value": str(e["value"]),
                 "id": str(e["id"]),
                 "classes": str(e["classes"]),
-                "color": str(e.get("color", "")) if V3_ACTION_SPACE else "",
+                "color": str(e.get("color", ""))
+                if V3_ACTION_SPACE and V3_ARM in {"all", "color"}
+                else "",
                 "left": float(e["left"][0]),
                 "top": float(e["top"][0]),
                 "width": float(e["width"][0]),
@@ -209,7 +212,7 @@ def serialize_state(
             round(e["width"]),
             round(e["height"]),
         ]
-        if V3_ACTION_SPACE and e.get("color"):
+        if V3_ACTION_SPACE and V3_ARM in {"all", "color"} and e.get("color"):
             d["color"] = e["color"]
         if e["focused"]:
             d["focused"] = True
@@ -582,7 +585,11 @@ def run_episode(
         "data_mode": "default",
         "page_reload_each_episode": True,
         "action_space": "farama CLICK_ELEMENT(ref) + FOCUS_ELEMENT_AND_TYPE_TEXT(ref,text)"
-        + (" + code-enumerated DRAG(source,target)" if V3_ACTION_SPACE else ""),
+        + (
+            " + code-enumerated DRAG(source,target)"
+            if V3_ACTION_SPACE and V3_ARM in {"all", "drag"}
+            else ""
+        ),
         "utterance": None,
         "success": 0.0,
         "success_strict": 0.0,

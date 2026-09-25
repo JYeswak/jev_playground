@@ -314,3 +314,22 @@ The second formatter rerun still exposed `4:03` because tokenized spans bypassed
 formatter. The corrected v3 path derives the native `HH:MM` value from the whole utterance and
 removes bare spoken clock values from the INPUT_TIME option set. The same exact ten keys and
 `>=8/10` bar remain fixed; prior results remain in their tracked rows.
+
+## Amendment: isolated feature flags
+
+The prior smoke rows and first exact runs were contaminated by `MINIWOB_V3=1` enabling every v3
+feature. They remain evidence but are not one-variable arm results. Before any further live call,
+the runner now uses `MINIWOB_V3_ARM`:
+
+| Arm | `MINIWOB_V3_ARM` | Enabled feature |
+|---|---|---|
+| quoted | `quoted` | preserve quoted terminal punctuation |
+| date/time | `date_time` | add INPUT_DATE/INPUT_TIME and no other v3 option changes |
+| page text | `page_text` | add visible page/value text options |
+| color | `color` | serialize color |
+| drag | `drag` | code-enumerated drag pairs and mouse sequence |
+| none | `none` | after-page-change none rule plus empty-action guard |
+
+Each re-run below sets `MINIWOB_V3=1 MINIWOB_V3_ARM=<arm>` and uses the exact fixed slice and bar
+above. `MINIWOB_V3_ARM=all` is reserved for the combined held-out run only. The contaminated smoke
+and first exact rows stay committed under their existing names and are excluded from all arm bars.

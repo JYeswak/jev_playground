@@ -58,6 +58,13 @@ ROWS_DIR = HERE / "rows"
 
 MODEL = "jev-1.13.0"
 V3_ENABLED = os.environ.get("MINIWOB_V3") == "1"
+V3_ARM = os.environ.get("MINIWOB_V3_ARM", "all")
+
+
+def v3_on(name: str) -> bool:
+    return V3_ENABLED and V3_ARM in {"all", name}
+
+
 OPTION_CAP = 255  # docs-mirror/typesafe/api.md:125, per Choice
 NONE_KEY = "none: do nothing this step"
 HALT_AFTER_CONSECUTIVE_FAILURES = 3
@@ -94,7 +101,7 @@ def utterance_spans(utterance: str, cap: int = OPTION_CAP) -> list[str]:
 
     def add(s: str, quoted: bool = False) -> bool:
         raw = s.strip()
-        if V3_ENABLED and quoted:
+        if v3_on("quoted") and quoted:
             s = raw
         else:
             s = raw.strip(SPAN_STRIP).strip()
@@ -192,7 +199,7 @@ def build_candidates(
     texts = element_texts(els)
     spans = utterance_spans(utterance)
     page_spans = []
-    if V3_ENABLED:
+    if v3_on("page_text"):
         for e in els:
             for value in (e.get("text", ""), e.get("value", "")):
                 value = str(value).strip()
@@ -208,7 +215,7 @@ def build_candidates(
             continue
         if e["kind"] in floor.TEXT_INPUT_TAGS:
             candidates = list(dict.fromkeys(spans + page_spans))
-            if V3_ENABLED and e["kind"] == "INPUT_TIME":
+            if v3_on("date_time") and e["kind"] == "INPUT_TIME":
                 formatted = format_time_for_input(utterance)
                 candidates = [
                     s for s in candidates if not re.fullmatch(r"\d{1,2}:\d{2}", s)
@@ -222,7 +229,7 @@ def build_candidates(
                 type_spans[r] = ok
     clicks = floor.clickable_refs(els)
     drag_pairs = []
-    if V3_ENABLED and re.search(r"\b(?:drag|draw|resize|slider)\b", utterance, re.I):
+    if v3_on("drag") and re.search(r"\b(?:drag|draw|resize|slider)\b", utterance, re.I):
         drag_refs = [
             e for e in els if e["ref"] > 0 and e["width"] > 0 and e["height"] > 0
         ]
@@ -263,7 +270,7 @@ def build_candidates(
     actions: dict[str, tuple[str, int]] = {}
     for _, _, kind, r in items:
         actions[f"{kind} [{r}] {describe(by_ref[r], texts.get(r, ''))}"] = (kind, r)
-    if V3_ENABLED:
+    if v3_on("drag"):
         for source_xy, target_xy, source_ref, target_ref in drag_pairs[
             : max(0, budget)
         ]:
@@ -292,7 +299,7 @@ def action_instructions(utterance: str) -> str:
 def text_instructions(utterance: str, ref: int, label: str) -> str:
     return (
         f"Goal: {utterance}\n"
-        f"Which text from the goal{'' if not V3_ENABLED else ' or visible page'} should be typed into element [{ref}] ({label})?"
+        f"Which text from the goal{'' if not v3_on('page_text') else ' or visible page'} should be typed into element [{ref}] ({label})?"
     )
 
 
