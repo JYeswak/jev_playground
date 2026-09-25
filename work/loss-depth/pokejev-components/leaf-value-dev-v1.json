@@ -1,0 +1,27 @@
+{
+  "receipt_type": "pokejev-leaf-value-dev-v1",
+  "lane": "offline",
+  "model": "jev-1.13.0",
+  "source": "work/poke-jev/stage-b/decisions-abyssal.jsonl and results-abyssal.jsonl",
+  "split_file": "decision-split-v1.json",
+  "split_sha256": "d10605fa534597820d159c60a723344561a40bf60ed77ff00dedaba4e05d340d",
+  "live_requests": 0,
+  "battle_runs": 0,
+  "arm": "chosen_leaf_value_vs_eventual_battle_outcome",
+  "ground_truth": "results-abyssal.won on the committed Stage B dev battles",
+  "unit": "decision rows, with bootstrap resampling by battle",
+  "n_decisions": 2060,
+  "n_battles": 95,
+  "positive_decisions": 1192,
+  "negative_decisions": 868,
+  "auc": 0.5371123349209785,
+  "auc_bootstrap95": [0.5042, 0.5700],
+  "bootstrap_reps": 5000,
+  "bootstrap_seed": 20260927,
+  "exclusions": {
+    "total_dev_decisions": 2653,
+    "fallback_decisions": 209,
+    "missing_or_unusable_decisions": 384
+  },
+  "boundary": "This descriptive dev loop scores only the chosen leaf value against the eventual battle outcome. Candidate values not chosen are not treated as counterfactual labels. It does not make live requests, run battles, or authorize the frozen-alpha battle retest."
+}

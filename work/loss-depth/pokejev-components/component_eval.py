@@ -494,6 +494,110 @@ def score_stage_b(split: dict) -> list[dict]:
     ]
 
 
+def auc(scores: list[tuple[float, bool]]) -> float:
+    positives = [score for score, label in scores if label]
+    negatives = [score for score, label in scores if not label]
+    if not positives or not negatives:
+        raise ValueError("AUC requires both eventual-outcome classes")
+    wins = sum(
+        1 if positive > negative else 0.5 if positive == negative else 0
+        for positive in positives
+        for negative in negatives
+    )
+    return wins / (len(positives) * len(negatives))
+
+
+def stage_b_leaf_rows(split: dict) -> tuple[list[tuple[str, float, bool]], dict]:
+    decisions = load_jsonl(STAGE_B / "decisions-abyssal.jsonl")
+    results = {
+        row["battle"]: row for row in load_jsonl(STAGE_B / "results-abyssal.jsonl")
+    }
+    dev_battles = set(split["stage_b"]["dev_battles"])
+    eligible = []
+    total = fallback = missing = 0
+    for decision in decisions:
+        if decision["battle"] not in dev_battles:
+            continue
+        total += 1
+        if decision.get("fallback"):
+            fallback += 1
+            continue
+        result = results.get(decision["battle"])
+        values = decision.get("values") or {}
+        chosen = decision.get("chosen")
+        if (
+            result is None
+            or not result.get("finished")
+            or not isinstance(result.get("won"), bool)
+            or not values
+            or chosen not in values
+        ):
+            missing += 1
+            continue
+        eligible.append((decision["battle"], float(values[chosen]), result["won"]))
+    return eligible, {
+        "total_decisions": total,
+        "fallback_decisions": fallback,
+        "missing_or_unusable_decisions": missing,
+    }
+
+
+def bootstrap_leaf_auc(
+    rows: list[tuple[str, float, bool]],
+) -> tuple[float, list[float]]:
+    by_battle: dict[str, list[tuple[float, bool]]] = {}
+    for battle, value, won in rows:
+        by_battle.setdefault(battle, []).append((value, won))
+    battles = sorted(by_battle)
+    rng = random.Random(BOOTSTRAP_SEED + 2)
+    samples = []
+    for _ in range(BOOTSTRAP_REPS):
+        sampled = []
+        for _ in battles:
+            sampled.extend(by_battle[rng.choice(battles)])
+        if any(label for _, label in sampled) and any(
+            not label for _, label in sampled
+        ):
+            samples.append(auc(sampled))
+    return auc([(value, won) for _, value, won in rows]), samples
+
+
+def score_leaf_value(split: dict) -> dict:
+    rows, exclusions = stage_b_leaf_rows(split)
+    point, samples = bootstrap_leaf_auc(rows)
+    return {
+        "dataset": "stage_b_dev",
+        "component": "leaf_value",
+        "arm": "chosen_leaf_value_vs_eventual_battle_outcome",
+        "n_decisions": len(rows),
+        "n_battles": len({battle for battle, _, _ in rows}),
+        "positive_decisions": sum(won for _, _, won in rows),
+        "negative_decisions": sum(not won for _, _, won in rows),
+        "auc": point,
+        "auc_bootstrap95": [
+            percentile(samples, 0.025),
+            percentile(samples, 0.975),
+        ],
+        "bootstrap_reps": BOOTSTRAP_REPS,
+        "bootstrap_seed": BOOTSTRAP_SEED + 2,
+        "exclusions": exclusions,
+        "boundary": "The chosen leaf value is scored against the eventual battle outcome; candidate values not chosen are not treated as counterfactual labels.",
+    }
+
+
+def leaf_markdown(row: dict) -> str:
+    lo, hi = row["auc_bootstrap95"]
+    return (
+        "| Component | Decisions | Battles | Positive | Negative | AUC (95% CI) | "
+        "Fallback decisions |\n"
+        "|---|---:|---:|---:|---:|---:|---:|\n"
+        f"| {row['component']} | {row['n_decisions']} | {row['n_battles']} | "
+        f"{row['positive_decisions']} | {row['negative_decisions']} | "
+        f"{row['auc']:.4f} [{lo:.4f}, {hi:.4f}] | "
+        f"{row['exclusions']['fallback_decisions']} |"
+    )
+
+
 def markdown_table(rows: list[dict]) -> str:
     lines = [
         "| Dataset | Component | Arm | N | Coverage | Top-1 | Log-loss |",
@@ -543,11 +647,12 @@ def main() -> int:
     parser.add_argument("--write-split", type=Path)
     parser.add_argument("--dev", action="store_true")
     parser.add_argument("--heldout", action="store_true")
+    parser.add_argument("--leaf-dev", action="store_true")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
     if args.write_split:
         split = make_split()
-    elif args.dev or args.heldout:
+    elif args.dev or args.heldout or args.leaf_dev:
         split = json.loads(SPLIT_PATH.read_text())
     else:
         split = make_split()
@@ -566,7 +671,13 @@ def main() -> int:
             print(json.dumps(rows, indent=2, sort_keys=True))
         else:
             print(heldout_markdown(rows))
-    if not args.write_split and not args.dev and not args.heldout:
+    if args.leaf_dev:
+        row = score_leaf_value(split)
+        if args.json:
+            print(json.dumps(row, indent=2, sort_keys=True))
+        else:
+            print(leaf_markdown(row))
+    if not args.write_split and not args.dev and not args.heldout and not args.leaf_dev:
         print(json.dumps(split, indent=2, sort_keys=True))
     return 0
 
