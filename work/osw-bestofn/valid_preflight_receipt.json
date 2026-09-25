@@ -1,0 +1,37 @@
+{
+  "status": "NOT_RUN",
+  "reason": "required acting evidence missing before first live call",
+  "prereg_commits": [
+    "667b447",
+    "8208af3"
+  ],
+  "manifest": "work/osw-bestofn/heldout_valid_slice.json",
+  "manifest_sha256": "7aa586ed485d48d8f35dde4bac9e6cea0d64705a49f5f041d31d715be897aea8",
+  "tasks": 361,
+  "sources": [
+    {
+      "dataset": "razzant/ouroboros-osworld-verified-sonnet46",
+      "snapshot": "0e8ad516a4eeaa586607ead400429885814e7633",
+      "model": "claude-sonnet-4.6",
+      "step_budget": 100,
+      "observation": "screenshot-only",
+      "rollouts": 1
+    },
+    {
+      "dataset": "razzant/ouroboros-osworld-verified-opus5",
+      "snapshot": "f52ebf2248ce0ce0c496db18f5e6edce631304fa",
+      "model": "claude-opus-5",
+      "step_budget": 100,
+      "observation": "screenshot-only",
+      "rollouts": 1
+    }
+  ],
+  "missing_action_evidence": [
+    "chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d/c0",
+    "chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d/c1"
+  ],
+  "observed": "ouroboros_task_final.json is exactly 2 bytes ({}) for both pinned packages; the preregistered acting-evidence serializer cannot construct this task without excluded outcome/manifest files",
+  "live_calls": 0,
+  "spend_usd": 0,
+  "boundary": "No Jev call, result score, selection, or bar verdict was produced."
+}

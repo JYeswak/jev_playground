@@ -2110,3 +2110,19 @@ without paging because the newest run was successful.
 
 Boundary: **0 Jev/API requests and $0 Jev spend**; this change observes GitHub
 workflow status only and does not claim the README's substantive judgments.
+
+## jev-9gtw.2 valid 100-step Best-of-N preflight [live NOT_RUN]
+
+The preregistered retest from `667b447`/`8208af3` was **not run**. The fixed
+`work/osw-bestofn/heldout_valid_slice.json` manifest has 361 tasks, but
+`ouroboros_task_final.json` is exactly `{}` (2 bytes) for
+`chrome/3720f614-37fd-4d04-8a6b-76f54f8c222d` in both pinned Ouroboros packages.
+The allowed acting-evidence state therefore cannot be constructed for that task without
+reading excluded outcome/manifest files. This is the preregistered state-construction
+hard stop, before any Jev call.
+
+Receipt: `work/osw-bestofn/valid_preflight_receipt.json`
+(`fd4b03dd765b3107ee23386628f8f71e1a088a7d5882902b1fe8f1fef72e89bc`).
+**0 live calls; $0 spend; no rows or bar score.**
+
+Boundary: no Best-of-N selection, official-reward join, comparator, or Jev result is claimed.
