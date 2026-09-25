@@ -535,3 +535,4 @@ code+Noul arm makes exactly one asker call per leaf, HTTP 401/402 stops instead 
 falling back, and a frozen-weight SHA-256 mismatch refuses to start. Run:
 `work/poke-jev/.venv/bin/python -m unittest work/loss-depth/pokejev-components/battle/test_run.py`.
 Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
+| work/miniwob-jev/test_external_rates.py | python3 -m unittest work/miniwob-jev/test_external_rates.py | committed Table 3 extraction carries PDF URL and SHA-256; all four projected values match every published row after n/a normalization; one planted book-flight aggregate mismatch fails | 2/2 keyless; mutation RED |
