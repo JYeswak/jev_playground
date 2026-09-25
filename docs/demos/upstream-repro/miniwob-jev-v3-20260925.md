@@ -25,6 +25,23 @@ Every contaminated smoke row records resolved model `jev-1.13.0` and remains und
 `work/miniwob-jev/rows/miniwob-jev-v3-contaminated-smoke-*.jsonl`. None is used for the combined
 held-out bar.
 
+## Harness-bug rows — NOT-SCORED
+
+The following six row files are **NOT-SCORED**. Commit `c7651c4` (`05:35:41Z`) dropped the
+`type_spans[r] = ...` assignment in `build_candidates`, so no `type [` candidate was offered.
+Commit `afd8a5b` (`07:25:58Z`) restored the assignment. Every run in that window typed 0 times;
+these rows are excluded from every arm score and are not evidence about Jev's action selection.
+
+- `miniwob-jev-v3-dev-quoted-isolated-rerun.s0.jsonl`
+- `miniwob-jev-v3-dev-quoted-isolated-correct.s0.jsonl`
+- `miniwob-jev-v3-dev-date-time-isolated-rerun.s0.jsonl`
+- `miniwob-jev-v3-dev-date-time-isolated-correct.s0.jsonl`
+- `miniwob-jev-v3-dev-date-time-isolated-rerun2.s0.jsonl`
+- `miniwob-jev-v3-dev-date-time-exact-rerun3.s0.jsonl`
+
+The 11 untracked `miniwob-jev-v3-dev-*.jsonl` row copies remain in place as evidence; none was
+deleted.
+
 ## Security boundary
 
 No further v3 live calls are permitted from this session after an environment propagation check

@@ -1871,3 +1871,11 @@ Boundary: no further live call after the amendment; no powered 59-pair continuat
 Detective/Deephome paired analysis, no comparator, and no Laya endpoint. Uniform pair rows are
 `work/jev-if/rows/zork1-uniform-s1.jsonl` and `zork1-uniform-s3.jsonl`; full raw run details and
 NOT-SCORED conditions are in the receipt.
+
+## jev-9gtw.4 MiniWoB v3 row provenance and harness-bug accounting (2026-09-25) [offline-verified]
+
+Keyless test command: `env -u TYPESAFE_API_KEY -u JEV_API_KEY /tmp/jev-miniwob-jev/venv/bin/python work/miniwob-jev/v3_options_test.py` → **4/4 passed**. The new row-writer test drives `JevPolicy` with `FakeAsker("greedy")` and reads one JSONL row; it asserts the exact `sha256(jev_arm.py)` plus UTC `started_utc` and `finished_utc` with `finished_utc >= started_utc`.
+
+The v3 report marks six harness-bug row files **NOT-SCORED**: `c7651c4` (`05:35:41Z`) dropped text-input candidates and `afd8a5b` (`07:25:58Z`) restored them; every run in that window typed 0 times. The 11 untracked `miniwob-jev-v3-dev-*.jsonl` copies remain untouched.
+
+Boundary: no TypeSafe calls, no held-out run, no live lane, and no score is claimed. `foundation/gates.sh` and `foundation/gates.sh --selftest` both returned **ALL GREEN**. `ubs work/miniwob-jev/jev_arm.py work/miniwob-jev/v3_options_test.py` returned exit 1 with baseline Python findings in the two files; this is not a clean UBS pass.

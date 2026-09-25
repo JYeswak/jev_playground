@@ -38,6 +38,7 @@ Never prints a key.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import json
 import math
@@ -46,6 +47,7 @@ import random
 import re
 import sys
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -636,10 +638,40 @@ def done_keys(path: Path) -> set[tuple[str, int, int]]:
     return out
 
 
+def utc_now() -> str:
+    return (
+        datetime.now(timezone.utc)
+        .isoformat(timespec="microseconds")
+        .replace("+00:00", "Z")
+    )
+
+
+def code_sha256_at_run_start() -> str:
+    return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+
+
+def write_row(out, row: dict, pol, *, code_sha256: str, started_utc: str) -> None:
+    row.update(
+        pol.row_fields() if pol else {"jev_calls": 0, "input_tokens": 0, "failures": []}
+    )
+    steps = row.get("steps") or 0
+    if steps and row.get("wall_s") is not None:
+        row["s_per_step_end_to_end"] = round(
+            (row["wall_s"] - (row.get("reset_s") or 0.0)) / steps, 4
+        )
+    row["code_sha256"] = code_sha256
+    row["started_utc"] = started_utc
+    row["finished_utc"] = utc_now()
+    if out is not None:
+        out.write(json.dumps(row, ensure_ascii=False) + "\n")
+        out.flush()
+
+
 def run_plan(
     plan, ask, out_path: Path | None, max_steps: int, none_policy: str = "always"
 ):
     """Run (task, seed, rep) episodes with the floor's env and run_episode. Returns exit code."""
+    code_sha256 = code_sha256_at_run_start()
     args = argparse.Namespace(
         max_steps=max_steps,
         episode_max_ms=floor.BENCHMARK_EPISODE_MAX_MS,
@@ -674,6 +706,7 @@ def run_plan(
             env = floor.make_env(task, args.wait_ms)
             try:
                 for seed, rep in pairs:
+                    started_utc = utc_now()
                     holder.pop("policy", None)
                     try:
                         row = floor.run_episode(
@@ -696,19 +729,13 @@ def run_plan(
                         )
                         return 4
                     pol = holder.get("policy")
-                    row.update(
-                        pol.row_fields()
-                        if pol
-                        else {"jev_calls": 0, "input_tokens": 0, "failures": []}
+                    write_row(
+                        out,
+                        row,
+                        pol,
+                        code_sha256=code_sha256,
+                        started_utc=started_utc,
                     )
-                    steps = row.get("steps") or 0
-                    if steps and row.get("wall_s") is not None:
-                        row["s_per_step_end_to_end"] = round(
-                            (row["wall_s"] - (row.get("reset_s") or 0.0)) / steps, 4
-                        )
-                    if out:
-                        out.write(json.dumps(row, ensure_ascii=False) + "\n")
-                        out.flush()
                     n += 1
                     succ += row["success"] > 0
                     print(

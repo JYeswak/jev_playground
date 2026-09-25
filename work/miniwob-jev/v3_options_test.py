@@ -3,11 +3,14 @@
 
 from __future__ import annotations
 
+import hashlib
+import io
 import json
 import os
 import subprocess
 import sys
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -194,6 +197,38 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
         current["spans"] = {str(k): v for k, v in current["spans"].items()}
         old["spans"] = {str(k): v for k, v in old["spans"].items()}
         self.assertEqual(current, old)
+
+    def test_row_writer_adds_provenance_for_fake_jev(self):
+        import jev_arm
+
+        payload = self.base_state()
+        policy = jev_arm.JevPolicy(
+            jev_arm.FakeAsker("greedy"), jev_arm.RunState(), max_steps=1
+        )
+        policy.act(payload["utterance"], payload["els"], payload["options"])
+        row = {"task": "click-button", "seed": 9000, "rep": 0}
+        started_utc = "2026-09-25T00:00:00.000000Z"
+        code_sha256 = hashlib.sha256(Path(jev_arm.__file__).read_bytes()).hexdigest()
+        self.assertEqual(jev_arm.code_sha256_at_run_start(), code_sha256)
+
+        out = io.StringIO()
+        jev_arm.write_row(
+            out,
+            row,
+            policy,
+            code_sha256=code_sha256,
+            started_utc=started_utc,
+        )
+        written = json.loads(out.getvalue())
+
+        self.assertEqual(written["code_sha256"], code_sha256)
+        self.assertEqual(written["started_utc"], started_utc)
+        finished = datetime.fromisoformat(
+            written["finished_utc"].replace("Z", "+00:00")
+        )
+        started = datetime.fromisoformat(started_utc.replace("Z", "+00:00"))
+        self.assertEqual(finished.tzinfo, timezone.utc)
+        self.assertGreaterEqual(finished, started)
 
 
 if __name__ == "__main__":
