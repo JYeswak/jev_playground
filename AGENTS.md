@@ -58,6 +58,10 @@ clone's own toolchain (`npm run typecheck` / `ruff`), never imposed across them.
     testing, benchmarking, analyzing or executing them, `fh` over the mirror included; route
     that work to a pane on another lab's model.
     [§ Rider-covered repos](#rider-covered-repos--restricted-lab-panes-stay-out)
+15. **Derive test patterns; never invent them.** Fixtures are captured from a real observation or
+    row, every bar names its source, and a live run is preceded by keyless feasibility checks
+    (the solving action is offered; every request fits the documented input limit).
+    [§ RULE 15](#rule-15---derive-test-patterns-never-invent-them)
 
 Gate inventory and every RED arm: [`GATES.md`](GATES.md). Refuted hypotheses and rejected
 designs, read before starting one: [`NEGATIVE_EVIDENCE.md`](NEGATIVE_EVIDENCE.md).
@@ -141,6 +145,40 @@ sat unread in our own tree.
 
 **Retirement condition: none.** This is a standing obligation. It retires only if the vendor stops
 publishing first-party code, which would be a different problem.
+
+## RULE 15 - DERIVE TEST PATTERNS, NEVER INVENT THEM
+
+Joshua, 2026-09-25: *"i feel like we need to do a better job deriving the test patterns instead
+of creating them (making shit up) or am i wrong here"*. He was not wrong. The same day:
+
+- The MiniWoB v3 colour arm read `e.get("color")`; MiniWoB observations carry `bg_color` and
+  `fg_color` (`miniwob/observation.py:69-73`). Colour was never sent, and the keyless test passed
+  because its fixture typed `"color": "red"`. The live 0/12 measured the old state.
+- The combined MiniWoB run passed `MINIWOB_V3_ARM=quoted,none`; `v3_on()` matches only a single
+  name, so every arm was off. The test asserted the string the stub received, not the effect.
+- The OSWorld Best-of-N run sent 12 states over the documented 32k input limit
+  (`docs-mirror/typesafe/llms-full.txt:13008`); they were refused and scored as wrong choices,
+  71% of the measured loss. The budget had estimated tokens as bytes/4; real JSON states run
+  1.48-2.08 bytes per token.
+
+**Four clauses. All of them bind.**
+
+1. **Fixtures are captured, not typed.** A test's input is a real observation, a real recorded
+   row, or bytes cut from one. A typed fixture may exercise plumbing (byte counts, exit codes),
+   never a claim about what the environment or the model provides.
+2. **Assert the effect, not the input.** A test of a switch, flag or filter checks what the code
+   then does (which arms are on, which rows are counted), not the value that was passed in.
+3. **Every bar names its source**: the benchmark's own scorer or a published human/SOTA rate
+   (EXTERNAL), a paired comparator on the same items (INCUMBENT), power or MDE arithmetic from
+   recorded rows (ARITHMETIC), or vendor docs (DOCS). A number with none of these is PROPOSED and
+   cannot pass or kill anything.
+4. **Feasibility before spend.** Before the first live call, check keylessly that the input can
+   succeed at all: a solving action is among the offered options on recorded episodes, and every
+   request fits the documented limit (`python3 scripts/jev-state-size.py STATES.jsonl
+   --question-bytes N`; band derived from billed tokens). An item that cannot succeed is decided in
+   the prereg (excluded, or changed by a stated rule), never scored as a model error.
+
+**Retirement condition: none.**
 
 ## RULE 12 - ADOPT FROM THE MENTOR BY DEFAULT
 
