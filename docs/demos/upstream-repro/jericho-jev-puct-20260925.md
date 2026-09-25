@@ -87,8 +87,36 @@ rows and the TypeSafe usage response. The uniform, random, and look arms make no
 cost $0. The first live checkpoint, if authorized, is exactly one **uncached** `jev` Zork1 run at
 seed 1; remaining runs stay stopped until that checkpoint's observed request count, tokens,
 resolved model, wall time, and spend are reported and the parent pane confirms continuation.
+### Wall-time amendment (before any Deephome live run)
 
-### Cache decision
+The completed keyless runs measured 303.826 s for a 9-step Zork1 episode and 155.309 s for a
+40-step Detective episode. The Deephome keyless attempt reached only five complete steps in an
+outer 1,800-second command budget and had no final row. This is a harness-time finding, not a
+partial result.
+
+The Deephome live arm therefore has a fixed **14,400-second (four-hour) per-run wall budget**,
+enforced by a foreground `timeout 14400` wrapper. This is intended to cover the roughly 3.5-hour
+keyless projection from the first five Deephome steps plus Jev request latency. If the wrapper
+returns 124, the process is killed, or the output has no `kind=final` row with `status=ok`, that
+seed is **NOT-SCORED**; its completed partial steps may be used only to explain the timeout and
+must not be averaged into the bar. Deephome remains in scope under this budget; dropping it
+requires a further preregistration amendment, not silent omission.
+
+The live Deephome command shape is:
+
+```bash
+timeout 14400 infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
+  docker run --rm --platform linux/arm64 \
+  -e TYPESAFE_API_KEY \
+  -v "$PWD/$run_dir:/results" jev-if:wave1 \
+  --game deephome --arm jev --seed 1 --out /results/deephome-jev-s1.jsonl
+```
+
+This amendment is committed before any Deephome live call. The Zork1 and Detective runs remain
+foreground and are also not scored if they lack a final `status=ok` row.
+
+## Cache decision
+
 
 A prior cache keyed by `sha256(canonical serialized state + exact valid-action list)` was
 considered. It is **not enabled in this preregistered primary arm**: the first live run is the
