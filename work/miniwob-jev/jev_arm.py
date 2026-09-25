@@ -213,7 +213,9 @@ def build_candidates(
         r = e["ref"]
         if r <= 0:
             continue
-        if e["kind"] in floor.TEXT_INPUT_TAGS:
+        if e["kind"] in floor.TEXT_INPUT_TAGS or (
+            v3_on("date_time") and e["kind"] in {"INPUT_DATE", "INPUT_TIME"}
+        ):
             candidates = list(dict.fromkeys(spans + page_spans))
             if v3_on("date_time") and e["kind"] == "INPUT_TIME":
                 formatted = format_time_for_input(utterance)

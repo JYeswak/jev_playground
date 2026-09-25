@@ -333,3 +333,10 @@ the runner now uses `MINIWOB_V3_ARM`:
 Each re-run below sets `MINIWOB_V3=1 MINIWOB_V3_ARM=<arm>` and uses the exact fixed slice and bar
 above. `MINIWOB_V3_ARM=all` is reserved for the combined held-out run only. The contaminated smoke
 and first exact rows stay committed under their existing names and are excluded from all arm bars.
+
+## Dev amendment: explicit v3 date/time typability fallback
+
+The isolated rerun showed `n_text_heads=0` for INPUT_DATE/INPUT_TIME because the floor module's
+environment-derived tag set was not visible through the imported module in this runner. The v3
+candidate builder now explicitly treats those two kinds as typable only under
+`MINIWOB_V3_ARM=date_time`; v1 remains unchanged. The exact slice and `>=8/10` bar remain fixed.
