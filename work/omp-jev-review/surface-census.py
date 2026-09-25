@@ -8,7 +8,7 @@ sessions are not real work.
 
     python3 work/omp-jev-review/surface-census.py               # surfaces, then judge-role
     python3 work/omp-jev-review/surface-census.py --judge       # judge-role section only
-    python3 work/omp-jev-review/surface-census.py --fleet-line  # one line, last 24h
+    python3 work/omp-jev-review/surface-census.py --fleet-line  # two lines, last 24h
 
 Judge role (bead jev-xpk1): omp answers find, auto-thinking, eval judge()/judge_batch() and
 unexpected-stop detection with the `judge` model role, pinned fleet-wide to typesafe/jev-latest
@@ -16,6 +16,13 @@ with no fallback (jev-m1e9). It writes one `model_usage` row per judge request i
 file, failed requests included: a planted failure (TYPESAFE_BASE_URL=http://127.0.0.1:9,
 2026-09-25) wrote `stopReason: "error"` plus `errorMessage: "Unable to connect. ..."` with zero
 usage, one row per failed request. So a failure count here is a measurement, not an absence.
+
+Skills (bead jev-yy7f): the second --fleet-line line counts skill reads in the same session files,
+probe sessions excluded: a `read` tool call of skill://<name>[/...] or of a path under
+.claude/skills/<name>/ or .agents/skills/<name>/, a `bash` call naming such a SKILL.md, and the
+`skill-prompt` row omp writes when a user invokes /skill:<name>. A call whose toolResult is
+`isError: true` ("Unknown skill" in a pane older than the install) is not a read. It names how many
+skills in ~/.claude/skills/THIRD-PARTY-SKILLS.tsv were read at least once; no ledger is NOT_RUN.
 
 Exit 0 always. This is a census, not a gate.
 """
@@ -34,6 +41,12 @@ TYPE_RE = re.compile(r"com\.zeststream\.[A-Za-z0-9_.-]+")
 CREDITS_AFTER = "2026-09-24T04:19:00Z"
 JUDGE_PROVIDER = "typesafe"
 SESSION_ROOTS = "~/.omp/agent/sessions, ~/.omp/profiles/*/agent/sessions"
+SKILL_LEDGER = HOME / ".claude" / "skills" / "THIRD-PARTY-SKILLS.tsv"
+SKILL_NAME = r"[A-Za-z0-9._-]+"
+SKILL_URL_RE = re.compile(rf"^skill://({SKILL_NAME})")
+SKILL_DIR_RE = re.compile(rf"/\.(?:claude|agents)/skills/({SKILL_NAME})/")
+SKILL_MD_RE = re.compile(rf"/\.(?:claude|agents)/skills/({SKILL_NAME})/SKILL\.md")
+SKILL_PROMPT_RE = re.compile(rf'^\[IMPORTANT: User invoked the "({SKILL_NAME})" skill')
 
 
 def packages():
@@ -348,6 +361,120 @@ def fleet_line(rows, now, have_sessions):
     return line
 
 
+def skill_names(row):
+    """(tool call id or None, skill name) for each skill one session row reads.
+
+    See the module docstring for the counted shapes. A skill-prompt row has no tool call id.
+    """
+    if row.get("type") == "custom_message":
+        if row.get("customType") != "skill-prompt":
+            return []
+        match = SKILL_PROMPT_RE.match(str(row.get("content") or ""))
+        return [(None, match.group(1))] if match else []
+    message = row.get("message")
+    if (
+        row.get("type") != "message"
+        or not isinstance(message, dict)
+        or message.get("role") != "assistant"
+        or not isinstance(message.get("content"), list)
+    ):
+        return []
+    names = []
+    for item in message["content"]:
+        if not isinstance(item, dict) or item.get("type") != "toolCall":
+            continue
+        args = item.get("arguments") if isinstance(item.get("arguments"), dict) else {}
+        if item.get("name") == "read":
+            path = str(args.get("path") or "")
+            match = SKILL_URL_RE.match(path)
+            if match is None:
+                match = SKILL_DIR_RE.search(path)
+            if match:
+                names.append((item.get("id"), match.group(1)))
+        elif item.get("name") == "bash":
+            command = str(args.get("command") or "")
+            names.extend(
+                (item.get("id"), n) for n in sorted(set(SKILL_MD_RE.findall(command)))
+            )
+    return names
+
+
+def skill_reads(files):
+    """(session file, probe, timestamp, skill name) for each skill read, one pass per file.
+
+    A tool call whose toolResult came back `isError: true` read nothing and is dropped: a pane
+    started before a skill was installed answers `read skill://<name>` with "Unknown skill".
+    """
+    for path in files:
+        try:
+            fh = path.open(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        pending, failed = [], set()
+        with fh:
+            for line in fh:
+                error = '"isError":true' in line and '"toolResult"' in line
+                skill = ('"toolCall"' in line or '"skill-prompt"' in line) and (
+                    "skill://" in line or "/skills/" in line or "skill-prompt" in line
+                )
+                if not (error or skill):
+                    continue
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if not isinstance(row, dict):
+                    continue
+                message = row.get("message")
+                if isinstance(message, dict) and message.get("role") == "toolResult":
+                    if message.get("isError") is True:
+                        failed.add(message.get("toolCallId"))
+                    continue
+                for call_id, name in skill_names(row):
+                    pending.append((call_id, row.get("timestamp"), name))
+        if not pending:
+            continue
+        probe = is_probe(path, session_cwd(path))
+        for call_id, timestamp, name in pending:
+            if call_id is None or call_id not in failed:
+                yield path, probe, timestamp, name
+
+
+def third_party(ledger):
+    """Skill names in the ledger's first column, header skipped; None when absent or empty."""
+    try:
+        text = Path(ledger).read_text(encoding="utf-8")
+    except OSError:
+        return None
+    names = [line.split("\t", 1)[0].strip() for line in text.splitlines()[1:]]
+    return list(dict.fromkeys(n for n in names if n)) or None
+
+
+def skills_line(reads, now, have_sessions, ledger):
+    """'Skills 24h: T skill reads in S sessions; third-party k/N read (top: ...); never read N-k'."""
+    if not have_sessions:
+        return f"Skills 24h: NOT_RUN no omp session files under {SESSION_ROOTS}"
+    since = now - timedelta(hours=24)
+    counts, sessions = Counter(), set()
+    for path, probe, timestamp, name in reads:
+        when = parse_time(timestamp)
+        if probe or when is None or when < since or when > now:
+            continue
+        counts[name] += 1
+        sessions.add(path)
+    line = (
+        f"Skills 24h: {sum(counts.values())} skill reads in {len(sessions)} sessions; "
+    )
+    listed = third_party(ledger)
+    if listed is None:
+        return line + "third-party NOT_RUN (no ledger)"
+    read = sorted((n for n in listed if counts[n]), key=lambda n: (-counts[n], n))
+    line += f"third-party {len(read)}/{len(listed)} read"
+    if read:
+        line += " (top: " + ", ".join(f"{n} x{counts[n]}" for n in read[:3]) + ")"
+    return line + f"; never read {len(listed) - len(read)}"
+
+
 def surfaces(roots, files):
     pkgs = packages()
     types_by = {p: decision_types(p) for p in pkgs}
@@ -446,6 +573,7 @@ def main(argv):
             except OSError:
                 continue
         print(fleet_line(judge_rows(recent), now, bool(files)))
+        print(skills_line(skill_reads(recent), now, bool(files), SKILL_LEDGER))
         return 0
     if "--judge" not in argv:
         surfaces(roots, files)

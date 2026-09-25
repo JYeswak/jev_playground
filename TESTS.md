@@ -71,6 +71,19 @@ claim nobody can check:
   sessions (is_probe reads only the path below the sessions root plus cwd; the old whole-path rule
   failed 5 of 7 on Linux CI 36079745187). Planting "drop failure rows" in `judge_rows` fails 4 of 8.
   Run: `python3 -m unittest work/omp-jev-review/test_judge_usage.py` (8 tests).
+- `work/omp-jev-review/test_skill_census.py` — the `Skills 24h:` line of
+  `work/omp-jev-review/surface-census.py --fleet-line` (jev-yy7f), on row shapes copied from real
+  omp session files, no model calls: a `read` of `skill://<name>` or `skill://<name>/<file>`, a read
+  under `.claude/skills/<name>/` or `.agents/skills/<name>/`, a `bash` call naming such a `SKILL.md`,
+  and the `skill-prompt` invocation row each count; a glob or directory listing, a toolResult that
+  quotes the header, non-skill reads, a `/tmp` probe session, a row older than 24h and a read whose
+  toolResult is `isError: true` ("Unknown skill" in a pane older than the install) do not; a skill
+  missing from `~/.claude/skills/THIRD-PARTY-SKILLS.tsv` counts in the total only; no ledger is
+  `third-party NOT_RUN (no ledger)` and no session files is `NOT_RUN`, never zero; the CLI prints
+  the judge line then the skills line, `scripts/fleet-idle-watch.py --once` shows both, and a
+  census timeout is NOT_RUN for both. Planting "drop the absolute-path branch" in `skill_names`
+  fails 2 of 13; "ignore error results" fails 1; HEAD's watcher fails the timeout test.
+  Run: `python3 -m unittest work/omp-jev-review/test_skill_census.py` (13 tests).
 - `work/fleet-idle-watch/test_fleet_idle_watch.py` — `scripts/fleet-idle-watch.py`'s classifier
   on process evidence (jev-6con), no tmux or ps: fixtures are the real process trees of jev panes
   0, 2, 4, 5 and two real screens, 2026-09-25. Both measured false readings: a screen with no

@@ -250,7 +250,8 @@ def ci_lines() -> list[str]:
 
 
 def judge_lines() -> list[str]:
-    """The Jev judge-role line (bead jev-xpk1). Informational: never sets our exit code."""
+    """The Jev judge-role line (jev-xpk1) and the skills line (jev-yy7f). Informational: never
+    sets our exit code. The census prints every line it has; a dead census is NOT_RUN for both."""
     script = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
         "work",
@@ -265,13 +266,11 @@ def judge_lines() -> list[str]:
             timeout=60,
         )
     except subprocess.TimeoutExpired:
-        return [
-            "Jev judge 24h: NOT_RUN surface-census.py --fleet-line timed out after 60s"
-        ]
+        why = "surface-census.py --fleet-line timed out after 60s"
+        return [f"Jev judge 24h: NOT_RUN {why}", f"Skills 24h: NOT_RUN {why}"]
     lines = done.stdout.splitlines()
-    return lines or [
-        f"Jev judge 24h: NOT_RUN surface-census.py printed nothing (exit {done.returncode})"
-    ]
+    why = f"surface-census.py printed nothing (exit {done.returncode})"
+    return lines or [f"Jev judge 24h: NOT_RUN {why}", f"Skills 24h: NOT_RUN {why}"]
 
 
 def selftest() -> int:
