@@ -36,7 +36,7 @@ python3 work/nev-differential/analyze_diff.py	0	-
 node --test work/nev-injection/seat-guard.test.mjs	0	-
 python3 work/gate-observe-dogfood/readout3b.py	0	-
 python3 work/gate-observe-dogfood/readout4.py score	0	-
-python3 work/loss-depth/pokejev-components/component_eval.py --heldout	NOT_RUN-named-prerequisite	missing prerequisite
+python3 work/loss-depth/pokejev-components/component_eval.py --heldout	NOT_RUN-named-prerequisite	pokechamp
 python3 work/score-sst5/score.py	0	-
 python3 work/jev-variance/score.py	0	-
 python3 work/choice-banking77/score.py	0	-
