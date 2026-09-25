@@ -23,18 +23,18 @@ the README (it must keep stages 15/95/97, readme-gate and the claim-coverage flo
 
 ## Do first (pending on you)
 
-1. **Verify `jev-9gtw.4.2`** (IvoryCreek, commit `026d1230`, Agent Mail 42687): text_candidates.py,
-   test_text_candidates.py (3/3), text-candidates-coverage.tsv. Check in a fresh clone: needed
-   strings derived from the 7 committed observations (copy-paste textarea with trailing space,
-   find-word `Lacus,`, scroll-text `Maecenas.`, text-transform `6gHF`, enter-time `21:37`) are
-   all covered; candidate count per step bounded; request size with `scripts/jev-state-size.py`;
-   plant a defect. Its note says the 75 recorded page-text rows are NOT_RUN (no observation in
-   them); decide whether that leaves the acceptance's episode leg open. It must not touch
-   `jev_arm.py` or `game-floors/miniwob/run.py` while pane 5's run is alive.
-2. **Pane 2's `jev-yru2` prereg** (`b3cfcece`, `6b0188a2`): you sent NAME-GAP (bead comment
-   16:5xZ): freeze the repo list as a rule before reading workflows; the 70% / +5 / +2.0 pp /
-   10-row bars are UNSOURCED (audit `1de0f39`) so derive or label PROPOSED; count NEAR drops.
-   Check its amendment when it lands, then its extract (raw text only if the license allows).
+1. **`jev-9gtw.4.2`** (IvoryCreek): checked `026d1230` at ~17:20Z, DEFECT (bead comment):
+   `build_candidates` inserted `derive_needed_text` (the answer) at position 0, so coverage was
+   1.000 by construction. Without it the generic builder covers 4 of 5 captured tasks
+   (text-transform not covered). Pane 3 is fixing: builder never reads the grader; generic
+   adjacent-character rule; a test that output is unchanged with the grader patched to raise;
+   20 no-model observations per page-text task; request size. Verify its next commit the same
+   way (remove the grader from reach, recount coverage and needed-string index yourself).
+2. **`jev-yru2`** (CopperHeron): prereg NAME-GAP resolved and extract verified at ~17:25Z
+   (`20f99ed3`, `bfc19b43`): cohort frozen as a rule, MIT-only with per-file license evidence,
+   10 target-shape rows (4 from one repo), thresholds PROPOSED. Next from pane 2: two blind label
+   files, then you adjudicate the disagreements. Live readiness needs 10 target-HARM rows, so one
+   no-harm label makes it UNDERPOWERED; that is an acceptable reported outcome.
 3. **MiniWoB held-out run** (pane 5): pids 30607/30641, `run-after-rotation.sh --live --steps
    combined`, arms `quoted,none,color` (from `work/miniwob-jev/v3-combined-arm-list.txt`), run root
    under `var/agent-tmp/`. Do not touch it. When it lands: recount rows, check keys equal the
