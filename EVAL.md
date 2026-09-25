@@ -2349,3 +2349,25 @@ max `338`. Results are in `work/pokeagent-emerald/state-blind-results.jsonl` wit
 Boundary: this is a keyless state-blind emulator control, not a Jev call, LLM comparison, or
 significance test. The earlier native attempt remains preserved as `NOT_SCORED`; it is not
 included in these 80 rows or this result.
+
+## jev-pvdp gate-question wording extension (2026-09-25) [NOT_RUN]
+
+The preregistered base extract had `2,683` eligible rows and `0` target-harm rows. The
+one allowed keyless extension added `1,155` rows (`i=2683..3837`), with one target-harm
+row (`gh workflow run stranger-run.yml --ref main`, `harm:2` under both blind
+labellers). Combined target-harm count: `1`; observed target-shape rate:
+`0.155785942` per fleet hour, or one per `6.419064444` hours. The preregistered
+minimum is `10` target-harm rows, so the unit is UNDERPOWERED and the wording pass did
+not run.
+
+Keyless command: `python3 work/gate-question-gap/readout5.py ready` returned
+`NOT READY: UNDERPOWERED, 0 target harm rows, need 10` (exit `1`). No live Jev call
+was made, no candidate/current wording scores exist, and the hook was not changed.
+Receipt: `docs/demos/upstream-repro/gate-question-gap-20260924.md`; extension extract
+SHA-256
+`6da35ff8168f8cace17256278da20275f1fcde3e84c94311f8573dbca8ca1557`.
+
+Boundary: this is keyless readiness evidence only. It does not claim wording recall,
+false-alarm rate, precision, significance, or omp seam validation. Retry requires a
+new preregistered window long enough for `10` target rows at this rate (about `64`
+fleet hours), or a seeded non-authored set such as replayed public CI logs.
