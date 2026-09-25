@@ -43,12 +43,12 @@
     "action_count": 6,
     "arm": "page_text",
     "elements": 7,
-    "offered": true,
-    "reason": "the answer-input target ref 6 and a type action on it are present; the source textarea ref 5 is present",
-    "solving_actions": [
-      "type [6] input_text #answer-input"
-    ],
-    "solving_offered": true,
+    "offered": false,
+    "needed_text": "Eget rhoncus, pellentesque malesuada non, donec morbi. Nunc ",
+    "needed_text_offered": false,
+    "reason": "the source textarea value is not among the offered type texts; the captured option omits its trailing space",
+    "solving_actions": [],
+    "solving_offered": false,
     "style_fields": 0,
     "target_refs": [
       6
@@ -99,7 +99,9 @@
     "arm": "date_time",
     "elements": 6,
     "offered": true,
-    "reason": "the input_time target ref 5 and a type action on it are present; the normalized target 21:37 is in its captured text spans",
+    "needed_text": "21:37",
+    "needed_text_offered": true,
+    "reason": "the input_time target ref 5 and normalized target 21:37 are both present in its offered type texts",
     "solving_actions": [
       "type [5] input_time #tt"
     ],
@@ -115,12 +117,12 @@
     "action_count": 5,
     "arm": "page_text",
     "elements": 6,
-    "offered": true,
-    "reason": "the answer-input target ref 5 and a type action on it are present; the paragraph source ref 4 is present",
-    "solving_actions": [
-      "type [5] input_text #answer-input"
-    ],
-    "solving_offered": true,
+    "offered": false,
+    "needed_text": "Lacus,",
+    "needed_text_offered": false,
+    "reason": "the needed first-word string Lacus, is not among the offered type texts; only the full paragraph is offered",
+    "solving_actions": [],
+    "solving_offered": false,
     "style_fields": 0,
     "target_refs": [
       5
@@ -145,12 +147,12 @@
     "action_count": 6,
     "arm": "page_text",
     "elements": 6,
-    "offered": true,
-    "reason": "the answer-input target ref 5 and a type action on it are present; the source textarea ref 4 is present",
-    "solving_actions": [
-      "type [5] input_text #answer-input"
-    ],
-    "solving_offered": true,
+    "offered": false,
+    "needed_text": "Maecenas.",
+    "needed_text_offered": false,
+    "reason": "the needed last-word string Maecenas. is not among the offered type texts",
+    "solving_actions": [],
+    "solving_offered": false,
     "style_fields": 0,
     "target_refs": [
       5
@@ -162,12 +164,10 @@
     "action_count": 12,
     "arm": "page_text",
     "elements": 25,
-    "offered": true,
-    "reason": "the ql-underline toolbar button ref 18 and its click action are present",
-    "solving_actions": [
-      "click [18] button"
-    ],
-    "solving_offered": true,
+    "offered": false,
+    "reason": "the ql-underline toolbar click is offered, but the captured observation has no text selection, so underline is not solving",
+    "solving_actions": [],
+    "solving_offered": false,
     "style_fields": 0,
     "target_refs": [
       18
@@ -179,12 +179,12 @@
     "action_count": 8,
     "arm": "page_text",
     "elements": 11,
-    "offered": true,
-    "reason": "the text-field target ref 10 and a type action on it are present",
-    "solving_actions": [
-      "type [10] input_text #tt"
-    ],
-    "solving_offered": true,
+    "offered": false,
+    "needed_text": "6gHF",
+    "needed_text_offered": false,
+    "reason": "the needed captcha string 6gHF is not among the offered type texts; only individual characters are offered",
+    "solving_actions": [],
+    "solving_offered": false,
     "style_fields": 0,
     "target_refs": [
       10
