@@ -162,6 +162,19 @@ def _interactive(e: dict) -> bool:
     return e["kind"] in floor.INTERACTIVE_TAGS or e["kind"].startswith("INPUT_")
 
 
+TIME_RE = re.compile(r"\b(\d{1,2}):(\d{2})\s*(AM|PM)\b", re.I)
+
+
+def format_time_for_input(value: str) -> str | None:
+    match = TIME_RE.search(value)
+    if not match:
+        return None
+    hour = int(match.group(1)) % 12
+    if match.group(3).upper() == "PM":
+        hour += 12
+    return f"{hour:02d}:{match.group(2)}"
+
+
 def build_candidates(
     utterance: str,
     els: list[dict],
@@ -194,7 +207,11 @@ def build_candidates(
         if r <= 0:
             continue
         if e["kind"] in floor.TEXT_INPUT_TAGS:
-            type_spans[r] = list(dict.fromkeys(spans + page_spans))
+            candidates = list(dict.fromkeys(spans + page_spans))
+            if V3_ENABLED and e["kind"] == "INPUT_TIME":
+                formatted = [format_time_for_input(s) for s in candidates]
+                candidates.extend(s for s in formatted if s and s not in candidates)
+            type_spans[r] = list(dict.fromkeys(candidates))
         elif e["kind"] == "SELECT" and r in options:
             opts = {floor._norm(o) for o in options[r]}
             ok = [s for s in spans if floor._norm(s) in opts]

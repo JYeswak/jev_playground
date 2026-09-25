@@ -292,3 +292,11 @@ fix is now committed in `work/miniwob-jev/jev_arm.py`: quoted regex matches call
 and preserve the matched contents verbatim, while unquoted spans keep the v1 stripping path. The
 slice, `>=14/16` bar, and combined-design exclusion rule are unchanged. The exact 16-row slice is
 re-run; both first and re-run results are retained in the receipt, and no other arm changes.
+
+## Dev amendment: time-input formatter re-run
+
+The first exact date/time slice produced 5/10 (enter-date 5/5, enter-time 0/5). The enter-time
+trace showed Jev selected the spoken `H:MM AM/PM` value, while MiniWoB's native time input requires
+24-hour `HH:MM`. The v3 harness now adds a guarded formatter that maps the spoken value to the
+native value (for example `4:03 PM` -> `16:03`) only when `MINIWOB_V3=1`. The exact ten keys and
+`>=8/10` bar are unchanged; first and rerun rows are both retained.
