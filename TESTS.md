@@ -59,6 +59,16 @@ claim nobody can check:
   and exit 2; log rows: gates `RED` stage plus its `FAIL` checks, `RED named`, and the runner's
   echoed script source is not a row. Planting `failure` into GREEN fails 2 tests.
   Run: `python3 -m unittest work/ci-main-status/test_ci_main_status.py` (14 tests).
+- `work/omp-jev-review/test_judge_usage.py` — the judge-role section of
+  `work/omp-jev-review/surface-census.py` and its `--fleet-line` (jev-xpk1), on row shapes copied
+  from real omp 18.3.0 session files, no model calls: success rows are calls, tokens and cost by
+  kind/day/purpose/profile/project; the planted-failure shape (`stopReason: "error"` +
+  `errorMessage`, what `TYPESAFE_BASE_URL=http://127.0.0.1:9` wrote) and `aborted` count as
+  failures and the line names the last reason; a `/tmp` probe session stays out of the real counts;
+  another provider's judge-role error and a row older than 24h are not counted; no session files is
+  `NOT_RUN`, never "0 failures"; `scripts/fleet-idle-watch.py --once` prints the line and keeps exit
+  0 with a failure in it. Planting "drop failure rows" in `judge_rows` fails 4 of 7.
+  Run: `python3 -m unittest work/omp-jev-review/test_judge_usage.py` (7 tests).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything

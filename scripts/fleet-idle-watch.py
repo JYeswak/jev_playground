@@ -10,8 +10,10 @@ conductor only looked when a callback arrived. Joshua: "dont let that happen aga
 
   python3 scripts/fleet-idle-watch.py            # run forever (start it under hub)
   python3 scripts/fleet-idle-watch.py --once     # one poll, then the CI-on-main line from
-                                                 # scripts/ci-main-status.py (informational);
-                                                 # exit 1 if any worker is idle
+                                                 # scripts/ci-main-status.py and the Jev judge
+                                                 # line from surface-census.py --fleet-line
+                                                 # (both informational); exit 1 if any worker
+                                                 # is idle
   python3 scripts/fleet-idle-watch.py --selftest # classifier on real status lines
 """
 
@@ -109,6 +111,31 @@ def ci_lines() -> list[str]:
     ]
 
 
+def judge_lines() -> list[str]:
+    """The Jev judge-role line (bead jev-xpk1). Informational: never sets our exit code."""
+    script = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "work",
+        "omp-jev-review",
+        "surface-census.py",
+    )
+    try:
+        done = subprocess.run(
+            [sys.executable, script, "--fleet-line"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+    except subprocess.TimeoutExpired:
+        return [
+            "Jev judge 24h: NOT_RUN surface-census.py --fleet-line timed out after 60s"
+        ]
+    lines = done.stdout.splitlines()
+    return lines or [
+        f"Jev judge 24h: NOT_RUN surface-census.py printed nothing (exit {done.returncode})"
+    ]
+
+
 def selftest() -> int:
     # Status lines captured from the jev session, 2026-09-24T02:0xZ.
     cases = [
@@ -146,6 +173,8 @@ def main() -> int:
         for index, (state, words) in sorted(states.items()):
             print(f"pane {index}: {state}  {words}")
         for line in ci_lines():
+            print(line)
+        for line in judge_lines():
             print(line)
         return 1 if any(state != "working" for state, _ in states.values()) else 0
     streak: dict[int, int] = {}

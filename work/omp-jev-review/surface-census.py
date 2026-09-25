@@ -6,21 +6,34 @@ line parses. Real work is a session whose path and cwd are not a probe or test
 session. The rule is the one jev-cz0 used: /tmp, review-l3, probe, and fixture
 sessions are not real work.
 
-    python3 work/omp-jev-review/surface-census.py
+    python3 work/omp-jev-review/surface-census.py               # surfaces, then judge-role
+    python3 work/omp-jev-review/surface-census.py --judge       # judge-role section only
+    python3 work/omp-jev-review/surface-census.py --fleet-line  # one line, last 24h
 
-Exit 0 when every package has a row. This is a census, not a gate.
+Judge role (bead jev-xpk1): omp answers find, auto-thinking, eval judge()/judge_batch() and
+unexpected-stop detection with the `judge` model role, pinned fleet-wide to typesafe/jev-latest
+with no fallback (jev-m1e9). It writes one `model_usage` row per judge request into the session
+file, failed requests included: a planted failure (TYPESAFE_BASE_URL=http://127.0.0.1:9,
+2026-09-25) wrote `stopReason: "error"` plus `errorMessage: "Unable to connect. ..."` with zero
+usage, one row per failed request. So a failure count here is a measurement, not an absence.
+
+Exit 0 always. This is a census, not a gate.
 """
 
-import glob
 import json
 import os
 import re
+import sys
+from collections import Counter
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 HOME = Path.home()
 REPO = Path(__file__).resolve().parents[2]
 TYPE_RE = re.compile(r"com\.zeststream\.[A-Za-z0-9_.-]+")
 CREDITS_AFTER = "2026-09-24T04:19:00Z"
+JUDGE_PROVIDER = "typesafe"
+SESSION_ROOTS = "~/.omp/agent/sessions, ~/.omp/profiles/*/agent/sessions"
 
 
 def packages():
@@ -184,14 +197,145 @@ def is_credit(data, timestamp):
     return "402" in blob
 
 
-def main():
+def profile_of(path):
+    parts = Path(path).parts
+    for i, part in enumerate(parts[:-1]):
+        if part == "profiles" and i > 0 and parts[i - 1] == ".omp":
+            return parts[i + 1]
+    return "default"
+
+
+def judge_rows(files):
+    """(profile, project, probe, row) for each model_usage row whose provider is typesafe."""
+    for path in files:
+        try:
+            fh = path.open(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        where = None
+        with fh:
+            for line in fh:
+                if '"model_usage"' not in line or f'"{JUDGE_PROVIDER}"' not in line:
+                    continue
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if not isinstance(row, dict) or row.get("type") != "model_usage":
+                    continue
+                if row.get("provider") != JUDGE_PROVIDER:
+                    continue
+                if where is None:
+                    cwd = session_cwd(path)
+                    project = Path(cwd).name if cwd else path.parent.name
+                    where = (profile_of(path), project or "-", is_probe(path, cwd))
+                yield where + (row,)
+
+
+def usage_of(row):
+    usage = row.get("usage") if isinstance(row.get("usage"), dict) else {}
+    cost = usage.get("cost") if isinstance(usage.get("cost"), dict) else {}
+    return int(usage.get("input") or 0), float(cost.get("total") or 0.0)
+
+
+def is_failure(row):
+    return row.get("stopReason") != "stop"
+
+
+def failure_reason(row):
+    text = str(row.get("errorMessage") or row.get("stopReason") or "no stopReason")
+    return " ".join(text.split())[:160]
+
+
+def parse_time(timestamp):
+    try:
+        return datetime.fromisoformat(str(timestamp).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def judge_report(rows):
+    """Lines for the judge-role section: calls by kind, day, purpose, profile and project."""
+    groups = {}
+    failures = {"real": [], "probe": []}
+    for profile, project, probe, row in rows:
+        kind = "probe" if probe else "real"
+        timestamp = str(row.get("timestamp") or "")
+        purpose = str(row.get("purpose") or "-")
+        key = (kind, timestamp[:10] or "-", purpose, profile, project)
+        slot = groups.setdefault(
+            key, {"calls": 0, "input": 0, "cost": 0.0, "stops": Counter()}
+        )
+        tokens, cost = usage_of(row)
+        slot["calls"] += 1
+        slot["input"] += tokens
+        slot["cost"] += cost
+        slot["stops"][str(row.get("stopReason") or "-")] += 1
+        if is_failure(row):
+            failures[kind].append(
+                (timestamp, purpose, profile, project, failure_reason(row))
+            )
+    lines = [
+        "# judge role: provider typesafe model_usage rows, one per judge request, failures included",
+        "kind\tday\tpurpose\tprofile\tproject\tcalls\tinput_tokens\tcost_usd\tstop_reasons",
+    ]
+    totals = {"real": [0, 0.0], "probe": [0, 0.0]}
+    for key in sorted(groups):
+        slot = groups[key]
+        totals[key[0]][0] += slot["calls"]
+        totals[key[0]][1] += slot["cost"]
+        stops = ",".join(f"{k}={v}" for k, v in sorted(slot["stops"].items()))
+        lines.append(
+            "\t".join(
+                list(key)
+                + [str(slot["calls"]), str(slot["input"]), f"{slot['cost']:.6f}", stops]
+            )
+        )
+    for kind in ("real", "probe"):
+        calls, cost = totals[kind]
+        lines.append(
+            f"# judge {kind} calls {calls} cost ${cost:.6f} failures {len(failures[kind])}"
+        )
+    if failures["real"]:
+        timestamp, purpose, profile, project, reason = max(failures["real"])
+        lines.append(
+            f"# last real failure {timestamp} {purpose} {profile}/{project}: {reason}"
+        )
+    return lines
+
+
+def fleet_line(rows, now, have_sessions):
+    """'Jev judge 24h: N calls, $X, F failures', real sessions only, plus the last failure."""
+    if not have_sessions:
+        return f"Jev judge 24h: NOT_RUN no omp session files under {SESSION_ROOTS}"
+    since = now - timedelta(hours=24)
+    calls, cost, failures = 0, 0.0, []
+    for profile, _project, probe, row in rows:
+        when = parse_time(row.get("timestamp"))
+        if probe or when is None or when < since or when > now:
+            continue
+        calls += 1
+        cost += usage_of(row)[1]
+        if is_failure(row):
+            failures.append(
+                (when, str(row.get("purpose") or "-"), profile, failure_reason(row))
+            )
+    line = f"Jev judge 24h: {calls} calls, ${cost:.4f}, {len(failures)} failures"
+    if failures:
+        when, purpose, profile, reason = max(failures)
+        line += (
+            f"; last {when.strftime('%Y-%m-%dT%H:%MZ')} {purpose} {profile}: {reason}"
+        )
+    return line
+
+
+def surfaces(roots, files):
     pkgs = packages()
     types_by = {p: decision_types(p) for p in pkgs}
     type_owner = {}
     for package, types in types_by.items():
         for token in types:
             type_owner[token] = package
-    roots, files = session_files()
     tallies = {
         p: {
             "real": 0,
@@ -269,5 +413,27 @@ def main():
     )
 
 
+def main(argv):
+    roots, files = session_files()
+    if "--fleet-line" in argv:
+        now = datetime.now(timezone.utc)
+        # Session files are append-only, so one untouched for 24h holds no row from the last 24h.
+        cutoff = now.timestamp() - 24 * 3600
+        recent = []
+        for path in files:
+            try:
+                if path.stat().st_mtime >= cutoff:
+                    recent.append(path)
+            except OSError:
+                continue
+        print(fleet_line(judge_rows(recent), now, bool(files)))
+        return 0
+    if "--judge" not in argv:
+        surfaces(roots, files)
+    for line in judge_report(judge_rows(files)):
+        print(line)
+    return 0
+
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    raise SystemExit(main(sys.argv[1:]))
