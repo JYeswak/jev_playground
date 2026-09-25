@@ -4593,3 +4593,15 @@ run this 24-task retry or relax its bar.
 **Evidence.** `work/osw-bestofn/PREREGISTER-R112-RETRY.md`,
 `work/osw-bestofn/r112_retry_preflight.json`, commits `c0ef4468` and `392ac1a5`,
 and `jev-jjwt`.
+
+## R115 — REFUTED implementation hypothesis: setup-node alone makes the kit prepare build portable
+
+**Hypothesis:** adding Node setup to the stranger workflow is sufficient for `npm ci --prefix kit` to run the README quickstart in the clean runner environment.
+
+**Measured 2026-09-25, keyless:** the first full stranger smoke reached `npm ci --prefix kit` but exited 127 during `kit` prepare: `sh: tsc: command not found`. The clean runner PATH intentionally omitted the machine-global TypeScript binary; local checkout success had been relying on that global executable. This was a real portability defect, not a Jev/API result.
+
+**Repair:** pin `typescript@5.8.3` as a kit devDependency and refresh `kit/package-lock.json`. The rerun reached `prepare` successfully and the stranger contract returned `EXPECTATION PASS rows=5`.
+
+**Retry condition:** a clean stranger run again reports `tsc: command not found` during kit prepare, or the package lock no longer installs the pinned compiler.
+
+**Boundary:** this row is about package/workflow portability. It makes no Jev accuracy, model, or spend claim.

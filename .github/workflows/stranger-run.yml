@@ -17,11 +17,52 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
+      - name: Start clone-to-offline timer
+        run: |
+          echo "STRANGER_START_NS=$(python3 -c 'import time; print(time.time_ns())')" >> "$GITHUB_ENV"
       - name: Checkout the target repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      - name: Set up Node.js for kit
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.18'
+          cache: npm
+          cache-dependency-path: kit/package-lock.json
+
+      - name: Run README kit quickstart offline
+        env:
+          TYPESAFE_API_KEY: ""
+          JEV_API_KEY: ""
+          OPENAI_API_KEY: ""
+          ANTHROPIC_API_KEY: ""
+          XAI_API_KEY: ""
+          OPENROUTER_API_KEY: ""
+        run: |
+          set -euo pipefail
+          env -u TYPESAFE_API_KEY -u JEV_API_KEY -u OPENAI_API_KEY \
+            -u ANTHROPIC_API_KEY -u XAI_API_KEY -u OPENROUTER_API_KEY \
+            npm ci --prefix kit --no-audit --no-fund
+          set +e
+          env -u TYPESAFE_API_KEY -u JEV_API_KEY -u OPENAI_API_KEY \
+            -u ANTHROPIC_API_KEY -u XAI_API_KEY -u OPENROUTER_API_KEY \
+            npx --prefix kit --no-install jev doctor --robot > "$RUNNER_TEMP/kit-doctor.json" 2>&1
+          doctor_rc=$?
+          set -e
+          cat "$RUNNER_TEMP/kit-doctor.json"
+          test "$doctor_rc" -eq 2
+          env -u TYPESAFE_API_KEY -u JEV_API_KEY -u OPENAI_API_KEY \
+            -u ANTHROPIC_API_KEY -u XAI_API_KEY -u OPENROUTER_API_KEY \
+            npx --prefix kit --no-install jev ask choice --fake \
+              --state kit/examples/state.json --question kit/examples/question.json --robot \
+              > "$RUNNER_TEMP/kit-offline.json"
+          cat "$RUNNER_TEMP/kit-offline.json"
+          end_ns=$(python3 -c 'import time; print(time.time_ns())')
+          elapsed_ms=$(( (end_ns - STRANGER_START_NS) / 1000000 ))
+          printf 'clone_to_offline_ms=%s\n' "$elapsed_ms" | tee "$RUNNER_TEMP/clone-to-offline.txt" >> "$GITHUB_STEP_SUMMARY"
+          test "$elapsed_ms" -lt 300000
       - name: Install uv for README commands
         uses: astral-sh/setup-uv@v7
 
@@ -49,5 +90,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: README-stranger-receipt-${{ github.run_id }}
-          path: ${{ runner.temp }}/stranger-run.md
+          path: |
+            ${{ runner.temp }}/stranger-run.md
+            ${{ runner.temp }}/clone-to-offline.txt
+            ${{ runner.temp }}/kit-doctor.json
+            ${{ runner.temp }}/kit-offline.json
           if-no-files-found: error

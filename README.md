@@ -10,11 +10,10 @@ From a fresh clone:
 
 ```bash
 git clone https://github.com/JYeswak/jev_playground.git
-cd jev_playground/kit
-npm ci
-npx jev doctor
+npm ci --prefix kit
+npx --prefix kit --no-install jev doctor --robot
 # Expected without a key: NOT_RUN and exit 2.
-npx jev ask choice --fake --state examples/state.json --question examples/question.json
+npx --prefix kit --no-install jev ask choice --fake --state kit/examples/state.json --question kit/examples/question.json --robot
 ```
 
 The example state and Choice question are captured from committed rows: `work/pokeagent-emerald/segment2-request-states.jsonl:1` and `work/pokeagent-emerald/macro_choice.py:73-89`. The fake command uses no network.
@@ -22,7 +21,7 @@ The example state and Choice question are captured from committed rows: `work/po
 For a live call, set `TYPESAFE_API_KEY` outside the repository using the official [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart), then run the same command without `--fake`:
 
 ```bash
-npx jev ask choice --state examples/state.json --question examples/question.json
+if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --prefix kit --no-install jev ask choice --state kit/examples/state.json --question kit/examples/question.json --robot || { rc=$?; exit "$rc"; }
 ```
 
 The pinned model is `jev-1.13.0`.

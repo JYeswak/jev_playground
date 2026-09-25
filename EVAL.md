@@ -2469,3 +2469,17 @@ tools, not for Jev in omp. Jev already makes about 1,700 real decisions a day in
 Boundary: counts only, from local session files. No accuracy or outcome for those decisions was
 measured; which pane or credential served the calls before this login was not determined; pinning
 the role to jev-1.13.0 instead of jev-latest is UNVERIFIED.
+
+## jev-h94q WP-S S2 stranger quickstart [test]
+
+S2 updates the README product quickstart to run from the repository root, replaces the old ledger-command stranger contract with the five current README commands, adds Node 22.18 setup plus a checkout-to-offline timer, and uploads the timing and kit receipts. The kit now declares pinned TypeScript 5.8.3 for its prepare build, so a clean runner does not depend on a global `tsc`.
+
+Keyless evidence:
+
+- `node --test kit/test/*.mjs` → **16/16 passed**.
+- Ruby YAML parse of `.github/workflows/stranger-run.yml` → **YAML PARSE PASS**.
+- README/expectation re-derivation → **5 commands, 5 expectation rows, 0 expected-nonzero rows**.
+- `env -u TYPESAFE_API_KEY -u JEV_API_KEY -u OPENAI_API_KEY -u ANTHROPIC_API_KEY -u XAI_API_KEY -u OPENROUTER_API_KEY python3 scripts/stranger-run-jev-playground.py --source "$PWD" --expect docs/demos/upstream-repro/stranger-run-expected.tsv --out var/agent-tmp/orangefrog-kit-review-20250925/stranger-run-s2-v3.md --timeout 600` → **EXPECTATION PASS rows=5**; command statuses 0, 0, 2 (doctor no-key), 0 (fake Choice), 2 (live ask no-key with explicit NOT_RUN marker).
+- Exact workflow offline shell smoke → doctor `NOT_RUN`, fake Choice `ok=true, choice=c1`, `clone_to_offline_ms=5972`, under the 300000 ms limit. This local smoke starts from the existing checkout; the committed workflow timer starts before `actions/checkout` and records the checkout-inclusive value in the artifact.
+
+Boundary: no TypeSafe/API request and no spend; the live README command was exercised only keylessly and reported NOT_RUN. GitHub-hosted checkout timing remains to be observed on the workflow run.
