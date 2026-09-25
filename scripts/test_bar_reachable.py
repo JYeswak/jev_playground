@@ -15,6 +15,10 @@ MANIFEST = ROOT / "work" / "osw-bestofn" / "heldout_valid_slice.json"
 USED_ROWS = ROOT / "work" / "osw-bestofn" / "live_rows_r3.jsonl"
 R112_SCORE = ROOT / "work" / "osw-bestofn" / "live_score_check_r3.json"
 PREFLIGHT = ROOT / "work" / "osw-bestofn" / "r112_retry_preflight.json"
+HEADROOM_UNREACHABLE_MANIFEST = (
+    ROOT / "work" / "osw-bestofn" / "headroom_unreachable_slice.json"
+)
+EMPTY_USED_ROWS = ROOT / "work" / "osw-bestofn" / "empty_used_rows.jsonl"
 
 
 def run_checker(*args: str) -> tuple[int, dict]:
@@ -78,6 +82,23 @@ class BarReachabilityTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertEqual(receipt["status"], "UNREACHABLE")
         self.assertLess(receipt["wilson_lower_bound_95"], 0.99)
+
+    def test_oracle_headroom_unreachable_when_comparator_misses_would_pass(self):
+        code, receipt = run_checker(
+            "--floor",
+            str(FLOOR),
+            "--manifest",
+            str(HEADROOM_UNREACHABLE_MANIFEST),
+            "--used-rows",
+            str(EMPTY_USED_ROWS),
+        )
+        self.assertEqual(code, 1)
+        self.assertEqual(receipt["status"], "UNREACHABLE")
+        self.assertEqual(receipt["tasks"], 30)
+        self.assertEqual(receipt["comparator_exact"], 20)
+        self.assertEqual(receipt["oracle_headroom"], 3)
+        self.assertEqual(receipt["max_discordant_wins"], 3)
+        self.assertEqual(receipt["minimum_attainable_p"], 0.25)
 
 
 if __name__ == "__main__":
