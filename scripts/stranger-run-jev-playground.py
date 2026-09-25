@@ -321,6 +321,7 @@ def render_receipt(
     uv_version: str,
     timeout: int,
 ) -> None:
+    command_rows = [row for row in rows if row["source"] != "post"]
     failures = [row for row in rows if row["rc"] not in (0, "TEMPLATE")]
     lines = [
         "# README stranger run (2026-09-25)",
