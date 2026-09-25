@@ -52,6 +52,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 FLOOR_PATH = ROOT / "work" / "game-floors" / "miniwob" / "run.py"
 PREREG = "docs/demos/upstream-repro/miniwob-jev-prereg-20260925.md"
+PREREG_V2 = "docs/demos/upstream-repro/miniwob-jev-v2-prereg-20260925.md"
 ROWS_DIR = HERE / "rows"
 
 MODEL = "jev-1.13.0"
@@ -156,7 +157,10 @@ def _interactive(e: dict) -> bool:
 
 
 def build_candidates(
-    utterance: str, els: list[dict], options: dict[int, list[str]] | None
+    utterance: str,
+    els: list[dict],
+    options: dict[int, list[str]] | None,
+    include_none: bool = True,
 ):
     """Return (actions, text_spans, truncated_clicks).
 
@@ -185,7 +189,7 @@ def build_candidates(
                 type_spans[r] = ok
     clicks = floor.clickable_refs(els)
 
-    budget = OPTION_CAP - 1  # "none" always offered
+    budget = OPTION_CAP - (1 if include_none else 0)
     types = sorted(type_spans, key=lambda r: order[r])[:budget]
     budget -= len(types)
     ranked = sorted(clicks, key=lambda r: (not _interactive(by_ref[r]), order[r]))
@@ -202,7 +206,8 @@ def build_candidates(
     actions: dict[str, tuple[str, int]] = {}
     for _, _, kind, r in items:
         actions[f"{kind} [{r}] {describe(by_ref[r], texts.get(r, ''))}"] = (kind, r)
-    actions[NONE_KEY] = ("none", 0)
+    if include_none:
+        actions[NONE_KEY] = ("none", 0)
     return actions, {r: type_spans[r] for r in types}, truncated
 
 
@@ -405,10 +410,14 @@ class RunState:
 class JevPolicy:
     name = "jev"
 
-    def __init__(self, ask, run: RunState, max_steps: int):
+    def __init__(self, ask, run: RunState, max_steps: int, none_policy: str = "always"):
+        if none_policy not in {"always", "after-page-change"}:
+            raise ValueError(f"unknown none policy: {none_policy}")
         self.ask = ask
         self.run = run
         self.max_steps = max_steps
+        self.none_policy = none_policy
+        self.page_fingerprint: str | None = None
         self.step = 0
         self.history: list[dict] = []
         self.calls = 0
@@ -435,14 +444,29 @@ class JevPolicy:
         return kind, ref, text
 
     def _act(self, utterance, els, options):
+        page_fingerprint = json.dumps(
+            {"elements": els, "options": options},
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+        allow_none = (
+            self.none_policy == "always"
+            or self.page_fingerprint is None
+            or page_fingerprint != self.page_fingerprint
+        )
+        self.page_fingerprint = page_fingerprint
         state = floor.serialize_state(
             utterance, els, self.step, self.max_steps, list(self.history), options
         )
-        actions, text_spans, truncated = build_candidates(utterance, els, options)
+        actions, text_spans, truncated = build_candidates(
+            utterance, els, options, include_none=allow_none
+        )
         questions = build_questions(utterance, els, actions, text_spans)
         dec = {
             "step": self.step,
             "n_action_options": len(actions),
+            "none_allowed": allow_none,
             "clicks_truncated": truncated,
             "n_text_heads": len(text_spans),
             "state_bytes": len(
@@ -502,6 +526,7 @@ class JevPolicy:
     def row_fields(self) -> dict:
         return {
             "model_requested": MODEL,
+            "none_policy": self.none_policy,
             "model": sorted(self.models),
             "jev_calls": self.calls,
             "input_tokens": self.input_tokens,
@@ -536,7 +561,9 @@ def done_keys(path: Path) -> set[tuple[str, int, int]]:
     return out
 
 
-def run_plan(plan, ask, out_path: Path | None, max_steps: int) -> int:
+def run_plan(
+    plan, ask, out_path: Path | None, max_steps: int, none_policy: str = "always"
+):
     """Run (task, seed, rep) episodes with the floor's env and run_episode. Returns exit code."""
     args = argparse.Namespace(
         max_steps=max_steps,
@@ -555,7 +582,7 @@ def run_plan(plan, ask, out_path: Path | None, max_steps: int) -> int:
     holder: dict = {}
 
     def factory(rng: random.Random):
-        holder["policy"] = JevPolicy(ask, run, max_steps)
+        holder["policy"] = JevPolicy(ask, run, max_steps, none_policy)
         return holder["policy"]
 
     floor.POLICIES["jev"] = (
@@ -636,7 +663,7 @@ def run_plan(plan, ask, out_path: Path | None, max_steps: int) -> int:
     return 0
 
 
-def cmd_live(shard: str) -> int:
+def cmd_live(shard: str, seeds: str = "benchmark", none_policy: str = "always") -> int:
     if not os.environ.get("TYPESAFE_API_KEY", "").strip():
         print(
             "unconfigured: TYPESAFE_API_KEY unset, no call made (NOT_RUN)",
@@ -647,24 +674,30 @@ def cmd_live(shard: str) -> int:
     from phase_gate import require_bar
 
     here_rel = str(Path(__file__).resolve().relative_to(ROOT))
-    for p in (PREREG, here_rel, str(FLOOR_PATH.relative_to(ROOT))):
+    prereg = PREREG if seeds == "benchmark" and none_policy == "always" else PREREG_V2
+    for p in (prereg, here_rel, str(FLOOR_PATH.relative_to(ROOT))):
         require_bar(p, repo=str(ROOT))  # AttemptPanic: zero calls
     ask = LiveAsker()
     k, n = (int(x) for x in shard.split("/"))
-    tasks = floor.load_task_list()[k::n]
-    plan = floor.episode_plan(
-        tasks, "benchmark", floor.benchmark_seeds(floor.load_task_list())
-    )
+    all_tasks = floor.load_task_list()
+    tasks = all_tasks[k::n]
+    plan = floor.episode_plan(tasks, seeds, floor.benchmark_seeds(all_tasks))
     ROWS_DIR.mkdir(parents=True, exist_ok=True)
-    out_path = ROWS_DIR / f"miniwob-jev.s{k}.jsonl"
+    if seeds == "benchmark" and none_policy == "always":
+        filename = f"miniwob-jev.s{k}.jsonl"
+    elif none_policy == "after-page-change":
+        filename = f"miniwob-jev-v2.s{k}.jsonl"
+    else:
+        filename = f"miniwob-jev-v1-heldout.s{k}.jsonl"
+    out_path = ROWS_DIR / filename
     have = done_keys(out_path)
     todo = [p for p in plan if p not in have]
     print(
-        f"shard {k}/{n}: {len(todo)} to run, {len(plan) - len(todo)} resumed",
+        f"shard {k}/{n}: {len(todo)} to run, {len(plan) - len(todo)} resumed; seeds={seeds}; none_policy={none_policy}",
         file=sys.stderr,
         flush=True,
     )
-    return run_plan(todo, ask, out_path, floor.BENCHMARK_MAX_STEPS)
+    return run_plan(todo, ask, out_path, floor.BENCHMARK_MAX_STEPS, none_policy)
 
 
 def cmd_dev(fake, tasks, seeds, out, max_steps, dump_request=None) -> int:
@@ -745,6 +778,13 @@ def selftest() -> int:
     check(tspans[4] == ["Tomato"], "select text head = spans equal to an option")
     check(("click", 3) in kinds and ("none", 0) in kinds, "click and none offered")
     check(trunc == 0, "no truncation on a small page")
+    acts_v2, _, _ = build_candidates(
+        "Select Tomato and click Submit",
+        els,
+        {4: ["Apple", "Tomato"]},
+        include_none=False,
+    )
+    check(NONE_KEY not in acts_v2, "after-page-change policy can remove none")
     lab6 = next(k for k, v in acts.items() if v == ("click", 6))
     check('"Tomato"' in lab6, "checkbox labelled by its <label> text run")
     acts2, tspans2, _ = build_candidates("Select nothing", els, {4: ["Apple"]})
@@ -874,12 +914,16 @@ def main(argv=None) -> int:
     )
     lv = sub.add_parser("live")
     lv.add_argument("--shard", default="0/1")
+    lv.add_argument("--seeds", default="benchmark")
+    lv.add_argument(
+        "--none-policy", choices=["always", "after-page-change"], default="always"
+    )
     a = ap.parse_args(argv)
     if a.cmd == "selftest":
         return selftest()
     if a.cmd == "dev":
         return cmd_dev(a.fake, a.tasks, a.seeds, a.out, a.max_steps, a.dump_request)
-    return cmd_live(a.shard)
+    return cmd_live(a.shard, a.seeds, a.none_policy)
 
 
 if __name__ == "__main__":
