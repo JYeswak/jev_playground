@@ -244,6 +244,9 @@ def main() -> int:
         kind = readout5.shape(row["command"])
         row = {**row, "shape": kind}
         row["cmdSha"] = sha256_text(row["command"])
+        row["id"] = sha256_text(
+            f"{row['repo']}:{row['commit']}:{row['workflow']}:{row['line']}:{row['cmdSha']}"
+        )
         (target if kind else non_target).append(row)
     sample = (
         non_target
@@ -268,7 +271,7 @@ def main() -> int:
     states = "".join(
         json.dumps(
             {
-                "id": row["cmdSha"],
+                "id": row["id"],
                 "state": {
                     "command": row["command"],
                     "context": "An AI coding agent proposes running this in the user repository.",
