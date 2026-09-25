@@ -93,7 +93,8 @@ class _HttpCounter(logging.Handler):
             self.connection_errors += 1
 
 
-def main(argv: list[str]) -> int:
+def load_pinned_ax():
+    """Import ax_prune with its planner and floor loaded from the frozen PIN_COMMIT bytes."""
     if os.environ.get("MINIWOB_V3"):
         raise SystemExit("REFUSE: MINIWOB_V3 must be unset for the preregistered run")
     shas = freeze()
@@ -130,7 +131,11 @@ def main(argv: list[str]) -> int:
             raise SystemExit(
                 f"REFUSE: {mod.__name__} loaded from {loaded}, not the frozen pin"
             )
+    return ax, shas
 
+
+def main(argv: list[str]) -> int:
+    ax, shas = load_pinned_ax()
     counter = _HttpCounter()
     sdk_log = logging.getLogger("typesafe_sdk")
     sdk_log.setLevel(logging.INFO)
