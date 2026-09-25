@@ -2030,3 +2030,9 @@ Boundary: **0 API requests**; no Jev, OpenAI, Anthropic, xAI, or OpenRouter
 request was authorized or sent. The quoted-number check remains textual
 containment, not semantic recomputation. The TEMPLATE command was listed and
 not executed.
+
+## jev-u6qc Decision-log provenance enforcement (2026-09-25) [offline-verified]
+
+Keyless tests: `python3 -m unittest work/row-provenance-check/test_row_provenance_check.py` → **12/12 passed**. Decision/action rows are now detected and validated; committed legacy decision logs are exempted by pinned SHA without rewriting. The live checker exits 0 and reports **8 experiment row files / 3278 rows / 2 decision logs / 4 exempted files**. A mutation skipping decision-log detection turns the suite RED. No TypeSafe calls or spend.
+
+Boundary: no model judgment, no live Jev call, and no row content was rewritten. The TESTS.md registry row is updated; pane-1 non-author verification remains pending.

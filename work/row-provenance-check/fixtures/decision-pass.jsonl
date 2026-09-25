@@ -1,0 +1,2 @@
+{"chosen": "move tackle", "candidates": ["move tackle", "switch alpha"], "run_py_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "started_utc": "2026-09-25T10:00:00Z"}
+{"decision": "click [1]", "action": "click", "code_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "finished_utc": "2026-09-25T10:00:01+00:00"}

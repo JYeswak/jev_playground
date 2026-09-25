@@ -164,6 +164,40 @@ class RowProvenanceCheckerTests(unittest.TestCase):
         self.assertIn("work/rows/legacy.jsonl", result.stderr)
         self.assertIn("code_sha256 or run_py_sha256", result.stderr)
 
+    def test_decision_log_with_hash_and_timestamp_passes(self) -> None:
+        self.install("decision-pass.jsonl", AFTER)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("checked 1 experiment row file", result.stdout)
+        self.assertIn("decision logs 1", result.stdout)
+
+    def test_decision_log_missing_hash_fails_with_file_and_row(self) -> None:
+        self.install("decision-missing-hash.jsonl", AFTER)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("work/rows/decision-missing-hash.jsonl", result.stderr)
+        self.assertIn("row 1", result.stderr)
+        self.assertIn("code_sha256 or run_py_sha256", result.stderr)
+
+    def test_decision_log_before_cutoff_is_skipped(self) -> None:
+        self.install("decision-missing-hash.jsonl", BEFORE)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("decision logs 0", result.stdout)
+
+    def test_decision_log_exemption_pins_legacy_bytes(self) -> None:
+        self.install(
+            "decision-missing-hash.jsonl", AFTER, filename="legacy-decisions.jsonl"
+        )
+        path = self.repo / "work" / "rows" / "legacy-decisions.jsonl"
+        self.write_exemption(
+            "work/rows/legacy-decisions.jsonl",
+            hashlib.sha256(path.read_bytes()).hexdigest(),
+        )
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("decision logs exempted 1", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

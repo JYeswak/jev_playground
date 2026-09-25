@@ -148,8 +148,19 @@ def sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def check_file(path: Path, relative: str) -> tuple[int, str | None]:
+def is_decision_row(row: object) -> bool:
+    if not isinstance(row, dict):
+        return False
+    return (
+        isinstance(row.get("chosen"), str)
+        and ("candidates" in row or "options" in row)
+        or ("decision" in row and "action" in row)
+    )
+
+
+def check_file(path: Path, relative: str) -> tuple[int, str | None, int]:
     experiment_rows = 0
+    decision_rows = 0
     first_error: tuple[int, list[str]] | None = None
     with path.open(encoding="utf-8") as stream:
         for row_number, raw in enumerate(stream, 1):
@@ -161,8 +172,14 @@ def check_file(path: Path, relative: str) -> tuple[int, str | None]:
                 return (
                     experiment_rows,
                     f"{relative} row {row_number} invalid JSON: {exc.msg}",
+                    decision_rows,
                 )
-            if not isinstance(row, dict) or not EXPERIMENT_KEYS.intersection(row):
+            if not isinstance(row, dict):
+                continue
+            decision = is_decision_row(row)
+            if decision:
+                decision_rows += 1
+            if not EXPERIMENT_KEYS.intersection(row) and not decision:
                 continue
             experiment_rows += 1
             missing: list[str] = []
@@ -173,9 +190,26 @@ def check_file(path: Path, relative: str) -> tuple[int, str | None]:
             if missing and first_error is None:
                 first_error = (row_number, missing)
     if first_error is None:
-        return experiment_rows, None
+        return experiment_rows, None, decision_rows
     row_number, missing = first_error
-    return experiment_rows, f"{relative} row {row_number} missing {'; '.join(missing)}"
+    return (
+        experiment_rows,
+        f"{relative} row {row_number} missing {'; '.join(missing)}",
+        decision_rows,
+    )
+
+
+def decision_row_count(path: Path) -> int:
+    count = 0
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        if not raw.strip():
+            continue
+        try:
+            row = json.JSONDecoder().decode(raw)
+        except json.JSONDecodeError:
+            continue
+        count += int(is_decision_row(row))
+    return count
 
 
 def main() -> int:
@@ -192,7 +226,11 @@ def main() -> int:
 
     checked_files = 0
     checked_rows = 0
+    checked_decision_files = 0
+    checked_decision_rows = 0
     exempted_files = 0
+    exempted_decision_files = 0
+    exempted_decision_rows = 0
     errors: list[str] = []
     for relative in paths:
         added = first_added.get(relative)
@@ -207,12 +245,19 @@ def main() -> int:
                 )
                 continue
             exempted_files += 1
+            decision_rows = decision_row_count(repo / relative)
+            if decision_rows:
+                exempted_decision_files += 1
+                exempted_decision_rows += decision_rows
             continue
-        rows, error = check_file(repo / relative, relative)
+        rows, error, decision_rows = check_file(repo / relative, relative)
         if rows == 0:
             continue
         checked_files += 1
         checked_rows += rows
+        if decision_rows:
+            checked_decision_files += 1
+            checked_decision_rows += decision_rows
         if error is not None:
             errors.append(error)
 
@@ -220,7 +265,10 @@ def main() -> int:
         print(f"ERROR: {error}", file=sys.stderr)
     print(
         f"checked {checked_files} experiment row file(s), "
-        f"{checked_rows} experiment rows, exempted {exempted_files} file(s)"
+        f"{checked_rows} experiment rows, checked decision logs "
+        f"{checked_decision_files} file(s)/{checked_decision_rows} rows, "
+        f"exempted {exempted_files} file(s), decision logs exempted "
+        f"{exempted_decision_files} file(s)/{exempted_decision_rows} rows"
     )
     return 1 if errors else 0
 
