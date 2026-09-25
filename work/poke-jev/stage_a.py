@@ -296,6 +296,7 @@ def cmd_sample():
             indent=1,
             sort_keys=True,
         )
+        fh.write("\n")
     print(json.dumps(dict(stats), sort_keys=True), file=sys.stderr)
     return 0
 
@@ -523,6 +524,7 @@ def cmd_score():
     )
     with open(RECEIPT, "w", encoding="utf-8") as fh:
         json.dump(result, fh, indent=1, sort_keys=True)
+        fh.write("\n")
     print(
         json.dumps(
             {

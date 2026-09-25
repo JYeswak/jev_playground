@@ -1,0 +1,22 @@
+{
+ "hf_repo": "milkkarten/pokechamp",
+ "hf_rev": "b5820ff5d0c8d5e5cec692d55f756b6e5a66a203",
+ "pokechamp": "0f84c46",
+ "seed": 20260925,
+ "stats": {
+  "calib:1200-1399": 250,
+  "calib:1400-1599": 250,
+  "calib:1600-1799": 250,
+  "calib:1800+": 250,
+  "eval:1200-1399": 500,
+  "eval:1400-1599": 500,
+  "eval:1600-1799": 500,
+  "eval:1800+": 500,
+  "excluded:illusion": 36,
+  "excluded:length": 61,
+  "excluded:transform": 41,
+  "state-failed:AttributeError": 1,
+  "state-failed:RuntimeError": 11,
+  "state-failed:ValueError": 50
+ }
+}
