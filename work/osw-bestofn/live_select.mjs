@@ -48,7 +48,9 @@ for (const line of lines) {
 }
 
 function reward(task, choice) {
-  return choice && choice !== "none" ? Number(rows[task]?.[floor.selected_archives[Number(choice.slice(1))]] ?? 0) : 0;
+  if (!choice || choice === "none") return 0;
+  const archive = /^c\d+$/.test(choice) ? floor.selected_archives[Number(choice.slice(1))] : choice;
+  return Number(rows[task]?.[archive] ?? 0);
 }
 function exact(task, choice) {
   return reward(task, choice) >= 1.0 ? 1 : 0;
