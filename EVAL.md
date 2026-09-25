@@ -2408,3 +2408,26 @@ location or state transition, because no different source-derived goal is curren
 Boundary: this is keyless emulator, feasibility, and power evidence only. It does not measure
 Jev accuracy, cost, latency, calibration, or any live/API result; the power receipt is host-uv
 evidence rather than pinned-image evidence because the image has no SciPy.
+
+## jev-1ww3 reachability preflight gate (2026-09-25) [test]
+
+Added scripts/bar-reachable.py and scripts/test_bar_reachable.py. The checker reads committed
+OSWorld floor/split receipts and computes the best possible exact McNemar result before a live
+call. For jev-jjwt's held-out split, the committed floor offers 22/24 exact comparator wins,
+leaving at most 2 Jev-only wins: minimum attainable two-sided exact McNemar p is 0.5, so the
+checker exits 1 with UNREACHABLE. For R112's committed 337-task score receipt, observed b=2,
+c=8 implies 289 comparator exact wins and 48 possible Jev-only wins; minimum attainable p is
+below 0.05, so the checker exits 0 with REACHABLE.
+
+Keyless evidence:
+
+- uv run python scripts/test_bar_reachable.py — 3/3 passed.
+- A planted mutation replacing max_wins = tasks - comparator_exact with max_wins = comparator_exact
+  made 2 tests fail; restoring the computation returned the suite to 3/3.
+- uv run ruff check scripts/bar-reachable.py scripts/test_bar_reachable.py — clean.
+- uv run ruff format --check scripts/bar-reachable.py scripts/test_bar_reachable.py — both formatted.
+- ubs scripts/bar-reachable.py scripts/test_bar_reachable.py — 0 warnings.
+
+Boundary: no Jev call, no API key, no spend. This proves only that the preregistered bars are
+reachable or unreachable from committed offline evidence; it does not measure Jev accuracy,
+cost, latency, or model behavior.
