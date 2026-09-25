@@ -264,7 +264,6 @@ Everything else under this root is a **vendored clone** and its tests belong to 
 
 | `scripts/row-provenance-check.py` + `work/row-provenance-check/test_row_provenance_check.py` | Run: `python3 -m unittest work.row-provenance-check.test_row_provenance_check && python3 scripts/row-provenance-check.py` | newly committed `work/**/*.jsonl` experiment rows must carry `code_sha256` or `run_py_sha256` and an ISO-8601 UTC timestamp; pre-cutoff and non-experiment JSONL are skipped; first bad row is named; timestamp-check mutation turns the suite RED | 5/5 offline; live 5 experiment row files / 94 rows; mutation RED |
 | `scripts/arm-sanity.py` + `work/arm-sanity/test_arm_sanity.py` | Run: `python3 -m unittest work/arm-sanity/test_arm_sanity.py` | keyless action-type mix gate over committed PokéJev and MiniWoB fixtures: r3 code vs stage-b mix-v1 rejects, mix-v1 vs control passes, c7651c4-window vs pre-window rejects with `type=type arm=0.000`, difference-only shift rejects without concentration, too few eligible rows is `NOT_RUN`, and dropping the offered-type filter is a planted RED | 6/6 offline; mutation RED |
-| `work/miniwob-jev/jev_arm.py` + `work/miniwob-jev/v3_options_test.py` | Run: `/tmp/jev-miniwob-jev/venv/bin/python work/miniwob-jev/v3_options_test.py` | fake click-only Jev reaches `--sanity-after K`, imports the shared arm-sanity checker, writes an `arm_sanity_stop` row on exit 1, and no-flag behavior matches the pre-gate selftest | 5/5 keyless; mutation RED |
 ---
 
 ## 2. Upstream's — each vendored clone runs its own suite
