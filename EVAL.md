@@ -2262,3 +2262,37 @@ The live receipt was updated with this audit:
 `7154c9beef9c04f2da76d3101750dd6b3a38460b4c33e05025e76d00d778611f`; score-check SHA-256
 `d9483cb4d1f35c5223020a409da8d53d8054d14bc039f2c56ed79140d8758a75`. Boundary: this is a
 post-run feasibility audit; no additional Jev call was made.
+## jev-ja32 Jev tool routing skill (2026-09-25) [test]
+
+Commit `73480f9` adds the project skill `.omp/skills/jev-tools/SKILL.md`, routing agents to
+`jev_rerank`, `jev_claim_check`, `jev_flag`, `jev_screen`, and the automatic `omp-jev-review`
+extension. Its applicability limits cite the committed rerank, claim-check, R80/R82/R83, tool-output,
+and diff-review receipts; it does not promote any receipt's scope into a general accuracy claim.
+
+The installed promotion gate
+`/Users/josh/.agents/skills/skill-promotion-quality-gate/scripts/skill-lint.sh .omp/skills/jev-tools`
+passed `yaml_strict`, `trigger_smoke`, `references_existence`, and `smoke_invocation`. A fresh
+`omp --mode=rpc --no-ui --max-time=120` session prompted `Read skill://jev-tools`; its
+`get_last_assistant_text` response was `jev-tools` followed by the first body line.
+
+Boundary: no organic fleet call per tool has been observed yet; this is skill-load evidence, not L3
+or L4 seam validation. `ubs .omp/skills/jev-tools/SKILL.md` returned exit 3 because Markdown has no
+supported scanner, so UBS is NOT a pass. The changed-file secret scan returned no matches.
+
+## jev-jy7t.1.12 Emerald live provenance repair (2026-09-25) [test]
+
+The keyless repair restores `kind: "macro"` on worker rows so `parent()`'s existing
+`kind == "macro"` aggregation remains live, and adds `code_sha256` plus UTC
+`recorded_at_utc` to every worker output line, including fatal lines. `LIVE_RECEIPT.md`
+renames the historical `runner_sha256` field to `code_sha256`, retains `key_status`, and
+states that its digest came from an uncommitted `live_segment.py`; no committed live runner
+matches that digest. The committed row-source check found 6,449 rows in tracked
+`live-results.jsonl` for seeds 0..79; `live-resume.jsonl` is untracked and contributed no
+committed row.
+
+Keyless checks: `uv run python -m unittest work/pokeagent-emerald/test_macro_choice.py
+work/pokeagent-emerald/test_capture_state.py` (5 tests), `uv run ruff check
+work/pokeagent-emerald/live_segment.py work/pokeagent-emerald/test_macro_choice.py`, and
+`ubs work/pokeagent-emerald/live_segment.py work/pokeagent-emerald/test_macro_choice.py`
+all passed. Boundary: no Jev call, no live spend, and no state-blind control was run in this
+repair; the historical Emerald receipt was not rescored.

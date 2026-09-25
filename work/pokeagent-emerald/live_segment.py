@@ -88,7 +88,7 @@ def worker(args: argparse.Namespace) -> int:
     emulator_cls = import_module("pokemon_env.emulator").EmeraldEmulator
     format_state = import_module("utils.state_formatter").format_state_for_llm
     TypeSafeClient = import_module("typesafe_sdk").TypeSafeClient
-    runner_sha = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    code_sha = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     env = emulator_cls(args.rom, headless=True, sound=False)
     env.initialize()
     for button in BOOT_MACROS[: START_MACRO + 1]:
@@ -113,6 +113,8 @@ def worker(args: argparse.Namespace) -> int:
             except Exception as exc:
                 error = {
                     "kind": "fatal",
+                    "code_sha256": code_sha,
+                    "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
                     "seed": args.seed,
                     "macro_index": macro_index,
                     "error": f"{type(exc).__name__}: {exc}",
@@ -125,7 +127,8 @@ def worker(args: argparse.Namespace) -> int:
             _press(env, button)
             after = _raw_state(env)
             row = {
-                "runner_sha256": runner_sha,
+                "kind": "macro",
+                "code_sha256": code_sha,
                 "recorded_at_utc": datetime.now(timezone.utc).isoformat(),
                 "seed": args.seed,
                 "macro_index": macro_index,

@@ -117,6 +117,7 @@
     "LIVE_RECEIPT_RESUME.md",
     "baseline-pilot-v*.jsonl"
   ],
-  "runner_sha256": "8d0b98f8cf549402fb80dc53fa9774bb29f24b57963049b4e8d5ed1d9ca8f5c6"
+  "code_sha256": "8d0b98f8cf549402fb80dc53fa9774bb29f24b57963049b4e8d5ed1d9ca8f5c6",
+  "code_sha256_source": "work/pokeagent-emerald/live_segment.py at run time; no committed version matches this digest; run code was never committed"
 }
 ```
