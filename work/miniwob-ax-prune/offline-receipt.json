@@ -1,7 +1,7 @@
 {
   "receipt_type": "keyless-selftest",
-  "source_commit": "dd04baf",
-  "recorded_at": "2026-09-25T03:52:28Z",
+  "source_commit": "b62e9e6",
+  "recorded_at": "2026-09-25T03:59:40Z",
   "lane": "offline",
   "live_requests": 0,
   "model": null,
@@ -15,8 +15,12 @@
       "result": "PASS: selectors, subgraph closure, Noul refusal, Jev v1 adapter"
     },
     {
-      "command": "ubs work/miniwob-ax-prune/ax_prune.py",
-      "result": "PASS: exit 0; 0 critical issues; 1 warning"
+      "command": "P=/tmp/jev-miniwob-jev/venv/bin/python; $P work/miniwob-ax-prune/score.py --selftest",
+      "result": "PASS: AX row validation helpers and nearest-rank summaries"
+    },
+    {
+      "command": "ubs work/miniwob-ax-prune/ax_prune.py work/miniwob-ax-prune/score.py",
+      "result": "PASS: exit 0; 0 critical issues; 2 warnings"
     }
   ],
   "boundary": "This receipt proves only keyless syntax, selector, validator, adapter-plumbing, and static-scan behavior. It does not exercise MiniWoB episodes, live TypeSafe responses, token usage, wall time, or the preregistered held-out bar."
