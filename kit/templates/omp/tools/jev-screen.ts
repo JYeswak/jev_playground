@@ -4,8 +4,7 @@
  *
  * THE SEAT IT USES. Question text is the U1 MAIN question verbatim
  * (work/nev-injection/live_unit1.mjs:21-33, 58/60 live with framing delta 0.0
- * in U2); the 0.5 cut is the full-bench cut (Jev 639/662 = 0.9653 vs grok-4
- * 0.8429 vs haiku 0.8746, McNemar p=2.0e-18 / 2.2e-14 —
+ * in U2); the 0.5 cut is the full-bench cut; this template names no paid comparator and never invokes one.
  * work/nev-differential/DIFF-RECEIPT.json @57d30e9). Same state shape
  * {assistant, user_message} as the bench WithContext arm. Asker injectable;
  * default is the live asker (needs TYPESAFE_API_KEY).
