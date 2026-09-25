@@ -101,9 +101,9 @@ hit rate; adding the cache requires a new preregistration that retains this unca
 ```bash
 PYTHONPATH=work/jev-if python3 -m unittest work/jev-if/test_puct.py
 
-. scripts/lib/agent_tmp.sh
-agent_tmp_init "jev-jericho-keyless"
-docker run --rm --platform linux/arm64 -v "$AGENT_TMP:/results" jev-if:wave1 \
+run_dir="var/agent-tmp/jev-jericho-keyless-$(date +%s)"
+mkdir -p "$run_dir"
+docker run --rm --platform linux/arm64 -v "$PWD/$run_dir:/results" jev-if:wave1 \
   --game zork1 --arm uniform --seed 1 --out /results/zork1-uniform-s1.jsonl
 ```
 
@@ -111,18 +111,33 @@ The keyless arm is required before the live arm. It must finish with a final row
 and `prior_calls=0`, `prior_failed=0`, and `$0`. The offline unit suite must be green. A fake-asker
 run may be used only as a keyless call-count/latency feasibility probe and is not scored.
 
+## Keyless checkpoint
+
+The required offline unit suite was green: **32/32**. The required keyless uniform run completed
+with no error row:
+
+```text
+game=zork1 seed=1 status=ok steps=9 done=true
+final_score=25 max_score=35 wall_s=303.826
+prior_requests=257 prior_calls=0 prior_failed=0
+input_tokens=0 output_tokens=0 spend=USD 0
+```
+
+This is `offline-verified` for the uniform arm only. It is not a Jev result and does not
+authorize a live call. The output was written under the ignored `var/agent-tmp/` scratch root.
+
 ## Live commands
 
 Build the image from this tree with the pinned Dockerfile. Use one foreground invocation at a time;
 no unattended loop or retry wrapper is permitted. The first authorized live command is:
 
 ```bash
-. scripts/lib/agent_tmp.sh
-agent_tmp_init "jev-jericho-zork1-live-s1"
+run_dir="var/agent-tmp/jev-jericho-zork1-live-s1-$(date +%s)"
+mkdir -p "$run_dir"
 infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
   docker run --rm --platform linux/arm64 \
   -e TYPESAFE_API_KEY \
-  -v "$AGENT_TMP:/results" jev-if:wave1 \
+  -v "$PWD/$run_dir:/results" jev-if:wave1 \
   --game zork1 --arm jev --seed 1 --out /results/zork1-jev-s1.jsonl
 ```
 
