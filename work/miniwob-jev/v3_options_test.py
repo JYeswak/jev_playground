@@ -401,6 +401,45 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
         )
         self.assertEqual(rows[-1]["row_type"], "arm_sanity_stop")
 
+    def test_comma_arm_list_enables_only_named_v3_arms(self):
+        code = """
+import importlib.util, json, os, sys
+sys.path.insert(0, "work/miniwob-jev")
+os.environ["MINIWOB_V3"] = "1"
+os.environ["MINIWOB_V3_ARM"] = "quoted,none"
+import jev_arm
+spec = importlib.util.spec_from_file_location("floor", "work/game-floors/miniwob/run.py")
+floor = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(floor)
+print(json.dumps({
+    "jev_quoted": jev_arm.v3_on("quoted"),
+    "jev_none": jev_arm.v3_on("none"),
+    "jev_color": jev_arm.v3_on("color"),
+    "floor_quoted": floor.v3_on("quoted"),
+    "floor_none": floor.v3_on("none"),
+    "floor_color": floor.v3_on("color"),
+}))
+"""
+        result = subprocess.run(
+            ["/tmp/jev-miniwob-jev/venv/bin/python", "-c", code],
+            cwd=HERE.parent.parent,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(
+            json.loads(result.stdout.splitlines()[-1]),
+            {
+                "jev_quoted": True,
+                "jev_none": True,
+                "jev_color": False,
+                "floor_quoted": True,
+                "floor_none": True,
+                "floor_color": False,
+            },
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

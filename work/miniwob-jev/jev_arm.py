@@ -63,9 +63,11 @@ MODEL = "jev-1.13.0"
 V3_ENABLED = os.environ.get("MINIWOB_V3") == "1"
 V3_ARM = os.environ.get("MINIWOB_V3_ARM", "all")
 
+V3_ARM_NAMES = {part.strip() for part in V3_ARM.split(",") if part.strip()}
+
 
 def v3_on(name: str) -> bool:
-    return V3_ENABLED and V3_ARM in {"all", name}
+    return V3_ENABLED and ("all" in V3_ARM_NAMES or name in V3_ARM_NAMES)
 
 
 OPTION_CAP = 255  # docs-mirror/typesafe/api.md:125, per Choice
