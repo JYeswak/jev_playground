@@ -1,0 +1,50 @@
+{
+  "model": "jev-1.13.0",
+  "callsPerArm": 20,
+  "concurrentArmLimit": 16,
+  "stateSource": {
+    "path": "docs-mirror/typesafe/llms-full.txt",
+    "sha256": "278de4c82484f1535f332c4b6bf0056b39f48aa434431ccdf963230a5f9ec566",
+    "byteLength": 18000
+  },
+  "question": {
+    "relevance": "Does this state contain useful information for a coding agent searching this repository?"
+  },
+  "sequential": {
+    "concurrency": 1,
+    "wallMs": 3164.239,
+    "calls": 20,
+    "successes": 20,
+    "failures": 0,
+    "failureReasons": {},
+    "callLatencyMs": {
+      "p50": 134,
+      "p95": 296.8
+    },
+    "wallPerCallMs": {
+      "p50": 134.24939599999993,
+      "p95": 296.99312115
+    },
+    "inputTokens": 100160,
+    "spendUsd": 0.004206720000000001
+  },
+  "concurrent16": {
+    "concurrency": 16,
+    "wallMs": 532.3027080000002,
+    "calls": 20,
+    "successes": 20,
+    "failures": 0,
+    "failureReasons": {},
+    "callLatencyMs": {
+      "p50": 336.5,
+      "p95": 529.05
+    },
+    "wallPerCallMs": {
+      "p50": 342.4178955000002,
+      "p95": 531.3200104499998
+    },
+    "inputTokens": 100160,
+    "spendUsd": 0.004206720000000001
+  },
+  "boundary": "This is a transport/queue smoke on one committed non-authored state, not an accuracy or ranking result."
+}
