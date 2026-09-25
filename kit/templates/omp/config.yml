@@ -1,0 +1,5 @@
+extensions:
+  - ./.omp/extensions/jev-rerank.ts
+  - ./.omp/extensions/jev-claim-check.ts
+  - ./.omp/extensions/jev-screen.ts
+  - ./.omp/extensions/jev-flag.ts

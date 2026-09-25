@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { askJev, askJevChoice, askJevScore, DEFAULT_MODEL } from "../dist/client.js";
 import { createFakeFetch } from "../dist/fake.js";
+import { installOmp, ompDiscovery } from "../dist/install.js";
 
 const ROOT = new URL("..", import.meta.url);
 
@@ -42,6 +43,7 @@ async function doctor(robot) {
     model: DEFAULT_MODEL,
     key_source: keyPresent ? "environment" : "none",
     sdk: sdkPresent ? "@typesafe-ai/sdk" : "missing",
+    omp: await ompDiscovery(process.cwd()),
   };
   const clean = Object.fromEntries(Object.entries(result).filter(([, value]) => value !== undefined));
   if (robot) robotPrint(clean);
@@ -84,7 +86,12 @@ let exitCode;
 try {
   if (args[0] === "doctor") exitCode = await doctor(robot);
   else if (args[0] === "ask") exitCode = await ask(args);
-  else {
+  else if (args[0] === "omp" && args[1] === "install") {
+    const repo = option(args, "--dir") ?? process.cwd();
+    const result = await installOmp(repo, hasFlag(args, "--dry-run"));
+    if (robot) robotPrint(result); else process.stdout.write(`${result.status}: installed ${result.files.length} files in ${result.repo}\n`);
+    exitCode = 0;
+  } else {
     const error = { status: "ERROR", reason: "usage", message: "jev doctor [--robot] or jev ask ..." };
     if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
     exitCode = 1;

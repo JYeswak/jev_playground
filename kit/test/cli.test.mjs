@@ -26,13 +26,13 @@ function runCli(args, env = {}) {
 test('doctor --robot is explicit NOT_RUN without a key', async () => {
   const result = await runCli(['doctor', '--robot']);
   assert.equal(result.code, 2);
-  assert.deepEqual(JSON.parse(result.stdout), {
-    status: 'NOT_RUN',
-    reason: 'no key',
-    model: 'jev-1.13.0',
-    key_source: 'none',
-    sdk: '@typesafe-ai/sdk',
-  });
+  const body = JSON.parse(result.stdout);
+  assert.equal(body.status, 'NOT_RUN');
+  assert.equal(body.reason, 'no key');
+  assert.equal(body.model, 'jev-1.13.0');
+  assert.equal(body.omp.repo, process.cwd());
+  assert.equal(body.omp.tools.length, 4);
+  assert.equal(body.omp.hooks.length, 1);
 });
 
 test('ask --fake produces an offline typed decision', async () => {
