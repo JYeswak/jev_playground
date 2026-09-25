@@ -34,7 +34,7 @@ def main() -> None:
         url = archive_url(filename)
         archive, remote = open_remote_zip(url)
         try:
-            rows, score = archive_score(archive)
+            rows, score = archive_score(archive, remote)
             if len(rows) != 361 or len(set(rows)) != 361:
                 excluded.append(
                     {

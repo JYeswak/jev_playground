@@ -6,6 +6,8 @@ screenshots, or trajectory text to the repository.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+
 import io
 import json
 import urllib.parse
@@ -63,6 +65,18 @@ class HTTPRangeFile(io.RawIOBase):
         self.fetched_bytes += len(data)
         return len(data)
 
+    def fetch_range(self, start: int, end: int) -> bytes:
+        if start > end:
+            return b""
+        request = urllib.request.Request(
+            self.url,
+            headers={"User-Agent": UA, "Range": f"bytes={start}-{end}"},
+        )
+        with urllib.request.urlopen(request) as response:
+            data = response.read()
+        self.fetched_bytes += len(data)
+        return data
+
 
 def open_remote_zip(url: str) -> tuple[zipfile.ZipFile, HTTPRangeFile]:
     remote = HTTPRangeFile(url)
@@ -92,8 +106,31 @@ def task_key(member: str) -> str:
     return "/".join(parts[-3:-1])
 
 
-def read_result(archive: zipfile.ZipFile, member: str) -> int:
-    value = archive.read(member).decode("utf-8", "replace").strip()
+def read_member_bytes(
+    archive: zipfile.ZipFile, remote: HTTPRangeFile, member: str
+) -> bytes:
+    info = archive.getinfo(member)
+    if info.compress_type != zipfile.ZIP_STORED:
+        return archive.read(member)
+    filename_bytes = info.filename.encode("utf-8")
+    data_start = info.header_offset + 30 + len(filename_bytes) + len(info.extra)
+    data = remote.fetch_range(data_start, data_start + info.compress_size - 1)
+    if len(data) != info.file_size:
+        raise ValueError(
+            f"{member}: stored range length={len(data)} expected={info.file_size}"
+        )
+    return data
+
+
+def read_result(
+    archive: zipfile.ZipFile, member: str, remote: HTTPRangeFile | None = None
+) -> int:
+    source = (
+        read_member_bytes(archive, remote, member)
+        if remote is not None
+        else archive.read(member)
+    )
+    value = source.decode("utf-8", "replace").strip()
     try:
         numeric = float(value)
     except ValueError as exc:
@@ -105,7 +142,14 @@ def read_result(archive: zipfile.ZipFile, member: str) -> int:
     return int(numeric)
 
 
-def archive_score(archive: zipfile.ZipFile) -> tuple[dict[str, int], int]:
+def archive_score(
+    archive: zipfile.ZipFile, remote: HTTPRangeFile | None = None
+) -> tuple[dict[str, int], int]:
     members = result_members(archive)
-    rows = {task_key(member): read_result(archive, member) for member in members}
+
+    def read_one(member: str) -> tuple[str, int]:
+        return task_key(member), read_result(archive, member, remote)
+
+    with ThreadPoolExecutor(max_workers=32) as executor:
+        rows = dict(executor.map(read_one, members))
     return rows, sum(rows.values())
