@@ -104,6 +104,10 @@ work/jev-score-register/scores.jsonl
 work/jev-triage/advisory-veto.jsonl
 work/p2-localjev/
 
+# Usage-router goals harvested from our own sessions (jev-vbh.4): session text, pinned by
+# sha256 in the prereg and regenerable with harvest_goals.py, so it never enters git.
+work/jev-usage-router/goals-*.jsonl
+
 # Live mail/cass row exports (may contain operational text)
 work/cass-mail-mines/exports/*.jsonl
 !work/cass-mail-mines/exports/*-receipt.txt

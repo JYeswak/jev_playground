@@ -17,12 +17,24 @@ import { askJevChoice } from '../../jev-client/src/index.ts';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
-const CRITERIA = {
+export const CRITERIA = {
   local: 'Answerable from local context, files, or memory without network.',
   research: 'Needs web search, corpus lookup, or multi-source gathering.',
   browser: 'Needs interactive browser, booking UI, or live page actions.',
   bypass: 'Unclear, irreversible, or should stay with a human / full agent.',
 };
+export const INSTRUCTIONS =
+  'Choose the cheapest adequate next action for this job. Prefer local when possible. Use bypass when unclear or irreversible.';
+
+/** The Choice state the router sends: goal, completed work, and the offered actions. */
+export function routeState(input) {
+  return {
+    goal: input.goal,
+    completed_work: input.completedWork ?? 'Nothing yet.',
+    available_actions: input.candidates ?? Object.keys(CRITERIA),
+  };
+}
+
 export async function loadConfig(configPath = path.join(ROOT, 'config.json')) {
   const raw = JSON.parse(await readFile(configPath, 'utf8'));
   return raw;
@@ -78,17 +90,12 @@ export async function routeUsage(input) {
   }
 
   const classes = CRITERIA;
-  const state = {
-    goal: input.goal,
-    completed_work: input.completedWork ?? 'Nothing yet.',
-    available_actions: input.candidates ?? Object.keys(CRITERIA),
-  };
+  const state = routeState(input);
 
   try {
     const r = await askJevChoice({
       state,
-      instructions:
-        'Choose the cheapest adequate next action for this job. Prefer local when possible. Use bypass when unclear or irreversible.',
+      instructions: INSTRUCTIONS,
       classes,
       model: config.model ?? 'jev-1.13.0',
       apiKey,
