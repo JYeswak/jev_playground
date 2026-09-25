@@ -499,6 +499,23 @@ When an upstream clone does not do what a demo needs, the ONLY acceptable moves 
 Editing a clone until green, then citing that tree's test suite as evidence, is the highest-value
 lie available in this workspace. Do not produce it.
 
+**Forks, patches and issues are in scope (Joshua, 2026-09-25, verbatim):** *"we can patch upstream
+forks to fix if we find issues"* / *"we can also submit issues to them"* / *"i want to keep native
+dicklesworthstone stuff but for others we can play with them"*.
+
+- **Dicklesworthstone repos stay native.** Use them as published; no forks, no patches. Today that
+  is `skillranker` (and its `-tip` copy); re-derive with the census above. Any issue to a
+  Dicklesworthstone repo goes only through `jeff-issue.py` (the dcg pack
+  `zeststream-upstream-issues` blocks `gh issue create` there otherwise).
+- **Every other upstream is ours to fork, patch and report.** When a loss-depth autopsy finds a
+  defect in someone else's code, fix it on a fork under `JYeswak/`, never in the pinned vendored
+  clone: `EVAL.md` rows name those SHAs, and an in-place edit silently changes what they measured.
+  Record the fork SHA wherever a result depends on it, keep the upstream SHA it diverged from, and
+  say what changed in the fork's README.
+- **File the issue too.** Evidence first (a failing input, the file and line, a measured effect,
+  a proposed fix), dedupe against the repo's open and closed issues before writing, one defect per
+  issue, and link it from the bead. A PR from the fork follows only once the fix is measured.
+
 ### Signals Must Name What They Observed
 
 A **signal** is anything a later reader trusts without re-deriving it: a log line, a return value,
