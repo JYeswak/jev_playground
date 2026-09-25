@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run fixed-script and uniform-random Emerald macro baselines without a model."""
+"""Run fixed-sequence and uniform-random Emerald macro baselines without a model."""
 
 from __future__ import annotations
 
@@ -21,9 +21,9 @@ from macro_choice import LEGAL_INPUTS
 START_MACRO = 228
 START_LOCATION = "MOVING_VAN"
 DEFAULT_CAP = 500
-SCRIPTED_SEED = 20260925
-_scripted_rng = random.Random(SCRIPTED_SEED)
-SCRIPTED_TAIL = [_scripted_rng.choice(LEGAL_INPUTS) for _ in range(DEFAULT_CAP)]
+FIXED_SEQUENCE_SEED = 20260925
+_fixed_rng = random.Random(FIXED_SEQUENCE_SEED)
+FIXED_SEQUENCE = [_fixed_rng.choice(LEGAL_INPUTS) for _ in range(DEFAULT_CAP)]
 
 
 def _state(env: Any) -> dict[str, Any]:
@@ -50,7 +50,12 @@ def _boot_to_start(env: Any) -> dict[str, Any]:
 
 
 def run_one(
-    emulator_cls: Any, rom: str, policy: str, seed: int, cap: int, scripted: list[str]
+    emulator_cls: Any,
+    rom: str,
+    policy: str,
+    seed: int,
+    cap: int,
+    fixed_sequence: list[str],
 ) -> dict[str, Any]:
     # A separate worker process per run avoids the native mGBA crash caused by
     # accumulating cores across repeated runs in one interpreter.
@@ -60,8 +65,8 @@ def run_one(
     start = _boot_to_start(env)
     rng = random.Random(seed)
     buttons = (
-        scripted
-        if policy == "scripted"
+        fixed_sequence
+        if policy == "fixed_sequence"
         else [rng.choice(LEGAL_INPUTS) for _ in range(cap)]
     )
     goal = False
@@ -92,7 +97,7 @@ def run_one(
 def _single(args: argparse.Namespace) -> int:
     emulator_cls = import_module("pokemon_env.emulator").EmeraldEmulator
     row = run_one(
-        emulator_cls, args.rom, args.policy, args.seed, args.cap, SCRIPTED_TAIL
+        emulator_cls, args.rom, args.policy, args.seed, args.cap, FIXED_SEQUENCE
     )
     print(json.dumps(row, separators=(",", ":")))
     return 0
@@ -102,14 +107,14 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--rom", required=True)
     parser.add_argument("--output")
-    parser.add_argument("--scripted", type=int, default=20)
-    parser.add_argument("--random", type=int, default=20)
+    parser.add_argument("--fixed-sequence", type=int, default=33)
+    parser.add_argument("--random", type=int, default=33)
     parser.add_argument("--cap", type=int, default=DEFAULT_CAP)
     parser.add_argument("--harness-sha", required=True)
     parser.add_argument("--seed-offset", type=int, default=0)
     parser.add_argument("--rom-sha1", required=True)
     parser.add_argument("--single", action="store_true")
-    parser.add_argument("--policy", choices=("scripted", "random"))
+    parser.add_argument("--policy", choices=("fixed_sequence", "random"))
     parser.add_argument("--seed", type=int)
     args = parser.parse_args()
 
@@ -124,9 +129,10 @@ def main() -> int:
     output.parent.mkdir(parents=True, exist_ok=True)
     code_sha = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
     rows = []
-    jobs = [("scripted", args.seed_offset + seed) for seed in range(args.scripted)] + [
-        ("random", 1000 + args.seed_offset + seed) for seed in range(args.random)
-    ]
+    jobs = [
+        ("fixed_sequence", args.seed_offset + seed)
+        for seed in range(args.fixed_sequence)
+    ] + [("random", 1000 + args.seed_offset + seed) for seed in range(args.random)]
     for policy, seed in jobs:
         command = [
             sys.executable,
@@ -177,7 +183,7 @@ def main() -> int:
         json.dumps(
             {
                 "rows": len(rows),
-                "scripted": args.scripted,
+                "fixed_sequence": args.fixed_sequence,
                 "random": args.random,
                 "cap": args.cap,
                 "code_sha256": code_sha,

@@ -66,12 +66,16 @@ At the harness normal preset (80 frames/s, 18 frames per macro), the rate is 4.4
 
 **Action cap:** 500 macros after the fixed start. Legal inputs are exactly the 11 labels above. No screenshots, save states, ROM bytes, chat, or model output enter the baseline rows.
 
-**Scripted baseline:** from macro 228, apply the deterministic SCRIPTED_SEED=20260925 sequence in run_baselines.py; N=33 seed rows. Keyless rerun: 33/33 reached the goal in 154 macros.
+**Fixed-sequence baseline:** from macro 228, apply the deterministic FIXED_SEQUENCE_SEED=20260925 sequence in run_baselines.py; N=33 repeated rows are descriptive provenance, not independent policy replicates. Keyless rerun: 33/33 reached the goal in 154 macros.
 
-**Uniform-random baseline:** for each seed 1000..1032, choose each legal input independently and uniformly for at most 500 macros from the same macro-228 start. Stop on the goal or at the cap. The runner records the goal boolean, macro count, start/final compact state, UTC timestamp, runner SHA-256, harness SHA, and ROM SHA-1. Keyless rerun: 26/33 reached the goal; successful macro counts are the baseline distribution.
+**Uniform-random baseline:** for each seed 1000..1032, choose each legal input independently and uniformly for at most 500 macros from the same macro-228 start. Stop on the goal or at the cap. The runner records the goal boolean, macro count, start/final compact state, UTC timestamp, runner SHA-256, harness SHA, and ROM SHA-1. Keyless rerun: 26/33 reached the goal; 7 failures are assigned the cap of 500 macros.
 
-**Power/MDE choice:** N=33 per arm was selected a priori with statsmodels.stats.power.NormalIndPower, one-sided alpha 0.05, power 0.80, equal arms, and a minimally important success-rate difference of 0.70 scripted/Jev versus 0.40 random. The same calculation gives N=30 for 0.80 versus 0.50 and N=15 for 0.90 versus 0.50. These are planning assumptions, not observed power.
+**Power/MDE choice:** the future primary comparison is one-sided Mann-Whitney on macro counts with failures represented as 500, success rate not below random, alpha 0.05, and p<0.05. A simulation seeded 20260925 bootstrapped the observed random distribution and found N=30 per policy for 80% power to detect a 50-macro reduction. This is the preregistered MDE and not observed power. The fixed-sequence arm is descriptive N=1: repeating the same deterministic sequence does not create independent samples.
 
-**Future Jev bar:** after key rotation, run the same start/goal/cap on held-out seeds not used here. Jev must reach the goal on at least 70% of held-out seeds and have a lower median macro count than the random baseline among successful runs. If fewer than five random runs reach the goal, the macro-count comparison is NO-CLAIM rather than a fabricated median.
+**Future Jev choice rule:** argmax over Jev probabilities is deterministic from this emulator start and is N=1 descriptive. The primary N=30 segment samples one macro from the returned 11-way probabilities using a preregistered per-seed PRNG; each seed gets the same start, cap, goal, and no-model baselines.
+
+**Future Jev bar:** after key rotation, Jev success rate must not be below random and the seeded Jev macro-count distribution must beat random by the one-sided Mann-Whitney p<0.05 criterion. If fewer than five random runs reach the goal, the macro-count comparison is NO-CLAIM rather than a fabricated median.
+
+**Pilot boundary:** seven untracked baseline-pilot-v*.jsonl files remain from pre-final keyless pilots; they are not committed results and are named here rather than silently treated as evidence.
 
 **No-call boundary:** this prereg, builder, and both baselines run with no TypeSafe API key and no model. A live segment may not start until Joshua explicitly confirms the key rotation.
