@@ -22,6 +22,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install uv for README commands
+        uses: astral-sh/setup-uv@v7
+
+
       - name: Run every README command keyless against this checkout
         env:
           TYPESAFE_API_KEY: ""
