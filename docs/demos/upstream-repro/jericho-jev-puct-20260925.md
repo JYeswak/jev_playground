@@ -212,3 +212,33 @@ protocols use different action spaces, memory, or rollout settings. It is not an
 this unit is a public runnable experiment. It is not a comparator-model result: paid comparisons
 are stopped. It does not use Laya. A live result is only `live-verified (N=...)` after the exact
 rows, model, tokens, and spend are recorded; keyless rows are `offline-verified` only.
+
+## Live checkpoint and continuation (2026-09-25)
+
+The uncached Jev Zork1 seed-1 checkpoint completed with `status=ok`, 9 steps, `done=true`,
+final score 25/35, wall 317.530 s, 261 prior requests, 261 calls, 0 prior failures, 131,385
+input tokens, 20,573 output tokens, and estimated spend `$0.005518170` at `$0.042/M` input
+tokens. The resolved model was `jev-1.13.0`. Its source row was copied byte-for-byte to
+`work/jev-if/rows/zork1-jev-s1.jsonl`; source and tracked SHA-256 are both
+`443e7a250602e689ffad0e58722ffde580c765b1566d9c575ec3b6689a6bf991`.
+
+Because 261 is below 3 × the keyless uniform count (771), continuation was authorized. Zork1
+seed 2 completed with `status=ok`, 35-step cap, `done=false`, score 44/44, wall 1884.914 s,
+1,971 prior requests, 1,941 calls, 7 prior validation failures, 1,013,756 input tokens,
+182,176 output tokens, and `$0.042577752`; seed 3 completed with `status=ok`, 35-step cap,
+`done=false`, score 44/44, wall 1478.798 s, 1,744 requests, 1,737 calls, 7 prior validation
+failures, 860,769 input tokens, 142,078 output tokens, and `$0.036152298`. Their tracked row
+SHA-256 values are respectively
+`8d574380ef66de53a6e38791d3c66374fc68fdbae0bcfb0a3ea872a104fa4b34` and
+`96f2478b34e3f90cc2dd29e2a050dfe8f28352c863fa4633bc4896750250365c`; both `cmp` checks returned
+0.
+
+The preregistration already names the non-auth malformed-answer behavior: it records a failed
+node and uses the uniform-prior fail-safe (lines 34–39). The 7 `prior_failed` rows on each of
+seeds 2 and 3 therefore require no prereg amendment; they are disclosed and are not silently
+recounted as successful Jev priors.
+
+The remaining Detective and Deephome seeds were launched concurrently in separate containers
+after the Zork1 seed-3 row completed. The three Deephome processes use the committed 14,400-second
+per-run wall budget. Their completion status, CPU-contention note, and any NOT-SCORED timeout
+rows will be appended after all six rows settle.
