@@ -1,0 +1,756 @@
+{
+ "source": "BrowserGym @9e779f0 browsergym/experiments/src/browsergym/experiments/benchmark/metadata/miniwob.csv (unchanged since fd1792c, 2024-10-23); order matters: benchmark seeds are drawn in this row order",
+ "benchmark": "BrowserGym DEFAULT_BENCHMARKS['miniwob'] (configs.py:101-114): all 125 rows, n_repeats=5, max_steps=10, seeds_rng=np.random.RandomState(42), seeds = rng.randint(0, SEED_MAX, size=5) per task with SEED_MAX = 2 ^ 32 == 34 (loop.py:35, Python XOR)",
+ "tasks": [
+  {
+   "task": "ascending-numbers",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "bisect-angle",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "book-flight",
+   "miniwob_category": "original",
+   "comment": "delay",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "book-flight-nodelay",
+   "miniwob_category": "nodelay",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "buy-ticket",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "choose-date",
+   "miniwob_category": "original",
+   "comment": "delay",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "choose-date-easy",
+   "miniwob_category": "debug",
+   "comment": "delay",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "choose-date-medium",
+   "miniwob_category": "debug",
+   "comment": "delay",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "choose-date-nodelay",
+   "miniwob_category": "nodelay",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "choose-list",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "circle-center",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-button",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-button-sequence",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-checkboxes",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-checkboxes-large",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-checkboxes-soft",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-checkboxes-transfer",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-collapsible",
+   "miniwob_category": "original",
+   "comment": "delay",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-collapsible-2",
+   "miniwob_category": "original",
+   "comment": "delay",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-collapsible-2-nodelay",
+   "miniwob_category": "nodelay",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-collapsible-nodelay",
+   "miniwob_category": "nodelay",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-color",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-dialog",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-dialog-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-link",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-menu",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-menu-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-option",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-pie",
+   "miniwob_category": "original",
+   "comment": "delay",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-pie-nodelay",
+   "miniwob_category": "nodelay",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-scroll-list",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-shades",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-shape",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-tab",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-tab-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-tab-2-easy",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-tab-2-hard",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-tab-2-medium",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-test",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "click-test-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-test-transfer",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "click-widget",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "copy-paste",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "copy-paste-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "count-shape",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "count-sides",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "daily-calendar",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "drag-box",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "drag-circle",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "drag-cube",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "drag-items",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "drag-items-grid",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "drag-shapes",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "drag-shapes-2",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "drag-single-shape",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "drag-sort-numbers",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "draw-circle",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "draw-line",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "email-inbox",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "email-inbox-delete",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "email-inbox-forward",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "email-inbox-forward-nl",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "email-inbox-forward-nl-turk",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "email-inbox-important",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "email-inbox-nl-turk",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "email-inbox-noscroll",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "email-inbox-reply",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "email-inbox-star-reply",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "enter-date",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "enter-password",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "enter-text",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "enter-text-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "enter-text-dynamic",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "enter-time",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "find-greatest",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "find-midpoint",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "find-word",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "focus-text",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "focus-text-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "form-sequence",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "form-sequence-2",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "form-sequence-3",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "generate-number",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "grid-coordinate",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "guess-number",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "highlight-text",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "highlight-text-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "hot-cold",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "identify-shape",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "login-user",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "login-user-popup",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "multi-layouts",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "multi-orderings",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "navigate-tree",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "number-checkboxes",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "odd-or-even",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "order-food",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "phone-book",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "read-table",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "read-table-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "resize-textarea",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "right-angle",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "scroll-text",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "scroll-text-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "search-engine",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "sign-agreement",
+   "miniwob_category": "hidden test",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "simple-algebra",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "simple-arithmetic",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "social-media",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "social-media-all",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "social-media-some",
+   "miniwob_category": "additional",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "stock-market",
+   "miniwob_category": "hidden test",
+   "comment": "delay",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "terminal",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "text-editor",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "text-transform",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "tic-tac-toe",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "unicode-test",
+   "miniwob_category": "debug",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "use-autocomplete",
+   "miniwob_category": "original",
+   "comment": "delay",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "use-autocomplete-nodelay",
+   "miniwob_category": "nodelay",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "use-colorwheel",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "use-colorwheel-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "use-slider",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "use-slider-2",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  },
+  {
+   "task": "use-spinner",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "test"
+  },
+  {
+   "task": "visual-addition",
+   "miniwob_category": "original",
+   "comment": "",
+   "browsergym_split": "train"
+  }
+ ]
+}

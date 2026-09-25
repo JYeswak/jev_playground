@@ -1,0 +1,41 @@
+{
+  "scenario": "defend_the_center",
+  "actions": {
+    "0": "TURN_LEFT",
+    "1": "TURN_RIGHT",
+    "2": "ATTACK"
+  },
+  "screen": {
+    "width": 1280,
+    "crosshair_x": 640,
+    "left_if_screen_x_below": 512,
+    "right_if_screen_x_above": 768
+  },
+  "objects": [
+    {
+      "category": "unknown",
+      "label": "MarineChainsawVzd",
+      "screen_x": 364,
+      "position_hint": "LEFT of center → need TURN_LEFT to aim",
+      "distance": 429.3
+    },
+    {
+      "category": "unknown",
+      "label": "MarineChainsawVzd",
+      "screen_x": 642,
+      "position_hint": "CENTER → can ATTACK now!",
+      "distance": 734.7
+    },
+    {
+      "category": "unknown",
+      "label": "DoomPlayer",
+      "screen_x": 566,
+      "position_hint": "CENTER → can ATTACK now!",
+      "distance": 0.0
+    }
+  ],
+  "player": {
+    "health": 100,
+    "armor": 0
+  }
+}
