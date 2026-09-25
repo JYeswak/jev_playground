@@ -1898,7 +1898,7 @@ Boundary: no TypeSafe API call, no paid spend, no model judgment, and no claim a
 
 ## jev-5v4s Arm action-mix sanity checker (2026-09-25) [offline-verified]
 
-Keyless tests: `python3 -m unittest work/arm-sanity/test_arm_sanity.py` → **5/5 passed**. Committed fixtures prove PokéJev r3 code vs stage-b mix-v1 exits 1, mix-v1 vs mix-v1-control exits 0, the c7651c4-window MiniWoB rows vs pre-window rows exits 1, and too few eligible rows exits 2. A temporary mutation removing the offered-type filter made the explicit eligible-row test pass with 0 instead of exit 2, so the plant was RED.
+Keyless tests: `python3 -m unittest work/arm-sanity/test_arm_sanity.py` → **6/6 passed**. Committed fixtures prove PokéJev r3 code vs stage-b mix-v1 exits 1, mix-v1 vs mix-v1-control exits 0, the c7651c4-window MiniWoB rows report `type=type arm=0.000` and exit 1 against the pre-window rows, the difference-only fixture (switch 0.750 vs 0.410) exits 1 without concentration, and too few eligible rows exits 2. A temporary mutation removing the offered-type filter made the explicit eligible-row test pass with 0 instead of exit 2, so the plant was RED.
 
 Direct keyless commands reported the expected exit sequence `1, 0, 1, 2`; `ruff format --check`, `ruff check`, and `ubs scripts/arm-sanity.py work/arm-sanity/test_arm_sanity.py` were run. No TypeSafe calls or spend were used.
 

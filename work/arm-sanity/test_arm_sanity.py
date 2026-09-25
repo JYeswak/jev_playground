@@ -30,6 +30,8 @@ MINIWOB_GOOD = (
     ROOT
     / "work/miniwob-jev/rows/miniwob-jev-v3-contaminated-smoke-quoted-exact.s0.jsonl"
 )
+DIFF_ARM = ROOT / "work/arm-sanity/fixtures/difference-only-arm.jsonl"
+DIFF_REFERENCE = ROOT / "work/arm-sanity/fixtures/difference-only-reference.jsonl"
 
 
 class ArmSanityContract(unittest.TestCase):
@@ -62,7 +64,12 @@ class ArmSanityContract(unittest.TestCase):
     def test_miniwob_c7651c4_window_type_mix_is_rejected(self):
         result = self.run_check(MINIWOB_BAD, MINIWOB_GOOD, "--min-rows", "10")
         self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
-        self.assertIn("type", result.stdout.lower())
+        self.assertIn("type=type arm=0.000", result.stdout)
+
+    def test_difference_rule_rejects_nonconcentrated_mix_shift(self):
+        result = self.run_check(DIFF_ARM, DIFF_REFERENCE)
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("arm=0.750 reference=0.410 diff=0.340", result.stdout)
 
     def test_single_type_offers_do_not_count_as_eligible(self):
         result = self.run_check(MIX_V1, MIX_V1, "--min-rows", "3000")
