@@ -62,6 +62,14 @@ compaction:
 # working and makes it redundant.
 
 
+# jev-xw3f: after the 2026-09-25 05:57Z key exposure, redact provider-visible text,
+# including tool results, using omp's built-ins and the TypeSafe regex in .omp/secrets.yml.
+# Sessions started before this change remain unprotected until restart. The key arrives
+# per command via infisical run, not omp's startup env-var collector, so the regex must
+# catch it; local session logs still contain restored values.
+secrets:
+  enabled: true
+
 # omp-kit (1).zip, installed 2026-09-23. Global ttsr.repeatMode is once, which
 # the kit author measured as catching 1 of 6 back-to-back violations. after-gap
 # with gap 0 caught all 6 on omp 18.2.10. Project config overrides the global.
