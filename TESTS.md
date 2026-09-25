@@ -74,16 +74,22 @@ claim nobody can check:
 - `work/omp-jev-review/test_skill_census.py` — the `Skills 24h:` line of
   `work/omp-jev-review/surface-census.py --fleet-line` (jev-yy7f), on row shapes copied from real
   omp session files, no model calls: a `read` of `skill://<name>` or `skill://<name>/<file>`, a read
-  under `.claude/skills/<name>/` or `.agents/skills/<name>/`, a `bash` call naming such a `SKILL.md`,
-  and the `skill-prompt` invocation row each count; a glob or directory listing, a toolResult that
-  quotes the header, non-skill reads, a `/tmp` probe session, a row older than 24h and a read whose
-  toolResult is `isError: true` ("Unknown skill" in a pane older than the install) do not; a skill
-  missing from `~/.claude/skills/THIRD-PARTY-SKILLS.tsv` counts in the total only; no ledger is
+  under `.claude/skills/<name>/` or `.agents/skills/<name>/`, a skill file as an argument of a bash
+  file reader (grep/cat/sed/..., `python3 -c "open(...)"`), an `eval` cell calling `read(`,
+  `tool.read(` or `open(` on one (py and JS cells, copied from codex sessions), and the
+  `skill-prompt` invocation row each count; a glob or directory listing, a skill path inside a
+  message (`ntm send '...'`, `br comments add "..."`, pane 1's real dispatches), a Python cell that
+  only quotes a read call in a string, a toolResult that quotes the header, non-skill reads, a `/tmp`
+  probe session, a row older than 24h and a call whose toolResult is `isError: true` ("Unknown
+  skill" in a pane older than the install) do not; a skill missing from
+  `~/.claude/skills/THIRD-PARTY-SKILLS.tsv` counts in the total only; no ledger is
   `third-party NOT_RUN (no ledger)` and no session files is `NOT_RUN`, never zero; the CLI prints
   the judge line then the skills line, `scripts/fleet-idle-watch.py --once` shows both, and a
-  census timeout is NOT_RUN for both. Planting "drop the absolute-path branch" in `skill_names`
-  fails 2 of 13; "ignore error results" fails 1; HEAD's watcher fails the timeout test.
-  Run: `python3 -m unittest work/omp-jev-review/test_skill_census.py` (13 tests).
+  census timeout is NOT_RUN for both. Plants, each restored byte-identical: drop the absolute-path
+  branch fails 5 of 17; e9d037e's any-mention bash rule 1; drop the bash reader branch 2; drop
+  `python -c` 1; drop the eval branch 2; Python cells by regex instead of ast 1; ignore error
+  results 2; HEAD's watcher fails the timeout test.
+  Run: `python3 -m unittest work/omp-jev-review/test_skill_census.py` (17 tests).
 - `work/fleet-idle-watch/test_fleet_idle_watch.py` — `scripts/fleet-idle-watch.py`'s classifier
   on process evidence (jev-6con), no tmux or ps: fixtures are the real process trees of jev panes
   0, 2, 4, 5 and two real screens, 2026-09-25. Both measured false readings: a screen with no
