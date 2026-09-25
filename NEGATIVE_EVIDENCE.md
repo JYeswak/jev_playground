@@ -4352,3 +4352,36 @@ that logs per-node answers shows a changed design (H1 one Noul first) meeting bo
 
 Receipt: `docs/demos/upstream-repro/miniwob-ax-prune-20260925.md`. Rows: `2c6cfed` (dev) and
 `66b8f61` (held-out).
+
+## R108 — REFUTED: frozen-alpha action/opponent mixture reaches the 70% Abyssal kill line
+
+**Claim (bead `jev-9gtw.1`, prereg `3977399`, amended `e657c48`).** Blending Jev's action
+prior and opponent model with the usage floor (`player alpha=0.40`, `opponent alpha=0.25`)
+would materially improve the Stage B Abyssal arm enough to clear the preregistered 70% kill
+line. The implementation was an isolated wrapper; `work/poke-jev/` stayed unchanged. Imported
+Stage B sources were pinned per row by SHA-256.
+
+**Measured 2026-09-24/25, live `jev-1.13.0`, N=200 battles per arm, pair seed `20260926`.**
+The live arm completed 200/200 with no 402 and 9,921 Jev calls, 36,326,568 input tokens,
+and $1.5257 Jev spend. The zero-call control completed 200/200 with zero calls and $0.
+
+| Arm | Wins / N | ITT win rate | Wilson 95% CI | Fallbacks | Jev calls | Spend |
+|---|---:|---:|---:|---:|---:|---:|
+| frozen-alpha live | 114/200 | 0.570 | [0.5007, 0.6367] | 84 `Unknown move: nothing` | 9,921 | $1.5257 |
+| zero-call control | 81/200 | 0.405 | [0.3394, 0.4742] | 4,675 (4,618 disabled; 57 `Unknown move: nothing`) | 0 | $0 |
+
+The frozen blend is +2 wins over the original Stage B 56.0% result, not a new kill. The
+paired comparison was 57 live wins versus 24 control wins in discordant pairs (exact
+McNemar two-sided `p=0.0002`), but the live Wilson upper bound remains 63.67%, below 70%.
+The kill condition therefore holds. The live receipt also reports 84 unknown-move fallbacks;
+the prior Stage B arm had 105 across 12 battles.
+
+**What it refutes.** This frozen action-prior/opponent-model mixture does not solve the
+loss-depth target. It does not refute a better leaf evaluator, a fixed unknown-move bug, a
+wider/deeper search within the 15-second turn, different team seeds, or Jev generally.
+
+**Retry condition.** Do not rerun this same mixture as a battle arm. Reopen only after the
+`Unknown move: nothing` path is fixed with a keyless regression test and a new preregistered
+leaf/search-width change has passed its held-out component gate; use fresh battle seeds and
+the same 70% line. Receipts and rows: `71bde42` (control) and `c60edae` (live), under
+`work/loss-depth/pokejev-components/battle/stage-b/`.
