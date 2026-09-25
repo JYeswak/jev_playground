@@ -7,6 +7,7 @@ State  = from process evidence first, screen second (bead jev-6con):
            working   the omp status line shows a spinner, OR omp has a live descendant that is not
                      one of its own long-lived helpers (OMP_HELPERS), i.e. a tool call is running,
                      OR a session .jsonl omp holds open was written in the last SESSION_FRESH s.
+           stalled-wait  a wait marker, a session idle for IDLE_STALL_S+, and no CPU-active child
            idle      omp is there and none of the above holds.
          Each state carries the evidence that decided it, e.g. "working (child: docker run ...)".
 Alert  = `ntm send jev --pane=1 "IDLE pane N ..."` after POLLS consecutive non-working polls,
@@ -51,6 +52,10 @@ INTERVAL = int(os.environ.get("IDLE_INTERVAL", "60"))
 POLLS = int(os.environ.get("IDLE_POLLS", "2"))
 REALERT = int(os.environ.get("IDLE_REALERT", "600"))
 SPINNER = re.compile(r"^\s*[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]")
+WAIT_MARKER = re.compile(
+    r"(?:^\s*[⌛⏳]|^\s*Wait\b|\bwaiting on \d+ jobs?\b)",
+    re.I | re.M,
+)
 # Comma list of pane indexes to watch; empty = every worker (index >= 2). Set it when some panes
 # are down for a known reason (2026-09-24: the five Muse panes hit a quota that resets 09-28).
 WATCH = {
@@ -70,8 +75,13 @@ OMP_HELPERS = (
     "@morphllm/morphmcp",  # MCP server morph: npm exec @morphllm/morphmcp
     "/morph-mcp",  # its node child …/.bin/morph-mcp, or the bin/morph-mcp.sh wrapper
     "franken-harvest serve",  # MCP server franken-harvest
+    "typescript-language-server",
+    "pyright-langserver",
+    "rust-analyzer",
+    "gopls",
 )
 SESSION_FRESH = int(os.environ.get("IDLE_SESSION_FRESH", "60"))
+IDLE_STALL_S = int(os.environ.get("IDLE_STALL_S", "600"))
 # Agent Mail paging (bead jev-lqfm). Paths are read from the env each round, not at import, so a
 # test that points HOME or these at a temp tree never reads or writes the real ones.
 INBOX_ROOT = (
@@ -92,6 +102,7 @@ class Snapshot(NamedTuple):
     screen: str  # tmux capture-pane text
     omp: bool  # an omp process is in the pane's process tree
     tools: tuple[str, ...] = ()  # non-helper descendants of omp, preorder
+    cpu_tools: tuple[str, ...] = ()  # non-helper descendants with ps %CPU > 0
     session_age: float | None = (
         None  # seconds since omp's open session .jsonl was written
     )
@@ -105,12 +116,32 @@ def short(command: str, width: int = 90) -> str:
 
 
 def classify(snap: Snapshot) -> tuple[str, str]:
-    """(working | idle | no-agent, the evidence that decided it)."""
+    """(working | stalled-wait | idle | no-agent, the deciding evidence)."""
     if not snap.omp:
         return (
             "no-agent",
             f"no omp in the pane's process tree; foreground {snap.command}",
         )
+    wait = WAIT_MARKER.search(snap.screen)
+    if wait:
+        if snap.cpu_tools:
+            more = (
+                f" (+{len(snap.cpu_tools) - 1} more)" if len(snap.cpu_tools) > 1 else ""
+            )
+            return (
+                "working",
+                f"wait marker, child using CPU: {short(snap.cpu_tools[-1])}{more}",
+            )
+        if snap.session_age is not None and snap.session_age < IDLE_STALL_S:
+            return (
+                "working",
+                f"wait marker, session written {snap.session_age:.0f}s ago",
+            )
+        if snap.session_age is not None:
+            return (
+                "stalled-wait",
+                f"wait marker, session idle {snap.session_age:.0f}s, no CPU descendant",
+            )
     lines = [line for line in snap.screen.splitlines() if STATUS.search(line)]
     if lines and SPINNER.match(lines[-1]):
         return "working", "spinner on the status line"
@@ -136,42 +167,91 @@ def last_words(screen: str) -> str:
     return keep[-1][:140] if keep else ""
 
 
-def parse_ps(text: str) -> dict[int, tuple[int, str]]:
-    """`ps -axo pid=,ppid=,command=` → {pid: (ppid, command)}."""
+def parse_ps(text: str) -> dict[int, tuple]:
+    """`ps -axo pid=,ppid=,pcpu=,command=` → {pid: (ppid, cpu, command)}."""
     table = {}
     for row in text.splitlines():
-        parts = row.split(None, 2)
-        if len(parts) == 3 and parts[0].isdigit() and parts[1].isdigit():
-            table[int(parts[0])] = (int(parts[1]), parts[2])
+        parts = row.split(None, 3)
+        if len(parts) == 4 and parts[0].isdigit() and parts[1].isdigit():
+            try:
+                cpu = float(parts[2])
+            except ValueError:
+                table[int(parts[0])] = (int(parts[1]), 0.0, f"{parts[2]} {parts[3]}")
+            else:
+                table[int(parts[0])] = (int(parts[1]), cpu, parts[3])
+        elif len(parts) == 3 and parts[0].isdigit() and parts[1].isdigit():
+            table[int(parts[0])] = (int(parts[1]), 0.0, parts[2])
     return table
 
 
-def omp_processes(
-    table: dict[int, tuple[int, str]], pane_pid: int
-) -> tuple[int | None, list[str]]:
-    """(the first omp pid at or under pane_pid, the commands of its non-helper descendants)."""
+def _parent_command(row: tuple) -> tuple[int, str]:
+    return int(row[0]), str(row[-1])
+
+
+def _cpu(row: tuple) -> float:
+    try:
+        return float(row[1]) if len(row) >= 3 else 0.0
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _process_children(table: dict[int, tuple]) -> dict[int, list[int]]:
     children: dict[int, list[int]] = {}
-    for pid, (ppid, _) in table.items():
+    for pid, row in table.items():
+        ppid, _ = _parent_command(row)
         children.setdefault(ppid, []).append(pid)
+    return children
+
+
+def _find_omp(
+    table: dict[int, tuple], pane_pid: int, children: dict[int, list[int]]
+) -> int | None:
     queue = [pane_pid]
-    omp = None
     while queue:
         pid = queue.pop(0)
-        if pid in table and OMP.search(table[pid][1]):
-            omp = pid
-            break
+        if pid in table and OMP.search(_parent_command(table[pid])[1]):
+            return pid
         queue.extend(sorted(children.get(pid, [])))
+    return None
+
+
+def omp_processes(
+    table: dict[int, tuple], pane_pid: int
+) -> tuple[int | None, list[str]]:
+    """(the first omp pid at or under pane_pid, all non-helper descendants)."""
+    children = _process_children(table)
+    omp = _find_omp(table, pane_pid, children)
     if omp is None:
         return None, []
     tools = []
     stack = sorted(children.get(omp, []), reverse=True)
     while stack:
         pid = stack.pop()
-        command = table[pid][1]
+        command = _parent_command(table[pid])[1]
         if not any(helper in command for helper in OMP_HELPERS):
             tools.append(command)
         stack.extend(sorted(children.get(pid, []), reverse=True))
     return omp, tools
+
+
+def omp_cpu_tools(table: dict[int, tuple], pane_pid: int) -> list[str]:
+    """Return non-helper omp descendants whose ps %CPU is positive."""
+    children = _process_children(table)
+    omp = _find_omp(table, pane_pid, children)
+    if omp is None:
+        return []
+    tools = []
+    stack = sorted(children.get(omp, []), reverse=True)
+    while stack:
+        pid = stack.pop()
+        command = _parent_command(table[pid])[1]
+        if (
+            not any(helper in command for helper in OMP_HELPERS)
+            and _cpu(table[pid]) > 0
+        ):
+            tools.append(command)
+        stack.extend(sorted(children.get(pid, []), reverse=True))
+    return tools
 
 
 def session_age(omp_pid: int, now: float) -> float | None:
@@ -212,7 +292,7 @@ def poll() -> dict[int, tuple[str, str]]:
     ).stdout
     table = parse_ps(
         subprocess.run(
-            ["ps", "-axo", "pid=,ppid=,command="],
+            ["ps", "-axo", "pid=,ppid=,pcpu=,command="],
             capture_output=True,
             text=True,
             timeout=10,
@@ -232,11 +312,13 @@ def poll() -> dict[int, tuple[str, str]]:
         omp, tools = (
             omp_processes(table, int(pane_pid)) if pane_pid.isdigit() else (None, [])
         )
+        cpu_tools = omp_cpu_tools(table, int(pane_pid)) if pane_pid.isdigit() else []
         snap = Snapshot(
             command=command,
             screen=screen,
             omp=omp is not None,
             tools=tuple(tools),
+            cpu_tools=tuple(cpu_tools),
             session_age=session_age(omp, time.time()) if omp is not None else None,
         )
         state, evidence = classify(snap)
@@ -270,6 +352,29 @@ def page(message: str) -> bool:
     said = "paged" if ok else "page FAILED"
     print(f"{time.strftime('%H:%M:%SZ', time.gmtime())} {said}: {message}", flush=True)
     return ok
+
+
+def page_stalled_once(
+    index: int,
+    now: float,
+    session_age: float,
+    last_line: str,
+    stalled_since: dict[int, float],
+    alerted: set[int],
+    send=page,
+) -> bool:
+    """Page one stalled-wait episode once, even when ntm itself is unavailable."""
+    if index in alerted:
+        return False
+    stalled_since.setdefault(index, now - session_age)
+    waiting_s = max(0.0, now - stalled_since[index])
+    message = (
+        f"STALLED pane {index}: waiting {waiting_s / 60:.0f} min, "
+        f"session idle {session_age / 60:.0f} min, last line: {last_line}"
+    )
+    send(message)
+    alerted.add(index)
+    return True
 
 
 def inbox_paths() -> tuple[Path, Path]:
@@ -440,22 +545,41 @@ def main() -> int:
         return selftest()
     if "--once" in sys.argv:
         states = poll()
-        for index, (state, words) in sorted(states.items()):
+        for index, reading in sorted(states.items()):
+            state, words = reading[:2]
             print(f"pane {index}: {state} {words}")
         for line in ci_lines():
             print(line)
         for line in judge_lines():
             print(line)
         print(inbox_round(*inbox_paths(), time.time(), page), flush=True)
-        return 1 if any(state != "working" for state, _ in states.values()) else 0
+        return 1 if any(reading[0] != "working" for reading in states.values()) else 0
     streak: dict[int, int] = {}
     idle_since: dict[int, float] = {}
     alerted_at: dict[int, float] = {}
+    stalled_since: dict[int, float] = {}
+    stalled_alerted: set[int] = set()
     print(f"watching {SESSION} worker panes every {INTERVAL}s", flush=True)
     started = time.time()
     while True:
         now = time.time()
-        for index, (state, words) in poll().items():
+        for index, reading in poll().items():
+            state, words = reading[:2]
+            if state == "stalled-wait":
+                match = re.search(r"session idle ([0-9.]+)s", words)
+                if match:
+                    last_line = words.rsplit(")  ", 1)[-1]
+                    page_stalled_once(
+                        index,
+                        now,
+                        float(match.group(1)),
+                        last_line,
+                        stalled_since,
+                        stalled_alerted,
+                    )
+                continue
+            stalled_since.pop(index, None)
+            stalled_alerted.discard(index)
             if state == "working":
                 streak.pop(index, None)
                 idle_since.pop(index, None)

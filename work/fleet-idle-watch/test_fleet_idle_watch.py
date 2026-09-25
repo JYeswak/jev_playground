@@ -25,8 +25,8 @@ import sys
 import tempfile
 import unittest
 from datetime import datetime, timezone
-from unittest import mock
 from pathlib import Path
+from unittest import mock
 
 HERE = Path(__file__).resolve().parent
 FIX = HERE / "fixtures"
@@ -41,17 +41,21 @@ PANE2_SCREEN = (FIX / "pane2-idle-prompt-docker.screen").read_text()
 PANE5_SCREEN = (FIX / "pane5-diff-todo-no-status.screen").read_text()
 PANE_PID = {0: 1370, 2: 11832, 4: 45425, 5: 37332}
 OLD = 600.0  # a session file last written 10 minutes ago
+WAIT_SCREEN = PANE5_SCREEN + "\n⏳ waiting on 1 job\n"
 
 
-def snapshot(pane, screen, command="bun", session_age=OLD, table=TABLE):
+def snapshot(pane, screen, command="bun", session_age=OLD, table=TABLE, cpu_tools=None):
     omp, tools = fiw.omp_processes(table, PANE_PID[pane])
-    return fiw.Snapshot(
-        command=command,
-        screen=screen,
-        omp=omp is not None,
-        tools=tuple(tools),
-        session_age=session_age,
-    )
+    fields = {
+        "command": command,
+        "screen": screen,
+        "omp": omp is not None,
+        "tools": tuple(tools),
+        "session_age": session_age,
+    }
+    if cpu_tools is not None:
+        fields["cpu_tools"] = tuple(cpu_tools)
+    return fiw.Snapshot(**fields)
 
 
 class ProcessTree(unittest.TestCase):
@@ -116,6 +120,82 @@ class Classify(unittest.TestCase):
             snapshot(0, "josh@studio jev % ", command="zsh", session_age=None)
         )
         self.assertEqual(state, "no-agent", evidence)
+
+    def test_stale_wait_with_only_helpers_is_stalled(self):
+        state, evidence = fiw.classify(
+            snapshot(
+                5,
+                WAIT_SCREEN,
+                session_age=fiw.IDLE_STALL_S,
+                cpu_tools=[],
+            )
+        )
+        self.assertEqual(state, "stalled-wait", evidence)
+        self.assertIn("wait marker", evidence)
+        self.assertIn("session idle 600s", evidence)
+
+    def test_wait_with_running_descendant_is_working(self):
+        state, evidence = fiw.classify(
+            snapshot(
+                5,
+                WAIT_SCREEN,
+                session_age=fiw.IDLE_STALL_S,
+                cpu_tools=["docker run --rm battle"],
+            )
+        )
+        self.assertEqual(state, "working", evidence)
+        self.assertIn("child using CPU", evidence)
+
+    def test_wait_under_stall_age_is_working(self):
+        state, evidence = fiw.classify(
+            snapshot(
+                5,
+                WAIT_SCREEN,
+                session_age=fiw.IDLE_STALL_S - 1,
+                cpu_tools=[],
+            )
+        )
+        self.assertEqual(state, "working", evidence)
+        self.assertIn("session written 599s ago", evidence)
+
+    def test_stalled_wait_pages_once_per_episode(self):
+        sent = []
+        stalled_since = {}
+        alerted = set()
+
+        def send(message):
+            sent.append(message)
+            return True
+
+        self.assertTrue(
+            fiw.page_stalled_once(
+                5,
+                now=1800.0,
+                session_age=1200.0,
+                last_line="Wait: waiting on 1 job",
+                stalled_since=stalled_since,
+                alerted=alerted,
+                send=send,
+            )
+        )
+        self.assertFalse(
+            fiw.page_stalled_once(
+                5,
+                now=1860.0,
+                session_age=1260.0,
+                last_line="Wait: waiting on 1 job",
+                stalled_since=stalled_since,
+                alerted=alerted,
+                send=send,
+            )
+        )
+        self.assertEqual(
+            sent,
+            [
+                "STALLED pane 5: waiting 20 min, session idle 20 min, last line: "
+                "Wait: waiting on 1 job"
+            ],
+        )
 
     def test_true_idle(self):
         # pane 4's tree (helpers only), pane 2's idle status line, old session file

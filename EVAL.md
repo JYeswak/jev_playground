@@ -1879,3 +1879,11 @@ Keyless test command: `env -u TYPESAFE_API_KEY -u JEV_API_KEY /tmp/jev-miniwob-j
 The v3 report marks six harness-bug row files **NOT-SCORED**: `c7651c4` (`05:35:41Z`) dropped text-input candidates and `afd8a5b` (`07:25:58Z`) restored them; every run in that window typed 0 times. The 11 untracked `miniwob-jev-v3-dev-*.jsonl` copies remain untouched.
 
 Boundary: no TypeSafe calls, no held-out run, no live lane, and no score is claimed. `foundation/gates.sh` and `foundation/gates.sh --selftest` both returned **ALL GREEN**. `ubs work/miniwob-jev/jev_arm.py work/miniwob-jev/v3_options_test.py` returned exit 1 with baseline Python findings in the two files; this is not a clean UBS pass.
+
+## jev-t54m Fleet watcher stalled-wait reading (2026-09-25) [offline-verified]
+
+Keyless command: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` → **28/28 passed** (24 existing plus 4 stalled-wait/paging tests). Real screen/process fixtures remain the basis; the new cases cover a stale wait with only MCP/LSP helpers, a CPU-active child, and a session age of 599 seconds. A temporary mutation that ignored the session-age threshold classified the 599-second case as `stalled-wait`, so the test turned RED as required. `ruff format --check`, `ruff check`, and `ubs scripts/fleet-idle-watch.py work/fleet-idle-watch/test_fleet_idle_watch.py` returned 0.
+
+One keyless `env -u TYPESAFE_API_KEY -u JEV_API_KEY python3 scripts/fleet-idle-watch.py --once` poll returned CI, judge, skills, and inbox lines. No `jev` tmux session was available, so no live pane state was observed; the hub watcher was not restarted.
+
+Boundary: no TypeSafe calls, no Jev spend, no live stalled pane, and no hub restart. The remaining live-pane proof requires the fleet session to be present.
