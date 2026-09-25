@@ -149,8 +149,10 @@ matching task coverage, not per-task scores:
 - `razzant/ouroboros-osworld-verified-opus5` at snapshot
   `f52ebf2248ce0ce0c496db18f5e6edce631304fa`, candidate `c1`, Apache-2.0.
 
-The fixed task manifest is `work/osw-bestofn/heldout_valid_slice.json`. It contains all 361
-domain/task IDs in lexicographic order, with SHA-256
+The fixed task manifest is `work/osw-bestofn/heldout_valid_slice.json` (file SHA-256
+`7aa586ed485d48d8f35dde4bac9e6cea0d64705a49f5f041d31d715be897aea8`). Its 361 domain/task IDs
+are lexicographically ordered; the separate digest below is the SHA-256 of the newline-joined ID
+list, not of the JSON file:
 `aafabe6fd1f06b7dcb2a3d57397722871ce909295ae3ce3556d5fdcf2e7586c3`. Before freezing it, the
 Hugging Face tree API was read only for path metadata: each snapshot exposed 361 task-ID
 directories, the two ID sets were equal, and no `result.txt`, `task_outcome.json`,
