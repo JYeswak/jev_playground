@@ -154,6 +154,11 @@ claim nobody can check:
   `node --experimental-strip-types --test work/citation-check/test/check.test.mjs` (7 tests).
 - `work/pokeagent-emerald/test_capture_state.py` — offline state-receipt percentile statistics.
   Run: `python3 -m unittest work/pokeagent-emerald/test_capture_state.py` (1 test).
+- `work/pokeagent-emerald/test_macro_choice.py` — the keyless Emerald macro Choice builder
+  (`macro_choice.py`, jev-jy7t.1.12): the request is a `Choice` pinned to the model over the
+  harness's legal inputs and never carries `state_text` or the screenshot; the budget reports rate
+  (20 requests/s), time, tokens and cost from state sizes without any network call. Typed SKIP on
+  Python < 3.12. Run: `python3 -m unittest work/pokeagent-emerald/test_macro_choice.py` (2 tests).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
