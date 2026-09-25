@@ -98,8 +98,17 @@ claim nobody can check:
   `no-agent`, a helpers-only omp with a 600 s old session file is `idle`, the 60 s freshness
   boundary, omp's helpers (`OMP_HELPERS`) are not tools while a subprocess of its eval kernel is,
   and the status-line `--selftest` (7/7). The HEAD screen-only classifier fails both false-reading
-  fixtures; planting "ignore descendants" in `omp_processes` fails 3 of 14.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (14 tests).
+  fixtures; planting "ignore descendants" in `omp_processes` fails 3 of 14. Agent Mail pages
+  (jev-lqfm), on archive files written per test in the real `…__42478.md` shape with the send
+  injected: urgent and high page pane 1 once each as `MAIL <importance> from <from>: <subject>
+  (id <id>, <HH:MM>Z)`, normal never; a second poll pages nothing; a restart (fresh module, same
+  state file) pages nothing, including an urgent from before start - 15 min that the first run
+  kept as history; a new high after round 1 pages; an id already in the state file does not; a
+  malformed front matter is named in the `Inbox:` line, not raised; a failed send is retried; a
+  missing inbox dir and an unreadable state file are `Inbox: NOT_RUN`; `--once` prints the Inbox
+  line after the skills line. Plants, each restored byte-identical: page every importance fails 7
+  of 24; drop the persisted set fails 7 of 24.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (24 tests).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
