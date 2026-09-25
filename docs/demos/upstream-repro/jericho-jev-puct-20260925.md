@@ -242,3 +242,46 @@ The remaining Detective and Deephome seeds were launched concurrently in separat
 after the Zork1 seed-3 row completed. The three Deephome processes use the committed 14,400-second
 per-run wall budget. Their completion status, CPU-contention note, and any NOT-SCORED timeout
 rows will be appended after all six rows settle.
+
+## Design amendment: seed-blocked paired comparison and pilot stop (2026-09-25)
+
+This amendment is committed before any further Detective or Deephome live invocation. The
+initial three-seed-per-arm plan is underpowered for the frozen Zork1 `+5` point bar when treated
+as an independent-means comparison. The revised design treats seed as a block: for each seed,
+the Jev and uniform arms must both have a final `status=ok` row, and the primary observation is
+the paired score difference `d_s = score_jev,s - score_uniform,s`. A partial, timed-out, crashed,
+or error row is not a score and cannot form a pair.
+
+The completed same-seed keyless rows are:
+
+| seed | Jev score | uniform score | paired difference | uniform row SHA-256 |
+|---:|---:|---:|---:|---|
+| 1 | 25 | 25 | 0 | `08c4ab4e868f295798a1b9fa5acc993cb163efb6a5986fde2e23f3eaef1fe730` |
+| 3 | 44 | 25 | 19 | `8164c6a5dbf40fb4b1630256d1436fe1d85fa1bbddb394ae65e4681c01f26d34` |
+
+The exact keyless uniform seed-2 run reached no final row before its 3,600-second wrapper
+deadline and ended with the known arm64 Jericho/Frotz worker segmentation fault. Its partial
+scratch output remains untracked and is not scored or copied. The two complete pairs give
+`d = [0, 19]`, mean `9.5`, sample SD `13.435`, and SEM `9.5` points. This is a two-pair pilot
+estimate, not a calibrated variance estimate.
+
+Using the statistical-power skill's paired/one-sample t-test recipe (`statsmodels 0.15.0`,
+SciPy 1.18.1), with the preregistered smallest effect of interest `delta=5`, two-sided
+`alpha=0.05`, and target power `0.80`, gives `dz = 5 / 13.435 = 0.3722`, raw `n=58.619`,
+and **59 complete seed pairs** after ceiling; power at 59 is `0.8026`. Sensitivity to the
+pilot SD is 34 pairs at `0.75 SD`, 59 at the observed SD, 91 at `1.25 SD`, and 130 at
+`1.5 SD`. The observed paired mean is not used as the powered effect.
+
+The completed Jev Zork1 runs average 1,227.081 seconds each; the two complete uniform runs
+average 280.792 seconds. At those observed means, 59 paired runs project to **24.712 hours**
+before startup, contention, or failures. The required powered count therefore cannot fit one
+attended day. Jericho is a **descriptive pilot**, not a powered confirmatory test, under this
+receipt. No further Jev runs are authorized by this amendment; Detective and Deephome are not
+scored against the original bar.
+
+For completeness, the Detective processes had already been launched before this amendment:
+seed 1 ended `status=error`, seed 2 ended `status=ok`, and seed 3 ended `status=error`; they
+are unpaired and therefore descriptive only. All three Deephome processes are incomplete
+without a final row: seed 2 was interrupted by its 300-second wrapper, and seeds 1 and 3 were
+cancelled after the superseding design instruction. No partial Detective or Deephome row is
+averaged into any bar, and no replacement live call is made.
