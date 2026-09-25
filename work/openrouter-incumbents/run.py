@@ -30,11 +30,14 @@ Rows: work/openrouter-incumbents/rows-<dataset>-<slug>[-prompted].jsonl. Resumes
 """
 
 import asyncio
+import hashlib
 import importlib.util
 import json
 import os
 import sys
 import time
+from datetime import datetime, timezone
+from pathlib import Path
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORK = os.path.dirname(HERE)
@@ -70,6 +73,7 @@ FEVER_PIN = {
 STSB_PIN = ("8e4bda9", "work/score-stsb/run.py")
 STSB_INSTRUCTIONS = "How similar in meaning are these two sentences?"
 MAX_REQUESTS_CEILING = 599
+RUN_PY_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 
 
 def _score_tuple(name):
@@ -287,6 +291,10 @@ async def run_free(model, dataset, prompted, limit, max_requests, resume):
                 waitMs=int(wait_s * 1000),
                 pacerWaitMs=pacer_ms,
                 requests=pacer.requests - req0,
+            )
+            row["run_py_sha256"] = RUN_PY_SHA256
+            row["recorded_at_utc"] = (
+                datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
             )
             with open(path, "a", encoding="utf-8") as fh:
                 fh.write(json.dumps(row, ensure_ascii=False) + "\n")

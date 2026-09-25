@@ -10,6 +10,7 @@ import os
 import sys
 import tempfile
 import unittest
+from datetime import datetime
 from unittest import mock
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -186,6 +187,14 @@ class FreeArmAmendment2(unittest.TestCase):
         with open(path) as fh:
             rows = [json.loads(line) for line in fh if line.strip()]
         return code, rows, path
+
+    def test_rows_include_runner_provenance(self):
+        code, rows, _ = self.run_script(["ok"], n_rows=1)
+        self.assertEqual(code, 0)
+        self.assertEqual(rows[0]["run_py_sha256"], run.RUN_PY_SHA256)
+        recorded = rows[0]["recorded_at_utc"]
+        self.assertTrue(recorded.endswith("Z"))
+        self.assertIsNotNone(datetime.fromisoformat(recorded[:-1] + "+00:00").tzinfo)
 
     def test_provider_429_is_waited_and_the_row_answers(self):
         code, rows, _ = self.run_script(
