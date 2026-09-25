@@ -1,0 +1,46 @@
+[
+  {
+    "id": "multi_apps/f7dfbef3-7697-431c-883a-db8583a4e4f9",
+    "answers": {
+      "choice": {
+        "type": "choice",
+        "choice": "c1",
+        "confidence": 0.77,
+        "probabilities": {
+          "c0": 0.08,
+          "c1": 0.85,
+          "none": 0.07
+        }
+      }
+    },
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 6951,
+      "output_tokens": 41,
+      "billing_units": null,
+      "extra": {}
+    }
+  },
+  {
+    "id": "libreoffice_writer/0e47de2a-32e0-456c-a366-8c607ef7a9d2",
+    "answers": {
+      "choice": {
+        "type": "choice",
+        "choice": "c1",
+        "confidence": 0.8,
+        "probabilities": {
+          "c0": 0.1,
+          "c1": 0.87,
+          "none": 0.03
+        }
+      }
+    },
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 15394,
+      "output_tokens": 41,
+      "billing_units": null,
+      "extra": {}
+    }
+  }
+]
