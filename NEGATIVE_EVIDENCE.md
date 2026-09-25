@@ -4513,3 +4513,27 @@ different question, or about browser goals (5 in the corpus).
 depends on it, only with a changed question or policy frozen first and then measured on a fresh
 pinned goal set, where short non-local goals are routed off local or abstained on at least 0.833
 and local false-routes stay at or below the keyword rule's 11/94. Do not re-run this sample.
+
+## R112 — NOT MET: a Jev Choice over the two dev archives beats the best single archive
+
+**Hypothesis (`jev-9gtw.2`).** On the retained OSWorld universe, a Jev Choice between the two
+development archives selects a better archive than the best single-archive policy.
+
+**Measurement.** Live `jev-1.13.0` on 2026-09-25, preregistered state/floor pair, retained
+`N=337` tasks. Jev's selected reward was `296.432` versus `303.388` for the best single archive:
+mean delta `-0.0206`. Exact McNemar was `b=2`, `c=8`, `p=0.109`. Twelve
+`max_tokens_exceeded` failures carry `4.957` of the `6.957` total loss. On the `325` answered
+tasks, Jev chose `c1` `312` times; its `13` `c0` choices cost `2.000` reward. Receipts:
+`work/osw-bestofn/live_receipt_r3.json`, `work/osw-bestofn/live_rows_r3.jsonl`, and
+`work/osw-bestofn/live_score_check_r3.json`. The post-run feasibility audit found 324 `FITS`,
+10 `NEAR`, and 3 `OVER` requests with the 484-byte Choice question.
+
+**What it does not refute.** States over the documented 32k-token limit were never judged. This
+result covers the retained `337` tasks, not all `361` base IDs. It does not refute a different
+state construction, a different Choice design, or a Jev policy that can beat always-`c1` on the
+answered set.
+
+**Retry condition.** Reopen only with a preregistration that sizes every state using
+`scripts/jev-state-size.py` and decides how to handle `NEAR` and `OVER` items before any call,
+plus a design in which Jev can beat always-`c1` on the answered set under a fresh held-out
+measurement. Do not treat another run with unjudged oversized states as a retry.
