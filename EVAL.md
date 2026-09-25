@@ -2329,3 +2329,23 @@ when any row has `child_error` or `final: null`.
 
 Boundary: no state-blind policy result is claimed until all 80 seeds run inside the pinned
 linux/arm64 PokeAgent runtime and every row has a final emulator state.
+
+## jev-jy7t.1.12 valid Docker state-blind control (2026-09-25) [test]
+
+The corrected rerun used the prepared linux/arm64 image `jev-pokeagent-runtime:20260925`
+(image ID `sha256:6eb7091484bf328ffa42e643bbeefcd2d0f71998039b40dd7a229d86e5f31ad6`) with
+`sethkarten/continual-harness` @`62bf6f614b66ff76b79954e5a3f04f91c3c6a049` on the read-only
+ROM SHA-1 `f3ae088181bf583e55daf962a92bb46f4f1d07b7`. The command ran 80 state-blind seeds
+`0..79`, each from macro 228 with cap 500 and goal `location != MOVING_VAN`; actions were
+sampled with replacement from the frozen 6,449-row pooled button source.
+
+Validation found 80/80 rows with a final state, `scored: true`, and no `child_error`. All 80
+reached the goal: success `80/80`, failures at cap `0`, capped-macro median `67`, p95 `188`,
+max `338`. Results are in `work/pokeagent-emerald/state-blind-results.jsonl` with SHA-256
+`99615e0db9d5148ed360b20782e326b2a39b10ea343df15a252abcbcb730645e`; the enriched receipt is
+`work/pokeagent-emerald/STATE_BLIND_RECEIPT.md`. Runner code SHA-256 is
+`1026758316e9ba49064599593e00071bc07f8ba014cd8c38eb818a01dbb63af3`.
+
+Boundary: this is a keyless state-blind emulator control, not a Jev call, LLM comparison, or
+significance test. The earlier native attempt remains preserved as `NOT_SCORED`; it is not
+included in these 80 rows or this result.
