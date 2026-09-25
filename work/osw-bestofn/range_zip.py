@@ -29,6 +29,7 @@ class HTTPRangeFile(io.RawIOBase):
         self.position = 0
         request = urllib.request.Request(url, method="HEAD", headers={"User-Agent": UA})
         with urllib.request.urlopen(request) as response:
+            self.url = response.geturl()
             self.size = int(response.headers["Content-Length"])
         self.fetched_bytes = 0
 

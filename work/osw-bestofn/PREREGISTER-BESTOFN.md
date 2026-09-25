@@ -21,15 +21,10 @@ autoglm_15steps.zip
 claude-3-7-sonnet-20250219-15steps.zip
 claude-4-sonnet-20250514-15steps.zip
 claude-sonnet-4-5-20250929_15steps.zip
-doubao-1-5-thinking-vision-pro-250428-15step.zip
-jedi-7b-4o-15steps.zip
 jedi-7b-o3-15steps.zip
-kimi-vl-a3b-15step.zip
 opencua_agent-opencua_qwen2_7b-cot_l2-action_history-3image-Ubuntu-15step.zip
 qwen2.5-vl-32b-instruct_15step.zip
-results_agent_s2_o3_15steps.zip
-results_agent_s2_gemini_15steps.zip
-results_gbox_15steps.zip
+qwen2.5-vl-72b-instruct_15step.zip
 ```
 
 Each candidate must have exactly 361 result rows; an invalid candidate is recorded as excluded and
