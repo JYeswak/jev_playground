@@ -49,12 +49,19 @@ class BarReachabilityTests(unittest.TestCase):
         self.assertEqual(receipt["minimum_attainable_p"], 0.5)
 
     def test_r112_split_has_room_beyond_observed_discordance(self):
-        code, receipt = run_checker("--score-receipt", str(R112_SCORE))
+        code, receipt = run_checker(
+            "--score-receipt",
+            str(R112_SCORE),
+            "--floor",
+            str(FLOOR),
+            "--used-rows",
+            str(USED_ROWS),
+        )
         self.assertEqual(code, 0)
         self.assertEqual(receipt["status"], "REACHABLE")
         self.assertEqual(receipt["tasks"], 337)
-        self.assertEqual(receipt["comparator_exact"], 289)
-        self.assertEqual(receipt["max_discordant_wins"], 10)
+        self.assertEqual(receipt["comparator_exact"], 139)
+        self.assertEqual(receipt["max_discordant_wins"], 74)
         self.assertLess(receipt["minimum_attainable_p"], 0.05)
         self.assertEqual(receipt["observed"]["observed_b"], 2)
         self.assertEqual(receipt["observed"]["observed_c"], 8)

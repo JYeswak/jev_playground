@@ -2416,15 +2416,16 @@ OSWorld floor/split receipts and computes the best possible exact McNemar result
 call. For jev-jjwt's held-out split, the committed floor offers 22/24 exact comparator wins,
 leaving at most 2 Jev-only wins: minimum attainable two-sided exact McNemar p is 0.5, so the
 checker exits 1 with UNREACHABLE. For R112's committed 337-task score receipt, observed b=2,
-c=8 is recorded as fixed-candidate headroom 10; minimum attainable p is 0.001953125, so the
+c=8 is observed, while floor.results_by_task over the fixed candidate pool yields comparator
+exact 139 and oracle headroom 74; minimum attainable p is 1.0587911840678754e-22, so the
 checker exits 0 with REACHABLE. The gate does not substitute tasks - comparator_exact for a
 fixed candidate pool.
 
 Keyless evidence:
 
 - uv run python scripts/test_bar_reachable.py — 3/3 passed.
-- A planted mutation replacing fixed-candidate headroom with comparator exact made 2 tests fail;
-  restoring the computation returned the suite to 3/3.
+- A planted mutation replacing floor-derived oracle headroom with comparator exact made 2 tests
+  fail; restoring the computation returned the suite to 3/3.
 - uv run ruff check scripts/bar-reachable.py scripts/test_bar_reachable.py — clean.
 - uv run ruff format --check scripts/bar-reachable.py scripts/test_bar_reachable.py — both formatted.
 - ubs scripts/bar-reachable.py scripts/test_bar_reachable.py — 0 warnings.

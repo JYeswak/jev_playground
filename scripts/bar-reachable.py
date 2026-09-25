@@ -133,7 +133,7 @@ def comparator_exact_from_floor(
     return comparator_wins, oracle_wins - comparator_wins, comparator
 
 
-def score_receipt_headroom(path: Path) -> tuple[int, int, dict[str, int | float]]:
+def score_receipt_observed(path: Path) -> tuple[int, dict[str, int | float]]:
     receipt = _read_json(path)
     try:
         tasks = int(receipt["retained_task_count"])
@@ -144,24 +144,14 @@ def score_receipt_headroom(path: Path) -> tuple[int, int, dict[str, int | float]
     except (KeyError, TypeError, ValueError) as exc:
         raise ValueError(f"{path} is missing the R112 score fields") from exc
     comparator_exact = selected_exact - observed_b + observed_c
-    headroom = observed_b + observed_c
-    if (
-        not 0 <= comparator_exact <= tasks
-        or not 0 <= headroom <= tasks - comparator_exact
-    ):
-        raise ValueError(
-            f"inconsistent R112 comparator/headroom counts for {tasks} tasks"
-        )
-    return (
-        comparator_exact,
-        headroom,
-        {
-            "observed_b": observed_b,
-            "observed_c": observed_c,
-            "observed_p": float(observed.get("p", math.nan)),
-            "headroom_source": "observed fixed-candidate discordant pairs",
-        },
-    )
+    if not 0 <= comparator_exact <= tasks:
+        raise ValueError(f"inconsistent R112 comparator count for {tasks} tasks")
+    return tasks, {
+        "observed_b": observed_b,
+        "observed_c": observed_c,
+        "observed_p": float(observed.get("p", math.nan)),
+        "score_comparator_exact": comparator_exact,
+    }
 
 
 def exact_mcnemar_p(discordant_wins: int, discordant_losses: int) -> float:
@@ -260,14 +250,27 @@ def main(argv: list[str] | None = None) -> int:
             result = rate_reachability(args.trials, args.threshold)
         else:
             if args.score_receipt:
-                comparator_exact, headroom, observed = score_receipt_headroom(
-                    args.score_receipt
+                if not args.floor or not args.used_rows:
+                    raise ValueError(
+                        "score receipt mode requires --score-receipt, --floor, and --used-rows"
+                    )
+                observed_tasks, observed = score_receipt_observed(args.score_receipt)
+                tasks_list = sorted(jsonl_tasks(args.used_rows))
+                if observed_tasks != len(tasks_list):
+                    raise ValueError(
+                        "score receipt and used rows have different task counts"
+                    )
+                comparator_exact, headroom, archive = comparator_exact_from_floor(
+                    args.floor, tasks_list, args.comparator_archive
                 )
-                tasks = int(_read_json(args.score_receipt)["retained_task_count"])
                 result = mcnemar_reachability(
-                    tasks, comparator_exact, headroom, args.alpha
+                    len(tasks_list), comparator_exact, headroom, args.alpha
                 )
                 result["observed"] = observed
+                result["comparator_archive"] = archive
+                result["oracle_headroom_source"] = (
+                    "floor.results_by_task fixed candidate pool"
+                )
             else:
                 if not args.floor or not args.manifest or not args.used_rows:
                     raise ValueError(
