@@ -1981,3 +1981,23 @@ Reproduce with:
 Boundary: no Jev or comparator request was authorized or sent; README.md was not
 edited; the command-output number check is textual containment, not semantic
 recalculation; nonzero rows are classified in the receipt for pane-1 routing.
+
+## jev-3e2i SST-5 free incumbent and row-provenance repair (2026-09-25) [live]
+
+The free comparator cell `nex-agi/nex-n2.5-mini:free` completed **500/500 SST-5 rows** after
+one permitted resume pass: 6 initial `TypeSafeAPITimeoutError` rows were retried, yielding
+500 answered, 0 failed, 6 zero-mass, and 506 retained attempt records. `score.py` self-check
+passed; Jev was the preregistered MAE-sign-test **WIN/HOLDS** against all three committed Jev
+runs (`p=6.63e-37`, `2.51e-35`, `1.83e-36`). The cell used 506 requests, 82,666 input
+tokens, 550,574 output tokens, and $0 OpenRouter spend. Receipt:
+`docs/demos/upstream-repro/openrouter-incumbents-20260924.md`; rows commit `9195999`.
+
+The subsequent keyless provenance repair is in `869aa44` (runner writes `run_py_sha256` and
+`recorded_at_utc` on every appended row), `1d6de07` (success and failure-row tests), and
+`66fac9b` (SHA-pinned exemption for the already committed pre-provenance rows; rows were not
+rewritten). `python3 scripts/row-provenance-check.py` reports 6 experiment files, 137 rows,
+and 2 exempted files. The registered runner suite reports **14 tests, OK**.
+
+Boundary: no other SST-5 set, comparator model, paid comparator, or TypeSafe call was run in
+this repair pass; no paid comparison was attempted. The six exempted legacy rows remain
+unmodified and are not evidence that future runner output may omit provenance.
