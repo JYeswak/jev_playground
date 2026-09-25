@@ -87,9 +87,9 @@ successful call. The pre-registered strict-improvement rule selected no variable
 | `noul` | 0.0000000 | 0/60 | 511,156 | $0.021468552 |
 
 The four-arm total was 1,950,512 input tokens and $0.081921504. Per-call resolved models and usage
-are retained in `work/osw-bestofn/dev_live_receipt.json`. Because `goal` tied `original` rather
-than strictly improving it, no arm was eligible under the locked rule. The held-out arm is
-therefore `original`, with no post hoc prompt or threshold change.
+are retained in `work/osw-bestofn/dev_live_receipt.json`. `goal` recovered one baseline failure but
+regressed one baseline success, so its mean tied `original`; neutral and Noul recovered zero. No arm
+was eligible under the locked strict-improvement rule.
 
 ## Held-out selection rule
 
@@ -101,27 +101,21 @@ variables: add the public instruction if `goal` is eligible, use neutral criteri
 eligible, and use per-candidate Nouls if `noul` is eligible. This combination is the sole
 pre-registered multi-variable held-out design; no prompt or threshold changes after seeing results.
 
-The exact pre-registered held-out manifest is `work/osw-bestofn/heldout_slice.json` (SHA-256
-`9fa3f207783795bac4dd160bcfbcddf91652a5ddc54eea633b8fde18da2c7521`, N=57). It is the sorted
-complement of the 60 dev tasks within the failure-class union reconstructed from committed
-`live_receipt.json` choices and `floor_receipt.json` rewards: 27 `correct_none`, 7 `false_none`,
-and 23 `wrong_pick`. Its state is rebuilt from the same pinned public task files and allowed
-trajectory and runtime members, with a different task set and the same fixed evidence window. The
-held-out arm is scored with the same original bar above.
+The exact manifest is `work/osw-bestofn/heldout_slice.json` (SHA-256
+`9fa3f207783795bac4dd160bcfbcddf91652a5ddc54eea633b8fde18da2c7521`, N=57). **Correction:** this
+set is the sorted complement of the 60 dev tasks inside the original 361-task failure-class union,
+reconstructed from committed prior `live_receipt.json` choices joined with `floor_receipt.json`
+rewards. Because the set was selected using the prior outcome, it is not an independent held-out
+retest and its result is NOT-SCORED. A valid retest must use all tasks in a different fixed run set
+or step budget, with the selection committed before any outcomes are read.
 
-## Held-out result
+## Held-out arm — NOT-SCORED
 
-The pre-registered `original` held-out arm completed 57/57 calls with no validation failures; every
-successful row resolved to `jev-1.13.0`. It used 456,282 input tokens and cost $0.019163844. The
-combined dev plus held-out spend was $0.101085348.
-
-| Arm | Mean official reward | Exact tasks | Best-single mean | Delta | Oracle mean |
-|---|---:|---:|---:|---:|---:|
-| `original`, N=57 | 0.0093946 | 0/57 | 0.3015857 (17/57) | -0.2921911 | 0.5263158 (30/57) |
-
-McNemar against the best single had `b=17` (Jev wrong, best single exact), `c=0` (Jev exact,
-best single wrong), exact two-sided `p=0.0000152588`. Gap closed was `-130.02%`. The locked bar
-was not met; no variable earned selection and this is not a general ruling about Jev.
+The selected `original` arm completed 57/57 calls with no validation failures; every successful row
+resolved to `jev-1.13.0`. It used 456,282 input tokens and cost $0.019163844. The run is retained
+only for accounting and audit of the flawed selection; it is not evidence for the preregistered
+bar. Its descriptive reward calculation (`0.0093946` vs `0.3015857` best single) is not a held-out
+score and must not be reported as a retest result.
 
 The sanitized live accounting receipt is `work/osw-bestofn/dev_live_receipt.json`; it records each
 call's task, choice, resolved model, token usage, latency, and validation status without raw state,

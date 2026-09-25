@@ -4237,3 +4237,15 @@ from named `traj.jsonl`/`runtime.log` fields. Require the same strict dev-improv
 fresh held-out pool before any live call; do not promote the held-out baseline failure into a
 variant result. Receipt: `work/osw-bestofn/dev_live_receipt.json`; report:
 `docs/demos/upstream-repro/osw-bestofn-loss-depth-dev-20260925.md`.
+
+**Correction (2026-09-25, pane 1 adjudication).** The held-out arm and every held-out comparison
+above are **NOT-SCORED** and must not be read as a retest. `heldout_slice.json` is the complement
+of the dev slice inside the original 361-task failure-class union; it was selected from prior Jev
+picks and floor outcomes, so it is outcome-selected and reuses the R104 pool. The reported
+`0.0093946` and `0.3015857` are descriptive accounting only, not evidence for a held-out bar.
+
+The valid finding in R106 is dev-only: on the fixed N=60 failure slice, `goal` recovered one
+baseline failure but regressed one baseline success (mean tie), while neutral labels and
+per-candidate Nouls recovered zero. No variant qualified under the strict preregistered
+improvement rule. A valid retest requires a different OSWorld-Verified run set or step budget over
+all tasks, selected and committed before outcomes; it is deferred until after Jericho.
