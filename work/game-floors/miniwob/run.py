@@ -73,6 +73,10 @@ TEXT_INPUT_TAGS = {
     "INPUT_URL",
     "TEXTAREA",
 }
+
+V3_ACTION_SPACE = os.environ.get("MINIWOB_V3") == "1"
+if V3_ACTION_SPACE:
+    TEXT_INPUT_TAGS.update({"INPUT_DATE", "INPUT_TIME"})
 INTERACTIVE_TAGS = {"BUTTON", "A", "SELECT", "TEXTAREA", "LABEL", "OPTION"}
 BUTTON_TAGS = {"BUTTON", "INPUT_SUBMIT", "INPUT_BUTTON", "INPUT_RESET"}
 
@@ -143,6 +147,7 @@ def elements_from_obs(obs) -> list[dict]:
                 "value": str(e["value"]),
                 "id": str(e["id"]),
                 "classes": str(e["classes"]),
+                "color": str(e.get("color", "")) if V3_ACTION_SPACE else "",
                 "left": float(e["left"][0]),
                 "top": float(e["top"][0]),
                 "width": float(e["width"][0]),
@@ -204,6 +209,8 @@ def serialize_state(
             round(e["width"]),
             round(e["height"]),
         ]
+        if V3_ACTION_SPACE and e.get("color"):
+            d["color"] = e["color"]
         if e["focused"]:
             d["focused"] = True
         if options and e["ref"] in options:
@@ -528,6 +535,18 @@ def to_env_action(env, act):
     return u.create_action(ActionTypes.NONE)
 
 
+def drag_env_actions(env, coords):
+    source, target = coords
+    u = env.unwrapped
+    source_xy = np.asarray(source, dtype=np.float32)
+    target_xy = np.asarray(target, dtype=np.float32)
+    return [
+        u.create_action(ActionTypes.MOUSEDOWN_COORDS, coords=source_xy),
+        u.create_action(ActionTypes.MOVE_COORDS, coords=target_xy),
+        u.create_action(ActionTypes.MOUSEUP_COORDS, coords=target_xy),
+    ]
+
+
 def resolve_ref(els: list[dict], ref: int) -> int:
     if ref < 0:
         return next((e["parent"] for e in els if e["ref"] == ref), ref)
@@ -562,7 +581,8 @@ def run_episode(
         "wait_ms": args.wait_ms,
         "data_mode": "default",
         "page_reload_each_episode": True,
-        "action_space": "farama CLICK_ELEMENT(ref) + FOCUS_ELEMENT_AND_TYPE_TEXT(ref,text)",
+        "action_space": "farama CLICK_ELEMENT(ref) + FOCUS_ELEMENT_AND_TYPE_TEXT(ref,text)"
+        + (" + code-enumerated DRAG(source,target)" if V3_ACTION_SPACE else ""),
         "utterance": None,
         "success": 0.0,
         "success_strict": 0.0,
@@ -614,10 +634,18 @@ def run_episode(
                 if dump_path:
                     Path(dump_path).write_text(blob + "\n")
             kind, ref, text = policy.act(utterance, els, opts)
-            ref = resolve_ref(els, ref)
-            action = to_env_action(env, (kind, ref, text))
+            if kind != "drag":
+                ref = resolve_ref(els, ref)
             ts = time.perf_counter()
-            obs, reward, done, trunc, info = env.step(action)
+            if kind == "drag":
+                for action in drag_env_actions(env, ref):
+                    obs, reward, done, trunc, info = env.step(action)
+                    if done:
+                        break
+            else:
+                obs, reward, done, trunc, info = env.step(
+                    to_env_action(env, (kind, ref, text))
+                )
             step_times.append(time.perf_counter() - ts)
             rec = {"type": kind, "ref": ref}
             if text is not None:

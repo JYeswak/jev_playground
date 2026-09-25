@@ -56,6 +56,7 @@ PREREG_V2 = "docs/demos/upstream-repro/miniwob-jev-v2-prereg-20260925.md"
 ROWS_DIR = HERE / "rows"
 
 MODEL = "jev-1.13.0"
+V3_ENABLED = os.environ.get("MINIWOB_V3") == "1"
 OPTION_CAP = 255  # docs-mirror/typesafe/api.md:125, per Choice
 NONE_KEY = "none: do nothing this step"
 HALT_AFTER_CONSECUTIVE_FAILURES = 3
@@ -91,7 +92,11 @@ def utterance_spans(utterance: str, cap: int = OPTION_CAP) -> list[str]:
     seen: set[str] = set()
 
     def add(s: str) -> bool:
-        s = s.strip().strip(SPAN_STRIP).strip()
+        raw = s.strip()
+        if V3_ENABLED and len(raw) >= 2 and raw[0] in {'"', "'"} and raw[-1] == raw[0]:
+            s = raw[1:-1].strip()
+        else:
+            s = raw.strip(SPAN_STRIP).strip()
         if s and s not in seen:
             seen.add(s)
             out.append(s)
@@ -172,6 +177,13 @@ def build_candidates(
     by_ref = {e["ref"]: e for e in els}
     texts = element_texts(els)
     spans = utterance_spans(utterance)
+    page_spans = []
+    if V3_ENABLED:
+        for e in els:
+            for value in (e.get("text", ""), e.get("value", "")):
+                value = str(value).strip()
+                if value and len(value) <= 160 and value not in page_spans:
+                    page_spans.append(value)
     options = options or {}
     order = {e["ref"]: i for i, e in enumerate(els)}
 
@@ -181,13 +193,36 @@ def build_candidates(
         if r <= 0:
             continue
         if e["kind"] in floor.TEXT_INPUT_TAGS:
-            type_spans[r] = list(spans)
+            type_spans[r] = list(dict.fromkeys(spans + page_spans))
         elif e["kind"] == "SELECT" and r in options:
             opts = {floor._norm(o) for o in options[r]}
             ok = [s for s in spans if floor._norm(s) in opts]
             if ok:
                 type_spans[r] = ok
     clicks = floor.clickable_refs(els)
+    drag_pairs = []
+    if V3_ENABLED and re.search(r"\b(?:drag|draw|resize|slider)\b", utterance, re.I):
+        drag_refs = [
+            e for e in els if e["ref"] > 0 and e["width"] > 0 and e["height"] > 0
+        ]
+        for source in drag_refs:
+            for target in drag_refs:
+                if source["ref"] == target["ref"]:
+                    continue
+                drag_pairs.append(
+                    (
+                        (
+                            source["left"] + source["width"] / 2,
+                            source["top"] + source["height"] / 2,
+                        ),
+                        (
+                            target["left"] + target["width"] / 2,
+                            target["top"] + target["height"] / 2,
+                        ),
+                        source["ref"],
+                        target["ref"],
+                    )
+                )
 
     budget = OPTION_CAP - (1 if include_none else 0)
     types = sorted(type_spans, key=lambda r: order[r])[:budget]
@@ -195,6 +230,7 @@ def build_candidates(
     ranked = sorted(clicks, key=lambda r: (not _interactive(by_ref[r]), order[r]))
     kept_clicks = set(ranked[:budget])
     truncated = len(clicks) - len(kept_clicks)
+    budget -= len(kept_clicks)
 
     items: list[tuple[int, int, str, int]] = []
     for r in clicks:
@@ -206,6 +242,14 @@ def build_candidates(
     actions: dict[str, tuple[str, int]] = {}
     for _, _, kind, r in items:
         actions[f"{kind} [{r}] {describe(by_ref[r], texts.get(r, ''))}"] = (kind, r)
+    if V3_ENABLED:
+        for source_xy, target_xy, source_ref, target_ref in drag_pairs[
+            : max(0, budget)
+        ]:
+            actions[f"drag [{source_ref}] -> [{target_ref}]"] = (
+                "drag",
+                (source_xy, target_xy),
+            )
     if include_none:
         actions[NONE_KEY] = ("none", 0)
     return actions, {r: type_spans[r] for r in types}, truncated
@@ -227,7 +271,7 @@ def action_instructions(utterance: str) -> str:
 def text_instructions(utterance: str, ref: int, label: str) -> str:
     return (
         f"Goal: {utterance}\n"
-        f"Which text from the goal should be typed into element [{ref}] ({label})?"
+        f"Which text from the goal{'' if not V3_ENABLED else ' or visible page'} should be typed into element [{ref}] ({label})?"
     )
 
 
@@ -526,7 +570,7 @@ class JevPolicy:
     def row_fields(self) -> dict:
         return {
             "model_requested": MODEL,
-            "none_policy": self.none_policy,
+            **({"none_policy": self.none_policy} if V3_ENABLED else {}),
             "model": sorted(self.models),
             "jev_calls": self.calls,
             "input_tokens": self.input_tokens,
