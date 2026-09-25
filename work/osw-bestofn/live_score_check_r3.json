@@ -1,0 +1,20 @@
+{
+  "status": "INDEPENDENT_SCORE_PASS",
+  "receipt": "work/osw-bestofn/live_receipt_r3.json",
+  "rows": "work/osw-bestofn/live_rows_r3.jsonl",
+  "rows_sha256": "66ea5c2c897b8bbeceb897bead74bfa05554486790ada9ddd2d18a39a0e335c0",
+  "retained_task_count": 337,
+  "failed_answer_count": 12,
+  "selected_reward_sum": 296.43182811259345,
+  "selected_mean_reward": 0.8796196679898916,
+  "selected_exact_tasks": 283,
+  "delta_vs_best_single": -0.020642468334476027,
+  "mcnemar_vs_best_single": {
+    "b": 2,
+    "c": 8,
+    "p": 0.109375
+  },
+  "input_floor_sha256": "3aabbf9d7c8c7c5930b8a7165e81e5bd3e6163f0a057112151bd173b07363e76",
+  "boundary": "Recomputed from the 337 row choices and frozen floor results only; no additional Jev call or outcome source was used.",
+  "receipt_sha256": "dc9e7504e0f667de690c94c080c1b8c4c3b59bd8d4ce271493396398568b3094"
+}

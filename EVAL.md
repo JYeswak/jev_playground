@@ -2212,3 +2212,37 @@ Boundary: the scan read only pinned path metadata and final-file structure neede
 emptiness booleans; it did not read `result.txt` contents, official outcome values, rewards,
 success/status fields, or any Jev response. Jev calls, scoring, and the bar remain **NOT_RUN**
 pending non-author receipt verification.
+
+## jev-9gtw.2 amended OSWorld Best-of-N live selection (2026-09-25) [live-verified (N=337)]
+
+After non-author verification of `f256089`, key status passed with
+`infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- python3 scripts/key-status.py`.
+The amended state/floor build completed keylessly with
+`uv run python var/agent-tmp/osw-bestofn-r3-360/build_states.py`. Guard commit `f167936` refused
+the planted 336-task floor mismatch (exit 2) and accepted the valid 337-task floor/state pair:
+both sorted task-ID digests are
+`c2f320a71b86a6b35ae66dbdb4d2fb9d368aee181b21787f149b48516440aaf2`, and the state order matches
+the `seed=20250925` permutation.
+
+Live command:
+`env OSW_STATE_FILE=var/agent-tmp/osw-bestofn-r3-360/states-goal-337.jsonl OSW_FLOOR_RECEIPT=var/agent-tmp/osw-bestofn-r3-360/floor-337.json OSW_LIVE_RECEIPT=work/osw-bestofn/live_receipt_r3.json OSW_LIVE_ROWS=work/osw-bestofn/live_rows_r3.jsonl infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- npx tsx work/osw-bestofn/live_select.mjs`.
+
+Pinned model `jev-1.13.0`; `337` calls, `12` answer failures, `3,713,209` input tokens,
+`13,325` output tokens, `$0.155954778`, wall time `60.127s`. The independent score check
+recomputed the 337 row choices against the frozen keyless floor: selected reward sum
+`296.43182811259345`, mean `0.8796196679898916`, exact-task count `283`, delta versus best
+single `-0.020642468334476027`, and exact McNemar `b=2,c=8,p=0.109375`. This is a loss to the
+best single comparator on the retained universe, not evidence of a routing win.
+
+Receipts: rows
+`work/osw-bestofn/live_rows_r3.jsonl` SHA-256
+`66ea5c2c897b8bbeceb897bead74bfa05554486790ada9ddd2d18a39a0e335c0`; live receipt
+`work/osw-bestofn/live_receipt_r3.json` SHA-256
+`dc9e7504e0f667de690c94c080c1b8c4c3b59bd8d4ce271493396398568b3094`; independent score check
+`work/osw-bestofn/live_score_check_r3.json` SHA-256
+`1bf117202c14610d2f7d6bcd103935a7adcda77c4f48f845be71abc159af0173`.
+
+Boundary: every result above covers the retained `337` tasks after the exhaustive presence rule,
+not all `361` base IDs. The 23 rule exclusions plus the initial excluded ID are not silently
+replaced. No paid comparator, second model, significance claim beyond the preregistered exact
+McNemar result, or full-base-universe result is claimed.
