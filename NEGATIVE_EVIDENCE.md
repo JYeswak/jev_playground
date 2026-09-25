@@ -4289,3 +4289,66 @@ baseline failure but regressed one baseline success (mean tie), while neutral la
 per-candidate Nouls recovered zero. No variant qualified under the strict preregistered
 improvement rule. A valid retest requires a different OSWorld-Verified run set or step budget over
 all tasks, selected and committed before outcomes; it is deferred until after Jericho.
+
+## R107 — REFUTED: three OR-kept Nouls per node prune a MiniWoB element list by 40% with no success loss
+
+**Claim (bead `jev-jy7t.1.6`).** A Jev pruner can prune the MiniWoB element list before the v1 Jev
+planner sees it. It sends three Nouls per node (`relevant_to_current_goal`,
+`contains_required_value`, `safe_to_omit`), keeps a node if either of the first two is at least 0.5
+or the last is below 0.5, then closes over ancestors and text. The claim was that this cuts mean
+planner input tokens by at least 40%, keeps success within 1 pt of `full`, and does not raise p95
+wall time. Bar preregistered in `docs/demos/upstream-repro/miniwob-ax-prune-prereg-20260925.md`
+(`dd04baf`).
+
+**Measured 2026-09-25, live, `jev-1.13.0`, N=50 per arm per split.** 50 MiniWoB tasks, `MAX_STEPS=1`.
+Planner and floor bytes were pinned to `dd04baf` via `run_frozen.py`. There were 500 HTTP calls,
+all returning 200, for 1,226,555 input tokens ($0.0515).
+
+| Held-out (seed 300) | Success | Mean planner tokens | Cut | p95 wall_s |
+|---|---:|---:|---:|---:|
+| full | 14/50 | 1944.7 | — | 1.448 |
+| code | 9/50 | 1068.2 | 45.1% | 1.017 |
+| jev | 14/50 | 1441.6 | 25.9% | 1.794 |
+| random | 8/50 | 1396.9 | 28.2% | 0.998 |
+
+Dev (seed 200) agreed: jev 15/50 = full 15/50, with a 25.7% cut. The success condition passed. The
+token and p95 conditions failed, so the kill rule "no 40% token cut" fired. Jev and full succeeded
+on identical tasks in both splits. Jev left the observation unchanged on 20/50 held-out episodes.
+The pruner request averaged 6,820 input tokens per episode, which puts the jev arm at 4.2x the total
+input tokens of full. Descriptive only: Jev beat random at a similar token count (discordant 6/0,
+exact p=0.031, not preregistered).
+
+**What it refutes.** This keep rule, at this 0.5 threshold, with Nouls over the full state, does not
+reach a 40% planner-token cut on one-step MiniWoB, and it costs more tokens than it saves. It does
+not refute:
+
+- a stricter keep rule (for example AND instead of OR, or dropping the `safe_to_omit` veto);
+- a single Choice or Score ranking of nodes with a fixed budget;
+- budget-matched comparisons with code and random;
+- multi-step episodes, where one prune could serve several planner calls;
+- a planner priced above Jev per input token.
+
+**Autopsy (keyless, `jev-9gtw.7`, `a68ba48`).** The rebuilt pages match the rows byte for byte on
+100/100. The best possible prune (the target plus ancestors and text) cuts about 49.8% of planner
+tokens, and in each split, 26 of 50 episodes cannot reach 40% under any pruner. The pruner costs
+442.6 input tokens per element (R² 0.998). Pruning pays only if the planner's input price is at
+least `c` times Jev's:
+
+- 13.56 as measured;
+- 7.05 even with a perfect cut;
+- 2.75 with one Noul instead of three;
+- 1.97 with one Noul, a node-text-only state and text runs skipped.
+
+With a Jev planner at one step per prune, no design in this family pays. The rows do not log
+per-node Noul answers, so which Noul kept the whole small pages (20/50 held-out) is not
+recoverable. See `docs/demos/upstream-repro/miniwob-ax-prune-autopsy-20260925.md`.
+
+**Retry condition.** Reopen with a new held-out preregistration only when a dev-seed-200 replay
+that logs per-node answers shows a changed design (H1 one Noul first) meeting both conditions:
+
+1. at least a 40% planner-token cut, with success within 1 pt of full;
+2. a break-even `c` at or below the ratio the bar will use: 1 for a Jev planner, or the stated
+   price ratio or planner calls per prune for any other setting.
+
+Receipt: `docs/demos/upstream-repro/miniwob-ax-prune-20260925.md`. Rows: `2c6cfed` (dev) and
+`66b8f61` (held-out).
