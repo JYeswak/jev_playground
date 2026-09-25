@@ -4,9 +4,14 @@ Run: cd work/poke-jev && python3 -m unittest test_policy
 """
 
 import math
+import os
+import sys
 import unittest
 
-import policy as p
+sys.path.insert(
+    0, os.path.dirname(os.path.abspath(__file__))
+)  # import from any cwd (CI runs from root)
+import policy as p  # noqa: E402
 
 DISPLAY = {"move a": "A", "move b": "B", "switch x": "Switch to X"}
 

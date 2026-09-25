@@ -4,9 +4,14 @@ Run: cd work/poke-jev && python3 -m unittest test_replay
 """
 
 import math
+import os
+import sys
 import unittest
 
-import replay as r
+sys.path.insert(
+    0, os.path.dirname(os.path.abspath(__file__))
+)  # import from any cwd (CI runs from root)
+import replay as r  # noqa: E402
 
 BATTLE = """|player|p1|alice|1|1500
 |player|p2|bob|2|1480
