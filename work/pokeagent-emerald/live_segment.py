@@ -229,6 +229,7 @@ def parent(args: argparse.Namespace) -> int:
             seed_rows and seed_rows[-1]["after"]["location"] != START_LOCATION
         )
     receipt = {
+        "key_status": "OK",
         "model": MODEL,
         "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         "seeds": seed_end - args.start_seed,

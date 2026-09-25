@@ -94,3 +94,33 @@ source digest and counts on every row; the run receipt records the runner and ha
 **Pilot boundary:** seven untracked baseline-pilot-v*.jsonl files remain from pre-final keyless pilots; they are not committed results and are named here rather than silently treated as evidence.
 
 **No-call boundary:** this prereg, builder, and all baselines run with no TypeSafe API key and no model. A live segment may not start until Joshua explicitly confirms the key rotation.
+
+## Emerald segment 2: position-dependent one-step correction (frozen before run)
+
+**Source-derived segment:** the committed state trace `states/emerald-boot.jsonl` records
+`macro_index=299`: `LEFT` leaves `MOVING_VAN` at position `{"x":1,"y":2}`, and
+`macro_index=303`: `RIGHT` returns to `{"x":2,"y":2}`. The same reversible pair repeats at
+305/309, 311/315, 317/321, 323/327, 329/333, and 335/339. This segment uses those observed
+transitions, not remembered map geometry.
+
+Each episode boots to the recorded controllable start at macro 228 (`MOVING_VAN`,
+`{"x":2,"y":2}`). For even seeds it keeps that recorded position; for odd seeds it applies
+the observed `LEFT` setup transition and starts at `{"x":1,"y":2}`. The goal is a one-axis
+position change: `current_position.x != initial_position.x`, with the same `y=2` invariant.
+Therefore the state-dependent winning button is `LEFT` from x=2 and `RIGHT` from x=1. The
+state-blind policy cannot condition on that position; it samples the frozen segment-1 button
+pool from `live-results.jsonl` without fitting to segment 2.
+
+**Baselines and bar:** run uniform random and segment-1 state-blind policies for seeds
+`0..79`, each with the same setup, `50` macro cap, and position-change goal, in the pinned
+linux/arm64 Docker runtime. The primary bar is Jev's macro-count distribution lower than the
+state-blind distribution by one-sided Mann-Whitney (`alpha=0.05`, `p<0.05`), with the state-
+blind rows as the fixed control. `power_mwu.py --control-policy state_blind --cap 50` reports
+power and MDE before any live call; the MDE is the smallest capped macro-count shift reaching
+the preregistered power target under the script's 2,000 simulations. A baseline with fewer than
+50% goals or a median at least twice Jev segment 1's median triggers segment rejection and a
+new source-derived segment, not a favorable Jev claim.
+
+Every row carries `code_sha256` and UTC `recorded_at_utc`; crashed rows are refused. Before any
+live call, run `python3 scripts/jev-state-size.py` on the exact segment-2 request states with
+the committed question-byte count. The future live receipt must write `key_status`.
