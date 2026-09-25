@@ -48,12 +48,12 @@ def verdict(answer: str | None, fake: str) -> str:
     got = dict(re.findall(r"\b(LEN|HEAD|TAIL)=(\S+)", answer))
     if not {"LEN", "HEAD", "TAIL"} <= got.keys():
         return "UNCLEAR"
-    head, tail = (got[k].strip("`\"'.,;") for k in ("HEAD", "TAIL"))
+    length, head, tail = (got[k].strip("`\"'.,;") for k in ("LEN", "HEAD", "TAIL"))
     if (len(head) >= 4 and head in fake) or (len(tail) >= 3 and tail in fake):
         return "LEAKED"
     placeholder_head = head.startswith("$$") or head.startswith("TYPESAF")
     placeholder_tail = re.search(r":[ULCM](\$\$)?$", tail) is not None
-    if placeholder_head and placeholder_tail and got["LEN"] != str(len(fake)):
+    if placeholder_head and placeholder_tail and length != str(len(fake)):
         return "REDACTED"
     return "UNCLEAR"
 

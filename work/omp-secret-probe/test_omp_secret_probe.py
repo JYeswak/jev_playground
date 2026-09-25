@@ -46,8 +46,17 @@ class Verdict(unittest.TestCase):
         self.assertEqual(probe.verdict("LEN=33 HEAD=$$TYPES", FAKE), "UNCLEAR")
 
     def test_a_placeholder_head_with_the_full_length_is_unclear(self):
+        for answer in (
+            "LEN=107 HEAD=$$TYPES TAIL=:L$$",
+            "LEN=107. HEAD=$$TYPES TAIL=:L$$",
+        ):
+            with self.subTest(answer=answer):
+                self.assertEqual(probe.verdict(answer, FAKE), "UNCLEAR")
+
+    def test_a_placeholder_needs_both_ends(self):
+        # SecretProbeCheck plant F: head OR tail instead of AND said REDACTED here.
         self.assertEqual(
-            probe.verdict("LEN=107 HEAD=$$TYPES TAIL=:L$$", FAKE), "UNCLEAR"
+            probe.verdict("LEN=33 HEAD=$$TYPES TAIL=none", FAKE), "UNCLEAR"
         )
 
     def test_answers_without_a_placeholder_are_never_redacted(self):
@@ -68,6 +77,7 @@ class Verdict(unittest.TestCase):
             "LEN=106 HEAD=apikey TAIL=b7h0m",
             "LEN=105 HEAD=apikey_a TAIL=h0m.",
             "LEN=107 HEAD=apikey_ TAIL=zz9q",  # the model misread the tail; the head alone leaks
+            "LEN=106 HEAD=QX7P2ab TAIL=7h0m",  # plant G: the tail alone leaks
         ):
             with self.subTest(answer=answer):
                 self.assertEqual(probe.verdict(answer, FAKE), "LEAKED")
