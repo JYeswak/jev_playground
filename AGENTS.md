@@ -1688,6 +1688,15 @@ A packet missing any of them is defective, and `BLOCKED` is the correct response
    - `work/oracle-kit/index.mjs` for every score: `auc` reports `constant=true`, `field` throws
      on a name absent from the SDK, `feasibility` refuses to rule when the arm is blind.
    - `docs/demos/SDK-SURFACE.md` before touching any answer field.
+   - **Skills, by name and path, with the step that applies.** Joshua, 2026-09-25: *"search for
+     and install a library of relevant skills that give us superpowers"* / *"keep going on
+     skills and make sure we're using them"*. 32 third-party skills (superpowers, K-Dense
+     scientific, Hugging Face, Anthropic) sit in `~/.claude/skills/` with pinned SHAs in
+     `THIRD-PARTY-SKILLS.tsv`; which one fits which unit is in
+     `notes/deep/dispatch/SKILL-ROUTING.md`. A session started before an install cannot load
+     `skill://<name>`, so packets give `/Users/josh/.claude/skills/<name>/SKILL.md`. The
+     callback names the skill step behind each choice; the `Skills 24h:` fleet line shows
+     whether any were read.
 3. **The mining process**, in order, because skipping a step is how four wrong numbers were
    produced in one day: read the artifact and cite `file:line` → preregister the bar **in the
    file** → build the corpus you did **not** author → include a feasibility arm that ought to
