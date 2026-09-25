@@ -1,0 +1,18 @@
+source	task	episodes	observation_rows	needed_text	covered	coverage	median_candidates	max_candidates
+captured-observation	click-color	1	1	NOT_APPLICABLE	0	0.000	0	0
+captured-observation	click-shades	1	1	NOT_APPLICABLE	0	0.000	0	0
+captured-observation	copy-paste	1	1	Eget rhoncus, pellentesque malesuada non, donec morbi. Nunc 	1	1.000	111	111
+captured-observation	drag-circle	1	1	NOT_APPLICABLE	0	0.000	0	0
+captured-observation	drag-shapes	1	1	NOT_APPLICABLE	0	0.000	0	0
+captured-observation	enter-time	1	1	21:37	1	1.000	42	42
+captured-observation	find-word	1	1	Lacus,	1	1.000	97	97
+captured-observation	highlight-text	1	1	NOT_APPLICABLE	0	0.000	0	0
+captured-observation	scroll-text	1	1	Maecenas.	1	1.000	221	221
+captured-observation	step-zero-offers	1	1	NOT_APPLICABLE	0	0.000	0	0
+captured-observation	text-editor	1	1	NOT_APPLICABLE	0	0.000	0	0
+captured-observation	text-transform	1	1	6gHF	1	1.000	55	55
+recorded-page-text-row	miniwob-jev-v3-contaminated-smoke-page-text-exact.s0.jsonl	13	0	NOT_RUN (no observation field)	NOT_RUN	NOT_RUN	NOT_RUN	NOT_RUN
+recorded-page-text-row	miniwob-jev-v3-contaminated-smoke-page-text.s0.jsonl	7	0	NOT_RUN (no observation field)	NOT_RUN	NOT_RUN	NOT_RUN	NOT_RUN
+recorded-page-text-row	miniwob-jev-v3-dev-page-text-exact.s0.jsonl	13	0	NOT_RUN (no observation field)	NOT_RUN	NOT_RUN	NOT_RUN	NOT_RUN
+recorded-page-text-row	miniwob-jev-v3-dev-page-text.s0.jsonl	7	0	NOT_RUN (no observation field)	NOT_RUN	NOT_RUN	NOT_RUN	NOT_RUN
+recorded-page-text-row	miniwob-jev-v3-page_text.s0.jsonl	35	0	NOT_RUN (no observation field)	NOT_RUN	NOT_RUN	NOT_RUN	NOT_RUN
