@@ -314,6 +314,8 @@ Everything else under this root is a **vendored clone** and its tests belong to 
 
 ---
 
+- `scripts/test_gate_outcomes.py` — G1 gate outcome joins on captured session-shaped rows: DCG deny, restore/revert, undo phrase, failed follow-up, unknown/misassigned session, and report totals; real session text remains local. Run: `python3 -m unittest scripts/test_gate_outcomes.py`.
+
 ## 2. Upstream's — each vendored clone runs its own suite
 
 We do not own, extend, or fix these. A failure is a **finding about that clone**, recorded in
@@ -545,3 +547,11 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 | work/miniwob-jev/test_external_rates.py | python3 -m unittest work/miniwob-jev/test_external_rates.py | committed Table 3 extraction carries PDF URL and SHA-256; all four projected values match every published row after n/a normalization; one planted book-flight aggregate mismatch fails | 2/2 keyless; mutation RED |
 | work/miniwob-jev/test_text_candidates.py | python3 -m unittest work/miniwob-jev/test_text_candidates.py | page-text candidate builder (jev-9gtw.4.2) on the 7 captured real observations. KNOWN DEFECT at 026d1230, found by pane 1: the builder inserts the grader's answer (`derive_needed_text`) into its own candidates, so the coverage test passes by construction; a fix is in IvoryCreek's working tree, not committed. Registered so the registry is complete, not as evidence | 3/3 keyless; tautological, see jev-9gtw.4.2 |
 | scripts/test_bar_reachable.py | uv run python scripts/test_bar_reachable.py | jev-1ww3 bar-reachability gate: jev-jjwt held-out split exits 1 (fixed-candidate oracle headroom 2, minimum p 0.5); R112 337-task split exits 0 from floor.results_by_task (observed b=2,c=8; comparator exact 139; fixed-candidate oracle headroom 74, minimum p 1.0587911840678754e-22); planted max-headroom defect turns tests red; no Jev calls | 3/3 keyless; mutation RED |
+| kit/test/preflight.test.mjs | node --test kit/test/preflight.test.mjs | Captured R112 OVER (calibration row 18), FITS OSWorld state, MiniWoB drag-items-grid one-option guard, offered-option guard, and NEAR allowNear policy; planted OVER guard and one-option threshold mutations each fail 1 test | 5/5 keyless; mutation RED |
+| kit/test/validate.test.mjs | node --test kit/test/validate.test.mjs | Noul/Choice/Score/bundle schema and hostile-answer refusal; planted probability-sum and bundle-validation bypass mutations fail | 5/5 keyless; mutation RED |
+| kit/test/fake.test.mjs | node --test kit/test/fake.test.mjs | Captured answer rows drive deterministic fake Choice and exhaustion refuses fallback; planted fallback mutation fails | 2/2 keyless; mutation RED |
+| work/jev-client/test/client.test.mjs | node --test work/jev-client/test/client.test.mjs | K1 temporary re-export and fresh-clone SDK-missing path plus existing client contract | 31/31 keyless |
+| kit/test/fixtures/r112-over-limit.json | covered by node --test kit/test/preflight.test.mjs | Captured calibration row 18 provenance for the OVER plant | registry-only; source fixture |
+| kit/test/fixtures/miniwob-drag-items-grid-one-option.json | covered by node --test kit/test/preflight.test.mjs | Captured MiniWoB seed 100 row and one-option observation provenance | registry-only; source fixture |
+| kit/test/fixtures/fits-state.json | covered by node --test kit/test/preflight.test.mjs | Committed `work/pokeagent-emerald/segment2-request-states.jsonl:1` FITS row; no scratch path | registry-only; source fixture |
+| kit/test/fixtures/recorded-answer-rows.json | covered by node --test kit/test/fake.test.mjs | Captured Choice answer rows from `work/osw-bestofn/live_rows_r3.jsonl` | registry-only; source fixture |

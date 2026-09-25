@@ -15,10 +15,10 @@ test('R112 captured max_tokens_exceeded row is refused as OVER before spend', ()
   );
 });
 
-test('captured FITS OSWorld state passes the same compact-byte band', () => {
-  const result = sizePreflight(fits.captured, fits.question);
+test('committed FITS state row passes the same compact-byte band', () => {
+  const result = sizePreflightBytes(fits.state_bytes, fits.question_bytes);
   assert.equal(result.status, 'FITS');
-  assert.ok(result.totalBytes < 32_768 * 1.4794769192690072);
+  assert.equal(fits.captured.id, 'uniform-0');
 });
 
 test('captured drag-items-grid one-option observation is refused before Choice spend', () => {

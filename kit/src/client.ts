@@ -1,34 +1,3 @@
-/**
- * jev-client — the ONLY sanctioned way to call Jev systemOne in this lane.
- *
- * WHY THIS EXISTS. Every hand-rolled call in this repo has gotten the shape wrong at least once:
- *   - `{questions: [...], context}`            -> HTTP 400 (invented, 2026-09-19)
- *   - `.probability` / `.distribution`         -> undefined reads (SDK-SURFACE.md)
- *   - unset key logged as a decision row        -> 27 rows of `not configured` nobody noticed
- * Auth was never the problem. The BODY was. So the body now lives in exactly one place.
- *
- * Do not construct a systemOne request anywhere else. If you need a shape this does not
- * support, extend this file and its tests — do not fork the fetch.
- *
- * TRANSPORT: the network goes through the vendored first-party SDK
- * (upstream/typesafe-ai/typesafe-sdk-js @ 66880cc, loaded from
- * work/sdk/node_modules/@typesafe-ai/sdk, pinned by work/sdk/package-lock.json;
- * `npm ci --prefix work/sdk` materializes it) and nothing else. Imported by
- * relative path; never edit upstream/. The import is LAZY: a fresh clone has no
- * node_modules, and the keyless paths (unconfigured key, injected askers,
- * measure-kit) must load without it. A missing SDK on a real call is
- * `sdk-missing` (not `unconfigured`, which means no key), never a crash and never a score.
- * Our code owns the failure taxonomy, the field guards, and the fail-safe
- * direction — the SDK owns the wire. Single-attempt semantics are preserved
- * (SDK retry disabled per call); our 4 s default timeout is passed through.
- *
- * CONTRACT, verified against a working live call:
- *   POST https://api.typesafe.ai/v1/systemone
- *   { model, state, questions: { <key>: { type: "noul", instructions } } }
- *   -> { answers: { <key>: { noul: number } } }
- * Field names per docs/demos/SDK-SURFACE.md (`NoulResponse.noul`, `ChoiceResponse.probabilities`;
- * there is no `.probability` and no `.distribution`).
- */
 import type * as SdkModule from "../../work/sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs";
 import { validateBundleAnswers, validateChoiceAnswer, validateNoulAnswer, validateScoreAnswer } from "./validate.ts";
 declare const process: { env: Record<string, string | undefined> };
