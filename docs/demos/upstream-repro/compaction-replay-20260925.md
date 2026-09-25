@@ -96,3 +96,75 @@ written.
 **NO-CLAIM.** 7 development sessions of one project and one model pin, with the two studies' cut
 point and 40-message horizon. The arms were written after the autopsy read these sessions, so a dev
 gain is a hypothesis for the held-out, not a result.
+
+## Dev results (live, 2026-09-25, `jev-1.13.0`)
+
+**Order.** `948b479` is the prereg above. The token check and the dev pass then ran once each, at
+05:01:30Z and 05:01:42Z, under `infisical run`, with `ANTHROPIC_API_KEY` and `OPENAI_API_KEY` unset.
+Re-score, keyless: `python3 work/loss-depth/compaction/replay.py`.
+
+**The baseline is the library's request.**
+- **Token check:** A0 plus C2 on `jev-jec6`'s 4 sessions, 8 requests, measured **72,649 input
+  tokens**. `jev-jec6` recorded exactly 72,649 (`tokens-check.json`, $0.0031).
+- **Nouls:** 159 of A0's 438 nouls equal the recorded ones. The largest difference is 0.07, so the pin
+  repeats a request exactly but its answers vary by a few hundredths.
+
+**Spend.** 28 dev requests, 337,717 input tokens, **$0.0142**. By arm: A0 70,630, H1 62,704,
+H2 115,387, H3 88,996. With the token check, the total is $0.0172.
+
+**Per arm.** Unpinned calls on the slice: 50 needed, 165 not-needed.
+
+| arm | score | AUC | needed kept at 0.5 | not-needed dropped at 0.5 | dev cut | needed kept at dev cut | not-needed dropped there |
+|---|---|---:|---|---:|---:|---|---:|
+| A0 library | keepResult | 0.648 | 0/50 (0.000–0.071) | 165/165 | 0.16 | 32/50 (0.501–0.759) | 87/165 |
+| H1 no re-run premise, one use Noul | use | **0.514** | 36/50 (0.583–0.825) | 47/165 | 0.59 | 28/50 (0.423–0.688) | 83/165 |
+| H2 output head in the state | keepResult | 0.663 | 0/50 (0.000–0.071) | 165/165 | 0.17 | **39/50 (0.648–0.872)** | 84/165 |
+| H3 task body in the goal | keepResult | 0.662 | 0/50 (0.000–0.071) | 165/165 | 0.16 | 36/50 (0.583–0.825) | 92/165 |
+
+No arm meets the jec6 bar on dev: no dev-cut Wilson lower bound reaches 0.80. The descriptive
+`keepCall` AUCs are A0 0.689, H2 0.641 and H3 0.701.
+
+**Score ranges** (unpinned calls, min–median–max):
+
+| arm | min | median | max |
+|---|---:|---:|---:|
+| A0 | 0.08 | 0.16 | 0.28 |
+| H2 | 0.07 | 0.17 | 0.29 |
+| H3 | 0.08 | 0.16 | 0.29 |
+| H1 | 0.22 | 0.60 | 0.91 |
+
+**Subgroups.**
+
+| arm | 9 goal-named reads: mean | ≥ 0.5 | 33 head-located needed: mean | 17 other needed: mean |
+|---|---:|---:|---:|---:|
+| A0 | 0.184 | 0 | 0.175 | 0.167 |
+| H1 | **0.727** | **7** | 0.608 | 0.583 |
+| H2 | 0.211 | 0 | 0.193 | 0.188 |
+| H3 | 0.210 | 0 | 0.178 | 0.171 |
+
+**Predictions.**
+- **H1:** the goal-named half held (7 of 9 reach ≥ 0.5, mean 0.727). The AUC half is **falsified**:
+  AUC fell to 0.514, below A0. Without the premise Jev scores almost every call as likely to be
+  used, and with no output to look at it cannot tell needed from not-needed.
+- **H2: falsified** (+0.015 AUC, under the 0.05 floor). The 33 head-located calls rose by 0.018 and
+  the other needed calls by 0.021, so there was no concentration either.
+- **H3: falsified as a design.** AUC rose by only 0.014. The goal-named reads gained 0.026 and the
+  other needed calls about 0.004. That difference exists but is small.
+
+**What the dev pass shows.**
+- While the re-run sentence and the two-condition question stand (A0, H2, H3), every `keepResult`
+  sits in 0.07–0.29. Showing Jev the output (H2) or the task (H3) moves it by about 0.01.
+- Removing the premise without showing the output (H1) spreads the scores to 0.22–0.91 but loses the
+  ranking.
+- Each studied variable alone is either suppressed by the premise or blind without evidence. The
+  combination of evidence with no premise has not been run.
+
+**Held-out selection, as preregistered.**
+- No arm raised AUC by ≥ 0.05 over A0, so the preregistered combination rule does not fire.
+- The candidate by dev-cut lower bound is H2 at cut 0.17: 39/50 kept, lower bound 0.648, with 84/165
+  dropped. It does not meet the bar on dev.
+- This table goes to pane 1 before any held-out work.
+
+**NO-CLAIM.** 7 development sessions, one pass per arm, one model pin. The pin's answers vary by up
+to 0.07 between identical requests, so dev differences under about 0.02 in a mean are within repeat
+noise.

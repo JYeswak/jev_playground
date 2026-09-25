@@ -1,0 +1,32 @@
+{
+  "recorded_requests": 8,
+  "recorded_input_tokens": 72649,
+  "requests": 8,
+  "input_tokens": 72649,
+  "equal": true,
+  "per": [
+    {
+      "session": "01a0d0f2",
+      "a0": 7815,
+      "c2": 8838
+    },
+    {
+      "session": "01a0d241",
+      "a0": 8092,
+      "c2": 9193
+    },
+    {
+      "session": "01a0d288",
+      "a0": 9504,
+      "c2": 10722
+    },
+    {
+      "session": "01a0d11c",
+      "a0": 8575,
+      "c2": 9910
+    }
+  ],
+  "spend_usd": 0.003051,
+  "at": "2026-09-25T05:01:30.197Z",
+  "model": "jev-1.13.0"
+}
