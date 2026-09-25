@@ -166,7 +166,9 @@ def snapshot_features(path: Path) -> dict[int, dict[str, float | str]]:
             else:
                 teams[side].setdefault(key, 1.0)
         elif kind == "poke" and len(fields) > 3:
-            teams[side].setdefault(species_key(fields[3]), 0.0)
+            # Team preview exposes all six team members; keep unseen members at full HP
+            # so replay training matches the live battle team's full-team feature.
+            teams[side].setdefault(species_key(fields[3]), 1.0)
         elif kind in ("-damage", "-heal") and len(fields) > 3:
             key = nick_species.get((side, nick_of(ident)))
             hp = parse_hp(fields[3])
@@ -596,14 +598,31 @@ async def fetch_nouls(rows: list[dict[str, Any]], output: Path) -> int:
 def selftest() -> None:
     import tempfile
 
-    replay = """<script type="text/plain" class="battle-log-data">|poke|p1|Pikachu, L50\n|poke|p2|Eevee, L50\n|switch|p1a: Pika|Pikachu, L50|100/100\n|switch|p2a: Eve|Eevee, L50|100/100\n|turn|1\n|move|p1a: Pika|Thunderbolt|p2a: Eve\n|move|p2a: Eve|Tackle|p1a: Pika\n|-damage|p1a: Pika|50/100\n|turn|2\n</script>"""
+    replay = (
+        '<script type="text/plain" class="battle-log-data">'
+        "|poke|p1|Pikachu, L50\n"
+        "|poke|p1|Eevee, L50\n"
+        "|poke|p1|Snorlax, L50\n"
+        "|poke|p1|Gengar, L50\n"
+        "|poke|p1|Mew, L50\n"
+        "|poke|p1|Charizard, L50\n"
+        "|poke|p2|Eevee, L50\n"
+        "|switch|p1a: Pika|Pikachu, L50|100/100\n"
+        "|switch|p2a: Eve|Eevee, L50|100/100\n"
+        "|turn|1\n"
+        "|move|p1a: Pika|Thunderbolt|p2a: Eve\n"
+        "|move|p2a: Eve|Tackle|p1a: Pika\n"
+        "|-damage|p1a: Pika|50/100\n"
+        "|turn|2\n"
+        "</script>"
+    )
     with tempfile.TemporaryDirectory() as directory:
         path = Path(directory) / "sample.html"
         path.write_text(replay)
         got = snapshot_features(path)
         if (
-            got[1]["hp_weighted_remaining"] != 1 / 6
-            or got[2]["hp_weighted_remaining"] != 0.5 / 6
+            got[1]["hp_weighted_remaining"] != 1.0
+            or got[2]["hp_weighted_remaining"] != 5.5 / 6
             or got[2]["speed_order_rate"] <= 0.5
         ):
             raise AssertionError(f"unexpected selftest features: {got}")

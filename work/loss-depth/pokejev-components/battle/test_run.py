@@ -141,6 +141,99 @@ class FrozenLeafArmTests(unittest.TestCase):
                     expected_sha256="0" * 64,
                 )
 
+    def test_two_move_summaries_with_different_hp_get_different_leaf_scores(self):
+        model = battle_run.FrozenLeafModel(
+            features=("hp_weighted_remaining",),
+            noul_features=(),
+            intercept=0.0,
+            code_weights=(1.0,),
+            means=(0.0,),
+            scales=(1.0,),
+            noul_intercept=0.0,
+            noul_code_weights=(1.0,),
+            noul_weights=(),
+            noul_means=(0.0,),
+            noul_scales=(1.0,),
+        )
+        base = {
+            "hp_weighted_remaining": 0.5,
+            "status_count": 0.0,
+            "hazard_count": 0.0,
+            "speed_order_rate": 0.5,
+        }
+        high = battle_run.LeafPlayer._summary_features(
+            {"your_active": "Pikachu 80%", "your_bench": []},
+            "move Thunderbolt",
+            base,
+        )
+        low = battle_run.LeafPlayer._summary_features(
+            {"your_active": "Pikachu 20%", "your_bench": []},
+            "move Thunderbolt",
+            base,
+        )
+        self.assertNotEqual(model.score(high), model.score(low))
+
+    def test_live_features_match_full_team_replay_features_on_three_turns(self):
+        from types import SimpleNamespace
+
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        import leaf_c  # noqa: PLC0415
+
+        replay_dir = Path(__file__).resolve().parents[1] / (
+            "replays-abyssal-leaf-code-leaf-c-r2-code"
+        )
+        checked = 0
+        for replay_path in sorted(replay_dir.glob("*.html")):
+            snapshots = leaf_c.snapshot_features(replay_path)
+            first_turn = snapshots[min(snapshots)]
+            if first_turn["speed_order_rate"] != 0.5:
+                continue
+            species = [
+                name for name in str(first_turn["known_species"]).split(",") if name
+            ]
+            team = {
+                name: SimpleNamespace(current_hp_fraction=1.0, status=None)
+                for name in species
+            }
+            battle = SimpleNamespace(team=team, side_conditions={})
+            live = battle_run.LeafPlayer._base_features(battle)
+            for feature in (
+                "hp_weighted_remaining",
+                "status_count",
+                "hazard_count",
+                "speed_order_rate",
+            ):
+                self.assertAlmostEqual(
+                    live[feature],
+                    float(first_turn[feature]),
+                    delta=1e-6,
+                    msg=f"{replay_path.name}:{min(snapshots)}:{feature}",
+                )
+            checked += 1
+            if checked == 3:
+                break
+        self.assertEqual(checked, 3)
+
+    def test_recorded_dev_leaf_switch_rate_is_near_stage_b_sanity_rate(self):
+        root = Path(__file__).resolve().parents[1]
+        path = root / "decisions-abyssal-leaf-code-v1.jsonl"
+        rows = [
+            json.loads(line) for line in path.read_text().splitlines() if line.strip()
+        ]
+        offered = [
+            row
+            for row in rows
+            if any(
+                str(candidate).startswith("switch ")
+                for candidate in row.get("candidates", [])
+            )
+        ][:100]
+        self.assertEqual(len(offered), 100)
+        switch_rate = sum(
+            str(row.get("chosen", "")).startswith("switch ") for row in offered
+        ) / len(offered)
+        self.assertLessEqual(abs(switch_rate - 0.41), 0.10)
+
     def test_shard_row_records_start_and_finish_timestamps(self):
         async def fake_play(_me, _opp, k, _replays):
             return {"k": k, "won": True}

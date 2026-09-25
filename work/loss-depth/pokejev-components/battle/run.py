@@ -436,7 +436,7 @@ class LeafPlayer(FrozenAlphaPlayer):
         hp = [
             float(match) / 100.0
             for line in lines
-            for match in re.findall(r"(\\d+)%", str(line))
+            for match in re.findall(r"(\d+)%", str(line))
         ]
         statuses = ("burn", "par", "poison", "tox", "sleep", "freeze")
         return {
