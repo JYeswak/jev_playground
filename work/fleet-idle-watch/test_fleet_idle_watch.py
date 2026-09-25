@@ -460,5 +460,64 @@ class Inbox(unittest.TestCase):
         self.assertEqual(self.sent, [])
 
 
+class StrangerPager(unittest.TestCase):
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp(prefix="fiw-stranger-"))
+        self.state = self.root / "state" / "stranger-paged.json"
+        self.sent = []
+
+    def send(self, message):
+        self.sent.append(message)
+        return True
+
+    def test_new_failure_pages_once_and_persists(self):
+        lines = [
+            "README stranger nightly: failure 36134076882 25m ago",
+            "  FIRST MISMATCH row changed class: planted",
+        ]
+        note = fiw.stranger_round(lines, self.state, self.send)
+        self.assertEqual(
+            self.sent,
+            [
+                "README STRANGER FAILURE: run 36134076882 25m ago; "
+                "row changed class: planted"
+            ],
+        )
+        self.assertTrue(
+            note.startswith("Stranger page: 1 new failures paged this round")
+        )
+        self.assertIn("36134076882", self.state.read_text())
+        self.assertEqual(
+            fiw.stranger_round(lines, self.state, self.send),
+            "Stranger page: 0 new failures paged this round, 1 paged total",
+        )
+        self.assertEqual(len(self.sent), 1)
+
+    def test_stale_failure_pages_and_failed_send_retries(self):
+        lines = [
+            "README stranger nightly: STALE failure 36131647900 2d ago",
+            "  FIRST MISMATCH new README command: planted",
+        ]
+        self.assertIn(
+            "1 send failed",
+            fiw.stranger_round(lines, self.state, lambda _message: False),
+        )
+        note = fiw.stranger_round(lines, self.state, self.send)
+        self.assertIn("1 new failures paged this round", note)
+        self.assertEqual(len(self.sent), 1)
+
+    def test_success_and_not_run_do_not_page(self):
+        lines = ["README stranger nightly: success 36135948301 25m ago"]
+        self.assertIsNone(fiw.stranger_round(lines, self.state, self.send))
+        self.assertIsNone(
+            fiw.stranger_round(
+                ["README stranger nightly: NOT_RUN no completed run"],
+                self.state,
+                self.send,
+            )
+        )
+        self.assertEqual(self.sent, [])
+
+
 if __name__ == "__main__":
     unittest.main()

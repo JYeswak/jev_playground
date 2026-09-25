@@ -57,8 +57,10 @@ claim nobody can check:
   newer unfinished pushes gets a STALE line; gh failing, gh absent, gh unauthenticated (gh 2.94.0's
   own stderr), gh hanging past the timeout, no completed run, and a cancelled run all print NOT_RUN
   and exit 2; log rows: gates `RED` stage plus its `FAIL` checks, `RED named`, and the runner's
-  echoed script source is not a row. Planting `failure` into GREEN fails 2 tests.
-  Run: `python3 -m unittest work/ci-main-status/test_ci_main_status.py` (14 tests).
+  echoed script source is not a row; the newest scheduled/workflow_dispatch README stranger run is
+  reported with result, age, first mismatch, and STALE after 36 h, with no completed run as NOT_RUN.
+  Planting `failure` into GREEN fails 2 tests.
+  Run: `python3 -m unittest work/ci-main-status/test_ci_main_status.py` (19 tests).
 - `work/omp-jev-review/test_judge_usage.py` — the judge-role section of
   `work/omp-jev-review/surface-census.py` and its `--fleet-line` (jev-xpk1), on row shapes copied
   from real omp 18.3.0 session files, no model calls: success rows are calls, tokens and cost by
@@ -129,12 +131,15 @@ claim nobody can check:
   kept as history; a new high after round 1 pages; an id already in the state file does not; a
   malformed front matter is named in the `Inbox:` line, not raised; a failed send is retried; a
   missing inbox dir and an unreadable state file are `Inbox: NOT_RUN`; `--once` prints the Inbox
-  line after the skills line. Plants, each restored byte-identical: page every importance fails 7
-  of 24; drop the persisted set fails 7 of 24. Wait marker (jev-t54m, jev-oxdq): a wait with a
-  session idle 600 s+ and nothing but helpers or nothing at all under omp is `stalled-wait`; a
-  CPU-active child, or a live child at 0.0 CPU (a paced `work/openrouter-incumbents/run.py`,
-  session idle 900 s), is `working`. Plant "require CPU again" fails 1 of 30.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (30 tests).
+  line after the skills line. Plants, each restored byte-identically: page every importance fails
+  7 of 24; drop the persisted set fails 7 of 24. README stranger failures from the CI line
+  (jev-gbdb) page pane 1 once per run id, including stale failures; failed sends retry and
+  success/NOT_RUN never page.
+  Wait marker (jev-t54m, jev-oxdq): a wait with a session idle 600 s+ and nothing but helpers or
+  nothing at all under omp is `stalled-wait`; a CPU-active child, or a live child at 0.0 CPU (a
+  paced `work/openrouter-incumbents/run.py`, session idle 900 s), is `working`. Plant "require
+  CPU again" fails 1 of 30.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (33 tests).
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder

@@ -2088,3 +2088,25 @@ used the remaining-20 cap and stopped at its 170-request cap. The account counte
 **No `score.py` run and no comparator verdict.** This is a PARTIAL cell that must resume after
 the reset until all 1,500 rows exist. Boundary: no other comparator model or set ran in this
 continuation; no paid call was attempted.
+
+## jev-gbdb README stranger status and pane-1 pager (2026-09-25) [test]
+
+Keyless fixture tests use recorded GitHub JSON for stranger runs `36135948301`,
+`36134076882`, `36131647900`, and `36131541214`, plus the recorded failed-log
+mismatch line. `scripts/ci-main-status.py` now reports the newest completed
+`workflow_dispatch` or `schedule` run, its age, first `row changed`/`new README
+command` mismatch, `STALE` after 36 hours, and `NOT_RUN` when no completed run
+exists. `scripts/fleet-idle-watch.py` prints the line and pages pane 1 once per
+failed run id, including stale failures; failed sends remain retryable.
+
+Evidence: `python3 -m unittest work/ci-main-status/test_ci_main_status.py
+work/fleet-idle-watch/test_fleet_idle_watch.py` → **52/52 passed**; the wrong
+workflow plant is RED, and watcher pager tests cover fresh failure, stale
+failure, duplicate suppression, failed-send retry, success, and NOT_RUN.
+`python3 scripts/ci-main-status.py` on this machine printed
+`README stranger nightly: success 36135948301 20m ago`. A real
+`python3 scripts/fleet-idle-watch.py --once` printed the same nightly line
+without paging because the newest run was successful.
+
+Boundary: **0 Jev/API requests and $0 Jev spend**; this change observes GitHub
+workflow status only and does not claim the README's substantive judgments.

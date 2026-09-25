@@ -33,10 +33,22 @@ spec.loader.exec_module(cms)
 
 GREEN_DONE = cms.epoch("2026-09-24T21:44:16Z")  # 36063055143 updatedAt
 RED_DONE = cms.epoch("2026-09-24T21:13:29Z")  # 36059723283 updatedAt
+STRANGER_DONE = cms.epoch("2026-09-25T12:44:21Z")  # 36135948301 updatedAt
 FAIL_ROW = "work/sr-adopt/test_runner_gates.py\t1\t3\t71.31\t\tFAIL"
 
 
-def fake_gh(listing, views=None, logs=None, broken=()):
+def fixture_text(source):
+    return (FIX / source).read_text() if isinstance(source, str) else json.dumps(source)
+
+
+def fake_gh(
+    listing,
+    views=None,
+    logs=None,
+    broken=(),
+    stranger_listing="list-stranger.json",
+    stranger_logs=None,
+):
     """A gh transport over fixture files; `broken` names calls ('list', 'jobs', 'log') that fail."""
     calls = []
 
@@ -48,9 +60,19 @@ def fake_gh(listing, views=None, logs=None, broken=()):
         if kind in broken:
             raise cms.GhError(f"gh exit 1: planted {kind} failure")
         if kind == "list":
-            return (FIX / listing).read_text()
-        table = views if kind == "jobs" else logs
-        return (FIX / table[args[2]]).read_text(encoding="utf-8")
+            workflow = args[args.index("--workflow") + 1]
+            source = stranger_listing if workflow == "stranger-run.yml" else listing
+            return fixture_text(source)
+        run_id = args[2]
+        table = (
+            stranger_logs
+            if kind == "log" and run_id in (stranger_logs or {})
+            else views
+            if kind == "jobs"
+            else logs
+        )
+        source = table[run_id]
+        return fixture_text(source)
 
     gh.calls = calls
     return gh
@@ -131,6 +153,77 @@ class Status(unittest.TestCase):
         )
 
 
+class StrangerStatus(unittest.TestCase):
+    def test_latest_dispatch_success_is_fresh(self):
+        gh = fake_gh("list-green.json")
+        lines = cms.stranger_status(gh, STRANGER_DONE + 25 * 60)
+        self.assertEqual(
+            lines, ["README stranger nightly: success 36135948301 25m ago"]
+        )
+        self.assertEqual(len(gh.calls), 1)
+
+    def test_failure_reports_first_mismatch_line(self):
+        runs = json.loads((FIX / "list-stranger.json").read_text())
+        runs[0], runs[1] = runs[1], runs[0]
+        gh = fake_gh(
+            "list-green.json",
+            stranger_listing=runs,
+            stranger_logs={"36134076882": "log-stranger-36134076882.txt"},
+        )
+        lines = cms.stranger_status(gh, cms.epoch("2026-09-25T12:50:18Z"))
+        self.assertEqual(
+            lines,
+            [
+                "README stranger nightly: failure 36134076882 25m ago",
+                "  FIRST MISMATCH row changed class: python3 scripts/run-registered-suites.py: "
+                "expected 0, got UNEXPECTED",
+            ],
+        )
+
+    def test_failure_older_than_36_hours_is_stale(self):
+        gh = fake_gh("list-green.json")
+        lines = cms.stranger_status(gh, STRANGER_DONE + 36 * 3600 + 1)
+        self.assertEqual(
+            lines, ["README stranger nightly: STALE success 36135948301 1d ago"]
+        )
+
+    def test_no_completed_stranger_run_is_not_run(self):
+        pending = [
+            {
+                "conclusion": "",
+                "databaseId": 99,
+                "event": "schedule",
+                "headSha": "a" * 40,
+                "status": "in_progress",
+                "updatedAt": "2026-09-25T12:44:21Z",
+            }
+        ]
+        lines = cms.stranger_status(lambda args: json.dumps(pending), STRANGER_DONE)
+        self.assertEqual(
+            lines,
+            [
+                "README stranger nightly: NOT_RUN no completed stranger-run.yml run "
+                "on main among the newest 1"
+            ],
+        )
+
+    def test_wrong_workflow_plant_is_caught(self):
+        gh = fake_gh("list-green.json")
+        original = cms.STRANGER_WORKFLOW
+        try:
+            cms.STRANGER_WORKFLOW = "gates.yml"
+            lines = cms.stranger_status(gh, STRANGER_DONE)
+        finally:
+            cms.STRANGER_WORKFLOW = original
+        self.assertEqual(
+            lines,
+            [
+                "README stranger nightly: NOT_RUN no completed gates.yml run "
+                "on main among the newest 5"
+            ],
+        )
+
+
 class LogRows(unittest.TestCase):
     def test_gates_red_row_and_its_fail_checks_both_jobs(self):
         rows = cms.failing_rows(
@@ -190,7 +283,9 @@ class Cli(unittest.TestCase):
             (done.stdout, done.returncode),
             (
                 "CI main NOT_RUN gh not installed; install it from https://cli.github.com,"
-                " then run: gh auth login\n",
+                " then run: gh auth login\n"
+                "README stranger nightly: NOT_RUN gh not installed; install it from "
+                "https://cli.github.com, then run: gh auth login\n",
                 2,
             ),
         )
@@ -204,21 +299,31 @@ class Cli(unittest.TestCase):
         self.assertEqual(
             done.stdout,
             "CI main NOT_RUN gh exit 4: gh: To use GitHub CLI in automation, set the GH_TOKEN"
-            " environment variable. (log in: gh auth login)\n",
+            " environment variable. (log in: gh auth login)\n"
+            "README stranger nightly: NOT_RUN gh exit 4: gh: To use GitHub CLI in automation, "
+            "set the GH_TOKEN environment variable. (log in: gh auth login)\n",
         )
 
     def test_gh_other_failure_gets_no_login_hint(self):
         done, _ = self.run_cli("echo 'HTTP 502: Bad Gateway' >&2\nexit 1\n")
         self.assertEqual(
             (done.stdout, done.returncode),
-            ("CI main NOT_RUN gh exit 1: HTTP 502: Bad Gateway\n", 2),
+            (
+                "CI main NOT_RUN gh exit 1: HTTP 502: Bad Gateway\n"
+                "README stranger nightly: NOT_RUN gh exit 1: HTTP 502: Bad Gateway\n",
+                2,
+            ),
         )
 
     def test_gh_hang_hits_the_timeout(self):
         done, seconds = self.run_cli("exec /bin/sleep 30\n", timeout="1")
         self.assertEqual(
             (done.stdout, done.returncode),
-            ("CI main NOT_RUN gh run list timed out after 1s\n", 2),
+            (
+                "CI main NOT_RUN gh run list timed out after 1s\n"
+                "README stranger nightly: NOT_RUN gh run list timed out after 1s\n",
+                2,
+            ),
         )
         self.assertLess(seconds, 10)
 

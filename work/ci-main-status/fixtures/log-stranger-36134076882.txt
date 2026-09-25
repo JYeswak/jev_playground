@@ -1,0 +1,1 @@
+stranger	Run every README command keyless against this checkout	2026-09-25T12:25:14.5010090Z - row changed class: python3 scripts/run-registered-suites.py: expected 0, got UNEXPECTED

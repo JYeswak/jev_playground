@@ -28,6 +28,10 @@ Key    = every round, the census's `Key exposure 24h:` line (surface-census.py -
          (bead jev-9ov4). Paged paths persist in JEV_WATCH_KEY_STATE, so a restart does not
          re-page; a first run pages every named path. Paths only, never the key. Why: 2026-09-25
          05:57Z a pane printed the live key into a tool result and nobody saw it for 50 minutes.
+Stranger = every round, the `README stranger nightly:` lines from ci-main-status.py are printed,
+         and each new failed or stale failed run goes to pane 1 once as `README STRANGER FAILURE: ...`.
+         Paged run ids persist in JEV_WATCH_STRANGER_STATE, so a restart does not re-page the same run.
+         Why: 2026-09-25 the README nightly gate failed twice before its green dispatch was visible.
 
 Why: 2026-09-24, 4 of 6 worker panes sat at their prompts for most of an hour and the
 conductor only looked when a callback arrived. Joshua: "dont let that happen again."
@@ -105,6 +109,12 @@ CREATED = re.compile(r"^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(\.\d+)?(Z|\+00:00)$")
 # Key exposure paging (bead jev-9ov4): the census's `Key exposure 24h:` line names up to 3 session
 # files holding a TypeSafe-shaped key; each path is paged once, persisted like the inbox ids.
 KEY_STATE = "~/.local/state/jev/key-exposure-paged.json"
+STRANGER_STATE = "~/.local/state/jev/stranger-paged.json"
+STRANGER_LINE = "README stranger nightly: "
+STRANGER_FAILURE = re.compile(
+    r"^README stranger nightly: (?:STALE )?failure (\d+) (.+)$"
+)
+
 KEY_LINE = "Key exposure 24h: "
 KEY_COUNT = re.compile(r"^Key exposure 24h: (\d+) session files hold")
 KEY_PATH = re.compile(r"(.+?\.jsonl) \((\d\d:\d\d)Z\)(?:, |$)")
@@ -541,6 +551,58 @@ def key_round(lines: list[str], state: Path, send) -> str | None:
     )
 
 
+def stranger_state_path() -> Path:
+    """The paged-run state file for README stranger failures."""
+    return Path(
+        os.environ.get("JEV_WATCH_STRANGER_STATE") or STRANGER_STATE
+    ).expanduser()
+
+
+def stranger_round(lines: list[str], state: Path, send) -> str | None:
+    """Page each new failed README stranger run once.
+
+    `send(message) -> bool`; a False leaves the run id unrecorded so the next round retries it.
+    The status script emits the mismatch on the following line, which is included in the page.
+    """
+    status = next((line for line in lines if line.startswith(STRANGER_LINE)), "")
+    match = STRANGER_FAILURE.match(status)
+    if not match:
+        return None
+    run_id, age = match.groups()
+    try:
+        saved = json.loads(state.read_text()) if state.exists() else {}
+        paged = {str(item) for item in saved.get("paged", [])}
+    except (OSError, ValueError, AttributeError, TypeError) as err:
+        return f"Stranger page: NOT_RUN state file {state} unreadable ({type(err).__name__}: {err})"
+    if run_id in paged:
+        return (
+            f"Stranger page: 0 new failures paged this round, {len(paged)} paged total"
+        )
+    mismatch = next(
+        (
+            line.removeprefix("  FIRST MISMATCH ")
+            for line in lines
+            if line.startswith("  FIRST MISMATCH ")
+        ),
+        "not named in failed log",
+    )
+    message = f"README STRANGER FAILURE: run {run_id} {age}; {mismatch}"
+    sent = 1 if send(message) else 0
+    failed = 0 if sent else 1
+    if sent:
+        paged.add(run_id)
+    notes = [f"{failed} send failed, retried next round"] if failed else []
+    try:
+        save_state(state, paged, set())
+    except OSError as err:
+        notes.append(f"state NOT saved, next round re-pages ({err})")
+    tail = f" ({'; '.join(notes)})" if notes else ""
+    return (
+        f"Stranger page: {sent} new failures paged this round, {len(paged)} paged total"
+        f"{tail}"
+    )
+
+
 def ci_lines() -> list[str]:
     """scripts/ci-main-status.py's output (bead jev-bfku). Informational: never sets our exit code."""
     script = os.path.join(
@@ -625,8 +687,12 @@ def main() -> int:
         for index, reading in sorted(states.items()):
             state, words = reading[:2]
             print(f"pane {index}: {state} {words}")
-        for line in ci_lines():
+        ci = ci_lines()
+        for line in ci:
             print(line)
+        note = stranger_round(ci, stranger_state_path(), page)
+        if note:
+            print(note)
         census = judge_lines()
         for line in census:
             print(line)
@@ -672,8 +738,14 @@ def main() -> int:
             if streak[index] >= POLLS and due:
                 alert(index, idle_since[index], f"[{state}] {words}")
                 alerted_at[index] = now
-        inbox_line = inbox_round(*inbox_paths(), started, page)
         stamp = time.strftime("%H:%M:%SZ", time.gmtime())
+        ci = ci_lines()
+        for line in ci:
+            print(f"{stamp} {line}", flush=True)
+        note = stranger_round(ci, stranger_state_path(), page)
+        if note:
+            print(f"{stamp} {note}", flush=True)
+        inbox_line = inbox_round(*inbox_paths(), started, page)
         print(f"{stamp} {inbox_line}", flush=True)
         # The census each round (about 2 s on 2026-09-25), so a printed key pages within one round.
         census = judge_lines()

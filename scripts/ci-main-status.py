@@ -20,6 +20,8 @@ Why: 2026-09-24, registered-suites failed on every push to main from cf70e28 (15
 (21:10Z), about 55 runs, and no agent looked for six hours (bead jev-bfku).
 """
 
+from __future__ import annotations
+
 import json
 import os
 import re
@@ -30,14 +32,20 @@ from datetime import datetime, timezone
 
 REPO = os.environ.get("JEV_CI_REPO", "JYeswak/jev_playground")
 WORKFLOW = "gates.yml"
+STRANGER_WORKFLOW = "stranger-run.yml"
+STRANGER_EVENTS = {"schedule", "workflow_dispatch"}
+STRANGER_STALE_SECONDS = 36 * 3600
+
 TIMEOUT = float(os.environ.get("CI_MAIN_STATUS_TIMEOUT", "20"))
 GREEN = {"success"}
 RED = {"failure", "timed_out", "startup_failure"}
 LIST_FIELDS = "databaseId,headSha,status,conclusion,createdAt,updatedAt,url"
+STRANGER_LIST_FIELDS = f"{LIST_FIELDS},event"
 # gh --log-failed line: <job>\t<step>\t<timestamp> <message>; the step's first line carries a BOM.
 STAMP = re.compile(r"^\ufeff?\d{4}-\d\d-\d\dT[0-9:.]+Z ?")
 ANSI = re.compile(r"(\x1b|\^\[)\[[0-9;]*m")
 WIDTH = 220
+STRANGER_MISMATCH = re.compile(r"\b(row changed|new README command)\b.*")
 
 
 class GhError(Exception):
@@ -193,8 +201,66 @@ def status(gh, now: float) -> tuple[list[str], int]:
     return lines, rc
 
 
+def stranger_mismatch(log: str) -> str | None:
+    """Return the first README expectation mismatch named by a stranger-run log."""
+    for line in log.splitlines():
+        message = ANSI.sub("", STAMP.sub("", line, count=1))
+        match = STRANGER_MISMATCH.search(message)
+        if match:
+            return message[match.start() :].strip()[:WIDTH]
+    return None
+
+
+def stranger_status(gh, now: float) -> list[str]:
+    """Report the newest completed scheduled or manually dispatched README stranger run."""
+    try:
+        runs = json.loads(
+            gh(
+                [
+                    "run",
+                    "list",
+                    "-R",
+                    REPO,
+                    "--workflow",
+                    STRANGER_WORKFLOW,
+                    "--branch",
+                    "main",
+                    "--limit",
+                    "20",
+                    "--json",
+                    STRANGER_LIST_FIELDS,
+                ]
+            )
+        )
+    except (GhError, ValueError) as error:
+        return [f"README stranger nightly: NOT_RUN {error}"]
+    eligible = [r for r in runs if r.get("event") in STRANGER_EVENTS]
+    done = next((r for r in eligible if r.get("status") == "completed"), None)
+    if done is None:
+        return [
+            f"README stranger nightly: NOT_RUN no completed {STRANGER_WORKFLOW} run "
+            f"on main among the newest {len(runs)}"
+        ]
+    conclusion = done.get("conclusion") or "none"
+    run_id = done["databaseId"]
+    run_age = age(done["updatedAt"], now)
+    stale = now - epoch(done["updatedAt"]) > STRANGER_STALE_SECONDS
+    prefix = "STALE " if stale else ""
+    lines = [f"README stranger nightly: {prefix}{conclusion} {run_id} {run_age}"]
+    if conclusion == "failure":
+        try:
+            mismatch = stranger_mismatch(
+                gh(["run", "view", str(run_id), "-R", REPO, "--log-failed"])
+            )
+        except GhError as error:
+            mismatch = f"NOT_RUN log unavailable: {error}"
+        lines.append(f"  FIRST MISMATCH {mismatch or 'not named in failed log'}")
+    return lines
+
+
 def main() -> int:
     lines, rc = status(gh, time.time())
+    lines += stranger_status(gh, time.time())
     print("\n".join(lines), flush=True)
     return rc
 
