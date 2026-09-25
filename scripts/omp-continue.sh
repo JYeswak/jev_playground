@@ -42,7 +42,7 @@ checker=foundation/kit/check-claim-discipline.sh
 if [ ! -f "$checker" ]; then
   say "claim checker missing: $checker"; exit 2
 fi
-if ! sh "$checker" foundation/kit/claims.tsv README.md "$top" >/dev/null 2>&1; then
+if ! sh "$checker" foundation/kit/claims.tsv docs/LEDGER.md "$top" >/dev/null 2>&1; then
   say "claim-discipline gate is RED; stopping so it gets fixed, not routed around"; exit 1
 fi
 

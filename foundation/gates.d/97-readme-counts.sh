@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Stage 97 — the README's typed counts must match what the repository actually contains.
+# Stage 97 — the ledger's typed counts must match what the repository actually contains.
 #
 #   CONSUMER            foundation/gates.sh (this stage)
-#   GATE                the stage-count word in README.md equals the gates.d glob; every numeral
+#   GATE                the stage-count word in docs/LEDGER.md equals the gates.d glob; every numeral
 #                       "<N> gate stages", "<N> verdict rows", and "(A cleared, B held, C ruled out"
-#                       in README.md equals its machine source; no upstream repo is described as
+#                       in docs/LEDGER.md equals its machine source; no upstream repo is described as
 #                       "not run" while a receipt for it exists
 #   OBSERVED DEFECTS    four in one day, all typed next to something that grows: "not run" for a repo
 #                       run hours earlier, "eight of ten" after an eleventh stage landed, "two of the
@@ -13,7 +13,7 @@
 #                       stages: numeral "12 gate stages" for 13, and "25 verdict rows (7/9/8)" for 33
 #                       (8/13/12), stated twice plus once more without a breakdown. The spelled-word
 #                       check matched "Thirteen stages"; the numerals lived two lines below it.
-#   RETIREMENT          when these counts are GENERATED into the README rather than typed, this stage
+#   RETIREMENT          when these counts are GENERATED into the ledger rather than typed, this stage
 #                       has nothing left to check and should be deleted rather than kept green
 #
 # WHY A GATE RATHER THAN ANOTHER NOTE. The pattern was named in a commit message last tick and
@@ -24,7 +24,7 @@
 # machine source are checked — the gates.d glob, STATUS.tsv row and verdict counts. A numeral
 # about anything else is free prose and out of scope for ever, because chasing every restatement
 # of a number through prose false-positives by construction. The check is exact-equality on a
-# fixed noun pattern, never "does this number appear somewhere", so a README that legitimately
+# fixed noun pattern, never "does this number appear somewhere", so a ledger that legitimately
 # says "12" about something else cannot trip it.
 #
 # WHAT IT DELIBERATELY DOES NOT CHECK: prose accuracy, the fresh-clone pass figure (which requires
@@ -34,9 +34,9 @@ set -euo pipefail
 
 root="${JEV_REPO:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 cd "$root"
-readme="${JEV_README:-README.md}"
+readme="${JEV_README:-docs/LEDGER.md}"
 
-# Spelled numbers, because the README spells them. Extend when the suite outgrows the list; an
+# Spelled numbers, because the ledger spells them. Extend when the suite outgrows the list; an
 # unmatched count is reported rather than skipped, so this cannot silently stop checking.
 num_word() {
   case "$1" in
@@ -58,7 +58,7 @@ if [[ "${1:-}" == "--selftest" ]]; then
     if [[ "$got" == "$want" ]]; then printf '  ok   %-40s rc=%s\n' "$name" "$got"
     else printf '  FAIL %-40s rc=%s want=%s\n' "$name" "$got" "$want"; fails=$((fails+1)); fi
   }
-  arm "live README agrees" 0 "$readme"
+  arm "live ledger agrees" 0 "$readme"
 
   n_now="$(find "$root/foundation/gates.d" -name '*.sh' | grep -c . || true)"
   wrong="$(num_word $((n_now - 1)))"
@@ -83,20 +83,20 @@ if [[ "${1:-}" == "--selftest" ]]; then
     >> "$tmp/stalenumerals.md"
   arm "stale numerals under matching word -> RED" 1 "$tmp/stalenumerals.md"
 
-  # The escape of 2026-09-22: a README generated through the Python eval kernel, whose `!` line
+  # The escape of 2026-09-22: a ledger generated through the Python eval kernel, whose `!` line
   # escape rewrote the hero line `![...](visual/hero.jpg)` into `__omp_shell("[...]")`.
   printf '__omp_shell("[hero](visual/hero.jpg)")\n' > "$tmp/harness.md"
   cat "$readme" >> "$tmp/harness.md"
-  arm "harness markup in README -> RED" 1 "$tmp/harness.md"
+  arm "harness markup in ledger -> RED" 1 "$tmp/harness.md"
 
-  arm "missing README -> refuse" 2 "$tmp/absent.md"
+  arm "missing ledger -> refuse" 2 "$tmp/absent.md"
 
   if (( fails > 0 )); then echo "stage 97 selftest: $fails arm(s) FAILED"; exit 1; fi
   echo "stage 97 selftest: $arms arms ok"
   exit 0
 fi
 
-[[ -f "$readme" ]] || { echo "FAIL  stage 97 readme counts            $readme missing"; exit 2; }
+[[ -f "$readme" ]] || { echo "FAIL  stage 97 ledger counts            $readme missing"; exit 2; }
 
 problems=""
 
@@ -106,13 +106,13 @@ if [[ -z "$word" ]]; then
   problems="$problems|no spelled form for $n_stages stages; extend num_word rather than skipping"
 elif ! grep -q "$word stages" "$readme"; then
   claimed="$(grep -oE '\b(Eight|Nine|Ten|Eleven|Twelve|Thirteen|Fourteen|Fifteen|Sixteen|Seventeen|Eighteen|Nineteen|Twenty(-[a-z]+)?) stages' "$readme" | head -1)"
-  problems="$problems|README says '${claimed:-no stage count}' but foundation/gates.d holds $n_stages ($word)"
+  problems="$problems|ledger says '${claimed:-no stage count}' but foundation/gates.d holds $n_stages ($word)"
 fi
 
 # Numeral forms of the same two machine-sourced facts. Every occurrence must equal the
 # machine count — the escape was a stale numeral two lines below a matching spelled word.
 while IFS= read -r hit; do
-  [[ "$hit" == "$n_stages" ]] || problems="$problems|README says '$hit gate stages' but foundation/gates.d holds $n_stages"
+  [[ "$hit" == "$n_stages" ]] || problems="$problems|ledger says '$hit gate stages' but foundation/gates.d holds $n_stages"
 done < <(grep -oE '[0-9]+ gate stages' "$readme" | grep -oE '^[0-9]+' || true)
 
 n_rows="$(grep -vc '^#\|^candidate\|^$' "$root/docs/demos/STATUS.tsv")"
@@ -120,11 +120,11 @@ n_cleared="$(awk -F'\t' '$4=="CLEARED"' "$root/docs/demos/STATUS.tsv" | grep -c 
 n_held="$(awk -F'\t' '$4=="HELD"' "$root/docs/demos/STATUS.tsv" | grep -c . || true)"
 n_out="$(awk -F'\t' '$4=="RULED_OUT"' "$root/docs/demos/STATUS.tsv" | grep -c . || true)"
 while IFS= read -r hit; do
-  [[ "$hit" == "$n_rows" ]] || problems="$problems|README says '$hit verdict rows' but STATUS.tsv holds $n_rows"
+  [[ "$hit" == "$n_rows" ]] || problems="$problems|ledger says '$hit verdict rows' but STATUS.tsv holds $n_rows"
 done < <(grep -oE '[0-9]+ verdict rows' "$readme" | grep -oE '^[0-9]+' || true)
 while IFS= read -r triple; do
   want="($n_cleared cleared, $n_held held, $n_out ruled out"
-  [[ "$triple" == "$want" ]] || problems="$problems|README breakdown '$triple)' differs from STATUS.tsv '$want)'"
+  [[ "$triple" == "$want" ]] || problems="$problems|ledger breakdown '$triple)' differs from STATUS.tsv '$want)'"
 done < <(grep -oE '\([0-9]+ cleared, [0-9]+ held, [0-9]+ ruled out' "$readme" || true)
 
 # Any repo row claiming "not run" while docs/demos/upstream-repro holds a receipt naming it.
@@ -138,15 +138,15 @@ done < <(grep -E '^\|`[a-z0-9-]+`.*not run' "$readme" || true)
 
 # Harness markup that leaked into the public page instead of the Markdown it replaced.
 while IFS= read -r hit; do
-  problems="$problems|README line ${hit%%:*} carries harness markup instead of Markdown: ${hit#*:}"
+  problems="$problems|ledger line ${hit%%:*} carries harness markup instead of Markdown: ${hit#*:}"
 done < <(grep -nE '__omp_shell\(|get_ipython\(\)' "$readme" | cut -c1-90 || true)
 
 if [[ -n "$problems" ]]; then
-  echo "FAIL  stage 97 readme counts            a typed count no longer matches the repository."
+  echo "FAIL  stage 97 ledger counts            a typed count no longer matches the repository."
   printf '%s' "$problems" | tr '|' '\n' | grep -v '^$' | sed 's/^/      /'
   echo "      Re-derive it; do not adjust it by arithmetic. That is how the last four went stale."
   exit 1
 fi
 
-echo "PASS  stage 97 readme counts             $n_stages stages stated as '$word'; no stale not-run row"
+echo "PASS  stage 97 ledger counts             $n_stages stages stated as '$word'; no stale not-run row"
 exit 0
