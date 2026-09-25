@@ -435,6 +435,70 @@ def score_model(
     return result
 
 
+def score_heldout_model(
+    train_rows: list[dict[str, Any]],
+    eval_rows: list[dict[str, Any]],
+    nouls: dict[str, list[float]],
+    with_nouls: bool,
+) -> dict[str, Any]:
+    try:
+        import numpy as np
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.pipeline import make_pipeline
+        from sklearn.preprocessing import StandardScaler
+    except ImportError as exc:
+        raise SystemExit(f"scoring dependencies unavailable: {exc}") from exc
+    if with_nouls:
+        train_rows = [row for row in train_rows if row["id"] in nouls]
+        eval_rows = [row for row in eval_rows if row["id"] in nouls]
+    names = list(FEATURES) + (
+        ["ko_now", "danger_now", "switch_needed"] if with_nouls else []
+    )
+
+    def matrix(rows: list[dict[str, Any]]) -> Any:
+        return np.asarray(
+            [
+                [
+                    *(row["features"][name] for name in FEATURES),
+                    *(nouls[row["id"]] if with_nouls else []),
+                ]
+                for row in rows
+            ],
+            dtype=float,
+        )
+
+    x_train = matrix(train_rows)
+    y_train = np.asarray([row["won"] for row in train_rows], dtype=int)
+    x_eval = matrix(eval_rows)
+    y_eval = np.asarray([row["won"] for row in eval_rows], dtype=int)
+    model = make_pipeline(
+        StandardScaler(),
+        LogisticRegression(C=1.0, penalty="l2", solver="liblinear", random_state=SEED),
+    )
+    model.fit(x_train, y_train)
+    probabilities = model.predict_proba(x_eval)[:, 1]
+    scored = [
+        (row["battle"], float(score), row["won"])
+        for row, score in zip(eval_rows, probabilities)
+    ]
+    point, interval = grouped_bootstrap(scored)
+    return {
+        "arm": "C_code_plus_noul" if with_nouls else "C_code_only",
+        "n": len(eval_rows),
+        "battles": len({row["battle"] for row in eval_rows}),
+        "positive": int(y_eval.sum()),
+        "negative": int((1 - y_eval).sum()),
+        "auc": point,
+        "auc95": interval,
+        "fit_n": len(train_rows),
+        "fit_battles": len({row["battle"] for row in train_rows}),
+        "features": names,
+        "noul_rows": len(eval_rows) if with_nouls else 0,
+        "heldout": True,
+        "boundary": "Fit on frozen dev rows only; score on held-out battles once. No battle arm was run.",
+    }
+
+
 def markdown(rows: list[dict[str, Any]]) -> str:
     lines = [
         "| Arm | N | Battles | Positive | Negative | AUC (95% CI) |",
@@ -550,6 +614,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--part", choices=("dev", "heldout"), default="dev")
     parser.add_argument("--score", action="store_true")
+    parser.add_argument("--heldout", action="store_true")
     parser.add_argument("--fetch-nouls", action="store_true")
     parser.add_argument("--nouls", type=Path, default=Noul_CACHE)
     parser.add_argument("--json", action="store_true")
@@ -561,6 +626,31 @@ def main() -> int:
     rows, exclusions = build_rows(args.part)
     if args.fetch_nouls:
         return asyncio.run(fetch_nouls(rows, args.nouls))
+    if args.heldout:
+        if not args.score:
+            raise SystemExit("--heldout requires --score")
+        dev_rows, dev_exclusions = build_rows("dev")
+        nouls = load_nouls(args.nouls)
+        results = [
+            baseline_row(rows, "prior_value", "A_action_prior"),
+            baseline_row(rows, "leaf_value", "B_leaf_value"),
+            score_heldout_model(dev_rows, rows, nouls, with_nouls=False),
+            score_heldout_model(dev_rows, rows, nouls, with_nouls=True),
+        ]
+        payload = {
+            "part": "heldout",
+            "fit_part": "dev",
+            "exclusions": exclusions,
+            "fit_exclusions": dev_exclusions,
+            "nouls_cached": len(nouls),
+            "results": results,
+        }
+        print(
+            json.dumps(payload, indent=2, sort_keys=True)
+            if args.json
+            else markdown(results)
+        )
+        return 0
     if not args.score:
         print(
             json.dumps(
