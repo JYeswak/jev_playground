@@ -1842,3 +1842,32 @@ which is untracked (0 of 200 files in git), so a stranger cannot re-run this fro
 
 Boundary: no battle run; the receipt authorizes a separate battle preregistration only. No
 comparator model, no causal or counterfactual claim, no claim that Jev improves the leaf.
+
+## jev-jy7t.1.4 Jericho Jev-PUCT paired pilot (2026-09-25) [live]
+
+Preregistration `docs/demos/upstream-repro/jericho-jev-puct-20260925.md` was amended before any
+further Detective or Deephome live invocation (`2b63914`) after reading the experimental-design
+and statistical-power skills. The initial three-seed independent-means plan was replaced by a
+same-seed blocked pair: only matching Jev/uniform final `status=ok` rows form a score difference.
+Jev Zork1 seeds 1–3 completed at `jev-1.13.0` (3,976 prior requests, 2,005,910 input tokens,
+344,827 output tokens, `$0.084248220`); scores were 25, 44, 44. Keyless uniform Zork1 seeds 1
+and 3 completed at scores 25 and 25; seed 2 hit the 3,600-second wrapper with an arm64
+Jericho/Frotz worker segfault and has no final row.
+
+The two complete pairs give differences `[0, 19]`, mean `9.5`, sample SD `13.435`. The
+pre-registered `+5` smallest effect, two-sided `alpha=.05`, power `.80`, and paired t-test
+recipe require 59 complete pairs (`dz=.3722`, raw `n=58.619`, achieved power `.8026`; SciPy
+1.18.1 / statsmodels 0.15.0). Observed Jev and complete-uniform mean wall times project
+24.712 hours for 59 pairs before overhead, so the powered count does not fit one attended day.
+This is a descriptive pilot, not a confirmatory pass/kill.
+
+Detective had already been launched before the hold: seed 1 `status=error`, seed 2 `status=ok`,
+seed 3 `status=error`; it is unpaired and descriptive only. All Deephome rows are incomplete
+without a final row; seed 2 was interrupted by its wrapper and seeds 1/3 were cancelled. No
+partial or unpaired row is averaged into the original bar. Commits `af76109` (Zork rows),
+`2b63914` (amendment + uniform pair rows), and `3f8ef5f` (bead evidence).
+
+Boundary: no further live call after the amendment; no powered 59-pair continuation, no
+Detective/Deephome paired analysis, no comparator, and no Laya endpoint. Uniform pair rows are
+`work/jev-if/rows/zork1-uniform-s1.jsonl` and `zork1-uniform-s3.jsonl`; full raw run details and
+NOT-SCORED conditions are in the receipt.
