@@ -2296,3 +2296,21 @@ work/pokeagent-emerald/live_segment.py work/pokeagent-emerald/test_macro_choice.
 `ubs work/pokeagent-emerald/live_segment.py work/pokeagent-emerald/test_macro_choice.py`
 all passed. Boundary: no Jev call, no live spend, and no state-blind control was run in this
 repair; the historical Emerald receipt was not rescored.
+
+## jev-jy7t.1.12 Emerald state-blind control (2026-09-25) [test]
+
+The preregistered state-blind control sampled each macro with replacement from the pooled
+button frequencies in tracked `work/pokeagent-emerald/live-results.jsonl` (6,449 rows,
+SHA-256 `5294ec9a24319ebc7c528cdb3076c11bc381df3e1abbbb4334a6bf36c97c84fa`). The run used
+the same macro-228 start, 500-macro cap, goal `location != MOVING_VAN`, and seeds `0..79`:
+`uv run python work/pokeagent-emerald/run_baselines.py --rom /Users/josh/Library/Application Support/jev-roms/pokeemerald.gba --output work/pokeagent-emerald/state-blind-results.jsonl --fixed-sequence 0 --random 0 --state-blind 80 --pooled-rows work/pokeagent-emerald/live-results.jsonl --cap 500 --harness-sha 62bf6f614b66ff76b79954e5a3f04f91c3c6a049 --rom-sha1 f3ae088181bf583e55daf962a92bb46f4f1d07b7`.
+
+Receipt `work/pokeagent-emerald/STATE_BLIND_RECEIPT.md` records runner code SHA-256
+`ee7cfd6a64ac6cb16bcee148838a69a0c631482535d2034500626584f081ad47` and result JSONL
+SHA-256 `3ce1e107a0a351e221840ff7271f15581966fc606722c07b473dc68de4ee0b8f`. All 80 runs
+failed to leave the truck and stopped at the cap: success `0/80`, capped-macro median `500`,
+p95 `500`. This is a keyless emulator control, not a Jev call or an LLM comparison.
+
+Boundary: this result describes one state-blind policy sampled from the committed Jev-row
+button pool; it does not claim that Jev's state-conditioned policy has the same distribution,
+and it supplies no significance test or model-quality verdict by itself.
