@@ -92,10 +92,10 @@ def utterance_spans(utterance: str, cap: int = OPTION_CAP) -> list[str]:
     out: list[str] = []
     seen: set[str] = set()
 
-    def add(s: str) -> bool:
+    def add(s: str, quoted: bool = False) -> bool:
         raw = s.strip()
-        if V3_ENABLED and len(raw) >= 2 and raw[0] in {'"', "'"} and raw[-1] == raw[0]:
-            s = raw[1:-1].strip()
+        if V3_ENABLED and quoted:
+            s = raw
         else:
             s = raw.strip(SPAN_STRIP).strip()
         if s and s not in seen:
@@ -104,7 +104,7 @@ def utterance_spans(utterance: str, cap: int = OPTION_CAP) -> list[str]:
         return len(out) >= cap
 
     for a, b in re.findall(r'"([^"]*)"|\u201c([^\u201d]*)\u201d', utterance):
-        if add(a or b):
+        if add(a or b, quoted=True):
             return out
     words = utterance.split()
     for w in words:
