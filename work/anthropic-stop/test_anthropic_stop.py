@@ -186,6 +186,7 @@ GUARDED = {
 # Tracked code that names a paid comparator and never calls one, with the reason.
 KEYLESS = {
     ".omp/tools/jev-screen.ts": "cites grok-4's published bench score in a comment; calls Jev only",
+    "work/osw-bestofn/select_pool.py": "names released OSWorld-Verified run archives; builds no client",
     "demos/routing-backtest/bin/adapt-claude.mjs": "reads Claude Code session files; price table only",
     "work/adapter-pin/finish-audit.py": "audits committed rows; names providers to classify them",
     "work/bicameral-gate/emit-c-labels.py": "names the adjudicating agent's model in a label",
