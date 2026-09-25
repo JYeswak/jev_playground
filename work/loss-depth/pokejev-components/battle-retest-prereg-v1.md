@@ -37,8 +37,9 @@ No prompt, candidate set, search depth, tie-break, clock, team, or leaf evaluato
   only for this arm;
 - clock: existing `gen9ouclock` format and Stage B per-decision deadline;
 - model: explicit `jev-1.13.0`, recorded on every live decision row;
-- outputs: `results-abyssal-mix-v1.jsonl`, `decisions-abyssal-mix-v1.jsonl`,
-  `replays-abyssal-mix-v1/`, plus matching `-control` paths;
+- outputs: `work/loss-depth/pokejev-components/battle/stage-b/results-abyssal-mix-v1.jsonl`, `decisions-abyssal-mix-v1.jsonl`,
+  `replays-abyssal-mix-v1/`, plus matching `-control` paths; each result and decision row records
+  the SHA-256 map of the imported Stage B modules.
 - budget: **USD 3 maximum** for Jev input-token spend; expected spend is approximately
   the Stage B live-arm estimate, USD 1.40 for 200 battles;
 - stop rule: stop the live arm immediately on any TypeSafe HTTP 402 / credit-exhaustion
