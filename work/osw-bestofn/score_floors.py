@@ -13,7 +13,13 @@ import re
 from pathlib import Path
 from typing import Any
 
-from range_zip import archive_score, open_remote_zip, result_members, task_key
+from range_zip import (
+    archive_score,
+    open_remote_zip,
+    read_member_bytes,
+    result_members,
+    task_key,
+)
 
 ROOT = Path(__file__).resolve().parent
 POOL = ROOT / "pool.json"
@@ -46,11 +52,20 @@ def stable_index(task: str, count: int) -> int:
     return int.from_bytes(digest[:8], "big") % count
 
 
-def read_result(archive, member: str) -> int:
-    value = archive.read(member).decode("utf-8", "replace").strip()
-    if value not in {"0", "1"}:
+def read_result(archive, member: str, remote=None) -> int:
+    source = (
+        read_member_bytes(archive, remote, member)
+        if remote is not None
+        else archive.read(member)
+    )
+    value = source.decode("utf-8", "replace").strip()
+    try:
+        numeric = float(value)
+    except ValueError as exc:
+        raise ValueError(f"{member}: unexpected result {value!r}") from exc
+    if numeric not in {0.0, 1.0}:
         raise ValueError(f"{member}: unexpected result {value!r}")
-    return int(value)
+    return int(numeric)
 
 
 def main() -> None:
@@ -65,7 +80,7 @@ def main() -> None:
         try:
             members = member_map(archive)
             rows = {
-                task: read_result(archive, info["result"])
+                task: read_result(archive, info["result"], remote)
                 for task, info in members.items()
                 if "result" in info
             }
