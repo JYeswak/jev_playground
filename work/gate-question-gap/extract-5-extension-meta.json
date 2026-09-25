@@ -1,0 +1,12 @@
+{
+  "extension": true,
+  "start": "2026-09-25T09:28:29.594Z",
+  "end": "2026-09-25T15:53:38.226Z",
+  "rows": 1155,
+  "index_offset": 2683,
+  "outside window": 4490,
+  "in window": 1395,
+  "excluded: seen in readout 3, 4, or 5": 72,
+  "excluded: repeat of an earlier row": 120,
+  "excluded: not a fleet row": 48
+}
