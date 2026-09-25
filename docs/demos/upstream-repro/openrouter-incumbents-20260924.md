@@ -304,3 +304,28 @@ nex-n2.5-mini's and lfm-2.5's six each (3,950 rows each) need about 12,000 more 
 **Rows.** `work/openrouter-incumbents/rows-sst5-dots-studio__dots-3-note-preview_free.jsonl`: 529
 records, one per attempt. It holds each row's id, the answer and probabilities, the raw map, the
 model's raw JSON text, tokens, latency, and the wait and request counts. It holds no SST-5 text.
+
+## Free arm, SST-5 × `nex-agi/nex-n2.5-mini:free`: SCORED (live, 2026-09-25)
+
+This cell followed the committed free-only bar and the one permitted resume pass. The initial
+continuation wrote 500 public rows with 6 request-timeout failures; the resume pass answered all
+6. The final status is **500/500 answered, 0 failed, 0 quota rows, 6 zero-mass rows**. There are
+506 attempt records because the six failed attempts and their six retries are retained. The six
+initial failures were `TypeSafeAPITimeoutError` at the 120-second attempt limit.
+
+**Result.** Against each of the three committed Jev SST-5 runs, the comparator scorer reports the
+preregistered **MAE sign-test WIN for Jev and HOLDS**:
+
+- `rows-jev.jsonl`: accuracy `190/50` WIN; MAE `284/58`, `p=6.63e-37` WIN;
+- `rows-jev-run2.jsonl`: accuracy `187/51` WIN; MAE `281/60`, `p=2.51e-35` WIN;
+- `rows-jev-run3.jsonl`: accuracy `189/49` WIN; MAE `282/58`, `p=1.83e-36` WIN.
+
+The scorer's full self-check passed before this cell was scored. This is a Jev win, not a
+`NEGATIVE_EVIDENCE` row. The cell used 506 requests, 82,666 input tokens and 550,574 output
+tokens; OpenRouter spend was **$0** because the model id is `:free`. The row file is
+`work/openrouter-incumbents/rows-sst5-nex-agi__nex-n2.5-mini_free.jsonl` (500 unique ids, no
+benchmark text committed).
+
+**Boundary.** Only SST-5 × this one free comparator ran in this cell. The other four sets and
+STS-B for this model, all cells for `liquid/lfm-2.5-2.6b:free`, and every paid comparator arm
+remain NOT RUN; no paid comparison was attempted.
