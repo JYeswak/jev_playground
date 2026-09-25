@@ -27,6 +27,9 @@ if [ "${ready:-0}" -eq 0 ]; then
     echo 'frontier empty — sending nothing. A wake with no work is noise.'
     exit 0
 fi
+if [ "${JEV_RERANK_SHADOW:-0}" = "1" ]; then
+    br ready --json 2>/dev/null | node --experimental-strip-types "$root/scripts/br-rerank-shadow.mjs" >/dev/null 2>&1 || true
+fi
 
 # Health IDLE is a candidate, not proof. Capture-gap panes report
 # is_idle=false and is_working=false while sitting at a prompt. Those are
