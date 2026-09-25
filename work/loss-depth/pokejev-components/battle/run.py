@@ -34,7 +34,7 @@ OUT = BATTLE_DIR / "stage-b"
 LEAF_OUT = COMPONENT_DIR
 ALPHA_PATH = COMPONENT_DIR / "frozen-alpha-v1.json"
 LEAF_MODEL_PATH = COMPONENT_DIR / "leaf-model-v1.json"
-LEAF_MODEL_SHA256 = "05e4ac31457665e478237be51741869cb7005b5911da17cfd33ae77b8cd3525f"
+LEAF_MODEL_SHA256 = "ad8cd16482eb41e409409c94c968d0b2857f736bd6258b9afd556d785273c49b"
 RUN_PY_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 RUN_STARTED_AT_UTC = datetime.now(timezone.utc).isoformat()
 STOP_PATH = OUT / "mix-v1-stop.json"
@@ -416,41 +416,66 @@ class LeafPlayer(FrozenAlphaPlayer):
             _LEAF_BATTLE.reset(token)
 
     @staticmethod
-    def _base_features(battle) -> dict[str, float]:
-        team = list(getattr(battle, "team", {}).values())
-        return {
-            "hp_weighted_remaining": sum(
+    def _team_hp_remaining(team) -> float:
+        return (
+            sum(
                 max(0.0, min(1.0, float(getattr(mon, "current_hp_fraction", 0.0))))
-                for mon in team
+                for mon in team.values()
             )
-            / 6.0,
-            "status_count": sum(bool(getattr(mon, "status", None)) for mon in team)
+            / 6.0
+        )
+
+    @classmethod
+    def _base_features(cls, battle) -> dict[str, float]:
+        team = getattr(battle, "team", {}) or {}
+        opponent_team = getattr(battle, "opponent_team", {}) or {}
+        hp = cls._team_hp_remaining(team)
+        opponent_hp = cls._team_hp_remaining(opponent_team)
+        return {
+            "hp_weighted_remaining": hp,
+            "status_count": sum(
+                bool(getattr(mon, "status", None)) for mon in team.values()
+            )
             / 6.0,
             "hazard_count": len(getattr(battle, "side_conditions", {}) or {}) / 4.0,
             "speed_order_rate": 0.5,
+            "opponent_hp_remaining": opponent_hp,
+            "hp_differential": hp - opponent_hp,
         }
 
     @staticmethod
-    def _summary_features(summary: dict, label: str, base: dict[str, float]):
-        lines = [summary.get("your_active", ""), *summary.get("your_bench", [])]
-        hp = [
-            float(match) / 100.0
-            for line in lines
-            for match in re.findall(r"(\d+)%", str(line))
+    def _summary_features(summary: dict, _label: str, base: dict[str, float]):
+        own_lines = [summary.get("your_active", ""), *summary.get("your_bench", [])]
+        opponent_lines = [
+            summary.get("opponent_active", ""),
+            *summary.get("opponent_bench_seen", summary.get("opponent_bench", [])),
         ]
+
+        def hp_values(lines):
+            return [
+                float(match) / 100.0
+                for line in lines
+                for match in re.findall(r"(\d+)%", str(line))
+            ]
+
+        own_hp = hp_values(own_lines)
+        opponent_hp = hp_values(opponent_lines)
         statuses = ("burn", "par", "poison", "tox", "sleep", "freeze")
+        hp = sum(own_hp) / 6.0 if own_hp else base["hp_weighted_remaining"]
+        opponent = (
+            sum(opponent_hp) / 6.0 if opponent_hp else base["opponent_hp_remaining"]
+        )
         return {
-            "hp_weighted_remaining": sum(hp) / 6.0
-            if hp
-            else base["hp_weighted_remaining"],
+            "hp_weighted_remaining": hp,
             "status_count": sum(
                 any(status in str(line).lower() for status in statuses)
-                for line in lines
+                for line in own_lines
             )
             / 6.0,
             "hazard_count": base["hazard_count"],
             "speed_order_rate": base["speed_order_rate"],
-            "ko_threat": 0.0 if str(label).lower().startswith("switch") else 1.0,
+            "opponent_hp_remaining": opponent,
+            "hp_differential": hp - opponent,
         }
 
     async def _leaf_nouls(self, state, rec) -> dict[str, float]:

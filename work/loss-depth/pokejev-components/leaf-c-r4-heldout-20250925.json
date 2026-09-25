@@ -1,0 +1,94 @@
+{
+  "exclusions": {
+    "fallback": 172,
+    "missing_turn": 0,
+    "unusable": 395
+  },
+  "fit_exclusions": {
+    "fallback": 209,
+    "missing_turn": 0,
+    "unusable": 384
+  },
+  "fit_part": "dev",
+  "nouls_cached": 4334,
+  "part": "heldout",
+  "results": [
+    {
+      "arm": "A_action_prior",
+      "auc": 0.5641581495386002,
+      "auc95": [
+        0.5356899359311329,
+        0.5928569632981397
+      ],
+      "battles": 95,
+      "n": 2274,
+      "negative": 1103,
+      "positive": 1171
+    },
+    {
+      "arm": "B_leaf_value",
+      "auc": 0.5663093356911088,
+      "auc95": [
+        0.5264237326398662,
+        0.6075141041787633
+      ],
+      "battles": 95,
+      "n": 2274,
+      "negative": 1103,
+      "positive": 1171
+    },
+    {
+      "arm": "C_code_only",
+      "auc": 0.8268881623210668,
+      "auc95": [
+        0.7546310278868419,
+        0.8835400277408585
+      ],
+      "battles": 95,
+      "boundary": "Fit on frozen dev rows only; score on held-out battles once. No battle arm was run.",
+      "features": [
+        "hp_weighted_remaining",
+        "status_count",
+        "hazard_count",
+        "speed_order_rate",
+        "opponent_hp_remaining",
+        "hp_differential"
+      ],
+      "fit_battles": 95,
+      "fit_n": 2060,
+      "heldout": true,
+      "n": 2274,
+      "negative": 1103,
+      "noul_rows": 0,
+      "positive": 1171
+    },
+    {
+      "arm": "C_code_plus_noul",
+      "auc": 0.8242120511329633,
+      "auc95": [
+        0.7536972943406547,
+        0.8819806485531737
+      ],
+      "battles": 95,
+      "boundary": "Fit on frozen dev rows only; score on held-out battles once. No battle arm was run.",
+      "features": [
+        "hp_weighted_remaining",
+        "status_count",
+        "hazard_count",
+        "speed_order_rate",
+        "opponent_hp_remaining",
+        "hp_differential",
+        "ko_now",
+        "danger_now",
+        "switch_needed"
+      ],
+      "fit_battles": 95,
+      "fit_n": 2060,
+      "heldout": true,
+      "n": 2274,
+      "negative": 1103,
+      "noul_rows": 2274,
+      "positive": 1171
+    }
+  ]
+}

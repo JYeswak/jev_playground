@@ -141,9 +141,11 @@ class FrozenLeafArmTests(unittest.TestCase):
                     expected_sha256="0" * 64,
                 )
 
-    def test_two_move_summaries_with_different_hp_get_different_leaf_scores(self):
+    def test_two_move_summaries_with_different_opponent_hp_get_different_leaf_scores(
+        self,
+    ):
         model = battle_run.FrozenLeafModel(
-            features=("hp_weighted_remaining",),
+            features=("opponent_hp_remaining",),
             noul_features=(),
             intercept=0.0,
             code_weights=(1.0,),
@@ -160,18 +162,39 @@ class FrozenLeafArmTests(unittest.TestCase):
             "status_count": 0.0,
             "hazard_count": 0.0,
             "speed_order_rate": 0.5,
+            "opponent_hp_remaining": 0.5,
+            "hp_differential": 0.0,
         }
         high = battle_run.LeafPlayer._summary_features(
-            {"your_active": "Pikachu 80%", "your_bench": []},
+            {
+                "your_active": "Pikachu 80%",
+                "your_bench": [],
+                "opponent_active": "Eevee 20%",
+                "opponent_bench": [],
+            },
             "move Thunderbolt",
             base,
         )
         low = battle_run.LeafPlayer._summary_features(
-            {"your_active": "Pikachu 20%", "your_bench": []},
+            {
+                "your_active": "Pikachu 80%",
+                "your_bench": [],
+                "opponent_active": "Eevee 80%",
+                "opponent_bench": [],
+            },
             "move Thunderbolt",
             base,
         )
         self.assertNotEqual(model.score(high), model.score(low))
+
+    def test_frozen_model_drops_action_type_and_adds_opponent_features(self):
+        model = battle_run.FrozenLeafModel.from_json(
+            battle_run.LEAF_MODEL_PATH,
+            expected_sha256=battle_run.LEAF_MODEL_SHA256,
+        )
+        self.assertNotIn("ko_threat", model.features)
+        self.assertIn("opponent_hp_remaining", model.features)
+        self.assertIn("hp_differential", model.features)
 
     def test_live_features_match_full_team_replay_features_on_three_turns(self):
         from types import SimpleNamespace
@@ -195,13 +218,23 @@ class FrozenLeafArmTests(unittest.TestCase):
                 name: SimpleNamespace(current_hp_fraction=1.0, status=None)
                 for name in species
             }
-            battle = SimpleNamespace(team=team, side_conditions={})
+            opponent_team = {
+                name: SimpleNamespace(current_hp_fraction=1.0, status=None)
+                for name in species
+            }
+            battle = SimpleNamespace(
+                team=team,
+                opponent_team=opponent_team,
+                side_conditions={},
+            )
             live = battle_run.LeafPlayer._base_features(battle)
             for feature in (
                 "hp_weighted_remaining",
                 "status_count",
                 "hazard_count",
                 "speed_order_rate",
+                "opponent_hp_remaining",
+                "hp_differential",
             ):
                 self.assertAlmostEqual(
                     live[feature],

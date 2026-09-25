@@ -34,7 +34,8 @@ FEATURES = (
     "status_count",
     "hazard_count",
     "speed_order_rate",
-    "ko_threat",
+    "opponent_hp_remaining",
+    "hp_differential",
 )
 HAZARDS = {"stealthrock", "spikes", "toxicspikes", "stickyweb"}
 
@@ -125,12 +126,15 @@ def snapshot_features(path: Path) -> dict[int, dict[str, float | str]]:
 
     def make_snapshot() -> dict[str, float | str]:
         hp = sum(teams["p1"].values()) / 6.0
+        opponent_hp = sum(teams["p2"].values()) / 6.0
         speed = (own_first + 1.0) / (prior_pairs + 2.0)
         return {
             "hp_weighted_remaining": hp,
             "status_count": len(statuses["p1"]) / 6.0,
             "hazard_count": len(hazards["p1"]) / 4.0,
             "speed_order_rate": speed,
+            "opponent_hp_remaining": opponent_hp,
+            "hp_differential": hp - opponent_hp,
             "active": active["p1"] or "unknown",
             "opponent_active": active["p2"] or "unknown",
             "known_species": ",".join(sorted(teams["p1"])),
@@ -233,10 +237,7 @@ def eligible_rows(
         if snapshot is None:
             excluded["missing_turn"] += 1
             continue
-        code = {name: float(snapshot[name]) for name in FEATURES[:-1]}
-        code["ko_threat"] = float(
-            bool((decision.get("tool") or "").startswith("move "))
-        )
+        code = {name: float(snapshot[name]) for name in FEATURES}
         state = {
             "turn": decision["turn"],
             "features": code,
