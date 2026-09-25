@@ -29,7 +29,9 @@ guarded to `/tmp/*`; the brainstorming server binds 127.0.0.1 with a token.
 A fresh omp session lists all 32 (`omp --profile claude --mode=rpc`, available commands,
 2026-09-25). A session started before the install cannot resolve `skill://<name>` for them.
 Until a pane restarts, packets give the file path: `/Users/josh/.claude/skills/<name>/SKILL.md`.
-Subagents are fresh sessions and can use `skill://`.
+Subagents do not help: they inherit the parent session's skill list, so a subagent spawned from a
+pane that started before the install also gets `Unknown skill` (SkillCensus and KeyExposure, both
+2026-09-25). Give subagents the file path too, or restart the pane.
 
 ## Which skill for which unit
 
