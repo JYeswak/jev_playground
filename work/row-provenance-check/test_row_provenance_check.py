@@ -198,6 +198,42 @@ class RowProvenanceCheckerTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("decision logs exempted 1", result.stdout)
 
+    def test_options_decision_missing_hash_fails(self) -> None:
+        self.install("decision-options-missing-hash.jsonl", AFTER)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("decision-options-missing-hash.jsonl", result.stderr)
+        self.assertIn("row 1", result.stderr)
+        self.assertIn("code_sha256 or run_py_sha256", result.stderr)
+
+    def test_checker_skips_its_own_fixture_directory(self) -> None:
+        relative = Path("work/row-provenance-check/fixtures/future-bad.jsonl")
+        destination = self.repo / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(
+            json.dumps({"chosen": "move tackle", "candidates": ["move tackle"]}) + "\n",
+            encoding="utf-8",
+        )
+        env = os.environ.copy()
+        env["GIT_AUTHOR_DATE"] = AFTER
+        env["GIT_COMMITTER_DATE"] = AFTER
+        subprocess.run(
+            ["git", "add", "--", str(relative)],
+            cwd=self.repo,
+            check=True,
+            timeout=30,
+        )
+        subprocess.run(
+            ["git", "commit", "-q", "-m", "future fixture"],
+            cwd=self.repo,
+            env=env,
+            check=True,
+            timeout=30,
+        )
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("checked 0 experiment row file", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

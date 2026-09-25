@@ -38,6 +38,7 @@ UTC_FIELD_NAMES = {
 }
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
 EXEMPTION_FILE = "scripts/row-provenance-exempt.tsv"
+SELF_FIXTURE_PREFIX = "work/row-provenance-check/fixtures/"
 
 
 def git_output(repo: Path, *args: str) -> str:
@@ -235,6 +236,8 @@ def main() -> int:
     for relative in paths:
         added = first_added.get(relative)
         if added is None or added <= CUTOFF:
+            continue
+        if relative.startswith(SELF_FIXTURE_PREFIX):
             continue
         if relative in exemptions:
             actual = sha256_file(repo / relative)
