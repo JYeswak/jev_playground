@@ -4040,3 +4040,33 @@ these, with 3 runs a side on `jev-1.13.0` or a named later pin:
 
 `jev-noul-pair`'s wording is the obvious candidate. A cheaper tool is the only reason to switch, so
 the retry must also report input tokens per call on both sets.
+
+## R102 — REFUTED: the published LLM numbers on ViZDoom defend_the_center and RTRG Snake are targets a Jev arm can win by beating
+
+**Claim (`notes/deep/next-gen/research-sota.md` §3, shortlist items 2 and 3).** A Jev arm on
+ViZDoom defend_the_center should aim at "12 kills per 600 frames", the symbols-only LLM row of
+arXiv 2603.11601v2 Table 4. On Real-Time Reasoning Gym, the AgileThinker and Reactive V3 numbers
+(arXiv 2511.04898) are the bar to beat.
+
+**Measured 2026-09-25, keyless, no model call, prereg `922fda3`** (`jev-jy7t.1.1`, receipt
+`docs/demos/upstream-repro/game-floors-20260924.md`). A hand-written scripted policy scores above
+the published LLM numbers on most of these cells:
+- **ViZDoom, 30 seeds per policy.** The scripted policy scores **31.10 ± 0.75** cumulative
+  reward under the setting the authors' code runs (600 decisions × 3 tics). It scores
+  17.77 / 17.20 under two other readings of "600 frames". Every published LLM number is 3–14. Only
+  the 600-tic reading (11.53 ± 0.41) sits level with 12.
+- **RTRG, 8 published instances per cell.** The scripted reactive policy is above both published
+  agents' means on all three Snake levels (.883 / .602 / .508 against at most .77 / .54 / .39)
+  and on Freeway-E (.993 against .98).
+
+Beating the published LLM on those cells would therefore say nothing about Jev.
+
+**This is not a ruling on Jev.** It refutes a choice of target, and it names where the room is:
+- MiniWoB's floors are 13.1% (random) and 22.4% (scripted), against 56.6–74.9% for LLM agents.
+- RTRG Freeway M/H and Overcooked M/H have floors of 0–.50, against AgileThinker's .51–.92.
+
+**Retry condition.** A Jev result on these environments is citable only when it clears
+`max(scripted floor, published LLM)` for its reading or cell, using the committed floors, or a
+stronger preregistered floor. On ViZDoom it must report all four readings. Reopen the "12 kills"
+target only if the authors publish the seeds and the reading behind Table 4, and that reading is
+the 600-tic one.

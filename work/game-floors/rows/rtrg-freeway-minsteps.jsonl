@@ -1,0 +1,26 @@
+pygame 2.6.1 (SDL 2.28.4, Python 3.11.15)
+Hello from the pygame community. https://www.pygame.org/contribute.html
+{"difficulty": "E", "seed": 0, "real_seed": 1000, "min_steps": 13}
+{"difficulty": "E", "seed": 1, "real_seed": 1001, "min_steps": 11}
+{"difficulty": "E", "seed": 2, "real_seed": 1002, "min_steps": 11}
+{"difficulty": "E", "seed": 3, "real_seed": 1003, "min_steps": 11}
+{"difficulty": "E", "seed": 4, "real_seed": 1013, "min_steps": 13}
+{"difficulty": "E", "seed": 5, "real_seed": 1014, "min_steps": 12}
+{"difficulty": "E", "seed": 6, "real_seed": 1016, "min_steps": 11}
+{"difficulty": "E", "seed": 7, "real_seed": 1018, "min_steps": 11}
+{"difficulty": "M", "seed": 0, "real_seed": 1069, "min_steps": 12}
+{"difficulty": "M", "seed": 1, "real_seed": 1093, "min_steps": 14}
+{"difficulty": "M", "seed": 2, "real_seed": 1536, "min_steps": 14}
+{"difficulty": "M", "seed": 3, "real_seed": 1858, "min_steps": 16}
+{"difficulty": "M", "seed": 4, "real_seed": 1338, "min_steps": 14}
+{"difficulty": "M", "seed": 5, "real_seed": 2496, "min_steps": 14}
+{"difficulty": "M", "seed": 6, "real_seed": 1933, "min_steps": 15}
+{"difficulty": "M", "seed": 7, "real_seed": 1863, "min_steps": 16}
+{"difficulty": "H", "seed": 0, "real_seed": 1447, "min_steps": 19}
+{"difficulty": "H", "seed": 1, "real_seed": 2408, "min_steps": 19}
+{"difficulty": "H", "seed": 2, "real_seed": 2418, "min_steps": 20}
+{"difficulty": "H", "seed": 3, "real_seed": 2661, "min_steps": 21}
+{"difficulty": "H", "seed": 4, "real_seed": 1100, "min_steps": 19}
+{"difficulty": "H", "seed": 5, "real_seed": 1944, "min_steps": 19}
+{"difficulty": "H", "seed": 6, "real_seed": 1310, "min_steps": 21}
+{"difficulty": "H", "seed": 7, "real_seed": 2453, "min_steps": 20}

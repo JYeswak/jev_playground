@@ -194,4 +194,66 @@ Then run the commands above. MiniWoB also needs a local Google Chrome; Selenium 
 
 ## Results
 
-Not yet run.
+**Run 2026-09-25, 00:28:43Z to 00:48:26Z.** The run started after the preregistration commit `922fda3` (committer time 00:28:13Z, pushed). It used exactly the commands above, through the driver `/tmp/jev-game-floors/wave2/run-wave2.sh`.
+- Episodes: 1,802 in total. ViZDoom had 120 runs of 600 decisions, MiniWoB 1,250 episodes and RTRG 432. The 24-row Freeway minimum-steps check ran on top of those.
+- Errored or incomplete episodes: 0.
+- Model calls: none. Spend: $0.
+- Timing: the machine was loaded (load average 30–120 on 32 cores, from other panes too), so seconds per step are upper bounds.
+
+**Rows** are in `work/game-floors/rows/`. Every table below is the output of `python3 work/game-floors/aggregate.py work/game-floors/rows`, which is stdlib-only and keyless. That output is byte-identical to the one taken from the `/tmp` run directory.
+
+### The floor table
+
+| Env | Metric (the benchmark's own) | Published LLM numbers (source) | Random floor | Scripted floor | N | s/step |
+|---|---|---|---|---|---|---|
+| ViZDoom defend_the_center, reading A (600 decisions × 3 tics, the code's setting) | cumulative reward per run (kills − deaths) | S-GT: Claude-4-Sonnet 12, GPT-4o 3, Gemini-2.5-Pro 12; F+S-GT 13–14 (arXiv 2603.11601v2 Table 4) | 2.00 ± 0.43 (kills 6.97) | **31.10 ± 0.75** (kills 32.50) | 30 seeds × 2 policies | 0.119 per decision |
+| ViZDoom, reading B (600 decisions × 1 tic) | same | same | 1.00 ± 0.21 | **17.77 ± 0.52** | 30 × 2 | 0.031 |
+| ViZDoom, reading C (first 200 decisions of A = 600 tics) | same | same | 0.90 ± 0.18 | **11.53 ± 0.41** | 30 × 2 | 0.119 |
+| ViZDoom, reading D (first 300 decisions of A) | same | same | 1.20 ± 0.21 | **17.20 ± 0.55** | 30 × 2 | 0.119 |
+| MiniWoB++, BrowserGym split (125 tasks × 5 benchmark seeds) | success % (raw reward > 0), errors = 0 | OrbyAgent-Claude-3.5-Sonnet 74.9 ± 1.2; GenericAgent-GPT-5 71.5; GenericAgent-Claude-3.5-Sonnet 69.8; GPT-4o 63.8; GPT-4o-mini 56.6 (BrowserGym leaderboard @`294ebe1`) | 13.1 ± 1.4 | **22.4 ± 1.7** | 625 × 2 | 0.642 (includes the preregistered 0.5 s wait) |
+| RTRG Freeway E / M / H | normalized S, mean of 8 instances | Table 6 (8k): Reactive V3 .98/.33/.06, AgileThinker .96/.84/.51; Table 2 wall-clock: AgileThinker 0.88, Reactive 0.24, Planning 0.12 | 0 / 0 / 0 | **.993** / 0 / 0 | 8 inst. × (1 default, 4 random, 1 scripted) | ≤ 0.001 |
+| RTRG Snake E / M / H | same | Table 6: Reactive V3 .77/.49/.30, AgileThinker .69/.54/.39; Table 2 (Agile / Reactive / Planning): 0.45 / 0.37 / 0.04 | .033 / .023 / .020 | **.883 / .602 / .508** | same | ≤ 0.0002 |
+| RTRG Overcooked E / M / H | same; unclipped (clipped) | Table 6: Reactive V3 .92/.37/.09, AgileThinker 1.0/.92/.60; Table 2 (Agile / Reactive / Planning): 0.89 / 0.57 / 0.00 | .003 / 0 / 0 | **1.054 (1.000)** / .143 / .500 | same | ≤ 0.005 |
+
+The RTRG `default` policy, an agent that never answers, scored 0 on Freeway and Overcooked, and 0.008–0.016 on Snake (R = −1 on most instances). SE over the 8 per-seed means:
+- Snake scripted: ± .115 / .064 / .061.
+- Freeway scripted E: ± .004.
+- Overcooked: default and scripted are identical across instances, because the seed is inert there, as the preregistration predicted. Only random varies, through its own RNG.
+
+Per-policy detail, including kills and deaths, the strict and 10 s MiniWoB metrics and raw R, is in the aggregator output.
+
+### What the floors say about the published targets
+
+**ViZDoom: the scripted floor is above every published LLM number under three of the four readings.**
+- Under reading A, the one the authors' code runs, it scores 31.1. That is about 2.6× the best symbols-only LLM (12) and 2.2× the frame-plus-true-symbols upper bound (14).
+- Only under reading C (600 game tics) does the floor, 11.5 ± 0.4, sit level with the published 12s.
+- Random's kills (6.97 per run under reading A) exceed GPT-4o's S-GT 3, though its cumulative reward (2.00) does not.
+- **So "beat 12 kills" is not a Jev target.** A Jev arm must beat the scripted floor of its reading: 31.1 (A), 17.8 (B), 11.5 (C) or 17.2 (D). The paper leaves the reading unresolved, so a Jev arm must report all four.
+
+**MiniWoB: the floors are far below every LLM agent.**
+- A generic scripted DOM policy succeeds on 22.4% and random on 13.1%. The weakest leaderboard entry is at 56.6%.
+- This env leaves real room: a Jev arm has to cover about 34 points to reach GPT-4o-mini and 52 to reach 74.9.
+- The floor's action set is narrower than BrowserGym's `miniwob_all` (no drag, draw or coordinates). It is therefore a floor for a click-and-type policy, which is the shape a Jev Choice over elements would have.
+- The dev tasks had been easier: 64% and 32% scripted, against 22.4% on the full split.
+
+**RTRG: the scripted reactive floor is above both published agents' means on four of the nine cells.**
+- Those cells are all three Snake levels and Freeway-E. On Overcooked-E it is above them unclipped and level clipped.
+- It is below them where one-step reactivity is not enough: Freeway M and H (0), and Overcooked M (.143 vs .37/.92).
+- It sits between them on Overcooked H (.500 vs .09/.60).
+- Snake is not a latency artifact. The paper reports that the reactive agent's scores hold across all time pressures (§4). A hand-written BFS simply plays Snake better than DeepSeek-V3 reasoning over the prose prompt.
+- The Snake SEs are wide (±.06–.12 over 8 instances), so "above" is a comparison of means, not a significance test.
+- The cells where a Jev arm can show anything are Freeway M/H and Overcooked M/H, where the floor is low and AgileThinker is high.
+
+**Findings about the benchmarks, not about Jev:**
+- RTRG's normalized score exceeds 1: scripted Overcooked-E reaches R = 59 against Table 4's Rmax of 56.
+- 3 of the 24 published Freeway instances fall outside Table 5's minimum-steps ranges, using a BFS with collisions forbidden: E seeds 0 and 4 need 13 steps, and M seed 0 needs 12.
+- ViZDoom's published S-GT state lists the player's own weapon as an object at distance 0.0, labelled "CENTER → can ATTACK now!". A Jev arm fed the faithful state inherits that trap.
+
+**Boundary.**
+- One scripted heuristic per environment, written without tuning on preregistered seeds. A better heuristic raises the floor. These are lower bounds on what no model achieves, not the best no-model policy.
+- The published ViZDoom seeds and prompt are unknown.
+- Orby's 74.9 uses about 1,250 episodes whose list is not public.
+- RTRG's Table 2 does not name its difficulty.
+- Not run: BrowserGym's own Playwright harness, since the floors ran on Farama `miniwob` with the same HTML and seed mapping; any time-pressure variant of RTRG; ViZDoom with the paper appendix's 4-action set.
+
+**Next, for a Jev arm.** The committed serializers are the states a Jev arm would receive. On each environment the target is `max(scripted floor, published LLM)` per reading or cell, never the published LLM number alone.
