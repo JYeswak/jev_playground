@@ -53,6 +53,7 @@ ROOT = HERE.parent.parent
 FLOOR_PATH = ROOT / "work" / "game-floors" / "miniwob" / "run.py"
 PREREG = "docs/demos/upstream-repro/miniwob-jev-prereg-20260925.md"
 PREREG_V2 = "docs/demos/upstream-repro/miniwob-jev-v2-prereg-20260925.md"
+PREREG_V3 = "docs/demos/upstream-repro/miniwob-jev-v3-prereg-20260925.md"
 ROWS_DIR = HERE / "rows"
 
 MODEL = "jev-1.13.0"
@@ -725,7 +726,11 @@ def cmd_live(
     from phase_gate import require_bar
 
     here_rel = str(Path(__file__).resolve().relative_to(ROOT))
-    prereg = PREREG if seeds == "benchmark" and none_policy == "always" else PREREG_V2
+    prereg = (
+        PREREG_V3
+        if V3_ENABLED
+        else (PREREG if seeds == "benchmark" and none_policy == "always" else PREREG_V2)
+    )
     for p in (prereg, here_rel, str(FLOOR_PATH.relative_to(ROOT))):
         require_bar(p, repo=str(ROOT))  # AttemptPanic: zero calls
     ask = LiveAsker()
