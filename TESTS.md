@@ -130,8 +130,11 @@ claim nobody can check:
   malformed front matter is named in the `Inbox:` line, not raised; a failed send is retried; a
   missing inbox dir and an unreadable state file are `Inbox: NOT_RUN`; `--once` prints the Inbox
   line after the skills line. Plants, each restored byte-identical: page every importance fails 7
-  of 24; drop the persisted set fails 7 of 24.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (24 tests).
+  of 24; drop the persisted set fails 7 of 24. Wait marker (jev-t54m, jev-oxdq): a wait with a
+  session idle 600 s+ and nothing but helpers or nothing at all under omp is `stalled-wait`; a
+  CPU-active child, or a live child at 0.0 CPU (a paced `work/openrouter-incumbents/run.py`,
+  session idle 900 s), is `working`. Plant "require CPU again" fails 1 of 30.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (30 tests).
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder

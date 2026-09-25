@@ -158,6 +158,46 @@ class Classify(unittest.TestCase):
         self.assertEqual(state, "working", evidence)
         self.assertIn("session written 599s ago", evidence)
 
+    def test_wait_on_a_live_paced_child_at_idle_cpu_is_working(self):
+        # jev-oxdq, 2026-09-25 ~10:40Z: pane 2 waited on a paced free-model client that sleeps
+        # between requests (0.0 CPU); session idle 11 min -> paged STALLED while rows kept landing.
+        table = dict(TABLE)
+        table.update(
+            fiw.parse_ps(
+                "8741 37384 0.0 upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python "
+                "work/openrouter-incumbents/run.py nex-agi/nex-n2.5-mini:free sst5 "
+                "--max-requests 200\n"
+            )
+        )
+        cpu_tools = fiw.omp_cpu_tools(table, PANE_PID[5])
+        self.assertEqual(cpu_tools, [])
+        state, evidence = fiw.classify(
+            snapshot(
+                5, WAIT_SCREEN, session_age=900.0, table=table, cpu_tools=cpu_tools
+            )
+        )
+        self.assertEqual(state, "working", evidence)
+        self.assertIn("child alive, idle CPU", evidence)
+        self.assertIn("python work/openrouter-incumbents/run.py", evidence)
+
+    def test_wait_with_no_child_at_all_is_stalled(self):
+        # jev-t54m's incidents: the waited-on run had exited, nothing under omp -> page (safe side)
+        table = fiw.parse_ps(
+            "10 1 0.0 -zsh\n11 10 0.3 bun /Users/josh/.bun/bin/omp --profile claude\n"
+        )
+        omp, tools = fiw.omp_processes(table, 10)
+        snap = fiw.Snapshot(
+            command="bun",
+            screen=WAIT_SCREEN,
+            omp=omp is not None,
+            tools=tuple(tools),
+            cpu_tools=tuple(fiw.omp_cpu_tools(table, 10)),
+            session_age=900.0,
+        )
+        state, evidence = fiw.classify(snap)
+        self.assertEqual(state, "stalled-wait", evidence)
+        self.assertIn("session idle 900s", evidence)
+
     def test_stalled_wait_pages_once_per_episode(self):
         sent = []
         stalled_since = {}

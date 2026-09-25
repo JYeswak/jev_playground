@@ -7,7 +7,10 @@ State  = from process evidence first, screen second (bead jev-6con):
            working   the omp status line shows a spinner, OR omp has a live descendant that is not
                      one of its own long-lived helpers (OMP_HELPERS), i.e. a tool call is running,
                      OR a session .jsonl omp holds open was written in the last SESSION_FRESH s.
-           stalled-wait  a wait marker, a session idle for IDLE_STALL_S+, and no CPU-active child
+           stalled-wait  a wait marker, a session idle for IDLE_STALL_S+, and no live non-helper
+                     descendant. A child alive at 0% CPU counts as working (bead jev-oxdq: a paced
+                     API client sleeps between requests). Known limit: a hung child at 0% CPU is
+                     no longer paged; only a wait with nothing left under omp is.
            idle      omp is there and none of the above holds.
          Each state carries the evidence that decided it, e.g. "working (child: docker run ...)".
 Alert  = `ntm send jev --pane=1 "IDLE pane N ..."` after POLLS consecutive non-working polls,
@@ -144,6 +147,11 @@ def classify(snap: Snapshot) -> tuple[str, str]:
                 "working",
                 f"wait marker, child using CPU: {short(snap.cpu_tools[-1])}{more}",
             )
+        if snap.tools:
+            return (
+                "working",
+                f"wait marker, child alive, idle CPU: {short(snap.tools[-1])}",
+            )
         if snap.session_age is not None and snap.session_age < IDLE_STALL_S:
             return (
                 "working",
@@ -152,7 +160,7 @@ def classify(snap: Snapshot) -> tuple[str, str]:
         if snap.session_age is not None:
             return (
                 "stalled-wait",
-                f"wait marker, session idle {snap.session_age:.0f}s, no CPU descendant",
+                f"wait marker, session idle {snap.session_age:.0f}s, no live child",
             )
     lines = [line for line in snap.screen.splitlines() if STATUS.search(line)]
     if lines and SPINNER.match(lines[-1]):
