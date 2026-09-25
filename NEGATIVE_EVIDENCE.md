@@ -4107,3 +4107,42 @@ the four arms. Stage B uses the ranking, as preregistered before this result.
    sample drawn from the same split with a new seed.
 2. A future `jev-latest` that resolves to a new model, rerun on this same sample with `stage_a.py
    run`, `score`.
+
+## R104 — REFUTED: Jev Best-of-N selection over released OSWorld runs clears the preregistered bar
+
+**Claim (bead `jev-jy7t.1.2`).** One Jev Choice over eight released 15-step OSWorld-Verified
+trajectories per task would beat the best single run by at least 3 percentage points, with paired
+McNemar p < 0.05, and close at least 30% of the mean-reward gap to oracle@8. The fixed pool,
+questions, state boundary and bar were committed before the first call (`BAR.md`, prereg and pool
+commits before the live receipt).
+
+**Measured 2026-09-25, live, `jev-1.13.0`.** Pool/oracle `be3f0d9`, live receipt `848c8da`.
+Eight fixed 15-step archives, 361 tasks, one Choice call per task, official `result.txt` reward
+rows, no comparator model:
+
+| Arm | Mean official reward | Exact completions |
+|---|---:|---:|
+| Jev selection | 0.482559 (48.2559 pp) | 167/361 |
+| Best single (`autoglm_15steps.zip`) | 0.462575 (46.2575 pp) | 161/361 |
+| Claims-success regex floor | 0.484624 (48.4624 pp) | 168/361 |
+| Oracle@8 | 0.674982 (67.4982 pp) | 237/361 |
+
+- Input tokens: 2,869,717; output tokens: 32,055; estimated spend: **$0.120528114** at the
+  documented $0.042/M input-token price, output free.
+- Jev vs best single: +0.019984 mean reward (+1.9984 pp), gap closure 9.4085%, McNemar b=45,
+  c=39, exact p=0.5856467947.
+- Jev vs claims-success floor (reported, not the bar): −0.002064 mean reward, McNemar b=30,
+  c=31, p=1.0.
+- Jev chose `none` on 74 tasks; 27 of those had a candidate with reward >0. A post-hoc fallback
+  to best single on those rows is **not** a result and is not used in the bar.
+
+**What it refutes.** On this released heterogeneous 15-step pool, the training-free text-only
+Choice did not meet the preregistered Best-of-N improvement bar. The result is a failed experiment,
+not a ruling about Jev generally; it also does not prove the pool is representative of future
+agent attempts. The claims-success regex is a stronger no-model floor on these rows.
+
+**Retry condition.** Reopen only with a new preregistration and a held-out pool not used here: a
+different OSWorld step budget or released-run set, with pool selection fixed before reading outcome
+rows. A possible repair is a `none -> best-single` fallback, but its threshold and fallback rule
+must be fixed on a calibration pool and evaluated on a fresh held-out pool; it may not reuse these
+361 tasks or the post-hoc 27-row observation.
