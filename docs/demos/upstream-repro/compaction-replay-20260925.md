@@ -203,3 +203,42 @@ a `repeat` field.
 at ≥ 50% of not-needed dropped) in **all 3** repeats. Otherwise the loop stops here. The result is
 then recorded against NEGATIVE_EVIDENCE R99/R100 as their retry condition being tested, and the
 held-out set is not labelled.
+
+## A1 results (live, 2026-09-25, `jev-1.13.0`): STOP
+
+`7f12e9f` committed A1 before the run. The run was one `replay.ts a1 --live` at 05:05:24Z: 42
+requests, 534,273 input tokens, **$0.0224**. Re-score, keyless: `python3
+work/loss-depth/compaction/replay.py`.
+
+| arm | repeat | AUC | needed kept at 0.5 | not-needed dropped at 0.5 | dev cut | needed kept at dev cut | not-needed dropped there |
+|---|---:|---:|---|---:|---:|---|---:|
+| A0 | 1 | 0.652 | 0/50 | 165/165 | 0.16 | 33/50 (0.522–0.776) | 89/165 |
+| A0 | 2 | 0.661 | 0/50 | 165/165 | 0.16 | 34/50 (0.542–0.792) | 96/165 |
+| A0 | 3 | 0.650 | 0/50 | 165/165 | 0.16 | 34/50 (0.542–0.792) | 87/165 |
+| C | 1 | 0.524 | 42/50 (0.715–0.917) | 34/165 | 0.68 | 28/50 (0.423–0.688) | 84/165 |
+| C | 2 | 0.537 | 42/50 (0.715–0.917) | 37/165 | 0.68 | 27/50 (0.404–0.670) | 85/165 |
+| C | 3 | 0.527 | 42/50 (0.715–0.917) | 31/165 | 0.68 | 28/50 (0.423–0.688) | 84/165 |
+
+**Repeat noise.** A0 over 4 runs (the dev pass plus 3 repeats) spans AUC 0.648–0.661, and C over 3
+spans 0.524–0.537. The arm differences in the dev pass (+0.015 for H2, +0.014 for H3) are the same
+size as that spread, so neither is a measured gain.
+
+**Gate: C meets the dev bar in 0 of 3 repeats, so the held-out is not run.** The `e7304e4` sample
+stays unlabelled. The result is recorded under NEGATIVE_EVIDENCE R100 as its retry condition tested
+and not met.
+
+**What the loop found.** The two library design choices the autopsy named are real, but fixing them
+did not produce a working keep signal on labelled data.
+- **The premise and the two-condition question suppress the scores.** With them in place (A0, H2,
+  H3), every `keepResult` sits in 0.07–0.29, whatever the state shows.
+- **Removing them lets the scores spread (0.22–0.91) but does not rank need**, with or without the
+  output: AUC 0.514 (H1) and 0.524–0.537 (C).
+- **The best operating point on dev** is still near the library's own `keepResult` ranking: H2 at
+  0.17, 39/50 kept (lower bound 0.648) with 84/165 dropped, below the bar.
+
+**Total spend** for jev-9gtw.6: $0.0031 (token check) + $0.0142 (dev) + $0.0224 (A1) = **$0.0397**.
+
+**NO-CLAIM.** 7 development sessions of one project and one model pin, with the studies' cut point
+and 40-message horizon. This rules out these five designs on this curve. It says nothing about keep
+signals outside Jev Nouls, such as the output-size and feature baselines in upstream
+`tamaratran/fast-jev-compaction#52` (proxy labels, AUC 0.84–0.85), or about other models.

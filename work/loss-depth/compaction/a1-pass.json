@@ -1,0 +1,8 @@
+{
+  "lane": "live",
+  "model": "jev-1.13.0",
+  "at": "2026-09-25T05:05:24.911Z",
+  "requests": 42,
+  "input_tokens": 534273,
+  "spend_usd": 0.022439
+}

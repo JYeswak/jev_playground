@@ -4005,6 +4005,33 @@ results are dropped. AUC above 0.65 alone does not qualify.
 - The cut is fixed from that curve, and the signal must then meet the same bar on fresh,
   rider-screened sessions labelled blind the same way.
 
+**Retry condition tested (jev-9gtw.6, 2026-09-25, `[live]`, dev data only; the retry is not met).**
+The loss-depth autopsy is `801f812`. The dev prereg is `948b479`, amendment A1 `7f12e9f`, results
+`73a16c4` and the commit carrying this paragraph. Every request was built in
+`work/loss-depth/compaction/replay.ts` on the 7 stub-free development sessions (50 needed, 165
+not-needed), `jev-1.13.0`, $0.0397 in total.
+- **The baseline reproduced exactly.** A0's request is byte-identical to the library's, and on
+  jec6 it re-measured the 72,649 input tokens recorded.
+- **Three single-variable arms, one pass each.** AUC A0 0.648, H1 0.514, H2 0.663, H3 0.662.
+  - H1 dropped the re-run premise and asked one "a later step uses this output" Noul.
+  - H2 showed each output's first 500 characters in the state (this condition's candidate).
+  - H3 put the unclipped task and the body of its named file or bead in the goal.
+- **Combined arm C, 3 repeats.** C showed the output heads, dropped the premise and asked one use
+  Noul. AUC was 0.524 / 0.537 / 0.527, against A0's 0.652 / 0.661 / 0.650.
+- **No design reaches the bar on its own development curve.** At the cut that drops ≥ 50% of
+  not-needed calls, the best needed-kept lower bound was:
+  - H2 at 0.17: 39/50, lower bound 0.648;
+  - A0 over its 4 runs: lower bound 0.501–0.542;
+  - C over its 3 repeats: lower bound 0.404–0.423.
+- The held-out (`e7304e4`) was not labelled.
+- **What the dev pass shows.** While the re-run premise and the two-condition question stand, every
+  `keepResult` sits in 0.07–0.29 whatever the state shows. Without them, the use Noul spreads to
+  0.22–0.91 but does not rank need, whether or not the output is visible.
+- **Next retry.** The remaining untested direction is a keep signal outside these Noul wordings, for
+  example the cheap-size and feature baselines an upstream replay reports
+  (`tamaratran/fast-jev-compaction#52`, AUC 0.85 on proxy labels). It must first reach the bar on
+  this development curve. Receipt: `docs/demos/upstream-repro/compaction-replay-20260925.md`.
+
 ## R101 — REFUTED: `jev_rerank` can switch to run.py's one-passage Noul without losing on negation
 
 **Claim (jev-k9z.9):** `work/rerank-scifact/run.py`'s one-passage Noul ("Does this passage contain
