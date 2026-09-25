@@ -54,10 +54,9 @@ clone's own toolchain (`npm run typecheck` / `ruff`), never imposed across them.
 13. **When Jeffrey does it, default to ADOPT.** He is this lane's mentor. The burden of proof sits
     on NOT adopting, never on adopting.
     [§ RULE 12](#rule-12---adopt-from-the-mentor-by-default)
-14. **A pane on an OpenAI or Anthropic model stays out of rider-covered repos.** No indexing,
-    testing, benchmarking, analyzing or executing them, `fh` over the mirror included; route
-    that work to a pane on another lab's model.
-    [§ Rider-covered repos](#rider-covered-repos--restricted-lab-panes-stay-out)
+14. **Every pane mines the mentor's repos.** Joshua reversed the rider restriction on 2026-09-25:
+    any pane may read, index, run and learn from the Dicklesworthstone mirror and `fh`.
+    [§ Rider-covered repos](#rider-covered-repos--reversed-2026-09-25-every-pane-may-use-them)
 15. **Derive test patterns; never invent them.** Fixtures are captured from a real observation or
     row, every bar names its source, and a live run is preceded by keyless feasibility checks
     (the solving action is offered; every request fits the documented input limit).
@@ -471,35 +470,22 @@ leak. This section is as load-bearing as the deletion rule.
 
 ---
 
-## Rider-Covered Repos — Restricted-Lab Panes Stay Out
+## Rider-Covered Repos — REVERSED 2026-09-25: every pane may use them
 
-**Fact** (`notes/deep/franken-deps.md` §W4.2, quoting the franken-assessment packets): 38 of the
-44 assessed Dicklesworthstone repos ship an MIT license with an "OpenAI/Anthropic Rider". It grants
-no rights to OpenAI, Anthropic, their affiliates, or anyone acting for them, and its restricted
-"Use" names copying, executing, **benchmarking, testing, analyzing, indexing**, and incorporating
-the software into any evaluation harness or ML pipeline.
+**Fact** (`notes/deep/franken-deps.md` §W4.2): 38 of the 44 assessed Dicklesworthstone repos ship
+an MIT license with an "OpenAI/Anthropic Rider" aimed at OpenAI, Anthropic, their affiliates, and
+their staff or servers.
 
-**Decision** — Joshua, 2026-09-24, on the question of whether any jev activity should change:
-*"approval on all"*. This lane takes the most conservative operational reading. It is not a legal
-opinion, and Joshua can widen it.
+**Decision (Joshua, 2026-09-25, verbatim; supersedes his 2026-09-24 "approval on all"):** *"we can
+all read them - his projects are open source - they are ment so that anthropic of codex employees
+or servers dont use it - he expects us to use agents with his repos"*.
 
-- **Restricted-lab pane** = a pane whose model comes from OpenAI or Anthropic. Resolve the model
-  from the process and its profile config, never from the pane title
-  (see [Profiles](#profiles--the-trap-that-fires-in-this-session)). Today that is pane 1 only.
-- A restricted-lab pane does **not** index, test, benchmark, analyze, execute, or copy from a
-  rider-covered repo. That covers `fh` over `/Volumes/ZestData/dicklesworthstone-mirror`,
-  `ripwire`/`rg`/`ast-grep` over those clones, and running their suites or binaries.
-- It **may** read third-party assessment packets (they are not the repos), read results another
-  pane reports, and dispatch the work to a pane on another lab's model (today: pane 2 on xAI,
-  panes 3-6 on Meta).
-- Out of scope of the rider by the packets' own census: `br`, `bv`, `fh` and `ripwire` as tools,
-  and the one plain-MIT repo (`franken_agent_detection`). Running a tool is not indexing a
-  rider-covered repo; pointing it at one is.
-- Files already in jev that reimplement a mechanism described in a rider-covered repo are left
-  as they are. This rule governs what a restricted-lab pane does from now on, not history.
-
-**Reversal condition:** Joshua says otherwise, or a legal reading he accepts says the rider does
-not reach a model working for a third party.
+- Every pane, whatever its model, may read, index, search, run and learn from the mirror
+  (`/Volumes/ZestData/dicklesworthstone-mirror`), `fh`, and the vendored Dicklesworthstone clones.
+  Mining his repos is expected work: RULE 12 (adopt from the mentor) applies in full.
+- Unchanged: Dicklesworthstone repos stay native (never forked or patched; issues only through
+  `jeff-issue.py`), and adopting a mechanism means implementing it in our own tree with our own
+  evidence, never copying his files.
 
 ---
 
@@ -1714,8 +1700,8 @@ A packet missing any of them is defective, and `BLOCKED` is the correct response
 1. **The mission line above**, so the pane knows which stage its unit serves.
 2. **The tools, by name, with what each is for** — not "use our tools":
    - `fh` over `/Volumes/ZestData/dicklesworthstone-mirror` (306 ledger rows, 102 bead repos),
-     **only on a pane outside the rider**
-     ([§ Rider-covered repos](#rider-covered-repos--restricted-lab-panes-stay-out)), for
+     on any pane
+     ([§ Rider-covered repos](#rider-covered-repos--reversed-2026-09-25-every-pane-may-use-them)), for
      *design* precedent: the e-process, the seven oracle shapes and the ratchet pattern were all
      read out of `asupersync`, `franken_ocr`, `franken_engine` and `frankensearch` rather than
      invented here.
