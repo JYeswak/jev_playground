@@ -59,3 +59,227 @@ rows, or an incomplete held-out set. Never impute missing rows and never score a
 
 No threshold, state field, option construction rule, seed, retry policy or bar changes after the
 first live v3 call. A failure is recorded as a harness/design result, not a ruling about Jev.
+
+## Amendment: exact autopsy slices and numeric dev bars
+The smoke rows previously run on seeds 9000/9001 are not these slices and are excluded. Each dev arm below uses the exact committed autopsy episode IDs; only the changed variable is enabled with `MINIWOB_V3=1`. Intermediate counts are dev-only and are excluded from the combined held-out design.
+### quoted — N=16
+
+- Change: preserve quoted terminal punctuation.
+- Bar: PASS >=14/16; FAIL <=8/16; 9-13 is dev-only and excluded from combined v3.
+- Exact keys:
+
+```text
+email-inbox-nl-turk/s4/r0
+email-inbox-nl-turk/s28/r0
+email-inbox-noscroll/s11/r0
+email-inbox-noscroll/s15/r0
+email-inbox/s21/r0
+email-inbox/s21/r1
+email-inbox-reply/s13/r0
+email-inbox-reply/s27/r0
+email-inbox-reply/s4/r0
+email-inbox-reply/s29/r0
+email-inbox-reply/s4/r1
+email-inbox-star-reply/s11/r0
+email-inbox-star-reply/s15/r0
+email-inbox-star-reply/s25/r0
+email-inbox-star-reply/s25/r1
+email-inbox-star-reply/s20/r0
+```
+### date time — N=10
+
+- Change: make INPUT_DATE/INPUT_TIME typable.
+- Bar: PASS >=8/10; FAIL <=2/10; 3-7 is dev-only and excluded from combined v3.
+- Exact keys:
+
+```text
+enter-date/s32/r0
+enter-date/s29/r0
+enter-date/s22/r0
+enter-date/s9/r0
+enter-date/s4/r0
+enter-time/s11/r0
+enter-time/s2/r0
+enter-time/s0/r0
+enter-time/s32/r0
+enter-time/s9/r0
+```
+### page text — N=35
+
+- Change: add visible page text/value options.
+- Bar: PASS >=20/35, find-word <=2/5, and no regression on already-successful type controls; FAIL <=12/35; otherwise dev-only.
+- Exact keys:
+
+```text
+find-word/s25/r0
+find-word/s9/r0
+find-word/s25/r1
+find-word/s33/r0
+find-word/s6/r0
+copy-paste/s17/r0
+copy-paste/s17/r1
+copy-paste/s1/r0
+copy-paste/s15/r0
+copy-paste/s32/r0
+read-table/s15/r0
+read-table/s7/r0
+read-table/s11/r0
+read-table/s23/r0
+read-table/s27/r0
+scroll-text/s5/r0
+scroll-text/s17/r0
+scroll-text/s4/r0
+scroll-text/s24/r0
+scroll-text/s1/r0
+text-transform/s1/r0
+text-transform/s10/r0
+text-transform/s33/r0
+text-transform/s33/r1
+text-transform/s17/r0
+copy-paste-2/s3/r0
+copy-paste-2/s32/r0
+copy-paste-2/s13/r0
+copy-paste-2/s20/r0
+copy-paste-2/s19/r0
+read-table-2/s7/r0
+read-table-2/s27/r0
+read-table-2/s25/r0
+read-table-2/s7/r1
+read-table-2/s27/r1
+```
+### color — N=12
+
+- Change: serialize element color.
+- Bar: PASS >=8/12; FAIL <=3/12; otherwise dev-only.
+- Exact keys:
+
+```text
+click-shape/s21/r0
+click-shape/s10/r0
+count-shape/s2/r0
+click-color/s22/r0
+click-color/s14/r0
+click-color/s28/r0
+click-color/s12/r0
+click-shades/s3/r0
+click-shades/s10/r0
+click-shades/s16/r0
+click-shades/s23/r0
+click-shades/s4/r0
+```
+### drag — N=87
+
+- Change: code-enumerate source/target drag pairs.
+- Bar: PASS >=50/87 and no empty-action rows; FAIL <=20/87; otherwise dev-only [PROPOSED because the autopsy gives no numeric drag bar].
+- Exact keys:
+
+```text
+drag-circle/s3/r0
+drag-circle/s16/r0
+drag-circle/s27/r0
+drag-circle/s29/r0
+drag-circle/s28/r0
+drag-shapes/s31/r0
+drag-shapes/s21/r0
+drag-shapes/s22/r0
+drag-shapes/s1/r0
+drag-shapes/s26/r0
+draw-circle/s13/r0
+draw-circle/s11/r0
+draw-circle/s22/r0
+draw-circle/s14/r0
+draw-circle/s27/r0
+resize-textarea/s27/r0
+resize-textarea/s26/r0
+resize-textarea/s16/r0
+resize-textarea/s8/r0
+resize-textarea/s32/r0
+drag-cube/s5/r0
+drag-cube/s23/r0
+drag-cube/s28/r0
+drag-cube/s30/r0
+drag-cube/s32/r0
+drag-shapes-2/s1/r0
+drag-shapes-2/s25/r0
+drag-shapes-2/s16/r0
+drag-shapes-2/s32/r0
+drag-shapes-2/s8/r0
+draw-line/s33/r0
+draw-line/s1/r0
+draw-line/s31/r0
+draw-line/s22/r0
+draw-line/s21/r0
+highlight-text/s13/r0
+highlight-text/s30/r0
+highlight-text/s4/r0
+highlight-text/s22/r0
+highlight-text/s28/r0
+text-editor/s16/r0
+text-editor/s22/r0
+text-editor/s14/r0
+text-editor/s20/r0
+text-editor/s13/r0
+use-slider/s3/r0
+use-slider/s3/r1
+use-slider/s24/r0
+use-slider/s2/r0
+use-slider/s31/r0
+drag-items/s20/r0
+drag-items/s31/r0
+drag-items/s22/r0
+drag-items/s32/r0
+drag-items/s2/r0
+drag-single-shape/s28/r0
+drag-single-shape/s25/r0
+drag-single-shape/s24/r0
+drag-single-shape/s23/r0
+drag-single-shape/s12/r0
+highlight-text-2/s10/r0
+highlight-text-2/s17/r0
+highlight-text-2/s11/r0
+highlight-text-2/s8/r0
+highlight-text-2/s9/r0
+use-slider-2/s2/r0
+use-slider-2/s26/r0
+use-slider-2/s28/r0
+use-slider-2/s31/r0
+use-slider-2/s18/r0
+drag-box/s32/r0
+drag-box/s27/r0
+drag-box/s32/r1
+drag-box/s4/r0
+drag-box/s18/r0
+drag-items-grid/s17/r0
+drag-items-grid/s24/r0
+drag-items-grid/s30/r0
+drag-items-grid/s2/r0
+drag-items-grid/s23/r0
+drag-sort-numbers/s6/r0
+drag-sort-numbers/s19/r0
+drag-sort-numbers/s7/r0
+drag-sort-numbers/s15/r0
+scroll-text-2/s29/r0
+scroll-text-2/s4/r0
+scroll-text-2/s32/r0
+```
+### none — N=11
+
+- Change: after-page-change none guard plus nonempty-action guard.
+- Bar: PASS >=6/11 and no empty-action rows; FAIL <=2/11; otherwise dev-only.
+- Exact keys:
+
+```text
+count-shape/s16/r0
+form-sequence-2/s22/r0
+form-sequence-2/s24/r0
+form-sequence-2/s29/r0
+form-sequence-2/s16/r0
+form-sequence-2/s19/r0
+email-inbox-forward-nl/s27/r0
+use-autocomplete/s28/r0
+use-autocomplete/s3/r0
+click-menu-2/s26/r0
+use-autocomplete-nodelay/s4/r0
+```
+
+The combined held-out run uses only fresh seeds 400-404 after every arm's dev gate is recorded; a dev arm not meeting its bar is excluded from the combined design and reported as a failed design arm.
