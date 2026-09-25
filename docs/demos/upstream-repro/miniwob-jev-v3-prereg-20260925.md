@@ -340,3 +340,23 @@ The isolated rerun showed `n_text_heads=0` for INPUT_DATE/INPUT_TIME because the
 environment-derived tag set was not visible through the imported module in this runner. The v3
 candidate builder now explicitly treats those two kinds as typable only under
 `MINIWOB_V3_ARM=date_time`; v1 remains unchanged. The exact slice and `>=8/10` bar remain fixed.
+
+## Prereg amendment: single-option Choice preflight
+
+Source: captured `drag-items-grid` row `work/game-floors/rows/miniwob.s3.jsonl:121` (seed 17,
+utterance `Drag Bernetta down by one.`), with the same v3 candidate-construction path that
+produced the held-out failure. The live failure was a TypeSafe 400 on an empty `action` Choice;
+the vendor/API contract also makes a one-option Choice unable to carry a meaningful decision.
+
+Before every action-head Jev call, the runner applies this fixed preflight:
+
+1. If the computed action-choice set has fewer than two options, make **no Jev call**.
+2. Record the action as `none: do nothing this step`, with zero Jev calls and zero usage tokens.
+3. Count that episode step as the none action for the existing scorer; do not fabricate a Jev answer.
+4. If the computed set has two or more options, send the unchanged Choice question.
+
+The held-out corpus, seeds, model, dev bars, McNemar bar, and spend accounting are unchanged.
+The captured observation is the regression fixture; the test must turn RED when this preflight is
+removed. This amendment is committed after `ba78db6f` because the first rerun was launched before
+the requested WP-X amendment; no further code change or live call is permitted until this amendment
+is committed. The prematurely launched fixed rerun was stopped at 255/625 before scoring.
