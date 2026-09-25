@@ -224,6 +224,7 @@ def build_candidates(
                 ]
                 if formatted:
                     candidates.insert(0, formatted)
+            type_spans[r] = list(dict.fromkeys(candidates))
         elif e["kind"] == "SELECT" and r in options:
             opts = {floor._norm(o) for o in options[r]}
             ok = [s for s in spans if floor._norm(s) in opts]
