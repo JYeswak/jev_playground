@@ -230,6 +230,40 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
         self.assertEqual(finished.tzinfo, timezone.utc)
         self.assertGreaterEqual(finished, started)
 
+    def test_type_starved_fake_jev_stops_at_sanity_threshold(self):
+        import jev_arm
+
+        payload = self.base_state()
+        reference = (
+            HERE / "rows" / "miniwob-jev-v3-contaminated-smoke-quoted-exact.s0.jsonl"
+        )
+        gate = jev_arm.SanityGate(reference, sanity_after=4)
+        policy = jev_arm.JevPolicy(
+            jev_arm.FakeAsker("click_only"), jev_arm.RunState(), max_steps=1
+        )
+        result = None
+        for i in range(4):
+            policy.act(payload["utterance"], payload["els"], payload["options"])
+            result = gate.observe({"decisions": [policy.decisions[-1]]})
+            if i < 3:
+                self.assertIsNone(result)
+        self.assertIsNotNone(result)
+        assert result is not None
+        self.assertEqual(result["exit_code"], 1)
+        self.assertIn("type=type arm=0.000", "\n".join(result["output"]))
+
+        out = io.StringIO()
+        jev_arm.write_sanity_stop_row(
+            out,
+            result,
+            code_sha256="test-sha",
+            started_utc="2026-09-25T00:00:00.000000Z",
+        )
+        stop = json.loads(out.getvalue())
+        self.assertEqual(stop["row_type"], "arm_sanity_stop")
+        self.assertEqual(stop["reason"], "arm_sanity_exit_1")
+        self.assertEqual(stop["eligible_rows"], 4)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -441,11 +441,16 @@ class FakeAsker:
                     for k in ids
                     if k.startswith("type [") and int(k[6 : k.index("]")]) not in typed
                 ]
+                pick_pool = (
+                    [k for k in ids if not k.startswith("type [")]
+                    if self.mode == "click_only"
+                    else ids
+                )
                 pick = (
                     fresh[0]
-                    if fresh
+                    if fresh and self.mode != "click_only"
                     else max(
-                        ids,
+                        pick_pool,
                         key=lambda k: (
                             len(
                                 goal
@@ -626,6 +631,63 @@ def repair_tail(path: Path) -> None:
         path.write_bytes(data[: data.rfind(b"\n") + 1])
 
 
+def load_arm_sanity():
+    path = ROOT / "scripts" / "arm-sanity.py"
+    spec = importlib.util.spec_from_file_location("arm_sanity", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load arm sanity checker: {path}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class SanityGate:
+    def __init__(self, reference: Path, sanity_after: int = 200):
+        if sanity_after < 1:
+            raise ValueError("sanity_after must be positive")
+        self.reference = reference
+        self.sanity_after = sanity_after
+        self.rows: list[dict] = []
+        self.checked = False
+        self.checker = load_arm_sanity()
+
+    def observe(self, row: dict) -> dict | None:
+        if self.checked:
+            return None
+        self.rows.append(row)
+        _, eligible = self.checker.mix_rows(self.rows)
+        if eligible < self.sanity_after:
+            return None
+        result = self.checker.compare_records(
+            self.rows, self.reference, min_rows=self.sanity_after
+        )
+        result["sanity_after"] = self.sanity_after
+        result["reference"] = str(self.reference)
+        if result["exit_code"] != 2:
+            self.checked = True
+        return result if result["exit_code"] == 1 else None
+
+
+def write_sanity_stop_row(
+    out, result: dict, *, code_sha256: str, started_utc: str
+) -> None:
+    row = {
+        "row_type": "arm_sanity_stop",
+        "reason": "arm_sanity_exit_1",
+        "checker_output": result["output"],
+        "eligible_rows": result["arm_rows"],
+        "reference_rows": result["reference_rows"],
+        "sanity_after": result["sanity_after"],
+        "reference": result["reference"],
+        "code_sha256": code_sha256,
+        "started_utc": started_utc,
+        "finished_utc": utc_now(),
+    }
+    if out is not None:
+        out.write(json.dumps(row, ensure_ascii=False) + "\n")
+        out.flush()
+
+
 def done_keys(path: Path) -> set[tuple[str, int, int]]:
     repair_tail(path)
     if not path.exists():
@@ -634,7 +696,8 @@ def done_keys(path: Path) -> set[tuple[str, int, int]]:
     for line in path.read_text().splitlines():
         if line.strip():
             r = json.loads(line)
-            out.add((r["task"], r["seed"], r["rep"]))
+            if r.get("row_type") != "arm_sanity_stop":
+                out.add((r["task"], r["seed"], r["rep"]))
     return out
 
 
@@ -668,9 +731,15 @@ def write_row(out, row: dict, pol, *, code_sha256: str, started_utc: str) -> Non
 
 
 def run_plan(
-    plan, ask, out_path: Path | None, max_steps: int, none_policy: str = "always"
+    plan,
+    ask,
+    out_path: Path | None,
+    max_steps: int,
+    none_policy: str = "always",
+    sanity_reference: Path | None = None,
+    sanity_after: int = 200,
 ):
-    """Run (task, seed, rep) episodes with the floor's env and run_episode. Returns exit code."""
+    """Run episodes, optionally stopping on an action-mix sanity failure."""
     code_sha256 = code_sha256_at_run_start()
     args = argparse.Namespace(
         max_steps=max_steps,
@@ -700,6 +769,13 @@ def run_plan(
     for task, seed, rep in plan:
         by_task.setdefault(task, []).append((seed, rep))
     out = open(out_path, "a") if out_path else None
+    if sanity_reference is not None and out is None:
+        raise ValueError("--sanity-reference requires --out for dev runs")
+    sanity_gate = (
+        SanityGate(sanity_reference, sanity_after)
+        if sanity_reference is not None
+        else None
+    )
     n = succ = 0
     try:
         for task, pairs in by_task.items():
@@ -736,6 +812,22 @@ def run_plan(
                         code_sha256=code_sha256,
                         started_utc=started_utc,
                     )
+                    if sanity_gate is not None:
+                        result = sanity_gate.observe(row)
+                        if result is not None:
+                            write_sanity_stop_row(
+                                out,
+                                result,
+                                code_sha256=code_sha256,
+                                started_utc=started_utc,
+                            )
+                            print(
+                                "arm sanity gate stopped run: "
+                                + " | ".join(result["output"]),
+                                file=sys.stderr,
+                                flush=True,
+                            )
+                            return 5
                     n += 1
                     succ += row["success"] > 0
                     print(
@@ -772,6 +864,8 @@ def cmd_live(
     tasks_spec: str = "all",
     label: str = "",
     plan_file: str | None = None,
+    sanity_reference: Path | None = None,
+    sanity_after: int = 200,
 ) -> int:
     if not os.environ.get("TYPESAFE_API_KEY", "").strip():
         print(
@@ -790,6 +884,8 @@ def cmd_live(
     )
     for p in (prereg, here_rel, str(FLOOR_PATH.relative_to(ROOT))):
         require_bar(p, repo=str(ROOT))  # AttemptPanic: zero calls
+    if sanity_reference is not None:
+        require_bar(str(sanity_reference.relative_to(ROOT)), repo=str(ROOT))
     ask = LiveAsker()
     k, n = (int(x) for x in shard.split("/"))
     all_tasks = floor.load_task_list()
@@ -826,10 +922,27 @@ def cmd_live(
         file=sys.stderr,
         flush=True,
     )
-    return run_plan(todo, ask, out_path, floor.BENCHMARK_MAX_STEPS, none_policy)
+    return run_plan(
+        todo,
+        ask,
+        out_path,
+        floor.BENCHMARK_MAX_STEPS,
+        none_policy,
+        sanity_reference,
+        sanity_after,
+    )
 
 
-def cmd_dev(fake, tasks, seeds, out, max_steps, dump_request=None) -> int:
+def cmd_dev(
+    fake,
+    tasks,
+    seeds,
+    out,
+    max_steps,
+    dump_request=None,
+    sanity_reference: Path | None = None,
+    sanity_after: int = 200,
+) -> int:
     seed_list = floor.parse_seeds(seeds)
     if any(s < 9000 for s in seed_list):
         print("dev seeds must be >= 9000 (never a benchmark seed)", file=sys.stderr)
@@ -837,7 +950,14 @@ def cmd_dev(fake, tasks, seeds, out, max_steps, dump_request=None) -> int:
     task_list = [t.strip() for t in tasks.split(",") if t.strip()]
     plan = floor.episode_plan(task_list, seeds, {})
     ask = FakeAsker(fake, dump_request)
-    return run_plan(plan, ask, Path(out) if out else None, max_steps)
+    return run_plan(
+        plan,
+        ask,
+        Path(out) if out else None,
+        max_steps,
+        sanity_reference=sanity_reference,
+        sanity_after=sanity_after,
+    )
 
 
 # ------------------------------------------------------------------ selftest
@@ -1041,6 +1161,8 @@ def main(argv=None) -> int:
     d.add_argument(
         "--dump-request", help="write the first request body (state+questions)"
     )
+    d.add_argument("--sanity-reference", type=Path)
+    d.add_argument("--sanity-after", type=int, default=200)
     lv = sub.add_parser("live")
     lv.add_argument("--shard", default="0/1")
     lv.add_argument("--seeds", default="benchmark")
@@ -1050,12 +1172,32 @@ def main(argv=None) -> int:
     lv.add_argument(
         "--none-policy", choices=["always", "after-page-change"], default="always"
     )
+    lv.add_argument("--sanity-reference", type=Path)
+    lv.add_argument("--sanity-after", type=int, default=200)
     a = ap.parse_args(argv)
     if a.cmd == "selftest":
         return selftest()
     if a.cmd == "dev":
-        return cmd_dev(a.fake, a.tasks, a.seeds, a.out, a.max_steps, a.dump_request)
-    return cmd_live(a.shard, a.seeds, a.none_policy, a.tasks, a.label, a.plan_file)
+        return cmd_dev(
+            a.fake,
+            a.tasks,
+            a.seeds,
+            a.out,
+            a.max_steps,
+            a.dump_request,
+            a.sanity_reference,
+            a.sanity_after,
+        )
+    return cmd_live(
+        a.shard,
+        a.seeds,
+        a.none_policy,
+        a.tasks,
+        a.label,
+        a.plan_file,
+        a.sanity_reference,
+        a.sanity_after,
+    )
 
 
 if __name__ == "__main__":

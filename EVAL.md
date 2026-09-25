@@ -1958,3 +1958,9 @@ into the score. The failure is action-mix mismatch, not omitted opponent reply.
 No new leaf Noul calls were made; the prior held-out Noul delta was about
 `-0.003`, so this leaf line is parked. Boundary: no battle win rate, Wilson
 interval, or Jev-vs-battle claim; no continuation of this arm.
+
+## jev-ztp9 MiniWoB in-process arm-sanity stop gate (2026-09-25) [offline-verified]
+
+Keyless `v3_options_test.py` → **5/5 passed**. A fake click-only Jev reaches four eligible decisions, returns arm-sanity exit 1, and writes an `arm_sanity_stop` row with the checker output and counts. `scripts/arm-sanity.py` is loaded in-process from its one source; no logic is copied. The current no-flag selftest stdout/stderr and exit code match the pre-gate `jev_arm.py` at `4ad081d`. A temporary mutation returning `None` for checker exit 1 produces no stop result, so the mutation is RED.
+
+Boundary: no TypeSafe calls, no Jev spend, no live MiniWoB run, and no claim about model behavior. TESTS.md registry update and pane-1 non-author verification remain pending.
