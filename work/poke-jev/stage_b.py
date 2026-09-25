@@ -24,6 +24,7 @@ Never prints a key.
 from __future__ import annotations
 
 import asyncio
+import gc
 import json
 import math
 import os
@@ -122,7 +123,7 @@ async def play(me: Player, opp: Player, k: int, replays: str) -> dict:
     b = me.battles[tag]
     path = os.path.join(replays, f"{me.username} - {tag}.html")
     loser_on_time = time_loss(path)
-    return {
+    row = {
         "k": k,
         "battle": tag,
         "our_team": ours,
@@ -136,6 +137,15 @@ async def play(me: Player, opp: Player, k: int, replays: str) -> dict:
         "wall_s": round(time.time() - t0, 1),
         "replay": os.path.relpath(path, HERE),
     }
+    # Off the clock: forget finished battles and collect now. Each battle leaves about 270k objects
+    # behind; after 25 battles a process held 7.5M, and a collection triggered mid-decision stalled
+    # the event loop for 5-15 s (8 decisions in the first rerun of the control arm).
+    for p in (me, opp):
+        for t, bt in list(p._battles.items()):
+            if bt.finished:
+                p._battles.pop(t)
+    gc.collect()
+    return row
 
 
 def make_players(
@@ -157,6 +167,8 @@ def make_players(
         battle_format=FORMAT,
         account_configuration=AccountConfiguration(f"{opp_name[:7]}bot{w}", None),
     )
+    gc.collect()
+    gc.freeze()  # the static heap (Pokédex, sets, the Bayesian model) is never scanned again
     return me, opp
 
 
@@ -208,10 +220,18 @@ def spawn(opp_name: str, n: int, workers: int, control: bool) -> int:
         str(n),
         str(workers),
     ]
+    env = dict(
+        os.environ,
+        OMP_NUM_THREADS="1",
+        OPENBLAS_NUM_THREADS="1",
+        MKL_NUM_THREADS="1",
+        VECLIB_MAXIMUM_THREADS="1",
+    )
     procs = [
         subprocess.Popen(
             args + [str(w)] + (["--control"] if control else []),
             stdout=subprocess.DEVNULL,
+            env=env,  # one BLAS thread per process: 8 processes must not oversubscribe the cores
         )
         for w in range(workers)
     ]

@@ -105,7 +105,7 @@ def fast_copy(battle):
     through this path and compares their sha256 with the ones built by LocalSim's own deepcopy.
     """
     memo = {}
-    for obj in (getattr(battle, "_data", None), getattr(battle, "_logger", None)):
+    for obj in (getattr(battle, "_data", None), getattr(battle, "logger", None)):
         if obj is not None:
             memo[id(obj)] = obj
     mons = list(getattr(battle, "_team", {}).values()) + list(

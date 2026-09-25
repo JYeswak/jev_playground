@@ -215,6 +215,32 @@ team with no game effect. Checked:
 That covers the control (72/200 wins) and the feasibility arm (18/20 wins). Both arms are rerun from
 k = 0 with the fix.
 
+## Amendment 2: a GC stall found by the control rerun (before any bar battle)
+
+Committed before any live battle against `abyssal`, `onestep` or `maxpower`. No bar, threshold or
+search constant changes.
+
+**Defect.** Each battle left about **270k tracked objects** behind in its process: 7.46M after 25
+battles, in a keyless single-process run. A garbage collection triggered in the middle of a decision
+then stalled the event loop. In the rerun control arm (79/200 wins):
+- **8 of 4,979 decisions** took 5.9–15.9 s, all spent in a 30 ms copy;
+- **3 battles were lost on time by PokéJev** and 2 by the opponent, which shares the event loop.
+
+The rerun feasibility arm (18/20 wins, 0 losses on time) ran in the same window.
+
+**Fix, in `stage_b.py`.**
+- Finished battles are dropped and collected between battles, off the clock.
+- The static heap is frozen once the players load (`gc.freeze()`: the Pokédex, sets and the Bayesian
+  model, 666k objects).
+- Each shard process runs with one BLAS thread.
+- `pc.fast_copy` also shares the battle's `logger` (it had looked for `_logger`).
+
+**Checked.** Over 10 battles in one process, tracked objects stayed at 11.8–12.0k and each
+collection took 2–24 ms.
+
+**Superseded runs are kept, not scored:** `work/poke-jev/stage-b/superseded-gc-stall/`. Both arms
+are rerun from k = 0 on this code.
+
 ## Commands
 
 ```bash
