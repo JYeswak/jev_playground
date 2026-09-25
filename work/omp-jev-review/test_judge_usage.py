@@ -4,7 +4,8 @@ Row shapes are copied from real omp 18.3.0 session files:
   SUCCESS_*     ~/.omp/profiles/claude/agent/sessions/-Developer-jev/... (2026-09-24, stop)
   FAILED_FIND   the planted failure, TYPESAFE_BASE_URL=http://127.0.0.1:9, 2026-09-25T00:27Z:
                 31 rows (30 find, 1 auto-thinking), each stopReason error, zero usage
-  XAI_ERROR     a judge-role row from another provider (xai-oauth 403), which is not Jev's
+  OTHER_ERROR   a judge-role row from another provider (ollama 404, 2026-09-24; timestamp moved
+                into the window), which is not Jev's
 """
 
 import contextlib
@@ -91,22 +92,22 @@ ABORTED = jev_row(
 OLD_FAILURE = jev_row(
     "2026-09-23T12:00:00.000Z", "find", stop="error", error="402 Payment Required"
 )
-XAI_ERROR = {
+OTHER_ERROR = {
     "type": "model_usage",
-    "id": "d1698b32",
-    "parentId": "796e8b23",
+    "id": "091ec6ee",
+    "parentId": "459f96ce",
     "timestamp": "2026-09-24T23:39:23.999Z",
     "purpose": "auto-thinking",
     "role": "judge",
     "api": "openai-responses",
-    "provider": "xai-oauth",
-    "model": "grok-4.7",
+    "provider": "ollama",
+    "model": "qwen3.8-uncensored:latest",
     "usage": dict(
         ZERO,
         cost={"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0, "total": 0},
     ),
     "stopReason": "error",
-    "errorMessage": "403 You have run out of credits or need a Grok subscription.",
+    "errorMessage": "404 model 'qwen3.8-uncensored:latest' not found",
 }
 NOW = datetime(2026, 9, 25, 0, 30, tzinfo=timezone.utc)
 
@@ -200,14 +201,14 @@ class Census(unittest.TestCase):
         self.assertIn("# judge real calls 1 cost $0.000135 failures 0", report)
 
     def test_other_providers_and_rows_older_than_24h_are_not_counted(self):
-        self.real([XAI_ERROR, OLD_FAILURE, SUCCESS_AUTO])
+        self.real([OTHER_ERROR, OLD_FAILURE, SUCCESS_AUTO])
         self.assertEqual(
             sc.fleet_line(self.rows(), NOW, True),
             "Jev judge 24h: 1 calls, $0.0000, 0 failures",
         )
         report = sc.judge_report(self.rows())
         self.assertIn("# judge real calls 2 cost $0.000044 failures 1", report)
-        self.assertNotIn("xai", "\n".join(report))
+        self.assertNotIn("ollama", "\n".join(report))
 
     def test_no_session_files_is_not_run_never_zero_failures(self):
         line = sc.fleet_line(self.rows(), NOW, False)
