@@ -1902,4 +1902,4 @@ Keyless tests: `python3 -m unittest work/arm-sanity/test_arm_sanity.py` → **5/
 
 Direct keyless commands reported the expected exit sequence `1, 0, 1, 2`; `ruff format --check`, `ruff check`, and `ubs scripts/arm-sanity.py work/arm-sanity/test_arm_sanity.py` were run. No TypeSafe calls or spend were used.
 
-Boundary: no live arm, no model judgment, no comparator, and no Jev API call. TESTS.md registry update and pane-1 non-author verification remain required before bead closure.
+Boundary: no live arm, no model judgment, no comparator, and no Jev API call. The TESTS.md row is now updated; pane-1 non-author verification remains required before bead closure.
