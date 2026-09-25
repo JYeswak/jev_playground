@@ -18,6 +18,7 @@ test('recorded answer rows drive a deterministic offline Choice response', async
   assert.equal(result.ok, true);
   assert.equal(result.choice, rows[0].answers.choice.choice);
   assert.deepEqual(result.probabilities, rows[0].answers.choice.probabilities);
+  assert.equal('usage' in result, false);
 });
 
 test('fake asker exhausts recorded rows rather than inventing a fallback', async () => {

@@ -18,7 +18,6 @@ function responseFor(row: RecordedAnswerRow): FakeResponse {
   const payload = JSON.stringify({
     answers: row.answers,
     ...(row.model ? { model: row.model } : {}),
-    ...(row.usage ? { usage: row.usage } : {}),
   });
   const response: FakeResponse = {
     ok: true,
