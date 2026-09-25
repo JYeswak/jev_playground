@@ -23,13 +23,17 @@ therefore has no task instruction. The goal arm adds the task's public instructi
 - Committed task manifest: `work/osw-bestofn/dev_slice.json`.
 - Manifest SHA-256: `154482ff5f277999c1a76331dee6e6c9819a0010904b9b6b6ba7841fdbd8898e`.
 - Slice: 60 tasks, 20 `correct_none`, 20 `false_none`, 20 `wrong_pick`; labels are from the
-  committed keyless floor receipt and are not sent to Jev.
+  committed `live_receipt.json` choices joined with the committed keyless floor rewards and are
+  not sent to Jev.
 
 Each state contains the compact `traj.jsonl` action records and a bounded `runtime.log` tail for
-all eight frozen candidate archives, plus the public task instruction. `result.txt` is used only by
-the offline scorer and task-label join; it is not in any live state, prompt, question, or arm
-output. Candidate archive names are stripped from the live state before serialization. Candidate
-IDs remain positional `c0` through `c7`; the prompt forbids treating IDs as correctness evidence.
+all eight frozen candidate archives, plus the public task instruction. `result.txt` contents are
+used only by the offline scorer and task-label join; no official result value, grader output, or
+success label is in any live state, prompt, question, or arm output. An action string may mention a
+file named `result.txt` as part of the candidate's recorded trajectory; that is not the official
+result content. Candidate archive names are stripped from the live state before serialization.
+Candidate IDs remain positional `c0` through `c7`; the prompt forbids treating IDs as correctness
+evidence.
 
 ## Pre-registered arms
 
@@ -46,7 +50,7 @@ serializer. Each arm differs from `original` by exactly one variable:
 Choice criteria: select `c0`–`c7` or `none`; `none` means the supplied evidence is insufficient.
 The Noul criteria are fixed: true means the supplied evidence establishes successful completion
 of the stated task; false means it does not. The validator rejects missing or non-finite answers.
-No arm carries `result.txt`, grader output, official reward, or a success label.
+No arm carries `result.txt` contents, grader output, official reward, or a success label.
 
 H5 is **not run in this four-arm dev batch**. If a terminal-status field is added in a later arm,
 it must be built only from the final parseable `traj.jsonl` record's terminal fields and the final
@@ -70,6 +74,23 @@ oracle. The original bar is retained unchanged: at least **+0.03 mean reward** v
 single, exact-completion McNemar `p < 0.05`, and at least **30% of the mean-reward gap to oracle@8**;
 all three are required. No arm is declared a win from confidence, response count, or a single row.
 
+## Dev result before held-out selection
+
+The four live arms completed with 60/60 valid rows and `resolvedModel = jev-1.13.0` on every
+successful call. The pre-registered strict-improvement rule selected no variable:
+
+| Arm | Mean official reward | Exact tasks | Input tokens | Spend |
+|---|---:|---:|---:|---:|
+| `original` | 0.0166667 | 1/60 | 477,436 | $0.020052312 |
+| `goal` | 0.0166667 | 1/60 | 480,164 | $0.020166888 |
+| `neutral` | 0.0000000 | 0/60 | 481,756 | $0.020233752 |
+| `noul` | 0.0000000 | 0/60 | 511,156 | $0.021468552 |
+
+The four-arm total was 1,950,512 input tokens and $0.081921504. The exact per-call resolved model
+and usage rows are retained in the four live receipts. Because `goal` tied `original` rather than
+strictly improving it, no arm was eligible under the locked rule. The held-out arm is therefore
+`original`, with no post hoc prompt or threshold change.
+
 ## Held-out selection rule
 
 Before any held-out call, score all four dev arms using the primary metric. An arm is eligible to
@@ -80,11 +101,13 @@ variables: add the public instruction if `goal` is eligible, use neutral criteri
 eligible, and use per-candidate Nouls if `noul` is eligible. This combination is the sole
 pre-registered multi-variable held-out design; no prompt or threshold changes after seeing results.
 
-The held-out task set is the deterministic complement of the 60 dev tasks in the committed
-`floor_receipt.json` failure-class union (`correct_none`, `false_none`, `wrong_pick`), sorted by
-task key. Its state is rebuilt from the same pinned public task files and allowed trajectory and
-runtime members, with a different task set and the same fixed evidence window. The held-out arm is
-scored with the same original bar above.
+The exact pre-registered held-out manifest is `work/osw-bestofn/heldout_slice.json` (SHA-256
+`9fa3f207783795bac4dd160bcfbcddf91652a5ddc54eea633b8fde18da2c7521`, N=57). It is the sorted
+complement of the 60 dev tasks within the failure-class union reconstructed from committed
+`live_receipt.json` choices and `floor_receipt.json` rewards: 27 `correct_none`, 7 `false_none`,
+and 23 `wrong_pick`. Its state is rebuilt from the same pinned public task files and allowed
+trajectory and runtime members, with a different task set and the same fixed evidence window. The
+held-out arm is scored with the same original bar above.
 
 ## Boundary
 
