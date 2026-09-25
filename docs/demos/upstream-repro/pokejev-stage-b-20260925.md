@@ -189,6 +189,32 @@ It will be reported as BEAT / TIE / LOSE by the Wilson interval of PokéJev's wi
   weights anyway, as preregistered before that result. A PASS here does not certify them as
   calibrated.
 
+## Amendment 1: a harness defect found by the feasibility arm (before any bar battle)
+
+Committed after the first feasibility and control runs and **before any live battle against
+`abyssal`, `onestep` or `maxpower`**. No bar, threshold or search constant changes.
+
+**Defect.** PokéChamp's team file `gen9ou12.txt` gives all six Pokémon a nickname, for example
+"Lynrd Spynrd (Great Tusk) @ Rocky Helmet". PokéChamp's poke-env fork then fails to match the
+nicknamed switch-in to its team-preview entry and raises `team already has 6 pokemons`. The side
+holding team 12 never moves and loses on time.
+
+**Measured.** Every team-12 battle ended in a loss on time by the side holding team 12:
+- first control run: 34 of 34;
+- first feasibility run: 2 of 2.
+
+No other battle in either run was lost on time.
+
+**Fix.** `stage_b.py team_text` strips the cosmetic nicknames: "Species (G) @ Item" is the same
+team with no game effect. Checked:
+- only team 12's six header lines change;
+- a gender tag such as "Latios (M) @ Soul Dew" is kept;
+- four team-12 battles (k = 12, 13, 28, 29, both sides) then finished with no loss on time.
+
+**The invalid first runs are kept, not scored:** `work/poke-jev/stage-b/invalid-team12-nickname-crash/`.
+That covers the control (72/200 wins) and the feasibility arm (18/20 wins). Both arms are rerun from
+k = 0 with the fix.
+
 ## Commands
 
 ```bash

@@ -87,8 +87,28 @@ def load_jsonl(path):
         return [json.loads(line) for line in fh if line.strip()]
 
 
+NICKNAMED = re.compile(
+    r"^(?P<nick>[^()\n]+?) \((?P<species>(?![MF]\))[^()\n]+)\)(?P<rest>.*)$", re.M
+)
+
+
+def team_text(tid: int) -> str:
+    """PokéChamp's pinned team file with cosmetic nicknames removed.
+
+    gen9ou12.txt nicknames all six Pokémon ("Lynrd Spynrd (Great Tusk) @ Rocky Helmet"). PokéChamp's
+    poke-env fork then fails to match the nicknamed switch-in to its team-preview entry, raises
+    "team already has 6 pokemons", and the player holding that team never moves and loses on time:
+    34 of 34 team-12 battles in the first control run, and both such battles in the first feasibility
+    run. A nickname has no game effect, so "Species (G) @ Item" is the same team.
+    Gender tags such as "Latios (M) @ Soul Dew" are left as they are.
+    """
+    return NICKNAMED.sub(
+        lambda m: m.group("species") + m.group("rest"), load_random_team(tid)
+    )
+
+
 def _team(tid: int) -> ConstantTeambuilder:
-    return ConstantTeambuilder(load_random_team(tid))
+    return ConstantTeambuilder(team_text(tid))
 
 
 async def play(me: Player, opp: Player, k: int, replays: str) -> dict:
