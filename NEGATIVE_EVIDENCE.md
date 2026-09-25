@@ -4141,6 +4141,18 @@ Choice did not meet the preregistered Best-of-N improvement bar. The result is a
 not a ruling about Jev generally; it also does not prove the pool is representative of future
 agent attempts. The claims-success regex is a stronger no-model floor on these rows.
 
+**Additional non-author disclosures (pane 3 re-check).** The live receipt has two harness defects
+that do not change the failed direction but invalidate a clean retry interpretation:
+
+- `work/osw-bestofn/live_select.mjs:7` hardcodes the request model string `jev-1.13.0` and drops
+  the per-call resolved model, so the receipt cannot prove which model answered each call.
+- `work/osw-bestofn/live_select.mjs:12` puts archive names such as `claude-sonnet-4-5-...` in the
+  Choice option labels, allowing a model/brand prior. A retry must use neutral labels `c0`–`c7`
+  and keep archive names out of the state, while recording each response's resolved model.
+
+These defects reinforce the retry condition: the next run must fix both before any live call, and
+must use a fresh held-out pool.
+
 **Retry condition.** Reopen only with a new preregistration and a held-out pool not used here: a
 different OSWorld step budget or released-run set, with pool selection fixed before reading outcome
 rows. A possible repair is a `none -> best-single` fallback, but its threshold and fallback rule

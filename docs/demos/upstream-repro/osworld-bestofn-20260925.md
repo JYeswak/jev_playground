@@ -81,3 +81,9 @@ infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=pr
 **Preregistered outcome:** the bar is not met (`+3 pp`, p<0.05, and >=30% gap closure all
 required). This is a measured failed experiment, not a ruling about Jev generally. No raw state,
 trajectory text, runtime log, screenshot, API key, or response body was committed.
+
+**Harness disclosure from pane 3's independent check:** this receipt's selector hardcodes the
+request model string and does not retain each response's resolved model; its Choice labels include
+public archive names, so brand priors are possible. A retry must record per-call resolved models and
+use neutral `c0`–`c7` labels with archive names excluded from state. The failed bar result above is
+unchanged, but this receipt is not a clean retry baseline.
