@@ -13,6 +13,7 @@ validation rules.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -36,6 +37,7 @@ UTC_FIELD_NAMES = {
     "timestamp_utc",
 }
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
+EXEMPTION_FILE = "scripts/row-provenance-exempt.tsv"
 
 
 def git_output(repo: Path, *args: str) -> str:
@@ -117,6 +119,35 @@ def utc_timestamp_present(row: dict[str, object]) -> bool:
     return any(parse_timestamp(value) is not None for _, value in candidates)
 
 
+def load_exemptions(repo: Path) -> dict[str, str]:
+    path = repo / EXEMPTION_FILE
+    if not path.is_file():
+        return {}
+    lines = path.read_text(encoding="utf-8").splitlines()
+    if not lines or lines[0] != "path\tsha256\treason":
+        raise RuntimeError(f"{EXEMPTION_FILE} must start with path, sha256, reason")
+    exemptions: dict[str, str] = {}
+    for line_number, line in enumerate(lines[1:], 2):
+        fields = line.split("\t")
+        if len(fields) != 3 or not all(fields):
+            raise RuntimeError(f"{EXEMPTION_FILE} line {line_number} is malformed")
+        relative, digest, _reason = fields
+        if relative in exemptions:
+            raise RuntimeError(
+                f"{EXEMPTION_FILE} line {line_number} duplicates {relative}"
+            )
+        if SHA256.fullmatch(digest) is None:
+            raise RuntimeError(
+                f"{EXEMPTION_FILE} line {line_number} has an invalid sha256"
+            )
+        exemptions[relative] = digest
+    return exemptions
+
+
+def sha256_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def check_file(path: Path, relative: str) -> tuple[int, str | None]:
     experiment_rows = 0
     first_error: tuple[int, list[str]] | None = None
@@ -154,16 +185,28 @@ def main() -> int:
     try:
         paths = tracked_jsonl(repo)
         first_added = first_added_commits(repo)
+        exemptions = load_exemptions(repo)
     except RuntimeError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
     checked_files = 0
     checked_rows = 0
+    exempted_files = 0
     errors: list[str] = []
     for relative in paths:
         added = first_added.get(relative)
         if added is None or added <= CUTOFF:
+            continue
+        if relative in exemptions:
+            actual = sha256_file(repo / relative)
+            expected = exemptions[relative]
+            if actual != expected:
+                errors.append(
+                    f"{relative} exemption sha256 mismatch: expected {expected}, got {actual}"
+                )
+                continue
+            exempted_files += 1
             continue
         rows, error = check_file(repo / relative, relative)
         if rows == 0:
@@ -176,7 +219,8 @@ def main() -> int:
     for error in errors:
         print(f"ERROR: {error}", file=sys.stderr)
     print(
-        f"checked {checked_files} experiment row file(s), {checked_rows} experiment rows"
+        f"checked {checked_files} experiment row file(s), "
+        f"{checked_rows} experiment rows, exempted {exempted_files} file(s)"
     )
     return 1 if errors else 0
 

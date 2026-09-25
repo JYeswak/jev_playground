@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import subprocess
 import tempfile
@@ -43,12 +44,15 @@ class RowProvenanceCheckerTests(unittest.TestCase):
             timeout=30,
         )
         (self.repo / "work" / "rows").mkdir(parents=True)
+        (self.repo / "scripts").mkdir()
 
     def tearDown(self) -> None:
         self.tempdir.cleanup()
 
-    def install(self, fixture: str, commit_date: str) -> None:
-        relative = Path("work/rows") / fixture
+    def install(
+        self, fixture: str, commit_date: str, filename: str | None = None
+    ) -> None:
+        relative = Path("work/rows") / (filename or fixture)
         destination = self.repo / relative
         rows = [
             json.JSONDecoder().decode(line)
@@ -77,6 +81,12 @@ class RowProvenanceCheckerTests(unittest.TestCase):
             env=env,
             check=True,
             timeout=30,
+        )
+
+    def write_exemption(self, relative: str, digest: str) -> None:
+        (self.repo / "scripts" / "row-provenance-exempt.tsv").write_text(
+            "path\tsha256\treason\n" f"{relative}\t{digest}\tlegacy test fixture\n",
+            encoding="utf-8",
         )
 
     def run_checker(self) -> subprocess.CompletedProcess[str]:
@@ -125,6 +135,34 @@ class RowProvenanceCheckerTests(unittest.TestCase):
         result = self.run_checker()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("checked 0 experiment row", result.stdout)
+
+    def test_matching_exemption_skips_legacy_file_and_reports_count(self) -> None:
+        self.install("missing-hash.jsonl", AFTER, filename="legacy.jsonl")
+        path = self.repo / "work" / "rows" / "legacy.jsonl"
+        self.write_exemption(
+            "work/rows/legacy.jsonl", hashlib.sha256(path.read_bytes()).hexdigest()
+        )
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("exempted 1 file", result.stdout)
+
+    def test_changed_exempted_file_fails_hash_pin(self) -> None:
+        self.install("missing-hash.jsonl", AFTER, filename="legacy.jsonl")
+        path = self.repo / "work" / "rows" / "legacy.jsonl"
+        self.write_exemption(
+            "work/rows/legacy.jsonl", hashlib.sha256(path.read_bytes()).hexdigest()
+        )
+        path.write_bytes(path.read_bytes() + b"\n")
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("exemption sha256 mismatch", result.stderr)
+
+    def test_unlisted_legacy_file_still_fails(self) -> None:
+        self.install("missing-hash.jsonl", AFTER, filename="legacy.jsonl")
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("work/rows/legacy.jsonl", result.stderr)
+        self.assertIn("code_sha256 or run_py_sha256", result.stderr)
 
 
 if __name__ == "__main__":

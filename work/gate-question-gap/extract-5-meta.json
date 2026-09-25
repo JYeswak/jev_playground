@@ -1,0 +1,10 @@
+{
+  "start": "2026-09-24T17:05:12.000Z",
+  "end": "2026-09-25T09:28:29.594Z",
+  "rows": 2683,
+  "outside window": 1124,
+  "in window": 3367,
+  "excluded: repeat of an earlier row": 288,
+  "excluded: seen in readout 3 or 4": 30,
+  "excluded: not a fleet row": 366
+}
