@@ -5,7 +5,7 @@
  * already installed, so a test that pins "no key anywhere" with setKeyProvider(async () =>
  * undefined) stays keyless whatever it constructs afterwards.
  */
-import { keyProviderInstalled, setKeyProvider } from "./index.ts";
+import { keyProviderInstalled, setKeyProvider } from "../../../kit/src/client.ts";
 import { infisicalKeyProvider } from "./infisical-key.ts";
 
 export function useInfisicalKey(): void {

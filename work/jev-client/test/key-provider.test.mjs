@@ -2,7 +2,7 @@
 // TYPESAFE_API_KEY, then an installed provider; the Infisical provider caches in memory only.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { askJev, askJevScore, keyProviderInstalled, setKeyProvider } from '../src/index.ts';
+import { askJev, askJevScore, keyProviderInstalled, setKeyProvider } from '../../../kit/src/client.ts';
 import { makeInfisicalKeyProvider, PROJECT_ID, TTL_MS, FAIL_TTL_MS, infisicalBinary } from '../src/infisical-key.ts';
 import { useInfisicalKey } from '../src/use-infisical-key.ts';
 

@@ -37,7 +37,7 @@ import { appendFile, mkdir, open } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { askJev, BILLING_HOLD_MS, billingHoldActive, noteBillingRefusal, resetBillingHold } from "../../../work/jev-client/src/index.ts";
+import { askJev, BILLING_HOLD_MS, billingHoldActive, noteBillingRefusal, resetBillingHold } from "../../../kit/src/client.ts";
 export { BILLING_HOLD_MS, resetBillingHold };
 import { CUT, RISK, STATE_CONTEXT } from "../../../work/bicameral-gate/questions.mjs";
 

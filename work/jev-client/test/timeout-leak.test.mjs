@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { askJev, guardDeadlineMs } from '../src/index.ts';
+import { askJev, guardDeadlineMs } from '../../../kit/src/client.ts';
 
 // Timed-out requests must never escape as unhandled rejections: node:test
 // (like a default Node host) fails the run on one, so a green run IS that

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { askJev, askJevChoice, askJevBundle, askJevScore, BILLING_HOLD_MS, observedFetch, resetBillingHold, SYSTEMONE_ENDPOINT } from '../src/index.ts';
+import { askJev, askJevChoice, askJevBundle, askJevScore, BILLING_HOLD_MS, observedFetch, resetBillingHold, SYSTEMONE_ENDPOINT } from '../../../kit/src/client.ts';
 
 const QUESTIONS = { harm: 'is this harmful?' };
 const STATE = { command: 'rm -rf /' };
@@ -72,7 +72,8 @@ test('a key with no installed SDK is sdk-missing, not unconfigured, and makes no
   mkdirSync(join(root, 'work/jev-client/src'), { recursive: true });
   mkdirSync(join(root, 'kit/src'), { recursive: true });
   const copy = join(root, 'work/jev-client/src/index.ts');
-  copyFileSync(fileURLToPath(new URL('../src/index.ts', import.meta.url)), copy);
+  copyFileSync(fileURLToPath(new URL('../../../kit/src/client.ts', import.meta.url)), copy);
+  copyFileSync(fileURLToPath(new URL('../../../kit/src/validate.ts', import.meta.url)), join(root, 'work/jev-client/src/validate.ts'));
   copyFileSync(fileURLToPath(new URL('../../../kit/src/client.ts', import.meta.url)), join(root, 'kit/src/client.ts'));
   copyFileSync(fileURLToPath(new URL('../../../kit/src/validate.ts', import.meta.url)), join(root, 'kit/src/validate.ts'));
   const bare = await import(pathToFileURL(copy).href);
@@ -343,7 +344,7 @@ test('askJevChoice reports HTTP and transport failures the same way askJev does'
 // Both real omp row shapes. A reader that handles one and not the other reports "no rows"
 // on live data that plainly contains them — the exact failure behind R33 and R41.
 test('readRow handles BOTH omp row shapes, and rejects neither-shaped input', async () => {
-  const { readRow } = await import('../src/index.ts');
+  const { readRow } = await import('../../../kit/src/client.ts');
   const nested = { customType: { type: 'x.decision.v1', data: { kind: 'harm_fire', score: 1 } } };
   const flat = { customType: 'x.decision.v1', data: { kind: 'failure_scored', score: 2 } };
 

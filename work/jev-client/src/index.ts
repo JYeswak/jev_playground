@@ -1,2 +1,1 @@
-/** Temporary K1 re-export; K7 migrates callers and removes this shim. */
-export * from "../../../kit/src/client.ts";
+/** K7: client callers import kit/src/client.ts directly; no public re-export remains. */
