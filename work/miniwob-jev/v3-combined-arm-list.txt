@@ -1,3 +1,5 @@
 # Arms that passed the isolated development bar and may enter held-out combined runs.
+# color: 8/12 descriptive PASS; preregistered bar is UNSOURCED.
 quoted
 none
+color
