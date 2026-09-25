@@ -4158,3 +4158,43 @@ different OSWorld step budget or released-run set, with pool selection fixed bef
 rows. A possible repair is a `none -> best-single` fallback, but its threshold and fallback rule
 must be fixed on a calibration pool and evaluated on a fresh held-out pool; it may not reuse these
 361 tasks or the post-hoc 27-row observation.
+
+## R105 — REFUTED: PokéJev beats the preregistered local Abyssal bar under the enforced clock
+
+**Claim (bead `jev-jy7t.1.3`).** Putting Jev (`jev-1.13.0`) in PokéChamp's action-prior,
+opponent-model and leaf-judgment slots would beat the PokéChamp/Abyssal comparison at the
+preregistered tier-1 bar: at least 84% wins over 200 Gen 9 OU Clock battles and zero PokéJev
+losses on time. The zero-call control and a Random feasibility arm were fixed before the bar arm.
+
+**Measured 2026-09-25, live, `jev-1.13.0`.** Preregistration `1a37ee4`, pinned PokéChamp/Showdown
+server and Gen 9 OU Clock, 200/200 Abyssal rows, 0 harness errors:
+
+| Arm | Wins | Win rate | Wilson 95% interval | Time losses |
+|---|---:|---:|---:|---:|
+| PokéJev vs Abyssal | 112/200 | 0.560 | 0.4907–0.6270 | 0 |
+| Zero-call control vs Abyssal | 79/200 | 0.395 | 0.3298–0.4641 | 0 |
+| Feasibility vs Random | 19/20 | 0.950 | 0.7639–0.9911 | 0 |
+
+The tier-1 PASS bar failed and the preregistered KILL condition fired because 0.560 < 0.70. The
+live arm was +16.5 percentage points over control (`z=3.303`, two-sided `p=0.001`), so Jev added
+signal over the fallback floor without reaching the task bar. The live arm made 9,334 Jev calls,
+used 33,273,577 input tokens, and had $1.397490234 estimated spend. Decision latency was p50/p95/
+max 1,088/2,424/5,064 ms.
+
+The live arm had 381 fallbacks: 271 no-credit TypeSafe API errors, 5 timeouts, and 105
+`Unknown move: nothing` errors. The fallback policy remained clock-safe; the credit-exhaustion
+boundary is disclosed rather than hidden. Aggregate receipt and committed keyless re-score inputs:
+`work/poke-jev/stage-b/receipt.json`; measured result:
+`docs/demos/upstream-repro/pokejev-stage-b-results-20260925.md`.
+
+**What it refutes.** This implementation, under this pinned local server, team schedule and
+stricter clock, is not a replacement for the preregistered Abyssal comparator at the 84% target.
+It does not refute the +16.5 pp improvement over the zero-call control, and it is not a ladder
+result, a human-action result, or a calibration result.
+
+**Retry condition.** Reopen only with a new preregistration that changes a stated design input:
+a corrected client/model revision, a different fixed team schedule or opponent, a revised clock,
+or a declared credit budget sufficient to avoid the measured no-credit fallback regime. Any retry
+must retain a zero-call control, the Random feasibility gate, 200 or more fixed battles, and the
+same KILL/PASS thresholds before the first live call. The Metamon stretch is a separate comparison,
+not a retry of this closed bar.
