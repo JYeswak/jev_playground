@@ -147,6 +147,56 @@ def main() -> int:
     print(
         f"A0 nouls equal to the recorded ones: {same} of {same + diffs}; largest difference {worst:.2f}"
     )
+    return amendment_a1(lab, pos, neg)
+
+
+def amendment_a1(lab: dict, pos: list, neg: list) -> int:
+    """Amendment A1: A0 and C, 3 repeats each; C goes to held-out only if it meets the dev bar in all 3."""
+    path = HERE / "a1-answers.jsonl"
+    print(
+        "\n## Amendment A1: A0 and C (output head visible, no re-run premise, one use Noul), 3 repeats"
+    )
+    if not path.exists():
+        print("NOT_RUN: a1-answers.jsonl is written by `replay.ts a1 --live`")
+        return 0
+    print((HERE / "a1-pass.json").read_text().strip())
+    by = {}
+    for r in N.read_jsonl(path):
+        if not r["pinned"]:
+            by.setdefault((r["arm"], r["repeat"]), {})[
+                (r["session"], r["tool_use_id"])
+            ] = r
+    fields = {"A0": "keepResult", "C": "use"}
+    print(
+        "\n| arm | repeat | AUC | needed kept at 0.5 | not-needed dropped at 0.5 | dev cut | needed kept at dev cut | not-needed dropped there | dev bar |"
+    )
+    print("|---|---:|---:|---|---:|---:|---|---:|---|")
+    met = {}
+    aucs = {}
+    for (arm, repeat), s in sorted(by.items()):
+        p = [s[k][fields[arm]] for k in pos]
+        q = [s[k][fields[arm]] for k in neg]
+        t = min(
+            v
+            for v in sorted(set(p + q))
+            if sum(x < v for x in q) >= DROP_AT_LEAST * len(q)
+        )
+        kt, dt = sum(x >= t for x in p), sum(x < t for x in q)
+        lo, _ = N.R1.wilson(kt, len(p))
+        met.setdefault(arm, []).append(lo >= 0.80)
+        aucs.setdefault(arm, []).append(auc(p, q))
+        print(
+            f"| {arm} | {repeat} | {aucs[arm][-1]:.3f} | {rate(sum(x >= CUT for x in p), len(p))} | {sum(x < CUT for x in q)}/{len(q)} | "
+            f"{t} | {rate(kt, len(p))} | {dt}/{len(q)} | {'MET' if lo >= 0.80 else 'not met'} |"
+        )
+    for arm, xs in aucs.items():
+        print(
+            f"{arm}: AUC mean {sum(xs) / len(xs):.3f}, range {min(xs):.3f}-{max(xs):.3f} over {len(xs)} repeats"
+        )
+    go = len(met.get("C", [])) == 3 and all(met["C"])
+    print(
+        f"\nA1 gate (C meets the dev bar in all 3 repeats): {'GO to held-out' if go else 'STOP: held-out not run'}"
+    )
     return 0
 
 

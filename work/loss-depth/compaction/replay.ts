@@ -5,6 +5,7 @@
 //   node --experimental-strip-types work/loss-depth/compaction/replay.ts check          # keyless: A0 body == the library's body, every arm's size
 //   node --experimental-strip-types work/loss-depth/compaction/replay.ts tokens --live  # A0 + C2 on jev-jec6's 4 sessions vs its recorded 72,649 input tokens
 //   node --experimental-strip-types work/loss-depth/compaction/replay.ts dev --live     # A0, H1, H2, H3 on the 7-session dev slice
+//   node --experimental-strip-types work/loss-depth/compaction/replay.ts a1 --live      # amendment A1: A0 and C, 3 repeats each
 //
 // Live modes run under `infisical run --silent --projectId=... --` and refuse without TYPESAFE_API_KEY.
 // Written files hold ids, numbers and hashes only, never session text.
@@ -32,7 +33,8 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, "..", "..", "..");
 const STUDIES = { x86y: join(ROOT, "work/compaction-need"), jec6: join(ROOT, "work/compaction-keep") };
 export const ARMS = ["A0", "H1", "H2", "H3"] as const;
-type Arm = (typeof ARMS)[number];
+// Amendment A1: C = H2's visible output heads + H1's premise removal and single use Noul.
+type Arm = (typeof ARMS)[number] | "C";
 const MAX_REQUEST_TOKENS = resolveOptions(OPTIONS).maxRequestTokens;
 const PRICE_PER_M = 0.042;
 
@@ -60,7 +62,10 @@ const H2_CONTEXT = STATE_CONTEXT.replace(OMITTED_PHRASE, `each tool output is cu
 // plus the full output of each prefix call that fetched a file or bead those prompts name.
 const BODY_CAP = 10_000;
 
-if (!STATE_CONTEXT.includes(RERUN_SENTENCE) || !STATE_CONTEXT.includes(OMITTED_PHRASE)) {
+// C: H2's context with H1's premise removal.
+const C_CONTEXT = H2_CONTEXT.replace(RERUN_SENTENCE, " Whatever is not kept is deleted permanently.");
+
+if (!STATE_CONTEXT.includes(RERUN_SENTENCE) || !STATE_CONTEXT.includes(OMITTED_PHRASE) || C_CONTEXT === H2_CONTEXT) {
   throw new Error("REFUSED: STATE_CONTEXT is not the 6e1da50 text this wrapper edits");
 }
 
@@ -137,7 +142,7 @@ export function requests(arm: Arm, prefix: readonly Message[]): Req[] {
   const fitted = arm === "H3" ? fitState(prefix, calls, { ...resolved, goal: h3Goal(prefix, calls).goal }) : fitState(prefix, calls, resolved);
   let state: CompactionState = fitted.state;
   if (arm === "H1") state = { ...state, context: H1_CONTEXT };
-  if (arm === "H2") {
+  if (arm === "H2" || arm === "C") {
     const output = new Map<string, string>();
     for (const m of prefix) for (const r of m.toolResults ?? []) output.set(r.tool_use_id, r.text ?? "");
     const byId = new Map(calls.map((c) => [c.id, c]));
@@ -153,15 +158,15 @@ export function requests(arm: Arm, prefix: readonly Message[]): Req[] {
         }),
       };
     });
-    state = { ...state, context: H2_CONTEXT, history };
+    state = { ...state, context: arm === "C" ? C_CONTEXT : H2_CONTEXT, history };
   }
-  // The library batches on fitState's own estimate; only H2 changes the state after fitting.
-  const tokens = arm === "H2" ? estimateTokens(JSON.stringify(state)) : fitted.tokens;
+  // The library batches on fitState's own estimate; only H2 and C change the state after fitting.
+  const tokens = arm === "H2" || arm === "C" ? estimateTokens(JSON.stringify(state)) : fitted.tokens;
   return batchCalls(candidates, tokens, resolved).map((batch, k) => ({
     arm,
     batch: k,
     state,
-    questions: arm === "H1" ? useQuestions(batch) : Object.assign({}, ...batch.map(questionsFor)),
+    questions: arm === "H1" || arm === "C" ? useQuestions(batch) : Object.assign({}, ...batch.map(questionsFor)),
     calls: batch,
     stage: fitted.stage,
   }));
@@ -183,7 +188,7 @@ async function check() {
     await compactMessages(prefix, { ...OPTIONS, apiKey: "-", fetch: fake });
     const mine = requests("A0", prefix).map((r) => bodyOf(r.state, r.questions));
     const same = mine.length === sent.length && mine.every((b, k) => b === sent[k]);
-    const sizes = Object.fromEntries(ARMS.map((a) => [a, requests(a, prefix).map((r) => estimateTokens(bodyOf(r.state, r.questions)))]));
+    const sizes = Object.fromEntries([...ARMS, "C" as const].map((a) => [a, requests(a, prefix).map((r) => estimateTokens(bodyOf(r.state, r.questions)))]));
     rows.push({ study: s.study, session: s.id, a0_bytes_identical: same, library_requests: sent.length, est_request_tokens: sizes, h3_bodies: h3Goal(prefix, collectToolCalls(prefix, 6)).bodies });
     if (!same) throw new Error(`REFUSED: ${s.id}: the A0 body differs from the library's`);
   }
@@ -238,45 +243,57 @@ async function tokens() {
   return out.equal ? 0 : 1;
 }
 
-async function dev() {
+/** One live pass over the dev slice: every arm in `arms`, `repeats` times, into `<name>-*.json(l)`. */
+async function pass(name: string, arms: readonly Arm[], repeats: number) {
   const key = liveKey();
   if (!key) return 2;
-  if (existsSync(join(HERE, "dev-answers.jsonl"))) {
-    console.log("REFUSED: dev-answers.jsonl exists; the dev pass has run");
+  if (existsSync(join(HERE, `${name}-answers.jsonl`))) {
+    console.log(`REFUSED: ${name}-answers.jsonl exists; this pass has run`);
     return 1;
   }
   const answers = [];
   const reqs = [];
   let input = 0;
-  for (const s of devSlice()) {
-    const prefix = prefixOf(s);
-    const resolved = resolveOptions(OPTIONS);
-    const all = collectToolCalls(prefix, resolved.preserveRecentMessages);
-    for (const arm of ARMS) {
-      const scores = new Map<string, Record<string, number>>();
-      for (const r of requests(arm, prefix)) {
-        const a = await ask(key, r.state, r.questions);
-        input += a.inputTokens;
-        reqs.push({ arm, study: s.study, session: s.id, batch: r.batch, stage: r.stage, calls: r.calls.length, input_tokens: a.inputTokens, body_sha256_16: a.bodySha });
-        for (const call of r.calls) {
-          const got = (k: string) => Number(a.answers[k]?.noul);
-          scores.set(call.id, arm === "H1" ? { use: got(`use_${call.id}`) } : { keepCall: got(`call_${call.id}`), keepResult: got(`result_${call.id}`) });
+  for (let repeat = 1; repeat <= repeats; repeat++) {
+    for (const s of devSlice()) {
+      const prefix = prefixOf(s);
+      const resolved = resolveOptions(OPTIONS);
+      const all = collectToolCalls(prefix, resolved.preserveRecentMessages);
+      for (const arm of arms) {
+        const scores = new Map<string, Record<string, number>>();
+        for (const r of requests(arm, prefix)) {
+          const a = await ask(key, r.state, r.questions);
+          input += a.inputTokens;
+          reqs.push({ arm, repeat, study: s.study, session: s.id, batch: r.batch, stage: r.stage, calls: r.calls.length, input_tokens: a.inputTokens, body_sha256_16: a.bodySha });
+          for (const call of r.calls) {
+            const got = (k: string) => Number(a.answers[k]?.noul);
+            scores.set(call.id, arm === "H1" || arm === "C" ? { use: got(`use_${call.id}`) } : { keepCall: got(`call_${call.id}`), keepResult: got(`result_${call.id}`) });
+          }
         }
+        for (const call of all) answers.push({ arm, repeat, study: s.study, session: s.id, tool_use_id: call.tool_use_id, id: call.id, pinned: call.pinned, ...(scores.get(call.id) ?? {}) });
+        console.error(`repeat ${repeat} ${s.id} ${arm}: ${scores.size} candidates scored`);
       }
-      for (const call of all) answers.push({ arm, study: s.study, session: s.id, tool_use_id: call.tool_use_id, id: call.id, pinned: call.pinned, ...(scores.get(call.id) ?? {}) });
-      console.error(`${s.id} ${arm}: ${scores.size} candidates scored`);
     }
   }
-  writeFileSync(join(HERE, "dev-answers.jsonl"), answers.map((r) => JSON.stringify(r)).join("\n") + "\n");
-  writeFileSync(join(HERE, "dev-requests.jsonl"), reqs.map((r) => JSON.stringify(r)).join("\n") + "\n");
-  const pass = { lane: "live", model: OPTIONS.model, at: new Date().toISOString(), requests: reqs.length, input_tokens: input, spend_usd: +((input * PRICE_PER_M) / 1e6).toFixed(6) };
-  writeFileSync(join(HERE, "dev-pass.json"), JSON.stringify(pass, null, 2) + "\n");
-  console.log(JSON.stringify(pass));
+  writeFileSync(join(HERE, `${name}-answers.jsonl`), answers.map((r) => JSON.stringify(r)).join("\n") + "\n");
+  writeFileSync(join(HERE, `${name}-requests.jsonl`), reqs.map((r) => JSON.stringify(r)).join("\n") + "\n");
+  const out = { lane: "live", model: OPTIONS.model, at: new Date().toISOString(), requests: reqs.length, input_tokens: input, spend_usd: +((input * PRICE_PER_M) / 1e6).toFixed(6) };
+  writeFileSync(join(HERE, `${name}-pass.json`), JSON.stringify(out, null, 2) + "\n");
+  console.log(JSON.stringify(out));
   return 0;
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const mode = process.argv[2];
-  const code = mode === "check" ? await check() : mode === "tokens" ? await tokens() : mode === "dev" ? await dev() : (console.log("usage: replay.ts check|tokens --live|dev --live"), 64);
+  const code =
+    mode === "check"
+      ? await check()
+      : mode === "tokens"
+        ? await tokens()
+        : mode === "dev"
+          ? await pass("dev", ARMS, 1)
+          : mode === "a1"
+            ? await pass("a1", ["A0", "C"], 3)
+            : (console.log("usage: replay.ts check|tokens --live|dev --live|a1 --live"), 64);
   process.exit(code);
 }

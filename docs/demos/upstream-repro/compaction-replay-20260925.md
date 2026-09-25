@@ -168,3 +168,38 @@ No arm meets the jec6 bar on dev: no dev-cut Wilson lower bound reaches 0.80. Th
 **NO-CLAIM.** 7 development sessions, one pass per arm, one model pin. The pin's answers vary by up
 to 0.07 between identical requests, so dev differences under about 0.02 in a mean are within repeat
 noise.
+
+## Amendment A1: the combined arm, with repeats (pane 1's GO; committed before any A1 call)
+
+**Why.** H1 and H2 each failed alone. The premise flattens every `keepResult` to 0.07–0.29 whatever
+the state shows. Without the premise and without the outputs, Jev is blind. Their combination is one
+variable away from H2 (the question and premise) and one from H1 (the evidence), and it was never
+run.
+
+One correction to the note above. The 0.07 is the largest difference between single A0 **nouls**
+across identical requests, not an AUC spread. The AUC spread across repeats has not been measured,
+and this amendment measures it.
+
+**Arm C.**
+- **State:** H2's, meaning each call's `result` is `ok|error, N chars: <first 500 characters> …[k more
+  chars]`. Its context is H2's with the re-run clause removed: *"…each tool output is cut to its first
+  500 characters in `result` … Whatever is not kept is deleted permanently."*
+- **Question:** H1's single-condition `use_tN` Noul, verbatim.
+- **Code:** `replay.ts` arm `C`. The keyless `check` gives 8.3k–21.2k estimated request tokens per
+  session, one batch each.
+
+**Run.** `replay.ts a1 --live` runs A0 and C, 3 repeats each, on the same 7-session dev slice: 42
+requests, about $0.03. The rows go to `a1-answers.jsonl` / `a1-requests.jsonl` / `a1-pass.json`, with
+a `repeat` field.
+
+**Report** (`replay.py`, keyless), per arm and repeat:
+- AUC;
+- needed kept and not-needed dropped at 0.5;
+- the dev cut (the smallest observed score that drops ≥ 50% of not-needed), needed kept there with
+  Wilson 95%, and the dev bar;
+- per arm, the AUC mean and range over the 3 repeats.
+
+**Gate.** The held-out goes ahead only if C meets the dev bar (needed kept with Wilson lower bound ≥ 0.80
+at ≥ 50% of not-needed dropped) in **all 3** repeats. Otherwise the loop stops here. The result is
+then recorded against NEGATIVE_EVIDENCE R99/R100 as their retry condition being tested, and the
+held-out set is not labelled.
