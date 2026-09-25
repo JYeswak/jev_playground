@@ -74,3 +74,40 @@ They never fake an answer.
 **Clock.** PokéChamp's simulator, as shipped, took 72–134 s per decision here, the same order as
 the clock it lost to on the ladder. `pc.fast_copy` and `pc.memoize_predictor` bring that to
 0.35–1.05 s. `verify-copy` checks that neither changes a state text or a simulated leaf.
+
+## Public challenge-only watch mode
+
+`watch_mode.py` is the public-server seam. It never calls `ladder()` and accepts challenges only from
+`POKEJEV_OWNER_USERNAME`. Credentials are read from the environment; no password or account name is
+stored in the script.
+
+Keyless dry run against the local pinned Showdown server:
+
+```bash
+cd work/poke-jev
+.venv/bin/python watch_mode.py --dry-run
+```
+
+The dry run connects to `ws://127.0.0.1:8000/showdown/websocket`, sends a harmless room-list command,
+and requires both the guest `updateuser` and `challstr` handshake frames. It does not authenticate,
+accept a challenge, send chat, or call Jev.
+
+Live owner-only watch mode, after Joshua creates the account and supplies the password through
+Infisical:
+
+```bash
+cd work/poke-jev
+infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
+  .venv/bin/python watch_mode.py --live --format gen9ou --games 1
+```
+
+Required environment names: `POKEJEV_SHOWDOWN_USERNAME`, `POKEJEV_SHOWDOWN_PASSWORD`, and
+`POKEJEV_OWNER_USERNAME`. Optional `POKEJEV_SHOWDOWN_SERVER` defaults to `sim3.psim.us` and
+`POKEJEV_SHOWDOWN_AUTH_URL` defaults to the public action endpoint. `--ladder` is an explicit refusal;
+ladder mode remains separately gated by the frozen-alpha 70% retest or Joshua's explicit approval.
+
+## Public-mode boundary
+
+The keyless local dry run is the only watch-mode run performed in this unit. A public challenge is
+`NOT_RUN` until Joshua provides the account and owner username. Public mode must be attended, use
+`gen9ou` with the timer, accept only Joshua's challenges, send no chat, and save the replay link.
