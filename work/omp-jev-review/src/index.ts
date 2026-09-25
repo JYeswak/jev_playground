@@ -240,22 +240,6 @@ export default function ompJevReview(pi: Host) {
           timestamp: new Date().toISOString(),
         });
       } catch {}
-      const loaded = await readDiff(command);
-      if (!loaded.ok && loaded.reason !== "empty-diff") {
-        try {
-          await pi.appendEntry(DECISION, {
-            schemaVersion: 1,
-            kind: "review_error",
-            command: command.slice(0, 2000),
-            toolCallId,
-            error: loaded.reason,
-            failure: loaded.reason,
-            timestamp: new Date().toISOString(),
-          });
-        } catch {}
-        return undefined;
-      }
-
       const notApplicable = async (reason: string) => {
         try {
           await pi.appendEntry(DECISION, {
@@ -272,6 +256,29 @@ export default function ompJevReview(pi: Host) {
         }
         return undefined;
       };
+
+      const loaded = await readDiff(command);
+      // A command the extension will not re-run (a pipe, `&&`, a redirect) is out of scope, not a
+      // failure: in the first 17 real fleet rows after the 2026-09-25 rollout, 9 were compound
+      // commands such as `git add ... && git diff --cached`, and logging them as review_error made
+      // most "errors" noise. A git that fails to run is still an error.
+      if (!loaded.ok && loaded.reason === "unsafe-command") {
+        return notApplicable("not-a-plain-diff-command");
+      }
+      if (!loaded.ok && loaded.reason !== "empty-diff") {
+        try {
+          await pi.appendEntry(DECISION, {
+            schemaVersion: 1,
+            kind: "review_error",
+            command: command.slice(0, 2000),
+            toolCallId,
+            error: loaded.reason,
+            failure: loaded.reason,
+            timestamp: new Date().toISOString(),
+          });
+        } catch {}
+        return undefined;
+      }
 
       if (!loaded.ok) {
         return notApplicable("empty-diff");

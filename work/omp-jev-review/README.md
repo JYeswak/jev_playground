@@ -5,10 +5,9 @@ Advisory diff review scorer for omp. Watches `bash` tool calls, and when one is 
 logs the answer. When the boundary answer is at least 0.9 it appends one advisory line to that
 call's git output. It never blocks and has no merge authority.
 
-```bash
-omp plugin install omp-jev-review
-export TYPESAFE_API_KEY=...        # without it, rows record review_error, never a pass
-```
+In this repo it loads in every omp session from `.omp/extensions/jev-review.ts`, which fetches the
+key from Infisical into the session's memory when the environment has none. Without any key, rows
+record `review_error`, never a pass.
 
 ## Why this one calls Jev and our other two do not
 
@@ -67,8 +66,8 @@ Seven hand-built diffs, labelled by whoever wrote them, bound nothing about real
 | kind | meaning |
 |---|---|
 | `review_scored` | Jev answered; `probabilities` and `comment` (whether the advisory line was queued) present |
-| `review_not_applicable` | `applicable:false`, zero Jev calls; `reason` is `empty-diff`, `vendored-diff`, `thin-diff` or `non-code-diff` |
-| `review_error` | unsafe command, git failed, key unset, transport failed, or a 200 with no probabilities |
+| `review_not_applicable` | `applicable:false`, zero Jev calls; `reason` is `empty-diff`, `vendored-diff`, `thin-diff`, `non-code-diff` or `not-a-plain-diff-command` (a pipe, `&&`, `;` or redirect: the extension never re-runs such a command) |
+| `review_error` | git failed, key unset, transport failed, or a 200 with no probabilities |
 
 There is no "clean" state. A failed call is never recorded as a pass — a crashed
 classifier that logs a pass is indistinguishable from a real clean result.
@@ -93,7 +92,7 @@ both ways: `docs/demos/upstream-repro/omp-jev-review-advisory-20260925.md`.
 ## Test
 
 ```bash
-node --experimental-strip-types --test test/review.test.mjs   # 20/20
+node --experimental-strip-types --test test/review.test.mjs   # 21/21
 ```
 
 ## Real commits: `behaviour` does not beat its own constant

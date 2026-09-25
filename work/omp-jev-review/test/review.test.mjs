@@ -306,7 +306,7 @@ test('another call, or a failed git call, gets no advisory line', async () => {
   assert.equal(await h.fireResult({ toolName: 'bash', toolCallId: 'tc-1', isError: true, content: gitOutput }), undefined);
 });
 
-test('a shell metacharacter is not executed and not scored', async () => {
+test('a compound or piped command is not executed, not scored, and recorded not-applicable rather than as an error', async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
@@ -318,14 +318,34 @@ test('a shell metacharacter is not executed and not scored', async () => {
     const h = host();
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff; echo pwned'));
-    const [row] = decisions(h);
-    assert.equal(row.data.failure, 'unsafe-command');
+    await h.fire(diffCall('git add -- a.py && git diff --cached --check'));
+    await h.fire(diffCall('git show abc:work/x.py | python3 -'));
+    const rows = decisions(h);
+    assert.equal(rows.length, 3);
+    for (const row of rows) {
+      assert.equal(row.data.kind, 'review_not_applicable');
+      assert.equal(row.data.reason, 'not-a-plain-diff-command');
+    }
     assert.equal(ran, 0);
     assert.equal(called, 0);
   } finally {
     globalThis.fetch = realFetch;
     if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
     else process.env.TYPESAFE_API_KEY = previous;
+  }
+});
+
+test('a plain git diff that fails to run is still review_error, never not-applicable', async () => {
+  setDiffRunner(async () => { throw new Error('fatal: bad revision'); });
+  try {
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git show deadbeef'));
+    const [row] = decisions(h);
+    assert.equal(row.data.kind, 'review_error');
+    assert.equal(row.data.failure, 'diff-exec');
+  } finally {
+    setDiffRunner(null);
   }
 });
 
