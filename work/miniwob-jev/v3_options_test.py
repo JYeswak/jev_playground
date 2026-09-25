@@ -264,6 +264,69 @@ print(json.dumps({{'actions': sorted(acts), 'spans': spans, 'state': state}}, so
         self.assertEqual(stop["reason"], "arm_sanity_exit_1")
         self.assertEqual(stop["eligible_rows"], 4)
 
+    def test_restart_after_stop_requires_tracked_continuation_note(self):
+        import jev_arm
+
+        out_path = Path("/tmp/jev-ztp9-existing-stop.jsonl")
+        out_path.write_text(json.dumps({"row_type": "arm_sanity_stop"}) + "\n")
+        restart_error = jev_arm.sanity_restart_error(out_path, None)
+        self.assertIsNotNone(restart_error)
+        assert restart_error is not None
+        self.assertIn("refusing restart", restart_error)
+        untracked_error = jev_arm.sanity_restart_error(
+            out_path, Path("/tmp/untracked-note.md")
+        )
+        self.assertIsNotNone(untracked_error)
+        assert untracked_error is not None
+        self.assertIn("not tracked", untracked_error)
+        self.assertIsNone(jev_arm.sanity_restart_error(out_path, HERE / "jev_arm.py"))
+
+    def test_run_plan_refuses_stopped_output_before_restart(self):
+        import jev_arm
+
+        out_path = Path("/tmp/jev-ztp9-run-plan-stop.jsonl")
+        out_path.write_text(json.dumps({"row_type": "arm_sanity_stop"}) + "\n")
+        reference = ROOT / "work/arm-sanity/fixtures/difference-only-reference.jsonl"
+        result = jev_arm.run_plan(
+            [],
+            jev_arm.FakeAsker("click_only"),
+            out_path,
+            max_steps=1,
+            sanity_reference=reference,
+            sanity_after=4,
+        )
+        self.assertEqual(result, 5)
+
+    def test_resumed_gate_counts_prior_rows_before_new_episode(self):
+        import jev_arm
+
+        reference = ROOT / "work/arm-sanity/fixtures/difference-only-reference.jsonl"
+        prior = [
+            {
+                "n_options": 2,
+                "candidates": ["switch alpha", "move tackle"],
+                "chosen": "switch alpha",
+            }
+            for _ in range(150)
+        ]
+        gate = jev_arm.SanityGate(reference, sanity_after=200, prior_rows=prior)
+        stopped_at = None
+        result = None
+        for i in range(60):
+            result = gate.observe(
+                {
+                    "n_options": 2,
+                    "candidates": ["switch alpha", "move tackle"],
+                    "chosen": "switch alpha",
+                }
+            )
+            if result is not None:
+                stopped_at = i + 1
+                break
+        self.assertEqual(stopped_at, 50)
+        assert result is not None
+        self.assertEqual(result["exit_code"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

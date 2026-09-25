@@ -44,6 +44,7 @@ import json
 import math
 import os
 import random
+import subprocess
 import re
 import sys
 import time
@@ -641,13 +642,51 @@ def load_arm_sanity():
     return module
 
 
+def tracked_path(path: Path) -> bool:
+    try:
+        relative = path.resolve().relative_to(ROOT.resolve())
+    except ValueError:
+        return False
+    result = subprocess.run(
+        ["git", "ls-files", "--error-unmatch", "--", str(relative)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    return result.returncode == 0
+
+
+def sanity_restart_error(
+    out_path: Path | None, continuation_note: Path | None
+) -> str | None:
+    if out_path is None or not out_path.exists():
+        return None
+    rows = load_arm_sanity().read_rows(out_path)
+    if not any(row.get("row_type") == "arm_sanity_stop" for row in rows):
+        return None
+    if continuation_note is None:
+        return (
+            "arm sanity stopped this output previously; refusing restart without "
+            "--after-sanity-stop <tracked continuation note>"
+        )
+    if not tracked_path(continuation_note):
+        return f"--after-sanity-stop note is not tracked in git: {continuation_note}"
+    return None
+
+
 class SanityGate:
-    def __init__(self, reference: Path, sanity_after: int = 200):
+    def __init__(
+        self,
+        reference: Path,
+        sanity_after: int = 200,
+        prior_rows: list[dict] | None = None,
+    ):
         if sanity_after < 1:
             raise ValueError("sanity_after must be positive")
         self.reference = reference
         self.sanity_after = sanity_after
-        self.rows: list[dict] = []
+        self.rows: list[dict] = list(prior_rows or [])
         self.checked = False
         self.checker = load_arm_sanity()
 
@@ -738,6 +777,7 @@ def run_plan(
     none_policy: str = "always",
     sanity_reference: Path | None = None,
     sanity_after: int = 200,
+    after_sanity_stop: Path | None = None,
 ):
     """Run episodes, optionally stopping on an action-mix sanity failure."""
     code_sha256 = code_sha256_at_run_start()
@@ -746,6 +786,11 @@ def run_plan(
         episode_max_ms=floor.BENCHMARK_EPISODE_MAX_MS,
         wait_ms=floor.BENCHMARK_WAIT_MS,
     )
+    if sanity_reference is not None:
+        restart_error = sanity_restart_error(out_path, after_sanity_stop)
+        if restart_error is not None:
+            print(restart_error, file=sys.stderr, flush=True)
+            return 5
     all_tasks = floor.load_task_list()
     bench = floor.benchmark_seeds(all_tasks)
     bench_pairs = {(t, s) for t, ss in bench.items() for s in ss}
@@ -769,10 +814,15 @@ def run_plan(
     for task, seed, rep in plan:
         by_task.setdefault(task, []).append((seed, rep))
     out = open(out_path, "a") if out_path else None
-    if sanity_reference is not None and out is None:
-        raise ValueError("--sanity-reference requires --out for dev runs")
+    if sanity_reference is not None:
+        if out_path is not None and out_path.exists():
+            prior_rows = load_arm_sanity().read_rows(out_path)
+        else:
+            prior_rows = []
+    else:
+        prior_rows = []
     sanity_gate = (
-        SanityGate(sanity_reference, sanity_after)
+        SanityGate(sanity_reference, sanity_after, prior_rows)
         if sanity_reference is not None
         else None
     )
@@ -866,6 +916,7 @@ def cmd_live(
     plan_file: str | None = None,
     sanity_reference: Path | None = None,
     sanity_after: int = 200,
+    after_sanity_stop: Path | None = None,
 ) -> int:
     if not os.environ.get("TYPESAFE_API_KEY", "").strip():
         print(
@@ -930,6 +981,7 @@ def cmd_live(
         none_policy,
         sanity_reference,
         sanity_after,
+        after_sanity_stop,
     )
 
 
@@ -942,6 +994,7 @@ def cmd_dev(
     dump_request=None,
     sanity_reference: Path | None = None,
     sanity_after: int = 200,
+    after_sanity_stop: Path | None = None,
 ) -> int:
     seed_list = floor.parse_seeds(seeds)
     if any(s < 9000 for s in seed_list):
@@ -957,6 +1010,7 @@ def cmd_dev(
         max_steps,
         sanity_reference=sanity_reference,
         sanity_after=sanity_after,
+        after_sanity_stop=after_sanity_stop,
     )
 
 
@@ -1163,6 +1217,7 @@ def main(argv=None) -> int:
     )
     d.add_argument("--sanity-reference", type=Path)
     d.add_argument("--sanity-after", type=int, default=200)
+    d.add_argument("--after-sanity-stop", type=Path)
     lv = sub.add_parser("live")
     lv.add_argument("--shard", default="0/1")
     lv.add_argument("--seeds", default="benchmark")
@@ -1174,6 +1229,7 @@ def main(argv=None) -> int:
     )
     lv.add_argument("--sanity-reference", type=Path)
     lv.add_argument("--sanity-after", type=int, default=200)
+    lv.add_argument("--after-sanity-stop", type=Path)
     a = ap.parse_args(argv)
     if a.cmd == "selftest":
         return selftest()
@@ -1187,6 +1243,7 @@ def main(argv=None) -> int:
             a.dump_request,
             a.sanity_reference,
             a.sanity_after,
+            a.after_sanity_stop,
         )
     return cmd_live(
         a.shard,
@@ -1197,6 +1254,7 @@ def main(argv=None) -> int:
         a.plan_file,
         a.sanity_reference,
         a.sanity_after,
+        a.after_sanity_stop,
     )
 
 
