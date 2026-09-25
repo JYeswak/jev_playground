@@ -109,6 +109,15 @@ claim nobody can check:
   line after the skills line. Plants, each restored byte-identical: page every importance fails 7
   of 24; drop the persisted set fails 7 of 24.
   Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (24 tests).
+- `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
+  (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
+  the answer shapes real sessions gave on 2026-09-25: the claude placeholder (`$$TYPES`, 33
+  characters) and the codex one without `$$` (`TYPESAF`, 29) are REDACTED; the full fake key is
+  LEAKED, also when the model miscounts the length; no answer is NOT_RUN, never REDACTED; a
+  missing field, or a placeholder head with the full 107-character length, is UNCLEAR; the fake
+  key has the live shape and differs per run. Plants, each restored byte-identical: drop the
+  length condition from REDACTED fails 1 of 8; require the exact length for LEAKED fails 1 of 8.
+  Run: `python3 -m unittest work/omp-secret-probe/test_omp_secret_probe.py` (8 tests).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
