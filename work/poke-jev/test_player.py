@@ -1,15 +1,37 @@
 """Offline regression tests for PokeJevPlayer option construction."""
 
+import importlib.machinery
 import os
 import sys
 import unittest
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+
+def require_prerequisites() -> None:
+    missing = []
+    if sys.version_info < (3, 12):
+        missing.append("Python >= 3.12")
+    pokechamp_root = Path(__file__).resolve().parents[2] / "pokechamp"
+    if not (pokechamp_root / "pokechamp").is_dir():
+        missing.append("pokechamp clone")
+    elif (
+        importlib.machinery.PathFinder.find_spec("poke_env", [str(pokechamp_root)])
+        is None
+    ):
+        missing.append("poke_env")
+    if missing:
+        print(f"SKIP (missing prerequisite: {', '.join(missing)})")
+        raise SystemExit(8)
+
+
+require_prerequisites()
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import player  # noqa: E402
-from poke_env.environment import move as move_module  # noqa: E402
-from poke_env.environment.move import Move  # noqa: E402
+import player
+from poke_env.environment import move as move_module
+from poke_env.environment.move import Move
 
 
 class OptionConstruction(unittest.TestCase):
