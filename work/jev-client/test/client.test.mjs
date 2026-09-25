@@ -70,8 +70,11 @@ test('a key with no installed SDK is sdk-missing, not unconfigured, and makes no
   const { pathToFileURL, fileURLToPath } = await import('node:url');
   const root = mkdtempSync(join(tmpdir(), 'jev-client-nosdk-'));
   mkdirSync(join(root, 'work/jev-client/src'), { recursive: true });
+  mkdirSync(join(root, 'kit/src'), { recursive: true });
   const copy = join(root, 'work/jev-client/src/index.ts');
   copyFileSync(fileURLToPath(new URL('../src/index.ts', import.meta.url)), copy);
+  copyFileSync(fileURLToPath(new URL('../../../kit/src/client.ts', import.meta.url)), join(root, 'kit/src/client.ts'));
+  copyFileSync(fileURLToPath(new URL('../../../kit/src/validate.ts', import.meta.url)), join(root, 'kit/src/validate.ts'));
   const bare = await import(pathToFileURL(copy).href);
   let called = false;
   const r = await bare.askJev({

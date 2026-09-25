@@ -28,6 +28,7 @@
 !/scripts/
 !/probes/
 !/foundation/
+!/kit/
 # Per-machine gate run history. Append-only and written on every gates.sh run, so tracking it in a
 # three-pane shared worktree would conflict constantly and tell a reader nothing they can act on.
 /foundation/gate-outcomes.tsv
