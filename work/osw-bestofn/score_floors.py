@@ -13,7 +13,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
-from range_zip import open_remote_zip, read_member_bytes, task_key
+from range_zip import archive_score, open_remote_zip, read_member_bytes, task_key
 
 ROOT = Path(__file__).resolve().parent
 POOL = ROOT / "pool.json"
@@ -65,11 +65,7 @@ def main() -> None:
     for candidate in selected:
         archive, remote = open_remote_zip(candidate["url"])
         members = member_map(archive)
-        rows = {
-            task: read_result(archive, remote, info["result"])
-            for task, info in members.items()
-            if "result" in info
-        }
+        rows, _score = archive_score(archive, remote)
         runs[candidate["archive"]] = {
             "url": candidate["url"],
             "rows": rows,
