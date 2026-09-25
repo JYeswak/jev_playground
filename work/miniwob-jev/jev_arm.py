@@ -999,4 +999,7 @@ def main(argv=None) -> int:
     if a.cmd == "dev":
         return cmd_dev(a.fake, a.tasks, a.seeds, a.out, a.max_steps, a.dump_request)
     return cmd_live(a.shard, a.seeds, a.none_policy, a.tasks, a.label, a.plan_file)
+
+
+if __name__ == "__main__":
     sys.exit(main())
