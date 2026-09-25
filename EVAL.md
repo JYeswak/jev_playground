@@ -2141,3 +2141,9 @@ Receipt: `work/gate-question-gap/live_preflight_receipt.json`.
 
 Boundary: the frozen extract and API-key status are proven, but the preregistered
 non-author labels/power gate remains unmet, so the live pass is not claimed.
+
+## jev-9gtw.4.1 Isolated MiniWoB v3 live pass (2026-09-25) [live-verified (N=889)]
+
+The approved Infisical run completed all six isolated steps from a clean archived root. Receipt: `work/miniwob-jev/live-20260925/receipt.json`; committed rows: `work/miniwob-jev/live-20260925/rows/`. Counts: quoted 16, date_time 10, page_text 35, color 12, drag 87, none 11; **171 rows, 889 Jev calls, 2,199,227 input tokens**. Recorded input-token billing at $0.042/M gives **$0.0924 estimated Jev spend**; no comparator spend. Every step printed `KEY: OK` and passed row provenance. No 401/402 occurred. The combined held-out step was not run.
+
+Boundary: the runner receipt does not record a resolved model version, so no model-version claim is made; no model-quality ruling is made. The live run used the clean archived root to avoid stale untracked output rows in the shared checkout.

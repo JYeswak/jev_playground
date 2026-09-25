@@ -1,0 +1,64 @@
+{
+  "kind": "miniwob-v3-live-receipt",
+  "date": "2026-09-25",
+  "mode": "live",
+  "key_status": "KEY: OK",
+  "model_claim": "not recorded by runner receipt; no model version claim made",
+  "steps": [
+    {
+      "step": "quoted",
+      "rows": 16,
+      "successes": 16,
+      "jev_calls": 64,
+      "input_tokens": 175369,
+      "row_sha256": "665a7eb37d8ba7099cfda4f79311ae73538f6c424a6bf1f4f498061e6530c715"
+    },
+    {
+      "step": "date_time",
+      "rows": 10,
+      "successes": 5,
+      "jev_calls": 30,
+      "input_tokens": 40315,
+      "row_sha256": "55ff20ab5bcadfc6699ad6c8231b93603df46b035738650fc7ea6aea26416b92"
+    },
+    {
+      "step": "page_text",
+      "rows": 35,
+      "successes": 10,
+      "jev_calls": 143,
+      "input_tokens": 680369,
+      "row_sha256": "d8ec31020ce8c864f79be253cfce3da3c8883a4597b37e6bce1dcb658129de1d"
+    },
+    {
+      "step": "color",
+      "rows": 12,
+      "successes": 0,
+      "jev_calls": 38,
+      "input_tokens": 51067,
+      "row_sha256": "39a39fdfcedd0c76668678c63633c66f05e6f16c4ed63030694de2f1a2ed700b"
+    },
+    {
+      "step": "drag",
+      "rows": 87,
+      "successes": 12,
+      "jev_calls": 555,
+      "input_tokens": 1072335,
+      "row_sha256": "c90231df6a87fe6310b0ab1101467bab86d4e9e4ba900e3aeee76968e405911e"
+    },
+    {
+      "step": "none",
+      "rows": 11,
+      "successes": 8,
+      "jev_calls": 59,
+      "input_tokens": 179772,
+      "row_sha256": "46446c706812889d95c15baf6e1c14c1a734af816fec0118234dcc67bf5c2b9c"
+    }
+  ],
+  "totals": {
+    "rows": 171,
+    "jev_calls": 889,
+    "input_tokens": 2199227
+  },
+  "combined_heldout": "NOT_RUN (stop after isolated steps; next pane-approved step)",
+  "boundary": "No 401/402 encountered; no model-quality ruling is made."
+}
