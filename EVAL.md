@@ -2147,3 +2147,34 @@ non-author labels/power gate remains unmet, so the live pass is not claimed.
 The approved Infisical run completed all six isolated steps from a clean archived root. Receipt: `work/miniwob-jev/live-20260925/receipt.json`; committed rows: `work/miniwob-jev/live-20260925/rows/`. Counts: quoted 16, date_time 10, page_text 35, color 12, drag 87, none 11; **171 rows, 889 Jev calls, 2,199,227 input tokens**. Recorded input-token billing at $0.042/M gives **$0.0924 estimated Jev spend**; no comparator spend. Every step printed `KEY: OK` and passed row provenance. No 401/402 occurred. The combined held-out step was not run.
 
 Boundary: the runner receipt does not record a resolved model version, so no model-version claim is made; no model-quality ruling is made. The live run used the clean archived root to avoid stale untracked output rows in the shared checkout.
+
+## jev-cni7 Rule 13 five-clone census (2026-09-25) [test]
+
+Pinned upstream rows and keyless outcomes:
+
+| Clone | Owner / license | Exact command or blocker | Result |
+|---|---|---|---|
+| `killmyidea@bc853421f2eb6f17da435621896dd6cd881a051c` | monteduro / no `LICENSE` file | `env -u TYPESAFE_API_KEY -u JEV_API_KEY npm test`; `env -u TYPESAFE_API_KEY -u JEV_API_KEY npm run typecheck` | Vitest **7 files / 48 tests passed**; TypeScript build passed. |
+| `OneVOneJev@365b339d04446836352687b3650762106ea37f17` | emrickgarrett / no `LICENSE` file | `env -u TYPESAFE_API_KEY -u JEV_API_KEY npm run build` | Shared, server, and client builds passed. The pinned tree contains **0 test files**, so there is no upstream test suite to run. |
+| `metamon@0a00a759c9a4382a2877088d828302ec294a05a5` | UT-Austin-RPL / MIT (`LICENSE:1`) | Not re-run: `work/poke-jev/README.md:53` records the released-Metamon **B stretch as pending**, and the pinned tree has no committed test-like paths. | Named refusal: the existing PokéJev work has not run this stretch arm; no keyless Metamon suite exists in the pinned tree. |
+| `pokemon-showdown@e64915c0eab066db1d3e732b1280386468dd7415` | jakegrigsby / MIT (`LICENSE:1`) | Not re-run: PokéJev already pins and runs this fork (`work/poke-jev/README.md:23,35`; `docs/demos/upstream-repro/pokejev-stage-b-results-20260925.md:20-27`). | Existing PokéJev Stage B ran its keyless selftest, local server, 200-battle control, random feasibility arm, 200-battle live arm, and score. This census adds no duplicate run. |
+| `skillranker-tip@2a16486239a5fba90e46e62f49ea92cba46bb917` | Dicklesworthstone / MIT + OpenAI/Anthropic Rider (`README.md:15`) | **Refused before execution:** this pane's OpenAI model is covered by the Rider restriction in `AGENTS.md`; it forbids executing, testing, analyzing, or indexing this clone. | No command run and no claim about the clone's suite. |
+
+For `killmyidea`, the policy tests read `src/lib/evaluate.test.ts` (composition, malformed
+responses, goal-specific dimensions, and the clarity gate) and `src/lib/scoring.test.ts`
+(normalization, weighted averages, ties, and KILL/FIX/SHIP thresholds). In a sanctioned scratch
+copy, flipping `needsDetail` from `< LOW_CLARITY_WARNING` to `>=` made
+`npm test -- --run src/lib/evaluate.test.ts` go **RED: 2 failures / 10 tests**; the scratch
+source was restored and `cmp` confirmed `evaluate.ts` byte-identical to the clone. The pinned
+clone itself remained clean.
+
+Clone status after this census: `killmyidea`, `OneVOneJev`, `metamon`, and `skillranker-tip`
+printed no status lines. The PokéJev Showdown clone was already dirty and remains unchanged:
+` M config/chat-plugins/mafia-logs.json`, ` M config/chat-plugins/seasons.json`, and
+`?? config/custom-formats.ts`. The untracked format is the PokéJev local format copied by
+`work/poke-jev/serve.sh`; this census did not clean or overwrite another agent's files.
+
+Boundary: this census made **0 Jev/API requests and $0 spend**. The cited PokéJev Stage B
+receipt is a separate prior live run; it reports `jev-1.13.0`, 9,334 calls, and 33,273,577
+input tokens. No Metamon stretch battle, paid comparator, ladder run, or skillranker execution
+is claimed here.
