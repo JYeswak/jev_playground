@@ -4,19 +4,18 @@
 #
 # LANE 1 — staged-deletion survival (house implementation, byte-identical to foundry's).
 #   Refuses a path-limited commit that silently DROPPED a staged deletion whose file is still on
-#   disk. Proof: foundation/gates.d/60-staged-deletion-lane.sh, **2 trigger + 6 satisfying** witnesses
-#   — corrected 2026-09-18 from "1 trigger + 5 satisfying", the SECOND place that stale count lived
-#   (pane 3, 85d75a0 found it in GATES.md; 71183c0 found this copy). Re-derive from the script, which
-#   is the authority; a count duplicated into a comment rots in every copy independently.
+#   disk. Proof: foundation/gates.d/60-staged-deletion-lane.sh, which runs trigger and satisfying
+#   witnesses. Derive witness counts from that script rather than duplicating them here.
 #
 # LANE 2 — autofix, in --check mode ONLY (report-only, exit 1 when the staged set is not clean).
 #   loop-kit/autofix-precommit.sh can MUTATE files, and this is the one wiring decision worth
 #   arguing: three agents share this worktree, and the fixer does NOT re-stage what it rewrites.
 #   Mutating during a commit would therefore land the UNFIXED bytes and leave a modified file
 #   behind — turning every commit into a dirty tree and failing the end-of-shift clean-tree lane.
-#   So the hook FLAGS and the human/agent fixes explicitly:
-#       ~/Developer/foundry/loop-kit/autofix-precommit.sh --staged --repo .
-#       git add -- <the files it rewrote>          # explicit paths; dcg denies git add -A here
+#   So the hook FLAGS and prints a fix scoped to this commit's prospective index:
+#       ~/Developer/foundry/loop-kit/autofix-precommit.sh --repo . -- <commit paths>
+#       git add -- <commit paths>
+#   Never suggest --staged outside the hook: the real shared index may hold a sibling's paths.
 #   The fixer stays one command away; it never runs behind your back.
 #
 # Both lanes are skipped with a named reason rather than silently when their implementation is
@@ -129,8 +128,15 @@ if [ ! -x "$_autofix" ]; then
 fi
 
 if ! "$_autofix" --check --staged --repo "$_repo"; then
+  _commit_paths=()
+  while IFS= read -r -d '' _path; do
+    _commit_paths+=("$_path")
+  done < <(git diff --cached --name-only --diff-filter=ACMR -z)
   printf '\nAUTOFIX_REFUSED: the staged set is not format-clean. Fix it explicitly:\n' >&2
-  printf '  %s --staged --repo %s\n' "$_autofix" "$_repo" >&2
-  printf '  git add -- <the rewritten paths>   # explicit paths; dcg denies git add -A here\n' >&2
+  printf '  %q --repo %q --' "$_autofix" "$_repo" >&2
+  printf ' %q' "${_commit_paths[@]}" >&2
+  printf '\n  git add --' >&2
+  printf ' %q' "${_commit_paths[@]}" >&2
+  printf '\n' >&2
   exit 1
 fi

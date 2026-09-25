@@ -68,6 +68,8 @@ new_fixture() {
         printf 'keep\n' > keep.txt
         printf 'doomed\n' > doomed.txt
         printf 'other\n' > other.txt
+        printf 'x = 0\n' > own.py
+        printf 'y = 0\n' > sibling.py
         git add -A
         git -c core.hooksPath=/dev/null commit -q -m 'base' --no-verify
     )
@@ -157,6 +159,27 @@ if [ -x "${LOOP_KIT:-$HOME/Developer/foundry/loop-kit}/autofix-precommit.sh" ]; 
         pass "autofix trigger: refused an unclean staged set, and did not mutate it"
     fi
 
+    # A path-limited commit's temporary index excludes a sibling's independently staged file.
+    # The printed fix instructions must stay scoped to that temporary index too.
+    new_fixture
+    (
+        cd "$work/r" || exit 1
+        printf 'x = 1   \n' > own.py
+        printf 'y = 1   \n' > sibling.py
+        git add sibling.py
+    )
+    out="$(run_commit --only -- own.py)"; code=$?
+    if [ "$code" -eq 0 ] || ! printf '%s' "$out" | grep -q 'AUTOFIX_REFUSED'; then
+        fail "autofix trigger: path-limited remedy" "unclean own.py did not cause AUTOFIX_REFUSED (rc=$code): $out"
+    elif ! printf '%s\n' "$out" | grep -Eq 'autofix-precommit\.sh --repo .* -- own\.py$' \
+      || ! printf '%s\n' "$out" | grep -Eq 'git add -- own\.py$' \
+      || printf '%s' "$out" | grep -q 'sibling.py' \
+      || printf '%s' "$out" | grep -q -- '--staged'; then
+        fail "autofix trigger: path-limited remedy" "expected own.py only, without --staged: $out"
+    else
+        pass "autofix trigger: remedy names own.py, not staged sibling.py or --staged"
+    fi
+
     new_fixture
     (cd "$work/r" && printf 'clean\n' > tidy.txt && git add tidy.txt)
     out="$(run_commit)"; code=$?
@@ -173,7 +196,7 @@ if [ "$fails" -eq 0 ] && [ -n "$autofix_skip" ]; then
     exit 8
 fi
 if [ "$fails" -eq 0 ]; then
-    echo "60-staged-deletion-lane: pre-commit wrapper proven — 2 triggers + 6 satisfying witnesses"
+    echo "60-staged-deletion-lane: pre-commit wrapper proven — 3 triggers + 6 satisfying witnesses"
     exit 0
 fi
 echo "60-staged-deletion-lane: $fails witness(es) failed" >&2
