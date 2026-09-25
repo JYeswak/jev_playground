@@ -283,3 +283,12 @@ use-autocomplete-nodelay/s4/r0
 ```
 
 The combined held-out run uses only fresh seeds 400-404 after every arm's dev gate is recorded; a dev arm not meeting its bar is excluded from the combined design and reported as a failed design arm.
+
+## Dev amendment: quoted-span mechanism re-run
+
+The first exact quoted slice (16 rows, 1/16) showed the v3 code still stripped punctuation because
+the regex had already removed the outer quotes before the normalizer saw the string. The mechanism
+fix is now committed in `work/miniwob-jev/jev_arm.py`: quoted regex matches call `add(..., quoted=True)`
+and preserve the matched contents verbatim, while unquoted spans keep the v1 stripping path. The
+slice, `>=14/16` bar, and combined-design exclusion rule are unchanged. The exact 16-row slice is
+re-run; both first and re-run results are retained in the receipt, and no other arm changes.
