@@ -99,7 +99,15 @@ def _state_value(row: dict[str, Any], path: str) -> Any:
 
 
 def _stats(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    sizes = [int(row["state_bytes"]) for row in rows]
+    row_sizes = sorted(int(row["state_bytes"]) for row in rows)
+    compact_sizes = sorted(
+        len(
+            json.dumps(
+                row["state"], sort_keys=True, separators=(",", ":"), default=str
+            ).encode()
+        )
+        for row in rows
+    )
     fields = [
         "visual.resolution",
         "visual.screenshot_present",
@@ -141,11 +149,24 @@ def _stats(rows: list[dict[str, Any]]) -> dict[str, Any]:
         }
     return {
         "state_bytes": {
-            "count": len(sizes),
-            "p50": statistics.median(sizes),
-            "p95": sizes[min(len(sizes) - 1, math.ceil(len(sizes) * 0.95) - 1)],
-            "min": min(sizes),
-            "max": max(sizes),
+            "count": len(row_sizes),
+            "meaning": "whole JSONL row",
+            "p50": statistics.median(row_sizes),
+            "p95": row_sizes[
+                min(len(row_sizes) - 1, math.ceil(len(row_sizes) * 0.95) - 1)
+            ],
+            "min": min(row_sizes),
+            "max": max(row_sizes),
+        },
+        "compact_state_bytes": {
+            "count": len(compact_sizes),
+            "meaning": "serialized compact state object only",
+            "p50": statistics.median(compact_sizes),
+            "p95": compact_sizes[
+                min(len(compact_sizes) - 1, math.ceil(len(compact_sizes) * 0.95) - 1)
+            ],
+            "min": min(compact_sizes),
+            "max": max(compact_sizes),
         },
         "fields": field_stats,
     }

@@ -9,14 +9,23 @@
   "model_calls": 0,
   "macro_count": 372,
   "reached_controllable_overworld": true,
-  "wall_time_s": 77.965,
+  "wall_time_s": 77.964384,
   "state_stats": {
     "state_bytes": {
       "count": 372,
+      "meaning": "whole JSONL row",
       "p50": 4677.0,
-      "p95": 4692,
+      "p95": 10164,
       "min": 1114,
       "max": 10181
+    },
+    "compact_state_bytes": {
+      "count": 372,
+      "meaning": "serialized compact state object only",
+      "p50": 1284.0,
+      "p95": 1528,
+      "min": 695,
+      "max": 1528
     },
     "fields": {
       "visual.resolution": {
@@ -148,8 +157,30 @@
     }
   ],
   "quoted_rows": [
-    {"macro_index":299,"button":"LEFT","wall_s":63.64247,"state_bytes":4691,"position":{"x":1,"y":2},"location":"MOVING_VAN","game_state":"overworld"},
-    {"macro_index":303,"button":"RIGHT","wall_s":64.44204,"state_bytes":4680,"position":{"x":2,"y":2},"location":"MOVING_VAN","game_state":"overworld"}
+    {
+      "macro_index": 299,
+      "button": "LEFT",
+      "wall_s": 63.64247,
+      "state_bytes": 4691,
+      "position": {
+        "x": 1,
+        "y": 2
+      },
+      "location": "MOVING_VAN",
+      "game_state": "overworld"
+    },
+    {
+      "macro_index": 303,
+      "button": "RIGHT",
+      "wall_s": 64.44204,
+      "state_bytes": 4680,
+      "position": {
+        "x": 2,
+        "y": 2
+      },
+      "location": "MOVING_VAN",
+      "game_state": "overworld"
+    }
   ],
   "scratch_screenshots": "/scratch",
   "output_jsonl": "/out/states/emerald-boot.jsonl"
