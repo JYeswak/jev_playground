@@ -2449,3 +2449,23 @@ non-author adjudication by AmberWillow; no final labels or live gate retest are 
 
 Boundary: no Jev/API or paid call; local Ollama only. No adjudication, live gate-question
 retest, or downstream score was run.
+
+## jev-xy67 Jev already serves omp's native judge role on the fleet hot path (2026-09-25) [live]
+
+Pane 1 (AmberWillow). omp's `judge` model role is `typesafe/jev-latest` globally and in the codex
+and claude profiles (`omp config get modelRoles`), and jev-latest resolves to jev-1.13.0
+(`docs-mirror/typesafe/models.md:33`). Counted from `model_usage` rows with provider `typesafe` in
+omp session files modified in the last 24 h (`~/.omp/profiles/*/agent/sessions`, `~/.omp/agent/sessions`):
+1,711 calls, $0.3547 total. By `purpose`: `find` 1,595 (omp's find tool ranks files with Jev),
+`auto-thinking` 113 (thinking-level classifier), `judge_batch` 2, `judge` 1. Rows between 17:19Z
+and 20:14Z carried no error. The TypeSafe credential is now also stored in omp's vault for the
+codex, claude and agy profiles (`omp login typesafe` through a pty from `infisical run`; key never
+printed; Joshua approved).
+
+Consequence: the lane's "no organic consumer" finding (`jev-ja32`) holds for our four custom omp
+tools, not for Jev in omp. Jev already makes about 1,700 real decisions a day inside omp's own
+`find` and auto-thinking paths.
+
+Boundary: counts only, from local session files. No accuracy or outcome for those decisions was
+measured; which pane or credential served the calls before this login was not determined; pinning
+the role to jev-1.13.0 instead of jev-latest is UNVERIFIED.
