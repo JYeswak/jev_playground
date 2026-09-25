@@ -1,0 +1,49 @@
+{
+ "arms": {
+  "abyssal-mix-v1": null,
+  "abyssal-mix-v1-control": {
+   "battles": 200,
+   "decision_ms_max": 910,
+   "decision_ms_p50": 66,
+   "decision_ms_p95": 224,
+   "decisions": 4853,
+   "fallback_reasons": {
+    "RuntimeError: control arm: Jev disabled, no call made": 4618,
+    "ValueError: Unknown move: nothing": 57
+   },
+   "fallbacks": 4675,
+   "frozen_alpha_sha256": "317d596b93b276de9f22663b5f490f54903d6ca136a4add312e26d8cdc80abb8",
+   "harness_errors": 0,
+   "input_tokens": 0,
+   "jev_calls": 0,
+   "losses": 119,
+   "models": [],
+   "module_sha256": {
+    "player.py": "8a16df10042314b37609b9363f39a6eadd83923db5d0f32967d1360ed72670d8",
+    "policy.py": "9d3015dbd7609da1df83d0f9cf65f16cecdea863687394eee0537e525f9bbada",
+    "replay.py": "5b2922779b0be7f7f5d69a078812a8921805a8b26adf77c3d4bdd236c69450cd",
+    "stage_b.py": "74d9bdc953ecaf9332e92c3236673639d46b5286d6e2a2da846c79cbf52310c9"
+   },
+   "opponent_time_losses": 0,
+   "own_time_losses": 0,
+   "spend_usd_at_0.042_per_M_input": 0.0,
+   "unfinished": 0,
+   "wilson95": [
+    0.3394,
+    0.4742
+   ],
+   "win_rate": 0.405,
+   "wins": 81
+  }
+ },
+ "frozen_alpha_sha256": "317d596b93b276de9f22663b5f490f54903d6ca136a4add312e26d8cdc80abb8",
+ "model": "jev-1.13.0",
+ "module_sha256": {
+  "player.py": "8a16df10042314b37609b9363f39a6eadd83923db5d0f32967d1360ed72670d8",
+  "policy.py": "9d3015dbd7609da1df83d0f9cf65f16cecdea863687394eee0537e525f9bbada",
+  "replay.py": "5b2922779b0be7f7f5d69a078812a8921805a8b26adf77c3d4bdd236c69450cd",
+  "stage_b.py": "74d9bdc953ecaf9332e92c3236673639d46b5286d6e2a2da846c79cbf52310c9"
+ },
+ "pair_seed": 20260926,
+ "stop_marker": null
+}
