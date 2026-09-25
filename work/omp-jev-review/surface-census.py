@@ -156,8 +156,31 @@ def session_cwd(path):
     return ""
 
 
+def session_location(path):
+    """(profile, parts below the sessions root) for a session file.
+
+    The root is the last `agent/sessions` pair: `~/.omp/agent/sessions` is profile `default`,
+    `~/.omp/profiles/<name>/agent/sessions` is `<name>`. The first part below it is the encoded
+    project dir. Nothing above the root (HOME) is returned, so HOME never classifies a session.
+    """
+    parts = Path(path).parts
+    for i in range(len(parts) - 2, 0, -1):
+        if parts[i] == "sessions" and parts[i - 1] == "agent":
+            profile = "default"
+            if i >= 4 and parts[i - 3] == "profiles" and parts[i - 4] == ".omp":
+                profile = parts[i - 2]
+            return profile, parts[i + 1 :]
+    return "default", parts[-2:]
+
+
 def is_probe(path, cwd):
-    blob = f"{path}\n{cwd}".lower()
+    """A probe or test session, judged on the path below its sessions root and the recorded cwd.
+
+    Never on the absolute path: a HOME under /tmp (Linux CI tempdirs) would make every session a
+    probe (jev-xpk1 reopen, CI run 36079745187).
+    """
+    profile, below = session_location(path)
+    blob = ("/" + "/".join(below) + "\n" + cwd).lower()
     markers = (
         "/tmp/",
         "/private/tmp/",
@@ -168,14 +191,14 @@ def is_probe(path, cwd):
     )
     if any(m in blob for m in markers):
         return True
-    encoded = path.parent.name.lower()
+    # The file's own directory: the encoded project dir for a session, the session dir for a
+    # subagent file. Always below the root, so never HOME.
+    encoded = below[-2].lower() if len(below) > 1 else ""
     if any(m in encoded for m in ("tmp", "probe", "fixture", "review-l3")):
         return True
     if "/test/" in cwd or "/tests/" in cwd or cwd.rstrip("/").endswith("/test"):
         return True
-    if "/profiles/omp-test/" in str(path) or "/profiles/jev-scratch" in str(path):
-        return True
-    return False
+    return profile == "omp-test" or profile.startswith("jev-scratch")
 
 
 def kind_of(data):
@@ -198,11 +221,7 @@ def is_credit(data, timestamp):
 
 
 def profile_of(path):
-    parts = Path(path).parts
-    for i, part in enumerate(parts[:-1]):
-        if part == "profiles" and i > 0 and parts[i - 1] == ".omp":
-            return parts[i + 1]
-    return "default"
+    return session_location(path)[0]
 
 
 def judge_rows(files):

@@ -218,6 +218,41 @@ class Census(unittest.TestCase):
         self.assertNotIn("0 failures", line)
 
 
+class HomeUnderTmp(unittest.TestCase):
+    """A HOME under /tmp (Linux CI tempdirs) must not turn real sessions into probes.
+
+    CI run 36079745187 failed 5 of 7 here: is_probe matched '/tmp/' in the absolute path.
+    """
+
+    def test_real_session_counts_when_home_is_under_tmp(self):
+        for home in ("/tmp/ci/home", "/private/tmp/ci/home", "/home/runner/probe-home"):
+            real = Path(
+                home, ".omp/profiles/claude/agent/sessions/-Developer-jev/s.jsonl"
+            )
+            planted = Path(home, ".omp/agent/sessions/--private-tmp-x--/s.jsonl")
+            with self.subTest(home=home):
+                self.assertFalse(sc.is_probe(real, "/Users/josh/Developer/jev"))
+                self.assertTrue(sc.is_probe(planted, "/tmp/x"))
+                self.assertEqual(sc.profile_of(real), "claude")
+                self.assertEqual(sc.profile_of(planted), "default")
+        if not Path("/tmp").is_dir():
+            self.skipTest("no /tmp on this host; the path arm above still ran")
+        with tempfile.TemporaryDirectory(prefix="judge-usage-", dir="/tmp") as tmp:
+            home = Path(tmp) / "home"
+            write_session(
+                home,
+                "claude",
+                "-Developer-jev",
+                "/Users/josh/Developer/jev",
+                [SUCCESS_FIND],
+            )
+            rows = list(sc.judge_rows(sorted(home.rglob("*.jsonl"))))
+            self.assertEqual(
+                sc.fleet_line(rows, NOW, True),
+                "Jev judge 24h: 1 calls, $0.0001, 0 failures",
+            )
+
+
 class Cli(unittest.TestCase):
     """The real --fleet-line path and fleet-idle-watch's --once, with HOME pointed at a temp tree."""
 
