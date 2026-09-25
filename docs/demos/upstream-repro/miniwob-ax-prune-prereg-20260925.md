@@ -55,6 +55,11 @@ The same quantities are reported on dev; dev does not substitute for held-out ac
 
 Planner-state token metric is the official SDK `usage.input_tokens` returned for the v1 planner request. The row also records full/seen serialized UTF-8 byte counts as an independent structural check. Wall time is the floor row's `wall_s`, including the fixed environment wait, and p95 uses the nearest-rank value over the 50 rows in each arm.
 
+The committed scorer `work/miniwob-ax-prune/score.py` reports the receipt for each split. It must
+show the success count and success rate for each of the four arms, plus the number and names of
+the 50 tasks that succeeded in at least one arm (`ever_successful_tasks`). That union is a
+descriptive informativeness check only; it does not change the held-out bar or the kill rules.
+
 ## Request and spend estimate
 
 Maximum HTTP requests:
