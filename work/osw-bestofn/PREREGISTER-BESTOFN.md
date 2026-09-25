@@ -80,3 +80,7 @@ from the permitted members, or the official result row cannot be joined unambigu
 No threshold, question wording, candidate ordering, tie-break, or bar may change after the first
 live call. Spend is reported from returned `usage.input_tokens` at the documented Jev price
 ($0.042/M input tokens; output free).
+
+## Frozen floor tie-breaks
+
+For `shortest`, the action count is the number of JSONL records in that candidate's `traj.jsonl`; ties break by candidate archive name. For `claims_success`, inspect only the final 12,000 characters of that candidate's `runtime.log` and mark a claim when the case-insensitive regex `(?:task\s+)?(?:completed|succeeded|success(?:ful|fully)?)` matches; multiple matches tie by archive name, and no-match tasks tie to the first archive name. The floor's success value still comes only from the selected candidate's official `result.txt` row.
