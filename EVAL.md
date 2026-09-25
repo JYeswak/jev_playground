@@ -1750,3 +1750,19 @@ keyless (f1). LOSE in all 12 paired-bootstrap pairings (−0.028 to −0.051) �
 NEGATIVE_EVIDENCE R101. Tokens/question 1,100 vs 1,456 (0.76×). 33,192 requests, 0 failed, $0.89.
 Receipt `docs/demos/upstream-repro/rerank-nevir-20260924.md`.
 Boundary: one negation set, one pin, run.py's wording only; upstream's `jev-noul-pair` wording not re-run.
+
+## jev-jy7t.1.3 PokéJev Stage B local battles (2026-09-24) [live]
+
+Prereg `1a37ee4` before the bar arm; `jev-1.13.0`; pinned PokéChamp/Showdown environment and
+Gen 9 OU Clock. Keyless selftest, zero-call control, live Random feasibility arm (19/20, 0 time
+losses), then live Abyssal bar arm (200/200 rows, 0 harness errors, 0 time losses). PokéJev won
+112/200 = 0.560 (Wilson 0.4907–0.6270), versus 79/200 = 0.395 for the zero-call control.
+The preregistered `<0.70` KILL bar fired; tier-1 PASS required ≥0.84. Live-minus-control was
++16.5 pp, z=3.303, two-sided p=0.001. The run made 9,334 Jev calls, 33,273,577 input tokens,
+and $1.397490234 estimated spend; decision latency p50/p95/max 1088/2424/5064 ms. Resolved
+model ids: `jev-1.13.0`. Fallbacks: 271 no-credit API errors, 5 timeouts, 105 unknown-move
+errors. Receipt `docs/demos/upstream-repro/pokejev-stage-b-results-20260925.md`, aggregate
+`work/poke-jev/stage-b/receipt.json`. Bead stays open for non-author check.
+Boundary: this is not a ladder result or calibration claim; no LLM comparator; no Metamon stretch
+run; compact result and decision JSONL are committed for keyless re-score, replay HTML is not.
+The API credit exhaustion occurred during the live arm and is disclosed in the receipt.

@@ -49,7 +49,7 @@ cd work/poke-jev && uv venv --python 3.12 .venv && uv pip install --python .venv
 | Stage | What | Lane | Prereg | Result |
 |---|---|---|---|---|
 | A | predict human player and opponent actions on 2,000 replay turns vs PokéChamp's Table 1 | live, TypeSafe only | `pokejev-stage-a-20260925.md` | **FAIL** (`pokejev-stage-a-results-20260925.md`): top-1 0.3365 / 0.2235 clears Table 1, log-loss loses to a usage floor (R103) |
-| B | 200 local Gen 9 OU battles each vs Abyssal, OneStep and MaxBasePower under an enforced clock, plus a zero-call control | live | `pokejev-stage-b-20260925.md` | pending |
+| B | 200 local Gen 9 OU battles each vs Abyssal, OneStep and MaxBasePower under an enforced clock, plus a zero-call control | live | `pokejev-stage-b-20260925.md` | **KILL** (`pokejev-stage-b-results-20260925.md`): 56.0% vs Abyssal, 0 time losses; the <70% KILL bar fires |
 | B stretch | a released Metamon checkpoint on the same server | live | addendum before its first battle | pending |
 | C | the public ladder | **not authorized** (needs Joshua) | none | — |
 

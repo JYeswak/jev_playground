@@ -1,0 +1,112 @@
+{
+ "abyssal": {
+  "battles": 200,
+  "decision_ms_max": 5064,
+  "decision_ms_p50": 1088,
+  "decision_ms_p95": 2424,
+  "decisions": 5494,
+  "fallback_reasons": [
+   "TimeoutError: ",
+   "TypeSafeAPIError: POST https://api.types",
+   "ValueError: Unknown move: nothing"
+  ],
+  "fallbacks": 381,
+  "harness_errors": 0,
+  "input_tokens": 33273577,
+  "jev_calls": 9334,
+  "losses_on_time": 0,
+  "models": [
+   "jev-1.13.0"
+  ],
+  "opponent_losses_on_time": 0,
+  "spend_usd_at_0.042_per_M_input": 1.3975,
+  "unfinished": 0,
+  "wilson95": [
+   0.4907,
+   0.627
+  ],
+  "win_rate": 0.56,
+  "wins": 112
+ },
+ "abyssal-control": {
+  "battles": 200,
+  "decision_ms_max": 1777,
+  "decision_ms_p50": 103,
+  "decision_ms_p95": 396,
+  "decisions": 4997,
+  "fallback_reasons": [
+   "RuntimeError: control arm: Jev disabled,",
+   "ValueError: Unknown move: nothing"
+  ],
+  "fallbacks": 4814,
+  "harness_errors": 0,
+  "input_tokens": 0,
+  "jev_calls": 0,
+  "losses_on_time": 0,
+  "models": [],
+  "opponent_losses_on_time": 0,
+  "spend_usd_at_0.042_per_M_input": 0.0,
+  "unfinished": 0,
+  "wilson95": [
+   0.3298,
+   0.4641
+  ],
+  "win_rate": 0.395,
+  "wins": 79
+ },
+ "bar": {
+  "battles": 200,
+  "losses_on_time": 0,
+  "tier1_vs_abyssal": "KILL",
+  "win_rate": 0.56
+ },
+ "live_minus_control_vs_abyssal": {
+  "difference": 0.165,
+  "p_two_sided": 0.001,
+  "z": 3.303
+ },
+ "random": {
+  "battles": 20,
+  "decision_ms_max": 5009,
+  "decision_ms_p50": 1458,
+  "decision_ms_p95": 2926,
+  "decisions": 549,
+  "fallback_reasons": [
+   "TimeoutError: "
+  ],
+  "fallbacks": 1,
+  "harness_errors": 0,
+  "input_tokens": 4226647,
+  "jev_calls": 1044,
+  "losses_on_time": 0,
+  "models": [
+   "jev-1.13.0"
+  ],
+  "opponent_losses_on_time": 0,
+  "spend_usd_at_0.042_per_M_input": 0.1775,
+  "unfinished": 0,
+  "wilson95": [
+   0.7639,
+   0.9911
+  ],
+  "win_rate": 0.95,
+  "wins": 19
+  },
+  "result_rows_committed": true,
+  "result_row_files": [
+    "work/poke-jev/stage-b/results-abyssal.jsonl",
+    "work/poke-jev/stage-b/results-abyssal-control.jsonl",
+    "work/poke-jev/stage-b/results-random.jsonl"
+  ],
+  "replays_committed": false,
+  "replay_manifest": {
+    "files": 420,
+    "bytes": 7143976,
+    "sha256": "65e906ea8bd9e534eb3222b13a96e6cbf21f88dc2929b2f1c9c31487c5c8adc8",
+    "sets": {
+      "replays-abyssal": {"files": 200, "bytes": 3493449, "sha256": "16827ffd3b2427704c3790581af45c7c75837966d0a20474332f440cc2c2de0b"},
+      "replays-abyssal-control": {"files": 200, "bytes": 3293514, "sha256": "0a15deba1b8286042f87f02c4fbd366c3d9c8da0a062068b2c7bb963bc24d6f5"},
+      "replays-random": {"files": 20, "bytes": 357013, "sha256": "1f290d133a191fe7709404e13539cef33d4fced274d8959163c354e0fb735ff1"}
+    }
+  }
+}
