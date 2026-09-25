@@ -2048,3 +2048,26 @@ Boundary: no TypeSafe call, no live runner, no spend. TESTS.md rows and pane-1 n
 Keyless run: `bash work/miniwob-jev/run-after-rotation.sh --fake --steps quoted,date_time` completed two episodes per selected step and ran row-provenance validation for each output. The revoked-fake plant returned exit 3 at step 1 before writing rows. The `--live` path is wired to the preregistered isolated sections and combined 400-404 held-out command, with `scripts/key-status.py` before every step.
 
 Boundary: no TypeSafe calls, no live runner, no spend. TESTS.md row is registered; pane-1 non-author verification remains pending.
+
+## jev-ljle README stranger regression gate (2026-09-25) [test]
+
+The nightly gate is in `.github/workflows/stranger-run.yml`. `scripts/stranger-run-jev-playground.py`
+now accepts `--source` for the checked-out repository, `--expect` for the committed
+`docs/demos/upstream-repro/stranger-run-expected.tsv`, and `--selftest`. The expectation has 82
+rows and was generated from the f2e61b0 receipt; it pins outcome classes and stable cause markers,
+not wall time or commit SHA. The planted selftest passes and names
+`python3 work/stranger-planted/untracked-input.py` as a new README row.
+
+The clean baseline checkout `ee4f0b3051cf340fb0914f9b7431def639141b0d` completed the full local
+`--source` run with **`EXPECTATION PASS rows=82`**. After fixing the real CI portability drift
+(missing `uv`, then the hard-coded MiniWoB venv), workflow dispatch
+**`36135948301`** ran on checkout commit `514502285d4e4c0bb75dcbca2286e1dd0d718e3d` and passed
+in **7m18s**. The uploaded receipt reports **82 rows, 72 exit 0, 9 nonzero, 1 TEMPLATE**; its
+nine nonzero rows are the committed expected claim-check bar, keyless/no-key results, and named
+environment prerequisites. The CI job installs `uv`, uses `--source "$GITHUB_WORKSPACE"` rather
+than cloning the target repository, and uploads the receipt artifact.
+
+Boundary: this is keyless/offline CI evidence only; **0 Jev/API requests and $0 spend**. The
+workflow does not prove the substantive judged results in the README. Earlier RED dispatches
+36131647900 and 36134076882 were retained as regression evidence: they caught a changed failure
+cause and the hard-coded MiniWoB venv before the final green run.
