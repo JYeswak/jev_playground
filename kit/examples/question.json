@@ -1,0 +1,8 @@
+{
+  "instructions": "Which captured candidate should be selected?",
+  "criteria": {
+    "c0": "Candidate 1",
+    "c1": "Candidate 2",
+    "none": "Abstain when evidence is insufficient."
+  }
+}

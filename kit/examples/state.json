@@ -1,0 +1,8 @@
+{
+  "game_state": "overworld",
+  "location": "MOVING_VAN",
+  "position": {
+    "x": 2,
+    "y": 2
+  }
+}
