@@ -4424,3 +4424,49 @@ gates on recorded turns: switch selection within 10 percentage points of the
 Stage B 41% offered-switch rate, and two move candidates with different
 outcomes receive different scores. No battle arm is authorized before all four
 conditions pass and the new note is committed.
+
+## R110 — NOT-SCORED: r4 Leaf C code-only arm fails the action-mix gate
+
+**Claim (bead `jev-9gtw.1`).** The r4 refit of the frozen Leaf C model could
+serve as an action-ranking leaf in the Abyssal battle arm.
+
+**Measured 2026-09-25, live `jev-1.13.0` upstream arm plus keyless code leaf.**
+The supervised code-only process wrote 991 decision rows under
+`run_id=leaf-c-r4-code` and stopped at the existing interim marker after the
+first eligible-decision gate. The stop-time reading recorded by pane 1 at
+`2026-09-25T09:39:29Z` was 245 eligible decisions with offered-switch rate
+`0.078` versus the Stage B reference `0.362`, absolute difference `0.284`, and
+checker exit `1`. After workers drained, the same 991-row file contained 415
+eligible decisions; the final keyless read was switch `0.089` versus `0.362`,
+absolute difference `0.272`, and exit `1`. The supervised child footer was
+`exit_code=1`. Both readings fail the preregistered `0.10` action-mix limit.
+The arm is `NOT-SCORED`; no battle win rate or Jev-vs-battle claim is made.
+
+**Autopsy.** The suspected missing-opponent-reply explanation is refuted.
+`work/poke-jev/player.py:248-262` creates a fresh simulator for every
+candidate/opponent pair and calls the same `leaf.step(orders[a], o_orders[o])`
+for move and switch candidates. The simulator switches before the opponent
+action (`pokechamp/poke_env/player/local_simulation.py:440-454`), calculates
+the resulting HP state (`:475-482`), and applies damage to the active Pokémon
+(`:500-512`). `work/poke-jev/player.py:74-85` records both active and bench
+HP, and `work/loss-depth/pokejev-components/battle/run.py:447-478` consumes
+our-side HP, opponent HP, and HP differential. A switch is therefore not
+scored on unchanged opponent HP alone; its switched-in Pokémon receives the
+opponent reply in the simulated state. The measured failure is the
+action-mixture mismatch, not an omitted opponent-reply update.
+
+The r4 held-out read also found a Noul delta of `-0.003` and no reason to carry
+the three Nouls forward once both sides' HP are present. More rounds on this
+leaf would tune PokéChamp's scorer, not test Jev, so the leaf line is parked.
+
+**What it does not refute.** This partial arm does not establish a battle
+win-rate result, and it does not refute a different action-ranking model,
+different features, or a new battle arm after the component gate is repaired.
+
+**Retry condition.** Reopen only with a new preregistered action-ranking design
+that passes keyless action-ranking tests (including two move candidates with
+different simulated outcomes receiving different scores), then a fresh
+supervised partial arm whose offered-switch rate is within ten percentage
+points of the Stage B reference `0.362`. Do not rerun this arm, append rows to
+it, or spend new leaf-Noul calls as a substitute for that gate. Receipt:
+`docs/demos/upstream-repro/loss-depth-pokejev-leaf-c-r4-partial-20250925.md`.
