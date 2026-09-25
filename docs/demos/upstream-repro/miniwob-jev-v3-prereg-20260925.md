@@ -360,3 +360,11 @@ The captured observation is the regression fixture; the test must turn RED when 
 removed. This amendment is committed after `ba78db6f` because the first rerun was launched before
 the requested WP-X amendment; no further code change or live call is permitted until this amendment
 is committed. The prematurely launched fixed rerun was stopped at 255/625 before scoring.
+
+## Correction: pre-amendment rerun boundary
+
+The fixed rerun launched before this amendment started with the committed 255-row file and wrote
+143 additional rows before it was stopped. Those 398 rows were never scored and are retained under
+`var/agent-tmp/jev-9gtw-heldout-resume.2/` as an unscored artifact. The next permitted supervised
+run restores the committed 255-row baseline and resumes with `--resume`; its receipt records the
+255-row starting point and the code SHA ranges explicitly.
