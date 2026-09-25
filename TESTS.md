@@ -182,8 +182,8 @@ claim nobody can check:
   Typed SKIP on Python < 3.12. Run: `uv run python -m unittest work/pokeagent-emerald/test_macro_choice.py` (4 tests).
 - `work/pokeagent-emerald/test_run_baselines.py` — keyless state-blind control policy: the
   pool is derived from all 6,449 committed `live-results.jsonl` button rows, seeded sampling is
-  reproducible, and `run_one` uses only pooled buttons. Run: `uv run python -m unittest
-  work/pokeagent-emerald/test_run_baselines.py` (3 tests).
+  reproducible, and `run_one` uses only pooled buttons.
+  Run: `uv run python -m unittest work/pokeagent-emerald/test_run_baselines.py` (3 tests).
 - `compaction/test/hindsight.test.ts` — the hindsight oracle (`compaction/hindsight.ts`), which
   scores Jev's keep/drop decisions against the transcript's own future. 4 tests: a drop counts as
   a mistake only when the result is later reused; the **planted negative** that keeping everything
