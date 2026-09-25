@@ -46,19 +46,31 @@ cd work/poke-jev && uv venv --python 3.12 .venv && uv pip install --python .venv
 
 ## Stages
 
-| Stage | What | Lane | Prereg |
-|---|---|---|---|
-| A | predict human player and opponent actions on 2,000 replay turns vs PokéChamp's Table 1 | live, TypeSafe only | `docs/demos/upstream-repro/pokejev-stage-a-20260925.md` |
-| B | 200 local Gen 9 OU battles each vs Abyssal and the poke-env heuristics, clock enforced | live | written before its first battle |
-| B stretch | a released Metamon checkpoint on the same server | live | same |
-| C | the public ladder | **not authorized** (needs Joshua) | none |
+| Stage | What | Lane | Prereg | Result |
+|---|---|---|---|---|
+| A | predict human player and opponent actions on 2,000 replay turns vs PokéChamp's Table 1 | live, TypeSafe only | `pokejev-stage-a-20260925.md` | **FAIL** (`pokejev-stage-a-results-20260925.md`): top-1 0.3365 / 0.2235 clears Table 1, log-loss loses to a usage floor (R103) |
+| B | 200 local Gen 9 OU battles each vs Abyssal, OneStep and MaxBasePower under an enforced clock, plus a zero-call control | live | `pokejev-stage-b-20260925.md` | pending |
+| B stretch | a released Metamon checkpoint on the same server | live | addendum before its first battle | pending |
+| C | the public ladder | **not authorized** (needs Joshua) | none | — |
+
+The prereg and result files live in `docs/demos/upstream-repro/`.
 
 ```bash
-cd work/poke-jev && python3 -m unittest test_replay                      # offline: labeller + floors
+cd work/poke-jev && python3 -m unittest test_replay test_policy           # offline: labeller, floors, policy, validator
 .venv/bin/python stage_a.py sample                                        # offline: fixed-seed sample
 infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- .venv/bin/python stage_a.py run
 .venv/bin/python stage_a.py score                                         # keyless re-score
+.venv/bin/python stage_a.py verify-copy 40                                # keyless: fast copy and memo change no answer
+./serve.sh                                                                # local server, Gen 9 OU Clock format
+.venv/bin/python stage_b.py selftest                                      # keyless, 4 arms incl. the clock's RED arm
+.venv/bin/python stage_b.py battles abyssal 200 --control                 # keyless zero-call control
+infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- .venv/bin/python stage_b.py battles abyssal 200
+.venv/bin/python stage_b.py score                                         # keyless receipt
 ```
 
-**Without a key,** `run` prints `unconfigured: ... (NOT_RUN)` and exits with status 2. It never
-fakes an answer.
+**Without a key,** `run` and `battles` print `unconfigured: ... (NOT_RUN)` and exit with status 2.
+They never fake an answer.
+
+**Clock.** PokéChamp's simulator, as shipped, took 72–134 s per decision here, the same order as
+the clock it lost to on the ladder. `pc.fast_copy` and `pc.memoize_predictor` bring that to
+0.35–1.05 s. `verify-copy` checks that neither changes a state text or a simulated leaf.

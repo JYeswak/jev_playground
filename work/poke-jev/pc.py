@@ -8,6 +8,7 @@ every path in this package is therefore absolute.
 from __future__ import annotations
 
 import contextlib
+import copy
 import io
 import logging
 import os
@@ -39,11 +40,89 @@ import replay  # noqa: E402
 
 GEN = GenData.from_format("gen9ou")
 SIM_FORMAT = "gen9ou"  # PokéChamp's LocalSim switches its set data on this exact string
+CLOCK_FORMAT = "gen9ouclock"  # Stage B's server format: Gen 9 OU rules plus a clock (showdown/custom-formats.ts)
 
 
-def new_sim(battle) -> "LocalSim":
-    return LocalSim(
-        battle,
+def alias_clock_format() -> None:
+    """Give the clocked format PokéChamp's Gen 9 OU Bayesian set predictor.
+
+    poke-env Pokémon carry their battle's format string, and PokéChamp's predictor singleton keys its
+    model by that string; for "gen9ouclock" it tries to download a model that does not exist (HTTP 404)
+    and every decision falls back. The rules are Gen 9 OU's, so the Gen 9 OU model is the right one.
+    """
+    from bayesian import predictor_singleton
+
+    with contextlib.redirect_stdout(io.StringIO()):
+        model = predictor_singleton.get_pokemon_predictor(SIM_FORMAT)
+    predictor_singleton._predictor_instances.setdefault(CLOCK_FORMAT, model)
+
+
+def memoize_predictor() -> None:
+    """Memoize PokéChamp's Bayesian predictor queries by their arguments.
+
+    Every damage calculation calls Pokemon.calculate_stats, which asks the predictor for the species'
+    most likely nature and EV spread (pokemon.py:972-1129): about 66 ms a call, dozens per decision.
+    The answer is a pure function of (species, teammates, observed moves) on a trained model, so a
+    cache returns the same answer; each hit hands back a deep copy so no caller can alter the cache.
+    `stage_a.py verify-copy` checks state texts and one-step leaves with and without the memo.
+    """
+    from bayesian import predictor_singleton
+
+    with contextlib.redirect_stdout(io.StringIO()):
+        model = predictor_singleton.get_pokemon_predictor(SIM_FORMAT)
+    if getattr(model, "_pokejev_memo", None) is not None:
+        return
+    raw = model.predict_component_probabilities
+    cache: dict = {}
+
+    def memo(species, teammates=None, observed_moves=None):
+        key = (species, tuple(teammates or ()), tuple(observed_moves or ()))
+        if key not in cache:
+            cache[key] = raw(species, teammates, observed_moves)
+        return copy.deepcopy(cache[key])
+
+    model._pokejev_memo = cache
+    model._pokejev_raw = raw
+    model.predict_component_probabilities = memo
+
+
+def unmemoize_predictor() -> None:
+    from bayesian import predictor_singleton
+
+    model = predictor_singleton.get_pokemon_predictor(SIM_FORMAT)
+    if getattr(model, "_pokejev_memo", None) is not None:
+        model.predict_component_probabilities = model._pokejev_raw
+        model._pokejev_memo = None
+
+
+def fast_copy(battle):
+    """deepcopy(battle), sharing the read-only static data every Pokémon points at.
+
+    Each poke-env Pokémon holds the whole GenData and its format's full sets table (406 species);
+    a plain deepcopy copies both for every Pokémon, about 3-5 s per battle on this machine. Those
+    objects are never written during a battle, so sharing them gives the same simulation. The
+    equivalence is checked, not assumed: `stage_a.py verify-copy` rebuilds committed Stage A states
+    through this path and compares their sha256 with the ones built by LocalSim's own deepcopy.
+    """
+    memo = {}
+    for obj in (getattr(battle, "_data", None), getattr(battle, "_logger", None)):
+        if obj is not None:
+            memo[id(obj)] = obj
+    mons = list(getattr(battle, "_team", {}).values()) + list(
+        getattr(battle, "_opponent_team", {}).values()
+    )
+    mons += list(getattr(battle, "_teampreview_opponent_team", []) or [])
+    for mon in mons:
+        for attr in ("_data", "_sets"):
+            obj = getattr(mon, attr, None)
+            if obj is not None:
+                memo[id(obj)] = obj
+    return copy.deepcopy(battle, memo)
+
+
+def sim_args() -> tuple:
+    """LocalSim's positional arguments after the battle, from PokéChamp's own data cache."""
+    return (
         data_cache.get_cached_move_effect(),
         data_cache.get_cached_pokemon_move_dict(),
         data_cache.get_cached_ability_effect(),
@@ -53,9 +132,20 @@ def new_sim(battle) -> "LocalSim":
         GEN,
         False,
         "",
-        format=SIM_FORMAT,
-        prompt_translate=state_translate2,
     )
+
+
+def new_sim(battle) -> "LocalSim":
+    """PokéChamp's LocalSim over a private copy of `battle`, made by fast_copy.
+
+    LocalSim.__init__ deep-copies whatever battle it is given and reads nothing else from it, so it
+    is constructed on None and handed the fast copy.
+    """
+    sim = LocalSim(
+        None, *sim_args(), format=SIM_FORMAT, prompt_translate=state_translate2
+    )
+    sim.battle = fast_copy(battle)
+    return sim
 
 
 def move_name(move_id: str) -> str:
@@ -67,15 +157,16 @@ def sets_data() -> dict:
     return data_cache.get_cached_moves_set(SIM_FORMAT)
 
 
-def build_state(
+def replay_sim(
     lines: list[str], player: str, turn: int, battle_id: str, active_key: str
-) -> dict:
-    """PokéChamp's own replay -> prompt path (pokechamp/translate.py add_battle), stopped at |turn|N.
+):
+    """A LocalSim holding the battle as the player saw it at |turn|N, via PokéChamp's replay path.
 
-    Differences from add_battle, both toward a correct state: the player's switch list is the
-    team's non-fainted, non-active members (spectator logs carry no |request|, and poke-env's
-    spectator list included fainted ones), and the action labels come from replay.label, not
-    from the last move line in a chunk.
+    Mirrors pokechamp/translate.py add_battle: nickname removal, |premove| lines giving the player's
+    team the moves each species used anywhere in the battle, then the log replayed through LocalSim.
+    One difference, toward a correct state: the player's switch list is the team's non-fainted,
+    non-active members (spectator logs carry no |request|, and poke-env's spectator list included
+    fainted ones).
     """
     names = replay.players(lines)
     text = recursive_nick_removal(list(lines))
@@ -128,6 +219,18 @@ def build_state(
     b._available_switches = [
         m for m in b.team.values() if not m.active and not m.fainted
     ]
+    return sim
+
+
+def build_state(
+    lines: list[str], player: str, turn: int, battle_id: str, active_key: str
+) -> dict:
+    """PokéChamp's state_translate2 text at |turn|N, plus its opponent move candidates.
+
+    The action labels come from replay.label, not from the last move line in a chunk as in add_battle.
+    """
+    sim = replay_sim(lines, player, turn, battle_id, active_key)
+    b = sim.battle
     with contextlib.redirect_stdout(io.StringIO()):
         system_prompt, state_prompt, action_prompt = state_translate2(sim, b)
         seen, potential = sim.get_opponent_current_moves(

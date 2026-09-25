@@ -22,8 +22,10 @@ Never prints a key.
 
 from __future__ import annotations
 
+import contextlib
 import gzip
 import hashlib
+import io
 import json
 import math
 import os
@@ -539,8 +541,124 @@ def cmd_score():
     return 0
 
 
+def cmd_verify_copy(n: int = 40) -> int:
+    """pc.fast_copy is a faithful deepcopy: on n committed Stage A states, under the same RNG seed, the
+    state text from the original battle, from LocalSim's own deepcopy and from pc.new_sim's fast copy
+    must be identical, one simulated step must leave identical after-states on both copies, and the
+    original battle must stay untouched. Offline, no key.
+
+    PokéChamp's state text is not deterministic (its stat guesses sample), so a seeded rebuild need not
+    equal the committed, unseeded sha256; that count is reported, not tested."""
+    import random as pyrandom
+
+    import numpy as np
+    import pc
+    import player as pj
+    from poke_env.environment.move import Move
+    from poke_env.player.local_simulation import LocalSim
+    from poke_env.player.player import Player
+
+    rows = load_jsonl(SAMPLE)[:n]
+    want = {r["battle_id"] for r in rows}
+    texts = {
+        b["battle_id"]: b["text"]
+        for band in battles_by_band().values()
+        for b in band
+        if b["battle_id"] in want
+    }
+
+    def text_of(sim):
+        np.random.seed(0)
+        pyrandom.seed(0)
+        with contextlib.redirect_stdout(io.StringIO()):
+            sp, st, sa = pc.state_translate2(sim, sim.battle)
+        return hashlib.sha256((sp + "\n" + st + "\n" + sa).encode("utf-8")).hexdigest()
+
+    bad, t_plain, t_fast, same_as_committed, stepped = [], 0.0, 0.0, 0, 0
+    for r in rows:
+        lines = replay.clean_lines(texts[r["battle_id"]])
+        base = pc.replay_sim(
+            lines, r["player"], r["turn"], r["battle_id"], r["player_species"]
+        )
+        before = pj.leaf_summary(base.battle)
+        t0 = time.perf_counter()
+        plain = LocalSim(
+            base.battle,
+            *pc.sim_args(),
+            format=pc.SIM_FORMAT,
+            prompt_translate=pc.state_translate2,
+        )
+        t_plain += time.perf_counter() - t0
+        t0 = time.perf_counter()
+        fast = pc.new_sim(base.battle)
+        t_fast += time.perf_counter() - t0
+        shas = {text_of(base), text_of(plain), text_of(fast)}
+        same_as_committed += r["state_sha256"] in shas
+        mv = base.battle.available_moves[0] if base.battle.available_moves else None
+        opp_moves = r["opp_options"]
+        memo_fast = pc.new_sim(
+            base.battle
+        )  # for the memo arm, stepped below with the memo on
+
+        def step_summary(sim):
+            np.random.seed(1)
+            pyrandom.seed(1)
+            with contextlib.redirect_stdout(io.StringIO()):
+                sim.step(
+                    Player.create_order(mv),
+                    Player.create_order(Move(opp_moves[0][5:], gen=9)),
+                )
+            return json.dumps(pj.leaf_summary(sim.battle), sort_keys=True)
+
+        leaf = set()
+        can_step = mv is not None and opp_moves[0].startswith("move ")
+        if can_step:
+            stepped += 1
+            leaf |= {step_summary(plain), step_summary(fast)}
+        pc.memoize_predictor()
+        memo_text = text_of(pc.new_sim(base.battle))
+        memo_leaf = {step_summary(memo_fast)} if can_step else set()
+        pc.unmemoize_predictor()
+        untouched = json.dumps(
+            pj.leaf_summary(base.battle), sort_keys=True
+        ) == json.dumps(before, sort_keys=True)
+        ok = (
+            len(shas) == 1
+            and len(leaf) <= 1
+            and untouched
+            and memo_text in shas
+            and memo_leaf <= leaf
+        )
+        if not ok:
+            bad.append(
+                {
+                    "id": r["id"],
+                    "text_variants": len(shas),
+                    "leaf_variants": len(leaf),
+                    "untouched": untouched,
+                    "memo_text_same": memo_text in shas,
+                    "memo_leaf_same": memo_leaf <= leaf,
+                }
+            )
+    print(
+        json.dumps(
+            {
+                "rows": len(rows),
+                "stepped": stepped,
+                "mismatches": bad,
+                "seeded_text_equals_committed": same_as_committed,
+                "deepcopy_s_total": round(t_plain, 2),
+                "fast_copy_s_total": round(t_fast, 2),
+            },
+            indent=1,
+        )
+    )
+    print("VERIFY-COPY PASS" if not bad else f"VERIFY-COPY FAIL {len(bad)}/{len(rows)}")
+    return 1 if bad else 0
+
+
 def main(argv):
-    if not argv or argv[0] not in ("sample", "run", "score"):
+    if not argv or argv[0] not in ("sample", "run", "score", "verify-copy"):
         print(__doc__, file=sys.stderr)
         return 2
     if argv[0] == "sample":
@@ -548,6 +666,8 @@ def main(argv):
     if argv[0] == "run":
         lim = int(argv[argv.index("--limit") + 1]) if "--limit" in argv else None
         return cmd_run(lim)
+    if argv[0] == "verify-copy":
+        return cmd_verify_copy(int(argv[1]) if len(argv) > 1 else 40)
     return cmd_score()
 
 
