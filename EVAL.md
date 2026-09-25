@@ -2371,3 +2371,40 @@ Boundary: this is keyless readiness evidence only. It does not claim wording rec
 false-alarm rate, precision, significance, or omp seam validation. Retry requires a
 new preregistered window long enough for `10` target rows at this rate (about `64`
 fleet hours), or a seeded non-authored set such as replayed public CI logs.
+
+## jev-jy7t.1.13 Emerald segment 2 keyless baseline replay (2026-09-25) [test]
+
+The source-derived segment uses committed work/pokeagent-emerald/states/emerald-boot.jsonl rows
+299/303: alternating starts at x=2/x=1, same y=2, with the goal x changing. The segment
+runner was segment2_baselines.py at code SHA-256
+3c3ae7a917242730e6e541c6dc0bb48fadb62f2d931620767a75d077668baee5; state-source SHA-256 was
+b403d9f99c1899dd8dac64c8b62087a08bc2c978b7ee4b6d5e5392f154c386b2, and the frozen pooled
+source was 6,449 rows at SHA-256 5294ec9a24319ebc7c528cdb3076c11bc381df3e1abbbb4334a6bf36c97c84fa.
+
+Keyless commands and results:
+
+- uv run python work/pokeagent-emerald/test_segment2_baselines.py — 8 tests passed.
+- uv run ruff check work/pokeagent-emerald/segment2_baselines.py work/pokeagent-emerald/test_segment2_baselines.py — clean.
+- ubs work/pokeagent-emerald/segment2_baselines.py — 0 critical, 0 warning, 22 info.
+- ripwire work/pokeagent-emerald --quality-delta — no reported quality-delta finding.
+- Both policies ran in jev-pokeagent-runtime:20260925 image
+  sha256:6eb7091484bf328ffa42e643bbeefcd2d0f71998039b40dd7a229d86e5f31ad6, with
+  sethkarten/continual-harness at 62bf6f614b66ff76b79954e5a3f04f91c3c6a049 and ROM
+  SHA-1 f3ae088181bf583e55daf962a92bb46f4f1d07b7. The run produced 160/160 scored rows:
+  uniform 47/80 goals (0.5875), capped-macro median 32; state-blind 61/80 (0.7625),
+  capped-macro median 3. No row had child_error or final: null; all rows had scored: true.
+  Results SHA-256 is 4f17be8d32536882027c3e8649eb9f64bd1cab868feb7b39176210ffafe9debe;
+  request states SHA-256 is 07cd950497598712a7878357d1e1ccab73e0ddf8c8ca711dc77fba7a56c0b842.
+- uv run python scripts/jev-state-size.py work/pokeagent-emerald/segment2-request-states.jsonl --field state --question-bytes 723 — FITS 160, NEAR 0, OVER 0.
+- power_mwu.py --rows work/pokeagent-emerald/segment2-baseline-results.jsonl --control-policy state_blind --cap 50 --fixed-control with 2,000 simulations — fixed-control power by capped shift: 2 -> 0.640, 5 -> 0.926, 10 -> 0.9975; rows SHA matches the result receipt. The pinned image lacks SciPy; an in-image install attempt timed out, so this deterministic power calculation ran with uv run --with numpy --with scipy on the host. It is not claimed as pinned-image power evidence.
+
+Verdict: LOSS for this segment, before any Jev call. The preregistered rejection bar is
+state-blind goal rate <50% or capped median >=2x Jev segment-1 median 62 (>=124).
+State-blind succeeded at 76.25% with median 3, so the button prior solves this goal. No
+live Jev call was made. The committed trace contains only the repeated MOVING_VAN left/right
+pair through row 371; the next segment should extend the recorded trace to the first new
+location or state transition, because no different source-derived goal is currently recorded.
+
+Boundary: this is keyless emulator, feasibility, and power evidence only. It does not measure
+Jev accuracy, cost, latency, calibration, or any live/API result; the power receipt is host-uv
+evidence rather than pinned-image evidence because the image has no SciPy.

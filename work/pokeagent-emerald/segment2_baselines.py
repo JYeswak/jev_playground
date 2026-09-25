@@ -7,10 +7,9 @@ import argparse
 import hashlib
 import json
 import random
-import subprocess
+import subprocess  # nosec B404 - argv is never shell-parsed
 import sys
 import time
-
 from datetime import datetime, timezone
 from importlib import import_module
 from pathlib import Path
@@ -25,6 +24,39 @@ DEFAULT_CAP = 50
 BASE_LOCATION = "MOVING_VAN"
 
 
+_JSON_DECODER = json.JSONDecoder()
+
+
+def _json_line(raw: str, source: str | Path, line_number: int) -> Any:
+    try:
+        return _JSON_DECODER.decode(raw)
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"{source} row {line_number} is not valid JSON: {exc.msg}"
+        ) from exc
+
+
+def _load_pooled_buttons(path: Path) -> list[str]:
+    pooled: list[str] = []
+    for line_number, line in enumerate(
+        path.read_text(encoding="utf-8").splitlines(), 1
+    ):
+        if not line.strip():
+            continue
+        row = _json_line(line, path, line_number)
+        if not isinstance(row, dict):
+            raise TypeError(f"{path} row {line_number} is not a JSON object")
+        button = row.get("button")
+        if button not in LEGAL_INPUTS:
+            raise ValueError(
+                f"{path} row {line_number} has an invalid button {button!r}"
+            )
+        pooled.append(button)
+    if not pooled:
+        raise ValueError(f"{path} has no macro buttons")
+    return pooled
+
+
 def _position(state: dict[str, Any]) -> dict[str, int]:
     position = state["player"]["position"] if "player" in state else state["position"]
     return {"x": int(position["x"]), "y": int(position["y"])}
@@ -32,11 +64,16 @@ def _position(state: dict[str, Any]) -> dict[str, int]:
 
 def derive_segment_spec(path: Path) -> dict[str, Any]:
     """Derive the two positions and reversible actions from the committed trace."""
-    rows = [
-        json.loads(line)
-        for line in path.read_text(encoding="utf-8").splitlines()
-        if line.strip()
-    ]
+    rows: list[dict[str, Any]] = []
+    for line_number, line in enumerate(
+        path.read_text(encoding="utf-8").splitlines(), 1
+    ):
+        if not line.strip():
+            continue
+        row = _json_line(line, path, line_number)
+        if not isinstance(row, dict):
+            raise TypeError(f"{path} row {line_number} is not a JSON object")
+        rows.append(row)
     by_macro = {int(row["macro_index"]): row for row in rows}
     base = by_macro[228]
     base_setup_end = by_macro[298]
@@ -138,7 +175,7 @@ def run_one(
     initial_position = _position(initial_state)
     if initial_position != setup_position(spec, seed):
         raise RuntimeError(f"segment setup drifted: {initial_position!r}")
-    rng = random.Random(seed)
+    rng = random.Random(seed)  # nosec B311 - deterministic experiment sampling only
     if policy == "uniform":
         buttons = [rng.choice(LEGAL_INPUTS) for _ in range(cap)]
     elif policy == "state_blind":
@@ -181,11 +218,7 @@ def _single(args: argparse.Namespace) -> int:
         if not args.pooled_rows:
             raise ValueError("state_blind requires --pooled-rows")
         pooled_path = Path(args.pooled_rows)
-        pooled = [
-            json.loads(line)["button"]
-            for line in pooled_path.read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
+        pooled = _load_pooled_buttons(pooled_path)
         metadata.update(pooled_metadata(pooled_path, pooled))
     row = run_one(
         emulator_cls,
@@ -230,15 +263,7 @@ def main() -> int:
         parser.error("--state-blind requires --pooled-rows")
     spec = derive_segment_spec(Path(args.states_source))
     pooled_path = Path(args.pooled_rows) if args.pooled_rows else None
-    pooled = (
-        [
-            json.loads(line)["button"]
-            for line in pooled_path.read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
-        if pooled_path
-        else None
-    )
+    pooled = _load_pooled_buttons(pooled_path) if pooled_path else None
     pool_metadata = (
         pooled_metadata(pooled_path, pooled) if pooled_path and pooled else {}
     )
@@ -273,10 +298,15 @@ def main() -> int:
         if policy == "state_blind":
             command.extend(["--pooled-rows", args.pooled_rows])
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # nosec B603 - argv list, shell=False, explicit inputs
                 command, check=True, capture_output=True, text=True, timeout=300
             )
-            row = json.loads(result.stdout.strip().splitlines()[-1])
+            child_lines = result.stdout.strip().splitlines()
+            if not child_lines:
+                raise ValueError("child produced no JSON row")
+            row = _json_line(child_lines[-1], f"child {policy} seed {seed}", 1)
+            if not isinstance(row, dict):
+                raise TypeError("child produced a non-object JSON row")
         except subprocess.CalledProcessError as exc:
             row = {
                 "policy": policy,
@@ -289,6 +319,19 @@ def main() -> int:
                 "timestamp_utc": datetime.now(timezone.utc).isoformat(),
                 "child_error": f"exit_{exc.returncode}",
                 "child_stderr": (exc.stderr or "").strip(),
+            }
+        except (TypeError, ValueError) as exc:
+            row = {
+                "policy": policy,
+                "seed": seed,
+                "segment": "position_change",
+                "goal_reached": False,
+                "macros_after_start": None,
+                "macro_cap": args.cap,
+                "final": None,
+                "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                "child_error": "invalid_child_output",
+                "child_stderr": str(exc),
             }
         row.update(
             {

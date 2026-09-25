@@ -1,0 +1,18 @@
+{
+  "alpha": 0.05,
+  "alternative": "treatment macro count lower than control",
+  "cap": 50,
+  "capped_stay": false,
+  "control_n": 80,
+  "control_policy": "state_blind",
+  "fixed_control": true,
+  "n_per_treatment_arm": 80,
+  "power_by_shift": {
+    "10": 0.9975,
+    "2": 0.64,
+    "5": 0.926
+  },
+  "rows_sha256": "4f17be8d32536882027c3e8649eb9f64bd1cab868feb7b39176210ffafe9debe",
+  "seed": 20260925,
+  "simulations": 2000
+}

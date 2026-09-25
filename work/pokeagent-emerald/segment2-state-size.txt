@@ -1,0 +1,1 @@
+limit 32768 tokens; bytes/token band 1.479-2.082 from calibration-osworld-r3.tsv; FITS 160, NEAR 0, OVER 0
