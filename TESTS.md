@@ -434,3 +434,4 @@ standalone script changes no caller behaviour. The label was the bottleneck, not
 Test 3 pins a defect found in this rule on its first run: it reported "referenced by README.md"
 and counted a documentation mention as a caller — mention-vs-use, inside the rule written to fix
 a bad label.
+- `work/poke-jev/test_watch_mode.py` — credential-free owner filter: exact, spaced, hyphenated, empty, spaces-only, and near-miss usernames; no network or Jev calls. Run: `.venv/bin/python -m unittest work/poke-jev/test_watch_mode.py` (6 tests; typed-skip exit 8 on Python <3.12, matching `work/poke-jev/test_player.py`, 3b8cf17).

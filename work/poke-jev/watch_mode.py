@@ -32,7 +32,9 @@ def _showdown_id(value: str) -> str:
 
 def accepts_challenge(challenger: str, owner: str) -> bool:
     """Return true only for the configured owner; empty owners accept nothing."""
-    return bool(owner) and _showdown_id(challenger) == _showdown_id(owner)
+    challenger_id = _showdown_id(challenger)
+    owner_id = _showdown_id(owner)
+    return bool(owner_id) and challenger_id == owner_id
 
 
 async def dry_run(ws_url: str, timeout_s: float) -> dict[str, Any]:
