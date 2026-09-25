@@ -1,5 +1,5 @@
 /**
- * omp-jev-review — observe-only review scorer for omp.
+ * omp-jev-review — advisory review scorer for omp.
  *
  * WHY THIS ONE CALLS JEV, WHEN omp-jev-harm AND omp-jev-preaction DO NOT.
  * Those gates were measured against a live model and WON: four regexes beat Jev 12/12 to 11/12
@@ -13,7 +13,10 @@
  * Upstream `jev-review` is RUN at 13/13 offline
  * (docs/demos/upstream-repro/jev-review-real-diffs-20260919.md).
  *
- * NEVER blocks. NEVER throws into the host. Returns undefined on every path.
+ * NEVER blocks. NEVER throws into the host. `tool_call` returns undefined on every path.
+ * `tool_result` returns undefined except for one case: a diff it scored with boundary >=
+ * BOUNDARY_COMMENT gets one advisory line appended to the git output (bead jev-k9z.2). It
+ * carries no merge authority and says so.
  * A failed call records `review_error`, never a pass — NEGATIVE_EVIDENCE R40: a crashed
  * classifier recording a pass is indistinguishable from a clean result.
  */
@@ -85,12 +88,70 @@ export function isThinDiff(diff: string): boolean {
 const CODE_EXTENSIONS = [".ts", ".mjs", ".py", ".sh"];
 
 export function touchesCodeFile(diff: string): boolean {
-  for (const line of diff.split("\n")) {
-    const m = /^diff --git a\/(.+) b\/\1$/.exec(line);
-    if (m && CODE_EXTENSIONS.some((ext) => m[1].endsWith(ext))) return true;
-  }
-  return false;
+  return changedFiles(diff).some(isCodePath);
 }
+
+function isCodePath(path: string): boolean {
+  return CODE_EXTENSIONS.some((ext) => path.endsWith(ext));
+}
+
+/**
+ * Vendored, generated and lock files are not ours to review (bead jev-k9z.2 planted negative:
+ * a 10k-line vendored diff must be applicable:false). A path is vendored when any directory
+ * segment is one of these, or its basename is a lockfile.
+ */
+const VENDORED_SEGMENTS: Record<string, true> = {
+  node_modules: true, vendor: true, third_party: true, dist: true, build: true, ".venv": true,
+  venv: true, "site-packages": true, "docs-mirror": true, upstream: true,
+};
+const LOCKFILES: Record<string, true> = {
+  "package-lock.json": true, "yarn.lock": true, "pnpm-lock.yaml": true, "bun.lock": true,
+  "bun.lockb": true, "uv.lock": true, "Cargo.lock": true, "poetry.lock": true, "go.sum": true,
+};
+
+export function isVendoredPath(path: string): boolean {
+  const parts = path.split("/");
+  const base = parts[parts.length - 1] ?? "";
+  return Object.hasOwn(LOCKFILES, base) || parts.slice(0, -1).some((p) => Object.hasOwn(VENDORED_SEGMENTS, p));
+}
+
+/** Post-image path of every file section, in order (`diff --git a/X b/Y` -> Y). */
+export function changedFiles(diff: string): string[] {
+  const files: string[] = [];
+  for (const line of diff.split("\n")) {
+    const m = /^diff --git a\/(.+) b\/(.+)$/.exec(line);
+    if (m) files.push(m[2]);
+  }
+  return files;
+}
+
+/**
+ * The diff with every vendored file section removed, and how many sections were dropped.
+ * Text before the first `diff --git` header (a `git show` commit header) is kept.
+ */
+export function reviewableDiff(diff: string): { diff: string; dropped: number } {
+  const sections = diff.split(/(?=^diff --git )/m);
+  let dropped = 0;
+  const kept = sections.filter((section) => {
+    const m = /^diff --git a\/(.+) b\/(.+)$/m.exec(section);
+    if (!m || !section.startsWith("diff --git ")) return true;
+    if (isVendoredPath(m[2])) {
+      dropped++;
+      return false;
+    }
+    return true;
+  });
+  return { diff: kept.join(""), dropped };
+}
+
+/**
+ * A scored boundary at or above this appends one advisory line to the git output. Chosen by
+ * fire rate, not accuracy: on the 125 real code diffs the 686-commit draw scored
+ * (docs/demos/upstream-repro/omp-jev-review-draw-20260923.md), boundary >= 0.9 fired on 3
+ * (2.4%), >= 0.7 on 13. Whether those 3 are true boundary changes is unmeasured.
+ */
+export const BOUNDARY_COMMENT = 0.9;
+const MAX_PENDING = 100;
 
 /** A clean `git diff|show` argv, or null if the string is not safe to exec. */
 export function gitArgv(command: string): string[] | null {
@@ -124,19 +185,42 @@ export async function readDiff(command: string): Promise<{ ok: true; diff: strin
   try {
     const stdout = await diffRun(argv);
     if (!stdout.trim()) return { ok: false, reason: "empty-diff" };
-    return { ok: true, diff: stdout.slice(0, MAX_DIFF) };
+    return { ok: true, diff: stdout };
   } catch {
     return { ok: false, reason: "diff-exec" };
   }
 }
 
 type ToolCallEvent = { toolName?: unknown; name?: unknown; toolCallId?: unknown; input?: unknown; command?: unknown };
+type ToolResultEvent = { toolName?: unknown; toolCallId?: unknown; content?: unknown; isError?: unknown };
 type Host = {
-  on: (event: string, handler: (event: ToolCallEvent) => Promise<undefined>) => void;
+  on: (event: string, handler: (event: any) => Promise<unknown>) => void;
   appendEntry: (type: string, data: Record<string, unknown>) => Promise<unknown>;
 };
 export default function ompJevReview(pi: Host) {
-  pi.on("tool_call", async (event) => {
+  /** toolCallId -> boundary score, for diffs that earned the advisory line. */
+  const pending = new Map<string, number>();
+
+  pi.on("tool_result", async (event: ToolResultEvent) => {
+    try {
+      const id = typeof event?.toolCallId === "string" ? event.toolCallId : null;
+      if (id === null || !pending.has(id)) return undefined;
+      const boundary = pending.get(id) as number;
+      pending.delete(id);
+      if (event?.toolName !== "bash" || event?.isError === true || !Array.isArray(event?.content)) {
+        return undefined;
+      }
+      const note =
+        `\n[jev-review advisory, no merge authority] boundary ${boundary.toFixed(2)}: this diff may ` +
+        "touch a security, permission, or authentication boundary. Fires on about 2% of code diffs; " +
+        "accuracy unmeasured.";
+      return { content: [...event.content, { type: "text", text: note }] };
+    } catch {
+      return undefined;
+    }
+  });
+
+  pi.on("tool_call", async (event: ToolCallEvent) => {
     try {
       const tool = String(event?.toolName ?? event?.name ?? "");
       const input = event?.input;
@@ -157,7 +241,7 @@ export default function ompJevReview(pi: Host) {
         });
       } catch {}
       const loaded = await readDiff(command);
-      if (!loaded.ok) {
+      if (!loaded.ok && loaded.reason !== "empty-diff") {
         try {
           await pi.appendEntry(DECISION, {
             schemaVersion: 1,
@@ -189,19 +273,32 @@ export default function ompJevReview(pi: Host) {
         return undefined;
       };
 
-      if (isThinDiff(loaded.diff)) {
+      if (!loaded.ok) {
+        return notApplicable("empty-diff");
+      }
+      const filtered = reviewableDiff(loaded.diff);
+      if (filtered.dropped > 0 && !touchesCodeFile(filtered.diff) && touchesCodeFile(loaded.diff)) {
+        return notApplicable("vendored-diff");
+      }
+      if (isThinDiff(filtered.diff)) {
         return notApplicable("thin-diff");
       }
-      if (!touchesCodeFile(loaded.diff)) {
+      if (!touchesCodeFile(filtered.diff)) {
         return notApplicable("non-code-diff");
       }
       const result = await ask({
-        state: { diff: loaded.diff },
+        state: { diff: filtered.diff.slice(0, MAX_DIFF) },
         questions: QUESTIONS,
         timeoutMs: 2500,
       });
       const probabilities = result.ok ? result.scores : undefined;
       const error = result.ok ? undefined : `${result.reason}: ${result.error}`;
+      const boundary = probabilities?.boundary;
+      const comment = toolCallId !== null && typeof boundary === "number" && boundary >= BOUNDARY_COMMENT;
+      if (comment) {
+        if (pending.size >= MAX_PENDING) pending.delete(pending.keys().next().value as string);
+        pending.set(toolCallId as string, boundary as number);
+      }
 
       try {
         await pi.appendEntry(DECISION, {
@@ -209,7 +306,8 @@ export default function ompJevReview(pi: Host) {
           kind: probabilities ? "review_scored" : "review_error",
           command: command.slice(0, 2000),
           toolCallId,
-          ...(probabilities ? { probabilities } : {}),
+          ...(probabilities ? { probabilities, comment } : {}),
+          ...(filtered.dropped > 0 ? { vendoredFilesDropped: filtered.dropped } : {}),
           ...(error === undefined ? {} : { error }),
           latencyMs: result.latencyMs,
           model: result.model,

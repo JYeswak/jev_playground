@@ -1,18 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import ompJevReview, { setDiffRunner, isThinDiff, touchesCodeFile } from '../src/index.ts';
+import ompJevReview, { setDiffRunner, isThinDiff, touchesCodeFile, isVendoredPath, reviewableDiff, BOUNDARY_COMMENT } from '../src/index.ts';
 import { requireSdkInstalled } from '../../sdk/require-installed.mjs';
 
 requireSdkInstalled();
 
 function host() {
   const rows = [];
-  let handler;
+  const handlers = {};
   return {
     rows,
-    fire: (event) => handler(event),
+    fire: (event) => handlers.tool_call(event),
+    fireResult: (event) => handlers.tool_result(event),
     pi: {
-      on: (_e, cb) => { handler = cb; },
+      on: (e, cb) => { handlers[e] = cb; },
       appendEntry: async (type, data) => { rows.push({ type, data }); },
     },
   };
@@ -176,7 +177,7 @@ test('asks exactly the two measured questions and no more', async () => {
   }
 });
 
-test('an empty diff is an error and does not call Jev', async () => {
+test('an empty diff records applicable:false and does not call Jev', async () => {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
@@ -188,13 +189,121 @@ test('an empty diff is an error and does not call Jev', async () => {
     ompJevReview(h.pi);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
-    assert.equal(row.data.failure, 'empty-diff');
+    assert.equal(row.data.kind, 'review_not_applicable');
+    assert.equal(row.data.applicable, false);
+    assert.equal(row.data.reason, 'empty-diff');
     assert.equal(called, 0);
   } finally {
     globalThis.fetch = realFetch;
     if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
     else process.env.TYPESAFE_API_KEY = previous;
   }
+});
+
+// Bead jev-k9z.2 planted negative: a 10k-line vendored diff is not ours to review.
+const VENDORED_10K = 'diff --git a/node_modules/lib/index.ts b/node_modules/lib/index.ts\n@@ -1,1 +1,10000 @@\n' +
+  Array.from({ length: 10000 }, (_, i) => `+vendored line ${i}`).join('\n') + '\n';
+
+test('a 10k-line vendored diff records applicable:false and never calls Jev', async () => {
+  const previous = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  let called = 0;
+  globalThis.fetch = async () => { called += 1; throw new Error('must not be called'); };
+  try {
+    stubDiff(VENDORED_10K + 'diff --git a/package-lock.json b/package-lock.json\n@@ -1 +1 @@\n+{}\n');
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git diff'));
+    const [row] = decisions(h);
+    assert.equal(row.data.kind, 'review_not_applicable');
+    assert.equal(row.data.reason, 'vendored-diff');
+    assert.equal(called, 0);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+});
+
+test('vendored sections are cut before scoring; our own code in the same diff still scores', async () => {
+  const previous = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  const sent = [];
+  const mk = (answers) => ({
+    ok: true, status: 200, headers: { get: () => 'application/json' },
+    text: async () => JSON.stringify({ answers }), clone: () => mk(answers),
+  });
+  globalThis.fetch = async (_url, init) => { sent.push(JSON.parse(init.body)); return mk({ behaviour: { noul: 0.3 }, boundary: { noul: 0.2 } }); };
+  try {
+    stubDiff(VENDORED_10K + SUBSTANTIAL);
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git diff'));
+    const [row] = decisions(h);
+    assert.equal(row.data.kind, 'review_scored');
+    assert.equal(row.data.vendoredFilesDropped, 1);
+    assert.equal(sent.length, 1);
+    assert.equal(sent[0].state.diff.includes('vendored line'), false, 'Jev never sees vendored text');
+    assert.equal(sent[0].state.diff.includes('added line 0'), true);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+});
+
+test('isVendoredPath: directory segments and lockfiles, not look-alike names', () => {
+  assert.equal(isVendoredPath('node_modules/a/b.ts'), true);
+  assert.equal(isVendoredPath('web/vendor/x.py'), true);
+  assert.equal(isVendoredPath('uv.lock'), true);
+  assert.equal(isVendoredPath('sub/package-lock.json'), true);
+  assert.equal(isVendoredPath('src/vendor.ts'), false, 'a file named vendor is not a vendor dir');
+  assert.equal(isVendoredPath('src/distance.ts'), false);
+  assert.equal(reviewableDiff('commit abc\n\nmsg\n' + VENDORED_10K).diff.startsWith('commit abc'), true, 'the git show header is kept');
+});
+
+// The advisory line: one scored diff, the git output of that same call, nothing else.
+async function scoredWithBoundary(boundary, id = 'tc-1') {
+  const previous = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  process.env.TYPESAFE_API_KEY = 'test-key';
+  globalThis.fetch = answersFetch({ behaviour: { noul: 0.4 }, boundary: { noul: boundary } });
+  try {
+    stubDiff(SUBSTANTIAL);
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire({ toolName: 'bash', toolCallId: id, input: { command: 'git show HEAD' } });
+    return h;
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+}
+const gitOutput = [{ type: 'text', text: 'commit abc\n' }];
+
+test('a boundary score at the threshold appends one advisory line to that call only', async () => {
+  const h = await scoredWithBoundary(BOUNDARY_COMMENT);
+  assert.equal(decisions(h)[0].data.comment, true);
+  const out = await h.fireResult({ toolName: 'bash', toolCallId: 'tc-1', content: gitOutput });
+  assert.equal(out.content.length, 2);
+  assert.deepEqual(out.content[0], gitOutput[0], 'the git output is kept verbatim');
+  assert.match(out.content[1].text, /jev-review advisory, no merge authority\] boundary 0\.90/);
+  assert.equal(await h.fireResult({ toolName: 'bash', toolCallId: 'tc-1', content: gitOutput }), undefined, 'fires once');
+});
+
+test('below the threshold the result is silent', async () => {
+  const h = await scoredWithBoundary(BOUNDARY_COMMENT - 0.01);
+  assert.equal(decisions(h)[0].data.comment, false);
+  assert.equal(await h.fireResult({ toolName: 'bash', toolCallId: 'tc-1', content: gitOutput }), undefined);
+});
+
+test('another call, or a failed git call, gets no advisory line', async () => {
+  const h = await scoredWithBoundary(0.97);
+  assert.equal(await h.fireResult({ toolName: 'bash', toolCallId: 'tc-other', content: gitOutput }), undefined);
+  assert.equal(await h.fireResult({ toolName: 'bash', toolCallId: 'tc-1', isError: true, content: gitOutput }), undefined);
 });
 
 test('a shell metacharacter is not executed and not scored', async () => {

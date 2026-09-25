@@ -1,7 +1,9 @@
 # omp-jev-review
 
-Observe-only diff review scorer for omp. Watches `bash` tool calls, and when one is a
-`git diff` / `git show`, asks Jev systemOne two questions about the change.
+Advisory diff review scorer for omp. Watches `bash` tool calls, and when one is a
+`git diff` / `git show` on our own code, asks Jev systemOne two questions about the change and
+logs the answer. When the boundary answer is at least 0.9 it appends one advisory line to that
+call's git output. It never blocks and has no merge authority.
 
 ```bash
 omp plugin install omp-jev-review
@@ -52,12 +54,11 @@ infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
 
 ## What the measurement does NOT cover
 
-It scores the questions against diff **text**. This extension sends `state: { diff: command }` —
-the command *string*, `git diff HEAD~1 -- src/server/dashboard.ts`, not the diff body. A live
-run of the shipped path returns `{behaviour: 0.41, boundary: 0.24}` from a filename. So 19/21 is
-an **upper bound** the extension does not reach, and the numbers in the decision rows today are
-scored on far less than the table above. Unmeasured, therefore unchanged: fixing the input is a
-behaviour change and gets its own measurement.
+The questions are scored on diff **text**: the extension runs the same `git diff|show` itself
+and sends the body (vendored sections removed, first 12,000 characters), never the command
+string. The 686-commit draw scored 125 real code diffs this way
+(`docs/demos/upstream-repro/omp-jev-review-draw-20260923.md`). None of them has a label, so no
+accuracy is claimed on real traffic.
 
 Seven hand-built diffs, labelled by whoever wrote them, bound nothing about real review traffic.
 
@@ -65,18 +66,34 @@ Seven hand-built diffs, labelled by whoever wrote them, bound nothing about real
 
 | kind | meaning |
 |---|---|
-| `review_scored` | Jev answered; `probabilities` present |
-| `review_error` | key unset, transport failed, or a 200 with no probabilities |
+| `review_scored` | Jev answered; `probabilities` and `comment` (whether the advisory line was queued) present |
+| `review_not_applicable` | `applicable:false`, zero Jev calls; `reason` is `empty-diff`, `vendored-diff`, `thin-diff` or `non-code-diff` |
+| `review_error` | unsafe command, git failed, key unset, transport failed, or a 200 with no probabilities |
 
-There is no third "clean" state. A failed call is never recorded as a pass — a crashed
+There is no "clean" state. A failed call is never recorded as a pass — a crashed
 classifier that logs a pass is indistinguishable from a real clean result.
 
-Never blocks. Never throws into the host. Returns `undefined` on every path.
+Vendored means a directory segment `node_modules`, `vendor`, `third_party`, `dist`, `build`,
+`.venv`, `venv`, `site-packages`, `docs-mirror` or `upstream`, or a lockfile. Those sections are
+cut before scoring; a diff that is only vendored code is `vendored-diff`.
+
+## The advisory line (jev-k9z.2)
+
+A scored diff with boundary >= 0.9 gets one line appended to the same call's git output:
+
+```
+[jev-review advisory, no merge authority] boundary 0.92: this diff may touch a security,
+permission, or authentication boundary. Fires on about 2% of code diffs; accuracy unmeasured.
+```
+
+0.9 was chosen by fire rate: 3 of the draw's 125 real code diffs. Every other result is left
+untouched, including a failed git call and every other tool call. Receipt with live sessions
+both ways: `docs/demos/upstream-repro/omp-jev-review-advisory-20260925.md`.
 
 ## Test
 
 ```bash
-node --experimental-strip-types --test test/review.test.mjs   # 7/7
+node --experimental-strip-types --test test/review.test.mjs   # 20/20
 ```
 
 ## Real commits: `behaviour` does not beat its own constant
