@@ -6,12 +6,14 @@ from __future__ import annotations
 import hashlib
 import os
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "key-status.py"
+PROBE = ROOT / "work/key-status/live_jev_guard_probe.py"
 REVOKED_KEY = "fake-revoked-key-for-tests-only"
 OTHER_KEY = "fake-other-key-for-tests-only"
 
@@ -76,15 +78,17 @@ class KeyStatusTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             revoked = Path(temp) / "revoked.tsv"
             self.write_revoked(revoked, REVOKED_KEY)
-            code = "import sys; sys.path.insert(0, 'work/miniwob-jev'); import jev_arm; jev_arm.LiveAsker()"
+            python = sys.executable
             result = subprocess.run(
-                ["/tmp/jev-miniwob-jev/venv/bin/python", "-c", code],
+                [python, str(PROBE)],
                 cwd=ROOT,
                 env=self.runner_env(revoked, REVOKED_KEY),
                 capture_output=True,
                 text=True,
                 timeout=30,
             )
+        if "No module named 'gymnasium'" in result.stderr:
+            self.skipTest("prerequisite: gymnasium unavailable for MiniWoB runner")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("KEY: REVOKED", result.stderr)
         self.assertNotIn(REVOKED_KEY, result.stdout + result.stderr)
