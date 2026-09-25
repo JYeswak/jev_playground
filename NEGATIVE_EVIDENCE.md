@@ -4070,3 +4070,40 @@ Beating the published LLM on those cells would therefore say nothing about Jev.
 stronger preregistered floor. On ViZDoom it must report all four readings. Reopen the "12 kills"
 target only if the authors publish the seeds and the reading behind Table 4, and that reading is
 the 600-tic one.
+
+## R103 — REFUTED: Jev's action distributions over human Pokémon Showdown turns are good enough to beat a usage-frequency floor
+
+**Claim (bead `jev-jy7t.1.3`, PokéJev Stage A).** Given PokéChamp's own state text, Jev's Choice
+distribution over a side's legal actions predicts human Gen 9 OU actions:
+- at or above PokéChamp-GPT-4o's published top-1 (arXiv 2503.04094 Table 1: player ≥ 0.30, opponent ≥ 0.16);
+- **and** with lower log-loss than a zero-call usage-frequency floor.
+
+**Measured 2026-09-25, live, `jev-1.13.0`.** Prereg `4452865`, sample `6b0f798` (fixed before any
+call), results `d5da3f3`. There were 2,000 rows from `milkkarten/pokechamp` test@`b5820ff`, 500 per
+Elo band.
+
+| | Jev | Usage floor | Uniform |
+|---|---:|---:|---:|
+| Player top-1 | 0.3365 | 0.3495 | 0.0740 |
+| Opponent top-1 | 0.2235 | 0.1865 | 0.0730 |
+| Player log-loss | 2.046 | 1.735 | 2.034 |
+| Opponent log-loss | 3.900 | 2.541 | 3.144 |
+
+- Top-1 clears the published rows, but so does the floor. **Table 1 is not a bar a zero-call floor
+  fails.**
+- On the player slot Jev ties the floor (McNemar χ² 0.80).
+- On the opponent slot Jev beats the floor on top-1 (χ² 10.57).
+- Log-loss is worse than **uniform** on both sides, for the same reason on both: overconfidence.
+  - ECE is 0.215 for the player and 0.174 for the opponent.
+  - The true opponent action gets under 1% on 11.8% of rows.
+
+**What it refutes.** Using Jev's probabilities *as probabilities*, for example as chance-node weights
+or a calibrated prior, on this task. It does not refute Jev's ranking: opponent top-1 is the best of
+the four arms. Stage B uses the ranking, as preregistered before this result.
+
+**Retry condition.** Two separate ways to reopen:
+1. A preregistered mixture of Jev's distribution with the usage floor, its weight fit only on the
+   1,000 calibration battles (`stage-a/calib.jsonl`), that beats the floor's log-loss on a fresh
+   sample drawn from the same split with a new seed.
+2. A future `jev-latest` that resolves to a new model, rerun on this same sample with `stage_a.py
+   run`, `score`.
