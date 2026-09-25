@@ -1731,6 +1731,31 @@ been checked.
 **A closed row is closed. Do not re-litigate it; spend the tick on the next row.** Reopening
 requires a new fact, recorded as a retry condition.
 
+### LOSS DEPTH — a loss after one design is a result about the design, not about Jev
+
+Joshua, 2026-09-25, verbatim: *"every loss means we're not going deep enough, in my opinion -
+we've got a whole library of advanced skills"*.
+
+A preregistered FAIL stands: the bar never moves and the NEGATIVE_EVIDENCE row stays. But a
+FAIL on the first question design only rules out that design. Before a candidate counts as
+closed under the rule above, run the loss-depth loop on it, in this order:
+
+1. **Autopsy, keyless.** Error analysis on the committed failing rows (`skill://error-discovery`
+   method): sample failures across clusters, name each failure mode, count it. Separate the four
+   causes the `typesafe-ai` skill names: missing evidence in the state, question design, harness
+   or code bug, model limit.
+2. **Hypotheses.** Three to five ranked, falsifiable ones (`skill://diagnosing-bugs` phase 3),
+   each naming the one variable it changes, checked against the live TypeSafe docs and cookbooks
+   (confidence, consistency, hierarchical choice, relative comparison) before any call.
+3. **A red-capable replay loop.** A fixed dev slice of the failing cases, replayed through one
+   changed variable at a time. Dev slices are never the held-out set.
+4. **Held-out retest.** Only the best design goes to a fresh, preregistered held-out run with the
+   original bar or a stricter one.
+
+The loop ends when a held-out retest passes, or when the autopsy shows the loss is a model limit
+no state or question change reaches (named, with the rows that show it). Either outcome is
+recorded against the original NEGATIVE_EVIDENCE row as its retry condition being tested.
+
 ### THE LOOP, and it does not stop for permission
 
 ```
