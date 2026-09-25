@@ -35,13 +35,18 @@ def power(
     simulations: int,
     seed: int,
     capped_stay: bool,
+    fixed_control: bool,
 ) -> float:
     rng = np.random.default_rng(seed)
     rejections = 0
+    control_fixed = np.array([value for value, _ in random_values])
     for _ in range(simulations):
-        control_idx = rng.integers(0, len(random_values), size=n)
+        if fixed_control:
+            control = control_fixed
+        else:
+            control_idx = rng.integers(0, len(random_values), size=n)
+            control = np.array([random_values[i][0] for i in control_idx])
         treatment_idx = rng.integers(0, len(random_values), size=n)
-        control = np.array([random_values[i][0] for i in control_idx])
         treatment = np.array([random_values[i][0] for i in treatment_idx])
         if capped_stay:
             treatment = np.where(
@@ -63,11 +68,16 @@ def main() -> int:
     parser.add_argument(
         "--rows", default="work/pokeagent-emerald/baseline-results.jsonl"
     )
-    parser.add_argument("--n", type=int, default=38)
+    parser.add_argument("--n", type=int, default=80)
     parser.add_argument("--simulations", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=20260925)
-    parser.add_argument("--shifts", type=int, nargs="+", default=[50, 75, 150])
+    parser.add_argument("--shifts", type=int, nargs="+", default=[75, 100])
     parser.add_argument("--capped-stay", action="store_true")
+    parser.add_argument(
+        "--fixed-control",
+        action="store_true",
+        help="Use the committed random rows as the fixed control arm",
+    )
     args = parser.parse_args()
 
     rows_path = Path(args.rows)
@@ -76,11 +86,13 @@ def main() -> int:
         "rows_sha256": hashlib.sha256(rows_path.read_bytes()).hexdigest(),
         "random_n": len(values),
         "random_values": values,
-        "n_per_arm": args.n,
+        "n_per_treatment_arm": args.n,
+        "control_n": len(values) if args.fixed_control else args.n,
         "simulations": args.simulations,
         "seed": args.seed,
         "alpha": 0.05,
         "capped_stay": args.capped_stay,
+        "fixed_control": args.fixed_control,
         "alternative": "treatment macro count lower than random",
         "power_by_shift": {
             str(shift): power(
@@ -90,6 +102,7 @@ def main() -> int:
                 args.simulations,
                 args.seed + shift,
                 args.capped_stay,
+                args.fixed_control,
             )
             for shift in args.shifts
         },

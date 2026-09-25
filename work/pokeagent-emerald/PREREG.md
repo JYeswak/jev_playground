@@ -70,11 +70,12 @@ At the harness normal preset (80 frames/s, 18 frames per macro), the rate is 4.4
 
 **Uniform-random baseline:** for each seed 1000..1032, choose each legal input independently and uniformly for at most 500 macros from the same macro-228 start. Stop on the goal or at the cap. The runner records the goal boolean, macro count, start/final compact state, UTC timestamp, runner SHA-256, harness SHA, and ROM SHA-1. Keyless rerun: 26/33 reached the goal; 7 failures are assigned the cap of 500 macros.
 
-**Power/MDE choice:** the future primary comparison is one-sided Mann-Whitney on macro counts with failures represented as 500, success rate not below random, alpha 0.05, and p<0.05. The committed power_mwu.py runs independent control/treatment resamples over the 33 random rows with 2,000 simulations. Optimistic mode (capped-stay false) at N=38 gives power 0.6375 for a 50-macro shift and 0.8125 for 75. Realistic capped-stay mode keeps failed runs at 500: N=38 gives 0.5285 for 75 and 0.8455 for 150; N=80 gives 0.809 for 75. Primary prereg: capped-stay, N=80, MDE about 75 macros. Fixed-sequence remains descriptive N=1.
+**Power/MDE choice:** the future primary comparison is one-sided Mann-Whitney on macro counts with failures represented as 500, success rate not below random, alpha 0.05, and p<0.05. The committed power_mwu.py runs independent control/treatment resamples over the 33 random rows with 2,000 simulations. The fixed-control primary uses the 33 committed random rows as control with --capped-stay: N=80 gives power 0.637 for a 75-macro shift and 0.810 for a 100-macro shift. The primary prereg MDE is therefore about 100 macros against the fixed 33-row random control. The resampled-control mode is retained as a sensitivity check only. Fixed-sequence remains descriptive N=1.
 
 **Future Jev choice rule:** argmax over Jev probabilities is deterministic from this emulator start and is N=1 descriptive. The primary N=80 segment samples one macro from the returned 11-way probabilities using a preregistered per-seed PRNG; each seed gets the same start, cap, goal, and no-model baselines.
 
-**Future Jev bar:** after key rotation, Jev success rate must not be below random and the seeded Jev macro-count distribution must beat random by the one-sided Mann-Whitney p<0.05 criterion. If fewer than five random runs reach the goal, the macro-count comparison is NO-CLAIM rather than a fabricated median.
+**Future Jev bar:** after key rotation, Jev success rate must not be below random and the seeded Jev macro-count distribution must beat the fixed-control random baseline by the one-sided Mann-Whitney p<0.05 criterion. If fewer than five random runs reach the goal, the macro-count comparison is NO-CLAIM rather than a fabricated median.
+
 
 **Pilot boundary:** seven untracked baseline-pilot-v*.jsonl files remain from pre-final keyless pilots; they are not committed results and are named here rather than silently treated as evidence.
 
