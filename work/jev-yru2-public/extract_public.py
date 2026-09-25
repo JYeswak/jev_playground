@@ -9,17 +9,16 @@ selected command set. It never calls Jev.
 from __future__ import annotations
 
 import hashlib
+import http.client
 import io
 import json
-import random
 import re
 import subprocess
 import sys
 import tarfile
-import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parent
 UA = "OpenAI File Downloader, XaiImageApiFetch/1.0"
@@ -27,24 +26,45 @@ CODELOAD = "https://codeload.github.com"
 SEED = 20260925
 NON_TARGET_LIMIT = 100
 LICENSES = {"MIT", "Apache-2.0", "BSD-2-Clause", "BSD-3-Clause"}
-REPOS = [
-    "nektos/act",
-    "go-gitea/gitea",
-    "fastapi/full-stack-fastapi-template",
-    "sdras/awesome-actions",
-    "goreleaser/goreleaser",
-    "ubicloud/ubicloud",
-    "cobusgreyling/loop-engineering",
-    "Agents365-ai/drawio-skill",
-    "community/community",
-    "hect0x7/JMComic-Crawler-Python",
-]
+SEARCH_QUERY = "topic:github-actions archived:false is:public"
+SEARCH_URL = "https://github.com/search?q=topic%3Agithub-actions+archived%3Afalse+is%3Apublic&type=repositories&s=stars&o=desc"
+SEARCH_FROZEN_AT = "2026-09-25T17:01:59Z"
+REPO_STARS = {
+    "nektos/act": "72.1k",
+    "go-gitea/gitea": "58.2k",
+    "fastapi/full-stack-fastapi-template": "45.8k",
+    "sdras/awesome-actions": "28.3k",
+    "goreleaser/goreleaser": "16.1k",
+    "ubicloud/ubicloud": "12.3k",
+    "cobusgreyling/loop-engineering": "11.3k",
+    "Agents365-ai/drawio-skill": "9.7k",
+    "community/community": "8.8k",
+    "hect0x7/JMComic-Crawler-Python": "7.4k",
+}
+REPOS = list(REPO_STARS)
 
 
 def get_bytes(url: str) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=60) as response:
-        return response.read()
+    parts = urlsplit(url)
+    if (
+        parts.scheme != "https"
+        or parts.netloc != "codeload.github.com"
+        or parts.query
+        or parts.fragment
+    ):
+        raise ValueError(f"unexpected archive URL: {url}")
+    connection = http.client.HTTPSConnection(parts.netloc, timeout=60)
+    try:
+        connection.request("GET", parts.path, headers={"User-Agent": UA})
+        response = connection.getresponse()
+        body = response.read()
+        if response.status != 200:
+            raise RuntimeError(
+                f"archive request returned HTTP {response.status}: {url}"
+            )
+        return body
+    finally:
+        connection.close()
 
 
 def resolve_head(repo: str) -> tuple[str, str]:
@@ -53,6 +73,7 @@ def resolve_head(repo: str) -> tuple[str, str]:
         check=True,
         capture_output=True,
         text=True,
+        timeout=60,
     )
     branch = next(
         line.split()[1].removeprefix("refs/heads/")
@@ -62,7 +83,7 @@ def resolve_head(repo: str) -> tuple[str, str]:
     commit = next(
         line.split()[0]
         for line in result.stdout.splitlines()
-        if line.endswith("\tHEAD")
+        if line.endswith("\tHEAD") and not line.startswith("ref:")
     )
     return branch, commit
 
@@ -79,7 +100,7 @@ def scalar_value(rest: str) -> str:
     rest = rest.strip()
     if rest.startswith('"') and rest.endswith('"'):
         try:
-            return json.loads(rest)
+            return json.JSONDecoder().decode(rest)
         except json.JSONDecodeError:
             return rest[1:-1]
     if rest.startswith("'") and rest.endswith("'"):
@@ -175,10 +196,13 @@ def main() -> int:
             license_path = license_member.name.split("/", 1)[1]
             license_url = f"https://github.com/{repo}/blob/{commit_sha}/{license_path}"
             workflow_members = sorted(
-                m
-                for m in members
-                if "/.github/workflows/" in m.name
-                and m.name.endswith((".yml", ".yaml"))
+                (
+                    m
+                    for m in members
+                    if "/.github/workflows/" in m.name
+                    and m.name.endswith((".yml", ".yaml"))
+                ),
+                key=lambda m: m.name,
             )
             for member in workflow_members:
                 content_bytes = tar.extractfile(member).read()
@@ -212,7 +236,7 @@ def main() -> int:
                     )
 
     sys.path.insert(0, str(Path(__file__).parents[1] / "gate-question-gap"))
-    import readout5  # type: ignore[import-not-found]  # noqa: E402
+    import readout5  # type: ignore[import-not-found]
 
     target: list[dict] = []
     non_target: list[dict] = []
@@ -221,12 +245,15 @@ def main() -> int:
         row = {**row, "shape": kind}
         row["cmdSha"] = sha256_text(row["command"])
         (target if kind else non_target).append(row)
-
-    rng = random.Random(SEED)
     sample = (
         non_target
         if len(non_target) <= NON_TARGET_LIMIT
-        else rng.sample(non_target, NON_TARGET_LIMIT)
+        else sorted(
+            non_target,
+            key=lambda row: hashlib.sha256(
+                f"{SEED}:{row['repo']}:{row['workflow']}:{row['line']}:{row['cmdSha']}".encode()
+            ).hexdigest(),
+        )[:NON_TARGET_LIMIT]
     )
     selected = sorted(
         target + sample,
@@ -258,6 +285,10 @@ def main() -> int:
     metadata = {
         "unit": "jev-yru2",
         "fetched_at_utc": fetched_at,
+        "search_query": SEARCH_QUERY,
+        "search_url": SEARCH_URL,
+        "search_frozen_at_utc": SEARCH_FROZEN_AT,
+        "top_n_by_stars": REPO_STARS,
         "extractor_sha256": sha256_bytes(Path(__file__).read_bytes()),
         "source_query": {
             "head": "git ls-remote --symref https://github.com/OWNER/REPO.git HEAD",
