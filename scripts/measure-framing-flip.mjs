@@ -18,7 +18,7 @@
 
 const key = process.env.TYPESAFE_API_KEY;
 if (!key) {
-  console.error('ERROR no key in env. Run under: infisical run --projectId=... -- node scripts/measure-framing-flip.mjs');
+  console.error('NOT_RUN (no TypeSafe key in env; run under infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba --env=prod -- node scripts/measure-framing-flip.mjs to spend)');
   process.exit(2);
 }
 const N = Number(process.argv[2] || 10);

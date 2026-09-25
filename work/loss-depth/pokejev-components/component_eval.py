@@ -13,6 +13,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import random
 import sys
 from collections import Counter
@@ -21,6 +22,21 @@ from pathlib import Path
 COMPONENT_DIR = Path(__file__).resolve().parent
 ROOT = COMPONENT_DIR.parents[2]
 POKE = ROOT / "work" / "poke-jev"
+POKECHAMP_SETS = Path(
+    os.environ.get(
+        "POKECHAMP_SETS_PATH",
+        str(
+            ROOT
+            / "pokechamp"
+            / "poke_env"
+            / "data"
+            / "static"
+            / "gen9"
+            / "ou"
+            / "sets_1000.json"
+        ),
+    )
+)
 STAGE_A = POKE / "stage-a"
 STAGE_B = POKE / "stage-b"
 SPLIT_SEED = "pokejev-component-split-v1"
@@ -29,6 +45,21 @@ SPLIT_PATH = COMPONENT_DIR / "decision-split-v1.json"
 ALPHA_PATH = COMPONENT_DIR / "frozen-alpha-v1.json"
 BOOTSTRAP_REPS = 5000
 BOOTSTRAP_SEED = 20260925
+
+
+def require_pokechamp_sets() -> None:
+    if not POKECHAMP_SETS.is_file():
+        print(
+            "NOT_RUN (missing prerequisite: git clone "
+            "https://github.com/sethkarten/pokechamp && "
+            "git -C pokechamp checkout 0f84c46)",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
+
+
+if any(flag in sys.argv for flag in ("--dev", "--heldout", "--leaf-dev")):
+    require_pokechamp_sets()
 
 sys.path.insert(0, str(POKE))
 import replay  # noqa: E402
@@ -183,18 +214,7 @@ def stage_a_component_rows(
 ]:
     rows, jev = stage_a_rows(split, part)
     p_switch, p_tera = calibration_params()
-    sets = json.loads(
-        (
-            ROOT
-            / "pokechamp"
-            / "poke_env"
-            / "data"
-            / "static"
-            / "gen9"
-            / "ou"
-            / "sets_1000.json"
-        ).read_text()
-    )
+    sets = json.loads(POKECHAMP_SETS.read_text())
     result = {}
     for side, label_key, options_key in (
         ("player", "player_label", "player_options"),

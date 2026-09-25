@@ -229,6 +229,10 @@ def referenced_missing_path(
     return None
 
 
+def is_template_command(command: str) -> bool:
+    return bool(re.search(r"<[^>\n]+>", command))
+
+
 def classify(
     command: str, result: dict[str, object], readme: str, clone: Path, tracked: set[str]
 ) -> tuple[str, str]:
@@ -317,8 +321,7 @@ def render_receipt(
     uv_version: str,
     timeout: int,
 ) -> None:
-    command_rows = [row for row in rows if row["source"] != "post"]
-    failures = [row for row in rows if row["rc"] != 0]
+    failures = [row for row in rows if row["rc"] not in (0, "TEMPLATE")]
     lines = [
         "# README stranger run (2026-09-25)",
         "",
@@ -334,7 +337,7 @@ def render_receipt(
         "",
         "## Command inventory",
         "",
-        "The script extracts runnable fenced commands and inline command spans in README order. Exact duplicate commands run once; all README line occurrences are listed.",
+        "The script extracts runnable fenced commands and inline command spans in README order. Exact duplicate commands run once; all README line occurrences are listed. Commands containing `<...>` are listed as `TEMPLATE` and are never executed.",
         "",
         "| # | README lines | command |",
         "|---:|---|---|",
@@ -349,7 +352,7 @@ def render_receipt(
         "",
         "`Quoted numbers` checks numbers in a same-line README `#` comment; it is a substring check, not semantic verification.",
         "",
-        "| # | README lines | command | exit | wall s | quoted numbers | failure class | first error line |",
+        "| # | README lines | command | exit/status | wall s | quoted numbers | failure class | first error line |",
         "|---:|---|---|---:|---:|---|---|---|",
     ]
     for number, row in enumerate(rows, 1):
@@ -366,11 +369,11 @@ def render_receipt(
         )
     lines += [
         "",
-        f"Result: `{len(rows)}` rows, `{sum(int(row['rc']) == 0 for row in rows)}` exit 0, `{len(failures)}` nonzero.",
+        f"Result: `{len(rows)}` rows, `{sum(row['rc'] == 0 for row in rows)}` exit 0, `{len(failures)}` nonzero, `{sum(row['rc'] == 'TEMPLATE' for row in rows)}` TEMPLATE.",
         "",
         "## Failures requiring README action",
         "",
-        "The classes below are assigned from the captured output and a fresh-clone `git ls-files` check. `expected nonzero` is retained for README commands that explicitly document a failing bar; every other nonzero row is listed for follow-up.",
+        "The classes below are assigned from the captured output and a fresh-clone `git ls-files` check. `expected nonzero` is retained for README commands that explicitly document a failing bar; `TEMPLATE` commands are not failures and are never executed; every other nonzero row is listed for follow-up.",
         "",
     ]
     action_rows = [
@@ -449,21 +452,35 @@ def main() -> int:
     rows: list[dict[str, object]] = []
     for index, item in enumerate(commands, 1):
         command = str(item["command"])
-        cwd = (
-            outside
-            if command.startswith(
-                (
-                    "git clone https://github.com/JYeswak/jev_playground",
-                    "cd jev_playground",
+        quoted, quoted_missing = cited_numbers(item, "")
+        if is_template_command(command):
+            result = {
+                "rc": "TEMPLATE",
+                "wall_s": 0.0,
+                "error": "",
+                "last": "",
+                "output": "",
+            }
+            failure_class = "TEMPLATE"
+            classification_note = "placeholder command listed but not executed"
+        else:
+            cwd = (
+                outside
+                if command.startswith(
+                    (
+                        "git clone https://github.com/JYeswak/jev_playground",
+                        "cd jev_playground",
+                    )
                 )
+                else clone
             )
-            else clone
-        )
-        result = run_command(command, cwd, env, logs / f"{index:03d}.log", args.timeout)
-        quoted, quoted_missing = cited_numbers(item, str(result["output"]))
-        failure_class, classification_note = classify(
-            command, result, readme, clone, tracked
-        )
+            result = run_command(
+                command, cwd, env, logs / f"{index:03d}.log", args.timeout
+            )
+            quoted, quoted_missing = cited_numbers(item, str(result["output"]))
+            failure_class, classification_note = classify(
+                command, result, readme, clone, tracked
+            )
         rows.append(
             {
                 "source": "command",
@@ -480,7 +497,8 @@ def main() -> int:
             }
         )
         print(
-            f"{index:02d} rc={result['rc']} {result['wall_s']}s {command}", flush=True
+            f"{index:02d} status={result['rc']} {result['wall_s']}s {command}",
+            flush=True,
         )
     render_receipt(
         args.out,
