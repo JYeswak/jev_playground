@@ -129,9 +129,26 @@ authorize a live call. The output was written under the ignored `var/agent-tmp/`
 The terminal reason was independently replayed against the same image and action sequence:
 `south` returned reward `-10`, `done=true`, `game_over=true`, and the engine text said
 `A lurking grue ... devoured you` / `You have died`. This was a death/game-over termination,
-not the 35-step cap. The uniform count gives only a provisional projection for the other eight
-planned runs: `8 × 257 = 2,056` prior requests if their traces had the same count; the live Jev
-seed-1 count must replace this proxy before projecting the remaining eight.
+not the 35-step cap. The Zork1 count must not be applied to the other games.
+
+Additional keyless uniform arms:
+
+```text
+detective seed=1 status=ok steps=40 done=true final_score=300 max_score=300
+wall_s=155.309 prior_requests=1023 prior_calls=0 prior_failed=0
+
+deephome seed=1 incomplete: outer 1800-second command timeout during step 6
+completed_steps=5 cumulative_prior_requests=314 prior_calls=0 prior_failed=0
+no final row; not scored and not treated as a completed run
+```
+
+The Detective run completed before its 50-step cap. Deephome is too slow to complete under the
+current keyless command deadline: its first five completed steps average 62.8 prior requests,
+so the only honest game-specific proxy is `35 × (314 / 5) ≈ 2,198` requests per Deephome run;
+this is explicitly **incomplete**, not a score or a Jev budget. Before the live checkpoint, the
+uniform-count proxy for the other eight runs is therefore Zork1 `2 × 257 = 514`, Deephome
+`3 × 2,198 ≈ 6,594`, Detective `3 × 1,023 = 3,069`, total **≈10,177** requests. The live Jev
+seed-1 count must replace these uniform proxies before projecting the remaining eight.
 
 ## Live commands
 
