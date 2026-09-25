@@ -300,3 +300,10 @@ trace showed Jev selected the spoken `H:MM AM/PM` value, while MiniWoB's native 
 24-hour `HH:MM`. The v3 harness now adds a guarded formatter that maps the spoken value to the
 native value (for example `4:03 PM` -> `16:03`) only when `MINIWOB_V3=1`. The exact ten keys and
 `>=8/10` bar are unchanged; first and rerun rows are both retained.
+
+## Dev amendment: time formatter correction
+
+The first formatter rerun still offered both spoken and native values, and Jev continued selecting
+the spoken form (0/5 enter-time). The corrected harness now replaces each v3 `INPUT_TIME` candidate
+with its native 24-hour `HH:MM` value so the model cannot choose the browser-invalid representation.
+The exact ten keys and `>=8/10` bar remain unchanged; both earlier reruns remain recorded.
