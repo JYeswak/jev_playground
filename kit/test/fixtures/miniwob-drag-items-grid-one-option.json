@@ -1,0 +1,85 @@
+{
+  "source": "work/miniwob-jev/rows/miniwob-floors-v2.heldout.jsonl:drag-items-grid seed 100",
+  "captured_row": {
+    "action_space": "farama CLICK_ELEMENT(ref) + FOCUS_ELEMENT_AND_TYPE_TEXT(ref,text)",
+    "action_warnings": [],
+    "actions": [
+      {
+        "ref": 0,
+        "type": "none"
+      },
+      {
+        "ref": 0,
+        "type": "none"
+      },
+      {
+        "ref": 0,
+        "type": "none"
+      },
+      {
+        "ref": 0,
+        "type": "none"
+      },
+      {
+        "ref": 0,
+        "type": "none"
+      },
+      {
+        "ref": 0,
+        "type": "none"
+      },
+      {
+        "ref": 0,
+        "type": "none"
+      },
+      {
+        "ref": 0,
+        "type": "none"
+      },
+      {
+        "ref": 0,
+        "type": "none"
+      },
+      {
+        "ref": 0,
+        "type": "none"
+      }
+    ],
+    "benchmark": "browsergym-miniwob",
+    "data_mode": "default",
+    "done": false,
+    "env": "miniwob",
+    "env_launch_s": 4.886,
+    "env_reward": 0,
+    "episode_max_ms": 1000000,
+    "episode_ms": 6884,
+    "error": null,
+    "js_seed": 824840,
+    "js_seed_in_benchmark_js_seeds": false,
+    "max_step_s": 0.745,
+    "max_steps": 10,
+    "mean_step_s": 0.6511,
+    "page_reload_each_episode": true,
+    "policy": "random",
+    "raw_reward": 0,
+    "reason": null,
+    "rep": 0,
+    "reset_s": 0.4577,
+    "reward_miniwob_10s": 0,
+    "seed": 100,
+    "seed_in_benchmark_list": false,
+    "state_bytes_step0": 338,
+    "steps": 10,
+    "success": 0,
+    "success_strict": 0,
+    "task": "drag-items-grid",
+    "truncated": true,
+    "utterance": "Drag Tonia to the top right.",
+    "wait_ms": 500,
+    "wall_s": 7.3208
+  },
+  "observed_options": [
+    "none"
+  ],
+  "observation_source": "docs/demos/upstream-repro/miniwob-jev-prereg-20260925.md:106"
+}

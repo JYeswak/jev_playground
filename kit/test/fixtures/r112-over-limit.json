@@ -1,0 +1,7 @@
+{
+  "source": "work/jev-state-size/calibration-osworld-r3.tsv:18",
+  "task": "thunderbird/a1af9f1c-50d5-4bc3-a51e-4d9b425ff638",
+  "state_bytes": 84544,
+  "question_bytes": 473,
+  "outcome": "max_tokens_exceeded"
+}
