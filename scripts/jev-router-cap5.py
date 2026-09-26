@@ -171,7 +171,15 @@ async def main() -> int:
             item["fixed"] = await call(client, key, FIXED_MODEL, state, labels, row)
             return item
 
-        stopped = await checkpoint_run(rows, process, checkpoint, id_key="i")
+        stopped = await checkpoint_run(
+            rows,
+            process,
+            checkpoint,
+            id_key="i",
+            live=True,
+            reach=ROOT / "work/jev-38qj/reach-receipt.json",
+            items_path=DATASET,
+        )
     results = (
         [
             json.loads(line)

@@ -1,0 +1,11 @@
+{
+  "minority_count": 200,
+  "mode": "auc",
+  "negative_count": 200,
+  "perfect_auc": 1.0,
+  "positive_count": 200,
+  "status": "REACHABLE",
+  "threshold": 0.7,
+  "items_path": "work/choice-banking77/subset.jsonl",
+  "items_sha256": "8af5785efc7c6fb12be701ee4ae16eded706e4518e06460635c5f0199c1c2479"
+}

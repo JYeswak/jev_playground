@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import inspect
+import hashlib
 import json
 import os
 import subprocess
@@ -45,6 +46,29 @@ def _completed_ids(path: Path, id_key: str) -> set[str]:
     return completed
 
 
+def verify_reachability(
+    reach_path: str | os.PathLike[str], items_path: str | os.PathLike[str]
+) -> None:
+    """Refuse live work unless a reachable receipt matches the exact items file."""
+    receipt_path = Path(reach_path)
+    if not receipt_path.exists():
+        raise RuntimeError(f"live run requires --reach receipt: {receipt_path}")
+    try:
+        receipt = json.loads(receipt_path.read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"invalid --reach receipt: {receipt_path}") from exc
+    if receipt.get("status") != "REACHABLE":
+        raise RuntimeError(
+            f"live run requires REACHABLE receipt, got {receipt.get('status')!r}"
+        )
+    expected = receipt.get("items_sha256")
+    if not isinstance(expected, str) or not expected:
+        raise RuntimeError("--reach receipt has no items_sha256")
+    actual = hashlib.sha256(Path(items_path).read_bytes()).hexdigest()
+    if actual != expected:
+        raise RuntimeError("--reach receipt items_sha256 does not match the items file")
+
+
 class StopRun(Exception):
     """Stop before the next item without writing a synthetic row."""
 
@@ -68,6 +92,9 @@ async def run(
     out_path: str | os.PathLike[str],
     *,
     id_key: str = "id",
+    live: bool = False,
+    reach: str | os.PathLike[str] | None = None,
+    items_path: str | os.PathLike[str] | None = None,
 ) -> str | None:
     """Process items exactly once per checkpoint id and append each completed row.
 
@@ -78,8 +105,11 @@ async def run(
     path = Path(out_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     _repair_trailing_line(path)
+    if live:
+        if reach is None or items_path is None:
+            raise RuntimeError("live run requires --reach and items_path")
+        verify_reachability(reach, items_path)
     completed = _completed_ids(path, id_key)
-
     with path.open("ab") as stream:
         for item in items:
             if id_key not in item:
@@ -192,6 +222,9 @@ def _main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--detach", action="store_true")
     parser.add_argument("--attached", action="store_true")
+    parser.add_argument("--live", action="store_true")
+    parser.add_argument("--reach", type=Path)
+    parser.add_argument("--items", type=Path)
     parser.add_argument("--pid-file", type=Path)
     parser.add_argument("--heartbeat-file", type=Path)
     parser.add_argument("--_child", action="store_true", help=argparse.SUPPRESS)
@@ -200,6 +233,15 @@ def _main() -> int:
     command = list(args.command)
     if command and command[0] == "--":
         command = command[1:]
+    if args.live:
+        if args.reach is None or args.items is None:
+            print("live run requires --reach RECEIPT and --items FILE", file=sys.stderr)
+            return 2
+        try:
+            verify_reachability(args.reach, args.items)
+        except RuntimeError as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
     if not args.detach and not args._child:
         parser.error("pass --detach to supervise a command")
     if args.pid_file is None or args.heartbeat_file is None:

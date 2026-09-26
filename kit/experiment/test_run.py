@@ -151,6 +151,69 @@ class SharedRunnerTest(unittest.TestCase):
                 time.sleep(0.02)
             self.assertIn("stopped", heartbeat_path.read_text())
 
+    def test_live_refuses_without_reach_receipt(self) -> None:
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            items = root / "items.jsonl"
+            items.write_text('{"id":"a"}\n')
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(RUNNER),
+                    "--live",
+                    "--items",
+                    str(items),
+                    "--pid-file",
+                    str(root / "runner.pid"),
+                    "--heartbeat-file",
+                    str(root / "runner.heartbeat"),
+                    "--",
+                    sys.executable,
+                    "-c",
+                    "pass",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("live run requires --reach", result.stderr)
+
+    def test_live_refuses_nonreachable_receipt(self) -> None:
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            items = root / "items.jsonl"
+            items.write_text('{"id":"a"}\n')
+            receipt = root / "reach.json"
+            receipt.write_text(
+                json.dumps({"status": "UNDERPOWERED", "items_sha256": "wrong"})
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(RUNNER),
+                    "--live",
+                    "--detach",
+                    "--reach",
+                    str(receipt),
+                    "--items",
+                    str(items),
+                    "--pid-file",
+                    str(root / "runner.pid"),
+                    "--heartbeat-file",
+                    str(root / "runner.heartbeat"),
+                    "--",
+                    sys.executable,
+                    "-c",
+                    "pass",
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("REACHABLE", result.stderr)
+
 
 if __name__ == "__main__":
     unittest.main()

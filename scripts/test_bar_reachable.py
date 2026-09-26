@@ -100,6 +100,40 @@ class BarReachabilityTests(unittest.TestCase):
         self.assertEqual(receipt["max_discordant_wins"], 3)
         self.assertEqual(receipt["minimum_attainable_p"], 0.25)
 
+    def test_auc_minority_class_refuses_70_3(self):
+        code, receipt = run_checker(
+            "--mode",
+            "auc",
+            "--positive-count",
+            "70",
+            "--negative-count",
+            "3",
+            "--threshold",
+            "0.70",
+            "--min-minority-class",
+            "5",
+        )
+        self.assertEqual(code, 1)
+        self.assertEqual(receipt["status"], "UNDERPOWERED")
+        self.assertEqual(receipt["minority_count"], 3)
+
+    def test_auc_minority_class_allows_40_30(self):
+        code, receipt = run_checker(
+            "--mode",
+            "auc",
+            "--positive-count",
+            "40",
+            "--negative-count",
+            "30",
+            "--threshold",
+            "0.70",
+            "--min-minority-class",
+            "5",
+        )
+        self.assertEqual(code, 0)
+        self.assertEqual(receipt["status"], "REACHABLE")
+        self.assertEqual(receipt["minority_count"], 30)
+
 
 if __name__ == "__main__":
     unittest.main()

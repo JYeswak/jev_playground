@@ -200,17 +200,64 @@ def wilson_lower_bound(successes: int, trials: int) -> float:
     return (center - spread) / denominator
 
 
-def rate_reachability(trials: int, threshold: float) -> dict[str, Any]:
+def _minority_status(minority_count: int | None, minimum: int | None) -> str | None:
+    if minimum is None:
+        return None
+    if minimum < 1:
+        raise ValueError("minimum minority class count must be positive")
+    if minority_count is None:
+        raise ValueError("minority class count is required when a minimum is set")
+    if minority_count < 0:
+        raise ValueError("minority class count must be non-negative")
+    return "REACHABLE" if minority_count >= minimum else "UNDERPOWERED"
+
+
+def rate_reachability(
+    trials: int,
+    threshold: float,
+    minority_count: int | None = None,
+    minimum_minority: int | None = None,
+) -> dict[str, Any]:
     if not 0 < threshold <= 1:
         raise ValueError("rate threshold must be in (0, 1]")
     lower = wilson_lower_bound(trials, trials)
+    minority_status = _minority_status(minority_count, minimum_minority)
+    status = minority_status or ("REACHABLE" if lower >= threshold else "UNREACHABLE")
     return {
         "mode": "rate",
         "trials": trials,
         "perfect_successes": trials,
         "wilson_lower_bound_95": lower,
         "threshold": threshold,
-        "status": "REACHABLE" if lower >= threshold else "UNREACHABLE",
+        **(
+            {"minority_count": minority_count, "minimum_minority": minimum_minority}
+            if minimum_minority is not None
+            else {}
+        ),
+        "status": status,
+    }
+
+
+def auc_reachability(
+    positive_count: int,
+    negative_count: int,
+    threshold: float,
+    minimum_minority: int | None = None,
+) -> dict[str, Any]:
+    if positive_count <= 0 or negative_count <= 0:
+        raise ValueError("AUROC class counts must both be positive")
+    if not 0 < threshold <= 1:
+        raise ValueError("AUROC threshold must be in (0, 1]")
+    minority_count = min(positive_count, negative_count)
+    minority_status = _minority_status(minority_count, minimum_minority)
+    return {
+        "mode": "auc",
+        "positive_count": positive_count,
+        "negative_count": negative_count,
+        "minority_count": minority_count,
+        "threshold": threshold,
+        "perfect_auc": 1.0,
+        "status": minority_status or "REACHABLE",
     }
 
 
@@ -231,7 +278,7 @@ def flip_fixture_result(path: Path) -> dict[str, Any]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--mode", choices=("mcnemar", "rate"), default="mcnemar")
+    parser.add_argument("--mode", choices=("mcnemar", "rate", "auc"), default="mcnemar")
     parser.add_argument(
         "--flip-fixture",
         type=Path,
@@ -258,6 +305,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--alpha", type=float, default=0.05)
     parser.add_argument("--trials", type=int)
     parser.add_argument("--threshold", type=float)
+    parser.add_argument("--minority-count", type=int)
+    parser.add_argument("--min-minority-class", type=int)
+    parser.add_argument("--positive-count", type=int)
+    parser.add_argument("--negative-count", type=int)
     return parser
 
 
@@ -269,7 +320,27 @@ def main(argv: list[str] | None = None) -> int:
         elif args.mode == "rate":
             if args.trials is None or args.threshold is None:
                 raise ValueError("rate mode requires --trials and --threshold")
-            result = rate_reachability(args.trials, args.threshold)
+            result = rate_reachability(
+                args.trials,
+                args.threshold,
+                args.minority_count,
+                args.min_minority_class,
+            )
+        elif args.mode == "auc":
+            if (
+                args.positive_count is None
+                or args.negative_count is None
+                or args.threshold is None
+            ):
+                raise ValueError(
+                    "auc mode requires --positive-count, --negative-count, and --threshold"
+                )
+            result = auc_reachability(
+                args.positive_count,
+                args.negative_count,
+                args.threshold,
+                args.min_minority_class,
+            )
         else:
             if args.score_receipt:
                 if not args.floor or not args.used_rows:

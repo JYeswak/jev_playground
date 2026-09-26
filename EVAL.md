@@ -2613,3 +2613,12 @@ Prereg commit 94177069 froze 73 closed rows not in the original 70-row census: 7
 - Preregistered bar: reusable AUROC >= mean + 0.05 and >= 0.70 — **not met**.
 
 Boundary: held-out closed-bead outcomes since 2026-09-25, excluding the original 70 rows; no automatic promotion or memory write.
+## jev-4igl reachable preflight gate [test]
+
+The shared experiment runner now refuses live runs without a REACHABLE receipt whose items_sha256 matches the exact items file. scripts/bar-reachable.py now supports AUROC reachability and a minimum minority-class count; a 70/3 split returns UNDERPOWERED/refuses while 40/30 returns REACHABLE. scripts/jev-router-cap5.py passes the committed reach receipt and dataset path to the shared runner.
+
+- Verification: scripts/test_bar_reachable.py + kit/experiment/test_run.py -> 13/13 passed; py_compile passed.
+- Mutation: replacing both live reach checks with pass made test_live_refuses_nonreachable_receipt fail; restore matched the pre-mutation file with cmp and tests returned green.
+- Router reach receipt: work/jev-38qj/reach-receipt.json, status REACHABLE, items hash pinned to work/choice-banking77/subset.jsonl.
+
+Boundary: this is a keyless pre-spend refusal gate. No live router benchmark was run by this change.
