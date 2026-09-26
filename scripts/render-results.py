@@ -92,6 +92,28 @@ def miniwob(root: Path) -> tuple[str, str]:
     )
 
 
+def webscreen(root: Path) -> tuple[str, str]:
+    receipt = (root / "work/hermes-webscreen-repro/RECEIPT.md").read_text()
+    caught = re.search(r"caught ([\d,]+)/([\d,]+) on arm A", receipt)
+    clean = re.search(r"clean false positives 0/([\d,]+)", receipt)
+    screenings = re.search(r"([\d,]+) screenings in [\d,]+ requests", receipt)
+    spend = re.search(
+        r"([\d,]+) input tokens x \$0\.042/M = \*\*\$([\d.]+)\*\*", receipt
+    )
+    if caught is None or clean is None or screenings is None or spend is None:
+        raise ValueError("web-screen receipt is missing a measured result")
+    caught_count, caught_total = caught.groups()
+    clean_count = clean.group(1)
+    screening_count = screenings.group(1)
+    input_tokens, spend_usd = spend.groups()
+    return (
+        f"jev+local {caught_count}/{caught_total} arm A, "
+        f"0/{clean_count} clean withheld, {screening_count} screenings, "
+        f"{input_tokens} input tokens, ${spend_usd}",
+        "Noul / web-screen",
+    )
+
+
 def omp_judge_usage(root: Path) -> tuple[str, str]:
     result = subprocess.run(
         ["git", "show", "b74704c9:EVAL.md"],
@@ -125,6 +147,11 @@ def render_table(root: Path) -> str:
         ),
         ("SST-5 sentiment scoring", *sst5(root), "work/score-sst5/score.py"),
         ("SciFact claim verification", *scifact(root), "work/noul-scifact/score.py"),
+        (
+            "Replicated web-screen",
+            *webscreen(root),
+            "work/hermes-webscreen-repro/RECEIPT.md; kerpopule/hermes-jev-skills@cf9e84c",
+        ),
         (
             "MiniWoB v3 held-out",
             *miniwob(root),

@@ -35,10 +35,13 @@ class RenderResultsTest(unittest.TestCase):
             "SciFact claim verification",
             "MiniWoB v3 held-out",
             "OMP judge usage",
+            "Replicated web-screen",
         ):
             self.assertIn(surface, table)
         self.assertIn("1,711 calls", table)
         self.assertIn("find 1,595", table)
+        self.assertIn("68/78", table)
+        self.assertIn("kerpopule/hermes-jev-skills@cf9e84c", table)
         self.assertNotIn("BEIR SciFact reranking", table)
         self.assertNotIn("35.62%", table)
 
