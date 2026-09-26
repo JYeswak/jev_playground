@@ -1,0 +1,25 @@
+{
+  "bead": "jev-ax1q",
+  "window_start": "2026-09-25T22:14:00Z",
+  "window_end": "2026-09-26T22:14:00Z",
+  "worker_panes": 4,
+  "poll_interval_seconds": 60,
+  "expected_decisions": 5760,
+  "shadow_rows": 4200,
+  "successful_jev_rows": 4176,
+  "failed_jev_rows": 24,
+  "agreement": {
+    "paired_rows": 4176,
+    "agree": 13,
+    "disagree": 4163,
+    "rate": 0.0031130268199233715,
+    "incumbent_counts": {"idle": 3898, "working": 302},
+    "jev_choice_counts": {"no-agent": 3887, "idle": 276, "working": 13}
+  },
+  "latency_ms": {"p50": 334, "p95": 549, "max": 2161},
+  "usage": {"input_tokens": 1930297, "spend_usd": 0.081072474},
+  "failure_reasons": {"http": 20, "no-answers": 3, "transport": 1},
+  "commits": {"initial": "d28576e3", "spinner_fix": "b80ff35b"},
+  "finding": "The shadow disagreed almost everywhere because the features-only state was too thin; Jev selected no-agent for most idle incumbent rows. The incumbent remained authoritative throughout.",
+  "boundary": "Observe-only; no dispatch or paging was changed. Rows before b80ff35b included the no-spinner substring bug; restart is required for the corrected extractor. This is a shadow agreement receipt, not a Jev accuracy ruling."
+}
