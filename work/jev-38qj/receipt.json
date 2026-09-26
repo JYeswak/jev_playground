@@ -1,0 +1,28 @@
+{
+  "status": "INCOMPLETE_TIMEOUT",
+  "model": "jev-1.13.0",
+  "router_model": "typesafe/jev-router",
+  "fixed_model": "dots-studio/dots-3-note-preview:free",
+  "dataset": "work/choice-banking77/subset.jsonl",
+  "dataset_sha256": "8af5785efc7c6fb12be701ee4ae16eded706e4518e06460635c5f0199c1c2479",
+  "n_rows": 400,
+  "rows_committed": 0,
+  "process_timeout_seconds": 1800,
+  "before_usage": {
+    "at": "2026-09-26T21:05:52Z",
+    "usage": 100.176529287,
+    "usage_daily": 0,
+    "free_model_daily_requests": {"used": 0, "remaining": 1000}
+  },
+  "after_usage": {
+    "at": "2026-09-26T22:16:12Z",
+    "usage": 100.199746687,
+    "usage_daily": 0,
+    "free_model_daily_requests": {"used": 326, "remaining": 674}
+  },
+  "incremental_openrouter_usage_usd": 0.0232174,
+  "hard_cap_usd": 5.0,
+  "quality": null,
+  "reason": "The direct bounded runner did not finish within 1800 seconds and did not checkpoint rows; no quality or router-vs-fixed verdict is computed.",
+  "boundary": "The preregistered $5 cap was not approached. No benchmark accuracy claim is made. The 326 free-model request delta includes the attempted run; paid usage remained at the before value."
+}
