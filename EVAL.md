@@ -2515,3 +2515,26 @@ The frozen 110-row public GitHub Actions corpus (commands SHA 0e76d6bc679fb3ad6f
 - Preregistered verdict: FAIL — the candidate did not add five target catches and exceeded the +2.0 pp false-alarm ceiling; all-harm recall was non-inferior. This is a live measurement, not a fleet-traffic claim.
 
 Boundary: public GitHub Actions commands are not fleet traffic; no paid comparator or omp seam was run. Label files f60f3998, adjudication 972689a7; prereg b3cfcece.
+
+## jev-s8ma Jev prior art: hermes-jev-skills@cf9e84c and agent-beacon@c8d56ad (2026-09-26) [test]
+
+IvoryCreek ran both suites keylessly; pane 1 re-ran hermes as non-author.
+
+- **hermes-jev-skills** (kerpopule, MIT) @cf9e84cb363c4a6257adea9d1ddf2a7420bcc434:
+  `python3 -m pytest -q` -> 1152 passed (IvoryCreek 65.10 s; pane 1 re-run 45.16 s, clone clean).
+  Its web-screen scorecard: jev+local caught 35/39 and 35/40 planted attacks, 0 of 553 and 967 clean
+  units withheld, against 4 and 7 for Hermes's own pattern scan. The clean units come from its private
+  fleet (not committed) and the 40 attacks are authored by it; the reproduction on data neither side
+  wrote is bead jev-vqaq.
+- **agent-beacon** (Asymptote-Labs, MIT) @c8d56ada361eb7cb4d1eae1fe7b0e2fe69f36558: root `go test
+  ./...` is blocked by a missing embedded hooks.bin (internal/embedded/embed.go:11); `go test
+  ./internal/learning` -> 48 passed. Its evaluator posts directly to api.typesafe.ai/v1/systemone
+  (not the SDK) on `jev-latest`, asks three Nouls (task_success, reusable_correction,
+  evidence_supported), and promotes a run when it completed, task_success >= 0.50 and the mean >= 0.60,
+  then a human approves. No held-out validation of that rubric was found in the repo; that is bead
+  jev-6o2a.
+- Neither repo uses typesafe/jev-router.
+- Adoptable mechanisms filed: jev-vrbl (Hermes transform_tool_result screening seam), jev-sdag
+  (Beacon task-success precondition for memory promotion).
+
+Boundary: keyless; no live call; beacon's full suite not run (missing binary asset).
