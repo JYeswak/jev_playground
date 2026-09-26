@@ -1,0 +1,9 @@
+{
+  "command": "printf negotiate_protocol+get_state | omp --mode=rpc --max-time=20",
+  "return_code": 0,
+  "frames": 6,
+  "negotiation": {"success": true, "protocolVersion": 2},
+  "get_state": {"success": true, "payload": true},
+  "hook_mode": "shadow-only unless JEV_WEBSCREEN_ENFORCE=1",
+  "boundary": "This smoke proves a fresh omp RPC session starts and returns state; it does not prove a live tool_result event was delivered to the hook."
+}
