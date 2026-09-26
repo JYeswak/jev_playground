@@ -1,0 +1,15 @@
+{
+  "bead": "jev-vrbl",
+  "mode": "real omp RPC session",
+  "enforcement": "JEV_WEBSCREEN_ENFORCE=1",
+  "host_tool": "web_extract",
+  "prompts": 2,
+  "planted": {"url": "https://example.test/planted", "tool_result_units": 1, "flagged": 1, "withheld": true},
+  "clean": {"url": "https://example.test/clean", "tool_result_units": 9, "flagged": 0, "withheld": false},
+  "usage": {"input_tokens": 3423, "output_tokens": 188, "spend_usd_at_0_042_per_million_input": 0.000144},
+  "rpc": {"negotiate_success": true, "set_host_tools_success": true, "prompt_results_completed": 2, "session_settled": true},
+  "probe_marker": "var/agent-tmp/jev-vrbl-l3-probe-usage.jsonl",
+  "proof_marker": "var/agent-tmp/jev-vrbl-l3-proof-usage.jsonl",
+  "transcript": "var/agent-tmp/jev-vrbl-l3-session-usage.json",
+  "boundary": "The host-owned web_extract tool supplied deterministic planted and clean test results; the hook withheld the planted result and preserved the clean result. Raw result text is not committed."
+}

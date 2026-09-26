@@ -186,7 +186,8 @@ export default function jevWebscreenHook(pi: Host): void {
       if (!raw) return undefined;
       if (process.env.JEV_WEBSCREEN_ENFORCE !== "1") return undefined;
       const decision = await screenWebResult(tool, raw);
-      if (decision.replacement === undefined || decision.replacement === raw) return undefined;
+      const proofPath = process.env.JEV_WEBSCREEN_PROOF_PATH;
+      if (proofPath) await appendFile(proofPath, JSON.stringify({ ts: new Date().toISOString(), toolName: tool, status: decision.status, units: decision.units, flagged: decision.flagged.length, withheld: decision.replacement !== undefined, input_tokens: decision.usage?.input_tokens ?? null, output_tokens: decision.usage?.output_tokens ?? null }) + "\n").catch(() => {});
       return { content: [{ type: "text", text: decision.replacement }], details: { screening: decision.status, units: decision.units, flagged: decision.flagged.length, model: MODEL } };
     } catch {
       return undefined;
