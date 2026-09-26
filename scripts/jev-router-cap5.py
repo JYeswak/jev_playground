@@ -24,6 +24,7 @@ RECEIPT = ROOT / "work/jev-38qj/receipt.json"
 
 import sys
 
+sys.path.insert(0, str(ROOT / "upstream/typesafe-ai/typesafe-sdk-python/src"))
 sys.path.insert(0, str(ROOT / "upstream/typesafe-ai/system-one-adapter-python/src"))
 from system_one_adapter import AsyncSystemOneAdapterClient  # noqa: E402
 from system_one_adapter.providers.openai import AsyncOpenAIProvider  # noqa: E402
