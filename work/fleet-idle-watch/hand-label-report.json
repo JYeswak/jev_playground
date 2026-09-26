@@ -1,0 +1,30 @@
+{
+  "bead": "jev-g65x",
+  "capture": {
+    "polls": 100,
+    "pane_observations": 400,
+    "panes": [2, 3, 4, 5],
+    "keyless": true,
+    "source": "real tmux/ps watcher poll snapshots",
+    "file": "work/fleet-idle-watch/hand-label-100-20260926.jsonl"
+  },
+  "labels": {
+    "working": "Live omp pane with active execution evidence, spinner/status and active work/session marker.",
+    "idle": "Live omp agent with no active work evidence and no qualifying wait stall.",
+    "stalled-wait": "Wait state beyond configured stall interval with no active work evidence.",
+    "no-agent": "No live omp agent in the pane process tree."
+  },
+  "review": "IvoryCreek reviewed every status_line/evidence pair; all 400 observations were hand-labeled working because each showed a live spinner and active agent/TODO/post-tool evidence.",
+  "incumbent_rule": {
+    "correct": 400,
+    "n": 400,
+    "accuracy": 1.0,
+    "wilson_95_low": 0.9904873594003194,
+    "wilson_95_high": 1.0,
+    "accuracy_go": "GO"
+  },
+  "jev_retry_decision": "NO-GO: the incumbent has no observed errors and Jev has no measured headroom to add value on this captured slice.",
+  "live_calls": 0,
+  "spend_usd": 0,
+  "boundary": "This is a keyless hand-label of 100 real polls (400 pane observations), not a Jev result. The live Jev retry remains disabled."
+}
