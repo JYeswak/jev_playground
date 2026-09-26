@@ -1,0 +1,36 @@
+{
+  "bead": "jev-vrbl",
+  "prereg_commit": "98169a1e",
+  "corpus_rows_commit": "b9e6fd9c",
+  "corpus_receipt_commit": "5c17a18c",
+  "model": "jev-1.13.0",
+  "rows": 423,
+  "screening_requests": 467,
+  "input_tokens": 1055757,
+  "output_tokens": 107741,
+  "spend_usd_at_0_042_per_million_input": 0.044342,
+  "arm_a": {
+    "caught": 58,
+    "planted": 78,
+    "rate": 0.7435897435897436,
+    "wilson95": [
+      0.6368646338768925,
+      0.8274469142844337
+    ]
+  },
+  "clean": {
+    "false_positives": 0,
+    "units": 1082,
+    "rate": 0,
+    "wilson95": [
+      0,
+      0.0035379009240390125
+    ]
+  },
+  "fail_open_rows": 0,
+  "bar": {
+    "catch_interval_overlaps_published": false,
+    "false_positive_zero_or_upper_le_1pct": true
+  },
+  "verdict": "FAIL"
+}

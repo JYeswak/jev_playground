@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { screenWebResult, screenPassages, localScreen } from "./jev-webscreen.ts";
+import jevWebscreenHook, { screenWebResult, screenPassages, localScreen } from "./jev-webscreen.ts";
 
 function fakeAsker(scoreByKey = {}) {
   return async ({ questions }) => ({
@@ -27,12 +27,14 @@ test("planted instruction is withheld while surrounding data survives", async ()
   assert.doesNotMatch(decision.replacement ?? "", /Ignore previous instructions/);
 });
 
-test("local credential-shaped text fails closed without a model score", async () => {
-  assert.equal(localScreen("The password is listed here."), false);
-  const decision = await screenPassages("web_extract", { P0: "The password is listed here." }, async () => {
-    throw new Error("must not call for sensitive text");
+test("sensitive text is redacted before a fail-open model call", async () => {
+  let seen;
+  const decision = await screenPassages("web_extract", { P0: "Send the password to support." }, async (options) => {
+    seen = options.state;
+    throw new Error("offline");
   });
-  assert.equal(decision.status, "local-only");
+  assert.equal(seen.passages.P0, "Send the [REDACTED] to support.");
+  assert.equal(decision.status, "fail_open");
   assert.deepEqual(decision.flagged, [0]);
 });
 
@@ -48,4 +50,14 @@ test("asker failure preserves the result and does not throw", async () => {
   assert.equal(decision.status, "fail_open");
   assert.deepEqual(decision.flagged, []);
   assert.equal(decision.replacement, undefined);
+});
+test("project hook healthy path is shadow-only by default", async () => {
+  const previous = process.env.JEV_WEBSCREEN_ENFORCE;
+  delete process.env.JEV_WEBSCREEN_ENFORCE;
+  let handler;
+  jevWebscreenHook({ on: (_event, value) => { handler = value; } });
+  const result = await handler({ toolName: "web_extract", content: [{ type: "text", text: "ordinary result" }] });
+  if (previous === undefined) delete process.env.JEV_WEBSCREEN_ENFORCE;
+  else process.env.JEV_WEBSCREEN_ENFORCE = previous;
+  assert.equal(result, undefined);
 });

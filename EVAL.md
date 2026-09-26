@@ -2583,3 +2583,13 @@ all recorded before 2026-09-26T00:00Z. Prereg `e1f217f7`, rows `b9e6fd9c`, recei
 Boundary: one machine's omp traffic, and the page half is mostly raw source and docs files. The run
 counts planted units, not agent behaviour. Arm B's prompts were written for a news assistant.
 jev_flag was not run on these units, and no omp seam was wired.
+## jev-vrbl Hermes webscreen seam shadow [live]
+
+The project-scoped post-hook candidate is implemented in .omp/hooks/post/jev-webscreen.ts and is shadow-only by default after the candidate failed the preregistered catch bar. The frozen corpus is the non-authored 423-row replay from jev-vqaq; raw web text remains outside the repository.
+
+- Prereg commit: 98169a1e; source corpus rows b9e6fd9c and receipt 5c17a18c.
+- Keyless seam tests: node --experimental-strip-types --test .omp/hooks/post/jev-webscreen.test.mjs -> 5/5 passed; healthy results are unchanged, planted instructions are withheld by the pure policy, sensitive text is redacted, model failure fails open, and the project hook healthy path is shadow-only.
+- Live shadow: model jev-1.13.0; 423 rows / 467 requests; 1,055,757 input tokens, 107,741 output tokens; spend $0.044342 at $0.042/M input, output free; zero fail-open rows.
+- Preregistered arm-A result: 58/78 caught (Wilson 63.7-82.7%), below the required interval overlap with 87.5-89.7%; clean false positives 0/1082 (Wilson upper 0.35%), bar met. Overall candidate verdict: FAIL on catch.
+
+Boundary: no automatic omp enforcement is enabled; no organic omp session was changed by this candidate. This shadow result does not support adoption of the seam; it records the failed candidate and preserves the healthy path.
