@@ -87,5 +87,21 @@ extensions:
   - ./.omp/extensions/jev-screen.ts
   - ./.omp/extensions/jev-claim-check.ts
   - ./.omp/extensions/kit-guard
+  # Operator safety baseline, restated on purpose. omp's settings merge REPLACES arrays
+  # (pi-coding-agent src/config/settings.ts #deepMerge), so this project list otherwise
+  # drops every extension the operator's profile lists: measured 2026-09-26, 3 of 4 jev
+  # sessions had zero dcg-tool-bridge decisions. Keep these paths identical to the
+  # profile lists (~/.omp/profiles/*/agent/config.yml); the loader dedupes by resolved
+  # path. kit-guard-optin is omitted: this repo loads its own ./.omp/extensions/kit-guard.
+  - /Users/josh/.omp/omp-extensions/observational-tool-result.ts
+  - /Users/josh/.omp/omp-extensions/dcg-tool-bridge.ts
+  - /Users/josh/.omp/omp-extensions/ee-failure-journal.ts
+  - /Users/josh/.omp/omp-extensions/zeststream-cast-spawn-cap.ts
+  - /Users/josh/.omp/omp-extensions/skill-topology-session-start.ts
+  - /Users/josh/.omp/omp-extensions/ee-ambient-session-start.ts
+  - /Users/josh/.omp/omp-extensions/zestgraph-danger-gate.ts
+  - /Users/josh/.omp/omp-extensions/slb-guard-fail-closed.ts
+  - /Users/josh/.omp/omp-extensions/rch-lane-bind-bridge.ts
+  - /Users/josh/.omp/omp-extensions/rch-mutator.ts
 #   (xd://jev_screen_ext_probe + nonce + --no-extensions arms), see
 #   work/nev-injection/screen-l2-receipt.json. Retire with the tool.
