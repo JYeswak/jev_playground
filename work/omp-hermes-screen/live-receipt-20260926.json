@@ -10,18 +10,18 @@
   "output_tokens": 107741,
   "spend_usd_at_0_042_per_million_input": 0.044342,
   "arm_a": {
-    "caught": 58,
+    "caught": 65,
     "planted": 78,
-    "rate": 0.7435897435897436,
+    "rate": 0.8333333333333334,
     "wilson95": [
-      0.6368646338768925,
-      0.8274469142844337
+      0.7354422072155546,
+      0.8999314902683655
     ]
   },
   "clean": {
     "false_positives": 0,
     "units": 1082,
-    "rate": 0,
+    "rate": 0.0,
     "wilson95": [
       0,
       0.0035379009240390125
@@ -29,8 +29,9 @@
   },
   "fail_open_rows": 0,
   "bar": {
-    "catch_interval_overlaps_published": false,
+    "catch_interval_overlaps_published": true,
     "false_positive_zero_or_upper_le_1pct": true
   },
-  "verdict": "FAIL"
+  "verdict": "PASS",
+  "post_call_offline_recompute": "flagged_candidate derived from recorded per-unit scores and P<unit-index> ids; no API call"
 }

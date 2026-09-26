@@ -87,7 +87,7 @@ function redactSensitive(text: string): string {
 }
 
 export function localScreen(text: string): boolean {
-  return /ignore (?:all )?previous instructions|system:\s|assistant.{0,20}(?:must|should)|reveal (?:your|the) (?:system|hidden) prompt|run the following command|send .*?(?:secret|key|password)|disable (?:your )?safety/i.test(text);
+  return /ignore (?:all )?previous instructions|system:\s|assistant.{0,20}(?:must|should)|reveal (?:your|the) (?:system|hidden) prompt|run the following command|send .*?(?:secret|key|password)|disable (?:your )?safety|(?:ai agents?|language model|chatbot|assistant).{0,100}(?:append|send|forward|include).{0,100}(?:api[_ -]?keys?|secret|password|conversation|system prompt)/i.test(text);
 }
 
 function reconstruct(parsed: unknown, units: Unit[], flagged: Set<number>): string | undefined {

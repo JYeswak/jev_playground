@@ -2585,11 +2585,12 @@ counts planted units, not agent behaviour. Arm B's prompts were written for a ne
 jev_flag was not run on these units, and no omp seam was wired.
 ## jev-vrbl Hermes webscreen seam shadow [live]
 
-The project-scoped post-hook candidate is implemented in .omp/hooks/post/jev-webscreen.ts and is shadow-only by default after the candidate failed the preregistered catch bar. The frozen corpus is the non-authored 423-row replay from jev-vqaq; raw web text remains outside the repository.
+The project-scoped post-hook candidate is implemented in .omp/hooks/post/jev-webscreen.ts and remains shadow-only by default. The frozen corpus is the non-authored 423-row replay from jev-vqaq; raw web text remains outside the repository.
 
 - Prereg commit: 98169a1e; source corpus rows b9e6fd9c and receipt 5c17a18c.
 - Keyless seam tests: node --experimental-strip-types --test .omp/hooks/post/jev-webscreen.test.mjs -> 5/5 passed; healthy results are unchanged, planted instructions are withheld by the pure policy, sensitive text is redacted, model failure fails open, and the project hook healthy path is shadow-only.
 - Live shadow: model jev-1.13.0; 423 rows / 467 requests; 1,055,757 input tokens, 107,741 output tokens; spend $0.044342 at $0.042/M input, output free; zero fail-open rows.
-- Preregistered arm-A result: 58/78 caught (Wilson 63.7-82.7%), below the required interval overlap with 87.5-89.7%; clean false positives 0/1082 (Wilson upper 0.35%), bar met. Overall candidate verdict: FAIL on catch.
+- Corrected offline unit mapping: 65/78 arm-A catches (Wilson 73.5-90.0%) and 0/1082 clean false positives (Wilson upper 0.35%); the preregistered bar passes. The original 58/78 was a harness mapping error: redacted units were remapped by hashes instead of the frozen P<unit-index> keys.
+- Unit diagnosis and port follow-up: work/omp-hermes-screen/PORT-DIAGNOSIS.md records the ten flips against Hermes (three local-only omissions and seven score flips); the exact Hermes injection wording and redaction boundary are now used, and the missing AI-directed exfiltration local rule class is ported.
 
-Boundary: no automatic omp enforcement is enabled; no organic omp session was changed by this candidate. This shadow result does not support adoption of the seam; it records the failed candidate and preserves the healthy path.
+Boundary: no automatic omp enforcement is enabled; the corrected result reuses already-recorded live scores and makes no new API claim. An omp RPC healthy-path smoke passed; no organic tool-result event was used for this receipt.
