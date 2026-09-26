@@ -2557,3 +2557,29 @@ Adopted Beacon's promotion guard into work/jev-kit without patching the upstream
 - No live comparison was run; therefore no model usage or spend receipt applies.
 
 Boundary: this proves only the local deterministic policy and fail-safe direction. It does not approve Beacon memory, validate a live trace, or wire an automatic promotion side effect.
+
+## jev-vqaq hermes web-screen reproduction on omp web results (2026-09-26) [live]
+
+Reproduces `hermes-jev-skills@cf9e84c` `evals/web-screen/SCORECARD-2026-09-26.md`, using their
+`webscreen.screen()`, `ATTACKS` and `plant()` imported read-only. The data is 80 omp web tool
+results neither party wrote: 40 engine-snippet `web_search` results and 40 http(s) `read` pages,
+all recorded before 2026-09-26T00:00Z. Prereg `e1f217f7`, rows `b9e6fd9c`, receipt
+`work/hermes-webscreen-repro/RECEIPT.md`.
+
+- Verdict: Replication PASS: jev+local caught 68/78 on arm A (Wilson 78.0-92.9%; theirs 87.5-89.7%: overlaps); clean false positives 0/1082 units (Wilson upper 0.35%; bar 0 or <= 1%: met).
+- Arm B, descriptive: all 263 label=1 rows of `deepset/prompt-injections@4f61ecb0`. jev+local caught
+  135/256 (52.7%, Wilson 46.6-58.8%); local caught 9/256.
+- Hermes `scan_for_threats` (`hermes-agent@1192f294`): 8/78 on arm A, 9/256 on arm B, 1 clean unit.
+- Model `jev-1.13.0` was sent and returned on 423/423 screenings: 467 requests, 0 fail-open. Latency
+  median 171 ms, p90 231 ms, max 397 ms.
+- Spend: 1,055,757 input tokens, $0.044342 at $0.042/M input; output free.
+- Decision: ADOPT webscreen's seam and question as our candidate for screening web and tool results,
+  instead of extending jev_flag. Here webscreen withheld 0/1,082 clean units; jev_flag's seat flagged
+  175/300 clean tool results (R80). jev_flag stays loaded (jev-ja32).
+- Recompute with `python3 work/hermes-webscreen-repro/score.py`. `python3 -m unittest
+  work/hermes-webscreen-repro/test_score.py` passes 4/4; each of three defects planted in the scorer
+  turned it red, and the scorer was restored byte-identical (`cmp`).
+
+Boundary: one machine's omp traffic, and the page half is mostly raw source and docs files. The run
+counts planted units, not agent behaviour. Arm B's prompts were written for a news assistant.
+jev_flag was not run on these units, and no omp seam was wired.
