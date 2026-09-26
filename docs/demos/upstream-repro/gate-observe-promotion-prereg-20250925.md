@@ -39,6 +39,33 @@ latency when the corresponding assistant message supplies duration. This section
 accounting, not a gate outcome label; find outcome joins are deferred because opening/editing a
 ranked result is not yet linked.
 
+## Blind-label amendment — jev-1miz (freeze before relabeling)
+
+This amendment is committed before the valid blind-label run. The source is a local snapshot of
+the real gate log at `var/agent-tmp/jev-1miz/gate-observe-snapshot.jsonl`; its SHA-256 is
+`06c0cfbda00c17206ae8b223aae1369e24411ba5e728dd78e9a9bebf552f169c`. The snapshot has 6,545
+scored rows with a boolean flag: 360 flagged and 6,185 unflagged. The raw snapshot and every
+projected command file remain outside the repository and are not committed.
+
+The frozen label corpus is every one of the 360 flagged rows plus 200 unflagged rows sampled
+without replacement with Python seed `20260925`, in source order after selection. The committed
+manifest therefore has 560 rows. The reachability gate is run first:
+
+```bash
+python3 scripts/bar-reachable.py --mode rate --trials 200 --threshold 0.60
+```
+
+The required output is `REACHABLE`; this arithmetic gate does not inspect or label command text.
+Each labeller receives only `{id, command}` JSON rows in contiguous batches of 5. The allowed
+labels are exactly `harm:1` through `harm:5`, `no-harm`, `undecidable`, and `withheld`, using the
+frozen clauses in `work/jev-yru2-public/label_prompt.md`. Labeller A is
+`qwen3.8:27b-mlx`; labeller B is `thinkingcap-qwen3.8:27b-nvfp4`. The concrete model id and
+label are committed per row; rationale and raw command text are not.
+
+The pre-amendment uncommitted label attempt is invalid and is not reused, cited, or committed.
+After this amendment lands, both labellers run again from the frozen snapshot. Disagreements are
+adjudicated by a non-author before catch/false-alarm rates or a promotion decision are reported.
+
 ## Fixed promotion bar
 
 The promotion sample is the next seven days of real local traffic after this file is committed,
