@@ -1,0 +1,28 @@
+{
+  "bead": "jev-b4jj",
+  "prereg_commit": "94177069",
+  "model": "jev-1.13.0",
+  "started": "2026-09-26T22:52:18.300Z",
+  "finished": "2026-09-26T22:52:31.972Z",
+  "rows": 73,
+  "ground_truth": {
+    "OK": 70,
+    "REPAIRABLE": 3
+  },
+  "reusable_correction_auc": 0.5,
+  "mean_of_three_auc": 0.5904761904761905,
+  "gain": -0.09047619047619049,
+  "hypothesis": {
+    "reusable_ge_mean_plus_005": false,
+    "reusable_ge_070": false,
+    "bar_met": false
+  },
+  "paired_at_050": {
+    "discordant_reusable_only": 0,
+    "discordant_mean_only": 49
+  },
+  "input_tokens": 52388,
+  "output_tokens": 4453,
+  "spend_usd_at_0_042_per_million_input": 0.0022,
+  "boundary": "Held-out closed-bead outcomes since 2026-09-25, excluding the original 70-row census; no automatic promotion or memory write."
+}

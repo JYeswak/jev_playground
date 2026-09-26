@@ -2603,3 +2603,13 @@ Fresh prereg commit 8450b8d2 froze 40 public attacks from S-Labs/prompt-injectio
 - Clean passthrough regression: six-test suite passes; deleting the early reconstruct return made 3 tests fail; restore from backup and cmp matched, then suite returned 6/6.
 
 Boundary: the fresh shadow fails its attack bar, so the candidate remains non-adopted/shadow-only. L3 proves the enforced path can withhold a planted web result and preserve a clean result in a real omp session; it does not validate deployment value on organic web traffic.
+## jev-b4jj held-out Beacon question comparison [live]
+
+Prereg commit 94177069 froze 73 closed rows not in the original 70-row census: 70 OK and 3 REPAIRABLE under the same B13 derivation. Model jev-1.13.0, 73 calls, 52,388 input tokens, 4,453 output tokens, spend $0.002200.
+
+- reusable_correction AUROC: 0.5000
+- mean-of-three AUROC: 0.5905
+- gain: -0.0905; paired threshold-0.5 discordance: reusable-only 0, mean-only 49
+- Preregistered bar: reusable AUROC >= mean + 0.05 and >= 0.70 — **not met**.
+
+Boundary: held-out closed-bead outcomes since 2026-09-25, excluding the original 70 rows; no automatic promotion or memory write.
