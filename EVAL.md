@@ -2618,7 +2618,7 @@ Boundary: held-out closed-bead outcomes since 2026-09-25, excluding the original
 The shared experiment runner now refuses live runs without a REACHABLE receipt whose items_sha256 matches the exact items file. scripts/bar-reachable.py now supports AUROC reachability and a minimum minority-class count; a 70/3 split returns UNDERPOWERED/refuses while 40/30 returns REACHABLE. scripts/jev-router-cap5.py passes the committed reach receipt and dataset path to the shared runner.
 
 - Verification: scripts/test_bar_reachable.py + kit/experiment/test_run.py -> 13/13 passed; py_compile passed.
-- Mutation: replacing both live reach checks with pass made test_live_refuses_nonreachable_receipt fail; restore matched the pre-mutation file with cmp and tests returned green.
-- Router reach receipt: work/jev-38qj/reach-receipt.json, status REACHABLE, items hash pinned to work/choice-banking77/subset.jsonl.
+- Mutation: replacing both live reach checks with pass made test_live_refuses_reachable_receipt_with_wrong_hash fail; replacing the hash comparison with a no-op made the same test fail; restore matched by cmp and tests returned green.
+- Router reach receipt: work/jev-38qj/reach-receipt.json uses paired McNemar reachability (400 tasks, fixed comparator exact 4, oracle headroom 396), status REACHABLE, items hash pinned to work/choice-banking77/subset.jsonl.
 
 Boundary: this is a keyless pre-spend refusal gate. No live router benchmark was run by this change.

@@ -179,14 +179,14 @@ class SharedRunnerTest(unittest.TestCase):
             self.assertEqual(result.returncode, 2)
             self.assertIn("live run requires --reach", result.stderr)
 
-    def test_live_refuses_nonreachable_receipt(self) -> None:
+    def test_live_refuses_reachable_receipt_with_wrong_hash(self) -> None:
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
             items = root / "items.jsonl"
             items.write_text('{"id":"a"}\n')
             receipt = root / "reach.json"
             receipt.write_text(
-                json.dumps({"status": "UNDERPOWERED", "items_sha256": "wrong"})
+                json.dumps({"status": "REACHABLE", "items_sha256": "wrong"})
             )
             result = subprocess.run(
                 [
@@ -212,7 +212,7 @@ class SharedRunnerTest(unittest.TestCase):
                 check=False,
             )
             self.assertEqual(result.returncode, 2)
-            self.assertIn("REACHABLE", result.stderr)
+            self.assertIn("items_sha256", result.stderr)
 
 
 if __name__ == "__main__":
