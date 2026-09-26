@@ -40,12 +40,16 @@ Every request is validated before code acts: the answer must name an offered opt
 
 The table summarizes results whose receipts and bars are in [`docs/LEDGER.md`](docs/LEDGER.md). Values are not claims about an unpinned `jev-latest`; they are tied to `jev-1.13.0`, the named corpus, and the cited receipt.
 
+<!-- BEGIN GENERATED: measured-wins -->
 | Surface | Result | Shape | Evidence |
-|---|---:|---|---|
-| Banking77 intent classification | Jev 2,467/3,080 vs LLM 2,267/3,080 | Choice | [`EVAL.md`](EVAL.md), `docs/demos/upstream-repro/choice-banking77-full-20260924.md` |
-| SST-5 sentiment scoring | Jev beats the free/LLM comparison on the preregistered MAE bar | Score | `docs/demos/upstream-repro/score-sst5-20260924.md` |
-| SciFact claim verification | Jev wins the preregistered verification comparison | Noul | `docs/demos/upstream-repro/noul-scifact-20260924.md` |
-| BEIR SciFact reranking | Jev improves the preregistered ranking metric | Choice/rerank | `docs/demos/upstream-repro/jev-rerank-l3-scifact-20260924.md` |
+|---|---|---|---|
+| Banking77 intent classification | Jev 2467/3080 (80.1%) vs Haiku 2267/3080 (73.6%) | Choice | `work/choice-banking77/score.py --set full-prompted` |
+| SST-5 sentiment scoring | Jev 273/500, MAE 0.488 vs Haiku 251/500, MAE 0.556 | Score | `work/score-sst5/score.py` |
+| SciFact claim verification | Jev 361/400 (90.2%, Brier 0.0709) vs Haiku 351/400 (87.8%, Brier 0.1002) | Noul | `work/noul-scifact/score.py` |
+| BEIR SciFact reranking | Jev top-1 35.62% vs grep 26.48% (n=219, McNemar p=0.0569) | Choice/rerank | `work/nev-rerank/live-receipt.json` |
+| MiniWoB v3 held-out | v3 342/625 vs v1 321/625 (McNemar p=0.02203; spend $0.458563) | Computer-use | `work/miniwob-jev/live-20260925/receipt.json` |
+| OMP judge usage | PREPARED-NOT-MEASURED (receipt pending) | OMP judge usage | `docs/demos/upstream-repro/gate-observe-promotion-prereg-20250925.md` |
+<!-- END GENERATED: measured-wins -->
 
 Jev is already making approximately 1,711 decisions per day inside the omp fleet; the daily path and receipt boundary are documented in the ledger and the cited EVAL entry.
 

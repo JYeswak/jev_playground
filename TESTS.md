@@ -50,6 +50,9 @@ claim nobody can check:
 - `scripts/promotion-four-gates.py` — four-gate VIEW over existing receipts; empty evidence fails.
   Run: `python3 scripts/promotion-four-gates.py --selftest` (exit 0) and
   `python3 scripts/promotion-four-gates.py UP-R5-jev-toolcall-gate` (exit 1 today; STATUS not written).
+- `scripts/test_render_results.py` — receipt-backed README results rendering for Banking77, SST-5,
+  SciFact, BEIR rerank, MiniWoB v3, and the explicit not-measured OMP judge usage row; the
+  planted README-number mutation fails the drift check. Run: `python3 -m unittest scripts/test_render_results.py` (3 tests).
 - `work/ci-main-status/test_ci_main_status.py` — `scripts/ci-main-status.py` (jev-bfku) against
   trimmed real gh output in `work/ci-main-status/fixtures/`, no network: green is one line and exit
   0 with no log fetch; the ff8316d red run (36059723283) names `registered-suites` and its

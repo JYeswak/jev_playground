@@ -52,6 +52,9 @@ jobs:
         with:
           node-version: '22.18'
 
+      - name: Verify receipt-backed README results table
+        run: python3 scripts/render-results.py --check README.md
+
       - name: ast-grep binary as `ast-grep` (stage 44 structural scan)
         # @ast-grep/cli ships prebuilt `sg`; stage 44 calls `ast-grep`.
         # Symlink, then prove the exact binary the stage invokes.

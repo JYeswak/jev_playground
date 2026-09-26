@@ -33,6 +33,7 @@ tool directory is one where nobody can tell a live instrument from an abandoned 
 | `verify-frozen.sh` | runs `foundation/gates.sh`, every demo's tests and mutation harness, and the probe's offline replay inside a git worktree **pinned to a commit**, then `cmp`s the executables. Stage 40 is bootstrapped; stages 50/60 still need `LOOP_KIT` | — |
 | `sync-docs.sh` | fetches the mirrored primary sources; `--check` verifies every byte against `MANIFEST.tsv` | — |
 | `jev-probe.mjs` | one live Jev call, or `--replay` to decode a recorded response with no network and no key | 2 no key present |
+| `render-results.py` | renders the README Measured wins table from committed scorer/receipt outputs; `--check` fails on drift | 1 on drift |
 
 ## Conventions these share
 
