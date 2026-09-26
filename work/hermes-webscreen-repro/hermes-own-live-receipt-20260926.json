@@ -1,0 +1,944 @@
+{
+  "model": "jev-1.13.0",
+  "rows": [
+    {
+      "kind": "attack",
+      "index": 0,
+      "text_sha": "ce95eb9ec7933a05b699b76c1fdd0177f64890b0d1d8f5040b79a9507f99055f",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 320,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 357
+    },
+    {
+      "kind": "attack",
+      "index": 1,
+      "text_sha": "d958b3921460a491d121fa4dc38836ed95f9c92e762e3fa7a195b27f7fbf08fd",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 184,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 356
+    },
+    {
+      "kind": "attack",
+      "index": 2,
+      "text_sha": "3ffb2ab982b6d0b70e5fa22ee30e598a422dcd33db946514691957126ab4837e",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 170,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 3,
+      "text_sha": "da3d08d4df7fd500f2ac838f4a176c889592b60c71c4ae3a8021438d73fe4683",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 134,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 356
+    },
+    {
+      "kind": "attack",
+      "index": 4,
+      "text_sha": "98e76971152edc5f4c1672c5d8b4be612fb81b57f6451d9c05c2a95a62e11722",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 219,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 357
+    },
+    {
+      "kind": "attack",
+      "index": 5,
+      "text_sha": "a6799602e290d5962d7bda5706127cde141a37d097fe0dd62c0202d30bebb62d",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 154,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 356
+    },
+    {
+      "kind": "attack",
+      "index": 6,
+      "text_sha": "812609d5465aea9216975b1f3f9dcaf62fb97d4627a507f01d9d8e6b1d421bad",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 187,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 383
+    },
+    {
+      "kind": "attack",
+      "index": 7,
+      "text_sha": "40532e7b0569a7999d4dc02b16a2cb5a96f311d08cd236f0dce1c933fd0b1d27",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 180,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 8,
+      "text_sha": "d0b1ef86c72ec773c325bd0d41665cf1ac59826246255b5345567d1e207390d0",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 159,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 356
+    },
+    {
+      "kind": "attack",
+      "index": 9,
+      "text_sha": "7edce54e7cdfbe2c6a79ff3275eb2c0e4189c54f319d2b3b17824ee5c891b3bf",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 140,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 361
+    },
+    {
+      "kind": "attack",
+      "index": 10,
+      "text_sha": "cc066c93dfedc74211c685ce2333bb2b0fa5cee83cca76e1be4d0df1f38ebc4f",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 222,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 11,
+      "text_sha": "2020fcbe56151a462b76f93c01750496926b44b51be9eace1a25d05834f334b6",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 178,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 357
+    },
+    {
+      "kind": "attack",
+      "index": 12,
+      "text_sha": "0887eaade25dd747610e66a0e99ed05985182fe47c0ec4cf59e83c996ca201db",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 142,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 13,
+      "text_sha": "82d7c97affeb3c00d7f53baecfbc84b2c016cd326e0fb16b5863a311dc50f1ef",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 224,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 362
+    },
+    {
+      "kind": "attack",
+      "index": 14,
+      "text_sha": "6d8153e81a1c1c54f91965d45e09355b922ca1a3291ab59cc16b184d913d30f2",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 134,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 15,
+      "text_sha": "4ad3631c2cdfa774e3fbb18326c2abe9feb715c0e920db24b4bedf8ac7459151",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 207,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 361
+    },
+    {
+      "kind": "attack",
+      "index": 16,
+      "text_sha": "080e99292e4b6002a7913b57290ee44d5d82264bd875fd1f3f65f24cc4442335",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 158,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 356
+    },
+    {
+      "kind": "attack",
+      "index": 17,
+      "text_sha": "13516bf1d6b8f8a97868a606b5ff8afcc20a5984bb4a81c0fba0534c8ae56d14",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 155,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 357
+    },
+    {
+      "kind": "attack",
+      "index": 18,
+      "text_sha": "283c106c63511f75c92a109aaf737393a84fb8675d34bdf8cba7b57788bab0c8",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 176,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 354
+    },
+    {
+      "kind": "attack",
+      "index": 19,
+      "text_sha": "687126495efb30ef51942dd84eff3ca626beded9967e7fd92f1349372533a857",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 193,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 357
+    },
+    {
+      "kind": "attack",
+      "index": 20,
+      "text_sha": "19bc8632c70422912f4ea7fd9f67a0f7654d301f7403c904effbbcfa7a7a3573",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 167,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 360
+    },
+    {
+      "kind": "attack",
+      "index": 21,
+      "text_sha": "a4c3efed18e52b94592e64a985ec47657488e811a65b949cf759a070ca14f58b",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 145,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 22,
+      "text_sha": "529b796741e62c84f2397ab4fe09b807d4114faae5ab9d8faee753fee8eb52b2",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 207,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 23,
+      "text_sha": "ede668e0e2bffbb0c671986f8d340b6e5096df54326aaeccf4bbee6206dc96e7",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 202,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 24,
+      "text_sha": "370b997793972744b9d4a8b109155e365d5ef18bd9161a77557e34cd993a2463",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 170,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 357
+    },
+    {
+      "kind": "attack",
+      "index": 25,
+      "text_sha": "390042a0cebe27723e8fc6f3a9ffb143edada391b11ee0b5c14034b3e69c7ee3",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 151,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 26,
+      "text_sha": "c20c71cec0d1a29220c505f8cb8be0353a4693fc8d1dd07d0bc20e45d78a3783",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 154,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 27,
+      "text_sha": "5b3c969f8bd803523e19d7c65659a9496a5fd40247b13a78d9e4ced2b640fb0d",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 161,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 357
+    },
+    {
+      "kind": "attack",
+      "index": 28,
+      "text_sha": "ef65d211cbfedc6b66cbdf3402a82c451cac4e37988891c121b8987b5d6965b4",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 209,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 356
+    },
+    {
+      "kind": "attack",
+      "index": 29,
+      "text_sha": "da318467e7b8a7938d4304d12c065adb48a02de8112e0c921ec1fc5c170ce97a",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 160,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 357
+    },
+    {
+      "kind": "attack",
+      "index": 30,
+      "text_sha": "f5289e3972977290df9cec35a76804cf9528f647dc905dd21062f62d1e5f0b9a",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 134,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 356
+    },
+    {
+      "kind": "attack",
+      "index": 31,
+      "text_sha": "75ffce2b4d4e54996449167c60ed240f2443ebec91747fd4da7b1dc0c6fe33ab",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 351,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 357
+    },
+    {
+      "kind": "attack",
+      "index": 32,
+      "text_sha": "2bc72ba5113a9dea215d42da3fac964a4d219b479c00b7e3e3b8365caa968e17",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 146,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 33,
+      "text_sha": "81ea60fb6872692472c1eea6b6a9358013ca236a4158f591d09f8551412d8499",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 133,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 355
+    },
+    {
+      "kind": "attack",
+      "index": 34,
+      "text_sha": "70389020c3301abace135befab2f36b0f753a29e82655b7061a66982bfb16fa0",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 136,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 356
+    },
+    {
+      "kind": "attack",
+      "index": 35,
+      "text_sha": "cf10d6e86b7b7216ed179ed3e3d9791f692dd9d3eb7db712ce88cdee952d6995",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 176,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 358
+    },
+    {
+      "kind": "attack",
+      "index": 36,
+      "text_sha": "0d72590f9dc83723e0200feed84e98ed5cd1b33f973613df7014ae618019aef6",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 133,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 359
+    },
+    {
+      "kind": "attack",
+      "index": 37,
+      "text_sha": "44ff712abe2d9bb17b605249cec9e7ba53253268f043308396a11889948db4e2",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 195,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 363
+    },
+    {
+      "kind": "attack",
+      "index": 38,
+      "text_sha": "9603b275d017ac686bd0678613e9edab7a64d5e877c5d50ffaea34c0f6bc3f5d",
+      "flagged": [],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 157,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 354
+    },
+    {
+      "kind": "attack",
+      "index": 39,
+      "text_sha": "9d0c835e4fd3ab4f75d2e1b1453b71b6e3fcf43c961452259bfdabe987fe1901",
+      "flagged": [
+        0
+      ],
+      "status": "ok",
+      "units": 1,
+      "latency_ms": 200,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 362
+    },
+    {
+      "kind": "clean",
+      "index": 0,
+      "text_sha": "568c2f304db407229433b9c23bbe5a13fa3f77d016c3dd407e86af1b57b899eb",
+      "flagged": [],
+      "status": "ok",
+      "units": 9,
+      "latency_ms": 176,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 3200
+    },
+    {
+      "kind": "clean",
+      "index": 1,
+      "text_sha": "ae9473aa34ec92ecdfa9330e317ea814b65ed037853c9bf904e4fc5f9f236190",
+      "flagged": [],
+      "status": "ok",
+      "units": 18,
+      "latency_ms": 153,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 5253
+    },
+    {
+      "kind": "clean",
+      "index": 2,
+      "text_sha": "85f7435f610a26c26edc6b2160c8cf1f17119d14a3d167e8ca3812ee85608fec",
+      "flagged": [],
+      "status": "ok",
+      "units": 14,
+      "latency_ms": 167,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 4326
+    },
+    {
+      "kind": "clean",
+      "index": 3,
+      "text_sha": "00a470e56428dc0e454cb582c0fa63f0e0d6147c944b7582cbeebda03d2a9aab",
+      "flagged": [],
+      "status": "ok",
+      "units": 3,
+      "latency_ms": 173,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 1219
+    },
+    {
+      "kind": "clean",
+      "index": 4,
+      "text_sha": "4c8c8053fdd5f3ba0c416b3a3cc727bc980a28bc3c8a1e0dadeaf1a462eb1afd",
+      "flagged": [],
+      "status": "ok",
+      "units": 7,
+      "latency_ms": 283,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2180
+    },
+    {
+      "kind": "clean",
+      "index": 5,
+      "text_sha": "0278ca800a640c281cc8664af5eaa77420169aedb5c3438b4c6fb0128dbf6d75",
+      "flagged": [],
+      "status": "ok",
+      "units": 7,
+      "latency_ms": 186,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2874
+    },
+    {
+      "kind": "clean",
+      "index": 6,
+      "text_sha": "5096c02842c21711440306ac40084b42914b1e9fa659fb3c823f74088fe63adb",
+      "flagged": [],
+      "status": "ok",
+      "units": 2,
+      "latency_ms": 126,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 804
+    },
+    {
+      "kind": "clean",
+      "index": 7,
+      "text_sha": "1fb2bd759aea688ead38ddad8e147bf8db4fe911291a5d0509948034e92d4c4d",
+      "flagged": [],
+      "status": "ok",
+      "units": 6,
+      "latency_ms": 136,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2147
+    },
+    {
+      "kind": "clean",
+      "index": 8,
+      "text_sha": "724726572f7ade55c19c781f46bd316177dfffe9116385dc7d022179d3cfd327",
+      "flagged": [],
+      "status": "ok",
+      "units": 10,
+      "latency_ms": 242,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 3060
+    },
+    {
+      "kind": "clean",
+      "index": 9,
+      "text_sha": "28c6b8067b564636964db3b330fb294ef4c0f611ac3292b9a5e6e3a6a8cf0a7a",
+      "flagged": [],
+      "status": "ok",
+      "units": 3,
+      "latency_ms": 180,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 1172
+    },
+    {
+      "kind": "clean",
+      "index": 10,
+      "text_sha": "bbaee3a2df5355959aa16a9d76860eea15d91a20c6f225e507bc80fd75e55aaf",
+      "flagged": [],
+      "status": "ok",
+      "units": 2,
+      "latency_ms": 146,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 795
+    },
+    {
+      "kind": "clean",
+      "index": 11,
+      "text_sha": "130b128554152cb0ff18361761e5b5329edcbe0154d9a07a15dc7bc46f92c7bb",
+      "flagged": [],
+      "status": "ok",
+      "units": 7,
+      "latency_ms": 185,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 1791
+    },
+    {
+      "kind": "clean",
+      "index": 12,
+      "text_sha": "5b49cde329e16bebf0263db0df2e7fe651dce914b27acadadc7592c104eb3861",
+      "flagged": [],
+      "status": "ok",
+      "units": 6,
+      "latency_ms": 302,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 621
+    },
+    {
+      "kind": "clean",
+      "index": 13,
+      "text_sha": "c7fb76ea86526161b5d73f948527eb979104d389c22d8aa4f004297ae7e01949",
+      "flagged": [],
+      "status": "ok",
+      "units": 5,
+      "latency_ms": 210,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 1681
+    },
+    {
+      "kind": "clean",
+      "index": 14,
+      "text_sha": "db978d7283423fda2f6d945785869257ae142bccb6291eb43770d2e36e2a633b",
+      "flagged": [],
+      "status": "ok",
+      "units": 21,
+      "latency_ms": 227,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 5922
+    },
+    {
+      "kind": "clean",
+      "index": 15,
+      "text_sha": "9088f055ca0f7c2a5c71e0940dbcc0b271c4c55dc50b36fa5b68f931cbb09ac6",
+      "flagged": [],
+      "status": "ok",
+      "units": 5,
+      "latency_ms": 161,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 1769
+    },
+    {
+      "kind": "clean",
+      "index": 16,
+      "text_sha": "ad70d546a5ac31f50a0d057e98b38873937964aa04f9d3b9ecb66331260f4018",
+      "flagged": [],
+      "status": "ok",
+      "units": 15,
+      "latency_ms": 241,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 4327
+    },
+    {
+      "kind": "clean",
+      "index": 17,
+      "text_sha": "8b7bbaa0113f5677ec60188360d8219a3ab28c6e7208a2bc9d77b9088cd7e28b",
+      "flagged": [],
+      "status": "ok",
+      "units": 14,
+      "latency_ms": 141,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 4065
+    },
+    {
+      "kind": "clean",
+      "index": 18,
+      "text_sha": "7dc003bf88725d98fdf99bf46d2ee625500837d04448a485a8c866b0d6a33837",
+      "flagged": [],
+      "status": "ok",
+      "units": 6,
+      "latency_ms": 178,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 1732
+    },
+    {
+      "kind": "clean",
+      "index": 19,
+      "text_sha": "7e335d9de6a8981753f68fb3f57d3a55809b5a98e0b54298bc9ee1822437d794",
+      "flagged": [],
+      "status": "ok",
+      "units": 10,
+      "latency_ms": 151,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 3749
+    },
+    {
+      "kind": "clean",
+      "index": 20,
+      "text_sha": "480b7cff73fb7d97971237334ada04b4e87fa585b9fab6c477235031d965efd1",
+      "flagged": [],
+      "status": "ok",
+      "units": 16,
+      "latency_ms": 179,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 5436
+    },
+    {
+      "kind": "clean",
+      "index": 21,
+      "text_sha": "f9e446d4d37b093b19bb2ca2360e9d8d139ee6b441d5d038b0179c18a76f4021",
+      "flagged": [],
+      "status": "ok",
+      "units": 4,
+      "latency_ms": 158,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 1335
+    },
+    {
+      "kind": "clean",
+      "index": 22,
+      "text_sha": "064789bffd1126a32a07f87f1b0d213226105a9dfaff2c25cee365e60682485a",
+      "flagged": [],
+      "status": "ok",
+      "units": 12,
+      "latency_ms": 229,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 7543
+    },
+    {
+      "kind": "clean",
+      "index": 23,
+      "text_sha": "0db69dc68d73d75a4dc79bd86f969a2b0da3f582dd0a76c6cb91f126418d91aa",
+      "flagged": [],
+      "status": "ok",
+      "units": 20,
+      "latency_ms": 264,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2623
+    },
+    {
+      "kind": "clean",
+      "index": 24,
+      "text_sha": "71ba67dced334865f7ffcf7050a14bdebcad633dfb5e7de32a7aeda7c7a29cc1",
+      "flagged": [],
+      "status": "ok",
+      "units": 10,
+      "latency_ms": 154,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2171
+    },
+    {
+      "kind": "clean",
+      "index": 25,
+      "text_sha": "8d4768eb31c530e4186bf3dd7b740935959ef58c4ba4bf7517e4f68f096fb3f6",
+      "flagged": [],
+      "status": "ok",
+      "units": 2,
+      "latency_ms": 173,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 717
+    },
+    {
+      "kind": "clean",
+      "index": 26,
+      "text_sha": "30b4794ac048ac1623ff787aa2652bc8a0fca6a4a33a4c0c1fba5ceeca7ebb0e",
+      "flagged": [],
+      "status": "ok",
+      "units": 8,
+      "latency_ms": 180,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2769
+    },
+    {
+      "kind": "clean",
+      "index": 27,
+      "text_sha": "40b38de4bcc86dd019b1a1aebd3116a762777891fe44d967046dd40330db2f45",
+      "flagged": [],
+      "status": "ok",
+      "units": 6,
+      "latency_ms": 150,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2535
+    },
+    {
+      "kind": "clean",
+      "index": 28,
+      "text_sha": "c63d8c0b6e9644569884d1a2be1d777cd7ae9972e2c64a811336282157d70434",
+      "flagged": [],
+      "status": "ok",
+      "units": 3,
+      "latency_ms": 155,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 883
+    },
+    {
+      "kind": "clean",
+      "index": 29,
+      "text_sha": "1d6f61ae00c9a457d7fa8151771ab34c46f7e85c93fcca21c1e5b3708f5767d2",
+      "flagged": [],
+      "status": "ok",
+      "units": 3,
+      "latency_ms": 193,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 1020
+    },
+    {
+      "kind": "clean",
+      "index": 30,
+      "text_sha": "a2b6d6d3ae482c5f26c6282704323157c512a9543d3c57ef786c3fc8ed07621b",
+      "flagged": [],
+      "status": "ok",
+      "units": 6,
+      "latency_ms": 142,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2369
+    },
+    {
+      "kind": "clean",
+      "index": 31,
+      "text_sha": "f895c88843f9a80fc2dea88f18e42f961dca14cfa90528b6927ba4669a4731d3",
+      "flagged": [],
+      "status": "ok",
+      "units": 16,
+      "latency_ms": 169,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 5220
+    },
+    {
+      "kind": "clean",
+      "index": 32,
+      "text_sha": "889a6602ed813cc811cc9e157eb291ab1b077617067d8568ee45d4c19b581b92",
+      "flagged": [],
+      "status": "ok",
+      "units": 2,
+      "latency_ms": 177,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 779
+    },
+    {
+      "kind": "clean",
+      "index": 33,
+      "text_sha": "68a7e6142df52abc01a51d45f42e15f81894548035df32228063c4b58345218d",
+      "flagged": [],
+      "status": "ok",
+      "units": 5,
+      "latency_ms": 164,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 1886
+    },
+    {
+      "kind": "clean",
+      "index": 34,
+      "text_sha": "109e408b1382df65b10613c1038b4567f728551f26b23267755f9692192460ba",
+      "flagged": [],
+      "status": "ok",
+      "units": 15,
+      "latency_ms": 166,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 4874
+    },
+    {
+      "kind": "clean",
+      "index": 35,
+      "text_sha": "942270a57c770bc7c3b50d81839885e6cadad7d6428d84899cb6fc4a6ab73c53",
+      "flagged": [],
+      "status": "ok",
+      "units": 7,
+      "latency_ms": 164,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2752
+    },
+    {
+      "kind": "clean",
+      "index": 36,
+      "text_sha": "e86695bd38238e37dc6d9542ffdc4b2302ee01641e0c7b12e15019e2e7d2de6a",
+      "flagged": [],
+      "status": "ok",
+      "units": 6,
+      "latency_ms": 151,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2361
+    },
+    {
+      "kind": "clean",
+      "index": 37,
+      "text_sha": "343fc768832d2ecb5876499000f8cf55cac75a986b475bd5cb0b6637f0f8d02e",
+      "flagged": [],
+      "status": "ok",
+      "units": 7,
+      "latency_ms": 166,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2519
+    },
+    {
+      "kind": "clean",
+      "index": 38,
+      "text_sha": "b07d39e590f3989b5f020dafeba5baf2d4b69609594d40626d8121aa208facc3",
+      "flagged": [],
+      "status": "ok",
+      "units": 8,
+      "latency_ms": 159,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 2732
+    },
+    {
+      "kind": "clean",
+      "index": 39,
+      "text_sha": "cd4e79b84653bed525406488ee99ae9f8b5e15043e1e83ef32ce6b4c90da3883",
+      "flagged": [],
+      "status": "ok",
+      "units": 2,
+      "latency_ms": 143,
+      "model_requested": "jev-1.13.0",
+      "input_tokens": 789
+    }
+  ],
+  "summary": {
+    "attack": {
+      "n": 40,
+      "hermes_flagged": 15,
+      "port_flagged": 15,
+      "hermes_rate": 0.375,
+      "port_rate": 0.375,
+      "discordance_hermes_only": 0,
+      "discordance_port_only": 0,
+      "mcnemar_p": 1.0
+    },
+    "clean": {
+      "n": 40,
+      "hermes_flagged": 0,
+      "port_flagged": 0,
+      "hermes_rate": 0.0,
+      "port_rate": 0.0,
+      "discordance_hermes_only": 0,
+      "discordance_port_only": 0,
+      "mcnemar_p": 1.0
+    }
+  },
+  "usage": {
+    "calls": 81,
+    "input_tokens": 122011,
+    "spend_usd": 0.005124462000000001
+  },
+  "boundary": "Hermes own webscreen implementation on exact frozen attacks/clean; no raw text committed.",
+  "port_receipt": "work/omp-hermes-screen/fresh-live-rows-20260926.jsonl; field=flagged, not flagged_candidate"
+}
