@@ -69,6 +69,28 @@ def usage_amount(snapshot: dict) -> float:
     return float(value) if isinstance(value, (int, float)) else 0.0
 
 
+def extract_json_object(content: Any) -> dict[str, Any] | None:
+    if isinstance(content, dict):
+        return content
+    if not isinstance(content, str):
+        return None
+    try:
+        parsed = json.loads(content)
+        return parsed if isinstance(parsed, dict) else None
+    except json.JSONDecodeError:
+        decoder = json.JSONDecoder()
+        for index, character in enumerate(content):
+            if character != "{":
+                continue
+            try:
+                parsed, _ = decoder.raw_decode(content[index:])
+            except json.JSONDecodeError:
+                continue
+            if isinstance(parsed, dict):
+                return parsed
+    return None
+
+
 def parse_answer(
     data: dict[str, Any], labels: dict[str, str], row: dict[str, Any]
 ) -> dict[str, Any]:
@@ -82,13 +104,12 @@ def parse_answer(
     )
     message_raw: Any = first.get("message")
     message = message_raw if isinstance(message_raw, dict) else {}
-    content = message.get("content", "")
-    parsed = json.loads(content) if isinstance(content, str) else content
+    parsed = extract_json_object(message.get("content", ""))
     choice = parsed.get("intent") if isinstance(parsed, dict) else None
     choice = labels.get(choice, choice) if isinstance(choice, str) else None
     usage_raw: Any = data.get("usage")
     usage = usage_raw if isinstance(usage_raw, dict) else {}
-    return {
+    answer = {
         "choice": choice,
         "correct": choice == row["intent"],
         "usage": {
@@ -99,6 +120,35 @@ def parse_answer(
             "cost": usage.get("cost"),
         },
         "metadata": {"model": data.get("model"), "provider": data.get("provider")},
+    }
+    if choice is None:
+        answer["error_code"] = "MISSING_CHOICE"
+    return answer
+
+
+def summarize_arm(rows: list[dict[str, Any]], arm: str) -> dict[str, Any]:
+    arm_rows = [row[arm] for row in rows if arm in row]
+    errors = sum(
+        bool(
+            answer.get("error")
+            or answer.get("error_code")
+            or answer.get("choice") is None
+        )
+        for answer in arm_rows
+    )
+    calls = len(arm_rows)
+    return {
+        "correct": sum(bool(answer.get("correct")) for answer in arm_rows),
+        "calls": calls,
+        "answered": calls - errors,
+        "errors": errors,
+        "error_rate": errors / calls if calls else 1.0,
+        "verdict_eligible": calls > 0 and errors / calls <= 0.05,
+        "input_tokens": sum(
+            answer.get("usage", {}).get("input_tokens", 0)
+            for answer in arm_rows
+            if isinstance(answer.get("usage"), dict)
+        ),
     }
 
 
@@ -137,9 +187,11 @@ async def call(
         answer["latency_ms"] = int((time.perf_counter() - started) * 1000)
         return answer
     except Exception as error:
+        status = getattr(getattr(error, "response", None), "status_code", None)
         return {
             "correct": False,
             "latency_ms": int((time.perf_counter() - started) * 1000),
+            "error_code": f"HTTP_{status}" if status else type(error).__name__,
             "error": f"{type(error).__name__}: {str(error)[:500]}",
         }
 
@@ -161,6 +213,8 @@ async def main() -> int:
             item = {"i": row["i"], "intent": row["intent"]}
             state = state_fn(row)
             item["router"] = await call(client, key, ROUTER_MODEL, state, labels, row)
+            if item["router"].get("error_code") == "HTTP_402":
+                raise StopAfterRow(item, "router-402-payment-required")
             after_router = usage_snapshot()
             item["router_usage_after"] = {
                 "usage": usage_amount(after_router),
@@ -190,9 +244,18 @@ async def main() -> int:
         else []
     )
     after = usage_snapshot()
-    router_rows = [row["router"] for row in results if "router" in row]
-    fixed_rows = [row["fixed"] for row in results if "fixed" in row]
+    router_summary = summarize_arm(results, "router")
+    fixed_summary = summarize_arm(results, "fixed")
+    error_refusal_arms = [
+        arm
+        for arm, summary in (("router", router_summary), ("fixed", fixed_summary))
+        if not summary["verdict_eligible"]
+    ]
     receipt = {
+        "status": "QUALITY_REFUSED_ERROR_RATE" if error_refusal_arms else "COMPLETE",
+        "quality_verdict_refused": bool(error_refusal_arms),
+        "error_rate_bar": 0.05,
+        "error_refusal_arms": error_refusal_arms,
         "model": MODEL,
         "router_model": ROUTER_MODEL,
         "fixed_model": FIXED_MODEL,
@@ -206,26 +269,11 @@ async def main() -> int:
         "after_usage": after,
         "incremental_openrouter_usage_usd": usage_amount(after) - before_amount,
         "wall_seconds": time.time() - started,
-        "router": {
-            "correct": sum(row.get("correct", False) for row in router_rows),
-            "calls": len(router_rows),
-            "input_tokens": sum(
-                row.get("usage", {}).get("input_tokens", 0)
-                for row in router_rows
-                if isinstance(row.get("usage"), dict)
-            ),
-        },
-        "fixed": {
-            "correct": sum(row.get("correct", False) for row in fixed_rows),
-            "calls": len(fixed_rows),
-            "input_tokens": sum(
-                row.get("usage", {}).get("input_tokens", 0)
-                for row in fixed_rows
-                if isinstance(row.get("usage"), dict)
-            ),
-        },
+        "router": router_summary,
+        "fixed": fixed_summary,
+        "quality": None,
         "rows": results,
-        "boundary": "Direct OpenRouter chat calls use the public Banking77 state; keys and raw benchmark text are not emitted outside requests.",
+        "boundary": "No quality or router-vs-fixed verdict is valid when either arm exceeds the 5% error bar; HTTP 402 is classified before further router calls. Direct OpenRouter chat calls use the public Banking77 state; keys and raw benchmark text are not emitted outside requests.",
     }
     RECEIPT.parent.mkdir(parents=True, exist_ok=True)
     RECEIPT.write_text(json.dumps(receipt, indent=2) + "\n")
