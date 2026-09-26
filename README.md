@@ -46,7 +46,7 @@ The table summarizes results whose receipts and bars are in [`docs/LEDGER.md`](d
 | Banking77 intent classification | Jev 2467/3080 (80.1%) vs Haiku 2267/3080 (73.6%) | Choice | `work/choice-banking77/score.py --set full-prompted` |
 | SST-5 sentiment scoring | Jev 273/500, MAE 0.488 vs Haiku 251/500, MAE 0.556 | Score | `work/score-sst5/score.py` |
 | SciFact claim verification | Jev 361/400 (90.2%, Brier 0.0709) vs Haiku 351/400 (87.8%, Brier 0.1002) | Noul | `work/noul-scifact/score.py` |
-| Replicated web-screen | jev+local 68/78 arm A, 0/1082 clean withheld, 423 screenings, 1,055,757 input tokens, $0.044342 | Noul / web-screen | `work/hermes-webscreen-repro/RECEIPT.md; kerpopule/hermes-jev-skills@cf9e84c` |
+| Replicated web-screen | Jev+local 68/78 own attacks; 135/256 deepset; Hermes own 15/40 fresh S-Labs; 0/1,437 clean withheld; pinned jev-1.13.0 | Noul / web-screen | `work/hermes-webscreen-repro/RECEIPT.md; kerpopule/hermes-jev-skills@cf9e84c` |
 | MiniWoB v3 held-out | v3 342/625 vs v1 321/625 (McNemar p=0.02203; spend $0.458563) | Computer-use | `work/miniwob-jev/live-20260925/receipt.json` |
 | OMP judge usage | 1,711 calls, $0.3547; find 1,595, auto-thinking 113, judge_batch 2, judge 1 | OMP judge usage | `EVAL.md@b74704c9` |
 <!-- END GENERATED: measured-wins -->

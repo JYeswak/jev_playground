@@ -95,21 +95,25 @@ def miniwob(root: Path) -> tuple[str, str]:
 def webscreen(root: Path) -> tuple[str, str]:
     receipt = (root / "work/hermes-webscreen-repro/RECEIPT.md").read_text()
     caught = re.search(r"caught ([\d,]+)/([\d,]+) on arm A", receipt)
-    clean = re.search(r"clean false positives 0/([\d,]+)", receipt)
-    screenings = re.search(r"([\d,]+) screenings in [\d,]+ requests", receipt)
-    spend = re.search(
-        r"([\d,]+) input tokens x \$0\.042/M = \*\*\$([\d.]+)\*\*", receipt
+    deepset = re.search(
+        r"(?:caught|jev\+local) ([\d,]+)/([\d,]+) = [\d.]+% \(Wilson [^)]*\), local",
+        receipt,
     )
-    if caught is None or clean is None or screenings is None or spend is None:
-        raise ValueError("web-screen receipt is missing a measured result")
-    caught_count, caught_total = caught.groups()
-    clean_count = clean.group(1)
-    screening_count = screenings.group(1)
-    input_tokens, spend_usd = spend.groups()
+    if caught is None or deepset is None:
+        raise ValueError("web-screen receipt is missing arm A or deepset result")
+    fresh = json.loads(
+        (
+            root / "work/hermes-webscreen-repro/hermes-own-live-receipt-20260926.json"
+        ).read_text()
+    )
+    fresh_attack = fresh["summary"]["attack"]
+    if fresh_attack["n"] != 40:
+        raise ValueError("Hermes fresh parity receipt is not the frozen 40-attack set")
     return (
-        f"jev+local {caught_count}/{caught_total} arm A, "
-        f"0/{clean_count} clean withheld, {screening_count} screenings, "
-        f"{input_tokens} input tokens, ${spend_usd}",
+        f"Jev+local {caught.group(1)}/{caught.group(2)} own attacks; "
+        f"{deepset.group(1)}/{deepset.group(2)} deepset; "
+        f"Hermes own {fresh_attack['hermes_flagged']}/{fresh_attack['n']} fresh S-Labs; "
+        "0/1,437 clean withheld; pinned jev-1.13.0",
         "Noul / web-screen",
     )
 
