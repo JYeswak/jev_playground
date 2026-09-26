@@ -154,7 +154,7 @@ def render_table(root: Path) -> str:
         (
             "Replicated web-screen",
             *webscreen(root),
-            "work/hermes-webscreen-repro/RECEIPT.md; kerpopule/hermes-jev-skills@cf9e84c",
+            "work/hermes-webscreen-repro/RECEIPT.md; work/omp-hermes-screen/hermes-own-live-receipt-20260926.json; kerpopule/hermes-jev-skills@cf9e84c",
         ),
         (
             "MiniWoB v3 held-out",
