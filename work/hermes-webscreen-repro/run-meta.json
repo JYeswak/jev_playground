@@ -1,0 +1,13 @@
+{
+ "started_utc": "2026-09-26T21:22:37Z",
+ "finished_utc": "2026-09-26T21:24:00Z",
+ "python": "3.9.6",
+ "model_pinned": "jev-1.13.0",
+ "provider": "typesafe",
+ "jev_head": "45db9eccaad862d390e5a91c6fbd58025d328393",
+ "hermes_jev_skills_head": "cf9e84cb363c4a6257adea9d1ddf2a7420bcc434",
+ "hermes_agent_head": "1192f29450f1dc440d44b094817977f00475643c",
+ "sample_sha": "18d94df9f67457628f6f7934964f8a84c7776cd2a5e17e83485c08f047da80d8",
+ "screenings": 423,
+ "rows": "rows.jsonl"
+}
