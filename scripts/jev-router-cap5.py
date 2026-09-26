@@ -9,6 +9,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import sys
 import time
 import urllib.request
 from pathlib import Path
@@ -17,6 +18,10 @@ from typing import Any
 import httpx
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from kit.experiment.run import StopAfterRow, StopRun, run as checkpoint_run
+
 ROUTER_MODEL = "typesafe/jev-router"
 FIXED_MODEL = "dots-studio/dots-3-note-preview:free"
 MODEL = "jev-1.13.0"
@@ -140,20 +145,19 @@ async def call(
 
 
 async def main() -> int:
-    rows, state_fn, labels = load_runner()
     key = os.environ.get("OPENROUTER_API_KEY")
     if not key:
         raise SystemExit("OPENROUTER_API_KEY is not set; no benchmark call made")
+    rows, state_fn, labels = load_runner()
     before = usage_snapshot()
     before_amount = usage_amount(before)
-    results = []
-    stopped = None
     started = time.time()
+    checkpoint = ROOT / "work/jev-38qj/rows.jsonl"
     async with httpx.AsyncClient(timeout=90) as client:
-        for row in rows:
+
+        async def process(row: dict[str, Any]) -> dict[str, Any]:
             if usage_amount(usage_snapshot()) - before_amount >= STOP_MARGIN_USD:
-                stopped = "hard-stop-before-router"
-                break
+                raise StopRun("hard-stop-before-router")
             item = {"i": row["i"], "intent": row["intent"]}
             state = state_fn(row)
             item["router"] = await call(client, key, ROUTER_MODEL, state, labels, row)
@@ -163,11 +167,20 @@ async def main() -> int:
                 "daily": after_router.get("usage_daily"),
             }
             if usage_amount(after_router) - before_amount >= CAP_USD:
-                stopped = "hard-stop-after-router"
-                results.append(item)
-                break
+                raise StopAfterRow(item, "hard-stop-after-router")
             item["fixed"] = await call(client, key, FIXED_MODEL, state, labels, row)
-            results.append(item)
+            return item
+
+        stopped = await checkpoint_run(rows, process, checkpoint, id_key="i")
+    results = (
+        [
+            json.loads(line)
+            for line in checkpoint.read_text().splitlines()
+            if line.strip()
+        ]
+        if checkpoint.exists()
+        else []
+    )
     after = usage_snapshot()
     router_rows = [row["router"] for row in results if "router" in row]
     fixed_rows = [row["fixed"] for row in results if "fixed" in row]
