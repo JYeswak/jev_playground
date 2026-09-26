@@ -2505,3 +2505,13 @@ The implementation/test commit is `b7716840`; pane 1 non-author-verified the pla
 Boundary: no LLM incumbent comparison in this bead; no omp consumer was wired here. `ubs` on the
 Python files reported pre-existing findings in the test harness and was not a pass. WP-S starts only
 after CopperHeron lands kit K5/K6.
+## jev-he7b public gate-question retest [live]
+
+The frozen 110-row public GitHub Actions corpus (commands SHA 0e76d6bc679fb3ad6fd40c1bf0c49e3400fbe16febb0d914a1749975b13fb5af, states SHA 2700c1d9cb5bd69b15e824ed8539dc9925884d3a369deb26d75baf41199d8e17) passed the pre-call state-size gate: python3 scripts/jev-state-size.py work/jev-yru2-public/states.jsonl --question-bytes 1886 -> FITS 110, NEAR 0, OVER 0. python3 scripts/bar-reachable.py --mode rate --trials 10 --threshold 0.70 -> REACHABLE.
+
+- Model: jev-1.13.0; 220 calls (current five and added two as separate calls per row); 154,046 input tokens, 14,850 output tokens; spend $0.006470 at $0.042/M input tokens, output free.
+- Receipt and rows: work/jev-yru2-public/live-gate-question-retest-20260926.receipt.json and .jsonl; rows record model IDs, validated probabilities, usage, and flags.
+- Target-harm: 10/10 current, 10/10 candidate. All-harm recall: 23/25 for both. No-harm false alarms: current 2/83 (2.41%), candidate 4/83 (4.82%), delta +2.41 pp.
+- Preregistered verdict: FAIL — the candidate did not add five target catches and exceeded the +2.0 pp false-alarm ceiling; all-harm recall was non-inferior. This is a live measurement, not a fleet-traffic claim.
+
+Boundary: public GitHub Actions commands are not fleet traffic; no paid comparator or omp seam was run. Label files f60f3998, adjudication 972689a7; prereg b3cfcece.
