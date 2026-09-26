@@ -334,6 +334,17 @@ def shadow_features(words: str) -> list[str]:
     return features or ["unclassified_evidence"]
 
 
+def redacted_status_line(screen: str) -> str:
+    """Keep only the status line, with path and prompt text replaced before Jev sees it."""
+    lines = [line.strip() for line in screen.splitlines() if STATUS.search(line)]
+    if not lines:
+        return ""
+    line = lines[-1]
+    line = re.sub(r"📁[^│·]+", "📁[path]", line)
+    line = re.sub(r"❯.*$", "❯[prompt]", line)
+    return line[:200]
+
+
 class ShadowDispatcher:
     def __init__(self) -> None:
         self.children: list[tuple[subprocess.Popen, io.BufferedWriter]] = []
@@ -380,22 +391,25 @@ class ShadowDispatcher:
 SHADOW_DISPATCHER = ShadowDispatcher()
 
 
-def submit_shadow(states: dict[int, tuple[str, str]]) -> None:
+def submit_shadow(states: dict[int, tuple[str, str, str]]) -> None:
     if not SHADOW_ENABLED:
         return
     worker_count = len(states)
-    for pane_index, (incumbent, evidence) in states.items():
+    for pane_index, reading in states.items():
+        incumbent, evidence = reading[:2]
+        status_line = reading[2] if len(reading) > 2 else ""
         SHADOW_DISPATCHER.submit(
             {
                 "pane_index": pane_index,
                 "worker_panes": worker_count,
                 "incumbent": incumbent,
                 "evidence_features": shadow_features(evidence),
+                "status_line": status_line,
             }
         )
 
 
-def poll() -> dict[int, tuple[str, str]]:
+def poll() -> dict[int, tuple[str, str, str]]:
     """{pane index: (state, "(evidence)  last screen line")} for every watched worker pane."""
     out = subprocess.run(
         [
@@ -442,7 +456,11 @@ def poll() -> dict[int, tuple[str, str]]:
             session_age=session_age(omp, time.time()) if omp is not None else None,
         )
         state, evidence = classify(snap)
-        states[int(index)] = (state, f"({evidence})  {last_words(screen)}")
+        states[int(index)] = (
+            state,
+            f"({evidence})  {last_words(screen)}",
+            redacted_status_line(screen),
+        )
     return states
 
 
