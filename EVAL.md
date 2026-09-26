@@ -2538,3 +2538,13 @@ IvoryCreek ran both suites keylessly; pane 1 re-ran hermes as non-author.
   (Beacon task-success precondition for memory promotion).
 
 Boundary: keyless; no live call; beacon's full suite not run (missing binary asset).
+## jev-6o2a agent-beacon rubric validation [live]
+
+Preregression commit cdcc2445 froze the corpus and bar before live calls. The 70-row census at source commit 62355af7 contains 40 OK and 30 REPAIRABLE outcomes under the committed B13 rule; majority floor 40/70 = 57.14%, constant AUROC 0.5. The deterministic close_reason_len baseline AUROC is 0.6920833333. The reachability guard python3 scripts/bar-reachable.py --mode rate --trials 40 --threshold 0.70 returned REACHABLE (Wilson lower 0.9123783988).
+
+- Source: agent-beacon @ c8d56ada361eb7cb4d1eae1fe7b0e2fe69f36558; evaluator.go SHA a12335211753a0f3f0b5d46bed2e5d55980cda4bd05b37c1e417bb42c97fb7fb2; exact rubric hash sha256:a1e00fed9327beffc443b833eeda73f8fa6021e37d7399cb4ed29f989b5fe1d9.
+- Model: jev-1.13.0; 70 calls containing Beacon's exact three Nouls; 46,655 input tokens and 4,270 output tokens; spend $0.001960 at $0.042/M input tokens, output free.
+- Jev mean-of-three AUROC: 0.7475; gain over length baseline +0.0554166667. The preregistered minimum was AUROC >= 0.70 and gain >= 0.10; receipt records bar_met=false.
+- Receipt and per-row validated probabilities: work/agent-beacon-jev/receipt-20260926.json and live-rows-20260926.jsonl.
+
+Boundary: retrospective bead-outcome census, not a random sample of all agent sessions; class is outcome-derived, not a human trace-quality label. No Beacon production promotion side effect or omp seam was run. Upstream issue was not posted from this lane because public issue creation requires explicit authorization.
