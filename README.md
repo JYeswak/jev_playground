@@ -46,9 +46,8 @@ The table summarizes results whose receipts and bars are in [`docs/LEDGER.md`](d
 | Banking77 intent classification | Jev 2467/3080 (80.1%) vs Haiku 2267/3080 (73.6%) | Choice | `work/choice-banking77/score.py --set full-prompted` |
 | SST-5 sentiment scoring | Jev 273/500, MAE 0.488 vs Haiku 251/500, MAE 0.556 | Score | `work/score-sst5/score.py` |
 | SciFact claim verification | Jev 361/400 (90.2%, Brier 0.0709) vs Haiku 351/400 (87.8%, Brier 0.1002) | Noul | `work/noul-scifact/score.py` |
-| BEIR SciFact reranking | Jev top-1 35.62% vs grep 26.48% (n=219, McNemar p=0.0569) | Choice/rerank | `work/nev-rerank/live-receipt.json` |
 | MiniWoB v3 held-out | v3 342/625 vs v1 321/625 (McNemar p=0.02203; spend $0.458563) | Computer-use | `work/miniwob-jev/live-20260925/receipt.json` |
-| OMP judge usage | PREPARED-NOT-MEASURED (receipt pending) | OMP judge usage | `docs/demos/upstream-repro/gate-observe-promotion-prereg-20250925.md` |
+| OMP judge usage | 1,711 calls, $0.3547; find 1,595, auto-thinking 113, judge_batch 2, judge 1 | OMP judge usage | `EVAL.md@b74704c9` |
 <!-- END GENERATED: measured-wins -->
 
 Jev is already making approximately 1,711 decisions per day inside the omp fleet; the daily path and receipt boundary are documented in the ledger and the cited EVAL entry.

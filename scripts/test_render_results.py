@@ -33,11 +33,14 @@ class RenderResultsTest(unittest.TestCase):
             "Banking77 intent classification",
             "SST-5 sentiment scoring",
             "SciFact claim verification",
-            "BEIR SciFact reranking",
             "MiniWoB v3 held-out",
             "OMP judge usage",
         ):
             self.assertIn(surface, table)
+        self.assertIn("1,711 calls", table)
+        self.assertIn("find 1,595", table)
+        self.assertNotIn("BEIR SciFact reranking", table)
+        self.assertNotIn("35.62%", table)
 
 
 if __name__ == "__main__":

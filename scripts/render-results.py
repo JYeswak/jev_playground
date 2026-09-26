@@ -2,6 +2,7 @@
 """Render the README measured-results table from committed receipts and scorers."""
 
 from __future__ import annotations
+import re
 
 import argparse
 import json
@@ -78,16 +79,6 @@ def scifact(root: Path) -> tuple[str, str]:
     )
 
 
-def rerank(root: Path) -> tuple[str, str]:
-    receipt = json.loads((root / "work/nev-rerank/live-receipt.json").read_text())
-    result = receipt["all"]
-    return (
-        f"Jev top-1 {result['jev_top1_pct']:.2f}% vs grep {result['grep_top1_pct']:.2f}% "
-        f"(n={result['n']}, McNemar p={result['mcnemar_two_sided_p']:.4g})",
-        "Choice/rerank",
-    )
-
-
 def miniwob(root: Path) -> tuple[str, str]:
     receipt = json.loads(
         (root / "work/miniwob-jev/live-20260925/receipt.json").read_text()
@@ -102,14 +93,27 @@ def miniwob(root: Path) -> tuple[str, str]:
 
 
 def omp_judge_usage(root: Path) -> tuple[str, str]:
-    # The committed source is a preregistration, not a measurement receipt. Keep that
-    # boundary visible instead of inventing a usage total from local session state.
-    source = (
-        root / "docs/demos/upstream-repro/gate-observe-promotion-prereg-20250925.md"
+    result = subprocess.run(
+        ["git", "show", "b74704c9:EVAL.md"],
+        cwd=root,
+        check=True,
+        capture_output=True,
+        text=True,
     )
-    if not source.exists():
-        raise FileNotFoundError(source)
-    return "PREPARED-NOT-MEASURED (receipt pending)", "OMP judge usage"
+    match = re.search(
+        r"([\d,]+) calls, \$([\d.]+) total\. By `purpose`: `find` ([\d,]+).*?"
+        r"`auto-thinking` ([\d,]+).*?`judge_batch` ([\d,]+), `judge` ([\d,]+)",
+        result.stdout,
+        re.DOTALL,
+    )
+    if not match:
+        raise ValueError("EVAL b74704c9 has no OMP judge usage receipt")
+    calls, dollars, find, auto_thinking, judge_batch, judge = match.groups()
+    return (
+        f"{calls} calls, ${dollars}; find {find}, auto-thinking {auto_thinking}, "
+        f"judge_batch {judge_batch}, judge {judge}",
+        "OMP judge usage",
+    )
 
 
 def render_table(root: Path) -> str:
@@ -121,7 +125,6 @@ def render_table(root: Path) -> str:
         ),
         ("SST-5 sentiment scoring", *sst5(root), "work/score-sst5/score.py"),
         ("SciFact claim verification", *scifact(root), "work/noul-scifact/score.py"),
-        ("BEIR SciFact reranking", *rerank(root), "work/nev-rerank/live-receipt.json"),
         (
             "MiniWoB v3 held-out",
             *miniwob(root),
@@ -130,7 +133,7 @@ def render_table(root: Path) -> str:
         (
             "OMP judge usage",
             *omp_judge_usage(root),
-            "docs/demos/upstream-repro/gate-observe-promotion-prereg-20250925.md",
+            "EVAL.md@b74704c9",
         ),
     ]
     lines = [
