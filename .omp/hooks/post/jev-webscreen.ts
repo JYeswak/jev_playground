@@ -174,23 +174,27 @@ function resultText(content: unknown): string | undefined {
   return parts.length ? parts.join("\n") : undefined;
 }
 
-export default function jevWebscreenHook(pi: Host): void {
-  useInfisicalKey();
-  pi.on("tool_result", async (event) => {
+export function makeWebscreenHandler(asker: Ask = askJev) {
+  return async (event: ToolResultEvent) => {
+    try {
       const probePath = process.env.JEV_WEBSCREEN_PROBE_PATH;
       if (probePath) await appendFile(probePath, JSON.stringify({ ts: new Date().toISOString(), toolName: event.toolName ?? null }) + "\n").catch(() => {});
-    try {
       const tool = typeof event.toolName === "string" ? event.toolName : "";
       if (!WEB_TOOLS[tool] || event.isError === true) return undefined;
       const raw = resultText(event.content);
-      if (!raw) return undefined;
-      if (process.env.JEV_WEBSCREEN_ENFORCE !== "1") return undefined;
-      const decision = await screenWebResult(tool, raw);
+      if (!raw || process.env.JEV_WEBSCREEN_ENFORCE !== "1") return undefined;
+      const decision = await screenWebResult(tool, raw, asker);
       const proofPath = process.env.JEV_WEBSCREEN_PROOF_PATH;
       if (proofPath) await appendFile(proofPath, JSON.stringify({ ts: new Date().toISOString(), toolName: tool, status: decision.status, units: decision.units, flagged: decision.flagged.length, withheld: decision.replacement !== undefined, input_tokens: decision.usage?.input_tokens ?? null, output_tokens: decision.usage?.output_tokens ?? null }) + "\n").catch(() => {});
+      if (decision.replacement === undefined || decision.replacement === raw) return undefined;
       return { content: [{ type: "text", text: decision.replacement }], details: { screening: decision.status, units: decision.units, flagged: decision.flagged.length, model: MODEL } };
     } catch {
       return undefined;
     }
-  });
+  };
+}
+
+export default function jevWebscreenHook(pi: Host): void {
+  useInfisicalKey();
+  pi.on("tool_result", makeWebscreenHandler());
 }

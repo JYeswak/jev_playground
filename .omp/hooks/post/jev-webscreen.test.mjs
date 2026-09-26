@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import jevWebscreenHook, { screenWebResult, screenPassages, localScreen } from "./jev-webscreen.ts";
+import jevWebscreenHook, { makeWebscreenHandler, screenWebResult, screenPassages, localScreen } from "./jev-webscreen.ts";
 
 function fakeAsker(scoreByKey = {}) {
   return async ({ questions }) => ({
@@ -57,6 +57,15 @@ test("project hook healthy path is shadow-only by default", async () => {
   let handler;
   jevWebscreenHook({ on: (_event, value) => { handler = value; } });
   const result = await handler({ toolName: "web_extract", content: [{ type: "text", text: "ordinary result" }] });
+  if (previous === undefined) delete process.env.JEV_WEBSCREEN_ENFORCE;
+  else process.env.JEV_WEBSCREEN_ENFORCE = previous;
+  assert.equal(result, undefined);
+});
+test("enforce mode preserves clean results", async () => {
+  const previous = process.env.JEV_WEBSCREEN_ENFORCE;
+  process.env.JEV_WEBSCREEN_ENFORCE = "1";
+  const handler = makeWebscreenHandler(fakeAsker());
+  const result = await handler({ toolName: "web_extract", content: [{ type: "text", text: JSON.stringify({ data: { web: [{ title: "clean", description: "ordinary" }] } }) }] });
   if (previous === undefined) delete process.env.JEV_WEBSCREEN_ENFORCE;
   else process.env.JEV_WEBSCREEN_ENFORCE = previous;
   assert.equal(result, undefined);
