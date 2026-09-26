@@ -2548,3 +2548,12 @@ Preregression commit cdcc2445 froze the corpus and bar before live calls. The 70
 - Receipt and per-row validated probabilities: work/agent-beacon-jev/receipt-20260926.json and live-rows-20260926.jsonl.
 
 Boundary: retrospective bead-outcome census, not a random sample of all agent sessions; class is outcome-derived, not a human trace-quality label. No Beacon production promotion side effect or omp seam was run. Upstream issue was not posted from this lane because public issue creation requires explicit authorization.
+## jev-sdag local memory promotion precondition [test]
+
+Adopted Beacon's promotion guard into work/jev-kit without patching the upstream clone. evaluateMemoryPromotion refuses non-completed evaluations, missing task_success, task_success below 0.50, and mean score below 0.60. Eligible output always carries requiresHumanApproval=true; it never approves or writes memory.
+
+- Source: agent-beacon @ c8d56ada361eb7cb4d1eae1fe7b0e2fe69f36558; promotion_test.go fixtures captured in work/jev-kit/test/fixtures/memory-promotion.json.
+- Offline verification: node --experimental-strip-types --test work/jev-kit/test/kit.test.mjs -> 11/11 passed; ubs work/jev-kit/src/index.ts work/jev-kit/test/kit.test.mjs -> rc 0; git diff --check -> rc 0.
+- No live comparison was run; therefore no model usage or spend receipt applies.
+
+Boundary: this proves only the local deterministic policy and fail-safe direction. It does not approve Beacon memory, validate a live trace, or wire an automatic promotion side effect.

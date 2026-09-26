@@ -173,6 +173,43 @@ export async function choice(options: AskChoiceOptions & { questionBytes?: numbe
   return { ...result, choice: validation.answer.choice, confidence: validation.answer.confidence, probabilities: validation.answer.probabilities };
 }
 
+export const MEMORY_TASK_SUCCESS_THRESHOLD = 0.5;
+export const MEMORY_SCORE_THRESHOLD = 0.6;
+
+export type MemoryPromotionInput = {
+  status: string;
+  taskSuccess?: number;
+  score: number;
+};
+
+export type MemoryPromotionDecision = {
+  eligible: boolean;
+  requiresHumanApproval: true;
+  reason: string;
+};
+
+/**
+ * Applies Beacon's task-success precondition without approving or writing memory.
+ * A high mean score cannot average a failed task into a reusable lesson.
+ */
+export function evaluateMemoryPromotion(input: MemoryPromotionInput): MemoryPromotionDecision {
+  if (input.status !== "completed") {
+    return { eligible: false, requiresHumanApproval: true, reason: "evaluation status is " + input.status + ", not completed" };
+  }
+  if (typeof input.taskSuccess !== "number" || !Number.isFinite(input.taskSuccess)) {
+    return { eligible: false, requiresHumanApproval: true, reason: "task_success was not answered" };
+  }
+  if (input.taskSuccess < MEMORY_TASK_SUCCESS_THRESHOLD) {
+    return { eligible: false, requiresHumanApproval: true, reason: "task_success " + input.taskSuccess.toFixed(2) + " is below " + MEMORY_TASK_SUCCESS_THRESHOLD.toFixed(2) };
+  }
+  if (!Number.isFinite(input.score) || input.score < 0 || input.score > 1) {
+    return { eligible: false, requiresHumanApproval: true, reason: "mean score is not finite in [0,1]" };
+  }
+  if (input.score < MEMORY_SCORE_THRESHOLD) {
+    return { eligible: false, requiresHumanApproval: true, reason: "mean score " + input.score.toFixed(2) + " is below " + MEMORY_SCORE_THRESHOLD.toFixed(2) };
+  }
+  return { eligible: true, requiresHumanApproval: true, reason: "eligible for human approval" };
+}
 export type GuardResult =
   | { ok: true; verdict: "flag" | "pass"; probability: number; calledModel: boolean }
   | { ok: false; verdict: "review"; reason: string; calledModel: boolean };

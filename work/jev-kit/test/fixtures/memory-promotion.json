@@ -1,0 +1,36 @@
+{
+  "source": "agent-beacon/cli/beacon/internal/learning/promotion_test.go at c8d56ada361eb7cb4d1eae1fe7b0e2fe69f36558",
+  "cases": [
+    {
+      "name": "failed task cannot be averaged into promotion",
+      "status": "completed",
+      "taskSuccess": 0.27,
+      "score": 0.6067,
+      "eligible": false,
+      "reason": "task_success 0.27 is below 0.50"
+    },
+    {
+      "name": "passing evaluation still requires human approval",
+      "status": "completed",
+      "taskSuccess": 0.9,
+      "score": 0.8,
+      "eligible": true,
+      "reason": "eligible for human approval"
+    },
+    {
+      "name": "missing task success fails closed",
+      "status": "completed",
+      "score": 0.8,
+      "eligible": false,
+      "reason": "task_success was not answered"
+    },
+    {
+      "name": "non-completed evaluation cannot promote",
+      "status": "dry_run",
+      "taskSuccess": 0.9,
+      "score": 0.8,
+      "eligible": false,
+      "reason": "evaluation status is dry_run, not completed"
+    }
+  ]
+}
