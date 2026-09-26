@@ -17,7 +17,10 @@ Public Banking77 subset, exactly 400 rows:
 The benchmark oracle is the public row intent label. The fixed model and router receive byte-equivalent
 state/question content. Each row records correctness, latency, input/output usage, OpenRouter-reported
 model/provider metadata, and failure reason without storing credentials.
-
+Both arms use the same direct OpenRouter Chat Completions request shape: a system instruction
+requiring one JSON object with the `intent` label and a user message containing the public
+customer state. `max_tokens=256` is fixed before the first benchmark call; it is a response-size
+cap, not an after-seeing optimization. The prompt and cap are identical across arms.
 ## Fixed bar
 
 The benchmark is scored only after both arms have the same answered-row denominator. A cell with
