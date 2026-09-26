@@ -1,0 +1,12 @@
+{
+  "command": "omp --mode=rpc --no-ui --max-time=60",
+  "prompt": "Use the bash tool exactly once to run printf l3-healthy. Then stop.",
+  "rpc": {"negotiate_protocol": true, "prompt_result": "completed", "session_settled": true},
+  "tool_result_observed": {"toolName": "bash", "probe_marker": "var/agent-tmp/omp-webscreen-l3.jsonl"},
+  "marker_rows": [
+    {"toolName": "bash"},
+    {"toolName": "eval"}
+  ],
+  "healthy_path": "hook returned no replacement; JEV_WEBSCREEN_ENFORCE was unset/0",
+  "boundary": "The marker proves a real tool_result reached the project post-hook. The probe does not claim a web_search/web_extract result was delivered; enforcement remains disabled because the candidate was not promoted."
+}

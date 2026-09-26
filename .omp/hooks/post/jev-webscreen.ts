@@ -1,4 +1,5 @@
 import { askJev, type JevResult } from "../../../kit/src/client.ts";
+import { appendFile } from "node:fs/promises";
 import { useInfisicalKey } from "../../../work/jev-client/src/use-infisical-key.ts";
 
 export const MODEL = "jev-1.13.0";
@@ -176,6 +177,8 @@ function resultText(content: unknown): string | undefined {
 export default function jevWebscreenHook(pi: Host): void {
   useInfisicalKey();
   pi.on("tool_result", async (event) => {
+      const probePath = process.env.JEV_WEBSCREEN_PROBE_PATH;
+      if (probePath) await appendFile(probePath, JSON.stringify({ ts: new Date().toISOString(), toolName: event.toolName ?? null }) + "\n").catch(() => {});
     try {
       const tool = typeof event.toolName === "string" ? event.toolName : "";
       if (!WEB_TOOLS[tool] || event.isError === true) return undefined;
