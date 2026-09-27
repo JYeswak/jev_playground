@@ -1,7 +1,8 @@
 {
-  "clean_free_better_status": "REACHABLE: six discordant wins, exact p=0.03125",
-  "clean_jev_better_status": "UNREACHABLE: maximum 5-0, exact p=0.0625",
+  "clean_free_better_status": "UNREACHABLE: Jev-only false-flag wins max 5; best p=0.0625",
+  "clean_jev_better_status": "REACHABLE: free-only false-flag wins up to 295; six wins exact p=0.03125",
   "clean_jev_false_flags": 5,
+  "clean_jev_source": "jev-a9fv committed clean answers",
   "clean_rows": 300,
   "excluded_rows": 0,
   "items_path": "work/jev-pgtu/items.jsonl",
@@ -9,6 +10,7 @@
   "launch_not_before": "2026-10-03T00:00:00Z",
   "markerless": true,
   "markerless_jev_catch": 268,
+  "markerless_jev_source": "jev-29s4 receipt 268/300",
   "maximum_losses": 0,
   "minimum_discordant_wins": 6,
   "minimum_exact_two_sided_p": 0.03125,
@@ -16,7 +18,7 @@
   "planted_both_directions_status": "REACHABLE: six discordant wins, exact p=0.03125",
   "planted_rows": 300,
   "prereg_path": "work/jev-pgtu/prereg.md",
-  "prereg_sha256": "1c5c7d2d8aee9fbec38f8d2e2c204efd575fa8676123b756c24671eedbae208e",
+  "prereg_sha256": "208b76e02d7a371b188fa6a83f1f206129de5089a8ffe7ac9fe17b5bb1a80604",
   "source": "ARITHMETIC; two paired McNemar bars; no comparator call",
   "status": "REACHABLE",
   "unit": "jev-pgtu"
