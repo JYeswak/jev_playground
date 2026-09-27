@@ -59,10 +59,11 @@ export async function scoreText(options: ScoreOptions): Promise<ScoreResult> {
     model: options.model,
   });
   if (!result.ok) throw new Error(`score failed (${result.reason}): ${result.error}`);
-  if (!Number.isInteger(result.score) || result.score < 0 || result.score >= levels.length) {
-    throw new Error(`score returned an invalid level index: ${result.score}`);
+  if (typeof result.score !== "number" || !Number.isFinite(result.score) || result.score < 0 || result.score > levels.length - 1) {
+    throw new Error(`score returned an invalid value: ${result.score}`);
   }
-  const level = levels[result.score];
+  const normalized = Math.min(levels.length - 1, Math.max(0, Math.floor(result.score + 0.5)));
+  const level = levels[normalized];
   if (typeof level !== "string") throw new Error("score level disappeared after validation");
   return {
     ok: true,

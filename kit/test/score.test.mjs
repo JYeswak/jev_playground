@@ -5,39 +5,46 @@ import { scoreText, SST5_INSTRUCTIONS, SST5_LEVELS } from "../src/score.ts";
 import { createFakeFetch } from "../src/fake.ts";
 import { PreflightError } from "../src/preflight.ts";
 
-const text = await readFile(new URL("../examples/sst5-example.txt", import.meta.url), "utf8");
+const capturedText = "These are AWFUL. They are see through, the fabric feels like tablecloth, and they fit like children’s clothing. Customer service did seem to be nice though, but I regret missing my return date for these. I wouldn’t even donate them because the quality is so poor.";
 const levels = JSON.parse(await readFile(new URL("../examples/sst5-levels.json", import.meta.url), "utf8"));
+const capturedRows = JSON.parse(await readFile(new URL("./fixtures/sst5-answer.json", import.meta.url), "utf8"));
 
-function fake(score = 3, model = "fake") {
-  return createFakeFetch([
-    {
-      id: "sst5-i0",
-      answers: {
-        score: {
-          score,
-          confidence: 0.98,
-          legend: Object.fromEntries(SST5_LEVELS.map((level, i) => [String(i), level])),
-          probabilities: { "0": 0, "1": 0.01, "2": 0, "3": 0.99, "4": 0 },
-        },
-      },
-      model,
-      usage: { input_tokens: 372, output_tokens: 18 },
-    },
-  ]);
-}
-
-test("score uses captured SST-5 levels and returns the selected level", async () => {
-  const result = await scoreText({ text, levels, apiKey: "fixture-key", fetchImpl: fake(), model: "fake" });
-  assert.equal(result.score, 3);
-  assert.equal(result.level, levels[3]);
-  assert.equal(result.confidence, 0.98);
+test("score accepts the captured continuous Score answer and rounds half up", async () => {
+  const result = await scoreText({
+    text: capturedText,
+    levels,
+    apiKey: "fixture-key",
+    fetchImpl: createFakeFetch(capturedRows),
+    model: "fake",
+  });
+  assert.equal(result.score, 0.07);
+  assert.equal(result.level, levels[0]);
+  assert.equal(result.confidence, 0.94);
   assert.equal(result.model, "fake");
+});
+
+test("score applies measured round-half-up normalization", async () => {
+  const result = await scoreText({
+    text: capturedText,
+    levels: SST5_LEVELS,
+    ask: async () => ({
+      ok: true,
+      score: 1.5,
+      confidence: 0.8,
+      legend: Object.fromEntries(SST5_LEVELS.map((level, i) => [String(i), level])),
+      probabilities: { "0": 0, "1": 0.5, "2": 0.5, "3": 0, "4": 0 },
+      latencyMs: 7,
+      model: "fake",
+    }),
+  });
+  assert.equal(result.score, 1.5);
+  assert.equal(result.level, SST5_LEVELS[2]);
 });
 
 test("score sends the exact SST-5 instruction, levels, and text state", async () => {
   let seen;
   const result = await scoreText({
-    text,
+    text: capturedText,
     levels: SST5_LEVELS,
     ask: async (options) => {
       seen = options;
@@ -53,7 +60,7 @@ test("score sends the exact SST-5 instruction, levels, and text state", async ()
     },
   });
   assert.equal(result.level, SST5_LEVELS[4]);
-  assert.deepEqual(seen.state, { text });
+  assert.deepEqual(seen.state, { text: capturedText });
   assert.equal(seen.instructions, SST5_INSTRUCTIONS);
   assert.deepEqual(seen.criteria, [...SST5_LEVELS]);
 });
@@ -74,21 +81,23 @@ test("score rejects oversized text before asking", async () => {
   assert.equal(asked, false);
 });
 
-test("score rejects a malformed level index", async () => {
-  await assert.rejects(
-    scoreText({
-      text,
-      levels,
-      ask: async () => ({
-        ok: true,
-        score: 5,
-        confidence: 1,
-        legend: {},
-        probabilities: {},
-        latencyMs: 0,
-        model: "fake",
+test("score rejects non-finite and out-of-range values", async () => {
+  for (const score of [Number.NaN, -0.1, 5]) {
+    await assert.rejects(
+      scoreText({
+        text: capturedText,
+        levels,
+        ask: async () => ({
+          ok: true,
+          score,
+          confidence: 1,
+          legend: {},
+          probabilities: {},
+          latencyMs: 0,
+          model: "fake",
+        }),
       }),
-    }),
-    /invalid level index/,
-  );
+      /invalid value/,
+    );
+  }
 });
