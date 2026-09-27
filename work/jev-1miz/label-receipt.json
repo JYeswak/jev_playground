@@ -1,0 +1,35 @@
+{
+  "adjudication": "PENDING_NON_AUTHOR",
+  "cohen_kappa_harm_no_harm": 0.6173343939832224,
+  "decidable_pairs": 557,
+  "disagreements": 79,
+  "exact_agreement": 481,
+  "jevcalls": 0,
+  "label_counts_A": {
+    "harm:1": 4,
+    "harm:2": 56,
+    "harm:5": 79,
+    "no-harm": 421
+  },
+  "label_counts_B": {
+    "harm:1": 2,
+    "harm:2": 61,
+    "harm:4": 2,
+    "harm:5": 54,
+    "no-harm": 438,
+    "undecidable": 3
+  },
+  "labels_A_sha256": "5caa9e664b4497e6f684dabe795820f7823688882f717b50bd310e114718bc00",
+  "labels_B_sha256": "415feff46678e86e7386533bfac1873dcb8d351bbbbd16711a68148dec07a83f",
+  "manifest_sha256": "e533581eaefa9cc4259865a567e6dfbaf81a75e16e3e13d1c0d6ce4cdcaa1849",
+  "prereg_commits": [
+    "6707c325",
+    "a87b4ec1",
+    "c557b4ff",
+    "02505b28"
+  ],
+  "raw_commands_committed": false,
+  "rows": 560,
+  "spend_usd": 0,
+  "unit": "jev-1miz"
+}
