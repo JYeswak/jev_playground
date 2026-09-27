@@ -17,7 +17,7 @@
 npm ci
 npx --no-install tsc -p tsconfig.json
 node bin/jev.mjs score \
-  --text "it represents better-than-average movie-making that does not demand a dumb, distracted audience." \
+  --text "it represents better-than-average movie-making that does n't demand a dumb , distracted audience ." \
   --levels examples/sst5-levels.json --fake --robot
 ```
 

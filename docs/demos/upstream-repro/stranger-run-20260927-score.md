@@ -4,7 +4,7 @@
 
 ## Source and environment
 
-- Clone commit: `3fcfff3f80be536693537005a4be9e034227d872`.
+- Clone commit: `001b81a122056fcca2799bfb9083bd5070bb2ea7`.
 - Tools: `v22.23.3`, `Python 3.9.6`, `uv 0.9.28 (Homebrew 2026-01-29)`.
 - Child command timeout: `600s` per command.
 - Child environment: only PATH, HOME, TMPDIR, LANG, TERM and USER; API-key variables were absent.
@@ -21,7 +21,7 @@ The script extracts runnable fenced commands and inline command spans in README 
 | 3 | L14 | `npx --prefix kit --no-install jev doctor --robot` |
 | 4 | L16 | `npx --prefix kit --no-install jev ask choice --fake --state kit/examples/state.json --question kit/examples/question.json --robot` |
 | 5 | L17 | `npx --prefix kit --no-install jev verify --claim "A low percentage of hematopoietic progenitor cells are susceptible to HIV-1 infection ex vivo." --evidence kit/examples/scifact-evidence.txt --fake --robot` |
-| 6 | L18 | `npx --prefix kit --no-install jev score --text "it represents better-than-average movie-making that does not demand a dumb, distracted audience." --levels kit/examples/sst5-levels.json --fake --robot` |
+| 6 | L18 | `npx --prefix kit --no-install jev score --text "it represents better-than-average movie-making that does n't demand a dumb , distracted audience ." --levels kit/examples/sst5-levels.json --fake --robot` |
 | 7 | L26 | `node kit/bin/jev.mjs rerank --query "Tax implications of holding EWU (or other such UK ETFs) as a US citizen?" --candidates kit/examples/rerank-candidates.json --fake --robot` |
 | 8 | L30 | `if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --prefix kit --no-install jev ask choice --state kit/examples/state.json --question kit/examples/question.json --robot \|\| { rc=$?; exit "$rc"; }` |
 
@@ -31,14 +31,14 @@ The script extracts runnable fenced commands and inline command spans in README 
 
 | # | README lines | command | exit/status | wall s | quoted numbers | failure class | first error line |
 |---:|---|---|---:|---:|---|---|---|
-| 1 | L12 | `git clone https://github.com/JYeswak/jev_playground.git` | 0 | 9.59 | — | none | — |
-| 2 | L13 | `npm ci --prefix kit` | 0 | 6.92 | — | none | — |
-| 3 | L14 | `npx --prefix kit --no-install jev doctor --robot` | 2 | 2.17 | — | needs key | {"status":"NOT_RUN","reason":"no key","model":"jev-1.13.0","key_source":"none","sdk":"@typesafe-ai/sdk","omp":{"repo":"/Users/josh/Developer/jev","tools":[{"path":".omp/tools/jev-rerank.ts","present":true},{"path":".omp/tools/jev-claim-check.ts","present":true},{"path":".omp/tools/jev-screen.ts","pr |
-| 4 | L16 | `npx --prefix kit --no-install jev ask choice --fake --state kit/examples/state.json --question kit/examples/question.json --robot` | 0 | 3.71 | — | none | — |
-| 5 | L17 | `npx --prefix kit --no-install jev verify --claim "A low percentage of hematopoietic progenitor cells are susceptible to HIV-1 infection ex vivo." --evidence kit/examples/scifact-evidence.txt --fake --robot` | 0 | 2.06 | — | none | — |
-| 6 | L18 | `npx --prefix kit --no-install jev score --text "it represents better-than-average movie-making that does not demand a dumb, distracted audience." --levels kit/examples/sst5-levels.json --fake --robot` | 0 | 2.24 | — | none | — |
-| 7 | L26 | `node kit/bin/jev.mjs rerank --query "Tax implications of holding EWU (or other such UK ETFs) as a US citizen?" --candidates kit/examples/rerank-candidates.json --fake --robot` | 0 | 0.18 | — | none | — |
-| 8 | L30 | `if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --prefix kit --no-install jev ask choice --state kit/examples/state.json --question kit/examples/question.json --robot \|\| { rc=$?; exit "$rc"; }` | 2 | 2.21 | — | needs key | NOT_RUN: no key |
+| 1 | L12 | `git clone https://github.com/JYeswak/jev_playground.git` | 0 | 9.95 | — | none | — |
+| 2 | L13 | `npm ci --prefix kit` | 0 | 4.0 | — | none | — |
+| 3 | L14 | `npx --prefix kit --no-install jev doctor --robot` | 2 | 2.47 | — | needs key | {"status":"NOT_RUN","reason":"no key","model":"jev-1.13.0","key_source":"none","sdk":"@typesafe-ai/sdk","omp":{"repo":"/Users/josh/Developer/jev","tools":[{"path":".omp/tools/jev-rerank.ts","present":true},{"path":".omp/tools/jev-claim-check.ts","present":true},{"path":".omp/tools/jev-screen.ts","pr |
+| 4 | L16 | `npx --prefix kit --no-install jev ask choice --fake --state kit/examples/state.json --question kit/examples/question.json --robot` | 0 | 2.01 | — | none | — |
+| 5 | L17 | `npx --prefix kit --no-install jev verify --claim "A low percentage of hematopoietic progenitor cells are susceptible to HIV-1 infection ex vivo." --evidence kit/examples/scifact-evidence.txt --fake --robot` | 0 | 1.91 | — | none | — |
+| 6 | L18 | `npx --prefix kit --no-install jev score --text "it represents better-than-average movie-making that does n't demand a dumb , distracted audience ." --levels kit/examples/sst5-levels.json --fake --robot` | 0 | 2.19 | — | none | — |
+| 7 | L26 | `node kit/bin/jev.mjs rerank --query "Tax implications of holding EWU (or other such UK ETFs) as a US citizen?" --candidates kit/examples/rerank-candidates.json --fake --robot` | 0 | 0.14 | — | none | — |
+| 8 | L30 | `if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --prefix kit --no-install jev ask choice --state kit/examples/state.json --question kit/examples/question.json --robot \|\| { rc=$?; exit "$rc"; }` | 2 | 2.23 | — | needs key | NOT_RUN: no key |
 
 Result: `8` rows, `6` exit 0, `2` nonzero, `0` TEMPLATE.
 
