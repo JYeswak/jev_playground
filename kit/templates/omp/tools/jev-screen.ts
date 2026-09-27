@@ -15,7 +15,7 @@
  */
 import { liveAsker } from "../jev-kit/nev-injection/live-flag.ts";
 import { useInfisicalKey } from "../jev-kit/use-infisical-key.ts";
-import { ASSISTANT, QUESTION, CUT as SEAT_CUT, MODEL as SEAT_MODEL } from "../../work/jev-a9fv/seat.mjs";
+import { ASSISTANT, QUESTION, CUT as SEAT_CUT, MODEL as SEAT_MODEL } from "../jev-kit/coding-agent-seat.mjs";
 export function screen(probability) {
   if (typeof probability !== "number" || !Number.isFinite(probability)) {
     return { verdict: "review", text: "REVIEW: malformed score, never verified. Human glance required." };

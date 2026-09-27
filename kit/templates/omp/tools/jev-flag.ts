@@ -8,7 +8,7 @@
  */
 import { liveAsker } from "../jev-kit/nev-injection/live-flag.ts";
 import { useInfisicalKey } from "../jev-kit/use-infisical-key.ts";
-import { ASSISTANT, QUESTION } from "../../work/jev-a9fv/seat.mjs";
+import { ASSISTANT, QUESTION } from "../jev-kit/coding-agent-seat.mjs";
 export function annotate(probability) {
   if (typeof probability !== "number" || !Number.isFinite(probability)) {
     return { level: "unknown", text: "" };

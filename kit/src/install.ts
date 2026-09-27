@@ -22,6 +22,7 @@ export const INSTALL_FILES = {
   "jev-kit/use-infisical-key.ts": "jev-kit/use-infisical-key.ts",
   "jev-kit/infisical-key.ts": "jev-kit/infisical-key.ts",
   "jev-kit/questions.mjs": "jev-kit/questions.mjs",
+  "jev-kit/coding-agent-seat.mjs": "omp/jev-kit/coding-agent-seat.mjs",
   "jev-kit/nev-rerank/rank.ts": "jev-kit/nev-rerank/rank.ts",
   "jev-kit/nev-rerank/live.ts": "jev-kit/nev-rerank/live.ts",
   "jev-kit/nev-injection/live-flag.ts": "jev-kit/nev-injection/live-flag.ts",
