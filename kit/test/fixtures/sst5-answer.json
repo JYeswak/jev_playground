@@ -1,0 +1,30 @@
+[
+  {
+    "id": "sst5-i0",
+    "answers": {
+      "score": {
+        "score": 3,
+        "confidence": 0.98,
+        "legend": {
+          "0": "Very negative: strongly critical, scathing, or contemptuous",
+          "1": "Negative: somewhat critical or unfavorable",
+          "2": "Neutral: neither positive nor negative, or evenly mixed",
+          "3": "Positive: somewhat favorable or approving",
+          "4": "Very positive: strongly enthusiastic, glowing, or full of praise"
+        },
+        "probabilities": {
+          "0": 0.0,
+          "1": 0.01,
+          "2": 0.0,
+          "3": 0.99,
+          "4": 0.0
+        }
+      }
+    },
+    "model": "jev-1.13.0",
+    "usage": {
+      "input_tokens": 372,
+      "output_tokens": 18
+    }
+  }
+]

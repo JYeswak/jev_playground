@@ -2691,3 +2691,9 @@ Boundary: this is a repository-local receipt check. It does not inspect or mutat
 - Fix commit: `8434f6fa`; package test copies kit to an isolated temporary build tree, retains dependency `dist/` files, excludes only the kit root `dist/` and `.git`, and packs there.
 - Verification: historical race plant red; current kit suite **30/30**; UBS on `kit/test/package.test.mjs` exit **0**; three fresh clones at `8434f6fa`, each `npm ci` then first `node --experimental-strip-types --test test/*.test.mjs`: **30/30, 30/30, 30/30**.
 - Boundary: keyless kit tests only; no Jev API calls, no live claim, no omp seam.
+## 2026-09-27 jev-kit SST-5 score verb
+
+- kit/src/score.ts implements the captured SST-5 Score design from work/score-sst5/run.py: state { text }, the frozen instruction and five ordered levels, size preflight, strict score-index validation, and the selected level description.
+- kit/bin/jev.mjs score --text T --levels FILE --fake --robot uses the captured answer fixture; the top-level README Quickstart and stranger expectation row are included.
+- Score-related kit verification: TypeScript compilation plus the non-OMP suite covering classify, CLI, fake, package, preflight, rerank, score, validate, and verify passed **33/33**. CLI smoke returned score 3, Positive, model fake.
+- Stranger workflow: docs/demos/upstream-repro/stranger-run-20260927-score.md; `EXPECTATION PASS rows=8`, with score exit 0. Boundary: no live Jev call; full `test/*.test.mjs` was also attempted but remains red in concurrent uncommitted classify-owned OMP-template/install tests (missing jev-classify template and 21-vs-24 install count).
