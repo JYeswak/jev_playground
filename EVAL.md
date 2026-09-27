@@ -2630,3 +2630,12 @@ Project model-role config is gate-protected, so no config outside the repository
 - Drift output names the expected model and offending row; no live call or key required.
 
 Boundary: this is a repository-local receipt check. It does not inspect or mutate ~/.omp profiles and does not claim that the current global judge role is pinned.
+
+## 8. jev-l7ym — omp find rank/use join (keyless, real logs)
+
+- Script: work/jev-l7ym/measure.py; receipt: work/jev-l7ym/receipt.json.
+- Source: ~/.omp/profiles/*/agent/sessions/**/*.jsonl, filesystem-mtime window of 3 days; 325 regular JSONL files across all profiles, 59 find results, 47 with non-empty ranked hits, 7 with a returned file read/edited/written in the next 10 tool calls.
+- Actual order: top-1 6/7 = 0.857 (Wilson 95% CI 0.487–0.974); top-3 7/7 = 1.000 (Wilson 0.646–1.000); no returned file used 52/59 = 0.881.
+- Baseline order: find pre-rerank order was absent from recorded result details, so the fallback is returned hits sorted by path length then lexical order; on the same 7 matched windows, top-1 3/7 = 0.429 (Wilson 0.158–0.750) and top-3 5/7 = 0.714 (Wilson 0.359–0.918).
+- Offline regression: python3 work/jev-l7ym/test_measure.py → 3 tests passed; includes a rank-matching defect guard. Live API lane: excluded by design; this is log-only dogfood.
+- Boundary: association only, causal uplift unmeasured; hit rates condition on a ranked result and a matched next-ten read/edit/write window. Bash/eval/grep/glob path use is excluded. Raw session text is uncommitted.

@@ -1,0 +1,507 @@
+{
+  "baseline": {
+    "definition": "same returned hits sorted by (len(rel), rel); no pre-rerank order was logged in inspected find result details",
+    "name": "path-length-then-lexical"
+  },
+  "boundary": "Logs establish association, not causality. The baseline is a deterministic proxy because find's pre-rerank order is absent from recorded result details. Bash/eval/grep/glob path use is not counted; only read, edit, and write arguments are matched. Hit rates use find results with at least one returned file and a matched next-ten read/edit/write window; no-returned-file share uses all find results.",
+  "cutoff_utc": "2026-09-24T01:41:55.342514+00:00",
+  "files": {
+    "malformed_json_lines": 0,
+    "seen": 325,
+    "selected": 325
+  },
+  "lane": "keyless-log-only",
+  "next_window": {
+    "matched_tools": [
+      "edit",
+      "read",
+      "write"
+    ],
+    "tool_calls": 10
+  },
+  "overall": {
+    "actual": {
+      "median_rank": 1,
+      "top1": {
+        "high": 0.9743203756552565,
+        "hits": 6,
+        "low": 0.4868721707256811,
+        "n": 7,
+        "rate": 0.8571428571428571
+      },
+      "top3": {
+        "high": 1.0,
+        "hits": 7,
+        "low": 0.6456695649333126,
+        "n": 7,
+        "rate": 1.0
+      }
+    },
+    "baseline": {
+      "median_rank": 2,
+      "top1": {
+        "high": 0.7495416354723428,
+        "hits": 3,
+        "low": 0.15821985525146975,
+        "n": 7,
+        "rate": 0.42857142857142855
+      },
+      "top3": {
+        "high": 0.9177810759959433,
+        "hits": 5,
+        "low": 0.35893445183261935,
+        "n": 7,
+        "rate": 0.7142857142857143
+      }
+    },
+    "denominators": {
+      "ranked_calls": 47,
+      "windowed_calls": 7
+    },
+    "find_calls": 59,
+    "find_results": 59,
+    "no_returned_file_used": 52,
+    "no_returned_file_used_share": 0.8813559322033898,
+    "profile": "all-profiles",
+    "ranked_calls": 47,
+    "used_returned_file": 7,
+    "windowed_calls": 7
+  },
+  "per_profile": {
+    "agy": {
+      "actual": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "baseline": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "denominators": {
+        "ranked_calls": 0,
+        "windowed_calls": 0
+      },
+      "find_calls": 0,
+      "find_results": 0,
+      "no_returned_file_used": 0,
+      "no_returned_file_used_share": null,
+      "profile": "agy",
+      "ranked_calls": 0,
+      "used_returned_file": 0,
+      "windowed_calls": 0
+    },
+    "claude": {
+      "actual": {
+        "median_rank": 1,
+        "top1": {
+          "high": 0.9743203756552565,
+          "hits": 6,
+          "low": 0.4868721707256811,
+          "n": 7,
+          "rate": 0.8571428571428571
+        },
+        "top3": {
+          "high": 1.0,
+          "hits": 7,
+          "low": 0.6456695649333126,
+          "n": 7,
+          "rate": 1.0
+        }
+      },
+      "baseline": {
+        "median_rank": 2,
+        "top1": {
+          "high": 0.7495416354723428,
+          "hits": 3,
+          "low": 0.15821985525146975,
+          "n": 7,
+          "rate": 0.42857142857142855
+        },
+        "top3": {
+          "high": 0.9177810759959433,
+          "hits": 5,
+          "low": 0.35893445183261935,
+          "n": 7,
+          "rate": 0.7142857142857143
+        }
+      },
+      "denominators": {
+        "ranked_calls": 47,
+        "windowed_calls": 7
+      },
+      "find_calls": 59,
+      "find_results": 59,
+      "no_returned_file_used": 52,
+      "no_returned_file_used_share": 0.8813559322033898,
+      "profile": "claude",
+      "ranked_calls": 47,
+      "used_returned_file": 7,
+      "windowed_calls": 7
+    },
+    "codex": {
+      "actual": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "baseline": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "denominators": {
+        "ranked_calls": 0,
+        "windowed_calls": 0
+      },
+      "find_calls": 0,
+      "find_results": 0,
+      "no_returned_file_used": 0,
+      "no_returned_file_used_share": null,
+      "profile": "codex",
+      "ranked_calls": 0,
+      "used_returned_file": 0,
+      "windowed_calls": 0
+    },
+    "grok": {
+      "actual": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "baseline": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "denominators": {
+        "ranked_calls": 0,
+        "windowed_calls": 0
+      },
+      "find_calls": 0,
+      "find_results": 0,
+      "no_returned_file_used": 0,
+      "no_returned_file_used_share": null,
+      "profile": "grok",
+      "ranked_calls": 0,
+      "used_returned_file": 0,
+      "windowed_calls": 0
+    },
+    "muse": {
+      "actual": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "baseline": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "denominators": {
+        "ranked_calls": 0,
+        "windowed_calls": 0
+      },
+      "find_calls": 0,
+      "find_results": 0,
+      "no_returned_file_used": 0,
+      "no_returned_file_used_share": null,
+      "profile": "muse",
+      "ranked_calls": 0,
+      "used_returned_file": 0,
+      "windowed_calls": 0
+    },
+    "nv-deepseek-flash": {
+      "actual": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "baseline": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "denominators": {
+        "ranked_calls": 0,
+        "windowed_calls": 0
+      },
+      "find_calls": 0,
+      "find_results": 0,
+      "no_returned_file_used": 0,
+      "no_returned_file_used_share": null,
+      "profile": "nv-deepseek-flash",
+      "ranked_calls": 0,
+      "used_returned_file": 0,
+      "windowed_calls": 0
+    },
+    "nv-glm": {
+      "actual": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "baseline": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "denominators": {
+        "ranked_calls": 0,
+        "windowed_calls": 0
+      },
+      "find_calls": 0,
+      "find_results": 0,
+      "no_returned_file_used": 0,
+      "no_returned_file_used_share": null,
+      "profile": "nv-glm",
+      "ranked_calls": 0,
+      "used_returned_file": 0,
+      "windowed_calls": 0
+    },
+    "nv-glm-flash": {
+      "actual": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "baseline": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "denominators": {
+        "ranked_calls": 0,
+        "windowed_calls": 0
+      },
+      "find_calls": 0,
+      "find_results": 0,
+      "no_returned_file_used": 0,
+      "no_returned_file_used_share": null,
+      "profile": "nv-glm-flash",
+      "ranked_calls": 0,
+      "used_returned_file": 0,
+      "windowed_calls": 0
+    },
+    "nv-kimi": {
+      "actual": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "baseline": {
+        "median_rank": null,
+        "top1": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        },
+        "top3": {
+          "high": null,
+          "hits": 0,
+          "low": null,
+          "n": 0,
+          "rate": null
+        }
+      },
+      "denominators": {
+        "ranked_calls": 0,
+        "windowed_calls": 0
+      },
+      "find_calls": 0,
+      "find_results": 0,
+      "no_returned_file_used": 0,
+      "no_returned_file_used_share": null,
+      "profile": "nv-kimi",
+      "ranked_calls": 0,
+      "used_returned_file": 0,
+      "windowed_calls": 0
+    }
+  },
+  "schema": "jev-l7ym.v1",
+  "source": "~/.omp/profiles/*/agent/sessions/**/*.jsonl",
+  "window_days": 3
+}
