@@ -1,0 +1,7 @@
+{
+  "fixture": "jev-qsa6 mcnemar point bar",
+  "tasks": 396,
+  "comparator_exact": 300,
+  "oracle_headroom": 6,
+  "bar_alpha": 0.05
+}
