@@ -11,7 +11,7 @@ export const MODEL = "jev-1.13.0";
 export const MAX_DAILY_CALLS = 100;
 export const LOG_SCHEMA = "jev-gate-shadow.v1";
 
-type Event = { toolName?: unknown; name?: unknown; input?: unknown; command?: unknown; details?: unknown };
+type Event = { toolName?: unknown; name?: unknown; toolCallId?: unknown; input?: unknown; args?: unknown; arguments?: unknown; command?: unknown; details?: unknown };
 type Append = (path: string, line: string) => Promise<void>;
 type Ask = (options: AskBundleOptions) => Promise<JevBundleResult>;
 type ShadowDeps = { ask?: Ask; append?: Append; path?: string; session?: string; cap?: number; now?: () => string };
@@ -34,7 +34,8 @@ function dayKey(now: () => string): string { return now().slice(0, 10); }
 function stringCommand(event: Event): string | undefined {
   const toolName = typeof event.toolName === "string" ? event.toolName : typeof event.name === "string" ? event.name : "";
   if (toolName !== "bash") return undefined;
-  const input = event.input && typeof event.input === "object" ? event.input as Record<string, unknown> : {};
+  const source = event.input ?? event.args ?? event.arguments;
+  const input = source && typeof source === "object" ? source as Record<string, unknown> : {};
   const command = input.command ?? input.cmd ?? event.command;
   return typeof command === "string" && command.length > 0 ? command : undefined;
 }
@@ -95,5 +96,15 @@ export function makeGateShadowHandler(deps: ShadowDeps = {}) {
 }
 
 export default function jevGateShadowHook(pi: { on: (event: string, handler: (event: unknown, ctx?: unknown) => unknown) => void }): void {
-  pi.on("tool_call", makeGateShadowHandler() as (event: unknown, ctx?: unknown) => unknown);
+  const handler = makeGateShadowHandler() as (event: unknown, ctx?: unknown) => unknown;
+  const seen = new Set<string>();
+  const dispatch = (event: unknown, ctx?: unknown): unknown => {
+    const id = event && typeof event === "object" && typeof (event as { toolCallId?: unknown }).toolCallId === "string"
+      ? (event as { toolCallId: string }).toolCallId : undefined;
+    if (id && seen.has(id)) return undefined;
+    if (id) { seen.add(id); setTimeout(() => seen.delete(id), 60_000); }
+    return handler(event, ctx);
+  };
+  pi.on("tool_call", dispatch);
+  pi.on("tool_execution_start", dispatch);
 }

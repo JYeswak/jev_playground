@@ -3,20 +3,22 @@ import { appendFile, mkdir, open } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
 import { rerankTop1, type RerankCandidate, type RerankOptions } from "../../../kit/src/rerank.ts";
-
 export const MODEL = "jev-1.13.0";
 export const MAX_RESULTS = 20;
 export const MAX_NEXT_TOOL_CALLS = 10;
 export const LOG_SCHEMA = "jev-web-search-rerank.v1";
 
+
 export type SearchEvent = {
   toolName?: unknown;
+  toolCallId?: unknown;
   input?: unknown;
+  args?: unknown;
   details?: unknown;
+  result?: unknown;
   content?: unknown;
   isError?: unknown;
 };
-
 type Ask = NonNullable<RerankOptions["ask"]>;
 type Append = (path: string, line: string) => Promise<void>;
 
@@ -85,7 +87,7 @@ function stringValue(value: unknown): string | undefined {
 
 function rawText(content: unknown): string | undefined {
   if (typeof content === "string") return content;
-  if (Array.isArray(content)) return content.map((part) => stringValue(part) ?? "").join("\n");
+  if (Array.isArray(content)) return content.map((part) => typeof part === "string" ? part : part && typeof part === "object" && typeof (part as Record<string, unknown>).text === "string" ? (part as Record<string, string>).text : "").join("\n");
   if (content && typeof content === "object") return JSON.stringify(content);
   return undefined;
 }
@@ -99,11 +101,16 @@ function parseJson(text: string): unknown {
 }
 
 export function parseSearchResult(event: SearchEvent): { query: string; items: ResultItem[] } | undefined {
-  const input = event.input && typeof event.input === "object" ? event.input as Record<string, unknown> : {};
+  const source = event.input ?? event.args;
+  const input = source && typeof source === "object" ? source as Record<string, unknown> : {};
   const query = stringValue(input.query) ?? stringValue(input.q);
-  const parsed = typeof event.details === "object" && event.details !== null
-    ? event.details
-    : parseJson(rawText(event.content) ?? "");
+  const execution = event.result && typeof event.result === "object" ? event.result as Record<string, unknown> : {};
+  const details = event.details ?? execution.details;
+  const content = event.content ?? execution.content;
+  const parsedDetails = details && typeof details === "object" && !Array.isArray(details)
+    && (Array.isArray((details as Record<string, unknown>).results) || Array.isArray((details as Record<string, unknown>).items))
+    ? details : undefined;
+  const parsed = parsedDetails ?? parseJson(rawText(content) ?? rawText(details) ?? "");
   const root = parsed && typeof parsed === "object" ? parsed as Record<string, unknown> : {};
   const rawItems = Array.isArray(root.results) ? root.results : Array.isArray(root.items) ? root.items : [];
   if (!query || rawItems.length < 2) return undefined;
@@ -172,13 +179,16 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
   let calls = 0;
   let paused = false;
   const pending = new Map<string, Pending>();
-
+  const seenEvents = new Set<string>();
   const write = (row: Record<string, unknown>): void => {
     void Promise.resolve(append(path, JSON.stringify(row))).catch(() => undefined);
   };
 
   const handler = async (event: SearchEvent, session = deps.session ?? "unknown"): Promise<undefined> => {
     try {
+      const eventId = typeof event.toolCallId === "string" ? event.toolCallId : undefined;
+      if (eventId && seenEvents.has(eventId)) return undefined;
+      if (eventId) { seenEvents.add(eventId); setTimeout(() => seenEvents.delete(eventId), 60_000); }
       const currentDay = dayKey(now);
       if (currentDay !== day) { day = currentDay; calls = 0; paused = false; }
       const key = sessionHash(session);
@@ -237,4 +247,5 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
 export default function jevWebSearchRerankHook(host: { on: (event: string, handler: (event: SearchEvent) => Promise<undefined>) => void }): void {
   const handler = makeWebSearchRerankHandler();
   host.on("tool_result", (event) => handler(event));
+  host.on("tool_execution_end", (event) => handler(event));
 }
