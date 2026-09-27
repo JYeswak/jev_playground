@@ -32,6 +32,39 @@
   },
   "model": "dots-studio/dots-3-note-preview:free",
   "n": 234,
+  "reconciliation": {
+    "errors_retried": 15,
+    "mcnemar_exact_two_sided_p": 0.18392482137699062,
+    "note": "The final receipt scores the third pass only; the 15 initial errors and one retry-1 error were retried, never scored as wrong.",
+    "passes": [
+      {
+        "error": 15,
+        "invalid": 0,
+        "name": "initial",
+        "ok": 219,
+        "rows": "rows-jev-97bq-openrouter.jsonl"
+      },
+      {
+        "error": 1,
+        "invalid": 0,
+        "name": "retry-1",
+        "ok": 233,
+        "rows": "rows-jev-97bq-final.jsonl"
+      },
+      {
+        "error": 0,
+        "invalid": 0,
+        "name": "retry-2-final",
+        "ok": 234,
+        "rows": "rows-jev-97bq-final2.jsonl"
+      }
+    ],
+    "top1_matches": {
+      "incumbent": 156,
+      "jev": 166,
+      "n": 234
+    }
+  },
   "rows": "work/rerank-scifact/rows-jev-97bq-final2.jsonl",
   "status": "SCORED",
   "usage": {
