@@ -1,6 +1,7 @@
 # jev-1lim held-out fleet confirmation preregistration
 
 **Status:** preregistered before any Jev/API call.
+reach-mode: mcnemar
 
 ## Frozen corpus and overlap
 
