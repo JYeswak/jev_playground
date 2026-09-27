@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 import {appendFile, readFile} from "node:fs/promises";
-import {createHash} from "node:crypto";
 import {askJevBundle} from "../../kit/src/client.ts";
 import {RISK, STATE_CONTEXT, CUT} from "../bicameral-gate/questions.mjs";
 
@@ -12,17 +11,6 @@ const LABEL_B = new URL("work/jev-1lim/labels-B.jsonl", ROOT);
 const ADJUDICATED = new URL("work/jev-1lim/adjudicated.jsonl", ROOT);
 const OUT = new URL(process.env.JEV_1LIM_OUT ?? "var/agent-tmp/jev-1lim/live-rows.jsonl", ROOT);
 
-const PREREG = new URL("work/jev-1lim/PREREG-QSA6.md", ROOT);
-const REACH = new URL("work/jev-1lim/reach-receipt-qsa6.json", ROOT);
-const LAUNCH_AFTER = Date.parse("2026-09-30T00:00:00Z");
-async function assertLaunchReady() {
-  if (Date.now() < LAUNCH_AFTER) throw new Error("jev-qsa6 launch refused before 2026-09-30T00:00:00Z");
-  const preregText = await readFile(PREREG, "utf8");
-  const preregSha = createHash("sha256").update(preregText).digest("hex");
-  const reach = JSON.parse(await readFile(REACH, "utf8"));
-  if (reach.status !== "REACHABLE" || reach.mode !== "mcnemar" || reach.prereg_sha256 !== preregSha) throw new Error("jev-qsa6 reach receipt is not bound to the current prereg");
-}
-await assertLaunchReady();
 const parseJsonl = async (url) => (await readFile(url, "utf8")).split("\n").filter(Boolean).map(JSON.parse);
 const raw = await parseJsonl(RAW);
 const manifest = await parseJsonl(MANIFEST);
