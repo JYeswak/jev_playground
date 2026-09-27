@@ -2684,3 +2684,10 @@ Boundary: this is a repository-local receipt check. It does not inspect or mutat
 - kit/bin/jev.mjs verify --claim C --evidence FILE --fake --robot and kit/examples/scifact-evidence.txt provide a stranger-runnable keyless example; the fake fixture is from SciFact row i=0 (noul=0.27, model jev-1.13.0).
 - Offline verification: npx --no-install tsc -p tsconfig.json; node --test test/*.test.mjs 30/30; CLI smoke emits ok:true, value:0.27, label:unsupported, model:fake.
 - Boundary: no live Jev call in this implementation pass; live claim remains unmeasured here. UBS scanned the changed TS/JS/test files but returned nonzero on existing CLI warnings; no UBS finding was introduced in verify.ts.
+
+## jev-ulg3 kit fresh-clone build race [offline-verified, 2026-09-27]
+
+- Root cause: `kit/test/package.test.mjs` ran `npm pack` in the live kit tree; its `prepack` TypeScript build rewrote shared `kit/dist/` while concurrent CLI tests imported it. A planted 3-second compiler delay on the historical first-run shape reproduced **6 failures / 20 passes**.
+- Fix commit: `8434f6fa`; package test copies kit to an isolated temporary build tree, retains dependency `dist/` files, excludes only the kit root `dist/` and `.git`, and packs there.
+- Verification: historical race plant red; current kit suite **30/30**; UBS on `kit/test/package.test.mjs` exit **0**; three fresh clones at `8434f6fa`, each `npm ci` then first `node --experimental-strip-types --test test/*.test.mjs`: **30/30, 30/30, 30/30**.
+- Boundary: keyless kit tests only; no Jev API calls, no live claim, no omp seam.
