@@ -78,7 +78,7 @@
     "first_recorded_at": "2026-09-27T06:04:32.688Z",
     "input_tokens": 42239,
     "last_recorded_at": "2026-09-27T06:04:42.181Z",
-    "original_3db9d119_bar_note": "Pane 1 reports the FULL 558-row revised-result run also passes the original 3db9d119 bare precision/catch bar; the 52-call pre-prereg partial is disclosed separately and is not used for any current result.",
+    "original_3db9f119_bar_note": "Pane 1 reports the FULL 558-row revised-result run also passes the original 3db9f119 bare precision/catch bar; the 52-call pre-prereg partial is disclosed separately and is not used for any current result.",
     "prereg_commit": "3db9f119",
     "rows_sha256": "0874a3a85732f129fe6ef1d0b7de3ab586190df1aa2ceb99b3b7504800bfae4b",
     "scored": 52,
