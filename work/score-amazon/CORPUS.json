@@ -1,0 +1,19 @@
+{
+  "dataset": "SetFit/amazon_reviews_multi_en",
+  "dataset_revision": "ec73b665e4be0f567b69d39425355401cfe0d29b",
+  "source_file": "test.jsonl",
+  "source_file_sha256": "64827868be6aeb86959e283bc9ae94f5c515ca2fa334c698c3cb5c4a36395029",
+  "source_file_bytes": 1180425,
+  "license": "apache-2.0",
+  "split": "test",
+  "selection": "first 60 rows per label from the pinned public test file",
+  "rows": 300,
+  "class_counts": {
+    "0": 60,
+    "1": 60,
+    "2": 60,
+    "3": 60,
+    "4": 60
+  },
+  "corpus_sha256": "591ba40224ccea0c0873b7dfea64a85ec53ce16b476e71d4336115d5f7d884b7"
+}

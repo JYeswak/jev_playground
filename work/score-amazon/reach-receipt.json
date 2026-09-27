@@ -1,0 +1,16 @@
+{
+  "status": "REACHABLE",
+  "mode": "mcnemar",
+  "tasks": 300,
+  "planned_n": 300,
+  "required_n": 278,
+  "reference_paired_n": 500,
+  "reference_sd_ae_difference": 0.4040226506081173,
+  "planning_effect_mae": 0.068,
+  "alpha": 0.05,
+  "power": 0.8,
+  "paired_test": "seeded_sign_flip_permutation_10000",
+  "items_sha256": "591ba40224ccea0c0873b7dfea64a85ec53ce16b476e71d4336115d5f7d884b7",
+  "prereg_path": "work/score-amazon/PREREG.md",
+  "prereg_sha256": "35f45a394becb4cccf7f0d0c27e421a30b01afb7fbc5d2a125bab5746f2c4469"
+}
