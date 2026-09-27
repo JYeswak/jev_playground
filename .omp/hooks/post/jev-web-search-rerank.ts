@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { appendFile, mkdir, open } from "node:fs/promises";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { spawn } from "node:child_process";
 import { homedir } from "node:os";
 import { rerankTop1, type RerankCandidate, type RerankOptions } from "../../../kit/src/rerank.ts";
 export const MODEL = "jev-1.13.0";
@@ -265,6 +266,15 @@ function syncObservedWeb(path: string, event: SearchEvent): void {
   } catch { /* observe-only */ }
 }
 
+function launchWebWorker(path: string, parsed: { query: string; items: ResultItem[] }, row: Record<string, unknown>): void {
+  try {
+    const child = spawn(process.execPath, ["--experimental-strip-types", join(process.cwd(), ".omp", "hooks", "jev-shadow-worker.ts")], { detached: true, stdio: ["pipe", "ignore", "ignore"] });
+    child.stdin.write(JSON.stringify({ kind: "web", path, query: parsed.query, items: parsed.items, row }));
+    child.stdin.end();
+    child.unref();
+  } catch { /* observe-only */ }
+}
+
 export default function jevWebSearchRerankHook(host: { on: (event: string, handler: (event: SearchEvent) => Promise<undefined>) => void }): void {
   const handler = makeWebSearchRerankHandler();
   const seen = new Set<string>();
@@ -272,7 +282,12 @@ export default function jevWebSearchRerankHook(host: { on: (event: string, handl
     const id = typeof event.toolCallId === "string" ? event.toolCallId : undefined;
     if (id && seen.has(id)) return Promise.resolve(undefined);
     if (id) { seen.add(id); setTimeout(() => seen.delete(id), 60_000); }
+    const parsed = parseSearchResult(event);
     syncObservedWeb(defaultPath(), event);
+    if (id && parsed) {
+      const row = { schema: LOG_SCHEMA, ts: new Date().toISOString(), sessionHash: hashValue(process.env.OMP_SESSION_ID ?? "unknown"), queryHash: hashValue(parsed.query), resultCount: parsed.items.length, pickIndex: null, providerRank1Index: 0, latencyMs: null, inputTokens: null, outputTokens: null, nextToolCalls: 0, openedPick: false, openedRank1: false, status: "observed" };
+      launchWebWorker(defaultPath(), parsed, row);
+    }
     return handler(event);
   };
   host.on("tool_result", observe);

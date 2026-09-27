@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, open } from "node:fs/promises";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
+import { spawn } from "node:child_process";
 import { dirname, join } from "node:path";
 import { askJevBundle, type AskBundleOptions, type JevBundleResult } from "../../../kit/src/client.ts";
 import { useInfisicalKey } from "../../../work/jev-client/src/use-infisical-key.ts";
@@ -52,6 +53,15 @@ function syncObserved(path: string, row: Record<string, unknown>): void {
   try {
     mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
     appendFileSync(path, JSON.stringify(row) + "\n", { mode: 0o600 });
+  } catch { /* observe-only */ }
+}
+
+function launchGateWorker(path: string, command: string, row: Record<string, unknown>): void {
+  try {
+    const child = spawn(process.execPath, ["--experimental-strip-types", join(process.cwd(), ".omp", "hooks", "jev-shadow-worker.ts")], { detached: true, stdio: ["pipe", "ignore", "ignore"] });
+    child.stdin.write(JSON.stringify({ kind: "gate", path, command, row }));
+    child.stdin.end();
+    child.unref();
   } catch { /* observe-only */ }
 }
 
@@ -114,7 +124,9 @@ export default function jevGateShadowHook(pi: { on: (event: string, handler: (ev
       ? (event as { toolCallId: string }).toolCallId : undefined;
     const command = event && typeof event === "object" ? stringCommand(event as Event) : undefined;
     if (id && command && !seen.has(id)) {
-      syncObserved(defaultPath(), { ...baseRow(command, process.env.OMP_SESSION_ID ?? "unknown", () => new Date().toISOString()), status: "observed", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null });
+      const observed = { ...baseRow(command, process.env.OMP_SESSION_ID ?? "unknown", () => new Date().toISOString()), status: "observed", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null };
+      syncObserved(defaultPath(), observed);
+      launchGateWorker(defaultPath(), command, observed);
     }
     if (id && seen.has(id)) return undefined;
     if (id) { seen.add(id); setTimeout(() => seen.delete(id), 60_000); }
