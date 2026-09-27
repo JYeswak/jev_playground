@@ -1,4 +1,4 @@
-# Jev Score confirmation retry: Shopee Reviews TL Stars
+# Jev Score confirmation retry: Shopee Reviews TL Stars cross-language test
 
 Status: PREREGISTERED BEFORE LIVE CALLS
 Bead: jev-545t
@@ -9,7 +9,9 @@ reach-mode: mcnemar
 
 ## Question
 
-Does the fixed five-level Score design from `kit/src/score.ts` retain the Amazon/SST-5 behavior on a fresh public five-class sentiment corpus, and does Jev beat the required free comparator on the same rows?
+Does the fixed five-level Score design from `kit/src/score.ts` generalize from the prior English SST-5/Amazon Score results to a fresh public five-class **cross-language** sentiment corpus, and does Jev beat the required free comparator on the same rows?
+
+This is a test of cross-language generalization. A loss on this Tagalog corpus does not refute the prior English Score results; it would identify a language-transfer boundary.
 
 ## Corpus
 
@@ -23,6 +25,7 @@ Does the fixed five-level Score design from `kit/src/score.ts` retain the Amazon
 - Selection: first 70 rows per label from the pinned public test split, preserving each source row index and review text; no text or label was authored or rewritten.
 - Labels `0..4` map directly to the dataset's documented 1-star through 5-star ordered levels.
 - Workspace novelty check: no prior committed Jev/comparator rows or source mention for this dataset before this preregistration.
+- Candidate search did not produce an eligible unscored English five-class corpus distinct from SST-5, Yelp, and Amazon, which this retry explicitly excludes. The available fresh set is therefore retained as a named cross-language test rather than presented as another English confirmation.
 
 ## Fixed design
 
@@ -69,8 +72,8 @@ The reach receipt is `work/score-shopee/reach-receipt.json`. The shared runner m
 
 ## Decision rule
 
-The result is `CONFIRMATION` only if both arms are present, at least 278 paired valid rows exist, corpus/preregistration hashes match, spend readings are present, no hard-stop status occurred, and every primary pass-bar condition holds. Otherwise report `UNDERPOWERED`, `INVALID`, `NO_CONFIRMATION`, `NOT_RUN`, or `RATE_LIMIT_STOP`; never change the bar after observing answers.
+The result is `CONFIRMATION` only if both arms are present, at least 278 paired valid rows exist, corpus/preregistration hashes match, spend readings are present, no hard-stop status occurred, and every primary pass-bar condition holds. This confirmation is scoped to the Tagalog cross-language test; a failure here is not a refutation of the prior English results. Otherwise report `UNDERPOWERED`, `INVALID`, `NO_CONFIRMATION`, `NOT_RUN`, or `RATE_LIMIT_STOP`; never change the bar after observing answers.
 
 ## Boundary
 
-This preregistration authorizes a future live run only. It makes no claim about Jev or comparator performance and contains no live answers. The launch date is deliberately deferred until after OrangeFrog's free-tier use; no live call is permitted before the stated UTC gate.
+This preregistration authorizes a future live cross-language test only. It makes no claim about Jev or comparator performance and contains no live answers. The launch date is deliberately deferred until after OrangeFrog's free-tier use; no live call is permitted before the stated UTC gate.
