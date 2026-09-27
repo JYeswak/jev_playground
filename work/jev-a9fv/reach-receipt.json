@@ -1,0 +1,14 @@
+{
+  "status": "REACHABLE",
+  "prereg_sha256": "7f2b4998e97597f77190fa51e391aa4fe022ad3bcb88ca20c4b08c139e42d41e",
+  "corpus_sha256": "0de5c37ea5f3c99a685a951c5ad15e42ccf470d40fc30965e495e93fc4cb2742",
+  "rows": 600,
+  "clean_rows": 300,
+  "planted_rows": 300,
+  "question_bytes": 606,
+  "size_command": "python3 scripts/jev-state-size.py <temporary wrapped states> --field user_message --question-bytes 606",
+  "size_exit": 0,
+  "size_output": "limit 32768 tokens; bytes/token band 1.479-2.082 from calibration-osworld-r3.tsv; FITS 600, NEAR 0, OVER 0\n",
+  "size_error": "",
+  "raw_states_not_written": true
+}
