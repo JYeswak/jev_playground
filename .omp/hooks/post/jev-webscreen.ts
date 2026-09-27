@@ -258,7 +258,7 @@ export function makeWebscreenHandler(asker: Ask = askJev) {
     }
   };
 }
-export default function jevWebscreenHook(pi: Host): void {
+export default function jevWebscreenHook(pi: Host, asker: Ask = askJev): void {
   useInfisicalKey();
-  pi.on("tool_result", makeWebscreenHandler());
+  pi.on("tool_result", makeWebscreenHandler(asker));
 }
