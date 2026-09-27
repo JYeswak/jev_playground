@@ -2644,7 +2644,7 @@ Boundary: this is a repository-local receipt check. It does not inspect or mutat
 
 - Prereg: work/rerank-scifact/PREREG-jev-iu1e.md, final SHA 0821e9f24bcd3a4e07198c41bcdb76fb12f24d4461a43bc059c92de3848758d0; reach receipt work/rerank-scifact/reach-receipt-nfcorpus.json is McNemar-mode REACHABLE for N=234.
 - Public data: BEIR NFCorpus test archive SHA efe5be03f8c5b86a5870102d0599d227c8c6e2484328e68c6522560385671b0b; deterministic stdlib BM25 candidate SHA 1ef3835708d8522ed39f2f2bd4018ea07390e403bcfd8e00119580e69860e3ec; 234 eligible queries, top-20 each.
-- Valid live receipt: work/rerank-scifact/receipt-nfcorpus-v2.json; rows: work/rerank-scifact/rows-nfcorpus-v2-jev.jsonl; commit a7aa296d; model jev-1.13.0; 234/234 valid Choice answers, one call per query with all 20 passages in state.
+- Valid live receipt: work/rerank-scifact/receipt-nfcorpus-v2.json; rows: work/rerank-scifact/rows-nfcorpus-v2-jev.jsonl; commits a7aa296d (measurement), d6f86941 (first-run disclosure); model jev-1.13.0; 234/234 valid Choice answers, one call per query with all 20 passages in state.
 - Metrics: BM25 nDCG@10 0.4210718, Jev 0.4480190, delta +0.0269472; BM25 top-1 0.5811966, Jev 0.7094017, delta +0.1282051; McNemar Jev-only 45 vs BM25-only 15, exact two-sided p 0.0001345.
 - Spend: valid arm 2,100,124 input tokens / 60,642 output tokens / $0.088205208 input cost; an earlier invalid one-passage transport made 4,680 calls / $0.24715488, excluded from scoring but retained in receipt accounting; total Jev input cost $0.335360088. No paid comparator or OpenRouter call.
 - Bar status: preregistered nDCG delta >=0.05 and top-1 delta >=0.10; top-1 met, nDCG did not. No ruling written.
