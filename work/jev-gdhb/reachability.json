@@ -1,0 +1,20 @@
+{
+  "status": "REACHABLE",
+  "mode": "mcnemar",
+  "unit": "jev-gdhb",
+  "dataset": "FastFit/hwu_64@9fb5bff1e37c4c5a6d46c1ff6f286b6d3f362222",
+  "items_path": "work/jev-gdhb/corpus.jsonl",
+  "items_sha256": "d35b793a7a908d45f0b7c088fb3357557020945dcbbc52b23909b95c7047be98",
+  "states_path": "work/jev-gdhb/states.jsonl",
+  "states_sha256": "29de5c4c596c53c4c0a9526675ac175189af2b1b67a5a3281de1287d0c68bed8",
+  "rows": 784,
+  "intents": 64,
+  "question_bytes": 500,
+  "state_size_preflight": "FITS 784, NEAR 0, OVER 0",
+  "prereg_path": "work/jev-gdhb/PREREG.md",
+  "prereg_sha256": "a54fe68ee0082b917e1b4a0405a0f8ad9053ccc4cafcac763363b944435f95dd",
+  "launch_after_comparator": "2026-10-02T00:00:00Z",
+  "hard_stop_statuses": [401, 402, 403, 429],
+  "hard_stop_outcome": "NOT_RUN",
+  "source": "DOCS plus keyless state-size preflight; no API call"
+}

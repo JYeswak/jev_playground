@@ -1,0 +1,784 @@
+{"id":"c865ae7d7f7ef854fe9c4e19346a090acca9227bf7e69daa5480ef90a8052bd5","source_row":0,"text":"tell me time of alarm you set","label":"alarm query"}
+{"id":"74f0b676f47b2f088bf2b7b05175d5b004ec69ab886432d715ba600fe6b41762","source_row":1,"text":"list all of my alarms","label":"alarm query"}
+{"id":"47e1cb764944df1cdf83b51138d03451d18e6c45ba6024cd71c2dc8db858ea50","source_row":2,"text":"alarm settings","label":"alarm query"}
+{"id":"30a8078743f1e80220fe6dbc1d618dc706505deea7f2aa650fb5c1c53a82f6e7","source_row":3,"text":"what alarms are set for today","label":"alarm query"}
+{"id":"dbf57a452bbfe3b05290608ed31f9b64d12d4badf7e47be0ed8c649ac153bde0","source_row":4,"text":"please see see for me the alarms that you have set sunday morning","label":"alarm query"}
+{"id":"d767fd6320138d5062ed3d26603cd9a8a65dd452eabf493024eec21c3e5a59c9","source_row":5,"text":"tell me when the next alarms are for","label":"alarm query"}
+{"id":"cacae761a7f1994f726f40d40eacdd182499d1e950f3e07b4c392ad5a5594889","source_row":6,"text":"please tell me what alarms are on","label":"alarm query"}
+{"id":"c8f3c0185f6c052ddec7463e3483ca0b93216d7984ef0b0a34e2f91537a62231","source_row":7,"text":"please list all my alarms","label":"alarm query"}
+{"id":"2017048bff372c36db12a16ee3d05c978adc2c3b535071e2f06ff71fcef01f13","source_row":8,"text":"what alarms are set right now","label":"alarm query"}
+{"id":"62fc953259cc38cf5306f2fa84822d17182c23c7bf901d4df519231a1c132704","source_row":9,"text":"check whether i have set any alarms for tomorrow morning","label":"alarm query"}
+{"id":"99a47edb10728c39b710077b4e382f4acb5692882f28dd6bb3e8648b46bc17fc","source_row":10,"text":"tell me about my alarms","label":"alarm query"}
+{"id":"d965def45299de6c1159db7a1d04023bdfabc4a7c80836dc3fe324fec74e9906","source_row":11,"text":"do i have any alarms set","label":"alarm query"}
+{"id":"5c5aab56d890ac0065b42ee76cea60ae8278e96cecd7e0599f4da7bfac1e6f12","source_row":12,"text":"is there an alarm at four am","label":"alarm query"}
+{"id":"fa620baaed50a878d678d0757acba2be41e94f129a10ce9bf9ef98b99040c94a","source_row":19,"text":"disable the alarm which is set at nine thirty pm","label":"alarm remove"}
+{"id":"8b9b198e0b375dadb499152f3e412a32328059010d334e330070a34fd72d8fc9","source_row":20,"text":"delete scheduled alarm","label":"alarm remove"}
+{"id":"bd66b548e8ab91c895da201509f92fea5f53a3a09e3b6967f4050ec3da6d4329","source_row":21,"text":"turn off my first alarm","label":"alarm remove"}
+{"id":"5b680c0ada45a8b9ebaff2336f855e085fcf35ae2b9fb9db1b8cb76fdf640644","source_row":22,"text":"please cancel all alarms for tomorrow","label":"alarm remove"}
+{"id":"40fbf0f4f68cc6755f43ea7c1d574fd6eecb221e50a9500e07798c7f58f96418","source_row":23,"text":"please delete the wednesday evening alarm","label":"alarm remove"}
+{"id":"0fed7d69c91e8d22e327b6a103c9efacc6fca54f8684c3f6f055a0cf0008aa4e","source_row":24,"text":"please delete my morning alarm","label":"alarm remove"}
+{"id":"6be3da876afbcd64b9c08368a7f2c7722df39738a868d9f791e99154b6dd0559","source_row":25,"text":"remove all of my alarms","label":"alarm remove"}
+{"id":"178ba4f1be7607545d75d9389d1ddfd4b650cedc6b0696e9601700a82e947b16","source_row":26,"text":"cancel alarm","label":"alarm remove"}
+{"id":"2fb1fc639eb1ae6eddc37da158269a64b22ef95277afe560cdbb7a3b9c1f49db","source_row":27,"text":"delete the alarm i just set","label":"alarm remove"}
+{"id":"3311ac825553682f4d01182f57c0cf2b9c59fade42d7a9177e058a8a2b5b5d18","source_row":28,"text":"could you please remove the set of alarms between eight and nine","label":"alarm remove"}
+{"id":"095a4173f1626c638f6844cc5a48e2ec5877f64a46bf3ee6d2444d20b6c90c03","source_row":29,"text":"please turn off the alarm","label":"alarm remove"}
+{"id":"f137ed6ba8c711bf6222ff7cd801de180adf8118aed67a2f0360524c9b147d9c","source_row":30,"text":"set an alarm for nine am","label":"alarm set"}
+{"id":"7c37fb42486f82e29cade58de598157d05c5280af00995d8519e6eead786634c","source_row":31,"text":"change alarm to start at midnight","label":"alarm set"}
+{"id":"25356b62f9efb308ead8c711426b62e49134a9b8c2ae4fdf6aa160a8ae62bd27","source_row":32,"text":"alarm ten am","label":"alarm set"}
+{"id":"ab4d606750b6593ae5045458115224c9828676bb5f785577e1429d95219db8d6","source_row":33,"text":"set an alarm for me for tomorrow","label":"alarm set"}
+{"id":"430b726cca28e57f6abf4a7121c16f1e9dc19dcb85d1d1a471ca975869fbe09b","source_row":34,"text":"set an alarm for twelve","label":"alarm set"}
+{"id":"b1092bf8a5d72fd7a31186cb61c0b42b5a2ebba4bfd592e9d34d8db0b162079f","source_row":35,"text":"set a timer at five am seven days a week","label":"alarm set"}
+{"id":"27823517066404c4ba204841edcfa5aa7abb0a56d0421e236c9f3ca4e71a2872","source_row":36,"text":"i need to set an alarm for next friday at noon","label":"alarm set"}
+{"id":"72af04b57137d20fc569e61c61ec12d1999a4e12df7ad8c6d7edf3341c3b77fa","source_row":37,"text":"please sound an alarm three hours before a scheduled event","label":"alarm set"}
+{"id":"9dcd3c500967ec5f8ff2667bf44a083733206d5e87a6ab93818f7c0e2bb13694","source_row":38,"text":"can you set an alarm for seven am","label":"alarm set"}
+{"id":"d699b0226585caf8a7df13afb37374a7eaa3f5af0f8ee220219ecdd8394c285e","source_row":39,"text":"alert me at ten am please","label":"alarm set"}
+{"id":"03b1f5e8e306bdc42f45f4636e6c05d4f43171175f5d86d7697e11d209ab58d1","source_row":40,"text":"set the alarm to seven am for work","label":"alarm set"}
+{"id":"abd902017acbed05d02ea24df5f8fe78db5937440104715e0ceab53d3e31e7a1","source_row":41,"text":"wake up time","label":"alarm set"}
+{"id":"31f5efee5da19f6d381d69b84b18748795f22cfbe9496169b3210549bac79fd2","source_row":42,"text":"change my alarms to mountain time","label":"alarm set"}
+{"id":"502114216ca73a47bb9b7b1d281d7121f02c172ebf50e6b7b1ff39522f6b7d9a","source_row":49,"text":"could you please lower the tone","label":"audio volume down"}
+{"id":"a2a4d639e7b5d1ef339110b317eb8d4b017305ffe1932806003ec0d39a09abda","source_row":50,"text":"please talk softer","label":"audio volume down"}
+{"id":"d7f85612d32aca6ae86bfe3d2719d8b38708f6dcc0e2a7498ec6135ed6e22224","source_row":51,"text":"lower the speak volume","label":"audio volume down"}
+{"id":"9642d432d27f41914529e146854643612b1d105ba132e329c00f9130230e69d5","source_row":52,"text":"it is too loud decrease the volume","label":"audio volume down"}
+{"id":"9782cc2cedbbc7c95379d802d04c238a69ee58af97ca72828cb04f9f9cfd1134","source_row":53,"text":"turn down volume","label":"audio volume down"}
+{"id":"0dce4fe0c4bc70a271d6141fbc34a83d003ba4c6243504917a96d1892ee45a58","source_row":54,"text":"reduce volume","label":"audio volume down"}
+{"id":"3b3f1831449da45fd71e6d0baf2f4dade1ebafd38d127523ac0eb56b6d816f59","source_row":55,"text":"lower the volume to twenty","label":"audio volume down"}
+{"id":"e7923834f01e2940d05532d05a314c967955b6050222273f56dab5f99a31fee8","source_row":56,"text":"lower volume by fifty percent","label":"audio volume down"}
+{"id":"ef6252d33681172feec83086d997009f949ac367c00b9e330facad2b1d060d5c","source_row":57,"text":"quiet please","label":"audio volume mute"}
+{"id":"302d22188d0fc043f7c3e9eb614329177be4a74f452775cf7e10a19b2cd34348","source_row":58,"text":"mute sound from speakers","label":"audio volume mute"}
+{"id":"6e037238caf48445bd9492f41c921a94d404cc1865460fcbf3145050ec2ee820","source_row":59,"text":"please mute for five minutes","label":"audio volume mute"}
+{"id":"748b90881fe4755f5c23837bf20cb3463a4334e18f458565044d629155a04b0d","source_row":60,"text":"mute my speakers for a minute here i need to make a call","label":"audio volume mute"}
+{"id":"42b2794c4329c11ce6bd4bfaffcb504075f5f29d63062c287d4e30696102ff61","source_row":61,"text":"mute speaker","label":"audio volume mute"}
+{"id":"378ce2d5b3f24dbdd7903d1a3013027f71453df69d2237bc9cec6aa6da4d995e","source_row":62,"text":"silence volume on speakers","label":"audio volume mute"}
+{"id":"8e20432b81b7adabf9baea16acd45b3e1d3e810f10015dd023c65bd2d9f834a4","source_row":63,"text":"turn off media volume","label":"audio volume mute"}
+{"id":"774445c512bcf243a74ae383232b0ba1434980666c8d86a21df51a4d30d87137","source_row":64,"text":"i need you to be quiet until tomorrow","label":"audio volume mute"}
+{"id":"04ca3a66bf87471cee40ce85c7bd25a72867e0ffa247fa1ab5aa532f50ae6701","source_row":65,"text":"go to sleep","label":"audio volume mute"}
+{"id":"6ab96c0e030e67a822f31ed7aeb89cac15c4fc2324760a214e914fd124bc5c9f","source_row":66,"text":"no notifications for five minutes","label":"audio volume mute"}
+{"id":"a05499839b49c835884ab6e580356cacdecf9fd6433fc69993e57358af6e5db6","source_row":67,"text":"turn off the sound","label":"audio volume mute"}
+{"id":"2a34160f87d5eb2948ef78566192d9149ba9b3b5c651c3a4b2a90445b556fbe7","source_row":68,"text":"mute the music","label":"audio volume mute"}
+{"id":"aa32cd6db7b3fc2a1f6cd87b01b5c9ac93d81a9d149a643fc40d587ac18a1b85","source_row":69,"text":"pause for ten seconds","label":"audio volume mute"}
+{"id":"da050ee10bb5df634d1eceedc1c236bedd2d6e442c33f075a76483a826e6769f","source_row":72,"text":"could you speak a little more softly","label":"audio volume up"}
+{"id":"008562569a31263fe79672b3123c51b1dacfa439b2ebad628881f719eb99ed44","source_row":73,"text":"turn it up","label":"audio volume up"}
+{"id":"553bf974c3eda76f422d7da2f6c048c838400da5743a8d8c12a1ab95bd552137","source_row":74,"text":"just increase the volume a little","label":"audio volume up"}
+{"id":"6e0c0c2892feffd7a1fd1ebdb69e0a58b0d14b693c1ef60728ef2427aa633c10","source_row":75,"text":"olly turn the volume up","label":"audio volume up"}
+{"id":"263594d0b666e7a80ebafc4525ef6d86146f94fa259a63141681ed5316a832e3","source_row":76,"text":"raise volume to level seven on music player","label":"audio volume up"}
+{"id":"466a5cc243240fc53f7ad5cd026d1d26a4a3ac23aa595243d113bc64beed9b3c","source_row":77,"text":"i want the speakers turned up high","label":"audio volume up"}
+{"id":"da775508148d1760112b1b7963b3cb861b942ccf2c7c71f018a2dba796286a12","source_row":78,"text":"rise volume","label":"audio volume up"}
+{"id":"17308bad7f56e8125bfbd5a10d31b378ba520ab73c75a7132eb06c94f1d87b08","source_row":79,"text":"please increase the volume of the music hips don't lie","label":"audio volume up"}
+{"id":"fcaf128f93e52ab232042996a859ab65f05f69b9fbb78b28fde5a4e66587d77b","source_row":80,"text":"raise the volume of my music player by fifty percent","label":"audio volume up"}
+{"id":"ccfe3fae3fbdd2bb28cd21b534e6ca1172e5621bac795128d6b5c702a3f3055d","source_row":81,"text":"speak as loud as you can","label":"audio volume up"}
+{"id":"902691579d619de8a4016d47c0d71996fb11dc6318628472a509df443e6c5a01","source_row":82,"text":"increase volume please","label":"audio volume up"}
+{"id":"a6210140b254c435d2a9d49a4f54d618d6a4485d460f4a34b0f932f8b336ed87","source_row":83,"text":"make this a bit louder","label":"audio volume up"}
+{"id":"de77122463768f0b7819966b8f949869d9555a1e768a177ed86f469a969fb338","source_row":84,"text":"increase volume to fifty percent","label":"audio volume up"}
+{"id":"9c704c9d93225314ba8d6dd1c9bb58f3fffbf176ff18abfb875de9b1f03816d2","source_row":85,"text":"when is the school dance junction marked","label":"calendar query"}
+{"id":"57416f523d52f485c2c7ba0edb70f2bd266d52f47ce6e5ef9c6a6eff513fd7bc","source_row":86,"text":"what is my schedule for tomorrow","label":"calendar query"}
+{"id":"c67939b8c6041d08bfde262ddd2738fe778b5dc9233c15ab166eb307344aa663","source_row":87,"text":"am i available at five pm on sunday","label":"calendar query"}
+{"id":"812cbf540b8bb9ac02fba2d4c5de18fcdd667c60d9ecf5457075f081f67aa880","source_row":88,"text":"do i have any notifications from social media","label":"calendar query"}
+{"id":"8df136fb7fa891e602752622c4aeb0242210e280b6139ecada16e61a8ce696e1","source_row":89,"text":"what do i have scheduled for next week","label":"calendar query"}
+{"id":"e34f4e0d9aa1a91baccadc776f6930cf1c97db91e573729fdeb5ce0fc6ee78bb","source_row":90,"text":"tell me the meetings i have for the week","label":"calendar query"}
+{"id":"adb7262349af3705c382971909ea274a8b78eb9fa841e15aa522dfc78f768250","source_row":91,"text":"do i have any openings on my schedule for tomorrow","label":"calendar query"}
+{"id":"28785ac21a644a9c4f728a23ce9bf0963ef1bfac0250f0a06fc4d3d2550d3cd7","source_row":92,"text":"do i need to pick up the kids from anything today","label":"calendar query"}
+{"id":"6dce2d5c538a123e7ff898841ec73f1db7ce5aa0262c49f9ed563362e5e9e527","source_row":93,"text":"is there anything i need to be aware of","label":"calendar query"}
+{"id":"f2e53a89ddbbb671a0ebeae49f96b945e31a6ad606c3cf08f1c46cbc739f146a","source_row":94,"text":"do i have any undone tasks","label":"calendar query"}
+{"id":"ee8d768e1dddc66081f90da0ca2335a6438a149a2c4633681d2d47bf0f03ae11","source_row":95,"text":"what is left for today","label":"calendar query"}
+{"id":"ab8f4158c47bd661ac8003a09cbdcf9aa8f559fc36e2043c4e27de6f4721b038","source_row":96,"text":"list out my upcoming events","label":"calendar query"}
+{"id":"270d6f554e2ae6c71bca86b287857cec4d3646d7d487ba5d11a86e4dc3444579","source_row":97,"text":"one thousand two hundred and thirty pm already you will have a meeting in ten mins","label":"calendar query"}
+{"id":"938e4322c6786e7809aef8cf5ab158cf22e3995afa45d67cca7ff6df8ca83862","source_row":104,"text":"remove the next event on my calendar","label":"calendar remove"}
+{"id":"f4c5bb9625a97d828b78c82ddd1adae97bd013ced9acdc5a0a59907bb8511cb6","source_row":105,"text":"format the calendar","label":"calendar remove"}
+{"id":"25ca6e7437449a09b9995deb13afe76f582b84abfa7a059a59b5f6ff109bbdeb","source_row":106,"text":"remove the board meeting and reschedule for next wednesday","label":"calendar remove"}
+{"id":"606967f9080ec756c87778d40e72f431ff929828a0aebd394e86015585106764","source_row":107,"text":"delete event from mine","label":"calendar remove"}
+{"id":"46003878b86633d3d08813b9c16fadf7c5562f86ace01fddc707d41b5eb92df2","source_row":108,"text":"cancel the event valentine's day from the calendar","label":"calendar remove"}
+{"id":"523b8e47b3febf8807066048c0325768a3ba82bd803fefda62289278cae3c8cf","source_row":109,"text":"remove my meeting today at one pm","label":"calendar remove"}
+{"id":"81867831fddef262b979952c72c9e3d84996333addfaf4d6005f536c540a2823","source_row":110,"text":"i no longer need to see the doctor can that event be removed","label":"calendar remove"}
+{"id":"851c0a4145be005cef72d69bc127dc6920e101911c9b3a8a33b825089240229d","source_row":111,"text":"please remove march nineteenth's scheduled event","label":"calendar remove"}
+{"id":"8c594eac2652421ba873096c9e4ed568a094113858591be24a30274e0c8497cf","source_row":112,"text":"make sure there is no events on my calendar","label":"calendar remove"}
+{"id":"fbaa89b3ffa2c13df3263977e288bb920d2d329dc6af7e1660f2bae7a81872f7","source_row":113,"text":"remove all the events on my calendar","label":"calendar remove"}
+{"id":"9e45ae7aca67f715a72abb5389ef489f9ae545011b1627654c3d5296e669bf69","source_row":114,"text":"delete my meeting event for march nineteen at one pm","label":"calendar remove"}
+{"id":"6e810d327fd134a677cea9319137e742131b5d3c02e84717c259ebf9ba83ff88","source_row":115,"text":"remove upcoming task","label":"calendar remove"}
+{"id":"a5d846b6d541e6632d2ff2e5982361462b0a0030c1caac86e253fb60f57cdb29","source_row":116,"text":"remove emma's birthday from events","label":"calendar remove"}
+{"id":"eb100a5228f0a7164900f9e7e27cc0f1b971673baca31e22006b3cc23f80fd40","source_row":123,"text":"set a reminder for tomorrow evening","label":"calendar set"}
+{"id":"52ff1a1d62eb0375d2c2dbacbcd808d78af7a80b9fda2562661deac579087b90","source_row":124,"text":"notify me when the event is going to take place","label":"calendar set"}
+{"id":"09afcc0338dbf21a0ea2171e2c35b46481c02a033278ba898612111fbb0c8a69","source_row":125,"text":"add jim and jerry to event","label":"calendar set"}
+{"id":"4d325d101c8316e6bea7ad0fb9cd910f96d0a687b28fd72f5750d92080a6d8fc","source_row":126,"text":"make a repeating reminder for my yoga practice every day at noon","label":"calendar set"}
+{"id":"faa035c94880bedb1e584e708ec3d424732d3a077e035fa5bf27544c7f460fe7","source_row":127,"text":"i have a meeting with sean at four pm on wednesday can you remind me","label":"calendar set"}
+{"id":"6d1c7411345a61ced78e15d6fbb400f222c2ed02856d6c6ddc3dfa53cb1e27b3","source_row":128,"text":"create an event gym day on monday and set it to repeat","label":"calendar set"}
+{"id":"14b5def9368a8e1ca9a57a6aade9de43ab8cddafb6fe48b4a347d71d5574e119","source_row":129,"text":"blot me all the phone calls planned for the morning of twenty three march","label":"calendar set"}
+{"id":"a5e25ad0d655c490b99d881493d4c20c4ab5c7bbd01de8a23a536fde6345d3da","source_row":130,"text":"can you remind me about my meeting tomorrow","label":"calendar set"}
+{"id":"5c7b91994ac80c29afaf928653e30a7a3580d85efdb9c1e9715e6c19244dd64e","source_row":131,"text":"repeat reminder for my schedule for christmas","label":"calendar set"}
+{"id":"61233bb6b579c697d09bb50c0845e0f6ef552cfef3af46f3a0d4310e4872c2cc","source_row":132,"text":"remind me to call my grandma this sunday","label":"calendar set"}
+{"id":"b3c795458211b63dfb46027d242a83928b4566224b6458abee38361ea9049e44","source_row":133,"text":"next week my uncle birthday","label":"calendar set"}
+{"id":"0d5c5eec25fd9802d7d6954ffb5e8c97eadd9f7e9dd900bcb406c7170ae14de3","source_row":134,"text":"add running to my calendar for thursday","label":"calendar set"}
+{"id":"26f75eb6abc5191edcca2a647d524d9683641ac0abd67004e17bed89ea83e0ea","source_row":135,"text":"i would like to attend church every sunday at eleven am","label":"calendar set"}
+{"id":"e7a201e351d4831fead6381374fcbdbefff615dc8b545f27f045ad2f50b93bb5","source_row":142,"text":"help me make brownies","label":"cooking recipe"}
+{"id":"0306a3409d5a2ee2ececbb37548d0ebbc11e3958170039c161ef5e9994f9a8a7","source_row":143,"text":"crabmeat recipe","label":"cooking recipe"}
+{"id":"554bbdb644de00388ad7f643ffe738ba1501febc2ea93e19fd8d78ddfd6d3ad6","source_row":144,"text":"it should spices","label":"cooking recipe"}
+{"id":"4484764f153dde979899ebbab922189d759f89ac039da2e2733b6f40498ae12a","source_row":145,"text":"tell how vegetable is cooked","label":"cooking recipe"}
+{"id":"c62eab926d9171b73aa39b0ba933b58d7761e1b12990e666f8e798215fb6b01d","source_row":146,"text":"learn to cut potatoes correctly","label":"cooking recipe"}
+{"id":"1c12ca2578470c042082816d1bc020b3eb65e33251edb973bc254e4074637482","source_row":147,"text":"how to cook that meal","label":"cooking recipe"}
+{"id":"3047c180dd7f42cba98f0f3df42a32f5da7bc20cbd730804e05f855da7008017","source_row":148,"text":"can i get a recipe for tuna","label":"cooking recipe"}
+{"id":"1970741a73ca68b86fd79686823ea7d7ec83b3bcc304b63bdec81feb7fb7b8ad","source_row":149,"text":"please cook me a hamburger","label":"cooking recipe"}
+{"id":"bfdd44e9f1c7629d0d1fb58200addafcedc0b4aebe003dc1674ab35226a2a901","source_row":150,"text":"how to cook yellow rice","label":"cooking recipe"}
+{"id":"9e7500feae71603eb08b20056a90ba05a1c8a9bcf63a2e940497ed3958d1714b","source_row":151,"text":"i need to know how to make stuffed peppers","label":"cooking recipe"}
+{"id":"28dd1fd99d2d9e1c1c4f84189acd184333ce688f4d33fc92c108648984540392","source_row":152,"text":"how can i cook pasta","label":"cooking recipe"}
+{"id":"fe68f7c27cb162c3c04b4b0eae634040eca6147af742cd739e0233cf97f022fa","source_row":153,"text":"look for different recipes","label":"cooking recipe"}
+{"id":"37b20483ea35ffe8c4a20be96e03c806fa197e6c8b0a3fbd1e700274e42fdd10","source_row":154,"text":"what ingredient can be used instead of saffron","label":"cooking recipe"}
+{"id":"cff6303f1c21fe591966369649288f5606dd1e897c481fbf797f750b56d4a8bb","source_row":161,"text":"if it's eight pm on the east coast what time is it in sacramento california","label":"datetime convert"}
+{"id":"ff5dc1d30129f03b28550d57359b720f06144afee66248a1d4284ca3764ec992","source_row":162,"text":"if it is four pm in missouri what time is it in london","label":"datetime convert"}
+{"id":"867bd5837934d8b028ab468d42b8f265bff9280bd60602ca0c1dda27c19d28ad","source_row":163,"text":"can you please change the time zone to us","label":"datetime convert"}
+{"id":"34ac7437e65228044fe57fd94ab2d5b633c00d6a3a6dc4d4da504c51f2e3f1fd","source_row":164,"text":"which time zone are we in please change to current","label":"datetime convert"}
+{"id":"6a9604d9fc87ab0ebd1a0624440d8ff12c35f475da1b97a596921a3b2061c2e8","source_row":165,"text":"please change time zone to canada","label":"datetime convert"}
+{"id":"5270718d78f1255e742755feda8fbe3d526573e5eec22dc66c7a72dd3da7875b","source_row":166,"text":"what time will it be locally at nine am bangalore india time","label":"datetime convert"}
+{"id":"4506e23d53167e242015b06843a531339dd601415e984fa0ddddb80495dc9d32","source_row":167,"text":"it is ten am in eastern standard time what time it is now it pacific standard time","label":"datetime convert"}
+{"id":"04fcf8441fe0855641bfbddbb41eef063b750667cb811264316f1ac770f4252c","source_row":168,"text":"change mountain standard to pacific","label":"datetime convert"}
+{"id":"94e2090d3c9823ad9d19e6235858e8124c249ab7fa9c6d8dcd904936710d71f6","source_row":169,"text":"please tell me the date","label":"datetime query"}
+{"id":"b6597cb0223a294254a83c582e65bf769baef66c7c7afce34786922a4440cf0b","source_row":170,"text":"date today","label":"datetime query"}
+{"id":"351a1be3316d6188b6a564a82f6d6777a09f5da2047dc9a888ec8cc44795d7bf","source_row":171,"text":"what is today","label":"datetime query"}
+{"id":"f5833beef683108d3153871f94c1001f680e6ff3a0c9c68b46119e8bdae8e558","source_row":172,"text":"what is the time in geneva","label":"datetime query"}
+{"id":"4e159cca730c00c0f0f0f624ab750be7f9c76521e0f3b11f70df541bcee0c58f","source_row":173,"text":"let me know the time","label":"datetime query"}
+{"id":"d082cafd0eeec5cc9f964bd4e60977bcb2ff9a2a2c0ca665666f1c3889716576","source_row":174,"text":"new york time please","label":"datetime query"}
+{"id":"4e247df5f88b9ffc5cff52262628effcbc775b3edfbd537704239b2343def35f","source_row":175,"text":"what is the time difference between here and dakar","label":"datetime query"}
+{"id":"b24f5dffab18d6a201c9bf36cb90aaff15fb355e4ad6513599e5a0c5bc353739","source_row":176,"text":"let me know the time in india","label":"datetime query"}
+{"id":"3e7c1ae951810b4d14a31492986e1e0d2c7a19e068892c833425a9d07a677a78","source_row":177,"text":"tell me the time in this time zone","label":"datetime query"}
+{"id":"5920e7ff2f75e26cca214d0cde5a9bded4ea45371ff7ccfa3f8c638ae30ec1df","source_row":178,"text":"which date is on next monday","label":"datetime query"}
+{"id":"ac58714de7f3d22c49e27303953fde0cdd346a1edfd570bf3c4b407269d85df3","source_row":179,"text":"tell me what time it is in dallas texas","label":"datetime query"}
+{"id":"b74859dd6135004426eefbb73815dfa514f12fe6956454e489c0ae1a4b6a947b","source_row":180,"text":"what time is it in the other time zones","label":"datetime query"}
+{"id":"13dc1dc5bbabcf82c5294842989be6b0d4f7921aa6d6ace9c1f22580cbaf9494","source_row":181,"text":"hey what's the current time in austin","label":"datetime query"}
+{"id":"456782f2e517aad843493e6456bf641526ae5eb13599ac9e1e097561599f0e2a","source_row":188,"text":"add dan's email","label":"email addcontact"}
+{"id":"d089f85acc9c5efbf11010dde06fce2ecb0d24f53207de2c229b3b21a73601ef","source_row":189,"text":"add contacts n mail","label":"email addcontact"}
+{"id":"566d1f4926f8592bfcca38aeb1dfc0a58b319eeb1ddeadf167c716e8ff82620d","source_row":190,"text":"enter atdfd@yahoo dot com into my contact list","label":"email addcontact"}
+{"id":"954106e2d7a62e9087d466e78380462cd0e67ce592b23d8dc9e82f7a77505736","source_row":191,"text":"get apahelp@yahoo dot com in my contacts","label":"email addcontact"}
+{"id":"48b9f0ef0092cd873f212c8b66470a544834f994068d5a9ff804981c89268481","source_row":192,"text":"save the email to my contact","label":"email addcontact"}
+{"id":"268d0aeee3097179bf1bb2d4f8a12de9c51851c17a6de2ab1f7cabdb22141a56","source_row":193,"text":"please add johndoe@yahoocom to my contact list","label":"email addcontact"}
+{"id":"ddde79428edaf98c5773f757f4b49d6646ebffec91283e9b1ea11deb3d92b991","source_row":194,"text":"add this new email","label":"email addcontact"}
+{"id":"d4e29bd5bdee66c332ea3eebe13eb5250bed815b9bd8d995d4b50d8be2877ff4","source_row":195,"text":"add work email address","label":"email addcontact"}
+{"id":"d4985dd43b49f43474627b3b780a4aed7e8fd84721d31ce054e2d87fad0f3745","source_row":196,"text":"are there any new emails from name","label":"email query"}
+{"id":"fc5f5e0b6057aac20fcacbc0bb37081cffeb96b00b40e20bcfc1e7d19bef47c0","source_row":197,"text":"give me recent emails","label":"email query"}
+{"id":"683b035a82ef85dd4750d22d71fb5420729cc7f67c170a4c927dcee106c8dab1","source_row":198,"text":"refresh email","label":"email query"}
+{"id":"2d33d278e270f590d30e045e68f6de0785a72d6767b94bb575a22f15522e9c18","source_row":199,"text":"i need to know all of the emails from contact pertaining to subject","label":"email query"}
+{"id":"832e50df15f220c7fc98d571a02ffe0c523ab080dbc9c52b31251809ae8d77fb","source_row":200,"text":"open email","label":"email query"}
+{"id":"cfa8b037453872a57f962120a643d8eb90793341ab6f071571cf4d587ffdad69","source_row":201,"text":"who has sent me an email in the past week","label":"email query"}
+{"id":"2e5ea5e1fa1338d298a9b04175f86b89115f469beeaa3270f57adc896d7b53b4","source_row":202,"text":"check emails for unread emails from mom","label":"email query"}
+{"id":"b5f2cddd1e2e4e54964e5e7221ed2a3e0fb81f187701352be5cfc22983585080","source_row":203,"text":"did any emails come for me in the last five hours","label":"email query"}
+{"id":"39b43a5bd661a0f196d467db0e26f09b3117f30797d78d24fcef3f526f745cc8","source_row":204,"text":"report what is new in my email inbox please","label":"email query"}
+{"id":"8985f766bb3ce1d5342ef328b098cd68ef887a546443c24df9fae8160053b656","source_row":205,"text":"what is the subject and who is the sender of my last email","label":"email query"}
+{"id":"ebd509446c5cf52aaf09471980146eca6581ef627e7a595a06feb11e81982415","source_row":206,"text":"what did i tell susan in my last email","label":"email query"}
+{"id":"3d15c6215a52bc86bd27561c722c413e8ab868865484828e078a055b1b2f5a81","source_row":207,"text":"show me all the emails received recently","label":"email query"}
+{"id":"663c5da3e87d878f898b4ba37aeb572b01be2890c1a9d1637cec5fac27c272b7","source_row":208,"text":"do i have any emails from jessica","label":"email query"}
+{"id":"1fcca44abebfdec9090fb38c995a08b7d562a4429cccd39f2acd749ecf0a80be","source_row":215,"text":"what is sarah's number","label":"email querycontact"}
+{"id":"8ceb6a7e8b3f48aa73362457de0c0ea88356f6ac61b3561b3df88410fc05d88d","source_row":216,"text":"can you give me details on john","label":"email querycontact"}
+{"id":"60c79d0087acfae2c847437bc7826057b0c1f675d3707cce1fd144e416f389a8","source_row":217,"text":"have you responded my phone calls","label":"email querycontact"}
+{"id":"f9d53b18598e6ce1f84c86f60696209251a756f0b0669893c03bd317096f91af","source_row":218,"text":"what is jeff's number","label":"email querycontact"}
+{"id":"06577a424c443488960969f505eca5638f3698b564ca914d2a1bea010fea3282","source_row":219,"text":"how many contacts are there named john","label":"email querycontact"}
+{"id":"2fbf1117ccc0f1f6d9fa13b2028c97d0de760f700f354bca9a057f92b415a3b5","source_row":220,"text":"tell me the contact details of my brother","label":"email querycontact"}
+{"id":"d2a76c4582282551190a914eafbf9a7c618a25d00bbc67330d41cf9505671b45","source_row":221,"text":"show mobile number of john","label":"email querycontact"}
+{"id":"2c5918bb9e632add93dd1626c78d129c1d9587c246a2741bd890e1000b37928f","source_row":222,"text":"does contact mona has an email as well","label":"email querycontact"}
+{"id":"e2840c0facd412553f54f4ebb94193952db19067f13cd3a5ab8e8c08c68d23bd","source_row":223,"text":"show number and contact email of rehan","label":"email querycontact"}
+{"id":"984e75e87c689ef631c3018130d074234de7ac54a5826bdbb86572887a6aab75","source_row":224,"text":"look up for the residential address of my team leader","label":"email querycontact"}
+{"id":"5c9f1b5257209a5c8fb44b51ccd1cebc9ab56a2ec9dcc4f498d5791c58cb19fe","source_row":225,"text":"what is my wife's email","label":"email querycontact"}
+{"id":"38f31b2d9bda14111df96bb69389151c010e673c3724c3a2ac44c7c790fc7718","source_row":226,"text":"select the contact","label":"email querycontact"}
+{"id":"8744ccfddbcf591fe25cb83b7831e8bc1432a97601388c4f8dfb4dacb8dcc683","source_row":227,"text":"is this my sisters cellphone number","label":"email querycontact"}
+{"id":"f4318aaa1b00ba4f1ad4e9a9ae6e48cbb2db5cb239dce41427b6f71b9a0f7c28","source_row":234,"text":"send a mail to whom to talk","label":"email sendemail"}
+{"id":"7941c4747a3c0e545079f0c84ea2d0490f45c61c3be7e5bb0a7b5d5627f9e110","source_row":235,"text":"pull up kate's email and write that i will let her know","label":"email sendemail"}
+{"id":"58098fabb67f7d200ee4ce9f3a413828215ace6f77e32ba7e83f27f2b8a619ad","source_row":236,"text":"please reply to my boss most recent email and say that the ppt will be ready in one hour maximum","label":"email sendemail"}
+{"id":"4e160db2164192c0caba847035fb22f59113315d352682e9da1a909875dd0e05","source_row":237,"text":"reply the email of charles with just thank you right now","label":"email sendemail"}
+{"id":"e66edbc4e617f13c81cfbd0d4e4f77556ab36914a23fbece3b3fe7d6d1a6c10c","source_row":238,"text":"send new email to jana dot litt at gmail dot com","label":"email sendemail"}
+{"id":"c52ae55a4c55bb173303e03a4851a47a07865a985ab943b1192a018fa3dd9c76","source_row":239,"text":"hey please reply to last pawel's email","label":"email sendemail"}
+{"id":"58ba881222126371c214614ae352eff1ee12b23a00c13d4b4e037bd90c506b90","source_row":240,"text":"send email to new email address","label":"email sendemail"}
+{"id":"7fee3df65b290cc64ef4ed4252e43d1ee8da0c7c04a0e28986c3e71446f96ac7","source_row":241,"text":"send an email to my friend say birthday wishes","label":"email sendemail"}
+{"id":"3a28ca4ea9e8976bf7aab4e28eb9b62476d60b3a385ae05a8ce60d5cca4767d6","source_row":242,"text":"send email to mom starting with the subject vacation","label":"email sendemail"}
+{"id":"bc3a3c2363d41cc17ced94bc8fda36efbea5555f9bb794bcc4f4457d2cf3b5e3","source_row":243,"text":"jj.nzt@yahoo dot com","label":"email sendemail"}
+{"id":"830a02de03f4a7c3c0c1d2de4381b683ca301f967770c80d0322a922dad540ff","source_row":244,"text":"email happy new year to john","label":"email sendemail"}
+{"id":"d5eadc85a84646a4adbf4b3aa4a8c81a0115bb168dcf9d5e053f297752cad192","source_row":245,"text":"tell to joe's email that come to my house in this moment i am alone","label":"email sendemail"}
+{"id":"6fe73e3338411de1e1d54286d21ac988644784a255d69f4875c80ea5196ce35e","source_row":246,"text":"go to email and send message to","label":"email sendemail"}
+{"id":"78f9c93a9e6582069892c6f6f8619e7984b0139d58bb7cc7393adef67f39809a","source_row":253,"text":"fantastic response.","label":"general affirm"}
+{"id":"807e2dd919d7d5956e6e18e770f56067006d384a6da9d05b2b3588789279b398","source_row":254,"text":"yeap you've gotten my instructions perfectly.","label":"general affirm"}
+{"id":"b8038866cfdfa0fc44f997f3dcffef742eff5d3f51080f811d20ef85277a0a6f","source_row":255,"text":"yeah wonderful response.","label":"general affirm"}
+{"id":"d8598b77900a4d4025a3a6b7f35a04d11217e5054b11546a603a26817cbd3e03","source_row":256,"text":"yeah exact response to the command.","label":"general affirm"}
+{"id":"481e806490c38aaf58e26c8927c005d21b483debf46491e1db763f253b7fc369","source_row":257,"text":"yeah perfect response to command.","label":"general affirm"}
+{"id":"52f08f71a0dda9d2d16c33914d2964a7349d561fd9d7d9dba3f2be3e96f455f7","source_row":258,"text":"yeah excellent.","label":"general affirm"}
+{"id":"d90dcd51f60cd7246d4f29fa493e5f6a6dd65391886b49a54ddf3932339d9a33","source_row":259,"text":"yeah exactly.","label":"general affirm"}
+{"id":"26975577d7fbfab08de3241d01524e57443ef09e75f43f02716e1da780d69550","source_row":260,"text":"perfect response to command.","label":"general affirm"}
+{"id":"8628722678104c81a661c2f252485116a18850cbba51f70d38b730b38f0f295b","source_row":261,"text":"yes you have got my instructions perfectly.","label":"general affirm"}
+{"id":"be6f19e3b0eaea5620d43b1eb1e9eadb5c033e6f71a5aa87746923fa8e2eaf74","source_row":262,"text":"yeah you understood command correcly.","label":"general affirm"}
+{"id":"eac4f4251a79522fe62cf5c0332e27b1c0e3f63e8beb52ec6c9a7774e2717b09","source_row":263,"text":"yeah wonderful response to command.","label":"general affirm"}
+{"id":"13936e294d5ac5b84386dd3c918ee7834ac69dd003a543c4169efcd3b2128255","source_row":264,"text":"strongly agree.","label":"general affirm"}
+{"id":"323267a1e99d0e8973b12e486a6121a24b9f5dba0a3081c7442d0b48f880b281","source_row":265,"text":"yeap it is confirmed.","label":"general affirm"}
+{"id":"53db809f0212f2604399bb2eb7c98d306daf75e2b8720d60071d8398dbfb3dfa","source_row":272,"text":"i would like you just stop it.","label":"general commandstop"}
+{"id":"2009e3f198ec3b868d8b3a47966057cefb66a48cd4b07605298e06ca00506416","source_row":273,"text":"will you please shut down.","label":"general commandstop"}
+{"id":"f7a6651bcece76e5c13c7961f46cfbadfb8ed9a7e8e4eb0ca7d95b711fbcd137","source_row":274,"text":"olly that's enough, just stop it.","label":"general commandstop"}
+{"id":"621b051f0da05a8bcb8e6f93ad44afdd32eba0bc7dac03aa60e8495127372f27","source_row":275,"text":"olly can you stop it.","label":"general commandstop"}
+{"id":"94bbc4be95679a092984456c202895203d1a0661affe99d3367878e9c27873c3","source_row":276,"text":"olly please would you stop.","label":"general commandstop"}
+{"id":"255fdd40d1f0d0f8aeb58b3dec1c9cc81d6643f32a96ee284ee30ebd45dab598","source_row":277,"text":"please shut up.","label":"general commandstop"}
+{"id":"0efaeba6440ac635bb7ecb14870977c854da99e93a60d07dde14307e1457994f","source_row":278,"text":"i like you cancel.","label":"general commandstop"}
+{"id":"bcc56036b88d35f55f6aa045467cb9a62529d82e408c33d8213b58b076fe6c80","source_row":279,"text":"will you just stop it please.","label":"general commandstop"}
+{"id":"9a5813d9566212fb923237544e2644822bf907ae613c7b27bd734d0d56f60ba2","source_row":280,"text":"would you cancel it please.","label":"general commandstop"}
+{"id":"979bf7b254de9f1c8d66de0bec460a9d72418d1138d66960ec817f98de5cfb47","source_row":281,"text":"olly can you shut down.","label":"general commandstop"}
+{"id":"28e77cc3f6b130df6f193243c0241c186915bb3bdccacf4bf63a059a390a9244","source_row":282,"text":"olly that is enough, just stop it.","label":"general commandstop"}
+{"id":"3dc18c2551193d2f4d80ac1f27257ab906e23ac65ec83ee2c7808b16e3c67c28","source_row":283,"text":"olly will you cancel please.","label":"general commandstop"}
+{"id":"d4850a566dbe759dbf06a66e4148f586dce932dfcaca29d3f025b5cf7fcba578","source_row":284,"text":"will you stop.","label":"general commandstop"}
+{"id":"e7f2e396d600f03494f7112be4b30bfc445651281109ec1cfbd798fb87149d46","source_row":291,"text":"would you confirm the question.","label":"general confirm"}
+{"id":"5107b24e06608b6b6867f20a2c0473e6a5e53d011eb4bf13edbe7ad5119fbb45","source_row":292,"text":"could you check my last question.","label":"general confirm"}
+{"id":"32d68bd48e8c12758eaa0fd0ed6b18c1beb477b407c556ca8eb14d3fb6d819b0","source_row":293,"text":"will you check and confirm command please.","label":"general confirm"}
+{"id":"43766c2e7050886791ae33d60f0005543b8a8ec452c63800378027b142ba19f7","source_row":294,"text":"please will you check it.","label":"general confirm"}
+{"id":"5bdda6b82fb532f0179dd5fe9e14fb66bec8fd9acb321b51ce4f2f2d07b9bd69","source_row":295,"text":"could you check and confirm what i last said please.","label":"general confirm"}
+{"id":"dbe67687166ffdd1729d61aca4c0289f4fb68fa3b2bc733ef6c945fc95b5f6a8","source_row":296,"text":"will you please check it.","label":"general confirm"}
+{"id":"8a30d51f4f6e13f8b437579ba73af64d23cc041b1590b2e65a181fa6c31d2d43","source_row":297,"text":"please can you confirm the question.","label":"general confirm"}
+{"id":"69df6316081c93f77c2aed2ba4ba0001c51ed762500348ee01038dd1e4327c46","source_row":298,"text":"check the details please.","label":"general confirm"}
+{"id":"3cbc4e62dea368e1b2558cffb4104090a94bb18ba8ffb7f0424cf4c9ba14eee0","source_row":299,"text":"can you confirm it.","label":"general confirm"}
+{"id":"3a2b8a8802906916afa72d5984efd4e183a846810f419f8a4d581575983ff9b2","source_row":300,"text":"please can you confirm it.","label":"general confirm"}
+{"id":"ce89338ecc0381a1ad197ec43c416603c1452864d5c1075e917a01628ea904bb","source_row":301,"text":"can you check and confirm the question please.","label":"general confirm"}
+{"id":"68dcbb98e3e1e2a00b6a834c99dbc4d7cca2709a66b159376540534f0c32d75f","source_row":302,"text":"i like you check question please.","label":"general confirm"}
+{"id":"c088986895b851499da2d582c41a8c5c5285e69006643e348cf30ce8d431de0d","source_row":303,"text":"did you get what just said correctly?","label":"general confirm"}
+{"id":"4a63929f8ed8f2995edaf19c780f4df5e42f1b0ed15eb1935948e9784e2a6aa2","source_row":310,"text":"i would not mind, olly.","label":"general dontcare"}
+{"id":"f8c7f1e7fb4d8b5712e7e5e947e2e957935dcc3fcfc6d9560b46738010cb793b","source_row":311,"text":"wouldn't mind for any one.","label":"general dontcare"}
+{"id":"c5027ac6a439e4a2ec8321a34ec54068373956241262b4a9505dc70b1ebb2ed6","source_row":312,"text":"does not matter for me, olly.","label":"general dontcare"}
+{"id":"a55d0b70749a376244c0c9c3b4c8fc181f6f3b1b2a151b9d24899a99f02bebd0","source_row":313,"text":"don't really bother, olly.","label":"general dontcare"}
+{"id":"49c194792d5a08eff9f878e20e6505d9c6c940e4227223519fb0d30829d97d0b","source_row":314,"text":"wouldn't really know, olly.","label":"general dontcare"}
+{"id":"769d3e02ee73cd4c7f1eec7c614b63b2589cdc144e5530309c342d96a823e3ce","source_row":315,"text":"i have no idea about what to do, olly.","label":"general dontcare"}
+{"id":"2a863045f8631ddde8d81830ddaecd955d9ff5083aca1b34d764ef215045a6e1","source_row":316,"text":"i do not mind for whatever.","label":"general dontcare"}
+{"id":"ccf79c02cbff95aaad8cb1ec62213cd50ed802f2385525c65ef8b3337cd8d39b","source_row":317,"text":"any one is good, olly.","label":"general dontcare"}
+{"id":"cab6e276d37f61301f9e22c7fe090616eba877160fa86959253df20db7f4d7f7","source_row":318,"text":"it does not matter to me, olly.","label":"general dontcare"}
+{"id":"6f7f435e17daf7002d660e11ee5faafa0d144312148ccd935f82b62a7488a99e","source_row":319,"text":"i would not mind to select any one.","label":"general dontcare"}
+{"id":"b2c05529d3709c8576ca28eb2643456043921d1deff76374e56e39c8cada6f10","source_row":320,"text":"i do not really mind for whatever.","label":"general dontcare"}
+{"id":"a56afd2390b9263e22d0b34568a46e183264474d7934e0d6b641c5d26f564550","source_row":321,"text":"this is unimportant for me.","label":"general dontcare"}
+{"id":"23437201b081b059cc412e499608eded5b7eb7ca02b3e88eeb6f9e594174e8f5","source_row":322,"text":"i would not mind to select any one, olly.","label":"general dontcare"}
+{"id":"fae6c187e8d976dbcccea91ab5a9ab82a825b7a3b7fe05ae3661a5c63906bd78","source_row":329,"text":"would you clarify me on your answer further please.","label":"general explain"}
+{"id":"035b8bff7ca3ba51a9e01ee97f67d47fa891f190b6faae6db6902425afdc7ea3","source_row":330,"text":"s2, i can not understand that.","label":"general explain"}
+{"id":"91c33ee56b210511246d735ef7eb2335b753bb7bb00fc3d3da8c4497dca67fe6","source_row":331,"text":"your words is not so clear.","label":"general explain"}
+{"id":"078a32f56eed968aefa27d8f12a69462868e1fddf7523e3fb9a1380417fc1448","source_row":332,"text":"s1, explain further please.","label":"general explain"}
+{"id":"d02689f8395fdbe8e099f88bff9c8b71685c76e944d1da0a3bfd9e7b037cdada","source_row":333,"text":"s2, i am unclear about what you have just said.","label":"general explain"}
+{"id":"fb2b884a7667f8855a8fa8a8820e3e2b5910171f33ff192b8a0726de1b6eda2c","source_row":334,"text":"please will you clarify me more on that.","label":"general explain"}
+{"id":"111ed23636deca2296e841043518d7012c260ccfa51e2d8154f0dd9d9908eec2","source_row":335,"text":"will you rephrase me about your response once again please.","label":"general explain"}
+{"id":"c548745894f05f8c2b0d8ddf43e435e82c1675e31fa2741a9ea012f1def55753","source_row":336,"text":"again clarify me on your answers.","label":"general explain"}
+{"id":"2e7edb48d8b0e2b94361af8a35abf9b16c4eb1a613cf67d5d5a6c30b7761b5b7","source_row":337,"text":"again elaborate.","label":"general explain"}
+{"id":"42c12ac1dca48b1046a1b80b62e9ab62e46281b9af833f25bd3c5fd80be429b1","source_row":338,"text":"couldn't understand what you just said now.","label":"general explain"}
+{"id":"142bdf3ad05f6c8dc17688b3325af0306e598f4bff9fdd6b548f84b0ad5320cf","source_row":339,"text":"can you again clarify what you've said please.","label":"general explain"}
+{"id":"39595f7a7a98ee13a728eee9789d406052057bfed882e7a53250e05ef4261c47","source_row":340,"text":"i didn't get your response.","label":"general explain"}
+{"id":"0d5af9b19e710e1b71079a07e64d2045ed2ceb4727fea15977e66e4be1d6c8fa","source_row":341,"text":"s1, could you please again rephrase me about what you said now.","label":"general explain"}
+{"id":"79cf81cb296869b2a7301120dd2526aaf8e8435c2c5ba350572ad0c202f47287","source_row":348,"text":"tell me random joke","label":"general joke"}
+{"id":"1394b3b5e2e90c91bb3b3c113133b1c662c95280e79e8d7b2a2b7bf15accc387","source_row":349,"text":"find me a joke related to baseball","label":"general joke"}
+{"id":"c024931ed6c5beffebe83686c23c762d4e44fccb9f96b5e8f4fa98279fb65f93","source_row":350,"text":"i need to be cheered up right now can you tell me a good joke","label":"general joke"}
+{"id":"9b7025064731306d0e148ad902ce4fd7d616dfa25d86c968bec5f7c84c4b5d64","source_row":351,"text":"today's jokes","label":"general joke"}
+{"id":"105be43ccfce9d36e9a6a92a64b1f79adaa16f4cae85b4a87ae3f553db5ba1ca","source_row":352,"text":"do you have a joke","label":"general joke"}
+{"id":"28512d7a4e0201b1bd4d6159855538030c1c8913b2bccc650163f5d45451aba9","source_row":353,"text":"what's your favorite joke","label":"general joke"}
+{"id":"82767047845a141401a6d965b8648c779734878946979ecec91e8049fb371e78","source_row":354,"text":"look for a joke","label":"general joke"}
+{"id":"8f858eb61a96da67680f32c95a5a6bb091139dd3618cf3a127186e98dfe19749","source_row":355,"text":"do you know what a joke is","label":"general joke"}
+{"id":"62282c2877dff9839f183a65391b8b9be17ac393d973b9701c82de39b6c726cb","source_row":356,"text":"i want a nerd joke","label":"general joke"}
+{"id":"b0d1cfffccc5cb940b7fb852409ed8c4cabe3dd09e157a02eb13cb51df06463f","source_row":357,"text":"what about this joke","label":"general joke"}
+{"id":"a65eb734daabdf44a3ec67715cd8a1d517942dbd15818555d283591d94c70d9f","source_row":358,"text":"have any jokes","label":"general joke"}
+{"id":"3f64594536c0464be43448140f0a19ed8fc103f56e38bf2603f9a1fb4b96d236","source_row":359,"text":"joke please","label":"general joke"}
+{"id":"dd1b5ef94d39215e55921198c822608c24cf02a353204ca975728b481413e9b0","source_row":360,"text":"thanks but i think you don't understand this correctly.","label":"general negate"}
+{"id":"00f479735d6847dda2fd4cc434a016f2038120cb0ec71b03e725da49ab94953c","source_row":361,"text":"sorry but i think you've got that not right.","label":"general negate"}
+{"id":"33a7f4c6701a476c3beac946860364de55fae9a1352e6f4251a2d9b9f3c2dffc","source_row":362,"text":"i didn't say it.","label":"general negate"}
+{"id":"8d5cc836a441a1d37c966ab06b8ae19abf885fd6f2890b81f08280c8d9dd1fc5","source_row":363,"text":"shit, not right.","label":"general negate"}
+{"id":"a90229f5a785d159af21bfcb0eb32b093e87133189b9aebfde2624fc8d46115c","source_row":364,"text":"i think it is not correct response.","label":"general negate"}
+{"id":"1a80f51dcea9627ab9ddf399e93b6aa1950a13ee6e3f448fa3791d745f3af010","source_row":365,"text":"thanks but you have understood this wrongly.","label":"general negate"}
+{"id":"65d9134157bdd998f9032ddb5c05881990092d0e6b37367a6694fb5ea9675708","source_row":366,"text":"wait, i think that's not the right answer.","label":"general negate"}
+{"id":"d04113550e1f0fa92b6b6a3cee56eb4c21e392fe6ca7608f87363696b86afeab","source_row":367,"text":"that wasn't right.","label":"general negate"}
+{"id":"d8dddb18f4e431d66aa05a05fcac69ce2a2c64b3f55796ff43ec87e0d39b6504","source_row":368,"text":"oops, you're not correct.","label":"general negate"}
+{"id":"77d1783ad2954c05f858b383f795a9e6422ed11dfbbbc16faac61875f7ce9644","source_row":369,"text":"wait, you did not interpret command right.","label":"general negate"}
+{"id":"bd6cc30ab5ee27a21600bcc814edf88d5f59026b333dccea96c1a66b71a814b8","source_row":370,"text":"you have done a wrong thing.","label":"general negate"}
+{"id":"08ed4f15b62f139be552fc971ab75cefb1da4094593033c92ceb43d0eb61eedc","source_row":371,"text":"wait, this is not the correct answer.","label":"general negate"}
+{"id":"28830628a6e515547079763a236017ca9ae915f159b774a6897a7033692813ad","source_row":372,"text":"thanks but i think you do not get me.","label":"general negate"}
+{"id":"79a43d630ce3f229a0213744b290294a2e0966c856e273b27466544d6ea33963","source_row":379,"text":"you are my hero, thank you very much, olly.","label":"general praise"}
+{"id":"9490b2705d090253db5faa4053732f903d64b110a214c2ce431dbf73afbef315","source_row":380,"text":"you have done it correctly thanks, olly.","label":"general praise"}
+{"id":"270a3ddbdfd265590b351df595f05b1c62ed537bea53ff0745d1082ef447abd5","source_row":381,"text":"ah that's nice one.","label":"general praise"}
+{"id":"4bdcb3696634d283c56d740909ae8fb1b6fff5f55739d2530c8a1f636307defb","source_row":382,"text":"you rock, thank you very much, olly.","label":"general praise"}
+{"id":"9b8aead6f4fff0c92a2e6bfcae65f2b99021b89c423d962e5763bfe13880d868","source_row":383,"text":"fantastic job, you did well.","label":"general praise"}
+{"id":"21b3f5c55fd7eab3fccd66d12eef1549479f89deb5009dc5de86c705039ed4e1","source_row":384,"text":"that's good, thanks.","label":"general praise"}
+{"id":"40bcac446d5ee6f1dd1e423eae0dae46a722576ab6b1259bc5566a20d1fca8a5","source_row":385,"text":"appreciate your answers, olly.","label":"general praise"}
+{"id":"66c211a802a1641f0849f99d34dc0dd3076b05481316149b9952fa8bd2659c97","source_row":386,"text":"you are my star, thank you so much, olly.","label":"general praise"}
+{"id":"a63ae22477979cb5376668ad7ab9c07156745cc96fcc04cee721969c9449421b","source_row":387,"text":"that was cool, i appreciate it.","label":"general praise"}
+{"id":"8fb4a46505dafc47ceca2a44b35dc06683b84a403a0a261ed930519c7cd343b3","source_row":388,"text":"fantastic job, you've done well, olly.","label":"general praise"}
+{"id":"9a7b07f6c801b761f61ff57345f91099c4753cbe552287ff793b03b27dd3423c","source_row":389,"text":"great work, you did well, olly.","label":"general praise"}
+{"id":"7dfd05cde5b0eea3c8c9d36837b76360747e44f5303269746df1ace18acbcf0e","source_row":390,"text":"that is cool, thanks, olly.","label":"general praise"}
+{"id":"412821ba8c30b108c47992d86ef18b8d4c9782cba7ab44b559af103b4264d404","source_row":391,"text":"thank you for the response, olly.","label":"general praise"}
+{"id":"78bc46ad7fa6fa851851c1531a6114a993ee9239f46e6d3a22a94af5715d8ffa","source_row":398,"text":"today i had a lunch with my longtime sweetheart play me a nice song to the mood","label":"general quirky"}
+{"id":"1c9b81fce965235e423418172dbd79fcf86e63dae20ab682b153c5d32fcbe3d6","source_row":399,"text":"what's on tv","label":"general quirky"}
+{"id":"9f314632332c01a46190b7687736a210b759e143ba5e0c0490d37aec799024f7","source_row":400,"text":"is the data prefers any problems in objects","label":"general quirky"}
+{"id":"8b4cb17d9541fe37ae950130cec9544f247ff022695fe0658a5b43c521c22dab","source_row":401,"text":"your salary","label":"general quirky"}
+{"id":"a273a2e4b6e1157e225715bdaaf89543b644ecbe009b5bb58c36258989168678","source_row":402,"text":"overall day","label":"general quirky"}
+{"id":"6acfba1ac8b18a1c75ff9943e9c41c84c3de8db138628fd1761fff3ad7b99f3f","source_row":403,"text":"anything i need to know","label":"general quirky"}
+{"id":"e508cefc60982e09bed7ba4adedae26abb1d6e24255622b5790bca29768c2576","source_row":404,"text":"is mile marker sixty five where the hanging tree is located","label":"general quirky"}
+{"id":"72b2fb38bb86048b6c8be8dd7c4dfcccf0ac6d616f8f3b04f887a6de61a93913","source_row":405,"text":"tell me what happens when we die","label":"general quirky"}
+{"id":"09fe66dca962436bb1fa91c7b8697c733e73722a56eadd7809407e5daea2dfa7","source_row":406,"text":"what is your country","label":"general quirky"}
+{"id":"99edce7dad41bc936a2e62effe74cd5697e489064aa3eb44f2707737df7df41e","source_row":407,"text":"do i need to spare washing my car today","label":"general quirky"}
+{"id":"459700f3433a69c479f8e0bdfc8f6f765e51ed15890f8260724b93a76d582f68","source_row":408,"text":"this brings some problems to us","label":"general quirky"}
+{"id":"83764a5b06a4d240e446515d22340f8587271760207bb3cdcde34f7e2a1173f4","source_row":409,"text":"can you explain me the problems when the syria becomes more stronger than america","label":"general quirky"}
+{"id":"5bf59df0d8df670369db49235fcdcd1f0cadf2db3df7b8d61918f59764bd3d5c","source_row":410,"text":"you are chatbot","label":"general quirky"}
+{"id":"f36ce12ac5058d2f6b1ce2fa972eee59b399acbd331cbe8ac6fec57420c86131","source_row":417,"text":"let's start over please.","label":"general repeat"}
+{"id":"d1abca03f5328e78760c2f1ef99885c1533b08ebd2261856ce736a089a369097","source_row":418,"text":"please say one more time again.","label":"general repeat"}
+{"id":"dc5cd9227791d59799264addb405ae8c64d40698bcd4932082c31e4ec6b0cb1e","source_row":419,"text":"i would like to hear that information spoken again.","label":"general repeat"}
+{"id":"9da07286e7b31b924c34aa49b7a5047bb12a9032b01dfb9539890654d495e35f","source_row":420,"text":"i would like to hear the last one spoken again.","label":"general repeat"}
+{"id":"cf8c182f9afe2bf8c1279f2e30bd64ed766c57c4ef003d390af5adc80f1bf21b","source_row":421,"text":"i'd like to hear the last spoke again.","label":"general repeat"}
+{"id":"94885c31c76a08015d28f187504ff0a156e89d509a5e935e41bcde025e5e1f54","source_row":422,"text":"i need to hear what you've said again.","label":"general repeat"}
+{"id":"166faa2fdca58c72766c5259b72e424f0795b686b6529c5c9e5492a5a693f133","source_row":423,"text":"retry please.","label":"general repeat"}
+{"id":"7b1bfa2c2cff5f0e440b7d910c93f9bf5dd4fd8473772055c9ccb397dc2dcf18","source_row":424,"text":"will you try what i have just said one more time please.","label":"general repeat"}
+{"id":"8994dbb106fee5e7baf5bea71aba14d41a17e4c1714c241677579a77d0d8768f","source_row":425,"text":"would you tell me one more again please.","label":"general repeat"}
+{"id":"c12e5fafabed35c21ec6d438f4b93ef64762aaf28bf866b03080db06a419ef07","source_row":426,"text":"would you tell me once again.","label":"general repeat"}
+{"id":"c5617eeda5a26d4fb0edef5eee09812f0562b7d44a7308200b857747346301f5","source_row":427,"text":"could you tell me the last one you just said again please.","label":"general repeat"}
+{"id":"0c7fbad07a1f23cf9f1e3c272c670c8ae65d3df6bbab1b225fbdf04357f04335","source_row":428,"text":"i want to hear that again.","label":"general repeat"}
+{"id":"3ff18dde4e552794071251dc6d5db5e51681d7b72bd2ce18b466564d624f9c50","source_row":429,"text":"i want to hear it again.","label":"general repeat"}
+{"id":"c039f676ec9c19b23926c23098af46211c77a03973274bf684aaa119e8108869","source_row":436,"text":"please activate my vacuum to clean the living room","label":"iot cleaning"}
+{"id":"dd41163b6a3ed4edc418a0229691171b55aef19babe300d68c53fe72781da816","source_row":437,"text":"can you wake the roomba for the kitchen","label":"iot cleaning"}
+{"id":"cf7f6af6a4213d3aca20a64cb910a3cd4f6abe2472afba1529a47a9d6fd14df0","source_row":438,"text":"please have vacuum go for one hour","label":"iot cleaning"}
+{"id":"3b25c6f37859c3ff1c96164d40232eb3e49a0eaa5c1b644f525ada335549557b","source_row":439,"text":"activate the vacuum","label":"iot cleaning"}
+{"id":"5e3cf86fa5edbcedc3a249fcab56e58348a08b4c787b04d4c6839fb0a4523504","source_row":440,"text":"clean the sofa with the vacuum cleaner","label":"iot cleaning"}
+{"id":"3425e983e7c9ec9a5f917256dd885987f4aaa218b1a496ce0cba77424df005ab","source_row":441,"text":"have the vacuum cleaner clean the room","label":"iot cleaning"}
+{"id":"aea3719ce7c26d40f26ccb4b18e8d082da0e36f0dff65f44dd4d66cfa82ffe63","source_row":442,"text":"hurriedly activates my robot vacuum cleaner","label":"iot cleaning"}
+{"id":"2e0a1270c3fc0e39fe8580fe93b80cb1e4e141474f89527a4c0e9337972f09bc","source_row":443,"text":"begin vacuum","label":"iot cleaning"}
+{"id":"6b5b4061d49eb962672a8c0ed3ba94b86f7981dffe421f6ac09f05e6cf0f2109","source_row":444,"text":"remove dust with vacuum cleaner","label":"iot cleaning"}
+{"id":"2b3b5127178a6ff079f9aa5a8dfc8aeab830f3e7824a53ab15497f63b6ca052a","source_row":445,"text":"start vacuum bot","label":"iot cleaning"}
+{"id":"e9f38d3fb3b64091da944c19737b5192f6027fe0d2cadfef5d74a344152e2f61","source_row":446,"text":"start my robot vacuum cleaner by ten to eleven am daily","label":"iot cleaning"}
+{"id":"6e09981af11938040f8b7744d1f39fa39b1cf8ddf17a19a15b30018fe2f0104d","source_row":447,"text":"activate vacuum cleaner","label":"iot cleaning"}
+{"id":"0ebdbbbf5012e949435dbc2a8279c39d3a8cfcb64af2f087a775a635d7a087af","source_row":448,"text":"turn on the roomba","label":"iot cleaning"}
+{"id":"ac9b8498999af171aa2813a5653181316e5bdb5b07b595857f518253ec7098c9","source_row":452,"text":"i would like some coffee now","label":"iot coffee"}
+{"id":"38bf6d97c9dc20c7984e1d61c7506679559f6416cb13b3da99eb79d0b2d2ce47","source_row":453,"text":"please make coffee at seven am","label":"iot coffee"}
+{"id":"eabe1361bc55e202add3a159603c0cd580e69c8cd0c3e24106fe2daff0d804b5","source_row":454,"text":"make a cup of coffee","label":"iot coffee"}
+{"id":"a6e7919eabbc0a7b0590c7a1998d18e7c99f29127a547558b6a4345af4a7e5f8","source_row":455,"text":"start coffee at six am","label":"iot coffee"}
+{"id":"93aaa1c47a9c6d45d39d823d336d403339732c8364ce8ecebf13d8de2e48c860","source_row":456,"text":"i want some coffee now","label":"iot coffee"}
+{"id":"97468aa695d90e120200a06aee27c4de47424c609f2fe605f51183be9079d1e1","source_row":457,"text":"get me some latte please","label":"iot coffee"}
+{"id":"35adef8299cb937020ddd6aea193a10fe3ca851cf862ff7a546d4524072d8eb6","source_row":458,"text":"prepare my morning coffee","label":"iot coffee"}
+{"id":"55b481bd9c4e06f951a251a4d638c9e4bef2e4dffc2a30ef7cd0eaa8a66c7a62","source_row":459,"text":"prepare some cups of coffee for us","label":"iot coffee"}
+{"id":"f885091be341854c45ef3b1ea22b140214f5fc1b3a2995fb5fdf693c4fac12cd","source_row":460,"text":"can you see to it that the coffee maker is ready with my filter coffee in approximately ten minutes from now","label":"iot coffee"}
+{"id":"a803e4b6e47df80a408de7633866aae6f0ae0c9ec9eeb4caf4666a5453670c6d","source_row":461,"text":"i'd like a coffee now","label":"iot coffee"}
+{"id":"ad8a3520c2d61eb830dcc6c5cb83480f24bd83af31e0a1940e137437608babd4","source_row":462,"text":"can you please turn on the coffee pot to make me coffee","label":"iot coffee"}
+{"id":"838eacc0c3112b4a31fd0588bd4110741bf3f6052ffbe329e88b5e02b1a229b7","source_row":463,"text":"prepare coffee now","label":"iot coffee"}
+{"id":"bec1d31e8cae78f3000339da5f6357204079c4baf12a610fa081eb3118ba434b","source_row":464,"text":"can you get me a cup of coffee","label":"iot coffee"}
+{"id":"caf5ae0b41df5e3954e6966a9b126fcd3f8c2769b496dd66bed8979c5ed32d0d","source_row":471,"text":"please make the lights natural","label":"iot hue lightchange"}
+{"id":"9fc9c1202f32b08c64820a3301656378606fc117532a14fe987bad1878a0cd70","source_row":472,"text":"lights to fifty percent","label":"iot hue lightchange"}
+{"id":"2e85c7f1e9ce064c5fb28793f6abe34ea571510604d7c665d956607c122cffa4","source_row":473,"text":"can you change the light colors in the house","label":"iot hue lightchange"}
+{"id":"6a7b7a7e284e8957b53059511fcc66622269a26621a3c936232a9922696a78b8","source_row":474,"text":"turn the lights on party mode","label":"iot hue lightchange"}
+{"id":"de52dadc17818790c2da7c01113f6ec64a9880660d19b9c1b2e6890d2357884a","source_row":475,"text":"set the mood please","label":"iot hue lightchange"}
+{"id":"72534ca1784f344e25496bf509c306bc50fc02276662f3224e9fde562ed7095a","source_row":476,"text":"change the light colors","label":"iot hue lightchange"}
+{"id":"fa27281f62046b7e8825d6bbc2d93a1b2fa0840f9f851ab239960e90aded0e65","source_row":477,"text":"could you change the lights colour to green please","label":"iot hue lightchange"}
+{"id":"b61731a9677a71b038b7a6a142487cdf34de24261766d335690c33be33690b34","source_row":478,"text":"make curser adjustable position","label":"iot hue lightchange"}
+{"id":"bb10ced2a25f0034023428e77875fc30ea9baa205909e1fb9f793c1758579ad1","source_row":479,"text":"change light color","label":"iot hue lightchange"}
+{"id":"70a298e30972ac776a27ca6c3c1557a481917b39032151d3779010ce1e2858cf","source_row":480,"text":"change the light color to blue","label":"iot hue lightchange"}
+{"id":"890bddfc567ec7c1b8d98a6f12aa9646c0158dce96ae26ced06b993ec9d832f6","source_row":481,"text":"alter the color of the lights at home","label":"iot hue lightchange"}
+{"id":"49023efb137e9a231bfaf1e209b7b2b388ffec53ea232e02978b2a959ee42a4f","source_row":482,"text":"change lights to blue","label":"iot hue lightchange"}
+{"id":"2bbf30ed5da0af1ab978cecf58015f7792e44257461e26e0ae97baa867cb707c","source_row":483,"text":"can you change the living room lights to a softer color","label":"iot hue lightchange"}
+{"id":"a81769e936931abf7e3be71539c84e5f6ce63de4d3b3c8ebe292bd2c22ed8aee","source_row":490,"text":"dim the lights at the living room","label":"iot hue lightdim"}
+{"id":"111a189eb72b416a2596ed54ec4d2080722d3ee1fc4d97b5679d1ed16c9fa52f","source_row":491,"text":"lower the light intensity","label":"iot hue lightdim"}
+{"id":"f88c738a26cdef4c2403960871f67c6a3acc2ef1967d5713d0ebff1563c735f8","source_row":492,"text":"hi can you please turn lower the lights","label":"iot hue lightdim"}
+{"id":"73de82b2cca94950a74b8b3601b253d55f4a47a7b3c4beb790efdfd19db43439","source_row":493,"text":"dim the lights please","label":"iot hue lightdim"}
+{"id":"8ab2dba4178093ac083fffd4608a99b7b7e0672fc94cff5bba68184ef172c8b4","source_row":494,"text":"please turn down the lights","label":"iot hue lightdim"}
+{"id":"324b9605cf5b134f74e3bcbeece3bdb59a5fd12594f1762e4b52e6294764f4af","source_row":495,"text":"lower the lights","label":"iot hue lightdim"}
+{"id":"43898d43f30e19edea8f4aaad22bfdc83f92e88fbb3c63485590d9c369cb6fee","source_row":496,"text":"lower the lights in bedroom two","label":"iot hue lightdim"}
+{"id":"9c46b528cfa69de941e3434159d47c63af26aa8cae69858dd51b162bda3b584c","source_row":497,"text":"i want the room to be less bright","label":"iot hue lightdim"}
+{"id":"bc77ca3c882901e9de994637e54a49652e39428aafd8cdb97e2f7b94d7b3e0c0","source_row":498,"text":"hey olly make the lights a little dimmer","label":"iot hue lightdim"}
+{"id":"70f33dab8f9d9b05b97903911c969657a41daf25ed62464d439c2a48e15fc08a","source_row":499,"text":"light is too much","label":"iot hue lightdim"}
+{"id":"275f78327e424cd32448d90dacfe9b2c4305b87893639a691dddf15193386044","source_row":500,"text":"reduce brightness","label":"iot hue lightdim"}
+{"id":"61d52c079ac171e05d7a595d1b6767849214cae9597e8b8eb5cfa89d4a806492","source_row":501,"text":"dim the overhead lights a tad","label":"iot hue lightdim"}
+{"id":"1e334ec7ba81967661e62dbe99fe275b353b220dc209a8468e6e077638ba61bd","source_row":502,"text":"switch off main light","label":"iot hue lightoff"}
+{"id":"77aeff99734f852fac1249ef92c8b5c5d15f4a0a395dd35edf91afab6dc45dfb","source_row":503,"text":"off all the lights on the right side","label":"iot hue lightoff"}
+{"id":"8c820198a88e1dfc423a98b3353a8d5f228e3e0253021a4989573f254eb4ff0c","source_row":504,"text":"turn off lights in bathroom","label":"iot hue lightoff"}
+{"id":"d8793aae2a64e1b0d069ea6d5ee7745849f77647f1d6c8fc2ace25cd5a7d96cc","source_row":505,"text":"bedroom lights off now","label":"iot hue lightoff"}
+{"id":"eeecefac429cd95e9b063be8ae6534172de97f2a11b7528c8ba982f270664999","source_row":506,"text":"turn off the lights in the bathroom","label":"iot hue lightoff"}
+{"id":"8a2650d212b0829638c349f9a61d3dba506cba22bdd683df7cbc907a9cf970e0","source_row":507,"text":"please turn off the lights in the kitchen","label":"iot hue lightoff"}
+{"id":"ad12799b8fe5c303feaf9e07cde9b831038ab7a592c073d606465eaaeef8da8c","source_row":508,"text":"turn off the room light","label":"iot hue lightoff"}
+{"id":"5a4f1daca901d08d92f1056e220e83ac97c70aa3474440a798b0594f75ab9038","source_row":509,"text":"power off the current","label":"iot hue lightoff"}
+{"id":"3b58169f5c8c7da98098a4b0363d88ba75e4a9d4b5ea7ce091418f66012b4f29","source_row":510,"text":"turn off lights of kitchen","label":"iot hue lightoff"}
+{"id":"36c8fdd4b5089ba79f771033761a60d1fd775cae8359c0d1b43b573d0e6737bd","source_row":511,"text":"by main power off","label":"iot hue lightoff"}
+{"id":"fe6eef1ee15984f444fd651d7bb49491e428e7ff589eb5890a46a669ba1b2ae0","source_row":512,"text":"turn off the upstairs bathroom light","label":"iot hue lightoff"}
+{"id":"5897bf5bc37f8d70b15deeca03fcf8a59d6b78f8c32463016b9be1adec6d8415","source_row":513,"text":"please turn off my patio lights","label":"iot hue lightoff"}
+{"id":"e92ab169ff4c04fa72fdff76ed7f1dc9e0de38e4e43eda4b623fecff3ba925bf","source_row":514,"text":"turn the lights off please","label":"iot hue lightoff"}
+{"id":"14533c4a3970833b5f96e5adf52d70ca5d9f28f6d4107a7b77ad68639ed50d8d","source_row":521,"text":"please turn on all lights","label":"iot hue lighton"}
+{"id":"d2ee6f1ded19fbe4d5b4d38979801316a78423c6549aab23a5317fd07dd4b77d","source_row":522,"text":"please turn on the lights","label":"iot hue lighton"}
+{"id":"d8801adba0001ea4a8099b7134ce88a16b79e2db0e4be364c478075e52f3a2df","source_row":523,"text":"it's dark in the living room","label":"iot hue lighton"}
+{"id":"0467fe96abefa18107c020768f3b7d4bc011209f7a6521975023ba84e9e6a2bb","source_row":524,"text":"light up","label":"iot hue lightup"}
+{"id":"097ca11452dcda4fb3fbaa4d001142aecf1456de06b6a10a71f6b8653219c81b","source_row":525,"text":"lighten the light","label":"iot hue lightup"}
+{"id":"c08feac7de7543323d50fc5a108febb6e0510e157528e29629871bc1bafea3dc","source_row":526,"text":"i need the lights in here to be turned up to seven","label":"iot hue lightup"}
+{"id":"0a9b993550d273946eef86a3a4ca3b6622e41e8a2645c57a9ad1ce707f99f990","source_row":527,"text":"increase brightness by twenty percent","label":"iot hue lightup"}
+{"id":"f24e80b142b67f03b8ee49eeb0224fbf8a4c35121e590968c78331f964963553","source_row":528,"text":"increase the light in the room","label":"iot hue lightup"}
+{"id":"4a0429a70ca1e8f1449bb3641b517bd7e124fcadf4adebf00bd6c42d58739af3","source_row":529,"text":"can you turn up the lights","label":"iot hue lightup"}
+{"id":"f4011fb25967948a234fee93f3680d7912a6e0d19601ec495ebe1ad111f6bdf5","source_row":530,"text":"i would like all the lights on when i enter","label":"iot hue lightup"}
+{"id":"54676a2a4b27b659c2223e7b1bf82c886c6663e1094e71a24853917d524ce086","source_row":531,"text":"please arrange to make all lights to show brighter","label":"iot hue lightup"}
+{"id":"667feada353699d46a4b8e34fb1d1b72aa7e55cb23becfeb37f20e7cf6e8cc1a","source_row":532,"text":"brighten living room lights","label":"iot hue lightup"}
+{"id":"64d7834314e2216684f65471d7513474d860667783b9069ca06362c658b8d195","source_row":533,"text":"raise all the lights on","label":"iot hue lightup"}
+{"id":"c920de82ef23ae8b4a32b7667946ea52c14054b24f766db18a0823116c579e58","source_row":534,"text":"raise the lights","label":"iot hue lightup"}
+{"id":"88df7604b217261d00bc5571b52f85415687144bb320355162454fdf5d2cb16e","source_row":535,"text":"brighten the light at seventy percent","label":"iot hue lightup"}
+{"id":"5cc9bced5d9a8c56722cc35b1439a23c0b402b7a75b8cc6e86be11120334e6a6","source_row":536,"text":"increase","label":"iot hue lightup"}
+{"id":"03e7c1d26a408216048a90361bfd83edc29a5f9101b9d3103579775bb0985458","source_row":538,"text":"deactive the socket","label":"iot wemo off"}
+{"id":"572a18baf76c78073ee48568237b673acbfc7c4fb7327e480338d885840e5403","source_row":539,"text":"turn off the rice cooker socket","label":"iot wemo off"}
+{"id":"ad33fec4c35f6cb6d56dfc3eddf0f497e583b03d8bcf1fdfe0334aa600f5b19e","source_row":540,"text":"power off wemo plug socket","label":"iot wemo off"}
+{"id":"5698b780c3db32ec7776503533800fa934003be0a7bd159abb6b4efb46872b71","source_row":541,"text":"please switch off on the wemo plug socket","label":"iot wemo off"}
+{"id":"4282515e5f13e8d67c855e33f942f1e87eb766c38645e07f08824dce9a6febe3","source_row":542,"text":"shut the smart socket down","label":"iot wemo off"}
+{"id":"75a975691815f8861f28b19591e5f1a3f74179057bf9c2a2a0468a2f1af3f9ac","source_row":543,"text":"i do not want to use the socket anymore","label":"iot wemo off"}
+{"id":"553d4c55ebf3edc713b3d5143d0ead793c2701d72b8ba536db7e6cc31cd4618a","source_row":544,"text":"turn off my smart plug in thirty minutes","label":"iot wemo off"}
+{"id":"aa46c9064a16f708a50afe05e932240aa2d823a5f8faa28277aeaa8dc5f86948","source_row":545,"text":"turn off wifi when you leave home to save power","label":"iot wemo off"}
+{"id":"41101bc52b005b518087f65075292ace3d8fdab90ea207492c4cb589ca1528d5","source_row":546,"text":"please turn off my smart plug socket","label":"iot wemo off"}
+{"id":"fbdf9aa219ce060031f7dcf5e46ac1cb07c348f890125da90c4bc6e2cd823743","source_row":547,"text":"turn on the wemo plug socket to connect my charger to it","label":"iot wemo on"}
+{"id":"ca59c7da37f12869be2b6c6ef6031ca533ca716daea6812494f03ecad8f4e938","source_row":548,"text":"turn on the plug","label":"iot wemo on"}
+{"id":"8b335f8a7b238397434d7748b282533fdcd9348d37b8fedf1d55b4369dbcecf4","source_row":549,"text":"on all the button on dashboard","label":"iot wemo on"}
+{"id":"387fb86dcfcbb5811ba13b6f1af270d4626221bc2b911c8a5af8f4d2f5730d6e","source_row":550,"text":"toggle wemo plug socket on","label":"iot wemo on"}
+{"id":"01c0451dabff91cfb6f6941796294e1ca0e9320f52715a9f3de77534f5443ea3","source_row":551,"text":"wemo on","label":"iot wemo on"}
+{"id":"669f8b7e4a3000cbd7634740fb91d4a774f2ef0f3fc26681de05ea4dc920b279","source_row":552,"text":"start new smart socket","label":"iot wemo on"}
+{"id":"3ceba1e971a780c266bc95aa007c7073136c1996fa2663b6044ba5be0a59c23d","source_row":553,"text":"make the wemo go on","label":"iot wemo on"}
+{"id":"857672d0259cfd6315b93f5bf51d57b36473ea9eec5dc6e20afa8d957374bb9e","source_row":554,"text":"create a list of monthly groceries to be bought","label":"lists createoradd"}
+{"id":"3c7eae0a9d80b6e65c13e6f7107fd5681dc9308f52e2d1b79d5708cdb6250941","source_row":555,"text":"create a list of books to be ordered","label":"lists createoradd"}
+{"id":"b26850f764c1c0d986ce8f8e1c8dd9c7c7e125be0409bc3488af8b654c945b18","source_row":556,"text":"create a blank list","label":"lists createoradd"}
+{"id":"08ac6b4dedf9e81ae303cedee6363952c9bf8939bb06dee3464cd85ac1c97c34","source_row":557,"text":"add to list","label":"lists createoradd"}
+{"id":"5ebe6c15e6baf97632becadac1cc5d63b7edee7dff1cef3f10e4e053a83c818c","source_row":558,"text":"add these documents to the things i need to travel with","label":"lists createoradd"}
+{"id":"adca39747dc6146c41552b74bfc720fcbad4d3f7e27fe8f0f3b54953a4ffebfa","source_row":559,"text":"start a new list","label":"lists createoradd"}
+{"id":"d53eb79f13db5aa6a039e00da424e771bba3df0eb9b96fc1d3fd3c5971035fc2","source_row":560,"text":"create a new to do list","label":"lists createoradd"}
+{"id":"039538b07870d80ea67446ca650fcfc3b941c886c1c2bbf96a8f4981188c9cc5","source_row":561,"text":"search the item","label":"lists createoradd"}
+{"id":"dc4b4eef6d7ee754aa31fb5e181298c3580fb52e0bba7615f22f99bb5e5236c1","source_row":562,"text":"create a new shopping list","label":"lists createoradd"}
+{"id":"29d994146a4ee0008658cbcf42012deab76d7d6b94c729566c27549598ff0898","source_row":563,"text":"start new list","label":"lists createoradd"}
+{"id":"7b920398fd21f0af28c8b59669d45a7fb26668494d8ba901c89d102fe406768b","source_row":564,"text":"i need to set up a new list","label":"lists createoradd"}
+{"id":"ad8d66ab865af00368ba676709c738d58202d8dc3d5dce029bc487cce24dd01c","source_row":565,"text":"remind me to buy jeans on my shopping list","label":"lists createoradd"}
+{"id":"ce3c812df2039f186b6127fcd998231a5f5eaa78feab64757c9fd75a1a5497de","source_row":566,"text":"add cereal to my shopping list","label":"lists createoradd"}
+{"id":"268442f1934c721357e1169aa81b5e20e00a96e738e92eeb38eae46cba023f10","source_row":573,"text":"open google keep","label":"lists query"}
+{"id":"ee7eaf2c37c5a3dc4a67faa0ed9f34205667476085e33641f6f9fffc869f44b8","source_row":574,"text":"what is the list type","label":"lists query"}
+{"id":"2b55c0eb57c83f977336dfd566aad58dee74672bf2bec60eacdcf0e4f79a959e","source_row":575,"text":"what list did i make today","label":"lists query"}
+{"id":"f7b570e9992e1ca7561a3a99109e733539fa6e33073fdd9a20feacc5046efdc9","source_row":576,"text":"did i put toothpaste on my pick up list","label":"lists query"}
+{"id":"fb5beaa4e86b59313a210646d638f5aebed6610fd1cdd0431e73d3df594e9529","source_row":577,"text":"please show me lists","label":"lists query"}
+{"id":"355278bae5c390a511c192dce6aecb7c0c5cee8f971a10a6e911a4500ab39f6d","source_row":578,"text":"groceries list","label":"lists query"}
+{"id":"599f438127dd2b364a91d71a71938c9f7ceba75985a8a41e57a35f520428aea9","source_row":579,"text":"tell me my lists","label":"lists query"}
+{"id":"6e60523b286aad1bd367ffb2039110d3dcfe6d1016d1b3265d50ec82b0faef13","source_row":580,"text":"how many items are on my list","label":"lists query"}
+{"id":"6a2d04dbfabf67c999ce4bd7295170bc8266d8ed02b71db86e767e4bda11ee16","source_row":581,"text":"tell me the names on the list","label":"lists query"}
+{"id":"824d6dc27a00db6ace9189a07179da52a2d0e73691f743e8d2b87d0a0192532e","source_row":582,"text":"show the list that are available with numbers","label":"lists query"}
+{"id":"19c147da6d023772c2e23636851ebfd8e441a34ec309f87a1302b735d0878022","source_row":583,"text":"please tell me what lists i have made","label":"lists query"}
+{"id":"dd0876d5c99ac08bb1baa61ee698c7850ca51ad071dda702a08fe2b4dc12c82e","source_row":584,"text":"most viewed list","label":"lists query"}
+{"id":"1f3f8c01258811d7fae02c5ab74ad0a4e1c4ecf468508079ce16554d17bb8c36","source_row":585,"text":"what did i put down already on the walmart list","label":"lists query"}
+{"id":"1c78a830d1672e6e19bae893426084fa3a5a126c61e909207966ec1d32cbbc8c","source_row":592,"text":"can you remove this item from the list","label":"lists remove"}
+{"id":"60b58cd252791aea3a152d2c2d143ce5a4c33b2622d87e5dea854a0f6ce07e5a","source_row":593,"text":"delete last entry","label":"lists remove"}
+{"id":"420b383c132b3be84803a580b654465d67709135fa911fa17b7bf1b9a564ecb2","source_row":594,"text":"remove books from list","label":"lists remove"}
+{"id":"f801cafb767bcbd4c11a5bf3f3adf90bedd429924771d88eb52b79adacd593b7","source_row":595,"text":"please remove my list of favorite albums","label":"lists remove"}
+{"id":"efaef43bd48abe618d058a2a3bff0ad69a23720db44a5a31f4e8751c19ecbf5a","source_row":596,"text":"please delete what i just typed","label":"lists remove"}
+{"id":"2361b724fb2b88adb8516f2eec502f1940cf0a11f34acfd219bb2001e5ff779f","source_row":597,"text":"take bread out from the shopping list","label":"lists remove"}
+{"id":"1848032381b0adc2280a04bd7aa00fb87c9abcb811e860b108996f8590112e5e","source_row":598,"text":"change that off the list","label":"lists remove"}
+{"id":"1d81258f4b2ef3d305fc0c315177f84bc2875a1ac63611fada47433d50ead64f","source_row":599,"text":"remove the list of apps which started with letter a","label":"lists remove"}
+{"id":"70d321c00e3ebaffee1b8fa8781f9d243c5d37e1cefe623f2a758e89d4a8217a","source_row":600,"text":"remove this from the list","label":"lists remove"}
+{"id":"e83bea783c6906310012e00a86903273ff522d55fafd67679cdc13e133b31828","source_row":601,"text":"get rid of peas","label":"lists remove"}
+{"id":"38aa906c50b5250ded7d0cb52e70a7c5d18a07c4d8fc68e7b9711ff7ee579ce8","source_row":602,"text":"remove item three from the list","label":"lists remove"}
+{"id":"bddfc5cb3fae200cfc3242a66faa845e0beee47d4a2d56fce30ea38c5eae8e95","source_row":603,"text":"take grocery buying off of the list","label":"lists remove"}
+{"id":"a33c0709d62bc46a250f6eb0f89b8af35ad5130b42c31aefe84d3ebb81ce3353","source_row":604,"text":"i don't have enough money to buy the nintendo switch right now can you please remove it on my amazon wishlist","label":"lists remove"}
+{"id":"dd69a4bfd74122c6b9ae3b08928e5acaeeb681cceb7bfa1a1abb6dc38d3ca35b","source_row":611,"text":"save this song in my favorites","label":"music likeness"}
+{"id":"fc874d47e2cf0278fd322ce2f9661b8a0b3c4deea638e243c832bc312709153d","source_row":612,"text":"please rate this song five stars please","label":"music likeness"}
+{"id":"3e1d1f7fdd8f5a0bb37091f7dba9ef796f35cf86cbb88a10a29c3f10d3745243","source_row":613,"text":"i like alt rock music","label":"music likeness"}
+{"id":"a9c67f433c075fec071eb0340311c94e17d1a93a74670c3efb34d888a2450c33","source_row":614,"text":"add song to running list","label":"music likeness"}
+{"id":"daf13c1f6de3ca07a3eae96cea9fcd77b6f236649b96688df5a7cf10cea42252","source_row":615,"text":"i like to be it","label":"music likeness"}
+{"id":"4d22845b6544da94993eb3427a333fac06b8691e88bc147c90ce88e21656044d","source_row":616,"text":"add this channel to pandora","label":"music likeness"}
+{"id":"ffd0a506e49875ac15dc5aab98778e3313515263d1e88f216e0e397abf65a7d7","source_row":617,"text":"this song should be on my playlist","label":"music likeness"}
+{"id":"1c280e03bb659896d7bcde1b9e144f8c4d960f7557df7b4376daefdb8f95828f","source_row":618,"text":"i like it","label":"music likeness"}
+{"id":"b5135f4b5e8501deca3250021509931ac82a8d8f4adf3a4ea5af5161a5c76c0c","source_row":619,"text":"add this song to favorites playlist","label":"music likeness"}
+{"id":"300c6183f6cd851edd3366ea966a2a6bc95a28cd943f1c1bd4a7a2c8ac3937f4","source_row":620,"text":"i favorite singer is arijit singh find his voice on radio","label":"music likeness"}
+{"id":"18c279cf9039dbc90eee8d6363a9c9954e9abbf68718e90ddf4546164ad3801b","source_row":621,"text":"i really enjoy this song","label":"music likeness"}
+{"id":"d7aad5dce3df878cd71920a05a1ed67830a63bf6eb9e46a0233881f3512547c9","source_row":622,"text":"i'd like you to remember that i like this song","label":"music likeness"}
+{"id":"f2514b0d17d297d16614a3271326841acc929d93b52ec53565f9f01b18a9026e","source_row":623,"text":"what is in my favorites music folder","label":"music likeness"}
+{"id":"69a676b780680b9fb844907534aa44e984bd9de74d2a696c36cb9ee06da35caa","source_row":629,"text":"who is the song writer","label":"music query"}
+{"id":"7a0a9f9bd8df2d50bfdd0859ed410e12564ad2f34a080ba3af4c5ad5c203034d","source_row":630,"text":"please give me detail of o zaalima song","label":"music query"}
+{"id":"ad6a7a8ab239acba03e56c53d07b7b3700c511a45ba4ef19840a9fb0dd176259","source_row":631,"text":"give me the details on elton john","label":"music query"}
+{"id":"455862b3ee7e3f737fcb19651f77e301beba0a1f90ed2316673b3a26a758aa86","source_row":632,"text":"what movie is this song from","label":"music query"}
+{"id":"daeef31517bed4cd4d5e7f2c5ff831bec5a88b218c195d48cf944824cfad76f0","source_row":633,"text":"when did pop it like it's hot come out","label":"music query"}
+{"id":"4790e62945cc9f3b56f31d38ba398e20cd109c9c5a4667219d7917733db5f62c","source_row":634,"text":"what is the name of the singer","label":"music query"}
+{"id":"2fd92773654f5074ef06e916e6bab3fdc2410afd1d5ae8fe5e401acbf0afc359","source_row":635,"text":"who is singing this song","label":"music query"}
+{"id":"4a61fe1a7b96fdd3d30d57b718b02ce25c999d107619022faf8ca39996593551","source_row":636,"text":"i want to know what song has the phrase stairway to heaven in it","label":"music query"}
+{"id":"e0abc99b0e4fc797eee906a51aa32bc4f22245961db2a2adcb77dbc58ea25f48","source_row":637,"text":"where can i find this song","label":"music query"}
+{"id":"ea6a2df99d6813d7e867790b472447da6331e62adcf6701315c2ce358521ced5","source_row":638,"text":"song info","label":"music query"}
+{"id":"afae730f036f5b50c7b0b6d1fc6f0d3e2106c35fc372d6c39963a010d2573b1d","source_row":639,"text":"what list is available for my favorite music from ed sheeran","label":"music query"}
+{"id":"d7d6040220b5b69d76c1a41e4f80ad935515f805a20ed7df09f487994a2db96d","source_row":640,"text":"who is this","label":"music query"}
+{"id":"2bed5875550d950c37999f6702cf8569c0ddd11a783e222825bea9d6d71c7ab2","source_row":641,"text":"list of playback of ar rahman collections","label":"music query"}
+{"id":"a405551be194ba5d36ea3576add320a268ae854af0c6bde2440fa034cb4638ac","source_row":648,"text":"shuffle this playlist","label":"music settings"}
+{"id":"c419eb26c2b0ad75825dcd937864ed757d2dcf469550eb345297d271be3f13b7","source_row":649,"text":"repeat this song when it ends","label":"music settings"}
+{"id":"e541001809ae7532211a1ca3a81a9226944fe381385a5d7884bc91ead8c735d5","source_row":650,"text":"cut the songs in this musics","label":"music settings"}
+{"id":"fc50f26d48c89369333f184ab30273e394029152d82f66dee202f54315fe255e","source_row":651,"text":"repeat previous song","label":"music settings"}
+{"id":"8f3bb037abe8154a48d686b7901aafe2254edf4395df941a8c3d6df7bfde6181","source_row":652,"text":"please repeat that music again of akon","label":"music settings"}
+{"id":"20c97d722b2eb65e991538c15c9089ac906fd2e1975a4cb5451de234d4e00f25","source_row":653,"text":"repeat this song","label":"music settings"}
+{"id":"f28db408d48b576f118b22bc30b8dcded6cdecf91e6d8238b9fdfb2add6f6ae8","source_row":654,"text":"repeat same song for ten times","label":"music settings"}
+{"id":"46c47cc1def154214911437b6622bc446e1ad8251477cf4f798a4fe388f1e5c7","source_row":655,"text":"add newscast time to daily schedule","label":"news query"}
+{"id":"4509273961ceb2fc581fce92ebb038dc9b700a9c9584c79635e01c2ae4cf5b20","source_row":656,"text":"what were the cities affected by the earthquake","label":"news query"}
+{"id":"d9abadec887ccc5fef7e99621b85a0dc93aea22a80375d6308dca6bababa779c","source_row":657,"text":"head lines today from news","label":"news query"}
+{"id":"1539abf52d94624929c482935d656c5a4599b6cf215d8fafb3bc814800b3a250","source_row":658,"text":"what is the seattle city council doing about homelessness","label":"news query"}
+{"id":"667086c124fbed7bd38e4983f7481e33a72455379915d23f984185ccd2868a08","source_row":659,"text":"find me any news from so clean the last six hours","label":"news query"}
+{"id":"9e4aec31905d0189fdac51a26b44fc62c5d5d787e8b8373279b0c45184950c04","source_row":660,"text":"what is the latest headline news from this newsource","label":"news query"}
+{"id":"bf46cfe3776f6788fae25e402413106159b8f9cdebcad8cbbe2ac75d36f4ce64","source_row":661,"text":"could you please find me the latest news from a source that i do not usually go to","label":"news query"}
+{"id":"f56258c06992d132039d9064ae48d9f65ef3608e13ff80d9844bce5f94413e6e","source_row":662,"text":"please keep tabs on how the presidential debates are going","label":"news query"}
+{"id":"83dd479fed79d93b37e29ab8baace3ac4085d5b4ffacf59de9dcc6a0dbcdb231","source_row":663,"text":"what's happening around the world","label":"news query"}
+{"id":"56ad6d9e87d6722a8bbea152863fe0368f775f7d8726805ab32462222b6c7cdc","source_row":664,"text":"i want to know everything that breaks about the dam breaking in california","label":"news query"}
+{"id":"7811bc51488124929c9a738a1ecb18bfb9c7bc7cff3950cd084ee997cdfc1658","source_row":665,"text":"what is the latest news about obamacare","label":"news query"}
+{"id":"c64342cf627cd44b553efaa2737f10f4817c76d977c26b4aedfa428b5337b460","source_row":666,"text":"show news of migration","label":"news query"}
+{"id":"c58a3f68d1b2e24b5c59e2079cc47db565a185b3c6a732cbba3680f2305a5430","source_row":667,"text":"find new trump articles but not from fox news","label":"news query"}
+{"id":"69c275acceb45ef4b39eba7d11b61da3f76e7f4bc58beacb7532ce344b08a633","source_row":674,"text":"i want to hear more audiobook","label":"play audiobook"}
+{"id":"0bc50e223ee987b9515e9b03300ef00c4dfe3d5d5b8cc3710962d8222fc1f90e","source_row":675,"text":"pause resume","label":"play audiobook"}
+{"id":"a01617488b7c96c861289630db9a43e5826c6e3089e1a05ca0a323a66a8353c0","source_row":676,"text":"resume my audio book from karl pilkington","label":"play audiobook"}
+{"id":"e00932512f4dae27ad24b8e070aa0a77b660c01057da70d691e55b4556973c70","source_row":677,"text":"book please","label":"play audiobook"}
+{"id":"c04331a2ef6048e66b1d656bc31bfae61591e5951198cf3fba43c3bece3d8c22","source_row":678,"text":"start playing american gods where i last stopped","label":"play audiobook"}
+{"id":"ea66f988110190f13d2a617dd2636d18113f93c5a74090cc230d6f085eebc678","source_row":679,"text":"play from my last session of joes book","label":"play audiobook"}
+{"id":"9c39f3ff0c6c92312bc6ddb0883fbfd8b07368277fae81843e88a1dcfb675a4b","source_row":680,"text":"open audio book history of rome","label":"play audiobook"}
+{"id":"7b7980eb3c8c1c6ae85c9123120b969fb0d454e27cd24c49220ca40d3aed925b","source_row":681,"text":"start audiobook the time traveller","label":"play audiobook"}
+{"id":"18c2f0d1ddcbd854593804edb841a116f4d5aec137a32493f3d77391fffa7329","source_row":682,"text":"resume animal farm","label":"play audiobook"}
+{"id":"a3e532c55ae32adc5e13c5c7b040c3fda015e1d4ca159078702f84fc1d12fcfb","source_row":683,"text":"can you play file","label":"play audiobook"}
+{"id":"c5eb704389b3218b2b5a4a64c1bb2e6588ceff4c108a0e48e8971f30d3a2fb14","source_row":684,"text":"audio","label":"play audiobook"}
+{"id":"154e696be546f7a7d621719e003da6300c6d109ce6f6c213edf3049e7c33390c","source_row":685,"text":"start from my last session of joes book","label":"play audiobook"}
+{"id":"2ee5f5023ffc0ed5b8da19a5ee7f62630d8341e4d913605ea03281dd07667eaf","source_row":686,"text":"play from this point from this audiobook","label":"play audiobook"}
+{"id":"f5fc387adf40f19020f5dd89fcc6970112b0908a20bbfe7a6a86c0f9f4a5edc0","source_row":693,"text":"play for me the game temple run","label":"play game"}
+{"id":"f511404c125ed6ec85c805e0eff2d5032aa7a190eeb9681e7e639cc81bd42392","source_row":694,"text":"i want to play solitare with you","label":"play game"}
+{"id":"b21a8c66144f571de8fb56bd18797ecbb0110b8f28d47ed57164349bac5dc34b","source_row":695,"text":"can we play twenty questions","label":"play game"}
+{"id":"6f47b21572b736d607eac46461ed6fecdceb8b9a0e4e085db75b549c812c5643","source_row":696,"text":"give me a company for playing football","label":"play game"}
+{"id":"a6f8446dc457ea01ab83d276ac6711889af4f811ca596aea8d25ee07e0342459","source_row":697,"text":"my games to play in my phones","label":"play game"}
+{"id":"aa99f7535a23a4ce7ed5b3e8ef204a697c72b72a4d6160ab105ca39312dd94a6","source_row":698,"text":"let's play","label":"play game"}
+{"id":"bf0ead026a91f3e05b7d61f0eef4303a3c258f026549dea437b2961b8157c9df","source_row":699,"text":"play tennis for me","label":"play game"}
+{"id":"395afef699289ebf65d649fe5297eeb8471cb9285672374a5990c66eb7198934","source_row":700,"text":"lets play poker","label":"play game"}
+{"id":"60d8b77d622fca016f3d1ce3afd323d3747feb7d19569f7858951f4b294a73c6","source_row":701,"text":"anyone for tennis","label":"play game"}
+{"id":"3cbf8e0b5d9353d0e50c4b93aac1f52c2f54d2a7fa7f9b545a272cc927e4687d","source_row":702,"text":"play pong against me","label":"play game"}
+{"id":"d51b4ee823a3dc6de12d7ffd5646627795d40528d70574796c9aefa7a97556e1","source_row":703,"text":"play solitaire","label":"play game"}
+{"id":"048b5c2fc78dba4ae3323c05b3d7cf5c2c9ccf9f85b881337590e4585f3d4b3d","source_row":704,"text":"we should play nfs at high speed","label":"play game"}
+{"id":"c636d65c3854ba210ec0f21b91a70e3282a3f554c948bbd9016f39cf789590ba","source_row":705,"text":"can we play a game of hangman","label":"play game"}
+{"id":"88fcdcd2ebcbc4e3fd4116a5eba9b98ac70362d01aea87e7e10e0a32a588b090","source_row":712,"text":"play music i have liked","label":"play music"}
+{"id":"e2fea4c8b5a2cd3bbb35e3948f6d3a1f5abc02104d498e8a85da3cd171c59765","source_row":713,"text":"i would like to hear the theme song to this is us","label":"play music"}
+{"id":"b5c4cb1f49b6a1bc39f2512634f7a1ff59f37bf3bafcd720c4a61e879e8f2d84","source_row":714,"text":"play the list from my favorites","label":"play music"}
+{"id":"f89ec8f49d61f25b38428b790db693fdd790b683498a67a9af946035f1f3d19c","source_row":715,"text":"put poker face by lady gaga next in the play queue","label":"play music"}
+{"id":"a2415055924a9c3fbdb5a0a50edd060b0f197b97856a1eff02e940afb3782cff","source_row":716,"text":"turn on the tunes","label":"play music"}
+{"id":"6f8b47ee83a753dab42e1fabb5eced8fe2466481366c9d2b1b306a9c7db2042d","source_row":717,"text":"rock","label":"play music"}
+{"id":"b9b8c0ad23427316fd1ae47638c90b5ec06c420f1d3bf78511d5a0bbc26230de","source_row":718,"text":"play jumper by third eye blind","label":"play music"}
+{"id":"ee44020bdeddde089207ba36811e9236272ce744d1f5dd930fb550b7818e94fe","source_row":719,"text":"play music playlist","label":"play music"}
+{"id":"4e86fdd55bfb854caa026853447792559b90b361aed31f7d874922ba71194ab2","source_row":720,"text":"please turn on my music","label":"play music"}
+{"id":"e1b5fec6b1f1eda4d627bc43fbc586966dadd7e49ab00db444754f937feda49d","source_row":721,"text":"play my rap playlist","label":"play music"}
+{"id":"81c0ef164f81ed084ba59a9d58a773cc7dce407bc65a516385f1ab9189275b00","source_row":722,"text":"after this song play atmosphere","label":"play music"}
+{"id":"8fe795b4415c2ff4abf4c7c8396253eb6b4b34c8f7d5f2f7aae6e98c4bb17a54","source_row":723,"text":"play true love next","label":"play music"}
+{"id":"df2949f854dee655a842dc629068856118b95ba879f29075a8e0ee3be2fdb3c0","source_row":724,"text":"play hip hop songs","label":"play music"}
+{"id":"131b448363fdaed08bf98e839214fd711861124c53fa4875d0fddb4c81c0b8ce","source_row":731,"text":"play fishing podcasts that are favorited","label":"play podcasts"}
+{"id":"068b71355907a7aebd8a8770c7e16bbd03ab4a9cdfc0c3928a056227acc205cb","source_row":732,"text":"play podcast for the philadelphia eagles content","label":"play podcasts"}
+{"id":"c1fd0b8936a384b4706544d59e863308e005c883768544102d5fc7d632002150","source_row":733,"text":"play me the new podcast from npr","label":"play podcasts"}
+{"id":"a0c767dcc08144614904963105aa18d372892d76015f14c848d74152e3c66630","source_row":734,"text":"keep playing the episodes in order","label":"play podcasts"}
+{"id":"8b5e4b77ba73f6eaf789343d3665f492a4f4ed840e866fc6937ad804226d1f2b","source_row":735,"text":"play next episode","label":"play podcasts"}
+{"id":"aac267ced7c13f52deca2ca8bf0360c995db68521829658377d1d64d2b2d93e3","source_row":736,"text":"play my play list","label":"play podcasts"}
+{"id":"f2184fecd4cad577c7209300d7ae2804aa7f5e92f566f748002ff56580d6bd9d","source_row":737,"text":"play favorites listed in podcasts starting with first one","label":"play podcasts"}
+{"id":"29d5291306a9164762604fda4d0be1e903f51d22af09c55ad0e806a0f57f3cc4","source_row":738,"text":"play previous episode","label":"play podcasts"}
+{"id":"0d9962d13dd508d963ccf23608406271d1080976fc494dcfb135f92b8b778acc","source_row":739,"text":"play my favourite podcasts","label":"play podcasts"}
+{"id":"7e8b5480c7336a47f50338a84f597df966ae6cb89022d12844bc33ddc04647a3","source_row":740,"text":"get the next episode","label":"play podcasts"}
+{"id":"352dddf09ffe170bc3cde15cb46a12ae902c7d9d1183e61ed6b2f5e6374fa4bf","source_row":741,"text":"please start the next podcast episode","label":"play podcasts"}
+{"id":"6b6472048a2175a4a7dbd8d5e1cf0e3abefe98017b8f2c5e584c7527c1ee3090","source_row":742,"text":"please play next episode of podcast","label":"play podcasts"}
+{"id":"64c97449e39201df7f00522cfbc93ceb13072461492e95412abd8fee3ce908b5","source_row":743,"text":"show me podcasts","label":"play podcasts"}
+{"id":"7c20ce19ee69c6640070581ce9ebc534165fae15aa120cbe76209751b5242ae0","source_row":750,"text":"play radia","label":"play radio"}
+{"id":"dfcafb04eb378351ae10d21d733e9f7cbd426346f5cada5c254fa15d5bcd2680","source_row":751,"text":"play nine hundred and seventy one","label":"play radio"}
+{"id":"4a756695fcf2c0f8755a6ef392c3bc460e44ef1659d251b8e97151e77668a33f","source_row":752,"text":"play the radio","label":"play radio"}
+{"id":"6b8039568cdf05c4c179269b92f8504964657de09a817271190a4d9ad08c9072","source_row":753,"text":"turn on the local radio","label":"play radio"}
+{"id":"86133946ed3289adbc31c2f2566c6cb476028d1ab3133f6b1ad7342649965f89","source_row":754,"text":"please turn on the sean hannity show on am","label":"play radio"}
+{"id":"fa411edfd04deec82b412502b9f726ab6d910bed0e731036415b158c12c4ef2d","source_row":755,"text":"play national public radio","label":"play radio"}
+{"id":"9537ecb140a50e4628b4d463b27c9f27f40998fecbd183d5167b9e5f6427d945","source_row":756,"text":"play one thousand and thirty seven fm","label":"play radio"}
+{"id":"d5a03e504cffefd76edaa58ab5de71cbbdfc2d4ad199e51a60845c7e84525842","source_row":757,"text":"show me upcoming programmes on one hundred and five point one","label":"play radio"}
+{"id":"1ca5f4970f9d15d72d4299e7e6d1d539a8c6c074ea87ea0f101c190acfd1640f","source_row":758,"text":"load sirius and play a rock and roll show","label":"play radio"}
+{"id":"9ae1ae20cf1e93d63202ee3082f2eb6146643180496c38fb81e9e42c1ed7f1e8","source_row":759,"text":"tune into the nearest english fm station","label":"play radio"}
+{"id":"8563232900d58cf8b2d652a34aae4b5671e686ca71f92ee286fe64db896612a2","source_row":760,"text":"please play some songs for kids","label":"play radio"}
+{"id":"af77e1841b0bfff039a95cc24ebb51e6ee7b384526e7c187718e737014a7bdae","source_row":761,"text":"find joel osteen's broadcast on sirius","label":"play radio"}
+{"id":"3febedcf2f62155d54c16efca9a31edf4988fac6805fd31679b740317bbf4408","source_row":762,"text":"please go to the local sports talk show on the radio","label":"play radio"}
+{"id":"18981d3a9fef78579f6d9e3f5bef7327d3d79cd168a7a262c8db4211ac68a903","source_row":769,"text":"what is the most current exchange rate in china","label":"qa currency"}
+{"id":"aa4c1c22778ca431e7707205317f5ce2e1e8caf6101d29fdf8b95844b84aedac","source_row":770,"text":"if i have five dollars how many rupies is that","label":"qa currency"}
+{"id":"68a3b9644d8531f868b4512c8ba732f0bf7a80a356294a5b6fcd6d8e2355f34c","source_row":771,"text":"how much is dollars american worth in yen","label":"qa currency"}
+{"id":"1aaef3a8051c23ea9eb8f11451e40aab4d28565559d4c8642e9707e9ad207402","source_row":772,"text":"convert euros to dollars","label":"qa currency"}
+{"id":"82849bbd28d1b801038b0353bc60b36c442098a93bb803cb54ad8fadfbd26e37","source_row":773,"text":"how much is ten dollars in euros","label":"qa currency"}
+{"id":"7c4e97c13223181dd7bcbfc2cb701e1551f8e67250b69759da0fc802b526f290","source_row":774,"text":"how much is b. p. in u. s. d.","label":"qa currency"}
+{"id":"4cef6c6cdce93e21d8f4228f52456943bbbcf9c3dc4e795a07eace9a50d15632","source_row":775,"text":"what's the value of the euro relative to nzd","label":"qa currency"}
+{"id":"88044ef3410a0a5632fb4a77dd64bf15a20bfa7a0efb98e1891055fe9570670e","source_row":776,"text":"exchange rate of euro with dollar","label":"qa currency"}
+{"id":"eb18de88fffcbc0a151d24e04a4b7b0f254a6631bd766205a304920145891762","source_row":777,"text":"how much money in us would i need to have a thousand pesos","label":"qa currency"}
+{"id":"d017ba510ff81cf018e6bdf3b08bf4f6c7b0f75734736aacb3d85b7a0b51d031","source_row":778,"text":"u. s. d. to g. b. p.","label":"qa currency"}
+{"id":"24396c0c769bfaa1aa4d3aef3c481b859d6a8269e27016d8377f133e258bb595","source_row":779,"text":"i have ten us dollars how many canadian dollars do i have","label":"qa currency"}
+{"id":"801d5f07a4b65f86bf4e3af6e6ee607257770e532817439c6ff87364ebecb64e","source_row":780,"text":"how much is the us dollar worth in canada","label":"qa currency"}
+{"id":"1a5a96f29ce0e23ad6dec9a13070325b6749ee1ae4814edf36f703eade7d8a00","source_row":781,"text":"what is the exchange rate between the us and canada","label":"qa currency"}
+{"id":"31587e2440ef068451a0df80f8316f1d4582ad5bbf22296c8412739711b0b6a3","source_row":788,"text":"please define forensic","label":"qa definition"}
+{"id":"442732a30520ecf2fb9824d7d4f45c599d47c2c6660e8170b07046f821ebbcbe","source_row":789,"text":"tell about the origin of the word evolution","label":"qa definition"}
+{"id":"54ee9f32b8a722a5ee2c2ca688c4eeebc1a07876302728cd8abfd10620d772fc","source_row":790,"text":"what's the definition of diverse","label":"qa definition"}
+{"id":"a00786878271947c0575fc0970f5a0f04f7491e5a87591dae4c94c288fa6b432","source_row":791,"text":"what is love","label":"qa definition"}
+{"id":"9d1e72dc073d991f9161868eade093b628ae92636c549510153d5e6c5be6d484","source_row":792,"text":"what is a trebuchet","label":"qa definition"}
+{"id":"fa61d41e633e9bc4ff4361a0acfeb160a81a5dc4e71281dbde0c68bf30a35edf","source_row":793,"text":"what do you know about the statue of liberty","label":"qa definition"}
+{"id":"d0afbf0b5cb3221ae2a05eb5e83a960e198bd8ab306bf7f76dbb6d6b4b4f3182","source_row":794,"text":"google definition for me","label":"qa definition"}
+{"id":"713dc45d1e89974f4602ca31d08e2ecca7d18551b53fa5baf59c106bb0040537","source_row":795,"text":"define economics","label":"qa definition"}
+{"id":"11472ff334df62ff75720dce88c027def57b2dd095bad619292b75f31b7a51c2","source_row":796,"text":"what does h2o stand for","label":"qa definition"}
+{"id":"23792779b3088f4322a30a4bef3d59453f8f3508768249f9fa5da3f0fc68d4f6","source_row":797,"text":"meaning of word","label":"qa definition"}
+{"id":"254752fbd9626f1838aed1a69b427ce44eef85c46710169e17880812177ec5b9","source_row":798,"text":"please tell me the definition of home","label":"qa definition"}
+{"id":"1aa8b63c87634a036e809c0a3ecde30bef3198ee4661179b75054d0fb5be2a6f","source_row":799,"text":"how would you define a car","label":"qa definition"}
+{"id":"681c865201254204c7eaf95965df7d98cb1f80869f407d35da988e8ebdb4cab4","source_row":800,"text":"look up animal and give me the definition","label":"qa definition"}
+{"id":"27cd34a3ed446dc1ff472ccb0cc3ed12f1a9ecc115956fbde8074c281b4d7ec9","source_row":807,"text":"what year what the eiffel tower built","label":"qa factoid"}
+{"id":"75d66d82aa475bb5ec162eb5dd6acba250ab3d2dcb2dc176c910bcc5f604b4c2","source_row":808,"text":"when does the super bowl officially start","label":"qa factoid"}
+{"id":"876931aaf0d0ddd7693deb66df830ee76fe3975b77e3eac5d39462b01bb980af","source_row":809,"text":"how many months in a year","label":"qa factoid"}
+{"id":"b5afe162aa413c53c1933adb8645c2956e5cc1c2d075d4c50921577344b9ff51","source_row":810,"text":"how many pages long is harry potter","label":"qa factoid"}
+{"id":"acca18b82e9916fc601a5485a65cd46195bc53acb0d9ae47eedc469c6855e12f","source_row":811,"text":"where do cows come from","label":"qa factoid"}
+{"id":"4ed08d105592a39face1170710e5fb06c6a38b0529de996799ef4f3e3178e96c","source_row":812,"text":"where is italy","label":"qa factoid"}
+{"id":"5a3ce56976377a3bb9d8bf1ce5de5681dc5504e4756e9ee6072bf64a86a771c8","source_row":813,"text":"give me the birth date of mahatma gandhi","label":"qa factoid"}
+{"id":"c392933aae2fb227141889e823aea49ed6bc4f0ff864317093453bd2719fd29f","source_row":814,"text":"which continent has highest growth of cotton and what is average production","label":"qa factoid"}
+{"id":"92528a5993b9515901854eeae32c65c5a05bd8d62409d023bdc4d349d865a4df","source_row":815,"text":"when is shakira's birthday","label":"qa factoid"}
+{"id":"b769c0f61c00895b0c65d297c01e672ebf748258575b1f01358644d835658ac7","source_row":816,"text":"please tell me about the historic facts about india","label":"qa factoid"}
+{"id":"77fd789597de02972b441e093ae9da089b4d4b4785569784c0e4796d211c4495","source_row":817,"text":"how old is emma watson newest boyfriend","label":"qa factoid"}
+{"id":"8454e649fd10c3285081a9ca31808cad813d0ac68200283caf874715049f5085","source_row":818,"text":"who assassinated lincoln","label":"qa factoid"}
+{"id":"64d22c9d1e44a6e9457b41c097e1752863bb2570facbd356306ae45dcf2acae1","source_row":819,"text":"tell me when will indians economy touch that of americas","label":"qa factoid"}
+{"id":"17de3352932bf9b63aae0f18e20173581af3b42b542fa55a2231facfbaeb3d1b","source_row":826,"text":"two by two is","label":"qa maths"}
+{"id":"471c97dedef06a8dcba3c00637d0412a0a3fb3cda20fd0368f3a336659216bd8","source_row":827,"text":"fifteen plus twenty","label":"qa maths"}
+{"id":"7ea2336790ed71f0cb9e2bad4d32e9621f68ce2e8f2c89dab43994ad3b465036","source_row":828,"text":"divide two hundred by four","label":"qa maths"}
+{"id":"c74e7483c6565d6ce3d675192e13599f47a5a029bf3f43692bedd9df67a30589","source_row":829,"text":"what is one plus one","label":"qa maths"}
+{"id":"079b004ea18832e18a0a85bafc353a3dac0dbac09ddb7aea9d3cec181bb31398","source_row":830,"text":"is one divisible by three","label":"qa maths"}
+{"id":"af7eeef526f94526673c8c57abdc8d3fda81b4a1ed4fdae7de00af134b4527ae","source_row":831,"text":"convert ten inches to centimeters","label":"qa maths"}
+{"id":"7a32cfc2eb54ac74f0fd993fa36076d4049003b4058be9b72b8d74d025a8717f","source_row":832,"text":"what is the answer to this math question","label":"qa maths"}
+{"id":"6fa0497257ac9f5b3840643ce35afd40f36452bcbacaff13a5b76e4bd989d14a","source_row":833,"text":"three times two equals six","label":"qa maths"}
+{"id":"c9db9f7053347789bcb669eb51178bf4cd4c0d8894d3a47d177a66d9840e707b","source_row":834,"text":"how many inches make one feet","label":"qa maths"}
+{"id":"3610c4c5fe9490f9b6c3f5cb38d8cdc210e4d04a7845a66f761eb8b1a5997e10","source_row":835,"text":"what is the square root of four","label":"qa maths"}
+{"id":"30a9ee9c8b5b007fa6b21544b8df6252e6fd165cbb93e41dd98118df14dc768e","source_row":836,"text":"can you add up thirteen plus five plus nine for me","label":"qa maths"}
+{"id":"f6d700f463aa354eb48ee9c60a103c7e77f06dd583c7b05c7694e219eb8dc2d8","source_row":837,"text":"what is twenty percent of one hundred and twenty","label":"qa maths"}
+{"id":"55a2a6e314b8d4233e938b5f3273a330b2f1eb60097c5d0678c8db9aaeb37e9e","source_row":838,"text":"what is five divided by one","label":"qa maths"}
+{"id":"22297ec7d45bb68f3e846fdc0ac38d093ef75a63c634bca2de571d6ca7329606","source_row":840,"text":"what are the stock prices of target","label":"qa stock"}
+{"id":"768e669f04977dfb8b93260ef337b7c446382796e9e84b8b9239995ec5986760","source_row":841,"text":"fill me in on stock symbol","label":"qa stock"}
+{"id":"be461cf138f9a0fde4a3f35d02e1eaf6841ffb9ff3950d19d8982d68601ca9dc","source_row":842,"text":"what is the price of stock for gm","label":"qa stock"}
+{"id":"8b441b3568ac575a8d3d21602936c1bd09b82cb268fc1ef190bd592004506860","source_row":843,"text":"google i. b. m. stock prices","label":"qa stock"}
+{"id":"9e0232c6b095b5c2051cf7d959dc0a0dddbc507a6533ed76017d2d5023dfb1d8","source_row":844,"text":"how is shell s stock doing today","label":"qa stock"}
+{"id":"698c1cdd19a3025d9b5a079219a161f9ec8faeed88503422ef31aee31952d2be","source_row":845,"text":"stock price for gss energy","label":"qa stock"}
+{"id":"7b64bad4d6cb4607601734c7cbc68062093f245d4718bd021843884ae83dde83","source_row":846,"text":"list me the stock of apple right now","label":"qa stock"}
+{"id":"879019b78c6b4786bffc0fbc77e8cc0dd445dc085813d03fc850c56547ea46b9","source_row":847,"text":"stock price for sprint","label":"qa stock"}
+{"id":"e410bf67c6a2ab335eb71a16d9f474a488493f3aabc2e775d537cecb6c5b84c2","source_row":848,"text":"what is the value of apple","label":"qa stock"}
+{"id":"96960c383893b4ee73f0e6db996d5e2d221a11a041a3de2f305cd9322575352a","source_row":849,"text":"compare the stock prices for nintendo and sony and tell me which ones are better","label":"qa stock"}
+{"id":"a1534228051c5289c24edc519640ab4ba8ab574022f84abf34e81ec089a00a6a","source_row":850,"text":"how much did facebook stock increase last night","label":"qa stock"}
+{"id":"43c646b35c8e94bfc49a3948fe648ad84f4c031831863ae9df019f9732845dea","source_row":851,"text":"what is the stock information of walmart","label":"qa stock"}
+{"id":"420619b908649418677f8cf8c035a3b999abc791a31fd804f6df8f94daf42072","source_row":852,"text":"what is now stock price of tata","label":"qa stock"}
+{"id":"c7d3f6533512e0150fcd8033c175ad962540879776267022c52328d1c8671e25","source_row":859,"text":"what events are coming up","label":"recommendation events"}
+{"id":"92dc08a5198967f33da6db2987e42810a6a93dd3d807a428cda62f9d813a967f","source_row":860,"text":"let me see cultural events for this weekend in palermo neighborhood","label":"recommendation events"}
+{"id":"ca39008f15b88ce15ba228959ba4e65b6900107df4ba2bc7c70f646cf458e6d2","source_row":861,"text":"what are the concerts happening nearby","label":"recommendation events"}
+{"id":"63e979905ee29aebfd424197dfc2d26ea3044692f86fdcb28c7c5fd66d1e4a38","source_row":862,"text":"is there any type of festival going on in town this weekend","label":"recommendation events"}
+{"id":"9ff1039d98ed931c51b8a563d36287ea2cb933d723531daeb12b8fda4e752c21","source_row":863,"text":"show me painting exhibition in bay area","label":"recommendation events"}
+{"id":"2e53dca1e3b6cb94bab267a03c37047ce0d7d67ef1c5a729842a71493e5c4bcf","source_row":864,"text":"are there any fun things to do in seattle this weekend","label":"recommendation events"}
+{"id":"cc60efe3b82cf2f2855e2b123367e34961e3416ae37f1116eb548ecdb0425058","source_row":865,"text":"what's going on","label":"recommendation events"}
+{"id":"a3076baea0cb2f47fb0f6b3183d4b93a6f9a39065a1b9482ab27421de171d01f","source_row":866,"text":"recommend an event happening in my area","label":"recommendation events"}
+{"id":"2284a5c9820b1b4f38be4ac1f1910ebe67256171d007d11beb631145b4b31278","source_row":867,"text":"what events are happening this weekend in my area","label":"recommendation events"}
+{"id":"45c999f32198de4df6525c8893a6e8e52c45f96d39de314f1ed07dc1cae5a5c5","source_row":868,"text":"what's happening at the library this month","label":"recommendation events"}
+{"id":"4a4cdc925d577d1c9c1c9333f6414afbbcfc65e32cfbf51b39a055f4c3ce413b","source_row":869,"text":"what is playing at the local theater right now","label":"recommendation events"}
+{"id":"3059f68d86785ee42812f83fd96f360d9ef7dd9967714db24d7002b296b00d22","source_row":870,"text":"what do they have going on for festivals downtown","label":"recommendation events"}
+{"id":"44f138da88e5dd0e6fbec63b8ad6fdf99f514a3d7f1bac4f7981d0fd6df75d03","source_row":871,"text":"could you list out the information on book fairs in washington dc for next week","label":"recommendation events"}
+{"id":"a19d83bf4150021d16b0d23ff327f70d2bc344114bc28f3d3551225bdbc9c510","source_row":878,"text":"please tell me a shop where i can find books to buy","label":"recommendation locations"}
+{"id":"17c4978c823b8d8e6aac69b74ad8b5009673e3c45080286e8652ea782bf9b807","source_row":879,"text":"where is the closest restaurant","label":"recommendation locations"}
+{"id":"4ee686c6d68c30648bc61db4b36a973ad6665de05a9a5a6c35a07dbef5093356","source_row":880,"text":"is there a sports bar near kansas city plaza area","label":"recommendation locations"}
+{"id":"86109fba5c154844bd68f06d9f343d8b8517b9fb45741a9a1995670a709c9651","source_row":881,"text":"where should i go eat tonight","label":"recommendation locations"}
+{"id":"ca3609283b9a1ace62f74b1312be6bed33c86f7eada69a561208703d90173f01","source_row":882,"text":"i'm looking for a casual restaurant for a dinner date","label":"recommendation locations"}
+{"id":"f5efbccb85a261267a9c4be74f36f8712e9460002f1054eb60bb6c1b4e1abae2","source_row":883,"text":"where is the shopping mall for shirts","label":"recommendation locations"}
+{"id":"b867fd24010b9324b8ff47fa01c8a09726c899bb1f35194a3f719ecbbc864c09","source_row":884,"text":"what shops are near me","label":"recommendation locations"}
+{"id":"1f370171797f552d95a6d7348aba7af938f450006ce1c92245e31a1bd88358b2","source_row":885,"text":"when does the closest bar close","label":"recommendation locations"}
+{"id":"35413ecaa10b56488ee6e8bc6df9c05973efa65d7ee435b5ddb41e68739e7f03","source_row":886,"text":"where can i find the nearest irish pub in my area","label":"recommendation locations"}
+{"id":"9e886d82032049b9427f695e717a1b42149769ccc7a34f227956a292b33d3a7b","source_row":887,"text":"give me some cafes near downtown fort lauderdale","label":"recommendation locations"}
+{"id":"d1f124951d33b2502d5cca24f44ef087ddafaed9e8f7ef93880c436b8773d7c5","source_row":888,"text":"where is the best place to buy party supplies in town","label":"recommendation locations"}
+{"id":"9077ec1f58e6d6bbbc246a7189083bee6c3f45d9f749e0677a04f484f78dbb59","source_row":889,"text":"where can i got to grab some drinks in west chester","label":"recommendation locations"}
+{"id":"aacf61c0c08859d1968001a6d4735fafdfde158596b461a5c421937270bc1934","source_row":890,"text":"where is the closer starbucks","label":"recommendation locations"}
+{"id":"a875b259a53465e953df11ee72faf20d2a2bb1a00a86e69e29ad2d1542e6bc09","source_row":897,"text":"play a movie i'll like","label":"recommendation movies"}
+{"id":"626d11e5861a81a2afb5eb72bc29abae9e567d55d40dda871bc33ffe3c2f14c2","source_row":898,"text":"what time will a movie be shown tomorrow","label":"recommendation movies"}
+{"id":"c0f51dca431b980771cc4b7f2e33905ffa55b2ed9c5f6a80eead1f64895e0e95","source_row":899,"text":"what new movies available today","label":"recommendation movies"}
+{"id":"e2e16e9e35bb5de521a26f3f79625f87cbe0f05fa91374118807700ef6e0753b","source_row":900,"text":"suggest a good genre movie that came out recently","label":"recommendation movies"}
+{"id":"d7d1fff27e7ba86f76169bcd508f15ccbb66f1b29367f1b5baa80040f1a74ca4","source_row":901,"text":"please recommend a movie","label":"recommendation movies"}
+{"id":"d968ea93b596de72b672ce8fbe7b827246e4291d5c86d8a70e7110df0eda3998","source_row":902,"text":"what is the highest rated movie this week","label":"recommendation movies"}
+{"id":"52724f72ed7db4fe12a0535e66c1b2c4b56137ed57375b27ab54ab900c8ba3de","source_row":903,"text":"recommend a movie for me","label":"recommendation movies"}
+{"id":"475ad6105fa40753425d329b644c9859d081fb8cd6f37ea3e964bec483baaf3a","source_row":904,"text":"do you recommend any movies that are currently playing in me area","label":"recommendation movies"}
+{"id":"321ace9b3ac356a0083521d88ef7fb8ec4ab4c209780a6afdf91dcd9dc968ff4","source_row":905,"text":"what is the highest rated movie now out","label":"recommendation movies"}
+{"id":"4e29d61c7ab8ff2171947f9ce7fa6103e0186b1407caa08895824e6056ceb3f8","source_row":906,"text":"what is the best movie to watch this weekend","label":"recommendation movies"}
+{"id":"c24639488f90d40e98c2524503b0498d71b3c08219787e3a63bb191f08419365","source_row":907,"text":"send a complaint to sony about this tv that quit working","label":"social post"}
+{"id":"749f7d827b5e42b15d04031c7aaf23814489008ade595c9514b3ee22a0f57328","source_row":908,"text":"write complaint to wallmart","label":"social post"}
+{"id":"58297e153bd37ed077745928281dfef8330290398ca0918d5d13125eb58926bf","source_row":909,"text":"please tweet about the problem i m facing with the product of company","label":"social post"}
+{"id":"aa59ca0a7ff4686a5766c2052a62af2bf61dcc91dc559cc5c90ceb9ac4c59012","source_row":910,"text":"open gallery post video name","label":"social post"}
+{"id":"ef1938ad6af4bfa72672c2111660f0eb1b0738dacbb22d13a2d03a4e85691e38","source_row":911,"text":"complain to amazon customer service for me","label":"social post"}
+{"id":"d56109cfee705e08acb24e729390654225c78a66d88bc4bd50d68fc7c4c40ebf","source_row":912,"text":"tell comcast i am still on hold","label":"social post"}
+{"id":"9ede8b5f010da333872034ed0f9e0d36e8fd2dbc137c062cf7bcb588cabb1db8","source_row":913,"text":"tweet that there was an insect in the chocolate packet","label":"social post"}
+{"id":"028a7ebbe8ca958f3cb5be59fb022be8eccad50399606c56fb728c448e0f5b8c","source_row":914,"text":"post new status","label":"social post"}
+{"id":"c6736ee96b660f7c4aa6a821b5a11a5ca05745dccf9a5869d6685bb50f464c52","source_row":915,"text":"lets send a tweet","label":"social post"}
+{"id":"d437367abc02eec2aecee6aff41bf75f3d7627370ea0ae2e1f66d28317753d2c","source_row":916,"text":"i want to tweet a complaint on apples phone issues","label":"social post"}
+{"id":"29ef2223616724acd94e5f76f7f7bcf7b7b3fb3395df4d7ca107ce785dab4ae6","source_row":917,"text":"tweet to ikea costumer service the following i'm not happy with this new klm product","label":"social post"}
+{"id":"7b6eaf3ff60e35f342a55ba6f16738bcfa8c0230f6a33e0f9a585164496691a7","source_row":918,"text":"tweet at quote unquote","label":"social post"}
+{"id":"b4fa0c14fb5eb47b08b539ffebf734dac94bab6c54828d62608aaf74524236fa","source_row":919,"text":"tweet customer service not good for lpg service in my twitter account","label":"social post"}
+{"id":"c5df230e86b2e67b2cf91fccc86c71b55071a0e2e6a659ce4aa96b16743d4463","source_row":926,"text":"who is doing facebook live right now","label":"social query"}
+{"id":"e61aafd70d404f7bbd20f15e145c4624150f96a63ac38fb084867d8c796c557f","source_row":927,"text":"tell me what's going on snap chat","label":"social query"}
+{"id":"774fb0bd988de45f0c9795794a80723280767501e5c88f36a02ffaf2dbde4770","source_row":928,"text":"what's the most popular story on my facebook newsfeed","label":"social query"}
+{"id":"940bb8d8d2a52211b611b6987bcd9a4e79fb708affe5a1b11d98f226e27681f4","source_row":929,"text":"how many notifications do i have on facebook","label":"social query"}
+{"id":"4f0772b04f81bd514c510c11a4925d9368370d987aabd108a38a114544c8a55a","source_row":930,"text":"please check the trending topics on twitter","label":"social query"}
+{"id":"20456206a5f9c2614af3936d26d649cbf81be160289692ec07f46443d8b3b02e","source_row":931,"text":"read me new post on my feed","label":"social query"}
+{"id":"3f5b7e2ada176905aa843525b876775059911d57d5f2de4a493c53d437e357d7","source_row":932,"text":"get me updates from kenny's facebook from the weekend","label":"social query"}
+{"id":"ad6c00f31c1e0f43ae0f3b37a1906a24a4b9b60b86c82d2bf4e79a0b3e15109a","source_row":933,"text":"did anyone get engaged or give birth among my online friends","label":"social query"}
+{"id":"11a48d2c94e5d15e711e401171466a2f190b44ac67b85b0caeb64eee6d4f950c","source_row":934,"text":"did anyone like my photo i just posted","label":"social query"}
+{"id":"266c1fb61e79e60ff98ea08174ef5dcfeea9ec2855115b096400c850e9ea007a","source_row":935,"text":"show me the posts of my friends in the last hour","label":"social query"}
+{"id":"6fc50681a48d73e8499cf79466fe3639b20ed4850fff2e8cb3bb9a1a9c7e3bc3","source_row":936,"text":"may i know what is trending in social media","label":"social query"}
+{"id":"a9a0785fd21a919cfee981300d80d4c18f92cc990f498a73bd167b181fcc0f9c","source_row":937,"text":"find updates from vicki's facebook from mardi gras day","label":"social query"}
+{"id":"69e0b49f6820c96c1aa6004f9cc5f46ee7f82676d6e23391246345b10040060a","source_row":938,"text":"open social media account","label":"social query"}
+{"id":"d90deb687f8b4d31da20d3ea4fa2ce872306bce586ca694726c43f0c9f786f5d","source_row":944,"text":"please call china wok and order number seven","label":"takeaway order"}
+{"id":"5acae556079ac17bb68b642e47cdc39e92231c6f5eab9e840479b480d4af7149","source_row":945,"text":"place order to pizza takeout for seven pm","label":"takeaway order"}
+{"id":"4094dccf3ab1b6aa1590858732bb7f3f46299667c4d0f0021c8573bfea643e46","source_row":946,"text":"can i order out","label":"takeaway order"}
+{"id":"27b2ec076df7872a98b3b99c48863daf36000e924ca527eb254948b90e8b6f1b","source_row":947,"text":"order two large pizzas and pieces of hot wings from dominoes","label":"takeaway order"}
+{"id":"f9893763becce01924c6a0cde260c7d0779ac23dda64e803356c5cacb3fd154a","source_row":948,"text":"order me a bowl from chipotle takeout","label":"takeaway order"}
+{"id":"747b5cd2e6c1b6e70ceab5885c9b6b66a0837c2716f6e2a74aa07288f269dd15","source_row":949,"text":"order a pizza for me","label":"takeaway order"}
+{"id":"c83b6f96d4aeabeeb0853addd7b53b9e54db5c4965585837e06fc4f2ee265ab5","source_row":950,"text":"place order for a chicken manchow soup from wangs kitchen restaurant","label":"takeaway order"}
+{"id":"1a4d6d00bccec972d59b81f7384e39a6b1761debe90be8c94f9248da1415e761","source_row":951,"text":"hey order a pizza pie with extra cheese","label":"takeaway order"}
+{"id":"18636fe230a127ed0e71124624f10a8b6e6a2a6df7c6246cecd24bb1e0488e92","source_row":952,"text":"i want to order food","label":"takeaway order"}
+{"id":"1c27361e5d4d297d82f8c44880355a377b7eadbb7427da1a9702e10857c63a9a","source_row":953,"text":"call for takeout","label":"takeaway order"}
+{"id":"4556d909170ebcb11fb5e98866a66edd76f1d80a78937c7db1f0f03a5fd574b5","source_row":954,"text":"is there any good chinese takeout that's open late","label":"takeaway order"}
+{"id":"3a5ae4e6d6a89b18f8440aa3f48bd242547202e7ece6d88310190403104493df","source_row":955,"text":"i would like to pickup a veggie sub with a cookie from subway","label":"takeaway order"}
+{"id":"30e58687b171e173d30cc1db7d1fb836549550310dade8d03a5f23982ce87b4b","source_row":956,"text":"pull up the menu for the closest mexican restaurant","label":"takeaway order"}
+{"id":"8b2aaa7328df2219f29f5aedb9ee560ba69b8a930fdb1d334275d21bd3cd4e0b","source_row":963,"text":"where can i order pizza for delivery","label":"takeaway query"}
+{"id":"719dcb32334c57d5d00c3272054a819570f2b238df5a5a3f677d963837c21169","source_row":964,"text":"does pings do takeaway","label":"takeaway query"}
+{"id":"e3a4213598becfc9af8d87ba5b6cf43a5a6c23db5c15e40446a7ae23065f59db","source_row":965,"text":"i need to know if mr pizza delivers","label":"takeaway query"}
+{"id":"a368b2d935f8aabe2d19996562dd9036ec83ea0058d2fcfb8bdb427b257d41af","source_row":966,"text":"what's the exact time we get food delivered once we place an order for food","label":"takeaway query"}
+{"id":"f767fbdf7a9e703cdca3e600f0bd36f004b5000dddbb8b582425437c8ecfccd5","source_row":967,"text":"how long until i receive my food","label":"takeaway query"}
+{"id":"9d0ff2e7f1415145adee00b633e58bc2a41638562e5cc1437c3b128568608b7a","source_row":968,"text":"check delivery options for the restaurant","label":"takeaway query"}
+{"id":"2eea4fd62ecf7bab9e3366263b226eea6358d4a74af35399b377c59d5860c945","source_row":969,"text":"does louie's do take out","label":"takeaway query"}
+{"id":"396bebad9d663cce6b2ea6f332d8cd3e77e4ddbdfe6bd3c0a813744b20d0d330","source_row":970,"text":"where are my takeaway order","label":"takeaway query"}
+{"id":"365b9f86a23cf61d2925db217e3a31651fa1884e41414b81dcf86e70e838f74b","source_row":971,"text":"is my order at domino's ready","label":"takeaway query"}
+{"id":"47f3de2801cfeaba5677f8e00b5a701474fb90e65875340dfa678a748582e4d6","source_row":972,"text":"hi there do you offer home delivery for orders","label":"takeaway query"}
+{"id":"6a32304c408895cdccf89068b861af70edbfb159129c8adcadec2978d2604732","source_row":973,"text":"can they provide takeaway","label":"takeaway query"}
+{"id":"680f13186c351c15d5f741c3e4bc9f282f720f6b8dc6f3a7cce101dae95a4269","source_row":974,"text":"restaurant order status","label":"takeaway query"}
+{"id":"d8775e938db59e6c394d6bfce9d0e3b34c16cfb6d9a685f25c6ec66e86ce70f1","source_row":975,"text":"when is my takeaway arriving","label":"takeaway query"}
+{"id":"05789db3f0b86b073dc2424475db281d992392e28de7f3cc0262378f2b0b3a4d","source_row":982,"text":"where can i book a train ticket to oregon","label":"transport query"}
+{"id":"71a3204ecadc2eeaf9cee356f84b97ad4ba6237384737dff58e29711f941922c","source_row":983,"text":"navigation search","label":"transport query"}
+{"id":"6779590218c9d0a2abeb12c5a8a074f89914512b1f1cb661ba8885d24fc11bba","source_row":984,"text":"what time does the train leave philadelphia","label":"transport query"}
+{"id":"e8eed0742bdeffed0bf9989c86ed37f80651378c116d59b6c264b7ddec78c24f","source_row":985,"text":"please let me know the time of train northern rail","label":"transport query"}
+{"id":"a3bbf549379915c187493b3e88af9a32b68545f0c5003009fcc0a1946841b97e","source_row":986,"text":"directions please","label":"transport query"}
+{"id":"5ce287a93ccbb378ebb0002a11893646ee0d4d5d24898ad917b6c0a79803be2f","source_row":987,"text":"how far away is the nearest rest stop","label":"transport query"}
+{"id":"dc512e84c22d321ddde5bf6599a4e38e337c6c524aa1f98678cb42a8b86a0b1b","source_row":988,"text":"what are the train times for today","label":"transport query"}
+{"id":"54b6c2062e342b50557f0c90e8acb8cb84398fa6c62dbb2b2cde278d1e2c964c","source_row":989,"text":"how much long until northern rail arrives at kings cross station","label":"transport query"}
+{"id":"d5e54fc460822df981071012e99a4481df021a62a372a2227b10b1afbdbf6316","source_row":990,"text":"show me the train schedules to the metropolitan opera house","label":"transport query"}
+{"id":"0d235448cb2e35cce09663df33abd0afaba74526cad5ab0da2edda4c1953c8c8","source_row":991,"text":"get route for los angles from here","label":"transport query"}
+{"id":"a5cf1de42983085a6d5fbfb2371ef3180dbc2fbc416227e2f950c0b50e96940e","source_row":992,"text":"direction to local train station","label":"transport query"}
+{"id":"be780706a153d0702414a218f04ededf53fec854e782f189e7b8d06b1286299c","source_row":993,"text":"what is the train schedule to denver","label":"transport query"}
+{"id":"5b33bc0774109153c020f9ad6d2cc47985ce10152205ee2c3f42784c32f9e27a","source_row":994,"text":"how long does it take to get from here to chicago by train","label":"transport query"}
+{"id":"5ffcd78ca749c6f548bb6e865b0830c3114dbe0822803ef812aafcb20612e75b","source_row":1001,"text":"request a driver for uber in five minutes","label":"transport taxi"}
+{"id":"864b1a09809409b409acb632c3d515efb6477ef4dd995f590e36a0b1202c43b9","source_row":1002,"text":"order me an uber ride please","label":"transport taxi"}
+{"id":"7e7cd5bf5f577d291ba17740a8e00cab7f5ca05d3399bc3773c5b03ecaf69fc1","source_row":1003,"text":"call yellow cab","label":"transport taxi"}
+{"id":"0fcc2238b6877ef50cca3ec92a58470a8b33898903ccbef5a34e4b84454d4cfb","source_row":1004,"text":"find an uber that can get me to the airport now","label":"transport taxi"}
+{"id":"3820ffb00a59654109ccf61d68bc063037de21c039090fd12d7fc9417695d1dc","source_row":1005,"text":"book me a taxi from castle street to airport","label":"transport taxi"}
+{"id":"ece193a83d2c31f15a685288b32d1384c856c3a7ed81e12329da8de2923b35d8","source_row":1006,"text":"call a taxi","label":"transport taxi"}
+{"id":"00648dadc0a53562311fa243e51087f44d9ee35ccadf325ac2c41a1476fe31d2","source_row":1007,"text":"book a taxi","label":"transport taxi"}
+{"id":"441c834b2edfeaa341aa32d0ed42e8c5f23e36cb918c84c8af8dc2a1d90e8d73","source_row":1008,"text":"book an uber to pick me up outside of long island bar right now","label":"transport taxi"}
+{"id":"d39265dcad9c3a41a9f52b899c3bc02fd2d2b1dbd1aa0841e607528c199f584f","source_row":1009,"text":"call a taxi to pick me up at work","label":"transport taxi"}
+{"id":"02cb377bcbd911cd4a9a67e4541952c774d706ec505e4579506ef40a0047a4ad","source_row":1010,"text":"find an uber driver available for tonight after ten pm","label":"transport taxi"}
+{"id":"8598442e4bee236de1713e59d44b9080ca1b2dedadda9186965e135e46962acc","source_row":1011,"text":"book me an uber","label":"transport taxi"}
+{"id":"5dfe04981cbcabccca9fbe25e5fab2f5636fb8e426460f3b32aab4335b8b0025","source_row":1012,"text":"schedule an uber in twenty minutes to tesco on fifth street","label":"transport taxi"}
+{"id":"5d3441f333f4440a9dc2db8372bfdbabd44ca2dd1a374221371fa14947487e48","source_row":1013,"text":"get me a taxi to the airport right now","label":"transport taxi"}
+{"id":"9c82a122caf713eb07f6de57cff50ee1be5a7c053c419d464510ddf832669481","source_row":1019,"text":"book me a train ticket to chicago for tomorrow morning before ten","label":"transport ticket"}
+{"id":"3d14cd903b5da38ff8bc7a89d88f67d39b1a85e7ce2039298c3e856bd605169d","source_row":1020,"text":"find out the the train arrival time and book me","label":"transport ticket"}
+{"id":"8cb9f2bb4cbf6f7cd059013462c37a3bd33a5edc6f46fdc0d11a713b340b8975","source_row":1021,"text":"google train tickets to washington dc","label":"transport ticket"}
+{"id":"21e7371118aeccb85dc68c4df5dc8dde1780c7e2072e834239fb93ad25e857fa","source_row":1022,"text":"book ticket for paris by train","label":"transport ticket"}
+{"id":"cc37f31e1092686810dc0a386e76c6bf6e167c39f030b5cac25adeeca3fabec2","source_row":1023,"text":"book me a train ticket","label":"transport ticket"}
+{"id":"ed10905e98a85358d343ee6deb3f7ded26c6a1591aa5f177cf6c327cf9fdb3c9","source_row":1024,"text":"book a train ticket to canada this evening","label":"transport ticket"}
+{"id":"17c83de1e8f3d9f7e329d30039545595869dd90a3d7d5478db0eb60de931d727","source_row":1025,"text":"book me on a train leaving penn station tomorrow travelling to any city more than two hundred miles away","label":"transport ticket"}
+{"id":"2d257760efc15fd6aabaf45841f01b8d64383c926a9bfb551d110cd256f46939","source_row":1026,"text":"get me two train tickets from where i am now to dallas arriving before dark","label":"transport ticket"}
+{"id":"04abde1ed0e1b0378aa8d3b29147e9385baf79902cb13d3cea2bc006192bead2","source_row":1027,"text":"book and pay for a train ticket to denver for saturday","label":"transport ticket"}
+{"id":"2f95ffdd53bf9eba5d26b290b74584a15d97a4b07e81a39ae21c49dd76ba732d","source_row":1028,"text":"please book a train ticket from london to manchester","label":"transport ticket"}
+{"id":"608206826d52f5c8eb47a5f419b217d67df1c284397c74ed09fd5cf2e1e58a2b","source_row":1029,"text":"google i need one train ticket to new york can you book that for me","label":"transport ticket"}
+{"id":"6978717526e711740b5493968a10b22cafc782881dcca71ceb3740c7497e4523","source_row":1030,"text":"i need to buy a train ticket","label":"transport ticket"}
+{"id":"bcf8a19429a5b02b230888288eac6844846493f47471103cd83bc2f405aa3142","source_row":1031,"text":"book a ticket in irctc website from sbc to mdu on may two for stored passenger list","label":"transport ticket"}
+{"id":"6b995ba89040753ee90162b31496a3e2f6c94ac60edf7f0bc89d36363086d6d4","source_row":1038,"text":"is it possible to drive now in ohio","label":"transport traffic"}
+{"id":"70f6ec1486db20e8796c2ce261c90f30ecf7712db5b037ca4bad2f0d4aa4c8bf","source_row":1039,"text":"how is traffic in city","label":"transport traffic"}
+{"id":"c520cf172ecc3280481f4897e8ca6ccbc754c338111a356d05f5b4a7e88878d7","source_row":1040,"text":"what is the current traffic","label":"transport traffic"}
+{"id":"6994066fa5979abf9276123dc08578a798fb0f78c2a405561e88f49d4e4a882e","source_row":1041,"text":"is there any traffic","label":"transport traffic"}
+{"id":"bc23fca6e0c64419339a61afa32fac7ab853bc935e92dda6db12c667ab669931","source_row":1042,"text":"are there are any delays on my commute","label":"transport traffic"}
+{"id":"47900a3f7dd21e80cb8d1e077a0b292d415f0076afd7d5eb22f592f629a79538","source_row":1043,"text":"what the traffic condition outside my office","label":"transport traffic"}
+{"id":"1761dc95a1031f26eb178f8ddf0e81487c369463005ab504b6cf01cee4520ed5","source_row":1044,"text":"in jodhpur traffic level is very low","label":"transport traffic"}
+{"id":"4c38d89ef2dbe27e2e9099fb2ed125fcdb3d977f399a5b68125a1050b8f0f45d","source_row":1045,"text":"outside traffic status please","label":"transport traffic"}
+{"id":"5d83ecf314382f2019f6ddac6cf81ddcaf698f47533caeaec516e4c1145d2ec5","source_row":1046,"text":"show me the current traffic nearby me","label":"transport traffic"}
+{"id":"3cc42986ed4c22fd9cd8f37eabafdcd6902755b9049f7b613c0325f7a7b73fd9","source_row":1047,"text":"give information about the traffic near my location please","label":"transport traffic"}
+{"id":"b8aff5498cda4fdb8ad041b96d02198ac64219f5c1043fb4ab8aa70f14197df7","source_row":1048,"text":"just how bad is traffic on my commute","label":"transport traffic"}
+{"id":"b3e528563dea545887e7988f08c881c1983a35ee12c58cd24d320d5b8892a04b","source_row":1049,"text":"how much traffic does atlanta georgia usually have","label":"transport traffic"}
+{"id":"6bdc59226710b510d2c98fc9b1cc6cee2007d00b60a6bc0350956600db8e0174","source_row":1050,"text":"what is the traffic like right now on telegraph","label":"transport traffic"}
+{"id":"17137733a5d915d4a965a6b1900ec8c639b756413d06f63e861ea226af4a3cc6","source_row":1057,"text":"do i have to bring umbrella for tonight party","label":"weather query"}
+{"id":"ca340d8dea307caecdb79d0056aea116f45ce5ccec8577b55a3b326d606011fe","source_row":1058,"text":"should i wear gloves tonight","label":"weather query"}
+{"id":"53021a59ce592242e9f62bc2baea55198f428a37fde09578e78cdfce0124582c","source_row":1059,"text":"will it rain in the noon","label":"weather query"}
+{"id":"4dc043c86ee301e17bc5ed79856852b0d1a1c1687f91ee3ba5ac045c6240ee7d","source_row":1060,"text":"how will be the weather at night","label":"weather query"}
+{"id":"ff7fd905e52e118fa313ac92872251d33c10fdeb98a8dfa66b3028e6b420b192","source_row":1061,"text":"will the temperature be higher than forty tomorrow","label":"weather query"}
+{"id":"5e28610766bc38b18ef493dbc0ef072a24e0f1c8bc8992b37589b4df8aa8183e","source_row":1062,"text":"ask for the weather today morning","label":"weather query"}
+{"id":"dd28f95b60c74be289d601b51a0de042b153ddf51638f6da665921117ca541de","source_row":1063,"text":"is summer going on","label":"weather query"}
+{"id":"40a465bac1bce77fab4e9b950e05291b6fd22405c5a1ff9bd401e4557e64e41f","source_row":1064,"text":"do you think i can wear sandals or should i wear sneakers tonight at seven pm","label":"weather query"}
+{"id":"0fc8b7bd5491a330863dc2f86f5cb741d9c231f944f631a4bf69cd4bd607b113","source_row":1065,"text":"show me the weather forecast for the next three three days","label":"weather query"}
+{"id":"549aae43b8f57a99edd9aabbddfbdb6f0b52c2c32fd9d3abcd6f69535fc5636f","source_row":1066,"text":"are you sure its going to rain tomorrow","label":"weather query"}
+{"id":"01aa3497d49d2d6ba7a1bfda17248f070970bd184e4781f7d23d7a41f7b6d962","source_row":1067,"text":"will i need my snow boots this afternoon","label":"weather query"}
+{"id":"beb5961c8fb32573a6b999216d8d2a2b6eb102554ea59cb74d9ea196ec5d9ebb","source_row":1068,"text":"do i need to wear sunscreen today","label":"weather query"}
+{"id":"dbc7993f4eb0982f74f2e20f8b48eeb9c263fd293325002b1ff58c0135ef3384","source_row":1069,"text":"what is the temperature today","label":"weather query"}
