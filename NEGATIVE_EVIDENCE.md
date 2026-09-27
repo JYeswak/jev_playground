@@ -4669,3 +4669,19 @@ paired `opened/used next` join is specified before the shadow starts.
 **Measured:** 821 comparator rows were refused by OpenRouter daily 429 quota; only 86/907 comparator rows were scored. The committed receipt status is `MEASURED_NOT_RUN_FREE_QUOTA`; no comparator accuracy claim is made. Jev completed 907/907 with 507,681 input tokens and estimated spend $0.021322602.
 
 **Retry condition:** stop on 429 as `NOT_RUN`, wait for the documented reset, then rerun the preregistered comparator arm only; do not coerce quota rows into wrong answers or mix the partial comparator into a Jev ruling. Evidence: `work/jev-oioo/final-receipt.json`.
+
+## R122 — NOT MET: H2 per-sentence fan-out improves the dev slice
+
+**Claim (jev-41c6).** Filtering or fanning out per-sentence evidence would improve Jev on the fixed Climate-FEVER dev slice.
+
+**Measured:** replay-only correct `155/199` versus baseline `148/199`; replay-only wins `10`, baseline-only wins `11`, exact McNemar p=`0.189`. The preregistered improvement bar was not met.
+
+**Retry condition:** none on this dev slice. H2 is set aside; H3 is the next hypothesis. A retry requires a new preregistered non-gold state design and a fresh held-out slice. Evidence: `work/jev-oioo/receipt-h1-za3a.json`, commit `027902fc`.
+
+## R123 — INCONCLUSIVE: H3 label-stratum separation confirms the model limit
+
+**Claim (jev-cqex).** Climate-FEVER rows whose evidence-label majority agrees with the dataset label should separate cleanly from rows where it disagrees.
+
+**Measured:** agree stratum `301/412 = 73.1%`; disagree stratum `291/495 = 58.8%`, Wilson interval `54.4%–63.0%`. The disagree stratum reaches the near-chance band only on the point estimate; because the Climate-FEVER labels and evidence labels are entangled, this cannot cleanly confirm H3.
+
+**Retry condition:** obtain an independently labelled evidence/claim set or a non-leaking adjudication, preregister the stratum bar, and retest before treating H3 as confirmed.
