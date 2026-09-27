@@ -142,6 +142,22 @@ def omp_judge_usage(root: Path) -> tuple[str, str]:
     )
 
 
+def nfcorpus_rerank(root: Path) -> tuple[str, str]:
+    receipt = json.loads(
+        (root / "work/rerank-scifact/receipt-nfcorpus-v2.json").read_text()
+    )
+    return (
+        f"Jev top-1 {receipt['jev_top1']:.1%} vs BM25 {receipt['baseline_top1']:.1%} "
+        f"(McNemar {receipt['mcnemar']['jev_only_wins']} vs "
+        f"{receipt['mcnemar']['bm25_only_wins']}, "
+        f"p={receipt['mcnemar']['two_sided_exact_p']:.5f}); "
+        f"nDCG@10 delta {receipt['ndcg10_delta']:+.3f}, "
+        "preregistered +0.05 bar missed; "
+        f"${receipt['spend']['total_input_cost_usd']:.3f} incl. discarded run",
+        "Choice rerank",
+    )
+
+
 def render_table(root: Path) -> str:
     rows = [
         (
@@ -160,6 +176,11 @@ def render_table(root: Path) -> str:
             "MiniWoB v3 held-out",
             *miniwob(root),
             "work/miniwob-jev/live-20260925/receipt.json",
+        ),
+        (
+            "BEIR NFCorpus rerank",
+            *nfcorpus_rerank(root),
+            "work/rerank-scifact/receipt-nfcorpus-v2.json",
         ),
         (
             "OMP judge usage",
