@@ -1,6 +1,7 @@
 # jev-oioo unseen SciFact confirmation preregistration
 
 **Status:** committed before any Jev or comparator call.
+reach-mode: mcnemar
 
 ## Frozen public corpus and sample
 
