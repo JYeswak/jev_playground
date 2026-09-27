@@ -14,6 +14,7 @@ assert _spec and _spec.loader
 _module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_module)
 build_report = _module.build_report
+write_outputs = _module.write_outputs
 
 
 class ShadowReportTests(unittest.TestCase):
@@ -96,6 +97,23 @@ class ShadowReportTests(unittest.TestCase):
             self.assertEqual(report["web_search_rerank"]["answered"], 2)
             self.assertEqual(report["web_search_rerank"]["pick_equals_rank1"], 1)
             self.assertEqual(report["web_search_rerank"]["opened_pick"], 1)
+
+    def test_output_names_are_latest_or_explicit_snapshot(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            report = build_report(
+                root / "missing-a", root / "missing-b", root / "missing-c"
+            )
+            latest, latest_disagreements = write_outputs(report, root, "latest")
+            snapshot, snapshot_disagreements = write_outputs(
+                report, root, "report-20990101"
+            )
+            self.assertEqual(latest.name, "latest.json")
+            self.assertEqual(latest_disagreements.name, "disagreements-latest.jsonl")
+            self.assertEqual(snapshot.name, "report-20990101.json")
+            self.assertEqual(
+                snapshot_disagreements.name, "disagreements-20990101.jsonl"
+            )
 
     def test_missing_logs_are_empty_not_raw_or_crashing(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -167,19 +167,13 @@ def build_report(
     }
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--gate-shadow", type=Path, default=DEFAULT_GATE_SHADOW)
-    parser.add_argument("--gate-observe", type=Path, default=DEFAULT_GATE_OBSERVE)
-    parser.add_argument("--web-shadow", type=Path, default=DEFAULT_WEB_SHADOW)
-    parser.add_argument("--out-dir", type=Path, default=Path("work/jev-5ay4"))
-    parser.add_argument("--sample-size", type=int, default=20)
-    args = parser.parse_args()
-    report = build_report(
-        args.gate_shadow, args.gate_observe, args.web_shadow, args.sample_size
-    )
-    args.out_dir.mkdir(parents=True, exist_ok=True)
-    (args.out_dir / "report.json").write_text(
+def write_outputs(
+    report: dict[str, Any], out_dir: Path, stem: str
+) -> tuple[Path, Path]:
+    out_dir.mkdir(parents=True, exist_ok=True)
+    report_path = out_dir / f"{stem}.json"
+    disagreements_path = out_dir / f"disagreements-{stem.removeprefix('report-')}.jsonl"
+    report_path.write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     blind = [
@@ -190,15 +184,41 @@ def main() -> int:
         }
         for row in report["gate"]["disagreements"]
     ]
-    (args.out_dir / "disagreements.jsonl").write_text(
+    disagreements_path.write_text(
         "".join(json.dumps(row, sort_keys=True) + "\n" for row in blind),
         encoding="utf-8",
     )
+    return report_path, disagreements_path
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--gate-shadow", type=Path, default=DEFAULT_GATE_SHADOW)
+    parser.add_argument("--gate-observe", type=Path, default=DEFAULT_GATE_OBSERVE)
+    parser.add_argument("--web-shadow", type=Path, default=DEFAULT_WEB_SHADOW)
+    parser.add_argument(
+        "--out-dir", type=Path, default=Path("var/agent-tmp/shadow-report")
+    )
+    parser.add_argument(
+        "--snapshot",
+        metavar="DATE",
+        help="write a deliberate work/jev-5ay4 dated snapshot",
+    )
+    parser.add_argument("--sample-size", type=int, default=20)
+    args = parser.parse_args()
+    report = build_report(
+        args.gate_shadow, args.gate_observe, args.web_shadow, args.sample_size
+    )
+    if args.snapshot:
+        out_dir, stem = Path("work/jev-5ay4"), f"report-{args.snapshot}"
+    else:
+        out_dir, stem = args.out_dir, "latest"
+    report_path, disagreements_path = write_outputs(report, out_dir, stem)
     print(
         json.dumps(
             {
-                "report": str(args.out_dir / "report.json"),
-                "disagreements": len(report["gate"]["disagreements"]),
+                "report": str(report_path),
+                "disagreements": str(disagreements_path),
                 "scored": report["gate"]["scored_rows"],
                 "answered": report["web_search_rerank"]["answered"],
             },
