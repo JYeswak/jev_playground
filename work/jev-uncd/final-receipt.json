@@ -1,0 +1,104 @@
+{
+  "boundary": "No promotion or fleet-wide claim; existing/DCG comparison is the frozen flag on the same sample.",
+  "existing_flag": {
+    "harm": {
+      "den": 93,
+      "num": 92,
+      "rate": 0.989247311827957,
+      "wilson95": [
+        0.9415808276451298,
+        0.9980993579713445
+      ]
+    },
+    "no_harm": {
+      "den": 465,
+      "num": 267,
+      "rate": 0.5741935483870968,
+      "wilson95": [
+        0.5288235466137057,
+        0.6183477384803217
+      ]
+    },
+    "precision": {
+      "den": 359,
+      "num": 92,
+      "rate": 0.2562674094707521,
+      "wilson95": [
+        0.2138532736043019,
+        0.3038424148410475
+      ]
+    }
+  },
+  "items": "work/jev-uncd/items.jsonl",
+  "items_sha256": "c6ed1feb32e05bf73fc9cc0fe4785a159c80ba6336795f614edcda7cac992e1d",
+  "jev": {
+    "harm": {
+      "den": 93,
+      "num": 90,
+      "rate": 0.967741935483871,
+      "wilson95": [
+        0.9094061748887851,
+        0.9889693871841081
+      ]
+    },
+    "no_harm": {
+      "den": 465,
+      "num": 140,
+      "rate": 0.3010752688172043,
+      "wilson95": [
+        0.26115026985112355,
+        0.34426005272286153
+      ]
+    },
+    "precision": {
+      "den": 230,
+      "num": 90,
+      "rate": 0.391304347826087,
+      "wilson95": [
+        0.3305119637155691,
+        0.45566795385696374
+      ]
+    }
+  },
+  "jevcalls": 558,
+  "mcnemar_no_harm": {
+    "b_existing_only_fp": 128,
+    "bar_direction": "b > c and p < 0.05",
+    "c_jev_only_fp": 1,
+    "exact_two_sided_p": 3.820356640172434e-37
+  },
+  "model": "jev-1.13.0",
+  "prereg": "work/jev-uncd/prereg.md",
+  "prereg_sha256": "eb214208374f2aa0fad7f4449a4edffb38593c936723a2724e7f3d80a496a6b0",
+  "random_unflagged": {
+    "jev_flag_rate": 0.005025125628140704,
+    "jev_flags": 1,
+    "rate_scope": "decidable random-unflagged rows; total and excluded rows reported",
+    "rows_decidable": 199,
+    "rows_total": 200,
+    "undecidable_excluded": 1
+  },
+  "raw_commands_committed": false,
+  "reach_receipt": "work/jev-uncd/reachability-mcnemar.json",
+  "reach_receipt_sha256": "2834bd541abb2376be6e173beeb82a01dae5736e8c42a3e21807075e2c45d698",
+  "refused": 0,
+  "rows": 558,
+  "sample_scope": "stratified sample rates only, not fleet rates",
+  "scored": 558,
+  "spend_usd": 0.018826332,
+  "status": "MEASURED_NO_PROMOTION_DECISION",
+  "unit": "jev-uncd",
+  "usage": {
+    "input_tokens": 448246,
+    "latency_ms": {
+      "max": 920,
+      "p50": 143.0,
+      "p95": 236.0
+    },
+    "output_tokens": 53568,
+    "resolved_models": {
+      "jev-1.13.0": 558
+    },
+    "spend_usd_input_at_0.042_per_million": 0.018826332
+  }
+}
