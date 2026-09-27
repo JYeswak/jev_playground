@@ -1,5 +1,12 @@
 [
-  {"id":"c0","title":"Candidate one","text":"A captured candidate passage that is less relevant."},
-  {"id":"c1","title":"Candidate two","text":"A captured candidate passage that is the selected answer."},
-  {"id":"none","title":"No answer","text":"No candidate is relevant enough."}
+  {
+    "id": "180146",
+    "title": "",
+    "text": "As long as the relative in the UK is not a US citizen and isn't considered domiciled in the US, there will be no estate taxes imposed by the US. You can see a much lengthier explanation on this subject here. The summary is that as a US citizen or resident, you can't circumvent estate taxes by moving yourself or your money abroad, but a relative who genuinely doesn't have US ties (other than inheritors located in the US) will be covered through applicable tax treaties (the UK does have an applicable tax treaty and applicable estate taxes as Ganesh points out)."
+  },
+  {
+    "id": "44955",
+    "title": "",
+    "text": "Transferring money you own from one place to another pretty much never has tax implications. It might have other implications, including requirement to report it. Being a US citizen has tax implications, including the requirement to file US tax forms for the rest of eternity."
+  }
 ]

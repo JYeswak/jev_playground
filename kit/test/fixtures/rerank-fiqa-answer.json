@@ -1,0 +1,16 @@
+[
+  {
+    "id": "fiqa-q10034",
+    "answers": {
+      "choice": {
+        "type": "choice",
+        "choice": "44955",
+        "confidence": 0.8,
+        "probabilities": {
+          "180146": 0.15,
+          "44955": 0.85
+        }
+      }
+    }
+  }
+]

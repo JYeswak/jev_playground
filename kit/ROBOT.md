@@ -8,19 +8,14 @@
 
 `jev ask choice|score|noul --state FILE --question FILE --robot` emits the client result object.
 `jev rerank --query Q --candidates FILE --robot` sends one Choice over the candidate passages and emits the chosen candidate first, followed by the original input order. It does not claim a full reranking.
-`--fake` uses the captured answer rows under `kit/test/fixtures/recorded-answer-rows.json` and
-never contacts Jev. Example:
+`--fake` uses the captured FiQA answer row under `kit/test/fixtures/rerank-fiqa-answer.json` and reports `model: "fake"`; it never contacts Jev. The example passages and IDs are copied from BEIR FiQA-2018 query `10034`, not typed. The measured design has no synthetic `none` candidate: no-answer behavior is represented by refusing malformed/unoffered answers, so the example intentionally contains only retrieved passages.
 
 ```bash
 npm ci
 npx --no-install tsc -p tsconfig.json
-node bin/jev.mjs rerank --query "Which candidate answers the query?" \
+node bin/jev.mjs rerank --query "Tax implications of holding EWU (or other such UK ETFs) as a US citizen?" \
   --candidates examples/rerank-candidates.json --fake --robot
 ```
-
-The rerank verb refuses more than 20 candidates, malformed or unoffered answers, and OVER/NEAR
-state-size preflights before spending a call. A successful result has `ok: true`; configuration,
-transport, HTTP, and validation failures have `ok: false` or a nonzero CLI exit.
 
 The live model is always pinned to `jev-1.13.0` unless the caller explicitly supplies the client
 model option in code. The CLI never prints the API key.

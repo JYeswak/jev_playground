@@ -93,9 +93,9 @@ async function rerank(args) {
   }
   const candidates = await readJson(candidatesPath);
   const fetchImpl = fake
-    ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/recorded-answer-rows.json", ROOT), "utf8")))
+    ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/rerank-fiqa-answer.json", ROOT), "utf8")))
     : undefined;
-  const result = await rerankTop1({ query, candidates, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
+  const result = await rerankTop1({ query, candidates, apiKey: fake ? "fixture-key" : undefined, fetchImpl, model: fake ? "fake" : undefined });
   if (robot) robotPrint(result);
   else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   return 0;

@@ -21,7 +21,7 @@ The example state and Choice question are captured from committed rows: `work/po
 
 The stranger-runnable top-1 rerank verb uses one Choice over all candidate passages and refuses more than 20 or OVER/NEAR states:
 
-`node kit/bin/jev.mjs rerank --query "Which candidate answers the query?" --candidates kit/examples/rerank-candidates.json --fake --robot`
+`node kit/bin/jev.mjs rerank --query "Tax implications of holding EWU (or other such UK ETFs) as a US citizen?" --candidates kit/examples/rerank-candidates.json --fake --robot`
 For a live call, set `TYPESAFE_API_KEY` outside the repository using the official [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart), then run the same command without `--fake`:
 
 ```bash
