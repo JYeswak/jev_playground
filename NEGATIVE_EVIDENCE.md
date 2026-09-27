@@ -4625,3 +4625,45 @@ least 100 decisions/day, or when a real scheduler for `feed-idle-panes.sh` is ad
 paired `opened/used next` join is specified before the shadow starts.
 
 **Evidence.** `dbfcf434`, jev-u95h bead comment, and the captured session tool-call census.
+
+## R117 — REFUTED: gold-agreeing evidence filtering rescues the Climate-FEVER SUPPORTS miss
+
+**Claim (jev-za3a / H1).** Keeping only evidence sentences whose per-sentence label agrees with the claim would improve Jev on a fixed 200-row Climate-FEVER dev slice.
+
+**Measured 2026-09-27, live `jev-1.13.0`.** The slice was fixed before calls (`h1-dev-items.jsonl`, 100 SUPPORTS / 100 REFUTES, item SHA `a3c4359f…`); the filter used gold evidence labels and is therefore a leak. Baseline was 148/200, filtered replay 147/200; replay-only 10, baseline-only 11, exact McNemar p=1.0. Calls 200/200 scored; input 89,206 tokens, estimated Jev spend $0.003746652, p50 143 ms. Receipt `work/jev-oioo/receipt-h1-za3a.json` @ `027902fc`.
+
+**Consequence.** The gold-informed selector did not improve the dev slice. This does not test a deployable selector.
+
+**Retry condition:** set H1 aside; test H2 (question-shape/fan-out design, jev-41c6) on a fresh preregistered slice without gold labels in the state.
+
+## R118 — NOT MET: Amazon Score dev arm clears the MAE bar
+
+**Claim (jev-dml3).** The Jev Score arm would meet the preregistered Amazon sentiment MAE bar against the fixed comparator.
+
+**Measured:** Jev MAE 0.518 versus comparator 1.328, p≈1e-4, but only 274/278 paired rows met the preregistered requirement, below the 278-pair bar. The result is under-complete, not a pass. Evidence: `work/score-amazon/run.py`, jev-dml3 receipt/rows.
+
+**Retry condition:** jev-545t runs a fresh unscored five-class set sized for comparator invalids and reuses the committed MAE/pair-count bar.
+
+## R119 — REFUTED harness assumption: continuous live Score answers can be forced into integer fixtures
+
+**Claim (jev-dml3 first run / jev-8j8q).** The kit Score path could treat live continuous scores as the integer answer shape used by the first fixture/run.
+
+**Measured:** the first Amazon run rejected 290 continuous Score answers at the integer validator; the same answer-shape defect was found in kit Score. This is a harness/contract defect, not a Jev quality result.
+
+**Retry condition:** every stored row must preserve the raw continuous answer fields and the scorer must explicitly define rounding/continuous handling before a new live run.
+
+## R120 — REFUTED fixture assumption: typed kit examples reproduce committed live answers
+
+**Claim (jev-i9ek).** The Banking77 and FiQA fixtures used by the kit examples represented captured Jev answers.
+
+**Measured:** before repair, Banking77 asserted invented `card arrival`/0.98 while committed live row i=0 was `lost_or_stolen_card`/0.86; FiQA asserted candidate `44955` while committed q10034 selected `181942` from 20 candidates. Commit `a7bad6d8` replaced fixtures/examples and updated the expectation.
+
+**Retry condition:** every future fixture cites a committed live row and its exact offered label/candidate set; a fixture without that citation cannot be used as live-answer evidence.
+
+## R121 — NOT RUN comparator arm: Climate-FEVER free-model confirmation is quota-blocked
+
+**Claim (jev-oioo).** The free OpenRouter incumbent could complete the Climate-FEVER comparison against Jev.
+
+**Measured:** 821 comparator rows were refused by OpenRouter daily 429 quota; only 86/907 comparator rows were scored. The committed receipt status is `MEASURED_NOT_RUN_FREE_QUOTA`; no comparator accuracy claim is made. Jev completed 907/907 with 507,681 input tokens and estimated spend $0.021322602.
+
+**Retry condition:** stop on 429 as `NOT_RUN`, wait for the documented reset, then rerun the preregistered comparator arm only; do not coerce quota rows into wrong answers or mix the partial comparator into a Jev ruling. Evidence: `work/jev-oioo/final-receipt.json`.
