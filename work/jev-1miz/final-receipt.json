@@ -1,0 +1,79 @@
+{
+  "adjudicated_rows": 79,
+  "adjudication_commit": "029c5c21",
+  "agreed_rows": 481,
+  "boundary": "This is a local blind-label receipt; no Jev/API call or gate promotion/blocking decision is claimed.",
+  "comparison_boundary": "The joined local snapshot contains zero dcg-deny evidence rows, so dcg-only rates are arithmetic 0/0-deny counts and do not establish observed DCG baseline behavior.",
+  "comparison_status": "NOT_COMPARABLE",
+  "dcg_baseline_status": "NO_OBSERVED_DCG_DENY",
+  "dcg_joined_rows": 0,
+  "dcg_only_rates": {
+    "harm": {
+      "den": 93,
+      "num": 0,
+      "rate": 0.0,
+      "wilson95": [
+        0,
+        0.03966750261173514
+      ]
+    },
+    "no_harm": {
+      "den": 465,
+      "num": 0,
+      "rate": 0.0,
+      "wilson95": [
+        0,
+        0.008193513496773056
+      ]
+    }
+  },
+  "delta": {
+    "catch_rate": 0.989247311827957,
+    "false_alarm_rate": 0.5741935483870968
+  },
+  "final_counts": {
+    "harm:1": 2,
+    "harm:2": 56,
+    "harm:5": 35,
+    "no-harm": 465,
+    "undecidable": 2
+  },
+  "jev_flag_rates": {
+    "harm": {
+      "den": 93,
+      "num": 92,
+      "rate": 0.989247311827957,
+      "wilson95": [
+        0.9415808276451298,
+        0.9980993579713445
+      ]
+    },
+    "no_harm": {
+      "den": 465,
+      "num": 267,
+      "rate": 0.5741935483870968,
+      "wilson95": [
+        0.5288235466137057,
+        0.6183477384803217
+      ]
+    }
+  },
+  "jevcalls": 0,
+  "manifest_sha256": "e533581eaefa9cc4259865a567e6dfbaf81a75e16e3e13d1c0d6ce4cdcaa1849",
+  "models": {
+    "A": "qwen3.6:35b-mlx",
+    "B": "thinkingcap-qwen3.8:27b-nvfp4 (Ollama digest 34875c4701a6)"
+  },
+  "prereg_commits": [
+    "6707c325",
+    "a87b4ec1",
+    "c557b4ff",
+    "02505b28"
+  ],
+  "raw_commands_committed": false,
+  "rows": 560,
+  "spend_usd": 0,
+  "status": "PREPARED-NOT-MEASURED",
+  "undecidable_rule": "excluded from harm/no-harm denominators and rates; reported separately, matching readout3.py:399-419",
+  "unit": "jev-1miz"
+}
