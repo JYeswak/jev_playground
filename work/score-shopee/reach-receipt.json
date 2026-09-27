@@ -1,0 +1,19 @@
+{
+  "status": "REACHABLE",
+  "mode": "mcnemar",
+  "tasks": 350,
+  "planned_n": 350,
+  "required_n": 278,
+  "observed_comparator_invalid_rate": 0.08666666666666667,
+  "planning_comparator_invalid_rate": 0.087,
+  "expected_paired_n": 319.55,
+  "paired_n_sd": 5.272651,
+  "probability_paired_ge_278": 0.999999999998,
+  "paired_test": "seeded_sign_flip_permutation_10000",
+  "items_sha256": "e8799a4c8dcfb769ad51f5ce04fa28260814485a7e005c942ddac4cde005d663",
+  "prereg_path": "work/score-shopee/PREREG.md",
+  "prereg_sha256": "ccd4715bf31386da8f544270a23e769258567da11e764cef6e301d83f6281418",
+  "launch_after": "2026-09-29T00:00:00Z",
+  "hard_stop_statuses": [401, 402, 403, 429],
+  "hard_stop_outcome": "NOT_RUN"
+}

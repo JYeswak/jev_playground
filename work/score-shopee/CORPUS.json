@@ -1,0 +1,20 @@
+{
+  "dataset": "scaredmeow/shopee-reviews-tl-stars",
+  "dataset_revision": "d096f402fdc76886458c0cfb5dedc829bea2b935",
+  "source_file": "test.csv",
+  "source_file_sha256": "d851b139250932165b1cd26b42e50ac69bd9033dae3c2bcf58091d5d069bc0ba",
+  "source_file_bytes": 334754,
+  "license": "mpl-2.0",
+  "language": "tl",
+  "split": "test",
+  "selection": "first 70 rows per label from the pinned public test.csv, preserving source row and text",
+  "rows": 350,
+  "class_counts": {
+    "0": 70,
+    "1": 70,
+    "2": 70,
+    "3": 70,
+    "4": 70
+  },
+  "corpus_sha256": "e8799a4c8dcfb769ad51f5ce04fa28260814485a7e005c942ddac4cde005d663"
+}
