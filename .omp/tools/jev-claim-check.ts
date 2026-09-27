@@ -3,6 +3,44 @@ import { verifyClaim, type VerifyResult } from "../../kit/src/verify.ts";
 import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 import type { AskOptions, JevResult } from "../../kit/src/client.ts";
 
+const NUM = String.raw`\d[\d,.]*(?:[eE][-+]?\d+)?`;
+const CHUNK = new RegExp(String.raw`(?<![A-Za-z0-9_.])(?<![A-Za-z]-)${NUM}(?:-${NUM})?(?:\/${NUM})*%?`, "g");
+const THOUSANDS = /^\d{1,3}(?:,\d{3})+(?:\.\d+)?(?:[eE][-+]?\d+)?%?$/;
+
+export function numberTokens(blanked: string): Array<{ text: string; at: number }> {
+  const out: Array<{ text: string; at: number }> = [];
+  for (const match of blanked.matchAll(CHUNK)) {
+    const text = match[0].replace(/[.,]+$/, "");
+    const at = match.index ?? 0;
+    const after = blanked[at + text.length] ?? "";
+    if (/[A-Za-z0-9_]/.test(after)) continue;
+    if (/^\d+\.\d+\.\d+/.test(text) && !text.includes("/")) continue;
+    const parts = text.split(/\/|-(?=\d)/);
+    if (parts.every((part) => !part.includes(",") || THOUSANDS.test(part))) {
+      out.push({ text, at });
+      continue;
+    }
+    let offset = 0;
+    for (const piece of text.split(",")) {
+      if (/\d/.test(piece)) out.push({ text: piece, at: at + offset });
+      offset += piece.length + 1;
+    }
+  }
+  return out.filter((token) => !/\d{8,}/.test(token.text));
+}
+
+// Legacy numeric experiment seam. The live tool delegates to kit/src/verify.ts at 0.5;
+// numeric.mjs imports this pure policy for its separate preregistered comparisons.
+export const SUPPORTED_AT = 0.8;
+export const UNSUPPORTED_AT = 0.2;
+export function classify(probability: unknown) {
+  if (typeof probability !== "number" || !Number.isFinite(probability) || probability < 0 || probability > 1) return null;
+  const confidence = Math.max(probability, 1 - probability);
+  if (probability >= SUPPORTED_AT) return { verdict: "supported", confidence };
+  if (probability <= UNSUPPORTED_AT) return { verdict: "unsupported", confidence };
+  return { verdict: "unsure", confidence };
+}
+
 type ToolHost = { zod: { object: (shape: Record<string, unknown>) => unknown; string: () => { min: (n: number) => unknown } } };
 type NoulAsker = (options: AskOptions) => Promise<JevResult>;
 
