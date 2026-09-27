@@ -1,0 +1,64 @@
+{
+  "bar": {
+    "both_metrics_tie_or_beat": false
+  },
+  "bead": "jev-97bq",
+  "boundary": "One free OpenRouter model on the frozen 234-query NFCorpus slice; no new Jev calls; invalid/error rows are counted separately and never scored as wrong.",
+  "candidates_sha256": "1ef3835708d8522ed39f2f2bd4018ea07390e403bcfd8e00119580e69860e3ec",
+  "delta_incumbent_minus_jev": {
+    "ndcg10": -0.013850727365590287,
+    "top1": -0.042735042735042805
+  },
+  "duplicate_rows": 0,
+  "error_rows": 0,
+  "incumbent": {
+    "ndcg10": 0.43416828217782355,
+    "top1": 0.6666666666666666
+  },
+  "invalid_rows": 0,
+  "jev": {
+    "ndcg10": 0.44801900954341384,
+    "top1": 0.7094017094017094
+  },
+  "latency_ms": {
+    "p50": 25938,
+    "p95": 75119,
+    "sum": 7555737
+  },
+  "mcnemar_top1": {
+    "discordant": 46,
+    "incumbent_only_wins": 18,
+    "jev_only_wins": 28
+  },
+  "model": "dots-studio/dots-3-note-preview:free",
+  "n": 234,
+  "rows": "work/rerank-scifact/rows-jev-97bq-final2.jsonl",
+  "status": "SCORED",
+  "usage": {
+    "after": {
+      "captured_at_utc": "2026-09-27T06:36:35.983796+00:00",
+      "is_free_tier": false,
+      "limit": null,
+      "limit_remaining": null,
+      "usage": 100.199757412
+    },
+    "before": {
+      "captured_at_utc": "2026-09-27T02:08:45.127980+00:00",
+      "is_free_tier": false,
+      "limit": null,
+      "limit_remaining": null,
+      "usage": 100.199757412
+    },
+    "cost_claim": "$0 only if unchanged and all rows are :free",
+    "row_input_tokens": 1822484,
+    "row_output_tokens": 710243,
+    "unchanged": true
+  },
+  "wilcoxon_ndcg": {
+    "n_nonzero": 70,
+    "p_approx": 0.032201623269266004,
+    "w_minus": 1609.0,
+    "w_plus": 876.0,
+    "z": -2.141898839617332
+  }
+}
