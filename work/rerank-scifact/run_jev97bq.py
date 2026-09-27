@@ -28,7 +28,7 @@ sys.path.insert(0, str(ROOT / "upstream/typesafe-ai/typesafe-sdk-python/src"))
 sys.path.insert(0, str(ROOT / "upstream/typesafe-ai/system-one-adapter-python/src"))
 sys.path.insert(0, str(ROOT))
 
-from kit.experiment.run import run as checkpoint_run  # noqa: E402
+from kit.experiment.run import StopRun, run as checkpoint_run  # noqa: E402
 from system_one_adapter import AsyncSystemOneAdapterClient  # noqa: E402
 from system_one_adapter.providers.openai import AsyncOpenAIProvider  # noqa: E402
 from typesafe_sdk import Choice, RetryPolicy  # noqa: E402
@@ -130,6 +130,14 @@ async def run_arm(
             row.update({"status": "ok", "choice": choice})
             return row
         except Exception as exc:  # noqa: BLE001 - checkpoint the failure and continue boundedly
+            message = f"{type(exc).__name__}: {str(exc)[:500]}"
+            if any(
+                marker in message
+                for marker in ("401", "402", "403", "quota", "payment")
+            ):
+                raise StopRun(
+                    f"stopping on non-retryable provider failure: {message}"
+                ) from exc
             errors += 1
             return {
                 "qid": qid,
