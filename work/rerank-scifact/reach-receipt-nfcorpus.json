@@ -11,6 +11,8 @@
   "best_case_discordant_losses": 0,
   "minimum_attainable_p": 1.1920928955078125e-7,
   "alpha": 0.05,
+  "prereg_path": "/Users/josh/Developer/jev/work/rerank-scifact/PREREG-jev-iu1e.md",
+  "prereg_sha256": "d784dd6dc718b9a7791a2f5abfe969e0ac3223e094027e0831c7a403fe9ba484",
   "command": "python3 scripts/bar-reachable.py --flip-fixture work/rerank-scifact/reach-fixture-jev-iu1e.json",
   "lane": "offline",
   "boundary": "This receipt proves only that the preregistered paired top-1 bar is mathematically reachable; it is not a live Jev result."

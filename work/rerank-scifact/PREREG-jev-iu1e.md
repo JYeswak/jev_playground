@@ -2,6 +2,8 @@
 
 **Amendment to `8fe1624d`; amendment `27148544`; frozen before the NFCorpus live call.**
 
+reach-mode: mcnemar
+
 - **Dataset:** public BEIR NFCorpus test split, qrels and corpus. This experiment does not use the previously scored SciFact items. The committed candidate file contains every NFCorpus test query whose deterministic BM25 top-20 contains at least one positive qrel.
 - **BM25:** stdlib implementation, document text `title + " " + text`, lower-case `[a-z0-9]+` tokens, Robertson/Sparck Jones IDF, `k1=0.9`, `b=0.4`, stable corpus-order tie break. The public archive SHA and candidate-file SHA are recorded in the receipt.
 - **Items:** all eligible NFCorpus test queries under that exact construction, N=234. The run MUST refuse if the candidate file does not contain exactly 234 rows or the reach receipt does not match its SHA. No query is selected after seeing Jev answers.
