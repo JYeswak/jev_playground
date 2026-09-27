@@ -38,8 +38,8 @@ The install currently writes six callable tools, one post-hook, five omp extensi
 | `jev_claim_check` | Kit verify Noul receipts: SciFact `docs/demos/upstream-repro/noul-scifact-20260924.md`; Climate-FEVER `work/jev-oioo/final-receipt.json` | Uses strict `noul > 0.5`; measured SciFact accuracy 90.2% and Climate-FEVER 65.3% (weak case). Numeric claims are outside measured scope. |
 | `jev_classify` | Banking77 measurement: `docs/demos/upstream-repro/choice-banking77-20260924.md` | The 80.1% result is the measured Banking77 corpus, not a general classification guarantee. |
 | `jev_gate` | Held-out gate receipt: `work/jev-1lim/final-receipt.json` | Reported rates are stratified sample rates; the receipt contains 47 harm rows, not fleet-wide prevalence. |
-| `jev_flag` | Gate/injection measurements: `EVAL.md` R80 and `work/jev-uncd/final-receipt.json` | R80 measured 175/300 clean tool-result false flags; do not cite web-screen support as `jev_flag` evidence. Installed advisory flag only; no universal accuracy claim. |
-| `jev_screen` | Web-screen measurements: `work/hermes-webscreen-repro/RECEIPT.md` | Cited measurements are bounded corpora/states; no general clean-output accuracy claim. |
+| `jev_flag` | Shared injection-seat measurement: `docs/demos/upstream-repro/jev-k9z5-flag-20260924.md` | R80 measured 640/662 attacks caught and 175/300 false flags on real tool results; not validated for production use. |
+| `jev_screen` | Shared injection-seat measurement: `docs/demos/upstream-repro/jev-k9z5-flag-20260924.md` | Same 640/662 attack and 175/300 real-tool false-flag scope; not validated as a general clean-output screen. |
 The installed tools load through project scope, so they apply to the throwaway repo regardless of the omp profile. To run the same command in a real project, replace `var/agent-tmp/jev-omp-demo` with that repository path.
 
 `jev omp install` is an installer, not a model call. The tools return keyless `NOT_RUN`/safe results when no TypeSafe key is available.
