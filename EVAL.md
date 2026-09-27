@@ -1204,6 +1204,13 @@ Pane 1's sharper edge, not re-run here: the identical method scores 0.9857 train
 
 **Boundary.** No live call in this citation. No omp seam. Not a certified seat. The rerank 219-pair result remains thin and uncertified (`work/nev-rerank/live-receipt.json`).
 
+
+## jev-xvzi reach receipt binding @9f0daace [offline-verified]
+
+- Changed `scripts/bar-reachable.py` to require an explicit `reach-mode:` declaration when producing a receipt with `--prereg`/`--items`; receipts carry absolute `prereg_path`, `prereg_sha256`, `items_sha256`, and computed `mode`.
+- Changed `kit/experiment/run.py` to require `--prereg` for live runs and refuse mode mismatch, preregistration hash drift, path mismatch, or item hash mismatch.
+- Verification: `python3 -m unittest scripts.test_bar_reachable kit.experiment.test_run` — **17/17**; `python3 -m py_compile scripts/bar-reachable.py kit/experiment/run.py`; `ubs` on all four changed Python files — **exit 0**; commit hook format check — **4 clean**.
+- Boundary: no Jev API calls; this verifies the offline receipt policy only, not model behavior or live experiment outcomes.
 ## differential LLM-vs-Jev on jev-sec-bench injection 662 (2026-09-21) [live]
 
 Incumbent arm RULE 14 required: same state + same InjectionBattery via
