@@ -1,0 +1,15 @@
+{
+  "bead": "jev-iu1e",
+  "status": "REACHABLE",
+  "mode": "rate",
+  "items": "candidates.jsonl",
+  "items_sha256": "2cf3a9a96a12253a76095f5505dc475dcae5eb64b5dd29b2ed36de9290fe83e8",
+  "trials": 219,
+  "threshold": 0.05,
+  "positive_count": 1,
+  "negative_count": 218,
+  "wilson_lower_bound_95": 0.9827614715815288,
+  "command": "python3 scripts/bar-reachable.py --mode rate --manifest work/rerank-scifact/candidates.jsonl --used-rows work/rerank-scifact/rows-jev.jsonl --trials 219 --threshold 0.05 --positive-count 1 --negative-count 218",
+  "lane": "offline",
+  "boundary": "This receipt proves only that the preregistered rate bar is mathematically reachable; it is not a live Jev result."
+}
