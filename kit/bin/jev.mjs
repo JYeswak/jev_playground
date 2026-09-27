@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { askJev, askJevChoice, askJevScore, DEFAULT_MODEL } from "../dist/client.js";
 import { rerankTop1 } from "../dist/rerank.js";
+import { classifyText } from "../dist/classify.js";
 import { createFakeFetch } from "../dist/fake.js";
 import { installOmp, ompDiscovery } from "../dist/install.js";
 
@@ -100,6 +101,31 @@ async function rerank(args) {
   else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   return 0;
 }
+async function classify(args) {
+  const robot = hasFlag(args, "--robot");
+  const fake = hasFlag(args, "--fake");
+  const text = option(args, "--text");
+  const labelsPath = option(args, "--labels");
+  if (!text || !labelsPath) {
+    const error = { status: "ERROR", reason: "usage", message: "jev classify --text T --labels FILE [--robot] [--fake]" };
+    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
+    return 1;
+  }
+  const labels = await readJson(labelsPath);
+  const fetchImpl = fake
+    ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/banking77-answer.json", ROOT), "utf8")))
+    : undefined;
+  const result = await classifyText({
+    text,
+    labels,
+    apiKey: fake ? "fixture-key" : undefined,
+    fetchImpl,
+    model: fake ? "fake" : undefined,
+  });
+  if (robot) robotPrint(result);
+  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  return 0;
+}
 
 const args = process.argv.slice(2);
 const robot = hasFlag(args, "--robot");
@@ -108,6 +134,7 @@ try {
   if (args[0] === "doctor") exitCode = await doctor(robot);
   else if (args[0] === "ask") exitCode = await ask(args);
   else if (args[0] === "rerank") exitCode = await rerank(args);
+  else if (args[0] === "classify") exitCode = await classify(args);
   else if (args[0] === "omp" && args[1] === "install") {
     const repo = option(args, "--dir") ?? process.cwd();
     const result = await installOmp(repo, hasFlag(args, "--dry-run"));

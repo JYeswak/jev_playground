@@ -9,6 +9,7 @@
 `jev ask choice|score|noul --state FILE --question FILE --robot` emits the client result object.
 `jev rerank --query Q --candidates FILE --robot` sends one Choice over the candidate passages and emits the chosen candidate first, followed by the original input order. It does not claim a full reranking.
 `--fake` uses the captured FiQA answer row under `kit/test/fixtures/rerank-fiqa-answer.json` and reports `model: "fake"`; it never contacts Jev. The example passages and IDs are copied from BEIR FiQA-2018 query `10034`, not typed. The measured design has no synthetic `none` candidate: no-answer behavior is represented by refusing malformed/unoffered answers, so the example intentionally contains only retrieved passages.
+`jev classify --text T --labels FILE --robot` sends the captured Banking77 intent Choice: state `{"customer_message": T}`, 77 humanized labels with null descriptions, and the measured instruction. It passes Jev's confidence through without a threshold. `--fake` uses `kit/test/fixtures/banking77-answer.json` and reports `model: "fake"` without contacting Jev.
 
 ```bash
 npm ci
