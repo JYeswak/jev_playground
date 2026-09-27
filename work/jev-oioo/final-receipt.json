@@ -1,0 +1,63 @@
+{
+  "arms": {
+    "comparator": {
+      "accuracy": {
+        "den": 86,
+        "num": 52,
+        "rate": 0.6046511627906976,
+        "wilson95": [
+          0.4989772079672809,
+          0.7013757274845405
+        ]
+      },
+      "brier": 0.3089337209302327,
+      "model": "dots-studio/dots-3-note-preview:free",
+      "refused": 821,
+      "scored": 86
+    },
+    "jev": {
+      "accuracy": {
+        "den": 907,
+        "num": 597,
+        "rate": 0.6582138919514884,
+        "wilson95": [
+          0.6267367977756302,
+          0.6883564571708357
+        ]
+      },
+      "brier": 0.2327659316427785,
+      "model": "jev-1.13.0",
+      "refused": 0,
+      "scored": 907
+    }
+  },
+  "boundary": "Unseen public Climate-FEVER eligible pairs only; no fleet-wide claim or promotion/ruling.",
+  "dataset": "tdiggelm/climate-fever@1.0.1",
+  "items": "work/jev-oioo/items.jsonl",
+  "items_sha256": "bbda30671b46678a11717d0fa89994b5226e9887ff321ec70a860e45f579032c",
+  "jevcalls": 907,
+  "mcnemar": {
+    "b_jev_only_correct": 3,
+    "c_comparator_only_correct": 2,
+    "exact_two_sided_p": 1
+  },
+  "prereg": "work/jev-oioo/prereg.md",
+  "prereg_sha256": "b8448df45f0c5ce4481688770a12c314f6f58df2aa6b74a846d0b997b2797a01",
+  "raw_answers_committed": true,
+  "raw_commands_committed": false,
+  "reach_receipt": "work/jev-oioo/reachability.json",
+  "reach_receipt_sha256": "ce91c69847801ad98aeacf4b73dae713d10ffc2b7b4dcce4324d6bcfd708d82c",
+  "rows": 907,
+  "source_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
+  "spend_usd": 0.021322602000000003,
+  "status": "MEASURED_NO_PROMOTION_DECISION",
+  "unit": "jev-oioo",
+  "usage": {
+    "comparator_completion_tokens": 87656,
+    "comparator_prompt_tokens": 20961,
+    "comparator_spend_usd": 0,
+    "jev_input_tokens": 507681,
+    "jev_spend_usd": 0.021322602000000003,
+    "openrouter_usage_present": true
+  }
+}
