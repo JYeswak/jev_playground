@@ -158,6 +158,21 @@ def nfcorpus_rerank(root: Path) -> tuple[str, str]:
     )
 
 
+def fiqa_rerank(root: Path) -> tuple[str, str]:
+    receipt = json.loads(
+        (root / "work/rerank-scifact/receipt-fiqa-mkex.json").read_text()
+    )
+    return (
+        f"Jev top-1 {receipt['jev_top1']:.1%} vs BM25 {receipt['baseline_top1']:.1%} "
+        f"(McNemar {receipt['mcnemar']['jev_only_wins']} vs "
+        f"{receipt['mcnemar']['bm25_only_wins']}, "
+        f"p={receipt['mcnemar']['two_sided_exact_p']:.3g}); "
+        f"nDCG@10 delta {receipt['ndcg10_delta']:+.3f}; "
+        f"confirmatory top-1 bar passed; ${receipt['spend']['total_input_cost_usd']:.3f}",
+        "Choice rerank",
+    )
+
+
 def render_table(root: Path) -> str:
     rows = [
         (
@@ -181,6 +196,11 @@ def render_table(root: Path) -> str:
             "BEIR NFCorpus rerank",
             *nfcorpus_rerank(root),
             "work/rerank-scifact/receipt-nfcorpus-v2.json",
+        ),
+        (
+            "BEIR FiQA rerank confirmation",
+            *fiqa_rerank(root),
+            "work/rerank-scifact/receipt-fiqa-mkex.json",
         ),
         (
             "OMP judge usage",
