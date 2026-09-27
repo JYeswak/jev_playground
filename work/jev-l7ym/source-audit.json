@@ -1,0 +1,133 @@
+{
+  "bar_alpha": 0.05,
+  "boundary": "Direct find results are the only source with a recorded ranked hit list and outer next-tool sequence. Eval-host find outputs are counted separately; their 30 non-empty outputs had no downstream outer path touch. Model-usage rows are API-request telemetry, not independent ranking outcomes: 2,625 codex rows trace to eval and 702 claude rows trace to direct find/read/bash/grep/glob chains. Broad path-touch is secondary because grep/bash use is not the original read/edit/write outcome. Association only; no causal ranking claim.",
+  "comparator_exact": 12,
+  "cutoff_utc": "2026-09-20T02:24:04.330436+00:00",
+  "direct": {
+    "broad_path_touch": {
+      "actual_top1": {
+        "high": 0.7898753292764273,
+        "hits": 28,
+        "low": 0.5155250737683379,
+        "n": 42,
+        "rate": 0.6666666666666666
+      },
+      "actual_top3": {
+        "high": 0.9754095901266941,
+        "hits": 39,
+        "low": 0.8099057319884169,
+        "n": 42,
+        "rate": 0.9285714285714286
+      },
+      "baseline_top1": {
+        "high": 0.4356720926819536,
+        "hits": 12,
+        "low": 0.17167024626049077,
+        "n": 42,
+        "rate": 0.2857142857142857
+      },
+      "baseline_top3": {
+        "high": 0.8469735971216702,
+        "hits": 31,
+        "low": 0.5893126929422804,
+        "n": 42,
+        "rate": 0.7380952380952381
+      },
+      "mcnemar": {
+        "actual_only": 20,
+        "baseline_only": 4,
+        "p_two_sided_exact": 0.001543879508972168
+      },
+      "n": 42
+    },
+    "broad_tools": {
+      "grep": 11,
+      "read": 31
+    },
+    "narrow_read_edit_write": {
+      "actual_top1": {
+        "high": 0.8036673347185581,
+        "hits": 25,
+        "low": 0.514636672419722,
+        "n": 37,
+        "rate": 0.6756756756756757
+      },
+      "actual_top3": {
+        "high": 0.9571481005958853,
+        "hits": 33,
+        "low": 0.7529146845587398,
+        "n": 37,
+        "rate": 0.8918918918918919
+      },
+      "baseline_top1": {
+        "high": 0.4297816832471427,
+        "hits": 10,
+        "low": 0.15397461511049093,
+        "n": 37,
+        "rate": 0.2702702702702703
+      },
+      "baseline_top3": {
+        "high": 0.8460253848895091,
+        "hits": 27,
+        "low": 0.5702183167528573,
+        "n": 37,
+        "rate": 0.7297297297297297
+      },
+      "mcnemar": {
+        "actual_only": 17,
+        "baseline_only": 2,
+        "p_two_sided_exact": 0.000728607177734375
+      },
+      "n": 37
+    },
+    "narrow_tools": {
+      "read": 37
+    },
+    "profiles": {
+      "claude": 59
+    },
+    "tool_execution_starts": 59,
+    "tool_results": 59
+  },
+  "eval_host": {
+    "nested_find_outputs": 44,
+    "nested_nonempty_outputs": 30,
+    "nested_outputs_with_downstream_path_touch": 0
+  },
+  "files": {
+    "candidate_files": 1008,
+    "files_read": 1007
+  },
+  "fixture": "jev-l7ym-direct-broad-path-touch",
+  "lane": "keyless-log-only",
+  "model_usage": {
+    "by_profile": {
+      "claude": 702,
+      "codex": 2658
+    },
+    "nearest_tool_execution": {
+      "claude:bash": 93,
+      "claude:find": 482,
+      "claude:glob": 9,
+      "claude:grep": 22,
+      "claude:read": 96,
+      "codex:eval": 2658
+    },
+    "purpose_find_rows": 3360
+  },
+  "oracle_headroom": 20,
+  "reachability": {
+    "alpha": 0.05,
+    "comparator_exact": 12,
+    "minimum_attainable_p": 1.9073486328125e-06,
+    "mode": "mcnemar",
+    "oracle_headroom": 20,
+    "preregistered_status": "UNDERPOWERED",
+    "status": "REACHABLE",
+    "tasks": 42
+  },
+  "schema": "jev-l7ym-source-audit.v1",
+  "source": "~/.omp/profiles/*/agent/sessions/**/*.jsonl",
+  "tasks": 42,
+  "window_days": 7
+}
