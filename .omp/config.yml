@@ -105,3 +105,4 @@ extensions:
   - /Users/josh/.omp/omp-extensions/rch-mutator.ts
 #   (xd://jev_screen_ext_probe + nonce + --no-extensions arms), see
 #   work/nev-injection/screen-l2-receipt.json. Retire with the tool.
+  - ./.omp/extensions/jev-gate.ts

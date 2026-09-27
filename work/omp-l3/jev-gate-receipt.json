@@ -1,0 +1,37 @@
+{
+  "schema": "jev-omp-l3/jev-gate-v1",
+  "recoveredFromSession": "/Users/josh/.omp/profiles/codex/agent/sessions/-Developer-jev/2026-09-27T09-24-52-318Z_01a0e22e-7bde-712d-85d7-b9becef3c793.jsonl",
+  "sessionId": "01a0e22e-7bde-712d-85d7-b9becef3c793",
+  "calls": [
+    {
+      "sequence": 1,
+      "phase": "live",
+      "tool": "jev_gate",
+      "verdict": "refuse",
+      "model": "jev-1.13.0",
+      "latencyMs": 176,
+      "usage": {
+        "input_tokens": 747,
+        "output_tokens": 96,
+        "billing_units": null,
+        "extra": {}
+      }
+    },
+    {
+      "sequence": 2,
+      "phase": "refusal",
+      "tool": "jev_gate",
+      "verdict": "refused-by-schema",
+      "model": null,
+      "latencyMs": 0,
+      "usage": null
+    }
+  ],
+  "totals": {
+    "input_tokens": 747,
+    "output_tokens": 96,
+    "estimated_input_spend_usd": 3.1374e-05,
+    "output_spend_usd": 0
+  },
+  "frames_sha256": "20448623d7f2e73acf76483f063c63b9d0a8b4c12494a9b17c6c472bcdce0b68"
+}
