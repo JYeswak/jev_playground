@@ -1,0 +1,83 @@
+{
+  "generated_at": "2026-09-26T23:58:06.354810+00:00",
+  "window_hours": 24,
+  "cutoff": "2026-09-25T23:58:06.354810+00:00",
+  "roots": [
+    "/Users/josh/.agents/skills",
+    "/Users/josh/.claude/skills"
+  ],
+  "skills": [
+    {
+      "skill": "jev-browser-use",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    },
+    {
+      "skill": "jev-compaction",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    },
+    {
+      "skill": "jev-computer-use",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    },
+    {
+      "skill": "jev-frontier-work",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    },
+    {
+      "skill": "jev-mailbox",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    },
+    {
+      "skill": "jev-memory",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    },
+    {
+      "skill": "jev-model-routing",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    },
+    {
+      "skill": "jev-search",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    },
+    {
+      "skill": "jev-setup",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    },
+    {
+      "skill": "jev-skill-select",
+      "reads": 0,
+      "keep_or_prune": "prune"
+    }
+  ],
+  "jev_cli_invocations": 4,
+  "purpose_counts": {},
+  "by_profile": {
+    "claude": {
+      "jev-cli": 4
+    }
+  },
+  "recent_sessions_by_profile": {
+    "agy": 1,
+    "claude": 657,
+    "codex": 1022,
+    "glm": 21,
+    "grok": 131,
+    "jev-lab": 57,
+    "muse": 324,
+    "nv-deepseek-flash": 4,
+    "nv-glm": 4,
+    "nv-glm-flash": 4,
+    "nv-kimi": 4,
+    "omp-test": 4
+  },
+  "boundary": "Only tool-call metadata was scanned; session text and command payloads were not emitted."
+}
