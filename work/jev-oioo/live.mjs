@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import {createHash} from "node:crypto";
 import {readFile, writeFile} from "node:fs/promises";
 import {askJev} from "../../kit/src/client.ts";
 import {SCIFACT_CRITERIA, SCIFACT_INSTRUCTIONS} from "../../kit/src/verify.ts";
@@ -10,6 +11,9 @@ const OUT = new URL(process.env.JEV_OIOO_OUT ?? "var/agent-tmp/jev-oioo/live-res
 const OPENROUTER_MODEL = "dots-studio/dots-3-note-preview:free";
 const RESET_AT = "2026-09-28T00:00:00Z";
 const comparatorOnly = process.env.JEV_OIOO_COMPARATOR_ONLY === "1";
+const DRY_RUN = process.env.JEV_OIOO_DRY_RUN === "1";
+const FAKE_429 = process.env.JEV_OIOO_FAKE_429 === "1";
+const NOW_MS = Date.parse(process.env.JEV_OIOO_NOW ?? new Date().toISOString());
 
 const parseJsonl = async (url) => (await readFile(url, "utf8")).split("\n").filter(Boolean).map(JSON.parse);
 const states = await parseJsonl(STATES);
@@ -19,13 +23,15 @@ const existing = await (async () => { try { return await parseJsonl(OUT); } catc
 const byId = new Map(existing.map((row) => [row.id, row]));
 const question = {type: "noul", instructions: SCIFACT_INSTRUCTIONS, criteria: SCIFACT_CRITERIA};
 const openRouterKey = process.env.OPENROUTER_API_KEY;
-if (!openRouterKey) throw new Error("OPENROUTER_API_KEY is not configured");
+if (!openRouterKey && !DRY_RUN) throw new Error("OPENROUTER_API_KEY is not configured");
 
 async function writeRows() {
   await writeFile(OUT, `${[...byId.values()].map((row) => JSON.stringify(row)).join("\n")}\n`);
 }
 
 async function comparator(state) {
+  if (DRY_RUN && FAKE_429) return {status: "not_run", reason: "openrouter-429-dry-run", retryAfter: RESET_AT, latencyMs: 0};
+  if (DRY_RUN) return {status: "scored", supported: false, confidence: 0.5, latencyMs: 0, usage: {prompt_tokens: 0, completion_tokens: 0}};
   const started = Date.now();
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
@@ -57,6 +63,13 @@ const baseFor = (id) => ({id, gold: items[id].label});
 const pending = comparatorOnly
   ? existing.filter((row) => row.comparator.status === "refused" || row.comparator.status === "not_run")
   : states.filter((row) => !byId.has(row.id)).map((row) => ({id: row.id}));
+const selectedIds = pending.map((row) => row.id);
+const selectedIdsSha256 = createHash("sha256").update(`${[...selectedIds].sort().join("\n")}\n`).digest("hex");
+if (DRY_RUN && NOW_MS < Date.parse(RESET_AT)) {
+  console.log(JSON.stringify({status: "NOT_RUN", selected: pending.length, selectedIdsSha256, sent: 0, reason: "reset-pending", resetAt: RESET_AT}));
+  process.exit(2);
+}
+let sent = 0;
 let stopped = false;
 for (const pendingRow of pending) {
   const id = pendingRow.id;
@@ -71,11 +84,12 @@ for (const pendingRow of pending) {
     row = {...baseFor(id), jev: jevAnswer, comparator: {status: "not_run", reason: "pending", retryAfter: RESET_AT}, wallMs: Date.now() - started};
   }
   if (stopped) { row.comparator = {status: "not_run", reason: "openrouter-429-daily-quota", retryAfter: RESET_AT}; byId.set(id, row); continue; }
+  sent += 1;
   const free = await comparator(state);
   row.comparator = free;
   byId.set(id, row);
   await writeRows();
-  if (free.status === "not_run" && free.reason === "openrouter-429-daily-quota") stopped = true;
+  if (free.status === "not_run" && free.reason.startsWith("openrouter-429")) stopped = true;
 }
 if (stopped) {
   for (const pendingRow of pending) {
@@ -85,4 +99,4 @@ if (stopped) {
   await writeRows();
 }
 const done = [...byId.values()];
-console.log(JSON.stringify({rows: done.length, comparatorOnly, jevRefused: done.filter((x) => x.jev.status !== "scored").length, comparatorRefused: done.filter((x) => x.comparator.status !== "scored").length, comparatorNotRun: done.filter((x) => x.comparator.status === "not_run").length, comparatorModel: OPENROUTER_MODEL}));
+console.log(JSON.stringify({rows: done.length, comparatorOnly, selected: pending.length, selectedIdsSha256, sent, stopped, comparatorRefused: done.filter((x) => x.comparator.status === "refused").length, comparatorNotRun: done.filter((x) => x.comparator.status === "not_run").length, comparatorModel: OPENROUTER_MODEL}));
