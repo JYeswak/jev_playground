@@ -4,7 +4,6 @@ import { mkdtemp } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { installOmp } from '../dist/install.js';
 
 const pi = {
   zod: {
@@ -16,9 +15,24 @@ const pi = {
 
 async function installedTool(name) {
   const repo = await mkdtemp(join(tmpdir(), 'jev-omp-tool-'));
+  const { installOmp } = await import('../dist/install.js');
   await installOmp(repo);
   return import(pathToFileURL(join(repo, '.omp/tools', name)).href);
 }
+
+test('installed omp gate applies the measured RISK cut without executing', async () => {
+  const { default: gateTool } = await installedTool('jev-gate.ts');
+  let seen;
+  const tool = gateTool(pi, async (options) => {
+    seen = options;
+    return { ok: true, answers: { destructive: { noul: 0.89 } }, latencyMs: 4, resolvedModel: 'fake' };
+  });
+  const result = await tool.execute('id', { command: 'rm -rf /important' });
+  assert.equal(seen.state.command, 'rm -rf /important');
+  assert.equal(result.details.verdict, 'flag');
+  assert.equal(result.details.flag, true);
+  assert.match(result.content[0].text, /flag=true/);
+});
 
 test('installed omp rerank calls the measured top-1 Choice design', async () => {
   const { default: rerankTool } = await installedTool('jev-rerank.ts');

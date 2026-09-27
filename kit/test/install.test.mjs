@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdtemp, writeFile, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -25,12 +25,14 @@ test('omp install copies tools and hook without overwriting user files', async (
   assert.equal(first.code, 0);
   const result = JSON.parse(first.stdout);
   assert.equal(result.status, 'READY');
-  assert.equal(result.files.length, 26);
-  assert.equal((await readFile(join(repo, '.omp/jev-kit-manifest.json'), 'utf8')).includes('jev-screen.ts'), true);
+  assert.equal(result.files.length, 28);
+  assert.equal((await readFile(join(repo, '.omp/jev-kit-manifest.json'), 'utf8')).includes('jev-gate.ts'), true);
   const manifest = await readFile(join(repo, '.omp/jev-kit-manifest.json'), 'utf8');
+  assert.equal(manifest.includes('jev-screen.ts'), true);
   assert.equal(manifest.includes('jev-kit/rerank.ts'), true);
   assert.equal(manifest.includes('jev-kit/verify.ts'), true);
   assert.equal(manifest.includes('jev-kit/classify.ts'), true);
+  assert.equal(manifest.includes('jev-kit/gate.ts'), true);
   const second = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
   assert.equal(second.code, 0);
   assert.equal(JSON.parse(second.stdout).status, 'READY');
