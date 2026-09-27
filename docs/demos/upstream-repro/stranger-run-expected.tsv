@@ -11,3 +11,4 @@ npx --prefix kit --no-install jev verify --claim "A low percentage of hematopoie
 npx --prefix kit --no-install jev score --text "it represents better-than-average movie-making that does n't demand a dumb , distracted audience ." --levels kit/examples/sst5-levels.json --fake --robot	0	-
 npx --prefix kit --no-install jev classify --text "How do I locate my card?" --labels kit/examples/banking77-labels.json --fake --robot	0	-
 npx --prefix kit --no-install jev gate --command "npm publish --access public" --fake --robot	0	-
+python3 -c 'from pathlib import Path; Path("var/agent-tmp/jev-omp-demo").mkdir(parents=True, exist_ok=True)' && git init -q var/agent-tmp/jev-omp-demo && npx --prefix kit --no-install jev omp install --dir var/agent-tmp/jev-omp-demo --robot	0	-

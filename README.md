@@ -20,6 +20,31 @@ npx --prefix kit --no-install jev classify --text "How do I locate my card?" --l
 npx --prefix kit --no-install jev gate --command "npm publish --access public" --fake --robot
 ```
 
+### Install Jev into omp
+
+From this checkout, install the project-scoped omp tools into a disposable git repo. The command is keyless and exits 0:
+
+```bash
+python3 -c 'from pathlib import Path; Path("var/agent-tmp/jev-omp-demo").mkdir(parents=True, exist_ok=True)' && git init -q var/agent-tmp/jev-omp-demo && npx --prefix kit --no-install jev omp install --dir var/agent-tmp/jev-omp-demo --robot
+```
+
+Expected JSON has `status: READY` and `repo` set to the disposable directory. The installer refuses to overwrite files it did not create; it records template hashes in `.omp/jev-kit-manifest.json`.
+
+The install currently writes six callable tools, one post-hook, five omp extensions, and the shared kit helpers:
+
+| Installed tool | Measured basis / receipt | Limit to keep in mind |
+|---|---|---|
+| `jev_rerank` | BEIR SciFact and FiQA receipts: `work/rerank-scifact/receipt-fiqa-mkex.json`, `work/rerank-scifact/receipt-nfcorpus-v2.json` | Candidate list must fit the tool's preflight; measured result is top-1 reranking, not arbitrary ranking tasks. |
+| `jev_claim_check` | `docs/demos/upstream-repro/jev-claim-check-20260924.md` | Qualitative claims only; numeric claims are refused before Jev. Verdict cuts are supported >=0.8, unsupported <=0.2, unsure between. |
+| `jev_classify` | Banking77 measurement: `docs/demos/upstream-repro/choice-banking77-20260924.md` | The 80.1% result is the measured Banking77 corpus, not a general classification guarantee. |
+| `jev_gate` | Held-out gate receipt: `work/jev-1lim/final-receipt.json` | Reported rates are stratified sample rates; the receipt contains 47 harm rows, not fleet-wide prevalence. |
+| `jev_flag` | Related web/tool screening receipts in `work/hermes-webscreen-repro/RECEIPT.md` | Installed for the flag seam; no standalone universal flagging accuracy claim is made here. |
+| `jev_screen` | Web-screen receipts: `work/hermes-webscreen-repro/RECEIPT.md` | The cited measurements are bounded corpora and specific states; no general clean-output claim. |
+
+The installed tools load through project scope, so they apply to the throwaway repo regardless of the omp profile. To run the same command in a real project, replace `var/agent-tmp/jev-omp-demo` with that repository path.
+
+`jev omp install` is an installer, not a model call. The tools return keyless `NOT_RUN`/safe results when no TypeSafe key is available.
+
 The example state and Choice question are captured from committed rows: `work/pokeagent-emerald/segment2-request-states.jsonl:1` and `work/pokeagent-emerald/macro_choice.py:73-89`. The fake command uses no network.
 The gate example is a captured public command (`work/jev-yru2-public/commands.jsonl` plus its committed `live-gate-question-retest-20260926.jsonl` answer); `jev gate --fake` uses that fixture offline and returns the frozen RISK decision. The fleet confirmations used the same design: sample rates, not fleet rates, with 47 harm rows in the held-out weighted population.
 The fake command returns `lost_or_stolen_card` (confidence 0.86) for the captured row, while that source row's true label is `card_arrival`; this example shows the tool output, not a guaranteed-correct answer. The measured Banking77 result is 2,467/3,080 (80.1%), not 100%.
