@@ -52,6 +52,18 @@ test('healthy bash command is shadow-scored, hash-only, and never blocked', asyn
   assert.equal(rows[0].jevFlag, false);
 });
 
+test('omp pre-tool alias shape is matched and durably logged', async () => {
+  const rows = [];
+  const fake = asker();
+  const handler = makeGateShadowHandler({ ask: fake.ask, append: async (_path, line) => rows.push(parseRow(line)), session: 's2', now: () => '2026-09-27T00:00:00.000Z' });
+  assert.equal(await handler({ name: 'bash', command: 'printf alias' }), undefined);
+  assert.equal(fake.calls(), 1);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].status, 'scored');
+  assert.equal(rows[0].existingFlagSource, 'gate-observe.jsonl:cmdSha');
+  assert.equal(rows[0].command, undefined);
+});
+
 test('non-bash tool is ignored without an asker call', async () => {
   const fake = asker();
   const handler = makeGateShadowHandler({ ask: fake.ask, append: async () => { throw new Error('must not append'); } });
