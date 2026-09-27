@@ -1,0 +1,47 @@
+{
+  "bead": "jev-mkex",
+  "dataset": "BEIR FiQA-2018 test",
+  "dataset_zip_sha256": "32c7df99ed21252fdfb2cf3f5673502a8d245ee0c44c4a133570d92ce2b3ad02",
+  "original_candidates_sha256": "e1411e654f7f02e2751ce8079d109bbe4b84cb31feb44120d9c4a41c38dccec6",
+  "candidates_sha256": "566622a1b705cf9ae91f235196b0ecd616bc840dc3a41035a078d2995a4c5229",
+  "prereg_sha256": "67db248f534c5c9447b5424c36d1f67e572c165ef1d72431a07ac0ddfe5afe64",
+  "model": "jev-1.13.0",
+  "calls": 323,
+  "answered": 323,
+  "invalid_choices": 0,
+  "excluded_near_limit": 26,
+  "true_bm25_missed_headroom": 196,
+  "rows": "rows-fiqa-mkex-jev.jsonl",
+  "baseline_top1": 0.3931888544891641,
+  "jev_top1": 0.7616099071207431,
+  "top1_delta": 0.3684210526315789,
+  "baseline_ndcg10": 0.43513621723630164,
+  "jev_ndcg10": 0.5917084177553835,
+  "ndcg10_delta": 0.15657220051908188,
+  "mcnemar": {
+    "jev_only_wins": 129,
+    "bm25_only_wins": 10,
+    "two_sided_exact_p": 1.6549161494073387e-27
+  },
+  "latency_ms": {
+    "p50": 266,
+    "p95": 414
+  },
+  "usage": {
+    "input_tokens": 2840901,
+    "output_tokens": 83970,
+    "jev_input_cost_usd": 0.119317842
+  },
+  "bar": {
+    "top1_delta_at_least": 0.05,
+    "mcnemar_p_below": 0.05,
+    "pass": true
+  },
+  "spend": {
+    "total_jev_calls": 323,
+    "total_input_tokens": 2840901,
+    "total_input_cost_usd": 0.119317842,
+    "pricing_basis": "0.042 USD per million input tokens; output free, per AGENTS.md lane policy"
+  },
+  "boundary": "No paid comparator or OpenRouter call. Confirmatory bar is top-1 only; nDCG@10 is descriptive. This receipt covers only the FiQA FITS subset and this BM25/Choice design."
+}
