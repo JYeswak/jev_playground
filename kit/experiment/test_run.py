@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import os
 import subprocess
@@ -13,7 +14,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from kit.experiment.run import run
+from kit.experiment.run import run, verify_reachability
 
 ROOT = Path(__file__).resolve().parents[2]
 RUNNER = ROOT / "kit" / "experiment" / "run.py"
@@ -185,8 +186,20 @@ class SharedRunnerTest(unittest.TestCase):
             items = root / "items.jsonl"
             items.write_text('{"id":"a"}\n')
             receipt = root / "reach.json"
+            prereg = root / "prereg.md"
+            prereg.write_text("reach-mode: mcnemar\n")
             receipt.write_text(
-                json.dumps({"status": "REACHABLE", "items_sha256": "wrong"})
+                json.dumps(
+                    {
+                        "status": "REACHABLE",
+                        "mode": "mcnemar",
+                        "items_sha256": "wrong",
+                        "prereg_path": str(prereg.resolve()),
+                        "prereg_sha256": hashlib.sha256(
+                            prereg.read_bytes()
+                        ).hexdigest(),
+                    }
+                )
             )
             result = subprocess.run(
                 [
@@ -198,6 +211,8 @@ class SharedRunnerTest(unittest.TestCase):
                     str(receipt),
                     "--items",
                     str(items),
+                    "--prereg",
+                    str(prereg),
                     "--pid-file",
                     str(root / "runner.pid"),
                     "--heartbeat-file",
@@ -213,6 +228,77 @@ class SharedRunnerTest(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 2)
             self.assertIn("items_sha256", result.stderr)
+
+    def test_reach_receipt_refuses_mode_mismatch(self) -> None:
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            items = root / "items.jsonl"
+            prereg = root / "prereg.md"
+            items.write_text('{"id":"a"}\n')
+            prereg.write_text("reach-mode: mcnemar\n")
+            receipt = root / "reach.json"
+            receipt.write_text(
+                json.dumps(
+                    {
+                        "status": "REACHABLE",
+                        "mode": "rate",
+                        "items_sha256": hashlib.sha256(items.read_bytes()).hexdigest(),
+                        "prereg_path": str(prereg.resolve()),
+                        "prereg_sha256": hashlib.sha256(
+                            prereg.read_bytes()
+                        ).hexdigest(),
+                    }
+                )
+            )
+            with self.assertRaisesRegex(RuntimeError, "mode"):
+                verify_reachability(receipt, items, prereg)
+
+    def test_reach_receipt_accepts_matching_mode(self) -> None:
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            items = root / "items.jsonl"
+            prereg = root / "prereg.md"
+            items.write_text('{"id":"a"}\n')
+            prereg.write_text("reach-mode: mcnemar\n")
+            receipt = root / "reach.json"
+            receipt.write_text(
+                json.dumps(
+                    {
+                        "status": "REACHABLE",
+                        "mode": "mcnemar",
+                        "items_sha256": hashlib.sha256(items.read_bytes()).hexdigest(),
+                        "prereg_path": str(prereg.resolve()),
+                        "prereg_sha256": hashlib.sha256(
+                            prereg.read_bytes()
+                        ).hexdigest(),
+                    }
+                )
+            )
+            verify_reachability(receipt, items, prereg)
+
+    def test_reach_receipt_refuses_edited_preregistration(self) -> None:
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            items = root / "items.jsonl"
+            prereg = root / "prereg.md"
+            items.write_text('{"id":"a"}\n')
+            prereg.write_text("reach-mode: mcnemar\n")
+            old_hash = hashlib.sha256(prereg.read_bytes()).hexdigest()
+            prereg.write_text("reach-mode: mcnemar\nn: 219\n")
+            receipt = root / "reach.json"
+            receipt.write_text(
+                json.dumps(
+                    {
+                        "status": "REACHABLE",
+                        "mode": "mcnemar",
+                        "items_sha256": hashlib.sha256(items.read_bytes()).hexdigest(),
+                        "prereg_path": str(prereg.resolve()),
+                        "prereg_sha256": old_hash,
+                    }
+                )
+            )
+            with self.assertRaisesRegex(RuntimeError, "prereg"):
+                verify_reachability(receipt, items, prereg)
 
 
 if __name__ == "__main__":

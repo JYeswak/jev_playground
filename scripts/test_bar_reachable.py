@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess  # nosec B404 - fixed local test script only
 import sys
+from tempfile import TemporaryDirectory
 import unittest
 from pathlib import Path
 
@@ -82,6 +84,36 @@ class BarReachabilityTests(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertEqual(receipt["status"], "UNREACHABLE")
         self.assertLess(receipt["wilson_lower_bound_95"], 0.99)
+
+    def test_rate_receipt_records_preregistration_identity(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            prereg = root / "prereg.md"
+            items = root / "items.jsonl"
+            prereg.write_text("reach-mode: rate\nn: 10\n")
+            items.write_text('{"id":"a"}\n')
+            code, receipt = run_checker(
+                "--mode",
+                "rate",
+                "--trials",
+                "10",
+                "--threshold",
+                "0.5",
+                "--prereg",
+                str(prereg),
+                "--items",
+                str(items),
+            )
+            self.assertEqual(code, 0)
+            self.assertEqual(receipt["mode"], "rate")
+            self.assertEqual(receipt["prereg_path"], str(prereg.resolve()))
+            self.assertEqual(
+                receipt["items_sha256"], hashlib.sha256(items.read_bytes()).hexdigest()
+            )
+            self.assertEqual(
+                receipt["prereg_sha256"],
+                hashlib.sha256(prereg.read_bytes()).hexdigest(),
+            )
 
     def test_oracle_headroom_unreachable_when_comparator_misses_would_pass(self):
         code, receipt = run_checker(

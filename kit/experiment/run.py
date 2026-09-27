@@ -7,6 +7,7 @@ import argparse
 import asyncio
 import inspect
 import hashlib
+import hmac
 import json
 import os
 import subprocess
@@ -46,13 +47,28 @@ def _completed_ids(path: Path, id_key: str) -> set[str]:
     return completed
 
 
+def _declared_reach_mode(prereg_path: Path) -> str:
+    for line in prereg_path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("reach-mode:"):
+            mode = line.partition(":")[2].strip()
+            if mode in {"mcnemar", "rate", "auc"}:
+                return mode
+            break
+    raise RuntimeError(f"{prereg_path} must declare reach-mode: mcnemar|rate|auc")
+
+
 def verify_reachability(
-    reach_path: str | os.PathLike[str], items_path: str | os.PathLike[str]
+    reach_path: str | os.PathLike[str],
+    items_path: str | os.PathLike[str],
+    prereg_path: str | os.PathLike[str],
 ) -> None:
-    """Refuse live work unless a reachable receipt matches the exact items file."""
+    """Refuse live work unless receipt, items, and preregistration still match."""
     receipt_path = Path(reach_path)
+    prereg = Path(prereg_path)
     if not receipt_path.exists():
         raise RuntimeError(f"live run requires --reach receipt: {receipt_path}")
+    if not prereg.exists():
+        raise RuntimeError(f"live run requires preregistration: {prereg}")
     try:
         receipt = json.loads(receipt_path.read_text())
     except (OSError, json.JSONDecodeError) as exc:
@@ -65,8 +81,26 @@ def verify_reachability(
     if not isinstance(expected, str) or not expected:
         raise RuntimeError("--reach receipt has no items_sha256")
     actual = hashlib.sha256(Path(items_path).read_bytes()).hexdigest()
-    if actual != expected:
+    if not hmac.compare_digest(actual, expected):
         raise RuntimeError("--reach receipt items_sha256 does not match the items file")
+    receipt_mode = receipt.get("mode")
+    declared_mode = _declared_reach_mode(prereg)
+    if receipt_mode != declared_mode:
+        raise RuntimeError(
+            f"--reach receipt mode {receipt_mode!r} does not match preregistration mode {declared_mode!r}"
+        )
+    expected_prereg = receipt.get("prereg_sha256")
+    if not isinstance(expected_prereg, str) or not expected_prereg:
+        raise RuntimeError("--reach receipt has no prereg_sha256")
+    actual_prereg = hashlib.sha256(prereg.read_bytes()).hexdigest()
+    if not hmac.compare_digest(actual_prereg, expected_prereg):
+        raise RuntimeError(
+            "--reach receipt prereg_sha256 does not match the preregistration"
+        )
+    if receipt.get("prereg_path") != str(prereg.resolve()):
+        raise RuntimeError(
+            "--reach receipt prereg_path does not match the preregistration"
+        )
 
 
 class StopRun(Exception):
@@ -95,6 +129,7 @@ async def run(
     live: bool = False,
     reach: str | os.PathLike[str] | None = None,
     items_path: str | os.PathLike[str] | None = None,
+    prereg_path: str | os.PathLike[str] | None = None,
 ) -> str | None:
     """Process items exactly once per checkpoint id and append each completed row.
 
@@ -106,9 +141,9 @@ async def run(
     path.parent.mkdir(parents=True, exist_ok=True)
     _repair_trailing_line(path)
     if live:
-        if reach is None or items_path is None:
-            raise RuntimeError("live run requires --reach and items_path")
-        verify_reachability(reach, items_path)
+        if reach is None or items_path is None or prereg_path is None:
+            raise RuntimeError("live run requires --reach, --items, and --prereg")
+        verify_reachability(reach, items_path, prereg_path)
     completed = _completed_ids(path, id_key)
     with path.open("ab") as stream:
         for item in items:
@@ -225,6 +260,7 @@ def _main() -> int:
     parser.add_argument("--live", action="store_true")
     parser.add_argument("--reach", type=Path)
     parser.add_argument("--items", type=Path)
+    parser.add_argument("--prereg", type=Path)
     parser.add_argument("--pid-file", type=Path)
     parser.add_argument("--heartbeat-file", type=Path)
     parser.add_argument("--_child", action="store_true", help=argparse.SUPPRESS)
@@ -234,11 +270,14 @@ def _main() -> int:
     if command and command[0] == "--":
         command = command[1:]
     if args.live:
-        if args.reach is None or args.items is None:
-            print("live run requires --reach RECEIPT and --items FILE", file=sys.stderr)
+        if args.reach is None or args.items is None or args.prereg is None:
+            print(
+                "live run requires --reach RECEIPT, --items FILE, and --prereg FILE",
+                file=sys.stderr,
+            )
             return 2
         try:
-            verify_reachability(args.reach, args.items)
+            verify_reachability(args.reach, args.items, args.prereg)
         except RuntimeError as exc:
             print(str(exc), file=sys.stderr)
             return 2

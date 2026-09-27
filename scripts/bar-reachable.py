@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -276,9 +277,35 @@ def flip_fixture_result(path: Path) -> dict[str, Any]:
     return result
 
 
+def _receipt_metadata(prereg_path: Path, items_path: Path, mode: str) -> dict[str, str]:
+    declared_mode = None
+    for line in prereg_path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("reach-mode:"):
+            declared_mode = line.partition(":")[2].strip()
+            break
+    if declared_mode not in {"mcnemar", "rate", "auc"}:
+        raise ValueError(f"{prereg_path} must declare reach-mode: mcnemar|rate|auc")
+    if declared_mode != mode:
+        raise ValueError(
+            f"preregistration declares reach mode {declared_mode!r}, not {mode!r}"
+        )
+    return {
+        "mode": mode,
+        "prereg_path": str(prereg_path.resolve()),
+        "prereg_sha256": hashlib.sha256(prereg_path.read_bytes()).hexdigest(),
+        "items_sha256": hashlib.sha256(items_path.read_bytes()).hexdigest(),
+    }
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=("mcnemar", "rate", "auc"), default="mcnemar")
+    parser.add_argument(
+        "--prereg", type=Path, help="preregistration declaring reach-mode"
+    )
+    parser.add_argument(
+        "--items", type=Path, help="exact items file hashed into the receipt"
+    )
     parser.add_argument(
         "--flip-fixture",
         type=Path,
@@ -386,6 +413,10 @@ def main(argv: list[str] | None = None) -> int:
                     result["oracle_headroom_source"] = (
                         "committed preflight oracle winner count"
                     )
+        if args.prereg is not None or args.items is not None:
+            if args.prereg is None or args.items is None:
+                raise ValueError("--prereg and --items must be supplied together")
+            result.update(_receipt_metadata(args.prereg, args.items, result["mode"]))
     except ValueError as exc:
         print(json.dumps({"status": "ERROR", "error": str(exc)}, sort_keys=True))
         return 2
