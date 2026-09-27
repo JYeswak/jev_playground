@@ -10,7 +10,7 @@
   "mode": "mcnemar",
   "planted_rows": 300,
   "prereg_path": "work/jev-pgtu/prereg.md",
-  "prereg_sha256": "f0cccf8d467d5065615c6b0a06ce4297ceafc98145d89b4652933d8675480f56",
+  "prereg_sha256": "f4eeb0cda8f105be8e265c98cc1e9f73589abdbb1cbeb08f01bf89644a5997d7",
   "source": "ARITHMETIC; two paired McNemar bars; no comparator call",
   "status": "REACHABLE",
   "unit": "jev-pgtu"
