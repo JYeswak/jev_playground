@@ -2671,3 +2671,10 @@ Boundary: this is a repository-local receipt check. It does not inspect or mutat
 - Restart smoke: a fresh `omp --mode=rpc --max-time=20` session returned `ready`, protocol negotiation success, and `get_state` success. Hook-specific firing remains **L2 loaded smoke only**, not L3; no 48-hour analyzable-window count yet.
 - Boundary: the 48-hour forward collection is pending; this commit establishes the no-call collector and privacy/test gates, not a ranking result.
 - Boundary: direct history contains only 59 visible find executions in the available session corpus; widening the window did not add direct events. Broad path-touch is diagnostic, not the original read/edit/write endpoint. One operator host find call occurred during diagnosis outside the scoring run; spend $0.000815514, excluded from these results.
+
+## jev-bzl7 — web-search rerank shadow L2 [keyless, 2026-09-27]
+
+- Hook: `.omp/hooks/post/jev-web-search-rerank.ts`; tests: `.omp/hooks/post/jev-web-search-rerank.test.mjs`; receipt: `work/rerank-scifact/l2-web-search-receipt.json`.
+- L2 proof: fresh `omp --mode=rpc --no-ui --max-time=20 --hook .omp/hooks/post/jev-web-search-rerank.ts` session `01a0e0c3-b3ec-7064-93e3-9a1e06486eab`; protocol v2 negotiation succeeded, `get_state` succeeded, and hook-load error count was 0.
+- Offline proof: 5/5 shadow tests; cap and 402 stop; hash-only row; next-ten open tracking; real `~/.local/state/jev/websearch-rerank.jsonl` line count remained 0→0 during tests; cap mutation made tests RED and was restored.
+- Boundary: this is L2 load evidence only; no real web_search row or Jev spend yet. The required 48-hour report comparing Jev-pick versus provider-rank-1 opens is pending.
