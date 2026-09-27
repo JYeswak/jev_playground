@@ -29,7 +29,9 @@ function validateLabels(labels: readonly string[]): string[] {
   if (labels.some((label) => typeof label !== "string" || label.length === 0)) {
     throw new Error("classify labels must be non-empty strings");
   }
-  if (new Set(labels).size !== labels.length) throw new Error("classify labels must be unique");
+  if (new Set(labels).size !== labels.length) {
+    throw new Error("classify labels must be unique");
+  }
   return [...labels];
 }
 

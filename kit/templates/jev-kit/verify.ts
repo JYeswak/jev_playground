@@ -36,7 +36,11 @@ export async function verifyClaim(options: VerifyOptions): Promise<VerifyResult>
   }
 
   const state = { claim: options.claim, evidence: options.evidence };
-  const question = { type: "noul", instructions: SCIFACT_INSTRUCTIONS, criteria: SCIFACT_CRITERIA };
+  const question = {
+    type: "noul",
+    instructions: SCIFACT_INSTRUCTIONS,
+    criteria: SCIFACT_CRITERIA,
+  };
   sizePreflight(state, { value: question });
 
   const ask = options.ask ?? askJev;
