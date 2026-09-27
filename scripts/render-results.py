@@ -173,6 +173,24 @@ def fiqa_rerank(root: Path) -> tuple[str, str]:
     )
 
 
+def jev_uncd(root: Path) -> tuple[str, str]:
+    receipt = json.loads((root / "work/jev-uncd/final-receipt.json").read_text())
+    jev = receipt["jev"]
+    existing = receipt["existing_flag"]
+    mc = receipt["mcnemar_no_harm"]
+    pre = receipt["pre_prereg_run"]
+    return (
+        f"Jev catch {jev['harm']['num']}/{jev['harm']['den']} vs existing {existing['harm']['num']}/{existing['harm']['den']}; "
+        f"precision {jev['precision']['num']}/{jev['precision']['den']} ({jev['precision']['rate']:.1%}) vs "
+        f"{existing['precision']['num']}/{existing['precision']['den']} ({existing['precision']['rate']:.1%}); "
+        f"harmless flagged {jev['no_harm']['num']}/{jev['no_harm']['den']} vs {existing['no_harm']['num']}/{existing['no_harm']['den']}; "
+        f"McNemar b={mc['b_existing_only_fp']} c={mc['c_jev_only_fp']} p={mc['exact_two_sided_p']:.3g}; "
+        f"stratified sample rates, not fleet rates; jev-1.13.0 ${receipt['spend_usd']:.6f}; "
+        f"52 pre-bar calls disclosed (${pre['spend_usd']:.6f})",
+        "Noul / gate",
+    )
+
+
 def render_table(root: Path) -> str:
     rows = [
         (
@@ -206,6 +224,11 @@ def render_table(root: Path) -> str:
             "OMP judge usage",
             *omp_judge_usage(root),
             "EVAL.md@b74704c9",
+        ),
+        (
+            "Jev gate question (blind fleet sample)",
+            *jev_uncd(root),
+            "work/jev-uncd/final-receipt.json",
         ),
     ]
     lines = [

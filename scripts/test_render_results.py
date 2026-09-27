@@ -35,6 +35,7 @@ class RenderResultsTest(unittest.TestCase):
             "SciFact claim verification",
             "MiniWoB v3 held-out",
             "OMP judge usage",
+            "Jev gate question (blind fleet sample)",
             "Replicated web-screen",
         ):
             self.assertIn(surface, table)
@@ -42,6 +43,8 @@ class RenderResultsTest(unittest.TestCase):
         self.assertIn("find 1,595", table)
         self.assertIn("68/78", table)
         self.assertIn("kerpopule/hermes-jev-skills@cf9e84c", table)
+        self.assertIn("stratified sample rates", table)
+        self.assertIn("pre-bar calls disclosed", table)
         self.assertNotIn("BEIR SciFact reranking", table)
         self.assertNotIn("35.62%", table)
 
