@@ -1,6 +1,7 @@
 import { appendFile, mkdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import { askJevBundle } from "../../kit/src/client.ts";
+import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 import { rerankTop1 } from "../../kit/src/rerank.ts";
 import { CUT, RISK, STATE_CONTEXT } from "../../work/bicameral-gate/questions.mjs";
 
@@ -25,6 +26,7 @@ async function appendRow(path: string, row: Record<string, unknown>): Promise<vo
 }
 
 async function main(): Promise<void> {
+  useInfisicalKey();
   const job = await readJob();
   try {
     if (job.kind === "gate") {
