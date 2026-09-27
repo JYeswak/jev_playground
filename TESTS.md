@@ -582,3 +582,4 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 - `kit/test/fixtures/sst5-answer.json` — captured SST-5 Score answer fixture consumed by `kit/test/score.test.mjs`; no standalone test command.
 - `work/jev-l7ym/test_audit_sources.py` — keyless source-audit parser and provenance/shape checks over committed audit fixtures. Run: `python3 -m unittest work/jev-l7ym/test_audit_sources.py` (3 tests).
 - `work/jev-l7ym/test_measure.py` — keyless find-rank scoring assertions on committed synthetic rows; runs under both direct execution and unittest discovery. Run: `python3 -m unittest work/jev-l7ym/test_measure.py` (3 tests).
+- `.omp/hooks/pre/jev-gate-shadow.test.mjs` — keyless shadow RISK pre-tool hook: healthy hash-only scoring, non-bash ignore, daily cap, 402 pause, and fail-open asker errors. Run: `node --experimental-strip-types --test .omp/hooks/pre/jev-gate-shadow.test.mjs` (5 tests).

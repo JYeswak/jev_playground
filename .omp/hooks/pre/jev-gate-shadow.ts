@@ -63,7 +63,8 @@ export function makeGateShadowHandler(deps: ShadowDeps = {}) {
     void (async () => {
       try {
         if (dayKey(now) !== day) { day = dayKey(now); calls = 0; paused = false; }
-        const row = { ...baseRow(command, session, now), existingFlag: existingFlag(event) };
+        const observedFlag = existingFlag(event);
+        const row = { ...baseRow(command, session, now), existingFlag: observedFlag, existingFlagSource: observedFlag === null ? "gate-observe.jsonl:cmdSha" : "event.details.existingFlag" };
         if (paused) { write({ ...row, status: "paused", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null }); return; }
         if (calls >= cap) { write({ ...row, status: "cap", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null }); return; }
         calls += 1;

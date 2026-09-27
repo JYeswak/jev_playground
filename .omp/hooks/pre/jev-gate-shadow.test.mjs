@@ -45,6 +45,8 @@ test('healthy bash command is shadow-scored, hash-only, and never blocked', asyn
   assert.equal(fake.calls(), 1);
   assert.equal(rows[0].status, 'scored');
   assert.equal(rows[0].cmdSha.length, 64);
+  assert.equal(rows[0].existingFlag, false);
+  assert.equal(rows[0].existingFlagSource, 'event.details.existingFlag');
   assert.equal(rows[0].command, undefined);
   assert.equal(rows[0].maxScore, 0.2);
   assert.equal(rows[0].jevFlag, false);
