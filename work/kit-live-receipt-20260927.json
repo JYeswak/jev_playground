@@ -1,0 +1,381 @@
+{
+  "all_commands_exit_0": true,
+  "bead": "jev-k26w",
+  "boundary": "One live call per README verb; no --fake; comparison is against the cited committed answer row and is not a general benchmark.",
+  "calls": 4,
+  "comparison_summary": {
+    "classify": "exact match",
+    "rerank": "exact match",
+    "score": "exact match",
+    "verify": "0.24 vs committed 0.27, absolute delta 0.03 within preregistered receipt tolerance 0.05"
+  },
+  "estimated_input_spend_usd": 0.00014582400000000002,
+  "input_tokens": 3472,
+  "model": "jev-1.13.0",
+  "output_tokens": 1126,
+  "rows": [
+    {
+      "answer": {
+        "confidence": 0.77,
+        "label": "lost_or_stolen_card",
+        "latencyMs": 288,
+        "model": "jev-1.13.0",
+        "ok": true,
+        "probabilities": {
+          "Refund_not_showing_up": 0,
+          "activate_my_card": 0,
+          "age_limit": 0,
+          "apple_pay_or_google_pay": 0,
+          "atm_support": 0,
+          "automatic_top_up": 0,
+          "balance_not_updated_after_bank_transfer": 0,
+          "balance_not_updated_after_cheque_or_cash_deposit": 0,
+          "beneficiary_not_allowed": 0,
+          "cancel_transfer": 0,
+          "card_about_to_expire": 0,
+          "card_acceptance": 0,
+          "card_arrival": 0.16,
+          "card_delivery_estimate": 0.04,
+          "card_linking": 0,
+          "card_not_working": 0,
+          "card_payment_fee_charged": 0,
+          "card_payment_not_recognised": 0,
+          "card_payment_wrong_exchange_rate": 0,
+          "card_swallowed": 0,
+          "cash_withdrawal_charge": 0,
+          "cash_withdrawal_not_recognised": 0,
+          "change_pin": 0,
+          "compromised_card": 0,
+          "contactless_not_working": 0,
+          "country_support": 0,
+          "declined_card_payment": 0,
+          "declined_cash_withdrawal": 0,
+          "declined_transfer": 0,
+          "direct_debit_payment_not_recognised": 0,
+          "disposable_card_limits": 0,
+          "edit_personal_details": 0,
+          "exchange_charge": 0,
+          "exchange_rate": 0,
+          "exchange_via_app": 0,
+          "extra_charge_on_statement": 0,
+          "failed_transfer": 0,
+          "fiat_currency_support": 0,
+          "get_disposable_virtual_card": 0,
+          "get_physical_card": 0.01,
+          "getting_spare_card": 0,
+          "getting_virtual_card": 0,
+          "lost_or_stolen_card": 0.79,
+          "lost_or_stolen_phone": 0,
+          "order_physical_card": 0,
+          "passcode_forgotten": 0,
+          "pending_card_payment": 0,
+          "pending_cash_withdrawal": 0,
+          "pending_top_up": 0,
+          "pending_transfer": 0,
+          "pin_blocked": 0,
+          "receiving_money": 0,
+          "request_refund": 0,
+          "reverted_card_payment?": 0,
+          "supported_cards_and_currencies": 0,
+          "terminate_account": 0,
+          "top_up_by_bank_transfer_charge": 0,
+          "top_up_by_card_charge": 0,
+          "top_up_by_cash_or_cheque": 0,
+          "top_up_failed": 0,
+          "top_up_limits": 0,
+          "top_up_reverted": 0,
+          "topping_up_by_card": 0,
+          "transaction_charged_twice": 0,
+          "transfer_fee_charged": 0,
+          "transfer_into_account": 0,
+          "transfer_not_received_by_recipient": 0,
+          "transfer_timing": 0,
+          "unable_to_verify_identity": 0,
+          "verify_my_identity": 0,
+          "verify_source_of_funds": 0,
+          "verify_top_up": 0,
+          "virtual_card_not_working": 0,
+          "visa_or_mastercard": 0,
+          "why_verify_identity": 0,
+          "wrong_amount_of_cash_received": 0,
+          "wrong_exchange_rate_for_cash_withdrawal": 0
+        },
+        "usage": {
+          "billing_units": null,
+          "extra": {},
+          "input_tokens": 1023,
+          "output_tokens": 829
+        }
+      },
+      "command": [
+        "node",
+        "bin/jev.mjs",
+        "classify",
+        "--text",
+        "How do I locate my card?",
+        "--labels",
+        "examples/banking77-labels.json",
+        "--robot"
+      ],
+      "comparison": {
+        "close": true,
+        "expected": "lost_or_stolen_card",
+        "kind": "exact",
+        "observed": "lost_or_stolen_card"
+      },
+      "exit_code": 0,
+      "expected_committed": "lost_or_stolen_card",
+      "latency_ms": 428,
+      "match": true,
+      "model": "jev-1.13.0",
+      "usage": {
+        "billing_units": null,
+        "extra": {},
+        "input_tokens": 1023,
+        "output_tokens": 829
+      },
+      "verb": "classify"
+    },
+    {
+      "answer": {
+        "choice": "181942",
+        "latencyMs": 300,
+        "model": "jev-1.13.0",
+        "ok": true,
+        "orderedCandidates": [
+          {
+            "id": "181942",
+            "text": "captured live candidate",
+            "title": ""
+          },
+          {
+            "id": "180146",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "44955",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "597519",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "381884",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "145999",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "198532",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "561750",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "314056",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "197478",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "528880",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "273645",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "506448",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "97010",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "287999",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "103176",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "457455",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "561695",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "298796",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          },
+          {
+            "id": "446190",
+            "text": "captured public FiQA candidate",
+            "title": ""
+          }
+        ],
+        "usage": {
+          "billing_units": null,
+          "extra": {},
+          "input_tokens": 1512,
+          "output_tokens": 260
+        }
+      },
+      "command": [
+        "node",
+        "bin/jev.mjs",
+        "rerank",
+        "--query",
+        "Which passage answers this financial question?",
+        "--candidates",
+        "examples/rerank-candidates.json",
+        "--robot"
+      ],
+      "comparison": {
+        "close": true,
+        "expected": "181942",
+        "kind": "exact",
+        "observed": "181942"
+      },
+      "exit_code": 0,
+      "expected_committed": "181942",
+      "latency_ms": 435,
+      "match": true,
+      "model": "jev-1.13.0",
+      "usage": {
+        "billing_units": null,
+        "extra": {},
+        "input_tokens": 1512,
+        "output_tokens": 260
+      },
+      "verb": "rerank"
+    },
+    {
+      "answer": {
+        "label": "unsupported",
+        "latencyMs": 405,
+        "model": "jev-1.13.0",
+        "ok": true,
+        "threshold": 0.5,
+        "usage": {
+          "billing_units": null,
+          "extra": {},
+          "input_tokens": 559,
+          "output_tokens": 20
+        },
+        "value": 0.24
+      },
+      "command": [
+        "node",
+        "bin/jev.mjs",
+        "verify",
+        "--claim",
+        "A low percentage of hematopoietic progenitor cells are susceptible to HIV-1 infection ex vivo.",
+        "--evidence",
+        "examples/scifact-evidence.txt",
+        "--robot"
+      ],
+      "comparison": {
+        "absolute_delta": 0.030000000000000027,
+        "close": true,
+        "expected": 0.27,
+        "kind": "numeric-close",
+        "observed": 0.24,
+        "tolerance": 0.05
+      },
+      "exit_code": 0,
+      "expected_committed": 0.27,
+      "latency_ms": 543,
+      "match": false,
+      "model": "jev-1.13.0",
+      "usage": {
+        "billing_units": null,
+        "extra": {},
+        "input_tokens": 559,
+        "output_tokens": 20
+      },
+      "verb": "verify"
+    },
+    {
+      "answer": {
+        "confidence": 0.99,
+        "latencyMs": 334,
+        "level": "Positive: somewhat favorable or approving",
+        "model": "jev-1.13.0",
+        "ok": true,
+        "probabilities": {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 1,
+          "4": 0
+        },
+        "score": 3,
+        "usage": {
+          "billing_units": null,
+          "extra": {},
+          "input_tokens": 378,
+          "output_tokens": 17
+        }
+      },
+      "command": [
+        "node",
+        "bin/jev.mjs",
+        "score",
+        "--text",
+        "it represents better-than-average movie-making that does n't demand a dumb , distracted audience .",
+        "--levels",
+        "examples/sst5-levels.json",
+        "--robot"
+      ],
+      "comparison": {
+        "close": true,
+        "expected": 3,
+        "kind": "exact",
+        "observed": 3
+      },
+      "exit_code": 0,
+      "expected_committed": 3,
+      "latency_ms": 426,
+      "match": true,
+      "model": "jev-1.13.0",
+      "usage": {
+        "billing_units": null,
+        "extra": {},
+        "input_tokens": 378,
+        "output_tokens": 17
+      },
+      "verb": "score"
+    }
+  ]
+}
