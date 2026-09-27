@@ -1,7 +1,7 @@
 {
-  "fixture": "jev-mkex FiQA eligible top-1 confirmation",
-  "tasks": 329,
-  "comparator_exact": 129,
+  "fixture": "jev-mkex FiQA FITS top-1 confirmation",
+  "tasks": 323,
+  "comparator_exact": 127,
   "oracle_headroom": 17,
   "bar_alpha": 0.05
 }
