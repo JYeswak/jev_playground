@@ -459,14 +459,24 @@ leak. This section is as load-bearing as the deletion rule.
   (`fast-jev-compaction`, official SDKs) vs `JEV_API_KEY` (`jev-review`). Read the client before
   assuming; a missing key surfaces as a *thrown error*, not a silent local fallback, in every
   client in this workspace. That is the correct design; copy it.
-- **No unattended live loops.** Never leave a live-calling script running in the background,
-  in a watcher, in a cron, or in an `ntm` pane you are not reading. A retry loop against a
-  metered endpoint is a billing incident.
+- **Live Jev calls are allowed, attended or not (Joshua, 2026-09-27, verbatim: *"we need to update
+  agents.md to allow live-calling on jev - how can we validate & test what we're building without
+  live calls"*).** Scheduled canaries, supervised background runs, and shadow hooks on real traffic
+  may call Jev without a pane watching. What makes one safe is its shape, not a watcher:
+  - **bounded**: a fixed number of calls per run or per day, written in the script;
+  - **no retry storm**: stop on 401/402/403 and after the SDK's retries, never loop on failure;
+  - **checkpointed**: every call leaves a row (model id, tokens, latency, status) a later reader can
+    count, e.g. `kit/experiment/run.py`;
+  - **spend stated** in the receipt.
+
+  This covers Jev (`api.typesafe.ai`) only. Paid comparator models still follow
+  [No paid comparisons](#no-paid-comparisons--joshua-2026-09-24).
 - **Never commit a captured response body containing anything derived from a real customer
   state.** The `state` you send is the interesting part of a demo and also the part most likely
   to contain someone's data.
-- **Budget discipline:** offline first (see the lane split). If a change can be proven against a
-  fake asker, proving it live is waste, not rigor.
+- **Offline tests and live runs do different jobs.** Offline tests prove our policy, validator and
+  fail-safe side (injected asker). Only live calls prove what Jev does. Both are required; neither
+  replaces the other.
 
 ---
 
@@ -717,8 +727,9 @@ one of them was cost:
   a probabilistic dependency cannot be unit-tested through the network. That was never about money.
 - **STANDING — preregistration.** Bar in a committed file before the first call. Cost was never why
   that rule exists; it exists because a bar set after seeing data is not a bar.
-- **STANDING — no unattended live loops.** A retry loop nobody is reading is a defect, not a budget
-  decision. An unbounded loop against a metered endpoint is still an incident.
+- **STANDING — bounded live runs.** Unattended Jev calls are allowed (2026-09-27); an unbounded
+  loop or a retry storm against a metered endpoint is still an incident. Bound it, stop on
+  401/402/403, checkpoint every call.
 - **STANDING — say what you spent.** Not for permission. Cost per result is a reportable property
   of a method, and "Jev ties an LLM at 1/100th the cost" is a claim we can only make if we measured
   both sides.
