@@ -1,0 +1,67 @@
+{
+  "status": "LIVE_COMPLETE",
+  "created_at": "2026-09-27T08:58:34.605799Z",
+  "model": "jev-1.13.0",
+  "comparator": "dots-studio/dots-3-note-preview:free",
+  "corpus_sha256": "591ba40224ccea0c0873b7dfea64a85ec53ce16b476e71d4336115d5f7d884b7",
+  "prereg_sha256": "d684bce6f9e808159378e2f1a50abe6a37f380097e6a4154b31fe978e5af34e6",
+  "rows": 300,
+  "stop_reason": null,
+  "usage_before": {
+    "captured_at": "2026-09-27T06:49:00.940145Z",
+    "usage_daily": 0,
+    "usage": 100.199757412,
+    "limit": null,
+    "limit_remaining": null
+  },
+  "usage_after": {
+    "captured_at": "2026-09-27T08:58:34.604531Z",
+    "usage_daily": 0,
+    "usage": 100.199757412,
+    "limit": null,
+    "limit_remaining": null
+  },
+  "spend": {
+    "jev": {
+      "responses": 300,
+      "input_tokens": 119708,
+      "output_tokens": 5400,
+      "input_rate_usd_per_million": 0.042,
+      "input_cost_usd": 0.005027736,
+      "output_cost_usd": 0.0
+    },
+    "comparator": {
+      "responses": 274,
+      "input_tokens": 47369,
+      "output_tokens": 565017,
+      "model_is_free": true,
+      "cost_usd": 0.0,
+      "openrouter_usage_before": 100.199757412,
+      "openrouter_usage_after": 100.199757412,
+      "openrouter_usage_delta": 0.0
+    }
+  },
+  "stats": {
+    "paired_valid": 274,
+    "invalid": {
+      "jev": 0,
+      "comparator": 26
+    },
+    "jev_mae": 0.5182481751824818,
+    "comparator_mae": 1.3284671532846715,
+    "mean_ae_difference_jev_minus_comparator": -0.8102189781021898,
+    "jev_exact_accuracy": 0.5255474452554745,
+    "comparator_exact_accuracy": 0.20072992700729927,
+    "permutation": {
+      "seed": 20260927,
+      "flips": 10000,
+      "p_value": 9.999000099990002e-05
+    },
+    "pass_bar": {
+      "paired_valid_ge_278": false,
+      "jev_mae_lt_comparator": true,
+      "p_lt_005": true,
+      "confirmation": false
+    }
+  }
+}
