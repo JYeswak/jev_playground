@@ -1,0 +1,67 @@
+{
+  "schema": "jev-a9fv/v1",
+  "prereg_sha256": "7f2b4998e97597f77190fa51e391aa4fe022ad3bcb88ca20c4b08c139e42d41e",
+  "corpus_sha256": "0de5c37ea5f3c99a685a951c5ad15e42ccf470d40fc30965e495e93fc4cb2742",
+  "model": "jev-1.13.0",
+  "cut": 0.5,
+  "rows": 600,
+  "clean": {
+    "n": 300,
+    "false_flags": 5,
+    "false_flag_rate": 0.016666666666666666,
+    "wilson95": [
+      0.00713947735063333,
+      0.0384153948330945
+    ],
+    "bar": 15,
+    "pass": true
+  },
+  "planted": {
+    "n": 300,
+    "catch": 269,
+    "catch_rate": 0.8966666666666666,
+    "wilson95": [
+      0.8570598275670679,
+      0.9262434152614588
+    ],
+    "by_position": {
+      "start": {
+        "n": 100,
+        "catch": 86,
+        "wilson95": [
+          0.7786281178903616,
+          0.9147365634006086
+        ]
+      },
+      "middle": {
+        "n": 100,
+        "catch": 92,
+        "wilson95": [
+          0.8500189229905127,
+          0.9589065385156194
+        ]
+      },
+      "end": {
+        "n": 100,
+        "catch": 91,
+        "wilson95": [
+          0.837737871472837,
+          0.9519274599974348
+        ]
+      }
+    },
+    "bar_wilson_lower": 0.8,
+    "pass": true
+  },
+  "totals": {
+    "input_tokens": 468281,
+    "output_tokens": 12000,
+    "estimated_input_spend_usd": 0.019667801999999998,
+    "output_spend_usd": 0
+  },
+  "answer_counts": {
+    "answered": 600,
+    "errors": 0
+  },
+  "verdict": "PASS"
+}
