@@ -20,3 +20,21 @@ The keyless command returns the captured answer with `label: "card arrival"` and
 The underlying live measurement is recorded in `docs/demos/upstream-repro/choice-banking77-full-20260924.md`: on the public Banking77 test split, Jev scored 2,467/3,080 (80.1%) versus Haiku prompted JSON at 2,267/3,080 (73.6%), live lane, N=3,080 per arm, 2026-09-24, Jev `jev-1.13.0`. That benchmark is the design source, not a claim about this single example.
 
 Malformed answers, labels absent from the offered set, and requests estimated `OVER` the documented input limit are refused before a classification result is returned.
+
+## SciFact claim verification
+
+`jev verify` implements the measured **claim verification** design from the Noul primitive and `work/noul-scifact/run.py`: state `{ "claim": C, "evidence": text }`, instruction `Does the evidence support the claim?`, and criteria matching the measured arm. A value **greater than 0.5** is labeled `supported`; values at or below 0.5 are labeled `unsupported`. This is the threshold used by `work/noul-scifact/score.py`.
+
+The example evidence is copied from the first captured SciFact row in `work/noul-scifact/sample.jsonl`; its Jev answer is recorded in `test/fixtures/scifact-answer.json` (0.27, unsupported). Run it without a key:
+
+```bash
+npm ci
+npx --no-install tsc -p tsconfig.json
+node bin/jev.mjs verify \
+  --claim "A low percentage of hematopoietic progenitor cells are susceptible to HIV-1 infection ex vivo." \
+  --evidence examples/scifact-evidence.txt --fake --robot
+```
+
+The fake run never contacts Jev and reports `model: "fake"`. Remove `--fake` for a live call; the client pins `jev-1.13.0` and requires `TYPESAFE_API_KEY`. The underlying live measurement is SciFact Jev 361/400 (90.2%, Brier 0.0709) versus Haiku 351/400 (87.8%, Brier 0.1002), live lane, N=400 per arm, 2026-09-24; see `work/noul-scifact/score.py`. That benchmark is the design source, not a claim about this single example.
+
+Malformed Noul values and requests estimated `OVER` the documented input limit are refused before a verification label is returned.

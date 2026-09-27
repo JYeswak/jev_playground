@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { askJev, askJevChoice, askJevScore, DEFAULT_MODEL } from "../dist/client.js";
 import { rerankTop1 } from "../dist/rerank.js";
 import { classifyText } from "../dist/classify.js";
+import { verifyClaim } from "../dist/verify.js";
 import { createFakeFetch } from "../dist/fake.js";
 import { installOmp, ompDiscovery } from "../dist/install.js";
 
@@ -75,7 +76,7 @@ async function ask(args) {
   } else if (kind === "score") {
     result = await askJevScore({ state, instructions: question.instructions ?? "", criteria: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
   } else {
-    result = await askJev({ state, questions: { value: question.instructions ?? question } , apiKey: fake ? "fixture-key" : undefined, fetchImpl });
+    result = await askJev({ state, questions: { value: question.instructions ?? question }, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
   }
   if (robot) robotPrint(result);
   else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
@@ -101,6 +102,7 @@ async function rerank(args) {
   else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
   return 0;
 }
+
 async function classify(args) {
   const robot = hasFlag(args, "--robot");
   const fake = hasFlag(args, "--fake");
@@ -127,6 +129,32 @@ async function classify(args) {
   return 0;
 }
 
+async function verify(args) {
+  const robot = hasFlag(args, "--robot");
+  const fake = hasFlag(args, "--fake");
+  const claim = option(args, "--claim");
+  const evidencePath = option(args, "--evidence");
+  if (!claim || !evidencePath) {
+    const error = { status: "ERROR", reason: "usage", message: "jev verify --claim C --evidence FILE [--robot] [--fake]" };
+    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
+    return 1;
+  }
+  const evidence = await readFile(resolve(evidencePath), "utf8");
+  const fetchImpl = fake
+    ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/scifact-answer.json", ROOT), "utf8")))
+    : undefined;
+  const result = await verifyClaim({
+    claim,
+    evidence,
+    apiKey: fake ? "fixture-key" : undefined,
+    fetchImpl,
+    model: fake ? "fake" : undefined,
+  });
+  if (robot) robotPrint(result);
+  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  return 0;
+}
+
 const args = process.argv.slice(2);
 const robot = hasFlag(args, "--robot");
 let exitCode;
@@ -135,13 +163,14 @@ try {
   else if (args[0] === "ask") exitCode = await ask(args);
   else if (args[0] === "rerank") exitCode = await rerank(args);
   else if (args[0] === "classify") exitCode = await classify(args);
+  else if (args[0] === "verify") exitCode = await verify(args);
   else if (args[0] === "omp" && args[1] === "install") {
     const repo = option(args, "--dir") ?? process.cwd();
     const result = await installOmp(repo, hasFlag(args, "--dry-run"));
     if (robot) robotPrint(result); else process.stdout.write(`${result.status}: installed ${result.files.length} files in ${result.repo}\n`);
     exitCode = 0;
   } else {
-    const error = { status: "ERROR", reason: "usage", message: "jev doctor [--robot] or jev ask ..." };
+    const error = { status: "ERROR", reason: "usage", message: "jev doctor|ask|rerank|classify|verify ..." };
     if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
     exitCode = 1;
   }

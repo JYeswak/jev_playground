@@ -2678,3 +2678,9 @@ Boundary: this is a repository-local receipt check. It does not inspect or mutat
 - L2 proof: fresh `omp --mode=rpc --no-ui --max-time=20 --hook .omp/hooks/post/jev-web-search-rerank.ts` session `01a0e0c3-b3ec-7064-93e3-9a1e06486eab`; protocol v2 negotiation succeeded, `get_state` succeeded, and hook-load error count was 0.
 - Offline proof: 5/5 shadow tests; cap and 402 stop; hash-only row; next-ten open tracking; real `~/.local/state/jev/websearch-rerank.jsonl` line count remained 0→0 during tests; cap mutation made tests RED and was restored.
 - Boundary: this is L2 load evidence only; no real web_search row or Jev spend yet. The required 48-hour report comparing Jev-pick versus provider-rank-1 opens is pending.
+## 2026-09-27 jev-kit SciFact verify verb
+
+- kit/src/verify.ts implements the measured SciFact Noul design from work/noul-scifact/run.py: state { claim, evidence }, the recorded instruction and criteria, size preflight, strict value validation, and the preregistered >0.5 supported cut.
+- kit/bin/jev.mjs verify --claim C --evidence FILE --fake --robot and kit/examples/scifact-evidence.txt provide a stranger-runnable keyless example; the fake fixture is from SciFact row i=0 (noul=0.27, model jev-1.13.0).
+- Offline verification: npx --no-install tsc -p tsconfig.json; node --test test/*.test.mjs 30/30; CLI smoke emits ok:true, value:0.27, label:unsupported, model:fake.
+- Boundary: no live Jev call in this implementation pass; live claim remains unmeasured here. UBS scanned the changed TS/JS/test files but returned nonzero on existing CLI warnings; no UBS finding was introduced in verify.ts.
