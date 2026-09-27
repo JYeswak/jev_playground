@@ -61,6 +61,9 @@
     }
   },
   "jevcalls": 558,
+  "live_results_path": "work/jev-uncd/live-results.jsonl",
+  "live_results_raw_commands_committed": false,
+  "live_results_sha256": "a05b1d373669de1d6f1dccced8d45c571dc31dc018ef73f3fddc1f47c7b00784",
   "mcnemar_no_harm": {
     "b_existing_only_fp": 128,
     "bar_direction": "b > c and p < 0.05",
@@ -68,6 +71,19 @@
     "exact_two_sided_p": 3.820356640172434e-37
   },
   "model": "jev-1.13.0",
+  "pre_prereg_run": {
+    "bar_followed": false,
+    "calls": 52,
+    "disclosure": "These 52 calls occurred before revised prereg 1750bd56 and are invalid for the current bar; they are disclosed only.",
+    "first_recorded_at": "2026-09-27T06:04:32.688Z",
+    "input_tokens": 42239,
+    "last_recorded_at": "2026-09-27T06:04:42.181Z",
+    "original_3db9d119_bar_note": "Pane 1 reports this partial set also passes the original bare precision/catch bar; not used for the revised result.",
+    "prereg_commit": "3db9f119",
+    "rows_sha256": "0874a3a85732f129fe6ef1d0b7de3ab586190df1aa2ceb99b3b7504800bfae4b",
+    "scored": 52,
+    "spend_usd": 0.001774038
+  },
   "prereg": "work/jev-uncd/prereg.md",
   "prereg_sha256": "eb214208374f2aa0fad7f4449a4edffb38593c936723a2724e7f3d80a496a6b0",
   "random_unflagged": {
