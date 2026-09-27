@@ -1,0 +1,19 @@
+{
+  "catch_floor": {
+    "threshold": 0.95,
+    "trials": 93
+  },
+  "items_path": "work/jev-uncd/items.jsonl",
+  "items_sha256": "c6ed1feb32e05bf73fc9cc0fe4785a159c80ba6336795f614edcda7cac992e1d",
+  "mcnemar_bar": {
+    "alpha": 0.05,
+    "best_case_jev_only_wins": 0,
+    "minimum_exact_two_sided_p": 0.03125,
+    "minimum_existing_only_wins": 6
+  },
+  "mode": "mcnemar",
+  "prereg_path": "work/jev-uncd/prereg.md",
+  "prereg_sha256": "eb214208374f2aa0fad7f4449a4edffb38593c936723a2724e7f3d80a496a6b0",
+  "source": "ARITHMETIC; exact two-sided McNemar on false-positive discordance; no Jev call",
+  "status": "REACHABLE"
+}
