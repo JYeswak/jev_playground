@@ -1,13 +1,13 @@
 {
   "items_path": "work/jev-oioo/items.jsonl",
-  "items_sha256": "bc44411c2cdcd640d9731a555771547349d2c20485dec3d69bc4f6b061fa4ef0",
+  "items_sha256": "bbda30671b46678a11717d0fa89994b5226e9887ff321ec70a860e45f579032c",
   "maximum_comparator_only_wins": 0,
   "minimum_exact_two_sided_p": 0.03125,
   "minimum_jev_only_wins": 6,
   "mode": "mcnemar",
-  "paired_rows": 200,
+  "paired_rows": 907,
   "prereg_path": "work/jev-oioo/prereg.md",
-  "prereg_sha256": "57ec356d9afc8815bd0b2eb024b04373f6f647768278b62b3c03599466afa575",
+  "prereg_sha256": "b8448df45f0c5ce4481688770a12c314f6f58df2aa6b74a846d0b997b2797a01",
   "source": "ARITHMETIC; exact McNemar reach; no API call",
   "status": "REACHABLE",
   "unit": "jev-oioo"
