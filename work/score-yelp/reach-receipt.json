@@ -1,13 +1,17 @@
 {
-  "items_sha256": "10d6775919c2353c34d6f73a3408036fad392a72daef9538e29f238cd71b3336",
-  "minimum_minority": 40,
-  "minority_count": 40,
-  "mode": "rate",
-  "perfect_successes": 200,
-  "prereg_path": "/Users/josh/Developer/jev/work/score-yelp/PREREG.md",
-  "prereg_sha256": "236534259cb94400f276869a1a1c5f3d955c8a1123e9cc169606171ed4845c02",
   "status": "REACHABLE",
-  "threshold": 0.8,
-  "trials": 200,
-  "wilson_lower_bound_95": 0.9811546736227333
+  "mode": "mcnemar",
+  "tasks": 300,
+  "planned_n": 300,
+  "required_n": 278,
+  "reference_paired_n": 500,
+  "reference_mean_ae_difference": -0.10392,
+  "reference_sd_ae_difference": 0.4040226506081173,
+  "target_effect_mae": 0.068,
+  "alpha": 0.05,
+  "power": 0.8,
+  "paired_test": "seeded_sign_flip_permutation_10000",
+  "items_sha256": "ed2bf2eda029993d8dda0101038153f3a3a45852c5f50aad11ba5e86ebc12452",
+  "prereg_path": "work/score-yelp/PREREG.md",
+  "prereg_sha256": "edc6e14db16bd6f00f623a976a27e94925300651022d480405969e4c5d84b15e"
 }

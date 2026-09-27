@@ -4,7 +4,7 @@ Status: PREREGISTERED BEFORE LIVE CALLS
 Bead: jev-dml3
 Date: 2026-09-27
 
-reach-mode: rate
+reach-mode: mcnemar
 
 ## Question
 
@@ -15,8 +15,8 @@ Does the measured five-level Score design from `kit/src/score.ts` retain its SST
 - Dataset: `Yelp/yelp_review_full`, owner `Yelp`, public `test` split.
 - Dataset revision: `c1f9ee939b7d05667af864ee1cb066393154bf85`.
 - Source endpoint: Hugging Face Datasets Server rows API, with the repository's required downloader user agent.
-- Selection: lowest source `row_idx` 40 examples from each of the five public labels, selected from the test split without authoring or rewriting text.
-- Exact corpus: `work/score-yelp/corpus.jsonl`, 200 rows, 40 per label, SHA-256 `10d6775919c2353c34d6f73a3408036fad392a72daef9538e29f238cd71b3336`.
+- Selection: lowest source `row_idx` 60 examples from each of the five public labels, selected from the test split without authoring or rewriting text.
+- Exact corpus: `work/score-yelp/corpus.jsonl`, 300 rows, 60 per label, SHA-256 `ed2bf2eda029993d8dda0101038153f3a3a45852c5f50aad11ba5e86ebc12452`.
 - Labels: Yelp `0..4` map directly to the five ordered sentiment levels below.
 - No row from this corpus has a committed Jev or comparator score before this preregistration.
 
@@ -38,27 +38,33 @@ Jev model: `jev-1.13.0`, via the official TypeSafe SDK/client path used by the k
 
 Every request must pass keyless size preflight before a live request. Invalid, missing, unparsed, or out-of-range answers are not coerced: they are recorded as invalid and excluded from the primary valid-row MAE denominator, with counts reported separately. A row is not silently dropped.
 
-## Preregistered metrics and bars
+## Preregistered metrics and numeric pass bar
 
 Primary metric: mean absolute error (MAE) against the dataset's own integer label, separately for Jev and the free comparator, on the paired valid intersection.
 
-Primary comparison: paired per-row absolute-error difference `Jev AE - comparator AE`; report the mean difference and a paired permutation/significance test with 10,000 seeded sign flips, seed `20260927`. The comparison is descriptive if either arm has fewer than 100 paired valid rows; no win claim is allowed below that count.
+Primary comparison: paired per-row absolute-error difference `Jev AE - comparator AE`; report the mean difference and a paired permutation test with 10,000 seeded sign flips, seed `20260927`.
 
-Secondary metrics: exact five-class accuracy, adjacent accuracy (`abs(score-label) <= 1`), valid count, invalid count, mean confidence, and per-class counts. These do not replace MAE.
+**Confirmation pass bar, fixed before calls:** at least 278 paired valid rows; Jev MAE is at least `0.068` lower than comparator MAE (`Jev MAE - comparator MAE <= -0.068`); and the two-sided seeded permutation p-value is `< 0.05`. If any condition fails, report `NO_CONFIRMATION` or `UNDERPOWERED`; never relax the bar after seeing answers.
 
-The fixed data-admissibility reach bar is in `work/score-yelp/reach-receipt.json`: 200 trials, minimum class count 40, `rate` reach mode, threshold 0.80. The run is refused unless that receipt matches this preregistration and the exact corpus hash.
+Secondary metrics: exact five-class accuracy, adjacent accuracy (`abs(score-label) <= 1`), valid count, invalid count, mean confidence, and per-class counts. These do not replace the primary bar.
+
+## Power and reach binding
+
+The 0.068 target gap is the observed Jev-versus-Haiku SST-5 MAE gap used only for prospective sizing. From the committed 500 paired SST-5 rows (`work/score-sst5/sample.jsonl`, `rows-jev.jsonl`, and `rows-haiku.jsonl`), the paired AE-difference mean was `-0.10392`, sample SD `0.4040226506`; normal approximation at two-sided alpha `0.05` and power `0.80` requires `278` paired rows for an effect of `0.068`. The Yelp corpus is therefore 300 rows, above that bound, with 60 examples per label.
+
+The matching paired-test reach receipt is `work/score-yelp/reach-receipt.json`. It declares `reach-mode: mcnemar`, binds the exact corpus and repo-relative preregistration path, records the reference arithmetic, and is `REACHABLE` only because planned n=300 is at least required n=278. This is a sample-size reach gate, not an observed outcome and not a claim that McNemar is the primary MAE test.
 
 ## Spend and execution bounds
 
-- Maximum calls: 200 Jev requests and 200 comparator requests, one each per row; no unbounded retry loop.
+- Maximum calls: 300 Jev requests and 300 comparator requests, one each per row; no unbounded retry loop.
 - Jev spend: record input/output tokens and billed usage from every returned row; report total and per-valid-row cost. The API key is loaded outside the tree.
 - Comparator spend: record OpenRouter usage before and after. The expected comparator spend is `$0` because the model id is `:free`; any nonzero charge or paid model response is a hard stop and invalidates the run.
 - Run detached only through `kit/experiment/run.py`, with checkpointed JSONL rows, PID, heartbeat, and the matching reach receipt. Stop on 401/402/403 or provider refusal; resume only from completed row ids.
 
 ## Decision rule
 
-The result is a confirmation only if the receipt contains both arms, at least 100 paired valid rows, exact corpus and preregistration hashes, spend readings, and the primary MAE/permutation result. Otherwise report `UNDERPOWERED`, `INVALID`, or `NOT_RUN`; do not reinterpret the bar after seeing answers.
+The result is a confirmation only if the receipt contains both arms, at least 278 paired valid rows, exact corpus and preregistration hashes, spend readings, and the primary MAE/permutation result meeting every numeric pass-bar condition. Otherwise report `UNDERPOWERED`, `INVALID`, `NO_CONFIRMATION`, or `NOT_RUN`; do not reinterpret the bar.
 
 ## Boundary
 
-This preregistration does not claim Jev or comparator performance. It authorizes the described live run only after the reach receipt is committed and its SHA is sent to pane 1. No live call has been made at preregistration time.
+This preregistration does not claim Jev or comparator performance. It authorizes the described live run only after the matching reach receipt is committed and its SHA is sent to pane 1. No live call has been made at preregistration time.

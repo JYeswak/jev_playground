@@ -2,15 +2,15 @@
   "dataset": "Yelp/yelp_review_full",
   "dataset_revision": "c1f9ee939b7d05667af864ee1cb066393154bf85",
   "split": "test",
-  "selection": "lowest row_idx 40 examples per label from the public test split, fetched in 100-row pages",
-  "rows": 200,
+  "selection": "lowest row_idx 60 examples per label from the public test split, fetched in 100-row pages",
+  "rows": 300,
   "class_counts": {
-    "0": 40,
-    "1": 40,
-    "2": 40,
-    "3": 40,
-    "4": 40
+    "0": 60,
+    "1": 60,
+    "2": 60,
+    "3": 60,
+    "4": 60
   },
-  "max_source_row_idx": 264,
-  "corpus_sha256": "10d6775919c2353c34d6f73a3408036fad392a72daef9538e29f238cd71b3336"
+  "max_source_row_idx": 334,
+  "corpus_sha256": "ed2bf2eda029993d8dda0101038153f3a3a45852c5f50aad11ba5e86ebc12452"
 }

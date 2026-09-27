@@ -97,7 +97,11 @@ def verify_reachability(
         raise RuntimeError(
             "--reach receipt prereg_sha256 does not match the preregistration"
         )
-    if receipt.get("prereg_path") != str(prereg.resolve()):
+    expected_paths = {
+        str(prereg.resolve()),
+        os.path.relpath(prereg.resolve(), Path.cwd().resolve()),
+    }
+    if receipt.get("prereg_path") not in expected_paths:
         raise RuntimeError(
             "--reach receipt prereg_path does not match the preregistration"
         )
