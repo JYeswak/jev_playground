@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import {appendFile, readFile, writeFile} from "node:fs/promises";
+import {readFile, writeFile} from "node:fs/promises";
 import {askJev} from "../../kit/src/client.ts";
 import {SCIFACT_CRITERIA, SCIFACT_INSTRUCTIONS} from "../../kit/src/verify.ts";
 
