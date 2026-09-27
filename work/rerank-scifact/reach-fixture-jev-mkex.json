@@ -1,0 +1,7 @@
+{
+  "fixture": "jev-mkex FiQA top-1 confirmation",
+  "tasks": 349,
+  "comparator_exact": 137,
+  "oracle_headroom": 18,
+  "bar_alpha": 0.05
+}

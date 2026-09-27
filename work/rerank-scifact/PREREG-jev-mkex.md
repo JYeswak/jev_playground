@@ -1,0 +1,19 @@
+# Jev top-1 rerank confirmation — jev-mkex
+
+**Frozen before any live call.**
+
+reach-mode: mcnemar
+
+- **Dataset:** public BEIR FiQA-2018 test split, qrels and corpus; this is a second BEIR set for the NFCorpus result and is not authored by this experiment.
+- **Archive:** FiQA zip SHA `32c7df99ed21252fdf2bcf3f5673502a8d245ee0c44c4a133570d92ce2b3ad02`.
+- **BM25:** stdlib implementation, document text `title + " " + text`, lower-case `[a-z0-9]+` tokens, Robertson/Sparck Jones IDF, `k1=0.9`, `b=0.4`, stable corpus-order tie break.
+- **Items:** all FiQA test queries whose deterministic BM25 top-20 contains at least one positive qrel: N=349. Candidate file SHA `e1411e654f7f02e2751ce8079d109bbe4b84cb31feb44120d9c4a41c38dccec6`; baseline top-1 exact count is 137/349. No query is selected after seeing Jev answers.
+- **Treatment:** one Jev Choice call per query, with the query and all 20 candidate passages in state and criteria keyed by candidate IDs; model pinned to `jev-1.13.0`; Jev only, no comparator.
+- **Primary confirmatory metric:** top-1 hit rate, paired against BM25 order.
+- **Confirmatory bar:** Jev top-1 gain >= +0.05 absolute (at least 18 Jev-only wins over BM25 at N=349) **and** exact two-sided McNemar p<0.05. Both conditions are required.
+- **Secondary descriptive metric:** report nDCG@10 for BM25 and Jev, but do not use it for the confirmatory pass/fail bar.
+- **Reachability:** `scripts/bar-reachable.py --mode mcnemar` MUST report REACHABLE for tasks=349, comparator_exact=137, and 18 additional Jev-only wins with zero losses. No rate-mode receipt is valid.
+- **Execution:** use the shared detached `kit/experiment/run.py` gate with checkpointing; each row records model, latency, and usage; stop on 401/402/403; no unbounded retries.
+- **Feasibility:** all generated states must fit `scripts/jev-state-size.py` before the first call; over-limit items are excluded before scoring and recorded.
+- **Spend:** Jev spend only; receipt records calls, input/output tokens, latency, and input cost. No paid comparator or OpenRouter call.
+- **Non-claims:** this confirms only the top-1 comparison on this FiQA eligible subset and this BM25/Choice design; nDCG is descriptive and no general retrieval claim follows from one confirmation set.

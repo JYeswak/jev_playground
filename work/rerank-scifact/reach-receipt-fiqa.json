@@ -1,0 +1,19 @@
+{
+  "bead": "jev-mkex",
+  "dataset": "BEIR FiQA-2018 test",
+  "status": "REACHABLE",
+  "mode": "mcnemar",
+  "items": "candidates-fiqa.jsonl",
+  "items_sha256": "e1411e654f7f02e2751ce8079d109bbe4b84cb31feb44120d9c4a41c38dccec6",
+  "tasks": 349,
+  "comparator_exact": 137,
+  "oracle_headroom": 18,
+  "best_case_discordant_losses": 0,
+  "minimum_attainable_p": 7.62939453125e-06,
+  "alpha": 0.05,
+  "prereg_path": "/Users/josh/Developer/jev/work/rerank-scifact/PREREG-jev-mkex.md",
+  "prereg_sha256": "38733aad76948a7013c6d7ed0bfe1bccb547ed9e7100fb2f1b01f71c7b1d21bc",
+  "command": "python3 scripts/bar-reachable.py --flip-fixture work/rerank-scifact/reach-fixture-jev-mkex.json",
+  "lane": "offline",
+  "boundary": "This receipt proves only that the preregistered paired top-1 bar is mathematically reachable; it is not a live Jev result."
+}
