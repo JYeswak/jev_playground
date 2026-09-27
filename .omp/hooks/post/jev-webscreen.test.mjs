@@ -96,7 +96,8 @@ test("shadow screens, logs one row, and passes through unchanged", async () => {
   assert.equal(calls, 1);
   assert.equal(rows.length, 1);
   assert.equal(rows[0].status, "ok");
-  assert.equal(rows[0].input_tokens, 12);
+  assert.equal(rows[0].schemaVersion, 2);
+  assert.equal(rows[0].model, "fake-offline");
   assert.match(rows[0].rawSha256, /^[0-9a-f]{64}$/);
 });
 
