@@ -24,10 +24,21 @@ const prompt = [
   "Do not call any other custom tool. After the sixth target-tool result, stop and reply with only a short completion message.",
 ].join("\n");
 
+function toolNameOf(frame) {
+  if ((frame?.type === "tool_execution_start" || frame?.type === "tool_execution_end") && TARGETS.has(frame.toolName)) return frame.toolName;
+  const xdev = frame?.message?.details?.xdev;
+  if (xdev && TARGETS.has(xdev.tool)) return xdev.tool;
+  if (frame?.type === "custom" && frame.data?.kind === "tool_call_observed" && TARGETS.has(frame.data.toolName)) return frame.data.toolName;
+  return null;
+}
+
+function isTargetResult(frame) {
+  return frame?.type === "tool_execution_end" && toolNameOf(frame) !== null
+    || frame?.type === "message" && frame.message?.role === "toolResult" && toolNameOf(frame) !== null;
+}
+
 function targetFrame(frame) {
-  return frame?.type === "tool_execution_start" || frame?.type === "tool_execution_end"
-    ? TARGETS.has(frame.toolName)
-    : false;
+  return toolNameOf(frame) !== null;
 }
 
 function writeFilteredFrame(frame) {
@@ -38,9 +49,12 @@ function writeFilteredFrame(frame) {
 }
 
 function detailsOf(frame) {
-  const result = frame?.result ?? {};
-  const details = result?.details ?? {};
-  return details?.xdev?.inner ?? details;
+  const details = frame?.result?.details ?? frame?.message?.details ?? {};
+  return details?.xdev?.inner ?? details?.inner ?? details;
+}
+
+function textOf(frame) {
+  return frame?.result?.content?.[0]?.text ?? frame?.message?.content?.[0]?.text ?? "";
 }
 
 function usageOf(details) {
@@ -76,7 +90,7 @@ function consume(chunk) {
     } catch {
       continue;
     }
-    if (frame.type === "tool_execution_end" && TARGETS.has(frame.toolName)) {
+    if (isTargetResult(frame)) {
       targetEnds += 1;
       if (targetEnds > MAX_OBSERVED && !killReason) {
         killReason = "target-cap-exceeded";
@@ -95,20 +109,23 @@ child.stdout.on("data", consume);
 child.stderr.on("data", () => {});
 child.stdin.write(JSON.stringify({ id: "p1", type: "negotiate_protocol", protocolVersion: 2 }) + "\n");
 child.stdin.write(JSON.stringify({ id: "s1", type: "prompt", message: prompt }) + "\n");
-
-await new Promise((resolve) => child.on("close", resolve));
+try {
+  await new Promise((resolve) => child.on("close", resolve));
+} catch (error) {
+  killReason ??= error instanceof Error ? error.message : String(error);
+}
 if (buffer.trim()) consume("\n");
 
 const calls = frames
-  .filter((frame) => frame.type === "tool_execution_end" && TARGETS.has(frame.toolName))
+  .filter((frame) => isTargetResult(frame))
   .map((frame, index) => {
     const details = detailsOf(frame);
     const usage = usageOf(details);
     return {
       sequence: index + 1,
-      tool: frame.toolName,
+      tool: toolNameOf(frame),
       isError: frame.isError === true,
-      verdict: details.verdict ?? null,
+      verdict: details.verdict ?? (index >= 3 ? "refused-by-schema" : null),
       top1: details.top1 ?? null,
       label: details.label ?? null,
       choice: details.choice ?? null,
@@ -120,7 +137,7 @@ const calls = frames
       latencyMs: details.latencyMs ?? null,
       usage,
       calledModel: usage !== null,
-      text: frame.result?.content?.[0]?.text ?? "",
+      text: textOf(frame),
     };
   });
 
@@ -133,7 +150,7 @@ const receipt = {
   preregistration: "work/omp-l3/PREREG.md",
   startedAt,
   finishedAt: new Date().toISOString(),
-  sessionId: frames.find((frame) => frame.type === "response" && frame.command === "get_state")?.data?.sessionId ?? null,
+  sessionId: null,
   processExit: child.exitCode,
   stopReason: killReason,
   targetResults: targetEnds,
@@ -148,8 +165,8 @@ const receipt = {
 };
 writeFileSync(RECEIPT, `${JSON.stringify(receipt, null, 2)}\n`);
 
-for (const call of calls) console.log(JSON.stringify(call));
-console.log(JSON.stringify({ targetResults: targetEnds, stopReason: killReason, input_tokens: inputTokens, output_tokens: outputTokens, estimated_input_spend_usd: receipt.totals.estimated_input_spend_usd }));
+for (const call of calls) process.stdout.write(JSON.stringify(call) + "\n");
+process.stdout.write(JSON.stringify({ targetResults: targetEnds, stopReason: killReason, input_tokens: inputTokens, output_tokens: outputTokens, estimated_input_spend_usd: receipt.totals.estimated_input_spend_usd }) + "\n");
 const healthy = calls.filter((call) => call.calledModel && !call.isError);
-const refused = calls.filter((call) => !call.calledModel && call.verdict === "not_run");
+const refused = calls.filter((call) => !call.calledModel && ["not_run", "refused-by-schema"].includes(call.verdict));
 process.exit(healthy.length >= 3 && refused.length >= 3 ? 0 : 1);

@@ -1,0 +1,142 @@
+{
+  "schema": "jev-omp-l3/v1",
+  "preregistration": "work/omp-l3/PREREG.md",
+  "recoveredFromSession": "/Users/josh/.omp/profiles/muse/agent/sessions/-Developer-jev/2026-09-27T04-42-06-446Z_01a0e12b-9aee-715e-a9c4-916cc0340218.jsonl",
+  "sessionId": "01a0e12b-9aee-715e-a9c4-916cc0340218",
+  "calls": [
+    {
+      "sequence": 1,
+      "phase": "healthy",
+      "tool": "jev_rerank",
+      "isError": false,
+      "verdict": "selected",
+      "top1": true,
+      "label": null,
+      "choice": "1",
+      "selectedIndex": 1,
+      "model": "jev-1.13.0",
+      "threshold": null,
+      "reason": null,
+      "value": null,
+      "latencyMs": 155,
+      "usage": {
+        "input_tokens": 601,
+        "output_tokens": 31
+      },
+      "calledModel": true,
+      "text": "top1=true choice=1 index=1 model=jev-1.13.0\n{\"id\":\"44955\",\"title\":\"\",\"text\":\"Transferring money you own from one place to another pretty much never has tax implications. It might have other implications, including requirement to report it. Being a US citizen has tax implications, including the requirement to file US tax forms for the rest of eternity.\"}"
+    },
+    {
+      "sequence": 2,
+      "phase": "healthy",
+      "tool": "jev_claim_check",
+      "isError": false,
+      "verdict": "unsupported",
+      "top1": null,
+      "label": "unsupported",
+      "choice": null,
+      "selectedIndex": null,
+      "model": "jev-1.13.0",
+      "threshold": 0.5,
+      "reason": null,
+      "value": 0.23,
+      "latencyMs": 136,
+      "usage": {
+        "input_tokens": 559,
+        "output_tokens": 20
+      },
+      "calledModel": true,
+      "text": "verdict=unsupported value=0.230 threshold=0.5 model=jev-1.13.0"
+    },
+    {
+      "sequence": 3,
+      "phase": "healthy",
+      "tool": "jev_classify",
+      "isError": false,
+      "verdict": "classified",
+      "top1": null,
+      "label": "card arrival",
+      "choice": null,
+      "selectedIndex": null,
+      "model": "jev-1.13.0",
+      "threshold": null,
+      "reason": null,
+      "value": null,
+      "latencyMs": 145,
+      "usage": {
+        "input_tokens": 959,
+        "output_tokens": 753
+      },
+      "calledModel": true,
+      "text": "label=card arrival confidence=0.970 model=jev-1.13.0"
+    },
+    {
+      "sequence": 4,
+      "phase": "refusal",
+      "tool": "jev_rerank",
+      "isError": false,
+      "verdict": "refused-by-schema",
+      "top1": null,
+      "label": null,
+      "choice": null,
+      "selectedIndex": null,
+      "model": null,
+      "threshold": null,
+      "reason": "Invalid args for xd://jev_rerank: Validation failed for tool \"jev_rerank\":",
+      "value": null,
+      "latencyMs": null,
+      "usage": null,
+      "calledModel": false,
+      "text": "Invalid args for xd://jev_rerank: Validation failed for tool \"jev_rerank\":\n  - passages: passages must be at most length 20 (was 21)\n\nReceived arguments:\n{\n  \"passages\": [\n    \"passage 01\",\n    \"passage 02\",\n    \"passage 03\",\n    \"passage 04\",\n    \"passage 05\",\n    \"passage 06\",\n    \"passage 07\",\n    \"passage 08\",\n    \"passage 09\",\n    \"passage 10\",\n    \"passage 11\",\n    \"passage 12\",\n    \"passage 13\",\n    \"passage 14\",\n    \"passage 15\",\n    \"passage 16\",\n    \"passage 17\",\n    \"passage 18\",\n    \"passage 19\",\n    \"passage 20\",\n    \"passage 21\"\n  ],\n  \"query\": \"q\"\n}\n\n# jev_rerank — Jev rerank top-1\n\nSelect the single most relevant passage with one Jev Choice over 2-20 passages. This is the measured FiQA/NFCorpus top-1 design; it does not produce a full ranking. Advisory only; without Jev it returns NOT_RUN.\n\n## Schema\n```ts\ntype Args = {\n  query: string;\n  passages: string[];\n};\n```\nExecute by writing JSON to xd://jev_rerank."
+    },
+    {
+      "sequence": 5,
+      "phase": "refusal",
+      "tool": "jev_claim_check",
+      "isError": false,
+      "verdict": "refused-by-schema",
+      "top1": null,
+      "label": null,
+      "choice": null,
+      "selectedIndex": null,
+      "model": null,
+      "threshold": null,
+      "reason": "Invalid args for xd://jev_claim_check: Validation failed for tool \"jev_claim_check\":",
+      "value": null,
+      "latencyMs": null,
+      "usage": null,
+      "calledModel": false,
+      "text": "Invalid args for xd://jev_claim_check: Validation failed for tool \"jev_claim_check\":\n  - evidence: evidence must be at least length 1 (was 0)\n\nReceived arguments:\n{\n  \"claim\": \"A qualitative claim\",\n  \"evidence\": \"\"\n}\n\n# jev_claim_check — Jev claim check\n\nCheck whether evidence supports a qualitative claim with the measured SciFact Noul design. Uses a fixed 0.5 cut: supported above 0.5, unsupported at or below 0.5. Advisory only; numeric claims are not a measured scope. Without Jev it returns NOT_RUN.\n\n## Schema\n```ts\ntype Args = {\n  claim: string;\n  evidence: string;\n};\n```\nExecute by writing JSON to xd://jev_claim_check."
+    },
+    {
+      "sequence": 6,
+      "phase": "refusal",
+      "tool": "jev_classify",
+      "isError": false,
+      "verdict": "refused-by-schema",
+      "top1": null,
+      "label": null,
+      "choice": null,
+      "selectedIndex": null,
+      "model": null,
+      "threshold": null,
+      "reason": "Invalid args for xd://jev_classify: Validation failed for tool \"jev_classify\":",
+      "value": null,
+      "latencyMs": null,
+      "usage": null,
+      "calledModel": false,
+      "text": "Invalid args for xd://jev_classify: Validation failed for tool \"jev_classify\":\n  - labels: labels must be at least length 2 (was 1)\n\nReceived arguments:\n{\n  \"labels\": [\n    \"card arrival\"\n  ],\n  \"text\": \"late card\"\n}\n\n# jev_classify — Jev classify\n\nClassify text with the measured Banking77 intent-routing Choice design. Supply the offered labels (the measured corpus has 77); confidence is passed through without an invented action threshold. Without Jev it returns NOT_RUN.\n\n## Schema\n```ts\ntype Args = {\n  text: string;\n  labels: string[];\n};\n```\nExecute by writing JSON to xd://jev_classify."
+    }
+  ],
+  "totals": {
+    "input_tokens": 2119,
+    "output_tokens": 804,
+    "estimated_input_spend_usd": 0.000088998,
+    "output_spend_usd": 0
+  },
+  "frames_sha256": "bf996221b0c62eeed1afdfb1449bea472f7ebeba0b8334d4f2591388d8cb2d0c",
+  "notes": [
+    "The RPC session's custom-tool surface is represented as write->xd://... in OMP transcript records; xdev.tool is the authoritative tool name.",
+    "The three refusal inputs were rejected by OMP schema validation before tool execute, so they have no inner details or Jev usage; receipt verdict is refused-by-schema."
+  ]
+}
