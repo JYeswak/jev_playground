@@ -23,8 +23,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = ROOT / "work" / "score-amazon"
-ROWS_PATH = HERE / "live-rows.jsonl"
-RECEIPT_PATH = HERE / "receipt.json"
+ROWS_PATH = Path(os.environ.get("SCORE_ROWS_PATH", HERE / "live-rows.jsonl"))
+RECEIPT_PATH = Path(os.environ.get("SCORE_RECEIPT_PATH", HERE / "receipt.json"))
 MODEL = "jev-1.13.0"
 COMPARATOR = "dots-studio/dots-3-note-preview:free"
 QNAME = "sentiment"
@@ -96,8 +96,6 @@ def score_answer(answer: object) -> dict[str, object]:
         raise ValueError(f"score out of range: {score}")
     if not math.isfinite(confidence) or not 0 <= confidence <= 1:
         raise ValueError(f"confidence out of range: {confidence}")
-    if not float(score).is_integer():
-        raise ValueError(f"score is not an integer level: {score}")
     if set(probabilities) != {str(i) for i in range(5)}:
         raise ValueError("probability keys do not match five levels")
     if any(
@@ -108,7 +106,7 @@ def score_answer(answer: object) -> dict[str, object]:
     if abs(sum(probabilities.values()) - 1) >= 0.02:
         raise ValueError("probabilities do not sum to one")
     return {
-        "score": int(score),
+        "score": score,
         "confidence": confidence,
         "probabilities": probabilities,
     }
@@ -144,14 +142,14 @@ def paired_stats(rows: list[dict[str, object]]) -> dict[str, object]:
         if not isinstance(comparator, dict) or "score" not in comparator:
             invalid["comparator"] += 1
             continue
-        paired.append((int(jev["score"]), int(comparator["score"]), label))
+        paired.append((float(jev["score"]), float(comparator["score"]), label))
     if not paired:
         return {"paired_valid": 0, "invalid": invalid}
     differences = [abs(j - label) - abs(c - label) for j, c, label in paired]
     jev_mae = sum(abs(j - label) for j, _, label in paired) / len(paired)
     comparator_mae = sum(abs(c - label) for _, c, label in paired) / len(paired)
-    jev_exact = sum(j == label for j, _, label in paired) / len(paired)
-    comparator_exact = sum(c == label for _, c, label in paired) / len(paired)
+    jev_exact = sum(round(j) == label for j, _, label in paired) / len(paired)
+    comparator_exact = sum(round(c) == label for _, c, label in paired) / len(paired)
     rng = random.Random(SEED)
     observed = sum(differences)
     extreme = 0
