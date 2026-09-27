@@ -58,6 +58,7 @@ claim nobody can check:
  - `scripts/test_jev_router_cap5.py` — keyless router 402 classification, fixed-arm JSON extraction, and >5% error-bar refusal. Run: `python3 -m unittest scripts/test_jev_router_cap5.py` (4 tests).
  - `work/hermes-webscreen-repro/test_score.py` — captured web-screen receipt scorer, Wilson reference, arm isolation, and planted bar-boundary tests. Run: `python3 -m unittest work/hermes-webscreen-repro/test_score.py` (4 tests).
 - `work/jev-kit/test/kit.test.mjs` — offline kit preflight, validation, fake asker, doctor, and memory-promotion policy tests using `work/jev-kit/test/fixtures/memory-promotion.json`. Run: `node --experimental-strip-types --test work/jev-kit/test/kit.test.mjs` (11 tests).
+- `kit/test/gate.test.mjs` — offline RISK gate verb: captured public live answer, exact five-question score preservation, malformed Noul refusal, and size preflight refusal; run `node --test kit/test/gate.test.mjs` (4 tests).
 - `work/ci-main-status/test_ci_main_status.py` — `scripts/ci-main-status.py` (jev-bfku) against
   trimmed real gh output in `work/ci-main-status/fixtures/`, no network: green is one line and exit
   0 with no log fetch; the ff8316d red run (36059723283) names `registered-suites` and its

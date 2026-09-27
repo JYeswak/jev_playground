@@ -10,3 +10,4 @@ node kit/bin/jev.mjs rerank --query "Tax implications of holding EWU (or other s
 npx --prefix kit --no-install jev verify --claim "A low percentage of hematopoietic progenitor cells are susceptible to HIV-1 infection ex vivo." --evidence kit/examples/scifact-evidence.txt --fake --robot	0	-
 npx --prefix kit --no-install jev score --text "it represents better-than-average movie-making that does n't demand a dumb , distracted audience ." --levels kit/examples/sst5-levels.json --fake --robot	0	-
 npx --prefix kit --no-install jev classify --text "How do I locate my card?" --labels kit/examples/banking77-labels.json --fake --robot	0	-
+npx --prefix kit --no-install jev gate --command "npm publish --access public" --fake --robot	0	-

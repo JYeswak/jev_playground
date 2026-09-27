@@ -6,6 +6,7 @@ import { rerankTop1 } from "../dist/rerank.js";
 import { classifyText } from "../dist/classify.js";
 import { verifyClaim } from "../dist/verify.js";
 import { scoreText } from "../dist/score.js";
+import { gateCommand } from "../dist/gate.js";
 import { createFakeFetch } from "../dist/fake.js";
 import { installOmp, ompDiscovery } from "../dist/install.js";
 
@@ -78,6 +79,32 @@ async function ask(args) {
     result = await askJevScore({ state, instructions: question.instructions ?? "", criteria: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
   } else {
     result = await askJev({ state, questions: { value: question.instructions ?? question }, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
+  }
+  if (robot) robotPrint(result);
+  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  return result.ok ? 0 : result.reason === "unconfigured" ? 2 : 1;
+}
+async function gate(args) {
+  const robot = hasFlag(args, "--robot");
+  const fake = hasFlag(args, "--fake");
+  const command = option(args, "--command");
+  if (!command) {
+    const error = { status: "ERROR", reason: "usage", message: "jev gate --command C [--robot] [--fake]" };
+    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
+    return 1;
+  }
+  let result;
+  if (fake) {
+    const fixture = await readJson(new URL("../examples/gate-public.json", import.meta.url).pathname);
+    if (command !== fixture.command) {
+      const error = { status: "ERROR", reason: "fake fixture", message: "--fake only supports the captured public example command" };
+      if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
+      return 1;
+    }
+    const answers = Object.fromEntries(Object.entries(fixture.scores).map(([key, noul]) => [key, { noul }]));
+    result = await gateCommand({ command, model: fixture.model, ask: async () => ({ ok: true, answers, latencyMs: 0, resolvedModel: fixture.model, usage: undefined }) });
+  } else {
+    result = await gateCommand({ command });
   }
   if (robot) robotPrint(result);
   else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
@@ -185,13 +212,14 @@ try {
   else if (args[0] === "classify") exitCode = await classify(args);
   else if (args[0] === "verify") exitCode = await verify(args);
   else if (args[0] === "score") exitCode = await score(args);
+  else if (args[0] === "gate") exitCode = await gate(args);
   else if (args[0] === "omp" && args[1] === "install") {
     const repo = option(args, "--dir") ?? process.cwd();
     const result = await installOmp(repo, hasFlag(args, "--dry-run"));
     if (robot) robotPrint(result); else process.stdout.write(`${result.status}: installed ${result.files.length} files in ${result.repo}\n`);
     exitCode = 0;
   } else {
-    const error = { status: "ERROR", reason: "usage", message: "jev doctor|ask|rerank|classify|verify|score ..." };
+    const error = { status: "ERROR", reason: "usage", message: "jev doctor|gate|ask|rerank|classify|verify|score ..." };
     if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
     exitCode = 1;
   }
