@@ -36,6 +36,7 @@ class RenderResultsTest(unittest.TestCase):
             "MiniWoB v3 held-out",
             "OMP judge usage",
             "Jev gate question (blind fleet sample)",
+            "Jev held-out fleet confirmation",
             "Replicated web-screen",
         ):
             self.assertIn(surface, table)
@@ -45,6 +46,8 @@ class RenderResultsTest(unittest.TestCase):
         self.assertIn("kerpopule/hermes-jev-skills@cf9e84c", table)
         self.assertIn("stratified sample rates", table)
         self.assertIn("pre-bar calls disclosed", table)
+        self.assertIn("weighted precision 67.3%", table)
+        self.assertIn("47 harm rows only", table)
         self.assertNotIn("BEIR SciFact reranking", table)
         self.assertNotIn("35.62%", table)
 

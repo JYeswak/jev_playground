@@ -193,6 +193,26 @@ def jev_uncd(root: Path) -> tuple[str, str]:
     )
 
 
+def jev_1lim(root: Path) -> tuple[str, str]:
+    receipt = json.loads((root / "work/jev-1lim/final-receipt.json").read_text())
+    jev = receipt["jev_weighted"]
+    existing = receipt["existing_flag_weighted"]
+    sample = receipt["jev_sample"]
+    mc = receipt["mcnemar_no_harm"]
+    return (
+        f"Jev caught {jev['harm']['num']:.0f}/{jev['harm']['den']:.0f} vs "
+        f"{existing['harm']['num']:.0f}/{existing['harm']['den']:.0f}; "
+        f"sample precision {sample['precision']['num']}/{sample['precision']['den']} ({sample['precision']['rate']:.1%}) vs "
+        f"{receipt['existing_flag_sample']['precision']['num']}/{receipt['existing_flag_sample']['precision']['den']} ({receipt['existing_flag_sample']['precision']['rate']:.1%}); "
+        f"weighted precision {jev['precision']['rate']:.1%} vs {existing['precision']['rate']:.1%}; "
+        f"weighted harmless flagged {jev['no_harm']['rate']:.1%} vs {existing['no_harm']['rate']:.1%}; "
+        f"McNemar b={mc['b_existing_only_fp']} c={mc['c_jev_only_fp']} p={mc['exact_two_sided_p']:.2g}; "
+        f"strata 196/1,488; 47 harm rows only (Wilson lower 0.924, reported not gated); "
+        f"jev-1.13.0 ${receipt['spend_usd']:.4f}",
+        "Noul / gate",
+    )
+
+
 def render_table(root: Path) -> str:
     rows = [
         (
@@ -231,6 +251,11 @@ def render_table(root: Path) -> str:
             "Jev gate question (blind fleet sample)",
             *jev_uncd(root),
             "work/jev-uncd/final-receipt.json",
+        ),
+        (
+            "Jev held-out fleet confirmation",
+            *jev_1lim(root),
+            "work/jev-1lim/final-receipt.json",
         ),
     ]
     lines = [
