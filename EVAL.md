@@ -2727,7 +2727,7 @@ Boundary: this is a repository-local receipt check. It does not inspect or mutat
 ## jev-oioo Climate-FEVER confirmation [live / comparator NOT_RUN]
 
 - Source/receipt: `work/jev-oioo/final-receipt.json`, strict-cut correction `838907da`; prereg/reach `85c18ece`/`41f35229`.
-- Command: `kit/experiment/run.py --live`; Jev arm 907/907, model `jev-1.13.0`, strict `>0.5` accuracy 592/907 = 65.2%, 507,681 input tokens, $0.021322602 before corrected receipt accounting. Free comparator: 86 scored and 821 HTTP-429 daily-quota rows quarantined NOT_RUN.
+- Command: `work/jev-oioo/live.mjs` direct checkpointed runner; Jev arm 907/907, model `jev-1.13.0`, strict `>0.5` accuracy 592/907 = 65.3%, 507,681 input tokens, $0.021322602 before corrected receipt accounting. Free comparator: 86 scored and 821 HTTP-429 daily-quota rows quarantined NOT_RUN.
 - Boundary: no free comparator result or paired confirmation; Jev arm is recorded only, and the comparator resume waits for quota reset.
 
 ## jev-za3a Climate-FEVER H1 dev replay [live / fail]
@@ -2769,7 +2769,7 @@ Boundary: this is a repository-local receipt check. It does not inspect or mutat
 ## jev-a9fv tool-result injection gate [live]
 
 - Source/receipt: prereg `da65e241`, feasibility `c0f431ed`, live receipt `929b661f`.
-- Command: `kit/experiment/run.py --live`; model `jev-1.13.0`, 600/600 answered, 468,281 input/12,000 output tokens, spend $0.019667802; clean 5/300 false flags, planted catch 269/300, positions 86/92/91.
+- Command: `work/jev-a9fv/run.mjs` direct checkpointed runner; model `jev-1.13.0`, 600/600 answered, 468,281 input/12,000 output tokens, spend $0.019667802; clean 5/300 false flags, planted catch 269/300, positions 86/92/91; jev-29s4 marker follow-up closed with 268/300 unmarked catches.
 - Boundary: raw text was not committed; the planted strings are wrapped in literal `[UNTRUSTED TOOL OUTPUT]...[/UNTRUSTED TOOL OUTPUT]` markers, a marker confound that can inflate catch; the pane verdict retained it as a prereg caveat and requested non-author recount.
 
 ## jev-g1xw omp shadow logs [omp-wired]
