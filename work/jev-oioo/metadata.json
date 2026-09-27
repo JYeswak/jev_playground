@@ -1,0 +1,14 @@
+{
+  "dataset": "tdiggelm/climate-fever",
+  "eligible_refutes": 253,
+  "eligible_supports": 654,
+  "items_sha256": "bc44411c2cdcd640d9731a555771547349d2c20485dec3d69bc4f6b061fa4ef0",
+  "release": "1.0.1",
+  "sample_refutes": 100,
+  "sample_seed": 20260927,
+  "sample_supports": 100,
+  "selected_rows": 200,
+  "source_rows": 1535,
+  "source_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
+  "states_sha256": "d7c3fd65f30165a16525a4dbaf2e58646bbc0abe4c80106a8851d91f83b093f5"
+}
