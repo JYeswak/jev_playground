@@ -1,0 +1,19 @@
+{
+  "unit": "jev-pgtu",
+  "clean_rows": 300,
+  "planted_rows": 300,
+  "retained_rows": 600,
+  "excluded_rows": 0,
+  "residual_secret_shaped_rows": 0,
+  "clean_source_sha256": "8cbef10a7e8effc8fa8c3ff256f89ead2f1ca5e08b1fd735663bbe05e3d1afa2",
+  "attack_source_sha256": "253e38dd6ee948a0a9dd063aa2236391d20327ac2888122df328956acbc6a149",
+  "corpus_source_sha256": "0de5c37ea5f3c99a685a951c5ad15e42ccf470d40fc30965e495e93fc4cb2742",
+  "redactor_source": ".omp/hooks/post/jev-gate-observe.ts",
+  "redactor_source_sha256": "c1f96f0a3c412c04c5dab7a8df1c65a13bbc35427423a1955547e3cb18bba3e4",
+  "marker": "[UNTRUSTED TOOL OUTPUT]",
+  "raw_states_path": "var/agent-tmp/jev-pgtu/states.jsonl",
+  "raw_states_committed": false,
+  "items_sha256": "06a97c209ce10d1e06bca70ae9b0337c27a31f2611f15a0e9145dd902eb56899",
+  "states_sha256": "9020b41f2e395eaafaecfd6e01d5b725317b48e39227a6bcf9866ed2caa3aa6c",
+  "launch_not_before": "2026-10-03T00:00:00Z"
+}
