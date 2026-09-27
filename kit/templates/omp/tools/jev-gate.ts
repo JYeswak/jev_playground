@@ -3,15 +3,14 @@
  * Uses kit/src/gate.ts's frozen five-Noul design; it never executes the command.
  * Without Jev it returns NOT_RUN rather than making a local decision.
  */
-import { gateCommand, type GateResult } from "../jev-kit/gate.ts";
+import { gateCommand, type GateAsk, type GateResult } from "../jev-kit/gate.ts";
 import { useInfisicalKey } from "../jev-kit/use-infisical-key.ts";
 
 type ToolHost = {
   zod: { object: (shape: Record<string, unknown>) => unknown; string: () => { min: (n: number) => unknown } };
 };
-type GateAsker = (options: Parameters<typeof gateCommand>[0]) => Promise<GateResult>;
 
-export default function jevGateTool(pi: ToolHost, asker?: GateAsker) {
+export default function jevGateTool(pi: ToolHost, asker?: GateAsk) {
   if (!asker) useInfisicalKey();
   return {
     name: "jev_gate",
@@ -21,7 +20,7 @@ export default function jevGateTool(pi: ToolHost, asker?: GateAsker) {
     parameters: pi.zod.object({ command: pi.zod.string().min(1) }),
     async execute(_id: string, params: { command: string }) {
       try {
-        const result = await gateCommand({ command: params.command, ...(asker ? { ask: asker } : {}) });
+        const result: GateResult = await gateCommand({ command: params.command, ...(asker ? { ask: asker } : {}) });
         if (!result.ok) {
           return {
             content: [{ type: "text", text: `verdict=not_run reason=${result.reason} NOT_RUN` }],

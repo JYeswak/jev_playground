@@ -31,7 +31,7 @@ test('doctor --robot is explicit NOT_RUN without a key', async () => {
   assert.equal(body.reason, 'no key');
   assert.equal(body.model, 'jev-1.13.0');
   assert.equal(body.omp.repo, root.pathname.replace(/\/$/, ''));
-  assert.equal(body.omp.tools.length, 5);
+  assert.equal(body.omp.tools.length, 6);
   assert.equal(body.omp.hooks.length, 1);
 });
 
