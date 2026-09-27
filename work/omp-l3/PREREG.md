@@ -43,6 +43,10 @@ These are deterministic preflight refusals. Any HTTP usage, model usage, or succ
 
 ## Stop and boundary rules
 
-- Stop after six tool executions, after a 401/402/403, or at the 600-second deadline. No retries inside the driver.
+- Stop after six tool executions, after a 401/402/403, or at the 420-second amended deadline. No retries inside the driver.
 - The receipt stores only filtered RPC/tool frames, structured tool outputs, model/usage/latency fields, and SHA-256 hashes of prompt input paths. It does not store the API key.
 - This measures one real OMP session and these public captured inputs. It does not prove fleet-wide L3, repeated-session reliability, or outcome value beyond these calls.
+
+## Amendment before first valid live call
+
+The initial bounded launch used omp-test with a 600-second child deadline and was terminated by the outer tool at 700 seconds before the driver wrote a receipt. The profile session log contained no jev_rerank, jev_claim_check, or jev_classify tool execution, so it is not a live result and is not scored. Before rerunning, the driver is amended to use the proven live muse profile and a 420-second child deadline, still within the same six-call cap and spend bar. The amendment is committed before the rerun.

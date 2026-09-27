@@ -52,8 +52,8 @@ function usageOf(details) {
   return { input_tokens: input, output_tokens: output };
 }
 
-if (!process.env.OMP_PROFILE) process.env.OMP_PROFILE = "omp-test";
-const child = spawn("omp", ["--profile=omp-test", "--cwd", ROOT, "--mode=rpc", "--max-time=600"], {
+const PROFILE = process.env.OMP_L3_PROFILE ?? "muse";
+const child = spawn("omp", [`--profile=${PROFILE}`, "--cwd", ROOT, "--mode=rpc", "--max-time=420"], {
   cwd: ROOT,
   env: { ...process.env },
 });
