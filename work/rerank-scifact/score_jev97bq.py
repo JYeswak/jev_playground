@@ -155,6 +155,11 @@ def main() -> int:
         json.dumps(usage_after.get("usage"), sort_keys=True),
     )
     row_usage = [r.get("usage", {}) for r in rows if r.get("status") == "ok"]
+    latencies = sorted(
+        int(r["latencyMs"])
+        for r in rows
+        if r.get("status") == "ok" and "latencyMs" in r
+    )
     result = {
         "bead": "jev-97bq",
         "status": "SCORED",
@@ -183,6 +188,11 @@ def main() -> int:
             "discordant": b + c,
         },
         "wilcoxon_ndcg": wilcoxon_signed_rank(incumbent_ndcg, jev_ndcg),
+        "latency_ms": {
+            "p50": latencies[len(latencies) // 2],
+            "p95": latencies[min(len(latencies) - 1, int(len(latencies) * 0.95))],
+            "sum": sum(latencies),
+        },
         "usage": {
             "before": usage_before,
             "after": usage_after,
