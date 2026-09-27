@@ -1,0 +1,12 @@
+{
+  "any_open_windows": 15,
+  "boundary": "Hash-only session audit; no command, query, URL, or model call; usable means a read/fetch/web_extract/open_url within ten subsequent tool calls matched a returned URL.",
+  "days": 7,
+  "expected_usable_windows_per_48h": 4.285714285714286,
+  "schema": "jev-web-open-audit.v1",
+  "session_files": 496,
+  "usable_hook_windows": 15,
+  "web_search_windows": 45,
+  "window_end": "2026-09-27T10:31:17.926987+00:00",
+  "window_start": "2026-09-20T10:31:17.926987+00:00"
+}
