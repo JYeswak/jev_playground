@@ -7,7 +7,7 @@ import {SCIFACT_CRITERIA, SCIFACT_INSTRUCTIONS} from "../../kit/src/verify.ts";
 const ROOT = new URL("../..", import.meta.url);
 const STATES = new URL("var/agent-tmp/jev-oioo/states.jsonl", ROOT);
 const ITEMS = new URL("work/jev-oioo/items.jsonl", ROOT);
-const OUT = new URL(process.env.JEV_OIOO_OUT ?? "var/agent-tmp/jev-oioo/live-results.jsonl", ROOT);
+const OUT = new URL(process.env.JEV_OIOO_OUT ?? "work/jev-oioo/live-results.jsonl", ROOT);
 const OPENROUTER_MODEL = "dots-studio/dots-3-note-preview:free";
 const RESET_AT = "2026-09-28T00:00:00Z";
 const comparatorOnly = process.env.JEV_OIOO_COMPARATOR_ONLY === "1";
@@ -60,9 +60,13 @@ async function comparator(state) {
 }
 
 const baseFor = (id) => ({id, gold: items[id].label});
-const pending = comparatorOnly
+const pendingBase = comparatorOnly
   ? existing.filter((row) => row.comparator.status === "refused" || row.comparator.status === "not_run")
   : states.filter((row) => !byId.has(row.id)).map((row) => ({id: row.id}));
+if (comparatorOnly && existing.length !== 907) throw new Error(`resume requires committed 907-row OUT, got ${existing.length}`);
+const planted = DRY_RUN && process.env.JEV_OIOO_PLANT_SELECT === "1";
+const answeredPlant = existing.find((row) => row.comparator.status === "scored");
+const pending = planted && answeredPlant ? [...pendingBase, {id: answeredPlant.id}] : pendingBase;
 const selectedIds = pending.map((row) => row.id);
 const selectedIdsSha256 = createHash("sha256").update(`${[...selectedIds].sort().join("\n")}\n`).digest("hex");
 if (DRY_RUN && NOW_MS < Date.parse(RESET_AT)) {
@@ -88,7 +92,7 @@ for (const pendingRow of pending) {
   const free = await comparator(state);
   row.comparator = free;
   byId.set(id, row);
-  await writeRows();
+  if (!DRY_RUN) await writeRows();
   if (free.status === "not_run" && free.reason.startsWith("openrouter-429")) stopped = true;
 }
 if (stopped) {
@@ -96,7 +100,7 @@ if (stopped) {
     const row = byId.get(pendingRow.id);
     if (row && row.comparator.status === "pending") { row.comparator = {status: "not_run", reason: "openrouter-429-daily-quota", retryAfter: RESET_AT}; byId.set(row.id, row); }
   }
-  await writeRows();
+  if (!DRY_RUN) await writeRows();
 }
 const done = [...byId.values()];
 console.log(JSON.stringify({rows: done.length, comparatorOnly, selected: pending.length, selectedIdsSha256, sent, stopped, comparatorRefused: done.filter((x) => x.comparator.status === "refused").length, comparatorNotRun: done.filter((x) => x.comparator.status === "not_run").length, comparatorModel: OPENROUTER_MODEL}));
