@@ -2622,3 +2622,11 @@ The shared experiment runner now refuses live runs without a REACHABLE receipt w
 - Router reach receipt: work/jev-38qj/reach-receipt.json uses paired McNemar reachability (400 tasks, fixed comparator exact 4, oracle headroom 396), status REACHABLE, items hash pinned to work/choice-banking77/subset.jsonl.
 
 Boundary: this is a keyless pre-spend refusal gate. No live router benchmark was run by this change.
+## jev-v87h omp judge drift check [test]
+
+Project model-role config is gate-protected, so no config outside the repository was changed and no global/profile setting was written. Added scripts/check-omp-judge-drift.py: it fails closed when recorded model_usage rows contain a model other than jev-1.13.0, and its selftest plants matching, drift, and missing-model rows.
+
+- Verification: python3 scripts/check-omp-judge-drift.py unused.jsonl --selftest -> SELFTEST PASS; unittest -> 4/4 passed; py_compile passed.
+- Drift output names the expected model and offending row; no live call or key required.
+
+Boundary: this is a repository-local receipt check. It does not inspect or mutate ~/.omp profiles and does not claim that the current global judge role is pinned.
