@@ -58,6 +58,14 @@
       ]
     }
   },
+  "flag_precision": {
+    "den": 359,
+    "num": 92,
+    "rate": 0.2562674094707521,
+    "wilson95": [0.2138532736043019, 0.3038424148410475]
+  },
+  "sample_design": "stratified sample: all 360 flagged rows plus 200 randomly sampled unflagged rows (seed 20260925)",
+  "sample_rate_scope": "The catch, false-alarm, and precision rates are sample rates, not fleet rates.",
   "jevcalls": 0,
   "manifest_sha256": "e533581eaefa9cc4259865a567e6dfbaf81a75e16e3e13d1c0d6ce4cdcaa1849",
   "models": {
