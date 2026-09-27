@@ -14,6 +14,7 @@ INPUT_COST_PER_MILLION = 0.042
 DEFAULT_GATE_SHADOW = Path.home() / ".local/state/jev/gate-shadow.jsonl"
 DEFAULT_GATE_OBSERVE = Path.home() / ".local/state/jev/gate-observe.jsonl"
 DEFAULT_WEB_SHADOW = Path.home() / ".local/state/jev/websearch-rerank.jsonl"
+DEFAULT_INJECTION_SHADOW = Path.home() / ".local/state/jev/injection-shadow.jsonl"
 
 
 def rows(path: Path) -> list[dict[str, Any]]:
@@ -152,10 +153,45 @@ def web_report(web: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def injection_report(values: list[dict[str, Any]]) -> dict[str, Any]:
+    scored = [row for row in values if row.get("status") == "scored"]
+    return {
+        "rows": len(values),
+        "status_counts": {
+            status: sum(row.get("status") == status for row in values)
+            for status in sorted({str(row.get("status")) for row in values})
+        },
+        "scored": len(scored),
+        "flags": sum(row.get("flag") is True for row in scored),
+        "latency_ms": {
+            "p50": percentile(
+                sorted(
+                    float(row["latencyMs"])
+                    for row in scored
+                    if isinstance(row.get("latencyMs"), (int, float))
+                ),
+                0.5,
+            ),
+            "p95": percentile(
+                sorted(
+                    float(row["latencyMs"])
+                    for row in scored
+                    if isinstance(row.get("latencyMs"), (int, float))
+                ),
+                0.95,
+            ),
+        },
+        "input_tokens": sum(
+            int((row.get("tokens") or {}).get("input_tokens") or 0) for row in scored
+        ),
+    }
+
+
 def build_report(
     shadow_path: Path,
     existing_path: Path,
     web_path: Path,
+    injection_path: Path,
     sample_size: int = 20,
     seed: int = 20260927,
 ) -> dict[str, Any]:
@@ -164,6 +200,7 @@ def build_report(
         "seed": seed,
         "gate": gate_report(rows(shadow_path), rows(existing_path), sample_size, seed),
         "web_search_rerank": web_report(rows(web_path)),
+        "injection_shadow": injection_report(rows(injection_path)),
     }
 
 
@@ -197,6 +234,9 @@ def main() -> int:
     parser.add_argument("--gate-observe", type=Path, default=DEFAULT_GATE_OBSERVE)
     parser.add_argument("--web-shadow", type=Path, default=DEFAULT_WEB_SHADOW)
     parser.add_argument(
+        "--injection-shadow", type=Path, default=DEFAULT_INJECTION_SHADOW
+    )
+    parser.add_argument(
         "--out-dir", type=Path, default=Path("var/agent-tmp/shadow-report")
     )
     parser.add_argument(
@@ -207,7 +247,11 @@ def main() -> int:
     parser.add_argument("--sample-size", type=int, default=20)
     args = parser.parse_args()
     report = build_report(
-        args.gate_shadow, args.gate_observe, args.web_shadow, args.sample_size
+        args.gate_shadow,
+        args.gate_observe,
+        args.web_shadow,
+        args.injection_shadow,
+        args.sample_size,
     )
     if args.snapshot:
         out_dir, stem = Path("work/jev-5ay4"), f"report-{args.snapshot}"

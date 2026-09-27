@@ -57,7 +57,11 @@ class ShadowReportTests(unittest.TestCase):
                 ],
             )
             report = build_report(
-                shadow, existing, root / "missing.jsonl", sample_size=2
+                shadow,
+                existing,
+                root / "missing.jsonl",
+                root / "missing-injection.jsonl",
+                sample_size=2,
             )
             gate = report["gate"]
             self.assertEqual(gate["matrix_2x2"]["jev_true_existing_false"], 1)
@@ -93,7 +97,12 @@ class ShadowReportTests(unittest.TestCase):
                     },
                 ],
             )
-            report = build_report(root / "missing.jsonl", root / "missing2.jsonl", web)
+            report = build_report(
+                root / "missing.jsonl",
+                root / "missing2.jsonl",
+                web,
+                root / "missing-injection.jsonl",
+            )
             self.assertEqual(report["web_search_rerank"]["answered"], 2)
             self.assertEqual(report["web_search_rerank"]["pick_equals_rank1"], 1)
             self.assertEqual(report["web_search_rerank"]["opened_pick"], 1)
@@ -102,7 +111,10 @@ class ShadowReportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             report = build_report(
-                root / "missing-a", root / "missing-b", root / "missing-c"
+                root / "missing-a",
+                root / "missing-b",
+                root / "missing-c",
+                root / "missing-injection.jsonl",
             )
             latest, latest_disagreements = write_outputs(report, root, "latest")
             snapshot, snapshot_disagreements = write_outputs(
@@ -119,7 +131,10 @@ class ShadowReportTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             report = build_report(
-                root / "missing-a", root / "missing-b", root / "missing-c"
+                root / "missing-a",
+                root / "missing-b",
+                root / "missing-c",
+                root / "missing-injection.jsonl",
             )
             self.assertEqual(report["gate"]["scored_rows"], 0)
             self.assertEqual(report["web_search_rerank"]["answered"], 0)
