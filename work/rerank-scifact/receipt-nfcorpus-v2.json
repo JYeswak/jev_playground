@@ -1,0 +1,54 @@
+{
+  "bead": "jev-iu1e",
+  "dataset": "BEIR NFCorpus test",
+  "dataset_zip_sha256": "efe5be03f8c5b86a5870102d0599d227c8c6e2484328e68c6522560385671b0b",
+  "candidates_sha256": "1ef3835708d8522ed39f2f2bd4018ea07390e403bcfd8e00119580e69860e3ec",
+  "prereg_sha256": "0821e9f24bcd3a4e07198c41bcdb76fb12f24d4461a43bc059c92de3848758d0",
+  "model": "jev-1.13.0",
+  "calls": 234,
+  "answered": 234,
+  "invalid_choices": 0,
+  "rows": "rows-nfcorpus-v2-jev.jsonl",
+  "baseline_ndcg10": 0.4210718142565178,
+  "jev_ndcg10": 0.4480190095434135,
+  "ndcg10_delta": 0.02694719528689571,
+  "baseline_top1": 0.5811965811965812,
+  "jev_top1": 0.7094017094017094,
+  "top1_delta": 0.1282051282051282,
+  "mcnemar": {
+    "jev_only_wins": 45,
+    "bm25_only_wins": 15,
+    "two_sided_exact_p": 0.00013451408092849532
+  },
+  "latency_ms": {
+    "p50": 260.0,
+    "p95": 582,
+    "sum": 67307
+  },
+  "usage": {
+    "input_tokens": 2100124,
+    "output_tokens": 60642,
+    "jev_input_cost_usd": 0.088205208
+  },
+  "bar": {
+    "ndcg10_delta_at_least": 0.05,
+    "top1_delta_at_least": 0.1,
+    "pass": false,
+    "reason": "top-1 threshold met; nDCG@10 threshold not met"
+  },
+  "invalid_first_run": {
+    "calls": 4680,
+    "input_tokens": 5884640,
+    "output_tokens": 1212000,
+    "jev_input_cost_usd": 0.24715488,
+    "total_input_cost_usd": 0.335360088,
+    "reason": "One-passage state with a 20-way Choice could not support the preregistered rerank; retained for incident accounting and excluded from scoring."
+  },
+  "spend": {
+    "total_jev_calls": 4914,
+    "total_input_tokens": 7984764,
+    "total_input_cost_usd": 0.335360088,
+    "pricing_basis": "0.042 USD per million input tokens; output free, per AGENTS.md lane policy"
+  },
+  "boundary": "No paid comparator or OpenRouter call. This receipt reports only NFCorpus queries eligible under this BM25 construction and this Choice state design; it is not a general retrieval claim and does not compare Jev with an LLM."
+}
