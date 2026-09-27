@@ -2705,3 +2705,81 @@ Boundary: this is a repository-local receipt check. It does not inspect or mutat
 - N=234 valid rows; invalid 0, error 0, duplicate 0. Free incumbent nDCG@10 **0.4341683**, top-1 **0.6666667**; committed Jev nDCG@10 **0.4480190**, top-1 **0.7094017**; incumbent minus Jev deltas **-0.0138507** and **-0.0427350**. McNemar top-1: incumbent-only 18, Jev-only 28, discordant 46. Wilcoxon nDCG approximate p **0.03220**. Latency p50/p95/sum **25,938 / 75,119 / 7,555,737 ms**.
 - Spend: OpenRouter usage before/after both **100.199757412**, unchanged; row usage 1,822,484 input / 710,243 output tokens. All row model IDs are `:free`; recorded comparator usage delta is $0 under the prereg gate.
 - Boundary: one free model, one frozen 234-query NFCorpus slice, no new Jev calls; incumbent did not tie or beat Jev on either primary metric. Initial 15 transient/error rows were retried through checkpointed outputs; final receipt scores no invalid/error rows and retains no raw command/state text.
+
+## jev-uncd gate question confirmation [live]
+
+- Source/receipt: `work/jev-uncd/final-receipt.json`, fixed in `8c27e036`; bound prereg/reach: `1750bd56`/`ad1f6ea2`.
+- Command: `kit/experiment/run.py --live`; 558/558 Jev rows, model `jev-1.13.0`, 448,246 input tokens, $0.018826332. Catch 90/93; precision 90/230 vs existing 92/359; McNemar b=128,c=1,p=3.8e-37.
+- Boundary: stratified sample rates only, not fleet rates; 52 pre-revised-bar calls ($0.001774038) are disclosed and invalid for the revised bar; comparator was not part of this run and no gate promotion was made.
+
+## jev-1lim held-out gate confirmation [live]
+
+- Source/receipt: `work/jev-1lim/final-receipt.json`, rows `0cd1ae7c`; prereg/reach `174bdd04`/`310666ef`.
+- Command: `kit/experiment/run.py --live`; 396/396 Jev rows, model `jev-1.13.0`, 318,056 input tokens, $0.013358352. Weighted precision 67.3% vs 24.0%; weighted harmless flagged 1.4% vs 9.1%; sample McNemar b=141,c=2,p=1.8e-39.
+- Boundary: all 196 flagged and 200/1,488 random-unflagged rows; three shared cmdSha retained and disclosed; 47 harm rows only, Wilson lower 0.924 reported not gated; no fleet-wide claim.
+
+## jev-dml3 unseen Score confirmation [live]
+
+- Source/receipt: `work/score-amazon`, final receipt commit `b6a766be`; prereg/reach approval `2e4245aa`.
+- Command: detached `kit/experiment/run.py --live`; 300 rows, Jev MAE 0.518 vs free comparator 1.328 on 274 paired valid rows; 26 comparator-invalid rows; seeded permutation p=1e-4; Jev input spend $0.0050.
+- Boundary: preregistered bar required at least 278 paired valid rows and was not met; descriptive effect only, not a confirmation or promotion.
+
+## jev-oioo unseen SciFact confirmation [live / comparator NOT_RUN]
+
+- Source/receipt: `work/jev-oioo/final-receipt.json`, strict-cut correction `838907da`; prereg/reach `85c18ece`/`41f35229`.
+- Command: `kit/experiment/run.py --live`; Jev arm 907/907, model `jev-1.13.0`, strict `>0.5` catch 592/907, 507,681 input tokens, $0.021322602 before corrected receipt accounting. Free comparator: 86 scored and 821 HTTP-429 daily-quota rows quarantined NOT_RUN.
+- Boundary: no comparator result, paired comparison, or promotion claim; comparator resume is scheduled after the documented reset and Jev arm is unchanged.
+
+## jev-za3a Climate-FEVER H1 dev replay [live / fail]
+
+- Source/receipt: replay receipt commit `027902fc`; prereg `6e8622cc`.
+- Command: Jev-only dev replay over 200 committed IDs; baseline 148/200, replay 147/200, replay-only 10, baseline-only 11, exact McNemar p=1.0.
+- Boundary: H1 was set aside and H2 was next under the frozen decision; per-row replay results were not committed, so no held-out or fleet claim follows.
+
+## jev-41c6 Climate-FEVER H2 dev design [test / prereg]
+
+- Source/prereg: `1512e0e1`; same 200 dev IDs as H1, aggregation any-support >0.5 and no-contradiction >0.5, reach arithmetic 6-0 p=0.031.
+- Command: NOT_RUN in the cited pane verdict; all states were reported FITS and the run was Jev-only.
+- Boundary: no live answer rows or confirmation result were cited; this is a preregistered dev design, not a measured outcome.
+
+## jev-cqex Climate-FEVER evidence-label concentration [test / prereg]
+
+- Source/prereg: `1e93d749`; frozen strata use the unique majority of five evidence labels, Noul >0.5, disagreement accuracy band [0.40,0.60], Wilson intervals per stratum.
+- Command: NOT_RUN in the cited pane verdict; no live Jev result was cited.
+- Boundary: only the keyless strata/preregistration contract is recorded; no accuracy, spend, or model claim.
+
+## jev-k26w README kit live smoke [live]
+
+- Source: bead `jev-k26w`; four README verbs were requested with key, model `jev-1.13.0`, and no `--fake` path.
+- Command: README Quickstart live verb commands; the cited pane verdict/receipt was not present in the current tree for numeric extraction.
+- Boundary: no new measurement is claimed here; use only the unit's committed receipt when it is linked by the owning verdict.
+
+## jev-f4ea omp kit verbs L3 [omp-wired]
+
+- Source: bead `jev-f4ea`; real omp session/tool-call acceptance requested for `jev_rerank`, `jev_claim_check`, and `jev_classify` plus a refused bad input.
+- Command: real omp session invocation; the cited pane verdict/receipt was not present in the current tree for numeric extraction.
+- Boundary: no unobserved L3 transcript or live spend is claimed in this ledger row.
+
+## jev-5p56 omp Jev gate tool L3 [omp-wired]
+
+- Source/receipts: implementation `34b36325`; refusal fix `4cd9d9b6`; L3 frames `633af8f8`; kit fix `bc59dc4d`.
+- Command: `omp --mode=rpc` fresh-session tool invocation on `npm publish --access public`; model `jev-1.13.0`, 747 input/96 output tokens, 94 ms, estimated input spend $0.000031374; empty command refused before Jev.
+- Boundary: L2/L3 proof is the cited filtered transcript; no command execution occurred and no automatic enforcement side effect is claimed.
+
+## jev-a9fv tool-result injection gate [live]
+
+- Source/receipt: prereg `da65e241`, feasibility `c0f431ed`, live receipt `929b661f`.
+- Command: `kit/experiment/run.py --live`; model `jev-1.13.0`, 600/600 answered, 468,281 input/12,000 output tokens, spend $0.019667802; clean 5/300 false flags, planted catch 269/300, positions 86/92/91.
+- Boundary: raw text was not committed; the pane verdict requested a non-author recount before closure, and this row claims only the cited receipt numbers.
+
+## jev-g1xw omp shadow logs [omp-wired]
+
+- Source: implementation/check `7b7a7bb2`; pane-one check recorded a real gate-shadow row: model `jev-1.13.0`, maxScore 0.02, latency 184 ms, no error.
+- Command: fresh `omp --profile codex -p` bash session; gate-shadow scored row observed.
+- Boundary: websearch-rerank remained unproven (no post-change answered row with model `jev-1.13.0`); no web seam promotion or fleet claim.
+
+## jev-bs5q omp pre-tool shadow hook [omp-wired]
+
+- Source/fix: `b71ba831`; offline hook tests 6/6 and stage 70 reported 153 tests.
+- Command: real pre-tool shadow path was attempted; the cited non-author check found no real gate-shadow row change and `existingFlag` unavailable on omp tool_call events.
+- Boundary: no live Jev result, no comparable existing flag, no L3 closure, and no enforcement claim; the hook remains a candidate only.
