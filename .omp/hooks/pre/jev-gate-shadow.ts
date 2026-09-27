@@ -74,7 +74,10 @@ export function makeGateShadowHandler(deps: ShadowDeps = {}) {
       calls += 1;
       let result: JevBundleResult;
       try {
-        result = await (ask ?? askJevBundle)({ state: { command, context: STATE_CONTEXT }, questions: RISK, model: MODEL, timeoutMs: 20_000 });
+        result = await Promise.race([
+          (ask ?? askJevBundle)({ state: { command, context: STATE_CONTEXT }, questions: RISK, model: MODEL, timeoutMs: 20_000 }),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error("shadow ask timeout")), 25_000)),
+        ]);
       } catch (error) {
         await write({ ...row, status: "error", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null, error: error instanceof Error ? error.message : String(error) });
         return undefined;

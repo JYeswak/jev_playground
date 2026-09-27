@@ -223,7 +223,10 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
       if (paused || calls >= cap) { write(loggedRow(base, now)); return undefined; }
       calls += 1;
       try {
-        const result = await rerankTop1({ query: parsed.query, candidates: parsed.items, ask });
+        const result = await Promise.race([
+          rerankTop1({ query: parsed.query, candidates: parsed.items, ask }),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error("rerank shadow timeout")), 25_000)),
+        ]);
         base.pickIndex = parsed.items.findIndex((item) => item.id === result.choice);
         base.latencyMs = result.latencyMs;
         base.inputTokens = result.usage?.input_tokens ?? null;
