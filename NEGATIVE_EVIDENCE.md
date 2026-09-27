@@ -3411,6 +3411,8 @@ clean output has median p 0.53, so any cut quiet enough here is untested against
 its public-corpus result. It says that seat is the wrong seat for tool output, so no
 `tool_result` hook was built.
 
+**Retry condition tested (2026-09-27, jev-wxw8 / jev-29s4):** the coding-agent seat replaced the news persona. On 300 real tool results it produced 5/300 false flags; on 300 markerless planted injections it caught 268/300 (Wilson lower 0.853). The retry condition's seat/bar portion PASSED. No LLM comparator was run; `jev-pgtu` is booked for 2026-10-03, so no comparator claim is made. Receipts: `work/jev-a9fv/receipt.json`, `work/jev-29s4/receipt.json`; implementation `3832ddd8`.
+
 ## R81 — FAILED BAR: the criteria gate catches at least 60% of risky commands among the hard cases
 
 **Claim:** the criteria gate (`work/bicameral-gate/questions.mjs` at HEAD, jev-1.13.0, cut 0.5)
@@ -4636,11 +4638,11 @@ paired `opened/used next` join is specified before the shadow starts.
 
 **Retry condition:** set H1 aside; test H2 (question-shape/fan-out design, jev-41c6) on a fresh preregistered slice without gold labels in the state.
 
-## R118 — NOT MET: Amazon Score dev arm clears the MAE bar
+## R118 — NOT MET: Amazon Score confirmation arm clears the MAE bar
 
 **Claim (jev-dml3).** The Jev Score arm would meet the preregistered Amazon sentiment MAE bar against the fixed comparator.
 
-**Measured:** Jev MAE 0.518 versus comparator 1.328, p≈1e-4, but only 274/278 paired rows met the preregistered requirement, below the 278-pair bar. The result is under-complete, not a pass. Evidence: `work/score-amazon/run.py`, jev-dml3 receipt/rows.
+**Measured:** Jev MAE 0.518 versus comparator 1.328, p≈1e-4, but only 274 pairs met the preregistered requirement of 278 pairs. The result is under-complete, not a pass. Evidence: `work/score-amazon/run.py`, jev-dml3 receipt/rows.
 
 **Retry condition:** jev-545t runs a fresh unscored five-class set sized for comparator invalids and reuses the committed MAE/pair-count bar.
 
