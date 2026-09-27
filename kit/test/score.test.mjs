@@ -5,7 +5,7 @@ import { scoreText, SST5_INSTRUCTIONS, SST5_LEVELS } from "../src/score.ts";
 import { createFakeFetch } from "../src/fake.ts";
 import { PreflightError } from "../src/preflight.ts";
 
-const capturedText = "These are AWFUL. They are see through, the fabric feels like tablecloth, and they fit like children’s clothing. Customer service did seem to be nice though, but I regret missing my return date for these. I wouldn’t even donate them because the quality is so poor.";
+const capturedText = "it represents better-than-average movie-making that does n't demand a dumb , distracted audience .";
 const levels = JSON.parse(await readFile(new URL("../examples/sst5-levels.json", import.meta.url), "utf8"));
 const capturedRows = JSON.parse(await readFile(new URL("./fixtures/sst5-answer.json", import.meta.url), "utf8"));
 
@@ -17,9 +17,9 @@ test("score accepts the captured continuous Score answer and rounds half up", as
     fetchImpl: createFakeFetch(capturedRows),
     model: "fake",
   });
-  assert.equal(result.score, 0.07);
-  assert.equal(result.level, levels[0]);
-  assert.equal(result.confidence, 0.94);
+  assert.equal(result.score, 2.99);
+  assert.equal(result.level, levels[3]);
+  assert.equal(result.confidence, 0.98);
   assert.equal(result.model, "fake");
 });
 
