@@ -37,12 +37,14 @@
     "reason": "top-1 threshold met; nDCG@10 threshold not met"
   },
   "invalid_first_run": {
+    "rows": "rows-nfcorpus-jev.jsonl",
     "calls": 4680,
+    "answered_rows": 4680,
+    "model": "jev-1.13.0",
     "input_tokens": 5884640,
     "output_tokens": 1212000,
     "jev_input_cost_usd": 0.24715488,
-    "total_input_cost_usd": 0.335360088,
-    "reason": "One-passage state with a 20-way Choice could not support the preregistered rerank; retained for incident accounting and excluded from scoring."
+    "reason": "The first runner sent one passage per state while asking a 20-way Choice. The resulting rows cannot measure a 20-candidate rerank, so they were discarded from all metrics and retained only for incident/spend accounting."
   },
   "spend": {
     "total_jev_calls": 4914,
