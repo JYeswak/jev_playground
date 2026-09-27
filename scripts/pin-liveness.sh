@@ -38,7 +38,11 @@
 #   scripts/pin-liveness.sh [STATUS_TSV] [THRESHOLD]     # positional, like the other lane tools
 #   exit 0 = no row pins to a hot file · 3 = at least one does · 2 = usage/IO error
 set -uo pipefail
-root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd -P)
+if [ -n "${PIN_LIVENESS_ROOT:-}" ]; then
+  root=$(CDPATH='' cd -- "$PIN_LIVENESS_ROOT" && pwd -P) || exit 1
+else
+  root=$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd -P) || exit 1
+fi
 cd "$root" || exit 1
 
 STATUS="${1:-docs/demos/STATUS.tsv}"

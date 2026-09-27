@@ -14,6 +14,18 @@ arm() { local name="$1" want="$2"; shift 2; "$@" >/dev/null 2>&1; local got=$?
 tmp=$(mktemp -d) || { echo "selftest-pin-liveness: mktemp failed"; exit 1; }
 trap 'rm -rf "$tmp"' EXIT
 hdr=$(head -1 docs/demos/STATUS.tsv)
+testroot="$tmp/repo"
+mkdir -p "$testroot"
+git -C "$testroot" init -q
+git -C "$testroot" config user.email selftest@example.invalid
+git -C "$testroot" config user.name pin-liveness-selftest
+git -C "$testroot" config core.hooksPath /dev/null
+printf 'baseline\n' > "$testroot/NEGATIVE_EVIDENCE.md"
+git -C "$testroot" add NEGATIVE_EVIDENCE.md
+git -C "$testroot" commit -q -m baseline
+printf 'hot append\n' >> "$testroot/NEGATIVE_EVIDENCE.md"
+git -C "$testroot" add NEGATIVE_EVIDENCE.md
+git -C "$testroot" commit -q -m append
 
 # 1. THE REAL DEFECT, replayed: a row pinned to NEGATIVE_EVIDENCE.md, the file that actually
 #    drifted tonight. Threshold 1 guarantees the hot-file condition regardless of today's rate,
@@ -21,7 +33,7 @@ hdr=$(head -1 docs/demos/STATUS.tsv)
 { printf '%s\n' "$hdr"
   printf 'replayed-UP-R16\t2\t0\tRULED_OUT\tpane1\tNEGATIVE_EVIDENCE.md\treason\t\tdeadbeefdeadbeef\tmeasurement\n'
 } > "$tmp/hot.tsv"
-arm "row pinned to a hot file exits 3" 3 bash "$S" "$tmp/hot.tsv" 1
+arm "row pinned to a hot file exits 3" 3 env PIN_LIVENESS_ROOT="$testroot" bash "$S" "$tmp/hot.tsv" 1
 
 # 2. The fix that was actually applied must PASS: same row repointed at the extracted receipt.
 { printf '%s\n' "$hdr"

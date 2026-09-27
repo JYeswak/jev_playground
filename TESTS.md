@@ -567,3 +567,18 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 | kit/test/cli.test.mjs | node --test kit/test/cli.test.mjs | doctor --robot NOT_RUN/no-key exit 2, fake offline ask, invalid robot usage; doctor-always-READY plant fails | 3/3 keyless; mutation RED |
 | kit/test/package.test.mjs | node --test kit/test/package.test.mjs | npm pack → temp install → compiled doctor --robot NOT_RUN/no-key exit 2; package-name plant fails | 1/1 keyless; mutation RED |
 | kit/test/install.test.mjs | node --test kit/test/install.test.mjs | fresh temp git repo receives 4 tools, observe hook, portable support files, extensions, and refuses a user-modified overwrite | 1/1 keyless; RPC L2 manual proof |
+## Newly registered tests — jev-1fv3
+
+- `.omp/hooks/post/jev-find-rank.test.mjs` — keyless forward find-rank shadow hook: hash-only rows, rank assertions, cap, and real-log protection. Run: `node --experimental-strip-types --test .omp/hooks/post/jev-find-rank.test.mjs` (4 tests).
+- `.omp/hooks/post/jev-web-search-rerank.test.mjs` — keyless web-search rerank shadow hook: passthrough, row logging, cap, 402 stop, and open tracking. Run: `node --experimental-strip-types --test .omp/hooks/post/jev-web-search-rerank.test.mjs` (5 tests).
+- `kit/test/classify.test.mjs` — Banking77 Choice policy, malformed/unoffered/OVER refusals, and captured example CLI. Run: `node --experimental-strip-types --test kit/test/classify.test.mjs` (5 tests).
+- `kit/test/omp-tools.test.mjs` — installed omp rerank/claim-check/classify wrappers call the measured kit designs. Run: `node --experimental-strip-types --test kit/test/omp-tools.test.mjs` (3 tests).
+- `kit/test/rerank.test.mjs` — measured top-1 Choice ordering and preflight/refusal policy. Run: `node --experimental-strip-types --test kit/test/rerank.test.mjs` (4 tests).
+- `kit/test/score.test.mjs` — captured SST-5 Score design, levels, size and malformed-answer policy. Run: `node --experimental-strip-types --test kit/test/score.test.mjs` (4 tests).
+- `kit/test/verify.test.mjs` — captured SciFact Noul design, 0.5 cut, size and malformed-answer policy. Run: `node --experimental-strip-types --test kit/test/verify.test.mjs` (4 tests).
+- `kit/test/fixtures/banking77-answer.json` — captured Banking77 answer fixture consumed by `kit/test/classify.test.mjs` and the stranger CLI example; no standalone test command.
+- `kit/test/fixtures/rerank-fiqa-answer.json` — captured FiQA answer fixture consumed by `kit/test/rerank.test.mjs` and the stranger CLI example; no standalone test command.
+- `kit/test/fixtures/scifact-answer.json` — captured SciFact Noul answer fixture consumed by `kit/test/verify.test.mjs` and the stranger CLI example; no standalone test command.
+- `kit/test/fixtures/sst5-answer.json` — captured SST-5 Score answer fixture consumed by `kit/test/score.test.mjs`; no standalone test command.
+- `work/jev-l7ym/test_audit_sources.py` — keyless source-audit parser and provenance/shape checks over committed audit fixtures. Run: `python3 -m unittest work/jev-l7ym/test_audit_sources.py` (3 tests).
+- `work/jev-l7ym/test_measure.py` — keyless find-rank scoring assertions on committed synthetic rows; runs under both direct execution and unittest discovery. Run: `python3 -m unittest work/jev-l7ym/test_measure.py` (3 tests).
