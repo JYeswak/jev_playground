@@ -19,12 +19,8 @@
     "jev": {
       "accuracy": {
         "den": 907,
-        "num": 597,
-        "rate": 0.6582138919514884,
-        "wilson95": [
-          0.6267367977756302,
-          0.6883564571708357
-        ]
+        "num": 592,
+        "rate": 0.6527012127894156
       },
       "brier": 0.2327659316427785,
       "model": "jev-1.13.0",
@@ -42,11 +38,19 @@
   "dataset": "tdiggelm/climate-fever@1.0.1",
   "items": "work/jev-oioo/items.jsonl",
   "items_sha256": "bbda30671b46678a11717d0fa89994b5226e9887ff321ec70a860e45f579032c",
+  "jev_threshold_correction": {
+    "corrected_jev_correct": 592,
+    "exact_ties_reclassified": 5,
+    "operator": "strict > 0.5",
+    "previous_jev_correct": 597,
+    "previous_operator": ">= 0.5",
+    "previous_result_invalid": true
+  },
   "jevcalls": 907,
   "mcnemar": {
     "b_jev_only_correct": 3,
     "c_comparator_only_correct": 2,
-    "exact_two_sided_p": 1
+    "exact_two_sided_p": 1.0
   },
   "prereg": "work/jev-oioo/prereg.md",
   "prereg_sha256": "b8448df45f0c5ce4481688770a12c314f6f58df2aa6b74a846d0b997b2797a01",
@@ -57,7 +61,7 @@
   "rows": 907,
   "source_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
   "spend_usd": 0.021322602000000003,
-  "status": "MEASURED_NOT_RUN_FREE_QUOTA",
+  "status": "MEASURED_NOT_RUN_FREE_QUOTA_THRESHOLD_CORRECTED",
   "unit": "jev-oioo",
   "usage": {
     "comparator_completion_tokens": 87656,

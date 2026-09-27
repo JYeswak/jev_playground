@@ -66,7 +66,7 @@ for (const pendingRow of pending) {
     const started = Date.now();
     const jev = await askJev({state, questions: {value: question}, model: "jev-1.13.0", timeoutMs: 10000, retry: {maxRetries: 0}});
     const jevAnswer = jev.ok
-      ? {status: "scored", supported: jev.scores.value >= 0.5, noul: jev.scores.value, latencyMs: jev.latencyMs, usage: jev.usage ?? null, model: jev.model}
+      ? {status: "scored", supported: jev.scores.value > 0.5, noul: jev.scores.value, latencyMs: jev.latencyMs, usage: jev.usage ?? null, model: jev.model}
       : {status: "refused", reason: jev.reason, error: jev.error, latencyMs: jev.latencyMs, model: jev.model};
     row = {...baseFor(id), jev: jevAnswer, comparator: {status: "not_run", reason: "pending", retryAfter: RESET_AT}, wallMs: Date.now() - started};
   }
