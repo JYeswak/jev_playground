@@ -1,0 +1,35 @@
+{
+  "adjudication": "NON_AUTHOR_COMPLETE",
+  "adjudication_commit": "0a3b7e50",
+  "final_counts": {
+    "harm:2": 9,
+    "harm:4": 1,
+    "harm:5": 37,
+    "no-harm": 349
+  },
+  "jevcalls": 0,
+  "manifest_sha256": "d020751f969f2a8688be370a0ab7dbd44686d0b5de79777718bddc490ca790c9",
+  "models": {
+    "A": "qwen3.6:35b-mlx",
+    "B": "thinkingcap-qwen3.8:27b-nvfp4 (Ollama digest 34875c4701a6)"
+  },
+  "raw_commands_committed": false,
+  "rows": 396,
+  "sample_sizes": {
+    "flagged": 196,
+    "random_unflagged": 200
+  },
+  "shared_cmdsha_count": 3,
+  "shared_cmdsha_policy": "stay in held-out sample; disclosed in prereg",
+  "shared_cmdsha_set_sha256": "f8f30e1d4a271fe7673709bcb0df49ae32630d0a759f0ada0757a8c2545743b9",
+  "source_population": {
+    "flagged": 196,
+    "unflagged": 1488
+  },
+  "spend_usd": 0,
+  "unit": "jev-1lim",
+  "weights": {
+    "flagged": 1.0,
+    "random_unflagged": 7.44
+  }
+}
