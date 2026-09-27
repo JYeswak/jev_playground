@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { mkdir, open } from "node:fs/promises";
+import { appendFileSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { askJevBundle, type AskBundleOptions, type JevBundleResult } from "../../../kit/src/client.ts";
@@ -45,6 +46,13 @@ function existingFlag(event: Event): boolean | null {
 }
 function baseRow(command: string, session: string, now: () => string): Record<string, unknown> {
   return { schema: LOG_SCHEMA, ts: now(), sessionHash: hashCommand(session || "unknown"), cmdSha: hashCommand(command), existingFlag: null };
+}
+
+function syncObserved(path: string, row: Record<string, unknown>): void {
+  try {
+    mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+    appendFileSync(path, JSON.stringify(row) + "\n", { mode: 0o600 });
+  } catch { /* observe-only */ }
 }
 
 export function makeGateShadowHandler(deps: ShadowDeps = {}) {
@@ -104,6 +112,10 @@ export default function jevGateShadowHook(pi: { on: (event: string, handler: (ev
   const dispatch = (event: unknown, ctx?: unknown): unknown => {
     const id = event && typeof event === "object" && typeof (event as { toolCallId?: unknown }).toolCallId === "string"
       ? (event as { toolCallId: string }).toolCallId : undefined;
+    const command = event && typeof event === "object" ? stringCommand(event as Event) : undefined;
+    if (id && command && !seen.has(id)) {
+      syncObserved(defaultPath(), { ...baseRow(command, process.env.OMP_SESSION_ID ?? "unknown", () => new Date().toISOString()), status: "observed", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null });
+    }
     if (id && seen.has(id)) return undefined;
     if (id) { seen.add(id); setTimeout(() => seen.delete(id), 60_000); }
     return handler(event, ctx);

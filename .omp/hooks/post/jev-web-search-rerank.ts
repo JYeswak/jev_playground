@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { appendFile, mkdir, open } from "node:fs/promises";
+import { appendFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
 import { rerankTop1, type RerankCandidate, type RerankOptions } from "../../../kit/src/rerank.ts";
@@ -101,6 +102,12 @@ function parseJson(text: string): unknown {
 }
 
 export function parseSearchResult(event: SearchEvent): { query: string; items: ResultItem[] } | undefined {
+function markdownItems(text: string): ResultItem[] {
+  const pattern = /(?:^|\n)\[(\d+)\]\s+([^\n]+)\n\s+(https?:\/\/\S+)([\s\S]*?)(?=\n\[\d+\]\s+|$)/g;
+  return [...text.matchAll(pattern)].slice(0, MAX_RESULTS).map((match, index) => ({
+    id: `result-${index}`, title: match[2].trim(), url: match[3].trim(), text: match[4].trim(),
+  }));
+}
   const source = event.input ?? event.args;
   const input = source && typeof source === "object" ? source as Record<string, unknown> : {};
   const query = stringValue(input.query) ?? stringValue(input.q);
@@ -110,9 +117,11 @@ export function parseSearchResult(event: SearchEvent): { query: string; items: R
   const parsedDetails = details && typeof details === "object" && !Array.isArray(details)
     && (Array.isArray((details as Record<string, unknown>).results) || Array.isArray((details as Record<string, unknown>).items))
     ? details : undefined;
-  const parsed = parsedDetails ?? parseJson(rawText(content) ?? rawText(details) ?? "");
+  const raw = rawText(content) ?? rawText(details) ?? "";
+  const parsed = parsedDetails ?? parseJson(raw);
   const root = parsed && typeof parsed === "object" ? parsed as Record<string, unknown> : {};
-  const rawItems = Array.isArray(root.results) ? root.results : Array.isArray(root.items) ? root.items : [];
+  const jsonItems = Array.isArray(root.results) ? root.results : Array.isArray(root.items) ? root.items : [];
+  const rawItems = jsonItems.length >= 2 ? jsonItems : markdownItems(raw);
   if (!query || rawItems.length < 2) return undefined;
   const items = rawItems.slice(0, MAX_RESULTS).flatMap((item, index) => {
     if (!item || typeof item !== "object") return [];
@@ -247,8 +256,25 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
   return handler;
 }
 
+function syncObservedWeb(path: string, event: SearchEvent): void {
+  try {
+    const parsed = parseSearchResult(event);
+    if (!parsed) return;
+    mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+    appendFileSync(path, JSON.stringify({ schema: LOG_SCHEMA, ts: new Date().toISOString(), sessionHash: hashValue(process.env.OMP_SESSION_ID ?? "unknown"), queryHash: hashValue(parsed.query), resultCount: parsed.items.length, pickIndex: null, providerRank1Index: 0, latencyMs: null, inputTokens: null, outputTokens: null, nextToolCalls: 0, openedPick: false, openedRank1: false, status: "observed" }) + "\n", { mode: 0o600 });
+  } catch { /* observe-only */ }
+}
+
 export default function jevWebSearchRerankHook(host: { on: (event: string, handler: (event: SearchEvent) => Promise<undefined>) => void }): void {
   const handler = makeWebSearchRerankHandler();
-  host.on("tool_result", (event) => handler(event));
-  host.on("tool_execution_end", (event) => handler(event));
+  const seen = new Set<string>();
+  const observe = (event: SearchEvent): Promise<undefined> => {
+    const id = typeof event.toolCallId === "string" ? event.toolCallId : undefined;
+    if (id && seen.has(id)) return Promise.resolve(undefined);
+    if (id) { seen.add(id); setTimeout(() => seen.delete(id), 60_000); }
+    syncObservedWeb(defaultPath(), event);
+    return handler(event);
+  };
+  host.on("tool_result", observe);
+  host.on("tool_execution_end", observe);
 }
