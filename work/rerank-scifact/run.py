@@ -72,7 +72,8 @@ BILLING = (
 
 
 def out_path(arm):
-    return os.path.join(HERE, f"rows-{arm}.jsonl")
+    suffix = f"-{DATASET}" if DATASET != "scifact" else ""
+    return os.path.join(HERE, f"rows{suffix}-{arm}.jsonl")
 
 
 def repair_tail(path):

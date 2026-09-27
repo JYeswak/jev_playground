@@ -1,0 +1,17 @@
+{
+  "bead": "jev-iu1e",
+  "dataset": "BEIR NFCorpus test",
+  "status": "REACHABLE",
+  "mode": "mcnemar",
+  "items": "candidates-nfcorpus.jsonl",
+  "items_sha256": "1ef3835708d8522ed39f2f2bd4018ea07390e403bcfd8e00119580e69860e3ec",
+  "tasks": 234,
+  "comparator_exact": 136,
+  "oracle_headroom": 24,
+  "best_case_discordant_losses": 0,
+  "minimum_attainable_p": 1.1920928955078125e-7,
+  "alpha": 0.05,
+  "command": "python3 scripts/bar-reachable.py --flip-fixture work/rerank-scifact/reach-fixture-jev-iu1e.json",
+  "lane": "offline",
+  "boundary": "This receipt proves only that the preregistered paired top-1 bar is mathematically reachable; it is not a live Jev result."
+}
