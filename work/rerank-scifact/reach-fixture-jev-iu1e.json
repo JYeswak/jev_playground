@@ -1,0 +1,7 @@
+{
+  "fixture": "jev-iu1e NFCorpus top-1 paired bar",
+  "tasks": 234,
+  "comparator_exact": 136,
+  "oracle_headroom": 24,
+  "bar_alpha": 0.05
+}

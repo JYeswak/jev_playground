@@ -29,30 +29,40 @@ sys.path.insert(
 )
 sys.path.insert(0, os.path.join(ROOT, "work", "anthropic-stop"))
 
-from typesafe_sdk import Noul, RetryPolicy  # noqa: E402
+from typesafe_sdk import Choice, RetryPolicy  # noqa: E402
 from anthropic_stop import refuse_paid_comparator  # noqa: E402  jev-lbgk
 
 JEV_MODEL = "jev-1.13.0"
 GROK_MODEL = "grok-4.20-0309-non-reasoning"
 GROK_BASE = "https://api.x.ai/v1"
 QNAME = "relevant"
-ZIP_SHA256 = "536e14446a0ba56ed1398ab1055f39fe852686ecad24a6306c80c490fa8e0165"
-ZIP_PATH = os.environ.get("BEIR_SCIFACT_ZIP", "/tmp/beir-scifact/scifact.zip")
+DATASET = os.environ.get("BEIR_DATASET", "scifact")
+ZIP_SHA256 = os.environ.get(
+    "BEIR_ZIP_SHA256",
+    "536e14446a0ba56ed1398ab1055f39fe852686ecad24a6306c80c490fa8e0165",
+)
+ZIP_PATH = os.environ.get(
+    "BEIR_ZIP_PATH",
+    os.environ.get("BEIR_SCIFACT_ZIP", "/tmp/beir-scifact/scifact.zip"),
+)
+CANDIDATES_PATH = os.environ.get(
+    "BEIR_CANDIDATES", os.path.join(HERE, "candidates.jsonl")
+)
 DEPTH = 20
 TIMEOUT_S = 120
-# Frozen with the bar. Instructions are the bead's phrase as a Noul question.
-# Criteria follow the rerank cookbook: true/false are defined, and relevance is
-# not collapsed into support.
-QUESTION = Noul(
-    instructions="Does this passage contain evidence relevant to the query?",
-    criteria={
-        "true": (
-            "The passage is on the query's subject and states evidence a reader "
-            "could use in assessing it, whether or not that evidence supports the query."
+
+
+def choice_question(doc_ids):
+    return Choice(
+        instructions=(
+            "Select the candidate passage most relevant to the query. "
+            "Choose the passage that best answers or provides evidence for the query; "
+            "choose among the IDs."
         ),
-        "false": "The passage is on a different subject, or states nothing about the query.",
-    },
-)
+        criteria={doc_id: f"Candidate passage with ID {doc_id}." for doc_id in doc_ids},
+    )
+
+
 ARMS = ("jev", "jev-run2", "jev-run3", "grok", "grok-run2", "grok-run3")
 BILLING = (
     "402 Your organization has no available TypeSafe API credits. "
@@ -93,7 +103,7 @@ def answered(arm):
         if not line.strip():
             continue
         row = json.loads(line)
-        if "noul" in row:
+        if "choice" in row:
             got.add((row["qid"], row["doc"]))
     return got
 
@@ -103,13 +113,14 @@ def load_text():
 
     digest = hashlib.sha256(open(ZIP_PATH, "rb").read()).hexdigest()
     if digest != ZIP_SHA256:
-        raise SystemExit(f"scifact.zip sha256 {digest} != {ZIP_SHA256}")
+        raise SystemExit(f"{DATASET}.zip sha256 {digest} != {ZIP_SHA256}")
     with zipfile.ZipFile(ZIP_PATH) as zf:
+        prefix = f"{DATASET}/"
         corpus = {
             d["_id"]: d
             for d in (
                 json.loads(line)
-                for line in zf.read("scifact/corpus.jsonl").decode().splitlines()
+                for line in zf.read(prefix + "corpus.jsonl").decode().splitlines()
                 if line.strip()
             )
         }
@@ -117,7 +128,7 @@ def load_text():
             q["_id"]: q["text"]
             for q in (
                 json.loads(line)
-                for line in zf.read("scifact/queries.jsonl").decode().splitlines()
+                for line in zf.read(prefix + "queries.jsonl").decode().splitlines()
                 if line.strip()
             )
         }
@@ -127,9 +138,11 @@ def load_text():
 def pairs():
     rows = [
         json.loads(line)
-        for line in open(os.path.join(HERE, "candidates.jsonl"), encoding="utf-8")
+        for line in open(CANDIDATES_PATH, encoding="utf-8")
         if line.strip()
     ]
+    if len(rows) != 234 and DATASET == "nfcorpus":
+        raise SystemExit(f"NFCorpus candidate count {len(rows)} != preregistered 234")
     out = []
     for row in rows:
         if len(row["cands"]) != DEPTH:
@@ -151,13 +164,13 @@ def state_for(corpus, queries, qid, doc):
     }
 
 
-def row_ok(qid, doc, arm, model, noul, latency_ms, usage, extra=None):
+def row_ok(qid, doc, arm, model, choice, latency_ms, usage, extra=None):
     row = {
         "qid": qid,
         "doc": doc,
         "arm": arm,
         "model": model,
-        "noul": noul,
+        "choice": choice,
         "latencyMs": latency_ms,
         "usage": usage,
     }
@@ -207,11 +220,17 @@ async def run_arm(arm, bar_path=None, repo=None):
         client_cm = AsyncTypeSafeClient(model=JEV_MODEL, retry=RetryPolicy())
 
         async def call(qid, doc):
+            docs = [
+                candidate_doc
+                for candidate_qid, candidate_doc in pairs()
+                if candidate_qid == qid
+            ]
             resp = await client_cm.system_one(
-                state_for(corpus, queries, qid, doc), {QNAME: QUESTION}
+                state_for(corpus, queries, qid, doc),
+                {QNAME: choice_question(docs)},
             )
             return {
-                "noul": float(resp.nouls[QNAME].noul),
+                "choice": resp.choices[QNAME].choice,
                 "model": resp.model,
                 "usage": {
                     "input_tokens": resp.usage.input_tokens,
@@ -236,12 +255,12 @@ async def run_arm(arm, bar_path=None, repo=None):
         async def call(qid, doc):
             resp = await client_cm.system_one(
                 state_for(corpus, queries, qid, doc),
-                {QNAME: QUESTION},
+                {QNAME: choice_question([doc])},
                 model=provider,
             )
             debug = resp.debug or {}
             return {
-                "noul": float(resp.answers[QNAME].noul),
+                "choice": resp.answers[QNAME].choice,
                 "model": f"xai/{GROK_MODEL}",
                 "usage": {
                     "input_tokens": int(resp.usage.input_tokens_total),
@@ -295,7 +314,7 @@ async def run_arm(arm, bar_path=None, repo=None):
                     doc,
                     arm,
                     got["model"],
-                    got["noul"],
+                    got["choice"],
                     int((time.perf_counter() - t0) * 1000),
                     got["usage"],
                     extra or None,
@@ -338,20 +357,11 @@ async def run_arm(arm, bar_path=None, repo=None):
 
 
 def selftest():
-    """Question and row shape. No key, no network, no passage text printed."""
+    """Choice question, state, and row shape; no key and no model call."""
     bad = []
-    if (
-        QUESTION.instructions
-        != "Does this passage contain evidence relevant to the query?"
-    ):
-        bad.append("instructions drifted")
-    criteria = QUESTION.criteria
-    true = criteria["true"] if isinstance(criteria, dict) else criteria.true
-    false = criteria["false"] if isinstance(criteria, dict) else criteria.false
-    if "whether or not that evidence supports" not in true:
-        bad.append("true criterion drifted")
-    if not false.startswith("The passage is on a different subject"):
-        bad.append("false criterion drifted")
+    question = choice_question(["doc-a", "doc-b"])
+    if question.type != "choice" or set(question.criteria) != {"doc-a", "doc-b"}:
+        bad.append("choice question drifted")
     if os.path.exists(ZIP_PATH):
         corpus, queries = load_text()
         qid, doc = pairs()[0]
@@ -365,9 +375,15 @@ def selftest():
         if st["passage"]["id"] != doc or not st["query"] or not st["passage"]["text"]:
             bad.append("state missing the pair")
         row = row_ok(
-            qid, doc, "jev", JEV_MODEL, 0.5, 1, {"input_tokens": 1, "output_tokens": 0}
+            qid,
+            doc,
+            "jev",
+            JEV_MODEL,
+            doc,
+            1,
+            {"input_tokens": 1, "output_tokens": 0},
         )
-        if "text" in json.dumps(row) and st["passage"]["text"][:20] in json.dumps(row):
+        if st["passage"]["text"][:20] in json.dumps(row):
             bad.append("row contains passage text")
     else:
         bad.append(f"zip absent at {ZIP_PATH}")
