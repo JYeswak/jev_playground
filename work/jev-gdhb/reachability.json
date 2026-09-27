@@ -12,7 +12,7 @@
   "question_bytes": 500,
   "state_size_preflight": "FITS 784, NEAR 0, OVER 0",
   "prereg_path": "work/jev-gdhb/PREREG.md",
-  "prereg_sha256": "a54fe68ee0082b917e1b4a0405a0f8ad9053ccc4cafcac763363b944435f95dd",
+  "prereg_sha256": "b83f6173cdb82ce2f603b46af85e0b809b2f0128aa9890b05cb28879263491ae",
   "launch_after_comparator": "2026-10-02T00:00:00Z",
   "hard_stop_statuses": [401, 402, 403, 429],
   "hard_stop_outcome": "NOT_RUN",

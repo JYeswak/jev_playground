@@ -30,10 +30,10 @@ Primary: paired exact McNemar on accuracy for Jev versus the free comparator, wi
 
 The frozen outcome rule follows the measured Banking77 classify bar:
 
-1. Both arms must have accuracy at least 50%; otherwise `NOT_SCORED` because the harness/arm is not feasible.
+1. An arm with more than 5% invalid, missing, malformed, or unparsed rows makes the run `NOT_SCORED` as a harness/arm failure. Accuracy below 50% is not itself a harness failure and remains part of the Jev-versus-free comparison.
 2. Jev must beat the fixed majority-label constant on the corpus.
 3. If `b > c` and exact McNemar `p < 0.05`, report `WIN`.
-4. Otherwise, if Jev accuracy is no more than 3 percentage points below the free comparator, report `NON_INFERIOR`.
+4. Otherwise, if Jev accuracy is no more than 3 percentage points below the free comparator **by point estimate**, report `NON_INFERIOR`; no interval is used for this margin.
 5. Otherwise report `LOSE`.
 6. `PASS` means `WIN` or `NON_INFERIOR` plus both refusal rates `<=5%`. Non-inferiority is not superiority; a non-significant difference alone is not a win.
 
