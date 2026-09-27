@@ -54,15 +54,25 @@ test("asker failure preserves the result and does not throw", async () => {
   assert.deepEqual(decision.flagged, []);
   assert.equal(decision.replacement, undefined);
 });
-test("project hook healthy path is shadow-only by default", async () => {
-  const previous = process.env.JEV_WEBSCREEN_ENFORCE;
+test("project hook healthy path is shadow-only and isolated", async () => {
+  const previousEnforce = process.env.JEV_WEBSCREEN_ENFORCE;
+  const previousPath = process.env.JEV_WEBSCREEN_SHADOW_PATH;
+  const temp = await mkdtemp(join(tmpdir(), "jev-qg1j-project-shadow-"));
+  const realPath = join(process.env.HOME ?? "", ".local/state/jev/webscreen-shadow.jsonl");
+  const before = await readFile(realPath, "utf8").catch(() => "");
+  process.env.JEV_WEBSCREEN_SHADOW_PATH = join(temp, "shadow.jsonl");
   delete process.env.JEV_WEBSCREEN_ENFORCE;
+  resetShadowForTest();
   let handler;
-  jevWebscreenHook({ on: (_event, value) => { handler = value; } });
+  jevWebscreenHook({ on: (_event, value) => { handler = value; } }, fakeAsker());
   const result = await handler({ toolName: "web_extract", content: [{ type: "text", text: "ordinary result" }] });
-  if (previous === undefined) delete process.env.JEV_WEBSCREEN_ENFORCE;
-  else process.env.JEV_WEBSCREEN_ENFORCE = previous;
+  const after = await readFile(realPath, "utf8").catch(() => "");
+  if (previousEnforce === undefined) delete process.env.JEV_WEBSCREEN_ENFORCE;
+  else process.env.JEV_WEBSCREEN_ENFORCE = previousEnforce;
+  if (previousPath === undefined) delete process.env.JEV_WEBSCREEN_SHADOW_PATH;
+  else process.env.JEV_WEBSCREEN_SHADOW_PATH = previousPath;
   assert.equal(result, undefined);
+  assert.equal(after.split("\n").filter(Boolean).length, before.split("\n").filter(Boolean).length);
 });
 test("enforce mode preserves clean results", async () => {
   const previous = process.env.JEV_WEBSCREEN_ENFORCE;
