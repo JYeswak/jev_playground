@@ -1,5 +1,5 @@
 {
-  "fixture": "jev-qsa6 mcnemar point bar",
+  "fixture": "jev-qsa6 free-vs-Jev no-harm McNemar headroom",
   "tasks": 396,
   "comparator_exact": 300,
   "oracle_headroom": 6,

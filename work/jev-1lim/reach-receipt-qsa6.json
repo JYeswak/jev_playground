@@ -2,14 +2,14 @@
   "alpha": 0.05,
   "best_case_discordant_losses": 0,
   "comparator_exact": 300,
-  "fixture": "jev-qsa6 mcnemar point bar",
+  "fixture": "jev-qsa6 free-vs-Jev no-harm McNemar headroom",
   "items_sha256": "d020751f969f2a8688be370a0ab7dbd44686d0b5de79777718bddc490ca790c9",
   "max_discordant_wins": 6,
   "minimum_attainable_p": 0.03125,
   "mode": "mcnemar",
   "oracle_headroom": 6,
   "prereg_path": "work/jev-1lim/PREREG-QSA6.md",
-  "prereg_sha256": "2efd1a52f27cb399764d737fb44bfddbc8842ce473a9d76efc3514c971fdf2bb",
+  "prereg_sha256": "09d4e4873b46355b259376e5a5da45829352e6895d01db3310ed9140299d4cf9",
   "status": "REACHABLE",
   "tasks": 396
 }
