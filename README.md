@@ -38,8 +38,8 @@ The install currently writes six callable tools, one post-hook, five omp extensi
 | `jev_claim_check` | Kit verify Noul receipts: SciFact `docs/demos/upstream-repro/noul-scifact-20260924.md`; Climate-FEVER `work/jev-oioo/final-receipt.json` | Uses strict `noul > 0.5`; measured SciFact accuracy 90.2% and Climate-FEVER 65.3% (weak case). Numeric claims are outside measured scope. |
 | `jev_classify` | Banking77 measurement: `docs/demos/upstream-repro/choice-banking77-20260924.md` | The 80.1% result is the measured Banking77 corpus, not a general classification guarantee. |
 | `jev_gate` | Held-out gate receipt: `work/jev-1lim/final-receipt.json` | Reported rates are stratified sample rates; the receipt contains 47 harm rows, not fleet-wide prevalence. |
-| `jev_flag` | Shared injection-seat measurement: `docs/demos/upstream-repro/jev-k9z5-flag-20260924.md` | R80 measured 640/662 attacks caught and 175/300 false flags on real tool results; not validated for production use. |
-| `jev_screen` | Shared injection-seat measurement: `docs/demos/upstream-repro/jev-k9z5-flag-20260924.md` | Same 640/662 attack and 175/300 real-tool false-flag scope; not validated as a general clean-output screen. |
+| `jev_flag` | Coding-agent seat: `work/jev-a9fv/receipt.json` + markerless replication `work/jev-29s4/receipt.json` | 5/300 false flags on real tool results; 268/300 markerless planted injections caught (Wilson lower 0.853); catch under replication. |
+| `jev_screen` | Coding-agent seat: `work/jev-a9fv/receipt.json` + markerless replication `work/jev-29s4/receipt.json` | Same coding-agent seat and privacy boundary; 5/300 clean false flags, 268/300 markerless catch (Wilson lower 0.853); catch under replication. |
 The installed tools load through project scope, so they apply to the throwaway repo regardless of the omp profile. To run the same command in a real project, replace `var/agent-tmp/jev-omp-demo` with that repository path.
 
 `jev omp install` is an installer, not a model call. The tools return keyless `NOT_RUN`/safe results when no TypeSafe key is available.
@@ -86,6 +86,7 @@ The table summarizes results whose receipts and bars are in [`docs/LEDGER.md`](d
 | BEIR FiQA rerank confirmation | Jev top-1 76.2% vs BM25 39.3% (McNemar 129 vs 10, p=1.65e-27); nDCG@10 delta +0.157; confirmatory top-1 bar passed; $0.119 | Choice rerank | `work/rerank-scifact/receipt-fiqa-mkex.json` |
 | OMP judge usage | 1,711 calls, $0.3547; find 1,595, auto-thinking 113, judge_batch 2, judge 1 | OMP judge usage | `EVAL.md@b74704c9` |
 | Jev gate question (blind fleet sample) | Jev catch 90/93 vs existing 92/93; precision 90/230 (39.1%) vs 92/359 (25.6%); harmless flagged 140/465 vs 267/465; McNemar b=128 c=1 p=3.82e-37; stratified sample rates, not fleet rates; jev-1.13.0 $0.018826; 52 pre-bar calls disclosed ($0.001774) | Noul / gate | `work/jev-uncd/final-receipt.json` |
+| Coding-agent tool-result injection seat | Clean real tool results falsely flagged 5/300 (Wilson 0.7%-3.8%); markerless planted injections caught 268/300 (Wilson 85.3%-92.3%; marked version 269/300); jev-1.13.0 $0.029779; Jev only, no LLM comparator; one public attack corpus planted at three fixed positions; replaces the news-persona seat's 175/300 false flags | Noul / coding-agent tool-result injection | `work/jev-a9fv/receipt.json; work/jev-29s4/receipt.json` |
 | Jev held-out fleet confirmation | Jev caught 47/47 vs 47/47; sample precision 47/57 (82.5%) vs 47/196 (24.0%); weighted precision 67.3% vs 24.0%; weighted harmless flagged 1.4% vs 9.1%; McNemar b=141 c=2 p=1.8e-39; strata 196/1,488; 47 harm rows only (Wilson lower 0.924, reported not gated); jev-1.13.0 $0.0134 | Noul / gate | `work/jev-1lim/final-receipt.json` |
 <!-- END GENERATED: measured-wins -->
 

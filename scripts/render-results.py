@@ -207,9 +207,30 @@ def jev_1lim(root: Path) -> tuple[str, str]:
         f"weighted precision {jev['precision']['rate']:.1%} vs {existing['precision']['rate']:.1%}; "
         f"weighted harmless flagged {jev['no_harm']['rate']:.1%} vs {existing['no_harm']['rate']:.1%}; "
         f"McNemar b={mc['b_existing_only_fp']} c={mc['c_jev_only_fp']} p={mc['exact_two_sided_p']:.2g}; "
-        f"strata 196/1,488; 47 harm rows only (Wilson lower 0.924, reported not gated); "
+        "strata 196/1,488; 47 harm rows only (Wilson lower 0.924, reported not gated); "
         f"jev-1.13.0 ${receipt['spend_usd']:.4f}",
         "Noul / gate",
+    )
+
+
+def jev_injection(root: Path) -> tuple[str, str]:
+    marked = json.loads((root / "work/jev-a9fv/receipt.json").read_text())
+    unmarked = json.loads((root / "work/jev-29s4/receipt.json").read_text())
+    clean = marked["clean"]
+    marked_planted = marked["planted"]
+    spend = (
+        marked["totals"]["estimated_input_spend_usd"]
+        + unmarked["totals"]["estimated_input_spend_usd"]
+    )
+    return (
+        f"Clean real tool results falsely flagged {clean['false_flags']}/{clean['n']} "
+        f"(Wilson {clean['wilson95'][0]:.1%}-{clean['wilson95'][1]:.1%}); "
+        f"markerless planted injections caught {unmarked['catch']}/{unmarked['rows']} "
+        f"(Wilson {unmarked['wilson95'][0]:.1%}-{unmarked['wilson95'][1]:.1%}; "
+        f"marked version {marked_planted['catch']}/{marked_planted['n']}); "
+        f"jev-1.13.0 ${spend:.6f}; Jev only, no LLM comparator; one public attack corpus "
+        "planted at three fixed positions; replaces the news-persona seat's 175/300 false flags",
+        "Noul / coding-agent tool-result injection",
     )
 
 
@@ -251,6 +272,11 @@ def render_table(root: Path) -> str:
             "Jev gate question (blind fleet sample)",
             *jev_uncd(root),
             "work/jev-uncd/final-receipt.json",
+        ),
+        (
+            "Coding-agent tool-result injection seat",
+            *jev_injection(root),
+            "work/jev-a9fv/receipt.json; work/jev-29s4/receipt.json",
         ),
         (
             "Jev held-out fleet confirmation",
