@@ -23,6 +23,11 @@ export const INSTALL_FILES = {
   "jev-kit/nev-rerank/rank.ts": "jev-kit/nev-rerank/rank.ts",
   "jev-kit/nev-rerank/live.ts": "jev-kit/nev-rerank/live.ts",
   "jev-kit/nev-injection/live-flag.ts": "jev-kit/nev-injection/live-flag.ts",
+  "tools/jev-classify.ts": "omp/tools/jev-classify.ts",
+  "extensions/jev-classify.ts": "omp/extensions/jev-classify.ts",
+  "jev-kit/rerank.ts": "../src/rerank.ts",
+  "jev-kit/verify.ts": "../src/verify.ts",
+  "jev-kit/classify.ts": "../src/classify.ts",
 };
 
 const MANIFEST_PATH = ".omp/jev-kit-manifest.json";

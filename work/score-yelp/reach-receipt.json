@@ -1,0 +1,13 @@
+{
+  "items_sha256": "10d6775919c2353c34d6f73a3408036fad392a72daef9538e29f238cd71b3336",
+  "minimum_minority": 40,
+  "minority_count": 40,
+  "mode": "rate",
+  "perfect_successes": 200,
+  "prereg_path": "/Users/josh/Developer/jev/work/score-yelp/PREREG.md",
+  "prereg_sha256": "236534259cb94400f276869a1a1c5f3d955c8a1123e9cc169606171ed4845c02",
+  "status": "REACHABLE",
+  "threshold": 0.8,
+  "trials": 200,
+  "wilson_lower_bound_95": 0.9811546736227333
+}

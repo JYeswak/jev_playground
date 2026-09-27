@@ -95,7 +95,7 @@ export type AskChoiceOptions = {
   /** The question itself, as text. */
   instructions: string;
   /** label -> description of that label. At least two; exactly one label comes back. */
-  classes: Record<string, string>;
+  classes: Record<string, string | null>;
   timeoutMs?: number;
   model?: string;
   apiKey?: string;

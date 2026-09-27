@@ -3,3 +3,4 @@ extensions:
   - ./.omp/extensions/jev-claim-check.ts
   - ./.omp/extensions/jev-screen.ts
   - ./.omp/extensions/jev-flag.ts
+  - ./.omp/extensions/jev-classify.ts

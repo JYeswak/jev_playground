@@ -1,17 +1,13 @@
 /**
- * Model-callable rerank. Returns an order the caller uses.
+ * Model-callable top-1 passage selection.
  *
- * The observe-only hook at work/omp-jev-rerank scores grep hits and changes
- * nothing. This tool is the other half: given a query and passages, it returns
- * them ordered by the score-batch rubric that won NevIR (0.711 vs BM25 0.022,
- * n=1383, jev-rerank-bench/results/nevir.json).
- *
- * No key: input order, ordered=false, reason=unconfigured. Never throws.
- * Never prints a key.
+ * This tool uses kit/src/rerank.ts: one Choice over 2-20 passages. The measured
+ * design proves only the selected top-1, not a complete ranking. It is advisory
+ * and returns NOT_RUN when Jev cannot be called.
  */
-import { rerank } from "../jev-kit/nev-rerank/rank.ts";
-import { liveAsker } from "../jev-kit/nev-rerank/live.ts";
+import { rerankTop1, type RerankResult } from "../jev-kit/rerank.ts";
 import { useInfisicalKey } from "../jev-kit/use-infisical-key.ts";
+import type { AskChoiceOptions, JevChoiceResult } from "../jev-kit/client.ts";
 
 type ToolHost = {
   zod: {
@@ -20,41 +16,48 @@ type ToolHost = {
     array: (item: unknown) => { min: (n: number) => { max: (n: number) => unknown } };
   };
 };
+type ChoiceAsker = (options: AskChoiceOptions) => Promise<JevChoiceResult>;
 
-export default function jevRerankTool(pi: ToolHost) {
-  useInfisicalKey();
+function notRun(reason: string) {
+  return {
+    content: [{ type: "text", text: `top1=false verdict=not_run reason=${reason} NOT_RUN` }],
+    details: { top1: false, verdict: "not_run", reason, choice: null, selectedIndex: null, model: null },
+  };
+}
+
+export default function jevRerankTool(pi: ToolHost, asker?: ChoiceAsker) {
+  if (!asker) useInfisicalKey();
   return {
     name: "jev_rerank",
-    label: "Jev rerank",
+    label: "Jev rerank top-1",
     description:
-      "Reorder passages by how well each supplies the query. Uses the Jev 4-level score rubric. Returns the ordered list. If the API key is absent, returns the input order and says NOT_RUN.",
+      "Select the single most relevant passage with one Jev Choice over 2-20 passages. This is the measured FiQA/NFCorpus top-1 design; it does not produce a full ranking. Advisory only; without Jev it returns NOT_RUN.",
     parameters: pi.zod.object({
       query: pi.zod.string().min(1),
-      passages: pi.zod.array(pi.zod.string().min(1)).min(2).max(30),
+      passages: pi.zod.array(pi.zod.string().min(1)).min(2).max(20),
     }),
     async execute(_id: string, params: { query: string; passages: string[] }) {
       try {
-        const result = await rerank(params.query, params.passages, liveAsker);
-        const lines = result.ranking.map((row, place) => `${place + 1}. [${row.id} ${Number.isFinite(row.score) ? row.score.toFixed(3) : "-"}] ${row.text}`);
-        const head = result.ordered
-          ? "ordered=true calledModel=true"
-          : `ordered=false reason=${result.reason ?? "unknown"} NOT_RUN`;
+        const candidates = params.passages.map((text, index) => ({ id: String(index), text }));
+        const result: RerankResult = await rerankTop1({ query: params.query, candidates, ...(asker ? { ask: asker } : {}) });
+        const selectedIndex = Number(result.choice);
+        const selected = result.orderedCandidates[0];
         return {
-          content: [{ type: "text", text: `${head}\n${lines.join("\n")}` }],
+          content: [{ type: "text", text: `top1=true choice=${result.choice} index=${selectedIndex} model=${result.model}\n${selected.text}` }],
           details: {
-            ordered: result.ordered,
-            reason: result.reason ?? null,
-            calledModel: result.calledModel,
-            truncated: result.truncated,
-            ranking: result.ranking.map((row) => ({ id: row.id, index: row.index, score: row.score })),
+            top1: true,
+            verdict: "selected",
+            reason: null,
+            choice: result.choice,
+            selectedIndex,
+            passage: selected.text,
+            model: result.model,
+            latencyMs: result.latencyMs,
+            usage: result.usage ?? null,
           },
         };
-      } catch (err) {
-        const reason = err instanceof Error ? err.message : "throw";
-        return {
-          content: [{ type: "text", text: `ordered=false reason=throw NOT_RUN\n${reason}` }],
-          details: { ordered: false, reason: "throw", calledModel: false, truncated: false, ranking: [] },
-        };
+      } catch (error) {
+        return notRun(error instanceof Error ? error.message : String(error));
       }
     },
   };
