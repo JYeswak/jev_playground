@@ -1,0 +1,28 @@
+{
+  "baseline_only_wins": 11,
+  "baseline_rows": "work/jev-oioo/live-results.jsonl",
+  "baseline_top1_correct": 148,
+  "bead": "jev-za3a",
+  "boundary": "Dev slice only; the replay filters evidence using gold per-sentence labels and is not deployable.",
+  "decision": "held-out non-gold selector is licensed only if replay_only_wins > baseline_only_wins and p < 0.05; otherwise set H1 aside and test H2 next",
+  "dev_slice_items_sha256": "a3c4359f502fee27e4b212d4d606f3c22da53b153fe5c706c43f6fd700a754a7",
+  "gold_label_leak": true,
+  "latency_ms": {
+    "p50": 143,
+    "p95": 231,
+    "sum": 30795
+  },
+  "mcnemar_exact_two_sided_p": 1.0,
+  "model": "jev-1.13.0",
+  "n": 200,
+  "prereg_sha256": "6e8622cc3c2baeeec75f652129289d61aa47ff0b799dd2d53b8bf7fdc58907d4",
+  "replay_only_wins": 10,
+  "replay_rows": "var/agent-tmp/jev-za3a-results.jsonl",
+  "replay_top1_correct": 147,
+  "status": "SCORED",
+  "usage": {
+    "input_spend_usd": 0.003746652,
+    "input_tokens": 89206,
+    "output_tokens": 4000
+  }
+}
