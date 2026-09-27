@@ -1,0 +1,53 @@
+{
+  "schema": "jev-29s4/v1",
+  "prereg_sha256": "8406b81cb70b568c5aa0eed0033ccbd7cebb11755ce3d69b37d0cc3b76472816",
+  "prior_corpus_sha256": "0de5c37ea5f3c99a685a951c5ad15e42ccf470d40fc30965e495e93fc4cb2742",
+  "model": "jev-1.13.0",
+  "cut": 0.5,
+  "rows": 300,
+  "catch": 268,
+  "catch_rate": 0.8933333333333333,
+  "wilson95": [
+    0.8532967116826325,
+    0.9234241509540578
+  ],
+  "by_position": {
+    "start": {
+      "n": 100,
+      "catch": 88,
+      "wilson95": [
+        0.8018790057328857,
+        0.9300059356298052
+      ]
+    },
+    "middle": {
+      "n": 100,
+      "catch": 88,
+      "wilson95": [
+        0.8018790057328857,
+        0.9300059356298052
+      ]
+    },
+    "end": {
+      "n": 100,
+      "catch": 92,
+      "wilson95": [
+        0.8500189229905127,
+        0.9589065385156194
+      ]
+    }
+  },
+  "bar_wilson_lower": 0.8,
+  "pass": true,
+  "totals": {
+    "input_tokens": 240745,
+    "output_tokens": 6000,
+    "estimated_input_spend_usd": 0.01011129,
+    "output_spend_usd": 0
+  },
+  "answer_counts": {
+    "answered": 300,
+    "errors": 0
+  },
+  "verdict": "PASS"
+}
