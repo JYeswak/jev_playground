@@ -50,6 +50,7 @@ CANDIDATES_PATH = os.environ.get(
 )
 DEPTH = 20
 TIMEOUT_S = 120
+RUN_TAG = os.environ.get("BEIR_RUN_TAG", "")
 
 
 def choice_question(doc_ids):
@@ -73,7 +74,8 @@ BILLING = (
 
 def out_path(arm):
     suffix = f"-{DATASET}" if DATASET != "scifact" else ""
-    return os.path.join(HERE, f"rows{suffix}-{arm}.jsonl")
+    run_suffix = f"-{RUN_TAG}" if RUN_TAG else ""
+    return os.path.join(HERE, f"rows{suffix}{run_suffix}-{arm}.jsonl")
 
 
 def repair_tail(path):
@@ -105,7 +107,7 @@ def answered(arm):
             continue
         row = json.loads(line)
         if "choice" in row:
-            got.add((row["qid"], row["doc"]))
+            got.add((row["qid"], row["qid"]))
     return got
 
 
@@ -148,21 +150,31 @@ def pairs():
     for row in rows:
         if len(row["cands"]) != DEPTH:
             raise SystemExit(f"qid {row['qid']} does not have {DEPTH} candidates")
-        for doc, _score in row["cands"]:
-            out.append((row["qid"], doc))
+        out.append((row["qid"], row["qid"]))
     return out
 
 
-def state_for(corpus, queries, qid, doc):
-    passage = corpus[doc]
-    return {
-        "query": queries[qid],
-        "passage": {
-            "id": doc,
-            "title": passage.get("title") or "",
-            "text": passage.get("text") or "",
-        },
-    }
+def candidate_docs(qid):
+    for line in open(CANDIDATES_PATH, encoding="utf-8"):
+        if line.strip():
+            row = json.loads(line)
+            if row["qid"] == qid:
+                return [doc for doc, _score in row["cands"]]
+    raise SystemExit(f"unknown qid {qid}")
+
+
+def state_for(corpus, queries, qid, _doc):
+    candidates = []
+    for doc in candidate_docs(qid):
+        passage = corpus[doc]
+        candidates.append(
+            {
+                "id": doc,
+                "title": passage.get("title") or "",
+                "text": passage.get("text") or "",
+            }
+        )
+    return {"query": queries[qid], "candidates": candidates}
 
 
 def row_ok(qid, doc, arm, model, choice, latency_ms, usage, extra=None):
@@ -219,11 +231,7 @@ async def run_arm(arm, bar_path=None, repo=None):
         client_cm = AsyncTypeSafeClient(model=JEV_MODEL, retry=RetryPolicy())
 
         async def call(qid, doc):
-            docs = [
-                candidate_doc
-                for candidate_qid, candidate_doc in pairs()
-                if candidate_qid == qid
-            ]
+            docs = candidate_docs(qid)
             resp = await client_cm.system_one(
                 state_for(corpus, queries, qid, doc),
                 {QNAME: choice_question(docs)},
@@ -236,7 +244,6 @@ async def run_arm(arm, bar_path=None, repo=None):
                     "output_tokens": resp.usage.output_tokens,
                 },
             }
-
     else:
         from system_one_adapter import AsyncSystemOneAdapterClient
         from system_one_adapter.providers.openai import AsyncOpenAIProvider
@@ -310,7 +317,7 @@ async def run_arm(arm, bar_path=None, repo=None):
                 }
                 return row_ok(
                     qid,
-                    doc,
+                    got["choice"],
                     arm,
                     got["model"],
                     got["choice"],
@@ -365,14 +372,12 @@ def selftest():
         corpus, queries = load_text()
         qid, doc = pairs()[0]
         st = state_for(corpus, queries, qid, doc)
-        if set(st) != {"query", "passage"} or set(st["passage"]) != {
-            "id",
-            "title",
-            "text",
-        }:
-            bad.append(f"state keys {set(st)} {set(st.get('passage', {}))}")
-        if st["passage"]["id"] != doc or not st["query"] or not st["passage"]["text"]:
-            bad.append("state missing the pair")
+        if set(st) != {"query", "candidates"} or len(st["candidates"]) != DEPTH:
+            bad.append(
+                f"state keys {set(st)} candidates={len(st.get('candidates', []))}"
+            )
+        if not st["query"] or any(not c["text"] for c in st["candidates"]):
+            bad.append("state missing query or candidate text")
         row = row_ok(
             qid,
             doc,
@@ -382,7 +387,7 @@ def selftest():
             1,
             {"input_tokens": 1, "output_tokens": 0},
         )
-        if st["passage"]["text"][:20] in json.dumps(row):
+        if any(c["text"][:20] in json.dumps(row) for c in st["candidates"]):
             bad.append("row contains passage text")
     else:
         bad.append(f"zip absent at {ZIP_PATH}")
