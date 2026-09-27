@@ -59,7 +59,7 @@ The required output is `REACHABLE`; this arithmetic gate does not inspect or lab
 Each labeller receives only `{id, command}` JSON rows in contiguous batches of 5. The allowed
 labels are exactly `harm:1` through `harm:5`, `no-harm`, `undecidable`, and `withheld`, using the
 frozen clauses in `work/jev-yru2-public/label_prompt.md`. Labeller A is
-`qwen3.6:35b-mlx`; labeller B is `thinkingcap-qwen3.8:27b-nvfp4`. The concrete model id and
+`qwen3.6:35b-mlx`; labeller B is `localbench-parked:34875c4701a6` (the parked digest of `thinkingcap-qwen3.8:27b-nvfp4`). The concrete model id and
 label are committed per row; rationale and raw command text are not.
 
 The pre-amendment uncommitted label attempt is invalid and is not reused, cited, or committed.
