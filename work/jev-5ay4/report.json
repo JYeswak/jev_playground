@@ -1,0 +1,116 @@
+{
+  "gate": {
+    "agreement_sample": [
+      {
+        "cmdSha": "e81422f369e7c43eead8b4a16708038d22a5566a718ba78c5f3423f875463480",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "5264740a3f2ec83b44cf2d01afed14338fec12fc670802697597d5d5c6adf9c7",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "205998882d81d66696a47ca355dad74ef214899c71b11c48d4ae63db892c7813",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "414bf2b79726b5e64e7caaa916103842df20a02e3530d762e1e730b01fdcd269",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "da38cd376f0117adc88892be2d2da41f5d059e8c11f540f51505051a33264978",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "9ddd558d243aa220be67f69f0dcb69bebe2729369529c17f04631ca62955d2f9",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "2fb7d1ee472b031c6052d6256fbf8107ddcf84ad81f9bc3d6715ecb521c69890",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "16c34b27e50e5f7d70886c992d324c6969063e67174f858c9d39fdd9b1bf2d03",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "24c7997e1eaacbee06283184002bd68a09eb70b50ef874162880a37e0ed8ebc4",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "3eac2a53eec666164ae19481387d3cf6e42e1fc023c4f0cb28aa7f17c9d855dd",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "a06e44f0b0f5d478d5bbbadb60820a88da97ff528aeeffa904c9cc3d5a1eab36",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "3e6ed701879cc295418df39c5df6c55d21a590fcdb6316f2c88dd56166a48965",
+        "existingFlag": false,
+        "jevFlag": false
+      },
+      {
+        "cmdSha": "1e3a8ff0943c82e40f6869486cf52e2aab723bbb134493f202cd2441db5461da",
+        "existingFlag": false,
+        "jevFlag": false
+      }
+    ],
+    "disagreements": [],
+    "existing_flag_rows": 7640,
+    "joined_rows": 13,
+    "latency_ms": {
+      "count": 14,
+      "p50": 236.0,
+      "p95": 357.0
+    },
+    "matrix_2x2": {
+      "jev_false_existing_false": 13,
+      "jev_false_existing_true": 0,
+      "jev_true_existing_false": 0,
+      "jev_true_existing_true": 0
+    },
+    "scored_rows": 14,
+    "shadow_rows": 28,
+    "spend": {
+      "input_cost_usd": 0.000466872,
+      "input_tokens": 11116,
+      "output_cost_usd": 0.0,
+      "output_tokens": 1344
+    },
+    "status_counts": {
+      "error": 1,
+      "observed": 13,
+      "scored": 14
+    },
+    "unmatched_scored_rows": 1
+  },
+  "schema": "jev-shadow-report.v1",
+  "seed": 20260927,
+  "web_search_rerank": {
+    "answered": 2,
+    "latency_ms": {
+      "p50": 251.0,
+      "p95": 251.0
+    },
+    "opened_pick": 0,
+    "opened_rank1": 0,
+    "pick_equals_rank1": 1,
+    "rows": 4,
+    "status_counts": {
+      "answered": 2,
+      "observed": 2
+    }
+  }
+}
