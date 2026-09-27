@@ -58,6 +58,7 @@ test('402 pauses the shadow and fails open', async () => {
   assert.equal(calls, 1);
   assert.equal(rows[0].status, 'auth-or-billing');
   assert.equal(rows[1].status, 'not-admitted');
+  assert.match(rows[0].error, /HTTP 402 credits exhausted/);
 });
 
 test('captured event parser ignores malformed or underspecified results', () => {

@@ -44,6 +44,7 @@ type Pending = {
   openedPick: boolean;
   openedRank1: boolean;
   status: string;
+  error: string | null;
   openedHashes: Set<string>;
 };
 
@@ -172,6 +173,7 @@ function loggedRow(pending: Pending, now: () => string): Record<string, unknown>
     openedPick: pending.openedPick,
     openedRank1: pending.openedRank1,
     status: pending.status,
+    error: pending.error,
   };
 }
 
@@ -228,6 +230,7 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
         openedPick: false,
         openedRank1: false,
         status: "not-admitted",
+        error: null,
         openedHashes: new Set(),
       };
       if (paused || calls >= cap) { write(loggedRow(base, now)); return undefined; }
@@ -247,6 +250,7 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
         const reason = stopReason({ reason: "", error: String(error) });
         if (reason) paused = true;
         base.status = reason ? "auth-or-billing" : "error";
+        base.error = String(error instanceof Error ? error.message : error);
         write(loggedRow(base, now));
       }
     } catch {
