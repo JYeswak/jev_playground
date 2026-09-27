@@ -6,20 +6,32 @@ A small TypeScript-first Jev client with preflight checks, typed validators, off
 
 `jev classify` implements the measured **intent routing** design from `docs-mirror/typesafe/patterns/intent-routing.md` and the Choice primitive. It asks one Choice over the 77 humanized Banking77 intent labels, with state `{ "customer_message": text }` and the instruction `The primary intent of this customer banking message`. Label descriptions remain `null`, matching `work/choice-banking77/run.py`; returned confidence is exposed without an invented action threshold.
 
-The captured public example comes from PolyAI-LDN/task-specific-datasets at revision `9d081458ff52e53cf7e848f414e6e9344e4e6696`, `banking_data/test.csv`, row 1. The source row is in `examples/banking77-example.json`; the complete label set is in `examples/banking77-labels.json`.
+The captured public example comes from PolyAI-LDN/task-specific-datasets at revision `9d081458ff52e53cf7e848f414e6e9344e4e6696`, `banking_data/test.csv`, row 0. The source row is in `examples/banking77-example.json`; the offered label set is the ten-label set captured in `examples/banking77-labels.json`, and the answer fields come from `work/choice-banking77/rows-full-jev.jsonl` i=0.
 ```bash
 npm ci
 npx --no-install tsc -p tsconfig.json
 node bin/jev.mjs classify \
-  --text "I still have not received my new card, I ordered over a week ago." \
+  --text "How do I locate my card?" \
   --labels examples/banking77-labels.json --fake --robot
 ```
 
-The keyless command returns the captured answer with `label: "card arrival"` and `model: "fake"`. Remove `--fake` for a live call; the client pins `jev-1.13.0` and requires `TYPESAFE_API_KEY`.
+The keyless command replays the captured live choice with `label: "lost_or_stolen_card"`, confidence `0.86`, and `model: "fake"`. Remove `--fake` for a live call; the client pins `jev-1.13.0` and requires `TYPESAFE_API_KEY`.
 
 The underlying live measurement is recorded in `docs/demos/upstream-repro/choice-banking77-full-20260924.md`: on the public Banking77 test split, Jev scored 2,467/3,080 (80.1%) versus Haiku prompted JSON at 2,267/3,080 (73.6%), live lane, N=3,080 per arm, 2026-09-24, Jev `jev-1.13.0`. That benchmark is the design source, not a claim about this single example.
 
 Malformed answers, labels absent from the offered set, and requests estimated `OVER` the documented input limit are refused before a classification result is returned.
+
+## FiQA passage reranking
+
+`jev rerank` replays the captured public FiQA Choice answer from `work/rerank-scifact/rows-fiqa-mkex-jev.jsonl` (qid `10034`). The frozen 20-candidate example in `examples/rerank-candidates.json` includes the live-selected candidate `181942`; the offline fixture preserves that choice and uses a one-hot distribution only to satisfy the typed fake transport.
+
+```bash
+npm ci
+npx --no-install tsc -p tsconfig.json
+node bin/jev.mjs rerank --query "Which passage answers this financial question?" --candidates examples/rerank-candidates.json --fake --robot
+```
+
+The keyless command returns candidate `181942` with `model: "fake"`. The live source row records model `jev-1.13.0`; this example is a transport replay, not a new live measurement.
 
 ## SciFact claim verification
 

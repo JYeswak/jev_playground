@@ -1,10 +1,14 @@
 {
-  "text": "I still have not received my new card, I ordered over a week ago.",
-  "expected_label": "card arrival",
+  "text": "How do I locate my card?",
+  "expected_label": "lost_or_stolen_card",
   "source": {
     "dataset": "PolyAI-LDN/task-specific-datasets",
     "revision": "9d081458ff52e53cf7e848f414e6e9344e4e6696",
     "split": "banking_data/test.csv",
-    "row": 1
+    "row": 0
+  },
+  "live_answer": {
+    "model": "jev-1.13.0",
+    "confidence": 0.86
   }
 }

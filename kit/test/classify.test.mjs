@@ -112,5 +112,5 @@ test('CLI runs the captured Banking77 example with the keyless fake', async () =
   const body = JSON.parse(result.stdout);
   assert.equal(body.label, example.expected_label);
   assert.equal(body.model, 'fake');
-  assert.equal(body.confidence, 0.98);
+  assert.equal(body.confidence, 0.86);
 });
