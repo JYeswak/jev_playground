@@ -36,17 +36,17 @@ Ordered levels, score indices 0 through 4:
 
 Jev model: `jev-1.13.0`, through the official TypeSafe client path used by the kit. Comparator: OpenRouter free model `dots-studio/dots-3-note-preview:free` through the existing free-comparator adapter. No paid comparator is permitted.
 
-Every request must pass keyless size preflight before a live request. Invalid, missing, unparsed, or out-of-range answers are recorded as invalid and excluded from the paired valid-row denominator, with counts reported separately. No row is silently dropped.
+Every request must pass keyless size preflight before a live request. The raw Score value, full probabilities, confidence, model, and normalized level are stored per arm and per row. Normalization is the measured SST-5 rule from work/score-sst5/score.py: `floor(raw_score + 0.5)`, clamped to 0..4 (round half up for these nonnegative scores). Jev and comparator use the same normalization rule. Invalid, missing, unparsed, or out-of-range answers are recorded as invalid and excluded from the paired valid-row denominator, with counts reported separately. No row is silently dropped.
 
 ## Preregistered metrics and numeric pass bar
 
-Primary metric: MAE against the dataset's own integer label, separately for Jev and the comparator, on the paired valid intersection.
+Primary metric: MAE against the dataset's own integer label using each arm's normalized level, separately for Jev and the comparator, on the paired valid intersection. Raw Score values and probabilities remain in every row for audit.
 
 Primary comparison: paired per-row absolute-error difference `Jev AE - comparator AE`; report the mean difference and a two-sided paired sign-flip permutation test with 10,000 flips, seed `20260927`.
 
 **Confirmation pass bar, fixed before calls:** at least 278 paired valid rows; Jev MAE is strictly lower than comparator MAE; and the two-sided seeded permutation p-value is `< 0.05`. No fixed `0.068` observed-gap requirement is imposed: `0.068` is used only for prospective sample sizing below, avoiding a 50%-power observed-effect gate.
 
-Secondary metrics: exact five-class accuracy, adjacent accuracy (`abs(score-label) <= 1`), valid count, invalid count, mean confidence, and per-class counts. These do not replace the primary bar.
+Secondary metrics: exact five-class accuracy and adjacent accuracy (`abs(normalized_level-label) <= 1`), raw-score MAE, valid count, invalid count, mean confidence, and per-class counts. These do not replace the primary bar.
 
 ## Power and reach binding
 
@@ -61,6 +61,9 @@ The reach receipt is `work/score-amazon/reach-receipt.json`. The shared runner r
 - Comparator spend: record OpenRouter usage before and after. Expected comparator spend is `$0` because the model id is `:free`; any nonzero charge or paid model response is a hard stop and invalidates the run.
 - Run detached only through `kit/experiment/run.py`, with checkpointed JSONL rows, PID, heartbeat, and the matching reach receipt. Stop on 401/402/403 or provider refusal; resume only from completed row ids.
 
+## Diagnostic disclosure
+
+The first live attempt is retained as a disclosed parser diagnostic at `work/score-amazon/diagnostic-invalid-integer-rows.jsonl` and `work/score-amazon/diagnostic-invalid-integer-receipt.json`. It incorrectly rejected continuous Score values as non-integer before this preregistration amendment; it is not a result and is excluded from confirmation.
 ## Decision rule
 
 The result is `CONFIRMATION` only if both arms are present, at least 278 paired valid rows exist, corpus/preregistration hashes match, spend readings are present, and every primary pass-bar condition holds. Otherwise report `UNDERPOWERED`, `INVALID`, `NO_CONFIRMATION`, or `NOT_RUN`; never change the bar after observing answers.

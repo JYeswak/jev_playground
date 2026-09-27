@@ -12,5 +12,5 @@
   "paired_test": "seeded_sign_flip_permutation_10000",
   "items_sha256": "591ba40224ccea0c0873b7dfea64a85ec53ce16b476e71d4336115d5f7d884b7",
   "prereg_path": "work/score-amazon/PREREG.md",
-  "prereg_sha256": "35f45a394becb4cccf7f0d0c27e421a30b01afb7fbc5d2a125bab5746f2c4469"
+  "prereg_sha256": "d684bce6f9e808159378e2f1a50abe6a37f380097e6a4154b31fe978e5af34e6"
 }

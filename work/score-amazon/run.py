@@ -105,8 +105,10 @@ def score_answer(answer: object) -> dict[str, object]:
         raise ValueError("probability outside [0,1]")
     if abs(sum(probabilities.values()) - 1) >= 0.02:
         raise ValueError("probabilities do not sum to one")
+    level = min(4, max(0, math.floor(score + 0.5)))
     return {
-        "score": score,
+        "raw_score": score,
+        "level": level,
         "confidence": confidence,
         "probabilities": probabilities,
     }
@@ -136,13 +138,13 @@ def paired_stats(rows: list[dict[str, object]]) -> dict[str, object]:
         label = int(row["label"])
         jev = row.get("jev")
         comparator = row.get("comparator")
-        if not isinstance(jev, dict) or "score" not in jev:
+        if not isinstance(jev, dict) or "level" not in jev:
             invalid["jev"] += 1
             continue
-        if not isinstance(comparator, dict) or "score" not in comparator:
+        if not isinstance(comparator, dict) or "level" not in comparator:
             invalid["comparator"] += 1
             continue
-        paired.append((float(jev["score"]), float(comparator["score"]), label))
+        paired.append((int(jev["level"]), int(comparator["level"]), label))
     if not paired:
         return {"paired_valid": 0, "invalid": invalid}
     differences = [abs(j - label) - abs(c - label) for j, c, label in paired]
