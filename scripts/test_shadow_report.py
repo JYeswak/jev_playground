@@ -107,6 +107,29 @@ class ShadowReportTests(unittest.TestCase):
             self.assertEqual(report["web_search_rerank"]["pick_equals_rank1"], 1)
             self.assertEqual(report["web_search_rerank"]["opened_pick"], 1)
 
+    def test_fake_clock_cap_rows_are_excluded_and_counted(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            injection = self.write(
+                root,
+                "injection.jsonl",
+                [
+                    {"ts": "2026-09-27T00:00:00.000Z", "status": "cap"},
+                    {"ts": "2026-09-27T00:00:00.000Z", "status": "cap"},
+                    {
+                        "ts": "2026-09-27T10:00:00.000Z",
+                        "status": "scored",
+                        "flag": False,
+                        "latencyMs": 10,
+                        "tokens": {"input_tokens": 2},
+                    },
+                ],
+            )
+            report = build_report(root / "a", root / "b", root / "c", injection)
+            shadow = report["injection_shadow"]
+            self.assertEqual(shadow["excluded_test_rows"], 2)
+            self.assertEqual(shadow["status_counts"], {"scored": 1})
+
     def test_output_names_are_latest_or_explicit_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

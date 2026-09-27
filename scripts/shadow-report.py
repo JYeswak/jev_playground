@@ -15,6 +15,7 @@ DEFAULT_GATE_SHADOW = Path.home() / ".local/state/jev/gate-shadow.jsonl"
 DEFAULT_GATE_OBSERVE = Path.home() / ".local/state/jev/gate-observe.jsonl"
 DEFAULT_WEB_SHADOW = Path.home() / ".local/state/jev/websearch-rerank.jsonl"
 DEFAULT_INJECTION_SHADOW = Path.home() / ".local/state/jev/injection-shadow.jsonl"
+TEST_CLOCKS = {"2026-09-27T00:00:00.000Z"}
 
 
 def rows(path: Path) -> list[dict[str, Any]]:
@@ -154,32 +155,26 @@ def web_report(web: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def injection_report(values: list[dict[str, Any]]) -> dict[str, Any]:
-    scored = [row for row in values if row.get("status") == "scored"]
+    excluded = [row for row in values if row.get("ts") in TEST_CLOCKS]
+    usable = [row for row in values if row.get("ts") not in TEST_CLOCKS]
+    scored = [row for row in usable if row.get("status") == "scored"]
+    latencies = sorted(
+        float(row["latencyMs"])
+        for row in scored
+        if isinstance(row.get("latencyMs"), (int, float))
+    )
     return {
-        "rows": len(values),
+        "rows": len(usable),
+        "excluded_test_rows": len(excluded),
         "status_counts": {
-            status: sum(row.get("status") == status for row in values)
-            for status in sorted({str(row.get("status")) for row in values})
+            status: sum(row.get("status") == status for row in usable)
+            for status in sorted({str(row.get("status")) for row in usable})
         },
         "scored": len(scored),
         "flags": sum(row.get("flag") is True for row in scored),
         "latency_ms": {
-            "p50": percentile(
-                sorted(
-                    float(row["latencyMs"])
-                    for row in scored
-                    if isinstance(row.get("latencyMs"), (int, float))
-                ),
-                0.5,
-            ),
-            "p95": percentile(
-                sorted(
-                    float(row["latencyMs"])
-                    for row in scored
-                    if isinstance(row.get("latencyMs"), (int, float))
-                ),
-                0.95,
-            ),
+            "p50": percentile(latencies, 0.5),
+            "p95": percentile(latencies, 0.95),
         },
         "input_tokens": sum(
             int((row.get("tokens") or {}).get("input_tokens") or 0) for row in scored
