@@ -1,0 +1,13 @@
+{
+  "bead": "jev-bzl7",
+  "status": "L2_LOADED",
+  "hook": ".omp/hooks/post/jev-web-search-rerank.ts",
+  "launch": "omp --mode=rpc --no-ui --max-time=20 --hook .omp/hooks/post/jev-web-search-rerank.ts",
+  "restart": "fresh omp RPC session",
+  "session_id": "01a0e0c3-b3ec-7064-93e3-9a1e06486eab",
+  "protocol_negotiation": "negotiate_protocol v2 success",
+  "get_state": "success",
+  "hook_load_errors": 0,
+  "observed": "fresh session accepted the explicit project hook path and returned get_state success without a load error",
+  "boundary": "L2 load proof only; no real web_search result was processed and the 48-hour shadow report is pending."
+}
