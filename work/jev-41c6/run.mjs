@@ -55,9 +55,10 @@ function summarize(rows) {
   const p = exactMcNemarP(h2Only, baselineOnly);
   const invalid = rows.length - valid.length;
   const usage = rows.map((row) => row.usage).filter(Boolean);
-  const usageComplete = usage.length === rows.length;
-  const inputTokens = usageComplete ? usage.reduce((sum, item) => sum + item.input_tokens, 0) : null;
-  const outputTokens = usageComplete ? usage.reduce((sum, item) => sum + item.output_tokens, 0) : null;
+const usageRows = rows.filter((row) => row.usage);
+const usageComplete = usageRows.length === rows.length;
+const inputTokens = usageRows.reduce((sum, item) => sum + item.usage.input_tokens, 0);
+const outputTokens = usageRows.reduce((sum, item) => sum + item.usage.output_tokens, 0);
   return {
     requested: rows.length,
     valid_paired: valid.length,
@@ -71,10 +72,12 @@ function summarize(rows) {
     mcnemar_exact_two_sided_p: p,
     refusal_rate: rows.length ? invalid / rows.length : null,
     pass_bar: valid.length > 0 && h2Correct > baselineCorrect && p < 0.05 && h2Only > baselineOnly && invalid / rows.length <= 0.05,
-    usage_complete: usageComplete,
-    input_tokens: inputTokens,
-    output_tokens: outputTokens,
-    spend_usd: inputTokens === null ? null : inputTokens * RATE / 1_000_000,
+usage_complete: usageComplete,
+usage_rows: usageRows.length,
+usage_missing_rows: rows.length - usageRows.length,
+input_tokens: inputTokens,
+output_tokens: outputTokens,
+spend_usd: inputTokens * RATE / 1_000_000,
   };
 }
 
@@ -180,7 +183,8 @@ const receipt = {
   prereg_sha256: preregSha,
   dev_id_manifest_sha256: sha256(idsBytes),
   state_source_sha256: sha256(stateBytes),
-  rows: rows.length,
+rows: rows.length,
+orphaned_api_calls: rows.filter((row) => row.orphaned_api_call).map((row) => row.id),
   stats,
 };
 await writeFile(RECEIPT, `${JSON.stringify(receipt, null, 2)}\n`);
