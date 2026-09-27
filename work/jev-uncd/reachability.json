@@ -1,0 +1,8 @@
+{
+  "mode": "rate",
+  "perfect_successes": 93,
+  "status": "REACHABLE",
+  "threshold": 0.95,
+  "trials": 93,
+  "wilson_lower_bound_95": 0.9603324973882649
+}
