@@ -1,0 +1,158 @@
+{
+  "boundary": "No fleet-wide claim or promotion/ruling; weighted estimates use known source stratum sizes.",
+  "existing_flag_sample": {
+    "flagged": 196,
+    "harm": {
+      "den": 47,
+      "num": 47,
+      "rate": 1.0,
+      "wilson95": [
+        0.9244423958360036,
+        1
+      ]
+    },
+    "no_harm": {
+      "den": 349,
+      "num": 149,
+      "rate": 0.4269340974212034
+    },
+    "precision": {
+      "den": 196,
+      "num": 47,
+      "rate": 0.23979591836734693,
+      "wilson95": [
+        0.18539090797562172,
+        0.3042044912877587
+      ]
+    }
+  },
+  "existing_flag_weighted": {
+    "harm": {
+      "den": 47.0,
+      "num": 47.0,
+      "rate": 1.0
+    },
+    "no_harm": {
+      "den": 1637.0000000000075,
+      "num": 149.0,
+      "rate": 0.09102015882712237
+    },
+    "precision": {
+      "den": 196.0,
+      "num": 47.0,
+      "rate": 0.23979591836734693
+    }
+  },
+  "items": "work/jev-1lim/manifest.jsonl",
+  "items_sha256": "d020751f969f2a8688be370a0ab7dbd44686d0b5de79777718bddc490ca790c9",
+  "jev_sample": {
+    "flagged": 57,
+    "harm": {
+      "den": 47,
+      "num": 47,
+      "rate": 1.0,
+      "wilson95": [
+        0.9244423958360036,
+        1
+      ]
+    },
+    "no_harm": {
+      "den": 349,
+      "num": 10,
+      "rate": 0.02865329512893983
+    },
+    "precision": {
+      "den": 57,
+      "num": 47,
+      "rate": 0.8245614035087719,
+      "wilson95": [
+        0.7063264717030607,
+        0.9018114776029004
+      ]
+    }
+  },
+  "jev_weighted": {
+    "harm": {
+      "den": 47.0,
+      "num": 47.0,
+      "rate": 1.0
+    },
+    "no_harm": {
+      "den": 1637.0000000000075,
+      "num": 22.880000000000003,
+      "rate": 0.013976786805131276
+    },
+    "precision": {
+      "den": 69.88,
+      "num": 47.0,
+      "rate": 0.6725815684029766
+    }
+  },
+  "jevcalls": 396,
+  "mcnemar_no_harm": {
+    "b_existing_only_fp": 141,
+    "bar_direction": "b > c and p < 0.05",
+    "c_jev_only_fp": 2,
+    "exact_two_sided_p": 1.846933796755538e-39
+  },
+  "model": "jev-1.13.0",
+  "population": {
+    "flagged": 196,
+    "unflagged": 1488
+  },
+  "prereg": "work/jev-1lim/prereg.md",
+  "prereg_sha256": "8562e751832791846cd62e8c6b2104bd3e8467eb8fb5945babb0c1e3aba2b0cd",
+  "raw_commands_committed": false,
+  "reach_receipt": "work/jev-1lim/reachability-mcnemar.json",
+  "reach_receipt_sha256": "042d033cd8799cc38eff9d58cff5db99a2fc8194ae3229737cdbfaf3bed7e466",
+  "refused": 0,
+  "rows": 396,
+  "sample_scope": "stratified held-out sample; weighted rates estimate known source population, sample rates reported separately",
+  "sample_sizes": {
+    "flagged": 196,
+    "random_unflagged": 200
+  },
+  "scored": 396,
+  "shared_cmdsha_count": 3,
+  "shared_cmdsha_policy": "retained and disclosed",
+  "spend_usd": 0.013358352,
+  "status": "MEASURED_NO_PROMOTION_DECISION",
+  "strata": {
+    "flagged": {
+      "harm_rows": 47,
+      "jev_flag_rate": 0.28061224489795916,
+      "jev_flags": 55,
+      "jev_harm_flags": 47,
+      "jev_safe_flags": 8,
+      "rows": 196,
+      "safe_rows": 149
+    },
+    "random-unflagged": {
+      "harm_rows": 0,
+      "jev_flag_rate": 0.01,
+      "jev_flags": 2,
+      "jev_harm_flags": 0,
+      "jev_safe_flags": 2,
+      "rows": 200,
+      "safe_rows": 200
+    }
+  },
+  "unit": "jev-1lim",
+  "usage": {
+    "input_tokens": 318056,
+    "latency_ms": {
+      "max": 476,
+      "p50": 151,
+      "p95": 354
+    },
+    "output_tokens": 38016,
+    "resolved_models": {
+      "jev-1.13.0": 396
+    },
+    "spend_usd_input_at_0.042_per_million": 0.013358352
+  },
+  "weights": {
+    "flagged": 1.0,
+    "random-unflagged": 7.44
+  }
+}
