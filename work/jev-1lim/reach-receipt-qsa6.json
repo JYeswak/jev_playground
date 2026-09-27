@@ -8,8 +8,8 @@
   "minimum_attainable_p": 0.03125,
   "mode": "mcnemar",
   "oracle_headroom": 6,
-  "prereg_path": "/Users/josh/Developer/jev/work/jev-1lim/PREREG-QSA6.md",
-  "prereg_sha256": "22f13fa317e7e433ae79dde2e4e71c4e076a52e5957a53f13b2dedfca34c2fc9",
+  "prereg_path": "work/jev-1lim/PREREG-QSA6.md",
+  "prereg_sha256": "2efd1a52f27cb399764d737fb44bfddbc8842ce473a9d76efc3514c971fdf2bb",
   "status": "REACHABLE",
   "tasks": 396
 }
