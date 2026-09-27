@@ -12,7 +12,8 @@
       },
       "brier": 0.3089337209302327,
       "model": "dots-studio/dots-3-note-preview:free",
-      "refused": 821,
+      "not_run": 821,
+      "refused": 0,
       "scored": 86
     },
     "jev": {
@@ -32,6 +33,12 @@
     }
   },
   "boundary": "Unseen public Climate-FEVER eligible pairs only; no fleet-wide claim or promotion/ruling.",
+  "comparator_quarantine": {
+    "count": 821,
+    "reason": "openrouter-429-daily-quota",
+    "resume_mode": "comparator-only; Jev arm unchanged",
+    "retry_after": "2026-09-28T00:00:00Z"
+  },
   "dataset": "tdiggelm/climate-fever@1.0.1",
   "items": "work/jev-oioo/items.jsonl",
   "items_sha256": "bbda30671b46678a11717d0fa89994b5226e9887ff321ec70a860e45f579032c",
@@ -50,7 +57,7 @@
   "rows": 907,
   "source_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
   "spend_usd": 0.021322602000000003,
-  "status": "MEASURED_NO_PROMOTION_DECISION",
+  "status": "MEASURED_NOT_RUN_FREE_QUOTA",
   "unit": "jev-oioo",
   "usage": {
     "comparator_completion_tokens": 87656,
