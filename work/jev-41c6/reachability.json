@@ -3,6 +3,8 @@
   "mode": "mcnemar",
   "unit": "jev-41c6",
   "dev_rows": 200,
+  "items_path": "work/jev-oioo/h1-dev-items.jsonl",
+  "items_sha256": "a3c4359f502fee27e4b212d4d606f3c22da53b153fe5c706c43f6fd700a754a7",
   "dev_id_manifest": "work/jev-oioo/h1-dev-items.jsonl",
   "dev_id_manifest_sha256": "a3c4359f502fee27e4b212d4d606f3c22da53b153fe5c706c43f6fd700a754a7",
   "state_source": "var/agent-tmp/jev-oioo/states.jsonl",
