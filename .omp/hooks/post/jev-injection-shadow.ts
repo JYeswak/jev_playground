@@ -40,14 +40,18 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
   const now = deps.now ?? (() => new Date().toISOString());
   let calls = 0;
   let day = now().slice(0, 10);
+  const write = async (row: Record<string, unknown>): Promise<void> => {
+    if (deps.append) { await deps.append(path, JSON.stringify(row)); return; }
+    syncObserved(path, row);
+  };
   return async (event: Event): Promise<undefined> => {
     const current = now().slice(0, 10); if (current !== day) { day = current; calls = 0; }
     if (event.isError === true) return undefined;
     const raw = outputText(event); if (!raw) return undefined;
-    if (calls >= cap) { syncObserved(path, { schema: LOG_SCHEMA, ts: now(), toolName: event.toolName ?? null, outputSha256: hash(raw), status: "cap" }); return undefined; }
+    if (calls >= cap) { await write({ schema: LOG_SCHEMA, ts: now(), toolName: event.toolName ?? null, outputSha256: hash(raw), status: "cap" }); return undefined; }
     calls += 1;
     const row = { schema: LOG_SCHEMA, ts: now(), toolName: event.toolName ?? null, outputSha256: hash(raw), status: "observed" };
-    syncObserved(path, row); launch(path, row, raw); return undefined;
+    await write(row); launch(path, row, raw); return undefined;
   };
 }
 
