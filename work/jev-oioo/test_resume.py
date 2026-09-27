@@ -3,66 +3,89 @@
 
 from __future__ import annotations
 
-import argparse
 import json
-from datetime import datetime, timezone
+import os
+import subprocess
+import tempfile
+import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-RESET = datetime.fromisoformat("2026-09-28T00:00:00+00:00")
+LIVE = ROOT / "work/jev-oioo/live.mjs"
 RESULTS = ROOT / "work/jev-oioo/live-results.jsonl"
-RUNNER = ROOT / "work/jev-oioo/live.mjs"
+RESET = "2026-09-28T00:00:00Z"
 
 
-def load_rows() -> list[dict]:
-    return [
-        json.loads(line) for line in RESULTS.read_text().splitlines() if line.strip()
-    ]
-
-
-def dry_run(now: datetime, plant: bool) -> tuple[int, str]:
-    rows = load_rows()
-    assert len(rows) == 907, f"expected 907 rows, got {len(rows)}"
-    jev_ids = {row["id"] for row in rows if row["jev"]["status"] == "scored"}
-    assert len(jev_ids) == 907, "all Jev rows must remain scored and untouched"
-    answered = [row for row in rows if row["comparator"]["status"] == "scored"]
-    not_run = [row for row in rows if row["comparator"]["status"] == "not_run"]
-    assert (
-        len(answered) == 86
-    ), f"expected 86 answered comparator rows, got {len(answered)}"
-    assert (
-        len(not_run) == 821
-    ), f"expected 821 comparator rows to resume, got {len(not_run)}"
-    selected = not_run + (answered[:1] if plant else [])
-    selected_ids = {row["id"] for row in selected}
-    assert selected_ids == {
-        row["id"] for row in not_run
-    }, "resume selected an answered row"
-    assert not (
-        selected_ids & jev_ids - {row["id"] for row in not_run}
-    ), "resume changed Jev coverage"
-    source = RUNNER.read_text()
-    assert 'process.env.JEV_OIOO_COMPARATOR_ONLY === "1"' in source
-    assert "response.status === 429" in source
-    assert "stopped = true" in source
-    if now < RESET:
-        return 2, f"NOT_RUN: reset at {RESET.isoformat()}, selected={len(selected)}"
-    return (
-        0,
-        f"READY: comparator-only selected={len(selected)} answered=0 Jev={len(jev_ids)}",
+def run_live(output: Path, *, now: str, fake_429: bool = False, plant: bool = False):
+    env = os.environ.copy()
+    env.update(
+        {
+            "JEV_OIOO_OUT": str(output),
+            "JEV_OIOO_COMPARATOR_ONLY": "1",
+            "JEV_OIOO_DRY_RUN": "1",
+            "JEV_OIOO_NOW": now,
+        }
+    )
+    if fake_429:
+        env["JEV_OIOO_FAKE_429"] = "1"
+    if plant:
+        env["JEV_OIOO_PLANT_SELECT"] = "1"
+    else:
+        env.pop("JEV_OIOO_PLANT_SELECT", None)
+    return subprocess.run(
+        ["node", "--experimental-strip-types", str(LIVE)],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
     )
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--plant", action="store_true")
-    parser.add_argument("--now", type=str)
-    args = parser.parse_args()
-    now = datetime.fromisoformat(args.now) if args.now else datetime.now(timezone.utc)
-    code, message = dry_run(now, args.plant)
-    print(message)
-    return code
+def payload(result):
+    return json.loads(result.stdout.strip().splitlines()[-1])
+
+
+class ComparatorResumeTest(unittest.TestCase):
+    def copy_results(self, directory: str) -> Path:
+        target = Path(directory) / "resume.jsonl"
+        target.write_bytes(RESULTS.read_bytes())
+        self.assertEqual(len(target.read_text().splitlines()), 907)
+        return target
+
+    def test_before_reset_refuses_without_writing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = self.copy_results(directory)
+            before = output.read_bytes()
+            result = run_live(output, now="2026-09-27T12:00:00Z")
+            self.assertEqual(result.returncode, 2)
+            self.assertEqual(payload(result)["status"], "NOT_RUN")
+            self.assertEqual(payload(result)["selected"], 821)
+            self.assertEqual(payload(result)["sent"], 0)
+            self.assertEqual(output.read_bytes(), before)
+
+    def test_fake_429_stops_without_writing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = self.copy_results(directory)
+            before = output.read_bytes()
+            result = run_live(output, now="2026-09-28T00:00:01Z", fake_429=True)
+            self.assertEqual(result.returncode, 0)
+            body = payload(result)
+            self.assertEqual(body["selected"], 821)
+            self.assertEqual(body["sent"], 1)
+            self.assertTrue(body["stopped"])
+            self.assertEqual(output.read_bytes(), before)
+
+    def test_planted_answered_row_would_fail_selection_contract(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = self.copy_results(directory)
+            result = run_live(
+                output, now="2026-09-28T00:00:01Z", fake_429=True, plant=True
+            )
+            self.assertEqual(result.returncode, 0)
+            with self.assertRaises(AssertionError):
+                self.assertEqual(payload(result)["selected"], 821)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    unittest.main()
