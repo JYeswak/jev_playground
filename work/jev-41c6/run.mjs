@@ -124,6 +124,9 @@ for (let j = 0; j < 5; j += 1) {
   };
 }
 
+const orphanId = idRows[0].id;
+const orphanBaseline = baselineById.get(orphanId);
+rowsById.set(orphanId, { id: orphanId, gold: orphanBaseline.gold, baseline_status: orphanBaseline.jev.status, baseline_prediction: orphanBaseline.jev.supported ? "SUPPORTS" : "REFUTES", h2_status: "invalid", reason: "orphaned_api_call_lost_before_checkpoint_due_to_runner_validation_bug", orphaned_api_call: true, model: MODEL, usage: null, latency_ms: null });
 for (const item of idRows) {
   if (rowsById.has(item.id)) continue;
   const baseline = baselineById.get(item.id);
@@ -143,8 +146,9 @@ for (const item of idRows) {
   if (answer.ok) {
     const scores = {};
     for (const [name, value] of Object.entries(answer.answers)) {
-      if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1) throw new Error(`validated answer escaped numeric bounds: ${item.id}/${name}`);
-      scores[name] = value;
+const raw = typeof value === "number" ? value : value && typeof value === "object" ? value.noul : undefined;
+      if (typeof raw !== "number" || !Number.isFinite(raw) || raw < 0 || raw > 1) throw new Error(`validated answer escaped numeric bounds: ${item.id}/${name}`);
+      scores[name] = raw;
     }
     const supportHit = [0, 1, 2, 3, 4].some((j) => scores[`support_${j}`] > 0.5);
     const contradictHit = [0, 1, 2, 3, 4].some((j) => scores[`contradict_${j}`] > 0.5);
