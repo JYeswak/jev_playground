@@ -51,6 +51,9 @@ CANDIDATES_PATH = os.environ.get(
 DEPTH = 20
 TIMEOUT_S = 120
 RUN_TAG = os.environ.get("BEIR_RUN_TAG", "")
+PREREG_PATH = os.environ.get(
+    "BEIR_PREREG", os.path.join(ROOT, "work/rerank-scifact/PREREG-jev-iu1e.md")
+)
 
 
 def choice_question(doc_ids):
@@ -205,7 +208,7 @@ async def run_arm(arm, bar_path=None, repo=None):
     sys.path.insert(0, os.path.join(ROOT, "work/sr-adopt"))
     from phase_gate import call_after_bar
 
-    bar = bar_path or os.path.join(ROOT, "work/rerank-scifact/PREREG-jev-iu1e.md")
+    bar = bar_path or PREREG_PATH
     call_after_bar(bar, lambda: None, repo=repo or ROOT)
     jev = arm.startswith("jev")
     need = "TYPESAFE_API_KEY" if jev else "XAI_API_KEY"
