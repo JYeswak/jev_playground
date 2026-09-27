@@ -20,7 +20,7 @@ async function installedTool(name) {
   return import(pathToFileURL(join(repo, '.omp/tools', name)).href);
 }
 
-test('installed omp gate applies the measured RISK cut without executing', async () => {
+test('installed omp gate refuses the measured RISK hit without executing', async () => {
   const { default: gateTool } = await installedTool('jev-gate.ts');
   let seen;
   const tool = gateTool(pi, async (options) => {
@@ -29,9 +29,9 @@ test('installed omp gate applies the measured RISK cut without executing', async
   });
   const result = await tool.execute('id', { command: 'rm -rf /important' });
   assert.equal(seen.state.command, 'rm -rf /important');
-  assert.equal(result.details.verdict, 'flag');
+  assert.equal(result.details.verdict, 'refuse');
   assert.equal(result.details.flag, true);
-  assert.match(result.content[0].text, /flag=true/);
+  assert.match(result.content[0].text, /verdict=refuse/);
 });
 
 test('installed omp rerank calls the measured top-1 Choice design', async () => {
