@@ -2,6 +2,7 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { askJev, askJevChoice, askJevScore, DEFAULT_MODEL } from "../dist/client.js";
+import { rerankTop1 } from "../dist/rerank.js";
 import { createFakeFetch } from "../dist/fake.js";
 import { installOmp, ompDiscovery } from "../dist/install.js";
 
@@ -80,12 +81,33 @@ async function ask(args) {
   return result.ok ? 0 : result.reason === "unconfigured" ? 2 : 1;
 }
 
+async function rerank(args) {
+  const robot = hasFlag(args, "--robot");
+  const fake = hasFlag(args, "--fake");
+  const query = option(args, "--query");
+  const candidatesPath = option(args, "--candidates");
+  if (!query || !candidatesPath) {
+    const error = { status: "ERROR", reason: "usage", message: "jev rerank --query Q --candidates FILE [--robot] [--fake]" };
+    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
+    return 1;
+  }
+  const candidates = await readJson(candidatesPath);
+  const fetchImpl = fake
+    ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/recorded-answer-rows.json", ROOT), "utf8")))
+    : undefined;
+  const result = await rerankTop1({ query, candidates, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
+  if (robot) robotPrint(result);
+  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  return 0;
+}
+
 const args = process.argv.slice(2);
 const robot = hasFlag(args, "--robot");
 let exitCode;
 try {
   if (args[0] === "doctor") exitCode = await doctor(robot);
   else if (args[0] === "ask") exitCode = await ask(args);
+  else if (args[0] === "rerank") exitCode = await rerank(args);
   else if (args[0] === "omp" && args[1] === "install") {
     const repo = option(args, "--dir") ?? process.cwd();
     const result = await installOmp(repo, hasFlag(args, "--dry-run"));

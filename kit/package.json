@@ -12,6 +12,7 @@
     "dist",
     "ROBOT.md",
     "test/fixtures",
+    "examples",
     "package.json",
     "templates"
   ],

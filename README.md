@@ -18,6 +18,10 @@ npx --prefix kit --no-install jev ask choice --fake --state kit/examples/state.j
 
 The example state and Choice question are captured from committed rows: `work/pokeagent-emerald/segment2-request-states.jsonl:1` and `work/pokeagent-emerald/macro_choice.py:73-89`. The fake command uses no network.
 
+
+The stranger-runnable top-1 rerank verb uses one Choice over all candidate passages and refuses more than 20 or OVER/NEAR states:
+
+`node kit/bin/jev.mjs rerank --query "Which candidate answers the query?" --candidates kit/examples/rerank-candidates.json --fake --robot`
 For a live call, set `TYPESAFE_API_KEY` outside the repository using the official [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart), then run the same command without `--fake`:
 
 ```bash

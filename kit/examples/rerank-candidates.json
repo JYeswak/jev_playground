@@ -1,0 +1,5 @@
+[
+  {"id":"c0","title":"Candidate one","text":"A captured candidate passage that is less relevant."},
+  {"id":"c1","title":"Candidate two","text":"A captured candidate passage that is the selected answer."},
+  {"id":"none","title":"No answer","text":"No candidate is relevant enough."}
+]
