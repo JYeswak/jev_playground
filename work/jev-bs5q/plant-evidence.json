@@ -1,0 +1,17 @@
+{
+  "schema": "jev-bs5q-plant/v1",
+  "bead": "jev-bs5q",
+  "target": ".omp/hooks/pre/jev-gate-shadow.ts",
+  "mutation": {
+    "before": "if (calls >= cap)",
+    "after": "if (calls > cap)",
+    "command": "node --experimental-strip-types --test .omp/hooks/pre/jev-gate-shadow.test.mjs"
+  },
+  "observed": {
+    "baseline_before_plant": { "tests": 5, "pass": 5, "fail": 0 },
+    "planted": { "tests": 5, "pass": 4, "fail": 1, "failure": "daily cap writes a cap row and does not call Jev again: expected calls 1, actual 2" },
+    "restored_after_plant": { "tests": 5, "pass": 5, "fail": 0 }
+  },
+  "restored_hook_sha256": "eb1c6aaa1f61e4fb0a70c9a85b92bcf9be23f5a1ec9dc26a35115aeaa9401516",
+  "command_text_stored": false
+}
