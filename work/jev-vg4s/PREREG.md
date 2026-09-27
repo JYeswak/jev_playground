@@ -55,6 +55,9 @@ Pass rule, fixed before calls:
 - Maximum calls: 840 Jev and 840 free-comparator requests, one per row and arm. If the free comparator exceeds its daily quota, the runner stops on HTTP 429 and records `NOT_RUN`; it never labels remaining rows as model failures or silently resumes within that day.
 - The runner must refuse before `2026-10-01T00:00:00Z` with no API request. After the gate, it stops on 401/402/403/429 and checkpoints every completed row.
 - Jev spend: record input/output tokens and compute input spend at `$0.042/M` billed input tokens, output free. Comparator OpenRouter usage and spend are recorded; expected comparator charge is `$0` for the `:free` model.
+## Dataset-card provenance boundary
+
+The pinned `jpd459/healthver_resplit` dataset card at revision `2d97d56c72aed720abb7bd7a981d44d645f136a5` contains license metadata but no description of how its resplit differs from the original HealthVer authors' release. The prereg therefore records the observable change only: this run uses the maintainer's pinned `train.jsonl`/`dev.jsonl`/`test.jsonl` resplit, specifically all 840 rows of its `test.jsonl`; no stronger claim about the resampling or deduplication procedure is made. The receipt must repeat this limitation.
 
 ## Boundary
 
