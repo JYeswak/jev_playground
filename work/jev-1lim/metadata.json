@@ -1,0 +1,18 @@
+{
+  "current_gate_log_sha256": "985bb46db8a0fce8fedf412af280499abe4a4aabf9acb8ef3d8a3ad8499e556e",
+  "cutoff_ts": "2026-09-26T20:49:32.833Z",
+  "fresh_flagged_rows": 196,
+  "fresh_scored_rows": 1684,
+  "fresh_unflagged_rows": 1488,
+  "manifest_sha256": "d020751f969f2a8688be370a0ab7dbd44686d0b5de79777718bddc490ca790c9",
+  "random_unflagged_sample_size": 200,
+  "raw_projection_committed": false,
+  "raw_projection_sha256": "229ea9b8bd0a552c5439227af7d918c914e2752cd1b805d7ecd4750b6cea8515",
+  "seed": 20260927,
+  "selected_flagged": 196,
+  "selected_random_unflagged": 200,
+  "selected_rows": 396,
+  "source_snapshot": "var/agent-tmp/jev-1miz/gate-observe-snapshot.jsonl",
+  "source_snapshot_sha256": "06c0cfbda00c17206ae8b223aae1369e24411ba5e728dd78e9a9bebf552f169c",
+  "unit": "jev-1lim"
+}
