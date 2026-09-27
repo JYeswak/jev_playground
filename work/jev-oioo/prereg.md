@@ -1,6 +1,6 @@
 # jev-oioo unseen SciFact confirmation preregistration
 
-**Status:** committed before any Jev or comparator call.
+**Status:** amended and committed before any Jev or comparator call.
 reach-mode: mcnemar
 
 ## Frozen public corpus and sample
@@ -10,11 +10,12 @@ reach-mode: mcnemar
 - Source SHA-256: `8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b`.
 - The source has 1,535 claims and four labels. Only the dataset's own `SUPPORTS` and `REFUTES`
   labels are eligible; `NOT_ENOUGH_INFO` and `DISPUTED` are excluded before scoring.
-- Sample: 100 `SUPPORTS` and 100 `REFUTES`, sampled without replacement with Python seed
-  `20260927`, then returned to source-row order. The hash-only item manifest is
-  `work/jev-oioo/items.jsonl` (SHA-256 `bc44411c2cdcd640d9731a555771547349d2c20485dec3d69bc4f6b061fa4ef0`).
-- Three-way? No: every scored pair has exactly one binary gold label from the dataset. Raw claims and
-  evidence stay in `var/agent-tmp/jev-oioo/states.jsonl` and are not committed.
+- The confirmation corpus is all `907` eligible pairs: 654 `SUPPORTS` and 253 `REFUTES`, in
+  source-row order. No sampling or post-hoc filtering is applied. The hash-only item manifest is
+  `work/jev-oioo/items.jsonl` (SHA-256 `bbda30671b46678a11717d0fa89994b5226e9887ff321ec70a860e45f579032c`).
+- For every state, `claim` is the dataset claim and `evidence` is the list of exactly the five
+  `evidences[*].evidence` sentences in their source order. Evidence IDs, votes, entropy, and
+  article metadata are not sent. The raw source/state stays local under `var/agent-tmp/jev-oioo/`.
 
 ## Jev and free comparator
 
@@ -38,8 +39,8 @@ coerced into an answer. Wilson 95% intervals are reported for accuracy and refus
 
 The reach receipt is bound to this preregistration, the item-manifest hash, and `mode: mcnemar`.
 The arithmetic reach bar is six Jev-only discordant wins and zero comparator-only wins: exact two-sided
-McNemar p `0.03125 < 0.05`, so 200 paired rows can reach the primary test. The exact state-size check
-must show all 200 requests `FITS` before the first call.
+McNemar p `0.03125 < 0.05`, so 907 paired rows can reach the primary test. The exact state-size check
+must show all 907 requests `FITS` before the first call.
 
 Input-token spend is computed from Jev usage at the documented `$0.042/M` input-token price; output
 is free. OpenRouter spend and usage are recorded from its response metadata. The receipt records model,
