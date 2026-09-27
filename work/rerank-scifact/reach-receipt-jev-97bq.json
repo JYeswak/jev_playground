@@ -1,0 +1,15 @@
+{
+  "alpha": 0.05,
+  "best_case_discordant_losses": 0,
+  "comparator_exact": 210,
+  "fixture": "jev-97bq paired incumbent reach bar",
+  "items_sha256": "1ef3835708d8522ed39f2f2bd4018ea07390e403bcfd8e00119580e69860e3ec",
+  "max_discordant_wins": 24,
+  "minimum_attainable_p": 1.1920928955078125e-07,
+  "mode": "mcnemar",
+  "oracle_headroom": 24,
+  "prereg_path": "/Users/josh/Developer/jev/work/rerank-scifact/PREREG-jev-97bq.md",
+  "prereg_sha256": "1660bf2543296f108f9183c0a4bacc1cb08c10b596aa66d02f888c3c05a0ebe5",
+  "status": "REACHABLE",
+  "tasks": 234
+}

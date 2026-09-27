@@ -1,0 +1,7 @@
+{
+  "fixture": "jev-97bq paired incumbent reach bar",
+  "tasks": 234,
+  "comparator_exact": 210,
+  "oracle_headroom": 24,
+  "bar_alpha": 0.05
+}
