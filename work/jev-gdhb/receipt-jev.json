@@ -1,0 +1,25 @@
+{
+  "status": "JEV_ARM_COMPLETE_COMPARATOR_NOT_RUN",
+  "created_at": "2026-09-27T10:32:23.739944Z",
+  "model": "jev-1.13.0",
+  "comparator": "dots-studio/dots-3-note-preview:free",
+  "comparator_status": "NOT_RUN_BY_DESIGN; gated until 2026-10-02T00:00:00Z",
+  "prereg_sha256": "b83f6173cdb82ce2f603b46af85e0b809b2f0128aa9890b05cb28879263491ae",
+  "corpus_sha256": "d35b793a7a908d45f0b7c088fb3357557020945dcbbc52b23909b95c7047be98",
+  "states_sha256": "29de5c4c596c53c4c0a9526675ac175189af2b1b67a5a3281de1287d0c68bed8",
+  "rows_sha256": "8d2aec51dd45808a6f1db51948629d0665a679d7d950dab5f898e33612451224",
+  "rows": 784,
+  "valid": 784,
+  "invalid": 0,
+  "accuracy": 0.8278061224489796,
+  "correct": 649,
+  "majority_baseline_accuracy": 0.016581632653061226,
+  "majority_baseline_correct": 13,
+  "intents": 64,
+  "usage": {
+    "input_tokens": 619606,
+    "output_tokens": 455295,
+    "spend_usd": 0.026023452
+  },
+  "boundary": "Jev arm only; no paired McNemar result or PASS classification until the free arm runs after its date gate."
+}
