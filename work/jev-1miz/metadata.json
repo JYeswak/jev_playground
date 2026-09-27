@@ -1,0 +1,17 @@
+{
+  "flagged_rows": 360,
+  "manifest_sha256": "e533581eaefa9cc4259865a567e6dfbaf81a75e16e3e13d1c0d6ce4cdcaa1849",
+  "random_seed": 20260925,
+  "random_unflagged_sample_size": 200,
+  "raw_projection_committed": false,
+  "raw_projection_path": "/Users/josh/Developer/jev/var/agent-tmp/jev-1miz",
+  "raw_projection_sha256": "8ff83ad19bdafc509b573d58e53737e0967e586500a6383369ca169dd33502ea",
+  "selected_flagged": 360,
+  "selected_random_unflagged": 200,
+  "selected_rows": 560,
+  "source_gate_log": "var/agent-tmp/jev-1miz/gate-observe-snapshot.jsonl",
+  "source_gate_log_sha256": "06c0cfbda00c17206ae8b223aae1369e24411ba5e728dd78e9a9bebf552f169c",
+  "source_scored_rows": 6545,
+  "unflagged_rows": 6185,
+  "unit": "jev-1miz"
+}
