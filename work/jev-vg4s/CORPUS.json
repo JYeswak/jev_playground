@@ -1,0 +1,17 @@
+{
+  "dataset": "jpd459/healthver_resplit",
+  "revision": "2d97d56c72aed720abb7bd7a981d44d645f136a5",
+  "source_file": "test.jsonl",
+  "source_sha256": "eced674cf13b2f5171705518786a0e58ef8dd468a4972cc808aa0d78b82d99ce",
+  "source_bytes": 378808,
+  "license": "apache-2.0",
+  "split": "test",
+  "rows": 840,
+  "label_mapping": {
+    "Supports": "SUPPORTS",
+    "Refutes": "NOT_SUPPORTED",
+    "Neutral": "NOT_SUPPORTED"
+  },
+  "selection": "all pinned test rows, source order",
+  "corpus_sha256": "24bdc0e651e1694652fc82bf4e2a167170e9b2aceeb2037efcaacd752d106d02"
+}

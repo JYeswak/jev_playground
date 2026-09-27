@@ -1,0 +1,22 @@
+{
+  "status": "REACHABLE",
+  "mode": "mcnemar",
+  "unit": "jev-vg4s",
+  "dataset": "jpd459/healthver_resplit@2d97d56c72aed720abb7bd7a981d44d645f136a5",
+  "items_path": "work/jev-vg4s/corpus.jsonl",
+  "items_sha256": "24bdc0e651e1694652fc82bf4e2a167170e9b2aceeb2037efcaacd752d106d02",
+  "states_path": "work/jev-vg4s/states.jsonl",
+  "states_sha256": "d5ef3bbb2cc9b6de47caa731435ff6698fb0e45c22866cd0ba5ee39b4ce6559e",
+  "rows": 840,
+  "label_counts": {"Supports": 322, "Refutes": 206, "Neutral": 312},
+  "binary_mapping": {"Supports": "SUPPORTS", "Refutes": "NOT_SUPPORTED", "Neutral": "NOT_SUPPORTED"},
+  "question_bytes": 256,
+  "state_size_preflight": "FITS 840, NEAR 0, OVER 0",
+  "prereg_path": "work/jev-vg4s/PREREG.md",
+  "prereg_sha256": "3fc0064c9057d3be73d2eccd77371d020e5b19891c8d7573fb2dd06678aa73cf",
+  "launch_after": "2026-10-01T00:00:00Z",
+  "hard_stop_statuses": [401, 402, 403, 429],
+  "hard_stop_outcome": "NOT_RUN",
+  "comparator": "dots-studio/dots-3-note-preview:free",
+  "source": "DOCS plus keyless state-size preflight; no API call"
+}
