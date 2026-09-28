@@ -4,10 +4,11 @@ import { makeInjectionShadowHandler } from './jev-injection-shadow.ts';
 import { spawnSync } from 'node:child_process';
 
 test('detached worker refuses an unadmitted job before reading state or acquiring credentials', () => {
+  const syntheticKey = 'synthetic-never-send';
   const result = spawnSync(process.execPath, ['--experimental-strip-types', '.omp/hooks/jev-shadow-worker.ts'], {
     cwd: process.cwd(),
     input: JSON.stringify({ kind: 'injection', text: 'PRIVATE_WORKER_STATE_7d03', path: '/nonexistent/jev-row.jsonl', row: {} }),
-    env: { ...process.env, TYPESAFE_API_KEY: 'synthetic-never-send' },
+    env: { ...process.env, TYPESAFE_API_KEY: syntheticKey },
     encoding: 'utf8',
     timeout: 10_000,
   });
