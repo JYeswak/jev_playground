@@ -72,17 +72,21 @@ async function machineIdentityKey(run: Runner, binary: string, home: string, rea
   const config = machineIdentityConfig(home, read);
   if (!config) return undefined;
   try {
-    const tokenOutput = await run(binary, ["login", "--method", "universal-auth", "--client-id", config.clientId, "--client-secret", config.clientSecret, "--domain", config.apiUrl, "--plain", "--silent"], TIMEOUT_MS, {
-      INFISICAL_CLIENT_ID: config.clientId,
-      INFISICAL_CLIENT_SECRET: config.clientSecret,
-      INFISICAL_API_URL: config.apiUrl,
-      ...(config.projectId ? {INFISICAL_PROJECT_ID: config.projectId} : {}),
-      ...(config.projectIds ? {INFISICAL_PROJECT_IDS: config.projectIds} : {}),
-      ...(config.environment ? {INFISICAL_ENV: config.environment} : {}),
-      ...(config.loaded ? {INFISICAL_LOADED: config.loaded} : {}),
+    // Infisical CLI universal-auth requires --client-secret, which exposes it in process argv.
+    // The documented login API accepts the same credentials in the HTTPS request body.
+    const url = new URL("/api/v1/auth/universal-auth/login", config.apiUrl);
+    const response = await fetch(url, {
+      method: "POST",
+      redirect: "error",
+      headers: {"content-type": "application/json"},
+      body: JSON.stringify({clientId: config.clientId, clientSecret: config.clientSecret}),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    const token = tokenOutput.trim();
-    if (!token || /\s/.test(token)) return undefined;
+    if (!response.ok) return undefined;
+    const login: unknown = await response.json();
+    if (!login || typeof login !== "object" || !("accessToken" in login)) return undefined;
+    const token = login.accessToken;
+    if (typeof token !== "string" || !token.trim() || /\s/.test(token)) return undefined;
     const out = await run(binary, ["secrets", "get", "TYPESAFE_API_KEY", `--projectId=${PROJECT_ID}`, "--plain", "--silent"], TIMEOUT_MS, {
       INFISICAL_API_URL: config.apiUrl,
       INFISICAL_TOKEN: token,

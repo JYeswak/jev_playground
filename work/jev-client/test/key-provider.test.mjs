@@ -2,6 +2,7 @@
 // TYPESAFE_API_KEY, then an installed provider; the Infisical provider caches in memory only.
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
 import { askJev, askJevScore, keyProviderInstalled, setKeyProvider } from '../../../kit/src/client.ts';
 import { makeInfisicalKeyProvider, PROJECT_ID, TTL_MS, FAIL_TTL_MS, infisicalBinary, machineIdentityConfig } from "../src/infisical-key.ts";
 import { useInfisicalKey } from '../src/use-infisical-key.ts';
@@ -116,26 +117,87 @@ test('Infisical provider never writes the key into the environment', async () =>
   assert.equal(Object.values(process.env).includes("secret-value"), false);
 });
 
-test("machine identity fallback logs in without exposing the token", async () => {
+test("machine identity fallback authenticates without putting client secret in child argv or output", async () => {
+  const secret = "synthetic-machine-secret";
   const calls = [];
-  const config = "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=csecret\nexport INFISICAL_API_URL=https://secrets.example";
-  const provider = makeInfisicalKeyProvider(async (file, args, _timeout, env) => {
-    calls.push({file, args, env});
-    if (args[0] === "secrets" && !env?.INFISICAL_TOKEN) throw new Error("user session expired");
-    if (args[0] === "login") return "machine-token\n";
-    return "machine-key\n";
-  }, () => 0, "/Users/josh/.local/bin/infisical", "/home", () => config);
-  assert.equal(await provider(), "machine-key");
-  assert.equal(calls.length, 3);
-  assert.equal(calls[1].args[0], "login");
-  assert.equal(calls[1].env.INFISICAL_CLIENT_ID, "cid");
-  assert.equal(calls[2].env.INFISICAL_TOKEN, "machine-token");
-  assert.equal(process.env.TYPESAFE_API_KEY, undefined);
+  const requests = [];
+  const server = createServer(async (request, response) => {
+    let body = "";
+    for await (const chunk of request) body += chunk;
+    requests.push({ path: request.url, body: JSON.parse(body) });
+    response.writeHead(200, { "content-type": "application/json" });
+    response.end(JSON.stringify({ accessToken: "machine-token", expiresIn: 3600, tokenType: "Bearer" }));
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  try {
+    const config = `export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=${secret}\nexport INFISICAL_API_URL=http://127.0.0.1:${server.address().port}/api`;
+    const provider = makeInfisicalKeyProvider(async (file, args, _timeout, env) => {
+      calls.push({ file, args, env });
+      if (!env?.INFISICAL_TOKEN) throw new Error("user session expired");
+      return "machine-key\n";
+    }, () => 0, "/bin/infisical", "/home", () => config);
+    const value = await provider();
+    assert.equal(calls.some(({ args, env }) => JSON.stringify({ args, env }).includes(secret)), false, "machine secret reached child process");
+    assert.equal(value, "machine-key");
+    assert.equal(calls.length, 2);
+    assert.deepEqual(requests, [{
+      path: "/api/v1/auth/universal-auth/login",
+      body: { clientId: "cid", clientSecret: secret },
+    }]);
+    assert.equal(calls[1].env.INFISICAL_TOKEN, "machine-token");
+    assert.equal(process.env.TYPESAFE_API_KEY, undefined);
+  } finally {
+    server.close();
+  }
 });
 
-test("machine identity fallback fails closed when both sessions fail", async () => {
-  const provider = makeInfisicalKeyProvider(async () => { throw new Error("provider failure"); }, () => 0, "infisical", "/home", () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=secret\nexport INFISICAL_API_URL=https://example");
-  assert.equal(await provider(), undefined);
+test("machine identity fallback refuses rejected authentication without exposing provider error text", async () => {
+  const secret = "synthetic-machine-secret";
+  let requests = 0;
+  const server = createServer(async (request, response) => {
+    requests++;
+    response.writeHead(401, { "content-type": "application/json" });
+    response.end(JSON.stringify({ error: `rejected ${secret}` }));
+  });
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  try {
+    const config = `export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=${secret}\nexport INFISICAL_API_URL=http://127.0.0.1:${server.address().port}/api`;
+    let childCalls = 0;
+    const provider = makeInfisicalKeyProvider(async () => { childCalls++; throw new Error("user session expired"); }, () => 0, "infisical", "/home", () => config);
+    assert.equal(await provider(), undefined);
+    assert.equal(requests, 1);
+    assert.equal(childCalls, 1, "no secret lookup after rejected login");
+  } finally {
+    server.close();
+  }
+});
+test("machine identity fallback refuses redirects before forwarding credentials", async () => {
+  const secret = "synthetic-machine-secret";
+  let redirected = 0;
+  const destination = createServer((_request, response) => {
+    redirected++;
+    response.writeHead(200, { "content-type": "application/json" });
+    response.end(JSON.stringify({ accessToken: "machine-token" }));
+  });
+  await new Promise((resolve) => destination.listen(0, "127.0.0.1", resolve));
+  const origin = createServer((_request, response) => {
+    response.writeHead(307, { location: `http://127.0.0.1:${destination.address().port}/collect` });
+    response.end();
+  });
+  await new Promise((resolve) => origin.listen(0, "127.0.0.1", resolve));
+  try {
+    const config = `export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=${secret}\nexport INFISICAL_API_URL=http://127.0.0.1:${origin.address().port}/api`;
+    const provider = makeInfisicalKeyProvider(async (_file, _args, _timeout, env) => {
+      if (!env?.INFISICAL_TOKEN) throw new Error("user session expired");
+      return "machine-key\n";
+    }, () => 0, "infisical", "/home", () => config);
+    const key = await provider();
+    assert.equal(redirected, 0, "credential body was forwarded to redirected host");
+    assert.equal(key, undefined);
+  } finally {
+    origin.close();
+    destination.close();
+  }
 });
 test("machine identity config requires all three non-empty fields", () => {
   assert.deepEqual(machineIdentityConfig("/home", () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=secret\nexport INFISICAL_API_URL=https://example"), {clientId: "cid", clientSecret: "secret", apiUrl: "https://example", projectId: undefined, projectIds: undefined, environment: undefined, loaded: undefined});
