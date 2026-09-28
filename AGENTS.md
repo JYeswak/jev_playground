@@ -1782,6 +1782,49 @@ Rank by a computed score, never by interest. In order of tie-breaking:
 Compute all four, write them in the dispatch, take the top row. If two tie, take the one whose
 failure would teach us more.
 
+### DECISION AUTHORITY — plan backward from the consumer, not the next experiment
+
+**At intake and after every result**, write the next decision in the owning bead. Start with the
+actual consumer and its incumbent, then work backward: what action changes for that consumer;
+what outside-authored outcome measures it; what existing baseline must be beaten; which
+feasibility and planted-negative arms could stop the run; what result promotes, holds, or kills
+the seat. Name the source snapshot, model, cost, success bar and non-claim. A test with no
+consumer decision is research, not a product milestone. Cite `franken-research`'s
+`synthesis/planning/execution-readiness.md` for the mechanical/documented-gate distinction,
+ControlArena for control evaluations, Inspect's tool approval for approval versus execution,
+and `slb/internal/core/execute.go` for action-bound authorization; these are patterns to
+adapt, not evidence that our own gates fired.
+
+**Authority is earned one boundary at a time.** Observe: Jev scores or ranks while the incumbent
+acts. Advise: an existing operator or policy chooses, with Jev's recommendation logged.
+Bounded act: a separate tested policy admits only specified reversible actions and refuses a
+planted bad one. Privileged act: deterministic authorization plus independent approval binds
+principal, exact action, resource and expiry; a Jev probability is never the credential. Record
+`suggested → permitted → executed → outcome` separately. A hook loading or approving is not
+proof of execution; a live answer is not proof of consumer benefit. Promotion requires a
+preregistered bar on non-author data against the incumbent, independent recount, a live omp
+positive *and* refusal, then measured shadow traffic before enforcement. Demote when new
+evidence breaks a rung; retain the original failed bar and retry condition.
+
+**Plan the graph, not an inventory.** A multi-component build gets a self-contained plan before
+code (`skill://planning-workflow`): each unit has WHAT/WHY/ACCEPTANCE, source and destination
+interfaces, dependency, consumer, falsifier, independent reviewer and explicit NO-CLAIM. Review
+the plan until structural revisions stop (four rounds for a substantial new project, not four
+rounds of ceremony for a local fix); confirm the most obscure unit is implementable alone and
+the DAG has no orphan or cycle, then convert to beads with the same edges. An alternative
+experiment is not a prerequisite of the winning path: do not parent it under a bead whose
+acceptance needs only one winner. If scope changes after a result, amend the successor and its
+retry trigger before dispatch; never retrofit the bar to match an answer.
+
+**Parked means a specific dependency, not silence.** For every blocked or date-gated bead,
+record the missing evidence/resource, owner, earliest trigger (timestamp or observable event),
+who resumes it, the first command after the trigger, and a fallback *independent of that
+trigger* if one exists. At each result, close the measured unit with its verdict, then either
+dispatch its already-ready successor, create the missing consumer-path unit from the evidence,
+or mark the branch blocked with that trigger. Do not call an assigned bead unassigned; do not
+fabricate ready work to satisfy a queue metric. If all real branches await external triggers,
+report the blocked inventory and next wake condition instead of another idle alert.
+
 ### CLOSURE — when a thing is truly ruled out
 
 A candidate is closed when **its bar was preregistered, its corpus was not authored by the
@@ -1833,11 +1876,12 @@ mine (fh over the mirror · ripwire · ast-grep · rg · jsm skills)
   → next row
 ```
 
-**A tick that ends with a question to Joshua and no dispatch is a wasted tick.** If the answer is
-computable, compute it. If a pane is idle and the queue is empty, the selection rules above name
-the next unit — run them rather than asking which.
+**A tick ends with a decision and a next trigger.** If a successor is executable, dispatch it;
+if every successor depends on external data, a date, a credential, or approval, record those
+blockers and resume conditions on the beads. Only Joshua's three escalation classes above
+go to him; a computable selection never does.
 
-### NO IDLE WORKERS — four mechanisms, all required
+### IDLE TRIAGE — separate missing work from legitimate waits
 
 Measured 2026-09-24: 4 of 6 worker panes sat at their prompts for most of an hour. `br ready` was
 empty, the stop hook returned nothing on an empty queue, one pane stalled between steps of its own
@@ -1851,9 +1895,11 @@ bead, and the conductor looked only when a callback arrived. Joshua: *"dont let 
    `scripts/fleet-idle-watch.py`) polls every 60 s and sends `IDLE pane N` to pane 1 after two
    idle polls, then every 10 minutes while a pane stays idle. If `hub op:ps` does not show it
    running while the fleet is up, restarting it is the conductor's first action.
-3. **The queue has a floor.** `br ready` holds at least three unassigned live units at all times.
-   A dispatch that drains it below three files the next units in the same turn, each with
-   WHAT / WHY / ACCEPTANCE.
-4. **No conductor turn ends with an idle worker.** Before yielding, pane 1 runs
-   `python3 scripts/fleet-idle-watch.py --once`; exit 1 means a pane gets a unit before the turn
-   ends. An `IDLE pane N` message is answered with a dispatch, never with an acknowledgement.
+3. **Keep a real ready queue.** Select the highest-ranked unassigned, executable bead. When fewer
+   than three exist, derive successors from actual consumer paths and measured gaps; write
+   WHAT / WHY / ACCEPTANCE and dependency edges only for work that changes a consumer decision.
+   A queue of zero because all valid branches await external triggers is an honest state.
+4. **Resolve an idle report once per state change.** Before yielding, pane 1 runs
+   `python3 scripts/fleet-idle-watch.py --once`. Dispatch executable work, or report why none
+   exists with its owner and next wake trigger. Repeated notifications with no changed trigger
+   are not new work and must not generate filler beads.
