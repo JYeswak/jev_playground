@@ -17,7 +17,7 @@ const TIMEOUT_MS = 15_000;
 export type Runner = (file: string, args: string[], timeoutMs: number, env?: Record<string, string>) => Promise<string>;
 export type FileReader = (file: string) => string;
 
-type MachineConfig = { clientId: string; clientSecret: string; apiUrl: string };
+type MachineConfig = { clientId: string; clientSecret: string; apiUrl: string; projectId?: string; projectIds?: string; environment?: string; loaded?: string };
 
 const defaultRunner: Runner = (file, args, timeoutMs, env) => {
   const { promise, resolve, reject } = Promise.withResolvers<string>();
@@ -48,7 +48,11 @@ export function machineIdentityConfig(home: string = homedir(), read: FileReader
     const clientId = parseExport(text, "INFISICAL_CLIENT_ID");
     const clientSecret = parseExport(text, "INFISICAL_CLIENT_SECRET");
     const apiUrl = parseExport(text, "INFISICAL_API_URL");
-    return clientId && clientSecret && apiUrl ? {clientId, clientSecret, apiUrl} : undefined;
+    const projectId = parseExport(text, "INFISICAL_PROJECT_ID");
+    const projectIds = parseExport(text, "INFISICAL_PROJECT_IDS");
+    const environment = parseExport(text, "INFISICAL_ENV");
+    const loaded = parseExport(text, "INFISICAL_LOADED");
+    return clientId && clientSecret && apiUrl ? {clientId, clientSecret, apiUrl, projectId, projectIds, environment, loaded} : undefined;
   } catch {
     return undefined;
   }
@@ -68,9 +72,14 @@ async function machineIdentityKey(run: Runner, binary: string, home: string, rea
   const config = machineIdentityConfig(home, read);
   if (!config) return undefined;
   try {
-    const tokenOutput = await run(binary, ["login", "--method", "universal-auth", "--domain", config.apiUrl, "--plain", "--silent"], TIMEOUT_MS, {
+    const tokenOutput = await run(binary, ["login", "--method", "universal-auth", "--client-id", config.clientId, "--client-secret", config.clientSecret, "--domain", config.apiUrl, "--plain", "--silent"], TIMEOUT_MS, {
       INFISICAL_CLIENT_ID: config.clientId,
       INFISICAL_CLIENT_SECRET: config.clientSecret,
+      INFISICAL_API_URL: config.apiUrl,
+      ...(config.projectId ? {INFISICAL_PROJECT_ID: config.projectId} : {}),
+      ...(config.projectIds ? {INFISICAL_PROJECT_IDS: config.projectIds} : {}),
+      ...(config.environment ? {INFISICAL_ENV: config.environment} : {}),
+      ...(config.loaded ? {INFISICAL_LOADED: config.loaded} : {}),
     });
     const token = tokenOutput.trim();
     if (!token || /\s/.test(token)) return undefined;

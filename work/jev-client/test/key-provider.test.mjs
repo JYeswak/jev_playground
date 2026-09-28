@@ -137,9 +137,8 @@ test("machine identity fallback fails closed when both sessions fail", async () 
   const provider = makeInfisicalKeyProvider(async () => { throw new Error("provider failure"); }, () => 0, "infisical", "/home", () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=secret\nexport INFISICAL_API_URL=https://example");
   assert.equal(await provider(), undefined);
 });
-
 test("machine identity config requires all three non-empty fields", () => {
-  assert.deepEqual(machineIdentityConfig("/home", () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=secret\nexport INFISICAL_API_URL=https://example"), {clientId: "cid", clientSecret: "secret", apiUrl: "https://example"});
+  assert.deepEqual(machineIdentityConfig("/home", () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=secret\nexport INFISICAL_API_URL=https://example"), {clientId: "cid", clientSecret: "secret", apiUrl: "https://example", projectId: undefined, projectIds: undefined, environment: undefined, loaded: undefined});
   assert.equal(machineIdentityConfig("/home", () => "export INFISICAL_CLIENT_ID=cid"), undefined);
 });
 
