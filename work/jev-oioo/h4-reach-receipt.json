@@ -1,7 +1,11 @@
 {
-  "status": "NOT_RUN",
-  "reason": "fresh labelled corpus unavailable; previous 92-row manifest reused scored Climate-FEVER rows",
+  "items_sha256": "054208b394cd9940fe968f43f346d96a01300683521c9973b8d60992d0c4e0b5",
+  "mode": "rate",
+  "perfect_successes": 119,
   "prereg_path": "work/jev-oioo/PREREG-H4-cicz.md",
-  "model": "jev-1.13.0",
-  "calls": 0
+  "prereg_sha256": "30b9e53aa29591483021e508da3a216b345e05a6228fa684b0b8aa3f58a714b3",
+  "status": "REACHABLE",
+  "threshold": 0.8,
+  "trials": 119,
+  "wilson_lower_bound_95": 0.9687283197580606
 }
