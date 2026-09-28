@@ -6,7 +6,7 @@ const STATES = new URL("var/agent-tmp/jev-pgtu/states.jsonl", ROOT);
 const ITEMS = new URL("work/jev-pgtu/items.jsonl", ROOT);
 const JEV_ROWS = new URL("work/jev-a9fv/live-rows.jsonl", ROOT);
 const OUT = new URL(process.env.JEV_PGTU_OUT ?? "var/agent-tmp/jev-pgtu/free-results.jsonl", ROOT);
-const RESET_AT = "2026-10-03T00:00:00Z";
+const RESET_AT = "2026-10-02T00:00:00Z";
 const MODEL = "dots-studio/dots-3-note-preview:free";
 const dry = process.env.JEV_PGTU_DRY_RUN === "1";
 const fake429 = process.env.JEV_PGTU_FAKE_429 === "1";

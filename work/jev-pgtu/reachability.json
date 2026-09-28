@@ -7,7 +7,7 @@
   "excluded_rows": 0,
   "items_path": "work/jev-pgtu/items.jsonl",
   "items_sha256": "fc417c602499328243f86a06d84e3c0888fa41e6662aeefc2a8251c1adf3437b",
-  "launch_not_before": "2026-10-03T00:00:00Z",
+  "launch_not_before": "2026-10-02T00:00:00Z",
   "markerless": true,
   "markerless_jev_catch": 268,
   "markerless_jev_source": "jev-29s4 receipt 268/300",
@@ -18,7 +18,7 @@
   "planted_both_directions_status": "REACHABLE: six discordant wins, exact p=0.03125",
   "planted_rows": 300,
   "prereg_path": "work/jev-pgtu/prereg.md",
-  "prereg_sha256": "208b76e02d7a371b188fa6a83f1f206129de5089a8ffe7ac9fe17b5bb1a80604",
+  "prereg_sha256": "20d27cbb3a108b859ed15e3e64db78ed746e64dd39c3035c0c58e4b00e916cc2",
   "source": "ARITHMETIC; two paired McNemar bars; no comparator call",
   "status": "REACHABLE",
   "unit": "jev-pgtu"

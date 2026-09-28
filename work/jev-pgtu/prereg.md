@@ -1,6 +1,6 @@
 # jev-pgtu free-LLM injection-seat comparison preregistration
 
-**Status:** amended before any comparator call. Launch is forbidden before `2026-10-03T00:00:00Z`.
+**Status:** amended before any comparator call. Launch is forbidden before `2026-10-02T00:00:00Z`.
 
 ## Privacy-frozen corpus
 
@@ -43,7 +43,7 @@ paired bars have directional p<0.05; no omp seat change follows automatically.
 ## Reach, launch, and spend
 
 Reach receipt mode is `mcnemar`, bound to this preregistration and `work/jev-pgtu/items.jsonl`.
-The runner must refuse before `2026-10-03T00:00:00Z`, stop on HTTP 429 as `NOT_RUN`, and never
+The runner must refuse before `2026-10-02T00:00:00Z`, stop on HTTP 429 as `NOT_RUN`, and never
 spend on a pre-launch call. State-size preflight must show all retained rows `FITS` before launch.
 OpenRouter usage is recorded before/after; free-arm spend is expected `$0` under the free-tier
 contract, but any usage/charge is recorded. Jev reuse carries no new API spend. This is a
