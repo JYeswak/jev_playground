@@ -52,14 +52,20 @@ function notRun(reason: string) {
 }
 
 export default function jevClaimCheckTool(pi: ToolHost, asker?: NoulAsker) {
-  if (!asker) useInfisicalKey();
   return {
     name: "jev_claim_check",
     label: "Jev claim check",
-    description: "Check whether evidence supports a qualitative claim with the measured SciFact Noul design. Uses a fixed 0.5 cut: supported above 0.5, unsupported at or below 0.5. Advisory only; numeric claims are not a measured scope. Without Jev it returns NOT_RUN.",
+    description: "Check whether evidence supports a qualitative claim with the measured SciFact Noul design. Uses a fixed 0.5 cut: supported above 0.5, unsupported at or below 0.5. Advisory only. A claim containing a number is refused before any model call; numeric claims are not a measured scope. Without Jev it returns NOT_RUN.",
     parameters: pi.zod.object({ claim: pi.zod.string().min(1), evidence: pi.zod.string().min(1) }),
     async execute(_id: string, params: { claim: string; evidence: string }) {
+      if (typeof params.claim === "string" && /\d/.test(params.claim)) {
+        return {
+          content: [{ type: "text", text: "verdict=refused reason=numeric-out-of-scope; compare the number with its source directly" }],
+          details: { verdict: "refused", reason: "numeric-out-of-scope", calledModel: false, label: null, value: null, threshold: 0.5, model: null },
+        };
+      }
       try {
+        if (!asker) useInfisicalKey();
         const result: VerifyResult = await verifyClaim({ claim: params.claim, evidence: params.evidence, ...(asker ? { ask: asker } : {}) });
         return {
           content: [{ type: "text", text: `verdict=${result.label} value=${result.value.toFixed(3)} threshold=${result.threshold} model=${result.model}` }],

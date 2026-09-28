@@ -9,7 +9,6 @@ export const INSTALL_FILES = {
   "tools/jev-flag.ts": "omp/tools/jev-flag.ts",
   "tools/jev-gate.ts": "omp/tools/jev-gate.ts",
   "hooks/post/jev-gate-observe.ts": "omp/hooks/post/jev-gate-observe.ts",
-  "config.yml": "omp/config.yml",
   "extensions/jev-rerank.ts": "omp/extensions/jev-rerank.ts",
   "extensions/jev-claim-check.ts": "omp/extensions/jev-claim-check.ts",
   "extensions/jev-screen.ts": "omp/extensions/jev-screen.ts",
@@ -35,7 +34,7 @@ export const INSTALL_FILES = {
 
 const MANIFEST_PATH = ".omp/jev-kit-manifest.json";
 type Manifest = { version: 1; files: Record<string, string> };
-export type InstallResult = { status: "READY" | "DRY_RUN"; repo: string; files: string[] };
+export type InstallResult = { status: "READY" | "DRY_RUN"; repo: string; files: string[]; extensionActivation: "MANUAL_REQUIRED" };
 async function exists(path: string): Promise<boolean> { try { await access(path); return true; } catch { return false; } }
 function sha256(content: string): string { return createHash("sha256").update(content, "utf8").digest("hex"); }
 async function readManifest(path: string): Promise<Manifest | undefined> {
@@ -50,6 +49,9 @@ export async function installOmp(repoDir: string, dryRun = false): Promise<Insta
   const files = Object.keys(INSTALL_FILES).map((path) => relative(repo, join(repo, ".omp", path)));
   const destinations = Object.keys(INSTALL_FILES).map((path) => join(repo, ".omp", path));
   const manifestPath = join(repo, MANIFEST_PATH); const manifest = await readManifest(manifestPath); const templates = new Map<string, string>();
+  if (manifest?.files["config.yml"]) {
+    throw new Error("existing installer-managed .omp/config.yml requires owner review; preserve and merge host extensions before a new install");
+  }
   for (const [destination, template] of Object.entries(INSTALL_FILES)) templates.set(destination, await readFile(new URL(template, templateRoot), "utf8"));
   const edited: string[] = []; const unmanaged: string[] = [];
   for (const [destination] of templates) { const absolute = join(repo, ".omp", destination); if (!(await exists(absolute))) continue; if (!manifest) unmanaged.push(relative(repo, absolute)); else { const expected = manifest.files[destination]; const actual = sha256(await readFile(absolute, "utf8")); if (!expected || actual !== expected) edited.push(relative(repo, absolute)); } }
@@ -57,7 +59,7 @@ export async function installOmp(repoDir: string, dryRun = false): Promise<Insta
   if (unmanaged.length > 0) throw new Error(`refusing to overwrite existing files without installer manifest: ${unmanaged.join(", ")}`);
   const outputFiles = [...files, relative(repo, manifestPath)];
   if (!dryRun) { for (const destination of destinations) await mkdir(resolve(destination, ".."), { recursive: true }); const hashes: Record<string, string> = {}; for (const [destination, content] of templates) { await writeFile(join(repo, ".omp", destination), content, { mode: 0o644 }); hashes[destination] = sha256(content); } await writeFile(manifestPath, `${JSON.stringify({ version: 1, files: hashes }, null, 2)}\n`, { mode: 0o644 }); }
-  return { status: dryRun ? "DRY_RUN" : "READY", repo, files: outputFiles };
+  return { status: dryRun ? "DRY_RUN" : "READY", repo, files: outputFiles, extensionActivation: "MANUAL_REQUIRED" };
 }
 export async function ompDiscovery(repoDir: string): Promise<Record<string, unknown>> {
   const repo = resolve(repoDir); const tools = Object.keys(INSTALL_FILES).filter((path) => path.startsWith("tools/")).map((path) => ({ path: `.omp/${path}`, present: true })); const hooks = [{ path: ".omp/hooks/post/jev-gate-observe.ts", present: true }];

@@ -28,9 +28,9 @@ From this checkout, install the project-scoped omp tools into a disposable git r
 python3 -c 'from pathlib import Path; Path("var/agent-tmp/jev-omp-demo").mkdir(parents=True, exist_ok=True)' && git init -q var/agent-tmp/jev-omp-demo && npx --prefix kit --no-install jev omp install --dir var/agent-tmp/jev-omp-demo --robot
 ```
 
-Expected JSON has `status: READY` and `repo` set to the disposable directory. The installer refuses to overwrite files it did not create; it records template hashes in `.omp/jev-kit-manifest.json`.
+Expected JSON has `status: READY` for copied files, `extensionActivation: MANUAL_REQUIRED`, and `repo` set to the disposable directory. The installer refuses unmanaged or edited tool collisions and records hashes in `.omp/jev-kit-manifest.json`. It never writes `.omp/config.yml`: omp replaces extension arrays rather than merging them, so a generated list could silently remove existing host safety extensions. An installation managed by an older kit that wrote config requires owner review before upgrading.
 
-The install currently writes six callable tools, one post-hook, five omp extensions, and the shared kit helpers:
+The install copies six callable tools, one post-hook, five extension files, and shared kit helpers. It does not prove any extension loaded or fired; enable only reviewed paths by merging them into the target's existing omp config without dropping host extensions.
 
 | Installed tool | Measured basis / receipt | Limit to keep in mind |
 |---|---|---|
@@ -40,7 +40,7 @@ The install currently writes six callable tools, one post-hook, five omp extensi
 | `jev_gate` | Held-out gate receipt: `work/jev-1lim/final-receipt.json` | Reported rates are stratified sample rates; the receipt contains 47 harm rows, not fleet-wide prevalence. |
 | `jev_flag` | Coding-agent seat: `work/jev-a9fv/receipt.json` + markerless replication `work/jev-29s4/receipt.json` | 5/300 false flags on real tool results; 268/300 markerless planted injections caught (Wilson lower 0.853); replication closed. |
 | `jev_screen` | Coding-agent seat: `work/jev-a9fv/receipt.json` + markerless replication `work/jev-29s4/receipt.json` | Same coding-agent seat and privacy boundary; 5/300 clean false flags, 268/300 markerless catch (Wilson lower 0.853); replication closed. |
-The installed tools load through project scope, so they apply to the throwaway repo regardless of the omp profile. To run the same command in a real project, replace `var/agent-tmp/jev-omp-demo` with that repository path.
+Only use the disposable target shown above until the project's owner has reviewed its extension list and provider-bound input policy. Copying files into another repo does not grant permission to send its commands or results to Jev.
 
 `jev omp install` is an installer, not a model call. The tools return keyless `NOT_RUN`/safe results when no TypeSafe key is available.
 

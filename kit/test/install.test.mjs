@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, readFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -35,7 +35,6 @@ test('omp install copies tools and hook without overwriting user files', async (
   assert.equal(first.code, 0);
   const result = JSON.parse(first.stdout);
   assert.equal(result.status, 'READY');
-  assert.equal(result.files.length, 29);
   assert.equal((await readFile(join(repo, '.omp/jev-kit-manifest.json'), 'utf8')).includes('jev-gate.ts'), true);
   const manifest = await readFile(join(repo, '.omp/jev-kit-manifest.json'), 'utf8');
   assert.equal(manifest.includes('jev-screen.ts'), true);
@@ -54,4 +53,40 @@ test('omp install copies tools and hook without overwriting user files', async (
   const third = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
   assert.equal(third.code, 1);
   assert.match(JSON.parse(third.stdout).message, /user-edited/);
+});
+
+test('install never replaces the host extension list or silently enables new extensions', async () => {
+  const repo = await mkdtemp(join(tmpdir(), 'jev-omp-config-'));
+  await mkdir(join(repo, '.omp'));
+  const hostConfig = 'extensions:\n  - /host/guard.ts\n';
+  await writeFile(join(repo, '.omp/config.yml'), hostConfig);
+  const installed = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(installed.code, 0, installed.stdout);
+  assert.equal(await readFile(join(repo, '.omp/config.yml'), 'utf8'), hostConfig);
+  const result = JSON.parse(installed.stdout);
+  assert.equal(result.extensionActivation, 'MANUAL_REQUIRED');
+  assert.ok(!result.files.includes('.omp/config.yml'));
+});
+
+test('unmanaged tool collision refuses without overwriting its bytes', async () => {
+  const repo = await mkdtemp(join(tmpdir(), 'jev-omp-collision-'));
+  await mkdir(join(repo, '.omp/tools'), { recursive: true });
+  const existing = 'operator tool; do not overwrite';
+  await writeFile(join(repo, '.omp/tools/jev-gate.ts'), existing);
+  const attempted = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(attempted.code, 1);
+  assert.match(JSON.parse(attempted.stdout).message, /existing files without installer manifest/);
+  assert.equal(await readFile(join(repo, '.omp/tools/jev-gate.ts'), 'utf8'), existing);
+});
+
+test('prior managed config requires an explicit owner migration', async () => {
+  const repo = await mkdtemp(join(tmpdir(), 'jev-omp-legacy-'));
+  await mkdir(join(repo, '.omp'));
+  const oldConfig = 'extensions:\n  - ./.omp/extensions/jev-rerank.ts\n';
+  await writeFile(join(repo, '.omp/config.yml'), oldConfig);
+  await writeFile(join(repo, '.omp/jev-kit-manifest.json'), JSON.stringify({ version: 1, files: { 'config.yml': 'previous-hash' } }));
+  const attempted = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(attempted.code, 1);
+  assert.match(JSON.parse(attempted.stdout).message, /owner review/);
+  assert.equal(await readFile(join(repo, '.omp/config.yml'), 'utf8'), oldConfig);
 });

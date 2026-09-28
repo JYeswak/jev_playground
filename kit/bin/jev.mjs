@@ -216,7 +216,7 @@ try {
   else if (args[0] === "omp" && args[1] === "install") {
     const repo = option(args, "--dir") ?? process.cwd();
     const result = await installOmp(repo, hasFlag(args, "--dry-run"));
-    if (robot) robotPrint(result); else process.stdout.write(`${result.status}: installed ${result.files.length} files in ${result.repo}\n`);
+    if (robot) robotPrint(result); else process.stdout.write(`${result.status}: copied ${result.files.length} files in ${result.repo}; extensions require manual config merge before omp loads them\n`);
     exitCode = 0;
   } else {
     const error = { status: "ERROR", reason: "usage", message: "jev doctor|gate|ask|rerank|classify|verify|score ..." };
