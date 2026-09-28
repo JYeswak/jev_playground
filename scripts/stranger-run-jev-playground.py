@@ -115,10 +115,18 @@ def run_selftest(expect_path: Path) -> int:
             "planted README regression did not produce the expected named mismatch"
         )
     print(f"SELFTEST PASS: planted README command named: {planted_command}")
+    metric = readme_commands(
+        "```bash\nnode demos/classify/demo.mjs  # measured 96.1% on Banking77\n```"
+    )[0]
+    _, missing = cited_numbers(metric, "Banking77 accuracy: 80.1%")
+    if "96.1" not in missing:
+        raise AssertionError("planted wrong metric was accepted")
+    print("SELFTEST PASS: altered Banking77 metric refused")
     return 0
 
 
 REPO_URL = "https://github.com/JYeswak/jev_playground.git"
+GIT_USER_AGENT = "OpenAI File Downloader, XaiImageApiFetch/1.0"
 KEY_NAMES = (
     "TYPESAFE_API_KEY",
     "JEV_API_KEY",
@@ -248,6 +256,7 @@ def make_clean_env(home: Path, bindir: Path) -> dict[str, str]:
         "LANG": "en_US.UTF-8",
         "TERM": "dumb",
         "USER": "stranger",
+        "GIT_HTTP_USER_AGENT": GIT_USER_AGENT,
     }
 
 
@@ -540,6 +549,7 @@ def main() -> int:
             ["git", "clone", "--quiet", REPO_URL, str(clone)],
             check=True,
             timeout=args.timeout,
+            env={**os.environ, "GIT_HTTP_USER_AGENT": GIT_USER_AGENT},
         )
         source_description = f"fresh network clone of {REPO_URL}"
     elif args.source.startswith(("https://", "http://")):
@@ -547,6 +557,7 @@ def main() -> int:
             ["git", "clone", "--quiet", args.source, str(clone)],
             check=True,
             timeout=args.timeout,
+            env={**os.environ, "GIT_HTTP_USER_AGENT": GIT_USER_AGENT},
         )
         source_description = f"network clone of {args.source}"
     else:
@@ -580,6 +591,7 @@ def main() -> int:
             timeout=args.timeout,
         ).strip()
     rows: list[dict[str, object]] = []
+    active_cwd = outside
     for index, item in enumerate(commands, 1):
         command = str(item["command"])
         quoted, quoted_missing = cited_numbers(item, "")
@@ -594,19 +606,23 @@ def main() -> int:
             failure_class = "TEMPLATE"
             classification_note = "placeholder command listed but not executed"
         else:
-            cwd = (
-                outside
-                if command.startswith(
-                    (
-                        "git clone https://github.com/JYeswak/jev_playground",
-                        "cd jev_playground",
-                    )
-                )
-                else clone
-            )
             result = run_command(
-                command, cwd, env, logs / f"{index:03d}.log", args.timeout
+                command, active_cwd, env, logs / f"{index:03d}.log", args.timeout
             )
+            if command == f"git clone {REPO_URL}" and result["rc"] == 0:
+                pasted_clone = outside / "jev_playground"
+                pasted_sha = subprocess.check_output(
+                    ["git", "-C", str(pasted_clone), "rev-parse", "HEAD"],
+                    text=True,
+                    timeout=args.timeout,
+                ).strip()
+                if pasted_sha != sha:
+                    raise SystemExit(
+                        f"README clone revision {pasted_sha} differs from source {sha}; "
+                        "refusing to grade commands against a different checkout"
+                    )
+            elif command == "cd jev_playground" and result["rc"] == 0:
+                active_cwd = outside / "jev_playground"
             quoted, quoted_missing = cited_numbers(item, str(result["output"]))
             failure_class, classification_note = classify(
                 command, result, readme, clone, tracked

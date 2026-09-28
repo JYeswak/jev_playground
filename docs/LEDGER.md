@@ -25,6 +25,8 @@ bash scripts/quickstart.sh      # five questions answered from files already in 
 
 Node 22.18 or newer: the tests and the client import TypeScript files directly, which Node 20 refuses. Python 3 only for the injection re-score. No key and no package install, except the compaction demo, which fetches and builds its upstream first. To make real calls, run `npm ci --prefix work/sdk` once (it installs the pinned TypeSafe SDK), put `TYPESAFE_API_KEY` in the environment from outside this tree, and add `--live` to a demo.
 
+The separate [`kit` CLI quickstart](../README.md#quickstart) needs `npm ci --prefix kit` and returns `NOT_RUN` (doctor exit 2) without a key; its `--fake` results are recorded fixtures, not live model responses. Its existing pinned four-call smoke is [`work/kit-live-receipt-20260927.json`](../work/kit-live-receipt-20260927.json) (2026-09-27, `jev-1.13.0`, N=4, estimated input charge $0.000145824). The clean-checkout keyless receipt and still-RED aggregate stage-15 boundary are in [`EVAL.md` §jev-p1](../EVAL.md). Copying omp tool and extension files does not demonstrate they loaded or fired.
+
 ## Demos
 
 Each demo is one recipe from TypeSafe's cookbooks ([published here](https://docs.typesafe.ai/cookbooks)), a public guide, or a paper, with the policy in plain code next to it. Without `--live` the questions go to recorded answers: they show the policy, not the model.

@@ -10,6 +10,7 @@ From a fresh clone:
 
 ```bash
 git clone https://github.com/JYeswak/jev_playground.git
+cd jev_playground
 npm ci --prefix kit
 npx --prefix kit --no-install jev doctor --robot
 # Expected without a key: NOT_RUN and exit 2.
@@ -52,13 +53,15 @@ The fake command returns `lost_or_stolen_card` (confidence 0.86) for the capture
 The stranger-runnable top-1 rerank verb uses one Choice over all candidate passages and refuses more than 20 or OVER/NEAR states:
 
 `node kit/bin/jev.mjs rerank --query "Tax implications of holding EWU (or other such UK ETFs) as a US citizen?" --candidates kit/examples/rerank-candidates.json --fake --robot`
-For a live call, set `TYPESAFE_API_KEY` outside the repository using the official [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart), then run the same command without `--fake`:
+For a live call, set `TYPESAFE_API_KEY` outside the repository using the official [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart), then run the same pinned Choice command without `--fake`. Without a key, doctor reports `NOT_RUN` and the live command refuses locally (exit 2); a configured key alone is not proof of API authorization:
 
 ```bash
 if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --prefix kit --no-install jev ask choice --state kit/examples/state.json --question kit/examples/question.json --robot || { rc=$?; exit "$rc"; }
 ```
 
 The pinned model is `jev-1.13.0`.
+
+The separate live smoke in [`work/kit-live-receipt-20260927.json`](work/kit-live-receipt-20260927.json) records **four calls** (`classify`, `rerank`, `verify`, `score`) to `jev-1.13.0` on 2026-09-27, with 3,472 input tokens and an estimated $0.000145824 input charge. This is an existing one-call-per-verb smoke, not a result reproduced by the offline commands above; the fake answer is not a live answer. No claim about real omp extension loading, organic benefit, or accuracy follows from copying files or from those four calls. The foundation aggregate gate remains RED after its reported stage-15 failures; see `EVAL.md` §jev-p1.
 
 ## What Jev answers
 
