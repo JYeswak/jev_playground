@@ -1,0 +1,5 @@
+{
+  "fixture": "jev-cicz H4 verify rate feasibility",
+  "trials": 92,
+  "threshold": 0.80
+}

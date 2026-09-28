@@ -1,0 +1,11 @@
+{
+  "items_sha256": "72013fcabdf2dd02be3c61b94ccf141884b8412ce28724af49ab4baf99b21e88",
+  "mode": "rate",
+  "perfect_successes": 92,
+  "prereg_path": "work/jev-oioo/PREREG-H4-cicz.md",
+  "prereg_sha256": "2009a95c58be9a319d8f6f731fc015cdf311e4877714d4a38e0efce6e4acd820",
+  "status": "REACHABLE",
+  "threshold": 0.8,
+  "trials": 92,
+  "wilson_lower_bound_95": 0.9599186107143782
+}
