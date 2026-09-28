@@ -1,0 +1,17 @@
+{
+  "status": "LIVE_COMPLETE",
+  "created_at": "2026-09-28T02:29:43.684633+00:00",
+  "model": "jev-1.13.0",
+  "comparator": "none",
+  "prereg_sha256": "27392472df4d74713ca23a89fea532e508d05f85f85038acb9cca4fe6fec6adb",
+  "corpus_sha256": "24bdc0e651e1694652fc82bf4e2a167170e9b2aceeb2037efcaacd752d106d02",
+  "states_sha256": "d5ef3bbb2cc9b6de47caa731435ff6698fb0e45c22866cd0ba5ee39b4ce6559e",
+  "rows": 840,
+  "invalid": 0,
+  "usage": {
+    "input_tokens": 339667,
+    "output_tokens": 16800,
+    "spend_usd": 0.014266014
+  },
+  "boundary": "Jev-only arm; free comparator remains date-gated"
+}
