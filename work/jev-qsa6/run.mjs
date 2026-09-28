@@ -9,7 +9,7 @@ const REACH = new URL("work/jev-1lim/reach-receipt-qsa6.json", ROOT);
 const REDACTED = new URL("var/agent-tmp/jev-qsa6-redacted.jsonl", ROOT);
 const OUT = new URL(process.env.JEV_QSA6_OUT ?? "var/agent-tmp/jev-qsa6/free-rows.jsonl", ROOT);
 const MODEL = "dots-studio/dots-3-note-preview:free";
-const LAUNCH_AFTER = Date.parse("2026-09-30T00:00:00Z");
+const LAUNCH_AFTER = Date.parse("2026-09-29T00:00:00Z");
 
 const jsonl = async (url) => (await readFile(url, "utf8")).split("\n").filter(Boolean).map(JSON.parse);
 async function launchGate() {

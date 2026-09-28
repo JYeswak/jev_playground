@@ -9,7 +9,7 @@
   "mode": "mcnemar",
   "oracle_headroom": 6,
   "prereg_path": "work/jev-1lim/PREREG-QSA6.md",
-  "prereg_sha256": "09d4e4873b46355b259376e5a5da45829352e6895d01db3310ed9140299d4cf9",
+  "prereg_sha256": "6f08ed9a5e594ce368d30eb1e41ae68040d1e9159b545c83665bc725e4098867",
   "status": "REACHABLE",
   "tasks": 396
 }

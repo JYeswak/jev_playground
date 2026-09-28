@@ -2,7 +2,7 @@
 
 **Prepared keylessly; no comparator call is authorized before `2026-09-30T00:00:00Z`.**
 
-launch-after: 2026-09-30T00:00:00Z
+launch-after: 2026-09-29T00:00:00Z
 reach-mode: mcnemar
 model: dots-studio/dots-3-note-preview:free
 n_input: 396
