@@ -6,7 +6,9 @@ This repository turns measured Jev behavior into small, runnable tools. The full
 
 ## Quickstart
 
-From a fresh clone:
+**Publication boundary (2026-09-28):** the corrected kit quickstart is present in this local branch at `4b0a588b`, but the public GitHub default branch observed at `7bf7961` does not yet include it. The commands below are offline-verified on a fresh **local clone** of this branch, not on that published commit. After cloning from GitHub, check `git cat-file -e 4b0a588b^{commit}` inside the clone; if it fails, stop—the published checkout cannot be graded against these instructions. Do not treat the local receipt as public release evidence.
+
+From a fresh clone once that revision is published:
 
 ```bash
 git clone https://github.com/JYeswak/jev_playground.git
