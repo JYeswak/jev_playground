@@ -4,9 +4,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
+import math
+from datetime import datetime, timezone
 import json
 import random
-import statistics
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +17,8 @@ DEFAULT_GATE_SHADOW = Path.home() / ".local/state/jev/gate-shadow.jsonl"
 DEFAULT_GATE_OBSERVE = Path.home() / ".local/state/jev/gate-observe.jsonl"
 DEFAULT_WEB_SHADOW = Path.home() / ".local/state/jev/websearch-rerank.jsonl"
 DEFAULT_INJECTION_SHADOW = Path.home() / ".local/state/jev/injection-shadow.jsonl"
+DEFAULT_WEBSCREEN_SHADOW = Path.home() / ".local/state/jev/webscreen-shadow.jsonl"
+WEBSCREEN_TEST_CUTOFF_UTC = "2026-09-27T00:52:00Z"
 TEST_CLOCKS = {"2026-09-27T00:00:00.000Z"}
 
 
@@ -182,6 +186,163 @@ def injection_report(values: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def _utc_timestamp(value: Any) -> datetime | None:
+    if isinstance(value, datetime):
+        parsed = value
+    elif isinstance(value, str):
+        try:
+            parsed = datetime.fromisoformat(
+                value[:-1] + "+00:00" if value.endswith("Z") else value
+            )
+        except ValueError:
+            return None
+    else:
+        return None
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        return None
+    return parsed.astimezone(timezone.utc)
+
+
+def _nonnegative_number(value: Any) -> float | None:
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return None
+    number = float(value)
+    if not math.isfinite(number) or number < 0:
+        return None
+    return number
+
+
+def _nonnegative_int(value: Any) -> int | None:
+    if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+        return None
+    return value
+
+
+def webscreen_report(
+    values: list[dict[str, Any]],
+    as_of: datetime | str | None = None,
+) -> dict[str, Any]:
+    report_time = (
+        _utc_timestamp(as_of) if as_of is not None else datetime.now(timezone.utc)
+    )
+    if report_time is None:
+        raise ValueError("as_of must be a timezone-aware ISO timestamp")
+    cutoff = _utc_timestamp(WEBSCREEN_TEST_CUTOFF_UTC)
+    if cutoff is None:
+        raise RuntimeError("invalid hard-coded webscreen test cutoff")
+    eligible: list[tuple[dict[str, Any], datetime]] = []
+    excluded_pre_fix = 0
+    invalid_timestamp = 0
+    for row in values:
+        timestamp = _utc_timestamp(row.get("ts"))
+        if timestamp is None:
+            invalid_timestamp += 1
+        elif timestamp < cutoff:
+            excluded_pre_fix += 1
+        else:
+            eligible.append((row, timestamp))
+    status_counts: dict[str, int] = {}
+    tool_counts: dict[str, int] = {}
+    model_counts: dict[str, int] = {}
+    for row, _ in eligible:
+        status = str(row.get("status") or "missing")
+        tool = str(row.get("toolName") or "missing")
+        model = str(row.get("model") or "missing")
+        status_counts[status] = status_counts.get(status, 0) + 1
+        tool_counts[tool] = tool_counts.get(tool, 0) + 1
+        model_counts[model] = model_counts.get(model, 0) + 1
+    answered = [row for row, _ in eligible if row.get("status") == "ok"]
+    metric_rows: list[tuple[int, int]] = []
+    invalid_flag_metrics = 0
+    latencies: list[float] = []
+    scores: list[float] = []
+    for row in answered:
+        units = _nonnegative_int(row.get("units"))
+        flagged = _nonnegative_int(row.get("flagged"))
+        if units is None or flagged is None or flagged > units:
+            invalid_flag_metrics += 1
+        else:
+            metric_rows.append((units, flagged))
+        latency = _nonnegative_number(row.get("latencyMs"))
+        score = _nonnegative_number(row.get("topScore"))
+        if latency is not None:
+            latencies.append(latency)
+        if score is not None:
+            scores.append(score)
+    input_tokens: list[int] = []
+    output_tokens: list[int] = []
+    usage_missing_rows = 0
+    for row, _ in eligible:
+        input_value = _nonnegative_int(row.get("input_tokens"))
+        output_value = _nonnegative_int(row.get("output_tokens"))
+        if input_value is not None:
+            input_tokens.append(input_value)
+        if output_value is not None:
+            output_tokens.append(output_value)
+        if (
+            row.get("status") in {"ok", "fail_open", "billing-stop"}
+            and input_value is None
+        ):
+            usage_missing_rows += 1
+    answered_units = sum(units for units, _ in metric_rows)
+    flagged_units = sum(flagged for _, flagged in metric_rows)
+    flagged_rows = sum(flagged > 0 for _, flagged in metric_rows)
+    first_event = min((timestamp for _, timestamp in eligible), default=None)
+    last_event = max((timestamp for _, timestamp in eligible), default=None)
+    elapsed_hours = (
+        max(0.0, (report_time - first_event).total_seconds() / 3600)
+        if first_event is not None
+        else 0.0
+    )
+    return {
+        "rows": len(eligible),
+        "excluded_pre_fix_rows": excluded_pre_fix,
+        "invalid_timestamp_rows": invalid_timestamp,
+        "legacy_test_cutoff_utc": WEBSCREEN_TEST_CUTOFF_UTC,
+        "status_counts": dict(sorted(status_counts.items())),
+        "tool_counts": dict(sorted(tool_counts.items())),
+        "model_counts": dict(sorted(model_counts.items())),
+        "answered_rows": len(answered),
+        "flag_metric_rows": len(metric_rows),
+        "invalid_flag_metric_rows": invalid_flag_metrics,
+        "flagged_rows": flagged_rows,
+        "flag_rate_per_row": flagged_rows / len(metric_rows) if metric_rows else None,
+        "answered_units": answered_units,
+        "flagged_units": flagged_units,
+        "flag_rate_per_unit": flagged_units / answered_units
+        if answered_units
+        else None,
+        "latency_ms": {
+            "p50": percentile(latencies, 0.50),
+            "p95": percentile(latencies, 0.95),
+            "rows": len(latencies),
+        },
+        "top_score": {
+            "p50": percentile(scores, 0.50),
+            "p95": percentile(scores, 0.95),
+            "max": max(scores) if scores else None,
+            "rows": len(scores),
+        },
+        "input_tokens": sum(input_tokens),
+        "output_tokens": sum(output_tokens),
+        "input_cost_usd_known": sum(input_tokens) * INPUT_COST_PER_MILLION / 1_000_000,
+        "usage_rows": len(input_tokens),
+        "usage_missing_rows": usage_missing_rows,
+        "spend_complete": usage_missing_rows == 0,
+        "spend_basis": "known input tokens at $0.042/M; Jev output is free; missing usage means total spend is incomplete",
+        "first_event_utc": first_event.isoformat().replace("+00:00", "Z")
+        if first_event
+        else None,
+        "last_event_utc": last_event.isoformat().replace("+00:00", "Z")
+        if last_event
+        else None,
+        "reported_at_utc": report_time.isoformat().replace("+00:00", "Z"),
+        "window_elapsed_hours": round(elapsed_hours, 3),
+        "window_complete_24h": first_event is not None and elapsed_hours >= 24,
+        "window_basis": "reported from first eligible post-fix event to report time; not proof of continuous hook uptime",
+    }
+
+
 def build_report(
     shadow_path: Path,
     existing_path: Path,
@@ -189,13 +350,22 @@ def build_report(
     injection_path: Path,
     sample_size: int = 20,
     seed: int = 20260927,
+    webscreen_path: Path | None = None,
 ) -> dict[str, Any]:
+    webscreen_rows = rows(webscreen_path) if webscreen_path is not None else []
+    webscreen = webscreen_report(webscreen_rows)
+    webscreen["source_sha256"] = (
+        hashlib.sha256(webscreen_path.read_bytes()).hexdigest()
+        if webscreen_path is not None and webscreen_path.exists()
+        else None
+    )
     return {
         "schema": "jev-shadow-report.v1",
         "seed": seed,
         "gate": gate_report(rows(shadow_path), rows(existing_path), sample_size, seed),
         "web_search_rerank": web_report(rows(web_path)),
         "injection_shadow": injection_report(rows(injection_path)),
+        "webscreen_shadow": webscreen,
     }
 
 
@@ -227,7 +397,9 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--gate-shadow", type=Path, default=DEFAULT_GATE_SHADOW)
     parser.add_argument("--gate-observe", type=Path, default=DEFAULT_GATE_OBSERVE)
-    parser.add_argument("--web-shadow", type=Path, default=DEFAULT_WEB_SHADOW)
+    parser.add_argument(
+        "--webscreen-shadow", type=Path, default=DEFAULT_WEBSCREEN_SHADOW
+    )
     parser.add_argument(
         "--injection-shadow", type=Path, default=DEFAULT_INJECTION_SHADOW
     )
@@ -247,6 +419,7 @@ def main() -> int:
         args.web_shadow,
         args.injection_shadow,
         args.sample_size,
+        webscreen_path=args.webscreen_shadow,
     )
     if args.snapshot:
         out_dir, stem = Path("work/jev-5ay4"), f"report-{args.snapshot}"
@@ -260,6 +433,10 @@ def main() -> int:
                 "disagreements": str(disagreements_path),
                 "scored": report["gate"]["scored_rows"],
                 "answered": report["web_search_rerank"]["answered"],
+                "webscreen_rows": report["webscreen_shadow"]["rows"],
+                "webscreen_window_complete_24h": report["webscreen_shadow"][
+                    "window_complete_24h"
+                ],
             },
             sort_keys=True,
         )

@@ -15,6 +15,7 @@ _module = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_module)
 build_report = _module.build_report
 write_outputs = _module.write_outputs
+webscreen_report = _module.webscreen_report
 
 
 class ShadowReportTests(unittest.TestCase):
@@ -161,6 +162,105 @@ class ShadowReportTests(unittest.TestCase):
             )
             self.assertEqual(report["gate"]["scored_rows"], 0)
             self.assertEqual(report["web_search_rerank"]["answered"], 0)
+
+    def test_webscreen_report_excludes_pre_fix_rows_and_reports_window(self) -> None:
+        # Captured records from ~/.local/state/jev/webscreen-shadow.jsonl; payload text is absent.
+        rows = [
+            {
+                "ts": "2026-09-27T00:35:52.237Z",
+                "toolName": "web_extract",
+                "rawSha256": "2345a12b2fe72060afdce9e486fcb0f5e625db6fd4293b27077562f1f910372f",
+                "units": 1,
+                "flagged": 0,
+                "topScore": 0.03,
+                "latencyMs": 751,
+                "input_tokens": 352,
+                "output_tokens": 22,
+                "status": "ok",
+                "model": "jev-1.13.0",
+                "cap": 100,
+            },
+            {
+                "ts": "2026-09-27T06:41:24.159Z",
+                "toolName": "web_search",
+                "rawSha256": "1df75d8c4ac822f7b51125ef84aa54e3a701cb14167720a4e3c463b6b78225d3",
+                "units": 1,
+                "flagged": 0,
+                "topScore": 0.03,
+                "latencyMs": 142,
+                "input_tokens": 741,
+                "output_tokens": 22,
+                "status": "ok",
+                "model": "jev-1.13.0",
+                "cap": 100,
+            },
+            {
+                "ts": "2026-09-28T04:25:37.142Z",
+                "toolName": "web_search",
+                "rawSha256": "adb38b38baba8a71f82ab327f7176e7a1195d931278c360ada0bd119c7e89f02",
+                "units": 1,
+                "flagged": 0,
+                "topScore": None,
+                "latencyMs": 0,
+                "input_tokens": None,
+                "output_tokens": None,
+                "status": "fail_open",
+                "model": "jev-1.13.0",
+                "cap": 100,
+            },
+        ]
+        report = webscreen_report(rows, as_of="2026-09-28T06:41:24.159Z")
+        self.assertEqual(report["rows"], 2)
+        self.assertEqual(report["excluded_pre_fix_rows"], 1)
+        self.assertEqual(report["status_counts"], {"fail_open": 1, "ok": 1})
+        self.assertEqual(report["input_tokens"], 741)
+        self.assertAlmostEqual(report["input_cost_usd_known"], 741 * 0.042 / 1_000_000)
+        self.assertEqual(report["usage_missing_rows"], 1)
+        self.assertFalse(report["spend_complete"])
+        self.assertTrue(report["window_complete_24h"])
+        self.assertNotIn("rawSha256", json.dumps(report))
+
+    def test_webscreen_report_uses_answered_unit_denominator(self) -> None:
+        # Arithmetic-only fixture; these values are not a Jev/model observation.
+        rows = [
+            {
+                "ts": "2026-09-27T06:41:24.159Z",
+                "units": 2,
+                "flagged": 1,
+                "status": "ok",
+                "latencyMs": 100,
+                "input_tokens": 100,
+                "output_tokens": 10,
+                "model": "jev-1.13.0",
+            },
+            {
+                "ts": "2026-09-27T07:41:24.159Z",
+                "units": 1,
+                "flagged": 0,
+                "status": "ok",
+                "latencyMs": 200,
+                "input_tokens": 200,
+                "output_tokens": 20,
+                "model": "jev-1.13.0",
+            },
+            {
+                "ts": "2026-09-27T08:41:24.159Z",
+                "units": 3,
+                "flagged": 0,
+                "status": "fail_open",
+                "latencyMs": None,
+                "input_tokens": None,
+                "output_tokens": None,
+                "model": "jev-1.13.0",
+            },
+        ]
+        report = webscreen_report(rows, as_of="2026-09-28T06:41:24.159Z")
+        self.assertEqual(report["flagged_rows"], 1)
+        self.assertEqual(report["answered_rows"], 2)
+        self.assertEqual(report["flagged_units"], 1)
+        self.assertEqual(report["answered_units"], 3)
+        self.assertAlmostEqual(report["flag_rate_per_unit"], 1 / 3)
+        self.assertEqual(report["status_counts"], {"fail_open": 1, "ok": 2})
 
 
 if __name__ == "__main__":
