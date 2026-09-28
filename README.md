@@ -6,7 +6,7 @@ This repository turns measured Jev behavior into small, runnable tools. The full
 
 ## Quickstart
 
-**Publication boundary (2026-09-28):** the corrected kit quickstart is present in this local branch at `4b0a588b`, but the public GitHub default branch observed at `7bf7961` does not yet include it. The commands below are offline-verified on a fresh **local clone** of this branch, not on that published commit. After cloning from GitHub, check `git cat-file -e 4b0a588b^{commit}` inside the clone; if it fails, stop—the published checkout cannot be graded against these instructions. Do not treat the local receipt as public release evidence.
+**Publication boundary (2026-09-28):** the corrected kit quickstart is present in this local branch at reviewed commit `4b0a588b3e12d2ca9d86b2dda3658f670a047022`, but the public GitHub default branch observed at `7bf7961` does not yet include it. The commands below were offline-verified on a fresh **local clone**, not the published checkout. In a fresh public clone, record `git remote get-url origin` and `git rev-parse HEAD`: the origin must be `https://github.com/JYeswak/jev_playground.git` and HEAD must equal that reviewed commit before the local receipt applies to that checkout. `git cat-file -e` proves only that an object exists, not that the public default-branch HEAD contains it. If URL or HEAD differs, stop; a newer descendant needs its own exact-command review at that HEAD. Do not treat the local receipt as public release evidence.
 
 From a fresh clone once that revision is published:
 
