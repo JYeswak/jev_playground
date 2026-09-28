@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { askJev, askJevScore, keyProviderInstalled, setKeyProvider } from '../../../kit/src/client.ts';
-import { makeInfisicalKeyProvider, PROJECT_ID, TTL_MS, FAIL_TTL_MS, infisicalBinary } from '../src/infisical-key.ts';
+import { makeInfisicalKeyProvider, PROJECT_ID, TTL_MS, FAIL_TTL_MS, infisicalBinary, machineIdentityConfig } from "../src/infisical-key.ts";
 import { useInfisicalKey } from '../src/use-infisical-key.ts';
 
 const fakeHeaders = () => ({ get: (name) => name.toLowerCase() === 'content-type' ? 'application/json' : null });
@@ -97,7 +97,7 @@ test('Infisical provider: a failure or junk output is no key, retried only after
   let t = 0;
   let runs = 0;
   const outputs = [() => { throw new Error('offline'); }, () => 'two words\n', () => 'good'];
-  const provider = makeInfisicalKeyProvider(async () => outputs[runs++](), () => t, 'x');
+  const provider = makeInfisicalKeyProvider(async () => outputs[runs++](), () => t, "x", "/no-machine-home");
   assert.equal(await provider(), undefined);
   t = FAIL_TTL_MS - 1;
   assert.equal(await provider(), undefined);
@@ -113,7 +113,34 @@ test('Infisical provider never writes the key into the environment', async () =>
   const provider = makeInfisicalKeyProvider(async () => 'secret-value', () => 0, 'x');
   await provider();
   assert.equal(process.env.TYPESAFE_API_KEY, before);
-  assert.equal(Object.values(process.env).includes('secret-value'), false);
+  assert.equal(Object.values(process.env).includes("secret-value"), false);
+});
+
+test("machine identity fallback logs in without exposing the token", async () => {
+  const calls = [];
+  const config = "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=csecret\nexport INFISICAL_API_URL=https://secrets.example";
+  const provider = makeInfisicalKeyProvider(async (file, args, _timeout, env) => {
+    calls.push({file, args, env});
+    if (args[0] === "secrets" && !env?.INFISICAL_TOKEN) throw new Error("user session expired");
+    if (args[0] === "login") return "machine-token\n";
+    return "machine-key\n";
+  }, () => 0, "/Users/josh/.local/bin/infisical", "/home", () => config);
+  assert.equal(await provider(), "machine-key");
+  assert.equal(calls.length, 3);
+  assert.equal(calls[1].args[0], "login");
+  assert.equal(calls[1].env.INFISICAL_CLIENT_ID, "cid");
+  assert.equal(calls[2].env.INFISICAL_TOKEN, "machine-token");
+  assert.equal(process.env.TYPESAFE_API_KEY, undefined);
+});
+
+test("machine identity fallback fails closed when both sessions fail", async () => {
+  const provider = makeInfisicalKeyProvider(async () => { throw new Error("provider failure"); }, () => 0, "infisical", "/home", () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=secret\nexport INFISICAL_API_URL=https://example");
+  assert.equal(await provider(), undefined);
+});
+
+test("machine identity config requires all three non-empty fields", () => {
+  assert.deepEqual(machineIdentityConfig("/home", () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=secret\nexport INFISICAL_API_URL=https://example"), {clientId: "cid", clientSecret: "secret", apiUrl: "https://example"});
+  assert.equal(machineIdentityConfig("/home", () => "export INFISICAL_CLIENT_ID=cid"), undefined);
 });
 
 test('infisicalBinary prefers ~/.local/bin/infisical and falls back to PATH', () => {
