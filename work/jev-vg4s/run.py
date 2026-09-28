@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 HERE = ROOT / "work" / "jev-vg4s"
 MODEL = "jev-1.13.0"
 COMPARATOR = "dots-studio/dots-3-note-preview:free"
-LAUNCH_AFTER = datetime(2026, 10, 1, tzinfo=timezone.utc)
+LAUNCH_AFTER = datetime(2026, 9, 30, tzinfo=timezone.utc)
 QNAME = "supports"
 QUESTION = {
     "type": "noul",

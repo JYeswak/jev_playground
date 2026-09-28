@@ -3,7 +3,7 @@
 Status: PREREGISTERED BEFORE LIVE CALLS
 Bead: jev-vg4s
 Date: 2026-09-27
-Launch gate: runner refuses before `2026-10-01T00:00:00Z`; 2026-09-28 through 2026-09-30 free-tier allocations are reserved by existing beads.
+Launch gate: Jev may run after approval; the free comparator runner refuses before `2026-09-30T00:00:00Z`; 2026-09-28 and 2026-09-29 free-tier allocations are reserved by existing beads.
 reach-mode: mcnemar
 
 ## Question and corpus
@@ -53,7 +53,7 @@ Pass rule, fixed before calls:
 - Planning reference: the prior SciFact paired run had Jev-only accuracy wins `b=19` and comparator-only wins `c=9` on 400 rows (discordance 28/400). This prereg uses the bead's prospective target of approximately 840 pairs for 0.80-power planning at that observed discordance; this is planning arithmetic, not an observed HealthVer result.
 - Reach receipt: `work/jev-vg4s/reachability.json`, bound to this preregistration and corpus before calls. Exact state-size preflight must show all 840 requests `FITS`.
 - Maximum calls: 840 Jev and 840 free-comparator requests, one per row and arm. If the free comparator exceeds its daily quota, the runner stops on HTTP 429 and records `NOT_RUN`; it never labels remaining rows as model failures or silently resumes within that day.
-- The runner must refuse before `2026-10-01T00:00:00Z` with no API request. After the gate, it stops on 401/402/403/429 and checkpoints every completed row.
+- The free-comparator runner must refuse before `2026-09-30T00:00:00Z` with no comparator API request. Jev may run after approval. After the comparator gate, stop on 401/402/403/429 and checkpoint every completed row.
 - Jev spend: record input/output tokens and compute input spend at `$0.042/M` billed input tokens, output free. Comparator OpenRouter usage and spend are recorded; expected comparator charge is `$0` for the `:free` model.
 ## Dataset-card provenance boundary
 
