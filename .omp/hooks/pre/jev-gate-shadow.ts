@@ -1,11 +1,8 @@
 import { createHash } from "node:crypto";
 import { mkdir, open } from "node:fs/promises";
-import { appendFileSync, mkdirSync } from "node:fs";
 import { homedir } from "node:os";
-import { spawn } from "node:child_process";
 import { dirname, join } from "node:path";
-import { askJevBundle, type AskBundleOptions, type JevBundleResult } from "../../../kit/src/client.ts";
-import { useInfisicalKey } from "../../../work/jev-client/src/use-infisical-key.ts";
+import type { AskBundleOptions, JevBundleResult } from "../../../kit/src/client.ts";
 declare const process: { env: Record<string, string | undefined> };
 import { CUT, RISK, STATE_CONTEXT } from "../../../work/bicameral-gate/questions.mjs";
 
@@ -16,7 +13,11 @@ export const LOG_SCHEMA = "jev-gate-shadow.v1";
 type Event = { toolName?: unknown; name?: unknown; toolCallId?: unknown; input?: unknown; args?: unknown; arguments?: unknown; command?: unknown; details?: unknown };
 type Append = (path: string, line: string) => Promise<void>;
 type Ask = (options: AskBundleOptions) => Promise<JevBundleResult>;
-type ShadowDeps = { ask?: Ask; append?: Append; path?: string; session?: string; cap?: number; now?: () => string };
+type ShadowDeps = {
+  ask?: Ask; append?: Append; path?: string; session?: string; cap?: number; now?: () => string;
+  /** Keyless synthetic admission only; production has no approved recipient/data-class policy. */
+  authorizeSynthetic?: (event: Event) => string | undefined;
+};
 
 function defaultPath(): string {
   return process.env.JEV_GATE_SHADOW_PATH ?? join(homedir(), ".local", "state", "jev", "gate-shadow.jsonl");
@@ -49,25 +50,9 @@ function baseRow(command: string, session: string, now: () => string): Record<st
   return { schema: LOG_SCHEMA, ts: now(), sessionHash: hashCommand(session || "unknown"), cmdSha: hashCommand(command), existingFlag: null };
 }
 
-function syncObserved(path: string, row: Record<string, unknown>): void {
-  try {
-    mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
-    appendFileSync(path, JSON.stringify(row) + "\n", { mode: 0o600 });
-  } catch { /* observe-only */ }
-}
-
-function launchGateWorker(path: string, command: string, row: Record<string, unknown>): void {
-  try {
-    const child = spawn(process.execPath, ["--experimental-strip-types", join(process.cwd(), ".omp", "hooks", "jev-shadow-worker.ts")], { detached: true, stdio: ["pipe", "ignore", "ignore"] });
-    child.stdin.write(JSON.stringify({ kind: "gate", path, command, row }));
-    child.stdin.end();
-    child.unref();
-  } catch { /* observe-only */ }
-}
 
 export function makeGateShadowHandler(deps: ShadowDeps = {}) {
   const ask = deps.ask;
-  if (!ask) useInfisicalKey();
   const append = deps.append ?? defaultAppend;
   const path = deps.path ?? defaultPath();
   const now = deps.now ?? (() => new Date().toISOString());
@@ -84,18 +69,20 @@ export function makeGateShadowHandler(deps: ShadowDeps = {}) {
     const command = stringCommand(event);
     if (!command) return undefined;
     try {
-      if (dayKey(now) !== day) { day = dayKey(now); calls = 0; paused = false; }
       const observedFlag = existingFlag(event);
-      const row = { ...baseRow(command, session, now), existingFlag: observedFlag, existingFlagSource: observedFlag === null ? "gate-observe.jsonl:cmdSha" : "event.details.existingFlag" };
+      const row = { ...baseRow(command, typeof session === "string" ? session : "unknown", now), existingFlag: observedFlag, existingFlagSource: observedFlag === null ? "gate-observe.jsonl:cmdSha" : "event.details.existingFlag" };
+      const approvedCommand = deps.authorizeSynthetic?.(event);
+      if (!ask || !approvedCommand || typeof event.toolCallId !== "string" || !event.toolCallId || typeof session !== "string" || !session || session === "unknown") {
+        await write({ ...row, status: "not-run", reason: "permission-denied", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null });
+        return undefined;
+      }
+      if (dayKey(now) !== day) { day = dayKey(now); calls = 0; paused = false; }
       if (paused) { await write({ ...row, status: "paused", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null }); return undefined; }
       if (calls >= cap) { await write({ ...row, status: "cap", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null }); return undefined; }
       calls += 1;
       let result: JevBundleResult;
       try {
-        result = await Promise.race([
-          (ask ?? askJevBundle)({ state: { command, context: STATE_CONTEXT }, questions: RISK, model: MODEL, timeoutMs: 20_000 }),
-          new Promise<never>((_, reject) => setTimeout(() => reject(new Error("shadow ask timeout")), 25_000)),
-        ]);
+        result = await ask({ state: { command: approvedCommand, context: STATE_CONTEXT }, questions: RISK, model: MODEL, timeoutMs: 20_000 });
       } catch (error) {
         await write({ ...row, status: "error", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null, error: error instanceof Error ? error.message : String(error) });
         return undefined;
@@ -117,20 +104,16 @@ export function makeGateShadowHandler(deps: ShadowDeps = {}) {
 }
 
 export default function jevGateShadowHook(pi: { on: (event: string, handler: (event: unknown, ctx?: unknown) => unknown) => void }): void {
-  const handler = makeGateShadowHandler() as (event: unknown, ctx?: unknown) => unknown;
+  const handler = makeGateShadowHandler();
   const seen = new Set<string>();
   const dispatch = (event: unknown, ctx?: unknown): unknown => {
-    const id = event && typeof event === "object" && typeof (event as { toolCallId?: unknown }).toolCallId === "string"
-      ? (event as { toolCallId: string }).toolCallId : undefined;
-    const command = event && typeof event === "object" ? stringCommand(event as Event) : undefined;
-    if (id && command && !seen.has(id)) {
-      const observed = { ...baseRow(command, process.env.OMP_SESSION_ID ?? "unknown", () => new Date().toISOString()), status: "observed", jevFlag: null, maxScore: null, scores: null, model: null, latencyMs: null, tokens: null };
-      syncObserved(defaultPath(), observed);
-      launchGateWorker(defaultPath(), command, observed);
-    }
+    const e = event as Event;
+    const id = typeof e?.toolCallId === "string" ? e.toolCallId : undefined;
     if (id && seen.has(id)) return undefined;
     if (id) { seen.add(id); setTimeout(() => seen.delete(id), 60_000); }
-    return handler(event, ctx);
+    let session = process.env.OMP_SESSION_ID ?? "unknown";
+    try { session = (ctx as { sessionManager?: { getSessionId?: () => string } } | undefined)?.sessionManager?.getSessionId?.() ?? session; } catch { /* unknown: no egress */ }
+    return handler(e, session);
   };
   pi.on("tool_call", dispatch);
   pi.on("tool_execution_start", dispatch);

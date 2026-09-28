@@ -218,13 +218,13 @@ export function normalizeLiveMessage(raw: unknown): {
 }
 
 /**
- * Self-installing entry: reads the host environment and registers the hook, or registers
- * nothing. The key lives outside every tree (loaded into the environment only, never a file,
- * fixture, or log); a keyless session behaves exactly as it did before this hook existed.
+ * Key presence is not transcript-export consent. Production entries pass no admission and do
+ * not register; keyless tests may supply an explicit synthetic transcript admission.
  * Never throws: this runs inside the session that would have to repair it.
  */
-export function registerOmpCompactionHookFromEnv(pi: OmpLike): void {
+export function registerOmpCompactionHookFromEnv(pi: OmpLike, admitSyntheticTranscript?: () => boolean): void {
   try {
+    if (!admitSyntheticTranscript?.()) return;
     const apiKey = process.env.TYPESAFE_API_KEY;
     if (!apiKey) {
       // Not an error: the offline lane is the default.

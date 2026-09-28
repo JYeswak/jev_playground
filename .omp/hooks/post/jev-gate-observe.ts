@@ -1,13 +1,12 @@
 /**
  * Observe-only tool-call gate (bead jev-deep-kit-8q7.7 follow-up: dogfood).
  *
- * On every completed `bash` tool call, asks the frozen gate questions from
- * `work/bicameral-gate/questions.mjs` through `work/jev-client` `askJev`
- * (pinned `jev-1.13.0`) and appends one row to
- * `~/.local/state/jev/gate-observe.jsonl`. Observe only: never blocks, never
- * rewrites a result, prints nothing. The handler returns synchronously; all
- * API and filesystem work runs detached, so the tool path waits only for the
- * synchronous slice (measured, see receipt).
+ * On every completed `bash` tool call, records a local observation in
+ * `~/.local/state/jev/gate-observe.jsonl`. The runtime never calls Jev:
+ * permission requires a per-event approval contract that is not yet available.
+ * Only a matching synthetic event ID and injected fake requester can score
+ * offline. Observe only: never blocks, rewrites a result or prints anything.
+ * The handler returns synchronously; filesystem work runs detached.
  *
  * Secrets: commands matching the PRIVATE/SECRET filters in
  * `work/bicameral-gate/real-sample.py` are never sent to the API — logged
@@ -18,17 +17,15 @@
  * skipped `filter-error`: a filter failure fails safe toward skip.
  *
  * Full-command sidecar (bead jev-izhc, R92 retry): the log above keeps a
- * 200-char redacted prefix, but Jev scores the whole command, so a flag cannot
- * be relabelled or re-scored from the log. Every command that passes the
- * filters is also appended verbatim — the exact text sent as `state.command`,
- * no HOME rewrite — to `~/.local/state/jev/gate-observe-full.jsonl`, one row
- * `{ts, session, cmdSha, cmd}` joined to the log by `cmdSha`. A command the
- * filters drop (secret or filter-error) writes nothing there. The file is
+ * 200-char redacted prefix. Every command that passes the filters is also
+ * appended verbatim to the local-only sidecar for offline review, with
+ * `{ts, session, cmdSha, cmd}` joined to the log by `cmdSha`.
+ * Commands dropped by filters (secret or filter-error) write nothing there. The file is
  * created and re-asserted mode 600 on every append, lives outside every repo,
  * and must never be copied into a committed extract.
  *
- * No key: one row `NOT_RUN reason=unconfigured`, no throw. Any throw anywhere
- * in this module is caught: the tool path never sees us.
+ * No permission: one `NOT_RUN reason=permission-required` row, no key lookup.
+ * Any throw anywhere in this module is caught: the tool path never sees us.
  */
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -37,7 +34,7 @@ import { appendFile, mkdir, open } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { askJev, BILLING_HOLD_MS, billingHoldActive, noteBillingRefusal, resetBillingHold } from "../../../kit/src/client.ts";
+import { BILLING_HOLD_MS, billingHoldActive, noteBillingRefusal, resetBillingHold } from "../../../kit/src/client.ts";
 export { BILLING_HOLD_MS, resetBillingHold };
 import { CUT, RISK, STATE_CONTEXT } from "../../../work/bicameral-gate/questions.mjs";
 
@@ -206,6 +203,9 @@ export interface ObserveDeps {
   }>;
   append?: (path: string, line: string) => Promise<void>;
   logPath?: string;
+  /** Offline-only: must match the event ID and be paired with an injected fake asker. */
+  approvedEventId?: string;
+  filter?: (command: string) => { drop: boolean; reason?: string };
   /** Full-command sidecar writer; the default forces mode 600. */
   appendSidecar?: (path: string, line: string) => Promise<void>;
   sidecarPath?: string;
@@ -264,7 +264,7 @@ export function defaultSidecarPath(): string {
  * mode below is a row, not an exception.
  */
 export async function observe(
-  event: { toolName?: string; input?: { command?: unknown } },
+  event: { toolName?: string; toolCallId?: unknown; input?: { command?: unknown } },
   deps: ObserveDeps = {},
 ): Promise<undefined> {
   const logPath = deps.logPath ?? defaultLogPath();
@@ -278,6 +278,12 @@ export async function observe(
   try {
     const command = typeof event.input?.command === "string" ? event.input.command : "";
     const base = buildRow({ session: deps.session ?? "unknown", command, now: deps.now });
+    // Refuse before writing a raw-command sidecar or even a command prefix.
+    // Only an exact event-ID match with an injected fake asker is admissible.
+    if (!deps.asker || !deps.approvedEventId || event.toolCallId !== deps.approvedEventId) {
+      await write({ ...base, cmd: "[permission-denied]", status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=permission-required" });
+      return undefined;
+    }
     const filter = deps.filter ?? defaultFilter;
     let verdict: { drop: boolean; reason?: string };
     try {
@@ -305,7 +311,7 @@ export async function observe(
     let answer;
     try {
       let apiKey: string | undefined;
-      if (!deps.asker || deps.keyResolver) {
+      if (deps.keyResolver) {
         const resolved = await resolveApiKey(deps.keyResolver);
         if (!resolved.ok) {
           await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `NOT_RUN reason=unconfigured ${resolved.note}` });
@@ -313,13 +319,12 @@ export async function observe(
         }
         apiKey = resolved.apiKey;
       }
-      answer = await (deps.asker ?? askJev)({
+      answer = await deps.asker({
         state: { command, context: STATE_CONTEXT },
         questions: RISK,
         model: MODEL,
         timeoutMs: 20000,
         apiKey,
-        nowMs: () => now,
       });
     } catch (err) {
       await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `ask-threw: ${err instanceof Error ? err.message : String(err)}` });
@@ -366,7 +371,7 @@ export function makeHandler(deps: ObserveDeps = {}) {
       } catch {
         /* a missing session id is logged as unknown */
       }
-      const seen = { toolName: e.toolName, input: { command: e.input?.command } };
+      const seen = { toolName: e.toolName, toolCallId: e.toolCallId, input: { command: e.input?.command } };
       setTimeout(() => void observe(seen, { ...deps, session }).catch(() => {}), 0);
     } catch {
       /* observe only: the tool path never sees us */
@@ -377,6 +382,6 @@ export function makeHandler(deps: ObserveDeps = {}) {
 
 export default function hook(pi: {
   on: (event: string, handler: (event: unknown, ctx?: unknown) => unknown) => void;
-}): void {
-  pi.on("tool_result", makeHandler() as (event: unknown, ctx?: unknown) => unknown);
+}, deps: ObserveDeps = {}): void {
+  pi.on("tool_result", makeHandler(deps) as (event: unknown, ctx?: unknown) => unknown);
 }

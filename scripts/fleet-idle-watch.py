@@ -62,7 +62,9 @@ from pathlib import Path
 from typing import NamedTuple
 
 SESSION = os.environ.get("JEV_SESSION", "jev")
-SHADOW_ENABLED = os.environ.get("JEV_FLEET_SHADOW") == "1"
+# A pane status line can contain private session state. The env flag alone is
+# not owner approval for TypeSafe export; keep background scoring disabled.
+SHADOW_ENABLED = False
 SHADOW_ONLY = os.environ.get("JEV_FLEET_SHADOW_ONLY") == "1"
 SHADOW_MAX_INFLIGHT = int(os.environ.get("JEV_FLEET_SHADOW_MAX_INFLIGHT", "16"))
 SHADOW_LOG = Path(

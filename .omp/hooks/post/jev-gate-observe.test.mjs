@@ -7,8 +7,9 @@ import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   MAX_PREFIX, REAL_SAMPLE, ROW_KEYS, SIDECAR_KEYS, buildRow, defaultFilter, defaultSidecarAppend,
-  loadFilters, makeFilter, makeHandler, observe, redact, resetBillingHold, resetKeyCache,
+  loadFilters, makeFilter, makeHandler, observe as observeRaw, redact, resetBillingHold, resetKeyCache,
 } from "./jev-gate-observe.ts";
+import gateObserveHook from "./jev-gate-observe.ts";
 const wrote = [];
 const full = [];
 const memAppend = async (path, line) => { wrote.push({ path, row: JSON.parse(line) }); };
@@ -23,6 +24,13 @@ const scoredAsker = async () => ({
   ok: true, scores: { exfiltration: 0.1, destructive: 0.9, privilege: 0.2, irreversible_publish: 0.1, secret_staging: 0.05 },
   latencyMs: 410, usage: { input_tokens: 300, output_tokens: 40 },
 });
+
+const APPROVED_EVENT_ID = "offline-gate-observe-001";
+// Existing policy tests intentionally exercise only an injected fake asker.
+const observe = (event, deps) => observeRaw(
+  { ...event, toolCallId: APPROVED_EVENT_ID },
+  { ...deps, approvedEventId: APPROVED_EVENT_ID },
+);
 
 test("row shape keys are frozen", async () => {
   reset();
@@ -97,9 +105,9 @@ test("handler returns undefined before any work starts, then logs the ctx sessio
   reset();
   let called = 0;
   const asker = async () => { called++; return scoredAsker(); };
-  const handler = makeHandler({ asker, ...mem });
+  const handler = makeHandler({ asker, approvedEventId: APPROVED_EVENT_ID, ...mem });
   const ctx = { sessionManager: { getSessionId: () => "sess-123" } };
-  const out = handler({ toolName: "bash", input: { command: "ls" } }, ctx);
+  const out = handler({ toolName: "bash", toolCallId: APPROVED_EVENT_ID, input: { command: "ls" } }, ctx);
   assert.equal(out, undefined, "a returned promise would put Jev on omp's awaited tool path");
   assert.equal(called, 0, "the asker ran inside the handler's synchronous slice");
   assert.equal(handler({ toolName: "read", input: { path: "x" } }, ctx), undefined);
@@ -328,4 +336,50 @@ test("only a 402 starts a hold; other http and transport errors do not", async (
   } finally {
     resetBillingHold();
   }
+});
+
+test("registered callback denies before key lookup or requester while preserving local observation", async () => {
+  reset();
+  let callback;
+  let requests = 0;
+  let keyLookups = 0;
+  gateObserveHook({ on: (name, handler) => {
+    assert.equal(name, "tool_result");
+    callback = handler;
+  } }, {
+    ...mem,
+    asker: async () => { requests++; return scoredAsker(); },
+    keyResolver: async () => { keyLookups++; throw new Error("unexpected key lookup"); },
+  });
+  assert.equal(callback({ toolName: "bash", toolCallId: APPROVED_EVENT_ID, input: { command: "ls -la" } },
+    { sessionManager: { getSessionId: () => "sess-denied" } }), undefined);
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal(requests, 0);
+  assert.equal(keyLookups, 0);
+  assert.equal(wrote.length, 1);
+  assert.equal(wrote[0].row.session, "sess-denied");
+  assert.equal(wrote[0].row.status, "not-run");
+  assert.equal(wrote[0].row.error, "NOT_RUN reason=permission-required");
+  assert.equal(wrote[0].row.cmd, "[permission-denied]");
+  assert.equal(full.length, 0);
+  assert.doesNotMatch(JSON.stringify(wrote), /ls -la/);
+});
+
+test("an event ID alone or an injected asker alone cannot authorize raw state", async () => {
+  reset();
+  let requests = 0;
+  let keyLookups = 0;
+  const deps = { ...mem, approvedEventId: APPROVED_EVENT_ID,
+    asker: async () => { requests++; return scoredAsker(); },
+    keyResolver: async () => { keyLookups++; throw new Error("unexpected key lookup"); } };
+  await observeRaw({ toolName: "bash", toolCallId: "different-id", input: { command: "pwd" } }, deps);
+  await observeRaw({ toolName: "bash", toolCallId: APPROVED_EVENT_ID, input: { command: "date" } },
+    { ...deps, asker: undefined });
+  assert.equal(requests, 0);
+  assert.equal(keyLookups, 0);
+  assert.deepEqual(wrote.map(({ row }) => row.error), [
+    "NOT_RUN reason=permission-required", "NOT_RUN reason=permission-required",
+  ]);
+  assert.equal(full.length, 0);
+  assert.ok(wrote.every(({ row }) => row.cmd === "[permission-denied]"));
 });

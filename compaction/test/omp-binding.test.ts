@@ -246,15 +246,29 @@ test('fromEnv registers nothing without a key and never throws', () => {
   }
 });
 
-test('fromEnv registers the handler with a key (constructing the asker calls no network)', () => {
+test('fromEnv refuses a keyed session without recipient and transcript approval', () => {
+  const hadKey = 'TYPESAFE_API_KEY' in process.env;
+  const savedKey = process.env.TYPESAFE_API_KEY;
+  process.env.TYPESAFE_API_KEY = 'test-key-never-sent';
+  try {
+    let registered = false;
+    registerOmpCompactionHookFromEnv({ on: () => { registered = true; } });
+    assert.equal(registered, false, 'a credential is not consent to send transcript content');
+  } finally {
+    if (hadKey) process.env.TYPESAFE_API_KEY = savedKey as string;
+    else delete process.env.TYPESAFE_API_KEY;
+  }
+});
+
+test('fromEnv registers synthetic-approved handler without a network call', () => {
   const hadKey = 'TYPESAFE_API_KEY' in process.env;
   const savedKey = process.env.TYPESAFE_API_KEY;
   process.env.TYPESAFE_API_KEY = 'test-key-never-sent';
   try {
     let handler: unknown = 'unset';
     const pi: OmpLike = { on: (_event, h) => { handler = h; } };
-    registerOmpCompactionHookFromEnv(pi);
-    assert.equal(typeof handler, 'function', 'a keyed session gets the pre-compact handler');
+    registerOmpCompactionHookFromEnv(pi, () => true);
+    assert.equal(typeof handler, 'function', 'synthetic approval plus a key registers the handler');
   } finally {
     if (hadKey) process.env.TYPESAFE_API_KEY = savedKey as string;
     else delete process.env.TYPESAFE_API_KEY;

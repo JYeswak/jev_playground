@@ -1,5 +1,4 @@
 import { appendFileSync, mkdirSync } from "node:fs";
-import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
@@ -27,12 +26,6 @@ function outputText(event: Event): string {
 function syncObserved(path: string, row: Record<string, unknown>): void {
   try { mkdirSync(dirname(path), { recursive: true, mode: 0o700 }); appendFileSync(path, JSON.stringify(row) + "\n", { mode: 0o600 }); } catch { /* observe-only */ }
 }
-function launch(path: string, row: Record<string, unknown>, raw: string): void {
-  try {
-    const child = spawn(process.execPath, ["--experimental-strip-types", join(process.cwd(), ".omp", "hooks", "jev-shadow-worker.ts")], { detached: true, stdio: ["pipe", "ignore", "ignore"] });
-    child.stdin.write(JSON.stringify({ kind: "injection", path, row, text: raw })); child.stdin.end(); child.unref();
-  } catch { /* observe-only */ }
-}
 
 export function makeInjectionShadowHandler(deps: Deps = {}) {
   const path = deps.path ?? defaultPath();
@@ -48,10 +41,10 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
     const current = now().slice(0, 10); if (current !== day) { day = current; calls = 0; }
     if (event.isError === true) return undefined;
     const raw = outputText(event); if (!raw) return undefined;
-    if (calls >= cap) { await write({ schema: LOG_SCHEMA, ts: now(), toolName: event.toolName ?? null, outputSha256: hash(raw), status: "cap" }); return undefined; }
+    if (calls >= cap) { await write({ schema: LOG_SCHEMA, ts: now(), toolName: event.toolName ?? null, outputSha256: hash(raw), status: "cap", reason: "recipient-and-data-class-approval-required" }); return undefined; }
     calls += 1;
-    const row = { schema: LOG_SCHEMA, ts: now(), toolName: event.toolName ?? null, outputSha256: hash(raw), status: "observed" };
-    await write(row); launch(path, row, raw); return undefined;
+    await write({ schema: LOG_SCHEMA, ts: now(), toolName: event.toolName ?? null, outputSha256: hash(raw), status: "not-run", reason: "recipient-and-data-class-approval-required" });
+    return undefined;
   };
 }
 

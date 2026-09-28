@@ -21,6 +21,7 @@ import importlib.util
 import io
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -56,6 +57,41 @@ def snapshot(pane, screen, command="bun", session_age=OLD, table=TABLE, cpu_tool
     if cpu_tools is not None:
         fields["cpu_tools"] = tuple(cpu_tools)
     return fiw.Snapshot(**fields)
+
+
+class ShadowAdmission(unittest.TestCase):
+    def test_env_flag_cannot_spawn_unapproved_provider_worker(self):
+        with mock.patch.dict(os.environ, {"JEV_FLEET_SHADOW": "1"}):
+            module_spec = importlib.util.spec_from_file_location(
+                "fleet_shadow_refusal", WATCH
+            )
+            module = importlib.util.module_from_spec(module_spec)
+            module_spec.loader.exec_module(module)
+            self.assertFalse(module.SHADOW_ENABLED)
+            with mock.patch.object(
+                module.subprocess, "Popen", side_effect=AssertionError("child started")
+            ):
+                module.submit_shadow(
+                    {2: ("working", "synthetic status", "private pane line")}
+                )
+
+    def test_direct_child_refuses_before_exporting_pane_state(self):
+        status = "PRIVATE_PANE_STATE_31ca"
+        fake_key = "-".join(("synthetic", "not", "for", "provider"))
+        result = subprocess.run(
+            ["node", "scripts/fleet-jev-shadow.mjs"],
+            input=json.dumps({"pane_index": 2, "status_line": status}) + "\n",
+            capture_output=True,
+            text=True,
+            env={**os.environ, "TYPESAFE_API_KEY": fake_key},
+            cwd=HERE.parents[1],
+            timeout=10,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("permission-required", result.stderr)
+        self.assertNotIn(status, result.stdout + result.stderr)
+        self.assertNotIn(fake_key, result.stdout + result.stderr)
 
 
 class ProcessTree(unittest.TestCase):

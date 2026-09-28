@@ -21,6 +21,7 @@
  * classifier recording a pass is indistinguishable from a clean result.
  */
 import { execFile } from "node:child_process";
+import { createHash } from "node:crypto";
 import { askJev } from "../../../kit/src/client.ts";
 
 import { recording } from "../../jev-score-register/register.mjs";
@@ -197,7 +198,8 @@ type Host = {
   on: (event: string, handler: (event: any) => Promise<unknown>) => void;
   appendEntry: (type: string, data: Record<string, unknown>) => Promise<unknown>;
 };
-export default function ompJevReview(pi: Host) {
+/** Production has no approved automatic Jev recipient/data-class policy. Only keyless tests inject synthetic admission. */
+export default function ompJevReview(pi: Host, admitSynthetic?: (event: ToolCallEvent) => boolean) {
   /** toolCallId -> boundary score, for diffs that earned the advisory line. */
   const pending = new Map<string, number>();
 
@@ -231,6 +233,7 @@ export default function ompJevReview(pi: Host) {
       if (tool !== "bash" || command === undefined || !/\bgit\s+(diff|show)\b/.test(command)) {
         return undefined;
       }
+      const commandSha = createHash("sha256").update(command).digest("hex");
 
       const toolCallId = typeof event?.toolCallId === "string" ? event.toolCallId : null;
       try {
@@ -246,7 +249,7 @@ export default function ompJevReview(pi: Host) {
             schemaVersion: 1,
             kind: "review_not_applicable",
             applicable: false,
-            command: command.slice(0, 2000),
+            commandSha,
             toolCallId,
             reason,
             timestamp: new Date().toISOString(),
@@ -256,6 +259,8 @@ export default function ompJevReview(pi: Host) {
         }
         return undefined;
       };
+
+      if (toolCallId === null || !admitSynthetic?.(event)) return notApplicable("permission-denied");
 
       const loaded = await readDiff(command);
       // A command the extension will not re-run (a pipe, `&&`, a redirect) is out of scope, not a
@@ -270,7 +275,7 @@ export default function ompJevReview(pi: Host) {
           await pi.appendEntry(DECISION, {
             schemaVersion: 1,
             kind: "review_error",
-            command: command.slice(0, 2000),
+            commandSha,
             toolCallId,
             error: loaded.reason,
             failure: loaded.reason,
@@ -311,7 +316,7 @@ export default function ompJevReview(pi: Host) {
         await pi.appendEntry(DECISION, {
           schemaVersion: 1,
           kind: probabilities ? "review_scored" : "review_error",
-          command: command.slice(0, 2000),
+          commandSha,
           toolCallId,
           ...(probabilities ? { probabilities, comment } : {}),
           ...(filtered.dropped > 0 ? { vendoredFilesDropped: filtered.dropped } : {}),

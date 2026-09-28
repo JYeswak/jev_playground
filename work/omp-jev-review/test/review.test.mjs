@@ -42,9 +42,33 @@ const answersFetch = (answers) => {
   return async () => mk();
 };
 
+test('unapproved automatic diff is recorded locally without re-running git or calling provider', async () => {
+  let gitRuns = 0;
+  let providerCalls = 0;
+  setDiffRunner(async () => { gitRuns += 1; return SUBSTANTIAL; });
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async () => { providerCalls += 1; throw new Error('unapproved egress'); };
+  try {
+    const h = host();
+    ompJevReview(h.pi);
+    await h.fire(diffCall('git diff --cached'));
+    assert.equal(gitRuns, 0);
+    assert.equal(providerCalls, 0);
+    const [row] = decisions(h);
+    assert.equal(row.data.kind, 'review_not_applicable');
+    assert.equal(row.data.reason, 'permission-denied');
+    assert.match(row.data.commandSha, /^[0-9a-f]{64}$/);
+    assert.equal(row.data.command, undefined);
+    assert.doesNotMatch(JSON.stringify(h.rows), /git diff --cached/);
+  } finally {
+    setDiffRunner(null);
+    globalThis.fetch = realFetch;
+  }
+});
+
 test('ignores every tool call that is not a git diff or show', async () => {
   const h = host();
-  ompJevReview(h.pi);
+  ompJevReview(h.pi, () => true);
   for (const event of [
     diffCall('echo hello'),
     { toolName: 'read', toolCallId: 'x', input: { command: 'git diff' } },
@@ -59,7 +83,7 @@ test('an unset API key records review_error, never a scored pass', async () => {
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff HEAD~1'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
@@ -79,7 +103,7 @@ test('a throwing transport records review_error and never breaks the session', a
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     assert.equal(await h.fire(diffCall('git show abc123')), undefined);
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
@@ -99,7 +123,7 @@ test('a real score is recorded as review_scored with its probabilities', async (
   globalThis.fetch = answersFetch({ behaviour: { noul: 0.82 }, boundary: { noul: 0.18 } });
   try {
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff --cached'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_scored');
@@ -125,7 +149,7 @@ test('a 200 with no probabilities is an error, not a silent pass', async () => {
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
@@ -139,7 +163,7 @@ test('a 200 with no probabilities is an error, not a silent pass', async () => {
 
 test('a host whose appendEntry throws still returns undefined', async () => {
   const h = host();
-  ompJevReview({ on: h.pi.on, appendEntry: async () => { throw new Error('log sink down'); } });
+  ompJevReview({ on: h.pi.on, appendEntry: async () => { throw new Error('log sink down'); } }, () => true);
   assert.equal(await h.fire(diffCall('git diff')), undefined);
 });
 
@@ -164,7 +188,7 @@ test('asks exactly the two measured questions and no more', async () => {
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff'));
     assert.equal(calls.length, 1, 'one scoring call, no gate call');
     assert.deepEqual(Object.keys(calls[0].questions).sort(), ['behaviour', 'boundary']);
@@ -186,7 +210,7 @@ test('an empty diff records applicable:false and does not call Jev', async () =>
   try {
     stubDiff('   \n');
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_not_applicable');
@@ -213,7 +237,7 @@ test('a 10k-line vendored diff records applicable:false and never calls Jev', as
   try {
     stubDiff(VENDORED_10K + 'diff --git a/package-lock.json b/package-lock.json\n@@ -1 +1 @@\n+{}\n');
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_not_applicable');
@@ -239,7 +263,7 @@ test('vendored sections are cut before scoring; our own code in the same diff st
   try {
     stubDiff(VENDORED_10K + SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_scored');
@@ -273,7 +297,7 @@ async function scoredWithBoundary(boundary, id = 'tc-1') {
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire({ toolName: 'bash', toolCallId: id, input: { command: 'git show HEAD' } });
     return h;
   } finally {
@@ -316,7 +340,7 @@ test('a compound or piped command is not executed, not scored, and recorded not-
   try {
     setDiffRunner(async () => { ran += 1; return 'should not run'; });
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff; echo pwned'));
     await h.fire(diffCall('git add -- a.py && git diff --cached --check'));
     await h.fire(diffCall('git show abc:work/x.py | python3 -'));
@@ -339,7 +363,7 @@ test('a plain git diff that fails to run is still review_error, never not-applic
   setDiffRunner(async () => { throw new Error('fatal: bad revision'); });
   try {
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git show deadbeef'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
@@ -372,7 +396,7 @@ test('a thin diff records applicable:false and never calls Jev', async () => {
   try {
     stubDiff('diff --git a/a.ts b/a.ts\n+one line\n');
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_not_applicable');
@@ -398,7 +422,7 @@ test('a docs-only diff records applicable:false and never calls Jev', async () =
         Array.from({ length: 12 }, (_, i) => `+doc line ${i}`).join('\n') + '\n',
     );
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_not_applicable');
@@ -420,7 +444,7 @@ test('planted negative: a >100-line code diff still scores', async () => {
   try {
     stubDiff(BIG);
     const h = host();
-    ompJevReview(h.pi);
+    ompJevReview(h.pi, () => true);
     await h.fire(diffCall('git diff --stat'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_scored');

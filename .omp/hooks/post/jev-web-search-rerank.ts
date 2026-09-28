@@ -1,10 +1,8 @@
 import { createHash } from "node:crypto";
-import { appendFile, mkdir, open } from "node:fs/promises";
-import { appendFileSync, mkdirSync } from "node:fs";
+import { mkdir, open } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { spawn } from "node:child_process";
 import { homedir } from "node:os";
-import { rerankTop1, type RerankCandidate, type RerankOptions } from "../../../kit/src/rerank.ts";
+import { rerankTop1, type RerankOptions } from "../../../kit/src/rerank.ts";
 export const MODEL = "jev-1.13.0";
 export const MAX_RESULTS = 20;
 export const MAX_NEXT_TOOL_CALLS = 10;
@@ -51,6 +49,8 @@ type Pending = {
 type ShadowDeps = {
   ask?: Ask;
   append?: Append;
+  /** Offline-only approval: a recorded event ID and injected fake requester are both required. */
+  approvedEventId?: string;
   path?: string;
   now?: () => string;
   session?: string;
@@ -177,10 +177,6 @@ function loggedRow(pending: Pending, now: () => string): Record<string, unknown>
   };
 }
 
-export function resetWebSearchShadowForTest(): void {
-  // Each handler owns its counters; this is intentionally a no-op compatibility seam.
-}
-
 export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
   const ask = deps.ask;
   const append = deps.append ?? defaultAppend;
@@ -230,9 +226,16 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
         openedPick: false,
         openedRank1: false,
         status: "not-admitted",
-        error: null,
+        error: "permission-required",
         openedHashes: new Set(),
       };
+      // The installed hook supplies neither approval nor an injected requester.
+      // No environment variable, cap, key or event payload can authorize egress.
+      if (!ask || !deps.approvedEventId || eventId !== deps.approvedEventId) {
+        write(loggedRow(base, now));
+        return undefined;
+      }
+      base.error = null;
       if (paused || calls >= cap) { write(loggedRow(base, now)); return undefined; }
       calls += 1;
       try {
@@ -261,39 +264,11 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
   return handler;
 }
 
-function syncObservedWeb(path: string, event: SearchEvent): void {
-  try {
-    const parsed = parseSearchResult(event);
-    if (!parsed) return;
-    mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
-    appendFileSync(path, JSON.stringify({ schema: LOG_SCHEMA, ts: new Date().toISOString(), sessionHash: hashValue(process.env.OMP_SESSION_ID ?? "unknown"), queryHash: hashValue(parsed.query), resultCount: parsed.items.length, pickIndex: null, providerRank1Index: 0, latencyMs: null, inputTokens: null, outputTokens: null, nextToolCalls: 0, openedPick: false, openedRank1: false, status: "observed" }) + "\n", { mode: 0o600 });
-  } catch { /* observe-only */ }
-}
-
-function launchWebWorker(path: string, parsed: { query: string; items: ResultItem[] }, row: Record<string, unknown>): void {
-  try {
-    const child = spawn(process.execPath, ["--experimental-strip-types", join(process.cwd(), ".omp", "hooks", "jev-shadow-worker.ts")], { detached: true, stdio: ["pipe", "ignore", "ignore"] });
-    child.stdin.write(JSON.stringify({ kind: "web", path, query: parsed.query, items: parsed.items, row }));
-    child.stdin.end();
-    child.unref();
-  } catch { /* observe-only */ }
-}
-
-export default function jevWebSearchRerankHook(host: { on: (event: string, handler: (event: SearchEvent) => Promise<undefined>) => void }): void {
-  const handler = makeWebSearchRerankHandler();
-  const seen = new Set<string>();
-  const observe = (event: SearchEvent): Promise<undefined> => {
-    const id = typeof event.toolCallId === "string" ? event.toolCallId : undefined;
-    if (id && seen.has(id)) return Promise.resolve(undefined);
-    if (id) { seen.add(id); setTimeout(() => seen.delete(id), 60_000); }
-    const parsed = parseSearchResult(event);
-    syncObservedWeb(defaultPath(), event);
-    if (id && parsed) {
-      const row = { schema: LOG_SCHEMA, ts: new Date().toISOString(), sessionHash: hashValue(process.env.OMP_SESSION_ID ?? "unknown"), queryHash: hashValue(parsed.query), resultCount: parsed.items.length, pickIndex: null, providerRank1Index: 0, latencyMs: null, inputTokens: null, outputTokens: null, nextToolCalls: 0, openedPick: false, openedRank1: false, status: "observed" };
-      launchWebWorker(defaultPath(), parsed, row);
-    }
-    return handler(event);
-  };
-  host.on("tool_result", observe);
-  host.on("tool_execution_end", observe);
+export default function jevWebSearchRerankHook(
+  host: { on: (event: string, handler: (event: SearchEvent) => Promise<undefined>) => void },
+  deps: ShadowDeps = {},
+): void {
+  const handler = makeWebSearchRerankHandler(deps);
+  host.on("tool_result", handler);
+  host.on("tool_execution_end", handler);
 }
