@@ -2,55 +2,84 @@
   "arms": {
     "comparator": {
       "accuracy": {
-        "den": 86,
-        "num": 52,
-        "rate": 0.6046511627906976,
+        "den": 906,
+        "num": 586,
+        "rate": 0.6467991169977925,
         "wilson95": [
-          0.4989772079672809,
-          0.7013757274845405
+          0.6151160346992025,
+          0.67724259264317
         ]
       },
-      "brier": 0.3089337209302327,
+      "brier": 0.2729196467991162,
       "model": "dots-studio/dots-3-note-preview:free",
-      "not_run": 821,
-      "refused": 0,
-      "scored": 86
+      "refusal_rate": {
+        "den": 907,
+        "num": 1,
+        "rate": 0.0011025358324145535,
+        "wilson95": [
+          0.0001946511666324043,
+          0.006218604141549676
+        ]
+      },
+      "refused": 1,
+      "scored": 906
     },
     "jev": {
       "accuracy": {
         "den": 907,
         "num": 592,
-        "rate": 0.6527012127894156
+        "rate": 0.6527012127894156,
+        "wilson95": [
+          0.6211307726510886,
+          0.6829836232380092
+        ]
       },
       "brier": 0.2327659316427785,
       "model": "jev-1.13.0",
+      "refusal_rate": {
+        "den": 907,
+        "num": 0,
+        "rate": 0.0,
+        "wilson95": [
+          0,
+          0.004217483496708449
+        ]
+      },
       "refused": 0,
       "scored": 907
     }
   },
-  "boundary": "Unseen public Climate-FEVER eligible pairs only; no fleet-wide claim or promotion/ruling.",
+  "boundary": "Full public eligible Climate-FEVER corpus only; free arm has one invalid response; paired metrics use 906 valid rows; no fleet-wide claim/promotion.",
   "comparator_quarantine": {
-    "count": 821,
-    "reason": "openrouter-429-daily-quota",
-    "resume_mode": "comparator-only; Jev arm unchanged",
-    "retry_after": "2026-09-28T00:00:00Z"
+    "initial_http_429": 821,
+    "remaining_not_run": 0,
+    "resume_mode": "comparator-only; Jev scores unchanged except strict >0.5 correction",
+    "resumed_attempts": 821,
+    "resumed_refused": 1,
+    "resumed_scored": 820
   },
   "dataset": "tdiggelm/climate-fever@1.0.1",
   "items": "work/jev-oioo/items.jsonl",
   "items_sha256": "bbda30671b46678a11717d0fa89994b5226e9887ff321ec70a860e45f579032c",
   "jev_threshold_correction": {
-    "corrected_jev_correct": 592,
-    "exact_ties_reclassified": 5,
-    "operator": "strict > 0.5",
-    "previous_jev_correct": 597,
-    "previous_operator": ">= 0.5",
-    "previous_result_invalid": true
+    "exact_ties": 5,
+    "operator": ">0.5",
+    "strict_accuracy": {
+      "den": 907,
+      "num": 592,
+      "rate": 0.6527012127894156,
+      "wilson95": [
+        0.6211307726510886,
+        0.6829836232380092
+      ]
+    }
   },
   "jevcalls": 907,
   "mcnemar": {
-    "b_jev_only_correct": 3,
-    "c_comparator_only_correct": 2,
-    "exact_two_sided_p": 1.0
+    "b_jev_only_correct": 60,
+    "c_comparator_only_correct": 54,
+    "exact_two_sided_p": 0.63976936864295,
+    "paired_valid": 906
   },
   "prereg": "work/jev-oioo/prereg.md",
   "prereg_sha256": "b8448df45f0c5ce4481688770a12c314f6f58df2aa6b74a846d0b997b2797a01",
@@ -61,14 +90,36 @@
   "rows": 907,
   "source_sha256": "8a4b9032d861be482ffb49dddfd283ffa6089e654f1e968040011882c5eb6e0b",
   "spend_usd": 0.021322602000000003,
-  "status": "MEASURED_NOT_RUN_FREE_QUOTA_THRESHOLD_CORRECTED",
+  "status": "MEASURED_COMPARATOR_RESUME_COMPLETE",
   "unit": "jev-oioo",
   "usage": {
-    "comparator_completion_tokens": 87656,
-    "comparator_prompt_tokens": 20961,
+    "comparator_completion_tokens": 998856,
+    "comparator_prompt_tokens": 231085,
     "comparator_spend_usd": 0,
+    "comparator_usage_rows": 906,
+    "free_request_delta": 819,
     "jev_input_tokens": 507681,
     "jev_spend_usd": 0.021322602000000003,
+    "openrouter_after": {
+      "free_requests": {
+        "limit": 1000,
+        "remaining": 181,
+        "used": 819
+      },
+      "usage": 100.199757412,
+      "usage_daily": 0
+    },
+    "openrouter_before": {
+      "free_requests": {
+        "limit": 1000,
+        "remaining": 1000,
+        "used": 0
+      },
+      "usage": 100.199757412,
+      "usage_daily": 0
+    },
+    "openrouter_usage_after_path": "var/agent-tmp/jev-oioo/openrouter-after.json (metadata-only in receipt)",
+    "openrouter_usage_before_path": "var/agent-tmp/jev-oioo/openrouter-before.json (metadata-only in receipt)",
     "openrouter_usage_present": true
   }
 }
