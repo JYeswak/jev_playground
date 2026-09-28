@@ -217,7 +217,9 @@ class ShadowReportTests(unittest.TestCase):
         self.assertAlmostEqual(report["input_cost_usd_known"], 741 * 0.042 / 1_000_000)
         self.assertEqual(report["usage_missing_rows"], 1)
         self.assertFalse(report["spend_complete"])
-        self.assertTrue(report["window_complete_24h"])
+        self.assertFalse(report["window_complete_24h"])
+        self.assertAlmostEqual(report["report_age_hours"], 24.0)
+        self.assertLess(report["window_elapsed_hours"], 24.0)
         self.assertNotIn("rawSha256", json.dumps(report))
 
     def test_webscreen_report_uses_answered_unit_denominator(self) -> None:
@@ -261,6 +263,14 @@ class ShadowReportTests(unittest.TestCase):
         self.assertEqual(report["answered_units"], 3)
         self.assertAlmostEqual(report["flag_rate_per_unit"], 1 / 3)
         self.assertEqual(report["status_counts"], {"fail_open": 1, "ok": 2})
+        # Timestamp-only plumbing control verifies the exact 24 h boundary.
+        window_rows = [
+            {"ts": "2026-09-29T12:00:00Z", "status": "ok", "units": 1, "flagged": 0},
+            {"ts": "2026-09-30T12:00:00Z", "status": "ok", "units": 1, "flagged": 0},
+        ]
+        complete = webscreen_report(window_rows, as_of="2026-09-30T12:00:00Z")
+        self.assertEqual(complete["window_elapsed_hours"], 24.0)
+        self.assertTrue(complete["window_complete_24h"])
 
 
 if __name__ == "__main__":

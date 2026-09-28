@@ -289,7 +289,12 @@ def webscreen_report(
     flagged_rows = sum(flagged > 0 for _, flagged in metric_rows)
     first_event = min((timestamp for _, timestamp in eligible), default=None)
     last_event = max((timestamp for _, timestamp in eligible), default=None)
-    elapsed_hours = (
+    event_span_hours = (
+        max(0.0, (last_event - first_event).total_seconds() / 3600)
+        if first_event is not None and last_event is not None
+        else 0.0
+    )
+    report_age_hours = (
         max(0.0, (report_time - first_event).total_seconds() / 3600)
         if first_event is not None
         else 0.0
@@ -337,9 +342,10 @@ def webscreen_report(
         if last_event
         else None,
         "reported_at_utc": report_time.isoformat().replace("+00:00", "Z"),
-        "window_elapsed_hours": round(elapsed_hours, 3),
-        "window_complete_24h": first_event is not None and elapsed_hours >= 24,
-        "window_basis": "reported from first eligible post-fix event to report time; not proof of continuous hook uptime",
+        "window_elapsed_hours": round(event_span_hours, 3),
+        "report_age_hours": round(report_age_hours, 3),
+        "window_complete_24h": event_span_hours >= 24.0,
+        "window_basis": "first-to-last eligible post-fix event span; report age is separate, and neither proves continuous hook uptime",
     }
 
 
