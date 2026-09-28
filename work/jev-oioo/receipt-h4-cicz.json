@@ -1,0 +1,38 @@
+{
+  "bar": {
+    "meaning": "recurrence only if SUPPORT recall is at least 20pp below REFUTES and Fisher p<.05",
+    "support_miss_recurrence": false
+  },
+  "bead": "jev-cicz",
+  "boundary": "Fresh official SciFact dev claims outside prior sample; no free comparator; no raw claim/evidence text committed.",
+  "counts": {
+    "CONTRADICT": {
+      "correct": 38,
+      "errors": 0,
+      "n": 38
+    },
+    "SUPPORT": {
+      "correct": 65,
+      "errors": 16,
+      "n": 81
+    }
+  },
+  "fisher_exact_two_sided_p": 4.857045953408368e-05,
+  "latency_ms": {
+    "p50": 176,
+    "p95": 319,
+    "sum": 22124
+  },
+  "manifest_sha256": "054208b394cd9940fe968f43f346d96a01300683521c9973b8d60992d0c4e0b5",
+  "model": "jev-1.13.0",
+  "n": 119,
+  "recall_gap_refute_minus_support": 0.19753086419753085,
+  "refute_recall": 1.0,
+  "status": "SCORED",
+  "support_recall": 0.8024691358024691,
+  "usage": {
+    "input_spend_usd": 0.002237928,
+    "input_tokens": 53284,
+    "output_tokens": 2380
+  }
+}
