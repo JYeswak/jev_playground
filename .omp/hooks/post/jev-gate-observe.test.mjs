@@ -10,6 +10,7 @@ import {
   loadFilters, makeFilter, makeHandler, observe as observeRaw, redact, resetBillingHold, resetKeyCache,
 } from "./jev-gate-observe.ts";
 import gateObserveHook from "./jev-gate-observe.ts";
+import { askJevBundle, observedFetch } from "../../../kit/src/client.ts";
 const wrote = [];
 const full = [];
 const memAppend = async (path, line) => { wrote.push({ path, row: JSON.parse(line) }); };
@@ -17,7 +18,7 @@ const memSidecar = async (path, line) => { full.push({ path, row: JSON.parse(lin
 const reset = () => { wrote.length = 0; full.length = 0; };
 const now = () => "2026-09-24T00:00:00.000Z";
 // Every observe() below routes both writers to memory: a test must never append to the real sidecar.
-const mem = { append: memAppend, logPath: "/tmp/x.jsonl", appendSidecar: memSidecar, sidecarPath: "/tmp/x-full.jsonl", now };
+const mem = { append: memAppend, logPath: "/tmp/x.jsonl", appendSidecar: memSidecar, sidecarPath: "/tmp/x-full.jsonl", now, session: "offline-session" };
 // Secret-shaped fixtures are built at runtime so this file never carries one.
 const fakeKey = "sk-" + "abcdefghij".repeat(3);
 const scoredAsker = async () => ({
@@ -382,4 +383,72 @@ test("an event ID alone or an injected asker alone cannot authorize raw state", 
   ]);
   assert.equal(full.length, 0);
   assert.ok(wrote.every(({ row }) => row.cmd === "[permission-denied]"));
+});
+
+test("recorded bash event without a session or tool-call ID never reaches the provider", async (t) => {
+  reset();
+  resetKeyCache();
+  t.after(resetKeyCache);
+  const recorded = JSON.parse(readFileSync(new URL("../../../work/omp-guard-rule/fixtures/session-pinned.jsonl", import.meta.url), "utf8").split("\n")[1]);
+  assert.equal(recorded.real, true);
+  let lookups = 0;
+  let requests = 0;
+  const deps = {
+    ...mem,
+    approvedEventId: APPROVED_EVENT_ID,
+    keyResolver: async () => { lookups++; throw new Error("key lookup before admission"); },
+    asker: async () => { requests++; return scoredAsker(); },
+  };
+  await observeRaw({ ...recorded, toolCallId: APPROVED_EVENT_ID }, { ...deps, session: "unknown" });
+  await observeRaw({ ...recorded, toolCallId: undefined }, deps);
+  assert.equal(lookups, 0);
+  assert.equal(requests, 0);
+  assert.equal(full.length, 0);
+  assert.deepEqual(wrote.map(({ row }) => row.status), ["not-run", "not-run"]);
+});
+
+test("recorded bash shape denies sensitive input and admits one harmless fake HTTP request", async (t) => {
+  reset();
+  resetKeyCache();
+  t.after(resetKeyCache);
+  const recorded = JSON.parse(readFileSync(new URL("../../../work/omp-guard-rule/fixtures/session-pinned.jsonl", import.meta.url), "utf8").split("\n")[1]);
+  assert.equal(recorded.real, true);
+  const requests = [];
+  let attempts = 0;
+  let lookups = 0;
+  const fetchImpl = observedFetch(
+    () => { attempts++; },
+    async (url, init) => {
+      requests.push({ url: String(url), body: JSON.parse(String(init.body)) });
+      return new Response(JSON.stringify({
+        model: "jev-1.13.0",
+        answers: Object.fromEntries(["exfiltration", "destructive", "privilege", "irreversible_publish", "secret_staging"].map((key) => [key, { type: "noul", noul: 0.1 }])),
+        usage: { input_tokens: 20, output_tokens: 5 },
+      }), { status: 200, headers: { "content-type": "application/json" } });
+    },
+  );
+  const deps = {
+    ...mem,
+    approvedEventId: APPROVED_EVENT_ID,
+    keyResolver: async () => { lookups++; return "synthetic-only"; },
+    asker: (options) => askJevBundle({ ...options, apiKey: "synthetic-only", fetchImpl }),
+  };
+  await observeRaw({ ...recorded, toolCallId: "not-approved" }, deps);
+  await observeRaw({ ...recorded, toolCallId: APPROVED_EVENT_ID, input: { command: `export K=${fakeKey}` } }, deps);
+  assert.equal(requests.length, 0);
+  assert.equal(attempts, 0);
+  assert.equal(lookups, 0);
+  assert.equal(full.length, 0);
+  await observeRaw({ ...recorded, toolCallId: APPROVED_EVENT_ID }, deps);
+  assert.equal(requests.length, 1);
+  assert.equal(attempts, 1);
+  assert.equal(requests[0].url, "https://api.typesafe.ai/v1/systemone");
+  assert.equal(requests[0].body.model, "jev-1.13.0");
+  assert.deepEqual(requests[0].body.state, {
+    command: "git status --porcelain=v1",
+    context: "An AI coding agent proposes running this in the user repository.",
+  });
+  assert.equal(wrote.at(-1).row.status, "scored");
+  assert.equal(full.length, 1);
+  assert.doesNotMatch(JSON.stringify(requests), /synthetic-only|sk-abcdefghij/);
 });

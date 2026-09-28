@@ -279,8 +279,9 @@ export async function observe(
     const command = typeof event.input?.command === "string" ? event.input.command : "";
     const base = buildRow({ session: deps.session ?? "unknown", command, now: deps.now });
     // Refuse before writing a raw-command sidecar or even a command prefix.
-    // Only an exact event-ID match with an injected fake asker is admissible.
-    if (!deps.asker || !deps.approvedEventId || event.toolCallId !== deps.approvedEventId) {
+    // Exact synthetic approval also requires the real session and event identity.
+    if (!deps.asker || !deps.approvedEventId || event.toolCallId !== deps.approvedEventId ||
+      typeof deps.session !== "string" || !deps.session.trim() || deps.session === "unknown") {
       await write({ ...base, cmd: "[permission-denied]", status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=permission-required" });
       return undefined;
     }
