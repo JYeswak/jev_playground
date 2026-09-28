@@ -4,7 +4,7 @@ Status: PREREGISTERED BEFORE LIVE CALLS
 Bead: jev-gdhb
 Date: 2026-09-27
 Jev launch: after prereg approval.
-Free-comparator launch: not before `2026-10-02T00:00:00Z`; free-tier allocations through 2026-10-01 are reserved by existing beads.
+Free-comparator launch: not before `2026-10-01T00:00:00Z`; free-tier allocations through 2026-09-30 are reserved by existing beads.
 reach-mode: mcnemar
 
 ## Corpus and freshness
