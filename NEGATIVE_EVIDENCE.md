@@ -4685,3 +4685,19 @@ paired `opened/used next` join is specified before the shadow starts.
 **Measured:** agree stratum `301/412 = 73.1%`; disagree stratum `291/495 = 58.8%`, Wilson interval `54.4%–63.0%`. The disagree stratum reaches the near-chance band only on the point estimate; because the Climate-FEVER labels and evidence labels are entangled, this cannot cleanly confirm H3.
 
 **Retry condition:** obtain an independently labelled evidence/claim set or a non-leaking adjudication, preregister the stratum bar, and retest before treating H3 as confirmed.
+
+## R124 — REFUTED: identical PGTU request hashes carry conflicting clean/planted labels (2026-09-29)
+
+**Hypothesis:** each exact TypeSafe request state in the frozen 600-row PGTU cohort belongs to one ground-truth class, so the row-level paired test has no duplicate-input label conflict.
+
+**Minimal repro / experiment:** keyless group of committed `work/jev-pgtu/items.jsonl` by `inputSha256` and `set`, with the frozen assistant/question contract. Then complete the separately preregistered Jev-only rescore of the 491 same-key stale-hash rows; do not score or run the free comparator.
+
+**Expected signal (if hypothesis true):** zero `inputSha256` groups assigned to both clean and planted; every exact request-state hash has one label.
+
+**Result (measured, inline):** the 600 fixed items have 471 unique hashes, 69 repeated groups, 129 duplicate-row excess, and 68 cross-set hash groups covering 196 rows (maximum 5 rows/hash). The assistant and question hashes are corpus-constant, so each cross-set hash is the same request state under opposite labels. The Jev rescore completed 491/491 (`jev-1.13.0`, 247246 input tokens, 10802 output tokens, `$0.010384332`, 76699.648 ms); exact hash joins now total 600/600, but that does not repair the label conflict. No comparator or performance score was run.
+
+**Verdict:** REFUTED.
+
+**Retry-condition:** before any free comparator call, obtain independent provenance review and preregister the exact-hash cluster as the independent unit, effective N, and fixed inclusion/aggregation rule. Every cross-set hash must be independently adjudicated to one label or excluded under a rule set without model outputs; repeated same-label hashes must not be counted as independent rows. State whether the already-collected Jev answers can be reused under that rule and freeze the revised bar before the comparator runs. Do not silently drop, relabel, reweight, or choose adjudication based on model answers.
+
+**Evidence:** `work/jev-pgtu/items.jsonl` SHA-256 `fc417c602499328243f86a06d84e3c0888fa41e6662aeefc2a8251c1adf3437b`; `work/jev-pgtu/jev-rescore-rows.jsonl` SHA-256 `cc0aa3427dfdf8a8a9dd74483cb580619ad9287694eabba1f2341a9321678a9e`; `work/jev-pgtu/reachability.json`; EVAL entry above; prereg/runner commits `2c1a72e9`, `bee800d1`, `424fc0f6`, live receipt commit `f2d687d3`.
