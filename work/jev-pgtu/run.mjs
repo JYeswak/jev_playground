@@ -69,6 +69,7 @@ function baselineEnvironment() {
       delete env[key];
     }
   }
+  delete env.TYPESAFE_LOG_LEVEL; // SDK debug logs include request and response bodies.
   return env;
 }
 
