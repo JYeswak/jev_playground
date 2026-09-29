@@ -4,12 +4,14 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import json
 import math
 import os
+import sys
 import time
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, TextIO
 
 from adapter_runner import (
     CUT,
@@ -22,13 +24,14 @@ from adapter_runner import (
     approved_commit,
     load_preflight,
     read_json,
+    run_rows,
 )
 from typesafe_sdk import (  # type: ignore[import-not-found]
+    AsyncTypeSafeClient,
     Noul,
     RetryPolicy,
     SystemOneResponse,
     TypeSafeAPIError,
-    TypeSafeClient,
     TypeSafeError,
 )
 
@@ -74,6 +77,13 @@ def extract_answer(
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def read_api_key(stream: TextIO) -> str | None:
+    key = stream.readline().rstrip("\r\n")
+    if not key or any(character.isspace() for character in key):
+        return None
+    return key
 
 
 def checkpoint(record: dict[str, Any]) -> None:
@@ -160,7 +170,155 @@ def emit(record: dict[str, Any], exit_code: int) -> int:
     return exit_code
 
 
-def run(assistant: str, question: str, *, live: bool) -> int:
+def run_live(
+    candidates: list[dict[str, Any]],
+    question: str,
+    api_key: str,
+    preflight: dict[str, Any],
+) -> int:
+    item_by_id = {pair["item"]["id"]: pair["item"] for pair in candidates}
+    started_all = time.perf_counter()
+
+    def persist_checkpoint(record: dict[str, Any]) -> None:
+        entry: dict[str, Any] = {
+            "schema_version": "jev-pgtu-rescore-checkpoint.v1",
+            **record,
+        }
+        if record.get("event") == "request_started":
+            item = item_by_id.get(record.get("id"))
+            if isinstance(item, dict):
+                for key in ("set", "baseIndex", "position", "inputSha256"):
+                    if key in item:
+                        entry[key] = item[key]
+                entry["model"] = JEV_MODEL
+                entry["started_utc"] = utc_now()
+        else:
+            entry["finished_utc"] = utc_now()
+        checkpoint(entry)
+
+    async def execute() -> dict[str, Any]:
+        async with AsyncTypeSafeClient(
+            api_key=api_key,
+            model=JEV_MODEL,
+            retry=RetryPolicy(max_retries=0),
+            timeout=30.0,
+        ) as client:
+            with CHECKPOINT_PATH.open("x", encoding="utf-8") as handle:
+                handle.flush()
+                os.fsync(handle.fileno())
+
+            async def ask(pair: dict[str, Any]) -> dict[str, Any]:
+                started = time.perf_counter()
+                try:
+                    response = await client.system_one(
+                        state=pair["state"],
+                        questions={QUESTION_ID: Noul(instructions=question)},
+                        model=JEV_MODEL,
+                        retry=RetryPolicy(max_retries=0),
+                        timeout=30.0,
+                    )
+                    probability, input_tokens, output_tokens = extract_answer(
+                        response, question_id=QUESTION_ID
+                    )
+                except TypeSafeAPIError as error:
+                    status = error.status
+                    reason = (
+                        f"http_{status}"
+                        if status in {401, 402, 403, 429}
+                        else "typesafe_api_error"
+                    )
+                    return {
+                        "status": "not_run",
+                        "reason": reason,
+                        "http_status": status,
+                    }
+                except TypeSafeError as error:
+                    return {
+                        "status": "not_run",
+                        "reason": "typesafe_request_failed",
+                        "error_type": type(error).__name__,
+                    }
+                except ValueError:
+                    return {"status": "not_run", "reason": "response_contract_rejected"}
+                return {
+                    "status": "answered",
+                    "model": response.model,
+                    "p": probability,
+                    "flag": probability >= CUT,
+                    "input_tokens": input_tokens,
+                    "output_tokens": output_tokens,
+                    "latency_ms": round((time.perf_counter() - started) * 1000, 3),
+                }
+
+            return await run_rows(candidates, ask, persist_checkpoint)
+
+    try:
+        result = asyncio.run(execute())
+    except (OSError, ValueError, TypeSafeError) as error:
+        return emit(
+            {
+                "status": "NOT_RUN",
+                "reason": "runner_failed",
+                "error_type": type(error).__name__,
+                "provider_requests": 0,
+                "preflight": preflight,
+            },
+            2,
+        )
+
+    attempts = result.get("request_attempts", 0)
+    answer_rows = [
+        row for row in result.get("rows", []) if row.get("status") == "answered"
+    ]
+    if (
+        result.get("status") != "COMPLETE"
+        or attempts != MAX_REQUESTS
+        or len(answer_rows) != MAX_REQUESTS
+    ):
+        return emit(
+            {
+                "status": "NOT_RUN",
+                "reason": result.get("stop_reason") or "request_count_mismatch",
+                "provider_requests": attempts,
+                "answered_rows": len(answer_rows),
+                "preflight": preflight,
+            },
+            2,
+        )
+    rows = [
+        {
+            "schema_version": "jev-pgtu-row.v1",
+            **{key: value for key, value in row.items() if key != "event"},
+        }
+        for row in answer_rows
+    ]
+    write_final_rows(rows)
+    input_tokens = sum(row["input_tokens"] for row in rows)
+    output_values = [row.get("output_tokens") for row in rows]
+    output_complete = all(value is not None for value in output_values)
+    output_tokens = sum(value for value in output_values if value is not None)
+    spend = input_tokens * INPUT_PRICE_USD_PER_MILLION / 1_000_000
+    return emit(
+        {
+            "status": "COMPLETE",
+            "provider_requests": attempts,
+            "answered_rows": len(rows),
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens if output_complete else None,
+            "input_token_usage_complete": True,
+            "output_token_usage_complete": output_complete,
+            "spend_usd": round(spend, 10),
+            "latency_total_ms": round((time.perf_counter() - started_all) * 1000, 3),
+            "preflight": preflight,
+            "output_path": RESCORE_OUTPUT_PATH.relative_to(ROOT).as_posix(),
+        },
+        0,
+    )
+
+
+def run(
+    assistant: str, question: str, *, live: bool, api_key: str | None = None
+) -> int:
     counts, candidates, reason = validate_plan(assistant, question)
     if reason is not None:
         return emit({"status": "NOT_RUN", "reason": reason, "preflight": counts}, 2)
@@ -184,7 +342,7 @@ def run(assistant: str, question: str, *, live: bool) -> int:
             },
             0,
         )
-    if not os.environ.get("TYPESAFE_API_KEY"):
+    if not api_key:
         return emit(
             {
                 "status": "NOT_RUN",
@@ -193,188 +351,7 @@ def run(assistant: str, question: str, *, live: bool) -> int:
             },
             2,
         )
-
-    with CHECKPOINT_PATH.open("x", encoding="utf-8") as handle:
-        handle.flush()
-        os.fsync(handle.fileno())
-    results: list[dict[str, Any]] = []
-    attempts = 0
-    total_input_tokens = 0
-    total_output_tokens = 0
-    output_tokens_reported = True
-    started_all = time.perf_counter()
-    try:
-        with TypeSafeClient(
-            model=JEV_MODEL,
-            retry=RetryPolicy(max_retries=0),
-            timeout=30.0,
-        ) as client:
-            for pair in candidates:
-                item = pair["item"]
-                state = pair["state"]
-                started_utc = utc_now()
-                checkpoint(
-                    {
-                        "schema_version": "jev-pgtu-rescore-checkpoint.v1",
-                        "event": "request_started",
-                        "id": item["id"],
-                        "set": item["set"],
-                        "baseIndex": item["baseIndex"],
-                        "position": item.get("position"),
-                        "inputSha256": item["inputSha256"],
-                        "model": JEV_MODEL,
-                        "started_utc": started_utc,
-                    }
-                )
-                attempts += 1
-                started = time.perf_counter()
-                try:
-                    response = client.system_one(
-                        state=state,
-                        questions={QUESTION_ID: Noul(instructions=question)},
-                        model=JEV_MODEL,
-                        retry=RetryPolicy(max_retries=0),
-                        timeout=30.0,
-                    )
-                    probability, input_tokens, output_tokens = extract_answer(
-                        response, question_id=QUESTION_ID
-                    )
-                except TypeSafeAPIError as error:
-                    status = error.status
-                    checkpoint(
-                        {
-                            "schema_version": "jev-pgtu-rescore-checkpoint.v1",
-                            "event": "request_failed",
-                            "id": item["id"],
-                            "inputSha256": item["inputSha256"],
-                            "http_status": status,
-                            "finished_utc": utc_now(),
-                        }
-                    )
-                    reason = (
-                        f"http_{status}"
-                        if status in {401, 402, 403, 429}
-                        else "typesafe_api_error"
-                    )
-                    return emit(
-                        {
-                            "status": "NOT_RUN",
-                            "reason": reason,
-                            "provider_requests": attempts,
-                            "preflight": counts,
-                        },
-                        2,
-                    )
-                except TypeSafeError as error:
-                    checkpoint(
-                        {
-                            "schema_version": "jev-pgtu-rescore-checkpoint.v1",
-                            "event": "request_failed",
-                            "id": item["id"],
-                            "inputSha256": item["inputSha256"],
-                            "error_type": type(error).__name__,
-                            "finished_utc": utc_now(),
-                        }
-                    )
-                    return emit(
-                        {
-                            "status": "NOT_RUN",
-                            "reason": "typesafe_request_failed",
-                            "provider_requests": attempts,
-                            "preflight": counts,
-                        },
-                        2,
-                    )
-                except ValueError:
-                    checkpoint(
-                        {
-                            "schema_version": "jev-pgtu-rescore-checkpoint.v1",
-                            "event": "response_rejected",
-                            "id": item["id"],
-                            "inputSha256": item["inputSha256"],
-                            "finished_utc": utc_now(),
-                        }
-                    )
-                    return emit(
-                        {
-                            "status": "NOT_RUN",
-                            "reason": "response_contract_rejected",
-                            "provider_requests": attempts,
-                            "preflight": counts,
-                        },
-                        2,
-                    )
-
-                latency_ms = round((time.perf_counter() - started) * 1000, 3)
-                row = {
-                    "schema_version": "jev-pgtu-row.v1",
-                    "id": item["id"],
-                    "set": item["set"],
-                    "baseIndex": item["baseIndex"],
-                    "position": item.get("position"),
-                    "inputSha256": item["inputSha256"],
-                    "status": "answered",
-                    "model": response.model,
-                    "p": probability,
-                    "flag": probability >= CUT,
-                    "input_tokens": input_tokens,
-                    "output_tokens": output_tokens,
-                    "latency_ms": latency_ms,
-                }
-                results.append(row)
-                total_input_tokens += input_tokens
-                if output_tokens is None:
-                    output_tokens_reported = False
-                else:
-                    total_output_tokens += output_tokens
-                checkpoint(
-                    {
-                        "schema_version": "jev-pgtu-rescore-checkpoint.v1",
-                        "event": "answered",
-                        **row,
-                        "finished_utc": utc_now(),
-                    }
-                )
-    except (OSError, ValueError, TypeSafeError) as error:
-        return emit(
-            {
-                "status": "NOT_RUN",
-                "reason": "runner_failed",
-                "error_type": type(error).__name__,
-                "provider_requests": attempts,
-            },
-            2,
-        )
-
-    if len(results) != MAX_REQUESTS or attempts != MAX_REQUESTS:
-        return emit(
-            {
-                "status": "NOT_RUN",
-                "reason": "request_count_mismatch",
-                "provider_requests": attempts,
-                "answered_rows": len(results),
-            },
-            2,
-        )
-    write_final_rows(results)
-    elapsed_ms = round((time.perf_counter() - started_all) * 1000, 3)
-    cost = total_input_tokens * INPUT_PRICE_USD_PER_MILLION / 1_000_000
-    return emit(
-        {
-            "status": "COMPLETE",
-            "provider_requests": attempts,
-            "answered_rows": len(results),
-            "input_tokens": total_input_tokens,
-            "output_tokens": total_output_tokens if output_tokens_reported else None,
-            "input_token_usage_complete": True,
-            "output_token_usage_complete": output_tokens_reported,
-            "spend_usd": round(cost, 10),
-            "latency_total_ms": elapsed_ms,
-            "preflight": counts,
-            "output_path": RESCORE_OUTPUT_PATH.relative_to(ROOT).as_posix(),
-        },
-        0,
-    )
+    return run_live(candidates, question, api_key, counts)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -382,6 +359,7 @@ def main(argv: list[str] | None = None) -> int:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--preflight-only", action="store_true")
     group.add_argument("--live", action="store_true")
+    parser.add_argument("--key-stdin", action="store_true")
     args = parser.parse_args(argv)
     assistant = os.environ.get("JEV_PGTU_ASSISTANT", "")
     question = os.environ.get("JEV_PGTU_QUESTION", "")
@@ -392,7 +370,10 @@ def main(argv: list[str] | None = None) -> int:
         or os.environ.get("JEV_PGTU_CUT") != str(CUT)
     ):
         return emit({"status": "NOT_RUN", "reason": "seat-contract-not-loaded"}, 2)
-    return run(assistant, question, live=args.live)
+    if args.key_stdin != args.live:
+        return emit({"status": "NOT_RUN", "reason": "key-stdin-mode-mismatch"}, 2)
+    api_key = read_api_key(sys.stdin) if args.key_stdin else None
+    return run(assistant, question, live=args.live, api_key=api_key)
 
 
 if __name__ == "__main__":

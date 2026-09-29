@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import {spawn, spawnSync} from "node:child_process";
 import path from "node:path";
-import {fileURLToPath} from "node:url";
+import {fileURLToPath, pathToFileURL} from "node:url";
 import {ASSISTANT, CUT, MODEL, QUESTION} from "../jev-a9fv/seat.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -9,6 +9,7 @@ const ADAPTER_PROJECT = path.join(ROOT, "upstream/typesafe-ai/system-one-adapter
 const PYTHON_RUNNER = path.join(ROOT, "work/jev-pgtu/adapter_runner.py");
 const SDK_PROJECT = path.join(ROOT, "upstream/typesafe-ai/typesafe-sdk-python");
 const JEV_BASELINE_RUNNER = path.join(ROOT, "work/jev-pgtu/jev_baseline.py");
+const INFISICAL_KEY_MODULE = path.join(ROOT, "work/jev-client/src/infisical-key.ts");
 const RESET_AT = Date.parse("2026-10-03T00:00:00Z");
 const args = process.argv.slice(2);
 const launch = args.length === 1 && args[0] === "--launch";
@@ -55,7 +56,7 @@ function runBuffered(mode) {
   });
 }
 
-function baselineEnvironment(allowTypeSafeKey) {
+function baselineEnvironment() {
   const env = {
     ...process.env,
     JEV_PGTU_ASSISTANT: ASSISTANT,
@@ -63,24 +64,59 @@ function baselineEnvironment(allowTypeSafeKey) {
     JEV_PGTU_JEV_MODEL: MODEL,
     JEV_PGTU_CUT: String(CUT),
   };
-  delete env.JEV_API_KEY;
-  delete env.OPENROUTER_API_KEY;
-  for (const key of Object.keys(env)) if (key.startsWith("INFISICAL_")) delete env[key];
-  if (!allowTypeSafeKey) delete env.TYPESAFE_API_KEY;
+  for (const key of Object.keys(env)) {
+    if (key.startsWith("INFISICAL_") || key.endsWith("_API_KEY") || key.endsWith("_TOKEN")) {
+      delete env[key];
+    }
+  }
   return env;
 }
 
-function jevBaselineArgs(mode) {
-  return ["run", "--project", SDK_PROJECT, "--frozen", "--no-sync", "python", JEV_BASELINE_RUNNER, mode];
+function jevBaselineArgs(mode, keyStdin = false) {
+  const args = ["run", "--project", SDK_PROJECT, "--frozen", "--no-sync", "python", JEV_BASELINE_RUNNER, mode];
+  if (keyStdin) args.push("--key-stdin");
+  return args;
 }
 
-function runJevBaseline(mode, allowTypeSafeKey) {
-  return spawnSync("uv", jevBaselineArgs(mode), {
+function runJevBaselinePython(mode, apiKey) {
+  const hasKey = Boolean(apiKey);
+  return spawnSync("uv", jevBaselineArgs(mode, hasKey), {
     cwd: ROOT,
-    env: baselineEnvironment(allowTypeSafeKey),
+    env: baselineEnvironment(),
+    input: hasKey ? apiKey + "\n" : undefined,
     encoding: "utf8",
     maxBuffer: 4 * 1024 * 1024,
   });
+}
+
+async function runJevBaseline(mode, resolveKey) {
+  if (!resolveKey) return runJevBaselinePython(mode);
+  const preflight = runJevBaselinePython("--preflight-only");
+  if (preflight.error || preflight.status !== 0) return preflight;
+  let report;
+  try {
+    report = JSON.parse(preflight.stdout.trim().split(/\r?\n/).at(-1));
+  } catch {
+    return preflight;
+  }
+  if (report?.status !== "READY_TO_RESCORE") return preflight;
+
+  let apiKey;
+  try {
+    const {infisicalKeyProvider} = await import(pathToFileURL(INFISICAL_KEY_MODULE).href);
+    apiKey = await infisicalKeyProvider();
+  } catch {
+    apiKey = undefined;
+  }
+  if (!apiKey) {
+    return {
+      error: undefined,
+      status: 2,
+      stdout: JSON.stringify({status: "NOT_RUN", reason: "infisical-key-unavailable"}) + "\n",
+      stderr: "",
+    };
+  }
+  return runJevBaselinePython("--live", apiKey);
 }
 
 function printResult(result) {
@@ -89,7 +125,17 @@ function printResult(result) {
 }
 
 if (jevRescorePreflight || jevRescoreLive) {
-  const result = runJevBaseline(jevRescoreLive ? "--live" : "--preflight-only", jevRescoreLive);
+  let result;
+  try {
+    result = await runJevBaseline(jevRescoreLive ? "--live" : "--preflight-only", jevRescoreLive);
+  } catch {
+    result = {
+      error: undefined,
+      status: 2,
+      stdout: JSON.stringify({status: "NOT_RUN", reason: "baseline-runner-failed"}) + "\n",
+      stderr: "",
+    };
+  }
   printResult(result);
   process.exitCode = result.error ? 2 : (result.status ?? 2);
 } else if (selftest) {
@@ -148,6 +194,6 @@ if (jevRescorePreflight || jevRescoreLive) {
     }
   }
 } else {
-  process.stdout.write(JSON.stringify({status: "NOT_RUN", reason: "usage", usage: "node work/jev-pgtu/run.mjs [--preflight-only|--selftest-429|--launch|--jev-rescore-preflight|--jev-rescore-live]"}) + "\n");
+  process.stdout.write(JSON.stringify({status: "NOT_RUN", reason: "usage", usage: "node work/jev-pgtu/run.mjs [--preflight-only|--selftest-429|--launch|--jev-rescore-preflight]; node --experimental-strip-types work/jev-pgtu/run.mjs --jev-rescore-live"}) + "\n");
   process.exitCode = 2;
 }

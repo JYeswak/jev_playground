@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import sys
 from importlib import import_module
 from pathlib import Path
@@ -217,3 +218,13 @@ def test_duplicate_rescore_join_keys_fail_closed() -> None:
 
     assert pairs == []
     assert counts["duplicate_rescore_keys"] == 1
+
+
+def test_empty_key_pipe_cannot_start_a_live_request() -> None:
+    try:
+        module = import_module("jev_baseline")
+    except ModuleNotFoundError as error:
+        pytest.fail(f"Jev baseline runner is missing: {error}")
+    read_api_key = getattr(module, "read_api_key", None)
+    assert callable(read_api_key), "stdin key guard is missing"
+    assert read_api_key(io.StringIO("")) is None
