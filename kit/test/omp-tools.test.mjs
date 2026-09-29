@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp } from 'node:fs/promises';
+import { mkdtemp, readFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -34,18 +34,68 @@ test('installed omp gate refuses the measured RISK hit without executing', async
   assert.match(result.content[0].text, /verdict=refuse/);
 });
 
-test('installed omp rerank calls the measured top-1 Choice design', async () => {
+test('installed omp rerank refuses 1/21 and selects projected 2 or recorded 20 FiQA IDs', async () => {
   const { default: rerankTool } = await installedTool('jev-rerank.ts');
-  let seen;
+  const fiqa = JSON.parse((await readFile(new URL('../../work/rerank-scifact/candidates-fiqa-fits.jsonl', import.meta.url), 'utf8')).split('\n', 1)[0]);
+  const answer = JSON.parse(await readFile(new URL('./fixtures/rerank-fiqa-answer.json', import.meta.url), 'utf8'))[0].answers.choice;
+  const ids = fiqa.cands.map(([id]) => id);
+  assert.equal(fiqa.qid, '10034');
+  assert.equal(ids.length, 20);
+  assert.equal(answer.choice, '181942');
+  let calls = 0;
+  let offered = [];
   const tool = rerankTool(pi, async (options) => {
-    seen = options;
-    return { ok: true, choice: '1', confidence: 0.91, probabilities: { '0': 0.09, '1': 0.91 }, latencyMs: 3, model: 'fake' };
+    calls++;
+    assert.deepEqual(Object.keys(options.classes), offered.map((_, i) => String(i)));
+    return {
+      ok: true,
+      choice: String(offered.indexOf(answer.choice)),
+      confidence: answer.confidence,
+      probabilities: Object.fromEntries(offered.map((id, i) => [String(i), answer.probabilities[id]])),
+      latencyMs: 3,
+      model: 'fake',
+    };
   });
-  const result = await tool.execute('id', { query: 'q', passages: ['first', 'selected'] });
-  assert.deepEqual(Object.keys(seen.classes), ['0', '1']);
-  assert.equal(result.details.choice, '1');
+  for (const invalid of [ids.slice(0, 1), [...ids, ids[0]]]) {
+    const result = await tool.execute('id', { query: fiqa.qid, passages: invalid });
+    assert.equal(result.details.verdict, 'not_run');
+    assert.match(result.content[0].text, /NOT_RUN/);
+    assert.equal(calls, 0);
+  }
+  for (const valid of [[ids[0], answer.choice], ids]) {
+    offered = valid;
+    const result = await tool.execute('id', { query: fiqa.qid, passages: valid });
+    assert.equal(result.details.verdict, 'selected');
+    assert.equal(result.details.selectedIndex, valid.indexOf(answer.choice));
+    assert.equal(result.details.passage, answer.choice);
+    assert.match(result.content[0].text, /top1=true/);
+  }
+  assert.equal(calls, 2);
+});
+
+test('installed omp rerank sends distinct passage text and returns selected text verbatim', async () => {
+  const { default: rerankTool } = await installedTool('jev-rerank.ts');
+  const passages = ['Bonds mature in 2034.', '  Stocks fell 2%.\nSecond line stays.  '];
+  const tool = rerankTool(pi, async (options) => {
+    assert.equal(options.state.query, 'Which passage discusses stocks?');
+    assert.deepEqual(options.state.candidates, [
+      { id: '0', text: passages[0] },
+      { id: '1', text: passages[1] },
+    ]);
+    return {
+      ok: true,
+      choice: '1',
+      confidence: 0.9,
+      probabilities: { '0': 0.1, '1': 0.9 },
+      latencyMs: 3,
+      model: 'fake',
+    };
+  });
+  const result = await tool.execute('id', { query: 'Which passage discusses stocks?', passages });
+  assert.equal(result.details.verdict, 'selected');
   assert.equal(result.details.selectedIndex, 1);
-  assert.match(result.content[0].text, /top1=true/);
+  assert.equal(result.details.passage, passages[1]);
+  assert.equal(result.content[0].text.split('\n').slice(1).join('\n'), passages[1]);
 });
 
 test('installed omp claim check uses the SciFact 0.5 cut', async () => {
@@ -62,6 +112,20 @@ test('installed omp claim check uses the SciFact 0.5 cut', async () => {
   });
   assert.equal(result.details.label, 'supported');
   assert.equal(result.details.threshold, 0.5);
+});
+
+test('installed omp claim check refuses numeric claims without asking', async () => {
+  const { default: claimCheckTool } = await installedTool('jev-claim-check.ts');
+  let calls = 0;
+  const tool = claimCheckTool(pi, async () => {
+    calls++;
+    throw new Error('numeric claim reached the asker');
+  });
+  const result = await tool.execute('id', { claim: 'The result improved by 3%.', evidence: 'Evidence text.' });
+  assert.equal(result.details.verdict, 'refused');
+  assert.equal(result.details.reason, 'numeric-out-of-scope');
+  assert.equal(result.details.calledModel, false);
+  assert.equal(calls, 0);
 });
 
 test('installed omp classify calls the measured Banking77 Choice design', async () => {
