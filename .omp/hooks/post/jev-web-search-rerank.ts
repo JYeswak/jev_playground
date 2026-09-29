@@ -200,17 +200,18 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
       const currentDay = dayKey(now);
       if (currentDay !== day) { day = currentDay; calls = 0; paused = false; }
       const key = sessionHash(session);
-      if (isOpenEvent(event)) {
-        const active = pending.get(key);
-        if (!active || active.nextCalls >= MAX_NEXT_TOOL_CALLS) return undefined;
+      const active = pending.get(key);
+      if (active) {
         active.nextCalls += 1;
-        const opened = openHashes(event);
-        const selectedUrl = active.pickIndex === null ? undefined : active.items[active.pickIndex]?.url;
-        active.openedPick ||= selectedUrl !== undefined && opened.has(hashValue(selectedUrl));
-        active.openedRank1 ||= active.items[0]?.url !== undefined && opened.has(hashValue(active.items[0].url));
+        if (isOpenEvent(event)) {
+          const opened = openHashes(event);
+          const selectedUrl = active.pickIndex === null ? undefined : active.items[active.pickIndex]?.url;
+          active.openedPick ||= selectedUrl !== undefined && opened.has(hashValue(selectedUrl));
+          active.openedRank1 ||= active.items[0]?.url !== undefined && opened.has(hashValue(active.items[0].url));
+        }
         if (active.nextCalls >= MAX_NEXT_TOOL_CALLS) { write(loggedRow(active, now)); pending.delete(key); }
-        return undefined;
       }
+      if (isOpenEvent(event)) return undefined;
       const parsed = parseSearchResult(event);
       if (!parsed) return undefined;
       const base: Pending = {

@@ -44,6 +44,31 @@ test('shadow is fail-open and logs hashes plus opened pick/rank1 after ten calls
   assert.equal(JSON.stringify(rows[0]).includes('two.example'), false);
 });
 
+test('ten distinct ordinary tool results close the search window before an eleventh-call open', async () => {
+  const rows = [];
+  const handlers = new Map();
+  jevWebSearchRerankHook(
+    { on: (name, handler) => handlers.set(name, handler) },
+    {
+      approvedEventId: APPROVED_EVENT_ID, ask: answer(),
+      append: async (_path, line) => rows.push(JSON.parse(line)),
+      session: 'session-a', now: () => '2026-09-27T00:00:00.000Z',
+    },
+  );
+  await handlers.get('tool_result')(searchEvent());
+  for (let i = 0; i < 10; i += 1) {
+    const event = { toolCallId: `ordinary-${i}`, toolName: 'web_fetch', content: 'unrelated' };
+    await handlers.get('tool_result')(event);
+    await handlers.get('tool_execution_end')(event);
+  }
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].nextToolCalls, 10);
+  assert.equal(rows[0].openedPick, false);
+  assert.equal(rows[0].openedRank1, false);
+  await handlers.get('tool_result')({ toolCallId: 'eleventh-open', toolName: 'open_url', input: { url: 'https://two.example' } });
+  assert.equal(rows.length, 1);
+});
+
 test('shadow cap records no call and does not throw', async () => {
   let calls = 0;
   const rows = [];
