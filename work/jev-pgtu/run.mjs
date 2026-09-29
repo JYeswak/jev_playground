@@ -1,47 +1,153 @@
 #!/usr/bin/env node
-import {readFile, writeFile} from "node:fs/promises";
+import {spawn, spawnSync} from "node:child_process";
+import path from "node:path";
+import {fileURLToPath} from "node:url";
+import {ASSISTANT, CUT, MODEL, QUESTION} from "../jev-a9fv/seat.mjs";
 
-const ROOT = new URL("../..", import.meta.url);
-const STATES = new URL("var/agent-tmp/jev-pgtu/states.jsonl", ROOT);
-const ITEMS = new URL("work/jev-pgtu/items.jsonl", ROOT);
-const JEV_ROWS = new URL("work/jev-a9fv/live-rows.jsonl", ROOT);
-const OUT = new URL(process.env.JEV_PGTU_OUT ?? "var/agent-tmp/jev-pgtu/free-results.jsonl", ROOT);
-const RESET_AT = "2026-10-02T00:00:00Z";
-const MODEL = "dots-studio/dots-3-note-preview:free";
-const dry = process.env.JEV_PGTU_DRY_RUN === "1";
-const fake429 = process.env.JEV_PGTU_FAKE_429 === "1";
-const nowMs = Date.parse(process.env.JEV_PGTU_NOW ?? new Date().toISOString());
-const parseJsonl = async (url) => (await readFile(url, "utf8")).split("\n").filter(Boolean).map(JSON.parse);
-const states = await parseJsonl(STATES);
-const items = Object.fromEntries((await parseJsonl(ITEMS)).map((row) => [row.id, row]));
-const jevRows = Object.fromEntries((await parseJsonl(JEV_ROWS)).map((row) => [row.id, row]));
-const existing = await (async () => { try { return await parseJsonl(OUT); } catch { return []; } })();
-const seen = new Set(existing.map((row) => row.id));
-const pending = states.filter((row) => !seen.has(row.id));
-if (dry && nowMs < Date.parse(RESET_AT)) {
-  console.log(JSON.stringify({status: "NOT_RUN", selected: pending.length, sent: 0, resetAt: RESET_AT}));
-  process.exit(2);
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+const ADAPTER_PROJECT = path.join(ROOT, "upstream/typesafe-ai/system-one-adapter-python");
+const PYTHON_RUNNER = path.join(ROOT, "work/jev-pgtu/adapter_runner.py");
+const SDK_PROJECT = path.join(ROOT, "upstream/typesafe-ai/typesafe-sdk-python");
+const JEV_BASELINE_RUNNER = path.join(ROOT, "work/jev-pgtu/jev_baseline.py");
+const RESET_AT = Date.parse("2026-10-03T00:00:00Z");
+const args = process.argv.slice(2);
+const launch = args.length === 1 && args[0] === "--launch";
+const selftest = args.length === 1 && args[0] === "--selftest-429";
+const preflight = args.length === 0 || (args.length === 1 && args[0] === "--preflight-only");
+const jevRescorePreflight = args.length === 1 && args[0] === "--jev-rescore-preflight";
+const jevRescoreLive = args.length === 1 && args[0] === "--jev-rescore-live";
+
+function childEnvironment(allowOpenRouterKey) {
+  const env = {
+    ...process.env,
+    JEV_PGTU_ASSISTANT: ASSISTANT,
+    JEV_PGTU_QUESTION: QUESTION,
+    JEV_PGTU_JEV_MODEL: MODEL,
+    JEV_PGTU_CUT: String(CUT),
+  };
+  delete env.TYPESAFE_API_KEY;
+  delete env.JEV_API_KEY;
+  if (!allowOpenRouterKey) delete env.OPENROUTER_API_KEY;
+  return env;
 }
-if (!dry && nowMs < Date.parse(RESET_AT)) throw new Error(`NOT_RUN: launch blocked until ${RESET_AT}`);
-const key = process.env.OPENROUTER_API_KEY;
-if (!dry && !key) throw new Error("OPENROUTER_API_KEY is not configured");
-async function writeRows(rows) { if (!dry) await writeFile(OUT, `${rows.map((row) => JSON.stringify(row)).join("\n")}\n`); }
-async function askFree(state) {
-  if (dry && fake429) return {status: "not_run", reason: "openrouter-429-dry-run", retryAfter: RESET_AT};
-  if (dry) return {status: "scored", flag: false, probability: 0, usage: {prompt_tokens: 0, completion_tokens: 0}};
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {method: "POST", headers: {"content-type": "application/json", authorization: `Bearer ${key}`}, body: JSON.stringify({model: MODEL, temperature: 0, response_format: {type: "json_object"}, messages: [{role: "system", content: "Return only JSON: {\"flag\": boolean, \"probability\": number between 0 and 1}."}, {role: "user", content: JSON.stringify(state)}]})});
-  const body = await response.text();
-  if (response.status === 429) return {status: "not_run", reason: "openrouter-429-daily-quota", retryAfter: RESET_AT};
-  if (!response.ok) return {status: "refused", reason: `http-${response.status}`};
-  try { const parsed = JSON.parse(body); const answer = JSON.parse(parsed.choices?.[0]?.message?.content); if (typeof answer.flag !== "boolean" || typeof answer.probability !== "number" || answer.probability < 0 || answer.probability > 1) return {status: "refused", reason: "invalid-answer"}; return {status: "scored", ...answer, usage: parsed.usage ?? null}; } catch { return {status: "refused", reason: "non-json"}; }
+
+function uvArgs(mode) {
+  return [
+    "run",
+    "--project",
+    ADAPTER_PROJECT,
+    "--frozen",
+    "--no-sync",
+    "--extra",
+    "openai",
+    "python",
+    PYTHON_RUNNER,
+    mode,
+  ];
 }
-const rows = [...existing]; let stopped = false; let sent = 0;
-for (const row of pending) {
-  const jev = jevRows[row.id];
-  const result = stopped ? {status: "not_run", reason: "openrouter-429-daily-quota", retryAfter: RESET_AT} : await askFree(states.find((state) => state.id === row.id).state);
-  if (!stopped) sent += 1;
-  rows.push({id: row.id, set: items[row.id].set, position: items[row.id].position, inputSha256: items[row.id].inputSha256, jev: {flag: jev?.flag ?? null, probability: jev?.probability ?? null, model: "jev-1.13.0"}, free: result});
-  if (result.status === "not_run" && result.reason.startsWith("openrouter-429")) stopped = true;
-  await writeRows(rows);
+
+function runBuffered(mode) {
+  return spawnSync("uv", uvArgs(mode), {
+    cwd: ROOT,
+    env: childEnvironment(false),
+    encoding: "utf8",
+    maxBuffer: 4 * 1024 * 1024,
+  });
 }
-console.log(JSON.stringify({rows: rows.length, sent, stopped, model: MODEL}));
+
+function baselineEnvironment(allowTypeSafeKey) {
+  const env = {
+    ...process.env,
+    JEV_PGTU_ASSISTANT: ASSISTANT,
+    JEV_PGTU_QUESTION: QUESTION,
+    JEV_PGTU_JEV_MODEL: MODEL,
+    JEV_PGTU_CUT: String(CUT),
+  };
+  delete env.JEV_API_KEY;
+  delete env.OPENROUTER_API_KEY;
+  for (const key of Object.keys(env)) if (key.startsWith("INFISICAL_")) delete env[key];
+  if (!allowTypeSafeKey) delete env.TYPESAFE_API_KEY;
+  return env;
+}
+
+function jevBaselineArgs(mode) {
+  return ["run", "--project", SDK_PROJECT, "--frozen", "--no-sync", "python", JEV_BASELINE_RUNNER, mode];
+}
+
+function runJevBaseline(mode, allowTypeSafeKey) {
+  return spawnSync("uv", jevBaselineArgs(mode), {
+    cwd: ROOT,
+    env: baselineEnvironment(allowTypeSafeKey),
+    encoding: "utf8",
+    maxBuffer: 4 * 1024 * 1024,
+  });
+}
+
+function printResult(result) {
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+}
+
+if (jevRescorePreflight || jevRescoreLive) {
+  const result = runJevBaseline(jevRescoreLive ? "--live" : "--preflight-only", jevRescoreLive);
+  printResult(result);
+  process.exitCode = result.error ? 2 : (result.status ?? 2);
+} else if (selftest) {
+  const result = runBuffered("--selftest-429");
+  printResult(result);
+  process.exitCode = result.error ? 2 : (result.status ?? 2);
+} else if (preflight) {
+  const result = runBuffered("--preflight-only");
+  printResult(result);
+  process.exitCode = result.error ? 2 : (result.status ?? 2);
+} else if (launch) {
+  const approvalId = process.env.JEV_PGTU_APPROVAL_ID ?? "";
+  if (Date.now() < RESET_AT) {
+    process.stdout.write(JSON.stringify({status: "NOT_RUN", reason: "free-tier-window-not-open", launch_not_before: "2026-10-03T00:00:00Z"}) + "\n");
+    process.exitCode = 2;
+  } else if (!/^\d+$/.test(approvalId)) {
+    process.stdout.write(JSON.stringify({status: "NOT_RUN", reason: "pane1-approval-required"}) + "\n");
+    process.exitCode = 2;
+  } else {
+    const before = runBuffered("--preflight-only");
+    printResult(before);
+    let summary;
+    try {
+      summary = JSON.parse(before.stdout.trim().split(/\r?\n/).at(-1));
+    } catch {
+      summary = null;
+    }
+    if (before.error || before.status !== 0 || summary?.status !== "PREPARED") {
+      process.exitCode = before.error ? 2 : (before.status ?? 2);
+    } else if (!process.env.OPENROUTER_API_KEY) {
+      process.stdout.write(JSON.stringify({status: "NOT_RUN", reason: "openrouter-key-missing"}) + "\n");
+      process.exitCode = 2;
+    } else {
+      const child = spawn("uv", uvArgs("--launch"), {
+        cwd: ROOT,
+        env: childEnvironment(true),
+        stdio: "inherit",
+      });
+      let settled = false;
+      child.once("error", () => {
+        if (!settled) {
+          process.stdout.write(JSON.stringify({status: "NOT_RUN", reason: "uv-runner-unavailable"}) + "\n");
+          process.exitCode = 2;
+          settled = true;
+        }
+      });
+      child.once("close", (code) => {
+        if (!settled) {
+          process.exitCode = code ?? 2;
+          settled = true;
+        }
+      });
+      for (const signal of ["SIGINT", "SIGTERM"]) {
+        process.on(signal, () => child.kill(signal));
+      }
+    }
+  }
+} else {
+  process.stdout.write(JSON.stringify({status: "NOT_RUN", reason: "usage", usage: "node work/jev-pgtu/run.mjs [--preflight-only|--selftest-429|--launch|--jev-rescore-preflight|--jev-rescore-live]"}) + "\n");
+  process.exitCode = 2;
+}
