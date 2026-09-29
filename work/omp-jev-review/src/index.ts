@@ -154,13 +154,16 @@ export function reviewableDiff(diff: string): { diff: string; dropped: number } 
 export const BOUNDARY_COMMENT = 0.9;
 const MAX_PENDING = 100;
 
-/** A clean `git diff|show` argv, or null if the string is not safe to exec. */
+/** A clean `git diff|show` argv, or null if the string may execute helpers or write files. */
 export function gitArgv(command: string): string[] | null {
   if (/[;&|`$<>\\\n]/.test(command) || command.includes("$(")) return null;
   const tokens = command.trim().split(/\s+/).filter(Boolean);
   if (tokens.length < 2 || tokens[0] !== "git") return null;
-  if (tokens[1] !== "diff" && tokens[1] !== "show") return null;
-  return tokens;
+  if (!["diff", "show"].includes(tokens[1])) return null;
+  if (tokens.slice(2).some((token) =>
+    ["--ext-diff", "--textconv", "--no-index", "--output"].includes(token) ||
+    token.startsWith("--output="))) return null;
+  return [tokens[0], tokens[1], "--no-ext-diff", "--no-textconv", ...tokens.slice(2)];
 }
 
 type DiffRun = (argv: string[]) => Promise<string>;
@@ -198,8 +201,11 @@ type Host = {
   on: (event: string, handler: (event: any) => Promise<unknown>) => void;
   appendEntry: (type: string, data: Record<string, unknown>) => Promise<unknown>;
 };
-/** Production has no approved automatic Jev recipient/data-class policy. Only keyless tests inject synthetic admission. */
-export default function ompJevReview(pi: Host, admitSynthetic?: (event: ToolCallEvent) => boolean) {
+/** Production has no approved automatic Jev recipient or local git-execution policy. */
+export default function ompJevReview(
+  pi: Host,
+  authorizeSynthetic?: (event: ToolCallEvent) => { provider: boolean; localDiffExecution: boolean },
+) {
   /** toolCallId -> boundary score, for diffs that earned the advisory line. */
   const pending = new Map<string, number>();
 
@@ -260,7 +266,9 @@ export default function ompJevReview(pi: Host, admitSynthetic?: (event: ToolCall
         return undefined;
       };
 
-      if (toolCallId === null || !admitSynthetic?.(event)) return notApplicable("permission-denied");
+      const approval = authorizeSynthetic?.(event);
+      if (toolCallId === null || approval?.provider !== true) return notApplicable("permission-denied");
+      if (approval.localDiffExecution !== true) return notApplicable("local-diff-denied");
 
       const loaded = await readDiff(command);
       // A command the extension will not re-run (a pipe, `&&`, a redirect) is out of scope, not a

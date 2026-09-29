@@ -1,13 +1,15 @@
 # omp-jev-review
 
-Advisory diff review scorer for omp. Watches `bash` tool calls, and when one is a
-`git diff` / `git show` on our own code, asks Jev systemOne two questions about the change and
-logs the answer. When the boundary answer is at least 0.9 it appends one advisory line to that
-call's git output. It never blocks and has no merge authority.
+Advisory diff review scorer for omp. It can evaluate `git diff` / `git show` against two
+Jev questions and append a boundary advisory to the same call's output; it has no merge
+authority. The installed `.omp/extensions/jev-review.ts` currently **observes only**:
+it hashes a matching command and records `permission-denied`, without reading a diff,
+installing an Infisical key provider, or contacting Jev. This is not a live review signal.
 
-In this repo it loads in every omp session from `.omp/extensions/jev-review.ts`, which fetches the
-key from Infisical into the session's memory when the environment has none. Without any key, rows
-record `review_error`, never a pass.
+The keyless test harness alone injects separate provider and local-diff-execution approval.
+Even under that synthetic approval, a re-run rejects shell operators, external diff/textconv,
+`--no-index` and `--output`, and forces `--no-ext-diff --no-textconv`. This only constrains
+the reviewed command; it does not certify other automatic Jev routes or loaded sessions.
 
 ## Why this one calls Jev and our other two do not
 
@@ -53,11 +55,12 @@ infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
 
 ## What the measurement does NOT cover
 
-The questions are scored on diff **text**: the extension runs the same `git diff|show` itself
-and sends the body (vendored sections removed, first 12,000 characters), never the command
-string. The 686-commit draw scored 125 real code diffs this way
-(`docs/demos/upstream-repro/omp-jev-review-draw-20260923.md`). None of them has a label, so no
-accuracy is claimed on real traffic.
+Historical measurements scored diff **text**: an authorized extension re-ran
+`git diff|show` and sent the body (vendored sections removed, first 12,000 characters), never
+the command string. The 686-commit draw scored 125 real code diffs this way
+(`docs/demos/upstream-repro/omp-jev-review-draw-20260923.md`). None has an independent
+label, so no accuracy is claimed on real traffic. The current installed extension does
+not send those diffs.
 
 Seven hand-built diffs, labelled by whoever wrote them, bound nothing about real review traffic.
 
@@ -65,9 +68,9 @@ Seven hand-built diffs, labelled by whoever wrote them, bound nothing about real
 
 | kind | meaning |
 |---|---|
-| `review_scored` | Jev answered; `probabilities` and `comment` (whether the advisory line was queued) present |
-| `review_not_applicable` | `applicable:false`, zero Jev calls; `reason` is `empty-diff`, `vendored-diff`, `thin-diff`, `non-code-diff` or `not-a-plain-diff-command` (a pipe, `&&`, `;` or redirect: the extension never re-runs such a command) |
-| `review_error` | git failed, key unset, transport failed, or a 200 with no probabilities |
+| `review_scored` | Synthetic approved path only: Jev answered; `probabilities` and `comment` (whether the advisory line was queued) present |
+| `review_not_applicable` | `applicable:false`, zero Jev calls; `permission-denied` is the installed default. `local-diff-denied` means provider approval lacked separate subprocess approval; other reasons include `empty-diff`, `vendored-diff`, `thin-diff`, `non-code-diff` and `not-a-plain-diff-command` (compound commands or disallowed git options). |
+| `review_error` | In an authorized path, git failed, key unset, transport failed, or a 200 with no probabilities |
 
 There is no "clean" state. A failed call is never recorded as a pass — a crashed
 classifier that logs a pass is indistinguishable from a real clean result.
@@ -92,7 +95,7 @@ both ways: `docs/demos/upstream-repro/omp-jev-review-advisory-20260925.md`.
 ## Test
 
 ```bash
-node --experimental-strip-types --test test/review.test.mjs   # 21/21
+npm test   # keyless extension suite, run from work/omp-jev-review
 ```
 
 ## Real commits: `behaviour` does not beat its own constant

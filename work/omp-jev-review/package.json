@@ -8,5 +8,5 @@
   "omp": { "extensions": ["./src/index.ts"] },
   "pi": { "extensions": ["./src/index.ts"] },
   "files": ["src", "README.md"],
-  "scripts": { "test": "node --test test/" }
+  "scripts": { "test": "node --test test/*.test.mjs" }
 }

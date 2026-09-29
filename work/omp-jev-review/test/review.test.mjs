@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import ompJevReview, { setDiffRunner, isThinDiff, touchesCodeFile, isVendoredPath, reviewableDiff, BOUNDARY_COMMENT } from '../src/index.ts';
 import { requireSdkInstalled } from '../../sdk/require-installed.mjs';
+import jevReviewExtension from '../../../.omp/extensions/jev-review.ts';
+import { keyProviderInstalled, setKeyProvider } from '../../../kit/src/client.ts';
 
 requireSdkInstalled();
 
@@ -41,6 +43,20 @@ const answersFetch = (answers) => {
   });
   return async () => mk();
 };
+const syntheticApproval = () => ({ provider: true, localDiffExecution: true });
+
+test('project extension loads without installing a global key provider before admission', async () => {
+  setKeyProvider(undefined);
+  try {
+    const h = host();
+    jevReviewExtension({ ...h.pi, zod: { object: () => ({}) }, registerTool: () => {} });
+    assert.equal(keyProviderInstalled(), false);
+    await h.fire(diffCall('git diff --cached'));
+    assert.equal(decisions(h)[0].data.reason, 'permission-denied');
+  } finally {
+    setKeyProvider(undefined);
+  }
+});
 
 test('unapproved automatic diff is recorded locally without re-running git or calling provider', async () => {
   let gitRuns = 0;
@@ -66,9 +82,64 @@ test('unapproved automatic diff is recorded locally without re-running git or ca
   }
 });
 
+test('provider approval alone cannot spawn a second local git command', async () => {
+  const realFetch = globalThis.fetch;
+  let gitRuns = 0;
+  let providerCalls = 0;
+  setDiffRunner(async () => { gitRuns += 1; return SUBSTANTIAL; });
+  globalThis.fetch = async () => { providerCalls += 1; throw new Error('unexpected provider request'); };
+  try {
+    const h = host();
+    ompJevReview(h.pi, () => ({ provider: true, localDiffExecution: false }));
+    await h.fire(diffCall('git diff --cached'));
+    assert.equal(gitRuns, 0);
+    assert.equal(providerCalls, 0);
+    assert.equal(decisions(h)[0].data.reason, 'local-diff-denied');
+  } finally {
+    setDiffRunner(null);
+    globalThis.fetch = realFetch;
+  }
+});
+
+test('approved diff execution refuses external helpers, no-index and output files before spawning', async () => {
+  let gitRuns = 0;
+  setDiffRunner(async () => { gitRuns += 1; return SUBSTANTIAL; });
+  try {
+    const h = host();
+    ompJevReview(h.pi, () => ({ provider: true, localDiffExecution: true }));
+    for (const command of [
+      'git diff --ext-diff',
+      'git show --textconv HEAD',
+      'git diff --no-index /etc/hosts ./file',
+      'git diff --output=outside.patch',
+    ]) {
+      await h.fire(diffCall(command));
+    }
+    assert.equal(gitRuns, 0);
+    assert.equal(decisions(h).length, 4);
+    assert.equal(decisions(h).every((row) => row.data.reason === 'not-a-plain-diff-command'), true);
+  } finally {
+    setDiffRunner(null);
+  }
+});
+
+test('locally approved ordinary diff explicitly disables external helpers', async () => {
+  let argv;
+  setDiffRunner(async (args) => { argv = args; return ''; });
+  try {
+    const h = host();
+    ompJevReview(h.pi, () => ({ provider: true, localDiffExecution: true }));
+    await h.fire(diffCall('git diff --cached'));
+    assert.deepEqual(argv, ['git', 'diff', '--no-ext-diff', '--no-textconv', '--cached']);
+    assert.equal(decisions(h)[0].data.reason, 'empty-diff');
+  } finally {
+    setDiffRunner(null);
+  }
+});
+
 test('ignores every tool call that is not a git diff or show', async () => {
   const h = host();
-  ompJevReview(h.pi, () => true);
+  ompJevReview(h.pi, syntheticApproval);
   for (const event of [
     diffCall('echo hello'),
     { toolName: 'read', toolCallId: 'x', input: { command: 'git diff' } },
@@ -83,7 +154,7 @@ test('an unset API key records review_error, never a scored pass', async () => {
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff HEAD~1'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
@@ -103,7 +174,7 @@ test('a throwing transport records review_error and never breaks the session', a
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     assert.equal(await h.fire(diffCall('git show abc123')), undefined);
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
@@ -123,7 +194,7 @@ test('a real score is recorded as review_scored with its probabilities', async (
   globalThis.fetch = answersFetch({ behaviour: { noul: 0.82 }, boundary: { noul: 0.18 } });
   try {
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff --cached'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_scored');
@@ -149,7 +220,7 @@ test('a 200 with no probabilities is an error, not a silent pass', async () => {
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
@@ -163,7 +234,7 @@ test('a 200 with no probabilities is an error, not a silent pass', async () => {
 
 test('a host whose appendEntry throws still returns undefined', async () => {
   const h = host();
-  ompJevReview({ on: h.pi.on, appendEntry: async () => { throw new Error('log sink down'); } }, () => true);
+  ompJevReview({ on: h.pi.on, appendEntry: async () => { throw new Error('log sink down'); } }, syntheticApproval);
   assert.equal(await h.fire(diffCall('git diff')), undefined);
 });
 
@@ -188,7 +259,7 @@ test('asks exactly the two measured questions and no more', async () => {
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff'));
     assert.equal(calls.length, 1, 'one scoring call, no gate call');
     assert.deepEqual(Object.keys(calls[0].questions).sort(), ['behaviour', 'boundary']);
@@ -210,7 +281,7 @@ test('an empty diff records applicable:false and does not call Jev', async () =>
   try {
     stubDiff('   \n');
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_not_applicable');
@@ -237,7 +308,7 @@ test('a 10k-line vendored diff records applicable:false and never calls Jev', as
   try {
     stubDiff(VENDORED_10K + 'diff --git a/package-lock.json b/package-lock.json\n@@ -1 +1 @@\n+{}\n');
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_not_applicable');
@@ -263,7 +334,7 @@ test('vendored sections are cut before scoring; our own code in the same diff st
   try {
     stubDiff(VENDORED_10K + SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_scored');
@@ -297,7 +368,7 @@ async function scoredWithBoundary(boundary, id = 'tc-1') {
   try {
     stubDiff(SUBSTANTIAL);
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire({ toolName: 'bash', toolCallId: id, input: { command: 'git show HEAD' } });
     return h;
   } finally {
@@ -340,7 +411,7 @@ test('a compound or piped command is not executed, not scored, and recorded not-
   try {
     setDiffRunner(async () => { ran += 1; return 'should not run'; });
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff; echo pwned'));
     await h.fire(diffCall('git add -- a.py && git diff --cached --check'));
     await h.fire(diffCall('git show abc:work/x.py | python3 -'));
@@ -363,7 +434,7 @@ test('a plain git diff that fails to run is still review_error, never not-applic
   setDiffRunner(async () => { throw new Error('fatal: bad revision'); });
   try {
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git show deadbeef'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_error');
@@ -396,7 +467,7 @@ test('a thin diff records applicable:false and never calls Jev', async () => {
   try {
     stubDiff('diff --git a/a.ts b/a.ts\n+one line\n');
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_not_applicable');
@@ -422,7 +493,7 @@ test('a docs-only diff records applicable:false and never calls Jev', async () =
         Array.from({ length: 12 }, (_, i) => `+doc line ${i}`).join('\n') + '\n',
     );
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_not_applicable');
@@ -444,7 +515,7 @@ test('planted negative: a >100-line code diff still scores', async () => {
   try {
     stubDiff(BIG);
     const h = host();
-    ompJevReview(h.pi, () => true);
+    ompJevReview(h.pi, syntheticApproval);
     await h.fire(diffCall('git diff --stat'));
     const [row] = decisions(h);
     assert.equal(row.data.kind, 'review_scored');
