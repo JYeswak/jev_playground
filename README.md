@@ -6,7 +6,7 @@ This repository turns measured Jev behavior into small, runnable tools. The full
 
 ## Quickstart
 
-**Publication boundary (2026-09-30):** public GitHub `main` was observed at `7fecd59dcc84502d265c9d2acac411337edba806`, a descendant of reviewed commit `4b0a588b3e12d2ca9d86b2dda3658f670a047022`. Fresh public checkouts at that exact SHA ran `npm ci --prefix kit` (exit 0), six documented fake verbs (6/6 exit 0), keyless doctor (`NOT_RUN`, exit 2), and a real no-key Choice (`unconfigured`, exit 2); exact commands and outputs are recorded in `EVAL.md` §jev-p1 and its scratch receipt. This is offline keyless CLI acceptance, not a live Jev answer, omp activation, or a complete P1 installer/gate handoff. Check `git remote get-url origin` and `git rev-parse HEAD` in your clone; a different public HEAD needs its own same-revision readback. `git cat-file -e` proves object presence, not public-branch inclusion.
+**Publication boundary (2026-09-30):** public GitHub `main` was observed at `b3e1cd89a5ba1e09ec318471cb325481590231f4` by a fresh `git ls-remote` check. The P9 keyless acceptance recorded in `EVAL.md` §jev-p9 ran against that public SHA: 14 README command rows (12 exit 0; doctor and real no-key Choice exit 2/`NOT_RUN`). At this observation, the corrected local README/LEDGER had not been published; a public same-HEAD readback of those revisions is required for P9 closure. This is offline keyless CLI acceptance, not a live Jev answer, omp activation, or a complete P1 installer/gate handoff. Check `git remote get-url origin` and `git rev-parse HEAD` in your clone; a different public HEAD needs its own same-revision readback. `git cat-file -e` proves object presence, not public-branch inclusion.
 
 From a fresh public clone:
 
