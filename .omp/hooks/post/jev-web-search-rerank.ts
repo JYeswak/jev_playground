@@ -19,6 +19,7 @@ export type SearchEvent = {
   content?: unknown;
   isError?: unknown;
 };
+type HookContext = { sessionManager?: { getSessionId?: () => string | undefined } };
 type Ask = NonNullable<RerankOptions["ask"]>;
 type Append = (path: string, line: string) => Promise<void>;
 
@@ -74,10 +75,6 @@ async function defaultAppend(path: string, line: string): Promise<void> {
 
 export function hashValue(value: string): string {
   return createHash("sha256").update(value).digest("hex");
-}
-
-function sessionHash(session: string): string {
-  return hashValue(session || process.env.OMP_SESSION_ID || "unknown");
 }
 
 function dayKey(now: () => string): string {
@@ -192,14 +189,17 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
     void Promise.resolve(append(path, JSON.stringify(row))).catch(() => undefined);
   };
 
-  const handler = async (event: SearchEvent, session = deps.session ?? "unknown"): Promise<undefined> => {
+  const handler = async (event: SearchEvent, ctx?: HookContext): Promise<undefined> => {
     try {
+      const session = ctx?.sessionManager?.getSessionId?.() ?? deps.session;
+      if (!session) return undefined;
+      const key = hashValue(session);
       const eventId = typeof event.toolCallId === "string" ? event.toolCallId : undefined;
-      if (eventId && seenEvents.has(eventId)) return undefined;
-      if (eventId) { seenEvents.add(eventId); setTimeout(() => seenEvents.delete(eventId), 60_000); }
+      const dedupKey = eventId ? `${key}:${eventId}` : undefined;
+      if (dedupKey && seenEvents.has(dedupKey)) return undefined;
+      if (dedupKey) { seenEvents.add(dedupKey); setTimeout(() => seenEvents.delete(dedupKey), 60_000); }
       const currentDay = dayKey(now);
       if (currentDay !== day) { day = currentDay; calls = 0; paused = false; }
-      const key = sessionHash(session);
       const active = pending.get(key);
       if (active) {
         active.nextCalls += 1;
@@ -214,6 +214,10 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
       if (isOpenEvent(event)) return undefined;
       const parsed = parseSearchResult(event);
       if (!parsed) return undefined;
+      if (active && pending.get(key) === active) {
+        write(loggedRow(active, now));
+        pending.delete(key);
+      }
       const base: Pending = {
         sessionHash: key,
         queryHash: hashValue(parsed.query),
@@ -266,7 +270,7 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
 }
 
 export default function jevWebSearchRerankHook(
-  host: { on: (event: string, handler: (event: SearchEvent) => Promise<undefined>) => void },
+  host: { on: (event: string, handler: (event: SearchEvent, ctx?: HookContext) => Promise<undefined>) => void },
   deps: ShadowDeps = {},
 ): void {
   const handler = makeWebSearchRerankHandler(deps);
