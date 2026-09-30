@@ -154,6 +154,17 @@ def run_selftest(expect_path: Path) -> int:
     assert_checkout_provenance("git remote get-url origin", REPO_URL + "\n", source_sha)
     assert_checkout_provenance("git rev-parse HEAD", source_sha + "\n", source_sha)
     print("SELFTEST PASS: wrong origin and SHA refused; current provenance accepted")
+    try:
+        assert_source_origin(
+            "https://github.com/JYeswak/not-the-jev-playground.git"
+        )  # observed same-SHA scratch clone with a changed origin
+    except SystemExit as exc:
+        if "source checkout origin mismatch" not in str(exc):
+            raise
+    else:
+        raise AssertionError("wrong-origin public source was accepted")
+    assert_source_origin(REPO_URL)
+    print("SELFTEST PASS: wrong-origin same-SHA source refused")
     if redact(source_sha + "\n", source_sha) != source_sha + "\n":
         raise AssertionError(
             "known public Git SHA was redacted before provenance validation"
@@ -256,6 +267,12 @@ def assert_checkout_cwd(active_cwd: Path, checkout: Path) -> None:
             f"README checkout cwd mismatch: {active_cwd} is not {checkout}; "
             "run cd jev_playground before checkout commands"
         )
+
+
+def assert_source_origin(origin: str) -> None:
+    """A source checkout must name the public repository even if its SHA matches."""
+    if origin != REPO_URL:
+        raise SystemExit("source checkout origin mismatch; refusing to grade README")
 
 
 def assert_checkout_provenance(command: str, output: str, source_sha: str) -> None:
@@ -630,6 +647,22 @@ def main() -> int:
         if not clone.is_dir():
             raise SystemExit(f"--source is not a directory: {clone}")
         source_description = f"local checkout {clone}"
+    source_root = subprocess.check_output(
+        ["git", "-C", str(clone), "rev-parse", "--show-toplevel"],
+        text=True,
+        timeout=args.timeout,
+    ).strip()
+    assert_checkout_cwd(Path(source_root), clone)
+    source_origin = subprocess.run(
+        ["git", "-C", str(clone), "remote", "get-url", "origin"],
+        capture_output=True,
+        text=True,
+        timeout=args.timeout,
+        check=False,
+    )
+    assert_source_origin(
+        source_origin.stdout.strip() if source_origin.returncode == 0 else ""
+    )
     sha = subprocess.check_output(
         ["git", "-C", str(clone), "rev-parse", "HEAD"], text=True, timeout=args.timeout
     ).strip()
