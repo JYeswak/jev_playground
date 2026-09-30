@@ -6,13 +6,15 @@ This repository turns measured Jev behavior into small, runnable tools. The full
 
 ## Quickstart
 
-**Publication boundary (2026-09-28):** the corrected kit quickstart is present in this local branch at reviewed commit `4b0a588b3e12d2ca9d86b2dda3658f670a047022`, but the public GitHub default branch observed at `7bf7961` does not yet include it. The commands below were offline-verified on a fresh **local clone**, not the published checkout. In a fresh public clone, record `git remote get-url origin` and `git rev-parse HEAD`: the origin must be `https://github.com/JYeswak/jev_playground.git` and HEAD must equal that reviewed commit before the local receipt applies to that checkout. `git cat-file -e` proves only that an object exists, not that the public default-branch HEAD contains it. If URL or HEAD differs, stop; a newer descendant needs its own exact-command review at that HEAD. Do not treat the local receipt as public release evidence.
+**Tested public baseline:** A fresh clone from `https://github.com/JYeswak/jev_playground.git` resolved to HEAD `7fecd59dcc84502d265c9d2acac411337edba806` during this quickstart rerun. The command evidence below applies to that source revision, not to later revisions. From any clone, compare `git remote get-url origin` and `git rev-parse HEAD`; a different HEAD needs the same-revision replay before these results apply.
 
-From a fresh clone once that revision is published:
+From a fresh public clone of the tested baseline:
 
 ```bash
 git clone https://github.com/JYeswak/jev_playground.git
 cd jev_playground
+git remote get-url origin
+git rev-parse HEAD
 npm ci --prefix kit
 npx --prefix kit --no-install jev doctor --robot
 # Expected without a key: NOT_RUN and exit 2.
@@ -87,7 +89,7 @@ The table summarizes results whose receipts and bars are in [`docs/LEDGER.md`](d
 | SciFact claim verification | Jev 361/400 (90.2%, Brier 0.0709) vs Haiku 351/400 (87.8%, Brier 0.1002) | Noul | `work/noul-scifact/score.py` |
 | Replicated web-screen | Jev+local 68/78 own attacks; 135/256 deepset; Hermes own 15/40 fresh S-Labs; 0/1,437 clean withheld; pinned jev-1.13.0 | Noul / web-screen | `work/hermes-webscreen-repro/RECEIPT.md; work/omp-hermes-screen/hermes-own-live-receipt-20260926.json; kerpopule/hermes-jev-skills@cf9e84c` |
 | MiniWoB v3 held-out | v3 342/625 vs v1 321/625 (McNemar p=0.02203; spend $0.458563) | Computer-use | `work/miniwob-jev/live-20260925/receipt.json` |
-| BEIR NFCorpus rerank | Jev top-1 70.9% vs BM25 58.1% (McNemar 45 vs 15, p=0.00013); free LLM 66.7% vs Jev 70.9% (McNemar 18 vs 28, p=0.184); nDCG free LLM 0.434 vs Jev 0.448; latency p50 25.9s; $0 by unchanged usage; 15+1 retries disclosed | Choice rerank / free incumbent | `work/rerank-scifact/receipt-nfcorpus-v2.json; work/rerank-scifact/receipt-jev-97bq.json` |
+| BEIR NFCorpus rerank | Jev Choice top-1, N=234, `jev-1.13.0`: 70.9% vs BM25 58.1% (45 vs 15, p=0.00013; +0.1282 meets the +0.10 top-1 bar); nDCG@10 0.4211 to 0.4480 (+0.0269), below the preregistered +0.05 bar, so the joint bar FAILS. Free incumbent: top-1 66.7% vs Jev 70.9% (18 vs 28, p=0.184); nDCG@10 0.4342 vs Jev 0.4480; p50 25.9s; free-comparator spend $0 by unchanged usage; 15+1 retries disclosed | Choice top-1 / free incumbent | `work/rerank-scifact/receipt-nfcorpus-v2.json; work/rerank-scifact/receipt-jev-97bq.json` |
 | BEIR FiQA rerank confirmation | Jev top-1 76.2% vs BM25 39.3% (McNemar 129 vs 10, p=1.65e-27); nDCG@10 delta +0.157; confirmatory top-1 bar passed; $0.119 | Choice rerank | `work/rerank-scifact/receipt-fiqa-mkex.json` |
 | OMP judge usage | 1,711 calls, $0.3547; find 1,595, auto-thinking 113, judge_batch 2, judge 1 | OMP judge usage | `EVAL.md@b74704c9` |
 | Jev gate question (blind fleet sample) | Jev catch 90/93 vs existing 92/93; precision 90/230 (39.1%) vs 92/359 (25.6%); harmless flagged 140/465 vs 267/465; McNemar b=128 c=1 p=3.82e-37; stratified sample rates, not fleet rates; jev-1.13.0 $0.018826; 52 pre-bar calls disclosed ($0.001774) | Noul / gate | `work/jev-uncd/final-receipt.json` |
