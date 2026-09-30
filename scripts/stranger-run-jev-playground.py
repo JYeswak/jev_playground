@@ -122,10 +122,8 @@ def run_selftest(expect_path: Path) -> int:
     if "96.1" not in missing:
         raise AssertionError("planted wrong metric was accepted")
     print("SELFTEST PASS: altered Banking77 metric refused")
-    checkout = (
-        Path(__file__).resolve().parents[1] / "var" / "agent-tmp" / "readme-clone"
-    )
-    # A nested scratch directory inherits this repo's Git root; it is not the README clone.
+    repo = Path(__file__).resolve().parents[1]
+    checkout = repo / "var" / "agent-tmp" / "readme-clone"
     try:
         assert_checkout_cwd(checkout.parent / "outside", checkout)
     except SystemExit as exc:
@@ -133,8 +131,16 @@ def run_selftest(expect_path: Path) -> int:
             raise
     else:
         raise AssertionError("wrong-cwd README command was accepted")
-    assert_checkout_cwd(checkout, checkout)
-    print("SELFTEST PASS: wrong-cwd Git ancestry refused; checkout cwd accepted")
+    # Real nested directory: lexical equality holds but Git finds the parent repo.
+    try:
+        assert_checkout_cwd(repo / "scripts", repo / "scripts")
+    except SystemExit as exc:
+        if "README checkout cwd mismatch" not in str(exc):
+            raise
+    else:
+        raise AssertionError("nested README cwd inherited parent Git root")
+    assert_checkout_cwd(repo, repo)
+    print("SELFTEST PASS: parent Git ancestry refused; checkout Git root accepted")
     source_sha = subprocess.check_output(
         ["git", "-C", str(Path(__file__).resolve().parents[1]), "rev-parse", "HEAD"],
         text=True,
@@ -266,6 +272,21 @@ def assert_checkout_cwd(active_cwd: Path, checkout: Path) -> None:
         raise SystemExit(
             f"README checkout cwd mismatch: {active_cwd} is not {checkout}; "
             "run cd jev_playground before checkout commands"
+        )
+    git_root = subprocess.run(
+        ["git", "-C", str(active_cwd), "rev-parse", "--show-toplevel"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+        timeout=10,
+        check=False,
+    )
+    if (
+        git_root.returncode != 0
+        or Path(git_root.stdout.strip()).resolve() != checkout.resolve()
+    ):
+        raise SystemExit(
+            f"README checkout cwd mismatch: {active_cwd} is not a Git root at {checkout}"
         )
 
 
