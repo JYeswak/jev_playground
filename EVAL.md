@@ -2990,3 +2990,69 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - Exact offline check: `npm test` in `work/omp-jev-review` passed **26/26**, including provider-only denial, installed-wrapper denial and unsafe-command refusal. A separate keyless Node host smoke imported `.omp/extensions/jev-review.ts`, fired one `tool_call` for `git diff --cached`, and observed `permission-denied`, **0 provider calls**, **2 local rows**; no real git re-execution or provider call was made. `git diff --check` on scoped changed paths exited 0; changed-file literal secret scan (`sk-|Bearer [A-Za-z0-9]|tskey`) found no match. `ripwire . --quality-delta --scope=work/omp-jev-review/src/index.ts,.omp/extensions/jev-review.ts,work/omp-jev-review/test/review.test.mjs` reported 0 scoped gating regressions, 5 minor; 5 out-of-scope gating regressions were excluded, not graded.
 - `ubs .omp/extensions/jev-review.ts work/omp-jev-review/src/index.ts` exited 0 (0 critical, 2 async-host-listener heuristic warnings); including `test/review.test.mjs` exited 1 (13 critical heuristic hits on non-secret `undefined`/literal comparisons, 6 warnings, 258 info). No scanner green is claimed for all changed files. There is no dedicated `work/omp-jev-review/tsconfig.json`. Post-commit, `node kit/node_modules/typescript/bin/tsc --noEmit --strict --allowJs --allowImportingTsExtensions --module nodenext --moduleResolution nodenext --target es2022 --typeRoots kit/node_modules/@types --skipLibCheck .omp/extensions/jev-review.ts` exited **0**; without `--allowJs` the standalone command cannot resolve the existing `register.mjs` type. No prior-art pin moved.
 - **Boundary / NO-CLAIM:** one fake-host denial is L0, not a real omp L3 trip. Already-loaded session revisions, other project/profile extensions, auto hooks, judge model roles, scheduled canary, U06 raw-result/provider-output redaction and U07 first-hop ownership remain untested here. No Jev answer, model/accuracy assertion or consumer outcome; live requests **0**, incremental spend **$0**. Keep P15 in progress; prove fresh and loaded-session positive/negative paths before lifting the plan's halt.
+
+## jev-p1-stranger-baseline-przc published-main handoff (2026-09-30 UTC) [offline / P1 BLOCKED]
+
+- **Source and revision:** a fresh public `git clone --branch main --single-branch https://github.com/JYeswak/jev_playground.git` with the documented HTTP user agent exited 0 at `7fecd59dcc84502d265c9d2acac411337edba806`, origin and branch checked, porcelain clean (`var/agent-tmp/p1-current.51372.0f8d96eb/checkout`). This published SHA descends from the reviewed `4b0a588b`; the older README assertion that publication had not happened was corrected locally, not pushed.
+- **Public CLI, no key:** a separate clean checkout at the same SHA (`var/agent-tmp/p1-cli-p2`) ran `env -u TYPESAFE_API_KEY -u JEV_API_KEY npm ci --prefix kit` (exit 0), all six documented `--fake` Choice/verify/score/classify/gate/rerank commands (6/6 exit 0), `npx --prefix kit --no-install jev doctor --robot` (exit 2, `NOT_RUN`, `jev-1.13.0`), and the real no-key Choice command (exit 2, `unconfigured`, no provider call). Exact argv, exits and stdout/stderr are in `var/agent-tmp/p1-cli-p2-evidence/receipt.txt` and adjacent files. Fake results are tool-plumbing results, not model accuracy.
+- **Refusal and routing, no network:** a clean locally cloned checkout pinned to the same published SHA ran `npm ci --offline --prefix work/sdk` (exit 0) and the inline `node --input-type=module -e` probe printed in `var/agent-tmp/p1-refusal-p3-20260930-0338-receipt.md` (exit 0). Injected HTTP 401 and malformed Noul each refused; the downstream `verifyClaim` action count stayed zero, global fetch calls stayed zero, two digit-bearing claims made zero injected asks, and a qualitative claim made one injected ask. Synthetic responses and claims only; the full command source is in that scratch receipt, not a committed executable.
+- **Installer, same published SHA:** in the clean pane-5 checkout, keyless `node kit/bin/jev.mjs omp install --dir <disposable-positive> --robot` exited 0/`READY`; the 27 manifest file hashes matched, installed gate/flag/screen imports exited 0, and no `.omp/config.yml` was created. A planted unmanaged `jev-gate.ts` collision exited 1 with its pre/post SHA-256 identical (`47ed21c6…44b57033e`), and a legacy manifest marker for `files.config.yml` exited 1 with manifest bytes unchanged (`5b9704c0…6a7437fde`). These checks did **not** exercise preservation of an existing host extension list: the scratch `.omp/config.yml` fixture write was refused by kit-guard B7. No bypass, no silent equivalence between an absent config and byte-preservation.
+- **Stage-15 diagnosis and correction:** a focused gate run before the correction reported 430 PASS, 1 FAIL, 3 SKIP; the four older expected-string misses now passed, while `rollout-key-infisical` exposed a false claim that the disabled review extension fetched an Infisical key. The source `.omp/extensions/jev-review.ts:1-11` has no such call; `.omp/tools/jev-rerank.ts:22-23` separately calls `useInfisicalKey` without an injected asker. After correcting `docs/LEDGER.md:250,252` and the five affected enforced rows in `foundation/kit/claims.tsv`, `python3 foundation/kit/claim-units.py docs/LEDGER.md foundation/kit/claims.tsv` counted **119 covered of 120 candidates**; `foundation/kit/claim-coverage.floor` was raised from 118/119 to **119/120**, not weakened. The subsequent `bash foundation/gates.d/15-kit-claim.sh` exited 0: **431 PASS, 0 FAIL, 3 SKIP**, coverage 119/120 at the new floor. A planted false review-key row against the same extension source failed with exit 1 while the truthful disabled-scorer row passed (`var/agent-tmp/p1-claim-red.11143/claims.tsv`). The stage-15 owner was notified; the aggregate/selftest outcomes below predate this final floor raise and do not certify a current full aggregate.
+- **Same-checkout refusal proof:** the original injected probe was run again **without installing or editing anything** in the pane-5 *public-origin installer checkout* `var/agent-tmp/p1-install-p5`, still clean at `7fecd59dcc84502d265c9d2acac411337edba806`. `env -u TYPESAFE_API_KEY -u JEV_API_KEY node --input-type=module -e <source in var/agent-tmp/p1-refusal-p3-20260930-0338-receipt.md>` exited 0: injected 401 (`http`) and malformed Noul (`no-answers`) refused, downstream actions 0, global fetches 0, two numeric claims made 0 asker calls, qualitative claim made 1. The exact argv, source hash `bc4986f7aaad5c7848730e487084e51a06f12659d8ad5e6907d064fcd0b43022`, stdout and clean-before/after status are in `var/agent-tmp/p1-install-p5-same-checkout-refusal-20260930.md`. This is the same checkout that proved the installer collision, not just the same revision.
+
+  Executed `-e` source (from the published checkout root, with both real key variables unset):
+
+  ```js
+  import assert from 'node:assert/strict';
+  import { askJev, SYSTEMONE_ENDPOINT } from './kit/src/client.ts';
+  import { verifyClaim } from './kit/src/verify.ts';
+  import jevClaimCheckTool from './.omp/tools/jev-claim-check.ts';
+  let globalFetchCalls = 0;
+  const savedFetch = globalThis.fetch;
+  globalThis.fetch = async () => { globalFetchCalls++; throw new Error('global fetch forbidden'); };
+  let http401Calls = 0;
+  let malformedCalls = 0;
+  let downstreamActions = 0;
+  const response = (body, status = 200) => new Response(body, { status, headers: { 'content-type': 'application/json' } });
+  const http401Fetch = async (url) => { http401Calls++; assert.equal(url, SYSTEMONE_ENDPOINT); return response(JSON.stringify({ error: 'synthetic unauthorized' }), 401); };
+  const malformedFetch = async (url) => { malformedCalls++; assert.equal(url, SYSTEMONE_ENDPOINT); return response(JSON.stringify({ model: 'jev-1.13.0', answers: { value: { noul: 1.5 } } })); };
+  const base = { state: { claim: 'The record establishes a general conclusion', evidence: 'synthetic evidence' }, questions: { value: 'Does the evidence support the claim?' }, apiKey: 'synthetic-test-key', model: 'jev-1.13.0', timeoutMs: 1000 };
+  async function assertNoAction(fetchImpl) {
+    try {
+      const result = await verifyClaim({ claim: 'The record establishes a general conclusion', evidence: 'synthetic evidence', ask: (options) => askJev({ ...options, apiKey: 'synthetic-test-key', model: 'jev-1.13.0', timeoutMs: 1000, fetchImpl }) });
+      downstreamActions++;
+      return result;
+    } catch { return null; }
+  }
+  try {
+    const unauthorized = await askJev({ ...base, fetchImpl: http401Fetch });
+    assert.equal(unauthorized.ok, false);
+    assert.equal(unauthorized.reason, 'http');
+    assert.match(unauthorized.error, /401/);
+    assert.equal(http401Calls, 1);
+    assert.equal(await assertNoAction(http401Fetch), null);
+    assert.equal(downstreamActions, 0);
+    const malformed = await askJev({ ...base, fetchImpl: malformedFetch });
+    assert.equal(malformed.ok, false);
+    assert.equal(malformedCalls, 1);
+    assert.equal(await assertNoAction(malformedFetch), null);
+    assert.equal(downstreamActions, 0);
+    let injectedAsks = 0;
+    const tool = jevClaimCheckTool({ zod: { object: (shape) => shape, string: () => ({ min: () => ({}) }) } }, async () => { injectedAsks++; return { ok: true, scores: { value: 0.8 }, latencyMs: 1, model: 'synthetic' }; });
+    for (const claim of ['The rate equals 42%.', 'The ratio is 3/5.']) {
+      const refused = await tool.execute('synthetic-id', { claim, evidence: 'synthetic evidence' });
+      assert.equal(refused.details.reason, 'numeric-out-of-scope');
+    }
+    assert.equal(injectedAsks, 0);
+    const qualitative = await tool.execute('synthetic-id', { claim: 'The record establishes a general conclusion.', evidence: 'synthetic evidence' });
+    assert.equal(qualitative.details.verdict, 'supported');
+    assert.equal(injectedAsks, 1);
+    assert.equal(globalFetchCalls, 0);
+    console.log(JSON.stringify({ result: 'PASS', modelPinned: 'jev-1.13.0', http401: { injectedFetches: http401Calls, refusal: unauthorized.reason }, malformed: { injectedFetches: malformedCalls, refusal: malformed.reason }, downstreamActions, numericClaims: 2, injectedAsksForNumeric: 0, qualitativeClaims: 1, injectedAsksForQualitative: 1, globalFetchCalls }));
+  } finally { globalThis.fetch = savedFetch; }
+  ```
+
+- **Existing-host-config acceptance:** `env -u TYPESAFE_API_KEY -u JEV_API_KEY TMPDIR=/Users/josh/Developer/jev/var/agent-tmp/p1-install-suite.37332/ node --test kit/test/install.test.mjs` in that public-origin checkout exited 0, **4/4 pass**. The pre-existing test asserts host `.omp/config.yml` byte identity plus `extensionActivation=MANUAL_REQUIRED`, unmanaged collision preservation, and older managed-config refusal without overwrite (`kit/test/install.test.mjs:58-92`). Its owned temp fixtures remain under the stated TMPDIR; the earlier B7 refusal applied to a manual tool write of a scratch fixture, not this normal test run. No `KIT_GATE_EDIT` or guard bypass.
+- **No-SDK cold clone boundary:** before `npm ci` in the other clean public clone, `TYPESAFE_API_KEY=synthetic-not-a-real-key node kit/bin/jev.mjs doctor --robot` exited 1 with `ERR_MODULE_NOT_FOUND` for `kit/dist/client.js`; it did **not** report READY, but it did not produce a typed `NOT_RUN` either. README orders `npm ci --prefix kit` before doctor; the no-key installed path above is the typed refusal. No real key or provider call was involved.
+- **Aggregate after targeted repair:** with real key variables unset and `TMPDIR=/Users/josh/Developer/jev/var/agent-tmp/p1-claim-red.11143`, `bash foundation/gates.sh` ran 2026-09-30 04:20–04:25 UTC and exited 1: **16 PASS, stage 80 RED** (`scripts/selftest-consumer-check.sh`: 11 ok/1 failed; `scripts/selftest-test-registry-hook.sh`: references absent `githooks/pre-commit-test-registry.sh`). This is an unrelated live gate defect, not a stage-15 miss or aggregate GREEN. The distinct `bash foundation/gates.sh --selftest` run at 04:25–04:41 UTC exited 0: **17 stage selftests PASS / ALL GREEN**, including stage 15's planted RED. `foundation/gate-outcomes.tsv:5962-5994` records per-stage exit codes at `d6b3e335`. Joshua selected “Authorize test scratch cleanup” and then “Confirm and run” after the exact commands and affected test-only paths were listed; those two commands ran with their scripts' temporary-file cleanup, including internally invoked `rm -rf` on self-owned test fixtures. No other deletion was performed by this pane.
+- **Boundary / next wake:** P1's bounded keyless stranger acceptance has a same-checkout negative and installer readback, but its updated README/ledger/registry are still uncommitted in a shared worktree, and the ordinary aggregate is **RED at stage 80**. Do not close P1 or unblock P9 until the exact owned hunks are saved without sweeping sibling edits and the stage-80 RED has an owner/wake; do not call this §4 validated. No live Jev/API call, paid comparator, recipient authorization, loaded omp L3, provider safety, or consumer benefit is established. Incremental TypeSafe spend **$0**.

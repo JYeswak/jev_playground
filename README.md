@@ -6,9 +6,9 @@ This repository turns measured Jev behavior into small, runnable tools. The full
 
 ## Quickstart
 
-**Publication boundary (2026-09-28):** the corrected kit quickstart is present in this local branch at reviewed commit `4b0a588b3e12d2ca9d86b2dda3658f670a047022`, but the public GitHub default branch observed at `7bf7961` does not yet include it. The commands below were offline-verified on a fresh **local clone**, not the published checkout. In a fresh public clone, record `git remote get-url origin` and `git rev-parse HEAD`: the origin must be `https://github.com/JYeswak/jev_playground.git` and HEAD must equal that reviewed commit before the local receipt applies to that checkout. `git cat-file -e` proves only that an object exists, not that the public default-branch HEAD contains it. If URL or HEAD differs, stop; a newer descendant needs its own exact-command review at that HEAD. Do not treat the local receipt as public release evidence.
+**Publication boundary (2026-09-30):** public GitHub `main` was observed at `7fecd59dcc84502d265c9d2acac411337edba806`, a descendant of reviewed commit `4b0a588b3e12d2ca9d86b2dda3658f670a047022`. Fresh public checkouts at that exact SHA ran `npm ci --prefix kit` (exit 0), six documented fake verbs (6/6 exit 0), keyless doctor (`NOT_RUN`, exit 2), and a real no-key Choice (`unconfigured`, exit 2); exact commands and outputs are recorded in `EVAL.md` §jev-p1 and its scratch receipt. This is offline keyless CLI acceptance, not a live Jev answer, omp activation, or a complete P1 installer/gate handoff. Check `git remote get-url origin` and `git rev-parse HEAD` in your clone; a different public HEAD needs its own same-revision readback. `git cat-file -e` proves object presence, not public-branch inclusion.
 
-From a fresh clone once that revision is published:
+From a fresh public clone:
 
 ```bash
 git clone https://github.com/JYeswak/jev_playground.git
@@ -63,7 +63,7 @@ if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --pr
 
 The pinned model is `jev-1.13.0`.
 
-The separate live smoke in [`work/kit-live-receipt-20260927.json`](work/kit-live-receipt-20260927.json) records **four calls** (`classify`, `rerank`, `verify`, `score`) to `jev-1.13.0` on 2026-09-27, with 3,472 input tokens and an estimated $0.000145824 input charge. This is an existing one-call-per-verb smoke, not a result reproduced by the offline commands above; the fake answer is not a live answer. No claim about real omp extension loading, organic benefit, or accuracy follows from copying files or from those four calls. The foundation aggregate gate remains RED after its reported stage-15 failures; see `EVAL.md` §jev-p1.
+The separate live smoke in [`work/kit-live-receipt-20260927.json`](work/kit-live-receipt-20260927.json) records **four calls** (`classify`, `rerank`, `verify`, `score`) to `jev-1.13.0` on 2026-09-27, with 3,472 input tokens and an estimated $0.000145824 input charge. This is an existing one-call-per-verb smoke, not a result reproduced by the offline commands above; the fake answer is not a live answer. No claim about real omp extension loading, organic benefit, or accuracy follows from copying files or from those four calls. The corrected local stage-15 gate passed (431/431 enforced); on 2026-09-30 the full foundation aggregate remained **RED at stage 80** (consumer-check 11/12 and a selftest referencing a missing pre-commit hook), while the aggregate `--selftest` passed every stage. This is not §4 validation; see `EVAL.md` §jev-p1.
 
 ## What Jev answers
 
