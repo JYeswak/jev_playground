@@ -122,6 +122,45 @@ def run_selftest(expect_path: Path) -> int:
     if "96.1" not in missing:
         raise AssertionError("planted wrong metric was accepted")
     print("SELFTEST PASS: altered Banking77 metric refused")
+    checkout = (
+        Path(__file__).resolve().parents[1] / "var" / "agent-tmp" / "readme-clone"
+    )
+    # A nested scratch directory inherits this repo's Git root; it is not the README clone.
+    try:
+        assert_checkout_cwd(checkout.parent / "outside", checkout)
+    except SystemExit as exc:
+        if "README checkout cwd mismatch" not in str(exc):
+            raise
+    else:
+        raise AssertionError("wrong-cwd README command was accepted")
+    assert_checkout_cwd(checkout, checkout)
+    print("SELFTEST PASS: wrong-cwd Git ancestry refused; checkout cwd accepted")
+    source_sha = subprocess.check_output(
+        ["git", "-C", str(Path(__file__).resolve().parents[1]), "rev-parse", "HEAD"],
+        text=True,
+        timeout=10,
+    ).strip()
+    for command, output in (
+        ("git remote get-url origin", REPO_URL.replace(".git", "-wrong.git")),
+        ("git rev-parse HEAD", "0" * 40 if source_sha != "0" * 40 else "1" * 40),
+    ):
+        try:
+            assert_checkout_provenance(command, output, source_sha)
+        except SystemExit as exc:
+            if "README checkout provenance mismatch" not in str(exc):
+                raise
+        else:
+            raise AssertionError(f"wrong README provenance accepted: {command}")
+    assert_checkout_provenance("git remote get-url origin", REPO_URL + "\n", source_sha)
+    assert_checkout_provenance("git rev-parse HEAD", source_sha + "\n", source_sha)
+    print("SELFTEST PASS: wrong origin and SHA refused; current provenance accepted")
+    if redact(source_sha + "\n", source_sha) != source_sha + "\n":
+        raise AssertionError(
+            "known public Git SHA was redacted before provenance validation"
+        )
+    if redact(source_sha + "\n") != "<redacted>\n":
+        raise AssertionError("unapproved 40-character output escaped redaction")
+    print("SELFTEST PASS: only the known checkout SHA survives redaction")
     return 0
 
 
@@ -210,6 +249,25 @@ def readme_commands(readme: str) -> list[dict[str, object]]:
     return list(merged.values())
 
 
+def assert_checkout_cwd(active_cwd: Path, checkout: Path) -> None:
+    """Do not let Git discover this repository above the stranger's working directory."""
+    if active_cwd.resolve() != checkout.resolve():
+        raise SystemExit(
+            f"README checkout cwd mismatch: {active_cwd} is not {checkout}; "
+            "run cd jev_playground before checkout commands"
+        )
+
+
+def assert_checkout_provenance(command: str, output: str, source_sha: str) -> None:
+    """A zero-exit Git command must describe the actual published checkout."""
+    expected = {
+        "git remote get-url origin": REPO_URL,
+        "git rev-parse HEAD": source_sha,
+    }.get(command)
+    if expected is not None and output.strip() != expected:
+        raise SystemExit(f"README checkout provenance mismatch: {command}")
+
+
 def cited_numbers(item: dict[str, object], output: str) -> tuple[list[str], list[str]]:
     cited: list[str] = []
     for context in item["contexts"]:
@@ -260,12 +318,19 @@ def make_clean_env(home: Path, bindir: Path) -> dict[str, str]:
     }
 
 
-def redact(output: str) -> str:
+def redact(output: str, known_sha: str | None = None) -> str:
+    if known_sha is not None and output.strip() == known_sha:
+        return output
     return re.sub(r"(?i)(?:bearer\s+)?[A-Za-z0-9_-]{40,}", "<redacted>", output)
 
 
 def run_command(
-    command: str, cwd: Path, env: dict[str, str], log_path: Path, timeout: int
+    command: str,
+    cwd: Path,
+    env: dict[str, str],
+    log_path: Path,
+    timeout: int,
+    known_sha: str | None = None,
 ) -> dict[str, object]:
     started = time.monotonic()
     try:
@@ -285,7 +350,7 @@ def run_command(
             "utf-8", "replace"
         ) + f"\nTIMEOUT after {timeout}s\n"
         return_code = 124
-    output = redact(output)
+    output = redact(output, known_sha)
     log_path.write_text(output)
     lines = [line.strip() for line in output.splitlines() if line.strip()]
     error_line = ""
@@ -606,9 +671,18 @@ def main() -> int:
             failure_class = "TEMPLATE"
             classification_note = "placeholder command listed but not executed"
         else:
+            if command not in {f"git clone {REPO_URL}", "cd jev_playground"}:
+                assert_checkout_cwd(active_cwd, outside / "jev_playground")
             result = run_command(
-                command, active_cwd, env, logs / f"{index:03d}.log", args.timeout
+                command,
+                active_cwd,
+                env,
+                logs / f"{index:03d}.log",
+                args.timeout,
+                sha if command == "git rev-parse HEAD" else None,
             )
+            if result["rc"] == 0:
+                assert_checkout_provenance(command, str(result["output"]), sha)
             if command == f"git clone {REPO_URL}" and result["rc"] == 0:
                 pasted_clone = outside / "jev_playground"
                 pasted_sha = subprocess.check_output(
