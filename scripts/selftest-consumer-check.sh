@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # selftest-consumer-check.sh — acceptance arms for consumer-check.
-# ARM1 is the refusal arm: 'ee preflight' must refuse (exit 1) AND name the
-# two live ee callers (orient + journal). A tool that cannot tell those apart
-# is not the tool. ARM1b is the anti-false-zero arm (CHALLENGE-P2 2026-09-20):
+# ARM1 refuses 'ee preflight', names the real orient caller, and does not
+# mistake the failure-journal's separate capture binary for an ee caller.
+# The capture binary must independently have a non-test consumer. ARM1b is
+# the anti-false-zero arm (CHALLENGE-P2 2026-09-20):
 # 'ee orient' must EXIT 0 — the args-array form (EE_BIN + COMMAND_ARGS spread)
 # fooled v1 into ZERO, the dangerous direction (retires live wiring).
 # ARM2 is the live arm: 'dcg' must exit 0 naming dcg-tool-bridge.ts.
@@ -40,8 +41,16 @@ case "$out1" in
   *) note FAIL "missing ambient-start/orient"; fail=$((fail+1));;
 esac
 case "$out1" in
-  *ee-failure-journal.ts*journal*) note ok "names failure-journal + journal"; pass=$((pass+1));;
-  *) note FAIL "missing failure-journal/journal"; fail=$((fail+1));;
+  *ee-failure-journal.ts*) note FAIL "capture-only failure-journal misclassified as ee caller"; fail=$((fail+1));;
+  *) note ok "capture-only failure-journal is not an ee caller"; pass=$((pass+1));;
+esac
+
+out_capture=$(./scripts/consumer-check.sh zestgraph-ee-capture 2>&1); rc_capture=$?
+if [ "$rc_capture" -eq 0 ]; then note ok "capture binary has a live consumer"; pass=$((pass+1));
+else note FAIL "capture binary exit=$rc_capture, want 0"; fail=$((fail+1)); fi
+case "$out_capture" in
+  *CONSUMERS*ee-failure-journal.ts*CAPTURE_BIN*) note ok "failure-journal capture path classified as consumer"; pass=$((pass+1));;
+  *) note FAIL "failure-journal capture consumer missing"; fail=$((fail+1));;
 esac
 
 out1b=""; rc1b=""
