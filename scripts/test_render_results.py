@@ -4,8 +4,10 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -27,29 +29,37 @@ class RenderResultsTest(unittest.TestCase):
         planted = readme.replace("2467/3080", "2466/3080", 1)
         self.assertNotEqual(render_results.render_readme_text(planted, ROOT), planted)
 
-    def test_generated_table_has_receipt_backed_surfaces(self):
-        table = render_results.render_table(ROOT)
-        for surface in (
-            "Banking77 intent classification",
-            "SST-5 sentiment scoring",
-            "SciFact claim verification",
-            "MiniWoB v3 held-out",
-            "OMP judge usage",
-            "Jev gate question (blind fleet sample)",
-            "Jev held-out fleet confirmation",
-            "Replicated web-screen",
+    def test_nfcorpus_failed_joint_bar_discloses_both_payers(self):
+        receipt = json.loads(
+            (ROOT / "work/rerank-scifact/receipt-nfcorpus-v2.json").read_text()
+        )
+        result, _ = render_results.nfcorpus_rerank(ROOT)
+        self.assertFalse(receipt["bar"]["pass"])
+        self.assertIn("joint bar FAIL:", result)
+        self.assertIn("nDCG@10 +0.027 missed +0.05", result)
+        self.assertIn("free LLM p50 25.9s, $0 by unchanged usage", result)
+        self.assertIn(
+            f"Jev eligible run ${receipt['usage']['jev_input_cost_usd']:.4f} "
+            f"(${receipt['spend']['total_input_cost_usd']:.4f} including discarded run)",
+            result,
+        )
+
+    def test_nfcorpus_inconsistent_pass_refused(self):
+        original_read_text = Path.read_text
+
+        def planted_read_text(path, *args, **kwargs):
+            text = original_read_text(path, *args, **kwargs)
+            if path.name == "receipt-nfcorpus-v2.json":
+                receipt = json.loads(text)
+                receipt["bar"]["pass"] = True
+                return json.dumps(receipt)
+            return text
+
+        with (
+            patch.object(Path, "read_text", planted_read_text),
+            self.assertRaisesRegex(ValueError, "bar disagrees"),
         ):
-            self.assertIn(surface, table)
-        self.assertIn("1,711 calls", table)
-        self.assertIn("find 1,595", table)
-        self.assertIn("68/78", table)
-        self.assertIn("kerpopule/hermes-jev-skills@cf9e84c", table)
-        self.assertIn("stratified sample rates", table)
-        self.assertIn("pre-bar calls disclosed", table)
-        self.assertIn("weighted precision 67.3%", table)
-        self.assertIn("47 harm rows only", table)
-        self.assertNotIn("BEIR SciFact reranking", table)
-        self.assertNotIn("35.62%", table)
+            render_results.nfcorpus_rerank(ROOT)
 
 
 if __name__ == "__main__":

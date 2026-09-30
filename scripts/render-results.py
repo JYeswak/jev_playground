@@ -2,10 +2,10 @@
 """Render the README measured-results table from committed receipts and scorers."""
 
 from __future__ import annotations
-import re
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -126,18 +126,29 @@ def omp_judge_usage(root: Path) -> tuple[str, str]:
         capture_output=True,
         text=True,
     )
+    section = re.search(
+        r"^## jev-xy67[^\n]*\((\d{4}-\d{2}-\d{2})\)[^\n]*\n(.*?)(?=^## |\Z)",
+        result.stdout,
+        re.MULTILINE | re.DOTALL,
+    )
+    if not section:
+        raise ValueError("EVAL b74704c9 has no dated OMP judge usage section")
+    date, body = section.groups()
     match = re.search(
         r"([\d,]+) calls, \$([\d.]+) total\. By `purpose`: `find` ([\d,]+).*?"
         r"`auto-thinking` ([\d,]+).*?`judge_batch` ([\d,]+), `judge` ([\d,]+)",
-        result.stdout,
+        body,
         re.DOTALL,
     )
     if not match:
         raise ValueError("EVAL b74704c9 has no OMP judge usage receipt")
     calls, dollars, find, auto_thinking, judge_batch, judge = match.groups()
     return (
-        f"{calls} calls, ${dollars}; find {find}, auto-thinking {auto_thinking}, "
-        f"judge_batch {judge_batch}, judge {judge}",
+        (
+            f"{date} local session-file census (files modified in prior 24 h): "
+            f"{calls} calls, ${dollars}; find {find}, auto-thinking {auto_thinking}, "
+            f"judge_batch {judge_batch}, judge {judge}; not a current daily rate"
+        ),
         "OMP judge usage",
     )
 
@@ -149,13 +160,26 @@ def nfcorpus_rerank(root: Path) -> tuple[str, str]:
     incumbent = json.loads(
         (root / "work/rerank-scifact/receipt-jev-97bq.json").read_text()
     )
+    bar = receipt["bar"]
+    top1_met = receipt["top1_delta"] >= bar["top1_delta_at_least"]
+    ndcg_met = receipt["ndcg10_delta"] >= bar["ndcg10_delta_at_least"]
+    if (top1_met and ndcg_met) != bar["pass"]:
+        raise ValueError("NFCorpus receipt bar disagrees with measured deltas")
     return (
-        f"Jev top-1 {receipt['jev_top1']:.1%} vs BM25 {receipt['baseline_top1']:.1%} "
-        f"(McNemar {receipt['mcnemar']['jev_only_wins']} vs {receipt['mcnemar']['bm25_only_wins']}, p={receipt['mcnemar']['two_sided_exact_p']:.5f}); "
-        f"free LLM {incumbent['incumbent']['top1']:.1%} vs Jev {incumbent['jev']['top1']:.1%} "
-        f"(McNemar {incumbent['mcnemar_top1']['incumbent_only_wins']} vs {incumbent['mcnemar_top1']['jev_only_wins']}, p={incumbent['reconciliation']['mcnemar_exact_two_sided_p']:.3f}); "
-        f"nDCG free LLM {incumbent['incumbent']['ndcg10']:.3f} vs Jev {incumbent['jev']['ndcg10']:.3f}; "
-        f"latency p50 {incumbent['latency_ms']['p50']/1000:.1f}s; $0 by unchanged usage; 15+1 retries disclosed",
+        (
+            f"Jev top-1 {receipt['jev_top1']:.1%} vs BM25 {receipt['baseline_top1']:.1%} "
+            f"(McNemar {receipt['mcnemar']['jev_only_wins']} vs {receipt['mcnemar']['bm25_only_wins']}, p={receipt['mcnemar']['two_sided_exact_p']:.5f}); "
+            f"free LLM {incumbent['incumbent']['top1']:.1%} vs Jev {incumbent['jev']['top1']:.1%} "
+            f"(McNemar {incumbent['mcnemar_top1']['incumbent_only_wins']} vs {incumbent['mcnemar_top1']['jev_only_wins']}, p={incumbent['reconciliation']['mcnemar_exact_two_sided_p']:.3f}); "
+            f"nDCG free LLM {incumbent['incumbent']['ndcg10']:.3f} vs Jev {incumbent['jev']['ndcg10']:.3f}; "
+            f"joint bar {'PASS' if bar['pass'] else 'FAIL'}: top-1 +{receipt['top1_delta']:.3f} "
+            f"{'met' if top1_met else 'missed'} +{bar['top1_delta_at_least']:.2f}, "
+            f"nDCG@10 +{receipt['ndcg10_delta']:.3f} {'met' if ndcg_met else 'missed'} "
+            f"+{bar['ndcg10_delta_at_least']:.2f}; "
+            f"free LLM p50 {incumbent['latency_ms']['p50'] / 1000:.1f}s, $0 by unchanged usage; "
+            f"Jev eligible run ${receipt['usage']['jev_input_cost_usd']:.4f} "
+            f"(${receipt['spend']['total_input_cost_usd']:.4f} including discarded run); 15+1 free LLM retries disclosed"
+        ),
         "Choice rerank / free incumbent",
     )
 

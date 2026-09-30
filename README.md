@@ -75,9 +75,9 @@ The separate live smoke in [`work/kit-live-receipt-20260927.json`](work/kit-live
 
 Every request is validated before code acts: the answer must name an offered option, probabilities must be finite and normalized, and low confidence must take the preregistered safe path.
 
-## Measured wins
+## Measured results
 
-The table summarizes results whose receipts and bars are in [`docs/LEDGER.md`](docs/LEDGER.md). Values are not claims about an unpinned `jev-latest`; they are tied to `jev-1.13.0`, the named corpus, and the cited receipt.
+The table summarizes measured results, including a failed NFCorpus joint bar, whose receipts and bars are in [`docs/LEDGER.md`](docs/LEDGER.md). Values are not claims about an unpinned `jev-latest`; they are tied to `jev-1.13.0`, the named corpus, and the cited receipt.
 
 <!-- BEGIN GENERATED: measured-wins -->
 | Surface | Result | Shape | Evidence |
@@ -87,9 +87,9 @@ The table summarizes results whose receipts and bars are in [`docs/LEDGER.md`](d
 | SciFact claim verification | Jev 361/400 (90.2%, Brier 0.0709) vs Haiku 351/400 (87.8%, Brier 0.1002) | Noul | `work/noul-scifact/score.py` |
 | Replicated web-screen | Jev+local 68/78 own attacks; 135/256 deepset; Hermes own 15/40 fresh S-Labs; 0/1,437 clean withheld; pinned jev-1.13.0 | Noul / web-screen | `work/hermes-webscreen-repro/RECEIPT.md; work/omp-hermes-screen/hermes-own-live-receipt-20260926.json; kerpopule/hermes-jev-skills@cf9e84c` |
 | MiniWoB v3 held-out | v3 342/625 vs v1 321/625 (McNemar p=0.02203; spend $0.458563) | Computer-use | `work/miniwob-jev/live-20260925/receipt.json` |
-| BEIR NFCorpus rerank | Jev top-1 70.9% vs BM25 58.1% (McNemar 45 vs 15, p=0.00013); free LLM 66.7% vs Jev 70.9% (McNemar 18 vs 28, p=0.184); nDCG free LLM 0.434 vs Jev 0.448; latency p50 25.9s; $0 by unchanged usage; 15+1 retries disclosed | Choice rerank / free incumbent | `work/rerank-scifact/receipt-nfcorpus-v2.json; work/rerank-scifact/receipt-jev-97bq.json` |
+| BEIR NFCorpus rerank | Jev top-1 70.9% vs BM25 58.1% (McNemar 45 vs 15, p=0.00013); free LLM 66.7% vs Jev 70.9% (McNemar 18 vs 28, p=0.184); nDCG free LLM 0.434 vs Jev 0.448; joint bar FAIL: top-1 +0.128 met +0.10, nDCG@10 +0.027 missed +0.05; free LLM p50 25.9s, $0 by unchanged usage; Jev eligible run $0.0882 ($0.3354 including discarded run); 15+1 free LLM retries disclosed | Choice rerank / free incumbent | `work/rerank-scifact/receipt-nfcorpus-v2.json; work/rerank-scifact/receipt-jev-97bq.json` |
 | BEIR FiQA rerank confirmation | Jev top-1 76.2% vs BM25 39.3% (McNemar 129 vs 10, p=1.65e-27); nDCG@10 delta +0.157; confirmatory top-1 bar passed; $0.119 | Choice rerank | `work/rerank-scifact/receipt-fiqa-mkex.json` |
-| OMP judge usage | 1,711 calls, $0.3547; find 1,595, auto-thinking 113, judge_batch 2, judge 1 | OMP judge usage | `EVAL.md@b74704c9` |
+| OMP judge usage | 2026-09-25 local session-file census (files modified in prior 24 h): 1,711 calls, $0.3547; find 1,595, auto-thinking 113, judge_batch 2, judge 1; not a current daily rate | OMP judge usage | `EVAL.md@b74704c9` |
 | Jev gate question (blind fleet sample) | Jev catch 90/93 vs existing 92/93; precision 90/230 (39.1%) vs 92/359 (25.6%); harmless flagged 140/465 vs 267/465; McNemar b=128 c=1 p=3.82e-37; stratified sample rates, not fleet rates; jev-1.13.0 $0.018826; 52 pre-bar calls disclosed ($0.001774) | Noul / gate | `work/jev-uncd/final-receipt.json` |
 | Coding-agent tool-result injection seat | Clean real tool results falsely flagged 5/300 (Wilson 0.7%-3.8%); markerless planted injections caught 268/300 (Wilson 85.3%-92.3%; marked version 269/300); jev-1.13.0 $0.029779; Jev only, no LLM comparator; one public attack corpus planted at three fixed positions; replaces the news-persona seat's 175/300 false flags | Noul / coding-agent tool-result injection | `work/jev-a9fv/receipt.json; work/jev-29s4/receipt.json` |
 | Jev held-out fleet confirmation | Jev caught 47/47 vs 47/47; sample precision 47/57 (82.5%) vs 47/196 (24.0%); weighted precision 67.3% vs 24.0%; weighted harmless flagged 1.4% vs 9.1%; McNemar b=141 c=2 p=1.8e-39; strata 196/1,488; 47 harm rows only (Wilson lower 0.924, reported not gated); jev-1.13.0 $0.0134 | Noul / gate | `work/jev-1lim/final-receipt.json` |
@@ -97,7 +97,7 @@ The table summarizes results whose receipts and bars are in [`docs/LEDGER.md`](d
 
 The two gate rows compare Jev with an earlier **Jev-derived** flag, not a joined deterministic incumbent. `work/jev-1miz/final-receipt.json` records `dcg_joined_rows=0` and `NOT_COMPARABLE`; 67.3% versus 24.0% is a stratified within-Jev comparison, not an organic or deterministic-baseline win.
 
-Jev is already making approximately 1,711 decisions per day inside the omp fleet; the daily path and receipt boundary are documented in the ledger and the cited EVAL entry.
+A 2026-09-25 local census found 1,711 native omp Jev calls in session files modified in the prior 24 hours. It does not establish today's rate or the outcomes of those decisions.
 
 ## Where it runs
 
@@ -105,8 +105,6 @@ Jev is already making approximately 1,711 decisions per day inside the omp fleet
 - `foundation/` — keyless calibration and gate receipts.
 - `demos/` — one-command examples using recorded answers first.
 - `.omp/` — the integration seams: tools, hooks, and observation surfaces.
-
-The next product step is `jev-kit`: a small TypeScript package with shared preflights, answer validation, fake-asker tests, receipts, `jev doctor`, and a robot JSON contract. It will replace duplicated caller-side guards without changing the official SDK wire contract.
 
 ## Read next
 
