@@ -14,7 +14,9 @@ import re
 import shutil
 import subprocess
 import time
+from datetime import datetime, timezone
 from pathlib import Path
+from unittest import mock
 
 EXPECTATION_HEADER = "command\tclass\tcause"
 EXPECTATION_CLASSES = {
@@ -178,6 +180,24 @@ def run_selftest(expect_path: Path) -> int:
     if redact(source_sha + "\n") != "<redacted>\n":
         raise AssertionError("unapproved 40-character output escaped redaction")
     print("SELFTEST PASS: only the known checkout SHA survives redaction")
+    rendered: list[str] = []
+    before = datetime.now(timezone.utc).date()
+    with (
+        mock.patch.object(Path, "mkdir"),
+        mock.patch.object(
+            Path, "write_text", side_effect=lambda text: rendered.append(text)
+        ),
+    ):
+        render_receipt(
+            Path("in-memory.md"), [], source_sha, "node", "python", "uv", 30, "selftest"
+        )
+    after = datetime.now(timezone.utc).date()
+    if len(rendered) != 1 or rendered[0].splitlines()[0] not in {
+        f"# README stranger run ({before})",
+        f"# README stranger run ({after})",
+    }:
+        raise AssertionError("receipt header does not record the actual UTC run date")
+    print("SELFTEST PASS: receipt header records run date in UTC")
     return 0
 
 
@@ -539,7 +559,7 @@ def render_receipt(
     command_rows = [row for row in rows if row["source"] != "post"]
     failures = [row for row in rows if row["rc"] not in (0, "TEMPLATE")]
     lines = [
-        "# README stranger run (2026-09-25)",
+        f"# README stranger run ({datetime.now(timezone.utc).date()})",
         "",
         f"- Source: {source_description}.",
         "",
