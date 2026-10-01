@@ -17,6 +17,8 @@
 import { liveAsker } from "../../work/nev-injection/src/live-flag.ts";
 import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 import { ASSISTANT, QUESTION, CUT as SEAT_CUT, MODEL as SEAT_MODEL } from "../../work/jev-a9fv/seat.mjs";
+/** Re-exported so the seat-guard suite pins the certified cut at its source. */
+export { SEAT_CUT };
 export function screen(probability) {
   if (typeof probability !== "number" || !Number.isFinite(probability)) {
     return { verdict: "review", text: "REVIEW: malformed score, never verified. Human glance required." };
