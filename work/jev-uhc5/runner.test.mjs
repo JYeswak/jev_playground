@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {call, cohortCoverage, cohortVerdict, pairedCorrectness} from './run.mjs';
+import {call, cohortCoverage, cohortVerdict, isTop1Hit, pairedCorrectness} from './run.mjs';
 
 const model = {name: 'nimble:latest', digest: 'test-digest', ollamaVersion: '0.35.0'};
 
@@ -50,12 +50,18 @@ test('an incomplete paired cohort is NOT_RUN, never scored on a partial slice', 
   assert.deepEqual(coverage.models['nimble:latest'].missingIds, [items[1].id]);
   assert.equal(coverage.models['tev1:latest'].answered, 2);
 });
-test('only complete supported cohorts receive an exploratory bar verdict', () => {
-  assert.equal(cohortVerdict('noul', true), 'EXPLORED');
-  assert.equal(cohortVerdict('gate', false), 'NOT_RUN');
-  assert.equal(cohortVerdict('fiqa', true), 'NOT_RUN');
+test('only complete cohorts receive an exploratory bar verdict', () => {
+  assert.equal(cohortVerdict(true), 'EXPLORED');
+  assert.equal(cohortVerdict(false), 'NOT_RUN');
 });
-test('complete FiQA answers remain unscoreable under the multi-positive metric', () => {
+test('FiQA top-1 hit accepts any relevant passage and rejects non-relevant passages', () => {
+  const item = {...fiqaItem, rel: ['303325', '79807'], candidateIds: ['303325', '79807', '472537']};
+
+  assert.equal(isTop1Hit(item, {choice: '79807'}), true);
+  assert.equal(isTop1Hit(item, {choice: '303325'}), true);
+  assert.equal(isTop1Hit(item, {choice: '472537'}), false);
+});
+test('complete FiQA answers are scoreable under the multi-positive top-1-hit metric', () => {
   const answerMaps = {
     'nimble:latest': {'fiqa/regression-control': {}},
     'tev1:latest': {'fiqa/regression-control': {}},
@@ -65,8 +71,8 @@ test('complete FiQA answers remain unscoreable under the multi-positive metric',
   const coverage = cohortCoverage('fiqa', [fiqaItem], answerMaps, attempts);
 
   assert.equal(coverage.complete, true);
-  assert.equal(coverage.scoreable, false);
-  assert.equal(coverage.verdict, 'NOT_RUN');
+  assert.equal(coverage.scoreable, true);
+  assert.equal(coverage.verdict, 'READY');
 });
 test('paired significance marks the local model worse only when Jev wins', () => {
   const localLoss = pairedCorrectness(Array.from({length: 8}, () => true), Array.from({length: 8}, () => false));

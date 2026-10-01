@@ -292,6 +292,9 @@ async function run(datasetName, datasets, pinnedModels) {
   }
   return {dataset: datasetName, requested: items.length, resumedPerModel: Object.fromEntries([...existing].map(([name, ids]) => [name, ids.size])), errors: (await Promise.all(MODELS.map(async (m) => (await outputRows(m.out)).filter((r) => r.dataset === datasetName && r.status !== 'answered').length))).reduce((a, b) => a + b, 0)};
 }
+export function isTop1Hit(item, answer) {
+  return item.rel.includes(answer.choice);
+}
 export function cohortCoverage(name, items, answerMaps, attempts) {
   let complete = true;
   const models = {};
@@ -322,11 +325,11 @@ export function cohortCoverage(name, items, answerMaps, attempts) {
       staleAttempts: rows.length - currentRows.length,
     };
   }
-  const scoreable = complete && name !== 'fiqa';
+  const scoreable = complete;
   return {complete, scoreable, verdict: scoreable ? 'READY' : 'NOT_RUN', models};
 }
-export function cohortVerdict(name, scoreable) {
-  return name === 'fiqa' || !scoreable ? 'NOT_RUN' : 'EXPLORED';
+export function cohortVerdict(scoreable) {
+  return scoreable ? 'EXPLORED' : 'NOT_RUN';
 }
 function percentile(values, q) {
   const sorted = [...values].sort((a, b) => a - b);
@@ -442,10 +445,8 @@ async function scoreResults(built) {
   for (const name of names) {
     const items = built.datasets[name];
     const coverage = cohortCoverage(name, items, answerMaps, attempts);
-    const verdict = cohortVerdict(name, coverage.scoreable);
-    const notRunReason = name === 'fiqa'
-      ? 'FiQA multi-positive top1-hit labels are not representable by the local single-choice label contract.'
-      : 'paired scoring requires every preregistered ID for both local models.';
+    const verdict = cohortVerdict(coverage.scoreable);
+    const notRunReason = 'paired scoring requires every preregistered ID for both local models.';
     if (verdict === 'NOT_RUN') {
       const models = Object.fromEntries(MODELS.map((model) => {
         const row = coverage.models[model.name];
@@ -508,9 +509,9 @@ async function scoreResults(built) {
         : item.metric === 'clean-false-flag-and-markerless-catch' ? tev1[i].answer.noul > INJ_CUT
           : name === 'noul' ? tev1[i].answer.noul > 0.5 : false;
       if (item.metric === 'top1-hit') {
-        jevCorrect.push(item.rel.includes(item.jev.choice));
-        nimbleCorrect.push(item.rel.includes(local[i].answer.choice));
-        tev1Correct.push(item.rel.includes(tev1[i].answer.choice));
+        jevCorrect.push(isTop1Hit(item, item.jev));
+        nimbleCorrect.push(isTop1Hit(item, local[i].answer));
+        tev1Correct.push(isTop1Hit(item, tev1[i].answer));
       } else if (item.metric === 'rounded-score-accuracy') {
         const y = Number(item.label);
         jevCorrect.push(roundedScore(item.jev.score) === y);
@@ -624,7 +625,7 @@ async function scoreResults(built) {
     boundaries: [
       'No consumer benefit, production-routing authorization, or cross-dataset equivalence claim.',
       'The source-hash preflight was not committed before the model run; all complete-cohort results are EXPLORED, not parity claims.',
-      'FiQA is NOT_RUN because its multi-positive top1-hit labels are not representable by the local single-choice label contract.',
+      'FiQA top-1 hit counts a selected passage as correct when its ID is in the full relevance set.',
       'Latency p50/p95 are recorded under shared GPU load; not a production SLO or standalone performance benchmark.',
       'A cohort with any missing paired local answer is NOT_RUN and has no partial metrics or bar result.',
     ],
