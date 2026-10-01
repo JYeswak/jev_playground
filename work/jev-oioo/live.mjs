@@ -5,7 +5,7 @@ import {askJev} from "../../kit/src/client.ts";
 import {SCIFACT_CRITERIA, SCIFACT_INSTRUCTIONS} from "../../kit/src/verify.ts";
 
 const ROOT = new URL("../..", import.meta.url);
-const STATES = new URL("var/agent-tmp/jev-oioo/states.jsonl", ROOT);
+const STATES = new URL(process.env.JEV_OIOO_STATES ?? "var/agent-tmp/jev-oioo/states.jsonl", ROOT);
 const ITEMS = new URL("work/jev-oioo/items.jsonl", ROOT);
 const OUT = new URL(process.env.JEV_OIOO_OUT ?? "work/jev-oioo/live-results.jsonl", ROOT);
 const OPENROUTER_MODEL = "dots-studio/dots-3-note-preview:free";

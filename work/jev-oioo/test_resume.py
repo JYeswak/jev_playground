@@ -16,6 +16,10 @@ LIVE = ROOT / "work/jev-oioo/live.mjs"
 # rewritten in place when the resume ran (5caf9f93, 821 comparator answers filled), so reading it
 # tested the post-resume state and failed 1 != 821 in CI from then on.
 RESULTS = ROOT / "work/jev-oioo/fixture-live-results-pre-resume.jsonl"
+# The states the rows were selected from, captured from the untracked live input
+# var/agent-tmp/jev-oioo/states.jsonl (absent on a fresh clone, which turned this
+# test red in CI with returncode 1 on all three cases). Resolved from the repo root.
+STATES = ROOT / "work/jev-oioo/fixture-states.jsonl"
 RESET = "2026-09-28T00:00:00Z"
 
 
@@ -24,6 +28,7 @@ def run_live(output: Path, *, now: str, fake_429: bool = False, plant: bool = Fa
     env.update(
         {
             "JEV_OIOO_OUT": str(output),
+            "JEV_OIOO_STATES": str(STATES),
             "JEV_OIOO_COMPARATOR_ONLY": "1",
             "JEV_OIOO_DRY_RUN": "1",
             "JEV_OIOO_NOW": now,
