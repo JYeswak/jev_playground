@@ -16,7 +16,7 @@ function contextWith(prompt, memoriesText) {
     messages: [
       { role: "user", content: [{ type: "text", text: prompt }] },
       { role: "assistant", content: [{ type: "text", text: "working" }] },
-      { role: "user", content: [{ type: "text", text: memoriesText }] },
+      { role: "system", content: [{ type: "text", text: memoriesText }] },
     ],
   };
 }
@@ -122,13 +122,23 @@ test("cut is 0.5: noul below drops", async () => {
 
 test("parseMemories splits both block types and dedupes", () => {
   const items = parseMemories([
-    { role: "user", content: `<memories>\n- alpha\n- alpha\n</memories>\nTask-relevant local EE memories\n- beta fact` },
+    { role: "system", content: `<memories>\n- alpha\n- alpha\n</memories>\nTask-relevant local EE memories\n- beta fact` },
   ]);
   assert.deepEqual(items.map((i) => i.text), ["alpha", "Task-relevant local EE memories", "beta fact"]);
 });
 
-test("currentPrompt takes the last user text", () => {
-  assert.equal(currentPrompt([{ role: "user", content: "first" }, { role: "user", content: "second" }]), "second");
+test("parseMemories ignores user text carrying the marker", () => {
+  const items = parseMemories([
+    { role: "user", content: "<memories>\n- user bullet\n</memories>" },
+  ]);
+  assert.deepEqual(items, []);
+});
+
+test("parseMemories yields zero items for a lone tool result with the literal", () => {
+  const items = parseMemories([
+    { role: "tool", content: "dump of jev-memory-filter.ts\nconst memRe = /<memories>([\\s\\S]*?)<\\/memories>/g;\nline2" },
+  ]);
+  assert.deepEqual(items, []);
 });
 
 test("repeat pair reuses the verdict without a second call", async () => {
@@ -152,16 +162,17 @@ test("sidecar carries text at mode 600 while the log stays hash-only", async () 
   assert.equal(statSync(join(dir, "full.jsonl")).mode & 0o777, 0o600);
   const side = rowsOf(join(dir, "full.jsonl"));
   assert.equal(side.length, 2);
-  assert.ok(side.every((r) => r.prompt === "fix the login bug\n" + MEM + "\n" && typeof r.memory === "string" && r.memory.length > 0));
+  assert.ok(side.every((r) => r.prompt === "fix the login bug\n" && typeof r.memory === "string" && r.memory.length > 0));
   assert.deepEqual(side.map((r) => r.memory).sort(), ["grep proof needs vgrep not bare grep", "the vault address is oak street"]);
   const logText = readFileSync(join(dir, "log.jsonl"), "utf8");
   assert.ok(!logText.includes("oak street") && !logText.includes("fix the login bug"));
 });
 
-test("parseMemories ignores marker text in tool and assistant messages", () => {
+test("parseMemories ignores marker text in tool, assistant and user messages", () => {
   const sourceDump = 'const memRe = /<memories>([\\s\\S]*?)<\\/memories>/g;\nconst x = 1;';
   const items = parseMemories([
-    { role: "user", content: "<memories>\n- real bullet\n</memories>" },
+    { role: "system", content: "<memories>\n- real bullet\n</memories>" },
+    { role: "user", content: "<memories>\n- user bullet\n</memories>" },
     { role: "assistant", content: [{ type: "text", text: MEM }] },
     { role: "tool", content: sourceDump },
   ]);
@@ -182,7 +193,7 @@ test("handler scores genuine bullets only when tool output carries the marker", 
   await handler({
     messages: [
       { role: "user", content: [{ type: "text", text: "fix the login bug" }] },
-      { role: "user", content: [{ type: "text", text: MEM }] },
+      { role: "system", content: [{ type: "text", text: MEM }] },
       { role: "tool", content: 'dump of jev-memory-filter.ts with <memories> literal\nline2\nline3' },
     ],
   });

@@ -34,11 +34,12 @@ type Ask = (options: AskOptions) => Promise<JevResult>;
 
 export type MemoryItem = { text: string };
 
-/** Roles that carry injected memories. Tool results and assistant turns are
- * excluded: file contents dumped there contain the `<memories>` literal
- * (this module's own source does) and flooded the per-turn cap, crowding out
- * genuine bullets (jev-s47b: 19/20 live items were source lines). */
-const MEMORY_ROLES: Record<string, true> = { system: true, user: true, human: true };
+/** Only injected memory messages are parsed. Tool results, assistant turns
+ * and user text are never memory sources: file contents dumped in tool
+ * results contain the `<memories>` literal (this module's own source does)
+ * and flooded the per-turn cap, crowding out genuine bullets (jev-s47b:
+ * 19/20 live items were source lines, zero genuine bullets scored). */
+const MEMORY_ROLES: Record<string, true> = { system: true };
 
  /** Split injected memory blocks into items. Exported for tests. */
  export function parseMemories(messages: unknown): MemoryItem[] {
