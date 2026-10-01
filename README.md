@@ -114,13 +114,21 @@ A 2026-09-25 local census found 1,711 native omp Jev calls in session files modi
 
 Native judge (`modelRoles.judge`, key command-resolved via `work/jev-client/bin/typesafe-key.mjs`) runs in five profiles (default, claude, codex, muse, grok): passage ranking on `find`, per-prompt effort from auto-thinking, promise-and-stop detection from smart stop. Proven live both ways over RPC 2026-09-30 (EVAL.md smart-stop/autothink rows); organic 2026-10-01 02:10–04:50Z: 514 find, 85 auto-thinking, 76 unexpected-stop calls (EVAL.md §2026-10-01).
 
-Shadow hooks (log only, never change results; daily caps, stop on 401/402/403, fail open): bash risk scoring (`gate-observe`, `df2cf0d9`), web-result injection screening (`webscreen`, `7418e3b5`), web_search rerank dogfood (`9aa0372b`; 48 h live report on bead jev-bzl7: 12 scored rows, Jev agreed with rank-1 in 3, zero opens on either side), tool-result injection shadow (`9abe975b`).
+`find` WORKS: 576 vs 5,293 tokens spent per located file against grep (jev-04q2 verified, 141/222 located vs 875/2627).
 
-Per-prompt skill hints: OFF since `1f031068` (reverted 2026-10-01). The live code misrouted on the dev set in 2 runs against a 0-misroute bar (run 1: 2 fired, 0 on-target; run 2: 4 fired, 1 on-target; `jev-mailbox` misroute stable across runs; 16 calls, ~$0.000645). History: listed in `.omp/config.yml` (`258e9d9a`), state capped at 400 chars with p95 255 ms (`c4c3c2a4`).
+Injection screens ENFORCE on Jev-only scores (`score >= cut` withholds; local patterns log, never withhold): tool-result shadow (jev-rud1: clean 0/222, catch 268/300) and web-result screen (jev-eo40: Jev-alone FPR 0/350).
 
-Fleet watcher (`scripts/fleet-idle-watch.py`): an idle worker waiting on a human pages pane 1 (`be74fcf2`).
+Gate cascade WORKS: local nimble screens every command, paid Jev confirms only nimble-flagged ones — 96% screened free in 1h live, fallback to paid on gateway failure, runtime `cascade-off` switch file (jev-nr3c). Bash-risk shadow itself is NO-SIGNAL (jev-qunw 0/403, jev-3m65 replication 0/148 flagged truly harmful).
 
-Retired: the `claim-without-evidence` TTSR rule — held-out precision 0.571 vs a 0.80 bar (`NEGATIVE_EVIDENCE.md` R130); file moved to `.omp/rules/disabled/`.
+Memory filter IN PROGRESS: the drops audit found JOIN VOID — 0/243 scored rows joinable to session transcripts, so the hook point is the wrong seam (jev-7vn9, open).
+
+Per-prompt skill hints PARKED (R133 VEIN-EXHAUSTED): every recall gain came with misroutes; silence was strictly safer. Extension stays OFF.
+
+Local models LOSE-TO-JEV except nimble as cascade first pass (jev-uhc5: gate/injection worse, p95 1.2–2.7 s).
+
+TTSR judged rules: rules below 0.80 precision retired (R132 `jev-key-canonical-source`); `claim-without-evidence` retired earlier (R130, precision 0.571).
+
+Fleet watcher (`scripts/fleet-idle-watch.py`): an idle worker waiting on a human pages pane 1 (jev-7aj1 verified: recall 10/10, 0/10 false pages).
 
 ## Read next
 

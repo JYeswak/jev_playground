@@ -3359,3 +3359,14 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Design (prereg + amendment, pre-calls):** N1b top-5 Noul/0.8 vs Choice/0.5 head-to-head on 24+24 harvested (prompt, skill-read) pairs (seeds 7/30, names_skill=false), 96 live jev-1.13.0 calls, no 401/402/403. Misroute (strict) = hint != read skill.
 - **Result:** dev Choice 4 hits + 5 misroutes, N1b 0/24; held Choice 0 hits + 12 misroutes, N1b 0/24 (23 low-noul 122-259ms, 1 timeout). N1b 0/48 vs Choice 17/48 identical prompts. Spend ~$0.006 max (silent paths unbilled in rows).
 - **Verdict:** 0-misroute safety bar MET on discriminating sets; hint rate 0/48 so usefulness unproven. Proposal: do NOT re-register yet; next bead = recall design. Receipt work/skill-routing/receipt-jev-4nyy-n2.json. Left in_progress for verifier.
+
+## 2026-10-01 docs-sync session (WildCarp): cascade, rud1-extend, 3m65, 04q2-verify, u05b-verify [mixed]
+
+- **Cascade 1h live (nr3c):** 15:36:30-16:36:30Z, 568 rows; genuine cascade 102 (98 nimble-cleared, 4 paid, share 0.039 vs 0.19 offline prediction); screen-failed 55 (gateway flap); legacy daily-cap 363. Nimble p50 2398ms p95 4576ms. Spend ~4 paid calls (~$0.0001).
+- **rud1-extend (WITHHOLD supported):** shadow question on 132/350 eo40 clean (218 hashes rotated) + 60 fresh + prior 30 = clean 0/222, Wilson upper 0.0170<=0.02 PASS; planted 268/300=0.893>=0.85 PASS (recounted, no new calls). Spend 292,569 in-tok ~$0.0123 over 252 new calls.
+- **3m65 (NO-GO, LOSS DEPTH done):** 0/98 flagged truly harmful + held-out 0/50 = 0/148, Wilson upper 0.0253; benign plant cleared, rm-rf-nonexistent plant MISSED by nimble. Spend ~$0.
+- **04q2-verify:** rerun 576.3 vs 5293.0 tokens/located (author 576.3/5297.2); 20/20 hand-checks agree; closed. Keyless, spend 0.
+- **u05b-verify:** bar predates labels; seed-7 relabels agree all directions; R132 retirement verified; closed. Keyless, spend 0.
+- **7aj1 (cited, HazySpring authored, OrangeFrog verified):** recall 10/10, false pages 0/10.
+- **Docs:** README Jev-in-omp rewritten to expected.json; render-results --check current; 15-kit-claim 433 passed 0 failed; keyless stranger run EXPECTATION PASS 14 rows (clone e011dd57).
+- **Boundary:** e011dd57 (my swept commit, unwound locally) is on origin/main — content preserved, attribution mixed; no force-push. Stranger source/clone skew (99de2347 vs e011dd57) resolved by default-clone run.
