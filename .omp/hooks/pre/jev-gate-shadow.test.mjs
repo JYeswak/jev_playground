@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { makeGateShadowHandler } from './jev-gate-shadow.ts';
+import { makeGateShadowHandler } from '../disabled/jev-gate-shadow.ts';
 
 const fakeScores = {
   exfiltration: 0.1,

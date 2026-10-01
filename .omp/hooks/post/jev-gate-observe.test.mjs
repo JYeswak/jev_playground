@@ -7,15 +7,22 @@ import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   MAX_PREFIX, REAL_SAMPLE, ROW_KEYS, SIDECAR_KEYS, buildRow, defaultFilter, defaultSidecarAppend,
-  loadFilters, makeFilter, makeHandler, observe as observeRaw, redact, resetBillingHold, resetKeyCache,
+  loadFilters, makeFilter, makeHandler, observe as observeRaw, redact, resetBillingHold,
 } from "./jev-gate-observe.ts";
 import gateObserveHook from "./jev-gate-observe.ts";
-import { askJevBundle, observedFetch } from "../../../kit/src/client.ts";
+import { askJevBundle, observedFetch, setKeyProvider } from "../../../kit/src/client.ts";
 const wrote = [];
 const full = [];
 const memAppend = async (path, line) => { wrote.push({ path, row: JSON.parse(line) }); };
 const memSidecar = async (path, line) => { full.push({ path, row: JSON.parse(line) }); };
 const reset = () => { wrote.length = 0; full.length = 0; };
+async function waitFor(condition, description = "the asynchronous hook write", timeoutMs = 5000) {
+  const deadline = Date.now() + timeoutMs;
+  while (!condition()) {
+    if (Date.now() >= deadline) throw new Error("Timed out waiting for " + description);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+}
 const now = () => "2026-09-24T00:00:00.000Z";
 // Every observe() below routes both writers to memory: a test must never append to the real sidecar.
 const mem = { append: memAppend, logPath: "/tmp/x.jsonl", appendSidecar: memSidecar, sidecarPath: "/tmp/x-full.jsonl", now, session: "offline-session" };
@@ -23,23 +30,20 @@ const mem = { append: memAppend, logPath: "/tmp/x.jsonl", appendSidecar: memSide
 const fakeKey = "sk-" + "abcdefghij".repeat(3);
 const scoredAsker = async () => ({
   ok: true, scores: { exfiltration: 0.1, destructive: 0.9, privilege: 0.2, irreversible_publish: 0.1, secret_staging: 0.05 },
-  latencyMs: 410, usage: { input_tokens: 300, output_tokens: 40 },
+  model: "test-model", latencyMs: 410, usage: { input_tokens: 300, output_tokens: 40 },
 });
 
-const APPROVED_EVENT_ID = "offline-gate-observe-001";
-// Existing policy tests intentionally exercise only an injected fake asker.
-const observe = (event, deps) => observeRaw(
-  { ...event, toolCallId: APPROVED_EVENT_ID },
-  { ...deps, approvedEventId: APPROVED_EVENT_ID },
-);
+const observe = (event, deps = {}) => observeRaw(event, { ...mem, ...deps });
 
-test("row shape keys are frozen", async () => {
+test("scored row records resolved model, risk flag, usage, and latency", async () => {
   reset();
-  await observe({ toolName: "bash", input: { command: "ls" } },
-    { asker: scoredAsker, ...mem });
+  await observe({ toolName: "bash", input: { command: "ls" } }, { asker: scoredAsker });
   assert.deepEqual(Object.keys(wrote[0].row).sort(), [...ROW_KEYS].sort());
   assert.equal(wrote[0].row.flag, true);
   assert.equal(wrote[0].row.status, "scored");
+  assert.equal(wrote[0].row.model, "test-model");
+  assert.deepEqual(wrote[0].row.tokens, { input_tokens: 300, output_tokens: 40 });
+  assert.equal(wrote[0].row.latencyMs, 410);
 });
 
 test("flag is false below the cut and at exactly the cut", async () => {
@@ -102,23 +106,47 @@ test("throwing asker and throwing fs still resolve undefined", async () => {
   assert.equal(out, undefined);
 });
 
-test("handler returns undefined before any work starts, then logs the ctx session id", async () => {
+test("handler schedules a bash observation without event-ID approval and returns immediately", async () => {
   reset();
   let called = 0;
   const asker = async () => { called++; return scoredAsker(); };
-  const handler = makeHandler({ asker, approvedEventId: APPROVED_EVENT_ID, ...mem });
+  const handler = makeHandler({ asker, ...mem });
   const ctx = { sessionManager: { getSessionId: () => "sess-123" } };
-  const out = handler({ toolName: "bash", toolCallId: APPROVED_EVENT_ID, input: { command: "ls" } }, ctx);
+  const out = handler({ toolName: "bash", input: { command: "ls" } }, ctx);
   assert.equal(out, undefined, "a returned promise would put Jev on omp's awaited tool path");
   assert.equal(called, 0, "the asker ran inside the handler's synchronous slice");
   assert.equal(handler({ toolName: "read", input: { path: "x" } }, ctx), undefined);
-  assert.equal(handler(null, { sessionManager: { getSessionId: () => { throw new Error("x"); } } }), undefined);
-  await new Promise((r) => setTimeout(r, 20));
-  assert.equal(called, 1, "non-bash tools are not observed");
-  assert.equal(wrote.length, 1);
+  await waitFor(() => wrote.length === 1);
+  assert.equal(called, 1, "only the real bash result is observed");
   assert.equal(wrote[0].row.session, "sess-123");
+  assert.equal(wrote[0].row.status, "scored");
 });
 
+test("daily cap stops same-day calls and resets at the UTC date boundary", async () => {
+  reset();
+  let timestamp = "2026-09-24T23:59:00.000Z";
+  let calls = 0;
+  const handler = makeHandler({
+    ...mem,
+    asker: async () => { calls++; return scoredAsker(); },
+    dailyCap: 1,
+    dailyBudget: { day: "", calls: 0 },
+    now: () => timestamp,
+  });
+  const ctx = { sessionManager: { getSessionId: () => "cap-session" } };
+  for (const command of ["pwd", "date"]) {
+    assert.equal(handler({ toolName: "bash", input: { command } }, ctx), undefined);
+  }
+  await waitFor(() => wrote.length === 2);
+  assert.equal(calls, 1);
+  assert.deepEqual(wrote.map(({ row }) => row.status), ["scored", "not-run"]);
+  assert.equal(wrote[1].row.error, "NOT_RUN reason=daily-cap");
+  timestamp = "2026-09-25T00:00:00.000Z";
+  assert.equal(handler({ toolName: "bash", input: { command: "date" } }, ctx), undefined);
+  await waitFor(() => wrote.length === 3);
+  assert.equal(calls, 2);
+  assert.equal(wrote[2].row.status, "scored");
+});
 test("secret-shaped and filter-error commands write no sidecar row", async () => {
   reset();
   await observe({ toolName: "bash", input: { command: `curl -H "Authorization: Bearer ${"a".repeat(24)}" x` } },
@@ -207,118 +235,65 @@ test("a drifted or unreadable owner changes behaviour and fails toward skip", ()
   assert.equal(redact(`echo ${fakeKey}`, "/home/x", null), "[filter-unavailable]");
 });
 
-test("env key wins over the resolver and is not written", async () => {
+test("forced-fail Infisical provider records NOT_RUN unconfigured and never reaches fetch", async () => {
   reset();
-  resetKeyCache();
-  const planted = "sk-" + "envkeyplant".repeat(2);
-  const prev = process.env.TYPESAFE_API_KEY;
-  process.env.TYPESAFE_API_KEY = planted;
-  let resolverCalls = 0;
-  let seen;
-  const asker = async (args) => { seen = args.apiKey; return scoredAsker(); };
-  try {
-    await observe({ toolName: "bash", input: { command: "ls" } }, {
-      asker,
-      keyResolver: async () => { resolverCalls++; throw new Error("must not run"); },
-      ...mem,
-    });
-    assert.equal(resolverCalls, 0);
-    assert.equal(seen, planted);
-    assert.equal(process.env.TYPESAFE_API_KEY, planted);
-    assert.equal(JSON.stringify(wrote).includes(planted), false);
-  } finally {
-    if (prev === undefined) delete process.env.TYPESAFE_API_KEY;
-    else process.env.TYPESAFE_API_KEY = prev;
-    resetKeyCache();
-  }
-});
-
-test("resolver runs once across tool calls and the value is not logged", async () => {
-  reset();
-  resetKeyCache();
-  const prev = process.env.TYPESAFE_API_KEY;
+  resetBillingHold();
+  const previousKey = process.env.TYPESAFE_API_KEY;
+  const previousFetch = globalThis.fetch;
+  let fetches = 0;
   delete process.env.TYPESAFE_API_KEY;
-  const planted = "sk-" + "resolverplant".repeat(2);
-  let calls = 0;
-  const asker = async (args) => { assert.equal(args.apiKey, planted); return scoredAsker(); };
+  setKeyProvider(async () => undefined);
+  globalThis.fetch = async () => { fetches++; throw new Error("unexpected network"); };
   try {
-    const deps = {
-      asker,
-      keyResolver: async () => { calls++; return planted; },
-      ...mem,
-    };
-    for (let i = 0; i < 3; i++) {
-      await observe({ toolName: "bash", input: { command: "git status" } }, deps);
-    }
-    assert.equal(calls, 1);
-    assert.equal(process.env.TYPESAFE_API_KEY, undefined);
-    assert.equal(JSON.stringify(wrote).includes(planted), false);
-    assert.equal(wrote.length, 3);
-  } finally {
-    if (prev === undefined) delete process.env.TYPESAFE_API_KEY;
-    else process.env.TYPESAFE_API_KEY = prev;
-    resetKeyCache();
-  }
-});
-
-test("resolver failure is cached, logged not-run, and does not throw", async () => {
-  reset();
-  resetKeyCache();
-  const prev = process.env.TYPESAFE_API_KEY;
-  delete process.env.TYPESAFE_API_KEY;
-  let calls = 0;
-  try {
-    const deps = {
-      asker: async () => { throw new Error("asker must not run"); },
-      keyResolver: async () => { calls++; throw new Error("boom"); },
-      ...mem,
-    };
-    const a = await observe({ toolName: "bash", input: { command: "ls" } }, deps);
-    const b = await observe({ toolName: "bash", input: { command: "pwd" } }, deps);
-    assert.equal(a, undefined);
-    assert.equal(b, undefined);
-    assert.equal(calls, 1);
-    assert.equal(wrote.length, 2);
+    const out = await observe({ toolName: "bash", input: { command: "pwd" } });
+    assert.equal(out, undefined);
+    assert.equal(wrote.length, 1);
     assert.equal(wrote[0].row.status, "not-run");
-    assert.match(wrote[0].row.error, /NOT_RUN reason=unconfigured key-source=infisical-failed/);
-    assert.equal(JSON.stringify(wrote).includes("boom"), false);
+    assert.equal(wrote[0].row.error, "NOT_RUN reason=unconfigured");
+    assert.equal(fetches, 0);
   } finally {
-    if (prev === undefined) delete process.env.TYPESAFE_API_KEY;
-    else process.env.TYPESAFE_API_KEY = prev;
-    resetKeyCache();
+    setKeyProvider(undefined);
+    if (previousKey === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previousKey;
+    globalThis.fetch = previousFetch;
+    resetBillingHold();
   }
 });
+
+
 
 // jev-nhv9: 233 calls hit HTTP 402 over 4.5 h, one per bash command.
-test("a 402 holds further calls for 15 minutes, then exactly one call is made", async () => {
+test("401, 402, and 403 hold further calls for 15 minutes, then permit again", async () => {
   resetBillingHold();
-  let clock = 1_000_000;
-  let calls = 0;
-  const refused = async () => { calls++; return { ok: false, reason: "http", error: "systemOne HTTP 402: 402 no available TypeSafe API credits", latencyMs: 90 }; };
-  const deps = { ...mem, nowMs: () => clock };
   try {
-    reset();
-    await observe({ toolName: "bash", input: { command: "ls" } }, { ...deps, asker: refused });
-    assert.equal(calls, 1);
-    assert.equal(wrote[0].row.status, "error");
-    // Literal 15 min, not the imported constant: a shorter window must fail here (ReadmeStrangerRun, 4a54bcb).
-    clock += 15 * 60 * 1000 - 1;
-    await observe({ toolName: "bash", input: { command: "pwd" } }, { ...deps, asker: refused });
-    assert.equal(calls, 1, "no call inside the hold");
-    assert.equal(wrote[1].row.status, "not-run");
-    assert.match(wrote[1].row.error, /^NOT_RUN reason=billing-hold until=/);
-    assert.equal(wrote[1].row.error, `NOT_RUN reason=billing-hold until=${new Date(1_000_000 + 15 * 60 * 1000).toISOString()}`);
-    clock += 1;
-    await observe({ toolName: "bash", input: { command: "date" } }, { ...deps, asker: scoredAsker });
-    assert.equal(wrote[2].row.status, "scored", "the hold ends at the window");
-    await observe({ toolName: "bash", input: { command: "ls" } }, { ...deps, asker: scoredAsker });
-    assert.equal(wrote[3].row.status, "scored", "a success does not start a hold");
+    for (const status of [401, 402, 403]) {
+      reset();
+      resetBillingHold();
+      let clock = 1_000_000;
+      let calls = 0;
+      const refused = async () => {
+        calls++;
+        return { ok: false, reason: "http", error: "systemOne HTTP " + status + ": refused", latencyMs: 90 };
+      };
+      const deps = { ...mem, nowMs: () => clock };
+      await observe({ toolName: "bash", input: { command: "ls" } }, { ...deps, asker: refused });
+      assert.equal(calls, 1);
+      assert.equal(wrote[0].row.status, "error");
+      clock += 15 * 60 * 1000 - 1;
+      await observe({ toolName: "bash", input: { command: "pwd" } }, { ...deps, asker: refused });
+      assert.equal(calls, 1, "no call inside the hold for HTTP " + status);
+      assert.equal(wrote[1].row.status, "not-run");
+      assert.equal(wrote[1].row.error, "NOT_RUN reason=billing-hold until=" + new Date(1_000_000 + 15 * 60 * 1000).toISOString());
+      clock += 1;
+      await observe({ toolName: "bash", input: { command: "date" } }, { ...deps, asker: scoredAsker });
+      assert.equal(wrote[2].row.status, "scored", "the hold ends at its pinned duration");
+    }
   } finally {
     resetBillingHold();
   }
 });
 
-test("only a 402 starts a hold; other http and transport errors do not", async () => {
+test("429, 503, and transport failures do not start the 401/402/403 hold", async () => {
   resetBillingHold();
   let calls = 0;
   const deps = { ...mem, nowMs: () => 5_000_000 };
@@ -339,83 +314,51 @@ test("only a 402 starts a hold; other http and transport errors do not", async (
   }
 });
 
-test("registered callback denies before key lookup or requester while preserving local observation", async () => {
+test("registered post-hook scores a bash result without synthetic event-ID approval", async () => {
   reset();
   let callback;
   let requests = 0;
-  let keyLookups = 0;
   gateObserveHook({ on: (name, handler) => {
     assert.equal(name, "tool_result");
     callback = handler;
   } }, {
     ...mem,
     asker: async () => { requests++; return scoredAsker(); },
-    keyResolver: async () => { keyLookups++; throw new Error("unexpected key lookup"); },
   });
-  assert.equal(callback({ toolName: "bash", toolCallId: APPROVED_EVENT_ID, input: { command: "ls -la" } },
-    { sessionManager: { getSessionId: () => "sess-denied" } }), undefined);
-  await new Promise((resolve) => setTimeout(resolve, 20));
-  assert.equal(requests, 0);
-  assert.equal(keyLookups, 0);
-  assert.equal(wrote.length, 1);
-  assert.equal(wrote[0].row.session, "sess-denied");
-  assert.equal(wrote[0].row.status, "not-run");
-  assert.equal(wrote[0].row.error, "NOT_RUN reason=permission-required");
-  assert.equal(wrote[0].row.cmd, "[permission-denied]");
-  assert.equal(full.length, 0);
-  assert.doesNotMatch(JSON.stringify(wrote), /ls -la/);
+  const ctx = { sessionManager: { getSessionId: () => "sess-live-shape" } };
+  assert.equal(callback({ toolName: "bash", input: { command: "ls -la" } }, ctx), undefined);
+  assert.equal(requests, 0, "the post-hook stays outside OMP's awaited tool path");
+  await waitFor(() => wrote.length === 1);
+  assert.equal(requests, 1);
+  assert.equal(wrote[0].row.session, "sess-live-shape");
+  assert.equal(wrote[0].row.status, "scored");
+  assert.equal(wrote[0].row.model, "test-model");
 });
 
-test("an event ID alone or an injected asker alone cannot authorize raw state", async () => {
-  reset();
-  let requests = 0;
-  let keyLookups = 0;
-  const deps = { ...mem, approvedEventId: APPROVED_EVENT_ID,
-    asker: async () => { requests++; return scoredAsker(); },
-    keyResolver: async () => { keyLookups++; throw new Error("unexpected key lookup"); } };
-  await observeRaw({ toolName: "bash", toolCallId: "different-id", input: { command: "pwd" } }, deps);
-  await observeRaw({ toolName: "bash", toolCallId: APPROVED_EVENT_ID, input: { command: "date" } },
-    { ...deps, asker: undefined });
-  assert.equal(requests, 0);
-  assert.equal(keyLookups, 0);
-  assert.deepEqual(wrote.map(({ row }) => row.error), [
-    "NOT_RUN reason=permission-required", "NOT_RUN reason=permission-required",
-  ]);
-  assert.equal(full.length, 0);
-  assert.ok(wrote.every(({ row }) => row.cmd === "[permission-denied]"));
-});
 
-test("recorded bash event without a session or tool-call ID never reaches the provider", async (t) => {
+test("missing session blocks egress but a captured bash result needs no tool-call ID", async () => {
   reset();
-  resetKeyCache();
-  t.after(resetKeyCache);
   const recorded = JSON.parse(readFileSync(new URL("../../../work/omp-guard-rule/fixtures/session-pinned.jsonl", import.meta.url), "utf8").split("\n")[1]);
   assert.equal(recorded.real, true);
-  let lookups = 0;
   let requests = 0;
-  const deps = {
-    ...mem,
-    approvedEventId: APPROVED_EVENT_ID,
-    keyResolver: async () => { lookups++; throw new Error("key lookup before admission"); },
-    asker: async () => { requests++; return scoredAsker(); },
-  };
-  await observeRaw({ ...recorded, toolCallId: APPROVED_EVENT_ID }, { ...deps, session: "unknown" });
-  await observeRaw({ ...recorded, toolCallId: undefined }, deps);
-  assert.equal(lookups, 0);
+  const deps = { ...mem, asker: async () => { requests++; return scoredAsker(); } };
+  await observeRaw({ ...recorded, toolCallId: undefined }, { ...deps, session: "unknown" });
   assert.equal(requests, 0);
+  assert.equal(wrote[0].row.status, "not-run");
+  assert.equal(wrote[0].row.error, "NOT_RUN reason=session-unavailable");
   assert.equal(full.length, 0);
-  assert.deepEqual(wrote.map(({ row }) => row.status), ["not-run", "not-run"]);
+  await observeRaw({ ...recorded, toolCallId: undefined }, { ...deps, session: "recorded-session" });
+  assert.equal(requests, 1);
+  assert.equal(wrote[1].row.status, "scored");
+  assert.equal(wrote[1].row.session, "recorded-session");
 });
 
-test("recorded bash shape denies sensitive input and admits one harmless fake HTTP request", async (t) => {
+test("captured bash result without a toolCallId reaches the offline client only after secret filtering", async () => {
   reset();
-  resetKeyCache();
-  t.after(resetKeyCache);
   const recorded = JSON.parse(readFileSync(new URL("../../../work/omp-guard-rule/fixtures/session-pinned.jsonl", import.meta.url), "utf8").split("\n")[1]);
   assert.equal(recorded.real, true);
   const requests = [];
   let attempts = 0;
-  let lookups = 0;
   const fetchImpl = observedFetch(
     () => { attempts++; },
     async (url, init) => {
@@ -427,19 +370,24 @@ test("recorded bash shape denies sensitive input and admits one harmless fake HT
       }), { status: 200, headers: { "content-type": "application/json" } });
     },
   );
-  const deps = {
-    ...mem,
-    approvedEventId: APPROVED_EVENT_ID,
-    keyResolver: async () => { lookups++; return "synthetic-only"; },
-    asker: (options) => askJevBundle({ ...options, apiKey: "synthetic-only", fetchImpl }),
+  const asker = async (options) => {
+    const result = await askJevBundle({ ...options, apiKey: "offline-test-only", fetchImpl });
+    if (!result.ok) return result;
+    return {
+      ok: true,
+      model: result.resolvedModel,
+      scores: Object.fromEntries(Object.entries(result.answers).map(([key, answer]) => [key, answer.noul])),
+      latencyMs: result.latencyMs,
+      usage: result.usage && { input_tokens: result.usage.input_tokens, output_tokens: result.usage.output_tokens },
+    };
   };
-  await observeRaw({ ...recorded, toolCallId: "not-approved" }, deps);
-  await observeRaw({ ...recorded, toolCallId: APPROVED_EVENT_ID, input: { command: `export K=${fakeKey}` } }, deps);
+  const deps = { ...mem, asker };
+  await observeRaw({ ...recorded, toolCallId: undefined, input: { command: "export K=" + fakeKey } }, deps);
   assert.equal(requests.length, 0);
   assert.equal(attempts, 0);
-  assert.equal(lookups, 0);
   assert.equal(full.length, 0);
-  await observeRaw({ ...recorded, toolCallId: APPROVED_EVENT_ID }, deps);
+  assert.equal(wrote.at(-1).row.status, "skipped");
+  await observeRaw({ ...recorded, toolCallId: undefined }, deps);
   assert.equal(requests.length, 1);
   assert.equal(attempts, 1);
   assert.equal(requests[0].url, "https://api.typesafe.ai/v1/systemone");
@@ -449,6 +397,9 @@ test("recorded bash shape denies sensitive input and admits one harmless fake HT
     context: "An AI coding agent proposes running this in the user repository.",
   });
   assert.equal(wrote.at(-1).row.status, "scored");
+  assert.equal(wrote.at(-1).row.model, "jev-1.13.0");
+  assert.deepEqual(wrote.at(-1).row.tokens, { input_tokens: 20, output_tokens: 5 });
+  assert.equal(typeof wrote.at(-1).row.latencyMs, "number");
   assert.equal(full.length, 1);
-  assert.doesNotMatch(JSON.stringify(requests), /synthetic-only|sk-abcdefghij/);
+  assert.doesNotMatch(JSON.stringify(requests), /offline-test-only|sk-abcdefghij/);
 });

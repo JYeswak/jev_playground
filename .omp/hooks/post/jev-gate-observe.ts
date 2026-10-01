@@ -2,11 +2,11 @@
  * Observe-only tool-call gate (bead jev-deep-kit-8q7.7 follow-up: dogfood).
  *
  * On every completed `bash` tool call, records a local observation in
- * `~/.local/state/jev/gate-observe.jsonl`. The runtime never calls Jev:
- * permission requires a per-event approval contract that is not yet available.
- * Only a matching synthetic event ID and injected fake requester can score
- * offline. Observe only: never blocks, rewrites a result or prints anything.
- * The handler returns synchronously; filesystem work runs detached.
+ * On every completed bash tool call, records a local risk observation in
+ * ~/.local/state/jev/gate-observe.jsonl and asks Jev through the shared kit client.
+ * The live asker uses work/jev-client's Infisical user-session provider, with its
+ * separately approved machine-identity fallback. Observe only: fail open; never
+ * block or rewrite the command or result.
  *
  * Secrets: commands matching the PRIVATE/SECRET filters in
  * `work/bicameral-gate/real-sample.py` are never sent to the API — logged
@@ -24,86 +24,29 @@
  * created and re-asserted mode 600 on every append, lives outside every repo,
  * and must never be copied into a committed extract.
  *
- * No permission: one `NOT_RUN reason=permission-required` row, no key lookup.
- * Any throw anywhere in this module is caught: the tool path never sees us.
+ * Missing OMP session: one NOT_RUN session-unavailable row and no provider lookup.
+ * Each handler is capped at 100 attempts per UTC date; HTTP 401/402/403 pause the client.
  */
-import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { appendFile, mkdir, open } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { BILLING_HOLD_MS, billingHoldActive, noteBillingRefusal, resetBillingHold } from "../../../kit/src/client.ts";
+import { askJevBundle, BILLING_HOLD_MS, billingHoldActive, noteBillingRefusal, resetBillingHold } from "../../../kit/src/client.ts";
+import { useInfisicalKey } from "../../../work/jev-client/src/use-infisical-key.ts";
 export { BILLING_HOLD_MS, resetBillingHold };
 import { CUT, RISK, STATE_CONTEXT } from "../../../work/bicameral-gate/questions.mjs";
 
 export const MODEL = "jev-1.13.0";
 export const MAX_PREFIX = 200;
+export const MAX_DAILY_CALLS = 100;
 export const LOG_REL = "state/jev/gate-observe.jsonl";
 export const SIDECAR_REL = "state/jev/gate-observe-full.jsonl";
 export const SIDECAR_MODE = 0o600;
 export const SIDECAR_KEYS = ["ts", "session", "cmdSha", "cmd"] as const;
 /** Local-only; `cmd` is the full scored command. Never commit one. */
 export type SidecarRow = Pick<ObserveRow, "ts" | "session" | "cmdSha" | "cmd">;
-export const INFISICAL_BIN = join(homedir(), ".local", "bin", "infisical");
-export const INFISICAL_PROJECT = "42b194c3-89d7-4ebb-895f-dd77ddf005ba";
-const KEY_TIMEOUT_MS = 8000;
-
-export type KeySource = { ok: true; apiKey: string } | { ok: false; note: string };
-
-let keyOnce: Promise<KeySource> | undefined;
-
-/** Test seam. The live process keeps one resolution for its whole life. */
-export function resetKeyCache(): void {
-  keyOnce = undefined;
-}
-
-
-
-/** stdout only. stderr is discarded. The value is never logged. */
-export function defaultKeyResolver(): Promise<string> {
-  const { promise, resolve, reject } = Promise.withResolvers<string>();
-  const child = spawn(INFISICAL_BIN, [
-    "secrets", "get", "TYPESAFE_API_KEY",
-    `--projectId=${INFISICAL_PROJECT}`,
-    "--plain", "--silent",
-  ], { stdio: ["ignore", "pipe", "ignore"] });
-  const chunks: Buffer[] = [];
-  const timer = setTimeout(() => {
-    child.kill();
-    reject(new Error("timeout"));
-  }, KEY_TIMEOUT_MS);
-  child.stdout.on("data", (buf: Buffer) => { chunks.push(buf); });
-  child.on("error", (err) => { clearTimeout(timer); reject(err); });
-  child.on("close", (code) => {
-    clearTimeout(timer);
-    if (code !== 0) { reject(new Error("exit")); return; }
-    resolve(Buffer.concat(chunks).toString("utf8").trim());
-  });
-  return promise;
-}
-
-/**
- * Env wins. Otherwise the resolver runs once per process, success or failure.
- * Never writes process.env.
- */
-export function resolveApiKey(resolver: () => Promise<string> = defaultKeyResolver): Promise<KeySource> {
-  if (!keyOnce) {
-    keyOnce = (async () => {
-      const fromEnv = process.env.TYPESAFE_API_KEY;
-      if (fromEnv) return { ok: true, apiKey: fromEnv };
-      try {
-        const apiKey = await resolver();
-        if (!apiKey) return { ok: false, note: "key-source=infisical-failed" };
-        return { ok: true, apiKey };
-      } catch {
-        return { ok: false, note: "key-source=infisical-failed" };
-      }
-    })();
-  }
-  return keyOnce;
-}
 export const REAL_SAMPLE = fileURLToPath(new URL("../../../work/bicameral-gate/real-sample.py", import.meta.url));
 
 export interface Filters {
@@ -144,7 +87,7 @@ function loadOwnedFilters(): Filters | null {
 export const FILTERS: Filters | null = loadOwnedFilters();
 
 export const ROW_KEYS = [
-  "ts", "session", "cmdSha", "cmd", "status", "probs", "flag",
+  "ts", "session", "cmdSha", "cmd", "status", "model", "probs", "flag",
   "latencyMs", "tokens", "skipped", "error",
 ] as const;
 export type RowStatus = "scored" | "skipped" | "not-run" | "error";
@@ -154,6 +97,7 @@ export interface ObserveRow {
   cmdSha: string;
   cmd: string;
   status: RowStatus;
+  model: string | null;
   probs: Record<string, number> | null;
   flag: boolean | null;
   latencyMs: number | null;
@@ -177,46 +121,70 @@ export function buildRow(init: {
   session: string;
   command: string;
   now?: () => string;
-}): Pick<ObserveRow, "ts" | "session" | "cmdSha" | "cmd"> {
+}): Pick<ObserveRow, "ts" | "session" | "cmdSha" | "cmd" | "model"> {
   return {
     ts: (init.now ?? (() => new Date().toISOString()))(),
     session: init.session,
     cmdSha: createHash("sha256").update(init.command).digest("hex"),
     cmd: redact(init.command),
+    model: null,
   };
 }
 
 export interface ObserveDeps {
   asker?: (args: {
-    state: unknown;
+    state: Record<string, unknown>;
     questions: typeof RISK;
     model: string;
     timeoutMs: number;
-    apiKey?: string;
   }) => Promise<{
     ok: boolean;
     reason?: string;
     error?: string;
     scores?: Record<string, number>;
+    model?: string;
     latencyMs?: number;
     usage?: { input_tokens: number; output_tokens: number };
   }>;
   append?: (path: string, line: string) => Promise<void>;
   logPath?: string;
-  /** Offline-only: must match the event ID and be paired with an injected fake asker. */
-  approvedEventId?: string;
   filter?: (command: string) => { drop: boolean; reason?: string };
-  /** Full-command sidecar writer; the default forces mode 600. */
   appendSidecar?: (path: string, line: string) => Promise<void>;
   sidecarPath?: string;
   now?: () => string;
-  /** omp session id, read from the hook ctx by `makeHandler`. */
   session?: string;
-  /** Injected for tests. Absent on the live path, which uses defaultKeyResolver. */
-  keyResolver?: () => Promise<string>;
-  /** Wall clock in ms for the billing hold; tests inject it. */
   nowMs?: () => number;
+  dailyCap?: number;
+  dailyBudget?: { day: string; calls: number };
 }
+
+const processDailyBudget = { day: "", calls: 0 };
+
+const liveAsker: NonNullable<ObserveDeps["asker"]> = async (args) => {
+  useInfisicalKey();
+  const result = await askJevBundle(args);
+  if (!result.ok) return result;
+
+  const scores: Record<string, number> = {};
+  for (const key in RISK) {
+    const answer = result.answers[key];
+    if (answer === null || typeof answer !== "object" || !("noul" in answer)) {
+      return { ok: false, reason: "no-answers", error: "bundle answer is missing a Noul score", latencyMs: result.latencyMs };
+    }
+    const score = answer.noul;
+    if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 1) {
+      return { ok: false, reason: "no-answers", error: "bundle answer has an invalid Noul score", latencyMs: result.latencyMs };
+    }
+    scores[key] = score;
+  }
+  return {
+    ok: true,
+    scores,
+    model: result.resolvedModel,
+    latencyMs: result.latencyMs,
+    usage: result.usage ? { input_tokens: result.usage.input_tokens, output_tokens: result.usage.output_tokens } : undefined,
+  };
+};
 
 export function makeFilter(filters: Filters | null): (command: string) => { drop: boolean; reason?: string } {
   return (command) => {
@@ -277,14 +245,8 @@ export async function observe(
   };
   try {
     const command = typeof event.input?.command === "string" ? event.input.command : "";
-    const base = buildRow({ session: deps.session ?? "unknown", command, now: deps.now });
-    // Refuse before writing a raw-command sidecar or even a command prefix.
-    // Exact synthetic approval also requires the real session and event identity.
-    if (!deps.asker || !deps.approvedEventId || event.toolCallId !== deps.approvedEventId ||
-      typeof deps.session !== "string" || !deps.session.trim() || deps.session === "unknown") {
-      await write({ ...base, cmd: "[permission-denied]", status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=permission-required" });
-      return undefined;
-    }
+    const session = typeof deps.session === "string" ? deps.session : "unknown";
+    const base = buildRow({ session, command, now: deps.now });
     const filter = deps.filter ?? defaultFilter;
     let verdict: { drop: boolean; reason?: string };
     try {
@@ -296,58 +258,72 @@ export async function observe(
       await write({ ...base, status: "skipped", probs: null, flag: null, latencyMs: null, tokens: null, skipped: verdict.reason === "filter-error" ? "filter-error" : "secret", error: null });
       return undefined;
     }
-    // Past the filters only. The text is exactly what `state.command` carries below.
+    if (!session.trim() || session === "unknown") {
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=session-unavailable" });
+      return undefined;
+    }
+    const now = (deps.nowMs ?? Date.now)();
+    const until = billingHoldActive(now);
+    if (until !== null) {
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=billing-hold until=" + new Date(until).toISOString() });
+      return undefined;
+    }
+    const budget = deps.dailyBudget ?? processDailyBudget;
+    const day = base.ts.slice(0, 10);
+    if (budget.day !== day) {
+      budget.day = day;
+      budget.calls = 0;
+    }
+    if (budget.calls >= (deps.dailyCap ?? MAX_DAILY_CALLS)) {
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=daily-cap" });
+      return undefined;
+    }
+    budget.calls += 1;
     try {
       const full: SidecarRow = { ts: base.ts, session: base.session, cmdSha: base.cmdSha, cmd: command };
       await (deps.appendSidecar ?? defaultSidecarAppend)(deps.sidecarPath ?? defaultSidecarPath(), JSON.stringify(full));
     } catch {
       /* best-effort like the log; the tool path never sees us */
     }
-    const now = (deps.nowMs ?? Date.now)();
-    const until = billingHoldActive(now);
-    if (until !== null) {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `NOT_RUN reason=billing-hold until=${new Date(until).toISOString()}` });
-      return undefined;
-    }
-    let answer;
+    let answer: Awaited<ReturnType<NonNullable<ObserveDeps["asker"]>>>;
     try {
-      let apiKey: string | undefined;
-      if (deps.keyResolver) {
-        const resolved = await resolveApiKey(deps.keyResolver);
-        if (!resolved.ok) {
-          await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `NOT_RUN reason=unconfigured ${resolved.note}` });
-          return undefined;
-        }
-        apiKey = resolved.apiKey;
-      }
-      answer = await deps.asker({
+      answer = await (deps.asker ?? liveAsker)({
         state: { command, context: STATE_CONTEXT },
         questions: RISK,
         model: MODEL,
         timeoutMs: 20000,
-        apiKey,
       });
     } catch (err) {
-      await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `ask-threw: ${err instanceof Error ? err.message : String(err)}` });
+      await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "ask-threw: " + (err instanceof Error ? err.message : String(err)) });
       return undefined;
     }
     if (!answer.ok) {
       if (answer.reason === "unconfigured") {
         await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=unconfigured" });
       } else if (answer.reason === "billing-hold") {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `NOT_RUN reason=${answer.error}` });
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=" + (answer.error ?? "billing-hold") });
       } else {
         noteBillingRefusal(answer, now);
-        await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: `${answer.reason ?? "unknown"}: ${answer.error ?? ""}` });
+        await write({ ...base, status: "error", probs: null, flag: null, latencyMs: answer.latencyMs ?? null, tokens: null, skipped: null, error: (answer.reason ?? "unknown") + ": " + (answer.error ?? "") });
       }
       return undefined;
     }
     const probs = answer.scores ?? {};
-    // Strictly above the cut, as every measured runner scores it (real-traffic.mjs, real-score.py).
+    let maxScore = -Infinity;
+    for (const key in probs) {
+      const score = probs[key];
+      if (typeof score === "number" && Number.isFinite(score) && score > maxScore) maxScore = score;
+    }
     await write({
-      ...base, status: "scored", probs, flag: Math.max(...Object.values(probs).map(Number)) > CUT,
-      latencyMs: answer.latencyMs ?? null, tokens: answer.usage ?? null,
-      skipped: null, error: null,
+      ...base,
+      status: "scored",
+      model: answer.model ?? null,
+      probs,
+      flag: maxScore > CUT,
+      latencyMs: answer.latencyMs ?? null,
+      tokens: answer.usage ?? null,
+      skipped: null,
+      error: null,
     });
     return undefined;
   } catch {

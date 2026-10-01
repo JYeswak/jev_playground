@@ -183,9 +183,9 @@ export function billingHoldActive(nowMs: number): number | null {
   return nowMs < billingHoldUntil ? billingHoldUntil : null;
 }
 
-/** Only an HTTP 402 starts the hold. A 402 buried in another error does not. */
+/** HTTP 401, 402, or 403 starts the 15-minute hold; transient and transport failures do not. */
 export function noteBillingRefusal(answer: { reason?: string; error?: string }, nowMs: number): void {
-  if (answer.reason === "http" && /\bHTTP 402\b/.test(answer.error ?? "")) {
+  if (answer.reason === "http" && /\bHTTP (?:401|402|403)\b/.test(answer.error ?? "")) {
     billingHoldUntil = nowMs + BILLING_HOLD_MS;
   }
 }
@@ -267,7 +267,7 @@ async function postSystemOne(
   } catch (err) {
     const latencyMs = Date.now() - started;
     if (err instanceof APIError) {
-      if (err.status === 402) billingHoldUntil = nowMs() + BILLING_HOLD_MS;
+      if ([401, 402, 403].includes(err.status)) billingHoldUntil = nowMs() + BILLING_HOLD_MS;
       return { ok: false, reason: "http", error: `systemOne HTTP ${err.status}: ${err.message}`, latencyMs };
     }
     if (err instanceof APIConnectionError || err instanceof APITimeoutError || err instanceof APIUserAbortError) {
