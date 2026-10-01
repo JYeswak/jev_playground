@@ -29,8 +29,8 @@
       "how": "defaultThinkingLevel auto + judge role",
       "expect": "on",
       "purpose": "auto-thinking",
-      "verdict": "UNMEASURED",
-      "evidence": "jev-m2c6 0f7de16e (no real fixed-effort arm)",
+      "verdict": "NO-WIN-EASY",
+      "evidence": "jev-5ai4 verified (OrangeFrog): auto vs high on 12 easy prompts, think_chars ratio 1.244 (bar <=0.80 FAIL), success 12/12 both; hard round pending",
       "saving": "none measured"
     },
     {
@@ -88,12 +88,12 @@
       "group": "hook",
       "name": "web-result screen",
       "decision": "is a web result an injection?",
-      "how": ".omp/hooks/post/jev-webscreen.ts (shadow)",
+      "how": ".omp/hooks/post/jev-webscreen.ts (enforce, Jev-only flags)",
       "expect": "on",
       "log": "webscreen-shadow.jsonl",
       "file": ".omp/hooks/post/jev-webscreen.ts",
-      "verdict": "NO-BENEFIT",
-      "evidence": "jev-qg1j 3/27 flags all FP; parked jev-6psj",
+      "verdict": "ENFORCING",
+      "evidence": "jev-eo40 QUALIFIED (FPR 1.43%, catch 89.3%, Jev-alone 0/350); PENDING-VERIFY until OrangeFrog closes",
       "saving": "none"
     },
     {
@@ -177,6 +177,31 @@
       "verdict": "WORKS",
       "evidence": "87387139",
       "saving": "context tokens per jev session (computed live)"
+    },
+    {
+      "id": "memory-filter",
+      "group": "extension",
+      "name": "memory relevance filter shadow",
+      "decision": "is an injected memory relevant to the request?",
+      "how": ".omp/extensions/jev-memory-filter.ts (phase-1 shadow, log only)",
+      "expect": "on",
+      "extension": "./.omp/extensions/jev-memory-filter.ts",
+      "verdict": "SHADOW",
+      "evidence": "phase-1 shadow 5e00575e, tests 9/9, L3 18drop+2keep live, 2h window running",
+      "saving": "would-be-saved memory tokens (logged)"
+    },
+    {
+      "id": "gate-cascade",
+      "group": "hook",
+      "name": "gate nimble-then-Jev cascade",
+      "decision": "screen locally, pay Jev only for nimble flags",
+      "how": ".omp/hooks/post/jev-gate-observe.ts (CASCADE_ENABLED)",
+      "expect": "on",
+      "log": "gate-observe.jsonl",
+      "file": ".omp/hooks/post/jev-gate-observe.ts",
+      "verdict": "WORKS",
+      "evidence": "jev-nr3c L3 both arms live (benign zero paid, planted paid Jev); jev-8w0h SHIP (catch 97.87, 81.1% paid saved)",
+      "saving": "~81% fewer paid gate calls"
     }
   ]
 }
