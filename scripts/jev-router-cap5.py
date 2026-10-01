@@ -15,8 +15,8 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
-import httpx
-
+# httpx is imported lazily in main(): the keyless unit tests import this
+# module for its pure parsers, and CI runners carry no httpx.
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
@@ -210,6 +210,8 @@ async def main() -> int:
     before_amount = usage_amount(before)
     started = time.time()
     checkpoint = ROOT / "work/jev-38qj/rows.jsonl"
+    import httpx  # noqa: E402  lazy: keyless test import must not require it
+
     async with httpx.AsyncClient(timeout=90) as client:
 
         async def process(row: dict[str, Any]) -> dict[str, Any]:
