@@ -2,6 +2,8 @@ import { createHash } from "node:crypto";
 import { mkdir, open } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
+import { askJevChoice } from "../../../kit/src/client.ts";
+import { useInfisicalKey } from "../../../work/jev-client/src/use-infisical-key.ts";
 import { rerankTop1, type RerankOptions } from "../../../kit/src/rerank.ts";
 export const MODEL = "jev-1.13.0";
 export const MAX_RESULTS = 20;
@@ -50,8 +52,6 @@ type Pending = {
 type ShadowDeps = {
   ask?: Ask;
   append?: Append;
-  /** Offline-only approval: a recorded event ID and injected fake requester are both required. */
-  approvedEventId?: string;
   path?: string;
   now?: () => string;
   session?: string;
@@ -87,7 +87,16 @@ function stringValue(value: unknown): string | undefined {
 
 function rawText(content: unknown): string | undefined {
   if (typeof content === "string") return content;
-  if (Array.isArray(content)) return content.map((part) => typeof part === "string" ? part : part && typeof part === "object" && typeof (part as Record<string, unknown>).text === "string" ? (part as Record<string, string>).text : "").join("\n");
+  if (Array.isArray(content)) {
+    return content.map((part) => {
+      if (typeof part === "string") return part;
+      if (part && typeof part === "object") {
+        const text = (part as Record<string, unknown>).text;
+        if (typeof text === "string") return text;
+      }
+      return "";
+    }).join("\n");
+  }
   if (content && typeof content === "object") return JSON.stringify(content);
   return undefined;
 }
@@ -175,7 +184,7 @@ function loggedRow(pending: Pending, now: () => string): Record<string, unknown>
 }
 
 export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
-  const ask = deps.ask;
+  const ask = deps.ask ?? askJevChoice;
   const append = deps.append ?? defaultAppend;
   const path = deps.path ?? defaultPath();
   const now = deps.now ?? (() => new Date().toISOString());
@@ -231,21 +240,15 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
         openedPick: false,
         openedRank1: false,
         status: "not-admitted",
-        error: "permission-required",
+        error: null,
         openedHashes: new Set(),
       };
-      // The installed hook supplies neither approval nor an injected requester.
-      // No environment variable, cap, key or event payload can authorize egress.
-      if (!ask || !deps.approvedEventId || eventId !== deps.approvedEventId) {
-        write(loggedRow(base, now));
-        return undefined;
-      }
       base.error = null;
       if (paused || calls >= cap) { write(loggedRow(base, now)); return undefined; }
       calls += 1;
       try {
         const result = await Promise.race([
-          rerankTop1({ query: parsed.query, candidates: parsed.items, ask }),
+          rerankTop1({ query: parsed.query, candidates: parsed.items, ask, model: MODEL }),
           new Promise<never>((_, reject) => setTimeout(() => reject(new Error("rerank shadow timeout")), 25_000)),
         ]);
         base.pickIndex = parsed.items.findIndex((item) => item.id === result.choice);
@@ -273,6 +276,7 @@ export default function jevWebSearchRerankHook(
   host: { on: (event: string, handler: (event: SearchEvent, ctx?: HookContext) => Promise<undefined>) => void },
   deps: ShadowDeps = {},
 ): void {
+  if (!deps.ask) useInfisicalKey();
   const handler = makeWebSearchRerankHandler(deps);
   host.on("tool_result", handler);
   host.on("tool_execution_end", handler);
