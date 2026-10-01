@@ -25,7 +25,7 @@ async function waitFor(condition, description = "the asynchronous hook write", t
 }
 const now = () => "2026-09-24T00:00:00.000Z";
 // Every observe() below routes both writers to memory: a test must never append to the real sidecar.
-const mem = { append: memAppend, logPath: "/tmp/x.jsonl", appendSidecar: memSidecar, sidecarPath: "/tmp/x-full.jsonl", now, session: "offline-session" };
+const mem = { append: memAppend, logPath: "/tmp/x.jsonl", appendSidecar: memSidecar, sidecarPath: "/tmp/x-full.jsonl", now, session: "offline-session", cascade: false };
 // Secret-shaped fixtures are built at runtime so this file never carries one.
 const fakeKey = "sk-" + "abcdefghij".repeat(3);
 // Captured bash result, byte-identical to work/omp-guard-rule/fixtures/session-pinned.jsonl

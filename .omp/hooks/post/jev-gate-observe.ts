@@ -53,7 +53,7 @@ export const MAX_DAILY_CALLS = 100;
  * jev-8w0h is verified-closed: CASCADE_ENABLED is false, so the live path is
  * byte-identical to the legacy direct-paid flow below.
  */
-export const CASCADE_ENABLED = false;
+export const CASCADE_ENABLED = true;
 export const LOCAL_MODEL = "nimble:latest";
 export const LOCAL_GATEWAY = "http://127.0.0.1:11300/omp-profile/default/v1/systemone";
 export const LOCAL_TIMEOUT_MS = 5000;
