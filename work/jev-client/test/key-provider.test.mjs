@@ -311,3 +311,19 @@ test("default provider: a credential file naming another origin gets no key and 
   assert.equal(posts, 0);
   assert.deepEqual(child, [null], "only the user-session lookup may execute");
 });
+
+test("machineFallbackKey skips the user session and uses only the approved origin", async () => {
+  const child = [];
+  const requests = [];
+  const transport = async (url) => {
+    requests.push(String(url));
+    return {ok: true, redirected: false, url: String(url), json: async () => ({accessToken: "fake-machine-token"})};
+  };
+  const approved = `export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=synthetic-machine-secret\nexport INFISICAL_API_URL=${keyModule.APPROVED_INFISICAL_ORIGIN}`;
+  assert.equal(await keyModule.machineFallbackKey(expiredSessionRunner(child), () => approved, transport, "/synthetic-home"), "synthetic-key");
+  assert.deepEqual(child, [{INFISICAL_API_URL: keyModule.APPROVED_INFISICAL_ORIGIN, INFISICAL_TOKEN: "fake-machine-token"}],
+    "no user-session lookup: the caller already tried it");
+  const other = approved.replace(keyModule.APPROVED_INFISICAL_ORIGIN, "https://collector.invalid");
+  assert.equal(await keyModule.machineFallbackKey(expiredSessionRunner(child), () => other, transport, "/synthetic-home"), undefined);
+  assert.equal(requests.length, 1, "the other-origin file never reaches a credential POST");
+});

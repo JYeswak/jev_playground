@@ -180,4 +180,18 @@ export function makeDefaultInfisicalKeyProvider(
     {origin: APPROVED_INFISICAL_ORIGIN, transport});
 }
 
+/**
+ * The approved machine-identity lookup alone, for a caller that already tried the user session
+ * (bin/typesafe-key.mjs runs under omp's 10 s command budget and cannot pay for a second try).
+ */
+export function machineFallbackKey(
+  run: Runner = defaultRunner,
+  read: FileReader = (file) => readFileSync(file, "utf8"),
+  transport: typeof fetch = fetch,
+  home: string = homedir(),
+): Promise<string | undefined> {
+  return machineIdentityKey(run, infisicalBinary(home), home, read,
+    approvedMachine({origin: APPROVED_INFISICAL_ORIGIN, transport}));
+}
+
 export const infisicalKeyProvider = makeDefaultInfisicalKeyProvider();
