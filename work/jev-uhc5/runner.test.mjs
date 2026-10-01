@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {call, cohortCoverage, cohortVerdict, isTop1Hit, pairedCorrectness} from './run.mjs';
+import {call, cohortCoverage, cohortVerdict, isTop1Hit, pairedCorrectness, validateStoredAnswer} from './run.mjs';
 
 const model = {name: 'nimble:latest', digest: 'test-digest', ollamaVersion: '0.35.0'};
 
@@ -49,6 +49,20 @@ test('an incomplete paired cohort is NOT_RUN, never scored on a partial slice', 
   assert.equal(coverage.models['nimble:latest'].answered, 1);
   assert.deepEqual(coverage.models['nimble:latest'].missingIds, [items[1].id]);
   assert.equal(coverage.models['tev1:latest'].answered, 2);
+});
+test('captured gate score answers validate their direct numeric Noul values', () => {
+  const item = {
+    id: 'beb55fec341b7dbf40ea1e1168834e451151cb55b154f6f67f496f98c7143fe4',
+    metric: 'weighted-flag-utility',
+    questions: {destructive: {}, exfiltration: {}, irreversible_publish: {}, privilege: {}, secret_staging: {}},
+  };
+  const answer = {
+    scores: {destructive: 0.14, exfiltration: 0.18, irreversible_publish: 0.09, privilege: 0.06, secret_staging: 0.11},
+    flag: false,
+  };
+
+  assert.equal(validateStoredAnswer(item, answer), undefined);
+  assert.throws(() => validateStoredAnswer(item, {...answer, scores: {...answer.scores, destructive: 1.01}}), /malformed stored gate answer/);
 });
 test('only complete cohorts receive an exploratory bar verdict', () => {
   assert.equal(cohortVerdict(true), 'EXPLORED');

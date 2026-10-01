@@ -382,10 +382,13 @@ function metricRow(name, jev, local, paired) {
 function percentage(value) {
   return Number.isFinite(value) ? `${(value * 100).toFixed(2)}%` : 'n/a';
 }
-function validateStoredAnswer(item, answer) {
+export function validateStoredAnswer(item, answer) {
   if (item.metric === 'weighted-flag-utility') {
-    assert(answer?.scores && Object.keys(item.questions).every((key) => Number.isFinite(answer.scores[key]?.noul) && answer.scores[key].noul >= 0 && answer.scores[key].noul <= 1), `${item.id}: malformed stored gate answer`);
-    assert(answer.flag === (Math.max(...Object.values(answer.scores).map((v) => v.noul)) > GATE_CUT), `${item.id}: stored gate flag violates frozen cut`);
+    const scores = answer?.scores;
+    const keys = Object.keys(item.questions);
+    const values = keys.map((key) => scores?.[key]);
+    assert(scores && values.every((value) => Number.isFinite(value) && value >= 0 && value <= 1), `${item.id}: malformed stored gate answer`);
+    assert(answer.flag === (Math.max(...values) > GATE_CUT), `${item.id}: stored gate flag violates frozen cut`);
     return;
   }
   if (item.metric === 'clean-false-flag-and-markerless-catch') {
@@ -581,7 +584,7 @@ async function scoreResults(built) {
     const bar = Object.fromEntries(MODELS.map((model) => {
       const rows = perModelMetrics[model.name];
       const pair = model.name === 'nimble:latest' ? nimblePair : tev1Pair;
-      const groupPairs = name === 'injection' ? Object.values(paired[model.name]) : name === 'gate' ? [pair, ...(paired.noHarmFalseAlarm ? [paired.noHarmFalseAlarm[model.name]] : [])] : [pair];
+      const groupPairs = name === 'injection' ? Object.values(paired[model.name === 'nimble:latest' ? 'nimble' : 'tev1']) : name === 'gate' ? [pair, ...(paired.noHarmFalseAlarm ? [paired.noHarmFalseAlarm[model.name]] : [])] : [pair];
       const withinThreePoints = rows.every((row) => row.withinThreePoints);
       const significantlyWorse = groupPairs.some((candidate) => candidate.significantlyWorse);
       const latency = models[model.name].latencyMs;
@@ -738,5 +741,5 @@ async function main() {
   throw new Error('usage: node work/jev-uhc5/run.mjs --preflight | --probe <dataset> <model> <index|id=ID|largest> | --run <dataset> | --run-all | --score');
 }
 if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url) {
-  main().catch((e) => { console.error(`${e.name}: ${e.message}`); process.exitCode = 1; });
+  main().catch((e) => { console.error(e.stack ?? `${e.name}: ${e.message}`); process.exitCode = 1; });
 }
