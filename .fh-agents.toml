@@ -25,10 +25,10 @@
 # `pytest`, and `claude plugin validate`, and an agent looking for "how do I verify" must find it
 # under a title that is true.
 #
-# `## Fleet Coordination — Three omp Agents in One NTM Session` must NOT become the canonical
-# `MCP Agent Mail`. Every agent in this session is omp; coordination is the harness's own `hub`.
-# A canonical rename here would instruct the next agent to reach for a coordination substrate
-# this lane does not run — the exact class of error `value-bearing-gates` prohibits.
+# `## Fleet Coordination — omp Agents in One NTM Session` must NOT become the canonical
+# `MCP Agent Mail`. Coordination here is NTM (`ntm send`) for dispatch and callbacks, with Agent
+# Mail used only for file reservations and durable messages; a canonical rename would point the
+# next agent at Agent Mail as the primary channel, which it is not.
 #
 # `## ripwire — Deterministic Code Context` must NOT become `Morph Warp Grep`. Same reason, same
 # precedent as control-plane's `.fh-agents.toml`, which maps that canonical row to `ripwire-first`.
@@ -36,8 +36,8 @@
 [synonyms]
 # canonical section = [phrases in THIS repo proving the doctrine is present under our own heading]
 
-# `## Fleet Coordination — Three omp Agents in One NTM Session` — peer messaging, file
-# contention on EVAL.md, one-agent-owns-a-tree, shared paid-API budget.
+# `## Fleet Coordination — omp Agents in One NTM Session` (right-sized 2026-09-30) — dispatch,
+# callbacks, reservations, never disturbing another agent's changes.
 "mcp agent mail" = ["fleet coordination"]
 
 # `## ripwire — Deterministic Code Context (use before you read files)` — the structural /

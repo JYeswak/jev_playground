@@ -20,9 +20,11 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 export const MISSION =
-  "Mission: prove Jev with the API. A claim about Jev comes only from live calls (pinned jev-1.13.0) on data we did not write, " +
-  "against a bar committed before the first call, with the spend stated. Build tools from what survives, liven an omp surface, " +
-  "dogfood it, keep the README a stranger can run. Do not stop on a single demo. Do not write a ruling.";
+  "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, " +
+  "tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp " +
+  "session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One " +
+  "model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. " +
+  "Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism.";
 
 const STAND_DOWN = /standing by|queue dry|nothing further|no further action/i;
 
@@ -70,7 +72,7 @@ export function decideStop(
   }
   if (world.readyCount > 0) {
     parts.push(
-      `br ready has ${world.readyCount} item(s). Claim the highest-priority unassigned one; another pane verifies it before it closes.`,
+      `br ready has ${world.readyCount} item(s). Work your own assigned bead first; claim an unassigned one only if you have none; another pane verifies it before it closes.`,
     );
   }
   if (world.missing.length > 0) {
