@@ -1108,6 +1108,78 @@ def selftest() -> int:
     return 1 if bad else 0
 
 
+# Stale index lock recovery. 2026-10-01 between 03:16Z and 04:12Z, four `git commit` runs killed
+# mid-hook under load each left an empty .git/index.lock behind, and every pane's commit failed
+# until the conductor moved it by hand. Stale means: empty, at least LOCK_STALE_S old, and no git
+# process whose cwd is inside this repository. The lock is renamed into var/agent-tmp, never
+# deleted; any failed probe leaves it in place.
+REPO_ROOT = Path(__file__).resolve().parents[1]
+LOCK_STALE_S = int(os.environ.get("JEV_LOCK_STALE_S", "120"))
+
+
+def live_git_in_repo(repo: Path):
+    """PIDs of git processes whose cwd is inside `repo`, or None when a probe fails."""
+    try:
+        found = subprocess.run(
+            ["pgrep", "-f", "(^|/)git( |$)"], capture_output=True, text=True, timeout=10
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if found.returncode not in (0, 1):
+        return None
+    root = str(repo)
+    live = []
+    for pid in found.stdout.split():
+        try:
+            cwd = subprocess.run(
+                ["lsof", "-a", "-p", pid, "-d", "cwd", "-Fn"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            ).stdout
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+        for line in cwd.splitlines():
+            path = line[1:]
+            if line.startswith("n") and (
+                path == root or path.startswith(root + os.sep)
+            ):
+                live.append(int(pid))
+    return live
+
+
+def stale_lock_round(
+    repo: Path, now: float, send, live_git=live_git_in_repo, park_dir=None
+):
+    """Move a stale .git/index.lock aside and page once; return a log line or None."""
+    lock = repo / ".git" / "index.lock"
+    try:
+        info = lock.stat()
+    except FileNotFoundError:
+        return None
+    age = int(now - info.st_mtime)
+    if info.st_size != 0 or age < LOCK_STALE_S:
+        return None
+    holders = live_git(repo)
+    if holders is None:
+        return f"Stale lock: NOT_RUN process probe failed; {lock} ({age}s old) left in place"
+    if holders:
+        return None
+    park = Path(park_dir) if park_dir is not None else repo / "var" / "agent-tmp"
+    stamp = time.strftime("%Y%m%dT%H%M%SZ", time.gmtime(now))
+    dest = park / f"git-index.lock.stale-{stamp}"
+    try:
+        park.mkdir(parents=True, exist_ok=True)
+        lock.rename(dest)
+    except OSError as err:
+        return f"Stale lock: move FAILED ({type(err).__name__}); {lock} left in place"
+    send(
+        f"STALE LOCK moved: {lock} (0 bytes, {age}s old, no git process in the repo) -> {dest}; "
+        "retry any commit that failed on index.lock"
+    )
+    return f"Stale lock: moved to {dest} ({age}s old)"
+
+
 def main() -> int:
     if "--selftest" in sys.argv:
         return selftest()
@@ -1132,6 +1204,9 @@ def main() -> int:
         if note:
             print(note)
         print(inbox_round(*inbox_paths(), time.time(), page), flush=True)
+        note = stale_lock_round(REPO_ROOT, time.time(), page)
+        if note:
+            print(note, flush=True)
         return 1 if any(reading[0] != "working" for reading in states.values()) else 0
     streak: dict[int, int] = {}
     idle_since: dict[int, float] = {}
@@ -1202,6 +1277,9 @@ def main() -> int:
             if line.startswith(KEY_LINE):
                 print(f"{stamp} {line}", flush=True)
         note = key_round(census, key_state_path(), page)
+        if note:
+            print(f"{stamp} {note}", flush=True)
+        note = stale_lock_round(REPO_ROOT, time.time(), page)
         if note:
             print(f"{stamp} {note}", flush=True)
         time.sleep(INTERVAL)

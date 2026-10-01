@@ -970,5 +970,66 @@ class ShadowFeatures(unittest.TestCase):
         )
 
 
+class StaleIndexLock(unittest.TestCase):
+    """The observed shape (four times on 2026-10-01): an empty .git/index.lock, no git holder."""
+
+    def make_repo(self, size=0, age=600):
+        root = Path(tempfile.mkdtemp())
+        (root / ".git").mkdir()
+        lock = root / ".git" / "index.lock"
+        lock.write_bytes(b"x" * size)
+        then = 1_790_000_000.0
+        os.utime(lock, (then, then))
+        return root, lock, then + age
+
+    def test_stale_empty_lock_is_moved_not_deleted_and_paged_once(self):
+        root, lock, now = self.make_repo()
+        pages = []
+        note = fiw.stale_lock_round(root, now, pages.append, live_git=lambda repo: [])
+        self.assertFalse(lock.exists())
+        parked = list((root / "var" / "agent-tmp").glob("git-index.lock.stale-*"))
+        self.assertEqual(len(parked), 1)
+        self.assertEqual(parked[0].stat().st_size, 0)
+        self.assertEqual(len(pages), 1)
+        self.assertIn("STALE LOCK moved", pages[0])
+        self.assertIn("moved to", note)
+        self.assertIsNone(
+            fiw.stale_lock_round(root, now, pages.append, live_git=lambda repo: [])
+        )
+        self.assertEqual(len(pages), 1)
+
+    def test_live_git_holder_leaves_lock_in_place(self):
+        root, lock, now = self.make_repo()
+        pages = []
+        note = fiw.stale_lock_round(
+            root, now, pages.append, live_git=lambda repo: [4242]
+        )
+        self.assertIsNone(note)
+        self.assertTrue(lock.exists())
+        self.assertEqual(pages, [])
+
+    def test_young_lock_is_left_for_a_commit_still_running(self):
+        root, lock, now = self.make_repo(age=fiw.LOCK_STALE_S - 1)
+        self.assertIsNone(
+            fiw.stale_lock_round(root, now, lambda m: None, live_git=lambda repo: [])
+        )
+        self.assertTrue(lock.exists())
+
+    def test_non_empty_lock_is_a_real_index_write_and_is_left(self):
+        root, lock, now = self.make_repo(size=128)
+        self.assertIsNone(
+            fiw.stale_lock_round(root, now, lambda m: None, live_git=lambda repo: [])
+        )
+        self.assertTrue(lock.exists())
+
+    def test_failed_process_probe_is_not_run_and_leaves_lock(self):
+        root, lock, now = self.make_repo()
+        pages = []
+        note = fiw.stale_lock_round(root, now, pages.append, live_git=lambda repo: None)
+        self.assertIn("NOT_RUN", note)
+        self.assertTrue(lock.exists())
+        self.assertEqual(pages, [])
+
+
 if __name__ == "__main__":
     unittest.main()

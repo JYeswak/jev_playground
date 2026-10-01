@@ -60,6 +60,7 @@ claim nobody can check:
 - `work/jev-kit/test/kit.test.mjs` — offline kit preflight, validation, fake asker, doctor, and memory-promotion policy tests using `work/jev-kit/test/fixtures/memory-promotion.json`. Run: `node --experimental-strip-types --test work/jev-kit/test/kit.test.mjs` (11 tests).
 - `kit/test/gate.test.mjs` — offline RISK gate verb: captured public live answer, exact five-question score preservation, malformed Noul refusal, and size preflight refusal; run `node --test kit/test/gate.test.mjs` (4 tests).
 - `kit/test/questions-drift.test.mjs` — byte identity between packaged `kit/src/questions.mjs` and frozen `work/bicameral-gate/questions.mjs`, with packed-install NOT_RUN skip and planted one-byte negative; run `node --test kit/test/questions-drift.test.mjs` (2 tests).
+- `kit/test/client.test.mjs` — `kit/src/client.ts` account protection with an injected fetch, no network: HTTP 401, 402 and 403 each start the shared Jev hold after one request and refuse the next request locally (`reason: billing-hold`, still one request); 429 and 503 never start it (jev-kk2u). Run: `node --experimental-strip-types --test kit/test/client.test.mjs` (5 tests).
 - `work/jev-oioo/test_resume.py` — keyless comparator-only resume contract: selects exactly 821 NOT_RUN rows, leaves 86 answers and all 907 Jev rows untouched, refuses before the reset, and a planted answered-row selection turns red. Run: `python3 work/jev-oioo/test_resume.py` (NOT_RUN before reset; pass after reset).
 - `work/ci-main-status/test_ci_main_status.py` — `scripts/ci-main-status.py` (jev-bfku) against
   trimmed real gh output in `work/ci-main-status/fixtures/`, no network: green is one line and exit
@@ -172,7 +173,11 @@ claim nobody can check:
   `NEEDS-HUMAN pane N: <one line>`, <0.7 stays silent; once per message sha, daily cap (20),
   401/402/403 stops the day, transport failure fails open. 3 tests. Live replay
   (receipt-jev-5qx8-replay.json): positive 0.97, negative 0.08, jev-1.13.0, $0.00003066.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (49 tests).
+  Stale index lock (2026-10-01, four fleet-wide commit blocks 03:16Z-04:12Z): an empty
+  `.git/index.lock` at least `LOCK_STALE_S` old with no git process in the repo is renamed into
+  `var/agent-tmp` (never deleted) and pages pane 1 once; a live holder, a young lock, a non-empty
+  lock, or a failed process probe leaves it in place (probe failure logs NOT_RUN). 5 tests.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (54 tests).
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder
