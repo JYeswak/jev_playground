@@ -199,8 +199,8 @@
       "expect": "on",
       "log": "gate-observe.jsonl",
       "file": ".omp/hooks/post/jev-gate-observe.ts",
-      "verdict": "WORKS",
-      "evidence": "jev-nr3c L3 both arms live (benign zero paid, planted paid Jev); jev-8w0h SHIP (catch 97.87, 81.1% paid saved)",
+      "verdict": "UNPROVEN",
+      "evidence": "jev-8w0h offline SHIP (81.1% paid saved, verified); jev-nr3c live L3 both arms; live saving n=6 rows (paid 1/6), 1h re-measure pending, verifier CyanPeak",
       "saving": "~81% fewer paid gate calls"
     }
   ]
