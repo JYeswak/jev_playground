@@ -82,3 +82,39 @@ for (const status of [429, 503]) {
     }
   });
 }
+test("identical transports share one cached client; distinct ones stay isolated", async () => {
+  const { askJev, resetClientCache, clientCacheSize } = await import("../src/client.ts");
+  resetClientCache();
+  assert.equal(clientCacheSize(), 0);
+  const answering = (seen) => async () => {
+    seen.push(1);
+    return new Response(JSON.stringify({ answers: { probe: { noul: 0.5 } } }), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  };
+  const seenA = [];
+  const shared = {
+    state: { probe: "offline cache test" },
+    questions: question,
+    model: "jev-1.13.0",
+    apiKey: "offline-test-only",
+    retry: { maxRetries: 0 },
+    timeoutMs: 1000,
+    fetchImpl: answering(seenA),
+  };
+  try {
+    const first = await askJev(shared);
+    const second = await askJev(shared);
+    assert.equal(first.ok, true);
+    assert.equal(second.ok, true);
+    assert.equal(seenA.length, 2, "both calls dispatch; the client is what is shared");
+    assert.equal(clientCacheSize(), 1);
+    const seenB = [];
+    await askJev({ ...shared, fetchImpl: answering(seenB) });
+    assert.equal(seenB.length, 1, "a different transport is never served the cached client");
+    assert.equal(clientCacheSize(), 2);
+  } finally {
+    resetClientCache();
+  }
+});

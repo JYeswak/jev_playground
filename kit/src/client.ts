@@ -9,6 +9,57 @@ function loadSdk(): Promise<Sdk | undefined> {
   sdkLoad ??= import(SDK_PATH).catch(() => import(new URL("../node_modules/@typesafe-ai/sdk/dist/index.mjs", import.meta.url).href)).then((m) => m as Sdk, () => undefined);
   return sdkLoad;
 }
+/**
+ * One TypeSafeClient per (transport, timeout, retry, key) shape, kept for the
+ * process so repeated calls reuse the warm transport underneath. The key is a
+ * nested map, never serialized or logged; entries hold no caller data beyond
+ * the wrapped fetch closure. Tests inject a fresh fetchImpl per case, so each
+ * lands in its own entry and stays isolated.
+ */
+type CachedClient = { systemOne: Sdk["TypeSafeClient"]["prototype"]["systemOne"] };
+type FetchFn = typeof fetch;
+const clientCache = new Map<FetchFn, Map<number, Map<number, Map<string, CachedClient>>>>();
+
+function cachedClient(
+  sdk: Sdk,
+  apiKey: string,
+  wrappedFetch: typeof fetch,
+  fetchImpl: typeof fetch,
+  timeoutMs: number,
+  maxRetries: number,
+): CachedClient {
+  const byTimeout = getOrCreate(clientCache, fetchImpl, () => new Map());
+  const byRetry = getOrCreate(byTimeout, timeoutMs, () => new Map());
+  const byKey = getOrCreate(byRetry, maxRetries, () => new Map());
+  return getOrCreate(byKey, apiKey, () => new sdk.TypeSafeClient({
+    apiKey,
+    fetch: wrappedFetch,
+    timeout: timeoutMs,
+    retry: { maxRetries },
+  }) as CachedClient);
+}
+
+function getOrCreate<K, V>(map: Map<K, V>, key: K, make: () => V): V {
+  const hit = map.get(key);
+  if (hit !== undefined) return hit;
+  const value = make();
+  map.set(key, value);
+  return value;
+}
+
+/** Test seam: drop every cached client. The live process never calls this. */
+export function resetClientCache(): void {
+  clientCache.clear();
+}
+
+/** Test seam: how many client shapes are cached. The live process never calls this. */
+export function clientCacheSize(): number {
+  let size = 0;
+  for (const byTimeout of clientCache.values())
+    for (const byRetry of byTimeout.values())
+      for (const byKey of byRetry.values()) size += byKey.size;
+  return size;
+}
 
 /** The endpoint the SDK targets by default. No fetch() is constructed beside it. */
 export const SYSTEMONE_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
@@ -250,19 +301,25 @@ async function postSystemOne(
   const { TypeSafeClient, APIError, APIConnectionError, APITimeoutError, APIUserAbortError } = sdk;
   // Clock starts after the load so latencyMs measures the call, as before the import went lazy.
   const started = Date.now();
-  // One client per call: no shared mutable transport, and the injected fetch
-  // is read at call time so offline tests can swap it per case. Construction
-  // is inside the try so a config rejection degrades to transport, never throws.
+  // One client per (apiKey, transport, timeout, retry) shape, kept for the
+  // process: the SDK holds no per-call mutable state, and the wrapped fetch
+  // is stateless across calls (a fresh AbortController per invocation), so a
+  // second identical call skips reconstruction AND reuses the warm transport
+  // underneath. Offline tests stay isolated because every case injects its own
+  // fetchImpl closure, which keys a different cache entry. Construction stays
+  // inside the try so a config rejection degrades to transport, never throws.
   // Retry is SDK-owned: callers pass maxRetries explicitly; absent means 0
   // (single attempt), preserving the fail-fast row semantics runners rely on.
   let result: { answers: unknown; usage?: unknown; model?: unknown };
   try {
-    const client = new TypeSafeClient({
+    const client = cachedClient(
+      sdk,
       apiKey,
-      fetch: guardedFetch(fetchImpl, timeoutMs, APITimeoutError),
-      timeout: timeoutMs,
-      retry: { maxRetries: retry?.maxRetries ?? 0 },
-    });
+      guardedFetch(fetchImpl, timeoutMs, APITimeoutError),
+      fetchImpl,
+      timeoutMs,
+      retry?.maxRetries ?? 0,
+    );
     result = await client.systemOne({ state: state as never, questions: questions as never, model });
   } catch (err) {
     const latencyMs = Date.now() - started;
