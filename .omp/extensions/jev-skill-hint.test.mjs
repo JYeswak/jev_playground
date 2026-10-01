@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { fileURLToPath } from 'node:url';
 import {
   hintSkills,
   shortlistSkills,
@@ -35,9 +36,12 @@ test('shortlist ranks skill names over description noise and caps at twenty', ()
   assert.ok(!clock.some((s) => s.name === 'ga4' || s.name === 'analytics-tracking'));
 });
 
-test('real roster holds both acceptance skills with usable descriptions', () => {
-  const roster = loadSkillRoster();
-  assert.ok(roster.length >= 700, 'expected the ~760-skill inventory, got ' + roster.length);
+test('vendored roster holds both acceptance skills with usable descriptions', () => {
+  // Byte-exact copies of four real SKILL.md files: hermetic in CI, where
+  // ~/.claude/skills does not exist, with every assertion intact.
+  const dir = new URL('./fixtures/skills', import.meta.url);
+  const roster = loadSkillRoster(fileURLToPath(dir));
+  assert.equal(roster.length, 4);
   const names = new Set(roster.map((s) => s.name));
   assert.ok(names.has('ga4') && names.has('analytics-tracking'));
   const ga4 = roster.find((s) => s.name === 'ga4');

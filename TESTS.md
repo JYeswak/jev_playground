@@ -139,14 +139,16 @@ claim nobody can check:
   fallback names all four (`test_skill_census.py`, `test_key_exposure.py`).
   Run: `python3 -m unittest work/omp-jev-review/test_jev_tool_census.py` (8 tests).
 - `.omp/extensions/jev-skill-hint.test.mjs` — the per-prompt skill hint (jev-4nyy), keyless with an
-  injected asker: the shortlist ranks skill names over description noise and caps at twenty; the
-  real roster (~760 SKILL.md files, folded descriptions parsed, escaping names skipped) shortlists
-  `ga4`/`analytics-tracking` for a GA4 funnel prompt and neither for `what time is it`; a confident
-  non-none Choice becomes `Likely relevant skills: ...` while none, sub-cut confidence, refusal,
-  throw, and empty prompt stay silent; billed usage flows to the hint result; slow failures past the
-  300 ms deadline log reason `timeout` (thrown and SDK-resolved alike) while fast ones keep theirs;
-  warmup probes once without blocking; the factory registers `session_start` + `before_agent_start`,
-  injects `{ customType: jev-skill-hint, ... }` on hint and yields undefined when silent.
+  injected asker: the shortlist ranks skill names over description noise and caps at twenty; four
+  byte-exact SKILL.md copies under `.omp/extensions/fixtures/skills/` stand in for the real roster
+  (hermetic where ~/.claude/skills is absent, e.g. CI run 36815800871) and shortlist
+  `ga4`/`analytics-tracking` for a GA4 funnel prompt and neither for `what time is it`, folded
+  descriptions parsed; a confident non-none Choice becomes `Likely relevant skills: ...` while none,
+  sub-cut confidence, refusal, throw, and empty prompt stay silent; billed usage flows to the hint
+  result; slow failures past the 300 ms deadline log reason `timeout` (thrown and SDK-resolved
+  alike) while fast ones keep theirs; warmup probes once without blocking; the factory registers
+  `session_start` + `before_agent_start`, injects `{ customType: jev-skill-hint, ... }` on hint
+  and yields undefined when silent.
   Run: `node --test .omp/extensions/jev-skill-hint.test.mjs` (10 tests).
 - `work/fleet-idle-watch/test_fleet_idle_watch.py` — `scripts/fleet-idle-watch.py`'s classifier
   on process evidence (jev-6con), no tmux or ps: fixtures are the real process trees of jev panes
