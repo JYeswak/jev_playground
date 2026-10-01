@@ -1,0 +1,107 @@
+{
+  "gate": {
+    "agreement_sample": [],
+    "disagreements": [],
+    "existing_flag_rows": 0,
+    "joined_rows": 0,
+    "latency_ms": {
+      "count": 0,
+      "p50": null,
+      "p95": null
+    },
+    "matrix_2x2": {
+      "jev_false_existing_false": 0,
+      "jev_false_existing_true": 0,
+      "jev_true_existing_false": 0,
+      "jev_true_existing_true": 0
+    },
+    "scored_rows": 0,
+    "shadow_rows": 0,
+    "spend": {
+      "input_cost_usd": 0.0,
+      "input_tokens": 0,
+      "output_cost_usd": 0.0,
+      "output_tokens": 0
+    },
+    "status_counts": {},
+    "unmatched_scored_rows": 0
+  },
+  "injection_shadow": {
+    "excluded_test_rows": 0,
+    "flags": 0,
+    "input_tokens": 0,
+    "latency_ms": {
+      "p50": null,
+      "p95": null
+    },
+    "rows": 0,
+    "scored": 0,
+    "status_counts": {}
+  },
+  "schema": "jev-shadow-report.v1",
+  "seed": 20260927,
+  "web_search_rerank": {
+    "answered": 0,
+    "latency_ms": {
+      "p50": null,
+      "p95": null
+    },
+    "opened_pick": 0,
+    "opened_rank1": 0,
+    "pick_equals_rank1": 0,
+    "rows": 0,
+    "status_counts": {}
+  },
+  "webscreen_shadow": {
+    "answered_rows": 27,
+    "answered_units": 27,
+    "excluded_pre_fix_rows": 27,
+    "first_event_utc": "2026-09-27T06:41:24.159000Z",
+    "flag_metric_rows": 27,
+    "flag_rate_per_row": 0.1111111111111111,
+    "flag_rate_per_unit": 0.1111111111111111,
+    "flagged_rows": 3,
+    "flagged_units": 3,
+    "input_cost_usd_known": 0.0010018680000000002,
+    "input_tokens": 23854,
+    "invalid_flag_metric_rows": 0,
+    "invalid_timestamp_rows": 0,
+    "last_event_utc": "2026-10-01T06:32:38.987000Z",
+    "latency_ms": {
+      "p50": 147.0,
+      "p95": 228.0,
+      "rows": 27
+    },
+    "legacy_test_cutoff_utc": "2026-09-27T00:52:00Z",
+    "model_counts": {
+      "jev-1.13.0": 44,
+      "missing": 10
+    },
+    "output_tokens": 594,
+    "report_age_hours": 95.887,
+    "reported_at_utc": "2026-10-01T06:34:35.948276Z",
+    "rows": 54,
+    "source_sha256": "60bad6b675936eb6ddad836c54befa24fb82d22868e6bbd6e1131c9fa112bc93",
+    "spend_basis": "known input tokens at $0.042/M; Jev output is free; missing usage means total spend is incomplete",
+    "spend_complete": false,
+    "status_counts": {
+      "fail_open": 17,
+      "local-only": 10,
+      "ok": 27
+    },
+    "tool_counts": {
+      "web_search": 54
+    },
+    "top_score": {
+      "max": 0.46,
+      "p50": 0.03,
+      "p95": 0.18,
+      "rows": 27
+    },
+    "usage_missing_rows": 17,
+    "usage_rows": 27,
+    "window_basis": "first-to-last eligible post-fix event span; report age is separate, and neither proves continuous hook uptime",
+    "window_complete_24h": true,
+    "window_elapsed_hours": 95.854
+  }
+}
