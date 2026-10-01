@@ -3353,3 +3353,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 
 - **Recompute:** clean 0/132+0/60+0/30=0/222 exact, Wilson upper 0.0170; catch 26/30 fresh (kit client) + 268/300 Sep-27 same-shadow-question rows (author-disclosed no-new-calls; same file eo40 cited); traffic 1/247 TP sha-matched; spend files sum 271,477 vs claimed 292,569 (Δ7% residual); bar 17:29:56Z < rows 17:31/17:33Z.
 - **Ruling:** clean gate 0/222 upper 1.70%<=2% on 192 fresh calls; catch 89.3% same-question + 26/30 fresh consistent. WITHHOLD qualifies per conductor order; flip is separate change. Residuals: 132-resolution method has no committed script; rows lack model/ts fields.
+
+## 2026-10-01 jev-4nyy N2 fresh-dev Noul-rank (WindyLantern): 0/48 misroutes, 0/48 hints [live]
+
+- **Design (prereg + amendment, pre-calls):** N1b top-5 Noul/0.8 vs Choice/0.5 head-to-head on 24+24 harvested (prompt, skill-read) pairs (seeds 7/30, names_skill=false), 96 live jev-1.13.0 calls, no 401/402/403. Misroute (strict) = hint != read skill.
+- **Result:** dev Choice 4 hits + 5 misroutes, N1b 0/24; held Choice 0 hits + 12 misroutes, N1b 0/24 (23 low-noul 122-259ms, 1 timeout). N1b 0/48 vs Choice 17/48 identical prompts. Spend ~$0.006 max (silent paths unbilled in rows).
+- **Verdict:** 0-misroute safety bar MET on discriminating sets; hint rate 0/48 so usefulness unproven. Proposal: do NOT re-register yet; next bead = recall design. Receipt work/skill-routing/receipt-jev-4nyy-n2.json. Left in_progress for verifier.

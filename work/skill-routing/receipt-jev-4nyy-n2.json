@@ -1,0 +1,13 @@
+{
+ "bead": "jev-4nyy",
+ "design": "N2 fresh-dev N1b top-5 Noul/0.8 vs Choice/0.5 head-to-head",
+ "dev_seed": 7,
+ "held_seed": 30,
+ "dev_choice_misroutes": 5,
+ "dev_noul_misroutes": 0,
+ "held_choice_misroutes": 12,
+ "held_noul_misroutes": 0,
+ "noul_hits_48": 0,
+ "spend_note": "silent paths carry no usage; bound 96 calls x ~1.5k est in-tok ~= $0.006 max",
+ "verdict": "N1b 0/48 misroutes on sets where Choice misrouted 17/48; hint rate 0/48. Safety bar met; usefulness unproven. Proposal: do NOT re-register for benefit yet; next bead: recall design."
+}

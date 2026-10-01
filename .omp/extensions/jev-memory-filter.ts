@@ -34,23 +34,35 @@ type Ask = (options: AskOptions) => Promise<JevResult>;
 
 export type MemoryItem = { text: string };
 
-/** Split injected memory blocks into items. Exported for tests. */
-export function parseMemories(messages: unknown): MemoryItem[] {
-  const texts: string[] = [];
-  const walk = (node: unknown): void => {
+/** Roles that carry injected memories. Tool results and assistant turns are
+ * excluded: file contents dumped there contain the `<memories>` literal
+ * (this module's own source does) and flooded the per-turn cap, crowding out
+ * genuine bullets (jev-s47b: 19/20 live items were source lines). */
+const MEMORY_ROLES: Record<string, true> = { system: true, user: true, human: true };
+
+ /** Split injected memory blocks into items. Exported for tests. */
+ export function parseMemories(messages: unknown): MemoryItem[] {
+   const texts: string[] = [];
+  const collect = (node: unknown): void => {
     if (typeof node === "string") {
       if (node.includes("<memories>") || node.includes("Task-relevant local EE memories")) texts.push(node);
       return;
     }
     if (Array.isArray(node)) {
-      for (const child of node) walk(child);
+      for (const child of node) collect(child);
       return;
     }
     if (node && typeof node === "object") {
-      for (const value of Object.values(node as Record<string, unknown>)) walk(value);
+      for (const value of Object.values(node as Record<string, unknown>)) collect(value);
     }
   };
-  walk(messages);
+  if (Array.isArray(messages)) {
+    for (const message of messages) {
+      if (message && typeof message === "object" && MEMORY_ROLES[(message as Record<string, unknown>)["role"] as string]) {
+        collect((message as Record<string, unknown>)["content"]);
+      }
+    }
+  }
   const items: MemoryItem[] = [];
   for (const text of texts) {
     const blocks: string[] = [];

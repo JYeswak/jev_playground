@@ -157,3 +157,34 @@ test("sidecar carries text at mode 600 while the log stays hash-only", async () 
   const logText = readFileSync(join(dir, "log.jsonl"), "utf8");
   assert.ok(!logText.includes("oak street") && !logText.includes("fix the login bug"));
 });
+
+test("parseMemories ignores marker text in tool and assistant messages", () => {
+  const sourceDump = 'const memRe = /<memories>([\\s\\S]*?)<\\/memories>/g;\nconst x = 1;';
+  const items = parseMemories([
+    { role: "user", content: "<memories>\n- real bullet\n</memories>" },
+    { role: "assistant", content: [{ type: "text", text: MEM }] },
+    { role: "tool", content: sourceDump },
+  ]);
+  assert.deepEqual(items.map((i) => i.text), ["real bullet"]);
+});
+
+test("parseMemories reads system-role blocks", () => {
+  const items = parseMemories([
+    { role: "system", content: "<memories>\n- sys bullet\n</memories>" },
+  ]);
+  assert.deepEqual(items.map((i) => i.text), ["sys bullet"]);
+});
+
+test("handler scores genuine bullets only when tool output carries the marker", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  let calls = 0;
+  const handler = makeMemoryFilterHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.1 }, latencyMs: 1, model: "m" }; }, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
+  await handler({
+    messages: [
+      { role: "user", content: [{ type: "text", text: "fix the login bug" }] },
+      { role: "user", content: [{ type: "text", text: MEM }] },
+      { role: "tool", content: 'dump of jev-memory-filter.ts with <memories> literal\nline2\nline3' },
+    ],
+  });
+  assert.equal(calls, 2);
+});
