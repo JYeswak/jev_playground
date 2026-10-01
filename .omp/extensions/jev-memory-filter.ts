@@ -24,10 +24,11 @@ export const CALL_TIMEOUT_MS = 15000;
 export const TURN_BUDGET_MS = 45000;
 export const PROMPT_CHARS = 2000;
 const LOG_SCHEMA = "jev-memory-filter.v1";
+const SIDECAR_SCHEMA = "jev-memory-filter-full.v1";
+export const MAX_MEMO = 2000;
 
 // One extension load serves one session process: rows stay attributable.
 const INSTANCE = randomUUID().slice(0, 8);
-
 
 type Ask = (options: AskOptions) => Promise<JevResult>;
 
@@ -105,20 +106,32 @@ export function currentPrompt(messages: unknown): string {
 
 const INSTRUCTIONS = "Memory: `memory`. Current request: `prompt`. Is this memory relevant to the current request?";
 
-export type FilterDeps = { ask?: Ask; cap?: number; path?: string; now?: () => string };
+export type FilterDeps = { ask?: Ask; cap?: number; path?: string; sidecarPath?: string; now?: () => string };
 
 export function makeMemoryFilterHandler(deps: FilterDeps = {}) {
   const ask = deps.ask ?? askJev;
   const cap = deps.cap ?? MAX_DAILY_CALLS;
   const path = deps.path ?? process.env.JEV_MEMORY_FILTER_LOG_PATH ?? join(homedir(), ".local", "state", "jev", "memory-filter.jsonl");
+  const sidecar = deps.sidecarPath ?? process.env.JEV_MEMORY_FILTER_SIDECAR_PATH ?? join(homedir(), ".local", "state", "jev", "memory-filter-full.jsonl");
   const now = deps.now ?? (() => new Date().toISOString());
   let day = "";
   let calls = 0;
   let paused = false;
+  // Per-instance memo: identical (prompt, memory) pairs reappear every context
+  // event of a long turn. Reuse the verdict instead of re-spending a call.
+  const memo = new Map<string, { noul: number; decision: string; inputTokens: number | null }>();
   const write = async (row: Record<string, unknown>): Promise<void> => {
     try {
       await mkdir(join(homedir(), ".local", "state", "jev"), { recursive: true });
       await appendFile(path, JSON.stringify(row) + "\n", { mode: 0o600 });
+    } catch {
+      // Logging never blocks the turn.
+    }
+  };
+  const writeSidecar = async (row: Record<string, unknown>): Promise<void> => {
+    try {
+      await mkdir(join(homedir(), ".local", "state", "jev"), { recursive: true });
+      await appendFile(sidecar, JSON.stringify(row) + "\n", { mode: 0o600 });
     } catch {
       // Logging never blocks the turn.
     }
@@ -140,6 +153,13 @@ export function makeMemoryFilterHandler(deps: FilterDeps = {}) {
       for (const item of items) {
         if (Date.now() - started > TURN_BUDGET_MS) break;
         const memoryHash = createHash("sha256").update(item.text).digest("hex");
+        const memoKey = promptHash + ":" + memoryHash;
+        const cached = memo.get(memoKey);
+        if (cached !== undefined) {
+          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "memo", promptHash, memoryHash, noul: cached.noul, decision: cached.decision, tokensSaved: cached.decision === "drop" ? Math.floor(item.text.length / 4) : 0, latencyMs: null, inputTokens: cached.inputTokens });
+          await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "memo", promptHash, memoryHash, prompt, memory: item.text, noul: cached.noul, decision: cached.decision });
+          continue;
+        }
         if (paused || calls >= cap) {
           await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: paused ? "paused" : "daily-cap", promptHash, memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: null, inputTokens: null });
           continue;
@@ -169,7 +189,14 @@ export function makeMemoryFilterHandler(deps: FilterDeps = {}) {
           continue;
         }
         const drop = noul < CUT;
-        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash, noul, decision: drop ? "drop" : "keep", tokensSaved: drop ? Math.floor(item.text.length / 4) : 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
+        const decision = drop ? "drop" : "keep";
+        if (memo.size >= MAX_MEMO) {
+          const oldest = memo.keys().next();
+          if (!oldest.done) memo.delete(oldest.value);
+        }
+        memo.set(memoKey, { noul, decision, inputTokens: result.usage?.input_tokens ?? null });
+        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash, noul, decision, tokensSaved: drop ? Math.floor(item.text.length / 4) : 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
+        await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash, prompt, memory: item.text, noul, decision });
       }
     } catch {
       // Shadow failures never affect the turn.

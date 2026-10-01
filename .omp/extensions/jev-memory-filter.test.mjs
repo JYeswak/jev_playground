@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -129,4 +129,31 @@ test("parseMemories splits both block types and dedupes", () => {
 
 test("currentPrompt takes the last user text", () => {
   assert.equal(currentPrompt([{ role: "user", content: "first" }, { role: "user", content: "second" }]), "second");
+});
+
+test("repeat pair reuses the verdict without a second call", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  let calls = 0;
+  const handler = makeMemoryFilterHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.1 }, latencyMs: 1, model: "m" }; }, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
+  const event = contextWith("fix the login bug", MEM);
+  await handler(event);
+  await handler(event);
+  assert.equal(calls, 2);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.equal(rows.length, 4);
+  assert.ok(rows.slice(0, 2).every((r) => r.status === "scored"));
+  assert.ok(rows.slice(2).every((r) => r.status === "memo" && r.decision === "drop" && r.noul === 0.1));
+});
+
+test("sidecar carries text at mode 600 while the log stays hash-only", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeMemoryFilterHandler({ ask: fakeAsk(0.1), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
+  await handler(contextWith("fix the login bug", MEM));
+  assert.equal(statSync(join(dir, "full.jsonl")).mode & 0o777, 0o600);
+  const side = rowsOf(join(dir, "full.jsonl"));
+  assert.equal(side.length, 2);
+  assert.ok(side.every((r) => r.prompt === "fix the login bug\n" + MEM + "\n" && typeof r.memory === "string" && r.memory.length > 0));
+  assert.deepEqual(side.map((r) => r.memory).sort(), ["grep proof needs vgrep not bare grep", "the vault address is oak street"]);
+  const logText = readFileSync(join(dir, "log.jsonl"), "utf8");
+  assert.ok(!logText.includes("oak street") && !logText.includes("fix the login bug"));
 });
