@@ -4701,3 +4701,79 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** before any free comparator call, obtain independent provenance review and preregister the exact-hash cluster as the independent unit, effective N, and fixed inclusion/aggregation rule. Every cross-set hash must be independently adjudicated to one label or excluded under a rule set without model outputs; repeated same-label hashes must not be counted as independent rows. State whether the already-collected Jev answers can be reused under that rule and freeze the revised bar before the comparator runs. Do not silently drop, relabel, reweight, or choose adjudication based on model answers.
 
 **Evidence:** `work/jev-pgtu/items.jsonl` SHA-256 `fc417c602499328243f86a06d84e3c0888fa41e6662aeefc2a8251c1adf3437b`; `work/jev-pgtu/jev-rescore-rows.jsonl` SHA-256 `cc0aa3427dfdf8a8a9dd74483cb580619ad9287694eabba1f2341a9321678a9e`; `work/jev-pgtu/reachability.json`; EVAL entry above; prereg/runner commits `2c1a72e9`, `bee800d1`, `424fc0f6`, live receipt commit `f2d687d3`.
+
+## R125 — REFUTED: an outside adopter is required before auditing our existing consumers (2026-09-29)
+
+**Hypothesis:** P0 must produce an independently consenting external adopter or terminal `NO_CONSUMER` verdict before local gate/search demand can be measured.
+
+**Minimal repro / experiment:** compare `docs/0927_reality_plan.md:188-193` and the original P0/P2/P8 Beads activation contracts with recorded local tool use and the corrected graph.
+
+**Expected signal:** no existing local consumer or keyless source remains usable without that external permission.
+
+**Result (keyless):** `EVAL.md:2465-2468` records 1,595 native `find` calls in a 24-hour window; `EVAL.md:3021-3024` records 2,425 local gate events. Our omp operator is a real local consumer. On 2026-09-29 the P0 blocking edges to P2/P3/P8/P11/P14 were removed; P2 and P8 became claimable for keyless audits while P0 stayed deferred. External adopter permission is still necessary for external deployment (P11), and recipient/data-class authorization plus route-specific P15/U06/U07 proof remain necessary before new provider-bound traffic. Usage is **not** evidence of Jev benefit or advice demand.
+
+**Verdict:** REFUTED for the prerequisite, not for the separate safety gates. **Retry-condition:** restore a specific edge only if its downstream action actually consumes a P0-owned authorization or source that cannot be obtained directly; demonstrate the denied negative and allowed positive without adding an outside adopter to keyless work.
+
+**Evidence:** `docs/0927_reality_plan.md:188-193,243-253`, `EVAL.md:2465-2468,3021-3024`, Beads `jev-p0-identify-consumer-e8uf`, `jev-p2-gate-demand-qdtl`, `jev-p8-search-feasibility-n2ca`.
+
+## R126 — REFUTED: zero Beads cycles and complete ID coverage certify an executable plan (2026-09-29)
+
+**Hypothesis:** converting P0–P9/P11–P15/U04/U06/U07 to 18 IDs with zero literal cycles proves the execution graph is ready.
+
+**Minimal repro / experiment:** inspect the converted graph against each bead's activation witness and safety acceptance, not just `br dep cycles` or `bv` centrality. Compare the semantic U04→`jev-wiya` closure path and the deferred conditional records.
+
+**Expected signal:** every blocking edge expresses a real prerequisite and every ready task has a positive, planted negative and runnable acceptance.
+
+**Result (keyless):** the original 18-ID zero-cycle conversion missed U04→`jev-wiya`'s semantic closure deadlock and prematurely converted eleven conditional records. The deadlock edge was removed, but the optional records remain deferred. `bv --robot-priority` also recommended demoting P15/U06/U07 safety while promoting blocked P5; graph importance cannot grant permission or replace a route proof.
+
+**Verdict:** REFUTED. **Retry-condition:** call a conversion executable only after an independent reviewer can start the least-obvious unit from its bead alone, identify a runnable rejecting negative and allowed positive, and show each blocking edge is consumed by that unit's actual acceptance; keep conditional records inactive until their witnesses exist. This is a specification check, not a claim that the runtime tests already fired.
+
+**Evidence:** `docs/0927_reality_plan.md:289-304`; `br show` for `jev-u04-key-provider-check-p147`, `jev-p5-gate-shadow-f63p`, `jev-p15-contain-automatic-egress-810p`; 2026-09-29 `bv --robot-priority` review. No runtime/provider-safety claim.
+
+## R127 — REFUTED: an NFCorpus top-1 gain constitutes a full preregistered rerank win (2026-09-29)
+
+**Hypothesis:** the public `README.md` "Measured wins" NFCorpus row can present the result without naming a failed primary bar, and "$0 by unchanged usage" can stand without specifying whose spend it describes.
+
+**Minimal repro / experiment:** compare `README.md:78-96` with the frozen paired metrics and spend in `EVAL.md:2650-2658,2703-2707`.
+
+**Expected signal:** every frozen bar leg passes, and zero spend describes the whole experiment.
+
+**Result (live receipts, source review only in this pass):** the 234-query Jev top-1 delta over BM25 is +0.1282051 and passes its +0.10 leg, but nDCG@10 delta is +0.0269472 and **misses** the frozen +0.05 leg. Valid Jev spend was $0.088205208; total Jev spend including invalid transport was $0.335360088. The unchanged $0 usage belongs only to the permitted `:free` OpenRouter comparator. The current README row omits the missed leg and does not attribute the $0, while its heading says "Measured wins." No new API call was made for this review.
+
+**Verdict:** REFUTED as a complete win or zero-cost Jev result. **Retry-condition:** the public claim must name both frozen legs and the correct arm's spend; a future complete win requires a new preregistered independent paired run meeting every original-or-stricter bar, not relabeling this receipt or changing the cutoff.
+
+**Evidence:** `README.md:78-96`, `EVAL.md:2650-2658,2703-2707`, `work/rerank-scifact/receipt-nfcorpus-v2.json`, `work/rerank-scifact/receipt-jev-97bq.json`; P1/P9 public-readback Beads. This row does not assert an organic reader benefit.
+
+## R128 — REFUTED: a command hash or search-path touch is an observed incumbent or outcome (2026-09-29)
+
+**Hypothesis:** shadow rows labelled `gate-observe.jsonl:cmdSha`, or search hits touched within a nominal ten-call window, suffice as same-event incumbent decisions or reader outcomes.
+
+**Minimal repro / experiment:** inspect `.omp/hooks/pre/jev-gate-shadow.ts:49-50,72-75` and `.omp/hooks/post/jev-web-search-rerank.ts:203-236`; compare `work/jev-1miz/final-receipt.json` and `EVAL.md:2661-2665`.
+
+**Expected signal:** the gate hook reads and logs a real source event ID, and the search hook retains all eligible queries with exactly ten subsequent tool calls, including no-open windows.
+
+**Result (source review, not a runtime replay):** when `event.details.existingFlag` is missing the gate hook emits the literal `gate-observe.jsonl:cmdSha` without reading that source; its row has no `toolCallId`. The prior receipt reports `dcg_joined_rows=0`, `NOT_COMPARABLE`. The search hook increments `nextCalls` only for open-like calls and writes no follow-up record for an answered query with zero later opens; 42 measured native find path-touch windows remain below a 100-window bar. None is a same-event deterministic incumbent or answer quality.
+
+**Verdict:** REFUTED for evidence provenance. **Retry-condition:** promote only after a recorded-event positive and planted same-command/different-event negative establish a real session/toolCallId source-row join, and a mixed ten-call-plus-eleventh-open/no-open search negative establishes a complete eligibility denominator; independently label the action/outcome before benefit claims.
+
+**Evidence:** the two hooks above; `EVAL.md:2661-2665,2711-2719`; Beads `jev-p3-gate-hook-d6zt` and `jev-p8-search-feasibility-n2ca`. No provider call or deployed-hook behavior was tested in this review.
+
+## R129 — REFUTED: `omp config get` confirms the RPC child's secret setting (2026-09-29)
+
+**Hypothesis:** setting `PI_CONFIG_FILES` to a file with `secrets.enabled: false` and reading back `omp config get secrets.enabled=false` proves a freshly spawned local RPC session will expose a synthetic planted secret in its outbound provider request.
+
+**Minimal repro / experiment:** the original `work/omp-secret-probe/probe.mjs` local fake-provider route used that environment overlay for both `config get` and the RPC child. An independent read-only witness decoded the two prior role=tool messages from Agent Mail message 43071: both masked and disabled-control messages carried an OMP placeholder and preserved benign text; the disabled arm never exposed the planted marker. The old untracked source had no exact outbound request/body capture, so the witness explicitly did not claim a full-request verdict. After changing only the synthetic child to `omp --config <bypass.yml>`, the same local fake provider captured a host frame carrying the marker and an exact second outbound request carrying it when disabled; the masked arm's exact request omitted it. Source hashes, per-arm byte hashes and the 15/15 keyless suite are in `EVAL.md:3034-3039`.
+
+**Verdict:** REFUTED as a configuration or redaction oracle; `config get` on a separate process is not a provider-byte witness for the RPC child. **Retry-condition:** only reconsider the environment-overlay route if the exact same launched RPC child, with a captured and independently recounted synthetic raw host result and full outbound request, exhibits a causal masked positive and disabled RED. Do not weaken the masking gate, infer cross-profile safety or substitute model readback for outbound bytes.
+
+**Evidence:** Agent Mail message 43071 (author-origin bytes independently decoded by a witness; not a non-author capture), `work/omp-secret-probe/probe.mjs` SHA-256 `de88ab7ccec00be6b93d8799b13bc28c5bed75299ace89ed51c1dc05d5c3ebda` in the uncommitted shared tree, `EVAL.md:2835-2838,3034-3039`. No Jev/API call or actual provider credential.
+
+## R130 — REFUTED: the claim-without-evidence TTSR rule meets precision >= 0.80 at cut 0.7 (2026-10-01)
+
+**Hypothesis:** the judged rule (`.omp/rules/claim-without-evidence.md`: Noul over state {output, content}, flag iff >= 0.7) catches unsupported done/fixed/passing claims at precision >= 0.80 and recall >= 0.50 on organic session outputs.
+
+**Minimal repro / experiment:** preregistered bar + blind labels committed first (`work/e2vb-revert-measure/PREREG.md`, ec08417c): 150 assistant outputs from 3147 session files (seed 20261001; 75 dev/21 pos, 75 held/23 pos; positive = result claim without quoted command+output, file:line, or commit). Live jev-1.13.0, rule-exact request. Dev: base P=0.500 R=0.571; criteria variant P=0.520 R=0.619; examples variant P=0.500 R=0.476. One held-out retest of the best (criteria): P=0.571 (12/21 flagged correct) R=0.522 — precision misses the 0.80 bar. Failure mode: DONE + artifact pointers (paths, hashes, URLs, counts) without command output score high and are the bulk of false positives; short status claims score low and are missed.
+
+**Verdict:** REFUTED at cut 0.7 as a precision gate. **Retry-condition:** re-measure only with a re-labeled corpus and a preregistered bar after a rule-question change, a cut change with ROC justification on the dev half, or per-output-type calibration; one held-out retest max per design. Recorded companion finding: in short RPC sessions a judged rule can inject (2 sessions, ttsr_injection present) with no model_usage purpose=ttsr row journaled — journaling race, not a judging failure.
+
+**Evidence:** `work/e2vb-revert-measure/` (PREREG.md, labels-dev/held.jsonl, scores-dev-{base,v1,v2}.jsonl, scores-held-v1.jsonl, VARIANTS.md); 300 live calls, 220610 input tokens ≈ $0.0093. Session texts kept local, never committed. Pending mechanical step (blocked by kit-guard B7, no KIT_GATE_EDIT): append `claim-without-evidence` to ttsr.disabledRules in `.omp/config.yml:79-80` (one list item under the existing `absence-from-one-probe` entry).
