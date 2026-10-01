@@ -11,7 +11,8 @@ def grade(task_id, srcdir):
         if os.path.isfile(s):
             shutil.copy(s, tmp)
     root = os.path.dirname(os.path.abspath(__file__))
-    test = open(os.path.join(root, "grading", f"{task_id}.py")).read()
+    gdir = "grading2" if task_id.startswith("k") else "grading"
+    test = open(os.path.join(root, gdir, f"{task_id}.py")).read()
     test = test.replace("SYS_PATH", repr(tmp)).replace("SYSCWD", repr(tmp))
     tp = os.path.join(tmp, "test_hidden.py")
     open(tp, "w").write(test)
