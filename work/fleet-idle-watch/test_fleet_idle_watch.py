@@ -94,6 +94,400 @@ class ShadowAdmission(unittest.TestCase):
         self.assertNotIn(fake_key, result.stdout + result.stderr)
 
 
+class PollTimeout(unittest.TestCase):
+    def poll_without_timeout_leak(self):
+        try:
+            return fiw.poll()
+        except subprocess.TimeoutExpired as error:
+            self.fail(f"poll leaked the recorded timeout: {error}")
+
+    def test_ps_timeout_is_not_run_and_does_not_escape_poll(self):
+        tmux_command = [
+            "tmux",
+            "list-panes",
+            "-t",
+            fiw.SESSION,
+            "-F",
+            "#{pane_index} #{pane_pid} #{pane_current_command}",
+        ]
+        ps_command = ["ps", "-axo", "pid=,ppid=,pcpu=,command="]
+
+        def run(command, **kwargs):
+            if command == tmux_command:
+                return subprocess.CompletedProcess(command, 0, "2 11832 bun\n", "")
+            if command == ps_command:
+                self.assertEqual(kwargs["timeout"], 10)
+                raise subprocess.TimeoutExpired(cmd=ps_command, timeout=10)
+            self.fail(f"unexpected subprocess: {command!r}")
+
+        output = io.StringIO()
+        with mock.patch.object(fiw.subprocess, "run", side_effect=run):
+            with contextlib.redirect_stdout(output):
+                try:
+                    states = fiw.poll()
+                except subprocess.TimeoutExpired as error:
+                    self.fail(f"poll leaked the recorded ps timeout: {error}")
+
+        self.assertIsNone(states)
+        self.assertIn("NOT_RUN", output.getvalue())
+        self.assertIn("ps", output.getvalue())
+
+    def test_tmux_list_panes_timeout_is_not_run(self):
+        command = [
+            "tmux",
+            "list-panes",
+            "-t",
+            fiw.SESSION,
+            "-F",
+            "#{pane_index} #{pane_pid} #{pane_current_command}",
+        ]
+
+        def run(actual, **kwargs):
+            self.assertEqual(actual, command)
+            self.assertEqual(kwargs["timeout"], 10)
+            raise subprocess.TimeoutExpired(cmd=command, timeout=10)
+
+        output = io.StringIO()
+        with mock.patch.object(fiw.subprocess, "run", side_effect=run):
+            with contextlib.redirect_stdout(output):
+                states = self.poll_without_timeout_leak()
+
+        self.assertIsNone(states)
+        self.assertIn("NOT_RUN", output.getvalue())
+        self.assertIn("tmux list-panes", output.getvalue())
+
+    def test_tmux_capture_pane_timeout_discards_partial_poll(self):
+        list_command = [
+            "tmux",
+            "list-panes",
+            "-t",
+            fiw.SESSION,
+            "-F",
+            "#{pane_index} #{pane_pid} #{pane_current_command}",
+        ]
+        ps_command = ["ps", "-axo", "pid=,ppid=,pcpu=,command="]
+
+        def run(command, **kwargs):
+            if command == list_command:
+                return subprocess.CompletedProcess(command, 0, "5 37332 bun\n", "")
+            if command == ps_command:
+                return subprocess.CompletedProcess(
+                    command, 0, (FIX / "ps-panes-0-2-4-5.txt").read_text(), ""
+                )
+            if command[:2] == ["tmux", "capture-pane"]:
+                self.assertEqual(kwargs["timeout"], 10)
+                raise subprocess.TimeoutExpired(cmd=command, timeout=10)
+            self.fail(f"unexpected subprocess: {command!r}")
+
+        output = io.StringIO()
+        with mock.patch.object(fiw.subprocess, "run", side_effect=run):
+            with contextlib.redirect_stdout(output):
+                states = self.poll_without_timeout_leak()
+
+        self.assertIsNone(states)
+        self.assertIn("NOT_RUN", output.getvalue())
+        self.assertIn("tmux capture-pane", output.getvalue())
+
+    def test_lsof_timeout_discards_partial_poll(self):
+        list_command = [
+            "tmux",
+            "list-panes",
+            "-t",
+            fiw.SESSION,
+            "-F",
+            "#{pane_index} #{pane_pid} #{pane_current_command}",
+        ]
+        ps_command = ["ps", "-axo", "pid=,ppid=,pcpu=,command="]
+
+        def run(command, **kwargs):
+            if command == list_command:
+                return subprocess.CompletedProcess(command, 0, "5 37332 bun\n", "")
+            if command == ps_command:
+                return subprocess.CompletedProcess(
+                    command, 0, (FIX / "ps-panes-0-2-4-5.txt").read_text(), ""
+                )
+            if command[:2] == ["tmux", "capture-pane"]:
+                return subprocess.CompletedProcess(command, 0, PANE5_SCREEN, "")
+            if command[:2] == ["lsof", "-p"]:
+                self.assertEqual(kwargs["timeout"], 10)
+                raise subprocess.TimeoutExpired(cmd=command, timeout=10)
+            self.fail(f"unexpected subprocess: {command!r}")
+
+        output = io.StringIO()
+        with mock.patch.object(fiw.subprocess, "run", side_effect=run):
+            with contextlib.redirect_stdout(output):
+                states = self.poll_without_timeout_leak()
+
+        self.assertIsNone(states)
+        self.assertIn("NOT_RUN", output.getvalue())
+        self.assertIn("lsof", output.getvalue())
+
+    def test_daemon_reports_surface_census_timeout_and_reaches_next_wait(self):
+        class StopAfterRound(Exception):
+            pass
+
+        def run(command, **kwargs):
+            self.assertTrue(any("surface-census.py" in part for part in command))
+            self.assertEqual(kwargs["timeout"], 60)
+            raise subprocess.TimeoutExpired(cmd=command, timeout=60)
+
+        output = io.StringIO()
+        with (
+            mock.patch.object(fiw, "poll", return_value={2: ("working", "")}),
+            mock.patch.object(fiw, "ci_lines", return_value=[]),
+            mock.patch.object(fiw, "stranger_round", return_value=None),
+            mock.patch.object(fiw, "inbox_round", return_value="Inbox: NOT_RUN test"),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw.time, "sleep", side_effect=StopAfterRound),
+            mock.patch.object(sys, "argv", ["fleet-idle-watch.py"]),
+            contextlib.redirect_stdout(output),
+        ):
+            with self.assertRaises(StopAfterRound):
+                fiw.main()
+
+        self.assertIn("NOT_RUN", output.getvalue())
+        self.assertIn("surface-census.py", output.getvalue())
+
+    def test_once_skips_the_round_after_poll_timeout(self):
+        output = io.StringIO()
+        with (
+            mock.patch.object(fiw, "poll", return_value=None),
+            mock.patch.object(
+                fiw, "ci_lines", side_effect=AssertionError("round must skip")
+            ),
+            mock.patch.object(sys, "argv", ["fleet-idle-watch.py", "--once"]),
+            contextlib.redirect_stdout(output),
+        ):
+            try:
+                result = fiw.main()
+            except Exception as error:
+                self.fail(f"--once leaked the poll timeout sentinel: {error}")
+
+        self.assertEqual(result, 2)
+
+    def test_daemon_sleeps_and_continues_after_poll_timeout(self):
+        class StopAfterWait(Exception):
+            pass
+
+        with (
+            mock.patch.object(fiw, "poll", return_value=None),
+            mock.patch.object(
+                fiw, "ci_lines", side_effect=AssertionError("round must skip")
+            ),
+            mock.patch.object(fiw.time, "sleep", side_effect=StopAfterWait),
+            mock.patch.object(sys, "argv", ["fleet-idle-watch.py"]),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            try:
+                fiw.main()
+            except StopAfterWait:
+                pass
+            except Exception as error:
+                self.fail(f"daemon leaked the poll timeout: {error}")
+            else:
+                self.fail("daemon did not wait for the next round")
+
+
+class NeedsHuman(unittest.TestCase):
+    # Positive: controlled real OMP turn on the codex profile, 2026-10-01,
+    # prompt_result completed sessionSettled true, stopReason stop.
+    POSITIVE = "May I proceed with the harmless reversible formatting step now \u2014 yes or no?"
+    # Negative: captured pane 6 session line 19945 (row 4c3d872b, 241 chars,
+    # sha bd61a0ba965aab7500b0871613cb4bd218c64fd2632d5cb1a832d82d6ecf8b56).
+    NEGATIVE = "The latest explicit instruction in the archived conversation parks new work until a concrete build/test packet arrives. I\u2019m not claiming from br ready or starting commands, tests, provider calls, edits, or commits. Waiting for that packet."
+
+    def write_session(self, directory, texts):
+        path = Path(directory) / "session.jsonl"
+        with path.open("w", encoding="utf-8") as handle:
+            for number, text in enumerate(texts):
+                row = {
+                    "id": f"row-{number}",
+                    "message": {
+                        "role": "assistant",
+                        "content": [{"type": "text", "text": text}],
+                        "stopReason": "stop",
+                        "timestamp": 1790821507000 + number,
+                    },
+                }
+                handle.write(json.dumps(row) + "\n")
+        return path
+
+    def isolated(self, tmp):
+        paged = Path(tmp) / "paged.json"
+        day = Path(tmp) / "day.json"
+        log = Path(tmp) / "calls.jsonl"
+        return {
+            "JEV_WATCH_NEEDS_HUMAN_PAGED": str(paged),
+            "JEV_WATCH_NEEDS_HUMAN_DAY": str(day),
+            "JEV_WATCH_NEEDS_HUMAN_LOG": str(log),
+        }
+
+    def test_last_message_skips_toolcall_only_rows(self):
+        tmp = tempfile.mkdtemp(prefix="fiw-needs-human-")
+        path = Path(tmp) / "session.jsonl"
+        tool_only = {
+            "id": "tool-1",
+            "message": {
+                "role": "assistant",
+                "content": [
+                    {"type": "toolCall", "id": "1", "name": "bash", "arguments": {}}
+                ],
+                "stopReason": "stop",
+            },
+        }
+        positive = {
+            "id": "row-9",
+            "message": {
+                "role": "assistant",
+                "content": [
+                    {"type": "thinking"},
+                    {"type": "text", "text": self.POSITIVE},
+                ],
+                "stopReason": "stop",
+                "timestamp": 1790821507006,
+            },
+        }
+        path.write_text(
+            json.dumps(tool_only) + "\n" + json.dumps(positive) + "\n", encoding="utf-8"
+        )
+        found = fiw.last_assistant_message(path)
+        self.assertEqual(found["text"], self.POSITIVE)
+        self.assertEqual(found["row_id"], "row-9")
+
+    def test_positive_pages_and_negative_stays_silent(self):
+        tmp = tempfile.mkdtemp(prefix="fiw-needs-human-")
+        with mock.patch.dict(os.environ, self.isolated(tmp)):
+            positive_file = self.write_session(tmp, [self.NEGATIVE, self.POSITIVE])
+            sent = []
+            paged = fiw.check_idle_needs_human(
+                6,
+                97023,
+                1790821600.0,
+                send=sent.append,
+                asker=lambda text: {
+                    "ok": True,
+                    "score": 0.91,
+                    "model": "jev-1.13.0",
+                    "latencyMs": 212,
+                    "usage": {"input_tokens": 120, "output_tokens": 0},
+                },
+                session_file=positive_file,
+            )
+            self.assertTrue(paged)
+            self.assertEqual(len(sent), 1)
+            self.assertTrue(sent[0].startswith("NEEDS-HUMAN pane 6: "))
+            self.assertIn("May I proceed", sent[0])
+            negative_file = self.write_session(tmp, [self.NEGATIVE])
+            sent.clear()
+            calls = [0]
+
+            def low_asker(text):
+                calls[0] += 1
+                return {
+                    "ok": True,
+                    "score": 0.05,
+                    "model": "jev-1.13.0",
+                    "latencyMs": 180,
+                }
+
+            paged = fiw.check_idle_needs_human(
+                6,
+                97023,
+                1790821700.0,
+                send=sent.append,
+                asker=low_asker,
+                session_file=negative_file,
+            )
+            self.assertFalse(paged)
+            self.assertEqual(sent, [])
+            self.assertEqual(calls[0], 1)
+
+    def test_once_per_message_cap_auth_stop_and_fail_open(self):
+        tmp = tempfile.mkdtemp(prefix="fiw-needs-human-")
+        with mock.patch.dict(os.environ, self.isolated(tmp)):
+            session_file = self.write_session(tmp, [self.POSITIVE])
+            calls = []
+            asker = lambda text: (
+                calls.append(text),
+                {"ok": True, "score": 0.95, "model": "jev-1.13.0", "latencyMs": 100},
+            )[1]
+            self.assertTrue(
+                fiw.check_idle_needs_human(
+                    6,
+                    97023,
+                    1790821600.0,
+                    send=lambda message: True,
+                    asker=asker,
+                    session_file=session_file,
+                )
+            )
+            self.assertEqual(len(calls), 1)
+            self.assertFalse(
+                fiw.check_idle_needs_human(
+                    6,
+                    97023,
+                    1790821700.0,
+                    send=lambda message: True,
+                    asker=asker,
+                    session_file=session_file,
+                )
+            )
+            self.assertEqual(len(calls), 1)
+            refused = fiw.check_idle_needs_human(
+                6,
+                97023,
+                1790821800.0,
+                send=lambda message: True,
+                asker=lambda text: (_ for _ in ()).throw(
+                    AssertionError("cap must stop the call")
+                ),
+                session_file=session_file,
+                cap=1,
+            )
+            self.assertFalse(refused)
+            failing = fiw.check_idle_needs_human(
+                5,
+                37332,
+                1790821900.0,
+                send=lambda message: True,
+                asker=lambda text: {
+                    "ok": False,
+                    "reason": "transport",
+                    "error": "helper TimeoutExpired",
+                    "model": "jev-1.13.0",
+                    "latencyMs": 0,
+                },
+                session_file=session_file,
+            )
+            self.assertFalse(failing)
+            denied = fiw.check_idle_needs_human(
+                4,
+                78292,
+                1790822000.0,
+                send=lambda message: True,
+                asker=lambda text: {
+                    "ok": False,
+                    "reason": "http",
+                    "error": "systemOne HTTP 403: forbidden",
+                    "model": "jev-1.13.0",
+                    "latencyMs": 50,
+                },
+                session_file=session_file,
+            )
+            self.assertFalse(denied)
+            after_stop = fiw.check_idle_needs_human(
+                3,
+                88558,
+                1790822100.0,
+                send=lambda message: True,
+                asker=lambda text: (_ for _ in ()).throw(
+                    AssertionError("auth stop must skip the call")
+                ),
+                session_file=session_file,
+            )
+            self.assertFalse(after_stop)
+
+
 class ProcessTree(unittest.TestCase):
     def test_omp_found_under_the_pane_shell(self):
         self.assertEqual(fiw.omp_processes(TABLE, PANE_PID[2])[0], 43091)

@@ -161,7 +161,18 @@ claim nobody can check:
   nothing at all under omp is `stalled-wait`; a CPU-active child, or a live child at 0.0 CPU (a
   paced `work/openrouter-incumbents/run.py`, session idle 900 s), is `working`. Plant "require
   CPU again" fails 1 of 30.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (33 tests).
+  Poll timeouts (jev-5qx8, crashes 02:54Z and 03:09Z under load): a TimeoutExpired from tmux
+  list-panes, ps, tmux capture-pane, or the lsof session probe returns None with a NOT_RUN line
+  and the round is skipped (exit 2 for --once, sleep-and-continue for the daemon); the 60 s
+  surface-census timeout reports NOT_RUN for all four lines and reaches the next wait. 7 tests.
+  Needs-human alert (jev-5qx8): last_assistant_message reads the newest non-empty assistant text
+  (stopReason stop, toolCall-only rows skipped) from the pane's omp session file, never the
+  screen. Fixtures are the controlled real approval question (codex RPC 2026-10-01) and captured
+  pane 6 line 19945 / pane 3 line 12867 reports. Injected asker: >=0.7 pages
+  `NEEDS-HUMAN pane N: <one line>`, <0.7 stays silent; once per message sha, daily cap (20),
+  401/402/403 stops the day, transport failure fails open. 3 tests. Live replay
+  (receipt-jev-5qx8-replay.json): positive 0.97, negative 0.08, jev-1.13.0, $0.00003066.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (49 tests).
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder
@@ -590,3 +601,4 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 - `.omp/tools/jev-seat.test.mjs` — captured jev-a9fv coding-agent seat source, 5/300 clean false flags, 269/300 planted catch, shared cut and malformed-answer policy. Run: `node --experimental-strip-types --test .omp/tools/jev-seat.test.mjs` (3 tests).
 - `kit/test/seat-drift.test.mjs` — byte identity between the measured `work/jev-a9fv/seat.mjs` and packaged installer seat. Run: `node --experimental-strip-types --test kit/test/seat-drift.test.mjs` (1 test).
 - `.omp/hooks/post/jev-injection-shadow.test.mjs` — keyless coding-agent injection-seat shadow: cap row privacy, failed-result ignore, and detached-worker contract seam. Run: `node --experimental-strip-types --test .omp/hooks/post/jev-injection-shadow.test.mjs` (2 tests).
+- `work/jev-pgtu/test_jev_baseline.py` — PGTU same-state pairing, stale-hash rescore selection, pinned-model and missing-token refusal, and empty-key-pipe refusal. Run: `uv run --no-project --python 3.12 --with ./upstream/typesafe-ai/typesafe-sdk-python --with pytest python -m pytest -q work/jev-pgtu/test_jev_baseline.py` (8/8 keyless on 2026-09-29). The plain system `python3 -m pytest` lacks the vendored SDK and fails 3/8; this command uses the local first-party SDK without a live request.

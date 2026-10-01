@@ -44,7 +44,7 @@ was 'idle' while its omp had a docker run live under a bash tool call.
                                                  # scripts/ci-main-status.py, the Jev judge
                                                  # line from surface-census.py --fleet-line
                                                  # (both informational) and one mail round;
-                                                 # exit 1 if any worker is not working
+                                                 # exit 1 if any worker is not working; 2 if ps is NOT_RUN
   python3 scripts/fleet-idle-watch.py --selftest # classifier on real status lines and trees
 """
 
@@ -128,6 +128,20 @@ STRANGER_FAILURE = re.compile(
 KEY_LINE = "Key exposure 24h: "
 KEY_COUNT = re.compile(r"^Key exposure 24h: (\d+) session files hold")
 KEY_PATH = re.compile(r"(.+?\.jsonl) \((\d\d:\d\d)Z\)(?:, |$)")
+
+
+NEEDS_HUMAN_THRESHOLD = float(os.environ.get("JEV_NEEDS_HUMAN_THRESHOLD", "0.7"))
+NEEDS_HUMAN_DAILY_CAP = int(os.environ.get("JEV_NEEDS_HUMAN_DAILY_CAP", "20"))
+NEEDS_HUMAN_HELPER = Path(__file__).with_name("fleet-needs-human.mjs")
+NEEDS_HUMAN_MODEL = "jev-1.13.0"
+NEEDS_HUMAN_CALL_LOG = "~/.local/state/jev/fleet-needs-human-calls.jsonl"
+NEEDS_HUMAN_PAGED_STATE = "~/.local/state/jev/needs-human-paged.json"
+NEEDS_HUMAN_DAY_STATE = "~/.local/state/jev/needs-human-day.json"
+NEEDS_HUMAN_TAIL_BYTES = 2_000_000
+NEEDS_HUMAN_MAX_CHARS = 2000
+KEY_SHAPE = re.compile(
+    r"(?:sk-[A-Za-z0-9_-]{16,}|apikey_[A-Za-z0-9_-]{20,}|Bearer\s+\S{20,})", re.I
+)
 
 
 class Snapshot(NamedTuple):
@@ -295,7 +309,7 @@ def omp_cpu_tools(table: dict[int, tuple], pane_pid: int) -> list[str]:
 
 
 def session_age(omp_pid: int, now: float) -> float | None:
-    """Seconds since the newest session .jsonl omp_pid holds open was written; None if none."""
+    """Seconds since the newest session .jsonl omp_pid holds open; None if none."""
     try:
         out = subprocess.run(
             ["lsof", "-p", str(omp_pid), "-Fn"],
@@ -303,7 +317,7 @@ def session_age(omp_pid: int, now: float) -> float | None:
             text=True,
             timeout=10,
         ).stdout
-    except (OSError, subprocess.TimeoutExpired):
+    except OSError:
         return None
     mtimes = []
     for line in out.splitlines():
@@ -313,6 +327,279 @@ def session_age(omp_pid: int, now: float) -> float | None:
             except OSError:
                 pass
     return max(0.0, now - max(mtimes)) if mtimes else None
+
+
+def newest_session_file(omp_pid: int):
+    """Newest session .jsonl omp_pid holds open, or None. Metadata only; never reads text."""
+    try:
+        out = subprocess.run(
+            ["lsof", "-p", str(omp_pid), "-Fn"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    best = None
+    for line in out.splitlines():
+        if not line.startswith("n") or not line.endswith(".jsonl"):
+            continue
+        path = Path(line[1:])
+        try:
+            if "sessions" not in path.parts or not path.is_file():
+                continue
+            mtime = path.stat().st_mtime_ns
+        except OSError:
+            continue
+        if best is None or mtime > best[0]:
+            best = (mtime, path)
+    return best[1] if best else None
+
+
+def assistant_text_of(row) -> str:
+    """Visible assistant text of one session row; toolCall/thinking-only rows yield ''."""
+    message = (
+        row.get("message")
+        if isinstance(row, dict) and isinstance(row.get("message"), dict)
+        else row
+    )
+    if not isinstance(message, dict) or message.get("role") != "assistant":
+        return ""
+    content = message.get("content")
+    if isinstance(content, str):
+        return content.strip()
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if (
+                isinstance(block, dict)
+                and block.get("type") == "text"
+                and isinstance(block.get("text"), str)
+            ):
+                parts.append(block["text"])
+        return "".join(parts).strip()
+    return ""
+
+
+def last_assistant_message(path: Path, tail_bytes: int = NEEDS_HUMAN_TAIL_BYTES):
+    """Newest non-empty assistant text with stopReason stop (or unset). Returns dict or None."""
+    try:
+        size = path.stat().st_size
+        with path.open("rb") as handle:
+            handle.seek(max(0, size - tail_bytes))
+            lines = handle.read().splitlines()
+        total = None
+        try:
+            with path.open("rb") as handle:
+                total = sum(1 for _ in handle)
+        except OSError:
+            total = None
+        offset = (total - len(lines)) if total is not None else None
+    except OSError:
+        return None
+    for reverse_index, line in enumerate(reversed(lines)):
+        try:
+            row = json.loads(line)
+        except ValueError:
+            continue
+        text = assistant_text_of(row)
+        if not text:
+            continue
+        message = (
+            row.get("message")
+            if isinstance(row, dict) and isinstance(row.get("message"), dict)
+            else row
+        )
+        stop = message.get("stopReason") if isinstance(message, dict) else None
+        if stop is not None and stop != "stop":
+            continue
+        line_no = (offset + len(lines) - reverse_index) if offset is not None else None
+        return {
+            "text": text,
+            "line": line_no,
+            "row_id": row.get("id"),
+            "timestamp": message.get("timestamp")
+            if isinstance(message, dict)
+            else None,
+        }
+    return None
+
+
+def needs_human_paths():
+    """(paged state, day state, call log) honoring test overrides; real paths by default."""
+    paged = Path(
+        os.environ.get("JEV_WATCH_NEEDS_HUMAN_PAGED") or NEEDS_HUMAN_PAGED_STATE
+    ).expanduser()
+    day = Path(
+        os.environ.get("JEV_WATCH_NEEDS_HUMAN_DAY") or NEEDS_HUMAN_DAY_STATE
+    ).expanduser()
+    log = Path(
+        os.environ.get("JEV_WATCH_NEEDS_HUMAN_LOG") or NEEDS_HUMAN_CALL_LOG
+    ).expanduser()
+    return paged, day, log
+
+
+def load_needs_human_marks(paged: Path) -> set:
+    try:
+        saved = json.loads(paged.read_text()) if paged.exists() else {}
+        return set(saved.get("paged", []))
+    except (OSError, ValueError, AttributeError):
+        return set()
+
+
+def save_needs_human_marks(paged: Path, marks: set) -> None:
+    try:
+        paged.parent.mkdir(parents=True, exist_ok=True)
+        tmp = paged.with_name(f"{paged.name}.{os.getpid()}.tmp")
+        tmp.write_text(json.dumps({"paged": sorted(marks)}) + "\n")
+        os.replace(tmp, paged)
+    except OSError:
+        pass
+
+
+def load_needs_human_day(day: Path):
+    today = time.strftime("%Y-%m-%d", time.gmtime())
+    try:
+        saved = json.loads(day.read_text()) if day.exists() else {}
+    except (OSError, ValueError, AttributeError):
+        saved = {}
+    if saved.get("date") != today:
+        return {"date": today, "count": 0, "auth_stop": False}
+    return {
+        "date": today,
+        "count": int(saved.get("count", 0)),
+        "auth_stop": bool(saved.get("auth_stop", False)),
+    }
+
+
+def save_needs_human_day(day: Path, state: dict) -> None:
+    try:
+        day.parent.mkdir(parents=True, exist_ok=True)
+        tmp = day.with_name(f"{day.name}.{os.getpid()}.tmp")
+        tmp.write_text(json.dumps(state) + "\n")
+        os.replace(tmp, day)
+    except OSError:
+        pass
+
+
+def ask_needs_human(text: str, timeout: int = 25):
+    """Call the bounded node helper once. Never raises; failures are data."""
+    try:
+        done = subprocess.run(
+            ["node", "--experimental-strip-types", str(NEEDS_HUMAN_HELPER)],
+            input=(json.dumps({"message": text}) + "\n"),
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+    except (OSError, subprocess.TimeoutExpired) as err:
+        return {
+            "ok": False,
+            "reason": "transport",
+            "error": f"helper {type(err).__name__}",
+            "model": NEEDS_HUMAN_MODEL,
+            "latencyMs": 0,
+        }
+    try:
+        return json.loads(done.stdout or "{}")
+    except ValueError:
+        return {
+            "ok": False,
+            "reason": "non-json",
+            "error": (done.stderr or "")[:200] or "helper printed no JSON",
+            "model": NEEDS_HUMAN_MODEL,
+            "latencyMs": 0,
+        }
+
+
+def append_needs_human_call(log: Path, row: dict) -> None:
+    try:
+        log.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        fd = os.open(log, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+        with os.fdopen(fd, "a") as handle:
+            handle.write(json.dumps(row, separators=(",", ":")) + "\n")
+    except OSError:
+        pass
+
+
+def check_idle_needs_human(
+    index: int,
+    omp_pid: int,
+    now: float,
+    send=None,
+    asker=ask_needs_human,
+    session_file=None,
+    cap: int = NEEDS_HUMAN_DAILY_CAP,
+    threshold: float = NEEDS_HUMAN_THRESHOLD,
+) -> bool:
+    """Page pane 1 when an idle pane's last session message waits on a human. True when paged."""
+    if send is None:
+        send = page
+    paged_path, day_path, log_path = needs_human_paths()
+    marks = load_needs_human_marks(paged_path)
+    day = load_needs_human_day(day_path)
+    if day.get("auth_stop"):
+        return False
+    if day.get("count", 0) >= cap:
+        return False
+    path = session_file or newest_session_file(omp_pid)
+    if path is None:
+        return False
+    found = last_assistant_message(path)
+    if not found or not found.get("text"):
+        return False
+    text = found["text"]
+    if KEY_SHAPE.search(text):
+        return False
+    if len(text) > NEEDS_HUMAN_MAX_CHARS:
+        text = text[:NEEDS_HUMAN_MAX_CHARS]
+    import hashlib as _hashlib
+
+    mark = f"{index}:{_hashlib.sha256(text.encode()).hexdigest()[:16]}"
+    if mark in marks:
+        return False
+    result = asker(text)
+    day["count"] = day.get("count", 0) + 1
+    status = "ok" if result.get("ok") else str(result.get("reason", "unknown"))
+    if (
+        not result.get("ok")
+        and result.get("reason") == "http"
+        and re.search(r"\b401\b|\b402\b|\b403\b", str(result.get("error", "")))
+    ):
+        day["auth_stop"] = True
+    save_needs_human_day(day_path, day)
+    append_needs_human_call(
+        log_path,
+        {
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)),
+            "pane": index,
+            "mark": mark,
+            "status": status,
+            "score": result.get("score") if result.get("ok") else None,
+            "model": result.get("model", NEEDS_HUMAN_MODEL),
+            "input_tokens": (result.get("usage") or {}).get("input_tokens")
+            if isinstance(result.get("usage"), dict)
+            else None,
+            "output_tokens": (result.get("usage") or {}).get("output_tokens")
+            if isinstance(result.get("usage"), dict)
+            else None,
+            "latencyMs": result.get("latencyMs", 0),
+            "chars": len(text),
+        },
+    )
+    marks.add(mark)
+    save_needs_human_marks(paged_path, marks)
+    if (
+        result.get("ok")
+        and isinstance(result.get("score"), (int, float))
+        and result["score"] >= threshold
+    ):
+        one_line = " ".join(text.split()).strip()
+        if len(one_line) > 140:
+            one_line = one_line[:137] + "..."
+        send(f"NEEDS-HUMAN pane {index}: {one_line}")
+        return True
+    return False
 
 
 def shadow_features(words: str) -> list[str]:
@@ -411,57 +698,83 @@ def submit_shadow(states: dict[int, tuple[str, str, str]]) -> None:
         )
 
 
-def poll() -> dict[int, tuple[str, str, str]]:
-    """{pane index: (state, "(evidence)  last screen line")} for every watched worker pane."""
-    out = subprocess.run(
-        [
-            "tmux",
-            "list-panes",
-            "-t",
-            SESSION,
-            "-F",
-            "#{pane_index} #{pane_pid} #{pane_current_command}",
-        ],
-        capture_output=True,
-        text=True,
-        timeout=10,
-    ).stdout
-    table = parse_ps(
-        subprocess.run(
-            ["ps", "-axo", "pid=,ppid=,pcpu=,command="],
+def poll() -> dict[int, tuple] | None:
+    """Read one complete pane snapshot, or return None if any process probe times out."""
+    try:
+        out = subprocess.run(
+            [
+                "tmux",
+                "list-panes",
+                "-t",
+                SESSION,
+                "-F",
+                "#{pane_index} #{pane_pid} #{pane_current_command}",
+            ],
             capture_output=True,
             text=True,
             timeout=10,
         ).stdout
-    )
+    except subprocess.TimeoutExpired:
+        print(
+            "NOT_RUN fleet-idle-watch poll: tmux list-panes timed out after 10s",
+            flush=True,
+        )
+        return None
+    try:
+        processes = subprocess.run(
+            ["ps", "-axo", "pid=,ppid=,pcpu=,command="],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except subprocess.TimeoutExpired:
+        print("NOT_RUN fleet-idle-watch poll: ps timed out after 10s", flush=True)
+        return None
+    table = parse_ps(processes.stdout)
     states = {}
     for row in out.splitlines():
         index, pane_pid, command = (row.split(" ", 2) + ["", ""])[:3]
         if not index.isdigit() or int(index) < 2 or (WATCH and int(index) not in WATCH):
             continue
-        screen = subprocess.run(
-            ["tmux", "capture-pane", "-p", "-t", f"{SESSION}:0.{index}"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        ).stdout
+        try:
+            screen = subprocess.run(
+                ["tmux", "capture-pane", "-p", "-t", f"{SESSION}:0.{index}"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+            ).stdout
+        except subprocess.TimeoutExpired:
+            print(
+                f"NOT_RUN fleet-idle-watch poll: tmux capture-pane pane {index} timed out after 10s",
+                flush=True,
+            )
+            return None
         omp, tools = (
             omp_processes(table, int(pane_pid)) if pane_pid.isdigit() else (None, [])
         )
         cpu_tools = omp_cpu_tools(table, int(pane_pid)) if pane_pid.isdigit() else []
+        try:
+            age = session_age(omp, time.time()) if omp is not None else None
+        except subprocess.TimeoutExpired:
+            print(
+                "NOT_RUN fleet-idle-watch poll: lsof session probe timed out after 10s",
+                flush=True,
+            )
+            return None
         snap = Snapshot(
             command=command,
             screen=screen,
             omp=omp is not None,
             tools=tuple(tools),
             cpu_tools=tuple(cpu_tools),
-            session_age=session_age(omp, time.time()) if omp is not None else None,
+            session_age=age,
         )
         state, evidence = classify(snap)
         states[int(index)] = (
             state,
             f"({evidence})  {last_words(screen)}",
             redacted_status_line(screen),
+            omp,
         )
     return states
 
@@ -800,6 +1113,8 @@ def main() -> int:
         return selftest()
     if "--once" in sys.argv:
         states = poll()
+        if states is None:
+            return 2
         submit_shadow(states)
         for index, reading in sorted(states.items()):
             state, words = reading[:2]
@@ -828,12 +1143,16 @@ def main() -> int:
     while True:
         now = time.time()
         states = poll()
+        if states is None:
+            time.sleep(INTERVAL)
+            continue
         submit_shadow(states)
         if SHADOW_ONLY:
             time.sleep(INTERVAL)
             continue
         for index, reading in states.items():
             state, words = reading[:2]
+            omp_pid = reading[3] if len(reading) > 3 else None
             if state == "stalled-wait":
                 match = re.search(r"session idle ([0-9.]+)s", words)
                 if match:
@@ -854,6 +1173,14 @@ def main() -> int:
                 idle_since.pop(index, None)
                 alerted_at.pop(index, None)
                 continue
+            if state == "idle" and omp_pid is not None:
+                try:
+                    check_idle_needs_human(index, omp_pid, now)
+                except Exception as err:
+                    print(
+                        f"needs-human check failed pane {index}: {type(err).__name__}",
+                        flush=True,
+                    )
             streak[index] = streak.get(index, 0) + 1
             idle_since.setdefault(index, now)
             due = now - alerted_at.get(index, 0) >= REALERT
