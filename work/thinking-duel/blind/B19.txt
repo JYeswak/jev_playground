@@ -1,0 +1,10 @@
+ITEM B19 | PROMPT p04
+RUBRIC-CORE: VACUUM autovacuum partitioning bloat dead-tuples
+---ANSWER---
+You're likely missing a `CHECK` on a `state/status` column: bare `TEXT` means the DB knows 0 legal states while your code enum defines N.
+
+Your nightly `DELETE ... WHERE state IN (...)` enumerates G < N, so terminal-but-unlisted states accumulate forever and disk grows despite deletes.
+
+Your metrics/rollup likely shares the same filter, hiding the leak until disk fills.
+
+Fix: add `CHECK(state IN (...))` to make enum-vs-filter diffable, fix GC to cover all terminal states, add index on the GC filter + `VACUUM` tuning since deletes don't return disk without it.

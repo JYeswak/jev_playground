@@ -1,0 +1,4 @@
+ITEM B02 | PROMPT p08
+RUBRIC-CORE: concrete specific human-voice not-template
+---ANSWER---
+Strip emdashes, `not X it's Y` pivots, `Here's why` lead-ins, and AI clusters like seamless/pivotal/delve; use is/has plainly. Cut significance commentary like `marks a pivotal moment` and trailing -ing clauses. Collapse filler to one sentence per claim and turn bold-label bullets into plain prose. Restore what slop displaced: name dates, numbers, owners, and what changes. Read it aloud once and rewrite any line you would not say to the team.

@@ -1,0 +1,10 @@
+ITEM B13 | PROMPT p11
+RUBRIC-CORE: SEO crawl index Core-Web-Vitals redirects
+---ANSWER---
+After a redesign, start at Layer 1: crawlability → indexation, per dependency chain — uncrawlable pages make content fixes worthless.
+
+Check `robots.txt` for unintentional blocks, XML sitemap for stale URLs, Search Console index coverage vs expected count, redirect chains/loops from old URLs, and canonical tags pointing at retired URLs.
+
+Then Layer 2: HTTPS/mixed content, mobile rendering, URL structure changes, and Core Web Vitals (LCP <2.5s, INP <200ms, CLS <0.1).
+
+Most post-redesign drops trace to blocked crawls, broken redirects, or deindexed pages — not content.

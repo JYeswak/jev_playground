@@ -1,0 +1,8 @@
+ITEM B06 | PROMPT p02
+RUBRIC-CORE: N+1 JOIN eager-loading batching
+---ANSWER---
+That's the N+1 query problem: 1 query for the table + 500 row queries.
+
+Replace the per-row lookup with one batched fetch — eager-load the relation (`joinedload`/equivalent) or a single `JOIN` / `WHERE id IN (...)` query.
+
+Also paginate the table and select only needed columns, with an index on the foreign key.

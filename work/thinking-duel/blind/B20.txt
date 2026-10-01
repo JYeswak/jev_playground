@@ -1,0 +1,7 @@
+ITEM B20 | PROMPT p03
+RUBRIC-CORE: retry backoff jitter idempotency circuit-breaker
+---ANSWER---
+Checkpoint progress per batch/vendor-key so a hiccup resumes instead of restarting; make writes idempotent via idempotency keys.
+Retry only transient `429/502/503/504` with exponential backoff + jitter, max ~5 attempts, honoring `Retry-After`.
+Trip a per-vendor circuit breaker after ~5 failures/60s and park the remainder to DLQ for next run — never hammer through an outage.
+Alert on breaker OPEN and DLQ depth.

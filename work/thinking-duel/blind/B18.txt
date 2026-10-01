@@ -1,0 +1,4 @@
+ITEM B18 | PROMPT p10
+RUBRIC-CORE: PDF puppeteer headless-Chrome header-footer
+---ANSWER---
+Use Template + Data Merge: Handlebars/Jinja2 templates + JSON data → rendered HTML → PDF engine. For HTML source use Puppeteer/Playwright for pixel-perfect output, or WeasyPrint for Python CSS-based reports. Set A4/Letter with explicit margins via `@page` CSS, and implement repeating headers/footers via `headerTemplate`/`footerTemplate` with `pageNumber`/`totalPages` spans, base64-embedded logo, and `printBackground: true`. Reuse one browser instance with a new page per PDF, generate async via queue, escape all user data, and verify with 1-row, 100+-row, and special-character fixtures.

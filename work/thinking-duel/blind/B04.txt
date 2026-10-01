@@ -1,0 +1,8 @@
+ITEM B04 | PROMPT p12
+RUBRIC-CORE: GA4 sign_up begin_checkout GTM-trigger
+---ANSWER---
+Fire GA4 `cta_click` with `cta_text` and `cta_position`, then `sign_up` with `method` and `user_id` via `window.dataLayer.push()` on Supabase `SIGNED_IN`.
+
+In GTM use a Google Tag on All Pages, a Click trigger for CTA, and a Custom Event trigger for `sign_up`.
+
+Mark `sign_up` as a key event in GA4 Admin > Data display > Events and register `method` as a custom dimension.

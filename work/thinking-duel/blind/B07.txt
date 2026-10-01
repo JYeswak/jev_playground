@@ -1,0 +1,8 @@
+ITEM B07 | PROMPT p05
+RUBRIC-CORE: triage priority SLA urgent-queue
+---ANSWER---
+Don't use `jev mail` here — it's for a personal backlog, not a shared queue.
+
+Use `jev triage`: it classifies each message as it lands by how soon, what kind, is a person needed, and is the sender blocked — routing to now / today / queue / ignore.
+
+Urgent refund cases score `route: now` with deadline + frustrated flags and surface ahead of password resets; pass `--customer-domain` so customer mail outranks internal noise.

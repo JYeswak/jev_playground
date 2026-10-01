@@ -1,0 +1,170 @@
+{
+ "p01-auto": {
+  "think_chars": 0,
+  "input": 41313,
+  "output": 370,
+  "cost_usd": 0.004283,
+  "answer": "Enforce per-user/per-API-key limits as primary, with a lower per-endpoint limit on expensive search \u2014 not just global or per-IP.\n\nUse sliding-window counter (or token bucket for controlled bursts) in centralized Redis with atomic check+increment, TTL matched to window.\n\nReturn `429` with `Retry-After` plus `X-RateLimit-Limit/Remaining/Reset` on all responses, and count all requests regardless of status."
+ },
+ "p01-high": {
+  "think_chars": 0,
+  "input": 41264,
+  "output": 307,
+  "cost_usd": 0.004266,
+  "answer": "Enforce per-user/per-API-key limits as primary, with a lower per-endpoint limit on expensive search \u2014 not just global or per-IP.\n\nUse sliding-window counter (or token bucket for controlled bursts) in centralized Redis with atomic check+increment, TTL matched to window.\n\nReturn `429` with `Retry-After` plus `X-RateLimit-Limit/Remaining/Reset` headers, and count all requests regardless of status.\n\nAdd global safety-net limit plus queuing/cached degradation and sustained-429 alerting to catch the next hog.\n"
+ },
+ "p02-auto": {
+  "think_chars": 0,
+  "input": 82068,
+  "output": 370,
+  "cost_usd": 0.008281,
+  "answer": "That's the N+1 query problem: 1 query for the table + 500 row queries.\n\nReplace the per-row lookup with one batched fetch \u2014 eager-load the relation (`joinedload`/equivalent) or a single `JOIN` / `WHERE id IN (...)` query.\n\nAlso paginate the table and select only needed columns, with an index on the foreign key."
+ },
+ "p02-high": {
+  "think_chars": 0,
+  "input": 43382,
+  "output": 809,
+  "cost_usd": 0.004578,
+  "answer": "That's the N+1 query problem: 1 query for the table + 500 row queries.\n\nReplace the per-row lookup with one batched fetch \u2014 eager-load the relation (`joinedload`/equivalent) or a single `JOIN` / `WHERE id IN (...)` query.\n\nAlso paginate the table and select only needed columns, with an index on the foreign key."
+ },
+ "p03-auto": {
+  "think_chars": 363,
+  "input": 42706,
+  "output": 2016,
+  "cost_usd": 0.004752,
+  "answer": "Checkpoint progress per batch/vendor-key so a hiccup resumes instead of restarting, with idempotent writes via idempotency keys. Retry only transient `429/502/503/504` with exponential backoff + jitter, max ~5 attempts, honoring `Retry-After`. Trip a per-vendor circuit breaker after consecutive failures to avoid the hour block, queueing remainder for next window. Send exhausted items to DLQ for review, never infinite retry."
+ },
+ "p03-high": {
+  "think_chars": 87,
+  "input": 41588,
+  "output": 695,
+  "cost_usd": 0.004376,
+  "answer": "Checkpoint progress per batch/vendor-key so a hiccup resumes instead of restarting; make writes idempotent via idempotency keys.\nRetry only transient `429/502/503/504` with exponential backoff + jitter, max ~5 attempts, honoring `Retry-After`.\nTrip a per-vendor circuit breaker after ~5 failures/60s and park the remainder to DLQ for next run \u2014 never hammer through an outage.\nAlert on breaker OPEN and DLQ depth."
+ },
+ "p04-auto": {
+  "think_chars": 150,
+  "input": 44878,
+  "output": 590,
+  "cost_usd": 0.004684,
+  "answer": "You're likely missing a `CHECK` on a `state/status` column: bare `TEXT` means the DB knows 0 legal states while your code enum defines N.\n\nYour nightly `DELETE ... WHERE state IN (...)` enumerates G < N, so terminal-but-unlisted states accumulate forever and runtime grows past sunrise.\n\nCheck your rollup/metrics filter too \u2014 it usually shares the same omission, hiding growth until disk fills.\n\nAnd `DELETE` never reclaims disk without `VACUUM` \u2014 confirm autovacuum keeps up, the collector actually runs in prod, and omitted variants are truly terminal."
+ },
+ "p04-high": {
+  "think_chars": 111,
+  "input": 45036,
+  "output": 701,
+  "cost_usd": 0.004722,
+  "answer": "You're likely missing a `CHECK` on a `state/status` column: bare `TEXT` means the DB knows 0 legal states while your code enum defines N.\n\nYour nightly `DELETE ... WHERE state IN (...)` enumerates G < N, so terminal-but-unlisted states accumulate forever and disk grows despite deletes.\n\nYour metrics/rollup likely shares the same filter, hiding the leak until disk fills.\n\nFix: add `CHECK(state IN (...))` to make enum-vs-filter diffable, fix GC to cover all terminal states, add index on the GC filter + `VACUUM` tuning since deletes don't return disk without it."
+ },
+ "p05-auto": {
+  "think_chars": 59,
+  "input": 41607,
+  "output": 1106,
+  "cost_usd": 0.00446,
+  "answer": "Don't use `jev mail` here \u2014 it's for a personal backlog, not a shared queue. Use `jev triage`: it classifies each message as it lands by how soon, what kind, is a person needed, and is the sender blocked \u2014 routing to now / today / queue / ignore. Urgent refund cases hit `now`, password resets fall to `queue`. Work `now` first so critical ones surface immediately."
+ },
+ "p05-high": {
+  "think_chars": 0,
+  "input": 8698,
+  "output": 577,
+  "cost_usd": 0.001128,
+  "answer": "Don't use `jev mail` here \u2014 it's for a personal backlog, not a shared queue.\n\nUse `jev triage`: it classifies each message as it lands by how soon, what kind, is a person needed, and is the sender blocked \u2014 routing to now / today / queue / ignore.\n\nUrgent refund cases score `route: now` with deadline + frustrated flags and surface ahead of password resets; pass `--customer-domain` so customer mail outranks internal noise."
+ },
+ "p06-auto": {
+  "think_chars": 153,
+  "input": 41922,
+  "output": 796,
+  "cost_usd": 0.004429,
+  "answer": "Score every trial on day-1 activation depth: no core action, <2 sessions, incomplete setup, zero invites/data = critical risk; declining usage slope precedes churn by 30-60 days. Use rule-based score to start (`Risk = 50 + activation miss +15, no return visit +12, support struggle +10`), tier 70+ immediate outreach, 50-69 proactive nudge within 7 days. Optimize for recall over precision \u2014 false outreach costs cents, missed churn costs full lifetime value \u2014 and always hold 10-20% control to prove save rate. Retrain monthly on actual day-7 retention, not vanity accuracy."
+ },
+ "p06-high": {
+  "think_chars": 140,
+  "input": 41837,
+  "output": 841,
+  "cost_usd": 0.00443,
+  "answer": "Score every trial on day-1 activation depth: no core action, <2 sessions, incomplete setup, zero invites/data = critical risk; declining usage slope precedes churn by 30-60 days. Use rule-based score to start (`Risk = 50 + activation miss +15, no return visit +12, support struggle +10`), tier 70+ immediate outreach, 50-69 contact within 7 days. Tie every tier to a specific intervention, hold 10-20% control to measure save rate. Optimize for recall over precision: false negative costs full lifetime value, false positive costs only the offer. Retrain quarterly; alert if AUC <0.70 or save rate <10%.\n"
+ },
+ "p07-auto": {
+  "think_chars": 0,
+  "input": 42320,
+  "output": 575,
+  "cost_usd": 0.004425,
+  "answer": "Fix error clarity first with one shared Zod payment schema for client + server to kill drift. Switch client to `mode: onBlur` + `reValidateMode: onChange` so errors appear after leaving a field then clear live. Replace generic \"Invalid input\" with per-field messages attached via `path` and rendered inline with `aria-describedby` + `role=\"alert\"`. Map server 400 `details` back onto fields with `setError` instead of resetting the form. This cuts confusion-driven abandonment before you touch anything else."
+ },
+ "p07-high": {
+  "think_chars": 120,
+  "input": 42272,
+  "output": 913,
+  "cost_usd": 0.004488,
+  "answer": "Fix error clarity first with one shared Zod payment schema for client + server to kill drift. Switch client to `mode: onBlur` + `reValidateMode: onChange` so errors appear after leaving a field then clear live. Replace generic \"Invalid input\" with per-field messages attached via `path` and rendered inline with `aria-invalid`, `aria-describedby`, `role=\"alert\"`. Preserve form state on server 400s and map `details` back with `setError` instead of resetting or alert().\n"
+ },
+ "p08-auto": {
+  "think_chars": 0,
+  "input": 41366,
+  "output": 562,
+  "cost_usd": 0.004327,
+  "answer": "Strip emdashes, `not X it's Y` pivots, `Here's why` lead-ins, and AI clusters like seamless/pivotal/delve; use is/has plainly. Cut significance commentary like `marks a pivotal moment` and trailing -ing clauses. Collapse filler to one sentence per claim and turn bold-label bullets into plain prose. Restore what slop displaced: names, dates, numbers, what changed and for whom. Read it aloud line by line until it sounds like an engineer explaining, not ad copy.\n"
+ },
+ "p08-high": {
+  "think_chars": 0,
+  "input": 41327,
+  "output": 639,
+  "cost_usd": 0.004338,
+  "answer": "Strip emdashes, `not X it's Y` pivots, `Here's why` lead-ins, and AI clusters like seamless/pivotal/delve; use is/has plainly. Cut significance commentary like `marks a pivotal moment` and trailing -ing clauses. Collapse filler to one sentence per claim and turn bold-label bullets into plain prose. Restore what slop displaced: name dates, numbers, owners, and what changes. Read it aloud once and rewrite any line you would not say to the team.\n"
+ },
+ "p09-auto": {
+  "think_chars": 0,
+  "input": 42252,
+  "output": 372,
+  "cost_usd": 0.004377,
+  "answer": "For existing TypeScript REST, use code-first: `swagger-jsdoc` + `swagger-ui-express`, or `@nestjs/swagger` / `tsoa` if on NestJS/Express with decorators.\n\nAnnotate routes with `@openapi` JSDoc including summary, tags, parameters, request/response schemas with realistic examples, and `securitySchemes`.\n\nServe Swagger UI at `/docs` and raw spec at `/openapi.json` for SDK generation via `openapi-generator-cli`.\n\nAdd CI check that regenerates the spec and fails on `git diff`, plus `redocly/cli lint` to prevent drift."
+ },
+ "p09-high": {
+  "think_chars": 125,
+  "input": 81539,
+  "output": 743,
+  "cost_usd": 0.008303,
+  "answer": "For existing TypeScript REST, use code-first: `swagger-jsdoc` + `swagger-ui-express`, or `@nestjs/swagger` / `tsoa` if on NestJS/Express with decorators.\n\nAnnotate routes with `@openapi` JSDoc including summary, tags, parameters, request/response schemas with realistic examples, and `securitySchemes`.\n\nServe Swagger UI at `/docs` and raw spec at `/openapi.json`, use Redoc/Scalar for clean reference if needed.\n\nPrevent drift in CI with `redocly lint` + regenerate-and-`git diff --exit-code` freshness check, then generate SDKs/Postman from the validated spec."
+ },
+ "p10-auto": {
+  "think_chars": 0,
+  "input": 41334,
+  "output": 652,
+  "cost_usd": 0.004342,
+  "answer": "Use Template + Data Merge: Handlebars/Jinja2 templates + JSON data \u2192 rendered HTML \u2192 PDF engine. For HTML source use Puppeteer/Playwright for pixel-perfect output, or WeasyPrint for Python CSS-based reports. Set A4/Letter with explicit margins via `@page` CSS, and implement repeating headers/footers via `headerTemplate`/`footerTemplate` with `pageNumber`/`totalPages` spans, base64-embedded logo, and `printBackground: true`. Reuse one browser instance with a new page per PDF, generate async via queue, escape all user data, and verify with 1-row, 100+-row, and special-character fixtures.\n"
+ },
+ "p10-high": {
+  "think_chars": 0,
+  "input": 41297,
+  "output": 395,
+  "cost_usd": 0.004286,
+  "answer": "Use Template + Data Merge: Handlebars/Jinja2 templates + JSON data \u2192 rendered HTML \u2192 PDF engine.\n\nFor HTML source use Puppeteer/Playwright for pixel-perfect output, or WeasyPrint for Python CSS-based reports.\n\nSet A4/Letter with explicit margins via `@page` CSS, and implement repeating headers/footers via `headerTemplate`/`footerTemplate` with `<span class=\"pageNumber\"></span>` / `<span class=\"totalPages\"></span>` plus `thead { display: table-header-group; }` and `tr { page-break-inside: avoid; }`.\n\nEmbed logo/fonts as base64, reuse one browser instance across pages, and generate async via queue with verification on 1-row, 100-row, and special-character fixtures."
+ },
+ "p11-auto": {
+  "think_chars": 0,
+  "input": 41148,
+  "output": 342,
+  "cost_usd": 0.004262,
+  "answer": "After a redesign, start at Layer 1: crawlability \u2192 indexation, per dependency chain \u2014 uncrawlable pages make content fixes worthless.\n\nCheck `robots.txt` for unintentional blocks, XML sitemap for stale URLs, Search Console index coverage vs expected count, redirect chains/loops from old URLs, and canonical tags pointing correctly."
+ },
+ "p11-high": {
+  "think_chars": 0,
+  "input": 41128,
+  "output": 337,
+  "cost_usd": 0.004259,
+  "answer": "After a redesign, start at Layer 1: crawlability \u2192 indexation, per dependency chain \u2014 uncrawlable pages make content fixes worthless.\n\nCheck `robots.txt` for unintentional blocks, XML sitemap for stale URLs, Search Console index coverage vs expected count, redirect chains/loops from old URLs, and canonical tags pointing at retired URLs.\n\nThen Layer 2: HTTPS/mixed content, mobile rendering, URL structure changes, and Core Web Vitals (LCP <2.5s, INP <200ms, CLS <0.1).\n\nMost post-redesign drops trace to blocked crawls, broken redirects, or deindexed pages \u2014 not content."
+ },
+ "p12-auto": {
+  "think_chars": 0,
+  "input": 42344,
+  "output": 477,
+  "cost_usd": 0.004409,
+  "answer": "Fire GA4 `cta_click` with `cta_text` and `cta_position`, then `sign_up` with `method` and `user_id` via `window.dataLayer.push()` on Supabase `SIGNED_IN`.\n\nIn GTM use a Google Tag on All Pages, a Click trigger for CTA, and a Custom Event trigger for `sign_up`.\n\nMark `sign_up` as a key event in GA4 Admin > Data display > Events and register `method` as a custom dimension."
+ },
+ "p12-high": {
+  "think_chars": 0,
+  "input": 43540,
+  "output": 777,
+  "cost_usd": 0.004588,
+  "answer": "Fire GA4 `cta_click` with `cta_text` and `cta_position`, then `sign_up` with `method` and `user_id` via `window.dataLayer.push()` on Supabase `SIGNED_IN`.\n\nIn GTM use a Google Tag on All Pages, a Click trigger for CTA, and a Custom Event trigger for `sign_up`.\n\nMark `sign_up` as a key event in GA4 Admin > Data display > Events.\n\nAdd `scroll_depth` via Scroll Depth trigger and `section_view` via Element Visibility to diagnose funnel drop-off."
+ }
+}

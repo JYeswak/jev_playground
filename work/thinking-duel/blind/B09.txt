@@ -1,0 +1,10 @@
+ITEM B09 | PROMPT p01
+RUBRIC-CORE: rate-limit throttle per-user quota
+---ANSWER---
+Enforce per-user/per-API-key limits as primary, with a lower per-endpoint limit on expensive search — not just global or per-IP.
+
+Use sliding-window counter (or token bucket for controlled bursts) in centralized Redis with atomic check+increment, TTL matched to window.
+
+Return `429` with `Retry-After` plus `X-RateLimit-Limit/Remaining/Reset` headers, and count all requests regardless of status.
+
+Add global safety-net limit plus queuing/cached degradation and sustained-429 alerting to catch the next hog.
