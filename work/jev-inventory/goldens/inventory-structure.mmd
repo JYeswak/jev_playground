@@ -2,7 +2,7 @@ flowchart LR
   JEV(["TypeSafe API jev-1.13.0"])
   LOCAL(["local Ollama nimble/tev1"])
   subgraph native["omp native judge (TypeSafe jev-1.13.0)"]
-    find["omp find tool<br/>UNPROVEN<br/>expect on"]
+    find["omp find tool<br/>WORKS<br/>expect on"]
     auto_thinking["auto-thinking<br/>UNMEASURED<br/>expect on"]
     smart_stop["smart stop<br/>IDLE-BY-DESIGN<br/>expect on"]
     ttsr_judged["judged TTSR rules<br/>PARTIAL<br/>expect on"]
@@ -45,5 +45,5 @@ flowchart LR
   classDef off fill:#e6e6e6,stroke:#777,stroke-dasharray:4 3
   class smart_stop,gate_observe,webscreen,websearch_rerank nobenefit
   class skill_hint,claim_rule,local_sys1 off
-  class find,auto_thinking,ttsr_judged,injection_shadow unproven
-  class needs_human,key_wrapper,agents_trim works
+  class auto_thinking,ttsr_judged,injection_shadow unproven
+  class find,needs_human,key_wrapper,agents_trim works
