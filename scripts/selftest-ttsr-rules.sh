@@ -97,6 +97,29 @@ arm "$K" fire  "jev-key: bash touches the key name"          'echo $TYPESAFE_API
 arm "$K" fire  "jev-key: bash touches the endpoint"          'curl -s https://api.typesafe.ai/v1/systemone'
 arm "$K" quiet "jev-key: unrelated bash"                     'node work/jev-client/test/client.test.mjs'
 
+J=.omp/rules/claim-without-evidence.md
+# JUDGED rule (question:). `omp ttsr test` never evaluates question rules (omp ttsr-injection-
+# lifecycle §9), so offline arms prove that the rule stays invisible to the offline matcher and that
+# its regex prefilter gates the right prose. The live judge direction (an unsupported claim flagged,
+# a claim quoting its command output not flagged) is bead jev-e2vb's L3 receipt, 2026-10-01.
+arm_text "$J" quiet "claim-evidence: judged rule is invisible to the offline matcher" 'Done — everything works and it is verified.'
+prefilter() { # prefilter <rule-file> <expect match|skip> <label> <prose>
+  local got
+  if python3 - "$1" "$4" <<'PY'
+import re, sys
+src = open(sys.argv[1], encoding="utf-8").read()
+pat = re.search(r"^condition:\s*'(.*)'\s*$", src, re.M).group(1)
+flags = re.I if pat.startswith("(?i)") else 0
+sys.exit(0 if re.search(pat[4:] if flags else pat, sys.argv[2], flags) else 1)
+PY
+  then got=match; else got=skip; fi
+  if [ "$got" = "$2" ]; then note ok "$3 ($2)"; pass=$((pass+1))
+  else note FAIL "$3 — wanted $2, got $got: $4"; fail=$((fail+1)); fi
+}
+prefilter "$J" match "claim-evidence prefilter: result claim reaches the judge" 'Done — everything works and it is verified.'
+prefilter "$J" match "claim-evidence prefilter: test claim reaches the judge" 'The suite passed and the fix is landed.'
+prefilter "$J" skip  "claim-evidence prefilter: neutral prose never costs a call" 'I read the client and found three call sites.'
+
 A=.omp/rules/absence-from-one-probe.md
 # INVARIANT rule. Measured 2026-09-20 over 45,103 assistant-text turns in 1,841 omp session
 # JSONL files: shipped predicate 185 fires / 0.4102%, hand-labelled FP 0.20 (n=20, seed 20260920).

@@ -151,8 +151,7 @@ what we evaluate). Python: `uv` only (never pip, poetry, conda or a hand-made ve
 | `.omp/hooks`, `.omp/tools` | omp runtime | loaded at session start |
 | `upstream/typesafe-ai/*` | their own | first-party SDKs and `system-one-adapter-python` |
 
-Good Jev integrations have almost no dependencies: a typed-question client is an HTTP POST and a
-validator.
+Good Jev integrations have almost no dependencies: a client is an HTTP POST and a validator.
 
 ---
 
@@ -174,8 +173,13 @@ validator.
   day, written in the code), **no retry storm** (stop on 401/402/403 and after the SDK's retries),
   **checkpointed** (one row per call: model, tokens, latency, status), **spend stated**.
 - **No paid comparisons.** Joshua, 2026-09-24, verbatim: *"we're not going to use any of the paid
-  comparisons"*. A comparator is a free OpenRouter model (`:free` id), a local model, or nothing.
-  Jev itself is not a comparator.
+  comparisons"*.
+- **A comparator is a free OpenRouter model (`:free` id) or nothing.** No Anthropic model (Haiku
+  or other), no grok or other xAI model, no paid OpenRouter model (`gpt-5-nano`,
+  `deepseek-v4-flash`, any id without `:free`). Do not re-run a paid arm a cap or balance refused,
+  and do not wait for a reset or a top-up. A paid pairing that never ran is reported as
+  *not run (paid comparisons stopped 2026-09-24)*. Jev itself is not a comparator; local models on
+  this machine (Ollama) cost nothing and fall outside this rule.
 
 ---
 
@@ -200,8 +204,7 @@ validator.
 
 ### No Script-Based Changes
 
-Never run a script that rewrites code files in this repo. Make changes by hand, or with parallel
-agents for many simple ones.
+Never run a script that rewrites code files here; change them by hand or with parallel agents.
 
 ### No File Proliferation
 
@@ -211,9 +214,8 @@ probe, or a diff where the capability runs.
 
 ### Never Patch Upstream To Make A Demo Pass
 
-Wrap it in our code, fork it deliberately, report it upstream, or drop the demo and say why.
-Editing a clone until green and citing its suite as evidence is the highest-value lie available
-here.
+Wrap it in our code, fork it deliberately, report it upstream, or drop the demo and say why. Editing
+a clone until green and citing its suite as evidence is the highest-value lie available here.
 
 ## Backwards Compatibility
 
@@ -264,12 +266,9 @@ worker, timeout) is UNSOLVED, never green.
 
 ### Test Categories
 
-| Tree | Focus |
-|---|---|
-| `.omp/hooks/**` | fires on the real event, bounded calls, secret skip, fail open, no raw text in logs, planted negative |
-| `.omp/tools/**`, `kit/` | question construction, validator refusal, `NOT_RUN` without a key, installer collision refusal |
-| `work/jev-client/` | retry/timeout, key provider order, usage and spend accounting |
-| `foundation/` | metric purity, each gate stage's RED arm |
+Hooks: fires on the real event, bounded calls, secret skip, fail open, no raw text in logs, planted
+negative. Tools and `kit/`: question construction, validator refusal, `NOT_RUN` without a key.
+`work/jev-client/`: retry/timeout, key-provider order, spend accounting. `foundation/`: each RED arm.
 
 ---
 
@@ -284,10 +283,8 @@ A claim about Jev that cannot be traced to a file there is a guess and must say 
 | When you need | Read |
 |---|---|
 | the request shape | `docs-mirror/typesafe/introduction/quickstart.md`, `api.md` |
-| which primitive | `primitives.md`, `primitives/{choice,score,noul}.md` |
-| whether to act on an answer | `confidence.md` |
-| architecture patterns | `patterns.md` (fan-out, confidence routing, composite scoring, intent routing) |
-| recipes | `cookbooks/*.md` |
+| which primitive; whether to act | `primitives.md`, `primitives/{choice,score,noul}.md`, `confidence.md` |
+| patterns and recipes | `patterns.md` (fan-out, confidence routing, composite scoring, intent routing), `cookbooks/*.md` |
 | known model failure modes | `model-jaggedness/jev-1.13.md` (read before filing a bug) |
 | model ids and pricing | `models.md` ($0.042 per million input tokens; output free) |
 | the local equivalent | `https://docs.ollama.com/api/systemone` (Ollama 0.35; ≤26 Choice options, 64 KiB body) |
@@ -328,18 +325,13 @@ join key; an unknown name defaults to the safe action. Input limit ~32k tokens.
 
 ```
 jev/
-├── AGENTS.md  README.md  EVAL.md  NEGATIVE_EVIDENCE.md  GATES.md  TESTS.md
-├── .omp/                 hooks/{pre,post}, tools, extensions, rules, skills, config.yml (project scope)
-├── kit/                  the `jev` CLI: ask/verify/score/classify/gate/rerank, `jev omp install`
-├── work/                 experiments and clients (work/jev-client is the SDK client + key provider)
-├── foundation/           calibration harness and gates.sh (each stage proves its RED arm)
-├── scripts/              sync-docs.sh, fleet-idle-watch.py, stranger-run, render-results
-├── docs/                 LEDGER.md, demos/, history/ (archived prior doctrine)
-├── docs-mirror/          TypeSafe docs + ripwire docs, sha256-manifested (bytes not committed)
-├── upstream/             first-party TypeSafe repos (pinned; manifest committed)
-└── <vendored clones>     other people's repos, pinned; take the census, never hardcode it
+├── AGENTS.md README.md EVAL.md NEGATIVE_EVIDENCE.md GATES.md TESTS.md
+├── .omp/        hooks/{pre,post}, tools, extensions, rules, skills, config.yml (project scope)
+├── kit/ work/   the `jev` CLI and installer; experiments and clients (work/jev-client: SDK + key provider)
+├── foundation/ scripts/   gates.sh (each stage proves its RED arm); fleet-idle-watch, stranger-run
+├── docs/ docs-mirror/ upstream/   LEDGER, history/; vendored TypeSafe docs and repos (manifests committed)
+└── <vendored clones>   pinned; census: for d in */; do [ -d "$d/.git" ] && echo "$d"; done
 ```
-Take the clone census, never hardcode it: `for d in */; do [ -d "$d/.git" ] && echo "$d"; done`.
 
 ### Key Design Decisions (observed upstream — adopt these)
 
@@ -379,6 +371,16 @@ verbatim):
 Never weaken a gate to land a change; no self-grading without independent verification; demotions
 are always allowed. **Reporting a loss is a success:** one line, revert, next lever.
 
+### LOSS DEPTH — a loss after one design is a result about the design, not about Jev
+
+Joshua, 2026-09-25, verbatim: *"every loss means we're not going deep enough, in my opinion - we've
+got a whole library of advanced skills"*. A preregistered FAIL stands, but it rules out only that
+design. Before closing a candidate: (1) keyless autopsy of the failing rows, counting failure modes
+(missing evidence, question design, harness bug, model limit); (2) three to five ranked one-variable
+hypotheses; (3) a dev-slice replay, one variable at a time; (4) one fresh preregistered held-out
+retest of the best design at the original or a stricter bar. It ends on a held-out pass or a named
+model limit.
+
 ---
 
 ## Jev × omp Integration
@@ -402,10 +404,8 @@ run as `omp --profile <name>`, so their state lives under `~/.omp/profiles/<name
 `tool_call`/`tool_result`, so a gate on those events is blind to them; hooks are not sandboxed; a
 hook directly in `.omp/hooks/` (not `pre/` or `post/`) is silently not discovered.
 
-**RPC facts:** `omp --mode=rpc` spawns a new session (it never attaches to a live pane);
-`prompt` is acknowledged, not completed — a run ends on `agent_end` and a prompt on its
-`prompt_result`; `model` is an object (`model.id`); a `success: true` with empty `data` is not a
-working capability.
+**RPC facts:** `omp --mode=rpc` spawns a new session (never a live pane); a run ends on `agent_end`,
+a prompt on its `prompt_result`; `model` is an object (`model.id`); empty `data` is not a capability.
 
 **Validation ladder** (name your rung, never round up): **L0** policy logic offline · **L1** one
 live answer with model id · **L2** the seam loads in omp · **L3** the seam fires in a real session
