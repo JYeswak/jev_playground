@@ -16,7 +16,7 @@ export const SKILL_HINT_MODEL = "jev-1.13.0";
 export const SKILL_HINT_CONFIDENCE_CUT = 0.5;
 export const SKILL_HINT_SHORTLIST_MAX = 20;
 export const SKILL_HINT_NONE = "none";
-export const SKILL_HINT_TIMEOUT_MS = 4000;
+export const SKILL_HINT_TIMEOUT_MS = 300;
 
 export type SkillEntry = { name: string; description: string };
 export type ChoiceAsker = (options: AskChoiceOptions) => Promise<JevChoiceResult>;
@@ -112,6 +112,7 @@ export async function hintSkills(options: {
   for (const entry of short) classes[entry.name] = entry.description || null;
   classes[SKILL_HINT_NONE] = "No skill is relevant to this prompt; proceed without reading any skill.";
   const started = Date.now();
+  const deadlineMs = options.timeoutMs ?? SKILL_HINT_TIMEOUT_MS;
   let answer: JevChoiceResult;
   try {
     answer = await options.ask({
@@ -119,10 +120,12 @@ export async function hintSkills(options: {
       instructions: "Which skill should the agent read before handling this prompt?",
       classes,
       model,
-      timeoutMs: options.timeoutMs ?? SKILL_HINT_TIMEOUT_MS,
+      timeoutMs: deadlineMs,
     });
   } catch (error) {
-    return { hint: null, reason: error instanceof Error ? error.message : String(error), model, latencyMs: Date.now() - started };
+    const elapsed = Date.now() - started;
+    const reason = elapsed >= deadlineMs - 60 ? "timeout" : error instanceof Error ? error.message : String(error);
+    return { hint: null, reason, model, latencyMs: elapsed };
   }
   const latencyMs = Date.now() - started;
   if (!answer.ok) return { hint: null, reason: answer.reason, model: answer.model, latencyMs };
@@ -133,4 +136,28 @@ export async function hintSkills(options: {
   const blurb = picked?.description ? ' \u2014 ' + picked.description.slice(0, 160) : '';
   const usage = answer.usage ? { input_tokens: answer.usage.input_tokens, output_tokens: answer.usage.output_tokens } : undefined;
   return { hint: 'Likely relevant skills: ' + answer.choice + blurb, skill: answer.choice, confidence: answer.confidence, model: answer.model, latencyMs, ...(usage ? { usage } : {}) };
+}
+
+export type WarmResult =
+  | { ok: true; model: string; latencyMs: number; usage?: { input_tokens: number; output_tokens: number } }
+  | { ok: false; reason: string; model: string; latencyMs: number };
+
+/** One tiny Choice at session start so the first real prompt reuses a warm transport. Fire and forget. */
+export async function warmTransport(ask: ChoiceAsker, model: string = SKILL_HINT_MODEL): Promise<WarmResult> {
+  const started = Date.now();
+  try {
+    const answer = await ask({
+      state: { warm: 1 },
+      instructions: "Answer warm.",
+      classes: { warm: "The transport works.", cold: "The transport is cold." },
+      model,
+      timeoutMs: 5000,
+    });
+    const latencyMs = Date.now() - started;
+    if (!answer.ok) return { ok: false, reason: answer.reason, model: answer.model, latencyMs };
+    const usage = answer.usage ? { input_tokens: answer.usage.input_tokens, output_tokens: answer.usage.output_tokens } : undefined;
+    return { ok: true, model: answer.model, latencyMs, ...(usage ? { usage } : {}) };
+  } catch (error) {
+    return { ok: false, reason: error instanceof Error ? error.message : String(error), model, latencyMs: Date.now() - started };
+  }
 }

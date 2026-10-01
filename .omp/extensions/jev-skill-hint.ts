@@ -11,7 +11,7 @@ import { appendFile, mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { askJevChoice } from "../../kit/src/client.ts";
-import { hintSkills, loadSkillRoster, type ChoiceAsker, type SkillEntry } from "../../kit/src/skill-hint.ts";
+import { hintSkills, loadSkillRoster, warmTransport, type ChoiceAsker, type SkillEntry } from "../../kit/src/skill-hint.ts";
 import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 
 const CALL_LOG = join(homedir(), ".local", "state", "jev", "skill-hint-calls.jsonl");
@@ -53,5 +53,20 @@ export function createSkillHintHandler(roster: SkillEntry[], ask: ChoiceAsker) {
 
 export default function jevSkillHintExtension(pi: { on: (event: string, handler: (event: BeforeAgentStartEvent) => Promise<unknown>) => void }) {
   useInfisicalKey();
-  pi.on("before_agent_start", createSkillHintHandler(loadSkillRoster(), (options) => askJevChoice(options)));
+  const ask: ChoiceAsker = (options) => askJevChoice(options);
+  // Warm the transport once per session without blocking any turn: the first
+  // real prompt then reuses a warm connection instead of paying cold-start TLS.
+  pi.on("session_start", () => {
+    void warmTransport(ask).then((warmed) =>
+      appendCall({
+        ts: new Date().toISOString(),
+        model: warmed.model,
+        status: "warmup",
+        ...(warmed.ok ? { ...(warmed.usage ? { usage: warmed.usage } : {}) } : { reason: warmed.reason }),
+        latencyMs: warmed.latencyMs,
+        promptChars: 0,
+      }),
+    );
+  });
+  pi.on("before_agent_start", createSkillHintHandler(loadSkillRoster(), ask));
 }

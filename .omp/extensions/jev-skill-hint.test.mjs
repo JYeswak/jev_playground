@@ -4,9 +4,11 @@ import {
   hintSkills,
   shortlistSkills,
   loadSkillRoster,
+  warmTransport,
   SKILL_HINT_MODEL,
   SKILL_HINT_CONFIDENCE_CUT,
   SKILL_HINT_SHORTLIST_MAX,
+  SKILL_HINT_TIMEOUT_MS,
 } from '../../kit/src/skill-hint.ts';
 import { createSkillHintHandler } from './jev-skill-hint.ts';
 
@@ -80,8 +82,7 @@ test('extension handler injects the message on hint and yields nothing when sile
   assert.equal(typeof factory, 'function');
   const seen = [];
   factory({ on: (event, handler) => seen.push([event, handler]) });
-  assert.equal(seen.length, 1);
-  assert.equal(seen[0][0], 'before_agent_start');
+  assert.deepEqual(seen.map(([event]) => event).sort(), ['before_agent_start', 'session_start']);
   const fired = createSkillHintHandler(ROSTER, answer('analytics-tracking', 0.72));
   const out = await fired({ prompt: GA4_PROMPT });
   assert.equal(out.message.customType, 'jev-skill-hint');
@@ -89,4 +90,33 @@ test('extension handler injects the message on hint and yields nothing when sile
   assert.equal(out.message.attribution, 'jev-skill-hint');
   const quiet = createSkillHintHandler(ROSTER, answer('none', 0.99));
   assert.equal(await quiet({ prompt: GA4_PROMPT }), undefined);
+});
+test('slow failures past the deadline log as timeout, fast ones keep their reason', async () => {
+  assert.equal(SKILL_HINT_TIMEOUT_MS, 300);
+  const slow = async () => { await new Promise((r) => setTimeout(r, SKILL_HINT_TIMEOUT_MS + 100)); throw new Error('socket hang up'); };
+  const slowResult = await hintSkills({ prompt: GA4_PROMPT, roster: ROSTER, ask: slow, timeoutMs: SKILL_HINT_TIMEOUT_MS });
+  assert.equal(slowResult.hint, null);
+  assert.equal(slowResult.reason, 'timeout');
+  const fast = async () => { throw new Error('connection refused'); };
+  const fastResult = await hintSkills({ prompt: GA4_PROMPT, roster: ROSTER, ask: fast, timeoutMs: 5000 });
+  assert.equal(fastResult.reason, 'connection refused');
+});
+
+test('warmup probes the transport once without blocking the turn', async () => {
+  let calls = 0;
+  const ask = async () => { calls += 1; return { ok: true, choice: 'warm', confidence: 1, probabilities: { warm: 1 }, latencyMs: 120, model: SKILL_HINT_MODEL }; };
+  const warmed = await warmTransport(ask);
+  assert.equal(warmed.ok, true);
+  assert.equal(calls, 1);
+  const failed = await warmTransport(async () => { throw new Error('down'); });
+  assert.equal(failed.ok, false);
+});
+
+test('extension warms on session_start without awaiting and hints on prompt', async () => {
+  const { default: factory } = await import('./jev-skill-hint.ts');
+  const seen = new Map();
+  factory({ on: (event, handler) => seen.set(event, handler) });
+  assert.deepEqual([...seen.keys()].sort(), ['before_agent_start', 'session_start']);
+  const warmHandler = seen.get('session_start');
+  assert.equal(warmHandler({}), undefined);
 });
