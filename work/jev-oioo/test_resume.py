@@ -12,7 +12,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 LIVE = ROOT / "work/jev-oioo/live.mjs"
-RESULTS = ROOT / "work/jev-oioo/live-results.jsonl"
+# The pre-resume rows, captured from 5caf9f93^:work/jev-oioo/live-results.jsonl. The live file was
+# rewritten in place when the resume ran (5caf9f93, 821 comparator answers filled), so reading it
+# tested the post-resume state and failed 1 != 821 in CI from then on.
+RESULTS = ROOT / "work/jev-oioo/fixture-live-results-pre-resume.jsonl"
 RESET = "2026-09-28T00:00:00Z"
 
 
