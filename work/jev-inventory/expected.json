@@ -186,9 +186,9 @@
       "how": ".omp/extensions/jev-memory-filter.ts (phase-1 shadow, log only)",
       "expect": "on",
       "extension": "./.omp/extensions/jev-memory-filter.ts",
-      "verdict": "SHADOW",
-      "evidence": "phase-1 shadow 5e00575e, tests 9/9, L3 18drop+2keep live, 2h window running",
-      "saving": "would-be-saved memory tokens (logged)"
+      "verdict": "ENFORCING",
+      "evidence": "jev-wb7j held-out 0.978 + replication 0.985 verified; jev-s47b live drops 30/30 twice (HazySpring, WildCarp); removal 5fc68a4e verified by OrangeFrog (13/13 kept present, 4/4 dropped absent)",
+      "saving": "memory tokens removed per turn: median 797, p90 3,408 (14 live turns, OrangeFrog)"
     },
     {
       "id": "gate-cascade",
