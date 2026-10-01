@@ -4777,3 +4777,17 @@ paired `opened/used next` join is specified before the shadow starts.
 **Verdict:** REFUTED at cut 0.7 as a precision gate. **Retry-condition:** re-measure only with a re-labeled corpus and a preregistered bar after a rule-question change, a cut change with ROC justification on the dev half, or per-output-type calibration; one held-out retest max per design. Recorded companion finding: in short RPC sessions a judged rule can inject (2 sessions, ttsr_injection present) with no model_usage purpose=ttsr row journaled — journaling race, not a judging failure.
 
 **Evidence:** `work/e2vb-revert-measure/` (PREREG.md, labels-dev/held.jsonl, scores-dev-{base,v1,v2}.jsonl, scores-held-v1.jsonl, VARIANTS.md); 300 live calls, 220610 input tokens ≈ $0.0093. Session texts kept local, never committed. Pending mechanical step (blocked by kit-guard B7, no KIT_GATE_EDIT): append `claim-without-evidence` to ttsr.disabledRules in `.omp/config.yml:79-80` (one list item under the existing `absence-from-one-probe` entry).
+
+## R131 — REVERTED: stopword-filtered skill-hint shortlist improves hints (2026-10-01)
+
+**Hypothesis:** dropping generic English function words from shortlist token overlap raises target recall on non-obvious prompts without hurting precision (jev-4nyy H1).
+
+**Minimal repro / experiment:** one-variable change in `kit/src/skill-hint.ts` tokens() (STOPWORDS Record + filter; Choice stage, cut 0.5, timeout 300ms, width 20 untouched). Keyless dev: 8 r2 symptom prompts (skill NAME absent, zero trigger hits) + 4 r1 obvious prompts, real 717-skill roster. Live dev replay: 8 WITH codex print sessions on r2 prompts; verifier re-ran hintSkills on the same 8.
+
+**Expected signal (if hypothesis true):** dev recall rises with zero new misroutes; live hint rate rises on-target; p95 stays < 300 ms.
+
+**Result (measured, inline):** dev recall 5/12 -> 7/12 (r2 1/8 -> 3/8; r1 obvious stay rank 0). BUT 5 misroutes across two runs where pre-H1 misses were silence only: mine (7 fired) hinted offline-first-sync .77, check-constraint .63, error-handling .52, capacity-planning .72; verifier (4 fired) capacity-planning .73 on the request-hog prompt whose r2-established target rate-limiting left the shortlist on its stop-heavy description. Live hint rate 3/8 -> 7/8 mine, 4/8 verifier (deadline/confidence nondeterminism); p95 250 ms PASS; tests 10/10 + 59/59 green throughout. Recall bought with misdirection: reverted.
+
+**Verdict:** REFUTED as a quality improvement (recall gain does not survive precision). **Retry-condition:** precision — 0 misroutes on the dev set (8 r2 prompts + request-hog must-not-misroute case) across 2 full runs, plus the rate-limiting prompt hinting rate-limiting or staying silent. Do not re-attempt stopword lists, IDF/width/stem/density/body variants (all keyless-dead: best 2/8) without a semantic-matching design.
+
+**Evidence:** shipped 4d0e76c5, reverted abbfdce8 (NEW commit, no amend); receipts `work/skill-routing/receipt-jev-4nyy-h1.json`, `-autopsy.json`, `-r2.json`; bead jev-4nyy autopsy/H1/reconcile comments. Live spend H1 unit: 20,150 + 7,687 billed input tokens ≈ $0.0012. Misfire dev case + tests kept (no test changes were needed).
