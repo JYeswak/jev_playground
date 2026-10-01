@@ -16,6 +16,8 @@ conformance failure (exit 1). Outputs (default dir var/jev-inventory/):
 from __future__ import annotations
 
 import calendar
+import hashlib
+import hmac
 import json
 import os
 import re
@@ -32,11 +34,42 @@ STATE = HOME / ".local" / "state" / "jev"
 GROUP_TITLES = {
     "native": "omp native judge (TypeSafe jev-1.13.0)",
     "hook": "project hooks (shadow, log only)",
+    "global": "machine-wide shadow screens (5 profiles)",
     "extension": "project extensions",
     "rule": "judged rules",
     "fleet": "fleet",
     "infra": "infrastructure",
 }
+
+
+def global_hook_state(surface: dict, ctx: dict) -> str:
+    """A global screen is on only while every profile copy is the repo file.
+
+    Git and most editors replace on write (rename), which breaks the hardlink:
+    either a differing inode or a differing sha256 means drift. Both are
+    checked so a byte-identical rewrite still fails closed (re-link to fix).
+    """
+    try:
+        repo = ROOT / surface["repo"]
+        rstat = repo.stat()
+        rhash = hashlib.sha256(repo.read_bytes()).hexdigest()
+    except OSError:
+        return "off"
+    for p in ctx.get("profile_names", []):
+        base = HOME / (".omp/agent" if p == "default" else f".omp/profiles/{p}/agent")
+        target = base / "hooks" / "post" / surface["hookfile"]
+        try:
+            tstat = target.stat()
+            tbytes = target.read_bytes()
+        except OSError:
+            return "off"
+        if (tstat.st_dev, tstat.st_ino) != (rstat.st_dev, rstat.st_ino):
+            return "off"
+        if not hmac.compare_digest(hashlib.sha256(tbytes).hexdigest(), rhash):
+            return "off"
+    return "on"
+
+
 VERDICT_CLASS = {
     "WORKS": "works",
     "WORKS-NO-BENEFIT-YET": "unproven",
@@ -200,6 +233,8 @@ def live_state(surface: dict, ctx: dict) -> str:
         return (
             "on" if len((ROOT / "AGENTS.md").read_text().splitlines()) <= 600 else "off"
         )
+    if sid in ("webscreen-global", "injection-global"):
+        return global_hook_state(surface, ctx)
     return "unknown"
 
 
@@ -230,7 +265,7 @@ def mermaid(expected: dict, live: dict | None) -> str:
         lines.append("  end")
     for s in expected["surfaces"]:
         n = node_id(s["id"])
-        if s["group"] in ("native", "hook") or s["id"] in ("needs-human",):
+        if s["group"] in ("native", "hook", "global") or s["id"] in ("needs-human",):
             lines.append(f"  JEV --> {n}")
         if s["id"] == "local-sys1":
             lines.append(f"  LOCAL -.-> {n}")

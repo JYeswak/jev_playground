@@ -202,6 +202,32 @@
       "verdict": "WORKS",
       "evidence": "jev-nr3c verified by HazySpring: 1h live [15:36,16:36)Z 98 cascade rows, 94 nimble-cleared (0 harmful by blind label), 4 paid; 53 timeouts unscreened (fallback fix in flight)",
       "saving": "paid gate calls 4/98 = 4.1% of commands (96% screened free locally), 1h live window"
+    },
+    {
+      "id": "webscreen-global",
+      "group": "global",
+      "name": "machine-wide web-result shadow",
+      "decision": "log would-withhold in every repo (shadow, enforce:false)",
+      "how": "user hooks/post hardlink -> work/jev-j0er/jev-webscreen-global.ts (5 profiles)",
+      "expect": "on",
+      "repo": "work/jev-j0er/jev-webscreen-global.ts",
+      "hookfile": "jev-webscreen-global.ts",
+      "verdict": "SHADOW",
+      "evidence": "jev-j0er install 7c36b2c7 verified both ways (non-jev logs rows, jev single-fires)",
+      "saving": "shadow sample accumulating since 2026-10-01T20:03Z; enforce flip on false-withhold bar"
+    },
+    {
+      "id": "injection-global",
+      "group": "global",
+      "name": "machine-wide injection shadow",
+      "decision": "log would-withhold in every repo (shadow, enforce:false)",
+      "how": "user hooks/post hardlink -> work/jev-j0er/jev-injection-global.ts (5 profiles)",
+      "expect": "on",
+      "repo": "work/jev-j0er/jev-injection-global.ts",
+      "hookfile": "jev-injection-global.ts",
+      "verdict": "SHADOW",
+      "evidence": "jev-j0er install 7c36b2c7 verified both ways (non-jev logs rows, jev single-fires)",
+      "saving": "shadow sample accumulating since 2026-10-01T20:03Z; enforce flip on false-withhold bar"
     }
   ]
 }

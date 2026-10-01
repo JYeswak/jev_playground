@@ -100,5 +100,68 @@ class Conformance(unittest.TestCase):
         self.assertEqual(inv.live_state(surface, ctx), "off")
 
 
+class GlobalHookDrift(unittest.TestCase):
+    PROFILES = ["default", "claude", "codex", "muse", "grok"]
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.home = Path(self.tmp.name)
+        self.prev_home = inv.HOME
+        inv.HOME = self.home
+        self.surface = {
+            "id": "webscreen-global",
+            "group": "global",
+            "repo": "work/jev-j0er/jev-webscreen-global.ts",
+            "hookfile": "jev-webscreen-global.ts",
+            "expect": "on",
+        }
+        self.ctx = {"profile_names": list(self.PROFILES)}
+
+    def tearDown(self):
+        inv.HOME = self.prev_home
+        self.tmp.cleanup()
+
+    def link_all(self):
+        src = Path(inv.ROOT) / self.surface["repo"]
+        for p in self.PROFILES:
+            base = self.home / (
+                ".omp/agent" if p == "default" else f".omp/profiles/{p}/agent"
+            )
+            target = base / "hooks" / "post" / self.surface["hookfile"]
+            target.parent.mkdir(parents=True, exist_ok=True)
+            os.link(src, target)
+
+    def test_matching_hardlinks_are_on(self):
+        self.link_all()
+        self.assertEqual(inv.live_state(self.surface, self.ctx), "on")
+
+    def test_rewritten_same_bytes_new_inode_is_off(self):
+        # git/editor replace-by-rename keeps bytes but breaks the link
+        self.link_all()
+        victim = (
+            self.home
+            / ".omp/profiles/codex/agent/hooks/post"
+            / self.surface["hookfile"]
+        )
+        data = victim.read_bytes()
+        victim.unlink()
+        victim.write_bytes(data)
+        self.assertEqual(inv.live_state(self.surface, self.ctx), "off")
+
+    def test_changed_content_is_off(self):
+        self.link_all()
+        victim = self.home / ".omp/agent/hooks/post" / self.surface["hookfile"]
+        victim.unlink()
+        victim.write_text("// drifted\n")
+        self.assertEqual(inv.live_state(self.surface, self.ctx), "off")
+
+    def test_missing_copy_is_off(self):
+        self.link_all()
+        (
+            self.home / ".omp/profiles/grok/agent/hooks/post" / self.surface["hookfile"]
+        ).unlink()
+        self.assertEqual(inv.live_state(self.surface, self.ctx), "off")
+
+
 if __name__ == "__main__":
     unittest.main()

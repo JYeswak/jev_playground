@@ -14,6 +14,10 @@ flowchart LR
     websearch_rerank["web_search rerank shadow<br/>NO-BENEFIT<br/>expect on"]
     gate_cascade["gate nimble-then-Jev cascade<br/>WORKS<br/>expect on"]
   end
+  subgraph global["machine-wide shadow screens (5 profiles)"]
+    webscreen_global["machine-wide web-result shadow<br/>SHADOW<br/>expect on"]
+    injection_global["machine-wide injection shadow<br/>SHADOW<br/>expect on"]
+  end
   subgraph extension["project extensions"]
     skill_hint["per-prompt skill hint<br/>OFF-MISROUTES<br/>expect off"]
     memory_filter["memory relevance filter shadow<br/>ENFORCING<br/>expect on"]
@@ -40,6 +44,8 @@ flowchart LR
   JEV --> needs_human
   LOCAL -.-> local_sys1
   JEV --> gate_cascade
+  JEV --> webscreen_global
+  JEV --> injection_global
   LOCAL -. cascade jev-8w0h offline 81% fewer paid calls .-> gate_observe
   key_wrapper --> JEV
   classDef works fill:#d4f7d4,stroke:#2a7a2a
@@ -48,4 +54,5 @@ flowchart LR
   classDef off fill:#e6e6e6,stroke:#777,stroke-dasharray:4 3
   class smart_stop,gate_observe,websearch_rerank nobenefit
   class skill_hint,claim_rule,local_sys1 off
+  class webscreen_global,injection_global unproven
   class find,auto_thinking,ttsr_judged,injection_shadow,webscreen,needs_human,key_wrapper,agents_trim,memory_filter,gate_cascade works
