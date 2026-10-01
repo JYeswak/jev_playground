@@ -1,0 +1,49 @@
+{
+  "bead": "jev-4nyy",
+  "date": "2026-10-01",
+  "model": "jev-1.13.0",
+  "prereg_commit": "ec64a48d",
+  "positive": {
+    "prompt": "Help me set up a GA4 conversion funnel for the signup page (+ do-nothing instruction)",
+    "evidence": "fresh codex RPC session: custom message {role:custom, customType:jev-skill-hint, content:\"Likely relevant skills: ga4 ...\"} in 7-message transcript",
+    "verdict": "PASS names ga4"
+  },
+  "negative": {
+    "prompt": "what time is it (+ do-nothing instruction)",
+    "evidence": "fresh codex RPC session: 0 hint messages in 4-message transcript, sessionSettled true",
+    "verdict": "PASS silent"
+  },
+  "latency": {
+    "n": 11,
+    "sorted_ms": [
+      153,
+      154,
+      179,
+      191,
+      199,
+      217,
+      290,
+      1581,
+      1590,
+      1814,
+      1930
+    ],
+    "p50_ms": 217,
+    "p95_ms": 1930,
+    "bar_ms": 300,
+    "verdict": "FAIL",
+    "analysis": "all three misses are first calls in fresh processes (TLS/SDK cold start); 8 of 11 warm calls land 153-290ms",
+    "retry_condition": "warm-up call at session start, persistent transport, or a bar that separates cold from warm p95"
+  },
+  "calls": 11,
+  "calls_bound": 12,
+  "stops": "no 401/402/403 on any call",
+  "spend": {
+    "measured_usd": 0.00011628,
+    "measured_basis": "final call billed 2769 input tokens at $0.042 per million; output free",
+    "unmeasured": "first 10 calls predate usage logging (gap fixed in be-commit below; usage-flow regression test added)",
+    "bound": "actual 11 of 12 preregistered calls"
+  },
+  "scoreboard": "accumulating: per-call checkpoint rows in ~/.local/state/jev/skill-hint-calls.jsonl plus session files; alternating-sessions comparison needs multi-day data",
+  "boundary": "A hint is not proof the skill helped. Latency FAIL is a result about this design, not a retestable bar."
+}
