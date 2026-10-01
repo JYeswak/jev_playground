@@ -18,8 +18,8 @@
       "expect": "on",
       "purpose": "find",
       "verdict": "WORKS",
-      "evidence": "jev-f1le + jev-04q2 verified",
-      "saving": "find 576 tokens per located file vs grep 5,293 (7d, jev-04q2)"
+      "evidence": "jev-f1le + jev-04q2 + jev-ynn7 verified",
+      "saving": "find 576 tokens per located file vs grep 5,293 (7d, jev-04q2); controlled A/B 404 vs 1,861 at equal success (jev-ynn7, verified)"
     },
     {
       "id": "auto-thinking",

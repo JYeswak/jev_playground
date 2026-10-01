@@ -33,6 +33,7 @@ formatting conventions come from each tree's own toolchain.
     and run his repos.
 11. **Derive test fixtures from real observations;** never type them from imagination.
 12. **No paid comparator models.** Live Jev calls are allowed when bounded.
+13. **Locate files with `find`, not `grep`.** Measured 576 vs 5,297 tokens per located file fleet-wide (jev-04q2); 404 vs 1,861 at equal success in a controlled A/B (jev-ynn7, verified). `grep` is for searching file contents.
 
 ---
 
@@ -377,11 +378,10 @@ are always allowed. **Reporting a loss is a success:** one line, revert, next le
 
 Joshua, 2026-09-25, verbatim: *"every loss means we're not going deep enough, in my opinion - we've
 got a whole library of advanced skills"*. A preregistered FAIL stands, but it rules out only that
-design. Before closing a candidate: (1) keyless autopsy of the failing rows, counting failure modes
+design. Before closing a candidate: (1) keyless autopsy of the failing rows by failure mode
 (missing evidence, question design, harness bug, model limit); (2) three to five ranked one-variable
 hypotheses; (3) a dev-slice replay, one variable at a time; (4) one fresh preregistered held-out
-retest of the best design at the original or a stricter bar. It ends on a held-out pass or a named
-model limit.
+retest of the best design at the original or a stricter bar, ending on a held-out pass or a named model limit.
 
 ---
 
