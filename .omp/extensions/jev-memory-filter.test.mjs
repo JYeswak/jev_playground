@@ -8,9 +8,18 @@ import {
   parseSystemMemories,
   splitMemoryBlocks,
   systemPromptText,
+  pruneSystemPrompt,
   CUT,
   MAX_ITEMS_PER_TURN,
 } from "./jev-memory-filter.ts";
+// Suite guard (jev-s47b defect 2026-10-01: scored tests wrote fake rows into the
+// prod sidecar via default paths). Redirect defaults to temp for the whole file;
+// every handler test also passes explicit paths. The guard test below fails if
+// this redirection is removed.
+const GUARD_DIR = mkdtempSync(join(tmpdir(), "memfilter-guard-"));
+process.env.JEV_MEMORY_FILTER_LOG_PATH = join(GUARD_DIR, "log.jsonl");
+process.env.JEV_MEMORY_FILTER_SIDECAR_PATH = join(GUARD_DIR, "full.jsonl");
+
 
 // Fixture provenance (AGENTS.md rule 11): structure + instruction prose captured
 // verbatim from live `before_agent_start` payloads
@@ -79,6 +88,12 @@ test("systemPromptText joins string arrays and passes strings through", () => {
   assert.equal(systemPromptText([{ type: "text", text: "x" }]), "x");
 });
 
+test("suite guard: prod log paths stay redirected to temp", () => {
+  for (const v of [process.env.JEV_MEMORY_FILTER_LOG_PATH, process.env.JEV_MEMORY_FILTER_SIDECAR_PATH]) {
+    assert.ok(v && v.startsWith(GUARD_DIR), `redirection removed, prod path would be touched: ${v}`);
+  }
+});
+
 test("instruction-only system prompt parses zero items", () => {
   assert.deepEqual(parseSystemMemories(SYS_INSTRUCTION_ONLY), []);
 });
@@ -95,7 +110,7 @@ test("splitMemoryBlocks dedupes repeated lines", () => {
 
 test("irrelevant memory logs drop and returns undefined", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
-  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1, { input_tokens: 800, output_tokens: 0 }), path: join(dir, "log.jsonl") });
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1, { input_tokens: 800, output_tokens: 0 }), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
   const { event, ctx } = eventFor("fix the login bug", SYS_RECALL);
   const out = await handler(event, ctx);
   assert.equal(out, undefined);
@@ -107,7 +122,7 @@ test("irrelevant memory logs drop and returns undefined", async () => {
 
 test("relevant memory logs keep with zero tokens saved", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
-  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.95), path: join(dir, "log.jsonl") });
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.95), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
   const { event, ctx } = eventFor("what was the verdict", SYS_RECALL);
   await handler(event, ctx);
   const rows = rowsOf(join(dir, "log.jsonl"));
@@ -118,7 +133,7 @@ test("relevant memory logs keep with zero tokens saved", async () => {
 
 test("invalid noul keeps fail-safe", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
-  const handler = makeBeforeAgentStartHandler({ ask: async () => ({ ok: true, scores: {}, latencyMs: 5, model: "m" }), path: join(dir, "log.jsonl") });
+  const handler = makeBeforeAgentStartHandler({ ask: async () => ({ ok: true, scores: {}, latencyMs: 5, model: "m" }), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
   const { event, ctx } = eventFor("q", SYS_RECALL);
   const out = await handler(event, ctx);
   assert.equal(out, undefined);
@@ -129,7 +144,7 @@ test("invalid noul keeps fail-safe", async () => {
 
 test("throwing asker fails open", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
-  const handler = makeBeforeAgentStartHandler({ ask: async () => { throw new Error("boom"); }, path: join(dir, "log.jsonl") });
+  const handler = makeBeforeAgentStartHandler({ ask: async () => { throw new Error("boom"); }, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
   const { event, ctx } = eventFor("q", SYS_RECALL);
   const out = await handler(event, ctx);
   assert.equal(out, undefined);
@@ -141,7 +156,7 @@ test("throwing asker fails open", async () => {
 test("daily cap stops calls and keeps", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
   let calls = 0;
-  const handler = makeBeforeAgentStartHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.1 }, latencyMs: 1, model: "m" }; }, cap: 1, path: join(dir, "log.jsonl") });
+  const handler = makeBeforeAgentStartHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.1 }, latencyMs: 1, model: "m" }; }, cap: 1, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
   const { event, ctx } = eventFor("q", SYS_RECALL);
   await handler(event, ctx);
   assert.equal(calls, 1);
@@ -155,7 +170,7 @@ test("daily cap stops calls and keeps", async () => {
 test("synthetic boundary: more than 20 items scores only 20", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
   let calls = 0;
-  const handler = makeBeforeAgentStartHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.9 }, latencyMs: 1, model: "m" }; }, path: join(dir, "log.jsonl") });
+  const handler = makeBeforeAgentStartHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.9 }, latencyMs: 1, model: "m" }; }, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
   const lines = [];
   for (let i = 0; i < 25; i++) lines.push(`- synthetic boundary fact ${i}`);
   const big = ["pre", `<memories>\n${lines.join("\n")}\n</memories>`];
@@ -167,7 +182,7 @@ test("synthetic boundary: more than 20 items scores only 20", async () => {
 test("cut is 0.5: noul below drops", async () => {
   assert.equal(CUT, 0.5);
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
-  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1), path: join(dir, "log.jsonl") });
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
   const { event, ctx } = eventFor("q", ["pre", "<memories>\n- one irrelevant fact\n</memories>"]);
   await handler(event, ctx);
   const rows = rowsOf(join(dir, "log.jsonl"));
@@ -206,7 +221,7 @@ test("sidecar carries text at mode 600 while the log stays hash-only", async () 
 test("ctx system prompt wins over the event copy", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
   let calls = 0;
-  const handler = makeBeforeAgentStartHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.1 }, latencyMs: 1, model: "m" }; }, path: join(dir, "log.jsonl") });
+  const handler = makeBeforeAgentStartHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.1 }, latencyMs: 1, model: "m" }; }, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
   const fakeCtx = { getSystemPrompt: () => SYS_RECALL };
   await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: ["no blocks here"] }, fakeCtx);
   assert.equal(calls, 2);
@@ -227,7 +242,50 @@ test("instruction-only turn is silent: zero calls, zero rows", async () => {
 test("empty prompt returns silently", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
   let calls = 0;
-  const handler = makeBeforeAgentStartHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.1 }, latencyMs: 1, model: "m" }; }, path: join(dir, "log.jsonl") });
+  const handler = makeBeforeAgentStartHandler({ ask: async () => { calls += 1; return { ok: true, scores: { rel: 0.1 }, latencyMs: 1, model: "m" }; }, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
   await handler({ type: "before_agent_start", prompt: "", images: [], systemPrompt: SYS_RECALL }, undefined);
   assert.equal(calls, 0);
+});
+
+test("enforce OFF returns undefined and leaves the prompt untouched", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath: join(dir, "no-switch-file") });
+  const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>"];
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, undefined);
+  assert.equal(out, undefined);
+});
+
+test("enforce ON removes dropped bullets and keeps kept ones", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const switchPath = join(dir, "enforce");
+  const { writeFileSync } = await import("node:fs");
+  writeFileSync(switchPath, "on");
+  const ask = async ({ state }) => ({ ok: true, scores: { rel: state.memory.includes("dropme") ? 0.1 : 0.9 }, latencyMs: 1, model: "m" });
+  const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath });
+  const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>"];
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, undefined);
+  assert.ok(out && typeof out === "object" && "systemPrompt" in out);
+  const pruned = out.systemPrompt;
+  assert.ok(Array.isArray(pruned) && pruned[0] === "pre");
+  assert.ok(!JSON.stringify(pruned).includes("dropme"));
+  assert.ok(JSON.stringify(pruned).includes("keepme bullet"));
+  assert.ok(JSON.stringify(pruned).includes("</memories>"));
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.ok(rows.some((r) => r.status === "enforced" && r.removed === 1 && r.kept === 1));
+});
+
+test("error path returns undefined: original prompt byte-identical", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath: join(dir, "no-switch-file") });
+  const sys = ["pre", "<memories>\n- dropme bullet\n</memories>"];
+  const snapshot = JSON.stringify(sys);
+  const throwingCtx = { getSystemPrompt: () => { throw new Error("prompt unavailable"); } };
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, throwingCtx);
+  assert.equal(out, undefined);
+  assert.equal(JSON.stringify(sys), snapshot);
+});
+
+test("pruneSystemPrompt is byte-identical with no drops", () => {
+  const sys = ["a\n- b", { type: "text", text: "c" }, 7];
+  assert.deepEqual(pruneSystemPrompt(sys, new Set()), sys);
 });

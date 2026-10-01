@@ -9,7 +9,7 @@
  * undefined. Bounded per AGENTS.md: max 20 items/turn, daily call cap in
  * code, stop on 401/402/403, fail safe (KEEP) on invalid/timeout/throw.
  */
-import { appendFile, mkdir } from "node:fs/promises";
+import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -97,11 +97,51 @@ export function parseSystemMemories(sys: unknown): MemoryItem[] {
   return items;
 }
 
+/** Removal path (default OFF): file presence enables, read per fire so no
+ * restart is needed to flip. Return contract proven live 2026-10-01: a raw
+ * string return is ignored, `{ systemPrompt }` replaces the prompt. */
+export async function enforceEnabled(switchPath: string): Promise<boolean> {
+  try {
+    await readFile(switchPath, "utf8");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Clean one raw line exactly as the splitter does. */
+function cleanLine(line: string): string {
+  return line.replace(/^[\s>*•\-–\d.)]+/, "").trim();
+}
+
+/** Drop exactly the decided-drop lines, byte-preserving everything else.
+ * Keeps are never touched; unknown shapes pass through unchanged. */
+export function pruneSystemPrompt(sys: unknown, dropped: Set<string>): unknown {
+  const pruneText = (text: string): string => {
+    if (dropped.size === 0) return text;
+    const kept = text.split("\n").filter((line) => !dropped.has(cleanLine(line)) || cleanLine(line).length <= 1);
+    return kept.join("\n");
+  };
+  if (typeof sys === "string") return pruneText(sys);
+  if (Array.isArray(sys)) {
+    return (sys as unknown[]).map((b) => {
+      if (typeof b === "string") return pruneText(b);
+      if (b && typeof b === "object" && typeof (b as Record<string, unknown>)["text"] === "string") {
+        return { ...(b as Record<string, unknown>), text: pruneText((b as Record<string, unknown>)["text"] as string) };
+      }
+      return b;
+    });
+  }
+  return sys;
+}
+
 const INSTRUCTIONS = "Memory: `memory`. Current request: `prompt`. Is this memory relevant to the current request?";
 
-export type FilterDeps = { ask?: Ask; cap?: number; path?: string; sidecarPath?: string; now?: () => string };
+
+export type FilterDeps = { ask?: Ask; cap?: number; path?: string; sidecarPath?: string; now?: () => string; switchPath?: string };
 
 export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
+  const switchPath = deps.switchPath ?? process.env.JEV_MEMORY_FILTER_ENFORCE_PATH ?? join(homedir(), ".local", "state", "jev", "memory-filter-enforce");
   const ask = deps.ask ?? askJev;
   const cap = deps.cap ?? MAX_DAILY_CALLS;
   const path = deps.path ?? process.env.JEV_MEMORY_FILTER_LOG_PATH ?? join(homedir(), ".local", "state", "jev", "memory-filter.jsonl");
@@ -129,7 +169,8 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
       // Logging never blocks the turn.
     }
   };
-  return async (event: unknown, ctx?: unknown): Promise<undefined> => {
+  return async (event: unknown, ctx?: unknown): Promise<undefined | { systemPrompt: unknown }> => {
+    const dropped = new Set<string>();
     try {
       const ev = (event ?? {}) as Record<string, unknown>;
       const rawPrompt = ev["prompt"];
@@ -156,6 +197,7 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
         const memoKey = promptHash + ":" + memoryHash;
         const cached = memo.get(memoKey);
         if (cached !== undefined) {
+          if (cached.decision === "drop") dropped.add(item.text);
           await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "memo", promptHash, memoryHash, noul: cached.noul, decision: cached.decision, tokensSaved: cached.decision === "drop" ? Math.floor(item.text.length / 4) : 0, latencyMs: null, inputTokens: cached.inputTokens });
           await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "memo", promptHash, memoryHash, prompt, memory: item.text, noul: cached.noul, decision: cached.decision });
           continue;
@@ -195,8 +237,14 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
           if (!oldest.done) memo.delete(oldest.value);
         }
         memo.set(memoKey, { noul, decision, inputTokens: result.usage?.input_tokens ?? null });
+        if (drop) dropped.add(item.text);
         await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash, noul, decision, tokensSaved: drop ? Math.floor(item.text.length / 4) : 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
         await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash, prompt, memory: item.text, noul, decision });
+      }
+      if (dropped.size > 0 && (await enforceEnabled(switchPath))) {
+        const kept = items.length - dropped.size;
+        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "enforced", promptHash, memoryHash: null, noul: null, decision: "prune", removed: dropped.size, kept, tokensSaved: 0, latencyMs: null, inputTokens: null });
+        return { systemPrompt: pruneSystemPrompt(sys, dropped) };
       }
     } catch {
       // Shadow failures never affect the turn.
