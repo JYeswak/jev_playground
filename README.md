@@ -116,7 +116,7 @@ Native judge (`modelRoles.judge`, key command-resolved via `work/jev-client/bin/
 
 Shadow hooks (log only, never change results; daily caps, stop on 401/402/403, fail open): bash risk scoring (`gate-observe`, `df2cf0d9`), web-result injection screening (`webscreen`, `7418e3b5`), web_search rerank dogfood (`9aa0372b`; 48 h live report on bead jev-bzl7: 12 scored rows, Jev agreed with rank-1 in 3, zero opens on either side), tool-result injection shadow (`9abe975b`).
 
-Per-prompt skill hints (`.omp/extensions/jev-skill-hint.ts`, listed in `.omp/config.yml`, `258e9d9a`; state capped at 400 chars, p95 255 ms on 10 long prompts, `c4c3c2a4`): re-verified both ways 2026-10-01 by fresh RPC sessions (SEO audit prompt → `seo-audit` hint; Hamlet summary → silent; bead jev-x1pq).
+Per-prompt skill hints: OFF since `1f031068` (reverted 2026-10-01). The live code misrouted on the dev set in 2 runs against a 0-misroute bar (run 1: 2 fired, 0 on-target; run 2: 4 fired, 1 on-target; `jev-mailbox` misroute stable across runs; 16 calls, ~$0.000645). History: listed in `.omp/config.yml` (`258e9d9a`), state capped at 400 chars with p95 255 ms (`c4c3c2a4`).
 
 Fleet watcher (`scripts/fleet-idle-watch.py`): an idle worker waiting on a human pages pane 1 (`be74fcf2`).
 
