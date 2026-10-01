@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { askJev, guardDeadlineMs } from '../../../kit/src/client.ts';
+import { askJev, guardDeadlineMs, resetClientCache } from '../../../kit/src/client.ts';
 
 // Timed-out requests must never escape as unhandled rejections: node:test
 // (like a default Node host) fails the run on one, so a green run IS that
@@ -35,6 +35,12 @@ function hangServer(t, onRequest) {
 
 async function assertTimesOut(server) {
   process.env.TYPESAFE_BASE_URL = `http://127.0.0.1:${server.address().port}`;
+  // The client caches one SDK client per process and the SDK reads
+  // TYPESAFE_BASE_URL at construction: without a reset the second server
+  // reuses the first server's (now closed) client and every call fails at
+  // connect instead of timing out. No assertion changes; only the endpoint
+  // the cached client points at.
+  resetClientCache();
   try {
     for (let i = 0; i < 8; i++) {
       const r = await askJev({ state: {}, questions: { q: 'x?' }, apiKey: 'k', timeoutMs: TIMEOUT_MS });
