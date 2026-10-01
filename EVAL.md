@@ -3370,3 +3370,12 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **7aj1 (cited, HazySpring authored, OrangeFrog verified):** recall 10/10, false pages 0/10.
 - **Docs:** README Jev-in-omp rewritten to expected.json; render-results --check current; 15-kit-claim 433 passed 0 failed; keyless stranger run EXPECTATION PASS 14 rows (clone e011dd57).
 - **Boundary:** e011dd57 (my swept commit, unwound locally) is on origin/main — content preserved, attribution mixed; no force-push. Stranger source/clone skew (99de2347 vs e011dd57) resolved by default-clone run.
+
+## 2026-10-01 jev-s47b memory-filter re-seam + drop audit (HazySpring): 30/30 PASS [live]
+
+- **Seam-blind (BLOCKED, then lever taken):** `context`-event messages carry only user/assistant/toolResult/developer roles (4,275 messages, 6 transcripts, zero system-role); memories inject via system prompt. 676ab041 system-only parser scored zero live items. Moved to `before_agent_start`, parsing `event.systemPrompt` (ctx.getSystemPrompt fallback); corrections: `before_agent_start` returns a message, not a prompt override (shadow returns undefined).
+- **Wire facts (8 rpc sessions, fresh each):** event keys [type,prompt,images,systemPrompt]; systemPrompt is string[] (3-4 elements); recall appended as own element on turn 2+ (first turns: 1 instruction `<memories>` mention, no close, zero items); per-element parsing (join-first merged the mention with the recall close and flooded the 20-cap with tool-routes prose).
+- **Tests:** 16/16 offline on captured redacted fixtures (instruction prose verbatim, bullet bodies redacted with receipt, synthetic boundary named); ubs 0/0. Commits fcccfc8b (re-seam), c597f87d (per-element).
+- **Live (jev-1.13.0, 2026-10-01):** 2×3-turn rpc sessions, instances e42fe1b1/bf1c7377, 80 scored calls, 29,148 input tokens, spend $0.0012, latency med 118/154ms. Turn 1 silent both sessions (no recall), recall turns capped 20/20. Cap burn: 40 calls per 3-turn session.
+- **Drop bar 27/30:** 30 random drops (seed 47, noul blinded) labeled from prompt+memory text: 30/30 truly irrelevant → PASS. 8 keeps are soft (0.51-0.97, several tangential just above bar; prompt-echo kept at 0.92): drop precision proven, keep usefulness not.
+- **Boundary:** what was NOT run: multi-session fleet traffic (panes restart on conductor order); keep-side tuning; instruction-prose items inside recall elements score-and-drop by design.
