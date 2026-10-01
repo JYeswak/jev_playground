@@ -68,10 +68,10 @@ test('complete FiQA answers remain unscoreable under the multi-positive metric',
   assert.equal(coverage.scoreable, false);
   assert.equal(coverage.verdict, 'NOT_RUN');
 });
-test('paired significance marks Jev as worse only when the local model wins', () => {
-  const jevLoss = pairedCorrectness(Array.from({length: 8}, () => false), Array.from({length: 8}, () => true));
-  const jevWin = pairedCorrectness(Array.from({length: 8}, () => true), Array.from({length: 8}, () => false));
+test('paired significance marks the local model worse only when Jev wins', () => {
+  const localLoss = pairedCorrectness(Array.from({length: 8}, () => true), Array.from({length: 8}, () => false));
+  const localWin = pairedCorrectness(Array.from({length: 8}, () => false), Array.from({length: 8}, () => true));
 
-  assert.equal(jevLoss.significantlyWorse, true);
-  assert.equal(jevWin.significantlyWorse, false);
+  assert.equal(localLoss.significantlyWorse, true);
+  assert.equal(localWin.significantlyWorse, false);
 });

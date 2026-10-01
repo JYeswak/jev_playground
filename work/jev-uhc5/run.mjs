@@ -351,7 +351,7 @@ export function pairedCorrectness(jev, local) {
     else if (local[i] && !jev[i]) localOnlyWins++;
   }
   const p = exactBinomialP(jevOnlyWins, jevOnlyWins + localOnlyWins);
-  return {jevOnlyWins, localOnlyWins, twoSidedExactP: p, significantlyWorse: p < 0.05 && localOnlyWins > jevOnlyWins};
+  return {jevOnlyWins, localOnlyWins, twoSidedExactP: p, significantlyWorse: p < 0.05 && jevOnlyWins > localOnlyWins};
 }
 function fraction(numerator, denominator) {
   return denominator ? numerator / denominator : null;

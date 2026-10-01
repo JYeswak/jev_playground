@@ -1,6 +1,6 @@
 {
   "schema": "jev-uhc5-local-evaluation/v1",
-  "createdAt": "2026-10-01T07:41:28.376Z",
+  "createdAt": "2026-10-01T07:45:00.930Z",
   "lane": "local",
   "jevModel": "jev-1.13.0",
   "overallVerdict": "EXPLORED",
@@ -60,7 +60,7 @@
             "jevOnlyWins": 50,
             "localOnlyWins": 16,
             "twoSidedExactP": 0.00003328235017032062,
-            "significantlyWorse": false
+            "significantlyWorse": true
           }
         },
         {
@@ -74,7 +74,7 @@
             "jevOnlyWins": 26,
             "localOnlyWins": 11,
             "twoSidedExactP": 0.020073851919732988,
-            "significantlyWorse": false
+            "significantlyWorse": true
           },
           "model": "tev1:latest"
         }
@@ -84,13 +84,13 @@
           "jevOnlyWins": 50,
           "localOnlyWins": 16,
           "twoSidedExactP": 0.00003328235017032062,
-          "significantlyWorse": false
+          "significantlyWorse": true
         },
         "tev1": {
           "jevOnlyWins": 26,
           "localOnlyWins": 11,
           "twoSidedExactP": 0.020073851919732988,
-          "significantlyWorse": false
+          "significantlyWorse": true
         }
       },
       "models": {
@@ -122,14 +122,14 @@
       "bar": {
         "nimble:latest": {
           "withinThreePoints": false,
-          "significantlyWorse": false,
+          "significantlyWorse": true,
           "withinLatencyBar": false,
           "passesMetricBar": false,
           "passesBar": false
         },
         "tev1:latest": {
           "withinThreePoints": false,
-          "significantlyWorse": false,
+          "significantlyWorse": true,
           "withinLatencyBar": false,
           "passesMetricBar": false,
           "passesBar": false
@@ -200,7 +200,7 @@
             "jevOnlyWins": 40,
             "localOnlyWins": 64,
             "twoSidedExactP": 0.02364563574976815,
-            "significantlyWorse": true
+            "significantlyWorse": false
           },
           "model": "tev1:latest"
         }
@@ -216,7 +216,7 @@
           "jevOnlyWins": 40,
           "localOnlyWins": 64,
           "twoSidedExactP": 0.02364563574976815,
-          "significantlyWorse": true
+          "significantlyWorse": false
         }
       },
       "models": {
@@ -255,7 +255,7 @@
         },
         "tev1:latest": {
           "withinThreePoints": false,
-          "significantlyWorse": true,
+          "significantlyWorse": false,
           "withinLatencyBar": false,
           "passesMetricBar": false,
           "passesBar": false
@@ -4142,10 +4142,10 @@
     "work/jev-29s4/live-rows.jsonl": "c4a5ec45c8b1fce706e8af3ad31b5f626f520f3737c8afc0164d01bf6573aa57",
     "var/agent-tmp/jev-1lim/commands-A.jsonl": "229ea9b8bd0a552c5439227af7d918c914e2752cd1b805d7ecd4750b6cea8515",
     "/tmp/beir-fiqa/fiqa.zip": "32c7df99ed21252fdfb2cf3f5673502a8d245ee0c44c4a133570d92ce2b3ad02",
-    "work/jev-uhc5/run.mjs": "06669fa4fa9d35187e1aff454d37a5594e8031a835da80739b06f9bdbb22cca5",
+    "work/jev-uhc5/run.mjs": "6541ffa75158b658733e109ebfc21b031e8d46e2703abceb9af39d16b9a54801",
     "work/jev-uhc5/injection-metrics.mjs": "68d09cb9488af22496c015e3af2952df80ace2e7cd5f1c28a51595122f72c9e4",
     "work/jev-uhc5/injection-metrics.test.mjs": "a880ae12265199e291e3cf822caefc6e1048cf4cd57afdaec59c1ba0bd2bc25b",
-    "work/jev-uhc5/runner.test.mjs": "da7868df50abd060a7e3f6f4eb83f7fb9803c3f7e2a794ef14dad7145ae4ef82"
+    "work/jev-uhc5/runner.test.mjs": "340c5d08aa92a9aa06624c2a232f68edec109b38c0c972b70f954aa25da28207"
   },
   "localCallsPlanned": 4438,
   "localCallsRecorded": 3119,
