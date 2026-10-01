@@ -19,6 +19,7 @@ import {
 const GUARD_DIR = mkdtempSync(join(tmpdir(), "memfilter-guard-"));
 process.env.JEV_MEMORY_FILTER_LOG_PATH = join(GUARD_DIR, "log.jsonl");
 process.env.JEV_MEMORY_FILTER_SIDECAR_PATH = join(GUARD_DIR, "full.jsonl");
+process.env.JEV_MEMORY_FILTER_ENFORCE_PATH = join(GUARD_DIR, "no-switch-file");
 
 
 // Fixture provenance (AGENTS.md rule 11): structure + instruction prose captured
@@ -89,7 +90,7 @@ test("systemPromptText joins string arrays and passes strings through", () => {
 });
 
 test("suite guard: prod log paths stay redirected to temp", () => {
-  for (const v of [process.env.JEV_MEMORY_FILTER_LOG_PATH, process.env.JEV_MEMORY_FILTER_SIDECAR_PATH]) {
+  for (const v of [process.env.JEV_MEMORY_FILTER_LOG_PATH, process.env.JEV_MEMORY_FILTER_SIDECAR_PATH, process.env.JEV_MEMORY_FILTER_ENFORCE_PATH]) {
     assert.ok(v && v.startsWith(GUARD_DIR), `redirection removed, prod path would be touched: ${v}`);
   }
 });
@@ -288,4 +289,31 @@ test("error path returns undefined: original prompt byte-identical", async () =>
 test("pruneSystemPrompt is byte-identical with no drops", () => {
   const sys = ["a\n- b", { type: "text", text: "c" }, 7];
   assert.deepEqual(pruneSystemPrompt(sys, new Set()), sys);
+});
+
+test("double factory call on one binding registers once", async () => {
+  const seen = [];
+  const pi = { on: (event, handler) => seen.push([event, handler]) };
+  const { default: factory } = await import("./jev-memory-filter.ts");
+  factory(pi, { ask: fakeAsk(0.1) });
+  factory(pi, { ask: fakeAsk(0.1) });
+  assert.equal(seen.filter(([event]) => event === "before_agent_start").length, 1);
+});
+
+test("fresh bindings each register", async () => {
+  const seen = [];
+  const { default: factory } = await import("./jev-memory-filter.ts");
+  factory({ on: (event, handler) => seen.push(event) }, { ask: fakeAsk(0.1) });
+  factory({ on: (event, handler) => seen.push(event) }, { ask: fakeAsk(0.1) });
+  assert.equal(seen.filter((event) => event === "before_agent_start").length, 2);
+});
+
+test("rows carry the session repo from ctx cwd", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
+  await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: SYS_RECALL }, { cwd: "/repo/example" });
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.ok(rows.length > 0 && rows.every((r) => r.repo === "/repo/example"));
+  const side = rowsOf(join(dir, "full.jsonl"));
+  assert.ok(side.length > 0 && side.every((r) => r.repo === "/repo/example"));
 });

@@ -153,10 +153,11 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
   // Per-instance memo: re-entry retries and repeated turns resubmit identical
   // (prompt, memory) pairs. Reuse the verdict instead of re-spending a call.
   const memo = new Map<string, { noul: number; decision: string; inputTokens: number | null }>();
+  let fireRepo: string | null = null;
   const write = async (row: Record<string, unknown>): Promise<void> => {
     try {
       await mkdir(join(homedir(), ".local", "state", "jev"), { recursive: true });
-      await appendFile(path, JSON.stringify(row) + "\n", { mode: 0o600 });
+      await appendFile(path, JSON.stringify({ ...row, repo: fireRepo }) + "\n", { mode: 0o600 });
     } catch {
       // Logging never blocks the turn.
     }
@@ -164,7 +165,7 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
   const writeSidecar = async (row: Record<string, unknown>): Promise<void> => {
     try {
       await mkdir(join(homedir(), ".local", "state", "jev"), { recursive: true });
-      await appendFile(sidecar, JSON.stringify(row) + "\n", { mode: 0o600 });
+      await appendFile(sidecar, JSON.stringify({ ...row, repo: fireRepo }) + "\n", { mode: 0o600 });
     } catch {
       // Logging never blocks the turn.
     }
@@ -183,6 +184,7 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
         return undefined;
       }
       const currentDay = now().slice(0, 10);
+      fireRepo = (ctx as { cwd?: string } | undefined)?.cwd ?? null;
       if (currentDay !== day) {
         day = currentDay;
         calls = 0;
@@ -252,10 +254,18 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
     return undefined;
   };
 }
+/** Double-registration guard: in repos where the project file and a global
+ * entry resolve to different spellings, the loader binds both in one session.
+ * The marker lives on the per-session binding, so fresh sessions (and
+ * subagents, which rebind) still register exactly once each. */
+const REGISTERED_MARK = "__jevMemoryFilterRegistered";
 export default function jevMemoryFilterExtension(
   pi: { on: (event: string, handler: (event: unknown, ctx?: unknown) => Promise<unknown>) => void },
   deps: FilterDeps = {},
 ): void {
   if (!deps.ask) useInfisicalKey();
+  const binding = pi as unknown as Record<string, unknown>;
+  if (binding[REGISTERED_MARK] === true) return;
+  binding[REGISTERED_MARK] = true;
   pi.on("before_agent_start", makeBeforeAgentStartHandler(deps));
 }
