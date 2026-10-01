@@ -65,9 +65,11 @@ for rid, tid in (("f01-control-pilot", "f01"), ("f01-treat-pilot", "f01")):
 
 
 def agg(rs, arm):
+    # WildCarp fix (ynn7 v1 fault): ALL tool-result tokens of every task in
+    # the arm, failures included, divided by successes.
     s = [r for r in rs if r["arm"] == arm]
     succ = sum(1 for r in s if r["success"])
-    tok = sum(r["tokens_locate"] for r in s if r["success"])
+    tok = sum(r["tokens_locate"] for r in s)
     finds = sum(r["per_tool"]["find"]["calls"] for r in s)
     greps = sum(r["per_tool"]["grep"]["calls"] for r in s)
     return {

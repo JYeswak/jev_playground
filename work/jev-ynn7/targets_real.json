@@ -1,0 +1,72 @@
+{
+ "r01": {
+  "token": "function deepLspDoctor",
+  "episode_file": "/Users/josh/Developer/omp-kit/src/cli.ts",
+  "session": "/Users/josh/.omp/agent/sessions/-Developer-omp-test/2026-09-29T15-32-27-295Z_01a0edcb-bc1f-7541-8032-f52903a53024.jsonl",
+  "tool_id": "call_wgj2TR2YqO2VRW3064EKiAdX|fc_07a8dba116b3a3cd016abd2af4d66487d0995712505d9a9514",
+  "pattern": "function deepLspDoctor"
+ },
+ "r02": {
+  "token": "function safePath",
+  "episode_file": "/Users/josh/Developer/omp-kit/src/lsp-probe.ts",
+  "session": "/Users/josh/.omp/agent/sessions/-Developer-omp-test/2026-09-29T15-32-25-872Z_01a0edcb-b690-71ab-ad1f-4eaea2560c40.jsonl",
+  "tool_id": "call_TYaTHoK1nZlsezecolBOlds0|fc_06af8656b4c42f14016abd2b857a7487d08c564d738dcd4052",
+  "pattern": "function safePath"
+ },
+ "r03": {
+  "token": "interface MemoryRedactorReport",
+  "episode_file": "/Users/josh/Developer/omp-kit/src/memory-readiness.ts",
+  "session": "/Users/josh/.omp/profiles/claude/agent/sessions/-Developer-omp-test/2026-09-25T17-20-32-906Z_01a0d995-428a-70f8-a44f-facbbc48bef1.jsonl",
+  "tool_id": "call_LWNiZiZNLeAKpECIdFWcngIn|fc_015dd2e895c7849b016abaa596666887d0967b4c005f33f418",
+  "pattern": "interface MemoryRedactorReport|redactor:|function redactor|const redactor"
+ },
+ "r04": {
+  "token": "export interface OmpIdentity",
+  "episode_file": "/Users/josh/Developer/omp-kit/src/paths.ts",
+  "session": "/Users/josh/.omp/profiles/claude/agent/sessions/-Developer-omp-test/2026-09-25T17-20-32-906Z_01a0d995-428a-70f8-a44f-facbbc48bef1.jsonl",
+  "tool_id": "call_os9z6buGreZA4TZ4iqKuLHTE|fc_02ac84f322922f0c016ababcd3c60487d0aebf47f917043d3c",
+  "pattern": "export interface OmpIdentity|export type OmpIdentity"
+ },
+ "r05": {
+  "token": "function undo",
+  "episode_file": "/Users/josh/Developer/omp-kit/src/mutations.ts",
+  "session": "/Users/josh/.omp/agent/sessions/-Developer-omp-test/2026-09-29T15-32-25-872Z_01a0edcb-b690-71ab-ad1f-4eaea2560c40.jsonl",
+  "tool_id": "call_US1RBamENHD2UaY1876uuKk1|fc_0ace332c5618ba2a016abbe40b00b487d08df61c1f863a28b3",
+  "pattern": "^export (type|function)|function undo|beforeSha|postHash|postSha|ownership"
+ },
+ "r06": {
+  "token": "allow-channel-change",
+  "episode_file": "/Users/josh/Developer/omp-kit/docs/superpowers/specs/2026-09-28-omp-kit-companion-cli-design.md",
+  "session": "/Users/josh/.omp/profiles/claude/agent/sessions/-Developer-omp-test/2026-09-25T17-20-32-906Z_01a0d995-428a-70f8-a44f-facbbc48bef1.jsonl",
+  "tool_id": "call_sB81wforwghBkg4ufSoVueKL|fc_0559be407bc16c07016aba1a60ace087d09f1932747845c2ee",
+  "pattern": "^#{1,5} .*([Cc]ommand|[Cc]apabilit|[Ss]chema|[Ee]xit)|allow-channel-change|proof_classes|global_flags"
+ },
+ "r07": {
+  "token": "harness_runtime:",
+  "episode_file": "/Users/josh/Developer/omp-kit/tests/cli/test-runner.test.ts",
+  "session": "/Users/josh/.omp/agent/sessions/-Developer-omp-test/2026-09-29T15-32-25-872Z_01a0edcb-b690-71ab-ad1f-4eaea2560c40.jsonl",
+  "tool_id": "call_9P7VJpsMd6nYiqxO7HE4JQSS|fc_023621fcf7fb6e09016abc77f1fb9887d098be951ce9bb3228",
+  "pattern": "createHash\\(|harness_runtime:|producer_rc"
+ },
+ "r08": {
+  "token": "typescript-language-server",
+  "episode_file": "/Users/josh/Developer/omp-kit/tests/cli/lsp-readiness.test.ts",
+  "session": "/Users/josh/.omp/agent/sessions/-Developer-omp-test/2026-09-29T15-32-25-872Z_01a0edcb-b690-71ab-ad1f-4eaea2560c40.jsonl",
+  "tool_id": "call_1tXCoaxpgXGPyJ7cQw30tBia|fc_036e8d6df8def346016abd3122239887d0abeadcc22ace5ec2",
+  "pattern": "node_modules/.bin|workspace-local|typescript-language-server|lsp.json"
+ },
+ "r09": {
+  "token": "native-guide",
+  "episode_file": "/Users/josh/Developer/omp-kit/tests/cli/native-guide.test.ts",
+  "session": "/Users/josh/.omp/agent/sessions/-Developer-omp-test/2026-09-29T15-32-27-295Z_01a0edcb-bc1f-7541-8032-f52903a53024.jsonl",
+  "tool_id": "call_dCbMJioQROKaUIShu8qAVLCZ|fc_01edb9576cd35f78016abd31b37d8487d0ad9c19a2f04d3b5c",
+  "pattern": "18\\.4\\.3|native-guide|hook flag|--hook"
+ },
+ "r10": {
+  "token": "test-skip-ts-fire",
+  "episode_file": "/Users/josh/Developer/omp-kit/tests/live/scenarios.json",
+  "session": "/Users/josh/.omp/agent/sessions/-Developer-omp-test/2026-09-29T15-32-27-295Z_01a0edcb-bc1f-7541-8032-f52903a53024.jsonl",
+  "tool_id": "call_dl6HUIdCmM4hdWrG79CUnKzc|fc_02ede6b92799dbe6016abc24db442087d0b1e55fcfca260478",
+  "pattern": "G4|test-skip-ts-fire|e2e-live|runtime-adapter|archive6"
+ }
+}

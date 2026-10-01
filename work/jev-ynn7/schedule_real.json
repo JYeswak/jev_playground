@@ -1,0 +1,102 @@
+[
+ {
+  "task": "r02",
+  "arm": "treat",
+  "order": 0
+ },
+ {
+  "task": "r08",
+  "arm": "treat",
+  "order": 1
+ },
+ {
+  "task": "r01",
+  "arm": "control",
+  "order": 2
+ },
+ {
+  "task": "r02",
+  "arm": "control",
+  "order": 3
+ },
+ {
+  "task": "r04",
+  "arm": "control",
+  "order": 4
+ },
+ {
+  "task": "r05",
+  "arm": "treat",
+  "order": 5
+ },
+ {
+  "task": "r05",
+  "arm": "control",
+  "order": 6
+ },
+ {
+  "task": "r08",
+  "arm": "control",
+  "order": 7
+ },
+ {
+  "task": "r10",
+  "arm": "control",
+  "order": 8
+ },
+ {
+  "task": "r07",
+  "arm": "treat",
+  "order": 9
+ },
+ {
+  "task": "r04",
+  "arm": "treat",
+  "order": 10
+ },
+ {
+  "task": "r06",
+  "arm": "control",
+  "order": 11
+ },
+ {
+  "task": "r01",
+  "arm": "treat",
+  "order": 12
+ },
+ {
+  "task": "r10",
+  "arm": "treat",
+  "order": 13
+ },
+ {
+  "task": "r09",
+  "arm": "control",
+  "order": 14
+ },
+ {
+  "task": "r07",
+  "arm": "control",
+  "order": 15
+ },
+ {
+  "task": "r06",
+  "arm": "treat",
+  "order": 16
+ },
+ {
+  "task": "r09",
+  "arm": "treat",
+  "order": 17
+ },
+ {
+  "task": "r03",
+  "arm": "control",
+  "order": 18
+ },
+ {
+  "task": "r03",
+  "arm": "treat",
+  "order": 19
+ }
+]
