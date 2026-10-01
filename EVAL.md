@@ -3348,3 +3348,8 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Design (prereg N1 + N1b amendment, bead comments pre-calls):** same lexical shortlist/state/300ms, Choice replaced by per-candidate Noul (single askJevBundle request), hint argmax iff >=0.80; N1b narrows to top-5 (N1/20 timed out 6/8). Same 8 r2 prompts, Choice head-to-head today, 2x8 runs, bound +24 calls.
 - **Live (jev-1.13.0, no 401/402/403):** Choice 0 hints/0 misroutes; N1b-A 0/8 (4 low-noul answered 170-276ms); N1b-B 0/8 (6 timeouts). 0 hints anywhere. Spend ~$0.0015 max (silent paths carry no usage).
 - **Verdict:** bar literally met but VACUOUS — r2 misroutes (check-constraint .82, form-validation .84) did not reproduce (roster drift + direct-call context + nondeterminism). Retry condition NOT claimable. Next: fresh dev set from currently-firing prompts. Code + 2 tests kept (12/12 green, tsc clean); extension stays OFF. Receipt work/skill-routing/receipt-jev-4nyy-n1.json. Left in_progress.
+
+## 2026-10-01 jev-rud1 extend verify (WindyLantern non-author): WITHHOLD qualifies, closed [offline]
+
+- **Recompute:** clean 0/132+0/60+0/30=0/222 exact, Wilson upper 0.0170; catch 26/30 fresh (kit client) + 268/300 Sep-27 same-shadow-question rows (author-disclosed no-new-calls; same file eo40 cited); traffic 1/247 TP sha-matched; spend files sum 271,477 vs claimed 292,569 (Δ7% residual); bar 17:29:56Z < rows 17:31/17:33Z.
+- **Ruling:** clean gate 0/222 upper 1.70%<=2% on 192 fresh calls; catch 89.3% same-question + 26/30 fresh consistent. WITHHOLD qualifies per conductor order; flip is separate change. Residuals: 132-resolution method has no committed script; rows lack model/ts fields.
