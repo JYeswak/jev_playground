@@ -4815,3 +4815,17 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** a new design scores >= 25% hint rate AND 0 misroutes on a committed per-row dev set (rows committed before the first live call, each row carrying its must-not-misroute cases). Stopword/IDF/width/stem/density/body/cut variants are dead without a semantic-matching design. Reopen cites this row.
 
 **Evidence:** R131 (H1 numbers, commits 4d0e76c5/abbfdce8, receipts work/skill-routing/receipt-jev-4nyy-h1.json, -autopsy.json, -r2.json); bead jev-4nyy deferred 2026-10-01 with autopsy/H1/reconcile comments.
+
+## R134 — TURNED-OFF: Jev web_search rerank earns its keep (2026-10-01)
+
+**Hypothesis:** a tool_result hook picking the best web_search result with one Jev Choice (shadow) guides the agent to better sources (bead jev-ib1h).
+
+**What was tried:** loss depth on 54 log rows (7d, 2026-09-27..10-01): 15 answered ($0.00065 spend), 18 observed, 16 errors with no error text (old schema predates the error field; current code logs it), 5 not-admitted. Jev disagreed with provider rank 1 on 11/15, but the agent opened nothing in follow-ups: 6 rows with nextToolCalls>=1, 0 opens of pick or rank 1. Discriminating cases (answered + follow-ups + disagree): 4 below the 6-case bar, 0 openedPick.
+
+**One-variable replay + shuffled control (keyless, same 6 rows):** pick source swapped Jev->uniform-random holding rows fixed: Jev 0/6, shuffled 0/6. Bottleneck is agent behavior (no opens), not pick quality.
+
+**Verdict:** OFF. Factory default-off (opt-in via enabled:true or JEV_WEB_SEARCH_RERANK_ENABLED=1); no config hook switch exists, verified live (fresh session web_search writes no rows).
+
+**Retry-condition:** agent-side result-open behavior changes first (opens measured >0 on answered rows), then a new 30-search round shows openedPick rate >= 1/2 on >=6 discriminating cases with shuffled control below. Reopen cites this row.
+
+**Evidence:** bead jev-ib1h bar + autopsy comments 2026-10-01; hook suite 11/11; EVAL row jev-ib1h 2026-10-01.

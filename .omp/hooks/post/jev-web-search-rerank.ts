@@ -56,6 +56,7 @@ type ShadowDeps = {
   now?: () => string;
   session?: string;
   cap?: number;
+  enabled?: boolean;
 };
 
 function defaultPath(): string {
@@ -272,10 +273,17 @@ export function makeWebSearchRerankHandler(deps: ShadowDeps = {}) {
   return handler;
 }
 
+/** OFF by default (jev-ib1h loss depth 2026-10-01: 0 opens in 15 answered, 4
+ * discriminating cases below the 6-case bar; spend stopped here). There is no
+ * config hook switch, so the factory itself is the switch: pass
+ * enabled:true (or JEV_WEB_SEARCH_RERANK_ENABLED=1) to re-enable for study.
+ * Sessions keep working; only Jev scoring + logging stop. */
 export default function jevWebSearchRerankHook(
   host: { on: (event: string, handler: (event: SearchEvent, ctx?: HookContext) => Promise<undefined>) => void },
   deps: ShadowDeps = {},
 ): void {
+  const enabled = deps.enabled ?? process.env.JEV_WEB_SEARCH_RERANK_ENABLED === "1";
+  if (!enabled) return;
   if (!deps.ask) useInfisicalKey();
   const handler = makeWebSearchRerankHandler(deps);
   host.on("tool_result", handler);

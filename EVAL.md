@@ -3379,3 +3379,11 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Live (jev-1.13.0, 2026-10-01):** 2×3-turn rpc sessions, instances e42fe1b1/bf1c7377, 80 scored calls, 29,148 input tokens, spend $0.0012, latency med 118/154ms. Turn 1 silent both sessions (no recall), recall turns capped 20/20. Cap burn: 40 calls per 3-turn session.
 - **Drop bar 27/30:** 30 random drops (seed 47, noul blinded) labeled from prompt+memory text: 30/30 truly irrelevant → PASS. 8 keeps are soft (0.51-0.97, several tangential just above bar; prompt-echo kept at 0.92): drop precision proven, keep usefulness not.
 - **Boundary:** what was NOT run: multi-session fleet traffic (panes restart on conductor order); keep-side tuning; instruction-prose items inside recall elements score-and-drop by design.
+
+## 2026-10-01 jev-ib1h websearch-rerank loss depth: OFF, 0/6 opens (HazySpring) [live]
+
+- **Autopsy (keyless, 54 rows 7d):** 15 answered ($0.00065), 18 observed, 16 errors with null text (old schema; current code logs error), 5 not-admitted. Jev disagreed with provider 11/15; agent opened nothing: 6 rows with follow-ups, 0 opens of pick or rank 1.
+- **Bar (committed pre-computation):** KEEP iff >=6 discriminating cases AND openedPick >= 1/2 AND shuffled below; else OFF. Result: 4 cases, 0 openedPick -> OFF.
+- **Replay + shuffled control:** Jev 0/6 vs uniform-random 0/6 on same rows; bottleneck is agent opens, not pick quality.
+- **Action:** factory default OFF (no config hook switch exists); suite 11/11; inventory expect on->off; NEGATIVE_EVIDENCE R134.
+- **Boundary:** opens via untracked tools would miss the flags (rows track read/fetch/web_extract/open_url URL hashes); no live errors since Sep-28 to recount failure modes.

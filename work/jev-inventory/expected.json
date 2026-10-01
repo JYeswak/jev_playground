@@ -101,12 +101,12 @@
       "group": "hook",
       "name": "web_search rerank shadow",
       "decision": "best web_search result for the agent",
-      "how": ".omp/hooks/post/jev-web-search-rerank.ts (shadow)",
-      "expect": "on",
+      "how": ".omp/hooks/post/jev-web-search-rerank.ts (shadow, factory default OFF since jev-ib1h)",
+      "expect": "off",
       "log": "websearch-rerank.jsonl",
       "file": ".omp/hooks/post/jev-web-search-rerank.ts",
       "verdict": "NO-BENEFIT",
-      "evidence": "jev-bzl7 0 opens; parked jev-y0tr",
+      "evidence": "jev-ib1h: 0 opens in 15 answered, 4 discriminating cases, shuffled 0/6; prior jev-bzl7 0 opens",
       "saving": "none"
     },
     {

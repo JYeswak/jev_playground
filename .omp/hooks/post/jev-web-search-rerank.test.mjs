@@ -55,6 +55,7 @@ test('ten distinct ordinary tool results close the search window before an eleve
   jevWebSearchRerankHook(
     { on: (name, handler) => handlers.set(name, handler) },
     {
+      enabled: true,
       ask: answer(),
       append: async (_path, line) => rows.push(parseLine(line)),
       now: () => '2026-09-27T00:00:00.000Z',
@@ -80,7 +81,7 @@ test('registered callbacks keep repeated call IDs separate across sessions', asy
   const handlers = new Map();
   jevWebSearchRerankHook(
     { on: (name, handler) => handlers.set(name, handler) },
-    { ask: answer(), append: async (_path, line) => rows.push(parseLine(line)) },
+    { enabled: true, ask: answer(), append: async (_path, line) => rows.push(parseLine(line)) },
   );
   for (const session of ['session-a', 'session-b']) {
     const ctx = { sessionManager: { getSessionId: () => session } };
@@ -153,7 +154,7 @@ test('registered callbacks rerank a real-shaped search event in shadow with inje
   let requests = 0;
   jevWebSearchRerankHook(
     { on: (name, handler) => handlers.set(name, handler) },
-    { ask: async () => { requests++; return answer()(); }, append: async (_path, line) => rows.push(parseLine(line)) },
+    { enabled: true, ask: async () => { requests++; return answer()(); }, append: async (_path, line) => rows.push(parseLine(line)) },
   );
   const event = searchEvent();
   const ctx = { sessionManager: { getSessionId: () => 'session-a' } };
@@ -170,4 +171,24 @@ test('registered callbacks rerank a real-shaped search event in shadow with inje
   assert.equal(rows[0].resultCount, 2);
   assert.equal(JSON.stringify(rows).includes('captured query'), false);
   assert.equal(JSON.stringify(rows).includes('first passage'), false);
+});
+
+test('factory default OFF subscribes nothing: no calls, no rows', async () => {
+  const handlers = new Map();
+  let requests = 0;
+  jevWebSearchRerankHook(
+    { on: (name, handler) => handlers.set(name, handler) },
+    { ask: async () => { requests++; throw new Error('must not be called'); }, append: async () => { throw new Error('must not log'); } },
+  );
+  assert.equal(handlers.size, 0);
+  assert.equal(requests, 0);
+});
+
+test('factory enabled:true subscribes both tool hooks', async () => {
+  const handlers = new Map();
+  jevWebSearchRerankHook(
+    { on: (name, handler) => handlers.set(name, handler) },
+    { enabled: true, ask: async () => { throw new Error('unused'); }, append: async () => undefined },
+  );
+  assert.deepEqual([...handlers.keys()].sort(), ['tool_execution_end', 'tool_result']);
 });
