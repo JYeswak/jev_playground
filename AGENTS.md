@@ -105,7 +105,7 @@ native calls; cost is not the deciding factor, quality and latency are.
 | judge role | `~/.omp/agent/config.yml` + profile configs | backend for the three above | `typesafe/jev-latest`; key command-resolved in `models.yml`; local `ollama-sys1` provider declared, inert |
 | project tools | `.omp/tools/*.ts`, `.omp/extensions/` | rerank, claim check, classify, gate, flag, screen | callable `xd://jev_*` devices |
 | project hooks | `.omp/hooks/post/` | bash risk (gate-observe), web-result injection (webscreen), web_search pick (rerank) | live shadow on `jev-1.13.0`, capped per day, fail open, log only; injection-shadow on tool results in progress (`jev-asbl`) |
-| claim rule | `.omp/rules/claim-without-evidence.md` | does a reply claim a result without evidence? | ON in this repo (judged TTSR, never interrupts); global after organic precision data |
+| claim rule | `.omp/rules/disabled/claim-without-evidence.md` | does a reply claim a result without evidence? | RETIRED 2026-10-01: held-out precision 0.571 vs a 0.80 bar (R130); outside rule discovery |
 | fleet watcher | `scripts/fleet-idle-watch.py` (hub service) | is an idle worker waiting on a human? | ON: pages pane 1 on idle, needs-human (`jev-1.13.0` Noul), CI, stranger run, key exposure |
 
 Scoreboard (bead `jev-4970`): `python3 work/omp-jev-review/surface-census.py --scoreboard --days 7`.
@@ -128,9 +128,11 @@ art needs no change. `docs-mirror/` and `upstream/` commit provenance (sha256 ma
 2. **Re-read right before any line-anchored write;** a stale anchor lands elsewhere silently.
 3. **Stage exactly your paths and read back the index:** `git add <path>...` (never `-A` or `.`;
    `dcg` denies it), then `git diff --cached --stat` must list only your paths.
-4. **Commit with `git commit --only <your paths>` on `main`; never a bare `git commit`, never amend.**
-   A bare commit takes the whole shared index: on 2026-10-01 one swept stale blobs and reverted a
-   sibling's commit in history (32d5c1ba, restored in f5faa0e2). A fix is a new commit.
+4. **Commit on `main` without sweeping anyone; never amend.** `git commit --only <paths>` skips others'
+   staged blobs but commits the WORKING-TREE file, so use it only on files that hold nothing but your
+   edits. In a shared file with others' pending hunks (EVAL.md, ledgers), stage your hunk as an index
+   blob (HEAD copy + your change, `git hash-object -w`, `git update-index --cacheinfo`), check
+   `git diff --cached`, then `git commit` with no pathspec. Incidents 2026-10-01: 32d5c1ba, bc9fd2a0.
 5. **The subject claims a verification level** (`commit-msg` refuses one without it), weakest first:
    `pending`, `selftest`, `test`, `mutation`, `oracle`, `live`. Claim the level you actually reached.
 
@@ -494,13 +496,11 @@ bare `cass` (it is a TUI): `cass search "<query>" --robot --limit 5`, `cass view
 
 ## Landing the Plane (Session Completion)
 
-1. **Record what ran:** an `EVAL.md` row for any live call, enabled surface or measured result — SHA,
-   lane, exact command, counts, spend, and a `Boundary` line for what you did not run. Reserve the
-   file first.
+1. **Record what ran:** an `EVAL.md` row for any live call, enabled surface or measured result (SHA,
+   lane, exact command, counts, spend, a `Boundary` line for what you did not run). Reserve it first.
 2. **File beads for remaining work** with WHAT/WHY/ACCEPTANCE.
 3. **Run the verification suite** for every tree you touched, plus `ubs` on changed code.
-4. **Confirm no secret escaped:** `rg -n 'sk-|Bearer [A-Za-z0-9]|tskey' <changed files>` clean, no
-   captured response bodies committed.
+4. **Confirm no secret escaped:** `rg -n 'sk-|Bearer [A-Za-z0-9]|tskey' <changed files>` clean.
 5. **Report the honest state per capability** (ON and tested / built not on / parked / refuted),
    one line each, and name the next concrete lever.
 
