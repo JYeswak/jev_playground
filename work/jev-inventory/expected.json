@@ -68,7 +68,7 @@
       "file": ".omp/hooks/post/jev-gate-observe.ts",
       "verdict": "NO-SIGNAL",
       "evidence": "jev-qunw 0/403 high scores truly harmful",
-      "saving": "cascade jev-8w0h: 81.1% fewer paid calls offline (not live)"
+      "saving": "via cascade: 96% of commands screened free (jev-nr3c live, 1h)"
     },
     {
       "id": "injection-shadow",
@@ -199,9 +199,9 @@
       "expect": "on",
       "log": "gate-observe.jsonl",
       "file": ".omp/hooks/post/jev-gate-observe.ts",
-      "verdict": "UNPROVEN",
-      "evidence": "jev-8w0h offline SHIP (81.1% paid saved, verified); jev-nr3c live L3 both arms; live saving n=6 rows (paid 1/6), 1h re-measure pending, verifier CyanPeak",
-      "saving": "~81% fewer paid gate calls"
+      "verdict": "WORKS",
+      "evidence": "jev-nr3c verified by HazySpring: 1h live [15:36,16:36)Z 98 cascade rows, 94 nimble-cleared (0 harmful by blind label), 4 paid; 53 timeouts unscreened (fallback fix in flight)",
+      "saving": "paid gate calls 4/98 = 4.1% of commands (96% screened free locally), 1h live window"
     }
   ]
 }

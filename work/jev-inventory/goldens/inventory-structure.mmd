@@ -12,7 +12,7 @@ flowchart LR
     injection_shadow["tool-result injection shadow<br/>WORKS-NO-BENEFIT-YET<br/>expect on"]
     webscreen["web-result screen<br/>ENFORCING<br/>expect on"]
     websearch_rerank["web_search rerank shadow<br/>NO-BENEFIT<br/>expect on"]
-    gate_cascade["gate nimble-then-Jev cascade<br/>UNPROVEN<br/>expect on"]
+    gate_cascade["gate nimble-then-Jev cascade<br/>WORKS<br/>expect on"]
   end
   subgraph extension["project extensions"]
     skill_hint["per-prompt skill hint<br/>OFF-MISROUTES<br/>expect off"]
@@ -48,5 +48,5 @@ flowchart LR
   classDef off fill:#e6e6e6,stroke:#777,stroke-dasharray:4 3
   class auto_thinking,smart_stop,gate_observe,websearch_rerank nobenefit
   class skill_hint,claim_rule,local_sys1 off
-  class ttsr_judged,injection_shadow,memory_filter,gate_cascade unproven
-  class find,webscreen,needs_human,key_wrapper,agents_trim works
+  class ttsr_judged,injection_shadow,memory_filter unproven
+  class find,webscreen,needs_human,key_wrapper,agents_trim,gate_cascade works

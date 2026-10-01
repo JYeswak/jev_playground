@@ -255,10 +255,134 @@ def mermaid(expected: dict, live: dict | None) -> str:
     return "\n".join(lines) + "\n"
 
 
+# Joshua, 2026-10-01: "anything unproven should automatically tell us - hey lets go create proper
+# dag tasks and go prove - it blanket approval / requirement to do so". A surface needs proof when
+# its verdict is not a measured outcome, or when it is ON and its saving was never measured.
+PROVEN_VERDICTS = {
+    "WORKS",
+    "NO-SIGNAL",
+    "NO-BENEFIT",
+    "IDLE-BY-DESIGN",
+    "OFF-MISROUTES",
+    "REFUTED",
+    "LOSES-TO-JEV",
+}
+UNMEASURED_SAVING = (
+    "none measured",
+    "not quantified",
+    "no token saving measured",
+    "logged",
+    "not live",
+)
+
+
+def needs_proof(surface: dict) -> str | None:
+    """Why this surface still needs a proof task, or None when it has a measured outcome."""
+    if surface["expect"] == "off":
+        return None
+    if surface["verdict"] not in PROVEN_VERDICTS:
+        return f"verdict {surface['verdict']} is not a measured outcome"
+    saving = surface.get("saving", "").lower()
+    if surface["expect"] == "on" and any(mark in saving for mark in UNMEASURED_SAVING):
+        return f"ON but its saving is unmeasured ({surface['saving']})"
+    return None
+
+
+def proof_bead_text(surface: dict, why: str) -> tuple[str, str]:
+    title = f"Prove {surface['name']}: {surface['decision']}"
+    body = (
+        f"AUTO-FILED by work/jev-inventory/inventory.py --file-beads ({why}). Standing order (Joshua 2026-10-01): "
+        "every unproven surface gets a proof task; blanket approval for bounded live calls.\n"
+        f"SURFACE: {surface['id']} - {surface['how']}. Current evidence: {surface['evidence']}.\n"
+        "WHAT: produce a measured outcome for this surface on real traffic or a controlled live experiment you build "
+        "(fresh omp sessions, real prompts or commands cut from session files). If the data does not exist, create it. "
+        "UNMEASURED / NOT_RUN is never an acceptable close.\n"
+        "ACCEPTANCE: (1) a bar committed in a bead comment BEFORE outcome data is read; (2) the number with its "
+        "denominator and a 95% interval where it is a rate; (3) spend stated; (4) a planted negative; (5) on a FAIL, "
+        "LOSS DEPTH (autopsy, 3 one-variable hypotheses, dev replay, one held-out retest) before parking; (6) update "
+        "work/jev-inventory/expected.json with the new verdict and re-bless the golden. A non-author verifies and closes.\n"
+        "NO-CLAIM: whatever the bar does not cover."
+    )
+    return title, body
+
+
+def file_proof_beads(expected: dict, run=subprocess.run) -> list[str]:
+    """Create one open proof bead per surface that needs proof and has none open; return created ids."""
+    env = dict(os.environ, RUST_LOG="error")
+    created = []
+    for surface in expected["surfaces"]:
+        why = needs_proof(surface)
+        if why is None:
+            continue
+        label = f"prove-{surface['id']}"
+        listed = run(
+            [
+                "br",
+                "list",
+                "--label",
+                label,
+                "--status",
+                "open",
+                "--status",
+                "in_progress",
+                "--status",
+                "blocked",
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            env=env,
+            cwd=ROOT,
+        )
+        try:
+            rows = json.loads(listed.stdout or "[]")
+        except ValueError:
+            rows = None
+        if rows is None or listed.returncode != 0:
+            print(f"NOT_RUN prove {surface['id']}: br list failed")
+            continue
+        if rows if isinstance(rows, list) else rows.get("issues", []):
+            continue
+        title, body = proof_bead_text(surface, why)
+        made = run(
+            [
+                "br",
+                "create",
+                "--actor",
+                "jev-inventory",
+                "--title",
+                title,
+                "--type",
+                "task",
+                "--priority",
+                "1",
+                "--labels",
+                f"{label},prove,reality-check",
+                "--description",
+                body,
+                "--json",
+            ],
+            capture_output=True,
+            text=True,
+            env=env,
+            cwd=ROOT,
+        )
+        try:
+            bead = json.loads(made.stdout)
+            created.append((bead[0] if isinstance(bead, list) else bead)["id"])
+        except (ValueError, KeyError, IndexError):
+            print(f"NOT_RUN prove {surface['id']}: br create failed")
+    return created
+
+
 def main(argv: list[str]) -> int:
     expected = load_expected()
     if "--structure" in argv:
         sys.stdout.write(mermaid(expected, None))
+        return 0
+    if "--file-beads" in argv:
+        made = file_proof_beads(expected)
+        print(f"proof beads created: {len(made)} {' '.join(made)}")
         return 0
     out_dir = Path(os.environ.get("JEV_INVENTORY_OUT", ROOT / "var" / "jev-inventory"))
     out_dir.mkdir(parents=True, exist_ok=True)
