@@ -33,7 +33,7 @@ _spec = importlib.util.spec_from_file_location(
 )
 _k9z5 = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_k9z5)
-QUESTION = _k9z5.QUESTION  # read from .omp/tools/jev-screen.ts at import
+QUESTION = _k9z5.QUESTION  # read from work/jev-a9fv/seat.mjs at import
 CUT = 0.5
 
 

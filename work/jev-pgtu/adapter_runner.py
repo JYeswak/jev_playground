@@ -11,6 +11,7 @@ import math
 import os
 import shutil
 import subprocess  # ubs:ignore — bounded local git receipt check; no user-controlled command.  # nosec B404
+import sys
 import time
 from collections.abc import Awaitable, Callable
 from datetime import datetime, timezone
@@ -18,6 +19,10 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "work" / "anthropic-stop"))
+
+from anthropic_stop import require_free_comparator  # noqa: E402  jev-izfl
+
 ITEMS_PATH = ROOT / "work/jev-pgtu/items.jsonl"
 STATES_PATH = ROOT / "var/agent-tmp/jev-pgtu/states.jsonl"
 META_PATH = ROOT / "work/jev-pgtu/metadata.json"
@@ -645,6 +650,7 @@ def approved_commit(relative: str) -> bool:
 
 
 async def run_live(pairs: list[JsonRow], question: str) -> int:
+    require_free_comparator(FREE_MODEL, "jev-pgtu free comparator")
     from openrouter.provider import (  # type: ignore[import-not-found]
         PacedProvider,
         Pacer,

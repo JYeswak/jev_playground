@@ -44,6 +44,9 @@ sys.path.insert(0, str(ROOT / "upstream/typesafe-ai" / "typesafe-sdk-python" / "
 sys.path.insert(
     0, str(ROOT / "upstream/typesafe-ai" / "system-one-adapter-python" / "src")
 )
+sys.path.insert(0, str(ROOT / "work" / "anthropic-stop"))
+
+from anthropic_stop import require_free_comparator  # noqa: E402  jev-izfl
 
 from system_one_adapter import AsyncSystemOneAdapterClient
 from typesafe_sdk import AsyncTypeSafeClient, RetryPolicy, Score
@@ -193,6 +196,7 @@ def paired_stats(rows: list[dict[str, object]]) -> dict[str, object]:
 
 
 async def main() -> int:
+    require_free_comparator(COMPARATOR, "score-shopee comparator")
     enforce_launch_gate()
     items = load_items()
     usage_before = usage_snapshot()

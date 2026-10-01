@@ -22,6 +22,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from kit.experiment.run import StopAfterRow, StopRun, run as checkpoint_run
 
+sys.path.insert(0, str(ROOT / "work" / "anthropic-stop"))
+
+from anthropic_stop import require_free_comparator  # noqa: E402  jev-izfl
+
 ROUTER_MODEL = "typesafe/jev-router"
 FIXED_MODEL = "dots-studio/dots-3-note-preview:free"
 MODEL = "jev-1.13.0"
@@ -197,6 +201,7 @@ async def call(
 
 
 async def main() -> int:
+    require_free_comparator(FIXED_MODEL, "jev-router-cap5 fixed comparator")
     key = os.environ.get("OPENROUTER_API_KEY")
     if not key:
         raise SystemExit("OPENROUTER_API_KEY is not set; no benchmark call made")

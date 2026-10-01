@@ -181,6 +181,51 @@ GUARDED = {
             layered=True,
         ),
     ),
+    # OpenRouter :free-only runners (jev-izfl): require_free_comparator on the
+    # model actually sent; entries patch the constant to a paid id to prove refusal.
+    "work/score-shopee/run.py": (
+        entry("main", is_async=True, patch={"COMPARATOR": "openai/gpt-5-nano"}),
+    ),
+    "work/score-amazon/run.py": (
+        entry("main", is_async=True, patch={"COMPARATOR": "openai/gpt-5-nano"}),
+    ),
+    "work/jev-vg4s/run.py": (entry("main", patch={"COMPARATOR": "openai/gpt-5-nano"}),),
+    "work/rerank-scifact/run_jev97bq.py": (
+        entry(
+            "run_arm",
+            "o",
+            "r",
+            "i",
+            "p",
+            False,
+            is_async=True,
+            patch={
+                "MODEL": "openai/gpt-5-nano",
+                "validate_corpus": lambda: [{"qid": "q"}],
+                "load_base": lambda: None,
+            },
+        ),
+    ),
+    "work/jev-pgtu/adapter_runner.py": (
+        entry(
+            "run_live",
+            [],
+            "q",
+            is_async=True,
+            patch={"FREE_MODEL": "openai/gpt-5-nano"},
+        ),
+    ),
+    "scripts/jev-router-cap5.py": (
+        entry("main", is_async=True, patch={"FIXED_MODEL": "openai/gpt-5-nano"}),
+    ),
+}
+
+# JavaScript runners the Python harness cannot import or guard-behaviour-test
+# (ast.parse): each names no non-free OpenRouter id, enforced below, and carries
+# at least one :free id so the entry cannot go vacuous.
+JSFREE = {
+    "work/jev-oioo/live.mjs": "comparator model is dots-studio :free only; DRY_RUN sends nothing",
+    "work/jev-qsa6/run.mjs": "comparator model is dots-studio :free only",
 }
 
 # Tracked code that names a paid comparator and never calls one, with the reason.
@@ -204,6 +249,7 @@ KEYLESS = {
     "work/second-incumbent/score_n4j.py": "scores committed grok rows",
     "work/sr-adopt/test_prereg.py": "offline test: fake XAI_API_KEY, providers stubbed",
     "work/sr-adopt/test_runner_gates.py": "offline test: fake keys, providers stubbed",
+    "work/jev-pgtu/run.mjs": "strips *_API_KEY/_TOKEN from the child env; exits NOT_RUN without the key; the launched runner uses the :free comparator",
 }
 
 KEYS = ("TYPESAFE_API_KEY", "XAI_API_KEY", "ANTHROPIC_API_KEY", "OPENROUTER_API_KEY")
@@ -497,16 +543,23 @@ class PaidStopTest(unittest.TestCase):
             if any(p.search(text) for p in NAMING):
                 naming.add(rel)
         self.assertEqual(
-            sorted(naming - set(GUARDED) - set(KEYLESS)),
+            sorted(naming - set(GUARDED) - set(KEYLESS) - set(JSFREE)),
             [],
             "a tracked file names a paid comparator and is neither guarded nor listed keyless",
         )
         self.assertEqual(
-            sorted((set(GUARDED) | set(KEYLESS)) - naming),
+            sorted((set(GUARDED) | set(KEYLESS) | set(JSFREE)) - naming),
             [],
             "a listed file no longer names one",
         )
-        self.assertEqual(sorted(set(GUARDED) & set(KEYLESS)), [])
+        self.assertEqual(
+            sorted(
+                set(GUARDED) & set(KEYLESS)
+                | set(GUARDED) & set(JSFREE)
+                | set(KEYLESS) & set(JSFREE)
+            ),
+            [],
+        )
         for rel in KEYLESS:
             text = (ROOT / rel).read_text(encoding="utf-8")
             with self.subTest(file=rel):
@@ -514,6 +567,18 @@ class PaidStopTest(unittest.TestCase):
                     CLIENT_SHAPE.findall(text),
                     [],
                     f"{rel} is listed keyless but builds a client or names an endpoint",
+                )
+        for rel in JSFREE:
+            text = (ROOT / rel).read_text(encoding="utf-8")
+            with self.subTest(file=rel):
+                self.assertEqual(
+                    OPENROUTER_PAID_ID.findall(text),
+                    [],
+                    f"{rel} names a non-free OpenRouter id",
+                )
+                self.assertTrue(
+                    ":free" in text,
+                    f"{rel} names no :free id; the registry entry is vacuous",
                 )
 
     def test_static_guard_precedes_every_paid_reference(self):

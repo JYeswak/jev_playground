@@ -26,7 +26,10 @@ ZIP_PATH = Path(os.environ.get("BEIR_NFCORPUS_ZIP", "/tmp/beir-nfcorpus/nfcorpus
 
 sys.path.insert(0, str(ROOT / "upstream/typesafe-ai/typesafe-sdk-python/src"))
 sys.path.insert(0, str(ROOT / "upstream/typesafe-ai/system-one-adapter-python/src"))
+sys.path.insert(0, str(ROOT / "work" / "anthropic-stop"))
 sys.path.insert(0, str(ROOT))
+
+from anthropic_stop import require_free_comparator  # noqa: E402  jev-izfl
 
 from kit.experiment.run import StopRun, run as checkpoint_run  # noqa: E402
 from system_one_adapter import AsyncSystemOneAdapterClient  # noqa: E402
@@ -76,6 +79,7 @@ def question(doc_ids: list[str]) -> Choice:
 async def run_arm(
     output: Path, reach: Path, items: Path, prereg: Path, resume: bool
 ) -> int:
+    require_free_comparator(MODEL, "rerank-scifact jev97bq comparator")
     rows = validate_corpus()
     base = load_base()
     corpus, queries = base.load_text()

@@ -33,6 +33,9 @@ sys.path.insert(0, str(ROOT / "upstream/typesafe-ai" / "typesafe-sdk-python" / "
 sys.path.insert(
     0, str(ROOT / "upstream/typesafe-ai" / "system-one-adapter-python" / "src")
 )
+sys.path.insert(0, str(ROOT / "work" / "anthropic-stop"))
+
+from anthropic_stop import require_free_comparator  # noqa: E402  jev-izfl
 from system_one_adapter import AsyncSystemOneAdapterClient  # noqa: E402
 from typesafe_sdk import AsyncTypeSafeClient, Noul, RetryPolicy  # noqa: E402
 
@@ -70,6 +73,7 @@ def usage_snapshot() -> dict[str, object]:
 
 
 def main() -> int:
+    require_free_comparator(COMPARATOR, "jev-vg4s comparator")
     if datetime.now(timezone.utc) < LAUNCH_AFTER:
         print(f"NOT_RUN launch gate closed until {LAUNCH_AFTER.isoformat()}")
         return 2

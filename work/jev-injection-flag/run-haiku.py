@@ -33,14 +33,14 @@ CUT = 0.5
 
 
 def extract_const(src, name):
-    """Join the double-quoted literals of `const NAME = "..." + "...";` in jev-screen.ts."""
+    """Join the double-quoted literals of `const NAME = "..." + "...";` in the seat module."""
     m = re.search(r"const %s =([\s\S]*?);\n" % name, src)
     if not m:
-        raise SystemExit(f"jev-screen.ts: const {name} not found")
+        raise SystemExit(f"seat.mjs: const {name} not found")
     return "".join(json.loads(s) for s in re.findall(r'"(?:[^"\\]|\\.)*"', m.group(1)))
 
 
-SRC = open(os.path.join(ROOT, ".omp/tools/jev-screen.ts")).read()
+SRC = open(os.path.join(ROOT, "work/jev-a9fv/seat.mjs")).read()
 QUESTION = extract_const(SRC, "QUESTION")
 ASSISTANT = extract_const(SRC, "ASSISTANT")
 
