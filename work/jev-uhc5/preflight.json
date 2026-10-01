@@ -1,0 +1,104 @@
+{
+  "schema": "jev-uhc5-preflight/v2",
+  "model": "jev-1.13.0",
+  "createdAt": "2026-10-01T07:30:52.274Z",
+  "endpoint": "http://127.0.0.1:11434/v1/systemone",
+  "maxBodyBytes": 65536,
+  "maxQuestions": 64,
+  "maxChoiceOptions": 26,
+  "models": [
+    {
+      "name": "nimble:latest",
+      "digestPrefix": "24e550a16a70",
+      "expectedOllamaVersion": "0.35.0"
+    },
+    {
+      "name": "tev1:latest",
+      "digestPrefix": "cef45ef93cf6",
+      "expectedOllamaVersion": "0.35.0"
+    }
+  ],
+  "sourceHashes": {
+    "work/noul-scifact/sample.jsonl": "424caf18097938cd337f04a3e784737f367302b688fa34f47c38e5244088ed33",
+    "work/noul-scifact/rows-jev-run3.jsonl": "603f0558f3c1cf1e18dfc0822837c4cbccd2d61fd87dcdb2dbbf28a61dd4117c",
+    "work/noul-scifact/run.py": "637c663fdeee40f3bf82f7d760432014f831933d22a1674dbf4270f819044125",
+    "work/noul-scifact/score.py": "0d5d67369fffc2a90966a18602f87f4afb87de1cffe354d5923c0ded2e5a414c",
+    "work/score-sst5/sample.jsonl": "522bee6e46027527bf74232cb281a8babd52305ca1aef51940442cb2b567d903",
+    "work/score-sst5/rows-jev-run3.jsonl": "523c391d9f66e8c3669f7e324082427b013afcb7d019d16e61f930e8e304d14d",
+    "work/score-sst5/run.py": "533f5455b656c4080dee8712688531c57d1662e5957df99d6a7985ac6995ac30",
+    "work/score-sst5/score.py": "58ca61ec107dc5a46fdc73bfbf65140a9fe0474e6e4ca969ff4c9f6fbf560549",
+    "work/rerank-scifact/candidates-fiqa-fits.jsonl": "566622a1b705cf9ae91f235196b0ecd616bc840dc3a41035a078d2995a4c5229",
+    "work/rerank-scifact/rows-fiqa-mkex-jev.jsonl": "66a4b20278bc832fa9b4f5a80f7b3f764f5530cad57aaff4ecf5173c01ccf2ac",
+    "work/rerank-scifact/run.py": "389d09c9b41ab5c95fb8ef72c2e8b62bc3c600b7b475cc5923248d38159eeec7",
+    "work/jev-1lim/manifest.jsonl": "d020751f969f2a8688be370a0ab7dbd44686d0b5de79777718bddc490ca790c9",
+    "work/jev-1lim/metadata.json": "b04bb03dce31cdd4a75a62718b9101f21603ceb714fcfa28b106c9e62bb1ad05",
+    "work/jev-1lim/labels-A.jsonl": "255d3cd7120a67c35130ddd2cd283019bd1705330ba95cbcd5984bf468cdda0b",
+    "work/jev-1lim/labels-B.jsonl": "7a4ad0e4072e7cd637fb1f7720e050e4312240f3173fb39b4b372afbafc10d85",
+    "work/jev-1lim/adjudicated.jsonl": "90530575d893fbc825b026615be4fe6e17ee2eff41dadd512348a8a9bc03db53",
+    "work/jev-1lim/live-results.jsonl": "a94ce27d88baff37c9688283a1650c1bd131b83fc066c04deebe3d6621e525d7",
+    "work/jev-1lim/live.mjs": "18970d6aabc4d5d175d4e5dd5b3f21458dc48910a5fec7995a1e0dae4d986de9",
+    "work/bicameral-gate/questions.mjs": "01ed13a3ab5b0605e148430fee99e79c127cc71b5abbe176b6ad6a4b3423237c",
+    "work/jev-a9fv/seat.mjs": "705ee2463aa5ad6407faf6f77ee257d04022e7bc96db8982e87d8e21e5feea4b",
+    "work/jev-a9fv/CORPUS.json": "0de5c37ea5f3c99a685a951c5ad15e42ccf470d40fc30965e495e93fc4cb2742",
+    "work/jev-injection-flag/tool-results-sample.json": "8cbef10a7e8effc8fa8c3ff256f89ead2f1ca5e08b1fd735663bbe05e3d1afa2",
+    "work/nev-injection/pairs.jsonl": "253e38dd6ee948a0a9dd063aa2236391d20327ac2888122df328956acbc6a149",
+    "work/jev-a9fv/live-rows.jsonl": "a46fc5bc8f807c06b440eaeb20ffc41fbf10301db9e79df10aaca8913b3ec4b8",
+    "work/jev-29s4/live-rows.jsonl": "c4a5ec45c8b1fce706e8af3ad31b5f626f520f3737c8afc0164d01bf6573aa57",
+    "var/agent-tmp/jev-1lim/commands-A.jsonl": "229ea9b8bd0a552c5439227af7d918c914e2752cd1b805d7ecd4750b6cea8515",
+    "/tmp/beir-fiqa/fiqa.zip": "32c7df99ed21252fdfb2cf3f5673502a8d245ee0c44c4a133570d92ce2b3ad02",
+    "work/jev-uhc5/run.mjs": "b0c40279cb80b71825ac7981e1c2a981aa7ba223c5076868a14ec66b5b6af10f",
+    "work/jev-uhc5/injection-metrics.mjs": "68d09cb9488af22496c015e3af2952df80ace2e7cd5f1c28a51595122f72c9e4",
+    "work/jev-uhc5/injection-metrics.test.mjs": "a880ae12265199e291e3cf822caefc6e1048cf4cd57afdaec59c1ba0bd2bc25b",
+    "work/jev-uhc5/runner.test.mjs": "ff5c076896273096eb5f3b9d4bb82f25a07e991d30740a73e5fc8da7a4859d98"
+  },
+  "datasets": {
+    "noul": {
+      "n": 400,
+      "uniqueIds": 400,
+      "maxRequestBytes": 5170,
+      "maxChoiceOptions": 0,
+      "maxQuestionCount": 1,
+      "allHaveRecordedJev": true,
+      "eligible": true
+    },
+    "score": {
+      "n": 500,
+      "uniqueIds": 500,
+      "maxRequestBytes": 672,
+      "maxChoiceOptions": 0,
+      "maxQuestionCount": 1,
+      "allHaveRecordedJev": true,
+      "eligible": true
+    },
+    "fiqa": {
+      "n": 323,
+      "uniqueIds": 323,
+      "maxRequestBytes": 48387,
+      "maxChoiceOptions": 20,
+      "maxQuestionCount": 1,
+      "allHaveRecordedJev": true,
+      "eligible": true
+    },
+    "gate": {
+      "n": 396,
+      "uniqueIds": 396,
+      "maxRequestBytes": 2252,
+      "maxChoiceOptions": 0,
+      "maxQuestionCount": 5,
+      "allHaveRecordedJev": true,
+      "eligible": true
+    },
+    "injection": {
+      "n": 600,
+      "uniqueIds": 600,
+      "maxRequestBytes": 5564,
+      "maxChoiceOptions": 0,
+      "maxQuestionCount": 1,
+      "allHaveRecordedJev": true,
+      "eligible": true
+    }
+  },
+  "totalItems": 2219,
+  "localCallsPlanned": 4438,
+  "ok": true
+}
