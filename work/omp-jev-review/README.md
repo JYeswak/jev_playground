@@ -138,3 +138,34 @@ infisical run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- \
 
 **Nothing is cut on this evidence.** Cutting `behaviour` because a crude label disagreed with
 it would be the same error as keeping a question because a tuned set flattered it.
+
+## Local-use scoreboard (jev-4970)
+
+Run the keyless local census:
+
+```bash
+python3 work/omp-jev-review/surface-census.py --scoreboard --days 7
+```
+
+It reports native `typesafe` judge calls by UTC day, profile and purpose, including recorded input
+tokens, cost and error rate; subsequent unexpected-stop assistant/tool-call evidence; hashed
+find-rank follow-through; each local Jev hook log's scored/not-run/error/other counts and input-token
+cost estimate. The estimate uses $0.042 per million input tokens; missing token fields are not
+imputed.
+
+Promise-stop idle gaps come from the next `role=user` message after an assistant `stop` with text,
+no tool call, and a promise/question regex match in the last 400 text characters. Reported baseline:
+49 flagged messages across 160 sessions, median 10.0 minutes, p75 31.5 minutes. Session-start
+context tokens are the first assistant message with nonzero `input + cacheRead + cacheWrite` usage
+in sessions with a native Jev call in the selected window; summaries are grouped by start date and
+profile.
+Snapshots from different runs are not directly comparable: `--days` uses a rolling cutoff and
+session files older than that cutoff by mtime are skipped. Compare against the printed end timestamp
+and identical input scope.
+
+The model-usage row does not persist unexpected-stop's classifier decision or an explicit
+continuation marker. The report therefore labels the following assistant/tool-call evidence as
+subsequent turns, not proof of an automatic continuation decision.
+
+`--days` accepts 1–365. Session logs are append-only, so the scan skips files whose mtime predates
+the window. The report is observational: counts do not establish user benefit or causality.

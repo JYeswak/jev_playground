@@ -309,5 +309,247 @@ class Cli(unittest.TestCase):
         )
 
 
+class Scoreboard(unittest.TestCase):
+    """Scoreboard input rows are cut from captured session and hook logs."""
+
+    def test_daily_totals_and_observers_keep_unavailable_metrics_explicit(self):
+        with tempfile.TemporaryDirectory(prefix="scoreboard-") as tmp:
+            home = Path(tmp)
+            session = write_session(
+                home,
+                "claude",
+                "-Developer-jev",
+                "/Users/josh/Developer/jev",
+                [SUCCESS_AUTO, FAILED_FIND],
+            )
+            state = home / ".local" / "state" / "jev"
+            state.mkdir(parents=True)
+            find_row = {
+                "schema": "jev-find-rank.v1",
+                "ts": "2026-09-27T03:22:16.733Z",
+                "session": "01a0e0c5-9ebf-70ea-b7e1-6c70b599a0db",
+                "hits": [
+                    "71812e7eb824cfc7e3cc5e5e380580a508bddcf1a7102bda296f1f1f71b5b1dd"
+                ],
+                "count": 1,
+                "nextToolCalls": [
+                    {"ordinal": 1, "tool": "eval", "touched": []},
+                    {"ordinal": 2, "tool": "bash", "touched": []},
+                    {"ordinal": 3, "tool": "eval", "touched": []},
+                    {"ordinal": 4, "tool": "read", "touched": []},
+                    {"ordinal": 5, "tool": "eval", "touched": []},
+                    {"ordinal": 6, "tool": "read", "touched": []},
+                    {"ordinal": 7, "tool": "eval", "touched": []},
+                    {"ordinal": 8, "tool": "bash", "touched": []},
+                    {"ordinal": 9, "tool": "eval", "touched": []},
+                    {"ordinal": 10, "tool": "glob", "touched": []},
+                ],
+                "complete": True,
+            }
+            find_follow_through = {
+                "schema": "jev-find-rank.v1",
+                "ts": "2026-09-27T03:32:28.259Z",
+                "session": "01a0e0d1-1967-72f7-a8d4-b946193213bb",
+                "hits": [
+                    "3529df3f561aead6ae72d2eea326f1e4ce08adab96228444a12313e3ce54bc8a",
+                    "8a4a5ed7848204572eaf6630aea2e235ae9390a5ff00be9eaec4c2005f754795",
+                    "abb1e1f3a283c224bb7fb8f6c8a9b554a2ccb0278dd3e31f020cdba6cda66e7d",
+                ],
+                "count": 3,
+                "nextToolCalls": [
+                    {
+                        "ordinal": 5,
+                        "tool": "read",
+                        "touched": [
+                            "3529df3f561aead6ae72d2eea326f1e4ce08adab96228444a12313e3ce54bc8a"
+                        ],
+                    }
+                ],
+                "complete": True,
+            }
+            (state / "find-rank.jsonl").write_text(
+                json.dumps(find_row) + "\n" + json.dumps(find_follow_through) + "\n"
+            )
+            gate = {
+                "ts": "2026-09-27T08:03:11.928Z",
+                "status": "scored",
+                "tokens": {"input_tokens": 746},
+            }
+            (state / "gate-shadow.jsonl").write_text(json.dumps(gate) + "\n")
+            not_run = {
+                "ts": "2026-09-24T02:19:17.240Z",
+                "status": "not-run",
+            }
+            (state / "gate-observe.jsonl").write_text(json.dumps(not_run) + "\n")
+
+            report = "\n".join(
+                sc.scoreboard(
+                    [session],
+                    7,
+                    now=datetime(2026, 9, 30, 12, tzinfo=timezone.utc),
+                    state_roots=[state],
+                )
+            )
+            self.assertIn("2026-09-24\tclaude\tauto-thinking\t1\t1058", report)
+            self.assertIn("2026-09-25\tclaude\tfind\t1\t0", report)
+            self.assertIn("# judge totals calls=2", report)
+            self.assertIn("errors=1 error_rate=0.5000", report)
+            self.assertIn("find-rank windows=2 complete=2 follow_through=1/2", report)
+            self.assertIn("hook gate-shadow rows=1 scored=1 not_run=0 errors=0", report)
+            self.assertIn("estimated_cost_usd=0.000031", report)
+            self.assertIn("# promise-stop idle n=0", report)
+            self.assertIn("session-start context tokens=NOT_RUN", report)
+
+    def test_promise_stop_idle_uses_captured_next_user_row(self):
+        with tempfile.TemporaryDirectory(prefix="promise-stop-") as tmp:
+            home = Path(tmp)
+            assistant = {
+                "type": "message",
+                "timestamp": "2026-09-23T05:02:58.352Z",
+                "message": {
+                    "role": "assistant",
+                    "stopReason": "stop",
+                    "content": [
+                        {"type": "text", "text": "I'll run the full test suite"}
+                    ],
+                },
+            }
+            user = {
+                "type": "message",
+                "timestamp": "2026-09-23T05:04:03.918Z",
+                "message": {"role": "user"},
+            }
+            path = write_session(
+                home,
+                "claude",
+                "-Developer-jev",
+                "/Users/josh/Developer/jev",
+                [assistant, user],
+            )
+            _, _, _, _, idle, starts = sc.session_metric_stats(
+                [path],
+                datetime(2026, 9, 23, 5, tzinfo=timezone.utc),
+                datetime(2026, 9, 23, 5, 10, tzinfo=timezone.utc),
+            )
+            self.assertEqual(len(idle), 1)
+            self.assertAlmostEqual(idle[0], 65.566 / 60, places=6)
+            self.assertEqual(starts, {})
+
+    def test_session_start_adds_input_cache_read_and_cache_write(self):
+        with tempfile.TemporaryDirectory(prefix="session-start-") as tmp:
+            home = Path(tmp)
+            zero_usage = {
+                "type": "message",
+                "timestamp": "2026-10-01T00:51:04.558Z",
+                "message": {
+                    "role": "assistant",
+                    "usage": {"input": 0, "cacheRead": 0, "cacheWrite": 0},
+                },
+            }
+            jev_call = {
+                "type": "model_usage",
+                "timestamp": "2026-10-01T00:57:03.167Z",
+                "provider": "typesafe",
+                "purpose": "auto-thinking",
+            }
+            first_nonzero_usage = {
+                "type": "message",
+                "timestamp": "2026-10-01T01:00:15.607Z",
+                "message": {
+                    "role": "assistant",
+                    "usage": {"input": 4, "cacheRead": 0, "cacheWrite": 106236},
+                },
+            }
+            path = write_session(
+                home,
+                "claude",
+                "-Developer-jev",
+                "/Users/josh/Developer/jev",
+                [zero_usage, jev_call, first_nonzero_usage],
+            )
+            groups, _, _, _, _, starts = sc.session_metric_stats(
+                [path],
+                datetime(2026, 10, 1, tzinfo=timezone.utc),
+                datetime(2026, 10, 1, 2, tzinfo=timezone.utc),
+            )
+            self.assertEqual(
+                groups[("2026-10-01", "claude", "auto-thinking")]["calls"], 1
+            )
+            self.assertEqual(starts, {("2026-10-01", "claude"): [106240]})
+
+    def test_non_jev_session_start_is_excluded(self):
+        with tempfile.TemporaryDirectory(prefix="session-start-") as tmp:
+            path = write_session(
+                Path(tmp),
+                "claude",
+                "-Developer-jev",
+                "/Users/josh/Developer/jev",
+                [
+                    {
+                        "type": "message",
+                        "timestamp": "2026-09-20T20:22:08.173Z",
+                        "message": {
+                            "role": "assistant",
+                            "usage": {"input": 0, "cacheRead": 0, "cacheWrite": 0},
+                        },
+                    },
+                    {
+                        "type": "message",
+                        "timestamp": "2026-09-20T20:22:33.021Z",
+                        "message": {
+                            "role": "assistant",
+                            "usage": {
+                                "input": 194,
+                                "cacheRead": 90097,
+                                "cacheWrite": 0,
+                            },
+                        },
+                    },
+                ],
+            )
+            groups, _, _, _, _, starts = sc.session_metric_stats(
+                [path],
+                datetime(2026, 9, 20, tzinfo=timezone.utc),
+                datetime(2026, 9, 21, tzinfo=timezone.utc),
+            )
+            self.assertEqual(groups, {})
+            self.assertEqual(starts, {})
+
+    def test_days_argument_is_bounded_and_required(self):
+        self.assertEqual(sc.scoreboard_days(["--scoreboard", "--days", "7"]), 7)
+        for args in (
+            ["--scoreboard"],
+            ["--days", "0"],
+            ["--days", "366"],
+            ["--days", "x"],
+        ):
+            with self.subTest(args=args), self.assertRaises(ValueError):
+                sc.scoreboard_days(args)
+
+    def test_cli_scoreboard_runs_from_temp_home(self):
+        with tempfile.TemporaryDirectory(prefix="scoreboard-cli-") as tmp:
+            home = Path(tmp)
+            stamp = (datetime.now(timezone.utc) - timedelta(hours=1)).isoformat()
+            write_session(
+                home,
+                "claude",
+                "-Developer-jev",
+                "/Users/josh/Developer/jev",
+                [dict(SUCCESS_AUTO, timestamp=stamp)],
+            )
+            done = subprocess.run(
+                [sys.executable, str(CENSUS), "--scoreboard", "--days", "7"],
+                capture_output=True,
+                text=True,
+                env=dict(os.environ, HOME=str(home)),
+                timeout=60,
+                check=False,
+            )
+            self.assertEqual(done.returncode, 0, done.stderr)
+            self.assertIn("# judge totals calls=1", done.stdout)
+            self.assertIn("# promise-stop idle n=0", done.stdout)
+            self.assertIn("session-start context tokens=NOT_RUN", done.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -51,6 +51,7 @@ Exit 0 always. This is a census, not a gate.
 
 import ast
 import json
+import mmap
 import os
 import re
 import shlex
@@ -898,8 +899,531 @@ def jev_tools_line(calls, now, have_sessions, roster):
     )
 
 
+def read_jsonl_rows(path):
+    """Yield parseable JSON objects from an append-only local log."""
+    try:
+        with Path(path).open(encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                try:
+                    row = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(row, dict):
+                    yield row
+    except OSError:
+        return
+
+
+SESSION_TIMESTAMP_RE = re.compile(rb'"timestamp"\s*:\s*("(?:[^"\\]|\\.)*")')
+SESSION_ROLE_RE = re.compile(rb'"role"\s*:\s*"(assistant|user)"')
+SESSION_USAGE_RE = re.compile(rb'"usage"\s*:\s*\{')
+SESSION_CONTENT_RE = re.compile(rb'"content"\s*:\s*\[')
+SESSION_TOOL_CALL_RE = re.compile(rb'"type"\s*:\s*"toolCall"')
+SESSION_STOP_RE = re.compile(rb'"stopReason"\s*:\s*"stop"')
+SESSION_METRIC_MARKER_RE = re.compile(rb'"message":|"model_usage"')
+SESSION_PROMISE_RE = re.compile(
+    rb"(?i)\bi.{1,4}ll\b|\bi\s+will\b|\blet\s+me\b|\bgoing\s+to\b|"
+    rb"\bdoing\s+that\s+now\b|\bshould\s+i\b|\bwant\s+me\s+to\b|\bshall\s+i\b"
+)
+
+
+def json_object_end(data, start, limit):
+    """Return the end of a JSON object in a mapped row without copying the row."""
+    depth = 0
+    quoted = escaped = False
+    for index in range(start, limit):
+        byte = data[index]
+        if quoted:
+            if escaped:
+                escaped = False
+            elif byte == 0x5C:
+                escaped = True
+            elif byte == 0x22:
+                quoted = False
+        elif byte == 0x22:
+            quoted = True
+        elif byte == 0x7B:
+            depth += 1
+        elif byte == 0x7D:
+            depth -= 1
+            if depth == 0:
+                return index + 1
+    return None
+
+
+def session_usage(data, start, end):
+    match = SESSION_USAGE_RE.search(data, start, end)
+    if match is None:
+        return None
+    object_start = data.find(b"{", match.start(), end)
+    object_end = json_object_end(data, object_start, end)
+    if object_end is None:
+        return None
+    try:
+        usage = json.loads(data[object_start:object_end])
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    return usage if isinstance(usage, dict) else None
+
+
+def session_content(data, start, end):
+    match = SESSION_CONTENT_RE.search(data, start, end)
+    if match is None:
+        return None
+    if SESSION_TOOL_CALL_RE.search(data, match.start(), end):
+        return [{"type": "toolCall"}]
+    return []
+
+
+def session_message_row(data, start, end, state):
+    """Extract only message fields that can still change an observational metric."""
+    role = SESSION_ROLE_RE.search(data, start, end)
+    timestamp = SESSION_TIMESTAMP_RE.search(data, start, end)
+    if role is None or timestamp is None:
+        return None
+    try:
+        when = json.loads(timestamp.group(1))
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    message = {"role": role.group(1).decode("ascii")}
+    if message["role"] == "assistant":
+        if state["first_context"] is None:
+            usage = session_usage(data, start, end)
+            if usage is not None:
+                message["usage"] = usage
+        if state["pending_stops"]:
+            content = session_content(data, start, end)
+            if content is not None:
+                message["content"] = content
+    return {"type": "message", "timestamp": when, "message": message}
+
+
+def session_promise_row(data, start, end, role):
+    if role != b"assistant":
+        return None
+    suffix_start = max(start, end - 4096)
+    if not SESSION_STOP_RE.search(data, suffix_start, end):
+        return None
+    if not SESSION_PROMISE_RE.search(data, suffix_start, end):
+        return None
+    try:
+        row = json.loads(data[start:end].decode("utf-8", errors="replace"))
+    except json.JSONDecodeError:
+        return None
+    return row if isinstance(row, dict) else None
+
+
+def decode_session_row(data, start, end):
+    try:
+        row = json.loads(data[start:end].decode("utf-8", errors="replace"))
+    except json.JSONDecodeError:
+        return None
+    return row if isinstance(row, dict) else None
+
+
+def read_session_metric_rows(path, state):
+    """Yield metric-relevant rows in one pass without decoding large message bodies."""
+    try:
+        with Path(path).open("rb") as fh:
+            size = os.fstat(fh.fileno()).st_size
+            if not size:
+                return
+            with mmap.mmap(fh.fileno(), 0, access=mmap.ACCESS_READ) as data:
+                offset = 0
+                while offset < size:
+                    marker = SESSION_METRIC_MARKER_RE.search(data, offset)
+                    if marker is None:
+                        return
+                    marker_start = marker.start()
+                    line_start = data.rfind(b"\n", 0, marker_start) + 1
+                    line_end = data.find(b"\n", marker_start)
+                    if line_end < 0:
+                        line_end = size
+                    if marker.group() == b'"message":':
+                        role = SESSION_ROLE_RE.search(data, line_start, line_end)
+                        row = None
+                        if role is not None:
+                            row = session_promise_row(
+                                data, line_start, line_end, role.group(1)
+                            )
+                            if row is None:
+                                row = session_message_row(
+                                    data, line_start, line_end, state
+                                )
+                    else:
+                        row = decode_session_row(data, line_start, line_end)
+                    if row is not None:
+                        yield row
+                    offset = line_end + 1
+    except (OSError, ValueError):
+        return
+
+
+def in_window(timestamp, since, now):
+    when = parse_time(timestamp)
+    return when is not None and since <= when <= now
+
+
+def find_rank_stats(path, since, now):
+    """Count completed find windows and follow-through from the existing hashed observer."""
+    rows = [
+        row
+        for row in read_jsonl_rows(path)
+        if row.get("schema") == "jev-find-rank.v1"
+        and in_window(row.get("ts"), since, now)
+    ]
+    complete = [
+        row for row in rows if isinstance(row.get("complete"), bool) and row["complete"]
+    ]
+    followed = 0
+    for row in complete:
+        hits = set(row.get("hits") or [])
+        if any(
+            hits.intersection(call.get("touched") or [])
+            for call in row.get("nextToolCalls", [])
+        ):
+            followed += 1
+    return len(rows), len(complete), followed
+
+
+def hook_log_stats(roots, since, now):
+    """Aggregate dated local Jev hook logs; spend is an input-token estimate."""
+    result = {}
+    for root in roots:
+        try:
+            paths = root.glob("*.jsonl")
+        except OSError:
+            continue
+        for path in paths:
+            slot = result.setdefault(
+                path.stem,
+                {
+                    "rows": 0,
+                    "scored": 0,
+                    "not_run": 0,
+                    "error": 0,
+                    "other": 0,
+                    "input_tokens": 0,
+                },
+            )
+            for row in read_jsonl_rows(path):
+                if not in_window(row.get("ts") or row.get("timestamp"), since, now):
+                    continue
+                status = str(row.get("status") or "").lower().replace("-", "_")
+                slot["rows"] += 1
+                if status == "scored":
+                    slot["scored"] += 1
+                elif status in ("not_run", "local_only", "skipped", "paused", "cap"):
+                    slot["not_run"] += 1
+                elif status in ("error", "fail_open", "billing_stop"):
+                    slot["error"] += 1
+                else:
+                    slot["other"] += 1
+                tokens = (
+                    row.get("tokens") if isinstance(row.get("tokens"), dict) else {}
+                )
+                amount = row.get("input_tokens", tokens.get("input_tokens"))
+                if isinstance(amount, (int, float)) and amount > 0:
+                    slot["input_tokens"] += int(amount)
+    return result
+
+
+PROMISE_TAIL_RE = re.compile(
+    r"\b(i.ll|i will|let me|going to|doing that now|should i|want me to|shall i)\b",
+    re.IGNORECASE,
+)
+
+
+def session_profile(path):
+    parts = Path(path).parts
+    try:
+        return parts[parts.index("profiles") + 1]
+    except (ValueError, IndexError):
+        return "default"
+
+
+def percentile(values, fraction):
+    ordered = sorted(values)
+    if not ordered:
+        return None
+    position = (len(ordered) - 1) * fraction
+    lower = int(position)
+    upper = min(lower + 1, len(ordered) - 1)
+    return ordered[lower] + (ordered[upper] - ordered[lower]) * (position - lower)
+
+
+def record_judge_usage(groups, row, profile, when):
+    """Add one in-window native judge request; return whether it was counted."""
+    if when is None or row.get("type") != "model_usage":
+        return False
+    if row.get("provider") != JUDGE_PROVIDER:
+        return False
+    key = (
+        str(row.get("timestamp", ""))[:10],
+        profile,
+        str(row.get("purpose") or "-"),
+    )
+    slot = groups.setdefault(key, {"calls": 0, "tokens": 0, "cost": 0.0, "errors": 0})
+    tokens, cost = usage_of(row)
+    slot["calls"] += 1
+    slot["tokens"] += tokens
+    slot["cost"] += cost
+    slot["errors"] += int(is_failure(row))
+    return True
+
+
+def message_text(content):
+    """Join text blocks from an assistant message."""
+    return "".join(
+        part["text"]
+        for part in content
+        if isinstance(part, dict)
+        and part.get("type") == "text"
+        and isinstance(part.get("text"), str)
+    )
+
+
+def message_has_tool_call(content):
+    """Whether a message includes a tool call block."""
+    return any(
+        isinstance(part, dict) and part.get("type") == "toolCall" for part in content
+    )
+
+
+def context_token_count(usage):
+    """Sum uncached and cached prompt tokens from one message usage object."""
+    return int(
+        sum(
+            value if isinstance(value, (int, float)) and value > 0 else 0
+            for value in (
+                usage.get("input"),
+                usage.get("cacheRead"),
+                usage.get("cacheWrite"),
+            )
+        )
+    )
+
+
+def consume_user_message(when, now, state):
+    """Close outstanding promise gaps at the next recorded human reply."""
+    if when is not None and when <= now:
+        for promise_time in state["pending_promises"]:
+            minutes = (when - promise_time).total_seconds() / 60
+            if minutes >= 0:
+                state["idle_minutes"].append(minutes)
+    state["pending_promises"].clear()
+    state["pending_stops"] = 0
+
+
+def consume_assistant_message(message, when, since, now, state):
+    """Update continuation, context-start and promise-stop evidence."""
+    content = message.get("content")
+    if not isinstance(content, list):
+        content = []
+    if state["pending_stops"]:
+        if isinstance(message.get("content"), list):
+            state["continued"] += state["pending_stops"]
+            if message_has_tool_call(content):
+                state["tool_turns"] += state["pending_stops"]
+        state["pending_stops"] = 0
+    usage = message.get("usage")
+    if state["first_context"] is None and isinstance(usage, dict):
+        token_count = context_token_count(usage)
+        if token_count:
+            state["first_context"] = (when, token_count)
+    text = message_text(content)
+    if (
+        message.get("stopReason") == "stop"
+        and text
+        and not message_has_tool_call(content)
+        and when is not None
+        and since <= when <= now
+        and PROMISE_TAIL_RE.search(text[-400:])
+    ):
+        state["pending_promises"].append(when)
+
+
+def consume_session_message(message, when, since, now, state):
+    """Dispatch the two roles used by the observational session metrics."""
+    role = message.get("role")
+    if role == "user":
+        consume_user_message(when, now, state)
+    elif role == "assistant":
+        consume_assistant_message(message, when, since, now, state)
+
+
+def update_session_state(row, groups, profile, window, state):
+    since, now = window
+    when = parse_time(row.get("timestamp"))
+    jev_call = (
+        when is not None
+        and since <= when <= now
+        and record_judge_usage(groups, row, profile, when)
+    )
+    unexpected_stop = (
+        row.get("type") == "model_usage"
+        and row.get("purpose") == "unexpected-stop"
+        and in_window(row.get("timestamp"), since, now)
+    )
+    if unexpected_stop:
+        state["pending_stops"] += 1
+        return jev_call, True
+    message = row.get("message")
+    if isinstance(message, dict):
+        consume_session_message(message, when, since, now, state)
+    return jev_call, False
+
+
+def record_session_start(starts, profile, since, now, state):
+    first_context = state["first_context"]
+    if (
+        first_context is not None
+        and first_context[0] is not None
+        and since <= first_context[0] <= now
+    ):
+        key = (first_context[0].date().isoformat(), profile)
+        starts.setdefault(key, []).append(first_context[1])
+
+
+def session_metric_stats(files, since, now):
+    """Aggregate judge, continuation and session metrics in one streaming log pass."""
+    groups = {}
+    observed = continued = tool_turns = 0
+    idle_minutes = []
+    starts = {}
+    window = (since, now)
+    for path in files:
+        if is_probe(path, session_cwd(path)):
+            continue
+        profile = session_profile(path)
+        state = {
+            "pending_stops": 0,
+            "pending_promises": [],
+            "continued": 0,
+            "tool_turns": 0,
+            "idle_minutes": [],
+            "first_context": None,
+        }
+        has_jev_call = False
+        for row in read_session_metric_rows(path, state):
+            jev_call, unexpected_stop = update_session_state(
+                row, groups, profile, window, state
+            )
+            has_jev_call |= jev_call
+            observed += unexpected_stop
+        continued += state["continued"]
+        tool_turns += state["tool_turns"]
+        idle_minutes.extend(state["idle_minutes"])
+        if has_jev_call:
+            record_session_start(starts, profile, since, now, state)
+    return groups, observed, continued, tool_turns, idle_minutes, starts
+
+
+def scoreboard(files, days, now=None, state_roots=None):
+    """Print the bounded daily local-impact census without model or network calls."""
+    now = now or datetime.now(timezone.utc)
+    since = now - timedelta(days=days)
+    cutoff_files = []
+    for path in files:
+        try:
+            if path.stat().st_mtime >= since.timestamp():
+                cutoff_files.append(path)
+        except OSError:
+            continue
+    files = cutoff_files
+    groups, stop_calls, continued, tool_turns, idle_minutes, starts = (
+        session_metric_stats(files, since, now)
+    )
+    lines = [
+        f"# local omp scoreboard: {days}d ending {now.isoformat()}",
+        "UTC-day\tprofile\tpurpose\tcalls\tinput_tokens\tcost_usd\terrors\terror_rate",
+    ]
+    for key, slot in sorted(groups.items()):
+        lines.append(
+            "\t".join(map(str, key))
+            + "\t"
+            + f"{slot['calls']}\t{slot['tokens']}\t{slot['cost']:.6f}\t"
+            f"{slot['errors']}\t{slot['errors'] / slot['calls']:.4f}"
+        )
+    calls = sum(slot["calls"] for slot in groups.values())
+    errors = sum(slot["errors"] for slot in groups.values())
+    cost = sum(slot["cost"] for slot in groups.values())
+    lines.append(
+        f"# judge totals calls={calls} cost_usd={cost:.6f} errors={errors} "
+        f"error_rate={errors / calls if calls else 0:.4f}"
+    )
+    lines.append(
+        f"# unexpected-stop observations={stop_calls} subsequent_assistant_turns={continued} "
+        f"with_tool_call={tool_turns}; decision outcome is not persisted"
+    )
+    roots = state_roots or [HOME / ".local" / "state" / "jev"]
+    finds, complete, followed = find_rank_stats(
+        roots[0] / "find-rank.jsonl", since, now
+    )
+    lines.append(
+        f"# find-rank windows={finds} complete={complete} follow_through={followed}/{complete} "
+        f"(historical baseline 55/122; hashed path touch only)"
+    )
+    for name, slot in sorted(hook_log_stats(roots, since, now).items()):
+        estimate = slot["input_tokens"] * 0.042 / 1_000_000
+        lines.append(
+            f"# hook {name} rows={slot['rows']} scored={slot['scored']} "
+            f"not_run={slot['not_run']} errors={slot['error']} other={slot['other']} "
+            f"input_tokens={slot['input_tokens']} estimated_cost_usd={estimate:.6f}"
+        )
+    # These metrics were computed with the judge scan above.
+    if idle_minutes:
+        median_idle = percentile(idle_minutes, 0.5)
+        p75_idle = percentile(idle_minutes, 0.75)
+        lines.append(
+            f"# promise-stop idle n={len(idle_minutes)} median_minutes={median_idle:.1f} "
+            f"p75_minutes={p75_idle:.1f} baseline_n=49 median_minutes=10.0 p75_minutes=31.5"
+        )
+    else:
+        lines.append(
+            "# promise-stop idle n=0 median_minutes=NOT_RUN p75_minutes=NOT_RUN "
+            "baseline_n=49 median_minutes=10.0 p75_minutes=31.5"
+        )
+    for (day, profile), values in sorted(starts.items()):
+        lines.append(
+            f"# session-start context day={day} profile={profile} sessions={len(values)} "
+            f"total_tokens={sum(values)} median_tokens={percentile(values, 0.5):.1f} "
+            f"p75_tokens={percentile(values, 0.75):.1f}"
+        )
+    if not starts:
+        lines.append(
+            "# session-start context tokens=NOT_RUN (no session with first assistant usage in window)"
+        )
+    return lines
+
+
+def scoreboard_days(argv):
+    try:
+        index = argv.index("--days")
+        value = int(argv[index + 1])
+    except (ValueError, IndexError):
+        raise ValueError("--scoreboard requires --days N") from None
+    if value < 1 or value > 365:
+        raise ValueError("--days must be between 1 and 365")
+    return value
+
+
+def scoreboard_cli(argv, files):
+    try:
+        days = scoreboard_days(argv)
+    except ValueError as err:
+        print(f"surface-census: {err}", file=sys.stderr)
+        return 2
+    for line in scoreboard(files, days):
+        print(line)
+    return 0
+
+
 def main(argv):
     roots, files = session_files()
+    if "--scoreboard" in argv:
+        return scoreboard_cli(argv, files)
+
     if "--fleet-line" in argv:
         now = datetime.now(timezone.utc)
         # Session files are append-only, so one untouched for 24h holds no row from the last 24h.
