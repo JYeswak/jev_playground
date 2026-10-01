@@ -26,6 +26,12 @@
  *
  * Missing OMP session: one NOT_RUN session-unavailable row and no provider lookup.
  * Each handler is capped at 100 attempts per UTC date; HTTP 401/402/403 pause the client.
+ *
+ * Cascade (bead jev-nr3c, INACTIVE until jev-8w0h is verified-closed): with
+ * `cascade: true`, nimble screens first via the localbench gateway and only
+ * nimble-flagged commands reach paid Jev (paid cap MAX_DAILY_PAID_CALLS).
+ * Nimble-cleared rows log jevSkipped:true; the paid budget counts paid calls
+ * only. Default CASCADE_ENABLED=false keeps the legacy direct-paid flow.
  */
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -41,6 +47,17 @@ import { CUT, RISK, STATE_CONTEXT } from "../../../work/bicameral-gate/questions
 export const MODEL = "jev-1.13.0";
 export const MAX_PREFIX = 200;
 export const MAX_DAILY_CALLS = 100;
+/**
+ * Cascade (bead jev-nr3c, measured in jev-8w0h): local nimble screens every
+ * command first; only nimble-flagged commands reach paid Jev. INACTIVE until
+ * jev-8w0h is verified-closed: CASCADE_ENABLED is false, so the live path is
+ * byte-identical to the legacy direct-paid flow below.
+ */
+export const CASCADE_ENABLED = false;
+export const LOCAL_MODEL = "nimble:latest";
+export const LOCAL_GATEWAY = "http://127.0.0.1:11300/omp-profile/default/v1/systemone";
+export const LOCAL_TIMEOUT_MS = 5000;
+export const MAX_DAILY_PAID_CALLS = 1000;
 export const LOG_REL = "state/jev/gate-observe.jsonl";
 export const SIDECAR_REL = "state/jev/gate-observe-full.jsonl";
 export const SIDECAR_MODE = 0o600;
@@ -88,7 +105,7 @@ export const FILTERS: Filters | null = loadOwnedFilters();
 
 export const ROW_KEYS = [
   "ts", "session", "cmdSha", "cmd", "status", "model", "probs", "flag",
-  "latencyMs", "tokens", "skipped", "error",
+  "latencyMs", "tokens", "skipped", "error", "nimbleProbs", "jevSkipped",
 ] as const;
 export type RowStatus = "scored" | "skipped" | "not-run" | "error";
 export interface ObserveRow {
@@ -104,6 +121,10 @@ export interface ObserveRow {
   tokens: { input_tokens: number; output_tokens: number } | null;
   skipped: null | "secret" | "filter-error";
   error: string | null;
+  /** Cascade only: nimble screen scores (null on the legacy path). */
+  nimbleProbs: Record<string, number> | null;
+  /** Cascade only: true when nimble cleared the command and paid Jev never ran. */
+  jevSkipped: boolean | null;
 }
 
 
@@ -131,21 +152,28 @@ export function buildRow(init: {
   };
 }
 
+export interface AskResult {
+  ok: boolean;
+  reason?: string;
+  error?: string;
+  scores?: Record<string, number>;
+  model?: string;
+  latencyMs?: number;
+  usage?: { input_tokens: number; output_tokens: number };
+}
+
+export interface AskArgs {
+  state: Record<string, unknown>;
+  questions: typeof RISK;
+  model: string;
+  timeoutMs: number;
+}
 export interface ObserveDeps {
-  asker?: (args: {
-    state: Record<string, unknown>;
-    questions: typeof RISK;
-    model: string;
-    timeoutMs: number;
-  }) => Promise<{
-    ok: boolean;
-    reason?: string;
-    error?: string;
-    scores?: Record<string, number>;
-    model?: string;
-    latencyMs?: number;
-    usage?: { input_tokens: number; output_tokens: number };
-  }>;
+  asker?: (args: AskArgs) => Promise<AskResult>;
+  /** Cascade screen: same contract as asker; defaults to the local gateway. */
+  localAsker?: (args: AskArgs) => Promise<AskResult>;
+  /** Cascade switch; defaults to CASCADE_ENABLED (false until 8w0h closes). */
+  cascade?: boolean;
   append?: (path: string, line: string) => Promise<void>;
   logPath?: string;
   filter?: (command: string) => { drop: boolean; reason?: string };
@@ -184,6 +212,60 @@ const liveAsker: NonNullable<ObserveDeps["asker"]> = async (args) => {
     latencyMs: result.latencyMs,
     usage: result.usage ? { input_tokens: result.usage.input_tokens, output_tokens: result.usage.output_tokens } : undefined,
   };
+};
+
+/**
+ * Free local screen through the localbench gateway. Same contract as the
+ * paid asker; every failure mode is a value, never a throw past observe().
+ * Timeout is tight (5 s): the gateway is loopback, slowness means fail open.
+ */
+export const liveLocalAsker: NonNullable<ObserveDeps["localAsker"]> = async (args) => {
+  const started = Date.now();
+  let response: Response;
+  try {
+    response = await fetch(LOCAL_GATEWAY, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ model: LOCAL_MODEL, state: args.state, questions: args.questions }),
+      signal: AbortSignal.timeout(args.timeoutMs ?? LOCAL_TIMEOUT_MS),
+    });
+  } catch (err) {
+    return { ok: false, reason: "gateway-unreachable", error: err instanceof Error ? err.message : String(err), latencyMs: Date.now() - started };
+  }
+  if (!response.ok) {
+    return { ok: false, reason: "gateway-http", error: `HTTP ${response.status}`, latencyMs: Date.now() - started };
+  }
+  let body: unknown;
+  try {
+    body = await response.json();
+  } catch (err) {
+    return { ok: false, reason: "gateway-bad-json", error: err instanceof Error ? err.message : String(err), latencyMs: Date.now() - started };
+  }
+  if (!body || typeof body !== "object" || !("answers" in body)) {
+    return { ok: false, reason: "no-answers", error: "gateway body has no answers object", latencyMs: Date.now() - started };
+  }
+  const answers: unknown = body.answers;
+  if (!answers || typeof answers !== "object") {
+    return { ok: false, reason: "no-answers", error: "gateway answers is not an object", latencyMs: Date.now() - started };
+  }
+  // Dynamic key read after the `in` guard below; index signature unexpressible otherwise.
+  const table: Record<string, unknown> = answers as Record<string, unknown>;
+  const scores: Record<string, number> = {};
+  for (const key in RISK) {
+    if (!(key in table)) {
+      return { ok: false, reason: "no-answers", error: "gateway answer is missing a Noul score", latencyMs: Date.now() - started };
+    }
+    const answer: unknown = table[key];
+    if (!answer || typeof answer !== "object" || !("noul" in answer)) {
+      return { ok: false, reason: "no-answers", error: "gateway answer is missing a Noul score", latencyMs: Date.now() - started };
+    }
+    const score: unknown = answer.noul;
+    if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 1) {
+      return { ok: false, reason: "no-answers", error: "gateway answer has an invalid Noul score", latencyMs: Date.now() - started };
+    }
+    scores[key] = score;
+  }
+  return { ok: true, scores, model: LOCAL_MODEL, latencyMs: Date.now() - started };
 };
 
 export function makeFilter(filters: Filters | null): (command: string) => { drop: boolean; reason?: string } {
@@ -255,27 +337,80 @@ export async function observe(
       verdict = { drop: true, reason: "filter-error" };
     }
     if (verdict.drop) {
-      await write({ ...base, status: "skipped", probs: null, flag: null, latencyMs: null, tokens: null, skipped: verdict.reason === "filter-error" ? "filter-error" : "secret", error: null });
+      await write({ ...base, status: "skipped", probs: null, flag: null, latencyMs: null, tokens: null, skipped: verdict.reason === "filter-error" ? "filter-error" : "secret", error: null, nimbleProbs: null, jevSkipped: null });
       return undefined;
     }
     if (!session.trim() || session === "unknown") {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=session-unavailable" });
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=session-unavailable", nimbleProbs: null, jevSkipped: null });
       return undefined;
     }
     const now = (deps.nowMs ?? Date.now)();
     const until = billingHoldActive(now);
     if (until !== null) {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=billing-hold until=" + new Date(until).toISOString() });
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=billing-hold until=" + new Date(until).toISOString(), nimbleProbs: null, jevSkipped: null });
       return undefined;
     }
+    const cascade = deps.cascade ?? CASCADE_ENABLED;
     const budget = deps.dailyBudget ?? processDailyBudget;
     const day = base.ts.slice(0, 10);
     if (budget.day !== day) {
       budget.day = day;
       budget.calls = 0;
     }
-    if (budget.calls >= (deps.dailyCap ?? MAX_DAILY_CALLS)) {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=daily-cap" });
+    // The shared daily budget counts PAID calls only; the free local screen
+    // never consumes it. The legacy path keeps its 100/day cap.
+    const paidCap = deps.dailyCap ?? (cascade ? MAX_DAILY_PAID_CALLS : MAX_DAILY_CALLS);
+    // Cascade screen (inactive until jev-8w0h is verified-closed): nimble
+    // clears benign commands before any paid call. Fail open throughout.
+    let nimbleProbs: Record<string, number> | null = null;
+    if (cascade) {
+      let screen: AskResult;
+      try {
+        screen = await (deps.localAsker ?? liveLocalAsker)({
+          state: { command, context: STATE_CONTEXT },
+          questions: RISK,
+          model: LOCAL_MODEL,
+          timeoutMs: LOCAL_TIMEOUT_MS,
+        });
+      } catch (err) {
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=local-screen-threw: " + (err instanceof Error ? err.message : String(err)), nimbleProbs: null, jevSkipped: null });
+        return undefined;
+      }
+      if (!screen.ok) {
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: screen.latencyMs ?? null, tokens: null, skipped: null, error: "NOT_RUN reason=local-screen-" + (screen.reason ?? "unknown"), nimbleProbs: null, jevSkipped: null });
+        return undefined;
+      }
+      const scores = screen.scores ?? {};
+      let top = -Infinity;
+      for (const key in scores) {
+        const score = scores[key];
+        if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 1) top = NaN;
+        else if (score > top) top = score;
+      }
+      if (!Number.isFinite(top)) {
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: screen.latencyMs ?? null, tokens: null, skipped: null, error: "NOT_RUN reason=local-screen-invalid", nimbleProbs: null, jevSkipped: null });
+        return undefined;
+      }
+      nimbleProbs = scores;
+      if (top <= CUT) {
+        await write({
+          ...base,
+          status: "scored",
+          model: screen.model ?? LOCAL_MODEL,
+          probs: scores,
+          flag: false,
+          latencyMs: screen.latencyMs ?? null,
+          tokens: null,
+          skipped: null,
+          error: null,
+          nimbleProbs: scores,
+          jevSkipped: true,
+        });
+        return undefined;
+      }
+    }
+    if (budget.calls >= paidCap) {
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=daily-cap", nimbleProbs, jevSkipped: cascade ? false : null });
       return undefined;
     }
     budget.calls += 1;
@@ -285,7 +420,7 @@ export async function observe(
     } catch {
       /* best-effort like the log; the tool path never sees us */
     }
-    let answer: Awaited<ReturnType<NonNullable<ObserveDeps["asker"]>>>;
+    let answer: AskResult;
     try {
       answer = await (deps.asker ?? liveAsker)({
         state: { command, context: STATE_CONTEXT },
@@ -294,17 +429,17 @@ export async function observe(
         timeoutMs: 20000,
       });
     } catch (err) {
-      await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "ask-threw: " + (err instanceof Error ? err.message : String(err)) });
+      await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "ask-threw: " + (err instanceof Error ? err.message : String(err)), nimbleProbs: null, jevSkipped: null });
       return undefined;
     }
     if (!answer.ok) {
       if (answer.reason === "unconfigured") {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=unconfigured" });
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=unconfigured", nimbleProbs: null, jevSkipped: null });
       } else if (answer.reason === "billing-hold") {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=" + (answer.error ?? "billing-hold") });
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=" + (answer.error ?? "billing-hold"), nimbleProbs: null, jevSkipped: null });
       } else {
         noteBillingRefusal(answer, now);
-        await write({ ...base, status: "error", probs: null, flag: null, latencyMs: answer.latencyMs ?? null, tokens: null, skipped: null, error: (answer.reason ?? "unknown") + ": " + (answer.error ?? "") });
+        await write({ ...base, status: "error", probs: null, flag: null, latencyMs: answer.latencyMs ?? null, tokens: null, skipped: null, error: (answer.reason ?? "unknown") + ": " + (answer.error ?? ""), nimbleProbs: null, jevSkipped: null });
       }
       return undefined;
     }
@@ -324,6 +459,8 @@ export async function observe(
       tokens: answer.usage ?? null,
       skipped: null,
       error: null,
+      nimbleProbs,
+      jevSkipped: cascade ? false : null,
     });
     return undefined;
   } catch {

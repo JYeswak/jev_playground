@@ -410,3 +410,60 @@ test("captured bash result without a toolCallId reaches the offline client only 
   assert.equal(full.length, 1);
   assert.doesNotMatch(JSON.stringify(requests), /offline-test-only|sk-abcdefghij/);
 });
+
+const cascadeMem = { ...mem, cascade: true, dailyBudget: { day: "", calls: 0 } };
+const nimbleClear = async () => ({ ok: true, scores: { destructive: 0.1, exfiltration: 0.05 }, model: "nimble:latest", latencyMs: 800 });
+const nimbleFlag = async () => ({ ok: true, scores: { destructive: 0.9, exfiltration: 0.1 }, model: "nimble:latest", latencyMs: 900 });
+
+test("cascade: nimble-negative never reaches the paid asker", async () => {
+  reset();
+  let paid = 0;
+  const asker = async () => { paid++; return scoredAsker(); };
+  await observe({ toolName: "bash", input: { command: "ls" } },
+    { ...cascadeMem, asker, localAsker: nimbleClear, dailyBudget: { day: "", calls: 0 } });
+  assert.equal(paid, 0, "a nimble-cleared command must not spend a paid call");
+  assert.equal(wrote[0].row.status, "scored");
+  assert.equal(wrote[0].row.flag, false);
+  assert.equal(wrote[0].row.model, "nimble:latest");
+  assert.equal(wrote[0].row.jevSkipped, true);
+  assert.deepEqual(wrote[0].row.nimbleProbs, { destructive: 0.1, exfiltration: 0.05 });
+});
+
+test("cascade: nimble-positive reaches the paid asker with both scores logged", async () => {
+  reset();
+  let paid = 0;
+  const asker = async () => { paid++; return scoredAsker(); };
+  await observe({ toolName: "bash", input: { command: "ls" } },
+    { ...cascadeMem, asker, localAsker: nimbleFlag, dailyBudget: { day: "", calls: 0 } });
+  assert.equal(paid, 1);
+  assert.equal(wrote[0].row.status, "scored");
+  assert.equal(wrote[0].row.jevSkipped, false);
+  assert.deepEqual(wrote[0].row.nimbleProbs, { destructive: 0.9, exfiltration: 0.1 });
+  assert.equal(wrote[0].row.model, "test-model");
+});
+
+test("cascade: gateway error is not-run and the paid asker never runs", async () => {
+  reset();
+  let paid = 0;
+  const asker = async () => { paid++; return scoredAsker(); };
+  const localAsker = async () => { throw new Error("gateway down"); };
+  await observe({ toolName: "bash", input: { command: "ls" } },
+    { ...cascadeMem, asker, localAsker, dailyBudget: { day: "", calls: 0 } });
+  assert.equal(paid, 0);
+  assert.equal(wrote[0].row.status, "not-run");
+  assert.match(wrote[0].row.error, /NOT_RUN reason=local-screen-threw/);
+});
+
+test("cascade: nimble-cleared commands do not consume the paid budget", async () => {
+  reset();
+  let paid = 0;
+  const asker = async () => { paid++; return scoredAsker(); };
+  const budget = { day: "", calls: 0 };
+  const cmd = (c) => observe({ toolName: "bash", input: { command: c } },
+    { ...cascadeMem, asker, localAsker: nimbleClear, dailyBudget: budget, dailyCap: 1 });
+  await cmd("ls");
+  await cmd("pwd");
+  assert.equal(paid, 0);
+  assert.deepEqual(wrote.map((w) => w.row.status), ["scored", "scored"]);
+  assert.equal(budget.calls, 0, "free screens must not burn paid budget");
+});
