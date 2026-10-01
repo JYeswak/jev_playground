@@ -172,7 +172,11 @@ def run_selftest(expect_path: Path) -> int:
     else:
         raise AssertionError("wrong-origin public source was accepted")
     assert_source_origin(REPO_URL)
-    print("SELFTEST PASS: wrong-origin same-SHA source refused")
+    # actions/checkout@v4 records the same repository without `.git` (CI run 36811528179).
+    assert_source_origin(REPO_URL[: -len(".git")])
+    print(
+        "SELFTEST PASS: wrong-origin same-SHA source refused; .git-less CI origin accepted"
+    )
     if redact(source_sha + "\n", source_sha) != source_sha + "\n":
         raise AssertionError(
             "known public Git SHA was redacted before provenance validation"
@@ -310,9 +314,15 @@ def assert_checkout_cwd(active_cwd: Path, checkout: Path) -> None:
         )
 
 
+def canonical_repo(url: str) -> str:
+    """Repository identity without a trailing slash or `.git` suffix."""
+    url = url.strip().rstrip("/")
+    return url[: -len(".git")] if url.endswith(".git") else url
+
+
 def assert_source_origin(origin: str) -> None:
     """A source checkout must name the public repository even if its SHA matches."""
-    if origin != REPO_URL:
+    if canonical_repo(origin) != canonical_repo(REPO_URL):
         raise SystemExit("source checkout origin mismatch; refusing to grade README")
 
 
