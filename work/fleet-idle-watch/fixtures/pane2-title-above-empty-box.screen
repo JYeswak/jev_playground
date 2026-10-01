@@ -1,0 +1,31 @@
+   first-sighting-arms-without-submitting, same-text-second-poll-submits-once,
+   empty-composer-resets, submit_enter reports tmux truthfully.
+
+ No false-fire path found; one residual (by design): a human who composes text in a
+ worker pane and stops typing for 2 full polls gets one Enter + a page to pane 1 —
+ that's the feature, and it's announced.
+
+╭──────────────────────────────────────────────────────────────────────────────────╮
+│ $ br ready --json 2>/dev/null | head -c 200                                      │
+├─── Output ───────────────────────────────────────────────────────────────────────┤
+│ []                                                                               │
+│ ⟦Wall: 0.04s | Timeout: 300s⟧                                                    │
+╰──────────────────────────────────────────────────────────────────────────────────╯
+
+╭──────────────────────────────────────────────────────────────────────────────────╮
+│ $ ntm send jev --pane=1 "IDLE pane 2: unsubmitted-composer watcher verified      │
+│ (63/63+7/7, pane 0 safe); nothing assigned, ready empty"                         │
+├─── Output ───────────────────────────────────────────────────────────────────────┤
+│ Sent to pane 1                                                                   │
+│ ⟦Wall: 9.47s | Timeout: 120s⟧                                                    │
+╰──────────────────────────────────────────────────────────────────────────────────╯
+
+ IDLE reported; stopping.
+
+ ※ recap: Goal is turning Jev on in our tooling with live proof. Tonight I verified
+ beads and fixed CI rows, and I'm currently idle awaiting the conductor's next
+ dispatch.
+
+                                                    Update README and validate gates
+ π > ◕ Muse Spark 1.3 (C) > 📁 ~/Developer/jev > ⑂ main *31 ?188 > S0.27 ▶──25%─┃1M─
+╰─

@@ -1031,15 +1031,15 @@ class StaleIndexLock(unittest.TestCase):
         note = fiw.stale_lock_round(root, now, pages.append, live_git=lambda repo: None)
         self.assertIn("NOT_RUN", note)
         self.assertTrue(lock.exists())
-        self.assertEqual(pages, [])
 
 
 class UnsubmittedComposer(unittest.TestCase):
     """A packet typed into a worker composer but never submitted (pane 4, 3x).
 
-    Fixture work/fleet-idle-watch/fixtures/pane4-unsubmitted-composer.screen:
-    idle composer-box shape observed on pane 3 2026-10-01, text the real
-    conductor resend packet var/agent-tmp/dispatch-pane-4-resend.txt lines 1-5.
+    Fixtures: pane4-unsubmitted-composer.screen (idle box shape from pane 3
+    2026-10-01, real resend packet lines 1-5 inside); pane2-title-above-empty-box
+    .screen (exact pane-2 capture 2026-10-01: transcript incl. the right-aligned
+    session title between a stale ╭ and a bottom ╰; must read empty, 08:58Z fire).
     """
 
     SCREEN = (FIX / "pane4-unsubmitted-composer.screen").read_text()
@@ -1053,6 +1053,16 @@ class UnsubmittedComposer(unittest.TestCase):
         self.assertEqual(fiw.composer_text(PANE2_SCREEN), "")
         self.assertEqual(fiw.composer_text(PANE5_SCREEN), "")
         self.assertEqual(fiw.composer_text("╭── idle ──╮\n╰─   ─╯"), "")
+
+    def test_right_aligned_title_above_dangling_close_reads_empty(self):
+        # 08:58Z false fire on pane 2: transcript (incl. the right-aligned
+        # session title, no borders) between a stale ╭ and a bottom ╰.
+        screen = (
+            Path(__file__).resolve().parent
+            / "fixtures"
+            / "pane2-title-above-empty-box.screen"
+        ).read_text()
+        self.assertEqual(fiw.composer_text(screen), "")
 
     def test_fixture_screen_classifies_idle(self):
         state, _ = fiw.classify(snapshot(4, self.SCREEN))

@@ -190,11 +190,13 @@ claim nobody can check:
   `var/agent-tmp` (never deleted) and pages pane 1 once; a live holder, a young lock, a non-empty
   lock, or a failed process probe leaves it in place (probe failure logs NOT_RUN). 5 tests.
   Unsubmitted composer (pane 4 typed-but-unsent packet, 3x 2026-10-01): text inside
-  the bottom-most ╭…╯ box reads as the composer (empty box and bare ❯ read empty);
-  the same non-empty composer on 2 idle polls sends one tmux Enter and pages
+  a bottom-anchored ╭…╯ box with all-bordered interior reads as the composer;
+  stale mid-screen boxes, a dangling ╰ under borderless transcript (pane 2's
+  right-aligned session title, 08:58Z false fire), empty box and bare ❯ all read
+  empty; the same non-empty composer on 2 idle polls sends one tmux Enter and pages
   `UNSUBMITTED pane N submitted` once per (pane, text); a changed or emptied
-  composer, a non-idle state, or a failed send resets without paging. 9 tests.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (63 tests).
+  composer, a non-idle state, or a failed send resets without paging. 10 tests.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (64 tests).
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder

@@ -214,35 +214,44 @@ def classify(snap: Snapshot) -> tuple[str, str]:
 
 
 def composer_text(screen: str) -> str:
-    """Text typed but unsent in the bottom-most composer box, else "".
+    """Text typed but unsent in the composer box open at the screen bottom.
 
-    The idle composer is a ╭…╮/╰…╯ box whose interior lines carry │ borders;
-    only lines strictly inside the box count (the ╭ line itself is chrome).
-    A box with no ╰ within 15 lines is transcript debris, not a composer.
-    Sessions showing the ❯ prompt form instead are out of scope (a submitted
-    command echoes as `❯ text`, indistinguishable from unsent text there).
+    A composer is a ╭…╮/╰…╯ box whose ╰ sits within the last 6 screen lines,
+    whose nearest ╭ above is within 40 lines, and whose every interior line
+    is bordered or blank. Anything else (stale transcript boxes mid-screen,
+    a dangling ╰ under borderless transcript like pane 2's right-aligned
+    session title at 08:58Z, the ❯ prompt form whose echoes are
+    indistinguishable from unsent text) reads as "".
     """
     lines = screen.splitlines()
-    tops = [i for i, line in enumerate(lines) if "╭" in line]
-    if tops:
-        top = tops[-1]
-        parts = []
-        closed = False
-        for line in lines[top + 1 : top + 16]:
-            if "╰" in line:
-                closed = True
-                break
-            cell = line.strip()
-            if cell.startswith("│"):
-                cell = cell[1:]
-            if cell.endswith("│"):
-                cell = cell[:-1]
-            cell = cell.strip(" ─")
-            if cell:
-                parts.append(cell)
-        if closed:
-            return " ".join(parts)[:500]
-    return ""
+    if not lines:
+        return ""
+    closers = [i for i, line in enumerate(lines) if "╰" in line]
+    bottom = [i for i in closers if i >= len(lines) - 6]
+    if not bottom:
+        return ""
+    close = bottom[-1]
+    top = None
+    for i in range(close - 1, max(-1, close - 40), -1):
+        if "╭" in lines[i]:
+            top = i
+            break
+    if top is None:
+        return ""
+    parts = []
+    for line in lines[top + 1 : close]:
+        cell = line.strip()
+        if not cell:
+            continue
+        if not cell.startswith("│"):
+            return ""
+        cell = cell[1:]
+        if cell.endswith("│"):
+            cell = cell[:-1]
+        cell = cell.strip(" ─")
+        if cell:
+            parts.append(cell)
+    return " ".join(parts)[:500]
 
 
 def unsubmitted_ready(state, index, composer, last_text, same_count, done):
