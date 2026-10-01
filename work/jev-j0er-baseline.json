@@ -1,0 +1,31 @@
+{
+ "bead": "jev-j0er",
+ "kind": "baseline-before",
+ "window": "2026-09-24..2026-10-01",
+ "files": 427,
+ "calls": 354,
+ "by_tool": {
+  "web_search": 354
+ },
+ "per_day_repo": {
+  "2026-09-24 -Developer-control-plane": 15,
+  "2026-09-24 -Developer-jev": 48,
+  "2026-09-25 -Developer-jev": 18,
+  "2026-09-25 -Developer-localbench": 54,
+  "2026-09-25 -Developer-omp-test": 7,
+  "2026-09-27 -Developer-jev": 8,
+  "2026-09-28 -Developer-clutterfreespaces.ios": 98,
+  "2026-09-29 -Developer-jev": 9,
+  "2026-09-29 -Developer-localbench": 44,
+  "2026-09-29 -Developer-omp-test": 15,
+  "2026-09-30 -Developer-clutterfreespaces.ios": 3,
+  "2026-09-30 -Developer-localbench": 11,
+  "2026-09-30 -Developer-uds": 5,
+  "2026-10-01 -Developer-clutterfreespaces.ios": 1,
+  "2026-10-01 -Developer-jev": 18
+ },
+ "method": "session-file toolCall census (filename session-start day; multi-day sessions misattribute; 1 call ~= >=1 result)",
+ "caveat_0926": "2026-09-26 shows 0 calls in session files",
+ "after_bar": "AFTER 48h global install: sample EVERY withhold, label true injection vs false withhold blind; bar: false withholds <= 2% of screened results with Wilson score upper bound (committed here before install, 2026-10-01). Also: withholds/day, Jev spend/day. Rollback = remove global install.",
+ "after_method": "same session-file census + shadow logs (webscreen-shadow, injection-shadow) for withhold counts; blind labeling of every withheld unit"
+}
