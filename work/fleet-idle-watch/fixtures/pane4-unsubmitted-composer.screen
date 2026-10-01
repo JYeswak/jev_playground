@@ -1,0 +1,17 @@
+# pane4-unsubmitted-composer.screen — composed fixture for the unsubmitted-packet watch.
+# Shape observed: idle worker composer box (pane 3, jev session, 2026-10-01 ~08:00Z):
+# a bottom-most ╭…╮/╰…╯ box whose interior lines carry │ borders; empty box holds
+# only spaces. Text observed: real conductor resend packet
+# var/agent-tmp/dispatch-pane-4-resend.txt lines 1-5 (the 2026-09-30 packet that
+# sat typed-but-unsubmitted on pane 4 until a manual Enter), cut to box width.
+# Never a live incident screen: shape and text are real, composition is the test's.
+ ※ recap: jev-uhc5 local parity runs queued behind a localbench GPU window request.
+
+╭── π > ◔ Muse Spark 1.3 (C) > 📁 …loper/jev > ⑂ main *33 ?188 > S0.03 ▶─8%─┃1M───╮
+│ THIS IS YOUR EXPLICIT NEW PACKET from the conductor (pane 1, BrownGoose).     │
+│ WildCarp: MISSION (conductor BrownGoose, pane 1; Joshua gave blanket approval, │
+│ no 'waiting for approval'): turn Jev ON in our own tooling and test it live.  │
+│ calls are allowed (Joshua 2026-09-27) when bounded: daily cap in code, stop on │
+│ 401/402/403, checkpoint a row per call, state spend. Key: infisical user sess │
+╰─                                                                               ─╯
+ π > ◔ Muse Spark 1.3 (C) > 📁 ~/Developer/jev > ⑂ main *33 ?188 > S0.03 ▶──8%─┃1M─

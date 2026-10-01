@@ -10,6 +10,9 @@ Fixtures, all captured read-only from the jev session 2026-09-25 ~05:37Z:
   pane5-diff-todo-no-status.screen  pane 5's capture cut above its status line: an edit view and a
                          todo panel, the shape that hid the status line when the screen-only
                          classifier read panes 2 and 5 as 'no-agent' at 05:0xZ.
+  pane4-unsubmitted-composer.screen  idle composer-box shape observed on pane 3 2026-10-01
+                         with the real conductor resend packet
+                         var/agent-tmp/dispatch-pane-4-resend.txt lines 1-5 typed inside.
 
 Inbox pages (bead jev-lqfm): Agent Mail archive files written into a temp dir per test, in the
 shape of the real AmberWillow inbox file ...__42478.md (`---json`, the JSON front matter, `---`,
@@ -1029,6 +1032,73 @@ class StaleIndexLock(unittest.TestCase):
         self.assertIn("NOT_RUN", note)
         self.assertTrue(lock.exists())
         self.assertEqual(pages, [])
+
+
+class UnsubmittedComposer(unittest.TestCase):
+    """A packet typed into a worker composer but never submitted (pane 4, 3x).
+
+    Fixture work/fleet-idle-watch/fixtures/pane4-unsubmitted-composer.screen:
+    idle composer-box shape observed on pane 3 2026-10-01, text the real
+    conductor resend packet var/agent-tmp/dispatch-pane-4-resend.txt lines 1-5.
+    """
+
+    SCREEN = (FIX / "pane4-unsubmitted-composer.screen").read_text()
+
+    def test_composer_text_extracts_packet_from_box(self):
+        text = fiw.composer_text(self.SCREEN)
+        self.assertIn("THIS IS YOUR EXPLICIT NEW PACKET", text)
+        self.assertIn("checkpoint a row per call", text)
+
+    def test_empty_box_and_bare_prompt_read_empty(self):
+        self.assertEqual(fiw.composer_text(PANE2_SCREEN), "")
+        self.assertEqual(fiw.composer_text(PANE5_SCREEN), "")
+        self.assertEqual(fiw.composer_text("╭── idle ──╮\n╰─   ─╯"), "")
+
+    def test_fixture_screen_classifies_idle(self):
+        state, _ = fiw.classify(snapshot(4, self.SCREEN))
+        self.assertEqual(state, "idle")
+
+    def test_working_pane_never_submits(self):
+        submit, same = fiw.unsubmitted_ready("working", 4, "some text", "", 5, set())
+        self.assertFalse(submit)
+
+    def test_first_sighting_arms_without_submitting(self):
+        submit, same = fiw.unsubmitted_ready("idle", 4, "packet text", "", 0, set())
+        self.assertFalse(submit)
+        self.assertEqual(same, 1)
+
+    def test_same_text_second_poll_submits_once(self):
+        submit, same = fiw.unsubmitted_ready("idle", 4, "packet", "packet", 1, set())
+        self.assertTrue(submit)
+        self.assertEqual(same, 2)
+        submit, _ = fiw.unsubmitted_ready(
+            "idle", 4, "packet", "packet", 2, {(4, "packet")}
+        )
+        self.assertFalse(submit)
+
+    def test_changed_text_resets_counter(self):
+        submit, same = fiw.unsubmitted_ready(
+            "idle", 4, "new text", "old text", 3, set()
+        )
+        self.assertFalse(submit)
+        self.assertEqual(same, 1)
+
+    def test_empty_composer_resets(self):
+        submit, same = fiw.unsubmitted_ready("idle", 4, "", "old text", 3, set())
+        self.assertFalse(submit)
+        self.assertEqual(same, 0)
+
+    def test_submit_enter_reports_tmux_truthfully(self):
+        with mock.patch.object(fiw.subprocess, "run") as run:
+            run.return_value.returncode = 0
+            self.assertTrue(fiw.submit_enter(4))
+            args = run.call_args[0][0]
+            self.assertEqual(args[:3], ["tmux", "send-keys", "-t"])
+            self.assertIn("Enter", args)
+            run.return_value.returncode = 1
+            self.assertFalse(fiw.submit_enter(4))
+            run.side_effect = subprocess.TimeoutExpired("tmux", 10)
+            self.assertFalse(fiw.submit_enter(4))
 
 
 if __name__ == "__main__":

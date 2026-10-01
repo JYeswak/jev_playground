@@ -213,6 +213,52 @@ def classify(snap: Snapshot) -> tuple[str, str]:
     return "idle", f"{seen}, no tool child, {age}"
 
 
+def composer_text(screen: str) -> str:
+    """Text typed but unsent in the bottom-most composer box, else "".
+
+    The idle composer is a ╭…╮/╰…╯ box whose interior lines carry │ borders;
+    only lines strictly inside the box count (the ╭ line itself is chrome).
+    A box with no ╰ within 15 lines is transcript debris, not a composer.
+    Sessions showing the ❯ prompt form instead are out of scope (a submitted
+    command echoes as `❯ text`, indistinguishable from unsent text there).
+    """
+    lines = screen.splitlines()
+    tops = [i for i, line in enumerate(lines) if "╭" in line]
+    if tops:
+        top = tops[-1]
+        parts = []
+        closed = False
+        for line in lines[top + 1 : top + 16]:
+            if "╰" in line:
+                closed = True
+                break
+            cell = line.strip()
+            if cell.startswith("│"):
+                cell = cell[1:]
+            if cell.endswith("│"):
+                cell = cell[:-1]
+            cell = cell.strip(" ─")
+            if cell:
+                parts.append(cell)
+        if closed:
+            return " ".join(parts)[:500]
+    return ""
+
+
+def unsubmitted_ready(state, index, composer, last_text, same_count, done):
+    """(submit_now, new_same_count) for one idle poll of one pane.
+
+    The same non-empty composer on 2 consecutive idle polls submits once per
+    (pane, text): a stuck paste is static across polls, active typing is not.
+    """
+    if state != "idle" or not composer:
+        return False, 0
+    same = same_count + 1 if composer == last_text else 1
+    if same >= 2 and (index, composer) not in done:
+        return True, same
+    return False, same
+
+
 def last_words(screen: str) -> str:
     stripped = [
         line.strip(" │╰╭─") for line in screen.splitlines() if not STATUS.search(line)
@@ -775,8 +821,22 @@ def poll() -> dict[int, tuple] | None:
             f"({evidence})  {last_words(screen)}",
             redacted_status_line(screen),
             omp,
+            composer_text(screen),
         )
     return states
+
+
+def submit_enter(index: int) -> bool:
+    """Press Enter in the pane's composer once; True only when tmux took it."""
+    try:
+        done = subprocess.run(
+            ["tmux", "send-keys", "-t", f"{SESSION}:0.{index}", "Enter"],
+            capture_output=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return done.returncode == 0
 
 
 def send_pane1(message: str) -> bool:
@@ -1208,6 +1268,9 @@ def main() -> int:
         if note:
             print(note, flush=True)
         return 1 if any(reading[0] != "working" for reading in states.values()) else 0
+    composer_last: dict[int, str] = {}
+    composer_same: dict[int, int] = {}
+    composer_done: set = set()
     streak: dict[int, int] = {}
     idle_since: dict[int, float] = {}
     alerted_at: dict[int, float] = {}
@@ -1256,6 +1319,37 @@ def main() -> int:
                         f"needs-human check failed pane {index}: {type(err).__name__}",
                         flush=True,
                     )
+            if state == "idle":
+                composer = reading[4] if len(reading) > 4 else ""
+                submit, composer_same[index] = unsubmitted_ready(
+                    state,
+                    index,
+                    composer,
+                    composer_last.get(index, ""),
+                    composer_same.get(index, 0),
+                    composer_done,
+                )
+                if composer:
+                    composer_last[index] = composer
+                else:
+                    composer_last.pop(index, None)
+                    composer_same.pop(index, None)
+                    composer_done = {
+                        (i, text) for i, text in composer_done if i != index
+                    }
+                if submit:
+                    ok = submit_enter(index)
+                    composer_done.add((index, composer))
+                    print(
+                        f"{time.strftime('%H:%M:%SZ', time.gmtime())} "
+                        f"unsubmitted pane {index} Enter {'sent' if ok else 'FAILED'}",
+                        flush=True,
+                    )
+                    if ok:
+                        page(f"UNSUBMITTED pane {index} submitted")
+            else:
+                composer_last.pop(index, None)
+                composer_same.pop(index, None)
             streak[index] = streak.get(index, 0) + 1
             idle_since.setdefault(index, now)
             due = now - alerted_at.get(index, 0) >= REALERT
