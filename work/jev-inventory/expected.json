@@ -29,9 +29,9 @@
       "how": "defaultThinkingLevel auto + judge role",
       "expect": "on",
       "purpose": "auto-thinking",
-      "verdict": "NO-WIN-EASY",
-      "evidence": "jev-5ai4 verified (OrangeFrog): auto vs high on 12 easy prompts, think_chars ratio 1.244 (bar <=0.80 FAIL), success 12/12 both; hard round pending",
-      "saving": "none measured"
+      "verdict": "WORKS",
+      "evidence": "jev-8qu6 verified by HazySpring: 16 calibrated-hard tasks, success auto 14/16 vs pinned-high 13/16; jev-77ow verified PASS-WEAK; jev-5ai4 easy prompts NO-WIN",
+      "saving": "16% lower cost at equal or better success on hard tasks (jev-8qu6); 4.6% on hard tasks at ceiling (jev-77ow)"
     },
     {
       "id": "smart-stop",
