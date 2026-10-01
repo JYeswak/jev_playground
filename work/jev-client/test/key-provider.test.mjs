@@ -2,9 +2,9 @@
 // TYPESAFE_API_KEY, then an installed provider; the Infisical provider caches in memory only.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createServer } from 'node:http';
 import { askJev, askJevScore, keyProviderInstalled, setKeyProvider } from '../../../kit/src/client.ts';
 import { makeInfisicalKeyProvider, PROJECT_ID, TTL_MS, FAIL_TTL_MS, infisicalBinary, machineIdentityConfig } from "../src/infisical-key.ts";
+import * as keyModule from "../src/infisical-key.ts";
 import { useInfisicalKey } from '../src/use-infisical-key.ts';
 
 const fakeHeaders = () => ({ get: (name) => name.toLowerCase() === 'content-type' ? 'application/json' : null });
@@ -117,86 +117,55 @@ test('Infisical provider never writes the key into the environment', async () =>
   assert.equal(Object.values(process.env).includes("secret-value"), false);
 });
 
-test("machine identity fallback authenticates without putting client secret in child argv or output", async () => {
-  const secret = "synthetic-machine-secret";
-  const calls = [];
+test("approved HTTPS login refuses rejected authentication without child secret lookup", async () => {
+  const previousFetch = globalThis.fetch;
   const requests = [];
-  const server = createServer(async (request, response) => {
-    let body = "";
-    for await (const chunk of request) body += chunk;
-    requests.push({ path: request.url, body: JSON.parse(body) });
-    response.writeHead(200, { "content-type": "application/json" });
-    response.end(JSON.stringify({ accessToken: "machine-token", expiresIn: 3600, tokenType: "Bearer" }));
-  });
-  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  globalThis.fetch = async (url) => {
+    requests.push(String(url));
+    return {ok: false, status: 401, url: String(url), redirected: false,
+      json: async () => ({error: "rejected synthetic-machine-secret"})};
+  };
   try {
-    const config = `export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=${secret}\nexport INFISICAL_API_URL=http://127.0.0.1:${server.address().port}/api`;
-    const provider = makeInfisicalKeyProvider(async (file, args, _timeout, env) => {
-      calls.push({ file, args, env });
-      if (!env?.INFISICAL_TOKEN) throw new Error("user session expired");
-      return "machine-key\n";
-    }, () => 0, "/bin/infisical", "/home", () => config);
-    const value = await provider();
-    assert.equal(calls.some(({ args, env }) => JSON.stringify({ args, env }).includes(secret)), false, "machine secret reached child process");
-    assert.equal(value, "machine-key");
-    assert.equal(calls.length, 2);
-    assert.deepEqual(requests, [{
-      path: "/api/v1/auth/universal-auth/login",
-      body: { clientId: "cid", clientSecret: secret },
-    }]);
-    assert.equal(calls[1].env.INFISICAL_TOKEN, "machine-token");
-    assert.equal(process.env.TYPESAFE_API_KEY, undefined);
+    let childCalls = 0;
+    const provider = makeInfisicalKeyProvider(async () => {
+      childCalls++;
+      throw new Error("user session expired");
+    }, () => 0, "infisical", "/synthetic-home",
+    () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=synthetic-machine-secret\nexport INFISICAL_API_URL=https://approved.infisical.test",
+    {origin: "https://approved.infisical.test"});
+    assert.equal(await provider(), undefined);
+    assert.deepEqual(requests, ["https://approved.infisical.test/api/v1/auth/universal-auth/login"]);
+    assert.equal(childCalls, 1, "no second child after rejected login");
   } finally {
-    server.close();
+    globalThis.fetch = previousFetch;
   }
 });
 
-test("machine identity fallback refuses rejected authentication without exposing provider error text", async () => {
-  const secret = "synthetic-machine-secret";
-  let requests = 0;
-  const server = createServer(async (request, response) => {
-    requests++;
-    response.writeHead(401, { "content-type": "application/json" });
-    response.end(JSON.stringify({ error: `rejected ${secret}` }));
-  });
-  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+test("approved HTTPS login refuses a recorded 307 without a second recipient", async () => {
+  const previousFetch = globalThis.fetch;
+  const firstHops = [];
+  let forwarded = 0;
+  globalThis.fetch = async (url, options) => {
+    firstHops.push(String(url));
+    if (options.redirect === "error") throw new TypeError("redirect rejected");
+    forwarded++;
+    return {ok: true, redirected: true, url: "https://collector.invalid/collect",
+      json: async () => ({accessToken: "fake-machine-token"})};
+  };
   try {
-    const config = `export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=${secret}\nexport INFISICAL_API_URL=http://127.0.0.1:${server.address().port}/api`;
     let childCalls = 0;
-    const provider = makeInfisicalKeyProvider(async () => { childCalls++; throw new Error("user session expired"); }, () => 0, "infisical", "/home", () => config);
+    const provider = makeInfisicalKeyProvider(async () => {
+      childCalls++;
+      throw new Error("user session expired");
+    }, () => 0, "infisical", "/synthetic-home",
+    () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=synthetic-machine-secret\nexport INFISICAL_API_URL=https://approved.infisical.test",
+    {origin: "https://approved.infisical.test"});
     assert.equal(await provider(), undefined);
-    assert.equal(requests, 1);
-    assert.equal(childCalls, 1, "no secret lookup after rejected login");
+    assert.deepEqual(firstHops, ["https://approved.infisical.test/api/v1/auth/universal-auth/login"]);
+    assert.equal(forwarded, 0);
+    assert.equal(childCalls, 1);
   } finally {
-    server.close();
-  }
-});
-test("machine identity fallback refuses redirects before forwarding credentials", async () => {
-  const secret = "synthetic-machine-secret";
-  let redirected = 0;
-  const destination = createServer((_request, response) => {
-    redirected++;
-    response.writeHead(200, { "content-type": "application/json" });
-    response.end(JSON.stringify({ accessToken: "machine-token" }));
-  });
-  await new Promise((resolve) => destination.listen(0, "127.0.0.1", resolve));
-  const origin = createServer((_request, response) => {
-    response.writeHead(307, { location: `http://127.0.0.1:${destination.address().port}/collect` });
-    response.end();
-  });
-  await new Promise((resolve) => origin.listen(0, "127.0.0.1", resolve));
-  try {
-    const config = `export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=${secret}\nexport INFISICAL_API_URL=http://127.0.0.1:${origin.address().port}/api`;
-    const provider = makeInfisicalKeyProvider(async (_file, _args, _timeout, env) => {
-      if (!env?.INFISICAL_TOKEN) throw new Error("user session expired");
-      return "machine-key\n";
-    }, () => 0, "infisical", "/home", () => config);
-    const key = await provider();
-    assert.equal(redirected, 0, "credential body was forwarded to redirected host");
-    assert.equal(key, undefined);
-  } finally {
-    origin.close();
-    destination.close();
+    globalThis.fetch = previousFetch;
   }
 });
 test("machine identity config requires all three non-empty fields", () => {
@@ -207,4 +176,138 @@ test("machine identity config requires all three non-empty fields", () => {
 test('infisicalBinary prefers ~/.local/bin/infisical and falls back to PATH', () => {
   assert.equal(infisicalBinary('/h', () => true), '/h/.local/bin/infisical');
   assert.equal(infisicalBinary('/h', () => false), 'infisical');
+});
+
+test("machine fallback denies wrong or non-HTTPS first recipients before credential POST", async () => {
+  const previousFetch = globalThis.fetch;
+  const attempts = [];
+  globalThis.fetch = async (url) => {
+    attempts.push(String(url));
+    return {ok: true, json: async () => ({accessToken: "fake-machine-token"})};
+  };
+  try {
+    for (const apiUrl of [
+      "http://approved.infisical.test",
+      "https://collector.invalid",
+      "https://user:synthetic@approved.infisical.test",
+      "https://approved.infisical.test/?token=synthetic",
+      "https://approved.infisical.test/#fragment",
+    ]) {
+      const child = [];
+      const config = `export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=synthetic-machine-secret\nexport INFISICAL_API_URL=${apiUrl}`;
+      const provider = makeInfisicalKeyProvider(async (_file, _args, _timeout, env) => {
+        child.push(env);
+        if (!env?.INFISICAL_TOKEN) throw new Error("user session expired");
+        return "synthetic-key";
+      }, () => 0, "infisical", "/synthetic-home", () => config, {origin: "https://approved.infisical.test"});
+      assert.equal(await provider(), undefined);
+      assert.equal(child.length, 1, "only the user-session lookup may execute");
+    }
+    assert.deepEqual(attempts, [], "no credential POST reaches an unapproved first hop");
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test("machine fallback has no credential-file read without an approved origin", async () => {
+  let reads = 0;
+  for (const approval of [undefined, {origin: "http://approved.infisical.test"},
+    {origin: "https://approved.infisical.test/api"}]) {
+    const provider = makeInfisicalKeyProvider(async () => { throw new Error("user session expired"); },
+      () => 0, "infisical", "/synthetic-home", () => { reads++; return "synthetic credentials"; }, approval);
+    assert.equal(await provider(), undefined);
+  }
+  assert.equal(reads, 0);
+});
+
+test("approved HTTPS first hop uses the recorded universal-auth login shape", async () => {
+  const previousFetch = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (url, options) => {
+    requests.push({url: String(url), method: options.method, redirect: options.redirect,
+      headers: options.headers, body: JSON.parse(options.body)});
+    return {ok: true, redirected: false, url: String(url),
+      json: async () => ({accessToken: "fake-machine-token"})};
+  };
+  try {
+    const child = [];
+    const provider = makeInfisicalKeyProvider(async (file, args, _timeout, env) => {
+      child.push({file, args, env});
+      if (!env?.INFISICAL_TOKEN) throw new Error("user session expired");
+      return "synthetic-key";
+    }, () => 0, "infisical", "/synthetic-home",
+    () => "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=synthetic-machine-secret\nexport INFISICAL_API_URL=https://approved.infisical.test/api",
+    {origin: "https://approved.infisical.test"});
+    assert.equal(await provider(), "synthetic-key");
+    assert.deepEqual(requests, [{
+      url: "https://approved.infisical.test/api/v1/auth/universal-auth/login",
+      method: "POST", redirect: "error", headers: {"content-type": "application/json"},
+      body: {clientId: "cid", clientSecret: "synthetic-machine-secret"},
+    }]);
+    assert.equal(child.length, 2);
+    assert.deepEqual(child[1], {file: "infisical",
+      args: ["secrets", "get", "TYPESAFE_API_KEY", `--projectId=${PROJECT_ID}`, "--plain", "--silent"],
+      env: {INFISICAL_API_URL: "https://approved.infisical.test", INFISICAL_TOKEN: "fake-machine-token"}});
+    assert.equal(JSON.stringify(child).includes("synthetic-machine-secret"), false);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test("final execFile child receives only named environment variables, never inherited secrets", async () => {
+  const sentinel = "synthetic-parent-sentinel";
+  const parent = {PATH: "/bin", HOME: "/synthetic-home", TMPDIR: "/synthetic-tmp",
+    INFISICAL_CLIENT_SECRET: sentinel, TYPESAFE_API_KEY: sentinel, UNRELATED: sentinel};
+  const calls = [];
+  const fakeExecFile = (file, args, options, callback) => {
+    calls.push({file, args, env: options.env});
+    callback(null, "synthetic-key\n", "");
+  };
+  assert.equal(typeof keyModule.makeDefaultRunner, "function", "final execFile seam must be testable");
+  const run = keyModule.makeDefaultRunner(fakeExecFile, parent);
+  assert.equal(await run("infisical", ["secrets", "get", "TYPESAFE_API_KEY"], 15000, {
+    INFISICAL_API_URL: "https://approved.infisical.test",
+    INFISICAL_TOKEN: "fake-machine-token",
+  }), "synthetic-key\n");
+  assert.deepEqual(calls, [{
+    file: "infisical",
+    args: ["secrets", "get", "TYPESAFE_API_KEY"],
+    env: {PATH: "/bin", HOME: "/synthetic-home", TMPDIR: "/synthetic-tmp",
+      INFISICAL_API_URL: "https://approved.infisical.test", INFISICAL_TOKEN: "fake-machine-token"},
+  }]);
+});
+
+// The 2026-09-28 outage shape: the user session expired, so every hook logged no key for days.
+function expiredSessionRunner(child) {
+  return async (_file, _args, _timeout, env) => {
+    child.push(env ?? null);
+    if (!env?.INFISICAL_TOKEN) throw new Error("user session expired");
+    return "synthetic-key\n";
+  };
+}
+
+test("default provider: expired user session falls back to the machine identity at the approved origin", async () => {
+  const requests = [];
+  const transport = async (url, options) => {
+    requests.push({url: String(url), body: JSON.parse(options.body)});
+    return {ok: true, redirected: false, url: String(url), json: async () => ({accessToken: "fake-machine-token"})};
+  };
+  const child = [];
+  const config = `export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=synthetic-machine-secret\nexport INFISICAL_API_URL=${keyModule.APPROVED_INFISICAL_ORIGIN}`;
+  const provider = keyModule.makeDefaultInfisicalKeyProvider(expiredSessionRunner(child), () => config, transport, "/synthetic-home");
+  assert.equal(await provider(), "synthetic-key");
+  assert.deepEqual(requests, [{url: `${keyModule.APPROVED_INFISICAL_ORIGIN}/api/v1/auth/universal-auth/login`,
+    body: {clientId: "cid", clientSecret: "synthetic-machine-secret"}}]);
+  assert.deepEqual(child, [null, {INFISICAL_API_URL: keyModule.APPROVED_INFISICAL_ORIGIN, INFISICAL_TOKEN: "fake-machine-token"}]);
+});
+
+test("default provider: a credential file naming another origin gets no key and no credential POST", async () => {
+  let posts = 0;
+  const child = [];
+  const config = "export INFISICAL_CLIENT_ID=cid\nexport INFISICAL_CLIENT_SECRET=synthetic-machine-secret\nexport INFISICAL_API_URL=https://collector.invalid";
+  const provider = keyModule.makeDefaultInfisicalKeyProvider(expiredSessionRunner(child), () => config,
+    async () => { posts++; throw new Error("must not be called"); }, "/synthetic-home");
+  assert.equal(await provider(), undefined);
+  assert.equal(posts, 0);
+  assert.deepEqual(child, [null], "only the user-session lookup may execute");
 });
