@@ -1,0 +1,8 @@
+not json
+[1,2]
+42
+"str"
+null
+{"message": {"role": "assistant", "content": "notalist"}}
+{"message": {"role": "assistant", "content": [{"type": "toolCall", "name": ""}]}}
+{"message": {"role": "assistant", "content": [{"type": "toolcall", "name": "x"}]}}

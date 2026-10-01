@@ -1,0 +1,146 @@
+{
+ "t01-auto": {
+  "think_chars": 0,
+  "input": 39789,
+  "output": 1165,
+  "cost_usd": 0.004518
+ },
+ "t01-high": {
+  "think_chars": 111,
+  "input": 39835,
+  "output": 1644,
+  "cost_usd": 0.00462
+ },
+ "t02-auto": {
+  "think_chars": 289,
+  "input": 42977,
+  "output": 3951,
+  "cost_usd": 0.005406
+ },
+ "t02-high": {
+  "think_chars": 325,
+  "input": 44255,
+  "output": 5254,
+  "cost_usd": 0.005878
+ },
+ "t03-auto": {
+  "think_chars": 119,
+  "input": 80582,
+  "output": 1979,
+  "cost_usd": 0.008764
+ },
+ "t03-high": {
+  "think_chars": 0,
+  "input": 40306,
+  "output": 1554,
+  "cost_usd": 0.004729
+ },
+ "t04-auto": {
+  "think_chars": 0,
+  "input": 40362,
+  "output": 1162,
+  "cost_usd": 0.004575
+ },
+ "t04-high": {
+  "think_chars": 105,
+  "input": 40097,
+  "output": 1647,
+  "cost_usd": 0.004646
+ },
+ "t05-auto": {
+  "think_chars": 210,
+  "input": 86082,
+  "output": 4240,
+  "cost_usd": 0.010343
+ },
+ "t05-high": {
+  "think_chars": 520,
+  "input": 44482,
+  "output": 5551,
+  "cost_usd": 0.006208
+ },
+ "t06-auto": {
+  "think_chars": 0,
+  "input": 40466,
+  "output": 1390,
+  "cost_usd": 0.004789
+ },
+ "t06-high": {
+  "think_chars": 125,
+  "input": 40510,
+  "output": 1762,
+  "cost_usd": 0.004869
+ },
+ "t07-auto": {
+  "think_chars": 0,
+  "input": 39696,
+  "output": 1062,
+  "cost_usd": 0.004489
+ },
+ "t07-high": {
+  "think_chars": 87,
+  "input": 40225,
+  "output": 1485,
+  "cost_usd": 0.004628
+ },
+ "t08-auto": {
+  "think_chars": 373,
+  "input": 43060,
+  "output": 4290,
+  "cost_usd": 0.005796
+ },
+ "t08-high": {
+  "think_chars": 269,
+  "input": 41768,
+  "output": 3184,
+  "cost_usd": 0.005204
+ },
+ "t09-auto": {
+  "think_chars": 0,
+  "input": 40299,
+  "output": 1585,
+  "cost_usd": 0.004656
+ },
+ "t09-high": {
+  "think_chars": 403,
+  "input": 45786,
+  "output": 5574,
+  "cost_usd": 0.006675
+ },
+ "t10-auto": {
+  "think_chars": 169,
+  "input": 41236,
+  "output": 2549,
+  "cost_usd": 0.005021
+ },
+ "t10-high": {
+  "think_chars": 188,
+  "input": 42506,
+  "output": 3546,
+  "cost_usd": 0.005435
+ },
+ "t11-auto": {
+  "think_chars": 130,
+  "input": 41427,
+  "output": 2690,
+  "cost_usd": 0.00499
+ },
+ "t11-high": {
+  "think_chars": 359,
+  "input": 86622,
+  "output": 4734,
+  "cost_usd": 0.010092
+ },
+ "t12-auto": {
+  "think_chars": 605,
+  "input": 7115,
+  "output": 6002,
+  "cost_usd": 0.00247
+ },
+ "t12-high": {
+  "think_chars": 736,
+  "input": 44444,
+  "output": 6192,
+  "cost_usd": 0.005999
+ }
+}
