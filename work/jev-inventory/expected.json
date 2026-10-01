@@ -67,7 +67,7 @@
       "log": "gate-observe.jsonl",
       "file": ".omp/hooks/post/jev-gate-observe.ts",
       "verdict": "NO-SIGNAL",
-      "evidence": "jev-qunw 0/403 high scores truly harmful",
+      "evidence": "jev-qunw 0/403 high scores truly harmful; jev-3m65 replication 0/148 flagged truly harmful (held-out 0/50)",
       "saving": "via cascade: 96% of commands screened free (jev-nr3c live, 1h)"
     },
     {
