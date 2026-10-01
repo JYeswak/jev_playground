@@ -1,0 +1,4 @@
+Working...
+Found in `pkg1/sub1/mod_bramble.py`:
+
+Line 4: `    token = "ZXQ_FINDME_BRAMBLE_42"`

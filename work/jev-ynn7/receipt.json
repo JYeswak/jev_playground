@@ -1,0 +1,547 @@
+{
+ "pilot": [
+  {
+   "rid": "f01-control-pilot",
+   "success": true,
+   "tokens_locate": 29.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 119
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 4.1e-05,
+   "usage_rows": 2
+  },
+  {
+   "rid": "f01-treat-pilot",
+   "success": true,
+   "tokens_locate": 77.0,
+   "per_tool": {
+    "find": {
+     "calls": 1,
+     "chars": 308
+    },
+    "grep": {
+     "calls": 0,
+     "chars": 0
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 0.000242,
+   "usage_rows": 3
+  }
+ ],
+ "control": {
+  "n": 10,
+  "success": 8,
+  "tokens_per_success": 29.9,
+  "find_calls": 0,
+  "grep_calls": 10,
+  "spend": 0.000215
+ },
+ "treat": {
+  "n": 10,
+  "success": 10,
+  "tokens_per_success": 57.4,
+  "find_calls": 6,
+  "grep_calls": 4,
+  "spend": 0.00174
+ },
+ "total_spend": 0.002238,
+ "rows": [
+  {
+   "rid": "f10-treat",
+   "task": "f10",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 29.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 119
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 4.5e-05,
+   "usage_rows": 2
+  },
+  {
+   "rid": "f03-treat",
+   "task": "f03",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 74.8,
+   "per_tool": {
+    "find": {
+     "calls": 1,
+     "chars": 299
+    },
+    "grep": {
+     "calls": 0,
+     "chars": 0
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 0.000282,
+   "usage_rows": 5
+  },
+  {
+   "rid": "f04-control",
+   "task": "f04",
+   "arm": "control",
+   "success": false,
+   "tokens_locate": 30.2,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 121
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 4.2e-05,
+   "usage_rows": 2
+  },
+  {
+   "rid": "f03-control",
+   "task": "f03",
+   "arm": "control",
+   "success": true,
+   "tokens_locate": 31.2,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 125
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 0.0,
+   "usage_rows": 0
+  },
+  {
+   "rid": "f09-treat",
+   "task": "f09",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 30.2,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 121
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 4.1e-05,
+   "usage_rows": 2
+  },
+  {
+   "rid": "f05-control",
+   "task": "f05",
+   "arm": "control",
+   "success": true,
+   "tokens_locate": 29.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 119
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 4.1e-05,
+   "usage_rows": 2
+  },
+  {
+   "rid": "f01-control",
+   "task": "f01",
+   "arm": "control",
+   "success": true,
+   "tokens_locate": 29.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 119
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 1.8e-05,
+   "usage_rows": 1
+  },
+  {
+   "rid": "f10-control",
+   "task": "f10",
+   "arm": "control",
+   "success": true,
+   "tokens_locate": 29.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 119
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 4.1e-05,
+   "usage_rows": 2
+  },
+  {
+   "rid": "f07-treat",
+   "task": "f07",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 29.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 119
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 4.1e-05,
+   "usage_rows": 2
+  },
+  {
+   "rid": "f02-treat",
+   "task": "f02",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 76.2,
+   "per_tool": {
+    "find": {
+     "calls": 1,
+     "chars": 305
+    },
+    "grep": {
+     "calls": 0,
+     "chars": 0
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 0.000282,
+   "usage_rows": 5
+  },
+  {
+   "rid": "f02-control",
+   "task": "f02",
+   "arm": "control",
+   "success": false,
+   "tokens_locate": 30.2,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 121
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 1.8e-05,
+   "usage_rows": 1
+  },
+  {
+   "rid": "f05-treat",
+   "task": "f05",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 75.2,
+   "per_tool": {
+    "find": {
+     "calls": 1,
+     "chars": 301
+    },
+    "grep": {
+     "calls": 0,
+     "chars": 0
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 0.000242,
+   "usage_rows": 3
+  },
+  {
+   "rid": "f01-treat",
+   "task": "f01",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 77.0,
+   "per_tool": {
+    "find": {
+     "calls": 1,
+     "chars": 308
+    },
+    "grep": {
+     "calls": 0,
+     "chars": 0
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 0.000223,
+   "usage_rows": 2
+  },
+  {
+   "rid": "f08-treat",
+   "task": "f08",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 75.0,
+   "per_tool": {
+    "find": {
+     "calls": 1,
+     "chars": 300
+    },
+    "grep": {
+     "calls": 0,
+     "chars": 0
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 0.000282,
+   "usage_rows": 5
+  },
+  {
+   "rid": "f08-control",
+   "task": "f08",
+   "arm": "control",
+   "success": true,
+   "tokens_locate": 28.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 115
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 0.0,
+   "usage_rows": 0
+  },
+  {
+   "rid": "f07-control",
+   "task": "f07",
+   "arm": "control",
+   "success": true,
+   "tokens_locate": 29.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 119
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 1.8e-05,
+   "usage_rows": 1
+  },
+  {
+   "rid": "f09-control",
+   "task": "f09",
+   "arm": "control",
+   "success": true,
+   "tokens_locate": 30.2,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 121
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 1.9e-05,
+   "usage_rows": 1
+  },
+  {
+   "rid": "f06-treat",
+   "task": "f06",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 29.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 119
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 4.1e-05,
+   "usage_rows": 2
+  },
+  {
+   "rid": "f06-control",
+   "task": "f06",
+   "arm": "control",
+   "success": true,
+   "tokens_locate": 29.8,
+   "per_tool": {
+    "find": {
+     "calls": 0,
+     "chars": 0
+    },
+    "grep": {
+     "calls": 1,
+     "chars": 119
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 1.8e-05,
+   "usage_rows": 1
+  },
+  {
+   "rid": "f04-treat",
+   "task": "f04",
+   "arm": "treat",
+   "success": true,
+   "tokens_locate": 76.2,
+   "per_tool": {
+    "find": {
+     "calls": 1,
+     "chars": 305
+    },
+    "grep": {
+     "calls": 0,
+     "chars": 0
+    },
+    "glob": {
+     "calls": 0,
+     "chars": 0
+    }
+   },
+   "n_result_rows": 2,
+   "spend": 0.000261,
+   "usage_rows": 4
+  }
+ ]
+}

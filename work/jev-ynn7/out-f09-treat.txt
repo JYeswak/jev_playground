@@ -1,0 +1,4 @@
+Working...
+Path: `pkg2/sub0/mod_saffron.py`
+
+Full line 4: `    token = "ZXQ_FINDME_SAFFRON_42"`

@@ -1,0 +1,4 @@
+Working...
+Path: `pkg1/sub3/mod_onyx.py`
+
+Full line 4: `    token = "ZXQ_FINDME_ONYX_42"`

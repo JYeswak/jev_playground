@@ -1,0 +1,4 @@
+Working...
+Path: `pkg0/sub2/mod_mirage.py`
+
+Full line 4: `    token = "ZXQ_FINDME_MIRAGE_42"`

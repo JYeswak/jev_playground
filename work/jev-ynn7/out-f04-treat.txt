@@ -1,0 +1,4 @@
+Working...
+Path: `pkg0/sub3/mod_halcyon.py`
+
+Full line 4: `    token = "ZXQ_FINDME_HALCYON_42"`
