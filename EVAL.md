@@ -3322,3 +3322,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Live:** 100/100 Noul `jev-1.13.0`, 0 retries, ~0.3s/call, 62,643 in-tok, spend ~$0.0026, no 401/402/403. Rows `var/agent-tmp-wb7j-live100.jsonl` (git-ignored scratch).
 - **Result:** dropped 68/100, relevant-dropped 1 (id 53); precision(drop)=67/68=0.985 PASS; token_reduction=0.656 PASS. Converges with held-out 0.978 direction.
 - **Boundary / NO-CLAIM:** prompts truncated to 1500 chars, memories to 800; no hook built. Design lives in `jev-7vn9` (OrangeFrog, in_progress); duplicate `jev-89kj` closed. Bead left in_progress for non-author verifier.
+
+## 2026-10-01 ttsr-audit (WindyLantern): judged-rule precision per rule, 1 retired [offline]
+
+- **Scope:** 7d session census (`~/.omp/agent/sessions` + profiles, 355 files w/ mtime>=2026-09-24): 1,447 ttsr_injection rows (36 rules) + 534 purpose=ttsr calls, $0.0131 (~$0.0019/day; packet's ~360/day claim NOT reproduced, measured ~76/day). Per-rule cost unattributable (usage rows carry no rule field).
+- **Bar (bead jev-u05b comment, pre-labeling):** >=20 injections -> blind-label 30 sampled (seed 20261001, top-up 20261002); precision>=0.80 keeps, below retires (in-repo) or reports (out-of-repo).
+- **Result:** claim-without-evidence 30/30 (bare "DONE"; already retired, still firing); bash-pipe-exit 14/18=0.78; bash-glob-silenced 12/24=0.50; jev-key-canonical-source 0/26 -> RETIRED (moved to `.omp/rules/disabled`, NEGATIVE_EVIDENCE R132); kit-test-skip 0/30, kit-close-reason-no-evidence 0/21, use-localbench-cli 0/30, no-head-tail 0/30, page-not-population 0/20, ts-no-tiny-functions 0/30, ts-set-map 0/30, ts-import-type 0/30, ts-no-dynamic-import 0/25, ts-no-local-is-record 0/21. Exclusions disclosed per rule (blocked/interrupt triggers cut from transcript; truncated stored commands).
+- **Boundary / NO-CLAIM:** offline labeling, $0 spend, no live calls. Interrupt-mode precisions are one-sided (true triggers unobservable). Bead left in_progress for named verifier; no `br close` by me.
