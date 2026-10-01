@@ -104,9 +104,9 @@ export async function hintSkills(options: {
 }): Promise<HintResult> {
   const model = options.model ?? SKILL_HINT_MODEL;
   const cut = options.confidenceCut ?? SKILL_HINT_CONFIDENCE_CUT;
-  const prompt = options.prompt.trim().slice(0, 2000);
-  if (!prompt) return { hint: null, reason: "empty-prompt", model, latencyMs: 0 };
-  const short = shortlistSkills(prompt, options.roster);
+  const fullPrompt = options.prompt.trim();
+  if (!fullPrompt) return { hint: null, reason: "empty-prompt", model, latencyMs: 0 };
+  const short = shortlistSkills(fullPrompt, options.roster);
   if (short.length === 0) return { hint: null, reason: "no-shortlist", model, latencyMs: 0 };
   const classes: Record<string, string | null> = {};
   for (const entry of short) classes[entry.name] = entry.description || null;
@@ -116,7 +116,7 @@ export async function hintSkills(options: {
   let answer: JevChoiceResult;
   try {
     answer = await options.ask({
-      state: { prompt },
+      state: { prompt: fullPrompt.slice(0, 400) },
       instructions: "Which skill should the agent read before handling this prompt?",
       classes,
       model,
