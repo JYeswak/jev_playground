@@ -4801,3 +4801,17 @@ paired `opened/used next` join is specified before the shadow starts.
 **Verdict:** RETIRED per bar. Moved `.omp/rules/jev-key-canonical-source.md` -> `.omp/rules/disabled/`. The canonical form remains documented in AGENTS.md. **Retry-condition:** a new false-absence report (agent claims key missing) tied to a session where the reminder did not fire.
 
 **Wider audit result (same bead):** 13 other rules with >=20 injections labeled: claim-without-evidence 30/30 (all bare assistant "DONE"; already retired 2026-10-01 yet still firing 125x — retirement not effective, hooks/rules not reloaded); bash-pipe-exit 14/18=0.78 (below bar; `~/.agents/rules`, reported not edited); bash-glob-silenced 12/24=0.50 (condition regex overfires on quoted `--include` and literal paths; `~/.agents/rules`); all others 0.00 over observable triggers — kit-test-skip 0/30 (fires on reads incl. its own rule file; 16 blocked-edit interrupts excluded unverifiable), kit-close-reason-no-evidence 0/21 (interrupt-mode: visible parents are bystander calls, blocked content cut from transcript), use-localbench-cli 0/30, no-head-tail 0/30 (fires on the rule's own prescribed capture-whole pattern), page-not-population 0/20, ts-no-tiny-functions 0/30, ts-set-map 0/30, ts-import-type 0/30, ts-no-dynamic-import 0/25, ts-no-local-is-record 0/21. Structural caveat: interrupt-mode true triggers are unobservable in session files, so those precisions are one-sided (false-positive rate over observable firings). Non-jev-repo rules reported with paths, not edited. Spend $0 (offline labeling, no live calls).
+
+## R133 — VEIN-EXHAUSTED: per-prompt Jev skill hint fires usefully (2026-10-01)
+
+**Hypothesis:** a before_agent_start extension (lexical shortlist <= 20 over skill name+description, one Jev Choice + 'none', inject on confidence >= 0.5) raises skill reads per session without misdirection (bead jev-4nyy).
+
+**What was tried:** H1 stopword-filtered shortlist tokens (R131: dev recall 5/12 -> 7/12 but 5 misroutes where pre-H1 misses were silence only; shipped 4d0e76c5, reverted abbfdce8); cut-0.7 threshold variant; N1; N2 48-pair comparison with receipt aggregates only and no pre-call bar. N2 ruling (conductor): 0/48 hints — safe but useless.
+
+**Trade-off (measured):** every recall gain came with misroutes; silence (no hint) was strictly safer than a wrong hint. Precision never reached shippable: hint path stayed OFF (extension disabled) throughout.
+
+**Verdict:** VEIN-EXHAUSTED for lexical-shortlist + Choice designs. Extension stays OFF.
+
+**Retry-condition:** a new design scores >= 25% hint rate AND 0 misroutes on a committed per-row dev set (rows committed before the first live call, each row carrying its must-not-misroute cases). Stopword/IDF/width/stem/density/body/cut variants are dead without a semantic-matching design. Reopen cites this row.
+
+**Evidence:** R131 (H1 numbers, commits 4d0e76c5/abbfdce8, receipts work/skill-routing/receipt-jev-4nyy-h1.json, -autopsy.json, -r2.json); bead jev-4nyy deferred 2026-10-01 with autopsy/H1/reconcile comments.
