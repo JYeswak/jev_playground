@@ -2,8 +2,8 @@
 // web results outside the jev repo. No-ops inside /Users/josh/Developer/jev
 // (project hooks cover it); enforces nothing anywhere (enforce: false) and
 // never touches process.env: shadow mode travels as a factory option.
-import { makeWebscreenHandler } from "../../.omp/hooks/post/jev-webscreen.ts";
-import { useInfisicalKey } from "../jev-client/src/use-infisical-key.ts";
+import { makeWebscreenHandler } from "/Users/josh/Developer/jev/.omp/hooks/post/jev-webscreen.ts";
+import { useInfisicalKey } from "/Users/josh/Developer/jev/work/jev-client/src/use-infisical-key.ts";
 
 const REPO = "/Users/josh/Developer/jev";
 
