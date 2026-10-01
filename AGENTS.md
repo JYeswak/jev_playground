@@ -104,9 +104,9 @@ native calls; cost is not the deciding factor, quality and latency are.
 | smart stop | native, `features.unexpectedStopDetection: smart` | did the agent promise and stop? | ON 2026-09-30, proven live both ways |
 | judge role | `~/.omp/agent/config.yml` + profile configs | backend for the three above | `typesafe/jev-latest`; key command-resolved in `models.yml`; local `ollama-sys1` provider declared, inert |
 | project tools | `.omp/tools/*.ts`, `.omp/extensions/` | rerank, claim check, classify, gate, flag, screen | callable `xd://jev_*` devices |
-| project hooks | `.omp/hooks/post/` | gate-observe, webscreen, web-search rerank, injection shadow | being re-armed live (beads `jev-kk2u`, `jev-qg1j`, `jev-bzl7`, `jev-asbl`) |
-| find-rank logger | `.omp/hooks/post/jev-find-rank.ts` | none (measures find follow-through) | ON |
-| worker continuation | `.omp/hooks/post/session-stop.ts` | none | ON |
+| project hooks | `.omp/hooks/post/` | bash risk (gate-observe), web-result injection (webscreen), web_search pick (rerank) | live shadow on `jev-1.13.0`, capped per day, fail open, log only; injection-shadow on tool results in progress (`jev-asbl`) |
+| claim rule | `.omp/rules/claim-without-evidence.md` | does a reply claim a result without evidence? | ON in this repo (judged TTSR, never interrupts); global after organic precision data |
+| fleet watcher | `scripts/fleet-idle-watch.py` (hub service) | is an idle worker waiting on a human? | ON: pages pane 1 on idle, needs-human (`jev-1.13.0` Noul), CI, stranger run, key exposure |
 
 Scoreboard (bead `jev-4970`): `python3 work/omp-jev-review/surface-census.py --scoreboard --days 7`.
 
