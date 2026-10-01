@@ -1,0 +1,6 @@
+{"message": {"role": "assistant", "content": [{"type": "toolCall", "name": "read"}]}}
+not json at all
+{"message": {"role": "assistant", "content": [{"type": "toolCall", "name": "bash"}, {"type": "text"}]}}
+[1,2,3]
+{"message": {"role": "user", "content": [{"type": "toolCall", "name": "read"}]}}
+{"message": {"role": "assistant", "content": [{"type": "toolCall"}, {"type": "toolCall", "name": 7}]}}
