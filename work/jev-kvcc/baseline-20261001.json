@@ -1,0 +1,41 @@
+{
+  "days": 7,
+  "window": 5,
+  "cwd": "",
+  "tools": {
+    "find": {
+      "calls_with_paths": 222,
+      "located": 141,
+      "located_rate": 0.6351,
+      "located_ci95": [
+        0.57,
+        0.6957
+      ],
+      "tokens_per_located": 576.3,
+      "control_located": 4
+    },
+    "grep": {
+      "calls_with_paths": 2681,
+      "located": 889,
+      "located_rate": 0.3316,
+      "located_ci95": [
+        0.314,
+        0.3496
+      ],
+      "tokens_per_located": 5300.9,
+      "control_located": 37
+    },
+    "glob": {
+      "calls_with_paths": 138,
+      "located": 9,
+      "located_rate": 0.0652,
+      "located_ci95": [
+        0.0347,
+        0.1193
+      ],
+      "tokens_per_located": 2007.0,
+      "control_located": 0
+    }
+  }
+}
+BAR PASS: find 576.3 vs grep 5300.9 tokens/located
