@@ -36,7 +36,7 @@
  * paid calls only. Default CASCADE_ENABLED=false keeps the legacy direct-paid flow.
  */
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { appendFile, mkdir, open } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
@@ -60,6 +60,7 @@ export const LOCAL_MODEL = "nimble:latest";
 export const LOCAL_GATEWAY = "http://127.0.0.1:11300/omp-profile/default/v1/systemone";
 export const LOCAL_TIMEOUT_MS = 5000;
 export const MAX_DAILY_PAID_CALLS = 1000;
+export const CASCADE_OFF_REL = "state/jev/cascade-off";
 export const LOG_REL = "state/jev/gate-observe.jsonl";
 export const SIDECAR_REL = "state/jev/gate-observe-full.jsonl";
 export const SIDECAR_MODE = 0o600;
@@ -178,6 +179,10 @@ export interface ObserveDeps {
   localAsker?: (args: AskArgs) => Promise<AskResult>;
   /** Cascade switch; defaults to CASCADE_ENABLED (false until 8w0h closes). */
   cascade?: boolean;
+  /** Runtime cascade-off switch file; defaults to ~/.local/state/jev/cascade-off. */
+  cascadeOffFile?: string;
+  /** Existence check for the switch file; defaults to existsSync. */
+  fsExists?: (p: string) => boolean;
   append?: (path: string, line: string) => Promise<void>;
   logPath?: string;
   filter?: (command: string) => { drop: boolean; reason?: string };
@@ -355,6 +360,14 @@ export async function observe(
       return undefined;
     }
     const cascade = deps.cascade ?? CASCADE_ENABLED;
+    // Per-call runtime switch (no pane restart): file presence skips nimble.
+    let cascadeOff = false;
+    try {
+      cascadeOff = (deps.fsExists ?? existsSync)(deps.cascadeOffFile ?? join(homedir(), ".local", CASCADE_OFF_REL));
+    } catch {
+      cascadeOff = false;
+    }
+    const effectiveCascade = cascade && !cascadeOff;
     const budget = deps.dailyBudget ?? processDailyBudget;
     const day = base.ts.slice(0, 10);
     if (budget.day !== day) {
@@ -363,7 +376,7 @@ export async function observe(
     }
     // The shared daily budget counts PAID calls only; the free local screen
     // never consumes it. The legacy path keeps its 100/day cap.
-    const paidCap = deps.dailyCap ?? (cascade ? MAX_DAILY_PAID_CALLS : MAX_DAILY_CALLS);
+    const paidCap = deps.dailyCap ?? (effectiveCascade ? MAX_DAILY_PAID_CALLS : MAX_DAILY_CALLS);
     // Cascade screen (inactive until jev-8w0h is verified-closed): nimble
     // clears benign commands before any paid call. Fail open throughout.
     // A failed local screen (throw, not-ok, invalid scores) falls through to
@@ -371,7 +384,7 @@ export async function observe(
     // so no command goes unscreened on a saturated local GPU.
     let nimbleProbs: Record<string, number> | null = null;
     let paidFallback = false;
-    if (cascade) {
+    if (effectiveCascade) {
       let screen: AskResult | null = null;
       try {
         screen = await (deps.localAsker ?? liveLocalAsker)({
@@ -459,6 +472,9 @@ export async function observe(
       const score = probs[key];
       if (typeof score === "number" && Number.isFinite(score) && score > maxScore) maxScore = score;
     }
+    let screenLabel: string | null = null;
+    if (cascadeOff) screenLabel = "paid-cascade-off";
+    else if (paidFallback) screenLabel = "paid-fallback";
     await write({
       ...base,
       status: "scored",
@@ -471,7 +487,7 @@ export async function observe(
       error: null,
       nimbleProbs,
       jevSkipped: cascade ? false : null,
-      screen: paidFallback ? "paid-fallback" : null,
+      screen: screenLabel,
     });
     return undefined;
   } catch {
