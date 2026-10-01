@@ -5,11 +5,11 @@ flowchart LR
     find["omp find tool<br/>WORKS<br/>expect on"]
     auto_thinking["auto-thinking<br/>NO-WIN-EASY<br/>expect on"]
     smart_stop["smart stop<br/>IDLE-BY-DESIGN<br/>expect on"]
-    ttsr_judged["judged TTSR rules<br/>PARTIAL<br/>expect on"]
+    ttsr_judged["judged TTSR rules<br/>WORKS<br/>expect on"]
   end
   subgraph hook["project hooks (shadow, log only)"]
     gate_observe["bash risk shadow<br/>NO-SIGNAL<br/>expect on"]
-    injection_shadow["tool-result injection shadow<br/>WORKS-NO-BENEFIT-YET<br/>expect on"]
+    injection_shadow["tool-result injection shadow<br/>ENFORCING<br/>expect on"]
     webscreen["web-result screen<br/>ENFORCING<br/>expect on"]
     websearch_rerank["web_search rerank shadow<br/>NO-BENEFIT<br/>expect on"]
     gate_cascade["gate nimble-then-Jev cascade<br/>WORKS<br/>expect on"]
@@ -48,5 +48,5 @@ flowchart LR
   classDef off fill:#e6e6e6,stroke:#777,stroke-dasharray:4 3
   class auto_thinking,smart_stop,gate_observe,websearch_rerank nobenefit
   class skill_hint,claim_rule,local_sys1 off
-  class ttsr_judged,injection_shadow,memory_filter unproven
-  class find,webscreen,needs_human,key_wrapper,agents_trim,gate_cascade works
+  class memory_filter unproven
+  class find,ttsr_judged,injection_shadow,webscreen,needs_human,key_wrapper,agents_trim,gate_cascade works

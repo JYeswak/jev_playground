@@ -260,6 +260,7 @@ def mermaid(expected: dict, live: dict | None) -> str:
 # its verdict is not a measured outcome, or when it is ON and its saving was never measured.
 PROVEN_VERDICTS = {
     "WORKS",
+    "ENFORCING",
     "NO-SIGNAL",
     "NO-BENEFIT",
     "IDLE-BY-DESIGN",

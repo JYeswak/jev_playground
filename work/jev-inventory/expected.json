@@ -18,8 +18,8 @@
       "expect": "on",
       "purpose": "find",
       "verdict": "WORKS",
-      "evidence": "jev-f1le verified: follow-through 331/444 (74.5%), top-3 305/331 (92%), bar >= grep and top-3 >= 60% PASS",
-      "saving": "agents open a returned file 74.5% of the time (no token saving measured)"
+      "evidence": "jev-f1le + jev-04q2 verified",
+      "saving": "find 576 tokens per located file vs grep 5,293 (7d, jev-04q2)"
     },
     {
       "id": "auto-thinking",
@@ -53,9 +53,9 @@
       "how": "ttsr question: rules",
       "expect": "on",
       "purpose": "ttsr",
-      "verdict": "PARTIAL",
-      "evidence": "claim-without-evidence rule refuted R130, retired 452c6ef9",
-      "saving": "none measured"
+      "verdict": "WORKS",
+      "evidence": "jev-u05b verified: per-rule precision; rules < 0.8 retired (R132)",
+      "saving": "claim rule 30/30 kept; key-source 0/26 and others retired"
     },
     {
       "id": "gate-observe",
@@ -79,9 +79,9 @@
       "expect": "on",
       "log": "injection-shadow.jsonl",
       "file": ".omp/hooks/post/jev-injection-shadow.ts",
-      "verdict": "WORKS-NO-BENEFIT-YET",
-      "evidence": "jev-asbl closed (plant 0.93 vs clean 0.08)",
-      "saving": "none measured"
+      "verdict": "ENFORCING",
+      "evidence": "jev-rud1 verified (clean 0/222, catch 268/300); enforce 3141ed3f verified 9/10",
+      "saving": "1 true injection flagged in 247 real results (7d)"
     },
     {
       "id": "webscreen",
@@ -93,8 +93,8 @@
       "log": "webscreen-shadow.jsonl",
       "file": ".omp/hooks/post/jev-webscreen.ts",
       "verdict": "ENFORCING",
-      "evidence": "jev-eo40 QUALIFIED (FPR 1.43%, catch 89.3%, Jev-alone 0/350) verified+closed; jev-3ogk live traffic 7d: 357 web results, 1 session-visible withhold (OWASP-example FP under pre-Jev-only code; agent abandoned the line), 0 withholds since Jev-only enforce; planted benign OWASP search delivered live (scores 0.03/0.13, spend $0.000053)",
-      "saving": "none"
+      "evidence": "jev-eo40 + jev-3ogk verified",
+      "saving": "0 withheld since Jev-only enforce in 363 real events (7d)"
     },
     {
       "id": "websearch-rerank",
@@ -142,8 +142,8 @@
       "expect": "on",
       "process": "fleet-idle-watch.py",
       "verdict": "WORKS",
-      "evidence": "jev-5qx8 live page 05:48Z true positive; jev-7aj1 controlled 10/10 recall, 0/10 false pages, organic 1/1 pages true + 0/13 misses",
-      "saving": "conductor attention (not quantified)"
+      "evidence": "jev-5qx8 + jev-7aj1 verified: recall 10/10, 0/10 false pages",
+      "saving": "no time saving: paged waits 6.9 min vs unpaged median 5.4 min"
     },
     {
       "id": "key-wrapper",
