@@ -1,0 +1,49 @@
+flowchart LR
+  JEV(["TypeSafe API jev-1.13.0"])
+  LOCAL(["local Ollama nimble/tev1"])
+  subgraph native["omp native judge (TypeSafe jev-1.13.0)"]
+    find["omp find tool<br/>UNPROVEN<br/>expect on"]
+    auto_thinking["auto-thinking<br/>UNMEASURED<br/>expect on"]
+    smart_stop["smart stop<br/>IDLE-BY-DESIGN<br/>expect on"]
+    ttsr_judged["judged TTSR rules<br/>PARTIAL<br/>expect on"]
+  end
+  subgraph hook["project hooks (shadow, log only)"]
+    gate_observe["bash risk shadow<br/>NO-SIGNAL<br/>expect on"]
+    injection_shadow["tool-result injection shadow<br/>WORKS-NO-BENEFIT-YET<br/>expect on"]
+    webscreen["web-result screen<br/>NO-BENEFIT<br/>expect on"]
+    websearch_rerank["web_search rerank shadow<br/>NO-BENEFIT<br/>expect on"]
+  end
+  subgraph extension["project extensions"]
+    skill_hint["per-prompt skill hint<br/>OFF-MISROUTES<br/>expect off"]
+  end
+  subgraph rule["judged rules"]
+    claim_rule["claim-without-evidence rule<br/>REFUTED<br/>expect off"]
+  end
+  subgraph fleet["fleet"]
+    needs_human["fleet needs-human page<br/>WORKS<br/>expect on"]
+  end
+  subgraph infra["infrastructure"]
+    key_wrapper["TypeSafe key wrapper<br/>WORKS<br/>expect on"]
+    local_sys1["local System One (Ollama)<br/>LOSES-TO-JEV<br/>expect inert"]
+    agents_trim["AGENTS.md right-size<br/>WORKS<br/>expect on"]
+  end
+  JEV --> find
+  JEV --> auto_thinking
+  JEV --> smart_stop
+  JEV --> ttsr_judged
+  JEV --> gate_observe
+  JEV --> injection_shadow
+  JEV --> webscreen
+  JEV --> websearch_rerank
+  JEV --> needs_human
+  LOCAL -.-> local_sys1
+  LOCAL -. cascade jev-8w0h offline 81% fewer paid calls .-> gate_observe
+  key_wrapper --> JEV
+  classDef works fill:#d4f7d4,stroke:#2a7a2a
+  classDef unproven fill:#fff3c4,stroke:#9a7a00
+  classDef nobenefit fill:#ffe0c2,stroke:#a85a00
+  classDef off fill:#e6e6e6,stroke:#777,stroke-dasharray:4 3
+  class smart_stop,gate_observe,webscreen,websearch_rerank nobenefit
+  class skill_hint,claim_rule,local_sys1 off
+  class find,auto_thinking,ttsr_judged,injection_shadow unproven
+  class needs_human,key_wrapper,agents_trim works
