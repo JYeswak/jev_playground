@@ -93,7 +93,7 @@
       "log": "webscreen-shadow.jsonl",
       "file": ".omp/hooks/post/jev-webscreen.ts",
       "verdict": "ENFORCING",
-      "evidence": "jev-eo40 QUALIFIED (FPR 1.43%, catch 89.3%, Jev-alone 0/350); PENDING-VERIFY until OrangeFrog closes",
+      "evidence": "jev-eo40 QUALIFIED (FPR 1.43%, catch 89.3%, Jev-alone 0/350) verified+closed; jev-3ogk live traffic 7d: 357 web results, 1 session-visible withhold (OWASP-example FP under pre-Jev-only code; agent abandoned the line), 0 withholds since Jev-only enforce; planted benign OWASP search delivered live (scores 0.03/0.13, spend $0.000053)",
       "saving": "none"
     },
     {

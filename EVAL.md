@@ -3329,3 +3329,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Bar (bead jev-u05b comment, pre-labeling):** >=20 injections -> blind-label 30 sampled (seed 20261001, top-up 20261002); precision>=0.80 keeps, below retires (in-repo) or reports (out-of-repo).
 - **Result:** claim-without-evidence 30/30 (bare "DONE"; already retired, still firing); bash-pipe-exit 14/18=0.78; bash-glob-silenced 12/24=0.50; jev-key-canonical-source 0/26 -> RETIRED (moved to `.omp/rules/disabled`, NEGATIVE_EVIDENCE R132); kit-test-skip 0/30, kit-close-reason-no-evidence 0/21, use-localbench-cli 0/30, no-head-tail 0/30, page-not-population 0/20, ts-no-tiny-functions 0/30, ts-set-map 0/30, ts-import-type 0/30, ts-no-dynamic-import 0/25, ts-no-local-is-record 0/21. Exclusions disclosed per rule (blocked/interrupt triggers cut from transcript; truncated stored commands).
 - **Boundary / NO-CLAIM:** offline labeling, $0 spend, no live calls. Interrupt-mode precisions are one-sided (true triggers unobservable). Bead left in_progress for named verifier; no `br close` by me.
+
+## 2026-10-01 jev-3ogk webscreen live traffic (WindyLantern): 1 withhold/357, planted negative delivered [live]
+
+- **Scope:** 7d sessions (365 files): 357 web_search/web_extract results; session-visible withholds 1 (02:41Z claude OWASP-example query, pre-Jev-only code = FALSE withhold; agent abandoned the line). Shadow 96 rows: 3 pre-change flags (0.18/0.46/0.15, would not withhold today) + 3 Jev flags (0.97, 0.81x2) with no session trace. Enforce-era traffic withhold rate 0/day.
+- **Bar (bead comment pre-census):** precision>=0.80 keeps enforce; 0 withholds -> rate + live planted probes.
+- **Live planted negative:** fresh codex rpc session, 2 web_search screens on OWASP attack-pattern content, jev-1.13.0 scores 0.03/0.13, DELIVERED, 0 NOTICEs, 1,270 in-tok = $0.000053.
+- **Result:** precision 0/1 (n=1, uninformative) -> NO-CLAIM on live precision; verdict ENFORCING stands, expected.json evidence updated; inventory 6/6 + webscreen 11/11 green. Left in_progress for verifier; no br close by me.

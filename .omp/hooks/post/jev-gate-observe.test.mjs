@@ -442,16 +442,45 @@ test("cascade: nimble-positive reaches the paid asker with both scores logged", 
   assert.equal(wrote[0].row.model, "test-model");
 });
 
-test("cascade: gateway error is not-run and the paid asker never runs", async () => {
+test("cascade: local timeout falls back to paid and logs screen=paid-fallback", async () => {
+  reset();
+  let paid = 0;
+  const asker = async () => { paid++; return scoredAsker(); };
+  const localAsker = async () => ({ ok: false, reason: "gateway-unreachable", error: "timeout 5001ms", latencyMs: 5001 });
+  const budget = { day: "", calls: 0 };
+  await observe({ toolName: "bash", input: { command: "rm -rf /tmp/x" } },
+    { ...cascadeMem, asker, localAsker, dailyBudget: budget });
+  assert.equal(paid, 1, "a timed-out local screen must spend one paid call");
+  assert.equal(wrote[0].row.status, "scored");
+  assert.equal(wrote[0].row.screen, "paid-fallback");
+  assert.equal(wrote[0].row.nimbleProbs, null);
+  assert.equal(wrote[0].row.jevSkipped, false);
+  assert.equal(wrote[0].row.flag, true);
+  assert.equal(budget.calls, 1, "fallback consumes the paid budget");
+});
+
+test("cascade: local throw falls back to paid and logs screen=paid-fallback", async () => {
   reset();
   let paid = 0;
   const asker = async () => { paid++; return scoredAsker(); };
   const localAsker = async () => { throw new Error("gateway down"); };
   await observe({ toolName: "bash", input: { command: "ls" } },
     { ...cascadeMem, asker, localAsker, dailyBudget: { day: "", calls: 0 } });
-  assert.equal(paid, 0);
+  assert.equal(paid, 1);
+  assert.equal(wrote[0].row.status, "scored");
+  assert.equal(wrote[0].row.screen, "paid-fallback");
+});
+
+test("cascade: fallback under an exhausted paid budget stays not-run on daily-cap", async () => {
+  reset();
+  let paid = 0;
+  const asker = async () => { paid++; return scoredAsker(); };
+  const localAsker = async () => ({ ok: false, reason: "gateway-unreachable", error: "timeout 5002ms", latencyMs: 5002 });
+  await observe({ toolName: "bash", input: { command: "ls" } },
+    { ...cascadeMem, asker, localAsker, dailyBudget: { day: "2026-09-24", calls: 1000 }, dailyCap: 1000 });
+  assert.equal(paid, 0, "paid cap still applies on fallback");
   assert.equal(wrote[0].row.status, "not-run");
-  assert.match(wrote[0].row.error, /NOT_RUN reason=local-screen-threw/);
+  assert.match(wrote[0].row.error, /NOT_RUN reason=daily-cap/);
 });
 
 test("cascade: nimble-cleared commands do not consume the paid budget", async () => {

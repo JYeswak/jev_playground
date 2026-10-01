@@ -30,8 +30,10 @@
  * Cascade (bead jev-nr3c, INACTIVE until jev-8w0h is verified-closed): with
  * `cascade: true`, nimble screens first via the localbench gateway and only
  * nimble-flagged commands reach paid Jev (paid cap MAX_DAILY_PAID_CALLS).
- * Nimble-cleared rows log jevSkipped:true; the paid budget counts paid calls
- * only. Default CASCADE_ENABLED=false keeps the legacy direct-paid flow.
+ * A failed local screen (timeout/error/invalid) falls back to the paid call
+ * (paid cap still applies) with screen=paid-fallback, so no command goes
+ * unscreened. Nimble-cleared rows log jevSkipped:true; the paid budget counts
+ * paid calls only. Default CASCADE_ENABLED=false keeps the legacy direct-paid flow.
  */
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -106,6 +108,7 @@ export const FILTERS: Filters | null = loadOwnedFilters();
 export const ROW_KEYS = [
   "ts", "session", "cmdSha", "cmd", "status", "model", "probs", "flag",
   "latencyMs", "tokens", "skipped", "error", "nimbleProbs", "jevSkipped",
+  "screen",
 ] as const;
 export type RowStatus = "scored" | "skipped" | "not-run" | "error";
 export interface ObserveRow {
@@ -124,7 +127,8 @@ export interface ObserveRow {
   /** Cascade only: nimble screen scores (null on the legacy path). */
   nimbleProbs: Record<string, number> | null;
   /** Cascade only: true when nimble cleared the command and paid Jev never ran. */
-  jevSkipped: boolean | null;
+  /** Cascade only: "paid-fallback" when the paid call ran because the local screen failed (timeout/error/invalid). Null otherwise. */
+  screen: "paid-fallback" | null;
 }
 
 
@@ -337,17 +341,17 @@ export async function observe(
       verdict = { drop: true, reason: "filter-error" };
     }
     if (verdict.drop) {
-      await write({ ...base, status: "skipped", probs: null, flag: null, latencyMs: null, tokens: null, skipped: verdict.reason === "filter-error" ? "filter-error" : "secret", error: null, nimbleProbs: null, jevSkipped: null });
+      await write({ ...base, status: "skipped", probs: null, flag: null, latencyMs: null, tokens: null, skipped: verdict.reason === "filter-error" ? "filter-error" : "secret", error: null, nimbleProbs: null, jevSkipped: null, screen: null });
       return undefined;
     }
     if (!session.trim() || session === "unknown") {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=session-unavailable", nimbleProbs: null, jevSkipped: null });
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=session-unavailable", nimbleProbs: null, jevSkipped: null, screen: null });
       return undefined;
     }
     const now = (deps.nowMs ?? Date.now)();
     const until = billingHoldActive(now);
     if (until !== null) {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=billing-hold until=" + new Date(until).toISOString(), nimbleProbs: null, jevSkipped: null });
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=billing-hold until=" + new Date(until).toISOString(), nimbleProbs: null, jevSkipped: null, screen: null });
       return undefined;
     }
     const cascade = deps.cascade ?? CASCADE_ENABLED;
@@ -362,9 +366,13 @@ export async function observe(
     const paidCap = deps.dailyCap ?? (cascade ? MAX_DAILY_PAID_CALLS : MAX_DAILY_CALLS);
     // Cascade screen (inactive until jev-8w0h is verified-closed): nimble
     // clears benign commands before any paid call. Fail open throughout.
+    // A failed local screen (throw, not-ok, invalid scores) falls through to
+    // the paid call below (paid cap still applies) with screen=paid-fallback,
+    // so no command goes unscreened on a saturated local GPU.
     let nimbleProbs: Record<string, number> | null = null;
+    let paidFallback = false;
     if (cascade) {
-      let screen: AskResult;
+      let screen: AskResult | null = null;
       try {
         screen = await (deps.localAsker ?? liveLocalAsker)({
           state: { command, context: STATE_CONTEXT },
@@ -372,45 +380,47 @@ export async function observe(
           model: LOCAL_MODEL,
           timeoutMs: LOCAL_TIMEOUT_MS,
         });
-      } catch (err) {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=local-screen-threw: " + (err instanceof Error ? err.message : String(err)), nimbleProbs: null, jevSkipped: null });
-        return undefined;
+      } catch {
+        paidFallback = true;
       }
-      if (!screen.ok) {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: screen.latencyMs ?? null, tokens: null, skipped: null, error: "NOT_RUN reason=local-screen-" + (screen.reason ?? "unknown"), nimbleProbs: null, jevSkipped: null });
-        return undefined;
-      }
-      const scores = screen.scores ?? {};
-      let top = -Infinity;
-      for (const key in scores) {
-        const score = scores[key];
-        if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 1) top = NaN;
-        else if (score > top) top = score;
-      }
-      if (!Number.isFinite(top)) {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: screen.latencyMs ?? null, tokens: null, skipped: null, error: "NOT_RUN reason=local-screen-invalid", nimbleProbs: null, jevSkipped: null });
-        return undefined;
-      }
-      nimbleProbs = scores;
-      if (top <= CUT) {
-        await write({
-          ...base,
-          status: "scored",
-          model: screen.model ?? LOCAL_MODEL,
-          probs: scores,
-          flag: false,
-          latencyMs: screen.latencyMs ?? null,
-          tokens: null,
-          skipped: null,
-          error: null,
-          nimbleProbs: scores,
-          jevSkipped: true,
-        });
-        return undefined;
+      if (!paidFallback) {
+        if (!screen!.ok) {
+          paidFallback = true;
+        } else {
+          const scores = screen!.scores ?? {};
+          let top = -Infinity;
+          for (const key in scores) {
+            const score = scores[key];
+            if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 1) top = NaN;
+            else if (score > top) top = score;
+          }
+          if (!Number.isFinite(top)) {
+            paidFallback = true;
+          } else {
+            nimbleProbs = scores;
+            if (top <= CUT) {
+              await write({
+                ...base,
+                status: "scored",
+                model: screen!.model ?? LOCAL_MODEL,
+                probs: scores,
+                flag: false,
+                latencyMs: screen!.latencyMs ?? null,
+                tokens: null,
+                skipped: null,
+                error: null,
+                nimbleProbs: scores,
+                jevSkipped: true,
+                screen: null,
+              });
+              return undefined;
+            }
+          }
+        }
       }
     }
     if (budget.calls >= paidCap) {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=daily-cap", nimbleProbs, jevSkipped: cascade ? false : null });
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=daily-cap", nimbleProbs, jevSkipped: cascade ? false : null, screen: null });
       return undefined;
     }
     budget.calls += 1;
@@ -429,17 +439,17 @@ export async function observe(
         timeoutMs: 20000,
       });
     } catch (err) {
-      await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "ask-threw: " + (err instanceof Error ? err.message : String(err)), nimbleProbs: null, jevSkipped: null });
+      await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "ask-threw: " + (err instanceof Error ? err.message : String(err)), nimbleProbs: null, jevSkipped: null, screen: null });
       return undefined;
     }
     if (!answer.ok) {
       if (answer.reason === "unconfigured") {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=unconfigured", nimbleProbs: null, jevSkipped: null });
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=unconfigured", nimbleProbs: null, jevSkipped: null, screen: null });
       } else if (answer.reason === "billing-hold") {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=" + (answer.error ?? "billing-hold"), nimbleProbs: null, jevSkipped: null });
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, skipped: null, error: "NOT_RUN reason=" + (answer.error ?? "billing-hold"), nimbleProbs: null, jevSkipped: null, screen: null });
       } else {
         noteBillingRefusal(answer, now);
-        await write({ ...base, status: "error", probs: null, flag: null, latencyMs: answer.latencyMs ?? null, tokens: null, skipped: null, error: (answer.reason ?? "unknown") + ": " + (answer.error ?? ""), nimbleProbs: null, jevSkipped: null });
+        await write({ ...base, status: "error", probs: null, flag: null, latencyMs: answer.latencyMs ?? null, tokens: null, skipped: null, error: (answer.reason ?? "unknown") + ": " + (answer.error ?? ""), nimbleProbs: null, jevSkipped: null, screen: null });
       }
       return undefined;
     }
@@ -461,6 +471,7 @@ export async function observe(
       error: null,
       nimbleProbs,
       jevSkipped: cascade ? false : null,
+      screen: paidFallback ? "paid-fallback" : null,
     });
     return undefined;
   } catch {
