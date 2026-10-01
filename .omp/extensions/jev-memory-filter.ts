@@ -78,9 +78,23 @@ export function splitMemoryBlocks(text: string): MemoryItem[] {
   });
 }
 
-/** Genuine memory bullets from a system prompt. Exported for tests. */
+/** Genuine memory bullets from a system prompt. Each prompt element is parsed
+ * separately: recall arrives as its own appended element, and joining first
+ * would merge the instruction mention (no closing tag) with the recall close,
+ * flooding the cap with static prompt text between them (live 2026-10-01:
+ * merged span swallowed the whole tool-routes section). */
 export function parseSystemMemories(sys: unknown): MemoryItem[] {
-  return splitMemoryBlocks(systemPromptText(sys));
+  const texts = Array.isArray(sys) ? (sys as unknown[]).map((b) => (typeof b === "string" ? b : systemPromptText(b))) : [systemPromptText(sys)];
+  const seen: Record<string, true> = {};
+  const items: MemoryItem[] = [];
+  for (const text of texts) {
+    for (const item of splitMemoryBlocks(text)) {
+      if (seen[item.text]) continue;
+      seen[item.text] = true;
+      items.push(item);
+    }
+  }
+  return items;
 }
 
 const INSTRUCTIONS = "Memory: `memory`. Current request: `prompt`. Is this memory relevant to the current request?";
