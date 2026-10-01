@@ -125,14 +125,14 @@ art needs no change. `docs-mirror/` and `upstream/` commit provenance (sha256 ma
 
 1. **Reserve before editing** in Agent Mail (exact paths, bead id as the reason). `EVAL.md`,
    `NEGATIVE_EVIDENCE.md`, `GATES.md`, `README.md` and this file collide most.
-2. **Re-read immediately before any line-anchored write;** a stale anchor lands in the wrong place
-   silently.
-3. **Stage exactly your paths:** `git add <path>...`. Never `git add -A` or `.` (`dcg` denies it).
-4. **Read back the index:** `git diff --cached --stat` must list only your paths.
-5. **Commit on `main`; never amend.** A fix is a new commit.
-6. **The subject claims a verification level;** the `commit-msg` hook refuses one without it. Levels,
-   weakest first: `pending`, `selftest`, `test`, `mutation`, `oracle`, `live`. Claim the level you
-   actually reached.
+2. **Re-read right before any line-anchored write;** a stale anchor lands elsewhere silently.
+3. **Stage exactly your paths and read back the index:** `git add <path>...` (never `-A` or `.`;
+   `dcg` denies it), then `git diff --cached --stat` must list only your paths.
+4. **Commit with `git commit --only <your paths>` on `main`; never a bare `git commit`, never amend.**
+   A bare commit takes the whole shared index: on 2026-10-01 one swept stale blobs and reverted a
+   sibling's commit in history (32d5c1ba, restored in f5faa0e2). A fix is a new commit.
+5. **The subject claims a verification level** (`commit-msg` refuses one without it), weakest first:
+   `pending`, `selftest`, `test`, `mutation`, `oracle`, `live`. Claim the level you actually reached.
 
 **Bootstrap a fresh clone:** `./scripts/sync-docs.sh && ./scripts/sync-docs.sh --check`.
 
