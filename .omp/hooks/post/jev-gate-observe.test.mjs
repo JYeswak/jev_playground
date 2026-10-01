@@ -28,6 +28,13 @@ const now = () => "2026-09-24T00:00:00.000Z";
 const mem = { append: memAppend, logPath: "/tmp/x.jsonl", appendSidecar: memSidecar, sidecarPath: "/tmp/x-full.jsonl", now, session: "offline-session" };
 // Secret-shaped fixtures are built at runtime so this file never carries one.
 const fakeKey = "sk-" + "abcdefghij".repeat(3);
+// Captured bash result, byte-identical to work/omp-guard-rule/fixtures/session-pinned.jsonl
+// line 2 (real:true row, jev-lab 2026-09-20 live-fire proof). Inlined so the suite passes in any
+// checkout without assuming that file is tracked; the file remains the provenance record.
+const RECORDED_BASH = {
+  event: "tool_call", toolName: "bash", toolCallId: "[ID]", input: { command: "git status --porcelain=v1" },
+  real: true, note: "clean pass shape",
+};
 const scoredAsker = async () => ({
   ok: true, scores: { exfiltration: 0.1, destructive: 0.9, privilege: 0.2, irreversible_publish: 0.1, secret_staging: 0.05 },
   model: "test-model", latencyMs: 410, usage: { input_tokens: 300, output_tokens: 40 },
@@ -338,7 +345,7 @@ test("registered post-hook scores a bash result without synthetic event-ID appro
 
 test("missing session blocks egress but a captured bash result needs no tool-call ID", async () => {
   reset();
-  const recorded = JSON.parse(readFileSync(new URL("../../../work/omp-guard-rule/fixtures/session-pinned.jsonl", import.meta.url), "utf8").split("\n")[1]);
+  const recorded = { ...RECORDED_BASH, input: { ...RECORDED_BASH.input } };
   assert.equal(recorded.real, true);
   let requests = 0;
   const deps = { ...mem, asker: async () => { requests++; return scoredAsker(); } };
@@ -355,7 +362,7 @@ test("missing session blocks egress but a captured bash result needs no tool-cal
 
 test("captured bash result without a toolCallId reaches the offline client only after secret filtering", async () => {
   reset();
-  const recorded = JSON.parse(readFileSync(new URL("../../../work/omp-guard-rule/fixtures/session-pinned.jsonl", import.meta.url), "utf8").split("\n")[1]);
+  const recorded = { ...RECORDED_BASH, input: { ...RECORDED_BASH.input } };
   assert.equal(recorded.real, true);
   const requests = [];
   let attempts = 0;

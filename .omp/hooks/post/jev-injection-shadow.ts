@@ -2,21 +2,16 @@ import { appendFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
-import { askJev, type JevResult } from "../../../kit/src/client.ts";
-import { useInfisicalKey } from "../../../work/jev-client/src/use-infisical-key.ts";
-import { ASSISTANT, CUT, MODEL, QUESTION } from "../../../work/jev-a9fv/seat.mjs";
 
-export { CUT, MODEL };
+export const MODEL = "jev-1.13.0";
 export const MAX_DAILY_CALLS = 100;
-export const MAX_STATE_BYTES = 30_000;
-export const LOG_SCHEMA = "jev-injection-shadow.v2";
-const SCREENED_TOOLS: Record<string, true> = { web_search: true, web_extract: true };
-const SECRET_SPANS = /s[k]-[A-Za-z0-9_-]{20,}|xai-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}|Bearer\s[A-Za-z0-9._-]{20,}|-----BEGIN [A-Z ]*PRIVATE KEY/g;
+export const LOG_SCHEMA = "jev-injection-shadow.v1";
 
 type Event = { toolName?: unknown; toolCallId?: unknown; content?: unknown; result?: unknown; isError?: unknown };
 type Host = { on: (event: string, handler: (event: Event) => Promise<unknown>) => void };
-type Ask = (options: Parameters<typeof askJev>[0]) => Promise<JevResult>;
-type Deps = { ask?: Ask; append?: (path: string, line: string) => Promise<void>; path?: string; cap?: number; now?: () => string; screenLocalRead?: boolean };
+
+type Deps = { append?: (path: string, line: string) => Promise<void>; path?: string; cap?: number; now?: () => string };
+
 function defaultPath(): string { return process.env.JEV_INJECTION_SHADOW_PATH ?? join(homedir(), ".local", "state", "jev", "injection-shadow.jsonl"); }
 function hash(value: string): string { return createHash("sha256").update(value).digest("hex"); }
 function text(value: unknown): string {
@@ -25,128 +20,36 @@ function text(value: unknown): string {
   return value && typeof value === "object" ? JSON.stringify(value) : "";
 }
 function outputText(event: Event): string {
-  const resultContent = (event.result as { content?: unknown } | null | undefined)?.content;
-  return text(event.content ?? resultContent);
+  const result = event.result && typeof event.result === "object" ? event.result as Record<string, unknown> : {};
+  return text(event.content ?? result.content);
 }
 function syncObserved(path: string, row: Record<string, unknown>): void {
   try { mkdirSync(dirname(path), { recursive: true, mode: 0o700 }); appendFileSync(path, JSON.stringify(row) + "\n", { mode: 0o600 }); } catch { /* observe-only */ }
 }
 
-type ShadowState = { day: string; calls: number; paused: boolean };
-type ShadowRow = { schema: string; ts: string; toolName: string; outputSha256: string };
-type WriteRow = (row: Record<string, unknown>) => Promise<void>;
-type ScoreArgs = { ask: Ask; write: WriteRow; state: ShadowState; cap: number; common: ShadowRow; raw: string };
-
-function resetDay(state: ShadowState, current: string): void {
-  if (current === state.day) return;
-  state.day = current;
-  state.calls = 0;
-  state.paused = false;
-}
-
-function stateSize(raw: string): number {
-  return Buffer.byteLength(raw, "utf8") + Buffer.byteLength(ASSISTANT, "utf8") + Buffer.byteLength(QUESTION, "utf8") + 64;
-}
-
-function authorizationRefusal(result: Extract<JevResult, { ok: false }>): string | undefined {
-  switch (result.reason) {
-    case "http": return result.error.match(/HTTP (401|402|403)\b/)?.[1];
-    default: return undefined;
-  }
-}
-
-function validScore(score: unknown): score is number {
-  return typeof score === "number" && Number.isFinite(score) && score >= 0 && score <= 1;
-}
-
-async function scoreAndRecord({ ask, write, state, cap, common, raw }: ScoreArgs): Promise<void> {
-  if (state.paused) {
-    await write({ ...common, status: "halted", reason: "authorization-refusal" });
-    return;
-  }
-  if (state.calls >= cap) {
-    await write({ ...common, status: "cap", reason: "daily-call-cap" });
-    return;
-  }
-  state.calls += 1;
-  let result: JevResult;
-  try {
-    result = await ask({
-      state: { assistant: ASSISTANT, user_message: raw.replace(SECRET_SPANS, "[REDACTED]") },
-      questions: { inj: QUESTION },
-      model: MODEL,
-      timeoutMs: 20_000,
-    });
-  } catch {
-    await write({ ...common, status: "failed", reason: "provider-exception" });
-    return;
-  }
-  if (!result.ok) {
-    const refusal = authorizationRefusal(result);
-    if (refusal) state.paused = true;
-    await write({
-      ...common,
-      status: refusal ? "refused" : "failed",
-      reason: refusal ? `http-${refusal}` : result.reason,
-      model: result.model,
-      latencyMs: result.latencyMs,
-    });
-    return;
-  }
-  const score = result.scores.inj;
-  if (!validScore(score)) {
-    await write({ ...common, status: "invalid", reason: "missing-or-invalid-score", model: result.model, latencyMs: result.latencyMs });
-    return;
-  }
-  await write({
-    ...common,
-    status: "scored",
-    score,
-    flag: score >= CUT,
-    model: result.model,
-    latencyMs: result.latencyMs,
-    tokens: {
-      input_tokens: result.usage?.input_tokens ?? null,
-      output_tokens: result.usage?.output_tokens ?? null,
-    },
-  });
-}
-
 export function makeInjectionShadowHandler(deps: Deps = {}) {
   const path = deps.path ?? defaultPath();
-  const ask = deps.ask ?? askJev;
-  const requestedCap = deps.cap ?? Number(process.env.JEV_INJECTION_SHADOW_DAILY_CAP ?? String(MAX_DAILY_CALLS));
-  const cap = Number.isSafeInteger(requestedCap) ? Math.min(MAX_DAILY_CALLS, Math.max(0, requestedCap)) : 0;
+  const cap = deps.cap ?? Number(process.env.JEV_INJECTION_SHADOW_DAILY_CAP ?? String(MAX_DAILY_CALLS));
   const now = deps.now ?? (() => new Date().toISOString());
-  const screenLocalRead = deps.screenLocalRead ?? (process.env.JEV_INJECTION_SHADOW_SCREEN_LOCAL_READ === "1");
-  const state: ShadowState = { calls: 0, day: now().slice(0, 10), paused: false };
-  const write: WriteRow = async (row) => {
-    if (!deps.append) { syncObserved(path, row); return; }
-    try { await deps.append(path, JSON.stringify(row)); }
-    catch { console.error("jev-injection-shadow:receipt-write-failed"); }
+  let calls = 0;
+  let day = now().slice(0, 10);
+  const write = async (row: Record<string, unknown>): Promise<void> => {
+    if (deps.append) { await deps.append(path, JSON.stringify(row)); return; }
+    syncObserved(path, row);
   };
   return async (event: Event): Promise<undefined> => {
-    try {
-      resetDay(state, now().slice(0, 10));
-      if (event.isError === true || typeof event.toolName !== "string" || (event.toolName === "read" ? !screenLocalRead : !Object.hasOwn(SCREENED_TOOLS, event.toolName))) return undefined;
-      const raw = outputText(event);
-      if (!raw) return undefined;
-      const common = { schema: LOG_SCHEMA, ts: now(), toolName: event.toolName, outputSha256: hash(raw) };
-      const bytes = stateSize(raw);
-      if (bytes > MAX_STATE_BYTES) {
-        await write({ ...common, status: "oversize", reason: "state-byte-limit", stateBytes: bytes });
-        return undefined;
-      }
-      await scoreAndRecord({ ask, write, state, cap, common, raw });
-    } catch {
-      console.error("jev-injection-shadow:handler-failed-open");
-    }
+    const current = now().slice(0, 10); if (current !== day) { day = current; calls = 0; }
+    if (event.isError === true) return undefined;
+    const raw = outputText(event); if (!raw) return undefined;
+    if (calls >= cap) { await write({ schema: LOG_SCHEMA, ts: now(), toolName: event.toolName ?? null, outputSha256: hash(raw), status: "cap", reason: "recipient-and-data-class-approval-required" }); return undefined; }
+    calls += 1;
+    await write({ schema: LOG_SCHEMA, ts: now(), toolName: event.toolName ?? null, outputSha256: hash(raw), status: "not-run", reason: "recipient-and-data-class-approval-required" });
     return undefined;
   };
 }
 
-export default function jevInjectionShadowHook(host: Host, deps?: Deps): void {
-  if (!deps?.ask) useInfisicalKey();
-  const handler = makeInjectionShadowHandler(deps);
-  host.on("tool_result", handler);
+export default function jevInjectionShadowHook(host: Host): void {
+  const seen = new Set<string>(); const handler = makeInjectionShadowHandler();
+  const observe = (event: Event): Promise<undefined> => { const id = typeof event.toolCallId === "string" ? event.toolCallId : undefined; if (id && seen.has(id)) return Promise.resolve(undefined); if (id) { seen.add(id); setTimeout(() => seen.delete(id), 60_000); } return handler(event); };
+  host.on("tool_result", observe); host.on("tool_execution_end", observe);
 }
