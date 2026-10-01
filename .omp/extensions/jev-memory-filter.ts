@@ -97,9 +97,14 @@ export function parseSystemMemories(sys: unknown): MemoryItem[] {
   return items;
 }
 
-/** Removal path (default OFF): file presence enables, read per fire so no
- * restart is needed to flip. Return contract proven live 2026-10-01: a raw
- * string return is ignored, `{ systemPrompt }` replaces the prompt. */
+/** Removal scope (jev-9cqw): drop precision is verified on jev-repo memories
+ * only, so removal applies inside the jev tree; everywhere else decided drops
+ * are logged (shadow) until the non-jev blind label passes, then widen. */
+export const ENFORCE_ROOT = "/Users/josh/Developer/jev";
+export function inEnforceScope(repo: string | null): boolean {
+  return repo === ENFORCE_ROOT || (repo !== null && repo.startsWith(ENFORCE_ROOT + "/"));
+}
+
 export async function enforceEnabled(switchPath: string): Promise<boolean> {
   try {
     await readFile(switchPath, "utf8");
@@ -245,8 +250,11 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
       }
       if (dropped.size > 0 && (await enforceEnabled(switchPath))) {
         const kept = items.length - dropped.size;
-        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "enforced", promptHash, memoryHash: null, noul: null, decision: "prune", removed: dropped.size, kept, tokensSaved: 0, latencyMs: null, inputTokens: null });
-        return { systemPrompt: pruneSystemPrompt(sys, dropped) };
+        if (inEnforceScope(fireRepo)) {
+          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "enforced", promptHash, memoryHash: null, noul: null, decision: "prune", removed: dropped.size, kept, tokensSaved: 0, latencyMs: null, inputTokens: null });
+          return { systemPrompt: pruneSystemPrompt(sys, dropped) };
+        }
+        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "shadowed", promptHash, memoryHash: null, noul: null, decision: "would-drop", removed: dropped.size, kept, tokensSaved: 0, latencyMs: null, inputTokens: null });
       }
     } catch {
       // Shadow failures never affect the turn.

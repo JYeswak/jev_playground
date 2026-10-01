@@ -9,6 +9,7 @@ import {
   splitMemoryBlocks,
   systemPromptText,
   pruneSystemPrompt,
+  inEnforceScope,
   CUT,
   MAX_ITEMS_PER_TURN,
 } from "./jev-memory-filter.ts";
@@ -29,8 +30,8 @@ process.env.JEV_MEMORY_FILTER_ENFORCE_PATH = join(GUARD_DIR, "no-switch-file");
 // [type,prompt,images,systemPrompt]; systemPrompt is string[] (3-4 elements,
 // ~93k/1.6k/45k chars, recall appended as its own element on turn 2+); first
 // turns carry exactly one `<memories>` mention (instruction prose, no closing
-// tag); recall turns merge instruction prose + genuine `- ` bullets closed by
-// one `</memories>`, bullets separated by blank lines, each ending
+// tag); recall arrives as its own appended element with open, bullets, close
+// (elements parse separately, so static text never merges in); bullets are
 // `… [source] (date)`. Bullet BODIES are redacted below (session-private
 // transcript text; sidecar precedent: text never committed): original A lent
 // 178 chars with a backticked bead id, a work path and a pane name; original B
@@ -256,7 +257,7 @@ test("enforce OFF returns undefined and leaves the prompt untouched", async () =
   assert.equal(out, undefined);
 });
 
-test("enforce ON removes dropped bullets and keeps kept ones", async () => {
+test("enforce ON in-scope removes dropped bullets and keeps kept ones", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
   const switchPath = join(dir, "enforce");
   const { writeFileSync } = await import("node:fs");
@@ -264,7 +265,7 @@ test("enforce ON removes dropped bullets and keeps kept ones", async () => {
   const ask = async ({ state }) => ({ ok: true, scores: { rel: state.memory.includes("dropme") ? 0.1 : 0.9 }, latencyMs: 1, model: "m" });
   const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath });
   const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>"];
-  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, undefined);
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, { cwd: "/Users/josh/Developer/jev" });
   assert.ok(out && typeof out === "object" && "systemPrompt" in out);
   const pruned = out.systemPrompt;
   assert.ok(Array.isArray(pruned) && pruned[0] === "pre");
@@ -273,6 +274,33 @@ test("enforce ON removes dropped bullets and keeps kept ones", async () => {
   assert.ok(JSON.stringify(pruned).includes("</memories>"));
   const rows = rowsOf(join(dir, "log.jsonl"));
   assert.ok(rows.some((r) => r.status === "enforced" && r.removed === 1 && r.kept === 1));
+});
+
+test("inEnforceScope bounds the jev tree exactly", () => {
+  assert.equal(inEnforceScope("/Users/josh/Developer/jev"), true);
+  assert.equal(inEnforceScope("/Users/josh/Developer/jev/work/x"), true);
+  assert.equal(inEnforceScope("/Users/josh/Developer/jev-evil"), false);
+  assert.equal(inEnforceScope("/Users/josh/Developer/uds"), false);
+  assert.equal(inEnforceScope(null), false);
+});
+
+test("enforce ON out-of-scope shadows: prompt unchanged, drop logged", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const switchPath = join(dir, "enforce");
+  const { writeFileSync } = await import("node:fs");
+  writeFileSync(switchPath, "on");
+  const ask = async ({ state }) => ({ ok: true, scores: { rel: state.memory.includes("dropme") ? 0.1 : 0.9 }, latencyMs: 1, model: "m" });
+  const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath });
+  const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>"];
+  const snapshot = JSON.stringify(sys);
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, { cwd: "/Users/josh/Developer/uds" });
+  assert.equal(out, undefined);
+  assert.equal(JSON.stringify(sys), snapshot);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.ok(rows.some((r) => r.status === "shadowed" && r.removed === 1 && r.kept === 1));
+  assert.ok(!rows.some((r) => r.status === "enforced"));
+  const side = rowsOf(join(dir, "full.jsonl"));
+  assert.ok(side.some((r) => r.memory.includes("dropme")));
 });
 
 test("error path returns undefined: original prompt byte-identical", async () => {
