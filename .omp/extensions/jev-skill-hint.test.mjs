@@ -3,11 +3,13 @@ import assert from 'node:assert/strict';
 import { fileURLToPath } from 'node:url';
 import {
   hintSkills,
+  hintSkillsNoul,
   shortlistSkills,
   loadSkillRoster,
   warmTransport,
   SKILL_HINT_MODEL,
   SKILL_HINT_CONFIDENCE_CUT,
+  SKILL_HINT_NOUL_CUT,
   SKILL_HINT_SHORTLIST_MAX,
   SKILL_HINT_TIMEOUT_MS,
 } from '../../kit/src/skill-hint.ts';
@@ -133,4 +135,33 @@ test('resolved deadline hits log as timeout, not transport', async () => {
   const fastAnswer = async () => ({ ok: false, reason: 'transport', error: 'refused', latencyMs: 40, model: SKILL_HINT_MODEL });
   const fast = await hintSkills({ prompt: GA4_PROMPT, roster: ROSTER, ask: fastAnswer, timeoutMs: SKILL_HINT_TIMEOUT_MS });
   assert.equal(fast.reason, 'transport');
+});
+
+const noulAnswer = (scores) => async () => ({
+  ok: true,
+  answers: Object.fromEntries(Object.entries(scores).map(([k, v]) => ['rel_' + k, { noul: v }])),
+  latencyMs: 210,
+  model: SKILL_HINT_MODEL,
+});
+
+test('noul-rank hints the argmax at or above cut', async () => {
+  const result = await hintSkillsNoul({ prompt: GA4_PROMPT, roster: ROSTER, ask: noulAnswer({ ga4: 0.85, 'analytics-tracking': 0.6, cooking: 0.1 }) });
+  assert.equal(result.skill, 'ga4');
+  assert.equal(result.hint.startsWith('Likely relevant skills: ga4'), true);
+  assert.equal(result.confidence, 0.85);
+});
+
+test('noul-rank stays silent below cut, on invalid scores, refusal, and empty prompt', async () => {
+  const silent = async (ask, prompt = GA4_PROMPT) => hintSkillsNoul({ prompt, roster: ROSTER, ask });
+  const low = await silent(noulAnswer({ ga4: 0.79, 'analytics-tracking': 0.6, cooking: 0.1 }));
+  assert.equal(low.hint, null);
+  assert.equal(low.reason, 'low-noul');
+  const bad = await silent(noulAnswer({ ga4: NaN, 'analytics-tracking': 0.6, cooking: 0.1 }));
+  assert.equal(bad.hint, null);
+  assert.equal(bad.reason, 'no-answers');
+  const refused = await silent(async () => ({ ok: false, reason: 'http', error: 'HTTP 403', latencyMs: 5, model: SKILL_HINT_MODEL }));
+  assert.equal(refused.hint, null);
+  const empty = await silent(noulAnswer({ ga4: 0.9 }), '   ');
+  assert.equal(empty.hint, null);
+  assert.equal(empty.reason, 'empty-prompt');
 });

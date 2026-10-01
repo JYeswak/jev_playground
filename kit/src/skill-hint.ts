@@ -11,11 +11,13 @@ import { basename, join } from "node:path";
 import { readdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import type { AskChoiceOptions, JevChoiceResult } from "./client.ts";
+import { validateNoulAnswer } from "./validate.ts";
 
 export const SKILL_HINT_MODEL = "jev-1.13.0";
 export const SKILL_HINT_CONFIDENCE_CUT = 0.5;
 export const SKILL_HINT_SHORTLIST_MAX = 20;
 export const SKILL_HINT_NONE = "none";
+export const SKILL_HINT_NOUL_DEPTH = 5;
 export const SKILL_HINT_TIMEOUT_MS = 300;
 
 export type SkillEntry = { name: string; description: string };
@@ -141,6 +143,90 @@ export async function hintSkills(options: {
   const blurb = picked?.description ? ' \u2014 ' + picked.description.slice(0, 160) : '';
   const usage = answer.usage ? { input_tokens: answer.usage.input_tokens, output_tokens: answer.usage.output_tokens } : undefined;
   return { hint: 'Likely relevant skills: ' + answer.choice + blurb, skill: answer.choice, confidence: answer.confidence, model: answer.model, latencyMs, ...(usage ? { usage } : {}) };
+}
+
+export const SKILL_HINT_NOUL_CUT = 0.8;
+
+export type BundleUsage = { input_tokens: number; output_tokens: number };
+
+export type BundleAnswer =
+  | { ok: true; answers: Record<string, unknown>; latencyMs: number; model: string; usage?: BundleUsage }
+  | { ok: false; reason: string; error: string; latencyMs: number; model: string };
+
+export type BundleAsker = (options: {
+  state: string | Record<string, unknown>;
+  questions: Record<string, unknown>;
+  model?: string;
+  timeoutMs?: number;
+}) => Promise<BundleAnswer>;
+
+/** N1 (bead jev-4nyy): same shortlist/state/timeout as hintSkills, but one
+ * Noul per candidate instead of Choice. Hint the argmax iff its noul >= cut;
+ * absolute relevance should reject lookalikes that Choice picks relatively.
+ * Fail open everywhere like hintSkills. */
+export async function hintSkillsNoul(options: {
+  prompt: string;
+  roster: SkillEntry[];
+  ask: BundleAsker;
+  model?: string;
+  noulCut?: number;
+  depth?: number;
+  timeoutMs?: number;
+}): Promise<HintResult> {
+  const model = options.model ?? SKILL_HINT_MODEL;
+  const cut = options.noulCut ?? SKILL_HINT_NOUL_CUT;
+  const fullPrompt = options.prompt.trim();
+  if (!fullPrompt) return { hint: null, reason: "empty-prompt", model, latencyMs: 0 };
+  const short = shortlistSkills(fullPrompt, options.roster).slice(0, options.depth ?? SKILL_HINT_NOUL_DEPTH);
+  if (short.length === 0) return { hint: null, reason: "no-shortlist", model, latencyMs: 0 };
+  const questions: Record<string, unknown> = {};
+  for (const entry of short) {
+    questions["rel_" + entry.name] = {
+      type: "noul",
+      instructions: "The agent should read the '" + entry.name + "' skill before handling this prompt" +
+        (entry.description ? " (" + entry.description.slice(0, 160) + ")" : "") + ".",
+    };
+  }
+  const started = Date.now();
+  const deadlineMs = options.timeoutMs ?? SKILL_HINT_TIMEOUT_MS;
+  let answer: BundleAnswer;
+  try {
+    answer = await options.ask({
+      state: { prompt: fullPrompt.slice(0, 400) },
+      questions,
+      model,
+      timeoutMs: deadlineMs,
+    });
+  } catch (error) {
+    const elapsed = Date.now() - started;
+    const reason = elapsed >= deadlineMs - 60 ? "timeout" : error instanceof Error ? error.message : String(error);
+    return { hint: null, reason, model, latencyMs: elapsed };
+  }
+  const latencyMs = Date.now() - started;
+  if (!answer.ok) {
+    const timedOut = latencyMs >= deadlineMs - 60;
+    return { hint: null, reason: timedOut ? "timeout" : answer.reason, model: answer.model, latencyMs };
+  }
+  let best: SkillEntry | undefined;
+  let bestNoul = -1;
+  for (const entry of short) {
+    let score: number;
+    try {
+      score = validateNoulAnswer(answer.answers["rel_" + entry.name]);
+    } catch {
+      return { hint: null, reason: "no-answers", model: answer.model, latencyMs };
+    }
+    if (score > bestNoul) {
+      bestNoul = score;
+      best = entry;
+    }
+  }
+  if (best === undefined || bestNoul < cut) {
+    return { hint: null, reason: "low-noul", model: answer.model, latencyMs };
+  }
+  const blurb = best.description ? ' \u2014 ' + best.description.slice(0, 160) : '';
+  const usage = answer.usage;
+  return { hint: 'Likely relevant skills: ' + best.name + blurb, skill: best.name, confidence: bestNoul, model: answer.model, latencyMs, ...(usage ? { usage } : {}) };
 }
 
 export type WarmResult =

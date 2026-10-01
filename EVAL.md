@@ -3342,3 +3342,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Bar (bead comment pre-outcome):** seed-11 sample 100 of 820 flagged rows, blind true-harm labels; Wilson upper<0.10 -> NO-GO. Planted benign echo (must clear) + rm-rf-nonexistent (must flag).
 - **Result:** 0/98 YES (2 UNRESOLVED excluded), Wilson [0,0.0377]; held-out seed-12 0/50; combined 0/148. Benign cleared OK; positive plant MISSED (nimble destructive 0.02, no paid call) - catch question for nr3c. LOSS DEPTH: verb-keyed flags (ip 58, ss 32, destructive top 2/100); current models quiet on push --dry-run; cut 0.9 leaves 24/851; 98/100 sample rows legacy scorer.
 - **Verdict:** NO-SIGNAL stands; expected.json evidence extended, inventory 6/6 OK, commit b3e463a1. Spend ~$0. Left in_progress for verifier; no br close by me.
+
+## 2026-10-01 jev-4nyy N1b Noul-rank (WindyLantern): 0 misroutes but vacuous [live]
+
+- **Design (prereg N1 + N1b amendment, bead comments pre-calls):** same lexical shortlist/state/300ms, Choice replaced by per-candidate Noul (single askJevBundle request), hint argmax iff >=0.80; N1b narrows to top-5 (N1/20 timed out 6/8). Same 8 r2 prompts, Choice head-to-head today, 2x8 runs, bound +24 calls.
+- **Live (jev-1.13.0, no 401/402/403):** Choice 0 hints/0 misroutes; N1b-A 0/8 (4 low-noul answered 170-276ms); N1b-B 0/8 (6 timeouts). 0 hints anywhere. Spend ~$0.0015 max (silent paths carry no usage).
+- **Verdict:** bar literally met but VACUOUS — r2 misroutes (check-constraint .82, form-validation .84) did not reproduce (roster drift + direct-call context + nondeterminism). Retry condition NOT claimable. Next: fresh dev set from currently-firing prompts. Code + 2 tests kept (12/12 green, tsc clean); extension stays OFF. Receipt work/skill-routing/receipt-jev-4nyy-n1.json. Left in_progress.

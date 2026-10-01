@@ -1,0 +1,275 @@
+{
+ "bead": "jev-4nyy",
+ "design": "N1b noul top-5 cut 0.8 vs Choice/0.5 head-to-head, same 8 r2 prompts",
+ "rows": [
+  {
+   "run": "base",
+   "mode": "choice",
+   "prompt": "flaky-vendor-sync",
+   "target": "retry-backoff-patterns",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 404,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "base",
+   "mode": "choice",
+   "prompt": "cleanup-overrun",
+   "target": "database-operations",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 385,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "base",
+   "mode": "choice",
+   "prompt": "helpdesk-pile",
+   "target": "ticket-triage",
+   "skill": null,
+   "reason": "no-shortlist",
+   "ms": 0,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "base",
+   "mode": "choice",
+   "prompt": "robot-announcement",
+   "target": "de-slopify",
+   "skill": null,
+   "reason": "choice-none",
+   "ms": 281,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "base",
+   "mode": "choice",
+   "prompt": "cart-abandonment",
+   "target": "page-cro",
+   "skill": null,
+   "reason": "no-shortlist",
+   "ms": 0,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "base",
+   "mode": "choice",
+   "prompt": "request-hog",
+   "target": "rate-limiting",
+   "skill": null,
+   "reason": "choice-none",
+   "ms": 174,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "base",
+   "mode": "choice",
+   "prompt": "query-per-row",
+   "target": "performance-review",
+   "skill": null,
+   "reason": "choice-none",
+   "ms": 229,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "base",
+   "mode": "choice",
+   "prompt": "trial-vanish",
+   "target": "churn-prediction",
+   "skill": null,
+   "reason": "low-confidence",
+   "ms": 130,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "A",
+   "mode": "noul5",
+   "prompt": "flaky-vendor-sync",
+   "target": "retry-backoff-patterns",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 301,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "A",
+   "mode": "noul5",
+   "prompt": "cleanup-overrun",
+   "target": "database-operations",
+   "skill": null,
+   "reason": "low-noul",
+   "ms": 276,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "A",
+   "mode": "noul5",
+   "prompt": "helpdesk-pile",
+   "target": "ticket-triage",
+   "skill": null,
+   "reason": "no-shortlist",
+   "ms": 0,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "A",
+   "mode": "noul5",
+   "prompt": "robot-announcement",
+   "target": "de-slopify",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 283,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "A",
+   "mode": "noul5",
+   "prompt": "cart-abandonment",
+   "target": "page-cro",
+   "skill": null,
+   "reason": "no-shortlist",
+   "ms": 0,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "A",
+   "mode": "noul5",
+   "prompt": "request-hog",
+   "target": "rate-limiting",
+   "skill": null,
+   "reason": "low-noul",
+   "ms": 185,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "A",
+   "mode": "noul5",
+   "prompt": "query-per-row",
+   "target": "performance-review",
+   "skill": null,
+   "reason": "low-noul",
+   "ms": 170,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "A",
+   "mode": "noul5",
+   "prompt": "trial-vanish",
+   "target": "churn-prediction",
+   "skill": null,
+   "reason": "low-noul",
+   "ms": 201,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "B",
+   "mode": "noul5",
+   "prompt": "flaky-vendor-sync",
+   "target": "retry-backoff-patterns",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 717,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "B",
+   "mode": "noul5",
+   "prompt": "cleanup-overrun",
+   "target": "database-operations",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 279,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "B",
+   "mode": "noul5",
+   "prompt": "helpdesk-pile",
+   "target": "ticket-triage",
+   "skill": null,
+   "reason": "no-shortlist",
+   "ms": 0,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "B",
+   "mode": "noul5",
+   "prompt": "robot-announcement",
+   "target": "de-slopify",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 278,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "B",
+   "mode": "noul5",
+   "prompt": "cart-abandonment",
+   "target": "page-cro",
+   "skill": null,
+   "reason": "no-shortlist",
+   "ms": 0,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "B",
+   "mode": "noul5",
+   "prompt": "request-hog",
+   "target": "rate-limiting",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 282,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "B",
+   "mode": "noul5",
+   "prompt": "query-per-row",
+   "target": "performance-review",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 276,
+   "usage": null,
+   "misroute": false
+  },
+  {
+   "run": "B",
+   "mode": "noul5",
+   "prompt": "trial-vanish",
+   "target": "churn-prediction",
+   "skill": null,
+   "reason": "timeout",
+   "ms": 288,
+   "usage": null,
+   "misroute": false
+  }
+ ],
+ "spend": {
+  "recorded_billed_input_tokens": 0,
+  "note": "silent paths carry no usage field; bound 24 calls x ~1.5k est in-tok ~= $0.0015 max"
+ },
+ "verdict": "0 misroutes all arms (Choice 0/8, N1b A 0/8, N1b B 0/8) BUT VACUOUS: zero hints anywhere; historical misroutes (check-constraint .82, form-validation .84) did not reproduce under current roster/code; N1b top-5 answers in 170-276ms when it answers (run A 4/8 answered, run B 2/8, rest timeouts/empty). Retry condition NOT claimable: no discriminating test. Next: fresh dev set from currently-firing prompts."
+}
