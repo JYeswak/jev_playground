@@ -3298,3 +3298,12 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Cut 0.7 does not separate (`abbfdce8` baseline, no code change).** Author: 2/8 hints, p95 297 ms, spend 5,089 in-tok. Non-author re-run: 3/8 (jev-mailbox 0.77 misroute on helpdesk-pile, form-validation 0.84 misroute on page-cro, rate-limiting 0.98 on-target), p95 285 ms; answered rows bill identically across runs (2,528 + 2,561 = 5,089). Misroutes fire at 0.77-0.98: no threshold below ~0.99 stops them without killing everything.
 - **Live-code check that turned it off (bar: 0 misroutes across 2 runs, fixed before the calls).** 8 r2 prompts x 2 runs through hintSkills + live askJevChoice at HEAD, cut 0.5: run 1 fired 2 (0 on-target), run 2 fired 4 (1 on-target, rate-limiting 0.98); jev-mailbox misroute on helpdesk-pile stable both runs (0.77, 0.80). Bar missed; extension reverted in `1f031068`. Spend 15,344 input tokens (~$0.000645), 16 calls, no auth stops.
 - **Boundary / NO-CLAIM:** the loss is about this design (lexical shortlist + 0.5 cut + 300 ms deadline), not about Jev Choice quality; the oracle probe answers decisively at 1.0 whenever the target reaches it. Recall is the binding constraint and lexical recall is exhausted.
+
+## 2026-10-01 jev-wb7j: memory-relevance Noul filter FAILS precision bar [live]
+
+- **Bar (preregistered in bead comment before outcomes):** 100 sampled (prompt, memory) pairs, seed 42, blind labels; one Noul per pair on `jev-1.13.0`, DROP iff noul < 0.5; PASS iff precision_of_drop >= 0.90 AND token_reduction >= 0.40.
+- **Census (keyless):** 270 files / 84 sessions; only 8 session_init blocks (328 items) + 6 ee-task-context blocks (19 items) are real injections (76/84 marker hits are docs prose). 347 pairs, sampled 100.
+- **Labels (frozen pre-live):** RELEVANT 21 / IRRELEVANT 79; relevant tokens 548/1989 (27.6%).
+- **Live:** 100/100 ok, 0 retries, median 119 ms, 79,441 input tokens, spend $0.0033. Cap 110, no 401/402/403. Rows in `work/jev-wb7j/rows.jsonl`.
+- **Result:** dropped 91/100 (TP75 FP16); precision_of_drop 0.824 FAIL; token_reduction 0.857 pass. VERDICT: FAIL. Autopsy: 8/16 FPs are borderline-label generics, 6/16 live receipts vs prompts forbidding live material. Follow-up hypotheses in `work/jev-wb7j/REPORT.md`. NO-CLAIM: no hook built, no design bead.
+- **Boundary:** per-turn Mnemopi `<memories>` seen live is not persisted to session files; file census undercounts live volume. Absolute on-disk opportunity ~11k tokens/7d.

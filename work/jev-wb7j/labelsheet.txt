@@ -1,0 +1,159 @@
+====================================================================================================
+PROMPT P0 (20 sampled pairs)
+====================================================================================================
+Complete assignment thoroughly:
+
+Independent reviewer 2 of 2 for an adversarial full review of the committed 0927 plan and all 18 plan Beads. Exact immutable target only: commit dcccf0354c58cdf72cb86efee1ca104b0b444e02; read plan with git show dcccf035:docs/0927_reality_plan.md and Beads with git show dcccf035:.beads/issues.jsonl. Do NOT read the live worktree .beads/issues.jsonl, current Beads DB/br show, earlier W4/W5 messages, or any uncommitted file. Do not edit, test, call Jev/provider, read secrets, or change ownership. Independently enumerate these 18 IDs: jev-p0-identify-consumer-e8uf, jev-p1-stranger-baseline-przc, jev-p2-gate-demand-qdtl, jev-p3-gate-hook-d6zt, jev-p4-gate-bar-gtok, jev-p5-gate-shadow-f63p, jev-p6-gate-advice-wk2c, jev-p7-gate-loss-depth-pwj4, jev-p8-search-feasibility-n2ca, jev-p9-stranger-quickstart-2srw, jev-p11-external-transfer-94e3, jev-p12-third-domain-2r0a, jev-p13-reader-outcome-pjzf, jev-p14-injection-advice-lqkm, jev-p15-contain-automatic-egress-810p, jev-u04-key-provider-check-p147, jev-u06-provider-output-redaction-noom, jev-u07-infisical-argv-gi70. Compare activation, acceptance, source citations, dependencies and current plan assertions. Focus on the post-W4 P13 search-user AND (selected-search OR gate-ineligible/concluded) condition; P11 independent root/P0 optional; P2/P8 keyless acceptance and prereg bars; P15 same-loaded-session admission/revocation and UNKNOWN boundaries. Check actual explicit source line/issue JSONL row references. Return: exact committed hashes you verified; each genuine contradiction with smallest correction or explicit ZERO across the checked scope; NO-CLAIM that no runtime/provider behavior was tested and no 2/2 credit is earned unless both reviewers independently return zero new findings. Do not infer from names or prior reports.
+  [S000|session_init|pmem=55] Final g1xw fix e9fed7b4: detached .omp/hooks/jev-shadow-worker.ts consumes real event state after session settle; fresh sessions now gate observed+scored (jev-1.13.0, 297ms) and web observed+answered (jev-1.13.0, 184ms).
+  [S001|session_init|pmem=30] Use `retain` to store durable facts (decisions, preferences, project context) the agent should remember in future sessions.
+  [S011|session_init|pmem=2] Answers:
+  [S014|session_init|pmem=17] Includes stratified sample-rate caveat and 52 pre-bar-call disclosure.
+  [S020|session_init|pmem=105] Pane 1 to WindyLantern: ff90e437 tests 5/5 and real log untouched, but not closed: (1) register the test in TESTS.md (stage 70 red); (2) existingFlag comes from event.details.existingFlag, which real tool_calls never carry, so every row logs null and the 48 h comparison is impossible: compute it as jev-1miz's prepare.py did, or log enough to recompute offline; (3) planted defect + L2 in a restarted pane. Send the sha.
+  [S022|session_init|pmem=65] Pane 1 to WindyLantern: 3e432dc4 verified (5/5, real log 0->0, cap plant red). Still open by its acceptance: prove L2 (restart a pane, show omp lists/loads the hook) and the 48 h report. Do the L2 proof now, send the sha; the report comes after 48 h of real rows.
+  [S026|session_init|pmem=11] Stage … [coding-agent-transcript] (2026-09-27)
+  [S030|session_init|pmem=9] All resolved model IDs: `jev-1.13.0`.
+  [S035|session_init|pmem=1] Launch:
+  [S039|session_init|pmem=13] Captured ran… [coding-agent-transcript] (2026-09-26)
+  [S046|session_init|pmem=5] Renderer tests: **3/3**
+  [S050|session_init|pmem=7] Hook/receipt commit: `3ea1f1ea`
+  [S058|session_init|pmem=24] Durable project facts, preferences, and decisions are retained automatically from completed turns.
+  [S063|session_init|pmem=12] No next batch started while localbench is parked
+  [S069|session_init|pmem=20] Generated README row reads from `final-receipt.json`; no hand-edited result text.
+  [S072|session_init|pmem=12] Implementation commit retained disabled: `dbfcf434`
+  [S073|session_init|pmem=39] Pane 1 to OrangeFrog: 8c27e036 wording is right. With jev-h9tw, also fix the typo: the note key and text say 3db9d119; the original prereg commit is 3db9f119.
+  [S076|session_init|pmem=9] Labeller A: **440/560** rows complete
+  [S080|session_init|pmem=5] Remaining B: **560**
+  [S099|session_init|pmem=5] Remaining A: **120**
+====================================================================================================
+PROMPT P1 (8 sampled pairs)
+====================================================================================================
+Complete assignment thoroughly:
+
+Independent full-plan/Bead review (second reader) of the immutable committed object d538? NO: exact target is commit 58663dc7b07209360364272af745be9f64c4cf10 only. Read plan using git show 58663dc7:docs/0927_reality_plan.md and issues using git show 58663dc7:.beads/issues.jsonl; do not inspect live worktree plan/issues, current Beads DB/br show, previous W4/W5 reports, or any uncommitted sibling bytes. No tests, source execution, edits, Beads transitions, provider/API calls, credentials or secrets. Independently inspect full plan and all 18 IDs P0-P9/P11-P15/U04/U06/U07; verify P2/P8 keyless activation and bars, P13 selection activation, P11 root, P15 loaded-session contract, statuses, and declared dependencies. Return exact Git-object hashes, exact file:line/JSONL row and smallest corrections for any findings, otherwise explicit ZERO for all 18; state runtime/provider NOT_RUN and no 2/2 credit unless this and the primary review are both zero-finding.
+  [S002|session_init|pmem=8] `render-results.py --check`: pass
+  [S012|session_init|pmem=12] No next batch started while localbench is parked
+  [S013|session_init|pmem=14] No labels commit … [coding-agent-transcript] (2026-09-27)
+  [S059|session_init|pmem=6] Ledger commit: `37765439`
+  [S068|session_init|pmem=19] Web rerank: `answered`, `jev-1.13.0`, **251 ms**, 636 input / 64 output tokens.
+  [S077|session_init|pmem=5] Renderer tests: **3/3**
+  [S092|session_init|pmem=28] Use `recall` proactively before answering questions about past conversations, project history, or user preferences.
+  [S096|session_init|pmem=14] Fresh RPC session: `01a0e0c3-b3ec-7064-93e3-9a1e06486eab`
+====================================================================================================
+PROMPT P2 (12 sampled pairs)
+====================================================================================================
+Complete assignment thoroughly:
+
+Independent reviewer for the fresh W5 committed snapshot. Exact target commit: d5382ba6 (resolve full hash using git show). Read only git objects: git show d5382ba6:docs/0927_reality_plan.md and git show d5382ba6:.beads/issues.jsonl. Do not inspect live worktree files, current Beads DB/br show, earlier review messages, or uncommitted sibling rows. No tests, edits, Beads transitions, API/provider calls, credentials, secrets, or worker dispatch. Review the whole plan and all 18 Beads P0-P9/P11-P15/U04/U06/U07 for activation, acceptance, dependencies, source anchors and internal consistency; focus on the newly revised conditional/active P2/P8 language and line 290, P13/P11, P15 loaded-session contract. Return exact plan/issue hashes from Git objects, each finding with file:line and smallest correction or explicit ZERO for all 18. State runtime/provider NOT_RUN and no 2/2 credit unless two independent reviews of these exact bytes find zero new issues.
+  [S003|session_init|pmem=19] Use `reflect` for questions that need a synthesised answer over many memories.
+  [S015|session_init|pmem=24] The current user message and tool output take precedence over recalled memories when they conflict.
+  [S016|session_init|pmem=14] Fresh RPC session: `01a0e0c3-b3ec-7064-93e3-9a1e06486eab`
+  [S021|session_init|pmem=28] Use `recall` proactively before answering questions about past conversations, project history, or user preferences.
+  [S043|session_init|pmem=19] Receipt SHA: `cfccf89ae3cf9e87314741946140844bd0a83726b29fbc9d04e419942457ac41`
+  [S047|session_init|pmem=4] Commit: `8961d82d`
+  [S049|session_init|pmem=6] Ledger commit: `37765439`
+  [S054|session_init|pmem=5] Renderer tests: **3/3**
+  [S085|session_init|pmem=8] `render-results.py --check`: pass
+  [S093|session_init|pmem=14] No labels commit … [coding-agent-transcript] (2026-09-27)
+  [S095|session_init|pmem=9] Labeller A: **440/560** rows complete
+  [S098|session_init|pmem=17] Gate: `scored`, `jev-1.13.0`, **243 ms**, 747 input / 96 output tokens.
+====================================================================================================
+PROMPT P3 (11 sampled pairs)
+====================================================================================================
+Complete assignment thoroughly:
+
+Independent review #2 of the frozen W6 plan/bead snapshot. Exact commit ee4b96efe3650d902dd112ae5d864243561704ed. Read only committed Git objects with git show ee4b96ef:docs/0927_reality_plan.md and git show ee4b96ef:.beads/issues.jsonl; do not read live plan/JSONL, current Beads DB/br show, previous W4/W5/W6 discussion, or sibling bytes. No edits, tests, provider/API calls, credentials, Beads transitions, or dispatches. Review the complete plan and all 18 IDs P0-P9/P11-P15/U04/U06/U07, including embedded dependency fields, status counts (historical conditional 11 vs active keyless P2/P8 and 9 deferred), P8 mixed-call negative in both plan and Bead, and P15 loaded-session gate. Return exact Git-object hashes, all genuine contradictions with file:line/issue-row and minimal fix, or explicit ZERO in checked scope; positive/negative evidence and NO-CLAIM runtime/provider. This is not a request to inspect or execute referenced code.
+  [S004|session_init|pmem=15] Future batches will run `scripts/local-model-guard.sh` first
+  [S006|session_init|pmem=8] `render-results.py --check`: pass
+  [S008|session_init|pmem=13] Captured ran… [coding-agent-transcript] (2026-09-26)
+  [S031|session_init|pmem=10] `s… [coding-agent-transcript] (2026-09-27)
+  [S034|session_init|pmem=5] Remaining B: **560**
+  [S044|session_init|pmem=6] Ledger commit: `37765439`
+  [S051|session_init|pmem=1] Launch:
+  [S056|session_init|pmem=12] Four README verbs ran live once; all exited `0`.
+  [S084|session_init|pmem=9] All resolved model IDs: `jev-1.13.0`.
+  [S088|session_init|pmem=12] Implementation commit retained disabled: `dbfcf434`
+  [S091|session_init|pmem=9] Labeller A: **440/560** rows complete
+====================================================================================================
+PROMPT P4 (16 sampled pairs)
+====================================================================================================
+Complete assignment thoroughly:
+
+Mission: validate Jev with pinned live API on external data before building, then liven omp, dogfood, publish. This task is READ-ONLY source-reality audit of immutable plan commit 17695178 (plan SHA256 8b5eb6821ebe8726005ab351d1bbd4460e6f24850c4ece592dd5bd65868dd6d9; issues SHA256 f23fafa3141da5e2cffe55825a561527bbcfb626a793e5e1830f478a259e95c9). Do not use live Jev/API/keys; do not rerun tests or reported failures; do not edit/write files or beads. Treat evidence the plan marks deferred/NOT_RUN as NOT_RUN, not a new defect. Trace existing sources/receipts through ingestion, scoring/oracle, to the named plan decision and immutable bead. For each candidate state positive feasibility, planted RED, prevalence and exact source snapshot/hash/count, with NO-CLAIM. Tools: fh over mirror for design precedent; ripwire <dir> --for=<task> for code navigation; ast-grep/rg for structure/literals; docs-mirror TypeSafe primary sources and first-party SDK before answer-field claims; work/oracle-kit/index.mjs for any score-contract interpretation. Skills: skill://codebase-audit/SKILL.md for specific source-linked root cause; skill://beads-north-star/SKILL.md for acceptance/graph; skill://ripwire-orient/SKILL.md for source navigation. Return exact file:line/receipt JSON pointers and clearly separate direct observations from inference. Packet acceptance: source-linked coverage, one falsifier/RED per candidate if it exists, explicit source/license/prevalence and snapshot, consumer/action decision, and NOT_RUN boundaries. This is a research slice only; do not close, create, or update beads. Don't rerun canonical failures.
+Slice: P8/P13/P14 plus their cited existing evidence (jev-l7ym, jev-u9u9, jev-bzl7, jev-cu20, NFCorpus/FiQA, webscreen). Reconstruct source/receipt → eligible rows → score/oracle → decision. Distinguish relevance from downstream opens/answers and observe-only hook from a new advisory consumer. Inspect exact source/receipt pointers; no live traffic or failure reruns. Return candidate matrix with feasibility/RED/prevalence/snapshot and only new actionable gaps, not explicitly deferred work.
+  [S005|session_init|pmem=9] All resolved model IDs: `jev-1.13.0`.
+  [S007|session_init|pmem=7] Hook/receipt commit: `3ea1f1ea`
+  [S009|session_init|pmem=12] Implementation commit retained disabled: `dbfcf434`
+  [S010|session_init|pmem=20] Generated README row reads from `final-receipt.json`; no hand-edited result text.
+  [S024|session_init|pmem=17] Gate: `scored`, `jev-1.13.0`, **243 ms**, 747 input / 96 output tokens.
+  [S025|session_init|pmem=55] Final g1xw fix e9fed7b4: detached .omp/hooks/jev-shadow-worker.ts consumes real event state after session settle; fresh sessions now gate observed+scored (jev-1.13.0, 297ms) and web observed+answered (jev-1.13.0, 184ms).
+  [S040|session_init|pmem=45] Pane 1 to OrangeFrog: localbench is parking for ~90-100 min. Finish only the batch in flight; your guard will hold the next one. Do not start any local model until the guard exits 0.
+  [S045|session_init|pmem=1] Launch:
+  [S048|session_init|pmem=15] Future batches will run `scripts/local-model-guard.sh` first
+  [S055|session_init|pmem=17] Includes stratified sample-rate caveat and 52 pre-bar-call disclosure.
+  [S062|session_init|pmem=8] `render-results.py --check`: pass
+  [S065|session_init|pmem=19] Receipt SHA: `cfccf89ae3cf9e87314741946140844bd0a83726b29fbc9d04e419942457ac41`
+  [S067|session_init|pmem=5] Remaining A: **120**
+  [S070|session_init|pmem=30] Use `retain` to store durable facts (decisions, preferences, project context) the agent should remember in future sessions.
+  [S079|session_init|pmem=56] Pane 1 to CopperHeron: jev-i9ek closed. Next jev-k26w (br show jev-k26w): run each README kit command live once (no --fake, jev-1.13.0), receipt with answer/model/tokens/latency/spend vs the committed live answer. Send the sha.
+  [S090|session_init|pmem=5] Renderer tests: **3/3**
+====================================================================================================
+PROMPT P5 (10 sampled pairs)
+====================================================================================================
+Complete assignment thoroughly:
+
+Mission: validate Jev with pinned live API on external data before building, then liven omp, dogfood, publish. This task is READ-ONLY source-reality audit of immutable plan commit 17695178 (plan SHA256 8b5eb6821ebe8726005ab351d1bbd4460e6f24850c4ece592dd5bd65868dd6d9; issues SHA256 f23fafa3141da5e2cffe55825a561527bbcfb626a793e5e1830f478a259e95c9). Do not use live Jev/API/keys; do not rerun tests or reported failures; do not edit/write files or beads. Treat evidence the plan marks deferred/NOT_RUN as NOT_RUN, not a new defect. Trace existing sources/receipts through ingestion, scoring/oracle, to the named plan decision and immutable bead. For each candidate state positive feasibility, planted RED, prevalence and exact source snapshot/hash/count, with NO-CLAIM. Tools: fh over mirror for design precedent; ripwire <dir> --for=<task> for code navigation; ast-grep/rg for structure/literals; docs-mirror TypeSafe primary sources and first-party SDK before answer-field claims; work/oracle-kit/index.mjs for any score-contract interpretation. Skills: skill://codebase-audit/SKILL.md for specific source-linked root cause; skill://beads-north-star/SKILL.md for acceptance/graph; skill://ripwire-orient/SKILL.md for source navigation. Return exact file:line/receipt JSON pointers and clearly separate direct observations from inference. Packet acceptance: source-linked coverage, one falsifier/RED per candidate if it exists, explicit source/license/prevalence and snapshot, consumer/action decision, and NOT_RUN boundaries. This is a research slice only; do not close, create, or update beads. Don't rerun canonical failures.
+Slice: P2-P7 and U04/U06/U07 on the immutable 18-record set. Trace gate evidence beginning at EVAL.md:2715-2719 and the actual receipts/preregs; include jev-uncd/jev-1lim/jev-1miz source-to-label-to-score chain, denominator/duplicates, incumbent and whether named operator/action evidence exists. For U04/U06/U07 trace current source and planned positive/RED through relevant source receipts; honor explicit NOT_RUN. Do not investigate unrelated P15 census. Return candidate matrix and at most three concrete new source-reality defects.
+  [S017|session_init|pmem=19] Web rerank: `answered`, `jev-1.13.0`, **251 ms**, 636 input / 64 output tokens.
+  [S019|session_init|pmem=17] Gate: `scored`, `jev-1.13.0`, **243 ms**, 747 input / 96 output tokens.
+  [S023|session_init|pmem=45] Pane 1 to OrangeFrog: localbench is parking for ~90-100 min. Finish only the batch in flight; your guard will hold the next one. Do not start any local model until the guard exits 0.
+  [S027|session_init|pmem=24] The current user message and tool output take precedence over recalled memories when they conflict.
+  [S037|session_init|pmem=14] Fresh RPC session: `01a0e0c3-b3ec-7064-93e3-9a1e06486eab`
+  [S041|session_init|pmem=2] Answers:
+  [S042|session_init|pmem=6] Ledger commit: `37765439`
+  [S053|session_init|pmem=39] Pane 1 to OrangeFrog: 8c27e036 wording is right. With jev-h9tw, also fix the typo: the note key and text say 3db9d119; the original prereg commit is 3db9f119.
+  [S064|session_init|pmem=17] Includes stratified sample-rate caveat and 52 pre-bar-call disclosure.
+  [S094|session_init|pmem=6] Finding commit: `4c543ff0`
+====================================================================================================
+PROMPT P6 (11 sampled pairs)
+====================================================================================================
+Complete assignment thoroughly:
+
+Independent full review #2; use committed objects only. Target commit dcccf0354c58cdf72cb86efee1ca104b0b444e02. Read docs/0927_reality_plan.md ONLY via git show dcccf035:docs/0927_reality_plan.md and all Bead records ONLY via git show dcccf035:.beads/issues.jsonl. Do not inspect current worktree files, current .beads DB, br show, prior W4/W5 messages, or any uncommitted sibling bytes. No tests, edits, Beads transitions, provider/API calls, keys/secrets, or worker dispatch. Independently review the full plan and these 18 exact IDs: jev-p0-identify-consumer-e8uf, jev-p1-stranger-baseline-przc, jev-p2-gate-demand-qdtl, jev-p3-gate-hook-d6zt, jev-p4-gate-bar-gtok, jev-p5-gate-shadow-f63p, jev-p6-gate-advice-wk2c, jev-p7-gate-loss-depth-pwj4, jev-p8-search-feasibility-n2ca, jev-p9-stranger-quickstart-2srw, jev-p11-external-transfer-94e3, jev-p12-third-domain-2r0a, jev-p13-reader-outcome-pjzf, jev-p14-injection-advice-lqkm, jev-p15-contain-automatic-egress-810p, jev-u04-key-provider-check-p147, jev-u06-provider-output-redaction-noom, jev-u07-infisical-argv-gi70. Check plan/Bead activation, acceptance bars, source references, and dependency statements. Focus P13 named-user AND branch, P11 root/P0 optional, P2/P8 keyless acceptance/bar, P15 loaded-session admission/revoke. Return exact committed hashes, each real contradiction with exact file:line and smallest wording correction, or explicit ZERO for checked scope; include NO-CLAIM that runtime/provider behavior is NOT_RUN and no 2/2 credit absent two zero-finding reviews. Do not write any files.
+  [S018|session_init|pmem=1] Launch:
+  [S028|session_init|pmem=7] Planted README drift: **RED**
+  [S029|session_init|pmem=45] Pane 1 to OrangeFrog: localbench is parking for ~90-100 min. Finish only the batch in flight; your guard will hold the next one. Do not start any local model until the guard exits 0.
+  [S032|session_init|pmem=19] Receipt SHA: `cfccf89ae3cf9e87314741946140844bd0a83726b29fbc9d04e419942457ac41`
+  [S038|session_init|pmem=6] Ledger commit: `37765439`
+  [S057|session_init|pmem=17] Includes stratified sample-rate caveat and 52 pre-bar-call disclosure.
+  [S060|session_init|pmem=7] Hook/receipt commit: `3ea1f1ea`
+  [S066|session_init|pmem=12] No next batch started while localbench is parked
+  [S075|session_init|pmem=39] Pane 1 to OrangeFrog: 8c27e036 wording is right. With jev-h9tw, also fix the typo: the note key and text say 3db9d119; the original prereg commit is 3db9f119.
+  [S078|session_init|pmem=15] Future batches will run `scripts/local-model-guard.sh` first
+  [S089|session_init|pmem=12] Implementation commit retained disabled: `dbfcf434`
+====================================================================================================
+PROMPT P7 (2 sampled pairs)
+====================================================================================================
+CONDUCTOR (pane 1) to HazySpring: skill hint is now OFF (1f031068) on your misroute result. README (073d0063) and EVAL (2b58257e) still say it is ON. Correct both: README line -> retired/off with reason (live misroutes, 2 runs, bar 0) and commit 1f031068; one EVAL entry for the H1 loss (R131), the cut-0.7 result and your live-code check with spend. Same gates as before (render-results --check, 15-kit-claim 0 failed, keyless stranger run). README --only; EVAL via index-blob if others have pending hunks. No push. Callback DONE hint-off-docs <sha>.
+  [S033|ee-task-context|pmem=54] mem_01M30A8VERE22V7WFGAYJRTMH7 (ee-mem://mem_01M30A8VERE22V7WFGAYJRTMH7): Never use grep -c as proof of absence. A zero from grep -c foo bar is not evidence the pattern is missing. Use scripts/vgrep.sh (exit 3 on zero).
+  [S074|ee-task-context|pmem=97] mem_01M303RY4AESZR67EP623A1ZP5 (ee-mem://mem_01M303RY4AESZR67EP623A1ZP5): Hashing a working-tree file pins the digest to mutable state: the next edit silently invalidates the receipt while the recorded hash still looks authoritative. CORRECTED COMMAND: hash the committed blob -- `git show <sha>:<path> | shasum -a 256` -- and record the commit sha alongside the digest. Observed 2026-09-20.
+====================================================================================================
+PROMPT P8 (8 sampled pairs)
+====================================================================================================
+Complete assignment thoroughly:
+
+Mission: validate Jev with pinned live API on external data before building, then liven omp, dogfood, publish. This task is READ-ONLY source-reality audit of immutable plan commit 17695178 (plan SHA256 8b5eb6821ebe8726005ab351d1bbd4460e6f24850c4ece592dd5bd65868dd6d9; issues SHA256 f23fafa3141da5e2cffe55825a561527bbcfb626a793e5e1830f478a259e95c9). Do not use live Jev/API/keys; do not rerun tests or reported failures; do not edit/write files or beads. Treat evidence the plan marks deferred/NOT_RUN as NOT_RUN, not a new defect. Trace existing sources/receipts through ingestion, scoring/oracle, to the named plan decision and immutable bead. For each candidate state positive feasibility, planted RED, prevalence and exact source snapshot/hash/count, with NO-CLAIM. Tools: fh over mirror for design precedent; ripwire <dir> --for=<task> for code navigation; ast-grep/rg for structure/literals; docs-mirror TypeSafe primary sources and first-party SDK before answer-field claims; work/oracle-kit/index.mjs for any score-contract interpretation. Skills: skill://codebase-audit/SKILL.md for specific source-linked root cause; skill://beads-north-star/SKILL.md for acceptance/graph; skill://ripwire-orient/SKILL.md for source navigation. Return exact file:line/receipt JSON pointers and clearly separate direct observations from inference. Packet acceptance: source-linked coverage, one falsifier/RED per candidate if it exists, explicit source/license/prevalence and snapshot, consumer/action decision, and NOT_RUN boundaries. This is a research slice only; do not close, create, or update beads. Don't rerun canonical failures.
+Slice: P1/P9/P11/P12 and cross-domain candidates (HealthVer; kit portability) against immutable beads. Trace fresh-clone/README receipts and actual CLI/SDK code; inspect docs-mirror/typesafe/concepts/use-case-map.md and official SDK source before Jev question-field claims. Determine whether HealthVer 840 source rows/832 state IDs and its comparator/bar are ready, or expressly NOT_RUN. For P11/P12 distinguish an actual named external owner/adopter from examples and same-repo demos. Return source-linked candidate matrix, one positive/red/prevalence/source-snapshot record where available, and minimal new fixes only.
+  [S036|session_init|pmem=87] Pane 1: you are WindyLantern, pane 5, restarted at b71ba831 so the fixed gate-shadow hook loads. Use your native bash tool once: echo gate-shadow-proof. Then report wc -l of ~/.local/state/jev/gate-shadow.jsonl and the last row's status, model, existingFlagSource (no command text). My own session predates the hook, so my bash call cannot prove it.
+  [S052|session_init|pmem=11] Stage … [coding-agent-transcript] (2026-09-27)
+  [S061|session_init|pmem=13] Captured ran… [coding-agent-transcript] (2026-09-26)
+  [S071|session_init|pmem=24] Durable project facts, preferences, and decisions are retained automatically from completed turns.
+  [S082|session_init|pmem=10] `s… [coding-agent-transcript] (2026-09-27)
+  [S083|session_init|pmem=19] Use `reflect` for questions that need a synthesised answer over many memories.
+  [S086|session_init|pmem=55] Final g1xw fix e9fed7b4: detached .omp/hooks/jev-shadow-worker.ts consumes real event state after session settle; fresh sessions now gate observed+scored (jev-1.13.0, 297ms) and web observed+answered (jev-1.13.0, 184ms).
+  [S087|session_init|pmem=7] Planted README drift: **RED**
+====================================================================================================
+PROMPT P9 (2 sampled pairs)
+====================================================================================================
+CONDUCTOR (pane 1) to HazySpring (non-author): verify jev-4nyy round 2, receipt 0de52509. Re-derive from its 16 session files + skill-hint-calls.jsonl: WITH 6/8 vs WITHOUT 5/8 matching skill read within first 3 tool calls; 3/8 hints fired, each followed at call 1; 5/8 silent; prereg in bead before first session; spend 0.000427. Also read the 2 cases where the author says their label lost to agent+hint agreement: is the label wrong or the agent? If counts hold, comment VERIFIED. Bar (+3) missed: per LOSS DEPTH this is a result about this design. Leave bead open; callback DONE 4nyy-r2-verify <counts>.
+  [S081|ee-task-context|pmem=52] mem_01M303BDQZEXYBZRVFPSRNW4GG (ee-mem://mem_01M303BDQZEXYBZRVFPSRNW4GG): Never use grep -c as proof of absence; a zero-count grep exits 1 and reads as clean. Use scripts/vgrep.sh which exits 3 on zero matches.
+  [S097|ee-task-context|pmem=51] mem_01M303GEF8E8CVVXEKDB3TPVEP (ee-mem://mem_01M303GEF8E8CVVXEKDB3TPVEP, ee-mem://mem_01M303GEF8E8CVVXEKDB3TPVEP): Workspace rule: 'git stash' is forbidden on this shared tree; commit with --only instead.

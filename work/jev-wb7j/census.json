@@ -1,0 +1,12 @@
+{
+ "files": 270,
+ "sessions": 84,
+ "ee_blocks": 6,
+ "ee_block_tokens": 1386,
+ "sysmem_blocks": 8,
+ "sysmem_block_tokens": 9640,
+ "ee_items": 19,
+ "sysmem_items": 328,
+ "total_pairs": 347,
+ "sampled": 100
+}
