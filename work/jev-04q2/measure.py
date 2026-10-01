@@ -35,7 +35,24 @@ def wilson(k: int, n: int) -> tuple[float, float]:
     return (c - h, c + h)
 
 
-def sessions(days: int):
+def session_cwd(path: Path) -> str:
+    try:
+        with path.open(encoding="utf-8", errors="ignore") as fh:
+            for line in fh:
+                try:
+                    row = json.loads(line)
+                except ValueError:
+                    continue
+                if row.get("type") == "session":
+                    return str(row.get("cwd") or "")
+                if row.get("type") in ("toolCall", "toolResult", "message"):
+                    return ""
+    except FileNotFoundError:
+        pass
+    return ""
+
+
+def sessions(days: int, cwd: str = ""):
     cutoff = time.time() - days * 86400
     roots = [HOME / ".omp/agent/sessions"] + list(
         (HOME / ".omp/profiles").glob("*/agent/sessions")
@@ -43,10 +60,13 @@ def sessions(days: int):
     for root in roots:
         for path in root.glob("*/*.jsonl"):
             try:
-                if path.stat().st_mtime >= cutoff:
-                    yield path
+                if path.stat().st_mtime < cutoff:
+                    continue
             except FileNotFoundError:
                 continue
+            if cwd and session_cwd(path) != cwd:
+                continue
+            yield path
 
 
 def calls_in(path: Path) -> list[dict]:
@@ -101,9 +121,10 @@ def located(item: dict, followers: list[dict]) -> bool:
 
 def main(argv: list[str]) -> int:
     days = int(argv[argv.index("--days") + 1]) if "--days" in argv else 7
+    cwd = str(argv[argv.index("--cwd") + 1]) if "--cwd" in argv else ""
     stats = defaultdict(lambda: {"n": 0, "loc": 0, "chars": 0, "ctrl_loc": 0})
     pool = []
-    for path in sessions(days):
+    for path in sessions(days, cwd):
         seq = calls_in(path)
         for i, item in enumerate(seq):
             if item["name"] not in TOOLS or not item["paths"]:
@@ -132,7 +153,9 @@ def main(argv: list[str]) -> int:
             "tokens_per_located": round(tokens / s["loc"], 1) if s["loc"] else None,
             "control_located": s["ctrl_loc"],
         }
-    print(json.dumps({"days": days, "window": WINDOW, "tools": out}, indent=2))
+    print(
+        json.dumps({"days": days, "window": WINDOW, "cwd": cwd, "tools": out}, indent=2)
+    )
     f, g = out["find"], out["grep"]
     if f["tokens_per_located"] and g["tokens_per_located"]:
         ok = f["tokens_per_located"] <= 0.8 * g["tokens_per_located"] and f[

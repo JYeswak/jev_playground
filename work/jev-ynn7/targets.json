@@ -1,0 +1,42 @@
+{
+ "f01": {
+  "file": "pkg0/sub0/mod_quasar.py",
+  "marker": "ZXQ_FINDME_QUASAR_42"
+ },
+ "f02": {
+  "file": "pkg1/sub1/mod_bramble.py",
+  "marker": "ZXQ_FINDME_BRAMBLE_42"
+ },
+ "f03": {
+  "file": "pkg2/sub2/mod_tesseract.py",
+  "marker": "ZXQ_FINDME_TESSERACT_42"
+ },
+ "f04": {
+  "file": "pkg0/sub3/mod_halcyon.py",
+  "marker": "ZXQ_FINDME_HALCYON_42"
+ },
+ "f05": {
+  "file": "pkg1/sub0/mod_zephyr.py",
+  "marker": "ZXQ_FINDME_ZEPHYR_42"
+ },
+ "f06": {
+  "file": "pkg2/sub1/mod_cobalt.py",
+  "marker": "ZXQ_FINDME_COBALT_42"
+ },
+ "f07": {
+  "file": "pkg0/sub2/mod_mirage.py",
+  "marker": "ZXQ_FINDME_MIRAGE_42"
+ },
+ "f08": {
+  "file": "pkg1/sub3/mod_onyx.py",
+  "marker": "ZXQ_FINDME_ONYX_42"
+ },
+ "f09": {
+  "file": "pkg2/sub0/mod_saffron.py",
+  "marker": "ZXQ_FINDME_SAFFRON_42"
+ },
+ "f10": {
+  "file": "pkg0/sub1/mod_tundra.py",
+  "marker": "ZXQ_FINDME_TUNDRA_42"
+ }
+}

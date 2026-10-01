@@ -1,0 +1,102 @@
+[
+ {
+  "task": "f10",
+  "arm": "treat",
+  "order": 0
+ },
+ {
+  "task": "f03",
+  "arm": "treat",
+  "order": 1
+ },
+ {
+  "task": "f04",
+  "arm": "control",
+  "order": 2
+ },
+ {
+  "task": "f03",
+  "arm": "control",
+  "order": 3
+ },
+ {
+  "task": "f09",
+  "arm": "treat",
+  "order": 4
+ },
+ {
+  "task": "f05",
+  "arm": "control",
+  "order": 5
+ },
+ {
+  "task": "f01",
+  "arm": "control",
+  "order": 6
+ },
+ {
+  "task": "f10",
+  "arm": "control",
+  "order": 7
+ },
+ {
+  "task": "f07",
+  "arm": "treat",
+  "order": 8
+ },
+ {
+  "task": "f02",
+  "arm": "treat",
+  "order": 9
+ },
+ {
+  "task": "f02",
+  "arm": "control",
+  "order": 10
+ },
+ {
+  "task": "f05",
+  "arm": "treat",
+  "order": 11
+ },
+ {
+  "task": "f01",
+  "arm": "treat",
+  "order": 12
+ },
+ {
+  "task": "f08",
+  "arm": "treat",
+  "order": 13
+ },
+ {
+  "task": "f08",
+  "arm": "control",
+  "order": 14
+ },
+ {
+  "task": "f07",
+  "arm": "control",
+  "order": 15
+ },
+ {
+  "task": "f09",
+  "arm": "control",
+  "order": 16
+ },
+ {
+  "task": "f06",
+  "arm": "treat",
+  "order": 17
+ },
+ {
+  "task": "f06",
+  "arm": "control",
+  "order": 18
+ },
+ {
+  "task": "f04",
+  "arm": "treat",
+  "order": 19
+ }
+]

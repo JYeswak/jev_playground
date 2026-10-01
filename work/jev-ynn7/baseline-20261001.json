@@ -1,0 +1,41 @@
+{
+  "days": 7,
+  "window": 5,
+  "cwd": "/Users/josh/Developer/jev",
+  "tools": {
+    "find": {
+      "calls_with_paths": 4,
+      "located": 2,
+      "located_rate": 0.5,
+      "located_ci95": [
+        0.15,
+        0.85
+      ],
+      "tokens_per_located": 706.5,
+      "control_located": 0
+    },
+    "grep": {
+      "calls_with_paths": 50,
+      "located": 12,
+      "located_rate": 0.24,
+      "located_ci95": [
+        0.143,
+        0.3741
+      ],
+      "tokens_per_located": 11615.2,
+      "control_located": 1
+    },
+    "glob": {
+      "calls_with_paths": 0,
+      "located": 0,
+      "located_rate": null,
+      "located_ci95": [
+        0.0,
+        0.0
+      ],
+      "tokens_per_located": null,
+      "control_located": 0
+    }
+  }
+}
+BAR PASS: find 706.5 vs grep 11615.2 tokens/located
