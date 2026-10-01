@@ -130,7 +130,7 @@
       "expect": "off",
       "rule": "claim-without-evidence",
       "verdict": "REFUTED",
-      "evidence": "R130 precision 0.571 < 0.80",
+      "evidence": "R130 precision 0.571 < 0.80; jev-pn7b census 2026-10-01: 0 firings in sessions started after retirement (259 files, 784 injections)",
       "saving": "n/a"
     },
     {

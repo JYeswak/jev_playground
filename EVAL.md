@@ -3387,3 +3387,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Replay + shuffled control:** Jev 0/6 vs uniform-random 0/6 on same rows; bottleneck is agent opens, not pick quality.
 - **Action:** factory default OFF (no config hook switch exists); suite 11/11; inventory expect on->off; NEGATIVE_EVIDENCE R134.
 - **Boundary:** opens via untracked tools would miss the flags (rows track read/fetch/web_extract/open_url URL hashes); no live errors since Sep-28 to recount failure modes.
+
+## 2026-10-01 jev-pn7b retired-rule census: RESTART-BOUNDARY, 0 post-start firings (HazySpring) [live]
+
+- **Census (keyless, 259 session files 7d, 784 ttsr_injection entries):** retirements claim 2026-10-01T05:39Z (452c6ef9), key 16:38Z (956cd110) — first attempt used wrong TZ (04:39Z), corrected before verdict. PRE-start firings: key 436, claim 125. POST-start: 0 and 0.
+- **Bar (committed pre-counts):** DEFECT iff >=1 firing in a session started after its rule retirement; else restart-boundary. Result: boundary, no loader defect; fresh sessions never discover disabled/ rules.
+- **Mechanism:** stale in-memory registrations fire until session end (05:30 session fired 116x 05:31-05:40, 26x at/after the move, then stopped); rebuilds/session churn self-heal. One stale session file touched recently (01:19Z start, last stale firing 06:41Z) named as restart candidate; no restart performed (conductor decision).
+- **Boundary:** 24h 0-firing proof still open (post-retirement evidence so far: claim ~18h, key ~7h); session start = filename timestamp; firing = injectedRules name match.
