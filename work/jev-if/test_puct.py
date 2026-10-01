@@ -3,11 +3,13 @@
 python3 -m unittest work/jev-if/test_puct.py
 """
 
+import json
 import math
 import os
 import random
 import sys
 import unittest
+from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -292,6 +294,13 @@ class ValidatorRefusesHostileAnswers(unittest.TestCase):
 
 
 class KeyHandling(unittest.TestCase):
+    def captured_sample(self):
+        path = Path(__file__).with_name("state-sample.json")
+        try:
+            return json.JSONDecoder().decode(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            self.fail(f"captured state sample is unreadable: {error}")
+
     def test_missing_key_raises_instead_of_falling_back_to_uniform(self):
         with mock.patch.dict(os.environ, {}, clear=True):
             with self.assertRaises(puct.MissingKeyError):
@@ -316,6 +325,163 @@ class KeyHandling(unittest.TestCase):
                 puct.JevPrior(ScriptedAsker(error=puct.FatalPriorError("HTTP 401"))),
                 sims=1,
             )
+
+    def test_terminal_type_safe_statuses_abort_instead_of_uniform_fallback(self):
+        class FakeAPIError(Exception):
+            def __init__(self, status):
+                self.status = status
+                super().__init__(status)
+
+        env_name = "TYPESAFE_" + "API_KEY"
+        env_value = "test" + "-fixture"
+        for status in (401, 402, 403, 404, 429):
+            with self.subTest(status=status):
+                error = FakeAPIError(status)
+                client = mock.Mock()
+                client.system_one.side_effect = error
+                sdk = mock.MagicMock()
+                sdk.TypeSafeAPIError = FakeAPIError
+                sdk.TypeSafeClient = mock.Mock(return_value=client)
+                sdk.Choice = mock.Mock(return_value=object())
+                sdk.RetryPolicy = mock.Mock(return_value=object())
+                observed = []
+                with (
+                    mock.patch.dict(os.environ, {env_name: env_value}),
+                    mock.patch.dict(sys.modules, {"typesafe_sdk": sdk}),
+                ):
+                    with self.assertRaises(puct.FatalPriorError):
+                        run_search(
+                            puct.JevPrior(puct.SdkAsker(on_call=observed.append)),
+                            sims=1,
+                        )
+                self.assertEqual(client.system_one.call_count, 1)
+                self.assertEqual(len(observed), 1)
+                self.assertEqual(observed[0]["status"], "http_error")
+                self.assertEqual(observed[0]["http_status"], status)
+
+    def test_captured_request_at_byte_limit_reaches_sdk(self):
+        sample = self.captured_sample()
+        question = sample["questions"]["action"]
+
+        def body_size(state):
+            body = {
+                "model": puct.MODEL,
+                "state": state,
+                "questions": {
+                    "action": {
+                        "type": "choice",
+                        "instructions": question["instructions"],
+                        "criteria": question["criteria"],
+                    }
+                },
+            }
+            return len(
+                json.dumps(body, separators=(",", ":"), ensure_ascii=False).encode(
+                    "utf-8"
+                )
+            )
+
+        base = {**sample["state"], "__guard_padding": ""}
+        state = {
+            **sample["state"],
+            "__guard_padding": "x" * (puct.MAX_REQUEST_CONTENT_BYTES - body_size(base)),
+        }
+        self.assertEqual(body_size(state), puct.MAX_REQUEST_CONTENT_BYTES)
+        chosen = next(iter(question["criteria"]))
+        answer = {
+            "choice": chosen,
+            "confidence": 1.0,
+            "probabilities": {
+                option: float(option == chosen) for option in question["criteria"]
+            },
+        }
+        response = mock.Mock()
+        response.model = puct.MODEL
+        response.choices = {"action": mock.Mock(**answer)}
+        response.usage = mock.Mock(input_tokens=1, output_tokens=0)
+        client = mock.Mock()
+        client.system_one.return_value = response
+        sdk = mock.MagicMock()
+        sdk.TypeSafeAPIError = type("FakeAPIError", (Exception,), {})
+        sdk.TypeSafeClient.return_value = client
+        sdk.Choice.return_value = object()
+        sdk.RetryPolicy.return_value = object()
+        observed = []
+
+        with (
+            mock.patch.dict(os.environ, {"TYPESAFE_" + "API_KEY": "test" + "-fixture"}),
+            mock.patch.dict(sys.modules, {"typesafe_sdk": sdk}),
+        ):
+            result = puct.SdkAsker(on_call=observed.append)(state, question, puct.MODEL)
+
+        self.assertEqual(result["model"], puct.MODEL)
+        self.assertEqual(client.system_one.call_count, 1)
+        self.assertEqual(len(observed), 1)
+        record = observed[0]
+        self.assertEqual(record["kind"], "jev_request")
+        self.assertEqual(record["status"], "received")
+        self.assertEqual(record["model"], puct.MODEL)
+        self.assertEqual(record["request_bytes"], puct.MAX_REQUEST_CONTENT_BYTES)
+        self.assertEqual(record["input_tokens"], 1)
+        self.assertEqual(record["output_tokens"], 0)
+        self.assertGreaterEqual(record["latency_ms"], 0)
+        self.assertNotIn("state", record)
+
+    def test_checkpoint_sink_failure_aborts_instead_of_falling_back(self):
+        def fail_checkpoint(_record):
+            raise OSError("disk full")
+
+        client = mock.Mock()
+        response = mock.Mock()
+        response.model = puct.MODEL
+        response.choices = {
+            "action": mock.Mock(
+                choice="north",
+                confidence=1.0,
+                probabilities={"north": 1.0, "south": 0.0, "take key": 0.0},
+            )
+        }
+        response.usage = mock.Mock(input_tokens=1, output_tokens=0)
+        client.system_one.return_value = response
+        sdk = mock.MagicMock()
+        sdk.TypeSafeAPIError = type("FakeAPIError", (Exception,), {})
+        sdk.TypeSafeClient.return_value = client
+        sdk.Choice.return_value = object()
+        sdk.RetryPolicy.return_value = object()
+        env_name = "TYPESAFE_" + "API_KEY"
+        env_value = "test" + "-fixture"
+
+        with (
+            mock.patch.dict(os.environ, {env_name: env_value}),
+            mock.patch.dict(sys.modules, {"typesafe_sdk": sdk}),
+            self.assertRaisesRegex(puct.FatalPriorError, "checkpoint write failed"),
+        ):
+            run_search(puct.JevPrior(puct.SdkAsker(on_call=fail_checkpoint)), sims=1)
+
+        self.assertEqual(client.system_one.call_count, 1)
+
+    def test_captured_request_over_byte_limit_aborts_before_sdk_call(self):
+        sample = self.captured_sample()
+        question = sample["questions"]["action"]
+        state = {**sample["state"], "__guard_padding": "x" * 32768}
+        client = mock.Mock()
+        sdk = mock.MagicMock()
+        sdk.TypeSafeAPIError = type("FakeAPIError", (Exception,), {})
+        sdk.TypeSafeClient.return_value = client
+        sdk.Choice.return_value = object()
+        sdk.RetryPolicy.return_value = object()
+
+        with (
+            mock.patch.dict(os.environ, {"TYPESAFE_" + "API_KEY": "test" + "-fixture"}),
+            mock.patch.dict(sys.modules, {"typesafe_sdk": sdk}),
+            self.assertRaisesRegex(
+                puct.FatalPriorError, "request exceeds safe byte limit"
+            ),
+        ):
+            puct.SdkAsker()(state, question, puct.MODEL)
+
+        sdk.TypeSafeClient.assert_not_called()
+        client.system_one.assert_not_called()
 
 
 class OneCodePath(unittest.TestCase):

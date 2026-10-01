@@ -33,6 +33,27 @@ Q_SOFTMAX_T = 10  # mcts.py:202
 PRIOR_SOFTMAX_T = 5  # main.py:38 (--softmax_temperature 5), llm.py:82
 ABSENT_LOGPROB = -5  # llm.py:81 (the paper, Appendix B, says -10; the code uses -5)
 MAX_CHOICE_OPTIONS = 255  # docs-mirror/typesafe/api.md, Choice `criteria`
+MAX_REQUEST_CONTENT_BYTES = (
+    32_768  # 32 KiB; count the full compact UTF-8 request, before the SDK call
+)
+
+
+def _request_content_bytes(state, question, model):
+    body = {
+        "model": model,
+        "state": state,
+        "questions": {
+            "action": {
+                "type": "choice",
+                "instructions": question["instructions"],
+                "criteria": question["criteria"],
+            }
+        },
+    }
+    return len(
+        json.dumps(body, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    )
+
 
 # Per-game settings of the Table 4 "w.o. DP" ablation. MC-DML Appendix B: c_puct 50, 20 for
 # Deephome, 200 for Detective, "following Jang et al. (2020)"; Section 4.3: without DP "we follow
@@ -276,10 +297,11 @@ class SdkAsker:
     Retries are the SDK's RetryPolicy (408, 429, 5xx, connection errors, timeouts).
     """
 
-    def __init__(self, transport=None, max_retries=2, timeout=20.0):
+    def __init__(self, transport=None, max_retries=2, timeout=20.0, on_call=None):
         self.transport = transport
         self.max_retries = max_retries
         self.timeout = timeout
+        self.on_call = on_call
         self._client = None
         self._key = None
         self._lock = threading.Lock()
@@ -299,40 +321,85 @@ class SdkAsker:
                 self._key = key
             return self._client
 
+    def _checkpoint(
+        self, status, model, request_bytes, started, response=None, error=None
+    ):
+        if self.on_call is None:
+            return
+        usage = getattr(response, "usage", None)
+        row = {
+            "kind": "jev_request",
+            "status": status,
+            "model": getattr(response, "model", model),
+            "http_status": getattr(error, "status", None),
+            "request_bytes": request_bytes,
+            "latency_ms": round((time.monotonic() - started) * 1000, 3),
+            "input_tokens": getattr(usage, "input_tokens", None),
+            "output_tokens": getattr(usage, "output_tokens", None),
+            "sdk_max_retries": self.max_retries,
+        }
+        try:
+            self.on_call(row)
+        except Exception:
+            raise FatalPriorError("Jev request checkpoint write failed") from None
+
     def __call__(self, state, question, model):
         key = os.environ.get("TYPESAFE_API_KEY", "").strip()
         if not key:
             raise MissingKeyError(
                 "TYPESAFE_API_KEY is not set; the jev arm refuses to run without it."
             )
-        from typesafe_sdk import Choice, TypeSafeAPIError
+        request_bytes = _request_content_bytes(state, question, model)
+        if request_bytes > MAX_REQUEST_CONTENT_BYTES:
+            raise FatalPriorError("request exceeds safe byte limit")
+
+        from typesafe_sdk import Choice
 
         choice = Choice(
             instructions=question["instructions"], criteria=question["criteria"]
         )
+        started = time.monotonic()
         try:
             response = self._client_for(key).system_one(
                 state=state, questions={"action": choice}, model=model
             )
-        except TypeSafeAPIError as error:
-            if error.status in (401, 403):
+        except Exception as error:
+            http_status = getattr(error, "status", None)
+            status = (
+                "http_error"
+                if isinstance(http_status, int) and http_status >= 400
+                else "sdk_error"
+            )
+            self._checkpoint(status, model, request_bytes, started, error=error)
+            if http_status in (401, 402, 403, 404, 429):
                 raise FatalPriorError(
-                    "TypeSafe rejected the key (HTTP %d)" % error.status
+                    f"TypeSafe terminal HTTP status {http_status}"
                 ) from None
             raise
-        answer = response.choices["action"]
-        return {
-            "model": response.model,
-            "answer": {
-                "choice": answer.choice,
-                "confidence": answer.confidence,
-                "probabilities": dict(answer.probabilities),
-            },
-            "usage": {
-                "input_tokens": response.usage.input_tokens,
-                "output_tokens": response.usage.output_tokens,
-            },
-        }
+
+        try:
+            answer = response.choices["action"]
+            usage = response.usage
+            result = {
+                "model": response.model,
+                "answer": {
+                    "choice": answer.choice,
+                    "confidence": answer.confidence,
+                    "probabilities": dict(answer.probabilities),
+                },
+                "usage": {
+                    "input_tokens": usage.input_tokens,
+                    "output_tokens": usage.output_tokens,
+                },
+            }
+        except Exception as error:
+            self._checkpoint(
+                "response_error", model, request_bytes, started, response, error
+            )
+            raise
+
+        self._checkpoint("received", model, request_bytes, started, response)
+        return result
 
 
 class FakeAsker:

@@ -5,8 +5,8 @@
 Arms: uniform | jev (PUCT, same code path, prior swapped); fakejev (jev path with a keyless fake
 asker and --fake-latency, dev only); random | look (floors, no search).
 Defaults are MC-DML's Table 4 "w.o. Mc, Mi, DP" setting; see puct.GAMES for the per-game values.
-One row per real step, one final row per run. Rows are appended, flushed and fsynced; an error
-writes an error row and a final row before re-raising.
+Jev runs log one row per SDK call; every arm logs per-step and final rows.
+Rows are appended and fsynced; errors write an error row and final row before re-raising.
 """
 
 import argparse
@@ -18,6 +18,7 @@ import signal
 import sys
 import time
 import traceback
+from threading import Lock
 
 import puct
 
@@ -93,12 +94,14 @@ class JerichoEnv:
 class Rows:
     def __init__(self, path):
         self.path = path
+        self.lock = Lock()
 
     def write(self, row):
-        with open(self.path, "a", encoding="utf-8") as handle:
-            handle.write(json.dumps(row, ensure_ascii=False) + "\n")
-            handle.flush()
-            os.fsync(handle.fileno())
+        with self.lock:
+            with open(self.path, "a", encoding="utf-8") as handle:
+                handle.write(json.dumps(row, ensure_ascii=False) + "\n")
+                handle.flush()
+                os.fsync(handle.fileno())
 
 
 def parse_args(argv=None):
@@ -159,11 +162,11 @@ def parse_args(argv=None):
     return p.parse_args(argv)
 
 
-def make_prior(args):
+def make_prior(args, on_call=None):
     if args.arm == "uniform":
         return puct.uniform_prior
     if args.arm == "jev":
-        return puct.JevPrior(puct.SdkAsker())
+        return puct.JevPrior(puct.SdkAsker(on_call=on_call))
     return puct.JevPrior(puct.FakeAsker(latency=args.fake_latency))
 
 
@@ -244,7 +247,7 @@ def main(argv=None):
         search = None
         if args.arm in ("uniform", "jev", "fakejev"):
             priors = puct.PriorService(
-                make_prior(args),
+                make_prior(args, on_call=rows.write if args.arm == "jev" else None),
                 args.prior_transform,
                 args.history_actions,
                 args.max_inflight,
