@@ -68,7 +68,27 @@ if [ "${1:-}" = "--selftest" ]; then
   if [ "$rc" -ne 1 ]; then echo "SELFTEST_FAIL: planted unregistered claim did not turn the ratchet RED (rc=$rc): $red"; exit 1; fi
   case "$red" in *"$plant"*) ;; *) echo "SELFTEST_FAIL: RED did not name the planted sentence"; exit 1 ;; esac
   removed_pattern='on 640 in a fresh live run here'
-  awk -v needle="$removed_pattern" 'index($0, needle) == 0' "$root/docs/LEDGER.md" > "$d/removed-claim.md"
+  # Blank every registered phrase inside the needle's sentence, not the whole line: LEDGER line 15
+  # packs three claim sentences, so a line drop vanishes three candidates and stays at 100% (jev-9q1g).
+  python3 - "$here/kit/claims.tsv" "$root/docs/LEDGER.md" "$d/removed-claim.md" "$removed_pattern" <<'EOF' || { echo "SELFTEST_FAIL: sentence phrase-blanking failed"; exit 1; }
+import csv, re, sys
+claims_p, ledger_p, out_p, needle = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+lines = open(ledger_p).read().split("\n")
+hits = [i for i, l in enumerate(lines) if needle in l]
+assert len(hits) == 1, "needle must occur exactly once"
+i = hits[0]
+tgt = [s for s in re.split(r"(?<=[.!])\s+|\s*\|\s*", lines[i]) if needle in s]
+assert len(tgt) == 1, "needle must hit exactly one sentence"
+with open(claims_p) as fh:
+    pats = [r["readme_pattern"] for r in csv.DictReader(fh, delimiter="\t") if r.get("readme_pattern") and r["readme_pattern"].lower() in tgt[0].lower()]
+assert pats, "no registered pattern in needle sentence"
+new_line = lines[i]
+for p in pats:
+    new_line = re.sub(re.escape(p), "", new_line, flags=re.I)
+assert len(new_line) >= 20 and re.search(r"\d", new_line), "remnant must stay a candidate"
+lines[i] = new_line
+open(out_p, "w").write("\n".join(lines))
+EOF
   removed=$("$checker" "$here/kit/claims.tsv" "$d/removed-claim.md" "$root" 2>&1); rc=$?
   if [ "$rc" -eq 0 ]; then echo "SELFTEST_FAIL: removing a registered ledger claim stayed green"; exit 1; fi
   case "$removed" in *"pattern was not found"*) ;; *) echo "SELFTEST_FAIL: removed claim RED did not name the missing pattern: $removed"; exit 1 ;; esac
