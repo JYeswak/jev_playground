@@ -25,12 +25,20 @@ export type HintResult =
   | { hint: string; skill: string; confidence: number; model: string; latencyMs: number; usage?: { input_tokens: number; output_tokens: number } }
   | { hint: null; reason: string; model: string; latencyMs: number };
 
+/**
+ * Generic English function words carry no retrieval signal and let long,
+ * generic descriptions outrank precise ones on shared filler (jev-4nyy H1:
+ * dev recall 5/12 -> 7/12 on r1+r2 prompts; disclosed regression:
+ * rate-limiting drops out on stop-heavy descriptions, judged by held-out).
+ */
+const STOPWORDS: Record<string, true> = { the: true, a: true, an: true, and: true, or: true, of: true, to: true, in: true, on: true, for: true, with: true, how: true, what: true, when: true, where: true, which: true, who: true, while: true, our: true, we: true, you: true, your: true, does: true, should: true, is: true, are: true, was: true, were: true, be: true, been: true, have: true, has: true, had: true, will: true, would: true, can: true, could: true, there: true, their: true, they: true, them: true, this: true, that: true, these: true, those: true, from: true, into: true, over: true, after: true, before: true, about: true, than: true, also: true, all: true, any: true, each: true, other: true, some: true, such: true, only: true, too: true, very: true, just: true, still: true, never: true, ever: true, both: true, few: true, more: true, most: true, own: true, same: true, not: true, nor: true, no: true, one: true, two: true };
+
 function tokens(text: string): Set<string> {
   return new Set(
     text
       .toLowerCase()
       .split(/[^a-z0-9]+/)
-      .filter((word) => word.length > 2),
+      .filter((word) => word.length > 2 && !STOPWORDS[word]),
   );
 }
 
