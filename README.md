@@ -110,6 +110,18 @@ A 2026-09-25 local census found 1,711 native omp Jev calls in session files modi
 - `demos/` — one-command examples using recorded answers first.
 - `.omp/` — the integration seams: tools, hooks, and observation surfaces.
 
+## Jev in omp — what is ON
+
+Native judge (`modelRoles.judge`, key command-resolved via `work/jev-client/bin/typesafe-key.mjs`) runs in five profiles (default, claude, codex, muse, grok): passage ranking on `find`, per-prompt effort from auto-thinking, promise-and-stop detection from smart stop. Proven live both ways over RPC 2026-09-30 (EVAL.md smart-stop/autothink rows); organic 2026-10-01 02:10–04:50Z: 514 find, 85 auto-thinking, 76 unexpected-stop calls (EVAL.md §2026-10-01).
+
+Shadow hooks (log only, never change results; daily caps, stop on 401/402/403, fail open): bash risk scoring (`gate-observe`, `df2cf0d9`), web-result injection screening (`webscreen`, `7418e3b5`), web_search rerank dogfood (`9aa0372b`; 48 h live report on bead jev-bzl7: 12 scored rows, Jev agreed with rank-1 in 3, zero opens on either side), tool-result injection shadow (`9abe975b`).
+
+Per-prompt skill hints (`.omp/extensions/jev-skill-hint.ts`, listed in `.omp/config.yml`, `258e9d9a`; state capped at 400 chars, p95 255 ms on 10 long prompts, `c4c3c2a4`): re-verified both ways 2026-10-01 by fresh RPC sessions (SEO audit prompt → `seo-audit` hint; Hamlet summary → silent; bead jev-x1pq).
+
+Fleet watcher (`scripts/fleet-idle-watch.py`): an idle worker waiting on a human pages pane 1 (`be74fcf2`).
+
+Retired: the `claim-without-evidence` TTSR rule — held-out precision 0.571 vs a 0.80 bar (`NEGATIVE_EVIDENCE.md` R130); file moved to `.omp/rules/disabled/`.
+
 ## Read next
 
 - [`docs/LEDGER.md`](docs/LEDGER.md) — complete measurements, boundaries, and receipts.
