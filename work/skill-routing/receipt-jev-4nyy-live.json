@@ -68,9 +68,42 @@
   "spend": {
     "measured_usd": 0.00011628,
     "measured_basis": "usage-bearing rows only (final first-run call: 2769 in-tok; re-measure hinted rows ~2700 in-tok each); silent/timeout rows carry no usage object although the call may still bill",
-    "unmeasured_gap": "usage logging landed after the first 10 calls; fixed with regression test"
+    "unmeasured_gap": "usage logging landed after the first 10 calls; fixed with regression test",
+    "planned_calls_total": "11 + 11 + 2 overrun = 24 Jev calls this unit (all bounded runs + 1 accident, disclosed)"
   },
   "config_listing": "NOT listed in .omp/config.yml extensions: deliberately withheld until the bar passes (conductor order)",
   "scoreboard": "accumulating: per-call checkpoint rows (now instance-attributed) plus session files; alternating-sessions comparison needs multi-day data",
-  "boundary": "A hint is not proof the skill helped. Both latency FAILs are results about this design, not retests."
+  "boundary": "A hint is not proof the skill helped. Both latency FAILs are results about this design, not retests.",
+  "loss_depth_keepalive": {
+    "change": "kit/src/client.ts: one TypeSafeClient per (transport, timeout, retry, key) shape per process (commit a2b37d9d [test]); cache regression in kit/test/client.test.mjs",
+    "suites": "kit 59/59, key-provider 20/20, hooks+hint 89/89, ubs 0 warn on client change (1 pre-existing critical false positive: model-name check)",
+    "remeasure_out_of_repo": {
+      "sessions": 3,
+      "prompts": 12,
+      "loader": "explicit -e with --no-extensions, cwd /tmp/jev-4nyy-re2",
+      "mine_latencies_ms": [
+        144,
+        144,
+        147,
+        175,
+        182,
+        190,
+        205,
+        225,
+        236,
+        248,
+        249,
+        276
+      ],
+      "p50_ms": 190,
+      "p95_ms": 276,
+      "bar_ms": 300,
+      "verdict": "PASS",
+      "coverage": "3/12 delivered (analytics-tracking 0.61/0.75/0.69); silent = 7 choice-none + 1 low-confidence + 1 timeout; GA4-funnel acceptance prompt silent at low confidence this round (nondeterministic Choice confidence: hinted 0.51 before)",
+      "other_pane_rows": 2
+    },
+    "accidental_overrun": "a transport-test command launched a duplicate 12-prompt run; killed after warmup + first prompt (ga4 hinted 0.52, 260ms, 2618 in-tok billed); 2 unplanned calls accounted here, no further calls made",
+    "l3_reproof_keepalive": "fresh in-repo RPC session, 19 messages, exactly 1 jev-skill-hint message (analytics-tracking on the GA4 prompt); clock prompt silent",
+    "config_listing": "WITHHELD by kit-guard B7 refusal; bead jev-x1pq filed for human KIT_GATE_EDIT=1 relaunch"
+  }
 }
