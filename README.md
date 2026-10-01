@@ -13,6 +13,8 @@ From a fresh public clone:
 ```bash
 git clone https://github.com/JYeswak/jev_playground.git
 cd jev_playground
+git remote get-url origin
+git rev-parse HEAD
 npm ci --prefix kit
 npx --prefix kit --no-install jev doctor --robot
 # Expected without a key: NOT_RUN and exit 2.
