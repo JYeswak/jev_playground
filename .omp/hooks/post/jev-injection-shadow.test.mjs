@@ -83,6 +83,29 @@ test('shadow opt-out env keeps log-only behavior on a high score', async () => {
     else process.env.JEV_INJECTION_SHADOW_ENFORCE = prev;
   }
 });
+
+test('enforce dep beats env both ways', async () => {
+  const high = async () => ({ ok: true, model: 'jev-1.13.0', latencyMs: 2, scores: { inj: 0.9 } });
+  const prev = process.env.JEV_INJECTION_SHADOW_ENFORCE;
+  try {
+    delete process.env.JEV_INJECTION_SHADOW_ENFORCE;
+    const rowsShadow = [];
+    const shadowed = makeInjectionShadowHandler({ ask: high, append: async (_p, line) => rowsShadow.push(parseLine(line)), enforce: false });
+    const outShadow = await shadowed({ toolName: 'web_search', content: [{ type: 'text', text: 'planted injection text' }] });
+    assert.equal(outShadow, undefined);
+    assert.equal(rowsShadow[0].flag, true);
+    assert.equal(rowsShadow[0].withheld, true);
+    process.env.JEV_INJECTION_SHADOW_ENFORCE = '0';
+    const rowsForced = [];
+    const forced = makeInjectionShadowHandler({ ask: high, append: async (_p, line) => rowsForced.push(parseLine(line)), enforce: true });
+    const outForced = await forced({ toolName: 'web_search', content: [{ type: 'text', text: 'planted injection text' }] });
+    assert.match(outForced.content[0].text, /withheld by Jev screening/);
+    assert.equal(rowsForced[0].withheld, true);
+  } finally {
+    if (prev === undefined) delete process.env.JEV_INJECTION_SHADOW_ENFORCE;
+    else process.env.JEV_INJECTION_SHADOW_ENFORCE = prev;
+  }
+});
 test('injection shadow reads result.content and safely ignores a null result object', async () => {
   const rows = [];
   let calls = 0;

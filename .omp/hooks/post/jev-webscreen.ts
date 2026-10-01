@@ -198,7 +198,7 @@ function resultText(content: unknown): string | undefined {
   return parts.length ? parts.join("\n") : undefined;
 }
 
-type WebscreenDeps = { ask?: Ask; cap?: number; now?: () => string };
+type WebscreenDeps = { ask?: Ask; cap?: number; now?: () => string; enforce?: boolean };
 
 function unaskedDecision(raw: string, status: "local-only" | "fail_open", reason: string): ScreenDecision {
   const { units } = parseResult(raw);
@@ -230,7 +230,7 @@ export function makeWebscreenHandler(deps: WebscreenDeps = {}) {
       // Enforce by default (jev-eo40 QUALIFIED: Jev-alone FPR 0/350); shadow
       // only on explicit opt-out. Withholding happens only on Jev scores
       // (flagged is Jev-only); local-pattern hits are logged, never withheld.
-      const shadow = process.env.JEV_WEBSCREEN_ENFORCE === "0";
+      const shadow = deps.enforce === false ? true : deps.enforce === true ? false : process.env.JEV_WEBSCREEN_ENFORCE === "0";
       let decision: ScreenDecision & { replacement?: string };
       if (parseResult(raw).units.length === 0) {
         decision = unaskedDecision(raw, "local-only", "no-screenable-units");

@@ -19,7 +19,7 @@ const SECRET_SPANS = /s[k]-[A-Za-z0-9_-]{20,}|xai-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-
 type Event = { toolName?: unknown; toolCallId?: unknown; content?: unknown; result?: unknown; isError?: unknown };
 type Host = { on: (event: string, handler: (event: Event) => Promise<unknown>) => void };
 type Ask = (options: Parameters<typeof askJev>[0]) => Promise<JevResult>;
-type Deps = { ask?: Ask; append?: (path: string, line: string) => Promise<void>; path?: string; cap?: number; now?: () => string; screenLocalRead?: boolean };
+type Deps = { ask?: Ask; append?: (path: string, line: string) => Promise<void>; path?: string; cap?: number; now?: () => string; screenLocalRead?: boolean; enforce?: boolean };
 function defaultPath(): string { return process.env.JEV_INJECTION_SHADOW_PATH ?? join(homedir(), ".local", "state", "jev", "injection-shadow.jsonl"); }
 function hash(value: string): string { return createHash("sha256").update(value).digest("hex"); }
 function text(value: unknown): string {
@@ -136,7 +136,7 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
   // Enforce by default (jev-rud1 WITHHOLD: shadow-question clean 0/222, catch 268/300);
   // shadow log-only on explicit opt-out. Withholding happens ONLY on a Jev
   // score at or above CUT. Fail-open throughout: anything unscored passes.
-  const shadow = process.env.JEV_INJECTION_SHADOW_ENFORCE === "0";
+  const shadow = deps.enforce === false ? true : deps.enforce === true ? false : process.env.JEV_INJECTION_SHADOW_ENFORCE === "0";
   return async (event: Event): Promise<unknown> => {
     try {
       resetDay(state, now().slice(0, 10));
