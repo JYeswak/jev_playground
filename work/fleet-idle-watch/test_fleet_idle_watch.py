@@ -973,6 +973,32 @@ class ShadowFeatures(unittest.TestCase):
         )
 
 
+class RealertBackoff(unittest.TestCase):
+    """A pane that stays idle is paged at once, then at doubling gaps up to the cap.
+    Measured 2026-10-01: a fixed 600 s re-page sent pane 1 300 pages for 56 idle episodes."""
+
+    def test_first_page_is_immediate(self):
+        self.assertTrue(fiw.realert_due(1000.0, None, 0))
+
+    def test_gap_doubles_after_each_page(self):
+        base = fiw.REALERT
+        self.assertFalse(fiw.realert_due(base - 1, 0.0, 1))
+        self.assertTrue(fiw.realert_due(base, 0.0, 1))
+        self.assertFalse(fiw.realert_due(2 * base - 1, 0.0, 2))
+        self.assertTrue(fiw.realert_due(2 * base, 0.0, 2))
+
+    def test_gap_is_capped(self):
+        self.assertTrue(fiw.realert_due(float(fiw.REALERT_MAX), 0.0, 30))
+
+    def test_six_hour_idle_episode_pages_far_less_than_fixed_cadence(self):
+        pages, last, now = 0, None, 0.0
+        while now <= 6 * 3600:
+            if fiw.realert_due(now, last, pages):
+                pages, last = pages + 1, now
+            now += 60
+        self.assertLessEqual(pages, 7)  # fixed 600 s cadence would page 37 times
+
+
 class StaleIndexLock(unittest.TestCase):
     """The observed shape (four times on 2026-10-01): an empty .git/index.lock, no git holder."""
 

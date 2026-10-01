@@ -14,7 +14,8 @@ State  = from process evidence first, screen second (bead jev-6con):
            idle      omp is there and none of the above holds.
          Each state carries the evidence that decided it, e.g. "working (child: docker run ...)".
 Alert  = `ntm send jev --pane=1 "IDLE pane N ..."` after POLLS consecutive non-working polls,
-         then again every REALERT seconds while it stays that way.
+         then again while it stays that way, the gap doubling from REALERT up to REALERT_MAX
+         (measured 2026-10-01: a fixed 600 s re-page sent pane 1 300 pages for 56 idle episodes).
 Mail   = every round, each urgent/high Agent Mail message in the conductor's archive inbox that
          was never paged goes to pane 1 once as `MAIL <importance> from <from>: <subject> (id <id>,
          <HH:MM>Z)` (bead jev-lqfm). Paged ids persist in JEV_WATCH_INBOX_STATE, so a restart
@@ -74,6 +75,7 @@ SHADOW_HELPER = Path(__file__).with_name("fleet-jev-shadow.mjs")
 INTERVAL = int(os.environ.get("IDLE_INTERVAL", "60"))
 POLLS = int(os.environ.get("IDLE_POLLS", "2"))
 REALERT = int(os.environ.get("IDLE_REALERT", "600"))
+REALERT_MAX = int(os.environ.get("IDLE_REALERT_MAX", "7200"))
 SPINNER = re.compile(r"^\s*[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]")
 WAIT_MARKER = re.compile(
     r"(?:^\s*[⌛⏳]|^\s*Wait\b|\bwaiting on \d+ jobs?\b)",
@@ -861,6 +863,13 @@ def send_pane1(message: str) -> bool:
     return done.returncode == 0
 
 
+def realert_due(now: float, last: float | None, count: int) -> bool:
+    """First page of an idle episode is due at once; each re-page waits twice as long as the last."""
+    if last is None:
+        return True
+    return now - last >= min(REALERT * (2 ** max(count - 1, 0)), REALERT_MAX)
+
+
 def alert(index: int, since: float, words: str) -> None:
     stamp = time.strftime("%H:%MZ", time.gmtime(since))
     message = f"IDLE pane {index} (since {stamp}), last line: {words}"
@@ -1283,6 +1292,7 @@ def main() -> int:
     streak: dict[int, int] = {}
     idle_since: dict[int, float] = {}
     alerted_at: dict[int, float] = {}
+    alert_count: dict[int, int] = {}
     stalled_since: dict[int, float] = {}
     stalled_alerted: set[int] = set()
     print(f"watching {SESSION} worker panes every {INTERVAL}s", flush=True)
@@ -1319,6 +1329,7 @@ def main() -> int:
                 streak.pop(index, None)
                 idle_since.pop(index, None)
                 alerted_at.pop(index, None)
+                alert_count.pop(index, None)
                 continue
             if state == "idle" and omp_pid is not None:
                 try:
@@ -1361,10 +1372,12 @@ def main() -> int:
                 composer_same.pop(index, None)
             streak[index] = streak.get(index, 0) + 1
             idle_since.setdefault(index, now)
-            due = now - alerted_at.get(index, 0) >= REALERT
-            if streak[index] >= POLLS and due:
+            if streak[index] >= POLLS and realert_due(
+                now, alerted_at.get(index), alert_count.get(index, 0)
+            ):
                 alert(index, idle_since[index], f"[{state}] {words}")
                 alerted_at[index] = now
+                alert_count[index] = alert_count.get(index, 0) + 1
         stamp = time.strftime("%H:%M:%SZ", time.gmtime())
         ci = ci_lines()
         for line in ci:
