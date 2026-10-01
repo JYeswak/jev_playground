@@ -161,13 +161,17 @@ export async function screenPassages(
   }
   if (!result.ok) return { status: "fail_open", units: entries.length, flagged: [], local, scores: {}, latencyMs: result.latencyMs, usage: null, model: result.model, error: result.error };
   const scores: Record<string, number> = {};
-  const flagged = new Set<number>(local);
+  // Withholding happens ONLY on a Jev score at or above CUT (jev-eo40: the
+  // local pattern caused 100% of false positives on 350 real results). Local
+  // hits stay in `local` for the log and never withhold. A missing score is
+  // fail-safe: without a Jev number nothing is withheld.
+  const flagged = new Set<number>();
   for (const [index, [id]] of entries.entries()) {
     const score = result.scores[`inj_${id}`];
     if (typeof score === "number") {
       scores[id] = score;
       if (score >= CUT) flagged.add(index);
-    } else flagged.add(index);
+    }
   }
   return { status: "ok", units: entries.length, flagged: [...flagged].sort((a, b) => a - b), local, scores, latencyMs: result.latencyMs, usage: result.usage ? { input_tokens: result.usage.input_tokens, output_tokens: result.usage.output_tokens } : null, model: result.model };
 }
@@ -223,7 +227,10 @@ export function makeWebscreenHandler(deps: WebscreenDeps = {}) {
         calls = 0;
         paused = false;
       }
-      const shadow = process.env.JEV_WEBSCREEN_ENFORCE !== "1";
+      // Enforce by default (jev-eo40 QUALIFIED: Jev-alone FPR 0/350); shadow
+      // only on explicit opt-out. Withholding happens only on Jev scores
+      // (flagged is Jev-only); local-pattern hits are logged, never withheld.
+      const shadow = process.env.JEV_WEBSCREEN_ENFORCE === "0";
       let decision: ScreenDecision & { replacement?: string };
       if (parseResult(raw).units.length === 0) {
         decision = unaskedDecision(raw, "local-only", "no-screenable-units");
@@ -236,8 +243,8 @@ export function makeWebscreenHandler(deps: WebscreenDeps = {}) {
         decision = await screenWebResult(tool, raw, ask);
         if (decision.status === "fail_open" && decision.error && /\bHTTP (?:401|402|403)\b/.test(decision.error)) paused = true;
       }
+      await recordShadow(tool, raw, decision);
       if (shadow) {
-        await recordShadow(tool, raw, decision);
         return undefined;
       }
       const proofPath = process.env.JEV_WEBSCREEN_PROOF_PATH;
