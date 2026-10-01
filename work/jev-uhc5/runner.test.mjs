@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {call, cohortCoverage, cohortVerdict} from './run.mjs';
+import {call, cohortCoverage, cohortVerdict, pairedCorrectness} from './run.mjs';
 
 const model = {name: 'nimble:latest', digest: 'test-digest', ollamaVersion: '0.35.0'};
 
@@ -67,4 +67,11 @@ test('complete FiQA answers remain unscoreable under the multi-positive metric',
   assert.equal(coverage.complete, true);
   assert.equal(coverage.scoreable, false);
   assert.equal(coverage.verdict, 'NOT_RUN');
+});
+test('paired significance marks Jev as worse only when the local model wins', () => {
+  const jevLoss = pairedCorrectness(Array.from({length: 8}, () => false), Array.from({length: 8}, () => true));
+  const jevWin = pairedCorrectness(Array.from({length: 8}, () => true), Array.from({length: 8}, () => false));
+
+  assert.equal(jevLoss.significantlyWorse, true);
+  assert.equal(jevWin.significantlyWorse, false);
 });

@@ -343,7 +343,7 @@ function exactBinomialP(k, n) {
   }
   return Math.min(1, 2 * tail / (2 ** n));
 }
-function pairedCorrectness(jev, local) {
+export function pairedCorrectness(jev, local) {
   let jevOnlyWins = 0;
   let localOnlyWins = 0;
   for (let i = 0; i < jev.length; i++) {
@@ -351,7 +351,7 @@ function pairedCorrectness(jev, local) {
     else if (local[i] && !jev[i]) localOnlyWins++;
   }
   const p = exactBinomialP(jevOnlyWins, jevOnlyWins + localOnlyWins);
-  return {jevOnlyWins, localOnlyWins, twoSidedExactP: p, significantlyWorse: p < 0.05 && jevOnlyWins > localOnlyWins};
+  return {jevOnlyWins, localOnlyWins, twoSidedExactP: p, significantlyWorse: p < 0.05 && localOnlyWins > jevOnlyWins};
 }
 function fraction(numerator, denominator) {
   return denominator ? numerator / denominator : null;
