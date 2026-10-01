@@ -151,6 +151,13 @@ claim nobody can check:
   `session_start` + `before_agent_start`, injects `{ customType: jev-skill-hint, ... }` on hint
   and yields undefined when silent.
   Run: `node --test .omp/extensions/jev-skill-hint.test.mjs` (10 tests).
+- `.omp/extensions/jev-memory-filter.test.mjs` — the memory relevance filter (jev-7vn9/jev-s47b), keyless with an
+  injected asker: system-role injection text parses to redacted bullets (tool/user text never parsed);
+  irrelevant memories log drop and return undefined while relevant ones log keep; invalid Noul keeps
+  fail-safe and throwing askers fail open; daily cap stops calls and keeps; over-20 inputs score 20;
+  cut 0.5 drops below-threshold Nouls; repeat pairs reuse the verdict without a second call.
+  Run: `node --test .omp/extensions/jev-memory-filter.test.mjs` (12 tests; count owned by HazySpring,
+  seam move in progress — update if her rewrite changes it).
 - `work/fleet-idle-watch/test_fleet_idle_watch.py` — `scripts/fleet-idle-watch.py`'s classifier
   on process evidence (jev-6con), no tmux or ps: fixtures are the real process trees of jev panes
   0, 2, 4, 5 and two real screens, 2026-09-25. Both measured false readings: a screen with no

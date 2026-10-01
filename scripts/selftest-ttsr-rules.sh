@@ -90,12 +90,11 @@ arm_text() { # arm_text <rule-file> <expect fire|quiet> <label> <prose>
   else note FAIL "$label — wanted $want, got $got: $txt"; fail=$((fail+1)); fi
 }
 
-K=.omp/rules/jev-key-canonical-source.md
-# ROUTING rule: fires on topic contact, not on a defect. The bar is "is the injected text worth
-# one paragraph", not precision. Four agents reported this key missing and all four were wrong.
-arm "$K" fire  "jev-key: bash touches the key name"          'echo $TYPESAFE_API_KEY | head -c 4'
-arm "$K" fire  "jev-key: bash touches the endpoint"          'curl -s https://api.typesafe.ai/v1/systemone'
-arm "$K" quiet "jev-key: unrelated bash"                     'node work/jev-client/test/client.test.mjs'
+K=.omp/rules/disabled/jev-key-canonical-source.md
+# jev-key-canonical-source was RETIRED 2026-10-01 (jev-u05b verified: precision 0/26 on live
+# key-topic traffic; NEGATIVE_EVIDENCE R132, commit 956cd110). It now lives at
+# .omp/rules/disabled/jev-key-canonical-source.md, outside the non-recursive .omp/rules/*.md
+# discovery glob, so no arms apply; the retry condition is in R132.
 
 # claim-without-evidence (judged) was RETIRED 2026-10-01: a non-author's preregistered held-out
 # measurement put it at precision 0.571 / recall 0.522 at cut 0.7 against a 0.80 / 0.50 bar
