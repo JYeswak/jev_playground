@@ -1,0 +1,4 @@
+Working...
+Path: `tests/cli/commands.test.ts`
+
+Line 215: `["update", "--allow-channel-change", "--apply", "--yes", "--json"],`

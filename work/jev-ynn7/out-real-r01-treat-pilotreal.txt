@@ -1,0 +1,4 @@
+Working...
+Path: `src/cli.ts`
+
+Line 423: `async function deepLspDoctor(request: ParsedCommand): Promise<CliResult> {`

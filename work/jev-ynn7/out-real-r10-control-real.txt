@@ -1,0 +1,5 @@
+Working...
+Path: `tests/live/scenarios.json`
+
+Line 44 containing `test-skip-ts-fire`:
+`{"id":"test-skip-ts-fire","rule":"kit-test-skip",...}`

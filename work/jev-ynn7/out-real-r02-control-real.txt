@@ -1,0 +1,4 @@
+Working...
+Path: `src/lsp-probe.ts`
+
+Line 199: `function safePath(command: string, pathEnv: string, project: string): string | null {`

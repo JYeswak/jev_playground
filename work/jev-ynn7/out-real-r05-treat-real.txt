@@ -1,0 +1,4 @@
+Working...
+Path: `src/kit-update.ts`
+
+Line 285: `export function undoKitUpdate(input: KitUndoInput): { status: "RESTORED"; receiptId: string; activeVersion: string; updatePending: boolean } {`

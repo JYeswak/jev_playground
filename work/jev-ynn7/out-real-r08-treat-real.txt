@@ -1,0 +1,4 @@
+Working...
+Path: `src/lsp-probe.ts`
+
+Line 327: `const server = readiness.servers.find(candidate => candidate.name === "typescript-language-server");`

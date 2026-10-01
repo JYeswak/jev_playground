@@ -1,0 +1,4 @@
+Working...
+Path: `src/memory-readiness.ts`
+
+Line 15: `export interface MemoryRedactorReport {`

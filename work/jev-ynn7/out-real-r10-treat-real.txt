@@ -1,0 +1,4 @@
+Working...
+Path: `scripts/ttsr-harness.ts`
+
+Line 185: `// the verdict. Measured live (e2e-live test-skip-ts-fire, 2026-09-24): the write landed, then`

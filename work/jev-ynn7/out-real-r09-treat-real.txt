@@ -1,0 +1,4 @@
+Working...
+Path: `tests/cli/native-guide.test.ts`
+
+Line 23: `` `native-guide: UNAVAILABLE/NOT_RUN: external installed OMP ${packageVersion} is outside the documented/proven pre-import refusal versions (18.4.3, 18.4.4); re-ena… ``
