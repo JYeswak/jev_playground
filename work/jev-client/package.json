@@ -1,0 +1,10 @@
+{
+  "name": "jev-client",
+  "version": "0.0.0",
+  "description": "Jev SDK client measurements and key provider (tests run with node --test, no dependencies).",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  }
+}
