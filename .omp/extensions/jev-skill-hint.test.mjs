@@ -120,3 +120,13 @@ test('extension warms on session_start without awaiting and hints on prompt', as
   const warmHandler = seen.get('session_start');
   assert.equal(warmHandler({}), undefined);
 });
+
+test('resolved deadline hits log as timeout, not transport', async () => {
+  const slowAnswer = async () => { await new Promise((r) => setTimeout(r, SKILL_HINT_TIMEOUT_MS)); return { ok: false, reason: 'transport', error: 'timed out', latencyMs: 0, model: SKILL_HINT_MODEL }; };
+  const timed = await hintSkills({ prompt: GA4_PROMPT, roster: ROSTER, ask: slowAnswer, timeoutMs: SKILL_HINT_TIMEOUT_MS });
+  assert.equal(timed.hint, null);
+  assert.equal(timed.reason, 'timeout');
+  const fastAnswer = async () => ({ ok: false, reason: 'transport', error: 'refused', latencyMs: 40, model: SKILL_HINT_MODEL });
+  const fast = await hintSkills({ prompt: GA4_PROMPT, roster: ROSTER, ask: fastAnswer, timeoutMs: SKILL_HINT_TIMEOUT_MS });
+  assert.equal(fast.reason, 'transport');
+});

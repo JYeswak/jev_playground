@@ -10,11 +10,14 @@
 import { appendFile, mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { randomUUID } from "node:crypto";
 import { askJevChoice } from "../../kit/src/client.ts";
 import { hintSkills, loadSkillRoster, warmTransport, type ChoiceAsker, type SkillEntry } from "../../kit/src/skill-hint.ts";
 import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 
 const CALL_LOG = join(homedir(), ".local", "state", "jev", "skill-hint-calls.jsonl");
+// One extension load serves one session process: shared checkpoint rows stay attributable.
+const INSTANCE = randomUUID().slice(0, 8);
 
 type BeforeAgentStartEvent = { prompt?: string };
 
@@ -33,6 +36,7 @@ export function createSkillHintHandler(roster: SkillEntry[], ask: ChoiceAsker) {
     const result = await hintSkills({ prompt, roster, ask });
     await appendCall({
       ts: new Date().toISOString(),
+      instance: INSTANCE,
       model: result.model,
       status: result.hint === null ? "silent" : "hinted",
       ...(result.hint === null ? { reason: result.reason } : { skill: result.skill, confidence: result.confidence, ...(result.usage ? { usage: result.usage } : {}) }),
@@ -60,6 +64,7 @@ export default function jevSkillHintExtension(pi: { on: (event: string, handler:
     void warmTransport(ask).then((warmed) =>
       appendCall({
         ts: new Date().toISOString(),
+        instance: INSTANCE,
         model: warmed.model,
         status: "warmup",
         ...(warmed.ok ? { ...(warmed.usage ? { usage: warmed.usage } : {}) } : { reason: warmed.reason }),

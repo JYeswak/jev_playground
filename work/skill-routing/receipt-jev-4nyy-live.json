@@ -13,7 +13,7 @@
     "evidence": "fresh codex RPC session: 0 hint messages in 4-message transcript, sessionSettled true",
     "verdict": "PASS silent"
   },
-  "latency": {
+  "latency_first_run": {
     "n": 11,
     "sorted_ms": [
       153,
@@ -32,18 +32,45 @@
     "p95_ms": 1930,
     "bar_ms": 300,
     "verdict": "FAIL",
-    "analysis": "all three misses are first calls in fresh processes (TLS/SDK cold start); 8 of 11 warm calls land 153-290ms",
-    "retry_condition": "warm-up call at session start, persistent transport, or a bar that separates cold from warm p95"
+    "analysis": "all three misses are first calls in fresh processes (TLS/SDK cold start); 8 of 11 warm calls land 153-290ms"
   },
-  "calls": 11,
-  "calls_bound": 12,
+  "remeasure": {
+    "design": "session_start warmup (one tiny Choice, fire-and-forget, logged) + 300ms hint deadline with timeout status; 3 fresh RPC sessions x 11 prompts (each first prompt included), all completed",
+    "calls": "11 prompts, all with attempted Jev calls (shortlist non-empty throughout)",
+    "attribution": "my prompt lengths [127,119,115,83,105,108,102,83,104,117,83] matched against checkpoint rows; 63/22-char and extra rows are other panes sharing the extension",
+    "mine_sorted_ms": [
+      146,
+      156,
+      159,
+      160,
+      170,
+      174,
+      211,
+      254,
+      261,
+      306,
+      445
+    ],
+    "p50_ms": 174,
+    "p95_ms": 445,
+    "bar_ms": 300,
+    "verdict": "FAIL (1930 -> 445, bar still stands)",
+    "cold_start_note": "warmup rows bill 1921-2688ms yet first prompts still time out (306, 445ms): the SDK builds one client per call so no connection is reused; session-start warming cannot warm a connection the hint call never shares",
+    "coverage": {
+      "delivered": 4,
+      "eligible": 11,
+      "verbatim": "4/11 overall; 4/8 on analytics prompts; silent = 5 choice-none + 2 timeouts; clocks silent throughout",
+      "note": "GTM-checkout and UTM-strategy prompts chose none: a quality signal beside the latency one"
+    }
+  },
+  "calls_bound": "11 + 11 actual of rolling prereg bounds (first run <= 12; re-measure 11 prompts, all completed)",
   "stops": "no 401/402/403 on any call",
   "spend": {
     "measured_usd": 0.00011628,
-    "measured_basis": "final call billed 2769 input tokens at $0.042 per million; output free",
-    "unmeasured": "first 10 calls predate usage logging (gap fixed in be-commit below; usage-flow regression test added)",
-    "bound": "actual 11 of 12 preregistered calls"
+    "measured_basis": "usage-bearing rows only (final first-run call: 2769 in-tok; re-measure hinted rows ~2700 in-tok each); silent/timeout rows carry no usage object although the call may still bill",
+    "unmeasured_gap": "usage logging landed after the first 10 calls; fixed with regression test"
   },
-  "scoreboard": "accumulating: per-call checkpoint rows in ~/.local/state/jev/skill-hint-calls.jsonl plus session files; alternating-sessions comparison needs multi-day data",
-  "boundary": "A hint is not proof the skill helped. Latency FAIL is a result about this design, not a retestable bar."
+  "config_listing": "NOT listed in .omp/config.yml extensions: deliberately withheld until the bar passes (conductor order)",
+  "scoreboard": "accumulating: per-call checkpoint rows (now instance-attributed) plus session files; alternating-sessions comparison needs multi-day data",
+  "boundary": "A hint is not proof the skill helped. Both latency FAILs are results about this design, not retests."
 }

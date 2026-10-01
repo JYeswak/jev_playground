@@ -128,7 +128,12 @@ export async function hintSkills(options: {
     return { hint: null, reason, model, latencyMs: elapsed };
   }
   const latencyMs = Date.now() - started;
-  if (!answer.ok) return { hint: null, reason: answer.reason, model: answer.model, latencyMs };
+  if (!answer.ok) {
+    // The SDK resolves deadline hits as transport/http, it does not throw:
+    // a slow failure at the deadline is a timeout, whatever the envelope says.
+    const timedOut = latencyMs >= deadlineMs - 60 && (answer.reason === "transport" || answer.reason === "http");
+    return { hint: null, reason: timedOut ? "timeout" : answer.reason, model: answer.model, latencyMs };
+  }
   if (answer.choice === SKILL_HINT_NONE || answer.confidence < cut) {
     return { hint: null, reason: answer.choice === SKILL_HINT_NONE ? "choice-none" : "low-confidence", model: answer.model, latencyMs };
   }

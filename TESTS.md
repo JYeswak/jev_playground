@@ -144,10 +144,10 @@ claim nobody can check:
   `ga4`/`analytics-tracking` for a GA4 funnel prompt and neither for `what time is it`; a confident
   non-none Choice becomes `Likely relevant skills: ...` while none, sub-cut confidence, refusal,
   throw, and empty prompt stay silent; billed usage flows to the hint result; slow failures past the
-  300 ms deadline log reason `timeout` while fast ones keep theirs; warmup probes once without
-  blocking; the factory registers `session_start` + `before_agent_start`, injects
-  `{ customType: jev-skill-hint, ... }` on hint and yields undefined when silent.
-  Run: `node --test .omp/extensions/jev-skill-hint.test.mjs` (9 tests).
+  300 ms deadline log reason `timeout` (thrown and SDK-resolved alike) while fast ones keep theirs;
+  warmup probes once without blocking; the factory registers `session_start` + `before_agent_start`,
+  injects `{ customType: jev-skill-hint, ... }` on hint and yields undefined when silent.
+  Run: `node --test .omp/extensions/jev-skill-hint.test.mjs` (10 tests).
 - `work/fleet-idle-watch/test_fleet_idle_watch.py` — `scripts/fleet-idle-watch.py`'s classifier
   on process evidence (jev-6con), no tmux or ps: fixtures are the real process trees of jev panes
   0, 2, 4, 5 and two real screens, 2026-09-25. Both measured false readings: a screen with no
