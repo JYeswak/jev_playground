@@ -1,0 +1,290 @@
+{
+ "main-k01-auto": {
+  "think": 169,
+  "in": 41811,
+  "out": 2891,
+  "cost": 0.005307,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k01-high": {
+  "think": 205,
+  "in": 40869,
+  "out": 2313,
+  "cost": 0.004858,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k02-auto": {
+  "think": 300,
+  "in": 42694,
+  "out": 3638,
+  "cost": 0.005392,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k02-high": {
+  "think": 544,
+  "in": 45097,
+  "out": 5181,
+  "cost": 0.006118,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k03-auto": {
+  "think": 120,
+  "in": 41247,
+  "out": 2333,
+  "cost": 0.00506,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k03-high": {
+  "think": 209,
+  "in": 42985,
+  "out": 3425,
+  "cost": 0.005622,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k04-auto": {
+  "think": 201,
+  "in": 8050,
+  "out": 2185,
+  "cost": 0.001695,
+  "lvls": [
+   "low"
+  ]
+ },
+ "main-k04-high": {
+  "think": 208,
+  "in": 79344,
+  "out": 2420,
+  "cost": 0.00865,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k05-auto": {
+  "think": 0,
+  "in": 40005,
+  "out": 1290,
+  "cost": 0.004644,
+  "lvls": [
+   "low"
+  ]
+ },
+ "main-k05-high": {
+  "think": 0,
+  "in": 79501,
+  "out": 1830,
+  "cost": 0.008624,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k06-auto": {
+  "think": 485,
+  "in": 83906,
+  "out": 6155,
+  "cost": 0.010302,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k06-high": {
+  "think": 369,
+  "in": 47314,
+  "out": 4390,
+  "cost": 0.005999,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k07-auto": {
+  "think": 316,
+  "in": 82877,
+  "out": 3450,
+  "cost": 0.009542,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k07-high": {
+  "think": 332,
+  "in": 44586,
+  "out": 3852,
+  "cost": 0.005875,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k08-auto": {
+  "think": 99,
+  "in": 7430,
+  "out": 1426,
+  "cost": 0.001401,
+  "lvls": [
+   "low"
+  ]
+ },
+ "main-k08-high": {
+  "think": 187,
+  "in": 41527,
+  "out": 2879,
+  "cost": 0.00512,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k09-auto": {
+  "think": 689,
+  "in": 46219,
+  "out": 7646,
+  "cost": 0.006647,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k09-high": {
+  "think": 487,
+  "in": 95338,
+  "out": 6458,
+  "cost": 0.011306,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k10-auto": {
+  "think": 164,
+  "in": 42166,
+  "out": 3052,
+  "cost": 0.005378,
+  "lvls": [
+   "xhigh"
+  ]
+ },
+ "main-k10-high": {
+  "think": 181,
+  "in": 43425,
+  "out": 2656,
+  "cost": 0.005178,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k11-auto": {
+  "think": 643,
+  "in": 6277,
+  "out": 6080,
+  "cost": 0.002235,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k11-high": {
+  "think": 764,
+  "in": 40492,
+  "out": 1631,
+  "cost": 0.004686,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k12-auto": {
+  "think": 121,
+  "in": 7583,
+  "out": 1563,
+  "cost": 0.001443,
+  "lvls": [
+   "low"
+  ]
+ },
+ "main-k12-high": {
+  "think": 114,
+  "in": 41081,
+  "out": 2098,
+  "cost": 0.004994,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k13-auto": {
+  "think": 270,
+  "in": 81134,
+  "out": 3877,
+  "cost": 0.00929,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k13-high": {
+  "think": 327,
+  "in": 44926,
+  "out": 4937,
+  "cost": 0.006208,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k14-auto": {
+  "think": 326,
+  "in": 41191,
+  "out": 2585,
+  "cost": 0.004946,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k14-high": {
+  "think": 179,
+  "in": 117896,
+  "out": 2899,
+  "cost": 0.012527,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k15-auto": {
+  "think": 338,
+  "in": 80520,
+  "out": 3365,
+  "cost": 0.008959,
+  "lvls": [
+   "medium"
+  ]
+ },
+ "main-k15-high": {
+  "think": 356,
+  "in": 42882,
+  "out": 4334,
+  "cost": 0.005468,
+  "lvls": [
+   "high"
+  ]
+ },
+ "main-k16-auto": {
+  "think": 1144,
+  "in": 94369,
+  "out": 9949,
+  "cost": 0.012188,
+  "lvls": [
+   "low"
+  ]
+ },
+ "main-k16-high": {
+  "think": 1433,
+  "in": 77903,
+  "out": 12181,
+  "cost": 0.011261,
+  "lvls": [
+   "high"
+  ]
+ }
+}
