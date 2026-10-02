@@ -1,0 +1,3042 @@
+[
+ {
+  "id": 36952991370,
+  "conclusion": "failure",
+  "registered-suites": {
+   "dur": 247,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     5,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     38,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     190,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "gates": {
+   "dur": 166,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     4,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     4,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     1,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     20,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     5,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     2,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     35,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     84,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36952525022,
+  "conclusion": "failure",
+  "registered-suites": {
+   "dur": 272,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     4,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     41,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     4,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     211,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "gates": {
+   "dur": 206,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     4,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     9,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     2,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     51,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     121,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36950369981,
+  "conclusion": "failure",
+  "gates": {
+   "dur": 205,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     0,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     6,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     7,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     14,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     2,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     49,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     116,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 266,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout": [
+     5,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     0,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     2,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     30,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     4,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     218,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36948298757,
+  "conclusion": "failure",
+  "gates": {
+   "dur": 175,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     0,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     6,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     4,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     7,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     13,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     2,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     40,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     98,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 234,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     4,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     0,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     33,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     184,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     1,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36945721265,
+  "conclusion": "failure",
+  "registered-suites": {
+   "dur": 262,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     0,
+     "success"
+    ],
+    "Checkout": [
+     5,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     31,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     213,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "gates": {
+   "dur": 213,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     4,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     2,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     9,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     3,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     50,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     127,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     1,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36945479584,
+  "conclusion": "failure",
+  "gates": {
+   "dur": 153,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     4,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     2,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     11,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     2,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     35,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     85,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 273,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     4,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     4,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     41,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     4,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     209,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     1,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36942270101,
+  "conclusion": "failure",
+  "registered-suites": {
+   "dur": 215,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     4,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     4,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     2,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     38,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     158,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "gates": {
+   "dur": 175,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     6,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     12,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     2,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     42,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     96,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36942219519,
+  "conclusion": "failure",
+  "registered-suites": {
+   "dur": 283,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     2,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     2,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     56,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     2,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     204,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "gates": {
+   "dur": 183,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     5,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     2,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     17,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     2,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     1,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     42,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     100,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36936922510,
+  "conclusion": "failure",
+  "gates": {
+   "dur": 212,
+   "conc": "success",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     2,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     9,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     2,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     51,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     124,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "success"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "success"
+    ],
+    "Post Checkout (full history: gate stages": [
+     1,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 265,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout": [
+     5,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     31,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     4,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     215,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36921649952,
+  "conclusion": "failure",
+  "gates": {
+   "dur": 187,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     6,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     7,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     17,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     2,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     3,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     42,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     99,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 256,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     5,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     47,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     188,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36914300710,
+  "conclusion": "success",
+  "gates": {
+   "dur": 218,
+   "conc": "success",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     6,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     9,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     13,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     3,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     51,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     125,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "success"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "success"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 292,
+   "conc": "success",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     6,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     2,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     53,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     214,
+     "success"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "success"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "success"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "success"
+    ],
+    "Post Checkout": [
+     1,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36909687234,
+  "conclusion": "success",
+  "gates": {
+   "dur": 211,
+   "conc": "success",
+   "steps": {
+    "Set up job": [
+     0,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     6,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     4,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     2,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     9,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     3,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     50,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     125,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "success"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "success"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 291,
+   "conc": "success",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     3,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     55,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     7,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     207,
+     "success"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     1,
+     "success"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "success"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "success"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36908102585,
+  "conclusion": "failure",
+  "gates": {
+   "dur": 239,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     0,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     6,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     2,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     34,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     3,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     50,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     126,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 295,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     2,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     2,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     54,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     216,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     1,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36902412939,
+  "conclusion": "failure",
+  "registered-suites": {
+   "dur": 270,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     5,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     2,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     41,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     4,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     207,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "gates": {
+   "dur": 223,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     15,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     3,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     51,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     128,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36901632899,
+  "conclusion": "failure",
+  "registered-suites": {
+   "dur": 262,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout": [
+     5,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     33,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     212,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "gates": {
+   "dur": 228,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     11,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     4,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     9,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     11,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     3,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     52,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     131,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36900299970,
+  "conclusion": "failure",
+  "gates": {
+   "dur": 218,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     6,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     2,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     9,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     2,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     2,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     52,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     127,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 264,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     9,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     2,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     52,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     178,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36900208765,
+  "conclusion": "failure",
+  "gates": {
+   "dur": 247,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     7,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     6,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     2,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     24,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     2,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     3,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     40,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     99,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 297,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     2,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     56,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     4,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     217,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36897089519,
+  "conclusion": "failure",
+  "registered-suites": {
+   "dur": 264,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout": [
+     5,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     4,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     1,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     32,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     4,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     214,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "gates": {
+   "dur": 222,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     1,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     4,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     6,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     17,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     3,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     51,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     127,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36893494926,
+  "conclusion": "failure",
+  "gates": {
+   "dur": 213,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     0,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     1,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     10,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     1,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     2,
+     "success"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     51,
+     "success"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     126,
+     "success"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "success"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "failure"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "registered-suites": {
+   "dur": 294,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     4,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     56,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     4,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     212,
+     "failure"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "skipped"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ },
+ {
+  "id": 36892880589,
+  "conclusion": "failure",
+  "registered-suites": {
+   "dur": 268,
+   "conc": "success",
+   "steps": {
+    "Set up job": [
+     2,
+     "success"
+    ],
+    "Checkout": [
+     6,
+     "success"
+    ],
+    "Node 22.18+ (README.md:26)": [
+     5,
+     "success"
+    ],
+    "Bun (6 suites run `bun test`, kit-guard ": [
+     2,
+     "success"
+    ],
+    "uv (2 suites run under the adapter venv,": [
+     1,
+     "success"
+    ],
+    "Install the prerequisites the suite comm": [
+     56,
+     "success"
+    ],
+    "omp 18.3.0 (the two TTSR selftests call ": [
+     3,
+     "success"
+    ],
+    "Plant a suite defect in the runner check": [
+     0,
+     "skipped"
+    ],
+    "Plant a Run:-only defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Plant a commit-msg hook defect in the ru": [
+     0,
+     "skipped"
+    ],
+    "Plant a TTSR rule defect in the runner c": [
+     0,
+     "skipped"
+    ],
+    "Run registered suites": [
+     187,
+     "success"
+    ],
+    "Post uv (2 suites run under the adapter ": [
+     0,
+     "success"
+    ],
+    "Post Bun (6 suites run `bun test`, kit-g": [
+     1,
+     "success"
+    ],
+    "Post Node 22.18+ (README.md:26)": [
+     0,
+     "success"
+    ],
+    "Post Checkout": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  },
+  "gates": {
+   "dur": 54,
+   "conc": "failure",
+   "steps": {
+    "Set up job": [
+     0,
+     "success"
+    ],
+    "Checkout (full history: gate stages read": [
+     5,
+     "success"
+    ],
+    "Plant defect in runner checkout only (di": [
+     0,
+     "skipped"
+    ],
+    "Node 22.18+ (README.md:26; the client an": [
+     5,
+     "success"
+    ],
+    "Verify receipt-backed README results tab": [
+     8,
+     "success"
+    ],
+    "ast-grep binary as `ast-grep` (stage 44 ": [
+     2,
+     "success"
+    ],
+    "Toolchain proof line": [
+     0,
+     "success"
+    ],
+    "ripgrep (stage 44 and friends scan with ": [
+     26,
+     "success"
+    ],
+    "Install br from official release asset (": [
+     5,
+     "success"
+    ],
+    "Import the bead store with released br": [
+     0,
+     "failure"
+    ],
+    "Run all gates (keyless; --portable, the ": [
+     0,
+     "skipped"
+    ],
+    "Run gates.sh --selftest --portable (same": [
+     0,
+     "skipped"
+    ],
+    "Diagnose RED stages with full output (lo": [
+     0,
+     "skipped"
+    ],
+    "Verdict (RED fails; SKIP is gates.sh's o": [
+     0,
+     "skipped"
+    ],
+    "Post Node 22.18+ (README.md:26; the clie": [
+     0,
+     "skipped"
+    ],
+    "Post Checkout (full history: gate stages": [
+     0,
+     "success"
+    ],
+    "Complete job": [
+     0,
+     "success"
+    ]
+   }
+  }
+ }
+]

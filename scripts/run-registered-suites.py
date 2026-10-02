@@ -693,6 +693,15 @@ def main(argv):
         if not arg.startswith("-"):
             repo = Path(arg)
     rows = survey(repo)
+    shard = [a for a in argv[1:] if a.startswith("--shard=")]
+    if shard:
+        try:
+            idx, total = (int(x) for x in shard[0].split("=", 1)[1].split("/", 1))
+            assert 1 <= idx <= total
+        except (ValueError, AssertionError):
+            print("ERROR: --shard=I/N with 1 <= I <= N", file=sys.stderr)
+            return 2
+        rows = [r for i, r in enumerate(rows) if i % total == idx - 1]
     if not rows:
         print(
             "ERROR: zero tracked test files — an empty scan set is not a pass",
