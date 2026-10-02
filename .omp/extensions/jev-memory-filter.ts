@@ -14,8 +14,8 @@ import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
-import { askJev, type AskOptions, type JevResult } from "/Users/josh/Developer/jev/kit/src/client.ts";
-import { useInfisicalKey } from "/Users/josh/Developer/jev/work/jev-client/src/use-infisical-key.ts";
+import { askJev, type AskOptions, type JevResult } from "../../kit/src/client.ts";
+import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 
 export const MODEL = "jev-1.13.0";
 export const CUT = 0.5;
