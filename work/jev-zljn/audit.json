@@ -1,0 +1,19 @@
+{
+ "population": "all needs-human judged rows since 2026-09-30 (fleet-needs-human-calls.jsonl, 25 rows 10-01T03:59Z..10-02T00:37Z)",
+ "pages": [
+  {
+   "mark": "5:0849f854e9e124a5",
+   "pane": 5,
+   "score": 0.72,
+   "excerpt": "IDLE sent with reasoning: the sole unassigned ready bead (`jev-x1pq`) resolves only via a `KIT_GATE_EDIT` human session or direct conduct...",
+   "decision_present": true,
+   "decision_span": "resolves only via KIT_GATE_EDIT human session (for jev-x1pq)"
+  }
+ ],
+ "rate": "1/1",
+ "wilson95": [
+  0.207,
+  1.0
+ ],
+ "verdict": "bar met mechanically (>=80%) -> DELETE enrichment direction; n=1 makes the rule vacuous, see R136 retry"
+}

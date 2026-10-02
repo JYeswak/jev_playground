@@ -4845,3 +4845,19 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** a shortlist method scoring recall@20 ≥ 8/20 on work/jev-zbb1/dev.jsonl, keylessly, before any live spend — then the identical Choice stage may run its ≤20 bounded calls against the R133 predicate (≥25% hints AND 0 misroutes). Reopen cites this row.
 
 **Evidence:** work/jev-zbb1/keyless.json + shortlist.py/embed_body.py + shortlists (committed); 24MB embedding vectors uncommitted in worktree; bead jev-zbb1 evidence comment.
+
+## R136 — DELETED: enriching needs-human pages beyond the 140-char excerpt (2026-10-01)
+
+**Hypothesis:** the delivered page prefix omits the concrete human decision, so a Jev span-selector would shorten page-to-resume time (bead jev-zljn; duel follow-up).
+
+**Minimal repro / experiment:** all needs-human judged rows since 2026-09-30 (fleet-needs-human-calls.jsonl: 25 rows, exactly 1 paged at score>=0.7 — pane 5, 0.72). Recovered source text by mark hash from the pane session file; delivered excerpt = first 140 chars, labeled blind to resume outcome.
+
+**Expected signal (if hypothesis true):** <80% of excerpts contain the decision (bead bar for keeping the direction).
+
+**Result (measured, inline):** 1/1 excerpts contain the decision (Wilson 95% CI [0.207, 1.0]). The page names the blocked bead (jev-x1pq) and both resolution paths (KIT_GATE_EDIT human session / conductor action) inside 140 chars. Bar met mechanically → direction DELETED per acceptance.
+
+**Verdict:** DELETED as specified. FRAGILITY DISCLOSED: n=1 makes the 80% rule vacuous — one future counterexample flips it. This row deletes the direction on the bead's terms, not on statistical evidence.
+
+**Retry-condition:** ≥10 organic pages accumulate with <80% decision-present (same labeling rule, blind to outcome), committed as work/jev-zljn/audit2.json before any enrichment build. Reopen cites this row.
+
+**Evidence:** work/jev-zljn/audit.json (excerpt + span); bead jev-zljn comment; watcher code scripts/fleet-idle-watch.py:647-654 (excerpt construction).
