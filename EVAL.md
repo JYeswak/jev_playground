@@ -3657,3 +3657,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 
 - **Non-author recompute from ad318c30 rows+scorer:** held scorer rerun -> tp=5 fp=19 fn=53 tn=223, prec 0.2083 rec 0.0862 acc 0.7600 (bar 0.85/0.40; abstain 0.807) — exact. Dev cut refit -> F1 0.4848 at 0.43 (prec 0.667 rec 0.381) — exact. Labels: 747 rows, dev 120 (21 pos) / held 300 (58 pos) via removed_later; repo-grouped split with zero repo overlap.
 - **Verdict:** FAIL stands (below abstain, recall flat vs regex 0.069, dev-to-held collapse). Closing with this evidence. No code change; receipt is this row.
+
+## 2026-10-02 event-census: destructive/instruction/failed-ignored top real-traffic ranking (WindyLantern) [keyless]
+
+- **Census (scorer `work/jev-census/census.py`, 1,239 session files / 139,018 turns, 7d all profiles; costs frozen pre-run):** destructive 133x1000=133,000; instruction 466x100=46,600; failed_ignored 3599x10=35,950; test_rerun 780x5=3,900; memory 594x3=1,782; long_unref 893; double_read 529; skill_abandoned 213x2=426.
+- **Honesty notes:** instruction regex is broad (may inflate ~5x — still top-3); failed_ignored counts same-tool non-retry only; memory is opportunity count (system+assistant lines), usage needs 9yjh labels; destructive counts attempts incl. benign test fixtures. Memory detector fixed mid-run (assistant-text only -> per-line; top-3 unaffected).
+- **Reading:** the next candidates are destructive-command gating (already has gate-observe/cascade/dcg coverage — check overlap first), injection-in-results (covered: screens ON), and failed-result triage (NO live coverage — the genuinely new candidate). Receipts: `work/jev-census/{census.py,table.json}`.
