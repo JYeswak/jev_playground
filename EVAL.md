@@ -3423,3 +3423,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Turn 1 (pre-fix 387fec6b):** transient API slowness (~1.3s/call vs 142ms serial-era p50; single-call probe 776ms) -> deadline-bound, 0 scored in budget, all fail-safe keeps; exposed double-write race (22 rows/20 slots, deadline-keep + late-ignored on one slot). 1,802 in-tok ~$0.00008.
 - **Fix a2233783:** claim-before-write on every terminal path (exactly one row per slot); suite 33/33, new race test RED on pre-fix code (32/33), ubs 0/0. Total spend ~$0.0005 over 41 bounded calls (turns + 1 probe); rows in var/agent-tmp/jev-11qz-live/log{,2}.jsonl.
 - **Boundary:** bar WIN#2 pooled across turns is 20/40 in-budget (turn-1 transient, turn-2 100%); bead left in_progress for named verifier. NO-CLAIM on drop precision. Probe scripts scratched (probe.mjs, bullets.json from real recall batches).
+
+## 2026-10-02 jev-li3w filter stability: keyless 4/118, live 0/20 flips (CyanPeak) [live]
+
+- **Keyless (memory-filter-full.jsonl, 3264 rows / 1225 scored pairs):** 118 repeated (promptHash, memoryHash) pairs scored >once, 4 flips (3.39% <= 5% bar): 2 ambiguous pairs x 2 windows, nouls alternating 0.10/0.95, all rows pre-a2233783 race-fix era. Same text occurs once per prompt: flips are same-input re-judgments, concentrated in one genuinely ambiguous pair (grep-proof vs login-bug prompt).
+- **Live (20 recorded pairs x 3 = 60 bounded jev-1.13.0 calls, handler's own askJev path, frozen question/cut):** 0/20 flip pairs, max noul spread <= 0.20; the 2 historically-flip pairs stable all 3 rounds. 23,592 in-tok ~$0.00099, no 401/402/403.
+- **Answer to 11qz note:** turn-level drop-split differences (16/4 vs 7/13) are prompt-driven (different promptHash), not same-pair instability. STABLE by bar in both arms. Feeds jev-m959 keep-precision context only.
+- **Boundary:** 118 keyless pairs dominated by replay-era duplicates; live N=20 small by design (bounded spend). Scratch: var/agent-tmp/syje.51150/stability-*. Left in_progress for verifier.
