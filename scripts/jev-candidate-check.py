@@ -476,10 +476,22 @@ def selftest():
     )
     # retry flip: REAL msax held-out (81 pairs, observed retry exits, session groups).
     # agreement illustrative {40,34} (no double-label sample taken) -> fit caps at PILOT.
-    with open("/Users/josh/Developer/jev/var/agent-tmp/msax-split.json") as _fh:
+    fixture = os.path.join(
+        os.path.dirname(__file__), "fixtures", "msax-split-scrubbed.json"
+    )
+    with open(fixture, encoding="utf-8") as _fh:
         _msd_all = json.load(_fh)
-    _ms = _msd_all["held"]
-    _msd = _msd_all["dev"]
+
+    def expand_groups(groups):
+        return [
+            {"label": label, "session": group["group"]}
+            for group in groups
+            for label, count in ((1, group["pos"]), (0, group["neg"]))
+            for _ in range(count)
+        ]
+
+    _ms = expand_groups(_msd_all["held"])
+    _msd = expand_groups(_msd_all["dev"])
     rt = [
         {
             "hash": _hl.sha256(("msax-h%d" % i).encode()).hexdigest()[:12],

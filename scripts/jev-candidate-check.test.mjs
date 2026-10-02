@@ -13,6 +13,28 @@ describe("jev-candidate-check", () => {
     assert.match(r.stdout || "", /gate-cascade: got GO/);
   });
 
+  it("selftest uses only committed fixtures, never agent-local scratch data", () => {
+    const code = `
+from pathlib import Path
+import builtins, runpy, sys
+open0 = builtins.open
+def guarded_open(path, *args, **kwargs):
+    parts = Path(path).parts
+    if parts[-3:] == ("var", "agent-tmp", "msax-split.json"):
+        raise AssertionError("selftest read agent-local scratch")
+    return open0(path, *args, **kwargs)
+builtins.open = guarded_open
+sys.argv = ["scripts/jev-candidate-check.py", "--selftest"]
+runpy.run_path("scripts/jev-candidate-check.py", run_name="__main__")
+`;
+    const r = spawnSync("python3", ["-c", code], {
+      encoding: "utf8",
+      timeout: 120000,
+    });
+    assert.equal(r.status, 0, (r.stdout || "") + (r.stderr || ""));
+    assert.match(r.stdout || "", /retry-inverted: got/);
+  });
+
   it("stops retry-flip on the missing outcome sample (G0b), memory-D2 stays STOP", () => {
     for (const [file, want] of [
       ["work/jev-science/candidates/memory-D2.json", /^STOP memory-D2-topk/],
