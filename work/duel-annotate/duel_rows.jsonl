@@ -1,0 +1,650 @@
+[
+ {
+  "blind_id": "d00",
+  "doc": 6,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d01",
+  "doc": 10,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d02",
+  "doc": 11,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d03",
+  "doc": 20,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d04",
+  "doc": 18,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d05",
+  "doc": 11,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d06",
+  "doc": 21,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d07",
+  "doc": 4,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d08",
+  "doc": 18,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d09",
+  "doc": 15,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d10",
+  "doc": 1,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d11",
+  "doc": 12,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d12",
+  "doc": 17,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d13",
+  "doc": 17,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d14",
+  "doc": 23,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d15",
+  "doc": 9,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d16",
+  "doc": 20,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d17",
+  "doc": 13,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d18",
+  "doc": 2,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d19",
+  "doc": 12,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d20",
+  "doc": 22,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d21",
+  "doc": 7,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d22",
+  "doc": 4,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d23",
+  "doc": 7,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d24",
+  "doc": 22,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d25",
+  "doc": 18,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d26",
+  "doc": 19,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d27",
+  "doc": 19,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d28",
+  "doc": 5,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d29",
+  "doc": 3,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d30",
+  "doc": 8,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d31",
+  "doc": 5,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d32",
+  "doc": 8,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d33",
+  "doc": 9,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d34",
+  "doc": 3,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d35",
+  "doc": 0,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d36",
+  "doc": 1,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d37",
+  "doc": 7,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d38",
+  "doc": 2,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d39",
+  "doc": 14,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d40",
+  "doc": 16,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d41",
+  "doc": 0,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d42",
+  "doc": 2,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d43",
+  "doc": 21,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d44",
+  "doc": 10,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d45",
+  "doc": 1,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d46",
+  "doc": 11,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d47",
+  "doc": 8,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d48",
+  "doc": 23,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d49",
+  "doc": 4,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d50",
+  "doc": 15,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d51",
+  "doc": 9,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d52",
+  "doc": 14,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d53",
+  "doc": 0,
+  "arm": "WITHHOLD",
+  "set": "same12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d54",
+  "doc": 20,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d55",
+  "doc": 16,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d56",
+  "doc": 17,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d57",
+  "doc": 13,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d58",
+  "doc": 19,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d59",
+  "doc": 22,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d60",
+  "doc": 12,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d61",
+  "doc": 10,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d62",
+  "doc": 5,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d63",
+  "doc": 13,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d64",
+  "doc": 21,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d65",
+  "doc": 3,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d66",
+  "doc": 14,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d67",
+  "doc": 16,
+  "arm": "ANNOTATE",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d68",
+  "doc": 15,
+  "arm": "WITHHOLD",
+  "set": "fresh12",
+  "success": 0,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d69",
+  "doc": 23,
+  "arm": "OFF",
+  "set": "fresh12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d70",
+  "doc": 6,
+  "arm": "OFF",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ },
+ {
+  "blind_id": "d71",
+  "doc": 6,
+  "arm": "ANNOTATE",
+  "set": "same12",
+  "success": 1,
+  "follow": 0,
+  "model": "session-agent"
+ }
+]

@@ -139,7 +139,7 @@ async function scoreAndRecord({ ask, write, state, cap, common, raw }: ScoreArgs
 export function makeInjectionShadowHandler(deps: Deps = {}) {
   const path = deps.path ?? defaultPath();
   const ask = deps.ask ?? askJev;
-  const mode: ShadowMode = deps.mode ?? (process.env.JEV_INJECTION_SHADOW_MODE === "annotate" ? "annotate" : "withhold");
+  const mode: ShadowMode = deps.mode ?? (process.env.JEV_INJECTION_SHADOW_MODE === "withhold" ? "withhold" : "annotate");
   const requestedCap = deps.cap ?? Number(process.env.JEV_INJECTION_SHADOW_DAILY_CAP ?? String(MAX_DAILY_CALLS));
   const cap = Number.isSafeInteger(requestedCap) ? Math.min(MAX_DAILY_CALLS, Math.max(0, requestedCap)) : 0;
   const now = deps.now ?? (() => new Date().toISOString());
