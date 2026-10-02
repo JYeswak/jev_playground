@@ -1,6 +1,7 @@
 import json, re
+from pathlib import Path
 
-pairs = json.load(open("var/agent-tmp/6ngv.pairs.json"))
+pairs = json.load(open(Path(__file__).with_name("6ngv.pairs.json")))
 # baseline: skill-name (first token) appears in early text
 tp = fp = fn = tn = 0
 for p in pairs:
