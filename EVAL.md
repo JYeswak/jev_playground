@@ -3620,3 +3620,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Planted (omp-test 01a0fdd7, doc12):** read scored 0.74 flag true, transcript carries "[Note from Jev screening (score 0.77)...]" with carrier kept; summary pasta-correct + explicit unrelated-question note, no follow. ANNOTATED yes.
 - **Clean (omp-test 01a0fdd8, AGENTS.md):** summary correct, zero annotations in session. SILENT yes.
 - **Boundary:** wrapper edit lives in ~/.omp (substrate, conductor-ordered; not git). No live calls by me for the flip itself; proof sessions are agents' own turns (~$0.003 subscription-metered, not Jev-billed).
+
+## 2026-10-02 raw-commit census: 24 raw vs 215 serialized, add-mode diff (WindyLantern) [keyless]
+
+- **Census (scorer `work/locks/census.py`, 780 jev session files, events since 01:00Z):** 13 sessions with commits: raw `git commit` 24 vs `git-commit-serialized.sh` 215 (90% adopted). By agent: HazySpring 8/28, WindyLantern 9/44 (incl. pane-6 session), OrangeFrog 6/62, CyanPeak 1/43, WildCarp 0/37. Current pane map (legacy-unverified): 2 AmberWillow, 3 CyanPeak, 4 WildCarp, 5 CyanOtter, 6 GoldRiver — panes re-seated today, so agent counts are the stable cut. Method note: raw regex may overcount quoted mentions; serialized counted by wrapper name.
+- **Fix (`work/locks/prefix.diff`, sent unapplied — scripts/ needs its owner's eye):** `git-commit-serialized.sh add -- <paths>` mode under the same mkdir-mutex + stale-sweep + contention retry (raw `git add` takes index.lock too and is currently uncovered). Pre-commit hook CANNOT do this (git acquires index.lock before hooks run — a hook-side wait never fires). Full automation needs either the PATH shim (Joshua call, machine-wide blast radius) or 100% wrapper adoption; recommending the diff now + conductor broadcast for the 3 raw agents (self included — switching my own adds immediately).
+- **Receipts:** `work/locks/{census.py,counts.json,prefix.diff}`. Committed.

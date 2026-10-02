@@ -1,0 +1,25 @@
+--- a/scripts/git-commit-serialized.sh
++++ b/scripts/git-commit-serialized.sh
+@@ -14,6 +14,7 @@
+ # sweeps those. Adoption is a conductor broadcast, not automatic.
+ #
+ # Usage: scripts/git-commit-serialized.sh [--only <paths>...] -m "msg [level]"
++#     or scripts/git-commit-serialized.sh add -- <paths>...   (same mutex for git add)
+ set -u
+ 
+ repo="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "git-commit-serialized: not in a git repo" >&2; exit 2; }
+@@ -40,11 +41,13 @@
+   fi
+ fi
+ 
++verb=commit
++if [ "${1:-}" = add ]; then verb=add; shift; fi
+ rc=0
+ attempt=0
+ while :; do
+   attempt=$((attempt + 1))
+-  out=$(git commit "$@" 2>&1)
++  out=$(git "$verb" "$@" 2>&1)
+   rc=$?
+   printf '%s\n' "$out"
+   # Retry ONLY live-lock contention (another pane's writer holds index.lock);
