@@ -125,6 +125,46 @@ class TestCapture(unittest.TestCase):
         row = w.capture_once(d, log, state, run=NoGit(lock))
         self.assertEqual(row["holders"][0]["pid"], "4242")
 
+    def test_poll_once_writes_fs_event_before_capture(self):
+        d = mkrepo()
+        lock = os.path.join(d, ".git", "index.lock")
+        open(lock, "w").write("")
+        log = os.path.join(d, "rows.jsonl")
+        state = os.path.join(d, "state.json")
+        ops = os.path.join(d, "ops.jsonl")
+
+        class FakeKQ:
+            def control(self, changes, max_events, timeout):
+                return ["evt"]
+
+        events = w._poll_once(FakeKQ(), d, log, state, ops, FakeRun(lock), 0)
+        self.assertEqual(events, 1)
+        rows = [json.loads(l) for l in open(ops)]
+        self.assertEqual(rows[0]["type"], "fs-event")
+        self.assertEqual(rows[0]["nevents"], 1)
+        cap = [json.loads(l) for l in open(log)]
+        self.assertEqual(cap[0]["holders"][0]["pid"], "4242")
+
+    def test_poll_once_quiet_when_no_event(self):
+        d = mkrepo()
+        ops = os.path.join(d, "ops.jsonl")
+
+        class QuietKQ:
+            def control(self, changes, max_events, timeout):
+                return []
+
+        events = w._poll_once(
+            QuietKQ(),
+            d,
+            os.path.join(d, "r.jsonl"),
+            os.path.join(d, "s.json"),
+            ops,
+            FakeRun("L"),
+            0,
+        )
+        self.assertEqual(events, 0)
+        self.assertFalse(os.path.exists(ops))
+
 
 if __name__ == "__main__":
     unittest.main()

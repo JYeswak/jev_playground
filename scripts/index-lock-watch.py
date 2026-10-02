@@ -43,7 +43,7 @@ def proc_field(pid, field, run=subprocess.run):
             ["ps", "-o", field + "=", "-p", str(pid)],
             capture_output=True,
             text=True,
-            timeout=10,
+            timeout=4,
         ).stdout.strip()
     except Exception:
         return None
@@ -51,31 +51,33 @@ def proc_field(pid, field, run=subprocess.run):
 
 
 def holders_of(lock: Path, run=subprocess.run):
-    """PIDs with the lock open. Targeted pgrep-git first (fast), full lsof fallback."""
+    """PIDs with the lock open. Single fast `lsof -t` scan first; bounded
+    targeted fallback. The old pgrep-every-git loop stalled minutes under
+    fleet load (10 s timeout x 50 pids), starving the kqueue loop."""
+    try:
+        out = run(
+            ["lsof", "-t", str(lock)], capture_output=True, text=True, timeout=15
+        ).stdout.split()
+        if out:
+            return out
+    except Exception:
+        pass
     try:
         gitpids = run(
-            ["pgrep", "-f", "(^|/)git( |$)"], capture_output=True, text=True, timeout=10
+            ["pgrep", "-f", "(^|/)git( |$)"], capture_output=True, text=True, timeout=5
         ).stdout.split()
     except Exception:
-        gitpids = []
-    found = []
-    for pid in gitpids[:50]:
+        return []
+    for pid in gitpids[:10]:
         try:
             out = run(
-                ["lsof", "-p", str(pid)], capture_output=True, text=True, timeout=10
+                ["lsof", "-p", str(pid)], capture_output=True, text=True, timeout=3
             ).stdout
         except Exception:
             continue
         if str(lock) in out:
-            found.append(str(pid))
-    if found:
-        return found
-    try:
-        return run(
-            ["lsof", "-t", str(lock)], capture_output=True, text=True, timeout=10
-        ).stdout.split()
-    except Exception:
-        return []
+            return [str(pid)]
+    return []
 
 
 def ancestors_of(pid, run=subprocess.run, depth=6):
@@ -179,7 +181,34 @@ def capture_once(repo, log_path=None, state_path=None, run=subprocess.run, now=N
     return row
 
 
-def watch(repo, log_path=None, state_path=None, once=False, run=subprocess.run):
+OPS_REL = "state/jev/index-lock-watch-ops.jsonl"
+
+
+def ts_now(when=None):
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(when or time.time()))
+
+
+def ops_write(ops_path, row):
+    """Best-effort ops row (heartbeat / fs-event). Never throws."""
+    try:
+        ops_path = Path(ops_path)
+        ops_path.parent.mkdir(parents=True, exist_ok=True)
+        fd = os.open(str(ops_path), os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o600)
+        with os.fdopen(fd, "a") as fh:
+            fh.write(json.dumps(row) + "\n")
+    except OSError:
+        pass
+
+
+def watch(
+    repo,
+    log_path=None,
+    state_path=None,
+    once=False,
+    run=subprocess.run,
+    ops_path=None,
+    max_iters=None,
+):
     """kqueue on .git/; capture on every directory change plus one scan now."""
     row = capture_once(repo, log_path, state_path, run)
     if row:
@@ -202,14 +231,38 @@ def watch(repo, log_path=None, state_path=None, once=False, run=subprocess.run):
             0,
             0,
         )
+        ops_path = Path(ops_path) if ops_path else Path(HOME) / OPS_REL
+        last_hb, events, iters = 0.0, 0, 0
+        ops_write(ops_path, {"ts": ts_now(), "type": "start", "pid": os.getpid()})
         while True:
-            kq.control(None, 1, 60)
-            time.sleep(0.2)
-            row = capture_once(repo, log_path, state_path, run)
-            if row:
-                print(json.dumps(row), flush=True)
+            events = _poll_once(kq, repo, log_path, state_path, ops_path, run, events)
+            now = time.time()
+            if now - last_hb >= 60:
+                ops_write(
+                    ops_path,
+                    {"ts": ts_now(), "type": "heartbeat", "events_seen": events},
+                )
+                last_hb = now
+            iters += 1
+            if max_iters is not None and iters >= max_iters:
+                return 0
     finally:
         os.close(fd)
+
+
+def _poll_once(kq, repo, log_path, state_path, ops_path, run, events):
+    """One kqueue wait + capture. Returns updated events_seen. Test seam."""
+    woke = kq.control(None, 1, 60)
+    if woke:
+        # Raw fs event BEFORE any lsof: a later miss with no fs-event
+        # row means kqueue never fired; a miss WITH one means the
+        # holder exited between event and capture.
+        events += len(woke)
+        ops_write(ops_path, {"ts": ts_now(), "type": "fs-event", "nevents": len(woke)})
+    row = capture_once(repo, log_path, state_path, run)
+    if row:
+        print(json.dumps(row), flush=True)
+    return events
 
 
 def main(argv):
