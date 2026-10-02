@@ -4927,3 +4927,17 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** a label source that captures backgrounded durations (join toolCallId to `hub` wait snapshots / async-result completion, proving the join keyless first) showing >=60 usable positives where majority < 0.95. Reopen cites this row.
 
 **Evidence:** var/agent-tmp/lrpred-work/scan.py + rows.jsonl (151,275 rows; scratch, uncommitted); bead jev-uup3 feasibility comment.
+
+## R142 — MODEL-LIMIT: Jev retry-worthiness gate for failed bash commands (2026-10-02)
+
+**Hypothesis:** a Jev decision on the failed command + exit predicts whether an identical retry succeeds, so agents skip doomed retries (bead jev-msax; 404 failed bash/24h fleet-wide).
+
+**Minimal repro / experiment:** bar pre-live (bead comment): 175 deduped pre-Oct pairs (failed bash + first identical retry, session files, labels from observed retry exit), session-disjoint seed-28 split (dev 94 / held-out 81, rates 0.649/0.556). Baselines on held: majority 0.556, transient-word regex 0.469. WIN bar: accuracy >= 0.70 on held-out.
+
+**Result (measured, inline):** V1 Noul 0.444 (73/81 predict no-retry); V2 Choice retry_identical/fix_first 0.444 (81/81 fix_first). The model never endorses an identical retry on real failed commands — safe posture (blind retries of destructive commands are dangerous), but it rules out the gate: precision on predicted-retry undefined, recall 0/45 and 4/45. Total live 243 bounded jev-1.13.0 calls, ~86.6k in-tok ~$0.0036 (incl. supervisor overlap, deduped by id).
+
+**Verdict:** MODEL-LIMIT (fail direction, both wordings). No seam; no retry gate.
+
+**Retry-condition:** a framing under which the model says retry on >= 30% of held-out with precision >= 0.70 (e.g. retry-with-backoff endorsement rather than blind identical retry), beating 0.556 keylessly first on this population. Reopen cites this row.
+
+**Evidence:** var/agent-tmp/msax-*.jsonl + miners (scratch); bead jev-msax bar + V1 comment; verifier recount in close comment.
