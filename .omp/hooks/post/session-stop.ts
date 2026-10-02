@@ -86,7 +86,9 @@ export function decideStop(
   }
   if (worker) {
     parts.push(
-      `If you have nothing in progress and nothing in br ready you can claim, run ` +
+      `If you finished any piece of work since your last callback, first run ` +
+        `\`ntm send jev --pane=1 "DONE <bead> <commit> <one-line evidence>"\` (never finish silently). ` +
+        `If you have nothing in progress and nothing in br ready you can claim, run ` +
         `\`ntm send jev --pane=1 "IDLE pane ${world.paneIndex}: <one line on what you finished>"\` ` +
         `so the conductor dispatches you, then stop.`,
     );
