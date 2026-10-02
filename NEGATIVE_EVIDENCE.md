@@ -4901,3 +4901,17 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** a structure with a different keep logic (e.g. disjunction with a precision guard, or few-shot exemplars), beating 0.42 keep / 0.90 drop on this same frozen dev slice keylessly first. Reopen cites this row.
 
 **Evidence:** work/jev-28gx/BAR.md + heldout-labels.json + planted.json (frozen 294543b9); var/agent-tmp/syje.51150/dev28.mjs + dev28-rows.jsonl + plant28.mjs (scratch); bead jev-28gx bar + results comments.
+
+## R140 — FAIL: Jev Choice triage of conductor-bound worker messages, act-vs-nothing (2026-10-02)
+
+**Hypothesis:** live jev-1.13.0 Choice on the packet text beats the best cheap text heuristic (B2: IDLE->nothing unless keyword hit, else act = 0.652 overall / 0.666 held-out) by 8pp, reaching 0.75 on held-out, enabling a pre-conductor suppression filter (bead jev-6c8n).
+
+**Minimal repro / experiment:** N=723 labelled keylessly from 2 conductor sessions (2026-09-23 x162 + 2026-10-01 x561); label = conductor next turn ran a state-changing tool (ntm send/br write/git commit) vs reply-only. Held-out = 2nd half (n=362), live sample 250, jev-1.13.0, 1 call/item, fail-safe ACT on confidence<0.6/invalid/error, stop on 401/402/403. 250 calls, 121,132 in-tok ~$0.00509, p50 latency 385ms.
+
+**Result (measured, inline):** accuracy 0.704 (176/250) vs 0.75 bar FAIL; raw Choice 0.648 < B2-held-out 0.666. Action recall 45/98 = 0.459: Jev suppresses real actions. Autopsy: 53/74 misses are ACT-as-IGNORE, of which 38 IDLE-alerts need fleet/assignment state and 15 terse DONEs need bead state — both outside the message text. One-variable dev replay (n=40, ACT-leaning instructions): 0.325 vs B2-on-same-40 0.525 (+40 calls ~$0.00079) — wording is not the lever. No held-out retest: dev decisive, spend saved. Total live 290 calls ~$0.00588, inside 300 budget.
+
+**Verdict:** FAIL with named model limit: the act-vs-nothing label depends on fleet/bead state not present in the packet text, so text-only triage cannot clear 0.75 while a regex sits at 0.65. No seam; no wiring.
+
+**Retry-condition:** a state-enriched design (packet + pane assignment/fleet snapshot or bead status at arrival) beating B2 keylessly on these frozen items first. Reopen cites this row.
+
+**Evidence:** var/agent-tmp/triage-6c8n.34880/{run.py,items.jsonl,receipt.jsonl,replay.py,dev40.jsonl,dev40_receipt.jsonl} (scratch, uncommitted); bead jev-6c8n bar + results comments.
