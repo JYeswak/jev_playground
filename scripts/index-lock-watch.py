@@ -24,9 +24,9 @@ import sys
 import time
 from pathlib import Path
 
-LOG_REL = "state/jev/index-lock-creators.jsonl"
-STATE_REL = "state/jev/index-lock-watch-event.json"
-OPS_REL = "state/jev/index-lock-watch-ops.jsonl"
+LOG_REL = ".local/state/jev/index-lock-creators.jsonl"
+STATE_REL = ".local/state/jev/index-lock-watch-event.json"
+OPS_REL = ".local/state/jev/index-lock-watch-ops.jsonl"
 
 
 def home_dir():
@@ -98,7 +98,7 @@ def holders_of(lock: Path, run=subprocess.run):
             ["lsof", "-t", str(lock)], capture_output=True, text=True, timeout=15
         ).stdout.split()
         if out:
-            return out
+            return [{"pid": p, "cmd": None} for p in out]
     except Exception:
         pass
     try:
@@ -115,8 +115,21 @@ def holders_of(lock: Path, run=subprocess.run):
         except Exception:
             continue
         if str(lock) in out:
-            return [str(pid)]
+            return [{"pid": str(pid), "cmd": lsof_command(out)}]
     return []
+
+
+def lsof_command(lsof_output):
+    """COMMAND column from `lsof -p` output (race-free: same call that proved
+    the hold). Returns None when unparseable."""
+    try:
+        for line in lsof_output.splitlines()[1:]:
+            parts = line.split()
+            if len(parts) >= 2 and parts[1].isdigit():
+                return parts[0][:64] or None
+    except Exception:
+        pass
+    return None
 
 
 def ancestors_of(pid, run=subprocess.run, depth=6):
@@ -184,19 +197,23 @@ def capture_once(repo, log_path=None, state_path=None, run=subprocess.run, now=N
         return None
     if prev == ident:
         return None
-    pids = holders_of(lock, run)
+    found = holders_of(lock, run)
     chain = []
-    for pid in pids:
+    for hit in found:
+        pid = hit["pid"]
         if any(h["pid"] == pid for h in chain):
             continue
         chain.append(
             {
                 "pid": pid,
                 "argv": proc_field(pid, "command", run),
+                "lsof_command": hit.get("cmd"),
                 "parents": ancestors_of(pid, run),
             }
         )
-    allpids = list(pids) + [a["pid"] for h in chain for a in h["parents"]]
+    allpids = [h["pid"] for h in chain] + [
+        a["pid"] for h in chain for a in h["parents"]
+    ]
     row = {
         "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now or time.time())),
         "lock": str(lock),

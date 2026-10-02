@@ -125,6 +125,24 @@ class TestCapture(unittest.TestCase):
         row = w.capture_once(d, log, state, run=NoGit(lock))
         self.assertEqual(row["holders"][0]["pid"], "4242")
 
+    def test_fallback_records_lsof_command_race_free(self):
+        d = mkrepo()
+        lock = os.path.join(d, ".git", "index.lock")
+        open(lock, "w").write("")
+
+        class EmptyT(FakeRun):
+            def __call__(self, cmd, **kw):
+                if cmd[0] == "lsof" and cmd[1] == "-t":
+                    return Out("")
+                return super().__call__(cmd, **kw)
+
+        log = os.path.join(d, "rows.jsonl")
+        state = os.path.join(d, "state.json")
+        row = w.capture_once(d, log, state, run=EmptyT(lock))
+        self.assertEqual(row["holders"][0]["pid"], "4242")
+        self.assertEqual(row["holders"][0]["lsof_command"], "git")
+        self.assertEqual(w.lsof_command("COMMAND PID\n"), None)
+
     def test_poll_once_writes_fs_event_before_capture(self):
         d = mkrepo()
         lock = os.path.join(d, ".git", "index.lock")
