@@ -3639,3 +3639,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **README "Jev in omp":** annotate-default + scope paragraph, prerule widening, veto-stays-shadow + vendor-shadow lines — present tense, bead ids, no SHAs (W8), W-rules 0/8 (M1 structural gaps pre-exist on HEAD too).
 - **Verification:** UPDATE_GOLDENS=1 diff reviewed (exactly +vendor/+veto, globals works-class); tests 12 OK; inventory 19/20 conform (agents-trim FAIL pre-exists: AGENTS.md 605 > 600 from others' commits, not fixed here); stage-15 124/124 green; readme-counts PASS; stranger keyless EXPECTATION PASS rows=14. ubs n/a on docs (exit 3, correctly not a pass).
 - **Receipts:** README.md, expected.json, goldens/inventory-structure.mmd. Committed via wrapper.
+
+## 2026-10-02 lockwatch-verify2: heartbeat ok, attribution awaits pane-owned lock (WindyLantern) [keyless]
+
+- **Non-author recompute (441d5799 + live logs):** unit tests 10 OK rerun; daemon pid 67688 alive, ops rows landing, heartbeats 19:33:54–19:36:54Z every minute. Creator rows 21 total, 3 with holders — all 02:44–02:48Z (pre-fix era).
+- **First real attribution:** 02:44:39Z row names pid 9356 + argv (`git status --porcelain`) + parent (ntm internal-monitor) with pane null — CORRECT null (daemon-spawned holder has no pane). Other two holder rows are pid-only (exited pre-ps, the known limitation). pane_for_pid_tree is implemented (tmux ancestry) but never yet exercised: no pane-shell-descended stale lock has been captured. Full pid+command+parent+PANE quad: unobserved, not refuted.
+- **Verdict:** 2/3 green (rows land, heartbeat per-minute); third INSUFFICIENT-EVENTS. No code change (verify only); receipt is this row.
