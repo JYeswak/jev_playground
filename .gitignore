@@ -11,6 +11,7 @@
 !/.gitignore
 !/AGENTS.md
 !/README.md
+!/CHANGELOG.md
 !/VERDICT.md
 !/ARC.md
 !/.omp/
@@ -121,3 +122,5 @@ work/cass-mail-mines/exports/*.jsonl
 # STS-B sentence text is not ours to commit (mixed source licenses; see
 # docs/demos/upstream-repro/score-stsb-20260924.md). Labels and scores only.
 work/score-stsb/*.csv
+# br doctor per-run artifacts
+.doctor/
