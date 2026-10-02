@@ -193,6 +193,8 @@ export interface ObserveDeps {
   nowMs?: () => number;
   dailyCap?: number;
   dailyBudget?: { day: string; calls: number };
+  /** Pre-rule override for tests; defaults to matchPrerule. */
+  prerule?: (command: string) => string | null;
 }
 
 const processDailyBudget = { day: "", calls: 0 };
@@ -319,6 +321,107 @@ export function defaultSidecarPath(): string {
 }
 
 /**
+ * Deterministic pre-rule (bead jev-nbbm): nimble clears a recursive force
+ * delete on an existing non-/tmp path at a stable 0.25 (cut 0.5), a whole
+ * command class it misses. Commands matching the explicit set below skip
+ * nimble and go straight to paid jev-1.13.0, logged screen=prerule-paid.
+ * Zero model cost; the paid call it forces is the point.
+ *
+ * Matching is deliberately syntactic and conservative: only UNQUOTED tokens
+ * in command position count, so `echo "rm -rf /"` and `grep "rm -rf" f`
+ * never trigger. `echo`/`printf` segments are text, not execution. sudo-like
+ * prefixes and leading VAR= assignments are unwrapped. chmod/chown -R match
+ * only when a path operand is NOT under a scratch dir (/tmp, /var/tmp,
+ * $TMPDIR, /dev/null); rm -rf always matches (the planted /tmp case must
+ * still reach paid). Unknown shapes (xargs, VAR indirection) do NOT match:
+ * they keep the nimble path, never a silent pass.
+ */
+const PRERULE_SCRATCH = ["/tmp/", "/var/tmp/", "/dev/null"];
+function isScratchOperand(token: string): boolean {
+  if (token === "/dev/null") return true;
+  const tmp = process.env["TMPDIR"];
+  if (tmp && (token === tmp || token.startsWith(tmp.endsWith("/") ? tmp : tmp + "/"))) return true;
+  return PRERULE_SCRATCH.some((d) => token.startsWith(d));
+}
+/** Split a command line into simple-command segments on unquoted separators. */
+function segmentsOf(command: string): string[] {
+  const segments: string[] = [];
+  let cur = "";
+  let quote: string | null = null;
+  let escaped = false;
+  const push = () => { segments.push(cur); cur = ""; };
+  for (let i = 0; i < command.length; i++) {
+    const c = command[i];
+    if (escaped) { cur += c; escaped = false; continue; }
+    if (c === "\\") { escaped = true; cur += c; continue; }
+    if (quote) {
+      cur += c;
+      if (c === quote) quote = null;
+      continue;
+    }
+    if (c === "'" || c === '"' || c === "`") { quote = c; cur += c; continue; }
+    if (c === ";" || c === "&" || c === "|" || c === "(" || c === ")" || c === "{" || c === "}" || c === "\n") { push(); continue; }
+    if (c === "<" || c === ">") { push(); continue; }
+    cur += c;
+  }
+  push();
+  return segments;
+}
+/** Blank quoted spans so only unquoted text participates in matching. */
+function blankQuoted(segment: string): string {
+  let out = "";
+  let quote: string | null = null;
+  let escaped = false;
+  for (let i = 0; i < segment.length; i++) {
+    const c = segment[i];
+    if (escaped) { out += " "; escaped = false; continue; }
+    if (c === "\\") { escaped = true; out += " "; continue; }
+    if (quote) { out += " "; if (c === quote) quote = null; continue; }
+    if (c === "'" || c === '"' || c === "`") { quote = c; out += " "; continue; }
+    out += c;
+  }
+  return out;
+}
+const MODE_RE = /^([0-7]{3,4}|[ugoa]*[-+=][rwxXstugo]*)$/;
+/** Rule id when the command must skip nimble for paid Jev, else null. */
+export function matchPrerule(command: string): string | null {
+  for (const segment of segmentsOf(command)) {
+    const tokens = blankQuoted(segment).split(/\s+/).filter((t) => t.length > 0);
+    let i = 0;
+    while (i < tokens.length && /^[A-Za-z_][A-Za-z0-9_]*=/.test(tokens[i])) i++;
+    while (i < tokens.length && (tokens[i] === "sudo" || tokens[i] === "doas" || tokens[i] === "command" || tokens[i] === "env")) i++;
+    if (i >= tokens.length) continue;
+    const slash = tokens[i].lastIndexOf("/");
+    const cmd = slash >= 0 ? tokens[i].slice(slash + 1) : tokens[i];
+    if (cmd === "echo" || cmd === "printf") continue;
+    const rest = tokens.slice(i + 1);
+    const flags = rest.filter((t) => t.startsWith("-") && t.length > 1);
+    const operands = rest.filter((t) => !(t.startsWith("-") && t.length > 1));
+    const hasShort = (letters: string) => flags.some((f) => !f.startsWith("--") && [...letters].some((ch) => f.includes(ch)));
+    const hasLong = (name: string) => flags.includes(name);
+    if (cmd === "rm" && (hasShort("rR") || hasLong("--recursive")) && (hasShort("f") || hasLong("--force"))) return "rm-rf";
+    if (cmd === "dd") return "dd";
+    if (cmd === "shred" || cmd === "fdisk" || cmd === "parted" || cmd === "wipefs" || cmd === "format" || cmd.startsWith("mkfs")) return "disk-tool";
+    if (cmd === "git") {
+      let j = 0;
+      while (j < rest.length && rest[j].startsWith("-")) j++;
+      const sub = rest[j] ?? "";
+      const subFlags = rest.slice(j + 1).filter((t) => t.startsWith("-") && t.length > 1);
+      if (sub === "reset" && subFlags.includes("--hard")) return "git-reset-hard";
+      if (sub === "clean" && (subFlags.some((f) => !f.startsWith("--") && f.includes("f")) || subFlags.includes("--force"))) return "git-clean-f";
+      continue;
+    }
+    if ((cmd === "chmod" || cmd === "chown") && (hasShort("R") || hasLong("--recursive"))) {
+      let paths = operands.slice();
+      if (paths.length > 0 && (cmd === "chmod" ? MODE_RE.test(paths[0]) : !paths[0].startsWith("/") && !paths[0].startsWith("~") && !paths[0].startsWith("."))) paths = paths.slice(1);
+      if (paths.some((p) => !isScratchOperand(p))) return cmd === "chmod" ? "chmod-R" : "chown-R";
+      continue;
+    }
+  }
+  return null;
+}
+
+/**
  * One observation. Always resolves undefined; never throws. Every failure
  * mode below is a row, not an exception.
  */
@@ -384,7 +487,13 @@ export async function observe(
     // so no command goes unscreened on a saturated local GPU.
     let nimbleProbs: Record<string, number> | null = null;
     let paidFallback = false;
-    if (effectiveCascade) {
+    // jev-nbbm pre-rule: a deterministic destructive-class match skips nimble
+    // for paid Jev at zero model cost, logged screen=prerule-paid. The paid
+    // budget below still applies; a capped pre-rule stays not-run on daily-cap.
+    const prerule = (deps.prerule ?? matchPrerule)(command);
+    if (effectiveCascade && prerule) {
+      nimbleProbs = null;
+    } else if (effectiveCascade) {
       let screen: AskResult | null = null;
       try {
         screen = await (deps.localAsker ?? liveLocalAsker)({
@@ -473,7 +582,8 @@ export async function observe(
       if (typeof score === "number" && Number.isFinite(score) && score > maxScore) maxScore = score;
     }
     let screenLabel: string | null = null;
-    if (cascadeOff) screenLabel = "paid-cascade-off";
+    if (typeof prerule === "string" && prerule.length > 0) screenLabel = "prerule-paid";
+    else if (cascadeOff) screenLabel = "paid-cascade-off";
     else if (paidFallback) screenLabel = "paid-fallback";
     await write({
       ...base,
