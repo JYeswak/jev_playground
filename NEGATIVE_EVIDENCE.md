@@ -4873,3 +4873,17 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** a redesign that changes the decision structure (not the wording): e.g. two-question conjunction (usable AND current), or few-shot relevant/irrelevant exemplars drawn from labelled rows. Reopen cites this row.
 
 **Evidence:** work/jev-9tkx/replay.mjs + s47b-keys.json + results.json (hashes/decisions/spend, no raw text); bead jev-9tkx bar + results comments.
+
+## R138 — REFUTED: local nimble screens memory relevance in the filter cascade (2026-10-02)
+
+**Hypothesis:** nimble agrees with paid jev-1.13.0 verdicts on memory relevance closely enough to screen recall turns for free (bead jev-yl60; gate cascade cut paid gate calls ~96% with 0/950 harmful clears).
+
+**Minimal repro / experiment:** bar pre-replay (bead comment 01:29:26Z): m959 labelled 50 keeps (11 relevant / 39 irrelevant, tracked work/jev-m959/labels.json) + seeded-random 200 recorded scored sidecar pairs (seed 11, snapshot 01:30:18Z). All 250 through localbench nimble with the SAME Noul wire shape as the handler, CUT 0.5, sequential. PASS iff agreement >= 95% AND zero drops among the 11 Jev-kept+m959-relevant. Local calls only, $0.
+
+**Result (measured, inline; verifier-recomputed exact):** 250/250 scored, 0 errors; agreement 211/250 (84.4%) vs 95% FAIL; nimble dropped 3/11 Jev-kept+m959-relevant (jev 0.62-0.76 -> nimble 0.06-0.48) vs never-drop FAIL. Asymmetry keep->drop 22 vs drop->keep 17: nimble is harsher, so neither drop-confirmation nor keep-only cascade is safe without paid look.
+
+**Verdict:** REFUTED. Memory relevance is the third nimble-unsuitable surface (after gate commands and injection screening, jev-uhc5). No cascade; no live spend justified.
+
+**Retry-condition:** a local screen scoring >= 95% agreement with zero critical drops on this same 250-pair population, keylessly, before any filter change. Reopen cites this row.
+
+**Evidence:** var/agent-tmp/syje.51150/yl60-pop.py + yl60-replay.mjs + yl60-pairs.json + yl60-nimble.jsonl (scratch, uncommitted); bead jev-yl60 bar + results comments; verifier recount in close comment.
