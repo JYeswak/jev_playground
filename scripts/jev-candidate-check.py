@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Gate every live Jev call: base rate, data validity, label-noise ceiling, headroom, fit, rank.
+"""Gate every live Jev call: harmful outcomes, data validity, label-noise ceiling, headroom, fit, rank.
 
 Input: JSON candidate file (see --example). Output: JSON + one line.
-Gates: G0b real-traffic base rate (hard, first) -> G0 shortcut floor
+Gates: G0b harmful-outcome base rate (hard, first) -> G0 shortcut floor
 (cheap baseline on held) -> G1 validity (hard) -> G2 noise ceiling
 (agreement inversion) -> G3 headroom -> G4 fit (Part A) -> rank + pilot
 rule. Keyless; no network; no key.
@@ -15,7 +15,8 @@ import sys
 
 MIN_HEADROOM_DEFAULT = 0.05
 MIN_HELD_N = 30
-MIN_TP_PER_WEEK_DEFAULT = 10.0
+MIN_HARM_PER_WEEK_DEFAULT = 1.0
+MIN_OUTCOME_N = 50
 
 
 def wilson(k, n, z=1.96):
@@ -50,49 +51,53 @@ def check(candidate):
     held = [r for r in rows if r.get("split") == "held"]
     dev_groups = {r.get("group") for r in dev if r.get("group")}
     held_groups = {r.get("group") for r in held if r.get("group")}
-    # G0b real-traffic base rate (hard, first): count the target event in
-    # real traffic on this machine over a stated window (observed sessions,
-    # logs, hook rows — never benchmark, planted, or replay rows). Expected
-    # true positives/week below the stated floor -> STOP with the count, no
-    # build. The floor is a cost parameter the candidate states and defends
-    # (default: occasional-use tripwire).
+    # G0b harmful-outcome base rate (hard, first): a blind-labelled OUTCOME
+    # sample (>= MIN_OUTCOME_N) from real traffic, counting outcomes where
+    # the system must act (harmful ignores, vendored executions, destructive
+    # runs) -- never pattern hits, benchmark, planted, or replay rows.
+    # Harmful outcomes/week below the stated floor -> STOP with the count.
+    # Rationale: precision/recall on benchmarks cannot justify a build when
+    # the target outcome never occurs in real traffic (failtriage 0/100,
+    # vendor-paste 0/39, cascade 0/50 destructive labels).
     t = candidate.get("traffic")
     try:
         t_days = float(t.get("days", 0))
         t_opp = int(t.get("opportunities", -1))
-        t_pos = int(t.get("positives", -1))
+        t_lab = int(t.get("outcomes_labelled", -1))
+        t_harm = int(t.get("harmful", -1))
     except (TypeError, ValueError, AttributeError):
-        t_days, t_opp, t_pos = 0, -1, -1
-    floor = candidate.get("min_true_per_week", MIN_TP_PER_WEEK_DEFAULT)
+        t_days, t_opp, t_lab, t_harm = 0, -1, -1, -1
+    floor = candidate.get("min_harmful_per_week", MIN_HARM_PER_WEEK_DEFAULT)
     try:
         floor = float(floor)
     except (TypeError, ValueError):
-        floor = MIN_TP_PER_WEEK_DEFAULT
+        floor = MIN_HARM_PER_WEEK_DEFAULT
     if (
         not isinstance(t, dict)
         or t_days <= 0
         or t_opp < 0
-        or t_pos < 0
-        or t_pos > t_opp
+        or t_lab < MIN_OUTCOME_N
+        or t_harm < 0
+        or t_harm > t_lab
     ):
         note(
             "G0b-base-rate",
             False,
-            "traffic {days, opportunities, positives} unstated or malformed: no build without a real-traffic count",
+            "traffic {days, opportunities, outcomes_labelled>=%d, harmful} unstated/underpowered/malformed: no build without a blind-labelled outcome sample"
+            % MIN_OUTCOME_N,
         )
         status = "STOP"
     else:
-        tpw = t_pos / t_days * 7
-        ok0b = tpw >= floor
+        hpw = t_harm / t_days * 7
+        ok0b = hpw >= floor
         note(
             "G0b-base-rate",
             ok0b,
-            "real traffic %d positives / %d opportunities over %.1fd = %.2f true/week (floor %.1f)"
-            % (t_pos, t_opp, t_days, tpw, floor),
+            "real traffic %d harmful / %d labelled outcomes over %.1fd = %.2f harmful/week (floor %.1f)"
+            % (t_harm, t_lab, t_days, hpw, floor),
         )
         if not ok0b:
             status = "STOP"
-
     # G1 validity (hard)
     ok = True
     if candidate.get("label_source") not in ("observed-outcome", "blind-human"):
@@ -309,7 +314,12 @@ def selftest():
                 "agreement": {"n": 90, "agree": 79},
                 "daily_volume": 1000,
                 "action_value": 0.001,
-                "traffic": {"days": 7, "opportunities": 500, "positives": 200},
+                "traffic": {
+                    "days": 7,
+                    "opportunities": 500,
+                    "outcomes_labelled": 60,
+                    "harmful": 30,
+                },
             },
             "STOP",
         )
@@ -334,7 +344,12 @@ def selftest():
                 "agreement": {"n": 50, "agree": 48},
                 "daily_volume": 500,
                 "action_value": 0.01,
-                "traffic": {"days": 7, "opportunities": 300, "positives": 60},
+                "traffic": {
+                    "days": 7,
+                    "opportunities": 300,
+                    "outcomes_labelled": 60,
+                    "harmful": 20,
+                },
             },
             "STOP",
         )
@@ -358,7 +373,12 @@ def selftest():
                 "agreement": {"n": 30, "agree": 27},
                 "daily_volume": 100,
                 "action_value": 0.01,
-                "traffic": {"days": 7, "opportunities": 100, "positives": 30},
+                "traffic": {
+                    "days": 7,
+                    "opportunities": 100,
+                    "outcomes_labelled": 60,
+                    "harmful": 15,
+                },
             },
             "STOP",
         )
@@ -416,7 +436,12 @@ def selftest():
                 },
                 "daily_volume": 400,
                 "action_value": 0.005,
-                "traffic": {"days": 7, "opportunities": 400, "positives": 120},
+                "traffic": {
+                    "days": 7,
+                    "opportunities": 400,
+                    "outcomes_labelled": 120,
+                    "harmful": 40,
+                },
             },
             "PILOT",
         )
@@ -468,7 +493,12 @@ def selftest():
                 },
                 "daily_volume": 1000,
                 "action_value": 0.002,
-                "traffic": {"days": 7, "opportunities": 423, "positives": 343},
+                "traffic": {
+                    "days": 7,
+                    "opportunities": 423,
+                    "outcomes_labelled": 100,
+                    "harmful": 60,
+                },
             },
             "GO",
         )
@@ -500,61 +530,35 @@ def selftest():
                 },
                 "daily_volume": 800,
                 "action_value": 0.002,
-                "traffic": {"days": 7, "opportunities": 16464, "positives": 672},
-                "min_true_per_week": 100,
+                "traffic": {
+                    "days": 7,
+                    "opportunities": 16464,
+                    "outcomes_labelled": 100,
+                    "harmful": 80,
+                },
             },
             "GO",
         )
     )
-    # G0b worked examples (real-traffic counts from the beads; floors stated).
-    # vendor-paste (jev-m94x 61ae2c43): 0 real positives in 39 hunks -> STOP.
-    vp = rows(40, 0.0, "vp")
+    # G0b worked examples: real blind-labelled OUTCOME samples. The rows
+    # below are scaffolding that passes every other gate, so only G0b
+    # decides; the traffic blocks carry the real counts.
+    # failtriage (1ba40655): 100 labelled outcomes (68 addressed, 32
+    # harmless), 0 harmful in 7d -> STOP.
+    fr = rows(40, 0.5, "fr")
     cases.append(
         (
-            "vendor-paste-base-rate",
+            "failtriage-outcome",
             {
-                "name": "vendor-paste",
-                "rows": vp,
+                "name": "failtriage",
+                "rows": fr,
                 "label_source": "blind-human",
                 "censoring_rate": 0.0,
                 "recomputable": True,
                 "baseline": {
                     "name": "always-neg",
                     "predictions": {
-                        r["hash"]: "neg" for r in vp if r["split"] == "held"
-                    },
-                },
-                "agreement": {"n": 40, "agree": 39},
-                "features": {
-                    "direction": "predict",
-                    "future": False,
-                    "answer_visible": True,
-                    "primitive": "Score",
-                },
-                "daily_volume": 50,
-                "action_value": 0.01,
-                "traffic": {"days": 7, "opportunities": 39, "positives": 0},
-            },
-            "STOP",
-        )
-    )
-    # skill veto (jev-wbel replay: 53 correct vetoes in 200 loads over 7d,
-    # precision 0.335): 53/week true vetoes below the stated 100 floor -> STOP.
-    # Other gates pass here, so only G0b decides.
-    wb = rows(40, 0.5, "wb")
-    cases.append(
-        (
-            "skill-veto-base-rate",
-            {
-                "name": "skill-veto",
-                "rows": wb,
-                "label_source": "blind-human",
-                "censoring_rate": 0.0,
-                "recomputable": True,
-                "baseline": {
-                    "name": "always-neg",
-                    "predictions": {
-                        r["hash"]: "neg" for r in wb if r["split"] == "held"
+                        r["hash"]: "neg" for r in fr if r["split"] == "held"
                     },
                 },
                 "agreement": {"n": 40, "agree": 36},
@@ -566,32 +570,74 @@ def selftest():
                 },
                 "daily_volume": 590,
                 "action_value": 0.002,
-                "traffic": {"days": 7, "opportunities": 200, "positives": 53},
-                "min_true_per_week": 100,
+                "traffic": {
+                    "days": 7,
+                    "opportunities": 4118,
+                    "outcomes_labelled": 100,
+                    "harmful": 0,
+                },
             },
             "STOP",
         )
     )
-    # gate cascade (facg 1h window: 98 rows, 4 paid = 672 true/week at scale)
-    # clears the 100 floor -> GO.
-    gc2 = rows(200, 0.185, "gc2")
+    # vendor-paste (61ae2c43): 39 hunks blind-labelled, 0 vendored
+    # executions. Sample underpowered (39 < 50) AND zero harm -> STOP.
+    vp2 = rows(40, 0.5, "vp2")
     cases.append(
         (
-            "cascade-base-rate",
+            "vendor-paste-outcome",
             {
-                "name": "gate-cascade-traffic",
-                "rows": gc2,
-                "label_source": "observed-outcome",
+                "name": "vendor-paste",
+                "rows": vp2,
+                "label_source": "blind-human",
                 "censoring_rate": 0.0,
                 "recomputable": True,
                 "baseline": {
-                    "name": "regex",
+                    "name": "always-neg",
                     "predictions": {
-                        r["hash"]: ("pos" if i < 30 else "neg")
-                        for i, r in enumerate(gc2)
+                        r["hash"]: "neg" for r in vp2 if r["split"] == "held"
                     },
                 },
-                "agreement": {"n": 50, "agree": 44},
+                "agreement": {"n": 40, "agree": 36},
+                "features": {
+                    "direction": "predict",
+                    "future": False,
+                    "answer_visible": True,
+                    "primitive": "Score",
+                },
+                "daily_volume": 50,
+                "action_value": 0.01,
+                "traffic": {
+                    "days": 1,
+                    "opportunities": 39,
+                    "outcomes_labelled": 39,
+                    "harmful": 0,
+                },
+            },
+            "STOP",
+        )
+    )
+    # gate cascade (work/cascade-harm RUBRIC+labels, seed 99): 50
+    # destructive-pattern commands blind-labelled, 0 HARMFUL (quoted text,
+    # prose words, tests, scoped scratch). Real data says STOP; the
+    # conductor-ordered GO does not reproduce without inventing harm.
+    gc0 = rows(40, 0.5, "gc0")
+    cases.append(
+        (
+            "cascade-outcome",
+            {
+                "name": "gate-cascade",
+                "rows": gc0,
+                "label_source": "blind-human",
+                "censoring_rate": 0.0,
+                "recomputable": True,
+                "baseline": {
+                    "name": "always-neg",
+                    "predictions": {
+                        r["hash"]: "neg" for r in gc0 if r["split"] == "held"
+                    },
+                },
+                "agreement": {"n": 40, "agree": 36},
                 "features": {
                     "direction": "predict",
                     "future": False,
@@ -600,40 +646,50 @@ def selftest():
                 },
                 "daily_volume": 800,
                 "action_value": 0.002,
-                "traffic": {"days": 7, "opportunities": 16464, "positives": 672},
-                "min_true_per_week": 100,
+                "traffic": {
+                    "days": 7,
+                    "opportunities": 50,
+                    "outcomes_labelled": 50,
+                    "harmful": 0,
+                },
             },
-            "GO",
+            "STOP",
         )
     )
-    # memory filter (wb7j replication census: 75 true drops in 170 pairs over
-    # 7d) clears the default 10 floor -> GO.
-    mf = rows(100, 0.44, "mf")
+    # Mechanism proof (SYNTHETIC labels, clearly marked): 45 harmful in 60
+    # labelled outcomes clears the default floor -> GO. Proves the gate
+    # opens when harm exists; no real candidate currently does.
+    syn = rows(40, 0.5, "syn")
     cases.append(
         (
-            "memory-base-rate",
+            "mechanism-opens-on-harm",
             {
-                "name": "memory-filter",
-                "rows": mf,
+                "name": "synthetic-opener",
+                "rows": syn,
                 "label_source": "blind-human",
                 "censoring_rate": 0.0,
                 "recomputable": True,
                 "baseline": {
                     "name": "always-neg",
                     "predictions": {
-                        r["hash"]: "neg" for r in mf if r["split"] == "held"
+                        r["hash"]: "neg" for r in syn if r["split"] == "held"
                     },
                 },
-                "agreement": {"n": 50, "agree": 46},
+                "agreement": {"n": 40, "agree": 36},
                 "features": {
-                    "direction": "flag",
+                    "direction": "predict",
                     "future": False,
                     "answer_visible": True,
                     "primitive": "Score",
                 },
-                "daily_volume": 300,
+                "daily_volume": 800,
                 "action_value": 0.002,
-                "traffic": {"days": 7, "opportunities": 170, "positives": 75},
+                "traffic": {
+                    "days": 7,
+                    "opportunities": 200,
+                    "outcomes_labelled": 60,
+                    "harmful": 45,
+                },
             },
             "GO",
         )
@@ -652,10 +708,10 @@ def selftest():
     # strict: first three must be exactly STOP
     # G0b worked examples must be decided BY the base-rate finding.
     for name, want_base in (
-        ("vendor-paste-base-rate", False),
-        ("skill-veto-base-rate", False),
-        ("cascade-base-rate", True),
-        ("memory-base-rate", True),
+        ("failtriage-outcome", False),
+        ("vendor-paste-outcome", False),
+        ("cascade-outcome", False),
+        ("mechanism-opens-on-harm", True),
     ):
         cand = next(c for n, c, w in cases if n == name)
         g0b = [f for f in check(cand)["findings"] if f["gate"] == "G0b-base-rate"]
