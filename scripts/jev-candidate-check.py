@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Gate every live Jev call: data validity, label-noise ceiling, headroom, fit, rank.
+"""Gate every live Jev call: base rate, data validity, label-noise ceiling, headroom, fit, rank.
 
 Input: JSON candidate file (see --example). Output: JSON + one line.
-Gates: G0 shortcut floor (cheap baseline on held) -> G1 validity (hard) ->
-G2 noise ceiling (agreement inversion) -> G3 headroom -> G4 fit (Part A) ->
-rank + pilot rule. Keyless; no network; no key.
+Gates: G0b real-traffic base rate (hard, first) -> G0 shortcut floor
+(cheap baseline on held) -> G1 validity (hard) -> G2 noise ceiling
+(agreement inversion) -> G3 headroom -> G4 fit (Part A) -> rank + pilot
+rule. Keyless; no network; no key.
 """
 
 from __future__ import annotations
@@ -14,6 +15,7 @@ import sys
 
 MIN_HEADROOM_DEFAULT = 0.05
 MIN_HELD_N = 30
+MIN_TP_PER_WEEK_DEFAULT = 10.0
 
 
 def wilson(k, n, z=1.96):
@@ -48,6 +50,48 @@ def check(candidate):
     held = [r for r in rows if r.get("split") == "held"]
     dev_groups = {r.get("group") for r in dev if r.get("group")}
     held_groups = {r.get("group") for r in held if r.get("group")}
+    # G0b real-traffic base rate (hard, first): count the target event in
+    # real traffic on this machine over a stated window (observed sessions,
+    # logs, hook rows — never benchmark, planted, or replay rows). Expected
+    # true positives/week below the stated floor -> STOP with the count, no
+    # build. The floor is a cost parameter the candidate states and defends
+    # (default: occasional-use tripwire).
+    t = candidate.get("traffic")
+    try:
+        t_days = float(t.get("days", 0))
+        t_opp = int(t.get("opportunities", -1))
+        t_pos = int(t.get("positives", -1))
+    except (TypeError, ValueError, AttributeError):
+        t_days, t_opp, t_pos = 0, -1, -1
+    floor = candidate.get("min_true_per_week", MIN_TP_PER_WEEK_DEFAULT)
+    try:
+        floor = float(floor)
+    except (TypeError, ValueError):
+        floor = MIN_TP_PER_WEEK_DEFAULT
+    if (
+        not isinstance(t, dict)
+        or t_days <= 0
+        or t_opp < 0
+        or t_pos < 0
+        or t_pos > t_opp
+    ):
+        note(
+            "G0b-base-rate",
+            False,
+            "traffic {days, opportunities, positives} unstated or malformed: no build without a real-traffic count",
+        )
+        status = "STOP"
+    else:
+        tpw = t_pos / t_days * 7
+        ok0b = tpw >= floor
+        note(
+            "G0b-base-rate",
+            ok0b,
+            "real traffic %d positives / %d opportunities over %.1fd = %.2f true/week (floor %.1f)"
+            % (t_pos, t_opp, t_days, tpw, floor),
+        )
+        if not ok0b:
+            status = "STOP"
 
     # G1 validity (hard)
     ok = True
@@ -265,6 +309,7 @@ def selftest():
                 "agreement": {"n": 90, "agree": 79},
                 "daily_volume": 1000,
                 "action_value": 0.001,
+                "traffic": {"days": 7, "opportunities": 500, "positives": 200},
             },
             "STOP",
         )
@@ -289,6 +334,7 @@ def selftest():
                 "agreement": {"n": 50, "agree": 48},
                 "daily_volume": 500,
                 "action_value": 0.01,
+                "traffic": {"days": 7, "opportunities": 300, "positives": 60},
             },
             "STOP",
         )
@@ -312,6 +358,7 @@ def selftest():
                 "agreement": {"n": 30, "agree": 27},
                 "daily_volume": 100,
                 "action_value": 0.01,
+                "traffic": {"days": 7, "opportunities": 100, "positives": 30},
             },
             "STOP",
         )
@@ -369,6 +416,7 @@ def selftest():
                 },
                 "daily_volume": 400,
                 "action_value": 0.005,
+                "traffic": {"days": 7, "opportunities": 400, "positives": 120},
             },
             "PILOT",
         )
@@ -420,6 +468,7 @@ def selftest():
                 },
                 "daily_volume": 1000,
                 "action_value": 0.002,
+                "traffic": {"days": 7, "opportunities": 423, "positives": 343},
             },
             "GO",
         )
@@ -451,6 +500,140 @@ def selftest():
                 },
                 "daily_volume": 800,
                 "action_value": 0.002,
+                "traffic": {"days": 7, "opportunities": 16464, "positives": 672},
+                "min_true_per_week": 100,
+            },
+            "GO",
+        )
+    )
+    # G0b worked examples (real-traffic counts from the beads; floors stated).
+    # vendor-paste (jev-m94x 61ae2c43): 0 real positives in 39 hunks -> STOP.
+    vp = rows(40, 0.0, "vp")
+    cases.append(
+        (
+            "vendor-paste-base-rate",
+            {
+                "name": "vendor-paste",
+                "rows": vp,
+                "label_source": "blind-human",
+                "censoring_rate": 0.0,
+                "recomputable": True,
+                "baseline": {
+                    "name": "always-neg",
+                    "predictions": {
+                        r["hash"]: "neg" for r in vp if r["split"] == "held"
+                    },
+                },
+                "agreement": {"n": 40, "agree": 39},
+                "features": {
+                    "direction": "predict",
+                    "future": False,
+                    "answer_visible": True,
+                    "primitive": "Score",
+                },
+                "daily_volume": 50,
+                "action_value": 0.01,
+                "traffic": {"days": 7, "opportunities": 39, "positives": 0},
+            },
+            "STOP",
+        )
+    )
+    # skill veto (jev-wbel replay: 53 correct vetoes in 200 loads over 7d,
+    # precision 0.335): 53/week true vetoes below the stated 100 floor -> STOP.
+    # Other gates pass here, so only G0b decides.
+    wb = rows(40, 0.5, "wb")
+    cases.append(
+        (
+            "skill-veto-base-rate",
+            {
+                "name": "skill-veto",
+                "rows": wb,
+                "label_source": "blind-human",
+                "censoring_rate": 0.0,
+                "recomputable": True,
+                "baseline": {
+                    "name": "always-neg",
+                    "predictions": {
+                        r["hash"]: "neg" for r in wb if r["split"] == "held"
+                    },
+                },
+                "agreement": {"n": 40, "agree": 36},
+                "features": {
+                    "direction": "predict",
+                    "future": False,
+                    "answer_visible": True,
+                    "primitive": "Score",
+                },
+                "daily_volume": 590,
+                "action_value": 0.002,
+                "traffic": {"days": 7, "opportunities": 200, "positives": 53},
+                "min_true_per_week": 100,
+            },
+            "STOP",
+        )
+    )
+    # gate cascade (facg 1h window: 98 rows, 4 paid = 672 true/week at scale)
+    # clears the 100 floor -> GO.
+    gc2 = rows(200, 0.185, "gc2")
+    cases.append(
+        (
+            "cascade-base-rate",
+            {
+                "name": "gate-cascade-traffic",
+                "rows": gc2,
+                "label_source": "observed-outcome",
+                "censoring_rate": 0.0,
+                "recomputable": True,
+                "baseline": {
+                    "name": "regex",
+                    "predictions": {
+                        r["hash"]: ("pos" if i < 30 else "neg")
+                        for i, r in enumerate(gc2)
+                    },
+                },
+                "agreement": {"n": 50, "agree": 44},
+                "features": {
+                    "direction": "predict",
+                    "future": False,
+                    "answer_visible": True,
+                    "primitive": "Score",
+                },
+                "daily_volume": 800,
+                "action_value": 0.002,
+                "traffic": {"days": 7, "opportunities": 16464, "positives": 672},
+                "min_true_per_week": 100,
+            },
+            "GO",
+        )
+    )
+    # memory filter (wb7j replication census: 75 true drops in 170 pairs over
+    # 7d) clears the default 10 floor -> GO.
+    mf = rows(100, 0.44, "mf")
+    cases.append(
+        (
+            "memory-base-rate",
+            {
+                "name": "memory-filter",
+                "rows": mf,
+                "label_source": "blind-human",
+                "censoring_rate": 0.0,
+                "recomputable": True,
+                "baseline": {
+                    "name": "always-neg",
+                    "predictions": {
+                        r["hash"]: "neg" for r in mf if r["split"] == "held"
+                    },
+                },
+                "agreement": {"n": 50, "agree": 46},
+                "features": {
+                    "direction": "flag",
+                    "future": False,
+                    "answer_visible": True,
+                    "primitive": "Score",
+                },
+                "daily_volume": 300,
+                "action_value": 0.002,
+                "traffic": {"days": 7, "opportunities": 170, "positives": 75},
             },
             "GO",
         )
@@ -467,6 +650,27 @@ def selftest():
         if not ok:
             fails.append(name)
     # strict: first three must be exactly STOP
+    # G0b worked examples must be decided BY the base-rate finding.
+    for name, want_base in (
+        ("vendor-paste-base-rate", False),
+        ("skill-veto-base-rate", False),
+        ("cascade-base-rate", True),
+        ("memory-base-rate", True),
+    ):
+        cand = next(c for n, c, w in cases if n == name)
+        g0b = [f for f in check(cand)["findings"] if f["gate"] == "G0b-base-rate"]
+        okb = len(g0b) == 1 and g0b[0]["pass"] == want_base
+        print(
+            "%s G0b=%s want %s %s"
+            % (
+                name,
+                g0b[0]["pass"] if g0b else "missing",
+                want_base,
+                "ok" if okb else "MISMATCH",
+            )
+        )
+        if not okb:
+            fails.append(name + ":G0b")
     return 1 if fails else 0
 
 
