@@ -1,0 +1,3 @@
+corpus.json is not committed (137 MB; GitHub limit 100 MB).
+sha256: 8bb107bf6a7a995b32d1e68d992164aff17332b146710c941be05a957b80bf25
+rebuild: python3 work/vendor-paste/build-corpus.py

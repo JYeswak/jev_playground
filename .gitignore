@@ -125,3 +125,6 @@ work/cass-mail-mines/exports/*.jsonl
 work/score-stsb/*.csv
 # br doctor per-run artifacts
 .doctor/
+
+# 137 MB generated corpus (rebuild: work/vendor-paste/build-corpus.py; hash in CORPUS-SHA256.txt)
+work/vendor-paste/corpus.json
