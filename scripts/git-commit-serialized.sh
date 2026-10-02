@@ -40,7 +40,22 @@ if [ -e "$lock" ] && [ ! -s "$lock" ]; then
   fi
 fi
 
-git commit "$@"
-rc=$?
+rc=0
+attempt=0
+while :; do
+  attempt=$((attempt + 1))
+  out=$(git commit "$@" 2>&1)
+  rc=$?
+  printf '%s\n' "$out"
+  # Retry ONLY live-lock contention (another pane's writer holds index.lock);
+  # any other failure (hook refuse, nothing to commit, auth) fails as before.
+  # Bounded: 3 attempts, ~15 s total, then the pre-existing failure stands.
+  case "$out" in
+    *"Unable to create "*index.lock*"' File exists"*|*"index.lock': File exists"*)
+      if [ "$attempt" -ge 3 ]; then break; fi
+      sleep $((attempt * 5)); continue ;;
+    *) break ;;
+  esac
+done
 rmdir "$mutex" 2>/dev/null
 exit $rc
