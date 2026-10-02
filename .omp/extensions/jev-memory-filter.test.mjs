@@ -11,6 +11,7 @@ import {
   systemPromptText,
   pruneSystemPrompt,
   inEnforceScope,
+  filterBudgetMs,
   CUT,
   MAX_ITEMS_PER_TURN,
   CONCURRENCY,
@@ -508,4 +509,28 @@ test("WIRE switch removed mid-scoring discards the late prune", async () => {
   const rows = rowsOf(join(dir, "log.jsonl"));
   assert.ok(rows.length > 0);
   assert.ok(!rows.some((r) => r.status === "enforced"));
+});
+
+test("filterBudgetMs sizes from p95 waves with the old floor", () => {
+  assert.equal(filterBudgetMs(0), FILTER_DEADLINE_MS);
+  assert.equal(filterBudgetMs(4), FILTER_DEADLINE_MS);
+  assert.equal(filterBudgetMs(16), 2000);
+  assert.equal(filterBudgetMs(20), 2500);
+  assert.equal(filterBudgetMs(21), 3000);
+});
+
+test("budget: loaded backend still completes a full turn", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const lines = [];
+  for (let i = 0; i < 20; i++) lines.push(`- loaded fact ${i}`);
+  const ask = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    return { ok: true, scores: { rel: 0.1 }, latencyMs: 350, model: "m", usage: { input_tokens: 10 } };
+  };
+  const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: ["<memories>\n" + lines.join("\n") + "\n</memories>"] }, undefined);
+  assert.equal(out, undefined);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.equal(rows.filter((r) => r.status === "scored").length, 20);
+  assert.ok(!rows.some((r) => r.status === "deadline-keep"));
 });

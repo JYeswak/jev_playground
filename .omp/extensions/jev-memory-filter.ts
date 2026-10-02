@@ -36,6 +36,14 @@ type Ask = (options: AskOptions) => Promise<JevResult>;
 export const CONCURRENCY = 4;
 export const FILTER_DEADLINE_MS = 1500;
 
+/** Per-turn scoring budget (jev-9cqw-live): measured single-call p95 is
+ * 282ms over 7d (n=1951) and 457ms in a loaded window; P95_LATENCY_MS=500
+ * covers both. ceil(items/CONCURRENCY) waves, never below the old floor. */
+export const P95_LATENCY_MS = 500;
+export function filterBudgetMs(items: number): number {
+  return Math.max(FILTER_DEADLINE_MS, Math.ceil(Math.max(items, 0) / CONCURRENCY) * P95_LATENCY_MS);
+}
+
 
 export type MemoryItem = {
   /** Cleaned judgment key. Identical cleaning/slicing to the serial
@@ -352,7 +360,7 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
           await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash: slot.memoryHash, prompt, memory: slot.item.text, noul, decision });
         }
       };
-      const deadlineAt = Date.now() + FILTER_DEADLINE_MS;
+      const deadlineAt = Date.now() + filterBudgetMs(slots.length);
       let cursor = 0;
       const worker = async (): Promise<void> => {
         for (;;) {
