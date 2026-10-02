@@ -5065,3 +5065,17 @@ quoting, beating 47 interruptions at 0 misses on these frozen 52 held rows keyle
 Reopen cites this row.
 
 **Evidence:** var/agent-tmp/dr4p-feas.34880/{wide_dev_ep,wide_held_ep,wide_dev_labels,wide_held_labels.json,widelive.py,wide_receipt.jsonl} (scratch); bead jev-dr4p widened comments.
+
+## R149 — FAIL: completion veto by Choice-over-items + verify (2026-10-02)
+
+**Hypothesis:** a Choice naming the least-supported acceptance item plus a verify Noul catches closes that get reopened (bead jev-3ivq; rank-then-verify pattern).
+
+**Minimal repro / experiment:** bar pre-live: 327 closed jev beads with acceptance text + close evidence (17 reopened positives); pilot 17 + 60 clean, item parser 1-6 per bead. Veto iff Choice != all_supported AND verify >= 0.5 (frozen). Bar: recall >= 7/17 AND false-veto <= 6/60. Live 77 rows x2 calls (154 bounded jev-1.13.0), 115,479 in-tok ~$0.00485.
+
+**Result (measured, inline):** recall 14/17 = 0.824 PASS but false-veto 40/60 (veto rate 70%, precision 0.259) FAIL. Cut sweep keyless post-hoc: recall needs cut <= 0.7 (false-veto >= 20), false-veto <= 6 needs cut >= 0.85 (recall <= 2) — no cut satisfies both. The design sees risk everywhere.
+
+**Verdict:** FAIL. No veto gate on these terms.
+
+**Retry-condition:** a framing with precision >= 0.50 at recall >= 0.40 on this same frozen 77 (e.g. veto-only-top-risk-per-batch, or evidence-contradiction wording rather than least-supported), beating the mapping baseline keylessly first. Reopen cites this row.
+
+**Evidence:** var/agent-tmp/veto-*.jsonl + miners + live runner (scratch); bead jev-3ivq bar + result comments.
