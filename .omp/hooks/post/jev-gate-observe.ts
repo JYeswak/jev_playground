@@ -316,19 +316,6 @@ export const liveAsker: NonNullable<ObserveDeps["asker"]> = async (args) => {
     usage: result.usage ? { input_tokens: result.usage.input_tokens, output_tokens: result.usage.output_tokens } : undefined,
   };
 };
-/** Override file (jev-1w52 planted proof): content is the gateway URL;
- * absent/empty/whitespace means default. Read per call so no restart is
- * needed; env vars are not reliably visible to hook sessions. */
-export function readGatewayUrlFile(path?: string): string | null {
-  try {
-    const text = readFileSync(path ?? join(homedir(), ".local", "state", "jev", "nimble-gateway-url"), "utf8").trim();
-    return text.length > 0 ? text : null;
-  } catch {
-    return null;
-  }
-}
-
-
 /** Gateway failure cause (jev-1w52, per localbench IcyBarn): refused means the
  * loopback listener is down; timeout means GPU contention won the 5 s race;
  * http-502 is Ollama upstream; http-503-fence is the agreed draining signal.
@@ -355,7 +342,7 @@ export function gatewayCauseOf(err: unknown): "refused" | "timeout" | "http" {
 export const liveLocalAsker: NonNullable<ObserveDeps["localAsker"]> = async (args) => {
   const started = Date.now();
   const doFetch = args.fetchImpl ?? fetch;
-  const gatewayUrl = args.gatewayUrl ?? readGatewayUrlFile() ?? process.env.JEV_NIMBLE_GATEWAY_URL ?? LOCAL_GATEWAY;
+  const gatewayUrl = args.gatewayUrl ?? process.env.JEV_NIMBLE_GATEWAY_URL ?? LOCAL_GATEWAY;
   let response: Response;
   try {
     response = await doFetch(gatewayUrl, {
@@ -699,7 +686,7 @@ export async function observe(
       }
     }
     if (paidFallback && fallbackCause === "refused") {
-      const gatewayUrl = deps.gatewayUrl ?? readGatewayUrlFile() ?? process.env.JEV_NIMBLE_GATEWAY_URL ?? LOCAL_GATEWAY;
+      const gatewayUrl = deps.gatewayUrl ?? process.env.JEV_NIMBLE_GATEWAY_URL ?? LOCAL_GATEWAY;
       await noteGatewayRefused(base, write, deps, now, gatewayUrl);
     }
     if (budget.calls >= paidCap) {

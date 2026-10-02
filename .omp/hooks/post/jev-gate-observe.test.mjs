@@ -857,22 +857,27 @@ test("WIRE contention timeouts never page", async () => {
   assert.equal(pages.length, 0);
 });
 
-test("WIRE gateway URL override file routes, empty means default", async () => {
-  const { readGatewayUrlFile, liveLocalAsker } = await import("./jev-gate-observe.ts");
-  const dir = mkdtempSync(join(tmpdir(), "gwurl-"));
-  assert.equal(readGatewayUrlFile(join(dir, "missing")), null);
-  const { writeFileSync } = await import("node:fs");
-  writeFileSync(join(dir, "u"), "http://127.0.0.1:9/");
-  assert.equal(readGatewayUrlFile(join(dir, "u")), "http://127.0.0.1:9/");
-  writeFileSync(join(dir, "e"), "  \n");
-  assert.equal(readGatewayUrlFile(join(dir, "e")), null);
-  let gotUrl = "";
-  const probe = async (url) => {
-    gotUrl = String(url);
-    throw new Error("fetch failed: connect ECONNREFUSED 127.0.0.1:9");
-  };
-  const res = await liveLocalAsker({ state: {}, questions: {}, model: "m", timeoutMs: 50, fetchImpl: probe, gatewayUrl: "http://127.0.0.1:9/" });
-  assert.equal(gotUrl, "http://127.0.0.1:9/");
-  assert.equal(res.ok, false);
-  assert.equal(res.reason, "gateway-refused");
+test("WIRE gateway URL precedence: args, then env, then const; no file read", async () => {
+  const { liveLocalAsker, LOCAL_GATEWAY } = await import("./jev-gate-observe.ts");
+  const prev = process.env.JEV_NIMBLE_GATEWAY_URL;
+  delete process.env.JEV_NIMBLE_GATEWAY_URL;
+  try {
+    let gotUrl = "";
+    const probe = async (url) => {
+      gotUrl = String(url);
+      throw new Error("fetch failed: connect ECONNREFUSED 127.0.0.1:9");
+    };
+    const base = { state: {}, questions: {}, model: "m", timeoutMs: 50, fetchImpl: probe };
+    let res = await liveLocalAsker(base);
+    assert.equal(gotUrl, LOCAL_GATEWAY);
+    assert.equal(res.reason, "gateway-refused");
+    process.env.JEV_NIMBLE_GATEWAY_URL = "http://127.0.0.1:9/";
+    res = await liveLocalAsker(base);
+    assert.equal(gotUrl, "http://127.0.0.1:9/");
+    res = await liveLocalAsker({ ...base, gatewayUrl: "http://127.0.0.1:7/" });
+    assert.equal(gotUrl, "http://127.0.0.1:7/");
+  } finally {
+    if (prev === undefined) delete process.env.JEV_NIMBLE_GATEWAY_URL;
+    else process.env.JEV_NIMBLE_GATEWAY_URL = prev;
+  }
 });
