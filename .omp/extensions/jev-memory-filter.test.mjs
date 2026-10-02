@@ -586,3 +586,16 @@ test("cap3 on + 2 memories leaves prompt unchanged", async () => {
   const rows = rowsOf(join(dir, "log.jsonl"));
   assert.ok(!rows.some((r) => String(r.status).startsWith("cap3")));
 });
+
+test("cap3 prunes with exhausted Jev cap and never calls", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  let called = false;
+  const throwingAsk = async () => { called = true; throw new Error("must not call"); };
+  const handler = makeBeforeAgentStartHandler({ ask: throwingAsk, cap: 0, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), cap3SwitchPath: await cap3Switch(dir) });
+  const { event } = eventFor("q", SYS_RECALL_5);
+  const out = await handler(event, { cwd: "/Users/josh/Developer/uds" });
+  assert.ok(out && typeof out.systemPrompt !== "undefined");
+  assert.equal(called, false);
+  const text = systemPromptText(out.systemPrompt);
+  assert.ok(!text.includes(BULLET_E), "4th+ dropped without any call");
+});
