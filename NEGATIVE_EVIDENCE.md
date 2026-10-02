@@ -4941,3 +4941,73 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** a framing under which the model says retry on >= 30% of held-out with precision >= 0.70 (e.g. retry-with-backoff endorsement rather than blind identical retry), beating 0.556 keylessly first on this population. Reopen cites this row.
 
 **Evidence:** var/agent-tmp/msax-*.jsonl + miners (scratch); bead jev-msax bar + V1 comment; verifier recount in close comment.
+
+## R143 — FAIL (harm): V10 TTSR applicability Choice suppresses 3 applicable reminders (2026-10-02)
+
+**Hypothesis:** single Choice applicable-vs-inapplicable on trigger+next-action suppresses
+inapplicable bash-pipe-exit reminders at zero missed applicable ones (bead jev-dr4p).
+
+**Minimal repro / experiment:** 118 frozen held-out rows (108 unseen sessions; blind labels
+19 applicable-clear / 43 borderline-printonly / 56 inapplicable), jev-1.13.0, 1 call/row,
+fail-safe KEEP on conf<0.6/invalid/error. Bar pre-live: interruptions <=57 AND 0 clear-misses
+(baseline regex 62/0). 118 calls, 73,545 in-tok ~$0.00309, p50 latency 360ms.
+
+**Result (measured, inline):** interruptions=39 (bar met) BUT clear-misses=3 (bar violated):
+test-binary exit=$? after tail (0.65), am --help exit=$? (0.78), census-grep exit=$? (0.69) —
+long-tail commands where status-read-after-pipe is genuine but Jev voted inapplicable.
+Suppression on inapplicable 53/56=0.946 Wilson [0.854, 0.982]. FAIL on harm.
+
+**Verdict:** FAIL. Single Choice buys volume (39 vs 62 interruptions) but cannot hold the
+zero-miss harm bound; the misses are high-confidence, so no threshold fixes it. No seam.
+
+**Retry-condition:** a design that keeps all 19 clear (e.g. hard keep-rule on
+pipe-plus-status-read with exceptions only for proven-correct usage) while beating 39
+interruptions, demonstrated keylessly on these frozen rows first. Reopen cites this row.
+
+**Evidence:** var/agent-tmp/dr4p-feas.34880/{held120_ep.json,held_labels.json,live_receipt.jsonl,live.py} (scratch); bead jev-dr4p prereg + result comments.
+
+## R144 — FAIL: D1 applicability battery+policy loses to single Choice (2026-10-02)
+
+**Hypothesis:** guardrails-pattern battery (3 Nouls + severity Score, strict policy) beats
+V10 single Choice on the same task (bead jev-n9vr, prereg in work/plan-20261002/BREADTH_RULES.md).
+
+**Minimal repro / experiment:** same 118 held-out rows/labels as R143; one request/row (4
+questions); SUPPRESS iff max(noul)<0.35 AND severity<2 else KEEP. Bar pre-live:
+interruptions <=57 AND 0 clear-misses AND < V10-Choice (39). 118 calls ~$0.00362, p50 383ms.
+
+**Result (measured, inline):** interruptions=78 (worse than regex 62 and Choice 39),
+clear-misses=0. Battery too conservative: kept 31/32 printonly and 19 inapplicable.
+Decomposition did not help; thresholds are not the lever. FAIL.
+
+**Verdict:** FAIL. No seam; D1 closed.
+
+**Retry-condition:** a battery whose questions separate print-only from relied-upon reads
+(the actual failure axis), beating 39 interruptions at 0 clear-misses on these frozen rows
+keylessly first. Reopen cites this row.
+
+**Evidence:** var/agent-tmp/n9vr-feas.34880/d1live.py + d1_receipt.jsonl (scratch);
+work/plan-20261002/BREADTH_RULES.md @3f40a52a; bead jev-n9vr comments.
+
+## R145 — FAIL: state-enriched conductor triage underperforms message-only (2026-10-02)
+
+**Hypothesis:** adding reconstructed fleet/bead state (pane, bead status at msg time via
+git-export/closed_at, verify comments) lifts conductor-triage Choice past the 0.75 bar
+(bead jev-ztfe, loss-depth on R140).
+
+**Minimal repro / experiment:** rebuilt corpus (731 packets; state resolution 219/226 bead
+mentions, 97%); held-out 366 -> sampled 250 same rule as V1; same Choice wording plus state
+block; fail-safe ACT conf<0.6. Bar pre-live: accuracy >=0.75 AND action-recall >=0.46.
+250 calls ~$0.00571. Corpus drift noted: 731 vs V1 723 packets (+8 rows).
+
+**Result (measured, inline):** accuracy 0.668 (V1 0.704), action-recall 0.344 (33/96; V1
+0.459). Enrichment HURT. Autopsy: 50/63 act-misses had NO bead state (bare DONEs) — the
+enrichment touched a minority while the extra text diluted the message signal; coarse
+status strings do not supply the decision-relevant state. No retest (directionally wrong).
+
+**Verdict:** FAIL. No seam; V2 closed.
+
+**Retry-condition:** a state design that covers the bare-message majority (e.g. pane
+assignment/fleet snapshot at arrival, not bead DB status), beating 0.704 keylessly first
+on this corpus. Reopen cites this row.
+
+**Evidence:** var/agent-tmp/ztfe-feas.34880/{build1,resolve,ztlive.py,corpus_states.json,zt_receipt.jsonl} (scratch); bead jev-ztfe feasibility + prereg comments.
