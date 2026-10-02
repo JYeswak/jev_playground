@@ -24,7 +24,8 @@ export const MISSION =
   "tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp " +
   "session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One " +
   "model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. " +
-  "Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism.";
+  "Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. " +
+  "Ambition floor: one failed design closes that design, never the area; go wide across primitives, patterns and cookbooks, and finish proofs instead of reporting them pending.";
 
 const STAND_DOWN = /standing by|queue dry|nothing further|no further action/i;
 

@@ -377,11 +377,16 @@ are always allowed. **Reporting a loss is a success:** one line, revert, next le
 ### LOSS DEPTH — a loss after one design is a result about the design, not about Jev
 
 Joshua, 2026-09-25, verbatim: *"every loss means we're not going deep enough, in my opinion - we've
-got a whole library of advanced skills"*. A preregistered FAIL stands, but it rules out only that
-design. Before closing a candidate: (1) keyless autopsy of the failing rows by failure mode
-(missing evidence, question design, harness bug, model limit); (2) three to five ranked one-variable
-hypotheses; (3) a dev-slice replay, one variable at a time; (4) one fresh preregistered held-out
-retest of the best design at the original or a stricter bar, ending on a held-out pass or a named model limit.
+got a whole library of advanced skills"*; 2026-10-02: *"if we're not reaching for the moon on
+creativity on what we're exploring, we're failing"*. A preregistered FAIL rules out only that design.
+Before closing a candidate: (1) keyless autopsy of failing rows by failure mode; (2) three to five
+ranked one-variable hypotheses; (3) a dev-slice replay, one variable at a time; (4) one fresh
+preregistered held-out retest at the original or a stricter bar. AMBITION FLOOR: an AREA (skills,
+memory, search, in-loop, rules...) is never "refuted" until it has had >= 3 distinct designs across
+>= 2 primitives (Choice/Score/Noul) and >= 2 patterns from docs-mirror/typesafe/{patterns,cookbooks}
+and awesome-jev, and its data passed the label-noise ceiling and headroom check
+(work/plan-20261002/PLAN.md). Every new candidate names its place in that design space and why it is
+the boldest testable option, not the nearest variant of the last one.
 
 ---
 
