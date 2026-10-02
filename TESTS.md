@@ -210,7 +210,11 @@ claim nobody can check:
   composer, a non-idle state, or a failed send resets without paging. 10 tests.
   Re-pages of a pane that stays idle back off (600 s doubling to 7,200 s): measured 2026-10-01, a
   fixed 600 s re-page sent pane 1 300 pages for 56 idle episodes. 4 tests.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (68 tests).
+  Fleet router (jev-ara9): a needs-verify bead never goes to its author, one ready bead to one
+  pane, priority then age order, verification before new work, per-pane cooldown, re-route waits
+  and never repeats a verifier, a refused claim sends nothing, the off switch makes no br call.
+  6 tests.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (74 tests).
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder

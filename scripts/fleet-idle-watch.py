@@ -13,9 +13,19 @@ State  = from process evidence first, screen second (bead jev-6con):
                      no longer paged; only a wait with nothing left under omp is.
            idle      omp is there and none of the above holds.
          Each state carries the evidence that decided it, e.g. "working (child: docker run ...)".
-Alert  = `ntm send jev --pane=1 "IDLE pane N ..."` after POLLS consecutive non-working polls,
-         then again while it stays that way, the gap doubling from REALERT up to REALERT_MAX
-         (measured 2026-10-01: a fixed 600 s re-page sent pane 1 300 pages for 56 idle episodes).
+Route  = a pane idle for POLLS polls gets work before pane 1 hears of it (bead jev-ara9): first an
+         in_progress bead labelled needs-verify that its agent did not write (oldest first), else
+         the highest-priority unassigned bead in br ready, claimed for the agent with br's atomic
+         --claim and --if-unchanged compare-and-set. br's close policy (.beads/policy.yaml) refuses a
+         self-close, so a misrouted verification cannot close anything. One routed item per pane
+         per ROUTE_COOLDOWN_S; a verification goes to another verifier after VERIFY_REROUTE_S, never
+         to the same one twice. Pane map: ~/.local/state/jev/pane-agents.json; the router is off
+         (the watcher behaves as before) without it or while ~/.local/state/jev/fleet-router.off
+         exists. Why: 2026-10-02 panes sat idle ~7 h (07:54-15:01Z) waiting on manual dispatch.
+Alert  = `ntm send jev --pane=1 "IDLE pane N ..."` after POLLS consecutive non-working polls when
+         nothing was routed, then again while it stays that way, the gap doubling from REALERT up
+         to REALERT_MAX (measured 2026-10-01: a fixed 600 s re-page sent pane 1 300 pages for 56
+         idle episodes).
 Mail   = every round, each urgent/high Agent Mail message in the conductor's archive inbox that
          was never paged goes to pane 1 once as `MAIL <importance> from <from>: <subject> (id <id>,
          <HH:MM>Z)` (bead jev-lqfm). Paged ids persist in JEV_WATCH_INBOX_STATE, so a restart
@@ -47,6 +57,8 @@ was 'idle' while its omp had a docker run live under a bash tool call.
                                                  # (both informational) and one mail round;
                                                  # exit 1 if any worker is not working; 2 if ps is NOT_RUN
   python3 scripts/fleet-idle-watch.py --selftest # classifier on real status lines and trees
+  python3 scripts/fleet-idle-watch.py --route-plan  # what the router would send idle panes now;
+                                                 # reads br and tmux only, writes nothing
 """
 
 from __future__ import annotations
@@ -1406,9 +1418,289 @@ def capture_lock_creator(repo, now, log_path=None, state_path=None, run=subproce
         return None
 
 
+ROUTER_MAP = (
+    "~/.local/state/jev/pane-agents.json"  # {"2": "HazySpring", ...}, read every round
+)
+ROUTER_OFF = "~/.local/state/jev/fleet-router.off"
+ROUTER_STATE = "~/.local/state/jev/fleet-router-state.json"
+ROUTER_LOG = "~/.local/state/jev/fleet-router.jsonl"
+ROUTE_COOLDOWN_S = int(os.environ.get("JEV_ROUTE_COOLDOWN_S", "1800"))
+VERIFY_REROUTE_S = int(os.environ.get("JEV_VERIFY_REROUTE_S", "3600"))
+VERIFY_LABEL = "needs-verify"
+ROUTER_ACTOR = "FleetRouter"
+
+
+def plan_routes(ripe, agents, ready, verify, state, now):
+    """[(pane, agent, kind, bead)] with kind 'verify' or 'claim'; pure, so tests need no br.
+
+    ripe: [(pane, idle_since)], longest idle served first; agents: {pane: agent name};
+    ready: unassigned ready beads; verify: in_progress beads labelled needs-verify;
+    state: {"pane": {pane: [bead, ts]}, "verify": {bead: [verifier, ts]}}.
+    A bead goes to one pane per round; a verification never to its assignee (the author), never
+    twice to the same verifier, and to another only after VERIFY_REROUTE_S; a pane gets one
+    routed item per ROUTE_COOLDOWN_S, so a pane that ignores its packet is paged, not re-fed."""
+    plans, taken = [], set()
+    for pane, _since in sorted(ripe, key=lambda item: item[1]):
+        agent = agents.get(pane)
+        last = state.get("pane", {}).get(str(pane))
+        if not agent or (last and now - last[1] < ROUTE_COOLDOWN_S):
+            continue
+        pick = None
+        for bead in sorted(verify, key=lambda b: b.get("updated_at") or ""):
+            routed = state.get("verify", {}).get(bead["id"])
+            if (
+                bead["id"] in taken
+                or bead.get("assignee") in (None, "", agent)
+                or (
+                    routed
+                    and (routed[0] == agent or now - routed[1] < VERIFY_REROUTE_S)
+                )
+            ):
+                continue
+            pick = ("verify", bead)
+            break
+        if pick is None:
+            for bead in sorted(
+                ready, key=lambda b: (b.get("priority", 9), b.get("created_at") or "")
+            ):
+                if (
+                    bead["id"] in taken
+                    or bead.get("assignee")
+                    or bead.get("issue_type") == "epic"
+                ):
+                    continue
+                pick = ("claim", bead)
+                break
+        if pick:
+            taken.add(pick[1]["id"])
+            plans.append((pane, agent, pick[0], pick[1]))
+    return plans
+
+
+def _cut(text: str, width: int = 100) -> str:
+    text = " ".join(str(text).split())
+    return text if len(text) <= width else text[: width - 3] + "..."
+
+
+def route_packet(pane: int, agent: str, kind: str, bead: dict) -> str:
+    """The ntm message for one routed item; ends with the callback line every dispatch carries."""
+    bid = bead["id"]
+    if kind == "claim":
+        return (
+            f"FLEET ROUTER to {agent} (pane {pane}): you were idle and {bid} "
+            f"(P{bead.get('priority')}) was unassigned in br ready; it is now claimed for you. "
+            f"{_cut(bead.get('title', ''))}. Start with br show {bid} and follow its ACCEPTANCE. "
+            f"When done: comment the evidence with commit:<sha>, then br --actor {agent} update "
+            f"{bid} --add-label {VERIFY_LABEL}; another pane closes it (br refuses a self-close). "
+            f'CALLBACK REQUIRED: ntm send jev --pane=1 "DONE {bid} <sha> <one-line evidence>".'
+        )
+    return (
+        f"FLEET ROUTER to {agent} (pane {pane}): verify {bid} (author {bead.get('assignee')}; "
+        f"you did not write it). {_cut(bead.get('title', ''))}. Read br show {bid} and its last "
+        f"comments, then recompute the claim from the committed rows and scorer (no provider "
+        f"calls unless the bead requires them). Holds: br --actor {agent} close {bid} --reason "
+        f'"verified <numbers> commit:<sha>". Differs: br --actor {agent} update {bid} '
+        f"--remove-label {VERIFY_LABEL} and comment the exact diff. CALLBACK REQUIRED: ntm send "
+        f'jev --pane=1 "DONE verify {bid} <holds|differs> <numbers>".'
+    )
+
+
+def send_pane(pane: int, message: str) -> bool:
+    """`ntm send` one message to a worker pane; True only when ntm exited 0."""
+    try:
+        done = subprocess.run(
+            [
+                "ntm",
+                "send",
+                SESSION,
+                f"--pane={pane}",
+                "--no-cass-check",
+                "--force-non-interactive",
+                message,
+            ],
+            capture_output=True,
+            timeout=60,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return done.returncode == 0
+
+
+def _issues(text: str) -> list[dict] | None:
+    """br --json stdout as a list of issues (br list wraps them in {"issues": ...}); None if unparseable."""
+    try:
+        data = json.loads(text)
+    except (TypeError, ValueError):
+        return None
+    if isinstance(data, dict):
+        data = data.get("issues")
+    return data if isinstance(data, list) else None
+
+
+class Router:
+    """One routing round per poll; every side effect goes through run, send and page."""
+
+    def __init__(self, run=subprocess.run, send=send_pane, pager=None):
+        self.run, self.send, self.pager = run, send, pager or page
+        self.said = None
+
+    def _say(self, note: str) -> None:
+        if note != self.said:
+            print(f"{time.strftime('%H:%M:%SZ', time.gmtime())} {note}", flush=True)
+        self.said = note
+
+    def br(self, *args: str) -> tuple[int | None, str]:
+        try:
+            done = self.run(
+                ["br", *args],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=REPO_ROOT,
+                env=dict(os.environ, RUST_LOG="off"),
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            return None, ""
+        return done.returncode, done.stdout or ""
+
+    def inputs(self):
+        """(agents, ready, verify), or None with the reason printed once."""
+        if (
+            os.environ.get("JEV_FLEET_ROUTER") == "0"
+            or Path(ROUTER_OFF).expanduser().exists()
+        ):
+            self._say("router off (switch)")
+            return None
+        try:
+            raw = json.loads(Path(ROUTER_MAP).expanduser().read_text())
+            agents = {int(k): str(v) for k, v in raw.items() if str(k).isdigit() and v}
+        except (OSError, ValueError, AttributeError):
+            agents = {}
+        if not agents:
+            self._say(f"NOT_RUN router: no pane map at {ROUTER_MAP}")
+            return None
+        rc_ready, ready = self.br("ready", "--unassigned", "--json")
+        rc_verify, verify = self.br(
+            "list", "--status", "in_progress", "--label", VERIFY_LABEL, "--json"
+        )
+        ready, verify = _issues(ready), _issues(verify)
+        if rc_ready != 0 or rc_verify != 0 or ready is None or verify is None:
+            self._say(
+                f"NOT_RUN router: br ready/list failed (rc {rc_ready}/{rc_verify})"
+            )
+            return None
+        self._say("router on")
+        return agents, ready, verify
+
+    def round(self, ripe: list[tuple[int, float]], now: float) -> set[int]:
+        """Route work to ripe idle panes; return the panes that got a packet."""
+        if not ripe:
+            return set()
+        loaded = self.inputs()
+        if loaded is None:
+            return set()
+        state_path = Path(ROUTER_STATE).expanduser()
+        try:
+            state = json.loads(state_path.read_text())
+        except (OSError, ValueError):
+            state = {}
+        state = {
+            kind: {k: v for k, v in state.get(kind, {}).items() if now - v[1] < 86400}
+            for kind in ("pane", "verify")
+        }
+        routed = set()
+        for pane, agent, kind, bead in plan_routes(ripe, *loaded, state, now):
+            row = {
+                "ts": now,
+                "pane": pane,
+                "agent": agent,
+                "kind": kind,
+                "bead": bead["id"],
+            }
+            if kind == "claim":
+                rc, _ = self.br(
+                    "update",
+                    bead["id"],
+                    "--claim",
+                    "--if-unchanged",
+                    bead.get("updated_at", ""),
+                    "--actor",
+                    agent,
+                )
+                if rc != 0:
+                    self._log({**row, "result": f"claim-refused rc {rc}"})
+                    continue
+            sent = self.send(pane, route_packet(pane, agent, kind, bead))
+            self._log({**row, "result": "sent" if sent else "send-failed"})
+            if not sent:
+                if kind == "claim":
+                    self.pager(
+                        f"ROUTER: {bead['id']} claimed for {agent} but the packet to pane {pane} failed"
+                    )
+                continue
+            state["pane"][str(pane)] = [bead["id"], now]
+            if kind == "verify":
+                state["verify"][bead["id"]] = [agent, now]
+            self.br(
+                "comments",
+                "add",
+                bead["id"],
+                f"fleet router: {kind} routed to {agent} (pane {pane})",
+                "--actor",
+                ROUTER_ACTOR,
+            )
+            routed.add(pane)
+        state_path.parent.mkdir(parents=True, exist_ok=True)
+        state_path.write_text(json.dumps(state))
+        return routed
+
+    def _log(self, row: dict) -> None:
+        path = Path(ROUTER_LOG).expanduser()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a") as handle:
+            handle.write(json.dumps(row) + "\n")
+        print(
+            f"{time.strftime('%H:%M:%SZ', time.gmtime())} routed {row['kind']} {row['bead']} "
+            f"-> {row['agent']} (pane {row['pane']}): {row['result']}",
+            flush=True,
+        )
+
+
+ROUTER = Router()
+
+
+def route_plan() -> int:
+    """--route-plan: print what the router would send every idle pane now; writes nothing."""
+    states = poll()
+    if states is None:
+        return 2
+    now = time.time()
+    ripe = [
+        (index, now)
+        for index, reading in sorted(states.items())
+        if reading[0] == "idle"
+    ]
+    loaded = Router().inputs()
+    if loaded is None:
+        return 2
+    try:
+        state = json.loads(Path(ROUTER_STATE).expanduser().read_text())
+    except (OSError, ValueError):
+        state = {}
+    print(f"idle panes: {[index for index, _ in ripe]}")
+    for pane, agent, kind, bead in plan_routes(ripe, *loaded, state, now):
+        print(
+            f"pane {pane} {agent}: {kind} {bead['id']} P{bead.get('priority')} "
+            f"{_cut(bead.get('title', ''), 70)}"
+        )
+    return 0
+
+
 def main() -> int:
     if "--selftest" in sys.argv:
         return selftest()
+    if "--route-plan" in sys.argv:
+        return route_plan()
     if "--once" in sys.argv:
         states = poll()
         if states is None:
@@ -1461,6 +1753,7 @@ def main() -> int:
         if SHADOW_ONLY:
             time.sleep(INTERVAL)
             continue
+        due: list[tuple[int, str, str]] = []
         for index, reading in states.items():
             state, words = reading[:2]
             omp_pid = reading[3] if len(reading) > 3 else None
@@ -1529,9 +1822,24 @@ def main() -> int:
             if streak[index] >= POLLS and realert_due(
                 now, alerted_at.get(index), alert_count.get(index, 0)
             ):
+                due.append((index, state, words))
+        try:
+            routed = ROUTER.round(
+                [
+                    (index, idle_since[index])
+                    for index, state, _ in due
+                    if state == "idle"
+                ],
+                now,
+            )
+        except Exception as err:  # the router must never stop the idle pages
+            print(f"router failed: {type(err).__name__}", flush=True)
+            routed = set()
+        for index, state, words in due:
+            if index not in routed:
                 alert(index, idle_since[index], f"[{state}] {words}")
-                alerted_at[index] = now
-                alert_count[index] = alert_count.get(index, 0) + 1
+            alerted_at[index] = now
+            alert_count[index] = alert_count.get(index, 0) + 1
         stamp = time.strftime("%H:%M:%SZ", time.gmtime())
         ci = ci_lines()
         for line in ci:

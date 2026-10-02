@@ -1137,5 +1137,124 @@ class UnsubmittedComposer(unittest.TestCase):
             self.assertFalse(fiw.submit_enter(4))
 
 
+class FleetRouter(unittest.TestCase):
+    """jev-ara9: who gets what when panes are idle. Beads are br --json shapes (ready is slim)."""
+
+    AGENTS = {2: "HazySpring", 3: "CyanPeak", 4: "WildCarp"}
+    EMPTY = {"pane": {}, "verify": {}}
+
+    def ready(self, bid, prio, created="2026-10-02T10:00:00Z"):
+        return {
+            "id": bid,
+            "priority": prio,
+            "created_at": created,
+            "updated_at": created,
+            "issue_type": "task",
+            "status": "open",
+            "title": bid,
+        }
+
+    def verify(self, bid, author, updated="2026-10-02T10:00:00Z"):
+        return {
+            "id": bid,
+            "assignee": author,
+            "updated_at": updated,
+            "status": "in_progress",
+            "title": bid,
+        }
+
+    def test_verification_never_goes_to_its_author(self):
+        plans = fiw.plan_routes(
+            [(4, 1.0), (3, 2.0)],
+            self.AGENTS,
+            [],
+            [self.verify("jev-v", "WildCarp")],
+            self.EMPTY,
+            100.0,
+        )
+        self.assertEqual(
+            [(p, a, k) for p, a, k, _ in plans], [(3, "CyanPeak", "verify")]
+        )
+
+    def test_one_ready_bead_is_assigned_to_one_pane_only(self):
+        plans = fiw.plan_routes(
+            [(2, 1.0), (3, 2.0)],
+            self.AGENTS,
+            [self.ready("jev-a", 1)],
+            [],
+            self.EMPTY,
+            100.0,
+        )
+        self.assertEqual([(p, b["id"]) for p, _, _, b in plans], [(2, "jev-a")])
+
+    def test_priority_then_age_order_and_longest_idle_first(self):
+        ready = [
+            self.ready("jev-p2", 2),
+            self.ready("jev-p1-new", 1, "2026-10-02T12:00:00Z"),
+            self.ready("jev-p1-old", 1, "2026-10-02T09:00:00Z"),
+        ]
+        plans = fiw.plan_routes(
+            [(3, 50.0), (2, 10.0)], self.AGENTS, ready, [], self.EMPTY, 100.0
+        )
+        self.assertEqual(
+            [(p, b["id"]) for p, _, _, b in plans],
+            [(2, "jev-p1-old"), (3, "jev-p1-new")],
+        )
+
+    def test_verification_beats_new_work_and_cooldown_holds_a_routed_pane(self):
+        state = {"pane": {"3": ["jev-x", 90.0]}, "verify": {}}
+        plans = fiw.plan_routes(
+            [(2, 1.0), (3, 2.0)],
+            self.AGENTS,
+            [self.ready("jev-a", 0)],
+            [self.verify("jev-v", "WildCarp")],
+            state,
+            100.0,
+        )
+        self.assertEqual([(p, k) for p, _, k, _ in plans], [(2, "verify")])
+
+    def test_reroute_waits_and_never_repeats_the_same_verifier(self):
+        bead = [self.verify("jev-v", "WildCarp")]
+        state = {"pane": {}, "verify": {"jev-v": ["CyanPeak", 0.0]}}
+        self.assertEqual(
+            fiw.plan_routes([(2, 1.0)], self.AGENTS, [], bead, state, 10.0), []
+        )
+        late = fiw.VERIFY_REROUTE_S + 1.0
+        self.assertEqual(
+            fiw.plan_routes([(3, 1.0)], self.AGENTS, [], bead, state, late), []
+        )
+        self.assertEqual(
+            len(fiw.plan_routes([(2, 1.0)], self.AGENTS, [], bead, state, late)), 1
+        )
+
+    def test_refused_claim_sends_nothing_and_switch_stops_all_br_calls(self):
+        calls, sent = [], []
+        ready = json.dumps([self.ready("jev-a", 1)])
+
+        def run(argv, **_):
+            calls.append(argv)
+            out = ready if argv[1] == "ready" else "[]"
+            rc = 6 if argv[1] == "update" else 0
+            return subprocess.CompletedProcess(argv, rc, out, "")
+
+        with (
+            tempfile.TemporaryDirectory() as home,
+            mock.patch.dict(os.environ, {"HOME": home}),
+        ):
+            state = Path(home) / ".local/state/jev"
+            state.mkdir(parents=True)
+            (state / "pane-agents.json").write_text(json.dumps({"2": "HazySpring"}))
+            router = fiw.Router(
+                run=run, send=lambda p, m: sent.append(p) or True, pager=lambda m: None
+            )
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(router.round([(2, 1.0)], 100.0), set())
+                self.assertEqual(sent, [])
+                (state / "fleet-router.off").write_text("")
+                calls.clear()
+                self.assertEqual(router.round([(2, 1.0)], 100.0), set())
+            self.assertEqual(calls, [])
+
+
 if __name__ == "__main__":
     unittest.main()
