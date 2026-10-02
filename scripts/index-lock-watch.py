@@ -210,6 +210,8 @@ def watch(
     max_iters=None,
 ):
     """kqueue on .git/; capture on every directory change plus one scan now."""
+    ops_path = Path(ops_path) if ops_path else Path(HOME) / OPS_REL
+    ops_write(ops_path, {"ts": ts_now(), "type": "start", "pid": os.getpid()})
     row = capture_once(repo, log_path, state_path, run)
     if row:
         print(json.dumps(row), flush=True)
@@ -231,9 +233,7 @@ def watch(
             0,
             0,
         )
-        ops_path = Path(ops_path) if ops_path else Path(HOME) / OPS_REL
         last_hb, events, iters = 0.0, 0, 0
-        ops_write(ops_path, {"ts": ts_now(), "type": "start", "pid": os.getpid()})
         while True:
             events = _poll_once(kq, repo, log_path, state_path, ops_path, run, events)
             now = time.time()
