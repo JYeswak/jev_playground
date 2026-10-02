@@ -3571,3 +3571,8 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Live (jev-1.13.0, 320/320 scored, 0 exclusions, ~$0.0115 in $0.015 cap):** dev cut 0.35 (J=0.617). Held tp=64 fp=12 fn=36 tn=88: prec 0.842 [0.74,0.91], rec 0.640 [0.54,0.73], acc 0.760. License baseline same half: 1.000 / 0.130 / 0.565. McNemar jev-only 65 vs lic-only 2, p~0. Bar MET. Locks 3/4: acc-delta 0.195 vs 0.20 locked — missed by 0.005, reported without retrofit.
 - **Reading:** recognition holds again — the answer (third-party idioms, headers, generated markers) is visible in the judged text. Baseline fires almost never (rec 0.13) but is perfect when it does; Jev buys the other 87% of positives at 0.84 precision. First corpus version failed (2 bulk commits, 5 hunks) — rebuilt on file-window provenance.
 - **Receipts:** `work/vendor-paste/{PREREG-vendor.md,LOCK.md,build-corpus.py,corpus.json,sample.json,run_vendor.mjs,vendor-rows.jsonl}`. Committed, not pushed. Bead jev-30hi left for verifier.
+
+## 2026-10-02 jev-9yjh verify CLOSE: exact recompute, certain-only reading (WindyLantern) [keyless]
+
+- **Non-author recompute from committed rows** (`strict-labels.json` + `author-labels.json` 72d32705, the gap from the partial verify now filled): author relevant-9 = o04/o13/o25/o27/o28/o32/o38/o41/o44. Agreement 36/44, discord b=7 c=1, kappa 0.2574, union 10/44=0.227, strict precision 3/44=0.068 (4/44=0.091 incl o06 uncertain) — every figure in comment 1448 matches exactly under the certain-only reading the comment documents. Bead closed with this reason.
+- **Boundary:** $0, keyless recompute; Jev-keep rows themselves were not re-scored (labels verify, not the model).
