@@ -3681,3 +3681,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Go-forward:** skill loads burned for nothing (~119/wk, mostly reference-file loads with 0B bodies and big unread skills), long unreferenced bloat (~214/wk ≥20KB), full-suite reruns without code change (~190/wk). Memory: 0 observed AND method-insufficient (use unprovable from traces) — not advanced on this basis; its live program (filter/cap3/9yjh) already covers it.
 - **Caveats:** skill rule is strict-lexical (domain-matching work without the token still counts); long rule needs ≥20KB (10-20KB ignored); test rule exempts targeted reruns. Instances+labels committed for re-audit.
 - **Receipts:** `work/outcome-census/{PREREG-outcome.md,extract.py,instances.json,labels.json}`. Committed.
+
+## 2026-10-02 longres: Jev wins safety, loses the savings race (WindyLantern) [live]
+
+- **Design (preregistered `work/longres/PREREG-longres.md`, skill borrowing: 350+350 judging, 400-char digest, invalid->keep):** Choice keep/summarize/drop on 200 long results (dev 100 / held 100, file-split, 3-probe labels), vs size+tool baseline (T=10,154 Youden-fit on dev, J=0.042 — near drop-all, disclosed weak).
+- **Held (jev-1.13.0, 199/200 scored, 1 no-answers exclusion, ~$0.0060 in $0.015 cap):** Jev miss 4/100 = 0.040 [0.016,0.098] vs baseline 31/100 = 0.310 — safety leg PASS big. Savings on unreferenced rows: Jev 588,490 chars vs baseline 1,542,184 (ratio 0.38) — savings leg FAIL. Choices spread keep 118 / summarize 54 / drop 27: conservative by construction.
+- **Reading:** the locked bar rewarded recklessness (baseline "saves" by dropping 31 needed rows). Correct verdict: Jev dominates where it matters (8x fewer lost references) at lower savings; a production policy wants Jev's miss rate with a more aggressive drop margin — new design, not a tweak. Tokens/week saveable at Jev's operating point: ~6,400 unreferenced ≥10k results x ~2.3k tokens saved ≈ 14.5M tok (~$0.61/wk input, estimate with stated assumptions).
+- **Receipts:** `work/longres/{PREREG-longres.md,extract.py,corpus.json,run_choice.mjs,choice-rows.jsonl}`. Committed. Bead jev-dau5 left for verifier.
