@@ -1,3 +1,4 @@
+<!-- 2026-10-02 Joshua: discovery, not refusal. See section 8 loss-depth rule. -->
 # Jev Discovery Plan — 2026-10-02
 
 Status: rounds 1-2 integrated (reviewer: gpt-6-luna via omp `claude` profile, REVIEW_R1.md, REVIEW_R2.md);
@@ -178,3 +179,10 @@ report exactly those candidate, design and data-window results. This does not pr
 Jev decision exists; choosing maintenance next is an operational decision. Reopen a candidate only
 when its retry condition is met; propose a new vein only with a named consumer, an observed problem
 and a keyless feasibility path.
+
+Loss-depth rule (Joshua, 2026-10-02: "we're supposed to be going into discovery - not claiming things
+are too hard"): NOT ENOUGH DATA or BASELINE WINS is not an exit until the owner has searched for more
+real data (other repos' `.beads` and sessions, longer windows, all omp profiles, background-job
+records) and tried the redesign the failure itself names. V2, V3 and V5 stopped after one look and are
+reopened as jev-ztfe (fleet state in the request), jev-zezf (labels from background-job durations) and
+jev-eruw (machine-wide ~59k-bead corpus).
