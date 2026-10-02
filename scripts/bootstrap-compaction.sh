@@ -61,7 +61,7 @@ if [ ! -f "$sibling/package.json" ]; then
   git -C "$sibling" checkout --detach "$PINNED_SHA" \
     || fail "could not checkout pin $PINNED_SHA (EVAL.md §1). Refusing to float HEAD."
 else
-  have=$(git -C "$sibling" rev-parse --short HEAD 2>/dev/null || echo unknown)
+  have=$(GIT_OPTIONAL_LOCKS=0 git -C "$sibling" rev-parse --short HEAD 2>/dev/null || echo unknown)
   echo "bootstrap-compaction: using existing sibling at $have (pin is $PINNED_SHA; not moved)"
 fi
 

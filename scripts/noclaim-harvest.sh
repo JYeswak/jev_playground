@@ -31,13 +31,13 @@ harvested=$(br list --json 2>/dev/null | grep -oE 'harvested-from:[0-9a-f]{7}' |
 
 printf 'UNHARVESTED NO-CLAIM lines since %s\n\n' "$since"
 found=0
-for sha in $(git log --format='%h' --since="$since" --no-merges); do
+for sha in $(GIT_OPTIONAL_LOCKS=0 git log --format='%h' --since="$since" --no-merges); do
     case "$harvested" in *"harvested-from:$sha"*) continue ;; esac
     # One commit can carry a multi-line NO-CLAIM paragraph; take it to the blank line.
-    body=$(git log -1 --format='%B' "$sha" | awk '/^NO-CLAIM/{f=1} f{print} /^$/{if(f)exit}')
+    body=$(GIT_OPTIONAL_LOCKS=0 git log -1 --format='%B' "$sha" | awk '/^NO-CLAIM/{f=1} f{print} /^$/{if(f)exit}')
     [ -n "$body" ] || continue
     found=$((found + 1))
-    printf '%s  %s\n' "$sha" "$(git log -1 --format='%s' "$sha" | cut -c1-64)"
+    printf '%s  %s\n' "$sha" "$(GIT_OPTIONAL_LOCKS=0 git log -1 --format='%s' "$sha" | cut -c1-64)"
     printf '%s\n\n' "$(printf '%s' "$body" | fold -s -w 96 | sed 's/^/    /')"
 done
 

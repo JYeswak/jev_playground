@@ -52,7 +52,7 @@ scan_export() { # scan_export <dir> ; the acceptance probe
   [ -z "$longsig" ] || { echo "FAIL  long thinkingSignature lines (blob-shaped):"; printf '%s\n' "$longsig"; bad=1; }
   # History leg: the committed content itself (tip == history by construction).
   if [ -d "$dir/.git" ]; then
-    local gh; gh=$(git -C "$dir" grep -c "/Users/josh\|encrypted_content" HEAD -- . 2>/dev/null | awk -F: '{s+=$NF} END {print s+0}')
+    local gh; gh=$(GIT_OPTIONAL_LOCKS=0 git -C "$dir" grep -c "/Users/josh\|encrypted_content" HEAD -- . 2>/dev/null | awk -F: '{s+=$NF} END {print s+0}')
     [ "$gh" -eq 0 ] || { echo "FAIL  $gh home/blob hits in export HISTORY"; bad=1; }
   fi
   return $bad
@@ -70,7 +70,7 @@ rm -rf "$EXPORT"
 mkdir -p "$EXPORT"
 
 # Allowlist: tracked tip minus the internal-operational paths (PUBLISH-SET.md).
-git -C "$ROOT" archive HEAD \
+GIT_OPTIONAL_LOCKS=0 git -C "$ROOT" archive HEAD \
   | tar -x -C "$EXPORT" \
     --exclude=".beads" \
     --exclude="docs/demos/duel-1/dispatch" \

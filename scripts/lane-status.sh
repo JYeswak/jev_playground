@@ -87,7 +87,7 @@ norm_digest() { perl -0777 -pe 's/\s+\z//' "$1" 2>/dev/null | shasum -a 256 | cu
 SIDECAR_PATH="${JEV_SIDECAR:-docs/demos/duel-2/runs/receipt-other-reasons.json}"
 fingerprint() {
   {
-    printf 'HEAD %s\n' "$(git rev-parse HEAD 2>/dev/null || echo no-head)"
+    printf 'HEAD %s\n' "$(GIT_OPTIONAL_LOCKS=0 git rev-parse HEAD 2>/dev/null || echo no-head)"
     {
       printf '%s\n' "$STATUS" "$SIDECAR_PATH"
       awk -F'\t' '!/^#/ && $1!="candidate" {print $6}' "$STATUS" 2>/dev/null
@@ -159,7 +159,7 @@ esac
 # override is FAIL-SAFE: it can only manufacture a FALSE TRANSIENT (no verdict), never a false pass.
 SELF_BEFORE="${JEV_SELF_DIGEST_OVERRIDE:-$(norm_digest "$0")}"
 FP_BEFORE="$(fingerprint)"
-printf 'JEV LANE STATUS  %s  HEAD=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(git rev-parse --short HEAD)"
+printf 'JEV LANE STATUS  %s  HEAD=%s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(GIT_OPTIONAL_LOCKS=0 git rev-parse --short HEAD)"
 printf '%s\n' "----------------------------------------------------------------------"
 
 # ---------------------------------------------------------------- gauntlet state
@@ -448,11 +448,11 @@ printf '  %-26s %3s files  %9s bytes\n' 'plan corpus' \
   "$(cat docs/demos/PLAN.md docs/demos/BEAD-TEMPLATE.md docs/demos/contracts/*.md 2>/dev/null | wc -c | tr -d ' ')"
 
 printf '\nUNCOMMITTED DELIVERIES (work sitting in the tree)\n'
-git status --porcelain | sed 's/^/  /' | head -12
-[ -z "$(git status --porcelain)" ] && printf '  (clean)\n'
+GIT_OPTIONAL_LOCKS=0 git status --porcelain | sed 's/^/  /' | head -12
+[ -z "$(GIT_OPTIONAL_LOCKS=0 git status --porcelain)" ] && printf '  (clean)\n'
 
 printf '\nLAST 6 COMMITS\n'
-git log --oneline -6 | sed 's/^/  /'
+GIT_OPTIONAL_LOCKS=0 git log --oneline -6 | sed 's/^/  /'
 
 printf '\nWORKER PANES (workers-only; pane_index 0 is the user shell)\n'
 if [ -x "$HOME/.local/bin/fleet-idle-monitor" ]; then

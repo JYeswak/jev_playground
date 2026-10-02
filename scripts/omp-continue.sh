@@ -12,7 +12,7 @@ STALL="${KIT_LOOP_STALL:-3}"
 STATE="${KIT_LOOP_STATE:-.omp/loop-state}"
 say() { printf 'omp-continue: %s\n' "$*"; }
 
-top=$(git rev-parse --show-toplevel 2>/dev/null) || { say "not a git repo"; exit 2; }
+top=$(GIT_OPTIONAL_LOCKS=0 git rev-parse --show-toplevel 2>/dev/null) || { say "not a git repo"; exit 2; }
 cd "$top" || exit 2
 mkdir -p "$(dirname "$STATE")"
 
@@ -46,7 +46,7 @@ if ! sh "$checker" foundation/kit/claims.tsv docs/LEDGER.md "$top" >/dev/null 2>
   say "claim-discipline gate is RED; stopping so it gets fixed, not routed around"; exit 1
 fi
 
-head=$(git rev-parse HEAD 2>/dev/null || echo none)
+head=$(GIT_OPTIONAL_LOCKS=0 git rev-parse HEAD 2>/dev/null || echo none)
 iter=0; last=""; still=0
 [ -f "$STATE" ] && . "$STATE"
 iter=$((iter + 1))

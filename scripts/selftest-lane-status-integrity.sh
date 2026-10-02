@@ -157,9 +157,9 @@ expect 'ARM 14 receipt_type EMPTY' 9 'not in enum' 'empty fails closed, never in
 bracketed_arm() { # $1=label $2=want_rc $3=forbidden_pattern $4=pass_note
   local attempt=1 h0 h1 out rc
   while :; do
-    h0=$(git -C "$REPO" rev-parse HEAD 2>/dev/null)
+    h0=$(GIT_OPTIONAL_LOCKS=0 git -C "$REPO" rev-parse HEAD 2>/dev/null)
     out=$(JEV_TRANSIENT_ATTEMPT=2 run); rc=$?
-    h1=$(git -C "$REPO" rev-parse HEAD 2>/dev/null)
+    h1=$(GIT_OPTIONAL_LOCKS=0 git -C "$REPO" rev-parse HEAD 2>/dev/null)
     [ "$h0" = "$h1" ] && break
     if [ "$attempt" -ge 2 ]; then
       printf 'TRANS %-48s HEAD moved during both attempts (%s -> %s); NOT a pass, NOT a fail\n' \

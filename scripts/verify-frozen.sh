@@ -33,11 +33,11 @@ set -euo pipefail
 
 repo=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
 ref=${1:-HEAD}
-sha=$(git -C "$repo" rev-parse --short "$ref")
+sha=$(GIT_OPTIONAL_LOCKS=0 git -C "$repo" rev-parse --short "$ref")
 
 # A frozen clone is worthless if the thing you are about to claim is not committed. Say so loudly
 # rather than producing a green result about bytes that are not the ones in your editor.
-dirty=$(git -C "$repo" status --porcelain | wc -l | tr -d ' ')
+dirty=$(GIT_OPTIONAL_LOCKS=0 git -C "$repo" status --porcelain | wc -l | tr -d ' ')
 if [ "$dirty" -ne 0 ]; then
     echo "NOTE  worktree has $dirty modified/untracked path(s). This run tests COMMITTED bytes at"
     echo "      $sha, NOT what is in your editor. That is the point, but know which you claimed."
@@ -96,7 +96,7 @@ echo
 differs=0
 while IFS= read -r f; do
     cmp -s "$repo/$f" "$tmp/frozen/$f" || differs=$((differs + 1))
-done < <(git -C "$repo" ls-files 'demos/**/*.mjs' 'scripts/*.sh' 'scripts/*.mjs')
+done < <(GIT_OPTIONAL_LOCKS=0 git -C "$repo" ls-files 'demos/**/*.mjs' 'scripts/*.sh' 'scripts/*.mjs')
 echo "cmp live-vs-frozen over tracked executables: $differs differ (nonzero is expected on a dirty tree)"
 
 cd "$repo"

@@ -229,7 +229,7 @@ record_repo() { # record_repo <name> <path>   ; path may be workspace-relative o
     *)         rec="$abs" ;;
   esac
   local pinned upstream_sha behind up_ref=FETCH_HEAD def fh line
-  pinned="$(git -C "$abs" rev-parse --short HEAD)"
+  pinned="$(GIT_OPTIONAL_LOCKS=0 git -C "$abs" rev-parse --short HEAD)"
   # A full `git fetch origin` writes EVERY branch to FETCH_HEAD, all `not-for-merge` on a
   # detached pin, so line 1 is whichever branch sorts first, not upstream. Measured 2026-09-24:
   # typesafe-sdk-js recorded branch 'codex/npm-bootstrap' (0098f35, behind 1) as its upstream

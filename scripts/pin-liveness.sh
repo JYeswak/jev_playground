@@ -58,7 +58,7 @@ while IFS=$'\t' read -r cand _rung _score _verdict _author receipt _blocked _con
   [ -z "${receipt:-}" ] && continue
   [ -z "${digest:-}" ] && continue          # unpinned rows are out of scope by design
   rows=$((rows + 1))
-  n=$(git log --since=24.hours --oneline -- "$receipt" 2>/dev/null | grep -c . || true)
+  n=$(GIT_OPTIONAL_LOCKS=0 git log --since=24.hours --oneline -- "$receipt" 2>/dev/null | grep -c . || true)
   if [ "${n:-0}" -ge "$THRESH" ]; then
     flagged=$((flagged + 1))
     echo "  HOT  $cand pins a digest to $receipt ($n commits in 24h, threshold $THRESH)"
