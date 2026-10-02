@@ -3536,3 +3536,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Mechanism (unchanged):** misses still score 0.02–0.05 — text-predictable cues + unattended-aging durations (miss tokens: (none)/br/rch/git/python3/cat). Positive statement + fitted cut recovered recall, did not fix the floor.
 - **Spend:** 840 calls, 376,982 in-tok ~$0.0158, in the $0.025 prereg cap, no 401/402/403. Receipts: `work/zezf/{sample_h3h4.json,cuts_h3h4.json,h3h4dev.jsonl,h3h4held.jsonl,run_h3h4.mjs}`. Bead jev-pslq left in_progress for verifier (no self-close).
 - **Boundary:** 55 positives shared with parent sample (recall directly comparable, precision on fresh negatives); causality/generalization NO-CLAIM; zezf 300/vein cap already breached before H3/H4 (disclosed in prereg).
+
+## 2026-10-02 jev-wbel coverage census: no hook miss, 4/4 in extension sessions (WindyLantern) [keyless]
+
+- **Denominator (scorer `work/wbel/skill-coverage.js`, glob stated in-file; 206 candidate files, events >= b6ea4d1c 07:08Z):** 8 skill-read toolCalls fleet-wide in ~8h. Zero `skill`-tool invocations in 116 `-Developer-jev` session files (full history, both spellings) — no second load path exists to fix; a blind branch would be dead code.
+- **Reconciliation vs 9 shadow rows:** 4 loads in session 01a0f9f9 (started 00:17, pre-extension) → 0 rows, expected (extensions load at session start). 3 loads in 01a0fb71 + 1 in 01a0fb8d (both started post-b6ea4d1c) → 4/4 rows. Two apparent misses (15:02:22, 15:02:34) were async lag — rows landed seconds later; re-tail closed them.
+- **Why so few:** (1) loads are rare — workers live in bash/read/write, skills arrive via context; (2) long-lived pre-extension sessions never load the hook (restart fixes); (3) no pane is on 8bb9e5f0 yet, so organic rows still read ask-unconfigured. No code change (nothing missed); system-prompt skills are a context-hook design, out of scope for a tool_call fix.
+- **Spend:** $0, keyless. Receipt: `work/wbel/coverage.json`. Bead jev-wbel left in_progress (24h label + pane restarts are conductor moves).

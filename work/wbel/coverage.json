@@ -1,0 +1,60 @@
+{
+ "baseline": "2026-10-02T07:08:00Z (b6ea4d1c)",
+ "glob": "~/.omp/agent/sessions/-Developer-jev*/ + profiles/*/agent/sessions/-Developer-jev*/",
+ "candidateFiles": 206,
+ "skillLoads": [
+  {
+   "session": "a0f9f9-380a-77a9-9001-68910ff21b6d.jsonl",
+   "ts": "2026-10-02T07:35:29.006Z",
+   "path": "skill://experimental-design"
+  },
+  {
+   "session": "a0f9f9-380a-77a9-9001-68910ff21b6d.jsonl",
+   "ts": "2026-10-02T07:39:11.183Z",
+   "path": "skill://prompt-engineering-science"
+  },
+  {
+   "session": "a0f9f9-380a-77a9-9001-68910ff21b6d.jsonl",
+   "ts": "2026-10-02T07:44:39.176Z",
+   "path": "skill://prediction-lock-research"
+  },
+  {
+   "session": "a0f9f9-380a-77a9-9001-68910ff21b6d.jsonl",
+   "ts": "2026-10-02T15:03:12.831Z",
+   "path": "skill://rust-hook-pattern"
+  },
+  {
+   "session": "a0fb71-8307-72a5-9fc2-3ff3f7a897fa.jsonl",
+   "ts": "2026-10-02T07:12:35.966Z",
+   "path": "skill://metamorphic-property-testing"
+  },
+  {
+   "session": "a0fb71-8307-72a5-9fc2-3ff3f7a897fa.jsonl",
+   "ts": "2026-10-02T07:25:38.308Z",
+   "path": "skill://grokbot-findings-discipline"
+  },
+  {
+   "session": "a0fb71-8307-72a5-9fc2-3ff3f7a897fa.jsonl",
+   "ts": "2026-10-02T15:02:22.062Z",
+   "path": "skill://safety-stack-gate"
+  },
+  {
+   "session": "a0fb8d-e518-7402-ac04-e607af804b18.jsonl",
+   "ts": "2026-10-02T15:02:34.533Z",
+   "path": "skill://omp-integration"
+  }
+ ],
+ "toolDistribution": {
+  "bash": 881,
+  "read": 542,
+  "write": 236,
+  "edit": 199,
+  "eval": 97,
+  "grep": 15,
+  "wait": 12,
+  "todo": 11,
+  "find": 3,
+  "glob": 3
+ },
+ "shadowRows": 9
+}
