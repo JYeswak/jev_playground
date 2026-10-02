@@ -187,7 +187,7 @@
       "expect": "on",
       "extension": "./.omp/extensions/jev-memory-filter.ts",
       "verdict": "ENFORCING",
-      "evidence": "jev-wb7j held-out 0.978 + replication 0.985 verified; jev-s47b live drops 30/30 twice (HazySpring, WildCarp); removal 5fc68a4e verified by OrangeFrog (13/13 kept present, 4/4 dropped absent); concurrent 4-wide jev-11qz VERIFIED+CLOSED (wall 1308ms -60% vs 3.3s serial, 20/20 in budget, byte-exact prune)",
+      "evidence": "jev-wb7j held-out 0.978 + replication 0.985 verified; jev-s47b live drops 30/30 twice (HazySpring, WildCarp); removal 5fc68a4e verified by OrangeFrog (13/13 kept present, 4/4 dropped absent); concurrent 4-wide jev-11qz VERIFIED+CLOSED (wall 1308ms -60% vs 3.3s serial, 20/20 in budget, byte-exact prune); keep precision stays ~0.22 after failed lifts: one-variable rewordings FAIL (R137, best 0.242), two-question conjunction FAIL (R139, keep 0.062); bundling OFF (jev-9n6h FAIL, parity 93.1% < 95%); nimble-memory cascade REFUTED (R138, agreement 84.4%, 3/11 critical dropped)",
       "saving": "memory tokens removed per turn: median 797, p90 3,408 (14 live turns, OrangeFrog); keep precision 0.22 jev-m959 VERIFIED+CLOSED, saving unchanged"
     },
     {
@@ -200,7 +200,7 @@
       "log": "gate-observe.jsonl",
       "file": ".omp/hooks/post/jev-gate-observe.ts",
       "verdict": "WORKS",
-      "evidence": "jev-nr3c verified by HazySpring: 1h live [15:36,16:36)Z 98 cascade rows, 94 nimble-cleared (0 harmful by blind label), 4 paid; 53 timeouts unscreened (fallback fix in flight); jev-syje (CyanPeak): 7d 950 distinct nimble-cleared, 0/950 harmful blind (Wilson UB 0.31%); rescore-100 paid 0 flags; planted 9/10 held (1 clear = rm-rf nonexistent path, both stages agree)",
+      "evidence": "jev-nr3c verified by HazySpring: 1h live [15:36,16:36)Z 98 cascade rows, 94 nimble-cleared (0 harmful by blind label), 4 paid; 53 timeouts unscreened (fallback fix in flight); jev-syje (CyanPeak): 7d 950 distinct nimble-cleared, 0/950 harmful blind (Wilson UB 0.31%); rescore-100 paid 0 flags; planted 9/10 held (1 clear = rm-rf nonexistent path, both stages agree); jev-nbbm VERIFIED+CLOSED: deterministic destructive pre-rule straight to paid (tests 30/30, syje 10/10 planted paid: 7 prerule + 3 nimble-flag; 13 hit rows/7d = 1.86 extra paid/day recomputed); jev-t3tk VERIFIED+CLOSED: every row carries one screen class (nimble-cleared/flagged-paid/prerule-paid/paid-fallback-timeout-http-fence/unscreened), 0/1553 timeout-taken-clears in 7d (suite 34/34, live timeout plant -> paid-fallback-timeout)",
       "saving": "paid gate calls 4/98 = 4.1% of commands (96% screened free locally), 1h live window"
     },
     {
