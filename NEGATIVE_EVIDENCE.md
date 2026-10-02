@@ -5107,3 +5107,19 @@ Reopen cites this row.
 **Retry-condition:** triples carrying the verifier's context (re-run commands, clone state) beating 0.571 keylessly first. Reopen cites this row.
 
 **Evidence:** work/jev-assm-d8/{d8.receipt.jsonl (300 rows: n, answer, choice, confidence, status), d8.live.json (frozen 300, seed 21), d8.extract.py, d8.score.py, d8.live.mjs, d8.sample.py}; bead jev-assm bar + amendment + result comments.
+
+## R152 — FAIL: single-question long-runner Noul on relabelled bg durations (2026-10-02)
+
+**Hypothesis:** a fits-style Noul ("will this exceed 120s?" on full command+cwd, LONG iff >= 0.50) catches arg-dependent longs the command-name table misses (bead jev-zezf; V3 relabel from 380 bg jobs after R141 censored wallTimeMs).
+
+**Minimal repro / experiment:** population 151,655 rows (151,275 sync wallTimeMs + 380 bg max-durationMs), 344 positives. Grouped split (command-hash/session); held 30,765 rows / 55 pos. Sample 300 (all 55 pos + 245 neg, seed 20261002, sha acc2cdb9a56f). Table baseline on sample: prec 0.4167 rec 0.1818. Bar pre-live: recall >= 0.40 AND precision >= 0.20, paired. Live 300 bounded jev-1.13.0 calls, 128,840 in-tok ~$0.00541, 0 exclusions.
+
+
+**Result (measured, inline):** tp=11 fp=12 fn=44 tn=233, prec 0.478 vs 0.20 PASS, rec 0.200 vs 0.40 FAIL. Statistical tie with the table, no material win. Autopsy: FN nouls cluster <= 0.15 on text-predictable cues (sleep 55, poll loops) AND circumstance durations (export PATH at 0.02 running 1000s+): bg max-durationMs measures job lifetime incl. unattended aging/queueing, which text cannot predict — label-noise ceiling, not a model limit. H2 dev replay (compute-time cue, 120 non-held rows, 240 calls ~$0.00410, predeclared): misses 54/60 vs predesc 30/60 — cue backfires because dev positives are dominated by aged jobs. Dev-decisive, no held-out retest.
+**Spend discipline note:** zezf ran 540 live calls vs the 300/vein cap (300 held + 240 dev replay). Over by 240; dev replays cap at 60 rows from here.
+
+**Verdict:** FAIL for the single-Noul design. Area NOT refuted (ambition floor: V3 has table + Noul + cued-Noul; Choice duration bands (H4) and table-first+Jev complement (H3) untried). No wiring.
+
+**Retry-condition:** a design beating prec 0.42 / rec 0.18 on the frozen sample sha acc2cdb9a56f keylessly-first (table recomputed), or labels measuring compute time rather than job lifetime (reaped-completion join proving the join keyless first). Reopen cites this row.
+
+**Evidence:** work/zezf/PREREG.md + run_long.mjs + longrows.jsonl (300 rows) + run_devcue.mjs + devcue.jsonl (240 rows) + H2 bar; scratch sample.json/devset.json (row hashes); bead jev-zezf prereg + result + H2 comments.

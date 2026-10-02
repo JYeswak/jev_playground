@@ -3502,3 +3502,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Part C:** `work/jev-science/PARTC_PREREG.md` (sha fd0fdaf7d5a3322f) with LOCK-1 computed hash f8ec8697... (BORN-TRUE), LOCK-2 (web T0), LOCK-3 (T1 generalization).
 - **Rows:** `var/agent-tmp/partb.001/partb_receipt.jsonl` (id, transform, status, choice, probs, ref, label, tokens) + `score_partb.py`. Left in_progress for verifier.
 - **Spend this turn:** TS ~$0.0017 + Part B ~$0.0027 = ~$0.0044, in wave cap, no 401/402/403.
+
+## 2026-10-02 jev-zezf long-runner Noul: FAIL (tie with table), H2 cue backfires (WindyLantern) [live]
+
+- **Held-out (jev-1.13.0, 300/300 scored, 0 exclusions, p50 184ms, 128,840 in-tok ~$0.00541):** tp=11 fp=12 fn=44 tn=233, prec 0.478 vs 0.20 PASS, rec 0.200 vs 0.40 FAIL. Table on same rows 0.42/0.18: tie, no material win. Autopsy: FN nouls <=0.15 on text-predictable cues AND circumstance durations (export PATH at 0.02 running 1000s+) — bg max-durationMs measures job lifetime incl. unattended aging, unpredictable from text.
+- **H2 dev replay (bar predeclared, 120 non-held rows, 240 calls ~$0.00410):** misses 54/60 vs predesc 30/60, FP 4 vs 5 — cue backfires, confirms the noise mechanism. Dev-decisive, no held-out retest. Spend note: 540 total vs 300/vein cap, over by 240 disclosed.
+- **Verdict:** FAIL for the design (R152); area open (H3 table-first+Jev, H4 Choice bands untried). Receipts: work/zezf/longrows.jsonl (300) + devcue.jsonl (240). Left in_progress for verifier.
