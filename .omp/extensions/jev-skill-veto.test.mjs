@@ -86,6 +86,7 @@ test('handler never blocks: undefined on skill and non-skill reads, even when th
   assert.equal(calls.length, 1);
   assert.equal(calls[0][0].wouldVeto, false);
   assert.equal(calls[0][0].decision, 'allow');
+  assert.equal(calls[0][0].status, 'fail_open:throw:Error: transport down');
   assert.equal(calls[0][0].session, 'unknown');
 });
 
@@ -104,16 +105,47 @@ test('session id flows from ctx sessionManager when present', async () => {
   assert.equal(calls[0][0].decision, 'allow');
 });
 
-test('cap reached means no Jev call and no row', async () => {
+test('cap reached means no Jev call but still a fail_open:cap row', async () => {
+  const calls = [];
   let asked = 0;
   const h = createSkillVetoHandler({
     ask: async (o) => { asked += 1; return noulAnswer(0.01)(o); },
     describe: async () => 'desc',
     countToday: async () => 100,
-    log: async () => { throw new Error('must not log'); },
+    log: async (row, sidecar) => { calls.push([row, sidecar]); },
   });
   assert.equal(await h.onToolCall({ toolName: 'read', input: { path: 'skill://x' } }), undefined);
   assert.equal(asked, 0);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0][0].status, 'fail_open:cap');
+  assert.equal(calls[0][0].noul, null);
+  assert.equal(calls[0][0].decision, 'allow');
+  assert.equal(calls[0][0].reason, 'cap-reached');
+});
+
+test('rows carry status: scored on a number, fail_open:<reason> otherwise', async () => {
+  const scored = [];
+  const hScored = createSkillVetoHandler({
+    ask: noulAnswer(0.9),
+    describe: async () => 'desc',
+    countToday: async () => 0,
+    log: async (row, sidecar) => { scored.push([row, sidecar]); },
+  });
+  await hScored.onToolCall({ toolName: 'read', input: { path: 'skill://x' } });
+  assert.equal(scored[0][0].status, 'scored');
+  assert.equal(scored[0][0].noul, 0.9);
+
+  const open = [];
+  const hOpen = createSkillVetoHandler({
+    ask: unconfiguredAsk,
+    describe: async () => 'desc',
+    countToday: async () => 0,
+    log: async (row, sidecar) => { open.push([row, sidecar]); },
+  });
+  await hOpen.onToolCall({ toolName: 'read', input: { path: 'skill://x' } });
+  assert.equal(open[0][0].status, 'fail_open:ask-unconfigured');
+  assert.equal(open[0][0].noul, null);
+  assert.equal(open[0][0].decision, 'allow');
 });
 
 test('log row carries hashes, never prompt text; sidecar carries the text keyed by hash', async () => {

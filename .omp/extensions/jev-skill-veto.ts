@@ -3,20 +3,23 @@
  * On `tool_call` for a skill `read` (a skill-protocol URL or a SKILL.md file read),
  * asks the exact preregistered fits-Noul (cut 0.40) and appends a would-veto row to
  * the shadow log. The handler ALWAYS returns undefined: the load proceeds untouched.
- * Any failure (no key, refused answer, timeout, error, reached daily cap, log
- * unwritable) skips the call silently. Prompt text goes only to the mode-600 sidecar,
+ * Any failure (no key, refused answer, timeout, error, reached daily cap) logs a
+ * fail-open allow row with noul null and status fail_open:<reason>; only an
+ * unwritable log is silent. Prompt text goes only to the mode-600 sidecar,
  * keyed by its hash, for later blind labeling; the main log carries hashes, never text.
  */
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { askJev } from "../../kit/src/client.ts";
+import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 import {
   isSkillReadPath,
   skillNameFromPath,
   vetoCheck,
   requestHash,
   SKILL_VETO_CAP_PER_DAY,
+  SKILL_VETO_MODEL,
   SKILL_VETO_PROMPT_MAX,
   type NoulAsker,
 } from "../../kit/src/skill-veto.ts";
@@ -102,6 +105,7 @@ export function createSkillVetoHandler(deps?: {
   countToday?: () => Promise<number>;
   log?: (row: Record<string, unknown>, sidecar: Record<string, unknown> | null) => Promise<void>;
 }) {
+  if (!deps?.ask) useInfisicalKey();
   const ask = deps?.ask ?? ((o) => askJev(o));
   const describe = deps?.describe ?? readDescription;
   const countToday = deps?.countToday ?? todayCount;
@@ -145,12 +149,31 @@ export function createSkillVetoHandler(deps?: {
         const path: unknown = event.input.path;
         if (!isSkillReadPath(path)) return undefined;
         if (typeof path !== "string") return undefined;
-        if ((await countToday()) >= SKILL_VETO_CAP_PER_DAY) return undefined;
         const skill = skillNameFromPath(path);
         const prompt = lastPrompt;
+        const day = new Date().toISOString().slice(0, 10);
+        if ((await countToday()) >= SKILL_VETO_CAP_PER_DAY) {
+          await log(
+            {
+              ts: new Date().toISOString(),
+              day,
+              skill,
+              session: sessionId(ctx),
+              reqHash: requestHash(prompt),
+              noul: null,
+              status: "fail_open:cap",
+              decision: "allow",
+              wouldVeto: false,
+              reason: "cap-reached",
+              latencyMs: 0,
+              model: SKILL_VETO_MODEL,
+            },
+            null,
+          );
+          return undefined;
+        }
         const description = await describe(skill);
         const r = await vetoCheck({ prompt, skill, description, ask });
-        const day = new Date().toISOString().slice(0, 10);
         const reqHash = requestHash(prompt);
         await log(
           {
@@ -160,6 +183,7 @@ export function createSkillVetoHandler(deps?: {
             session: sessionId(ctx),
             reqHash,
             noul: r.noul,
+            status: typeof r.noul === "number" ? "scored" : `fail_open:${r.reason}`,
             decision: r.vetoed ? "veto" : "allow",
             wouldVeto: r.vetoed,
             reason: r.reason,
