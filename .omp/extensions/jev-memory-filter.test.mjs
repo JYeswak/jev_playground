@@ -6,12 +6,15 @@ import { join } from "node:path";
 import {
   makeBeforeAgentStartHandler,
   parseSystemMemories,
-  splitMemoryBlocks,
+  parseOccurrences,
+  occurrencesIn,
   systemPromptText,
   pruneSystemPrompt,
   inEnforceScope,
   CUT,
   MAX_ITEMS_PER_TURN,
+  CONCURRENCY,
+  FILTER_DEADLINE_MS,
 } from "./jev-memory-filter.ts";
 // Suite guard (jev-s47b defect 2026-10-01: scored tests wrote fake rows into the
 // prod sidecar via default paths). Redirect defaults to temp for the whole file;
@@ -105,9 +108,12 @@ test("recall system prompt yields only the redacted genuine bullets", () => {
   assert.deepEqual(items.map((i) => i.text), [BULLET_A, BULLET_B]);
 });
 
-test("splitMemoryBlocks dedupes repeated lines", () => {
-  const items = splitMemoryBlocks("<memories>\n- alpha\n- alpha\n</memories>");
-  assert.deepEqual(items.map((i) => i.text), ["alpha"]);
+test("occurrences keep every address; judgments dedupe by text", () => {
+  const occs = occurrencesIn("<memories>\n- alpha\n- alpha\n</memories>", 0);
+  assert.equal(occs.length, 2);
+  assert.notEqual(occs[0].start, occs[1].start);
+  assert.deepEqual(occs.map((o) => o.text), ["alpha", "alpha"]);
+  assert.deepEqual(parseSystemMemories(["<memories>\n- alpha\n- alpha\n</memories>"]).map((i) => i.text), ["alpha"]);
 });
 
 test("irrelevant memory logs drop and returns undefined", async () => {
@@ -164,9 +170,8 @@ test("daily cap stops calls and keeps", async () => {
   assert.equal(calls, 1);
   const rows = rowsOf(join(dir, "log.jsonl"));
   assert.equal(rows.length, 2);
-  assert.equal(rows[0].decision, "drop");
-  assert.equal(rows[1].status, "daily-cap");
-  assert.equal(rows[1].decision, "keep");
+  assert.ok(rows.some((r) => r.status === "scored" && r.decision === "drop"));
+  assert.ok(rows.some((r) => r.status === "daily-cap" && r.decision === "keep"));
 });
 
 test("synthetic boundary: more than 20 items scores only 20", async () => {
@@ -316,7 +321,7 @@ test("error path returns undefined: original prompt byte-identical", async () =>
 
 test("pruneSystemPrompt is byte-identical with no drops", () => {
   const sys = ["a\n- b", { type: "text", text: "c" }, 7];
-  assert.deepEqual(pruneSystemPrompt(sys, new Set()), sys);
+  assert.deepEqual(pruneSystemPrompt(sys, []), sys);
 });
 
 test("double factory call on one binding registers once", async () => {
@@ -344,4 +349,96 @@ test("rows carry the session repo from ctx cwd", async () => {
   assert.ok(rows.length > 0 && rows.every((r) => r.repo === "/repo/example"));
   const side = rowsOf(join(dir, "full.jsonl"));
   assert.ok(side.length > 0 && side.every((r) => r.repo === "/repo/example"));
+});
+
+test("occurrence spans slice back to raw lines with matching hash", async () => {
+  const { createHash } = await import("node:crypto");
+  for (const o of parseOccurrences(SYS_RECALL)) {
+    const el = SYS_RECALL[o.element];
+    const raw = el.slice(o.start, o.end);
+    assert.equal(createHash("sha256").update(raw).digest("hex"), o.hash);
+    assert.ok(raw.includes(o.text.slice(0, 20)));
+  }
+});
+
+test("outside-block duplicate survives while the recall occurrence is pruned", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const switchPath = join(dir, "enforce");
+  const { writeFileSync } = await import("node:fs");
+  writeFileSync(switchPath, "on");
+  const ask = async ({ state }) => ({ ok: true, scores: { rel: state.memory.includes("dropme") ? 0.1 : 0.9 }, latencyMs: 1, model: "m" });
+  const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath });
+  const sys = ["echo: dropme bullet", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>"];
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, { cwd: "/Users/josh/Developer/jev" });
+  assert.ok(out && typeof out === "object" && "systemPrompt" in out);
+  const pruned = out.systemPrompt;
+  assert.equal(pruned[0], "echo: dropme bullet");
+  assert.ok(!pruned[1].includes("dropme"));
+  assert.ok(pruned[1].includes("keepme bullet") && pruned[1].includes("</memories>"));
+});
+
+test("changed span keeps: hash mismatch prunes nothing", () => {
+  const sys = ["<memories>\n- dropme bullet\n</memories>"];
+  const occs = parseOccurrences(sys);
+  assert.equal(occs.length, 1);
+  const tampered = ["<memories>\n- dropme BULLET\n</memories>"];
+  assert.deepEqual(pruneSystemPrompt(tampered, occs), tampered);
+});
+
+test("recorded-transport replay: concurrent decisions match serial, bounded in flight, faster wall", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const lines = [];
+  for (let i = 0; i < 8; i++) lines.push(`- replay fact ${i}`);
+  const sys = ["pre", `<memories>\n${lines.join("\n")}\n</memories>`];
+  let inFlight = 0;
+  let maxInFlight = 0;
+  const ask = async ({ state }) => {
+    inFlight += 1;
+    maxInFlight = Math.max(maxInFlight, inFlight);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    inFlight -= 1;
+    const n = Number(state.memory.replace("replay fact ", ""));
+    return { ok: true, scores: { rel: n % 2 === 0 ? 0.1 : 0.9 }, latencyMs: 50, model: "m" };
+  };
+  const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
+  const t0 = Date.now();
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, undefined);
+  const wall = Date.now() - t0;
+  assert.equal(out, undefined);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.equal(rows.length, 8);
+  assert.ok(rows.every((r) => r.status === "scored"));
+  const side = rowsOf(join(dir, "full.jsonl"));
+  assert.equal(side.length, 8);
+  for (const r of side) {
+    const n = Number(r.memory.replace("replay fact ", ""));
+    assert.equal(r.decision, n % 2 === 0 ? "drop" : "keep");
+  }
+  assert.ok(maxInFlight > 1 && maxInFlight <= CONCURRENCY);
+  assert.ok(wall < 8 * 50, `wall ${wall}ms should beat serial 400ms`);
+});
+
+test("deadline: stalled item keeps, resolved items decide, wall bounded", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const ask = ({ state }) => state.memory.includes("stalled")
+    ? new Promise(() => {})
+    : Promise.resolve({ ok: true, scores: { rel: 0.9 }, latencyMs: 1, model: "m" });
+  const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
+  const sys = ["<memories>\n- stalled bullet\n\n- fine bullet\n</memories>"];
+  const t0 = Date.now();
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, undefined);
+  const wall = Date.now() - t0;
+  assert.equal(out, undefined);
+  assert.ok(wall < FILTER_DEADLINE_MS + 800, `wall ${wall}ms exceeds budget + slack`);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.ok(rows.some((r) => r.status === "scored" && r.decision === "keep"));
+  assert.ok(rows.some((r) => r.status === "deadline-keep" && r.decision === "keep"));
+});
+
+test("span prune is byte-exact on collision-free recall", () => {
+  const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>", "tail"];
+  const occs = parseOccurrences(sys);
+  const drops = occs.filter((o) => o.text === "dropme bullet");
+  assert.equal(drops.length, 1);
+  assert.deepEqual(pruneSystemPrompt(sys, drops), ["pre", "<memories>\n\n- keepme bullet\n</memories>", "tail"]);
 });

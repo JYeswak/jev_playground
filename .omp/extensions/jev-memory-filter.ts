@@ -33,7 +33,22 @@ const INSTANCE = randomUUID().slice(0, 8);
 
 type Ask = (options: AskOptions) => Promise<JevResult>;
 
-export type MemoryItem = { text: string };
+export const CONCURRENCY = 4;
+export const FILTER_DEADLINE_MS = 1500;
+
+
+export type MemoryItem = {
+  /** Cleaned judgment key. Identical cleaning/slicing to the serial
+   * incumbent, so recorded-transport replay decides exactly the same. */
+  text: string;
+  /** Index into the parsed element-text array (0 when sys is one string). */
+  element: number;
+  /** Char offsets of the RAW line within that element text (end excludes \n). */
+  start: number;
+  end: number;
+  /** sha256 of the raw line bytes; prune re-validates before removing. */
+  hash: string;
+};
 
 /** Memory bullets live in the system prompt (omp memory backend injects
  * there), never in conversation messages: live `context`-event payloads
@@ -55,44 +70,65 @@ export function systemPromptText(sys: unknown): string {
   return JSON.stringify(sys ?? "");
 }
 
-/** Split one text into memory items. Exported for tests. */
-export function splitMemoryBlocks(text: string): MemoryItem[] {
-  const blocks: string[] = [];
+/** All memory occurrences in one element text, with exact spans. Each
+ * occurrence must lie inside a validated recall block (`<memories>` pair or
+ * the EE tail); identically-worded lines anywhere else are not occurrences
+ * and can never be pruned (COD hazard: instruction echo of a recall line). */
+export function occurrencesIn(text: string, element: number): MemoryItem[] {
+  const blocks: Array<{ body: string; base: number }> = [];
   const memRe = /<memories>([\s\S]*?)<\/memories>/g;
   let m: RegExpExecArray | null;
-  while ((m = memRe.exec(text)) !== null) blocks.push(m[1]);
+  while ((m = memRe.exec(text)) !== null) {
+    blocks.push({ body: m[1], base: m.index + "<memories>".length });
+  }
   const eeIndex = text.indexOf("Task-relevant local EE memories");
-  if (eeIndex >= 0) blocks.push(text.slice(eeIndex));
-  const items: MemoryItem[] = [];
+  if (eeIndex >= 0) blocks.push({ body: text.slice(eeIndex), base: eeIndex });
+  const out: MemoryItem[] = [];
   for (const block of blocks) {
-    for (const line of block.split("\n")) {
+    let off = 0;
+    for (const line of block.body.split("\n")) {
+      const start = block.base + off;
+      const end = start + line.length;
+      off = end - block.base + 1;
       const clean = line.replace(/^[\s>*•\-–\d.)]+/, "").trim();
-      if (clean.length > 1) items.push({ text: clean.slice(0, 2000) });
+      if (clean.length > 1) {
+        out.push({
+          text: clean.slice(0, 2000),
+          element,
+          start,
+          end,
+          hash: createHash("sha256").update(line).digest("hex"),
+        });
+      }
     }
   }
-  const seen: Record<string, true> = {};
-  return items.filter((item) => {
-    if (seen[item.text]) return false;
-    seen[item.text] = true;
-    return true;
+  return out;
+}
+
+/** Every occurrence across all elements, judgment order (first-seen wins). */
+export function parseOccurrences(sys: unknown): MemoryItem[] {
+  const texts = Array.isArray(sys) ? (sys as unknown[]).map((b) => (typeof b === "string" ? b : systemPromptText(b))) : [systemPromptText(sys)];
+  const out: MemoryItem[] = [];
+  texts.forEach((text, element) => {
+    out.push(...occurrencesIn(text, element));
   });
+  return out;
 }
 
 /** Genuine memory bullets from a system prompt. Each prompt element is parsed
  * separately: recall arrives as its own appended element, and joining first
  * would merge the instruction mention (no closing tag) with the recall close,
  * flooding the cap with static prompt text between them (live 2026-10-01:
- * merged span swallowed the whole tool-routes section). */
+ * merged span swallowed the whole tool-routes section). Judgments dedupe by
+ * text (first occurrence wins); every occurrence address is retained by
+ * parseOccurrences for span-scoped pruning. */
 export function parseSystemMemories(sys: unknown): MemoryItem[] {
-  const texts = Array.isArray(sys) ? (sys as unknown[]).map((b) => (typeof b === "string" ? b : systemPromptText(b))) : [systemPromptText(sys)];
   const seen: Record<string, true> = {};
   const items: MemoryItem[] = [];
-  for (const text of texts) {
-    for (const item of splitMemoryBlocks(text)) {
-      if (seen[item.text]) continue;
-      seen[item.text] = true;
-      items.push(item);
-    }
+  for (const item of parseOccurrences(sys)) {
+    if (seen[item.text]) continue;
+    seen[item.text] = true;
+    items.push(item);
   }
   return items;
 }
@@ -114,25 +150,46 @@ export async function enforceEnabled(switchPath: string): Promise<boolean> {
   }
 }
 
-/** Clean one raw line exactly as the splitter does. */
-function cleanLine(line: string): string {
-  return line.replace(/^[\s>*•\-–\d.)]+/, "").trim();
+/** Splice validated drop spans out of one element text. A span applies only
+ * when the current bytes still hash to the recorded hash (changed source
+ * keeps); removal covers the raw line plus its newline, so blank separators
+ * and every non-memory byte survive exactly as the line filter left them. */
+function pruneText(text: string, spans: MemoryItem[]): string {
+  const good = spans
+    .filter((s) => text.slice(s.start, s.end).length === s.end - s.start
+      && createHash("sha256").update(text.slice(s.start, s.end)).digest("hex") === s.hash)
+    .sort((a, b) => b.start - a.start);
+  let out = text;
+  for (const s of good) {
+    const nl = out[s.end] === "\n" ? 1 : 0;
+    const lead = nl === 0 && s.start > 0 && out[s.start - 1] === "\n" ? 1 : 0;
+    out = out.slice(0, s.start - lead) + out.slice(s.end + nl);
+  }
+  return out;
 }
 
-/** Drop exactly the decided-drop lines, byte-preserving everything else.
- * Keeps are never touched; unknown shapes pass through unchanged. */
-export function pruneSystemPrompt(sys: unknown, dropped: Set<string>): unknown {
-  const pruneText = (text: string): string => {
-    if (dropped.size === 0) return text;
-    const kept = text.split("\n").filter((line) => !dropped.has(cleanLine(line)) || cleanLine(line).length <= 1);
-    return kept.join("\n");
-  };
-  if (typeof sys === "string") return pruneText(sys);
+/** Drop exactly the validated recall occurrences, byte-preserving everything
+ * else. Only spans recorded by parseOccurrences are eligible: identically
+ * worded lines outside a recall block, changed spans (hash mismatch), and
+ * unknown element shapes all pass through unchanged. Keeps never touched. */
+export function pruneSystemPrompt(sys: unknown, dropped: MemoryItem[]): unknown {
+  if (dropped.length === 0) return sys;
+  const byElement = new Map<number, MemoryItem[]>();
+  for (const s of dropped) {
+    const list = byElement.get(s.element) ?? [];
+    list.push(s);
+    byElement.set(s.element, list);
+  }
+  const texts = Array.isArray(sys)
+    ? (sys as unknown[]).map((b) => (typeof b === "string" ? b : systemPromptText(b)))
+    : null;
+  if (typeof sys === "string") return pruneText(sys, byElement.get(0) ?? []);
   if (Array.isArray(sys)) {
-    return (sys as unknown[]).map((b) => {
-      if (typeof b === "string") return pruneText(b);
+    return (sys as unknown[]).map((b, i) => {
+      const text = texts?.[i] ?? "";
+      if (typeof b === "string") return pruneText(text, byElement.get(i) ?? []);
       if (b && typeof b === "object" && typeof (b as Record<string, unknown>)["text"] === "string") {
-        return { ...(b as Record<string, unknown>), text: pruneText((b as Record<string, unknown>)["text"] as string) };
+        return { ...(b as Record<string, unknown>), text: pruneText(text, byElement.get(i) ?? []) };
       }
       return b;
     });
@@ -176,7 +233,7 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
     }
   };
   return async (event: unknown, ctx?: unknown): Promise<undefined | { systemPrompt: unknown }> => {
-    const dropped = new Set<string>();
+    const droppedTexts = new Set<string>();
     try {
       const ev = (event ?? {}) as Record<string, unknown>;
       const rawPrompt = ev["prompt"];
@@ -195,16 +252,25 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
         calls = 0;
         paused = false;
       }
-      const items = parseSystemMemories(sys).slice(0, MAX_ITEMS_PER_TURN);
+      const occurrences = parseOccurrences(sys);
+      const seen: Record<string, true> = {};
+      const items = occurrences
+        .filter((item) => {
+          if (seen[item.text]) return false;
+          seen[item.text] = true;
+          return true;
+        })
+        .slice(0, MAX_ITEMS_PER_TURN);
       const promptHash = createHash("sha256").update(prompt).digest("hex");
-      const started = Date.now();
+      // Phase 1 (synchronous, item order): memo hits and cap reservation.
+      // Cap counting is identical to the serial incumbent: first-come wins.
+      const slots: Array<{ item: MemoryItem; memoryHash: string; memoKey: string }> = [];
       for (const item of items) {
-        if (Date.now() - started > TURN_BUDGET_MS) break;
         const memoryHash = createHash("sha256").update(item.text).digest("hex");
         const memoKey = promptHash + ":" + memoryHash;
         const cached = memo.get(memoKey);
         if (cached !== undefined) {
-          if (cached.decision === "drop") dropped.add(item.text);
+          if (cached.decision === "drop") droppedTexts.add(item.text);
           await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "memo", promptHash, memoryHash, noul: cached.noul, decision: cached.decision, tokensSaved: cached.decision === "drop" ? Math.floor(item.text.length / 4) : 0, latencyMs: null, inputTokens: cached.inputTokens });
           await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "memo", promptHash, memoryHash, prompt, memory: item.text, noul: cached.noul, decision: cached.decision });
           continue;
@@ -214,28 +280,47 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
           continue;
         }
         calls += 1;
+        slots.push({ item, memoryHash, memoKey });
+      }
+      // Phase 2: at most CONCURRENCY asks in flight, FILTER_DEADLINE_MS total.
+      // Unresolved at the deadline keeps (logged); late answers are ignored
+      // for decisions and logged late-ignored for spend visibility.
+      const settled = new Array<boolean>(slots.length).fill(false);
+      let timedOut = false;
+      const settle = async (idx: number): Promise<void> => {
+        const slot = slots[idx];
         const t0 = Date.now();
         let result: JevResult;
         try {
           result = await ask({
-            state: { prompt, memory: item.text },
+            state: { prompt, memory: slot.item.text },
             questions: { rel: { instructions: INSTRUCTIONS } },
             model: MODEL,
             timeoutMs: CALL_TIMEOUT_MS,
           });
         } catch (error) {
-          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "fail_open", promptHash, memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: Date.now() - t0, inputTokens: null, error: error instanceof Error ? error.message : String(error) });
-          continue;
+          if (!timedOut) {
+            await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "fail_open", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: Date.now() - t0, inputTokens: null, error: error instanceof Error ? error.message : String(error) });
+          }
+          settled[idx] = true;
+          return;
+        }
+        if (timedOut) {
+          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "late-ignored", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
+          settled[idx] = true;
+          return;
         }
         if (!result.ok) {
           if (/\bHTTP (?:401|402|403)\b/.test(result.error)) paused = true;
-          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "fail_open", promptHash, memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: null, error: result.error });
-          continue;
+          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "fail_open", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: null, error: result.error });
+          settled[idx] = true;
+          return;
         }
         const noul = result.scores["rel"];
         if (typeof noul !== "number" || !Number.isFinite(noul)) {
-          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "invalid-keep", promptHash, memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
-          continue;
+          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "invalid-keep", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
+          settled[idx] = true;
+          return;
         }
         const drop = noul < CUT;
         const decision = drop ? "drop" : "keep";
@@ -243,18 +328,45 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
           const oldest = memo.keys().next();
           if (!oldest.done) memo.delete(oldest.value);
         }
-        memo.set(memoKey, { noul, decision, inputTokens: result.usage?.input_tokens ?? null });
-        if (drop) dropped.add(item.text);
-        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash, noul, decision, tokensSaved: drop ? Math.floor(item.text.length / 4) : 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
-        await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash, prompt, memory: item.text, noul, decision });
-      }
-      if (dropped.size > 0 && (await enforceEnabled(switchPath))) {
-        const kept = items.length - dropped.size;
-        if (inEnforceScope(fireRepo)) {
-          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "enforced", promptHash, memoryHash: null, noul: null, decision: "prune", removed: dropped.size, kept, tokensSaved: 0, latencyMs: null, inputTokens: null });
-          return { systemPrompt: pruneSystemPrompt(sys, dropped) };
+        memo.set(slot.memoKey, { noul, decision, inputTokens: result.usage?.input_tokens ?? null });
+        if (drop) droppedTexts.add(slot.item.text);
+        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash: slot.memoryHash, noul, decision, tokensSaved: drop ? Math.floor(slot.item.text.length / 4) : 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
+        await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash: slot.memoryHash, prompt, memory: slot.item.text, noul, decision });
+        settled[idx] = true;
+      };
+      const deadlineAt = Date.now() + FILTER_DEADLINE_MS;
+      let cursor = 0;
+      const worker = async (): Promise<void> => {
+        for (;;) {
+          if (timedOut || Date.now() >= deadlineAt) return;
+          const idx = cursor;
+          cursor += 1;
+          if (idx >= slots.length) return;
+          await settle(idx);
         }
-        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "shadowed", promptHash, memoryHash: null, noul: null, decision: "would-drop", removed: dropped.size, kept, tokensSaved: 0, latencyMs: null, inputTokens: null });
+      };
+      const workers: Array<Promise<void>> = [];
+      for (let w = 0; w < CONCURRENCY && w < slots.length; w += 1) workers.push(worker());
+      await Promise.race([
+        Promise.all(workers),
+        new Promise<void>((resolve) => setTimeout(resolve, Math.max(0, deadlineAt - Date.now()))),
+      ]);
+      timedOut = true;
+      for (let idx = 0; idx < slots.length; idx += 1) {
+        if (!settled[idx]) {
+          settled[idx] = true;
+          const slot = slots[idx];
+          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "deadline-keep", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: null, inputTokens: null });
+        }
+      }
+      const dropSpans = occurrences.filter((o) => droppedTexts.has(o.text));
+      if (dropSpans.length > 0 && (await enforceEnabled(switchPath))) {
+        const kept = items.length - droppedTexts.size;
+        if (inEnforceScope(fireRepo)) {
+          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "enforced", promptHash, memoryHash: null, noul: null, decision: "prune", removed: dropSpans.length, kept, tokensSaved: 0, latencyMs: null, inputTokens: null });
+          return { systemPrompt: pruneSystemPrompt(sys, dropSpans) };
+        }
+        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "shadowed", promptHash, memoryHash: null, noul: null, decision: "would-drop", removed: dropSpans.length, kept, tokensSaved: 0, latencyMs: null, inputTokens: null });
       }
     } catch {
       // Shadow failures never affect the turn.
