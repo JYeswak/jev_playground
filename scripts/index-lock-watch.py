@@ -26,7 +26,46 @@ from pathlib import Path
 
 LOG_REL = "state/jev/index-lock-creators.jsonl"
 STATE_REL = "state/jev/index-lock-watch-event.json"
-HOME = str(Path.home())
+OPS_REL = "state/jev/index-lock-watch-ops.jsonl"
+
+
+def home_dir():
+    return str(Path.home())
+
+
+HOME = home_dir()
+
+
+def resolve_paths(log_path, state_path, ops_path):
+    """Absolute resolved paths for every file this daemon writes."""
+    return (
+        str(Path(log_path).resolve())
+        if log_path
+        else str((Path(HOME) / LOG_REL).resolve()),
+        str(Path(state_path).resolve())
+        if state_path
+        else str((Path(HOME) / STATE_REL).resolve()),
+        str(Path(ops_path).resolve())
+        if ops_path
+        else str((Path(HOME) / OPS_REL).resolve()),
+    )
+
+
+def diag_line(paths):
+    logp, statep, opsp = paths
+    return json.dumps(
+        {
+            "ts": ts_now(),
+            "type": "paths",
+            "pid": os.getpid(),
+            "cwd": os.getcwd(),
+            "home": HOME,
+            "tmpdir": os.environ.get("TMPDIR"),
+            "log": logp,
+            "state": statep,
+            "ops": opsp,
+        }
+    )
 
 
 def ident_of(lock: Path):
@@ -171,6 +210,8 @@ def capture_once(repo, log_path=None, state_path=None, run=subprocess.run, now=N
         fd = os.open(str(log), os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o600)
         with os.fdopen(fd, "a") as fh:
             fh.write(json.dumps(row) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
     except OSError:
         pass
     try:
@@ -179,9 +220,6 @@ def capture_once(repo, log_path=None, state_path=None, run=subprocess.run, now=N
     except OSError:
         pass
     return row
-
-
-OPS_REL = "state/jev/index-lock-watch-ops.jsonl"
 
 
 def ts_now(when=None):
@@ -196,6 +234,8 @@ def ops_write(ops_path, row):
         fd = os.open(str(ops_path), os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o600)
         with os.fdopen(fd, "a") as fh:
             fh.write(json.dumps(row) + "\n")
+            fh.flush()
+            os.fsync(fh.fileno())
     except OSError:
         pass
 
@@ -210,9 +250,10 @@ def watch(
     max_iters=None,
 ):
     """kqueue on .git/; capture on every directory change plus one scan now."""
-    ops_path = Path(ops_path) if ops_path else Path(HOME) / OPS_REL
-    ops_write(ops_path, {"ts": ts_now(), "type": "start", "pid": os.getpid()})
-    row = capture_once(repo, log_path, state_path, run)
+    logp, statep, opsp = resolve_paths(log_path, state_path, ops_path)
+    print(diag_line((logp, statep, opsp)), flush=True)
+    ops_write(opsp, {"ts": ts_now(), "type": "start", "pid": os.getpid()})
+    row = capture_once(repo, logp, statep, run)
     if row:
         print(json.dumps(row), flush=True)
     if once:
@@ -235,11 +276,11 @@ def watch(
         )
         last_hb, events, iters = 0.0, 0, 0
         while True:
-            events = _poll_once(kq, repo, log_path, state_path, ops_path, run, events)
+            events = _poll_once(kq, repo, logp, statep, opsp, run, events)
             now = time.time()
             if now - last_hb >= 60:
                 ops_write(
-                    ops_path,
+                    opsp,
                     {"ts": ts_now(), "type": "heartbeat", "events_seen": events},
                 )
                 last_hb = now
