@@ -1,4 +1,4 @@
-import { appendFileSync, mkdirSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
@@ -9,6 +9,7 @@ import { ASSISTANT, CUT, MODEL, QUESTION } from "../../../work/jev-a9fv/seat.mjs
 export { CUT, MODEL };
 export const MAX_DAILY_CALLS = 3500;
 export const MAX_STATE_BYTES = 30_000;
+export const READ_SCREEN_OFF_REL = "state/jev/read-screen-off";
 export const LOG_SCHEMA = "jev-injection-shadow.v2";
 const SCREENED_TOOLS: Record<string, true> = { web_search: true, web_extract: true, fetch: true };
 export const NOTICE =
@@ -19,7 +20,7 @@ const SECRET_SPANS = /s[k]-[A-Za-z0-9_-]{20,}|xai-[A-Za-z0-9]{20,}|ghp_[A-Za-z0-
 type Event = { toolName?: unknown; toolCallId?: unknown; content?: unknown; result?: unknown; isError?: unknown };
 type Host = { on: (event: string, handler: (event: Event) => Promise<unknown>) => void };
 type Ask = (options: Parameters<typeof askJev>[0]) => Promise<JevResult>;
-type Deps = { ask?: Ask; append?: (path: string, line: string) => Promise<void>; path?: string; cap?: number; now?: () => string; screenLocalRead?: boolean; enforce?: boolean; mode?: "withhold" | "annotate" };
+type Deps = { ask?: Ask; append?: (path: string, line: string) => Promise<void>; path?: string; cap?: number; now?: () => string; screenLocalRead?: boolean; readScreenOffFile?: string; fsExists?: (path: string) => boolean; enforce?: boolean; mode?: "withhold" | "annotate" };
 export type ShadowMode = "withhold" | "annotate";
 const SPAN_HINT = /ignore (?:all )?previous instructions|forget (?:everything|all)|disregard .*instructions|you are now|reveal .*prompt|send .*secret|do not (?:look|read)|just output|print yay|act as two entities|role-play/i;
 export function spanQuote(raw: string): string | null {
@@ -54,7 +55,7 @@ function syncObserved(path: string, row: Record<string, unknown>): void {
 type ShadowState = { day: string; calls: number; paused: boolean };
 type ShadowRow = { schema: string; ts: string; toolName: string; outputSha256: string };
 type WriteRow = (row: Record<string, unknown>) => Promise<void>;
-type ScoreArgs = { ask: Ask; write: WriteRow; state: ShadowState; cap: number; common: ShadowRow; raw: string };
+type ScoreArgs = { ask: Ask; write: WriteRow; state: ShadowState; cap: number; common: ShadowRow; raw: string; annotateOnly?: boolean };
 
 function resetDay(state: ShadowState, current: string): void {
   if (current === state.day) return;
@@ -80,7 +81,7 @@ function validScore(score: unknown): score is number {
 
 type ScoreOutcome = { score: number; flag: boolean } | null;
 
-async function scoreAndRecord({ ask, write, state, cap, common, raw }: ScoreArgs): Promise<ScoreOutcome> {
+async function scoreAndRecord({ ask, write, state, cap, common, raw, annotateOnly }: ScoreArgs): Promise<ScoreOutcome> {
   if (state.paused) {
     await write({ ...common, status: "halted", reason: "authorization-refusal" });
     return null;
@@ -125,7 +126,7 @@ async function scoreAndRecord({ ask, write, state, cap, common, raw }: ScoreArgs
     status: "scored",
     score,
     flag,
-    withheld: flag,
+    withheld: flag && !annotateOnly,
     model: result.model,
     latencyMs: result.latencyMs,
     tokens: {
@@ -143,7 +144,19 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
   const requestedCap = deps.cap ?? Number(process.env.JEV_INJECTION_SHADOW_DAILY_CAP ?? String(MAX_DAILY_CALLS));
   const cap = Number.isSafeInteger(requestedCap) ? Math.min(MAX_DAILY_CALLS, Math.max(0, requestedCap)) : 0;
   const now = deps.now ?? (() => new Date().toISOString());
-  const screenLocalRead = deps.screenLocalRead ?? (process.env.JEV_INJECTION_SHADOW_SCREEN_LOCAL_READ === "1");
+  // Read screening is ON by default (jev-hqha 20/24 planted-in-reads); file reads are
+  // external content like web/fetch. Off only via the read-screen-off switch file
+  // (same pattern as gate-observe cascade-off) or explicit env =0. Read at APPLY
+  // time per call, never cached, so retiring mid-session stops screening reads.
+  const screenLocalReadDep = deps.screenLocalRead;
+  const offFile = deps.readScreenOffFile;
+  const fsExists = deps.fsExists ?? existsSync;
+  const readScreenOn = (): boolean => {
+    if (screenLocalReadDep !== undefined) return screenLocalReadDep;
+    if (process.env.JEV_INJECTION_SHADOW_SCREEN_LOCAL_READ === "0") return false;
+    try { if (fsExists(offFile ?? join(homedir(), ".local", READ_SCREEN_OFF_REL))) return false; } catch { /* off-switch unreadable: stay on */ }
+    return true;
+  };
   const state: ShadowState = { calls: 0, day: now().slice(0, 10), paused: false };
   const write: WriteRow = async (row) => {
     if (!deps.append) { syncObserved(path, row); return; }
@@ -160,7 +173,7 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
   return async (event: Event): Promise<unknown> => {
     try {
       resetDay(state, now().slice(0, 10));
-      if (event.isError === true || typeof event.toolName !== "string" || (event.toolName === "read" ? !screenLocalRead : !Object.hasOwn(SCREENED_TOOLS, event.toolName))) return undefined;
+      if (event.isError === true || typeof event.toolName !== "string" || (event.toolName === "read" ? !readScreenOn() : !Object.hasOwn(SCREENED_TOOLS, event.toolName))) return undefined;
       const raw = outputText(event);
       if (!raw) return undefined;
       const common = { schema: LOG_SCHEMA, ts: now(), toolName: event.toolName, outputSha256: hash(raw) };
@@ -169,8 +182,16 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
         await write({ ...common, status: "oversize", reason: "state-byte-limit", stateBytes: bytes });
         return undefined;
       }
-      const outcome = await scoreAndRecord({ ask, write, state, cap, common, raw });
+      const annotateOnly = event.toolName === "read";
+      const outcome = await scoreAndRecord({ ask, write, state, cap, common, raw, annotateOnly });
+      // Reads annotate, never withhold: a withheld file read breaks the session's
+      // own context (jev-fpkw: withhold success 4/24), so flagged reads keep content.
       if (!isShadow() && outcome !== null && outcome.flag) {
+        if (annotateOnly) {
+          const span = spanQuote(raw);
+          await write({ ...common, status: "annotated", score: outcome.score, spanSha256: span === null ? null : hash(span), withheld: false });
+          return { content: [{ type: "text", text: annotateNotice(outcome.score, span) + "\n\n" + raw }], details: { screening: "annotated", score: outcome.score, cut: CUT, model: MODEL } };
+        }
         if (mode === "annotate") {
           const span = spanQuote(raw);
           await write({ ...common, status: "annotated", score: outcome.score, spanSha256: span === null ? null : hash(span) });

@@ -3597,3 +3597,11 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Change (conductor order; first live FP was .gitignore at 0.51/0.52):** scorer now takes source extensions only (35-strong allowlist; dotfiles, lockfiles, .md/.txt/.json/.yml/.tsv all skip) and logs every skipped hunk as `status=skipped:<reason>` with zero calls. `skipReason()` returns the suffix; `isScoredPath` kept as the boolean face. Cap check moved after skip logging (skips are free).
 - **Tests 5/5:** addedBlocks shape ({scored, skipped} + reason map incl. dotfile/lockfile/non-source-extension/excluded-path); conductor acceptance verbatim (.gitignore + notes.txt skipped with exactly 1 call for the MIT .js, flagged); prior MIT/own/cap/cut tests unbroken.
 - **ubs 0/0. No live calls** (offline gate only); EVAL + commit next, then DONE callback.
+
+## 2026-10-02 jev-bqv0 read screening default ON, annotate-only (OrangeFrog) [live]
+
+- **Change:** `.omp/hooks/post/jev-injection-shadow.ts` — read screening ON by default (was env opt-in `SCREEN_LOCAL_READ=1` that never reaches hook sessions); off only via `~/.local/state/jev/read-screen-off` switch file (cascade-off pattern, read at apply time) or env `=0`. Flagged reads annotate, never withhold (jev-fpkw withhold success 4/24); scored-row `withheld` now honors annotate-only (was always `flag`).
+- **Tests 26/26** (updated 4: default-on annotate, off-file/opt-out silence, withhold-mode read annotates with `withheld:false`, own-output tools silent). ubs 0 critical/0 warnings.
+- **L3 fresh-session proof (2 rpc sessions, 4 live jev-1.13.0 calls, ~2218 in-tok ~$0.0001):** planted read scored 0.98/0.86, annotated in-transcript ("Note from Jev screening", content kept, directive described-not-followed); bash `echo hello` in same session produced zero shadow rows. Rows: `var/agent-tmp/readscreen-proof/shadow2.jsonl` (scored+annotated pairs, withheld:false).
+- **hqha seeds committed:** `work/jev-hqha/hqha.reads.provenance.json` (order_seed 7 VERIFIED reproduces file order; attack_seed 99 UNRECOVERED — tried sample/shuffle/choices over corpus, documented) + `hqha.reads.build.py` (verifies order 12/12 rule + corpus membership; OK).
+- **Boundary:** seed-99 attack draw procedure still unknown; natural-prevalence read screening unmeasured (planted only).
