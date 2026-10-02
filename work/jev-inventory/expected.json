@@ -75,12 +75,12 @@
       "group": "hook",
       "name": "tool-result injection shadow",
       "decision": "is this tool result an injection?",
-      "how": ".omp/hooks/post/jev-injection-shadow.ts (web tools; local read opt-in)",
+      "how": ".omp/hooks/post/jev-injection-shadow.ts (web tools; read screening default-ON annotate-only)",
       "expect": "on",
       "log": "injection-shadow.jsonl",
       "file": ".omp/hooks/post/jev-injection-shadow.ts",
       "verdict": "ENFORCING",
-      "evidence": "jev-rud1 verified (clean 0/222, catch 268/300); enforce 3141ed3f verified 9/10; unified orchestrator jev-n4eu VERIFIED+CLOSED (600/600 equivalence, catch 269/300 incumbent, $0.0038, 10/10 loads, no double fire)",
+      "evidence": "jev-rud1 verified (clean 0/222, catch 268/300); enforce 3141ed3f verified 9/10; unified orchestrator jev-n4eu VERIFIED+CLOSED (600/600 equivalence, catch 269/300 incumbent, $0.0038, 10/10 loads, no double fire); read screening default-ON annotate-only bqv0 515b037b (planted L3 0.98/0.86 annotated)",
       "saving": "1 true injection flagged in 247 real results (7d)"
     },
     {
@@ -88,12 +88,12 @@
       "group": "hook",
       "name": "web-result screen",
       "decision": "is a web result an injection?",
-      "how": ".omp/hooks/post/jev-webscreen.ts (enforce, Jev-only flags)",
+      "how": ".omp/hooks/post/jev-webscreen.ts (enforce, Jev-only flags; external content + fetch scope 2b41517e)",
       "expect": "on",
       "log": "webscreen-shadow.jsonl",
       "file": ".omp/hooks/post/jev-webscreen.ts",
       "verdict": "ENFORCING",
-      "evidence": "jev-eo40 + jev-3ogk verified; unified orchestrator jev-n4eu VERIFIED+CLOSED (600/600 equivalence, catch 269/300 incumbent, $0.0038, 10/10 loads, no double fire)",
+      "evidence": "jev-eo40 + jev-3ogk verified; unified orchestrator jev-n4eu VERIFIED+CLOSED (600/600 equivalence, catch 269/300 incumbent, $0.0038, 10/10 loads, no double fire); scope 2b41517e; fpkw annotate availability 24/24 on the composed path",
       "saving": "0 withheld since Jev-only enforce in 363 real events (7d)"
     },
     {
@@ -200,34 +200,59 @@
       "log": "gate-observe.jsonl",
       "file": ".omp/hooks/post/jev-gate-observe.ts",
       "verdict": "WORKS",
-      "evidence": "jev-nr3c verified by HazySpring: 1h live [15:36,16:36)Z 98 cascade rows, 94 nimble-cleared (0 harmful by blind label), 4 paid; 53 timeouts unscreened (fallback fix in flight); jev-syje (CyanPeak): 7d 950 distinct nimble-cleared, 0/950 harmful blind (Wilson UB 0.31%); rescore-100 paid 0 flags; planted 9/10 held (1 clear = rm-rf nonexistent path, both stages agree); jev-nbbm VERIFIED+CLOSED: deterministic destructive pre-rule straight to paid (tests 30/30, syje 10/10 planted paid: 7 prerule + 3 nimble-flag; 13 hit rows/7d = 1.86 extra paid/day recomputed); jev-t3tk VERIFIED+CLOSED: every row carries one screen class (nimble-cleared/flagged-paid/prerule-paid/paid-fallback-timeout-http-fence/unscreened), 0/1553 timeout-taken-clears in 7d (suite 34/34, live timeout plant -> paid-fallback-timeout)",
+      "evidence": "jev-nr3c verified by HazySpring: 1h live [15:36,16:36)Z 98 cascade rows, 94 nimble-cleared (0 harmful by blind label), 4 paid; 53 timeouts unscreened (fallback fix in flight); jev-syje (CyanPeak): 7d 950 distinct nimble-cleared, 0/950 harmful blind (Wilson UB 0.31%); rescore-100 paid 0 flags; planted 9/10 held (1 clear = rm-rf nonexistent path, both stages agree); jev-nbbm VERIFIED+CLOSED: deterministic destructive pre-rule straight to paid (tests 30/30, syje 10/10 planted paid: 7 prerule + 3 nimble-flag; 13 hit rows/7d = 1.86 extra paid/day recomputed); prerule widened 2596d25c (find -delete, find -exec rm) + 89b23139 (every rm to paid); jev-t3tk VERIFIED+CLOSED: every row carries one screen class (nimble-cleared/flagged-paid/prerule-paid/paid-fallback-timeout-http-fence/unscreened), 0/1553 timeout-taken-clears in 7d (suite 34/34, live timeout plant -> paid-fallback-timeout)",
       "saving": "paid gate calls 4/98 = 4.1% of commands (96% screened free locally), 1h live window"
     },
     {
       "id": "webscreen-global",
       "group": "global",
       "name": "machine-wide web-result shadow",
-      "decision": "log would-withhold in every repo (shadow, enforce:false)",
+      "decision": "annotate flagged results in every repo (inj enforce-annotate; web stays shadow)",
       "how": "user hooks/post hardlink -> work/jev-j0er/jev-webscreen-global.ts (5 profiles)",
       "expect": "on",
       "repo": "work/jev-j0er/jev-webscreen-global.ts",
       "hookfile": "jev-webscreen-global.ts",
-      "verdict": "SHADOW",
-      "evidence": "jev-j0er install 7c36b2c7 verified both ways (non-jev logs rows, jev single-fires)",
-      "saving": "shadow sample accumulating since 2026-10-01T20:03Z; enforce flip on false-withhold bar"
+      "verdict": "ENFORCING",
+      "evidence": "jev-j0er install 7c36b2c7 verified both ways (non-jev logs rows, jev single-fires); annotate flip 022ccf27 (0/100 false organic, omp-test witness pair planted-annotated/clean-silent)",
+      "saving": "shadow sample accumulating since 2026-10-01T20:03Z; blind-label campaign for the 0.90/0.10 bar"
     },
     {
       "id": "injection-global",
       "group": "global",
       "name": "machine-wide injection shadow",
-      "decision": "log would-withhold in every repo (shadow, enforce:false)",
+      "decision": "annotate flagged results in every repo (inj enforce-annotate; web stays shadow)",
       "how": "user hooks/post hardlink -> work/jev-j0er/jev-injection-global.ts (5 profiles)",
       "expect": "on",
       "repo": "work/jev-j0er/jev-injection-global.ts",
       "hookfile": "jev-injection-global.ts",
+      "verdict": "ENFORCING",
+      "evidence": "jev-j0er install 7c36b2c7 verified both ways (non-jev logs rows, jev single-fires); annotate flip 022ccf27 (0/100 false organic, omp-test witness pair planted-annotated/clean-silent)",
+      "saving": "shadow sample accumulating since 2026-10-01T20:03Z; blind-label campaign for the 0.90/0.10 bar"
+    },
+    {
+      "id": "vendor-shadow",
+      "group": "hook",
+      "name": "vendor-paste post-commit shadow",
+      "decision": "does this commit paste vendored third-party code?",
+      "how": "githooks/post-commit -> work/vendor-paste/vendor-shadow.mjs (shadow, cap 100/day, source hunks only)",
+      "expect": "on",
+      "log": "vendor-shadow.jsonl",
+      "file": "githooks/post-commit",
       "verdict": "SHADOW",
-      "evidence": "jev-j0er install 7c36b2c7 verified both ways (non-jev logs rows, jev single-fires)",
-      "saving": "shadow sample accumulating since 2026-10-01T20:03Z; enforce flip on false-withhold bar"
+      "evidence": "jev-30hi PASS (prec 0.842/rec 0.640, McNemar 65/2); seam m94x f618f143 installed; scope cut a9b02bc1",
+      "saving": "shadow sample accumulating; enforce bar blind 0.90/0.10 at >=30 hunks"
+    },
+    {
+      "id": "skill-veto",
+      "group": "extension",
+      "name": "skill-load veto shadow",
+      "decision": "does this skill load fit the request?",
+      "how": ".omp/extensions/jev-skill-veto.ts (shadow, cut 0.40, fail-open rows)",
+      "expect": "on",
+      "extension": "./.omp/extensions/jev-skill-veto.ts",
+      "verdict": "SHADOW",
+      "evidence": "jev-wbel: D9 0.990 did not transfer (organic precision 0.335 at 79% veto, blind 200); state-enrichment and cookbook rank-verify also FAIL; enforcement refuted, shadow stays log-only",
+      "saving": "shadow sample accumulating; enforce bar blind 0.80/0.10"
     }
   ]
 }
