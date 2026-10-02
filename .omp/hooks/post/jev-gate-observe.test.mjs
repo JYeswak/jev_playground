@@ -759,8 +759,75 @@ test("WIRE five consecutive refused pages once, then suppresses", async () => {
   assert.match(pages[0], /GATEWAY/);
   const alerts = wrote.filter((w) => w.row.error && w.row.error.startsWith("gateway-alert"));
   assert.equal(alerts.length, 1);
+  assert.match(alerts[0].row.error, /page=sent/);
   await observe({ toolName: "bash", input: { command: "refused-probe-6" } }, { ...deps, dailyBudget: { day: "", calls: 0 } });
   assert.equal(pages.length, 1);
+});
+
+test("WIRE throwing notify still writes the alert row", async () => {
+  const { resetGatewayAlert } = await import("./jev-gate-observe.ts");
+  resetGatewayAlert();
+  reset();
+  const dir = mkdtempSync(join(tmpdir(), "gwalert-"));
+  const failing = async () => {
+    const err = new Error("fetch failed");
+    err.cause = new Error("connect ECONNREFUSED 127.0.0.1:1");
+    throw err;
+  };
+  const deps = {
+    ...cascadeMem,
+    asker: async () => ({ ok: false, reason: "http", error: "HTTP 500", latencyMs: 1 }),
+    localAsker: async (args) => {
+      const { liveLocalAsker: live } = await import("./jev-gate-observe.ts");
+      return live({ ...args, fetchImpl: failing });
+    },
+    fetchImpl: failing,
+    notify: async () => { throw new Error("pager down"); },
+    markerPath: join(dir, "marker"),
+    dailyBudget: { day: "", calls: 0 },
+  };
+  for (let i = 0; i < 5; i++) {
+    await observe({ toolName: "bash", input: { command: `throw-probe-${i}` } }, { ...deps, dailyBudget: { day: "", calls: 0 } });
+  }
+  const alerts = wrote.filter((w) => w.row.error && w.row.error.startsWith("gateway-alert"));
+  assert.equal(alerts.length, 1);
+  assert.match(alerts[0].row.error, /page=notify-threw/);
+});
+
+test("WIRE default notify records non-zero exit in the row", async () => {
+  const { resetGatewayAlert } = await import("./jev-gate-observe.ts");
+  resetGatewayAlert();
+  reset();
+  const dir = mkdtempSync(join(tmpdir(), "gwalert-"));
+  const prevBin = process.env.JEV_NTM_BIN;
+  process.env.JEV_NTM_BIN = "/bin/false";
+  try {
+    const failing = async () => {
+      const err = new Error("fetch failed");
+      err.cause = new Error("connect ECONNREFUSED 127.0.0.1:1");
+      throw err;
+    };
+    const deps = {
+      ...cascadeMem,
+      asker: async () => ({ ok: false, reason: "http", error: "HTTP 500", latencyMs: 1 }),
+      localAsker: async (args) => {
+        const { liveLocalAsker: live } = await import("./jev-gate-observe.ts");
+        return live({ ...args, fetchImpl: failing });
+      },
+      fetchImpl: failing,
+      markerPath: join(dir, "marker"),
+      dailyBudget: { day: "", calls: 0 },
+    };
+    for (let i = 0; i < 5; i++) {
+      await observe({ toolName: "bash", input: { command: `rc-probe-${i}` } }, { ...deps, dailyBudget: { day: "", calls: 0 } });
+    }
+    const alerts = wrote.filter((w) => w.row.error && w.row.error.startsWith("gateway-alert"));
+    assert.equal(alerts.length, 1);
+    assert.match(alerts[0].row.error, /page=rc=1/);
+  } finally {
+    if (prevBin === undefined) delete process.env.JEV_NTM_BIN;
+    else process.env.JEV_NTM_BIN = prevBin;
+  }
 });
 
 test("WIRE contention timeouts never page", async () => {

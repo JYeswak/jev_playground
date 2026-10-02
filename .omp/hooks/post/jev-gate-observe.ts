@@ -219,10 +219,20 @@ export function resetGatewayAlert(): void {
   gatewayRefusedStreak = 0;
 }
 
-async function defaultNotify(msg: string): Promise<void> {
-  await new Promise<void>((resolve) => {
-    execFile("ntm", ["send", "jev", "--pane=1", msg], { timeout: 10000 }, () => resolve());
-  });
+async function defaultNotify(msg: string): Promise<string> {
+  const bin = process.env.JEV_NTM_BIN ?? "/Users/josh/.local/bin/ntm";
+  try {
+    return await new Promise<string>((resolve) => {
+      execFile(bin, ["send", "jev", "--pane=1", msg], { timeout: 10000 }, (err, stdout, stderr) => {
+        const code = err && typeof err === "object" && "code" in err ? String(err.code) : null;
+        const rc = code !== null && /^\d+$/.test(code) ? code : err ? "1" : "0";
+        const tag = code !== null && !/^\d+$/.test(code) ? code + " " : "";
+        resolve(`rc=${rc} ${tag}out=${String(stdout ?? stderr ?? "").slice(0, 80)}`);
+      });
+    });
+  } catch (e) {
+    return `spawn-failed:${e instanceof Error ? e.message.slice(0, 60) : "?"}`;
+  }
 }
 
 async function healthzOk(gatewayUrl: string, fetchImpl?: typeof fetch): Promise<boolean> {
@@ -265,16 +275,18 @@ async function noteGatewayRefused(
   } catch {
     // Marker best-effort only.
   }
+  let delivered: string;
+  try {
+    const receipt = await (deps.notify ?? defaultNotify)(`GATEWAY nimble gateway refused ${GATEWAY_ALERT_N} consecutive screens and /healthz is failing; fleet on paid fallback`);
+    delivered = String(receipt ?? "sent");
+  } catch {
+    delivered = "notify-threw";
+  }
   await write({
     ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null,
-    skipped: null, error: `gateway-alert: ${GATEWAY_ALERT_N} consecutive refused, /healthz failing`,
+    skipped: null, error: `gateway-alert: ${GATEWAY_ALERT_N} consecutive refused, /healthz failing; page=${delivered}`,
     nimbleProbs: null, jevSkipped: null, screen: "gateway-alert",
   });
-  try {
-    await (deps.notify ?? defaultNotify)(`GATEWAY nimble gateway refused ${GATEWAY_ALERT_N} consecutive screens and /healthz is failing; fleet on paid fallback`);
-  } catch {
-    // Paging never fails the hook.
-  }
 }
 
 export const liveAsker: NonNullable<ObserveDeps["asker"]> = async (args) => {
