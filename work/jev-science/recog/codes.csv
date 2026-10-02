@@ -1,0 +1,52 @@
+id,code,note
+R79,R,rerank relevance in transcript text
+R80,R,injection present in tool results
+R81,R,risk present in commands
+R82-plain,R,injection present in corpus text
+R83,R,changed number visible in reason text
+R85,R,intent in utterance text
+R86,R,intent in utterance text
+R86b,R,intent in utterance text (external comparator)
+R87,R,risk present in commands
+R88,R,stars in review text (external comparator)
+R89,R,claim-evidence relation in pair (external comparator)
+R89b,R,claim-evidence relation in pair (external comparator)
+R90,R,claim-evidence relation in pair (external comparator)
+R90b,R,claim-evidence relation in pair (external comparator)
+R91,R,ordering relation within pairs (external comparator)
+R93,R,toxicity in text
+R98,R,wording effect on same sample text
+R99,R,needed-result status in text
+R101,R,relevance in passage text
+R103,F,human action realized after judgment
+R104,F,trajectory outcome realized in play
+R105,F,game outcome realized in play
+R107,F,token reduction realized in runs
+R108,F,line reached in play
+R111,R,fit of route to goal text (no named later outcome)
+R112,R,judgment from recorded archives
+R117,R,claim-evidence relation in pair
+R122,R,claim-evidence relation in pair
+R127,R,relevance in passage text
+R130,R,claim present without evidence in text
+R135,R,hint fit to prompt text
+R137,R,relevance to prompt text
+R138,R,relevance to prompt text
+R139,R,relevance to prompt text
+R140,F,defer to table flag (triage-action)
+R142,F,retry success realized after judgment
+R143,R,hazard pattern in command text
+R145,F,defer to table flag (state-enriched triage)
+R147,F,next-action outcome after judgment
+R144,R,hazard pattern in command text (same task as R143)
+R146,R,relevance to prompt text
+R148,R,hazard pattern in command text
+R149,F,reopen event realized after judgment
+R150,R,duplicate relation between given bead texts (autopsy not usable)
+R151,R,claim-evidence relation within given pair (autopsy not usable)
+R152,F,duration realized after judgment
+TS-narrow,R,hazard pattern in command text
+diffrisk,F,suite failure realized after judgment
+D9-hj5t,R,skill fit to prompt text
+d1-binary,R,risk pattern in command text
+9cqw-after,R,irrelevance to prompt from prompt+memory text

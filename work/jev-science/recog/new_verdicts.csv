@@ -1,0 +1,13 @@
+id,verdict,source
+R144,loss,NEGATIVE_EVIDENCE R144
+R146,loss,EVAL jev-h1hr R146
+R148,loss,bead jev-dr4p widened RESULT
+R149,loss,NEGATIVE_EVIDENCE R149
+R150,loss,NEGATIVE_EVIDENCE R150
+R151,loss,NEGATIVE_EVIDENCE R151
+R152,loss,NEGATIVE_EVIDENCE R152 + EVAL jev-zezf
+TS-narrow,loss,bead jev-dr4p TS RESULT + EVAL
+diffrisk,loss,var/agent-tmp/diffrisk-live-dev.jsonl AUC 0.3768
+D9-hj5t,win,EVAL jev-hj5t
+d1-binary,win,work/jev-science/CALIBRATION.md d1-read cut (with caveat)
+9cqw-after,win,bead jev-9cqw AFTER-BAR 30/30 + LIVE
