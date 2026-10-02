@@ -3668,3 +3668,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 
 - **OrangeFrog found the committed scorer crashing (NameError: fp undefined) — my edit-skirmish ate the loop binding.** One-line fix, rerun clean: 1,239 files / 139,143 turns, top-3 identical in order (destructive 133,000; instruction 46,800; failed_ignored 36,060; small count drift from time + fixed code path).
 - **failed_ignored looseness (as ordered, noted):** it currently means "no same-tool call on the next turn" and consecutive errors overwrite the pending slot — looser than "ignored". Track A labelled sample will show how loose.
+
+## 2026-10-02 failtriage: A precision 0.000, nudge stays OFF, B degenerate (WindyLantern) [keyless]
+
+- **Track A (preregistered `work/failtriage/PREREG.md`):** deterministic detector over 7d sessions -> 4,118 candidates, 100 seeded blind-labeled (sha `e7ed1796e417`): 68 ADDRESSED (mostly benign-text regex matches) / 32 HARMLESS-IGNORE / 0 HARMFUL. Precision 0/100 = 0.000 [0, 0.037] vs 0.80 bar — nudge stays OFF by a mile. The regex finds docs/code/prose containing fail-words, not neglected failures.
+- **Track B not run (stated, not skipped silently):** 0 harmful labels in 100 leaves no positives to fit a cut on and none for B to beat — A already flags all 100 rows at precision 0. Spending 100 Choice calls to document 0=0 is waste; B needs a richer sample (oversample real skips) as its own design. Borderline HARMFUL candidates named for it: f064 (30 judge failures), f094 (disk-low inaction).
+- **Receipts:** `work/failtriage/{PREREG.md,detect.py,candidates.json,labels.json}`. Committed. Bead jev-irkq left for verifier.
