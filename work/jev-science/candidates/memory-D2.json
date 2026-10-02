@@ -1,0 +1,608 @@
+{
+ "name": "memory-D2-topk",
+ "rows": [
+  {
+   "hash": "m959-o01",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o02",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o03",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o04",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o05",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o06",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o07",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o08",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o09",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o10",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o11",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o12",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o13",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o14",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o15",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o16",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o17",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o18",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o19",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o20",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o21",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o22",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o23",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o24",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o25",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o26",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o27",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o28",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o29",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o30",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o31",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o32",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o33",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o34",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o35",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o36",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o37",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o38",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o39",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o40",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o41",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o42",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o43",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o44",
+   "label": "pos",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o45",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o46",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o47",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o48",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o49",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "m959-o50",
+   "label": "neg",
+   "split": "dev",
+   "group": "m959-pool"
+  },
+  {
+   "hash": "h28-h00",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h01",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h02",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h03",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h04",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h05",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h06",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h07",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h08",
+   "label": "pos",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h09",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h10",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h11",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h12",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h13",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h14",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h15",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h16",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h17",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h18",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h19",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h20",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h21",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h22",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h23",
+   "label": "pos",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h24",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h25",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h26",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h27",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h28",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h29",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h30",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h31",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h32",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h33",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h34",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h35",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h36",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h37",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h38",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  },
+  {
+   "hash": "h28-h39",
+   "label": "neg",
+   "split": "held",
+   "group": "h28-pool"
+  }
+ ],
+ "label_source": "blind-human",
+ "censoring_rate": 0.0,
+ "recomputable": true,
+ "min_headroom": 0.05,
+ "daily_volume": 1000,
+ "action_value": 0.001,
+ "group_note": "pool-level groups only; session-level regroup required for GO",
+ "features": {
+  "direction": "keep",
+  "future": false,
+  "answer_visible": true,
+  "primitive": "Choice"
+ },
+ "baseline": {
+  "name": "always-drop",
+  "predictions": {
+   "h28-h00": "neg",
+   "h28-h01": "neg",
+   "h28-h02": "neg",
+   "h28-h03": "neg",
+   "h28-h04": "neg",
+   "h28-h05": "neg",
+   "h28-h06": "neg",
+   "h28-h07": "neg",
+   "h28-h08": "neg",
+   "h28-h09": "neg",
+   "h28-h10": "neg",
+   "h28-h11": "neg",
+   "h28-h12": "neg",
+   "h28-h13": "neg",
+   "h28-h14": "neg",
+   "h28-h15": "neg",
+   "h28-h16": "neg",
+   "h28-h17": "neg",
+   "h28-h18": "neg",
+   "h28-h19": "neg",
+   "h28-h20": "neg",
+   "h28-h21": "neg",
+   "h28-h22": "neg",
+   "h28-h23": "neg",
+   "h28-h24": "neg",
+   "h28-h25": "neg",
+   "h28-h26": "neg",
+   "h28-h27": "neg",
+   "h28-h28": "neg",
+   "h28-h29": "neg",
+   "h28-h30": "neg",
+   "h28-h31": "neg",
+   "h28-h32": "neg",
+   "h28-h33": "neg",
+   "h28-h34": "neg",
+   "h28-h35": "neg",
+   "h28-h36": "neg",
+   "h28-h37": "neg",
+   "h28-h38": "neg",
+   "h28-h39": "neg"
+  }
+ },
+ "agreement": {
+  "n": 90,
+  "agree": 79,
+  "note": "measured 2026-10-02 blind re-label"
+ }
+}
