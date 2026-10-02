@@ -3394,3 +3394,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Bar (committed pre-counts):** DEFECT iff >=1 firing in a session started after its rule retirement; else restart-boundary. Result: boundary, no loader defect; fresh sessions never discover disabled/ rules.
 - **Mechanism:** stale in-memory registrations fire until session end (05:30 session fired 116x 05:31-05:40, 26x at/after the move, then stopped); rebuilds/session churn self-heal. One stale session file touched recently (01:19Z start, last stale firing 06:41Z) named as restart candidate; no restart performed (conductor decision).
 - **Boundary:** 24h 0-firing proof still open (post-retirement evidence so far: claim ~18h, key ~7h); session start = filename timestamp; firing = injectedRules name match.
+
+## 2026-10-02 stranger-run origin/main 448a7ee7: 14/14 README steps green keyless, 1 live call (CyanPeak) [live]
+
+- **Keyless (fresh clone 448a7ee7, clean HOME, no key):** 12 exit 0 (npm ci, 5 fake verbs, omp install, rerank --fake), 2 needs-key exit 2 as documented (doctor NOT_RUN, live ask choice NOT_RUN). 0 failures requiring README action.
+- **Live (1 bounded call, jev-1.13.0, 2026-10-02):** ask choice on kit example state/question -> choice none conf 0.99, 371 input tokens, ~$0.000016. No drift vs tonight's commits: kit rerank verb still passes (5bcd9b33 factory-OFF is the omp-tool seam, no README step asserts it ON); j0er wrappers/watcher backoff/124-124 floor have no README runnable step; README L70 floor history tops at dated 123/124 (historical record, not a live claim) -- no README edit made.
+- **Boundary:** single example call only; not a quality claim. Receipt: var/agent-tmp/stranger.51150/receipt.md (reaper-owned scratch).
