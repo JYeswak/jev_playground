@@ -24,6 +24,7 @@ import {
 const GUARD_DIR = mkdtempSync(join(tmpdir(), "memfilter-guard-"));
 process.env.JEV_MEMORY_FILTER_LOG_PATH = join(GUARD_DIR, "log.jsonl");
 process.env.JEV_MEMORY_FILTER_SIDECAR_PATH = join(GUARD_DIR, "full.jsonl");
+process.env.JEV_MEMORY_CAP3_PATH = join(GUARD_DIR, "no-cap3-switch-file");
 process.env.JEV_MEMORY_FILTER_ENFORCE_PATH = join(GUARD_DIR, "no-switch-file");
 
 
@@ -95,7 +96,7 @@ test("systemPromptText joins string arrays and passes strings through", () => {
 });
 
 test("suite guard: prod log paths stay redirected to temp", () => {
-  for (const v of [process.env.JEV_MEMORY_FILTER_LOG_PATH, process.env.JEV_MEMORY_FILTER_SIDECAR_PATH, process.env.JEV_MEMORY_FILTER_ENFORCE_PATH]) {
+  for (const v of [process.env.JEV_MEMORY_FILTER_LOG_PATH, process.env.JEV_MEMORY_FILTER_SIDECAR_PATH, process.env.JEV_MEMORY_FILTER_ENFORCE_PATH, process.env.JEV_MEMORY_CAP3_PATH]) {
     assert.ok(v && v.startsWith(GUARD_DIR), `redirection removed, prod path would be touched: ${v}`);
   }
 });
