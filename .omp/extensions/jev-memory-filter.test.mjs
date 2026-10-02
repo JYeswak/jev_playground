@@ -534,3 +534,54 @@ test("budget: loaded backend still completes a full turn", async () => {
   assert.equal(rows.filter((r) => r.status === "scored").length, 20);
   assert.ok(!rows.some((r) => r.status === "deadline-keep"));
 });
+
+// Cap-3 shipment (jev-8c09): mechanical top-3 rank cut, switch-gated.
+const BULLET_C = "[redacted session-private body C] … [coding-agent-transcript] (2026-10-02)";
+const BULLET_D = "[redacted session-private body D] … [coding-agent-transcript] (2026-10-02)";
+const BULLET_E = "[redacted session-private body E] … [coding-agent-transcript] (2026-10-02)";
+const SYS_RECALL_5 = [
+  "system prompt preamble",
+  INSTRUCTION_MENTION,
+  `<memories>\n- ${BULLET_A}\n\n- ${BULLET_B}\n\n- ${BULLET_C}\n\n- ${BULLET_D}\n\n- ${BULLET_E}\n</memories>`,
+];
+
+async function cap3Switch(dir) {
+  const { writeFileSync } = await import("node:fs");
+  const p = join(dir, "cap3-on");
+  writeFileSync(p, "on");
+  return p;
+}
+
+test("cap3 on + 5 memories drops 4th+, top-3 byte-exact", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.95), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), cap3SwitchPath: await cap3Switch(dir) });
+  const { event } = eventFor("q", SYS_RECALL_5);
+  const out = await handler(event, { cwd: "/Users/josh/Developer/uds" });
+  assert.ok(out && typeof out.systemPrompt !== "undefined");
+  const text = systemPromptText(out.systemPrompt);
+  for (const b of [BULLET_A, BULLET_B, BULLET_C]) assert.ok(text.includes(b), "top-3 kept");
+  for (const b of [BULLET_D, BULLET_E]) assert.ok(!text.includes(b), "4th+ dropped");
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.equal(rows.filter((r) => r.status === "cap3-pruned").length, 2);
+});
+
+test("cap3 switch absent falls through to scoring", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.95), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), cap3SwitchPath: join(dir, "no-such-switch") });
+  const { event, ctx } = eventFor("q", SYS_RECALL_5);
+  const out = await handler(event, ctx);
+  assert.equal(out, undefined);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.ok(rows.length === 5 && rows.every((r) => r.decision === "keep"));
+  assert.ok(!rows.some((r) => r.status === "cap3-pruned"));
+});
+
+test("cap3 on + 2 memories leaves prompt unchanged", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.95), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), cap3SwitchPath: await cap3Switch(dir) });
+  const { event, ctx } = eventFor("q", SYS_RECALL);
+  const out = await handler(event, ctx);
+  assert.equal(out, undefined);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.ok(!rows.some((r) => String(r.status).startsWith("cap3")));
+});

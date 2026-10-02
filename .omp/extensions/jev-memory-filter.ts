@@ -20,6 +20,8 @@ import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts"
 export const MODEL = "jev-1.13.0";
 export const CUT = 0.5;
 export const MAX_ITEMS_PER_TURN = 20;
+/** Cap-3 shipment (jev-8c09, pooled n=60 non-inferior): keep top-3 by system rank. */
+export const CAP3_KEEP = 3;
 export const MAX_DAILY_CALLS = 600;
 export const CALL_TIMEOUT_MS = 15000;
 export const TURN_BUDGET_MS = 45000;
@@ -208,10 +210,11 @@ export function pruneSystemPrompt(sys: unknown, dropped: MemoryItem[]): unknown 
 const INSTRUCTIONS = "Memory: `memory`. Current request: `prompt`. Is this memory relevant to the current request?";
 
 
-export type FilterDeps = { ask?: Ask; cap?: number; path?: string; sidecarPath?: string; now?: () => string; switchPath?: string };
+export type FilterDeps = { ask?: Ask; cap?: number; path?: string; sidecarPath?: string; now?: () => string; switchPath?: string; cap3SwitchPath?: string };
 
 export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
   const switchPath = deps.switchPath ?? process.env.JEV_MEMORY_FILTER_ENFORCE_PATH ?? join(homedir(), ".local", "state", "jev", "memory-filter-enforce");
+  const cap3SwitchPath = deps.cap3SwitchPath ?? process.env.JEV_MEMORY_CAP3_PATH ?? join(homedir(), ".local", "state", "jev", "memory-cap3");
   const ask = deps.ask ?? askJev;
   const cap = deps.cap ?? MAX_DAILY_CALLS;
   const path = deps.path ?? process.env.JEV_MEMORY_FILTER_LOG_PATH ?? join(homedir(), ".local", "state", "jev", "memory-filter.jsonl");
@@ -269,7 +272,23 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
           return true;
         })
         .slice(0, MAX_ITEMS_PER_TURN);
+      // Cap-3 shipment (jev-8c09): mechanical top-3 rank cut, switch-gated,
+      // default OFF. When the switch file exists and >3 memories parsed,
+      // drop the 4th+ spans and return the pruned prompt, skipping Jev
+      // scoring. Switch absent (or <=3 items): fall through untouched.
       const promptHash = createHash("sha256").update(prompt).digest("hex");
+      if (items.length > CAP3_KEEP && (await enforceEnabled(cap3SwitchPath))) {
+        const dropped = items.slice(CAP3_KEEP);
+        if (inEnforceScope(fireRepo)) {
+          for (const item of dropped) {
+            const memoryHash = createHash("sha256").update(item.text).digest("hex");
+            await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "cap3-pruned", promptHash, memoryHash, noul: null, decision: "prune", tokensSaved: Math.floor(item.text.length / 4), latencyMs: null, inputTokens: null });
+            await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "cap3-pruned", promptHash, memoryHash, prompt, memory: item.text, noul: null, decision: "prune" });
+          }
+          return { systemPrompt: pruneSystemPrompt(sys, dropped) };
+        }
+        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "cap3-shadowed", promptHash, memoryHash: null, noul: null, decision: "would-prune", removed: dropped.length, kept: CAP3_KEEP, tokensSaved: 0, latencyMs: null, inputTokens: null });
+      }
       // Phase 1 (synchronous, item order): memo hits and cap reservation.
       // Cap counting is identical to the serial incumbent: first-come wins.
       const slots: Array<{ item: MemoryItem; memoryHash: string; memoKey: string }> = [];
