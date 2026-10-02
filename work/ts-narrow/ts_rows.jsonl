@@ -1,0 +1,558 @@
+[
+ {
+  "hash": "06da62dd664a",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-set-map"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.02,
+   "inapplicable": 0.98
+  },
+  "confidence": 0.95,
+  "status": "ok",
+  "input_tokens": 595,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "079a70a80159",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.93,
+   "applicable": 0.07
+  },
+  "confidence": 0.87,
+  "status": "ok",
+  "input_tokens": 619,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "110a233d88de",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-any"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.76,
+   "applicable": 0.24
+  },
+  "confidence": 0.52,
+  "status": "ok",
+  "input_tokens": 682,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "1d6af48940cf",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-set-map"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.69,
+   "applicable": 0.31
+  },
+  "confidence": 0.38,
+  "status": "ok",
+  "input_tokens": 757,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "206cfb02b9cf",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions"
+  ],
+  "answer": "applicable",
+  "probabilities": {
+   "inapplicable": 0.47,
+   "applicable": 0.53
+  },
+  "confidence": 0.05,
+  "status": "ok",
+  "input_tokens": 613,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "22ecc21132e9",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.97,
+   "applicable": 0.03
+  },
+  "confidence": 0.93,
+  "status": "ok",
+  "input_tokens": 627,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "24276e8ce0c8",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-redundant-clear-guard"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.73,
+   "applicable": 0.27
+  },
+  "confidence": 0.46,
+  "status": "ok",
+  "input_tokens": 719,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "24806f29a1bf",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.78,
+   "applicable": 0.22
+  },
+  "confidence": 0.55,
+  "status": "ok",
+  "input_tokens": 855,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "2eb8ca22f097",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-import-type"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.87,
+   "applicable": 0.13
+  },
+  "confidence": 0.73,
+  "status": "ok",
+  "input_tokens": 648,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "31c5a83da362",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-any"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.92,
+   "applicable": 0.08
+  },
+  "confidence": 0.83,
+  "status": "ok",
+  "input_tokens": 826,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "35c0a2ec9730",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-import-type",
+   "ts-no-any",
+   "ts-no-dynamic-import"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.09,
+   "inapplicable": 0.91
+  },
+  "confidence": 0.81,
+  "status": "ok",
+  "input_tokens": 555,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "41a56e3e6434",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.84,
+   "applicable": 0.16
+  },
+  "confidence": 0.68,
+  "status": "ok",
+  "input_tokens": 690,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "4c2515b8263a",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-import-type",
+   "ts-no-dynamic-import"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.15,
+   "inapplicable": 0.85
+  },
+  "confidence": 0.7,
+  "status": "ok",
+  "input_tokens": 701,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "67586b976d1e",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.35,
+   "inapplicable": 0.65
+  },
+  "confidence": 0.3,
+  "status": "ok",
+  "input_tokens": 871,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "6958db13d260",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.02,
+   "inapplicable": 0.98
+  },
+  "confidence": 0.96,
+  "status": "ok",
+  "input_tokens": 621,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "6cdee24a9bd9",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-import-type",
+   "ts-no-dynamic-import"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.81,
+   "applicable": 0.19
+  },
+  "confidence": 0.62,
+  "status": "ok",
+  "input_tokens": 663,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "8d44c4dbd0a7",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-set-map",
+   "ts-no-tiny-functions"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.11,
+   "inapplicable": 0.89
+  },
+  "confidence": 0.78,
+  "status": "ok",
+  "input_tokens": 614,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "9388d0ee079e",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions",
+   "ts-set-map"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.01,
+   "inapplicable": 0.99
+  },
+  "confidence": 0.97,
+  "status": "ok",
+  "input_tokens": 592,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "9c54d70e7cb8",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "A",
+  "rules": [
+   "ts-no-any",
+   "ts-no-tiny-functions"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.03,
+   "inapplicable": 0.97
+  },
+  "confidence": 0.95,
+  "status": "ok",
+  "input_tokens": 657,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "a293102a5d56",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions",
+   "ts-no-return-type"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.97,
+   "applicable": 0.03
+  },
+  "confidence": 0.94,
+  "status": "ok",
+  "input_tokens": 619,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "ba290e4b0722",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-set-map"
+  ],
+  "answer": "applicable",
+  "probabilities": {
+   "applicable": 0.58,
+   "inapplicable": 0.42
+  },
+  "confidence": 0.16,
+  "status": "ok",
+  "input_tokens": 629,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "ba6027dbd5e4",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.54,
+   "applicable": 0.46
+  },
+  "confidence": 0.09,
+  "status": "ok",
+  "input_tokens": 1062,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "be3f9d73894b",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "A",
+  "rules": [
+   "ts-no-return-type"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.26,
+   "inapplicable": 0.74
+  },
+  "confidence": 0.49,
+  "status": "ok",
+  "input_tokens": 723,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "be8cbbdb3fc5",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-any"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.19,
+   "inapplicable": 0.81
+  },
+  "confidence": 0.62,
+  "status": "ok",
+  "input_tokens": 703,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "c990c2a6cafe",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-import-type",
+   "ts-no-dynamic-import"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.7,
+   "applicable": 0.3
+  },
+  "confidence": 0.41,
+  "status": "ok",
+  "input_tokens": 533,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "ccff42dca2e5",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-import-type",
+   "ts-no-dynamic-import"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.92,
+   "applicable": 0.08
+  },
+  "confidence": 0.85,
+  "status": "ok",
+  "input_tokens": 614,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "e0dfe0222148",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions",
+   "ts-set-map",
+   "ttsr-embedded-inline-flag"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.93,
+   "applicable": 0.07
+  },
+  "confidence": 0.87,
+  "status": "ok",
+  "input_tokens": 631,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "e5604b5a2a2a",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-import-type",
+   "ts-no-dynamic-import",
+   "ts-no-any"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.25,
+   "inapplicable": 0.75
+  },
+  "confidence": 0.51,
+  "status": "ok",
+  "input_tokens": 748,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "f03c77ce6eff",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-import-type",
+   "ts-no-dynamic-import"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "inapplicable": 0.61,
+   "applicable": 0.39
+  },
+  "confidence": 0.22,
+  "status": "ok",
+  "input_tokens": 661,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ },
+ {
+  "hash": "fe98d5ecf400",
+  "split": "held",
+  "seed": "ts-fresh-23sess",
+  "label": "I",
+  "rules": [
+   "ts-no-tiny-functions",
+   "ts-set-map"
+  ],
+  "answer": "inapplicable",
+  "probabilities": {
+   "applicable": 0.17,
+   "inapplicable": 0.83
+  },
+  "confidence": 0.67,
+  "status": "ok",
+  "input_tokens": 638,
+  "scorer": "var/agent-tmp/ts-narrow.001/live_v2.py (jev-1.13.0 Choice, fail-safe keep)"
+ }
+]
