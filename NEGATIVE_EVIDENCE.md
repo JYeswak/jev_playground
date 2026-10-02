@@ -4887,3 +4887,17 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** a local screen scoring >= 95% agreement with zero critical drops on this same 250-pair population, keylessly, before any filter change. Reopen cites this row.
 
 **Evidence:** var/agent-tmp/syje.51150/yl60-pop.py + yl60-replay.mjs + yl60-pairs.json + yl60-nimble.jsonl (scratch, uncommitted); bead jev-yl60 bar + results comments; verifier recount in close comment.
+
+## R139 — MODEL-LIMIT: two-question conjunction (useful AND current) lifts memory-filter keep precision (2026-10-02)
+
+**Hypothesis:** the R137 retry-condition structure — keep iff two independent Nouls (useful-for-this-request AND current/usable) both pass — lifts keep precision where single-sentence rewordings failed (bead jev-28gx).
+
+**Minimal repro / experiment:** bar + 40-item held-out labels + 2 planted cases frozen pre-run (294543b9). Dev: the 9tkx 170-pair slice rebuilt (44 keeps incl 9 relevant + 126 drops), live jev-1.13.0, 2 calls/pair (340 calls, 224,784 in-tok ~$0.00944, inside $0.02 cap), CUT 0.5 each, keep iff both pass.
+
+**Result (measured, inline):** kept 16/170, relevant-kept 1 -> keep precision 0.062 vs 0.42 bar FAIL (base single-question was 0.190: the conjunction is stricter AND worse). Drop precision 146/154 = 0.948 vs 0.90 bar PASS. Critical dropped 8/9. Marginals: Q1 passes 38 (relevant 6/9), Q2 passes 16 (relevant 1/9) — the current/usable wording rejects nearly everything including relevant memories. Planted: useful-old DROPPED (0.26/0.12) FAIL, echo dropped PASS. Held-out not run: dev decisive, spend saved.
+
+**Verdict:** MODEL-LIMIT for conjunction structure on this task (R137 lineage). No wiring; no held-out.
+
+**Retry-condition:** a structure with a different keep logic (e.g. disjunction with a precision guard, or few-shot exemplars), beating 0.42 keep / 0.90 drop on this same frozen dev slice keylessly first. Reopen cites this row.
+
+**Evidence:** work/jev-28gx/BAR.md + heldout-labels.json + planted.json (frozen 294543b9); var/agent-tmp/syje.51150/dev28.mjs + dev28-rows.jsonl + plant28.mjs (scratch); bead jev-28gx bar + results comments.

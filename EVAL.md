@@ -3443,3 +3443,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Results:** base keep 8/42=0.190 drops 120/126=0.952; usability 7/37=0.189 drops 117/126; antiecho 8/35=0.229 drops 119/126; staleness 8/33=0.242 drops 121/126. Bar needed keep >= 0.390 with drops >= 0.90: best arm +0.05. ALL FAIL, no held-out run.
 - **Verdict:** MODEL-LIMIT for single-sentence rewordings (NEGATIVE_EVIDENCE R137). ubs on replay.mjs: 1 critical + 8 warnings all verified false positives (console.logs emit counts only; JSON.parse targets committed files; status is a declared let). No shadow change.
 - **Boundary:** wb7j labels made under a stricter rubric than filter relevance; single-call (not 3x) per EXPLORED stability; results.json carries hashes/decisions only.
+
+## 2026-10-02 jev-28gx two-question conjunction: keep 0.062 FAIL, R139 (CyanPeak) [live]
+
+- **Dev (170 pairs, live jev-1.13.0, 340 calls, 224,784 in-tok ~$0.00944 within $0.02 cap, frozen Q1+Q2 CUT 0.5):** kept 16, relevant-kept 1 -> keep precision 0.062 vs 0.42 FAIL (worse than base 0.190); drops 146/154 = 0.948 vs 0.90 PASS; critical dropped 8/9. Q1 passes 38 (relevant 6/9), Q2 passes 16 (relevant 1/9): the current/usable wording rejects nearly everything.
+- **Planted:** useful-old DROPPED (0.26/0.12) FAIL, echo dropped PASS (4 calls, 1,340 tok). Held-out not run: dev decisive, spend saved. Total ~$0.0095.
+- **Verdict:** MODEL-LIMIT (R139, R137 lineage). No wiring. Scratch: var/agent-tmp/syje.51150/dev28* + plant28.mjs. Left in_progress for verifier.
