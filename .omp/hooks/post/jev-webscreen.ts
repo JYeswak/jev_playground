@@ -202,6 +202,12 @@ function resultText(content: unknown): string | undefined {
 
 type WebscreenDeps = { ask?: Ask; cap?: number; now?: () => string; enforce?: boolean };
 
+// Revocation (jev-0mof): the switch is read when the answer is APPLIED,
+// never before the ask, so retiring mid-flight discards the late answer.
+function isShadow(deps: WebscreenDeps): boolean {
+  return deps.enforce === false ? true : deps.enforce === true ? false : process.env.JEV_WEBSCREEN_ENFORCE === "0";
+}
+
 function unaskedDecision(raw: string, status: "local-only" | "fail_open", reason: string): ScreenDecision {
   const { units } = parseResult(raw);
   const local = units.map((unit, index) => localScreen(unit.text) ? index : -1).filter((index) => index >= 0);
@@ -232,7 +238,7 @@ export function makeWebscreenHandler(deps: WebscreenDeps = {}) {
       // Enforce by default (jev-eo40 QUALIFIED: Jev-alone FPR 0/350); shadow
       // only on explicit opt-out. Withholding happens only on Jev scores
       // (flagged is Jev-only); local-pattern hits are logged, never withheld.
-      const shadow = deps.enforce === false ? true : deps.enforce === true ? false : process.env.JEV_WEBSCREEN_ENFORCE === "0";
+      // The shadow read happens at apply time below, never here.
       let decision: ScreenDecision & { replacement?: string };
       if (parseResult(raw).units.length === 0) {
         decision = unaskedDecision(raw, "local-only", "no-screenable-units");
@@ -246,7 +252,7 @@ export function makeWebscreenHandler(deps: WebscreenDeps = {}) {
         if (decision.status === "fail_open" && decision.error && /\bHTTP (?:401|402|403)\b/.test(decision.error)) paused = true;
       }
       await recordShadow(tool, raw, decision);
-      if (shadow) {
+      if (isShadow(deps)) {
         return undefined;
       }
       const proofPath = process.env.JEV_WEBSCREEN_PROOF_PATH;

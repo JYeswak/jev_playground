@@ -136,7 +136,10 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
   // Enforce by default (jev-rud1 WITHHOLD: shadow-question clean 0/222, catch 268/300);
   // shadow log-only on explicit opt-out. Withholding happens ONLY on a Jev
   // score at or above CUT. Fail-open throughout: anything unscored passes.
-  const shadow = deps.enforce === false ? true : deps.enforce === true ? false : process.env.JEV_INJECTION_SHADOW_ENFORCE === "0";
+  // Revocation (jev-0mof): read at APPLY time, never cached across the ask,
+  // so retiring mid-flight discards the late answer.
+  const isShadow = (): boolean =>
+    deps.enforce === false ? true : deps.enforce === true ? false : process.env.JEV_INJECTION_SHADOW_ENFORCE === "0";
   return async (event: Event): Promise<unknown> => {
     try {
       resetDay(state, now().slice(0, 10));
@@ -150,7 +153,7 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
         return undefined;
       }
       const outcome = await scoreAndRecord({ ask, write, state, cap, common, raw });
-      if (!shadow && outcome !== null && outcome.flag) {
+      if (!isShadow() && outcome !== null && outcome.flag) {
         return { content: [{ type: "text", text: NOTICE }], details: { screening: "withheld", score: outcome.score, cut: CUT, model: MODEL } };
       }
     } catch {

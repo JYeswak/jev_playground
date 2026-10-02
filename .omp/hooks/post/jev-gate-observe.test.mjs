@@ -684,3 +684,17 @@ test("WIRE liveAsker honors injected fetchImpl with fixture key", async () => {
     else process.env.TYPESAFE_API_KEY = previous;
   }
 });
+
+test("WIRE cascade-off mid-paid-call labels off, never an enforced route", async () => {
+  reset();
+  let off = false;
+  const asker = async () => {
+    off = true;
+    await new Promise((r) => setTimeout(r, 5));
+    return scoredAsker();
+  };
+  await observe({ toolName: "bash", input: { command: "ls" } },
+    { ...cascadeMem, asker, localAsker: nimbleFlag, fsExists: () => off, cascadeOffFile: "revocation-probe", dailyBudget: { day: "", calls: 0 } });
+  assert.equal(wrote[0].row.screen, "paid-cascade-off");
+  assert.equal(wrote[0].row.flag, true);
+});

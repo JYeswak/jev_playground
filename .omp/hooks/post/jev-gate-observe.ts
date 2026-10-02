@@ -605,8 +605,16 @@ export async function observe(
     // (their paid verdict still stands in probs/flag) — reachable only with
     // cascade disabled, which no production profile does.
     let screenLabel: string | null = null;
+    // Revocation (jev-0mof): re-read at apply time; a switch flipped during
+    // the paid call labels the row as off, never as an enforced route.
+    let offNow = cascadeOff;
+    try {
+      offNow = (deps.fsExists ?? existsSync)(deps.cascadeOffFile ?? join(homedir(), ".local", CASCADE_OFF_REL));
+    } catch {
+      offNow = cascadeOff;
+    }
     if (typeof prerule === "string" && prerule.length > 0) screenLabel = "prerule-paid";
-    else if (cascadeOff) screenLabel = "paid-cascade-off";
+    else if (offNow) screenLabel = "paid-cascade-off";
     else if (fallbackCause) screenLabel = "paid-fallback-" + fallbackCause;
     else if (nimbleProbs) screenLabel = "nimble-flagged-paid";
     else screenLabel = "unscreened";
