@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, statSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -281,15 +281,16 @@ test("enforce ON in-scope removes dropped bullets and keeps kept ones", async ()
   assert.ok(rows.some((r) => r.status === "enforced" && r.removed === 1 && r.kept === 1));
 });
 
-test("inEnforceScope bounds the jev tree exactly", () => {
+test("inEnforceScope covers every known repo, fails safe on unknown", () => {
   assert.equal(inEnforceScope("/Users/josh/Developer/jev"), true);
   assert.equal(inEnforceScope("/Users/josh/Developer/jev/work/x"), true);
-  assert.equal(inEnforceScope("/Users/josh/Developer/jev-evil"), false);
-  assert.equal(inEnforceScope("/Users/josh/Developer/uds"), false);
+  assert.equal(inEnforceScope("/Users/josh/Developer/uds"), true);
+  assert.equal(inEnforceScope("/Users/josh/Developer/jev-evil"), true);
   assert.equal(inEnforceScope(null), false);
+  assert.equal(inEnforceScope(""), false);
 });
 
-test("enforce ON out-of-scope shadows: prompt unchanged, drop logged", async () => {
+test("enforce ON unknown repo shadows: prompt unchanged, drop logged", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
   const switchPath = join(dir, "enforce");
   const { writeFileSync } = await import("node:fs");
@@ -298,7 +299,7 @@ test("enforce ON out-of-scope shadows: prompt unchanged, drop logged", async () 
   const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath });
   const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>"];
   const snapshot = JSON.stringify(sys);
-  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, { cwd: "/Users/josh/Developer/uds" });
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, undefined);
   assert.equal(out, undefined);
   assert.equal(JSON.stringify(sys), snapshot);
   const rows = rowsOf(join(dir, "log.jsonl"));
@@ -306,6 +307,22 @@ test("enforce ON out-of-scope shadows: prompt unchanged, drop logged", async () 
   assert.ok(!rows.some((r) => r.status === "enforced"));
   const side = rowsOf(join(dir, "full.jsonl"));
   assert.ok(side.some((r) => r.memory.includes("dropme")));
+});
+
+test("enforce ON uds removes dropped bullets and keeps kept ones", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const switchPath = join(dir, "enforce");
+  const { writeFileSync } = await import("node:fs");
+  writeFileSync(switchPath, "on");
+  const ask = async ({ state }) => ({ ok: true, scores: { rel: state.memory.includes("dropme") ? 0.1 : 0.9 }, latencyMs: 1, model: "m" });
+  const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath });
+  const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>"];
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, { cwd: "/Users/josh/Developer/uds" });
+  assert.ok(out && typeof out === "object" && "systemPrompt" in out);
+  assert.ok(!JSON.stringify(out.systemPrompt).includes("dropme"));
+  assert.ok(JSON.stringify(out.systemPrompt).includes("keepme bullet"));
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.ok(rows.some((r) => r.status === "enforced" && r.removed === 1 && r.kept === 1));
 });
 
 test("error path returns undefined: original prompt byte-identical", async () => {
@@ -472,4 +489,23 @@ test("WIRE out-of-range noul keeps fail-safe as invalid-keep", async () => {
   const rows = rowsOf(join(dir, "log.jsonl"));
   assert.ok(rows.length > 0);
   assert.ok(rows.every((r) => r.decision === "keep" && r.status === "invalid-keep"));
+});
+
+test("WIRE switch removed mid-scoring discards the late prune", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const switchPath = join(dir, "enforce");
+  const { writeFileSync } = await import("node:fs");
+  writeFileSync(switchPath, "on");
+  const ask = async () => {
+    rmSync(switchPath);
+    await new Promise((r) => setTimeout(r, 5));
+    return { ok: true, scores: { rel: 0.1 }, latencyMs: 1, model: "m" };
+  };
+  const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath });
+  const { event, ctx } = eventFor("q", SYS_RECALL);
+  const out = await handler(event, ctx);
+  assert.equal(out, undefined);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.ok(rows.length > 0);
+  assert.ok(!rows.some((r) => r.status === "enforced"));
 });

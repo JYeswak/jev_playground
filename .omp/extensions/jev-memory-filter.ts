@@ -133,12 +133,12 @@ export function parseSystemMemories(sys: unknown): MemoryItem[] {
   return items;
 }
 
-/** Removal scope (jev-9cqw): drop precision is verified on jev-repo memories
- * only, so removal applies inside the jev tree; everywhere else decided drops
- * are logged (shadow) until the non-jev blind label passes, then widen. */
+/** Removal scope (jev-9cqw AFTER: non-jev drop bar 30/30 PASS 2026-10-02):
+ * removal applies in every repo with a known session cwd; null provenance
+ * (unknown cwd) stays shadow fail-safe. Same global switch file. */
 export const ENFORCE_ROOT = "/Users/josh/Developer/jev";
 export function inEnforceScope(repo: string | null): boolean {
-  return repo === ENFORCE_ROOT || (repo !== null && repo.startsWith(ENFORCE_ROOT + "/"));
+  return repo !== null && repo.length > 0;
 }
 
 export async function enforceEnabled(switchPath: string): Promise<boolean> {
