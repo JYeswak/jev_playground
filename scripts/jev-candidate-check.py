@@ -12,6 +12,9 @@ Keyless; no network; no key.
 from __future__ import annotations
 import json
 import math
+import os
+import re
+import subprocess
 import sys
 
 MIN_HEADROOM_DEFAULT = 0.05
@@ -161,6 +164,48 @@ def check(candidate):
         note("G1-duplicates", False, "duplicate row hashes")
     else:
         note("G1-duplicates", True, "%d unique hashes" % len(hashes))
+    # G1-prior-overlap (jev-wjig): a replication must name the committed hash sets of every
+    # earlier sample and share no row with them. 2026-10-02 a "fresh" longres replication
+    # reused 67/67 files of the sample it claimed to replicate.
+    priors = candidate.get("prior_samples") or []
+    if candidate.get("replication") and not priors:
+        ok = False
+        note("G1-prior-overlap", False, "replication names no prior_samples hash files")
+    elif priors:
+        seen, missing = set(), []
+        for path in priors:
+            committed = (
+                subprocess.run(
+                    ["git", "ls-files", "--error-unmatch", path],
+                    capture_output=True,
+                    env=dict(os.environ, GIT_OPTIONAL_LOCKS="0"),
+                ).returncode
+                == 0
+            )
+            try:
+                text = open(path, encoding="utf-8").read()
+            except OSError:
+                committed = False
+            if not committed:
+                missing.append(path)
+                continue
+            for found in re.findall(r'"hash"\s*:\s*"([^"]+)"', text):
+                seen.add(found)
+        shared = sorted(set(hashes) & seen)
+        if missing or shared:
+            ok = False
+            note(
+                "G1-prior-overlap",
+                False,
+                "uncommitted prior %s; %d rows shared with prior samples %s"
+                % (missing, len(shared), shared[:3]),
+            )
+        else:
+            note(
+                "G1-prior-overlap",
+                True,
+                "0 of %d rows in %d prior samples" % (len(hashes), len(priors)),
+            )
     if dev_groups and held_groups and dev_groups & held_groups:
         ok = False
         note(
