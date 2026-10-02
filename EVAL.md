@@ -3645,3 +3645,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Non-author recompute (441d5799 + live logs):** unit tests 10 OK rerun; daemon pid 67688 alive, ops rows landing, heartbeats 19:33:54–19:36:54Z every minute. Creator rows 21 total, 3 with holders — all 02:44–02:48Z (pre-fix era).
 - **First real attribution:** 02:44:39Z row names pid 9356 + argv (`git status --porcelain`) + parent (ntm internal-monitor) with pane null — CORRECT null (daemon-spawned holder has no pane). Other two holder rows are pid-only (exited pre-ps, the known limitation). pane_for_pid_tree is implemented (tmux ancestry) but never yet exercised: no pane-shell-descended stale lock has been captured. Full pid+command+parent+PANE quad: unobserved, not refuted.
 - **Verdict:** 2/3 green (rows land, heartbeat per-minute); third INSUFFICIENT-EVENTS. No code change (verify only); receipt is this row.
+
+## 2026-10-02 cap3-verify: tests+switch+live rows green, prompt proof blocked on cap (WindyLantern) [live]
+
+- **Non-author verify (c0a99353 in .omp/extensions/jev-memory-filter.ts):** tests 41/41 rerun green; switch file present (0 bytes, created 19:38Z = bar time); live cap3-pruned rows firing on a real session (19:41:57Z instance, 10+ prunes same promptHash).
+- **Fresh session (omp-test 01a0fe29):** filter instance hit daily-cap — no prune observable, so 4th+-absent/top-3-byte-exact NOT proven by me (needs a prune event; retry post-reset).
+- **24h tokens/turn:** division checks (165912/179 = 927.0); my independent session-file cuts do NOT reproduce the population (memory-files: 33 files, 11964 turns, 306/turn) — the 179-turn method needs HazySpring's committed query to re-verify. Cited, not confirmed.
+- **Verdict:** mechanics verified; two gaps named (prompt proof, token method). Bead stays (N30 running). No code change; receipt is this row.
