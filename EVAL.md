@@ -3652,3 +3652,8 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Fresh session (omp-test 01a0fe29):** filter instance hit daily-cap — no prune observable, so 4th+-absent/top-3-byte-exact NOT proven by me (needs a prune event; retry post-reset).
 - **24h tokens/turn:** division checks (165912/179 = 927.0); my independent session-file cuts do NOT reproduce the population (memory-files: 33 files, 11964 turns, 306/turn) — the 179-turn method needs HazySpring's committed query to re-verify. Cited, not confirmed.
 - **Verdict:** mechanics verified; two gaps named (prompt proof, token method). Bead stays (N30 running). No code change; receipt is this row.
+
+## 2026-10-02 pkn5-verify CLOSE: FAIL holds on every recompute (WindyLantern) [keyless]
+
+- **Non-author recompute from ad318c30 rows+scorer:** held scorer rerun -> tp=5 fp=19 fn=53 tn=223, prec 0.2083 rec 0.0862 acc 0.7600 (bar 0.85/0.40; abstain 0.807) — exact. Dev cut refit -> F1 0.4848 at 0.43 (prec 0.667 rec 0.381) — exact. Labels: 747 rows, dev 120 (21 pos) / held 300 (58 pos) via removed_later; repo-grouped split with zero repo overlap.
+- **Verdict:** FAIL stands (below abstain, recall flat vs regex 0.069, dev-to-held collapse). Closing with this evidence. No code change; receipt is this row.
