@@ -7,9 +7,9 @@ import { createHash } from "node:crypto";
 
 const BASE = new URL(".", import.meta.url).pathname;
 const join2 = (a, ...p) => p.reduce((x, y) => x.replace(/\/$/, "") + "/" + y.replace(/^\//, ""), a);
-const corpus = JSON.parse(readFileSync(join2(BASE, "corpus.json"), "utf8"));
+const corpus = JSON.parse(readFileSync(join2(BASE, process.env.LONGRES_CORPUS ?? "corpus.json"), "utf8"));
 const rows = [...corpus.dev, ...corpus.held];
-const OUT = join2(BASE, "choice-rows.jsonl");
+const OUT = join2(BASE, process.env.LONGRES_OUT ?? "choice-rows.jsonl");
 
 const INSTR = "This tool result just arrived. How should it be kept for the rest of the session?";
 const CLASSES = {

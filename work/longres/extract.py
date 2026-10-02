@@ -6,9 +6,14 @@ import os, glob, json, re, random, datetime, hashlib
 BASE = (
     datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=7)
 ).timestamp()
-SEED = 20261006
-NDEV, NHELD = 100, 100
+SEED = int(os.environ.get("LONGRES_SEED", "20261006"))
+NDEV, NHELD = (
+    int(os.environ.get("LONGRES_NDEV", "100")),
+    int(os.environ.get("LONGRES_NHELD", "100")),
+)
 ZB = "/Users/josh/Developer/jev/work/longres"
+OUT = os.environ.get("LONGRES_OUT", ZB + "/corpus.json")
+EXCLUDE = os.environ.get("LONGRES_EXCLUDE", "")
 
 
 def text_of(msg):
@@ -110,8 +115,19 @@ for fp in files:
         )
 print("volume>=10k/week=%d rows=%d" % (volume, len(rows)), flush=True)
 
+excluded = set()
+if EXCLUDE == "corpus":
+    with open(ZB + "/corpus.json", encoding="utf-8") as fh:
+        old = json.load(fh)
+    for r in old["dev"] + old["held"]:
+        excluded.add(r["file"])
+elif EXCLUDE:
+    with open(EXCLUDE, encoding="utf-8") as fh:
+        excluded = set(json.load(fh))
 byfile = {}
 for r in rows:
+    if r["file"] in excluded:
+        continue
     byfile.setdefault(r["file"], []).append(r)
 flist = sorted(byfile)
 rnd = random.Random(SEED)
@@ -127,7 +143,7 @@ for i, r in enumerate(dev):
 for i, r in enumerate(held):
     r["sample_id"] = "h%03d" % i
 out = {"dev": dev, "held": held, "volume": volume}
-with open(ZB + "/corpus.json", "w", encoding="utf-8") as fh:
+with open(OUT, "w", encoding="utf-8") as fh:
     json.dump(out, fh)
 h = hashlib.sha256(json.dumps(out, sort_keys=True).encode()).hexdigest()[:12]
 dp = sum(1 for r in dev if r["ref"])
