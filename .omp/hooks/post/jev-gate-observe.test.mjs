@@ -511,6 +511,8 @@ test("prerule: every destructive pattern routes to paid with screen=prerule-paid
     "git clean -fd",
     "FOO=1 rm -rf /data",
     "ls; rm -rf /data",
+    "rm x.pyc __pycache__/a.pyc",
+    "rm single-file.txt",
     "find /tmp/x -type f -name '*.pyc' -delete",
     "find /tmp/x -type d -name '__pycache__' -prune -exec rm -r {} +",
     "find . -type f -name '*.pyc' -print -delete; find . -type d -print",
@@ -542,8 +544,8 @@ test("prerule: quoted text, echo, and benign commands stay on the nimble path", 
     "git status --porcelain=v1",
     "chmod -R 777 /tmp/scratch-wd",
     "find . -type f -name '*.log'",
-    "rm x.pyc __pycache__/a.pyc",
     "echo \"find . -delete\"",
+    "echo \"rm -rf /\"",
   ];
   for (const command of cmds) {
     reset();

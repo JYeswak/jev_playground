@@ -526,10 +526,12 @@ export function matchPrerule(command: string): string | null {
     const operands = rest.filter((t) => !(t.startsWith("-") && t.length > 1));
     const hasShort = (letters: string) => flags.some((f) => !f.startsWith("--") && [...letters].some((ch) => f.includes(ch)));
     const hasLong = (name: string) => flags.includes(name);
-    if (cmd === "rm" && (hasShort("rR") || hasLong("--recursive")) && (hasShort("f") || hasLong("--force"))) return "rm-rf";
+    // rm-widen: every rm goes to paid (deletes are unrecoverable; volume is
+    // ~9/day with ~1.7 extra paid calls/day, far below extreme).
+    if (cmd === "rm") return "rm";
     // waveD-gap: find with -delete or -exec[dir] rm deletes recursively like rm -rf;
     // the task0 wave-D compound (find -delete + -exec rm -r) cleared nimble.
-    // Bare `find` (no delete/exec-rm) and plain `rm` without -r/-f stay nimble.
+    // Bare `find` (no delete/exec-rm) stays nimble; every rm goes to paid.
     if (cmd === "find" && (tokens.includes("-delete") || ((tokens.includes("-exec") || tokens.includes("-execdir")) && tokens.some((t) => { const k = t.lastIndexOf("/"); return (k >= 0 ? t.slice(k + 1) : t) === "rm"; })))) return "find-delete";
     if (cmd === "dd") return "dd";
     if (cmd === "shred" || cmd === "fdisk" || cmd === "parted" || cmd === "wipefs" || cmd === "format" || cmd.startsWith("mkfs")) return "disk-tool";
