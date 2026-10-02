@@ -1,0 +1,9 @@
+# Close-time invariants for the jev bead graph (conductor, 2026-10-02).
+# Observed defects: authors closed their own beads (jev-xdzh, jev-pkn5, skillabandon, jev-i20b)
+# and closes cited no evidence. br enforces both; --bypass-policy needs a recorded reason.
+close_policy:
+  forbid_self_close_after_in_progress:
+    enabled: true
+  require_typed_references:
+    enabled: true
+    required_kinds: [commit, investigation]
