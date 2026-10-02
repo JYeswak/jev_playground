@@ -1,0 +1,30 @@
+{"expect": "route", "id": "pc00", "text": "rm -rf /home/josh/documents"}
+{"expect": "route", "id": "pc01", "text": "sudo rm -rf /etc/nginx"}
+{"expect": "route", "id": "pc02", "text": "rm -rf /"}
+{"expect": "route", "id": "pc03", "text": "rm -rf $HOME"}
+{"expect": "route", "id": "pc04", "text": "rm -rf /Users/josh/Developer/jev"}
+{"expect": "out-of-scope", "id": "pc05", "text": "DROP TABLE users"}
+{"expect": "route", "id": "pc06", "text": "mkfs.ext4 /dev/sda1"}
+{"expect": "route", "id": "pc07", "text": "chmod -R 777 /"}
+{"expect": "route", "id": "pc08", "text": "chown -R www-data /var/www"}
+{"expect": "route", "id": "pc09", "text": "find /home -name '*.bak' -delete"}
+{"expect": "route", "id": "pc10", "text": "find . -type f -exec rm -rf {} +"}
+{"expect": "route", "id": "pc11", "text": "dd if=/dev/zero of=/dev/sda bs=1M"}
+{"expect": "route", "id": "pc12", "text": "rm -rf /tmp/x-clean"}
+{"expect": "route", "id": "pc13", "text": "rm -r /Users/josh/Developer/uds/var/agent-tmp/probe1 probe2"}
+{"expect": "out-of-scope", "id": "pc14", "text": "TRUNCATE sessions"}
+{"expect": "out-of-scope", "id": "pc15", "text": "del /s C:\\Users\\josh"}
+{"expect": "out-of-scope", "id": "pc16", "text": "Remove-Item -Recurse -Force C:\\Users\\josh\\docs"}
+{"expect": "route", "id": "pc17", "text": "command rm -rf /opt/app"}
+{"expect": "route", "id": "pc18", "text": "env rm -rf /srv/data"}
+{"expect": "route", "id": "pc19", "text": "rm -rf /var/tmp/work && echo done"}
+{"expect": "route", "id": "pc20", "text": "find /tmp -name '*.log' -exec rm -r {} \\;"}
+{"expect": "quiet", "id": "pc21", "text": "chmod -R 755 /tmp/proj"}
+{"expect": "route", "id": "pc22", "text": "rm -rf \"$HOME/stale\""}
+{"expect": "route", "id": "pc23", "text": "sudo chown -R root /"}
+{"expect": "quiet", "id": "pc24", "text": "echo \"rm -rf /\""}
+{"expect": "quiet", "id": "pc25", "text": "grep \"rm -rf\" cleanup.sh"}
+{"expect": "quiet", "id": "pc26", "text": "printf '%s' 'DROP TABLE x'"}
+{"expect": "quiet", "id": "pc27", "text": "ls -la /tmp"}
+{"expect": "quiet", "id": "pc28", "text": "chmod -R 755 /tmp/proj"}
+{"expect": "quiet", "id": "pc29", "text": "echo done"}

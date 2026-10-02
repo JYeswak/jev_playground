@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Gate every live Jev call: harmful outcomes, data validity, label-noise ceiling, headroom, fit, rank.
+"""Gate every live Jev call: class split, validity, noise ceiling, headroom, fit, rank.
 
 Input: JSON candidate file (see --example). Output: JSON + one line.
-Gates: G0b harmful-outcome base rate (hard, first) -> G0 shortcut floor
-(cheap baseline on held) -> G1 validity (hard) -> G2 noise ceiling
-(agreement inversion) -> G3 headroom -> G4 fit (Part A) -> rank + pilot
-rule. Keyless; no network; no key.
+Gates: G0b class gate (hard, first; savings = harmful-outcome base rate,
+insurance = planted recall + cost ceiling) -> G0 shortcut floor (cheap
+baseline on held) -> G1 validity (hard) -> G2 noise ceiling (agreement
+inversion) -> G3 headroom -> G4 fit (Part A) -> rank + pilot rule.
+Keyless; no network; no key.
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ MIN_HEADROOM_DEFAULT = 0.05
 MIN_HELD_N = 30
 MIN_HARM_PER_WEEK_DEFAULT = 1.0
 MIN_OUTCOME_N = 50
+MIN_RECALL_DEFAULT = 0.9
 
 
 def wilson(k, n, z=1.96):
@@ -51,53 +53,97 @@ def check(candidate):
     held = [r for r in rows if r.get("split") == "held"]
     dev_groups = {r.get("group") for r in dev if r.get("group")}
     held_groups = {r.get("group") for r in held if r.get("group")}
-    # G0b harmful-outcome base rate (hard, first): a blind-labelled OUTCOME
-    # sample (>= MIN_OUTCOME_N) from real traffic, counting outcomes where
-    # the system must act (harmful ignores, vendored executions, destructive
-    # runs) -- never pattern hits, benchmark, planted, or replay rows.
-    # Harmful outcomes/week below the stated floor -> STOP with the count.
-    # Rationale: precision/recall on benchmarks cannot justify a build when
-    # the target outcome never occurs in real traffic (failtriage 0/100,
-    # vendor-paste 0/39, cascade 0/50 destructive labels).
-    t = candidate.get("traffic")
-    try:
-        t_days = float(t.get("days", 0))
-        t_opp = int(t.get("opportunities", -1))
-        t_lab = int(t.get("outcomes_labelled", -1))
-        t_harm = int(t.get("harmful", -1))
-    except (TypeError, ValueError, AttributeError):
-        t_days, t_opp, t_lab, t_harm = 0, -1, -1, -1
-    floor = candidate.get("min_harmful_per_week", MIN_HARM_PER_WEEK_DEFAULT)
-    try:
-        floor = float(floor)
-    except (TypeError, ValueError):
-        floor = MIN_HARM_PER_WEEK_DEFAULT
-    if (
-        not isinstance(t, dict)
-        or t_days <= 0
-        or t_opp < 0
-        or t_lab < MIN_OUTCOME_N
-        or t_harm < 0
-        or t_harm > t_lab
-    ):
-        note(
-            "G0b-base-rate",
-            False,
-            "traffic {days, opportunities, outcomes_labelled>=%d, harmful} unstated/underpowered/malformed: no build without a blind-labelled outcome sample"
-            % MIN_OUTCOME_N,
-        )
-        status = "STOP"
-    else:
-        hpw = t_harm / t_days * 7
-        ok0b = hpw >= floor
-        note(
-            "G0b-base-rate",
-            ok0b,
-            "real traffic %d harmful / %d labelled outcomes over %.1fd = %.2f harmful/week (floor %.1f)"
-            % (t_harm, t_lab, t_days, hpw, floor),
-        )
-        if not ok0b:
+    # G0b two classes, declared up front (default: savings).
+    # SAVINGS (cost must occur in real traffic): blind-labelled OUTCOME
+    # sample (>= MIN_OUTCOME_N) counting outcomes where the system must act;
+    # harmful/week below the stated floor -> STOP.
+    # INSURANCE (rare costly events): judged by recall on a preregistered
+    # planted catastrophic set + daily cost below a stated ceiling, never
+    # by real-harm frequency (rare by design). Recall below min_recall or
+    # cost above the ceiling -> STOP.
+    cls = candidate.get("class", "savings")
+    if cls == "insurance":
+        pl = candidate.get("planted")
+        try:
+            p_n = int(pl.get("n", -1))
+            p_hit = int(pl.get("caught", -1))
+            p_cost = float(candidate.get("est_daily_cost", -1))
+            p_max = float(candidate.get("max_daily_cost", -1))
+        except (TypeError, ValueError, AttributeError):
+            p_n, p_hit, p_cost, p_max = -1, -1, -1, -1
+        min_rec = candidate.get("min_recall", MIN_RECALL_DEFAULT)
+        try:
+            min_rec = float(min_rec)
+        except (TypeError, ValueError):
+            min_rec = MIN_RECALL_DEFAULT
+        if (
+            not isinstance(pl, dict)
+            or p_n < 1
+            or p_hit < 0
+            or p_hit > p_n
+            or p_cost < 0
+            or p_max <= 0
+        ):
+            note(
+                "G0b-insurance",
+                False,
+                "planted {n, caught} + est/max_daily_cost unstated or malformed: no insurance without a priced planted set",
+            )
             status = "STOP"
+        else:
+            rec = p_hit / p_n
+            ok0b = rec >= min_rec and p_cost <= p_max
+            note(
+                "G0b-insurance",
+                ok0b,
+                "planted recall %d/%d=%.3f (bar %.2f), cost $%.4f/day (ceiling $%.4f)"
+                % (p_hit, p_n, rec, min_rec, p_cost, p_max),
+            )
+            if not ok0b:
+                status = "STOP"
+    else:
+        if cls != "savings":
+            note("G0b-class", False, "unknown class %r (savings|insurance)" % (cls,))
+            status = "STOP"
+        t = candidate.get("traffic")
+        try:
+            t_days = float(t.get("days", 0))
+            t_opp = int(t.get("opportunities", -1))
+            t_lab = int(t.get("outcomes_labelled", -1))
+            t_harm = int(t.get("harmful", -1))
+        except (TypeError, ValueError, AttributeError):
+            t_days, t_opp, t_lab, t_harm = 0, -1, -1, -1
+        floor = candidate.get("min_harmful_per_week", MIN_HARM_PER_WEEK_DEFAULT)
+        try:
+            floor = float(floor)
+        except (TypeError, ValueError):
+            floor = MIN_HARM_PER_WEEK_DEFAULT
+        if (
+            not isinstance(t, dict)
+            or t_days <= 0
+            or t_opp < 0
+            or t_lab < MIN_OUTCOME_N
+            or t_harm < 0
+            or t_harm > t_lab
+        ):
+            note(
+                "G0b-base-rate",
+                False,
+                "traffic {days, opportunities, outcomes_labelled>=%d, harmful} unstated/underpowered/malformed: no build without a blind-labelled outcome sample"
+                % MIN_OUTCOME_N,
+            )
+            status = "STOP"
+        else:
+            hpw = t_harm / t_days * 7
+            ok0b = hpw >= floor
+            note(
+                "G0b-base-rate",
+                ok0b,
+                "real traffic %d harmful / %d labelled outcomes over %.1fd = %.2f harmful/week (floor %.1f)"
+                % (t_harm, t_lab, t_days, hpw, floor),
+            )
+            if not ok0b:
+                status = "STOP"
     # G1 validity (hard)
     ok = True
     if candidate.get("label_source") not in ("observed-outcome", "blind-human"):
@@ -551,6 +597,7 @@ def selftest():
             "failtriage-outcome",
             {
                 "name": "failtriage",
+                "class": "savings",
                 "rows": fr,
                 "label_source": "blind-human",
                 "censoring_rate": 0.0,
@@ -588,6 +635,7 @@ def selftest():
             "vendor-paste-outcome",
             {
                 "name": "vendor-paste",
+                "class": "savings",
                 "rows": vp2,
                 "label_source": "blind-human",
                 "censoring_rate": 0.0,
@@ -617,16 +665,19 @@ def selftest():
             "STOP",
         )
     )
-    # gate cascade (work/cascade-harm RUBRIC+labels, seed 99): 50
-    # destructive-pattern commands blind-labelled, 0 HARMFUL (quoted text,
-    # prose words, tests, scoped scratch). Real data says STOP; the
-    # conductor-ordered GO does not reproduce without inventing harm.
+    # gate cascade, INSURANCE class (conductor split): real harm ~0/50, so
+    # savings would STOP; insurance judges planted recall + cost instead.
+    # Planted set work/cascade-harm/planted.jsonl (30 rows: 19 in-scope
+    # catastrophic, 7 quiet, 4 out-of-scope non-executable shapes): pre-rule
+    # routes 19/19 catastrophic, 7/7 quiet clean. Cost: ~96 paid/day at
+    # ~700 input tok (~$0.003/day) vs $0.05 ceiling -> GO.
     gc0 = rows(40, 0.5, "gc0")
     cases.append(
         (
-            "cascade-outcome",
+            "cascade-insurance",
             {
                 "name": "gate-cascade",
+                "class": "insurance",
                 "rows": gc0,
                 "label_source": "blind-human",
                 "censoring_rate": 0.0,
@@ -652,6 +703,43 @@ def selftest():
                     "outcomes_labelled": 50,
                     "harmful": 0,
                 },
+                "planted": {"n": 19, "caught": 19},
+                "est_daily_cost": 0.003,
+                "max_daily_cost": 0.05,
+            },
+            "GO",
+        )
+    )
+    # Insurance bar bites: recall 12/20 below 0.9 -> STOP even with harm present.
+    im = rows(40, 0.5, "im")
+    cases.append(
+        (
+            "insurance-miss",
+            {
+                "name": "leaky-screen",
+                "class": "insurance",
+                "rows": im,
+                "label_source": "blind-human",
+                "censoring_rate": 0.0,
+                "recomputable": True,
+                "baseline": {
+                    "name": "always-neg",
+                    "predictions": {
+                        r["hash"]: "neg" for r in im if r["split"] == "held"
+                    },
+                },
+                "agreement": {"n": 40, "agree": 36},
+                "features": {
+                    "direction": "predict",
+                    "future": False,
+                    "answer_visible": True,
+                    "primitive": "Score",
+                },
+                "daily_volume": 800,
+                "action_value": 0.002,
+                "planted": {"n": 20, "caught": 12},
+                "est_daily_cost": 0.003,
+                "max_daily_cost": 0.05,
             },
             "STOP",
         )
@@ -665,6 +753,7 @@ def selftest():
             "mechanism-opens-on-harm",
             {
                 "name": "synthetic-opener",
+                "class": "savings",
                 "rows": syn,
                 "label_source": "blind-human",
                 "censoring_rate": 0.0,
@@ -707,19 +796,21 @@ def selftest():
             fails.append(name)
     # strict: first three must be exactly STOP
     # G0b worked examples must be decided BY the base-rate finding.
-    for name, want_base in (
-        ("failtriage-outcome", False),
-        ("vendor-paste-outcome", False),
-        ("cascade-outcome", False),
-        ("mechanism-opens-on-harm", True),
+    for name, gate, want_base in (
+        ("failtriage-outcome", "G0b-base-rate", False),
+        ("vendor-paste-outcome", "G0b-base-rate", False),
+        ("cascade-insurance", "G0b-insurance", True),
+        ("insurance-miss", "G0b-insurance", False),
+        ("mechanism-opens-on-harm", "G0b-base-rate", True),
     ):
         cand = next(c for n, c, w in cases if n == name)
-        g0b = [f for f in check(cand)["findings"] if f["gate"] == "G0b-base-rate"]
+        g0b = [f for f in check(cand)["findings"] if f["gate"] == gate]
         okb = len(g0b) == 1 and g0b[0]["pass"] == want_base
         print(
-            "%s G0b=%s want %s %s"
+            "%s %s=%s want %s %s"
             % (
                 name,
+                gate,
                 g0b[0]["pass"] if g0b else "missing",
                 want_base,
                 "ok" if okb else "MISMATCH",
