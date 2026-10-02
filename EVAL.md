@@ -3663,3 +3663,8 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Census (scorer `work/jev-census/census.py`, 1,239 session files / 139,018 turns, 7d all profiles; costs frozen pre-run):** destructive 133x1000=133,000; instruction 466x100=46,600; failed_ignored 3599x10=35,950; test_rerun 780x5=3,900; memory 594x3=1,782; long_unref 893; double_read 529; skill_abandoned 213x2=426.
 - **Honesty notes:** instruction regex is broad (may inflate ~5x — still top-3); failed_ignored counts same-tool non-retry only; memory is opportunity count (system+assistant lines), usage needs 9yjh labels; destructive counts attempts incl. benign test fixtures. Memory detector fixed mid-run (assistant-text only -> per-line; top-3 unaffected).
 - **Reading:** the next candidates are destructive-command gating (already has gate-observe/cascade/dcg coverage — check overlap first), injection-in-results (covered: screens ON), and failed-result triage (NO live coverage — the genuinely new candidate). Receipts: `work/jev-census/{census.py,table.json}`.
+
+## 2026-10-02 census-fix: NameError repaired, top-3 reproduce (WindyLantern) [keyless]
+
+- **OrangeFrog found the committed scorer crashing (NameError: fp undefined) — my edit-skirmish ate the loop binding.** One-line fix, rerun clean: 1,239 files / 139,143 turns, top-3 identical in order (destructive 133,000; instruction 46,800; failed_ignored 36,060; small count drift from time + fixed code path).
+- **failed_ignored looseness (as ordered, noted):** it currently means "no same-tool call on the next turn" and consecutive errors overwrite the pending slot — looser than "ignored". Track A labelled sample will show how loose.

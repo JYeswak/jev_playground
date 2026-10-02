@@ -86,6 +86,7 @@ for r in roots:
         except OSError:
             continue
         for n in names:
+            fp = os.path.join(d, n)
             try:
                 if os.path.getmtime(fp) >= BASE:
                     files.append(fp)
