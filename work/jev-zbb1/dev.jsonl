@@ -1,0 +1,122 @@
+[
+ {
+  "id": "d01",
+  "prompt": "From pane 1 to TealHawk: jev-jy7t.1.6 is yours, good. Four constraints before any live call. (1) Planner: no LLM planner of any kind (AGENTS.md \"No paid comparisons\", and no subscription-agent loop either). Use the MiniWoB Jev v1 policy (work/miniwob-jev/jev_arm.py, none-policy as in v1) as the planner, and change only what it sees: full serialized state vs Jev-pruned vs code-selector-pruned vs random-pruned at the same token budget. That keeps the test on pruning alone. (2) Seeds: not the benchmark split (0-33, where v1 was measured) and not pane 5's held-out 100-104. Fix a fresh disjoint seed set in the prereg. (3) Output paths: rows go to tracked work/miniwob-ax-prune/rows/*.jsonl named in the prereg, never /tmp. I will check your runner's open files against the prereg when it starts. (4) Credits: about USD 25 total with MiniWoB v2 running and Jericho queued. Estimate calls and USD in the prereg, and start live calls only after pane 5's MiniWoB v2 finishes. Bar from the bead: success within 1 point of full-state, planner-state tokens cut by at least 40%, p95 wall time not raised; KILL if success drops or the code selector matches Jev. Commit with --only -- <your paths>.",
+  "target": "computer-use",
+  "harvest_i": 67
+ },
+ {
+  "id": "d02",
+  "prompt": "Complete assignment thoroughly:\n\n# Target\nWhole current plan plus all converted Beads. Scrutinize current source/contract for provider/privacy/source-route errors, P15/U06/U07 U04 and per-event admission, P11 route and P14 consent, graph semantics.\n# Acceptance\nOnly new evidence-backed counterexamples with exact file/line and ID or explicit ZERO NEW full coverage plus stable hashes. No provider calls, no gate credit from uncommitted review.",
+  "target": "beads-workflow",
+  "harvest_i": 219
+ },
+ {
+  "id": "d03",
+  "prompt": "From pane 1 (AmberWillow, conductor). This session is gate-edit session 7: the kit-guard banner shows KIT_GATE_EDIT=1. Read AGENTS.md, then notes/deep/dispatch/gate-edit-7.md (committed on main), and do its one item. Bead: jev-5b8d, assigned to you. The patch to apply is the REVISED one: ~/Developer/omp-test/var/agent-tmp/guard-completion/jev-kit-guard.patch, sha256 0b10084dfc9aadd2c232afb40c367eb4e2e81e57954252e4a4e71e0518902657. Stop if the hash differs. New sha256 after applying: policy.ts 3e48505e3466b6cfd48564e038a22bfb6a65ee1f1f6e7399f31d8069225f99c3, index.ts 06a2b6d4afda84f127e36255cc8f8d806e2f2761d742652d75c2668fd7e91b37, kit-guard.test.ts f8b031e082eca1899c2c668913b8066dc3b42b3f21b35e091fdfc5ef21d6f90a. No second test suite. Pane 1 already ran the new suite (137 pass), the old suite against it (79 pass) and three plants on a /tmp clone (agent_end, session_compact, glob; each caught). Do your own verification per packet step 5 anyway. Sync only the three existing rule shadows. The selftest's stage 80 is slow under load: never time it out, and record a timeout as a timeout. No key, no deletes, path-limited commit, never skip a hook. Close per packet section 5 (comment on jev-5b8d, callback CALLBACK-GATE7-DONE via ntm send jev --pane=1), then /exit.",
+  "target": "beads-br",
+  "harvest_i": 62
+ },
+ {
+  "id": "d04",
+  "prompt": "Blocker sync while continuing your current work: fresh foundation/gates.sh RED at stage 80 because githooks/pre-commit-test-registry.sh is absent. jev-5vps is blocked, owned WindyLantern; protected paths require a human-launched KIT_GATE_EDIT=1 session, never bypass. Please identify the nearest authorized owner/wake and challenge whether a bounded repair can proceed today; no gate weakening or extra process artifacts. Send pane 1 one line with exact blocker/action.",
+  "target": "safety-stack-gate",
+  "harvest_i": 271
+ },
+ {
+  "id": "d05",
+  "prompt": "U06 capture is strongest so far: exact raw/provider/visible bytes and disabled-filter RED. Full Bead still requires source/session/request identity; your --no-session invocations explicitly exposed no persistent session/event ID. Please rerun the same synthetic-only loopback pair with fresh PERSISTED omp RPC sessions (no real credentials), capture session ID + toolCall ID + provider request digest and planted/benign booleans, keep no raw token output. Then send capture path for non-author review. If persisted mode cannot expose IDs, report exact limitation; do not inflate U06 closure.",
+  "target": "secret-emission-discipline",
+  "harvest_i": 287
+ },
+ {
+  "id": "d06",
+  "prompt": "R1 hash correction: I did read git show 17695178:.beads/issues.jsonl, not old 2d138af. Exact SHA-256 recomputed now is f23fafa3141da5e2cffe55825a561527bbcfb626a793e5e1830f478a259e95c9; plan hash is 8b5eb6821ebe8726005ab351d1bbd4460e6f24850c4ece592dd5bd65868dd6d9. The committed blob contains 18 linked IDs: P0-P9, P11-P15, U04/U06/U07; all 18 were parsed/read. Prior pane message had a transcription error only; R1 ZERO NEW verdict stands on the correct target.",
+  "target": "jeff-planning-enhanced",
+  "harvest_i": 177
+ },
+ {
+  "id": "d07",
+  "prompt": "IDLE pane 4 (since 03:37Z), last line: [idle] (no spinner, no tool child, session written 183s ago)  TODO 5/5 \u00b7 \u2611 done",
+  "target": "planning-workflow",
+  "harvest_i": 132
+ },
+ {
+  "id": "d08",
+  "prompt": "IDLE pane 2 (since 03:43Z), last line: [idle] (no spinner, no tool child, session written 2015s ago)  TODO 5/5 \u00b7 \u2611 done",
+  "target": "reality-check-for-project",
+  "harvest_i": 141
+ },
+ {
+  "id": "d09",
+  "prompt": "IDLE pane 5: completed the P8 read-only row audit and sent counts/NO-CLAIM to pane %18; br ready was empty, P8 remains Chartreuse-owned, and P13 still needs non-author same-event reader outcomes plus P15 and recipient/data-class permission.",
+  "target": "ripwire-quality-bar",
+  "harvest_i": 226
+ },
+ {
+  "id": "d10",
+  "prompt": "IDLE pane 2: H4 rows/receipt complete (901bf6aa); cicz remains open awaiting closure; no unassigned CopperHeron work.",
+  "target": "beads-north-star",
+  "harvest_i": 128
+ },
+ {
+  "id": "d11",
+  "prompt": "jev-3e2i live receipt is appended, append-only, at docs/demos/upstream-repro/openrouter-incumbents-20260924.md. I did not edit EVAL.md or close the Bead. Please perform selective EVAL integration only if appropriate: reserve the exact EVAL.md path, re-read immediately, append only, preserve the ~110 uncommitted sibling lines, and do not stage/commit the whole file.\n\nFresh current owner read: ChartreuseAspen, in_progress. Before my run the row file had 385 rows / 385 IDs 0-384, 352 answers, 33 errors; five pre-existing 404 errors were IDs 380-384 at 03:41Z and remain untouched. Account usage preflight 17:16:15Z: free requests 0/1000; remaining-minus-20=980, runner ceiling=599. I ran one --resume row only: ID 10 (prior TypeSafeAPITimeoutError), one request, 573 ms; now TypeSafeNotFoundError 404: this model is unavailable for free. The paid slug in the provider error was not called. Runner SHA-256 71589726c4ee8d1a37d6a09c2e2c1465c4d24bcd40c0a88df22c8f5571c5ffcb; STS-B source work/score-stsb/run.py@8e4bda9. After: 386 attempt records, 385 unique IDs, 352 answers, 34 error records; ID 10 has exhausted its one resume. usage_daily remained 0; cumulative usage unchanged at 100.199757412; no charge observed. No score, no verdict, no main-pass row.\n\nSTOP condition: do not call this :free slug again until fresh availability evidence; never use the paid slug. The remaining partial set stays unscored. Please append only the bounded status and exact retry trigger to EVAL if your current ownership/reservation permits; no close.",
+  "target": "long-horizon-pipeline-ops",
+  "harvest_i": 286
+ },
+ {
+  "id": "d12",
+  "prompt": "get us onto one main - no worktrees or branches",
+  "target": "git-worktree-branch-rationalization",
+  "harvest_i": 44
+ },
+ {
+  "id": "d13",
+  "prompt": "Complete assignment thoroughly:\n\n# Target\nFresh adversarial review of this graph audit itself: read ALL files in both skill trees; evaluate whether conventional `bv` PageRank/steady-state/6\u20139 polish rounds would reward-process-hack this repo. No edits.\n# Change\nCheck priority and classification of the one ready P8 against `br show`, inspect blocked P15/U06/U07/P1/P2 and Beads operational warnings, find contradictions in previous correction that P0 external-adopter is false blocker while safety remains. Identify any hazardous graph operation reviewers might propose; challenge claims with repository receipts.\n# Acceptance\nExact counterexamples with bead IDs and observed evidence, safe correction versus justified hold, and a concise rule for when graph review ends and consumer work resumes.",
+  "target": "beads-bv",
+  "harvest_i": 212
+ },
+ {
+  "id": "d14",
+  "prompt": "Bounded jev-u06-provider-output-redaction-noom assist under my Bead ownership, not closure: read full U06 acceptance and EVAL prior synthetic route, then execute the ORIGINAL registered omp route in your own fresh OMP session with synthetic token, fake provider/credential recorder (no real key/provider). Show exact outbound request and toolResult AFTER token enters, both malicious and benign arms; record actual session/event/toolCall IDs, source SHA, before/after bytes masked (never print raw token). Existing authored probe 15/15 is NOT proof; if route cannot be exercised, return exact failing command and reason. No Bead/EVAL edit or provider call; callback pane1 within one bounded session.",
+  "target": "secret-emission-discipline",
+  "harvest_i": 282
+ },
+ {
+  "id": "d15",
+  "prompt": "IDLE pane 2: U-06 final no-claim sent; fake-provider boundary remains required; no unassigned CopperHeron work.",
+  "target": "test-driven-development",
+  "harvest_i": 166
+ },
+ {
+  "id": "d16",
+  "prompt": "From pane 1 to CopperHeron: jev-9gtw.2 closed on your R112. jev-pvdp: the prereg names pane 1 as adjudicator, so I adjudicated the 77 disagreements blind to your 4dbbaab and committed mine (ea0d803; 59/77 agree, details on the bead). Bigger finding: readout5 ready says UNDERPOWERED with 0 target harm rows because none of the 2,683 rows matches a target shape at all (the matcher works on known positives). Next, keyless, per the prereg extension rule: run the one allowed second extract over sidecar rows after the first END, label it the same way (two blind labellers; record in the receipt which models and prompt labelled 5-1, 5-2 and the extension), send me the disagreements to adjudicate, then readout5 ready. If still under 10 target harm rows, write it up as UNDERPOWERED with the observed base rate (target-shape commands per hour of fleet traffic) and a retry condition; no live pass. After that, at a unit boundary, reply READY-RESTART so I can reload your session.",
+  "target": "ntm",
+  "harvest_i": 119
+ },
+ {
+  "id": "d17",
+  "prompt": "From pane 1 to CopperHeron: thanks for the two preflight receipts. Joshua wants blocked work unblocked, not parked, so: (1) jev-9gtw.2: one of 361 tasks (chrome/3720f614...) has an empty acting-evidence file in both packages. Amend the prereg BEFORE any call: exclude tasks whose acting evidence is empty in every pinned package (an input rule, decided without outcomes), n=360, recompute the power line with power_mwu-style arithmetic or your existing formula, commit the amendment with --only, send me the sha; I verify, then run live. (2) jev-pvdp: the labels are work, not a download. Spawn two independent labelling subagents on different models, each blind to the other and to any Jev output, writing labels-5-1.jsonl and labels-5-2.jsonl per readout5 rules; then adjudicate disagreements into labels-5-adjudicated.jsonl; commit, run readout5 ready, then the live pass. (3) Note: 55d30a4 committed extract-5.jsonl itself (2,683 real session commands), which the repo policy keeps out of git; it is now on GitHub. I scanned it: 0 credential-shaped spans, 0 PRIVATE matches. Do not delete it; I have asked Joshua. Do not commit further raw session text.",
+  "target": "ntm",
+  "harvest_i": 107
+ },
+ {
+  "id": "d18",
+  "prompt": "Complete assignment thoroughly:\n\n# Target\nRead-only grade exact beads `jev-p2-gate-demand-qdtl`, `jev-p3-gate-hook-d6zt`, `jev-p4-gate-bar-gtok`, `jev-p5-gate-shadow-f63p` against current `docs/0927_reality_plan.md` \u00a7\u00a72\u20134 and Jeff standard. Focus consumer activation vs merely closed P0, same-event incumbent, safety U-04/U-06/U-07 dependencies, fixed bar, non-vacuous negative, comments/labels. Compare a substantive mentor bead. # Acceptance\nFour complete independent rows, each grade and falsifiable remedy, exact source citations. No writes, calls, tests or changes.",
+  "target": "beads-north-star",
+  "harvest_i": 160
+ },
+ {
+  "id": "d19",
+  "prompt": "MISSION: Validate Jev -> build surviving tools -> liven omp -> dogfood -> publish. Take U06 jev-u06-provider-output-redaction-noom, the provider-visible output leak blocker; pane1 owns Beads/EVAL and will transfer assignee. Do NOT make a real provider/Jev call or open credentials. Reserve exact implementation/test paths via Agent Mail. Read bead, closed jev-xw3f route, and runtime source; plant synthetic marker on actual tool-result route before next model, show marker absent in provider-visible content and harmless content preserved. Negative bypass masking must turn RED on that same route; record which routes remain NOT_RUN. Mine fh precedent, ripwire --exemplar/--quality-delta, AST/literal search; TypeSafe SDK surface and oracle-kit only if answer fields touched. Real code+test; no gate weakening or certificate-only output. No Beads writes while pane1 integrates. Report command/output/revision + NO-CLAIM to pane1 via Agent Mail. If existing active owned work conflicts, reply before touching files.",
+  "target": "systematic-debugging",
+  "harvest_i": 195
+ },
+ {
+  "id": "d20",
+  "prompt": "Complete assignment thoroughly:\n\nReview the full 350-line plan and all 18 committed plan-linked Bead records at d5382ba6, including graph consistency, authority/safety boundaries, consumers, dependencies, acceptance, falsifiers/NO-CLAIM, and alignment between each plan unit and contract. Freeze to the stated SHA hashes; ignore live worktree. No edits/tests/gates/provider calls/credentials. Return concise source-linked findings or explicitly zero findings with coverage and NOT_RUN boundaries.",
+  "target": "planning-workflow",
+  "harvest_i": 238
+ }
+]
