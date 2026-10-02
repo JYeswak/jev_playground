@@ -4861,3 +4861,15 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** ≥10 organic pages accumulate with <80% decision-present (same labeling rule, blind to outcome), committed as work/jev-zljn/audit2.json before any enrichment build. Reopen cites this row.
 
 **Evidence:** work/jev-zljn/audit.json (excerpt + span); bead jev-zljn comment; watcher code scripts/fleet-idle-watch.py:647-654 (excerpt construction).
+
+## R137 — MODEL-LIMIT: one-variable Noul rewordings lift memory-filter keep precision (2026-10-02)
+
+**Hypothesis:** appending usability, anti-echo, or staleness criteria to the held-out-winning Noul question lifts keep precision without losing drop precision (bead jev-9tkx; m959 loss-depth redesigns).
+
+**What was tried:** dev replay on 44 clean keeps + 126 drops (30 s47b + 96 wb7j), live jev-1.13.0, 680 single calls (stability EXPLORED 3.39%, jev-li3w), 445,148 input tokens ~$0.0187, all 680 scored clean. Base keep 8/42=0.190, drops 120/126=0.952. Best arm (staleness) keep 8/33=0.242 (+0.05, bar needed +0.20), drops 121/126=0.960. Usability 7/37=0.189, antiecho 8/35=0.229. All arms hold drops >= 0.90 but none lifts keeps near the bar.
+
+**Verdict:** MODEL-LIMIT for single-sentence Noul rewordings on this task. No shadow change; no held-out run (bar gates it).
+
+**Retry-condition:** a redesign that changes the decision structure (not the wording): e.g. two-question conjunction (usable AND current), or few-shot relevant/irrelevant exemplars drawn from labelled rows. Reopen cites this row.
+
+**Evidence:** work/jev-9tkx/replay.mjs + s47b-keys.json + results.json (hashes/decisions/spend, no raw text); bead jev-9tkx bar + results comments.

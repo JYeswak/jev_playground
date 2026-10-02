@@ -3436,3 +3436,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Population (bar pre-replay):** m959 labelled 50 keeps (11 relevant / 39 irrelevant) + seeded-random 200 recorded sidecar pairs (seed 11, snapshot 01:30:18Z). 250 pairs through localbench nimble, SAME Noul wire shape as handler (rel/type-noul/backtick template, CUT 0.5), sequential, 0 errors. Window cleared by localbench; latencies recorded, not judged (shared GPU).
 - **Result:** agreement with recorded jev-1.13.0 verdicts 211/250 (84.4%) vs 95% bar FAIL; nimble dropped 3/11 Jev-kept+m959-relevant (jev 0.62-0.76 -> nimble 0.06-0.48) vs never-drop bar FAIL. Asymmetry: keep->drop 22 vs drop->keep 17 — nimble is harsher, so neither drop-confirmation nor keep-only cascade is safe without paid look. No cascade proposed; recorded per bead.
 - **Spend:** $0 (local only). Scratch: var/agent-tmp/syje.51150/yl60-*. Left in_progress for verifier.
+
+## 2026-10-02 jev-9tkx one-variable replay: all 3 FAIL, keep best 0.242 (HazySpring) [live]
+
+- **Dev slice:** m959 44 clean keeps (9 relevant) + s47b 30 drops + wb7j 96 drops = 170 pairs x 4 variants, live jev-1.13.0 single calls (stability EXPLORED 3.39% per jev-li3w; bar amendment committed pre-run). 680/680 scored clean, 445,148 input tokens ~$0.0187, no 401/402/403.
+- **Results:** base keep 8/42=0.190 drops 120/126=0.952; usability 7/37=0.189 drops 117/126; antiecho 8/35=0.229 drops 119/126; staleness 8/33=0.242 drops 121/126. Bar needed keep >= 0.390 with drops >= 0.90: best arm +0.05. ALL FAIL, no held-out run.
+- **Verdict:** MODEL-LIMIT for single-sentence rewordings (NEGATIVE_EVIDENCE R137). ubs on replay.mjs: 1 critical + 8 warnings all verified false positives (console.logs emit counts only; JSON.parse targets committed files; status is a declared let). No shadow change.
+- **Boundary:** wb7j labels made under a stricter rubric than filter relevance; single-call (not 3x) per EXPLORED stability; results.json carries hashes/decisions only.
