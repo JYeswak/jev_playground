@@ -1,0 +1,23 @@
+{
+ "design": "semantic shortlist keyless evaluation",
+ "dev": "work/jev-zbb1/dev.jsonl (20 rows, seed 20261002)",
+ "width": 20,
+ "methods": {
+  "lexical_overlap": {
+   "recall_at_20": "4/20"
+  },
+  "semantic_desc_cosine": {
+   "recall_at_20": "3/20",
+   "model": "nomic-embed-text (local Ollama)"
+  },
+  "semantic_desc_body_cosine": {
+   "recall_at_20": "4/20"
+  },
+  "hybrid_rrf_lex_sem": {
+   "recall_at_20": "1/20"
+  }
+ },
+ "live_calls": 0,
+ "spend": 0,
+ "verdict": "FAIL keyless: best recall 4/20 caps hints below 25% bar; semantic sets nested in lexical, adds nothing"
+}

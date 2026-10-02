@@ -4829,3 +4829,19 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** agent-side result-open behavior changes first (opens measured >0 on answered rows), then a new 30-search round shows openedPick rate >= 1/2 on >=6 discriminating cases with shuffled control below. Reopen cites this row.
 
 **Evidence:** bead jev-ib1h bar + autopsy comments 2026-10-01; hook suite 11/11; EVAL row jev-ib1h 2026-10-01.
+
+## R135 — REFUTED: semantic (embedding) skill shortlist clears headroom for R133's bar (2026-10-01)
+
+**Hypothesis:** replacing the lexical shortlist with cosine similarity over local nomic-embed-text vectors puts the read skill in the top-20 on enough dev prompts to leave headroom for the 25% hint bar (bead jev-zbb1; the R133-named semantic retry).
+
+**Minimal repro / experiment:** dev set work/jev-zbb1/dev.jsonl (20 harvested real prompt/skill-read pairs, names_skill=false, seed 20261002, committed 840128a7 before any calls); roster 761 skills from ~/.claude/skills; width 20 (same as lexical baseline); local Ollama nomic-embed-text, keyless. Three encodings: name+description cosine; name+description+body-head cosine; RRF hybrid lexical+semantic.
+
+**Expected signal (if hypothesis true):** semantic recall@20 well above lexical 4/20, with ≥8/20 headroom for Choice-selection attrition toward the ≥5-hint bar.
+
+**Result (measured, inline):** lexical 4/20; semantic-desc 3/20 (strict subset of lexical hits — adds nothing); semantic-desc+body 4/20; hybrid RRF 1/20. Best recall 4/20 caps hints at 4 < 5 needed; Choice stage can only lose further (selection + 0.5 cut). 0 live calls, $0 spend — bar unreachable keylessly, so no paid calls were justified.
+
+**Verdict:** REFUTED (keyless NO-GO; the semantic design as built, not the whole semantic family). Extension stays OFF.
+
+**Retry-condition:** a shortlist method scoring recall@20 ≥ 8/20 on work/jev-zbb1/dev.jsonl, keylessly, before any live spend — then the identical Choice stage may run its ≤20 bounded calls against the R133 predicate (≥25% hints AND 0 misroutes). Reopen cites this row.
+
+**Evidence:** work/jev-zbb1/keyless.json + shortlist.py/embed_body.py + shortlists (committed); 24MB embedding vectors uncommitted in worktree; bead jev-zbb1 evidence comment.
