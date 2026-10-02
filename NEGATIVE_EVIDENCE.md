@@ -5037,3 +5037,31 @@ on this corpus. Reopen cites this row.
 **Retry-condition:** a routing design that beats 0.452 on this same frozen 250 held-out keylessly first (e.g. wiring demos/function-call dispatch instead of the custom runner, or confidence-gated act-only-above-cut with the cut fixed on dev). Reopen cites this row.
 
 **Evidence:** var/agent-tmp/d1-*.jsonl + miners + live runner (scratch); bead jev-r524 bar + split-correction comments.
+
+## R148 — FAIL (harm): widened multi-rule TTSR applicability, per-family dev cuts (2026-10-02)
+
+**Hypothesis:** rule-agnostic applicability Choice with per-family dev-fitted cuts beats the
+per-rule-regex mix on fresh multi-rule reminder episodes (bead jev-dr4p widened confirmation).
+
+**Minimal repro / experiment:** 56 dev + 52 held episodes (8 rules/5 families, row-ts>=10-02,
+file-disjoint splits, blind labels frozen pre-live: dev 17A/39I, held 19A/33I). Strongest
+keyless baseline on held (pipe: pipe+status; glob: unquoted-glob+silenced; else fire):
+47 interruptions, 0 misses. Bar pre-live: 0 misses AND <=42 interruptions. 108 live
+jev-1.13.0 calls ~$0.00339, fail-safe keep.
+
+**Result (measured, inline):** interruptions=34 (beats baseline by 13) BUT misses=2 (bar
+violated): kit-no-verify and shell-instead-of-tool, both in dev-uncovered families where
+the cut defaulted to 0.5. Stratified held: pipe 9/9 kept all-A (no value over regex);
+glob kept 14/14 incl 9 inapplicable (strictly worse than the quoting regex, which the
+model cannot see); ts suppressed 5/5 all-I (the only Jev win); misc 10TN/1miss; kit 1TN/1miss.
+
+**Verdict:** FAIL. A third design in the rules area (Choice single, battery+policy D1,
+per-family cuts) still cannot hold zero-miss while beating regexes; the area stays OPEN
+per the ambition floor (a 4th design must cover unseen families fail-safe and beat the
+quoting regex on glob).
+
+**Retry-condition:** fail-safe-keep for dev-uncovered families + a glob design that sees
+quoting, beating 47 interruptions at 0 misses on these frozen 52 held rows keylessly first.
+Reopen cites this row.
+
+**Evidence:** var/agent-tmp/dr4p-feas.34880/{wide_dev_ep,wide_held_ep,wide_dev_labels,wide_held_labels.json,widelive.py,wide_receipt.jsonl} (scratch); bead jev-dr4p widened comments.
