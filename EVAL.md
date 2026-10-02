@@ -3480,3 +3480,25 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Rows now carry decision+session+noul:** fresh RPC 06:58Z logged skill plan-to-beads (name fix: no more /SKILL.md suffix), session 01a0fb68-..., decision allow, noul 0.47. Tests 10/10 (session/decision asserts). Ambient discovery loads the extension in NEW sessions (L3 + probe rows with no config change).
 - **Not done by me:** `.omp/config.yml` listing refused by kit-guard B7 (edit tool carries the refusal; needs KIT_GATE_EDIT hand). Organic rows need one idle-pane restart (worker sessions predate the file). One orphan RPC session from a killed driver probe wrote 1 unattributed row ~06:5xZ; joins the blind-label pool.
 - **Verdict:** code + fields + fresh-session proof committed; DONE wbel-live waits on organic rows. Left in_progress; BLOCKED callback sent (blocker: config listing + pane restart).
+
+## 2026-10-02 jev-sk29 diffrisk vs retry AUC coincidence: same number, different bias (OrangeFrog) [keyless]
+
+- **Check (user-ordered):** diffrisk dev AUC recomputed pairwise = 0.3768 (100 rows, 33 pos/67 neg) vs msax-v1 retry AUC 0.3765 (calibration.json, 81 rows). Equal to 3 decimals.
+- **Bias differs:** retry v1_nouls (`work/jev-msax/retry-rows.jsonl`): mean 0.250, stdev 0.125, range 0.12-0.62, 2/81 in 0.38-0.43, pos 0.237 < neg 0.265 = default-NO. Diffrisk (`var/agent-tmp/diffrisk-live-dev.jsonl`, future Noul "will suite fail", labels from sk29-runs observed outcomes): mean 0.415, stdev 0.036, range 0.32-0.58, 74/100 in 0.38-0.43, pos 0.404 < neg 0.420 = default-MIDDLE.
+- **Reading:** both inverted by ~0.02-0.03 (hence equal AUC); collapse levels differ (0.25 vs 0.41). Hypothesis: future-question hedging at different anchors. Feeds jev-2zbl Part B I3 (negation-complement probes anchor-vs-negation). Bead comment on jev-sk29. Left in_progress for verifier.
+- **Boundary:** keyless recomputation only, no live calls, $0 spend.
+
+## 2026-10-02 jev-dr4p V10-TS narrow: FAIL, both borderlines missed twice (OrangeFrog) [live]
+
+- **Design:** 40 fresh TS-rule episodes from 23 sessions unseen in feasibility+widened dev/held; 10 censored (edit-triggered, no bash: coverage boundary, 25% of TS firings); held 30 blind 2A(borderline)/28I frozen pre-live (`work/ts-narrow/PREREG-ts.md`). jev-1.13.0 Choice, fail-safe keep, <=30 calls. Bar: 0 misses AND interruptions <= 20 (beats always-fire 30 and .ts-mention keep-24 by >=4). Gate: STOP pilot-only (no ceiling, recomputable=false).
+- **Live (30 calls ~$0.0009 + 30-call v2 rerun with probs ~$0.0009):** v1 0 interruptions/2 misses; v2 2 interruptions/2 misses — same 2 borderlines missed both times, 2 inapplicables kept. Suppression on inapplicable 26/28 Wilson [0.774,0.980]. FAIL on harm bound. Same mode as widened R148: over-suppression of weak positives. Instability note: v1 vs v2 same-question repeat flipped 2/30 modals (feeds Part C LOCK-1, BORN-TRUE).
+- **Rows (conductor rule):** `work/ts-narrow/ts_rows.jsonl` (hash, label, rules, answer, probabilities, conf, status, tokens, split, seed, scorer). Receipts: `var/agent-tmp/ts-narrow.001/`. Left in_progress for verifier.
+- **Boundary:** only 2 borderline applicables (true applicable-rate UB ~20%); no enforcement claim; shadow not earned.
+
+## 2026-10-02 jev-2zbl Part B msax arm: decisions invariant, negation probs incoherent (OrangeFrog) [live]
+
+- **Live (160 calls ~$0.0027, jev-1.13.0, 40 retry-rows ids 0-39 with recorded v2 refs, positional join 81/81 to split cmds):** I0 identity 40/40 PASS; I1 option-permute 0/40 flips (UB 0.088) PASS; I2 field-shuffle 0/40 PASS; I3 negated modal-agree 38/40 = 0.95 PASS but probability-complement mean 0.364 max 0.51 vs 0.15 bar FAIL.
+- **Reading:** decisions invariant to surface form (losses not from order/field sensitivity); negation redistributes mass incoherently while preserving modal — probabilities unreliable under transform, consistent with calibration ECE. Caveat: refs 40/40 fix_first, single-modal pool. Web arm NOT RUN (BLOCKED: no unit text stored by privacy design).
+- **Part C:** `work/jev-science/PARTC_PREREG.md` (sha fd0fdaf7d5a3322f) with LOCK-1 computed hash f8ec8697... (BORN-TRUE), LOCK-2 (web T0), LOCK-3 (T1 generalization).
+- **Rows:** `var/agent-tmp/partb.001/partb_receipt.jsonl` (id, transform, status, choice, probs, ref, label, tokens) + `score_partb.py`. Left in_progress for verifier.
+- **Spend this turn:** TS ~$0.0017 + Part B ~$0.0027 = ~$0.0044, in wave cap, no 401/402/403.
