@@ -1,0 +1,693 @@
+{
+ "bead": "jev-j0er",
+ "reason": "duel LIVE-113 synthetic replay traffic (author OrangeFrog n4eu); exclude from organic shadow sample, do not delete rows",
+ "window": [
+  "2026-10-02T00:39:00Z",
+  "2026-10-02T00:40:59Z"
+ ],
+ "rows": [
+  {
+   "ts": "2026-10-02T00:37:53.656Z",
+   "rawSha256": "d3fcfefab3f3b02e3b3a0c68d7bcea10794058fee03cc547b9bc2872b3106f83",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:53.899Z",
+   "rawSha256": "3e6a974a026f4a6c053ad9186741c74c021f06b74e6944df4cb135a831f07276",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:54.125Z",
+   "rawSha256": "9c5273435e3895f597b50f3b37f41f6a6d651fedf3ebd61d9b7ff79a6c40fe62",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:54.333Z",
+   "rawSha256": "f21549e7f0607883221b63c8a309a69d1ada72c16dc159001eb78fbc86980e32",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:54.595Z",
+   "rawSha256": "ae2c2a92fc960184b7ee139e7ef18028ba239bfc7029fcdc55a33c1f22ea4301",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:54.725Z",
+   "rawSha256": "0df0b1040274c587bf071cbf5cc9b0ce4969d10ca92e4680538e3729640cd3eb",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:54.939Z",
+   "rawSha256": "36868d19e2cbd7bc274f2d12e7ad686a7e9e25631df421071e92656109af16db",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:55.196Z",
+   "rawSha256": "52339325f02b890fc4c8c42aac5e902c4e96e0786047840794a11f2c7c31dfcc",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:55.379Z",
+   "rawSha256": "b68814f78f01e19ef67e9f02e2da778c8d2973c1d3c210baa98f548ccf3f2038",
+   "flagged": 2
+  },
+  {
+   "ts": "2026-10-02T00:37:55.572Z",
+   "rawSha256": "9b3b3f84ce5af38c0bcab1b262d70ba05092e8c77fe2c8ed2aa236c1db979fb3",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:55.792Z",
+   "rawSha256": "b468aac9efdd4518bb9c441c1b4e861f71e4aad55129b1d8d4565f97a29848d8",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:56.101Z",
+   "rawSha256": "44d4c3dd95f409708b246491920138c1e228204ac11c1e2e76718e4d7bc06a68",
+   "flagged": 2
+  },
+  {
+   "ts": "2026-10-02T00:37:56.310Z",
+   "rawSha256": "f12937743f0186feee973cb0edb3458277549bb85ca424881a2fb01386bd0d62",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:56.533Z",
+   "rawSha256": "8e8465cc3a48bba967ebaa79891df2214dc3360b01371cbea8faf1cf3fe3a8af",
+   "flagged": 6
+  },
+  {
+   "ts": "2026-10-02T00:37:56.818Z",
+   "rawSha256": "2c46ea02d8b9a06d8deae5b8615fe8934a9733de9c39e99b12af4f2a53ee5baa",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:37:56.952Z",
+   "rawSha256": "2f6adcd72f5f1b11c21ff38fb41789bb8c64fb77b266d8194efdd0796ee53e8f",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:57.192Z",
+   "rawSha256": "9d41598435c8e1a15eea9d2c7a30a6ba234f2467829a0e0f940aecf51ecb6bb8",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:57.453Z",
+   "rawSha256": "284468cbd68ebac1076715e74a4054f3b23908a01a15f3feedead44dfa13b11f",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:37:57.659Z",
+   "rawSha256": "0361dd5c4d4631b3303d800c53de4d342d1bfbc25e095a0dd0362fcbce064b32",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:37:57.882Z",
+   "rawSha256": "da70b9b43e10d6cd8ff0128c3936cd98878554dd13991330dadc41357993a183",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:42.938Z",
+   "rawSha256": "d3fcfefab3f3b02e3b3a0c68d7bcea10794058fee03cc547b9bc2872b3106f83",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:43.145Z",
+   "rawSha256": "3e6a974a026f4a6c053ad9186741c74c021f06b74e6944df4cb135a831f07276",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:43.404Z",
+   "rawSha256": "9c5273435e3895f597b50f3b37f41f6a6d651fedf3ebd61d9b7ff79a6c40fe62",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:43.596Z",
+   "rawSha256": "f21549e7f0607883221b63c8a309a69d1ada72c16dc159001eb78fbc86980e32",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:43.868Z",
+   "rawSha256": "ae2c2a92fc960184b7ee139e7ef18028ba239bfc7029fcdc55a33c1f22ea4301",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:44.095Z",
+   "rawSha256": "0df0b1040274c587bf071cbf5cc9b0ce4969d10ca92e4680538e3729640cd3eb",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:44.284Z",
+   "rawSha256": "36868d19e2cbd7bc274f2d12e7ad686a7e9e25631df421071e92656109af16db",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:44.425Z",
+   "rawSha256": "52339325f02b890fc4c8c42aac5e902c4e96e0786047840794a11f2c7c31dfcc",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:44.620Z",
+   "rawSha256": "b68814f78f01e19ef67e9f02e2da778c8d2973c1d3c210baa98f548ccf3f2038",
+   "flagged": 2
+  },
+  {
+   "ts": "2026-10-02T00:39:44.835Z",
+   "rawSha256": "9b3b3f84ce5af38c0bcab1b262d70ba05092e8c77fe2c8ed2aa236c1db979fb3",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:45.157Z",
+   "rawSha256": "b468aac9efdd4518bb9c441c1b4e861f71e4aad55129b1d8d4565f97a29848d8",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:45.306Z",
+   "rawSha256": "44d4c3dd95f409708b246491920138c1e228204ac11c1e2e76718e4d7bc06a68",
+   "flagged": 2
+  },
+  {
+   "ts": "2026-10-02T00:39:45.495Z",
+   "rawSha256": "f12937743f0186feee973cb0edb3458277549bb85ca424881a2fb01386bd0d62",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:45.655Z",
+   "rawSha256": "8e8465cc3a48bba967ebaa79891df2214dc3360b01371cbea8faf1cf3fe3a8af",
+   "flagged": 6
+  },
+  {
+   "ts": "2026-10-02T00:39:45.841Z",
+   "rawSha256": "2c46ea02d8b9a06d8deae5b8615fe8934a9733de9c39e99b12af4f2a53ee5baa",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:46.147Z",
+   "rawSha256": "2f6adcd72f5f1b11c21ff38fb41789bb8c64fb77b266d8194efdd0796ee53e8f",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:46.301Z",
+   "rawSha256": "9d41598435c8e1a15eea9d2c7a30a6ba234f2467829a0e0f940aecf51ecb6bb8",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:46.493Z",
+   "rawSha256": "284468cbd68ebac1076715e74a4054f3b23908a01a15f3feedead44dfa13b11f",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:46.672Z",
+   "rawSha256": "0361dd5c4d4631b3303d800c53de4d342d1bfbc25e095a0dd0362fcbce064b32",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:46.903Z",
+   "rawSha256": "da70b9b43e10d6cd8ff0128c3936cd98878554dd13991330dadc41357993a183",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:47.115Z",
+   "rawSha256": "744b7ac08ccd4077dc8fd8a6dfe8e7cc547e920078b9dbf90c3a492960db8d28",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:47.328Z",
+   "rawSha256": "2f56d136d41a48d4ea8eaf3f948c717536233f4b31477e9a4db2690e009bf569",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:47.494Z",
+   "rawSha256": "28d554e9fbf81925115b9511a46c64f1dbdf71b99b4a2c9859a737a7b97e9d75",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:47.717Z",
+   "rawSha256": "bb99635d4a80f773a0e9a96c30f65efce9eaa0401ff1340b6d95a047c76affc5",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:47.857Z",
+   "rawSha256": "d7849a002215b44d13690af639f8bc13550249433a51b584f78faced123f1086",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:48.203Z",
+   "rawSha256": "b38abe4b6655f42daf8c42cf144676e01cda6dde5f369e113eb62e7a9a191335",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:48.419Z",
+   "rawSha256": "c1f82a89b0ecfb4ee5d9d989d2325389fc43b5360885c703719e0b84cba963d9",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:48.649Z",
+   "rawSha256": "4cc8d369f20de02ddaa1c3dc4374b65925297c55cfc76668a792e01891a085f0",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:48.858Z",
+   "rawSha256": "9a0fa8eed2b6de1ec772bdd0ea482e5bc5a2eda0f0b6cdbda7ec9e7bc8fb9478",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:49.079Z",
+   "rawSha256": "dd2c19eaaa22055d36fb6dadf9964d8beb065fa7ce1a5cc5b700dc645a7de348",
+   "flagged": 2
+  },
+  {
+   "ts": "2026-10-02T00:39:49.317Z",
+   "rawSha256": "438a7a0e2d062b977b78b44f315c9c3d90d3258606280d37b03c22c7ea1d6a41",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:49.514Z",
+   "rawSha256": "a403b1fe68435e6e511f09b0d4425fcc5c54d977914a1d599960a84cc206bd33",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:49.692Z",
+   "rawSha256": "e2fc3b02695879646b4ff23e7ed020939b8d92d5fe6c15ba6f8d05e3124b0b67",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:50.071Z",
+   "rawSha256": "60abc476020082420d2033917eb6a0374edae259c98bcd7edfa7644391d4f503",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:50.362Z",
+   "rawSha256": "f5690e5f6aff7c02a413434e4127bbc7e0a085e3056a9bfabe655dc5125f9045",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:50.611Z",
+   "rawSha256": "dd9302874d6ccec9ed6653a63de78abd94a98eaf56bf4eaf2fd3a756b43200ca",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:50.876Z",
+   "rawSha256": "dbe210863724c1ebb73a07bf50403e11814b20af1cc3d03528b3bfe1f91dc6ff",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:51.097Z",
+   "rawSha256": "00a41891c5c3a6693b0a5ee48832512498c095dbdca186fc905c15a86e0be47d",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:51.317Z",
+   "rawSha256": "accffca95026d781e9180bc920ffeb8a866d8b55b5fe151770bdd6fbcdeb0c5f",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:51.513Z",
+   "rawSha256": "725f31c995144b6a6cd88243fad83a3e9306e1d21bba28dd194f058e6663a7e2",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:51.689Z",
+   "rawSha256": "ff481b95d8311bf2f99cfcb6f0a58c81e45d2535cc846f26717033b00e98a1d6",
+   "flagged": 2
+  },
+  {
+   "ts": "2026-10-02T00:39:51.962Z",
+   "rawSha256": "c0173f6f6be34ca9862bee0cf4a37d0c8f9caff3c2debd3af11867ee1b11385d",
+   "flagged": 2
+  },
+  {
+   "ts": "2026-10-02T00:39:52.215Z",
+   "rawSha256": "1b76f58ab91a51d40799a23bbba50480d8c1ca0d4cd4c7e479938577e484bae3",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:52.436Z",
+   "rawSha256": "606eb285b37b85e82ac18a6cf30eaa7c290686817937d77a3cad8d14a085d8d4",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:52.618Z",
+   "rawSha256": "9c2ee93528d46a0a8bd09573436678d0753534eed617732741b96675d9952ca3",
+   "flagged": 2
+  },
+  {
+   "ts": "2026-10-02T00:39:52.813Z",
+   "rawSha256": "daae0af01f548796ee890eecda6a07182b329a02a7bca6a0a15651d73fede19c",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:52.978Z",
+   "rawSha256": "d3f5e10a7dc8d61d8bbb91fc8f63d6ac91c894812767f38e1bc69ee505559367",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:53.188Z",
+   "rawSha256": "e3694b643dfdf98c74769df159daae61fb211151bb28bd707095b0025325d25a",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:53.363Z",
+   "rawSha256": "87b324879ad6e2ec2c23298040cc56ae49bd7854c0326cfc608036bd615a9b6f",
+   "flagged": 2
+  },
+  {
+   "ts": "2026-10-02T00:39:53.569Z",
+   "rawSha256": "0355c54e429bb18ac281930eec02280f33169a0852f420752ab292230a9bdea8",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:53.789Z",
+   "rawSha256": "0bc1be609be1fa427446ca0fa1fcb571a3ae1ccbfebf4a044311700e92080829",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:54.033Z",
+   "rawSha256": "ad7edd7b998135e64e70db6cef0d97c223dae9741bbaaafa2d49712862a741cc",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:54.174Z",
+   "rawSha256": "819c0ee782d3c5871ef78c46e6d3dc875489977ad72c4680328fa9c081a05d9d",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:54.361Z",
+   "rawSha256": "ef99d3f43f901106d7004e6ad0782967d0396dd80dbb483ed05e3ba1068e5988",
+   "flagged": 1
+  },
+  {
+   "ts": "2026-10-02T00:39:54.644Z",
+   "rawSha256": "2af0fc0ace3becba4e548f97ae2179f2841408f1f7943dffde6dab32d5d4ee43",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:54.784Z",
+   "rawSha256": "06abeec180972c313699a58f7ab635aee6da5cf19205bd72c44b85bf3f0df0c1",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:55.084Z",
+   "rawSha256": "436a6aa468a5ee6cb3f56ae40d534702de6af28b3172b5ed08d9458dc4cf82b1",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:55.248Z",
+   "rawSha256": "cfe177fa720229cbc05e8e8151e4d339d6246fbdcefe5cb245bb9123c8813def",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:55.475Z",
+   "rawSha256": "9301316478d0407f2ced281009938d415983d47c9d4203f0e95c6de28752d15c",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:55.723Z",
+   "rawSha256": "76b8cc3d56b26a5feeb1a93c9ca708d23a331015622a416f0b4f366ffd53761d",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:55.878Z",
+   "rawSha256": "7b81c8f57249959f37e2cd9ad779ca014abfc834e2ca6249716135b46ce7d732",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:56.168Z",
+   "rawSha256": "17d1971b7f1b0f6f9eb8604e3e970e6dd4f0060f390f81bb56836570aaf8c169",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:56.374Z",
+   "rawSha256": "572df5d4117e9d5964eed15180998afb8ae5bf5e7520b650cf92eb50146d0c6a",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:56.631Z",
+   "rawSha256": "1f71bc23769649c4245a3f878acc90e5a37d98d2892ef05f681c6204b76c4cb9",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:56.775Z",
+   "rawSha256": "06a999174b733029e1286a57582e24fd65610a67e453a0f6f10e854b416fdde9",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:57.028Z",
+   "rawSha256": "c8295ff0242a6f19d838d9ec21a112cc248f301a28348c6336d1b1997d7f9278",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:57.355Z",
+   "rawSha256": "8dd1c3abd20326295515f4f3a48f57ccbe488434dddefb8f1dedd1d5aa0ccfc7",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:57.543Z",
+   "rawSha256": "4d100707c98188223a146fa81294c21b9876cabd2e3d441e178e503d11bfc591",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:57.720Z",
+   "rawSha256": "456247000b8f8e04eab1acd3c2de29e95e8e89e197e3319b6efbb70da0efa551",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:57.891Z",
+   "rawSha256": "7417f888bd5eecc928f7db662a94cc6550538ab10cf50682041665725c833f91",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:58.081Z",
+   "rawSha256": "810e3d2e50fc38c6050d76e8061f4091b2d757f50c372bc062f1cdac9a83dd8a",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:58.317Z",
+   "rawSha256": "e278fa483c8711534fb2702fc9564ca484e687163ea68b04b9e9b5f8cff18731",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:58.535Z",
+   "rawSha256": "b98dd444c5301e1dffab1fc31de96143f7f87bd7e438bf00db83b8b69d837610",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:58.729Z",
+   "rawSha256": "25847cef5a9176cd7b2c7f9e2ecba1f12910ebabd9d85264d5f2cc635a678805",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:58.880Z",
+   "rawSha256": "ed44d7a9fd7f1daf2028c8f04850b0791e4a8447ce3ccf5828fbd43f6fd199c8",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:59.149Z",
+   "rawSha256": "a3eb482dfff5337232ef2e3fb13fc91c5f2e7024f479ddf14b1f16e1ad04688a",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:59.415Z",
+   "rawSha256": "154e2fb1d170ec425094ad81b26d829bd7c6872d3cf3e390bdc302c53793ee85",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:59.618Z",
+   "rawSha256": "502786807ea3cd6f13f1be94d3247aeb27e1c360fe37b9deb93968281057581c",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:39:59.853Z",
+   "rawSha256": "eb0bd6605c228eeb5159db979d6ff7927a983dd2aedefe9c618c50063a0d01c8",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:00.114Z",
+   "rawSha256": "7a686443d9b68021344915f54c16e471366526ac1e2987ef12df911cb01e957b",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:00.301Z",
+   "rawSha256": "f972a017922247c550603c4206fd8eb9d18c3de52711358953a7c6a15fc535b8",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:00.555Z",
+   "rawSha256": "d111f8057a586b6defa425afb23a8b0af64ba642a656f56ebe7768d17e506feb",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:00.705Z",
+   "rawSha256": "ef7aa1e5d02618e14430b10feafbd66a0936d61bee10263d570da7ae65a818a5",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:00.878Z",
+   "rawSha256": "5aff9daed1804771bade89b8ea1607d78d5943d282571e1d1f6586ba429b34f3",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:01.086Z",
+   "rawSha256": "218fc840410488479f944a3e04a7d51abdc228a92d4070299a0a72db624b5378",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:01.254Z",
+   "rawSha256": "0bde1c6b285c1dcc22f731dc5829a8db152fb5104cfa32f79c5777958c7354e7",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:01.524Z",
+   "rawSha256": "fe0a86a50ee701e873212f57986326a73717ed550c3e3a116f5d97c4496d2a4c",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:01.681Z",
+   "rawSha256": "5313af0131e9f249bde1e6536cdabb2c5423aa3b1e514fa482427955697a575d",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:01.878Z",
+   "rawSha256": "5d5e8ff3a29d64ea1c351a8aa6d91f3c4d7390152dafef847c3e0290cc4112c2",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:02.035Z",
+   "rawSha256": "e1ac49739f8bfd8e4ab366468f28b941b9b01f4c109e1df25e634b53fa58a73e",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:02.224Z",
+   "rawSha256": "7bec998376114c51019bd8f0dfc43301f98d79bf9c2bb0033b7fae34500f213c",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:02.404Z",
+   "rawSha256": "acc13244655133f9e287673e08e6cd010dbf4154031fed07237e6a56b24ce933",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:02.539Z",
+   "rawSha256": "83577a7620fafce5bc69b5f5cfd2dbbb360596e2344bcf19357572fb14a521bf",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:02.752Z",
+   "rawSha256": "a6fd40373dbe562c46a339d7b40d64b57f4409cea0d5180af5a95b6c50fc2f43",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:02.943Z",
+   "rawSha256": "cb235e654157d807cb2ca23d853f5663ee83bd271f5a6e614c51f263be57ea37",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:03.119Z",
+   "rawSha256": "ef5645556eabb7e8a22e61c8fbb1d1723b6c1d05e644e95a75070183af76a50d",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:03.453Z",
+   "rawSha256": "d99ebf2c66fb67a467accab3a632690172ba5ed3fb7c196b9d2e0864e200c340",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:03.793Z",
+   "rawSha256": "fa2bcbd43aba645296cfdc31f346f54138a08b7711f35a0c979ccffedb0683d2",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:03.972Z",
+   "rawSha256": "9b22683d3663be2f4816d497801f7a8b6c8dfae58bf5dca036aa88e0cf366082",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:04.203Z",
+   "rawSha256": "41bf764d1d75c34eab3d7a772f47e869e1254b370f7b3e45c642852547c72d80",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:04.493Z",
+   "rawSha256": "0ec6c1254db756b6546658d8dbde1c8087499dd55eb64419aa63681d7ff9f6c1",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:04.714Z",
+   "rawSha256": "dc4630716419500ec4f263ddca142dd300df2cbe2c2f810eee25874af1eae292",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:05.040Z",
+   "rawSha256": "ac4fd5ed3e3817818b1d1c3d40870e8eeb8e7463362bc674bea8b662916f1383",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:05.183Z",
+   "rawSha256": "bb978e9c45c07c9a0a2db5fe6eb54db6e98f0e9f61ed07d027fb9f8f415ab1e9",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:05.578Z",
+   "rawSha256": "11cb115eaa0ebc2b03a3957963ddb2bff1ab525de2c7baef3acc5e0ddf2c6673",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:05.932Z",
+   "rawSha256": "536e021616bfa6641320715fc19155e6b4bd05a88cdfce1096ec78289d88759b",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:06.269Z",
+   "rawSha256": "d88e8969bb14b1f55518578a99eed18d1f4061a24d57de6772fe4507628824c6",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:06.738Z",
+   "rawSha256": "62c7ea9dce27406b7635eb8842d9449a5a86e79e473f88d458ae0ca8670c32d8",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:06.997Z",
+   "rawSha256": "cfddce895978e0e3425896899b896157c91f5a3ab5e4b5036fde3b62f83f983b",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:07.218Z",
+   "rawSha256": "27127b3fe28543a4049f5bebd44e256fddea80ac1f784ff17c011e21111b9d69",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:07.406Z",
+   "rawSha256": "d4b4f8dd41637a0723ed36d49b657ecacc47328b35f6c994326a9b95e1b498e1",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:07.646Z",
+   "rawSha256": "b11d8301c0376e53f36968ade1b30a37ab5d65bb446fd88e703c180bf4d29da3",
+   "flagged": 0
+  },
+  {
+   "ts": "2026-10-02T00:40:07.885Z",
+   "rawSha256": "9c352e3ddc84f8059e3404dd0dfbf1a6611212bd22968a8c8509c59036a413ec",
+   "flagged": 0
+  }
+ ],
+ "clusters": {
+  "replay-0037": {
+   "why": "20 distinct scored rows in 7s, zero injection rows, zero session: webscreen-maker-direct replay traffic, not organic",
+   "n": 20
+  },
+  "synthetic-0039": {
+   "why": "author duel LIVE-113 replay (n4eu)",
+   "n": 113
+  }
+ },
+ "sample": {
+  "window_since": "2026-10-01T20:03:00Z",
+  "real_rows": 46,
+  "flagged": 0,
+  "wilson_upper_0": 0.0771,
+  "bar": "false withholds <=2pc Wilson upper",
+  "verdict": "NO FLIP: sample clean (0 withholds to label) but N=49 gives upper 7.3pc > 2pc; needs ~190 withhold-free results"
+ }
+}
