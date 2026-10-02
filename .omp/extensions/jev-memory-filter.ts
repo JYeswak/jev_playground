@@ -285,6 +285,8 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
         }
         if (paused || calls >= cap) {
           await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: paused ? "paused" : "daily-cap", promptHash, memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: null, inputTokens: null });
+          // Volume visibility (jev-i20b): the item was present but unscored.
+          await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: paused ? "paused" : "daily-cap", promptHash, memoryHash, prompt, memory: item.text, noul: null, decision: "keep" });
           continue;
         }
         calls += 1;
