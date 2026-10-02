@@ -178,7 +178,9 @@ def pane_for_pid_tree(pids, run=subprocess.run):
     return None
 
 
-def capture_once(repo, log_path=None, state_path=None, run=subprocess.run, now=None):
+def capture_once(
+    repo, log_path=None, state_path=None, run=subprocess.run, now=None, pre_pids=None
+):
     """Capture the lock's holders iff its identity changed since last sight."""
     lock = Path(repo) / ".git" / "index.lock"
     log = Path(log_path) if log_path else Path(HOME) / LOG_REL
@@ -197,7 +199,10 @@ def capture_once(repo, log_path=None, state_path=None, run=subprocess.run, now=N
         return None
     if prev == ident:
         return None
-    found = holders_of(lock, run)
+    if pre_pids is None:
+        found = holders_of(lock, run)
+    else:
+        found = [{"pid": p, "cmd": None} for p in pre_pids]
     chain = []
     for hit in found:
         pid = hit["pid"]
@@ -311,16 +316,34 @@ def watch(
 def _poll_once(kq, repo, log_path, state_path, ops_path, run, events):
     """One kqueue wait + capture. Returns updated events_seen. Test seam."""
     woke = kq.control(None, 1, 60)
+    snap = None
     if woke:
         # Raw fs event BEFORE any lsof: a later miss with no fs-event
         # row means kqueue never fired; a miss WITH one means the
         # holder exited between event and capture.
         events += len(woke)
         ops_write(ops_path, {"ts": ts_now(), "type": "fs-event", "nevents": len(woke)})
-    row = capture_once(repo, log_path, state_path, run)
+        # Priority snapshot FIRST: short-lived git exits in ms; the full
+        # holder scan below is slower than the holder's lifetime.
+        snap = snap_holders(repo, run)
+    row = capture_once(repo, log_path, state_path, run, pre_pids=snap)
     if row:
         print(json.dumps(row), flush=True)
     return events
+
+
+def snap_holders(repo, run=subprocess.run):
+    """Fast pid snapshot for one lock; None when absent. One bounded call."""
+    try:
+        out = run(
+            ["lsof", "-t", str(Path(repo) / ".git" / "index.lock")],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        ).stdout.split()
+        return out or None
+    except Exception:
+        return None
 
 
 def main(argv):

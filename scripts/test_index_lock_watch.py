@@ -183,6 +183,32 @@ class TestCapture(unittest.TestCase):
         self.assertEqual(events, 0)
         self.assertFalse(os.path.exists(ops))
 
+    def test_pre_pids_snapshot_used_without_rescan(self):
+        d = mkrepo()
+        lock = os.path.join(d, ".git", "index.lock")
+        open(lock, "w").write("")
+        log = os.path.join(d, "rows.jsonl")
+        state = os.path.join(d, "state.json")
+
+        class NoScan(FakeRun):
+            def __call__(self, cmd, **kw):
+                if cmd[0] in ("lsof", "pgrep"):
+                    raise AssertionError("rescan must not run, %r" % (cmd,))
+                return super().__call__(cmd, **kw)
+
+        row = w.capture_once(d, log, state, run=NoScan(lock), pre_pids=["4242"])
+        self.assertEqual(row["holders"][0]["pid"], "4242")
+        self.assertEqual(row["holders"][0]["argv"], "git commit -m x")
+
+    def test_snap_holders_returns_pids(self):
+        self.assertEqual(w.snap_holders("/repo", run=FakeRun("L")), ["4242"])
+
+        class Empty(FakeRun):
+            def __call__(self, cmd, **kw):
+                return Out("")
+
+        self.assertIsNone(w.snap_holders("/repo", run=Empty("L")))
+
 
 if __name__ == "__main__":
     unittest.main()
