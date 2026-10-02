@@ -20,18 +20,40 @@ const noulAnswer = (noul) => async () => ({
   usage: { input_tokens: 500, output_tokens: 20 },
 });
 
-test('addedBlocks splits per file, skips vendored and dep trees, needs 3 added lines', () => {
+test('addedBlocks splits per file, skips vendored/dep/non-source paths, needs 3 added lines', () => {
   const diff = [
     diffOf('upstream/acme/lib.js', ['a', 'b', 'c', 'd']),
     diffOf('kit/src/mine.ts', ['x', 'y']),
     diffOf('work/x/node_modules/dep/index.js', ['a', 'b', 'c', 'd']),
     diffOf('kit/src/real.ts', ['l1', 'l2', 'l3', 'l4', 'l5']),
+    diffOf('.gitignore', ['a', 'b', 'c']),
+    diffOf('docs/guide.txt', ['a', 'b', 'c']),
+    diffOf('bun.lock', ['a', 'b', 'c']),
   ].join('\n');
-  const blocks = addedBlocks(diff);
-  assert.deepEqual(blocks.map((b) => b.file), ['kit/src/real.ts']);
+  const { scored, skipped } = addedBlocks(diff);
+  assert.deepEqual(scored.map((b) => b.file), ['kit/src/real.ts']);
+  assert.deepEqual(new Map(skipped.map((s) => [s.file, s.reason])), new Map([
+    ['upstream/acme/lib.js', 'excluded-path'],
+    ['work/x/node_modules/dep/index.js', 'excluded-path'],
+    ['.gitignore', 'dotfile'],
+    ['docs/guide.txt', 'non-source-extension'],
+    ['bun.lock', 'lockfile'],
+  ]));
   assert.equal(isScoredPath('upstream/acme/lib.js'), false);
   assert.equal(isScoredPath('work/x/node_modules/dep/index.js'), false);
   assert.equal(isScoredPath('kit/src/real.ts'), true);
+  assert.equal(isScoredPath('kit/src/real.md'), false);
+});
+
+test('.gitignore and .txt are skipped without a call; pasted MIT .js is scored', async () => {
+  const rows = [];
+  let asked = 0;
+  const diff = [diffOf('.gitignore', ['a', 'b', 'c']), diffOf('notes.txt', ['a', 'b', 'c']), diffOf('lib/pasted.js', MIT_BLOCK.split('\n'))].join('\n');
+  const r = await scoreCommit({ commit: 's1', diff, ask: async (o) => { asked += 1; return noulAnswer(0.91)(o); }, log: async (row) => rows.push(row), count: async () => 0 });
+  assert.equal(asked, 1);
+  assert.equal(r.scored, 1);
+  assert.deepEqual(rows.filter((x) => x.status === 'skipped').map((x) => [x.file, x.reason]), [['.gitignore', 'dotfile'], ['notes.txt', 'non-source-extension']]);
+  assert.equal(rows.find((x) => x.file === 'lib/pasted.js').would_flag, true);
 });
 
 test('planted MIT block is flagged, own code is not; rows carry commit/file/hash', async () => {

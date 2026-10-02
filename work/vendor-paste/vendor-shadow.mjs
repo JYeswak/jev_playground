@@ -34,17 +34,30 @@ const LOG_FILE = process.env.VENDOR_SHADOW_LOG ??
 
 const SKIP_DIRS = ["upstream/", "docs-mirror/"];
 const SKIP_SEGS = new Set(["node_modules", ".venv"]);
+const SOURCE_EXTS = new Set(["ts", "js", "mjs", "cjs", "jsx", "tsx", "py", "rs", "go", "sh", "bash", "c", "h", "cpp", "hpp", "cc", "cxx", "java", "rb", "php", "swift", "kt", "kts", "cs", "scala", "hs", "ml", "mli", "ex", "exs", "erl", "clj", "cljs", "zig", "nim", "lua", "pl", "pm", "r", "jl", "dart", "vue", "svelte"]);
+const LOCKFILES = new Set(["package-lock.json", "yarn.lock", "bun.lock", "bun.lockb", "cargo.lock", "gemfile.lock", "poetry.lock", "pdm.lock", "pnpm-lock.yaml", "podfile.lock", "composer.lock", "pipfile.lock", "packages.lock.json", "pubspec.lock", "go.sum"]);
 
 export function isScoredPath(path) {
-  if (typeof path !== "string" || !path) return false;
-  if (SKIP_DIRS.some((d) => path === d || path.startsWith(d))) return false;
-  if (path.split("/").some((s) => SKIP_SEGS.has(s))) return false;
-  const low = path.toLowerCase();
-  if (low.includes("fork") || low.includes("/sdk/") || low.includes("p2-compaction")) return false;
-  return true;
+  return skipReason(path) === null;
 }
 
-/** Added-line blocks per file from a unified diff (added lines only, <=60). */
+/** null = score it; otherwise the skipped:<reason> suffix (no call made). */
+export function skipReason(path) {
+  if (typeof path !== "string" || !path) return "bad-path";
+  if (SKIP_DIRS.some((d) => path === d || path.startsWith(d))) return "excluded-path";
+  if (path.split("/").some((s) => SKIP_SEGS.has(s))) return "excluded-path";
+  const low = path.toLowerCase();
+  if (low.includes("fork") || low.includes("/sdk/") || low.includes("p2-compaction")) return "excluded-path";
+  const base = path.split("/").pop() ?? path;
+  if (base.startsWith(".")) return "dotfile";
+  if (LOCKFILES.has(base.toLowerCase())) return "lockfile";
+  const dot = base.lastIndexOf(".");
+  if (dot < 0 || !SOURCE_EXTS.has(base.slice(dot + 1).toLowerCase())) return "non-source-extension";
+  return null;
+}
+
+/** Added-line blocks per file (added lines only, <=60). Returns scored
+ * candidates plus per-file skip reasons; skips make no calls. */
 export function addedBlocks(diff) {
   const blocks = [];
   let file = null;
@@ -66,9 +79,12 @@ export function addedBlocks(diff) {
     }
   }
   flush();
-  return blocks.filter((b) => isScoredPath(b.file))
+  const scored = blocks.filter((b) => skipReason(b.file) === null)
     .sort((a, b) => b.added.length - a.added.length)
     .slice(0, VENDOR_MAX_HUNKS);
+  const skipped = blocks.filter((b) => skipReason(b.file) !== null)
+    .map((b) => ({ file: b.file, reason: skipReason(b.file) }));
+  return { scored, skipped };
 }
 
 const sha = (s) => createHash("sha256").update(s, "utf8").digest("hex").slice(0, 12);
@@ -88,14 +104,19 @@ export async function todayCount(logFile = LOG_FILE) {
 
 export async function scoreCommit({ commit, diff, ask, log, count }) {
   const day = new Date().toISOString().slice(0, 10);
-  const blocks = addedBlocks(diff);
+  const { scored: blocks, skipped } = addedBlocks(diff);
+  for (const s of skipped) {
+    await log({ ts: new Date().toISOString(), day, commit, file: s.file, status: "skipped", reason: s.reason, model: VENDOR_MODEL });
+  }
   if (blocks.length === 0) {
-    await log({ ts: new Date().toISOString(), day, commit, status: "skipped", reason: "no-scorable-hunks", model: VENDOR_MODEL });
-    return { scored: 0, skipped: "no-scorable-hunks" };
+    if (skipped.length === 0) {
+      await log({ ts: new Date().toISOString(), day, commit, status: "skipped", reason: "no-scorable-hunks", model: VENDOR_MODEL });
+    }
+    return { scored: 0, skipped: skipped.length };
   }
   if ((await count()) >= VENDOR_CAP_PER_DAY) {
     await log({ ts: new Date().toISOString(), day, commit, status: "fail_open", reason: "cap", model: VENDOR_MODEL });
-    return { scored: 0, skipped: "cap" };
+    return { scored: 0, skipped: skipped.length };
   }
   let scored = 0;
   for (const b of blocks) {

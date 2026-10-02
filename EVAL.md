@@ -3591,3 +3591,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Fresh proof on real HEAD 9ac57444 (manual run = exact hook code path):** CORPUS-SHA256.txt noul 0.25 allow (correct); .gitignore allowlist block noul 0.51/0.52 would_flag BOTH runs (live FP sample, matches eval 12/76 wrong). Key resolved via fleet provider, 1804/229/143ms, ~$0.002 total. First vendor-shadow.jsonl rows.
 - **Key tradeoff stated in-file:** provider spawns infisical CLI (15 s timeout, 10-min TTL) inside the hook path — against the close-check no-subprocess shape; the alternative is a seam that never scores (post-commit env rarely carries the key). Bounded and fail-open; revisit if commit latency complains.
 - **Receipts:** scorer + tests + wrapper + this row. Committing now (COMMITS OK); bead jev-m94x left in_progress for the >=30-hunk blind-label campaign.
+
+## 2026-10-02 jev-m94x scope cut: source hunks only, skips logged (WindyLantern) [test]
+
+- **Change (conductor order; first live FP was .gitignore at 0.51/0.52):** scorer now takes source extensions only (35-strong allowlist; dotfiles, lockfiles, .md/.txt/.json/.yml/.tsv all skip) and logs every skipped hunk as `status=skipped:<reason>` with zero calls. `skipReason()` returns the suffix; `isScoredPath` kept as the boolean face. Cap check moved after skip logging (skips are free).
+- **Tests 5/5:** addedBlocks shape ({scored, skipped} + reason map incl. dotfile/lockfile/non-source-extension/excluded-path); conductor acceptance verbatim (.gitignore + notes.txt skipped with exactly 1 call for the MIT .js, flagged); prior MIT/own/cap/cut tests unbroken.
+- **ubs 0/0. No live calls** (offline gate only); EVAL + commit next, then DONE callback.
