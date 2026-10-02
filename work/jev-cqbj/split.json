@@ -1,0 +1,1 @@
+{"seed": 78, "design": "dev-first-15 held-rest per task, file order of arm rows", "bars": {"retry": "acc>=0.70", "d1read": "acc>=0.60", "diffrisk": "rec>=0.50 and acc>=0.70", "veto": "rec>=7/17-equiv and fp<=6/60-equiv"}, "arms": {"arm1": "both polarities parallel, s=(p_pos+(1-p_neg))/2", "arm2": "positive-only Choice + fitted conf gate"}}
