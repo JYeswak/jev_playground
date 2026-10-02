@@ -3430,3 +3430,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Live (20 recorded pairs x 3 = 60 bounded jev-1.13.0 calls, handler's own askJev path, frozen question/cut):** 0/20 flip pairs, max noul spread <= 0.20; the 2 historically-flip pairs stable all 3 rounds. 23,592 in-tok ~$0.00099, no 401/402/403.
 - **Answer to 11qz note:** turn-level drop-split differences (16/4 vs 7/13) are prompt-driven (different promptHash), not same-pair instability. STABLE by bar in both arms. Feeds jev-m959 keep-precision context only.
 - **Boundary:** 118 keyless pairs dominated by replay-era duplicates; live N=20 small by design (bounded spend). Scratch: var/agent-tmp/syje.51150/stability-*. Left in_progress for verifier.
+
+## 2026-10-02 jev-yl60 nimble memory-relevance replay: 84.4% agreement, 3/11 critical dropped FAIL (CyanPeak) [keyless-local]
+
+- **Population (bar pre-replay):** m959 labelled 50 keeps (11 relevant / 39 irrelevant) + seeded-random 200 recorded sidecar pairs (seed 11, snapshot 01:30:18Z). 250 pairs through localbench nimble, SAME Noul wire shape as handler (rel/type-noul/backtick template, CUT 0.5), sequential, 0 errors. Window cleared by localbench; latencies recorded, not judged (shared GPU).
+- **Result:** agreement with recorded jev-1.13.0 verdicts 211/250 (84.4%) vs 95% bar FAIL; nimble dropped 3/11 Jev-kept+m959-relevant (jev 0.62-0.76 -> nimble 0.06-0.48) vs never-drop bar FAIL. Asymmetry: keep->drop 22 vs drop->keep 17 — nimble is harsher, so neither drop-confirmation nor keep-only cascade is safe without paid look. No cascade proposed; recorded per bead.
+- **Spend:** $0 (local only). Scratch: var/agent-tmp/syje.51150/yl60-*. Left in_progress for verifier.
