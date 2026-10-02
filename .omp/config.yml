@@ -86,6 +86,7 @@ extensions:
   - ./.omp/extensions/jev-flag.ts
   - ./.omp/extensions/jev-screen.ts
   - ./.omp/extensions/jev-claim-check.ts
+  - ./.omp/extensions/jev-skill-veto.ts
   - ./.omp/extensions/kit-guard
   # Operator safety baseline, restated on purpose. omp's settings merge REPLACES arrays
   # (pi-coding-agent src/config/settings.ts #deepMerge), so this project list otherwise
