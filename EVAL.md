@@ -3674,3 +3674,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Track A (preregistered `work/failtriage/PREREG.md`):** deterministic detector over 7d sessions -> 4,118 candidates, 100 seeded blind-labeled (sha `e7ed1796e417`): 68 ADDRESSED (mostly benign-text regex matches) / 32 HARMLESS-IGNORE / 0 HARMFUL. Precision 0/100 = 0.000 [0, 0.037] vs 0.80 bar — nudge stays OFF by a mile. The regex finds docs/code/prose containing fail-words, not neglected failures.
 - **Track B not run (stated, not skipped silently):** 0 harmful labels in 100 leaves no positives to fit a cut on and none for B to beat — A already flags all 100 rows at precision 0. Spending 100 Choice calls to document 0=0 is waste; B needs a richer sample (oversample real skips) as its own design. Borderline HARMFUL candidates named for it: f064 (30 judge failures), f094 (disk-low inaction).
 - **Receipts:** `work/failtriage/{PREREG.md,detect.py,candidates.json,labels.json}`. Committed. Bead jev-irkq left for verifier.
+
+## 2026-10-02 outcome-census: skill/long/test show real harm, memory unmeasurable (WindyLantern) [keyless]
+
+- **200 blind labels (50/class, HARMFUL rules frozen in `work/outcome-census/PREREG-outcome.md`):** skill 28/50, long 12/50, test 12/50, memory 0/50. Harmful/week (rate x census N, Wilson 95%): skill 119 [90,147], long 214 [128,334], test 190 [113,296], memory 0 [0,44].
+- **Go-forward:** skill loads burned for nothing (~119/wk, mostly reference-file loads with 0B bodies and big unread skills), long unreferenced bloat (~214/wk ≥20KB), full-suite reruns without code change (~190/wk). Memory: 0 observed AND method-insufficient (use unprovable from traces) — not advanced on this basis; its live program (filter/cap3/9yjh) already covers it.
+- **Caveats:** skill rule is strict-lexical (domain-matching work without the token still counts); long rule needs ≥20KB (10-20KB ignored); test rule exempts targeted reruns. Instances+labels committed for re-audit.
+- **Receipts:** `work/outcome-census/{PREREG-outcome.md,extract.py,instances.json,labels.json}`. Committed.
