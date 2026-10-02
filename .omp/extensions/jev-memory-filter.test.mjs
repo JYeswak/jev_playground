@@ -435,6 +435,26 @@ test("deadline: stalled item keeps, resolved items decide, wall bounded", async 
   assert.ok(rows.some((r) => r.status === "deadline-keep" && r.decision === "keep"));
 });
 
+test("deadline race: exactly one terminal row per slot (live-found 22 rows for 20)", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const delays = { "race a": 1400, "race b": 1490, "race c": 1560, "race d": 1700 };
+  const ask = async ({ state }) => {
+    await new Promise((resolve) => setTimeout(resolve, delays[state.memory]));
+    return { ok: true, scores: { rel: 0.9 }, latencyMs: delays[state.memory], model: "m", usage: { input_tokens: 10 } };
+  };
+  const handler = makeBeforeAgentStartHandler({ ask, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
+  const sys = ["<memories>\n- race a\n\n- race b\n\n- race c\n\n- race d\n</memories>"];
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, undefined);
+  await new Promise((resolve) => setTimeout(resolve, 500));
+  assert.equal(out, undefined);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.equal(rows.length, 4);
+  for (const h of new Set(rows.map((r) => r.memoryHash))) {
+    assert.equal(rows.filter((r) => r.memoryHash === h).length, 1);
+  }
+  assert.ok(rows.every((r) => ["scored", "deadline-keep", "late-ignored"].includes(r.status)));
+});
+
 test("span prune is byte-exact on collision-free recall", () => {
   const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>", "tail"];
   const occs = parseOccurrences(sys);

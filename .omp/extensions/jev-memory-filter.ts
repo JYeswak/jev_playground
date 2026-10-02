@@ -286,6 +286,15 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
       // Unresolved at the deadline keeps (logged); late answers are ignored
       // for decisions and logged late-ignored for spend visibility.
       const settled = new Array<boolean>(slots.length).fill(false);
+      // Claim-before-write: the deadline loop awaits between rows, so a late
+      // settle can complete mid-loop. Every terminal row must win this claim
+      // first, or one slot emits two rows (live-found 2026-10-02: 22 rows for
+      // 20 slots, deadline-keep + late-ignored on the same slot).
+      const claim = (idx: number): boolean => {
+        if (settled[idx]) return false;
+        settled[idx] = true;
+        return true;
+      };
       let timedOut = false;
       const settle = async (idx: number): Promise<void> => {
         const slot = slots[idx];
@@ -299,40 +308,48 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
             timeoutMs: CALL_TIMEOUT_MS,
           });
         } catch (error) {
-          if (!timedOut) {
+          // Post-deadline failures leave the row to the deadline loop.
+          if (!timedOut && claim(idx)) {
             await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "fail_open", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: Date.now() - t0, inputTokens: null, error: error instanceof Error ? error.message : String(error) });
           }
-          settled[idx] = true;
           return;
         }
         if (timedOut) {
-          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "late-ignored", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
-          settled[idx] = true;
+          if (claim(idx)) {
+            await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "late-ignored", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
+          }
           return;
         }
         if (!result.ok) {
           if (/\bHTTP (?:401|402|403)\b/.test(result.error)) paused = true;
-          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "fail_open", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: null, error: result.error });
-          settled[idx] = true;
+          // Post-deadline failures leave the row to the deadline loop.
+          if (!timedOut && claim(idx)) {
+            await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "fail_open", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: null, error: result.error });
+          }
           return;
         }
         const noul = result.scores["rel"];
         if (typeof noul !== "number" || !Number.isFinite(noul)) {
-          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "invalid-keep", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
-          settled[idx] = true;
+          // Post-deadline invalid answers keep spend visible as late-ignored.
+          if (!timedOut && claim(idx)) {
+            await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "invalid-keep", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
+          } else if (timedOut && claim(idx)) {
+            await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "late-ignored", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null, error: "invalid-score" });
+          }
           return;
         }
         const drop = noul < CUT;
         const decision = drop ? "drop" : "keep";
-        if (memo.size >= MAX_MEMO) {
-          const oldest = memo.keys().next();
-          if (!oldest.done) memo.delete(oldest.value);
+        if (!timedOut && claim(idx)) {
+          if (memo.size >= MAX_MEMO) {
+            const oldest = memo.keys().next();
+            if (!oldest.done) memo.delete(oldest.value);
+          }
+          memo.set(slot.memoKey, { noul, decision, inputTokens: result.usage?.input_tokens ?? null });
+          if (drop) droppedTexts.add(slot.item.text);
+          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash: slot.memoryHash, noul, decision, tokensSaved: drop ? Math.floor(slot.item.text.length / 4) : 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
+          await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash: slot.memoryHash, prompt, memory: slot.item.text, noul, decision });
         }
-        memo.set(slot.memoKey, { noul, decision, inputTokens: result.usage?.input_tokens ?? null });
-        if (drop) droppedTexts.add(slot.item.text);
-        await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash: slot.memoryHash, noul, decision, tokensSaved: drop ? Math.floor(slot.item.text.length / 4) : 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });
-        await writeSidecar({ schema: SIDECAR_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "scored", promptHash, memoryHash: slot.memoryHash, prompt, memory: slot.item.text, noul, decision });
-        settled[idx] = true;
       };
       const deadlineAt = Date.now() + FILTER_DEADLINE_MS;
       let cursor = 0;
@@ -353,8 +370,7 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
       ]);
       timedOut = true;
       for (let idx = 0; idx < slots.length; idx += 1) {
-        if (!settled[idx]) {
-          settled[idx] = true;
+        if (claim(idx)) {
           const slot = slots[idx];
           await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "deadline-keep", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: null, inputTokens: null });
         }
