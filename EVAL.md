@@ -3455,3 +3455,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Census:** all 3,337 omp session files, bash toolResults with `details.wallTimeMs`: N=151,275 labelled, longs>60 s = 5 (base rate 0.0033%), majority always-short = 0.999967. Wall p50 260 ms / p90 10.2 s / p99 40.0 s / max 120.0 s.
 - **Longs autopsy:** `rm -ri` + `git add -p` x2 (interactive prompts, not compute), `sleep 60` (planted), one 60 s-poll loop. True longs are censored from this label: the harness backgrounds them, so recorded wallTimeMs stays small.
 - **Verdict:** STOP at discovery step 1 (N=5 < 60; baseline already ~1.0). No bar, no live calls, $0 spend. NEGATIVE_EVIDENCE R141. Scratch: var/agent-tmp/lrpred-work/scan.py + rows.jsonl. Left in_progress for verifier.
+
+## 2026-10-02 jev-h1hr RAG 4-Noul branch: keep 0.071 FAIL, R146 (HazySpring) [live]
+
+- **Dev (170 pairs, live jev-1.13.0, 170 calls, 117,492 in-tok ~$0.0049, thresholds committed pre-run: evidence 0.55, injection 0.70):** kept 14, relevant-kept 1 -> keep precision 0.071 vs 0.405 FAIL (worse than base 0.205); drops 123/126 = 0.976 vs 0.90 PASS. The usable-evidence question rejects nearly everything including relevant memories.
+- **Post-hoc threshold sweep (30 combos, $0, same answers):** keep precision never exceeds 0.23 at any cut while drops trade off — the usable axis carries no keep signal on this pool.
+- **Verdict:** MODEL-LIMIT (R146). No shadow change, no held-out run. Left in_progress for verifier.

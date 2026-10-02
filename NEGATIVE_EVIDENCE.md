@@ -5011,3 +5011,15 @@ assignment/fleet snapshot at arrival, not bead DB status), beating 0.704 keyless
 on this corpus. Reopen cites this row.
 
 **Evidence:** var/agent-tmp/ztfe-feas.34880/{build1,resolve,ztlive.py,corpus_states.json,zt_receipt.jsonl} (scratch); bead jev-ztfe feasibility + prereg comments.
+
+## R146 — MODEL-LIMIT: RAG 4-Noul branch for memory keep precision (2026-10-02)
+
+**Hypothesis:** usable-evidence Noul + route() (classifying_rag_passages port) lifts keep precision without losing drop precision (bead jev-h1hr, breadth D1).
+
+**What was tried:** preregistered dev replay, 44 clean keeps + 126 drops, live jev-1.13.0, 170 single calls (4 questions each), 117,492 input tokens ~$0.0049, all scored clean, thresholds committed pre-run (evidence 0.55, injection 0.70). Result: keep 1/14=0.071, drops 123/126=0.976. Post-hoc threshold sweep (30 combos, $0 extra): keep precision never exceeds 0.23 at any cut while drops trade off — the usable axis carries no keep signal here.
+
+**Verdict:** MODEL-LIMIT for Noul-based keep triage on this pool. No shadow change, no held-out run.
+
+**Retry-condition:** a design that changes the decision structure with set-wise or relative judgment (Choice top-k D2, hierarchical beam D5), or labels that separate usable from topical (D3 graded rubric). Reopen cites this row.
+
+**Evidence:** work/jev-h1hr/replay-d1.mjs + results-d1.json (hashes/decisions/spend, no raw text); bead jev-h1hr bar + results comments.
