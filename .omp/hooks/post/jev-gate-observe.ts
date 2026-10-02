@@ -449,17 +449,17 @@ export async function observe(
       verdict = { drop: true, reason: "filter-error" };
     }
     if (verdict.drop) {
-      await write({ ...base, status: "skipped", probs: null, flag: null, latencyMs: null, tokens: null, skipped: verdict.reason === "filter-error" ? "filter-error" : "secret", error: null, nimbleProbs: null, jevSkipped: null, screen: null });
+      await write({ ...base, status: "skipped", probs: null, flag: null, latencyMs: null, tokens: null, skipped: verdict.reason === "filter-error" ? "filter-error" : "secret", error: null, nimbleProbs: null, jevSkipped: null, screen: "unscreened" });
       return undefined;
     }
     if (!session.trim() || session === "unknown") {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=session-unavailable", nimbleProbs: null, jevSkipped: null, screen: null });
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=session-unavailable", nimbleProbs: null, jevSkipped: null, screen: "unscreened" });
       return undefined;
     }
     const now = (deps.nowMs ?? Date.now)();
     const until = billingHoldActive(now);
     if (until !== null) {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=billing-hold until=" + new Date(until).toISOString(), nimbleProbs: null, jevSkipped: null, screen: null });
+      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=billing-hold until=" + new Date(until).toISOString(), nimbleProbs: null, jevSkipped: null, screen: "unscreened" });
       return undefined;
     }
     const cascade = deps.cascade ?? CASCADE_ENABLED;
@@ -483,9 +483,14 @@ export async function observe(
     // Cascade screen (inactive until jev-8w0h is verified-closed): nimble
     // clears benign commands before any paid call. Fail open throughout.
     // A failed local screen (throw, not-ok, invalid scores) falls through to
-    // the paid call below (paid cap still applies) with screen=paid-fallback,
+    // the paid call below (paid cap still applies) with screen=paid-fallback-<cause>,
     // so no command goes unscreened on a saturated local GPU.
     let nimbleProbs: Record<string, number> | null = null;
+    // jev-t3tk: fallback cause rides along so the paid row logs exactly why
+    // nimble did not decide: timeout (gateway stall), http (bad gateway
+    // response), or fence (fallback path hit the paid budget). Null = nimble
+    // decided or was skipped by rule/switch.
+    let fallbackCause: "timeout" | "http" | "fence" | null = null;
     let paidFallback = false;
     // jev-nbbm pre-rule: a deterministic destructive-class match skips nimble
     // for paid Jev at zero model cost, logged screen=prerule-paid. The paid
@@ -495,6 +500,7 @@ export async function observe(
       nimbleProbs = null;
     } else if (effectiveCascade) {
       let screen: AskResult | null = null;
+      let screenError: unknown = null;
       try {
         screen = await (deps.localAsker ?? liveLocalAsker)({
           state: { command, context: STATE_CONTEXT },
@@ -502,47 +508,58 @@ export async function observe(
           model: LOCAL_MODEL,
           timeoutMs: LOCAL_TIMEOUT_MS,
         });
-      } catch {
+      } catch (err) {
+        screenError = err;
         paidFallback = true;
+        const msg = screenError instanceof Error ? screenError.message : String(screenError);
+        fallbackCause = /timeout|timed out|TimeoutError|abort/i.test(msg) ? "timeout" : "http";
       }
       if (!paidFallback) {
         if (!screen!.ok) {
           paidFallback = true;
+          const reason = screen!.reason ?? "";
+          const detail = screen!.error ?? "";
+          fallbackCause = reason === "gateway-unreachable" && /timeout|timed out|TimeoutError|abort/i.test(reason + " " + detail) ? "timeout" : "http";
         } else {
-          const scores = screen!.scores ?? {};
-          let top = -Infinity;
-          for (const key in scores) {
-            const score = scores[key];
-            if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 1) top = NaN;
-            else if (score > top) top = score;
-          }
-          if (!Number.isFinite(top)) {
-            paidFallback = true;
-          } else {
-            nimbleProbs = scores;
-            if (top <= CUT) {
-              await write({
-                ...base,
-                status: "scored",
-                model: screen!.model ?? LOCAL_MODEL,
-                probs: scores,
-                flag: false,
-                latencyMs: screen!.latencyMs ?? null,
-                tokens: null,
-                skipped: null,
-                error: null,
-                nimbleProbs: scores,
-                jevSkipped: true,
-                screen: null,
-              });
-              return undefined;
+            const scores = screen!.scores ?? {};
+            let top = -Infinity;
+            for (const key in scores) {
+              const score = scores[key];
+              if (typeof score !== "number" || !Number.isFinite(score) || score < 0 || score > 1) top = NaN;
+              else if (score > top) top = score;
             }
-          }
+            if (!Number.isFinite(top)) {
+              paidFallback = true;
+              fallbackCause = "http";
+            } else {
+              nimbleProbs = scores;
+              if (top <= CUT) {
+                await write({
+                  ...base,
+                  status: "scored",
+                  model: screen!.model ?? LOCAL_MODEL,
+                  probs: scores,
+                  flag: false,
+                  latencyMs: screen!.latencyMs ?? null,
+                  tokens: null,
+                  skipped: null,
+                  error: null,
+                  nimbleProbs: scores,
+                  jevSkipped: true,
+                  screen: "nimble-cleared",
+                });
+                return undefined;
+              }
+            }
         }
       }
     }
     if (budget.calls >= paidCap) {
-      await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=daily-cap", nimbleProbs, jevSkipped: cascade ? false : null, screen: null });
+      if (fallbackCause) {
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=daily-cap", nimbleProbs, jevSkipped: cascade ? false : null, screen: "paid-fallback-fence" });
+      } else {
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=daily-cap", nimbleProbs, jevSkipped: cascade ? false : null, screen: "unscreened" });
+      }
       return undefined;
     }
     budget.calls += 1;
@@ -561,17 +578,17 @@ export async function observe(
         timeoutMs: 20000,
       });
     } catch (err) {
-      await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "ask-threw: " + (err instanceof Error ? err.message : String(err)), nimbleProbs: null, jevSkipped: null, screen: null });
+      await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "ask-threw: " + (err instanceof Error ? err.message : String(err)), nimbleProbs: null, jevSkipped: null, screen: "unscreened" });
       return undefined;
     }
     if (!answer.ok) {
       if (answer.reason === "unconfigured") {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=unconfigured", nimbleProbs: null, jevSkipped: null, screen: null });
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "NOT_RUN reason=unconfigured", nimbleProbs: null, jevSkipped: null, screen: "unscreened" });
       } else if (answer.reason === "billing-hold") {
-        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, skipped: null, error: "NOT_RUN reason=" + (answer.error ?? "billing-hold"), nimbleProbs: null, jevSkipped: null, screen: null });
+        await write({ ...base, status: "not-run", probs: null, flag: null, latencyMs: null, skipped: null, error: "NOT_RUN reason=" + (answer.error ?? "billing-hold"), nimbleProbs: null, jevSkipped: null, screen: "unscreened" });
       } else {
         noteBillingRefusal(answer, now);
-        await write({ ...base, status: "error", probs: null, flag: null, latencyMs: answer.latencyMs ?? null, tokens: null, skipped: null, error: (answer.reason ?? "unknown") + ": " + (answer.error ?? ""), nimbleProbs: null, jevSkipped: null, screen: null });
+        await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: (answer.reason ?? "unknown") + ": " + (answer.error ?? ""), nimbleProbs: null, jevSkipped: null, screen: "unscreened" });
       }
       return undefined;
     }
@@ -581,10 +598,16 @@ export async function observe(
       const score = probs[key];
       if (typeof score === "number" && Number.isFinite(score) && score > maxScore) maxScore = score;
     }
+    // jev-t3tk taxonomy: every paid row names its screening route. Legacy
+    // non-cascade rows never ran a local screen; they land on unscreened
+    // (their paid verdict still stands in probs/flag) — reachable only with
+    // cascade disabled, which no production profile does.
     let screenLabel: string | null = null;
     if (typeof prerule === "string" && prerule.length > 0) screenLabel = "prerule-paid";
     else if (cascadeOff) screenLabel = "paid-cascade-off";
-    else if (paidFallback) screenLabel = "paid-fallback";
+    else if (fallbackCause) screenLabel = "paid-fallback-" + fallbackCause;
+    else if (nimbleProbs) screenLabel = "nimble-flagged-paid";
+    else screenLabel = "unscreened";
     await write({
       ...base,
       status: "scored",

@@ -442,7 +442,7 @@ test("cascade: nimble-positive reaches the paid asker with both scores logged", 
   assert.equal(wrote[0].row.model, "test-model");
 });
 
-test("cascade: local timeout falls back to paid and logs screen=paid-fallback", async () => {
+test("cascade: local timeout falls back to paid and logs screen=paid-fallback-timeout", async () => {
   reset();
   let paid = 0;
   const asker = async () => { paid++; return scoredAsker(); };
@@ -452,14 +452,14 @@ test("cascade: local timeout falls back to paid and logs screen=paid-fallback", 
     { ...cascadeMem, asker, localAsker, dailyBudget: budget });
   assert.equal(paid, 1, "a timed-out local screen must spend one paid call");
   assert.equal(wrote[0].row.status, "scored");
-  assert.equal(wrote[0].row.screen, "paid-fallback");
+  assert.equal(wrote[0].row.screen, "paid-fallback-timeout");
   assert.equal(wrote[0].row.nimbleProbs, null);
   assert.equal(wrote[0].row.jevSkipped, false);
   assert.equal(wrote[0].row.flag, true);
   assert.equal(budget.calls, 1, "fallback consumes the paid budget");
 });
 
-test("cascade: local throw falls back to paid and logs screen=paid-fallback", async () => {
+test("cascade: local throw falls back to paid and logs screen=paid-fallback-http", async () => {
   reset();
   let paid = 0;
   const asker = async () => { paid++; return scoredAsker(); };
@@ -468,10 +468,10 @@ test("cascade: local throw falls back to paid and logs screen=paid-fallback", as
     { ...cascadeMem, asker, localAsker, dailyBudget: { day: "", calls: 0 } });
   assert.equal(paid, 1);
   assert.equal(wrote[0].row.status, "scored");
-  assert.equal(wrote[0].row.screen, "paid-fallback");
+  assert.equal(wrote[0].row.screen, "paid-fallback-http");
 });
 
-test("cascade: fallback under an exhausted paid budget stays not-run on daily-cap", async () => {
+test("cascade: fallback under an exhausted paid budget logs paid-fallback-fence", async () => {
   reset();
   let paid = 0;
   const asker = async () => { paid++; return scoredAsker(); };
@@ -480,7 +480,7 @@ test("cascade: fallback under an exhausted paid budget stays not-run on daily-ca
     { ...cascadeMem, asker, localAsker, dailyBudget: { day: "2026-09-24", calls: 1000 }, dailyCap: 1000 });
   assert.equal(paid, 0, "paid cap still applies on fallback");
   assert.equal(wrote[0].row.status, "not-run");
-  assert.match(wrote[0].row.error, /NOT_RUN reason=daily-cap/);
+  assert.equal(wrote[0].row.screen, "paid-fallback-fence");
 });
 
 test("cascade: nimble-cleared commands do not consume the paid budget", async () => {
@@ -596,4 +596,47 @@ test("prerule: syje 10 planted commands all reach paid (recorded nimble verdicts
   assert.equal(paid, 10, `only ${paid}/10 planted reached paid`);
   assert.equal(screens.filter((s) => s === "prerule-paid").length, 7);
   assert.equal(nimbleCalls, 3, "nimble must see only the 3 non-pattern plants");
+});
+
+test("taxonomy: slow-but-answered nimble clear logs nimble-cleared, never a timeout class", async () => {
+  reset();
+  let paid = 0;
+  const asker = async () => { paid++; return scoredAsker(); };
+  const localAsker = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 120));
+    return { ok: true, scores: { destructive: 0.1, exfiltration: 0.05 }, model: "nimble:latest", latencyMs: 4800 };
+  };
+  await observe({ toolName: "bash", input: { command: "ls" } },
+    { ...cascadeMem, asker, localAsker, dailyBudget: { day: "", calls: 0 } });
+  assert.equal(paid, 0);
+  assert.equal(wrote[0].row.screen, "nimble-cleared");
+  assert.equal(wrote[0].row.jevSkipped, true);
+  assert.equal(wrote[0].row.latencyMs, 4800);
+});
+
+test("taxonomy: gateway-http failure logs paid-fallback-http", async () => {
+  reset();
+  const asker = async () => scoredAsker();
+  const localAsker = async () => ({ ok: false, reason: "gateway-http", error: "HTTP 502", latencyMs: 40 });
+  await observe({ toolName: "bash", input: { command: "ls" } },
+    { ...cascadeMem, asker, localAsker, dailyBudget: { day: "", calls: 0 } });
+  assert.equal(wrote[0].row.screen, "paid-fallback-http");
+  assert.equal(wrote[0].row.jevSkipped, false);
+});
+
+test("taxonomy: nimble-flagged paid rows carry nimble-flagged-paid", async () => {
+  reset();
+  const asker = async () => scoredAsker();
+  await observe({ toolName: "bash", input: { command: "ls" } },
+    { ...cascadeMem, asker, localAsker: nimbleFlag, dailyBudget: { day: "", calls: 0 } });
+  assert.equal(wrote[0].row.screen, "nimble-flagged-paid");
+  assert.equal(wrote[0].row.jevSkipped, false);
+});
+
+test("taxonomy: secret, session-less, and error rows carry unscreened", async () => {
+  reset();
+  const asker = async () => scoredAsker();
+  await observe({ toolName: "bash", input: { command: "ls" } }, { ...cascadeMem, asker, session: "unknown" });
+  assert.equal(wrote[0].row.screen, "unscreened");
+  assert.equal(wrote[0].row.status, "not-run");
 });
