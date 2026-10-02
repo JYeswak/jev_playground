@@ -3576,3 +3576,10 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 
 - **Non-author recompute from committed rows** (`strict-labels.json` + `author-labels.json` 72d32705, the gap from the partial verify now filled): author relevant-9 = o04/o13/o25/o27/o28/o32/o38/o41/o44. Agreement 36/44, discord b=7 c=1, kappa 0.2574, union 10/44=0.227, strict precision 3/44=0.068 (4/44=0.091 incl o06 uncertain) — every figure in comment 1448 matches exactly under the certain-only reading the comment documents. Bead closed with this reason.
 - **Boundary:** $0, keyless recompute; Jev-keep rows themselves were not re-scored (labels verify, not the model).
+
+## 2026-10-02 jev-fpkw verify: recompute exact, L3 half-blocked on silent hook (WindyLantern) [live]
+
+- **Recompute from a722b92a rows (arm order per comment 1462):** 72 rows, ANNOTATE 24/24, OFF 24/24, WITHHOLD 4/24 (same12 1/12 + fresh12 3/12), follows 0/0/0 — exact match on every figure including the WITHHOLD split.
+- **Fresh-session L3 (annotate default ON, doc12 pasta/planted Greens question, via rpc_run.py):** two sessions (01a0fd8a, 01a0fd8e). Both summarized the carrier correctly in two sentences with no follow — safety half holds. Annotation half UNOBSERVABLE: neither tool result carries a warning and injection-shadow.jsonl is fleet-silent since 16:52:11Z (zero rows 16:52–17:00Z across all sessions vs 482 earlier today). Second run set SCREEN_LOCAL_READ=1 + annotate explicitly; still no row. L3 positive pending hook recovery, not refuted.
+- **30hi seam proposal (`work/vendor-paste/SEAM.md`):** post-commit shadow log of would-flags on our own diffs (hashes only, bounded caps, fail-open); pre-commit stays out because 12/76 vetoes wrong. Enforcement-grade bar locked inside (blind precision >= 0.90 AND miss <= 0.10 on 2 weeks of shadow).
+- **Receipts:** `work/fpkw-verify/l3-receipt.json`, `work/vendor-paste/SEAM.md`. Committed, not pushed. Bead jev-fpkw left for verifier/author (recompute passes; L3 positive retries when the log resumes).
