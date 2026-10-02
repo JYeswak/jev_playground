@@ -7,7 +7,7 @@ import { useInfisicalKey } from "../../../work/jev-client/src/use-infisical-key.
 import { ASSISTANT, CUT, MODEL, QUESTION } from "../../../work/jev-a9fv/seat.mjs";
 
 export { CUT, MODEL };
-export const MAX_DAILY_CALLS = 100;
+export const MAX_DAILY_CALLS = 3500;
 export const MAX_STATE_BYTES = 30_000;
 export const LOG_SCHEMA = "jev-injection-shadow.v2";
 const SCREENED_TOOLS: Record<string, true> = { web_search: true, web_extract: true };

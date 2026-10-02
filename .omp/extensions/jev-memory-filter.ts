@@ -20,7 +20,7 @@ import { useInfisicalKey } from "/Users/josh/Developer/jev/work/jev-client/src/u
 export const MODEL = "jev-1.13.0";
 export const CUT = 0.5;
 export const MAX_ITEMS_PER_TURN = 20;
-export const MAX_DAILY_CALLS = 200;
+export const MAX_DAILY_CALLS = 600;
 export const CALL_TIMEOUT_MS = 15000;
 export const TURN_BUDGET_MS = 45000;
 export const PROMPT_CHARS = 2000;
