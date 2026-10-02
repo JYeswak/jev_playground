@@ -114,3 +114,10 @@ export function makeRerunRecorder(deps: Deps = {}) {
     return undefined;
   };
 }
+
+/**
+ * Loader entry. Intentionally registers nothing: the observer/recorder are
+ * wired explicitly per session with injected deps (never fleet-wide), so a
+ * bare load must stay inert. Satisfies the extension loader's factory check.
+ */
+export default function jevTestRerunExtension(): void {}

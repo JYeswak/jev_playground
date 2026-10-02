@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {
+import jevTestRerunExtension, {
   makeRerunObserver,
   makeRerunRecorder,
   matchTestCommand,
@@ -8,6 +8,12 @@ import {
 } from "./jev-test-rerun.ts";
 
 const CMD = "node --test .omp/hooks/post/jev-gate-observe.test.mjs";
+
+test("loader entry: valid factory, registers nothing (bare load stays inert)", () => {
+  const regs = [];
+  assert.equal(jevTestRerunExtension({ on: (e, h) => regs.push([e, h]) }), undefined);
+  assert.deepEqual(regs, []);
+});
 
 test("matchTestCommand spots runners, ignores plain commands", () => {
   assert.ok(matchTestCommand(CMD));
