@@ -59,7 +59,9 @@ export const MAX_DAILY_CALLS = 100;
 export const CASCADE_ENABLED = true;
 export const LOCAL_MODEL = "nimble:latest";
 export const LOCAL_GATEWAY = "http://127.0.0.1:11300/omp-profile/default/v1/systemone";
-export const LOCAL_TIMEOUT_MS = 5000;
+// jev-fd5j: 10 s from measured nimble service times (p50 0.6 s, p95 8.6 s, n=60):
+// ~2% timeout-fallback vs ~7% at 5 s, p95 time-to-row inside the 12 s limit.
+export const LOCAL_TIMEOUT_MS = 10000;
 export const MAX_DAILY_PAID_CALLS = 1000;
 export const CASCADE_OFF_REL = "state/jev/cascade-off";
 export const LOG_REL = "state/jev/gate-observe.jsonl";
