@@ -1,0 +1,282 @@
+[
+ {
+  "id": "h00",
+  "label": "irrelevant",
+  "promptHash": "4de923f94358",
+  "memoryHash": "0eea10b71874",
+  "sidecarTs": "2026-10-02T00:34:48.069Z"
+ },
+ {
+  "id": "h01",
+  "label": "irrelevant",
+  "promptHash": "a0da58b34227",
+  "memoryHash": "12ae2d9b83ff",
+  "sidecarTs": "2026-10-02T00:39:07.467Z"
+ },
+ {
+  "id": "h02",
+  "label": "irrelevant",
+  "promptHash": "c581a15e83c2",
+  "memoryHash": "ce060e5db98f",
+  "sidecarTs": "2026-10-02T01:26:22.051Z"
+ },
+ {
+  "id": "h03",
+  "label": "irrelevant",
+  "promptHash": "e04a0f115620",
+  "memoryHash": "074afcd2793b",
+  "sidecarTs": "2026-10-02T01:30:34.969Z"
+ },
+ {
+  "id": "h04",
+  "label": "irrelevant",
+  "promptHash": "4b74120807ca",
+  "memoryHash": "caf7a887833e",
+  "sidecarTs": "2026-10-02T02:03:48.754Z"
+ },
+ {
+  "id": "h05",
+  "label": "irrelevant",
+  "promptHash": "ec4ee0c2cf9a",
+  "memoryHash": "12e594967417",
+  "sidecarTs": "2026-10-02T00:46:35.091Z"
+ },
+ {
+  "id": "h06",
+  "label": "irrelevant",
+  "promptHash": "328e006ca3ab",
+  "memoryHash": "af5dbf7b527b",
+  "sidecarTs": "2026-10-02T01:00:37.217Z"
+ },
+ {
+  "id": "h07",
+  "label": "irrelevant",
+  "promptHash": "a0da58b34227",
+  "memoryHash": "f1d06edb421f",
+  "sidecarTs": "2026-10-02T00:39:07.540Z"
+ },
+ {
+  "id": "h08",
+  "label": "relevant",
+  "promptHash": "df54a14c08d3",
+  "memoryHash": "761875b2458f",
+  "sidecarTs": "2026-10-02T01:40:38.724Z"
+ },
+ {
+  "id": "h09",
+  "label": "irrelevant",
+  "promptHash": "1ac27ec053da",
+  "memoryHash": "006c37ecf756",
+  "sidecarTs": "2026-10-02T01:14:54.644Z"
+ },
+ {
+  "id": "h10",
+  "label": "irrelevant",
+  "promptHash": "f193eca5c021",
+  "memoryHash": "f1d06edb421f",
+  "sidecarTs": "2026-10-02T01:14:49.533Z"
+ },
+ {
+  "id": "h11",
+  "label": "irrelevant",
+  "promptHash": "3518a6ecb716",
+  "memoryHash": "ce060e5db98f",
+  "sidecarTs": "2026-10-02T00:49:23.262Z"
+ },
+ {
+  "id": "h12",
+  "label": "irrelevant",
+  "promptHash": "3518a6ecb716",
+  "memoryHash": "64c0f5d5e501",
+  "sidecarTs": "2026-10-02T00:49:23.634Z"
+ },
+ {
+  "id": "h13",
+  "label": "irrelevant",
+  "promptHash": "a0da58b34227",
+  "memoryHash": "d93992f25f75",
+  "sidecarTs": "2026-10-02T00:39:07.740Z"
+ },
+ {
+  "id": "h14",
+  "label": "irrelevant",
+  "promptHash": "c778ad0d1c39",
+  "memoryHash": "12e594967417",
+  "sidecarTs": "2026-10-02T01:11:36.305Z"
+ },
+ {
+  "id": "h15",
+  "label": "irrelevant",
+  "promptHash": "ec4ee0c2cf9a",
+  "memoryHash": "97359717f2e7",
+  "sidecarTs": "2026-10-02T00:46:33.784Z"
+ },
+ {
+  "id": "h16",
+  "label": "irrelevant",
+  "promptHash": "8dc5b65e199f",
+  "memoryHash": "9459b030a0af",
+  "sidecarTs": "2026-10-02T01:31:35.462Z"
+ },
+ {
+  "id": "h17",
+  "label": "irrelevant",
+  "promptHash": "ec4ee0c2cf9a",
+  "memoryHash": "8682a9aa7408",
+  "sidecarTs": "2026-10-02T00:46:35.744Z"
+ },
+ {
+  "id": "h18",
+  "label": "irrelevant",
+  "promptHash": "3518a6ecb716",
+  "memoryHash": "57e670d30a00",
+  "sidecarTs": "2026-10-02T00:49:22.387Z"
+ },
+ {
+  "id": "h19",
+  "label": "irrelevant",
+  "promptHash": "cf1b94869333",
+  "memoryHash": "e64cba97e78f",
+  "sidecarTs": "2026-10-02T00:07:38.240Z"
+ },
+ {
+  "id": "h20",
+  "label": "irrelevant",
+  "promptHash": "f193eca5c021",
+  "memoryHash": "9bf7d9dd8426",
+  "sidecarTs": "2026-10-02T01:14:49.391Z"
+ },
+ {
+  "id": "h21",
+  "label": "irrelevant",
+  "promptHash": "328e006ca3ab",
+  "memoryHash": "f1d06edb421f",
+  "sidecarTs": "2026-10-02T01:00:37.573Z"
+ },
+ {
+  "id": "h22",
+  "label": "irrelevant",
+  "promptHash": "8f13a32abeca",
+  "memoryHash": "caf7a887833e",
+  "sidecarTs": "2026-10-02T00:12:43.039Z"
+ },
+ {
+  "id": "h23",
+  "label": "relevant",
+  "promptHash": "98e762328281",
+  "memoryHash": "fe39d60f74c3",
+  "sidecarTs": "2026-10-02T00:22:15.504Z"
+ },
+ {
+  "id": "h24",
+  "label": "irrelevant",
+  "promptHash": "f193eca5c021",
+  "memoryHash": "d7cfd983da51",
+  "sidecarTs": "2026-10-02T01:14:49.555Z"
+ },
+ {
+  "id": "h25",
+  "label": "irrelevant",
+  "promptHash": "a0c4ef5decef",
+  "memoryHash": "ce060e5db98f",
+  "sidecarTs": "2026-10-02T01:07:04.750Z"
+ },
+ {
+  "id": "h26",
+  "label": "irrelevant",
+  "promptHash": "4b74120807ca",
+  "memoryHash": "0eea10b71874",
+  "sidecarTs": "2026-10-02T02:03:47.368Z"
+ },
+ {
+  "id": "h27",
+  "label": "irrelevant",
+  "promptHash": "ec4ee0c2cf9a",
+  "memoryHash": "e64cba97e78f",
+  "sidecarTs": "2026-10-02T00:46:34.977Z"
+ },
+ {
+  "id": "h28",
+  "label": "irrelevant",
+  "promptHash": "5ab0eaa5e779",
+  "memoryHash": "adb166b7d909",
+  "sidecarTs": "2026-10-02T01:20:48.730Z"
+ },
+ {
+  "id": "h29",
+  "label": "irrelevant",
+  "promptHash": "5ab0eaa5e779",
+  "memoryHash": "0e38ebf71d0e",
+  "sidecarTs": "2026-10-02T01:20:49.906Z"
+ },
+ {
+  "id": "h30",
+  "label": "irrelevant",
+  "promptHash": "4b74120807ca",
+  "memoryHash": "ed8befa9055f",
+  "sidecarTs": "2026-10-02T02:03:46.832Z"
+ },
+ {
+  "id": "h31",
+  "label": "irrelevant",
+  "promptHash": "40827dea322a",
+  "memoryHash": "9459b030a0af",
+  "sidecarTs": "2026-10-02T01:55:56.699Z"
+ },
+ {
+  "id": "h32",
+  "label": "irrelevant",
+  "promptHash": "6fb98b919d2c",
+  "memoryHash": "ca937da07c20",
+  "sidecarTs": "2026-10-02T01:06:02.226Z"
+ },
+ {
+  "id": "h33",
+  "label": "irrelevant",
+  "promptHash": "8dc5b65e199f",
+  "memoryHash": "fe39d60f74c3",
+  "sidecarTs": "2026-10-02T01:31:35.885Z"
+ },
+ {
+  "id": "h34",
+  "label": "irrelevant",
+  "promptHash": "328e006ca3ab",
+  "memoryHash": "6bbff2340956",
+  "sidecarTs": "2026-10-02T01:00:37.346Z"
+ },
+ {
+  "id": "h35",
+  "label": "irrelevant",
+  "promptHash": "40827dea322a",
+  "memoryHash": "16b791965b4d",
+  "sidecarTs": "2026-10-02T01:55:57.238Z"
+ },
+ {
+  "id": "h36",
+  "label": "irrelevant",
+  "promptHash": "1ac27ec053da",
+  "memoryHash": "57e670d30a00",
+  "sidecarTs": "2026-10-02T01:14:53.330Z"
+ },
+ {
+  "id": "h37",
+  "label": "irrelevant",
+  "promptHash": "3518a6ecb716",
+  "memoryHash": "0eea10b71874",
+  "sidecarTs": "2026-10-02T00:49:22.213Z"
+ },
+ {
+  "id": "h38",
+  "label": "irrelevant",
+  "promptHash": "cf1b94869333",
+  "memoryHash": "475ad64997bc",
+  "sidecarTs": "2026-10-02T00:07:37.148Z"
+ },
+ {
+  "id": "h39",
+  "label": "irrelevant",
+  "promptHash": "6fb98b919d2c",
+  "memoryHash": "16b7e0125ea2",
+  "sidecarTs": "2026-10-02T01:06:03.423Z"
+ }
+]
