@@ -221,9 +221,11 @@ export function resetGatewayAlert(): void {
 
 async function defaultNotify(msg: string): Promise<string> {
   const bin = process.env.JEV_NTM_BIN ?? "/Users/josh/.local/bin/ntm";
+  // ntm send takes 25-40s wall; shorter timeouts kill the page mid-send
+  // (live-found 2026-10-02). Alerts are suppression-gated, so this is rare.
   try {
     return await new Promise<string>((resolve) => {
-      execFile(bin, ["send", "jev", "--pane=1", msg], { timeout: 10000 }, (err, stdout, stderr) => {
+      execFile(bin, ["send", "jev", "--pane=1", msg], { timeout: 60000 }, (err, stdout, stderr) => {
         const code = err && typeof err === "object" && "code" in err ? String(err.code) : null;
         const rc = code !== null && /^\d+$/.test(code) ? code : err ? "1" : "0";
         const tag = code !== null && !/^\d+$/.test(code) ? code + " " : "";
