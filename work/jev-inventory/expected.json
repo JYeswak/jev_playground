@@ -80,7 +80,7 @@
       "log": "injection-shadow.jsonl",
       "file": ".omp/hooks/post/jev-injection-shadow.ts",
       "verdict": "ENFORCING",
-      "evidence": "jev-rud1 verified (clean 0/222, catch 268/300); enforce 3141ed3f verified 9/10",
+      "evidence": "jev-rud1 verified (clean 0/222, catch 268/300); enforce 3141ed3f verified 9/10; unified orchestrator jev-n4eu VERIFIED+CLOSED (600/600 equivalence, catch 269/300 incumbent, $0.0038, 10/10 loads, no double fire)",
       "saving": "1 true injection flagged in 247 real results (7d)"
     },
     {
@@ -93,7 +93,7 @@
       "log": "webscreen-shadow.jsonl",
       "file": ".omp/hooks/post/jev-webscreen.ts",
       "verdict": "ENFORCING",
-      "evidence": "jev-eo40 + jev-3ogk verified",
+      "evidence": "jev-eo40 + jev-3ogk verified; unified orchestrator jev-n4eu VERIFIED+CLOSED (600/600 equivalence, catch 269/300 incumbent, $0.0038, 10/10 loads, no double fire)",
       "saving": "0 withheld since Jev-only enforce in 363 real events (7d)"
     },
     {
@@ -106,7 +106,7 @@
       "log": "websearch-rerank.jsonl",
       "file": ".omp/hooks/post/jev-web-search-rerank.ts",
       "verdict": "NO-BENEFIT",
-      "evidence": "jev-ib1h: 0 opens in 15 answered, 4 discriminating cases, shuffled 0/6; prior jev-bzl7 0 opens",
+      "evidence": "jev-ib1h VERIFIED+CLOSED: 0 opens in 15 answered, 4 discriminating cases, shuffled 0/6; prior jev-bzl7 0 opens",
       "saving": "none"
     },
     {
@@ -118,7 +118,7 @@
       "expect": "off",
       "extension": "./.omp/extensions/jev-skill-hint.ts",
       "verdict": "OFF-MISROUTES",
-      "evidence": "1f031068 (live misroutes 2/2 runs)",
+      "evidence": "1f031068 (live misroutes 2/2 runs); semantic REFUTED jev-zbb1 VERIFIED+CLOSED (R135 best recall 4/20 < 8/20 retry gate)",
       "saving": "n/a"
     },
     {
@@ -142,7 +142,7 @@
       "expect": "on",
       "process": "fleet-idle-watch.py",
       "verdict": "WORKS",
-      "evidence": "jev-5qx8 + jev-7aj1 verified: recall 10/10, 0/10 false pages",
+      "evidence": "jev-5qx8 + jev-7aj1 verified: recall 10/10, 0/10 false pages; enrichment DELETED jev-zljn CLOSED (R136 n=1 fragile, base paging unchanged)",
       "saving": "no time saving: paged waits 6.9 min vs unpaged median 5.4 min"
     },
     {
@@ -187,8 +187,8 @@
       "expect": "on",
       "extension": "./.omp/extensions/jev-memory-filter.ts",
       "verdict": "ENFORCING",
-      "evidence": "jev-wb7j held-out 0.978 + replication 0.985 verified; jev-s47b live drops 30/30 twice (HazySpring, WildCarp); removal 5fc68a4e verified by OrangeFrog (13/13 kept present, 4/4 dropped absent)",
-      "saving": "memory tokens removed per turn: median 797, p90 3,408 (14 live turns, OrangeFrog)"
+      "evidence": "jev-wb7j held-out 0.978 + replication 0.985 verified; jev-s47b live drops 30/30 twice (HazySpring, WildCarp); removal 5fc68a4e verified by OrangeFrog (13/13 kept present, 4/4 dropped absent); concurrent 4-wide jev-11qz VERIFIED+CLOSED (wall 1308ms -60% vs 3.3s serial, 20/20 in budget, byte-exact prune)",
+      "saving": "memory tokens removed per turn: median 797, p90 3,408 (14 live turns, OrangeFrog); keep precision 0.22 jev-m959 VERIFIED+CLOSED, saving unchanged"
     },
     {
       "id": "gate-cascade",

@@ -14,6 +14,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -99,6 +100,27 @@ class Conformance(unittest.TestCase):
         }
         self.assertEqual(inv.live_state(surface, ctx), "off")
 
+
+    def test_default_off_hook_reports_off_without_recent_rows(self):
+        prev_home, prev_state = inv.HOME, inv.STATE
+        inv.HOME = inv.STATE = Path(tempfile.mkdtemp())
+        try:
+            (inv.STATE / "websearch-rerank.jsonl").write_text("")
+            surface = {"id": "websearch-rerank", "group": "hook", "file": ".omp/hooks/post/jev-web-search-rerank.ts", "expect": "off"}
+            self.assertEqual(inv.live_state(surface, {}), "off")
+        finally:
+            inv.HOME, inv.STATE = prev_home, prev_state
+
+    def test_default_off_hook_reports_on_when_it_fires(self):
+        prev_home, prev_state = inv.HOME, inv.STATE
+        inv.HOME = inv.STATE = Path(tempfile.mkdtemp())
+        try:
+            ts = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime())
+            (inv.STATE / "websearch-rerank.jsonl").write_text(json.dumps({"ts": ts, "status": "scored"}) + "\n")
+            surface = {"id": "websearch-rerank", "group": "hook", "file": ".omp/hooks/post/jev-web-search-rerank.ts", "expect": "off"}
+            self.assertEqual(inv.live_state(surface, {}), "on")
+        finally:
+            inv.HOME, inv.STATE = prev_home, prev_state
 
 class GlobalHookDrift(unittest.TestCase):
     PROFILES = ["default", "claude", "codex", "muse", "grok"]

@@ -116,19 +116,19 @@ Native judge (`modelRoles.judge`, key command-resolved via `work/jev-client/bin/
 
 `find` WORKS: 576 vs 5,293 tokens spent per located file against grep (jev-04q2 verified, 141/222 located vs 875/2627).
 
-Injection screens ENFORCE on Jev-only scores (`score >= cut` withholds; local patterns log, never withhold): tool-result shadow (jev-rud1: clean 0/222, catch 268/300) and web-result screen (jev-eo40: Jev-alone FPR 0/350).
+Injection screens ENFORCE on Jev-only scores (`score >= cut` withholds; local patterns log, never withhold): tool-result shadow (jev-rud1: clean 0/222, catch 268/300) and web-result screen (jev-eo40: Jev-alone FPR 0/350). Both run through one composable handler that captures bytes once and scores both concurrently (jev-n4eu: 600/600 byte-identical equivalence, catch 269/300 at incumbent, no double fire).
 
-Gate cascade WORKS: local nimble screens every command, paid Jev confirms only nimble-flagged ones — 96% screened free in 1h live, fallback to paid on gateway failure, runtime `cascade-off` switch file (jev-nr3c). Bash-risk shadow itself is NO-SIGNAL (jev-qunw 0/403, jev-3m65 replication 0/148 flagged truly harmful).
+Gate cascade WORKS: local nimble screens every command, paid Jev confirms only nimble-flagged ones — 96% screened free in 1h live, fallback to paid on gateway failure, runtime `cascade-off` switch file (jev-nr3c). Nimble-cleared commands audit 0/950 harmful (jev-syje). Bash-risk shadow itself is NO-SIGNAL (jev-qunw 0/403, jev-3m65 replication 0/148 flagged truly harmful).
 
-Memory filter IN PROGRESS: the drops audit found JOIN VOID — 0/243 scored rows joinable to session transcripts, so the hook point is the wrong seam (jev-7vn9, open).
+Memory filter ENFORCES: concurrent 4-wide judging at session start (jev-11qz: wall 1308ms, -60% vs 3.3s serial, 20/20 in budget, byte-exact prune); keep precision 0.22 (jev-m959, saving unchanged); median 797 tokens removed per turn.
 
-Per-prompt skill hints PARKED (R133 VEIN-EXHAUSTED): every recall gain came with misroutes; silence was strictly safer. Extension stays OFF.
+Per-prompt skill hints PARKED (R133 VEIN-EXHAUSTED): every recall gain came with misroutes; silence was strictly safer. Extension stays OFF. The semantic retry is refuted too (jev-zbb1, R135: best recall 4/20 below the 8/20 gate). Web-search rerank stays OFF (jev-ib1h: 0 opens in 15 answered).
 
 Local models LOSE-TO-JEV except nimble as cascade first pass (jev-uhc5: gate/injection worse, p95 1.2–2.7 s).
 
 TTSR judged rules: rules below 0.80 precision retired (R132 `jev-key-canonical-source`); `claim-without-evidence` retired earlier (R130, precision 0.571).
 
-Fleet watcher (`scripts/fleet-idle-watch.py`): an idle worker waiting on a human pages pane 1 (jev-7aj1 verified: recall 10/10, 0/10 false pages).
+Fleet watcher (`scripts/fleet-idle-watch.py`): an idle worker waiting on a human pages pane 1 with the 140-char excerpt (jev-7aj1 verified: recall 10/10, 0/10 false pages). Enrichment beyond the excerpt is deleted (jev-zljn, R136: n=1, fragile).
 
 ## Read next
 
