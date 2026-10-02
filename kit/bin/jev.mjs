@@ -8,7 +8,7 @@ import { verifyClaim } from "../dist/verify.js";
 import { scoreText } from "../dist/score.js";
 import { gateCommand } from "../dist/gate.js";
 import { createFakeFetch } from "../dist/fake.js";
-import { installOmp, ompDiscovery } from "../dist/install.js";
+import { installOmp, ompDiscovery, uninstallOmp } from "../dist/install.js";
 
 const ROOT = new URL("..", import.meta.url);
 
@@ -217,6 +217,11 @@ try {
     const repo = option(args, "--dir") ?? process.cwd();
     const result = await installOmp(repo, hasFlag(args, "--dry-run"));
     if (robot) robotPrint(result); else process.stdout.write(`${result.status}: copied ${result.files.length} files in ${result.repo}; extensions require manual config merge before omp loads them\n`);
+    exitCode = 0;
+  } else if (args[0] === "omp" && args[1] === "uninstall") {
+    const repo = option(args, "--dir") ?? process.cwd();
+    const result = await uninstallOmp(repo, !hasFlag(args, "--apply"));
+    if (robot) robotPrint(result); else process.stdout.write(`${result.status}: ${result.files.length} listed, ${result.kept.length} kept (edited), ${result.missing.length} already missing in ${result.repo}\n`);
     exitCode = 0;
   } else {
     const error = { status: "ERROR", reason: "usage", message: "jev doctor|gate|ask|rerank|classify|verify|score ..." };

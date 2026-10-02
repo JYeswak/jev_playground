@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
 import { join, relative, resolve } from "node:path";
 
 export const INSTALL_FILES = {
@@ -60,6 +60,39 @@ export async function installOmp(repoDir: string, dryRun = false): Promise<Insta
   const outputFiles = [...files, relative(repo, manifestPath)];
   if (!dryRun) { for (const destination of destinations) await mkdir(resolve(destination, ".."), { recursive: true }); const hashes: Record<string, string> = {}; for (const [destination, content] of templates) { await writeFile(join(repo, ".omp", destination), content, { mode: 0o644 }); hashes[destination] = sha256(content); } await writeFile(manifestPath, `${JSON.stringify({ version: 1, files: hashes }, null, 2)}\n`, { mode: 0o644 }); }
   return { status: dryRun ? "DRY_RUN" : "READY", repo, files: outputFiles, extensionActivation: "MANUAL_REQUIRED" };
+}
+
+export type UninstallResult = { status: "DRY_RUN" | "REMOVED"; repo: string; files: string[]; kept: string[]; missing: string[] };
+export async function uninstallOmp(repoDir: string, dryRun = true): Promise<UninstallResult> {
+  const repo = resolve(repoDir);
+  const manifestPath = join(repo, MANIFEST_PATH);
+  const manifest = await readManifest(manifestPath);
+  if (!manifest) throw new Error(`no installer manifest: ${relative(process.cwd(), manifestPath)}`);
+  const ompRoot = join(repo, ".omp");
+  const remove: string[] = [];
+  const kept: string[] = [];
+  const missing: string[] = [];
+  for (const [destination, expected] of Object.entries(manifest.files)) {
+    const absolute = resolve(ompRoot, destination);
+    if (absolute !== ompRoot && !absolute.startsWith(ompRoot + "/")) {
+      throw new Error(`manifest entry escapes .omp, refusing: ${destination}`);
+    }
+    const rel = relative(repo, absolute);
+    if (!(await exists(absolute))) {
+      missing.push(rel);
+      continue;
+    }
+    if (sha256(await readFile(absolute, "utf8")) !== expected) {
+      kept.push(rel);
+      continue;
+    }
+    remove.push(rel);
+  }
+  remove.push(relative(repo, manifestPath));
+  if (!dryRun) {
+    for (const rel of remove) await unlink(join(repo, rel));
+  }
+  return { status: dryRun ? "DRY_RUN" : "REMOVED", repo, files: remove, kept, missing };
 }
 export async function ompDiscovery(repoDir: string): Promise<Record<string, unknown>> {
   const repo = resolve(repoDir); const tools = Object.keys(INSTALL_FILES).filter((path) => path.startsWith("tools/")).map((path) => ({ path: `.omp/${path}`, present: true })); const hooks = [{ path: ".omp/hooks/post/jev-gate-observe.ts", present: true }];

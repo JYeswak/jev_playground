@@ -90,3 +90,46 @@ test('prior managed config requires an explicit owner migration', async () => {
   assert.match(JSON.parse(attempted.stdout).message, /owner review/);
   assert.equal(await readFile(join(repo, '.omp/config.yml'), 'utf8'), oldConfig);
 });
+
+test('omp uninstall dry-runs by default and removes exactly manifest files on --apply', async () => {
+  const repo = await mkdtemp(join(tmpdir(), 'jev-omp-uninstall-'));
+  const installed = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(installed.code, 0);
+  const listed = await run(['omp', 'uninstall', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(listed.code, 0);
+  const dry = JSON.parse(listed.stdout);
+  assert.equal(dry.status, 'DRY_RUN');
+  assert.ok(dry.files.length > 10);
+  assert.ok(dry.files.includes('.omp/jev-kit-manifest.json'));
+  const stillThere = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(stillThere.code, 0, 'dry run must remove nothing');
+  const applied = await run(['omp', 'uninstall', '--dir', repo, '--apply', '--robot'], kitRoot);
+  assert.equal(applied.code, 0);
+  const done = JSON.parse(applied.stdout);
+  assert.equal(done.status, 'REMOVED');
+  assert.deepEqual(done.kept, []);
+  for (const f of done.files) {
+    let gone = false;
+    try { await readFile(join(repo, f), 'utf8'); } catch { gone = true; }
+    assert.equal(gone, true, `${f} still present after uninstall --apply`);
+  }
+});
+
+test('omp uninstall keeps user-edited and non-manifest files, refuses without a manifest', async () => {
+  const repo = await mkdtemp(join(tmpdir(), 'jev-omp-uninstall-keep-'));
+  const installed = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(installed.code, 0);
+  const owned = 'operator-owned tool file';
+  await writeFile(join(repo, '.omp/tools/jev-gate.ts'), owned);
+  await writeFile(join(repo, '.omp/tools/operator-extra.ts'), 'operator file, never in manifest');
+  const applied = await run(['omp', 'uninstall', '--dir', repo, '--apply', '--robot'], kitRoot);
+  assert.equal(applied.code, 0);
+  const done = JSON.parse(applied.stdout);
+  assert.ok(done.kept.includes('.omp/tools/jev-gate.ts'));
+  assert.equal(await readFile(join(repo, '.omp/tools/jev-gate.ts'), 'utf8'), owned);
+  assert.equal(await readFile(join(repo, '.omp/tools/operator-extra.ts'), 'utf8'), 'operator file, never in manifest');
+  const bare = await mkdtemp(join(tmpdir(), 'jev-omp-uninstall-bare-'));
+  const refused = await run(['omp', 'uninstall', '--dir', bare, '--robot'], kitRoot);
+  assert.equal(refused.code, 1);
+  assert.match(JSON.parse(refused.stdout).message, /no installer manifest/);
+});
