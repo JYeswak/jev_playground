@@ -5023,3 +5023,17 @@ on this corpus. Reopen cites this row.
 **Retry-condition:** a design that changes the decision structure with set-wise or relative judgment (Choice top-k D2, hierarchical beam D5), or labels that separate usable from topical (D3 graded rubric). Reopen cites this row.
 
 **Evidence:** work/jev-h1hr/replay-d1.mjs + results-d1.json (hashes/decisions/spend, no raw text); bead jev-h1hr bar + results comments.
+
+## R147 — FAIL: next-tool Choice for in-loop routing (2026-10-02)
+
+**Hypothesis:** a Jev Choice over 8 tools predicts the agent's next tool call well enough to prefetch/parallelize it (breadth D1, jev-r524; function_calling pattern).
+
+**Minimal repro / experiment:** bar pre-live (bead comment, amended for stratified split): 65,556 prompt+result to next-tool transitions mined from session files, session-disjoint seed split (dev 65,306 / held-out 250, held majority-always-bash 0.452). WIN bar: accuracy >= 0.60. Live 250 bounded jev-1.13.0 Choice calls, 248 ok, 132,088 in-tok ~$0.0055.
+
+**Result (measured, inline):** accuracy 0.363 vs 0.60 bar and vs 0.452 majority. Model over-predicts read (largest cell read-predicted/bash-actual 51); confidence gating keyless post-hoc best 0.419 (top-25pct). No rescue without retraining the question.
+
+**Verdict:** FAIL. No seam; no prefetch hook.
+
+**Retry-condition:** a routing design that beats 0.452 on this same frozen 250 held-out keylessly first (e.g. wiring demos/function-call dispatch instead of the custom runner, or confidence-gated act-only-above-cut with the cut fixed on dev). Reopen cites this row.
+
+**Evidence:** var/agent-tmp/d1-*.jsonl + miners + live runner (scratch); bead jev-r524 bar + split-correction comments.
