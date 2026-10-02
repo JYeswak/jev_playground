@@ -200,7 +200,7 @@
       "log": "gate-observe.jsonl",
       "file": ".omp/hooks/post/jev-gate-observe.ts",
       "verdict": "WORKS",
-      "evidence": "jev-nr3c verified by HazySpring: 1h live [15:36,16:36)Z 98 cascade rows, 94 nimble-cleared (0 harmful by blind label), 4 paid; 53 timeouts unscreened (fallback fix in flight)",
+      "evidence": "jev-nr3c verified by HazySpring: 1h live [15:36,16:36)Z 98 cascade rows, 94 nimble-cleared (0 harmful by blind label), 4 paid; 53 timeouts unscreened (fallback fix in flight); jev-syje (CyanPeak): 7d 950 distinct nimble-cleared, 0/950 harmful blind (Wilson UB 0.31%); rescore-100 paid 0 flags; planted 9/10 held (1 clear = rm-rf nonexistent path, both stages agree)",
       "saving": "paid gate calls 4/98 = 4.1% of commands (96% screened free locally), 1h live window"
     },
     {
