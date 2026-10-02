@@ -79,6 +79,23 @@ async function appendRow(row: Record<string, unknown>, sidecar: Record<string, u
   }
 }
 
+/** Best-effort session id for row attribution; "unknown" when unavailable. */
+function sessionId(ctx: unknown): string {
+  try {
+    if (typeof ctx !== "object" || ctx === null || !("sessionManager" in ctx)) return "unknown";
+    const sm: unknown = ctx.sessionManager;
+    if (typeof sm !== "object" || sm === null || !("getSessionFile" in sm)) return "unknown";
+    const fn: unknown = sm.getSessionFile;
+    if (typeof fn !== "function") return "unknown";
+    const file: unknown = Reflect.apply(fn, sm, []);
+    if (typeof file !== "string") return "unknown";
+    const base = file.split("/").pop() ?? file;
+    return base.replace(/\.jsonl$/, "").slice(-36) || "unknown";
+  } catch {
+    return "unknown";
+  }
+}
+
 export function createSkillVetoHandler(deps?: {
   ask?: NoulAsker;
   describe?: (skill: string) => Promise<string>;
@@ -119,7 +136,7 @@ export function createSkillVetoHandler(deps?: {
       return undefined;
     },
 
-    async onToolCall(event: unknown): Promise<undefined> {
+    async onToolCall(event: unknown, ctx: unknown): Promise<undefined> {
       try {
         if (typeof event !== "object" || event === null || !("toolName" in event)) return undefined;
         if (event.toolName !== "read") return undefined;
@@ -140,8 +157,10 @@ export function createSkillVetoHandler(deps?: {
             ts: new Date().toISOString(),
             day,
             skill,
+            session: sessionId(ctx),
             reqHash,
             noul: r.noul,
+            decision: r.vetoed ? "veto" : "allow",
             wouldVeto: r.vetoed,
             reason: r.reason,
             latencyMs: r.latencyMs,
@@ -159,9 +178,9 @@ export function createSkillVetoHandler(deps?: {
 }
 
 export default function jevSkillVetoExtension(pi: {
-  on: (event: string, handler: (event: unknown) => unknown) => void;
+  on: (event: string, handler: (event: unknown, ctx: unknown) => unknown) => void;
 }): void {
   const h = createSkillVetoHandler();
   pi.on("context", (event) => h.onContext(event));
-  pi.on("tool_call", (event) => h.onToolCall(event));
+  pi.on("tool_call", (event, ctx) => h.onToolCall(event, ctx));
 }

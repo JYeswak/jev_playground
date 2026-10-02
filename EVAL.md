@@ -3474,3 +3474,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **L3 (two fresh omp --mode=rpc sessions, bar predeclared):** A (17*23 + plan-to-beads read) noul 0.24 wouldVeto=true; B (beads ask + beads read) noul 0.54 wouldVeto=false; both reads succeeded. Driver filter bug found+fixed (skillNameFromPath kept trailing filename; regression tests added). First real shadow rows live in-session.
 - **Dev one variable (bar predeclared, 41 non-held rows, 82 live calls ~$0.00276):** fulldesc (cross-root desc + 700-char body) misses 4/11 vs predesc 5/11, wrong-vetoed 22/30 both. Bar MET; adopted into extension describe path. Receipt: work/skills-breadth/devvar.jsonl.
 - **Verdict:** shadow ON in project scope; enforcement only after >=24h rows + blind-label precision>=0.95. Left in_progress for verifier.
+
+## 2026-10-02 jev-wbel wbel-live: fields+fresh-session proven, config+B7 + restart conductor-side (WindyLantern) [live]
+
+- **Rows now carry decision+session+noul:** fresh RPC 06:58Z logged skill plan-to-beads (name fix: no more /SKILL.md suffix), session 01a0fb68-..., decision allow, noul 0.47. Tests 10/10 (session/decision asserts). Ambient discovery loads the extension in NEW sessions (L3 + probe rows with no config change).
+- **Not done by me:** `.omp/config.yml` listing refused by kit-guard B7 (edit tool carries the refusal; needs KIT_GATE_EDIT hand). Organic rows need one idle-pane restart (worker sessions predate the file). One orphan RPC session from a killed driver probe wrote 1 unattributed row ~06:5xZ; joins the blind-label pool.
+- **Verdict:** code + fields + fresh-session proof committed; DONE wbel-live waits on organic rows. Left in_progress; BLOCKED callback sent (blocker: config listing + pane restart).

@@ -85,6 +85,23 @@ test('handler never blocks: undefined on skill and non-skill reads, even when th
   assert.equal(await h.onToolCall({ toolName: 'bash', input: { command: 'ls' } }), undefined);
   assert.equal(calls.length, 1);
   assert.equal(calls[0][0].wouldVeto, false);
+  assert.equal(calls[0][0].decision, 'allow');
+  assert.equal(calls[0][0].session, 'unknown');
+});
+
+test('session id flows from ctx sessionManager when present', async () => {
+  const calls = [];
+  const h = createSkillVetoHandler({
+    ask: noulAnswer(0.9),
+    describe: async () => 'desc',
+    countToday: async () => 0,
+    log: async (row, sidecar) => { calls.push([row, sidecar]); },
+  });
+  h.onContext({ messages: [{ role: 'user', content: [{ type: 'text', text: 'do beads' }] }] });
+  const ctx = { sessionManager: { getSessionFile: () => '/Users/josh/.omp/agent/sessions/-Developer-jev/2026-10-02T06-37-40-585Z_01a0fb55-aa99-7185-a9ab-8d9efc2b3161.jsonl' } };
+  assert.equal(await h.onToolCall({ toolName: 'read', input: { path: 'skill://plan-to-beads' } }, ctx), undefined);
+  assert.equal(calls[0][0].session, '01a0fb55-aa99-7185-a9ab-8d9efc2b3161');
+  assert.equal(calls[0][0].decision, 'allow');
 });
 
 test('cap reached means no Jev call and no row', async () => {
