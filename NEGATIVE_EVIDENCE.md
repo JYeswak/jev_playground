@@ -4915,3 +4915,15 @@ paired `opened/used next` join is specified before the shadow starts.
 **Retry-condition:** a state-enriched design (packet + pane assignment/fleet snapshot or bead status at arrival) beating B2 keylessly on these frozen items first. Reopen cites this row.
 
 **Evidence:** var/agent-tmp/triage-6c8n.34880/{run.py,items.jsonl,receipt.jsonl,replay.py,dev40.jsonl,dev40_receipt.jsonl} (scratch, uncommitted); bead jev-6c8n bar + results comments.
+
+## R141 — NOT ENOUGH DATA + BASELINE WINS: long-runner (>60 s bash) prediction from command text + cwd (2026-10-02)
+
+**Hypothesis:** a Jev decision on the command text and cwd predicts whether a bash tool call runs longer than 60 s, so agents background predicted-longs instead of blocking.
+
+**Keyless feasibility (no live calls):** all 3,337 omp session files (`~/.omp/agent/sessions` + `~/.omp/profiles/*/agent/sessions`), label = `details.wallTimeMs` on bash toolResults. N=151,275 labelled, longs>60 s = 5 (base rate 0.0033%); majority always-short baseline = 0.999967. The 5 longs: `rm -ri` (interactive prompt), `git add -p` x2 (interactive), `sleep 60` (planted), a 60 s-poll loop. Held-out would hold ~0-1 positives: no margin exists for Jev to beat.
+
+**Verdict:** STOP per discovery protocol step 1. No bar committed, no live spend, no seam proposed. Second defect, independent of N: the label is censored — true long-runners get backgrounded by the harness (async-running toolResult + `hub` durationMs snapshots), so their recorded wallTimeMs stays small; wall-time labels do not measure actual wall time.
+
+**Retry-condition:** a label source that captures backgrounded durations (join toolCallId to `hub` wait snapshots / async-result completion, proving the join keyless first) showing >=60 usable positives where majority < 0.95. Reopen cites this row.
+
+**Evidence:** var/agent-tmp/lrpred-work/scan.py + rows.jsonl (151,275 rows; scratch, uncommitted); bead jev-uup3 feasibility comment.

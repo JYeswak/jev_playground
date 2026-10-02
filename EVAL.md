@@ -3449,3 +3449,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Dev (170 pairs, live jev-1.13.0, 340 calls, 224,784 in-tok ~$0.00944 within $0.02 cap, frozen Q1+Q2 CUT 0.5):** kept 16, relevant-kept 1 -> keep precision 0.062 vs 0.42 FAIL (worse than base 0.190); drops 146/154 = 0.948 vs 0.90 PASS; critical dropped 8/9. Q1 passes 38 (relevant 6/9), Q2 passes 16 (relevant 1/9): the current/usable wording rejects nearly everything.
 - **Planted:** useful-old DROPPED (0.26/0.12) FAIL, echo dropped PASS (4 calls, 1,340 tok). Held-out not run: dev decisive, spend saved. Total ~$0.0095.
 - **Verdict:** MODEL-LIMIT (R139, R137 lineage). No wiring. Scratch: var/agent-tmp/syje.51150/dev28* + plant28.mjs. Left in_progress for verifier.
+
+## 2026-10-02 jev-uup3 long-runner discovery: STOP, NOT ENOUGH DATA + BASELINE WINS (WindyLantern) [keyless]
+
+- **Census:** all 3,337 omp session files, bash toolResults with `details.wallTimeMs`: N=151,275 labelled, longs>60 s = 5 (base rate 0.0033%), majority always-short = 0.999967. Wall p50 260 ms / p90 10.2 s / p99 40.0 s / max 120.0 s.
+- **Longs autopsy:** `rm -ri` + `git add -p` x2 (interactive prompts, not compute), `sleep 60` (planted), one 60 s-poll loop. True longs are censored from this label: the harness backgrounds them, so recorded wallTimeMs stays small.
+- **Verdict:** STOP at discovery step 1 (N=5 < 60; baseline already ~1.0). No bar, no live calls, $0 spend. NEGATIVE_EVIDENCE R141. Scratch: var/agent-tmp/lrpred-work/scan.py + rows.jsonl. Left in_progress for verifier.
