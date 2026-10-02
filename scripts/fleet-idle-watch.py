@@ -1258,6 +1258,154 @@ def stale_lock_round(
     return f"Stale lock: moved to {dest} ({age}s old)"
 
 
+LOCK_CREATOR_LOG_REL = "state/jev/index-lock-creators.jsonl"
+LOCK_WATCH_STATE_REL = "state/jev/index-lock-watch.json"
+
+
+def _read_watch_state(path):
+    try:
+        return json.loads(Path(path).read_text())
+    except (OSError, ValueError):
+        return None
+
+
+def _write_watch_state(path, ident):
+    try:
+        p = Path(path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(ident))
+    except OSError:
+        pass
+
+
+def _proc_field(pid, field):
+    try:
+        out = subprocess.run(
+            ["ps", "-o", field + "=", "-p", str(pid)],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout.strip()
+        return out[:300] or None
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+
+
+def _pane_for_pids(pids):
+    """Best-effort tmux pane owning one of the pids; None when unavailable."""
+    try:
+        out = subprocess.run(
+            ["tmux", "list-panes", "-s", "-F", "#{pane_pid} #{pane_id}"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    table = {}
+    for line in out.splitlines():
+        parts = line.split()
+        if len(parts) >= 2:
+            table[parts[0]] = parts[1]
+    for pid in pids:
+        if str(pid) in table:
+            return table[str(pid)]
+    return None
+
+
+def _holders_of(lock, run):
+    """PIDs with the lock file open. Targeted first: every known creator is
+    git, and a full `lsof -t` scan stalls 10 s+ under fleet load. Falls back
+    to the full scan so a non-git holder is still found when it answers."""
+    try:
+        gitpids = run(
+            ["pgrep", "-f", "(^|/)git( |$)"], capture_output=True, text=True, timeout=10
+        ).stdout.split()
+    except Exception:
+        gitpids = []
+    found = []
+    for pid in gitpids[:50]:
+        try:
+            out = run(
+                ["lsof", "-p", str(pid)], capture_output=True, text=True, timeout=10
+            ).stdout
+        except Exception:
+            continue
+        if str(lock) in out:
+            found.append(str(pid))
+    if found:
+        return found
+    try:
+        return run(
+            ["lsof", "-t", str(lock)], capture_output=True, text=True, timeout=10
+        ).stdout.split()
+    except Exception:
+        return []
+
+
+def capture_lock_creator(repo, now, log_path=None, state_path=None, run=subprocess.run):
+    """Log the creating process the first time .git/index.lock is seen.
+
+    jev-5hw1: the stale sweeper only sees abandoned locks. This runs beside it
+    and captures a fresh lock's holder (pid, argv, parent chain, tmux pane)
+    into a private 0600 log. Read-only: it never moves or deletes the lock.
+    Capture-once per lock identity; a lock that vanishes resets the state so
+    the next appearance captures again. Returns the row on first sight, else
+    None. Never throws past the caller.
+    """
+    try:
+        lock = Path(repo) / ".git" / "index.lock"
+        home = Path.home()
+        log = Path(log_path) if log_path else home / ".local" / LOCK_CREATOR_LOG_REL
+        state = state_path if state_path else home / ".local" / LOCK_WATCH_STATE_REL
+        try:
+            info = lock.stat()
+        except FileNotFoundError:
+            _write_watch_state(state, None)
+            return None
+        ident = [info.st_dev, info.st_ino, info.st_mtime_ns, info.st_size]
+        if _read_watch_state(state) == ident:
+            return None
+        pids = _holders_of(lock, run)
+        chain = []
+        seen = set()
+        for pid in pids:
+            if pid in seen:
+                continue
+            seen.add(pid)
+            argv = _proc_field(pid, "command")
+            ancestors = []
+            at, depth = pid, 0
+            while depth < 5:
+                ppid = _proc_field(at, "ppid")
+                if not ppid or not ppid.strip().isdigit() or ppid.strip() == "1":
+                    break
+                at = ppid.strip()
+                ancestors.append({"pid": at, "argv": _proc_field(at, "command")})
+                depth += 1
+            chain.append({"pid": pid, "argv": argv, "parents": ancestors})
+        row = {
+            "ts": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now)),
+            "lock": str(lock),
+            "size": info.st_size,
+            "holders": chain,
+            "pane": _pane_for_pids(
+                [p for p in pids] + [a["pid"] for h in chain for a in h["parents"]]
+            ),
+        }
+        try:
+            log.parent.mkdir(parents=True, exist_ok=True)
+            fd = os.open(str(log), os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o600)
+            with os.fdopen(fd, "a") as fh:
+                fh.write(json.dumps(row) + "\n")
+        except OSError:
+            pass
+        _write_watch_state(state, ident)
+        return row
+    except Exception:
+        return None
+
+
 def main() -> int:
     if "--selftest" in sys.argv:
         return selftest()
@@ -1285,6 +1433,12 @@ def main() -> int:
         note = stale_lock_round(REPO_ROOT, time.time(), page)
         if note:
             print(note, flush=True)
+        row = capture_lock_creator(REPO_ROOT, time.time())
+        if row:
+            print(
+                f"{time.strftime('%H:%M:%SZ', time.gmtime())} lock-creator: {row['lock']} holders={[h['pid'] for h in row['holders']]}",
+                flush=True,
+            )
         return 1 if any(reading[0] != "working" for reading in states.values()) else 0
     composer_last: dict[int, str] = {}
     composer_same: dict[int, int] = {}
@@ -1398,6 +1552,12 @@ def main() -> int:
         note = stale_lock_round(REPO_ROOT, time.time(), page)
         if note:
             print(f"{stamp} {note}", flush=True)
+        row = capture_lock_creator(REPO_ROOT, time.time())
+        if row:
+            print(
+                f"{stamp} lock-creator: {row['lock']} holders={[h['pid'] for h in row['holders']]}",
+                flush=True,
+            )
         time.sleep(INTERVAL)
 
 

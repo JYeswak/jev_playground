@@ -67,7 +67,7 @@ The pinned model is `jev-1.13.0`.
 
 The separate live smoke in [`work/kit-live-receipt-20260927.json`](work/kit-live-receipt-20260927.json) records **four calls** (`classify`, `rerank`, `verify`, `score`) to `jev-1.13.0` on 2026-09-27, with 3,472 input tokens and an estimated $0.000145824 input charge. This is an existing one-call-per-verb smoke, not a result reproduced by the offline commands above; the fake answer is not a live answer. No claim about real omp extension loading, organic benefit, or accuracy follows from copying files or from those four calls.
 
-At the 2026-09-30 04:20 UTC snapshot, the corrected local stage-15 gate passed (431/431 enforced), while the ordinary foundation aggregate remained **RED at stage 80** (consumer-check 11/12 and a selftest referencing a missing pre-commit hook); the aggregate `--selftest` passed at 04:41 UTC. A later stage-15 claim-coverage RED (115/119, then 116/118 against the then-unchanged 119/120 floor) was repaired in `2ae763c6`: its targeted gate passed 432 claims with 0 failed, 3 skipped, and coverage 121/122. After source-backed claim additions, the coverage floor was strengthened again; the 2026-09-30 targeted run recorded in `EVAL.md` §jev-p9 passed 432 claims with 0 failed, 3 skipped, coverage 123/124, and the stage's planted-negative `--selftest` passed. A later local working-tree run (also recorded in `EVAL.md` §jev-p9) passed the targeted stage-15 check at 124/124 against the 123/124 floor, but the planted-negative `--selftest` failed because its additional unregistered claim left coverage above the floor. These are dated targeted results, not a current aggregate GREEN or §4 validation; neither dirty-tree result proves committed-HEAD completeness or public same-HEAD parity. P9 remains OPEN.
+At the 2026-09-30 04:20 UTC snapshot, the corrected local stage-15 gate passed (431/431 enforced), while the ordinary foundation aggregate remained **RED at stage 80** (consumer-check 11/12 and a selftest referencing a missing pre-commit hook); the aggregate `--selftest` passed at 04:41 UTC. A later stage-15 claim-coverage RED (115/119, then 116/118 against the then-unchanged 119/120 floor) was repaired in `2ae763c6`: its targeted gate passed 432 claims with 0 failed, 3 skipped, and coverage 121/122. After source-backed claim additions, the coverage floor was strengthened again; the 2026-09-30 targeted run recorded in `EVAL.md` §jev-p9 passed 432 claims with 0 failed, 3 skipped, coverage 123/124, and the stage's planted-negative `--selftest` passed. A later floor sync to 124/124 with its claims.tsv rows keeps the targeted gate at 433 passed, 0 failed.
 
 ## What Jev answers
 
@@ -105,10 +105,10 @@ A 2026-09-25 local census found 1,711 native omp Jev calls in session files modi
 
 ## Where it runs
 
-- `work/jev-client/` — the current official-SDK client and policy surface.
-- `foundation/` — keyless calibration and gate receipts.
-- `demos/` — one-command examples using recorded answers first.
-- `.omp/` — the integration seams: tools, hooks, and observation surfaces.
+- `work/jev-client/`: the current official-SDK client and policy surface.
+- `foundation/`: keyless calibration and gate receipts.
+- `demos/`: one-command examples using recorded answers first.
+- `.omp/`: the integration seams: tools, hooks, and observation surfaces.
 
 ## Jev in omp — what is ON
 
@@ -118,7 +118,7 @@ Native judge (`modelRoles.judge`, key command-resolved via `work/jev-client/bin/
 
 Injection screens ENFORCE on Jev-only scores (`score >= cut` withholds; local patterns log, never withhold): tool-result shadow (jev-rud1: clean 0/222, catch 268/300) and web-result screen (jev-eo40: Jev-alone FPR 0/350). Both run through one composable handler that captures bytes once and scores both concurrently (jev-n4eu: 600/600 byte-identical equivalence, catch 269/300 at incumbent, no double fire).
 
-Gate cascade WORKS: local nimble screens every command, paid Jev confirms only nimble-flagged ones — 96% screened free in 1h live, fallback to paid on gateway failure, runtime `cascade-off` switch file (jev-nr3c). Nimble-cleared commands audit 0/950 harmful (jev-syje). Bash-risk shadow itself is NO-SIGNAL (jev-qunw 0/403, jev-3m65 replication 0/148 flagged truly harmful).
+Gate cascade WORKS: local nimble screens every command, paid Jev confirms only nimble-flagged ones (96% screened free in 1h live, fallback to paid on gateway failure, runtime `cascade-off` switch file, jev-nr3c). Deterministic destructive pre-rule routes straight to paid (jev-nbbm: 10/10 planted paid, 1.86 extra paid/day); every row carries one screen class with zero timeout-taken-clears in 7d (jev-t3tk). Nimble-cleared commands audit 0/950 harmful (jev-syje). Bash-risk shadow itself is NO-SIGNAL (jev-qunw 0/403, jev-3m65 replication 0/148 flagged truly harmful).
 
 Memory filter ENFORCES: concurrent 4-wide judging at session start (jev-11qz: wall 1308ms, -60% vs 3.3s serial, 20/20 in budget, byte-exact prune); keep precision 0.22 (jev-m959, saving unchanged); median 797 tokens removed per turn.
 
@@ -132,7 +132,7 @@ Fleet watcher (`scripts/fleet-idle-watch.py`): an idle worker waiting on a human
 
 ## Read next
 
-- [`docs/LEDGER.md`](docs/LEDGER.md) — complete measurements, boundaries, and receipts.
-- [`docs-mirror/typesafe/introduction/quickstart.md`](docs-mirror/typesafe/introduction/quickstart.md) — official request shape.
-- [`docs-mirror/typesafe/primitives.md`](docs-mirror/typesafe/primitives.md) — Choice, Score, and Noul.
-- [`EVAL.md`](EVAL.md) — verification ledger with lane, N, model, and boundary.
+- [`docs/LEDGER.md`](docs/LEDGER.md): complete measurements, boundaries, and receipts.
+- [`docs-mirror/typesafe/introduction/quickstart.md`](docs-mirror/typesafe/introduction/quickstart.md): official request shape.
+- [`docs-mirror/typesafe/primitives.md`](docs-mirror/typesafe/primitives.md): Choice, Score, and Noul.
+- [`EVAL.md`](EVAL.md): verification ledger with lane, N, model, and boundary.
