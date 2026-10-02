@@ -35,9 +35,10 @@
  * unscreened. Nimble-cleared rows log jevSkipped:true; the paid budget counts
  * paid calls only. Default CASCADE_ENABLED=false keeps the legacy direct-paid flow.
  */
+import { execFile } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { appendFile, mkdir, open } from "node:fs/promises";
+import { appendFile, mkdir, open, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -173,6 +174,7 @@ export interface AskArgs {
   model: string;
   timeoutMs: number;
   fetchImpl?: typeof fetch;
+  gatewayUrl?: string;
 }
 export interface ObserveDeps {
   asker?: (args: AskArgs) => Promise<AskResult>;
@@ -184,8 +186,16 @@ export interface ObserveDeps {
   cascadeOffFile?: string;
   /** Existence check for the switch file; defaults to existsSync. */
   fsExists?: (p: string) => boolean;
-  append?: (path: string, line: string) => Promise<void>;
-  logPath?: string;
+  /** Pre-rule override for tests; defaults to matchPrerule. */
+  prerule?: (command: string) => string | null;
+  /** Test seam: threaded into both askers; production leaves unset. */
+  fetchImpl?: typeof fetch;
+  /** Test seam: gateway override; production reads JEV_NIMBLE_GATEWAY_URL. */
+  gatewayUrl?: string;
+  /** Test seam: alert delivery; defaults to a single ntm page to pane 1. */
+  notify?: (msg: string) => Promise<unknown> | unknown;
+  /** Test seam: alert marker path; defaults to the state dir. */
+  markerPath?: string;
   filter?: (command: string) => { drop: boolean; reason?: string };
   appendSidecar?: (path: string, line: string) => Promise<void>;
   sidecarPath?: string;
@@ -199,6 +209,73 @@ export interface ObserveDeps {
 }
 
 const processDailyBudget = { day: "", calls: 0 };
+
+/** Gateway-down alert (jev-1w52): page pane 1 only on refused screens
+ * confirmed by /healthz, never on contention timeouts or fence 503s. */
+export const GATEWAY_ALERT_N = 5;
+export const GATEWAY_ALERT_QUIET_S = 3600;
+let gatewayRefusedStreak = 0;
+export function resetGatewayAlert(): void {
+  gatewayRefusedStreak = 0;
+}
+
+async function defaultNotify(msg: string): Promise<void> {
+  await new Promise<void>((resolve) => {
+    execFile("ntm", ["send", "jev", "--pane=1", msg], { timeout: 10000 }, () => resolve());
+  });
+}
+
+async function healthzOk(gatewayUrl: string, fetchImpl?: typeof fetch): Promise<boolean> {
+  try {
+    const url = new URL("/healthz", gatewayUrl).toString();
+    const response = await (fetchImpl ?? fetch)(url, { signal: AbortSignal.timeout(3000) });
+    if (!response.ok) return false;
+    const body = await response.text().catch(() => "");
+    return body.includes('"ok":true') || body.includes('"ok": true');
+  } catch {
+    return false;
+  }
+}
+
+type AlertDeps = { notify?: (msg: string) => Promise<unknown> | unknown; markerPath?: string; fetchImpl?: typeof fetch };
+
+async function noteGatewayRefused(
+  base: Record<string, unknown>,
+  write: (row: Record<string, unknown>) => Promise<void>,
+  deps: AlertDeps,
+  now: () => string,
+  gatewayUrl: string,
+): Promise<void> {
+  gatewayRefusedStreak += 1;
+  if (gatewayRefusedStreak !== GATEWAY_ALERT_N) return;
+  if (await healthzOk(gatewayUrl, deps.fetchImpl)) {
+    gatewayRefusedStreak = 0;
+    return;
+  }
+  const marker = deps.markerPath ?? join(homedir(), ".local", "state", "jev", "gateway-alert-marker");
+  try {
+    const last = Number(await readFile(marker, "utf8"));
+    if (Number.isFinite(last) && Date.now() - last < GATEWAY_ALERT_QUIET_S * 1000) return;
+  } catch {
+    // Missing/unreadable marker means never alerted: proceed.
+  }
+  try {
+    await mkdir(dirname(marker), { recursive: true });
+    await writeFile(marker, String(Date.now()), { mode: 0o600 });
+  } catch {
+    // Marker best-effort only.
+  }
+  await write({
+    ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null,
+    skipped: null, error: `gateway-alert: ${GATEWAY_ALERT_N} consecutive refused, /healthz failing`,
+    nimbleProbs: null, jevSkipped: null, screen: "gateway-alert",
+  });
+  try {
+    await (deps.notify ?? defaultNotify)(`GATEWAY nimble gateway refused ${GATEWAY_ALERT_N} consecutive screens and /healthz is failing; fleet on paid fallback`);
+  } catch {
+    // Paging never fails the hook.
+  }
+}
 
 export const liveAsker: NonNullable<ObserveDeps["asker"]> = async (args) => {
   useInfisicalKey();
@@ -225,28 +302,73 @@ export const liveAsker: NonNullable<ObserveDeps["asker"]> = async (args) => {
     usage: result.usage ? { input_tokens: result.usage.input_tokens, output_tokens: result.usage.output_tokens } : undefined,
   };
 };
+/** Override file (jev-1w52 planted proof): content is the gateway URL;
+ * absent/empty/whitespace means default. Read per call so no restart is
+ * needed; env vars are not reliably visible to hook sessions. */
+export function readGatewayUrlFile(path?: string): string | null {
+  try {
+    const text = readFileSync(path ?? join(homedir(), ".local", "state", "jev", "nimble-gateway-url"), "utf8").trim();
+    return text.length > 0 ? text : null;
+  } catch {
+    return null;
+  }
+}
 
-/**
- * Free local screen through the localbench gateway. Same contract as the
- * paid asker; every failure mode is a value, never a throw past observe().
- * Timeout is tight (5 s): the gateway is loopback, slowness means fail open.
- */
+
+/** Gateway failure cause (jev-1w52, per localbench IcyBarn): refused means the
+ * loopback listener is down; timeout means GPU contention won the 5 s race;
+ * http-502 is Ollama upstream; http-503-fence is the agreed draining signal.
+ * Only refused pages pane 1 (after a confirming /healthz); the rest never do. */
+export function gatewayCauseOf(err: unknown): "refused" | "timeout" | "http" {
+  const parts: string[] = [];
+  let cur: unknown = err;
+  for (let i = 0; i < 3 && cur !== null && cur !== undefined; i += 1) {
+    if (cur instanceof Error) {
+      parts.push(cur.message);
+      if ("code" in cur && typeof cur.code === "string") parts.push(cur.code);
+      cur = "cause" in cur ? cur.cause : undefined;
+    } else {
+      parts.push(String(cur));
+      break;
+    }
+  }
+  const msg = parts.join(" ");
+  if (/ECONNREFUSED|EHOSTUNREACH|ENETUNREACH|Unable to connect|ConnectionRefused|Connection refused/i.test(msg)) return "refused";
+  if (/timeout|timed out|TimeoutError|abort/i.test(msg)) return "timeout";
+  return "http";
+}
+
 export const liveLocalAsker: NonNullable<ObserveDeps["localAsker"]> = async (args) => {
   const started = Date.now();
   const doFetch = args.fetchImpl ?? fetch;
+  const gatewayUrl = args.gatewayUrl ?? readGatewayUrlFile() ?? process.env.JEV_NIMBLE_GATEWAY_URL ?? LOCAL_GATEWAY;
   let response: Response;
   try {
-    response = await doFetch(LOCAL_GATEWAY, {
+    response = await doFetch(gatewayUrl, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ model: LOCAL_MODEL, state: args.state, questions: args.questions }),
       signal: AbortSignal.timeout(args.timeoutMs ?? LOCAL_TIMEOUT_MS),
     });
   } catch (err) {
-    return { ok: false, reason: "gateway-unreachable", error: err instanceof Error ? err.message : String(err), latencyMs: Date.now() - started };
+    const cause = gatewayCauseOf(err);
+    return { ok: false, reason: `gateway-${cause}`, error: err instanceof Error ? err.message : String(err), latencyMs: Date.now() - started };
   }
   if (!response.ok) {
-    return { ok: false, reason: "gateway-http", error: `HTTP ${response.status}`, latencyMs: Date.now() - started };
+    let bodyText = "";
+    try {
+      bodyText = (await response.text()).slice(0, 512);
+    } catch {
+      bodyText = "";
+    }
+    if (response.status === 502) {
+      return { ok: false, reason: "gateway-http-502", error: `HTTP 502 ${bodyText}`, latencyMs: Date.now() - started };
+    }
+    if (response.status === 503) {
+      const fenced = /fence|draining/i.test(bodyText);
+      return { ok: false, reason: fenced ? "gateway-http-503-fence" : "gateway-http-503", error: `HTTP 503 ${bodyText}`, latencyMs: Date.now() - started };
+    }
+    return { ok: false, reason: "gateway-http", error: `HTTP ${response.status} ${bodyText}`, latencyMs: Date.now() - started };
   }
   let body: unknown;
   try {
@@ -492,7 +614,7 @@ export async function observe(
     // nimble did not decide: timeout (gateway stall), http (bad gateway
     // response), or fence (fallback path hit the paid budget). Null = nimble
     // decided or was skipped by rule/switch.
-    let fallbackCause: "timeout" | "http" | "fence" | null = null;
+    let fallbackCause: "timeout" | "http" | "fence" | "refused" | null = null;
     let paidFallback = false;
     // jev-nbbm pre-rule: a deterministic destructive-class match skips nimble
     // for paid Jev at zero model cost, logged screen=prerule-paid. The paid
@@ -509,6 +631,8 @@ export async function observe(
           questions: RISK,
           model: LOCAL_MODEL,
           timeoutMs: LOCAL_TIMEOUT_MS,
+          fetchImpl: deps.fetchImpl,
+          gatewayUrl: deps.gatewayUrl,
         });
       } catch (err) {
         screenError = err;
@@ -521,7 +645,10 @@ export async function observe(
           paidFallback = true;
           const reason = screen!.reason ?? "";
           const detail = screen!.error ?? "";
-          fallbackCause = reason === "gateway-unreachable" && /timeout|timed out|TimeoutError|abort/i.test(reason + " " + detail) ? "timeout" : "http";
+          if (reason === "gateway-refused") fallbackCause = "refused";
+          else if (reason === "gateway-timeout") fallbackCause = "timeout";
+          else if (reason === "gateway-http-502" || reason === "gateway-http-503" || reason === "gateway-http-503-fence" || reason === "gateway-http" || reason === "gateway-bad-json") fallbackCause = "http";
+          else fallbackCause = reason === "gateway-unreachable" && /timeout|timed out|TimeoutError|abort/i.test(reason + " " + detail) ? "timeout" : "http";
         } else {
             const scores = screen!.scores ?? {};
             let top = -Infinity;
@@ -535,6 +662,7 @@ export async function observe(
               fallbackCause = "http";
             } else {
               nimbleProbs = scores;
+              gatewayRefusedStreak = 0;
               if (top <= CUT) {
                 await write({
                   ...base,
@@ -555,6 +683,10 @@ export async function observe(
             }
         }
       }
+    }
+    if (paidFallback && fallbackCause === "refused") {
+      const gatewayUrl = deps.gatewayUrl ?? process.env.JEV_NIMBLE_GATEWAY_URL ?? LOCAL_GATEWAY;
+      await noteGatewayRefused(base, write, deps, now, gatewayUrl);
     }
     if (budget.calls >= paidCap) {
       if (fallbackCause) {
@@ -578,6 +710,7 @@ export async function observe(
         questions: RISK,
         model: MODEL,
         timeoutMs: 20000,
+        fetchImpl: deps.fetchImpl,
       });
     } catch (err) {
       await write({ ...base, status: "error", probs: null, flag: null, latencyMs: null, tokens: null, skipped: null, error: "ask-threw: " + (err instanceof Error ? err.message : String(err)), nimbleProbs: null, jevSkipped: null, screen: "unscreened" });

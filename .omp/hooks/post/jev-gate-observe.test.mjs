@@ -698,3 +698,114 @@ test("WIRE cascade-off mid-paid-call labels off, never an enforced route", async
   assert.equal(wrote[0].row.screen, "paid-cascade-off");
   assert.equal(wrote[0].row.flag, true);
 });
+
+test("WIRE gateway causes classify refused/timeout/http/502/fence", async () => {
+  const { gatewayCauseOf, liveLocalAsker } = await import("./jev-gate-observe.ts");
+  const refused = new Error("fetch failed");
+  refused.cause = new Error("connect ECONNREFUSED 127.0.0.1:11300");
+  assert.equal(gatewayCauseOf(refused), "refused");
+  const bunRefused = new Error("Unable to connect. Is the computer able to access the url?");
+  bunRefused.code = "ConnectionRefused";
+  assert.equal(gatewayCauseOf(bunRefused), "refused");
+  assert.equal(gatewayCauseOf(new Error("TimeoutError: signal timed out")), "timeout");
+  assert.equal(gatewayCauseOf(new Error("boom")), "http");
+  const refusing = async () => {
+    const err = new Error("fetch failed");
+    err.cause = new Error("connect ECONNREFUSED 127.0.0.1:11300");
+    throw err;
+  };
+  const r1 = await liveLocalAsker({ state: {}, questions: {}, model: "m", timeoutMs: 50, fetchImpl: refusing });
+  assert.equal(r1.ok, false);
+  assert.equal(r1.reason, "gateway-refused");
+  const fence = async () => new Response("draining, fence active", { status: 503, headers: { "content-type": "text/plain" } });
+  const r2 = await liveLocalAsker({ state: {}, questions: {}, model: "m", timeoutMs: 50, fetchImpl: fence });
+  assert.equal(r2.reason, "gateway-http-503-fence");
+  const plain503 = async () => new Response("overloaded", { status: 503, headers: { "content-type": "text/plain" } });
+  const r3 = await liveLocalAsker({ state: {}, questions: {}, model: "m", timeoutMs: 50, fetchImpl: plain503 });
+  assert.equal(r3.reason, "gateway-http-503");
+  const bad502 = async () => new Response("bad gateway", { status: 502, headers: { "content-type": "text/plain" } });
+  const r4 = await liveLocalAsker({ state: {}, questions: {}, model: "m", timeoutMs: 50, fetchImpl: bad502 });
+  assert.equal(r4.reason, "gateway-http-502");
+});
+
+test("WIRE five consecutive refused pages once, then suppresses", async () => {
+  const { resetGatewayAlert } = await import("./jev-gate-observe.ts");
+  resetGatewayAlert();
+  reset();
+  const pages = [];
+  const mk = () => mkdtempSync(join(tmpdir(), "gwalert-"));
+  const dir = mk();
+  const failing = async () => {
+    const err = new Error("fetch failed");
+    err.cause = new Error("connect ECONNREFUSED 127.0.0.1:1");
+    throw err;
+  };
+  const deps = {
+    ...cascadeMem,
+    asker: async () => ({ ok: false, reason: "http", error: "HTTP 500", latencyMs: 1 }),
+    localAsker: async (args) => {
+      const { liveLocalAsker: live } = await import("./jev-gate-observe.ts");
+      return live({ ...args, fetchImpl: failing });
+    },
+    fetchImpl: failing,
+    notify: async (msg) => { pages.push(msg); },
+    markerPath: join(dir, "marker"),
+    dailyBudget: { day: "", calls: 0 },
+  };
+  for (let i = 0; i < 5; i++) {
+    await observe({ toolName: "bash", input: { command: `refused-probe-${i}` } }, { ...deps, dailyBudget: { day: "", calls: 0 } });
+  }
+  assert.equal(pages.length, 1);
+  assert.match(pages[0], /GATEWAY/);
+  const alerts = wrote.filter((w) => w.row.error && w.row.error.startsWith("gateway-alert"));
+  assert.equal(alerts.length, 1);
+  await observe({ toolName: "bash", input: { command: "refused-probe-6" } }, { ...deps, dailyBudget: { day: "", calls: 0 } });
+  assert.equal(pages.length, 1);
+});
+
+test("WIRE contention timeouts never page", async () => {
+  const { resetGatewayAlert } = await import("./jev-gate-observe.ts");
+  resetGatewayAlert();
+  reset();
+  const pages = [];
+  const dir = mkdtempSync(join(tmpdir(), "gwalert-"));
+  const slow = async () => {
+    await new Promise((r) => setTimeout(r, 30));
+    throw new Error("TimeoutError: signal timed out");
+  };
+  const deps = {
+    ...cascadeMem,
+    asker: async () => ({ ok: false, reason: "http", error: "HTTP 500", latencyMs: 1 }),
+    localAsker: async (args) => {
+      const { liveLocalAsker: live } = await import("./jev-gate-observe.ts");
+      return live({ ...args, fetchImpl: slow });
+    },
+    notify: async (msg) => { pages.push(msg); },
+    markerPath: join(dir, "marker"),
+    dailyBudget: { day: "", calls: 0 },
+  };
+  for (let i = 0; i < 7; i++) {
+    await observe({ toolName: "bash", input: { command: `timeout-probe-${i}` } }, { ...deps, dailyBudget: { day: "", calls: 0 } });
+  }
+  assert.equal(pages.length, 0);
+});
+
+test("WIRE gateway URL override file routes, empty means default", async () => {
+  const { readGatewayUrlFile, liveLocalAsker } = await import("./jev-gate-observe.ts");
+  const dir = mkdtempSync(join(tmpdir(), "gwurl-"));
+  assert.equal(readGatewayUrlFile(join(dir, "missing")), null);
+  const { writeFileSync } = await import("node:fs");
+  writeFileSync(join(dir, "u"), "http://127.0.0.1:9/");
+  assert.equal(readGatewayUrlFile(join(dir, "u")), "http://127.0.0.1:9/");
+  writeFileSync(join(dir, "e"), "  \n");
+  assert.equal(readGatewayUrlFile(join(dir, "e")), null);
+  let gotUrl = "";
+  const probe = async (url) => {
+    gotUrl = String(url);
+    throw new Error("fetch failed: connect ECONNREFUSED 127.0.0.1:9");
+  };
+  const res = await liveLocalAsker({ state: {}, questions: {}, model: "m", timeoutMs: 50, fetchImpl: probe, gatewayUrl: "http://127.0.0.1:9/" });
+  assert.equal(gotUrl, "http://127.0.0.1:9/");
+  assert.equal(res.ok, false);
+  assert.equal(res.reason, "gateway-refused");
+});
