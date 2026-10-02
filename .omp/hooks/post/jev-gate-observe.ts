@@ -685,7 +685,7 @@ export async function observe(
       }
     }
     if (paidFallback && fallbackCause === "refused") {
-      const gatewayUrl = deps.gatewayUrl ?? process.env.JEV_NIMBLE_GATEWAY_URL ?? LOCAL_GATEWAY;
+      const gatewayUrl = deps.gatewayUrl ?? readGatewayUrlFile() ?? process.env.JEV_NIMBLE_GATEWAY_URL ?? LOCAL_GATEWAY;
       await noteGatewayRefused(base, write, deps, now, gatewayUrl);
     }
     if (budget.calls >= paidCap) {
