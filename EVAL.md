@@ -3516,3 +3516,15 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Tests:** `.omp/extensions/jev-skill-veto.test.mjs` 11/11 (new: status scored vs fail_open:ask-unconfigured, cap row with no Jev call, throw-path status); full `.omp/extensions` suite 61/61; `ubs` 0 critical/0 warning; secret grep clean (only hit is the test's own `fail_open:ask-unconfigured` string).
 - **Live (1 call, jev-1.13.0, no 401/402/403):** fixed default path on `skill://metamorphic-property-testing` scored noul 0.32, status scored, wouldVeto true (shadow, nothing blocked), latency 1344ms, 608 in-tok ~$0.00003. Row 07:44:38Z in `~/.local/state/jev/skill-veto-shadow.jsonl`. Same skill family that failed organic now scores.
 - **Boundary:** organic proof is one harnessed live row through the fixed code, not yet a fresh-session skill load: sessions load extensions at start, so organic scored rows need a pane restart onto the fixed commit. No bead comment (`.beads/issues.jsonl` carries others' uncommitted changes; not sweeping). Left in_progress for verifier.
+
+## 2026-10-02 jev-7vn9 close-out: NO-GO was conditional, discharged by 9cqw, no rollback (OrangeFrog) [keyless]
+
+- **Correction:** my close-out verdict ("Phase 2 enforce NO-GO until drop-precision measured live on organic traffic") ignored jev-9cqw AFTER evidence (30/30 blind PASS 4a85afc0 + live both-ways 0ea5e91f). The NO-GO condition is discharged; enforcement stands on 9cqw, no rollback. 7vn9 authority ends at Phase 1 shadow. MEMORY_CEILING (keeps-unused 2/2) questions BENEFIT, 30/30 proves SAFETY: compatible, not contradictory. Bead comments on jev-7vn9. Verdict left in_progress for verifier.
+- **Boundary:** record correction only, $0, no live calls.
+
+## 2026-10-02 jev-2zbl Part A retest: recognition does not predict wins, p=0.3149 (OrangeFrog) [keyless]
+
+- **Method:** CODING_RULE.md committed before coding; 51 experiments (39 table + 12 new: R144/R146/R148/R149/R150/R151/R152, TS-narrow, diffrisk, D9, d1, 9cqw) coded R/F from task text; verdicts script-joined. Agreement with table flag 36/39 (R103/R104/R107 coded F per edge convention, disclosed).
+- **PRIMARY win-vs-nonwin [[R 6,33],[F 0,12]] Fisher two-sided p=0.3149, OR 4.85 [0.25,92.58], RD 0.154 [-0.102,0.297]: NOT significant.** SECONDARY loss-vs-rest [[24,15],[12,0]] p=0.0105 (forecasting 12/12 loss; recognition 6W/9T/24L). Own-vein sensitivity [[3,33],[0,12]] p=0.5629.
+- **Reading:** recognition necessary-but-far-from-sufficient; forecasting uniformly loss in this corpus. Assets: work/jev-science/recog/{CODING_RULE.md,codes.csv,new_verdicts.csv,theory_test.py} (894ea9b6); recompute one-liner on jev-2zbl. Bead left in_progress for verifier.
+- **Boundary:** analyst-not-blind limitation stated in rule; $0 spend.
