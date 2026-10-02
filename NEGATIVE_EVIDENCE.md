@@ -5079,3 +5079,31 @@ Reopen cites this row.
 **Retry-condition:** a framing with precision >= 0.50 at recall >= 0.40 on this same frozen 77 (e.g. veto-only-top-risk-per-batch, or evidence-contradiction wording rather than least-supported), beating the mapping baseline keylessly first. Reopen cites this row.
 
 **Evidence:** var/agent-tmp/veto-*.jsonl + miners + live runner (scratch); bead jev-3ivq bar + result comments.
+
+## R150 — FAIL: duplicate-bead discrimination by Choice over Jaccard top-5 (2026-10-02)
+
+**Hypothesis:** live jev-1.13.0 Choice over the top-5 title-overlap candidates (+none) beats abstain-always on same-work vs related-work bead pairs, enabling a br-create-time duplicate suggestion (bead jev-eruw; loss-depth on V5 NOT ENOUGH DATA).
+
+**Minimal repro / experiment:** machine-wide corpus 263,711 beads / 202 repos; 778 explicit "Duplicate of X" links, 517 same-repo resolvable, 228 title-deduped, 210 organic pairs across 34 repos (79,730 universe). Grouped repo split dev 105 / test 105 pairs + 368 high-overlap negatives (seed 13). Task: pick the true original among top-5 or none. Best cheap baseline B3 = abstain-always: dev 0.6678, test 0.6781. Bar pre-live (bead comment): accuracy >= 0.758 on 292 test items, <= 300 calls. Live 292 bounded jev-1.13.0 calls, 292/292 ok+valid, 453,176 in-tok ~$0.01903, p50 387ms.
+
+**Result (measured, inline):** accuracy 108/292 = 0.3699 vs 0.758 bar FAIL; pos 85/94 = 0.904, neg 16/187 = 0.086; pick precision 85/268 = 0.317. Model picks a duplicate on 268/292, never abstains. Autopsy: confidence gating maxes at 0.5925 (pick precision flat 0.33-0.36 across cuts) — calibration is not the lever.
+
+**Verdict:** FAIL with named model limit: same-work vs related-work needs acceptance/work-graph state outside title+description text. No create-time suggestion on these terms.
+
+**Retry-condition:** a state-enriched design (acceptance criteria, bead links) beating abstain keylessly first on these frozen items. Reopen cites this row.
+
+**Evidence:** work/jev-eruw/{eruw.live.jsonl (292 rows: n, answer, choice, confidence, status, input_tokens, latency_ms), eruw.items.json (frozen 292 + split seeds), eruw.score.py, eruw.autopsy.py, eruw.live.py, eruw.split.py, eruw.b3c.py}; bead jev-eruw bar + result comments.
+
+## R151 — FAIL: citation-check Choice on verifier claim-evidence triples (2026-10-02)
+
+**Hypothesis:** the demos/citation question (Choice supports/contradicts/says_nothing + 0.8 gate via kit askJevChoice) judges verifier claim-evidence pairs, enabling a DONE-callback pre-check (bead jev-assm, breadth D8; V6 owns parser-decidable cases, this is the semantic remainder).
+
+**Minimal repro / experiment:** 488 non-author verifier comments mined to 333 (claim-number + artifact) triples, 12/12 audit genuine; 300 sampled (seed 21), 189 verified / 111 refuted. Binary mapping (supports vs not). Baseline R130 0.571. Bar pre-live as amended (binary, reason stated): accuracy >= 0.65, <= 300 calls. Live 267 bounded jev-1.13.0 calls via kit askJevChoice + 33 missing-artifact auto-fabricated (no call, per demo).
+
+**Result (measured, inline):** accuracy 148/300 = 0.4933 vs 0.65 bar FAIL (live-call subset 140/267 = 0.5243; auto-fabricated 8/33). Pred supported 167 vs gold 189: over-supports ambiguous prose. Spend ~$0.0056 est (~500 in-tok/call from state sizes; receipt lacks usage).
+
+**Verdict:** FAIL with named model limit: verifier verdicts rest on full-session context (re-runs, clean clones) that a claim-excerpt pair does not carry. No pre-check on these terms.
+
+**Retry-condition:** triples carrying the verifier's context (re-run commands, clone state) beating 0.571 keylessly first. Reopen cites this row.
+
+**Evidence:** work/jev-assm-d8/{d8.receipt.jsonl (300 rows: n, answer, choice, confidence, status), d8.live.json (frozen 300, seed 21), d8.extract.py, d8.score.py, d8.live.mjs, d8.sample.py}; bead jev-assm bar + amendment + result comments.
