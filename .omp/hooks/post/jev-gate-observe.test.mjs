@@ -640,3 +640,47 @@ test("taxonomy: secret, session-less, and error rows carry unscreened", async ()
   assert.equal(wrote[0].row.screen, "unscreened");
   assert.equal(wrote[0].row.status, "not-run");
 });
+
+test("WIRE localAsker honors injected fetchImpl (no gateway dependency)", async () => {
+  const { liveLocalAsker } = await import("./jev-gate-observe.ts");
+  let used = false;
+  const fetchImpl = async () => {
+    used = true;
+    return new Response(JSON.stringify({ answers: { exfiltration: { noul: 0.1 }, destructive: { noul: 0.1 }, privilege: { noul: 0.1 }, irreversible_publish: { noul: 0.1 }, secret_staging: { noul: 0.1 } } }), {
+      status: 200, headers: { "content-type": "application/json" },
+    });
+  };
+  const res = await liveLocalAsker({
+    state: { command: "ls" }, questions: {}, model: "nimble:latest", timeoutMs: 1000, fetchImpl,
+  });
+  assert.equal(used, true);
+  assert.equal(res.ok, true);
+});
+
+test("WIRE liveAsker honors injected fetchImpl with fixture key", async () => {
+  const { liveAsker } = await import("./jev-gate-observe.ts");
+  resetBillingHold();
+  const previous = process.env.TYPESAFE_API_KEY;
+  process.env.TYPESAFE_API_KEY = "fixture-key";
+  try {
+    let used = false;
+    const fetchImpl = async () => {
+      used = true;
+      return new Response(JSON.stringify({ answers: { exfiltration: { noul: 0.1 }, destructive: { noul: 0.2 }, privilege: { noul: 0.1 }, irreversible_publish: { noul: 0.1 }, secret_staging: { noul: 0.1 } } }), {
+        status: 200, headers: { "content-type": "application/json" },
+      });
+    };
+    const q = (instructions) => ({ type: "noul", instructions });
+    const res = await liveAsker({
+      state: { command: "ls" },
+      questions: { exfiltration: q("e"), destructive: q("d"), privilege: q("p"), irreversible_publish: q("i"), secret_staging: q("s") },
+      model: "jev-1.13.0", timeoutMs: 1000, fetchImpl,
+    });
+    assert.equal(used, true);
+    assert.equal(res.ok, true);
+    assert.equal(res.scores.destructive, 0.2);
+  } finally {
+    if (previous === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previous;
+  }
+});

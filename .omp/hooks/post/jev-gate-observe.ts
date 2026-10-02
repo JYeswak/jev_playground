@@ -172,6 +172,7 @@ export interface AskArgs {
   questions: typeof RISK;
   model: string;
   timeoutMs: number;
+  fetchImpl?: typeof fetch;
 }
 export interface ObserveDeps {
   asker?: (args: AskArgs) => Promise<AskResult>;
@@ -199,9 +200,9 @@ export interface ObserveDeps {
 
 const processDailyBudget = { day: "", calls: 0 };
 
-const liveAsker: NonNullable<ObserveDeps["asker"]> = async (args) => {
+export const liveAsker: NonNullable<ObserveDeps["asker"]> = async (args) => {
   useInfisicalKey();
-  const result = await askJevBundle(args);
+  const result = await askJevBundle({ ...args, fetchImpl: args.fetchImpl });
   if (!result.ok) return result;
 
   const scores: Record<string, number> = {};
@@ -232,9 +233,10 @@ const liveAsker: NonNullable<ObserveDeps["asker"]> = async (args) => {
  */
 export const liveLocalAsker: NonNullable<ObserveDeps["localAsker"]> = async (args) => {
   const started = Date.now();
+  const doFetch = args.fetchImpl ?? fetch;
   let response: Response;
   try {
-    response = await fetch(LOCAL_GATEWAY, {
+    response = await doFetch(LOCAL_GATEWAY, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ model: LOCAL_MODEL, state: args.state, questions: args.questions }),

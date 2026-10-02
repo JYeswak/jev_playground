@@ -329,7 +329,8 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
           return;
         }
         const noul = result.scores["rel"];
-        if (typeof noul !== "number" || !Number.isFinite(noul)) {
+        // Contract mirror of kit finiteProbability: finite and in [0,1].
+        if (typeof noul !== "number" || !Number.isFinite(noul) || noul < 0 || noul > 1) {
           // Post-deadline invalid answers keep spend visible as late-ignored.
           if (!timedOut && claim(idx)) {
             await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: result.model, status: "invalid-keep", promptHash, memoryHash: slot.memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: result.latencyMs, inputTokens: result.usage?.input_tokens ?? null });

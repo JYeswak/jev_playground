@@ -168,7 +168,9 @@ export async function screenPassages(
   const flagged = new Set<number>();
   for (const [index, [id]] of entries.entries()) {
     const score = result.scores[`inj_${id}`];
-    if (typeof score === "number") {
+    // Contract mirror of injection-shadow: finite and in [0,1], else the
+    // answer is hostile and the unit stays unflagged and unrecorded.
+    if (typeof score === "number" && Number.isFinite(score) && score >= 0 && score <= 1) {
       scores[id] = score;
       if (score >= CUT) flagged.add(index);
     }

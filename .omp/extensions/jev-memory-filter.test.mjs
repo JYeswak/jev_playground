@@ -462,3 +462,14 @@ test("span prune is byte-exact on collision-free recall", () => {
   assert.equal(drops.length, 1);
   assert.deepEqual(pruneSystemPrompt(sys, drops), ["pre", "<memories>\n\n- keepme bullet\n</memories>", "tail"]);
 });
+
+test("WIRE out-of-range noul keeps fail-safe as invalid-keep", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeBeforeAgentStartHandler({ ask: async () => ({ ok: true, scores: { rel: 9.9 }, latencyMs: 1, model: "m" }), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl") });
+  const { event, ctx } = eventFor("q", SYS_RECALL);
+  const out = await handler(event, ctx);
+  assert.equal(out, undefined);
+  const rows = rowsOf(join(dir, "log.jsonl"));
+  assert.ok(rows.length > 0);
+  assert.ok(rows.every((r) => r.decision === "keep" && r.status === "invalid-keep"));
+});

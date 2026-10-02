@@ -241,3 +241,14 @@ test("no screenable passages records a non-permission local outcome", async () =
 });
 
 // Sensitive-phrase gating was deliberately removed with the approval refusal.
+
+test("WIRE hostile out-of-range score is refused, never flagged or recorded", async () => {
+  const decision = await screenPassages("web_extract", { P0: "Ordinary factual content." }, async ({ questions }) => ({
+    ok: true,
+    scores: Object.fromEntries(Object.keys(questions).map((key) => [key, 9.9])),
+    latencyMs: 0,
+    model: "fake-hostile",
+  }));
+  assert.deepEqual(decision.flagged, []);
+  assert.deepEqual(decision.scores, {});
+});
