@@ -5,119 +5,136 @@
    "days": 1.0,
    "opportunities": 39,
    "positives": 0,
+   "status": "COUNTED",
    "positives_source": "labels",
    "provenance": "39 hunks blind-labeled (61ae2c43), window from key-SHA commit dates",
    "tp_per_week": 0.0,
    "traffic": {
     "days": 1.0,
     "opportunities": 39,
-    "positives": 0
+    "positives": 0,
+    "status": "COUNTED"
    }
   },
   "skill_veto": {
    "days": 7.0,
    "opportunities": 200,
    "positives": 53,
+   "status": "COUNTED",
    "positives_source": "labels",
    "provenance": "200 organic loads 2026-09-25T15Z-2026-10-02T15Z, blind FIT/UNFIT pre-score (541055bc)",
    "tp_per_week": 53.0,
    "traffic": {
     "days": 7.0,
     "opportunities": 200,
-    "positives": 53
+    "positives": 53,
+    "status": "COUNTED"
    }
   },
   "gate_cascade": {
    "days": 0.041666666666666664,
-   "opportunities": 98,
+   "opportunities": 102,
    "positives": 4,
+   "status": "COUNTED",
    "positives_source": "labels-paid-as-target",
-   "provenance": "1h live window 15:36-16:36Z, 98 cascade rows, 4 paid (jev-facg close); paid flags stand in for target events, truth unmeasured",
+   "paid_share": 0.0392156862745098,
+   "provenance": "1h live window 15:36-16:36Z, 98 nimble-cleared + 4 paid = 102 total; paid share 4/102=3.92%; target truth unmeasured",
    "tp_per_week": 672.0,
    "traffic": {
     "days": 0.041666666666666664,
-    "opportunities": 98,
-    "positives": 4
+    "opportunities": 102,
+    "positives": 4,
+    "status": "COUNTED"
    }
   },
   "memory_filter": {
    "days": 7.0,
    "opportunities": 100,
    "positives": 75,
+   "status": "COUNTED",
    "positives_source": "labels",
    "provenance": "100-pair seed-42 sample of the 170-pair 7d census; TP75 true drops (replication row, EVAL)",
    "tp_per_week": 75.0,
    "traffic": {
     "days": 7.0,
     "opportunities": 100,
-    "positives": 75
+    "positives": 75,
+    "status": "COUNTED"
    }
   },
   "injection_reads": {
    "days": 7.0,
-   "opportunities": 32846,
+   "opportunities": 41473,
    "positives": null,
+   "status": "NOT_COUNTED",
    "positives_source": "unmeasured",
-   "proxy_hits": 124,
-   "provenance": "read results scanned 32846, instruction-pattern hits 124 are PROXY not truth; hqha planted rows excluded by rule",
+   "provenance": "HazySpring 7d session census reported 41,473 read results; no independent positive labels, proxy matches excluded",
    "tp_per_week": null,
    "traffic": {
     "days": 7.0,
-    "opportunities": 32846,
-    "positives": null
+    "opportunities": 41473,
+    "positives": null,
+    "status": "NOT_COUNTED"
    }
   },
   "webscreen": {
    "days": 7.0,
-   "opportunities": 311,
+   "opportunities": 325,
    "positives": null,
+   "status": "NOT_COUNTED",
    "positives_source": "unmeasured",
-   "proxy_hits": 4,
-   "provenance": "web results scanned 311, instruction-pattern hits 4 are PROXY not truth",
+   "provenance": "HazySpring 7d session census reported 325 web results; no independent positive labels, proxy matches excluded",
    "tp_per_week": null,
    "traffic": {
     "days": 7.0,
-    "opportunities": 311,
-    "positives": null
+    "opportunities": 325,
+    "positives": null,
+    "status": "NOT_COUNTED"
    }
   },
   "skill_loads_observed": {
    "days": 7.0,
    "opportunities": 4270,
    "positives": null,
+   "status": "NOT_COUNTED",
    "positives_source": "unmeasured",
    "provenance": "skill:// loads counted 4270; UNFIT labels need the wbel replay, not this scan",
    "tp_per_week": null,
    "traffic": {
     "days": 7.0,
     "opportunities": 4270,
-    "positives": null
+    "positives": null,
+    "status": "NOT_COUNTED"
    }
   },
   "bash_commands_observed": {
    "days": 7.0,
    "opportunities": 47851,
    "positives": null,
+   "status": "NOT_COUNTED",
    "positives_source": "unmeasured",
    "provenance": "bash toolCalls counted 47851",
    "tp_per_week": null,
    "traffic": {
     "days": 7.0,
     "opportunities": 47851,
-    "positives": null
+    "positives": null,
+    "status": "NOT_COUNTED"
    }
   },
   "memory_messages_observed": {
    "days": 7.0,
    "opportunities": 6,
    "positives": null,
+   "status": "NOT_COUNTED",
    "positives_source": "unmeasured",
    "provenance": "<memories> messages counted 6; keep/drop truth needs filter labels",
    "tp_per_week": null,
    "traffic": {
     "days": 7.0,
     "opportunities": 6,
-    "positives": null
+    "positives": null,
+    "status": "NOT_COUNTED"
    }
   }
  }

@@ -207,13 +207,17 @@ def wbel_labels():
 
 
 def facg_window():
-    """facg 1h live window: 98 cascade rows, 4 paid escalations (blind truth unmeasured)."""
+    """1h cascade total: 98 nimble-cleared rows plus 4 paid rows."""
     return (
-        98,
+        102,
         4,
         1.0 / 24,
-        "1h live window 15:36-16:36Z, 98 cascade rows, 4 paid (jev-facg close); paid flags stand in for target events, truth unmeasured",
+        "1h live window 15:36-16:36Z: 98 nimble-cleared + 4 paid = 102 total; paid share 4/102=3.92%; target truth unmeasured",
     )
+
+
+def counting_status(positives):
+    return "NOT_COUNTED" if positives is None else "COUNTED"
 
 
 def wb7j_sample():
@@ -230,7 +234,7 @@ def main():
     opp = scan_sessions()
     n39, vpos, vdays, vprov = vendor_labels()
     n200, wtp, wdays, wprov = wbel_labels()
-    n98, fpaid, fdays, fprov = facg_window()
+    n102, fpaid, fdays, fprov = facg_window()
     n100, mtp, mdays, mprov = wb7j_sample()
     cands = {
         "vendor_paste": {
@@ -249,9 +253,10 @@ def main():
         },
         "gate_cascade": {
             "days": fdays,
-            "opportunities": n98,
+            "opportunities": n102,
             "positives": fpaid,
             "positives_source": "labels-paid-as-target",
+            "paid_share": fpaid / n102,
             "provenance": fprov,
         },
         "memory_filter": {
@@ -305,15 +310,14 @@ def main():
     }
     for name, c in cands.items():
         p = c["positives"]
+        c["status"] = counting_status(p)
         c["tp_per_week"] = (p / c["days"] * 7) if isinstance(p, int) else None
         c["traffic"] = {
             "days": c["days"],
             "opportunities": c["opportunities"],
             "positives": c["positives"],
+            "status": c["status"],
         }
-    out = os.path.join(HERE, "candidates.json")
-    with open(out, "w", encoding="utf-8") as fh:
-        json.dump({"window_days": DAYS, "candidates": cands}, fh, indent=1)
     for name, c in cands.items():
         print(
             "%-22s days=%-6g opp=%-7d pos=%-6s tp/wk=%-8s src=%s"
