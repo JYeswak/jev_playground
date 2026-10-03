@@ -1,118 +1,265 @@
-"""Tests for scripts/git-commit-serialized.sh (jev-fxm2). Hermetic tmp repos only."""
+"""Tests for the daemon-backed serialized Git writer. Hermetic repos only."""
 
+from __future__ import annotations
+
+import json
 import os
+import shutil
 import subprocess
+import sys
 import tempfile
-import time
 import unittest
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
+from pathlib import Path
 
-WRAPPER = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)), "git-commit-serialized.sh"
-)
+ROOT = Path(__file__).resolve().parents[1]
+EXECUTABLES = {
+    name: executable
+    for name, executable in (
+        ("git", shutil.which("git")),
+        ("bash", shutil.which("bash")),
+    )
+    if executable is not None
+}
+EXECUTABLES["python3"] = sys.executable
+EXECUTABLES["git-dispatch"] = str(ROOT / "scripts" / "git")
+DAEMON = ROOT / "scripts" / "git-commitd.py"
+SCRATCH = ROOT / "var" / "agent-tmp"
 
 
-def sh(cwd, *args, env=None):
-    e = dict(os.environ)
+def sh(
+    cwd: Path,
+    command: str,
+    *args: str,
+    env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
+    if command not in EXECUTABLES:
+        raise ValueError(f"unsupported test command: {command!r}")
+    child_env = dict(os.environ)
     if env:
-        e.update(env)
+        child_env.update(env)
+    if command == "git-dispatch":
+        child_env["JEV_COMMITD_TARGET_ROOT"] = str(cwd.resolve())
     return subprocess.run(
-        args, cwd=cwd, capture_output=True, text=True, env=e, timeout=120
+        (EXECUTABLES[command], *args),
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        env=child_env,
+        timeout=120,
+        check=False,
     )
 
 
 def init_repo():
-    d = tempfile.mkdtemp(prefix="fxm2-")
-    sh(d, "git", "init", "-q", ".")
-    sh(d, "git", "config", "user.email", "t@t.t")
-    sh(d, "git", "config", "user.name", "t")
-    with open(os.path.join(d, "f.txt"), "w") as fh:
-        fh.write("x\n")
-    sh(d, "git", "add", "f.txt")
-    return d
+    SCRATCH.mkdir(parents=True, exist_ok=True)
+    scratch = Path(tempfile.mkdtemp(prefix=f"git-writer.{os.getpid()}.", dir=SCRATCH))
+    (scratch / ".owner").write_text(
+        f"pid={os.getpid()}\n"
+        "label=git-commit-serialized-tests\n"
+        f"repo={ROOT}\n"
+        f"created={datetime.now(timezone.utc).isoformat()}\n",
+        encoding="utf-8",
+    )
+    repo = scratch / "repo"
+    repo.mkdir()
+    sh(repo, "git", "init", "-q", ".")
+    sh(repo, "git", "config", "user.email", "writer-test@example.invalid")
+    sh(repo, "git", "config", "user.name", "writer test")
+    (repo / "base.txt").write_text("base\n", encoding="utf-8")
+    sh(repo, "git", "add", "--", "base.txt")
+    base = sh(repo, "git", "commit", "-qm", "baseline [selftest]")
+    if base.returncode:
+        raise AssertionError(base.stderr)
+    return repo, sh(repo, "git", "rev-parse", "HEAD").stdout.strip()
+
+
+def commit(repo, message, *paths, env=None):
+    return sh(
+        repo,
+        "git-dispatch",
+        "commit",
+        "--only",
+        "-m",
+        message,
+        "--",
+        *paths,
+        env=env,
+    )
+
+
+def install_pre_commit_hook(repo, log_path):
+    hook_dir = repo / ".git" / "test-hooks"
+    hook_dir.mkdir()
+    hook = hook_dir / "pre-commit"
+    hook.write_text(
+        "#!/bin/sh\nprintf 'ran\\n' >> \"$JEV_TEST_HOOK_LOG\"\n",
+        encoding="utf-8",
+    )
+    hook.chmod(0o755)
+    sh(repo, "git", "config", "core.hooksPath", str(hook_dir))
+    return {"JEV_TEST_HOOK_LOG": str(log_path)}
 
 
 class TestSerializedCommit(unittest.TestCase):
-    def test_sweep_stale_then_commit(self):
-        d = init_repo()
-        with open(os.path.join(d, "g.txt"), "w") as fh:
-            fh.write("y\n")
-        sh(d, "git", "add", "g.txt")
-        lock = os.path.join(d, ".git", "index.lock")
-        with open(lock, "w"):
-            pass
-        old = time.time() - 400
-        os.utime(lock, (old, old))
-        p = sh(d, "bash", WRAPPER, "-qm", "sweep test [test]")
-        self.assertEqual(p.returncode, 0, p.stderr)
-        moved = [
-            f
-            for f in os.listdir(os.path.join(d, "var", "agent-tmp"))
-            if f.startswith("git-index.lock.stale-")
-        ]
-        self.assertEqual(len(moved), 1)
-        log = sh(d, "git", "log", "--format=%s", "-1")
-        self.assertIn("sweep test", log.stdout)
-
-    def test_live_lock_untouched(self):
-        d = init_repo()
-        with open(os.path.join(d, "g.txt"), "w") as fh:
-            fh.write("y\n")
-        sh(d, "git", "add", "g.txt")
-        lock = os.path.join(d, ".git", "index.lock")
-        with open(lock, "w") as fh:
-            fh.write("live-bytes")
-        old = time.time() - 400
-        os.utime(lock, (old, old))
-        p = sh(d, "bash", WRAPPER, "-qm", "must fail through [test]")
-        self.assertNotEqual(p.returncode, 0)
-        self.assertTrue(os.path.exists(lock))
-
-    def test_mutex_timeout(self):
-        d = init_repo()
-        os.mkdir(os.path.join(d, ".git", "fleet-commit.lockdir"))
-        with open(os.path.join(d, "g.txt"), "w") as fh:
-            fh.write("y\n")
-        sh(d, "git", "add", "g.txt")
-        p = sh(
-            d,
-            "bash",
-            WRAPPER,
-            "-qm",
-            "blocked [test]",
-            env={"JEV_COMMIT_MUTEX_TIMEOUT": "3"},
+    def setUp(self):
+        self.repo, self.base = init_repo()
+        self.addCleanup(
+            sh,
+            self.repo,
+            "python3",
+            str(DAEMON),
+            "stop",
+            "--repo",
+            str(self.repo),
         )
-        self.assertEqual(p.returncode, 3)
 
-    def test_mutex_serializes_commits(self):
-        d = init_repo()
-        hook = os.path.join(d, ".git", "hooks", "pre-commit")
-        with open(hook, "w") as fh:
-            fh.write("#!/bin/sh\nsleep 2\n")
-        os.chmod(hook, 0o755)
-        with open(os.path.join(d, "a.txt"), "w") as fh:
-            fh.write("a\n")
-        sh(d, "git", "add", "a.txt")
-        import threading
+    def test_concurrent_commits_are_path_isolated_and_run_repo_hook(self):
+        hook_log = self.repo / ".git" / "hook.log"
+        env = install_pre_commit_hook(self.repo, hook_log)
+        for name in ("a.txt", "b with spaces.txt"):
+            (self.repo / name).write_text(f"content: {name}\n", encoding="utf-8")
 
-        os.mkdir(os.path.join(d, ".git", "fleet-commit.lockdir"))
-        results = []
-
-        def one():
-            results.append(
-                sh(d, "bash", WRAPPER, "-qm", "held commit [test]").returncode
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(
+                pool.map(
+                    lambda item: commit(
+                        self.repo, f"serialized {item} [selftest]", item, env=env
+                    ),
+                    ("a.txt", "b with spaces.txt"),
+                )
             )
 
-        t = threading.Thread(target=one)
-        t.start()
-        time.sleep(3)
-        log = sh(d, "git", "log", "--format=%s")
-        self.assertNotIn("held commit", log.stdout)
-        self.assertTrue(t.is_alive())
-        os.rmdir(os.path.join(d, ".git", "fleet-commit.lockdir"))
-        t.join(timeout=100)
-        self.assertEqual(results, [0])
-        log = sh(d, "git", "log", "--format=%s")
-        self.assertIn("held commit", log.stdout)
+        self.assertEqual([result.returncode for result in results], [0, 0], results)
+        commits = sh(
+            self.repo, "git", "rev-list", "--reverse", f"{self.base}..HEAD"
+        ).stdout.splitlines()
+        self.assertEqual(len(commits), 2)
+        committed_paths = []
+        for sha in commits:
+            paths = sh(
+                self.repo,
+                "git",
+                "diff-tree",
+                "--no-commit-id",
+                "--name-only",
+                "-r",
+                sha,
+            ).stdout.splitlines()
+            self.assertEqual(len(paths), 1)
+            committed_paths.extend(paths)
+        self.assertCountEqual(committed_paths, ["a.txt", "b with spaces.txt"])
+        self.assertEqual(
+            hook_log.read_text(encoding="utf-8").splitlines(), ["ran", "ran"]
+        )
+        receipt_path = self.repo / ".git" / "jev-commitd-receipts.jsonl"
+        try:
+            receipts = [
+                json.loads(line) for line in receipt_path.read_text().splitlines()
+            ]
+        except json.JSONDecodeError as exc:
+            self.fail(f"daemon wrote malformed receipt: {exc}")
+        self.assertEqual(len(receipts), 2)
+        self.assertEqual(
+            {tuple(row["paths"]) for row in receipts},
+            {("a.txt",), ("b with spaces.txt",)},
+        )
+        self.assertEqual(sh(self.repo, "git", "status", "--porcelain").stdout, "")
+
+    def test_add_request_stages_only_requested_path(self):
+        (self.repo / "a.txt").write_text("a\n", encoding="utf-8")
+        (self.repo / "b.txt").write_text("b\n", encoding="utf-8")
+        result = sh(self.repo, "git-dispatch", "add", "--", "a.txt")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        staged = sh(
+            self.repo, "git", "diff", "--cached", "--name-only"
+        ).stdout.splitlines()
+        self.assertEqual(staged, ["a.txt"])
+
+    def test_concurrent_adds_are_serialized_without_dropping_paths(self):
+        for name in ("a.txt", "b.txt"):
+            (self.repo / name).write_text(f"{name}\n", encoding="utf-8")
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(
+                pool.map(
+                    lambda name: sh(self.repo, "git-dispatch", "add", "--", name),
+                    ("a.txt", "b.txt"),
+                )
+            )
+
+        self.assertEqual([result.returncode for result in results], [0, 0], results)
+        staged = sh(
+            self.repo, "git", "diff", "--cached", "--name-only"
+        ).stdout.splitlines()
+        self.assertEqual(staged, ["a.txt", "b.txt"])
+
+    def test_global_options_before_commit_fail_closed(self):
+        (self.repo / "new.txt").write_text("new\n", encoding="utf-8")
+        result = sh(
+            self.repo,
+            "git-dispatch",
+            "-C",
+            str(self.repo),
+            "commit",
+            "--only",
+            "-m",
+            "should refuse [selftest]",
+            "--",
+            "new.txt",
+        )
+        self.assertEqual(result.returncode, 2, result.stderr)
+        self.assertIn("without global options", result.stderr)
+        self.assertEqual(
+            sh(self.repo, "git", "rev-parse", "HEAD").stdout.strip(), self.base
+        )
+
+    def test_commit_does_not_capture_an_unrequested_staged_path(self):
+        (self.repo / "a.txt").write_text("a\n", encoding="utf-8")
+        (self.repo / "b.txt").write_text("b\n", encoding="utf-8")
+        sh(self.repo, "git", "add", "--", "b.txt")
+
+        result = commit(self.repo, "only a [selftest]", "a.txt")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        sha = sh(self.repo, "git", "rev-parse", "HEAD").stdout.strip()
+        committed_paths = sh(
+            self.repo,
+            "git",
+            "diff-tree",
+            "--no-commit-id",
+            "--name-only",
+            "-r",
+            sha,
+        ).stdout.splitlines()
+        self.assertEqual(committed_paths, ["a.txt"])
+        staged_paths = sh(
+            self.repo, "git", "diff", "--cached", "--name-only"
+        ).stdout.splitlines()
+        self.assertEqual(staged_paths, ["b.txt"])
+
+    def test_daemon_unavailable_refuses_without_git_fallback(self):
+        (self.repo / "new.txt").write_text("new\n", encoding="utf-8")
+        result = commit(
+            self.repo,
+            "must refuse [selftest]",
+            "new.txt",
+            env={"JEV_COMMITD_AUTOSTART": "0"},
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("commit daemon unavailable", result.stderr.lower())
+        self.assertEqual(
+            sh(self.repo, "git", "rev-parse", "HEAD").stdout.strip(), self.base
+        )
+        self.assertFalse((self.repo / ".git" / "jev-commitd-receipts.jsonl").exists())
+
+    def test_request_rejects_path_escape(self):
+        result = commit(self.repo, "unsafe path [selftest]", "../outside.txt")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(
+            sh(self.repo, "git", "rev-parse", "HEAD").stdout.strip(), self.base
+        )
 
 
 if __name__ == "__main__":

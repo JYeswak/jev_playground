@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Route this checkout's index-mutating commands through its single writer.
+set -u
+set -f
+script_dir="$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+target_root="$(CDPATH= cd -- "$script_dir/.." && pwd -P)"
+target_root="${JEV_COMMITD_TARGET_ROOT:-$target_root}"
+real_git=
+old_ifs=$IFS
+IFS=:
+for directory in ${PATH:-}; do
+  [ -n "$directory" ] || continue
+  candidate="$directory/git"
+  if [ -x "$candidate" ] && ! [ "$candidate" -ef "$script_dir/git" ]; then
+    real_git=$candidate
+    break
+  fi
+done
+IFS=$old_ifs
+if [ -z "$real_git" ]; then
+  echo "jev-git-dispatch: cannot find the underlying git executable" >&2
+  exit 127
+fi
+
+args=("$@")
+index=0
+while [ "$index" -lt "${#args[@]}" ]; do
+  case "${args[$index]}" in
+    -C|-c|--git-dir|--work-tree|--namespace|--exec-path|--config-env)
+      index=$((index + 2))
+      ;;
+    --git-dir=*|--work-tree=*|--namespace=*|--exec-path=*|--config-env=*)
+      index=$((index + 1))
+      ;;
+    --no-pager|--paginate|--no-replace-objects|--literal-pathspecs|--glob-pathspecs|--noglob-pathspecs|--icase-pathspecs|--bare|--no-optional-locks|--no-lazy-fetch)
+      index=$((index + 1))
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+verb=${args[$index]:-}
+root="$("$real_git" "${args[@]:0:index}" rev-parse --show-toplevel 2>/dev/null)" || root=
+if [ -z "$root" ]; then
+  root="$("$real_git" rev-parse --show-toplevel 2>/dev/null)" || root=
+fi
+if [ "$root" = "$target_root" ]; then
+  if [ "$verb" = add ] || [ "$verb" = commit ]; then
+    if [ "$index" -ne 0 ]; then
+      echo "jev-git-dispatch: run git $verb without global options from the jev checkout" >&2
+      exit 2
+    fi
+    exec "$script_dir/git-commit-serialized.sh" "${args[@]}"
+  fi
+  if [ -n "$verb" ] && [ "${verb#-}" != "$verb" ]; then
+    for arg in "${args[@]:$index}"; do
+      if [ "$arg" = add ] || [ "$arg" = commit ]; then
+        echo "jev-git-dispatch: unsupported global option before a mutating command" >&2
+        exit 2
+      fi
+    done
+  fi
+fi
+exec "$real_git" "$@"
