@@ -23,6 +23,7 @@ def load(path):
 
 ROWS = load(os.path.join(B77, "full.jsonl"))
 SAMPLE = sorted(random.Random(7).sample(range(len(ROWS)), 600))
+DEV = sorted(random.Random(8).sample(sorted(set(range(len(ROWS))) - set(SAMPLE)), 200))
 INTENTS = sorted({r["intent"] for r in ROWS}, key=lambda c: (c.casefold(), c))
 LABELS = {c.replace("_", " ").lower(): c for c in INTENTS}
 
@@ -46,11 +47,13 @@ def ask(url, row):
         return json.load(resp)["answers"]["intent"]
 
 
-def run(arm, url):
-    path = os.path.join(HERE, "rows-%s.jsonl" % arm)
+def run(arm, url, split="held"):
+    path = os.path.join(
+        HERE, "rows-%s%s.jsonl" % (arm, "" if split == "held" else "-dev")
+    )
     done = {r["i"] for r in load(path)} if os.path.exists(path) else set()
     with open(path, "a", encoding="utf-8") as out:
-        for i in SAMPLE:
+        for i in SAMPLE if split == "held" else DEV:
             if i in done:
                 continue
             row = ROWS[i]
@@ -155,8 +158,49 @@ def score(arms):
         )
 
 
+def platt(arm):
+    """BAR-b77-platt.md: Platt on chosen-option probability, fit on dev, apply to held."""
+    import math
+
+    def logit(p):
+        p = min(max(float(p or 0.0), 1e-4), 1 - 1e-4)
+        return math.log(p / (1 - p))
+
+    dev = [
+        r
+        for r in load(os.path.join(HERE, "rows-%s-dev.jsonl" % arm))
+        if "error" not in r
+    ]
+    xs = [(logit(r["p_choice"]), r["choice"] == r["intent"]) for r in dev]
+    a, b = 1.0, 0.0
+    for _ in range(2000):
+        ga = gb = 0.0
+        for x, y in xs:
+            p = 1 / (1 + math.exp(-(a * x + b)))
+            ga += (p - y) * x
+            gb += p - y
+        a -= 0.1 * ga / len(xs)
+        b -= 0.1 * gb / len(xs)
+    held = [
+        r for r in load(os.path.join(HERE, "rows-%s.jsonl" % arm)) if "error" not in r
+    ]
+    for r in held:
+        r["p_choice"] = 1 / (1 + math.exp(-(a * logit(r["p_choice"]) + b)))
+    s = stats(held)
+    print(
+        arm + "+platt",
+        "a=%.3f b=%.3f dev_n=%d" % (a, b, len(xs)),
+        json.dumps(s),
+        "PASS" if s["acc"] >= 0.7867 - 0.02 and s["ece"] <= 0.1017 else "FAIL",
+    )
+
+
 if __name__ == "__main__":
     if sys.argv[1] == "--score":
         score(sys.argv[2:])
+    elif sys.argv[1] == "--platt":
+        platt(sys.argv[2])
+    elif sys.argv[1] == "--dev":
+        run(sys.argv[2], sys.argv[3], "dev")
     else:
         run(sys.argv[1], sys.argv[2])
