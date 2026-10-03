@@ -2,6 +2,7 @@
 
 import importlib.util
 import json
+import time
 import unittest
 from pathlib import Path
 
@@ -106,6 +107,169 @@ class SecretScrubTests(unittest.TestCase):
         )
 
         self.assertEqual(scrubbed["state"]["result_head"], "[MODEL_ANSWER_REDACTED]")
+
+
+class RegexSafetyTests(unittest.TestCase):
+    def test_token_regex_forms_and_identifier_boundaries(self):
+        self.assertEqual(
+            BUILDER.PATH_TOKEN_RE.findall("/workspace/archive.tar.gz"),
+            ["/workspace/archive.tar.gz"],
+        )
+        self.assertIsNone(BUILDER.PATH_TOKEN_RE.search("x/workspace/file.txt/"))
+        self.assertEqual(
+            BUILDER.BACKTICK_TOKEN_RE.findall("`cache_index_42`"),
+            ["cache_index_42"],
+        )
+        self.assertEqual(BUILDER.BACKTICK_TOKEN_RE.findall("`two words`"), [])
+        self.assertEqual(
+            BUILDER.QUALIFIED_IDENTIFIER_RE.findall("pkg::CacheIndex42"),
+            ["pkg::CacheIndex42"],
+        )
+        self.assertNotIn(
+            "Pkg::CacheIndex42",
+            BUILDER.QUALIFIED_IDENTIFIER_RE.findall("xPkg::CacheIndex42Suffix"),
+        )
+        self.assertEqual(
+            BUILDER.IDENTIFIER_RE.findall("cache_index_42"), ["cache_index_42"]
+        )
+        self.assertNotIn(
+            "cache_index_42",
+            BUILDER.IDENTIFIER_RE.findall("notcache_index_42x"),
+        )
+
+    def test_path_token_strips_sentence_final_period(self):
+        self.assertIn("/x/abc", BUILDER.reference_tokens("Result path: /x/abc."))
+
+    def test_short_path_reuse_ignores_sentence_final_period(self):
+        source = "Result path: /x/abc."
+        later = {
+            "message": {
+                "role": "assistant",
+                "content": [
+                    {"type": "toolCall", "arguments": {"path": "/x/abc"}},
+                ],
+            }
+        }
+
+        self.assertTrue(
+            BUILDER.has_later_exact_reference(source, 10, iter([(11, later)]))
+        )
+
+    def test_different_multi_extension_path_is_not_a_reuse(self):
+        source = "The output is /x/archive.tar.gz"
+        later = {
+            "message": {
+                "role": "assistant",
+                "content": [
+                    {
+                        "type": "toolCall",
+                        "arguments": {"path": "/x/archive.tar.backup"},
+                    }
+                ],
+            }
+        }
+
+        self.assertFalse(
+            BUILDER.has_later_exact_reference(source, 10, iter([(11, later)]))
+        )
+
+    def test_regex_near_misses_are_bounded_at_doubled_lengths(self):
+        for pattern, prefix, suffix in (
+            (BUILDER.PATH_TOKEN_RE, "", "/"),
+            (BUILDER.BACKTICK_TOKEN_RE, "`", ""),
+            (BUILDER.QUALIFIED_IDENTIFIER_RE, "", "::"),
+        ):
+            for size in (2048, 4096, 8192):
+                near_miss = prefix + "a" * size + suffix
+                started = time.perf_counter()
+                match = pattern.search(near_miss)
+                elapsed = time.perf_counter() - started
+
+                self.assertIsNone(match)
+                self.assertLess(
+                    elapsed,
+                    1.0,
+                    f"{pattern.pattern!r} n={len(near_miss)} elapsed={elapsed:.3f}s",
+                )
+
+
+class MechanicalOutcomeTests(unittest.TestCase):
+    def referenced(self, source, events):
+        return BUILDER.has_later_exact_reference(source, 10, iter(events))
+
+    def test_20_character_later_verbatim_span_is_relevant(self):
+        source = "prefix silver lanterns glow suffix"
+        earlier = {
+            "message": {
+                "role": "assistant",
+                "content": [{"type": "text", "text": "silver lanterns glow"}],
+            }
+        }
+        later = {
+            "message": {
+                "role": "assistant",
+                "content": [{"type": "text", "text": "silver lanterns glow"}],
+            }
+        }
+
+        self.assertTrue(self.referenced(source, [(9, earlier), (11, later)]))
+
+    def test_19_character_span_is_not_relevant(self):
+        source = "silver lanterns glo"
+        later = {
+            "message": {
+                "role": "assistant",
+                "content": [{"type": "text", "text": "silver lanterns glo"}],
+            }
+        }
+
+        self.assertFalse(self.referenced(source, [(11, later)]))
+
+    def test_later_tool_argument_with_exact_path_is_relevant(self):
+        source = "The generated artifact is /workspace/src/engine/route_index.py."
+        later = {
+            "message": {
+                "role": "assistant",
+                "content": [
+                    {
+                        "type": "toolCall",
+                        "arguments": {"path": "/workspace/src/engine/route_index.py"},
+                    }
+                ],
+            }
+        }
+
+        self.assertTrue(self.referenced(source, [(11, later)]))
+
+    def test_later_tool_argument_with_exact_identifier_is_relevant(self):
+        source = "The report names cache_index_42 as the retry sentinel."
+        later = {
+            "message": {
+                "role": "assistant",
+                "content": [
+                    {
+                        "type": "toolCall",
+                        "arguments": {"symbol": "cache_index_42"},
+                    }
+                ],
+            }
+        }
+
+        self.assertTrue(self.referenced(source, [(11, later)]))
+
+    def test_unrelated_assistant_text_is_not_relevant(self):
+        source = "prefix silver lanterns glow suffix"
+        later = {
+            "message": {
+                "role": "assistant",
+                "content": [
+                    {"type": "text", "text": "The unrelated status check completed."},
+                    {"type": "thinking", "text": "silver lanterns glow"},
+                ],
+            }
+        }
+
+        self.assertFalse(self.referenced(source, [(11, later)]))
 
 
 class TaskMetadataTests(unittest.TestCase):

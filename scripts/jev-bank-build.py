@@ -28,6 +28,30 @@ MAX_FULL_TOKENS = 32_768
 MAX_LOCAL_TOKENS = 1_500
 LONG_RESULT_CHARS = 10_000
 CENSOR_RECENT_HOURS = 24
+MIN_VERBATIM_REFERENCE_CHARS = 20
+D_LABEL_SOURCE = "observed-outcome:later-exact-reference-v1"
+D_LABEL_DEFINITION = (
+    "relevant iff a later source-order assistant message in the same session has a text "
+    "block or the text representation of a toolCall.arguments key or scalar value containing "
+    "either (a) an exact, case-sensitive contiguous span of at least 20 Unicode code points "
+    "from the full tool result, or (b) an exact path token or code identifier extracted from "
+    "that result. Paths are slash-delimited tokens with optional leading /, ~/ or ./; "
+    "terminal periods are stripped as sentence punctuation. Code identifiers are "
+    "backtick-delimited tokens, qualified ASCII identifiers, or "
+    "ASCII identifiers containing an underscore, digit, or internal uppercase letter. "
+    "User, thinking, and toolResult content does not count. Censored rows remain unlabeled."
+)
+PATH_TOKEN_RE = re.compile(
+    r"(?<![A-Za-z0-9_./~])(?:~?/|\.{1,2}/|/)?"
+    r"(?:[A-Za-z0-9_.@+-]+/)+[A-Za-z0-9_.@+-]+"
+    r"(?![A-Za-z0-9_./-])"
+)
+BACKTICK_TOKEN_RE = re.compile(r"`([^`\s]+)`")
+QUALIFIED_IDENTIFIER_RE = re.compile(
+    r"(?<![A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*(?:(?:\.|::)"
+    r"[A-Za-z_][A-Za-z0-9_]*)+(?![A-Za-z0-9_])"
+)
+IDENTIFIER_RE = re.compile(r"(?<![A-Za-z0-9_])[A-Za-z_][A-Za-z0-9_]*(?![A-Za-z0-9_])")
 
 SECRET_PATTERNS = [
     re.compile("s" "k-[A-Za-z0-9_-]{20,}"),
@@ -234,6 +258,73 @@ class Aho:
             if self.out[state]:
                 hits.update(self.out[state])
         return state, hits
+
+
+def reference_tokens(text: str) -> set[str]:
+    tokens = {token.rstrip(".") for token in PATH_TOKEN_RE.findall(text)}
+    tokens.update(BACKTICK_TOKEN_RE.findall(text))
+    tokens.update(QUALIFIED_IDENTIFIER_RE.findall(text))
+    for match in IDENTIFIER_RE.finditer(text):
+        token = match.group()
+        if (
+            "_" in token
+            or any(char.isdigit() for char in token)
+            or any(char.isupper() for char in token[1:])
+        ):
+            tokens.add(token)
+    return tokens
+
+
+def argument_texts(value: Any) -> Iterable[str]:
+    if isinstance(value, dict):
+        for key, child in value.items():
+            yield str(key)
+            yield from argument_texts(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from argument_texts(child)
+    elif isinstance(value, (str, int, float, bool)):
+        yield str(value)
+
+
+def assistant_reference_texts(message: dict[str, Any]) -> Iterable[str]:
+    if message.get("role") != "assistant":
+        return
+    content = message.get("content")
+    if isinstance(content, str):
+        yield content
+    elif isinstance(content, list):
+        for block in content:
+            if not isinstance(block, dict):
+                continue
+            if block.get("type") == "text" and isinstance(block.get("text"), str):
+                yield block["text"]
+            elif block.get("type") == "toolCall":
+                yield from argument_texts(block.get("arguments"))
+
+
+def has_later_exact_reference(
+    source: str, source_line: int, events: Iterable[tuple[int, dict[str, Any]]]
+) -> bool:
+    span_hashes = {
+        hash(source[offset : offset + MIN_VERBATIM_REFERENCE_CHARS])
+        for offset in range(len(source) - MIN_VERBATIM_REFERENCE_CHARS + 1)
+    }
+    source_tokens = reference_tokens(source)
+    for index, event in events:
+        if index <= source_line:
+            continue
+        message = event.get("message")
+        if not isinstance(message, dict):
+            continue
+        for text in assistant_reference_texts(message):
+            if source_tokens.intersection(reference_tokens(text)):
+                return True
+            for offset in range(len(text) - MIN_VERBATIM_REFERENCE_CHARS + 1):
+                span = text[offset : offset + MIN_VERBATIM_REFERENCE_CHARS]
+                if hash(span) in span_hashes and span in source:
+                    return True
+    return False
 
 
 def longres_candidates(
