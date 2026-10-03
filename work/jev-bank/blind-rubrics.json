@@ -1,8 +1,8 @@
 {
   "D": {
-    "decision": "Does a later turn in this same session clearly use or refer to the substantive content of the tool result?",
+    "decision": "Does a later turn in the shown window quote, edit, or act on specific content of this result?",
     "options": ["relevant", "not-relevant"],
-    "rule": "Label relevant only when a later turn depends on, applies, or explicitly refers to information specific to the displayed tool result. Label not-relevant when the outcome window contains no clear evidence of such use. Lexical overlap, generic wording, shared boilerplate, or mere topic similarity is not enough. Use the complete chronological outcome_window; if evidence is ambiguous, choose not-relevant. Do not infer from any automated label or decision.",
+    "rule": "Label relevant only if a later turn in the shown outcome_window quotes, edits, or acts on specific content of this exact tool result. Otherwise label not-relevant. Topic similarity, generic continuation, lexical overlap, boilerplate, or reference to another source is not evidence. If linkage to this result is ambiguous, label not-relevant. Do not infer from any automated label or decision.",
     "window": "The scrubbed message text after the sampled toolResult through the end of that same frozen session file, in source order. No earlier turns are included."
   },
   "G": {
