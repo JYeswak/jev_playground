@@ -12,6 +12,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from cap3_reference import cap3_reference_report, cap3_turn_rows
+
 HOME = Path.home()
 STATE = HOME / ".local/state/jev"
 ROOT = Path(__file__).resolve().parents[2]
@@ -116,35 +118,103 @@ def sidecar_memory(
     return all_rows, selected, malformed, source
 
 
+def memory_totals(
+    rows: list[Row], statuses: dict[tuple[Any, ...], Any]
+) -> tuple[dict[tuple[Any, ...], dict[str, int]], int, int]:
+    turns = defaultdict(lambda: {"received": 0, "cut": 0, "items": 0})
+    for row in rows:
+        item = (row.get("instance"), row.get("promptHash"), row.get("memoryHash"))
+        status = statuses.get(item)
+        if status is None:
+            status = row.get("status")
+        memory = row.get("memory", "")
+        amount = (
+            len(memory.encode("utf-16-le", errors="surrogatepass")) // 8
+            if isinstance(memory, str)
+            else 0
+        )
+        turn = turns[item[:2]]
+        turn["items"] += 1
+        if status in ("enforced", "cap3-pruned") or row.get("decision") == "prune":
+            turn["cut"] += amount
+        else:
+            turn["received"] += amount
+    return (
+        turns,
+        sum(turn["received"] for turn in turns.values()),
+        sum(turn["cut"] for turn in turns.values()),
+    )
+
+
+def metric_delta(baseline: float | None, replayed: float | None) -> float | None:
+    if baseline == replayed:
+        return 0.0
+    if (
+        isinstance(baseline, (int, float))
+        and not isinstance(baseline, bool)
+        and isinstance(replayed, (int, float))
+        and not isinstance(replayed, bool)
+    ):
+        return float(replayed - baseline)
+    return None
+
+
 def memory_report(
     main_path: Path,
     sidecar_path: Path,
     bank_path: Path,
     reference_path: Path,
+    legacy_reference_path: Path,
     start: dt.datetime,
     end: dt.datetime,
     noop: bool,
 ) -> dict[str, Any]:
     main = read_main_memory(main_path, start, end)
     _, full_rows, full_bad, _ = sidecar_memory(sidecar_path, start, end)
-    turns = defaultdict(lambda: {"received": 0, "cut": 0})
-    for row in full_rows:
-        item = (row.get("instance"), row.get("promptHash"), row.get("memoryHash"))
-        status = main["statuses"].get(item)
-        if status is None:
-            status = row.get("status")
-        amount = (
-            len(row.get("memory", "")) // 4
-            if isinstance(row.get("memory", ""), str)
-            else 0
+    turns, total_received, observed_cut = memory_totals(full_rows, main["statuses"])
+    observed_turn_rows = cap3_turn_rows(turns)
+    policy_off = None
+    if noop:
+        replayed_turns, replayed_received, replayed_cut = memory_totals(
+            [dict(row) for row in full_rows], main["statuses"]
         )
-        turn = turns[item[:2]]
-        if status in ("enforced", "cap3-pruned") or row.get("decision") == "prune":
-            turn["cut"] += amount
-        else:
-            turn["received"] += amount
-    total_received = sum(v["received"] for v in turns.values())
-    observed_cut = sum(v["cut"] for v in turns.values())
+        replayed_latency = sum(
+            row["latencyMs"]
+            for row in (dict(row) for row in main["rows"])
+            if isinstance(row.get("latencyMs"), (int, float)) and row["latencyMs"] >= 0
+        )
+        baseline = {
+            "turns": len(turns),
+            "sidecar_items": len(full_rows),
+            "received_tokens": total_received,
+            "cut_tokens": observed_cut,
+            "misses": None,
+            "labeled_miss_rows": 0,
+            "latency_ms": main["observed_latency_ms_sum"],
+        }
+        replayed = {
+            "turns": len(replayed_turns),
+            "sidecar_items": sum(turn["items"] for turn in replayed_turns.values()),
+            "received_tokens": replayed_received,
+            "cut_tokens": replayed_cut,
+            "misses": None,
+            "labeled_miss_rows": 0,
+            "latency_ms": replayed_latency,
+        }
+        policy_off = {
+            "baseline": baseline,
+            "replayed": replayed,
+            "misses_status": "unobserved: source logs have no blind harm labels",
+            "delta": {
+                key: metric_delta(baseline[key], replayed[key])
+                for key in (
+                    "received_tokens",
+                    "cut_tokens",
+                    "misses",
+                    "latency_ms",
+                )
+            },
+        }
     bank = json.loads(bank_path.read_text(encoding="utf-8"))
     if (
         not isinstance(bank, dict)
@@ -152,24 +222,14 @@ def memory_report(
         or not isinstance(bank.get("tokens_per_turn"), dict)
     ):
         raise TypeError("decision bank must contain pooled and tokens_per_turn objects")
-    reference = json.loads(reference_path.read_text(encoding="utf-8"))
-    if not isinstance(reference, dict):
-        raise TypeError("cap3 reference must be an object")
     observed = {
         "turns": len(turns),
         "received_tokens": total_received,
         "cut_tokens": observed_cut,
     }
-    reference_values = {
-        "turns": reference.get("turns"),
-        "received_tokens": reference.get("received"),
-        "cut_tokens": reference.get("cut"),
-    }
-    reference_delta = {
-        key: observed[key] - expected if isinstance(expected, int) else None
-        for key, expected in reference_values.items()
-    }
-    reference_match = all(reference_delta[key] == 0 for key in reference_values)
+    reference_reports = cap3_reference_report(
+        reference_path, legacy_reference_path, observed_turn_rows, start, end
+    )
     pooled = bank["pooled"]
     n60 = bank["tokens_per_turn"]
     c3 = n60.get("C3_top3_chars4")
@@ -200,6 +260,7 @@ def memory_report(
             "sidecar": str(sidecar_path),
             "decision_bank": str(bank_path),
             "cap3_reference": str(reference_path),
+            "legacy_aggregate_reference": str(legacy_reference_path),
         },
         "coverage": {"main": main["coverage"], "sidecar": coverage(full_rows)},
         "valid_window_rows": {
@@ -214,12 +275,7 @@ def memory_report(
                 if turns
                 else None,
             },
-            "frozen_reference": {
-                "window": reference.get("window"),
-                **reference_values,
-                "observed_minus_reference": reference_delta,
-                "matches_exactly": reference_match,
-            },
+            **reference_reports,
             "n60_reference": {
                 "n": n,
                 "on_tokens_per_turn": on,
@@ -248,12 +304,23 @@ def memory_report(
             "n60_metric_boundary": "The bank's C3/ON token estimates are 3-task calibration applied to 60 fixed tasks; not observed session-token usage.",
         },
     }
-    if noop:
+    if noop and policy_off is not None:
+        report["cap3"]["policy_off"] = policy_off
         report["cap3"]["noop_delta"] = {
-            "received_tokens": 0,
-            "cut_tokens": 0,
-            "misses": 0,
-            "latency_ms": 0,
+            key: (
+                metric_delta(
+                    policy_off["baseline"]["labeled_miss_rows"],
+                    policy_off["replayed"]["labeled_miss_rows"],
+                )
+                if key == "misses"
+                else policy_off["delta"][key]
+            )
+            for key in (
+                "received_tokens",
+                "cut_tokens",
+                "misses",
+                "latency_ms",
+            )
         }
     return report
 
@@ -311,12 +378,53 @@ def gate_report(
         "malformed": malformed,
     }
     if noop:
-        result["noop_delta"] = {
-            "free_screen_share": 0,
-            "would_reach_paid_jev": 0,
-            "latency_ms": 0,
-            "misses": 0,
+        replayed_rows = [dict(row) for row in eligible]
+        replayed_total = len(replayed_rows)
+        replayed_free = sum(row.get("jevSkipped") is True for row in replayed_rows)
+        replayed_share = replayed_free / replayed_total if replayed_total else None
+        replayed_paid = replayed_total - replayed_free
+        replayed_latency = sum(
+            row["latencyMs"]
+            for row in replayed_rows
+            if isinstance(row.get("latencyMs"), (int, float))
+            and not isinstance(row.get("latencyMs"), bool)
+        )
+        baseline = {
+            "eligible_screens": total,
+            "free_screens": free,
+            "free_screen_share": share,
+            "would_reach_paid_jev": paid,
+            "misses": None,
+            "labeled_miss_rows": 0,
+            "latency_ms": sum(paid_latency) + sum(local_latency),
         }
+        replayed = {
+            "eligible_screens": replayed_total,
+            "free_screens": replayed_free,
+            "free_screen_share": replayed_share,
+            "would_reach_paid_jev": replayed_paid,
+            "misses": None,
+            "labeled_miss_rows": 0,
+            "latency_ms": replayed_latency,
+        }
+        delta = {
+            key: metric_delta(baseline[key], replayed[key])
+            for key in (
+                "free_screen_share",
+                "would_reach_paid_jev",
+                "latency_ms",
+            )
+        }
+        delta["misses"] = metric_delta(
+            baseline["labeled_miss_rows"], replayed["labeled_miss_rows"]
+        )
+        result["policy_off"] = {
+            "baseline": baseline,
+            "replayed": replayed,
+            "misses_status": "unobserved: source logs have no blind harm labels",
+            "delta": delta,
+        }
+        result["noop_delta"] = delta
     return result
 
 
@@ -379,7 +487,14 @@ def main() -> int:
     parser.add_argument("--gate-log", type=Path, default=STATE / "gate-observe.jsonl")
     parser.add_argument("--decision-bank", type=Path, default=BANK)
     parser.add_argument(
-        "--memory-reference", type=Path, default=ROOT / "work/jev-i20b/cap3-before.json"
+        "--memory-reference",
+        type=Path,
+        default=ROOT / "work/jev-jzgm/cap3-reference.json",
+    )
+    parser.add_argument(
+        "--legacy-memory-reference",
+        type=Path,
+        default=ROOT / "work/jev-i20b/cap3-before.json",
     )
     args = parser.parse_args()
     if args.days < 1 or args.days > 30:
@@ -413,6 +528,7 @@ def main() -> int:
             args.memory_sidecar,
             args.decision_bank,
             args.memory_reference,
+            args.legacy_memory_reference,
             start,
             end,
             noop,
@@ -458,9 +574,12 @@ def main() -> int:
         },
         "event_span_coverage": coverage_report,
         "acceptance_checks": {
-            "cap3_exact_reference": memory["cap3"]["frozen_reference"][
+            "cap3_per_turn_reference": memory["cap3"]["frozen_reference"][
                 "matches_exactly"
             ],
+            "cap3_legacy_aggregate_reference": memory["cap3"][
+                "legacy_aggregate_reference"
+            ]["matches_exactly"],
             "gate_96pct_in_wilson95": gate["reference_96pct_in_wilson95"],
             "noop_zero_delta": not noop
             or (
