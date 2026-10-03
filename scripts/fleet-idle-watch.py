@@ -268,6 +268,47 @@ def composer_text(screen: str) -> str:
     return " ".join(parts)[:500]
 
 
+STEERING = re.compile(r"^\s*Steering · (\d+)\s*$")
+STEERING_NUDGE = "Continue: read the queued steering message above and act on it."
+
+
+def steering_text(screen: str) -> str:
+    """First queued steering message near the screen bottom, or "" (bead jev-of3b).
+
+    omp shows "Steering · N" then "1. <text>" when a message waits for the next turn; an idle
+    pane never takes that turn by itself (pane 4, 2026-10-03 11:18Z and 11:25Z).
+    """
+    lines = screen.splitlines()[-15:]
+    for i, line in enumerate(lines):
+        if STEERING.match(line):
+            for nxt in lines[i + 1 : i + 3]:
+                cell = nxt.strip()
+                if cell[:2].rstrip(".").isdigit() or cell.startswith("1."):
+                    return cell.split(".", 1)[-1].strip()[:200]
+            return "queued"
+    return ""
+
+
+def steering_due(state, index, text, done) -> bool:
+    """Nudge once per (pane, queued text) while the pane is idle."""
+    return state == "idle" and bool(text) and (index, text) not in done
+
+
+def nudge_steering(index: int) -> bool:
+    """Type one fixed prompt and Enter so omp starts a turn; True only when tmux took both."""
+    try:
+        typed = subprocess.run(
+            ["tmux", "send-keys", "-t", f"{SESSION}:0.{index}", STEERING_NUDGE],
+            capture_output=True,
+            timeout=10,
+        )
+        if typed.returncode != 0:
+            return False
+        return submit_enter(index)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+
+
 def unsubmitted_ready(state, index, composer, last_text, same_count, done):
     """(submit_now, new_same_count) for one idle poll of one pane.
 
@@ -845,6 +886,7 @@ def poll() -> dict[int, tuple] | None:
             redacted_status_line(screen),
             omp,
             composer_text(screen),
+            steering_text(screen),
         )
     return states
 
@@ -1735,6 +1777,7 @@ def main() -> int:
     composer_last: dict[int, str] = {}
     composer_same: dict[int, int] = {}
     composer_done: set = set()
+    steering_done: set = set()
     streak: dict[int, int] = {}
     idle_since: dict[int, float] = {}
     alerted_at: dict[int, float] = {}
@@ -1804,6 +1847,17 @@ def main() -> int:
                     composer_done = {
                         (i, text) for i, text in composer_done if i != index
                     }
+                steer = reading[5] if len(reading) > 5 else ""
+                if not steer:
+                    steering_done = {(i, t) for i, t in steering_done if i != index}
+                elif steering_due(state, index, steer, steering_done) and not composer:
+                    ok = nudge_steering(index)
+                    steering_done.add((index, steer))
+                    print(
+                        f"{time.strftime('%H:%M:%SZ', time.gmtime())} "
+                        f"steering pane {index} nudge {'sent' if ok else 'FAILED'}",
+                        flush=True,
+                    )
                 if submit:
                     ok = submit_enter(index)
                     composer_done.add((index, composer))

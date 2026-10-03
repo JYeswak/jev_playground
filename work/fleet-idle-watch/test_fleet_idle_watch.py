@@ -1256,5 +1256,29 @@ class FleetRouter(unittest.TestCase):
             self.assertEqual(calls, [])
 
 
+class SteeringQueue(unittest.TestCase):
+    """jev-of3b: an idle pane with a queued steering message gets one turn-starting nudge."""
+
+    SCREEN = (FIX / "pane4-steering-queued.screen").read_text(encoding="utf-8")
+
+    def test_real_queued_screen_reads_the_message(self):
+        text = fiw.steering_text(self.SCREEN)
+        self.assertTrue(text.startswith("CONDUCTOR (pane 1) to WildCarp"), text)
+
+    def test_no_steering_marker_reads_empty(self):
+        self.assertEqual(
+            fiw.steering_text(self.SCREEN.replace("Steering · 1", "Thinking")), ""
+        )
+
+    def test_nudge_once_while_idle_never_while_working(self):
+        text = fiw.steering_text(self.SCREEN)
+        done = set()
+        self.assertTrue(fiw.steering_due("idle", 4, text, done))
+        self.assertFalse(fiw.steering_due("working", 4, text, done))
+        done.add((4, text))
+        self.assertFalse(fiw.steering_due("idle", 4, text, done))
+        self.assertTrue(fiw.steering_due("idle", 4, text + " v2", done))
+
+
 if __name__ == "__main__":
     unittest.main()
