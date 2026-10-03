@@ -37,6 +37,7 @@ def sh(
     if command not in EXECUTABLES:
         raise ValueError(f"unsupported test command: {command!r}")
     child_env = dict(os.environ)
+    child_env["JEV_COMMITD_AUTOSTART"] = "1"
     if env:
         child_env.update(env)
     if command == "git-dispatch":
