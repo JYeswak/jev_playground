@@ -17,3 +17,24 @@ Policy interface is limited to `cap3` (replay observed cap3 decisions) and `noop
 ## Interpretation boundary
 
 This replay can reproduce recorded outcomes and compare a policy transform over recorded units. It cannot estimate unobserved outcomes, prove a counterfactual Jev answer, or establish a full 30-day population when source logs retain less than 30 days. Any absent interval is `INSUFFICIENT_COVERAGE`, never imputed.
+
+## Supplemental cap3 source-integrity bar (2026-10-03)
+
+This is a new, prospective replay-source check, not a rewrite of the 2026-10-02 preregistered
+result. The prior aggregate-only comparison remains a FAIL: the retained raw logs report 166,095
+received tokens versus 165,912 in `work/jev-i20b/cap3-before.json` (+183); that artifact has no
+per-turn rows or source hash, so the old inputs cannot be reconstructed.
+
+Before rerunning the replay, freeze the retained raw-log result for the same UTC window in
+`work/jev-jzgm/cap3-reference.jsonl`. Its manifest is `work/jev-jzgm/cap3-reference.json`.
+The row file SHA-256 is
+`f4479a5d940ca0df44fe51b155b37ddbe8c14b90c742824da06293d3f1fffb59`; the manifest also pins both
+source-log hashes. It has 179 distinct pseudonymous turns, 3,238 sidecar items, 166,095 received
+tokens, and 846 cut tokens. Turn rows contain only SHA-256 turn identifiers and per-turn totals.
+
+**Pass condition:** the replay verifies the row-file SHA-256, then reproduces every frozen turn row
+exactly (turn hash, item count, received tokens, cut tokens), with no missing, extra, or duplicate
+turn. Aggregate equality alone is insufficient. A mismatch is FAIL; do not alter this fixture or
+bar to obtain a pass. This supplemental check establishes replay reproducibility against the
+retained source bytes only. It does not repair the prior +183-token historical mismatch, establish
+the original raw inputs, or satisfy the separate n60 estimate comparison.

@@ -1,0 +1,19 @@
+{
+  "cut_tokens": 846,
+  "derivation": "Same timestamp filtering, (instance,promptHash,memoryHash) last-status join, UTF-16 code-unit memory.length // 4, prune classification, and (instance,promptHash) turn grouping as work/jev-i20b/cap3-tokens.mjs. turn_sha256 = SHA256(instance + LF + promptHash).",
+  "privacy": "Rows contain only pseudonymous turn hashes and per-turn aggregates; no prompts, memories, commands, or raw identifiers.",
+  "received_tokens": 166095,
+  "rows_file": "cap3-reference.jsonl",
+  "rows_sha256": "f4479a5d940ca0df44fe51b155b37ddbe8c14b90c742824da06293d3f1fffb59",
+  "schema": "jev-jzgm-cap3-reference-v1",
+  "sidecar_items": 3238,
+  "source_logs": {
+    "memory-filter-full.jsonl_sha256": "25252251e570d42b31ebb3719f016f2b696281145479e6e4be204a54d2183088",
+    "memory-filter.jsonl_sha256": "d3e0e8d13ba2ceed7b392fbc576a326c36b4a41b3317c5a1dd454d4508da5796"
+  },
+  "turn_rows": 179,
+  "window_utc": {
+    "from_inclusive": "2026-10-01T19:45:00Z",
+    "to_exclusive": "2026-10-02T19:45:00Z"
+  }
+}
