@@ -11,8 +11,12 @@ note() { printf '  %-4s %s\n' "$1" "$2"; }
 ok() { note ok "$1"; pass=$((pass + 1)); }
 no() { printf '  FAIL %s\n' "$1"; fail=$((fail + 1)); }
 
-tmp=$(mktemp -d) || { echo "selftest-serialized-add: mktemp failed"; exit 1; }
-trap 'rm -rf "$tmp"' EXIT
+mkdir -p "$root/var/agent-tmp" || exit 1
+tmp=$(mktemp -d "$root/var/agent-tmp/serialized-add.XXXXXX") || { echo "selftest-serialized-add: mktemp failed"; exit 1; }
+printf 'pid=%s\nlabel=selftest-serialized-add\nrepo=%s\ncreated=%s\n' "$$" "$root" "$(date -u +%FT%TZ)" > "$tmp/.owner"
+cleanup() { python3 "$root/scripts/git-commitd.py" stop --repo "$tmp" >/dev/null 2>&1 || true; }
+trap cleanup EXIT
+export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null
 git -C "$tmp" init -q
 git -C "$tmp" config user.email selftest@example.invalid
 git -C "$tmp" config user.name serialized-add-selftest
@@ -37,9 +41,11 @@ if [ "$(cd "$tmp" && git diff --cached --name-only)" = "a.txt
 b.txt
 c.txt" ]; then ok "add stages its paths"; else no "add paths wrong"; fi
 
-# Arm 3: default mode still commits (no regression on the original path).
-if (cd "$tmp" && "$S" -m "selftest commit [test]" >/dev/null 2>&1); then ok "commit path intact"; else no "commit path broke"; fi
-if [ ! -e "$tmp/.git/index.lock" ]; then ok "no index.lock after commit"; else no "index.lock after commit"; fi
+# Arm 3: commit only the requested path; sibling staged paths stay staged.
+if (cd "$tmp" && "$S" --only -m "selftest commit [test]" -- c.txt >/dev/null 2>&1); then ok "path-limited commit intact"; else no "path-limited commit broke"; fi
+committed=$(cd "$tmp" && git diff-tree --no-commit-id --name-only -r HEAD | tr '\n' ' ')
+staged=$(cd "$tmp" && git diff --cached --name-only | sort | tr '\n' ' ')
+if [ "$committed" = "c.txt " ] && [ "$staged" = "a.txt b.txt " ]; then ok "commit isolated to requested path"; else no "commit paths=[$committed] staged=[$staged]"; fi
 
 printf 'selftest-serialized-add: pass=%d fail=%d\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]
