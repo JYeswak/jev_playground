@@ -259,47 +259,28 @@ def memory_report(
 
 
 def gate_report(
-    path: Path, start: dt.datetime, end: dt.datetime, cut: float, noop: bool
+    path: Path, start: dt.datetime, end: dt.datetime, noop: bool
 ) -> dict[str, Any]:
     all_rows, malformed, _ = load_jsonl(path)
     rows = [r for r in all_rows if in_window(r, start, end)]
-    scored = []
-    for row in rows:
-        probs = row.get("nimbleProbs")
-        if not isinstance(probs, dict) or not probs:
-            continue
-        vals = [
-            v
-            for v in probs.values()
-            if isinstance(v, (int, float))
-            and not isinstance(v, bool)
-            and math.isfinite(v)
-            and 0 <= v <= 1
-        ]
-        if len(vals) == len(probs) and isinstance(row.get("jevSkipped"), bool):
-            scored.append((row, max(vals)))
-    free = (
-        sum(row.get("jevSkipped") is True for row, _ in scored)
-        if noop
-        else sum(score <= cut for _, score in scored)
-    )
-    actual_free = sum(row.get("jevSkipped") is True for row, _ in scored)
-    total = len(scored)
-    paid = total - free
+    eligible = [r for r in rows if isinstance(r.get("jevSkipped"), bool)]
+    free = sum(r.get("jevSkipped") is True for r in eligible)
+    paid = len(eligible) - free
     paid_latency = [
         r["latencyMs"]
-        for r, _ in scored
+        for r in eligible
         if r.get("jevSkipped") is False
         and isinstance(r.get("latencyMs"), (int, float))
         and not isinstance(r.get("latencyMs"), bool)
     ]
     local_latency = [
         r["latencyMs"]
-        for r, _ in scored
+        for r in eligible
         if r.get("jevSkipped") is True
         and isinstance(r.get("latencyMs"), (int, float))
         and not isinstance(r.get("latencyMs"), bool)
     ]
+    total = len(eligible)
     share = free / total if total else None
     interval = wilson(free, total)
     result = {
@@ -310,17 +291,14 @@ def gate_report(
         },
         "coverage": coverage(rows),
         "window_rows": len(rows),
-        "rows_without_boolean_screen_outcome": sum(
-            not isinstance(row.get("jevSkipped"), bool) for row in rows
-        ),
-        "screen_rows_with_valid_scores": total,
+        "rows_without_boolean_screen_outcome": len(rows) - total,
+        "eligible_screens": total,
+        "free_screens": free,
         "free_screen_share": share,
-        "observed_free_screen_share": actual_free / total if total else None,
         "free_screen_wilson95": interval,
         "reference_96pct_in_wilson95": interval is not None
         and interval[0] <= 0.96 <= interval[1],
         "would_reach_paid_jev": paid,
-        "cut": cut,
         "misses": None,
         "misses_reason": "gate log has no blind harm labels; screen share is not a miss-rate measure",
         "observed_latency_ms": {
@@ -393,12 +371,6 @@ def main() -> int:
         help="cap to replay; only logged cap 3 is identifiable",
     )
     parser.add_argument(
-        "--gate-cut",
-        type=float,
-        default=0.5,
-        help="max Noul score at or below which gate cascade free-screens",
-    )
-    parser.add_argument(
         "--memory-log", type=Path, default=STATE / "memory-filter.jsonl"
     )
     parser.add_argument(
@@ -416,8 +388,6 @@ def main() -> int:
         parser.error(
             "only --memory-cap 3 is supported; other caps lack recorded rank/order evidence"
         )
-    if not math.isfinite(args.gate_cut) or not 0 <= args.gate_cut <= 1:
-        parser.error("--gate-cut must be finite and in [0,1]")
     if bool(args.gate_from) != bool(args.gate_to):
         parser.error("--gate-from and --gate-to must be supplied together")
     end = parse_time(args.to_ts) if args.to_ts else dt.datetime.now(dt.timezone.utc)
@@ -447,7 +417,7 @@ def main() -> int:
             end,
             noop,
         )
-        gate = gate_report(args.gate_log, gate_start, gate_end, args.gate_cut, noop)
+        gate = gate_report(args.gate_log, gate_start, gate_end, noop)
     except (OSError, json.JSONDecodeError, TypeError, ValueError) as exc:
         print(
             json.dumps({"status": "INPUT_ERROR", "error": str(exc)[:160]}),
@@ -465,7 +435,7 @@ def main() -> int:
             coverage_report[key]["covers_requested_bounds"]
             for key in ("memory_main", "memory_sidecar", "gate")
         )
-        and gate["screen_rows_with_valid_scores"] > 0
+        and gate["eligible_screens"] > 0
     )
     payload = {
         "schema": "jev-jzgm-replay-v1",
