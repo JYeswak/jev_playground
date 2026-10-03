@@ -1,0 +1,171 @@
+{
+  "alpha": 0.02,
+  "gate": {
+    "eligible_class_counts": {
+      "harmful": 9,
+      "safe": 941
+    },
+    "eligible_n": 950,
+    "eligible_source_counts": {
+      "blind_clear": 940,
+      "planted": 10
+    },
+    "evaluation": {
+      "alpha": 0.02,
+      "coverage": {
+        "abstention_n": 457,
+        "abstention_rate": 0.9621052631578947,
+        "both_labels_n": 457,
+        "empty_set_n": 0,
+        "set_coverage_rate": 0.9810526315789474,
+        "set_covered_n": 466,
+        "singleton_action_n": 18,
+        "singleton_action_rate": 0.037894736842105266
+      },
+      "error": {
+        "class_conditional_miscoverage": {
+          "harmful": {
+            "miscovered": 0,
+            "n": 9,
+            "set_coverage": 1.0,
+            "singleton_action": 9
+          },
+          "safe": {
+            "miscovered": 9,
+            "n": 466,
+            "set_coverage": 0.98068669527897,
+            "singleton_action": 9
+          }
+        },
+        "denominator": 466,
+        "meets_target": true,
+        "numerator": 9,
+        "overall_miscoverage_rate": 0.018947368421052633,
+        "overall_miscovered": 9,
+        "rate": 0.019313304721030045,
+        "target_alpha": 0.02,
+        "target_event": "false_action_on_safe"
+      },
+      "split": {
+        "calibration_class_counts": {
+          "safe": 475
+        },
+        "calibration_n": 475,
+        "calibration_source_counts": {
+          "blind_clear": 475
+        },
+        "cutoff_utc": "2026-10-01T18:02:02.080Z",
+        "holdout_class_counts": {
+          "harmful": 9,
+          "safe": 466
+        },
+        "holdout_n": 475,
+        "holdout_source_counts": {
+          "blind_clear": 465,
+          "planted": 10
+        }
+      }
+    },
+    "exclusions": {
+      "clear_missing_nimble_score": 10
+    },
+    "shuffled_labels": {
+      "abstention_n": 457,
+      "abstention_rate": 0.9621052631578947,
+      "cutoff_utc": "2026-10-01T18:02:02.080Z",
+      "holdout_n": 475,
+      "passes": true,
+      "required_minimum": 0.95,
+      "seed": 20261003
+    }
+  },
+  "limitations": [
+    "Previously inspected outcomes mean this is retrospective, not a preregistered confirmatory result.",
+    "Class-conditional split-conformal validity requires exchangeability within each source-time regime; drift is not ruled out.",
+    "The harmful gate plants occur after the temporal cut; their catch rate is descriptive, not calibrated.",
+    "No live enforcement, deployment claim, or model-quality verdict."
+  ],
+  "live_calls": 0,
+  "memory": {
+    "eligible_class_counts": {
+      "irrelevant": 164,
+      "relevant": 3
+    },
+    "eligible_n": 167,
+    "eligible_source_counts": {
+      "m959": 41,
+      "s47b": 30,
+      "wb7j": 96
+    },
+    "evaluation": {
+      "alpha": 0.02,
+      "coverage": {
+        "abstention_n": 67,
+        "abstention_rate": 0.7701149425287356,
+        "both_labels_n": 67,
+        "empty_set_n": 0,
+        "set_coverage_rate": 0.7931034482758621,
+        "set_covered_n": 69,
+        "singleton_action_n": 20,
+        "singleton_action_rate": 0.22988505747126436
+      },
+      "error": {
+        "class_conditional_miscoverage": {
+          "irrelevant": {
+            "miscovered": 18,
+            "n": 84,
+            "set_coverage": 0.7857142857142857,
+            "singleton_action": 18
+          },
+          "relevant": {
+            "miscovered": 0,
+            "n": 3,
+            "set_coverage": 1.0,
+            "singleton_action": 2
+          }
+        },
+        "denominator": 3,
+        "meets_target": true,
+        "numerator": 0,
+        "overall_miscoverage_rate": 0.20689655172413793,
+        "overall_miscovered": 18,
+        "rate": 0.0,
+        "target_alpha": 0.02,
+        "target_event": "false_action_on_relevant"
+      },
+      "split": {
+        "calibration_class_counts": {
+          "irrelevant": 80
+        },
+        "calibration_n": 80,
+        "calibration_source_counts": {
+          "wb7j": 80
+        },
+        "cutoff_utc": "2026-09-29T22:43:08.084Z",
+        "holdout_class_counts": {
+          "irrelevant": 84,
+          "relevant": 3
+        },
+        "holdout_n": 87,
+        "holdout_source_counts": {
+          "m959": 41,
+          "s47b": 30,
+          "wb7j": 16
+        }
+      }
+    },
+    "exclusions": {
+      "uncertain_or_missing_strict_label": 3
+    },
+    "shuffled_labels": {
+      "abstention_n": 67,
+      "abstention_rate": 0.7701149425287356,
+      "cutoff_utc": "2026-09-29T22:43:08.084Z",
+      "holdout_n": 87,
+      "passes": false,
+      "required_minimum": 0.95,
+      "seed": 20261003
+    }
+  },
+  "protocol_commit": "e2d397c59472ca8291935f18e415013545c0a74e"
+}
