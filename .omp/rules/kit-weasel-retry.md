@@ -1,7 +1,7 @@
 ---
 description: "Kit A5/B4: every ledger REJECT needs a testable retry predicate"
 condition:
-  - '(?i)retry predicate:?\**:?[ \t]*(?:later|tbd|n/?a|none|todo|\?|-)?[ \t]*\.?[ \t]*\r?\n'
+  - '(?i)retry predicate:?\**:?[ \t]*(?:(?:later|tbd|n/?a|none|todo|\?|-)[ \t]*)?(?:\.[ \t]*)?\r?\n'
   - '(?i)retry predicate:?\**:?[ \t]*(?:later|tbd|n/a|todo)\b'
 scope: "tool:edit(**/NEGATIVE_EVIDENCE.md), tool:write(**/NEGATIVE_EVIDENCE.md)"
 interruptMode: always
