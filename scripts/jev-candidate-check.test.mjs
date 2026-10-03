@@ -13,15 +13,18 @@ describe("jev-candidate-check", () => {
     assert.match(r.stdout || "", /gate-cascade: got GO/);
   });
 
-  it("selftest uses only committed fixtures, never agent-local scratch data", () => {
+  it("selftest uses only committed fixtures, never scratch or workstation paths", () => {
     const code = `
 from pathlib import Path
 import builtins, runpy, sys
 open0 = builtins.open
 def guarded_open(path, *args, **kwargs):
-    parts = Path(path).parts
+    candidate = Path(path)
+    parts = candidate.parts
     if parts[-3:] == ("var", "agent-tmp", "msax-split.json"):
         raise AssertionError("selftest read agent-local scratch")
+    if candidate.is_absolute() and parts[-3:] == ("work", "hermes-webscreen-repro", "rows.jsonl"):
+        raise AssertionError("selftest read a workstation-specific fixture path")
     return open0(path, *args, **kwargs)
 builtins.open = guarded_open
 sys.argv = ["scripts/jev-candidate-check.py", "--selftest"]

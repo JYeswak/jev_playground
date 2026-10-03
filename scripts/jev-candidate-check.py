@@ -553,9 +553,10 @@ def selftest():
     # agreement illustrative {60,57} (no rater study on these rows).
     import collections as _co
 
-    with open(
-        "/Users/josh/Developer/jev/work/hermes-webscreen-repro/rows.jsonl"
-    ) as _wfh:
+    ws_path = os.path.join(
+        os.path.dirname(__file__), "..", "work", "hermes-webscreen-repro", "rows.jsonl"
+    )
+    with open(ws_path, encoding="utf-8") as _wfh:
         _wsrows = [json.loads(l) for l in _wfh if l.strip()]
     _by = _co.defaultdict(list)
     for _r in _wsrows:
