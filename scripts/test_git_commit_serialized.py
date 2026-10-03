@@ -168,10 +168,8 @@ class TestSerializedCommit(unittest.TestCase):
         )
         self.assertEqual(sh(self.repo, "git", "status", "--porcelain").stdout, "")
 
-    def test_daemon_starts_with_a_deep_unix_socket_path(self):
-        scratch = Path(
-            tempfile.mkdtemp(prefix=f"git-writer-deep.{os.getpid()}.", dir=SCRATCH)
-        )
+    def test_daemon_commits_in_a_deep_clean_clone(self):
+        scratch = Path(tempfile.mkdtemp(prefix=f"d{os.getpid()}.", dir=SCRATCH))
         (scratch / ".owner").write_text(
             f"pid={os.getpid()}\n"
             "label=git-commit-deep-socket-test\n"
@@ -179,21 +177,60 @@ class TestSerializedCommit(unittest.TestCase):
             f"created={datetime.now(timezone.utc).isoformat()}\n",
             encoding="utf-8",
         )
+        socket_limit = 107 if sys.platform.startswith("linux") else 103
         suffix = "/repo/.git/j.sock"
-        padding = 103 - len(os.fsencode(str(scratch))) - 1 - len(os.fsencode(suffix))
-        self.assertGreater(padding, 0)
+        padding = (
+            socket_limit - len(os.fsencode(str(scratch))) - 1 - len(os.fsencode(suffix))
+        )
+        self.assertGreaterEqual(padding, 0)
+
+        seed = scratch / "seed"
+        seed.mkdir()
+        sh(seed, "git", "init", "-q", ".")
+        sh(seed, "git", "config", "user.email", "writer-test@example.invalid")
+        sh(seed, "git", "config", "user.name", "writer test")
+        (seed / "base.txt").write_text("base\n", encoding="utf-8")
+        sh(seed, "git", "add", "--", "base.txt")
+        seed_commit = sh(seed, "git", "commit", "-qm", "baseline [test]")
+        self.assertEqual(seed_commit.returncode, 0, seed_commit.stderr)
+
         repo = scratch / ("x" * padding) / "repo"
-        repo.mkdir(parents=True)
-        self.assertEqual(len(os.fsencode(str(repo / ".git" / "j.sock"))), 103)
-        sh(repo, "git", "init", "-q", ".")
+        repo.parent.mkdir(parents=True)
+        cloned = sh(
+            repo.parent, "git", "clone", "-q", "--no-hardlinks", str(seed), str(repo)
+        )
+        self.assertEqual(cloned.returncode, 0, cloned.stderr)
+        for key, value in (
+            ("user.email", "writer-test@example.invalid"),
+            ("user.name", "writer test"),
+        ):
+            configured = sh(repo, "git", "config", key, value)
+            self.assertEqual(configured.returncode, 0, configured.stderr)
+
+        compact_socket = repo / ".git" / "j.sock"
+        legacy_socket = repo / ".git" / "jev-commitd.sock"
+        self.assertEqual(len(os.fsencode(compact_socket)), socket_limit)
+        self.assertGreater(len(os.fsencode(legacy_socket)), socket_limit)
         self.addCleanup(sh, repo, "python3", str(DAEMON), "stop", "--repo", str(repo))
+
         (repo / "a.txt").write_text("a\n", encoding="utf-8")
-
-        result = sh(repo, "git-dispatch", "add", "--", "a.txt")
-
-        self.assertEqual(result.returncode, 0, result.stderr)
-        staged = sh(repo, "git", "diff", "--cached", "--name-only").stdout.splitlines()
-        self.assertEqual(staged, ["a.txt"])
+        added = sh(repo, "git-dispatch", "add", "--", "a.txt")
+        self.assertEqual(added.returncode, 0, added.stderr)
+        committed = commit(repo, "deep path [test]", "a.txt")
+        self.assertEqual(committed.returncode, 0, committed.stderr)
+        self.assertEqual(
+            sh(
+                repo,
+                "git",
+                "diff-tree",
+                "--no-commit-id",
+                "--name-only",
+                "-r",
+                "HEAD",
+            ).stdout.splitlines(),
+            ["a.txt"],
+        )
+        self.assertEqual(sh(repo, "git", "status", "--porcelain").stdout, "")
 
     def test_add_request_stages_only_requested_path(self):
         (self.repo / "a.txt").write_text("a\n", encoding="utf-8")

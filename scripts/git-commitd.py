@@ -19,8 +19,8 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import cast
 
-# The narrowest supported `sun_path` is 104 bytes, including its NUL terminator.
-MAX_UNIX_SOCKET_PATH_BYTES = 103
+# `sun_path` includes its NUL terminator: 104 bytes on Darwin, 108 on Linux.
+MAX_UNIX_SOCKET_PATH_BYTES = 107 if sys.platform.startswith("linux") else 103
 MAX_REQUEST_BYTES = 65536
 MAX_PATHS = 50
 REAL_GIT = "/usr/bin/git"
