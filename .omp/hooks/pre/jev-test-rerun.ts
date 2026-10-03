@@ -16,11 +16,67 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 
 export const STORE_REL = "state/jev/test-rerun.json";
-const TESTCMD = /(^|[;&|(\s])(pytest|uv\s+run.*test|bun\s+test|npm\s+test|node\s+--test|go\s+test|cargo\s+test)\b/;
-
+const DIRECT_TESTCMD = /(^|[;&|(\s])(pytest|bun\s+test|npm\s+test|node\s+--test|go\s+test|cargo\s+test)\b/;
+const UV_RUN = /(^|[;&|(\s])uv\s+run/g;
+const LINE_BREAKS = ["\r", "\n", "\u2028", "\u2029"];
+function nextLineEnd(text: string, start: number): number {
+  let end = text.length;
+  for (const lineBreak of LINE_BREAKS) {
+    const index = text.indexOf(lineBreak, start);
+    if (index !== -1 && index < end) end = index;
+  }
+  return end;
+}
+function afterLineEnd(text: string, end: number): number {
+  return text[end] === "\r" && text[end + 1] === "\n" ? end + 2 : end + 1;
+}
+function isWordCharacter(value: string | undefined): boolean {
+  return value !== undefined && /[A-Za-z0-9_]/.test(value);
+}
+function testEndsByLine(command: string): Map<number, number> {
+  const ends = new Map<number, number>();
+  let start = 0;
+  while (start <= command.length) {
+    const end = nextLineEnd(command, start);
+    let lastTestEnd = -1;
+    for (let index = command.indexOf("test", start); index !== -1 && index < end; index = command.indexOf("test", index + 1)) {
+      if (!isWordCharacter(command[index + 4])) lastTestEnd = index + 4;
+    }
+    if (lastTestEnd !== -1) ends.set(start, lastTestEnd);
+    if (end === command.length) break;
+    start = afterLineEnd(command, end);
+  }
+  return ends;
+}
+function uvRunTest(command: string): { start: number; end: number } | null {
+  let cursor = 0;
+  let lineStart = 0;
+  let lineEnd = -1;
+  let testEnds: Map<number, number> | undefined;
+  while (cursor <= command.length) {
+    UV_RUN.lastIndex = cursor;
+    const match = UV_RUN.exec(command);
+    if (!match) return null;
+    if (lineEnd < 0) lineEnd = nextLineEnd(command, lineStart);
+    testEnds ??= testEndsByLine(command);
+    const start = match.index + match[1].length;
+    const runEnd = match.index + match[0].length;
+    while (runEnd > lineEnd && lineEnd < command.length) {
+      lineStart = afterLineEnd(command, lineEnd);
+      lineEnd = nextLineEnd(command, lineStart);
+    }
+    const end = testEnds.get(lineStart);
+    if (end !== undefined && end > runEnd) return { start, end };
+    cursor = start + 2;
+  }
+  return null;
+}
 export function matchTestCommand(command: string): string | null {
-  const m = TESTCMD.exec(command);
-  return m ? m[2].replace(/\s+/g, " ").trim() : null;
+  const direct = DIRECT_TESTCMD.exec(command);
+  const uv = uvRunTest(command);
+  const directStart = direct ? direct.index + direct[1].length : Infinity;
+  if (direct && (!uv || directStart <= uv.start)) return direct[2].replace(/\s+/g, " ").trim();
+  return uv ? command.slice(uv.start, uv.end).replace(/\s+/g, " ").trim() : null;
 }
 
 export type Run = { cmd: string; cwd: string };

@@ -1,4 +1,5 @@
 import test from "node:test";
+import { performance } from "node:perf_hooks";
 import assert from "node:assert/strict";
 import jevTestRerunExtension, {
   makeRerunObserver,
@@ -16,10 +17,25 @@ test("loader entry: valid factory, registers nothing (bare load stays inert)", (
 });
 
 test("matchTestCommand spots runners, ignores plain commands", () => {
-  assert.ok(matchTestCommand(CMD));
-  assert.ok(matchTestCommand("uv run python -m unittest tests.test_x"));
+  assert.equal(matchTestCommand(CMD), "node --test");
+  assert.equal(matchTestCommand("uv run python -m unittest tests.test_x"), "uv run python -m unittest");
   assert.equal(matchTestCommand("ls -la"), null);
   assert.equal(matchTestCommand("echo 'npm test'"), null);
+  assert.equal(matchTestCommand("uv run noop; uv \nrun pytest"), "uv run pytest");
+  assert.equal(matchTestCommand("uv run pytest; npm test"), "uv run pytest; npm test");
+  assert.equal(matchTestCommand("npm test; uv run pytest"), "npm test");
+});
+
+test("matchTestCommand stays below 50 ms on a 50k adversarial command", () => {
+  const input = "uv run x; ".repeat(5000);
+  const elapsed = [];
+  for (let i = 0; i < 3; i += 1) {
+    const start = performance.now();
+    assert.equal(matchTestCommand(input), null);
+    elapsed.push(performance.now() - start);
+  }
+  elapsed.sort((a, b) => a - b);
+  assert.ok(elapsed[1] < 50, `median scan took ${elapsed[1].toFixed(1)} ms`);
 });
 test("observer logs would-skip on same command, tree, and previous pass", async () => {
   const rows = [];

@@ -108,8 +108,39 @@ function setPath(root: unknown, path: Path, value: unknown): void {
   target[path[path.length - 1]] = value;
 }
 
+const LINE_BREAKS = ["\r", "\n", "\u2028", "\u2029"];
+const SEND_PREFIX = /send /ig;
+const SEND_SENSITIVE = /(?:secret|key|password)/ig;
+function nextLineEnd(text: string, start: number): number {
+  let end = text.length;
+  for (const lineBreak of LINE_BREAKS) {
+    const index = text.indexOf(lineBreak, start);
+    if (index !== -1 && index < end) end = index;
+  }
+  return end;
+}
+function afterLineEnd(text: string, end: number): number {
+  return text[end] === "\r" && text[end + 1] === "\n" ? end + 2 : end + 1;
+}
+function hasSendSensitive(text: string): boolean {
+  let start = 0;
+  while (start <= text.length) {
+    const end = nextLineEnd(text, start);
+    SEND_PREFIX.lastIndex = start;
+    const send = SEND_PREFIX.exec(text);
+    if (send && send.index < end) {
+      SEND_SENSITIVE.lastIndex = send.index + send[0].length;
+      const sensitive = SEND_SENSITIVE.exec(text);
+      if (sensitive && sensitive.index < end) return true;
+    }
+    if (end === text.length) return false;
+    start = afterLineEnd(text, end);
+  }
+  return false;
+}
+const LOCAL_SCREEN = /ignore (?:all )?previous instructions|system:\s|assistant.{0,20}(?:must|should)|reveal (?:your|the) (?:system|hidden) prompt|run the following command|disable (?:your )?safety|(?:ai agents?|language model|chatbot|assistant).{0,100}(?:append|send|forward|include).{0,100}(?:api[_ -]?keys?|secret|password|conversation|system prompt)/i;
 export function localScreen(text: string): boolean {
-  return /ignore (?:all )?previous instructions|system:\s|assistant.{0,20}(?:must|should)|reveal (?:your|the) (?:system|hidden) prompt|run the following command|send .*?(?:secret|key|password)|disable (?:your )?safety|(?:ai agents?|language model|chatbot|assistant).{0,100}(?:append|send|forward|include).{0,100}(?:api[_ -]?keys?|secret|password|conversation|system prompt)/i.test(text);
+  return LOCAL_SCREEN.test(text) || hasSendSensitive(text);
 }
 
 

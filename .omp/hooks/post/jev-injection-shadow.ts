@@ -22,12 +22,54 @@ type Host = { on: (event: string, handler: (event: Event) => Promise<unknown>) =
 type Ask = (options: Parameters<typeof askJev>[0]) => Promise<JevResult>;
 type Deps = { ask?: Ask; append?: (path: string, line: string) => Promise<void>; path?: string; cap?: number; now?: () => string; screenLocalRead?: boolean; readScreenOffFile?: string; fsExists?: (path: string) => boolean; enforce?: boolean; mode?: "withhold" | "annotate" };
 export type ShadowMode = "withhold" | "annotate";
-const SPAN_HINT = /ignore (?:all )?previous instructions|forget (?:everything|all)|disregard .*instructions|you are now|reveal .*prompt|send .*secret|do not (?:look|read)|just output|print yay|act as two entities|role-play/i;
+const SPAN_HINT = /ignore (?:all )?previous instructions|forget (?:everything|all)|you are now|do not (?:look|read)|just output|print yay|act as two entities|role-play/i;
+const ORDERED_HINTS = [
+  { prefix: /disregard /ig, suffix: /instructions/ig },
+  { prefix: /reveal /ig, suffix: /prompt/ig },
+  { prefix: /send /ig, suffix: /secret/ig },
+];
+const LINE_BREAKS = ["\r", "\n", "\u2028", "\u2029"];
+function nextLineEnd(text: string, start: number): number {
+  let end = text.length;
+  for (const lineBreak of LINE_BREAKS) {
+    const index = text.indexOf(lineBreak, start);
+    if (index !== -1 && index < end) end = index;
+  }
+  return end;
+}
+function afterLineEnd(text: string, end: number): number {
+  return text[end] === "\r" && text[end + 1] === "\n" ? end + 2 : end + 1;
+}
+function orderedHintIndex(line: string, prefix: RegExp, suffix: RegExp): number | null {
+  let start = 0;
+  while (start <= line.length) {
+    const end = nextLineEnd(line, start);
+    prefix.lastIndex = start;
+    const first = prefix.exec(line);
+    if (first && first.index < end) {
+      suffix.lastIndex = first.index + first[0].length;
+      const last = suffix.exec(line);
+      if (last && last.index < end) return first.index;
+    }
+    if (end === line.length) return null;
+    start = afterLineEnd(line, end);
+  }
+  return null;
+}
+function spanHintIndex(line: string): number | null {
+  const match = SPAN_HINT.exec(line);
+  let earliest = match?.index ?? null;
+  for (const hint of ORDERED_HINTS) {
+    const index = orderedHintIndex(line, hint.prefix, hint.suffix);
+    if (index !== null && (earliest === null || index < earliest)) earliest = index;
+  }
+  return earliest;
+}
 export function spanQuote(raw: string): string | null {
   for (const line of raw.split(/\r?\n/)) {
-    const m = line.match(SPAN_HINT);
-    if (m) {
-      const at = Math.max(0, (m.index ?? 0) - 40);
+    const index = spanHintIndex(line);
+    if (index !== null) {
+      const at = Math.max(0, index - 40);
       return line.slice(at, at + 120).trim();
     }
   }
