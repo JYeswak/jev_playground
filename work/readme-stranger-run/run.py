@@ -31,6 +31,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import atexit
 import json
 import os
 import re
@@ -40,6 +41,7 @@ import sys
 import tempfile
 import time
 from pathlib import Path
+
 
 REPO = Path(__file__).resolve().parents[2]
 RUNNABLE = (
@@ -255,7 +257,21 @@ def main() -> None:
     if not args.out:
         ap.error("--out is required unless --report")
 
-    base = Path(tempfile.mkdtemp(prefix="readme-stranger-"))
+    temp_root = REPO / "var" / "agent-tmp"
+    temp_root.mkdir(parents=True, exist_ok=True)
+    base = Path(tempfile.mkdtemp(prefix="readme-stranger-run.", dir=temp_root))
+    (base / ".owner").write_text(
+        json.dumps(
+            {
+                "pid": os.getpid(),
+                "label": "readme-stranger-run",
+                "repo": str(REPO),
+                "created": time.time(),
+            }
+        )
+        + "\n"
+    )
+    atexit.register(shutil.rmtree, base, ignore_errors=True)
     clone, stranger_dir, home, bindir, logs = (
         base / d for d in ("clone", "gh", "home", "bin", "logs")
     )

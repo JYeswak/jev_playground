@@ -21,10 +21,13 @@ lane already learned from `command_sha256` that a second key is a defect, not a 
 
 EXIT  0 clean · 1 verification failure · 2 usage/environment error
 """
+import atexit
+import datetime
 import hashlib
 import json
-import re
 import os
+import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -239,7 +242,14 @@ def main() -> int:
                 inputs.append(f[5])
         pre = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest()[:16]
                for p in inputs if Path(p).is_file()}
-        root = Path(tempfile.mkdtemp(prefix="jev-snap-"))
+        temp_root = Path(__file__).resolve().parent.parent / "var" / "agent-tmp"
+        temp_root.mkdir(parents=True, exist_ok=True)
+        root = Path(tempfile.mkdtemp(prefix="jev-snap.", dir=temp_root))
+        (root / ".owner").write_text(json.dumps({
+            "pid": os.getpid(), "label": "jev-snap", "repo": str(temp_root.parent.parent),
+            "created": datetime.datetime.now().astimezone().isoformat(),
+        }) + "\n")
+        atexit.register(shutil.rmtree, root, ignore_errors=True)
         mapped, rejected, realpaths = snapshot(inputs, root, REPO)
         if rejected:
             # A REJECTED SYMLINK IS A DURABLE FAILURE, NOT A TRANSIENT. Pane 2: the snapshot would

@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { cp, mkdtemp } from 'node:fs/promises'
-import { tmpdir } from 'node:os';
+import { cp, mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 
@@ -17,10 +16,19 @@ function run(command, args, options) {
   });
 }
 
-test('npm pack installs a stranger copy and doctor reports NOT_RUN without a key', async () => {
-  const scratch = await mkdtemp(join(tmpdir(), 'jev-kit-pack-'));
+test('npm pack installs a stranger copy and doctor reports NOT_RUN without a key', async (t) => {
+  const repo = new URL('../..', import.meta.url).pathname;
+  const tempRoot = join(repo, 'var', 'agent-tmp');
+  await mkdir(tempRoot, { recursive: true });
+  const owned = await mkdtemp(join(tempRoot, 'jev-kit-pack-build.'));
+  await writeFile(join(owned, '.owner'), JSON.stringify({
+    pid: process.pid, label: 'jev-kit-pack-build', repo, created: new Date().toISOString(),
+  }) + '\n');
+  t.after(() => rm(owned, { recursive: true, force: true }));
+  const scratch = join(owned, 'pack');
+  const build = join(owned, 'build');
+  await mkdir(scratch);
   const kitRoot = new URL('..', import.meta.url).pathname;
-  const build = await mkdtemp(join(tmpdir(), 'jev-kit-pack-build-'));
   await cp(kitRoot, build, {
     recursive: true,
     filter: (name) => !name.startsWith(join(kitRoot, 'dist')) && !name.includes('/.git/'),
