@@ -237,6 +237,7 @@ class PollTimeout(unittest.TestCase):
         output = io.StringIO()
         with (
             mock.patch.object(fiw, "poll", return_value={2: ("working", "")}),
+            mock.patch.object(fiw, "SHADOW_ONLY", False),
             mock.patch.object(fiw, "ci_lines", return_value=[]),
             mock.patch.object(fiw, "stranger_round", return_value=None),
             mock.patch.object(fiw, "inbox_round", return_value="Inbox: NOT_RUN test"),
@@ -891,6 +892,71 @@ class Inbox(unittest.TestCase):
             lines[-1].startswith("Inbox: 0 urgent/high paged this round, 2 paged total")
         )
         self.assertEqual(self.sent, [])
+
+    def test_daemon_first_run_uses_process_start_cutoff_when_inbox_arrives_later(self):
+        class StopAfterSecondRound(Exception):
+            pass
+
+        inbox = self.root / "late" / "AmberWillow" / "inbox"
+        state = self.root / "late-state" / "inbox-paged.json"
+        clock = [STARTED]
+        sent = []
+        sleep_calls = 0
+
+        def sleep(_interval):
+            nonlocal sleep_calls
+            sleep_calls += 1
+            if sleep_calls == 1:
+                mail(
+                    inbox,
+                    42495,
+                    "urgent",
+                    "2026-09-25T06:10:00.000000Z",
+                    "startup lease",
+                )
+                clock[0] = STARTED + 1800
+                return
+            raise StopAfterSecondRound
+
+        output = io.StringIO()
+        with (
+            mock.patch.object(fiw, "poll", return_value={}),
+            mock.patch.object(fiw, "submit_shadow"),
+            mock.patch.object(fiw, "SHADOW_ONLY", False),
+            mock.patch.object(fiw, "hook_load_round", return_value=None),
+            mock.patch.object(fiw, "ci_lines", return_value=[]),
+            mock.patch.object(fiw, "stranger_round", return_value=None),
+            mock.patch.object(fiw, "judge_lines", return_value=[]),
+            mock.patch.object(fiw, "key_round", return_value=None),
+            mock.patch.object(fiw, "stale_lock_round", return_value=None),
+            mock.patch.object(fiw, "capture_lock_creator", return_value=None),
+            mock.patch.object(fiw, "inbox_paths", return_value=(inbox, state)),
+            mock.patch.object(
+                fiw, "page", side_effect=lambda message: sent.append(message) or True
+            ),
+            mock.patch.object(fiw.ROUTER, "round", return_value=set()),
+            mock.patch.object(fiw.time, "time", side_effect=lambda: clock[0]),
+            mock.patch.object(fiw.time, "monotonic", return_value=1.0),
+            mock.patch.object(fiw.time, "sleep", side_effect=sleep),
+            mock.patch.object(sys, "argv", ["fleet-idle-watch.py"]),
+            contextlib.redirect_stdout(output),
+        ):
+            with self.assertRaises(StopAfterSecondRound):
+                fiw.main()
+
+        self.assertEqual(
+            sent,
+            ["MAIL urgent from WindyLantern: startup lease (id 42495, 06:10Z)"],
+        )
+        self.assertIn("Inbox: NOT_RUN no inbox dir", output.getvalue())
+        self.assertIn(
+            "Inbox: 1 urgent/high paged this round, 1 paged total",
+            output.getvalue(),
+        )
+        self.assertNotIn("router failed:", output.getvalue())
+        saved = json.loads(state.read_text())
+        self.assertEqual(saved["history"], [])
+        self.assertEqual(saved["paged"], [42495])
 
 
 class StrangerPager(unittest.TestCase):

@@ -88,6 +88,7 @@ INTERVAL = int(os.environ.get("IDLE_INTERVAL", "60"))
 POLLS = int(os.environ.get("IDLE_POLLS", "2"))
 REALERT = int(os.environ.get("IDLE_REALERT", "600"))
 REALERT_MAX = int(os.environ.get("IDLE_REALERT_MAX", "7200"))
+HOOK_LOAD_INTERVAL = 600
 SPINNER = re.compile(r"^\s*[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]")
 WAIT_MARKER = re.compile(
     r"(?:^\s*[⌛⏳]|^\s*Wait\b|\bwaiting on \d+ jobs?\b)",
@@ -1249,6 +1250,36 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 LOCK_STALE_S = int(os.environ.get("JEV_LOCK_STALE_S", "120"))
 
 
+def hook_load_round(
+    repo: Path = REPO_ROOT,
+    home: Path = Path.home(),
+    run=subprocess.run,
+    pager=page,
+):
+    """Validate installed hooks/extensions and page pane 1 on parse or resolution failures."""
+    command = [
+        "bun",
+        str(repo / "scripts" / "check-hook-loads.mjs"),
+        "--repo",
+        str(repo),
+        "--home",
+        str(home),
+    ]
+    try:
+        result = run(command, capture_output=True, text=True, timeout=8, cwd=repo)
+    except subprocess.TimeoutExpired:
+        note = "HOOK LOAD FAILURE reason=checker-timeout after=8s"
+    except OSError as err:
+        note = f"HOOK LOAD FAILURE reason=checker-unavailable type={type(err).__name__}"
+    else:
+        if result.returncode == 0:
+            return None
+        details = " ".join((result.stdout + " " + result.stderr).split())[:1200]
+        note = f"HOOK LOAD FAILURE exit={result.returncode} {details}".rstrip()
+    pager(note)
+    return note
+
+
 def live_git_in_repo(repo: Path):
     """PIDs of git processes whose cwd is inside `repo`, or None when a probe fails."""
     try:
@@ -1785,9 +1816,16 @@ def main() -> int:
     stalled_since: dict[int, float] = {}
     stalled_alerted: set[int] = set()
     print(f"watching {SESSION} worker panes every {INTERVAL}s", flush=True)
-    started = time.time()
+    next_hook_load = 0.0
+    started = time.time()  # Stable first-run cutoff, even if the inbox appears later.
     while True:
         now = time.time()
+        monotonic_now = time.monotonic()
+        if monotonic_now >= next_hook_load:
+            next_hook_load = monotonic_now + HOOK_LOAD_INTERVAL
+            hook_note = hook_load_round()
+            if hook_note:
+                print(hook_note, flush=True)
         states = poll()
         if states is None:
             time.sleep(INTERVAL)

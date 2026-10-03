@@ -180,7 +180,9 @@ claim nobody can check:
   kept as history; a new high after round 1 pages; an id already in the state file does not; a
   malformed front matter is named in the `Inbox:` line, not raised; a failed send is retried; a
   missing inbox dir and an unreadable state file are `Inbox: NOT_RUN`; `--once` prints the Inbox
-  line after the skills line. Plants, each restored byte-identically: page every importance fails
+  line after the skills line. A two-round live-loop smoke verifies that the first-run cutoff stays
+  anchored to process start when the inbox directory appears after the first poll.
+  Plants, each restored byte-identically: page every importance fails
   7 of 24; drop the persisted set fails 7 of 24. README stranger failures from the CI line
   (jev-gbdb) page pane 1 once per run id, including stale failures; failed sends retry and
   success/NOT_RUN never page.
@@ -216,7 +218,7 @@ claim nobody can check:
   pane, priority then age order, verification before new work, per-pane cooldown, re-route waits
   and never repeats a verifier, a refused claim sends nothing, the off switch makes no br call.
   6 tests.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (77 tests). Steering queue (jev-of3b): queued message on a real idle screen is read, nudged once per text, never while working. 3 tests.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (78 tests). Steering queue (jev-of3b): queued message on a real idle screen is read, nudged once per text, never while working. 3 tests.
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder
@@ -661,6 +663,8 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 - `.omp/hooks/pre/jev-test-rerun.test.mjs` — verifies test-command recognition, same-tree prior-pass would-skip observation, pass-through for changed trees/failures, ignored unrelated tools, pass/fail recording, and graceful git-hash failure. Run: `node --test .omp/hooks/pre/jev-test-rerun.test.mjs` (7 tests).
 - `scripts/jev-candidate-check.test.mjs` — checks historical verdicts and retry-flip STOP behavior, G1 overlap rejection, and that selftest reads committed fixtures without agent-scratch or workstation-specific paths. Run: `node --test scripts/jev-candidate-check.test.mjs` (4 tests).
 - `scripts/test_index_lock_watch.py` — offline tests for index-lock watcher capture and polling: no-lock silence, holder/pane attribution, once-only capture, vanished-lock reset, lsof fallback/race handling, filesystem-event ordering, quiet polls, cached PID use, and empty process snapshots. Run: `python3 -m unittest scripts/test_index_lock_watch.py` (10 tests).
+- `scripts/check-hook-loads.test.mjs` — verifies healthy project/profile installs, missing listed extensions, syntax errors, broken relative imports from a global install copy, and a real checkout run under ten seconds. Run: `node --test scripts/check-hook-loads.test.mjs` (4 tests).
+- `scripts/test_hook_load_watch.py` — verifies the fleet watcher pages pane 1 on checker failure or timeout and remains silent on a healthy result. Run: `python3 -m unittest scripts.test_hook_load_watch` (3 tests).
 - `work/jev-science/recog/theory_test.py` — recomputes the recognition-versus-forecasting contingency tables, Fisher tests, effect estimates, and own-vein sensitivity from the committed coding/verdict data; asserts the coding/verdict ID join is complete. Run: `python3 work/jev-science/recog/theory_test.py` (1 executable check; prints 4 tables).
 - `work/vendor-paste/vendor-shadow.test.mjs` — verifies added-block/path eligibility, skips for vendored/dependency/non-source/lockfile paths, scores pasted MIT text but not own code, logs hashes and provenance, fails open on refusal/cap, and pins the frozen cut. Run: `node --test work/vendor-paste/vendor-shadow.test.mjs` (5 tests).
 - `work/jev-jzgm/test_replay.py` — verifies the committed cap3 row hash and totals, rejects altered frozen rows, detects per-turn differences/missing turns, exercises policy-off identity replay and computed memory/gate deltas while marking harm labels unobserved, and checks JavaScript UTF-16 token sizing including lone surrogates. Run: `python3 -m unittest work/jev-jzgm/test_replay.py` (6 tests).

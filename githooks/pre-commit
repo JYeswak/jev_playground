@@ -94,6 +94,27 @@ else
   rm -rf "$_canary"
 fi
 
+# ── lane 0c: installed hook/extension parse and import resolution ───────────────────────────────
+# The staged tree cannot reveal a broken install copy; check the live project and profile paths.
+# Hermetic gate fixtures are not installed jev trees and intentionally skip this lane.
+if [ ! -d "$_repo/foundation/kit" ] && [ ! -e "$_repo/.omp/kit-guard.json" ]; then
+  printf 'HOOK_LOAD_SKIPPED reason=not-guarded-tree repo=%s\n' "$_repo" >&2
+else
+  _hook_load_checker="$_repo/scripts/check-hook-loads.mjs"
+  if [ ! -f "$_hook_load_checker" ]; then
+    printf 'HOOK_LOAD_REFUSED reason=checker-missing path=%s\n' "$_hook_load_checker" >&2
+    exit 1
+  fi
+  if ! command -v bun >/dev/null 2>&1; then
+    printf 'HOOK_LOAD_REFUSED reason=bun-missing\n' >&2
+    exit 1
+  fi
+  if ! bun "$_hook_load_checker" --repo "$_repo" --home "$HOME"; then
+    printf 'HOOK_LOAD_REFUSED reason=installed-source-invalid\n' >&2
+    exit 1
+  fi
+fi
+
 # ── lane 1: staged-deletion survival ────────────────────────────────────────────────────────────
 _impl="$_hookdir/pre-commit-staged-deletion-survives.sh"
 if [ ! -x "$_impl" ]; then
