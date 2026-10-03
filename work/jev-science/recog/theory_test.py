@@ -1,42 +1,41 @@
 #!/usr/bin/env python3
-"""Part A retest: does RECOGNITION vs FORECASTING predict WIN vs NON-WIN?
-Reads committed codes.csv (no outcomes), joins verdicts from table_draft.json +
-new_verdicts.csv, prints 2x2 tables + Fisher exact (two-sided) + OR (Haldane) +
-risk difference (Newcombe 95% CI). Recompute: python3 work/jev-science/recog/theory_test.py
+"""Statistical calculation tests and an explicit local analysis report.
+
+The registered unittest path reads committed inputs only. `--report` reads the
+optional local work/jev-science/table_draft.json and committed CSV files.
 """
 
+import argparse
 import csv
 import json
 import math
 import os
+import sys
+import unittest
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-J = "/Users/josh/Developer/jev"
-codes = {}
-with open(os.path.join(HERE, "codes.csv")) as fh:
-    for row in csv.DictReader(fh):
-        codes[row["id"]] = row["code"]
-table = json.load(open(os.path.join(J, "work/jev-science/table_draft.json")))
-verdict = {x["id"]: x["verdict"] for x in table}
-with open(os.path.join(HERE, "new_verdicts.csv")) as fh:
-    for row in csv.DictReader(fh):
-        verdict[row["id"]] = row["verdict"]
-assert set(codes) == set(verdict), set(codes) ^ set(verdict)
-flag = {x["id"]: x.get("future_counterfactual") for x in table}
-agree = sum(
-    1
-    for i in table
-    if ((codes[i["id"]] == "F") == bool(i.get("future_counterfactual")))
-)
-print("n=%d agree-with-table-flag=%d/%d" % (len(codes), agree, len(table)))
-print(
-    "disagreements:",
-    [
-        i["id"]
-        for i in table
-        if (codes[i["id"]] == "F") != bool(i.get("future_counterfactual"))
-    ],
-)
+ROOT = os.path.abspath(os.path.join(HERE, "..", "..", ".."))
+
+
+def load_report_inputs(draft_path=None):
+    codes = {}
+    with open(os.path.join(HERE, "codes.csv"), encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            codes[row["id"]] = row["code"]
+    if draft_path is None:
+        draft_path = os.path.join(ROOT, "work", "jev-science", "table_draft.json")
+    try:
+        with open(draft_path, encoding="utf-8") as fh:
+            table = json.load(fh)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot read report draft {draft_path}: {exc}") from exc
+    verdict = {x["id"]: x["verdict"] for x in table}
+    with open(os.path.join(HERE, "new_verdicts.csv"), encoding="utf-8") as fh:
+        for row in csv.DictReader(fh):
+            verdict[row["id"]] = row["verdict"]
+    if set(codes) != set(verdict):
+        raise ValueError(f"coding/verdict ID mismatch: {set(codes) ^ set(verdict)}")
+    return codes, verdict, table
 
 
 def fisher(a, b, c, d):
@@ -82,7 +81,7 @@ def newcombe(a, n1, c, n2):
     return rd, lo, hi
 
 
-def report(name, pos):
+def report(name, pos, codes, verdict):
     # pos(id) True means event; rows R/F
     a = sum(1 for i in codes if codes[i] == "R" and pos(i))
     b = sum(1 for i in codes if codes[i] == "R" and not pos(i))
@@ -92,21 +91,82 @@ def report(name, pos):
     OR, olo, ohi = or_haldane(a, b, c, d)
     rd, rlo, rhi = newcombe(a, a + b, c, c + d)
     print(
-        "%s 2x2 [[R-event %d, R-no %d],[F-event %d, F-no %d]] p=%.4f OR=%.2f [%.2f,%.2f] RD=%.3f [%.3f,%.3f]"
-        % (name, a, b, c, d, p, OR, olo, ohi, rd, rlo, rhi)
+        f"{name} 2x2 [[R-event {a}, R-no {b}],[F-event {c}, F-no {d}]] p={p:.4f} OR={OR:.2f} [{olo:.2f},{ohi:.2f}] RD={rd:.3f} [{rlo:.3f},{rhi:.3f}]"
     )
 
 
-report("PRIMARY win-vs-nonwin  ", lambda i: verdict[i] == "win")
-report("SECONDARY loss-vs-rest ", lambda i: verdict[i] == "loss")
-report("SECONDARY winTie-vs-loss", lambda i: verdict[i] in ("win", "tie"))
-own = {i for i in codes if i not in ("R86b", "R89b", "R90b")}
-sub = {i: codes[i] for i in own}
-a = sum(1 for i in sub if sub[i] == "R" and verdict[i] == "win")
-b = sum(1 for i in sub if sub[i] == "R" and verdict[i] != "win")
-c = sum(1 for i in sub if sub[i] == "F" and verdict[i] == "win")
-d = sum(1 for i in sub if sub[i] == "F" and verdict[i] != "win")
-p = fisher(a, b, c, d)
-print(
-    "SENSITIVITY own-vein-only win-vs-nonwin [[%d,%d],[%d,%d]] p=%.4f" % (a, b, c, d, p)
-)
+def run_report(draft_path=None):
+    codes, verdict, table = load_report_inputs(draft_path)
+    agree = sum(
+        1
+        for row in table
+        if ((codes[row["id"]] == "F") == bool(row.get("future_counterfactual")))
+    )
+    print(f"n={len(codes)} agree-with-table-flag={agree}/{len(table)}")
+    print(
+        "disagreements:",
+        [
+            row["id"]
+            for row in table
+            if (codes[row["id"]] == "F") != bool(row.get("future_counterfactual"))
+        ],
+    )
+    report("PRIMARY win-vs-nonwin  ", lambda i: verdict[i] == "win", codes, verdict)
+    report("SECONDARY loss-vs-rest ", lambda i: verdict[i] == "loss", codes, verdict)
+    report(
+        "SECONDARY winTie-vs-loss",
+        lambda i: verdict[i] in ("win", "tie"),
+        codes,
+        verdict,
+    )
+    own = {i for i in codes if i not in ("R86b", "R89b", "R90b")}
+    sub = {i: codes[i] for i in own}
+    a = sum(1 for i in sub if sub[i] == "R" and verdict[i] == "win")
+    b = sum(1 for i in sub if sub[i] == "R" and verdict[i] != "win")
+    c = sum(1 for i in sub if sub[i] == "F" and verdict[i] == "win")
+    d = sum(1 for i in sub if sub[i] == "F" and verdict[i] != "win")
+    p = fisher(a, b, c, d)
+    print(f"SENSITIVITY own-vein-only win-vs-nonwin [[{a},{b}],[{c},{d}]] p={p:.4f}")
+
+
+class TestStatistics(unittest.TestCase):
+    def test_fisher_two_sided_known_table(self):
+        self.assertAlmostEqual(
+            fisher(1, 9, 11, 3),
+            0.0027594561852200836,
+            places=12,
+        )
+
+    def test_haldane_correction_handles_zero_cells(self):
+        odds_ratio, lower, upper = or_haldane(0, 3, 4, 0)
+        self.assertAlmostEqual(odds_ratio, 1 / 63)
+        self.assertTrue(
+            all(math.isfinite(value) for value in (odds_ratio, lower, upper))
+        )
+        self.assertLess(lower, odds_ratio)
+        self.assertGreater(upper, odds_ratio)
+
+    def test_newcombe_interval_contains_risk_difference(self):
+        difference, lower, upper = newcombe(7, 12, 2, 10)
+        self.assertAlmostEqual(difference, 7 / 12 - 2 / 10)
+        self.assertLessEqual(lower, difference)
+        self.assertGreaterEqual(upper, difference)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--report",
+        action="store_true",
+        help="recompute the local analysis from table_draft.json",
+    )
+    parser.add_argument("--draft", help="path to a table_draft.json for --report")
+    args, unittest_args = parser.parse_known_args()
+    if args.report:
+        run_report(args.draft)
+    else:
+        unittest.main(argv=[sys.argv[0], *unittest_args])
+
+
+if __name__ == "__main__":
+    main()
