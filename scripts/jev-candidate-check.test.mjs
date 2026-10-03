@@ -85,4 +85,28 @@ print(json.dumps({
       plain: [],
     });
   });
+  it("G1-prior-overlap uses committed prior hashes, not working-tree edits", () => {
+    const code = `
+import builtins, importlib.util, io, json
+s = importlib.util.spec_from_file_location("c", "scripts/jev-candidate-check.py"); m = importlib.util.module_from_spec(s); s.loader.exec_module(m)
+base = json.load(open("work/jev-science/candidates/retry-flip.json"))
+prior = "work/jev-science/candidates/memory-D2.json"
+original_open = builtins.open
+def dirty_open(path, *args, **kwargs):
+    if str(path) == prior:
+        return io.StringIO(json.dumps({"rows": [{"hash": base["rows"][0]["hash"]}]}))
+    return original_open(path, *args, **kwargs)
+builtins.open = dirty_open
+try:
+    out = m.check(dict(base, replication=True, prior_samples=[prior]))
+finally:
+    builtins.open = original_open
+found = out["findings"] if isinstance(out, dict) else out
+print(json.dumps([f["pass"] for f in found if f["gate"] == "G1-prior-overlap"]))
+`;
+    const r = spawnSync("python3", ["-c", code], { encoding: "utf8", timeout: 60000 });
+    assert.equal(r.status, 0, r.stderr);
+    assert.deepEqual(JSON.parse(r.stdout.trim().split("\n").at(-1)), [true]);
+  });
+
 });

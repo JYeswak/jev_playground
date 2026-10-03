@@ -174,22 +174,20 @@ def check(candidate):
     elif priors:
         seen, missing = set(), []
         for path in priors:
-            committed = (
-                subprocess.run(
-                    ["git", "ls-files", "--error-unmatch", path],
-                    capture_output=True,
-                    env=dict(os.environ, GIT_OPTIONAL_LOCKS="0"),
-                ).returncode
-                == 0
+            # Read the committed blob, not a tracked but edited or staged worktree file.
+            committed = subprocess.run(
+                ["git", "show", "HEAD:" + path],
+                capture_output=True,
+                check=False,
+                timeout=10,
+                text=True,
+                encoding="utf-8",
+                env=dict(os.environ, GIT_OPTIONAL_LOCKS="0"),
             )
-            try:
-                text = open(path, encoding="utf-8").read()
-            except OSError:
-                committed = False
-            if not committed:
+            if committed.returncode != 0:
                 missing.append(path)
                 continue
-            for found in re.findall(r'"hash"\s*:\s*"([^"]+)"', text):
+            for found in re.findall(r'"hash"\s*:\s*"([^"]+)"', committed.stdout):
                 seen.add(found)
         shared = sorted(set(hashes) & seen)
         if missing or shared:
