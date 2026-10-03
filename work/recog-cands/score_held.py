@@ -7,8 +7,15 @@ import json
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def load_rows(fname):
+    with open(os.path.join(HERE, fname), encoding="utf-8") as stream:
+        return [json.loads(line) for line in stream if line.strip()]
+
+
 for name, fname, acc_bar in (("A", "a_rows.jsonl", 0.95), ("B", "b_rows.jsonl", 0.82)):
-    rows = json.load(open(os.path.join(HERE, fname)))
+    rows = load_rows(fname)
     held = [r for r in rows if r["phase"] == "held" and r["status"] == "ok"]
     tp = fn = fp = tn = 0
     for r in held:
@@ -39,7 +46,7 @@ for name, fname, acc_bar in (("A", "a_rows.jsonl", 0.95), ("B", "b_rows.jsonl", 
         )
     )
 for name, fname in (("B-fresh", "b_rows.jsonl"),):
-    rows = json.load(open(os.path.join(HERE, fname)))
+    rows = load_rows(fname)
     fresh = [r for r in rows if r["phase"] == "fresh" and r["status"] == "ok"]
     tp = fn = fp = tn = 0
     for r in fresh:

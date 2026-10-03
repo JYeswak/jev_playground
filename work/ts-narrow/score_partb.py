@@ -2,11 +2,15 @@
 """Score Part B msax arm (jev-2zbl). T0/T1/T2 flips vs recorded ref / T0; T3 meaning-mapped.
 Reads the committed rows (same dir); a non-author recomputes with: python3 work/ts-narrow/score_partb.py"""
 
-import json, math, os
+import json
+import math
+import os
 
-rec = json.load(
-    open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "partb_rows.jsonl"))
-)
+with open(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "partb_rows.jsonl"),
+    encoding="utf-8",
+) as stream:
+    rec = [json.loads(line) for line in stream if line.strip()]
 bad = [r for r in rec if r["status"] != "ok"]
 print("rows=160 bad=%d" % len(bad))
 byid = {}

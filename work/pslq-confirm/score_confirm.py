@@ -47,10 +47,16 @@ def grp_sync(cmd):
     return "cmd:" + hashlib.sha256((cmd or "").encode()).hexdigest()[:12]
 
 
-sync = [
-    json.loads(l) for l in open(os.path.join(J, "var/agent-tmp/lrpred-work/rows.jsonl"))
-]
-jobs = json.load(open(os.path.join(J, "var/agent-tmp/zezf/jobs.json")))
+with open(
+    os.path.join(J, "var/agent-tmp/lrpred-work/rows.jsonl"),
+    encoding="utf-8",
+) as stream:
+    sync = [json.loads(line) for line in stream]
+with open(
+    os.path.join(J, "var/agent-tmp/zezf/jobs.json"),
+    encoding="utf-8",
+) as stream:
+    jobs = json.load(stream)
 rows = []
 for r in sync:
     rows.append(
@@ -70,7 +76,8 @@ for tok, p, _ in train:
     stat[tok] = (c + 1, k + (1 if p else 0))
 table = {t: k / c for t, (c, k) in stat.items()}
 print("frozen table: train=%d tokens=%d" % (len(train), len(table)))
-rows_c = json.load(open(os.path.join(HERE, "confirm_rows.jsonl")))
+with open(os.path.join(HERE, "confirm_rows.jsonl"), encoding="utf-8") as stream:
+    rows_c = [json.loads(line) for line in stream if line.strip()]
 sample = [r for r in rows_c if r["phase"] == "held"]
 print(
     "confirm held n=%d pos=%d"

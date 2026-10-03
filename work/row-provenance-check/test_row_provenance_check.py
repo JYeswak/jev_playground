@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import os
 import subprocess
 import tempfile
@@ -12,9 +12,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-SCRIPT = Path(
-    os.environ.get("ROW_PROVENANCE_CHECK", ROOT / "scripts" / "row-provenance-check.py")
-)
+SCRIPT = ROOT / "scripts" / "row-provenance-check.py"
 FIXTURES = HERE / "fixtures"
 AFTER = "2026-09-25T03:01:00-0600"
 BEFORE = "2026-09-25T02:59:00-0600"
@@ -50,22 +48,35 @@ class RowProvenanceCheckerTests(unittest.TestCase):
         self.tempdir.cleanup()
 
     def install(
-        self, fixture: str, commit_date: str, filename: str | None = None
+        self,
+        fixture: str,
+        commit_date: str,
+        filename: str | None = None,
+        *,
+        format_as_array: bool = False,
+        raw_bytes: bytes | None = None,
     ) -> None:
         relative = Path("work/rows") / (filename or fixture)
         destination = self.repo / relative
-        rows = [
-            json.JSONDecoder().decode(line)
-            for line in (FIXTURES / fixture).read_text().splitlines()
-        ]
-        if fixture == "missing-hash.jsonl":
-            rows[-1].pop("code_sha256", None)
-        if fixture == "missing-timestamp.jsonl":
-            rows[-1].pop("finished_utc", None)
-        destination.write_text(
-            "\n".join(json.dumps(row) for row in rows) + "\n",
-            encoding="utf-8",
-        )
+        if raw_bytes is not None:
+            content: str | bytes = raw_bytes
+        else:
+            rows = [
+                json.JSONDecoder().decode(line)
+                for line in (FIXTURES / fixture).read_text().splitlines()
+            ]
+            if fixture == "missing-hash.jsonl":
+                rows[-1].pop("code_sha256", None)
+            if fixture == "missing-timestamp.jsonl":
+                rows[-1].pop("finished_utc", None)
+            if format_as_array:
+                content = json.dumps(rows) + "\n"
+            else:
+                content = "\n".join(json.dumps(row) for row in rows) + "\n"
+        if isinstance(content, bytes):
+            destination.write_bytes(content)
+        else:
+            destination.write_text(content, encoding="utf-8")
         env = os.environ.copy()
         env["GIT_AUTHOR_DATE"] = commit_date
         env["GIT_COMMITTER_DATE"] = commit_date
@@ -83,10 +94,30 @@ class RowProvenanceCheckerTests(unittest.TestCase):
             timeout=30,
         )
 
-    def write_exemption(self, relative: str, digest: str) -> None:
-        (self.repo / "scripts" / "row-provenance-exempt.tsv").write_text(
-            "path\tsha256\treason\n" f"{relative}\t{digest}\tlegacy test fixture\n",
+    def write_exemption(
+        self,
+        relative: str,
+        digest: str,
+        bead: str = "jev-b0b4",
+        mode: str = "provenance",
+    ) -> None:
+        path = self.repo / "scripts" / "row-provenance-exempt.tsv"
+        path.write_text(
+            "path\tsha256\treason\tbead\tmode\n"
+            f"{relative}\t{digest}\tlegacy test fixture\t{bead}\t{mode}\n",
             encoding="utf-8",
+        )
+        subprocess.run(
+            ["git", "add", "--", "scripts/row-provenance-exempt.tsv"],
+            cwd=self.repo,
+            check=True,
+            timeout=30,
+        )
+        subprocess.run(
+            ["git", "commit", "-q", "-m", "add test exemption"],
+            cwd=self.repo,
+            check=True,
+            timeout=30,
         )
 
     def run_checker(self) -> subprocess.CompletedProcess[str]:
@@ -107,6 +138,69 @@ class RowProvenanceCheckerTests(unittest.TestCase):
         result = self.run_checker()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("checked 1 experiment row file", result.stdout)
+
+    def test_single_line_json_array_is_rejected_as_jsonl(self) -> None:
+        self.install("pass.jsonl", AFTER, format_as_array=True)
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("work/rows/pass.jsonl", result.stderr)
+        self.assertIn("JSON array", result.stderr)
+
+    def test_exemption_does_not_skip_jsonl_shape_validation(self) -> None:
+        self.install(
+            "missing-hash.jsonl",
+            AFTER,
+            filename="legacy.jsonl",
+            format_as_array=True,
+        )
+        path = self.repo / "work" / "rows" / "legacy.jsonl"
+        self.write_exemption(
+            "work/rows/legacy.jsonl", hashlib.sha256(path.read_bytes()).hexdigest()
+        )
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("JSON array", result.stderr)
+
+    def test_hash_pinned_raw_fixture_allows_malformed_lines(self) -> None:
+        relative = "work/thinking-duel-hard/tasks/t03/sample.jsonl"
+        raw = (ROOT / relative).read_bytes()
+        self.install(
+            "pass.jsonl",
+            AFTER,
+            filename="raw-fixture.jsonl",
+            raw_bytes=raw,
+        )
+        before_exemption = self.run_checker()
+        self.assertEqual(before_exemption.returncode, 1)
+        self.assertIn("invalid JSON", before_exemption.stderr)
+        self.write_exemption(
+            "work/rows/raw-fixture.jsonl",
+            hashlib.sha256(raw).hexdigest(),
+            bead="jev-77ow",
+            mode="raw-fixture",
+        )
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("exempted 1 file", result.stdout)
+        fixture = self.repo / "work" / "rows" / "raw-fixture.jsonl"
+        mutated = bytearray(raw)
+        mutated[-1] ^= 1
+        fixture.write_bytes(mutated)
+        subprocess.run(
+            ["git", "add", "--", "work/rows/raw-fixture.jsonl"],
+            cwd=self.repo,
+            check=True,
+            timeout=30,
+        )
+        subprocess.run(
+            ["git", "commit", "-q", "-m", "mutate raw fixture byte"],
+            cwd=self.repo,
+            check=True,
+            timeout=30,
+        )
+        changed = self.run_checker()
+        self.assertEqual(changed.returncode, 1)
+        self.assertIn("exemption sha256 mismatch", changed.stderr)
 
     def test_missing_hash_fails_with_file_row_and_field(self) -> None:
         self.install("missing-hash.jsonl", AFTER)
@@ -136,6 +230,28 @@ class RowProvenanceCheckerTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("checked 0 experiment row", result.stdout)
 
+    def test_untracked_experiment_file_is_ignored(self) -> None:
+        self.install("non-experiment.jsonl", AFTER, filename="baseline.jsonl")
+        path = self.repo / "work" / "rows" / "untracked.jsonl"
+        path.write_text(
+            (FIXTURES / "missing-hash.jsonl").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("checked 0 experiment row file", result.stdout)
+
+    def test_uncommitted_edit_does_not_change_committed_rows(self) -> None:
+        self.install("pass.jsonl", AFTER)
+        path = self.repo / "work" / "rows" / "pass.jsonl"
+        path.write_text(
+            (FIXTURES / "missing-hash.jsonl").read_text(encoding="utf-8"),
+            encoding="utf-8",
+        )
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("checked 1 experiment row file", result.stdout)
+
     def test_matching_exemption_skips_legacy_file_and_reports_count(self) -> None:
         self.install("missing-hash.jsonl", AFTER, filename="legacy.jsonl")
         path = self.repo / "work" / "rows" / "legacy.jsonl"
@@ -149,13 +265,53 @@ class RowProvenanceCheckerTests(unittest.TestCase):
     def test_changed_exempted_file_fails_hash_pin(self) -> None:
         self.install("missing-hash.jsonl", AFTER, filename="legacy.jsonl")
         path = self.repo / "work" / "rows" / "legacy.jsonl"
+        original = bytearray(path.read_bytes())
         self.write_exemption(
-            "work/rows/legacy.jsonl", hashlib.sha256(path.read_bytes()).hexdigest()
+            "work/rows/legacy.jsonl", hashlib.sha256(original).hexdigest()
         )
-        path.write_bytes(path.read_bytes() + b"\n")
+        index = original.index(b'"code_sha256"') + 2
+        original[index] = ord("x")
+        path.write_bytes(original)
+        subprocess.run(
+            ["git", "add", "--", "work/rows/legacy.jsonl"],
+            cwd=self.repo,
+            check=True,
+            timeout=30,
+        )
+        subprocess.run(
+            ["git", "commit", "-q", "-m", "change one exempt byte"],
+            cwd=self.repo,
+            check=True,
+            timeout=30,
+        )
         result = self.run_checker()
         self.assertEqual(result.returncode, 1)
         self.assertIn("exemption sha256 mismatch", result.stderr)
+
+    def test_uncommitted_exemption_cannot_bypass_checker(self) -> None:
+        self.install("missing-hash.jsonl", AFTER, filename="legacy.jsonl")
+        path = self.repo / "work" / "rows" / "legacy.jsonl"
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        (self.repo / "scripts" / "row-provenance-exempt.tsv").write_text(
+            "path\tsha256\treason\tbead\tmode\n"
+            f"work/rows/legacy.jsonl\t{digest}\tlocal only\tjev-b0b4\tprovenance\n",
+            encoding="utf-8",
+        )
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("code_sha256 or run_py_sha256", result.stderr)
+
+    def test_exemption_without_bead_is_rejected(self) -> None:
+        self.install("missing-hash.jsonl", AFTER, filename="legacy.jsonl")
+        path = self.repo / "work" / "rows" / "legacy.jsonl"
+        self.write_exemption(
+            "work/rows/legacy.jsonl",
+            hashlib.sha256(path.read_bytes()).hexdigest(),
+            bead="",
+        )
+        result = self.run_checker()
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("row-provenance-exempt.tsv line 2 is malformed", result.stderr)
 
     def test_unlisted_legacy_file_still_fails(self) -> None:
         self.install("missing-hash.jsonl", AFTER, filename="legacy.jsonl")

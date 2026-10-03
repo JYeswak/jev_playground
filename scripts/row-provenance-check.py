@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """Check provenance on newly committed experiment JSONL rows.
 
-Only tracked ``work/**/*.jsonl`` files whose first adding commit is after the
+Only committed ``work/**/*.jsonl`` files whose first adding commit is after the
 fixed cutoff are inspected.  Rows are considered experiment rows when they
 carry one of the lane's result keys, or a ``probabilities`` map (a recorded
 Jev answer; the Emerald and OSWorld live rows of 2026-09-25 carried only that
-and went unchecked).  A checked row must carry a full SHA-256 code hash and an
-ISO-8601 timestamp with a UTC offset.  A line that is not JSON fails the file,
-even when no earlier row was an experiment row.
+and went unchecked). A checked row must carry a full SHA-256 code hash and an
+ISO-8601 timestamp with a UTC offset. JSON arrays containing experiment or
+decision rows fail, including inside a provenance exemption; invalid JSON lines fail
+unless an exact-hash exemption explicitly marks an intentional ``raw-fixture``.
+
+The file list, row bytes, and exemption list are all read from ``HEAD``.  Local
+untracked output and uncommitted edits cannot change the registered check.
 
 ``JEV_REPO`` is an offline-test hook; the live invocation uses the repository
 containing this script.  It changes the root only, never the cutoff or the
@@ -48,7 +52,9 @@ UTC_FIELD_NAMES = {
     "timestamp_utc",
 }
 SHA256 = re.compile(r"^[0-9a-fA-F]{64}$")
+BEAD_ID = re.compile(r"^[a-z0-9][a-z0-9.-]*$")
 EXEMPTION_FILE = "scripts/row-provenance-exempt.tsv"
+EXEMPTION_MODES = {"provenance", "raw-fixture"}
 SELF_FIXTURE_PREFIX = "work/row-provenance-check/fixtures/"
 
 
@@ -69,8 +75,26 @@ def git_output(repo: Path, *args: str) -> str:
         raise RuntimeError(f"git {args[0]} failed: {detail}") from exc
 
 
+def git_bytes(repo: Path, *args: str) -> bytes:
+    try:
+        return subprocess.check_output(
+            ["git", "-C", str(repo), *args],
+            stderr=subprocess.PIPE,
+            timeout=30,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        detail = (
+            exc.stderr.decode("utf-8", "replace").strip()
+            if isinstance(exc, subprocess.CalledProcessError)
+            else str(exc)
+        )
+        raise RuntimeError(f"git {args[0]} failed: {detail}") from exc
+
+
 def tracked_jsonl(repo: Path) -> list[str]:
-    output = git_output(repo, "ls-files", "-z", "--", "work")
+    output = git_output(
+        repo, "ls-tree", "-r", "--name-only", "-z", "HEAD", "--", "work"
+    )
     return sorted(path for path in output.split("\0") if path.endswith(".jsonl"))
 
 
@@ -131,19 +155,24 @@ def utc_timestamp_present(row: dict[str, object]) -> bool:
     return any(parse_timestamp(value) is not None for _, value in candidates)
 
 
-def load_exemptions(repo: Path) -> dict[str, str]:
-    path = repo / EXEMPTION_FILE
-    if not path.is_file():
+def load_exemptions(repo: Path) -> dict[str, tuple[str, str, str, str]]:
+    tracked = git_output(
+        repo, "ls-tree", "-r", "--name-only", "HEAD", "--", EXEMPTION_FILE
+    )
+    if not tracked.strip():
         return {}
-    lines = path.read_text(encoding="utf-8").splitlines()
-    if not lines or lines[0] != "path\tsha256\treason":
-        raise RuntimeError(f"{EXEMPTION_FILE} must start with path, sha256, reason")
-    exemptions: dict[str, str] = {}
+    raw = git_bytes(repo, "show", f"HEAD:{EXEMPTION_FILE}")
+    lines = raw.decode("utf-8").splitlines()
+    if not lines or lines[0] != "path\tsha256\treason\tbead\tmode":
+        raise RuntimeError(
+            f"{EXEMPTION_FILE} must start with path, sha256, reason, bead, mode"
+        )
+    exemptions: dict[str, tuple[str, str, str, str]] = {}
     for line_number, line in enumerate(lines[1:], 2):
         fields = line.split("\t")
-        if len(fields) != 3 or not all(fields):
+        if len(fields) != 5 or not all(fields):
             raise RuntimeError(f"{EXEMPTION_FILE} line {line_number} is malformed")
-        relative, digest, _reason = fields
+        relative, digest, reason, bead, mode = fields
         if relative in exemptions:
             raise RuntimeError(
                 f"{EXEMPTION_FILE} line {line_number} duplicates {relative}"
@@ -152,12 +181,20 @@ def load_exemptions(repo: Path) -> dict[str, str]:
             raise RuntimeError(
                 f"{EXEMPTION_FILE} line {line_number} has an invalid sha256"
             )
-        exemptions[relative] = digest
+        if BEAD_ID.fullmatch(bead) is None:
+            raise RuntimeError(
+                f"{EXEMPTION_FILE} line {line_number} has an invalid bead id"
+            )
+        if mode not in EXEMPTION_MODES:
+            raise RuntimeError(
+                f"{EXEMPTION_FILE} line {line_number} has invalid mode {mode!r}"
+            )
+        exemptions[relative] = (digest, reason, bead, mode)
     return exemptions
 
 
-def sha256_file(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+def sha256_file(repo: Path, relative: str) -> str:
+    return hashlib.sha256(git_bytes(repo, "show", f"HEAD:{relative}")).hexdigest()
 
 
 def is_decision_row(row: object) -> bool:
@@ -170,37 +207,53 @@ def is_decision_row(row: object) -> bool:
     )
 
 
-def check_file(path: Path, relative: str) -> tuple[int, str | None, int]:
+def check_file(
+    repo: Path, relative: str, *, require_provenance: bool = True
+) -> tuple[int, str | None, int]:
     experiment_rows = 0
     decision_rows = 0
     first_error: tuple[int, list[str]] | None = None
-    with path.open(encoding="utf-8") as stream:
-        for row_number, raw in enumerate(stream, 1):
-            if not raw.strip():
+    content = git_bytes(repo, "show", f"HEAD:{relative}").decode("utf-8")
+    for row_number, raw in enumerate(content.splitlines(), 1):
+        if not raw.strip():
+            continue
+        try:
+            row = json.JSONDecoder().decode(raw)
+        except json.JSONDecodeError as exc:
+            return (
+                experiment_rows,
+                f"{relative} row {row_number} invalid JSON: {exc.msg}",
+                decision_rows,
+            )
+        if isinstance(row, list):
+            if not any(
+                isinstance(item, dict)
+                and (EXPERIMENT_KEYS.intersection(item) or is_decision_row(item))
+                for item in row
+            ):
                 continue
-            try:
-                row = json.JSONDecoder().decode(raw)
-            except json.JSONDecodeError as exc:
-                return (
-                    experiment_rows,
-                    f"{relative} row {row_number} invalid JSON: {exc.msg}",
-                    decision_rows,
-                )
-            if not isinstance(row, dict):
-                continue
-            decision = is_decision_row(row)
-            if decision:
-                decision_rows += 1
-            if not EXPERIMENT_KEYS.intersection(row) and not decision:
-                continue
-            experiment_rows += 1
-            missing: list[str] = []
-            if not has_code_hash(row):
-                missing.append("code_sha256 or run_py_sha256")
-            if not utc_timestamp_present(row):
-                missing.append("UTC timestamp")
-            if missing and first_error is None:
-                first_error = (row_number, missing)
+            return (
+                experiment_rows,
+                f"{relative} row {row_number} is a JSON array, not a JSONL record",
+                decision_rows,
+            )
+        if not isinstance(row, dict):
+            continue
+        decision = is_decision_row(row)
+        if decision:
+            decision_rows += 1
+        if not EXPERIMENT_KEYS.intersection(row) and not decision:
+            continue
+        experiment_rows += 1
+        if not require_provenance:
+            continue
+        missing: list[str] = []
+        if not has_code_hash(row):
+            missing.append("code_sha256 or run_py_sha256")
+        if not utc_timestamp_present(row):
+            missing.append("UTC timestamp")
+        if missing and first_error is None:
+            first_error = (row_number, missing)
     if first_error is None:
         return experiment_rows, None, decision_rows
     row_number, missing = first_error
@@ -209,19 +262,6 @@ def check_file(path: Path, relative: str) -> tuple[int, str | None, int]:
         f"{relative} row {row_number} missing {'; '.join(missing)}",
         decision_rows,
     )
-
-
-def decision_row_count(path: Path) -> int:
-    count = 0
-    for raw in path.read_text(encoding="utf-8").splitlines():
-        if not raw.strip():
-            continue
-        try:
-            row = json.JSONDecoder().decode(raw)
-        except json.JSONDecodeError:
-            continue
-        count += int(is_decision_row(row))
-    return count
 
 
 def main() -> int:
@@ -251,20 +291,29 @@ def main() -> int:
         if relative.startswith(SELF_FIXTURE_PREFIX):
             continue
         if relative in exemptions:
-            actual = sha256_file(repo / relative)
-            expected = exemptions[relative]
+            expected, reason, bead, mode = exemptions[relative]
+            actual = sha256_file(repo, relative)
             if actual != expected:
                 errors.append(
-                    f"{relative} exemption sha256 mismatch: expected {expected}, got {actual}"
+                    f"{relative} exemption sha256 mismatch ({bead}: {reason}): "
+                    f"expected {expected}, got {actual}"
                 )
                 continue
+            if mode == "raw-fixture":
+                exempted_files += 1
+                continue
+            rows, error, decision_rows = check_file(
+                repo, relative, require_provenance=False
+            )
+            if error is not None:
+                errors.append(error)
+                continue
             exempted_files += 1
-            decision_rows = decision_row_count(repo / relative)
             if decision_rows:
                 exempted_decision_files += 1
                 exempted_decision_rows += decision_rows
             continue
-        rows, error, decision_rows = check_file(repo / relative, relative)
+        rows, error, decision_rows = check_file(repo, relative)
         if rows == 0 and error is None:
             continue
         checked_files += 1

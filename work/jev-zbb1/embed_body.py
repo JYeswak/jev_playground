@@ -1,4 +1,7 @@
-import json, math, os, urllib.request
+import json
+import math
+import os
+import urllib.request
 
 
 def embed(text):
@@ -24,16 +27,19 @@ for child in sorted(os.listdir(S)):
     p = os.path.join(S, child, "SKILL.md")
     if not os.path.isfile(p):
         continue
-    t = open(p, encoding="utf-8", errors="ignore").read()
+    with open(p, encoding="utf-8", errors="ignore") as f:
+        t = f.read()
     vecs.append((child, embed(child + "\n" + t[:2500])))
-json.dump(
-    {
-        "model": "nomic-embed-text+body",
-        "skills": [{"name": n, "vec": v} for n, v in vecs],
-    },
-    open("work/jev-zbb1/vectors_body.json", "w"),
-)
-dev = json.load(open("work/jev-zbb1/dev.jsonl"))
+with open("work/jev-zbb1/vectors_body.json", "w", encoding="utf-8") as f:
+    json.dump(
+        {
+            "model": "nomic-embed-text+body",
+            "skills": [{"name": n, "vec": v} for n, v in vecs],
+        },
+        f,
+    )
+with open("work/jev-zbb1/dev.jsonl", encoding="utf-8") as f:
+    dev = [json.loads(line) for line in f if line.strip()]
 rec = 0
 for row in dev:
     q = embed(row["prompt"][:2000])

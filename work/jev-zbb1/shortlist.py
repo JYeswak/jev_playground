@@ -33,7 +33,8 @@ def roster():
         p = os.path.join(SKILLS, child, "SKILL.md")
         if not os.path.isfile(p):
             continue
-        text = open(p, encoding="utf-8", errors="ignore").read()
+        with open(p, encoding="utf-8", errors="ignore") as f:
+            text = f.read()
         name, desc = child, ""
         for line in text.split("\n"):
             if line.startswith("name:"):
@@ -58,11 +59,14 @@ if sys.argv[1] == "--index":
         {"name": e["name"], "vec": embed(e["name"] + ": " + e["description"])}
         for e in ros
     ]
-    json.dump({"model": MODEL, "skills": vecs}, open(sys.argv[2], "w"))
+    with open(sys.argv[2], "w", encoding="utf-8") as f:
+        json.dump({"model": MODEL, "skills": vecs}, f)
     print("indexed", len(vecs))
 elif sys.argv[1] == "--query":
-    idx = json.load(open("work/jev-zbb1/vectors.json"))
-    dev = json.load(open("work/jev-zbb1/dev.jsonl"))
+    with open("work/jev-zbb1/vectors.json", encoding="utf-8") as f:
+        idx = json.load(f)
+    with open("work/jev-zbb1/dev.jsonl", encoding="utf-8") as f:
+        dev = [json.loads(line) for line in f if line.strip()]
     res = []
     for row in dev:
         q = embed(row["prompt"][:2000])
@@ -77,6 +81,7 @@ elif sys.argv[1] == "--query":
                 ),
             }
         )
-    json.dump(res, open(sys.argv[2], "w"), indent=1)
+    with open(sys.argv[2], "w", encoding="utf-8") as f:
+        json.dump(res, f, indent=1)
     rec = sum(1 for r in res if r["target_rank"] is not None and r["target_rank"] < 20)
     print("recall@20: %d/%d" % (rec, len(res)))
