@@ -1,7 +1,10 @@
 """Regression tests for the phase-0 decision-bank builder."""
 
+import collections
+import hashlib
 import importlib.util
 import json
+import tempfile
 import time
 import unittest
 from pathlib import Path
@@ -193,110 +196,186 @@ class RegexSafetyTests(unittest.TestCase):
                 )
 
 
-class MechanicalOutcomeTests(unittest.TestCase):
+class TemporaryTestCase(unittest.TestCase):
+    def setUp(self):
+        self.tempdir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tempdir.cleanup)
+        self.tmp_path = Path(self.tempdir.name)
+
+
+class ReferenceTestCase(unittest.TestCase):
+    def assistant_event(self, *content):
+        return {"message": {"role": "assistant", "content": list(content)}}
+
+    def text_block(self, text):
+        return {"type": "text", "text": text}
+
+    def tool_call_block(self, arguments):
+        return {"type": "toolCall", "arguments": arguments}
+
     def referenced(self, source, events):
         return BUILDER.has_later_exact_reference(source, 10, iter(events))
 
-    def test_20_character_later_verbatim_span_is_relevant(self):
-        source = "prefix silver lanterns glow suffix"
-        earlier = {
-            "message": {
-                "role": "assistant",
-                "content": [{"type": "text", "text": "silver lanterns glow"}],
-            }
-        }
-        later = {
-            "message": {
-                "role": "assistant",
-                "content": [{"type": "text", "text": "silver lanterns glow"}],
-            }
-        }
 
-        self.assertTrue(self.referenced(source, [(9, earlier), (11, later)]))
+class VerbatimReferenceTests(ReferenceTestCase):
+    def test_minimum_span_length(self):
+        source = "files already formatted"
+        cases = (("files already forma", False), ("files already format", True))
 
-    def test_19_character_span_is_not_relevant(self):
-        source = "silver lanterns glo"
-        later = {
-            "message": {
-                "role": "assistant",
-                "content": [{"type": "text", "text": "silver lanterns glo"}],
-            }
-        }
-
-        self.assertFalse(self.referenced(source, [(11, later)]))
-
-    def test_later_tool_argument_with_exact_path_is_relevant(self):
-        source = "The generated artifact is /workspace/src/engine/route_index.py."
-        later = {
-            "message": {
-                "role": "assistant",
-                "content": [
-                    {
-                        "type": "toolCall",
-                        "arguments": {"path": "/workspace/src/engine/route_index.py"},
-                    }
-                ],
-            }
-        }
-
-        self.assertTrue(self.referenced(source, [(11, later)]))
-
-    def test_later_tool_argument_with_exact_identifier_is_relevant(self):
-        source = "The report names cache_index_42 as the retry sentinel."
-        later = {
-            "message": {
-                "role": "assistant",
-                "content": [
-                    {
-                        "type": "toolCall",
-                        "arguments": {"symbol": "cache_index_42"},
-                    }
-                ],
-            }
-        }
-
-        self.assertTrue(self.referenced(source, [(11, later)]))
-
-    def test_unrelated_assistant_text_is_not_relevant(self):
-        source = "prefix silver lanterns glow suffix"
-        later = {
-            "message": {
-                "role": "assistant",
-                "content": [
-                    {"type": "text", "text": "The unrelated status check completed."},
-                    {"type": "thinking", "text": "silver lanterns glow"},
-                ],
-            }
-        }
-
-        self.assertFalse(self.referenced(source, [(11, later)]))
+        for span, expected in cases:
+            with self.subTest(span=span):
+                later = self.assistant_event(self.text_block(span))
+                self.assertIs(self.referenced(source, [(11, later)]), expected)
 
 
-class TaskMetadataTests(unittest.TestCase):
-    def test_tool_result_metadata_keeps_source_and_exclusion_counts(self):
-        summary = {
-            "source_files": 7,
-            "source_hashed_files": 6,
-            "source_manifest_sha256": "a" * 64,
-            "censor_as_of_utc": "2026-10-03T02:05:37Z",
-            "dropped_over_32k": 2,
-            "duplicate_state": 3,
-            "conflicting_state": 4,
-            "skipped_few_probe_words": 5,
-        }
-
-        metadata = BUILDER.build_task_metadata(
-            "tool-result", summary, "units-sha", "candidate-sha"
+class TokenReferenceTests(ReferenceTestCase):
+    def test_later_tool_arguments_reuse_exact_path_and_identifier(self):
+        cases = (
+            (
+                "The generated artifact is scripts/jev-bank-build.py.",
+                {"path": "scripts/jev-bank-build.py"},
+            ),
+            (
+                "The report names build_task_metadata as the serialization helper.",
+                {"symbol": "build_task_metadata"},
+            ),
         )
 
-        self.assertEqual(metadata["source_files"], 7)
-        self.assertEqual(metadata["source_hashed_files"], 6)
-        self.assertEqual(metadata["source_manifest_sha256"], "a" * 64)
-        self.assertEqual(metadata["censor_as_of_utc"], "2026-10-03T02:05:37Z")
-        self.assertEqual(metadata["dropped_over_32k"], 2)
-        self.assertEqual(metadata["duplicate_state"], 3)
-        self.assertEqual(metadata["conflicting_state"], 4)
-        self.assertEqual(metadata["skipped_few_probe_words"], 5)
+        for source, arguments in cases:
+            with self.subTest(arguments=arguments):
+                later = self.assistant_event(self.tool_call_block(arguments))
+                self.assertTrue(self.referenced(source, [(11, later)]))
+
+
+class ScopeReferenceTests(ReferenceTestCase):
+    def test_thinking_content_is_not_relevant(self):
+        source = "files already formatted"
+        later = self.assistant_event(
+            self.text_block("The unrelated status check completed."),
+            {"type": "thinking", "text": "files already formatted"},
+        )
+
+        self.assertFalse(self.referenced(source, [(11, later)]))
+
+
+class FullBankClassifierTests(TemporaryTestCase):
+    def test_full_bank_classifier_ignores_user_and_tool_result_reuse(self):
+        source = "session-specific-outcome-marker-" + "z" * 40
+        events = [
+            {"message": {"role": "toolResult", "content": source}},
+            {"message": {"role": "toolResult", "content": source}},
+            {"message": {"role": "user", "content": source}},
+        ]
+        path = self.tmp_path / "session.jsonl"
+        path.write_text("".join(json.dumps(row) + "\n" for row in events))
+        row = {
+            "_line": 0,
+            "_source_text": source,
+            "censored": False,
+            "unit_id": "unit",
+        }
+
+        BUILDER.classify_later_references(path, [row], collections.Counter())
+
+        self.assertEqual(row["label"], "not-relevant")
+        self.assertNotIn("_source_text", row)
+        self.assertNotIn("_line", row)
+
+    def test_full_bank_classifier_accepts_assistant_text_reference(self):
+        source = "session-specific-outcome-marker-" + "y" * 40
+        events = [
+            {"message": {"role": "toolResult", "content": source}},
+            {"message": {"role": "assistant", "content": source}},
+        ]
+        path = self.tmp_path / "session.jsonl"
+        path.write_text("".join(json.dumps(row) + "\n" for row in events))
+        row = {
+            "_line": 0,
+            "_source_text": source,
+            "censored": False,
+            "unit_id": "unit",
+        }
+
+        BUILDER.classify_later_references(path, [row], collections.Counter())
+
+        self.assertEqual(row["label"], "relevant")
+        self.assertNotIn("_source_text", row)
+        self.assertNotIn("_line", row)
+
+
+class DMechanicalAuditTests(unittest.TestCase):
+    def test_d_mechanical_audit_matches_frozen_labels_and_rejects_drift(self):
+        root = BUILDER.ROOT / "work" / "jev-bank"
+        manifest = json.loads((root / "blind-sample-manifest.json").read_text())
+        ids = manifest["tasks"]["D"]["ids"]
+        labels = json.loads(
+            (root / "vvkr-D-mechanical-labels-wildcarp.json").read_text()
+        )
+        rows = [{"unit_id": item, "label": labels[item]} for item in ids]
+
+        audit = BUILDER.d_mechanical_label_audit(rows, root)
+
+        self.assertEqual(audit["n"], 50)
+        self.assertEqual(audit["matched"], 50)
+        self.assertEqual(audit["counts"], {"not-relevant": 4, "relevant": 46})
+        self.assertEqual(audit["status"], "MATCHED_TO_BUILDER")
+        rows[0]["label"] = (
+            "not-relevant" if rows[0]["label"] == "relevant" else "relevant"
+        )
+        with self.assertRaisesRegex(ValueError, "disagree with builder outcomes"):
+            BUILDER.d_mechanical_label_audit(rows, root)
+
+
+class TeacherBlindLabelTests(unittest.TestCase):
+    def test_g_blind_double_label_matches_frozen_sample(self):
+        root = BUILDER.ROOT / "work" / "jev-bank"
+        manifest = json.loads((root / "blind-sample-manifest.json").read_text())
+        ids = manifest["tasks"]["G"]["ids"]
+        rows = [{"unit_id": item} for item in ids]
+
+        summary = BUILDER.g_blind_double_label(rows, root)
+
+        self.assertEqual(summary["n"], 50)
+        self.assertEqual(summary["agree"], 35)
+        self.assertAlmostEqual(summary["agreement"], 0.7)
+        self.assertAlmostEqual(summary["cohen_kappa"], 0.3218806509945748)
+        self.assertEqual(summary["status"], "COMPLETE")
+        self.assertEqual(summary["labelers"], ["WildCarp", "HazySpring"])
+        self.assertEqual(len(summary["sample_manifest_sha256"]), 64)
+        self.assertEqual(len(summary["label_files_sha256"]), 2)
+
+    def test_g_blind_double_label_rejects_missing_candidate_id(self):
+        root = BUILDER.ROOT / "work" / "jev-bank"
+        manifest = json.loads((root / "blind-sample-manifest.json").read_text())
+        rows = [{"unit_id": item} for item in manifest["tasks"]["G"]["ids"][:-1]]
+
+        with self.assertRaisesRegex(ValueError, "not in candidate rows"):
+            BUILDER.g_blind_double_label(rows, root)
+
+
+class SourceManifestTests(unittest.TestCase):
+    def test_source_manifest_digest_is_order_independent(self):
+        sources = [("b", "2"), ("a", "1")]
+
+        digest = BUILDER.source_manifest_digest(sources)
+
+        expected = hashlib.sha256(b"a\x001\nb\x002\n").hexdigest()
+        self.assertEqual(digest, expected)
+        self.assertEqual(
+            BUILDER.source_manifest_digest(list(reversed(sources))), expected
+        )
+
+    def test_read_rows_hashes_exact_source_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "source.jsonl"
+            raw = b'{"row":1}\n{"row":2}\n'
+            path.write_bytes(raw)
+            digest = hashlib.sha256()
+
+            rows = BUILDER.read_rows(path, digest)
+
+        self.assertEqual(rows, [{"row": 1}, {"row": 2}])
+        self.assertEqual(digest.hexdigest(), hashlib.sha256(raw).hexdigest())
 
 
 if __name__ == "__main__":

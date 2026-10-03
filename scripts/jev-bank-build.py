@@ -134,6 +134,16 @@ def sha(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8", "replace")).hexdigest()
 
 
+def source_manifest_digest(source_hashes: Iterable[tuple[str, str]]) -> str:
+    manifest = hashlib.sha256()
+    for source_id, file_sha in sorted(source_hashes):
+        manifest.update(source_id.encode("ascii"))
+        manifest.update(b"\0")
+        manifest.update(file_sha.encode("ascii"))
+        manifest.update(b"\n")
+    return manifest.hexdigest()
+
+
 def text_of(message: dict[str, Any]) -> str:
     content = message.get("content")
     if isinstance(content, str):
@@ -212,52 +222,6 @@ def iter_jsonl(
                 continue
             if isinstance(row, dict):
                 yield index, row
-
-
-class Aho:
-    """Small per-session multi-pattern matcher for all later-reference probes."""
-
-    def __init__(self, patterns: dict[str, set[int]]):
-        self.next: list[dict[str, int]] = [{}]
-        self.fail = [0]
-        self.out: list[set[int]] = [set()]
-        for pattern, ids in patterns.items():
-            state = 0
-            for char in pattern:
-                next_state = self.next[state].get(char)
-                if next_state is None:
-                    next_state = self._new_state()
-                    self.next[state][char] = next_state
-                state = next_state
-            self.out[state].update(ids)
-        queue = collections.deque()
-        for state in self.next[0].values():
-            queue.append(state)
-        while queue:
-            state = queue.popleft()
-            for char, child in self.next[state].items():
-                queue.append(child)
-                fallback = self.fail[state]
-                while fallback and char not in self.next[fallback]:
-                    fallback = self.fail[fallback]
-                self.fail[child] = self.next[fallback].get(char, 0)
-                self.out[child].update(self.out[self.fail[child]])
-
-    def _new_state(self) -> int:
-        self.next.append({})
-        self.fail.append(0)
-        self.out.append(set())
-        return len(self.next) - 1
-
-    def scan(self, text: str, state: int = 0) -> tuple[int, set[int]]:
-        hits: set[int] = set()
-        for char in text:
-            while state and char not in self.next[state]:
-                state = self.fail[state]
-            state = self.next[state].get(char, 0)
-            if self.out[state]:
-                hits.update(self.out[state])
-        return state, hits
 
 
 def reference_tokens(text: str) -> set[str]:
@@ -351,22 +315,12 @@ def longres_candidates(
         if len(raw) < LONG_RESULT_CHARS:
             continue
         counters["long_results"] += 1
-        long_words = [word for word in raw.split() if len(word) >= 40]
-        if len(long_words) < 6:
-            counters["too_few_probe_words"] += 1
-            continue
         stamp = parse_ts(row.get("timestamp"))
         if stamp is None:
             counters["missing_timestamp"] += 1
             continue
         if stamp < cutoff:
             continue
-        positions = (
-            len(long_words) // 3,
-            2 * len(long_words) // 3,
-            len(long_words) - 2,
-        )
-        probes = tuple(dict.fromkeys(long_words[pos][:60] for pos in positions))
         state_full = {
             "tool": scrub(str(message.get("toolName", ""))),
             "task": scrub(last_user),
@@ -401,51 +355,87 @@ def longres_candidates(
                 "tokens_full": tokens,
                 "tokens_local": local_tokens,
                 "label": None,
-                "label_source": "observed-outcome:later-probe-reference",
+                "label_source": "observed-outcome:later-exact-reference-v1",
                 "censored": path.stat().st_mtime
                 >= now.timestamp() - CENSOR_RECENT_HOURS * 3600,
                 "baseline": {"tool": state_full["tool"], "result_chars": len(raw)},
-                "_probes": probes,
+                "_source_text": raw,
                 "_line": index,
             }
         )
     return candidates
 
 
-def classify_later_references(
-    path: Path, rows: list[dict[str, Any]], counters: collections.Counter[str]
-) -> None:
-    pattern_rows: dict[str, set[int]] = collections.defaultdict(set)
+def _index_later_reference_candidates(
+    rows: list[dict[str, Any]], counters: collections.Counter[str]
+) -> tuple[int, dict[str, list[int]], dict[int, list[int]]]:
+    token_index: dict[str, list[int]] = collections.defaultdict(list)
+    span_index: dict[int, list[int]] = collections.defaultdict(list)
+    eligible_count = 0
     for candidate_id, row in enumerate(rows):
-        for pattern in row.pop("_probes"):
-            if pattern:
-                pattern_rows[pattern].add(candidate_id)
-    if not pattern_rows:
-        return
-    matcher = Aho(pattern_rows)
-    matched: set[int] = set()
-    for index, row in iter_jsonl(path):
-        if not rows:
-            break
-        message = row.get("message")
-        if not isinstance(message, dict):
-            continue
-        text = text_of(message)
-        if not text:
-            continue
-        _, hits = matcher.scan(text)
-        for candidate_id in hits:
-            if rows[candidate_id]["_line"] < index:
-                matched.add(candidate_id)
-    for candidate_id, row in enumerate(rows):
-        row["label"] = "relevant" if candidate_id in matched else "not-relevant"
         if row["censored"]:
             row["label"] = None
             counters["censored"] += 1
-        else:
+            continue
+        eligible_count += 1
+        source = row["_source_text"]
+        for token in reference_tokens(source):
+            token_index[token].append(candidate_id)
+        spans = {
+            hash(source[offset : offset + MIN_VERBATIM_REFERENCE_CHARS])
+            for offset in range(len(source) - MIN_VERBATIM_REFERENCE_CHARS + 1)
+        }
+        for span_hash in spans:
+            span_index[span_hash].append(candidate_id)
+    return eligible_count, token_index, span_index
+
+
+def _mark_later_references(
+    text: str,
+    line_no: int,
+    rows: list[dict[str, Any]],
+    token_index: dict[str, list[int]],
+    span_index: dict[int, list[int]],
+    matched: set[int],
+) -> None:
+    for token in reference_tokens(text):
+        for candidate_id in token_index.get(token, ()):
+            if rows[candidate_id]["_line"] < line_no:
+                matched.add(candidate_id)
+    for offset in range(len(text) - MIN_VERBATIM_REFERENCE_CHARS + 1):
+        span = text[offset : offset + MIN_VERBATIM_REFERENCE_CHARS]
+        for candidate_id in span_index.get(hash(span), ()):
+            if (
+                rows[candidate_id]["_line"] < line_no
+                and span in rows[candidate_id]["_source_text"]
+            ):
+                matched.add(candidate_id)
+
+
+def classify_later_references(
+    path: Path, rows: list[dict[str, Any]], counters: collections.Counter[str]
+) -> None:
+    eligible_count, token_index, span_index = _index_later_reference_candidates(
+        rows, counters
+    )
+    matched: set[int] = set()
+    for line_no, event in iter_jsonl(path):
+        message = event.get("message")
+        if not isinstance(message, dict) or message.get("role") != "assistant":
+            continue
+        for text in assistant_reference_texts(message):
+            _mark_later_references(
+                text, line_no, rows, token_index, span_index, matched
+            )
+        if len(matched) == eligible_count:
+            break
+
+    for candidate_id, row in enumerate(rows):
+        if not row["censored"]:
+            row["label"] = "relevant" if candidate_id in matched else "not-relevant"
             counters["labeled"] += 1
-    for row in rows:
         row.pop("_line", None)
+        row.pop("_source_text", None)
         row["hash"] = row["unit_id"]
 
 
@@ -545,7 +535,7 @@ def d_candidate(
     )
     return {
         "name": "tool-result-later-reference",
-        "label_source": "observed-outcome",
+        "label_source": "observed-outcome:later-exact-reference-v1",
         "censoring_rate": sum(r["censored"] for r in rows) / max(1, len(rows)),
         "recomputable": True,
         "class": "savings",
@@ -619,16 +609,18 @@ def run_d(
                     f"skip unreadable session #{number}: {type(exc).__name__}",
                     file=sys.stderr,
                 )
-    source_manifest = hashlib.sha256()
-    for group, file_sha in sorted(source_hashes):
-        source_manifest.update(group.encode("ascii"))
-        source_manifest.update(b"\0")
-        source_manifest.update(file_sha.encode("ascii"))
-        source_manifest.update(b"\n")
+    source_manifest = source_manifest_digest(source_hashes)
     all_rows = deduplicate_units(all_rows, counters)
     split_map, split_cutoff = temporal_splits(all_rows)
     for row in all_rows:
         row["split"] = split_map.get(row["group_key"], "temporal-boundary")
+    mechanical_label_audit = (
+        d_mechanical_label_audit(all_rows)
+        if cutoff is None
+        else not_run_mechanical_label_audit(
+            "filtered run excludes the full audit sample"
+        )
+    )
     units_path = PRIVATE_OUT / "tool-result" / "units.jsonl"
     digest = _emit_jsonl(units_path, all_rows, dry_run)
     candidate = d_candidate(all_rows, split_cutoff)
@@ -650,7 +642,7 @@ def run_d(
         "dry_run": dry_run,
         "source_files": len(files),
         "source_hashed_files": len(source_hashes),
-        "source_manifest_sha256": source_manifest.hexdigest(),
+        "source_manifest_sha256": source_manifest,
         "censor_as_of_utc": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "units": len(all_rows),
         "labeled": len(labeled),
@@ -674,9 +666,10 @@ def run_d(
         "base_rate_relevant": sum(r["label"] == "relevant" for r in labeled)
         / max(1, len(labeled)),
         "dropped_over_32k": counters["over_32k_dropped"],
-        "skipped_few_probe_words": counters["too_few_probe_words"],
+        "candidate_min_result_chars": LONG_RESULT_CHARS,
         "duplicate_state": counters["duplicate_state"],
         "conflicting_state": counters["conflicting_state"],
+        "mechanical_label_audit": mechanical_label_audit,
         "unit_sha256": digest,
         "candidate_sha256": candidate_sha,
     }
@@ -799,10 +792,21 @@ def deduplicate_units(
     return list(kept.values())
 
 
-def read_rows(path: Path) -> list[dict[str, Any]]:
+def read_rows(path: Path, source_digest: Any | None = None) -> list[dict[str, Any]]:
     if not path.exists():
+        if source_digest is not None:
+            source_digest.update(b"<missing>")
         return []
-    return [row for _, row in iter_jsonl(path)]
+    return [row for _, row in iter_jsonl(path, source_digest)]
+
+
+def read_source_rows(
+    path: Path, source_hashes: list[tuple[str, str]]
+) -> list[dict[str, Any]]:
+    digest = hashlib.sha256()
+    rows = read_rows(path, digest)
+    source_hashes.append((sha(str(path)), digest.hexdigest()))
+    return rows
 
 
 def model_is_1130(row: dict[str, Any]) -> bool:
@@ -825,15 +829,17 @@ def best_join(
 
 
 def build_gate_units(
-    min_bpt: float, counters: collections.Counter[str]
+    min_bpt: float,
+    counters: collections.Counter[str],
+    source_hashes: list[tuple[str, str]],
 ) -> list[dict[str, Any]]:
     base = HOME / ".local" / "state" / "jev"
-    full_rows = read_rows(base / "gate-observe-full.jsonl")
+    full_rows = read_source_rows(base / "gate-observe-full.jsonl", source_hashes)
     by_key: dict[tuple[str, str], list[dict[str, Any]]] = collections.defaultdict(list)
     for row in full_rows:
         by_key[(str(row.get("session", "")), str(row.get("cmdSha", "")))].append(row)
     units = []
-    for row in read_rows(base / "gate-observe.jsonl"):
+    for row in read_source_rows(base / "gate-observe.jsonl", source_hashes):
         if row.get("status") != "scored" or row.get("jevSkipped") is True:
             counters["gate_not_paid_scored"] += 1
             continue
@@ -869,23 +875,28 @@ def build_gate_units(
     return units
 
 
+def memory_join_key(row: dict[str, Any]) -> tuple[str, str, str]:
+    return (
+        str(row.get("instance", "")),
+        str(row.get("promptHash", "")),
+        str(row.get("memoryHash", "")),
+    )
+
+
 def build_memory_units(
-    min_bpt: float, counters: collections.Counter[str]
+    min_bpt: float,
+    counters: collections.Counter[str],
+    source_hashes: list[tuple[str, str]],
 ) -> list[dict[str, Any]]:
     base = HOME / ".local" / "state" / "jev"
-    full_rows = read_rows(base / "memory-filter-full.jsonl")
+    full_rows = read_source_rows(base / "memory-filter-full.jsonl", source_hashes)
     by_key: dict[tuple[str, str, str], list[dict[str, Any]]] = collections.defaultdict(
         list
     )
     for row in full_rows:
-        key = (
-            str(row.get("instance", "")),
-            str(row.get("promptHash", "")),
-            str(row.get("memoryHash", "")),
-        )
-        by_key[key].append(row)
+        key = memory_join_key(row)
     units = []
-    for row in read_rows(base / "memory-filter.jsonl"):
+    for row in read_source_rows(base / "memory-filter.jsonl", source_hashes):
         if row.get("status") != "scored" or not model_is_1130(row):
             counters["memory_not_paid_scored"] += 1
             continue
@@ -893,11 +904,7 @@ def build_memory_units(
         if decision not in {"drop", "keep"}:
             counters["memory_invalid_label"] += 1
             continue
-        key = (
-            str(row.get("instance", "")),
-            str(row.get("promptHash", "")),
-            str(row.get("memoryHash", "")),
-        )
+        key = memory_join_key(row)
         side = best_join(by_key.get(key, []), parse_ts(row.get("ts")))
         if (
             not side
@@ -932,12 +939,14 @@ def build_memory_units(
 
 
 def build_injection_units(
-    min_bpt: float, counters: collections.Counter[str]
+    min_bpt: float,
+    counters: collections.Counter[str],
+    source_hashes: list[tuple[str, str]],
 ) -> list[dict[str, Any]]:
     base = HOME / ".local" / "state" / "jev"
     scored = [
         row
-        for row in read_rows(base / "injection-shadow.jsonl")
+        for row in read_source_rows(base / "injection-shadow.jsonl", source_hashes)
         if row.get("status") == "scored"
         and model_is_1130(row)
         and isinstance(row.get("flag"), bool)
@@ -950,7 +959,8 @@ def build_injection_units(
     if targets:
         for path in session_files():
             session_group = sha(str(path))
-            for line_no, event in iter_jsonl(path):
+            file_digest = hashlib.sha256()
+            for line_no, event in iter_jsonl(path, file_digest):
                 message = event.get("message")
                 if not isinstance(message, dict) or message.get("role") != "toolResult":
                     continue
@@ -972,6 +982,7 @@ def build_injection_units(
                             line_no,
                             raw,
                         )
+            source_hashes.append((session_group, file_digest.hexdigest()))
         counters["injection_sources_joined"] = len(sources)
         counters["injection_sources_missing"] = len(scored) - len(sources)
     units = []
@@ -1056,6 +1067,118 @@ def teacher_candidate(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def g_blind_double_label(
+    rows: list[dict[str, Any]], evidence_root: Path = PUBLIC_OUT
+) -> dict[str, Any]:
+    manifest_path = evidence_root / "blind-sample-manifest.json"
+    rubric_path = evidence_root / "blind-rubrics.json"
+    label_paths = {
+        "WildCarp": evidence_root / "vvkr-labels-wildcarp.json",
+        "HazySpring": evidence_root / "vvkr-labels-hazyspring.json",
+    }
+    manifest_bytes = manifest_path.read_bytes()
+    manifest = json.loads(manifest_bytes)
+    sample = manifest["tasks"]["G"]
+    ids = sample["ids"]
+    if len(ids) != 50 or len(set(ids)) != 50:
+        raise ValueError("G blind sample must contain 50 unique IDs")
+    candidate_ids = {row.get("unit_id") for row in rows}
+    if not set(ids).issubset(candidate_ids):
+        raise ValueError("G blind sample contains IDs not in candidate rows")
+
+    labels: dict[str, dict[str, str]] = {}
+    packets: set[str] = set()
+    label_hashes: dict[str, str] = {}
+    for labeler, path in label_paths.items():
+        raw = path.read_bytes()
+        record = json.loads(raw)
+        entries = record["G"]
+        if (
+            record.get("labeler") != labeler
+            or record.get("rubric_only") is not True
+            or len(entries) != len(ids)
+        ):
+            raise ValueError(f"invalid G blind labels from {labeler}")
+        pairs = dict(entries)
+        if len(pairs) != len(entries) or set(pairs) != set(ids):
+            raise ValueError(f"G blind label IDs do not match sample for {labeler}")
+        if not set(pairs.values()).issubset({"act", "pass"}):
+            raise ValueError(f"invalid G blind label value from {labeler}")
+        labels[labeler] = pairs
+        packets.add(record["packet"])
+        label_hashes[path.name] = hashlib.sha256(raw).hexdigest()
+    if len(packets) != 1:
+        raise ValueError("G blind label packet IDs disagree")
+
+    left, right = labels.values()
+    agree = sum(left[item] == right[item] for item in ids)
+    observed = agree / len(ids)
+    left_counts = collections.Counter(left.values())
+    right_counts = collections.Counter(right.values())
+    expected = sum(
+        left_counts[value] * right_counts[value] for value in ("act", "pass")
+    ) / (len(ids) ** 2)
+    kappa = (observed - expected) / (1 - expected) if expected < 1 else None
+    rubric_bytes = rubric_path.read_bytes()
+    return {
+        "n": len(ids),
+        "agree": agree,
+        "agreement": observed,
+        "cohen_kappa": kappa,
+        "status": "COMPLETE",
+        "labelers": list(labels),
+        "packet": next(iter(packets)),
+        "seed": sample["seed"],
+        "rubric_sha256": sample["rubric_sha256"],
+        "sample_manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+        "rubric_file_sha256": hashlib.sha256(rubric_bytes).hexdigest(),
+        "label_files_sha256": label_hashes,
+    }
+
+
+def not_run_blind_double_label(reason: str) -> dict[str, Any]:
+    return {"n": 0, "agree": 0, "status": "NOT_RUN", "reason": reason}
+
+
+def d_mechanical_label_audit(
+    rows: list[dict[str, Any]], evidence_root: Path = PUBLIC_OUT
+) -> dict[str, Any]:
+    manifest_path = evidence_root / "blind-sample-manifest.json"
+    labels_path = evidence_root / "vvkr-D-mechanical-labels-wildcarp.json"
+    manifest_bytes = manifest_path.read_bytes()
+    manifest = json.loads(manifest_bytes)
+    ids = manifest["tasks"]["D"]["ids"]
+    if len(ids) != 50 or len(set(ids)) != 50:
+        raise ValueError("D mechanical audit sample must contain 50 unique IDs")
+    labels_bytes = labels_path.read_bytes()
+    labels = json.loads(labels_bytes)
+    if set(labels) != set(ids) or len(labels) != len(ids):
+        raise ValueError("D mechanical labels do not match the frozen sample")
+    candidate_labels = {
+        row["unit_id"]: row["label"]
+        for row in rows
+        if isinstance(row.get("unit_id"), str)
+    }
+    if not set(ids).issubset(candidate_labels):
+        raise ValueError("D mechanical audit contains IDs not in candidate rows")
+    if any(candidate_labels[item] != labels[item] for item in ids):
+        raise ValueError("D mechanical labels disagree with builder outcomes")
+    return {
+        "n": len(ids),
+        "matched": len(ids),
+        "counts": dict(sorted(collections.Counter(labels.values()).items())),
+        "status": "MATCHED_TO_BUILDER",
+        "sample_seed": manifest["tasks"]["D"]["seed"],
+        "sample_manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+        "label_artifact_sha256": hashlib.sha256(labels_bytes).hexdigest(),
+        "label_definition_sha256": sha(D_LABEL_DEFINITION),
+    }
+
+
+def not_run_mechanical_label_audit(reason: str) -> dict[str, Any]:
+    return {"n": 0, "matched": 0, "status": "NOT_RUN", "reason": reason}
+
+
 def build_task_metadata(
     task: str, summary: dict[str, Any], units_sha: str, candidate_sha: str
 ) -> dict[str, Any]:
@@ -1067,7 +1190,9 @@ def build_task_metadata(
             "class": "savings",
             "primitive": "Choice",
             "options": ["keep", "summarize", "drop"],
-            "label_source": "observed-outcome:later-probe-reference",
+            "label_source": D_LABEL_SOURCE,
+            "label_definition": D_LABEL_DEFINITION,
+            "label_definition_sha256": sha(D_LABEL_DEFINITION),
             "positive_label": "relevant",
             "base_rate": summary.get("base_rate_relevant"),
             "censoring_rate": summary.get("censoring_rate"),
@@ -1082,9 +1207,10 @@ def build_task_metadata(
             "dropped_over_32k": summary.get("dropped_over_32k"),
             "duplicate_state": summary.get("duplicate_state"),
             "conflicting_state": summary.get("conflicting_state"),
-            "skipped_few_probe_words": summary.get("skipped_few_probe_words"),
+            "candidate_min_result_chars": summary.get("candidate_min_result_chars"),
             "time_span_utc": summary.get("time_span"),
             "temporal_cutoff_utc": summary.get("temporal_cutoff"),
+            "mechanical_label_audit": summary.get("mechanical_label_audit"),
             "blind_double_label": {"n": 0, "agree": 0, "status": "NOT_RUN"},
             "unit_path": "var/jev-bank/tool-result/units.jsonl",
             "units_sha256": units_sha,
@@ -1107,16 +1233,14 @@ def build_task_metadata(
         "N_groups_by_split": summary.get("split_groups"),
         "time_span_utc": summary.get("time_span"),
         "temporal_cutoff_utc": summary.get("temporal_cutoff"),
-        "blind_double_label": {
-            "n": 0,
-            "agree": 0,
-            "status": "NOT_RUN",
-            "reason": "teacher decisions are proxy labels, not truth; no independent human outcome labels collected",
-        },
+        "blind_double_label": summary.get("blind_double_label"),
         "unit_path": "var/jev-bank/teacher-student/units.jsonl",
         "units_sha256": units_sha,
         "candidate_path": "var/jev-bank/teacher-student/candidate.json",
         "candidate_sha256": candidate_sha,
+        "source_files": summary.get("source_files"),
+        "source_hashed_files": summary.get("source_hashed_files"),
+        "source_manifest_sha256": summary.get("source_manifest_sha256"),
         "source_counts": summary.get("source_counts"),
         "dropped": summary.get("dropped"),
     }
@@ -1125,10 +1249,11 @@ def build_task_metadata(
 def run_teacher(dry_run: bool, cutoff: dt.datetime | None) -> dict[str, Any]:
     min_bpt = calibration_min_bytes_per_token()
     counters: collections.Counter[str] = collections.Counter()
+    source_hashes: list[tuple[str, str]] = []
     rows = (
-        build_gate_units(min_bpt, counters)
-        + build_injection_units(min_bpt, counters)
-        + build_memory_units(min_bpt, counters)
+        build_gate_units(min_bpt, counters, source_hashes)
+        + build_injection_units(min_bpt, counters, source_hashes)
+        + build_memory_units(min_bpt, counters, source_hashes)
     )
     if cutoff:
         rows = [
@@ -1138,6 +1263,11 @@ def run_teacher(dry_run: bool, cutoff: dt.datetime | None) -> dict[str, Any]:
     split_map, split_cutoff = temporal_splits(rows)
     for row in rows:
         row["split"] = split_map.get(row["group_key"], "temporal-boundary")
+    blind_double_label = (
+        g_blind_double_label(rows)
+        if cutoff is None
+        else not_run_blind_double_label("filtered run excludes the full blind sample")
+    )
     units_sha = _emit_jsonl(
         PRIVATE_OUT / "teacher-student" / "units.jsonl", rows, dry_run
     )
@@ -1178,6 +1308,10 @@ def run_teacher(dry_run: bool, cutoff: dt.datetime | None) -> dict[str, Any]:
         else None,
         "base_rate_action": sum(row["label"] == "pos" for row in selected)
         / max(1, len(selected)),
+        "blind_double_label": blind_double_label,
+        "source_files": len(source_hashes),
+        "source_hashed_files": len(source_hashes),
+        "source_manifest_sha256": source_manifest_digest(source_hashes),
         "unit_sha256": units_sha,
         "candidate_sha256": candidate_sha,
         "source_counts": {
