@@ -92,3 +92,24 @@ test('refused asker and cap both log fail-open rows and never throw', async () =
 test('cut 0.35 is the frozen 30hi operating point', () => {
   assert.equal(VENDOR_CUT, 0.35);
 });
+
+test('jev-517o: local verdict is logged beside Jev, Platt-mapped; a down server logs NOT_RUN and Jev row still lands', async () => {
+  const { askLocal, plattMap } = await import('./vendor-shadow.mjs');
+  const diff = diffOf('work/pasted-lib/index.js', MIT_BLOCK.split('\n'));
+  const ok = async () => ({ ok: true, json: async () => ({ answers: { vendored: { noul: 0.2 } } }) });
+  const rows = [];
+  await scoreCommit({ commit: 'l1', diff, ask: noulAnswer(0.91), log: async (r) => rows.push(r), count: async () => 0, local: (code) => askLocal(code, 'http://x', ok) });
+  const s = rows.find((r) => r.status === 'scored');
+  assert.equal(s.noul, 0.91);
+  assert.equal(s.local_status, 'scored');
+  assert.equal(s.local_raw, 0.2);
+  assert.ok(Math.abs(s.local_noul - plattMap(0.2)) < 1e-12);
+  assert.ok(s.local_noul > 0.2, 'Platt b>0 lifts low raw scores (fitted on vendor dev)');
+  const down = async () => { throw Object.assign(new Error('refused'), { name: 'TypeError' }); };
+  const rows2 = [];
+  const r = await scoreCommit({ commit: 'l2', diff, ask: noulAnswer(0.91), log: async (x) => rows2.push(x), count: async () => 0, local: (code) => askLocal(code, 'http://x', down) });
+  assert.equal(r.scored, 1);
+  const s2 = rows2.find((x) => x.status === 'scored');
+  assert.equal(s2.noul, 0.91);
+  assert.equal(s2.local_status, 'NOT_RUN');
+});

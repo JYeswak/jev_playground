@@ -102,7 +102,38 @@ export async function todayCount(logFile = LOG_FILE) {
   }
 }
 
-export async function scoreCommit({ commit, diff, ask, log, count }) {
+// jev-517o: a second, local verdict (Clef-flash + Platt map fitted on vendor dev, jev-576e) logged
+// beside Jev's. Log only; NOT_RUN when the local server is absent; never blocks the commit.
+export const LOCAL_URL = process.env.JEV_VENDOR_LOCAL_URL ?? "http://127.0.0.1:8010/v1/systemone";
+export const LOCAL_PLATT = { a: 1.239, b: 2.926 };
+export const LOCAL_TIMEOUT_MS = 10000;
+
+export function plattMap(p, { a, b } = LOCAL_PLATT) {
+  const q = Math.min(Math.max(p, 1e-4), 1 - 1e-4);
+  return 1 / (1 + Math.exp(-(a * Math.log(q / (1 - q)) + b)));
+}
+
+export async function askLocal(code, url = LOCAL_URL, fetchImpl = fetch) {
+  const started = Date.now();
+  try {
+    const res = await fetchImpl(url, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ model: "clef-flash", state: { code }, questions: { vendored: { type: "noul", instructions: VENDOR_QUESTION } } }),
+      signal: AbortSignal.timeout(LOCAL_TIMEOUT_MS),
+    });
+    if (!res.ok) return { local_status: "NOT_RUN", local_reason: `http-${res.status}` };
+    const raw = (await res.json())?.answers?.vendored;
+    const n = typeof raw === "number" ? raw : raw?.noul;
+    if (typeof n !== "number" || !Number.isFinite(n)) return { local_status: "NOT_RUN", local_reason: "invalid-noul" };
+    const p = plattMap(n);
+    return { local_status: "scored", local_raw: n, local_noul: p, local_would_flag: p >= 0.5, local_ms: Date.now() - started };
+  } catch (err) {
+    return { local_status: "NOT_RUN", local_reason: String(err?.name ?? err).slice(0, 40) };
+  }
+}
+
+export async function scoreCommit({ commit, diff, ask, log, count, local = askLocal }) {
   const day = new Date().toISOString().slice(0, 10);
   const { scored: blocks, skipped } = addedBlocks(diff);
   for (const s of skipped) {
@@ -133,7 +164,8 @@ export async function scoreCommit({ commit, diff, ask, log, count }) {
         await log({ ...base, status: "fail_open", reason: "invalid-noul", latencyMs: Date.now() - started });
         continue;
       }
-      await log({ ...base, status: "scored", noul: n, would_flag: decideVendor(n), latencyMs: Date.now() - started, ...(res.usage ? { usage: res.usage } : {}) });
+      const second = await local(b.added.slice(0, 4000));
+      await log({ ...base, status: "scored", noul: n, would_flag: decideVendor(n), latencyMs: Date.now() - started, ...(res.usage ? { usage: res.usage } : {}), ...second });
       scored += 1;
     } catch (err) {
       await log({ ...base, status: "fail_open", reason: `throw:${String(err).slice(0, 60)}`, latencyMs: Date.now() - started });
