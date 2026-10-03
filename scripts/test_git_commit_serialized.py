@@ -168,6 +168,33 @@ class TestSerializedCommit(unittest.TestCase):
         )
         self.assertEqual(sh(self.repo, "git", "status", "--porcelain").stdout, "")
 
+    def test_daemon_starts_with_a_deep_unix_socket_path(self):
+        scratch = Path(
+            tempfile.mkdtemp(prefix=f"git-writer-deep.{os.getpid()}.", dir=SCRATCH)
+        )
+        (scratch / ".owner").write_text(
+            f"pid={os.getpid()}\n"
+            "label=git-commit-deep-socket-test\n"
+            f"repo={ROOT}\n"
+            f"created={datetime.now(timezone.utc).isoformat()}\n",
+            encoding="utf-8",
+        )
+        suffix = "/repo/.git/j.sock"
+        padding = 103 - len(os.fsencode(str(scratch))) - 1 - len(os.fsencode(suffix))
+        self.assertGreater(padding, 0)
+        repo = scratch / ("x" * padding) / "repo"
+        repo.mkdir(parents=True)
+        self.assertEqual(len(os.fsencode(str(repo / ".git" / "j.sock"))), 103)
+        sh(repo, "git", "init", "-q", ".")
+        self.addCleanup(sh, repo, "python3", str(DAEMON), "stop", "--repo", str(repo))
+        (repo / "a.txt").write_text("a\n", encoding="utf-8")
+
+        result = sh(repo, "git-dispatch", "add", "--", "a.txt")
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        staged = sh(repo, "git", "diff", "--cached", "--name-only").stdout.splitlines()
+        self.assertEqual(staged, ["a.txt"])
+
     def test_add_request_stages_only_requested_path(self):
         (self.repo / "a.txt").write_text("a\n", encoding="utf-8")
         (self.repo / "b.txt").write_text("b\n", encoding="utf-8")

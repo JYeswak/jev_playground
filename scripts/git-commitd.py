@@ -19,6 +19,8 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import cast
 
+# The narrowest supported `sun_path` is 104 bytes, including its NUL terminator.
+MAX_UNIX_SOCKET_PATH_BYTES = 103
 MAX_REQUEST_BYTES = 65536
 MAX_PATHS = 50
 REAL_GIT = "/usr/bin/git"
@@ -54,7 +56,15 @@ def state_paths(repo: Path) -> tuple[Path, Path]:
             git_dir_result.stderr.strip() or "cannot resolve git directory"
         )
     git_dir = Path(git_dir_result.stdout.strip()).resolve()
-    return git_dir / "jev-commitd.sock", git_dir / "jev-commitd-receipts.jsonl"
+    # Preserve the old address where it fits; deep roots need a compact socket name.
+    socket_path = git_dir / "jev-commitd.sock"
+    if len(os.fsencode(socket_path)) > MAX_UNIX_SOCKET_PATH_BYTES:
+        socket_path = git_dir / "j.sock"
+    if len(os.fsencode(socket_path)) > MAX_UNIX_SOCKET_PATH_BYTES:
+        raise ValueError(
+            "repository path is too long for the Unix-domain writer socket"
+        )
+    return socket_path, git_dir / "jev-commitd-receipts.jsonl"
 
 
 def validate(request: object, repo: Path) -> str | None:
