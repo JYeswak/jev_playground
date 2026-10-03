@@ -52,16 +52,32 @@ PRIVATE_PROJECTS = re.compile(
     re.IGNORECASE,
 )
 HOME_PATH = re.compile(r"/Users/[^/\s]+")
+_JSON_QUOTE = r'\\?"'
 ANSWER_FIELD = re.compile(
-    r'"(?:noul|choice|probabilities|raw_score|score)"\s*:', re.IGNORECASE
-)
-ANSWER_MARKER = re.compile(r'"(?:noul|raw_score)"\s*:', re.IGNORECASE)
-JEV_MODEL = re.compile(
-    r'"(?:model|model_id|provider|engine)"\s*:\s*"[^"]*(?:jev|typesafe)[^"]*"',
+    _JSON_QUOTE
+    + r"(?:noul|choice|probabilities|raw_score|score)"
+    + _JSON_QUOTE
+    + r"\s*:",
     re.IGNORECASE,
 )
-ANSWER_CONTAINER = re.compile(r'"answers"\s*:\s*\{', re.IGNORECASE)
-ANSWER_PROVIDER = re.compile(r'"(?:jev|typesafe)"\s*:\s*\{', re.IGNORECASE)
+ANSWER_MARKER = re.compile(
+    _JSON_QUOTE + r"(?:noul|raw_score)" + _JSON_QUOTE + r"\s*:", re.IGNORECASE
+)
+JEV_MODEL = re.compile(
+    _JSON_QUOTE
+    + r"(?:model|model_id|provider|engine)"
+    + _JSON_QUOTE
+    + r"\s*:\s*"
+    + _JSON_QUOTE
+    + r'[^"]*(?:jev|typesafe)',
+    re.IGNORECASE,
+)
+ANSWER_CONTAINER = re.compile(
+    _JSON_QUOTE + r"answers" + _JSON_QUOTE + r"\s*:\s*\{", re.IGNORECASE
+)
+ANSWER_PROVIDER = re.compile(
+    _JSON_QUOTE + r"(?:jev|typesafe)" + _JSON_QUOTE + r"\s*:\s*\{", re.IGNORECASE
+)
 
 
 def contains_jev_answer_shape(value: str) -> bool:
@@ -605,7 +621,7 @@ def redact_blind_sheet_value(value: Any) -> Any:
     if isinstance(value, list):
         return [redact_blind_sheet_value(item) for item in value]
     if isinstance(value, dict):
-        return {key: redact_blind_sheet_value(item) for key, item in value.items()}
+        return {str(key): redact_blind_sheet_value(item) for key, item in value.items()}
     return value
 
 

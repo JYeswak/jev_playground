@@ -85,6 +85,28 @@ class SecretScrubTests(unittest.TestCase):
             r'"(?:noul|choice|probabilities|raw_score)"\s*:',
         )
 
+    def test_redacts_escaped_answer_payload_in_truncated_sheet_text(self):
+        escaped = json.dumps(
+            json.dumps(
+                {
+                    "answers": {
+                        "relevance": {
+                            "noul": 0.9,
+                            "confidence": 0.8,
+                            "model": "jev-1.13.0",
+                        }
+                    }
+                }
+            )
+        )[1:-1]
+        truncated = escaped[: escaped.index("confidence")]
+
+        scrubbed = BUILDER.redact_blind_sheet_value(
+            {"state": {"result_head": truncated}}
+        )
+
+        self.assertEqual(scrubbed["state"]["result_head"], "[MODEL_ANSWER_REDACTED]")
+
 
 class TaskMetadataTests(unittest.TestCase):
     def test_tool_result_metadata_keeps_source_and_exclusion_counts(self):
