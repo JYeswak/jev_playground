@@ -1,0 +1,66 @@
+# Ideas from TypeSafe cookbooks, patterns, primitives (docs-mirror/typesafe, upstream/typesafe-ai)
+
+Note: `docs-mirror/typesafe/cookbooks/` holds **18** files, not 19 (`ls | wc -l` = 18). All 18 covered.
+Paths are relative to `docs-mirror/typesafe/` unless they start with `upstream/`, `EVAL.md` or `NEGATIVE_EVIDENCE.md` (NE).
+"Repro?": every cookbook is a notebook with its own claims. I did not re-run any. Their numbers are *their* claims; their receipts are UNVERIFIED by us.
+
+## Cookbook techniques
+
+|repo/doc|idea|primitive + pattern|evidence (their claim; repro?)|plan family/verb or GAP|tested by us?|
+|-|-|-|-|-|-|
+|cookbooks/autoformat.md:7,20-30|Restore Markdown from stripped text: model never generates text, code renders it|Pass 1: one Noul per adjacent line pair ("split sentence?"); Pass 2: one Choice per block (heading/list/code/callout) plus companion questions. Two **dependent** requests|qualitative walkthrough on one memo; no accuracy number in intro; cached notebook|GAP (structure/extract family). Nearest: `score`/`route` per block|No (grep "autoformat\|stitch" in EVAL/NE: 0 hits)|
+|cookbooks/autoresearch_feature_discovery.md:7-30|Let an LLM propose questions; Jev answers them per row; the answers become features for CatBoost; errors feed the next proposal round|29 Score (2 columns each: expected level + uncertainty) + 9 Noul = 67 features; loop proposal→answer→train→error report|their held-out-error curve per round; repro needs LLM + Jev keys|GAP: *question discovery / feature-ization*. Closest plan hook is `calibrate`/`skillgap`, neither generates questions|No (0 hits "autoresearch\|CatBoost")|
+|cookbooks/citation_check.md:7,17-30|Check LLM citations: string-match the quote first (free), then one Choice on the quote's context: supports / contradicts / says nothing|free deterministic pre-filter → one 3-option Choice|claim of catching fabricated + contradicted citations; no number in intro|`verify` (claim+evidence). Adds a 3-way answer (contradicts ≠ unsupported) and a free string-match step|Partly: `verify` SciFact/FEVER (PRODUCT.md:60); simple-jev citation question, keyless, 1.7 s (EVAL.md:290-294)|
+|cookbooks/classification_using_confidence.md:7,19-30|75-way SIC Choice; if confidence < 0.9 report the parent division instead (no 2nd call)|single Choice + **confidence back-off up the hierarchy**|their 60 filings: conf ≥0.9 half 90% right, other half 40%, 70% when backed off to the parent level (:28-29)|`route` with abstain. Back-off to the parent label is a GAP: plan only offers abstain|Not this design. Hierarchical routing was REFUTED (NE:3604 R85); back-off itself untested|
+|cookbooks/classifying_rag_passages.md:7,15-22|Between retrieval and generation, one request per passage: relevant? usable? contradicts the query's premise? injection? → evidence / conflict / drop|4 Noul/Choice in one request (multi-question bundle) + code policy dict (:107-108)|81-passage auth corpus, a planted injection, 2 false-premise queries; qualitative|Combines `rank`+`screen`+`verify`. GAP: no single verb runs one bundle across families; "false premise" check is missing|`rank` FiQA/jev-rerank-bench (EVAL.md:278); `screen` (PRODUCT.md:56); bundled design untested|
+|cookbooks/consistency_choice_cookbook.md:7-30|Re-run an 8-Choice moderation rubric 15× per condition and compare label flips with LLMs at temp 0 / default / reasoning|8 Choice in one call, fresh `uid` per call|their plots: labels can flip even for TypeSafe (:30); repro needs keys|`<family> eval` stability metric = GAP (plan has no repeat/variance check)|Partial: run-to-run spread noted in NE:3636, 3709|
+|cookbooks/consistency_noul_cookbook.md:7-30|Same for 14 Noul claim-triage questions; route near-threshold P to human review|14 Noul / call; band around threshold → review|their claim: LLMs move run to run even at temp 0; TypeSafe mean is steadier (:29-30)|`gate`/`screen` threshold band → review = abstain zone. Repeat-variance as a calibration input is a GAP|Same as above|
+|cookbooks/date_extraction_cookbook.md:7-25|Extract date parts with Choices (kind, month, day, year, weekday); code does the calendar math and validates|several Choice in one call → code resolves; low confidence or impossible date → review|4 short docs; cached json_cache.json (:81-82) replays offline|GAP: no extract family. Doc confirms Jev must not do date math (model-jaggedness/jev-1.13.md:20)|No|
+|cookbooks/entity_alignment.md:7-30|Dedupe 450 catalogue pairs: one 3-level Score (different / maybe / same) + 3 Noul naming which field disagrees|Score with a middle "curator" level + companion Nouls for explanation|450 pairs; qualitative in intro|GAP (dedup/match). Could live in `score` + `explain`|No|
+|cookbooks/function_calling.md:7-30|Natural-language request → function name + closed-set (`Literal`) args, each a Choice with confidence|Choice for the function, Choice per Literal arg, confidence per arg|their example confidences 0.75-1.00 (:14-25)|GAP: tool/arg selection. Overlaps `route` (intent) only|No direct test; skillranker/route work is a different task (EVAL.md:65)|
+|cookbooks/hierarchical_classification.md:7-30|Walk a taxonomy root→leaf; beam search keeps K paths by geometric-mean edge probability|parallel Choice per node over K paths per call; length-normalized score (:20-22)|4 hierarchies (patent, retail, biomed, code)|`route` (`--hierarchy`)|**REFUTED by us**: Banking77 beam K=3 77.5% < flat 80.1% (NE:3604-3615, bead jev-5fm)|
+|cookbooks/llm_guardrails.md:7-30|Screen every LLM input and output: Noul battery of hazards + Score of harm severity → pass / review / block / route-to-support|N Noul + 1 Score in one request; thresholds per action|qualitative|`screen` (injection) + `gate`. GAP: screening outputs, multi-hazard battery, severity Score|`screen` 268/300 (PRODUCT.md:56); jev-sec-bench injection 96.5% (EVAL.md:286)|
+|cookbooks/parallel_questions.md:7-27|Batch 13 questions on one doc in one call: same answers, cheaper|8 Noul + 2 Choice + 3 Score in one request|their claim: 12.2× cheaper, 10.0× faster, std dev 0.0 for most answers (:7,17-18); repro needs key|GAP in CLI surface: `ask` takes one primitive; no multi-question/multi-family bundle verb|Not as a batch-vs-single test (no hit)|
+|cookbooks/pre_parsed_value_extraction_cookbook.md:7-27|Regex over-finds candidate spans; Choice picks the one asked for; code copies it verbatim (no invented digits)|deterministic candidates → Choice over spans + attribute Choices|3 worked cases|GAP: extract-by-pick. Same shape as `rank` over spans|No|
+|cookbooks/rerank_typesafe.md:7-22|BM25 top-30 → one question per query-candidate pair → re-order|per-pair Score/Noul (pointwise), not one Choice|their CLERC: top-1 5%→18%, top-10 38%→62% (:7)|`rank`|Yes, other data: FiQA top-1 76.2% vs BM25 39.3% (PRODUCT.md:55); jev-rerank-bench 0.692 vs 0.691 p=.910 (EVAL.md:278). Pointwise mode vs our Choice mode not compared|
+|cookbooks/sde_cascade.md:7-30|Cheap LLM extracts; a per-field Noul asks "is this wrong?"; escalate to a reasoning model only if one fires|Noul verifier per field → escalate|their price ladder (:13-20); 100-prompt tradeoff|`effort` (tier routing) + `verify`|`effort`: "gate-cascade cost win only; usage router and best-of-N LOST" (PRODUCT.md:62). Field-verifier cascade itself untested|
+|cookbooks/semantic_find.md:7-30|Number each line; one Choice ranks line IDs vs query; a Noul in the same request asks "does an answer exist?"|Choice over ≤255 line IDs + existence Noul (abstain)|GitHub ToS, 218 lines (:7)|`rank` + abstain. Line-ID-as-options is a GAP in input shaping|Partly: EVAL.md:59 "find incl. absence check" ~0.6-0.7 s|
+|cookbooks/skill_suggestion.md:7-30|Request 1 ranks all 182 skills + "does the turn need a skill?"; request 2 re-reads top 3 in full and may reject all|Choice + Noul, then Choice with a none option (progressive disclosure)|their claim: wrong skill loads cut by more than half (:12)|`rank`/`route` + meta `skillgap`|Yes: skillranker eval contract; always-abstain 0.833 loss (EVAL.md:490-513); copying the two-stage design REJECTED (NE:1857)|
+
+## Patterns, primitives, confidence, jaggedness
+
+|doc|idea|primitive + pattern|evidence|plan|tested?|
+|-|-|-|-|-|-|
+|patterns.md:17|Speculative fan-out: ask extra questions in the same call, code decides what's relevant|multi-question|none (design note)|GAP (no bundle verb)|No|
+|patterns.md:18; confidence.md:177-216|Confidence-gated routing; per-action thresholds (destructive needs more than read-only), 0.5 floor|Choice `confidence`|example thresholds only; "test with your own data" (:219)|`calibrate` / abstain. Per-action thresholds are a GAP|Partly: ECE/abstain in `route` (PRODUCT.md:58)|
+|patterns.md:19|Composite scoring: several dimensions → one score|several Score/Noul combined in code|none|`score`. Combining is a GAP|No|
+|patterns.md:20|Intent routing|Choice|none|`route`|Yes, Banking77/CLINC150 (PRODUCT.md:58)|
+|primitives.md:440-460|Speculative questions; split a judgment; dependent questions need a 2nd call|request design|guidance|GAP|No|
+|primitives/advanced.md:357-473|Structured (JSON) instructions/options: rubric per option, taxonomy walk, structured Score levels, structured Noul criteria|criteria-as-options|guidance|GAP: `ask` doesn't expose structured options|No|
+|primitives/score.md:671-762|Read Score as a distribution (expected level + spread); split complex judgments into several Scores|Score|guidance|`score` exposes level only [INFERENCE from PRODUCT.md:64]|SST-5 (EVAL.md:1992)|
+|confidence.md:145|Noul has no `confidence` field; Choice/Score do|—|doc|`calibrate` must treat Noul differently|No (UNVERIFIED in our code)|
+|model-jaggedness/jev-1.13.md:17-27|9 failure modes: literal reading, math, dates, indirection, large irrelevant state, adversarial, contradictory criteria, structural invariants, generation|—|vendor list|feed `doctor`/`cases` as preflight lints. GAP|Numeric claims REFUTED in `verify` (PRODUCT.md:60), consistent with this list|
+|upstream/typesafe-ai/skills/skills/typesafe-ai/SKILL.md:1-40|Agent skill: read live docs, start from the closest cookbook, which often decomposes better than a generic classifier|—|—|`skillgap`/`install` could ship it|No|
+|upstream/typesafe-ai/system-one-adapter-python/README.md:1-38; src/system_one_adapter/{_client,_response,_schema,providers}|Drop-in `system_one` backed by OpenAI/Anthropic/Gemini, `llm_answer_mode` probabilities/discrete|same Choice/Score/Noul API on any LLM|purpose: compare cost/speed/intelligence (:6-7)|backend: `--backend llm` is a GAP (plan has jev\|clef\|auto only); natural incumbent for `eval`|Checked out at 0bb819b (EVAL.md:129, 176); not used as an incumbent backend|
+
+## GAPs ranked by how much they would change the plan
+1. **Multi-question bundles across families** (parallel_questions, classifying_rag_passages, llm_guardrails, patterns fan-out). The plan runs one family per call. These cookbooks run one state with N mixed questions and their claim is 12.2× cheaper (parallel_questions.md:7). This would change the command tree: you need a `bundle`/spec-file verb, not just 10 single-purpose families.
+2. **Extraction family** (date_extraction, pre_parsed_value_extraction, function_calling, autoformat, sde_cascade): code proposes candidates, a Choice picks one, code renders. 5 of 18 cookbooks; no plan family.
+3. **LLM-adapter backend** (system-one-adapter): `--backend llm` gives a same-API incumbent for every `eval`. PRODUCT.md:78 already requires a baseline.
+4. **Hierarchy back-off instead of abstain** (classification_using_confidence.md:23-29). Cheap, and a different design from the REFUTED beam (NE:3604).
+5. **Repeat-stability metric in `eval`/`calibrate`** (consistency_* cookbooks).
+6. **Question discovery** (autoresearch): generates `cases`/questions; affects `skillgap`.
+7. **Entity match / dedup** with a 3-level Score that has a curator level (entity_alignment).
+8. Jaggedness lints in `doctor` (jev-1.13.md:17-27).
+
+## What the primitives can do that our CLI verbs do not expose
+- **Multi-question requests over one state**, mixing Choice + Score + Noul (primitives.md:360; parallel_questions.md:26-27). `ask` is single-primitive (PRODUCT.md:31).
+- **Speculative questions**: ask for answers you may throw away (primitives.md:440).
+- **Dependent two-request chains**: pass-1 answers build the pass-2 state (primitives.md:454; autoformat.md:29).
+- **Criteria-as-options / structured JSON instructions, levels and criteria** (primitives/advanced.md:256-473).
+- **Score as a distribution**: expected level + uncertainty as two features (autoresearch_feature_discovery.md:27-28; score.md:671).
+- **Confidence routing with per-action thresholds and hierarchical back-off** (confidence.md:177-216; classification_using_confidence.md:23-26).
+- **Options as IDs** (line IDs, span IDs, function names) to locate or extract, ≤255 options (semantic_find.md:26-28; pre_parsed:16-27).
+- **Existence/none Noul next to a Choice**, because Choice probabilities always sum to 1 (semantic_find.md:27-30; skill_suggestion.md:25-27).
+- **Companion Nouls that explain a Score** (which field disagrees) (entity_alignment.md:7). `explain` may cover this; UNVERIFIED.
+- **Pointwise per-candidate scoring** as a `rank` mode that is an alternative to one Choice (rerank_typesafe.md:7).
