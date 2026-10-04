@@ -129,15 +129,26 @@ def load(epic, wanted, all_open):
             file=sys.stderr,
         )
         sys.exit(69)
-    issues = json.loads(raw.stdout)["issues"]
-    ids = {b["id"] for b in issues}
-    db = sqlite3.connect(f"file:{REPO / '.beads/beads.db'}?mode=ro", uri=True)
-    deps = [
-        (a, b)
-        for a, b in db.execute(
-            "select issue_id, depends_on_id from dependencies where type='blocks'"
+    try:
+        issues = json.loads(raw.stdout)["issues"]
+    except (ValueError, KeyError, TypeError):
+        print(
+            f"bead-lint: br list returned no issues (exit {raw.returncode}): {raw.stdout[:400].strip()}"
+            " -- if SYNC_CONFLICT, run `br doctor` then `br doctor migrate-schema recover`",
+            file=sys.stderr,
         )
-    ]
+        sys.exit(69)
+    ids = {b["id"] for b in issues}
+    # Read and close at once: a long-held read handle blocks br's WAL recovery (2026-10-04).
+    db = sqlite3.connect(f"file:{REPO / '.beads/beads.db'}?mode=ro", uri=True)
+    try:
+        deps = list(
+            db.execute(
+                "select issue_id, depends_on_id from dependencies where type='blocks'"
+            )
+        )
+    finally:
+        db.close()
     live = [b for b in issues if b["status"] in ("open", "in_progress")]
     if epic:
         sel = [b for b in live if b["id"] == epic or b["id"].startswith(epic + ".")]
