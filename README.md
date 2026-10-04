@@ -17,18 +17,18 @@ Every decision we automate goes through the same arc, and it does not change wit
 
 What the evidence says so far (sources in [`work/plan-20261004/ECOSYSTEM.md`](work/plan-20261004/ECOSYSTEM.md)):
 
-- **The cheapest instrument often wins.** Keyword and regex rules have beaten a typed model on tool-call risk triage and phishing, and abstaining beat it on duplicate detection; a deterministic gate replaced a model pre-gate at 98.1% agreement with zero calls.
+- **The cheapest instrument often wins.** Keyword and regex rules have beaten a typed model on tool-call risk triage, phishing, review-finding novelty and reviewer-verdict checks, and abstaining beat it on duplicate detection; a deterministic gate replaced a model pre-gate at 98.1% agreement with zero calls. A TF-IDF probe beats both Jev and Clef on vendored-code detection.
 - **Typed models win where the label is in the text and lexical cues break:** passage selection (FiQA top-1 76.2% vs BM25 39.3%), injection on a public corpus, out-of-distribution spam. They lose on forecasting (0 wins / 12).
 - **Local open-weight models are not one thing.** On Banking77 intent routing, Clef-Flash scores .962, Kev-4B .810, Jev .787; Kev-4B is near chance on vendored-code detection.
 - **Calibration changes verdicts more than model choice.** With the same calibration on both, an apparent Clef-over-Jev calibration win disappears, and their vendored-code gap is not significant.
-- **The classic encoder family is our biggest unmeasured gap:** fine-tuned small encoders, SetFit, NLI cross-encoders, open injection-guard models and fact-check models have never been run on our rows.
+- **The classic encoder family is our biggest unmeasured gap:** one small encoder has run on our rows and failed: localbench's Laya-MLX (421M ModernBERT with decision heads) is rejected on all four jev suites it saw (bash gate, SST-5, auto-thinking, unexpected stop; `localbench/docs/evidence/NEGATIVE_EVIDENCE.md:1076-1090`). Fine-tuned encoders, SetFit, NLI cross-encoders, open injection-guard models and fact-check models have not been run on our rows yet.
 
 ## Techniques in play
 
 | Technique | Where it fits for us | Status here |
 |---|---|---|
-| Rules, regex, lookups | Labels already in the tokens: destructive commands, licence headers, structure checks | In use; first bar for every question |
-| Lexical retrieval (BM25, TF-IDF) | Candidate generation, in-domain text | Baseline in rank and diff |
+| Rules, regex, lookups | Labels already in the tokens: destructive commands, licence headers, structure checks | In use; first bar for every question; the incumbent for review findings and verdicts (E1, E2) |
+| Lexical retrieval (BM25, TF-IDF) | Candidate generation, in-domain text | Baseline in rank; a TF-IDF probe leads on vendored code (X4) |
 | Embeddings + nearest neighbour / linear probe / SetFit | Dedup, shortlists, few-shot heads | Next: vendored code, intent routing |
 | Fine-tuned small encoders | Fixed label sets with enough labels | Next: injection, intent, fact-check |
 | Zero-shot NLI cross-encoders | Claim vs evidence, changing label sets | Next: claim verification |
@@ -40,18 +40,19 @@ What the evidence says so far (sources in [`work/plan-20261004/ECOSYSTEM.md`](wo
 
 ## What we are testing next
 
-Each row names its question, the labels it reuses, and the result that would rule it out. They become beads in the graph, under the classifier epic (`jev-b35c`) and the mission root (`jev-q3q8`), when the current review rounds converge; until then this table is the queue.
+Each row names its question, the labels it reuses, and the result that would rule it out. Each is a bead under the mission root (`jev-q3q8`), and every family's bake-off order is fixed in [`work/plan-20261004/PRODUCT.md`](work/plan-20261004/PRODUCT.md) section 8. Building waits for the convergence gate (`jev-convergence-gate-g57u`).
 
 | # | Experiment | Bar to beat | Ruled out if |
 |---|---|---|---|
 | X1 | Open injection-guard encoders vs Jev on 1,262 labelled tool results | 5/300 false flags, 268/300 caught | catch lower bound < .853 at the same false-flag rate |
 | X2 | Clef-Flash vs Jev on four suites with equal calibration | Jev's accuracy and calibration | significantly worse (exact McNemar) or calibration CI above Jev's |
 | X3 | Fact-check models (MiniCheck, NLI) vs Jev on SciFact / FEVER | Jev 361/400 | worse after equal calibration |
-| X4 | Embedding or TF-IDF probe on vendored-code detection | AUC .827 (Jev), .839 (Clef) | held AUC < .807 |
+| X4 | Embedding or TF-IDF probe on vendored-code detection | AUC .827 (Jev), .839 (Clef) | **Run: beats the bar.** A TF-IDF probe scores held AUC .917 vs Jev .827 and Clef .839 (DeLong p=.0004 and .0066), $0, on the constructed 320-window sample; ECE and the embedding arm are still open ([receipt](work/plan-20261004/receipts/x4-vendored-probe-RECEIPT.md)) |
 | X5 | Preregistered replication of a small local model's sentiment-scoring lead | Jev on SST-5 | no lead on fresh rows |
 | X6 | Fine-tuned encoder / SetFit on Banking77 intent routing | Clef .962 | below Clef, and 10-shot below Jev |
-| X7 | Deterministic command rules joined onto the blind-labelled gate rows | Jev's catch and false-alarm rates | rules match Jev at no more false alarms |
+| X7 | Deterministic command rules joined onto the blind-labelled gate rows | Jev's catch and false-alarm rates | **Run: rules lose.** Jev catches 47/47 at 1.40% weighted false alarms; dcg plus the cascade pre-rule catch 7/47 at 14.81% ([receipt](work/plan-20261004/receipts/x7-gate-rules-RECEIPT.md)) |
 | X8 | Memory relevance: P(drop \| relevant) on 59+ sampled relevant memories | always-drop | upper 95% bound above the tolerance |
+| E1–E2 | Reviewer verdicts and findings: does a verdict hold, is a finding new | the majority answer and a keyword / same-bead rule | **Run: rules beat Jev.** Finding novelty: rule 77/85 vs Jev 49/85 ([receipt](work/plan-20261004/receipts/e2-finding-novelty-RECEIPT.md)); verdict holds: keyword rule accuracy .618, kappa .288 vs Jev .400, kappa −.067 ([receipt](work/plan-20261004/receipts/e1-verdict-holds-RECEIPT.md)) |
 
 **Not classifiable here** (decided by people or by code instead): which work to fund and the plan's scope; whether the bead graph reaches the mission (a graph property, checked by lint and PageRank); writing code, docs and fixes; anything with no labels and no observable outcome yet.
 
