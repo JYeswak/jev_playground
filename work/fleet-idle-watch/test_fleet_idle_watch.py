@@ -238,6 +238,7 @@ class PollTimeout(unittest.TestCase):
         with (
             mock.patch.object(fiw, "poll", return_value={2: ("working", "")}),
             mock.patch.object(fiw, "SHADOW_ONLY", False),
+            mock.patch.object(fiw, "hook_load_round", return_value=None),
             mock.patch.object(fiw, "ci_lines", return_value=[]),
             mock.patch.object(fiw, "stranger_round", return_value=None),
             mock.patch.object(fiw, "inbox_round", return_value="Inbox: NOT_RUN test"),
@@ -275,6 +276,7 @@ class PollTimeout(unittest.TestCase):
 
         with (
             mock.patch.object(fiw, "poll", return_value=None),
+            mock.patch.object(fiw, "hook_load_round", return_value=None),
             mock.patch.object(
                 fiw, "ci_lines", side_effect=AssertionError("round must skip")
             ),

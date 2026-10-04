@@ -395,6 +395,7 @@ class KeyPage(Keyed):
         with (
             mock.patch.dict(os.environ, env),
             mock.patch.object(fiw, "poll", return_value={}),
+            mock.patch.object(fiw, "hook_load_round", return_value=None),
             mock.patch.object(fiw, "judge_lines", return_value=lines),
             mock.patch.object(fiw, "send_pane1", side_effect=self.send),
             mock.patch.object(fiw.time, "sleep", side_effect=Stop),
