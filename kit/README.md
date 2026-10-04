@@ -8,7 +8,9 @@ A small TypeScript-first Jev client with preflight checks, typed validators, off
 cursor. It extracts tool, command-family, file-read, skill-read, error, and retry metadata locally,
 clusters repeated failures, and sends only compact cluster summaries plus the bounded skill-name/
 description inventory through `kit/src/client.ts`'s `askJevBundle` seam. The model selector is
-`--model`, then `JEV_MODEL`, then the pinned `jev-1.13.0` default. Missing credentials produce
+`--model`, then `JEV_MODEL`, then the pinned `jev-1.13.0` default. Failure keys hash the DCG rule
+ID, exit-code class, and a masked first error line; nearest-skill ranking uses the loaded global/
+project inventory, including symlinked skills roots. Missing credentials produce
 `NOT_RUN` with zero calls. Reports include scan coverage, event counts, model calls, input tokens,
 estimated input cost, latency, evidence `path:line`, and review-bead outcomes. It queues bounded
 human review beads; it never edits skill files.

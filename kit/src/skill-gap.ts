@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { createReadStream, existsSync } from "node:fs";
-import { mkdir, lstat, open, readdir, readFile, rename } from "node:fs/promises";
+import { mkdir, lstat, open, readdir, readFile, rename, stat as statPath } from "node:fs/promises";
 import { spawnSync } from "node:child_process";
 import { homedir } from "node:os";
 import { basename, dirname, extname, join, resolve } from "node:path";
@@ -22,6 +22,7 @@ const MAX_DESCRIPTION_CHARS = 180;
 const MAX_REVIEW_BEADS_PER_RUN = 3;
 const MODEL_TIMEOUT_MS = 4_000;
 const MAX_MODEL_REQUEST_BYTES = 96 * 1024;
+const ERROR_SIGNATURE_VERSION = 1;
 export const JEV_INPUT_PRICE_PER_MILLION = 0.042;
 export const LAUNCH_AGENT_LABEL = "ai.zeststream.jev-skill-gap-miner";
 export const INFISICAL_PROJECT_ID = "42b194c3-89d7-4ebb-895f-dd77ddf005ba";
@@ -57,9 +58,11 @@ type MinerEvent = {
   at: number;
   toolName: string;
   commandFamily: string;
+  commandVerb?: string;
   fileExtension?: string;
   skillName?: string;
   errorClass?: string;
+  errorSignature?: string;
   clusterKey?: string;
   priorSkillName?: string;
 };
@@ -68,12 +71,13 @@ type CallSummary = {
   signature: string;
   toolName: string;
   commandFamily: string;
+  commandVerb: string;
   fileExtension?: string;
   skillName?: string;
   clusterKey: string;
 };
 
-type FileCursor = { dev: number; ino: number; offset: number; line: number };
+type FileCursor = { dev: number; ino: number; offset: number; line: number; errorSignatureVersion?: number };
 type Classification = {
   kind: "uncovered" | "existing-skill";
   skillName?: string;
@@ -380,8 +384,8 @@ function fileExtension(path: string): string | undefined {
   return ext ? safeName(ext.slice(1), "") : undefined;
 }
 
-function clusterKey(toolName: string, errorClass: string, family: string, ext?: string): string {
-  return JSON.stringify([toolName, errorClass, family, ext ?? ""]);
+function clusterKey(toolName: string, errorClass: string, family: string, ext: string | undefined, errorSignature: string): string {
+  return JSON.stringify([toolName, errorClass, family, ext ?? "", digest(errorSignature)]);
 }
 
 function messageTimestamp(row: JsonObject, message?: JsonObject): number | undefined {
@@ -404,13 +408,65 @@ function errorText(value: unknown, budget: { left: number }): string {
   return [record.text, record.message, record.error, record.details].map((part) => errorText(part, budget)).join(" ");
 }
 
-function classifyError(value: unknown): string {
-  const text = errorText(value, { left: 8_192 });
+function classifyError(text: string): string {
   for (const name of ERROR_CLASSES) if (text.includes(name)) return name;
   const lower = text.toLowerCase();
   if (lower.includes("timed out") || lower.includes("timeout")) return "TimeoutError";
   if (lower.includes("permission denied")) return "PermissionError";
   return "ToolError";
+}
+
+function maskErrorLine(value: string): string {
+  const output: string[] = [];
+  let token = "";
+  let quote = "";
+  let quoted = "";
+  const flush = () => {
+    if (token) output.push(token.includes("/") ? "<path>" : token.replace(/\d+/g, "<n>"));
+    token = "";
+  };
+  for (const ch of value.slice(0, 512)) {
+    if (quote) {
+      if (ch === quote) {
+        output.push(quoted.includes("/") ? "<path>" : quoted.replace(/\d+/g, "<n>"), ch);
+        quote = "";
+        quoted = "";
+      } else {
+        quoted += ch;
+      }
+    } else if (ch === "'" || ch === "\"") {
+      flush();
+      output.push(ch);
+      quote = ch;
+    } else if (" \t\r\n()[]{};,".includes(ch)) {
+      flush();
+      output.push(ch);
+    } else {
+      token += ch;
+    }
+  }
+  if (quote) output.push(quoted.includes("/") ? "<path>" : quoted.replace(/\d+/g, "<n>"));
+  else flush();
+  return output.join("");
+}
+
+function normalizedErrorSignature(text: string, explicitExitCode?: number): string {
+  const firstErrorLine = text.split(/\r?\n/).map((line) => line.trim()).find(Boolean) ?? "";
+  const ruleId = /(?:^|\n)\s*Rule:\s*([A-Za-z0-9_.:-]+)/im.exec(text)?.[1]?.toLowerCase() ?? "";
+  const textExitCode = /\b(?:exit(?:ed)?|status|code)\b\D{0,24}(\d{1,3})\b/i.exec(text)?.[1];
+  const exitCode = explicitExitCode !== undefined && Number.isInteger(explicitExitCode) && explicitExitCode >= 0 && explicitExitCode <= 255
+    ? explicitExitCode
+    : textExitCode === undefined ? undefined : Number(textExitCode);
+  const exitCodeClass = exitCode === undefined ? "unknown"
+    : exitCode === 0 ? "success"
+      : exitCode === 126 ? "permission-denied"
+        : exitCode === 127 ? "command-not-found"
+          : exitCode >= 128 ? "signal" : "nonzero";
+  return JSON.stringify({
+    dcgRuleId: ruleId,
+    exitCodeClass,
+    firstErrorLine: maskErrorLine(firstErrorLine),
+  });
 }
 
 
@@ -419,7 +475,7 @@ function eventBase(
   path: string,
   line: number,
   at: number,
-  summary: Pick<CallSummary, "toolName" | "commandFamily" | "fileExtension" | "skillName">,
+  summary: Pick<CallSummary, "toolName" | "commandFamily" | "commandVerb" | "fileExtension" | "skillName">,
 ): MinerEvent {
   return {
     kind,
@@ -429,6 +485,7 @@ function eventBase(
     at,
     toolName: summary.toolName,
     commandFamily: summary.commandFamily,
+    commandVerb: summary.commandVerb,
     ...(summary.fileExtension ? { fileExtension: summary.fileExtension } : {}),
     ...(summary.skillName ? { skillName: summary.skillName } : {}),
   };
@@ -440,16 +497,19 @@ function addEvent(state: MinerState, event: MinerEvent): void {
 
 function callSummary(toolNameValue: string, args: JsonObject): CallSummary {
   const toolName = safeName(toolNameValue, "unknown-tool");
-  const filePath = stringField(args.path) ?? stringField(args.file) ?? stringField(args.url) ?? "";
+  const filePath = stringField(args.filePath) ?? stringField(args.path) ?? stringField(args.file) ?? stringField(args.url) ?? "";
   const skillName = toolName === "read" ? skillNameFromPath(filePath) : undefined;
   const ext = toolName === "read" ? fileExtension(filePath) : undefined;
+  const command = stringField(args.command) ?? stringField(args.cmd) ?? "";
   const family = commandFamily(toolName, args);
+  const commandVerb = safeName(firstWord(command), toolName);
   const serializedArgs = JSON.stringify(args);
   const signature = digest(`${toolName}\0${serializedArgs}`);
   return {
     signature,
     toolName,
     commandFamily: family,
+    commandVerb,
     ...(ext ? { fileExtension: ext } : {}),
     ...(skillName ? { skillName } : {}),
     clusterKey: "",
@@ -507,11 +567,17 @@ function recordToolResult(state: MinerState, path: string, line: number, at: num
     if (failures) state.recentFailures[path] = failures.filter((item) => item.signature !== summary.signature);
     return;
   }
-  const errorClass = classifyError([message.content, message.details]);
+  const error = errorText([message.content, message.details], { left: 8_192 });
+  const errorClass = classifyError(error);
+  const details = object(message.details);
+  const explicitExitCode = typeof message.exitCode === "number" ? message.exitCode
+    : typeof details?.exitCode === "number" ? details.exitCode : undefined;
+  const signature = normalizedErrorSignature(error, explicitExitCode);
   const priorSkill = state.lastSkillRead[path];
-  const key = clusterKey(summary.toolName, errorClass, summary.commandFamily, summary.fileExtension);
+  const key = clusterKey(summary.toolName, errorClass, summary.commandFamily, summary.fileExtension, signature);
   const failure = eventBase("failure", path, line, at, summary);
   failure.errorClass = errorClass;
+  failure.errorSignature = signature;
   failure.clusterKey = key;
   if (priorSkill && priorSkill.line < line) failure.priorSkillName = priorSkill.name;
   addEvent(state, failure);
@@ -526,12 +592,14 @@ function recordCustomFailure(state: MinerState, path: string, line: number, at: 
   const toolName = safeName(stringField(data.toolName) ?? "hook", "hook");
   const callId = stringField(data.toolCallId);
   const summary = callId ? state.pendingCalls[path]?.[callId] : undefined;
-  const selected: CallSummary = summary ?? { signature: "", toolName, commandFamily: toolName, clusterKey: "" };
+  const selected: CallSummary = summary ?? { signature: "", toolName, commandFamily: toolName, commandVerb: toolName, clusterKey: "" };
   if (callId && state.pendingCalls[path]) delete state.pendingCalls[path][callId];
   const errorClass = "HookFailure";
-  const key = clusterKey(selected.toolName, errorClass, selected.commandFamily, selected.fileExtension);
+  const signature = normalizedErrorSignature("");
+  const key = clusterKey(selected.toolName, errorClass, selected.commandFamily, selected.fileExtension, signature);
   const failure = eventBase("failure", path, line, at, selected);
   failure.errorClass = errorClass;
+  failure.errorSignature = signature;
   failure.clusterKey = key;
   const priorSkill = state.lastSkillRead[path];
   if (priorSkill && priorSkill.line < line) failure.priorSkillName = priorSkill.name;
@@ -677,17 +745,30 @@ async function scanSessions(home: string, state: MinerState, now: number) {
       continue;
     }
     let cursor = state.cursors[path];
-    if (!cursor || cursor.dev !== stat.dev || cursor.ino !== stat.ino || stat.size < cursor.offset) {
+    const replaced = !cursor || cursor.dev !== stat.dev || cursor.ino !== stat.ino || stat.size < cursor.offset;
+    const needsSignatureReindex = cursor !== undefined
+      && cursor.errorSignatureVersion !== ERROR_SIGNATURE_VERSION
+      && cursor.errorSignatureVersion !== 0;
+    if (replaced || needsSignatureReindex) {
       if (cursor) {
         state.events = state.events.filter((event) => event.sessionPath !== path);
         delete state.pendingCalls[path];
         delete state.recentFailures[path];
         delete state.lastSkillRead[path];
       }
-      cursor = { dev: stat.dev, ino: stat.ino, offset: 0, line: 0 };
+      cursor = {
+        dev: stat.dev,
+        ino: stat.ino,
+        offset: 0,
+        line: 0,
+        errorSignatureVersion: cursor ? 0 : ERROR_SIGNATURE_VERSION,
+      };
     }
     const budget = Math.min(MAX_BYTES_PER_FILE_RUN, MAX_BYTES_PER_RUN - bytesRead);
     const result = await scanFile(state, path, cursor, stat.size, budget, now);
+    if (cursor.errorSignatureVersion === 0 && !result.truncated) {
+      result.cursor.errorSignatureVersion = ERROR_SIGNATURE_VERSION;
+    }
     state.cursors[path] = result.cursor;
     if (result.bytesRead > 0) filesScanned += 1;
     bytesRead += result.bytesRead;
@@ -698,6 +779,11 @@ async function scanSessions(home: string, state: MinerState, now: number) {
   }
   const filesDeferred = Math.max(0, files.length - filesConsidered);
   if (filesDeferred > 0) partial = true;
+  const signatureMigrationPending = files.some((path) => {
+    const cursor = state.cursors[path];
+    return cursor !== undefined && cursor.errorSignatureVersion !== ERROR_SIGNATURE_VERSION;
+  });
+  if (signatureMigrationPending) partial = true;
   return {
     roots: roots.roots.length,
     filesDiscovered: discovered,
@@ -711,6 +797,7 @@ async function scanSessions(home: string, state: MinerState, now: number) {
     symlinksSkipped: discovery.symlinks,
     inaccessibleRoots: discovery.inaccessible,
     partial,
+    signatureMigrationPending,
   };
 }
 
@@ -775,8 +862,8 @@ function parseFrontmatter(text: string): Skill | null {
 
 async function skillFiles(root: string, files: string[], metrics: { skipped: number; inaccessible: number }): Promise<void> {
   try {
-    const rootStat = await lstat(root);
-    if (!rootStat.isDirectory() || rootStat.isSymbolicLink()) return;
+    const rootStat = await statPath(root);
+    if (!rootStat.isDirectory()) return;
     const entries = await readdir(root, { withFileTypes: true });
     entries.sort((a, b) => a.name.localeCompare(b.name));
     for (const entry of entries) {
@@ -841,7 +928,7 @@ export function buildFailureClusters(events: MinerEvent[], skills: Skill[]): Fai
     const first = rows[0];
     const sessions = new Set(rows.map((event) => event.sessionPath));
     const skillNames = [...new Set(rows.map((event) => event.priorSkillName).filter((name): name is string => Boolean(name)))].sort();
-    const query = `${first.toolName} ${first.errorClass ?? "ToolError"} ${first.commandFamily} ${first.fileExtension ?? ""}`;
+    const query = `${first.commandVerb ?? ""} ${first.toolName} ${first.errorClass ?? "ToolError"} ${first.commandFamily} ${first.fileExtension ?? ""} ${first.errorSignature ?? ""}`;
     clusters.push({
       id: `gap-${digest(key).slice(0, 12)}`,
       key,
@@ -862,7 +949,6 @@ export function buildFailureClusters(events: MinerEvent[], skills: Skill[]): Fai
   return clusters.sort((a, b) => b.sessionCount - a.sessionCount || b.failureCount - a.failureCount || a.id.localeCompare(b.id));
 }
 
-
 function buildModelPlan(clusters: FailureCluster[], skills: Skill[]): ModelPlan {
   const selected = clusters.slice(0, MAX_QUESTIONS_PER_CALL);
   const stateClusters: Array<Record<string, unknown>> = [];
@@ -871,7 +957,11 @@ function buildModelPlan(clusters: FailureCluster[], skills: Skill[]): ModelPlan 
   for (let index = 0; index < selected.length; index += 1) {
     const cluster = selected[index];
     const key = `cluster_${index}`;
-    const candidates = nearestSkills(`${cluster.toolName} ${cluster.errorClass} ${cluster.commandFamily}`, skills, MAX_SKILLS_PER_QUESTION);
+    const candidates = nearestSkills(
+      `${cluster.toolName} ${cluster.errorClass} ${cluster.commandFamily} ${cluster.nearestExistingSkill?.name ?? ""}`,
+      skills,
+      MAX_SKILLS_PER_QUESTION,
+    );
     const criteria: Record<string, string> = { uncovered: "No existing skill meaningfully covers this repeated failure pattern." };
     const selectedSkills: Record<string, string> = {};
     candidates.forEach((skill, skillIndex) => {
@@ -1011,8 +1101,9 @@ export async function runDailyMiner(options: DailyMinerOptions): Promise<MinerRe
   const evictedThisRun = ageEvictions + overLimit;
   state.evictedEvents += evictedThisRun;
   const inventory = await loadSkills(home, options.repoRoot, state.projectRoots);
-  const clusters = buildFailureClusters(state.events, inventory.skills).filter((cluster) => cluster.sessionCount >= 2);
-  const pending = clusters.filter((cluster) => !state.classifications[cluster.id]);
+  const eventsForClustering = state.events.filter((event) => state.cursors[event.sessionPath]?.errorSignatureVersion === ERROR_SIGNATURE_VERSION);
+  const clusters = buildFailureClusters(eventsForClustering, inventory.skills).filter((cluster) => cluster.sessionCount >= 2);
+  const pending = scan.signatureMigrationPending ? [] : clusters.filter((cluster) => !state.classifications[cluster.id]);
   let modelReport: MinerReport["model"] = {
     status: "NOT_RUN",
     model,
@@ -1022,7 +1113,9 @@ export async function runDailyMiner(options: DailyMinerOptions): Promise<MinerRe
     latency_ms: null,
     reason: "no-new-repeated-clusters",
   };
-  if (pending.length && !inventory.skills.length) {
+  if (scan.signatureMigrationPending) {
+    modelReport.reason = "error-signature-reindex-in-progress";
+  } else if (pending.length && !inventory.skills.length) {
     modelReport.reason = "skill-inventory-unavailable";
   } else if (pending.length && state.attemptedDay === date) {
     modelReport.reason = "daily-model-call-cap";
@@ -1070,10 +1163,9 @@ export async function runDailyMiner(options: DailyMinerOptions): Promise<MinerRe
       }
       await writeJsonAtomic(statePath, state);
     }
-  } else if (clusters.length) {
+  } else if (clusters.length && !scan.signatureMigrationPending) {
     modelReport = { ...modelReport, status: "CACHED", reason: "classifications-cached" };
   }
-
   const ranked = clusters.map((cluster) => ({ cluster, classification: state.classifications[cluster.id] ?? null }));
   const gaps = ranked.filter((item) => item.classification?.kind === "uncovered");
   const skillUpdateCandidates = gaps.filter((item) => item.cluster.skillsReadBeforeFailure.length > 0).map(({ cluster }) => ({
@@ -1119,7 +1211,7 @@ export async function runDailyMiner(options: DailyMinerOptions): Promise<MinerRe
   }));
 
   const eventCounts = { tool_calls: 0, file_reads: 0, skill_reads: 0, failures: 0, retries: 0 };
-  for (const event of state.events) {
+  for (const event of eventsForClustering) {
     if (event.kind === "tool_call") eventCounts.tool_calls += 1;
     else if (event.kind === "file_read") eventCounts.file_reads += 1;
     else if (event.kind === "skill_read") eventCounts.skill_reads += 1;
@@ -1128,7 +1220,7 @@ export async function runDailyMiner(options: DailyMinerOptions): Promise<MinerRe
   }
   const noSessionRoots = scan.roots === 0;
   const hasGapsWithoutClassification = pending.length > 0 && modelReport.status !== "CALLED";
-  const partial = scan.partial || inventory.skipped > 0 || inventory.inaccessible > 0 || hasGapsWithoutClassification || review.errors > 0;
+  const partial = scan.partial || scan.signatureMigrationPending || inventory.skipped > 0 || inventory.inaccessible > 0 || hasGapsWithoutClassification || review.errors > 0;
   const report: MinerReport = {
     date,
     status: noSessionRoots ? "NOT_RUN" : partial ? "PARTIAL" : "OK",
@@ -1161,6 +1253,7 @@ export async function runDailyMiner(options: DailyMinerOptions): Promise<MinerRe
       ...(scan.oversizedRows ? ["oversized-jsonl-rows"] : []),
       ...(inventory.skipped ? ["skill-inventory-items-skipped"] : []),
       ...(inventory.inaccessible ? ["skill-inventory-unavailable"] : []),
+      ...(scan.signatureMigrationPending ? ["error-signature-reindex-in-progress"] : []),
       ...(review.errors ? ["review-bead-queue-failed"] : []),
       ...(scan.partial ? ["scan-budget-or-file-limit"] : []),
       ...(pending.length > 0 && modelReport.status === "NOT_RUN" ? ["jev-model-not-run"] : []),

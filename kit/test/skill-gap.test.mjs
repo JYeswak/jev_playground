@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { createHash, randomUUID } from "node:crypto";
+import { mkdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { join, resolve } from "node:path";
 import test from "node:test";
@@ -24,10 +24,13 @@ async function fixture(label) {
   const repoRoot = join(root, "repo");
   const otherRepoRoot = join(root, "other-repo");
   const stateDir = join(root, "state");
+  const globalSkillStore = join(root, "global-skills");
   await mkdir(repoRoot, { recursive: true });
   await mkdir(otherRepoRoot, { recursive: true });
-  await mkdir(join(home, ".agents", "skills", "python-import-support"), { recursive: true });
-  await writeFile(join(home, ".agents", "skills", "python-import-support", "SKILL.md"), [
+  await mkdir(join(home, ".agents"), { recursive: true });
+  await mkdir(join(globalSkillStore, "python-import-support"), { recursive: true });
+  await symlink(globalSkillStore, join(home, ".agents", "skills"), "dir");
+  await writeFile(join(globalSkillStore, "python-import-support", "SKILL.md"), [
     "---",
     "name: python-import-support",
     "description: Diagnose Python import errors and missing modules.",
@@ -35,7 +38,7 @@ async function fixture(label) {
     "Use import diagnostics.",
     "",
   ].join("\n"));
-  return { root, home, repoRoot, otherRepoRoot, stateDir };
+  return { root, home, repoRoot, otherRepoRoot, stateDir, globalSkillStore };
 }
 function parseJson(value) {
   try {
@@ -284,6 +287,131 @@ test("separate daily CLI processes resume cursors and enforce one model attempt 
   assert.equal(second.coverage.files_discovered, first.coverage.files_discovered);
   assert.equal(second.coverage.files_scanned, 0, "an unchanged session file is not rescanned after restart");
   assert.deepEqual(second.clusters, first.clusters);
+});
+test("daily miner hashes normalized error signatures and ranks DCG blocks from the linked global inventory", async () => {
+  const fx = await fixture("dcg-signature");
+  const sessions = await writeTwoProfileSessions(fx);
+  const dcgSkillPath = join(fx.globalSkillStore, "dcg", "SKILL.md");
+  const compactSkillPath = join(fx.repoRoot, ".omp", "skills", "jev-compact", "SKILL.md");
+  await mkdir(join(fx.globalSkillStore, "dcg"), { recursive: true });
+  await mkdir(join(fx.repoRoot, ".omp", "skills", "jev-compact"), { recursive: true });
+  await writeFile(dcgSkillPath, [
+    "---",
+    "name: dcg",
+    "description: Handle blocked destructive commands. Use when dcg blocks rm -rf, git reset --hard, DROP DATABASE, kubectl delete, or when configuring agent safety guardrails.",
+    "---",
+    "",
+  ].join("\n"));
+  await writeFile(compactSkillPath, [
+    "---",
+    "name: jev-compact",
+    "description: Jev-judged pre-compaction for omp sessions. Use when asked about compacting a session with calibrated keep/drop judgment, installing the compaction hook, or reading the compaction decision log.",
+    "---",
+    "",
+  ].join("\n"));
+
+  const dcgResult = "shell redirect to a dynamic or escaped path may truncate a sensitive file and requires human approval.\n\nRule: core.filesystem:redirect-truncate-dynamic-path";
+  const pathErrors = [
+    "FileNotFoundError: [Errno 2] No such file or directory: 'work/jev-claim-check/numeric-cases.jsonl'",
+    "FileNotFoundError: [Errno 2] No such file or directory: 'work/jev-claim-check/numeric-v2-cases.jsonl'",
+  ];
+  for (const [sessionPath, pathError] of [[sessions.pathA, pathErrors[0]], [sessions.pathB, pathErrors[1]]]) {
+    const rows = (await readFile(sessionPath, "utf8")).trim().split("\n").map(JSON.parse);
+    for (const row of rows) {
+      const message = row.message;
+      const call = Array.isArray(message?.content) ? message.content.find((part) => part.type === "toolCall") : undefined;
+      if (call?.id?.startsWith("bash-fail")) {
+        call.arguments.command = "rm -rf /tmp/sr-cleanroom && mkdir -p /tmp/sr-cleanroom";
+      } else if (message?.role === "toolResult" && message.toolCallId?.startsWith("bash-fail")) {
+        message.content = dcgResult;
+      } else if (message?.role === "toolResult" && message.toolCallId === "read-fail") {
+        message.content = pathError;
+      }
+    }
+    await writeFile(sessionPath, `${rows.map((row) => JSON.stringify(row)).join("\n")}\n`);
+  }
+
+  const report = await runDailyMiner({
+    home: fx.home,
+    repoRoot: fx.repoRoot,
+    stateDir: fx.stateDir,
+    now: () => NOW,
+    model: "jev-1.13.0",
+    apiKey: "",
+    runCommand: fakeBeads([]),
+  });
+  const dcgCluster = report.clusters.find((cluster) => cluster.error_class === "ToolError");
+  assert.equal(dcgCluster?.session_count, 2);
+  assert.equal(dcgCluster?.nearest_existing_skill?.name, "dcg");
+  const signature = JSON.stringify({
+    dcgRuleId: "core.filesystem:redirect-truncate-dynamic-path",
+    exitCodeClass: "unknown",
+    firstErrorLine: "shell redirect to a dynamic or escaped path may truncate a sensitive file and requires human approval.",
+  });
+  const clusterKey = JSON.stringify([
+    "bash",
+    "ToolError",
+    "bash",
+    "",
+    createHash("sha256").update(signature).digest("hex"),
+  ]);
+  assert.equal(dcgCluster?.id, `gap-${createHash("sha256").update(clusterKey).digest("hex").slice(0, 12)}`);
+
+  const pathCluster = report.clusters.find((cluster) => cluster.error_class === "FileNotFoundError");
+  assert.equal(pathCluster?.session_count, 2);
+  const pathSignature = JSON.stringify({
+    dcgRuleId: "",
+    exitCodeClass: "unknown",
+    firstErrorLine: "FileNotFoundError: [Errno <n>] No such file or directory: '<path>'",
+  });
+  const pathClusterKey = JSON.stringify([
+    "read",
+    "FileNotFoundError",
+    "read",
+    "py",
+    createHash("sha256").update(pathSignature).digest("hex"),
+  ]);
+  assert.equal(pathCluster?.id, `gap-${createHash("sha256").update(pathClusterKey).digest("hex").slice(0, 12)}`);
+});
+
+
+
+test("legacy session cursors are fully reindexed before signature clusters are reused", async () => {
+  const fx = await fixture("legacy-signatures");
+  await writeTwoProfileSessions(fx);
+  const options = {
+    home: fx.home,
+    repoRoot: fx.repoRoot,
+    stateDir: fx.stateDir,
+    now: () => NOW,
+    model: "jev-1.13.0",
+    apiKey: "",
+    dryRun: true,
+  };
+  const before = await runDailyMiner(options);
+  const statePath = join(fx.stateDir, "state.json");
+  const state = parseJson(await readFile(statePath, "utf8"));
+  for (const cursor of Object.values(state.cursors)) delete cursor.errorSignatureVersion;
+  const legacyKeys = new Map();
+  for (const event of state.events) {
+    if (event.kind !== "failure") continue;
+    const legacyKey = JSON.stringify([event.toolName, event.errorClass, event.commandFamily, event.fileExtension ?? ""]);
+    legacyKeys.set(event.clusterKey, legacyKey);
+    event.clusterKey = legacyKey;
+    delete event.errorSignature;
+  }
+  for (const event of state.events) {
+    if (event.kind === "retry") event.clusterKey = legacyKeys.get(event.clusterKey) ?? event.clusterKey;
+  }
+  await writeFile(statePath, `${JSON.stringify(state)}\n`);
+
+  const after = await runDailyMiner(options);
+  const reindexed = parseJson(await readFile(statePath, "utf8"));
+  assert.deepEqual(after.coverage.event_counts, before.coverage.event_counts);
+  assert.deepEqual(after.clusters, before.clusters);
+  assert.equal(after.coverage.files_scanned, 2);
+  assert.equal(after.errors.includes("error-signature-reindex-in-progress"), false);
+  assert.equal(Object.values(reindexed.cursors).every((cursor) => cursor.errorSignatureVersion === 1), true);
 });
 
 test("LaunchAgent install schedules a bounded daily invocation and is idempotent", async () => {
