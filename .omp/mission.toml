@@ -1,0 +1,73 @@
+# jev mission record (Mission Protocol v0.1, P1). Human text: ROADMAP.md "Mission".
+# Charter fields (skill://charter) plus protocol fields; edited in place, never duplicated.
+# Pillar `check` commands are inactive until registered by hash with omp-kit (protocol O2, MP1).
+
+name = "jev"
+identity = "Typed classifiers that earn their place in our tools: each one proven live, measured, and delivered through one model-neutral CLI that makes the next one cheap."
+stage = "1: families proven or refuted, CLI built"
+approved_by = "Joshua"
+approved_at = "2026-10-04"
+approval_quote = "yes i like c"
+protocol_approval_quote = "i approve the shape that all agent orchs agree on, with a caviet that any failures that any sessions find get reported uphill, fixed foundationally, and applied to all repos through our omp-kit process"
+plan_of_record = "ROADMAP.md"
+buyer = "Joshua (ZestStream fleet operator)"
+product_paths = ["kit/src/**", "kit/bin/**", ".omp/hooks/**", ".omp/tools/**", ".omp/extensions/**", "work/jev-client/src/**"]
+irreversible = ["publish to npm", "upstream issue or PR", "paid model calls beyond a run's written cap"]
+rejections = ["paid comparator models (Joshua 2026-09-24)", "the `jev` binary name (hermes-jev-skills keeps it; Joshua 2026-10-04)", "hierarchical beam search for routing (NEGATIVE_EVIDENCE.md)"]
+
+done_rule = "live in a real session both ways + value receipt + non-author re-ran acceptance + commit on origin/main (refutation: committed investigation artifact)"
+not_in_mission = ["benchmark tourism", "certificates, ledgers or dashboards with no consumer", "games, computer use, trading", "paid comparator models", "a family without a host tool", "audits of our own docs", "fleet plumbing owned by omp-kit"]
+
+[[pillar]]
+id = "live"
+clause = "every claimed surface fires on a positive and stays silent on a planted negative in a fresh omp RPC session"
+check = "classifier doctor --json"
+status = "partial"
+interim_check = "python3 work/omp-jev-review/surface-census.py --scoreboard --days 7"
+beads = ["jev-b35c.3"]
+
+[[pillar]]
+id = "measured"
+clause = "every live surface has a value-minus-cost receipt from our own session logs; negative turns it off"
+check = "value ledger receipt per surface"
+status = "missing"
+beads = ["jev-mvvh"]
+
+[[pillar]]
+id = "honest"
+clause = "every quality claim has a bar committed before the first live call, an incumbent on the same rows, N, date, model id, spend"
+check = "python3 scripts/bead-lint.py --all-open"
+status = "partial"
+beads = []
+
+[[pillar]]
+id = "local-first"
+clause = "Clef serves a family only where a committed receipt shows it matches or beats Jev under the same calibration, through localbench's gateway"
+check = "classifier --backend auto"
+status = "missing"
+beads = ["jev-b35c.4"]
+
+[[pillar]]
+id = "portable"
+clause = "a stranger runs the README from a fresh clone; classifier ready plus one family run in a project we did not write"
+check = ".github/workflows/stranger-run.yml"
+status = "partial"
+beads = ["jev-b35c.7"]
+
+[[pillar]]
+id = "current"
+clause = "what is declared ON is what is running"
+check = "classifier doctor --json (drift section)"
+status = "missing"
+beads = ["jev-b35c.3", "jev-35sg"]
+
+[cadence]
+daily = ["stranger-run.yml (Actions, 03:17 UTC)", "jev-latest canary (launchd, 09:07)", "pillar checks (omp-kit MP5, not running)", "fleet watcher (stopped)"]
+weekly = ["value-ledger review", "omp-kit doctor --scope mission (MP2, not running)"]
+exit = "every pillar check green on 7 consecutive daily rows"
+
+[blast_radius]
+installs_outside_repo = [".omp/extensions/jev-memory-filter.ts (every repo's session via global install)", "~/.omp hooks installed by kit"]
+rule = "latency budget under omp handler limits, fail open, host pane 1 off switch"
+shared_binaries = ["br 0.7.4", "ntm 1.36.1", "dcg 0.15.2", "cass 0.10.0", "bv 0.25.2", "ubs 5.4.17"]
+neighbours = { localbench = "%55", omp-kit = "omp-test %54", uds = "control-plane:%57" }

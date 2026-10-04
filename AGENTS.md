@@ -63,9 +63,14 @@ build output are still files: cheap to rebuild is not the same as yours to delet
 
 ## The Mission
 
-> **Turn Jev ON in the tools we use and prove it live.** Validate Jev with live calls on data we did
-> not write, build tools from what survives, turn them on in omp and our fleet, measure the benefit
-> in our own session logs, and keep a README a stranger can run.
+**Plan of record: [`ROADMAP.md`](ROADMAP.md) "Mission" (approved by Joshua 2026-10-04; machine form
+`.omp/mission.toml`). It wins where this section disagrees. Every open bead carries a `pillar:` label;
+a failure in shared tooling goes to omp-kit (%54), never a local-only patch.**
+
+> **Typed classifiers that earn their place in our tools: each one proven live, measured, and
+> delivered through one model-neutral CLI.** Its first pillar keeps the 2026-09-30 mission: turn Jev
+> ON in the tools we use and prove it live, measured in our own session logs, with a README a
+> stranger can run.
 
 Joshua, 2026-09-30, verbatim: *"i want this on and tested - dont give me 'waiting for approval' bs -
 i've given blanket approval to get this on and valuable and figured out"*.
