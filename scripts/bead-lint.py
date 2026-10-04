@@ -120,6 +120,21 @@ def path_exists(path):
         return False
 
 
+# A command that is only an interpreter name runs nothing (jev-8vli/cqbj/dau5/nwo1, WildCarp
+# converge r1 L3, 2026-10-04: "`python3` over the committed rows" passed lint).
+BARE_INTERPRETERS = {
+    "python3",
+    "python",
+    "node",
+    "bash",
+    "sh",
+    "uv run",
+    "npm",
+    "npx",
+    "jq",
+}
+
+
 def command_problems(acc, root=None):
     """(missing paths, placeholders) inside the acceptance's backtick commands.
 
@@ -131,7 +146,7 @@ def command_problems(acc, root=None):
     created = declared_creates(acc)
     missing, placeholders = [], []
     for span in backtick_spans(acc):
-        if multiword_slot(span):
+        if multiword_slot(span) or span.strip() in BARE_INTERPRETERS:
             placeholders.append(span)
         for token in span.split():
             base = token.strip("'\"(),;[]").split(":", 1)[0]

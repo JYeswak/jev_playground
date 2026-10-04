@@ -148,6 +148,14 @@ class BeadLint(unittest.TestCase):
         )
         self.assertIn("missing-path", self.codes(bead, {"jev-x.1"}))
 
+    def test_bare_interpreter_command_is_a_placeholder(self):
+        # WildCarp converge r1 L3: "`python3` over the committed rows" named no script.
+        bead = dict(
+            COMPLETE,
+            acceptance_criteria="`python3` over the committed rows recomputes 0.906. Plant a bad row.",
+        )
+        self.assertIn("placeholder", self.codes(bead, {"jev-x.1"}))
+
 
 if __name__ == "__main__":
     unittest.main()
