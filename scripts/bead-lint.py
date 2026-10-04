@@ -1,0 +1,186 @@
+#!/usr/bin/env python3
+"""bead-lint: is each bead self-contained enough for a fresh agent to work it alone?
+
+beads-workflow quality checklist made executable: every non-epic bead needs WHAT and WHY,
+an acceptance with a runnable command and a planted negative, at least one checkable source
+(repo path, path:line, arXiv id, URL, or commit sha), and no dependency on a bead that does
+not exist. Read-only: it never writes beads.
+
+Usage: bead-lint.py [--epic ID | --ids ID,ID] [--all-open] [--json]
+Exit: 0 no findings, 1 findings, 64 usage, 69 br unavailable.
+"""
+
+import argparse
+import json
+import os
+import re
+import sqlite3
+import subprocess
+import sys
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parent.parent
+# Linear patterns only (regex-engineering section 7: 50k near-miss < 50 ms each).
+ARXIV = re.compile(r"arXiv:\d{4}\.\d{4,5}")
+URL = re.compile(r"https?://[^\s)]{1,300}")
+SHA = re.compile(
+    r"\b(?=[0-9a-f]{0,39}[a-f])[0-9a-f]{8,40}\b|\bcommit[: ][0-9a-f]{7,40}\b"
+)
+SOURCE_EXT = (
+    ".md",
+    ".py",
+    ".ts",
+    ".mjs",
+    ".sh",
+    ".json",
+    ".jsonl",
+    ".rs",
+    ".tsv",
+    ".yml",
+    ".yaml",
+)
+COMMAND_MARKERS = (
+    "`",
+    "python3 ",
+    "node ",
+    "npm ",
+    "bash ",
+    "br ",
+    "classifier ",
+    "jq ",
+    " -> ",
+)
+NEGATIVE_MARKERS = (
+    "planted",
+    "negative",
+    "refus",
+    "must not",
+    "never ",
+    "fails",
+    "red ",
+)
+
+
+def has_path(text):
+    """A token that names a repo file, optionally with :line (checked with str ops, no regex)."""
+    for token in text.split():
+        base = token.strip("`'\"(),;[]").split(":", 1)[0]
+        if base.endswith(SOURCE_EXT) and len(base) > 3:
+            return True
+    return False
+
+
+def has_source(text):
+    return bool(
+        ARXIV.search(text) or has_path(text) or URL.search(text) or SHA.search(text)
+    )
+
+
+def lint_bead(bead, ids, deps):
+    """Findings for one bead. ids: every known bead id. deps: (dependent, prerequisite) pairs."""
+    desc = bead.get("description") or ""
+    acc = bead.get("acceptance_criteria") or ""
+    if not acc and "ACCEPTANCE" in desc:
+        acc = desc[desc.index("ACCEPTANCE") :]
+    out = []
+
+    def add(code, why):
+        out.append({"id": bead["id"], "code": code, "why": why})
+
+    if "WHAT" not in desc:
+        add("no-what", "description has no WHAT: the observable change")
+    if "WHY" not in desc:
+        add("no-why", "description has no WHY: the measurement or failure behind it")
+    if not acc.strip():
+        add("no-acceptance", "no acceptance criteria")
+    if bead.get("issue_type") != "epic":
+        low = acc.lower()
+        if not any(m in acc for m in COMMAND_MARKERS):
+            add("no-command", "acceptance names no runnable command")
+        if not any(m in low for m in NEGATIVE_MARKERS):
+            add("no-negative", "acceptance has no planted negative or refusal case")
+    if not has_source(desc + " " + acc):
+        add(
+            "no-source",
+            "no checkable source: path, path:line, arXiv id, URL or commit sha",
+        )
+    for dependent, prereq in deps:
+        if dependent == bead["id"] and prereq not in ids:
+            add("dangling-dep", f"depends on {prereq}, which does not exist")
+    return out
+
+
+def load(epic, wanted, all_open):
+    env = dict(os.environ, RUST_LOG="off")
+    try:
+        raw = subprocess.run(
+            ["br", "list", "--json", "--limit", "0"],
+            cwd=REPO,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=60,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        print(
+            f"bead-lint: br unavailable ({exc}); run from the jev checkout with br on PATH",
+            file=sys.stderr,
+        )
+        sys.exit(69)
+    issues = json.loads(raw.stdout)["issues"]
+    ids = {b["id"] for b in issues}
+    db = sqlite3.connect(f"file:{REPO / '.beads/beads.db'}?mode=ro", uri=True)
+    deps = [
+        (a, b)
+        for a, b in db.execute(
+            "select issue_id, depends_on_id from dependencies where type='blocks'"
+        )
+    ]
+    live = [b for b in issues if b["status"] in ("open", "in_progress")]
+    if epic:
+        sel = [b for b in live if b["id"] == epic or b["id"].startswith(epic + ".")]
+    elif wanted:
+        sel = [b for b in issues if b["id"] in wanted]
+    elif all_open:
+        sel = live
+    else:
+        return None, ids, deps
+    return sel, ids, deps
+
+
+def main(argv=None):
+    p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    p.add_argument("--epic", help="lint the epic and its dotted children")
+    p.add_argument("--ids", help="comma-separated bead ids")
+    p.add_argument(
+        "--all-open", action="store_true", help="lint every open or in-progress bead"
+    )
+    p.add_argument("--json", action="store_true", help="one JSON object on stdout")
+    a = p.parse_args(argv)
+    wanted = {i for i in (a.ids or "").split(",") if i}
+    sel, ids, deps = load(a.epic, wanted, a.all_open)
+    if sel is None:
+        print(
+            "bead-lint: name what to lint: --epic jev-b35c, --ids jev-a,jev-b, or --all-open",
+            file=sys.stderr,
+        )
+        return 64
+    findings = [f for b in sel for f in lint_bead(b, ids, deps)]
+    if a.json:
+        print(
+            json.dumps(
+                {"schema": "bead-lint.v1", "checked": len(sel), "findings": findings},
+                sort_keys=True,
+            )
+        )
+    else:
+        for f in findings:
+            print(f"{f['id']}\t{f['code']}\t{f['why']}")
+        print(
+            f"bead-lint: {len(sel)} checked, {len(findings)} findings", file=sys.stderr
+        )
+    return 1 if findings else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
