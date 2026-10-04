@@ -66,6 +66,33 @@ test("a worker's second stop is silent, so the idle message cannot loop", () => 
   assert.equal(decideStop({ stop_hook_active: true }, { ...quiet, paneIndex: 4 }), undefined);
 });
 
+// Joshua 2026-10-04: no bead implementation until two clean convergence rounds. The worker line
+// "finish the bead you have in progress / claim from br ready" sent GoldRiver into writing
+// work/jev-nwo1/score.py during the freeze (19:30Z).
+test("during a build freeze a worker is not told to claim or finish bead work", () => {
+  const result = decideStop(
+    { stop_hook_active: false },
+    { ...quiet, readyCount: 17, paneIndex: 6, freeze: "Joshua 2026-10-04: two clean convergence rounds first" },
+  );
+  assert.equal(result.continue, true);
+  assert.match(result.additionalContext, /BUILD FREEZE/);
+  assert.match(result.additionalContext, /two clean convergence rounds first/);
+  assert.match(result.additionalContext, /IDLE pane 6:/);
+  assert.doesNotMatch(result.additionalContext, /br ready has|claim an unassigned|finish the bead you have in progress/);
+});
+
+test("during a build freeze the conductor's quiet turn stays silent even with ready work", () => {
+  assert.equal(
+    decideStop({ stop_hook_active: false }, { ...quiet, readyCount: 17, paneIndex: 1, freeze: "x" }),
+    undefined,
+  );
+});
+
+test("an empty freeze reason is no freeze", () => {
+  const result = decideStop({ stop_hook_active: false }, { ...quiet, readyCount: 2, paneIndex: 3, freeze: "" });
+  assert.match(result.additionalContext, /br ready has 2 item/);
+});
+
 // Measured 2026-09-24: an `omp --mode=rpc` probe launched from pane 7 inherited TMUX_PANE, was
 // treated as a worker, and was steered into bead work instead of the one write it was sent to plant.
 test("a non-interactive probe session is never continued, even from a worker pane with ready work", () => {

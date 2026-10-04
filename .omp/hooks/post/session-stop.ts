@@ -57,6 +57,7 @@ export function decideStop(
     lastText: string;
     paneIndex?: number;
     interactive?: boolean;
+    freeze?: string;
   },
 ): { continue: true; additionalContext: string } | undefined {
   if (event.stop_hook_active || event.signal?.aborted) return undefined;
@@ -66,6 +67,20 @@ export function decideStop(
   if (world.interactive === false) return undefined;
   const standingDown = STAND_DOWN.test(world.lastText);
   const worker = typeof world.paneIndex === "number" && world.paneIndex >= 2;
+  const frozen = Boolean(world.freeze && world.freeze.trim());
+  if (frozen) {
+    // A build freeze overrides "finish your bead / claim br ready": during the 2026-10-04 freeze
+    // that line sent a worker into implementation. Workers still report idle, never stop silently.
+    if (!worker) return undefined;
+    return {
+      continue: true,
+      additionalContext:
+        `BUILD FREEZE: ${world.freeze!.trim()}. Do only the review task pane 1 assigned you; ` +
+        `no bead implementation, no new scripts or tests, no br claims, no commits outside your review file. ` +
+        `If you have no assigned review, run \`ntm send jev --pane=1 "IDLE pane ${world.paneIndex}: <one line on what you finished>"\` ` +
+        `and stop.`,
+    };
+  }
   if (!worker && world.readyCount <= 0 && world.missing.length === 0 && !standingDown) return undefined;
   const parts = [MISSION];
   if (worker) {
@@ -111,6 +126,17 @@ function readyCount(): number {
   }
 }
 
+// The freeze switch: a non-empty file at this path holds the reason (one line). Absent = no freeze.
+export const FREEZE_FILE = `${process.env.HOME ?? ""}/.local/state/jev/build-freeze`;
+
+function freezeReason(): string {
+  try {
+    return existsSync(FREEZE_FILE) ? readFileSync(FREEZE_FILE, "utf8").split("\n")[0].slice(0, 300) : "";
+  } catch {
+    return "";
+  }
+}
+
 function paneIndex(): number | undefined {
   const pane = process.env.TMUX_PANE;
   if (!pane) return undefined;
@@ -147,6 +173,7 @@ export default function sessionStopHook(pi: {
         interactive:
           Boolean(process.stdin.isTTY) &&
           !process.argv.some((arg) => arg.startsWith("--mode") || arg === "-p" || arg === "--print"),
+        freeze: freezeReason(),
       });
     } catch {
       return undefined;
