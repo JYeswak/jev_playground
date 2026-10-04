@@ -5,14 +5,15 @@ import { delimiter, join } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const checker = join(process.cwd(), "scripts/check-hook-loads.mjs");
-const bun = process.env.PATH.split(delimiter).map((directory) => join(directory, "bun")).find((file) => {
+function accessible(file, mode = constants.F_OK) {
   try {
-    accessSync(file, constants.X_OK);
+    accessSync(file, mode);
     return true;
   } catch {
     return false;
   }
-});
+}
+const bun = process.env.PATH.split(delimiter).map((directory) => join(directory, "bun")).find((file) => accessible(file, constants.X_OK));
 assert.ok(bun, "Bun executable must be on PATH");
 
 function fixture() {
@@ -87,7 +88,11 @@ describe("installed hook and extension load check", () => {
     assert.ok(output.includes("expected-on extension is not listed: good-extension"), output);
   });
 
-  it("passes the real checkout and installed profiles within the ten-second budget", () => {
+  // This arm checks THIS machine's installed omp profiles. A CI runner or a stranger's clone has
+  // none, so there it is a typed skip (missing prerequisite), never a pass; the planted arms above
+  // still run everywhere.
+  const installed = accessible(join(process.env.HOME, ".omp", "agent", "config.yml"));
+  it("passes the real checkout and installed profiles within the ten-second budget", { skip: installed ? false : "missing prerequisite: omp install (~/.omp/agent/config.yml)" }, () => {
     const started = performance.now();
     const result = run(process.cwd(), process.env.HOME);
     assert.equal(result.status, 0, (result.stdout || "") + (result.stderr || ""));
