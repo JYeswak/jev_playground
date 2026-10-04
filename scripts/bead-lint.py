@@ -51,7 +51,7 @@ COMMAND_MARKERS = (
     " -> ",
 )
 NEGATIVE_MARKERS = (
-    "planted",
+    "plant",
     "negative",
     "refus",
     "must not",
@@ -114,7 +114,9 @@ def load(epic, wanted, all_open):
     env = dict(os.environ, RUST_LOG="off")
     try:
         raw = subprocess.run(
-            ["br", "list", "--json", "--limit", "0"],
+            # --all: closed beads are valid prerequisites; without it every edge to a closed
+            # bead read as dangling (2 false positives on jev-06wt, jev-ara9, 2026-10-04).
+            ["br", "list", "--all", "--json", "--limit", "0"],
             cwd=REPO,
             capture_output=True,
             text=True,

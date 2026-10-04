@@ -76,6 +76,14 @@ class BeadLint(unittest.TestCase):
         )
         self.assertNotIn("no-source", self.codes(bead, {"jev-x.1"}))
 
+    def test_imperative_plant_counts_as_a_negative(self):
+        # jev-b35c.16 (2026-10-04) wrote "Plant out-of-scope route ..." and was flagged no-negative.
+        bead = dict(
+            COMPLETE,
+            acceptance_criteria="`node --test x.mjs` passes. Plant a bad fixture; assert the safe side.",
+        )
+        self.assertNotIn("no-negative", self.codes(bead, {"jev-x.1"}))
+
 
 if __name__ == "__main__":
     unittest.main()

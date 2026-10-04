@@ -106,19 +106,40 @@ Beads (epic `jev-b35c`; edges are real prerequisites only, 0 cycles):
 | Rename and shell | `.1` | — |
 | Registry and error rewrites | `.2` | `.1` |
 | Doctor | `.3` | `.1` |
-| **Measurement core** (D2-D7, D17) | `.10` | — |
-| Backend seam + combine/cascade/llm (D8, D10) | `.4` | `.1`, `.2`, `.10` |
-| Families | `.5` | `.2`, `.4`, `.10` |
+| **Measurement core** (D2-D7, D17): integration owner | `.10` | `.23`, `.24`, `.25` |
+| ↳ symmetric calibration + rerun spread (D2, D7) | `.23` | — |
+| ↳ expected-cost, NP, prevalence, KS (D3, D4, D16) | `.24` | — |
+| ↳ conformal sets, multiplicity, PPI (D5, D6, D17) | `.25` | — |
+| Backend seam + combine/cascade (D8) | `.4` | `.1`, `.2`, `.10` |
+| ↳ shippable LLM comparison arm (D10) | `.15` | `.2`, `.4`, `.10` |
+| Families: integration owner (D9 do-not-build list) | `.5` | `.16`, `.17`, `.2`, `.4`, `.10` |
+| ↳ cohort A: route, rank, verify, score, gate | `.16` | `.2`, `.4`, `.10`, `.15` |
+| ↳ cohort B: screen, diff, memory, watch, effort | `.17` | `.2`, `.4`, `.10`, `.15` |
 | Skill-gap migration | `.6` | `.2`, jev-daily-omp-skill-gap-mining-7jci |
 | `ready` | `.7` | `.5`, `.10` |
-| Installer | `.8` | `.3`, `.5` |
+| Doctor repair (scoped mutation, undo, quarantine) | `.14` | `.3` |
+| Installer: integration owner | `.8` | `.3`, `.5`, `.18`-`.22` |
+| ↳ foundation: plan, manifest, bootstrap, package | `.18` | `.1` |
+| ↳ targets: CLI, omp profile/config, skills | `.19` | `.1`, `.2`, `.5` |
+| ↳ target: services and daily job | `.20` | `.1`, `.2`, `.3`, `.5` |
+| ↳ target: local Clef | `.21` | `.1`, `.4` |
+| ↳ verification ladder, docs, completions, e2e | `.22` | `.3`, `.5`, `.18`-`.21` |
 | Docs | `.9` | `.8` |
 | `ask` bundle (D11) | `.11` | `.4` |
-| `chain` + rank long-doc (D12) | `.12` | `.2`, `.4` |
+| `chain`: integration owner (D12) | `.12` | `.26`, `.27` |
+| ↳ propose-check-act runner | `.26` | `.2`, `.4` |
+| ↳ rank long-document windowed search | `.27` | `.2`, `.4` |
 | `extract` family (D13) | `.13` | `.2`, `.4` |
+| `overview` mega-command | `.28` | `.1`-`.5`, `.8`, `.10` |
 
-Incidents outside the epic: `jev-08hr` (memory enforce switch absent), `jev-35sg` (skill-hint
-running while OFF), `jev-s0ve` (memory filter 45.5% deadline-keep; `jev-9cqw` waits on it).
+The epic owns D14 and D15 (inherited by every child). Every child `.1`-`.28` must close before the
+epic closes. Wave 1 (2026-10-04, five read-only review lanes in `var/agent-tmp/wave1/`) produced these
+children, the acceptance rewrites and the binding MATH REVIEW sections; `scripts/bead-lint.py --epic
+jev-b35c` reports 29 checked, 0 findings.
+
+Incidents outside the epic: `jev-08hr` (memory enforce switch: toggled by the jev-qpv2 natural
+experiment, not a fault), `jev-35sg` (skill-hint running while OFF), `jev-s0ve` (memory filter
+45.5% deadline-keep). `jev-9cqw` waits on `jev-s0ve` and `jev-qpv2`.
 
 1. **Rename and shell** — `classifier`/`clf` bin, argv with did-you-mean, help/version exit 0,
    exit-code module, envelope (ergo T1-T4). Fixes the silent-flag and no-key-exit defects.
