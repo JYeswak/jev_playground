@@ -1,4 +1,4 @@
-# `classifier` — product plan (DRAFT for review; no beads yet)
+# `classifier` — product plan (beads: epic jev-b35c; building waits for Joshua's go)
 
 One CLI that applies typed classifiers (Choice / Score / Noul, calibrated probabilities, an abstain
 path) to the work this fleet touches. The backend is a flag, never the name: TypeSafe Jev
@@ -55,8 +55,8 @@ window, not a check of these numbers.
 | 1 | `rank` | top-1 passage/file for a query | omp `find` 32,301 calls/7 d [sb]; 576 vs 5,293 tokens per located file; FiQA top-1 76.2% vs BM25 39.3% | unmeasured | library + CLI; omp native already ON |
 | 2 | `screen` | is this text an injection? | 268/300 caught, 5/300 false flags; public 639/662 | unmeasured (nimble/tev1 lose) | omp tool-result hook (shadow) |
 | 3 | `gate` | is this command risky? (free cascade first) | cascade clears 133/135 free (PROVISIONAL: EVAL.md:3703 flags a conflicting jev-nr3c row at EVAL.md:3316, 42 scored / 3 cleared, and the verifier resolution is outstanding); Jev signal alone 0/403 harmful (REFUTED as a signal) | unmeasured | advisory hook; rubric must be frozen first [areas key findings] |
-| 4 | `route` | which intent/queue, with abstain | Banking77, CLINC150 + abstain | **WIN** acc .962 vs .787, ECE .025 vs .102 | CLI + library; Clef primary |
-| 5 | `diff` | is this hunk vendored / license-bearing? | prec .842 rec .640 vs license regex rec .130 (PASS with one preregistered accuracy-delta lock missed by 0.005, EVAL.md:3568); organic prevalence 0/39 | **WIN** AUC .839 vs .827 (raw ECE .311: never uncalibrated) | pre-merge CI check on imported code, not organic commits |
+| 4 | `route` | which intent/queue, with abstain | Banking77, CLINC150 + abstain | **Accuracy WIN** .962 vs .787 (McNemar 107/2). Calibration TIE once both get the same dev-fitted Platt map: ECE .0246 vs .0276, diff CI [-.010, +.037] (specs/advanced-mathops.md section A) | CLI + library; Clef primary for accuracy |
+| 5 | `diff` | is this hunk vendored / license-bearing? | prec .842 rec .640 vs license regex rec .130 (PASS with one preregistered accuracy-delta lock missed by 0.005, EVAL.md:3568); organic prevalence 0/39; cut 0.35 was Youden-tuned on a 60/60 set and predicts precision .21 at 5% prevalence (specs/advanced-mathops.md) | **TIE** AUC .839 vs .827, DeLong p=.67; Jev+Clef logistic combination AUC .862 vs Jev .828 (p=.005) | pre-merge CI check on imported code, not organic commits |
 | 6 | `verify` | does the evidence support the claim? | SciFact/FEVER: accuracy tie, better Brier/ECE; numeric claims REFUTED | unmeasured | CLI + library |
 | 7 | `memory` | is this recalled memory relevant now? | Drop precision .985 on the blind 30/30 check. Of the ~455k tokens counted over 7 d [sb window], 312k came from the mechanical top-3 cut (`cap3-pruned`, no Jev), 160k are Jev `scored` would-drops that are removed only on enforced turns (368 enforced turns in 7 d), 39k memo. The enforce switch file has been absent since 2026-10-04T01:59Z, so Jev drops are not applied (scoring continues). Keep side fails: keep precision 0.190-0.242 across designs (NE:4869, 4897, 5019). Long-result keep/drop lost on safety in its first run (EVAL.md:3685) and is EXPLORED-only after (EVAL.md:3692, jev-dau5 replication pending) | too slow for the 1.5 s hook budget | omp extension (drop side only; enforcement switch currently off) |
 | 8 | `effort` | which model tier / effort for this task | gate-cascade cost win only; usage router and best-of-N LOST | unmeasured | shadow only until a bar passes |
@@ -99,6 +99,27 @@ Rows 16-18 are where "done is done, validation recurs": `classifier <family> wat
 Detailed task lists with files and commands: [ergo §3] T1-T14, [doctor §5] T1-T11,
 [install §3] 14 tasks, [clef §5] T0-T9. The merged order:
 
+Beads (epic `jev-b35c`; edges are real prerequisites only, 0 cycles):
+
+| Step | Bead | Needs |
+|---|---|---|
+| Rename and shell | `.1` | — |
+| Registry and error rewrites | `.2` | `.1` |
+| Doctor | `.3` | `.1` |
+| **Measurement core** (D2-D7, D17) | `.10` | — |
+| Backend seam + combine/cascade/llm (D8, D10) | `.4` | `.1`, `.2`, `.10` |
+| Families | `.5` | `.2`, `.4`, `.10` |
+| Skill-gap migration | `.6` | `.2`, jev-daily-omp-skill-gap-mining-7jci |
+| `ready` | `.7` | `.5`, `.10` |
+| Installer | `.8` | `.3`, `.5` |
+| Docs | `.9` | `.8` |
+| `ask` bundle (D11) | `.11` | `.4` |
+| `chain` + rank long-doc (D12) | `.12` | `.2`, `.4` |
+| `extract` family (D13) | `.13` | `.2`, `.4` |
+
+Incidents outside the epic: `jev-08hr` (memory enforce switch absent), `jev-35sg` (skill-hint
+running while OFF), `jev-s0ve` (memory filter 45.5% deadline-keep; `jev-9cqw` waits on it).
+
 1. **Rename and shell** — `classifier`/`clf` bin, argv with did-you-mean, help/version exit 0,
    exit-code module, envelope (ergo T1-T4). Fixes the silent-flag and no-key-exit defects.
 2. **Family registry and error rewrites** — `capabilities`, `robot-docs` and `schema` generated
@@ -130,8 +151,32 @@ Detailed task lists with files and commands: [ergo §3] T1-T14, [doctor §5] T1-
 - Clef is measured on two tasks only. "Prefer Clef" is a routing rule gated on receipts, not a
   default.
 - The ten families are a ranking of where evidence exists today, not a promise that each will pass.
+- The memory row's ".985 drop precision" is near the always-drop baseline (.94, p=.080); the number
+  that decides safety is relevant memories dropped, 1/6 (Wilson [.03, .56]) (specs/advanced-mathops.md).
 
-## 7. Next step
+## 7. Decision register
 
-One non-author review of this file, then Joshua's go, then conversion to beads under one epic with
-the section 5 order as edges.
+Every structural choice, with what it beat, the evidence, whether we borrow or write it, and what
+would reverse it. Sources: `specs/advanced-mathops.md` [M], `specs/advanced-literature.md` [L],
+`specs/advanced-repos.md` [R], `specs/ideas-*.md` [I], the five CLI specs. Every number is a
+recomputation on committed rows unless marked as an upstream claim (UPSTREAM).
+
+| # | Decision | Chosen | Rejected | Evidence | Borrow / write | Reversed if |
+|---|---|---|---|---|---|---|
+| D1 | Name | `classifier` / `clf`; backend is a flag | `jev` (owned by hermes on PATH); a model name | Joshua verbatim (section 1); `command -v` 2026-10-04 | write | — |
+| D2 | Calibrating backends | the same pipeline for every backend: floor probabilities at 0.005, fit on dev (temperature, Platt, isotonic), report ECE with its noise floor and a bootstrap CI, compare with paired tests | calibrate one backend, compare against the other raw | Jev ECE .1017 -> .0276 with the same Platt map [M A]; 181/3,080 Banking77 rows put exactly 0.00 on gold [R]; noise floor ECE ~.045 at n=60 (UPSTREAM jev-exploration) [R]; Guo et al. 2017 [L] | PORT the design of franken_nlp `src/calibration.rs` (digest-bound splits, temperature, isotonic PAV, seeded bootstrap, abstain = exit 0) [R]; write in TS, zero deps | symmetric recalibration on committed rows does not reproduce Jev ECE ~.028 |
+| D3 | Setting cuts | expected-cost cut at projected real prevalence; Neyman–Pearson cut from negatives only where positives are scarce (29/59/149/299 negatives for FPR .10/.05/.02/.01, δ=.05) | Youden on a balanced dev set; fixed 0.5 | Youden 0.35 predicts precision .21 at 5% prevalence, matching organic .19-.24 [M]; NP umbrella (Tong et al.) [L K1] | write (order statistic + cost matrix); idea from process_triage expected-loss action [R] | an NP cut on held negatives exceeds its stated FPR bound in replay |
+| D4 | Before shipping any bar | project the result to real prevalence (BBSE) and run a KS alarm on live scores | trust the demo-set number | skill veto .990 -> .335 was predictable: projection gives .40-.63, KS p≈.001 [L R4] | write; QuaPy as idea [R] | projection fails to predict a known demo-to-organic drop when replayed |
+| D5 | Abstain path | split-conformal LAC answer sets (`route --set`), refuse when exchangeability is not declared | top-k lists; a fixed confidence cut | α=.10: coverage .903, mean size 1.67, 58.5% singletons at 94.9% accuracy; worst class .152 (marginal guarantee only); α=.05 degenerate because of exact zeros [L R2] | write the algorithm (small); borrow franken_nlp's exchangeability-memo refusal [R] | coverage on a fresh disjoint split falls outside its finite-sample band |
+| D6 | Many tests | Benjamini–Hochberg across the ledger; e-BH within a batch; confidence sequences to stop shadow phases | per-bar α=.05 with no correction | 74 bars at .05 imply ~3.7 false passes [M] | write; e-BH idea from process_triage [R] | — (accounting rule) |
+| D7 | Drift and canaries | test against same-model rerun spread | textbook McNemar null | two runs of pinned jev-1.13.0 differ at p=.0076 on 3,080 rows [L R5] | write | — |
+| D8 | Combining backends | per-task logistic combination and Jev-first cascade, only with a committed receipt | always one backend | combination AUC .862 vs .828 (p=.005); cascade sends 42% to Clef, .942 vs .962 [M] | write | the combination loses its gain on a disjoint split |
+| D9 | Rejected designs | do not build: agreement/Dawid–Skene accuracy estimates, juries, self-consistency, BM25-margin cascade for `find` | — | Dawid–Skene ranks Clef .872 / Jev .924 against true .962 / .787; errors correlated (.182 vs .059) [L R3]; self-consistency AUROC .525 vs 1−conf .843 [L R6]; BM25 cascade −3.4 pp for −20% calls [L R7] | — | new evidence on our rows |
+| D10 | Comparison arm | `--backend llm` through system-one-adapter-python as the shippable-LLM incumbent in every `eval` | no LLM arm | ML Test Score "simpler model" test [areas]; adapter gives the same API over any LLM [I] | USE-AS-BASELINE (external process; licence check before vendoring) | — |
+| D11 | Multi-question calls | `ask` takes a bundle of mixed questions over one state | one primitive per call | parallel_questions cookbook: 12.2x cheaper, 10x faster (UPSTREAM, not re-run) [I] | write | bundle answers differ from single calls beyond run-to-run spread |
+| D12 | Long documents / chained steps | `chain` (propose, check, act); `rank` long-doc = section tree with a beam of 3 and a Noul check | single flat Choice | jev-doc-search, 2 example questions (UPSTREAM) [R]; hierarchical beam REFUTED for routing (NE:3604), untested for document search | borrow the algorithm idea; write | fails its own committed bar on a doc-search set |
+| D13 | Extraction | an `extract` family: code proposes candidates, a Choice picks one, code renders | free-text generation | 5 of 18 cookbooks use this shape [I] | write | — |
+| D14 | CLI shell, doctor, installer | robot mode, `capabilities --json`, golden schema tests; doctor/health/repair; manifest installer | ad-hoc verbs | coding_agent_session_search robot mode [R]; the three CLI skills (specs/cli-*.md) | borrow conventions; write | — |
+| D15 | Dependencies | port algorithms, import nothing heavy | import MAPIE/TorchCP/alibi-detect | licences: alibi-detect BSL, TorchCP LGPL, Jev-Calibration unlicensed [R]; AGENTS.md design decision 6 | port | — |
+| D16 | Memory filter | fix the deadline model, then measure P(drop given relevant) on >= 59 sampled relevant memories, then decide enforcement | enforce on drop precision | 45.5% of items time out (1,328/2,921); drop precision .985 vs always-drop .94 (p=.080); relevant dropped 1/6 [M]; relabel 22/30 < 27 (jev-9cqw) | write | — |
+| D17 | Labels | prediction-powered inference for metrics on organic traffic before spending labels | label everything / label nothing | PPI (Angelopoulos et al.) [L]; ~0 organic positives killed m94x, 9kmq | write; ppi_py as reference [R] | PPI interval no narrower than labels-only on our data |
