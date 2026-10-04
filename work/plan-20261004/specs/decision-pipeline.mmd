@@ -1,0 +1,51 @@
+flowchart TD
+  %% One omp decision point, end to end. Cheapest layer first; each layer either decides with
+  %% calibrated confidence or passes the case down. Every node is owned by one session.
+
+  subgraph OMP["omp session (omp-kit owns load + rules)"]
+    EV["omp event<br/>tool_call / tool_result / before_agent_start / session_stop"]
+    HOOK["jev hook or extension<br/>latency budget, fail-open, off switch"]
+  end
+
+  subgraph CONTRACT["decision contract (kit/contracts/family.json)"]
+    STATE["state builder<br/>allowlisted fields, size cap, no raw transcript"]
+  end
+
+  subgraph CASCADE["cascade: cheapest first, stop at the first confident layer"]
+    R0["L0 rule / regex / lookup<br/>~0 ms, $0"]
+    R1["L1 embedding + linear probe<br/>Qwen3-0.6B / bge, ms, $0"]
+    R2["L2 encoder classifier<br/>DeBERTa / MiniCheck / NLI, 10-100 ms, $0"]
+    R3["L3 typed model<br/>Clef local via localbench gateway, 3-4 s<br/>or Jev hosted, 0.2-1 s, paid"]
+    R4["L4 LLM judge<br/>comparison arm only"]
+  end
+
+  CAL["calibration + threshold<br/>same Platt for every backend, NP or cost cut, abstain set"]
+  ACT["action on the safe side<br/>keep / allow / annotate / route / drop"]
+  LOG["decision log ~/.local/state/jev<br/>backend, latency, cost, hash, never text"]
+
+  subgraph OUTCOME["outcome labels from the fleet logs"]
+    LBL["read-back, re-read, error, revert, user correction"]
+  end
+
+  subgraph PROOF["proof and value (beads)"]
+    CONF["conformance C1-C7 + goldens<br/>harness bead"]
+    L3P["L3 live both ways<br/>jev-grzn"]
+    VAL["value ledger KEEP / KILL<br/>jev-mvvh, VALUE2 jev-ktrx"]
+  end
+
+  EV --> HOOK --> STATE --> R0
+  R0 -- "decided" --> CAL
+  R0 -- "unsure" --> R1
+  R1 -- "confident" --> CAL
+  R1 -- "unsure" --> R2
+  R2 -- "confident" --> CAL
+  R2 -- "unsure or no encoder" --> R3
+  R3 --> CAL
+  R4 -. "offline bake-off only" .-> CAL
+  CAL --> ACT --> LOG
+  HOOK -- "timeout / no key / cap" --> ACT
+  LOG --> LBL
+  LBL -- "fixtures + goldens" --> CONF
+  LBL -- "rows" --> VAL
+  CONF --> L3P --> VAL
+  VAL -- "KILL switches the surface off" --> HOOK
