@@ -76,6 +76,73 @@ def has_source(text):
     )
 
 
+def backtick_spans(text):
+    """Contents of `...` spans: the runnable commands a bead names (str ops, no regex)."""
+    parts = text.split("`")
+    return parts[1::2]
+
+
+def declared_creates(text):
+    """Paths the bead says it creates: tokens after 'creates:' up to the next sentence end."""
+    out = set()
+    low = text.lower()
+    start = 0
+    while (i := low.find("creates:", start)) != -1:
+        tail = text[i + len("creates:") :].split(". ", 1)[0].split("\n", 1)[0]
+        for token in tail.replace(",", " ").split():
+            out.add(token.strip("`'\"();[]").rstrip("."))
+        start = i + 1
+    return out
+
+
+def multiword_slot(span):
+    """True when a `<...>` slot in the command contains a space and only words (not `<`/`>` operators)."""
+    start = 0
+    while (i := span.find("<", start)) != -1:
+        j = span.find(">", i)
+        if j == -1:
+            return False
+        inner = span[i + 1 : j].strip()
+        if (
+            " " in inner
+            and inner.replace(" ", "").replace("-", "").replace("_", "").isalnum()
+        ):
+            return True
+        start = i + 1
+    return False
+
+
+def path_exists(path):
+    """exists() that treats an unstat-able path (too long, bad bytes) as missing instead of crashing."""
+    try:
+        return path.exists()
+    except (OSError, ValueError):
+        return False
+
+
+def command_problems(acc, root=None):
+    """(missing paths, placeholders) inside the acceptance's backtick commands.
+
+    A repo-relative path in a command must exist at `root` or be declared with `creates:`;
+    a `<two words>` slot inside a command stands in for a missing artifact (jev-mvvh, 2026-10-04);
+    one-word slots (`<id>`, `<dir>`, `<sha>`) are usage parameters and stay allowed.
+    """
+    root = REPO if root is None else root
+    created = declared_creates(acc)
+    missing, placeholders = [], []
+    for span in backtick_spans(acc):
+        if multiword_slot(span):
+            placeholders.append(span)
+        for token in span.split():
+            base = token.strip("'\"(),;[]").split(":", 1)[0]
+            if base.startswith(("-", "~", "/", "$")) or "*" in base or "://" in base:
+                continue
+            if "/" in base and (base.endswith(SOURCE_EXT) or base.endswith("/")):
+                if base not in created and not path_exists(root / base):
+                    missing.append(base[:200])
+    return missing, placeholders
+
+
 def lint_bead(bead, ids, deps):
     """Findings for one bead. ids: every known bead id. deps: (dependent, prerequisite) pairs."""
     desc = bead.get("description") or ""
@@ -104,6 +171,14 @@ def lint_bead(bead, ids, deps):
             "no-source",
             "no checkable source: path, path:line, arXiv id, URL or commit sha",
         )
+    missing, placeholders = command_problems(acc)
+    if missing:
+        add(
+            "missing-path",
+            f"command names {', '.join(sorted(set(missing)))}: not in the repo and not declared 'creates:'",
+        )
+    if placeholders:
+        add("placeholder", f"command contains a placeholder: `{placeholders[0][:80]}`")
     for dependent, prereq in deps:
         if dependent == bead["id"] and prereq not in ids:
             add("dangling-dep", f"depends on {prereq}, which does not exist")
