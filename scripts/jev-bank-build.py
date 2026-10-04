@@ -27,7 +27,7 @@ CALIBRATION = ROOT / "work" / "jev-state-size" / "calibration-osworld-r3.tsv"
 MAX_FULL_TOKENS = 32_768
 MAX_LOCAL_TOKENS = 1_500
 LONG_RESULT_CHARS = 10_000
-CENSOR_RECENT_HOURS = 24
+CENSOR_RECENT_HOURS = 48
 MIN_VERBATIM_REFERENCE_CHARS = 20
 D_LABEL_SOURCE = "observed-outcome:later-exact-reference-v1"
 D_LABEL_DEFINITION = (
@@ -621,6 +621,11 @@ def run_d(
             "filtered run excludes the full audit sample"
         )
     )
+    blind_double_label = (
+        d_blind_double_label(all_rows)
+        if cutoff is None
+        else not_run_blind_double_label("filtered run excludes the full blind sample")
+    )
     units_path = PRIVATE_OUT / "tool-result" / "units.jsonl"
     digest = _emit_jsonl(units_path, all_rows, dry_run)
     candidate = d_candidate(all_rows, split_cutoff)
@@ -670,6 +675,7 @@ def run_d(
         "duplicate_state": counters["duplicate_state"],
         "conflicting_state": counters["conflicting_state"],
         "mechanical_label_audit": mechanical_label_audit,
+        "blind_double_label": blind_double_label,
         "unit_sha256": digest,
         "candidate_sha256": candidate_sha,
     }
@@ -1140,6 +1146,122 @@ def not_run_blind_double_label(reason: str) -> dict[str, Any]:
     return {"n": 0, "agree": 0, "status": "NOT_RUN", "reason": reason}
 
 
+def d_blind_double_label(
+    rows: list[dict[str, Any]], evidence_root: Path = PUBLIC_OUT
+) -> dict[str, Any]:
+    manifest_path = evidence_root / "blind-sample-manifest.json"
+    rubric_path = evidence_root / "blind-rubrics.json"
+    labels_path = evidence_root / "vvkr-D-blind-labels.json"
+    manifest_bytes = manifest_path.read_bytes()
+    manifest = json.loads(manifest_bytes)
+    sample = manifest["tasks"]["D"]
+    ids = sample["ids"]
+    if len(ids) != 50 or len(set(ids)) != 50:
+        raise ValueError("D blind sample must contain 50 unique IDs")
+    candidate_ids = {row.get("unit_id") for row in rows}
+    if not set(ids).issubset(candidate_ids):
+        raise ValueError("D blind sample contains IDs not in candidate rows")
+
+    if not labels_path.is_file():
+        return {
+            **not_run_blind_double_label("D blind-label artifact is missing"),
+            "expected_rubric_sha256": sample["rubric_sha256"],
+            "sample_manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+        }
+
+    labels_bytes = labels_path.read_bytes()
+    record = json.loads(labels_bytes)
+    sample_ids_sha = hashlib.sha256(
+        json.dumps(ids, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    if (
+        record.get("schema_version") != "jev.decision-bank.blind-labels.v1"
+        or record.get("task") != "D"
+        or record.get("seed") != sample["seed"]
+        or record.get("sample_ids_sha256") != sample_ids_sha
+    ):
+        raise ValueError("D blind-label metadata does not match the frozen sample")
+
+    rubric_bytes = rubric_path.read_bytes()
+    rubrics = json.loads(rubric_bytes)
+    rubric_sha = hashlib.sha256(
+        json.dumps(
+            rubrics["D"], ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()
+    if rubric_sha != sample["rubric_sha256"]:
+        raise ValueError("D blind rubric does not match the frozen sample")
+    if record.get("rubric_sha256") != sample["rubric_sha256"]:
+        observed_rubric_sha = record.get("rubric_sha256")
+        return {
+            **not_run_blind_double_label(
+                "D blind labels use a different rubric; agreement is not claimed"
+            ),
+            "expected_rubric_sha256": sample["rubric_sha256"],
+            "observed_rubric_sha256": observed_rubric_sha,
+            "sample_manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+            "label_artifact_sha256": hashlib.sha256(labels_bytes).hexdigest(),
+        }
+
+    labelers: dict[str, dict[str, str]] = {}
+    source_hashes: dict[str, str] = {}
+    label_records = record.get("labelers")
+    if not isinstance(label_records, dict) or set(label_records) != {
+        "WildCarp",
+        "HazySpring",
+    }:
+        raise ValueError("D blind-label artifact must contain exactly two labelers")
+    for labeler in ("WildCarp", "HazySpring"):
+        label_record = label_records[labeler]
+        if not isinstance(label_record, dict):
+            raise TypeError(f"invalid D blind-label record for {labeler}")
+        if label_record.get("blind") is not True:
+            raise ValueError(f"D blind labels were not marked blind for {labeler}")
+        entries = label_record["labels"]
+        if not isinstance(entries, list) or len(entries) != len(ids):
+            raise ValueError(f"invalid D blind labels from {labeler}")
+        pairs = dict(entries)
+        if len(pairs) != len(entries) or set(pairs) != set(ids):
+            raise ValueError(f"D blind label IDs do not match sample for {labeler}")
+        if not set(pairs.values()).issubset({"relevant", "not-relevant"}):
+            raise ValueError(f"invalid D blind label value from {labeler}")
+        source_sha = label_record["source_artifact_sha256"]
+        if (
+            not isinstance(source_sha, str)
+            or len(source_sha) != 64
+            or any(char not in "0123456789abcdef" for char in source_sha.lower())
+        ):
+            raise ValueError(f"invalid D label source hash for {labeler}")
+        labelers[labeler] = pairs
+        source_hashes[labeler] = source_sha
+
+    left, right = (labelers[name] for name in ("WildCarp", "HazySpring"))
+    agree = sum(left[item] == right[item] for item in ids)
+    observed = agree / len(ids)
+    left_counts = collections.Counter(left.values())
+    right_counts = collections.Counter(right.values())
+    expected = sum(
+        left_counts[value] * right_counts[value]
+        for value in ("relevant", "not-relevant")
+    ) / (len(ids) ** 2)
+    kappa = (observed - expected) / (1 - expected) if expected < 1 else None
+    return {
+        "n": len(ids),
+        "agree": agree,
+        "agreement": observed,
+        "cohen_kappa": kappa,
+        "status": "COMPLETE",
+        "labelers": ["WildCarp", "HazySpring"],
+        "seed": sample["seed"],
+        "rubric_sha256": sample["rubric_sha256"],
+        "sample_ids_sha256": sample_ids_sha,
+        "sample_manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
+        "rubric_file_sha256": hashlib.sha256(rubric_bytes).hexdigest(),
+        "label_artifact_sha256": hashlib.sha256(labels_bytes).hexdigest(),
+        "label_files_sha256": source_hashes,
+    }
+
+
 def d_mechanical_label_audit(
     rows: list[dict[str, Any]], evidence_root: Path = PUBLIC_OUT
 ) -> dict[str, Any]:
@@ -1211,7 +1333,9 @@ def build_task_metadata(
             "time_span_utc": summary.get("time_span"),
             "temporal_cutoff_utc": summary.get("temporal_cutoff"),
             "mechanical_label_audit": summary.get("mechanical_label_audit"),
-            "blind_double_label": {"n": 0, "agree": 0, "status": "NOT_RUN"},
+            "blind_double_label": summary.get(
+                "blind_double_label", {"n": 0, "agree": 0, "status": "NOT_RUN"}
+            ),
             "unit_path": "var/jev-bank/tool-result/units.jsonl",
             "units_sha256": units_sha,
             "candidate_path": "var/jev-bank/tool-result/candidate.json",

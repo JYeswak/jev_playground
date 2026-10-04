@@ -4,6 +4,7 @@ import collections
 import hashlib
 import importlib.util
 import json
+import os
 import tempfile
 import time
 import unittest
@@ -303,6 +304,38 @@ class FullBankClassifierTests(TemporaryTestCase):
         self.assertNotIn("_line", row)
 
 
+class CensoringBoundaryTests(TemporaryTestCase):
+    def test_tool_result_censoring_uses_48_hour_window(self):
+        now = BUILDER.dt.datetime(2026, 10, 4, tzinfo=BUILDER.dt.timezone.utc)
+        session = self.tmp_path / "session.jsonl"
+        message = {
+            "role": "toolResult",
+            "toolName": "read",
+            "content": "x" * 10_001,
+        }
+        session.write_text(
+            json.dumps({"timestamp": "2026-10-04T00:00:00Z", "message": message})
+            + "\n",
+            encoding="utf-8",
+        )
+
+        for age_hours, expected in ((47, True), (49, False)):
+            with self.subTest(age_hours=age_hours):
+                modified = now.timestamp() - age_hours * 3600
+                os.utime(session, (modified, modified))
+                rows = BUILDER.longres_candidates(
+                    session,
+                    "session-hash",
+                    BUILDER.dt.datetime.min.replace(tzinfo=BUILDER.dt.timezone.utc),
+                    now,
+                    1.0,
+                    collections.Counter(),
+                )
+
+                self.assertEqual(len(rows), 1)
+                self.assertIs(rows[0]["censored"], expected)
+
+
 class DMechanicalAuditTests(unittest.TestCase):
     def test_d_mechanical_audit_matches_frozen_labels_and_rejects_drift(self):
         root = BUILDER.ROOT / "work" / "jev-bank"
@@ -324,6 +357,60 @@ class DMechanicalAuditTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "disagree with builder outcomes"):
             BUILDER.d_mechanical_label_audit(rows, root)
+
+
+class DBlindDoubleLabelTests(unittest.TestCase):
+    def test_d_blind_double_label_reports_missing_and_stale_rubric_as_not_run(self):
+        source_root = BUILDER.ROOT / "work" / "jev-bank"
+
+        with tempfile.TemporaryDirectory(prefix="jev-d-labels-") as temporary:
+            root = Path(temporary)
+            for name in ("blind-sample-manifest.json", "blind-rubrics.json"):
+                (root / name).write_bytes((source_root / name).read_bytes())
+            manifest = json.loads((root / "blind-sample-manifest.json").read_bytes())
+            sample = manifest["tasks"]["D"]
+            ids = sample["ids"]
+            rows = [{"unit_id": item} for item in ids]
+            audit = BUILDER.d_blind_double_label
+
+            missing = audit(rows, root)
+            self.assertEqual(missing["status"], "NOT_RUN")
+            self.assertIn("missing", missing["reason"].lower())
+
+            labels = {
+                "schema_version": "jev.decision-bank.blind-labels.v1",
+                "task": "D",
+                "seed": sample["seed"],
+                "sample_ids_sha256": hashlib.sha256(
+                    json.dumps(ids, ensure_ascii=False, separators=(",", ":")).encode(
+                        "utf-8"
+                    )
+                ).hexdigest(),
+                "rubric_sha256": (
+                    "3ced2963d9575ad2a17c8ef9ef91a4021a37a69fd1a79cf14ace5fcc05683a1c"
+                ),
+            }
+            (root / "vvkr-D-blind-labels.json").write_text(
+                json.dumps(labels), encoding="utf-8"
+            )
+
+            stale = audit(rows, root)
+
+            self.assertEqual(stale["n"], 0)
+            self.assertEqual(stale["status"], "NOT_RUN")
+            self.assertIn("rubric", stale["reason"].lower())
+            self.assertEqual(stale["observed_rubric_sha256"], labels["rubric_sha256"])
+            self.assertEqual(stale["expected_rubric_sha256"], sample["rubric_sha256"])
+
+    def test_d_blind_double_label_rejects_missing_candidate_id(self):
+        root = BUILDER.ROOT / "work" / "jev-bank"
+        manifest = json.loads((root / "blind-sample-manifest.json").read_text())
+        ids = manifest["tasks"]["D"]["ids"]
+        audit = getattr(BUILDER, "d_blind_double_label", None)
+        self.assertTrue(callable(audit), "D blind-double-label audit helper is missing")
+
+        with self.assertRaisesRegex(ValueError, "not in candidate rows"):
+            audit([{"unit_id": item} for item in ids[:-1]], root)
 
 
 class TeacherBlindLabelTests(unittest.TestCase):
