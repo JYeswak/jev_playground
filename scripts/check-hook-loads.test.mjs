@@ -18,6 +18,7 @@ assert.ok(bun, "Bun executable must be on PATH");
 function fixture() {
   const scratch = join(process.cwd(), "var", "agent-tmp");
   assert.ok(scratch.includes(join("var", "agent-tmp")), "scratch must stay under var/agent-tmp");
+  mkdirSync(scratch, { recursive: true });
   const root = mkdtempSync(join(scratch, "jev-n072."));
   writeFileSync(join(root, ".owner"), `pid=${process.pid}\nlabel=jev-n072-test\nrepo=${process.cwd()}\ncreated=${new Date().toISOString()}\n`);
   const repo = join(root, "repo");
