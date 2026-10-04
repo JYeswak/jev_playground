@@ -16,6 +16,7 @@ import {
   MAX_ITEMS_PER_TURN,
   CONCURRENCY,
   FILTER_DEADLINE_MS,
+  HANDLER_BUDGET_MS,
 } from "./jev-memory-filter.ts";
 // Suite guard (jev-s47b defect 2026-10-01: scored tests wrote fake rows into the
 // prod sidecar via default paths). Redirect defaults to temp for the whole file;
@@ -598,4 +599,31 @@ test("cap3 prunes with exhausted Jev cap and never calls", async () => {
   assert.equal(called, false);
   const text = systemPromptText(out.systemPrompt);
   assert.ok(!text.includes(BULLET_E), "4th+ dropped without any call");
+});
+
+// Incident 2026-10-04 03:00Z: in clutterfreespaces.ios the omp process's file I/O stalled, each
+// awaited log append took ~4-9 s (one cap3-pruned row per ~8 s in memory-filter.jsonl), and omp
+// killed this handler at its 30 s limit twice. Log writes must not hold the turn.
+const stalledAppend = () => new Promise(() => {});
+
+test("stalled log I/O: cap3 prune still returns fast with the pruned prompt", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.95), append: stalledAppend, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), cap3SwitchPath: await cap3Switch(dir) });
+  const { event } = eventFor("q", SYS_RECALL_5);
+  const started = Date.now();
+  const out = await handler(event, { cwd: "/Users/josh/Developer/uds" });
+  const elapsed = Date.now() - started;
+  assert.ok(elapsed < 3000, `handler held the turn ${elapsed} ms behind stalled log I/O`);
+  assert.ok(out && !systemPromptText(out.systemPrompt).includes(BULLET_E), "4th+ still dropped");
+});
+
+test("stalled log I/O: scoring path keeps everything and returns before omp's 30 s limit", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1), append: stalledAppend, path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), cap3SwitchPath: join(dir, "no-such-switch") });
+  const { event, ctx } = eventFor("q", SYS_RECALL_5);
+  const started = Date.now();
+  await handler(event, ctx);
+  const elapsed = Date.now() - started;
+  assert.ok(elapsed < HANDLER_BUDGET_MS + 1000, `handler took ${elapsed} ms`);
+  assert.ok(HANDLER_BUDGET_MS < 30000, "budget sits under omp's 30 s handler limit");
 });

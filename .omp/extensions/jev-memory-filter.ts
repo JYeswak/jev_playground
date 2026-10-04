@@ -12,7 +12,7 @@
 import { appendFile, mkdir, readFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { askJev, type AskOptions, type JevResult } from "../../kit/src/client.ts";
 import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
@@ -44,6 +44,26 @@ export const FILTER_DEADLINE_MS = 1500;
 export const P95_LATENCY_MS = 500;
 export function filterBudgetMs(items: number): number {
   return Math.max(FILTER_DEADLINE_MS, Math.ceil(Math.max(items, 0) / CONCURRENCY) * P95_LATENCY_MS);
+}
+
+/** Hard ceiling for the whole before_agent_start handler. omp kills a handler at 30 s and shows an
+ * error in the user's pane (seen in clutterfreespaces.ios 2026-10-04 03:00Z, twice). At the budget
+ * the turn proceeds with every memory kept (the fail-safe side). */
+export const HANDLER_BUDGET_MS = 20000;
+/** Log rows are queued, never awaited on the turn path; at most this long is spent letting the
+ * queue drain before the handler returns. A stalled disk delays the log, not the turn. */
+export const LOG_FLUSH_MS = 250;
+/** Queued log rows beyond this are dropped (counted) so a stalled disk cannot grow memory. */
+export const MAX_PENDING_LOG_ROWS = 200;
+/** A switch-file read slower than this counts as "switch off" (no pruning). */
+export const SWITCH_READ_MS = 250;
+
+function sleep(ms: number): Promise<void> {
+  const { promise, resolve } = Promise.withResolvers<void>();
+  const timer = setTimeout(resolve, ms);
+  // Never keep the omp process (or a test run) alive just for a budget timer.
+  if (typeof timer === "object" && timer !== null && "unref" in timer) timer.unref();
+  return promise;
 }
 
 
@@ -210,7 +230,13 @@ export function pruneSystemPrompt(sys: unknown, dropped: MemoryItem[]): unknown 
 const INSTRUCTIONS = "Memory: `memory`. Current request: `prompt`. Is this memory relevant to the current request?";
 
 
-export type FilterDeps = { ask?: Ask; cap?: number; path?: string; sidecarPath?: string; now?: () => string; switchPath?: string; cap3SwitchPath?: string };
+type Append = (path: string, line: string) => Promise<void>;
+export type FilterDeps = { ask?: Ask; cap?: number; path?: string; sidecarPath?: string; now?: () => string; switchPath?: string; cap3SwitchPath?: string; append?: Append };
+
+const appendLine: Append = async (path, line) => {
+  await mkdir(dirname(path), { recursive: true });
+  await appendFile(path, line, { mode: 0o600 });
+};
 
 export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
   const switchPath = deps.switchPath ?? process.env.JEV_MEMORY_FILTER_ENFORCE_PATH ?? join(homedir(), ".local", "state", "jev", "memory-filter-enforce");
@@ -227,23 +253,30 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
   // (prompt, memory) pairs. Reuse the verdict instead of re-spending a call.
   const memo = new Map<string, { noul: number; decision: string; inputTokens: number | null }>();
   let fireRepo: string | null = null;
-  const write = async (row: Record<string, unknown>): Promise<void> => {
-    try {
-      await mkdir(join(homedir(), ".local", "state", "jev"), { recursive: true });
-      await appendFile(path, JSON.stringify({ ...row, repo: fireRepo }) + "\n", { mode: 0o600 });
-    } catch {
-      // Logging never blocks the turn.
-    }
+  // Log rows go through one FIFO queue that the turn never waits on beyond LOG_FLUSH_MS. A stalled
+  // disk then delays (or, past MAX_PENDING_LOG_ROWS, drops) log rows; it never holds the turn.
+  const append = deps.append ?? appendLine;
+  let logQueue: Promise<void> = Promise.resolve();
+  let pendingRows = 0;
+  const enqueue = (file: string, row: Record<string, unknown>): Promise<void> => {
+    if (pendingRows >= MAX_PENDING_LOG_ROWS) return Promise.resolve();
+    pendingRows += 1;
+    const line = JSON.stringify({ ...row, repo: fireRepo }) + "\n";
+    logQueue = logQueue
+      .then(() => append(file, line))
+      .catch(() => {
+        // Logging never blocks the turn.
+      })
+      .finally(() => {
+        pendingRows -= 1;
+      });
+    return Promise.resolve();
   };
-  const writeSidecar = async (row: Record<string, unknown>): Promise<void> => {
-    try {
-      await mkdir(join(homedir(), ".local", "state", "jev"), { recursive: true });
-      await appendFile(sidecar, JSON.stringify({ ...row, repo: fireRepo }) + "\n", { mode: 0o600 });
-    } catch {
-      // Logging never blocks the turn.
-    }
-  };
-  return async (event: unknown, ctx?: unknown): Promise<undefined | { systemPrompt: unknown }> => {
+  const write = (row: Record<string, unknown>): Promise<void> => enqueue(path, row);
+  const writeSidecar = (row: Record<string, unknown>): Promise<void> => enqueue(sidecar, row);
+  // A switch read that stalls counts as "off": no pruning is the safe side.
+  const switchOn = (file: string): Promise<boolean> => Promise.race([enforceEnabled(file), sleep(SWITCH_READ_MS).then(() => false)]);
+  const body = async (event: unknown, ctx?: unknown): Promise<undefined | { systemPrompt: unknown }> => {
     const droppedTexts = new Set<string>();
     try {
       const ev = (event ?? {}) as Record<string, unknown>;
@@ -277,7 +310,7 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
       // drop the 4th+ spans and return the pruned prompt, skipping Jev
       // scoring. Switch absent (or <=3 items): fall through untouched.
       const promptHash = createHash("sha256").update(prompt).digest("hex");
-      if (items.length > CAP3_KEEP && (await enforceEnabled(cap3SwitchPath))) {
+      if (items.length > CAP3_KEEP && (await switchOn(cap3SwitchPath))) {
         const dropped = items.slice(CAP3_KEEP);
         if (inEnforceScope(fireRepo)) {
           for (const item of dropped) {
@@ -406,7 +439,7 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
         }
       }
       const dropSpans = occurrences.filter((o) => droppedTexts.has(o.text));
-      if (dropSpans.length > 0 && (await enforceEnabled(switchPath))) {
+      if (dropSpans.length > 0 && (await switchOn(switchPath))) {
         const kept = items.length - droppedTexts.size;
         if (inEnforceScope(fireRepo)) {
           await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "enforced", promptHash, memoryHash: null, noul: null, decision: "prune", removed: dropSpans.length, kept, tokensSaved: 0, latencyMs: null, inputTokens: null });
@@ -418,6 +451,12 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
       // Shadow failures never affect the turn.
     }
     return undefined;
+  };
+  return async (event: unknown, ctx?: unknown): Promise<undefined | { systemPrompt: unknown }> => {
+    // Past HANDLER_BUDGET_MS the turn proceeds with every memory kept; late work is ignored.
+    const result = await Promise.race([body(event, ctx), sleep(HANDLER_BUDGET_MS).then(() => undefined)]);
+    await Promise.race([logQueue, sleep(LOG_FLUSH_MS)]);
+    return result;
   };
 }
 /** Double-registration guard: in repos where the project file and a global
