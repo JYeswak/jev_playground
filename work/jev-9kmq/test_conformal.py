@@ -4,6 +4,7 @@ from conformal import (
     chronological_split,
     conformal_prediction_set,
     permute_labels,
+    support_gated_prediction_set,
 )
 
 
@@ -33,6 +34,30 @@ class ConformalPredictionSetTests(unittest.TestCase):
         )
 
         self.assertEqual(result.labels, frozenset(self.LABELS))
+
+    def test_one_sided_action_abstains_below_alpha_resolution_support(self):
+        calibration = [("keep", {"keep": 0.99, "drop": 0.01}) for _ in range(80)]
+        calibration += [("drop", {"keep": 0.01, "drop": 0.99}) for _ in range(48)]
+        probabilities = {"keep": 0.01, "drop": 0.99}
+        base = conformal_prediction_set(
+            calibration, probabilities, self.LABELS, alpha=0.02
+        )
+        result = support_gated_prediction_set(
+            calibration, probabilities, self.LABELS, alpha=0.02
+        )
+
+        self.assertEqual(base.labels, frozenset({"drop"}))
+        self.assertEqual(result.labels, frozenset(self.LABELS))
+        self.assertEqual(result.p_values, base.p_values)
+
+    def test_support_gate_allows_action_at_minimum_resolvable_support(self):
+        calibration = [("keep", {"keep": 0.99, "drop": 0.01}) for _ in range(80)]
+        calibration += [("drop", {"keep": 0.01, "drop": 0.99}) for _ in range(49)]
+        result = support_gated_prediction_set(
+            calibration, {"keep": 0.01, "drop": 0.99}, self.LABELS, alpha=0.02
+        )
+
+        self.assertEqual(result.labels, frozenset({"drop"}))
 
     def test_tied_calibration_scores_are_included_conservatively(self):
         calibration = [("keep", {"keep": 0.5, "drop": 0.5}) for _ in range(9)]

@@ -89,6 +89,29 @@ def conformal_prediction_set(
     return PredictionSet(frozenset(included), p_values)
 
 
+def support_gated_prediction_set(
+    calibration: Sequence[tuple[str, Mapping[str, float]]],
+    probabilities: Mapping[str, float],
+    labels: Sequence[str],
+    *,
+    alpha: float,
+) -> PredictionSet:
+    """Add a conservative actionability guard to the split-conformal set.
+
+    A class p-value cannot reach ``alpha`` unless its calibration count ``n``
+    satisfies ``1 / (n + 1) <= alpha``. If any class lacks that resolution,
+    retain every label so the better-sampled class cannot trigger a one-sided
+    action. The underlying p-values remain unchanged.
+    """
+    result = conformal_prediction_set(calibration, probabilities, labels, alpha=alpha)
+    counts = dict.fromkeys(labels, 0)
+    for truth, _ in calibration:
+        counts[truth] += 1
+    if any(1.0 / (count + 1) > alpha for count in counts.values()):
+        return PredictionSet(frozenset(labels), result.p_values)
+    return result
+
+
 def _utc_timestamp(value: object) -> datetime:
     if not isinstance(value, str) or not value:
         raise ValueError("timestamp must be a non-empty ISO-8601 string")

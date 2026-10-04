@@ -1,6 +1,6 @@
 # jev-9kmq offline conformal evaluation
 
-**Decision: FAIL for the memory filter; gate is an offline pass only. Do not enable either surface from this result.**
+**Decision: FAIL for the baseline memory design. A post-hoc support-gated variant abstains on every row and has zero singleton-action coverage; neither surface is enabled. The command-gate baseline remains an offline pass only.**
 
 - Target: class-conditional error `alpha = 0.02`; singleton prediction is an action, and a two-class set is abstention.
 - The calculation is retrospective, not confirmatory. `PROTOCOL.md` records prior exposure to the same dataset; its cutoff, method, and shuffle seed were frozen for reproducibility, not preregistered before outcome inspection.
@@ -23,9 +23,17 @@
 - Holdout set coverage: `466/475` (98.11%); singleton actions `18/475` (3.79%); abstentions `457/475` (96.21%); empty sets 0. All 9 harmful plants were singleton harmful actions, descriptive only.
 - Shuffled-label falsifier: `457/475` abstentions (96.21%) against the required 95%; PASS.
 
+## Post-hoc support-gated variant
+
+This exploratory wrapper keeps the original conformal p-values and widens the set to both labels unless every class has enough calibration examples for its smallest attainable p-value, `1/(n+1)`, to reach `alpha`. At `alpha = 0.02`, the minimum is 49 examples per class. The acceptance bar, temporal split, and shuffle seed were unchanged; this variant was added after the baseline results were inspected and is not confirmatory.
+
+- Memory: calibration has 80 irrelevant and 0 relevant rows, so all 87 holdout sets contain both labels. Singleton actions `0/87`; abstentions `87/87` (100%); set coverage `87/87`; false-drop `0/3`. Shuffled-label abstention `87/87` (100%), above the 95% falsifier bar.
+- Command gate: calibration has 475 safe and 0 harmful rows, so all 475 holdout sets contain both labels. Singleton actions `0/475`; abstentions `475/475` (100%); set coverage `475/475`; false-veto `0/466`. Shuffled-label abstention `475/475` (100%), above the 95% falsifier bar.
+- This is vacuous risk control with no decision utility. The apparent zero error is caused by abstaining on every row, not evidence of Jev quality or a deployable safety bound.
+
 ## Reproduction
 
-- `python3 work/jev-9kmq/test_conformal.py -v` — 9 tests passed.
+- `python3 work/jev-9kmq/test_conformal.py -v` — 11 tests passed.
 - `python3 work/jev-9kmq/analyze.py` — replayed the fixed, hash-only analysis; emitted the metrics in `results.json`.
 - `live_calls = 0`; `spend = $0`.
-- Boundary: no live enforcement, production safety, or model-quality claim. Memory fails the acceptance falsifier; gate's numeric pass does not override the retrospective exposure or exchangeability limitations.
+- Boundary: zero live calls; no live enforcement, production-safety, or model-quality claim. The baseline memory design fails its falsifier; the support-gated variant passes only by abstaining on every row, and the command-gate baseline's numeric pass remains retrospective.

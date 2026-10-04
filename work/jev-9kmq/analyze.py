@@ -12,7 +12,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from conformal import chronological_split, conformal_prediction_set, permute_labels
+from conformal import (
+    chronological_split,
+    conformal_prediction_set,
+    permute_labels,
+    support_gated_prediction_set,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 ALPHA = 0.02
@@ -353,14 +358,20 @@ def _gate_rows() -> tuple[list[dict[str, Any]], dict[str, int]]:
 
 
 def _metrics(
-    rows: list[dict[str, Any]], labels: tuple[str, str], good_label: str, bad_label: str
+    rows: list[dict[str, Any]],
+    labels: tuple[str, str],
+    good_label: str,
+    bad_label: str,
+    *,
+    support_gated: bool = False,
 ) -> dict[str, Any]:
     calibration, holdout, cutoff = chronological_split(rows)
     calibration_data = [(row["label"], row["probabilities"]) for row in calibration]
+    predictor = (
+        support_gated_prediction_set if support_gated else conformal_prediction_set
+    )
     predictions = [
-        conformal_prediction_set(
-            calibration_data, row["probabilities"], labels, alpha=ALPHA
-        ).labels
+        predictor(calibration_data, row["probabilities"], labels, alpha=ALPHA).labels
         for row in holdout
     ]
     truths = [row["label"] for row in holdout]
@@ -432,7 +443,10 @@ def _metrics(
 
 
 def _shuffled_abstention(
-    rows: list[dict[str, Any]], labels: tuple[str, str]
+    rows: list[dict[str, Any]],
+    labels: tuple[str, str],
+    *,
+    support_gated: bool = False,
 ) -> dict[str, Any]:
     calibration, holdout, cutoff = chronological_split(rows)
     ordered = calibration + holdout
@@ -441,10 +455,11 @@ def _shuffled_abstention(
     calibration_data = [
         (shuffled_by_id[row["id"]], row["probabilities"]) for row in calibration
     ]
+    predictor = (
+        support_gated_prediction_set if support_gated else conformal_prediction_set
+    )
     sets = [
-        conformal_prediction_set(
-            calibration_data, row["probabilities"], labels, alpha=ALPHA
-        ).labels
+        predictor(calibration_data, row["probabilities"], labels, alpha=ALPHA).labels
         for row in holdout
     ]
     abstained = sum(len(prediction) != 1 for prediction in sets)
@@ -484,6 +499,29 @@ def main() -> None:
             "exclusions": gate_exclusions,
             "evaluation": _metrics(gate_rows, GATE_LABELS, "safe", "harmful"),
             "shuffled_labels": _shuffled_abstention(gate_rows, GATE_LABELS),
+        },
+        "support_gated_variant": {
+            "status": "post-hoc exploratory; not part of the frozen protocol",
+            "rule": (
+                "retain all labels unless every class has calibration resolution "
+                "1/(n+1) <= alpha"
+            ),
+            "memory": {
+                "evaluation": _metrics(
+                    memory_rows, LABELS, "relevant", "irrelevant", support_gated=True
+                ),
+                "shuffled_labels": _shuffled_abstention(
+                    memory_rows, LABELS, support_gated=True
+                ),
+            },
+            "gate": {
+                "evaluation": _metrics(
+                    gate_rows, GATE_LABELS, "safe", "harmful", support_gated=True
+                ),
+                "shuffled_labels": _shuffled_abstention(
+                    gate_rows, GATE_LABELS, support_gated=True
+                ),
+            },
         },
         "limitations": [
             "Previously inspected outcomes mean this is retrospective, not a preregistered confirmatory result.",
