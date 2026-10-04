@@ -93,13 +93,13 @@ Not parked yet: they are applied in the stamp batch with the wave-2 bead edits (
 | localbench (%55): local models and GPU | jev runs its own `serve.py` for Clef-Flash on `:8010`; localbench's `AGENTS.md:16-17` lists "the jev CLI" and the omp judge role among its retained local uses | localbench owns serving, model placement and GPU admission; jev owns the decision, the calibration and the bar. jev's `:8010` server moves behind localbench's gateway |
 | localbench: memory | localbench does mnemopi extraction; jev's memory filter decides relevance before a memory enters context | separate decisions; each states which one it measures |
 | cfsios (%53) and every repo | jev's memory extension runs in every repo's session (it hit omp's 30 s limit in cfsios, fixed in `5eb02549`) | new mission clause: any jev surface installed outside jev has a latency budget under omp's limits, fails open, and has an off switch the host conductor can use |
-| uds (%57): Dicklesworthstone binaries | jev depends on `br` 0.7.4 (17 files), `ntm` 1.36.1 (7), `dcg` 0.15.2 (8), `cass` 0.10.0 (3), `bv` 0.25.2 (2), `ubs` 5.4.17 (2) | no version holds; no `br`/`ntm` upgrade while a jev bead apply or dispatch runs (ask pane 1 first) |
+| uds, guided by control-plane pane 1 (`control-plane:%57`): Dicklesworthstone binaries | jev depends on `br` 0.7.4 (17 files), `ntm` 1.36.1 (7), `dcg` 0.15.2 (8), `cass` 0.10.0 (3), `bv` 0.25.2 (2), `ubs` 5.4.17 (2) | no version holds; no `br`/`ntm` upgrade while a jev bead apply or dispatch runs (ask pane 1 first) |
 
 ## What the team is missing (all missions, same rigor, separate scopes)
 
 1. **No shared owners table.** Each mission names its own scope; none names the neighbours'. Every
    session should carry the same table: models/GPU -> localbench; OMP, rules, fleet layer, machine
-   load -> omp-kit; Dicklesworthstone binaries -> uds; fleet supervision -> control-plane; Jev
+   load -> omp-kit; Dicklesworthstone binaries -> uds (conductor: `control-plane:%57`); fleet supervision -> control-plane; Jev
    surfaces and the classifier CLI -> jev.
 2. **No shared "done" rule.** omp-kit: merged, CI green, non-author re-run. uds: its own pillars.
    jev: a value receipt. A common floor (sha on origin/main + non-author evidence) should be one
