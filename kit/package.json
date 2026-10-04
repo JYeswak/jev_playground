@@ -5,7 +5,8 @@
   "type": "module",
   "private": false,
   "bin": {
-    "jev": "bin/jev.mjs"
+    "jev": "bin/jev.mjs",
+    "jev-skill-gap": "bin/jev-skill-gap.mjs"
   },
   "files": [
     "bin",

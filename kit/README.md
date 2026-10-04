@@ -2,6 +2,28 @@
 
 A small TypeScript-first Jev client with preflight checks, typed validators, offline fixtures, and CLI verbs.
 
+## Daily OMP skill-gap mining
+
+`jev-skill-gap --daily` scans default and named-profile OMP session JSONL files with a persistent
+cursor. It extracts tool, command-family, file-read, skill-read, error, and retry metadata locally,
+clusters repeated failures, and sends only compact cluster summaries plus the bounded skill-name/
+description inventory through `kit/src/client.ts`'s `askJevBundle` seam. The model selector is
+`--model`, then `JEV_MODEL`, then the pinned `jev-1.13.0` default. Missing credentials produce
+`NOT_RUN` with zero calls. Reports include scan coverage, event counts, model calls, input tokens,
+estimated input cost, latency, evidence `path:line`, and review-bead outcomes. It queues bounded
+human review beads; it never edits skill files.
+
+```bash
+npm run prepare --prefix kit
+node kit/bin/jev-skill-gap.mjs --daily --robot
+node kit/bin/jev-skill-gap.mjs --install --robot
+```
+
+`--install` writes a per-user LaunchAgent for 03:30 daily runs, invoking `infisical run` for the
+project key. Installation is explicit; it is not performed by `--daily`. State and dated reports
+live under `~/.local/state/jev/skill-gap-miner/`. `--no-review-beads` suppresses Beads writes only;
+it still scans, persists state/reports, and may call Jev.
+
 ## Banking77 classification
 
 `jev classify` implements the measured **intent routing** design from `docs-mirror/typesafe/patterns/intent-routing.md` and the Choice primitive. It asks one Choice over the 77 humanized Banking77 intent labels, with state `{ "customer_message": text }` and the instruction `The primary intent of this customer banking message`. Label descriptions remain `null`, matching `work/choice-banking77/run.py`; returned confidence is exposed without an invented action threshold.
