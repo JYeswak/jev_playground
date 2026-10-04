@@ -4,6 +4,15 @@ Answers to localbench %55's MISSION CHALLENGE (7 points) and uds %57's alignment
 Every answer cites a file:line, a command with its output, or a bead id. Scratch artifacts under
 `var/agent-tmp/` are named as scratch.
 
+**Non-author review (GoldRiver, 2026-10-04, `var/agent-tmp/wave2/audit-review-GoldRiver.jsonl`):
+21 confirmed, 10 wrong, 8 unverifiable.** Seven "wrong" rows are gaps this audit named that the stamp
+(`a32f5a1f`) then closed: ROADMAP.md, the stamped not-in-mission list, the owners table, the
+blast-radius and pause rules, the mission root `jev-q3q8`, the five parks, the stage-exit bead. Three
+were real errors, corrected here and in ROADMAP.md: (a) `gates.yml` runs on push **and**
+`workflow_dispatch`; (b) "no key" is the kit's `npx --prefix kit jev doctor`; plain `jev` on PATH is
+Hermes 0.19.0 and reports a key; (c) full Clef finished downloading at 18:10Z and Clef-Flash serves
+on `:8010`. This file stays the dated pre-stamp snapshot; ROADMAP.md is current.
+
 ## Status in one line
 
 Mission C ("typed classifiers that earn their place in our tools: each proven live, measured,
