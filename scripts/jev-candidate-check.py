@@ -171,7 +171,7 @@ def check(candidate):
     if candidate.get("replication") and not priors:
         ok = False
         note("G1-prior-overlap", False, "replication names no prior_samples hash files")
-    elif priors:
+    elif candidate.get("replication") and priors:
         seen, missing = set(), []
         for path in priors:
             # Read the committed blob, not a tracked but edited or staged worktree file.

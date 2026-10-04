@@ -74,6 +74,7 @@ print(json.dumps({
   "none": gate(replication=True),
   "uncommitted": gate(replication=True, prior_samples=["var/agent-tmp/no-such-prior.jsonl"]),
   "plain": gate(),
+  "plainPrior": gate(replication=False, prior_samples=["work/jev-science/candidates/retry-flip.json"]),
 }))`;
     const r = spawnSync("python3", ["-c", code], { encoding: "utf8", timeout: 60000 });
     assert.equal(r.status, 0, r.stderr);
@@ -83,6 +84,7 @@ print(json.dumps({
       none: [false],
       uncommitted: [false],
       plain: [],
+      plainPrior: [],
     });
   });
   it("G1-prior-overlap uses committed prior hashes, not working-tree edits", () => {
