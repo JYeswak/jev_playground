@@ -19,9 +19,11 @@ Route  = a pane idle for POLLS polls gets work before pane 1 hears of it (bead j
          --claim and --if-unchanged compare-and-set. br's close policy (.beads/policy.yaml) refuses a
          self-close, so a misrouted verification cannot close anything. One routed item per pane
          per ROUTE_COOLDOWN_S; a verification goes to another verifier after VERIFY_REROUTE_S, never
-         to the same one twice. Pane map: ~/.local/state/jev/pane-agents.json; the router is off
-         (the watcher behaves as before) without it or while ~/.local/state/jev/fleet-router.off
-         exists. Why: 2026-10-02 panes sat idle ~7 h (07:54-15:01Z) waiting on manual dispatch.
+         to the same one twice. Agents are resolved each round from tmux pane ids through Agent
+         Mail's per-pane identity bindings (pane_agents), never from a stored name map, so a
+         restarted pane is routed under its new name; the router is off (the watcher behaves as
+         before) while no pane has a binding or while ~/.local/state/jev/fleet-router.off exists.
+         Why: 2026-10-02 panes sat idle ~7 h (07:54-15:01Z) waiting on manual dispatch.
 Alert  = `ntm send jev --pane=1 "IDLE pane N ..."` after POLLS consecutive non-working polls when
          nothing was routed, then again while it stays that way, the gap doubling from REALERT up
          to REALERT_MAX (measured 2026-10-01: a fixed 600 s re-page sent pane 1 300 pages for 56
@@ -63,6 +65,7 @@ was 'idle' while its omp had a docker run live under a bash tool call.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import io
@@ -130,6 +133,9 @@ PAGE_IMPORTANCE = ("urgent", "high")
 INBOX_LOOKBACK = (
     15 * 60
 )  # with no state file, mail created before start - this is history
+# Agent Mail's canonical per-pane identity bindings; the watcher resolves names from pane ids here.
+IDENTITY_ROOT = "~/.config/agent-mail/identity"
+CONDUCTOR_PANE = 1
 CREATED = re.compile(r"^(\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d)(\.\d+)?(Z|\+00:00)$")
 # Key exposure paging (bead jev-9ov4): the census's `Key exposure 24h:` line names up to 3 session
 # files holding a TypeSafe-shaped key; each path is paged once, persisted like the inbox ids.
@@ -963,12 +969,55 @@ def page_stalled_once(
     return True
 
 
+def agent_mail_project_dir(repo: Path) -> str:
+    """Agent Mail's identity directory name for a repo: sha1 of its path, first 12 hex (observed:
+    /Users/josh/Developer/jev -> 0427e59174bf). Naming only, not a security hash."""
+    return hashlib.sha1(str(repo).encode(), usedforsecurity=False).hexdigest()[:12]
+
+
+def pane_agents(run=subprocess.run) -> dict[int, str]:
+    """{pane index: Agent Mail name} for SESSION, resolved live on every call.
+
+    Pinned to tmux pane ids, never to names: each pane id is looked up in Agent Mail's own
+    per-pane binding (<root>/<sha1(repo)[:12]>/<pane id without %>, JSON {"name": ...} or a bare
+    name), so a restarted pane is followed under whatever name its new session registered. A pane
+    with no readable binding is absent. Why: 2026-10-04 a hand-kept index->name map still named
+    three ended sessions, so routes would have claimed beads for agents that no longer exist."""
+    root = Path(os.environ.get("JEV_WATCH_IDENTITY_ROOT") or IDENTITY_ROOT).expanduser()
+    project = root / agent_mail_project_dir(REPO_ROOT)
+    try:
+        out = run(
+            ["tmux", "list-panes", "-t", SESSION, "-F", "#{pane_index} #{pane_id}"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        ).stdout
+    except (OSError, subprocess.TimeoutExpired):
+        return {}
+    agents = {}
+    for row in (out or "").splitlines():
+        index, _, pane_id = row.strip().partition(" ")
+        if not index.isdigit() or not pane_id.startswith("%"):
+            continue
+        try:
+            text = (project / pane_id[1:]).read_text(encoding="utf-8").strip()
+            name = json.loads(text).get("name") if text.startswith("{") else text
+        except (OSError, ValueError, AttributeError):
+            continue
+        if isinstance(name, str) and name.strip():
+            agents[int(index)] = name.strip()
+    return agents
+
+
 def inbox_paths() -> tuple[Path, Path]:
-    """(the conductor's archive inbox dir, the paged-ids state file)."""
+    """(the conductor's archive inbox dir, the paged-ids state file). The conductor is whoever
+    holds pane CONDUCTOR_PANE right now; JEV_WATCH_INBOX_AGENT overrides (tests)."""
     root = Path(os.environ.get("JEV_WATCH_INBOX_ROOT") or INBOX_ROOT).expanduser()
-    agent = os.environ.get("JEV_WATCH_INBOX_AGENT") or "AmberWillow"
+    agent = os.environ.get("JEV_WATCH_INBOX_AGENT") or pane_agents().get(CONDUCTOR_PANE)
     state = Path(os.environ.get("JEV_WATCH_INBOX_STATE") or INBOX_STATE).expanduser()
-    return root / agent / "inbox", state
+    return root / (
+        agent or f"no-agent-mail-identity-for-pane-{CONDUCTOR_PANE}"
+    ) / "inbox", state
 
 
 def read_mail(path: Path) -> dict:
@@ -994,12 +1043,15 @@ def read_mail(path: Path) -> dict:
     }
 
 
-def save_state(state: Path, paged: set[int], history: set[int]) -> None:
+def save_state(
+    state: Path, paged: set[int], history: set[int], agent: str = ""
+) -> None:
     """Write the state file atomically: a sibling temp file, then os.replace."""
     state.parent.mkdir(parents=True, exist_ok=True)
     tmp = state.with_name(f"{state.name}.{os.getpid()}.tmp")
     tmp.write_text(
-        json.dumps({"paged": sorted(paged), "history": sorted(history)}) + "\n"
+        json.dumps({"agent": agent, "paged": sorted(paged), "history": sorted(history)})
+        + "\n"
     )
     os.replace(tmp, state)
 
@@ -1007,7 +1059,10 @@ def save_state(state: Path, paged: set[int], history: set[int]) -> None:
 def inbox_round(inbox: Path, state: Path, started: float, send) -> str:
     """Page every urgent/high message not paged before; return this round's `Inbox:` line.
     `send(message) -> bool`; a False leaves the id unrecorded so the next round retries it.
-    State: {"paged": ids sent, "history": urgent/high ids older than the first-run cutoff}."""
+    State: {"agent": inbox owner, "paged": ids sent, "history": urgent/high ids older than the
+    first-run cutoff}. When pane 1 restarts under a new name, the new owner's existing backlog is
+    history, exactly like a first run (2026-10-04: a rename paged 3 resolved day-old mails)."""
+    agent = inbox.parent.name
     if not inbox.is_dir():
         return f"Inbox: NOT_RUN no inbox dir {inbox}"
     first_run = not state.exists()
@@ -1026,7 +1081,13 @@ def inbox_round(inbox: Path, state: Path, started: float, send) -> str:
             mails.append(read_mail(path))
         except (OSError, ValueError, KeyError, TypeError):
             malformed.append(path.name)
-    cutoff = started - INBOX_LOOKBACK if first_run else None
+    renamed = bool(saved.get("agent")) and saved.get("agent") != agent
+    if first_run:
+        cutoff = started - INBOX_LOOKBACK
+    elif renamed:
+        cutoff = time.time() - INBOX_LOOKBACK
+    else:
+        cutoff = None
     sent = failed = 0
     for mail in sorted(mails, key=lambda m: m["created"]):
         if mail["importance"] not in PAGE_IMPORTANCE or mail["id"] in paged | history:
@@ -1045,7 +1106,7 @@ def inbox_round(inbox: Path, state: Path, started: float, send) -> str:
             failed += 1
     notes = [inbox.parent.name, f"{len(files)} messages"]
     try:
-        save_state(state, paged, history)
+        save_state(state, paged, history, agent)
     except OSError as err:
         notes.append(f"state NOT saved, next round re-pages ({err})")
     if malformed:
@@ -1491,9 +1552,6 @@ def capture_lock_creator(repo, now, log_path=None, state_path=None, run=subproce
         return None
 
 
-ROUTER_MAP = (
-    "~/.local/state/jev/pane-agents.json"  # {"2": "HazySpring", ...}, read every round
-)
 ROUTER_OFF = "~/.local/state/jev/fleet-router.off"
 ROUTER_STATE = "~/.local/state/jev/fleet-router-state.json"
 ROUTER_LOG = "~/.local/state/jev/fleet-router.jsonl"
@@ -1644,13 +1702,11 @@ class Router:
         ):
             self._say("router off (switch)")
             return None
-        try:
-            raw = json.loads(Path(ROUTER_MAP).expanduser().read_text())
-            agents = {int(k): str(v) for k, v in raw.items() if str(k).isdigit() and v}
-        except (OSError, ValueError, AttributeError):
-            agents = {}
+        agents = pane_agents(self.run)
         if not agents:
-            self._say(f"NOT_RUN router: no pane map at {ROUTER_MAP}")
+            self._say(
+                f"NOT_RUN router: no {SESSION} pane has an Agent Mail identity binding"
+            )
             return None
         rc_ready, ready = self.br("ready", "--unassigned", "--json")
         rc_verify, verify = self.br(

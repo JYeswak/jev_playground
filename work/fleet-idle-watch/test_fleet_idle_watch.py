@@ -736,6 +736,20 @@ def mail(inbox, msg_id, importance, created, subject, sender="WindyLantern", raw
     return path
 
 
+# Agent Mail's per-pane identity directory for this repo, observed 2026-10-04:
+# ~/.config/agent-mail/identity/0427e59174bf/{56,18,26,27,32,29} held {"name":"BrownGoose"} etc.
+REAL_REPO = Path("/Users/josh/Developer/jev")
+REAL_PROJECT_DIR = "0427e59174bf"
+
+
+def bind(root, bindings, project=None):
+    """Write per-pane identity files {pane id without %: file text} under root."""
+    folder = root / (project or fiw.agent_mail_project_dir(fiw.REPO_ROOT))
+    folder.mkdir(parents=True, exist_ok=True)
+    for pane, text in bindings.items():
+        (folder / pane).write_text(text)
+
+
 URGENT_PAGE = (
     "MAIL urgent from WindyLantern: [URGENT] TypeSafe key emitted during MiniWoB env check"
     " (id 42478, 05:57Z)"
@@ -787,6 +801,25 @@ class Inbox(unittest.TestCase):
         return (module or fiw).inbox_round(
             self.inbox, self.state, STARTED, send or self.send
         )
+
+    def test_a_new_conductor_name_treats_its_backlog_as_history_but_pages_new_mail(
+        self,
+    ):
+        # pane 1 restarted: the state was written for the previous owner of the conductor pane
+        self.state.parent.mkdir(parents=True)
+        self.state.write_text(
+            json.dumps({"agent": "HazySpring", "paged": [], "history": []})
+        )
+        line = self.round()
+        self.assertEqual(self.sent, [], line)
+        saved = json.loads(self.state.read_text())
+        self.assertEqual(saved["agent"], "AmberWillow")
+        self.assertIn(42478, saved["history"])
+        now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.0Z")
+        mail(self.inbox, 42600, "high", now, "fresh after restart")
+        self.round()
+        self.assertEqual(len(self.sent), 1)
+        self.assertIn("(id 42600,", self.sent[0])
 
     def test_urgent_and_high_page_once_each_normal_and_pre_start_never(self):
         line = self.round()
@@ -1301,17 +1334,22 @@ class FleetRouter(unittest.TestCase):
 
         def run(argv, **_):
             calls.append(argv)
+            if argv[0] == "tmux":
+                return subprocess.CompletedProcess(argv, 0, "1 %56\n2 %18\n", "")
             out = ready if argv[1] == "ready" else "[]"
             rc = 6 if argv[1] == "update" else 0
             return subprocess.CompletedProcess(argv, rc, out, "")
 
         with (
             tempfile.TemporaryDirectory() as home,
-            mock.patch.dict(os.environ, {"HOME": home}),
+            mock.patch.dict(
+                os.environ,
+                {"HOME": home, "JEV_WATCH_IDENTITY_ROOT": f"{home}/identity"},
+            ),
         ):
             state = Path(home) / ".local/state/jev"
             state.mkdir(parents=True)
-            (state / "pane-agents.json").write_text(json.dumps({"2": "HazySpring"}))
+            bind(Path(home) / "identity", {"18": '{"name":"HazySpring"}'})
             router = fiw.Router(
                 run=run, send=lambda p, m: sent.append(p) or True, pager=lambda m: None
             )
@@ -1322,6 +1360,51 @@ class FleetRouter(unittest.TestCase):
                 calls.clear()
                 self.assertEqual(router.round([(2, 1.0)], 100.0), set())
             self.assertEqual(calls, [])
+
+
+class PaneAgents(unittest.TestCase):
+    """The watcher resolves names from tmux pane ids, so a pane restart is followed, not pinned."""
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp(prefix="fiw-identity-"))
+        self.env = mock.patch.dict(
+            os.environ, {"JEV_WATCH_IDENTITY_ROOT": str(self.root)}
+        )
+        self.env.start()
+        self.addCleanup(self.env.stop)
+        repo = mock.patch.object(fiw, "REPO_ROOT", REAL_REPO)
+        repo.start()
+        self.addCleanup(repo.stop)
+
+    @staticmethod
+    def tmux(rows):
+        return lambda argv, **_: subprocess.CompletedProcess(argv, 0, rows, "")
+
+    def test_names_follow_the_pane_id_across_a_restart(self):
+        bind(
+            self.root,
+            {
+                "56": '{"name":"BrownGoose"}',
+                "18": '{"name":"HazySpring"}',
+                "26": "CyanPeak\n",
+            },
+            project=REAL_PROJECT_DIR,
+        )
+        run = self.tmux("1 %56\n2 %18\n3 %26\n4 %27\n")
+        self.assertEqual(
+            fiw.pane_agents(run), {1: "BrownGoose", 2: "HazySpring", 3: "CyanPeak"}
+        )
+        # pane %18 restarted and its new session registered under a new name
+        bind(self.root, {"18": '{"name":"AmberWillow"}'}, project=REAL_PROJECT_DIR)
+        self.assertEqual(fiw.pane_agents(run)[2], "AmberWillow")
+
+    def test_unreachable_tmux_yields_no_agents_so_the_router_stays_off(self):
+        bind(self.root, {"18": '{"name":"AmberWillow"}'}, project=REAL_PROJECT_DIR)
+
+        def down(argv, **_):
+            raise subprocess.TimeoutExpired(argv, 10)
+
+        self.assertEqual(fiw.pane_agents(down), {})
 
 
 class SteeringQueue(unittest.TestCase):
