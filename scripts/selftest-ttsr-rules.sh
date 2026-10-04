@@ -153,14 +153,19 @@ fi
 # 2026-10-04). It protects the rule system itself: an EMBEDDED inline flag makes a rule load and
 # never fire, and only `omp ttsr test` says so — a live session logs-and-ignores. The near-miss arm
 # is load-bearing, because a LEADING (?i) is legal (omp lifts it to the `i` flag).
+# CI scope (jev-hjzz rule above): the rule ships in the omp-kit plugin, so a machine without that
+# plugin (a CI runner, a stranger's clone) has nothing to test: n/a. A machine WITH the plugin whose
+# omp does not list the rule as effective is RED. (CI run 37233800857 went red when this check
+# treated the plugin's absence as a missing rule, 2026-10-04.)
+KIT_PLUGIN="$HOME/.omp/plugins/node_modules/omp-kit-companion"
 F=""
-if command -v omp >/dev/null 2>&1; then
+if [ ! -d "$KIT_PLUGIN" ] || ! command -v omp >/dev/null 2>&1; then
+  rule_state=out-of-scope
+else
   ttsr_list=$(timeout 60 omp ttsr list --json 2>/dev/null) || ttsr_list=""
   F=$(printf '%s' "$ttsr_list" | jq -r '(if type=="array" then . else (.rules // []) end)[]
         | select((.name // .id) == "ttsr-embedded-inline-flag") | (.source // .path) // empty' 2>/dev/null | head -n 1)
   if [ -n "$F" ] && [ -f "$F" ]; then rule_state=present; else rule_state=missing; fi
-else
-  rule_state=unavailable
 fi
 case $rule_state in
 present)
@@ -178,7 +183,7 @@ present)
   armw quiet "inline-flag: prose mentioning (?i)"              "the docs say (?i) is invalid here"
   ;;
 missing) note FAIL "inline-flag rule not effective: omp ttsr list --json has no ttsr-embedded-inline-flag"; fail=$((fail+1)) ;;
-*) na_note "ttsr-embedded-inline-flag arms (omp not on PATH)" ;;
+*) note n/a "ttsr-embedded-inline-flag arms (no omp-kit plugin or no omp on this machine: out of scope here)"; na=$((na+1)) ;;
 esac
 # GAP-CONDITIONED ROUTER (P4, 2026-09-20). Survives R64 because the trigger IS the gap:
 # `unsafe` inside a .rs edit/write. Injection is skill names + a working jsm query, not
