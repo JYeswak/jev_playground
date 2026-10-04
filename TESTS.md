@@ -668,3 +668,7 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 - `work/jev-science/recog/theory_test.py` — recomputes the recognition-versus-forecasting contingency tables, Fisher tests, effect estimates, and own-vein sensitivity from the committed coding/verdict data; asserts the coding/verdict ID join is complete. Run: `python3 work/jev-science/recog/theory_test.py` (1 executable check; prints 4 tables).
 - `work/vendor-paste/vendor-shadow.test.mjs` — verifies added-block/path eligibility, skips for vendored/dependency/non-source/lockfile paths, scores pasted MIT text but not own code, logs hashes and provenance, fails open on refusal/cap, and pins the frozen cut. Run: `node --test work/vendor-paste/vendor-shadow.test.mjs` (5 tests).
 - `work/jev-jzgm/test_replay.py` — verifies the committed cap3 row hash and totals, rejects altered frozen rows, detects per-turn differences/missing turns, exercises policy-off identity replay and computed memory/gate deltas while marking harm labels unobserved, and checks JavaScript UTF-16 token sizing including lone surrogates. Run: `python3 -m unittest work/jev-jzgm/test_replay.py` (6 tests).
+
+## Newly registered tests — jev-9kmq
+
+- `work/jev-9kmq/test_conformal.py` — class-conditional prediction sets, malformed probability refusal, absent-class handling, conservative ties, nearest timestamp-group split, split refusal, and seeded label permutation. Run: `python3 work/jev-9kmq/test_conformal.py -v` (9 tests).
