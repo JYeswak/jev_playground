@@ -257,12 +257,17 @@ test("empty prompt returns silently", async () => {
   assert.equal(calls, 0);
 });
 
-test("enforce OFF returns undefined and leaves the prompt untouched", async () => {
+test("enforce OFF scores drops but emits no enforcement or prune row", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
-  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1), path: join(dir, "log.jsonl"), sidecarPath: join(dir, "full.jsonl"), switchPath: join(dir, "no-switch-file") });
+  const logPath = join(dir, "log.jsonl");
+  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1), path: logPath, sidecarPath: join(dir, "full.jsonl"), switchPath: join(dir, "no-switch-file") });
   const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>"];
-  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, undefined);
+  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, { cwd: "/Users/josh/Developer/jev" });
   assert.equal(out, undefined);
+  const rows = rowsOf(logPath);
+  assert.equal(rows.length, 2);
+  assert.ok(rows.every((row) => row.status === "scored" && row.decision === "drop"));
+  assert.ok(!rows.some((row) => row.status === "enforced" || row.decision === "prune"));
 });
 
 test("enforce ON in-scope removes dropped bullets and keeps kept ones", async () => {
