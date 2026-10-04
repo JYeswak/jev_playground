@@ -1,8 +1,63 @@
-# Jev — typed decisions for code
+# jev_playground — classifiers that earn their place in a coding-agent fleet
 
-Jev is TypeSafe's System One model for typed judgments. Give it a JSON state and a typed question; get a choice, score, or true/false value with probabilities and confidence. Jev does not generate prose. Your code owns the threshold, the safe side, and the action taken when an answer is malformed or uncertain.
+We run a fleet of coding agents and put typed classifiers inside their loop: which file to read, whether a tool result is an injection, whether a command is risky, whether a recalled memory belongs in context, whether a reviewer's finding is new. This repository is where we decide **which technique** answers each of those questions, prove it live, measure what it is worth, and ship the winners through one model-neutral CLI (`classifier`). The plan of record is [`ROADMAP.md`](ROADMAP.md); the work queue is the bead graph in `.beads/`.
 
-This repository turns measured Jev behavior into small, runnable tools. The full measurement ledger lives in [`docs/LEDGER.md`](docs/LEDGER.md); source receipts and preregistrations are linked there instead of being copied into this page.
+Jev (TypeSafe's System One model: a JSON state plus a typed question returns a choice, score, or true/false value with probabilities) is one technique among several here, not the frame. Everything built before October 2026 is the foundation this plan stands on; the full measurement ledger is [`docs/LEDGER.md`](docs/LEDGER.md).
+
+## How we choose a technique
+
+Every decision we automate goes through the same arc, and it does not change with the model:
+
+1. **Labels first.** A question gets a blind-labelled set before any model sees it.
+2. **The constant and the cheapest rule set the bar.** Always-the-majority-answer and a regex or keyword rule are scored first; a model has to beat both on the same rows.
+3. **The bar is committed before the first call**, with N, model id and a spend cap.
+4. **Every backend is calibrated the same way** before two are compared.
+5. **Live both ways.** A surface counts only when it fires on a positive and stays silent on a planted negative in a real session, and its effect shows in the session logs.
+6. **Value, not accuracy, keeps it on.** Each live surface carries a benefit-minus-cost receipt; a negative one turns it off.
+
+What the evidence says so far (sources in [`work/plan-20261004/ECOSYSTEM.md`](work/plan-20261004/ECOSYSTEM.md)):
+
+- **The cheapest instrument often wins.** Keyword and regex rules have beaten a typed model on tool-call risk triage and phishing, and abstaining beat it on duplicate detection; a deterministic gate replaced a model pre-gate at 98.1% agreement with zero calls.
+- **Typed models win where the label is in the text and lexical cues break:** passage selection (FiQA top-1 76.2% vs BM25 39.3%), injection on a public corpus, out-of-distribution spam. They lose on forecasting (0 wins / 12).
+- **Local open-weight models are not one thing.** On Banking77 intent routing, Clef-Flash scores .962, Kev-4B .810, Jev .787; Kev-4B is near chance on vendored-code detection.
+- **Calibration changes verdicts more than model choice.** With the same calibration on both, an apparent Clef-over-Jev calibration win disappears, and their vendored-code gap is not significant.
+- **The classic encoder family is our biggest unmeasured gap:** fine-tuned small encoders, SetFit, NLI cross-encoders, open injection-guard models and fact-check models have never been run on our rows.
+
+## Techniques in play
+
+| Technique | Where it fits for us | Status here |
+|---|---|---|
+| Rules, regex, lookups | Labels already in the tokens: destructive commands, licence headers, structure checks | In use; first bar for every question |
+| Lexical retrieval (BM25, TF-IDF) | Candidate generation, in-domain text | Baseline in rank and diff |
+| Embeddings + nearest neighbour / linear probe / SetFit | Dedup, shortlists, few-shot heads | Next: vendored code, intent routing |
+| Fine-tuned small encoders | Fixed label sets with enough labels | Next: injection, intent, fact-check |
+| Zero-shot NLI cross-encoders | Claim vs evidence, changing label sets | Next: claim verification |
+| Small local generative LMs | Free first pass behind a paid check | In use as the gate cascade's first pass |
+| Typed System One models: Jev (hosted), Clef (open-weight) | Choice / Score / Noul with probabilities | In use: ranking, screening, gating, memory; Clef runs as a shadow second verdict |
+| General LLM-as-judge | Criteria that need reasoning over long state | Comparison arm only (free models) |
+| Cascades | Cheap screen clears most traffic, paid tier confirms | In use on the command gate |
+| Calibration, conformal sets, prevalence projection | Turning any score into a decision | Being built as the measurement core |
+
+## What we are testing next
+
+Each row names its question, the labels it reuses, and the result that would rule it out. They become beads in the graph, under the classifier epic (`jev-b35c`) and the mission root (`jev-q3q8`), when the current review rounds converge; until then this table is the queue.
+
+| # | Experiment | Bar to beat | Ruled out if |
+|---|---|---|---|
+| X1 | Open injection-guard encoders vs Jev on 1,262 labelled tool results | 5/300 false flags, 268/300 caught | catch lower bound < .853 at the same false-flag rate |
+| X2 | Clef-Flash vs Jev on four suites with equal calibration | Jev's accuracy and calibration | significantly worse (exact McNemar) or calibration CI above Jev's |
+| X3 | Fact-check models (MiniCheck, NLI) vs Jev on SciFact / FEVER | Jev 361/400 | worse after equal calibration |
+| X4 | Embedding or TF-IDF probe on vendored-code detection | AUC .827 (Jev), .839 (Clef) | held AUC < .807 |
+| X5 | Preregistered replication of a small local model's sentiment-scoring lead | Jev on SST-5 | no lead on fresh rows |
+| X6 | Fine-tuned encoder / SetFit on Banking77 intent routing | Clef .962 | below Clef, and 10-shot below Jev |
+| X7 | Deterministic command rules joined onto the blind-labelled gate rows | Jev's catch and false-alarm rates | rules match Jev at no more false alarms |
+| X8 | Memory relevance: P(drop \| relevant) on 59+ sampled relevant memories | always-drop | upper 95% bound above the tolerance |
+
+**Not classifiable here** (decided by people or by code instead): which work to fund and the plan's scope; whether the bead graph reaches the mission (a graph property, checked by lint and PageRank); writing code, docs and fixes; anything with no labels and no observable outcome yet.
+
+## How the plan is checked
+
+The bead graph is reviewed in rounds by five independent lenses (mission coverage, research backing, system fit, honesty, graph order), with planted defects that each reviewer must catch and a fresh-eyes round from agents given almost no context. Building starts only after two consecutive rounds bring no new findings and a capture-recapture estimate puts the remaining defects near zero.
 
 ## Quickstart
 
@@ -129,7 +184,7 @@ Skill veto stays shadow-only: loads are scored and logged, never blocked (jev-wb
 
 Per-prompt skill hints PARKED (R133 VEIN-EXHAUSTED): every recall gain came with misroutes; silence was strictly safer. Extension stays OFF. The semantic retry is refuted too (jev-zbb1, R135: best recall 4/20 below the 8/20 gate). Web-search rerank stays OFF (jev-ib1h: 0 opens in 15 answered).
 
-Local models: nimble/tev1 LOSE-TO-JEV except nimble as cascade first pass (jev-uhc5: gate/injection worse, p95 1.2–2.7 s). Open-weight Clef-flash + a Platt map fitted on dev BEATS recorded jev-1.13.0 on two held sets at $0 (jev-576e, verified: Banking77 n=600 acc 0.962 vs 0.787, ECE 0.025 vs 0.102; vendored code n=200 AUC 0.839 vs 0.827, ECE 0.083 vs 0.185), at ~3 s/call on this Mac, so it runs as a shadow second verdict on the vendor-paste hook (jev-517o), not in the agent's hot path. Kev-4B wins Banking77 but is near chance on vendored code (AUC 0.53). Recompute: `python3 work/local-decision-arms/run.py --platt clefflash`.
+Local models: nimble/tev1 LOSE-TO-JEV except nimble as cascade first pass (jev-uhc5: gate/injection worse, p95 1.2–2.7 s). Open-weight Clef-flash wins Banking77 intent routing on accuracy (n=600, 0.962 vs 0.787); with the same dev-fitted calibration on both, the calibration gap closes (ECE 0.0246 vs 0.0276) and vendored code is a tie (AUC 0.839 vs 0.827, DeLong p=0.67) (`work/plan-20261004/specs/advanced-mathops.md:7-8`). At ~3-4 s/call on this Mac it runs as a shadow second verdict on the vendor-paste hook (jev-517o), not in the agent's hot path. Kev-4B scores 0.810 on Banking77 but is near chance on vendored code (AUC 0.53). Recompute: `python3 work/local-decision-arms/run.py --platt clefflash`.
 
 TTSR judged rules: rules below 0.80 precision retired (R132 `jev-key-canonical-source`); `claim-without-evidence` retired earlier (R130, precision 0.571).
 
