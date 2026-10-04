@@ -147,13 +147,24 @@ fi
 # check silently inverts. That is this repo's own `bash-pipe-exit` class biting the selftest that
 # guards TTSR rules — measured here 2026-09-20, and it made both RED arms below read as green.
 
-# SYSTEM-WIDE rule, lives in ~/.agents/rules so it fires in every repo. It protects the rule
-# system itself: an EMBEDDED inline flag makes a rule load and never fire, and only `omp ttsr
-# test` says so — a live session logs-and-ignores. The near-miss arm is load-bearing, because a
-# LEADING (?i) is legal (omp lifts it to the `i` flag) and flagging it would be over-strict.
-F="$SYS_ROOT/ttsr-embedded-inline-flag.md"
-case $(sys_rule_state "$SYS_ROOT" ttsr-embedded-inline-flag.md) in
+# SYSTEM-WIDE rule (ships in the omp-kit plugin since migrate receipt d0aef824, 2026-10-03; it was
+# in ~/.agents/rules before). Assert it is EFFECTIVE from any source (`omp ttsr list --json`), not
+# that a file sits at one path: the file-path check went red when omp-kit moved it (omp-test triage
+# 2026-10-04). It protects the rule system itself: an EMBEDDED inline flag makes a rule load and
+# never fire, and only `omp ttsr test` says so — a live session logs-and-ignores. The near-miss arm
+# is load-bearing, because a LEADING (?i) is legal (omp lifts it to the `i` flag).
+F=""
+if command -v omp >/dev/null 2>&1; then
+  ttsr_list=$(timeout 60 omp ttsr list --json 2>/dev/null) || ttsr_list=""
+  F=$(printf '%s' "$ttsr_list" | jq -r '(if type=="array" then . else (.rules // []) end)[]
+        | select((.name // .id) == "ttsr-embedded-inline-flag") | (.source // .path) // empty' 2>/dev/null | head -n 1)
+  if [ -n "$F" ] && [ -f "$F" ]; then rule_state=present; else rule_state=missing; fi
+else
+  rule_state=unavailable
+fi
+case $rule_state in
 present)
+  note ok "inline-flag rule effective from: $F"; pass=$((pass+1))
   armw() { # armw <expect> <label> <payload>
     local want="$1" label="$2" txt="$3" got
     if omp ttsr test --rule "$F" --source tool --tool write --path /tmp/probe.md "$txt" 2>&1 \
@@ -166,8 +177,8 @@ present)
   armw quiet "inline-flag: ordinary condition"                 "condition: 'grep[^|;&]*2>/dev/null'"
   armw quiet "inline-flag: prose mentioning (?i)"              "the docs say (?i) is invalid here"
   ;;
-missing) note FAIL "system-wide rule missing: $F"; fail=$((fail+1)) ;;
-*) na_note "ttsr-embedded-inline-flag arms" ;;
+missing) note FAIL "inline-flag rule not effective: omp ttsr list --json has no ttsr-embedded-inline-flag"; fail=$((fail+1)) ;;
+*) na_note "ttsr-embedded-inline-flag arms (omp not on PATH)" ;;
 esac
 # GAP-CONDITIONED ROUTER (P4, 2026-09-20). Survives R64 because the trigger IS the gap:
 # `unsafe` inside a .rs edit/write. Injection is skill names + a working jsm query, not
