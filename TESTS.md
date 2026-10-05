@@ -41,6 +41,13 @@ claim nobody can check:
   `selected:false` (planted `selected:true` fails `true !== false`), and a
   fitted logistic separates separable data deterministically.
   Run: `node work/oracle-kit/test.mjs` (29 checks).
+- `kit/test/cli-argv.test.mjs` — safe one-edit typo suggestions; distant and destructive-flag typos are not suggested or applied. Run: `node --test kit/test/cli-argv.test.mjs` (2 tests).
+- `kit/test/cli-bins.test.mjs` — package/lock bin agreement, published command set, and matching `classifier`/`clf` version output. Run: `node --test kit/test/cli-bins.test.mjs` (1 test).
+- `kit/test/cli-envelope.test.mjs` — JSON envelope schema/data placement and deterministic output outside volatile latency/usage fields. Run: `node --test kit/test/cli-envelope.test.mjs` (2 tests).
+- `kit/test/cli-exit.test.mjs` — stable exit classes, missing-key JSON/robot behavior, doctor output contracts, and refusal of unoffered answers. Run: `node --test kit/test/cli-exit.test.mjs` (3 tests).
+- `kit/test/cli-help.test.mjs` — pinned overview, topic/command help, and version output. Run: `node --test kit/test/cli-help.test.mjs` (2 tests).
+- `kit/test/cli-support.mjs` — shared isolated-home and subprocess helpers used by the `kit/test/cli-*.test.mjs` CLI tests; exercised through those tests.
+- `work/fleet-schema/test_miner.py` — fixture-backed miner joins, cutoff handling, reread metadata, provenance checks, load-safety behavior, and report output. Run: `python3 -m unittest discover -s work/fleet-schema -p test_miner.py -v`.
 - `work/oracle-kit/prevalence_threshold.py` — t*(π) on frozen priors 30/186449 and 488/50149.
   Run: `python3 work/oracle-kit/prevalence_threshold.py` (exit 0; prints the 1:2300 identity).
 - `work/oracle-kit/selector-guard.mjs` — scorers cannot silently read `.distribution` / `.probability`.
@@ -680,6 +687,8 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 
 - `work/x4-vendored-probe/test_run.py` — refuses a probe fit that includes held rows and a bootstrap that samples windows rather than source groups; accepts the dev-only fit and confirms 53 held source groups. Run: `uv run --no-project --with scikit-learn python -m unittest work/x4-vendored-probe/test_run.py -v` (4 tests).
 - `work/blast-radius/test_jev_lab_offswitch.py` — jev-lab per-call off switches (jev-3ofj): OFF file takes effect on the next call. Run: `python3 -m unittest work/blast-radius/test_jev_lab_offswitch.py`
+- `work/jev-nwo1/test_score.py` — recomputes the NWO1 per-case summary, including the strict-positive/recall-unmeasured boundary; a planted continued=yes row must change the count. Run: `uv run --no-project python -m unittest work/jev-nwo1/test_score.py -v` (3 tests).
+- `work/provider-safety/test-u07.mjs` — exercises the approved-origin request, wrong-host/non-HTTPS refusal, redirect refusal, and final child argv/env boundary using synthetic credentials and zero network calls. Run: `node work/provider-safety/test-u07.mjs --json` (4 scenario runs; writes a redacted receipt).
 
 ## Newly registered tests — jev-9kmq
 

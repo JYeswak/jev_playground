@@ -1,0 +1,102 @@
+{
+  "bead": "jev-u07-infisical-argv-gi70",
+  "result": "PASS",
+  "run_at": "2026-10-05T18:27:33.059Z",
+  "reviewer_identity": {
+    "name": "CyanOtter (pane %32; legacy-unverified binding)",
+    "pane": "%32",
+    "source": "JEV_REVIEWER",
+    "independent": false
+  },
+  "source": "work/jev-client/src/infisical-key.ts",
+  "network": {
+    "external_calls": 0,
+    "ambient_fetch_calls": 0,
+    "injected_transport_calls": 2
+  },
+  "approved_origin": {
+    "returned_synthetic_key": true,
+    "external_network_calls": 0,
+    "synthetic_transport_calls": 1,
+    "request": {
+      "url": "https://secrets.zeststream.ai/api/v1/auth/universal-auth/login",
+      "method": "POST",
+      "redirect": "error",
+      "header_names": [
+        "content-type"
+      ],
+      "body_fields": [
+        "clientId",
+        "clientSecret"
+      ],
+      "client_id_matches_synthetic": true,
+      "client_secret_matches_synthetic": true
+    },
+    "children": [
+      {
+        "file": "infisical",
+        "argv": [
+          "secrets",
+          "get",
+          "TYPESAFE_API_KEY",
+          "--projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba",
+          "--plain",
+          "--silent"
+        ],
+        "env_names": [
+          "HOME",
+          "PATH",
+          "TMPDIR"
+        ],
+        "parent_secret_inherited": false,
+        "client_secret_in_argv": false,
+        "machine_token_matches_synthetic": false
+      },
+      {
+        "file": "infisical",
+        "argv": [
+          "secrets",
+          "get",
+          "TYPESAFE_API_KEY",
+          "--projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba",
+          "--plain",
+          "--silent"
+        ],
+        "env_names": [
+          "HOME",
+          "INFISICAL_API_URL",
+          "INFISICAL_TOKEN",
+          "PATH",
+          "TMPDIR"
+        ],
+        "parent_secret_inherited": false,
+        "client_secret_in_argv": false,
+        "machine_token_matches_synthetic": true
+      }
+    ]
+  },
+  "denied_origins": [
+    {
+      "configured_origin": "https://collector.invalid",
+      "credential_post_attempts": 0,
+      "child_invocations": 1
+    },
+    {
+      "configured_origin": "http://secrets.zeststream.ai",
+      "credential_post_attempts": 0,
+      "child_invocations": 1
+    }
+  ],
+  "redirect_refusal": {
+    "first_recipient": "https://secrets.zeststream.ai/api/v1/auth/universal-auth/login",
+    "redirect_policy": "error",
+    "reported_final_recipient": "https://collector.invalid/collect",
+    "first_hop_calls": 1,
+    "unapproved_second_request_calls": 0,
+    "credential_child_invocations": 0,
+    "refused": true
+  },
+  "no_real_credentials": true,
+  "no_live_infisical_or_typesafe_calls": true,
+  "no_independent_review_claim": true
+}
