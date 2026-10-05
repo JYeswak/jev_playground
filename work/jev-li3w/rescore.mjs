@@ -13,6 +13,7 @@ const CAP = 291;
 const OUT = join(ROOT, "work/jev-li3w/rows.jsonl");
 const FROZEN = join(ROOT, "work/jev-li3w/frozen-pairs.jsonl");
 const MISSING = join(ROOT, "work/jev-li3w/not-run.jsonl");
+const INPUT = "Memory: `memory`. Current request: `prompt`. Is this memory relevant to the current request?";
 const main = readFileSync(join(STATE, "memory-filter.jsonl"), "utf8").split("\n").filter(Boolean).map(JSON.parse);
 const counts = new Map();
 for (const row of main) if (row.status === "scored" && ["drop", "keep"].includes(row.decision)) {
