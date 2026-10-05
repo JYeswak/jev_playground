@@ -21,8 +21,9 @@ rows, and the winner is whichever implementation passes conformance **and** beat
 `kit/contracts/<family>.json` (created by N0's successor, see beads):
 - `question`: type (choice / score / noul / rule), options with descriptions, the threshold or decision rule.
 - `state`: the input shape (fields, size limit, privacy allowlist: summaries only, never raw transcript).
-- `safe_side`: the action on invalid answer, timeout, unconfigured key, cap reached (always the no-op /
-  keep / allow side for anything that runs inside a session).
+- `safe_side`: the action on invalid answer, timeout, unconfigured key, cap reached, declared per contract:
+  a command gate is fail-closed (REFUSE the tool call); a result screen or advisory hook is fail-open
+  (PASS the result / keep / allow). The harness tests each contract against its own declared side.
 - `budget`: latency budget (ms) and per-run call/spend cap.
 - `labels`: the label source in the fleet logs and its extraction command.
 - `bar`: majority constant, cheapest rule, and the preregistered bar (committed before any call).
@@ -33,7 +34,7 @@ MUST clauses every backend adapter is tested against (spec-derived matrix, skill
 |---|---|---|
 | C1 | An answer outside the offered options is refused, and the safe side is taken | recorded answer with choice moved out of ids |
 | C2 | Probabilities are finite, in [0,1], sum to 1 within 0.02, and the chosen option is the max | NaN / rescaled / chosen-below-max mutations |
-| C3 | Timeout, transport error, or missing key takes the safe side and never blocks the host turn | fake transport that hangs past budget; no key |
+| C3 | Timeout, transport error, or missing key is handled within the latency budget by applying the contract's declared `safe_side`: the host never hangs; the safe side may be REFUSING the tool call (command gate, fail-closed) or PASSING the result (result screen, fail-open) | two fixtures, each asserting the action and the return: a fail-closed command gate whose fake transport hangs past budget must return in budget with the call refused; a fail-open result screen under the same hang must return in budget with the result passed unchanged; no key on both |
 | C4 | Spend/call cap reached takes the safe side and logs `daily-cap` | cap = 0 |
 | C5 | Input over the size limit or outside the privacy allowlist is refused before any call | 50k-char state; a raw-transcript field |
 | C6 | Same input, same recorded answer → same decision (deterministic policy) | run twice |
@@ -66,7 +67,7 @@ A scenario is one node: **family × backend × condition**. Conditions:
 |---|---|---|
 | nominal | accuracy vs labels | fuzzy receipt golden |
 | invalid answer | C1/C2 safe side | spec matrix |
-| down / timeout / no key | C3 fail-open, host turn not held | spec matrix + latency budget |
+| down / timeout / no key | C3 declared safe side within the latency budget (gate refuses, screen passes); host never hangs | spec matrix + latency budget |
 | cap reached | C4 | spec matrix |
 | oversize / private field | C5 refusal before call | spec matrix |
 | adversarial / planted | catches the planted positive | per-family planted fixture |

@@ -45,11 +45,11 @@ Each row names its question, the labels it reuses, and the result that would rul
 | # | Experiment | Bar to beat | Ruled out if |
 |---|---|---|---|
 | X1 | Open injection-guard encoders vs Jev on 1,262 labelled tool results | 5/300 false flags, 268/300 caught | catch lower bound < .853 at the same false-flag rate |
-| X2 | Clef-Flash vs Jev on four suites with equal calibration | Jev's accuracy and calibration | significantly worse (exact McNemar) or calibration CI above Jev's |
+| X2 | Clef-Flash vs Jev with equal calibration on the two family suites: gate 396 and injection 600 (SciFact and SST-5 route no family, so they are not run) | Jev's accuracy and calibration | significantly worse (exact McNemar) or calibration CI above Jev's |
 | X3 | Fact-check models (MiniCheck, NLI) vs Jev on SciFact / FEVER | Jev 361/400 | worse after equal calibration |
 | X4 | Embedding or TF-IDF probe on vendored-code detection | AUC .827 (Jev), .839 (Clef) | **Run: beats the bar.** A TF-IDF probe scores held AUC .917 vs Jev .827 and Clef .839 (DeLong p=.0004 and .0066), $0, on the constructed 320-window sample; ECE and the embedding arm are still open ([receipt](work/plan-20261004/receipts/x4-vendored-probe-RECEIPT.md)) |
-| X5 | Preregistered replication of a small local model's sentiment-scoring lead | Jev on SST-5 | no lead on fresh rows |
-| X6 | Fine-tuned encoder / SetFit on Banking77 intent routing | Clef .962 | below Clef, and 10-shot below Jev |
+| X5 | ~~Preregistered replication of a small local model's sentiment-scoring lead on SST-5~~ **Dropped (in review): benchmark tourism.** SST-5 sentiment carries no evidence about the `nudge` family's follow/act labels | — | — |
+| X6 | Embedding probe and SetFit as arms of the route/locate bake-off (N3), trained on dev locate episodes and scored on held ones. Banking77 is the already-run calibration point: the probe scored .868 vs Jev .787, below Clef .962 (dogfood run; receipt not yet committed) | N3's rule (R) and grep-always (.776) | not ahead of R by exact McNemar on held episodes |
 | X7 | Deterministic command rules joined onto the blind-labelled gate rows | Jev's catch and false-alarm rates | **Run: rules lose.** Jev catches 47/47 at 1.40% weighted false alarms; dcg plus the cascade pre-rule catch 7/47 at 14.81% ([receipt](work/plan-20261004/receipts/x7-gate-rules-RECEIPT.md)) |
 | X8 | Memory relevance: P(drop \| relevant) on 59+ sampled relevant memories | always-drop | upper 95% bound above the tolerance |
 | E1–E2 | Reviewer verdicts and findings: does a verdict hold, is a finding new | the majority answer and a keyword / same-bead rule | **Run: rules beat Jev.** Finding novelty: rule 77/85 vs Jev 49/85 ([receipt](work/plan-20261004/receipts/e2-finding-novelty-RECEIPT.md)); verdict holds: keyword rule accuracy .618, kappa .288 vs Jev .400, kappa −.067 ([receipt](work/plan-20261004/receipts/e1-verdict-holds-RECEIPT.md)) |
@@ -58,7 +58,7 @@ Each row names its question, the labels it reuses, and the result that would rul
 
 ## How the plan is checked
 
-The bead graph is reviewed in rounds by five independent lenses (mission coverage, research backing, system fit, honesty, graph order), with planted defects that each reviewer must catch and a fresh-eyes round from agents given almost no context. Building starts only after two consecutive rounds bring no new findings and a capture-recapture estimate puts the remaining defects near zero.
+The bead graph is reviewed in rounds by five independent lenses (mission coverage, research backing, system fit, honesty, graph order), with planted defects that each reviewer must catch and a fresh-eyes round from agents given almost no context. Building starts only after two consecutive rounds bring no new findings (a finding is new unless an earlier round recorded the same bead, class and substance), every lens catches its planted defect, at least one of the two rounds is fresh-eyes, and a non-author confirms. Any estimate of the defects still remaining is reported with its assumptions and uncertainty; it is not a gate.
 
 ## Quickstart
 
