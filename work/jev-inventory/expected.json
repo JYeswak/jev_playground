@@ -241,18 +241,6 @@
       "verdict": "SHADOW",
       "evidence": "jev-30hi PASS (prec 0.842/rec 0.640, McNemar 65/2); seam m94x f618f143 installed; scope cut a9b02bc1",
       "saving": "shadow sample accumulating; enforce bar blind 0.90/0.10 at >=30 hunks"
-    },
-    {
-      "id": "skill-veto",
-      "group": "extension",
-      "name": "skill-load veto shadow",
-      "decision": "does this skill load fit the request?",
-      "how": ".omp/extensions/jev-skill-veto.ts (shadow, cut 0.40, fail-open rows)",
-      "expect": "on",
-      "extension": "./.omp/extensions/jev-skill-veto.ts",
-      "verdict": "SHADOW",
-      "evidence": "jev-wbel: D9 0.990 did not transfer (organic precision 0.335 at 79% veto, blind 200); state-enrichment and cookbook rank-verify also FAIL; enforcement refuted, shadow stays log-only",
-      "saving": "shadow sample accumulating; enforce bar blind 0.80/0.10"
     }
   ]
 }
