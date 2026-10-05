@@ -18,6 +18,7 @@ cites them as `[areas §N]`, `[ergo §N]`, `[doctor §N]`, `[install §N]`, `[cl
 | Exit codes | one dictionary for every command: 0 ok, 1 findings, 3 refused (e.g. an unoffered label), 4 refused_unsafe, 5 retryable, 6 online_required, 64 usage, 66 no_input, 73, 74; no key = 1 | conductor [ergo §2.4]; `3` added 2026-10-04 (converge r2 L4: jev-b35c.1's test already required it) |
 | Output | one envelope `classifier.<cmd>.v1 {ok,schema,status,data,meta,warnings,commands,errors}`; `doctor --json` is the raw doctor report, `--robot` wraps it | conductor [ergo §2.5] |
 | Repair | dry-run unless `--apply` | conductor [doctor §3] |
+| Package and channel | `jev-kit` (kit/package.json) stays the package name and is not published in stage 1: `classifier` is taken on npm, jev-r1vp installs from a fresh clone of origin/main, and publishing is irreversible. bins are exactly `classifier`, `clf` and the `jev-skill-gap` deprecation shim; no `jev` bin (mission rejection, .omp/mission.toml:16). A package-name/channel decision (owner Joshua) is opened only if a later stage needs a published package. | converge r4 (Cli batch), 2026-10-05; reversible plan text |
 
 ## 2. Command tree
 
@@ -28,7 +29,7 @@ classifier ready <project-dir>      # the readiness audit for a NEW project (sec
 classifier doctor | health | repair # [doctor]; every check names its data source
 classifier install <target>         # [install]; cli | omp-project | omp-profile | daily | clef | all
 classifier capabilities --json | robot-docs | schema   # generated from the family registry
-classifier ask choice|score|noul    # raw primitive escape hatch
+classifier ask choice|score|noul    # raw primitive escape hatch (one question; the mixed-bundle mode is jev-b35c.11, out of stage 1)
 classifier skillgap mine|status     # ex `jev-skill-gap` (bin kept as a deprecation shim)
 
 classifier <family> [run] <inputs>  # one decision ("run" implied)
@@ -106,31 +107,31 @@ Beads (epic `jev-b35c`; edges are real prerequisites only, 0 cycles):
 | Rename and shell | `.1` | — |
 | Registry and error rewrites | `.2` | `.1` |
 | Doctor | `.3` | `.1` |
-| **Measurement core** (D2-D7, D17): integration owner | `.10` | `.23`, `.24`, `.25` |
+| **Measurement core** (D2, D3, D4 formula, D5, D7, D16; library only): integration owner | `.10` | `.23`, `.24`, `.25` |
 | ↳ symmetric calibration + rerun spread (D2, D7) | `.23` | — |
-| ↳ expected-cost, NP, prevalence, KS (D3, D4, D16) | `.24` | — |
-| ↳ conformal sets, multiplicity, PPI (D5, D6, D17) | `.25` | — |
+| ↳ expected-cost and NP cuts, PPV formula, D16 NP bound (D3, D4 formula only, D16); BBSE and KS not built in stage 1 | `.24` | — |
+| ↳ conformal sets (D5); D6 and D17 wait for a family PREREG that names them | `.25` | — |
 | Backend seam + combine/cascade (D8) | `.4` | `.1`, `.2`, `.10` |
 | ↳ free/local general-LLM comparison arm (D10); optional NOT_RUN arm for families | `.15` | `.2`, `.4`, `.10` |
 | Families: integration owner of the 16-family registry (D9 do-not-build list) | `.5` | `.16`, `.17`, `.2`, `.4`, `.10` |
 | ↳ cohort A (organic labels): result, rank, reread, route, nudge, recover | `.16` | `.2`, `.4`, `.10`, N1-N4, N9, conformance harness |
 | ↳ cohort B (planted/blind labels): memory, screen, gate, review, watch, effort | `.17` | `.2`, `.4`, `.10`, N6, N10, X1, X7, X8, harness, metamorphic |
 | `classifier gaps` (ranks omp-kit's extractor output; jev's miner retires) | `.6` | `.2`, jev-daily-omp-skill-gap-mining-7jci |
-| `ready` | `.7` | `.5`, `.10` |
-| Doctor repair (scoped mutation, undo, quarantine) | `.14` | `.3` |
-| Installer: integration owner | `.8` | `.3`, `.5`, `.18`-`.22` |
-| ↳ foundation: plan, manifest, bootstrap, package | `.18` | `.1` |
-| ↳ targets: CLI, omp profile/config, skills | `.19` | `.1`, `.2`, `.5` |
-| ↳ target: services and daily job | `.20` | `.1`, `.2`, `.3`, `.5` |
-| ↳ target: local Clef | `.21` | `.1`, `.4` |
-| ↳ verification ladder, docs, completions, e2e | `.22` | `.3`, `.5`, `.18`-`.21` |
-| Docs | `.9` | `.8` |
-| `ask` bundle (D11) | `.11` | `.4` |
+| `ready` | `.7` | `.2`, `.10` |
+| Doctor repair (scoped mutation, undo, quarantine; owns `repair --apply`) | `.14` | `.3`, `.18` |
+| ~~Installer: integration owner~~ FOLDED into `.22` (converge r4), in_review | `.8` | — |
+| ↳ foundation: plan, manifest, lock (bootstrap/package/cosign out of stage 1) | `.18` | `.1` |
+| ↳ targets: CLI, omp profile/config, skills | `.19` | `.1`, `.2` (fixture registry) |
+| ↳ target: daily job manifests for `omp-kit service install` | `.20` | `.1`, `.2`, `.3`, canary fix, omp-kit rz5.113 (external) |
+| ↳ target: local Clef | `.21` | `.1`, `.4`, localbench kit-jtq2 (external) |
+| ↳ installer integration owner: verification ladder, docs, completions, e2e | `.22` | `.3`, `.18`-`.21` |
+| Docs (doctor-rendered; present-tense fixes are a separate docs-only bead) | `.9` | `.3`, jev-grzn |
+| ~~`ask` bundle (D11)~~ OUT OF STAGE 1 (converge r4), in_review: no consumer names a bundled arm | `.11` | `.4` |
 | ~~`chain`: integration owner (D12)~~ DROPPED 2026-10-04, in_review: no fleet decision is a pipeline | `.12` | — |
 | ~~↳ propose-check-act runner~~ DROPPED, in_review | `.26` | — |
 | ~~↳ rank long-document windowed search~~ DROPPED, in_review: no long-document decision | `.27` | — |
 | ~~`extract` family (D13)~~ DROPPED, in_review: no extraction decision, no host tool | `.13` | — |
-| `overview` mega-command | `.28` | `.1`-`.5`, `.8`, `.10` |
+| `overview` mega-command | `.28` | `.1`-`.5`, `.10`, `.18`; localbench kit-jtq2 (external) |
 
 The epic owns D14 and D15 (inherited by every child). Every child `.1`-`.28` must close before the
 epic closes. Wave 1 (2026-10-04, five read-only review lanes in `var/agent-tmp/wave1/`) produced these
@@ -187,7 +188,7 @@ recomputation on committed rows unless marked as an upstream claim (UPSTREAM).
 | D1 | Name | `classifier` / `clf`; backend is a flag | `jev` (owned by hermes on PATH); a model name | Joshua verbatim (section 1); `command -v` 2026-10-04 | write | — |
 | D2 | Calibrating backends | the same pipeline for every backend: floor probabilities at 0.005, fit on dev (temperature, Platt, isotonic), report ECE with its noise floor and a bootstrap CI, compare with paired tests | calibrate one backend, compare against the other raw | Jev ECE .1017 -> .0276 with the same Platt map [M A]; 181/3,080 Banking77 rows put exactly 0.00 on gold [R]; noise floor ECE ~.045 at n=60 (UPSTREAM jev-exploration) [R]; Guo et al. 2017 [L] | PORT the design of franken_nlp `src/calibration.rs` (digest-bound splits, temperature, isotonic PAV, seeded bootstrap, abstain = exit 0) [R]; write in TS, zero deps | symmetric recalibration on committed rows does not reproduce Jev ECE ~.028 |
 | D3 | Setting cuts | expected-cost cut at projected real prevalence; Neyman–Pearson cut from negatives only where positives are scarce (29/59/149/299 negatives for FPR .10/.05/.02/.01, δ=.05) | Youden on a balanced dev set; fixed 0.5 | the cost/prevalence formula alone: Youden 0.35 projects precision .21 at 5% prevalence [M]; no organic vendored-code precision exists to check it (0/39 positives), and memory-filter keep precision .19-.24 is a different classifier, not a validation; a same-classifier replay (skill veto at known prevalence .29) is `.24`'s acceptance; NP umbrella (Tong et al.) [L K1] | write (order statistic + cost matrix); idea from process_triage expected-loss action [R] | an NP cut on held negatives exceeds its stated FPR bound in replay |
-| D4 | Before shipping any bar | project the result to a GIVEN real prevalence (formula) and run a KS alarm on live scores; BBSE only where its label-shift assumption holds, else UNIDENTIFIABLE | trust the demo-set number | skill veto .990 -> .335: the fixed-prevalence projection at the blind-labelled .29 gives .40-.63 (.629/.399), KS p≈.001 [L R4]; BBSE itself returned π̂ .938 vs truth .29 under conditional shift (veto-on-FIT .20 -> .739), so it reports a shift alarm here, never a pass (arXiv:1802.03916) | write; QuaPy as idea [R] | the projection fails to predict a known demo-to-organic drop when replayed |
+| D4 | Before shipping any bar | project the result to a GIVEN real prevalence (formula) and run a KS alarm on live scores; BBSE only where its label-shift assumption holds, else UNIDENTIFIABLE | trust the demo-set number | skill veto .990 -> .335: the fixed-prevalence projection at the blind-labelled .29 gives .40-.63 (.629/.399), KS p≈.001 [L R4]; BBSE itself returned π̂ .938 vs truth .29 under conditional shift (veto-on-FIT .20 -> .739), so it reports a shift alarm here, never a pass (arXiv:1802.03916) | write; QuaPy as idea [R] | the projection fails to predict a known demo-to-organic drop when replayed. REVERSED by this criterion (converge r4, 2026-10-05): the skill-veto replay projects .399-.629 against the observed .335 under conditional shift, so BBSE and the KS alarm are not built in stage 1; the fixed-prevalence PPV formula stays as a utility of D3 (jev-b35c.24) |
 | D5 | Abstain path | split-conformal LAC answer sets (`route --set`), refuse when exchangeability is not declared | top-k lists; a fixed confidence cut | α=.10: coverage .903, mean size 1.67, 58.5% singletons at 94.9% accuracy; worst class .152 (marginal guarantee only); α=.05 degenerate because of exact zeros [L R2] | write the algorithm (small); borrow franken_nlp's exchangeability-memo refusal [R] | coverage on a fresh disjoint split falls outside its finite-sample band |
 | D6 | Many tests | Benjamini–Hochberg across the ledger; e-BH within a batch; confidence sequences to stop shadow phases | per-bar α=.05 with no correction | 74 bars at .05 imply ~3.7 false passes [M] | write; e-BH idea from process_triage [R] | — (accounting rule) |
 | D7 | Drift and canaries | test against same-model rerun spread | textbook McNemar null | two runs of pinned jev-1.13.0 differ at p=.0076 on 3,080 rows [L R5] | write | — |

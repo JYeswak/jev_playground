@@ -1,0 +1,1 @@
+round 4 snapshot (FRESH-EYES round): .beads/issues.jsonl at commit cdb63948 (round-3 fixes df0f3755 + CI/blast-radius fix) plus planted defects. The plan = beads with status open, in_progress, blocked, in_review.

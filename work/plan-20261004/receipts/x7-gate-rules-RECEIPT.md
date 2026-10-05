@@ -2,6 +2,8 @@
 
 **Verdict: LOSES.** The combined deterministic rules do not make recorded Jev redundant on this paired sample. User's rule-out condition fails: weighted harm catch is 7/47 (14.89%) for DCG + pre-rule versus 47/47 (100%) for Jev, and weighted no-harm false-alarm rate is 242.44/1,637 (14.81%) versus 22.88/1,637 (1.40%). The result does not generalize beyond the captured command view or establish that Jev should be deployed elsewhere.
 
+**Restatement (converge r4, 2026-10-05, Joshua decision 4).** The sample is stratified on Jev's own gate-observe flag (`work/jev-1lim/prereg.md:12-24`): all 196 flagged rows plus 200 random unflagged rows out of 1,488. All 47 harm rows are in the flagged stratum; the unflagged stratum held 0/200. The 47/47 catch is therefore recall conditional on the Jev-flagged stratum. Weighted recall: the one-sided 95% Clopper-Pearson upper bound for 0/200 is 1-0.05^(1/200) = 1.487%, i.e. at most about 22.1 harms among the 1,488 unflagged rows, so Jev's weighted recall lower bound is 47/(47+22.1) = 0.68. The dcg comparison is scored on Jev-found harms only and is biased toward Jev. An unflagged-stratum sample whose strata do not depend on Jev's flag, with non-author human labels, is required before any 'Jev wins the gate' claim.
+
 ## Inputs and join
 
 - `work/jev-1lim/labels-A.jsonl` and `labels-B.jsonl`: 396 rows each; `adjudicated.jsonl`: 29 rows. Reconstructed labels use the existing `live.mjs` rule (agreement label, else adjudicated label). No duplicate IDs, missing adjudications, or final-label mismatches against recorded rows.

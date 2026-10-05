@@ -89,7 +89,7 @@ Since the B77 map is fitted on `p_choice`, the label never changes and accuracy 
 
 If any condition fails, the request goes to Jev and the result shows `backend:"jev"` and `route_reason:"<first failing clause>"`.
 
-Receipts that qualify today: `banking77-intent.v1` and `vendored-code.v1`. The only kit verb whose request matches is `classify`, and only when it is called with the 77 humanized Banking77 labels (classify.ts:4, :41-43 matches run.py:16, :28, :34-40 on state, instructions and criteria). `verify` (SciFact), `score` (SST5), `rerank` (FiQA/NFCorpus) and `gate` (RISK, 5 Nouls) have no Clef receipt and always go to Jev.
+Receipts that qualify today: `banking77-intent.v1` and `vendored-code.v1`. **Converge r4 (2026-10-05): neither qualifies.** A receipt qualifies `auto` only if its question key belongs to a registered family's contract (`kit/contracts/<family>.json`) and its rows are that family's frozen labelled rows; Banking77 is a public benchmark with no fleet traffic and vendored-code belongs to no registered family, so `auto` routes 0 calls to Clef until a family receipt exists (jev-b35c.4). The only kit verb whose request matches is `classify`, and only when it is called with the 77 humanized Banking77 labels (classify.ts:4, :41-43 matches run.py:16, :28, :34-40 on state, instructions and criteria). `verify` (SciFact), `score` (SST5), `rerank` (FiQA/NFCorpus) and `gate` (RISK, 5 Nouls) have no Clef receipt and always go to Jev.
 
 **Clef error or timeout under `auto`, per primitive:**
 
@@ -143,6 +143,19 @@ Global acceptance: `cd kit && node --test test/*.test.mjs` (kit/package.json:31)
 | T7 | Doctor `backends` block (§4) | doctor.test (inside cli.test.mjs) with an injected GET: DOWN → Jev status unchanged; fingerprint absent → `UNPINNED` and routing shows 0 Clef | A doctor that makes any POST (the spy asserts the method is GET) | `node kit/bin/jev.mjs doctor --robot` |
 | T8 | Clean cutover: `work/vendor-paste/vendor-shadow.mjs` drops `LOCAL_PLATT`, `plattMap` and the inline askLocal body (vendor-shadow.mjs:107-134) and calls the kit's `askClef` | vendor-shadow.test.mjs still passes; new case: when the kit calibration file is missing, the local verdict is `NOT_RUN`/`uncalibrated` | A second copy of the map left in vendor-shadow (checked with grep for `2.926`) | `node --test work/vendor-paste/vendor-shadow.test.mjs` |
 | T9 | Docs: kit/README.md and ROBOT.md backend section; AGENTS.md "Local vs paid" gains a Clef row (AGENTS.md:92-97) | n/a | n/a | the docs state the evidence gate word for word as in §3 |
+
+## 6. Gateway URL contract (converge r4, 2026-10-05)
+
+Clef is reached only through localbench's gateway (localbench bead `kit-jtq2`, open on 2026-10-05).
+
+| Field | Value | Source |
+|---|---|---|
+| Host | `127.0.0.1` | `~/Developer/localbench/localbench/gateway.py:35` |
+| Port | `11300` (gateway.PORT) | `~/Developer/localbench/localbench/__main__.py:4101` ("default 11300") |
+| Health | `GET /healthz`, 500 ms bound in doctor and overview | `~/Developer/localbench/localbench/gateway.py:133` |
+| Clef route path | UNKNOWN until `kit-jtq2` closes | `kit-jtq2` acceptance |
+
+Validation rule for `JEV_CLEF_URL` (installer T11, backend seam): accept only if the host is loopback (`127.0.0.1`, `::1`, `localhost`) **and** the port is not `8010`. `http://127.0.0.1:8010` is refused (direct Clef, bypasses attribution); `http://10.0.0.5:11300` is refused (not loopback).
 
 ## Open items (UNVERIFIED)
 - Whether Clef's tokenizer matches the byte band in preflight.ts:2-5. Verify by sending one long local request and comparing `usage.input_tokens` with `estimatedTokensAtLowRatio`.
