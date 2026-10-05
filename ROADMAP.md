@@ -51,7 +51,7 @@ gitignored file.
 | Daily | Stranger-run of the README | GitHub Actions `stranger-run.yml`, 03:17 UTC | runs: 5 of the last 7 scheduled runs green, 2026-09-29 to 2026-10-05 (`gh run list --workflow stranger-run.yml --event schedule`); keyless `--fake` lane |
 | Daily | `jev-latest` canary against the pinned `jev-1.13.0` | launchd `ai.zeststream.jev-latest-canary`, 09:07 | runs |
 | Daily | Every pillar check, one scoreboard row | omp-kit MP5 `ompkit-rc-epic-land-fix-release-dogfood-rz5.97` | NOT RUNNING: open in omp-kit; jev side `jev-2b7f` |
-| Daily | Fleet watcher pages pane 1 on idle, needs-human, CI red | `scripts/fleet-idle-watch.py` | STOPPED since the 2026-10-04 overnight pause |
+| Daily | Fleet watcher pages pane 1 on idle, needs-human, CI red; nudges undelivered omp steering messages | `scripts/fleet-idle-watch.py` | runs (restarted 2026-10-05T15:55Z after the 2026-10-04 overnight pause) |
 | Weekly | Value-ledger review: keep, kill or promote each surface; mission audit | omp-kit MP2 `ompkit-rc-epic-land-fix-release-dogfood-rz5.94` (`doctor --scope mission`) | NOT RUNNING: open in omp-kit; jev side `jev-2b7f` |
 | Long-term | The sixteen decision families (`work/plan-20261004/PRODUCT.md` section 8) each live, shipped as code, refuted or dropped with evidence; Clef the default only where it is non-inferior; `classifier` adoptable by another repo in under an hour | stage-exit bead `jev-uzq1` | open |
 

@@ -112,7 +112,7 @@ native calls; cost is not the deciding factor, quality and latency are.
 | project tools | `.omp/tools/*.ts`, `.omp/extensions/` | rerank, claim check, classify, gate, flag, screen | callable `xd://jev_*` devices |
 | project hooks | `.omp/hooks/post/` | bash risk (gate-observe), web-result injection (webscreen), web_search pick (rerank) | live shadow on `jev-1.13.0`, capped per day, fail open, log only; injection-shadow on tool results in progress (`jev-asbl`) |
 | claim rule | `.omp/rules/disabled/claim-without-evidence.md` | does a reply claim a result without evidence? | RETIRED 2026-10-01: held-out precision 0.571 vs a 0.80 bar (R130); outside rule discovery |
-| fleet watcher | `scripts/fleet-idle-watch.py` (hub service) | is an idle worker waiting on a human? | STOPPED since the 2026-10-04 overnight pause (ROADMAP.md:46; no fleet-idle-watch process); when running it pages pane 1 on idle, needs-human (`jev-1.13.0` Noul), CI, stranger run, key exposure |
+| fleet watcher | `scripts/fleet-idle-watch.py` (hub service) | is an idle worker waiting on a human? | ON again 2026-10-05T15:55Z (service fleet-idle-watch-12, nice 10) after the 2026-10-04 overnight pause; pages pane 1 on idle, needs-human (`jev-1.13.0` Noul), CI, stranger run, key exposure, and nudges an idle pane whose omp steering queue holds an undelivered message (`jev-of3b`) |
 
 Scoreboard (bead `jev-4970`): `python3 work/omp-jev-review/surface-census.py --scoreboard --days 7`.
 

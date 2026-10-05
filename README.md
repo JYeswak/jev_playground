@@ -189,7 +189,7 @@ Local models: nimble/tev1 LOSE-TO-JEV except nimble as cascade first pass (jev-u
 
 TTSR judged rules: rules below 0.80 precision retired (R132 `jev-key-canonical-source`); `claim-without-evidence` retired earlier (R130, precision 0.571).
 
-Fleet watcher (`scripts/fleet-idle-watch.py`), STOPPED since the 2026-10-04 overnight pause (ROADMAP.md:46; no fleet-idle-watch process on 2026-10-05). When it runs, an idle worker waiting on a human pages pane 1 with the 140-char excerpt (jev-7aj1 verified: recall 10/10, 0/10 false pages). Enrichment beyond the excerpt is deleted (jev-zljn, R136: n=1, fragile).
+Fleet watcher (`scripts/fleet-idle-watch.py`), ON again since 2026-10-05T15:55Z after the 2026-10-04 overnight pause. An idle worker waiting on a human pages pane 1 with the 140-char excerpt (jev-7aj1 verified: recall 10/10, 0/10 false pages), and an idle pane whose omp steering queue holds an undelivered message gets one nudge (`jev-of3b`). Enrichment beyond the excerpt is deleted (jev-zljn, R136: n=1, fragile).
 
 ## Read next
 
