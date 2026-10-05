@@ -25,6 +25,7 @@ import { createHash } from "node:crypto";
 import { askJev } from "../../../kit/src/client.ts";
 
 import { recording } from "../../jev-score-register/register.mjs";
+import { jevLabOff } from "../../jev-lab-offswitch.mjs";
 
 /**
  * Export what this extension already computes. Every Jev score it produces is
@@ -211,6 +212,7 @@ export default function ompJevReview(
 
   pi.on("tool_result", async (event: ToolResultEvent) => {
     try {
+      if (await jevLabOff("review")) return undefined;
       const id = typeof event?.toolCallId === "string" ? event.toolCallId : null;
       if (id === null || !pending.has(id)) return undefined;
       const boundary = pending.get(id) as number;
@@ -230,6 +232,7 @@ export default function ompJevReview(
 
   pi.on("tool_call", async (event: ToolCallEvent) => {
     try {
+      if (await jevLabOff("review")) return undefined;
       const tool = String(event?.toolName ?? event?.name ?? "");
       const input = event?.input;
       const raw =

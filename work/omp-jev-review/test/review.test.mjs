@@ -4,6 +4,9 @@ import ompJevReview, { setDiffRunner, isThinDiff, touchesCodeFile, isVendoredPat
 import { requireSdkInstalled } from '../../sdk/require-installed.mjs';
 import jevReviewExtension from '../../../.omp/extensions/jev-review.ts';
 import { keyProviderInstalled, setKeyProvider } from '../../../kit/src/client.ts';
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 
 requireSdkInstalled();
 
@@ -543,4 +546,29 @@ test('touchesCodeFile: draw-derived extensions only', () => {
     true,
     'one code file among docs is applicable',
   );
+});
+
+test('presence-OFF skips review authorization, diff execution, and Jev', async () => {
+  const stateDir = join(homedir(), '.local', 'state', 'jev');
+  const marker = join(stateDir, 'jev-lab-review.off');
+  await mkdir(stateDir, { recursive: true });
+  await writeFile(marker, 'operator off');
+  const previousFetch = globalThis.fetch;
+  const calls = { authorization: 0, diff: 0, provider: 0 };
+  globalThis.fetch = async () => { calls.provider += 1; throw new Error('unexpected Jev request'); };
+  setDiffRunner(async () => { calls.diff += 1; return SUBSTANTIAL; });
+  try {
+    const h = host();
+    ompJevReview(h.pi, () => {
+      calls.authorization += 1;
+      return { provider: true, localDiffExecution: true };
+    });
+    assert.equal(await h.fire(diffCall('git diff')), undefined);
+    assert.deepEqual(calls, { authorization: 0, diff: 0, provider: 0 });
+    assert.equal(decisions(h).length, 0);
+  } finally {
+    globalThis.fetch = previousFetch;
+    setDiffRunner(null);
+    await unlink(marker);
+  }
 });

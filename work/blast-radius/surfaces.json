@@ -92,8 +92,8 @@
       "outside_repo": true,
       "latency_budget_ms": 5000,
       "fail_open_test": "work/omp-jev-route/test/route.test.mjs: an unset API key records route_error, never scored advice",
-      "off_switch": null,
-      "safe_side": "advice-only; return undefined, never route or block",
+      "off_switch": {"path": "~/.local/state/jev/jev-lab-route.off", "polarity": "presence-OFF"},
+      "safe_side": "return undefined without a Jev call; no routing or blocking",
       "owner": "jev-w2mf"
     },
     {
@@ -103,8 +103,8 @@
       "outside_repo": true,
       "latency_budget_ms": 5000,
       "fail_open_test": "work/omp-jev-review/test/review.test.mjs: a throwing transport records review_error and never breaks the session",
-      "off_switch": null,
-      "safe_side": "permission-denied before provider or child work",
+      "off_switch": {"path": "~/.local/state/jev/jev-lab-review.off", "polarity": "presence-OFF"},
+      "safe_side": "return undefined without review or child work",
       "owner": "jev-w2mf"
     },
     {
@@ -114,8 +114,8 @@
       "outside_repo": true,
       "latency_budget_ms": 50,
       "fail_open_test": "work/omp-jev-preaction/test/preaction.test.mjs: it observes only: no block, no throw, undefined on every path",
-      "off_switch": null,
-      "safe_side": "return undefined; no host action on classifier failure",
+      "off_switch": {"path": "~/.local/state/jev/jev-lab-preaction.off", "polarity": "presence-OFF"},
+      "safe_side": "return undefined; allow the tool call with no preaction decision",
       "owner": "jev-w2mf"
     },
     {
@@ -125,8 +125,8 @@
       "outside_repo": true,
       "latency_budget_ms": 50,
       "fail_open_test": "work/omp-jev-observer/test/observer.test.mjs: Jev error returns undefined and records the error without cost",
-      "off_switch": null,
-      "safe_side": "observe-only; no decision returned",
+      "off_switch": {"path": "~/.local/state/jev/jev-lab-observer.off", "polarity": "presence-OFF"},
+      "safe_side": "return undefined without a Jev call; allow tool call",
       "owner": "jev-w2mf"
     }
   ]

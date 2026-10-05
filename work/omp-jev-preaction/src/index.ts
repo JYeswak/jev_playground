@@ -6,6 +6,7 @@
  */
 const DECISION = "com.zeststream.omp-jev-preaction.decision.v1";
 const DIAG = "com.zeststream.omp-jev-preaction.diagnostic.v1";
+import { jevLabOff } from "../../jev-lab-offswitch.mjs";
 
 const PATTERNS: { id: string; re: RegExp; reason: string }[] = [
   { id: "wipe-root", re: /rm\s+-rf\s+\/(\s|$)/, reason: "unconditional root wipe" },
@@ -28,6 +29,7 @@ function match(command: string) {
 export default function ompJevPreaction(pi: any) {
   pi.on("tool_call", async (event: any) => {
     try {
+      if (await jevLabOff("preaction")) return undefined;
       const toolName = event?.toolName ?? event?.name;
       const command = event?.input?.command ?? event?.command ?? event?.input?.cmd;
       try {

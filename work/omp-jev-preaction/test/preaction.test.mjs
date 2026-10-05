@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import ompJevPreaction from '../src/index.ts';
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 
 function host() {
   const rows = [];
@@ -80,4 +83,18 @@ test('the decision row names what matched, so a fire is always explainable', asy
   assert.equal(row.d.command.includes('mkfs'), true);
   assert.equal(typeof row.d.hits[0].reason, 'string');
   assert.ok(row.d.hits[0].reason.length > 0);
+});
+test('presence-OFF allows the tool call without a preaction decision', async () => {
+  const stateDir = join(homedir(), '.local', 'state', 'jev');
+  const marker = join(stateDir, 'jev-lab-preaction.off');
+  await mkdir(stateDir, { recursive: true });
+  await writeFile(marker, 'operator off');
+  try {
+    const h = host();
+    ompJevPreaction(h.pi);
+    assert.equal(await h.fire(bash('rm -rf /')), undefined);
+    assert.equal(decisions(h).length, 0);
+  } finally {
+    await unlink(marker);
+  }
 });

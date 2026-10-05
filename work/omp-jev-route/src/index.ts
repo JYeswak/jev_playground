@@ -19,6 +19,7 @@ const MAX_PROMPT = 4000;
 import { askJev } from "../../../kit/src/client.ts";
 import { appendProcessDecision } from "./process.mjs";
 import { recording } from "../../jev-score-register/register.mjs";
+import { jevLabOff } from "../../jev-lab-offswitch.mjs";
 
 /**
  * Export what this extension already computes. Every Jev score it produces is
@@ -78,6 +79,7 @@ function promptText(event) {
 export default function ompJevRoute(pi) {
   pi.on("context", async (event) => {
     try {
+      if (await jevLabOff("route")) return undefined;
       if (process.env.OMP_JEV_ROUTE_DEBUG === "1") {
         try {
           await pi.appendEntry(DIAG, {

@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createObserver, installObserver } from '../src/observer.mjs';
+import ompJevObserver, { createObserver, installObserver } from '../src/observer.mjs';
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 
 function setup({ classify, dcg = async () => ({ verdict: 'allow' }), enabled = true, timeoutMs = 25 } = {}) {
   const records = [];
@@ -96,4 +99,39 @@ test('missing gate and session context stay absent without blocking', async () =
   assert.equal(records[0].toolCallId, 'no-context-1');
   assert.equal('sessionId' in records[0], false);
   assert.equal('dcgVerdict' in records[0], false);
+});
+test('presence-OFF skips observer classification in the exported extension and factory', async () => {
+  const stateDir = join(homedir(), '.local', 'state', 'jev');
+  const marker = join(stateDir, 'jev-lab-observer.off');
+  await mkdir(stateDir, { recursive: true });
+  await writeFile(marker, 'operator off');
+  const previousKey = process.env.TYPESAFE_API_KEY;
+  const previousFetch = globalThis.fetch;
+  let classifyCalls = 0;
+  let fetchCalls = 0;
+  process.env.TYPESAFE_API_KEY = 'offline-test-key';
+  globalThis.fetch = async () => { fetchCalls += 1; throw new Error('unexpected Jev request'); };
+  try {
+    let extensionHandler;
+    const entries = [];
+    ompJevObserver({
+      on: (_name, handler) => { extensionHandler = handler; },
+      appendEntry: async (type, data) => { entries.push({ type, data }); },
+    });
+    assert.equal(await extensionHandler(event, context), undefined);
+    const observer = createObserver({
+      logger: { append: async () => { throw new Error('unexpected decision row'); } },
+      dcg: async () => ({ verdict: 'allow' }),
+      classify: async () => { classifyCalls += 1; return { questionSet: [], probabilities: {} }; },
+    });
+    assert.equal(await observer(event, context), undefined);
+    assert.equal(classifyCalls, 0);
+    assert.equal(fetchCalls, 0);
+    assert.equal(entries.some((row) => row.type.endsWith('decision.v1')), false);
+  } finally {
+    globalThis.fetch = previousFetch;
+    if (previousKey === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previousKey;
+    await unlink(marker);
+  }
 });

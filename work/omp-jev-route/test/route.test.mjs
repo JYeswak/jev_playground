@@ -1,6 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import ompJevRoute, { QUESTIONS, suggestTier } from '../src/index.ts';
+import { mkdir, unlink, writeFile } from 'node:fs/promises';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 
 function host() {
   const rows = [];
@@ -33,6 +36,30 @@ test('an unset API key records route_error, never scored advice', async () => {
     assert.equal('suggested_tier' in row.data, false);
   } finally {
     if (previous !== undefined) process.env.TYPESAFE_API_KEY = previous;
+  }
+});
+
+test('presence-OFF skips route judgment on the next context event', async () => {
+  const stateDir = join(homedir(), '.local', 'state', 'jev');
+  const marker = join(stateDir, 'jev-lab-route.off');
+  await mkdir(stateDir, { recursive: true });
+  await writeFile(marker, 'operator off');
+  const previousKey = process.env.TYPESAFE_API_KEY;
+  const previousFetch = globalThis.fetch;
+  let calls = 0;
+  process.env.TYPESAFE_API_KEY = 'offline-test-key';
+  globalThis.fetch = async () => { calls += 1; throw new Error('unexpected Jev request'); };
+  try {
+    const h = host();
+    ompJevRoute(h.pi);
+    await h.fire({ type: 'context', messages: [{ role: 'user', content: 'Refactor the auth boundary.' }] });
+    assert.equal(calls, 0);
+    assert.equal(decisions(h).length, 0);
+  } finally {
+    globalThis.fetch = previousFetch;
+    if (previousKey === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previousKey;
+    await unlink(marker);
   }
 });
 

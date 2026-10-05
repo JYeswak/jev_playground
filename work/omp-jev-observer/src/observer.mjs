@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { createSystemOneClassify } from './classify-systemone.mjs';
+import { jevLabOff } from '../../jev-lab-offswitch.mjs';
 
 const SCHEMA_VERSION = 1;
 const DECISION_TYPE = 'com.zeststream.omp-jev-observer.decision.v1';
@@ -69,6 +70,7 @@ export function createObserver({ logger, dcg, classify, enabled = true, timeoutM
   let rawEmitted = false;
   return async function observeToolCall(event, context = {}) {
     try {
+      if (await jevLabOff('observer')) return undefined;
       if (!rawEmitted) { rawEmitted = true; await diagnostic({ kind: 'tool_call_observed', event: raw(event) }); }
       if (!enabled || (event?.toolName ?? event?.name) !== 'bash') return undefined;
       const command = event?.input?.command ?? event?.command ?? event?.input?.cmd;
@@ -107,6 +109,7 @@ export default function ompJevObserver(pi) {
   const endpoint = process.env.JEV_OBSERVER_ENDPOINT;
   pi.on('tool_call', async (event, context = {}) => {
     try {
+      if (await jevLabOff('observer')) return undefined;
       const toolName = event?.toolName ?? event?.name;
       const command = event?.input?.command ?? event?.command ?? event?.input?.cmd;
       await safeAppend(pi, DIAGNOSTIC_TYPE, { kind: 'tool_call_observed', toolName, event: raw(event) });
