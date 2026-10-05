@@ -17,9 +17,10 @@ the same decision are not flips. Non-scored statuses (including `memo`,
 - Historical keyless arm: every pair in
   `~/.local/state/jev/memory-filter.jsonl` with at least two `status=scored`
   rows, grouped by exact `promptHash + memoryHash`. No sampling.
-- Live arm: first 20 pairs in lexicographic `(promptHash, memoryHash)` order
-  among the frozen historical pairs having at least three scored rows. Rescore
-  each pair three times, same model and unchanged pair, 60 calls maximum.
+- Live arm: every repeated pair in the frozen keyless source (126 pairs in the
+  census used for this preregistration). Rescore each pair three times, same
+  model and unchanged payload; 378 calls maximum. The complete pair identities
+  are frozen in `rows.jsonl` before the first live request.
 - Frozen estimator in each arm: flipping-pair count / tested-pair count.
 - Stable iff flip rate is <= 0.05 in each arm. Any arm above 0.05 MUST report
   `UNSTABLE`; never report `STABLE` on partial live coverage.
@@ -33,16 +34,17 @@ and any subsequent live calls; it does not retroactively validate the old run.
 
 ## Bounded live protocol
 
-The runner accepts only frozen pair hashes and a pre-captured exact pair
-payload supplied by the operator; it MUST NOT discover/change pairs after
-calls begin. Hard cap: 60 requests, no retries, stop immediately on HTTP 401,
-402, or 403. Pin `jev-1.13.0`; record one sanitized row per response with pair
-hashes, decision, status, input tokens, latency, and model. Spend is
-`inputTokens * $0.042 / 1,000,000`; output spend is $0. A missing credential
-means `NOT_RUN`, not a fallback.
+The runner accepts only the frozen pair identities and payloads joined from
+the mode-0600 sidecar before calls begin; it MUST NOT select or change pairs
+afterward. Hard cap: 378 requests, one pass of three calls per pair, no retries.
+Stop immediately on HTTP 401, 402, or 403. Pin `jev-1.13.0`; record sanitized
+rows only: pair hashes, round, decision, status, input tokens, latency, and
+model. Spend is `inputTokens * $0.042 / 1,000,000`; output spend is $.
+Missing credentials mean `NOT_RUN`, not a fallback. Never write prompt or
+memory text into the repository.
 
-The keyless source contains hashes only, not pair text, so it cannot by itself
-reconstruct live request states. Do not infer request payloads from hashes.
+The operator-local source sidecar contains exact payloads and is mode 0600.
+The repo ledger contains hashes/outcomes only.
 
 ## Verification boundary
 

@@ -5,27 +5,27 @@ Protocol: `PREREG.md`, frozen before pair extraction. Recompute with
 
 ## Keyless same-pair check
 
-Source: `~/.local/state/jev/memory-filter.jsonl` (operator-local, not committed;
-raw rows contain hashes and model outcomes). Estimator includes only rows with
-`status=scored`, exact `promptHash` + `memoryHash` pair identity, and binary
-`drop`/`keep` decision. Non-scored records are excluded.
+Source: `~/.local/state/jev/memory-filter.jsonl` (operator-local; hashes and
+outcomes only). Include only `status=scored` rows with exact pair identity
+`promptHash + memoryHash` and `drop`/`keep` decisions; exclude all other
+statuses.
 
-Initial census recorded during implementation: 5,707 unique scored pairs;
-126 pairs scored more than once; 2 flipping pairs; 1.59% observed flip rate.
-This is below the preregistered 5% descriptive bar for this historical census.
-Source includes post-cutover and prior-era rows; the pooled result is NOT a
-causal estimate of a single code version. The committed runner reports the
-current source contents on each invocation.
+At freeze time: 5,763 unique scored pairs; 126 repeated pairs; 2 flipping
+pairs (1.5873%, below the preregistered 5% bar). The complete 126 pair hashes
+are in `frozen-pairs.jsonl`. Census includes prior code eras and is descriptive,
+not a causal estimate of one code version. The runner recomputes and refuses
+if the local source census differs from the committed pair list.
 
 ## Live rescore
 
-NOT RUN. The local log stores only pair hashes, not original prompt/memory
-payloads. The bounded protocol requires exact unchanged payloads. Reconstructing
-payloads from digests is impossible; no live requests were attempted. Spend:
-$0.00. No claim of a live stability pass.
+Pending. Exact text comes only from the mode-0600
+`~/.local/state/jev/memory-filter-full.jsonl` sidecar, joined on both hashes
+and hash-verified in memory. No prompt or memory text is written to the repo.
+Protocol allows 378 total calls; cap and auth-stop behavior are in
+`rescore.mjs`. Spend is `$0.042 / 1,000,000` input tokens; output is free.
+No live result or spend claim yet.
 
 ## Boundary
 
-Keyless result is descriptive stability of observed repeated calls, not memory
-relevance, safe-drop precision, or a deployment claim. The live arm remains
-NOT_RUN until supplied exact payloads and 60-or-fewer responses.
+Stability is temporal decision reproducibility only; it does not establish
+memory relevance, safe-drop precision, or deployment suitability.
