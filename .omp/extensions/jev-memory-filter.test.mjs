@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
@@ -26,7 +26,8 @@ const GUARD_DIR = mkdtempSync(join(tmpdir(), "memfilter-guard-"));
 process.env.JEV_MEMORY_FILTER_LOG_PATH = join(GUARD_DIR, "log.jsonl");
 process.env.JEV_MEMORY_FILTER_SIDECAR_PATH = join(GUARD_DIR, "full.jsonl");
 process.env.JEV_MEMORY_CAP3_PATH = join(GUARD_DIR, "no-cap3-switch-file");
-process.env.JEV_MEMORY_FILTER_ENFORCE_PATH = join(GUARD_DIR, "no-switch-file");
+process.env.JEV_MEMORY_FILTER_ENFORCE_PATH = join(GUARD_DIR, "enforce-on");
+writeFileSync(process.env.JEV_MEMORY_FILTER_ENFORCE_PATH, "on");
 
 
 // Fixture provenance (AGENTS.md rule 11): structure + instruction prose captured
@@ -126,9 +127,11 @@ test("irrelevant memory logs drop and returns undefined", async () => {
   const out = await handler(event, ctx);
   assert.equal(out, undefined);
   const rows = rowsOf(join(dir, "log.jsonl"));
-  assert.equal(rows.length, 2);
-  assert.ok(rows.every((r) => r.decision === "drop" && r.noul === 0.1 && r.status === "scored"));
-  assert.ok(rows.every((r) => typeof r.memoryHash === "string" && !JSON.stringify(r).includes("redacted session-private")));
+  const scored = rows.filter((row) => row.status === "scored");
+  assert.equal(scored.length, 2);
+  assert.ok(scored.every((r) => r.decision === "drop" && r.noul === 0.1));
+  assert.ok(rows.some((row) => row.status === "shadowed" && row.decision === "would-drop"));
+  assert.ok(scored.every((r) => typeof r.memoryHash === "string" && !JSON.stringify(r).includes("redacted session-private")));
 });
 
 test("relevant memory logs keep with zero tokens saved", async () => {
@@ -172,7 +175,7 @@ test("daily cap stops calls and keeps", async () => {
   await handler(event, ctx);
   assert.equal(calls, 1);
   const rows = rowsOf(join(dir, "log.jsonl"));
-  assert.equal(rows.length, 2);
+  assert.equal(rows.filter((row) => row.status !== "shadowed").length, 2);
   assert.ok(rows.some((r) => r.status === "scored" && r.decision === "drop"));
   assert.ok(rows.some((r) => r.status === "daily-cap" && r.decision === "keep"));
 });
@@ -196,8 +199,8 @@ test("cut is 0.5: noul below drops", async () => {
   const { event, ctx } = eventFor("q", ["pre", "<memories>\n- one irrelevant fact\n</memories>"]);
   await handler(event, ctx);
   const rows = rowsOf(join(dir, "log.jsonl"));
-  assert.equal(rows.length, 1);
-  assert.equal(rows[0].decision, "drop");
+  assert.equal(rows.filter((row) => row.status === "scored").length, 1);
+  assert.equal(rows.find((row) => row.status === "scored").decision, "drop");
 });
 
 test("repeat pair reuses the verdict without a second call", async () => {
@@ -209,9 +212,9 @@ test("repeat pair reuses the verdict without a second call", async () => {
   await handler(event, ctx);
   assert.equal(calls, 2);
   const rows = rowsOf(join(dir, "log.jsonl"));
-  assert.equal(rows.length, 4);
-  assert.ok(rows.slice(0, 2).every((r) => r.status === "scored"));
-  assert.ok(rows.slice(2).every((r) => r.status === "memo" && r.decision === "drop" && r.noul === 0.1));
+  assert.equal(rows.filter((r) => r.status === "scored").length, 2);
+  assert.equal(rows.filter((r) => r.status === "memo" && r.decision === "drop" && r.noul === 0.1).length, 2);
+  assert.equal(rows.filter((r) => r.status === "shadowed").length, 2);
 });
 
 test("sidecar carries text at mode 600 while the log stays hash-only", async () => {
@@ -257,17 +260,26 @@ test("empty prompt returns silently", async () => {
   assert.equal(calls, 0);
 });
 
-test("enforce OFF scores drops but emits no enforcement or prune row", async () => {
+test("enforce OFF returns without scoring and records scoring-off rows", async () => {
   const dir = mkdtempSync(join(tmpdir(), "memfilter-"));
   const logPath = join(dir, "log.jsonl");
-  const handler = makeBeforeAgentStartHandler({ ask: fakeAsk(0.1), path: logPath, sidecarPath: join(dir, "full.jsonl"), switchPath: join(dir, "no-switch-file") });
+  let calls = 0;
+  const handler = makeBeforeAgentStartHandler({
+    ask: () => { calls += 1; return new Promise(() => {}); },
+    path: logPath,
+    sidecarPath: join(dir, "full.jsonl"),
+    switchPath: join(dir, "no-switch-file"),
+  });
   const sys = ["pre", "<memories>\n- dropme bullet\n\n- keepme bullet\n</memories>"];
-  const out = await handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, { cwd: "/Users/josh/Developer/jev" });
-  assert.equal(out, undefined);
+  const result = await Promise.race([
+    handler({ type: "before_agent_start", prompt: "q", images: [], systemPrompt: sys }, { cwd: "/Users/josh/Developer/jev" }),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("switch-off handler waited for scoring")), 100)),
+  ]);
+  assert.equal(result, undefined);
+  assert.equal(calls, 0);
   const rows = rowsOf(logPath);
   assert.equal(rows.length, 2);
-  assert.ok(rows.every((row) => row.status === "scored" && row.decision === "drop"));
-  assert.ok(!rows.some((row) => row.status === "enforced" || row.decision === "prune"));
+  assert.ok(rows.every((row) => row.status === "scoring-off" && row.decision === "keep"));
 });
 
 test("enforce ON in-scope removes dropped bullets and keeps kept ones", async () => {
@@ -431,8 +443,8 @@ test("recorded-transport replay: concurrent decisions match serial, bounded in f
   const wall = Date.now() - t0;
   assert.equal(out, undefined);
   const rows = rowsOf(join(dir, "log.jsonl"));
-  assert.equal(rows.length, 8);
-  assert.ok(rows.every((r) => r.status === "scored"));
+  assert.equal(rows.length, 9);
+  assert.ok(rows.some((r) => r.status === "shadowed" && r.decision === "would-drop"));
   const side = rowsOf(join(dir, "full.jsonl"));
   assert.equal(side.length, 8);
   for (const r of side) {

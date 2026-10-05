@@ -308,7 +308,8 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
       // Cap-3 shipment (jev-8c09): mechanical top-3 rank cut, switch-gated,
       // default OFF. When the switch file exists and >3 memories parsed,
       // drop the 4th+ spans and return the pruned prompt, skipping Jev
-      // scoring. Switch absent (or <=3 items): fall through untouched.
+      // scoring. If absent (or <=3 items), cap-3 leaves the prompt untouched;
+      // Jev scoring is separately gated by the enforce switch below.
       const promptHash = createHash("sha256").update(prompt).digest("hex");
       if (items.length > CAP3_KEEP && (await switchOn(cap3SwitchPath))) {
         const dropped = items.slice(CAP3_KEEP);
@@ -321,6 +322,16 @@ export function makeBeforeAgentStartHandler(deps: FilterDeps = {}) {
           return { systemPrompt: pruneSystemPrompt(sys, dropped) };
         }
         await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "cap3-shadowed", promptHash, memoryHash: null, noul: null, decision: "would-prune", removed: dropped.length, kept: CAP3_KEEP, tokensSaved: 0, latencyMs: null, inputTokens: null });
+      }
+      // Scoring is opt-in via the same switch that permits enforcement. When
+      // it is absent, keep every memory and record the unscored volume without
+      // starting a model request.
+      if (items.length > 0 && !(await switchOn(switchPath))) {
+        for (const item of items) {
+          const memoryHash = createHash("sha256").update(item.text).digest("hex");
+          await write({ schema: LOG_SCHEMA, ts: now(), instance: INSTANCE, model: MODEL, status: "scoring-off", promptHash, memoryHash, noul: null, decision: "keep", tokensSaved: 0, latencyMs: null, inputTokens: null });
+        }
+        return undefined;
       }
       // Phase 1 (synchronous, item order): memo hits and cap reservation.
       // Cap counting is identical to the serial incumbent: first-come wins.
