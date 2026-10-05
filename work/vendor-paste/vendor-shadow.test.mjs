@@ -245,6 +245,69 @@ test('slow local endpoint shares one two-second deadline across commit hunks', a
     await new Promise((resolve, reject) => server.close((err) => err ? reject(err) : resolve()));
   }
 });
+test('main shares its local deadline across hunks through the production askLocal adapter', async () => {
+  const scratch = await mkdtemp(join(process.cwd(), 'var/agent-tmp/jev-a5ny-main.'));
+  await writeFile(join(scratch, '.owner'), `pid=${process.pid}\nlabel=jev-a5ny-main-test\nrepo=${process.cwd()}\ncreated=${new Date().toISOString()}\n`);
+  const localbench = join(scratch, 'localbench-free.sh');
+  await writeFile(localbench, '#!/bin/sh\nprintf \'{"parked":[]}\\n\'\n', { mode: 0o755 });
+  let requests = 0;
+  const server = createServer((_req, res) => {
+    requests += 1;
+    const timer = setTimeout(() => {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ answers: { vendored: { noul: 0.2 } } }));
+    }, 3000);
+    res.once('close', () => clearTimeout(timer));
+  });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  const previous = {
+    url: process.env.JEV_VENDOR_LOCAL_URL,
+    bin: process.env.LOCALBENCH_BIN,
+    hold: process.env.JEV_GPU_HOLD_FILE,
+  };
+  process.env.JEV_VENDOR_LOCAL_URL = `http://127.0.0.1:${server.address().port}/v1/systemone`;
+  process.env.LOCALBENCH_BIN = localbench;
+  process.env.JEV_GPU_HOLD_FILE = join(scratch, 'missing-hold-file');
+  const rows = [];
+  const diff = [
+    diffOf('work/pasted-lib/a.js', ['a', 'b', 'c']),
+    diffOf('work/pasted-lib/b.js', ['d', 'e', 'f']),
+  ].join('\n');
+  const git = (args) => {
+    if (args.join(' ') === 'rev-parse HEAD') return 'commit-a5ny-main';
+    if (args.join(' ') === 'rev-parse HEAD^') return 'parent-a5ny-main';
+    if (args[0] === 'show') return diff;
+    throw new Error(`unexpected git args: ${args.join(' ')}`);
+  };
+  const started = Date.now();
+  try {
+    await main([], {
+      ask: noulAnswer(0.91),
+      git,
+      log: async (row) => rows.push(row),
+      count: async () => 0,
+    });
+    const elapsed = Date.now() - started;
+    assert.ok(elapsed < 2500, `production main local leg took ${elapsed}ms`);
+    assert.equal(requests, 1, 'expired shared deadline must skip the next hunk');
+    assert.equal(rows.filter((row) => row.status === 'scored').length, 2);
+    assert.equal(rows[0].local_status, 'NOT_RUN');
+    assert.equal(rows[1].local_status, 'NOT_RUN');
+  } finally {
+    for (const [name, value] of Object.entries({
+      JEV_VENDOR_LOCAL_URL: previous.url,
+      LOCALBENCH_BIN: previous.bin,
+      JEV_GPU_HOLD_FILE: previous.hold,
+    })) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+    server.closeAllConnections();
+    await new Promise((resolve, reject) => server.close((err) => err ? reject(err) : resolve()));
+  }
+});
+
 
 test('local endpoint has no baked-in loopback default', async () => {
   const source = await readFile(new URL('./vendor-shadow.mjs', import.meta.url), 'utf8');

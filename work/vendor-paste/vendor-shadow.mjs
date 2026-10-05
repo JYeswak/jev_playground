@@ -253,7 +253,7 @@ export async function main(argv = process.argv.slice(2), dependencies = {}) {
       ask,
       log: dependencies.log ?? appendRow,
       count: dependencies.count ?? (() => todayCount()),
-      local: dependencies.local ?? askLocal,
+      local: dependencies.local ?? ((code, deadlineAt) => askLocal(code, undefined, fetch, runLocalModelGuard, deadlineAt)),
     });
   } catch (err) {
     console.error(`VENDOR_SHADOW_SKIPPED reason=git-failed err=${String(err).slice(0, 80)}`);
