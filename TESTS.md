@@ -677,6 +677,7 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 - `work/longres/test_score.py` — recomputes the matched `corpus2` and original Youden results from committed rows, asserts threshold/miss/savings/spend/week arithmetic, and refuses unsafe fallback choices or incomplete receipts. Run: `uv run --no-project python -m unittest work.longres.test_score` (4 tests).
 
 - `work/x4-vendored-probe/test_run.py` — refuses a probe fit that includes held rows and a bootstrap that samples windows rather than source groups; accepts the dev-only fit and confirms 53 held source groups. Run: `uv run --no-project --with scikit-learn python -m unittest work/x4-vendored-probe/test_run.py -v` (4 tests).
+- `work/blast-radius/test_jev_lab_offswitch.py` — jev-lab per-call off switches (jev-3ofj): OFF file takes effect on the next call. Run: `python3 -m unittest work/blast-radius/test_jev_lab_offswitch.py`
 
 ## Newly registered tests — jev-9kmq
 
