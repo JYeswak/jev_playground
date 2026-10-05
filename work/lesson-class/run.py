@@ -376,17 +376,18 @@ def main() -> int:
     with out.open("w", encoding="utf-8") as stream:
         for row in calls:
             stream.write(json.dumps(row, sort_keys=True, allow_nan=False) + "\n")
+    errors = sum(row["status"] == "ERROR" for row in calls)
     print(
         json.dumps(
             {
                 "calls": len(calls),
                 "rows": len(heldout),
                 "scored": sum(row["status"] == "scored" for row in calls),
-                "errors": sum(row["status"] == "ERROR" for row in calls),
+                "errors": errors,
             }
         )
     )
-    return 0
+    return 1 if errors else 0
 
 
 if __name__ == "__main__":

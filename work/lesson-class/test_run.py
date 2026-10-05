@@ -4,7 +4,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from run import (  # noqa: E402
+from run import (
     MAX_CALLS,
     OPTIONS,
     fit_keyword_rule,
@@ -23,6 +23,31 @@ class LessonClassTests(unittest.TestCase):
         self.assertIsNone(choice)
         self.assertIsNone(probs)
         self.assertEqual(refusal, "choice_not_offered")
+
+    def test_unoffered_choice_is_recorded_as_not_scored(self):
+        row = {
+            "row_id": "row",
+            "sentence_sha256": "sha",
+            "truth": "OTHER",
+            "split": "held-out",
+            "source_repo": "repo",
+            "keyword_pred": "OTHER",
+            "majority_pred": "OTHER",
+            "finding": "private sentence",
+        }
+        result = run_predictions(
+            [row],
+            lambda _finding: {
+                "choice": "NOT_A_CLASS",
+                "probabilities": self.probabilities,
+                "latency_ms": 1,
+                "model": "clef-flash",
+            },
+        )
+        self.assertEqual(result[0]["status"], "NOT_SCORED")
+        self.assertEqual(result[0]["refusal"], "choice_not_offered")
+        self.assertEqual(result[0]["offered_classes"], list(OPTIONS))
+        self.assertNotIn("finding", result[0])
 
     def test_probability_mass_outside_tolerance_is_refused(self):
         bad = dict(self.probabilities)
