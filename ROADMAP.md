@@ -66,9 +66,11 @@ plumbing that omp-kit owns (git writers, idle dispatch, index locks).
   (%54), fixed at the foundation, and rolled to every repo through omp-kit. No local-only patch of a
   shared defect.
 - **Blast radius.** Any jev surface installed outside this repo (omp extension, hook, rule) has a
-  latency budget under omp's handler limits, fails open, and has an off switch the host session's
-  pane 1 may use without asking. Incident: the memory filter hit omp's 30 s limit in cfsios
-  (2026-10-04, fixed in `5eb02549`).
+  latency budget under omp's handler limits, never holds the host turn, takes the safe side its
+  decision contract declares when the classifier is down, slow or capped (a result screen passes the
+  result; a command gate may refuse the call), and has an off switch the host session's pane 1 may use
+  without asking. Incident: the memory filter hit omp's 30 s limit in cfsios (2026-10-04, fixed in
+  `5eb02549`).
 - **Heavy work.** `nice -n 10`, one full suite per pane, deferred while the 1-minute load is above
   80; through `omp-kit heavy` once it ships. A long-lived handle on a shared database is a defect
   (it blocked `br` recovery, 2026-10-04).

@@ -69,7 +69,9 @@ test("an empty claim does not call the model", async () => {
 
 test("a real sentence in README.md locates, a nonce does not", () => {
   const readme = readFileSync(new URL("../../../README.md", import.meta.url), "utf8");
-  const present = "Jev is TypeSafe's System One model for typed judgments.";
+  // A sentence the README states as the project's method; it moved here when the README was
+  // reframed around the classifier ecosystem (4747610e removed the previous Jev-first sentence).
+  const present = "Every decision we automate goes through the same arc, and it does not change with the model:";
   assert.equal(locate(readme, present).status, "found");
   assert.equal(locate(readme, "zzzz_cannot_exist_9c42 quote").status, "missing");
 });

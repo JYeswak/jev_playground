@@ -68,6 +68,6 @@ exit = "every pillar check green on 7 consecutive daily rows"
 
 [blast_radius]
 installs_outside_repo = [".omp/extensions/jev-memory-filter.ts (every repo's session via global install)", "~/.omp hooks installed by kit"]
-rule = "latency budget under omp handler limits, fail open, host pane 1 off switch"
+rule = "latency budget under omp handler limits, never holds the host turn, takes the contract's declared safe side when down/slow/capped (screen passes, command gate may refuse), host pane 1 off switch"
 shared_binaries = ["br 0.7.4", "ntm 1.36.1", "dcg 0.15.2", "cass 0.10.0", "bv 0.25.2", "ubs 5.4.17"]
 neighbours = { localbench = "%55", omp-kit = "omp-test %54", uds = "control-plane:%57" }
