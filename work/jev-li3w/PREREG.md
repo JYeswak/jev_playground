@@ -17,10 +17,11 @@ the same decision are not flips. Non-scored statuses (including `memo`,
 - Historical keyless arm: every pair in
   `~/.local/state/jev/memory-filter.jsonl` with at least two `status=scored`
   rows, grouped by exact `promptHash + memoryHash`. No sampling.
-- Live arm: every repeated pair in the frozen keyless source (126 pairs in the
-  census used for this preregistration). Rescore each pair three times, same
-  model and unchanged payload; 378 calls maximum. The complete pair identities
-  are frozen in `rows.jsonl` before the first live request.
+- Live arm: all 97 of the 126 repeated keyless pairs with exact sidecar payloads
+  at preregistration time. Rescore each pair three times with unchanged
+  payloads; cap 291 requests. The other 29 identities are recorded
+  `NOT_RUN` in `not-run.jsonl` because their exact payloads are absent.
+  Both hash-only lists were frozen before the first live request.
 - Frozen estimator in each arm: flipping-pair count / tested-pair count.
 - Stable iff flip rate is <= 0.05 in each arm. Any arm above 0.05 MUST report
   `UNSTABLE`; never report `STABLE` on partial live coverage.
@@ -34,9 +35,9 @@ and any subsequent live calls; it does not retroactively validate the old run.
 
 ## Bounded live protocol
 
-The runner accepts only the frozen pair identities and payloads joined from
-the mode-0600 sidecar before calls begin; it MUST NOT select or change pairs
-afterward. Hard cap: 378 requests, one pass of three calls per pair, no retries.
+The runner accepts only the committed 97-pair hash list; it joins exact payloads
+from the mode-0600 sidecar in memory, verifies text hashes, and MUST NOT change
+the sample after calls begin. Hard cap: 291 requests, three per pair, no retries.
 Stop immediately on HTTP 401, 402, or 403. Pin `jev-1.13.0`; record sanitized
 rows only: pair hashes, round, decision, status, input tokens, latency, and
 model. Spend is `inputTokens * $0.042 / 1,000,000`; output spend is $.
