@@ -25,14 +25,15 @@ function runCli(args, env = {}) {
 
 test('doctor --robot is explicit NOT_RUN without a key', async () => {
   const result = await runCli(['doctor', '--robot']);
-  assert.equal(result.code, 2);
+  assert.equal(result.code, 1);
   const body = JSON.parse(result.stdout);
+  assert.equal(body.schema, 'classifier.doctor.v1');
   assert.equal(body.status, 'NOT_RUN');
-  assert.equal(body.reason, 'no key');
-  assert.equal(body.model, 'jev-1.13.0');
-  assert.equal(body.omp.repo, root.pathname.replace(/\/$/, ''));
-  assert.equal(body.omp.tools.length, 6);
-  assert.equal(body.omp.hooks.length, 1);
+  assert.equal(body.errors[0].code, 'NOT_RUN');
+  assert.equal(body.meta.model, 'jev-1.13.0');
+  assert.equal(body.data.omp.repo, root.pathname.replace(/\/$/, ''));
+  assert.equal(body.data.omp.tools.length, 6);
+  assert.equal(body.data.omp.hooks.length, 1);
 });
 
 test('ask --fake produces an offline typed decision', async () => {
@@ -45,11 +46,14 @@ test('ask --fake produces an offline typed decision', async () => {
   assert.equal(result.code, 0);
   const body = JSON.parse(result.stdout);
   assert.equal(body.ok, true);
-  assert.equal(body.model, 'jev-1.13.0');
+  assert.equal(body.data.choice, 'c1');
+  assert.equal(body.meta.model, 'jev-1.13.0');
 });
 
 test('invalid command is a robot error, not a successful empty result', async () => {
   const result = await runCli(['ask', 'choice', '--robot']);
-  assert.equal(result.code, 1);
-  assert.equal(JSON.parse(result.stdout).reason, 'usage');
+  assert.equal(result.code, 64);
+  const body = JSON.parse(result.stdout);
+  assert.equal(body.status, 'USAGE');
+  assert.equal(body.errors[0].code, 'USAGE');
 });

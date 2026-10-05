@@ -42,6 +42,9 @@ test('npm pack installs a stranger copy and doctor reports NOT_RUN without a key
   assert.equal(install.code, 0, install.stderr);
   const entry = join(scratch, 'node_modules', 'jev-kit', 'bin', 'jev.mjs');
   const doctor = await run(process.execPath, [entry, 'doctor', '--robot'], { cwd: scratch, env: { ...process.env, TYPESAFE_API_KEY: undefined } });
-  assert.equal(doctor.code, 2, doctor.stderr);
-  assert.deepEqual(JSON.parse(doctor.stdout).status, 'NOT_RUN');
+  assert.equal(doctor.code, 1, doctor.stderr);
+  const body = JSON.parse(doctor.stdout);
+  assert.equal(body.schema, 'classifier.doctor.v1');
+  assert.equal(body.status, 'NOT_RUN');
+  assert.equal(body.data.status, 'NOT_RUN');
 });

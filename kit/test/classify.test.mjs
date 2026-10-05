@@ -110,7 +110,7 @@ test('CLI runs the captured Banking77 example with the keyless fake', async () =
   const result = await runCli(['classify', '--text', example.text, '--labels', labels, '--fake', '--robot']);
   assert.equal(result.code, 0, result.stderr);
   const body = JSON.parse(result.stdout);
-  assert.equal(body.label, example.expected_label);
-  assert.equal(body.model, 'fake');
-  assert.equal(body.confidence, 0.86);
+  assert.equal(body.data.label, example.expected_label);
+  assert.equal(body.meta.model, 'fake');
+  assert.equal(body.data.confidence, 0.86);
 });
