@@ -58,10 +58,11 @@ gitignored file.
 ### Not in the mission
 
 Benchmark tourism; certificates, ledgers or dashboards with no consumer; games, computer use,
-trading; paid comparator models; a family without a host tool; audits of our own docs (one named
-exception: the convergence gate `jev-convergence-gate-g57u` reviews the bead plan before builds; a
-round cap is PROPOSED, pending Joshua, with no gate effect: ask him after round 7 whether to release
-the freeze); fleet plumbing that omp-kit owns (git writers, idle dispatch, index locks).
+trading; paid comparator models; a family without a host tool; audits of our own docs, including
+bead-review rounds over the DAG (the convergence gate `jev-convergence-gate-g57u` and its build freeze
+were retired 2026-10-05 under the fleet planning protocol, `~/.agents/skills/jeff-planning-enhanced`:
+plan rounds happen in one plan file, ready beads build); fleet plumbing that omp-kit owns (git
+writers, idle dispatch, index locks).
 
 ### Neighbours (same rigor, separate scopes)
 
