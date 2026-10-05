@@ -1,0 +1,133 @@
+{
+  "schema_version": "blast-radius-surfaces.v1",
+  "surfaces": [
+    {
+      "id": "memory-filter",
+      "installed_paths": [
+        "/Users/josh/.omp/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+        "/Users/josh/.omp/profiles/claude/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+        "/Users/josh/.omp/profiles/codex/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+        "/Users/josh/.omp/profiles/grok/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+        "/Users/josh/.omp/profiles/muse/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts"
+      ],
+      "loaded_from": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "outside_repo": true,
+      "latency_budget_ms": 1500,
+      "fail_open_test": ".omp/extensions/jev-memory-filter.test.mjs: throwing asker fails open",
+      "off_switch": {"path": "~/.local/state/jev/memory-filter-enforce", "polarity": "presence-ON"},
+      "safe_side": "keep all memories on refusal, timeout, or switch absence",
+      "owner": "jev-9cqw/jev-ugk0"
+    },
+    {
+      "id": "webscreen-global",
+      "installed_paths": [
+        "/Users/josh/.omp/agent/hooks/post/jev-webscreen-global.ts",
+        "/Users/josh/.omp/profiles/claude/agent/hooks/post/jev-webscreen-global.ts",
+        "/Users/josh/.omp/profiles/codex/agent/hooks/post/jev-webscreen-global.ts",
+        "/Users/josh/.omp/profiles/grok/agent/hooks/post/jev-webscreen-global.ts",
+        "/Users/josh/.omp/profiles/muse/agent/hooks/post/jev-webscreen-global.ts"
+      ],
+      "loaded_from": "/Users/josh/Developer/jev/.omp/hooks/post/jev-webscreen-global.ts",
+      "outside_repo": true,
+      "latency_budget_ms": 5000,
+      "fail_open_test": ".omp/hooks/post/jev-webscreen.test.mjs: asker failure preserves the result and does not throw",
+      "off_switch": null,
+      "safe_side": "shadow web scoring and annotate-only injection; never withhold tool results",
+      "owner": "jev-j0er"
+    },
+    {
+      "id": "injection-global-retired-noop",
+      "installed_paths": [
+        "/Users/josh/.omp/agent/hooks/post/jev-injection-global.ts",
+        "/Users/josh/.omp/profiles/claude/agent/hooks/post/jev-injection-global.ts",
+        "/Users/josh/.omp/profiles/codex/agent/hooks/post/jev-injection-global.ts",
+        "/Users/josh/.omp/profiles/grok/agent/hooks/post/jev-injection-global.ts",
+        "/Users/josh/.omp/profiles/muse/agent/hooks/post/jev-injection-global.ts"
+      ],
+      "loaded_from": "/Users/josh/Developer/jev/.omp/hooks/post/jev-injection-global.ts",
+      "outside_repo": true,
+      "latency_budget_ms": 1,
+      "fail_open_test": ".omp/hooks/post/jev-injection-shadow.test.mjs: injection shadow fail-opens and halts later calls after authorization refusal",
+      "off_switch": null,
+      "safe_side": "no-op; returns undefined and does not screen",
+      "owner": "jev-j0er"
+    },
+    {
+      "id": "guard-rule",
+      "installed_paths": [
+        "/Users/josh/.omp/agent/hooks/pre/guard-rule.ts",
+        "/Users/josh/.omp/profiles/claude/agent/hooks/pre/guard-rule.ts",
+        "/Users/josh/.omp/profiles/codex/agent/hooks/pre/guard-rule.ts",
+        "/Users/josh/.omp/profiles/grok/agent/hooks/pre/guard-rule.ts",
+        "/Users/josh/.omp/profiles/muse/agent/hooks/pre/guard-rule.ts",
+        "/Users/josh/.omp/profiles/jev-lab/agent/hooks/pre/guard-rule.ts",
+        "/Users/josh/.omp/profiles/glm/agent/hooks/pre/guard-rule.ts"
+      ],
+      "loaded_from": "/Users/josh/Developer/jev/work/omp-guard-rule/guard-rule.ts",
+      "outside_repo": true,
+      "latency_budget_ms": 50,
+      "fail_open_test": "work/omp-guard-rule/guard-rule.test.mjs: throwing classify yields guard_error, never a pass",
+      "off_switch": null,
+      "safe_side": "observe-only; return undefined and never block",
+      "owner": "jev-w2mf"
+    },
+    {
+      "id": "harm-rule",
+      "installed_paths": [
+        "/Users/josh/.omp/profiles/codex/agent/extensions/omp-harm-rule.ts",
+        "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-harm-rule.ts"
+      ],
+      "loaded_from": "/Users/josh/Developer/jev/work/omp-harm-rule/harm-rule.ts",
+      "outside_repo": true,
+      "latency_budget_ms": 50,
+      "fail_open_test": "work/omp-harm-rule/harm-error.test.mjs: throwing classify yields harm_error with no score field",
+      "off_switch": null,
+      "safe_side": "observe-only; return undefined and never block",
+      "owner": "jev-w2mf"
+    },
+    {
+      "id": "jev-lab-route",
+      "installed_paths": ["/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-route.ts"],
+      "loaded_from": "/Users/josh/Developer/jev/work/omp-jev-route/src/index.ts",
+      "outside_repo": true,
+      "latency_budget_ms": 5000,
+      "fail_open_test": "work/omp-jev-route/test/route.test.mjs: an unset API key records route_error, never scored advice",
+      "off_switch": null,
+      "safe_side": "advice-only; return undefined, never route or block",
+      "owner": "jev-w2mf"
+    },
+    {
+      "id": "jev-lab-review",
+      "installed_paths": ["/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-review.ts"],
+      "loaded_from": "/Users/josh/Developer/jev/work/omp-jev-review/src/index.ts",
+      "outside_repo": true,
+      "latency_budget_ms": 5000,
+      "fail_open_test": "work/omp-jev-review/test/review.test.mjs: a throwing transport records review_error and never breaks the session",
+      "off_switch": null,
+      "safe_side": "permission-denied before provider or child work",
+      "owner": "jev-w2mf"
+    },
+    {
+      "id": "jev-lab-preaction",
+      "installed_paths": ["/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-preaction.ts"],
+      "loaded_from": "/Users/josh/Developer/jev/work/omp-jev-preaction/src/index.ts",
+      "outside_repo": true,
+      "latency_budget_ms": 50,
+      "fail_open_test": "work/omp-jev-preaction/test/preaction.test.mjs: it observes only: no block, no throw, undefined on every path",
+      "off_switch": null,
+      "safe_side": "return undefined; no host action on classifier failure",
+      "owner": "jev-w2mf"
+    },
+    {
+      "id": "jev-lab-observer",
+      "installed_paths": ["/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-observer.ts"],
+      "loaded_from": "/Users/josh/Developer/jev/work/omp-jev-observer/src/index.ts",
+      "outside_repo": true,
+      "latency_budget_ms": 50,
+      "fail_open_test": "work/omp-jev-observer/test/observer.test.mjs: Jev error returns undefined and records the error without cost",
+      "off_switch": null,
+      "safe_side": "observe-only; no decision returned",
+      "owner": "jev-w2mf"
+    }
+  ]
+}

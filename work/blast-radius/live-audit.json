@@ -1,0 +1,191 @@
+{
+  "errors": [
+    {
+      "kind": "missing_or_invalid_off_switch",
+      "surface": "webscreen-global"
+    },
+    {
+      "kind": "missing_or_invalid_off_switch",
+      "surface": "injection-global-retired-noop"
+    },
+    {
+      "kind": "missing_or_invalid_off_switch",
+      "surface": "guard-rule"
+    },
+    {
+      "kind": "missing_or_invalid_off_switch",
+      "surface": "harm-rule"
+    },
+    {
+      "kind": "missing_or_invalid_off_switch",
+      "surface": "jev-lab-route"
+    },
+    {
+      "kind": "missing_or_invalid_off_switch",
+      "surface": "jev-lab-review"
+    },
+    {
+      "kind": "missing_or_invalid_off_switch",
+      "surface": "jev-lab-preaction"
+    },
+    {
+      "kind": "missing_or_invalid_off_switch",
+      "surface": "jev-lab-observer"
+    }
+  ],
+  "installed": [
+    {
+      "loaded_from": "/Users/josh/.omp/agent/hooks/pre/guard-rule.ts",
+      "name": "guard-rule.ts",
+      "path": "/Users/josh/.omp/agent/hooks/pre/guard-rule.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/claude/agent/hooks/pre/guard-rule.ts",
+      "name": "guard-rule.ts",
+      "path": "/Users/josh/.omp/profiles/claude/agent/hooks/pre/guard-rule.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/codex/agent/hooks/pre/guard-rule.ts",
+      "name": "guard-rule.ts",
+      "path": "/Users/josh/.omp/profiles/codex/agent/hooks/pre/guard-rule.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/glm/agent/hooks/pre/guard-rule.ts",
+      "name": "guard-rule.ts",
+      "path": "/Users/josh/.omp/profiles/glm/agent/hooks/pre/guard-rule.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/grok/agent/hooks/pre/guard-rule.ts",
+      "name": "guard-rule.ts",
+      "path": "/Users/josh/.omp/profiles/grok/agent/hooks/pre/guard-rule.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/jev-lab/agent/hooks/pre/guard-rule.ts",
+      "name": "guard-rule.ts",
+      "path": "/Users/josh/.omp/profiles/jev-lab/agent/hooks/pre/guard-rule.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/muse/agent/hooks/pre/guard-rule.ts",
+      "name": "guard-rule.ts",
+      "path": "/Users/josh/.omp/profiles/muse/agent/hooks/pre/guard-rule.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/agent/hooks/post/jev-injection-global.ts",
+      "name": "jev-injection-global.ts",
+      "path": "/Users/josh/.omp/agent/hooks/post/jev-injection-global.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/claude/agent/hooks/post/jev-injection-global.ts",
+      "name": "jev-injection-global.ts",
+      "path": "/Users/josh/.omp/profiles/claude/agent/hooks/post/jev-injection-global.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/codex/agent/hooks/post/jev-injection-global.ts",
+      "name": "jev-injection-global.ts",
+      "path": "/Users/josh/.omp/profiles/codex/agent/hooks/post/jev-injection-global.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/grok/agent/hooks/post/jev-injection-global.ts",
+      "name": "jev-injection-global.ts",
+      "path": "/Users/josh/.omp/profiles/grok/agent/hooks/post/jev-injection-global.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/muse/agent/hooks/post/jev-injection-global.ts",
+      "name": "jev-injection-global.ts",
+      "path": "/Users/josh/.omp/profiles/muse/agent/hooks/post/jev-injection-global.ts"
+    },
+    {
+      "configured_at": "/Users/josh/.omp/agent/config.yml",
+      "loaded_from": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "name": "jev-memory-filter.ts",
+      "path": "/Users/josh/.omp/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "physical_path": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts"
+    },
+    {
+      "configured_at": "/Users/josh/.omp/profiles/claude/agent/config.yml",
+      "loaded_from": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "name": "jev-memory-filter.ts",
+      "path": "/Users/josh/.omp/profiles/claude/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "physical_path": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts"
+    },
+    {
+      "configured_at": "/Users/josh/.omp/profiles/codex/agent/config.yml",
+      "loaded_from": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "name": "jev-memory-filter.ts",
+      "path": "/Users/josh/.omp/profiles/codex/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "physical_path": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts"
+    },
+    {
+      "configured_at": "/Users/josh/.omp/profiles/grok/agent/config.yml",
+      "loaded_from": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "name": "jev-memory-filter.ts",
+      "path": "/Users/josh/.omp/profiles/grok/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "physical_path": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts"
+    },
+    {
+      "configured_at": "/Users/josh/.omp/profiles/muse/agent/config.yml",
+      "loaded_from": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "name": "jev-memory-filter.ts",
+      "path": "/Users/josh/.omp/profiles/muse/agent/config.yml::/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts",
+      "physical_path": "/Users/josh/Developer/jev/.omp/extensions/jev-memory-filter.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/agent/hooks/post/jev-webscreen-global.ts",
+      "name": "jev-webscreen-global.ts",
+      "path": "/Users/josh/.omp/agent/hooks/post/jev-webscreen-global.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/claude/agent/hooks/post/jev-webscreen-global.ts",
+      "name": "jev-webscreen-global.ts",
+      "path": "/Users/josh/.omp/profiles/claude/agent/hooks/post/jev-webscreen-global.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/codex/agent/hooks/post/jev-webscreen-global.ts",
+      "name": "jev-webscreen-global.ts",
+      "path": "/Users/josh/.omp/profiles/codex/agent/hooks/post/jev-webscreen-global.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/grok/agent/hooks/post/jev-webscreen-global.ts",
+      "name": "jev-webscreen-global.ts",
+      "path": "/Users/josh/.omp/profiles/grok/agent/hooks/post/jev-webscreen-global.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/muse/agent/hooks/post/jev-webscreen-global.ts",
+      "name": "jev-webscreen-global.ts",
+      "path": "/Users/josh/.omp/profiles/muse/agent/hooks/post/jev-webscreen-global.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/codex/agent/extensions/omp-harm-rule.ts",
+      "name": "omp-harm-rule.ts",
+      "path": "/Users/josh/.omp/profiles/codex/agent/extensions/omp-harm-rule.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-harm-rule.ts",
+      "name": "omp-harm-rule.ts",
+      "path": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-harm-rule.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-observer.ts",
+      "name": "omp-jev-observer.ts",
+      "path": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-observer.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-preaction.ts",
+      "name": "omp-jev-preaction.ts",
+      "path": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-preaction.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-review.ts",
+      "name": "omp-jev-review.ts",
+      "path": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-review.ts"
+    },
+    {
+      "loaded_from": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-route.ts",
+      "name": "omp-jev-route.ts",
+      "path": "/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-route.ts"
+    }
+  ],
+  "installed_count": 28,
+  "registered_path_count": 28,
+  "status": "RED"
+}
