@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { createServer } from 'node:http';
+import { once } from 'node:events';
 import { main, addedBlocks, askLocal, isScoredPath, scoreCommit, VENDOR_CUT } from './vendor-shadow.mjs';
 
 const MIT_BLOCK = `/*
@@ -191,6 +193,56 @@ test('local guard timeout bounds the post-commit runner under two seconds', asyn
       if (value === undefined) delete process.env[name];
       else process.env[name] = value;
     }
+  }
+});
+
+test('slow local endpoint shares one two-second deadline across commit hunks', async () => {
+  let requests = 0;
+  const server = createServer((_req, res) => {
+    requests += 1;
+    const timer = setTimeout(() => {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ answers: { vendored: { noul: 0.2 } } }));
+    }, 3000);
+    res.once('close', () => clearTimeout(timer));
+  });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  const endpoint = `http://127.0.0.1:${server.address().port}/v1/systemone`;
+  const previous = process.env.JEV_VENDOR_LOCAL_URL;
+  process.env.JEV_VENDOR_LOCAL_URL = endpoint;
+  const rows = [];
+  const diff = [
+    diffOf('work/pasted-lib/a.js', ['a', 'b', 'c']),
+    diffOf('work/pasted-lib/b.js', ['d', 'e', 'f']),
+  ].join('\n');
+  const started = Date.now();
+  try {
+    await scoreCommit({
+      commit: 'slow-local',
+      diff,
+      ask: noulAnswer(0.91),
+      log: async (row) => rows.push(row),
+      count: async () => 0,
+      local: (code, deadline) => askLocal(
+        code,
+        endpoint,
+        fetch,
+        async () => ({ available: true }),
+        deadline,
+      ),
+    });
+    const elapsed = Date.now() - started;
+    assert.ok(elapsed < 2500, `shared local leg took ${elapsed}ms`);
+    assert.equal(requests, 1, 'expired shared deadline must skip the next hunk');
+    assert.equal(rows.filter((row) => row.status === 'scored').length, 2);
+    assert.equal(rows[0].local_status, 'NOT_RUN');
+    assert.equal(rows[1].local_status, 'NOT_RUN');
+  } finally {
+    if (previous === undefined) delete process.env.JEV_VENDOR_LOCAL_URL;
+    else process.env.JEV_VENDOR_LOCAL_URL = previous;
+    server.closeAllConnections();
+    await new Promise((resolve, reject) => server.close((err) => err ? reject(err) : resolve()));
   }
 });
 

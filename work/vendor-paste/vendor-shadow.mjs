@@ -11,6 +11,8 @@
  * close-check shape; the alternative is a seam that never scores (post-commit
  * env almost never carries the key). Bounded: hunk cap 5/commit, 20 s per
  * call, daily row cap, fail_open row on any key/transport failure.
+ * The optional local leg is disabled unless JEV_VENDOR_LOCAL_URL is set; when
+ * enabled, one shared 2 s deadline covers all local scores for the commit.
  */
 import { appendFile, mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
@@ -107,7 +109,7 @@ export async function todayCount(logFile = LOG_FILE) {
 // beside Jev's. Log only; NOT_RUN when the local server is absent; never blocks the commit.
 export const LOCAL_URL = process.env.JEV_VENDOR_LOCAL_URL;
 export const LOCAL_PLATT = { a: 1.239, b: 2.926 };
-export const LOCAL_TIMEOUT_MS = 10000;
+export const LOCAL_TIMEOUT_MS = 2000;
 const LOCAL_GUARD_TIMEOUT_MS = 750;
 const LOCAL_GUARD_SCRIPT = fileURLToPath(new URL("../../scripts/local-model-guard.sh", import.meta.url));
 
@@ -116,7 +118,7 @@ export function plattMap(p, { a, b } = LOCAL_PLATT) {
   return 1 / (1 + Math.exp(-(a * Math.log(q / (1 - q)) + b)));
 }
 
-function runLocalModelGuard() {
+function runLocalModelGuard(timeoutMs = LOCAL_GUARD_TIMEOUT_MS) {
   return new Promise((resolve) => {
     let settled = false;
     let timer;
@@ -144,23 +146,27 @@ function runLocalModelGuard() {
         } catch {}
       }
       finish({ available: false, reason: "guard-timeout" });
-    }, LOCAL_GUARD_TIMEOUT_MS);
+    }, timeoutMs);
   });
 }
 
-export async function askLocal(code, url = process.env.JEV_VENDOR_LOCAL_URL, fetchImpl = fetch, guard = runLocalModelGuard) {
+export async function askLocal(code, url = process.env.JEV_VENDOR_LOCAL_URL, fetchImpl = fetch, guard = runLocalModelGuard, deadlineAt = Date.now() + LOCAL_TIMEOUT_MS) {
   const configuredUrl = process.env.JEV_VENDOR_LOCAL_URL;
   if (!configuredUrl) return { local_status: "NOT_RUN", local_reason: "disabled" };
   const endpoint = url ?? configuredUrl;
+  const remainingMs = deadlineAt - Date.now();
+  if (remainingMs <= 0) return { local_status: "NOT_RUN", local_reason: "deadline" };
   const started = Date.now();
   try {
-    const status = await guard();
+    const status = await guard(Math.min(LOCAL_GUARD_TIMEOUT_MS, remainingMs));
     if (!status?.available) return { local_status: "NOT_RUN", local_reason: status?.reason ?? "local-guard" };
+    const timeoutMs = deadlineAt - Date.now();
+    if (timeoutMs <= 0) return { local_status: "NOT_RUN", local_reason: "deadline" };
     const res = await fetchImpl(endpoint, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ model: "clef-flash", state: { code }, questions: { vendored: { type: "noul", instructions: VENDOR_QUESTION } } }),
-      signal: AbortSignal.timeout(LOCAL_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     if (!res.ok) return { local_status: "NOT_RUN", local_reason: `http-${res.status}` };
     const raw = (await res.json())?.answers?.vendored;
@@ -173,7 +179,7 @@ export async function askLocal(code, url = process.env.JEV_VENDOR_LOCAL_URL, fet
   }
 }
 
-export async function scoreCommit({ commit, diff, ask, log, count, local = askLocal }) {
+export async function scoreCommit({ commit, diff, ask, log, count, local = (code, deadlineAt) => askLocal(code, undefined, fetch, runLocalModelGuard, deadlineAt) }) {
   const day = new Date().toISOString().slice(0, 10);
   const { scored: blocks, skipped } = addedBlocks(diff);
   for (const s of skipped) {
@@ -190,6 +196,7 @@ export async function scoreCommit({ commit, diff, ask, log, count, local = askLo
     return { scored: 0, skipped: skipped.length };
   }
   let scored = 0;
+  let localDeadlineAt;
   for (const b of blocks) {
     const started = Date.now();
     const base = { ts: new Date().toISOString(), day, commit, file: b.file, hunk_sha: sha(b.added), model: VENDOR_MODEL };
@@ -204,7 +211,8 @@ export async function scoreCommit({ commit, diff, ask, log, count, local = askLo
         await log({ ...base, status: "fail_open", reason: "invalid-noul", latencyMs: Date.now() - started });
         continue;
       }
-      const second = await local(b.added.slice(0, 4000));
+      localDeadlineAt ??= Date.now() + LOCAL_TIMEOUT_MS;
+      const second = await local(b.added.slice(0, 4000), localDeadlineAt);
       await log({ ...base, status: "scored", noul: n, would_flag: decideVendor(n), latencyMs: Date.now() - started, ...(res.usage ? { usage: res.usage } : {}), ...second });
       scored += 1;
     } catch (err) {
