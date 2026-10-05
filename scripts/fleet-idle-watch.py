@@ -110,16 +110,31 @@ OMP = re.compile(r"(^|[\s/])omp(\s|$)|pi-coding-agent/dist/cli\.js(?!\s+__omp_wo
 # omp's own long-lived children, present under every live omp whether or not it is mid-task
 # (ps under jev panes 1-5, 2026-09-25). A match is not tool work, but its descendants are still
 # walked: a subprocess started from the python or js eval kernel is a running tool.
+# MCP and language servers match by generic name markers, not by server name: a named list went
+# stale the day the math MCPs were installed (2026-10-05: infisical, mathlas, z3, sympy, wolfram
+# and vscode-json servers made every pane read 'working', so no idle alert or steering nudge fired).
+# Tradeoff: a tool call whose command line itself carries one of these markers reads as a helper.
 OMP_HELPERS = (
     "__omp_worker_",  # cli.js __omp_worker_{mnemopi_embed,js_eval_process,daemon_broker}
     "/omp-python-runner/",  # python eval kernel: Python -u $TMPDIR/omp-python-runner/runner-*.py
     "@morphllm/morphmcp",  # MCP server morph: npm exec @morphllm/morphmcp
-    "/morph-mcp",  # its node child …/.bin/morph-mcp, or the bin/morph-mcp.sh wrapper
     "franken-harvest serve",  # MCP server franken-harvest
-    "typescript-language-server",
-    "pyright-langserver",
+    # MCP servers: @infisical/mcp/dist, mcp-z3-prover, sympy-mcp / mcp[cli] / server.mcp.run(),
+    # mathlas-mcp, wolfram_llm_mcp.py, morph-mcp
+    "/mcp/",
+    "mcp-",
+    "-mcp",
+    "_mcp",
+    "mcp[cli]",
+    ".mcp.run(",
+    # language servers: typescript-, vscode-json-language-server, pyright-langserver, ...
+    "language-server",
+    "langserver",
     "rust-analyzer",
     "gopls",
+    "marksman server",  # markdown language server (pane 6, 2026-10-05T16:15Z)
+    # a zombie (ps shows "<defunct>") is no work in progress (pane 5, 2026-10-05T16:15Z)
+    "<defunct>",
 )
 SESSION_FRESH = int(os.environ.get("IDLE_SESSION_FRESH", "60"))
 IDLE_STALL_S = int(os.environ.get("IDLE_STALL_S", "600"))

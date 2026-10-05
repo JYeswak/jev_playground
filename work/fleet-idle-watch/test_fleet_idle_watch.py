@@ -522,6 +522,60 @@ class ProcessTree(unittest.TestCase):
             ["python3 work/loss-depth/run.py selftest"],
         )
 
+    def test_mcp_and_language_servers_are_helpers(self):
+        # captured from pane 5 (omp 84455) and panes 2/4/6 at 2026-10-05T16:12Z: after the math MCPs were
+        # installed every pane carried these children, so every pane read 'working' and no idle alert
+        # or steering nudge fired all afternoon
+        servers = [
+            "/opt/homebrew/bin/node /Users/josh/.local/share/infisical-mcp/0.0.24/node_modules/@infisical/mcp/dist/index.js",
+            "/opt/homebrew/bin/uv tool uvx mcp-z3-prover",
+            "/Users/josh/.cache/uv/archive-v0/xSMSnS2CCMWgCMtCiYSwX/bin/python /Users/josh/.cache/uv/archive-v0/xSMSnS2CCMWgCMtCiYSwX/bin/mcp-z3-prover",
+            "/opt/homebrew/bin/uv run --no-project --with mcp[cli]<2 --with https://github.com/sdiehl/sympy-mcp/releases/download/0.1/sympy_mcp-0.1.0-py3-none-any.whl",
+            "/Users/josh/.cache/uv/builds-v0/.tmpEFUYaf/bin/python -P -c import server; server.mcp.run()",
+            "/opt/homebrew/bin/uv tool uvx --with sentence-transformers --with torch mathlas-mcp",
+            "Python /Users/josh/Developer/formula-atlas/corpus/index/wolfram_llm_mcp.py",
+            "node /opt/homebrew/bin/vscode-json-language-server --stdio",
+            # second capture 16:15Z: pane 6's markdown language server, pane 5's zombie child
+            "marksman server",
+            "<defunct>",
+        ]
+        table = {10: (1, "-zsh"), 11: (10, "bun /x/bin/omp --auto-approve")}
+        for n, command in enumerate(servers, start=20):
+            table[n] = (11, command)
+        self.assertEqual(fiw.omp_processes(table, 10), (11, []))
+        state, evidence = fiw.classify(
+            fiw.Snapshot(
+                command="zsh",
+                screen="",
+                omp=True,
+                tools=(),
+                cpu_tools=(),
+                session_age=300.0,
+            )
+        )
+        self.assertEqual(state, "idle", evidence)
+
+    def test_a_real_tool_call_beside_mcp_servers_is_still_a_tool(self):
+        # planted negative: a bash tool call under the same omp must keep the pane 'working'
+        table = {
+            10: (1, "-zsh"),
+            11: (10, "bun /x/bin/omp --auto-approve"),
+            20: (
+                11,
+                "Python /Users/josh/Developer/formula-atlas/corpus/index/wolfram_llm_mcp.py",
+            ),
+            21: (
+                11,
+                "/bin/zsh -c nice -n 10 node --test work/vendor-paste/vendor-shadow.test.mjs",
+            ),
+        }
+        self.assertEqual(
+            fiw.omp_processes(table, 10)[1],
+            [
+                "/bin/zsh -c nice -n 10 node --test work/vendor-paste/vendor-shadow.test.mjs"
+            ],
+        )
+
     def test_omp_worker_is_not_mistaken_for_omp_itself(self):
         table = {
             10: (1, "-zsh"),
