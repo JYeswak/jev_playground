@@ -352,9 +352,33 @@ def score_rows(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def read_prior_attempts(
+    path: Path, first_row_id: str, expected_n: int, recovery_authorized: bool
+) -> list[dict[str, Any]]:
+    if not path.exists() or path.stat().st_size == 0:
+        return []
+    prior = [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    if not recovery_authorized:
+        raise FileExistsError(f"refusing to overwrite existing call ledger: {path}")
+    if (
+        len(prior) != 1
+        or prior[0].get("status") != "ERROR"
+        or prior[0].get("error_class") != "HTTPError"
+        or prior[0].get("row_id") != first_row_id
+        or prior[0].get("expected_heldout_n") != expected_n
+    ):
+        raise ValueError("recovery requires the single recorded first-row HTTP failure")
+    return prior
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--score-only", type=Path)
+    parser.add_argument("--recovery-authorized", action="store_true")
     args = parser.parse_args()
     if args.score_only:
         rows = [
@@ -374,19 +398,25 @@ def main() -> int:
         row["keyword_pred"] = predict_keyword(row["finding"], rule, majority)
         row["majority_pred"] = majority
     out = ROOT / "work/lesson-class/rows.jsonl"
-    if out.exists() and out.stat().st_size:
-        raise FileExistsError(f"refusing to overwrite existing call ledger: {out}")
-    calls = run_predictions(heldout, request_local)
-    with out.open("w", encoding="utf-8") as stream:
+    prior = read_prior_attempts(
+        out, heldout[0]["row_id"], len(heldout), args.recovery_authorized
+    )
+    if len(prior) + len(heldout) > MAX_CALLS:
+        raise ValueError("recovery plus held-out rows exceeds the total call cap")
+    calls = run_predictions(heldout, request_local, MAX_CALLS - len(prior))
+    with out.open("a" if out.exists() else "x", encoding="utf-8") as stream:
         for row in calls:
             stream.write(json.dumps(row, sort_keys=True, allow_nan=False) + "\n")
-    errors = sum(row["status"] == "ERROR" for row in calls)
+    attempts = prior + calls
+    errors = sum(row["status"] == "ERROR" for row in attempts)
     print(
         json.dumps(
             {
-                "calls": len(calls),
+                "new_calls": len(calls),
                 "rows": len(heldout),
-                "scored": sum(row["status"] == "scored" for row in calls),
+                "prior_attempts": len(prior),
+                "total_attempts": len(attempts),
+                "scored": sum(row["status"] == "scored" for row in attempts),
                 "errors": errors,
             }
         )

@@ -1,5 +1,7 @@
+import json
 import sys
 import unittest
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -9,6 +11,7 @@ from run import (
     OPTIONS,
     build_request_payload,
     fit_keyword_rule,
+    read_prior_attempts,
     run_predictions,
     validate_answer,
 )
@@ -25,6 +28,26 @@ class LessonClassTests(unittest.TestCase):
         self.assertEqual(payload["state"], {"finding": "finding"})
         self.assertEqual(question["criteria"], dict.fromkeys(OPTIONS))
         self.assertNotIn("options", question)
+
+    def test_recovery_only_accepts_authorized_single_first_row_error(self):
+        attempt = {
+            "row_id": "first",
+            "status": "ERROR",
+            "error_class": "HTTPError",
+            "expected_heldout_n": 310,
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "rows.jsonl"
+            path.write_text(json.dumps(attempt) + "\n", encoding="utf-8")
+            with self.assertRaises(FileExistsError):
+                read_prior_attempts(path, "first", 310, False)
+            self.assertEqual(read_prior_attempts(path, "first", 310, True), [attempt])
+            path.write_text(
+                json.dumps({**attempt, "row_id": "different"}) + "\n",
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "single recorded first-row"):
+                read_prior_attempts(path, "first", 310, True)
 
     def test_answer_outside_offered_classes_is_not_scored(self):
         choice, probs, refusal = validate_answer("NOT_A_CLASS", self.probabilities)
