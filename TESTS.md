@@ -389,6 +389,8 @@ Everything else under this root is a **vendored clone** and its tests belong to 
 
 - `scripts/test_gate_outcomes.py` — G1 gate outcome joins on captured session-shaped rows: DCG deny, restore/revert, undo phrase, failed follow-up, unknown/misassigned session, and report totals; real session text remains local. Run: `python3 -m unittest scripts/test_gate_outcomes.py`.
 
+- `scripts/test_result_commit_evidence.py` — refuses result claims without committed per-call rows, scorer, split/seed, and exact-hash source provenance; accepts an atomic rows/scorer/split/source/manifest commit; allows documentation-only EVAL headings without metric claims; rejects malformed row files; and verifies historical commits against their own trees. Run: `python3 -m unittest scripts.test_result_commit_evidence` (13 tests).
+
 ## 2. Upstream's — each vendored clone runs its own suite
 
 We do not own, extend, or fix these. A failure is a **finding about that clone**, recorded in
@@ -671,7 +673,10 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 - `work/jev-science/recog/theory_test.py` — recomputes the recognition-versus-forecasting contingency tables, Fisher tests, effect estimates, and own-vein sensitivity from the committed coding/verdict data; asserts the coding/verdict ID join is complete. Run: `python3 work/jev-science/recog/theory_test.py` (1 executable check; prints 4 tables).
 - `work/vendor-paste/vendor-shadow.test.mjs` — verifies added-block/path eligibility, skips for vendored/dependency/non-source/lockfile paths, scores pasted MIT text but not own code, logs hashes and provenance, fails open on refusal/cap, and pins the frozen cut. Run: `node --test work/vendor-paste/vendor-shadow.test.mjs` (5 tests).
 - `work/jev-jzgm/test_replay.py` — verifies the committed cap3 row hash and totals, rejects altered frozen rows, detects per-turn differences/missing turns, exercises policy-off identity replay and computed memory/gate deltas while marking harm labels unobserved, and checks JavaScript UTF-16 token sizing including lone surrogates. Run: `python3 -m unittest work/jev-jzgm/test_replay.py` (6 tests).
+
 - `work/longres/test_score.py` — recomputes the matched `corpus2` and original Youden results from committed rows, asserts threshold/miss/savings/spend/week arithmetic, and refuses unsafe fallback choices or incomplete receipts. Run: `uv run --no-project python -m unittest work.longres.test_score` (4 tests).
+
+- `work/x4-vendored-probe/test_run.py` — refuses a probe fit that includes held rows and a bootstrap that samples windows rather than source groups; accepts the dev-only fit and confirms 53 held source groups. Run: `uv run --no-project --offline --with scikit-learn python -m unittest work/x4-vendored-probe/test_run.py -v` (4 tests).
 
 ## Newly registered tests — jev-9kmq
 
