@@ -170,18 +170,22 @@ def validate_answer(
     return answer, {key: float(value) for key, value in probabilities.items()}, None
 
 
-def request_local(finding: str, timeout: float = 30) -> dict[str, Any]:
-    payload = {
+def build_request_payload(finding: str) -> dict[str, Any]:
+    return {
         "model": MODEL,
         "state": {"finding": finding},
         "questions": {
             "cls": {
                 "type": "choice",
-                "options": list(OPTIONS),
+                "criteria": {label: None for label in OPTIONS},
                 "instructions": INSTRUCTIONS,
             }
         },
     }
+
+
+def request_local(finding: str, timeout: float = 30) -> dict[str, Any]:
+    payload = build_request_payload(finding)
     request = urllib.request.Request(
         ENDPOINT,
         data=json.dumps(payload).encode(),

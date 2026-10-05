@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run import (
     MAX_CALLS,
     OPTIONS,
+    build_request_payload,
     fit_keyword_rule,
     run_predictions,
     validate_answer,
@@ -17,6 +18,13 @@ class LessonClassTests(unittest.TestCase):
     def setUp(self):
         self.probabilities = {label: 0.05 for label in OPTIONS}
         self.probabilities["OTHER"] = 0.5
+
+    def test_choice_request_uses_canonical_criteria_map(self):
+        payload = build_request_payload("finding")
+        question = payload["questions"]["cls"]
+        self.assertEqual(payload["state"], {"finding": "finding"})
+        self.assertEqual(question["criteria"], dict.fromkeys(OPTIONS))
+        self.assertNotIn("options", question)
 
     def test_answer_outside_offered_classes_is_not_scored(self):
         choice, probs, refusal = validate_answer("NOT_A_CLASS", self.probabilities)
