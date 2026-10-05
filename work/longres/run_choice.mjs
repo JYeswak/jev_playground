@@ -10,6 +10,11 @@ const join2 = (a, ...p) => p.reduce((x, y) => x.replace(/\/$/, "") + "/" + y.rep
 const corpus = JSON.parse(readFileSync(join2(BASE, process.env.LONGRES_CORPUS ?? "corpus.json"), "utf8"));
 const rows = [...corpus.dev, ...corpus.held];
 const OUT = join2(BASE, process.env.LONGRES_OUT ?? "choice-rows.jsonl");
+const MAX_CALLS = 200;
+if (rows.length > MAX_CALLS) {
+  console.error(`STOP call cap ${MAX_CALLS} exceeded: ${rows.length} rows`);
+  process.exit(3);
+}
 
 const INSTR = "This tool result just arrived. How should it be kept for the rest of the session?";
 const CLASSES = {
