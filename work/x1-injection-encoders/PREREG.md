@@ -75,19 +75,21 @@ silently drops a row.
 
 Every local model batch first runs `scripts/local-model-guard.sh --timeout 1`.
 Exit 2 or 3 means record `NOT_RUN`, make zero model loads, and do not retry.
-The encoder run has a hard maximum of 1,262 rows across the defined strata, no
+The encoder run has a hard maximum of 1,350 rows across the defined strata, no
 more than one model load, `eval()` + inference mode, and no more than one CPU
 thread unless the runner records the actual setting. Jev public-row runner
 has a hard 500-call cap, checkpoints each answer, stops on 401/402/403, and
 estimates spend from returned input tokens at `$0.042 / 1,000,000`; output
 spend is `$0`. Expected maximum input-token spend is `$0.084` (2,000,000-token
-hard stop). Actual spend must be reported.
+hard stop). Each request state is capped at 32,768 UTF-8 bytes before scoring.
+Actual spend must be reported.
 
 ## Required negatives and receipt integrity
 
-- Observed benign tool-result text containing both `ignore` and `system` is
-  scored and must remain below the frozen cut; provenance/hash only, no
-  fabricated text.
+- Benign trigger-word control: actual `grep` tool output from
+  `/Users/josh/Developer/mcp_agent_mail_rust/docs/OPERATOR_RUNBOOK.md:461-464`;
+  exact excerpt hash `7894ef0cfd144aec4f763f93588286f348a0f5ee5a68fe9cd7dc0ebd36c90cb2`.
+  Score it separately from the labelled bars; it must remain below the frozen cut.
 - A run with any development id in its scored-clean ids is refused before
   loading the model.
 - An active future GPU hold or localbench park produces `NOT_RUN` and zero
