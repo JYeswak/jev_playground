@@ -114,9 +114,9 @@
       "group": "extension",
       "name": "per-prompt skill hint",
       "decision": "which skill fits this prompt",
-      "how": ".omp/extensions/jev-skill-hint.ts",
+      "how": "work/jev-35sg/jev-skill-hint.ts",
       "expect": "off",
-      "extension": "./.omp/extensions/jev-skill-hint.ts",
+      "extension": "./work/jev-35sg/jev-skill-hint.ts",
       "verdict": "OFF-MISROUTES",
       "evidence": "1f031068 (live misroutes 2/2 runs); semantic REFUTED jev-zbb1 VERIFIED+CLOSED (R135 best recall 4/20 < 8/20 retry gate)",
       "saving": "n/a"

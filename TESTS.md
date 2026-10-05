@@ -148,16 +148,16 @@ claim nobody can check:
   Run: `python3 -m unittest work/omp-jev-review/test_jev_tool_census.py` (8 tests).
 - `work/jev-35sg/jev-skill-hint.test.mjs` — the per-prompt skill hint (jev-4nyy), keyless with an
   injected asker: the shortlist ranks skill names over description noise and caps at twenty; four
-  byte-exact SKILL.md copies under `.omp/extensions/fixtures/skills/` stand in for the real roster
-  (hermetic where ~/.claude/skills is absent, e.g. CI run 36815800871) and shortlist
-  `ga4`/`analytics-tracking` for a GA4 funnel prompt and neither for `what time is it`, folded
-  descriptions parsed; a confident non-none Choice becomes `Likely relevant skills: ...` while none,
-  sub-cut confidence, refusal, throw, and empty prompt stay silent; billed usage flows to the hint
-  result; slow failures past the 300 ms deadline log reason `timeout` (thrown and SDK-resolved
-  alike) while fast ones keep theirs; warmup probes once without blocking; the factory registers
-  `session_start` + `before_agent_start`, injects `{ customType: jev-skill-hint, ... }` on hint
-  and yields undefined when silent.
-  Run: `node --test work/jev-35sg/jev-skill-hint.test.mjs` (10 tests).
+  byte-exact SKILL.md copies under `work/jev-35sg/fixtures/skills/` stand in for the real roster
+  (hermetic where ~/.claude/skills is absent, e.g. CI run 36815800871); shortlist `ga4`/`analytics-tracking`
+  for a GA4 funnel prompt and neither for `what time is it`, folded descriptions parse; a confident
+  non-none Choice becomes `Likely relevant skills: ...` while none, sub-cut confidence, refusal,
+  throw, and empty prompt stay silent; billed usage flows to the hint result; slow failures past the
+  300 ms deadline log reason `timeout` (thrown and SDK-resolved alike) while fast ones keep theirs.
+  Declared OFF skips hint, ask, log, and session-start warmup; a planted ON fixture exercises the
+  handler with injected asker and in-memory recorder; only ON registers both hooks and warmup
+  remains nonblocking if its checkpoint rejects.
+  Run: `node --test work/jev-35sg/jev-skill-hint.test.mjs` (12 tests).
 - `.omp/extensions/jev-memory-filter.test.mjs` — the memory relevance filter (jev-7vn9/jev-s47b), keyless with an
   injected asker: system-role injection text parses to redacted bullets (tool/user text never parsed);
   irrelevant memories log drop and return undefined while relevant ones log keep; invalid Noul keeps

@@ -13,7 +13,6 @@ import {
   SKILL_HINT_SHORTLIST_MAX,
   SKILL_HINT_TIMEOUT_MS,
 } from '../../kit/src/skill-hint.ts';
-import { createSkillHintHandler } from './jev-skill-hint.ts';
 
 // Tiny roster: shortlist logic without touching the real 764-skill inventory.
 const ROSTER = [
@@ -83,19 +82,32 @@ test('none, low confidence, refusal, and empty prompt all stay silent', async ()
   assert.equal(empty.reason, 'empty-prompt');
 });
 
-test('extension handler injects the message on hint and yields nothing when silent', async () => {
+test('declared OFF policy skips calls; a planted ON policy exercises the handler', async () => {
   const { default: factory } = await import('./jev-skill-hint.ts');
-  assert.equal(typeof factory, 'function');
-  const seen = [];
-  factory({ on: (event, handler) => seen.push([event, handler]) });
-  assert.deepEqual(seen.map(([event]) => event).sort(), ['before_agent_start', 'session_start']);
-  const fired = createSkillHintHandler(ROSTER, answer('analytics-tracking', 0.72));
-  const out = await fired({ prompt: GA4_PROMPT });
+  let calls = 0;
+  const ask = async () => {
+    calls += 1;
+    return { ok: true, choice: 'analytics-tracking', confidence: 0.72, probabilities: { 'analytics-tracking': 0.72 }, latencyMs: 210, model: SKILL_HINT_MODEL };
+  };
+  const rows = [];
+  const record = async (row) => rows.push(row);
+  const options = { ask, record, roster: ROSTER };
+  const offEvents = new Map();
+  factory({ on: (event, handler) => offEvents.set(event, handler) }, { ...options, policy: 'off' });
+  assert.deepEqual([...offEvents.keys()], ['before_agent_start']);
+  assert.equal(await offEvents.get('before_agent_start')({ prompt: GA4_PROMPT }), undefined);
+  assert.equal(calls, 0);
+  assert.deepEqual(rows, []);
+  const onEvents = new Map();
+  factory({ on: (event, handler) => onEvents.set(event, handler) }, { ...options, policy: 'on' });
+  assert.deepEqual([...onEvents.keys()].sort(), ['before_agent_start', 'session_start']);
+  const out = await onEvents.get('before_agent_start')({ prompt: GA4_PROMPT });
+  assert.equal(calls, 1);
   assert.equal(out.message.customType, 'jev-skill-hint');
   assert.match(out.message.content, /analytics-tracking/);
   assert.equal(out.message.attribution, 'jev-skill-hint');
-  const quiet = createSkillHintHandler(ROSTER, answer('none', 0.99));
-  assert.equal(await quiet({ prompt: GA4_PROMPT }), undefined);
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].status, 'hinted');
 });
 test('slow failures past the deadline log as timeout, fast ones keep their reason', async () => {
   assert.equal(SKILL_HINT_TIMEOUT_MS, 300);
@@ -118,13 +130,32 @@ test('warmup probes the transport once without blocking the turn', async () => {
   assert.equal(failed.ok, false);
 });
 
-test('extension warms on session_start without awaiting and hints on prompt', async () => {
+test('extension warmup is fire-and-forget and ignores checkpoint failure', async () => {
   const { default: factory } = await import('./jev-skill-hint.ts');
   const seen = new Map();
-  factory({ on: (event, handler) => seen.set(event, handler) });
-  assert.deepEqual([...seen.keys()].sort(), ['before_agent_start', 'session_start']);
-  const warmHandler = seen.get('session_start');
-  assert.equal(warmHandler({}), undefined);
+  const unhandled = [];
+  let calls = 0;
+  const ask = async () => {
+    calls += 1;
+    return { ok: true, choice: 'warm', confidence: 1, probabilities: { warm: 1 }, latencyMs: 120, model: SKILL_HINT_MODEL };
+  };
+  const captureUnhandled = (reason) => unhandled.push(reason);
+  process.on('unhandledRejection', captureUnhandled);
+  try {
+    factory({ on: (event, handler) => seen.set(event, handler) }, {
+      policy: 'on',
+      ask,
+      record: async () => { throw new Error('checkpoint unavailable'); },
+      roster: ROSTER,
+    });
+    assert.deepEqual([...seen.keys()].sort(), ['before_agent_start', 'session_start']);
+    assert.equal(seen.get('session_start')({}), undefined);
+    assert.equal(calls, 1);
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.deepEqual(unhandled, []);
+  } finally {
+    process.off('unhandledRejection', captureUnhandled);
+  }
 });
 
 test('resolved deadline hits log as timeout, not transport', async () => {

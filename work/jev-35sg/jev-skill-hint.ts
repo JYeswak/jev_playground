@@ -29,12 +29,28 @@ async function appendCall(row: Record<string, unknown>): Promise<void> {
     // Checkpointing never blocks the turn.
   }
 }
+type SkillHintPolicy = "off" | "on";
+type SkillHintExtensionOptions = {
+  policy?: SkillHintPolicy;
+  ask?: ChoiceAsker;
+  record?: typeof appendCall;
+  roster?: SkillEntry[];
+};
+const DECLARED_POLICY: SkillHintPolicy = "off";
 
-export function createSkillHintHandler(roster: SkillEntry[], ask: ChoiceAsker) {
+
+export function createSkillHintHandler(
+  roster: SkillEntry[],
+  ask: ChoiceAsker,
+  options: { policy?: SkillHintPolicy; record?: typeof appendCall } = {},
+) {
+  const policy = options.policy ?? DECLARED_POLICY;
+  const record = options.record ?? appendCall;
   return async (event: BeforeAgentStartEvent) => {
+    if (policy === "off") return undefined;
     const prompt = typeof event.prompt === "string" ? event.prompt : "";
     const result = await hintSkills({ prompt, roster, ask });
-    await appendCall({
+    await record({
       ts: new Date().toISOString(),
       instance: INSTANCE,
       model: result.model,
@@ -55,23 +71,33 @@ export function createSkillHintHandler(roster: SkillEntry[], ask: ChoiceAsker) {
   };
 }
 
-export default function jevSkillHintExtension(pi: { on: (event: string, handler: (event: BeforeAgentStartEvent) => Promise<unknown>) => void }) {
-  useInfisicalKey();
-  const ask: ChoiceAsker = (options) => askJevChoice(options);
-  // Warm the transport once per session without blocking any turn: the first
-  // real prompt then reuses a warm connection instead of paying cold-start TLS.
-  pi.on("session_start", () => {
-    void warmTransport(ask).then((warmed) =>
-      appendCall({
-        ts: new Date().toISOString(),
-        instance: INSTANCE,
-        model: warmed.model,
-        status: "warmup",
-        ...(warmed.ok ? { ...(warmed.usage ? { usage: warmed.usage } : {}) } : { reason: warmed.reason }),
-        latencyMs: warmed.latencyMs,
-        promptChars: 0,
-      }),
-    );
-  });
-  pi.on("before_agent_start", createSkillHintHandler(loadSkillRoster(), ask));
+
+export default function jevSkillHintExtension(
+  pi: { on: (event: string, handler: (event: BeforeAgentStartEvent) => unknown) => void },
+  options: SkillHintExtensionOptions = {},
+) {
+  const policy = options.policy ?? DECLARED_POLICY;
+  const record = options.record ?? appendCall;
+  if (policy === "on" && options.ask === undefined) useInfisicalKey();
+  const ask: ChoiceAsker = options.ask ?? ((request) => askJevChoice(request));
+  const roster = options.roster ?? (policy === "on" ? loadSkillRoster() : []);
+  if (policy === "on") {
+    // Warm the transport once per session without blocking any turn.
+    pi.on("session_start", () => {
+      void warmTransport(ask)
+        .then((warmed) =>
+          record({
+            ts: new Date().toISOString(),
+            instance: INSTANCE,
+            model: warmed.model,
+            status: "warmup",
+            ...(warmed.ok ? { ...(warmed.usage ? { usage: warmed.usage } : {}) } : { reason: warmed.reason }),
+            latencyMs: warmed.latencyMs,
+            promptChars: 0,
+          }),
+        )
+        .catch(() => undefined);
+    });
+  }
+  pi.on("before_agent_start", createSkillHintHandler(roster, ask, { policy, record }));
 }
