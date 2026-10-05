@@ -1,31 +1,26 @@
 # jev-li3w receipt
 
-Protocol: `PREREG.md`, frozen before pair extraction. Recompute with
-`python3 work/jev-li3w/stability.py --json`.
+Protocol: `PREREG.md`; 5% bar committed before calls. Recompute keyless and
+live results with `python3 work/jev-li3w/stability.py --json`.
 
 ## Keyless same-pair check
 
-Source: `~/.local/state/jev/memory-filter.jsonl` (operator-local; hashes and
-outcomes only). Include only `status=scored` rows with exact pair identity
-`promptHash + memoryHash` and `drop`/`keep` decisions; exclude all other
-statuses.
+Source: operator-local `~/.local/state/jev/memory-filter.jsonl`. Include only
+`status=scored` rows, exact `promptHash + memoryHash`, binary `drop`/`keep`.
+At final recomputation: 5,770 unique scored pairs; 126 repeated pairs; 2
+flipping pairs (1.5873%, below the preregistered 5% bar).
+Exact sidecar payloads were available for 97 pairs; their identities are in
+`frozen-pairs.jsonl`. The remaining 29 identities and absence reasons are in
+`not-run.jsonl`. The census includes prior code eras and is descriptive, not
+causal for one code version.
 
-At freeze time: 5,763 unique scored pairs; 126 repeated pairs; 2 flipping
-pairs (1.5873%, below the preregistered 5% bar). Exact sidecar payloads exist
-for 97 of those pairs; their identities are in `frozen-pairs.jsonl`. The
-remaining 29 identities and absence reason are in `not-run.jsonl`. Census
-includes prior code eras and is descriptive, not causal for one code version.
-
-## Live rescore
-
-Pending. The runner joins exact text from the mode-0600
-`~/.local/state/jev/memory-filter-full.jsonl`, verifies both SHA-256 hashes in
-memory, and writes no prompt/memory text to the repo. Cap: 291 requests, 97
-pairs x 3. Stop on HTTP 401/402/403; no retries. Spend is
-`inputTokens * $0.042 / 1,000,000`; output is free. No live calls or results
-yet.
+Live flips: 1/97 pairs = 1.0309% (below 5%; descriptive `STABLE` for the
+rescorable subset). Input tokens: 124,968. Cost at $0.042 / 1M input tokens,
+output free: **$0.005248656**. Model on all responses: `jev-1.13.0`.
+Mean latency 162.48 ms; p95 243 ms.
 
 ## Boundary
 
-Stability is temporal decision reproducibility only; it does not establish
-memory relevance, safe-drop precision, or deployment suitability.
+Not a complete estimate for all 126 repeated pairs: 29 pairs were unavailable
+for live rescore. This measures temporal decision reproducibility only; it does
+not establish memory relevance, safe-drop precision, or deployment suitability.

@@ -13,8 +13,9 @@ ROOT = Path(__file__).resolve().parents[2]
 SOURCE = Path.home() / ".local/state/jev/memory-filter.jsonl"
 LIVE = ROOT / "work/jev-li3w/rows.jsonl"
 THRESHOLD = 0.05
-EXPECTED_PAIRS = 20
+EXPECTED_PAIRS = 97
 EXPECTED_REPEATS = 3
+FROZEN_PATH = ROOT / "work/jev-li3w/frozen-pairs.jsonl"
 
 
 def read_rows(path: Path) -> list[dict[str, Any]]:
@@ -75,10 +76,12 @@ def main() -> int:
 
     source_groups = groups(read_rows(args.source))
     keyless = summarize(source_groups)
-    eligible = sorted(
-        key for key, rows in source_groups.items() if len(rows) >= EXPECTED_REPEATS
-    )
-    frozen = eligible[:EXPECTED_PAIRS]
+    frozen_rows = read_rows(FROZEN_PATH)
+    frozen = [(row["promptHash"], row["memoryHash"]) for row in frozen_rows]
+    if len(frozen) != EXPECTED_PAIRS:
+        raise ValueError(
+            f"frozen sample has {len(frozen)} pairs, expected {EXPECTED_PAIRS}"
+        )
     live_rows = read_rows(args.live) if args.live.exists() else []
     live_groups = groups(live_rows)
     observed = {key: live_groups.get(key, []) for key in frozen}
@@ -124,8 +127,9 @@ def main() -> int:
             / 1_000_000,
             "summary": live_summary,
         },
-        "frozen_pairs": [{"promptHash": p, "memoryHash": m} for p, m in frozen],
-        "boundary": "No claim beyond sampled pairs; live arm requires exact pair payloads and is not called by this offline runner.",
+        "frozen_pair_count": len(frozen),
+        "not_run_count": len(read_rows(ROOT / "work/jev-li3w/not-run.jsonl")),
+        "boundary": "Live analysis only covers exact-payload frozen pairs; the 29 NOT_RUN pairs are excluded. This does not establish relevance or safe-drop precision.",
     }
     print(
         json.dumps(output, sort_keys=True)
