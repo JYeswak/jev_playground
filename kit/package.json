@@ -1,11 +1,12 @@
 {
   "name": "jev-kit",
   "version": "0.0.0",
-  "description": "Small TypeScript-first Jev client, preflights, validators, fake asker, and CLI.",
+  "description": "Small TypeScript-first Jev client, preflight checks, typed validators, offline fixtures, and a model-neutral classifier CLI.",
   "type": "module",
-  "private": false,
+  "private": true,
   "bin": {
-    "jev": "bin/jev.mjs",
+    "classifier": "bin/jev.mjs",
+    "clf": "bin/jev.mjs",
     "jev-skill-gap": "bin/jev-skill-gap.mjs"
   },
   "files": [

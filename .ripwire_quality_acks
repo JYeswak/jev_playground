@@ -1,0 +1,4 @@
+# ripwire quality acks v1 — written by --quality-ack; a finding stays suppressed until it worsens past its acked magnitude
+# format: ack <kind> <16-hex-key> <ackNow> [cid=<16-hex-content-id>] [by=<scope that acked it>] <reason to end of line> — one per line, kept SORTED by (kind,key) on every write (merge-friendly)
+ack short-horizon-churn 40eda27cbc551656 11 cid=916b344991037f66 by=kit/bin/jev.mjs,kit/src/cli,kit/test/cli-*.mjs Intentional CLI-wide output-contract migration: ask and rerank return results to shared envelope and exit handling for the classifier entrypoint; recent churn is the rolling per-verb CLI expansion.
+ack short-horizon-churn 7014b2a4efaba19a 11 cid=14bbb95432ec4572 by=kit/bin/jev.mjs,kit/src/cli,kit/test/cli-*.mjs Intentional CLI-wide output-contract migration: ask and rerank return results to shared envelope and exit handling for the classifier entrypoint; recent churn is the rolling per-verb CLI expansion.

@@ -6,14 +6,14 @@ cd jev_playground	0	-
 git remote get-url origin	0	-
 git rev-parse HEAD	0	-
 npm ci --prefix kit	0	-
-npx --prefix kit --no-install jev doctor --robot	NOT_RUN-no-key	no key
-npx --prefix kit --no-install jev ask choice --fake --state kit/examples/state.json --question kit/examples/question.json --robot	0	-
-if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --prefix kit --no-install jev ask choice --state kit/examples/state.json --question kit/examples/question.json --robot || { rc=$?; exit "$rc"; }	NOT_RUN-no-key	no key
-node kit/bin/jev.mjs rerank --query "Tax implications of holding EWU (or other such UK ETFs) as a US citizen?" --candidates kit/examples/rerank-candidates.json --fake --robot	0	-
-npx --prefix kit --no-install jev verify --claim "A low percentage of hematopoietic progenitor cells are susceptible to HIV-1 infection ex vivo." --evidence kit/examples/scifact-evidence.txt --fake --robot	0	-
-npx --prefix kit --no-install jev score --text "it represents better-than-average movie-making that does n't demand a dumb , distracted audience ." --levels kit/examples/sst5-levels.json --fake --robot	0	-
-npx --prefix kit --no-install jev classify --text "How do I locate my card?" --labels kit/examples/banking77-labels.json --fake --robot	0	-
-npx --prefix kit --no-install jev gate --command "npm publish --access public" --fake --robot	0	-
-python3 -c 'from pathlib import Path; Path("var/agent-tmp/jev-omp-demo").mkdir(parents=True, exist_ok=True)' && git init -q var/agent-tmp/jev-omp-demo && npx --prefix kit --no-install jev omp install --dir var/agent-tmp/jev-omp-demo --robot	0	-
+npx --prefix kit --no-install classifier doctor --robot	NOT_RUN-no-key	no key
+npx --prefix kit --no-install classifier ask choice --fake --state kit/examples/state.json --question kit/examples/question.json --robot	0	-
+if [ -z "${TYPESAFE_API_KEY:-}" ]; then printf "NOT_RUN: no key\n"; fi; npx --prefix kit --no-install classifier ask choice --state kit/examples/state.json --question kit/examples/question.json --robot || { rc=$?; exit "$rc"; }	NOT_RUN-no-key	no key
+npx --prefix kit --no-install classifier rerank --query "Tax implications of holding EWU (or other such UK ETFs) as a US citizen?" --candidates kit/examples/rerank-candidates.json --fake --robot	0	-
+npx --prefix kit --no-install classifier verify --claim "A low percentage of hematopoietic progenitor cells are susceptible to HIV-1 infection ex vivo." --evidence kit/examples/scifact-evidence.txt --fake --robot	0	-
+npx --prefix kit --no-install classifier score --text "it represents better-than-average movie-making that does n't demand a dumb , distracted audience ." --levels kit/examples/sst5-levels.json --fake --robot	0	-
+npx --prefix kit --no-install classifier classify --text "How do I locate my card?" --labels kit/examples/banking77-labels.json --fake --robot	0	-
+npx --prefix kit --no-install classifier gate --command "npm publish --access public" --fake --robot	0	-
+python3 -c 'from pathlib import Path; Path("var/agent-tmp/jev-omp-demo").mkdir(parents=True, exist_ok=True)' && git init -q var/agent-tmp/jev-omp-demo && npx --prefix kit --no-install classifier omp install --dir var/agent-tmp/jev-omp-demo --robot	0	-
 python3 work/jev-jzgm/replay.py --days 30 --memory-cap 3 --policy cap3	0	-
 python3 work/local-decision-arms/run.py --platt clefflash	0	-

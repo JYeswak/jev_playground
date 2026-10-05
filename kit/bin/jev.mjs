@@ -9,6 +9,10 @@ import { scoreText } from "../dist/score.js";
 import { gateCommand } from "../dist/gate.js";
 import { createFakeFetch } from "../dist/fake.js";
 import { installOmp, ompDiscovery, uninstallOmp } from "../dist/install.js";
+import { createEnvelope } from "../src/cli/envelope.mjs";
+import { exitCodeForFailure } from "../src/cli/exit.mjs";
+import { parseArgv } from "../src/cli/argv.mjs";
+import { helpFor } from "../src/cli/help.mjs";
 
 const ROOT = new URL("..", import.meta.url);
 
@@ -21,15 +25,16 @@ function option(args, name) {
   return index >= 0 ? args[index + 1] : undefined;
 }
 
-function robotPrint(value) {
-  process.stdout.write(`${JSON.stringify(value)}\n`);
-}
 
 async function readJson(path) {
   return JSON.parse(await readFile(resolve(path), "utf8"));
 }
 
-async function doctor(robot) {
+function usageFailure(message) {
+  return { ok: false, reason: "usage", error: message };
+}
+
+async function doctor() {
   const keyPresent = typeof process.env.TYPESAFE_API_KEY === "string" && process.env.TYPESAFE_API_KEY.length > 0;
   const sdkPath = new URL("../../work/sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs", import.meta.url);
   let sdkPresent = true;
@@ -51,186 +56,181 @@ async function doctor(robot) {
     omp: await ompDiscovery(process.cwd()),
   };
   const clean = Object.fromEntries(Object.entries(result).filter(([, value]) => value !== undefined));
-  if (robot) robotPrint(clean);
-  else process.stdout.write(`${clean.status}: ${clean.reason ?? "ready"} (model=${clean.model})\n`);
-  return clean.status === "READY" ? 0 : 2;
+  return clean;
 }
 
 async function ask(args) {
   const kind = args[1];
-  const robot = hasFlag(args, "--robot");
   const fake = hasFlag(args, "--fake");
   const statePath = option(args, "--state");
   const questionPath = option(args, "--question");
   if (!kind || !statePath || !questionPath || !["choice", "score", "noul"].includes(kind)) {
-    const error = { status: "ERROR", reason: "usage", message: "jev ask choice|score|noul --state FILE --question FILE [--robot] [--fake]" };
-    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
-    return 1;
+    return usageFailure("classifier ask choice|score|noul --state FILE --question FILE [--fake] [--json|--robot]");
   }
   const state = await readJson(statePath);
   const question = await readJson(questionPath);
   const fetchImpl = fake
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/recorded-answer-rows.json", ROOT), "utf8")))
     : undefined;
-  let result;
   if (kind === "choice") {
-    result = await askJevChoice({ state, instructions: question.instructions ?? "", classes: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
-  } else if (kind === "score") {
-    result = await askJevScore({ state, instructions: question.instructions ?? "", criteria: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
-  } else {
-    result = await askJev({ state, questions: { value: question.instructions ?? question }, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
+    return askJevChoice({ state, instructions: question.instructions ?? "", classes: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
   }
-  if (robot) robotPrint(result);
-  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-  return result.ok ? 0 : result.reason === "unconfigured" ? 2 : 1;
+  if (kind === "score") {
+    return askJevScore({ state, instructions: question.instructions ?? "", criteria: question.criteria, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
+  }
+  return askJev({ state, questions: { value: question.instructions ?? question }, apiKey: fake ? "fixture-key" : undefined, fetchImpl });
 }
+
 async function gate(args) {
-  const robot = hasFlag(args, "--robot");
   const fake = hasFlag(args, "--fake");
   const command = option(args, "--command");
-  if (!command) {
-    const error = { status: "ERROR", reason: "usage", message: "jev gate --command C [--robot] [--fake]" };
-    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
-    return 1;
-  }
-  let result;
+  if (!command) return usageFailure("classifier gate --command C [--fake] [--json|--robot]");
   if (fake) {
     const fixture = await readJson(new URL("../examples/gate-public.json", import.meta.url).pathname);
-    if (command !== fixture.command) {
-      const error = { status: "ERROR", reason: "fake fixture", message: "--fake only supports the captured public example command" };
-      if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
-      return 1;
-    }
+    if (command !== fixture.command) return usageFailure("--fake only supports the captured public example command");
     const answers = Object.fromEntries(Object.entries(fixture.scores).map(([key, noul]) => [key, { noul }]));
-    result = await gateCommand({ command, model: fixture.model, ask: async () => ({ ok: true, answers, latencyMs: 0, resolvedModel: fixture.model, usage: undefined }) });
-  } else {
-    result = await gateCommand({ command });
+    return gateCommand({ command, model: fixture.model, ask: async () => ({ ok: true, answers, latencyMs: 0, resolvedModel: fixture.model, usage: undefined }) });
   }
-  if (robot) robotPrint(result);
-  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-  return result.ok ? 0 : result.reason === "unconfigured" ? 2 : 1;
+  return gateCommand({ command });
 }
 
 async function rerank(args) {
-  const robot = hasFlag(args, "--robot");
   const fake = hasFlag(args, "--fake");
   const query = option(args, "--query");
   const candidatesPath = option(args, "--candidates");
-  if (!query || !candidatesPath) {
-    const error = { status: "ERROR", reason: "usage", message: "jev rerank --query Q --candidates FILE [--robot] [--fake]" };
-    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
-    return 1;
-  }
+  if (!query || !candidatesPath) return usageFailure("classifier rerank --query Q --candidates FILE [--fake] [--json|--robot]");
   const candidates = await readJson(candidatesPath);
   const fetchImpl = fake
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/rerank-fiqa-answer.json", ROOT), "utf8")))
     : undefined;
-  const result = await rerankTop1({ query, candidates, apiKey: fake ? "fixture-key" : undefined, fetchImpl, model: fake ? "fake" : undefined });
-  if (robot) robotPrint(result);
-  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-  return 0;
+  return rerankTop1({ query, candidates, apiKey: fake ? "fixture-key" : undefined, fetchImpl, model: fake ? "fake" : undefined });
 }
 
 async function classify(args) {
-  const robot = hasFlag(args, "--robot");
   const fake = hasFlag(args, "--fake");
   const text = option(args, "--text");
   const labelsPath = option(args, "--labels");
-  if (!text || !labelsPath) {
-    const error = { status: "ERROR", reason: "usage", message: "jev classify --text T --labels FILE [--robot] [--fake]" };
-    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
-    return 1;
-  }
+  if (!text || !labelsPath) return usageFailure("classifier classify --text T --labels FILE [--fake] [--json|--robot]");
   const labels = await readJson(labelsPath);
   const fetchImpl = fake
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/banking77-answer.json", ROOT), "utf8")))
     : undefined;
-  const result = await classifyText({
+  return classifyText({
     text,
     labels,
     apiKey: fake ? "fixture-key" : undefined,
     fetchImpl,
     model: fake ? "fake" : undefined,
   });
-  if (robot) robotPrint(result);
-  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-  return 0;
 }
 
 async function verify(args) {
-  const robot = hasFlag(args, "--robot");
   const fake = hasFlag(args, "--fake");
   const claim = option(args, "--claim");
   const evidencePath = option(args, "--evidence");
-  if (!claim || !evidencePath) {
-    const error = { status: "ERROR", reason: "usage", message: "jev verify --claim C --evidence FILE [--robot] [--fake]" };
-    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
-    return 1;
-  }
+  if (!claim || !evidencePath) return usageFailure("classifier verify --claim C --evidence FILE [--fake] [--json|--robot]");
   const evidence = await readFile(resolve(evidencePath), "utf8");
   const fetchImpl = fake
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/scifact-answer.json", ROOT), "utf8")))
     : undefined;
-  const result = await verifyClaim({
+  return verifyClaim({
     claim,
     evidence,
     apiKey: fake ? "fixture-key" : undefined,
     fetchImpl,
     model: fake ? "fake" : undefined,
   });
-  if (robot) robotPrint(result);
-  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-  return 0;
 }
 
 async function score(args) {
-  const robot = hasFlag(args, "--robot");
   const fake = hasFlag(args, "--fake");
   const text = option(args, "--text");
   const levelsPath = option(args, "--levels");
-  if (!text || !levelsPath) {
-    const error = { status: "ERROR", reason: "usage", message: "jev score --text T --levels FILE [--robot] [--fake]" };
-    if (robot) robotPrint(error); else process.stderr.write(error.message + "\n");
-    return 1;
-  }
+  if (!text || !levelsPath) return usageFailure("classifier score --text T --levels FILE [--fake] [--json|--robot]");
   const levels = await readJson(levelsPath);
   const fetchImpl = fake
     ? createFakeFetch(JSON.parse(await readFile(new URL("./test/fixtures/sst5-answer.json", ROOT), "utf8")))
     : undefined;
-  const result = await scoreText({ text, levels, apiKey: fake ? "fixture-key" : undefined, fetchImpl, model: fake ? "fake" : undefined });
-  if (robot) robotPrint(result);
-  else process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
-  return 0;
+  return scoreText({ text, levels, apiKey: fake ? "fixture-key" : undefined, fetchImpl, model: fake ? "fake" : undefined });
 }
-const args = process.argv.slice(2);
-const robot = hasFlag(args, "--robot");
-let exitCode;
-try {
-  if (args[0] === "doctor") exitCode = await doctor(robot);
-  else if (args[0] === "ask") exitCode = await ask(args);
-  else if (args[0] === "rerank") exitCode = await rerank(args);
-  else if (args[0] === "classify") exitCode = await classify(args);
-  else if (args[0] === "verify") exitCode = await verify(args);
-  else if (args[0] === "score") exitCode = await score(args);
-  else if (args[0] === "gate") exitCode = await gate(args);
-  else if (args[0] === "omp" && args[1] === "install") {
-    const repo = option(args, "--dir") ?? process.cwd();
-    const result = await installOmp(repo, hasFlag(args, "--dry-run"));
-    if (robot) robotPrint(result); else process.stdout.write(`${result.status}: copied ${result.files.length} files in ${result.repo}; extensions require manual config merge before omp loads them\n`);
-    exitCode = 0;
-  } else if (args[0] === "omp" && args[1] === "uninstall") {
-    const repo = option(args, "--dir") ?? process.cwd();
-    const result = await uninstallOmp(repo, !hasFlag(args, "--apply"));
-    if (robot) robotPrint(result); else process.stdout.write(`${result.status}: ${result.files.length} listed, ${result.kept.length} kept (edited), ${result.missing.length} already missing in ${result.repo}\n`);
-    exitCode = 0;
-  } else {
-    const error = { status: "ERROR", reason: "usage", message: "jev doctor|gate|ask|rerank|classify|verify|score ..." };
-    if (robot) robotPrint(error); else process.stderr.write(`${error.message}\n`);
-    exitCode = 1;
+async function main() {
+  const args = process.argv.slice(2);
+  const parsed = parseArgv(args);
+  if (parsed.version) {
+    const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+    process.stdout.write(`classifier ${pkg.version}\n`);
+    return 0;
   }
-} catch (error) {
-  const result = { status: "ERROR", reason: "exception", message: error instanceof Error ? error.message : String(error) };
-  if (robot) robotPrint(result); else process.stderr.write(`${result.message}\n`);
-  exitCode = 1;
+  if (parsed.help || args.length === 0) {
+    const topic = args[0] === "help" ? args[1] ?? "" : parsed.command ?? "";
+    process.stdout.write(`${helpFor(topic)}\n`);
+    return 0;
+  }
+  if (parsed.error) {
+    const { message, correctedCommand } = parsed.error;
+    const detail = `${message}${correctedCommand ? `\nDid you mean: ${correctedCommand}` : ""}`;
+    if (parsed.outputMode === "human") process.stderr.write(`${detail}\n`);
+    else process.stdout.write(`${JSON.stringify(createEnvelope("cli", usageFailure(detail)))}\n`);
+    return exitCodeForFailure(usageFailure(detail));
+  }
+
+  let result;
+  try {
+    if (parsed.command === "doctor") result = await doctor();
+    else if (parsed.command === "ask") result = await ask(args);
+    else if (parsed.command === "rerank") result = await rerank(args);
+    else if (parsed.command === "classify") result = await classify(args);
+    else if (parsed.command === "verify") result = await verify(args);
+    else if (parsed.command === "score") result = await score(args);
+    else if (parsed.command === "gate") result = await gate(args);
+    else if (parsed.command === "omp" && parsed.subcommand === "install") {
+      result = { ok: true, ...await installOmp(option(args, "--dir") ?? process.cwd(), hasFlag(args, "--dry-run")) };
+    } else if (parsed.command === "omp" && parsed.subcommand === "uninstall") {
+      result = { ok: true, ...await uninstallOmp(option(args, "--dir") ?? process.cwd(), !hasFlag(args, "--apply")) };
+    } else {
+      result = usageFailure("classifier doctor|gate|ask|rerank|classify|verify|score|omp ...");
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const code = error && typeof error === "object" ? error.code : undefined;
+    const knownReasons = ["unconfigured", "sdk-missing", "billing-hold", "transport", "http", "non-json", "no-answers", "invalid-answer"];
+    const reason = knownReasons.find((candidate) => message.includes(`(${candidate})`))
+      ?? (code === "ENOENT" ? "no-input" : ["EACCES", "EIO", "EISDIR"].includes(code) ? "io" : "exception");
+    result = { ok: false, reason, error: message, ...(code ? { code } : {}) };
+  }
+
+  const doctorFailure = parsed.command === "doctor" && result.status !== "READY";
+  const envelopeResult = parsed.command === "doctor"
+    ? { ...result, ok: !doctorFailure, reason: result.reason === "no key" ? "unconfigured" : result.reason === "sdk missing" ? "sdk-missing" : result.reason, error: result.reason }
+    : result;
+  const exitCode = parsed.command === "doctor"
+    ? (result.status === "READY" ? 0 : result.reason === "sdk missing" ? 6 : 1)
+    : result.ok === true ? 0 : exitCodeForFailure(result);
+
+  if (parsed.outputMode !== "human") {
+    if (parsed.outputMode === "json" && parsed.command === "doctor") {
+      process.stdout.write(`${JSON.stringify(result)}\n`);
+    } else {
+      const envelopeOptions = parsed.command === "doctor" ? { data: result } : {};
+      process.stdout.write(`${JSON.stringify(createEnvelope(parsed.command ?? "cli", envelopeResult, envelopeOptions))}\n`);
+    }
+  } else if (result.reason === "usage") {
+    process.stderr.write(`${result.error}\n`);
+  } else if (parsed.command === "doctor") {
+    process.stdout.write(`${result.status}: ${result.reason ?? "ready"} (model=${result.model})\n`);
+  } else if (parsed.command === "omp" && parsed.subcommand === "install") {
+    process.stdout.write(`${result.status}: copied ${result.files.length} files in ${result.repo}; extensions require manual config merge before omp loads them\n`);
+  } else if (parsed.command === "omp" && parsed.subcommand === "uninstall") {
+    process.stdout.write(`${result.status}: ${result.files.length} listed, ${result.kept.length} kept (edited), ${result.missing.length} already missing in ${result.repo}\n`);
+  } else if (result.ok === false && result.reason !== "unconfigured") {
+    process.stderr.write(`${result.error}\n`);
+  } else {
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+  }
+  return exitCode;
 }
-process.exitCode = exitCode;
+
+process.exitCode = await main().catch((error) => {
+  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+  return 74;
+});
