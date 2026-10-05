@@ -47,7 +47,7 @@ test('PLANTED NEGATIVE: a .md mention is not a caller', () => {
 });
 
 test('a registered entry point counts as reachable even with zero importers', () => {
-  const row = labelCommit(sh('git log --format=%H -1 --no-merges -- foundation/gates.d/'));
+  const row = labelCommit(sh('git log --format=%H -1 --no-merges -- ":(glob)foundation/gates.d/*.sh"'));
   if (row.sourceFiles === 0) return;
   assert.equal(row.behaviour, true, 'gates.d stages are invoked by the glob and are entry points');
 });
