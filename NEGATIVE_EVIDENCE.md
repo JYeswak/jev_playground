@@ -5123,3 +5123,19 @@ Reopen cites this row.
 **Retry-condition:** a design beating prec 0.42 / rec 0.18 on the frozen sample sha acc2cdb9a56f keylessly-first (table recomputed), or labels measuring compute time rather than job lifetime (reaped-completion join proving the join keyless first). Reopen cites this row.
 
 **Evidence:** work/zezf/PREREG.md + run_long.mjs + longrows.jsonl (300 rows) + run_devcue.mjs + devcue.jsonl (240 rows) + H2 bar; scratch sample.json/devset.json (row hashes); bead jev-zezf prereg + result + H2 comments.
+
+## R153 — REFUTED: organic skill-load veto meets its preregistered precision bar (2026-10-05)
+
+**Hypothesis:** the skill-load veto at cut 0.40 reaches precision >= 0.80 and miss rate <= 0.10 on organic skill loads, justifying enforcement.
+
+**Minimal repro / experiment:** 200 blind-labelled organic loads (seed 20261002, frozen before scoring); pinned jev-1.13.0, same fits question and cut 0.40; enforce only if precision >= 0.80, miss rate <= 0.10, and at least 30 vetoes.
+
+**Expected signal:** at least 30 vetoes with precision >= 0.80 and miss rate <= 0.10.
+
+**Result (measured, inline):** 158/200 vetoes; 53/158 = 0.335 precision [0.27, 0.41], miss rate 0.881 [0.75, 0.95], both bars missed; 200 calls, ~$0.0053.
+
+**Verdict:** REFUTED. Enforcement at this question and cut is off; the result does not refute the broader area.
+
+**Retry-condition:** a new skill-veto decision structure is committed in its own preregistration, with frozen organic labels, a stated pass bar, and a bounded live-call cap, before any further live calls.
+
+**Evidence:** `EVAL.md:3549-3551`; `work/wbel/PREREG-replay.md`, `work/wbel/replay-rows.jsonl`; bead `jev-wbel`.

@@ -191,6 +191,18 @@
       "saving": "memory tokens removed per turn: median 797, p90 3,408 (14 live turns, OrangeFrog); keep precision 0.22 jev-m959 VERIFIED+CLOSED, saving unchanged"
     },
     {
+      "id": "skill-veto",
+      "group": "extension",
+      "name": "skill-load veto shadow",
+      "decision": "does this skill load fit the request?",
+      "how": "work/wbel/jev-skill-veto.ts",
+      "expect": "off",
+      "extension": "./work/wbel/jev-skill-veto.ts",
+      "verdict": "REFUTED",
+      "evidence": "EVAL.md:3549-3551: 53/158 = 0.335 precision on organic loads; enforcement bar failed",
+      "saving": "n/a"
+    },
+    {
       "id": "gate-cascade",
       "group": "hook",
       "name": "gate nimble-then-Jev cascade",

@@ -22,6 +22,7 @@ flowchart LR
   subgraph extension["project extensions"]
     skill_hint["per-prompt skill hint<br/>OFF-MISROUTES<br/>expect off"]
     memory_filter["memory relevance filter shadow<br/>ENFORCING<br/>expect on"]
+    skill_veto["skill-load veto shadow<br/>REFUTED<br/>expect off"]
   end
   subgraph rule["judged rules"]
     claim_rule["claim-without-evidence rule<br/>REFUTED<br/>expect off"]
@@ -55,6 +56,6 @@ flowchart LR
   classDef nobenefit fill:#ffe0c2,stroke:#a85a00
   classDef off fill:#e6e6e6,stroke:#777,stroke-dasharray:4 3
   class smart_stop,gate_observe,websearch_rerank nobenefit
-  class skill_hint,claim_rule,local_sys1 off
+  class skill_hint,claim_rule,local_sys1,skill_veto off
   class vendor_shadow unproven
   class find,auto_thinking,ttsr_judged,injection_shadow,webscreen,needs_human,key_wrapper,agents_trim,memory_filter,gate_cascade,webscreen_global,injection_global works
