@@ -8,12 +8,15 @@
 #   2. a hold file, ~/.local/state/jev/local-gpu-hold-until, containing a UTC epoch second; pane 1
 #      writes it to grant localbench a quiet window.
 #
-# Usage: scripts/local-model-guard.sh [--timeout SECONDS]   (default: wait indefinitely)
-# Exit:  0 GPU free, 2 timed out waiting, 3 localbench status unreadable (fail closed).
+# Usage: scripts/local-model-guard.sh [--once | --timeout SECONDS] (default: wait indefinitely)
+# --once performs one hold/park check and returns immediately when busy.
+# Exit: 0 GPU free, 2 timed out/busy, 3 localbench status unreadable (fail closed).
 set -euo pipefail
 
 timeout=0
-if [[ "${1:-}" == "--timeout" ]]; then timeout="${2:?--timeout needs seconds}"; fi
+once=0
+if [[ "${1:-}" == "--once" ]]; then once=1
+elif [[ "${1:-}" == "--timeout" ]]; then timeout="${2:?--timeout needs seconds}"; fi
 hold_file="${JEV_GPU_HOLD_FILE:-$HOME/.local/state/jev/local-gpu-hold-until}"
 localbench_bin="${LOCALBENCH_BIN:-localbench}"
 start=$(date +%s)
@@ -47,5 +50,9 @@ while true; do
     exit 2
   fi
   echo "local-model-guard: waiting: $reason"
+  if [[ "$once" == "1" ]]; then
+    echo "local-model-guard: still waiting: $reason" >&2
+    exit 2
+  fi
   sleep 30
 done

@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { addedBlocks, isScoredPath, scoreCommit, VENDOR_CUT } from './vendor-shadow.mjs';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { main, addedBlocks, askLocal, isScoredPath, scoreCommit, VENDOR_CUT } from './vendor-shadow.mjs';
 
 const MIT_BLOCK = `/*
 Copyright (c) 2024 Example Corp. All rights reserved.
@@ -94,22 +96,105 @@ test('cut 0.35 is the frozen 30hi operating point', () => {
 });
 
 test('jev-517o: local verdict is logged beside Jev, Platt-mapped; a down server logs NOT_RUN and Jev row still lands', async () => {
-  const { askLocal, plattMap } = await import('./vendor-shadow.mjs');
-  const diff = diffOf('work/pasted-lib/index.js', MIT_BLOCK.split('\n'));
-  const ok = async () => ({ ok: true, json: async () => ({ answers: { vendored: { noul: 0.2 } } }) });
+  const { plattMap } = await import('./vendor-shadow.mjs');
+  const previous = process.env.JEV_VENDOR_LOCAL_URL;
+  process.env.JEV_VENDOR_LOCAL_URL = 'http://x';
+  try {
+    const diff = diffOf('work/pasted-lib/index.js', MIT_BLOCK.split('\n'));
+    const ok = async () => ({ ok: true, json: async () => ({ answers: { vendored: { noul: 0.2 } } }) });
+    const available = async () => ({ available: true });
+    const rows = [];
+    await scoreCommit({ commit: 'l1', diff, ask: noulAnswer(0.91), log: async (r) => rows.push(r), count: async () => 0, local: (code) => askLocal(code, 'http://x', ok, available) });
+    const s = rows.find((r) => r.status === 'scored');
+    assert.equal(s.noul, 0.91);
+    assert.equal(s.local_status, 'scored');
+    assert.equal(s.local_raw, 0.2);
+    assert.ok(Math.abs(s.local_noul - plattMap(0.2)) < 1e-12);
+    assert.ok(s.local_noul > 0.2, 'Platt b>0 lifts low raw scores (fitted on vendor dev)');
+    const down = async () => { throw Object.assign(new Error('refused'), { name: 'TypeError' }); };
+    const rows2 = [];
+    const r = await scoreCommit({ commit: 'l2', diff, ask: noulAnswer(0.91), log: async (x) => rows2.push(x), count: async () => 0, local: (code) => askLocal(code, 'http://x', down, available) });
+    assert.equal(r.scored, 1);
+    const s2 = rows2.find((x) => x.status === 'scored');
+    assert.equal(s2.noul, 0.91);
+    assert.equal(s2.local_status, 'NOT_RUN');
+  } finally {
+    if (previous === undefined) delete process.env.JEV_VENDOR_LOCAL_URL;
+    else process.env.JEV_VENDOR_LOCAL_URL = previous;
+  }
+});
+test('local leg is disabled before fetch or guard when its opt-in URL is unset', async () => {
+  const previous = process.env.JEV_VENDOR_LOCAL_URL;
+  delete process.env.JEV_VENDOR_LOCAL_URL;
+  let fetchCalls = 0;
+  let guardCalls = 0;
+  try {
+    const result = await askLocal('code', undefined, async () => {
+      fetchCalls += 1;
+      throw new Error('fetch must not run');
+    }, async () => {
+      guardCalls += 1;
+      return { available: true };
+    });
+    assert.equal(result.local_status, 'NOT_RUN');
+    assert.equal(fetchCalls, 0);
+    assert.equal(guardCalls, 0);
+  } finally {
+    if (previous === undefined) delete process.env.JEV_VENDOR_LOCAL_URL;
+    else process.env.JEV_VENDOR_LOCAL_URL = previous;
+  }
+});
+
+test('local guard timeout bounds the post-commit runner under two seconds', async () => {
+  const scratch = await mkdtemp(join(process.cwd(), 'var/agent-tmp/jev-a5ny.'));
+  await writeFile(join(scratch, '.owner'), `pid=${process.pid}\nlabel=jev-a5ny-test\nrepo=${process.cwd()}\ncreated=${new Date().toISOString()}\n`);
+  const stub = join(scratch, 'localbench-sleeps.sh');
+  await writeFile(stub, '#!/bin/sh\nexec /bin/sleep 30\n', { mode: 0o755 });
+
+  const prior = {
+    url: process.env.JEV_VENDOR_LOCAL_URL,
+    bin: process.env.LOCALBENCH_BIN,
+    hold: process.env.JEV_GPU_HOLD_FILE,
+  };
+  process.env.JEV_VENDOR_LOCAL_URL = 'http://127.0.0.1:8010/v1/systemone';
+  process.env.LOCALBENCH_BIN = stub;
+  process.env.JEV_GPU_HOLD_FILE = join(scratch, 'missing-hold-file');
   const rows = [];
-  await scoreCommit({ commit: 'l1', diff, ask: noulAnswer(0.91), log: async (r) => rows.push(r), count: async () => 0, local: (code) => askLocal(code, 'http://x', ok) });
-  const s = rows.find((r) => r.status === 'scored');
-  assert.equal(s.noul, 0.91);
-  assert.equal(s.local_status, 'scored');
-  assert.equal(s.local_raw, 0.2);
-  assert.ok(Math.abs(s.local_noul - plattMap(0.2)) < 1e-12);
-  assert.ok(s.local_noul > 0.2, 'Platt b>0 lifts low raw scores (fitted on vendor dev)');
-  const down = async () => { throw Object.assign(new Error('refused'), { name: 'TypeError' }); };
-  const rows2 = [];
-  const r = await scoreCommit({ commit: 'l2', diff, ask: noulAnswer(0.91), log: async (x) => rows2.push(x), count: async () => 0, local: (code) => askLocal(code, 'http://x', down) });
-  assert.equal(r.scored, 1);
-  const s2 = rows2.find((x) => x.status === 'scored');
-  assert.equal(s2.noul, 0.91);
-  assert.equal(s2.local_status, 'NOT_RUN');
+  const diff = diffOf('work/pasted-lib/index.js', MIT_BLOCK.split('\n'));
+  const git = (args) => {
+    if (args.join(' ') === 'rev-parse HEAD') return 'commit-a5ny';
+    if (args.join(' ') === 'rev-parse HEAD^') return 'parent-a5ny';
+    if (args[0] === 'show') return diff;
+    throw new Error(`unexpected git args: ${args.join(' ')}`);
+  };
+  const started = Date.now();
+  try {
+    const result = await main([], {
+      ask: noulAnswer(0.91),
+      git,
+      log: async (row) => rows.push(row),
+      count: async () => 0,
+      local: (code) => askLocal(code, undefined, async () => {
+        throw new Error('fetch must not run after guard timeout');
+      }),
+    });
+    assert.equal(result, 0);
+    assert.ok(Date.now() - started < 2000, `runner took ${Date.now() - started}ms`);
+    const row = rows.find((x) => x.status === 'scored');
+    assert.equal(row?.local_status, 'NOT_RUN');
+  } finally {
+    for (const [name, value] of Object.entries({
+      JEV_VENDOR_LOCAL_URL: prior.url,
+      LOCALBENCH_BIN: prior.bin,
+      JEV_GPU_HOLD_FILE: prior.hold,
+    })) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  }
+});
+
+test('local endpoint has no baked-in loopback default', async () => {
+  const source = await readFile(new URL('./vendor-shadow.mjs', import.meta.url), 'utf8');
+  assert.equal(source.includes('127.0.0.1:8010'), false);
 });

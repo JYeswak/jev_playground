@@ -16,7 +16,8 @@ import { appendFile, mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { askJev } from "../../kit/src/client.ts";
 import { useInfisicalKey } from "../../work/jev-client/src/use-infisical-key.ts";
 
@@ -104,19 +105,58 @@ export async function todayCount(logFile = LOG_FILE) {
 
 // jev-517o: a second, local verdict (Clef-flash + Platt map fitted on vendor dev, jev-576e) logged
 // beside Jev's. Log only; NOT_RUN when the local server is absent; never blocks the commit.
-export const LOCAL_URL = process.env.JEV_VENDOR_LOCAL_URL ?? "http://127.0.0.1:8010/v1/systemone";
+export const LOCAL_URL = process.env.JEV_VENDOR_LOCAL_URL;
 export const LOCAL_PLATT = { a: 1.239, b: 2.926 };
 export const LOCAL_TIMEOUT_MS = 10000;
+const LOCAL_GUARD_TIMEOUT_MS = 750;
+const LOCAL_GUARD_SCRIPT = fileURLToPath(new URL("../../scripts/local-model-guard.sh", import.meta.url));
 
 export function plattMap(p, { a, b } = LOCAL_PLATT) {
   const q = Math.min(Math.max(p, 1e-4), 1 - 1e-4);
   return 1 / (1 + Math.exp(-(a * Math.log(q / (1 - q)) + b)));
 }
 
-export async function askLocal(code, url = LOCAL_URL, fetchImpl = fetch) {
+function runLocalModelGuard() {
+  return new Promise((resolve) => {
+    let settled = false;
+    let timer;
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(result);
+    };
+    let child;
+    try {
+      child = spawn("/bin/bash", [LOCAL_GUARD_SCRIPT, "--once"], { detached: true, stdio: "ignore" });
+    } catch {
+      finish({ available: false, reason: "guard-error" });
+      return;
+    }
+    child.once("error", () => finish({ available: false, reason: "guard-error" }));
+    child.once("close", (code) => finish(code === 0
+      ? { available: true }
+      : { available: false, reason: "guard-unavailable" }));
+    timer = setTimeout(() => {
+      if (child.pid !== undefined) {
+        try {
+          process.kill(-child.pid, "SIGKILL");
+        } catch {}
+      }
+      finish({ available: false, reason: "guard-timeout" });
+    }, LOCAL_GUARD_TIMEOUT_MS);
+  });
+}
+
+export async function askLocal(code, url = process.env.JEV_VENDOR_LOCAL_URL, fetchImpl = fetch, guard = runLocalModelGuard) {
+  const configuredUrl = process.env.JEV_VENDOR_LOCAL_URL;
+  if (!configuredUrl) return { local_status: "NOT_RUN", local_reason: "disabled" };
+  const endpoint = url ?? configuredUrl;
   const started = Date.now();
   try {
-    const res = await fetchImpl(url, {
+    const status = await guard();
+    if (!status?.available) return { local_status: "NOT_RUN", local_reason: status?.reason ?? "local-guard" };
+    const res = await fetchImpl(endpoint, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ model: "clef-flash", state: { code }, questions: { vendored: { type: "noul", instructions: VENDOR_QUESTION } } }),
@@ -187,18 +227,26 @@ function git(args) {
   return execFileSync("git", args, { encoding: "utf8", timeout: 15000 }).trim();
 }
 
-export async function main(argv = process.argv.slice(2)) {
-  useInfisicalKey();
-  const ask = (o) => askJev(o);
+export async function main(argv = process.argv.slice(2), dependencies = {}) {
+  const ask = dependencies.ask ?? ((o) => askJev(o));
+  if (!dependencies.ask) useInfisicalKey();
+  const gitCommand = dependencies.git ?? git;
   try {
-    const commit = git(["rev-parse", "HEAD"]);
-    const parent = (() => { try { return git(["rev-parse", "HEAD^"]); } catch { return null; } })();
+    const commit = gitCommand(["rev-parse", "HEAD"]);
+    const parent = (() => { try { return gitCommand(["rev-parse", "HEAD^"]); } catch { return null; } })();
     if (!parent) {
       console.error("VENDOR_SHADOW_SKIPPED reason=root-commit");
       return 0;
     }
-    const diff = git(["show", "--format=", "--unified=0", "HEAD"]);
-    await scoreCommit({ commit, diff, ask, log: appendRow, count: () => todayCount() });
+    const diff = gitCommand(["show", "--format=", "--unified=0", "HEAD"]);
+    await scoreCommit({
+      commit,
+      diff,
+      ask,
+      log: dependencies.log ?? appendRow,
+      count: dependencies.count ?? (() => todayCount()),
+      local: dependencies.local ?? askLocal,
+    });
   } catch (err) {
     console.error(`VENDOR_SHADOW_SKIPPED reason=git-failed err=${String(err).slice(0, 80)}`);
   }
