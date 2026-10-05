@@ -285,15 +285,22 @@ def _memory_rows() -> tuple[list[dict[str, Any]], dict[str, int]]:
 def _gate_rows() -> tuple[list[dict[str, Any]], dict[str, int]]:
     blind_commands = _json(ROOT / "var/agent-tmp/syje.51150/blind-cmds.json")
     command_set = set(blind_commands)
-    log_rows = _jsonl(Path.home() / ".local/state/jev/gate-observe.jsonl")
+    state_dir = Path.home() / ".local/state/jev"
+    log_rows = _jsonl(state_dir / "gate-observe.jsonl")
+    sidecar_by_hash: dict[str, str] = {
+        row["cmdSha"]: row["cmd"]
+        for row in _jsonl(state_dir / "gate-observe-full.jsonl")
+        if isinstance(row.get("cmdSha"), str) and isinstance(row.get("cmd"), str)
+    }
     event_rows = [
         row
         for row in log_rows
-        if GATE_START <= row.get("ts", "") < GATE_END and row.get("cmd") in command_set
+        if GATE_START <= row.get("ts", "") < GATE_END
+        and sidecar_by_hash.get(row.get("cmdSha")) in command_set
     ]
     by_command: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in event_rows:
-        by_command[row["cmd"]].append(row)
+        by_command[sidecar_by_hash[row["cmdSha"]]].append(row)
 
     exclusions: Counter[str] = Counter()
     output: list[dict[str, Any]] = []

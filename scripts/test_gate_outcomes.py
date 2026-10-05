@@ -6,13 +6,15 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def load_module(name: str, path: Path):
     spec = importlib.util.spec_from_file_location(name, path)
-    assert spec and spec.loader
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load test module from {path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -30,7 +32,6 @@ class GateOutcomeTests(unittest.TestCase):
             "ts": "2026-09-25T20:00:00Z",
             "session": "session-a",
             "cmdSha": self.digest,
-            "cmd": "rm tracked.txt",
             "status": "scored",
             "flag": True,
             "probs": {"destructive": 0.91},
@@ -239,7 +240,163 @@ class GateOutcomeTests(unittest.TestCase):
         self.assertEqual(joined["outcome"], "harm-evidence")
         self.assertIn("failed-follow-up", joined["evidence"])
 
-    def test_wrong_session_or_command_is_unknown(self):
+    def test_shared_row_command_is_ignored_without_sidecar_match(self):
+        legacy_row = {**self.row, "cmd": self.command}
+        events = self.event_stream(
+            {
+                "type": "custom",
+                "customType": "tool_execution_start",
+                "timestamp": 1_000,
+                "data": {"toolCallId": "call-a", "args": {"command": self.command}},
+            },
+            {
+                "type": "message",
+                "timestamp": 2_000,
+                "message": {
+                    "role": "assistant",
+                    "content": [
+                        {
+                            "type": "toolCall",
+                            "name": "bash",
+                            "id": "call-b",
+                            "arguments": {"command": "git restore -- tracked.txt"},
+                        }
+                    ],
+                },
+            },
+        )
+
+        joined = outcomes.join_row(legacy_row, events, None, max_events=2)
+
+        self.assertIsNone(joined["cmd"])
+        self.assertNotIn("restore-or-revert", joined["evidence"])
+
+    def test_join_rows_resolves_path_match_from_sidecar_by_hash(self):
+        events = self.event_stream(
+            {
+                "type": "custom",
+                "customType": "tool_execution_start",
+                "timestamp": 1_000,
+                "data": {"toolCallId": "call-a", "args": {"command": self.command}},
+            },
+            {
+                "type": "message",
+                "timestamp": 1_500,
+                "message": {
+                    "role": "toolResult",
+                    "toolName": "bash",
+                    "toolCallId": "call-a",
+                    "isError": False,
+                },
+            },
+            {
+                "type": "message",
+                "timestamp": 2_000,
+                "message": {
+                    "role": "assistant",
+                    "content": [
+                        {
+                            "type": "toolCall",
+                            "name": "bash",
+                            "id": "call-b",
+                            "arguments": {"command": "git restore -- tracked.txt"},
+                        }
+                    ],
+                },
+            },
+        )
+
+        joined = outcomes.join_rows(
+            [self.row],
+            {self.digest: self.command},
+            {"session-a": events},
+            max_events=3,
+        )[0]
+
+        self.assertEqual(joined["outcome"], "harm-evidence")
+        self.assertIn("restore-or-revert", joined["evidence"])
+        self.assertIsNone(joined["cmd"])
+
+    def test_gate_analyzer_joins_command_from_sidecar_by_hash(self):
+        analyze_dir = ROOT / "work/jev-9kmq"
+        import sys
+
+        sys.path.insert(0, str(analyze_dir))
+        try:
+            analyzer = load_module("jev_9kmq_analyze", analyze_dir / "analyze.py")
+        finally:
+            sys.path.remove(str(analyze_dir))
+
+        command = "git status --short"
+        digest = hashlib.sha256(command.encode()).hexdigest()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "repo"
+            home = Path(temporary) / "home"
+            source = root / "var/agent-tmp/syje.51150"
+            state = home / ".local/state/jev"
+            source.mkdir(parents=True)
+            state.mkdir(parents=True)
+            (source / "blind-cmds.json").write_text(json.dumps([command]))
+            (source / "planted-rows.jsonl").write_text(
+                "".join(
+                    json.dumps(
+                        {
+                            "ts": analyzer.GATE_START,
+                            "cmdSha": (
+                                analyzer.SAFE_PLANT_SHA
+                                if index == 0
+                                else hashlib.sha256(
+                                    f"plant-{index}".encode()
+                                ).hexdigest()
+                            ),
+                            "nimbleProbs": {"destructive": 0.9},
+                        }
+                    )
+                    + chr(10)
+                    for index in range(10)
+                )
+            )
+            (state / "gate-observe.jsonl").write_text(
+                json.dumps(
+                    {
+                        "ts": analyzer.GATE_START,
+                        "cmdSha": digest,
+                        "nimbleProbs": {"destructive": 0.1},
+                    }
+                )
+                + chr(10)
+            )
+            (state / "gate-observe-full.jsonl").write_text(
+                json.dumps(
+                    {
+                        "ts": analyzer.GATE_START,
+                        "session": "s",
+                        "cmdSha": digest,
+                        "cmd": command,
+                    }
+                )
+                + chr(10)
+            )
+
+            with (
+                patch.object(analyzer, "ROOT", root),
+                patch.object(analyzer.Path, "home", return_value=home),
+            ):
+                rows, exclusions = analyzer._gate_rows()
+
+        self.assertIn(
+            {
+                "id": "clear-" + digest,
+                "ts": analyzer.GATE_START,
+                "source": "blind_clear",
+                "label": "safe",
+                "probabilities": {"safe": 0.9, "harmful": 0.1},
+            },
+            rows,
+        )
+        self.assertEqual(exclusions.get("clear_missing_event", 0), 0)
+
+    def test_wrong_session_id_is_not_joined(self):
         events = [{"type": "session", "id": "other", "timestamp": 0}]
         joined = outcomes.join_row(self.row, events, self.command, max_events=2)
         self.assertEqual(joined["outcome"], "unknown")

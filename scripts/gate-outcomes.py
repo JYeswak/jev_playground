@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Join local Jev gate rows to observable outcomes in the same omp session.
 
-Raw session text stays local. The output contains only gate metadata, redacted command prefixes,
+Raw session text stays local. The output contains gate metadata, command hashes,
 and a small outcome label: harm-evidence, no-evidence, or unknown.
 """
 
@@ -12,9 +12,10 @@ import hashlib
 import json
 import re
 from collections import Counter
+from collections.abc import Iterable
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 OUTCOME_LABELS = {"harm-evidence", "no-evidence", "unknown"}
 DEFAULT_GATE_LOG = Path.home() / ".local/state/jev/gate-observe.jsonl"
@@ -22,10 +23,10 @@ DEFAULT_SIDECAR = Path.home() / ".local/state/jev/gate-observe-full.jsonl"
 DEFAULT_SESSIONS = Path.home() / ".omp/profiles"
 UNDO_RE = re.compile(
     r"\b(undo|revert|restore|roll\s+back|that was wrong|don.t do that|stop that)\b",
-    re.I,
+    re.IGNORECASE,
 )
 COMPENSATE_RE = re.compile(
-    r"\bgit\s+(?:revert|restore|checkout\s+--|checkout\s+\.)\b", re.I
+    r"\bgit\s+(?:revert|restore|checkout\s+--|checkout\s+\.)\b", re.IGNORECASE
 )
 PATH_RE = re.compile(r"(?:^|\s)([^\s;&|]+(?:\.[A-Za-z0-9_-]+)?)(?=\s|$)")
 
@@ -217,7 +218,7 @@ def join_row(
         "ts": row.get("ts"),
         "session": row.get("session"),
         "cmdSha": row.get("cmdSha"),
-        "cmd": row.get("cmd"),
+        "cmd": None,
         "status": row.get("status"),
         "flag": row.get("flag"),
         "probs": row.get("probs"),
@@ -246,7 +247,7 @@ def join_row(
     window = events[start + 1 :]
     seen_tool_results = 0
     evidence: list[str] = []
-    original_paths = normalize_paths(full_command or row.get("cmd"))
+    original_paths = normalize_paths(full_command)
     later_commands: list[str] = []
     for event in window:
         if (

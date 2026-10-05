@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  MAX_PREFIX, REAL_SAMPLE, ROW_KEYS, SIDECAR_KEYS, buildRow, defaultFilter, defaultSidecarAppend,
-  loadFilters, makeFilter, makeHandler, matchPrerule, observe as observeRaw, redact, resetBillingHold,
+  REAL_SAMPLE, ROW_KEYS, SIDECAR_KEYS, defaultFilter, defaultSidecarAppend,
+  loadFilters, makeFilter, makeHandler, matchPrerule, observe as observeRaw, resetBillingHold,
 } from "./jev-gate-observe.ts";
 import gateObserveHook from "./jev-gate-observe.ts";
 import { askJevBundle, observedFetch, setKeyProvider } from "../../../kit/src/client.ts";
@@ -73,16 +73,9 @@ test("secret command is skipped and the asker never runs", async () => {
   assert.equal(wrote[0].row.status, "skipped");
   assert.equal(wrote[0].row.skipped, "secret");
   assert.equal(wrote[0].row.probs, null);
-  assert.match(wrote[0].row.cmd, /\[REDACTED\]/);
+  assert.equal(Object.hasOwn(wrote[0].row, "cmd"), false);
 });
 
-test("a key straddling the 200-char cut is scrubbed, not logged as a stub", () => {
-  const command = "x".repeat(MAX_PREFIX - 10) + " " + fakeKey;
-  const logged = redact(command);
-  assert.ok(logged.length <= MAX_PREFIX);
-  assert.doesNotMatch(logged, /sk-[a-z]/, `partial key leaked: ${logged.slice(-15)}`);
-  assert.equal(buildRow({ session: "s", command, now }).cmd, logged);
-});
 
 test("asker receives the landed true/false criteria", async () => {
   reset();
@@ -165,7 +158,7 @@ test("secret-shaped and filter-error commands write no sidecar row", async () =>
   assert.equal(full.length, 0, "a dropped command reached the full-command sidecar");
 });
 
-test("sidecar text equals the scored command, joins by cmdSha, and leaves the prefix row unchanged", async () => {
+test("shared log carries only cmdSha while sidecar retains the exact scored command", async () => {
   reset();
   const command = `cd ${homedir()}/Developer/jev && ` + "echo long-body ".repeat(30) + "| hub send --to pane1";
   let scored;
@@ -181,13 +174,13 @@ test("sidecar text equals the scored command, joins by cmdSha, and leaves the pr
   assert.equal(row.cmdSha, side.cmdSha);
   assert.equal(side.session, "s1");
   assert.equal(side.ts, row.ts);
+  assert.equal(Object.hasOwn(row, "cmd"), false);
+  assert.equal(JSON.stringify(row).includes(command), false);
   assert.deepEqual(Object.keys(row).sort(), [...ROW_KEYS].sort());
-  assert.equal(row.cmd, redact(command), "the prefix log changed shape");
-  assert.ok(row.cmd.length <= MAX_PREFIX && command.length > MAX_PREFIX);
   assert.equal(full[0].path, "/tmp/x-full.jsonl");
 });
 
-test("a failing sidecar write still logs the scored prefix row", async () => {
+test("a failing sidecar write still logs the hash-only scored row", async () => {
   reset();
   await observe({ toolName: "bash", input: { command: "ls" } },
     { asker: scoredAsker, ...mem, appendSidecar: async () => { throw new Error("disk gone"); } });
@@ -195,18 +188,31 @@ test("a failing sidecar write still logs the scored prefix row", async () => {
   assert.equal(wrote[0].row.status, "scored");
 });
 
-test("default sidecar writer creates mode 600 and narrows a pre-existing wider file", async () => {
-  // Scratch under the OS temp dir; left for the OS to reap (no deletes in this lane).
-  const dir = mkdtempSync(join(tmpdir(), "jev-sidecar-"));
-  const fresh = join(dir, "nested", "full.jsonl");
-  await defaultSidecarAppend(fresh, '{"a":1}');
+test("shared log is mode 600 and rotates at its size limit with every file private", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "jev-log-"));
+  const appendObserved = async (logPath) => observe(
+    { toolName: "bash", input: { command: "ls" } },
+    { ...mem, append: undefined, logPath, asker: scoredAsker },
+  );
+  const fresh = join(dir, "fresh.jsonl");
+  await appendObserved(fresh);
   assert.equal(statSync(fresh).mode & 0o777, 0o600);
+
   const wide = join(dir, "wide.jsonl");
-  writeFileSync(wide, '{"old":1}\n', { mode: 0o644 });
+  writeFileSync(wide, '{"old":1}' + String.fromCharCode(10), { mode: 0o644 });
   assert.equal(statSync(wide).mode & 0o777, 0o644);
-  await defaultSidecarAppend(wide, '{"b":2}');
+  await appendObserved(wide);
   assert.equal(statSync(wide).mode & 0o777, 0o600);
-  assert.equal(readFileSync(wide, "utf8"), '{"old":1}\n{"b":2}\n');
+  assert.match(readFileSync(wide, "utf8"), /"cmdSha"/);
+
+  const rotate = join(dir, "rotate.jsonl");
+  writeFileSync(rotate, "x".repeat(5 * 1024 * 1024), { mode: 0o644 });
+  await appendObserved(rotate);
+  const archives = readdirSync(dir).filter((name) => name.startsWith("rotate.jsonl."));
+  assert.equal(archives.length, 1);
+  assert.equal(statSync(join(dir, archives[0])).mode & 0o777, 0o600);
+  assert.equal(statSync(rotate).mode & 0o777, 0o600);
+  assert.match(readFileSync(rotate, "utf8"), /"cmdSha"/);
 });
 
 // The owner of the filters is real-sample.py. Python's own parser (ast, no execution) is the
@@ -239,7 +245,6 @@ test("a drifted or unreadable owner changes behaviour and fails toward skip", ()
   assert.equal(makeFilter(drifted)("cd alps").drop, false, "the filter must follow the file, not a copy");
   assert.throws(() => loadFilters("PRIVATE = 1\n"));
   assert.deepEqual(makeFilter(null)("ls"), { drop: true, reason: "filter-error" });
-  assert.equal(redact(`echo ${fakeKey}`, "/home/x", null), "[filter-unavailable]");
 });
 
 test("forced-fail Infisical provider records NOT_RUN unconfigured and never reaches fetch", async () => {

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, chmod, readdir, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -53,6 +53,67 @@ test('omp install copies tools and hook without overwriting user files', async (
   const third = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
   assert.equal(third.code, 1);
   assert.match(JSON.parse(third.stdout).message, /user-edited/);
+});
+
+test('installed gate observer keeps command text out of shared logs and rotates private files', async () => {
+  const repo = await mkdtemp(join(tmpdir(), 'jev-gate-observe-'));
+  const installed = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
+  assert.equal(installed.code, 0, installed.stderr);
+
+  const stateDir = join(repo, 'state');
+  await mkdir(stateDir);
+  const shared = join(stateDir, 'gate-observe.jsonl');
+  await writeFile(shared, JSON.stringify({ status: 'old' }) + '\n', { mode: 0o644 });
+  await chmod(shared, 0o644);
+  const rotating = join(stateDir, 'rotating.jsonl');
+  const archiveMarker = 'archive-tail-preserved\n';
+  const archiveBytes = 5 * 1024 * 1024;
+  await writeFile(rotating, 'x'.repeat(archiveBytes - Buffer.byteLength(archiveMarker)) + archiveMarker, { mode: 0o644 });
+  await chmod(rotating, 0o644);
+
+  const hookUrl = pathToFileURL(join(repo, '.omp/hooks/post/jev-gate-observe.ts')).href;
+  const sharedPath = JSON.stringify(shared);
+  const rotatingPath = JSON.stringify(rotating);
+  const sidecarPath = JSON.stringify(join(stateDir, 'gate-observe-full.jsonl'));
+  const script = `
+    const { observe } = await import(${JSON.stringify(hookUrl)});
+    const deps = {
+      session: 'install-test',
+      filter: () => ({ drop: false }),
+      asker: async () => ({
+        ok: true,
+        scores: { destructive: 0.1, benign: 0.9 },
+        model: 'jev-1.13.0',
+        latencyMs: 1,
+        usage: { input_tokens: 1, output_tokens: 0 },
+      }),
+      sidecarPath: ${sidecarPath},
+    };
+    await observe({ toolName: 'bash', input: { command: 'ls' } }, { ...deps, logPath: ${sharedPath} });
+    await observe({ toolName: 'bash', input: { command: 'ls' } }, { ...deps, logPath: ${rotatingPath} });
+  `;
+  const smoke = await runNode(['--experimental-strip-types', '--input-type=module', '-e', script], repo);
+  assert.equal(smoke.code, 0, smoke.stderr);
+
+  const rows = (await readFile(shared, 'utf8')).trim().split('\n').map(JSON.parse);
+  assert.equal(Object.hasOwn(rows.at(-1), 'cmd'), false);
+  assert.equal((await stat(shared)).mode & 0o777, 0o600);
+  const sidecar = join(stateDir, 'gate-observe-full.jsonl');
+  const sidecarRows = (await readFile(sidecar, 'utf8')).trim().split('\n').map(JSON.parse);
+  assert.equal(sidecarRows.length, 2);
+  assert.ok(sidecarRows.every((row) => row.cmd === 'ls'));
+  assert.equal((await stat(sidecar)).mode & 0o777, 0o600);
+  const archives = (await readdir(stateDir)).filter((name) => name.startsWith('rotating.jsonl.'));
+  assert.equal(archives.length, 1);
+  const archivedPath = join(stateDir, archives[0]);
+  const archivedText = await readFile(archivedPath, 'utf8');
+  assert.equal(Buffer.byteLength(archivedText), archiveBytes);
+  assert.ok(archivedText.endsWith(archiveMarker));
+  assert.equal((await stat(archivedPath)).mode & 0o777, 0o600);
+  const activeRows = (await readFile(rotating, 'utf8')).trim().split('\n').map(JSON.parse);
+  assert.equal(activeRows.length, 1);
+  assert.equal(activeRows[0].status, 'scored');
+  assert.equal(Object.hasOwn(activeRows[0], 'cmd'), false);
 });
 
 test('install never replaces the host extension list or silently enables new extensions', async () => {

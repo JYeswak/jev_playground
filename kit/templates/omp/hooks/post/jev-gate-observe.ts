@@ -11,29 +11,25 @@
  *
  * Secrets: commands matching the PRIVATE/SECRET filters in
  * `work/bicameral-gate/real-sample.py` are never sent to the API — logged
- * `skipped:secret` with a redacted prefix. The patterns are compiled from that
+ * `skipped:secret` without command text. The patterns are compiled from that
  * file's source at load (`loadFilters`), so there is one owner and no copy to
  * drift; importing the .py is refused because it rewrites its output file at
  * module scope. If the source cannot be read or parsed, every command is
  * skipped `filter-error`: a filter failure fails safe toward skip.
  *
- * Full-command sidecar (bead jev-izhc, R92 retry): the log above keeps a
- * 200-char redacted prefix, but Jev scores the whole command, so a flag cannot
- * be relabelled or re-scored from the log. Every command that passes the
- * filters is also appended verbatim — the exact text sent as `state.command`,
- * no HOME rewrite — to `~/.local/state/jev/gate-observe-full.jsonl`, one row
- * `{ts, session, cmdSha, cmd}` joined to the log by `cmdSha`. A command the
- * filters drop (secret or filter-error) writes nothing there. The file is
- * created and re-asserted mode 600 on every append, lives outside every repo,
- * and must never be copied into a committed extract.
+ * The shared log contains command hashes and verdict metadata only. It is
+ * mode 0600 and rotates at `MAX_LOG_BYTES`; timestamped archives also stay
+ * mode 0600. The separate local-only sidecar retains the exact command scored
+ * by Jev for offline joins on `cmdSha`. It must never enter a committed extract.
+ * Commands dropped by filters write no sidecar row.
  *
  * No key: one row `NOT_RUN reason=unconfigured`, no throw. Any throw anywhere
  * in this module is caught: the tool path never sees us.
  */
 import { spawn } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { appendFile, mkdir, open } from "node:fs/promises";
+import { chmod, mkdir, open, rename } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -42,13 +38,14 @@ export { BILLING_HOLD_MS, resetBillingHold };
 import { CUT, RISK, STATE_CONTEXT } from "../../jev-kit/questions.mjs";
 
 export const MODEL = "jev-1.13.0";
-export const MAX_PREFIX = 200;
 export const LOG_REL = "state/jev/gate-observe.jsonl";
 export const SIDECAR_REL = "state/jev/gate-observe-full.jsonl";
+export const LOG_MODE = 0o600;
+export const MAX_LOG_BYTES = 5 * 1024 * 1024;
 export const SIDECAR_MODE = 0o600;
 export const SIDECAR_KEYS = ["ts", "session", "cmdSha", "cmd"] as const;
 /** Local-only; `cmd` is the full scored command. Never commit one. */
-export type SidecarRow = Pick<ObserveRow, "ts" | "session" | "cmdSha" | "cmd">;
+export type SidecarRow = { ts: string; session: string; cmdSha: string; cmd: string };
 export const INFISICAL_BIN = join(homedir(), ".local", "bin", "infisical");
 export const INFISICAL_PROJECT = "42b194c3-89d7-4ebb-895f-dd77ddf005ba";
 const KEY_TIMEOUT_MS = 8000;
@@ -112,7 +109,6 @@ export const REAL_SAMPLE = fileURLToPath(new URL("../../../work/bicameral-gate/r
 export interface Filters {
   privateRe: RegExp;
   secretRe: RegExp;
-  scrubRe: RegExp;
 }
 
 /**
@@ -133,7 +129,6 @@ export function loadFilters(src: string): Filters {
   return {
     privateRe: new RegExp(priv.source, priv.ignoreCase ? "i" : ""),
     secretRe: new RegExp(secret.source, secret.ignoreCase ? "i" : ""),
-    scrubRe: new RegExp(secret.source, secret.ignoreCase ? "gi" : "g"),
   };
 }
 
@@ -147,7 +142,7 @@ function loadOwnedFilters(): Filters | null {
 export const FILTERS: Filters | null = loadOwnedFilters();
 
 export const ROW_KEYS = [
-  "ts", "session", "cmdSha", "cmd", "status", "probs", "flag",
+  "ts", "session", "cmdSha", "status", "probs", "flag",
   "latencyMs", "tokens", "skipped", "error",
 ] as const;
 export type RowStatus = "scored" | "skipped" | "not-run" | "error";
@@ -155,7 +150,6 @@ export interface ObserveRow {
   ts: string;
   session: string;
   cmdSha: string;
-  cmd: string;
   status: RowStatus;
   probs: Record<string, number> | null;
   flag: boolean | null;
@@ -166,26 +160,16 @@ export interface ObserveRow {
 }
 
 
-/**
- * Redacted prefix for the log: HOME → ~, secret shapes scrubbed, then the
- * first 200 chars. Scrubbing before the cut matters: a key straddling char 200
- * would otherwise be cut below the pattern's minimum length and logged raw.
- */
-export function redact(command: string, home: string = homedir(), filters: Filters | null = FILTERS): string {
-  if (!filters) return "[filter-unavailable]";
-  return command.replaceAll(home, "~").trim().replace(filters.scrubRe, "[REDACTED]").slice(0, MAX_PREFIX);
-}
 
 export function buildRow(init: {
   session: string;
   command: string;
   now?: () => string;
-}): Pick<ObserveRow, "ts" | "session" | "cmdSha" | "cmd"> {
+}): Pick<ObserveRow, "ts" | "session" | "cmdSha"> {
   return {
     ts: (init.now ?? (() => new Date().toISOString()))(),
     session: init.session,
     cmdSha: createHash("sha256").update(init.command).digest("hex"),
-    cmd: redact(init.command),
   };
 }
 
@@ -232,8 +216,32 @@ export function makeFilter(filters: Filters | null): (command: string) => { drop
 export const defaultFilter = makeFilter(FILTERS);
 
 async function defaultAppend(path: string, line: string): Promise<void> {
-  await mkdir(dirname(path), { recursive: true });
-  await appendFile(path, line + "\n");
+  await mkdir(dirname(path), { recursive: true, mode: 0o700 });
+  const data = line + "\n";
+  const handle = await open(path, "a", LOG_MODE);
+  let closed = false;
+  try {
+    await handle.chmod(LOG_MODE);
+    const size = (await handle.stat()).size;
+    if (size > 0 && size + Buffer.byteLength(data) > MAX_LOG_BYTES) {
+      await handle.close();
+      closed = true;
+      const archive = `${path}.${Date.now()}.${randomUUID()}.archive`;
+      await rename(path, archive);
+      await chmod(archive, LOG_MODE);
+      const next = await open(path, "a", LOG_MODE);
+      try {
+        await next.chmod(LOG_MODE);
+        await next.appendFile(data);
+      } finally {
+        await next.close();
+      }
+      return;
+    }
+    await handle.appendFile(data);
+  } finally {
+    if (!closed) await handle.close();
+  }
 }
 
 /**
