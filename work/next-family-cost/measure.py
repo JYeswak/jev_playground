@@ -82,20 +82,22 @@ def _is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
 
 
 def _family_candidates(root: Path) -> list[dict[str, Any]]:
-    contracts = sorted(
+    contracts = [
         path
-        for path in (root / "kit" / "contracts").glob("*.json")
-        if path.stem != "schema"
-    )
+        for path in _git(
+            root, "ls-tree", "-r", "--name-only", "HEAD", "--", "kit/contracts"
+        ).splitlines()
+        if path.endswith(".json") and Path(path).stem != "schema"
+    ]
     candidates: list[dict[str, Any]] = []
-    for contract in contracts:
-        contract_rel = contract.relative_to(root).as_posix()
-        ship_rel = f"work/ship/{contract.stem}/SHIP.md"
+    for contract_rel in contracts:
+        family = Path(contract_rel).stem
+        ship_rel = f"work/ship/{family}/SHIP.md"
         start_commits = _commits_for_path(root, contract_rel)
         end_commits = _commits_for_path(root, ship_rel)
         if not start_commits:
             raise MeasurementError(
-                f"family {contract.stem}: contract start commit missing ({contract_rel})"
+                f"family {family}: contract start commit missing ({contract_rel})"
             )
         if not end_commits:
             continue
@@ -103,17 +105,17 @@ def _family_candidates(root: Path) -> list[dict[str, Any]]:
         end_sha, end_epoch = end_commits[0]
         if not _is_ancestor(root, start_sha, end_sha):
             raise MeasurementError(
-                f"family {contract.stem}: ship verdict is not descended from contract commit"
+                f"family {family}: ship verdict is not descended from contract commit"
             )
         ship_text = _git(root, "show", f"{end_sha}:{ship_rel}")
         beads = _bead_ids(ship_text)
         if not beads:
             raise MeasurementError(
-                f"family {contract.stem}: SHIP.md must cite its family bead IDs"
+                f"family {family}: SHIP.md must cite its family bead IDs"
             )
         candidates.append(
             {
-                "family": contract.stem,
+                "family": family,
                 "contract_path": contract_rel,
                 "ship_path": ship_rel,
                 "start_sha": start_sha,

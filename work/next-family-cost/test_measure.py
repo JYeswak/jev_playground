@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -40,6 +41,50 @@ class MeasureEvidenceTests(unittest.TestCase):
         ):
             measure._family_candidates(ROOT)
         self.assertIn("contract start commit missing", str(caught.exception))
+
+    def test_uncommitted_contract_does_not_enter_candidate_scan(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            contracts = root / "kit" / "contracts"
+            contracts.mkdir(parents=True)
+            (contracts / "committed.json").write_text("{}\n", encoding="utf-8")
+            subprocess.run(["git", "init", "-q"], cwd=root, check=True, timeout=20)
+            subprocess.run(
+                ["git", "config", "user.name", "Test"],
+                cwd=root,
+                check=True,
+                timeout=20,
+            )
+            subprocess.run(
+                ["git", "config", "user.email", "test@example.invalid"],
+                cwd=root,
+                check=True,
+                timeout=20,
+            )
+            subprocess.run(
+                ["git", "add", "kit/contracts/committed.json"],
+                cwd=root,
+                check=True,
+                timeout=20,
+            )
+            subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    "core.hooksPath=/dev/null",
+                    "commit",
+                    "-qm",
+                    "fixture [test]",
+                ],
+                cwd=root,
+                check=True,
+                timeout=20,
+            )
+            (contracts / "uncommitted.json").write_text("{}\n", encoding="utf-8")
+
+            candidates = measure._family_candidates(root)
+
+        self.assertEqual(candidates, [])
 
     def test_missing_ship_commit_refuses_to_measure(self) -> None:
         def commits_for_path(root: Path, path: str) -> list[tuple[str, int]]:

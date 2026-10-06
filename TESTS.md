@@ -716,7 +716,7 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 
 ## Newly registered tests — jev-i15c
 
-- `work/next-family-cost/test_measure.py` — keyless cost-measurement guards for bead-ID parsing, missing contract and ship commits, absent spend evidence, and late preregistration. Run: `python3 -m unittest work/next-family-cost/test_measure.py -v` (5 tests).
+- `work/next-family-cost/test_measure.py` — keyless cost-measurement guards for bead-ID parsing, uncommitted-contract exclusion, missing contract and ship commits, absent spend evidence, and late preregistration. Run: `python3 -m unittest work/next-family-cost/test_measure.py -v` (6 tests).
 
 ## Newly registered tests — jev-qhmw
 
