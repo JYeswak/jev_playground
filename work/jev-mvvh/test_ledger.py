@@ -86,7 +86,7 @@ CAPTURED_LATE_IGNORED = {
 
 class LedgerTests(unittest.TestCase):
     def tempdir(self) -> tempfile.TemporaryDirectory[str]:
-        return tempfile.TemporaryDirectory(dir=os.environ["TMPDIR"])
+        return tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR"))
 
     def test_window_is_start_inclusive_end_exclusive_and_hashes_exact_bytes(
         self,
