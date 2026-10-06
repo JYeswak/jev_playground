@@ -226,7 +226,15 @@ claim nobody can check:
   pane, priority then age order, verification before new work, per-pane cooldown, re-route waits
   and never repeats a verifier, a refused claim sends nothing, the off switch makes no br call.
   6 tests.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (78 tests). Steering queue (jev-of3b): queued message on a real idle screen is read, nudged once per text, never while working. 3 tests.
+  Pane-1 busy-safe paging (jev-06wt): the last four pane lines detect a busy spinner; busy pages
+  queue literal text without Enter, coalesce during the ten-minute window, then recheck the pane;
+  idle pages use ntm, and capture/send failures do not retry or fall back. 8 tests.
+  Per-surface heartbeat (jev-06wt): hourly checks compare event-rate confidence intervals against
+  the seven-day baseline; silent or sustained-error surfaces trip only their declared switch.
+  Healthy traffic and zero host traffic do not trip; stale/invalid telemetry is unhealthy; only a
+  healthy log-only probe restores an off surface; dry-run sends no ntm; scheduled ON cannot
+  override watcher auto-off. 15 tests.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (106 tests). Steering queue (jev-of3b): queued message on a real idle screen is read, nudged once per text, never while working. 3 tests.
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder

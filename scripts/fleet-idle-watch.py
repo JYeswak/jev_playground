@@ -24,10 +24,11 @@ Route  = a pane idle for POLLS polls gets work before pane 1 hears of it (bead j
          restarted pane is routed under its new name; the router is off (the watcher behaves as
          before) while no pane has a binding or while ~/.local/state/jev/fleet-router.off exists.
          Why: 2026-10-02 panes sat idle ~7 h (07:54-15:01Z) waiting on manual dispatch.
-Alert  = `ntm send jev --pane=1 "IDLE pane N ..."` after POLLS consecutive non-working polls when
-         nothing was routed, then again while it stays that way, the gap doubling from REALERT up
-         to REALERT_MAX (measured 2026-10-01: a fixed 600 s re-page sent pane 1 300 pages for 56
-         idle episodes).
+Alert  = after POLLS idle polls, page pane 1 only when no route was accepted. If pane 1 has a
+         spinner in its last four lines, queue via literal `tmux send-keys -l` then `C-q`, never
+         Enter. Busy pages coalesce and flush at most once per 600 s; when idle use `ntm send`.
+         Re-alert gaps still double from REALERT to REALERT_MAX (measured 2026-10-01: a fixed
+         600 s re-page sent pane 1 300 pages for 56 idle episodes).
 Mail   = every round, each urgent/high Agent Mail message in the conductor's archive inbox that
          was never paged goes to pane 1 once as `MAIL <importance> from <from>: <subject> (id <id>,
          <HH:MM>Z)` (bead jev-lqfm). Paged ids persist in JEV_WATCH_INBOX_STATE, so a restart
@@ -66,9 +67,9 @@ was 'idle' while its omp had a docker run live under a bash tool call.
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
-import io
 import re
 import subprocess
 import sys
@@ -76,6 +77,12 @@ import time
 from calendar import timegm
 from pathlib import Path
 from typing import NamedTuple
+
+WATCHER_DIR = str(Path(__file__).resolve().parent)
+if WATCHER_DIR not in sys.path:
+    sys.path.insert(0, WATCHER_DIR)
+
+import fleet_surface_heartbeat as surface_heartbeat  # noqa: E402
 
 SESSION = os.environ.get("JEV_SESSION", "jev")
 # A pane status line can contain private session state. The env flag alone is
@@ -92,6 +99,15 @@ POLLS = int(os.environ.get("IDLE_POLLS", "2"))
 REALERT = int(os.environ.get("IDLE_REALERT", "600"))
 REALERT_MAX = int(os.environ.get("IDLE_REALERT_MAX", "7200"))
 HOOK_LOAD_INTERVAL = 600
+HEARTBEAT_INTERVAL = 3600
+SURFACE_REGISTRY = Path(
+    os.environ.get(
+        "JEV_SURFACE_REGISTRY",
+        str(Path(__file__).resolve().parents[1] / "work/blast-radius/surfaces.json"),
+    )
+).expanduser()
+
+
 SPINNER = re.compile(r"^\s*[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏]")
 WAIT_MARKER = re.compile(
     r"(?:^\s*[⌛⏳]|^\s*Wait\b|\bwaiting on \d+ jobs?\b)",
@@ -926,8 +942,56 @@ def submit_enter(index: int) -> bool:
     return done.returncode == 0
 
 
-def send_pane1(message: str) -> bool:
-    """`ntm send` one line to the conductor; True only when ntm exited 0."""
+PAGE_BATCH_INTERVAL = 600.0
+PAGE_BUSY_LAST_SENT: float | None = None
+PAGE_BUSY_PENDING: list[str] = []
+PAGE_SEND_ACTION = "sent"
+
+
+def _capture_pane1_screen() -> str | None:
+    try:
+        result = subprocess.run(
+            ["tmux", "capture-pane", "-p", "-t", f"{SESSION}:0.1"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout if result.returncode == 0 else None
+
+
+def _pane1_is_busy(screen: str) -> bool:
+    # OMP's status bar includes a border before the spinner; strip it before matching.
+    return any(SPINNER.match(line.lstrip("╭─ ")) for line in screen.splitlines()[-4:])
+
+
+def _combine_page_messages(messages: list[str]) -> str:
+    return "; ".join(dict.fromkeys(message for message in messages if message))
+
+
+def _send_busy_page1(message: str) -> bool:
+    """Queue literal text in pane 1 without submitting or interrupting its active turn."""
+    target = f"{SESSION}:0.1"
+    try:
+        typed = subprocess.run(
+            ["tmux", "send-keys", "-l", "-t", target, message],
+            capture_output=True,
+            timeout=10,
+        )
+        if typed.returncode != 0:
+            return False
+        queued = subprocess.run(
+            ["tmux", "send-keys", "-t", target, "C-q"],
+            capture_output=True,
+            timeout=10,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return queued.returncode == 0
+
+
+def _send_idle_page1(message: str) -> bool:
     try:
         done = subprocess.run(
             ["ntm", "send", SESSION, "--pane=1", message],
@@ -937,6 +1001,69 @@ def send_pane1(message: str) -> bool:
     except (OSError, subprocess.TimeoutExpired):
         return False
     return done.returncode == 0
+
+
+def send_pane1(message: str) -> bool:
+    """Send when pane 1 is idle; queue/coalesce without Enter while its spinner is visible."""
+    global PAGE_BUSY_LAST_SENT, PAGE_SEND_ACTION
+    if surface_heartbeat.record_dry_run_send(message, pane=1):
+        PAGE_SEND_ACTION = "dry-run"
+        return True
+    screen = _capture_pane1_screen()
+    if screen is None:
+        PAGE_SEND_ACTION = "failed"
+        return False
+    busy = _pane1_is_busy(screen)
+    now = time.monotonic()
+    messages = [*PAGE_BUSY_PENDING, message]
+    payload = _combine_page_messages(messages)
+    if (
+        busy
+        and PAGE_BUSY_LAST_SENT is not None
+        and now - PAGE_BUSY_LAST_SENT < PAGE_BATCH_INTERVAL
+    ):
+        if message and message not in PAGE_BUSY_PENDING:
+            PAGE_BUSY_PENDING.append(message)
+        PAGE_SEND_ACTION = "batched"
+        return True
+    sent = _send_busy_page1(payload) if busy else _send_idle_page1(payload)
+    if not sent:
+        # A failed send may have typed part of the payload into the composer.
+        # Do not retry it automatically: that could duplicate or submit stale text.
+        PAGE_BUSY_PENDING.clear()
+        PAGE_SEND_ACTION = "failed"
+        return False
+    PAGE_BUSY_PENDING.clear()
+    PAGE_BUSY_LAST_SENT = now if busy else None
+    PAGE_SEND_ACTION = "queued" if busy else "sent"
+    return True
+
+
+def flush_pending_page1(now: float | None = None) -> bool:
+    """Deliver a coalesced busy-pane batch after its ten-minute cooldown."""
+    global PAGE_BUSY_LAST_SENT, PAGE_SEND_ACTION
+    if not PAGE_BUSY_PENDING or PAGE_BUSY_LAST_SENT is None:
+        return False
+    now = time.monotonic() if now is None else now
+    if now - PAGE_BUSY_LAST_SENT < PAGE_BATCH_INTERVAL:
+        return False
+    screen = _capture_pane1_screen()
+    if screen is None:
+        PAGE_SEND_ACTION = "failed"
+        return False
+    payload = _combine_page_messages(PAGE_BUSY_PENDING)
+    busy = _pane1_is_busy(screen)
+    sent = _send_busy_page1(payload) if busy else _send_idle_page1(payload)
+    if not sent:
+        # The batch may already be in the composer; retrying could duplicate it.
+        PAGE_BUSY_PENDING.clear()
+        PAGE_BUSY_LAST_SENT = None
+        PAGE_SEND_ACTION = "failed"
+        return False
+    PAGE_BUSY_PENDING.clear()
+    PAGE_BUSY_LAST_SENT = now if busy else None
+    PAGE_SEND_ACTION = "queued" if busy else "sent"
+    return True
 
 
 def realert_due(now: float, last: float | None, count: int) -> bool:
@@ -949,14 +1076,35 @@ def realert_due(now: float, last: float | None, count: int) -> bool:
 def alert(index: int, since: float, words: str) -> None:
     stamp = time.strftime("%H:%MZ", time.gmtime(since))
     message = f"IDLE pane {index} (since {stamp}), last line: {words}"
-    send_pane1(message)
-    print(f"{time.strftime('%H:%M:%SZ', time.gmtime())} alerted: {message}", flush=True)
+    ok = send_pane1(message)
+    if surface_heartbeat.DRY_RUN and ok:
+        result = "would alert"
+    elif not ok:
+        result = "alert FAILED"
+    elif PAGE_SEND_ACTION == "batched":
+        result = "batched"
+    elif PAGE_SEND_ACTION == "queued":
+        result = "queued"
+    else:
+        result = "alerted"
+    print(
+        f"{time.strftime('%H:%M:%SZ', time.gmtime())} {result}: {message}", flush=True
+    )
 
 
 def page(message: str) -> bool:
-    """The watcher's mail pager: send_pane1 plus a log line saying whether ntm took it."""
+    """Page pane 1, or record the attempt in dry-run mode."""
     ok = send_pane1(message)
-    said = "paged" if ok else "page FAILED"
+    if surface_heartbeat.DRY_RUN and ok:
+        said = "would page"
+    elif not ok:
+        said = "page FAILED"
+    elif PAGE_SEND_ACTION == "batched":
+        said = "page batched"
+    elif PAGE_SEND_ACTION == "queued":
+        said = "page queued"
+    else:
+        said = "paged"
     print(f"{time.strftime('%H:%M:%SZ', time.gmtime())} {said}: {message}", flush=True)
     return ok
 
@@ -1653,6 +1801,8 @@ def route_packet(pane: int, agent: str, kind: str, bead: dict) -> str:
 
 def send_pane(pane: int, message: str) -> bool:
     """`ntm send` one message to a worker pane; True only when ntm exited 0."""
+    if surface_heartbeat.record_dry_run_send(message, pane=pane):
+        return True
     try:
         done = subprocess.run(
             [
@@ -1840,16 +1990,100 @@ def route_plan() -> int:
     return 0
 
 
+def _surface_heartbeat_round(now: float) -> int:
+    state_dir = surface_heartbeat.resolve_state_dir()
+    try:
+        assessments = surface_heartbeat.monitor(
+            SURFACE_REGISTRY,
+            state_dir,
+            now=now,
+            omp_root=surface_heartbeat.real_omp_root(),
+            send=page,
+        )
+    except (OSError, ValueError) as error:
+        reason = type(error).__name__
+        print(f"surface heartbeat NOT_RUN: {reason}", flush=True)
+        page(f"SURFACE HEARTBEAT NOT_RUN: {reason}")
+        return 2
+    for assessment in assessments:
+        print(
+            f"surface {assessment.surface_id}: {assessment.state} "
+            f"events={assessment.host_events} rows={assessment.rows} errors={assessment.errors}",
+            flush=True,
+        )
+    return 0
+
+
+def _record_liveness(now: float, status: str) -> None:
+    try:
+        surface_heartbeat.append_liveness(
+            surface_heartbeat.resolve_state_dir(), now=now, status=status
+        )
+    except (OSError, ValueError) as error:
+        print(f"watcher liveness NOT_RUN: {type(error).__name__}", flush=True)
+
+
 def main() -> int:
-    if "--selftest" in sys.argv:
+    args = sys.argv[1:]
+    if "--selftest" in args:
         return selftest()
-    if "--route-plan" in sys.argv:
+    if "--route-plan" in args:
+        if "--dry-run" in args:
+            print("--dry-run supports --once or --probe-start", file=sys.stderr)
+            return 2
         return route_plan()
-    if "--once" in sys.argv:
+    dry_run = "--dry-run" in args
+    surface_heartbeat.DRY_RUN = dry_run
+    surface_heartbeat.DRY_RUN_SENDS.clear()
+    if dry_run:
+        state_dir = surface_heartbeat.resolve_state_dir()
+        if not surface_heartbeat.dry_run_targets_are_isolated(
+            SURFACE_REGISTRY, state_dir
+        ):
+            print(
+                "--dry-run requires telemetry, switch, and state paths under HOME inside TMPDIR",
+                file=sys.stderr,
+            )
+            return 2
+        if "--once" not in args and "--probe-start" not in args:
+            print("--dry-run supports --once or --probe-start", file=sys.stderr)
+            return 2
+    if "--probe-start" in args:
+        if "--once" in args or "--hours" not in args:
+            print("usage: --probe-start SURFACE_ID --hours N", file=sys.stderr)
+            return 2
+        try:
+            surface_id = args[args.index("--probe-start") + 1]
+            duration = int(
+                float(args[args.index("--hours") + 1]) * surface_heartbeat.HOUR
+            )
+            surface = next(
+                item
+                for item in surface_heartbeat.load_registry(SURFACE_REGISTRY)
+                if item.id == surface_id
+            )
+            surface_heartbeat.start_restore_probe(
+                surface,
+                surface_heartbeat.resolve_state_dir(),
+                now=time.time(),
+                duration_seconds=duration,
+            )
+        except (IndexError, StopIteration, OSError, ValueError, OverflowError) as error:
+            print(f"restore probe refused: {type(error).__name__}", file=sys.stderr)
+            return 2
+        print(
+            f"{surface_id}: log-only probe registered; keep the surface in shadow mode "
+            "for the stated window"
+        )
+        return 0
+    if "--once" in args:
         states = poll()
         if states is None:
+            _record_liveness(time.time(), "poll-unavailable")
             return 2
         submit_shadow(states)
+        heartbeat_rc = _surface_heartbeat_round(time.time())
+        _record_liveness(time.time(), "ok" if heartbeat_rc == 0 else "heartbeat-error")
         for index, reading in sorted(states.items()):
             state, words = reading[:2]
             print(f"pane {index}: {state} {words}")
@@ -1875,6 +2109,14 @@ def main() -> int:
                 f"{time.strftime('%H:%M:%SZ', time.gmtime())} lock-creator: {row['lock']} holders={[h['pid'] for h in row['holders']]}",
                 flush=True,
             )
+        if dry_run:
+            print(
+                f"dry-run: recorded {len(surface_heartbeat.DRY_RUN_SENDS)} pane sends; "
+                "ntm subprocess sends=0",
+                flush=True,
+            )
+        if heartbeat_rc:
+            return 2
         return 1 if any(reading[0] != "working" for reading in states.values()) else 0
     composer_last: dict[int, str] = {}
     composer_same: dict[int, int] = {}
@@ -1888,6 +2130,7 @@ def main() -> int:
     stalled_alerted: set[int] = set()
     print(f"watching {SESSION} worker panes every {INTERVAL}s", flush=True)
     next_hook_load = 0.0
+    next_heartbeat = 0.0
     started = time.time()  # Stable first-run cutoff, even if the inbox appears later.
     while True:
         now = time.time()
@@ -1899,9 +2142,23 @@ def main() -> int:
                 print(hook_note, flush=True)
         states = poll()
         if states is None:
+            _record_liveness(now, "poll-unavailable")
             time.sleep(INTERVAL)
             continue
         submit_shadow(states)
+        heartbeat_status = "checked"
+        if monotonic_now >= next_heartbeat:
+            next_heartbeat = monotonic_now + HEARTBEAT_INTERVAL
+            heartbeat_status = (
+                "checked" if _surface_heartbeat_round(now) == 0 else "heartbeat-error"
+            )
+        _record_liveness(now, heartbeat_status)
+        if flush_pending_page1():
+            print(
+                f"{time.strftime('%H:%M:%SZ', time.gmtime())} "
+                f"page batch {PAGE_SEND_ACTION}",
+                flush=True,
+            )
         if SHADOW_ONLY:
             time.sleep(INTERVAL)
             continue

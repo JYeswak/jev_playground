@@ -54,3 +54,15 @@ runs, free-comparator arms (see NEGATIVE_EVIDENCE.md).
   raised to match registered claims (`f19406be` + floor sync).
 - Verifications closed with evidence: `jev-nbbm` (pre-rule), `jev-9q1g`
   filed (claim-gate removal arm brittle at perfect coverage).
+- Candidate checker (`jev-wjig`): G1 prior-sample overlap is limited to replications.
+- Gate observer privacy (`jev-rpqu`): committed hook versions write shared logs
+  with only `cmdSha`, keep raw commands in the private sidecar, and rotate
+  private archives; live migration remains pending coordinated session restarts.
+- Local shadow timeout (`jev-a5ny`): the opt-in local scorer now shares one
+  2 s deadline across a commit's hunks; a slow loopback endpoint test proves it
+  aborts within budget and skips later local requests.
+- Fleet watcher (`jev-06wt`): pane-1 pages detect a spinner in the last four
+  lines; busy notices are literal-queued and coalesced without Enter, while
+  idle notices use `ntm send`. Failed submissions are discarded, not retried.
+  Heartbeat logic remains keyless; production registry coordination and
+  supervised-service activation are pending.

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>ai.jev.fleet-idle-watch</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/python3</string>
+		<string>/Users/josh/Developer/jev/scripts/fleet-idle-watch.py</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/josh/Developer/jev</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>HOME</key>
+		<string>/Users/josh</string>
+		<key>IDLE_INTERVAL</key>
+		<string>60</string>
+		<key>JEV_SESSION</key>
+		<string>jev</string>
+		<key>PATH</key>
+		<string>/Users/josh/.local/bin:/Users/josh/.cargo/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<key>PYTHONUNBUFFERED</key>
+		<string>1</string>
+	</dict>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>StandardOutPath</key>
+	<string>/Users/josh/.local/state/jev/fleet-idle-watch.stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/josh/.local/state/jev/fleet-idle-watch.stderr.log</string>
+</dict>
+</plist>

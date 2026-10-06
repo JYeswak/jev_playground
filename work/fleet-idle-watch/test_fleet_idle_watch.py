@@ -24,6 +24,7 @@ import importlib.util
 import io
 import json
 import os
+import plistlib
 import subprocess
 import sys
 import tempfile
@@ -237,6 +238,7 @@ class PollTimeout(unittest.TestCase):
         output = io.StringIO()
         with (
             mock.patch.object(fiw, "poll", return_value={2: ("working", "")}),
+            mock.patch.object(fiw, "_surface_heartbeat_round", return_value=0),
             mock.patch.object(fiw, "SHADOW_ONLY", False),
             mock.patch.object(fiw, "hook_load_round", return_value=None),
             mock.patch.object(fiw, "ci_lines", return_value=[]),
@@ -413,10 +415,16 @@ class NeedsHuman(unittest.TestCase):
         with mock.patch.dict(os.environ, self.isolated(tmp)):
             session_file = self.write_session(tmp, [self.POSITIVE])
             calls = []
-            asker = lambda text: (
-                calls.append(text),
-                {"ok": True, "score": 0.95, "model": "jev-1.13.0", "latencyMs": 100},
-            )[1]
+
+            def asker(text):
+                calls.append(text)
+                return {
+                    "ok": True,
+                    "score": 0.95,
+                    "model": "jev-1.13.0",
+                    "latencyMs": 100,
+                }
+
             self.assertTrue(
                 fiw.check_idle_needs_human(
                     6,
@@ -965,6 +973,7 @@ class Inbox(unittest.TestCase):
         with (
             mock.patch.dict(os.environ, env),
             mock.patch.object(fiw, "poll", return_value={2: ("working", "")}),
+            mock.patch.object(fiw, "_surface_heartbeat_round", return_value=0),
             mock.patch.object(fiw, "ci_lines", return_value=["CI main: green"]),
             mock.patch.object(
                 fiw, "judge_lines", return_value=["Jev judge 24h: x", "Skills 24h: y"]
@@ -1010,6 +1019,7 @@ class Inbox(unittest.TestCase):
         output = io.StringIO()
         with (
             mock.patch.object(fiw, "poll", return_value={}),
+            mock.patch.object(fiw, "_surface_heartbeat_round", return_value=0),
             mock.patch.object(fiw, "submit_shadow"),
             mock.patch.object(fiw, "SHADOW_ONLY", False),
             mock.patch.object(fiw, "hook_load_round", return_value=None),
@@ -1292,6 +1302,236 @@ class UnsubmittedComposer(unittest.TestCase):
             self.assertFalse(fiw.submit_enter(4))
 
 
+class ConductorPaging(unittest.TestCase):
+    """Conductor pages must not interrupt active pane-1 work (jev-06wt)."""
+
+    def run_sender(self, screen):
+        calls = []
+
+        def run(argv, **_):
+            calls.append(argv)
+            if argv[:2] == ["tmux", "capture-pane"]:
+                return subprocess.CompletedProcess(argv, 0, screen, "")
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        return calls, run
+
+    def test_busy_spinner_in_last_four_lines_queues_without_enter(self):
+        screen = (
+            "older line\nstatus\nprompt\n"
+            "╭── ⠋ 1h > ◕ GPT-6-Luna > "
+            "📁 ~/Developer/jev > ⑂ main *54 +18 ?855 > "
+            "S0.68 ▶─────"
+        )
+        calls, run = self.run_sender(screen)
+        with (
+            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
+            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
+        ):
+            self.assertTrue(fiw.send_pane1("alert text"))
+
+        sends = [call for call in calls if call[:2] == ["tmux", "send-keys"]]
+        self.assertEqual(
+            sends[0][2:],
+            ["-l", "-t", f"{fiw.SESSION}:0.1", "alert text"],
+        )
+        self.assertEqual(sends[1][2:], ["-t", f"{fiw.SESSION}:0.1", "C-q"])
+        self.assertFalse(any(call[:2] == ["ntm", "send"] for call in calls))
+        self.assertFalse(any("Enter" in call for call in calls))
+
+    def test_spinner_above_last_four_lines_does_not_mark_pane_busy(self):
+        screen = "⠋ old activity\none\ntwo\nthree\nprompt"
+        calls, run = self.run_sender(screen)
+        with (
+            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
+            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
+        ):
+            self.assertTrue(fiw.send_pane1("idle alert"))
+
+        self.assertTrue(any(call[:2] == ["ntm", "send"] for call in calls))
+        self.assertFalse(any(call[:2] == ["tmux", "send-keys"] for call in calls))
+
+    def test_capture_failure_fails_closed_without_sending(self):
+        calls = []
+
+        def run(argv, **_):
+            calls.append(argv)
+            return subprocess.CompletedProcess(argv, 1, "", "pane unavailable")
+
+        with (
+            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
+            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
+        ):
+            self.assertFalse(fiw.send_pane1("unverified pane"))
+
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(calls[0][:2], ["tmux", "capture-pane"])
+
+    def test_failed_busy_queue_never_falls_back_to_ntm_send(self):
+        calls = []
+
+        def run(argv, **_):
+            calls.append(argv)
+            if argv[:2] == ["tmux", "capture-pane"]:
+                return subprocess.CompletedProcess(argv, 0, "⠋ active", "")
+            if argv[:2] == ["tmux", "send-keys"] and "-l" in argv:
+                return subprocess.CompletedProcess(argv, 1, "", "send refused")
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        with (
+            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
+            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
+        ):
+            self.assertFalse(fiw.send_pane1("busy alert"))
+
+        self.assertFalse(any(call[:2] == ["ntm", "send"] for call in calls))
+        self.assertFalse(
+            any(call[:2] == ["tmux", "send-keys"] and "C-q" in call for call in calls)
+        )
+
+    def test_failed_busy_submit_is_not_retried_or_entered(self):
+        calls = []
+
+        def run(argv, **_):
+            calls.append(argv)
+            if argv[:2] == ["tmux", "capture-pane"]:
+                return subprocess.CompletedProcess(argv, 0, "⠋ active", "")
+            if argv[:2] == ["tmux", "send-keys"] and "C-q" in argv:
+                return subprocess.CompletedProcess(argv, 1, "", "submit refused")
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        with (
+            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", 0.0, create=True),
+            mock.patch.object(
+                fiw, "PAGE_BUSY_PENDING", ["previous alert"], create=True
+            ),
+        ):
+            self.assertFalse(fiw.flush_pending_page1(now=600.0))
+            self.assertEqual(fiw.PAGE_BUSY_PENDING, [])
+            self.assertFalse(fiw.flush_pending_page1(now=660.0))
+
+        self.assertEqual(
+            len(
+                [
+                    call
+                    for call in calls
+                    if call[:2] == ["tmux", "send-keys"] and "-l" in call
+                ]
+            ),
+            1,
+        )
+        self.assertFalse(any(call[:2] == ["ntm", "send"] for call in calls))
+        self.assertFalse(any("Enter" in call for call in calls))
+
+    def test_failed_initial_busy_submit_discards_batch_without_enter(self):
+        calls = []
+
+        def run(argv, **_):
+            calls.append(argv)
+            if argv[:2] == ["tmux", "capture-pane"]:
+                return subprocess.CompletedProcess(argv, 0, "⠋ active", "")
+            if argv[:2] == ["tmux", "send-keys"] and "C-q" in argv:
+                return subprocess.CompletedProcess(argv, 1, "", "submit refused")
+            return subprocess.CompletedProcess(argv, 0, "", "")
+
+        with (
+            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw.time, "monotonic", return_value=600.0),
+            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
+            mock.patch.object(
+                fiw, "PAGE_BUSY_PENDING", ["buffered alert"], create=True
+            ),
+        ):
+            self.assertFalse(fiw.send_pane1("new alert"))
+            self.assertEqual(fiw.PAGE_BUSY_PENDING, [])
+
+        self.assertFalse(any(call[:2] == ["ntm", "send"] for call in calls))
+        self.assertFalse(any("Enter" in call for call in calls))
+
+    def test_busy_pages_coalesce_and_flush_no_more_than_once_per_ten_minutes(self):
+        screen = "status\nprompt\n⠋ working"
+        calls, run = self.run_sender(screen)
+        with (
+            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw.time, "monotonic", side_effect=[0.0, 30.0, 60.0]),
+            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
+            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
+        ):
+            self.assertTrue(fiw.send_pane1("first alert"))
+            self.assertTrue(fiw.send_pane1("second alert"))
+            self.assertTrue(fiw.send_pane1("third alert"))
+            queued_before_window = [
+                call
+                for call in calls
+                if call[:2] == ["tmux", "send-keys"] and "-l" in call
+            ]
+            self.assertEqual(len(queued_before_window), 1)
+            self.assertFalse(fiw.flush_pending_page1(now=599.9))
+            self.assertTrue(fiw.flush_pending_page1(now=600.0))
+
+        queued = [
+            call for call in calls if call[:2] == ["tmux", "send-keys"] and "-l" in call
+        ]
+        self.assertEqual(len(queued), 2)
+        self.assertEqual(queued[1][-1], "second alert; third alert")
+
+    def test_buffered_batch_uses_idle_send_after_spinner_clears(self):
+        screens = iter(["⠋ active", "⠋ active", "idle prompt"])
+        calls = []
+
+        def run(argv, **_):
+            calls.append(argv)
+            screen = next(screens) if argv[:2] == ["tmux", "capture-pane"] else ""
+            return subprocess.CompletedProcess(argv, 0, screen, "")
+
+        with (
+            mock.patch.object(fiw.surface_heartbeat, "DRY_RUN", False),
+            mock.patch.object(fiw.subprocess, "run", side_effect=run),
+            mock.patch.object(fiw.time, "monotonic", side_effect=[0.0, 30.0]),
+            mock.patch.object(fiw, "PAGE_BUSY_LAST_SENT", None, create=True),
+            mock.patch.object(fiw, "PAGE_BUSY_PENDING", [], create=True),
+        ):
+            self.assertTrue(fiw.send_pane1("first alert"))
+            self.assertTrue(fiw.send_pane1("deferred alert"))
+            self.assertTrue(fiw.flush_pending_page1(now=600.0))
+
+        idle_sends = [call for call in calls if call[:2] == ["ntm", "send"]]
+        self.assertEqual(idle_sends[0][-1], "deferred alert")
+        self.assertEqual(
+            len(
+                [
+                    call
+                    for call in calls
+                    if call[:2] == ["tmux", "send-keys"] and "-l" in call
+                ]
+            ),
+            1,
+        )
+        self.assertEqual(
+            len(
+                [
+                    call
+                    for call in calls
+                    if call[:2] == ["tmux", "send-keys"] and "-l" in call
+                ]
+            ),
+            1,
+        )
+        self.assertFalse(any("Enter" in call for call in calls))
+
+
 class FleetRouter(unittest.TestCase):
     """jev-ara9: who gets what when panes are idle. Beads are br --json shapes (ready is slim)."""
 
@@ -1483,6 +1723,510 @@ class SteeringQueue(unittest.TestCase):
         done.add((4, text))
         self.assertFalse(fiw.steering_due("idle", 4, text, done))
         self.assertTrue(fiw.steering_due("idle", 4, text + " v2", done))
+
+
+class SurfaceHeartbeat(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix="surface-heartbeat-")
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name)
+        self.home = self.root / "home"
+        self.state_dir = self.root / "state"
+        self.omp_root = self.root / "omp"
+        self.session_file = (
+            self.omp_root / "agent/sessions/-Developer-jev/session.jsonl"
+        )
+        self.session_file.parent.mkdir(parents=True)
+        self.registry = self.root / "surfaces.json"
+        self.telemetry_path = self.root / "telemetry.jsonl"
+        self.switch = self.root / "surface.off"
+        self.heartbeat = fiw.surface_heartbeat
+        self.heartbeat.DRY_RUN = False
+        self.heartbeat.DRY_RUN_SENDS.clear()
+        self.current_end = (
+            int(fiw.time.time() // self.heartbeat.HOUR) * self.heartbeat.HOUR
+        )
+        self.current_start = self.current_end - self.heartbeat.HOUR
+        self.now = self.current_end + 1
+        self.history_start = self.current_start - self.heartbeat.HISTORY_SECONDS
+
+    def write_registry(self, polarity="presence-OFF", *, owner="jev-test"):
+        entry = {
+            "id": "test-surface",
+            "owner": owner,
+            "heartbeat": {
+                "source": "jsonl",
+                "eligible_event": "tool_result",
+                "path": str(self.telemetry_path),
+                "status_field": "status",
+                "error_rate_ceiling": 0.25,
+                "minimum_error_rows": 3,
+            },
+            "off_switch": None
+            if polarity is None
+            else {"path": str(self.switch), "polarity": polarity},
+        }
+        self.registry.write_text(
+            json.dumps(
+                {"schema_version": "blast-radius-surfaces.v1", "surfaces": [entry]}
+            ),
+            encoding="utf-8",
+        )
+        if polarity == "presence-ON":
+            self.switch.write_text("enabled\n", encoding="utf-8")
+        else:
+            self.switch.unlink(missing_ok=True)
+        return self.heartbeat.load_registry(self.registry)[0]
+
+    def write_inputs(
+        self, current_events=3, statuses=(), *, stale=False, invalid=False
+    ):
+        session_rows = []
+        telemetry_rows = []
+        for index in range(27):
+            stamp = self.history_start + index * self.heartbeat.HOUR + 60
+            session_rows.append(
+                {
+                    "type": "message",
+                    "timestamp": stamp,
+                    "message": {"role": "toolResult"},
+                }
+            )
+            telemetry_rows.append({"ts": stamp, "status": "ok"})
+        for index in range(current_events):
+            stamp = self.current_start + 60 + index * 10
+            session_rows.append(
+                {
+                    "type": "message",
+                    "timestamp": stamp,
+                    "message": {"role": "toolResult"},
+                }
+            )
+        for index, status in enumerate(statuses):
+            stamp = self.current_start + 60 + index * 10
+            telemetry_rows.append({"ts": stamp, "status": status})
+        if stale:
+            telemetry_rows.append({"ts": self.current_start - 7200, "status": "ok"})
+        lines = [json.dumps(row) for row in telemetry_rows]
+        if invalid:
+            lines.append(json.dumps({"ts": self.current_start + 5, "status": 7}))
+        self.session_file.write_text(
+            "\n".join(json.dumps(row) for row in session_rows) + "\n", encoding="utf-8"
+        )
+        self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
+        self.telemetry_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    def monitor(self, *, now=None):
+        messages = []
+        result = self.heartbeat.monitor(
+            self.registry,
+            self.state_dir,
+            now=self.now if now is None else now,
+            omp_root=self.omp_root,
+            send=messages.append,
+        )
+        return result[0], messages
+
+    def test_silent_surface_pages_reason_and_turns_off_presence_off_switch(self):
+        self.write_registry()
+        self.write_inputs(statuses=[])
+
+        assessment, messages = self.monitor()
+
+        self.assertEqual(assessment.state, "silent")
+        self.assertTrue(self.switch.is_file())
+        self.assertIn("no current telemetry rows", self.switch.read_text())
+        self.assertEqual(len(messages), 1)
+        self.assertIn("test-surface", messages[0])
+        self.assertIn("owner=jev-test", messages[0])
+        self.assertIn("no current telemetry rows", messages[0])
+
+    def test_session_error_spike_turns_off_presence_on_switch(self):
+        custom_type = "test.surface.decision.v1"
+        self.registry.write_text(
+            json.dumps(
+                {
+                    "schema_version": "blast-radius-surfaces.v1",
+                    "surfaces": [
+                        {
+                            "id": "test-surface",
+                            "owner": "jev-test",
+                            "heartbeat": {
+                                "source": "omp_session",
+                                "eligible_event": "tool_call",
+                                "custom_types": [custom_type],
+                                "error_rate_ceiling": 0.25,
+                                "minimum_error_rows": 3,
+                            },
+                            "off_switch": {
+                                "path": str(self.switch),
+                                "polarity": "presence-ON",
+                            },
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        self.switch.write_text("enabled\n", encoding="utf-8")
+        session_rows = []
+        for index in range(27):
+            stamp = self.history_start + index * self.heartbeat.HOUR + 60
+            session_rows.extend(
+                [
+                    {
+                        "type": "custom",
+                        "customType": "tool_execution_start",
+                        "timestamp": stamp,
+                    },
+                    {
+                        "type": "custom",
+                        "customType": custom_type,
+                        "timestamp": stamp,
+                        "data": {"error": None},
+                    },
+                ]
+            )
+        for index in range(3):
+            stamp = self.current_start + 60 + index * 10
+            session_rows.extend(
+                [
+                    {
+                        "type": "custom",
+                        "customType": "tool_execution_start",
+                        "timestamp": stamp,
+                    },
+                    {
+                        "type": "custom",
+                        "customType": custom_type,
+                        "timestamp": stamp,
+                        "data": {"error": "asker-failed"},
+                    },
+                ]
+            )
+        self.session_file.write_text(
+            "\n".join(json.dumps(row) for row in session_rows) + "\n",
+            encoding="utf-8",
+        )
+
+        assessment, messages = self.monitor()
+
+        self.assertEqual(assessment.state, "error-rate")
+        self.assertEqual(
+            (assessment.host_events, assessment.rows, assessment.errors), (3, 3, 3)
+        )
+        self.assertFalse(self.switch.exists())
+        self.assertEqual(len(messages), 1)
+        self.assertIn("3/3 telemetry rows errored", messages[0])
+
+    def test_error_spike_pages_reason_and_removes_presence_on_switch(self):
+        self.write_registry("presence-ON")
+        self.write_inputs(statuses=["error"] * 3)
+
+        assessment, messages = self.monitor()
+
+        self.assertEqual(assessment.state, "error-rate")
+        self.assertFalse(self.switch.exists())
+        self.assertEqual(len(messages), 1)
+        self.assertIn("owner=jev-test", messages[0])
+        self.assertIn("3/3 telemetry rows errored", messages[0])
+        state = self.heartbeat.load_state(self.state_dir)
+        self.assertTrue(state["surfaces"]["test-surface"]["auto_off"])
+        self.assertIn(
+            "3/3 telemetry rows errored", state["surfaces"]["test-surface"]["reason"]
+        )
+
+    def test_auto_off_is_scoped_to_failed_surface(self):
+        self.write_registry()
+        data = json.loads(self.registry.read_text(encoding="utf-8"))
+        other_log = self.root / "other-telemetry.jsonl"
+        other_switch = self.root / "other-surface.on"
+        other = {
+            "id": "other-surface",
+            "owner": "jev-other",
+            "heartbeat": {
+                "source": "jsonl",
+                "eligible_event": "tool_result",
+                "path": str(other_log),
+                "status_field": "status",
+                "error_rate_ceiling": 0.25,
+                "minimum_error_rows": 3,
+            },
+            "off_switch": {"path": str(other_switch), "polarity": "presence-ON"},
+        }
+        data["surfaces"].append(other)
+        self.registry.write_text(json.dumps(data), encoding="utf-8")
+        other_switch.write_text("enabled\n", encoding="utf-8")
+        self.write_inputs(statuses=[])
+        other_rows = [
+            {
+                "ts": self.history_start + index * self.heartbeat.HOUR + 60,
+                "status": "ok",
+            }
+            for index in range(27)
+        ]
+        other_rows.extend(
+            {"ts": self.current_start + 60 + index * 10, "status": "ok"}
+            for index in range(3)
+        )
+        other_log.write_text(
+            "\n".join(json.dumps(row) for row in other_rows) + "\n", encoding="utf-8"
+        )
+
+        messages = []
+        assessments = self.heartbeat.monitor(
+            self.registry,
+            self.state_dir,
+            now=self.now,
+            omp_root=self.omp_root,
+            send=messages.append,
+        )
+
+        by_id = {assessment.surface_id: assessment for assessment in assessments}
+        self.assertEqual(by_id["test-surface"].state, "silent")
+        self.assertEqual(by_id["other-surface"].state, "healthy")
+        self.assertTrue(self.switch.is_file())
+        self.assertTrue(other_switch.is_file())
+        self.assertEqual(len(messages), 1)
+        self.assertIn("test-surface", messages[0])
+
+    def test_healthy_rows_inside_seven_day_ci_leave_surface_on(self):
+        self.write_registry()
+        self.write_inputs(statuses=["ok"] * 3)
+
+        assessment, messages = self.monitor()
+
+        self.assertEqual(assessment.state, "healthy")
+        self.assertEqual(assessment.interval.lower, 1.0)
+        self.assertEqual(assessment.interval.upper, 1.0)
+        self.assertFalse(self.switch.exists())
+        self.assertEqual(messages, [])
+
+    def test_zero_host_traffic_for_three_hours_does_not_trip_switch(self):
+        self.write_registry("presence-ON")
+        self.write_inputs(current_events=0, statuses=[])
+
+        messages = []
+        for offset in (0, self.heartbeat.HOUR, 2 * self.heartbeat.HOUR):
+            assessments = self.heartbeat.monitor(
+                self.registry,
+                self.state_dir,
+                now=self.now + offset,
+                omp_root=self.omp_root,
+                send=messages.append,
+            )
+            self.assertEqual(assessments[0].state, "idle")
+
+        self.assertTrue(self.switch.is_file())
+        self.assertEqual(messages, [])
+
+    def test_stale_rows_cannot_make_surface_healthy(self):
+        self.write_registry()
+        self.write_inputs(statuses=[], stale=True)
+
+        assessment, messages = self.monitor()
+
+        self.assertNotEqual(assessment.state, "healthy")
+        self.assertTrue(assessment.unhealthy)
+        self.assertTrue(self.switch.is_file())
+        self.assertEqual(assessment.rows, 0)
+        self.assertEqual(len(messages), 1)
+
+    def test_invalid_row_makes_otherwise_healthy_telemetry_unhealthy(self):
+        self.write_registry()
+        self.write_inputs(statuses=["ok"] * 3, invalid=True)
+
+        assessment, messages = self.monitor()
+
+        self.assertEqual(assessment.state, "invalid-telemetry")
+        self.assertTrue(assessment.unhealthy)
+        self.assertTrue(self.switch.is_file())
+        self.assertIn("invalid telemetry", assessment.reason)
+        self.assertEqual(len(messages), 1)
+
+    def test_surface_without_switch_alerts_but_is_never_reported_switched_off(self):
+        self.write_registry(None)
+        self.write_inputs(statuses=[])
+
+        assessment, messages = self.monitor()
+        state = self.heartbeat.load_state(self.state_dir)
+
+        self.assertEqual(assessment.state, "silent")
+        self.assertEqual(len(messages), 1)
+        self.assertFalse(state["surfaces"]["test-surface"]["auto_off"])
+        self.assertFalse(self.switch.exists())
+
+    def test_off_surface_never_restores_without_probe(self):
+        self.write_registry()
+        self.switch.write_text("manual off\n", encoding="utf-8")
+        self.write_inputs(statuses=["ok"] * 3)
+
+        self.monitor()
+
+        self.assertTrue(self.switch.is_file())
+
+    def test_healthy_log_only_probe_restores_once_and_stays_on(self):
+        surface = self.write_registry()
+        self.switch.write_text("manual off\n", encoding="utf-8")
+        self.write_inputs(statuses=["ok"] * 3)
+        self.heartbeat.start_restore_probe(
+            surface,
+            self.state_dir,
+            now=self.current_start,
+            duration_seconds=self.heartbeat.HOUR,
+        )
+
+        _, first_messages = self.monitor()
+        state = self.heartbeat.load_state(self.state_dir)
+        self.assertFalse(self.switch.exists())
+        self.assertEqual(state["probes"]["test-surface"]["status"], "restored")
+        self.assertTrue(
+            any("SURFACE RESTORED test-surface" in item for item in first_messages)
+        )
+
+        _, later_messages = self.monitor(now=self.now + self.heartbeat.HOUR)
+        self.assertFalse(self.switch.exists())
+        self.assertFalse(
+            any("SURFACE RESTORE BLOCKED" in item for item in later_messages)
+        )
+
+    def test_failed_log_only_probe_keeps_surface_off(self):
+        surface = self.write_registry()
+        self.switch.write_text("manual off\n", encoding="utf-8")
+        self.write_inputs(statuses=[])
+        self.heartbeat.start_restore_probe(
+            surface,
+            self.state_dir,
+            now=self.current_start,
+            duration_seconds=self.heartbeat.HOUR,
+        )
+
+        _, messages = self.monitor()
+
+        state = self.heartbeat.load_state(self.state_dir)
+        self.assertTrue(self.switch.is_file())
+        self.assertEqual(state["probes"]["test-surface"]["status"], "failed")
+        self.assertTrue(
+            any("SURFACE RESTORE BLOCKED test-surface" in item for item in messages)
+        )
+
+    def test_dry_run_records_pager_without_running_ntm_and_writes_liveness(self):
+        self.home.mkdir()
+        self.state_dir = self.home / ".local/state/jev"
+        self.telemetry_path = self.state_dir / "webscreen-shadow.jsonl"
+        self.switch = self.state_dir / "test-surface.off"
+        self.write_registry()
+        self.write_inputs(statuses=[])
+        no_send = mock.Mock(side_effect=AssertionError("dry-run invoked a subprocess"))
+        output = io.StringIO()
+        patches = (
+            mock.patch.dict(
+                os.environ,
+                {
+                    "HOME": str(self.home),
+                    "TMPDIR": str(self.root),
+                    "JEV_FLEET_STATE_DIR": str(self.state_dir),
+                    "JEV_OMP_ROOT": str(self.omp_root),
+                },
+            ),
+            mock.patch.object(fiw, "SURFACE_REGISTRY", self.registry),
+            mock.patch.object(fiw, "poll", return_value={}),
+            mock.patch.object(fiw, "submit_shadow"),
+            mock.patch.object(fiw, "ci_lines", return_value=[]),
+            mock.patch.object(fiw, "stranger_round", return_value=None),
+            mock.patch.object(fiw, "judge_lines", return_value=[]),
+            mock.patch.object(fiw, "key_round", return_value=None),
+            mock.patch.object(fiw, "inbox_paths", return_value=(self.root, self.root)),
+            mock.patch.object(fiw, "inbox_round", return_value="no mail"),
+            mock.patch.object(fiw, "stale_lock_round", return_value=None),
+            mock.patch.object(fiw, "capture_lock_creator", return_value=None),
+            mock.patch.object(fiw.time, "time", return_value=self.now),
+            mock.patch.object(fiw.subprocess, "run", no_send),
+            mock.patch.object(
+                sys, "argv", ["fleet-idle-watch.py", "--once", "--dry-run"]
+            ),
+        )
+        with contextlib.ExitStack() as stack:
+            for patcher in patches:
+                stack.enter_context(patcher)
+            with contextlib.redirect_stdout(output):
+                self.assertEqual(fiw.main(), 0)
+            self.assertTrue(fiw.send_pane(3, "dry-run worker message"))
+
+        self.assertTrue(self.switch.is_file())
+        self.assertIn("no current telemetry rows", self.switch.read_text())
+        self.assertEqual(self.heartbeat.DRY_RUN_SENDS[0][0], 1)
+        self.assertIn((3, "dry-run worker message"), self.heartbeat.DRY_RUN_SENDS)
+        no_send.assert_not_called()
+        self.assertIn("would page", output.getvalue())
+        self.assertNotIn("paged:", output.getvalue())
+        liveness = self.state_dir / self.heartbeat.LIVENESS_NAME
+        row = json.loads(liveness.read_text().splitlines()[-1])
+        self.assertEqual(row["status"], "ok")
+
+    def test_scheduled_on_cannot_override_watcher_auto_off(self):
+        path = HERE.parents[1] / "work/jev-qpv2/flip.py"
+        spec = importlib.util.spec_from_file_location("jev_qpv2_flip", path)
+        flip = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(flip)
+        schedule = self.root / "schedule.json"
+        heartbeat_state = self.root / "heartbeat-state.json"
+        switch = self.root / "memory-filter-enforce"
+        journal = self.root / "flips.jsonl"
+        schedule.write_text(
+            json.dumps(
+                {
+                    "blocks": [
+                        {
+                            "start": "2026-10-05T12:00:00Z",
+                            "end": "2026-10-05T16:00:00Z",
+                            "state": "ON",
+                        }
+                    ]
+                }
+            ),
+            encoding="utf-8",
+        )
+        heartbeat_state.write_text(
+            json.dumps({"surfaces": {"memory-filter": {"auto_off": True}}}),
+            encoding="utf-8",
+        )
+        output = io.StringIO()
+        patches = (
+            mock.patch.object(flip, "SCHED", str(schedule)),
+            mock.patch.object(flip, "ENFORCE", str(switch)),
+            mock.patch.object(flip, "JOURNAL", str(journal)),
+            mock.patch.object(
+                flip, "HEARTBEAT_STATE", str(heartbeat_state), create=True
+            ),
+            mock.patch.object(
+                flip,
+                "now",
+                return_value=flip.datetime(
+                    2026, 10, 5, 12, 5, tzinfo=flip.timezone.utc
+                ),
+            ),
+        )
+        with contextlib.ExitStack() as stack:
+            for patcher in patches:
+                stack.enter_context(patcher)
+            with contextlib.redirect_stdout(output):
+                self.assertEqual(flip.main(), 0)
+
+        self.assertFalse(switch.exists())
+        self.assertIn("watcher auto-off", output.getvalue())
+
+    def test_launchd_job_is_kept_alive_and_runs_this_watcher(self):
+        service = plistlib.loads((HERE / "ai.jev.fleet-idle-watch.plist").read_bytes())
+        repo = HERE.parents[1]
+
+        self.assertEqual(service["Label"], "ai.jev.fleet-idle-watch")
+        self.assertTrue(service["KeepAlive"])
+        self.assertTrue(service["RunAtLoad"])
+        self.assertEqual(service["WorkingDirectory"], str(repo))
+        self.assertEqual(
+            Path(service["ProgramArguments"][1]), repo / "scripts/fleet-idle-watch.py"
+        )
 
 
 if __name__ == "__main__":
