@@ -1827,6 +1827,124 @@ class SurfaceHeartbeat(unittest.TestCase):
         )
         return result[0], messages
 
+    def test_webscreen_counts_only_external_web_tool_results(self):
+        self.write_registry()
+        entry = json.loads(self.registry.read_text(encoding="utf-8"))["surfaces"][0]
+        entry["id"] = "webscreen-global"
+        entry["heartbeat"].update(
+            {
+                "eligible_tool_names": ["web_search", "web_extract"],
+                "exclude_cwd_roots": ["/Users/josh/Developer/jev"],
+            }
+        )
+        self.registry.write_text(
+            json.dumps({"schema_version": "blast-radius-surfaces.v1", "surfaces": [entry]}),
+            encoding="utf-8",
+        )
+        surface = self.heartbeat.load_registry(self.registry)[0]
+        inside = [
+            {"type": "session", "cwd": "/Users/josh/Developer/jev"},
+            {
+                "type": "message",
+                "timestamp": self.current_start + 60,
+                "message": {"role": "toolResult", "toolName": "web_search"},
+            },
+        ]
+        outside = [
+            {"type": "session", "cwd": "/Users/josh/Developer/other"},
+            {
+                "type": "message",
+                "timestamp": self.current_start + 70,
+                "message": {"role": "toolResult", "toolName": "eval"},
+            },
+            {
+                "type": "message",
+                "timestamp": self.current_start + 75,
+                "message": {
+                    "role": "toolResult",
+                    "toolName": "web_search",
+                    "isError": True,
+                },
+            },
+            {
+                "type": "message",
+                "timestamp": self.current_start + 80,
+                "message": {"role": "toolResult", "toolName": "web_extract"},
+            },
+        ]
+        self.session_file.write_text(
+            "\n".join(json.dumps(row) for row in inside) + "\n", encoding="utf-8"
+        )
+        external = self.session_file.parent / "external" / "session.jsonl"
+        external.parent.mkdir(parents=True)
+        external.write_text(
+            "\n".join(json.dumps(row) for row in outside) + "\n", encoding="utf-8"
+        )
+
+        host_events, _, _ = self.heartbeat.scan_omp_sessions(
+            self.omp_root,
+            self.history_start,
+            self.now,
+            set(),
+            [surface],
+        )
+
+        self.assertEqual(host_events[surface.id], [self.current_start + 80])
+
+    def test_webscreen_paused_status_is_not_classified_as_silence(self):
+        self.write_registry(polarity="presence-ON")
+        entry = json.loads(self.registry.read_text(encoding="utf-8"))["surfaces"][0]
+        entry["id"] = "webscreen-global"
+        entry["heartbeat"]["paused_statuses"] = ["fail_open", "paused", "local-only"]
+        self.registry.write_text(
+            json.dumps({"schema_version": "blast-radius-surfaces.v1", "surfaces": [entry]}),
+            encoding="utf-8",
+        )
+        self.write_inputs(statuses=[])
+        with self.telemetry_path.open("a", encoding="utf-8") as handle:
+            handle.write(
+                json.dumps(
+                    {
+                        "ts": self.current_start + 10,
+                        "status": "fail_open",
+                        "reason": None,
+                    }
+                )
+                + "\n"
+            )
+
+        assessment, messages = self.monitor()
+
+        self.assertEqual(assessment.state, "paused")
+        self.assertFalse(assessment.unhealthy)
+        self.assertEqual(messages, [])
+        self.assertTrue(self.switch.exists())
+
+    def test_surface_without_telemetry_is_unmeasurable_not_silent(self):
+        self.registry.write_text(
+            json.dumps(
+                {
+                    "schema_version": "blast-radius-surfaces.v1",
+                    "surfaces": [
+                        {
+                            "id": "harm-rule",
+                            "owner": "jev-w2mf",
+                            "telemetry": "none",
+                            "off_switch": None,
+                        }
+                    ],
+                }
+            ),
+            encoding="utf-8",
+        )
+        self.write_inputs(statuses=[])
+
+        assessment, messages = self.monitor()
+
+        self.assertEqual(assessment.state, "unmeasurable")
+        self.assertFalse(assessment.unhealthy)
+        self.assertEqual(messages, [])
+
     def test_silent_surface_pages_reason_and_turns_off_presence_off_switch(self):
         self.write_registry()
         self.write_inputs(statuses=[])
@@ -1854,6 +1972,7 @@ class SurfaceHeartbeat(unittest.TestCase):
                             "heartbeat": {
                                 "source": "omp_session",
                                 "eligible_event": "tool_call",
+                                "eligible_tool_names": ["bash"],
                                 "custom_types": [custom_type],
                                 "error_rate_ceiling": 0.25,
                                 "minimum_error_rows": 3,
@@ -1878,6 +1997,7 @@ class SurfaceHeartbeat(unittest.TestCase):
                         "type": "custom",
                         "customType": "tool_execution_start",
                         "timestamp": stamp,
+                        "data": {"toolName": "bash"},
                     },
                     {
                         "type": "custom",
@@ -1895,6 +2015,13 @@ class SurfaceHeartbeat(unittest.TestCase):
                         "type": "custom",
                         "customType": "tool_execution_start",
                         "timestamp": stamp,
+                        "data": {"toolName": "bash"},
+                    },
+                    {
+                        "type": "custom",
+                        "customType": "tool_execution_start",
+                        "timestamp": stamp,
+                        "data": {"toolName": "web_search"},
                     },
                     {
                         "type": "custom",
@@ -2067,7 +2194,12 @@ class SurfaceHeartbeat(unittest.TestCase):
 
     def test_healthy_log_only_probe_restores_once_and_stays_on(self):
         surface = self.write_registry()
-        self.switch.write_text("manual off\n", encoding="utf-8")
+        self.write_inputs(statuses=[])
+        self.monitor()
+        self.assertTrue(self.switch.is_file())
+        self.assertTrue(
+            self.heartbeat.load_state(self.state_dir)["surfaces"]["test-surface"]["auto_off"]
+        )
         self.write_inputs(statuses=["ok"] * 3)
         self.heartbeat.start_restore_probe(
             surface,
@@ -2106,6 +2238,38 @@ class SurfaceHeartbeat(unittest.TestCase):
         state = self.heartbeat.load_state(self.state_dir)
         self.assertTrue(self.switch.is_file())
         self.assertEqual(state["probes"]["test-surface"]["status"], "failed")
+        self.assertTrue(
+            any("SURFACE RESTORE BLOCKED test-surface" in item for item in messages)
+        )
+
+    def test_operator_off_marker_beats_healthy_restore_probe(self):
+        self.write_registry("presence-ON")
+        self.write_inputs(statuses=[])
+        self.monitor()
+        self.assertFalse(self.switch.exists())
+        entry = json.loads(self.registry.read_text(encoding="utf-8"))["surfaces"][0]
+        marker = self.root / "operator-off"
+        entry["operator_off_marker"] = str(marker)
+        self.registry.write_text(
+            json.dumps({"schema_version": "blast-radius-surfaces.v1", "surfaces": [entry]}),
+            encoding="utf-8",
+        )
+        surface = self.heartbeat.load_registry(self.registry)[0]
+        marker.write_text("operator requested OFF\n", encoding="utf-8")
+        self.write_inputs(statuses=["ok"] * 3)
+        self.heartbeat.start_restore_probe(
+            surface,
+            self.state_dir,
+            now=self.current_start,
+            duration_seconds=self.heartbeat.HOUR,
+        )
+
+        _, messages = self.monitor()
+        state = self.heartbeat.load_state(self.state_dir)
+
+        self.assertFalse(self.switch.exists())
+        self.assertEqual(state["probes"]["test-surface"]["status"], "failed")
+        self.assertIn("operator OFF marker is present", state["probes"]["test-surface"]["reason"])
         self.assertTrue(
             any("SURFACE RESTORE BLOCKED test-surface" in item for item in messages)
         )
@@ -2164,6 +2328,56 @@ class SurfaceHeartbeat(unittest.TestCase):
         row = json.loads(liveness.read_text().splitlines()[-1])
         self.assertEqual(row["status"], "ok")
 
+    def test_dry_run_healthy_traffic_keeps_switch_on_without_ntm(self):
+        self.home.mkdir()
+        self.state_dir = self.home / ".local/state/jev"
+        self.telemetry_path = self.state_dir / "webscreen-shadow.jsonl"
+        self.switch = self.state_dir / "test-surface.off"
+        self.write_registry()
+        self.write_inputs(statuses=["ok"] * 3)
+        no_send = mock.Mock(side_effect=AssertionError("dry-run invoked a subprocess"))
+        output = io.StringIO()
+        patches = (
+            mock.patch.dict(
+                os.environ,
+                {
+                    "HOME": str(self.home),
+                    "TMPDIR": str(self.root),
+                    "JEV_FLEET_STATE_DIR": str(self.state_dir),
+                    "JEV_OMP_ROOT": str(self.omp_root),
+                },
+            ),
+            mock.patch.object(fiw, "SURFACE_REGISTRY", self.registry),
+            mock.patch.object(fiw, "poll", return_value={}),
+            mock.patch.object(fiw, "submit_shadow"),
+            mock.patch.object(fiw, "ci_lines", return_value=[]),
+            mock.patch.object(fiw, "stranger_round", return_value=None),
+            mock.patch.object(fiw, "judge_lines", return_value=[]),
+            mock.patch.object(fiw, "key_round", return_value=None),
+            mock.patch.object(fiw, "inbox_paths", return_value=(self.root, self.root)),
+            mock.patch.object(fiw, "inbox_round", return_value="no mail"),
+            mock.patch.object(fiw, "stale_lock_round", return_value=None),
+            mock.patch.object(fiw, "capture_lock_creator", return_value=None),
+            mock.patch.object(fiw.time, "time", return_value=self.now),
+            mock.patch.object(fiw.subprocess, "run", no_send),
+            mock.patch.object(
+                sys, "argv", ["fleet-idle-watch.py", "--once", "--dry-run"]
+            ),
+        )
+        with contextlib.ExitStack() as stack:
+            for patcher in patches:
+                stack.enter_context(patcher)
+            with contextlib.redirect_stdout(output):
+                self.assertEqual(fiw.main(), 0)
+
+        self.assertFalse(self.switch.exists())
+        self.assertEqual(self.heartbeat.DRY_RUN_SENDS, [])
+        no_send.assert_not_called()
+        self.assertIn("healthy", output.getvalue())
+        liveness = self.state_dir / self.heartbeat.LIVENESS_NAME
+        row = json.loads(liveness.read_text().splitlines()[-1])
+        self.assertEqual(row["status"], "ok")
+
     def test_scheduled_on_cannot_override_watcher_auto_off(self):
         path = HERE.parents[1] / "work/jev-qpv2/flip.py"
         spec = importlib.util.spec_from_file_location("jev_qpv2_flip", path)
@@ -2215,6 +2429,47 @@ class SurfaceHeartbeat(unittest.TestCase):
 
         self.assertFalse(switch.exists())
         self.assertIn("watcher auto-off", output.getvalue())
+
+    def test_operator_off_marker_beats_scheduled_on_when_heartbeat_is_healthy(self):
+        path = HERE.parents[1] / "work/jev-qpv2/flip.py"
+        spec = importlib.util.spec_from_file_location("jev_qpv2_operator_off", path)
+        flip = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(flip)
+        schedule = self.root / "schedule.json"
+        heartbeat_state = self.root / "heartbeat-state.json"
+        switch = self.root / "memory-filter-enforce"
+        operator_off = self.root / "memory-filter.operator-off"
+        journal = self.root / "flips.jsonl"
+        schedule.write_text(json.dumps({"blocks": [{"start": "2026-10-05T12:00:00Z", "end": "2026-10-05T16:00:00Z", "state": "ON"}]}), encoding="utf-8")
+        heartbeat_state.write_text(
+            json.dumps({"surfaces": {"memory-filter": {"auto_off": False}}}),
+            encoding="utf-8",
+        )
+        operator_off.write_text("operator requested OFF\n", encoding="utf-8")
+        output = io.StringIO()
+        patches = (
+            mock.patch.object(flip, "SCHED", str(schedule)),
+            mock.patch.object(flip, "ENFORCE", str(switch)),
+            mock.patch.object(flip, "OPERATOR_OFF", str(operator_off)),
+            mock.patch.object(flip, "JOURNAL", str(journal)),
+            mock.patch.object(flip, "HEARTBEAT_STATE", str(heartbeat_state)),
+            mock.patch.object(
+                flip,
+                "now",
+                return_value=flip.datetime(
+                    2026, 10, 5, 12, 5, tzinfo=flip.timezone.utc
+                ),
+            ),
+        )
+        with contextlib.ExitStack() as stack:
+            for patcher in patches:
+                stack.enter_context(patcher)
+            with contextlib.redirect_stdout(output):
+                self.assertEqual(flip.main(), 0)
+
+        self.assertFalse(switch.exists())
+        self.assertFalse(journal.exists())
+        self.assertIn("operator OFF active", output.getvalue())
 
     def test_launchd_job_is_kept_alive_and_runs_this_watcher(self):
         service = plistlib.loads((HERE / "ai.jev.fleet-idle-watch.plist").read_bytes())

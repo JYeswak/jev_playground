@@ -7,13 +7,13 @@ import pwd
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable
+from collections.abc import Callable
 
 SCRIPT_DIR = str(Path(__file__).resolve().parent)
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
 
-from fleet_surface_telemetry import (  # noqa: E402
+from fleet_surface_telemetry import (
     HISTORY_SECONDS,
     Assessment,
     HeartbeatError,
@@ -56,6 +56,8 @@ def switch_is_on(surface: Surface) -> bool | None:
 
 def _set_switch(surface: Surface, *, on: bool, reason: str) -> bool:
     path, polarity = surface.switch_path, surface.switch_polarity
+    if on and surface.operator_off_path is not None and surface.operator_off_path.exists():
+        return False
     if path is None or polarity is None or switch_is_on(surface) == on:
         return False
     _guard_write(path)
@@ -236,8 +238,21 @@ def finish_restore_probe(
     )
     if result == "pending":
         return result
+    if result == "restored":
+        record = state.get("surfaces", {}).get(surface.id, {})
+        if not isinstance(record, dict) or record.get("auto_off") is not True:
+            result, reason = "failed", "OFF state is not owned by heartbeat"
+        elif surface.operator_off_path is not None and surface.operator_off_path.exists():
+            result, reason = "failed", "operator OFF marker is present"
+        elif surface.switch_polarity == "presence-OFF" and surface.switch_path is not None:
+            try:
+                marker_text = surface.switch_path.read_text(encoding="utf-8")
+            except OSError:
+                marker_text = ""
+            if not marker_text.startswith("fleet heartbeat auto-off: "):
+                result, reason = "failed", "operator OFF marker is present"
     if result == "restored" and not _set_switch(surface, on=True, reason=reason):
-        result, reason = "failed", "switch polarity or state prevented restoration"
+        result, reason = "failed", "operator OFF marker or switch state prevented restoration"
     probe["status"] = result
     probe["reason"] = reason
     if result == "restored":
@@ -293,7 +308,7 @@ def monitor(
         raise HeartbeatError("dry-run targets are not isolated under scratch HOME")
     custom_types = {custom for surface in surfaces for custom in surface.custom_types}
     host_events, session_telemetry, session_available = scan_omp_sessions(
-        omp_root, history_start, now, custom_types
+        omp_root, history_start, now, custom_types, surfaces
     )
     state = load_state(state_dir)
     assessments = []
@@ -303,7 +318,7 @@ def monitor(
         )
         if surface.source == "omp_session" and not session_available:
             telemetry.available = False
-        events = host_events.get(surface.event_kind, [])
+        events = host_events.get(surface.id, host_events.get(surface.event_kind, []))
         assessment = assess_surface(
             surface, events, telemetry, history_start, current_start, current_end
         )
@@ -318,9 +333,8 @@ def monitor(
             baseline=assessment.interval,
             send=send,
         )
-        if probe_status in {"pending", "restored", "failed"}:
-            if probe_status in {"restored", "failed"}:
-                continue
+        if probe_status in {"restored", "failed"}:
+            continue
         record = state.setdefault("surfaces", {}).setdefault(surface.id, {})
         prior_state = record.get("state")
         record.update(
@@ -400,6 +414,10 @@ def dry_run_targets_are_isolated(registry_path: Path, state_dir: Path) -> bool:
     return all(
         (surface.path is None or _under(surface.path, Path.home()))
         and (surface.switch_path is None or _under(surface.switch_path, Path.home()))
+        and (
+            surface.operator_off_path is None
+            or _under(surface.operator_off_path, Path.home())
+        )
         for surface in surfaces
     )
 

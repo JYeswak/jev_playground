@@ -10,7 +10,7 @@ from pathlib import Path
 HOUR = 3600
 HISTORY_HOURS = 7 * 24
 HISTORY_SECONDS = HISTORY_HOURS * HOUR
-ERROR_STATUSES = {"error", "failed", "failure", "fail_open", "timeout", "invalid"}
+ERROR_STATUSES = {"error", "failed", "failure", "timeout", "invalid"}
 
 
 class HeartbeatError(ValueError):
@@ -35,13 +35,17 @@ class Surface:
     minimum_error_rows: int
     switch_path: Path | None
     switch_polarity: str | None
+    eligible_tool_names: frozenset[str] = frozenset()
+    exclude_cwd_roots: tuple[Path, ...] = ()
+    paused_statuses: frozenset[str] = frozenset()
+    operator_off_path: Path | None = None
 
 
 @dataclass(frozen=True)
 class Observation:
     timestamp: float
     error: bool
-
+    status: str | None = None
 
 @dataclass
 class Telemetry:
@@ -49,8 +53,10 @@ class Telemetry:
     invalid_rows: int = 0
     available: bool = True
 
-    def add(self, timestamp: float, is_error: bool) -> None:
-        self.observations.append(Observation(timestamp, is_error))
+    def add(
+        self, timestamp: float, is_error: bool, status: str | None = None
+    ) -> None:
+        self.observations.append(Observation(timestamp, is_error, status))
 
     def counts(self, start: float, end: float) -> tuple[int, int]:
         rows = errors = 0
@@ -142,6 +148,28 @@ def load_registry(path: Path) -> list[Surface]:
         if not isinstance(owner, str) or not owner.strip():
             raise HeartbeatError(f"{surface_id}: live surface has no owner")
         heartbeat = entry.get("heartbeat")
+        if heartbeat is None and entry.get("telemetry") == "none":
+            result.append(
+                Surface(
+                    id=surface_id,
+                    owner=owner,
+                    event_kind="",
+                    source="none",
+                    path=None,
+                    timestamp_field="ts",
+                    status_field=None,
+                    error_field=None,
+                    error_statuses=ERROR_STATUSES,
+                    surface_field=None,
+                    surface_value=None,
+                    custom_types=(),
+                    error_rate_ceiling=1.0,
+                    minimum_error_rows=1,
+                    switch_path=None,
+                    switch_polarity=None,
+                )
+            )
+            continue
         if not isinstance(heartbeat, dict):
             raise HeartbeatError(
                 f"{surface_id}: live surface has no heartbeat configuration"
@@ -185,6 +213,14 @@ def load_registry(path: Path) -> list[Surface]:
             }:
                 raise HeartbeatError(f"{surface_id}: invalid switch path or polarity")
             switch_path = Path(raw_switch).expanduser()
+        raw_operator_off = entry.get("operator_off_marker")
+        if raw_operator_off is not None and not isinstance(raw_operator_off, str):
+            raise HeartbeatError(f"{surface_id}: operator_off_marker must be a path")
+        operator_off_path = (
+            Path(raw_operator_off).expanduser()
+            if isinstance(raw_operator_off, str)
+            else None
+        )
         ceiling = heartbeat.get("error_rate_ceiling")
         minimum_errors = heartbeat.get("minimum_error_rows", 3)
         if (
@@ -209,6 +245,21 @@ def load_registry(path: Path) -> list[Surface]:
             isinstance(item, str) for item in custom_types
         ):
             raise HeartbeatError(f"{surface_id}: custom_types must be strings")
+        eligible_tools = heartbeat.get("eligible_tool_names", [])
+        excluded_cwds = heartbeat.get("exclude_cwd_roots", [])
+        paused_statuses = heartbeat.get("paused_statuses", [])
+        if not isinstance(eligible_tools, list) or not all(
+            isinstance(item, str) for item in eligible_tools
+        ):
+            raise HeartbeatError(f"{surface_id}: eligible_tool_names must be strings")
+        if not isinstance(excluded_cwds, list) or not all(
+            isinstance(item, str) for item in excluded_cwds
+        ):
+            raise HeartbeatError(f"{surface_id}: exclude_cwd_roots must be strings")
+        if not isinstance(paused_statuses, list) or not all(
+            isinstance(item, str) for item in paused_statuses
+        ):
+            raise HeartbeatError(f"{surface_id}: paused_statuses must be strings")
         result.append(
             Surface(
                 id=surface_id,
@@ -228,15 +279,21 @@ def load_registry(path: Path) -> list[Surface]:
                 minimum_error_rows=minimum_errors,
                 switch_path=switch_path,
                 switch_polarity=switch_polarity,
+                eligible_tool_names=frozenset(eligible_tools),
+                exclude_cwd_roots=tuple(Path(item).resolve() for item in excluded_cwds),
+                paused_statuses=frozenset(item.casefold() for item in paused_statuses),
+                operator_off_path=operator_off_path,
             )
         )
     return result
 
 
 def is_error(row: dict, surface: Surface) -> bool:
+    status = row.get(surface.status_field) if surface.status_field else None
+    if isinstance(status, str) and status.casefold() in surface.paused_statuses:
+        return False
     if surface.error_field and row.get(surface.error_field) not in (None, False, "", 0):
         return True
-    status = row.get(surface.status_field) if surface.status_field else None
     if not isinstance(status, str):
         return False
     normalized = status.casefold()
@@ -274,37 +331,47 @@ def read_jsonl(path: Path, surface: Surface, start: float, end: float) -> Teleme
             if stamp is None:
                 telemetry.invalid_rows += 1
             elif start <= stamp < end:
-                telemetry.add(stamp, is_error(row, surface))
+                telemetry.add(
+                    stamp,
+                    is_error(row, surface),
+                    row.get(surface.status_field) if surface.status_field else None,
+                )
     return telemetry
 
 
 def _session_files(omp_root: Path) -> list[Path]:
-    directories = [omp_root / "agent" / "sessions" / "-Developer-jev"]
+    agents = [omp_root / "agent"]
     profiles = omp_root / "profiles"
     try:
-        profile_dirs = list(profiles.iterdir())
+        agents.extend(profile / "agent" for profile in profiles.iterdir())
     except OSError:
-        profile_dirs = []
-    directories.extend(
-        profile / "agent" / "sessions" / "-Developer-jev" for profile in profile_dirs
-    )
+        pass
     paths = []
-    for directory in directories:
+    for agent in agents:
         try:
-            paths.extend(path for path in directory.glob("*.jsonl") if path.is_file())
+            paths.extend(
+                path
+                for path in (agent / "sessions").rglob("*.jsonl")
+                if path.is_file()
+            )
         except OSError:
             continue
     return paths
 
 
 def scan_omp_sessions(
-    omp_root: Path, start: float, end: float, custom_types: set[str]
+    omp_root: Path,
+    start: float,
+    end: float,
+    custom_types: set[str],
+    surfaces: tuple[Surface, ...] | list[Surface] = (),
 ) -> tuple[dict[str, list[float]], dict[str, Telemetry], bool]:
     host_events: dict[str, list[float]] = {
         "turn": [],
         "tool_result": [],
         "tool_call": [],
     }
+    host_events.update({surface.id: [] for surface in surfaces})
     custom_rows = {name: Telemetry() for name in custom_types}
     files = _session_files(omp_root)
     if not omp_root.exists():
@@ -316,6 +383,7 @@ def scan_omp_sessions(
             handle = path.open(encoding="utf-8")
         except OSError:
             continue
+        session_cwd: Path | None = None
         with handle:
             for line in handle:
                 try:
@@ -323,6 +391,10 @@ def scan_omp_sessions(
                 except ValueError:
                     continue
                 if not isinstance(row, dict):
+                    continue
+                if row.get("type") == "session":
+                    cwd = row.get("cwd")
+                    session_cwd = Path(cwd).resolve() if isinstance(cwd, str) else None
                     continue
                 if row.get("type") == "message":
                     message = row.get("message")
@@ -338,17 +410,53 @@ def scan_omp_sessions(
                         "tool_result"
                         if role == "toolResult"
                         else "turn"
-                        if role == "assistant"
+                        if role == "user"
                         else None
                     )
-                    if kind:
-                        host_events[kind].append(stamp)
+                    if (
+                        kind is None
+                        or (kind == "tool_result" and message.get("isError") is True)
+                    ):
+                        continue
+                    host_events[kind].append(stamp)
+                    for surface in surfaces:
+                        if surface.event_kind != kind:
+                            continue
+                        if (
+                            surface.eligible_tool_names
+                            and message.get("toolName") not in surface.eligible_tool_names
+                        ):
+                            continue
+                        if surface.exclude_cwd_roots and (
+                            session_cwd is None
+                            or any(
+                                _path_is_within(session_cwd, root)
+                                for root in surface.exclude_cwd_roots
+                            )
+                        ):
+                            continue
+                        host_events[surface.id].append(stamp)
                 elif row.get("type") == "custom":
                     custom_type = row.get("customType")
                     if custom_type == "tool_execution_start":
                         stamp = parse_timestamp(row.get("timestamp"))
                         if stamp is not None and start <= stamp < end:
                             host_events["tool_call"].append(stamp)
+                            for surface in surfaces:
+                                if surface.event_kind != "tool_call":
+                                    continue
+                                data = row.get("data")
+                                tool_name = (
+                                    data.get("toolName")
+                                    if isinstance(data, dict)
+                                    else None
+                                )
+                                if (
+                                    surface.eligible_tool_names
+                                    and tool_name not in surface.eligible_tool_names
+                                ):
+                                    continue
+                                host_events[surface.id].append(stamp)
                     if custom_type not in custom_rows:
                         continue
                     data = row.get("data")
@@ -359,8 +467,18 @@ def scan_omp_sessions(
                     if stamp is None:
                         custom_rows[custom_type].invalid_rows += 1
                     elif start <= stamp < end:
-                        custom_rows[custom_type].add(stamp, bool(data.get("error")))
+                        custom_rows[custom_type].add(
+                            stamp, bool(data.get("error")), data.get("status")
+                        )
     return host_events, custom_rows, True
+
+
+def _path_is_within(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+    except ValueError:
+        return False
+    return True
 
 
 def fit_rate_interval(
@@ -408,6 +526,11 @@ def assess_surface(
         host_events, telemetry.observations, history_start, current_start
     )
     rate = rows / events if events else None
+    if surface.source == "none":
+        return Assessment(
+            surface.id, "unmeasurable", "surface has no telemetry source", events,
+            rows, errors, rate, interval
+        )
     if events == 0:
         return Assessment(
             surface.id,
@@ -436,6 +559,26 @@ def assess_surface(
             surface.id,
             "invalid-telemetry",
             reason,
+            events,
+            rows,
+            errors,
+            rate,
+            interval,
+        )
+    current_rows = [
+        row
+        for row in telemetry.observations
+        if current_start <= row.timestamp < current_end
+    ]
+    if (
+        current_rows
+        and current_rows[-1].status is not None
+        and current_rows[-1].status.casefold() in surface.paused_statuses
+    ):
+        return Assessment(
+            surface.id,
+            "paused",
+            f"latest telemetry status is {current_rows[-1].status}",
             events,
             rows,
             errors,

@@ -15,7 +15,24 @@
       "latency_budget_ms": 1500,
       "fail_open_test": ".omp/extensions/jev-memory-filter.test.mjs: throwing asker fails open",
       "off_switch": {"path": "~/.local/state/jev/memory-filter-enforce", "polarity": "presence-ON"},
+      "operator_off_marker": "~/.local/state/jev/memory-filter.operator-off",
       "safe_side": "keep all memories on refusal, timeout, or switch absence",
+      "heartbeat": {
+        "source": "jsonl",
+        "eligible_event": "turn",
+        "path": "~/.local/state/jev/memory-filter.jsonl",
+        "timestamp_field": "ts",
+        "status_field": "status",
+        "error_statuses": ["fail_open", "invalid-keep", "late-ignored"],
+        "error_rate_ceiling": 0.25,
+        "minimum_error_rows": 3,
+        "provenance": {
+          "writer": ".omp/extensions/jev-memory-filter.ts:245-247",
+          "rows": ".omp/extensions/jev-memory-filter.ts:386-400,409-412,424-425",
+          "host_event": "scripts/fleet_surface_telemetry.py:395-438",
+          "test": ".omp/extensions/jev-memory-filter.test.mjs:26,100-103"
+        }
+      },
       "owner": "jev-9cqw/jev-ugk0"
     },
     {
@@ -33,6 +50,24 @@
       "fail_open_test": ".omp/hooks/post/jev-webscreen.test.mjs: asker failure preserves the result and does not throw",
       "off_switch": null,
       "safe_side": "shadow web scoring and annotate-only injection; never withhold tool results",
+      "heartbeat": {
+        "source": "jsonl",
+        "eligible_event": "tool_result",
+        "eligible_tool_names": ["web_search", "web_extract"],
+        "exclude_cwd_roots": ["/Users/josh/Developer/jev"],
+        "path": "~/.local/state/jev/webscreen-shadow.jsonl",
+        "timestamp_field": "ts",
+        "status_field": "status",
+        "paused_statuses": ["fail_open", "paused", "local-only"],
+        "error_rate_ceiling": 0.25,
+        "minimum_error_rows": 3,
+        "provenance": {
+          "scope": "work/jev-j0er/jev-webscreen-global.ts:14-19; .omp/hooks/post/jev-webscreen.ts:10,259-261",
+          "pause": ".omp/hooks/post/jev-webscreen.ts:273-286; 401/402/403 circuit breaker has no durable paused marker",
+          "rows": ".omp/hooks/post/jev-webscreen.ts:16-35,283-290",
+          "test": ".omp/hooks/post/jev-webscreen.test.mjs:81-94,110-126"
+        }
+      },
       "owner": "jev-j0er"
     },
     {
@@ -69,6 +104,19 @@
       "fail_open_test": "work/omp-guard-rule/guard-rule.test.mjs: throwing classify yields guard_error, never a pass",
       "off_switch": null,
       "safe_side": "observe-only; return undefined and never block",
+      "heartbeat": {
+        "source": "omp_session",
+        "eligible_event": "tool_call",
+        "eligible_tool_names": ["bash"],
+        "custom_types": ["com.zeststream.omp-guard-rule.decision.v1"],
+        "error_field": "error",
+        "error_rate_ceiling": 0.25,
+        "minimum_error_rows": 3,
+        "provenance": {
+          "writer": "work/omp-guard-rule/guard-rule.ts:18,42-47,66-74",
+          "test": "work/omp-guard-rule/guard-rule.test.mjs:76-84"
+        }
+      },
       "owner": "jev-w2mf"
     },
     {
@@ -83,6 +131,8 @@
       "fail_open_test": "work/omp-harm-rule/harm-error.test.mjs: throwing classify yields harm_error with no score field",
       "off_switch": null,
       "safe_side": "observe-only; return undefined and never block",
+      "telemetry": "none",
+      "telemetry_reason": "No dedicated telemetry file or appendFile logger; do not infer silence from session volume.",
       "owner": "jev-w2mf"
     },
     {
@@ -94,6 +144,18 @@
       "fail_open_test": "work/omp-jev-route/test/route.test.mjs: an unset API key records route_error, never scored advice",
       "off_switch": {"path": "~/.local/state/jev/jev-lab-route.off", "polarity": "presence-OFF"},
       "safe_side": "return undefined without a Jev call; no routing or blocking",
+      "heartbeat": {
+        "source": "omp_session",
+        "eligible_event": "turn",
+        "custom_types": ["com.zeststream.omp-jev-route.decision.v1"],
+        "error_field": "error",
+        "error_rate_ceiling": 0.25,
+        "minimum_error_rows": 3,
+        "provenance": {
+          "writer": "work/omp-jev-route/src/index.ts:99-115",
+          "test": "work/omp-jev-route/test/route.test.mjs:24-36"
+        }
+      },
       "owner": "jev-w2mf"
     },
     {
@@ -105,6 +167,19 @@
       "fail_open_test": "work/omp-jev-review/test/review.test.mjs: a throwing transport records review_error and never breaks the session",
       "off_switch": {"path": "~/.local/state/jev/jev-lab-review.off", "polarity": "presence-OFF"},
       "safe_side": "return undefined without review or child work",
+      "heartbeat": {
+        "source": "omp_session",
+        "eligible_event": "tool_call",
+        "eligible_tool_names": ["bash"],
+        "custom_types": ["com.zeststream.omp-jev-review.decision.v1"],
+        "error_field": "error",
+        "error_rate_ceiling": 0.25,
+        "minimum_error_rows": 3,
+        "provenance": {
+          "writer": "work/omp-jev-review/src/index.ts:270-310,342-354",
+          "test": "work/omp-jev-review/test/review.test.mjs:167-199,449-457"
+        }
+      },
       "owner": "jev-w2mf"
     },
     {
@@ -116,17 +191,42 @@
       "fail_open_test": "work/omp-jev-preaction/test/preaction.test.mjs: it observes only: no block, no throw, undefined on every path",
       "off_switch": {"path": "~/.local/state/jev/jev-lab-preaction.off", "polarity": "presence-OFF"},
       "safe_side": "return undefined; allow the tool call with no preaction decision",
+      "heartbeat": {
+        "source": "omp_session",
+        "eligible_event": "tool_call",
+        "eligible_tool_names": ["bash"],
+        "custom_types": ["com.zeststream.omp-jev-preaction.decision.v1"],
+        "error_rate_ceiling": 0.25,
+        "minimum_error_rows": 3,
+        "provenance": {
+          "writer": "work/omp-jev-preaction/src/index.ts:36-53",
+          "test": "work/omp-jev-preaction/test/preaction.test.mjs:17-53"
+        }
+      },
       "owner": "jev-w2mf"
     },
     {
       "id": "jev-lab-observer",
       "installed_paths": ["/Users/josh/.omp/profiles/jev-lab/agent/extensions/omp-jev-observer.ts"],
-      "loaded_from": "/Users/josh/Developer/jev/work/omp-jev-observer/src/index.ts",
+      "loaded_from": "/Users/josh/Developer/jev/work/omp-jev-observer/src/observer.mjs",
       "outside_repo": true,
       "latency_budget_ms": 50,
       "fail_open_test": "work/omp-jev-observer/test/observer.test.mjs: Jev error returns undefined and records the error without cost",
       "off_switch": {"path": "~/.local/state/jev/jev-lab-observer.off", "polarity": "presence-OFF"},
       "safe_side": "return undefined without a Jev call; allow tool call",
+      "heartbeat": {
+        "source": "omp_session",
+        "eligible_event": "tool_call",
+        "eligible_tool_names": ["bash"],
+        "custom_types": ["com.zeststream.omp-jev-observer.decision.v1"],
+        "error_field": "error",
+        "error_rate_ceiling": 0.25,
+        "minimum_error_rows": 3,
+        "provenance": {
+          "writer": "work/omp-jev-observer/src/observer.mjs:6,104-105,132-136",
+          "test": "work/omp-jev-observer/test/emits-rows.test.mjs:53-77"
+        }
+      },
       "owner": "jev-w2mf"
     }
   ]
