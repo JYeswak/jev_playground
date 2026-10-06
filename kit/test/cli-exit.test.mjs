@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { EXIT_CODES, exitCodeForFailure, statusForFailure } from '../src/cli/exit.mjs';
+import { rewriteCliError } from '../dist/cli/errors.js';
 import { examplePath, freshHome, runCli } from './cli-support.mjs';
 
 test('the shared exit dictionary and failure classes are stable', () => {
@@ -30,6 +31,16 @@ test('the shared exit dictionary and failure classes are stable', () => {
   assert.equal(exitCodeForFailure({ reason: 'no-input' }), 66);
   assert.equal(exitCodeForFailure({ reason: 'cannot-create' }), 73);
   assert.equal(exitCodeForFailure({ reason: 'io' }), 74);
+});
+
+test('retryable and unsafe installer errors retain their typed exit envelopes', () => {
+  const retryable = rewriteCliError({ reason: 'transport', message: 'installer is already running', command: 'classifier install' });
+  assert.equal(retryable.code, 'RETRYABLE');
+  assert.equal(retryable.exit_code, EXIT_CODES.RETRYABLE);
+
+  const refused = rewriteCliError({ reason: 'refused-unsafe', message: 'invalid installer manifest', command: 'classifier install' });
+  assert.equal(refused.code, 'REFUSED_UNSAFE');
+  assert.equal(refused.exit_code, EXIT_CODES.REFUSED_UNSAFE);
 });
 
 test('missing credentials stay NOT_RUN with the same exit under JSON and robot modes', async () => {

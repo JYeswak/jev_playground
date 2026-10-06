@@ -31,3 +31,17 @@ test('distant typos and destructive-flag typos are not suggested or applied', as
   assert.ok(!destructive.stderr.includes('--apply'), destructive.stderr);
   assert.ok(!destructive.stderr.includes('Did you mean:'), destructive.stderr);
 });
+
+test('installer verbs parse target, directory and explicit apply mode', () => {
+  const install = parseArgv(['install', 'all', '--dry-run', '--robot']);
+  assert.equal(install.command, 'install');
+  assert.deepEqual(install.positionals, ['all']);
+  assert.equal(install.options['dry-run'], true);
+  assert.equal(install.outputMode, 'robot');
+
+  const uninstall = parseArgv(['uninstall', 'omp-project', '--dir', '/repo', '--apply']);
+  assert.equal(uninstall.command, 'uninstall');
+  assert.deepEqual(uninstall.positionals, ['omp-project']);
+  assert.equal(uninstall.options.dir, '/repo');
+  assert.equal(uninstall.options.apply, true);
+});

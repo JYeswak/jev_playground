@@ -1,4 +1,4 @@
-const COMMANDS = ['doctor', 'ask', 'rerank', 'classify', 'verify', 'score', 'gate', 'omp'];
+const COMMANDS = ['doctor', 'ask', 'rerank', 'classify', 'verify', 'score', 'gate', 'omp', 'install', 'uninstall'];
 const DESTRUCTIVE_OPTIONS = new Set(['--apply', '--force', '--yes', '--delete', '--remove', '--adopt', '--take-over-bin']);
 const COMMON = new Set(['--json', '--robot', '--no-color']);
 const VALUE_OPTIONS = {
@@ -10,6 +10,8 @@ const VALUE_OPTIONS = {
   score: new Set(['--text', '--levels']),
   gate: new Set(['--command']),
   omp: new Set(['--dir']),
+  install: new Set(['--dir']),
+  uninstall: new Set(['--dir']),
 };
 const BOOLEAN_OPTIONS = {
   doctor: new Set(),
@@ -20,6 +22,8 @@ const BOOLEAN_OPTIONS = {
   score: new Set(['--fake']),
   gate: new Set(['--fake']),
   omp: new Set(['--dry-run', '--apply']),
+  install: new Set(['--dry-run', '--apply']),
+  uninstall: new Set(['--dry-run', '--apply']),
 };
 
 function oneEditOrSwap(left, right) {

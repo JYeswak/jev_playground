@@ -45,20 +45,58 @@ async function readManifest(path: string): Promise<Manifest | undefined> {
   return parsed as Manifest;
 }
 export async function installOmp(repoDir: string, dryRun = false): Promise<InstallResult> {
-  const repo = resolve(repoDir); const templateRoot = new URL("../templates/", import.meta.url);
+  const repo = resolve(repoDir);
+  const templateRoot = new URL("../templates/", import.meta.url);
   const files = Object.keys(INSTALL_FILES).map((path) => relative(repo, join(repo, ".omp", path)));
-  const destinations = Object.keys(INSTALL_FILES).map((path) => join(repo, ".omp", path));
-  const manifestPath = join(repo, MANIFEST_PATH); const manifest = await readManifest(manifestPath); const templates = new Map<string, string>();
+  const manifestPath = join(repo, MANIFEST_PATH);
+  const manifest = await readManifest(manifestPath);
+  const templates = new Map<string, string>();
   if (manifest?.files["config.yml"]) {
     throw new Error("existing installer-managed .omp/config.yml requires owner review; preserve and merge host extensions before a new install");
   }
-  for (const [destination, template] of Object.entries(INSTALL_FILES)) templates.set(destination, await readFile(new URL(template, templateRoot), "utf8"));
-  const edited: string[] = []; const unmanaged: string[] = [];
-  for (const [destination] of templates) { const absolute = join(repo, ".omp", destination); if (!(await exists(absolute))) continue; if (!manifest) unmanaged.push(relative(repo, absolute)); else { const expected = manifest.files[destination]; const actual = sha256(await readFile(absolute, "utf8")); if (!expected || actual !== expected) edited.push(relative(repo, absolute)); } }
+  for (const [destination, template] of Object.entries(INSTALL_FILES)) {
+    templates.set(destination, await readFile(new URL(template, templateRoot), "utf8"));
+  }
+
+  const edited: string[] = [];
+  const unmanaged: string[] = [];
+  const writes = new Set<string>();
+  for (const [destination, content] of templates) {
+    const absolute = join(repo, ".omp", destination);
+    if (!(await exists(absolute))) {
+      writes.add(destination);
+      continue;
+    }
+    if (!manifest) {
+      unmanaged.push(relative(repo, absolute));
+      continue;
+    }
+    const existing = await readFile(absolute, "utf8");
+    const expected = manifest.files[destination];
+    if (!expected || sha256(existing) !== expected) {
+      edited.push(relative(repo, absolute));
+      continue;
+    }
+    if (existing !== content) writes.add(destination);
+  }
   if (edited.length > 0) throw new Error(`refusing to overwrite user-edited files: ${edited.join(", ")}`);
   if (unmanaged.length > 0) throw new Error(`refusing to overwrite existing files without installer manifest: ${unmanaged.join(", ")}`);
+
   const outputFiles = [...files, relative(repo, manifestPath)];
-  if (!dryRun) { for (const destination of destinations) await mkdir(resolve(destination, ".."), { recursive: true }); const hashes: Record<string, string> = {}; for (const [destination, content] of templates) { await writeFile(join(repo, ".omp", destination), content, { mode: 0o644 }); hashes[destination] = sha256(content); } await writeFile(manifestPath, `${JSON.stringify({ version: 1, files: hashes }, null, 2)}\n`, { mode: 0o644 }); }
+  if (!dryRun) {
+    for (const destination of writes) await mkdir(resolve(join(repo, ".omp", destination), ".."), { recursive: true });
+    const hashes: Record<string, string> = {};
+    for (const [destination, content] of templates) hashes[destination] = sha256(content);
+    for (const destination of writes) {
+      const content = templates.get(destination);
+      if (content === undefined) throw new Error(`installer plan references an unknown template: ${destination}`);
+      await writeFile(join(repo, ".omp", destination), content, { mode: 0o644 });
+    }
+    const manifestContent = `${JSON.stringify({ version: 1, files: hashes }, null, 2)}\n`;
+    if (!(await exists(manifestPath)) || await readFile(manifestPath, "utf8") !== manifestContent) {
+      await writeFile(manifestPath, manifestContent, { mode: 0o644 });
+    }
+  }
   return { status: dryRun ? "DRY_RUN" : "READY", repo, files: outputFiles, extensionActivation: "MANUAL_REQUIRED" };
 }
 

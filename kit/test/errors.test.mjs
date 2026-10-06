@@ -104,7 +104,7 @@ test('installer collision is refused and names the first three paths', async () 
   assert.equal(result.status, 4);
   assert.ok(result.stderr.includes('refusing to overwrite 4 unmanaged files'));
   assert.ok(result.stderr.includes('.omp/tools/jev-rerank.ts, .omp/tools/jev-claim-check.ts, .omp/tools/jev-screen.ts'));
-  assert.ok(result.stderr.includes('preview: classifier omp install --dry-run'));
+  assert.ok(result.stderr.includes('preview: classifier install omp-project --dir REPO --dry-run'));
   for (const path of paths) assert.equal(await readFile(join(repo, '.omp', 'tools', path), 'utf8'), 'user-owned');
 });
 

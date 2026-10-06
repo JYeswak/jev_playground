@@ -726,3 +726,8 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 
 - `kit/test/errors.test.mjs` — CLI error guidance, exit mapping, safe correction, missing-input handling, refusal messages, rank candidate limits, installer collision, and online-required formatting. Run: `node --test kit/test/errors.test.mjs` (12 tests).
 - `kit/test/registry.test.mjs` — registered command capabilities, robot docs/schema consistency, aliases, and reserved/malformed family-name rejection. Run: `node --test kit/test/registry.test.mjs` (2 tests).
+
+## Newly registered tests — jev-b35c.18
+
+- `kit/test/install-plan.test.mjs` — installer dry-run plan boundaries and safe target refusal. Run: `node --test kit/test/install-plan.test.mjs` (2 tests).
+- `kit/test/install-manifest.test.mjs` — manifest validation, ownership boundaries, idempotence, and safe uninstall. Run: `node --test kit/test/install-manifest.test.mjs` (4 tests).

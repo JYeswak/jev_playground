@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { homedir } from "node:os";
+import { join, resolve } from "node:path";
 import { askJev, askJevChoice, askJevScore, DEFAULT_MODEL } from "../dist/client.js";
 import { rerankTop1 } from "../dist/rerank.js";
 import { classifyText } from "../dist/classify.js";
@@ -9,6 +10,8 @@ import { scoreText } from "../dist/score.js";
 import { gateCommand } from "../dist/gate.js";
 import { createFakeFetch } from "../dist/fake.js";
 import { installOmp, ompDiscovery, uninstallOmp } from "../dist/install.js";
+import { createInstallPlan } from "../dist/install/plan.js";
+import { acquireInstallLock } from "../dist/install/manifest.js";
 import { createEnvelope } from "../src/cli/envelope.mjs";
 import { exitCodeForFailure } from "../src/cli/exit.mjs";
 import { parseArgv } from "../src/cli/argv.mjs";
@@ -155,6 +158,48 @@ async function score(args) {
     : undefined;
   return scoreText({ text, levels, apiKey: fake ? "fixture-key" : undefined, fetchImpl, model: fake ? "fake" : undefined });
 }
+async function runInstaller(command, args, parsed) {
+  if (hasFlag(args, "--dry-run") && hasFlag(args, "--apply")) {
+    return usageFailure("--dry-run and --apply cannot be used together");
+  }
+  if (parsed.positionals.length > 1) return usageFailure(`classifier ${command} accepts one target or all`);
+  const target = parsed.positionals[0] ?? "all";
+  const plan = await createInstallPlan({ target, dir: option(args, "--dir") });
+  const apply = hasFlag(args, "--apply");
+
+  if (target !== "omp-project") {
+    if (apply) return usageFailure(`--apply is not available for ${target}; use --dry-run to inspect its plan`);
+    return {
+      ok: true,
+      ...(command === "install" ? plan : {
+        status: plan.status,
+        target: plan.target,
+        mode: "dry-run",
+        steps: plan.steps,
+      }),
+    };
+  }
+
+  const repo = plan.dir;
+  if (!apply) {
+    const result = command === "install"
+      ? await installOmp(repo, true)
+      : await uninstallOmp(repo, true);
+    return { ok: true, ...result };
+  }
+
+  const lockPath = join(process.env.HOME ?? homedir(), ".local/state/classifier/install.lock");
+  const lock = await acquireInstallLock(lockPath);
+  try {
+    const result = command === "install"
+      ? await installOmp(repo, false)
+      : await uninstallOmp(repo, false);
+    return { ok: true, ...result };
+  } finally {
+    await lock.release();
+  }
+}
+
 const FAMILY_RUNNERS = { classify, rerank, verify, score, gate };
 async function main() {
   const suppliedArgs = process.argv.slice(2);
@@ -218,20 +263,25 @@ async function main() {
   try {
     if (parsed.command === "doctor") result = await doctor();
     else if (parsed.command === "ask") result = await ask(args);
+    else if (parsed.command === "install" || parsed.command === "uninstall") result = await runInstaller(parsed.command, args, parsed);
     else if (family && typeof FAMILY_RUNNERS[family.runner] === "function") result = await FAMILY_RUNNERS[family.runner](args);
     else if (parsed.command === "omp" && parsed.subcommand === "install") {
       result = { ok: true, ...await installOmp(option(args, "--dir") ?? process.cwd(), hasFlag(args, "--dry-run")) };
     } else if (parsed.command === "omp" && parsed.subcommand === "uninstall") {
       result = { ok: true, ...await uninstallOmp(option(args, "--dir") ?? process.cwd(), !hasFlag(args, "--apply")) };
     } else {
-      result = usageFailure("classifier doctor|gate|ask|rerank|classify|verify|score|omp ...");
+      result = usageFailure("classifier doctor|gate|ask|rerank|classify|verify|score|install|uninstall|omp ...");
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     const code = error && typeof error === "object" ? error.code : undefined;
     const knownReasons = ["unconfigured", "sdk-missing", "billing-hold", "transport", "http", "non-json", "no-answers", "invalid-answer"];
     const reason = knownReasons.find((candidate) => message.includes(`(${candidate})`))
-      ?? (code === "ENOENT" ? "no-input" : ["EACCES", "EIO", "EISDIR"].includes(code) ? "io" : "exception");
+      ?? (code === "USAGE" ? "usage"
+        : code === "REFUSED" ? "refused-unsafe"
+          : code === "RETRYABLE" ? "transport"
+            : code === "ENOENT" || code === "ENOTDIR" ? "no-input"
+              : ["EACCES", "EIO", "EISDIR", "IO"].includes(code) ? "io" : "exception");
     cliError = rewriteCliError({
       reason,
       message,

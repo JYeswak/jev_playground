@@ -2,6 +2,21 @@
 
 A small TypeScript-first Jev client with preflight checks, typed validators, offline fixtures, and the `classifier` CLI. Machine output uses versioned envelopes; see `ROBOT.md`.
 
+## Installer
+
+Installer plans are keyless and local. `all` is a dry-run plan; the project-scoped OMP target also
+supports apply and uninstall, while other targets refuse apply until their target handlers exist:
+
+```bash
+node kit/bin/jev.mjs install all --dry-run --robot
+node kit/bin/jev.mjs install omp-project --dir /path/to/git/repo --dry-run --robot
+node kit/bin/jev.mjs install omp-project --dir /path/to/git/repo --apply --robot
+node kit/bin/jev.mjs uninstall omp-project --dir /path/to/git/repo --dry-run --robot
+```
+
+`uninstall` previews by default. Apply removes only manifest-owned, unchanged files; edited and
+unrelated files remain in place.
+
 ## Daily OMP skill-gap mining
 
 `jev-skill-gap --daily` scans default and named-profile OMP session JSONL files with a persistent

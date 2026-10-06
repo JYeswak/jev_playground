@@ -72,7 +72,15 @@ export function rewriteCliError(input: ErrorInput): CliError {
     const listed = files.slice(0, 3).join(', ');
     return result('REFUSED_UNSAFE', EXIT_CODES.REFUSED_UNSAFE,
       `error: refusing to overwrite ${input.count ?? files.length} unmanaged files${listed ? `: ${listed}` : ''}`,
-      ['preview: classifier omp install --dry-run', 'adopt only files you own: classifier omp install --apply'], command);
+      ['preview: classifier install omp-project --dir REPO --dry-run', 'adopt only files you own: classifier install omp-project --dir REPO --apply'], command);
+  }
+  if (input.reason === 'refused-unsafe') {
+    return result('REFUSED_UNSAFE', EXIT_CODES.REFUSED_UNSAFE,
+      message || 'REFUSED_UNSAFE: installer refused to modify files', ['inspect the reported path before retrying'], command);
+  }
+  if (input.reason === 'transport' || input.reason === 'http') {
+    return result('RETRYABLE', EXIT_CODES.RETRYABLE,
+      message || 'RETRYABLE: transient operation failure', ['retry after the active operation or transient failure clears'], command);
   }
   if (input.reason === 'clef-unreachable') {
     return result('ONLINE_REQUIRED', EXIT_CODES.ONLINE_REQUIRED,
