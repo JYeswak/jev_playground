@@ -70,7 +70,7 @@ The classes below are assigned from the captured output and a fresh-clone `git l
 - The stranger-run selftest passed all eight checks, including the planted new command, a removed expected row against a stubbed successful step, wrong metric, cwd/provenance, SHA redaction, and receipt-date checks. Command: `export TMPDIR=var/agent-tmp/qx7b-session && env -u TYPESAFE_API_KEY -u JEV_API_KEY nice -n 10 python3 scripts/stranger-run-jev-playground.py --selftest --expect docs/demos/upstream-repro/stranger-run-expected.tsv`.
 - `bash foundation/gates.d/15-kit-claim.sh`: PASS, 433 passed / 0 failed / 3 skipped (433 enforced), ledger claim coverage 124/124 at the 124/124 floor.
 - The public clone was keyless. Doctor and direct choice calls returned the expected no-key `NOT_RUN`; no live Jev or comparator calls were made.
-- `./foundation/gates.sh --selftest`: not run. Joshua authorized the exact command, but the required preflight `sbh check --need 10G` returned exit 1 (`disk space below threshold`). Retry when the storage check passes; no aggregate selftest pass is claimed.
+- `./foundation/gates.sh --selftest`: not run. The command reaches stage 15, which invokes `rm -rf` on its temporary fixture; Joshua has not authorized this exact command. The required `sbh check --need 10G` also returned exit 1 (`disk space below threshold`). No aggregate selftest pass is claimed.
 
 ## Boundary (NO-CLAIM)
 
