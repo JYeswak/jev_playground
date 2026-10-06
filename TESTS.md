@@ -47,6 +47,7 @@ claim nobody can check:
 - `kit/test/cli-exit.test.mjs` — stable exit classes, missing-key JSON/robot behavior, doctor output contracts, and refusal of unoffered answers. Run: `node --test kit/test/cli-exit.test.mjs` (3 tests).
 - `kit/test/cli-help.test.mjs` — pinned overview, topic/command help, and version output. Run: `node --test kit/test/cli-help.test.mjs` (2 tests).
 - `kit/test/cli-support.mjs` — shared isolated-home and subprocess helpers used by the `kit/test/cli-*.test.mjs` CLI tests; exercised through those tests.
+- `kit/test/doctor-support.mjs` — shared isolated-home, fake state and repository helpers used by the `kit/test/doctor*.test.mjs` and `kit/test/health.test.mjs` doctor tests; exercised through those tests.
 - `work/fleet-schema/test_miner.py` — fixture-backed miner joins, cutoff handling, reread metadata, provenance checks, load-safety behavior, and report output. Run: `python3 -m unittest discover -s work/fleet-schema -p test_miner.py -v`.
 - `work/oracle-kit/prevalence_threshold.py` — t*(π) on frozen priors 30/186449 and 488/50149.
   Run: `python3 work/oracle-kit/prevalence_threshold.py` (exit 0; prints the 1:2300 identity).
