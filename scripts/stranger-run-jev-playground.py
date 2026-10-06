@@ -117,6 +117,35 @@ def run_selftest(expect_path: Path) -> int:
             "planted README regression did not produce the expected named mismatch"
         )
     print(f"SELFTEST PASS: planted README command named: {planted_command}")
+    # Simulate deleting a recorded command from a copy of the expectation TSV.
+    # A stubbed successful step still has to be rejected as unlisted.
+    omitted_command = next(
+        (
+            command
+            for command, (expected_class, _cause) in expected.items()
+            if expected_class == "0"
+        ),
+        None,
+    )
+    if omitted_command is None:
+        raise AssertionError("expectation TSV has no successful row to omit")
+    copied_expectations = expected.copy()
+    del copied_expectations[omitted_command]
+    stubbed_step = {
+        "command": omitted_command,
+        "rc": 0,
+        "failure_class": "",
+        "error": "",
+    }
+    omission_mismatches = compare_expectations([stubbed_step], copied_expectations)
+    missing_expectation_message = (
+        f"new README command lacks expectation row: {omitted_command}"
+    )
+    if missing_expectation_message not in omission_mismatches:
+        raise AssertionError(
+            "a README command omitted from the expected TSV was accepted"
+        )
+    print("SELFTEST PASS: removed expectation row refused for a stubbed step")
     metric = readme_commands(
         "```bash\nnode demos/classify/demo.mjs  # measured 96.1% on Banking77\n```"
     )[0]
@@ -317,7 +346,7 @@ def assert_checkout_cwd(active_cwd: Path, checkout: Path) -> None:
 def canonical_repo(url: str) -> str:
     """Repository identity without a trailing slash or `.git` suffix."""
     url = url.strip().rstrip("/")
-    return url[: -len(".git")] if url.endswith(".git") else url
+    return url.removesuffix(".git")
 
 
 def assert_source_origin(origin: str) -> None:
