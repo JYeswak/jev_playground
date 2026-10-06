@@ -49,6 +49,7 @@ claim nobody can check:
 - `kit/test/cli-support.mjs` — shared isolated-home and subprocess helpers used by the `kit/test/cli-*.test.mjs` CLI tests; exercised through those tests.
 - `kit/test/doctor-support.mjs` — shared isolated-home, fake state and repository helpers used by the `kit/test/doctor*.test.mjs` and `kit/test/health.test.mjs` doctor tests; exercised through those tests.
 - `work/fleet-schema/test_miner.py` — fixture-backed miner joins, cutoff handling, reread metadata, provenance checks, load-safety behavior, and report output. Run: `python3 -m unittest discover -s work/fleet-schema -p test_miner.py -v`.
+- `work/jev-gdhb-redo/test_run.py` — offline local Clef runner contract: request/schema and model-identity refusals, guarded request-ID requirement, serial execution, and stop-on-error behavior. Run: `upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/jev-gdhb-redo/test_run.py -v` (9 tests).
 - `work/oracle-kit/prevalence_threshold.py` — t*(π) on frozen priors 30/186449 and 488/50149.
   Run: `python3 work/oracle-kit/prevalence_threshold.py` (exit 0; prints the 1:2300 identity).
 - `work/oracle-kit/selector-guard.mjs` — scorers cannot silently read `.distribution` / `.probability`.
