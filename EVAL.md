@@ -3747,3 +3747,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Verification:** at `HEAD 19c1dc62a404aed2c992fb02a25f01952744b8ed`, the implementation and reader paths match `b400c72b`; `node --test .omp/hooks/post/jev-gate-observe.test.mjs` passes 42/42, `npm test --prefix kit` passes 86/86, `python3 -m unittest scripts.test_gate_outcomes scripts.test_jev_bank_build -v` passes 36/36, and `python3 -m unittest scripts.test_shadow_report -v` passes 9/9. Keyless local checks, not live-session proof.
 - **Live state:** the prior 15:25Z metadata-only sample was 161 rows / 69 with `cmd`; a fresh check found 216 rows / 106 with `cmd`, 0 invalid JSON, across six session IDs; file mode `0600`. No migration attempted: active writers can repopulate raw commands.
 - **Boundary:** no live cutover or fresh-session proof; the active log still needs a coordinated restart and 0600 archive migration. The `jev-b35c.3` doctor check (d) is owned by that bead, not this change. Keep `jev-rpqu` open until live log checks pass.
+
+
+## 2026-10-06 pane 5 native `find` usage [live]
+
+- **Usage:** Pane 5 reported 13 requests, 92K input tokens, and `$0.0039` spend. The configured judge alias is `typesafe/jev-latest`; the resolved model version was not recorded.
+- **Boundary:** Usage evidence only. The report arrived in a blocked callback; no successful `find` outcome or quality claim is made.
