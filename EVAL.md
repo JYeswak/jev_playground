@@ -3753,3 +3753,9 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 
 - **Usage:** Pane 5 reported 13 requests, 92K input tokens, and `$0.0039` spend. The configured judge alias is `typesafe/jev-latest`; the resolved model version was not recorded.
 - **Boundary:** Usage evidence only. The report arrived in a blocked callback; no successful `find` outcome or quality claim is made.
+
+## 2026-10-06 jev-fd5j 24-hour fallback replay receipt alignment [offline]
+
+- **Run:** `python3 work/jev-fd5j/after_measure.py --json`; output matched `work/jev-fd5j/RECEIPT.json` byte-for-byte with `cmp` (exit 0) after restoring the runner's final LF. Artifact commit: `8c643732a49ae64e739aeab0a19c636926d866e2`.
+- **Measurement:** Historical post-change window: 226/4,138 cascade-screen rows were fallbacks (5.4616%), including 34 timeouts; frozen baseline: 1,032/3,560 (28.9888%). Source snapshot SHA-256: `e9c392befbe5e75dcfe448b30bb67adafe81de836c3941eec9132229ac75352c`.
+- **Spend and boundary:** $0; no Jev/Clef calls. This is local historical-log replay, not current runtime evidence or causal attribution. Independent pane-5 byte comparison requested; bead remains open pending that verification.
