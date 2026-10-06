@@ -28,8 +28,12 @@ classifier classify --text T --labels FILE --robot
 classifier verify --claim C --evidence FILE --robot
 classifier score --text T --levels FILE --robot
 classifier gate --command C --robot
+classifier doctor --deep --robot
+classifier repair --only ID[,ID...] --robot
+classifier repair --apply --only ID[,ID...] --robot
+classifier repair undo latest --robot
 classifier omp install --dir DIR --robot
-classifier omp uninstall --dir DIR --robot
+classifier omp uninstall --dir DIR --apply --robot
 ```
 
 `--fake` uses captured fixtures and never contacts Jev. For example, `classifier rerank` replays the captured FiQA answer from `kit/test/fixtures/rerank-fiqa-answer.json`; the example passages and IDs are copied from BEIR FiQA-2018 query `10034`. Rerank is one Choice over the candidate passages, not a full reranking. The measured design has no synthetic `none` candidate; malformed or unoffered answers are refused.
@@ -37,3 +41,5 @@ classifier omp uninstall --dir DIR --robot
 Banking77 classification uses the captured intent Choice, null label descriptions, and no confidence threshold. Claim verification uses the captured SciFact Noul and labels values `>0.5` supported, `<=0.5` unsupported. SST-5 scoring returns the selected integer level, description, confidence, and probabilities. `--fake` for each uses its committed fixture and reports `model: "fake"`.
 
 The CLI pins `jev-1.13.0` by default and never prints the API key. Direct clients can choose another model in code.
+
+`repair` is read-only by default. `--apply` performs only the selected, validated fixes under the doctor lock; `repair undo latest` restores the latest recorded run from verified backups. `omp uninstall --apply` moves unchanged manifest-owned files out of active `.omp` paths into doctor-state quarantine. Edited, protected, or symlinked files remain for manual review. A recovered stale lock is returned as `fm-concurrency-stale-doctor-lock` with its owner PID.

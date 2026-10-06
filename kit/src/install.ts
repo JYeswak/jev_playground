@@ -1,6 +1,8 @@
-import { createHash } from "node:crypto";
-import { access, mkdir, readFile, unlink, writeFile } from "node:fs/promises";
+import { createHash, randomUUID } from "node:crypto";
+import { access, lstat, mkdir, readFile, writeFile } from "node:fs/promises";
+import { homedir } from "node:os";
 import { join, relative, resolve } from "node:path";
+import { isProtectedMutationPath, mutate } from "./doctor/mutate.js";
 
 export const INSTALL_FILES = {
   "tools/jev-rerank.ts": "omp/tools/jev-rerank.ts",
@@ -34,22 +36,39 @@ export const INSTALL_FILES = {
 
 const MANIFEST_PATH = ".omp/jev-kit-manifest.json";
 type Manifest = { version: 1; files: Record<string, string> };
+type ManifestSnapshot = { manifest: Manifest; bytes: Buffer; mode: number };
 export type InstallResult = { status: "READY" | "DRY_RUN"; repo: string; files: string[]; extensionActivation: "MANUAL_REQUIRED" };
 async function exists(path: string): Promise<boolean> { try { await access(path); return true; } catch { return false; } }
-function sha256(content: string): string { return createHash("sha256").update(content, "utf8").digest("hex"); }
-async function readManifest(path: string): Promise<Manifest | undefined> {
-  if (!(await exists(path))) return undefined;
+function sha256(content: string | Uint8Array): string {
+  const hash = createHash("sha256");
+  return (typeof content === "string" ? hash.update(content, "utf8") : hash.update(content)).digest("hex");
+}
+async function readManifestSnapshot(path: string): Promise<ManifestSnapshot | undefined> {
+  let metadata;
+  try { metadata = await lstat(path); }
+  catch (cause) {
+    if (cause && typeof cause === "object" && "code" in cause && cause.code === "ENOENT") return undefined;
+    throw cause;
+  }
+  if (!metadata.isFile() || metadata.isSymbolicLink()) throw new Error(`refusing to read unsafe installer manifest: ${relative(process.cwd(), path)}`);
+  const bytes = await readFile(path);
   let parsed: unknown;
-  try { parsed = JSON.parse(await readFile(path, "utf8")); } catch { throw new Error(`refusing to overwrite invalid installer manifest: ${relative(process.cwd(), path)}`); }
-  if (!parsed || typeof parsed !== "object" || (parsed as Manifest).version !== 1 || typeof (parsed as Manifest).files !== "object") throw new Error(`refusing to overwrite invalid installer manifest: ${relative(process.cwd(), path)}`);
-  return parsed as Manifest;
+  try { parsed = JSON.parse(bytes.toString("utf8")); } catch { throw new Error(`refusing to overwrite invalid installer manifest: ${relative(process.cwd(), path)}`); }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error(`refusing to overwrite invalid installer manifest: ${relative(process.cwd(), path)}`);
+  const candidate = parsed as { version?: unknown; files?: unknown };
+  if (candidate.version !== 1 || !candidate.files || typeof candidate.files !== "object" || Array.isArray(candidate.files) ||
+    Object.values(candidate.files).some((value) => typeof value !== "string")) {
+    throw new Error(`refusing to overwrite invalid installer manifest: ${relative(process.cwd(), path)}`);
+  }
+  return { manifest: parsed as Manifest, bytes, mode: metadata.mode & 0o777 };
 }
 export async function installOmp(repoDir: string, dryRun = false): Promise<InstallResult> {
   const repo = resolve(repoDir);
   const templateRoot = new URL("../templates/", import.meta.url);
   const files = Object.keys(INSTALL_FILES).map((path) => relative(repo, join(repo, ".omp", path)));
   const manifestPath = join(repo, MANIFEST_PATH);
-  const manifest = await readManifest(manifestPath);
+  const manifestSnapshot = await readManifestSnapshot(manifestPath);
+  const manifest = manifestSnapshot?.manifest;
   const templates = new Map<string, string>();
   if (manifest?.files["config.yml"]) {
     throw new Error("existing installer-managed .omp/config.yml requires owner review; preserve and merge host extensions before a new install");
@@ -104,31 +123,61 @@ export type UninstallResult = { status: "DRY_RUN" | "REMOVED"; repo: string; fil
 export async function uninstallOmp(repoDir: string, dryRun = true): Promise<UninstallResult> {
   const repo = resolve(repoDir);
   const manifestPath = join(repo, MANIFEST_PATH);
-  const manifest = await readManifest(manifestPath);
-  if (!manifest) throw new Error(`no installer manifest: ${relative(process.cwd(), manifestPath)}`);
+  const manifestSnapshot = await readManifestSnapshot(manifestPath);
+  const manifest = manifestSnapshot?.manifest;
+  if (!manifestSnapshot || !manifest) throw new Error(`no installer manifest: ${relative(process.cwd(), manifestPath)}`);
   const ompRoot = join(repo, ".omp");
   const remove: string[] = [];
   const kept: string[] = [];
   const missing: string[] = [];
-  for (const [destination, expected] of Object.entries(manifest.files)) {
+  const expected = new Map<string, { sha256: string; mode: number }>();
+  for (const [destination, expectedHash] of Object.entries(manifest.files)) {
     const absolute = resolve(ompRoot, destination);
-    if (absolute !== ompRoot && !absolute.startsWith(ompRoot + "/")) {
+    if (absolute === ompRoot || !absolute.startsWith(ompRoot + "/")) {
       throw new Error(`manifest entry escapes .omp, refusing: ${destination}`);
     }
     const rel = relative(repo, absolute);
-    if (!(await exists(absolute))) {
-      missing.push(rel);
-      continue;
+    let metadata;
+    try { metadata = await lstat(absolute); }
+    catch (cause) {
+      if (cause && typeof cause === "object" && "code" in cause && (cause.code === "ENOENT" || cause.code === "ENOTDIR")) {
+        missing.push(rel);
+        continue;
+      }
+      throw cause;
     }
-    if (sha256(await readFile(absolute, "utf8")) !== expected) {
+    if (isProtectedMutationPath(rel) || !metadata.isFile() || metadata.isSymbolicLink()) {
       kept.push(rel);
       continue;
     }
+    const bytes = await readFile(absolute);
+    if (sha256(bytes) !== expectedHash) {
+      kept.push(rel);
+      continue;
+    }
+    expected.set(rel, { sha256: sha256(bytes), mode: metadata.mode & 0o777 });
     remove.push(rel);
   }
-  remove.push(relative(repo, manifestPath));
+  const manifestRelative = relative(repo, manifestPath);
+  expected.set(manifestRelative, { sha256: sha256(manifestSnapshot.bytes), mode: manifestSnapshot.mode });
+  remove.push(manifestRelative);
   if (!dryRun) {
-    for (const rel of remove) await unlink(join(repo, rel));
+    const doctorDir = resolve(process.env.JEV_DOCTOR_DIR || join(homedir(), ".local", "state", "classifier", "doctor"));
+    const runId = `${new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-')}.${randomUUID()}`;
+    for (const rel of remove) {
+      const before = expected.get(rel)!;
+      await mutate({
+        root: repo,
+        doctorDir,
+        target: rel,
+        writeScopes: [rel],
+        operation: "quarantine",
+        runId,
+        expectedBeforeSha256: before.sha256,
+        expectedBeforeMode: before.mode,
+        actionKind: "uninstall",
+      });
+    }
   }
   return { status: dryRun ? "DRY_RUN" : "REMOVED", repo, files: remove, kept, missing };
 }

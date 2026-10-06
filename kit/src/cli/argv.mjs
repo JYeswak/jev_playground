@@ -1,8 +1,9 @@
-const COMMANDS = ['doctor', 'health', 'ask', 'rerank', 'classify', 'verify', 'score', 'gate', 'omp', 'install', 'uninstall'];
+const COMMANDS = ['doctor', 'health', 'repair', 'ask', 'rerank', 'classify', 'verify', 'score', 'gate', 'omp', 'install', 'uninstall'];
 const DESTRUCTIVE_OPTIONS = new Set(['--apply', '--force', '--yes', '--delete', '--remove', '--adopt', '--take-over-bin']);
 const COMMON = new Set(['--json', '--robot', '--no-color']);
 const VALUE_OPTIONS = {
   doctor: new Set(['--only', '--skip']),
+  repair: new Set(['--only']),
   ask: new Set(['--state', '--question']),
   rerank: new Set(['--query', '--candidates']),
   classify: new Set(['--text', '--labels']),
@@ -15,6 +16,7 @@ const VALUE_OPTIONS = {
 };
 const BOOLEAN_OPTIONS = {
   doctor: new Set(['--quick', '--deep', '--online']),
+  repair: new Set(['--apply']),
   ask: new Set(['--fake']),
   rerank: new Set(['--fake']),
   classify: new Set(['--fake']),
@@ -112,7 +114,7 @@ export function parseArgv(args) {
     };
   }
 
-  const subcommands = command === 'ask' ? ['choice', 'score', 'noul'] : command === 'omp' ? ['install', 'uninstall'] : [];
+  const subcommands = command === 'ask' ? ['choice', 'score', 'noul'] : command === 'omp' ? ['install', 'uninstall'] : command === 'repair' ? ['undo'] : [];
   const positional = commandArgs.filter((token) => !token.startsWith('-'));
   const subcommand = subcommands.length ? positional[0] : null;
   const validSubcommand = !subcommands.length || subcommands.includes(subcommand);

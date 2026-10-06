@@ -1,5 +1,6 @@
-import { readFile } from 'node:fs/promises';
-import { join, relative, resolve } from 'node:path';
+import { createHash } from 'node:crypto';
+import { lstat, readdir, readFile, realpath, stat } from 'node:fs/promises';
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 
 const BAD_ON_VERDICTS = new Set(['OFF', 'MISSING', 'REFUTED', 'BROKEN', 'FAIL', 'FAILED', 'RED', 'NOT-FOUND']);
 const WATCH_INTERVAL_MS = 60_000;
@@ -28,13 +29,119 @@ async function readJsonLines(path) {
   } catch { return null; }
 }
 
+function safeInventoryPath(value) {
+  return typeof value === 'string' && value.length > 0 && !isAbsolute(value) &&
+    !value.includes('\\') && !value.split('/').includes('..') && !value.split('/').includes('.');
+}
+function isWithin(root, candidate) {
+  const path = relative(resolve(root), resolve(candidate));
+  return path !== '..' && !path.startsWith(`..${sep}`) && !isAbsolute(path);
+}
+async function safeDirectoryParents(root, directory) {
+  if (!isWithin(root, directory)) return false;
+  let current = resolve(root);
+  const parts = relative(current, resolve(directory)).split(sep).filter(Boolean);
+  for (const part of parts) {
+    current = join(current, part);
+    try {
+      const entry = await lstat(current);
+      if (entry.isSymbolicLink() || !entry.isDirectory()) return false;
+    } catch (error) {
+      if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') return true;
+      throw error;
+    }
+  }
+  return true;
+}
+async function globalHookFindings(ctx) {
+  if (!ctx.repo || !ctx.home || !ctx.inventory) return [];
+  let repoRoot;
+  let homeRoot;
+  try {
+    [repoRoot, homeRoot] = await Promise.all([realpath(ctx.repo), realpath(ctx.home)]);
+  } catch { return []; }
+  const profiles = [{ name: 'agent', path: join(homeRoot, '.omp', 'agent') }];
+  const profileRoot = join(homeRoot, '.omp', 'profiles');
+  if (await safeDirectoryParents(homeRoot, profileRoot)) {
+    try {
+      for (const entry of await readdir(profileRoot, { withFileTypes: true })) {
+        if (entry.isDirectory() && safeInventoryPath(entry.name)) {
+          profiles.push({ name: entry.name, path: join(profileRoot, entry.name, 'agent') });
+        }
+      }
+    } catch (error) {
+      if (error?.code !== 'ENOENT' && error?.code !== 'ENOTDIR') throw error;
+    }
+  }
+  const findings = [];
+  for (const surface of surfaces(ctx.inventory)) {
+    if (surface?.expect !== 'on' || surface?.group !== 'global') continue;
+    if (!safeInventoryPath(surface.repo) || typeof surface.hookfile !== 'string' ||
+      basename(surface.hookfile) !== surface.hookfile || surface.hookfile === '.' || surface.hookfile === '..') continue;
+    const source = resolve(repoRoot, surface.repo);
+    if (!isWithin(repoRoot, source)) continue;
+    let sourceBytes = null;
+    let committedBytes = null;
+    let sourceStat = null;
+    try {
+      const sourceReal = await realpath(source);
+      const sourceLstat = await lstat(source);
+      if (isWithin(repoRoot, sourceReal) && sourceLstat.isFile() && !sourceLstat.isSymbolicLink()) {
+        sourceBytes = await readFile(source);
+        sourceStat = await stat(source);
+      }
+    } catch { /* unavailable source is reported as drift below */ }
+    try {
+      const committed = await ctx.exec('git', ['-C', repoRoot, 'show', `HEAD:${surface.repo}`], {
+        timeout: 1000, maxBuffer: 4 * 1024 * 1024,
+      });
+      if (committed?.code === 0) committedBytes = Buffer.from(committed.stdout, 'utf8');
+    } catch { /* unavailable source is not healthy evidence */ }
+    const sourceMatches = sourceBytes !== null && committedBytes !== null && sourceBytes.equals(committedBytes);
+    for (const profile of profiles) {
+      const target = join(profile.path, 'hooks', 'post', surface.hookfile);
+      if (!isWithin(homeRoot, target)) continue;
+      const parentSafe = await safeDirectoryParents(homeRoot, dirname(target));
+      let targetLstat = null;
+      let targetStat = null;
+      let targetBytes = null;
+      if (parentSafe) {
+        try {
+          targetLstat = await lstat(target);
+          if (!targetLstat.isSymbolicLink() && targetLstat.isFile()) {
+            targetStat = await stat(target);
+            targetBytes = await readFile(target);
+          }
+        } catch (error) {
+          if (error?.code !== 'ENOENT' && error?.code !== 'ENOTDIR') throw error;
+        }
+      }
+      const linkType = !sourceMatches ? 'source_drift' :
+        !parentSafe ? 'path_escape' :
+          !targetLstat ? 'missing' :
+            targetLstat.isSymbolicLink() ? 'symlink' :
+              !targetStat?.isFile() ? 'not_file' :
+                sourceStat.dev === targetStat.dev && sourceStat.ino === targetStat.ino ? 'hardlink' : 'copy';
+      if (linkType === 'hardlink') continue;
+      findings.push(finding('P1', 'A', 'Global hook is not linked to the committed source', {
+        surface: surface.id ?? null,
+        source: surface.repo,
+        target: relative(homeRoot, target),
+        profile: profile.name,
+        link_type: linkType,
+        source_sha256: sourceBytes ? createHash('sha256').update(sourceBytes).digest('hex') : null,
+        target_sha256: targetBytes ? createHash('sha256').update(targetBytes).digest('hex') : null,
+      }, 'Run classifier repair --apply --only fm-hooks-global-link-broken.'));
+    }
+  }
+  return findings;
+}
+
 export const detectors = [
   {
     id: 'fm-hooks-global-link-broken', subsystem: 'hooks', tier: 'D', repo_required: true,
-    availability: 'unavailable',
-    skipped_reason: 'pin-global audit implementation is not present',
-    data_sources: ['pin-global audit script (unavailable)'],
-    async run() { return []; },
+    data_sources: ['ctx.inventory global hook declarations', 'committed source via git show HEAD:<repo>', 'ctx.home global and profile hook paths'],
+    async run(ctx) { return globalHookFindings(ctx); },
   },
   {
     id: 'fm-surfaces-outside-repo-audit', subsystem: 'drift', tier: 'D', repo_required: false,

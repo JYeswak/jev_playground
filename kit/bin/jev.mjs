@@ -18,6 +18,7 @@ import { exitCodeForFailure } from "../src/cli/exit.mjs";
 import { parseArgv } from "../src/cli/argv.mjs";
 import { helpFor } from "../src/cli/help.mjs";
 import { runDoctor } from "../src/doctor/engine.mjs";
+import { runRepair } from "../dist/doctor/repair.js";
 import { runHealth } from "../src/doctor/readiness.mjs";
 import { FAMILIES, capabilities, dispatchCommand, robotDocs, schema, validateFamilyNames } from "../dist/families/registry.js";
 import { formatCliError, rewriteCliError } from "../dist/cli/errors.js";
@@ -82,6 +83,7 @@ async function doctorContext(parsed) {
     ? await readJson(join(repo, "work/jev-inventory/expected.json"))
     : discovered.inventory;
   const stateDir = resolve(process.env.JEV_STATE_DIR || join(home, ".local", "state", "jev"));
+  const doctorDir = resolve(process.env.JEV_DOCTOR_DIR || join(home, ".local", "state", "classifier", "doctor"));
   const target = repo
     ? await execProbe("git", ["-C", repo, "rev-parse", "HEAD"], { timeout: 1000, maxBuffer: 1024 })
     : null;
@@ -89,6 +91,7 @@ async function doctorContext(parsed) {
     repo,
     home,
     stateDir,
+    doctorDir,
     now: Date.now(),
     target_sha: target?.code === 0 ? target.stdout.trim() : null,
     tier: parsed.options.deep ? "deep" : parsed.options.quick ? "quick" : "default",
@@ -114,6 +117,15 @@ async function health(parsed) {
     ok: report.status === "ok",
     ...(report.status === "findings" ? { reason: "findings" } : {}),
   };
+}
+
+async function repair(parsed) {
+  const context = await doctorContext({ ...parsed, options: { ...parsed.options, deep: true } });
+  if (parsed.subcommand === "undo") {
+    return runRepair({ context, undo: true, options: parsed.options, positionals: parsed.positionals });
+  }
+  const report = await runDoctor(context);
+  return runRepair({ context, report, options: parsed.options, positionals: parsed.positionals });
 }
 
 async function ask(args) {
@@ -314,6 +326,7 @@ async function main() {
   let cliError;
   try {
     if (parsed.command === "doctor") result = await doctor(parsed);
+    else if (parsed.command === "repair") result = await repair(parsed);
     else if (parsed.command === "health") result = await health(parsed);
     else if (parsed.command === "ask") result = await ask(args);
     else if (parsed.command === "install" || parsed.command === "uninstall") result = await runInstaller(parsed.command, args, parsed);
