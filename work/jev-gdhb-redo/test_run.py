@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import sys
+import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Self
 from unittest.mock import patch
@@ -157,13 +159,25 @@ class ClefMassiveTests(unittest.TestCase):
             finally:
                 active -= 1
 
-        predictions = run.run_predictions(rows, transport)
+        with tempfile.TemporaryDirectory() as directory:
+            results_path = Path(directory) / "rows.jsonl"
+            predictions = run.run_predictions(rows, transport, results_path=results_path)
+            persisted = run.load_jsonl(results_path)
 
         self.assertEqual(calls, 2)
         self.assertEqual(max_active, 1)
         self.assertEqual([row["status"] for row in predictions], ["scored", "ERROR"])
         self.assertNotIn("text", predictions[0])
         self.assertEqual(predictions[1]["error_class"], "ConnectionError")
+        self.assertEqual(persisted, predictions)
+        expected_hash = run.sha256_file(Path(run.__file__))
+        for record in persisted:
+            self.assertEqual(record["run_py_sha256"], expected_hash)
+            timestamp = record["row_started_at_utc"]
+            self.assertIsInstance(timestamp, str)
+            self.assertTrue(timestamp.endswith("Z"))
+            parsed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+            self.assertEqual(parsed.utcoffset(), timezone.utc.utcoffset(None))
 
     def test_prediction_loop_refuses_wrong_model(self) -> None:
         corpus = run.load_jsonl(run.CORPUS)

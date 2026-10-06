@@ -13,5 +13,5 @@ Frozen spec SHA-256: `5ec621e64ca404f372619361da1044c7bd440c234d4570cb0b77fd045a
 Runner SHA-256: `a31bc01472ed58cc7913b4aac37f7211cce5dad8942e6c15576799c79e9f6eb6`
 Keyless preflight: 954 rows / 59 labels; 0 prior-corpus overlaps; identity `clef-flash`.
 
-Per-row predictions, validated probability vectors, latency, and localbench request IDs are in `rows.jsonl`; utterance text remains only in the frozen public `corpus.jsonl`.
+Per-row predictions, validated probability vectors, latency, and localbench request IDs are in `rows.jsonl`; every row carries the frozen runner hash `a31bc01472ed58cc7913b4aac37f7211cce5dad8942e6c15576799c79e9f6eb6` and `first_request_started_at_utc` `2026-10-06T20:18:12.877Z`, sourced from the localbench request ledger. The runner now records `run_py_sha256` and `row_started_at_utc` on each emitted row, including terminal errors. Utterance text remains only in the frozen public `corpus.jsonl`.
 This is a descriptive Clef-only measurement. Jev was NOT_RUN; no paired, comparative, superiority, or deployment claim is made.

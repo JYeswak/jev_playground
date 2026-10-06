@@ -391,6 +391,8 @@ def run_predictions(
     if not rows or len(rows) > EXPECTED_ROWS:
         raise ValueError(f"request count must be between 1 and {EXPECTED_ROWS}")
     labels = sorted({row["gold"] for row in rows})
+    run_py_sha256 = sha256_file(Path(__file__))
+
     predictions: list[dict[str, Any]] = []
     for row in rows:
         record: dict[str, Any] = {
@@ -398,6 +400,8 @@ def run_predictions(
             "gold": row["gold"],
             "arm": "clef",
             "model": CLEF_MODEL,
+            "run_py_sha256": run_py_sha256,
+            "row_started_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
             "attempts": 1,
             "jev_arm_status": "NOT_RUN",
             "cost_usd": 0.0,
