@@ -36,7 +36,7 @@ export async function rerankTop1(options: RerankOptions): Promise<RerankResult> 
     throw new Error(`rerank needs at least 2 candidates, got ${candidates?.length ?? "non-list"}`);
   }
   if (candidates.length > MAX_CANDIDATES) {
-    throw new Error(`rerank accepts at most ${MAX_CANDIDATES} candidates; chunking is not supported`);
+    throw new Error(`rerank accepts at most ${MAX_CANDIDATES} candidates, got ${candidates.length}; chunking is not supported`);
   }
   const ids = candidates.map((candidate) => candidate.id);
   if (ids.some((id) => typeof id !== "string" || id.length === 0) || new Set(ids).size !== ids.length) {

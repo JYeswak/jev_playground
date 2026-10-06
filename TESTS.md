@@ -721,3 +721,8 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 ## Newly registered tests — jev-qhmw
 
 - `scripts/test_jev_latest_canary_run.py` — offline coverage for authentication failure classification, notifications for distinct nonzero outcomes, success logging without notification, and offline help without checkout dependence. Run: `python3 -m unittest scripts.test_jev_latest_canary_run -v` (4 tests).
+
+## Newly registered tests — jev-ir6m
+
+- `kit/test/errors.test.mjs` — CLI error guidance, exit mapping, safe correction, missing-input handling, refusal messages, rank candidate limits, installer collision, and online-required formatting. Run: `node --test kit/test/errors.test.mjs` (12 tests).
+- `kit/test/registry.test.mjs` — registered command capabilities, robot docs/schema consistency, aliases, and reserved/malformed family-name rejection. Run: `node --test kit/test/registry.test.mjs` (2 tests).
