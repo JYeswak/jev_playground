@@ -713,3 +713,11 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 ## Newly registered tests — jev-49oe
 
 - `scripts/test_pin_global_jev.py` — offline global-loader discovery, frozen-commit pinning, checksum drift refusal, working-tree and atomic-replace isolation, checkout-import refusal, and hardlink-preserving rollback. Run: `python3 -m unittest scripts.test_pin_global_jev -v` (5 tests).
+
+## Newly registered tests — jev-i15c
+
+- `work/next-family-cost/test_measure.py` — keyless cost-measurement guards for bead-ID parsing, missing contract and ship commits, absent spend evidence, and late preregistration. Run: `python3 -m unittest work/next-family-cost/test_measure.py -v` (5 tests).
+
+## Newly registered tests — jev-qhmw
+
+- `scripts/test_jev_latest_canary_run.py` — offline coverage for authentication failure classification, notifications for distinct nonzero outcomes, success logging without notification, and offline help without checkout dependence. Run: `python3 -m unittest scripts.test_jev_latest_canary_run -v` (4 tests).
