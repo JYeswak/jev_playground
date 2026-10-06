@@ -40,9 +40,17 @@ test('npm pack installs a stranger copy and doctor reports NOT_RUN without a key
   const archive = join(scratch, names.find((name) => name.endsWith('.tgz')));
   const install = await run('npm', ['install', '--prefix', scratch, '--ignore-scripts', '--no-audit', '--no-fund', archive], { cwd: scratch, env: { ...process.env, TYPESAFE_API_KEY: undefined } });
   assert.equal(install.code, 0, install.stderr);
+  for (const name of ['classifier', 'clf']) {
+    const bin = await run(process.execPath, [join(scratch, 'node_modules', '.bin', name), '--version'], {
+      cwd: scratch,
+      env: { ...process.env, TYPESAFE_API_KEY: undefined },
+    });
+    assert.equal(bin.code, 0, bin.stderr);
+    assert.equal(bin.stdout, 'classifier 0.0.0\n');
+  }
   const entry = join(scratch, 'node_modules', 'jev-kit', 'bin', 'jev.mjs');
   const doctor = await run(process.execPath, [entry, 'doctor', '--robot'], { cwd: scratch, env: { ...process.env, TYPESAFE_API_KEY: undefined } });
-  assert.equal(doctor.code, 1, doctor.stderr);
+  assert.equal(doctor.code, 2, doctor.stderr);
   const body = JSON.parse(doctor.stdout);
   assert.equal(body.schema, 'classifier.doctor.v1');
   assert.equal(body.status, 'NOT_RUN');

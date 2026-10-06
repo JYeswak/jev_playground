@@ -51,8 +51,8 @@ test('omp install copies tools and hook without overwriting user files', async (
 
   await writeFile(join(repo, '.omp/tools/jev-screen.ts'), 'user-owned');
   const third = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
-  assert.equal(third.code, 1);
-  assert.match(JSON.parse(third.stdout).errors[0].message, /user-edited/);
+  assert.equal(third.code, 4);
+  assert.match(JSON.parse(third.stdout).errors[0].message, /refusing to overwrite \d+ unmanaged files:/);
 });
 
 test('installed gate observer keeps command text out of shared logs and rotates private files', async () => {
@@ -135,8 +135,8 @@ test('unmanaged tool collision refuses without overwriting its bytes', async () 
   const existing = 'operator tool; do not overwrite';
   await writeFile(join(repo, '.omp/tools/jev-gate.ts'), existing);
   const attempted = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
-  assert.equal(attempted.code, 1);
-  assert.match(JSON.parse(attempted.stdout).errors[0].message, /existing files without installer manifest/);
+  assert.equal(attempted.code, 4);
+  assert.match(JSON.parse(attempted.stdout).errors[0].message, /refusing to overwrite \d+ unmanaged files:/);
   assert.equal(await readFile(join(repo, '.omp/tools/jev-gate.ts'), 'utf8'), existing);
 });
 

@@ -9,6 +9,7 @@ test('the shared exit dictionary and failure classes are stable', () => {
   assert.deepEqual({ ...EXIT_CODES }, {
     OK: 0,
     FINDINGS: 1,
+    NOT_RUN: 2,
     REFUSED: 3,
     REFUSED_UNSAFE: 4,
     RETRYABLE: 5,
@@ -18,7 +19,7 @@ test('the shared exit dictionary and failure classes are stable', () => {
     CANT_CREATE: 73,
     IO: 74,
   });
-  assert.equal(exitCodeForFailure({ reason: 'unconfigured' }), 1);
+  assert.equal(exitCodeForFailure({ reason: 'unconfigured' }), 2);
   assert.equal(statusForFailure({ reason: 'unconfigured' }), 'NOT_RUN');
   assert.equal(exitCodeForFailure({ reason: 'no-answers' }), 3);
   assert.equal(statusForFailure({ reason: 'no-answers' }), 'REFUSED');
@@ -36,23 +37,24 @@ test('missing credentials stay NOT_RUN with the same exit under JSON and robot m
   const base = ['ask', 'choice', '--state', examplePath('state.json'), '--question', examplePath('question.json')];
   for (const mode of ['--json', '--robot']) {
     const result = runCli([...base, mode], { home });
-    assert.equal(result.status, 1, result.stderr);
+    assert.equal(result.status, 2, result.stderr);
     const body = JSON.parse(result.stdout);
     assert.equal(body.schema, 'classifier.ask.v1');
     assert.equal(body.ok, false);
     assert.equal(body.status, 'NOT_RUN');
     assert.equal(body.errors[0].code, 'NOT_RUN');
+    assert.equal(body.errors[0].exit_code, 2);
   }
 });
 
-test('doctor preserves its raw --json contract while --robot wraps it; both use no-key exit 1', async () => {
+test('doctor preserves its raw --json contract while --robot wraps it; both use no-key exit 2', async () => {
   const home = await freshHome('classifier-doctor-no-key');
   const raw = runCli(['doctor', '--json'], { home });
-  assert.equal(raw.status, 1, raw.stderr);
+  assert.equal(raw.status, 2, raw.stderr);
   assert.equal(JSON.parse(raw.stdout).status, 'NOT_RUN');
   assert.equal(Object.hasOwn(JSON.parse(raw.stdout), 'schema'), false);
   const robot = runCli(['doctor', '--robot'], { home });
-  assert.equal(robot.status, 1, robot.stderr);
+  assert.equal(robot.status, 2, robot.stderr);
   const body = JSON.parse(robot.stdout);
   assert.equal(body.schema, 'classifier.doctor.v1');
   assert.equal(body.status, 'NOT_RUN');

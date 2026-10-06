@@ -25,11 +25,12 @@ function runCli(args, env = {}) {
 
 test('doctor --robot is explicit NOT_RUN without a key', async () => {
   const result = await runCli(['doctor', '--robot']);
-  assert.equal(result.code, 1);
+  assert.equal(result.code, 2);
   const body = JSON.parse(result.stdout);
   assert.equal(body.schema, 'classifier.doctor.v1');
   assert.equal(body.status, 'NOT_RUN');
   assert.equal(body.errors[0].code, 'NOT_RUN');
+  assert.equal(body.errors[0].exit_code, 2);
   assert.equal(body.meta.model, 'jev-1.13.0');
   assert.equal(body.data.omp.repo, root.pathname.replace(/\/$/, ''));
   assert.equal(body.data.omp.tools.length, 6);

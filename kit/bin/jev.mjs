@@ -13,6 +13,8 @@ import { createEnvelope } from "../src/cli/envelope.mjs";
 import { exitCodeForFailure } from "../src/cli/exit.mjs";
 import { parseArgv } from "../src/cli/argv.mjs";
 import { helpFor } from "../src/cli/help.mjs";
+import { FAMILIES, capabilities, dispatchCommand, robotDocs, schema, validateFamilyNames } from "../dist/families/registry.js";
+import { formatCliError, rewriteCliError } from "../dist/cli/errors.js";
 
 const ROOT = new URL("..", import.meta.url);
 
@@ -35,7 +37,7 @@ function usageFailure(message) {
 }
 
 async function doctor() {
-  const keyPresent = typeof process.env.TYPESAFE_API_KEY === "string" && process.env.TYPESAFE_API_KEY.length > 0;
+  const keyPresent = Boolean(process.env.TYPESAFE_API_KEY?.length);
   const sdkPath = new URL("../../work/sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs", import.meta.url);
   let sdkPresent = true;
   try {
@@ -153,9 +155,32 @@ async function score(args) {
     : undefined;
   return scoreText({ text, levels, apiKey: fake ? "fixture-key" : undefined, fetchImpl, model: fake ? "fake" : undefined });
 }
+const FAMILY_RUNNERS = { classify, rerank, verify, score, gate };
 async function main() {
-  const args = process.argv.slice(2);
-  const parsed = parseArgv(args);
+  const suppliedArgs = process.argv.slice(2);
+  const correctedRobotFlag = suppliedArgs.includes("--robto");
+  const args = suppliedArgs.map((value) => value === "--robto" ? "--robot" : value);
+  if (args.length > 0) args[0] = dispatchCommand(args[0]);
+  const metaVerb = args[0];
+  if (metaVerb === "capabilities" || metaVerb === "robot-docs" || metaVerb === "schema") {
+    if (validateFamilyNames().length > 0) {
+      process.stderr.write(`invalid family registry: ${validateFamilyNames().join("; ")}\n`);
+      return 74;
+    }
+    const output = metaVerb === "capabilities" ? capabilities()
+      : metaVerb === "schema" ? schema(option(args, "--command"))
+        : robotDocs();
+    process.stdout.write(`${typeof output === "string" ? output : JSON.stringify(output, null, 2)}\n`);
+    return 0;
+  }
+  if (correctedRobotFlag) process.stderr.write("warning: '--robto' interpreted as '--robot'\n");
+  let parsed = parseArgv(args);
+  if (parsed.error?.message.startsWith("Unknown option: ") && !parsed.error.correctedCommand) {
+    const unknownOption = parsed.error.message.slice("Unknown option: ".length);
+    process.stderr.write(`warning: unknown flag '${unknownOption}' ignored; see classifier ${parsed.command ?? ""} --help\n`);
+    args.splice(args.indexOf(unknownOption), 1);
+    parsed = parseArgv(args);
+  }
   if (parsed.version) {
     const pkg = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
     process.stdout.write(`classifier ${pkg.version}\n`);
@@ -168,21 +193,32 @@ async function main() {
   }
   if (parsed.error) {
     const { message, correctedCommand } = parsed.error;
-    const detail = `${message}${correctedCommand ? `\nDid you mean: ${correctedCommand}` : ""}`;
+    const unknownCommand = message.startsWith("Unknown command: ");
+    const error = rewriteCliError({
+      reason: unknownCommand ? "unknown-command" : message.startsWith("Unknown option: ") ? "unknown-option" : "usage",
+      message,
+      option: unknownCommand ? message.slice("Unknown command: ".length) : message.startsWith("Unknown option: ") ? message.slice("Unknown option: ".length) : undefined,
+      correctedCommand,
+    });
+    const detail = formatCliError(error);
     if (parsed.outputMode === "human") process.stderr.write(`${detail}\n`);
-    else process.stdout.write(`${JSON.stringify(createEnvelope("cli", usageFailure(detail)))}\n`);
-    return exitCodeForFailure(usageFailure(detail));
+    else {
+      const envelope = createEnvelope("cli", { ok: false, reason: "usage", error: error.message });
+      envelope.errors = [error];
+      envelope.commands = [error.see];
+      process.stdout.write(`${JSON.stringify(envelope)}\n`);
+      process.stderr.write(`${detail}\n`);
+    }
+    return error.exit_code;
   }
 
+  const family = FAMILIES.find((candidate) => candidate.name === parsed.command || candidate.aliases.includes(parsed.command));
   let result;
+  let cliError;
   try {
     if (parsed.command === "doctor") result = await doctor();
     else if (parsed.command === "ask") result = await ask(args);
-    else if (parsed.command === "rerank") result = await rerank(args);
-    else if (parsed.command === "classify") result = await classify(args);
-    else if (parsed.command === "verify") result = await verify(args);
-    else if (parsed.command === "score") result = await score(args);
-    else if (parsed.command === "gate") result = await gate(args);
+    else if (family && typeof FAMILY_RUNNERS[family.runner] === "function") result = await FAMILY_RUNNERS[family.runner](args);
     else if (parsed.command === "omp" && parsed.subcommand === "install") {
       result = { ok: true, ...await installOmp(option(args, "--dir") ?? process.cwd(), hasFlag(args, "--dry-run")) };
     } else if (parsed.command === "omp" && parsed.subcommand === "uninstall") {
@@ -196,7 +232,33 @@ async function main() {
     const knownReasons = ["unconfigured", "sdk-missing", "billing-hold", "transport", "http", "non-json", "no-answers", "invalid-answer"];
     const reason = knownReasons.find((candidate) => message.includes(`(${candidate})`))
       ?? (code === "ENOENT" ? "no-input" : ["EACCES", "EIO", "EISDIR"].includes(code) ? "io" : "exception");
-    result = { ok: false, reason, error: message, ...(code ? { code } : {}) };
+    cliError = rewriteCliError({
+      reason,
+      message,
+      code,
+      command: parsed.command,
+      option: parsed.command === "classify" ? "--labels" : undefined,
+      path: parsed.command === "classify" ? option(args, "--labels") : undefined,
+      cwd: process.cwd(),
+    });
+    result = { ok: false, reason, error: cliError.message, ...(code ? { code } : {}) };
+  }
+  if (!cliError && result?.ok === false) {
+    cliError = rewriteCliError({ reason: result.reason, message: result.error ?? result.message, command: parsed.command });
+  }
+  if (cliError) {
+    const reasonByCode = {
+      NOT_RUN: "unconfigured",
+      USAGE: "usage",
+      NO_INPUT: "no-input",
+      REFUSED: "invalid-answer",
+      REFUSED_UNSAFE: "refused-unsafe",
+      RETRYABLE: "transport",
+      ONLINE_REQUIRED: "sdk-missing",
+      CANT_CREATE: "cannot-create",
+      IO: "io",
+    };
+    result = { ...result, reason: reasonByCode[cliError.code] ?? result.reason, error: cliError.message };
   }
 
   const doctorFailure = parsed.command === "doctor" && result.status !== "READY";
@@ -204,7 +266,7 @@ async function main() {
     ? { ...result, ok: !doctorFailure, reason: result.reason === "no key" ? "unconfigured" : result.reason === "sdk missing" ? "sdk-missing" : result.reason, error: result.reason }
     : result;
   const exitCode = parsed.command === "doctor"
-    ? (result.status === "READY" ? 0 : result.reason === "sdk missing" ? 6 : 1)
+    ? (result.status === "READY" ? 0 : result.reason === "sdk missing" ? 6 : 2)
     : result.ok === true ? 0 : exitCodeForFailure(result);
 
   if (parsed.outputMode !== "human") {
@@ -212,10 +274,17 @@ async function main() {
       process.stdout.write(`${JSON.stringify(result)}\n`);
     } else {
       const envelopeOptions = parsed.command === "doctor" ? { data: result } : {};
-      process.stdout.write(`${JSON.stringify(createEnvelope(parsed.command ?? "cli", envelopeResult, envelopeOptions))}\n`);
+      const envelope = createEnvelope(parsed.command ?? "cli", envelopeResult, envelopeOptions);
+      if (cliError) {
+        envelope.status = cliError.code;
+        envelope.errors = [cliError];
+        envelope.commands = [cliError.see];
+        process.stderr.write(`${formatCliError(cliError)}\n`);
+      }
+      process.stdout.write(`${JSON.stringify(envelope)}\n`);
     }
-  } else if (result.reason === "usage") {
-    process.stderr.write(`${result.error}\n`);
+  } else if (cliError) {
+    process.stderr.write(`${formatCliError(cliError)}\n`);
   } else if (parsed.command === "doctor") {
     process.stdout.write(`${result.status}: ${result.reason ?? "ready"} (model=${result.model})\n`);
   } else if (parsed.command === "omp" && parsed.subcommand === "install") {

@@ -1,6 +1,7 @@
 export const EXIT_CODES = Object.freeze({
   OK: 0,
   FINDINGS: 1,
+  NOT_RUN: 2,
   REFUSED: 3,
   REFUSED_UNSAFE: 4,
   RETRYABLE: 5,
@@ -27,7 +28,7 @@ export function statusForFailure(failure = {}) {
 
 export function exitCodeForFailure(failure = {}) {
   switch (statusForFailure(failure)) {
-    case 'NOT_RUN': return EXIT_CODES.FINDINGS;
+    case 'NOT_RUN': return EXIT_CODES.NOT_RUN;
     case 'ONLINE_REQUIRED': return EXIT_CODES.ONLINE_REQUIRED;
     case 'RETRYABLE': return EXIT_CODES.RETRYABLE;
     case 'REFUSED': return EXIT_CODES.REFUSED;
