@@ -40,7 +40,7 @@ type Unit = { path: Path; text: string; group?: string };
 type Ask = (options: AskOptions) => Promise<JevResult>;
 
 export type ScreenDecision = {
-  status: "ok" | "local-only" | "fail_open";
+  status: "ok" | "local-only" | "fail_open" | "paused";
   units: number;
   flagged: number[];
   local: number[];
@@ -239,7 +239,7 @@ function isShadow(deps: WebscreenDeps): boolean {
   return deps.enforce === false ? true : deps.enforce === true ? false : process.env.JEV_WEBSCREEN_ENFORCE === "0";
 }
 
-function unaskedDecision(raw: string, status: "local-only" | "fail_open", reason: string): ScreenDecision {
+function unaskedDecision(raw: string, status: "local-only" | "fail_open" | "paused", reason: string): ScreenDecision {
   const { units } = parseResult(raw);
   const local = units.map((unit, index) => localScreen(unit.text) ? index : -1).filter((index) => index >= 0);
   return { status, reason, units: units.length, flagged: [], local, scores: {}, latencyMs: null, usage: null };
@@ -274,7 +274,7 @@ export function makeWebscreenHandler(deps: WebscreenDeps = {}) {
       if (parseResult(raw).units.length === 0) {
         decision = unaskedDecision(raw, "local-only", "no-screenable-units");
       } else if (paused) {
-        decision = unaskedDecision(raw, "fail_open", "http-auth-or-billing-stop");
+        decision = unaskedDecision(raw, "paused", "auth-or-billing");
       } else if (calls >= cap) {
         decision = unaskedDecision(raw, "local-only", "daily-cap");
       } else {

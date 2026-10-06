@@ -223,6 +223,63 @@ test("HTTP 401, 402, and 403 stop further Jev calls for that hook session", asyn
   }
 });
 
+test("HTTP 402 logs paused outcomes without content; HTTP 429 does not pause", async () => {
+  const previousPath = process.env.JEV_WEBSCREEN_SHADOW_PATH;
+  const temp = await mkdtemp(join(tmpdir(), "jev-lco8-paused-"));
+  const shadowPath = join(temp, "shadow.jsonl");
+  process.env.JEV_WEBSCREEN_SHADOW_PATH = shadowPath;
+  const raw = JSON.stringify({ results: [{ title: "Private title", content: "Private result body." }] });
+  const content = [{ type: "text", text: raw }];
+  try {
+    let authCalls = 0;
+    const authHandler = makeWebscreenHandler({
+      ask: async () => {
+        authCalls += 1;
+        return { ok: false, reason: "http", error: "systemOne HTTP 402: refused", latencyMs: 1, model: "fake-offline" };
+      },
+      now: () => "2026-10-06T21:00:00.000Z",
+    });
+    assert.equal(await authHandler({ toolName: "web_extract", content }), undefined);
+    assert.equal(await authHandler({ toolName: "web_extract", content }), undefined);
+    assert.equal(await authHandler({ toolName: "web_extract", content }), undefined);
+    assert.equal(authCalls, 1);
+
+    const authRows = (await readFile(shadowPath, "utf8")).trim().split("\n").map(JSON.parse);
+    assert.equal(authRows.length, 3);
+    assert.equal(authRows[0].status, "fail_open");
+    assert.equal(authRows[1].status, "paused");
+    assert.equal(authRows[1].reason, "auth-or-billing");
+    assert.equal(authRows[2].status, "paused");
+    assert.equal(authRows[2].reason, "auth-or-billing");
+    const serializedAuthRows = JSON.stringify(authRows);
+    assert.equal(serializedAuthRows.includes("Private title"), false);
+    assert.equal(serializedAuthRows.includes("Private result body."), false);
+
+    const ratePath = join(temp, "rate.jsonl");
+    process.env.JEV_WEBSCREEN_SHADOW_PATH = ratePath;
+    let rateCalls = 0;
+    const rateHandler = makeWebscreenHandler({
+      ask: async (options) => {
+        rateCalls += 1;
+        if (rateCalls === 1) {
+          return { ok: false, reason: "http", error: "systemOne HTTP 429: retry later", latencyMs: 1, model: "fake-offline" };
+        }
+        return fakeAsker()(options);
+      },
+      now: () => "2026-10-06T21:00:00.000Z",
+    });
+    await rateHandler({ toolName: "web_extract", content });
+    await rateHandler({ toolName: "web_extract", content });
+    assert.equal(rateCalls, 2);
+    const rateRows = (await readFile(ratePath, "utf8")).trim().split("\n").map(JSON.parse);
+    assert.equal(rateRows.length, 2);
+    assert.notEqual(rateRows[1].status, "paused");
+  } finally {
+    if (previousPath === undefined) delete process.env.JEV_WEBSCREEN_SHADOW_PATH;
+    else process.env.JEV_WEBSCREEN_SHADOW_PATH = previousPath;
+  }
+});
+
 test("local-only hit passes through in enforce mode and is logged local", async () => {
   // Deliberate behavior change (jev-eo40): the local pattern caused 100% of
   // false positives on 350 real results, so it logs but never withholds.
