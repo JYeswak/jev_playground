@@ -23,18 +23,18 @@ function runCli(args, env = {}) {
   });
 }
 
-test('doctor --robot is explicit NOT_RUN without a key', async () => {
+test('doctor --robot reports keyless findings without claiming a live Jev run', async () => {
   const result = await runCli(['doctor', '--robot']);
-  assert.equal(result.code, 2);
+  assert.equal(result.code, 1);
   const body = JSON.parse(result.stdout);
   assert.equal(body.schema, 'classifier.doctor.v1');
-  assert.equal(body.status, 'NOT_RUN');
-  assert.equal(body.errors[0].code, 'NOT_RUN');
-  assert.equal(body.errors[0].exit_code, 2);
+  assert.equal(body.status, 'FINDINGS');
+  assert.equal(body.errors[0].code, 'FINDINGS');
+  assert.equal(body.errors[0].exit_code, 1);
   assert.equal(body.meta.model, 'jev-1.13.0');
-  assert.equal(body.data.omp.repo, root.pathname.replace(/\/$/, ''));
-  assert.equal(body.data.omp.tools.length, 6);
-  assert.equal(body.data.omp.hooks.length, 1);
+  assert.equal(body.data.repo, root.pathname.replace(/\/$/, ''));
+  const toolsCheck = body.data.checks.find(({ id }) => id === 'fm-plugins-omp-tool-missing');
+  assert.equal(toolsCheck.data_sources.filter((source) => source.includes('/.omp/tools/')).length, 6);
 });
 
 test('ask --fake produces an offline typed decision', async () => {

@@ -16,7 +16,7 @@ test('unknown commands give a safe correction and the help command', async () =>
 test('a one-character flag typo is interpreted and reported without changing the JSON result', async () => {
   const home = await freshHome('classifier-error-flag');
   const result = runCli(['doctor', '--robto'], { home });
-  assert.equal(result.status, 2);
+  assert.equal(result.status, 1);
   assert.ok(result.stderr.includes("interpreted as '--robot'"));
   assert.equal(JSON.parse(result.stdout).schema, 'classifier.doctor.v1');
 });
@@ -42,12 +42,12 @@ test('an existing label path is read normally and never gets the missing-input s
 test('an unknown flag is ignored with a warning but a near miss runs its documented correction', async () => {
   const home = await freshHome('classifier-error-stage0');
   const typo = runCli(['doctor', '--robto'], { home });
-  assert.equal(typo.status, 2);
+  assert.equal(typo.status, 1);
   assert.ok(typo.stderr.includes("interpreted as '--robot'"));
   assert.equal(JSON.parse(typo.stdout).schema, 'classifier.doctor.v1');
 
   const distant = runCli(['doctor', '--zzzz'], { home });
-  assert.equal(distant.status, 2);
+  assert.equal(distant.status, 1);
   assert.ok(distant.stderr.includes("unknown flag '--zzzz' ignored"));
   assert.ok(!distant.stderr.includes('Did you mean:'));
 });

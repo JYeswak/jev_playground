@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import { homedir } from "node:os";
-import { join, resolve } from "node:path";
-import { askJev, askJevChoice, askJevScore, DEFAULT_MODEL } from "../dist/client.js";
+import { dirname, join, resolve } from "node:path";
+import { askJev, askJevChoice, askJevScore } from "../dist/client.js";
 import { rerankTop1 } from "../dist/rerank.js";
 import { classifyText } from "../dist/classify.js";
 import { verifyClaim } from "../dist/verify.js";
@@ -16,6 +17,8 @@ import { createEnvelope } from "../src/cli/envelope.mjs";
 import { exitCodeForFailure } from "../src/cli/exit.mjs";
 import { parseArgv } from "../src/cli/argv.mjs";
 import { helpFor } from "../src/cli/help.mjs";
+import { runDoctor } from "../src/doctor/engine.mjs";
+import { runHealth } from "../src/doctor/readiness.mjs";
 import { FAMILIES, capabilities, dispatchCommand, robotDocs, schema, validateFamilyNames } from "../dist/families/registry.js";
 import { formatCliError, rewriteCliError } from "../dist/cli/errors.js";
 
@@ -39,29 +42,78 @@ function usageFailure(message) {
   return { ok: false, reason: "usage", error: message };
 }
 
-async function doctor() {
-  const keyPresent = Boolean(process.env.TYPESAFE_API_KEY?.length);
-  const sdkPath = new URL("../../work/sdk/node_modules/@typesafe-ai/sdk/dist/index.mjs", import.meta.url);
-  let sdkPresent = true;
-  try {
-    await import(sdkPath.href);
-  } catch {
+function execProbe(command, args, options = {}) {
+  return new Promise((resolveResult) => {
+    execFile(command, args, {
+      ...options,
+      encoding: "utf8",
+      timeout: options.timeout ?? 1000,
+      maxBuffer: options.maxBuffer ?? 1024 * 1024,
+    }, (error, stdout, stderr) => {
+      resolveResult({
+        code: error ? (Number.isInteger(error.code) ? error.code : 1) : 0,
+        stdout: stdout ?? "",
+        stderr: stderr ?? "",
+      });
+    });
+  });
+}
+
+async function findRepo(start) {
+  let current = resolve(start);
+  while (true) {
     try {
-      await import(new URL("../node_modules/@typesafe-ai/sdk/dist/index.mjs", import.meta.url).href);
-    } catch {
-      sdkPresent = false;
+      const inventory = await readJson(join(current, "work/jev-inventory/expected.json"));
+      return { repo: current, inventory };
+    } catch (error) {
+      if (error?.code !== "ENOENT" && error?.code !== "ENOTDIR") throw error;
     }
+    const parent = dirname(current);
+    if (parent === current) return { repo: null, inventory: null };
+    current = parent;
   }
-  const result = {
-    status: keyPresent && sdkPresent ? "READY" : "NOT_RUN",
-    reason: keyPresent ? (sdkPresent ? undefined : "sdk missing") : "no key",
-    model: DEFAULT_MODEL,
-    key_source: keyPresent ? "environment" : "none",
-    sdk: sdkPresent ? "@typesafe-ai/sdk" : "missing",
-    omp: await ompDiscovery(process.cwd()),
+}
+
+async function doctorContext(parsed) {
+  const home = resolve(parsed.options.home ?? process.env.HOME ?? homedir());
+  const discovered = await findRepo(parsed.options.repo ?? process.cwd());
+  const repo = parsed.options.repo ? resolve(parsed.options.repo) : discovered.repo;
+  const inventory = parsed.options.repo
+    ? await readJson(join(repo, "work/jev-inventory/expected.json"))
+    : discovered.inventory;
+  const stateDir = resolve(process.env.JEV_STATE_DIR || join(home, ".local", "state", "jev"));
+  const target = repo
+    ? await execProbe("git", ["-C", repo, "rev-parse", "HEAD"], { timeout: 1000, maxBuffer: 1024 })
+    : null;
+  return {
+    repo,
+    home,
+    stateDir,
+    now: Date.now(),
+    target_sha: target?.code === 0 ? target.stdout.trim() : null,
+    tier: parsed.options.deep ? "deep" : parsed.options.quick ? "quick" : "default",
+    only: parsed.options.only,
+    skip: parsed.options.skip,
+    online: parsed.options.online === true,
+    env: process.env,
+    inventory,
+    omp: await ompDiscovery(repo ?? process.cwd()),
+    exec: execProbe,
+    fetch: (url, init) => globalThis.fetch(url, init),
   };
-  const clean = Object.fromEntries(Object.entries(result).filter(([, value]) => value !== undefined));
-  return clean;
+}
+
+async function doctor(parsed) {
+  return runDoctor(await doctorContext(parsed));
+}
+
+async function health(parsed) {
+  const report = await runHealth(await doctorContext(parsed));
+  return {
+    ...report,
+    ok: report.status === "ok",
+    ...(report.status === "findings" ? { reason: "findings" } : {}),
+  };
 }
 
 async function ask(args) {
@@ -261,7 +313,8 @@ async function main() {
   let result;
   let cliError;
   try {
-    if (parsed.command === "doctor") result = await doctor();
+    if (parsed.command === "doctor") result = await doctor(parsed);
+    else if (parsed.command === "health") result = await health(parsed);
     else if (parsed.command === "ask") result = await ask(args);
     else if (parsed.command === "install" || parsed.command === "uninstall") result = await runInstaller(parsed.command, args, parsed);
     else if (family && typeof FAMILY_RUNNERS[family.runner] === "function") result = await FAMILY_RUNNERS[family.runner](args);
@@ -293,7 +346,7 @@ async function main() {
     });
     result = { ok: false, reason, error: cliError.message, ...(code ? { code } : {}) };
   }
-  if (!cliError && result?.ok === false) {
+  if (!cliError && result?.ok === false && parsed.command !== "doctor" && parsed.command !== "health") {
     cliError = rewriteCliError({ reason: result.reason, message: result.error ?? result.message, command: parsed.command });
   }
   if (cliError) {
@@ -311,19 +364,20 @@ async function main() {
     result = { ...result, reason: reasonByCode[cliError.code] ?? result.reason, error: cliError.message };
   }
 
-  const doctorFailure = parsed.command === "doctor" && result.status !== "READY";
+  const doctorExitCode = parsed.command === "doctor"
+    ? Number.isInteger(result.exit_code) ? result.exit_code : exitCodeForFailure(result)
+    : null;
+  const doctorFailure = parsed.command === "doctor" && doctorExitCode !== 0;
   const envelopeResult = parsed.command === "doctor"
-    ? { ...result, ok: !doctorFailure, reason: result.reason === "no key" ? "unconfigured" : result.reason === "sdk missing" ? "sdk-missing" : result.reason, error: result.reason }
+    ? { ok: !doctorFailure, reason: doctorFailure ? "findings" : undefined, message: result.state, model: result.backends?.jev?.model }
     : result;
-  const exitCode = parsed.command === "doctor"
-    ? (result.status === "READY" ? 0 : result.reason === "sdk missing" ? 6 : 2)
-    : result.ok === true ? 0 : exitCodeForFailure(result);
+  const exitCode = parsed.command === "doctor" ? doctorExitCode : result.ok === true ? 0 : exitCodeForFailure(result);
 
   if (parsed.outputMode !== "human") {
     if (parsed.outputMode === "json" && parsed.command === "doctor") {
       process.stdout.write(`${JSON.stringify(result)}\n`);
     } else {
-      const envelopeOptions = parsed.command === "doctor" ? { data: result } : {};
+      const envelopeOptions = parsed.command === "doctor" || parsed.command === "health" ? { data: result } : {};
       const envelope = createEnvelope(parsed.command ?? "cli", envelopeResult, envelopeOptions);
       if (cliError) {
         envelope.status = cliError.code;
@@ -336,7 +390,9 @@ async function main() {
   } else if (cliError) {
     process.stderr.write(`${formatCliError(cliError)}\n`);
   } else if (parsed.command === "doctor") {
-    process.stdout.write(`${result.status}: ${result.reason ?? "ready"} (model=${result.model})\n`);
+    process.stdout.write(`${result.state}: checks=${result.summary.checks_run} findings=${result.summary.total_findings}\n`);
+  } else if (parsed.command === "health") {
+    process.stdout.write(`${result.status}: checks=${result.checks} findings=${result.findings.length}\n`);
   } else if (parsed.command === "omp" && parsed.subcommand === "install") {
     process.stdout.write(`${result.status}: copied ${result.files.length} files in ${result.repo}; extensions require manual config merge before omp loads them\n`);
   } else if (parsed.command === "omp" && parsed.subcommand === "uninstall") {

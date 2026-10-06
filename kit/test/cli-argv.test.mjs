@@ -9,7 +9,7 @@ test('one-edit flag typo is interpreted with a warning at the CLI seam', async (
 
   const home = await freshHome('classifier-argv');
   const result = runCli(['doctor', '--robto'], { home });
-  assert.equal(result.status, 2, result.stderr);
+  assert.equal(result.status, 1, result.stderr);
   assert.equal(JSON.parse(result.stdout).schema, 'classifier.doctor.v1');
   assert.ok(result.stderr.includes("interpreted as '--robot'"), result.stderr);
 });
@@ -22,14 +22,32 @@ test('distant typos and destructive-flag typos are not suggested or applied', as
 
   const home = await freshHome('classifier-argv-negative');
   const noMatch = runCli(['doctor', '--zzzz'], { home });
-  assert.equal(noMatch.status, 2, noMatch.stderr);
+  assert.equal(noMatch.status, 1, noMatch.stderr);
   assert.ok(noMatch.stderr.includes("unknown flag '--zzzz' ignored"), noMatch.stderr);
   assert.ok(!noMatch.stderr.includes('Did you mean:'), noMatch.stderr);
   const destructive = runCli(['doctor', '--aply'], { home });
-  assert.equal(destructive.status, 2, destructive.stderr);
+  assert.equal(destructive.status, 1, destructive.stderr);
   assert.ok(destructive.stderr.includes("unknown flag '--aply' ignored"), destructive.stderr);
   assert.ok(!destructive.stderr.includes('--apply'), destructive.stderr);
   assert.ok(!destructive.stderr.includes('Did you mean:'), destructive.stderr);
+});
+
+test('doctor accepts selection, tier, online and output options', () => {
+  const parsed = parseArgv([
+    'doctor',
+    '--only', 'fm-secrets-no-key-source',
+    '--skip', 'fm-clef-unreachable',
+    '--quick',
+    '--online',
+    '--json',
+  ]);
+  assert.equal(parsed.error, undefined);
+  assert.equal(parsed.command, 'doctor');
+  assert.equal(parsed.options.only, 'fm-secrets-no-key-source');
+  assert.equal(parsed.options.skip, 'fm-clef-unreachable');
+  assert.equal(parsed.options.quick, true);
+  assert.equal(parsed.options.online, true);
+  assert.equal(parsed.outputMode, 'json');
 });
 
 test('installer verbs parse target, directory and explicit apply mode', () => {

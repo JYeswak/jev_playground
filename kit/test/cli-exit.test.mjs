@@ -58,18 +58,21 @@ test('missing credentials stay NOT_RUN with the same exit under JSON and robot m
   }
 });
 
-test('doctor preserves its raw --json contract while --robot wraps it; both use no-key exit 2', async () => {
+test('doctor preserves raw --json findings and wraps findings in the robot envelope', async () => {
   const home = await freshHome('classifier-doctor-no-key');
   const raw = runCli(['doctor', '--json'], { home });
-  assert.equal(raw.status, 2, raw.stderr);
-  assert.equal(JSON.parse(raw.stdout).status, 'NOT_RUN');
-  assert.equal(Object.hasOwn(JSON.parse(raw.stdout), 'schema'), false);
+  assert.equal(raw.status, 1, raw.stderr);
+  const rawBody = JSON.parse(raw.stdout);
+  assert.equal(rawBody.state, 'DONE_FINDINGS');
+  assert.equal(rawBody.backends.jev.status, 'NOT_RUN');
+  assert.equal(Object.hasOwn(rawBody, 'schema'), false);
   const robot = runCli(['doctor', '--robot'], { home });
-  assert.equal(robot.status, 2, robot.stderr);
+  assert.equal(robot.status, 1, robot.stderr);
   const body = JSON.parse(robot.stdout);
   assert.equal(body.schema, 'classifier.doctor.v1');
-  assert.equal(body.status, 'NOT_RUN');
-  assert.equal(body.data.status, 'NOT_RUN');
+  assert.equal(body.status, 'FINDINGS');
+  assert.equal(body.data.state, 'DONE_FINDINGS');
+  assert.equal(body.data.backends.jev.status, 'NOT_RUN');
 });
 
 test('an unoffered recorded answer is REFUSED with exit 3, not NOT_RUN', async () => {

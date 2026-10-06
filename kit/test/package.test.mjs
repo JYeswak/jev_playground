@@ -16,7 +16,7 @@ function run(command, args, options) {
   });
 }
 
-test('npm pack installs a stranger copy and doctor reports NOT_RUN without a key', async (t) => {
+test('npm pack installs a stranger copy and doctor reports keyless findings without claiming a Jev call', async (t) => {
   const repo = new URL('../..', import.meta.url).pathname;
   const tempRoot = join(repo, 'var', 'agent-tmp');
   await mkdir(tempRoot, { recursive: true });
@@ -50,9 +50,10 @@ test('npm pack installs a stranger copy and doctor reports NOT_RUN without a key
   }
   const entry = join(scratch, 'node_modules', 'jev-kit', 'bin', 'jev.mjs');
   const doctor = await run(process.execPath, [entry, 'doctor', '--robot'], { cwd: scratch, env: { ...process.env, TYPESAFE_API_KEY: undefined } });
-  assert.equal(doctor.code, 2, doctor.stderr);
+  assert.equal(doctor.code, 1, doctor.stderr);
   const body = JSON.parse(doctor.stdout);
   assert.equal(body.schema, 'classifier.doctor.v1');
-  assert.equal(body.status, 'NOT_RUN');
-  assert.equal(body.data.status, 'NOT_RUN');
+  assert.equal(body.status, 'FINDINGS');
+  assert.equal(body.data.state, 'DONE_FINDINGS');
+  assert.equal(body.data.backends.jev.status, 'NOT_RUN');
 });

@@ -1,8 +1,8 @@
-const COMMANDS = ['doctor', 'ask', 'rerank', 'classify', 'verify', 'score', 'gate', 'omp', 'install', 'uninstall'];
+const COMMANDS = ['doctor', 'health', 'ask', 'rerank', 'classify', 'verify', 'score', 'gate', 'omp', 'install', 'uninstall'];
 const DESTRUCTIVE_OPTIONS = new Set(['--apply', '--force', '--yes', '--delete', '--remove', '--adopt', '--take-over-bin']);
 const COMMON = new Set(['--json', '--robot', '--no-color']);
 const VALUE_OPTIONS = {
-  doctor: new Set(),
+  doctor: new Set(['--only', '--skip']),
   ask: new Set(['--state', '--question']),
   rerank: new Set(['--query', '--candidates']),
   classify: new Set(['--text', '--labels']),
@@ -14,7 +14,7 @@ const VALUE_OPTIONS = {
   uninstall: new Set(['--dir']),
 };
 const BOOLEAN_OPTIONS = {
-  doctor: new Set(),
+  doctor: new Set(['--quick', '--deep', '--online']),
   ask: new Set(['--fake']),
   rerank: new Set(['--fake']),
   classify: new Set(['--fake']),

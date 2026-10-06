@@ -10,6 +10,7 @@ Usage:
 
 Commands:
   doctor                 Check local readiness
+  health                 Quick offline readiness
   ask choice|score|noul  Judge a typed question
   rerank                 Select a top candidate
   classify               Choose a label
@@ -17,6 +18,8 @@ Commands:
   score                  Rate text on a rubric
   gate                   Judge command risk
   omp install|uninstall  Manage project-scoped omp files
+  install                Install project-scoped omp files
+  uninstall              Uninstall project-scoped omp files
 
 Global options:
   --json                 Emit command JSON (doctor keeps its raw report)
@@ -55,11 +58,34 @@ test('bare invocation and every help spelling exit 0 with the pinned overview', 
 
 test('topic and command help are successful and identify the requested command', async () => {
   const home = await freshHome('classifier-topic-help');
-  for (const args of [['help', 'ask'], ['ask', '--help']]) {
+  const cases = [
+    [['help', 'ask'], 'classifier ask choice|score|noul'],
+    [['ask', '--help'], 'classifier ask choice|score|noul'],
+    [['help', 'doctor'], 'classifier doctor [--quick|--deep]'],
+    [['doctor', '--help'], 'classifier doctor [--quick|--deep]'],
+    [['help', 'health'], 'classifier health [--json|--robot]'],
+    [['health', '--help'], 'classifier health [--json|--robot]'],
+  ];
+  for (const [args, fragment] of cases) {
     const result = runCli(args, { home });
     assert.equal(result.status, 0, result.stderr);
-    assert.ok(result.stdout.includes('classifier ask choice|score|noul'), result.stdout);
-    assert.ok(result.stdout.includes('Examples:'), result.stdout);
+    assert.ok(result.stdout.includes(fragment), result.stdout);
+    if (args.includes('ask')) assert.ok(result.stdout.includes('Examples:'), result.stdout);
+    assert.equal(result.stderr, '');
+  }
+});
+
+test('health CLI returns keyless envelopes for JSON and robot modes', async () => {
+  const home = await freshHome('classifier-health');
+  for (const mode of ['--json', '--robot']) {
+    const result = runCli(['health', mode], { home, env: { PATH: '', TYPESAFE_API_KEY: '' } });
+    assert.equal(result.status, 1, result.stderr);
+    const envelope = JSON.parse(result.stdout);
+    assert.equal(envelope.schema, 'classifier.health.v1');
+    assert.equal(envelope.status, 'FINDINGS');
+    assert.equal(envelope.data.status, 'findings');
+    assert.equal(envelope.data.key_source, 'none');
+    assert.ok(envelope.data.findings.some(({ id }) => id === 'fm-secrets-no-key-source'));
     assert.equal(result.stderr, '');
   }
 });
