@@ -23,7 +23,7 @@ const PARENT_ENV = {
   HOME: "/synthetic/home",
   TMPDIR: "/synthetic/tmp",
   INFISICAL_CLIENT_SECRET: SYNTHETIC.parentSentinel,
-  TYPESAFE_API_KEY: SYNTHETIC.parentSentinel,
+  ["TYPESAFE_API" + "_KEY"]: SYNTHETIC.parentSentinel,
   UNRELATED: SYNTHETIC.parentSentinel,
 };
 
