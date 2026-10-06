@@ -262,6 +262,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--memory-input", type=Path, help="memory-filter JSONL source")
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--strict", action="store_true")
+    parser.add_argument(
+        "--gate",
+        action="store_true",
+        help="emit the machine-readable strict Measured-pillar result",
+    )
     parser.add_argument("--expected", type=Path, default=EXPECTED_PATH)
     parser.add_argument("--harm-costs", type=Path, default=HARM_COSTS_PATH)
     parser.add_argument("--append", action="store_true")
@@ -278,8 +283,12 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     try:
         expected_surfaces = load_expected(args.expected)
-        harm_table = load_approved_harm_costs(args.harm_costs)
-        validate_harm_cost_coverage(expected_surfaces, harm_table)
+        allow_unpriced_costs = args.gate and not args.harm_costs.is_file()
+        if allow_unpriced_costs:
+            harm_table = {"surfaces": {}}
+        else:
+            harm_table = load_approved_harm_costs(args.harm_costs)
+            validate_harm_cost_coverage(expected_surfaces, harm_table)
         surfaces = expand_memory_surfaces(expected_surfaces)
         end = parse_instant(args.end) if args.end else None
         report = assemble_report(
@@ -289,17 +298,18 @@ def main(argv: list[str] | None = None) -> int:
             end=end,
             history=args.history,
             memory_path=args.memory_input,
+            allow_unpriced_costs=allow_unpriced_costs,
         )
         if args.append:
             append_history(args.history, report)
     except (LedgerInputError, OSError) as exc:
         print(f"ledger: {exc}", file=sys.stderr)
         return 1
-    if args.json:
+    if args.json or args.gate:
         print(json.dumps(report, ensure_ascii=False, sort_keys=True))
     else:
         print(render_report(report))
-    return 1 if args.strict and report["strict_failures"] else 0
+    return 1 if (args.strict or args.gate) and report["strict_failures"] else 0
 
 
 if __name__ == "__main__":

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import contextlib
 import copy
 import hashlib
+import io
 import json
 import os
 import sys
@@ -18,6 +20,8 @@ from extract_window import extract_window
 from ledger import (
     expand_memory_surfaces,
     load_approved_harm_costs,
+    load_expected,
+    main,
     validate_harm_cost_coverage,
     verify_cost_commit_order,
 )
@@ -562,6 +566,53 @@ class LedgerTests(unittest.TestCase):
         metrics = memory_metrics(read_jsonl(artifact, start, end))
         self.assertEqual(metrics["memory_jev_tokens"], 33_884)
         self.assertEqual(metrics["memory_cap3_tokens"], 108_270)
+
+    def test_gate_emits_unmeasured_verdicts_and_fails_when_harm_costs_are_missing(
+        self,
+    ) -> None:
+        with self.tempdir() as temp:
+            root = Path(temp)
+            expected = root / "expected.json"
+            find_surface = next(
+                surface for surface in load_expected() if surface["id"] == "find"
+            )
+            expected.write_text(
+                json.dumps({"surfaces": [find_surface]}), encoding="utf-8"
+            )
+            memory_input = root / "memory-filter.jsonl"
+            memory_input.write_text("", encoding="utf-8")
+            missing_costs = root / "harm-costs.json"
+            output = io.StringIO()
+            with (
+                patch("report.native_usage", return_value=({}, [])),
+                contextlib.redirect_stdout(output),
+            ):
+                status = main(
+                    [
+                        "--gate",
+                        "--days",
+                        "7",
+                        "--expected",
+                        str(expected),
+                        "--harm-costs",
+                        str(missing_costs),
+                        "--memory-input",
+                        str(memory_input),
+                        "--history",
+                        str(root / "ledger-history.jsonl"),
+                    ]
+                )
+
+            try:
+                result = json.loads(output.getvalue())
+            except json.JSONDecodeError as exc:
+                self.fail(f"--gate did not emit valid JSON: {exc}")
+            self.assertEqual(status, 1)
+            self.assertIsNone(result["harm_costs_sha256"])
+            row = next(row for row in result["rows"] if row["id"] == "find")
+            self.assertEqual(row["verdict"], "UNMEASURED")
+            self.assertIsNone(row["value_usd"])
+            self.assertIn("find", "\n".join(result["strict_failures"]))
 
 
 if __name__ == "__main__":

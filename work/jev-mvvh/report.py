@@ -211,6 +211,7 @@ def assemble_report(
     end: datetime | None = None,
     history: Path = LEDGER_HISTORY_PATH,
     memory_path: Path | None = None,
+    allow_unpriced_costs: bool = False,
 ) -> dict[str, Any]:
     end = (end or datetime.now(timezone.utc)).astimezone(timezone.utc)
     start = end - timedelta(days=days)
@@ -221,11 +222,10 @@ def assemble_report(
         if surface.get("group") in ("hook", "global")
     }
     missing = sorted(required_costs - set(costs))
-    if missing:
+    if missing and not allow_unpriced_costs:
         raise LedgerInputError(
             f"approved harm-cost table lacks surfaces: {', '.join(missing)}"
         )
-
     usage, sessions = native_usage(start, end)
     memory_source = memory_path or MEMORY_LOG
     memory = read_jsonl(memory_source, start, end)
@@ -516,7 +516,7 @@ def assemble_report(
         "schema": "jev-mvvh.ledger.v1",
         "window": {"start": start.isoformat(), "end": end.isoformat(), "days": days},
         "generated_at": end.isoformat(),
-        "harm_costs_sha256": harm_table["_sha256"],
+        "harm_costs_sha256": harm_table.get("_sha256"),
         "rows": report_rows,
         "strict_failures": failures,
     }
