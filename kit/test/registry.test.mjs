@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { freshHome, runCli } from './cli-support.mjs';
 import { EXIT_CODES as CLI_EXIT_CODES } from '../src/cli/exit.mjs';
-import { FAMILIES, dispatchCommand, validateFamilyNames } from '../dist/families/registry.js';
+import * as registryModule from '../dist/families/registry.js';
+const { FAMILIES, dispatchCommand, validateFamilyNames } = registryModule;
 
 const META_VERBS = new Set(['overview', 'capabilities', 'robot-docs', 'schema', 'doctor', 'install', 'ask', 'help', 'skillgap']);
 const FAMILY_VERBS = new Set(['run', 'batch', 'explain', 'cases', 'eval', 'calibrate']);
@@ -57,6 +58,34 @@ test('capabilities, robot docs, and schema are generated from the registered fam
   assert.deepEqual(Object.keys(JSON.parse(aliasSchema.stdout).commands), ['rank']);
   assert.equal(dispatchCommand('rank'), 'rerank');
   assert.equal(dispatchCommand('rerank'), 'rerank');
+});
+
+test('an injected family flows through the registry dispatch and generated surfaces', () => {
+  assert.equal(typeof registryModule.createFamilyRegistry, 'function', 'the registry must expose one injectable family list');
+  const observe = {
+    name: 'observe',
+    runner: 'score',
+    primitive: 'score',
+    aliases: ['inspect'],
+    usage: 'observe --text T --levels FILE',
+    description: 'Inspect an observation.',
+  };
+  const registry = registryModule.createFamilyRegistry([...FAMILIES, observe]);
+  const capabilities = registry.capabilities();
+
+  assert.equal(capabilities.commands.observe.name, 'observe');
+  assert.equal(capabilities.commands.observe.primitive, 'score');
+  assert.ok(capabilities.commands.observe.exit_codes.includes(CLI_EXIT_CODES.RETRYABLE));
+  assert.equal(capabilities.commands.observe.output_format, 'classifier.<command>.v1');
+  assert.ok(registry.robotDocs().includes('- observe: Inspect an observation. Usage: observe --text T --levels FILE.'));
+  assert.ok(registry.robotDocs().includes('- `inspect` aliases `observe`.'));
+  assert.equal(registry.schema().commands.observe.name, 'observe');
+  assert.deepEqual(Object.keys(registry.schema('observe').commands), ['observe']);
+  assert.deepEqual(Object.keys(registry.schema('inspect').commands), ['observe']);
+  const dispatchedAlias = registry.dispatchCommand('inspect');
+  assert.equal(dispatchedAlias, 'inspect');
+  assert.equal(registry.familyForCommand(dispatchedAlias).runner, 'score');
+  assert.deepEqual(registry.schema('inspect').commands.observe, capabilities.commands.observe);
 });
 
 test('family naming validator rejects meta, family, hermes, and malformed names', () => {
