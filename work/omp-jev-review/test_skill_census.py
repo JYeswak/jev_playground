@@ -482,6 +482,11 @@ class Cli(unittest.TestCase):
         self.home = Path(self.tmp.name) / "home"
         ledger = self.home / ".claude" / "skills" / "THIRD-PARTY-SKILLS.tsv"
         ledger.parent.mkdir(parents=True)
+        self.registry = self.home / "surfaces.json"
+        self.registry.write_text(
+            json.dumps({"schema_version": "blast-radius-surfaces.v1", "surfaces": []}),
+            encoding="utf-8",
+        )
         ledger.write_text(LEDGER)
 
     def tearDown(self):
@@ -524,6 +529,7 @@ class Cli(unittest.TestCase):
         self.assertTrue(lines[3].startswith("Jev tools 24h: "), lines[3])
         out = io.StringIO()
         with (
+            mock.patch.object(fiw, "SURFACE_REGISTRY", self.registry),
             mock.patch.dict(os.environ, {"HOME": str(self.home)}),
             mock.patch.object(fiw, "poll", return_value={2: ("working", "")}),
             mock.patch.object(fiw, "ci_lines", return_value=[]),

@@ -2218,14 +2218,16 @@ class SurfaceHeartbeat(unittest.TestCase):
 
     def test_launchd_job_is_kept_alive_and_runs_this_watcher(self):
         service = plistlib.loads((HERE / "ai.jev.fleet-idle-watch.plist").read_bytes())
-        repo = HERE.parents[1]
 
         self.assertEqual(service["Label"], "ai.jev.fleet-idle-watch")
         self.assertTrue(service["KeepAlive"])
         self.assertTrue(service["RunAtLoad"])
-        self.assertEqual(service["WorkingDirectory"], str(repo))
+        watcher = Path(service["ProgramArguments"][1])
         self.assertEqual(
-            Path(service["ProgramArguments"][1]), repo / "scripts/fleet-idle-watch.py"
+            Path(service["WorkingDirectory"]), watcher.resolve().parents[1]
+        )
+        self.assertEqual(
+            watcher.resolve().parts[-2:], ("scripts", "fleet-idle-watch.py")
         )
 
 

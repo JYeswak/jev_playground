@@ -260,6 +260,11 @@ class Cli(unittest.TestCase):
         self.tmp = tempfile.TemporaryDirectory(prefix="judge-usage-")
         self.home = Path(self.tmp.name) / "home"
         self.home.mkdir()
+        self.registry = self.home / "surfaces.json"
+        self.registry.write_text(
+            json.dumps({"schema_version": "blast-radius-surfaces.v1", "surfaces": []}),
+            encoding="utf-8",
+        )
 
     def tearDown(self):
         self.tmp.cleanup()
@@ -295,6 +300,7 @@ class Cli(unittest.TestCase):
         out = io.StringIO()
         with (
             mock.patch.dict(os.environ, {"HOME": str(self.home)}),
+            mock.patch.object(fiw, "SURFACE_REGISTRY", self.registry),
             mock.patch.object(fiw, "poll", return_value={2: ("working", "")}),
             mock.patch.object(fiw, "ci_lines", return_value=[]),
             mock.patch.object(sys, "argv", ["fleet-idle-watch.py", "--once"]),

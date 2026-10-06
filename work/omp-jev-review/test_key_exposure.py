@@ -380,6 +380,11 @@ class KeyPage(Keyed):
         self.assertEqual(self.state.read_text(), "{not json")
 
     def test_the_forever_loop_pages_in_its_first_round(self):
+        registry = self.home / "surfaces.json"
+        registry.write_text(
+            json.dumps({"schema_version": "blast-radius-surfaces.v1", "surfaces": []}),
+            encoding="utf-8",
+        )
         path = write_session(self.home, "leak", self.key(), 60)
         lines = self.census()
 
@@ -393,6 +398,7 @@ class KeyPage(Keyed):
         }
         out = io.StringIO()
         with (
+            mock.patch.object(fiw, "SURFACE_REGISTRY", registry),
             mock.patch.dict(os.environ, env),
             mock.patch.object(fiw, "poll", return_value={}),
             mock.patch.object(fiw, "hook_load_round", return_value=None),
