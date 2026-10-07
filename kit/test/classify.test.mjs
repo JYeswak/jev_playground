@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
+import { randomUUID } from 'node:crypto';
 import { classifyText, BANKING77_INSTRUCTIONS } from '../src/classify.ts';
 import { PreflightError } from '../src/preflight.ts';
 
@@ -113,4 +114,19 @@ test('CLI runs the captured Banking77 example with the keyless fake', async () =
   assert.equal(body.data.label, example.expected_label);
   assert.equal(body.meta.model, 'fake');
   assert.equal(body.data.confidence, 0.86);
+});
+
+test('CLI maps a missing labels file to NO_INPUT and exit 66', async () => {
+  const example = JSON.parse(await readFile(new URL('../examples/banking77-example.json', import.meta.url)));
+  const missingLabels = new URL(`../examples/missing-${randomUUID()}.json`, import.meta.url).pathname;
+  const result = await runCli(['classify', '--text', example.text, '--labels', missingLabels, '--fake', '--robot']);
+  assert.equal(result.code, 66, result.stderr);
+  const body = JSON.parse(result.stdout);
+  assert.equal(body.ok, false);
+  assert.equal(body.schema, 'classifier.classify.v1');
+  assert.equal(body.status, 'NO_INPUT');
+  assert.equal(body.data, null);
+  assert.deepEqual(body.commands, ['classifier classify --help']);
+  assert.deepEqual(body.errors.map(({ code, exit_code }) => ({ code, exit_code })), [{ code: 'NO_INPUT', exit_code: 66 }]);
+  assert.ok(body.errors[0].message.includes(`--labels file not found: ${missingLabels}`));
 });

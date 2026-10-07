@@ -17,9 +17,10 @@ import { createEnvelope } from "../src/cli/envelope.mjs";
 import { exitCodeForFailure } from "../src/cli/exit.mjs";
 import { parseArgv } from "../src/cli/argv.mjs";
 import { helpFor } from "../src/cli/help.mjs";
+import { FAMILY_REGISTRY } from "../dist/families/registry.js";
 import { runDoctor } from "../src/doctor/engine.mjs";
+import { runRepair } from "../dist/doctor/repair.js";
 import { runHealth } from "../src/doctor/readiness.mjs";
-import { FAMILIES, capabilities, dispatchCommand, robotDocs, schema, validateFamilyNames } from "../dist/families/registry.js";
 import { formatCliError, rewriteCliError } from "../dist/cli/errors.js";
 
 const ROOT = new URL("..", import.meta.url);
@@ -82,6 +83,7 @@ async function doctorContext(parsed) {
     ? await readJson(join(repo, "work/jev-inventory/expected.json"))
     : discovered.inventory;
   const stateDir = resolve(process.env.JEV_STATE_DIR || join(home, ".local", "state", "jev"));
+  const doctorDir = resolve(process.env.JEV_DOCTOR_DIR || join(home, ".local", "state", "classifier", "doctor"));
   const target = repo
     ? await execProbe("git", ["-C", repo, "rev-parse", "HEAD"], { timeout: 1000, maxBuffer: 1024 })
     : null;
@@ -89,6 +91,7 @@ async function doctorContext(parsed) {
     repo,
     home,
     stateDir,
+    doctorDir,
     now: Date.now(),
     target_sha: target?.code === 0 ? target.stdout.trim() : null,
     tier: parsed.options.deep ? "deep" : parsed.options.quick ? "quick" : "default",
@@ -114,6 +117,15 @@ async function health(parsed) {
     ok: report.status === "ok",
     ...(report.status === "findings" ? { reason: "findings" } : {}),
   };
+}
+
+async function repair(parsed) {
+  const context = await doctorContext({ ...parsed, options: { ...parsed.options, deep: true } });
+  if (parsed.subcommand === "undo") {
+    return runRepair({ context, undo: true, options: parsed.options, positionals: parsed.positionals });
+  }
+  const report = await runDoctor(context);
+  return runRepair({ context, report, options: parsed.options, positionals: parsed.positionals });
 }
 
 async function ask(args) {
@@ -257,16 +269,17 @@ async function main() {
   const suppliedArgs = process.argv.slice(2);
   const correctedRobotFlag = suppliedArgs.includes("--robto");
   const args = suppliedArgs.map((value) => value === "--robto" ? "--robot" : value);
-  if (args.length > 0) args[0] = dispatchCommand(args[0]);
+  if (args.length > 0) args[0] = FAMILY_REGISTRY.dispatchCommand(args[0]);
   const metaVerb = args[0];
   if (metaVerb === "capabilities" || metaVerb === "robot-docs" || metaVerb === "schema") {
-    if (validateFamilyNames().length > 0) {
-      process.stderr.write(`invalid family registry: ${validateFamilyNames().join("; ")}\n`);
+    const registryErrors = FAMILY_REGISTRY.validateFamilyNames();
+    if (registryErrors.length > 0) {
+      process.stderr.write(`invalid family registry: ${registryErrors.join("; ")}\n`);
       return 74;
     }
-    const output = metaVerb === "capabilities" ? capabilities()
-      : metaVerb === "schema" ? schema(option(args, "--command"))
-        : robotDocs();
+    const output = metaVerb === "capabilities" ? FAMILY_REGISTRY.capabilities()
+      : metaVerb === "schema" ? FAMILY_REGISTRY.schema(option(args, "--command"))
+        : FAMILY_REGISTRY.robotDocs();
     process.stdout.write(`${typeof output === "string" ? output : JSON.stringify(output, null, 2)}\n`);
     return 0;
   }
@@ -309,19 +322,21 @@ async function main() {
     return error.exit_code;
   }
 
-  const family = FAMILIES.find((candidate) => candidate.name === parsed.command || candidate.aliases.includes(parsed.command));
+  const family = FAMILY_REGISTRY.familyForCommand(parsed.command);
   let result;
   let cliError;
   try {
     if (parsed.command === "doctor") result = await doctor(parsed);
+    else if (parsed.command === "repair") result = await repair(parsed);
     else if (parsed.command === "health") result = await health(parsed);
     else if (parsed.command === "ask") result = await ask(args);
     else if (parsed.command === "install" || parsed.command === "uninstall") result = await runInstaller(parsed.command, args, parsed);
-    else if (family && typeof FAMILY_RUNNERS[family.runner] === "function") result = await FAMILY_RUNNERS[family.runner](args);
     else if (parsed.command === "omp" && parsed.subcommand === "install") {
       result = { ok: true, ...await installOmp(option(args, "--dir") ?? process.cwd(), hasFlag(args, "--dry-run")) };
     } else if (parsed.command === "omp" && parsed.subcommand === "uninstall") {
       result = { ok: true, ...await uninstallOmp(option(args, "--dir") ?? process.cwd(), !hasFlag(args, "--apply")) };
+    } else if (family && typeof FAMILY_RUNNERS[family.runner] === "function") {
+      result = await FAMILY_RUNNERS[family.runner](args);
     } else {
       result = usageFailure("classifier doctor|gate|ask|rerank|classify|verify|score|install|uninstall|omp ...");
     }

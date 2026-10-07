@@ -1,8 +1,9 @@
-const COMMANDS = ['doctor', 'health', 'ask', 'rerank', 'classify', 'verify', 'score', 'gate', 'omp', 'install', 'uninstall'];
+const COMMANDS = ['doctor', 'health', 'repair', 'ask', 'rank', 'rerank', 'classify', 'verify', 'score', 'gate', 'omp', 'install', 'uninstall'];
 const DESTRUCTIVE_OPTIONS = new Set(['--apply', '--force', '--yes', '--delete', '--remove', '--adopt', '--take-over-bin']);
 const COMMON = new Set(['--json', '--robot', '--no-color']);
 const VALUE_OPTIONS = {
   doctor: new Set(['--only', '--skip']),
+  repair: new Set(['--only']),
   ask: new Set(['--state', '--question']),
   rerank: new Set(['--query', '--candidates']),
   classify: new Set(['--text', '--labels']),
@@ -15,6 +16,7 @@ const VALUE_OPTIONS = {
 };
 const BOOLEAN_OPTIONS = {
   doctor: new Set(['--quick', '--deep', '--online']),
+  repair: new Set(['--apply']),
   ask: new Set(['--fake']),
   rerank: new Set(['--fake']),
   classify: new Set(['--fake']),
@@ -84,10 +86,11 @@ function shellQuote(value) {
 }
 
 function optionsFor(command, subcommand) {
-  const values = new Set(VALUE_OPTIONS[command] ?? []);
-  const booleans = new Set([...(BOOLEAN_OPTIONS[command] ?? []), ...COMMON]);
-  if (command === 'omp' && subcommand === 'install') booleans.delete('--apply');
-  if (command === 'omp' && subcommand === 'uninstall') booleans.delete('--dry-run');
+  const optionCommand = command === 'rank' ? 'rerank' : command;
+  const values = new Set(VALUE_OPTIONS[optionCommand] ?? []);
+  const booleans = new Set([...(BOOLEAN_OPTIONS[optionCommand] ?? []), ...COMMON]);
+  if (optionCommand === 'omp' && subcommand === 'install') booleans.delete('--apply');
+  if (optionCommand === 'omp' && subcommand === 'uninstall') booleans.delete('--dry-run');
   return { values, booleans };
 }
 
@@ -112,10 +115,19 @@ export function parseArgv(args) {
     };
   }
 
-  const subcommands = command === 'ask' ? ['choice', 'score', 'noul'] : command === 'omp' ? ['install', 'uninstall'] : [];
-  const positional = commandArgs.filter((token) => !token.startsWith('-'));
-  const subcommand = subcommands.length ? positional[0] : null;
-  const validSubcommand = !subcommands.length || subcommands.includes(subcommand);
+  const subcommands = command === 'ask' ? ['choice', 'score', 'noul'] : command === 'omp' ? ['install', 'uninstall'] : command === 'repair' ? ['undo'] : [];
+  let firstPositional = null;
+  for (let i = 0; i < commandArgs.length; i += 1) {
+    const token = commandArgs[i];
+    if (token.startsWith('-')) {
+      if (VALUE_OPTIONS[command]?.has(token)) i += 1;
+      continue;
+    }
+    firstPositional = token;
+    break;
+  }
+  const subcommand = subcommands.length ? firstPositional : null;
+  const validSubcommand = !subcommands.length || (command === 'repair' && subcommand === null) || subcommands.includes(subcommand);
   const { values, booleans } = optionsFor(command, subcommand);
   const options = {};
   const positionals = [];

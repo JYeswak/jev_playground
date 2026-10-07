@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseArgv } from '../src/cli/argv.mjs';
-import { freshHome, runCli } from './cli-support.mjs';
+import { examplePath, freshHome, runCli } from './cli-support.mjs';
 
 test('one-edit flag typo is interpreted with a warning at the CLI seam', async () => {
   const parsed = parseArgv(['--robto']);
@@ -62,4 +62,21 @@ test('installer verbs parse target, directory and explicit apply mode', () => {
   assert.deepEqual(uninstall.positionals, ['omp-project']);
   assert.equal(uninstall.options.dir, '/repo');
   assert.equal(uninstall.options.apply, true);
+});
+
+test('rank alias reaches the captured rerank runner through the CLI', async () => {
+  const home = await freshHome('classifier-rank-alias');
+  const result = runCli([
+    'rank',
+    '--query', '10034',
+    '--candidates', examplePath('rerank-candidates.json'),
+    '--fake',
+    '--robot',
+  ], { home });
+  assert.equal(result.status, 0, result.stderr);
+  const body = JSON.parse(result.stdout);
+  assert.equal(body.schema, 'classifier.rerank.v1');
+  assert.equal(body.status, 'OK');
+  assert.equal(body.data.orderedCandidates[0].id, '181942');
+  assert.equal(body.meta.model, 'fake');
 });
