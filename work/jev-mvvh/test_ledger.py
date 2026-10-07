@@ -501,6 +501,7 @@ class LedgerTests(unittest.TestCase):
             self.assertEqual(
                 memory_row["value_measure"], {"tokens_saved": 74, "drop_rows": 1}
             )
+            self.assertEqual(memory_row["value_source"], str(memory_log))
             self.assertEqual(memory_row["calls"], 2)
             self.assertEqual(memory_row["input_tokens"], 848)
             self.assertAlmostEqual(memory_row["jev_spend_usd"], 0.000035616)
@@ -612,6 +613,8 @@ class LedgerTests(unittest.TestCase):
             row = next(row for row in result["rows"] if row["id"] == "find")
             self.assertEqual(row["verdict"], "UNMEASURED")
             self.assertIsNone(row["value_usd"])
+            self.assertIsNone(row["value_measure"])
+            self.assertIsNone(row["value_source"])
             self.assertIn("find", "\n".join(result["strict_failures"]))
 
 

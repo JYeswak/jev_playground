@@ -185,10 +185,8 @@ def _report_row(
         "clef_calls": None,
         "latency_ms_p50": None if metrics is None else metrics["latency_ms_p50"],
         "latency_ms_p95": None if metrics is None else metrics["latency_ms_p95"],
-        "value_measure": surface.get("saving")
-        if value_measure is None
-        else value_measure,
-        "value_source": surface.get("evidence"),
+        "value_measure": value_measure,
+        "value_source": source if value_measure is not None else None,
         "harm_cost_usd_per_prevented_harm": cost.get("usd_per_prevented_harm")
         if isinstance(cost, dict)
         else None,
