@@ -3768,3 +3768,16 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Run:** `python3 work/jev-fd5j/after_measure.py --json`; output matched `work/jev-fd5j/RECEIPT.json` byte-for-byte with `cmp` (exit 0) after restoring the runner's final LF. Artifact commit: `8c643732a49ae64e739aeab0a19c636926d866e2`.
 - **Measurement:** Historical post-change window: 226/4,138 cascade-screen rows were fallbacks (5.4616%), including 34 timeouts; frozen baseline: 1,032/3,560 (28.9888%). Source snapshot SHA-256: `e9c392befbe5e75dcfe448b30bb67adafe81de836c3941eec9132229ac75352c`.
 - **Spend and boundary:** $0; no Jev/Clef calls. This is local historical-log replay, not current runtime evidence or causal attribution. Independent pane-5 byte comparison requested; bead remains open pending that verification.
+
+## 2026-10-06 jev-gdhb: local Clef pass unavailable after guarded timeout [live]
+
+- **Run:** `nice -n 10 upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/jev-gdhb-redo/run.py --run-clef --json` after preregistration commit `8be4683a`. One serial pass; 552 POST attempts recorded, 551 valid response rows with localbench request IDs, then `TimeoutError` at 30s for `massive-1.1-en-US-test-3099`; 402 corpus rows were not attempted. Runner receipt status is `INCOMPLETE_NO_VERDICT`; the result is **UNAVAILABLE** and no accuracy metric was computed.
+- **Accounting:** Clef model `clef-flash`; Jev calls 0; retries 0; external calls 0; spend $0.00. `work/jev-gdhb-redo/rows.jsonl` retains the 551 responses and one error row; `RECEIPT.md` records the incomplete run.
+- **Boundary:** No retry or resume, per the frozen contract. No partial-data average, paired comparison, superiority, or deployment claim. Keep `jev-gdhb` open; investigate the local timeout before any separately authorized run.
+
+## 2026-10-07 native jevify storage-classifier smoke (BrownGoose handoff) [live]
+
+- **Call:** Native `judge_batch` call `jdgb-159c7b6fcf9c6e6d` used `typesafe/jev-1.13.0` on 300 recorded real scratch-plan candidates (artifact 77). The rubric was frozen before model loading (artifact 105). Four noncandidate lines were prefiltered; retries, errors, and truncations were all 0; host completion was 18.4 seconds.
+- **Routes and incumbent:** Jev routed 165 to retention, 117 to missing, 18 to owner-release, and 0 to protected. The same invocation's deterministic incumbent classified 259 LIVE, 29 SKIP, and 12 QUARANTINE. All 300 were escalated; all five exact status/reason templates and the source-action guard were confirmed. Route transitions: 153 LIVE→retention, 106 LIVE→missing, 18 SKIP→owner-release.
+- **Accounting and decision:** cost `$0.009059778`. Direct log-routing was not adopted. This is one design result, not an area- or model-level verdict.
+- **Boundary:** advisory smoke only; no preregistered model-quality benchmark, mutation, reclaimed-byte, or kit-installed integration claim. Artifacts 77 and 105 remain local-session artifacts; no output files were copied into this save.
