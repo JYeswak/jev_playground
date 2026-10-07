@@ -17,20 +17,28 @@
 		<string>/Users/josh</string>
 		<key>IDLE_INTERVAL</key>
 		<string>60</string>
+		<key>JEV_FLEET_STATE_DIR</key>
+		<string>/Users/josh/Developer/jev/var/fleet-idle-watch</string>
+		<key>JEV_FLEET_SURFACE_OBSERVE_ONLY</key>
+		<string>1</string>
 		<key>JEV_SESSION</key>
 		<string>jev</string>
 		<key>PATH</key>
 		<string>/Users/josh/.local/bin:/Users/josh/.cargo/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
 		<key>PYTHONUNBUFFERED</key>
 		<string>1</string>
+		<key>TMUX</key>
+		<string>/Users/josh/.tmux-sockets/tmux-501/default,1369,0</string>
+		<key>TMUX_TMPDIR</key>
+		<string>/Users/josh/.tmux-sockets</string>
 	</dict>
 	<key>RunAtLoad</key>
 	<true/>
 	<key>KeepAlive</key>
 	<true/>
 	<key>StandardOutPath</key>
-	<string>/Users/josh/.local/state/jev/fleet-idle-watch.stdout.log</string>
+	<string>/Users/josh/Developer/jev/var/fleet-idle-watch/fleet-idle-watch.stdout.log</string>
 	<key>StandardErrorPath</key>
-	<string>/Users/josh/.local/state/jev/fleet-idle-watch.stderr.log</string>
-</dict>
+	<string>/Users/josh/Developer/jev/var/fleet-idle-watch/fleet-idle-watch.stderr.log</string>
+	</dict>
 </plist>

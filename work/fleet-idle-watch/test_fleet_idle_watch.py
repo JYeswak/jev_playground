@@ -28,6 +28,7 @@ import plistlib
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
@@ -1715,14 +1716,104 @@ class SteeringQueue(unittest.TestCase):
             fiw.steering_text(self.SCREEN.replace("Steering · 1", "Thinking")), ""
         )
 
+    def test_steering_marker_rejects_embedded_prefix(self):
+        screen = self.SCREEN.replace("Steering · 1", "xSteering · 1", 1)
+        self.assertEqual(fiw.steering_text(screen), "")
+
+    def test_steering_marker_long_near_miss_completes_within_bound(self):
+        screen = "Steering · " + "9" * 100_000 + " " * 100_000 + "x"
+        started = time.perf_counter()
+
+        self.assertEqual(fiw.steering_text(screen), "")
+        self.assertLess(time.perf_counter() - started, 1.0)
+
     def test_nudge_once_while_idle_never_while_working(self):
         text = fiw.steering_text(self.SCREEN)
         done = set()
-        self.assertTrue(fiw.steering_due("idle", 4, text, done))
-        self.assertFalse(fiw.steering_due("working", 4, text, done))
+        self.assertTrue(fiw.steering_due("idle", 4, text, "", done))
+        self.assertFalse(fiw.steering_due("working", 4, text, "", done))
+        self.assertFalse(fiw.steering_due("unknown", 4, text, "", done))
+        self.assertFalse(fiw.steering_due("idle", 4, text, "composer", done))
         done.add((4, text))
-        self.assertFalse(fiw.steering_due("idle", 4, text, done))
-        self.assertTrue(fiw.steering_due("idle", 4, text + " v2", done))
+        self.assertFalse(fiw.steering_due("idle", 4, text, "", done))
+        self.assertTrue(fiw.steering_due("idle", 4, text + " v2", "", done))
+
+    def test_nudge_sends_literal_dot_and_enter_only_after_fresh_safe_snapshot(self):
+        text = fiw.steering_text(self.SCREEN)
+        calls = []
+
+        def completed(argv, **kwargs):
+            calls.append(argv)
+            return subprocess.CompletedProcess(argv, 0, stdout="", stderr="")
+
+        fresh = {4: ("idle", "", "", True, "", text)}
+        with (
+            mock.patch.object(fiw, "poll", return_value=fresh) as check,
+            mock.patch.object(fiw.subprocess, "run", side_effect=completed),
+        ):
+            self.assertTrue(
+                fiw.nudge_steering(
+                    4, state="idle", composer="", queued_steer=text
+                )
+            )
+
+        check.assert_called_once_with()
+        self.assertEqual(
+            calls,
+            [
+                ["tmux", "send-keys", "-l", "-t", "jev:0.4", "."],
+                ["tmux", "send-keys", "-t", "jev:0.4", "Enter"],
+            ],
+        )
+
+    def test_nudge_refuses_working_unknown_composed_or_empty_queue(self):
+        cases = (
+            ("working", "", "queued"),
+            ("unknown", "", "queued"),
+            ("idle", "composer", "queued"),
+            ("idle", "", ""),
+        )
+        for state, composer, queued_steer in cases:
+            with self.subTest(state=state, composer=composer, steer=queued_steer):
+                with (
+                    mock.patch.object(fiw, "poll") as check,
+                    mock.patch.object(fiw.subprocess, "run") as run,
+                ):
+                    self.assertFalse(
+                        fiw.nudge_steering(
+                            4,
+                            state=state,
+                            composer=composer,
+                            queued_steer=queued_steer,
+                        )
+                    )
+                check.assert_not_called()
+                run.assert_not_called()
+
+    def test_nudge_refuses_if_fresh_snapshot_is_unsafe_or_missing(self):
+        text = fiw.steering_text(self.SCREEN)
+        unsafe = (
+            None,
+            {},
+            {4: ("idle",)},
+            {4: ("working", "", "", True, "", text)},
+            {4: ("unknown", "", "", True, "", text)},
+            {4: ("idle", "", "", True, "composer", text)},
+            {4: ("idle", "", "", True, "", "different queued message")},
+        )
+        for fresh in unsafe:
+            with self.subTest(snapshot=fresh):
+                with (
+                    mock.patch.object(fiw, "poll", return_value=fresh) as check,
+                    mock.patch.object(fiw.subprocess, "run") as run,
+                ):
+                    self.assertFalse(
+                        fiw.nudge_steering(
+                            4, state="idle", composer="", queued_steer=text
+                        )
+                    )
+                check.assert_called_once_with()
+                run.assert_not_called()
 
 
 class SurfaceHeartbeat(unittest.TestCase):
@@ -1816,16 +1907,51 @@ class SurfaceHeartbeat(unittest.TestCase):
         self.telemetry_path.parent.mkdir(parents=True, exist_ok=True)
         self.telemetry_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    def monitor(self, *, now=None):
+    def monitor(self, *, now=None, observe_only=False):
         messages = []
+        kwargs = {"observe_only": True} if observe_only else {}
         result = self.heartbeat.monitor(
             self.registry,
             self.state_dir,
             now=self.now if now is None else now,
             omp_root=self.omp_root,
             send=messages.append,
+            **kwargs,
         )
         return result[0], messages
+
+    def test_watcher_observe_only_and_shadow_only_reach_monitor(self):
+        cases = ((True, False, True), (False, True, True), (False, False, False))
+        for surface_only, shadow_only, expected in cases:
+            with self.subTest(surface_only=surface_only, shadow_only=shadow_only):
+                monitor = mock.Mock(return_value=[])
+                patches = (
+                    mock.patch.object(
+                        fiw, "SURFACE_OBSERVE_ONLY", surface_only, create=True
+                    ),
+                    mock.patch.object(fiw, "SHADOW_ONLY", shadow_only),
+                    mock.patch.object(
+                        fiw.surface_heartbeat,
+                        "resolve_state_dir",
+                        return_value=self.state_dir,
+                    ),
+                    mock.patch.object(
+                        fiw.surface_heartbeat,
+                        "real_omp_root",
+                        return_value=self.omp_root,
+                    ),
+                    mock.patch.object(
+                        fiw.surface_heartbeat, "monitor", monitor
+                    ),
+                )
+                with contextlib.ExitStack() as stack:
+                    for patcher in patches:
+                        stack.enter_context(patcher)
+                    with contextlib.redirect_stdout(io.StringIO()):
+                        self.assertEqual(
+                            fiw._surface_heartbeat_round(self.now), 0
+                        )
+                self.assertIs(monitor.call_args.kwargs["observe_only"], expected)
 
     def test_webscreen_counts_only_external_web_tool_results(self):
         self.write_registry()
@@ -2273,6 +2399,86 @@ class SurfaceHeartbeat(unittest.TestCase):
         self.assertTrue(
             any("SURFACE RESTORE BLOCKED test-surface" in item for item in messages)
         )
+
+    def test_observe_only_alerts_on_unhealthy_surface_without_switching(self):
+        self.write_registry("presence-ON")
+        self.write_inputs(statuses=["error"] * 3)
+
+        assessment, messages = self.monitor(observe_only=True)
+        state = self.heartbeat.load_state(self.state_dir)
+        record = state["surfaces"]["test-surface"]
+        events = [
+            json.loads(line)
+            for line in (self.state_dir / self.heartbeat.EVENTS_NAME)
+            .read_text(encoding="utf-8")
+            .splitlines()
+        ]
+
+        self.assertEqual(assessment.state, "error-rate")
+        self.assertTrue(assessment.unhealthy)
+        self.assertTrue(any("SURFACE ANOMALY test-surface" in item for item in messages))
+        self.assertTrue(self.switch.is_file())
+        self.assertEqual(self.switch.read_text(encoding="utf-8"), "enabled\n")
+        self.assertFalse(record.get("auto_off", False))
+        self.assertEqual(events[-1]["action"], "alert")
+
+    def test_observe_only_preserves_expired_restore_probe_and_operator_markers(self):
+        self.write_registry("presence-OFF")
+        entry = json.loads(self.registry.read_text(encoding="utf-8"))["surfaces"][0]
+        operator_marker = self.root / "operator-off"
+        entry["operator_off_marker"] = str(operator_marker)
+        self.registry.write_text(
+            json.dumps({"schema_version": "blast-radius-surfaces.v1", "surfaces": [entry]}),
+            encoding="utf-8",
+        )
+        surface = self.heartbeat.load_registry(self.registry)[0]
+        self.switch.write_text(
+            "fleet heartbeat auto-off: prior error rate\n", encoding="utf-8"
+        )
+        operator_marker.write_text("operator requested OFF\n", encoding="utf-8")
+        self.write_inputs(statuses=["ok"] * 3)
+        self.heartbeat.save_state(
+            self.state_dir,
+            {
+                "schema_version": "fleet-surface-heartbeat-state.v1",
+                "surfaces": {
+                    "test-surface": {"state": "error-rate", "auto_off": True}
+                },
+                "probes": {},
+            },
+        )
+        self.heartbeat.start_restore_probe(
+            surface,
+            self.state_dir,
+            now=self.current_start,
+            duration_seconds=self.heartbeat.HOUR,
+        )
+        probe_before = self.heartbeat.load_state(self.state_dir)["probes"][
+            "test-surface"
+        ].copy()
+        switch_before = self.switch.read_bytes()
+        operator_before = operator_marker.read_bytes()
+
+        assessment, messages = self.monitor(observe_only=True)
+        state = self.heartbeat.load_state(self.state_dir)
+
+        self.assertEqual(assessment.state, "healthy")
+        self.assertEqual(messages, [])
+        self.assertEqual(state["probes"]["test-surface"], probe_before)
+        self.assertTrue(state["surfaces"]["test-surface"]["auto_off"])
+        self.assertEqual(self.switch.read_bytes(), switch_before)
+        self.assertEqual(operator_marker.read_bytes(), operator_before)
+
+    def test_dry_run_refuses_unisolated_home_before_any_write(self):
+        self.write_registry()
+        self.write_inputs(statuses=["error"] * 3)
+
+        with mock.patch.object(self.heartbeat, "DRY_RUN", True):
+            with self.assertRaises(self.heartbeat.HeartbeatError):
+                self.monitor()
+
+        self.assertFalse(self.state_dir.exists())
+        self.assertEqual(self.heartbeat.DRY_RUN_SENDS, [])
 
     def test_dry_run_records_pager_without_running_ntm_and_writes_liveness(self):
         self.home.mkdir()

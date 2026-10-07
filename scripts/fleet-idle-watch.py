@@ -89,6 +89,7 @@ SESSION = os.environ.get("JEV_SESSION", "jev")
 # not owner approval for TypeSafe export; keep background scoring disabled.
 SHADOW_ENABLED = False
 SHADOW_ONLY = os.environ.get("JEV_FLEET_SHADOW_ONLY") == "1"
+SURFACE_OBSERVE_ONLY = os.environ.get("JEV_FLEET_SURFACE_OBSERVE_ONLY") == "1"
 SHADOW_MAX_INFLIGHT = int(os.environ.get("JEV_FLEET_SHADOW_MAX_INFLIGHT", "16"))
 SHADOW_LOG = Path(
     os.environ.get("JEV_FLEET_SHADOW_LOG", "~/.local/state/jev/fleet-jev-shadow.jsonl")
@@ -307,7 +308,6 @@ def composer_text(screen: str) -> str:
 
 
 STEERING = re.compile(r"^\s*Steering · (\d+)\s*$")
-STEERING_NUDGE = "Continue: read the queued steering message above and act on it."
 
 
 def steering_text(screen: str) -> str:
@@ -327,16 +327,37 @@ def steering_text(screen: str) -> str:
     return ""
 
 
-def steering_due(state, index, text, done) -> bool:
-    """Nudge once per (pane, queued text) while the pane is idle."""
-    return state == "idle" and bool(text) and (index, text) not in done
+def steering_due(state, index, text, composer, done) -> bool:
+    """Nudge once per queued message, only from an idle empty-composer snapshot."""
+    return (
+        state == "idle"
+        and not composer
+        and bool(text)
+        and (index, text) not in done
+    )
 
 
-def nudge_steering(index: int) -> bool:
-    """Type one fixed prompt and Enter so omp starts a turn; True only when tmux took both."""
+def nudge_steering(
+    index: int, *, state: str, composer: str, queued_steer: str
+) -> bool:
+    """Start queued steering only after a fresh idle, empty-composer snapshot."""
+    if state != "idle" or composer or not queued_steer:
+        return False
+    states = poll()
+    reading = states.get(index) if states is not None else None
+    if reading is None or len(reading) < 6:
+        return False
+    fresh_state, _, _, _, fresh_composer, fresh_steer = reading[:6]
+    if (
+        fresh_state != "idle"
+        or fresh_composer
+        or fresh_steer != queued_steer
+    ):
+        return False
+    target = f"{SESSION}:0.{index}"
     try:
         typed = subprocess.run(
-            ["tmux", "send-keys", "-t", f"{SESSION}:0.{index}", STEERING_NUDGE],
+            ["tmux", "send-keys", "-l", "-t", target, "."],
             capture_output=True,
             timeout=10,
         )
@@ -1999,6 +2020,7 @@ def _surface_heartbeat_round(now: float) -> int:
             now=now,
             omp_root=surface_heartbeat.real_omp_root(),
             send=page,
+            observe_only=SHADOW_ONLY or SURFACE_OBSERVE_ONLY,
         )
     except (OSError, ValueError) as error:
         reason = type(error).__name__
@@ -2216,8 +2238,13 @@ def main() -> int:
                 steer = reading[5] if len(reading) > 5 else ""
                 if not steer:
                     steering_done = {(i, t) for i, t in steering_done if i != index}
-                elif steering_due(state, index, steer, steering_done) and not composer:
-                    ok = nudge_steering(index)
+                elif steering_due(state, index, steer, composer, steering_done):
+                    ok = nudge_steering(
+                        index,
+                        state=state,
+                        composer=composer,
+                        queued_steer=steer,
+                    )
                     steering_done.add((index, steer))
                     print(
                         f"{time.strftime('%H:%M:%SZ', time.gmtime())} "

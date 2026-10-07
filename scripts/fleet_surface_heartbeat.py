@@ -299,6 +299,7 @@ def monitor(
     now: float,
     omp_root: Path,
     send: Callable[[str], bool],
+    observe_only: bool = False,
 ) -> list[Assessment]:
     surfaces = load_registry(registry_path)
     current_end = int(now // HOUR) * HOUR
@@ -323,18 +324,19 @@ def monitor(
             surface, events, telemetry, history_start, current_start, current_end
         )
         assessments.append(assessment)
-        probe_status = finish_restore_probe(
-            surface,
-            state,
-            state_dir,
-            now=now,
-            host_events=events,
-            telemetry=telemetry,
-            baseline=assessment.interval,
-            send=send,
-        )
-        if probe_status in {"restored", "failed"}:
-            continue
+        if not observe_only:
+            probe_status = finish_restore_probe(
+                surface,
+                state,
+                state_dir,
+                now=now,
+                host_events=events,
+                telemetry=telemetry,
+                baseline=assessment.interval,
+                send=send,
+            )
+            if probe_status in {"restored", "failed"}:
+                continue
         record = state.setdefault("surfaces", {}).setdefault(surface.id, {})
         prior_state = record.get("state")
         record.update(
@@ -354,11 +356,12 @@ def monitor(
         )
         switched = False
         if assessment.unhealthy:
-            if switch_is_on(surface) is True:
-                switched = _set_switch(surface, on=False, reason=assessment.reason)
-                record["auto_off"] = switched
-            elif switch_is_on(surface) is None:
-                record["auto_off"] = False
+            if not observe_only:
+                if switch_is_on(surface) is True:
+                    switched = _set_switch(surface, on=False, reason=assessment.reason)
+                    record["auto_off"] = switched
+                elif switch_is_on(surface) is None:
+                    record["auto_off"] = False
             if prior_state != assessment.state or switched:
                 send(
                     f"SURFACE ANOMALY {surface.id} owner={surface.owner}: "
