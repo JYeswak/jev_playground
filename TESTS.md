@@ -237,7 +237,7 @@ claim nobody can check:
   Healthy traffic and zero host traffic do not trip; stale/invalid telemetry is unhealthy; only a
   healthy log-only probe restores an off surface; dry-run sends no ntm; scheduled ON cannot
   override watcher auto-off. 15 tests.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (106 tests). Steering queue (jev-of3b): queued message on a real idle screen is read, nudged once per text, never while working. 3 tests.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (112 tests). Steering queue (jev-of3b): queued message on a real idle screen is read, nudged once per text, never while working. 3 tests.
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder
