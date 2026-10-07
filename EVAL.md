@@ -3749,6 +3749,15 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 - **Boundary:** no live cutover or fresh-session proof; the active log still needs a coordinated restart and 0600 archive migration. The `jev-b35c.3` doctor check (d) is owned by that bead, not this change. Keep `jev-rpqu` open until live log checks pass.
 
 
+## 2026-10-05 jev-dau5 48-hour replication: matched-miss PASS; original bar FAIL (AmberWillow) [live]
+
+- **Locked cohort:** `work/longres-rep/PREREG-timewindow.md` freezes 2026-10-02T22:00Z–2026-10-04T22:00Z, 200 results split by source file, the exact 200-call/$0.015 caps, and the no-claim boundary. Collection yielded dev 100 / held 100; held had 44 referenced and 56 unreferenced.
+- **Call:** `infisical run --silent --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- node --experimental-strip-types work/longres-rep/run_timewindow.mjs --live`; pinned `jev-1.13.0`, 200/200 scored, 200 usage records, 148,990 input tokens, `$0.006258` at `$0.042/M`, median latency 187 ms, 0 fallback keeps, 0 retries. Keyless preflight estimated 222,310 tokens / `$0.009337` under the `$0.015` cap.
+- **Primary:** Jev and the held-matched size+tool baseline each dropped 11/44 referenced rows (25%); Jev saved 752,560 characters on held unreferenced rows vs 429,328 for the baseline (1.7529x). **PASS** the preregistered equal-miss, strictly-greater-savings bar. Estimated weekly savings: Jev 4,180,471 tokens; matched baseline 2,384,917.
+- **Secondary original bar:** **FAIL**. Jev dropped 11 references vs Youden's 13, but saved 752,560 characters vs 795,654; this does not meet the 1.2x savings requirement. Youden threshold: 34,175 characters; estimate 4,419,858 tokens/week.
+- **Receipt and replay:** `work/longres-rep/TIMEWINDOW-RECEIPT.md`; corpus SHA-256 `706754624f46db70bb92fc1ced3aea8491911d945a631bb07b989a5974930a33`; answer-row SHA-256 `86a6d02ab9f2965df57f7039c07ee64fbf0ed4f2fa20bac307c7565ccc66d3c7`. `python3 work/longres-rep/score_timewindow.py --corpus work/longres-rep/timewindow-corpus.json --rows work/longres-rep/timewindow-rows.jsonl --json` recomputes the receipt; `python3 -m unittest work/longres-rep/test_score_timewindow.py -v` passes 6/6.
+- **Boundary:** no enforcement, production, or beyond-window claim. No result text in the receipt; no extra live calls on checkpoint resume. Non-author replay at the pushed SHA remains required before closing jev-dau5.
+
 ## 2026-10-06 pane 5 native `find` usage [live]
 
 - **Usage:** Pane 5 reported 13 requests, 92K input tokens, and `$0.0039` spend. The configured judge alias is `typesafe/jev-latest`; the resolved model version was not recorded.
