@@ -47,9 +47,8 @@ claim nobody can check:
 - `kit/test/cli-exit.test.mjs` — stable exit classes, missing-key JSON/robot behavior, doctor output contracts, and refusal of unoffered answers. Run: `node --test kit/test/cli-exit.test.mjs` (3 tests).
 - `kit/test/cli-help.test.mjs` — pinned overview, topic/command help, and version output. Run: `node --test kit/test/cli-help.test.mjs` (2 tests).
 - `kit/test/cli-support.mjs` — shared isolated-home and subprocess helpers used by the `kit/test/cli-*.test.mjs` CLI tests; exercised through those tests.
-- `kit/test/doctor-support.mjs` — shared isolated-home, fake state and repository helpers used by the `kit/test/doctor*.test.mjs` and `kit/test/health.test.mjs` doctor tests; exercised through those tests.
 - `work/fleet-schema/test_miner.py` — fixture-backed miner joins, cutoff handling, reread metadata, provenance checks, load-safety behavior, and report output. Run: `python3 -m unittest discover -s work/fleet-schema -p test_miner.py -v`.
-- `work/jev-gdhb-redo/test_run.py` — offline local Clef runner contract: request/schema and model-identity refusals, guarded request-ID requirement, serial execution, and stop-on-error behavior. Run: `upstream/typesafe-ai/system-one-adapter-python/.venv/bin/python work/jev-gdhb-redo/test_run.py -v` (9 tests).
+- `work/jev-gdhb-redo/test_run.py` — offline local Clef runner contract: request/schema and model-identity refusals, guarded request-ID requirement, serial execution, and stop-on-error behavior. Run: `uv run --no-project --python 3.11 python3 work/jev-gdhb-redo/test_run.py -v` (9 tests).
 - `work/oracle-kit/prevalence_threshold.py` — t*(π) on frozen priors 30/186449 and 488/50149.
   Run: `python3 work/oracle-kit/prevalence_threshold.py` (exit 0; prints the 1:2300 identity).
 - `work/oracle-kit/selector-guard.mjs` — scorers cannot silently read `.distribution` / `.probability`.
@@ -78,6 +77,13 @@ claim nobody can check:
 - `kit/test/client.test.mjs` — `kit/src/client.ts` account protection with an injected fetch, no network: HTTP 401, 402 and 403 each start the shared Jev hold after one request and refuse the next request locally (`reason: billing-hold`, still one request); 429 and 503 never start it (jev-kk2u). Run: `node --experimental-strip-types --test kit/test/client.test.mjs` (5 tests).
 - `kit/test/skill-gap.test.mjs` — keyless-capable daily OMP miner contract: scans default and named-profile JSONL roots across two repositories, extracts tool/file/skill/error/retry counts, clusters repeated failures with resolvable evidence, sends only summaries plus skill inventory through the injected Jev client, persists cursors/classifications across process reruns, refuses skill-update candidates without a prior skill read, emits evidence-bearing review beads without modifying skills, reports missing credentials as `NOT_RUN`, and verifies daily CLI/report plus idempotent LaunchAgent scheduling. No live model calls; run after TypeScript compilation with `node --experimental-strip-types --test kit/test/skill-gap.test.mjs` (6 tests).
 - `kit/test/doctor.test.mjs`, `kit/test/health.test.mjs`, `kit/test/doctor-{logs,secrets,surfaces}.test.mjs`, and `kit/test/cli-help.test.mjs` — read-only doctor and health contracts, keyless status, repository-unavailable checks, detector boundaries, Clef timeout, D9 error-share boundary, command help, and the health CLI envelope. Fixture-only; no live or deployment-health claim. Run: `node --test kit/test/doctor.test.mjs kit/test/health.test.mjs kit/test/doctor-logs.test.mjs kit/test/doctor-secrets.test.mjs kit/test/doctor-surfaces.test.mjs kit/test/cli-help.test.mjs` (34 tests).
+- `kit/test/doctor-fixtures.test.mjs` — repair lifecycle and safety fixtures: zero-write plan, three-fixer apply/repeat/doctor-clean/byte-identical undo, protected target and unsafe action-log refusals, edited-template refusal, lock contention, stale-lock recovery, and mutation choke point. Fake HOME/repository only; run: `node --test kit/test/doctor-fixtures.test.mjs` (8 tests).
+- `kit/test/doctor-repair.test.mjs` — CLI plan-only contract and exact usage correction for unknown repair-option typos. Fake HOME only; run: `node --test kit/test/doctor-repair.test.mjs` (2 tests).
+- `kit/test/doctor-support.mjs` — shared fake-HOME doctor fixture, snapshot, and source-loader helpers used by the doctor and repair test suites.
+- `kit/test/install-manifest.test.mjs` — manifest idempotence/validation and installer-lock behavior, including live-lock refusal and dead-lock recovery. Fake HOME only; run: `node --test kit/test/install-manifest.test.mjs` (4 tests).
+- `kit/test/install-plan.test.mjs` — install dry-run no-write behavior, idempotent project install, and uninstall preview/apply boundaries. Fake HOME and repository only; run: `node --test kit/test/install-plan.test.mjs` (2 tests).
+
+Source status is **SOURCE-UNVERIFIED (pending)**: the repair/install suites above consume generated `kit/dist` directly or through the CLI. Run `npm run prepare --prefix kit` before them; stale-`dist` results are not source verification.
 - `work/jev-oioo/test_resume.py` — keyless comparator-only resume contract on the captured pre-resume rows (`work/jev-oioo/fixture-live-results-pre-resume.jsonl`, from `5caf9f93^:work/jev-oioo/live-results.jsonl`; the live file was rewritten in place when the resume ran, which turned this test red with 1 != 821): selects exactly 821 NOT_RUN rows, leaves 86 answers and all 907 Jev rows untouched, refuses before the reset, and a planted answered-row selection turns red. Run: `python3 -m unittest work/jev-oioo/test_resume.py` (3 tests).
 - `work/jev-inventory/test_inventory.py` — the Jev surface inventory (`work/jev-inventory/inventory.py`): the structural Mermaid diagram generated from `expected.json` equals the reviewed golden `goldens/inventory-structure.mmd` (any changed claim, verdict or wiring fails until re-blessed with `UPDATE_GOLDENS=1` and a reviewed `git diff`), it passes `frankenmermaid validate --fail-on error` (NOT_RUN skip when the binary is absent), every surface has a node and a colour class; conformance: a claimed hook whose file is missing reads `off`, an extension claimed off but still listed reads `on`, a native surface reads `off` when one profile lacks the TypeSafe judge. Planted live negative (manual): `JEV_INVENTORY_EXPECTED=<copy with skill-hint expect on>` exits 1 with `CONFORMANCE FAIL skill-hint: claimed on, live off`. Run: `python3 -m unittest work/jev-inventory/test_inventory.py` (6 tests).
 - `work/ci-main-status/test_ci_main_status.py` — `scripts/ci-main-status.py` (jev-bfku) against
@@ -236,8 +242,8 @@ claim nobody can check:
   the seven-day baseline; silent or sustained-error surfaces trip only their declared switch.
   Healthy traffic and zero host traffic do not trip; stale/invalid telemetry is unhealthy; only a
   healthy log-only probe restores an off surface; dry-run sends no ntm; scheduled ON cannot
-  override watcher auto-off. 15 tests.
-  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (112 tests). Steering queue (jev-of3b): queued message on a real idle screen is read, nudged once per text, never while working. 3 tests.
+  override watcher auto-off. 25 tests.
+  Run: `python3 -m unittest work/fleet-idle-watch/test_fleet_idle_watch.py` (121 tests). Steering queue (jev-of3b): queued message on a real idle screen is read, nudged once per text, never while working. 8 tests.
 - `work/omp-secret-probe/test_omp_secret_probe.py` — verdicts of `scripts/omp-secret-probe.py`
   (jev-doc7), the live check that omp hides a TypeSafe-shaped key from the model (jev-xw3f), on
   the answer shapes real sessions gave on 2026-09-25. REDACTED needs positive placeholder
@@ -717,6 +723,12 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 
 - `scripts/test_pin_global_jev.py` — offline global-loader discovery, frozen-commit pinning, checksum drift refusal, working-tree and atomic-replace isolation, checkout-import refusal, and hardlink-preserving rollback. Run: `python3 -m unittest scripts.test_pin_global_jev -v` (5 tests).
 
+## Newly registered tests — jev-x7-gate-rules-closeout-9td0
+
+- `work/x7-gate-rules/test_prepare.py` — deterministic DCG-stratified sampling, replay exclusion, privacy-filter boundaries, unreadable missing-transcript rows, malformed DCG decisions, private command-pack integrity, and frozen prior-manifest verification. Run: `uv run --no-project --offline --python 3.12 --with pytest python -m pytest -q work/x7-gate-rules/test_prepare.py` (11 tests).
+- `work/x7-gate-rules/test_run.mjs` — independent label validation and adjudication, one-attempt behavior, HTTP-refusal and spend/call caps, usage accounting, input limits, and refusal to score an unexpected model. Run: `node --experimental-strip-types --test work/x7-gate-rules/test_run.mjs` (10 tests).
+- `work/x7-gate-rules/test_np_cut.py` — rejects harm labels and undersized audit samples, keeps fit/audit rows disjoint, checks the 149-negative feasibility boundary, and validates frozen row/receipt invariants. Run: `uv run --no-project --offline --python 3.12 python -m unittest work/x7-gate-rules/test_np_cut.py -v` (9 tests).
+
 ## Newly registered tests — jev-i15c
 
 - `work/next-family-cost/test_measure.py` — keyless cost-measurement guards for bead-ID parsing, uncommitted-contract exclusion, missing contract and ship commits, absent spend evidence, and late preregistration. Run: `python3 -m unittest work/next-family-cost/test_measure.py -v` (6 tests).
@@ -729,8 +741,3 @@ Typed skip (exit 8) on Python <3.12, matching `work/poke-jev/test_player.py`.
 
 - `kit/test/errors.test.mjs` — CLI error guidance, exit mapping, safe correction, missing-input handling, refusal messages, rank candidate limits, installer collision, and online-required formatting. Run: `node --test kit/test/errors.test.mjs` (12 tests).
 - `kit/test/registry.test.mjs` — registered command capabilities, robot docs/schema consistency, aliases, and reserved/malformed family-name rejection. Run: `node --test kit/test/registry.test.mjs` (2 tests).
-
-## Newly registered tests — jev-b35c.18
-
-- `kit/test/install-plan.test.mjs` — installer dry-run plan boundaries and safe target refusal. Run: `node --test kit/test/install-plan.test.mjs` (2 tests).
-- `kit/test/install-manifest.test.mjs` — manifest validation, ownership boundaries, idempotence, and safe uninstall. Run: `node --test kit/test/install-manifest.test.mjs` (4 tests).

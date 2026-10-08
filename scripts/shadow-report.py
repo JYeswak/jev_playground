@@ -41,6 +41,23 @@ def rows(path: Path) -> list[dict[str, Any]]:
     return out
 
 
+APPROVAL_MARKERS = ("permission-required", "recipient-and-data-class")
+
+
+def _approval_marker_count(values: list[dict[str, Any]]) -> int:
+    """Count rows with known approval markers in reason, error, or status."""
+    fields = ("reason", "error", "status")
+    return sum(
+        any(
+            isinstance(row.get(field), str)
+            and any(marker in row[field] for marker in APPROVAL_MARKERS)
+            for field in fields
+        )
+        for row in values
+    )
+
+
+
 def percentile(values: list[float], fraction: float) -> float | None:
     if not values:
         return None
@@ -103,6 +120,7 @@ def gate_report(
             for status in sorted({str(row.get("status")) for row in shadow})
         },
         "scored_rows": len(scored),
+        "existing_approval_marker_rows": _approval_marker_count(existing),
         "existing_flag_rows": len(existing_by_sha),
         "joined_rows": sum(matrix.values()),
         "unmatched_scored_rows": unmatched,
@@ -169,6 +187,7 @@ def injection_report(values: list[dict[str, Any]]) -> dict[str, Any]:
     )
     return {
         "rows": len(usable),
+        "approval_marker_rows": _approval_marker_count(usable),
         "excluded_test_rows": len(excluded),
         "status_counts": {
             status: sum(row.get("status") == status for row in usable)
@@ -403,6 +422,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--gate-shadow", type=Path, default=DEFAULT_GATE_SHADOW)
     parser.add_argument("--gate-observe", type=Path, default=DEFAULT_GATE_OBSERVE)
+    parser.add_argument("--web-shadow", type=Path, default=DEFAULT_WEB_SHADOW)
     parser.add_argument(
         "--webscreen-shadow", type=Path, default=DEFAULT_WEBSCREEN_SHADOW
     )

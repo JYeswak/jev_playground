@@ -103,6 +103,17 @@ jobs:
           set -u
           br sync --import-only
           ls .beads/*.db
+      - name: Check close references added after checker landed
+        if: github.ref == 'refs/heads/main'
+        run: |
+          set -euo pipefail
+          landing_sha="$(git log --reverse --first-parent --format=%H --diff-filter=A origin/main -- scripts/close-ref-check.py | python3 -c 'import sys; lines=sys.stdin.read().splitlines(); print(lines[0] if lines else \"\")')"
+          if [ -z "$landing_sha" ]; then
+            echo "close-ref-check: cannot find the checker landing commit" >&2
+            exit 1
+          fi
+          since="$(git show -s --format=%cI "$landing_sha")"
+          python3 scripts/close-ref-check.py --since "$since" --json
       - name: Run all gates (keyless; --portable, the stranger's command)
         id: gates
         run: |

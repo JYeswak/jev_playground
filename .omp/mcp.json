@@ -3,7 +3,7 @@
   "mcpServers": {
     "morph": {
       "type": "stdio",
-      "command": "/Users/josh/Developer/franken-harvest/bin/morph-mcp.sh",
+      "command": "${HOME}/Developer/franken-harvest/bin/morph-mcp.sh",
       "args": [],
       "timeout": 120000
     }

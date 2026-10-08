@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -130,6 +132,43 @@ class ShadowReportTests(unittest.TestCase):
             shadow = report["injection_shadow"]
             self.assertEqual(shadow["excluded_test_rows"], 2)
             self.assertEqual(shadow["status_counts"], {"scored": 1})
+
+
+    def test_approval_markers_are_counted_across_reason_and_error_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            gate_observe = self.write(
+                root,
+                "gate-observe.jsonl",
+                [
+                    {
+                        "ts": "2026-10-02T16:51:28.967Z",
+                        "status": "not-run",
+                        "error": "NOT_RUN reason=permission-required",
+                    },
+                    {"ts": "2026-10-04T00:00:00Z", "status": "scored"},
+                ],
+            )
+            injection = self.write(
+                root,
+                "injection-shadow.jsonl",
+                [
+                    {
+                        "ts": "2026-10-02T16:51:15.840Z",
+                        "status": "cap",
+                        "reason": "recipient-and-data-class-approval-required",
+                    },
+                    {"ts": "2026-10-04T00:00:00Z", "status": "scored"},
+                ],
+            )
+            report = build_report(
+                root / "missing-shadow.jsonl",
+                gate_observe,
+                root / "missing-web.jsonl",
+                injection,
+            )
+            self.assertEqual(report["gate"]["existing_approval_marker_rows"], 1)
+            self.assertEqual(report["injection_shadow"]["approval_marker_rows"], 1)
 
     def test_output_names_are_latest_or_explicit_snapshot(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -273,5 +312,37 @@ class ShadowReportTests(unittest.TestCase):
         self.assertTrue(complete["window_complete_24h"])
 
 
+    def test_cli_web_shadow_argument_reports_answered_rows(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            web = self.write(
+                root,
+                "web.jsonl",
+                [{
+                    "status": "answered",
+                    "pickIndex": 0,
+                    "providerRank1Index": 0,
+                    "openedPick": True,
+                    "openedRank1": True,
+                    "latencyMs": 100,
+                }],
+            )
+            empty = self.write(root, "empty.jsonl", [])
+            output_dir = root / "report"
+            command = [
+                sys.executable,
+                str(Path(__file__).with_name("shadow-report.py")),
+                "--gate-shadow", str(empty),
+                "--gate-observe", str(empty),
+                "--web-shadow", str(web),
+                "--injection-shadow", str(empty),
+                "--webscreen-shadow", str(empty),
+                "--out-dir", str(output_dir),
+            ]
+            completed = subprocess.run(command, capture_output=True, text=True, check=False)
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            payload = json.loads(completed.stdout)
+            report = json.loads(Path(payload["report"]).read_text(encoding="utf-8"))
+            self.assertEqual(report["web_search_rerank"]["answered"], 1)
 if __name__ == "__main__":
     unittest.main()

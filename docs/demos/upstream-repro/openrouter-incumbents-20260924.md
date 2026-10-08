@@ -348,3 +348,36 @@ was produced.
 
 **Boundary.** Only the first 380 public STS-B rows were sent for this model. No other comparator
 model or set ran in this continuation, and no paid call was attempted.
+
+## Free arm, STS-B × `nex-agi/nex-n2.5-mini:free`: STOPPED (live, 2026-09-30; no score)
+
+The 2026-09-25 receipt above remains unchanged. Before this attempt, the row file held 385 records
+for 385 unique ids (0–384): 352 answers and 33 failures. Five later pre-existing records, ids
+380–384 at 2026-09-30 03:41Z, were each one-request `TypeSafeNotFoundError` failures; they were
+preserved, not overwritten. The current Bead read showed assignee `ChartreuseAspen`; I found no
+Bead comment documenting approval for the five-row addition, and I do not attribute its authorship.
+
+**Preflight.** `usage_daily` at 17:16:15Z reported `free_model_daily_requests` used 0 / remaining
+1,000. The amended remaining-minus-20 budget is 980; the runner ceiling is 599. The bounded
+one-row invocation used `--max-requests 599` and `--limit 1`. The pinned runner SHA-256 was
+`71589726c4ee8d1a37d6a09c2e2c1465c4d24bcd40c0a88df22c8f5571c5ffcb`; STS-B source is
+`work/score-stsb/run.py@8e4bda9`.
+
+**Attempt.** Resumed only id 10, whose sole earlier record was a 2025-09-25
+`TypeSafeAPITimeoutError`. The one permitted resume made one request (573 ms, no 429 waits) and
+recorded `TypeSafeNotFoundError: 404 This model is unavailable for free`. The provider's error
+suggested the paid slug `nex-agi/nex-n2.5-mini`; it was not called. No automatic paid fallback
+occurred.
+
+**Postflight.** At 17:23:15Z, `usage_daily` still reported free requests used 0 / remaining 1,000,
+`usage_daily=0`, and cumulative `usage=100.199757412`, unchanged from preflight. No charge was
+observed; the attempt row records one request. The row file now has 386 records, 385 unique ids,
+352 answers and 34 failure records. Id 10 now has two non-quota failures and is ineligible for any
+further resume. No row in the main pass was started; no scoring ran.
+
+**Boundary and retry trigger.** The free Nex endpoint returned a permanent 404 both in the five
+pre-existing rows and in this resumed row. Stop this cell; do not call the paid slug. Resume only
+after a fresh availability check makes this exact `:free` id callable, or a separately
+amendment-approved `:free` candidate passes the existing feasibility bar. The partial STS-B set
+has no score or verdict.
+

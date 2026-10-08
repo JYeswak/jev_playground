@@ -1,0 +1,8 @@
+CALLBACK-P2-W1.1-W1.2-W1.3-DONE
+artifacts: notes/deep/omp-kit-load-census.tsv notes/deep/omp-kit-upstream-proofs.md notes/deep/kit-guard-jev-cases.tsv notes/deep/omp-kit-findings.md
+commit: cead414
+HEAD at run: 33fe6ae
+census: 6/6 rows. kit-guard loaded in 0/6 live panes (5 omp processes started before 572e3eb; pane 2 has no omp child). Fresh sessions from repo root: default doctor loaded kit-guard; grok and muse rpc listed kit-guard. Project TTSR after-gap/0 wins over grok and muse profiles. Subdirectory plant: 0/6 project kit rules from jev/notes.
+upstream: ttsr 25/25 exit 0; kit-guard unit 39/39 exit 0; e2e-live 0/10 exit 1 (omp never called the model); omp-continue test exit 2 (initial commit failed, 0 scenarios).
+planted negative: githooks/pre-commit expected block, observed pass, MISMATCH. 8/12 layout rows mismatch.
+NO-CLAIM: 8/12 is the pure function on 12 strings, not a live pane frame. The e2e planted-failure arm was not run because the clean suite never called the model.

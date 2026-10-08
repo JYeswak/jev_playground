@@ -1,0 +1,29 @@
+id	class	status	evidence_path	note
+A1	DAY-1 PROCEDURAL	GAP	NONE	no docs/planning/packet.md and no docs/planning dir; scope lives as prose (Rule 12, phase boundary) not a non-goals section
+A2	DAY-1 PROCEDURAL	PARTIAL	AGENTS.md	Rule 14 pins the incumbent doctrine and upstream/MANIFEST.tsv pins SHAs, but there is no packet SOTA section recording revision plus oracle binary
+A3	DAY-1 MECHANICAL	GAP	NONE	no packet schema and no check-readiness.sh; work is packetized as beads, not schema-gated packets
+A4	DAY-1 PROCEDURAL	HAVE	foundation/kit/claims.tsv	registry exists with planned-claim rows plus foundation/kit/check-claim-discipline.sh; ported by another pane, cited not touched
+A5	DAY-1 MECHANICAL	PARTIAL	NEGATIVE_EVIDENCE.md	ledger exists with row schema and retry predicates (96 retry mentions) but no per-commit row lint; only a commit-msg hook is installed
+A6	DAY-1 PROCEDURAL	GAP	NONE	no docs/evidence/demotion-rules.md and no docs/evidence dir; only scattered demote mentions in NEGATIVE_EVIDENCE.md
+A7	DAY-1 PROCEDURAL	GAP	NONE	mission five stages are named in AGENTS.md but no phase entry conditions, exit proofs, or OPEN-dependency closure rule exist
+A8	DAY-1 PROCEDURAL	PARTIAL	AGENTS.md	DoD lives as AGENTS.md section 4 with command-evidence rules, not as docs/definition-of-done.md; bead VERDICTs cite commands by convention
+A9	DAY-1 PROCEDURAL	PARTIAL	AGENTS.md	10 adapted patterns named, not the 12 verbatim; load-bearing rules partly present (gate-weakening ban, mutual-grading ban, report-a-loss)
+A10	PROVISIONAL	PARTIAL	AGENTS.md	dispatch-packet acceptance shape (positive observable, planted negative, NO-CLAIM) is convention; bead acceptance_criteria do not enforce all three lines
+A11	PROVISIONAL	PARTIAL	AGENTS.md	four-oracle ladder plus known-bad catalogue declared; no explicit non-proof list
+A12	PROVISIONAL	PARTIAL	AGENTS.md	BUILD/HOLD/AUDIT phase boundary plus consumer-gated permanence; artifacts lack per-item deletion conditions
+A13	DAY-1 PROCEDURAL	PARTIAL	AGENTS.md	loop requires non-author confirmation before closure; no standing review artifact, only ad-hoc notes/ reviews
+A14	DAY-1 PROCEDURAL	GAP	NONE	no release-gate statement; no waivable/non-waivable clauses and no waiver records found
+B1	DAY-1 PROCEDURAL	HAVE	.beads/issues.jsonl	graph is the plan of record, 91 rows, no parallel prose tracker
+B2	DAY-1 PROCEDURAL	PARTIAL	.beads/issues.jsonl	closed beads carry evidence-citing close reasons in spot check (first 8 of 66 closed all True); full 66-row census not run
+B3	DAY-1 PROCEDURAL	PARTIAL	foundation/runs/20260922T021352Z.json	receipts carry model, started_at, config, fixture, metrics; no commit/host/worker provenance fields
+B4	DAY-1 PROCEDURAL	HAVE	NEGATIVE_EVIDENCE.md	falsified hypotheses banked with retry predicates (e.g. R28); relitigation requires a new fact
+B5	DAY-1 MECHANICAL	PARTIAL	.git/hooks/commit-msg	verification-level commit-msg hook is live; no pre-commit hook and no canary self-test exist
+B6	DAY-1 MECHANICAL	HAVE	foundation/kit/check-claim-discipline.sh	script plus claims.tsv with an enforce=yes row; ported by another pane, cited not touched
+B7	DAY-1 PROCEDURAL	GAP	NONE	no two-direction-evidence rule for gate changes found in AGENTS.md or GATES.md
+B8	DAY-1 PROCEDURAL	GAP	NONE	no scheduled demotion pass and no demotion ledger entries found
+B9	DAY-1 PROCEDURAL	GAP	NONE	no waiver records and no waiver policy found
+B10	DAY-1 PROCEDURAL	HAVE	AGENTS.md	Landing the Plane ritual adopted (append EVAL, file beads, run suites, secret check, state, hand off); review-enforced
+B11	MATURITY	GAP	NONE	no resurrection cadence and no VOID- rows found
+B12	MATURITY	GAP	NONE	no claim-coverage audit found; the USER 0/ENABLER 5/PROCESS 17 audit measured process, not claim registration
+B13	MATURITY	GAP	NONE	no false-closure/thin-close repair sweep found
+B14	MATURITY	PARTIAL	foundation/gates.d/10-fixture-integrity.sh	gate scripts reference RED/known-bad arms and AGENTS.md requires proving them, but no break-test was executed in this pass

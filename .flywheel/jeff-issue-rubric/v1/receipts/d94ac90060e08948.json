@@ -1,0 +1,168 @@
+{
+  "axes": [
+    {
+      "axis": "bug_reality",
+      "evidence": [
+        "observed",
+        "expected",
+        "repro",
+        "version",
+        "cost"
+      ],
+      "findings": [
+        "all bug-reality proof elements present"
+      ],
+      "level": "high",
+      "passed": true,
+      "score": 2,
+      "suggestions": [],
+      "threshold": "high"
+    },
+    {
+      "axis": "dedup",
+      "evidence": [
+        "gh issue list",
+        "no duplicate"
+      ],
+      "findings": [
+        "duplicate-search command and result present"
+      ],
+      "level": "high",
+      "passed": true,
+      "score": 2,
+      "suggestions": [],
+      "threshold": "high"
+    },
+    {
+      "axis": "source_trace",
+      "evidence": [
+        "internal/state/migrations/011_runtime_handoff.sql:6",
+        "internal/state/migrations/011_runtime_handoff.sql:7",
+        "internal/state/runtime_store.go:970",
+        "internal/state/runtime_store.go:975",
+        "internal/state/runtime_store.go:1016",
+        "internal/state/runtime_schema.go:262"
+      ],
+      "findings": [
+        "6 file:line citations plus version context"
+      ],
+      "level": "high",
+      "passed": true,
+      "score": 2,
+      "suggestions": [],
+      "threshold": "high"
+    },
+    {
+      "axis": "signal_not_prescription",
+      "evidence": [
+        "prescriptive_terms=1",
+        "out_of_scope"
+      ],
+      "findings": [
+        "contract gap is bounded without implementation prescription"
+      ],
+      "level": "high",
+      "passed": true,
+      "score": 2,
+      "suggestions": [],
+      "threshold": "high"
+    },
+    {
+      "axis": "tone_match",
+      "evidence": [
+        "words=224",
+        "hedges=0",
+        "sections=9"
+      ],
+      "findings": [
+        "tone/structure misses Jeff issue contract"
+      ],
+      "level": "low",
+      "passed": false,
+      "score": 0,
+      "suggestions": [
+        "Make it shorter, direct, evidence-led, and include tracking bead."
+      ],
+      "threshold": "high"
+    },
+    {
+      "axis": "jeff_thank_test_hostile",
+      "evidence": [],
+      "findings": [
+        "no generic thanks, demand, vendor, or hostile wording"
+      ],
+      "level": "high",
+      "passed": true,
+      "score": 2,
+      "suggestions": [],
+      "threshold": "high"
+    },
+    {
+      "axis": "no_derail",
+      "evidence": [
+        "missing_tracking_bead"
+      ],
+      "findings": [
+        "missing_tracking_bead"
+      ],
+      "level": "medium",
+      "passed": false,
+      "score": 1,
+      "suggestions": [
+        "Remove derail risks, scrub internal identifiers, and keep out-of-scope framing."
+      ],
+      "threshold": "high"
+    }
+  ],
+  "axes_count": 7,
+  "checked_at": "2026-09-20T22:16:49Z",
+  "corpus_scan": {
+    "buckets": {
+      "anti_pattern": [],
+      "prior_art": [
+        "**What happened:** Dicklesworthstone/ntm@0b88f8d5 still writes runtime handoff",
+        "**Duplicate search:** `gh issue list --repo Dicklesworthstone/ntm --search"
+      ],
+      "same_issue_already_filed": [],
+      "shape_precedent": []
+    },
+    "categories": {
+      "anti_pattern": 0,
+      "prior_art": 2,
+      "same_issue_already_filed": 0,
+      "shape_precedent": 0
+    },
+    "citation_block_md": "## Corpus-aware citations (cross-collection-fanout)\n\n### Prior Art (2)\n- **What happened:** Dicklesworthstone/ntm@0b88f8d5 still writes runtime handoff\n- **Duplicate search:** `gh issue list --repo Dicklesworthstone/ntm --search\n",
+    "same_issue_blocker": false
+  },
+  "decision": "withdraw",
+  "draft_path": "/var/folders/d0/09qgt_0n1m1ff8nyzbxppx9c0000gn/T/jeff-issue-rubric.Yka6oj/live-draft.md",
+  "draft_sha256": "d94ac90060e089489b6eac637a0ccaa0cbb750b0d1ec1f0cb084f3e5813d82af",
+  "hard_fail_axes": [
+    "tone_match",
+    "no_derail"
+  ],
+  "high_axes_count": 5,
+  "public_payload": {
+    "checked": false,
+    "draft_scaffold_findings": [],
+    "internal_identifier_findings": []
+  },
+  "schema_version": "jeff-issue-rubric/v1",
+  "status": "fail",
+  "suggested_revisions": [
+    {
+      "axis": "tone_match",
+      "suggestions": [
+        "Make it shorter, direct, evidence-led, and include tracking bead."
+      ]
+    },
+    {
+      "axis": "no_derail",
+      "suggestions": [
+        "Remove derail risks, scrub internal identifiers, and keep out-of-scope framing."
+      ]
+    }
+  ],
+  "threshold": "high"
+}

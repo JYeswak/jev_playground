@@ -1,0 +1,11 @@
+CALLBACK-P5-CLAIM-COVERAGE-DONE
+
+Artifact: notes/claim-coverage-p5.tsv — 55 substantive README claims, one row
+each with readme_line, in_registry, proof_exists. All rows validated 4-field.
+Result: 1 of 55 in registry (line 273, official-sdk, proof work/jev-client).
+54 unregistered, all with proof artifacts verified on disk (58 paths checked,
+none missing), all unenforced. claims.tsv untouched; no enforce flag set
+anywhere; a claim with no proof would have stayed unenforced, but every claim
+here has its artifact — the gap is registration, not evidence.
+
+NO-CLAIM: a coverage count is not an enforcement decision.

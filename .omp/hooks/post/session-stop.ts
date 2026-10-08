@@ -9,11 +9,11 @@
  *   ready work is still queued, or
  *   the README names a set of demos that are not all on disk, or
  *   the turn is a stand-down while that mission is unfinished, or
- *   the pane is a WORKER (tmux pane index >= 2). A worker always gets one
- *   continuation: finish its own in-progress bead, then claim from br ready,
- *   and if nothing is claimable tell pane 1 it is idle instead of stopping
- *   silently. Measured 2026-09-24: with br ready empty this hook returned
- *   nothing, and 4 of 6 worker panes sat idle until Joshua noticed.
+ * or the pane is a WORKER (tmux pane index >= 2). A worker gets one continuation
+ * to resume its own work; when it has nothing claimable, the conductor uses live
+ * NTM pane state instead of worker-generated idle messages. Measured 2026-09-24:
+ * with br ready empty this hook returned nothing, and 4 of 6 worker panes sat idle
+ * until Joshua noticed.
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -69,16 +69,15 @@ export function decideStop(
   const worker = typeof world.paneIndex === "number" && world.paneIndex >= 2;
   const frozen = Boolean(world.freeze && world.freeze.trim());
   if (frozen) {
-    // A build freeze overrides "finish your bead / claim br ready": during the 2026-10-04 freeze
-    // that line sent a worker into implementation. Workers still report idle, never stop silently.
+    // A build freeze overrides bead work. If there is no assigned review, stop quietly;
+    // the conductor checks live NTM state rather than asking the worker to post status.
     if (!worker) return undefined;
     return {
       continue: true,
       additionalContext:
-        `BUILD FREEZE: ${world.freeze!.trim()}. Do only the review task pane 1 assigned you; ` +
-        `no bead implementation, no new scripts or tests, no br claims, no commits outside your review file. ` +
-        `If you have no assigned review, run \`ntm send jev --pane=1 "IDLE pane ${world.paneIndex}: <one line on what you finished>"\` ` +
-        `and stop.`,
+        `BUILD FREEZE: ${world.freeze!.trim()} ` +
+        `Never claim or implement a bead from br ready during a freeze. Do your assigned item; if you have none, take the next unclaimed item from the director's queue. ` +
+        `If you have no assigned review, stop quietly; the conductor checks live NTM pane state.`,
     };
   }
   if (!worker && world.readyCount <= 0 && world.missing.length === 0 && !standingDown) return undefined;
@@ -105,9 +104,8 @@ export function decideStop(
         `run \`br --actor <your agent name> update <bead> --add-label needs-verify\` (never close your own bead; ` +
         `another pane is routed to verify it), then run ` +
         `\`ntm send jev --pane=1 "DONE <bead> <commit> <one-line evidence>"\` (never finish silently). ` +
-        `If you have nothing in progress and nothing in br ready you can claim, run ` +
-        `\`ntm send jev --pane=1 "IDLE pane ${world.paneIndex}: <one line on what you finished>"\` ` +
-        `so the conductor dispatches you, then stop.`,
+      `If you have nothing in progress and nothing in br ready you can claim, stop quietly; ` +
+        `the conductor checks live NTM pane state.`,
     );
   }
   return { continue: true, additionalContext: parts.join(" ") };

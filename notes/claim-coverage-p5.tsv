@@ -1,0 +1,56 @@
+claim	readme_line	in_registry	proof_exists
+guard fixture: refund passes; jailbreak blocks; dosage reviews; crisis supports	9	no	yes
+guard live smoke: pass/block/block/support over askJevBundle, N=4	15	no	yes
+rag fixture: injection dropped; premise-denier kept; irrelevant dropped	17	no	yes
+rag live: all five dropped; fixture had kept sessions-01	23	no	yes
+citation fixture: supported stands; contradicted/unsupported review; fabricated dropped	25	no	yes
+citation live: 4 calls, 2 verified, 2 contradicted to review, power_ten never reached model	31	no	yes
+skill-suggest fixture: two tasks get a skill; third gets nothing	33	no	yes
+skill-suggest live: 6 calls, music-video and screencast-redact suggested, mastodon abstained	39	no	yes
+chief fixture: confident pick to research/write; unsure to review, never worker	41	no	yes
+chief live: 4 jobs, 3 agree, vague-ask diverged research-live vs review-fixture	47	no	yes
+compact fixture: stale Glob dropped with result; verbose Read keeps call loses tail; failures verbatim	49	no	yes
+compact live: 1 bundle, 1169 to 287 chars, all three calls dropped, fixture kept Bash call	55	no	yes
+function-call fixture: 3 commands dispatch typed calls; one omits arg so default applies	57	no	yes
+classify fixture: sure filing reports group; unsure reports division; nothing dropped	65	no	yes
+rerank fixture: overlap shortlist misorders both queries; recorded nouls put right passage first	73	no	yes
+rerank live: 10 pair calls, both queries ranked wanted document first	79	no	yes
+date fixture: 6 docs resolve; missing stays empty; under 0.60 to review	81	no	yes
+date live: 6 bundles, 4 matched, kickoff 2026-08-14 at 0.33 under review, exit 1	87	no	yes
+entity fixture: identical merge; different unlinked; close variants to curator	89	no	yes
+entity live: 4 bundles, sameAs asserted, diff unlinked, 2 pairs to curator queue	95	no	yes
+hierarchy fixture: greedy takes top child irrecoverably; beam keeps 2 paths, repairs early mistake	97	no	yes
+hierarchy live: 10 calls, food-first roots, beam kept tech/gadgets, pie missed, exit 1	103	no	yes
+autoformat fixture: wrapped lines stitch; blocks classify; memo renders markdown	105	no	yes
+autoformat live: 2 bundles, 1 of 2 joins, no headings/callouts, 0 of 6 markers, exit 1	111	no	yes
+parallel fixture: one document, 4 questions of 3 types, single fixture request object	113	no	yes
+parallel live: 1 bundle, all 4 answers present, same as fixture within noise	119	no	yes
+semantic-find fixture: one query points at its line; other reads unanswered via exists check	121	no	yes
+semantic-find live: 2 bundles, refund answered from L03, holiday no answer	127	no	yes
+cascade fixture: schema-valid extraction escalated on field head; overall head displayed not gating	129	no	yes
+cascade live: 1 bundle, registration_open_date escalated 0.76, location passed 0.18, exit 1	135	no	yes
+ontology-gate fixture: query term not layer; ship only if candidate beats parent	137	no	yes
+consistency fixture: 8 Choices x5 repeats; action flips twice, one abstains, pluralities hold	145	no	yes
+consistency live: 3 bundles, 8 of 8 hold gated plurality at 0.60	151	no	yes
+consistency-noul fixture: 14 Nouls x5; covered crosses 0.50 stays review; 2 edge flips	153	no	yes
+consistency-noul live: 3 bundles, 4 of 14 hold non-uncertain plurality, band 0.30-0.70	159	no	yes
+preparsed fixture: regexes over-find; recorded picks choose; verbatim copy plus normalization	161	no	yes
+preparsed live: 4 bundles, same extractions as fixture, verbatim/normalization held	167	no	yes
+live call needs TYPESAFE_API_KEY from outside tree; never printed or committed	191	no	yes
+quickstart: no key, no install, 5 questions answered from committed bytes	201	no	yes
+caller: missing key returns unconfigured; malformed body is not a score	207	no	yes
+askJevChoice returns one label only from the offered set	230	no	yes
+askJevBundle carries several questions in one request on one state	232	no	yes
+jev-screen: flag at 0.5, pass below, review otherwise; does not block	234	no	yes
+injection: n=662 cut 0.5 jev-1.13.0; Jev 639/662 0.9653; grok-4 0.8429; Haiku 0.8746	240	no	yes
+discordants: Jev-only 89 vs grok-4, 65 vs Haiku; rule passes on this corpus only	248	no	yes
+seat-guard: planted hostile flags, planted benign passes, broken answer reviews	256	no	yes
+calibration: N=80 pinned model, ECE 0.0614, Brier 0.0195, choice 19/20	262	no	yes
+harm-rule: small rule beat live judge on tool-call harm; use when label in tokens	264	no	yes
+pin jev-1.13.0; jev-latest moves; percent without model id uncitable	270	no	yes
+rule written before spend; PREREGISTER-DIFF.md is the shape	271	no	yes
+call the official SDK; hand-rolled fetch drifts	273	yes	yes
+framing control: state must contain evidence; script measures framing flip live	283	no	yes
+missing field, non-finite probability, or thrown client is review, never pass	285	no	yes
+one call is smoke; harness refuses relative verdict under ten stable samples	286	no	yes
+wrapper unifies missing-key, timeout, bad-body failures; tests never need network	317	no	yes

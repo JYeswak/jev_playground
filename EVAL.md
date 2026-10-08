@@ -3745,8 +3745,26 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 
 - **Implementation:** `b400c72b` removes command text from shared gate-observer rows, keeps it in a mode-0600 sidecar, adds 5 MiB rotation with private archives, and updates the installed hook plus three readers.
 - **Verification:** at `HEAD 19c1dc62a404aed2c992fb02a25f01952744b8ed`, the implementation and reader paths match `b400c72b`; `node --test .omp/hooks/post/jev-gate-observe.test.mjs` passes 42/42, `npm test --prefix kit` passes 86/86, `python3 -m unittest scripts.test_gate_outcomes scripts.test_jev_bank_build -v` passes 36/36, and `python3 -m unittest scripts.test_shadow_report -v` passes 9/9. Keyless local checks, not live-session proof.
-- **Live state:** the prior 15:25Z metadata-only sample was 161 rows / 69 with `cmd`; a fresh check found 216 rows / 106 with `cmd`, 0 invalid JSON, across six session IDs; file mode `0600`. No migration attempted: active writers can repopulate raw commands.
+- **Live state:** the 15:25Z sample was 161 rows / 69 with `cmd`; at 15:59:13Z the shared log had 344 rows / 215 with `cmd`, 0 invalid JSON, six session IDs, mode `0600`. No migration attempted: the count grew while old writers remained active.
 - **Boundary:** no live cutover or fresh-session proof; the active log still needs a coordinated restart and 0600 archive migration. The `jev-b35c.3` doctor check (d) is owned by that bead, not this change. Keep `jev-rpqu` open until live log checks pass.
+
+## 2026-10-05 jev-x1-injection-encoders-e2gp: ProtectAI fails paired tool-result bar (AmberWillow) [live]
+
+- **Run:** code/preregistration commit `8f690b8443de38e3a036c2197a3399f2157796f2`; preregistered at `work/x1-injection-encoders/PREREG.md` before scoring. Command: `"/Users/josh/.local/bin/infisical" run --projectId=42b194c3-89d7-4ebb-895f-dd77ddf005ba -- nice -n 10 uv run --offline --no-project --with torch --with transformers --with sentencepiece --with protobuf python work/x1-injection-encoders/run.py --json`; `TMPDIR`, `UV_CACHE_DIR`, and pinned `HF_HOME` were set. The runner's first step was `scripts/local-model-guard.sh --timeout 1` (`gpu-free`).
+- **Live Jev calls:** 447 English public rows, model `jev-1.13.0`; 204,847 input tokens; estimated spend `$0.008603574` at `$0.042/M` input tokens, output free. One local model load (`protectai/deberta-v3-base-prompt-injection-v2`, revision `90c9989b1a342275dd0d1a95aad283c04e075671`); one CPU thread.
+- **Paired result:** clean scored rows 200, encoder false flags 1 vs Jev 2; marked attacks 48/300 vs Jev 269/300 (McNemar encoder-only 11, Jev-only 232, p=`5.1571884842034585e-55`); markerless attacks 14/300 vs Jev 268/300 (0 vs 254, p=`6.908934844075556e-77`). English public rows 447 (165 positive), encoder 21 catches vs Jev 127; 215 German rows excluded from the encoder bar. Benign trigger-word control stayed unflagged. Final bar **FAIL**.
+- **Receipts and checks:** `work/x1-injection-encoders/{RECEIPT.md,answers-protectai.jsonl,answers-jev.jsonl}` and `kit/fixtures/screen/answers-{protectai,jev}.jsonl`. Independently recomputed counts, Wilson bounds and McNemar values from saved rows keyed by `(set,id)`; paired row ids/labels/hashes match and all receipt values agree within `0.005`. `nice -n 10 python3 work/x1-injection-encoders/run.py --selftest` reports PASS (1,348 reconstructed rows, 447 English public candidates, 0 model loads/calls). With a future `JEV_GPU_HOLD_FILE`, `--json` returns `status=NOT_RUN`, `guard-exit-2`, 0 model loads and 0 Jev calls; the scored receipt was restored after this hold test.
+- **Boundary:** 447 new live Jev calls; no enforcement, integration, held-out/model-quality promotion, or German-performance claim. The paired bar failed; non-author rerun remains required before bead close.
+
+## 2026-10-05 jev-5ctg cap-increase interim measurement (AmberWillow) [local]
+
+- **Run:** `nice -n 10 python3 work/jev-5ctg/after_measure.py --json` at `2026-10-05T20:19:10.311Z`; exit 3, `status=INCOMPLETE`. The seven-day post-change interval from `2026-10-02T03:44:26Z` is 3.6908 days old. The script aggregates local logs and makes no direct Jev API calls.
+- **Same-query 24h:** injection log has 8,305 scored rows, 0 cap rows, 19,248,269 recorded input tokens, $0.808427 recorded spend, 28 flags, and 0 explicit withholds. Memory filter has 809 scored, 839 daily-cap, and 294 memo rows; scored input is 399,031 tokens and recorded spend is $0.016759.
+- **Interim post-change:** current injection logs are v2: 15,936 scored rows, 0 current-schema cap rows, and 849 legacy-v1 cap rows reported separately. Across all v2 scored rows, 56/15,936 explicit withholds = 0.3514%, Wilson 95% [0.2707%, 0.4560%]; v2 flag rate is 0.6024%. These are not the newly-covered cohort; this v2 data has no cap-scope ID or daily call ordinal.
+- **Memory versus frozen baseline:** scored share among scored+daily-cap+memo is 4,435/11,644 = 38.09%, versus 1,630/8,453 = 19.28% before the change. Jev memory-filter savings are 196,474 tokens / $0.094693 recorded Jev spend = 6.22x estimated value, versus frozen 5.59x. `cap3-pruned` rows are excluded. These are interim 3.6908-day values, not seven-day acceptance.
+- **Instrumentation:** injection-shadow v3 now logs a random cap-scope ID and per-day call ordinal without changing cap decisions. No v3 rows exist in local logs yet; the active session has not loaded this source change.
+- **Checks:** `node --test .omp/hooks/post/jev-injection-shadow.test.mjs` passes 28/28; `nice -n 10 python3 work/jev-5ctg/after_measure.py --selftest` passes the cap, new-cohort boundary/window, ROI, baseline-share, and Wilson cases. `ubs` timed out at 120 s; no result claimed.
+- **Boundary:** cap values and enforcement remain unchanged. Seven-day bars remain pending; newly-covered withhold rate is unmeasurable until v3 telemetry is loaded in a fresh session and observed for seven days. Bead remains open.
 
 
 ## 2026-10-05 jev-dau5 48-hour replication: matched-miss PASS; original bar FAIL (AmberWillow) [live]
@@ -3762,12 +3780,6 @@ Source inventory only; no hook edit, owner approval, credential lookup, key, fak
 
 - **Usage:** Pane 5 reported 13 requests, 92K input tokens, and `$0.0039` spend. The configured judge alias is `typesafe/jev-latest`; the resolved model version was not recorded.
 - **Boundary:** Usage evidence only. The report arrived in a blocked callback; no successful `find` outcome or quality claim is made.
-
-## 2026-10-06 jev-fd5j 24-hour fallback replay receipt alignment [offline]
-
-- **Run:** `python3 work/jev-fd5j/after_measure.py --json`; output matched `work/jev-fd5j/RECEIPT.json` byte-for-byte with `cmp` (exit 0) after restoring the runner's final LF. Artifact commit: `8c643732a49ae64e739aeab0a19c636926d866e2`.
-- **Measurement:** Historical post-change window: 226/4,138 cascade-screen rows were fallbacks (5.4616%), including 34 timeouts; frozen baseline: 1,032/3,560 (28.9888%). Source snapshot SHA-256: `e9c392befbe5e75dcfe448b30bb67adafe81de836c3941eec9132229ac75352c`.
-- **Spend and boundary:** $0; no Jev/Clef calls. This is local historical-log replay, not current runtime evidence or causal attribution. Independent pane-5 byte comparison requested; bead remains open pending that verification.
 
 ## 2026-10-06 jev-gdhb: local Clef pass unavailable after guarded timeout [live]
 

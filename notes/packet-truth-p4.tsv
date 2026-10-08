@@ -1,0 +1,4 @@
+claim	file	verdict
+CALIBRATION.md does not mention a host	foundation/CALIBRATION.md	MATCH
+work/jev-client/README.md names the score-path commit as 118185e, not 118180e	work/jev-client/README.md	MATCH
+foundation/gates.d is not sixteen	foundation/gates.d	MATCH

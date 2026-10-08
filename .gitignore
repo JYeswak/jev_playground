@@ -129,3 +129,13 @@ work/score-stsb/*.csv
 
 # 137 MB generated corpus (rebuild: work/vendor-paste/build-corpus.py; hash in CORPUS-SHA256.txt)
 work/vendor-paste/corpus.json
+
+# Machine state found by the 2026-10-08 save sweep: br WAL index dirs, br recovery snapshots,
+# kit scratch, session-file lock sidecars, runner pid/heartbeat files.
+.beads/.br-wal-index-*/
+.beads/recovery_*/
+kit/var/
+*.jsonl.lock.os
+*.jsonl.owner.lock
+*.pid
+*.heartbeat

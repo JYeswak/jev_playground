@@ -193,3 +193,39 @@ finalize, and do your own searches too: independent grounding is part of the due
 10. **Novel mechanism:** the thing no published approach does, and the closest published work.
 11. **SOTA to beat:** benchmark, metric, number, source URL and date.
 12. **Local example:** the environment, its install command, and the first runnable demo.
+
+## 10. omp 18.3.0 has Jev built in (Joshua, 2026-09-24: "this is omp 18.3 that we are on now")
+
+`omp --version` reads `omp/18.3.0`. The harness now ships native Jev surfaces, all answered by the
+`judge` model role, whose built-in chain starts at `typesafe/jev-latest`
+(`omp://environment-variables.md:398`, `omp://local-models.md:225`):
+
+- **`judge()` / `judge_batch()` in the eval kernel** (18.2.4 / 18.2.7): typed Choice, bool and
+  Score questions over one state, many states in a host-owned batch with drain/status. The eval
+  kernel also has `computer.*` (desktop, AX trees, input) and `browser.*` (Chromium tabs), so a
+  computer-use or browser-game loop with Jev judging each step can run inside omp today, with no
+  new infrastructure.
+- **`jevify` magic keyword** (18.2.7, `omp://magic-keywords.md:14`): a bulk-classification
+  contract for `judge()` (freeze question, rubric, pre-filter and escalation threshold before
+  loading data; judge every item in one batch; read only what it flags).
+- **`find` tool and `omp find` CLI** (18.2.7, `omp://tools/find.md`): semantic grep, a TypeScript
+  port of jegrep's cascade. Lexical scan, then Nouls over file names (64 per request), passage
+  sketches (46 per request) and full passages, 16 requests in flight, calibrated relevance per
+  range. Enabled only when the judge role resolves to a native System One model.
+  **Measured by pane 1 just now:** `omp find "where a 402 billing response starts a hold that
+  stops further Jev calls" work/jev-client` ranked `src/index.ts` first at 0.98; 4 requests,
+  12K tokens, $0.0005, 1.2 s.
+- **Auto thinking-level classifier and Smart unexpected-stop detection** also run on the judge
+  role, so every agent turn can be a Jev judgment.
+- **`omp toks`** (18.3.0): offline token counting with Jev's encodings, so a state's cost can be
+  known before a call.
+- `openrouter/~typesafe/jev-latest` is accepted as a judge option (18.3.0).
+
+**Current state of this fleet:** neither the `claude` nor the `codex` profile sets a `judge` role,
+and fleet sessions start without `TYPESAFE_API_KEY` in their environment. So `find` is absent from
+agents' tool lists and eval `judge()` does not resolve to Jev. With the key present, it does
+(the `omp find` run above). Any experiment that uses `judge()` must record which model answered.
+
+**For ideation:** ideas that run on these native surfaces (a `computer` + `judge()` desktop agent,
+a `browser` + `judge_batch()` game loop, `find` as a Jev-native code search agents use every turn)
+are directly runnable and directly dogfoodable. They are welcome, not required.

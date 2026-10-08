@@ -26,3 +26,26 @@ The first run is the inherited-profile row below. It is not a kit-logic failure.
 Earned. After the profile vars were unset, removing `kit-test-skip.md` and disabling the guard block made 4 of 10 scenarios fail. The clean suite in that same environment was 10/10, so the 4 failures are the plant, not the model-not-found exit.
 
 NO-CLAIM: I re-opened the kept transcripts and the hook at line 63. I did not personally re-run the 10-scenario or 11-scenario suites. Those counts are the subagent runs whose artifacts I opened.
+
+## Personal re-runs 2026-09-24 (SunnyTiger, keyless except where noted)
+
+Ran every suite above personally from `/tmp/jev-rc-p1/omp-kit-copy/omp-kit`
+(clone trees untouched; all plants in `/tmp` copies):
+
+- e2e-live, profile unset (`env -u OMP_PROFILE -u PI_PROFILE -u PI_CODING_AGENT_DIR KEEP=1 sh tests/e2e-live.sh /tmp/jev-intake/franken-zip/starter-kit`): rc=0, **10/10**, kept dir in `/var/folders/.../T/tmp.gtAV8xfzrX`.
+- run-ttsr-tests (`OMP=omp sh tests/run-ttsr-tests.sh`): rc=0, **25 passed, 0 failed**.
+- kit-guard.test.ts (`bun test`): rc=0, **39 pass, 0 fail**.
+- omp-continue real HOME: rc=2 `initial commit failed` — reproduces the documented env failure above, not a new finding.
+- omp-continue isolated HOME, br off PATH: rc=0, **11/11**.
+- omp-continue isolated HOME, br on PATH (`/Users/josh/.cargo/bin` first): rc=1, **5 passed / 6 failed** (`br ready` exits stopping) — reproduces the documented br-ready-7 behavior. First attempt ran with br accidentally off PATH (11/11) and was discarded as the wrong env, then re-run correctly.
+- doctor.sh per profile (default/grok/muse): rc=0 all three, kit-guard loaded in every fresh session.
+- `omp [--profile <p>] ttsr list`: rc=0 all three profiles (11 kit- rules each; grok lists 51 total).
+- Fresh `--mode=rpc --max-time=20` per profile (negotiate + get_state): rc=0 all three, kit-guard present. Fresh default session reports model muse-spark-1.3.
+
+## Subdirectory-launch planted negative (W1.1 adversarial fixture)
+
+`sh tests/doctor.sh` with cwd `jev/notes/`: rc=1, `WARN kit-guard extension NOT loaded`, 4 warnings — a session launched from a subdirectory loads 0 kit rules. The trap is confirmed: project-scope discovery depends on launch dir. Recorded, not fixed (fix belongs to W1.4 guard rebuild, not to this census).
+## e2e planted arm, reproduced personally (neutered policy)
+
+- e2e planted arm, neutered policy (`bashVerdict`/`pathVerdict` → null) + skip rule removed, /tmp copy only: rc=1, **6 passed / 4 failed** (B5, B7, 2 skip scenarios) — the documented 4-fail plant, reproduced personally. Anomaly on file: disabling by *renaming* the extension dir (same + skip removal) gave 8/2 — the guard scenarios still blocked. Two hypotheses, unresolved: native TTSR rules overlap the B5 path, or discovery globs `extensions/*/index.ts` regardless of dirname. Not chased: the neuter run already proves the suite discriminates guard behavior.
+NO-CLAIM: the 10/11-scenario clean counts in the prior section remain subagent-measured; everything in the two sections above was re-run personally 2026-09-24. Not re-run: a second plant variant to resolve the rename anomaly.

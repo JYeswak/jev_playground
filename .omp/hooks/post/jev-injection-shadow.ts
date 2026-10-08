@@ -1,5 +1,5 @@
 import { appendFileSync, existsSync, mkdirSync } from "node:fs";
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 import { homedir } from "node:os";
 import { askJev, type JevResult } from "../../../kit/src/client.ts";
@@ -10,7 +10,7 @@ export { CUT, MODEL };
 export const MAX_DAILY_CALLS = 3500;
 export const MAX_STATE_BYTES = 30_000;
 export const READ_SCREEN_OFF_REL = "state/jev/read-screen-off";
-export const LOG_SCHEMA = "jev-injection-shadow.v2";
+export const LOG_SCHEMA = "jev-injection-shadow.v3";
 const SCREENED_TOOLS: Record<string, true> = { web_search: true, web_extract: true, fetch: true };
 export const NOTICE =
   "[withheld by Jev screening: this result carried instructions aimed at an AI assistant. " +
@@ -94,8 +94,8 @@ function syncObserved(path: string, row: Record<string, unknown>): void {
   try { mkdirSync(dirname(path), { recursive: true, mode: 0o700 }); appendFileSync(path, JSON.stringify(row) + "\n", { mode: 0o600 }); } catch { /* observe-only */ }
 }
 
-type ShadowState = { day: string; calls: number; paused: boolean };
-type ShadowRow = { schema: string; ts: string; toolName: string; outputSha256: string };
+type ShadowState = { day: string; calls: number; paused: boolean; capScopeId: string };
+type ShadowRow = { schema: string; ts: string; toolName: string; outputSha256: string; capScopeId: string; dailyCallOrdinal?: number };
 type WriteRow = (row: Record<string, unknown>) => Promise<void>;
 type ScoreArgs = { ask: Ask; write: WriteRow; state: ShadowState; cap: number; common: ShadowRow; raw: string; annotateOnly?: boolean };
 
@@ -132,7 +132,7 @@ async function scoreAndRecord({ ask, write, state, cap, common, raw, annotateOnl
     await write({ ...common, status: "cap", reason: "daily-call-cap" });
     return null;
   }
-  state.calls += 1;
+  const call = { ...common, dailyCallOrdinal: ++state.calls };
   let result: JevResult;
   try {
     result = await ask({
@@ -142,14 +142,14 @@ async function scoreAndRecord({ ask, write, state, cap, common, raw, annotateOnl
       timeoutMs: 20_000,
     });
   } catch {
-    await write({ ...common, status: "failed", reason: "provider-exception" });
+    await write({ ...call, status: "failed", reason: "provider-exception" });
     return null;
   }
   if (!result.ok) {
     const refusal = authorizationRefusal(result);
     if (refusal) state.paused = true;
     await write({
-      ...common,
+      ...call,
       status: refusal ? "refused" : "failed",
       reason: refusal ? `http-${refusal}` : result.reason,
       model: result.model,
@@ -159,12 +159,12 @@ async function scoreAndRecord({ ask, write, state, cap, common, raw, annotateOnl
   }
   const score = result.scores.inj;
   if (!validScore(score)) {
-    await write({ ...common, status: "invalid", reason: "missing-or-invalid-score", model: result.model, latencyMs: result.latencyMs });
+    await write({ ...call, status: "invalid", reason: "missing-or-invalid-score", model: result.model, latencyMs: result.latencyMs });
     return null;
   }
   const flag = score >= CUT;
   await write({
-    ...common,
+    ...call,
     status: "scored",
     score,
     flag,
@@ -199,7 +199,7 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
     try { if (fsExists(offFile ?? join(homedir(), ".local", READ_SCREEN_OFF_REL))) return false; } catch { /* off-switch unreadable: stay on */ }
     return true;
   };
-  const state: ShadowState = { calls: 0, day: now().slice(0, 10), paused: false };
+  const state: ShadowState = { calls: 0, day: now().slice(0, 10), paused: false, capScopeId: randomUUID() };
   const write: WriteRow = async (row) => {
     if (!deps.append) { syncObserved(path, row); return; }
     try { await deps.append(path, JSON.stringify(row)); }
@@ -214,11 +214,12 @@ export function makeInjectionShadowHandler(deps: Deps = {}) {
     deps.enforce === false ? true : deps.enforce === true ? false : process.env.JEV_INJECTION_SHADOW_ENFORCE === "0";
   return async (event: Event): Promise<unknown> => {
     try {
-      resetDay(state, now().slice(0, 10));
+      const timestamp = now();
+      resetDay(state, timestamp.slice(0, 10));
       if (event.isError === true || typeof event.toolName !== "string" || (event.toolName === "read" ? !readScreenOn() : !Object.hasOwn(SCREENED_TOOLS, event.toolName))) return undefined;
       const raw = outputText(event);
       if (!raw) return undefined;
-      const common = { schema: LOG_SCHEMA, ts: now(), toolName: event.toolName, outputSha256: hash(raw) };
+      const common = { schema: LOG_SCHEMA, ts: timestamp, toolName: event.toolName, outputSha256: hash(raw), capScopeId: state.capScopeId };
       const bytes = stateSize(raw);
       if (bytes > MAX_STATE_BYTES) {
         await write({ ...common, status: "oversize", reason: "state-byte-limit", stateBytes: bytes });

@@ -22,7 +22,7 @@ not_in_mission = ["benchmark tourism", "certificates, ledgers or dashboards with
 
 [[pillar]]
 id = "live"
-clause = "every claimed surface fires on a positive and stays silent on a planted negative in a fresh omp RPC session"
+clause = "Every claimed surface is ON in a real omp session: it fires on a positive and stays silent on a planted negative in a fresh omp --mode=rpc session."
 check = "classifier doctor --json"
 check_fails_when = "any claimed-ON surface lacks a fresh both-ways L3 receipt in work/l3-receipts/receipts.jsonl (jev-grzn)"
 status = "partial"
@@ -31,7 +31,7 @@ beads = ["jev-grzn", "jev-b35c.3", "jev-b35c.30", "jev-c710"]
 
 [[pillar]]
 id = "measured"
-clause = "every live surface has a value-minus-cost receipt from our own session logs; negative turns it off"
+clause = "Every live surface has a value-minus-cost receipt from our own session logs (tokens saved, harms caught, turns rescued, minus Jev/Clef spend and latency). A negative result turns the surface off."
 check = "python3 work/jev-mvvh/ledger.py --gate --days 7"
 check_fails_when = "any surface UNMEASURED or any KILL verdict still ON"
 status = "missing"
@@ -39,7 +39,7 @@ beads = ["jev-mvvh", "jev-n1-result-family-bakeoff-fcqw", "jev-n2-reread-dedup-r
 
 [[pillar]]
 id = "honest"
-clause = "every quality claim has a bar committed before the first live call, an incumbent on the same rows, N, date, model id, spend"
+clause = "Every quality claim has its bar committed before the first live call, an incumbent on the same rows, N, date, model id and spend."
 check = "python3 scripts/bar_chronology.py --since 2026-09-24 --json --strict && python3 scripts/bead-lint.py --all-open"
 check_fails_when = "any result row FAILs bar chronology or lacks incumbent, row-set hash, N, date, model id or spend; bead-lint is the plan-quality lint"
 status = "partial"
@@ -47,30 +47,30 @@ beads = ["jev-6gun", "jev-oh7c", "jev-convergence-gate-g57u", "jev-n0-fleet-deci
 
 [[pillar]]
 id = "local-first"
-clause = "Clef serves a family only where a committed receipt shows it non-inferior to Jev within a preregistered margin under the same calibration, through localbench's gateway"
+clause = "Clef serves a family only where a committed receipt shows it non-inferior to Jev within a preregistered margin under the same calibration; otherwise Jev. Clef runs through localbench's gateway (localbench kit-jtq2, tracked by a jev bead); if that gateway is not delivered, Clef stays out of stage 1 and every family keeps Jev or its rule incumbent. Stage 1 measures Clef-Flash on the gate and screen family suites only (X2); other families keep Jev or their rule/encoder winner, and full Clef (51 GB) is DROPPED from stage 1 (jev-52s0 records the decision and its provenance)."
 check = "classifier backend audit --json"
 check_fails_when = "any family routes to Clef without a committed non-inferiority receipt"
 status = "missing"
-beads = ["jev-b35c.4", "jev-x1-injection-encoders-e2gp", "jev-x2-clef-four-suites-3rbd", "jev-x3-factcheck-encoders-s28q", "jev-x6-intent-encoder-0u9a", "jev-oy76", "jev-52s0", "jev-k3yw", "jev-d7tn"]
+beads = ["jev-b35c.4", "jev-x1-injection-encoders-e2gp", "jev-x2-clef-four-suites-3rbd", "jev-x3-factcheck-encoders-s28q", "jev-x6-intent-encoder-0u9a", "jev-c3vl", "jev-oy76", "jev-52s0", "jev-k3yw", "jev-d7tn"]
 
 [[pillar]]
 id = "portable"
-clause = "a stranger runs the README from a fresh clone; classifier ready plus one family run in a project we did not write"
+clause = "A stranger runs the README from a fresh clone, and classifier ready plus one family run in a project we did not write."
 check = "gh run list --workflow stranger-run.yml --event schedule --limit 7 --json conclusion --jq 'all(.[]; .conclusion == \"success\")' | grep -qx true && classifier ready"
 check_fails_when = "any of the last 7 scheduled stranger-runs failed (manual reruns do not count) or classifier ready fails on the jev-r1vp project; the lane is keyless and uses --fake"
 status = "partial"
-beads = ["jev-r1vp", "jev-b35c.7"]
+beads = ["jev-r1vp", "jev-b35c.7", "jev-i15c"]
 
 [[pillar]]
 id = "current"
-clause = "what is declared ON is what is running"
+clause = "What is declared ON is what is running: no switch, hook or log that says one thing while the machine does another."
 check = "classifier doctor --json"
 check_fails_when = "the drift section reports any declared-vs-running mismatch"
 status = "missing"
 beads = ["jev-b35c.3", "jev-35sg"]
 
 [cadence]
-daily = ["stranger-run.yml (Actions, 03:17 UTC; 5 of the last 7 scheduled runs green 2026-09-29..10-05, keyless --fake lane)", "jev-latest canary (launchd, 09:07)", "pillar checks (omp-kit MP5, not running)", "fleet watcher (stopped)"]
+daily = ["stranger-run.yml (Actions, 03:17 UTC; recent scheduled runs use the keyless --fake lane)", "jev-latest canary (launchd, 09:07)", "pillar checks (omp-kit MP5, not running)", "fleet watcher (stopped)"]
 weekly = ["value ledger --gate (launchd work/jev-mvvh/ai.jev.value-ledger.plist)", "omp-kit doctor --scope mission (MP2, not running)"]
 exit = "every pillar check green on 7 consecutive daily rows"
 

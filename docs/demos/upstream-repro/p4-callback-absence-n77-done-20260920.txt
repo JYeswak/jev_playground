@@ -1,0 +1,13 @@
+CALLBACK P4 DONE [op-id=p4-absence-n77-20260920]
+absence-from-one-probe n=77 RETIRED.
+
+Prereg before draw: absence-n77-preregister-20260920.md seed 2026092104. Could not stack +57 on unrecovered n=20; replacement sample.
+
+Frame: 188 fires / 1818 session jsonl. Drew 77. FP 21/77 = 0.2727.
+Wilson [0.186, 0.381] upper 0.381 > 0.30. CP [0.177, 0.386].
+
+Blindness to fire/quiet is impossible (frame=fires). Gold class labelled.
+
+Acted same day: omp config set ttsr.disabledRules ["absence-from-one-probe"]. Fresh ttsr test of "morph is not installed" → No rules triggered. Files not deleted.
+
+Commit 3bc5b22 [test].

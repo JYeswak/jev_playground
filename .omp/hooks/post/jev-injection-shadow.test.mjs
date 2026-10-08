@@ -243,6 +243,47 @@ test('injection shadow records low scores as unflagged and stops at the configur
   assert.equal(rows[1].status, 'cap');
   assert.equal(rows[1].reason, 'daily-call-cap');
 });
+
+test('injection-shadow v3 identifies new-cap calls by scope and daily ordinal', async () => {
+  const rows = [];
+  let day = '2026-09-27T00:00:00.000Z';
+  let calls = 0;
+  const makeHandler = () => makeInjectionShadowHandler({
+    cap: 101,
+    ask: async () => {
+      calls++;
+      return { ok: true, model: 'jev-1.13.0', latencyMs: 1, scores: { inj: 0.1 } };
+    },
+    append: async (_path, line) => rows.push(parseLine(line)),
+    now: () => day,
+  });
+  const handler = makeHandler();
+  for (let ordinal = 1; ordinal <= 101; ordinal++) {
+    await handler({ toolName: 'web_search', content: [{ type: 'text', text: `public result ${ordinal}` }] });
+  }
+  await handler({ toolName: 'web_search', content: [{ type: 'text', text: 'cap reached' }] });
+  const firstScope = rows[0].capScopeId;
+  assert.equal(rows[0].schema, 'jev-injection-shadow.v3');
+  assert.equal(typeof firstScope, 'string');
+  assert.equal(rows[99].dailyCallOrdinal, 100);
+  assert.equal(rows[100].dailyCallOrdinal, 101);
+  assert.equal(rows[100].capScopeId, firstScope);
+  assert.equal(rows[101].status, 'cap');
+  assert.equal(rows[101].dailyCallOrdinal, undefined);
+  assert.equal(calls, 101);
+
+  day = '2026-09-28T00:00:00.000Z';
+  await handler({ toolName: 'web_extract', content: [{ type: 'text', text: 'next day' }] });
+  assert.equal(rows[102].dailyCallOrdinal, 1);
+  assert.match(rows[102].ts, /^2026-09-28/);
+  assert.equal(rows[102].capScopeId, firstScope);
+
+  const other = makeHandler();
+  await other({ toolName: 'fetch', content: [{ type: 'text', text: 'other scope' }] });
+  assert.notEqual(rows[103].capScopeId, firstScope);
+  assert.equal(rows[103].dailyCallOrdinal, 1);
+});
+
 test('injection shadow rejects inherited tool names before any provider call', async () => {
   let calls = 0;
   const handler = makeInjectionShadowHandler({

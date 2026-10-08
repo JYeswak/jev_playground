@@ -20,6 +20,7 @@ import sys
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+MISSION_ROOT = "jev-q3q8"
 # Linear patterns only (regex-engineering section 7: 50k near-miss < 50 ms each).
 ARXIV = re.compile(r"arXiv:\d{4}\.\d{4,5}")
 URL = re.compile(r"https?://[^\s)]{1,300}")
@@ -38,6 +39,23 @@ SOURCE_EXT = (
     ".tsv",
     ".yml",
     ".yaml",
+)
+CITATION_EXT = SOURCE_EXT + (
+    ".tsx",
+    ".jsx",
+    ".toml",
+    ".txt",
+    ".csv",
+    ".db",
+    ".lock",
+    ".log",
+    ".html",
+    ".css",
+    ".sql",
+    ".xml",
+    ".pdf",
+    ".svg",
+    ".ipynb",
 )
 COMMAND_MARKERS = (
     "`",
@@ -199,6 +217,163 @@ def lint_bead(bead, ids, deps):
             add("dangling-dep", f"depends on {prereq}, which does not exist")
     return out
 
+def citation_paths(bead):
+    """Repo-relative paths named in SOURCE or input citation fields."""
+    paths = set()
+    for field in ("description", "acceptance_criteria", "design", "notes", "prerequisites"):
+        text = bead.get(field)
+        if not isinstance(text, str):
+            continue
+        low = text.lower()
+        field_markers = (
+            "what:",
+            "why:",
+            "source:",
+            "input:",
+            "inputs:",
+            "acceptance:",
+            "scope:",
+            "boundary:",
+            "no-claim:",
+        )
+        for marker, search_text in (("SOURCE:", text), ("input:", low), ("inputs:", low)):
+            start = 0
+            while (i := search_text.find(marker, start)) != -1:
+                if i and (search_text[i - 1].isalnum() or search_text[i - 1] in "-_"):
+                    start = i + len(marker)
+                    continue
+                end = text.find("\n", i)
+                if end == -1:
+                    end = len(text)
+                for next_marker in field_markers:
+                    next_i = low.find(next_marker, i + len(marker))
+                    if next_i != -1:
+                        end = min(end, next_i)
+                for token in text[i + len(marker) : end].replace(",", " ").split():
+                    path = token.strip("`'\"()[]{};,").rstrip(".").split(":", 1)[0]
+                    if (
+                        (path.endswith("/") or path.lower().endswith(CITATION_EXT))
+                        and not path.startswith(("/", "~", "$", "-"))
+                        and "://" not in path
+                    ):
+                        while path.startswith("./"):
+                            path = path[2:]
+                        paths.add(path)
+                start = i + len(marker)
+    return paths
+
+
+def ignored_paths(paths, repo=REPO):
+    """Return repo-relative paths matched by git check-ignore."""
+    if not paths:
+        return set()
+    result = subprocess.run(
+        ["git", "check-ignore", "--stdin"],
+        cwd=repo,
+        input="\n".join(sorted(paths)) + "\n",
+        capture_output=True,
+        text=True,
+        timeout=10,
+    )
+    if result.returncode not in (0, 1):
+        raise RuntimeError(result.stderr.strip() or "git check-ignore failed")
+    return set(result.stdout.splitlines())
+
+
+def lint_ignored_sources(beads, repo=REPO):
+    """Report ignored source/input citations unless the bead declares that path as created."""
+    bead_paths = {}
+    candidates = set()
+    for bead in beads:
+        texts = [
+            value
+            for field in ("description", "acceptance_criteria", "design", "notes", "prerequisites")
+            if isinstance((value := bead.get(field)), str)
+        ]
+        created = declared_creates("\n".join(texts))
+        paths = citation_paths(bead) - created
+        bead_paths[bead["id"]] = paths
+        candidates.update(paths)
+    ignored = ignored_paths(candidates, repo)
+    return [
+        {
+            "id": bead["id"],
+            "code": "gitignored-source",
+            "why": f"source/input citation {path} is ignored by git",
+        }
+        for bead in beads
+        for path in sorted(bead_paths[bead["id"]] & ignored)
+    ]
+
+
+def lint_graph(issues, deps, parent_child, selected_ids=None, root_id=MISSION_ROOT):
+    """Find graph invariants. deps are (dependent, prerequisite); parent_child are (child, parent)."""
+    by_id = {bead["id"]: bead for bead in issues}
+    selected = set(selected_ids) if selected_ids is not None else set(by_id)
+    children_by_parent = {}
+    for child, parent in parent_child:
+        children_by_parent.setdefault(parent, set()).add(child)
+
+    reachable = set()
+    pending = [root_id]
+    while pending:
+        issue_id = pending.pop()
+        if issue_id in reachable:
+            continue
+        reachable.add(issue_id)
+        pending.extend(prereq for dependent, prereq in deps if dependent == issue_id)
+
+    findings = []
+    for bead in issues:
+        issue_id = bead["id"]
+        if issue_id not in selected:
+            continue
+        status = bead.get("status")
+        labels = bead.get("labels") or []
+        if isinstance(labels, str):
+            labels = [labels]
+        has_pillar = any(
+            isinstance(label, str)
+            and label.lower().startswith("pillar:")
+            and label.lower() != "pillar:none"
+            for label in labels
+        )
+        if status in ("open", "in_progress") and has_pillar and issue_id not in reachable:
+            findings.append(
+                {
+                    "id": issue_id,
+                    "code": "unreachable-from-root",
+                    "why": f"pillar bead is not reachable from mission root {root_id} over blocks edges",
+                }
+            )
+        if status == "in_progress":
+            for dependent, prereq in deps:
+                if (
+                    dependent == issue_id
+                    and prereq in by_id
+                    and by_id[prereq].get("status") != "closed"
+                ):
+                    findings.append(
+                        {
+                            "id": issue_id,
+                            "code": "blocked-in-progress",
+                            "why": f"in-progress bead has non-closed prerequisite {prereq}",
+                        }
+                    )
+        if bead.get("issue_type") == "epic":
+            own_children = children_by_parent.get(issue_id, set())
+            for dependent, prereq in deps:
+                if dependent == issue_id and prereq in own_children:
+                    findings.append(
+                        {
+                            "id": issue_id,
+                            "code": "epic-blocks-own-child",
+                            "why": f"epic has a blocks dependency on its own child {prereq}",
+                        }
+                    )
+    return findings
+
+
 
 def load(epic, wanted, all_open):
     env = dict(os.environ, RUST_LOG="off")
@@ -237,6 +412,11 @@ def load(epic, wanted, all_open):
                 "select issue_id, depends_on_id from dependencies where type='blocks'"
             )
         )
+        parent_child = list(
+            db.execute(
+                "select issue_id, depends_on_id from dependencies where type='parent-child'"
+            )
+        )
     finally:
         db.close()
     live = [b for b in issues if b["status"] in ("open", "in_progress")]
@@ -247,8 +427,8 @@ def load(epic, wanted, all_open):
     elif all_open:
         sel = live
     else:
-        return None, ids, deps
-    return sel, ids, deps
+        return None, ids, deps, parent_child, issues
+    return sel, ids, deps, parent_child, issues
 
 
 def main(argv=None):
@@ -261,14 +441,22 @@ def main(argv=None):
     p.add_argument("--json", action="store_true", help="one JSON object on stdout")
     a = p.parse_args(argv)
     wanted = {i for i in (a.ids or "").split(",") if i}
-    sel, ids, deps = load(a.epic, wanted, a.all_open)
+    sel, ids, deps, parent_child, issues = load(a.epic, wanted, a.all_open)
     if sel is None:
         print(
             "bead-lint: name what to lint: --epic jev-b35c, --ids jev-a,jev-b, or --all-open",
             file=sys.stderr,
         )
         return 64
-    findings = [f for b in sel for f in lint_bead(b, ids, deps)]
+    try:
+        findings = [f for b in sel for f in lint_bead(b, ids, deps)]
+        findings.extend(
+            lint_graph(issues, deps, parent_child, {bead["id"] for bead in sel})
+        )
+        findings.extend(lint_ignored_sources(sel))
+    except (OSError, subprocess.SubprocessError, RuntimeError) as exc:
+        print(f"bead-lint: git check-ignore failed: {exc}", file=sys.stderr)
+        return 69
     if a.json:
         print(
             json.dumps(

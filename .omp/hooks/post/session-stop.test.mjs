@@ -48,23 +48,21 @@ test("the conductor's finished turn with nothing queued stays silent", () => {
 
 // Measured 2026-09-24: br ready was empty, this hook returned nothing, and 4 of 6
 // worker panes sat idle at their prompts until Joshua noticed.
-test("a worker with nothing queued is told to finish its own bead or report idle to pane 1", () => {
+test("a worker with no ready work gets a work continuation without queuing an idle notice", () => {
   const result = decideStop({ stop_hook_active: false }, { ...quiet, paneIndex: 5 });
   assert.equal(result.continue, true);
   assert.match(result.additionalContext, /finish the bead you have in progress/);
-  assert.match(result.additionalContext, /ntm send jev --pane=1 "IDLE pane 5:/);
+  assert.doesNotMatch(result.additionalContext, /IDLE pane/);
   assert.doesNotMatch(result.additionalContext, /br ready has/);
 });
 
-test("a worker with ready work gets both the claim and the idle fallback", () => {
+test("a worker with ready work is directed to claim it without an idle fallback", () => {
   const result = decideStop({ stop_hook_active: false }, { ...quiet, readyCount: 2, paneIndex: 3 });
   assert.match(result.additionalContext, /br ready has 2 item/);
-  assert.match(result.additionalContext, /IDLE pane 3:/);
+  assert.doesNotMatch(result.additionalContext, /IDLE pane/);
 });
 
-test("a worker's second stop is silent, so the idle message cannot loop", () => {
-  assert.equal(decideStop({ stop_hook_active: true }, { ...quiet, paneIndex: 4 }), undefined);
-});
+
 
 // Joshua 2026-10-04: no bead implementation until two clean convergence rounds. The worker line
 // "finish the bead you have in progress / claim from br ready" sent GoldRiver into writing
@@ -77,7 +75,7 @@ test("during a build freeze a worker is not told to claim or finish bead work", 
   assert.equal(result.continue, true);
   assert.match(result.additionalContext, /BUILD FREEZE/);
   assert.match(result.additionalContext, /two clean convergence rounds first/);
-  assert.match(result.additionalContext, /IDLE pane 6:/);
+  assert.doesNotMatch(result.additionalContext, /IDLE pane/);
   assert.doesNotMatch(result.additionalContext, /br ready has|claim an unassigned|finish the bead you have in progress/);
 });
 

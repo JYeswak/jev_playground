@@ -17,8 +17,8 @@
 #      compaction-retention-oracle-20260919.md, math-and-next-level-20260919.md:155)
 #   * Keep-everything beat every pruner on mistakes: 12/4/13 vs 82/91/81. ~90% of tool results are
 #     referenced again, and no threshold 0.1–0.9 beat keeping them.
-#   * The real lever is retransmitted bulk: 98.878% of billed tokens over 4,619 sessions, marked
-#     REPRODUCIBLE in readme-numeric-claims-audit-20260919.md via demos/usage-shape/bin/shape.mjs.
+#   * The real lever is retransmitted bulk: 98.878% of billed tokens over the audited session set,
+#     marked REPRODUCIBLE in readme-numeric-claims-audit-20260919.md via demos/usage-shape/bin/shape.mjs.
 #     `shake` + supersedeReads + dropUseless remove that WITHOUT rewriting any decision.
 #
 # NOT ADOPTED, deliberately — these were suggested alongside and carry no measurement here:
@@ -89,20 +89,19 @@ extensions:
   - ./.omp/extensions/kit-guard
   # Operator safety baseline, restated on purpose. omp's settings merge REPLACES arrays
   # (pi-coding-agent src/config/settings.ts #deepMerge), so this project list otherwise
-  # drops every extension the operator's profile lists: measured 2026-09-26, 3 of 4 jev
-  # sessions had zero dcg-tool-bridge decisions. Keep these paths identical to the
-  # profile lists (~/.omp/profiles/*/agent/config.yml); the loader dedupes by resolved
-  # path. kit-guard-optin is omitted: this repo loads its own ./.omp/extensions/kit-guard.
-  - /Users/josh/.omp/omp-extensions/observational-tool-result.ts
-  - /Users/josh/.omp/omp-extensions/dcg-tool-bridge.ts
-  - /Users/josh/.omp/omp-extensions/ee-failure-journal.ts
-  - /Users/josh/.omp/omp-extensions/zeststream-cast-spawn-cap.ts
-  - /Users/josh/.omp/omp-extensions/skill-topology-session-start.ts
-  - /Users/josh/.omp/omp-extensions/ee-ambient-session-start.ts
-  - /Users/josh/.omp/omp-extensions/zestgraph-danger-gate.ts
-  - /Users/josh/.omp/omp-extensions/slb-guard-fail-closed.ts
-  - /Users/josh/.omp/omp-extensions/rch-lane-bind-bridge.ts
-  - /Users/josh/.omp/omp-extensions/rch-mutator.ts
+  # drops every profile extension. Keep these paths identical to the profile lists
+  # (~/.omp/profiles/*/agent/config.yml); the loader dedupes by resolved path.
+  # kit-guard-optin is omitted: this repo loads its own ./.omp/extensions/kit-guard.
+  - ~/.omp/omp-extensions/observational-tool-result.ts
+  - ~/.omp/omp-extensions/dcg-tool-bridge.ts
+  - ~/.omp/omp-extensions/ee-failure-journal.ts
+  - ~/.omp/omp-extensions/zeststream-cast-spawn-cap.ts
+  - ~/.omp/omp-extensions/skill-topology-session-start.ts
+  - ~/.omp/omp-extensions/ee-ambient-session-start.ts
+  - ~/.omp/omp-extensions/zestgraph-danger-gate.ts
+  - ~/.omp/omp-extensions/slb-guard-fail-closed.ts
+  - ~/.omp/omp-extensions/rch-lane-bind-bridge.ts
+  - ~/.omp/omp-extensions/rch-mutator.ts
 #   (xd://jev_screen_ext_probe + nonce + --no-extensions arms), see
 #   work/nev-injection/screen-l2-receipt.json. Retire with the tool.
   - ./.omp/extensions/jev-gate.ts
