@@ -19,7 +19,7 @@ The package exposes `classifier` and the short alias `clf`; both invoke the same
 
 `classifier doctor --json` is the exception: it preserves the raw doctor report. `classifier doctor --robot` wraps that report in `classifier.doctor.v1`. With no key, the doctor report is `NOT_RUN` and exit 2; a missing SDK yields `ONLINE_REQUIRED`/exit 6 in the robot envelope (the raw `--json` report retains the doctor status and reason).
 
-Exit codes are shared across commands: 0 success; 1 findings; 2 `NOT_RUN`; 3 refused (including an unoffered answer); 4 refused_unsafe; 5 retryable; 6 online_required; 64 usage; 66 missing input; 73 cannot create; 74 I/O. Unknown flags are usage errors unless Stage 0 recognizes a unique safe correction or ignores a distant, non-destructive flag with a warning. Destructive flags are never auto-corrected.
+Exit codes are shared across commands: 0 success; 1 findings; 2 `NOT_RUN`; 3 refused (including an unoffered answer); 4 refused_unsafe; 5 retryable; 6 online_required; 64 usage; 66 missing input; 73 cannot create; 74 I/O. Unknown flags are usage errors, except distant non-destructive flags that Stage 0 ignores with a warning. A unique safe correction prints the full corrected command; destructive flags are never auto-corrected.
 
 ```bash
 classifier ask choice|score|noul --state FILE --question FILE --robot
@@ -28,8 +28,12 @@ classifier classify --text T --labels FILE --robot
 classifier verify --claim C --evidence FILE --robot
 classifier score --text T --levels FILE --robot
 classifier gate --command C --robot
+classifier doctor --deep --robot
+classifier repair --only ID[,ID...] --robot
+classifier repair --apply --only ID[,ID...] --robot
+classifier repair undo latest --robot
 classifier omp install --dir DIR --robot
-classifier omp uninstall --dir DIR --robot
+classifier omp uninstall --dir DIR --apply --robot
 ```
 
 `--fake` uses captured fixtures and never contacts Jev. For example, `classifier rerank` replays the captured FiQA answer from `kit/test/fixtures/rerank-fiqa-answer.json`; the example passages and IDs are copied from BEIR FiQA-2018 query `10034`. Rerank is one Choice over the candidate passages, not a full reranking. The measured design has no synthetic `none` candidate; malformed or unoffered answers are refused.
@@ -37,3 +41,5 @@ classifier omp uninstall --dir DIR --robot
 Banking77 classification uses the captured intent Choice, null label descriptions, and no confidence threshold. Claim verification uses the captured SciFact Noul and labels values `>0.5` supported, `<=0.5` unsupported. SST-5 scoring returns the selected integer level, description, confidence, and probabilities. `--fake` for each uses its committed fixture and reports `model: "fake"`.
 
 The CLI pins `jev-1.13.0` by default and never prints the API key. Direct clients can choose another model in code.
+
+`repair` is read-only by default. `--apply` performs only the selected, validated fixes under the doctor lock; `repair undo latest` restores the latest recorded run from verified backups. `omp uninstall --apply` moves unchanged manifest-owned files out of active `.omp` paths into doctor-state quarantine. Edited, protected, or symlinked files remain for manual review. A recovered stale lock is returned as `fm-concurrency-stale-doctor-lock` with its owner PID.

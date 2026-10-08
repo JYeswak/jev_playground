@@ -7,6 +7,7 @@ Usage:
 Commands:
   doctor                 Check local readiness
   health                 Quick offline readiness
+  repair                 Plan or apply bounded doctor repairs; undo the latest action
   ask choice|score|noul  Judge a typed question
   rerank                 Select a top candidate
   classify               Choose a label
@@ -40,6 +41,12 @@ const DOCTOR_HELP = `classifier doctor [--quick|--deep] [--online] [--only ID,..
 
 Diagnose local readiness without changing files. --json emits the raw report; --robot emits an envelope.`;
 
+const REPAIR_HELP = `classifier repair [--only ID,...] [--apply] [--json|--robot]
+classifier repair undo latest [--json|--robot]
+
+Plan repairs without writing by default. --apply executes only the reported, scoped actions.
+Undo restores the latest recorded action from its byte-identical backup.`;
+
 const HEALTH_HELP = `classifier health [--json|--robot]
 
 Run quick offline readiness checks without changing files.`;
@@ -56,6 +63,7 @@ export function helpFor(topic = '') {
   if (!topic) return OVERVIEW_HELP;
   if (topic === 'doctor') return DOCTOR_HELP;
   if (topic === 'health') return HEALTH_HELP;
+  if (topic === 'repair') return REPAIR_HELP;
   if (topic === 'ask') return ASK_HELP;
   return `${OVERVIEW_HELP}\n\nUse classifier ${topic} --help for command usage.`;
 }

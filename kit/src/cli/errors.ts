@@ -37,6 +37,11 @@ export function rewriteCliError(input: ErrorInput): CliError {
       'error: classify requires --labels FILE (got --label; did you mean --labels?)',
       ['example: classifier classify --text "How do I locate my card?" --labels kit/examples/banking77-labels.json --fake --json'], command);
   }
+  if (input.reason === 'unknown-option') {
+    const suggestion = input.correctedCommand ? `\ndid you mean: ${input.correctedCommand}` : '';
+    return result('USAGE', EXIT_CODES.USAGE,
+      `error: unknown option '${input.option ?? message}'${suggestion}`, [], command);
+  }
   if (input.reason === 'no-input' || input.code === 'ENOENT') {
     const option = input.option ?? (message.includes('labels') ? '--labels' : 'input');
     const path = input.path ?? message;

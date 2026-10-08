@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { chmod, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { chmod, copyFile, link, mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { detectors as surfaceDetectors, surfacePaths } from '../src/doctor/detectors/surfaces.mjs';
@@ -90,13 +91,68 @@ test('missing sibling bin is reported and an executable sibling is healthy', asy
   assert.deepEqual(await run(base(repo)), []);
 });
 
-test('pin-global and outside-repo audits are explicitly unavailable rather than healthy', async () => {
-  for (const id of ['fm-hooks-global-link-broken', 'fm-surfaces-outside-repo-audit']) {
-    const item = detector(driftDetectors, id);
-    assert.equal(item.availability, 'unavailable');
-    assert.ok(item.skipped_reason);
-    assert.deepEqual(await item.run(base(null)), []);
+async function globalHookFixture(label, hardlink) {
+  const root = await fixture(label);
+  const repo = join(root, 'repo');
+  const home = join(root, 'home');
+  const inventory = JSON.parse(await readFile(join(repoRoot, 'work/jev-inventory/expected.json'), 'utf8'));
+  const global = inventory.surfaces.filter((surface) => surface.group === 'global' && surface.expect === 'on');
+  assert.ok(global.length > 0, 'recorded inventory has no active global hooks');
+  await mkdir(join(repo, 'work/jev-inventory'), { recursive: true });
+  await writeFile(join(repo, 'work/jev-inventory/expected.json'), JSON.stringify(inventory));
+  const sources = [];
+  for (const surface of global) {
+    const source = join(repo, surface.repo);
+    await mkdir(dirname(source), { recursive: true });
+    await copyFile(join(repoRoot, surface.repo), source);
+    sources.push(surface.repo);
+    const destinations = [
+      join(home, '.omp/agent/hooks/post', surface.hookfile),
+      join(home, '.omp/profiles/fixture/agent/hooks/post', surface.hookfile),
+    ];
+    for (const destination of destinations) {
+      await mkdir(dirname(destination), { recursive: true });
+      if (hardlink) await link(source, destination);
+      else await copyFile(source, destination);
+    }
   }
+  const gitEnv = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', GIT_TERMINAL_PROMPT: '0' };
+  const git = (args) => {
+    const result = spawnSync('git', args, { cwd: repo, env: gitEnv, encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr);
+    return { code: 0, stdout: result.stdout, stderr: result.stderr };
+  };
+  git(['init', '--quiet']);
+  git(['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'add', '--', 'work/jev-inventory/expected.json', ...sources]);
+  git(['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--quiet', '-m', 'fixture']);
+  const ctx = base(repo, {
+    home,
+    inventory,
+    stateDir: join(root, 'state'),
+    exec: async (command, args) => {
+      const result = spawnSync(command, args, { cwd: repo, env: gitEnv, encoding: 'utf8' });
+      return { code: result.status ?? 1, stdout: result.stdout ?? '', stderr: result.stderr ?? '' };
+    },
+  });
+  return { root, repo, home, inventory, global, ctx };
+}
+
+test('global hook audit catches copied hooks and accepts only hardlinks to the committed source', async () => {
+  const audit = detector(driftDetectors, 'fm-hooks-global-link-broken');
+  const broken = await globalHookFixture('doctor-global-link-broken', false);
+  const findings = await audit.run(broken.ctx);
+  assert.equal(findings.length, broken.global.length * 2);
+  assert.ok(findings.every((item) => item.evidence.link_type === 'copy'));
+
+  const healthy = await globalHookFixture('doctor-global-link-healthy', true);
+  assert.deepEqual(await audit.run(healthy.ctx), []);
+});
+
+test('outside-repo audit remains explicitly unavailable', async () => {
+  const item = detector(driftDetectors, 'fm-surfaces-outside-repo-audit');
+  assert.equal(item.availability, 'unavailable');
+  assert.ok(item.skipped_reason);
+  assert.deepEqual(await item.run(base(null)), []);
 });
 
 test('fleet watcher is healthy with a fresh liveness row and RED after two intervals', async () => {

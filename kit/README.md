@@ -11,11 +11,26 @@ supports apply and uninstall, while other targets refuse apply until their targe
 node kit/bin/jev.mjs install all --dry-run --robot
 node kit/bin/jev.mjs install omp-project --dir /path/to/git/repo --dry-run --robot
 node kit/bin/jev.mjs install omp-project --dir /path/to/git/repo --apply --robot
-node kit/bin/jev.mjs uninstall omp-project --dir /path/to/git/repo --dry-run --robot
+node kit/bin/jev.mjs uninstall omp-project --dir /path/to/git/repo --apply --robot
 ```
 
-`uninstall` previews by default. Apply removes only manifest-owned, unchanged files; edited and
-unrelated files remain in place.
+`uninstall` previews by default. Apply removes only manifest-owned, unchanged files; it leaves
+edited and unrelated files in place.
+
+## CLI contract
+
+Build the CLI, then inspect its machine-readable command registry or concise agent guide:
+
+```bash
+npm run prepare --prefix kit
+node kit/bin/jev.mjs capabilities --json
+node kit/bin/jev.mjs schema --json
+node kit/bin/jev.mjs robot-docs guide
+```
+
+`capabilities` and `schema` describe the same registered command surface. `robot-docs guide` is a
+short, offline reference; none of these commands calls Jev.
+
 
 ## Daily OMP skill-gap mining
 
@@ -105,3 +120,14 @@ npx --no-install classifier score --text "it represents better-than-average movi
 The fake run never contacts Jev; its result is in `data` and `model: "fake"` is in envelope `meta`. Remove `--fake` for a live call; the client pins `jev-1.13.0` and requires `TYPESAFE_API_KEY`. The underlying live measurement is SST-5 Jev 273/500 (MAE 0.488) versus Haiku 251/500 (MAE 0.556), live lane, N=500 per arm, 2026-09-24; see `work/score-sst5/score.py`. That benchmark is the design source, not a claim about this single example.
 
 Malformed score answers and requests estimated `OVER` the documented input limit are refused before a score is returned.
+
+## Classifier conformance
+
+Decision contracts in `contracts/` declare the input shape, host, consumer, latency and daily-call budgets, and safe side. The shared adapter harness runs C1–C7 offline against recorded answers with injected transports; it does not make network calls:
+
+```bash
+node --test kit/test/contract-schema.test.mjs kit/test/conformance.test.mjs kit/test/conformance-matrix.test.mjs
+node kit/bin/conformance-matrix.mjs
+```
+
+The second command checks fixture `PROVENANCE.md` files and regenerates `work/plan-20261004/CONFORMANCE.md`. Untested clauses remain blank and block shipped backends. Known adapter limitations are recorded in `conformance/DISCREPANCIES.md`; the regex adapter's missing probabilities are an explicit C2 XFAIL, not a skipped test.

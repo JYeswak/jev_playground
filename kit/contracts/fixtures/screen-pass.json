@@ -1,0 +1,29 @@
+{
+  "family": "conformance-result-screen",
+  "question": {
+    "type": "choice",
+    "instructions": "Choose whether this result should be shown.",
+    "decision": "On classifier failure, preserve and pass the original result unchanged.",
+    "options": {
+      "show": { "description": "Show the result", "action": "pass" },
+      "withhold": { "description": "Withhold the result", "action": "refuse" }
+    }
+  },
+  "state": {
+    "fields": ["record_id"],
+    "privacy_allowlist": ["record_id"],
+    "maximum_state_text_bytes": 128,
+    "raw_transcript_allowed": false
+  },
+  "surface_type": "result-screen",
+  "safe_side": "pass",
+  "budget": {
+    "latency_budget_ms": 1000,
+    "daily_call_cap": 100,
+    "cap_reached_action": "pass"
+  },
+  "labels": { "source": "contract fixture; no model evaluation" },
+  "bar": { "source": "contract tests only; not a shipping bar" },
+  "host": "kit/test/conformance.test.mjs",
+  "consumer": "conformance test harness"
+}

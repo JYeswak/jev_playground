@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, mkdir, writeFile, readFile, chmod, readdir, stat } from 'node:fs/promises';
+import { mkdtemp, mkdir, writeFile, readFile, chmod, readdir, stat, lstat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -8,9 +8,9 @@ import { pathToFileURL } from "node:url";
 const kitRoot = new URL('..', import.meta.url);
 const cli = new URL('../bin/jev.mjs', import.meta.url);
 
-function run(args, cwd) {
+function run(args, cwd, extraEnv = {}) {
   return new Promise((resolve) => {
-    const child = spawn(process.execPath, [cli.pathname, ...args], { cwd, env: { ...process.env, TYPESAFE_API_KEY: undefined }, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(process.execPath, [cli.pathname, ...args], { cwd, env: { ...process.env, ...extraEnv, TYPESAFE_API_KEY: undefined }, stdio: ['ignore', 'pipe', 'pipe'] });
     let stdout = '';
     let stderr = '';
     child.stdout.on('data', (chunk) => { stdout += chunk; });
@@ -152,8 +152,11 @@ test('prior managed config requires an explicit owner migration', async () => {
   assert.equal(await readFile(join(repo, '.omp/config.yml'), 'utf8'), oldConfig);
 });
 
-test('omp uninstall dry-runs by default and removes exactly manifest files on --apply', async () => {
+test('omp uninstall dry-runs by default, quarantines owned files, and can restore them', async () => {
   const repo = await mkdtemp(join(tmpdir(), 'jev-omp-uninstall-'));
+  const inventoryPath = join(repo, 'work/jev-inventory/expected.json');
+  await mkdir(join(repo, 'work/jev-inventory'), { recursive: true });
+  await writeFile(inventoryPath, `${JSON.stringify({ schema_version: 'fixture.v1', surfaces: [] })}\n`);
   const installed = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
   assert.equal(installed.code, 0);
   const listed = await run(['omp', 'uninstall', '--dir', repo, '--robot'], kitRoot);
@@ -164,15 +167,31 @@ test('omp uninstall dry-runs by default and removes exactly manifest files on --
   assert.ok(dry.data.files.includes('.omp/jev-kit-manifest.json'));
   const stillThere = await run(['omp', 'install', '--dir', repo, '--robot'], kitRoot);
   assert.equal(stillThere.code, 0, 'dry run must remove nothing');
-  const applied = await run(['omp', 'uninstall', '--dir', repo, '--apply', '--robot'], kitRoot);
-  assert.equal(applied.code, 0);
+  const prior = new Map();
+  for (const file of JSON.parse(stillThere.stdout).data.files) {
+    const path = join(repo, file);
+    prior.set(file, { bytes: await readFile(path), mode: (await lstat(path)).mode & 0o777 });
+  }
+  const doctorDir = join(repo, 'doctor');
+  const env = { HOME: repo, JEV_STATE_DIR: join(repo, 'state'), JEV_DOCTOR_DIR: doctorDir };
+  const applied = await run(['omp', 'uninstall', '--dir', repo, '--apply', '--robot'], kitRoot, env);
+  assert.equal(applied.code, 0, applied.stderr);
   const done = JSON.parse(applied.stdout);
   assert.equal(done.data.status, 'REMOVED');
   assert.deepEqual(done.data.kept, []);
-  for (const f of done.data.files) {
-    let gone = false;
-    try { await readFile(join(repo, f), 'utf8'); } catch { gone = true; }
-    assert.equal(gone, true, `${f} still present after uninstall --apply`);
+  const [runId] = await readdir(join(doctorDir, 'runs'));
+  const quarantine = join(doctorDir, 'runs', runId, 'quarantine');
+  for (const file of done.data.files) {
+    await assert.rejects(lstat(join(repo, file)), { code: 'ENOENT' }, `${file} remains installed`);
+    assert.ok((await lstat(join(quarantine, file))).isFile(), `${file} was not preserved in quarantine`);
+  }
+  const undo = await run(['repair', 'undo', 'latest', '--robot'], repo, env);
+  assert.equal(undo.code, 0, undo.stderr);
+  assert.equal(JSON.parse(undo.stdout).data.actions_taken, done.data.files.length);
+  for (const [file, state] of prior) {
+    const path = join(repo, file);
+    assert.deepEqual(await readFile(path), state.bytes, `${file} bytes changed after undo`);
+    assert.equal((await lstat(path)).mode & 0o777, state.mode, `${file} mode changed after undo`);
   }
 });
 
@@ -183,7 +202,10 @@ test('omp uninstall keeps user-edited and non-manifest files, refuses without a 
   const owned = 'operator-owned tool file';
   await writeFile(join(repo, '.omp/tools/jev-gate.ts'), owned);
   await writeFile(join(repo, '.omp/tools/operator-extra.ts'), 'operator file, never in manifest');
-  const applied = await run(['omp', 'uninstall', '--dir', repo, '--apply', '--robot'], kitRoot);
+  const applied = await run(['omp', 'uninstall', '--dir', repo, '--apply', '--robot'], kitRoot, {
+    HOME: repo,
+    JEV_DOCTOR_DIR: join(repo, 'doctor'),
+  });
   assert.equal(applied.code, 0);
   const done = JSON.parse(applied.stdout);
   assert.ok(done.data.kept.includes('.omp/tools/jev-gate.ts'));

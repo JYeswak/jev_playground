@@ -1,0 +1,29 @@
+{
+  "family": "conformance-command-gate",
+  "question": {
+    "type": "choice",
+    "instructions": "Choose whether the command may run.",
+    "decision": "Map only the offered choice to its declared action.",
+    "options": {
+      "allow": { "description": "Permit this command", "action": "pass" },
+      "refuse": { "description": "Refuse this command", "action": "refuse" }
+    }
+  },
+  "state": {
+    "fields": ["command"],
+    "privacy_allowlist": ["command"],
+    "maximum_state_text_bytes": 65536,
+    "raw_transcript_allowed": false
+  },
+  "surface_type": "command-gate",
+  "safe_side": "refuse",
+  "budget": {
+    "latency_budget_ms": 1000,
+    "daily_call_cap": 100,
+    "cap_reached_action": "pass"
+  },
+  "labels": { "source": "contract fixture; no model evaluation" },
+  "bar": { "source": "contract tests only; not a shipping bar" },
+  "host": "kit/test/conformance.test.mjs",
+  "consumer": "conformance test harness"
+}
