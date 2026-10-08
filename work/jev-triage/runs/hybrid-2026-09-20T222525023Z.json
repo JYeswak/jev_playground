@@ -1,0 +1,282 @@
+{
+  "at": "2026-09-20T22:25:25.022Z",
+  "n": 20,
+  "semantic_callable": 6,
+  "budget_this_run": 3,
+  "survivors": [
+    "bash-glob-silenced",
+    "bash-pipe-exit-v2",
+    "bash-structural-def-search",
+    "bash-callsite-grep-exclusion",
+    "absence-from-one-probe",
+    "count-as-verdict",
+    "digest-truncation",
+    "path-nonexistence",
+    "pipefail-masked",
+    "pipefail-anywhere",
+    "R59-broad-backticks",
+    "R56-bare-workaround"
+  ],
+  "noulCache": {
+    "bash-glob-silenced": 0.52,
+    "bash-pipe-exit-v2": 0.9,
+    "bash-structural-def-search": 0.36,
+    "bash-callsite-grep-exclusion": 0.5,
+    "absence-from-one-probe": 0.63,
+    "count-as-verdict": 0.43,
+    "live-file-digest": 0.63,
+    "digest-truncation": 0.09,
+    "path-nonexistence": 0.24,
+    "SCREAMING_CASE-missing": 0.81,
+    "NOT-INSTALLED": 0.77,
+    "pipefail-masked": 0.51,
+    "tmux-untargeted": 0.7,
+    "git-add-A": 0.58,
+    "new-scripts-sh": 0.31,
+    "v2-files": 0.48,
+    "claim-verb": 0.86,
+    "structural-grep-v1": 0.53,
+    "D4-read-burst": 0.47
+  },
+  "hybrid_0_5": {
+    "binary": {
+      "n": 20,
+      "tp": 4,
+      "fp": 1,
+      "tn": 13,
+      "fn": 2,
+      "correct": 17
+    },
+    "five": {
+      "correct": 15,
+      "n": 20
+    },
+    "semantic": {
+      "correct": 2,
+      "n": 3
+    }
+  },
+  "baseline": {
+    "binary": {
+      "n": 20,
+      "tp": 6,
+      "fp": 3,
+      "tn": 11,
+      "fn": 0,
+      "correct": 17
+    },
+    "five": {
+      "correct": 15,
+      "n": 20
+    },
+    "semantic": {
+      "correct": 0,
+      "n": 3
+    }
+  },
+  "best_t": {
+    "t": 0.25,
+    "correct": 19,
+    "fp": 1,
+    "fn": 0,
+    "tp": 6,
+    "semH": 2,
+    "noulSem": 2
+  },
+  "sweep": [
+    {
+      "t": 0.25,
+      "correct": 19,
+      "fp": 1,
+      "fn": 0,
+      "tp": 6,
+      "semH": 2,
+      "noulSem": 2
+    },
+    {
+      "t": 0.3,
+      "correct": 19,
+      "fp": 1,
+      "fn": 0,
+      "tp": 6,
+      "semH": 2,
+      "noulSem": 2
+    },
+    {
+      "t": 0.35,
+      "correct": 19,
+      "fp": 1,
+      "fn": 0,
+      "tp": 6,
+      "semH": 2,
+      "noulSem": 2
+    },
+    {
+      "t": 0.1,
+      "correct": 18,
+      "fp": 2,
+      "fn": 0,
+      "tp": 6,
+      "semH": 1,
+      "noulSem": 1
+    },
+    {
+      "t": 0.15,
+      "correct": 18,
+      "fp": 2,
+      "fn": 0,
+      "tp": 6,
+      "semH": 1,
+      "noulSem": 1
+    },
+    {
+      "t": 0.2,
+      "correct": 18,
+      "fp": 2,
+      "fn": 0,
+      "tp": 6,
+      "semH": 1,
+      "noulSem": 1
+    },
+    {
+      "t": 0.4,
+      "correct": 18,
+      "fp": 1,
+      "fn": 1,
+      "tp": 5,
+      "semH": 2,
+      "noulSem": 2
+    },
+    {
+      "t": 0,
+      "correct": 17,
+      "fp": 3,
+      "fn": 0,
+      "tp": 6,
+      "semH": 0,
+      "noulSem": 0
+    },
+    {
+      "t": 0.05,
+      "correct": 17,
+      "fp": 3,
+      "fn": 0,
+      "tp": 6,
+      "semH": 0,
+      "noulSem": 0
+    },
+    {
+      "t": 0.45,
+      "correct": 17,
+      "fp": 1,
+      "fn": 2,
+      "tp": 4,
+      "semH": 2,
+      "noulSem": 2
+    },
+    {
+      "t": 0.5,
+      "correct": 17,
+      "fp": 1,
+      "fn": 2,
+      "tp": 4,
+      "semH": 2,
+      "noulSem": 2
+    },
+    {
+      "t": 0.55,
+      "correct": 16,
+      "fp": 0,
+      "fn": 4,
+      "tp": 2,
+      "semH": 3,
+      "noulSem": 3
+    },
+    {
+      "t": 0.6,
+      "correct": 16,
+      "fp": 0,
+      "fn": 4,
+      "tp": 2,
+      "semH": 3,
+      "noulSem": 3
+    },
+    {
+      "t": 0.65,
+      "correct": 15,
+      "fp": 0,
+      "fn": 5,
+      "tp": 1,
+      "semH": 3,
+      "noulSem": 3
+    },
+    {
+      "t": 0.7,
+      "correct": 15,
+      "fp": 0,
+      "fn": 5,
+      "tp": 1,
+      "semH": 3,
+      "noulSem": 3
+    },
+    {
+      "t": 0.75,
+      "correct": 15,
+      "fp": 0,
+      "fn": 5,
+      "tp": 1,
+      "semH": 3,
+      "noulSem": 3
+    },
+    {
+      "t": 0.8,
+      "correct": 15,
+      "fp": 0,
+      "fn": 5,
+      "tp": 1,
+      "semH": 3,
+      "noulSem": 3
+    },
+    {
+      "t": 0.85,
+      "correct": 15,
+      "fp": 0,
+      "fn": 5,
+      "tp": 1,
+      "semH": 3,
+      "noulSem": 3
+    },
+    {
+      "t": 0.9,
+      "correct": 15,
+      "fp": 0,
+      "fn": 5,
+      "tp": 1,
+      "semH": 3,
+      "noulSem": 3
+    },
+    {
+      "t": 0.95,
+      "correct": 14,
+      "fp": 0,
+      "fn": 6,
+      "tp": 0,
+      "semH": 3,
+      "noulSem": 3
+    },
+    {
+      "t": 1,
+      "correct": 14,
+      "fp": 0,
+      "fn": 6,
+      "tp": 0,
+      "semH": 3,
+      "noulSem": 3
+    }
+  ],
+  "mapping": {
+    "not_a_defect": "REFUSE_NUISANCE",
+    "concentration": "UNDERPOWERED",
+    "note": "Choice has five labels and no NOT_A_DEFECT or CONCENTRATION. These two mappings are a join choice, not observed gold. Noul gold does not use them."
+  }
+}

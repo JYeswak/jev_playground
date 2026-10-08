@@ -1,0 +1,4 @@
+Working...
+Fixed `qs.py`: `+`→space before `%XX` decode (so `%2B`→`+`), UTF-8 byte accumulation, leading `?` strip, blank/`None` handling, order/repeats kept, stdlib-free (`urllib` absent).
+
+Verified 17 cases + malformed-`%` edges: all pass (`a=&b=1&a=2`, `?`-strip, `+`/`%2B`/`%20`, `%C3%A9`→`é`, `%E2%82%AC`→`€`, `flag`→`None`, `a=b=c`, empty-segment skip).

@@ -1,0 +1,29 @@
+{
+  "schema": "jev-z885-bar.v1",
+  "bead": "jev-z885",
+  "status": "preregistered",
+  "experiment": {
+    "unit": "one before_agent_start invocation with at least one parsed memory and known repository cwd",
+    "control": "run the existing memory filter in shadow mode; do not prune the system prompt",
+    "treatment": "run the existing memory filter and apply validated drops",
+    "assignment": "independent Bernoulli per eligible invocation; treatment probability 0.90, control probability 0.10",
+    "eligibility": "only when the explicit event-randomization switch is enabled; disabled by default; no switch creation or live enablement in this bead",
+    "logging": "one hash-only assignment row per eligible invocation with event_id, chosen arm, chosen-arm propensity, and both arm probabilities; no prompt or memory text"
+  },
+  "offline_simulation": {
+    "source": "the qpv2 4-hour block schedule and completed flip journal, joined to local memory-filter shadow decision rows by timestamp",
+    "unit": "promptHash and instance grouped within a 60-second timestamp window; ambiguous or incomplete groups excluded and counted",
+    "outcome": "sum of logged tokensSaved for candidate filter drops; control potential outcome is zero",
+    "interpretation": "mechanistic token-saving proxy only; not task success, memory utility, or evidence of safe pruning",
+    "estimand": "finite-sample average treatment effect on the registered token-saving proxy",
+    "comparison": "10,000 seeded assignment replays on the same eligible events: per-event 90/10 Bernoulli assignment versus 4-hour block assignment following the qpv2 block size and 50/50 arm share; report empirical estimator variance and ratio without a pass threshold or direction claim",
+    "estimators": "report inverse-propensity (Horvitz-Thompson) and doubly-robust estimates; doubly-robust outcome predictions are cross-fitted by 4-hour block; confidence intervals use the estimator's empirical influence-function standard error",
+    "planted_effect": "add a fixed +100 proxy tokens to every treated potential outcome; require the planted-effect estimate's 95% interval to contain +100 in the fixed-seed replay"
+  },
+  "safety": {
+    "live_jev_calls": 0,
+    "randomization_enabled": false,
+    "behavioral_claim": false,
+    "approval_required_before_enablement": true
+  }
+}

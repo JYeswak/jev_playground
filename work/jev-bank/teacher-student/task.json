@@ -1,0 +1,66 @@
+{
+  "schema_version": "jev.decision-bank.task.v1",
+  "decision": "whether local models agree with paid Jev 1.13.0 action on state_local",
+  "consumer": "local nimble/tev1 route before paid Jev; teacher labels are action proxies only",
+  "class": "savings",
+  "primitive": "Choice",
+  "options": [
+    "act",
+    "pass"
+  ],
+  "label_source": "paid-jev-1.13.0-decision; not truth",
+  "positive_label": "pos = paid Jev took action",
+  "base_rate": 0.5009974351667141,
+  "censoring_rate": 0.0,
+  "N": 5567,
+  "N_groups": 147,
+  "N_groups_by_split": {
+    "dev": 108,
+    "held": 30
+  },
+  "time_span_utc": [
+    "2026-09-27T11:22:51Z",
+    "2026-10-03T10:55:03Z"
+  ],
+  "temporal_cutoff_utc": "2026-10-02T16:23:21Z",
+  "blind_double_label": {
+    "n": 50,
+    "agree": 35,
+    "agreement": 0.7,
+    "cohen_kappa": 0.32188065099457497,
+    "status": "COMPLETE",
+    "labelers": [
+      "WildCarp",
+      "HazySpring"
+    ],
+    "packet": "b2ac1a83",
+    "seed": 20261004,
+    "rubric_sha256": "37772579cb7ae577d621c11c55e06846f83a5de4067391386179473ccc0c2488",
+    "sample_manifest_sha256": "de4304687a12ff50f246e26d7f4bf68c1c1b46611ba04baea9379dce4be1bc57",
+    "rubric_file_sha256": "092745fac4b96ad3acc906ed8e8a944173f123ec6d65354053a9ef31edf1281b",
+    "label_files_sha256": {
+      "vvkr-labels-wildcarp.json": "6fa7a28902a4dc5bd701f2925362ac894bca5f93756095f6cbe3914386e12f3d",
+      "vvkr-labels-hazyspring.json": "c8f510e703aedd40f1ea2fe1db01bfd99b9d390bb9cbca9059ba3481b024b94f"
+    }
+  },
+  "unit_path": "var/jev-bank/teacher-student/units.jsonl",
+  "units_sha256": "91fed64044f5e5be0f69042f95acb687bcc6df6690f343306dc398c18183a630",
+  "candidate_path": "var/jev-bank/teacher-student/candidate.json",
+  "candidate_sha256": "7e897ada23b912bf6b2414d577d29986bcb364bab6bb565314857f580279f8c9",
+  "source_files": 4283,
+  "source_hashed_files": 4283,
+  "source_manifest_sha256": "a2c0fe5b87a3c0471bb9c7932fee822274a10891e6fb43f63700ab71d9effec6",
+  "source_counts": {
+    "gate_joined": 2134,
+    "injection_joined": 124,
+    "injection_sources_joined": 234,
+    "injection_sources_missing": 268,
+    "memory_joined": 3463
+  },
+  "dropped": {
+    "over_32k_dropped": 0,
+    "local_over_1500_dropped": 0,
+    "duplicate_state": 154,
+    "conflicting_state": 0
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "task": "jev-u06-provider-output-redaction-noom",
+  "captured_at": "2026-09-30T17:43:03Z",
+  "runtime": "omp/18.4.4",
+  "source": {
+    "path": "work/omp-secret-probe/probe.mjs",
+    "sha256": "de88ab7ccec00be6b93d8799b13bc28c5bed75299ace89ed51c1dc05d5c3ebda",
+    "execution": "in-memory transformation only: removed --no-session and exposed scratchDir in the runner result; repository source unchanged"
+  },
+  "provider": "synthetic OpenAI-compatible HTTP provider bound to 127.0.0.1; no external requests",
+  "arms": [
+    {
+      "arm": "mask-enabled",
+      "omp_session_id": "01a0f369-70fa-74a7-86aa-0b4609eeeee6",
+      "session_timestamp": "2026-09-30T17:42:48.826Z",
+      "prompt_status": "completed",
+      "tool_name": "bash",
+      "tool_call_id": "call-u06-synthetic-output",
+      "tool_execution_is_error": false,
+      "host_tool_result": {
+        "synthetic_marker_present": true,
+        "benign_control_present": true,
+        "raw_frame_bytes": 382,
+        "raw_frame_sha256": "003ab39bccc0c5280c35688687afb6532ec609be55e38c064f32372f0545db89"
+      },
+      "provider_request": {
+        "request_count": 2,
+        "exact_body_bytes": 158418,
+        "sha256": "f9d91a9083770a2c6563f11a8bbe02b455cd8937ee902e7c8d9ba973c6978bce",
+        "synthetic_marker_present": false,
+        "benign_control_present": true,
+        "model_visible_tool_result_bytes": 161
+      }
+    },
+    {
+      "arm": "mask-disabled-planted-RED",
+      "omp_session_id": "01a0f369-a8f3-73c8-99a7-0fc0fd8d2bfe",
+      "session_timestamp": "2026-09-30T17:43:03.155Z",
+      "prompt_status": "completed",
+      "tool_name": "bash",
+      "tool_call_id": "call-u06-synthetic-output",
+      "tool_execution_is_error": false,
+      "host_tool_result": {
+        "synthetic_marker_present": true,
+        "benign_control_present": true,
+        "raw_frame_bytes": 381,
+        "raw_frame_sha256": "a061ddd3d0181c0e080d3111be29b99c98052f99af25d701d11585b488808ca1"
+      },
+      "provider_request": {
+        "request_count": 2,
+        "exact_body_bytes": 158406,
+        "sha256": "93984b52a086441ab5e0a6003f9025c52750be5b9b5638056559a2b9ed5fcc85",
+        "synthetic_marker_present": true,
+        "benign_control_present": true,
+        "model_visible_tool_result_bytes": 235
+      }
+    }
+  ],
+  "redaction": "Synthetic marker value, raw host frames, and provider request bodies are not present in this receipt or tool output. The isolated persisted test sessions retain generated synthetic test data in their temp HOME logs.",
+  "excluded_attempt": "One preliminary mask-enabled RPC session was excluded: the capture wrapper omitted scratchDir from its summary and failed while resolving the persisted session ID after the model turn. It was not counted in this paired result.",
+  "boundary": "Two fresh file-persisted OMP RPC sessions against a local fake provider only; no Jev/TypeSafe calls, real credentials, active fleet session, non-author source review, or U06 closure."
+}

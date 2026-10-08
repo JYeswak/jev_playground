@@ -1,0 +1,4 @@
+Working...
+Fixed `kmerge.py` with heap-based k-way merge: `(key, stream_index)` heap entries guarantee stability, `iter()`/`next()` handles generators and empty streams, no value comparison.
+
+Verified in `$PWD`: sorted merge, stability both orders, list/generator/outer-generator inputs, empty inner/outer streams, `key=None` default, intra-stream dupes — all pass.

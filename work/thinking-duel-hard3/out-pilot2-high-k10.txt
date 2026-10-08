@@ -1,0 +1,6 @@
+Working...
+Fixed `bucket.py`: `take()` now does one `now()` read, clamps negative elapsed, caps refill at `burst` via `min`, and holds `self.lock` for refill+check+deduct.
+
+Bugs removed: unlocked read-modify-write race, double `now()` TOCTOU, uncapped `tokens += elapsed*rate` over-refill.
+
+Verified stdlib-only with fake clock + threads: drain/refuse, 1000s idle caps at `burst` (9.0 after take), continuous refill math, 1 clock read per `take`, 20-thread no-refill race sums to exactly 100/100, frozen-clock 10-thread race sums to exactly 50/50, failed `take(n)` deducts nothing.

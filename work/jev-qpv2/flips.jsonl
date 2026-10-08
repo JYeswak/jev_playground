@@ -1,1 +1,13 @@
 {"ts": "2026-10-02T21:29:00Z", "block": "2026-10-02T20:00:00Z", "state": "ON", "note": "seeded by WildCarp: switch file pre-existed (2026-10-01T13:22Z, 0 bytes); flip.py 21:28Z confirms already-ON, no transition. No outcome data inspected."}
+{"ts": "2026-10-03T02:02:00Z", "block": "2026-10-03T00:00:00Z", "state": "OFF"}
+{"ts": "2026-10-03T06:02:00Z", "block": "2026-10-03T04:00:00Z", "state": "ON"}
+{"ts": "2026-10-03T10:02:00Z", "block": "2026-10-03T08:00:00Z", "state": "OFF"}
+{"ts": "2026-10-03T14:02:00Z", "block": "2026-10-03T12:00:00Z", "state": "ON"}
+{"ts": "2026-10-03T18:02:00Z", "block": "2026-10-03T16:00:00Z", "state": "OFF"}
+{"ts": "2026-10-03T22:02:00Z", "block": "2026-10-03T20:00:00Z", "state": "ON"}
+{"ts": "2026-10-04T02:02:01Z", "block": "2026-10-04T00:00:00Z", "state": "OFF"}
+{"ts": "2026-10-04T06:02:00Z", "block": "2026-10-04T04:00:00Z", "state": "ON"}
+{"ts": "2026-10-04T10:02:00Z", "block": "2026-10-04T08:00:00Z", "state": "OFF"}
+{"ts": "2026-10-04T14:02:00Z", "block": "2026-10-04T12:00:00Z", "state": "ON"}
+{"ts": "2026-10-04T18:02:00Z", "block": "2026-10-04T16:00:00Z", "state": "OFF"}
+{"ts": "2026-10-04T20:43:04Z", "block": "2026-10-04T20:00:00Z", "state": "ON"}

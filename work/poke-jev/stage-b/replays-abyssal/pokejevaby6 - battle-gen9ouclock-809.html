@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-809</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-809<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby6</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot6</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-809|init|battle
+|title|pokejevaby6 vs. abyssalbot6
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot6
+|gametype|singles
+|player|p1|pokejevaby6|pokekid|
+|player|p2|abyssalbot6|swimmerf-gen4dp|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Ninetales, F|
+|poke|p1|Ceruledge, F|
+|poke|p1|Venusaur, M|
+|poke|p1|Hatterene, F|
+|poke|p1|Great Tusk|
+|poke|p1|Walking Wake|
+|poke|p2|Darkrai|
+|poke|p2|Great Tusk|
+|poke|p2|Ogerpon-Wellspring, F|
+|poke|p2|Gholdengo|
+|poke|p2|Dragonite, M|
+|poke|p2|Ting-Lu|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|start
+|switch|p1a: Hatterene|Hatterene, F|318/318
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Hatterene
+|-damage|p1a: Hatterene|123/318
+|-enditem|p1a: Hatterene|Eject Button
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Venusaur|Venusaur, M|301/301
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Ogerpon|U-turn|p1a: Venusaur
+|-damage|p1a: Venusaur|197/301
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Dragonite|Dragonite, M|100/100|[from] U-turn
+|move|p1a: Venusaur|Sludge Bomb|p2a: Dragonite
+|-damage|p2a: Dragonite|75/100
+|-damage|p1a: Venusaur|167/301|[from] item: Life Orb
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Great Tusk|Great Tusk|434/434
+|move|p2a: Dragonite|Earthquake|p1a: Great Tusk
+|-damage|p1a: Great Tusk|331/434
+|upkeep
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Great Tusk|Ice Spinner|p2a: Dragonite
+|-supereffective|p2a: Dragonite
+|-damage|p2a: Dragonite|0 fnt
+|faint|p2a: Dragonite
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-end|p1a: Great Tusk|Protosynthesis|[silent]
+|switch|p1a: Venusaur|Venusaur, M|167/301
+|move|p2a: Ogerpon|Power Whip|p1a: Venusaur
+|-resisted|p1a: Venusaur
+|-damage|p1a: Venusaur|93/301
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Ogerpon|U-turn|p1a: Venusaur
+|-damage|p1a: Venusaur|0 fnt
+|faint|p1a: Venusaur
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Gholdengo|Gholdengo|100/100|[from] U-turn
+|-item|p2a: Gholdengo|Air Balloon
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 10 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Ninetales|Ninetales, F|349/349
+|-weather|SunnyDay|[from] ability: Drought|[of] p1a: Ninetales
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Ninetales|Flamethrower|p2a: Gholdengo
+|-supereffective|p2a: Gholdengo
+|-damage|p2a: Gholdengo|21/100
+|-enditem|p2a: Gholdengo|Air Balloon
+|move|p2a: Gholdengo|Shadow Ball|p1a: Ninetales
+|-damage|p1a: Ninetales|226/349
+|-weather|SunnyDay|[upkeep]
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Ninetales|Flamethrower|p2a: Gholdengo
+|-supereffective|p2a: Gholdengo
+|-damage|p2a: Gholdengo|0 fnt
+|faint|p2a: Gholdengo
+|-weather|SunnyDay|[upkeep]
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Ninetales
+|-resisted|p1a: Ninetales
+|-damage|p1a: Ninetales|81/349
+|move|p1a: Ninetales|Flamethrower|p2a: Ogerpon
+|-damage|p2a: Ogerpon|53/100
+|-weather|SunnyDay|[upkeep]
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Ninetales
+|-resisted|p1a: Ninetales
+|-damage|p1a: Ninetales|0 fnt
+|faint|p1a: Ninetales
+|-weather|SunnyDay|[upkeep]
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Ceruledge|Ceruledge, F|291/291
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Knock Off|p1a: Ceruledge
+|-supereffective|p1a: Ceruledge
+|-enditem|p1a: Ceruledge|Focus Sash
+|-damage|p1a: Ceruledge|1/291
+|-ability|p1a: Ceruledge|Weak Armor|boost
+|-unboost|p1a: Ceruledge|def|1
+|-boost|p1a: Ceruledge|spe|2
+|move|p1a: Ceruledge|Bitter Blade|p2a: Ogerpon
+|-damage|p2a: Ogerpon|0 fnt
+|-heal|p1a: Ceruledge|81/291|[from] drain|[of] p2a: Ogerpon
+|faint|p2a: Ogerpon
+|-weather|SunnyDay|[upkeep]
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Darkrai|Darkrai|100/100
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Great Tusk|Great Tusk|331/434
+|-activate|p1a: Great Tusk|ability: Protosynthesis
+|-start|p1a: Great Tusk|protosynthesisspe
+|move|p2a: Darkrai|Nasty Plot|p2a: Darkrai
+|-boost|p2a: Darkrai|spa|2
+|-weather|SunnyDay|[upkeep]
+|upkeep
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Great Tusk|Headlong Rush|p2a: Darkrai
+|-damage|p2a: Darkrai|45/100
+|-unboost|p1a: Great Tusk|def|1
+|-unboost|p1a: Great Tusk|spd|1
+|move|p2a: Darkrai|Ice Beam|p1a: Great Tusk
+|-supereffective|p1a: Great Tusk
+|-damage|p1a: Great Tusk|0 fnt
+|faint|p1a: Great Tusk
+|-end|p1a: Great Tusk|Protosynthesis|[silent]
+|-weather|SunnyDay|[upkeep]
+|-heal|p2a: Darkrai|52/100|[from] item: Leftovers
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Walking Wake|Walking Wake|339/339
+|-activate|p1a: Walking Wake|ability: Protosynthesis
+|-start|p1a: Walking Wake|protosynthesisspa
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Darkrai|Dark Pulse|p1a: Walking Wake
+|-damage|p1a: Walking Wake|72/339
+|move|p1a: Walking Wake|Draco Meteor|p2a: Darkrai
+|-damage|p2a: Darkrai|0 fnt
+|-unboost|p1a: Walking Wake|spa|2
+|faint|p2a: Darkrai
+|-weather|none
+|-end|p1a: Walking Wake|Protosynthesis
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Walking Wake|Draco Meteor|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|76/100
+|-unboost|p1a: Walking Wake|spa|2
+|move|p2a: Ting-Lu|Spikes|p1a: Walking Wake
+|-sidestart|p1: pokejevaby6|Spikes
+|-heal|p2a: Ting-Lu|82/100|[from] item: Leftovers
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-end|p1a: Walking Wake|Protosynthesis|[silent]
+|switch|p1a: Hatterene|Hatterene, F|123/318
+|-damage|p1a: Hatterene|84/318|[from] Spikes
+|move|p2a: Ting-Lu|Earthquake|p1a: Hatterene
+|-damage|p1a: Hatterene|0 fnt
+|faint|p1a: Hatterene
+|-heal|p2a: Ting-Lu|88/100|[from] item: Leftovers
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Walking Wake|Walking Wake|72/339
+|-damage|p1a: Walking Wake|30/339|[from] Spikes
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Walking Wake|Hydro Steam|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|34/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Walking Wake
+|-damage|p1a: Walking Wake|0 fnt
+|faint|p1a: Walking Wake
+|-end|p1a: Walking Wake|Protosynthesis|[silent]
+|-heal|p2a: Ting-Lu|40/100|[from] item: Leftovers
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Ceruledge|Ceruledge, F|81/291
+|-damage|p1a: Ceruledge|45/291|[from] Spikes
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Ceruledge|Solar Blade||[still]
+|-prepare|p1a: Ceruledge|Solar Blade
+|move|p2a: Ting-Lu|Earthquake|p1a: Ceruledge
+|-supereffective|p1a: Ceruledge
+|-damage|p1a: Ceruledge|0 fnt
+|faint|p1a: Ceruledge
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

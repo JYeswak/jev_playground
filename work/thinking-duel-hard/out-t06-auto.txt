@@ -1,0 +1,4 @@
+Working...
+Fixed `touches.py:7` — `ranks.add(i)` → `ranks.add(i + 1)`. Was returning 0-based ranks; spec is sorted unique 1-based.
+
+Verified 9 cases (exact, `/hit` suffix, substring, empty value/hits/entry, duplicates, no-match) — all pass.

@@ -1,0 +1,3 @@
+Working...
+Fix error clarity first with one shared Zod payment schema for client + server to kill drift. Switch client to `mode: onBlur` + `reValidateMode: onChange` so errors appear after leaving a field then clear live. Replace generic "Invalid input" with per-field messages attached via `path` and rendered inline with `aria-invalid`, `aria-describedby`, `role="alert"`. Preserve form state on server 400s and map `details` back with `setError` instead of resetting or alert().
+

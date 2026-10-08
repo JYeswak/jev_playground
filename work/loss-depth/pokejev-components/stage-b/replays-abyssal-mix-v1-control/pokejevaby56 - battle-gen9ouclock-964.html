@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-964</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-964<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby56</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot56</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-964|init|battle
+|title|pokejevaby56 vs. abyssalbot56
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot56
+|gametype|singles
+|player|p1|pokejevaby56|triathleterunnerf-gen3|
+|player|p2|abyssalbot56|twins-gen2|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Zapdos|
+|poke|p1|Hydrapple, M|
+|poke|p1|Zamazenta-*|
+|poke|p1|Slowking-Galar, F|
+|poke|p1|Tinkaton, F|
+|poke|p1|Ting-Lu|
+|poke|p2|Darkrai|
+|poke|p2|Great Tusk|
+|poke|p2|Ogerpon-Wellspring, F|
+|poke|p2|Gholdengo|
+|poke|p2|Dragonite, M|
+|poke|p2|Ting-Lu|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|start
+|switch|p1a: Zapdos|Zapdos|383/383
+|switch|p2a: Great Tusk|Great Tusk|100/100
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zapdos|Hurricane|p2a: Great Tusk
+|-supereffective|p2a: Great Tusk
+|-damage|p2a: Great Tusk|0 fnt
+|faint|p2a: Great Tusk
+|-end|p2a: Great Tusk|Protosynthesis|[silent]
+|upkeep
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|switch|p2a: Darkrai|Darkrai|100/100
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Darkrai|Nasty Plot|p2a: Darkrai
+|-boost|p2a: Darkrai|spa|2
+|move|p1a: Zapdos|Volt Switch|p2a: Darkrai
+|-damage|p2a: Darkrai|68/100
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|325/325|[from] Volt Switch
+|-ability|p1a: Zamazenta|Dauntless Shield|boost
+|-boost|p1a: Zamazenta|def|1
+|-heal|p2a: Darkrai|74/100|[from] item: Leftovers
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Close Combat|p2a: Darkrai
+|-supereffective|p2a: Darkrai
+|-damage|p2a: Darkrai|0 fnt
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|faint|p2a: Darkrai
+|upkeep
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|switch|p2a: Dragonite|Dragonite, M|100/100
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Stone Edge|p2a: Dragonite|[miss]
+|-miss|p1a: Zamazenta|p2a: Dragonite
+|move|p2a: Dragonite|Earthquake|p1a: Zamazenta
+|-damage|p1a: Zamazenta|206/325
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Stone Edge|p2a: Dragonite
+|-supereffective|p2a: Dragonite
+|-damage|p2a: Dragonite|68/100
+|move|p2a: Dragonite|Earthquake|p1a: Zamazenta
+|-damage|p1a: Zamazenta|85/325
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Close Combat|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|41/100
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|move|p2a: Dragonite|Earthquake|p1a: Zamazenta
+|-damage|p1a: Zamazenta|0 fnt
+|faint|p1a: Zamazenta
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|513/513
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Dragonite|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|430/513
+|move|p1a: Ting-Lu|Body Press|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|27/100
+|-heal|p1a: Ting-Lu|462/513|[from] item: Leftovers
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Dragonite|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|381/513
+|move|p1a: Ting-Lu|Body Press|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|14/100
+|-heal|p1a: Ting-Lu|413/513|[from] item: Leftovers
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Dragonite|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|331/513
+|move|p1a: Ting-Lu|Body Press|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|0 fnt
+|faint|p2a: Dragonite
+|-heal|p1a: Ting-Lu|363/513|[from] item: Leftovers
+|upkeep
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Ting-Lu
+|-supereffective|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|51/513
+|move|p1a: Ting-Lu|Earthquake|p2a: Ogerpon
+|-resisted|p2a: Ogerpon
+|-damage|p2a: Ogerpon|74/100
+|-heal|p1a: Ting-Lu|83/513|[from] item: Leftovers
+|upkeep
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Ting-Lu|[miss]
+|-miss|p2a: Ogerpon|p1a: Ting-Lu
+|move|p1a: Ting-Lu|Earthquake|p2a: Ogerpon
+|-resisted|p2a: Ogerpon
+|-damage|p2a: Ogerpon|48/100
+|-heal|p1a: Ting-Lu|115/513|[from] item: Leftovers
+|upkeep
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Ting-Lu
+|-supereffective|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|0 fnt
+|faint|p1a: Ting-Lu
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, F|393/393
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Knock Off|p1a: Slowking
+|-supereffective|p1a: Slowking
+|-damage|p1a: Slowking|67/393
+|-enditem|p1a: Slowking|Heavy-Duty Boots|[from] move: Knock Off|[of] p2a: Ogerpon
+|move|p1a: Slowking|Sludge Bomb|p2a: Ogerpon
+|-supereffective|p2a: Ogerpon
+|-damage|p2a: Ogerpon|0 fnt
+|faint|p2a: Ogerpon
+|upkeep
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Ting-Lu|Spikes|p1a: Slowking
+|-sidestart|p1: pokejevaby56|Spikes
+|move|p1a: Slowking|Future Sight|p2a: Ting-Lu
+|-start|p1a: Slowking|move: Future Sight
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Ting-Lu|Earthquake|p1a: Slowking
+|-supereffective|p1a: Slowking
+|-damage|p1a: Slowking|0 fnt
+|faint|p1a: Slowking
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|switch|p1a: Tinkaton|Tinkaton, F|373/373
+|-ability|p1a: Tinkaton|Mold Breaker
+|-item|p1a: Tinkaton|Air Balloon
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Gigaton Hammer|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|78/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-end|p2a: Ting-Lu|move: Future Sight
+|-immune|p2a: Ting-Lu
+|-heal|p2a: Ting-Lu|84/100|[from] item: Leftovers
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|91/100|[from] item: Leftovers
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Gigaton Hammer|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|68/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|74/100|[from] item: Leftovers
+|upkeep
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|81/100|[from] item: Leftovers
+|upkeep
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Gigaton Hammer|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|57/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|63/100|[from] item: Leftovers
+|upkeep
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|70/100|[from] item: Leftovers
+|upkeep
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Gigaton Hammer|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|44/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|51/100|[from] item: Leftovers
+|upkeep
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|57/100|[from] item: Leftovers
+|upkeep
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Gigaton Hammer|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|34/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|40/100|[from] item: Leftovers
+|upkeep
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|46/100|[from] item: Leftovers
+|upkeep
+|turn|26
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Gigaton Hammer|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|21/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|27/100|[from] item: Leftovers
+|upkeep
+|turn|27
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|33/100|[from] item: Leftovers
+|upkeep
+|turn|28
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Gigaton Hammer|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|10/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|16/100|[from] item: Leftovers
+|upkeep
+|turn|29
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|23/100|[from] item: Leftovers
+|upkeep
+|turn|30
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Gigaton Hammer|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|1/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Tinkaton
+|-immune|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|7/100|[from] item: Leftovers
+|upkeep
+|turn|31
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|187/373
+|-enditem|p1a: Tinkaton|Air Balloon
+|-heal|p2a: Ting-Lu|13/100|[from] item: Leftovers
+|upkeep
+|turn|32
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|94/373
+|-heal|p2a: Ting-Lu|19/100|[from] item: Leftovers
+|upkeep
+|turn|33
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|47/373
+|-heal|p2a: Ting-Lu|26/100|[from] item: Leftovers
+|upkeep
+|turn|34
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|24/373
+|-heal|p2a: Ting-Lu|32/100|[from] item: Leftovers
+|upkeep
+|turn|35
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|12/373
+|-heal|p2a: Ting-Lu|38/100|[from] item: Leftovers
+|upkeep
+|turn|36
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|6/373
+|-heal|p2a: Ting-Lu|44/100|[from] item: Leftovers
+|upkeep
+|turn|37
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|3/373
+|-heal|p2a: Ting-Lu|51/100|[from] item: Leftovers
+|upkeep
+|turn|38
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|2/373
+|-heal|p2a: Ting-Lu|57/100|[from] item: Leftovers
+|upkeep
+|turn|39
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|1/373
+|-heal|p2a: Ting-Lu|63/100|[from] item: Leftovers
+|upkeep
+|turn|40
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Tinkaton|Thunder Wave|p2a: Ting-Lu
+|-immune|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Ruination|p1a: Tinkaton
+|-damage|p1a: Tinkaton|0 fnt
+|faint|p1a: Tinkaton
+|-heal|p2a: Ting-Lu|69/100|[from] item: Leftovers
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|switch|p1a: Zapdos|Zapdos|383/383
+|turn|41
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zapdos|Hurricane|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|52/100
+|move|p2a: Ting-Lu|Ruination|p1a: Zapdos|[miss]
+|-miss|p2a: Ting-Lu|p1a: Zapdos
+|-heal|p2a: Ting-Lu|58/100|[from] item: Leftovers
+|upkeep
+|turn|42
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zapdos|Hurricane|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|39/100
+|move|p2a: Ting-Lu|Ruination|p1a: Zapdos
+|-damage|p1a: Zapdos|192/383
+|-heal|p2a: Ting-Lu|46/100|[from] item: Leftovers
+|upkeep
+|turn|43
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zapdos|Hurricane|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|25/100
+|-start|p2a: Ting-Lu|confusion
+|-activate|p2a: Ting-Lu|confusion
+|move|p2a: Ting-Lu|Ruination|p1a: Zapdos
+|-damage|p1a: Zapdos|96/383
+|-heal|p2a: Ting-Lu|31/100|[from] item: Leftovers
+|upkeep
+|turn|44
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zapdos|Hurricane|p2a: Ting-Lu|[miss]
+|-miss|p1a: Zapdos|p2a: Ting-Lu
+|-activate|p2a: Ting-Lu|confusion
+|-damage|p2a: Ting-Lu|26/100|[from] confusion
+|-heal|p2a: Ting-Lu|32/100|[from] item: Leftovers
+|upkeep
+|turn|45
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zapdos|Hurricane|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|12/100
+|-activate|p2a: Ting-Lu|confusion
+|move|p2a: Ting-Lu|Ruination|p1a: Zapdos
+|-damage|p1a: Zapdos|48/383
+|-heal|p2a: Ting-Lu|18/100|[from] item: Leftovers
+|upkeep
+|turn|46
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zapdos|Hurricane|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|0 fnt
+|faint|p2a: Ting-Lu
+|upkeep
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|switch|p2a: Gholdengo|Gholdengo|100/100
+|-item|p2a: Gholdengo|Air Balloon
+|turn|47
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zapdos|Volt Switch|p2a: Gholdengo
+|-crit|p2a: Gholdengo
+|-damage|p2a: Gholdengo|61/100
+|-enditem|p2a: Gholdengo|Air Balloon
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|switch|p1a: Hydrapple|Hydrapple, M|415/415|[from] Volt Switch
+|move|p2a: Gholdengo|Nasty Plot|p2a: Gholdengo
+|-boost|p2a: Gholdengo|spa|2
+|upkeep
+|turn|48
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Gholdengo|Dazzling Gleam|p1a: Hydrapple
+|-supereffective|p1a: Hydrapple
+|-damage|p1a: Hydrapple|41/415
+|move|p1a: Hydrapple|Earth Power|p2a: Gholdengo
+|-supereffective|p2a: Gholdengo
+|-damage|p2a: Gholdengo|12/100
+|upkeep
+|turn|49
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p2a: Gholdengo|Dazzling Gleam|p1a: Hydrapple
+|-supereffective|p1a: Hydrapple
+|-damage|p1a: Hydrapple|0 fnt
+|faint|p1a: Hydrapple
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|switch|p1a: Zapdos|Zapdos|48/383
+|turn|50
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby56 has 15 seconds left this turn.
+|inactive|abyssalbot56 has 15 seconds left this turn.
+|move|p1a: Zapdos|Hurricane|p2a: Gholdengo|[miss]
+|-miss|p1a: Zapdos|p2a: Gholdengo
+|move|p2a: Gholdengo|Shadow Ball|p1a: Zapdos
+|-damage|p1a: Zapdos|0 fnt
+|faint|p1a: Zapdos
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

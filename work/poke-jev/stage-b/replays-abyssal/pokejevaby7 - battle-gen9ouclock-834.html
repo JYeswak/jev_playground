@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-834</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-834<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby7</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot7</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-834|init|battle
+|title|pokejevaby7 vs. abyssalbot7
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot7
+|gametype|singles
+|player|p1|pokejevaby7|ash-sinnoh|
+|player|p2|abyssalbot7|elesa-masters|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Ting-Lu|
+|poke|p1|Dragapult, F|
+|poke|p1|Slowking-Galar, F|
+|poke|p1|Kingambit, F|
+|poke|p1|Gliscor, F|
+|poke|p1|Zamazenta-*|
+|poke|p2|Blissey, F|
+|poke|p2|Ditto|
+|poke|p2|Dondozo, F|
+|poke|p2|Toxapex, F|
+|poke|p2|Alomomola, F|
+|poke|p2|Ting-Lu|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|start
+|switch|p1a: Kingambit|Kingambit, F|399/399
+|switch|p2a: Ditto|Ditto|100/100
+|-transform|p2a: Ditto|p1a: Kingambit|[from] ability: Imposter
+|-item|p2a: Ditto|Air Balloon
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p2a: Ditto|Kowtow Cleave|p1a: Kingambit
+|-resisted|p1a: Kingambit
+|-crit|p1a: Kingambit
+|-damage|p1a: Kingambit|282/399
+|move|p1a: Kingambit|Swords Dance|p1a: Kingambit
+|-boost|p1a: Kingambit|atk|2
+|-heal|p1a: Kingambit|306/399|[from] item: Leftovers
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Kingambit|Iron Head|p2a: Ditto
+|-resisted|p2a: Ditto
+|-damage|p2a: Ditto|56/100
+|-enditem|p2a: Ditto|Air Balloon
+|move|p2a: Ditto|Swords Dance|p2a: Ditto
+|-boost|p2a: Ditto|atk|2
+|-heal|p1a: Kingambit|330/399|[from] item: Leftovers
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Ditto
+|-resisted|p2a: Ditto
+|-damage|p2a: Ditto|13/100
+|move|p2a: Ditto|Kowtow Cleave|p1a: Kingambit
+|-resisted|p1a: Kingambit
+|-damage|p1a: Kingambit|185/399
+|-heal|p1a: Kingambit|209/399|[from] item: Leftovers
+|upkeep
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Ditto
+|-resisted|p2a: Ditto
+|-damage|p2a: Ditto|0 fnt
+|faint|p2a: Ditto
+|-end|p2a: Ditto|fallenundefined|[silent]
+|-heal|p1a: Kingambit|233/399|[from] item: Leftovers
+|upkeep
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallenundefined|[silent]
+|switch|p1a: Zamazenta|Zamazenta|345/345
+|-ability|p1a: Zamazenta|Dauntless Shield|boost
+|-boost|p1a: Zamazenta|def|1
+|move|p2a: Ting-Lu|Spikes|p1a: Zamazenta
+|-sidestart|p1: pokejevaby7|Spikes
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Close Combat|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-crit|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|6/100
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Zamazenta
+|-damage|p1a: Zamazenta|227/345
+|upkeep
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Close Combat|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-crit|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|0 fnt
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|faint|p2a: Ting-Lu
+|upkeep
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|switch|p2a: Toxapex|Toxapex, F|100/100
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Stone Edge|p2a: Toxapex
+|-damage|p2a: Toxapex|82/100
+|move|p2a: Toxapex|Toxic Spikes|p1a: Zamazenta
+|-sidestart|p1: pokejevaby7|move: Toxic Spikes
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|switch|p1a: Dragapult|Dragapult, F|317/317
+|move|p2a: Toxapex|Toxic|p1a: Dragapult
+|-status|p1a: Dragapult|tox
+|-damage|p1a: Dragapult|298/317 tox|[from] psn
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Dragapult|Draco Meteor|p2a: Toxapex
+|-damage|p2a: Toxapex|34/100
+|-unboost|p1a: Dragapult|spa|2
+|move|p2a: Toxapex|Toxic|p1a: Dragapult
+|-fail|p1a: Dragapult|tox
+|-damage|p1a: Dragapult|260/317 tox|[from] psn
+|upkeep
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Dragapult|Draco Meteor|p2a: Toxapex
+|-damage|p2a: Toxapex|10/100
+|-unboost|p1a: Dragapult|spa|2
+|move|p2a: Toxapex|Toxic|p1a: Dragapult
+|-fail|p1a: Dragapult|tox
+|-damage|p1a: Dragapult|203/317 tox|[from] psn
+|upkeep
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Dragapult|Draco Meteor|p2a: Toxapex
+|-damage|p2a: Toxapex|0 fnt
+|-unboost|p1a: Dragapult|spa|2
+|faint|p2a: Toxapex
+|-damage|p1a: Dragapult|127/317 tox|[from] psn
+|upkeep
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|switch|p2a: Alomomola|Alomomola, F|100/100
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Dragapult|U-turn|p2a: Alomomola
+|-damage|p2a: Alomomola|91/100
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|227/345|[from] U-turn
+|move|p2a: Alomomola|Chilling Water|p1a: Zamazenta
+|-damage|p1a: Zamazenta|200/345
+|-unboost|p1a: Zamazenta|atk|1
+|upkeep
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Close Combat|p2a: Alomomola
+|-damage|p2a: Alomomola|71/100
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|move|p2a: Alomomola|Chilling Water|p1a: Zamazenta
+|-damage|p1a: Zamazenta|163/345
+|-unboost|p1a: Zamazenta|atk|1
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Close Combat|p2a: Alomomola
+|-damage|p2a: Alomomola|55/100
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|move|p2a: Alomomola|Chilling Water|p1a: Zamazenta
+|-crit|p1a: Zamazenta
+|-damage|p1a: Zamazenta|91/345
+|-unboost|p1a: Zamazenta|atk|1
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|switch|p1a: Kingambit|Kingambit, F|233/399
+|-damage|p1a: Kingambit|184/399|[from] Spikes
+|move|p2a: Alomomola|Chilling Water|p1a: Kingambit
+|-damage|p1a: Kingambit|153/399
+|-unboost|p1a: Kingambit|atk|1
+|-heal|p1a: Kingambit|177/399|[from] item: Leftovers
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Alomomola
+|-damage|p2a: Alomomola|41/100
+|move|p2a: Alomomola|Chilling Water|p1a: Kingambit
+|-damage|p1a: Kingambit|143/399
+|-unboost|p1a: Kingambit|atk|1
+|-heal|p1a: Kingambit|167/399|[from] item: Leftovers
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Alomomola
+|-damage|p2a: Alomomola|30/100
+|move|p2a: Alomomola|Chilling Water|p1a: Kingambit
+|-damage|p1a: Kingambit|134/399
+|-unboost|p1a: Kingambit|atk|1
+|-heal|p1a: Kingambit|158/399|[from] item: Leftovers
+|upkeep
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Alomomola
+|-damage|p2a: Alomomola|21/100
+|move|p2a: Alomomola|Chilling Water|p1a: Kingambit
+|-damage|p1a: Kingambit|124/399
+|-unboost|p1a: Kingambit|atk|1
+|-heal|p1a: Kingambit|148/399|[from] item: Leftovers
+|upkeep
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Alomomola
+|-damage|p2a: Alomomola|14/100
+|move|p2a: Alomomola|Chilling Water|p1a: Kingambit
+|-damage|p1a: Kingambit|112/399
+|-unboost|p1a: Kingambit|atk|1
+|-heal|p1a: Kingambit|136/399|[from] item: Leftovers
+|upkeep
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Alomomola
+|-damage|p2a: Alomomola|7/100
+|move|p2a: Alomomola|Chilling Water|p1a: Kingambit
+|-damage|p1a: Kingambit|100/399
+|-unboost|p1a: Kingambit|atk|1
+|-heal|p1a: Kingambit|124/399|[from] item: Leftovers
+|upkeep
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p2a: Alomomola|Chilling Water|p1a: Kingambit
+|-damage|p1a: Kingambit|87/399
+|move|p1a: Kingambit|Kowtow Cleave|p2a: Alomomola
+|-damage|p2a: Alomomola|0 fnt
+|faint|p2a: Alomomola
+|-heal|p1a: Kingambit|111/399|[from] item: Leftovers
+|upkeep
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|switch|p2a: Dondozo|Dondozo, F|100/100
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallenundefined|[silent]
+|switch|p1a: Dragapult|Dragapult, F|127/317 tox
+|move|p2a: Dondozo|Body Press|p1a: Dragapult
+|-immune|p1a: Dragapult
+|-damage|p1a: Dragapult|108/317 tox|[from] psn
+|upkeep
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Dragapult|Draco Meteor|p2a: Dondozo
+|-damage|p2a: Dondozo|49/100
+|-unboost|p1a: Dragapult|spa|2
+|move|p2a: Dondozo|Avalanche|p1a: Dragapult
+|-supereffective|p1a: Dragapult
+|-damage|p1a: Dragapult|0 fnt
+|faint|p1a: Dragapult
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, F|394/394
+|-sideend|p1: pokejevaby7|move: Toxic Spikes|[of] p1a: Slowking
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Slowking|Sludge Bomb|p2a: Dondozo
+|-damage|p2a: Dondozo|16/100
+|-status|p2a: Dondozo|psn
+|move|p2a: Dondozo|Avalanche|p1a: Slowking
+|-damage|p1a: Slowking|287/394
+|-damage|p2a: Dondozo|3/100 psn|[from] psn
+|upkeep
+|turn|26
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Slowking|Sludge Bomb|p2a: Dondozo
+|-damage|p2a: Dondozo|0 fnt
+|faint|p2a: Dondozo
+|upkeep
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|switch|p2a: Blissey|Blissey, F|100/100
+|turn|27
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|91/345
+|move|p2a: Blissey|Calm Mind|p2a: Blissey
+|-boost|p2a: Blissey|spa|1
+|-boost|p2a: Blissey|spd|1
+|upkeep
+|turn|28
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby7 has 15 seconds left this turn.
+|inactive|abyssalbot7 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Close Combat|p2a: Blissey
+|-supereffective|p2a: Blissey
+|-damage|p2a: Blissey|0 fnt
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|faint|p2a: Blissey
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

@@ -1,0 +1,4 @@
+Working...
+Fixed `retrypy.py`: transient-only retry, `Retry-After` honored case-insensitively with float parse and backoff fallback, `0.1*2^attempt` with 0.5–1.0 jitter, total sleep clipped to 2.0s, no sleep after final attempt, `PermanentError` on non-transient, body on 200.
+
+Verified: 200 passthrough, 400/404/418/422 and 500 immediate with zero sleeps, 429/502/503/504 + `TransientError` retried, `Retry-After: 0.7` exact, backoff in `[0.5*base, base]`, totals capped at 2.0s for `Retry-After: 5` and 20-retry runs, exhausted raises.

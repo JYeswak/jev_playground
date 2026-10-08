@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-1679</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-1679<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby55</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot55</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-1679|init|battle
+|title|pokejevaby55 vs. abyssalbot55
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot55
+|gametype|singles
+|player|p1|pokejevaby55|daisy-gen3|
+|player|p2|abyssalbot55|boarder-gen2|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Lokix, M|
+|poke|p1|Pecharunt|
+|poke|p1|Zamazenta-*|
+|poke|p1|Ting-Lu|
+|poke|p1|Latios, M|
+|poke|p1|Gliscor, M|
+|poke|p2|Zapdos|
+|poke|p2|Hydrapple, F|
+|poke|p2|Zamazenta-*|
+|poke|p2|Slowking-Galar, M|
+|poke|p2|Tinkaton, F|
+|poke|p2|Ting-Lu|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|start
+|switch|p1a: Zamazenta|Zamazenta|325/325
+|switch|p2a: Zapdos|Zapdos|100/100
+|-ability|p1a: Zamazenta|Dauntless Shield|boost
+|-boost|p1a: Zamazenta|def|1
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Stone Edge|p2a: Zapdos
+|-supereffective|p2a: Zapdos
+|-crit|p2a: Zapdos
+|-damage|p2a: Zapdos|1/100
+|move|p2a: Zapdos|Hurricane|p1a: Zamazenta
+|-supereffective|p1a: Zamazenta
+|-damage|p1a: Zamazenta|29/325
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Stone Edge|p2a: Zapdos
+|-supereffective|p2a: Zapdos
+|-damage|p2a: Zapdos|0 fnt
+|faint|p2a: Zapdos
+|upkeep
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Slowking|Slowking-Galar, M|100/100
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Crunch|p2a: Slowking
+|-supereffective|p2a: Slowking
+|-damage|p2a: Slowking|49/100
+|move|p2a: Slowking|Future Sight|p1a: Zamazenta
+|-start|p2a: Slowking|move: Future Sight
+|upkeep
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|514/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Slowking|Future Sight||[still]
+|-fail|p2a: Slowking
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Ruination|p2a: Slowking
+|-damage|p2a: Slowking|25/100
+|move|p2a: Slowking|Flamethrower|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|465/514
+|-end|p1a: Ting-Lu|move: Future Sight
+|-immune|p1a: Ting-Lu
+|-heal|p1a: Ting-Lu|497/514|[from] item: Leftovers
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Ruination|p2a: Slowking
+|-damage|p2a: Slowking|13/100
+|move|p2a: Slowking|Flamethrower|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|445/514
+|-heal|p1a: Ting-Lu|477/514|[from] item: Leftovers
+|upkeep
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Ruination|p2a: Slowking
+|-damage|p2a: Slowking|7/100
+|move|p2a: Slowking|Flamethrower|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|430/514
+|-heal|p1a: Ting-Lu|462/514|[from] item: Leftovers
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Ruination|p2a: Slowking
+|-damage|p2a: Slowking|4/100
+|move|p2a: Slowking|Flamethrower|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|414/514
+|-heal|p1a: Ting-Lu|446/514|[from] item: Leftovers
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Ruination|p2a: Slowking
+|-damage|p2a: Slowking|2/100
+|move|p2a: Slowking|Flamethrower|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|398/514
+|-heal|p1a: Ting-Lu|430/514|[from] item: Leftovers
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Ruination|p2a: Slowking
+|-damage|p2a: Slowking|1/100
+|move|p2a: Slowking|Flamethrower|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|380/514
+|-heal|p1a: Ting-Lu|412/514|[from] item: Leftovers
+|upkeep
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Ruination|p2a: Slowking
+|-damage|p2a: Slowking|1/100
+|move|p2a: Slowking|Flamethrower|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|360/514
+|-heal|p1a: Ting-Lu|392/514|[from] item: Leftovers
+|upkeep
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Ruination|p2a: Slowking
+|-damage|p2a: Slowking|1/100
+|move|p2a: Slowking|Flamethrower|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|344/514
+|-heal|p1a: Ting-Lu|376/514|[from] item: Leftovers
+|upkeep
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Ruination|p2a: Slowking
+|-damage|p2a: Slowking|0 fnt
+|faint|p2a: Slowking
+|-heal|p1a: Ting-Lu|408/514|[from] item: Leftovers
+|upkeep
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Zamazenta|Zamazenta|100/100
+|-ability|p2a: Zamazenta|Dauntless Shield|boost
+|-boost|p2a: Zamazenta|def|1
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Pecharunt|Pecharunt|380/380
+|move|p2a: Zamazenta|Close Combat|p1a: Pecharunt
+|-immune|p1a: Pecharunt
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Latios|Latios, M|301/301
+|move|p2a: Zamazenta|Crunch|p1a: Latios
+|-supereffective|p1a: Latios
+|-damage|p1a: Latios|67/301
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Latios
+|-supereffective|p1a: Latios
+|-damage|p1a: Latios|0 fnt
+|faint|p1a: Latios
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Pecharunt|Pecharunt|380/380
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Pecharunt
+|-supereffective|p1a: Pecharunt
+|-damage|p1a: Pecharunt|284/380
+|move|p1a: Pecharunt|Parting Shot|p2a: Zamazenta
+|-unboost|p2a: Zamazenta|atk|1
+|-unboost|p2a: Zamazenta|spa|1
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|29/325|[from] Parting Shot
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Pecharunt|Pecharunt|284/380
+|move|p2a: Zamazenta|Close Combat|p1a: Pecharunt
+|-immune|p1a: Pecharunt
+|upkeep
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Pecharunt
+|-supereffective|p1a: Pecharunt
+|-damage|p1a: Pecharunt|222/380
+|move|p1a: Pecharunt|Parting Shot|p2a: Zamazenta
+|-unboost|p2a: Zamazenta|atk|1
+|-unboost|p2a: Zamazenta|spa|1
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|29/325|[from] Parting Shot
+|upkeep
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Pecharunt|Pecharunt|222/380
+|move|p2a: Zamazenta|Close Combat|p1a: Pecharunt
+|-immune|p1a: Pecharunt
+|upkeep
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Pecharunt
+|-supereffective|p1a: Pecharunt
+|-damage|p1a: Pecharunt|172/380
+|move|p1a: Pecharunt|Parting Shot|p2a: Zamazenta
+|-unboost|p2a: Zamazenta|atk|1
+|-unboost|p2a: Zamazenta|spa|1
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|29/325|[from] Parting Shot
+|upkeep
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Pecharunt|Pecharunt|172/380
+|switch|p2a: Tinkaton|Tinkaton, F|100/100
+|-ability|p2a: Tinkaton|Mold Breaker
+|-item|p2a: Tinkaton|Air Balloon
+|upkeep
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|29/325
+|move|p2a: Tinkaton|Gigaton Hammer|p1a: Zamazenta
+|-damage|p1a: Zamazenta|0 fnt
+|faint|p1a: Zamazenta
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|408/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Tinkaton|Thunder Wave|p1a: Ting-Lu
+|-immune|p1a: Ting-Lu
+|move|p1a: Ting-Lu|Earthquake|p2a: Tinkaton
+|-immune|p2a: Tinkaton
+|-heal|p1a: Ting-Lu|440/514|[from] item: Leftovers
+|upkeep
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Tinkaton|Gigaton Hammer|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|326/514
+|move|p1a: Ting-Lu|Earthquake|p2a: Tinkaton
+|-immune|p2a: Tinkaton
+|-heal|p1a: Ting-Lu|358/514|[from] item: Leftovers
+|upkeep
+|turn|26
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Tinkaton|Thunder Wave|p1a: Ting-Lu
+|-immune|p1a: Ting-Lu
+|move|p1a: Ting-Lu|Ruination|p2a: Tinkaton
+|-damage|p2a: Tinkaton|51/100
+|-enditem|p2a: Tinkaton|Air Balloon
+|-heal|p1a: Ting-Lu|390/514|[from] item: Leftovers
+|upkeep
+|turn|27
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Tinkaton|Gigaton Hammer|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|264/514
+|move|p1a: Ting-Lu|Ruination|p2a: Tinkaton
+|-damage|p2a: Tinkaton|26/100
+|-heal|p1a: Ting-Lu|296/514|[from] item: Leftovers
+|upkeep
+|turn|28
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Tinkaton|Thunder Wave|p1a: Ting-Lu
+|-immune|p1a: Ting-Lu
+|move|p1a: Ting-Lu|Ruination|p2a: Tinkaton
+|-damage|p2a: Tinkaton|13/100
+|-heal|p1a: Ting-Lu|328/514|[from] item: Leftovers
+|upkeep
+|turn|29
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Tinkaton|Gigaton Hammer|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|214/514
+|move|p1a: Ting-Lu|Ruination|p2a: Tinkaton|[miss]
+|-miss|p1a: Ting-Lu|p2a: Tinkaton
+|-heal|p1a: Ting-Lu|246/514|[from] item: Leftovers
+|upkeep
+|turn|30
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Tinkaton|Thunder Wave|p1a: Ting-Lu
+|-immune|p1a: Ting-Lu
+|move|p1a: Ting-Lu|Earthquake|p2a: Tinkaton
+|-supereffective|p2a: Tinkaton
+|-damage|p2a: Tinkaton|0 fnt
+|faint|p2a: Tinkaton
+|-heal|p1a: Ting-Lu|278/514|[from] item: Leftovers
+|upkeep
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Zamazenta|Zamazenta|100/100
+|turn|31
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Pecharunt|Pecharunt|172/380
+|move|p2a: Zamazenta|Close Combat|p1a: Pecharunt
+|-immune|p1a: Pecharunt
+|upkeep
+|turn|32
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Pecharunt
+|-supereffective|p1a: Pecharunt
+|-damage|p1a: Pecharunt|78/380
+|move|p1a: Pecharunt|Parting Shot|p2a: Zamazenta
+|-unboost|p2a: Zamazenta|atk|1
+|-unboost|p2a: Zamazenta|spa|1
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|352/352|[from] Parting Shot
+|-status|p1a: Gliscor|tox|[from] item: Toxic Orb
+|upkeep
+|turn|33
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Pecharunt|Pecharunt|78/380
+|move|p2a: Zamazenta|Close Combat|p1a: Pecharunt
+|-immune|p1a: Pecharunt
+|upkeep
+|turn|34
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Pecharunt
+|-supereffective|p1a: Pecharunt
+|-damage|p1a: Pecharunt|12/380
+|move|p1a: Pecharunt|Parting Shot|p2a: Zamazenta
+|-unboost|p2a: Zamazenta|atk|1
+|-unboost|p2a: Zamazenta|spa|1
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Lokix|Lokix, M|283/283|[from] Parting Shot
+|upkeep
+|turn|35
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Pecharunt|Pecharunt|12/380
+|move|p2a: Zamazenta|Close Combat|p1a: Pecharunt
+|-immune|p1a: Pecharunt
+|upkeep
+|turn|36
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Pecharunt
+|-supereffective|p1a: Pecharunt
+|-damage|p1a: Pecharunt|0 fnt
+|faint|p1a: Pecharunt
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|352/352 tox
+|turn|37
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect|p1a: Gliscor
+|-singleturn|p1a: Gliscor|Protect
+|move|p2a: Zamazenta|Close Combat|p1a: Gliscor
+|-activate|p1a: Gliscor|move: Protect
+|upkeep
+|turn|38
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Lokix|Lokix, M|283/283
+|move|p2a: Zamazenta|Close Combat|p1a: Lokix
+|-damage|p1a: Lokix|150/283
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|upkeep
+|turn|39
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|352/352 tox
+|move|p2a: Zamazenta|Stone Edge|p1a: Gliscor
+|-damage|p1a: Gliscor|303/352 tox
+|-heal|p1a: Gliscor|347/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|40
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect|p1a: Gliscor
+|-singleturn|p1a: Gliscor|Protect
+|move|p2a: Zamazenta|Stone Edge|p1a: Gliscor
+|-activate|p1a: Gliscor|move: Protect
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|41
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect||[still]
+|-fail|p1a: Gliscor
+|move|p2a: Zamazenta|Stone Edge|p1a: Gliscor
+|-damage|p1a: Gliscor|307/352 tox
+|-heal|p1a: Gliscor|351/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|42
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect|p1a: Gliscor
+|-singleturn|p1a: Gliscor|Protect
+|move|p2a: Zamazenta|Stone Edge|p1a: Gliscor
+|-activate|p1a: Gliscor|move: Protect
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|43
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect||[still]
+|-fail|p1a: Gliscor
+|move|p2a: Zamazenta|Stone Edge|p1a: Gliscor
+|-damage|p1a: Gliscor|304/352 tox
+|-heal|p1a: Gliscor|348/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|44
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect|p1a: Gliscor
+|-singleturn|p1a: Gliscor|Protect
+|move|p2a: Zamazenta|Stone Edge|p1a: Gliscor
+|-activate|p1a: Gliscor|move: Protect
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|45
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect|p1a: Gliscor
+|-singleturn|p1a: Gliscor|Protect
+|move|p2a: Zamazenta|Stone Edge|p1a: Gliscor
+|-activate|p1a: Gliscor|move: Protect
+|upkeep
+|turn|46
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect||[still]
+|-fail|p1a: Gliscor
+|move|p2a: Zamazenta|Stone Edge|p1a: Gliscor
+|-damage|p1a: Gliscor|306/352 tox
+|-heal|p1a: Gliscor|350/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|47
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect|p1a: Gliscor
+|-singleturn|p1a: Gliscor|Protect
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-activate|p1a: Gliscor|move: Protect
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|48
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect||[still]
+|-fail|p1a: Gliscor
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|313/352 tox
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|49
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect|p1a: Gliscor
+|-singleturn|p1a: Gliscor|Protect
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-activate|p1a: Gliscor|move: Protect
+|upkeep
+|turn|50
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect||[still]
+|-fail|p1a: Gliscor
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|315/352 tox
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|51
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect|p1a: Gliscor
+|-singleturn|p1a: Gliscor|Protect
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-activate|p1a: Gliscor|move: Protect
+|upkeep
+|turn|52
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect||[still]
+|-fail|p1a: Gliscor
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-crit|p1a: Gliscor
+|-damage|p1a: Gliscor|236/352 tox
+|-heal|p1a: Gliscor|280/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|53
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect|p1a: Gliscor
+|-singleturn|p1a: Gliscor|Protect
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-activate|p1a: Gliscor|move: Protect
+|-heal|p1a: Gliscor|324/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|54
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|Protect||[still]
+|-fail|p1a: Gliscor
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|287/352 tox
+|-heal|p1a: Gliscor|331/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|55
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|296/352 tox
+|move|p1a: Gliscor|Spikes|p2a: Zamazenta
+|-sidestart|p2: abyssalbot55|Spikes
+|-heal|p1a: Gliscor|340/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|56
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|306/352 tox
+|move|p1a: Gliscor|Knock Off|p2a: Zamazenta
+|-resisted|p2a: Zamazenta
+|-damage|p2a: Zamazenta|85/100
+|-enditem|p2a: Zamazenta|Heavy-Duty Boots|[from] move: Knock Off|[of] p1a: Gliscor
+|-heal|p1a: Gliscor|350/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|57
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|315/352 tox
+|move|p1a: Gliscor|Knock Off|p2a: Zamazenta
+|-resisted|p2a: Zamazenta
+|-damage|p2a: Zamazenta|75/100
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|58
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|316/352 tox
+|move|p1a: Gliscor|Knock Off|p2a: Zamazenta
+|-resisted|p2a: Zamazenta
+|-damage|p2a: Zamazenta|65/100
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|59
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|316/352 tox
+|move|p1a: Gliscor|Knock Off|p2a: Zamazenta
+|-resisted|p2a: Zamazenta
+|-damage|p2a: Zamazenta|55/100
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|60
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|314/352 tox
+|move|p1a: Gliscor|Knock Off|p2a: Zamazenta
+|-resisted|p2a: Zamazenta
+|-damage|p2a: Zamazenta|45/100
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|61
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|316/352 tox
+|move|p1a: Gliscor|Knock Off|p2a: Zamazenta
+|-resisted|p2a: Zamazenta
+|-crit|p2a: Zamazenta
+|-damage|p2a: Zamazenta|30/100
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|62
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Gliscor
+|-damage|p1a: Gliscor|318/352 tox
+|move|p1a: Gliscor|Knock Off|p2a: Zamazenta
+|-resisted|p2a: Zamazenta
+|-damage|p2a: Zamazenta|21/100
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|63
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Heavy Slam|p1a: Gliscor
+|-damage|p1a: Gliscor|305/352 tox
+|move|p1a: Gliscor|Knock Off|p2a: Zamazenta
+|-resisted|p2a: Zamazenta
+|-damage|p2a: Zamazenta|10/100
+|-heal|p1a: Gliscor|349/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|64
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|278/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Zamazenta|Heavy Slam|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|258/514
+|-heal|p1a: Ting-Lu|290/514|[from] item: Leftovers
+|upkeep
+|turn|65
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Heavy Slam|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|269/514
+|move|p1a: Ting-Lu|Ruination|p2a: Zamazenta
+|-damage|p2a: Zamazenta|5/100
+|-heal|p1a: Ting-Lu|301/514|[from] item: Leftovers
+|upkeep
+|turn|66
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Heavy Slam|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|284/514
+|move|p1a: Ting-Lu|Ruination|p2a: Zamazenta
+|-damage|p2a: Zamazenta|3/100
+|-heal|p1a: Ting-Lu|316/514|[from] item: Leftovers
+|upkeep
+|turn|67
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Heavy Slam|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|298/514
+|move|p1a: Ting-Lu|Ruination|p2a: Zamazenta
+|-damage|p2a: Zamazenta|2/100
+|-heal|p1a: Ting-Lu|330/514|[from] item: Leftovers
+|upkeep
+|turn|68
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|349/352 tox
+|move|p2a: Zamazenta|Heavy Slam|p1a: Gliscor
+|-damage|p1a: Gliscor|299/352 tox
+|-heal|p1a: Gliscor|343/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|69
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|330/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Zamazenta|Heavy Slam|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|310/514
+|-heal|p1a: Ting-Lu|342/514|[from] item: Leftovers
+|upkeep
+|turn|70
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|343/352 tox
+|move|p2a: Zamazenta|Heavy Slam|p1a: Gliscor
+|-damage|p1a: Gliscor|297/352 tox
+|-heal|p1a: Gliscor|341/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|71
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|342/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Zamazenta|Heavy Slam|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|323/514
+|-heal|p1a: Ting-Lu|355/514|[from] item: Leftovers
+|upkeep
+|turn|72
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|341/352 tox
+|move|p2a: Zamazenta|Heavy Slam|p1a: Gliscor
+|-damage|p1a: Gliscor|298/352 tox
+|-heal|p1a: Gliscor|342/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|73
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|355/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Zamazenta|Heavy Slam|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|338/514
+|-heal|p1a: Ting-Lu|370/514|[from] item: Leftovers
+|upkeep
+|turn|74
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|342/352 tox
+|move|p2a: Zamazenta|Heavy Slam|p1a: Gliscor
+|-damage|p1a: Gliscor|298/352 tox
+|-heal|p1a: Gliscor|342/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|75
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|370/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Zamazenta|Heavy Slam|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|352/514
+|-heal|p1a: Ting-Lu|384/514|[from] item: Leftovers
+|upkeep
+|turn|76
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|342/352 tox
+|move|p2a: Zamazenta|Heavy Slam|p1a: Gliscor
+|-damage|p1a: Gliscor|295/352 tox
+|-heal|p1a: Gliscor|339/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|77
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|384/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Zamazenta|Heavy Slam|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|365/514
+|-heal|p1a: Ting-Lu|397/514|[from] item: Leftovers
+|upkeep
+|turn|78
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|339/352 tox
+|move|p2a: Zamazenta|Heavy Slam|p1a: Gliscor
+|-damage|p1a: Gliscor|296/352 tox
+|-heal|p1a: Gliscor|340/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|79
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|397/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|-activate|p2a: Zamazenta|move: Struggle
+|move|p2a: Zamazenta|Struggle|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|373/514
+|-damage|p2a: Zamazenta|0 fnt|[from] recoil
+|faint|p2a: Zamazenta
+|-heal|p1a: Ting-Lu|405/514|[from] item: Leftovers
+|upkeep
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Hydrapple|Hydrapple, F|100/100
+|turn|80
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Lokix|Lokix, M|150/283
+|move|p2a: Hydrapple|Nasty Plot|p2a: Hydrapple
+|-boost|p2a: Hydrapple|spa|2
+|upkeep
+|turn|81
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Lokix|First Impression|p2a: Hydrapple
+|-supereffective|p2a: Hydrapple
+|-damage|p2a: Hydrapple|46/100
+|move|p2a: Hydrapple|Draco Meteor|p1a: Lokix
+|-damage|p1a: Lokix|0 fnt
+|-unboost|p2a: Hydrapple|spa|2
+|faint|p1a: Lokix
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|340/352 tox
+|turn|82
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|405/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Hydrapple|Draco Meteor|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|273/514
+|-unboost|p2a: Hydrapple|spa|2
+|-heal|p1a: Ting-Lu|305/514|[from] item: Leftovers
+|upkeep
+|turn|83
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|340/352 tox
+|move|p2a: Hydrapple|Giga Drain|p1a: Gliscor
+|-damage|p1a: Gliscor|292/352 tox
+|-heal|p2a: Hydrapple|51/100|[from] drain|[of] p1a: Gliscor
+|-heal|p1a: Gliscor|336/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|84
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|305/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Hydrapple|Draco Meteor|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|247/514
+|-unboost|p2a: Hydrapple|spa|2
+|-heal|p1a: Ting-Lu|279/514|[from] item: Leftovers
+|upkeep
+|turn|85
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|336/352 tox
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-damage|p2a: Ting-Lu|88/100|[from] Spikes
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|-heal|p2a: Ting-Lu|94/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|86
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|279/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Ting-Lu|Body Press|p1a: Ting-Lu
+|-supereffective|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|111/514
+|-heal|p2a: Ting-Lu|100/100|[from] item: Leftovers
+|-heal|p1a: Ting-Lu|143/514|[from] item: Leftovers
+|upkeep
+|turn|87
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|352/352 tox
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|309/352 tox
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|88
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|143/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Ting-Lu|Body Press|p1a: Ting-Lu
+|-supereffective|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|0 fnt
+|faint|p1a: Ting-Lu
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Gliscor|Gliscor, M|352/352 tox
+|turn|89
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|87/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|311/352 tox
+|-heal|p2a: Ting-Lu|93/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|90
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|79/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|310/352 tox
+|-heal|p2a: Ting-Lu|85/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|91
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|73/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|308/352 tox
+|-heal|p2a: Ting-Lu|79/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|92
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|66/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|314/352 tox
+|-heal|p2a: Ting-Lu|72/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|93
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|60/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|315/352 tox
+|-heal|p2a: Ting-Lu|66/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|94
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|54/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|310/352 tox
+|-heal|p2a: Ting-Lu|60/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|95
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|47/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|311/352 tox
+|-heal|p2a: Ting-Lu|53/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|96
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|40/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|310/352 tox
+|-heal|p2a: Ting-Lu|47/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|97
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|34/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|310/352 tox
+|-heal|p2a: Ting-Lu|40/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|98
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-crit|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|21/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|309/352 tox
+|-heal|p2a: Ting-Lu|28/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|99
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|15/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|308/352 tox
+|-heal|p2a: Ting-Lu|21/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|100
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|9/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|310/352 tox
+|-heal|p2a: Ting-Lu|15/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|101
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|2/100
+|move|p2a: Ting-Lu|Body Press|p1a: Gliscor
+|-resisted|p1a: Gliscor
+|-damage|p1a: Gliscor|309/352 tox
+|-heal|p2a: Ting-Lu|8/100|[from] item: Leftovers
+|-heal|p1a: Gliscor|352/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|102
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|0 fnt
+|faint|p2a: Ting-Lu
+|upkeep
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Hydrapple|Hydrapple, F|85/100
+|turn|103
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Hydrapple
+|-supereffective|p2a: Hydrapple
+|-damage|p2a: Hydrapple|65/100
+|move|p2a: Hydrapple|Draco Meteor|p1a: Gliscor
+|-damage|p1a: Gliscor|183/352 tox
+|-unboost|p2a: Hydrapple|spa|2
+|-heal|p1a: Gliscor|227/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|104
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Hydrapple
+|-supereffective|p2a: Hydrapple
+|-damage|p2a: Hydrapple|43/100
+|move|p2a: Hydrapple|Draco Meteor|p1a: Gliscor
+|-damage|p1a: Gliscor|134/352 tox
+|-unboost|p2a: Hydrapple|spa|2
+|-heal|p1a: Gliscor|178/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|105
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Hydrapple
+|-supereffective|p2a: Hydrapple
+|-damage|p2a: Hydrapple|24/100
+|move|p2a: Hydrapple|Draco Meteor|p1a: Gliscor
+|-damage|p1a: Gliscor|120/352 tox
+|-unboost|p2a: Hydrapple|spa|2
+|-heal|p1a: Gliscor|164/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|106
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Hydrapple
+|-supereffective|p2a: Hydrapple
+|-damage|p2a: Hydrapple|3/100
+|move|p2a: Hydrapple|Draco Meteor|p1a: Gliscor
+|-damage|p1a: Gliscor|116/352 tox
+|-heal|p1a: Gliscor|160/352 tox|[from] ability: Poison Heal
+|upkeep
+|turn|107
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Gliscor|U-turn|p2a: Hydrapple
+|-supereffective|p2a: Hydrapple
+|-damage|p2a: Hydrapple|0 fnt
+|faint|p2a: Hydrapple
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

@@ -1,22 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import ompJevReview, { setDiffRunner, isThinDiff, touchesCodeFile, isVendoredPath, reviewableDiff, BOUNDARY_COMMENT } from '../src/index.ts';
-import { requireSdkInstalled } from '../../sdk/require-installed.mjs';
-import jevReviewExtension from '../../../.omp/extensions/jev-review.ts';
-import { keyProviderInstalled, setKeyProvider } from '../../../kit/src/client.ts';
 import { mkdir, unlink, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { requireSdkInstalled } from '../../sdk/require-installed.mjs';
+import jevReviewExtension from '../../../.omp/extensions/jev-review.ts';
+import { keyProviderInstalled, setKeyProvider } from '../../../kit/src/client.ts';
 
 requireSdkInstalled();
+
+const sessionContext = (sessionId = 'synthetic-session') => ({
+  sessionManager: { getSessionId: () => sessionId },
+});
 
 function host() {
   const rows = [];
   const handlers = {};
   return {
     rows,
-    fire: (event) => handlers.tool_call(event),
-    fireResult: (event) => handlers.tool_result(event),
+    fire: (event, context = sessionContext()) => handlers.tool_call(event, context),
+    fireResult: (event, context = sessionContext()) => handlers.tool_result(event, context),
     pi: {
       on: (e, cb) => { handlers[e] = cb; },
       appendEntry: async (type, data) => { rows.push({ type, data }); },
@@ -25,6 +29,15 @@ function host() {
 }
 const decisions = (h) => h.rows.filter((r) => r.type.endsWith('decision.v1'));
 const diffCall = (command) => ({ toolName: 'bash', toolCallId: 'tc-1', input: { command } });
+
+// Captured OMP tool call: P15 session 01a0f3a9-d58e-748c-83af-3a2661b433ca, call-p15-1.
+const P15_RECORDED_SESSION = '01a0f3a9-d58e-748c-83af-3a2661b433ca';
+const P15_RECORDED_CALL = {
+  toolName: 'bash',
+  toolCallId: 'call-p15-1',
+  input: { command: 'git diff --cached -- src/eligible.ts' },
+};
+
 const stubDiff = (body = 'diff --git a/a b/a\n+changed\n') => setDiffRunner(async () => body);
 // A diff the gate must let through: @@ hunks with 12 changed lines.
 const SUBSTANTIAL = 'diff --git a/a.ts b/a.ts\n@@ -1,6 +1,6 @@\n' +
@@ -363,7 +376,7 @@ test('isVendoredPath: directory segments and lockfiles, not look-alike names', (
 });
 
 // The advisory line: one scored diff, the git output of that same call, nothing else.
-async function scoredWithBoundary(boundary, id = 'tc-1') {
+async function scoredWithBoundary(boundary, id = 'tc-1', sessionId = 'synthetic-session', command = 'git show HEAD') {
   const previous = process.env.TYPESAFE_API_KEY;
   const realFetch = globalThis.fetch;
   process.env.TYPESAFE_API_KEY = 'test-key';
@@ -372,7 +385,7 @@ async function scoredWithBoundary(boundary, id = 'tc-1') {
     stubDiff(SUBSTANTIAL);
     const h = host();
     ompJevReview(h.pi, syntheticApproval);
-    await h.fire({ toolName: 'bash', toolCallId: id, input: { command: 'git show HEAD' } });
+    await h.fire({ toolName: 'bash', toolCallId: id, input: { command } }, sessionContext(sessionId));
     return h;
   } finally {
     globalThis.fetch = realFetch;
@@ -548,6 +561,75 @@ test('touchesCodeFile: draw-derived extensions only', () => {
   );
 });
 
+test('approved recorded OMP event score is bound to its source session and toolCallId', async () => {
+  const previousKey = process.env.TYPESAFE_API_KEY;
+  const realFetch = globalThis.fetch;
+  delete process.env.TYPESAFE_API_KEY;
+  let credentialCalls = 0;
+  globalThis.fetch = answersFetch({ behaviour: { noul: 0.82 }, boundary: { noul: 0.18 } });
+  stubDiff(SUBSTANTIAL);
+  setKeyProvider(async () => { credentialCalls++; return 'synthetic-p15-key'; });
+  try {
+    const h = host();
+    ompJevReview(h.pi, syntheticApproval);
+    await h.fire(P15_RECORDED_CALL, sessionContext(P15_RECORDED_SESSION));
+    const [row] = decisions(h);
+    assert.equal(row.data.kind, 'review_scored');
+    assert.equal(row.data.toolCallId, P15_RECORDED_CALL.toolCallId);
+    assert.equal(row.data.sessionId, P15_RECORDED_SESSION);
+    assert.equal(credentialCalls, 1);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (previousKey === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previousKey;
+    setDiffRunner(null);
+    setKeyProvider(undefined);
+  }
+});
+
+test('unknown OMP session refuses before authorization, diff execution, or Jev', async () => {
+  const previousKey = process.env.TYPESAFE_API_KEY;
+  const previousFetch = globalThis.fetch;
+  delete process.env.TYPESAFE_API_KEY;
+  const calls = { authorization: 0, diff: 0, provider: 0, credential: 0 };
+  const answer = answersFetch({ behaviour: { noul: 0.82 }, boundary: { noul: 0.18 } });
+  globalThis.fetch = async (...args) => { calls.provider++; return answer(...args); };
+  setDiffRunner(async () => { calls.diff++; return SUBSTANTIAL; });
+  setKeyProvider(async () => { calls.credential++; return 'synthetic-p15-key'; });
+  try {
+    const h = host();
+    ompJevReview(h.pi, () => {
+      calls.authorization++;
+      return { provider: true, localDiffExecution: true };
+    });
+    await h.fire(P15_RECORDED_CALL, sessionContext('unknown'));
+    const [row] = decisions(h);
+    assert.equal(row.data.reason, 'missing-session-id');
+    assert.equal(row.data.sessionId, null);
+    assert.deepEqual(calls, { authorization: 0, diff: 0, provider: 0, credential: 0 });
+    assert.doesNotMatch(JSON.stringify(h.rows), /added line/);
+  } finally {
+    if (previousKey === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = previousKey;
+    globalThis.fetch = previousFetch;
+    setDiffRunner(null);
+    setKeyProvider(undefined);
+  }
+});
+
+test('tool-result advisory is scoped to both recorded session and toolCallId', async () => {
+  const h = await scoredWithBoundary(
+    BOUNDARY_COMMENT,
+    P15_RECORDED_CALL.toolCallId,
+    P15_RECORDED_SESSION,
+    P15_RECORDED_CALL.input.command,
+  );
+  const otherSession = '01a0f39e-fcd4-7703-9b9a-e1255f733f6d';
+  assert.equal(await h.fireResult({ toolName: 'bash', toolCallId: P15_RECORDED_CALL.toolCallId, content: gitOutput }, sessionContext(otherSession)), undefined);
+  const original = await h.fireResult({ toolName: 'bash', toolCallId: P15_RECORDED_CALL.toolCallId, content: gitOutput }, sessionContext(P15_RECORDED_SESSION));
+  assert.equal(original.content.length, 2);
+  assert.deepEqual(original.content[0], gitOutput[0]);
+});
 test('presence-OFF skips review authorization, diff execution, and Jev', async () => {
   const stateDir = join(homedir(), '.local', 'state', 'jev');
   const marker = join(stateDir, 'jev-lab-review.off');

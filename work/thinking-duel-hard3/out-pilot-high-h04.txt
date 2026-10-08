@@ -1,0 +1,4 @@
+Working...
+Fixed `ac.py`: Wald → Agresti-Coull per spec + clamp to `[0,1]`.
+
+Check: independent `math.sqrt` reference over 13 `(k,n)` × 4 `z` values — worst diff 0, all in `[0,1]`, `lo ≤ hi`. Edge `k=0,n=0` → `(0.0, 1.0)`. Stdlib only, no imports.

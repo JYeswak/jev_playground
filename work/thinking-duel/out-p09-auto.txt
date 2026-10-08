@@ -1,0 +1,8 @@
+Working...
+For existing TypeScript REST, use code-first: `swagger-jsdoc` + `swagger-ui-express`, or `@nestjs/swagger` / `tsoa` if on NestJS/Express with decorators.
+
+Annotate routes with `@openapi` JSDoc including summary, tags, parameters, request/response schemas with realistic examples, and `securitySchemes`.
+
+Serve Swagger UI at `/docs` and raw spec at `/openapi.json` for SDK generation via `openapi-generator-cli`.
+
+Add CI check that regenerates the spec and fails on `git diff`, plus `redocly/cli lint` to prevent drift.

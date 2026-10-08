@@ -1,0 +1,4 @@
+Working...
+Fixed `ivl.py`: `union` now merges on `lo < top` by default, `lo <= top` only with `merge_adjacent=True`, skips empty `hi <= lo`; `gaps` clips to `span`, walks sorted merged emitting `(cur, min(lo, shi))` holes.
+
+Verified 20/20: empty, adjacent both modes, sorted/nested/overlap/dup, zero-length, gaps basic/full/outside/clipped/empty-span.

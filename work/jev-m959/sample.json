@@ -1,0 +1,452 @@
+[
+ {
+  "id": "k01",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 4 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:33:46.943Z",
+   "adb2de3802df7693d68e4afac9129c381192783bd5829f28ba759f4a39104cfc"
+  ]
+ },
+ {
+  "id": "k02",
+  "prompt": "Load check delta2: what is the uds burn-down grader status? One sentence, no tools.",
+  "memory": "Load check delta followup: what recent work happened in uds? One sentence, no tools.",
+  "ref": [
+   "2026-10-01T20:19:25.626Z",
+   "8b06f3b81c127320a14d7ed87818759948198ba0a22eb6672f8819220b86629f"
+  ]
+ },
+ {
+  "id": "k03",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 3 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:33:39.459Z",
+   "af332e1198699cfcd5319a0684631cf13f1e0349e8d0cb5b925b5d00d9a8c8ec"
+  ]
+ },
+ {
+  "id": "k04",
+  "prompt": "q\n",
+  "memory": "fact number 4 about unrelated trivia",
+  "ref": [
+   "2026-10-01T18:19:51.949Z",
+   "adb2de3802df7693d68e4afac9129c381192783bd5829f28ba759f4a39104cfc"
+  ]
+ },
+ {
+  "id": "k05",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 12 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:36:32.540Z",
+   "127167344b9e06f78f5dd6d012b28a0329ba26e88218dedc4382a88420ca19d2"
+  ]
+ },
+ {
+  "id": "k06",
+  "prompt": "Summarize the rud1 WITHHOLD verdict and its numbers. One paragraph, no tools.",
+  "memory": "Summarize the rud1 WITHHOLD verdict and its numbers. One paragraph, no tools.",
+  "ref": [
+   "2026-10-01T18:55:51.027Z",
+   "c0179ebede2a3221f4586f4e30643c47395f4d2986913b3a4993da7926060087"
+  ]
+ },
+ {
+  "id": "k07",
+  "prompt": "q\n",
+  "memory": "fact number 19 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:56:41.596Z",
+   "c2c2f8c9479ac17b8f941870bc330b302c64b88b9886b8976cb66d722a2f17f5"
+  ]
+ },
+ {
+  "id": "k08",
+  "prompt": "q",
+  "memory": "synthetic boundary fact 18",
+  "ref": [
+   "2026-10-01T19:03:26.872Z",
+   "889a0729187ca99a200f0b1109b0dbd370107e0053a2f1e624f10175790250ec"
+  ]
+ },
+ {
+  "id": "k09",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 19 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:34:22.071Z",
+   "c2c2f8c9479ac17b8f941870bc330b302c64b88b9886b8976cb66d722a2f17f5"
+  ]
+ },
+ {
+  "id": "k10",
+  "prompt": "Mission (Joshua 2026-10-01): nothing broken stays broken; Jev ON in our tools, proven live both ways. Rules: commit --only your paths, no push, never stage .beads/issues.jsonl, no file deletion, name verification level. CONDUCTOR (pane 1) to CyanPeak (non-author verify): I committed eba8cd2d: jev-j0er global screen wrappers now use absolute imports (omp-test reported 'Cannot find module' in every claude/codex/grok/muse session). Verify live: start a FRESH omp session with --profile claude and one with --profile codex, cwd OUTSIDE the jev repo (e.g. ~/Developer/localbench, read-only prompt that runs one web_search), confirm no 'Failed to load extension' for jev-*-global.ts and that ~/.local/state/jev/injection-shadow.jsonl or webscreen-shadow.jsonl gets a row from that session's cwd. Planted negative: git show eba8cd2d^:work/jev-j0er/jev-injection-global.ts placed at a hooks/post-depth path fails import. Callback: ntm send jev --pane=1 \"DONE j0er-import-verify <rows> <negative>\".",
+  "memory": "RULES: claim your bead (br update <id> --status in_progress). Read br show <id> for the full acceptance. R\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T22:34:24.892Z",
+   "fe39d60f74c36d27960c2d0060e5693fd4c6d835a912b0560dab714c48f34316"
+  ]
+ },
+ {
+  "id": "k11",
+  "prompt": "q",
+  "memory": "synthetic boundary fact 3",
+  "ref": [
+   "2026-10-01T18:44:23.971Z",
+   "8255a8751c2774ccb9dfea0b3763dec3482d43fead31a31965c550969159ccc3"
+  ]
+ },
+ {
+  "id": "k12",
+  "prompt": "q",
+  "memory": "synthetic boundary fact 9",
+  "ref": [
+   "2026-10-01T19:03:26.741Z",
+   "977071a4f7361a6c78b30d795bea045f0a4a33af5cb294b2e4ce6d4e8dfcaf40"
+  ]
+ },
+ {
+  "id": "k13",
+  "prompt": "q\n",
+  "memory": "fact number 7 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:58:12.660Z",
+   "305af8ba2c1427f9e2d42e0134801ce478e0a1a1ccf3caafaf485fbd3a8b0d1e"
+  ]
+ },
+ {
+  "id": "k14",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 6 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:33:48.577Z",
+   "773c39304d273fbc1621940074e2c94490b3824c173d3da76b605c9eb1811355"
+  ]
+ },
+ {
+  "id": "k15",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 16 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:33:39.465Z",
+   "02ba8d9058729187ad7b2e5cdb1fe17c0ad09d068e237ea7a98337cfa7839364"
+  ]
+ },
+ {
+  "id": "k16",
+  "prompt": "CONDUCTOR (pane 1) to CyanPeak: new bead jev-vi1i assigned to you (br show jev-vi1i for full acceptance). Bar first, commit --only your paths, no push, never stage .beads/issues.jsonl. Callback DONE jev-vi1i <numbers>.",
+  "memory": "IDLE pane 6: jev-ynn7 A/B done NO-SHIP (c41e61a6, awaiting verifier); sole ready item is CyanPeak's 8qu6",
+  "ref": [
+   "2026-10-01T22:46:33.004Z",
+   "caf7a887833eb7d01bb98f31a962bf0b3b4945e69b504ef8590922f9d6ce14bb"
+  ]
+ },
+ {
+  "id": "k17",
+  "prompt": "what was the verdict",
+  "memory": "[redacted session-private body A] \u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T18:53:14.503Z",
+   "cb404e3fb7f38e656a3fecdf7576ab6505911fadd13f5bcf9933d25c889944f1"
+  ]
+ },
+ {
+  "id": "k18",
+  "prompt": "And what was the seam-blind finding? One sentence, no tools.",
+  "memory": "Use `xd://reflect` for questions that need a synthesised answer over many memories.",
+  "ref": [
+   "2026-10-01T18:36:05.846Z",
+   "0d820f2259aeca98e77300c45de9b72e0b4c5836d56c6d6285e0b820b4543b9d"
+  ]
+ },
+ {
+  "id": "k19",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 15 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:34:31.734Z",
+   "287f581e8d4d166345bc26ba7c0716f2d6b16a2ab44228d09b4dab6bbea53742"
+  ]
+ },
+ {
+  "id": "k20",
+  "prompt": "Repro2 charlie: what did OrangeFrog verify recently? One sentence, no tools.",
+  "memory": "Use `xd://reflect` for questions that need a synthesised answer over many memories.",
+  "ref": [
+   "2026-10-01T22:41:34.304Z",
+   "0d820f2259aeca98e77300c45de9b72e0b4c5836d56c6d6285e0b820b4543b9d"
+  ]
+ },
+ {
+  "id": "k21",
+  "prompt": "Coordinator %54: nice catch with X1. It already found jev's regression; I've sent jev the list. The PR #29 'fails' were runs I cancelled, so ignore them; its real run has one macOS job left. Review takes priority now: PR #31 (S4 rules, head 090c73d), then #33 (S5 guard, stacked), then re-check #27 once it is green. Someone else will independently review your #34.",
+  "memory": "Done. Report sent to %54.",
+  "ref": [
+   "2026-10-02T00:46:35.091Z",
+   "12e59496741725260fbbc2896daa17535e62660dac89da98783f25c50fa0344b"
+  ]
+ },
+ {
+  "id": "k22",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 18 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:34:31.736Z",
+   "5c26c444e76c60cb043dd5952e2760fa8e4daf2e8e06ecd4b5efc11fde50ac2d"
+  ]
+ },
+ {
+  "id": "k23",
+  "prompt": "Mission (Joshua 2026-10-01): nothing broken stays broken; Jev ON in our tools, proven live both ways. Rules: commit --only your paths, no push, never stage .beads/issues.jsonl, no file deletion, name verification level. CONDUCTOR (pane 1) to CyanPeak (non-author verify): I committed eba8cd2d: jev-j0er global screen wrappers now use absolute imports (omp-test reported 'Cannot find module' in every claude/codex/grok/muse session). Verify live: start a FRESH omp session with --profile claude and one with --profile codex, cwd OUTSIDE the jev repo (e.g. ~/Developer/localbench, read-only prompt that runs one web_search), confirm no 'Failed to load extension' for jev-*-global.ts and that ~/.local/state/jev/injection-shadow.jsonl or webscreen-shadow.jsonl gets a row from that session's cwd. Planted negative: git show eba8cd2d^:work/jev-j0er/jev-injection-global.ts placed at a hooks/post-depth path fails import. Callback: ntm send jev --pane=1 \"DONE j0er-import-verify <rows> <negative>\".",
+  "memory": "WildCarp: MISSION (conductor BrownGoose, pane 1; Joshua gave blanket approval, no 'waiting for approval'): turn Jev ON in our own tooling and test it live. Live Jev calls are allowed (Joshua 2026-09-27) when bounded: daily cap in code, stop on 401/402/403, checkpoint a row per call, state spend. Key: infisical user session works now (conductor checked len=107); never print it.",
+  "ref": [
+   "2026-10-01T22:34:24.789Z",
+   "180abd1c3deaf83c5676c0d6f8889d01508aab9e5b5371ab069ce3a0b5c00110"
+  ]
+ },
+ {
+  "id": "k24",
+  "prompt": "q",
+  "memory": "synthetic boundary fact 4",
+  "ref": [
+   "2026-10-01T19:03:26.737Z",
+   "01ea3c0fbfb6163040323376de09d949d085b33c1214c933484bffe501bfa808"
+  ]
+ },
+ {
+  "id": "k25",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 12 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:33:48.867Z",
+   "127167344b9e06f78f5dd6d012b28a0329ba26e88218dedc4382a88420ca19d2"
+  ]
+ },
+ {
+  "id": "k26",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. This turn stood down. Pick the next unfinished stage of the mission and start it. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 3: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "Nothing to claim; the one ready bead is CyanPeak's round 3 of the effort test. The oth\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T22:52:47.361Z",
+   "9a43c2b5f2b0d9a09fd43eaca2b2b366513492e2c899723574efca95993cf39a"
+  ]
+ },
+ {
+  "id": "k27",
+  "prompt": "q\n",
+  "memory": "fact number 3 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:52:37.591Z",
+   "af332e1198699cfcd5319a0684631cf13f1e0349e8d0cb5b925b5d00d9a8c8ec"
+  ]
+ },
+ {
+  "id": "k28",
+  "prompt": "What recent work happened in uds? One sentence, no tools.",
+  "memory": "PANE 1: you finished H4 and are idle. Workers %49 %50 %51 are blocked waiting on you for main.rs integration of the ergonomics beads (ehy8 3ags rvs3 qpkf 96cs ema4 1rmh z7ud yp63). You are now the main.rs integrator: read their mails, merge each one's glue into main.rs as its own small commit (coordinate the lease with CreamShore), build+test via rch, and tell each worker its glue landed so it can route to the grader. Highest-value first: anything already graded or about to be.",
+  "ref": [
+   "2026-10-01T19:57:16.762Z",
+   "82c593f1c5bf585a0bc5bdd7f10a9b5efa165e288b49dc070db1be7abd7a9c9a"
+  ]
+ },
+ {
+  "id": "k29",
+  "prompt": "q",
+  "memory": "synthetic boundary fact 13",
+  "ref": [
+   "2026-10-01T18:53:14.513Z",
+   "62c0092ebdbddbd3580d2db8e553e6e7f172eb72f8d78037ce9171e2f9355ce3"
+  ]
+ },
+ {
+  "id": "k30",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 13 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:36:32.550Z",
+   "79d265193585d9dd273e79973512aeb7b58943b03a784ba2a7434ff4f2820f72"
+  ]
+ },
+ {
+  "id": "k31",
+  "prompt": "q\n",
+  "memory": "fact number 9 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:52:37.598Z",
+   "46e74698cd9c3b3d5135f68f4ab76d05cef6243e17ce0c3d97f50e1672e9f086"
+  ]
+ },
+ {
+  "id": "k32",
+  "prompt": "q\n",
+  "memory": "fact number 13 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:58:12.920Z",
+   "79d265193585d9dd273e79973512aeb7b58943b03a784ba2a7434ff4f2820f72"
+  ]
+ },
+ {
+  "id": "k33",
+  "prompt": "q\n",
+  "memory": "fact number 6 about unrelated trivia",
+  "ref": [
+   "2026-10-01T18:19:51.950Z",
+   "773c39304d273fbc1621940074e2c94490b3824c173d3da76b605c9eb1811355"
+  ]
+ },
+ {
+  "id": "k34",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 4: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "DONE jev-m2c6 0f7de16e UNMEASURED (fixed arm structurally void: 57 single-turn RPC probes; locked proxy fires on negation at 0.63). Table+analyzer committed, spend $0. Bead in_progress for OrangeFrog.",
+  "ref": [
+   "2026-10-01T22:41:54.086Z",
+   "9daf0990104d461ae21d391cece8b091378abc6cb3246f63384b719c3e610545"
+  ]
+ },
+ {
+  "id": "k35",
+  "prompt": "fix the login bug\n",
+  "memory": "grep proof needs vgrep not bare grep",
+  "ref": [
+   "2026-10-01T18:19:51.938Z",
+   "385c5ed57f0061bb5cad8f24a7aa405fd9df8beed19fad0a87d7da5e0df26e4c"
+  ]
+ },
+ {
+  "id": "k36",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 12 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:33:46.947Z",
+   "127167344b9e06f78f5dd6d012b28a0329ba26e88218dedc4382a88420ca19d2"
+  ]
+ },
+ {
+  "id": "k37",
+  "prompt": "q\n",
+  "memory": "fact number 9 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:52:55.495Z",
+   "46e74698cd9c3b3d5135f68f4ab76d05cef6243e17ce0c3d97f50e1672e9f086"
+  ]
+ },
+ {
+  "id": "k38",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 9 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:47:56.803Z",
+   "46e74698cd9c3b3d5135f68f4ab76d05cef6243e17ce0c3d97f50e1672e9f086"
+  ]
+ },
+ {
+  "id": "k39",
+  "prompt": "q",
+  "memory": "synthetic boundary fact 2",
+  "ref": [
+   "2026-10-01T19:03:26.736Z",
+   "5d71cffd9ffc9c35d36594ac935f36530286e6ed677931f76a8c7c889e668258"
+  ]
+ },
+ {
+  "id": "k40",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. This turn stood down. Pick the next unfinished stage of the mission and start it. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 4: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "CONDUCTOR (pane 1) to HazySpring (restarted onto fc7a5eff: memory-filter sidecar + memo). Read AGENTS.md. Resume jev-s47b: confirm this session logs memory-filter rows with sidecar text (mode 600) and repeat pairs cost 1 call; collect >= 30 new drops, then blind-label them against the committed >= 27/30 bar. Callback DONE memfilter-drops <x>/30.",
+  "ref": [
+   "2026-10-01T22:59:08.039Z",
+   "20d1810fcd5f14f3bce74dffef93cbcca2285a73c1a47b4ee8f8e32a1911c945"
+  ]
+ },
+ {
+  "id": "k41",
+  "prompt": "CONDUCTOR (pane 1) to CyanPeak: duel-consensus #1 bead jev-syje assigned (br show jev-syje): audit commands nimble clears. Bar first, blind labels. Commit --only, no push. Callback DONE jev-syje <numbers>.",
+  "memory": "RULES: claim your bead (br update <id> --status in_progress). Read br show <id> for the full acceptance. R\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-02T00:22:15.504Z",
+   "fe39d60f74c36d27960c2d0060e5693fd4c6d835a912b0560dab714c48f34316"
+  ]
+ },
+ {
+  "id": "k42",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 15 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:33:46.948Z",
+   "287f581e8d4d166345bc26ba7c0716f2d6b16a2ab44228d09b4dab6bbea53742"
+  ]
+ },
+ {
+  "id": "k43",
+  "prompt": "q\n",
+  "memory": "fact number 7 about unrelated trivia",
+  "ref": [
+   "2026-10-01T18:11:03.267Z",
+   "305af8ba2c1427f9e2d42e0134801ce478e0a1a1ccf3caafaf485fbd3a8b0d1e"
+  ]
+ },
+ {
+  "id": "k44",
+  "prompt": "what was the verdict",
+  "memory": "[redacted session-private body B] \u2026 [sleep_consolidation] (2026-10-01)",
+  "ref": [
+   "2026-10-01T18:45:49.130Z",
+   "a3a3f4913d69d0eb2b0b05ea372fbbd810374c659105ffdac369b631b6b07a77"
+  ]
+ },
+ {
+  "id": "k45",
+  "prompt": "q\n",
+  "memory": "fact number 4 about unrelated trivia",
+  "ref": [
+   "2026-10-01T18:23:22.396Z",
+   "adb2de3802df7693d68e4afac9129c381192783bd5829f28ba759f4a39104cfc"
+  ]
+ },
+ {
+  "id": "k46",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 8 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:33:46.945Z",
+   "0881fe447104fbf28a34974d3f8c82671a58781f28a7a595ef1edb66f2ee69af"
+  ]
+ },
+ {
+  "id": "k47",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 15 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:47:56.809Z",
+   "287f581e8d4d166345bc26ba7c0716f2d6b16a2ab44228d09b4dab6bbea53742"
+  ]
+ },
+ {
+  "id": "k48",
+  "prompt": "q\n<memories>\n- fact number 0 about unrelated trivia\n- fact number 1 about unrelated trivia\n- fact number 2 about unrelated trivia\n- fact number 3 about unrelated trivia\n- fact number 4 about unrelated trivia\n- fact number 5 about unrelated trivia\n- fact number 6 about unrelated trivia\n- fact number 7 about unrelated trivia\n- fact number 8 about unrelated trivia\n- fact number 9 about unrelated trivia\n- fact number 10 about unrelated trivia\n- fact number 11 about unrelated trivia\n- fact number 12 about unrelated trivia\n- fact number 13 about unrelated trivia\n- fact number 14 about unrelated trivia\n- fact number 15 about unrelated trivia\n- fact number 16 about unrelated trivia\n- fact number 17 about unrelated trivia\n- fact number 18 about unrelated trivia\n- fact number 19 about unrelated trivia\n- fact number 20 about unrelated trivia\n- fact number 21 about unrelated trivia\n- fact number 22 about unrelated trivia\n- fact number 23 about unrelated trivia\n- fact number 24 about unrelated trivia\n</memories>\n",
+  "memory": "fact number 19 about unrelated trivia",
+  "ref": [
+   "2026-10-01T17:34:13.143Z",
+   "c2c2f8c9479ac17b8f941870bc330b302c64b88b9886b8976cb66d722a2f17f5"
+  ]
+ },
+ {
+  "id": "k49",
+  "prompt": "CONDUCTOR (pane 1) to WildCarp: good clean FAIL, routed to CyanPeak to verify. Stand by: duel winners become beads within the hour.",
+  "memory": "CONDUCTOR (pane 1) to CyanPeak: HazySpring verified jev-og44 does NOT measure smart stop: surface-census.py ~L1223-28 counts any next turn after a classified stop, and genuine continuation markers (developer-role \"You said you would continue ... Attempt #N/3\") are 0 after 02:10Z, so the continuation bar passed vacuously. Fix: count only genuine markers; report n=0 as NOT_RUN (no continuations yet), not PASS. Keep the idle comparison but label it confounded (smart stop never continu\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T22:58:54.761Z",
+   "ed8befa9055f5eb3427d5e85d5d0f548b26b767ec2cdbff3ed62e60d05cc0663"
+  ]
+ },
+ {
+  "id": "k50",
+  "prompt": "q\n",
+  "memory": "fact number 11 about unrelated trivia",
+  "ref": [
+   "2026-10-01T18:11:03.271Z",
+   "4b54360f36e39e25c80c3747537585e0dd95c56589af569639f15a6d4d4f41e2"
+  ]
+ }
+]

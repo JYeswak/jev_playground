@@ -4,14 +4,17 @@ The two live answers are the ones recorded on the bead on 2026-09-25: with the k
 reported a 33-character placeholder, without it the full fake key.
 """
 
-import importlib.util
+import base64
+import json
 import pathlib
+import runpy
+import shutil
+import subprocess
 import unittest
+from types import SimpleNamespace
 
 SCRIPT = pathlib.Path(__file__).resolve().parents[2] / "scripts" / "omp-secret-probe.py"
-spec = importlib.util.spec_from_file_location("omp_secret_probe", SCRIPT)
-probe = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(probe)
+probe = SimpleNamespace(**runpy.run_path(SCRIPT, run_name="omp_secret_probe"))
 
 FAKE = "apikey_" + "a" * 35 + "_" + "b" * 60 + "7h0m"
 
@@ -102,6 +105,70 @@ class FakeKey(unittest.TestCase):
         # so omp still redacts it and the probe still tests redaction.
         for _ in range(20):
             self.assertTrue(probe.fake_key().startswith("apikey_fakefake"))
+class ProviderRoute(unittest.TestCase):
+    def run_probe(self, masking: bool) -> dict:
+        node = shutil.which("node")
+        if node is None:
+            self.fail("node executable not found")
+        try:
+            result = subprocess.run(
+                [
+                    node,
+                    str(pathlib.Path(__file__).with_name("probe.mjs")),
+                    "--mask" if masking else "--bypass-mask",
+                    "--inspect-result",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=60,
+                check=True,
+            )
+        except subprocess.CalledProcessError as error:
+            self.fail(error.stderr)
+        try:
+            return json.JSONDecoder().decode(result.stdout)
+        except json.JSONDecodeError as error:
+            self.fail(f"provider probe returned invalid JSON: {error}")
+
+    def test_actual_tool_result_is_redacted_before_local_provider_and_benign_content_survives(self):
+        observed = self.run_probe(masking=True)
+        self.assertEqual(observed["providerRequests"], 2)
+        self.assertEqual(observed["promptStatus"], "completed")
+        self.assertEqual(len(observed["toolExecutionEnds"]), 1)
+        self.assertFalse(observed["toolExecutionEnds"][0]["isError"])
+        self.assertTrue(observed["toolExecutionEnds"][0]["containsBenign"])
+        self.assertFalse(observed["markerVisible"])
+        request = json.loads(base64.b64decode(observed["providerRequestB64"], validate=True))
+        host_result = base64.b64decode(
+            observed["toolExecutionEnds"][0]["rawHostToolResultB64"], validate=True
+        ).decode()
+        self.assertIn("apikey_fakefake", host_result)
+        self.assertNotIn("apikey_fakefake", json.dumps(request))
+        self.assertIn("u06-benign-output-survives", json.dumps(request))
+        captured = base64.b64decode(observed["providerVisibleResultB64"], validate=True).decode()
+        self.assertIn("u06-benign-output-survives", captured)
+        self.assertNotIn("apikey_fakefake", captured)
+        self.assertIn(json.loads(captured), request["messages"])
+        self.assertTrue(observed["benignVisible"])
+
+    def test_masking_bypass_is_red_on_the_same_provider_route(self):
+        observed = self.run_probe(masking=False)
+        self.assertEqual(observed["providerRequests"], 2)
+        self.assertEqual(observed["promptStatus"], "completed")
+        self.assertEqual(len(observed["toolExecutionEnds"]), 1)
+        self.assertFalse(observed["toolExecutionEnds"][0]["isError"])
+        self.assertTrue(observed["toolExecutionEnds"][0]["containsBenign"])
+        request = json.loads(base64.b64decode(observed["providerRequestB64"], validate=True))
+        host_result = base64.b64decode(
+            observed["toolExecutionEnds"][0]["rawHostToolResultB64"], validate=True
+        ).decode()
+        self.assertIn("apikey_fakefake", host_result)
+        self.assertIn("apikey_fakefake", json.dumps(request))
+        captured = base64.b64decode(observed["providerVisibleResultB64"], validate=True).decode()
+        self.assertIn("apikey_fakefake", captured)
+        self.assertIn(json.loads(captured), request["messages"])
+        self.assertTrue(observed["markerVisible"])
+        self.assertTrue(observed["benignVisible"])
 
 
 if __name__ == "__main__":

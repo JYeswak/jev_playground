@@ -1,0 +1,4 @@
+Working...
+Fixed `census.py`: `count_calls` now skips blank/malformed/non-dict lines, requires `message.role == "assistant"` with list `content`, and counts only dict items with `type == "toolCall"` and string `name`.
+
+Check: `count_calls('sample.jsonl') == {'read': 1, 'bash': 1}`; edge cases (non-dict rows, non-dict `message`/`content`/items, wrong case `toolcall`, missing/non-string `name`) all return correct counts.

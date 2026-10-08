@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-700</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-700<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevran2</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">randombot2</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-700|init|battle
+|title|pokejevran2 vs. randombot2
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆randombot2
+|gametype|singles
+|player|p1|pokejevran2|lass-gen4|
+|player|p2|randombot2|camper-gen2|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Skarmory, M|
+|poke|p1|Ting-Lu|
+|poke|p1|Zamazenta-*|
+|poke|p1|Weavile, M|
+|poke|p1|Kyurem|
+|poke|p1|Slowking-Galar, M|
+|poke|p2|Ting-Lu|
+|poke|p2|Dragapult, M|
+|poke|p2|Slowking-Galar, M|
+|poke|p2|Kingambit, M|
+|poke|p2|Gliscor, M|
+|poke|p2|Zamazenta-*|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|start
+|switch|p1a: Weavile|Weavile, M|281/281
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|-terastallize|p2a: Ting-Lu|Water
+|move|p1a: Weavile|Triple Axel|p2a: Ting-Lu
+|-resisted|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|98/100
+|-resisted|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|93/100
+|-resisted|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|86/100
+|-hitcount|p2a: Ting-Lu|3
+|move|p2a: Ting-Lu|Ruination|p1a: Weavile
+|-damage|p1a: Weavile|141/281
+|-heal|p2a: Ting-Lu|92/100|[from] item: Leftovers
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Slowking|Slowking-Galar, M|100/100
+|move|p1a: Weavile|Low Kick|p2a: Slowking
+|-resisted|p2a: Slowking
+|-damage|p2a: Slowking|94/100
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|514/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|switch|p2a: Zamazenta|Zamazenta|100/100
+|-ability|p2a: Zamazenta|Dauntless Shield|boost
+|-boost|p2a: Zamazenta|def|1
+|upkeep
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Stone Edge|p1a: Ting-Lu|[miss]
+|-miss|p2a: Zamazenta|p1a: Ting-Lu
+|move|p1a: Ting-Lu|Earthquake|p2a: Zamazenta
+|-damage|p2a: Zamazenta|78/100
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Stone Edge|p1a: Ting-Lu|[miss]
+|-miss|p2a: Zamazenta|p1a: Ting-Lu
+|move|p1a: Ting-Lu|Earthquake|p2a: Zamazenta
+|-damage|p2a: Zamazenta|58/100
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Earthquake|p2a: Zamazenta
+|-damage|p2a: Zamazenta|37/100
+|move|p2a: Zamazenta|Roar|p1a: Ting-Lu
+|drag|p1a: Skarmory|Skarmory, M|333/333
+|upkeep
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Gliscor|Gliscor, M|100/100
+|move|p1a: Skarmory|Brave Bird|p2a: Gliscor
+|-damage|p2a: Gliscor|70/100
+|-damage|p1a: Skarmory|298/333|[from] Recoil
+|-status|p2a: Gliscor|tox|[from] item: Toxic Orb
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Kyurem|Kyurem|391/391
+|-ability|p1a: Kyurem|Pressure
+|move|p2a: Gliscor|Knock Off|p1a: Kyurem
+|-damage|p1a: Kyurem|308/391
+|-enditem|p1a: Kyurem|Heavy-Duty Boots|[from] move: Knock Off|[of] p2a: Gliscor
+|-heal|p2a: Gliscor|83/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, M|100/100
+|move|p1a: Kyurem|Ice Beam|p2a: Kingambit
+|-resisted|p2a: Kingambit
+|-damage|p2a: Kingambit|76/100
+|-heal|p2a: Kingambit|82/100|[from] item: Leftovers
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|325/325
+|-ability|p1a: Zamazenta|Dauntless Shield|boost
+|-boost|p1a: Zamazenta|def|1
+|move|p2a: Kingambit|Iron Head|p1a: Zamazenta
+|-damage|p1a: Zamazenta|226/325
+|-heal|p2a: Kingambit|88/100|[from] item: Leftovers
+|upkeep
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|-end|p2a: Kingambit|fallenundefined|[silent]
+|switch|p2a: Zamazenta|Zamazenta|37/100
+|move|p1a: Zamazenta|Close Combat|p2a: Zamazenta
+|-damage|p2a: Zamazenta|0 fnt
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|faint|p2a: Zamazenta
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu, tera:Water|92/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Close Combat|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|61/100
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|move|p2a: Ting-Lu|Ruination|p1a: Zamazenta
+|-damage|p1a: Zamazenta|113/325
+|-heal|p2a: Ting-Lu|67/100|[from] item: Leftovers
+|upkeep
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|514/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Ting-Lu|Stealth Rock|p1a: Ting-Lu
+|-sidestart|p1: pokejevran2|move: Stealth Rock
+|-heal|p2a: Ting-Lu|74/100|[from] item: Leftovers
+|upkeep
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Slowking|Slowking-Galar, M|100/100
+|move|p1a: Ting-Lu|Earthquake|p2a: Slowking
+|-supereffective|p2a: Slowking
+|-damage|p2a: Slowking|23/100
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Earthquake|p2a: Slowking
+|-supereffective|p2a: Slowking
+|-damage|p2a: Slowking|0 fnt
+|faint|p2a: Slowking
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Gliscor|Gliscor, M|83/100 tox
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Dragapult|Dragapult, M|100/100
+|switch|p1a: Kyurem|Kyurem|308/391
+|-damage|p1a: Kyurem|211/391|[from] Stealth Rock
+|-ability|p1a: Kyurem|Pressure
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Dragapult|U-turn|p1a: Kyurem
+|-damage|p1a: Kyurem|143/391
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, M|88/100|[from] U-turn
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen2|[silent]
+|move|p1a: Kyurem|Freeze-Dry|p2a: Kingambit
+|-resisted|p2a: Kingambit
+|-damage|p2a: Kingambit|68/100
+|-heal|p2a: Kingambit|74/100|[from] item: Leftovers
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Kyurem|Earth Power|p2a: Kingambit
+|-supereffective|p2a: Kingambit
+|-damage|p2a: Kingambit|15/100
+|move|p2a: Kingambit|Swords Dance|p2a: Kingambit
+|-boost|p2a: Kingambit|atk|2
+|-heal|p2a: Kingambit|21/100|[from] item: Leftovers
+|upkeep
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Kyurem|Earth Power|p2a: Kingambit
+|-supereffective|p2a: Kingambit
+|-damage|p2a: Kingambit|0 fnt
+|faint|p2a: Kingambit
+|-end|p2a: Kingambit|fallen2|[silent]
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Dragapult|Dragapult, M|100/100
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu, tera:Water|74/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|move|p1a: Kyurem|Ice Beam|p2a: Ting-Lu
+|-resisted|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|62/100
+|-status|p2a: Ting-Lu|frz
+|-heal|p2a: Ting-Lu|68/100 frz|[from] item: Leftovers
+|upkeep
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|514/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|-curestatus|p2a: Ting-Lu|frz|[msg]
+|move|p2a: Ting-Lu|Whirlwind|p1a: Ting-Lu
+|drag|p1a: Slowking|Slowking-Galar, M|394/394
+|-heal|p2a: Ting-Lu|74/100|[from] item: Leftovers
+|upkeep
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|514/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Ting-Lu|Whirlwind|p1a: Ting-Lu
+|drag|p1a: Slowking|Slowking-Galar, M|394/394
+|-heal|p2a: Ting-Lu|81/100|[from] item: Leftovers
+|upkeep
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Gliscor|Gliscor, M|83/100 tox
+|switch|p1a: Ting-Lu|Ting-Lu|514/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|-heal|p2a: Gliscor|95/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu, tera:Water|81/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|move|p1a: Ting-Lu|Ruination|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|41/100
+|-heal|p2a: Ting-Lu|47/100|[from] item: Leftovers
+|upkeep
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Ting-Lu|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|415/514
+|move|p1a: Ting-Lu|Earthquake|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|29/100
+|-heal|p2a: Ting-Lu|35/100|[from] item: Leftovers
+|upkeep
+|turn|26
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Earthquake|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|16/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|301/514
+|-heal|p2a: Ting-Lu|23/100|[from] item: Leftovers
+|upkeep
+|turn|27
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Ting-Lu|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|201/514
+|move|p1a: Ting-Lu|Earthquake|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|4/100
+|-heal|p2a: Ting-Lu|10/100|[from] item: Leftovers
+|upkeep
+|turn|28
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Gliscor|Gliscor, M|95/100 tox
+|move|p1a: Ting-Lu|Earthquake|p2a: Gliscor
+|-immune|p2a: Gliscor
+|-heal|p2a: Gliscor|100/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|29
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Kyurem|Kyurem|143/391
+|-damage|p1a: Kyurem|46/391|[from] Stealth Rock
+|-ability|p1a: Kyurem|Pressure
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|upkeep
+|turn|30
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Kyurem|Ice Beam|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|0 fnt
+|faint|p2a: Gliscor
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Dragapult|Dragapult, M|100/100
+|turn|31
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu, tera:Water|10/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|switch|p1a: Skarmory|Skarmory, M|298/333
+|-damage|p1a: Skarmory|257/333|[from] Stealth Rock
+|-heal|p2a: Ting-Lu|16/100|[from] item: Leftovers
+|upkeep
+|turn|32
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Skarmory|Brave Bird|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|0 fnt
+|faint|p2a: Ting-Lu
+|-damage|p1a: Skarmory|230/333|[from] Recoil
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Dragapult|Dragapult, M|100/100
+|turn|33
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Dragapult|Hex|p1a: Skarmory
+|-damage|p1a: Skarmory|97/333
+|move|p1a: Skarmory|Brave Bird|p2a: Dragapult
+|-damage|p2a: Dragapult|57/100
+|-damage|p1a: Skarmory|51/333|[from] Recoil
+|upkeep
+|turn|34
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Weavile|Weavile, M|141/281
+|move|p2a: Dragapult|Will-O-Wisp|p1a: Weavile
+|-status|p1a: Weavile|brn
+|-damage|p1a: Weavile|124/281 brn|[from] brn
+|upkeep
+|turn|35
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Dragapult|U-turn|p1a: Weavile
+|-supereffective|p1a: Weavile
+|-crit|p1a: Weavile
+|-damage|p1a: Weavile|0 fnt
+|faint|p1a: Weavile
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevran2 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|113/325
+|turn|36
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Dragapult|Draco Meteor|p1a: Zamazenta
+|-damage|p1a: Zamazenta|0 fnt
+|-unboost|p2a: Dragapult|spa|2
+|faint|p1a: Zamazenta
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevran2 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|201/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|turn|37
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Dragapult|Will-O-Wisp|p1a: Ting-Lu
+|-status|p1a: Ting-Lu|brn
+|move|p1a: Ting-Lu|Earthquake|p2a: Dragapult
+|-damage|p2a: Dragapult|32/100
+|-damage|p1a: Ting-Lu|169/514 brn|[from] brn
+|upkeep
+|turn|38
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Dragapult|Will-O-Wisp|p1a: Ting-Lu
+|-fail|p1a: Ting-Lu|brn
+|move|p1a: Ting-Lu|Earthquake|p2a: Dragapult
+|-damage|p2a: Dragapult|7/100
+|-damage|p1a: Ting-Lu|137/514 brn|[from] brn
+|upkeep
+|turn|39
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Dragapult|Will-O-Wisp|p1a: Ting-Lu
+|-fail|p1a: Ting-Lu|brn
+|move|p1a: Ting-Lu|Earthquake|p2a: Dragapult
+|-damage|p2a: Dragapult|0 fnt
+|faint|p2a: Dragapult
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

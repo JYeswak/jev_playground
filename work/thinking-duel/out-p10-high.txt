@@ -1,0 +1,8 @@
+Working...
+Use Template + Data Merge: Handlebars/Jinja2 templates + JSON data → rendered HTML → PDF engine.
+
+For HTML source use Puppeteer/Playwright for pixel-perfect output, or WeasyPrint for Python CSS-based reports.
+
+Set A4/Letter with explicit margins via `@page` CSS, and implement repeating headers/footers via `headerTemplate`/`footerTemplate` with `<span class="pageNumber"></span>` / `<span class="totalPages"></span>` plus `thead { display: table-header-group; }` and `tr { page-break-inside: avoid; }`.
+
+Embed logo/fonts as base64, reuse one browser instance across pages, and generate async via queue with verification on 1-row, 100-row, and special-character fixtures.

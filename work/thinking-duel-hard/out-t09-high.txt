@@ -1,0 +1,6 @@
+Working...
+Fixed. `csvexp.py` now uses stdlib `csv.writer` (`QUOTE_MINIMAL`, `doublequote=True`, `newline=""`, CRLF terminator); `cli.py` interface unchanged (stdin JSON → stdout CSV), internal file read switched to `newline=""` so embedded CRLF survives the temp-file passthrough.
+
+- Direct `write_csv` → `csv.reader` round-trip: OK (commas, quotes, LF, CRLF, empty, `"`-only fields)
+- `cli.py` round-trip: OK in text mode (LF rows) and byte mode (incl. `\r\n` field)
+

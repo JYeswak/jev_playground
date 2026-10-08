@@ -1,0 +1,4 @@
+Working...
+Fixed `b64x.py`: strip all whitespace, reject non-alphabet chars, require length multiple of 4, allow max 2 `=` only as terminal suffix, then `b64decode(validate=True)`.
+
+Check: round-trips incl. 256-byte binary across 1-char/2-char/uneven/generator splits and whitespace-injected splits pass; `TQ`, `TWE`, `AB=C`, `=ABC`, `AB==CD`, `A===`, `ABC==`, `TWFu!/-_/$` all raise `ValueError`; `TWFu`/`TQ==`/`TWE=`/ws-only/`""` decode correctly.

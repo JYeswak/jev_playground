@@ -1,0 +1,954 @@
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-1264","scenario":"alarm","source_id":"1264","text":"is my alarm set for tomorrow morning"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-1483","scenario":"alarm","source_id":"1483","text":"what alarms did i set"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-1635","scenario":"alarm","source_id":"1635","text":"what times do my alarms go off"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-1646","scenario":"alarm","source_id":"1646","text":"are there any alarms going off today"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-1658","scenario":"alarm","source_id":"1658","text":"i want to see all set alarms"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-1862","scenario":"alarm","source_id":"1862","text":"when does my alarm go off"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-2673","scenario":"alarm","source_id":"2673","text":"did i remember to set a reminder alarm for my next doctor's appointment"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-3161","scenario":"alarm","source_id":"3161","text":"do i have any alarms set for six am tomorrow"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-3702","scenario":"alarm","source_id":"3702","text":"olly do i have an alarm set for tomorrow"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-3870","scenario":"alarm","source_id":"3870","text":"what is the wake up time for my alarm i have set for the flight this weekend"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-4121","scenario":"alarm","source_id":"4121","text":"what time have you set the alarm"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-4145","scenario":"alarm","source_id":"4145","text":"what alarms did i set today"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-4851","scenario":"alarm","source_id":"4851","text":"is my alarm set"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-5122","scenario":"alarm","source_id":"5122","text":"check if default alarm is set"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-5902","scenario":"alarm","source_id":"5902","text":"check if alarm is set for six am"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-5974","scenario":"alarm","source_id":"5974","text":"did i set an alarm to have tablets in the noon"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-61","scenario":"alarm","source_id":"61","text":"what alarms i have set"}
+{"gold":"alarm_query","id":"massive-1.1-en-US-test-796","scenario":"alarm","source_id":"796","text":"confirm my alarm settings"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-1205","scenario":"alarm","source_id":"1205","text":"disable alarm for three p. m."}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-1452","scenario":"alarm","source_id":"1452","text":"remove the alarm for tomorrow"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-1454","scenario":"alarm","source_id":"1454","text":"set the alarm off"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-1675","scenario":"alarm","source_id":"1675","text":"remove tuesday alarm of nine am"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-1774","scenario":"alarm","source_id":"1774","text":"turn off the alarm"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-2168","scenario":"alarm","source_id":"2168","text":"turn off my alarm"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-2983","scenario":"alarm","source_id":"2983","text":"remove set alarm"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-3435","scenario":"alarm","source_id":"3435","text":"remove the latest alarm"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-3829","scenario":"alarm","source_id":"3829","text":"please remove the alarm that is set for weekdays at nine"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-399","scenario":"alarm","source_id":"399","text":"remove the first alarm"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-4017","scenario":"alarm","source_id":"4017","text":"get rid of my current alarms"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-4712","scenario":"alarm","source_id":"4712","text":"do not wake me up tomorrow"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-5103","scenario":"alarm","source_id":"5103","text":"olly cancel all soccer practice alarms"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-5116","scenario":"alarm","source_id":"5116","text":"i don't want any alarms"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-560","scenario":"alarm","source_id":"560","text":"turn off eight am alarm"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-59","scenario":"alarm","source_id":"59","text":"cancel my seven am alarm"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-6162","scenario":"alarm","source_id":"6162","text":"delete alarm"}
+{"gold":"alarm_remove","id":"massive-1.1-en-US-test-920","scenario":"alarm","source_id":"920","text":"please remove my alarm"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-0","scenario":"alarm","source_id":"0","text":"wake me up at five am this week"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-174","scenario":"alarm","source_id":"174","text":"set wake up thursday seven am"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-1913","scenario":"alarm","source_id":"1913","text":"wake me up at five am"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-1982","scenario":"alarm","source_id":"1982","text":"set alarm at six thirty am"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-2166","scenario":"alarm","source_id":"2166","text":"set an alarm for tomorrow at six in the morning"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-2334","scenario":"alarm","source_id":"2334","text":"add an alarm for tomorrow morning at six am"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-3213","scenario":"alarm","source_id":"3213","text":"set a new alarm for that time"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-3761","scenario":"alarm","source_id":"3761","text":"get me up at eight am"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-4319","scenario":"alarm","source_id":"4319","text":"i need to get up at ten tomorrow"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-4654","scenario":"alarm","source_id":"4654","text":"set an alarm for six thirty am"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-5043","scenario":"alarm","source_id":"5043","text":"set my alarm for twelve p. m."}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-5051","scenario":"alarm","source_id":"5051","text":"make a new alarm"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-5365","scenario":"alarm","source_id":"5365","text":"set alarm six am"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-5475","scenario":"alarm","source_id":"5475","text":"i need you to get me up at six am"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-5635","scenario":"alarm","source_id":"5635","text":"ensure i have to get up at six in morning"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-6083","scenario":"alarm","source_id":"6083","text":"create an alarm for today at ten am"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-612","scenario":"alarm","source_id":"612","text":"please ring the wake up alarm at eight am next saturday"}
+{"gold":"alarm_set","id":"massive-1.1-en-US-test-940","scenario":"alarm","source_id":"940","text":"turn my morning alarm on"}
+{"gold":"audio_volume_down","id":"massive-1.1-en-US-test-1048","scenario":"audio","source_id":"1048","text":"lower the speaker volume"}
+{"gold":"audio_volume_down","id":"massive-1.1-en-US-test-1352","scenario":"audio","source_id":"1352","text":"please slow down volume of speaker"}
+{"gold":"audio_volume_down","id":"massive-1.1-en-US-test-1639","scenario":"audio","source_id":"1639","text":"please turn the volume down"}
+{"gold":"audio_volume_down","id":"massive-1.1-en-US-test-3474","scenario":"audio","source_id":"3474","text":"please lower music volume"}
+{"gold":"audio_volume_down","id":"massive-1.1-en-US-test-3486","scenario":"audio","source_id":"3486","text":"speak softer please"}
+{"gold":"audio_volume_down","id":"massive-1.1-en-US-test-3809","scenario":"audio","source_id":"3809","text":"slow down the speaker volume"}
+{"gold":"audio_volume_down","id":"massive-1.1-en-US-test-5219","scenario":"audio","source_id":"5219","text":"please reduce the speaker volume"}
+{"gold":"audio_volume_down","id":"massive-1.1-en-US-test-5481","scenario":"audio","source_id":"5481","text":"cut down the volume"}
+{"gold":"audio_volume_down","id":"massive-1.1-en-US-test-5823","scenario":"audio","source_id":"5823","text":"decrease twenty percent"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-1510","scenario":"audio","source_id":"1510","text":"quiet mode on until i am home from work"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-2205","scenario":"audio","source_id":"2205","text":"silence for two hours"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-2206","scenario":"audio","source_id":"2206","text":"from now on mute"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-3","scenario":"audio","source_id":"3","text":"quiet"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-317","scenario":"audio","source_id":"317","text":"do not speak today"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-3175","scenario":"audio","source_id":"3175","text":"turn off the speakers"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-3460","scenario":"audio","source_id":"3460","text":"quiet time"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-3582","scenario":"audio","source_id":"3582","text":"mute please"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-3812","scenario":"audio","source_id":"3812","text":"mute for fifteen minutes"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-3838","scenario":"audio","source_id":"3838","text":"turn off the sounds"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-4653","scenario":"audio","source_id":"4653","text":"set the speakers to mute"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-4833","scenario":"audio","source_id":"4833","text":"clear data"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-4994","scenario":"audio","source_id":"4994","text":"please mute my speaker"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-5525","scenario":"audio","source_id":"5525","text":"mute for one hour"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-5958","scenario":"audio","source_id":"5958","text":"can you please stop speaking"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-6064","scenario":"audio","source_id":"6064","text":"don't speak for an hour"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-751","scenario":"audio","source_id":"751","text":"don't talk until i ask you to"}
+{"gold":"audio_volume_mute","id":"massive-1.1-en-US-test-804","scenario":"audio","source_id":"804","text":"hey siri mute the speakers"}
+{"gold":"audio_volume_other","id":"massive-1.1-en-US-test-1065","scenario":"audio","source_id":"1065","text":"where is volume setting"}
+{"gold":"audio_volume_other","id":"massive-1.1-en-US-test-4155","scenario":"audio","source_id":"4155","text":"change volume to thirty five percent"}
+{"gold":"audio_volume_other","id":"massive-1.1-en-US-test-4166","scenario":"audio","source_id":"4166","text":"change volume level to maximum"}
+{"gold":"audio_volume_other","id":"massive-1.1-en-US-test-4638","scenario":"audio","source_id":"4638","text":"change volume settings in the negative alexa"}
+{"gold":"audio_volume_other","id":"massive-1.1-en-US-test-5579","scenario":"audio","source_id":"5579","text":"can you change the volume at"}
+{"gold":"audio_volume_other","id":"massive-1.1-en-US-test-5812","scenario":"audio","source_id":"5812","text":"set the default audio setting"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-1300","scenario":"audio","source_id":"1300","text":"fast"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-1374","scenario":"audio","source_id":"1374","text":"can you turn up your volume"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-1630","scenario":"audio","source_id":"1630","text":"raise the volume of the current music"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-1640","scenario":"audio","source_id":"1640","text":"turn it up olly"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-258","scenario":"audio","source_id":"258","text":"i can't hear you"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-261","scenario":"audio","source_id":"261","text":"i can barely hear you"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-3349","scenario":"audio","source_id":"3349","text":"where is the car"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-3590","scenario":"audio","source_id":"3590","text":"speak loudly"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-4090","scenario":"audio","source_id":"4090","text":"turn up the volume on my speakers"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-443","scenario":"audio","source_id":"443","text":"raise volume"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-4702","scenario":"audio","source_id":"4702","text":"please turn my speakers on google"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-4831","scenario":"audio","source_id":"4831","text":"speaker volume increase"}
+{"gold":"audio_volume_up","id":"massive-1.1-en-US-test-608","scenario":"audio","source_id":"608","text":"unmute after"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-15792","scenario":"calendar","source_id":"15792","text":"who am i meeting today"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-6747","scenario":"calendar","source_id":"6747","text":"how many reminders do i have"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-6946","scenario":"calendar","source_id":"6946","text":"are there any meetings set for next wednesday"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-6968","scenario":"calendar","source_id":"6968","text":"i need to confirm all meetings for today can the invite person"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-6980","scenario":"calendar","source_id":"6980","text":"give me to do list"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-7316","scenario":"calendar","source_id":"7316","text":"do i have any appointments"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-7817","scenario":"calendar","source_id":"7817","text":"is this true about this date"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-7879","scenario":"calendar","source_id":"7879","text":"what are my next three events"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-7889","scenario":"calendar","source_id":"7889","text":"what time will the soccer match be tonight"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-8042","scenario":"calendar","source_id":"8042","text":"how many people are attending my next meeting"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-8043","scenario":"calendar","source_id":"8043","text":"what time is my next appointment"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-8044","scenario":"calendar","source_id":"8044","text":"what's my schedule today"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-8461","scenario":"calendar","source_id":"8461","text":"what are my plans for the month of may"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-8469","scenario":"calendar","source_id":"8469","text":"what is scheduled on my calendar today"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-8828","scenario":"calendar","source_id":"8828","text":"is calendar event true"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-8846","scenario":"calendar","source_id":"8846","text":"do i have anything set for the fourth of july this year"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-9121","scenario":"calendar","source_id":"9121","text":"what days do i have booked"}
+{"gold":"calendar_query","id":"massive-1.1-en-US-test-9137","scenario":"calendar","source_id":"9137","text":"at what time is the italian cafe closed between lunch and dinner"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-6761","scenario":"calendar","source_id":"6761","text":"remove from my calendar meeting at nine am"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-6918","scenario":"calendar","source_id":"6918","text":"delete events from calendar"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-6928","scenario":"calendar","source_id":"6928","text":"erase all the events"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-7087","scenario":"calendar","source_id":"7087","text":"cancel the tomorrow's meeting from my calendar"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-7294","scenario":"calendar","source_id":"7294","text":"remove the appointment with george adams from my calendar"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-7500","scenario":"calendar","source_id":"7500","text":"can you delete the next event"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-7680","scenario":"calendar","source_id":"7680","text":"in my calendar delete all of my golf events for the current month"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-7890","scenario":"calendar","source_id":"7890","text":"clear haircut today"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-7912","scenario":"calendar","source_id":"7912","text":"alexa remove dinner with mike from my calendar"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-8241","scenario":"calendar","source_id":"8241","text":"clear everything off my calendar for the rest of the year"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-8284","scenario":"calendar","source_id":"8284","text":"remove birthday from calendar"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-8431","scenario":"calendar","source_id":"8431","text":"get rid of all my scheduled events"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-8631","scenario":"calendar","source_id":"8631","text":"erase that from my calendar"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-8853","scenario":"calendar","source_id":"8853","text":"clear my next activity"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-8888","scenario":"calendar","source_id":"8888","text":"delete it"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-9074","scenario":"calendar","source_id":"9074","text":"please remove that event"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-9095","scenario":"calendar","source_id":"9095","text":"remove tonights dinner with shelly"}
+{"gold":"calendar_remove","id":"massive-1.1-en-US-test-9194","scenario":"calendar","source_id":"9194","text":"please remove this event from my calendar"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-6789","scenario":"calendar","source_id":"6789","text":"set meeting with joanna on saturday four p. m."}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7000","scenario":"calendar","source_id":"7000","text":"new event"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7161","scenario":"calendar","source_id":"7161","text":"remind this event in future"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7196","scenario":"calendar","source_id":"7196","text":"remind me the meeting with allen on fifteenth march"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7531","scenario":"calendar","source_id":"7531","text":"please add my pay days"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7628","scenario":"calendar","source_id":"7628","text":"remind me when i am at the library to get a new library card"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7655","scenario":"calendar","source_id":"7655","text":"add a reminder for april twenty as my bro's birthday"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7697","scenario":"calendar","source_id":"7697","text":"set a reminder for this"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7712","scenario":"calendar","source_id":"7712","text":"hey olly cancel all my other meetings and calls for second march as it is jim's birthday tag it as an event in your calendar"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7851","scenario":"calendar","source_id":"7851","text":"i have a meeting at noon today"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7863","scenario":"calendar","source_id":"7863","text":"remind me to start supper this afternoon at five"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7956","scenario":"calendar","source_id":"7956","text":"can you make this event repetitive"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-7971","scenario":"calendar","source_id":"7971","text":"set a reminder for two days prior of the event"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-8245","scenario":"calendar","source_id":"8245","text":"i would need to be notified of church services on sundays at eleven am"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-8387","scenario":"calendar","source_id":"8387","text":"create reminder for laundry at eight p. m."}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-8520","scenario":"calendar","source_id":"8520","text":"add event to calendar app"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-8568","scenario":"calendar","source_id":"8568","text":"will you send a calendar invite out to james and alice for brunch at eleven am on tuesday"}
+{"gold":"calendar_set","id":"massive-1.1-en-US-test-9053","scenario":"calendar","source_id":"9053","text":"set a meeting event reminder with mona on tuesday"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10019","scenario":"cooking","source_id":"10019","text":"please tell me how to i bake twelve oatmeal cookies"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10027","scenario":"cooking","source_id":"10027","text":"instructions to make a meal"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10049","scenario":"cooking","source_id":"10049","text":"tell me how to make a poor boy sandwich"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10055","scenario":"cooking","source_id":"10055","text":"what's the recipe for fried chicken"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10076","scenario":"cooking","source_id":"10076","text":"can you substitute baking soda for baking powder"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10081","scenario":"cooking","source_id":"10081","text":"tell me how to cook meatballs"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10099","scenario":"cooking","source_id":"10099","text":"do you know how to cook risotto"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10100","scenario":"cooking","source_id":"10100","text":"do you know recipe for risotto"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10132","scenario":"cooking","source_id":"10132","text":"how long should i cook a steak to be medium"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10182","scenario":"cooking","source_id":"10182","text":"how many eggs do i need for an omelet"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10214","scenario":"cooking","source_id":"10214","text":"recipes that can be cooked in an hour"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10217","scenario":"cooking","source_id":"10217","text":"find the recipe for sambar in cookingforu application"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-10226","scenario":"cooking","source_id":"10226","text":"let me know the recipe for preparing pasta"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-13023","scenario":"cooking","source_id":"13023","text":"show me recipes"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-9930","scenario":"cooking","source_id":"9930","text":"how long should i boil the egg"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-9940","scenario":"cooking","source_id":"9940","text":"find me a chocolate cake recipe"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-9942","scenario":"cooking","source_id":"9942","text":"what all goes into a red velvet cake"}
+{"gold":"cooking_recipe","id":"massive-1.1-en-US-test-9994","scenario":"cooking","source_id":"9994","text":"can you tell me the recipe to cook pav bhaji"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-1191","scenario":"datetime","source_id":"1191","text":"if it's sunrise in stockholm what time is it in okinawa"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-1266","scenario":"datetime","source_id":"1266","text":"if it's five am in berlin what time is it here"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-2309","scenario":"datetime","source_id":"2309","text":"it is seven am in pacific standard time"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-2451","scenario":"datetime","source_id":"2451","text":"seven hundred"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-3669","scenario":"datetime","source_id":"3669","text":"tell me the time in someplace"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-4112","scenario":"datetime","source_id":"4112","text":"convert current time from g. m. t. to e. s. t."}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-4845","scenario":"datetime","source_id":"4845","text":"how many hours distance is between my location and new york"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-50","scenario":"datetime","source_id":"50","text":"olly tell me the time in g. m. t. plus five"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-5204","scenario":"datetime","source_id":"5204","text":"convert eight am manila time to new york time"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-5332","scenario":"datetime","source_id":"5332","text":"time between us and canada"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-5333","scenario":"datetime","source_id":"5333","text":"time difference between u. k. and us"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-5497","scenario":"datetime","source_id":"5497","text":"what is the time difference between california and new york"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-5523","scenario":"datetime","source_id":"5523","text":"convert eight thirty from gtm four to g. m. t. five thirty"}
+{"gold":"datetime_convert","id":"massive-1.1-en-US-test-944","scenario":"datetime","source_id":"944","text":"what is the time difference between here and japan"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-1098","scenario":"datetime","source_id":"1098","text":"what day of the week does the fifteenth of march fall on"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-1148","scenario":"datetime","source_id":"1148","text":"what's the time in sydney now"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-1449","scenario":"datetime","source_id":"1449","text":"when is easter in the year two thousand and eighteen"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-197","scenario":"datetime","source_id":"197","text":"what time is it"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-2330","scenario":"datetime","source_id":"2330","text":"display the local time of london at this moment"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-2497","scenario":"datetime","source_id":"2497","text":"today is what date"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-2801","scenario":"datetime","source_id":"2801","text":"what time is it in london"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-355","scenario":"datetime","source_id":"355","text":"what day of the week is first april"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-4187","scenario":"datetime","source_id":"4187","text":"hey siri what's the time"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-4254","scenario":"datetime","source_id":"4254","text":"what time is it on the east coast of the united states"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-4362","scenario":"datetime","source_id":"4362","text":"what time is it in cleveland"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-4463","scenario":"datetime","source_id":"4463","text":"how many saturdays are in march"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-4882","scenario":"datetime","source_id":"4882","text":"what time is it in a city"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-4957","scenario":"datetime","source_id":"4957","text":"what day of the week is the twenty third of this month"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-5671","scenario":"datetime","source_id":"5671","text":"what is the time in las vegas"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-5774","scenario":"datetime","source_id":"5774","text":"current time in cpt"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-686","scenario":"datetime","source_id":"686","text":"what is the time now in new york"}
+{"gold":"datetime_query","id":"massive-1.1-en-US-test-8343","scenario":"datetime","source_id":"8343","text":"is it wednesday"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-15747","scenario":"email","source_id":"15747","text":"add this person's email"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-15987","scenario":"email","source_id":"15987","text":"add this new email with contact"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-16158","scenario":"email","source_id":"16158","text":"remember this email"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-16225","scenario":"email","source_id":"16225","text":"open contacts"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-16455","scenario":"email","source_id":"16455","text":"add new email to my contacts macs at gmail dot com"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-16470","scenario":"email","source_id":"16470","text":"please add this email to my contacts"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-16693","scenario":"email","source_id":"16693","text":"add lowes hardware to my contact emails located in cleveland ohio"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-16694","scenario":"email","source_id":"16694","text":"locate the email to giant eagle and put it into my contact list"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-16781","scenario":"email","source_id":"16781","text":"add this email address to my contacts and send an email to"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-16846","scenario":"email","source_id":"16846","text":"please add an email for john doe to my contacts johndoe at yahoo dot com"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-16911","scenario":"email","source_id":"16911","text":"please place my new email address to the contact"}
+{"gold":"email_addcontact","id":"massive-1.1-en-US-test-17054","scenario":"email","source_id":"17054","text":"just add a new email in my contacts from michael"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-15839","scenario":"email","source_id":"15839","text":"topic"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16075","scenario":"email","source_id":"16075","text":"display recent email from john"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16098","scenario":"email","source_id":"16098","text":"check unread emails from amy"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16183","scenario":"email","source_id":"16183","text":"check email about my job"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16263","scenario":"email","source_id":"16263","text":"did i receive any new email from robert"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16275","scenario":"email","source_id":"16275","text":"initiate polling for new email"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16354","scenario":"email","source_id":"16354","text":"check for emails from my employer"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16413","scenario":"email","source_id":"16413","text":"show all emails sent to me from my boss"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16669","scenario":"email","source_id":"16669","text":"did i get an email from paul"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16712","scenario":"email","source_id":"16712","text":"do i have any new email"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16763","scenario":"email","source_id":"16763","text":"emails in the last ten minutes"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16772","scenario":"email","source_id":"16772","text":"show all emails regarding the breach"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16814","scenario":"email","source_id":"16814","text":"check emails"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16888","scenario":"email","source_id":"16888","text":"what about new mail"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-16974","scenario":"email","source_id":"16974","text":"please check all new email of income tax department"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-17051","scenario":"email","source_id":"17051","text":"get me new email"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-17075","scenario":"email","source_id":"17075","text":"are there any new emails received after four o'clock today"}
+{"gold":"email_query","id":"massive-1.1-en-US-test-7353","scenario":"email","source_id":"7353","text":"just let me know next weeks weather in california"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-15794","scenario":"email","source_id":"15794","text":"where seth lives"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-15815","scenario":"email","source_id":"15815","text":"what is a work phone number of emilia"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-15946","scenario":"email","source_id":"15946","text":"find john smith in contacts"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-15948","scenario":"email","source_id":"15948","text":"open contacts and call john smith"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-15982","scenario":"email","source_id":"15982","text":"give me petey's telephone number"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16222","scenario":"email","source_id":"16222","text":"tell me about mary s."}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16228","scenario":"email","source_id":"16228","text":"is it anyone i knows birthday this month"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16229","scenario":"email","source_id":"16229","text":"which contact haven't i called in twelve months"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16523","scenario":"email","source_id":"16523","text":"can you tell me the contact information of jo"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16529","scenario":"email","source_id":"16529","text":"check mom's number"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16532","scenario":"email","source_id":"16532","text":"make a call to"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16589","scenario":"email","source_id":"16589","text":"who is the contact that last called me"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16710","scenario":"email","source_id":"16710","text":"how many of my contacts live or work in detroit"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16777","scenario":"email","source_id":"16777","text":"show john's contact information"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16797","scenario":"email","source_id":"16797","text":"what is mr. taxi's phone number it is in my contacts"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16874","scenario":"email","source_id":"16874","text":"how many phone numbers do i have for brenden"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-16983","scenario":"email","source_id":"16983","text":"do we have morgan's office's number"}
+{"gold":"email_querycontact","id":"massive-1.1-en-US-test-17095","scenario":"email","source_id":"17095","text":"what's leon's email"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-15765","scenario":"email","source_id":"15765","text":"answer to pawel's email"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-15829","scenario":"email","source_id":"15829","text":"go to contacts and enter a new email address"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-15950","scenario":"email","source_id":"15950","text":"respond to the email from john doe"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-15995","scenario":"email","source_id":"15995","text":"email karen about the budget meeting"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16082","scenario":"email","source_id":"16082","text":"send an email to peter and ask him how is he now can i do something to help him"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16245","scenario":"email","source_id":"16245","text":"send email to joe at a. o. l. dot com"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16377","scenario":"email","source_id":"16377","text":"send mom an email now"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16398","scenario":"email","source_id":"16398","text":"please send the email to jeff"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16559","scenario":"email","source_id":"16559","text":"send a reply to mike with the answer four hundred and thirty from his email he sent this morning"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16593","scenario":"email","source_id":"16593","text":"that last email needs to be answer a. s. a. p."}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16624","scenario":"email","source_id":"16624","text":"i need an email to be sent to comcastcom about my service issues"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16729","scenario":"email","source_id":"16729","text":"respond to my email from bob letting them know i'll see them tomorrow"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16838","scenario":"email","source_id":"16838","text":"can you send the email to the new email id"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16916","scenario":"email","source_id":"16916","text":"hey reply a mail which i received"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-16947","scenario":"email","source_id":"16947","text":"reply email"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-17019","scenario":"email","source_id":"17019","text":"compose a reply to last email"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-17042","scenario":"email","source_id":"17042","text":"write an email for john at gmail dot com"}
+{"gold":"email_sendemail","id":"massive-1.1-en-US-test-17123","scenario":"email","source_id":"17123","text":"email form for regional v. p."}
+{"gold":"general_greet","id":"massive-1.1-en-US-test-46","scenario":"general","source_id":"46","text":"what's up olly"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-1158","scenario":"general","source_id":"1158","text":"crack a joke"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-122","scenario":"general","source_id":"122","text":"send a giggle my way"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-124","scenario":"general","source_id":"124","text":"olly tell me a joke"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-1256","scenario":"general","source_id":"1256","text":"what's the funniest joke you know"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-1372","scenario":"general","source_id":"1372","text":"what's a good joke"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-2721","scenario":"general","source_id":"2721","text":"do you have a funny joke for me"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-3330","scenario":"general","source_id":"3330","text":"i want to hear a joke"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-3364","scenario":"general","source_id":"3364","text":"knock knock"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-411","scenario":"general","source_id":"411","text":"can you tell me a joke"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-412","scenario":"general","source_id":"412","text":"tell me a funny joke"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-4216","scenario":"general","source_id":"4216","text":"tell me the funniest joke that was ever told"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-4217","scenario":"general","source_id":"4217","text":"i would like to hear some good funny jokes"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-4913","scenario":"general","source_id":"4913","text":"are you aware this joke"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-494","scenario":"general","source_id":"494","text":"what's a good joke"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-4982","scenario":"general","source_id":"4982","text":"what is the funniest joke ever"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-5952","scenario":"general","source_id":"5952","text":"say a good joke for me right now"}
+{"gold":"general_joke","id":"massive-1.1-en-US-test-6147","scenario":"general","source_id":"6147","text":"find funny jokes"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-13150","scenario":"general","source_id":"13150","text":"can you cook something special for me and my wife"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-13223","scenario":"general","source_id":"13223","text":"why does sofia vergara look so young"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-13348","scenario":"general","source_id":"13348","text":"i need to ask you how many angels can dance on a pinhead"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-13486","scenario":"general","source_id":"13486","text":"can you show me a list of all my recent commands"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-13547","scenario":"general","source_id":"13547","text":"where was will ferrell seen last night"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-14071","scenario":"general","source_id":"14071","text":"tell me what i wore yesterday"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-14356","scenario":"general","source_id":"14356","text":"i think i can travel the whole world in a day"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-14367","scenario":"general","source_id":"14367","text":"will there be a world war four"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-14461","scenario":"general","source_id":"14461","text":"features of google pixel"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-3127","scenario":"general","source_id":"3127","text":"how many tornadoes have there been this month"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-3598","scenario":"general","source_id":"3598","text":"how about you"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-6294","scenario":"general","source_id":"6294","text":"olly i just cleaned my car"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-6304","scenario":"general","source_id":"6304","text":"how are you feeling today"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-6371","scenario":"general","source_id":"6371","text":"veganism"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-6593","scenario":"general","source_id":"6593","text":"start a gossip"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-6650","scenario":"general","source_id":"6650","text":"alexa how much do you know about me"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-6672","scenario":"general","source_id":"6672","text":"go on sweet talk me"}
+{"gold":"general_quirky","id":"massive-1.1-en-US-test-6737","scenario":"general","source_id":"6737","text":"olly i am taking day off tomorrow"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-1151","scenario":"iot","source_id":"1151","text":"start vacuum cleaner"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-1703","scenario":"iot","source_id":"1703","text":"my vacuum cleaner should start between ten to eleven am everyday"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-1941","scenario":"iot","source_id":"1941","text":"clean my house"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-2434","scenario":"iot","source_id":"2434","text":"start robot vacuum cleaner"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-2517","scenario":"iot","source_id":"2517","text":"how do i start the robot vacuum cleaner"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-27","scenario":"iot","source_id":"27","text":"it's dirty here make some noise"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-2903","scenario":"iot","source_id":"2903","text":"please start the vacuum cleaner"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-292","scenario":"iot","source_id":"292","text":"turn on the vacuum cleaner"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-2960","scenario":"iot","source_id":"2960","text":"start the vacuum"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-31","scenario":"iot","source_id":"31","text":"hoover the hallway"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-3841","scenario":"iot","source_id":"3841","text":"activate the roomba"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-4043","scenario":"iot","source_id":"4043","text":"run the vacuum"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-4173","scenario":"iot","source_id":"4173","text":"activate the vacuum cleaner and use it"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-5330","scenario":"iot","source_id":"5330","text":"put on the vacuum on now and clean the living room"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-6159","scenario":"iot","source_id":"6159","text":"clean the floor"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-635","scenario":"iot","source_id":"635","text":"please start vacuum cleaner"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-843","scenario":"iot","source_id":"843","text":"start the robot roomba"}
+{"gold":"iot_cleaning","id":"massive-1.1-en-US-test-864","scenario":"iot","source_id":"864","text":"robot vacuum the living room now"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-11914","scenario":"iot","source_id":"11914","text":"olly i need a drink"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-1812","scenario":"iot","source_id":"1812","text":"please make me coffee without sweetener"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-2512","scenario":"iot","source_id":"2512","text":"how do i set my coffee machine to make coffee"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-2753","scenario":"iot","source_id":"2753","text":"i need a cup of coffee"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-3138","scenario":"iot","source_id":"3138","text":"make me a cup of coffee with salted carmel flavored cream"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-3196","scenario":"iot","source_id":"3196","text":"hey olly can you please make me a creamy coffee"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-3320","scenario":"iot","source_id":"3320","text":"please activate my coffee pot for me"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-3323","scenario":"iot","source_id":"3323","text":"please turn on my coffee pot"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-3418","scenario":"iot","source_id":"3418","text":"can you set my coffee machine to make me coffee at seven am"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-3568","scenario":"iot","source_id":"3568","text":"set my coffee machine"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-4084","scenario":"iot","source_id":"4084","text":"make a coffee"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-4244","scenario":"iot","source_id":"4244","text":"olly turn on the coffee machine to make me some coffee"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-4988","scenario":"iot","source_id":"4988","text":"prepare a cup of coffee for me"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-5017","scenario":"iot","source_id":"5017","text":"can you please make a coffee"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-5149","scenario":"iot","source_id":"5149","text":"set the coffee maker to on"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-6034","scenario":"iot","source_id":"6034","text":"coffee"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-6060","scenario":"iot","source_id":"6060","text":"please start the coffee pot"}
+{"gold":"iot_coffee","id":"massive-1.1-en-US-test-6061","scenario":"iot","source_id":"6061","text":"make the coffee"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-1217","scenario":"iot","source_id":"1217","text":"olly change the lighting to blue"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-1428","scenario":"iot","source_id":"1428","text":"i'd like some red lighting"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-1960","scenario":"iot","source_id":"1960","text":"change the light to pink color"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-2351","scenario":"iot","source_id":"2351","text":"olly put dark colors instead of light ones in the house"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-2540","scenario":"iot","source_id":"2540","text":"make the room light blue"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-2542","scenario":"iot","source_id":"2542","text":"make the bedroom lights red and the hall lights normal color please"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-2975","scenario":"iot","source_id":"2975","text":"please change the light colors to red"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-3542","scenario":"iot","source_id":"3542","text":"change the lights in the living room to green and red"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-3543","scenario":"iot","source_id":"3543","text":"i want the light to be a little more red ish"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-3674","scenario":"iot","source_id":"3674","text":"i would like the like in the kitchen to be a different color"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-3734","scenario":"iot","source_id":"3734","text":"turn the lights to red color"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-4174","scenario":"iot","source_id":"4174","text":"hey olly chance the current light settings"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-4247","scenario":"iot","source_id":"4247","text":"house change all lights to blue"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-4248","scenario":"iot","source_id":"4248","text":"house lights blue"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-4516","scenario":"iot","source_id":"4516","text":"olly change the color of the lights"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-456","scenario":"iot","source_id":"456","text":"change the bedroom lights to green"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-4826","scenario":"iot","source_id":"4826","text":"make the lights pink"}
+{"gold":"iot_hue_lightchange","id":"massive-1.1-en-US-test-4955","scenario":"iot","source_id":"4955","text":"would you love to see"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-1030","scenario":"iot","source_id":"1030","text":"dim the lights in the living room"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-1778","scenario":"iot","source_id":"1778","text":"please dim the lights"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-2016","scenario":"iot","source_id":"2016","text":"lower lights in kitchen"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-2128","scenario":"iot","source_id":"2128","text":"color of light should be dimmed bright"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-2263","scenario":"iot","source_id":"2263","text":"show me the dim color"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-2311","scenario":"iot","source_id":"2311","text":"alexa turn the lights down to seven"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-3222","scenario":"iot","source_id":"3222","text":"i want a lower light"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-3280","scenario":"iot","source_id":"3280","text":"lower the lights please"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-3834","scenario":"iot","source_id":"3834","text":"turn down lights"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-468","scenario":"iot","source_id":"468","text":"change the lights to dim"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-4896","scenario":"iot","source_id":"4896","text":"lower the overhead lights"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-5047","scenario":"iot","source_id":"5047","text":"alexa please turn down the lights in the house"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-5201","scenario":"iot","source_id":"5201","text":"turn my lights down to a lower level of brightness"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-5349","scenario":"iot","source_id":"5349","text":"olly give me some dim light"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-5988","scenario":"iot","source_id":"5988","text":"adjust the lights to a lower setting please"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-6015","scenario":"iot","source_id":"6015","text":"decrease brightness of lights"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-665","scenario":"iot","source_id":"665","text":"can you lower the lights"}
+{"gold":"iot_hue_lightdim","id":"massive-1.1-en-US-test-964","scenario":"iot","source_id":"964","text":"i want dimmer lights"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-1554","scenario":"iot","source_id":"1554","text":"turn off the lamps"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-1784","scenario":"iot","source_id":"1784","text":"turn off the dining room"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-1786","scenario":"iot","source_id":"1786","text":"switch off the master's bedroom"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-2160","scenario":"iot","source_id":"2160","text":"i'm going to sleep now"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-2230","scenario":"iot","source_id":"2230","text":"turn off kitchen light"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-2965","scenario":"iot","source_id":"2965","text":"turn office lights off"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-3098","scenario":"iot","source_id":"3098","text":"make the lights off"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-3378","scenario":"iot","source_id":"3378","text":"no lights in the kitchen"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-4088","scenario":"iot","source_id":"4088","text":"turn off overhead light"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-4171","scenario":"iot","source_id":"4171","text":"turn off the lights in the kitchen"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-428","scenario":"iot","source_id":"428","text":"turn off the bathroom lights"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-5157","scenario":"iot","source_id":"5157","text":"olly turn the light off in the living room"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-5243","scenario":"iot","source_id":"5243","text":"siri please turn the lights off in the bathroom"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-6055","scenario":"iot","source_id":"6055","text":"did i leave the light on in the garage"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-6073","scenario":"iot","source_id":"6073","text":"turn off porch light"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-914","scenario":"iot","source_id":"914","text":"please turn lights off"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-997","scenario":"iot","source_id":"997","text":"turn the living room's light off"}
+{"gold":"iot_hue_lightoff","id":"massive-1.1-en-US-test-999","scenario":"iot","source_id":"999","text":"could you turn the light off"}
+{"gold":"iot_hue_lighton","id":"massive-1.1-en-US-test-14","scenario":"iot","source_id":"14","text":"and the darkness has fallen"}
+{"gold":"iot_hue_lighton","id":"massive-1.1-en-US-test-286","scenario":"iot","source_id":"286","text":"light up the lights in the kitchen"}
+{"gold":"iot_hue_lighton","id":"massive-1.1-en-US-test-3522","scenario":"iot","source_id":"3522","text":"please turn on my balcony lights"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-1071","scenario":"iot","source_id":"1071","text":"brighten the lights in the hallway"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-1072","scenario":"iot","source_id":"1072","text":"please turn up the screen brightness all the way"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-1090","scenario":"iot","source_id":"1090","text":"can you increase the brightness in the room"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-1756","scenario":"iot","source_id":"1756","text":"brighten the lights"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-2075","scenario":"iot","source_id":"2075","text":"i want more light"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-2082","scenario":"iot","source_id":"2082","text":"raise the light"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-2234","scenario":"iot","source_id":"2234","text":"i can't see turn up the lights"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-2264","scenario":"iot","source_id":"2264","text":"light color for study room"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-2403","scenario":"iot","source_id":"2403","text":"give me more light"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-3595","scenario":"iot","source_id":"3595","text":"brighter"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-3883","scenario":"iot","source_id":"3883","text":"brighten up the lighting"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-4283","scenario":"iot","source_id":"4283","text":"increase the brightness in this room"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-5501","scenario":"iot","source_id":"5501","text":"please put all the lights"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-5573","scenario":"iot","source_id":"5573","text":"please set the brightness of lightness appropriately in kitchen"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-5574","scenario":"iot","source_id":"5574","text":"brighten of lights in living room"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-5727","scenario":"iot","source_id":"5727","text":"brighten the light of hall"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-6174","scenario":"iot","source_id":"6174","text":"make it brighter in here"}
+{"gold":"iot_hue_lightup","id":"massive-1.1-en-US-test-80","scenario":"iot","source_id":"80","text":"set lights brightness higher"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-2566","scenario":"iot","source_id":"2566","text":"turn off my wemo socket"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-2690","scenario":"iot","source_id":"2690","text":"turn off the socket"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-3077","scenario":"iot","source_id":"3077","text":"shut off the socket"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-321","scenario":"iot","source_id":"321","text":"disable my okug"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-3298","scenario":"iot","source_id":"3298","text":"power off the wemo plug"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-3326","scenario":"iot","source_id":"3326","text":"turn the plug off"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-3774","scenario":"iot","source_id":"3774","text":"disable smart socket"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-3775","scenario":"iot","source_id":"3775","text":"i want the smart socket off now"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-4024","scenario":"iot","source_id":"4024","text":"please power down"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-4026","scenario":"iot","source_id":"4026","text":"power off"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-4154","scenario":"iot","source_id":"4154","text":"turn off my wifi"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-4966","scenario":"iot","source_id":"4966","text":"hello i want to turn off my wemo plug"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-4992","scenario":"iot","source_id":"4992","text":"turn off sockets"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-5050","scenario":"iot","source_id":"5050","text":"off all type of active devices"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-5396","scenario":"iot","source_id":"5396","text":"please turn socket off"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-5652","scenario":"iot","source_id":"5652","text":"switch wemo plug socket off"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-5856","scenario":"iot","source_id":"5856","text":"turn off smart plug socket"}
+{"gold":"iot_wemo_off","id":"massive-1.1-en-US-test-5888","scenario":"iot","source_id":"5888","text":"power off please"}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-13548","scenario":"iot","source_id":"13548","text":"i'd like you to turn turn on the t. v."}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-1551","scenario":"iot","source_id":"1551","text":"turn on wemo"}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-3184","scenario":"iot","source_id":"3184","text":"stop start the juice"}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-322","scenario":"iot","source_id":"322","text":"enable my plug"}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-389","scenario":"iot","source_id":"389","text":"turn the smart plug on"}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-4201","scenario":"iot","source_id":"4201","text":"power on wemo"}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-426","scenario":"iot","source_id":"426","text":"power up the plug socket one"}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-4618","scenario":"iot","source_id":"4618","text":"enable smart socket"}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-4620","scenario":"iot","source_id":"4620","text":"turn on new smart socket"}
+{"gold":"iot_wemo_on","id":"massive-1.1-en-US-test-4799","scenario":"iot","source_id":"4799","text":"please turn on the wemo plug socket"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10471","scenario":"lists","source_id":"10471","text":"i need to create a new to do list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10503","scenario":"lists","source_id":"10503","text":"add the post office to my list of errands for saturday"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10645","scenario":"lists","source_id":"10645","text":"add red wine to my shopping list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10712","scenario":"lists","source_id":"10712","text":"create a new list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10738","scenario":"lists","source_id":"10738","text":"can you please add an item to my grocery list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10812","scenario":"lists","source_id":"10812","text":"add bananas to my shopping list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10816","scenario":"lists","source_id":"10816","text":"create a playlist"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10858","scenario":"lists","source_id":"10858","text":"new list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10898","scenario":"lists","source_id":"10898","text":"please add list of things to buy for party"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10915","scenario":"lists","source_id":"10915","text":"begin a new list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10938","scenario":"lists","source_id":"10938","text":"please add sugar to my grocery list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10940","scenario":"lists","source_id":"10940","text":"make a new shopping list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10982","scenario":"lists","source_id":"10982","text":"put hamburger on my grocery list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-10996","scenario":"lists","source_id":"10996","text":"add bob to my list of contacts"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-11026","scenario":"lists","source_id":"11026","text":"add new item to list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-11140","scenario":"lists","source_id":"11140","text":"set list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-11141","scenario":"lists","source_id":"11141","text":"please find all name start with alphabetic of a and create a list"}
+{"gold":"lists_createoradd","id":"massive-1.1-en-US-test-11157","scenario":"lists","source_id":"11157","text":"please create new list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10440","scenario":"lists","source_id":"10440","text":"any special events on my list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10451","scenario":"lists","source_id":"10451","text":"what i am going to do today"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10512","scenario":"lists","source_id":"10512","text":"list everything left on my query"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10538","scenario":"lists","source_id":"10538","text":"please repeat my shopping list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10588","scenario":"lists","source_id":"10588","text":"show me the contents of the list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10679","scenario":"lists","source_id":"10679","text":"what is on my to do list today"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10760","scenario":"lists","source_id":"10760","text":"tell me that list i wrote two days ago"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10855","scenario":"lists","source_id":"10855","text":"need to check my list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10868","scenario":"lists","source_id":"10868","text":"olly anything else left on the list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10927","scenario":"lists","source_id":"10927","text":"let me hear my list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10931","scenario":"lists","source_id":"10931","text":"what is on my playlist"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10956","scenario":"lists","source_id":"10956","text":"what groups are listed in my contacts"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-10999","scenario":"lists","source_id":"10999","text":"say the list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-11124","scenario":"lists","source_id":"11124","text":"list items on my work list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-11154","scenario":"lists","source_id":"11154","text":"check recent to do list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-11172","scenario":"lists","source_id":"11172","text":"give me all available lists"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-11186","scenario":"lists","source_id":"11186","text":"i have my clothes list"}
+{"gold":"lists_query","id":"massive-1.1-en-US-test-11215","scenario":"lists","source_id":"11215","text":"list"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10494","scenario":"lists","source_id":"10494","text":"remove pencil from stationary"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10508","scenario":"lists","source_id":"10508","text":"remove list item"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10565","scenario":"lists","source_id":"10565","text":"delete all lists"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10568","scenario":"lists","source_id":"10568","text":"remove the old music list"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10579","scenario":"lists","source_id":"10579","text":"reset my locations list"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10696","scenario":"lists","source_id":"10696","text":"replace"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10755","scenario":"lists","source_id":"10755","text":"throw away my to do list please"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10756","scenario":"lists","source_id":"10756","text":"clear out the shopping list"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10790","scenario":"lists","source_id":"10790","text":"delete item from list"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10808","scenario":"lists","source_id":"10808","text":"delete last item listed"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10828","scenario":"lists","source_id":"10828","text":"erase all"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10895","scenario":"lists","source_id":"10895","text":"delete item from my list"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10960","scenario":"lists","source_id":"10960","text":"scratch that one from the list"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-10985","scenario":"lists","source_id":"10985","text":"delete my to do's for this week"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-11053","scenario":"lists","source_id":"11053","text":"get rid of the list google"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-11133","scenario":"lists","source_id":"11133","text":"remove the guest list i created last week"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-11162","scenario":"lists","source_id":"11162","text":"i want to remove apples from list"}
+{"gold":"lists_remove","id":"massive-1.1-en-US-test-11164","scenario":"lists","source_id":"11164","text":"away off from list"}
+{"gold":"music_dislikeness","id":"massive-1.1-en-US-test-1076","scenario":"music","source_id":"1076","text":"do not play rock metal"}
+{"gold":"music_dislikeness","id":"massive-1.1-en-US-test-2056","scenario":"music","source_id":"2056","text":"i never want to hear that song again"}
+{"gold":"music_dislikeness","id":"massive-1.1-en-US-test-3029","scenario":"music","source_id":"3029","text":"i hate this song"}
+{"gold":"music_dislikeness","id":"massive-1.1-en-US-test-3103","scenario":"music","source_id":"3103","text":"don't play this song again"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-150","scenario":"music","source_id":"150","text":"i like this song"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-1527","scenario":"music","source_id":"1527","text":"remind me that i like that song"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-1872","scenario":"music","source_id":"1872","text":"great song for the commute"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-2780","scenario":"music","source_id":"2780","text":"are there any upcoming concerts by"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-3193","scenario":"music","source_id":"3193","text":"rate five"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-3204","scenario":"music","source_id":"3204","text":"please note i like jazz and hate disco"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-3683","scenario":"music","source_id":"3683","text":"olly save all the songs i have listened to more than once"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-3819","scenario":"music","source_id":"3819","text":"please rate current song as five stars"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-3915","scenario":"music","source_id":"3915","text":"this is a good tune please notate file accordingly"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-4086","scenario":"music","source_id":"4086","text":"nice lyrics"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-4550","scenario":"music","source_id":"4550","text":"hey olly i like music by sigur ros"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-4809","scenario":"music","source_id":"4809","text":"remember how i fell about this song"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-4874","scenario":"music","source_id":"4874","text":"enter song suggestion"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-5198","scenario":"music","source_id":"5198","text":"tag this song with five stars"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-5229","scenario":"music","source_id":"5229","text":"i like music"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-5258","scenario":"music","source_id":"5258","text":"save this song to playlist"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-5531","scenario":"music","source_id":"5531","text":"the song in background is cool"}
+{"gold":"music_likeness","id":"massive-1.1-en-US-test-6109","scenario":"music","source_id":"6109","text":"store opinion on song"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-1176","scenario":"music","source_id":"1176","text":"who sings the song about a long black train"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-1677","scenario":"music","source_id":"1677","text":"what music is currently playing on"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-1741","scenario":"music","source_id":"1741","text":"hey olly please tell me the name of this song that is currently playing"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-2093","scenario":"music","source_id":"2093","text":"bring me the title of current music"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-2094","scenario":"music","source_id":"2094","text":"what is the music playing right now"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-2174","scenario":"music","source_id":"2174","text":"who is the singer of hotel california"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-2354","scenario":"music","source_id":"2354","text":"which type of music it is"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-2355","scenario":"music","source_id":"2355","text":"which film the music comes from what is the name of the music"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-2365","scenario":"music","source_id":"2365","text":"what song is on the radio"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-3741","scenario":"music","source_id":"3741","text":"what song is playing right now"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-3742","scenario":"music","source_id":"3742","text":"do you know the name of the song that is playing"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-3864","scenario":"music","source_id":"3864","text":"who sings the song that i am listening to right now"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-4189","scenario":"music","source_id":"4189","text":"what would you call this kind of music that we're listening to"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-484","scenario":"music","source_id":"484","text":"who is the singer of song"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-5250","scenario":"music","source_id":"5250","text":"title of song"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-5544","scenario":"music","source_id":"5544","text":"who is the music director of this song"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-6014","scenario":"music","source_id":"6014","text":"what artist is this"}
+{"gold":"music_query","id":"massive-1.1-en-US-test-761","scenario":"music","source_id":"761","text":"i want to know about this song"}
+{"gold":"music_settings","id":"massive-1.1-en-US-test-1710","scenario":"music","source_id":"1710","text":"change the music mode to rock"}
+{"gold":"music_settings","id":"massive-1.1-en-US-test-2647","scenario":"music","source_id":"2647","text":"could you please create a pandora channel for adele"}
+{"gold":"music_settings","id":"massive-1.1-en-US-test-4268","scenario":"music","source_id":"4268","text":"move to the next song in the list"}
+{"gold":"music_settings","id":"massive-1.1-en-US-test-5152","scenario":"music","source_id":"5152","text":"please skip two songs"}
+{"gold":"music_settings","id":"massive-1.1-en-US-test-5911","scenario":"music","source_id":"5911","text":"replay the musics"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-16146","scenario":"news","source_id":"16146","text":"give me the latest updates"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-1666","scenario":"news","source_id":"1666","text":"so clean news in past six hours is what"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-2098","scenario":"news","source_id":"2098","text":"what's going on in the world these days"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-2315","scenario":"news","source_id":"2315","text":"what's the news for today"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-2496","scenario":"news","source_id":"2496","text":"daily news"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-2724","scenario":"news","source_id":"2724","text":"give me news from c. n. n."}
+{"gold":"news_query","id":"massive-1.1-en-US-test-2898","scenario":"news","source_id":"2898","text":"are there any updates in regard to the election"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-3099","scenario":"news","source_id":"3099","text":"show me some current events"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-3624","scenario":"news","source_id":"3624","text":"news from c. n. n."}
+{"gold":"news_query","id":"massive-1.1-en-US-test-4178","scenario":"news","source_id":"4178","text":"is there any news about the presidency"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-4391","scenario":"news","source_id":"4391","text":"what are the headlines on c. n. n."}
+{"gold":"news_query","id":"massive-1.1-en-US-test-441","scenario":"news","source_id":"441","text":"what are the latest news headlines"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-4492","scenario":"news","source_id":"4492","text":"what are the latest crime statistics for me area"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-5196","scenario":"news","source_id":"5196","text":"i want to know about the brexit"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-588","scenario":"news","source_id":"588","text":"what is new news for today"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-6618","scenario":"news","source_id":"6618","text":"tell interesting news"}
+{"gold":"news_query","id":"massive-1.1-en-US-test-712","scenario":"news","source_id":"712","text":"i want to hear the last news from c. n. n."}
+{"gold":"news_query","id":"massive-1.1-en-US-test-765","scenario":"news","source_id":"765","text":"could you please give me up to date news headlines from my newest provider"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-11273","scenario":"play","source_id":"11273","text":"play next episode of harry potter by j. k. rowling"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-3894","scenario":"play","source_id":"3894","text":"read that back"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9669","scenario":"play","source_id":"9669","text":"i want to listen to be more chill by ned vizzini"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9680","scenario":"play","source_id":"9680","text":"resume harry potter from the place i have stopped listening to last time"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9689","scenario":"play","source_id":"9689","text":"pause the book"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9694","scenario":"play","source_id":"9694","text":"resume the playback of a child called it"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9700","scenario":"play","source_id":"9700","text":"play biography of jackie kennedy"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9720","scenario":"play","source_id":"9720","text":"resume harry potter book four"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9732","scenario":"play","source_id":"9732","text":"open davinci code audiobook"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9746","scenario":"play","source_id":"9746","text":"play pride and prejudice"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9754","scenario":"play","source_id":"9754","text":"olly let's listen to hunt for read october"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9767","scenario":"play","source_id":"9767","text":"play audiobook of planets"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9815","scenario":"play","source_id":"9815","text":"please play this playback on audiobook"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9851","scenario":"play","source_id":"9851","text":"resume joes book from where i left off last time"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9856","scenario":"play","source_id":"9856","text":"play the twilight book"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9878","scenario":"play","source_id":"9878","text":"please resume my audiobook"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9896","scenario":"play","source_id":"9896","text":"start chapter five of physics for future presidents"}
+{"gold":"play_audiobook","id":"massive-1.1-en-US-test-9897","scenario":"play","source_id":"9897","text":"playback tom clancy splinter cell"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10263","scenario":"play","source_id":"10263","text":"open chess app and begin game"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10268","scenario":"play","source_id":"10268","text":"let's play global thermonuclear war"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10285","scenario":"play","source_id":"10285","text":"please play clash of clans"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10288","scenario":"play","source_id":"10288","text":"play me a game of tic tac toe"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10302","scenario":"play","source_id":"10302","text":"launch game"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10317","scenario":"play","source_id":"10317","text":"play me in tic tac toe"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10319","scenario":"play","source_id":"10319","text":"play football with me"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10321","scenario":"play","source_id":"10321","text":"i want to play fifa seventeen"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10339","scenario":"play","source_id":"10339","text":"please open chess game i would like to play with you"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10346","scenario":"play","source_id":"10346","text":"start a game and play with me"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10349","scenario":"play","source_id":"10349","text":"let's play you'll be the keeper and never change position"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10352","scenario":"play","source_id":"10352","text":"play papa pear saga"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10353","scenario":"play","source_id":"10353","text":"bring up papa pear saga"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10365","scenario":"play","source_id":"10365","text":"play a game of contra as a second player"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10381","scenario":"play","source_id":"10381","text":"start a competitive crossword for us"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10399","scenario":"play","source_id":"10399","text":"please open and play chess with me"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10403","scenario":"play","source_id":"10403","text":"open games"}
+{"gold":"play_game","id":"massive-1.1-en-US-test-10406","scenario":"play","source_id":"10406","text":"open parcheese game for you and i"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-1318","scenario":"play","source_id":"1318","text":"start music app and play a song for me"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-1467","scenario":"play","source_id":"1467","text":"play slayer"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-1546","scenario":"play","source_id":"1546","text":"play my summer jams playlist"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-1994","scenario":"play","source_id":"1994","text":"can you open my itunes"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-2007","scenario":"play","source_id":"2007","text":"please play thirteen"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-2931","scenario":"play","source_id":"2931","text":"play atmosphere next"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-3207","scenario":"play","source_id":"3207","text":"stream poker face by lady gaga"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-3631","scenario":"play","source_id":"3631","text":"hey google play some jazz music for me"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-3911","scenario":"play","source_id":"3911","text":"i want to hear any songs that got grammys this year"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-397","scenario":"play","source_id":"397","text":"play any song by joe prsaise"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-4136","scenario":"play","source_id":"4136","text":"can you please play imogen heap"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-4909","scenario":"play","source_id":"4909","text":"play songs by barenaked ladies"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-5278","scenario":"play","source_id":"5278","text":"please play only music of pop mix"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-5347","scenario":"play","source_id":"5347","text":"play techno music"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-540","scenario":"play","source_id":"540","text":"play the song sung by katy perry"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-5813","scenario":"play","source_id":"5813","text":"play silent song"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-9457","scenario":"play","source_id":"9457","text":"play the song let it go"}
+{"gold":"play_music","id":"massive-1.1-en-US-test-9707","scenario":"play","source_id":"9707","text":"open media play jingle bells"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11259","scenario":"play","source_id":"11259","text":"jump to next podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11261","scenario":"play","source_id":"11261","text":"next"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11267","scenario":"play","source_id":"11267","text":"find an interesting podcast about last pritzker price winners"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11270","scenario":"play","source_id":"11270","text":"play next podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11322","scenario":"play","source_id":"11322","text":"what are todays top podcasts"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11341","scenario":"play","source_id":"11341","text":"find the latest disney podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11349","scenario":"play","source_id":"11349","text":"olly start the podcast over that i started last night"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11366","scenario":"play","source_id":"11366","text":"go back to previous episode of podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11376","scenario":"play","source_id":"11376","text":"i want to listen to podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11420","scenario":"play","source_id":"11420","text":"start playing my most recent podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11442","scenario":"play","source_id":"11442","text":"please play the latest bill simmons podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11459","scenario":"play","source_id":"11459","text":"go back to the last episode in this podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11460","scenario":"play","source_id":"11460","text":"i want to listen to a sports podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11470","scenario":"play","source_id":"11470","text":"play my favorite podcast please"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11483","scenario":"play","source_id":"11483","text":"start playing ringcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11505","scenario":"play","source_id":"11505","text":"replay my last played podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-11515","scenario":"play","source_id":"11515","text":"lets hear the united states of anxiety podcast"}
+{"gold":"play_podcasts","id":"massive-1.1-en-US-test-9592","scenario":"play","source_id":"9592","text":"search for podcasts that cover men's issues"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9212","scenario":"play","source_id":"9212","text":"someone play the radio"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9216","scenario":"play","source_id":"9216","text":"play my station"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9291","scenario":"play","source_id":"9291","text":"put on"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9301","scenario":"play","source_id":"9301","text":"play an f. m."}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9316","scenario":"play","source_id":"9316","text":"play kiss f. m. for me"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9326","scenario":"play","source_id":"9326","text":"please play radio station one right now"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9352","scenario":"play","source_id":"9352","text":"play the radio please"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9358","scenario":"play","source_id":"9358","text":"start radio channel eight hundred and eighty nine"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9363","scenario":"play","source_id":"9363","text":"let's play hits on the radio"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9408","scenario":"play","source_id":"9408","text":"start radio play"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9471","scenario":"play","source_id":"9471","text":"turn on a country music station"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9542","scenario":"play","source_id":"9542","text":"let me listen the latest news program on radio"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9562","scenario":"play","source_id":"9562","text":"could you please play this program for me"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9569","scenario":"play","source_id":"9569","text":"ok google play one hundred and six point seven"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9619","scenario":"play","source_id":"9619","text":"play prairie home companion on the car radio"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9629","scenario":"play","source_id":"9629","text":"could you please help me in listening to the radio"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9630","scenario":"play","source_id":"9630","text":"play radio mirchi for me"}
+{"gold":"play_radio","id":"massive-1.1-en-US-test-9651","scenario":"play","source_id":"9651","text":"play netflix on my p. s. four"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-13567","scenario":"qa","source_id":"13567","text":"currency converter please"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-13666","scenario":"qa","source_id":"13666","text":"what are pounds worth right now"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-13684","scenario":"qa","source_id":"13684","text":"what is the dollar price in inr"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-13685","scenario":"qa","source_id":"13685","text":"has the dollar rate increased"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-13847","scenario":"qa","source_id":"13847","text":"what is the exchange rate for mexico money"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-13896","scenario":"qa","source_id":"13896","text":"from dollar to euro"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-13966","scenario":"qa","source_id":"13966","text":"what is the yen worth"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14044","scenario":"qa","source_id":"14044","text":"what is the exchange rates in this region"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14074","scenario":"qa","source_id":"14074","text":"one dolla equals how much inr"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14239","scenario":"qa","source_id":"14239","text":"how much is the us dollar versus the pound"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14526","scenario":"qa","source_id":"14526","text":"what is price of dollar"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14530","scenario":"qa","source_id":"14530","text":"notify me when g. b. p. to u. s. d. rate as i expected"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14620","scenario":"qa","source_id":"14620","text":"foreign exchange rates"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14658","scenario":"qa","source_id":"14658","text":"what is the exchange rate of euro and dollar"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14762","scenario":"qa","source_id":"14762","text":"dollar to euro exchange rate"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14763","scenario":"qa","source_id":"14763","text":"how much is the dollar worth compared to the euro"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-14928","scenario":"qa","source_id":"14928","text":"let me know about the exchange rate of rupee to dirham"}
+{"gold":"qa_currency","id":"massive-1.1-en-US-test-15109","scenario":"qa","source_id":"15109","text":"siri please check exchange rates"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-13166","scenario":"qa","source_id":"13166","text":"spell and define oscillate"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-13494","scenario":"qa","source_id":"13494","text":"give the definition of motivation"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-13625","scenario":"qa","source_id":"13625","text":"what is the largest desk"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-13871","scenario":"qa","source_id":"13871","text":"how would you describe a happy birthday"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-13900","scenario":"qa","source_id":"13900","text":"the definition of life"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-13907","scenario":"qa","source_id":"13907","text":"define flabbergasted"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-13983","scenario":"qa","source_id":"13983","text":"suffering consequences"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14000","scenario":"qa","source_id":"14000","text":"describe a sloth"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14023","scenario":"qa","source_id":"14023","text":"describe hell"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14116","scenario":"qa","source_id":"14116","text":"describe rock sand"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14150","scenario":"qa","source_id":"14150","text":"what are converse shoes"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14429","scenario":"qa","source_id":"14429","text":"what is a caftan"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14498","scenario":"qa","source_id":"14498","text":"give me the description about smartphone"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14668","scenario":"qa","source_id":"14668","text":"describe item xy"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14690","scenario":"qa","source_id":"14690","text":"ok google what is a president"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14701","scenario":"qa","source_id":"14701","text":"describe the heart stone card game"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-14857","scenario":"qa","source_id":"14857","text":"could you explain the meaning of exorbitant for me please"}
+{"gold":"qa_definition","id":"massive-1.1-en-US-test-15092","scenario":"qa","source_id":"15092","text":"find a description about a samsung t. v."}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-13252","scenario":"qa","source_id":"13252","text":"what was george eliot's first november el"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-13513","scenario":"qa","source_id":"13513","text":"how many legs does a dog have"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-13636","scenario":"qa","source_id":"13636","text":"what is arnold schwarzenegger's birthday"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-13679","scenario":"qa","source_id":"13679","text":"can you tell me how many stomachs a cow has"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-13690","scenario":"qa","source_id":"13690","text":"what color are chairs"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-13758","scenario":"qa","source_id":"13758","text":"how old is marian carey"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14015","scenario":"qa","source_id":"14015","text":"what are the coordinates of the equator"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14083","scenario":"qa","source_id":"14083","text":"where jackie chan currently live"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14118","scenario":"qa","source_id":"14118","text":"show geographic details of pyramids"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14126","scenario":"qa","source_id":"14126","text":"show bio of rihana"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14370","scenario":"qa","source_id":"14370","text":"tell me the profession of celebrity"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14419","scenario":"qa","source_id":"14419","text":"is angeline having a new movie this year"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14505","scenario":"qa","source_id":"14505","text":"who is the current prime minister of russia"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14508","scenario":"qa","source_id":"14508","text":"please summarize the latest george r. r. martin ice and fire book"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14545","scenario":"qa","source_id":"14545","text":"tell me about india location"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-14822","scenario":"qa","source_id":"14822","text":"to compare in people"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-15039","scenario":"qa","source_id":"15039","text":"olly where do the rocky mountains start"}
+{"gold":"qa_factoid","id":"massive-1.1-en-US-test-4968","scenario":"qa","source_id":"4968","text":"who won the presidential election this year"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13035","scenario":"qa","source_id":"13035","text":"what is two hundred divided by ten"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13102","scenario":"qa","source_id":"13102","text":"how much is one plus one"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13122","scenario":"qa","source_id":"13122","text":"what is the factorial of ten"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13172","scenario":"qa","source_id":"13172","text":"calculate two multiplied by two"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13199","scenario":"qa","source_id":"13199","text":"do you know math"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13312","scenario":"qa","source_id":"13312","text":"alexa i've got dollars for the month how much can i spend every day this month"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13359","scenario":"qa","source_id":"13359","text":"what is twelve plus one hundred and ninety six"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13370","scenario":"qa","source_id":"13370","text":"what's the sum of the two numbers four and six"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13391","scenario":"qa","source_id":"13391","text":"what's ten percent off forty dollars"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13411","scenario":"qa","source_id":"13411","text":"show me the answer for this problem two hundred and forty six plus six hundred and fifty four"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13412","scenario":"qa","source_id":"13412","text":"what is four plus five"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13459","scenario":"qa","source_id":"13459","text":"what is twelve divided by four"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13460","scenario":"qa","source_id":"13460","text":"tell me what the product of eighteen and thirty one is"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-13552","scenario":"qa","source_id":"13552","text":"what is six divided by two"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-14025","scenario":"qa","source_id":"14025","text":"one plus two equal"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-14223","scenario":"qa","source_id":"14223","text":"answer for three times four"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-14268","scenario":"qa","source_id":"14268","text":"can you do nine plus two"}
+{"gold":"qa_maths","id":"massive-1.1-en-US-test-14757","scenario":"qa","source_id":"14757","text":"divide seventy six in two parts"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-13639","scenario":"qa","source_id":"13639","text":"what is the increase in stock value over the past week of disney"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-13754","scenario":"qa","source_id":"13754","text":"tell me the current price of exxon mobil stock"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-13934","scenario":"qa","source_id":"13934","text":"how is the stock going in general"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14090","scenario":"qa","source_id":"14090","text":"facebook current stock rate"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14130","scenario":"qa","source_id":"14130","text":"what is googs current price"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14189","scenario":"qa","source_id":"14189","text":"what is the price of starbuck's stock"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14342","scenario":"qa","source_id":"14342","text":"what is the stock price of hdfc"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14406","scenario":"qa","source_id":"14406","text":"give the stock price details of motorolla"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14473","scenario":"qa","source_id":"14473","text":"open stock price for name"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14555","scenario":"qa","source_id":"14555","text":"let me know up and down in stock price of this company stock"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14644","scenario":"qa","source_id":"14644","text":"stock price"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14820","scenario":"qa","source_id":"14820","text":"more stock price"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14874","scenario":"qa","source_id":"14874","text":"check stock price for dinky donuts"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14904","scenario":"qa","source_id":"14904","text":"were the stocks rising or declining"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14919","scenario":"qa","source_id":"14919","text":"how have megatel shares done last week"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14925","scenario":"qa","source_id":"14925","text":"did the price of walmart stock go up or down"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-14926","scenario":"qa","source_id":"14926","text":"how much would it cost to buy stock in apple"}
+{"gold":"qa_stock","id":"massive-1.1-en-US-test-2995","scenario":"qa","source_id":"2995","text":"please tell me news related to the stock market"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11570","scenario":"recommendation","source_id":"11570","text":"what's happening around my town"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11582","scenario":"recommendation","source_id":"11582","text":"is there anything happening on jazz scene around edinburgh"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11585","scenario":"recommendation","source_id":"11585","text":"any cultural events in california"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11598","scenario":"recommendation","source_id":"11598","text":"please let me know the dog shows events going on in my home town"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11643","scenario":"recommendation","source_id":"11643","text":"what events are happening soon"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11644","scenario":"recommendation","source_id":"11644","text":"show me events in sacramento"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11770","scenario":"recommendation","source_id":"11770","text":"any events this weekend in pondichery"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11827","scenario":"recommendation","source_id":"11827","text":"where can i go tonight"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11839","scenario":"recommendation","source_id":"11839","text":"what's happening around me"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11845","scenario":"recommendation","source_id":"11845","text":"olly hit me up with some exciting events in the bay area"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11860","scenario":"recommendation","source_id":"11860","text":"tell me the local events"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-11916","scenario":"recommendation","source_id":"11916","text":"what are some theme parks nearby"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-12054","scenario":"recommendation","source_id":"12054","text":"what's happening around town"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-12070","scenario":"recommendation","source_id":"12070","text":"when does panama city mall open"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-12073","scenario":"recommendation","source_id":"12073","text":"refer local current events"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-12098","scenario":"recommendation","source_id":"12098","text":"show me nearby musical events"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-13619","scenario":"recommendation","source_id":"13619","text":"are there any free events on in my area today"}
+{"gold":"recommendation_events","id":"massive-1.1-en-US-test-2113","scenario":"recommendation","source_id":"2113","text":"tell me all the current events in my hometown"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11607","scenario":"recommendation","source_id":"11607","text":"give the list of theaters in the vicinity"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11664","scenario":"recommendation","source_id":"11664","text":"olly i'm looking for a bar do you know a good one"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11677","scenario":"recommendation","source_id":"11677","text":"locate me the amazon restaurants"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11678","scenario":"recommendation","source_id":"11678","text":"i would like to know the best rating pubs in the local area"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11706","scenario":"recommendation","source_id":"11706","text":"what shops are round here"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11751","scenario":"recommendation","source_id":"11751","text":"what shops are within ten miles"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11778","scenario":"recommendation","source_id":"11778","text":"where is a good wine bar near me"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11796","scenario":"recommendation","source_id":"11796","text":"which bar has the most affordable drinks near sixth street"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11802","scenario":"recommendation","source_id":"11802","text":"are there any good pizza places around here"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11903","scenario":"recommendation","source_id":"11903","text":"search for local shops"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11942","scenario":"recommendation","source_id":"11942","text":"can you find me a furniture store near me"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-11953","scenario":"recommendation","source_id":"11953","text":"where is the nearest walmart"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-12004","scenario":"recommendation","source_id":"12004","text":"olly please list the best clothing shops near me"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-12020","scenario":"recommendation","source_id":"12020","text":"tell me what clothing stores are within five miles of me"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-12409","scenario":"recommendation","source_id":"12409","text":"where is the nearest gas station"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-13031","scenario":"recommendation","source_id":"13031","text":"what is the nearest pizza shop"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-13630","scenario":"recommendation","source_id":"13630","text":"where's the closest zoo to where i'm at"}
+{"gold":"recommendation_locations","id":"massive-1.1-en-US-test-6366","scenario":"recommendation","source_id":"6366","text":"tell me some best tourist places to visit in america"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11633","scenario":"recommendation","source_id":"11633","text":"what movies are showing in cinema today"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11634","scenario":"recommendation","source_id":"11634","text":"what movie should i watch today"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11636","scenario":"recommendation","source_id":"11636","text":"what movies are going around me"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11695","scenario":"recommendation","source_id":"11695","text":"do you have any suggestion action movies"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11733","scenario":"recommendation","source_id":"11733","text":"how is the new movie swat"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11744","scenario":"recommendation","source_id":"11744","text":"olly what are new drama movies opening this weekend"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11764","scenario":"recommendation","source_id":"11764","text":"cisco system"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11773","scenario":"recommendation","source_id":"11773","text":"find an oscar nominee movie"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11812","scenario":"recommendation","source_id":"11812","text":"what movies are playing tonight"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11858","scenario":"recommendation","source_id":"11858","text":"movies with good reviews"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11871","scenario":"recommendation","source_id":"11871","text":"recommend a movie playing in my area"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11920","scenario":"recommendation","source_id":"11920","text":"what movies are out this week"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11932","scenario":"recommendation","source_id":"11932","text":"what should i watch today"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11987","scenario":"recommendation","source_id":"11987","text":"look up movies near me"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-11990","scenario":"recommendation","source_id":"11990","text":"what's a movie in theaters that doesn't suck"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-12104","scenario":"recommendation","source_id":"12104","text":"kung fu panda three"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-13181","scenario":"recommendation","source_id":"13181","text":"check for all the movie theater prices and availability for a newly released movie in my location"}
+{"gold":"recommendation_movies","id":"massive-1.1-en-US-test-6376","scenario":"recommendation","source_id":"6376","text":"what is a good iranian film from two thousand and sixteen"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15166","scenario":"social","source_id":"15166","text":"post my business on twitter"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15177","scenario":"social","source_id":"15177","text":"please retweet this post on twitter"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15289","scenario":"social","source_id":"15289","text":"post the message now"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15318","scenario":"social","source_id":"15318","text":"i want to thank everyone for the birthday wishes"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15359","scenario":"social","source_id":"15359","text":"open tweet to apple that my iphone's battery is always drained"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15448","scenario":"social","source_id":"15448","text":"send a tweet about sonys volume issues"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15454","scenario":"social","source_id":"15454","text":"tweet at united airlines i'm angry you lost my bags"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15457","scenario":"social","source_id":"15457","text":"i had a problem with my burger can you tweet bk"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15459","scenario":"social","source_id":"15459","text":"send a twitter complaint"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15554","scenario":"social","source_id":"15554","text":"please tweet on dell service for delay services"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15587","scenario":"social","source_id":"15587","text":"open gallery post picture name"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15598","scenario":"social","source_id":"15598","text":"open company name and find complaints"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15626","scenario":"social","source_id":"15626","text":"please tweet a complaint to comcast for bad customer service"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15661","scenario":"social","source_id":"15661","text":"post my latest entry to twitter at n.s.a."}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15672","scenario":"social","source_id":"15672","text":"tweet to apple about non receipt of iphone i sent for repairs last week"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15686","scenario":"social","source_id":"15686","text":"hello my item which i bought from some one has gone out of order"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15723","scenario":"social","source_id":"15723","text":"set feeling happy status on facebook"}
+{"gold":"social_post","id":"massive-1.1-en-US-test-15732","scenario":"social","source_id":"15732","text":"tweet samsung and tell them to stop killing people with their products"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15138","scenario":"social","source_id":"15138","text":"check my social networks"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15181","scenario":"social","source_id":"15181","text":"do i have any new friend requests"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15199","scenario":"social","source_id":"15199","text":"what going on"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15203","scenario":"social","source_id":"15203","text":"new updates"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15205","scenario":"social","source_id":"15205","text":"give me my facebook update every three hours"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15225","scenario":"social","source_id":"15225","text":"show me latest notifications"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15229","scenario":"social","source_id":"15229","text":"is there any post from my friend mike in facebook"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15274","scenario":"social","source_id":"15274","text":"please scan my social media and tell me what's happening"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15280","scenario":"social","source_id":"15280","text":"facebook"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15298","scenario":"social","source_id":"15298","text":"olly what's hot social media topics"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15304","scenario":"social","source_id":"15304","text":"has anyone follow me today on twitter today"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15311","scenario":"social","source_id":"15311","text":"tell me what's going on with facebook"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15321","scenario":"social","source_id":"15321","text":"has anyone commented on my status"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15326","scenario":"social","source_id":"15326","text":"please read my facebook feed"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15333","scenario":"social","source_id":"15333","text":"anything new on insta"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15445","scenario":"social","source_id":"15445","text":"tell me what's happening on instagram"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-15513","scenario":"social","source_id":"15513","text":"is there anything important happening on social media"}
+{"gold":"social_query","id":"massive-1.1-en-US-test-4334","scenario":"social","source_id":"4334","text":"what does my facebook feed look like"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-1042","scenario":"takeaway","source_id":"1042","text":"open the folder app please"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-1043","scenario":"takeaway","source_id":"1043","text":"call the nearest thai restaurant with delivery"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-132","scenario":"takeaway","source_id":"132","text":"order a takeaway"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-1516","scenario":"takeaway","source_id":"1516","text":"order a pizza with sausage from domino's"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-1831","scenario":"takeaway","source_id":"1831","text":"order one pizza from pizza hut"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-2255","scenario":"takeaway","source_id":"2255","text":"can i order take out from licari's"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-2336","scenario":"takeaway","source_id":"2336","text":"noodles one pack make it as takeaway"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-2338","scenario":"takeaway","source_id":"2338","text":"make an order for noodles one pack make it as takeaway order"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-2447","scenario":"takeaway","source_id":"2447","text":"i feel like having soup for lunch order from wangs kitchen restaurant a chicken manchow soup"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-2480","scenario":"takeaway","source_id":"2480","text":"call for take-out"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-3080","scenario":"takeaway","source_id":"3080","text":"it's time for junk food"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-3835","scenario":"takeaway","source_id":"3835","text":"i want to order chinese take-out"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-5570","scenario":"takeaway","source_id":"5570","text":"find food and order"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-5840","scenario":"takeaway","source_id":"5840","text":"i need to order some food from papa john's"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-5966","scenario":"takeaway","source_id":"5966","text":"can you please order some food for me"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-6112","scenario":"takeaway","source_id":"6112","text":"hey order two wings with french fries from the chinese food store"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-668","scenario":"takeaway","source_id":"668","text":"i want two burgers and one coke order it fast"}
+{"gold":"takeaway_order","id":"massive-1.1-en-US-test-89","scenario":"takeaway","source_id":"89","text":"could you order sushi for tonight dinner"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-1379","scenario":"takeaway","source_id":"1379","text":"does pizza hut have delivery"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-169","scenario":"takeaway","source_id":"169","text":"can they do delivery"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-171","scenario":"takeaway","source_id":"171","text":"olly do they deliver home"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-2035","scenario":"takeaway","source_id":"2035","text":"olly where is my food"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-2163","scenario":"takeaway","source_id":"2163","text":"hows the food order going"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-2850","scenario":"takeaway","source_id":"2850","text":"is there takeaway at papa john's"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-3276","scenario":"takeaway","source_id":"3276","text":"olly does shibaru sushi deliver"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-3413","scenario":"takeaway","source_id":"3413","text":"do you know the eta of my order"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-4048","scenario":"takeaway","source_id":"4048","text":"please find out of charley's steakhouse delivers"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-4125","scenario":"takeaway","source_id":"4125","text":"where can i get a shot of tequila and some to go mexican food"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-4137","scenario":"takeaway","source_id":"4137","text":"could you please confirm if paradise does takeaway"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-4224","scenario":"takeaway","source_id":"4224","text":"when will my chinese food be delivered"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-4461","scenario":"takeaway","source_id":"4461","text":"is fongs dine in only"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-5324","scenario":"takeaway","source_id":"5324","text":"hey do you have home delivery"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-5552","scenario":"takeaway","source_id":"5552","text":"who takes less of duration of time for delivery"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-5600","scenario":"takeaway","source_id":"5600","text":"check the dish price and all"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-6072","scenario":"takeaway","source_id":"6072","text":"how many minutes do i need to wait to pick up my food from china on the go"}
+{"gold":"takeaway_query","id":"massive-1.1-en-US-test-967","scenario":"takeaway","source_id":"967","text":"can i get take-out from pf changs"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12240","scenario":"transport","source_id":"12240","text":"what is the traffic like on my commute home at five"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12261","scenario":"transport","source_id":"12261","text":"tell me my options for a train to los angles next wednesday or thursday"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12263","scenario":"transport","source_id":"12263","text":"california"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12310","scenario":"transport","source_id":"12310","text":"give me the list of available train tickets from edinburgh to leeds"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12354","scenario":"transport","source_id":"12354","text":"give me the train time"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12367","scenario":"transport","source_id":"12367","text":"what's the best way to sheffield"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12392","scenario":"transport","source_id":"12392","text":"tell me today's direction"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12402","scenario":"transport","source_id":"12402","text":"when does the next train traveling the city leave here"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12430","scenario":"transport","source_id":"12430","text":"tell me the train arrival time to new york"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12436","scenario":"transport","source_id":"12436","text":"how long will it take to get to the airport"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12446","scenario":"transport","source_id":"12446","text":"can you tell me the times the train leaves for chicago"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12618","scenario":"transport","source_id":"12618","text":"how much is a round trip train ticket to go to new york"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12623","scenario":"transport","source_id":"12623","text":"do you have the train times for beaumont tx"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12629","scenario":"transport","source_id":"12629","text":"what time does the first train depart from chicago"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12818","scenario":"transport","source_id":"12818","text":"how much is a train ticket to chicago"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12835","scenario":"transport","source_id":"12835","text":"what time does the train to place leave"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-12866","scenario":"transport","source_id":"12866","text":"what is the timing of bagmati express"}
+{"gold":"transport_query","id":"massive-1.1-en-US-test-6403","scenario":"transport","source_id":"6403","text":"how to get somewhere"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12121","scenario":"transport","source_id":"12121","text":"book me a taxi to leith in half an hour"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12159","scenario":"transport","source_id":"12159","text":"can you book an uber for me"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12160","scenario":"transport","source_id":"12160","text":"can you book an uber tomorrow"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12212","scenario":"transport","source_id":"12212","text":"call city cab to airport"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12244","scenario":"transport","source_id":"12244","text":"book a taxi to go to the movies at one"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12248","scenario":"transport","source_id":"12248","text":"olly find the nearest uber"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12299","scenario":"transport","source_id":"12299","text":"call me a taxi olly"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12383","scenario":"transport","source_id":"12383","text":"find a taxi to book"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12452","scenario":"transport","source_id":"12452","text":"uber me to the airport"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12548","scenario":"transport","source_id":"12548","text":"i need a ride home"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12553","scenario":"transport","source_id":"12553","text":"book me a cab going to location"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12608","scenario":"transport","source_id":"12608","text":"schedule taxi pickup for monday at noon"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12710","scenario":"transport","source_id":"12710","text":"call taxi"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12716","scenario":"transport","source_id":"12716","text":"call an uberpool to get me at long island bar"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12745","scenario":"transport","source_id":"12745","text":"book an uber to pick me up now"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12779","scenario":"transport","source_id":"12779","text":"reserve the closest uber"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12844","scenario":"transport","source_id":"12844","text":"book a cab to office for me"}
+{"gold":"transport_taxi","id":"massive-1.1-en-US-test-12905","scenario":"transport","source_id":"12905","text":"please reserve the next taxi a nine am"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12127","scenario":"transport","source_id":"12127","text":"i need to go to dundee at five am on sunday by train"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12162","scenario":"transport","source_id":"12162","text":"can you book a train ticket"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12233","scenario":"transport","source_id":"12233","text":"google train tickets to washington d. c."}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12293","scenario":"transport","source_id":"12293","text":"ticket for delhi"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12339","scenario":"transport","source_id":"12339","text":"book a train ticket for one one way for this tuesday at nine am"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12468","scenario":"transport","source_id":"12468","text":"find a train ticket to philadelphia"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12469","scenario":"transport","source_id":"12469","text":"purchase ticket to new york city on train"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12511","scenario":"transport","source_id":"12511","text":"travel book a train ticket"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12536","scenario":"transport","source_id":"12536","text":"book me a train ticket to barcelona please"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12722","scenario":"transport","source_id":"12722","text":"order a train ticket to boston"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12723","scenario":"transport","source_id":"12723","text":"buy me a ticket to boston"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12802","scenario":"transport","source_id":"12802","text":"book a ticket to ny by train"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12813","scenario":"transport","source_id":"12813","text":"please book a ticket of rajdhani express train from jaipur"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12814","scenario":"transport","source_id":"12814","text":"please book a ticket form jaipur to mumbai on tuesday"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12846","scenario":"transport","source_id":"12846","text":"please book train ticket from mumbai to sangli for tomorrow morning"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12873","scenario":"transport","source_id":"12873","text":"train ticket"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-12874","scenario":"transport","source_id":"12874","text":"train ticket please"}
+{"gold":"transport_ticket","id":"massive-1.1-en-US-test-5128","scenario":"transport","source_id":"5128","text":"confirm a travel ticket to german"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12182","scenario":"transport","source_id":"12182","text":"what are the traffic conditions on the one hundred and one"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12254","scenario":"transport","source_id":"12254","text":"tell me about city traffic"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12256","scenario":"transport","source_id":"12256","text":"how is the traffic presently near central park road"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12289","scenario":"transport","source_id":"12289","text":"is there a traffic jam on my route"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12413","scenario":"transport","source_id":"12413","text":"what is the current traffic situation"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12442","scenario":"transport","source_id":"12442","text":"what is the traffic situation at the bazaar highway"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12675","scenario":"transport","source_id":"12675","text":"is traffic light"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12685","scenario":"transport","source_id":"12685","text":"what is the traffic like right now"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12693","scenario":"transport","source_id":"12693","text":"what does the traffic look like on my usual route to work"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12717","scenario":"transport","source_id":"12717","text":"what is the traffic like now"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12736","scenario":"transport","source_id":"12736","text":"road traffic"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12789","scenario":"transport","source_id":"12789","text":"can you tell me about the traffic"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12838","scenario":"transport","source_id":"12838","text":"how is the traffic at the moment"}
+{"gold":"transport_traffic","id":"massive-1.1-en-US-test-12869","scenario":"transport","source_id":"12869","text":"traffic report"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-1933","scenario":"weather","source_id":"1933","text":"will there be a fall in temperature by tonight"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-219","scenario":"weather","source_id":"219","text":"should i bring an umbrella tomorrow"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-2917","scenario":"weather","source_id":"2917","text":"weekly weather report"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-3338","scenario":"weather","source_id":"3338","text":"report weather for largo"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-334","scenario":"weather","source_id":"334","text":"i wish to know the weather in san fransico"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-3408","scenario":"weather","source_id":"3408","text":"is the weather going to be nice this weekend"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-3426","scenario":"weather","source_id":"3426","text":"what degree is it outside"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-3507","scenario":"weather","source_id":"3507","text":"is there snow in the forecast"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-4313","scenario":"weather","source_id":"4313","text":"will there be rain tomorrow in rome"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-4439","scenario":"weather","source_id":"4439","text":"how is the weather in san francisco"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-4689","scenario":"weather","source_id":"4689","text":"do you know the weather"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-5038","scenario":"weather","source_id":"5038","text":"what is the weather for this week"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-5524","scenario":"weather","source_id":"5524","text":"weather at the moment"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-5732","scenario":"weather","source_id":"5732","text":"shall i change my car tires to snow tires soon"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-6039","scenario":"weather","source_id":"6039","text":"will it be rainy day tomorrow"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-6116","scenario":"weather","source_id":"6116","text":"info on this week weather"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-6411","scenario":"weather","source_id":"6411","text":"what's the weather next wednesday"}
+{"gold":"weather_query","id":"massive-1.1-en-US-test-826","scenario":"weather","source_id":"826","text":"what is the current temperature outside"}

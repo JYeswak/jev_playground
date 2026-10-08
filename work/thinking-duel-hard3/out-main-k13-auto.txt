@@ -1,0 +1,4 @@
+Working...
+Fixed `b64x.py`: join chunks, strip whitespace (`isspace`), reject non-alphabet chars, require length multiple of 4, allow `=` only as final 1–2 chars, decode with `validate=True`.
+
+Evidence: stdlib probe showed `b64decode("AB=CD==")` silently returns bytes and `"TQ==AAA="` truncates — hence the placement check. Verified: odd-split round-trips (7 vectors × 30 random cuts with whitespace), every boundary split on `TWFuTWFuTWFu`/`TQ==`, `=`-elsewhere / missing-padding / non-alphabet all raise `ValueError`, empty/whitespace-only → `b""`.

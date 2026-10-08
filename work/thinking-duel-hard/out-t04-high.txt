@@ -1,0 +1,5 @@
+Working...
+Fixed `wilson.py:5` — margin now divided by `denom`:
+`margin = z*sqrt((p(1-p)+z²/4n)/n)/denom`.
+
+Verified in-dir via independent `math.sqrt(p(1-p)/n+z²/4n²)` reference: 12 cases × 3 z-values match to 1e-12; spot `wilson(5,10)=(0.23659,0.76341)` correct.

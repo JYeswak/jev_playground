@@ -1,0 +1,4 @@
+Working...
+Fixed `lockfile.py`: `O_CREAT|O_EXCL` atomic create, stale-by-mtime remove-and-retry loop, `FileNotFoundError` retry/no-op paths, `mkstemp`-in-same-dir + flush/fsync/`os.replace`.
+
+Verified live (eval, just now): fresh acquire True→False with content/mtime untouched; 100s-stale reclaimed; `stale_after=3600` untouched; release + double-release silent; 32-thread race exactly 1 winner; 16-proc race exactly 1 winner; overwrite reads correct; no `.tmp-*` left; source has `O_EXCL`/`os.replace`/`fsync`.

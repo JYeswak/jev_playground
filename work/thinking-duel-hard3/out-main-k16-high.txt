@@ -1,0 +1,30 @@
+Working...
+Done. `rsv.py` reimplemented as Algorithm R with inline LCG, no `random`, single pass, O(k).
+
+```python
+def sample(stream, k, seed):
+    if k <= 0:
+        for _ in stream:
+            pass
+        return []
+    reservoir = []
+    state = seed % 2147483648
+    for idx, item in enumerate(stream):
+        if idx < k:
+            reservoir.append(item)
+        else:
+            state = (1103515245 * state + 12345) % 2147483648
+            j = state % (idx + 1)
+            if j < k:
+                reservoir[j] = item
+    return reservoir
+```
+
+`idx` is 0-based, so `idx+1` is the 1-based count; LCG advances only after the fill phase.
+
+Verification (all in `$PWD`):
+- No `random`/`list(`/`tuple(`/`sorted(` in source; works on single-iteration generators.
+- Exact LCG trace matches an independent spec recomputation for seeds 0,1,42,12345 × k 1,3,5.
+- Deterministic: `sample(range(100),10,42)` → `[49,74,61,3,69,56,53,98,93,9]` twice; seed 43 differs.
+- Rough uniformity (n=20,k=5,N=5000): mean exact (Σfreq=k), no starved items. Strict uniformity is unattainable — raw-LCG low bits alternate parity / have short periods, so later-item frequencies wobble (e.g. 0.06–0.34); inherent to the prescribed `state % i`.
+- Edges: empty→`[]`, k>n returns all, k=0→`[]`.

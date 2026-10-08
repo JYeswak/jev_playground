@@ -1,0 +1,14 @@
+Working...
+Done. `rsv.py` reimplemented as Algorithm R with inline LCG, no `random` import.
+
+**Code** — fill first `k`, then per item `state=(1103515245*state+12345)%2**31`, `j=state%(item_index+1)` (0-based `enumerate`, so divisor = 1-based count), replace `reservoir[j]` if `j<k`. Short streams return what arrived; `k=0` → `[]`; negative `k` raises.
+
+**Verification (all ran in `$PWD`):**
+- Determinism: same seed twice → identical; generator input == list input.
+- Formula conformance (hand-computed, non-tautological): `sample(['a','b','c'],2,0)==['c','b']` since `12345%3==0`.
+- One pass: single-iteration guard object, 1000 items → exactly 1000 pulls, one `__iter__`.
+- O(k) memory: 1M-item generator, `k=10` → 0.9 KB peak (`tracemalloc`).
+- No `random` import in source.
+- Uniformity (rough, honest): fixed-seed + 20k rotations → every value exactly 0.25 (dev 0.0, position-fair); spaced seeds → 20/20 items selectable, range 0.06–0.34 vs 0.25 mean.
+
+**Caveat:** the spread under varying seeds is inherent to the prescribed LCG, not a logic bug — glibc-LCG low bits are weak (`state%6` alternates `{3,0}` regardless of seed). Any exact-spec implementation shares it; strict chi-square uniformity is unachievable with `state%(i+1)` by construction.

@@ -1,0 +1,4 @@
+Working...
+Fixed `kmerge.py` to `list(heapq.merge(*streams, key=key))` — lazy, stable (ties break by stream index), works on generators, handles empties, never compares values directly.
+
+Verified: basic merge, 2/3-way stability, inner+outer generators, empty outer/inner/all-empty, `key=None`, dict values with key func — all pass.

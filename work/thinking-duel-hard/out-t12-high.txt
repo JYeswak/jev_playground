@@ -1,0 +1,4 @@
+Working...
+Fixed `beads.py`: strict row regex `^\s*-\s+\[([ x~\-])\]\s+(jev-\d+)\s+\|\s+(.*\S)\s*$` with full status map `x/ /~/— → closed/open/in_progress/deferred`. Splits on first ` | `, preserves `|`/brackets in title, skips bad mark/id/empty title/missing separator.
+
+Verified stdlib-only: 7 positive cases (4 statuses, `a | b | c`, `[bug]`, `a|b [c] | d`), 13 malformed skips, multi-line mix — all pass.

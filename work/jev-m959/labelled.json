@@ -1,0 +1,552 @@
+[
+ {
+  "id": "o01",
+  "prompt": "fix the login bug\n<memories>\n- grep proof needs vgrep not bare grep\n- the vault address is oak street\n</memories>\n",
+  "memory": "grep proof needs vgrep not bare grep",
+  "ref": [
+   "2026-10-01T17:42:15.402Z",
+   "385c5ed57f0061bb5cad8f24a7aa405fd9df8beed19fad0a87d7da5e0df26e4c"
+  ],
+  "noul": 0.95,
+  "label": "relevant"
+ },
+ {
+  "id": "o02",
+  "prompt": "CONDUCTOR (pane 1) to WildCarp (non-author): verify jev-zbb1 (WindyLantern 70312812): semantic skill-hint FAIL keyless, recall@20 best 4/20 vs 25% bar, so no live calls. Recompute recall from the committed dev set and scripts, check the bar predates the run, R135 present, extension OFF. Close if it holds. Callback DONE zbb1-verify.",
+  "memory": "CONDUCTOR (pane 1) to WildCarp: claim jev-wb7j now (br update jev-wb7j --status in_progress). Read AGENTS.md first. REALITY CHECK: the fleet idled ~6h with an empty queue; native Jev runs ~8,400 calls/day but no surface has a measured benefit. Your bead is self-contained: br show <id>. Fix the bar in a bead comment BEFORE reading outcome data; bounded live calls, spend stated; commit --only your files (index-blob for shared files); no push; leave in_progress for the named verifier.\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-02T00:39:07.562Z",
+   "674563152655ba39dbfe20b42d35fcf13900d37f656c9cb8a8fd959cfb60a64a"
+  ],
+  "noul": 0.61,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o03",
+  "prompt": "fix the login bug\n<memories>\n- grep proof needs vgrep not bare grep\n- the vault address is oak street\n</memories>\n",
+  "memory": "grep proof needs vgrep not bare grep",
+  "ref": [
+   "2026-10-01T17:33:46.931Z",
+   "385c5ed57f0061bb5cad8f24a7aa405fd9df8beed19fad0a87d7da5e0df26e4c"
+  ],
+  "noul": 0.95,
+  "label": "relevant"
+ },
+ {
+  "id": "o04",
+  "prompt": "Load check delta2: summarize any recent uds grades. One sentence, no tools.",
+  "memory": "No verified recent work in context \u2014 would need `br`/git log to say. [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T20:20:10.254Z",
+   "dfd7657e55a54f638160a9a0949f018ba220cd9e515b4fdf99aab746e539bb66"
+  ],
+  "noul": 0.82,
+  "label": "relevant"
+ },
+ {
+  "id": "o05",
+  "prompt": "Summarize the rud1 WITHHOLD verdict and its numbers. One paragraph, no tools.",
+  "memory": "[coding-agent-transcript] jev-qg1j: fresh shadow RPC made 2 live Jev-1.13.0 calls: OWASP search result 1/1 flagged (topScore .18) | clean NIST CVE result 0/1 flagged (topScore .02) | 1,665 input +44 output tokens | estimated Jev charge $0.00006993. Fresh JEV_WEBSCREEN_ENFORCE=1 RPC then made 2 more calls; source proof rows: OWASP result withheld=true | NIST result withheld=false | 2,718 input +44 output tokens | estimated $0.000114156. Combined 4 calls / 4,383 input / 88 output / ~$0.000184086.\u2026 [sleep_consolidation] (2026-10-01)",
+  "ref": [
+   "2026-10-01T18:55:52.839Z",
+   "63c8d2193017e82856ef4725f990db1d5ac436a0bf9b6a759f026c65f67e905e"
+  ],
+  "noul": 0.89,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o06",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 3: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "CONDUCTOR (pane 1) to OrangeFrog (restarted onto current hooks incl. the fixed memory filter; read AGENTS.md): verify jev-4nyy N2 (WindyLantern 8cc6b66d): Noul-rank 0/48 misroutes vs Choice 17/48 on dev+held-out, hint rate 0/48; WindyLantern does not re-register it. Recompute from rows, check bar order, and rule plainly: safe but useless at 0/48 hints. If it holds, comment VERIFIED; the bead stays open for a design that fires on a real share of prompts. Callback DONE 4nyy-n2-verify\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T23:01:24.063Z",
+   "42253a60b181394ff2dc43deabbed54c086f2a4836c59781cf4a364b974c1e09"
+  ],
+  "noul": 0.83,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o07",
+  "prompt": "Load check bravo followup: what recent work happened in uds? One sentence, no tools.",
+  "memory": "CRON 2026-10-01T17:00:02Z: read /Users/josh/.local/share/zeststream/uds-control-tick.md and execute it now, in full.",
+  "ref": [
+   "2026-10-01T20:17:04.332Z",
+   "8265fecc9805c8dc0a353fa3e6e1215403aad621778912f6e7c667c7a4f89b30"
+  ],
+  "noul": 0.62,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o08",
+  "prompt": "PANE 1 CORRECTION: the 5fbh FAIL comment is signed 'grader CreamFern, pane %50', so worker %50 posted at least that one. In your attribution mail claim ONLY verdicts your own transcript shows you posted (bead + time); do not claim the others. The new unique identity still applies.",
+  "memory": "uds-sa3v: GRADE PARTIAL** at HEAD `9ad31b7`. I posted the grade as a comment on the bead and mailed CreamShore (`GRADED uds-sa3v PARTIAL`, cc SapphireIsland). I did not close it.",
+  "ref": [
+   "2026-10-01T23:12:04.138Z",
+   "9ce322c09e101f5f062ce0dae184608d1b18b7929f1495f22bb7e1bcb00d09f1"
+  ],
+  "noul": 0.75,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o09",
+  "prompt": "what was the verdict",
+  "memory": "The current user message and tool output take precedence over recalled memories when they conflict.",
+  "ref": [
+   "2026-10-01T18:44:28.743Z",
+   "d09d4d1a7abd3e3b6bf10e7e65ca767de56a1b9ad9e638651490cabe99f0be5e"
+  ],
+  "noul": 0.95,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o10",
+  "prompt": "PANE 1: grade uds-rc-config-file-ke0e at 511e884/7fc5647 (config verb glue landed); QuietSpire takes wcpy. Close on PASS.",
+  "memory": "Now re-run the proofs myself.",
+  "ref": [
+   "2026-10-02T01:06:01.267Z",
+   "b99fbc2785463a4a0813089508fd453c813ff917708713e1c84afd47d82eb822"
+  ],
+  "noul": 0.52,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o11",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 4: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "CONDUCTOR (pane 1) to WindyLantern: thanks for yielding 8qu6 cleanly. New lever bead jev-ynn7 assigned to you (br show jev-ynn7): turn the verified find-vs-grep efficiency into an actual saving. Bar first. Do not stage .beads/issues.jsonl. Callback DONE jev-ynn7 <numbers>.",
+  "ref": [
+   "2026-10-01T22:41:53.762Z",
+   "a4b920036c2150fef36d08d5d2954456af778068d88870a3e59f853cd0b4b761"
+  ],
+  "noul": 0.87,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o12",
+  "prompt": "PANE 1: identity collision: you posted grades as CreamFern, which is worker %50's Agent Mail name; %50 is now confused about who it is. Register a NEW unique Agent Mail identity for yourself (create_agent_identity in project /Users/josh/Developer/uds, program omp, model opus-5.5), use only that name from now on, tag every verdict '(grader <NewName>, pane %79)', and mail DustyHarbor, PlumStream and SapphireIsland one line: 'grades signed CreamFern at 22:58Z-23:09Z (5fbh, e4qy, wcpy) were mine, grader pane %79, now <NewName>'. When the grading queue is empty, sweep br list --status grading every 5 min; do not idle-wait on workers.",
+  "memory": "CRON 2026-10-01T16:45:00Z: read /Users/josh/.local/share/zeststream/uds-control-tick.md and execute it now, in full.",
+  "ref": [
+   "2026-10-01T23:11:45.910Z",
+   "cf0ce19a968c13b5df2a98cb57fde81774b1ee3e4b52ed2f8ed7669a7f5011f3"
+  ],
+  "noul": 0.68,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o13",
+  "prompt": "Load check bravo followup: what recent work happened in uds? One sentence, no tools.",
+  "memory": "B closes: window [none] \u00b7 since 2026-10-01T05:00:00Z 1 \u00b7 WITHOUT grader PASS [] \u00b7 grading 3 \u00b7 in_progress 8 \u00b7 ready 22 \u00b7 open 251",
+  "ref": [
+   "2026-10-01T20:17:05.055Z",
+   "0c325f7df4dab0f524f1b2529b3e86e904619dda9d309133e63968d356938e38"
+  ],
+  "noul": 0.52,
+  "label": "relevant"
+ },
+ {
+  "id": "o14",
+  "prompt": "fix the login bug\n",
+  "memory": "the vault address is oak street",
+  "ref": [
+   "2026-10-01T17:52:37.548Z",
+   "de313f7386fd1ca4afebd142a2cd72197a45ed9440af8ce0de9d79a4ca88bb21"
+  ],
+  "noul": 0.95,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o15",
+  "prompt": "fix the login bug\n<memories>\n- grep proof needs vgrep not bare grep\n- the vault address is oak street\n</memories>\n",
+  "memory": "the vault address is oak street",
+  "ref": [
+   "2026-10-01T17:34:21.758Z",
+   "de313f7386fd1ca4afebd142a2cd72197a45ed9440af8ce0de9d79a4ca88bb21"
+  ],
+  "noul": 0.95,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o16",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. This turn stood down. Pick the next unfinished stage of the mission and start it. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 4: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "DONE jev-m2c6 0f7de16e UNMEASURED (fixed arm structurally void: 57 single-turn RPC probes; locked proxy fires on negation at 0.63). Table+analyzer committed, spend $0. Bead in_progress for OrangeFrog.",
+  "ref": [
+   "2026-10-01T22:59:07.638Z",
+   "9daf0990104d461ae21d391cece8b091378abc6cb3246f63384b719c3e610545"
+  ],
+  "noul": 0.94,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o17",
+  "prompt": "Repro2 alpha: what did OrangeFrog verify recently? One sentence, no tools.",
+  "memory": "Key result: the retained artifact\u2019s hash matches its original build output and its Mach-O arm64 identity is confirmed, but it was built fr\u2026 [coding-agent-transcript] (2026-09-30)",
+  "ref": [
+   "2026-10-01T22:41:35.782Z",
+   "d5a7bcb82ff9f4626dff9e1bb8d2fe7609543c38de9683cba2765f825d3a9c57"
+  ],
+  "noul": 0.85,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o18",
+  "prompt": "Summarize the rud1 WITHHOLD verdict and its numbers. One paragraph, no tools.",
+  "memory": "Use `xd://recall` proactively before answering questions about past conversations, project history, or user preferences.",
+  "ref": [
+   "2026-10-01T18:47:54.340Z",
+   "7c2c825d11b59f40be885a05e1a38ebd392def47ca231343e0d6a1233a0c1cf3"
+  ],
+  "noul": 0.54,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o19",
+  "prompt": "Coordinator %54: I1Muse's independent review of your #34 (X1) found 4 FALSE positives on Josh's machine: dcg-guard bare specifiers that resolve through a bundle exports map, and the guard demonstrably loads (details in x1-review-i1muse.md). A doctor check must not flag a working extension. After your current #33 review: read OMP's own extension loader in the installed 18.4.9 source to see how it resolves bare and host-package specifiers (host-provided @oh-my-pi/* packages, exports maps, the extension's own node_modules), then mirror exactly that resolution. Add each of the 4 shapes as a planted 'must stay quiet' fixture. The real machine should show 1 finding (jev-lab). Push to #34.",
+  "memory": "Done. Report sent to %54.",
+  "ref": [
+   "2026-10-02T01:11:36.305Z",
+   "12e59496741725260fbbc2896daa17535e62660dac89da98783f25c50fa0344b"
+  ],
+  "noul": 0.51,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o20",
+  "prompt": "What happened with bead jev-8qu6 and double-claiming panes? One paragraph, no tools.",
+  "memory": "Use `xd://recall` proactively before answering questions about past conversations, project history, or user preferences.",
+  "ref": [
+   "2026-10-01T18:48:37.554Z",
+   "7c2c825d11b59f40be885a05e1a38ebd392def47ca231343e0d6a1233a0c1cf3"
+  ],
+  "noul": 0.69,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o21",
+  "prompt": "PANE 1: identity collision: you posted grades as CreamFern, which is worker %50's Agent Mail name; %50 is now confused about who it is. Register a NEW unique Agent Mail identity for yourself (create_agent_identity in project /Users/josh/Developer/uds, program omp, model opus-5.5), use only that name from now on, tag every verdict '(grader <NewName>, pane %79)', and mail DustyHarbor, PlumStream and SapphireIsland one line: 'grades signed CreamFern at 22:58Z-23:09Z (5fbh, e4qy, wcpy) were mine, grader pane %79, now <NewName>'. When the grading queue is empty, sweep br list --status grading every 5 min; do not idle-wait on workers.",
+  "memory": "uds-sa3v: GRADE PARTIAL** at HEAD `9ad31b7`. I posted the grade as a comment on the bead and mailed CreamShore (`GRADED uds-sa3v PARTIAL`, cc SapphireIsland). I did not close it.",
+  "ref": [
+   "2026-10-01T23:11:44.727Z",
+   "9ce322c09e101f5f062ce0dae184608d1b18b7929f1495f22bb7e1bcb00d09f1"
+  ],
+  "noul": 0.7,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o22",
+  "prompt": "CONDUCTOR (pane 1) to HazySpring (restarted onto fc7a5eff: memory-filter sidecar + memo). Read AGENTS.md. Resume jev-s47b: confirm this session logs memory-filter rows with sidecar text (mode 600) and repeat pairs cost 1 call; collect >= 30 new drops, then blind-label them against the committed >= 27/30 bar. Callback DONE memfilter-drops <x>/30.\nCONDUCTOR (pane 1) to HazySpring: excellent catch, and it changes the story: the earlier 96% drop rate was mostly the filter scoring lines of its own source code from tool results, not memories. Do your lever now: parse only memory-injection blocks (the injected system/custom memory messages), never tool results or user text; add a test with a tool result containing the literal <memories> that yields zero items, and one with a real injected block that yields its bullets. Then collect 30 genuine drops across sessions (restart panes as they go idle: tell me which; also log keeps), blind-label vs the 27/30 bar. Re-check the held-out precision assumption: was jev-wb7j measured on real injected memories? Commit --only; no push. Callback DONE memfilter-parser <sha> then DONE memfilter-drops <x>/30.\nCONDUCTOR (pane 1) URGENT to HazySpring: WindyLantern's rebase with autostash left conflict markers in YOUR uncommitted .omp/extensions/jev-memory-filter.ts (1 block) and .test.mjs (2 blocks), status UU. Your pre-rebase version is preserved in the autostash entry (see the shared tree's saved-changes list, entry 0). Every new omp session loads that extension from disk, so it is broken until fixed. Resolve now: keep your in-progress parser fix, remove the markers, run the tests, git add the two files, commit --only them. Do not discard the saved autostash entry until your commit is in. Callback DONE memfilter-conflict <sha>.\n",
+  "memory": "Task-relevant local EE memories\")) texts.push(node);",
+  "ref": [
+   "2026-10-01T17:56:00.444Z",
+   "ca7786b00eea53a14998ed0cdb38536299cb36ea26378719c0e849dbc0f6cb8a"
+  ],
+  "noul": 0.62,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o23",
+  "prompt": "What recent work happened in uds? One sentence, no tools.",
+  "memory": "[us\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T19:57:16.895Z",
+   "82fa1fe3febfddf3e4c1ad50cbe0b12e952fcdd6b819fe34039a7f127f28346b"
+  ],
+  "noul": 0.67,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o24",
+  "prompt": "Coordinator %54: don't wait for CI. OpsMuse pushed PR #27 at 8030fc5. Re-check locally now: a unified snake_case uninstall envelope with label on both platforms (run the linux path tests); no silent early returns left in service.test.ts (grep for 'return;' inside test bodies); isolation still holds (prod omp-watch print identical before and after). Comment on .39. After that, the release run for v0.2.1 is queued on GitHub runners; when the tag is published I'll ping you for the G1 tag-to-tag plugin upgrade.",
+  "memory": "Done. Report sent to %54.",
+  "ref": [
+   "2026-10-01T23:55:26.199Z",
+   "12e59496741725260fbbc2896daa17535e62660dac89da98783f25c50fa0344b"
+  ],
+  "noul": 0.5,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o25",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. This turn stood down. Pick the next unfinished stage of the mission and start it. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 4: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "[coding-agent-transcript] Joshua\u2019s 2026-10-01 mission pivot is authoritative: park the currently assigned P2/P9/P15/U04/U06/U07 | README/LEDGER | stage-15/80 | Jericho/PokeJev/game |+free-comparator work@the next safe point. Do not start another test/call | edit | claim<-br ready |/change status; preserve the current diff/receipts+send pane 1 a concise safe-point status. Wait\u2192the concrete build/test bead.",
+  "ref": [
+   "2026-10-01T22:59:08.655Z",
+   "5340ce177bb58397f965f76d8ba7e7bfeaf35520ae6bba0dda9f0aa7d5ec4d8f"
+  ],
+  "noul": 0.92,
+  "label": "relevant"
+ },
+ {
+  "id": "o26",
+  "prompt": "What recent work happened in uds? One sentence, no tools.",
+  "memory": "you are working with pane 2 of control-plane as your orchestrator. use ntm send to communicate back with them as needed. when you send agentmail messages, they do not automatically get notified, we have to use agentmail + ntm send. refer to /ntm and /just-say-no-to-process-porn-and-ceremony as you work through this. I expect you to all work as a team in this ntm session uds--burn-down using tools like bv --robot-triage and guidance from pane 2 control-plane along the way to burn th\u2026 [coding-agent-transcript] (2026-09-30)",
+  "ref": [
+   "2026-10-01T19:57:17.293Z",
+   "ab1935420b29457158cadd0b574ef25a3ac6c37ed3ef74cc2cebfb4b2dbfd92f"
+  ],
+  "noul": 0.54,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o27",
+  "prompt": "Load check alpha followup: what recent work happened in uds? One sentence, no tools.",
+  "memory": "Focused actual result now lib72pass bin32pass health18pass1fail. Healthy-health positive has manifest empty_target_set (actual stdout), so your ps-control insertion dropped/omitted its ordinary manifest row. Restore the original valid demo ordinary row BEFORE snapshot, retain controlled valid nonrustc ps and expected exit0. No rerun/repinning. No gates/format/build/commit/close.",
+  "ref": [
+   "2026-10-01T20:17:05.383Z",
+   "22cad40a227169c7ada06e991255116a94d23afba5c6e461fb72cbc36e519da7"
+  ],
+  "noul": 0.7,
+  "label": "relevant"
+ },
+ {
+  "id": "o28",
+  "prompt": "Mission (Joshua 2026-10-01): nothing broken stays broken; Jev ON in our tools, proven live both ways. Rules: commit --only your paths, no push, never stage .beads/issues.jsonl, no file deletion, name verification level. CONDUCTOR (pane 1) to CyanPeak (non-author verify): I committed eba8cd2d: jev-j0er global screen wrappers now use absolute imports (omp-test reported 'Cannot find module' in every claude/codex/grok/muse session). Verify live: start a FRESH omp session with --profile claude and one with --profile codex, cwd OUTSIDE the jev repo (e.g. ~/Developer/localbench, read-only prompt that runs one web_search), confirm no 'Failed to load extension' for jev-*-global.ts and that ~/.local/state/jev/injection-shadow.jsonl or webscreen-shadow.jsonl gets a row from that session's cwd. Planted negative: git show eba8cd2d^:work/jev-j0er/jev-injection-global.ts placed at a hooks/post-depth path fails import. Callback: ntm send jev --pane=1 \"DONE j0er-import-verify <rows> <negative>\".",
+  "memory": "WildCarp: MISSION (conductor BrownGoose, pane 1; Joshua gave blanket approval, no 'waiting for approval'): turn Jev ON in our own tooling and test it live. Live Jev calls are allowed (Joshua 2026-09-27) when bounded: daily cap in code, stop on 401/402/403, checkpoint a row per call, state spend. Key: infisical user session works now (conductor checked len=107); never print it.",
+  "ref": [
+   "2026-10-01T22:34:24.789Z",
+   "180abd1c3deaf83c5676c0d6f8889d01508aab9e5b5371ab069ce3a0b5c00110"
+  ],
+  "noul": 0.62,
+  "label": "relevant"
+ },
+ {
+  "id": "o29",
+  "prompt": "Load check echo2: summarize any recent uds grades. One sentence, no tools.",
+  "memory": "Load check echo followup: what recent work happened in uds? One sentence, no tools.",
+  "ref": [
+   "2026-10-01T20:20:09.502Z",
+   "508f9700326c554ab24d366d0dad60f5ee8c2a74f87e5c6b7ff5126712c680cd"
+  ],
+  "noul": 0.77,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o30",
+  "prompt": "fix the login bug\n<memories>\n- grep proof needs vgrep not bare grep\n- the vault address is oak street\n</memories>\n",
+  "memory": "the vault address is oak street",
+  "ref": [
+   "2026-10-01T17:47:56.777Z",
+   "de313f7386fd1ca4afebd142a2cd72197a45ed9440af8ce0de9d79a4ca88bb21"
+  ],
+  "noul": 0.95,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o31",
+  "prompt": "What recent work happened in uds? One sentence, no tools.",
+  "memory": "Joshua explicitly authorizes SLICE E now. You are DustyHarbor, pane %63, /Users/josh/Developer/uds shared main. Read var/agent-tmp/p3-ergonomics-installer.md and skill://agent-ergonomics-and-intuitiveness-maximization-for-cli-tools, full mode ALL phases1\u201310. Intake already specified: targetuds, in-tree /Users/josh/Developer/uds/agent_ergonomics_audit, current main/no branches/no sibling, >=10 substantive landed surface changes across >=3 dimensions, R-NNN regression each FAILS on g\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T20:03:51.285Z",
+   "ee38efd29f2fd12da8aa50a83e4bd6163118eecb169683d911fe1570c1f01fbf"
+  ],
+  "noul": 0.68,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o32",
+  "prompt": "CONDUCTOR (pane 1) to WildCarp (non-author): verify jev-ynn7 real-repo rerun (WindyLantern 539c907a): 10 session-cut tasks on the omp-kit template; control 10/10, 10 grep 0 find, 1,861 tok/success; nudge 10/10, 10 find 7 grep, 404 tok/success (0.22x). Resolve the author's own caveat FIRST: whole-session spend nudge $0.013 vs control $0.0002 (65x). Which spend is that (Jev judge calls from find? main model?), and what is the NET cost per success including main-model input tokens? A tool-result token saving that costs more money overall is not a saving. Also: failure tokens included, tasks really cut from session files, bar predates runs. Confirm the 3.8 G template is not tracked by git. Comment VERIFIED or differs.",
+  "memory": "No real comparison group.** The only fixed-effort sessions are 57 single-turn test probes, not real work sessio\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T19:16:58.341Z",
+   "aadcd419d88d711a595503b6badf329b034318f58c83e04e5f371c61a2d5be77"
+  ],
+  "noul": 0.76,
+  "label": "relevant"
+ },
+ {
+  "id": "o33",
+  "prompt": "PANE 1: identity collision: you posted grades as CreamFern, which is worker %50's Agent Mail name; %50 is now confused about who it is. Register a NEW unique Agent Mail identity for yourself (create_agent_identity in project /Users/josh/Developer/uds, program omp, model opus-5.5), use only that name from now on, tag every verdict '(grader <NewName>, pane %79)', and mail DustyHarbor, PlumStream and SapphireIsland one line: 'grades signed CreamFern at 22:58Z-23:09Z (5fbh, e4qy, wcpy) were mine, grader pane %79, now <NewName>'. When the grading queue is empty, sweep br list --status grading every 5 min; do not idle-wait on workers.",
+  "memory": "Read and follow /Users/josh/Developer/uds/var/agent-tmp/grader-brief.md. You are the Claude grader for uds--burn-down.",
+  "ref": [
+   "2026-10-01T23:11:44.284Z",
+   "81a7bc7d2609ad8372e8d506282b541e6d4d1e51cb84c7d848f6dabade71b451"
+  ],
+  "noul": 0.68,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o34",
+  "prompt": "CONDUCTOR (pane 1) to HazySpring (restarted onto fc7a5eff: memory-filter sidecar + memo). Read AGENTS.md. Resume jev-s47b: confirm this session logs memory-filter rows with sidecar text (mode 600) and repeat pairs cost 1 call; collect >= 30 new drops, then blind-label them against the committed >= 27/30 bar. Callback DONE memfilter-drops <x>/30.\nCONDUCTOR (pane 1) to HazySpring: excellent catch, and it changes the story: the earlier 96% drop rate was mostly the filter scoring lines of its own source code from tool results, not memories. Do your lever now: parse only memory-injection blocks (the injected system/custom memory messages), never tool results or user text; add a test with a tool result containing the literal <memories> that yields zero items, and one with a real injected block that yields its bullets. Then collect 30 genuine drops across sessions (restart panes as they go idle: tell me which; also log keeps), blind-label vs the 27/30 bar. Re-check the held-out precision assumption: was jev-wb7j measured on real injected memories? Commit --only; no push. Callback DONE memfilter-parser <sha> then DONE memfilter-drops <x>/30.\n",
+  "memory": "Task-relevant local EE memories\")) texts.push(node);",
+  "ref": [
+   "2026-10-01T17:49:38.098Z",
+   "ca7786b00eea53a14998ed0cdb38536299cb36ea26378719c0e849dbc0f6cb8a"
+  ],
+  "noul": 0.62,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o35",
+  "prompt": "Load check delta2: what is the uds burn-down grader status? One sentence, no tools.",
+  "memory": "`uds` is the apply-half management plane that installs, updates, and traces provenance for this machine's `dicklesworthstone` binaries.",
+  "ref": [
+   "2026-10-01T20:19:25.496Z",
+   "43eca58dcfa7ae327a4f1f53a52b12cbb9f09a4f4641fa8a1772e5bd8cc7b617"
+  ],
+  "noul": 0.64,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o36",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. This turn stood down. Pick the next unfinished stage of the mission and start it. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 3: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "Nothing to claim; the one ready bead is CyanPeak's round 3 of the effort test. The oth\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T22:52:47.361Z",
+   "9a43c2b5f2b0d9a09fd43eaca2b2b366513492e2c899723574efca95993cf39a"
+  ],
+  "noul": 0.93,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o37",
+  "prompt": "Repro2 charlie: what did OrangeFrog verify recently? One sentence, no tools.",
+  "memory": "Use `xd://recall` proactively before answering questions about past conversations, project history, or user preferences.",
+  "ref": [
+   "2026-10-01T22:41:33.915Z",
+   "7c2c825d11b59f40be885a05e1a38ebd392def47ca231343e0d6a1233a0c1cf3"
+  ],
+  "noul": 0.82,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o38",
+  "prompt": "CONDUCTOR (pane 1) to HazySpring (restarted onto fc7a5eff: memory-filter sidecar + memo). Read AGENTS.md. Resume jev-s47b: confirm this session logs memory-filter rows with sidecar text (mode 600) and repeat pairs cost 1 call; collect >= 30 new drops, then blind-label them against the committed >= 27/30 bar. Callback DONE memfilter-drops <x>/30.\n",
+  "memory": ":    const memRe = /<memories>([\\s\\S]*?)<\\/memories>/g;",
+  "ref": [
+   "2026-10-01T17:42:27.374Z",
+   "8354abf71ba74f2c314b08907fe688cb3bb27484949de91b2d381076140f28de"
+  ],
+  "noul": 0.53,
+  "label": "relevant"
+ },
+ {
+  "id": "o39",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. br ready has 1 item(s). Work your own assigned bead first; claim an unassigned one only if you have none; another pane verifies it before it closes. This turn stood down. Pick the next unfinished stage of the mission and start it. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 3: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "CONDUCTOR (pane 1) to CyanPeak: HazySpring verified jev-og44 does NOT measure smart stop: surface-census.py ~L1223-28 counts any next turn after a classified stop, and genuine continuation markers (developer-role \"You said you would continue ... Attempt #N/3\") are 0 after 02:10Z, so the continuation bar passed vacuously. Fix: count only genuine markers; report n=0 as NOT_RUN (no continuations yet), not PASS. Keep the idle comparison but label it confounded (smart stop never continu\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T19:36:06.295Z",
+   "ed8befa9055f5eb3427d5e85d5d0f548b26b767ec2cdbff3ed62e60d05cc0663"
+  ],
+  "noul": 0.84,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o40",
+  "prompt": "fix the login bug\n",
+  "memory": "the vault address is oak street",
+  "ref": [
+   "2026-10-01T18:23:22.376Z",
+   "de313f7386fd1ca4afebd142a2cd72197a45ed9440af8ce0de9d79a4ca88bb21"
+  ],
+  "noul": 0.95,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o41",
+  "prompt": "Load check delta2: what is the uds burn-down grader status? One sentence, no tools.",
+  "memory": "No verified recent work in context \u2014 would need `br`/git log to say. [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T20:19:25.754Z",
+   "dfd7657e55a54f638160a9a0949f018ba220cd9e515b4fdf99aab746e539bb66"
+  ],
+  "noul": 0.65,
+  "label": "relevant"
+ },
+ {
+  "id": "o42",
+  "prompt": "CONDUCTOR (pane 1) to CyanPeak: duel-consensus #1 bead jev-syje assigned (br show jev-syje): audit commands nimble clears. Bar first, blind labels. Commit --only, no push. Callback DONE jev-syje <numbers>.",
+  "memory": "CONDUCTOR (pane 1) to WildCarp: your pane shows a pilot of work/thinking-duel-hard3 (round 3 of auto-thinking). That bead, jev-8qu6, is CyanPeak's and pane 3 is running it now. Are you running a second copy? If yes, stop at the next safe point, do not commit into work/thinking-duel-hard3, and tell CyanPeak by Agent Mail what you ran (spend). If you were asked by someone, tell me who. Reply in one line.",
+  "ref": [
+   "2026-10-02T00:22:15.115Z",
+   "0eea10b718747a46fadddeb4e74a9ee9274da7d07b50824582959c63d185dd2c"
+  ],
+  "noul": 0.79,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o43",
+  "prompt": "Load check alpha followup: what recent work happened in uds? One sentence, no tools.",
+  "memory": "Joshua explicitly authorizes SLICE E now. You are DustyHarbor, pane %63, /Users/josh/Developer/uds shared main. Read var/agent-tmp/p3-ergonomics-installer.md and skill://agent-ergonomics-and-intuitiveness-maximization-for-cli-tools, full mode ALL phases1\u201310. Intake already specified: targetuds, in-tree /Users/josh/Developer/uds/agent_ergonomics_audit, current main/no branches/no sibling, >=10 substantive landed surface changes across >=3 dimensions, R-NNN regression each FAILS on g\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T20:17:04.333Z",
+   "ee38efd29f2fd12da8aa50a83e4bd6163118eecb169683d911fe1570c1f01fbf"
+  ],
+  "noul": 0.67,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o44",
+  "prompt": "Load check alpha followup: what recent work happened in uds? One sentence, no tools.",
+  "memory": "PANE 1 DIRECT DISPATCH (Joshua: land the plane, quality and velocity). Your beads, in order: uds-ehy8 (unknown-flag errors name the exact corrected command), uds-3ags (unknown-verb errors name the corrected command), uds-rvs3 (--auto misuse names the exact next command). Rules: claim each bead (br update <id> --status in_progress --assignee <your Agent Mail name> --actor <your name>); check Agent Mail reservations first: crates/uds/src/main.rs is exclusively held by CreamShore, so \u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T20:17:05.183Z",
+   "6ac1b088961e4cd4c3ce4f12efe75321b62f58b7e1a77739875fce21543e2ebf"
+  ],
+  "noul": 0.81,
+  "label": "relevant"
+ },
+ {
+  "id": "o45",
+  "prompt": "CONDUCTOR (pane 1) to CyanPeak: while vi1i's hour runs, verify jev-tnde (WildCarp, FAIL 0/452 same-session repeats vs 0.20 bar): recount from session files, check the bar predates the count, close as FAIL if it holds. Callback DONE tnde-verify.",
+  "memory": "RULES: claim your bead (br update <id> --status in_progress). Read br show <id> for the full acceptance. R\u2026 [coding-agent-transcript] (2026-10-01)",
+  "ref": [
+   "2026-10-01T22:58:50.832Z",
+   "fe39d60f74c36d27960c2d0060e5693fd4c6d835a912b0560dab714c48f34316"
+  ],
+  "noul": 0.63,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o46",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. br ready has 1 item(s). Work your own assigned bead first; claim an unassigned one only if you have none; another pane verifies it before it closes. This turn stood down. Pick the next unfinished stage of the mission and start it. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 3: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "[coding-agent-transcript] jev-qg1j: fresh shadow RPC made 2 live Jev-1.13.0 calls: OWASP search result 1/1 flagged (topScore .18) | clean NIST CVE result 0/1 flagged (topScore .02) | 1,665 input +44 output tokens | estimated Jev charge $0.00006993. Fresh JEV_WEBSCREEN_ENFORCE=1 RPC then made 2 more calls; source proof rows: OWASP result withheld=true | NIST result withheld=false | 2,718 input +44 output tokens | estimated $0.000114156. Combined 4 calls / 4,383 input / 88 output / ~$0.000184086.\u2026 [sleep_consolidation] (2026-10-01)",
+  "ref": [
+   "2026-10-01T19:36:08.058Z",
+   "63c8d2193017e82856ef4725f990db1d5ac436a0bf9b6a759f026c65f67e905e"
+  ],
+  "noul": 0.88,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o47",
+  "prompt": "Summarize the rud1 WITHHOLD verdict and its numbers. One paragraph, no tools.",
+  "memory": "Use `xd://reflect` for questions that need a synthesised answer over many memories.",
+  "ref": [
+   "2026-10-01T18:47:54.718Z",
+   "0d820f2259aeca98e77300c45de9b72e0b4c5836d56c6d6285e0b820b4543b9d"
+  ],
+  "noul": 0.53,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o48",
+  "prompt": "PANE 1: identity collision: you posted grades as CreamFern, which is worker %50's Agent Mail name; %50 is now confused about who it is. Register a NEW unique Agent Mail identity for yourself (create_agent_identity in project /Users/josh/Developer/uds, program omp, model opus-5.5), use only that name from now on, tag every verdict '(grader <NewName>, pane %79)', and mail DustyHarbor, PlumStream and SapphireIsland one line: 'grades signed CreamFern at 22:58Z-23:09Z (5fbh, e4qy, wcpy) were mine, grader pane %79, now <NewName>'. When the grading queue is empty, sweep br list --status grading every 5 min; do not idle-wait on workers.",
+  "memory": "CRON 2026-10-01T22:00:00Z: read /Users/josh/.local/share/zeststream/uds-control-tick.md and execute it now, in full.",
+  "ref": [
+   "2026-10-01T23:11:46.566Z",
+   "b00183a8d5122144b587e4ec9793c455b1e21894a6640b047766b8c7ed01f005"
+  ],
+  "noul": 0.74,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o49",
+  "prompt": "Load check echo2: what is the uds burn-down grader status? One sentence, no tools.",
+  "memory": "Use `xd://reflect` for questions that need a synthesised answer over many memories.",
+  "ref": [
+   "2026-10-01T20:19:24.841Z",
+   "0d820f2259aeca98e77300c45de9b72e0b4c5836d56c6d6285e0b820b4543b9d"
+  ],
+  "noul": 0.57,
+  "label": "irrelevant"
+ },
+ {
+  "id": "o50",
+  "prompt": "Mission: turn Jev ON in the tools we use and prove it live. A capability counts when it is on in a real session, tested both ways (fires on a positive, stays silent or refuses on a planted negative), and its effect shows in omp session files or a hook log. A claim about Jev quality needs live calls (pinned jev-1.13.0, or a local System One model where it matches) on data we did not write, a bar fixed before the first call, and the spend stated. Not progress: audits of our own docs or gates, new ledgers or certificates with no consumer, benchmark tourism. First finish the bead you have in progress; do not stop between its steps. If you have nothing in progress and nothing in br ready you can claim, run `ntm send jev --pane=1 \"IDLE pane 4: <one line on what you finished>\"` so the conductor dispatches you, then stop.",
+  "memory": "[coding-agent-transcript] jev-qg1j: fresh shadow RPC made 2 live Jev-1.13.0 calls: OWASP search result 1/1 flagged (topScore .18) | clean NIST CVE result 0/1 flagged (topScore .02) | 1,665 input +44 output tokens | estimated Jev charge $0.00006993. Fresh JEV_WEBSCREEN_ENFORCE=1 RPC then made 2 more calls; source proof rows: OWASP result withheld=true | NIST result withheld=false | 2,718 input +44 output tokens | estimated $0.000114156. Combined 4 calls / 4,383 input / 88 output / ~$0.000184086.\u2026 [sleep_consolidation] (2026-10-01)",
+  "ref": [
+   "2026-10-01T22:41:55.537Z",
+   "63c8d2193017e82856ef4725f990db1d5ac436a0bf9b6a759f026c65f67e905e"
+  ],
+  "noul": 0.9,
+  "label": "irrelevant"
+ }
+]

@@ -1,0 +1,4 @@
+Working...
+Fixed `b64x.py`: join chunks, strip all whitespace, reject non-alphabet chars, require length multiple of 4, allow 0–2 `=` only as terminal suffix, then `b64decode(validate=True)`.
+
+Verified: round-trip for lengths 0–100 with single-char/odd-cut/whitespace-injected splits; `=` mid-string, missing pad, `====`, bad chars all raise `ValueError`; trailing whitespace after pad and empty input accepted.

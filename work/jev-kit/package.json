@@ -1,0 +1,13 @@
+{
+  "name": "@jev/kit",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "jev": "bin/jev.mjs"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/kit.test.mjs",
+    "doctor": "node bin/jev.mjs doctor",
+    "quickstart": "node bin/jev.mjs quickstart"
+  }
+}

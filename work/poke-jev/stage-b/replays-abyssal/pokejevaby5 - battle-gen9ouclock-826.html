@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-826</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-826<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby5</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot5</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-826|init|battle
+|title|pokejevaby5 vs. abyssalbot5
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot5
+|gametype|singles
+|player|p1|pokejevaby5|ninjaboy|
+|player|p2|abyssalbot5|archie-gen3|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Blissey, F|
+|poke|p1|Ditto|
+|poke|p1|Dondozo, F|
+|poke|p1|Toxapex, M|
+|poke|p1|Alomomola, M|
+|poke|p1|Ting-Lu|
+|poke|p2|Darkrai|
+|poke|p2|Great Tusk|
+|poke|p2|Ogerpon-Wellspring, F|
+|poke|p2|Gholdengo|
+|poke|p2|Dragonite, F|
+|poke|p2|Ting-Lu|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|start
+|switch|p1a: Toxapex|Toxapex, M|303/303
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Toxapex|[miss]
+|-miss|p2a: Ogerpon|p1a: Toxapex
+|move|p1a: Toxapex|Toxic|p2a: Ogerpon
+|-status|p2a: Ogerpon|tox
+|-damage|p2a: Ogerpon|95/100 tox|[from] psn
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Toxapex
+|-damage|p1a: Toxapex|168/303
+|move|p1a: Toxapex|Recover|p1a: Toxapex
+|-heal|p1a: Toxapex|303/303
+|-damage|p2a: Ogerpon|83/100 tox|[from] psn
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Toxapex|[miss]
+|-miss|p2a: Ogerpon|p1a: Toxapex
+|move|p1a: Toxapex|Toxic|p2a: Ogerpon
+|-fail|p2a: Ogerpon|tox
+|-damage|p2a: Ogerpon|65/100 tox|[from] psn
+|upkeep
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Toxapex
+|-damage|p1a: Toxapex|168/303
+|move|p1a: Toxapex|Toxic Spikes|p2a: Ogerpon
+|-sidestart|p2: abyssalbot5|move: Toxic Spikes
+|-damage|p2a: Ogerpon|41/100 tox|[from] psn
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Toxapex
+|-damage|p1a: Toxapex|32/303
+|move|p1a: Toxapex|Recover|p1a: Toxapex
+|-heal|p1a: Toxapex|184/303
+|-damage|p2a: Ogerpon|11/100 tox|[from] psn
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Power Whip|p1a: Toxapex
+|-damage|p1a: Toxapex|61/303
+|move|p1a: Toxapex|Recover|p1a: Toxapex
+|-heal|p1a: Toxapex|213/303
+|-damage|p2a: Ogerpon|0 fnt|[from] psn
+|faint|p2a: Ogerpon
+|upkeep
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p2a: Great Tusk|Great Tusk|100/100
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Dondozo|Dondozo, F|503/503
+|move|p2a: Great Tusk|Rapid Spin|p1a: Dondozo
+|-damage|p1a: Dondozo|462/503
+|-boost|p2a: Great Tusk|spe|1
+|-sideend|p2: abyssalbot5|Toxic Spikes|[from] move: Rapid Spin|[of] p2a: Great Tusk
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Great Tusk|Headlong Rush|p1a: Dondozo
+|-damage|p1a: Dondozo|327/503
+|-unboost|p2a: Great Tusk|def|1
+|-unboost|p2a: Great Tusk|spd|1
+|move|p1a: Dondozo|Avalanche|p2a: Great Tusk
+|-supereffective|p2a: Great Tusk
+|-damage|p2a: Great Tusk|61/100
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Great Tusk|Headlong Rush|p1a: Dondozo
+|-damage|p1a: Dondozo|182/503
+|-unboost|p2a: Great Tusk|def|1
+|-unboost|p2a: Great Tusk|spd|1
+|move|p1a: Dondozo|Avalanche|p2a: Great Tusk
+|-supereffective|p2a: Great Tusk
+|-damage|p2a: Great Tusk|20/100
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Great Tusk|Headlong Rush|p1a: Dondozo
+|-damage|p1a: Dondozo|37/503
+|-unboost|p2a: Great Tusk|def|1
+|-unboost|p2a: Great Tusk|spd|1
+|move|p1a: Dondozo|Avalanche|p2a: Great Tusk
+|-supereffective|p2a: Great Tusk
+|-damage|p2a: Great Tusk|0 fnt
+|faint|p2a: Great Tusk
+|-end|p2a: Great Tusk|Protosynthesis|[silent]
+|upkeep
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p2a: Dragonite|Dragonite, F|100/100
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Earthquake|p1a: Dondozo
+|-damage|p1a: Dondozo|0 fnt
+|faint|p1a: Dondozo
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|switch|p1a: Ditto|Ditto|299/299
+|-transform|p1a: Ditto|p2a: Dragonite|[from] ability: Imposter
+|-item|p1a: Ditto|Air Balloon
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Ditto|Dragon Tail|p2a: Dragonite
+|-supereffective|p2a: Dragonite
+|-damage|p2a: Dragonite|68/100
+|drag|p2a: Gholdengo|Gholdengo|100/100
+|-item|p2a: Gholdengo|Air Balloon
+|upkeep
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Gholdengo|Nasty Plot|p2a: Gholdengo
+|-boost|p2a: Gholdengo|spa|2
+|move|p1a: Ditto|Earthquake|p2a: Gholdengo
+|-immune|p2a: Gholdengo
+|upkeep
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|514/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Gholdengo|Nasty Plot|p2a: Gholdengo
+|-boost|p2a: Gholdengo|spa|2
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Gholdengo|Dazzling Gleam|p1a: Ting-Lu
+|-supereffective|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|198/514
+|move|p1a: Ting-Lu|Earthquake|p2a: Gholdengo
+|-immune|p2a: Gholdengo
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Ditto|Ditto|299/299
+|-transform|p1a: Ditto|p2a: Gholdengo|[from] ability: Imposter
+|-item|p1a: Ditto|Air Balloon
+|move|p2a: Gholdengo|Dazzling Gleam|p1a: Ditto
+|-resisted|p1a: Ditto
+|-damage|p1a: Ditto|165/299
+|-enditem|p1a: Ditto|Air Balloon
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Gholdengo|Nasty Plot|p2a: Gholdengo
+|-boost|p2a: Gholdengo|spa|2
+|move|p1a: Ditto|Shadow Ball|p2a: Gholdengo
+|-supereffective|p2a: Gholdengo
+|-damage|p2a: Gholdengo|0 fnt
+|-enditem|p2a: Gholdengo|Air Balloon
+|faint|p2a: Gholdengo
+|upkeep
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p2a: Darkrai|Darkrai|100/100
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Darkrai|Nasty Plot|p2a: Darkrai
+|-boost|p2a: Darkrai|spa|2
+|move|p1a: Ditto|Dazzling Gleam|p2a: Darkrai
+|-supereffective|p2a: Darkrai
+|-damage|p2a: Darkrai|0 fnt
+|faint|p2a: Darkrai
+|upkeep
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Ting-Lu|Spikes|p1a: Alomomola
+|-sidestart|p1: pokejevaby5|Spikes
+|upkeep
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|93/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|468/534
+|-heal|p2a: Ting-Lu|99/100|[from] item: Leftovers
+|upkeep
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|93/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|411/534
+|-heal|p2a: Ting-Lu|99/100|[from] item: Leftovers
+|upkeep
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|92/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|365/534
+|-heal|p2a: Ting-Lu|99/100|[from] item: Leftovers
+|upkeep
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p2a: Dragonite|Dragonite, F|68/100
+|move|p1a: Alomomola|Chilling Water|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|64/100
+|-unboost|p2a: Dragonite|atk|1
+|upkeep
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Ditto|Ditto|165/299
+|-damage|p1a: Ditto|128/299|[from] Spikes
+|-transform|p1a: Ditto|p2a: Dragonite|[from] ability: Imposter
+|move|p2a: Dragonite|Earthquake|p1a: Ditto
+|-immune|p1a: Ditto
+|upkeep
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Dragon Tail|p1a: Ditto
+|-supereffective|p1a: Ditto
+|-damage|p1a: Ditto|0 fnt
+|faint|p1a: Ditto
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, M|303/303
+|turn|26
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Earthquake|p1a: Toxapex
+|-supereffective|p1a: Toxapex
+|-damage|p1a: Toxapex|211/303
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|27
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Earthquake|p1a: Toxapex
+|-supereffective|p1a: Toxapex
+|-damage|p1a: Toxapex|57/303
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|28
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|419/534
+|upkeep
+|turn|29
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect|p1a: Alomomola
+|-singleturn|p1a: Alomomola|Protect
+|move|p2a: Dragonite|Earthquake|p1a: Alomomola
+|-activate|p1a: Alomomola|move: Protect
+|upkeep
+|turn|30
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Blissey|Blissey, F|652/652
+|move|p2a: Dragonite|Earthquake|p1a: Blissey
+|-damage|p1a: Blissey|380/652
+|upkeep
+|turn|31
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Earthquake|p1a: Blissey
+|-damage|p1a: Blissey|136/652
+|move|p1a: Blissey|Seismic Toss|p2a: Dragonite
+|-damage|p2a: Dragonite|38/100
+|upkeep
+|turn|32
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, M|158/303
+|move|p2a: Dragonite|Earthquake|p1a: Toxapex
+|-supereffective|p1a: Toxapex
+|-damage|p1a: Toxapex|10/303
+|upkeep
+|turn|33
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|418/534
+|upkeep
+|turn|34
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect|p1a: Alomomola
+|-singleturn|p1a: Alomomola|Protect
+|move|p2a: Dragonite|Earthquake|p1a: Alomomola
+|-activate|p1a: Alomomola|move: Protect
+|upkeep
+|turn|35
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect||[still]
+|-fail|p1a: Alomomola
+|move|p2a: Dragonite|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|305/534
+|upkeep
+|turn|36
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect|p1a: Alomomola
+|-singleturn|p1a: Alomomola|Protect
+|move|p2a: Dragonite|Earthquake|p1a: Alomomola
+|-activate|p1a: Alomomola|move: Protect
+|upkeep
+|turn|37
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect||[still]
+|-fail|p1a: Alomomola
+|move|p2a: Dragonite|Earthquake|p1a: Alomomola
+|-crit|p1a: Alomomola
+|-damage|p1a: Alomomola|127/534
+|upkeep
+|turn|38
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|198/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Dragonite|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|86/514
+|upkeep
+|turn|39
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, M|111/303
+|move|p2a: Dragonite|Earthquake|p1a: Toxapex
+|-supereffective|p1a: Toxapex
+|-damage|p1a: Toxapex|0 fnt
+|faint|p1a: Toxapex
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|305/534
+|turn|40
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|35/100
+|-unboost|p2a: Dragonite|atk|1
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola|[miss]
+|-miss|p2a: Dragonite|p1a: Alomomola
+|upkeep
+|turn|41
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|31/100
+|-unboost|p2a: Dragonite|atk|1
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|259/534
+|drag|p1a: Blissey|Blissey, F|136/652
+|upkeep
+|turn|42
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|437/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|391/534
+|drag|p1a: Ting-Lu|Ting-Lu|86/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|upkeep
+|turn|43
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|486/534
+|drag|p1a: Ting-Lu|Ting-Lu|86/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|upkeep
+|turn|44
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|485/534
+|drag|p1a: Blissey|Blissey, F|136/652
+|upkeep
+|turn|45
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|483/534
+|drag|p1a: Blissey|Blissey, F|136/652
+|upkeep
+|turn|46
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|488/534
+|drag|p1a: Ting-Lu|Ting-Lu|86/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|upkeep
+|turn|47
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|479/534
+|drag|p1a: Blissey|Blissey, F|136/652
+|upkeep
+|turn|48
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|483/534
+|drag|p1a: Blissey|Blissey, F|136/652
+|upkeep
+|turn|49
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|483/534
+|drag|p1a: Ting-Lu|Ting-Lu|86/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|upkeep
+|turn|50
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|488/534
+|drag|p1a: Ting-Lu|Ting-Lu|86/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|upkeep
+|turn|51
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|479/534
+|drag|p1a: Ting-Lu|Ting-Lu|86/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|upkeep
+|turn|52
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-damage|p1a: Alomomola|483/534
+|drag|p1a: Blissey|Blissey, F|136/652
+|upkeep
+|turn|53
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola|[miss]
+|-miss|p2a: Dragonite|p1a: Alomomola
+|upkeep
+|turn|54
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|27/100
+|-unboost|p2a: Dragonite|atk|1
+|move|p2a: Dragonite|Dragon Tail|p1a: Alomomola
+|-crit|p1a: Alomomola
+|-damage|p1a: Alomomola|387/534
+|drag|p1a: Ting-Lu|Ting-Lu|86/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|upkeep
+|turn|55
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|99/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|switch|p1a: Alomomola|Alomomola, M|534/534
+|-heal|p2a: Ting-Lu|100/100|[from] item: Leftovers
+|upkeep
+|turn|56
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|93/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|462/534
+|-heal|p2a: Ting-Lu|99/100|[from] item: Leftovers
+|upkeep
+|turn|57
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|93/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|413/534
+|-heal|p2a: Ting-Lu|99/100|[from] item: Leftovers
+|upkeep
+|turn|58
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|92/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|368/534
+|-heal|p2a: Ting-Lu|98/100|[from] item: Leftovers
+|upkeep
+|turn|59
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p2a: Dragonite|Dragonite, F|27/100
+|move|p1a: Alomomola|Chilling Water|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|23/100
+|-unboost|p2a: Dragonite|atk|1
+|upkeep
+|turn|60
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Extreme Speed|p1a: Alomomola
+|-damage|p1a: Alomomola|306/534
+|move|p1a: Alomomola|Chilling Water|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|19/100
+|-unboost|p2a: Dragonite|atk|1
+|upkeep
+|turn|61
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect|p1a: Alomomola
+|-singleturn|p1a: Alomomola|Protect
+|move|p2a: Dragonite|Extreme Speed|p1a: Alomomola
+|-activate|p1a: Alomomola|move: Protect
+|upkeep
+|turn|62
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect||[still]
+|-fail|p1a: Alomomola
+|move|p2a: Dragonite|Extreme Speed|p1a: Alomomola
+|-damage|p1a: Alomomola|259/534
+|upkeep
+|turn|63
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect|p1a: Alomomola
+|-singleturn|p1a: Alomomola|Protect
+|move|p2a: Dragonite|Extreme Speed|p1a: Alomomola
+|-activate|p1a: Alomomola|move: Protect
+|upkeep
+|turn|64
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect||[still]
+|-fail|p1a: Alomomola
+|move|p2a: Dragonite|Extreme Speed|p1a: Alomomola
+|-damage|p1a: Alomomola|217/534
+|upkeep
+|turn|65
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect|p1a: Alomomola
+|-singleturn|p1a: Alomomola|Protect
+|move|p2a: Dragonite|Extreme Speed|p1a: Alomomola
+|-activate|p1a: Alomomola|move: Protect
+|upkeep
+|turn|66
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect||[still]
+|-fail|p1a: Alomomola
+|move|p2a: Dragonite|Extreme Speed|p1a: Alomomola
+|-damage|p1a: Alomomola|176/534
+|upkeep
+|turn|67
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect|p1a: Alomomola
+|-singleturn|p1a: Alomomola|Protect
+|move|p2a: Dragonite|Extreme Speed|p1a: Alomomola
+|-activate|p1a: Alomomola|move: Protect
+|upkeep
+|turn|68
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect||[still]
+|-fail|p1a: Alomomola
+|move|p2a: Dragonite|Roost|p2a: Dragonite
+|-heal|p2a: Dragonite|69/100
+|-singleturn|p2a: Dragonite|move: Roost
+|upkeep
+|turn|69
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect|p1a: Alomomola
+|-singleturn|p1a: Alomomola|Protect
+|move|p2a: Dragonite|Roost|p2a: Dragonite
+|-heal|p2a: Dragonite|100/100
+|-singleturn|p2a: Dragonite|move: Roost
+|upkeep
+|turn|70
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect|p1a: Alomomola
+|-singleturn|p1a: Alomomola|Protect
+|move|p2a: Dragonite|Roost||[still]
+|-fail|p2a: Dragonite|heal
+|upkeep
+|turn|71
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Protect||[still]
+|-fail|p1a: Alomomola
+|move|p2a: Dragonite|Roost||[still]
+|-fail|p2a: Dragonite|heal
+|upkeep
+|turn|72
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Roost||[still]
+|-fail|p2a: Dragonite|heal
+|move|p1a: Alomomola|Wish|p1a: Alomomola
+|upkeep
+|turn|73
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Roost||[still]
+|-fail|p2a: Dragonite|heal
+|move|p1a: Alomomola|Wish||[still]
+|-fail|p1a: Alomomola
+|-heal|p1a: Alomomola|443/534|[from] move: Wish|[wisher] Alomomola
+|upkeep
+|turn|74
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Roost||[still]
+|-fail|p2a: Dragonite|heal
+|move|p1a: Alomomola|Wish|p1a: Alomomola
+|upkeep
+|turn|75
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Dragonite|Roost||[still]
+|-fail|p2a: Dragonite|heal
+|move|p1a: Alomomola|Chilling Water|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|99/100
+|-unboost|p2a: Dragonite|atk|1
+|-heal|p1a: Alomomola|534/534|[from] move: Wish|[wisher] Alomomola
+|upkeep
+|turn|76
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|-activate|p2a: Dragonite|move: Struggle
+|move|p2a: Dragonite|Struggle|p1a: Alomomola
+|-damage|p1a: Alomomola|510/534
+|-damage|p2a: Dragonite|74/100|[from] recoil
+|move|p1a: Alomomola|Wish|p1a: Alomomola
+|upkeep
+|turn|77
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|-activate|p2a: Dragonite|move: Struggle
+|move|p2a: Dragonite|Struggle|p1a: Alomomola
+|-damage|p1a: Alomomola|488/534
+|-damage|p2a: Dragonite|49/100|[from] recoil
+|move|p1a: Alomomola|Chilling Water|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|45/100
+|-unboost|p2a: Dragonite|atk|1
+|-heal|p1a: Alomomola|534/534|[from] move: Wish|[wisher] Alomomola
+|upkeep
+|turn|78
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|-activate|p2a: Dragonite|move: Struggle
+|move|p2a: Dragonite|Struggle|p1a: Alomomola
+|-damage|p1a: Alomomola|515/534
+|-damage|p2a: Dragonite|20/100|[from] recoil
+|move|p1a: Alomomola|Chilling Water|p2a: Dragonite
+|-resisted|p2a: Dragonite
+|-damage|p2a: Dragonite|16/100
+|-unboost|p2a: Dragonite|atk|1
+|upkeep
+|turn|79
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|-activate|p2a: Dragonite|move: Struggle
+|move|p2a: Dragonite|Struggle|p1a: Alomomola
+|-damage|p1a: Alomomola|499/534
+|-damage|p2a: Dragonite|0 fnt|[from] recoil
+|faint|p2a: Dragonite
+|move|p1a: Alomomola|Chilling Water|p2: Dragonite|[notarget]
+|-fail|p1a: Alomomola
+|upkeep
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|98/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|80
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|91/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|427/534
+|-heal|p2a: Ting-Lu|97/100|[from] item: Leftovers
+|upkeep
+|turn|81
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|90/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-crit|p1a: Alomomola
+|-damage|p1a: Alomomola|280/534
+|-heal|p2a: Ting-Lu|96/100|[from] item: Leftovers
+|upkeep
+|turn|82
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|88/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-crit|p1a: Alomomola
+|-damage|p1a: Alomomola|127/534
+|-heal|p2a: Ting-Lu|95/100|[from] item: Leftovers
+|upkeep
+|turn|83
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|88/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|88/534
+|-heal|p2a: Ting-Lu|94/100|[from] item: Leftovers
+|upkeep
+|turn|84
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|86/100
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-crit|p1a: Alomomola
+|-damage|p1a: Alomomola|0 fnt
+|faint|p1a: Alomomola
+|-heal|p2a: Ting-Lu|93/100|[from] item: Leftovers
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|switch|p1a: Blissey|Blissey, F|136/652
+|turn|85
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Blissey|Seismic Toss|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|73/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Blissey
+|-damage|p1a: Blissey|61/652
+|-heal|p2a: Ting-Lu|79/100|[from] item: Leftovers
+|upkeep
+|turn|86
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|86/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Ting-Lu|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|56/514
+|-heal|p2a: Ting-Lu|86/100|[from] item: Leftovers
+|upkeep
+|turn|87
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Ting-Lu|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|28/514
+|move|p1a: Ting-Lu|Earthquake|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|66/100
+|-heal|p2a: Ting-Lu|73/100|[from] item: Leftovers
+|upkeep
+|turn|88
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p2a: Ting-Lu|Earthquake|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|0 fnt
+|faint|p1a: Ting-Lu
+|-heal|p2a: Ting-Lu|79/100|[from] item: Leftovers
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|switch|p1a: Blissey|Blissey, F|61/652
+|turn|89
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby5 has 15 seconds left this turn.
+|inactive|abyssalbot5 has 15 seconds left this turn.
+|move|p1a: Blissey|Seismic Toss|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|59/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Blissey
+|-damage|p1a: Blissey|0 fnt
+|faint|p1a: Blissey
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

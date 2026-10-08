@@ -1,0 +1,6 @@
+Working...
+Fixed `prefix.py`: scrub-then-cut, marker-safe truncation.
+
+Problem: old code truncated to 200 chars *before* substituting, so a secret straddling the cut survived partially (pattern no longer matched) and output could leak.
+Decision: `home`→`~`, strip, apply ALL patterns, then cut to ≤200; if char 200 lands strictly inside a `[REDACTED]` (start in `[191, 200)`), back the cut up to the marker start, dropping it whole.
+Check: 9-case throwaway (basic, multi-pattern, straddling leak, split-marker exclusion, exact-fit at 200 kept, adjacent `[REDACTED][REDACTED]`, plain truncation, 185–204 start sweep, beyond-cut secret) — ALL PASS, no `secret` residue, no split marker, `len ≤ 200` everywhere.

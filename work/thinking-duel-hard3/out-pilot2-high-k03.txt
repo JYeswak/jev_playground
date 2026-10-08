@@ -1,0 +1,8 @@
+Working...
+Fixed `sjoin.py`: normalize before check, directory-aware prefix check.
+
+- Bypass 1 (unnormalized `..` passed `startswith`): now `normpath(join(abspath(base), stripped))` before check.
+- Bypass 2 (`/tmp/x-evil` passes `startswith("/tmp/x")`): now `p == base or p.startswith(base + os.sep)`.
+- Absolute parts stripped (`lstrip(os.sep)`) so `join` never resets to `/`.
+
+Verified 14/14: normal/dot/dupsep/dotdot-inside resolve inside; `..`, `a/../../evil`, `a/../..`, `../x-evil`, `/../evil` all raise `ValueError`; `/etc/passwd` → `/tmp/x/etc/passwd`.

@@ -1,0 +1,4 @@
+Working...
+Fixed `where.py`: leaves emit `$N` with raw value in `params`; `and`/`or`/`not` thread shared params/counter in encounter order, nesting parenthesized.
+
+Verified: leaf, `and` order, nested `or`, `not`, `LIKE`, injection `"1' OR '1'='1"` stays in `params` with `name = $1`, deep-nest order `['a','b',9]` → `(x = $1 AND (y != $2 OR (NOT z <= $3)))`.

@@ -1,0 +1,9 @@
+Working...
+Fixed `where.py`: recursive `_build(node, params)` threads one `params` list depth-first, emitting `$N` in encounter order; leaf validates op/column and appends raw value; `and`/`or`/`not` propagate params instead of dropping them.
+
+Verified in PWD:
+- `('age','>',21)` → `('age > $1', [21])`
+- nested `and/or/not` → `(age > $1 AND (name = $2 OR city LIKE $3) AND (NOT active = $4))`, params `[21, "o'brien", "%york%", True]`
+- all 7 ops emit `$1` with raw param
+- injection `x' OR '1'='1` stays inert: sql `name = $1`, value only in params
+- bad op (`<>`) / bad column (`c; X`, `bad col`) raise `ValueError`

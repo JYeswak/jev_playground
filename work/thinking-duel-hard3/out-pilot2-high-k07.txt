@@ -1,0 +1,8 @@
+Working...
+Fixed `semver.py` in place. All 19 checks pass.
+
+Decision:
+- `^0.0.x` upper now `(0,0,p+1)` (was `(0,m+1,0)` → `^0.0.3` gave `<0.1.0`, now `<0.0.4`). Full caret: `M>0→(M+1,0,0)`, `m>0→(0,m+1,0)`, else patch bump. Covers `^0.0.0→<0.0.1`.
+- Exact `1.2.3` now `((1,2,3),(1,2,4))` (was `(v,v)` → always `lo>=hi` → always `None`). Patch-bump makes `[lo,hi)` contain exactly that version.
+
+Check: numeric compare already tuple-of-int, so `1.10.0 > 1.9.0` correct; verified `intersect('1.10.0','>=1.9.0') → ((1,10,0),(1,10,1))`, plus caret/tilde/exact/star/empty intersections (19/19 PASS, incl. `^0.2.3 ∩ ^0.3.0 → None`, `1.2.3 ∩ 1.2.4 → None`).

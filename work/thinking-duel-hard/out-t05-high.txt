@@ -1,0 +1,12 @@
+Working...
+Fixed `runbox.py`: `start_new_session=True` + `os.killpg(SIGKILL)` on `TimeoutExpired`, then a final `communicate()` to collect partial output, returning `124`.
+
+Was broken: timeout returned empty output and left the child running.
+
+Verified in place:
+- `echo hello` → `0`, correct output
+- `sleep 10` @ 0.5s → `124` in ~0.5s
+- print-then-sleep → `124` with `part1` in stdout
+- 200k-line stderr / 20MB stdout → no deadlock, full capture
+- 50k-line-then-hang @ 1s → `124` with 539KB partial incl. `MARKER`
+- `sleep 4719 & sleep 4819 & wait` @ 0.5s → `124`, zero new sleep PIDs

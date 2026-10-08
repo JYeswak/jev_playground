@@ -1,0 +1,8 @@
+Working...
+Fixed `retrypy.py`: retry only {429,502,503,504} + `TransientError`; everything else (incl. 501) raises `PermanentError(status)` immediately; 200 returns body.
+
+- `Retry-After`: case-insensitive lookup; `int` delta-seconds first, else `parsedate_to_datetime` with `wait = max(0, ts − now())`; past/invalid → 0 / backoff fallback.
+- Backoff `0.1·2**attempt`, backoff total capped at 2.0s (last wait truncated, e.g. retries=6 → `[0.1,0.2,0.4,0.8,0.5]`); server-directed `Retry-After` honored uncapped (verified 5.0s date slept fully).
+- No sleep after final attempt; exhaustion raises `PermanentError("exhausted")`.
+
+Verified 13/14 live checks pass; the one "FAIL" was my test's artifact (`formatdate` truncates to whole seconds, so +2.5s implies 2.0s — code slept exactly the implied 2.0).

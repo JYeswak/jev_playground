@@ -1,0 +1,4 @@
+Working...
+Fixed `census.py:count_calls`: skips malformed JSON (`JSONDecodeError`), non-dict rows/messages/items, non-list content, non-assistant roles, non-`toolCall` types, non-string names.
+
+Verified: `count_calls('sample.jsonl') == {'read': 1, 'bash': 1}`; edge file (malformed, list/int/str/null rows, string content, lowercase type) yields `{'': 1}` only.

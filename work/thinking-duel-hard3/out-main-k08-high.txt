@@ -1,0 +1,8 @@
+Working...
+Fixed `where.py`: `build` threads one shared `params` list through recursion, emitting `$N` in encounter order; leaves validate `op` and append raw values; `and`/`or`/`not` preserve nesting with parens. Nothing interpolates into SQL.
+
+Evidence (live run in `$PWD`):
+- `("name","=","alice")` → `('name = $1', ['alice'])`
+- nested `and/or/not` → `(age > $1 AND (name = $2 OR city LIKE $3) AND (NOT active = $4))`, params `[30,'bob','%x%',True]` — numbering/ordering correct
+- injection `"\' OR '1'='1"` → sql `name = $1`, payload inert in `params`
+- bad op `~~` → `ValueError`

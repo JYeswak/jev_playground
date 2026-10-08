@@ -1,0 +1,4 @@
+Working...
+Fixed `mdtable.py`: unescaped-`|` split with `\|`/`\\` unescape, outer-pipe tolerance, strict delimiter-row validation (`:?-+:?`, len≥3, column-count match), first-valid-table scan, `None` pad/truncate.
+
+Verified: basic, alignment variants (`---`/`:--`/`--:`/`:-:`), escaped pipes, pad/truncate, no-pipe form, no-table `[]`, blank/non-pipe termination, false-header skip — all pass.

@@ -1,0 +1,2 @@
+work/thinking-duel-hard3/pilot.sh: line 16: syntax error near unexpected token `done'
+work/thinking-duel-hard3/pilot.sh: line 16: `  done'

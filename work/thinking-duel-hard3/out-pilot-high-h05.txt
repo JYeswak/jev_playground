@@ -1,0 +1,8 @@
+Working...
+Fixed `runbox.py`: single merged pipe (`stderr=STDOUT`) for arrival-order interleave + no deadlock; `start_new_session=True` + `os.killpg(SIGKILL)` on `TimeoutExpired` → exit 124 with partial output, reap via second `communicate`.
+
+Evidence (live, this session):
+- stdout+stderr flood 50k lines each: exit 0, 677KB, 0.6s, both tails present.
+- stderr-only 5.1MB flood: exit 0, 0.3s.
+- `sleep 30`, `bash -c 'sleep 30 & sleep 30; wait'`, pipe-holder `(sleep 30 &); echo started; sleep 30`: all exit 124 in ~1.0s, `ps` shows zero `sleep 30` leftovers, partial `started\n` preserved.
+- exit-code passthrough: `exit 7` with `out1`/`err1` in merged output.

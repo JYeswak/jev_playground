@@ -1,0 +1,6 @@
+Working...
+Fixed. `<=` skipped past matches, `lo` landed on `bisect_right`; `a[lo]==x` then always missed.
+
+Decision: `search.py:5` `a[mid] <= x` → `a[mid] < x` (standard `bisect_left`).
+
+Check: 556 checks pass (empty, single, dup-runs, missing, 500 randomized sorted arrays vs linear scan).

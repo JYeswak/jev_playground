@@ -1,0 +1,4 @@
+Working...
+Fixed `mdtable.py`: escape-aware split on unescaped `|`, delimiter validation (`^:?-+:?$`), outer-pipe tolerance, pad-`None`/truncate, first-table scan, `[]` fallback.
+
+Verified inline (`python3 -c`, 9 cases): basic, no-outer-pipes + `:--`/`--:`/`:-:` alignments, escaped `\|`, pad/truncate, no-table `[]`, first-table-wins, blank-line termination, escaped pipe in header — `ALL OK`.

@@ -1,0 +1,4 @@
+Working...
+Fixed `search.py:5` — `a[mid] <= x` → `a[mid] < x`. Old code was `bisect_right` + equality check: returned past-the-end on duplicates/at-tail (e.g. `[1,2,2,2,3],x=2` → 4 not 1; `[1,2,3],x=3` → -1).
+
+Verified vs `bisect.bisect_left` oracle: 10 edge cases + 5000 fuzz cases pass.

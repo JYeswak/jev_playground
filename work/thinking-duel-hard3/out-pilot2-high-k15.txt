@@ -1,0 +1,9 @@
+Working...
+Fixed `tmpl.py`: single-pass recursive parser instead of regex replace.
+
+- `{{name}}` → `str(ctx.get(name,""))`, unknown/None → `""`.
+- `{{name|escape}}` → `html.escape(..., quote=True)`, covers `&<>"'`.
+- `{% if name %}...{% endif %}` → Python truthiness, recursive `parse(stop=True)` so nesting works; falsy branch still consumes to matching endif.
+- Stray `{% endif %}` / malformed tags emitted literally; unclosed `if` runs to EOF.
+
+Verified: subst, unknown-empty, if true/false/missing, nested TT/TF/F (`ABC`/`AC`/`""`), `{{v|escape}}` of `&<>"'` → `&amp;&lt;&gt;&quot;&#x27;`, missing-escape → `""`, if+escape combo. `ALL PASS`.

@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-511</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-511<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevran2</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">randombot2</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-511|init|battle
+|title|pokejevran2 vs. randombot2
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆randombot2
+|gametype|singles
+|player|p1|pokejevran2|lass-gen4|
+|player|p2|randombot2|camper-gen2|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Dragapult, F|
+|poke|p1|Primarina, F|
+|poke|p1|Iron Crown|
+|poke|p1|Samurott-Hisui, M|
+|poke|p1|Kingambit, M|
+|poke|p1|Landorus-Therian, M|
+|poke|p2|Kingambit, F|
+|poke|p2|Cinderace, F|
+|poke|p2|Landorus-Therian, M|
+|poke|p2|Iron Valiant|
+|poke|p2|Kyurem|
+|poke|p2|Slowking-Galar, M|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|start
+|switch|p1a: Samurott|Samurott-Hisui, M|321/321
+|switch|p2a: Slowking|Slowking-Galar, M, shiny|100/100
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|-terastallize|p2a: Slowking|Water
+|move|p1a: Samurott|Knock Off|p2a: Slowking
+|-damage|p2a: Slowking|55/100
+|-enditem|p2a: Slowking|Heavy-Duty Boots|[from] move: Knock Off|[of] p1a: Samurott
+|-prepare|p2a: Slowking|Chilly Reception|[premajor]
+|move|p2a: Slowking|Chilly Reception|p2a: Slowking
+|-weather|Snowscape
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, F|100/100|[from] Chilly Reception
+|-weather|Snowscape|[upkeep]
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Kingambit|Sucker Punch|p1a: Samurott
+|-resisted|p1a: Samurott
+|-damage|p1a: Samurott|231/321
+|move|p1a: Samurott|Razor Shell|p2a: Kingambit
+|-damage|p2a: Kingambit|63/100
+|-unboost|p2a: Kingambit|def|1
+|-weather|Snowscape|[upkeep]
+|-heal|p2a: Kingambit|69/100|[from] item: Leftovers
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|-end|p2a: Kingambit|fallenundefined|[silent]
+|switch|p2a: Cinderace|Cinderace, F, shiny|100/100
+|move|p1a: Samurott|Razor Shell|p2a: Cinderace
+|-supereffective|p2a: Cinderace
+|-damage|p2a: Cinderace|0 fnt
+|faint|p2a: Cinderace
+|-weather|Snowscape|[upkeep]
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Landorus|Landorus-Therian, M, shiny|100/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-unboost|p1a: Samurott|atk|1
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Dragapult|Dragapult, F, shiny|317/317
+|switch|p2a: Kingambit|Kingambit, F|69/100
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen1|[silent]
+|-weather|Snowscape|[upkeep]
+|-heal|p2a: Kingambit|75/100|[from] item: Leftovers
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M|382/382
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Kingambit|atk|1
+|-end|p2a: Kingambit|fallen1|[silent]
+|switch|p2a: Slowking|Slowking-Galar, M, shiny, tera:Water|89/100
+|-weather|none
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Iron Crown|Iron Crown|321/321
+|switch|p2a: Iron Valiant|Iron Valiant|100/100
+|-enditem|p2a: Iron Valiant|Booster Energy
+|-activate|p2a: Iron Valiant|ability: Quark Drive|[fromitem]
+|-start|p2a: Iron Valiant|quarkdrivespe
+|upkeep
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Iron Valiant|Close Combat|p1a: Iron Crown
+|-damage|p1a: Iron Crown|131/321
+|-unboost|p2a: Iron Valiant|def|1
+|-unboost|p2a: Iron Valiant|spd|1
+|move|p1a: Iron Crown|Tachyon Cutter|p2a: Iron Valiant
+|-supereffective|p2a: Iron Valiant
+|-damage|p2a: Iron Valiant|0 fnt
+|faint|p2a: Iron Valiant
+|-end|p2a: Iron Valiant|Quark Drive|[silent]
+|-hitcount|p2: Iron Valiant|1
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, F|75/100
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen2|[silent]
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|-end|p2a: Kingambit|fallen2|[silent]
+|switch|p2a: Landorus|Landorus-Therian, M, shiny|100/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-unboost|p1a: Iron Crown|atk|1
+|move|p1a: Iron Crown|Focus Blast|p2a: Landorus|[miss]
+|-miss|p1a: Iron Crown|p2a: Landorus
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|-end|p1a: Iron Crown|Quark Drive|[silent]
+|switch|p1a: Primarina|Primarina, F|363/363
+|switch|p2a: Kyurem|Kyurem, shiny|100/100
+|-ability|p2a: Kyurem|Pressure
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Kyurem|Blizzard|p1a: Primarina
+|-resisted|p1a: Primarina
+|-crit|p1a: Primarina
+|-damage|p1a: Primarina|168/363
+|move|p1a: Primarina|Moonblast|p2a: Kyurem
+|-supereffective|p2a: Kyurem
+|-damage|p2a: Kyurem|9/100
+|upkeep
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Landorus|Landorus-Therian, M, shiny|100/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-unboost|p1a: Primarina|atk|1
+|move|p1a: Primarina|Moonblast|p2a: Landorus
+|-damage|p2a: Landorus|47/100
+|-unboost|p2a: Landorus|spa|1
+|upkeep
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kyurem|Kyurem, shiny|9/100
+|-ability|p2a: Kyurem|Pressure
+|move|p1a: Primarina|Surf|p2a: Kyurem
+|-resisted|p2a: Kyurem
+|-damage|p2a: Kyurem|0 fnt
+|faint|p2a: Kyurem
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, F|75/100
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen3|[silent]
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M|382/382
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Kingambit|atk|1
+|-end|p2a: Kingambit|fallen3|[silent]
+|switch|p2a: Landorus|Landorus-Therian, M, shiny|47/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-unboost|p1a: Landorus|atk|1
+|upkeep
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Landorus|U-turn|p1a: Landorus
+|-resisted|p1a: Landorus
+|-damage|p1a: Landorus|355/382
+|-damage|p2a: Landorus|30/100|[from] item: Rocky Helmet|[of] p1a: Landorus
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, F|75/100|[from] U-turn
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen3|[silent]
+|move|p1a: Landorus|Grass Knot|p2a: Kingambit
+|-resisted|p2a: Kingambit
+|-damage|p2a: Kingambit|63/100
+|-heal|p2a: Kingambit|69/100|[from] item: Leftovers
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|-end|p2a: Kingambit|fallen3|[silent]
+|switch|p2a: Slowking|Slowking-Galar, M, shiny, tera:Water|100/100
+|move|p1a: Landorus|Earth Power|p2a: Slowking
+|-damage|p2a: Slowking|83/100
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Iron Crown|Iron Crown|131/321
+|move|p2a: Slowking|Toxic|p1a: Iron Crown
+|-immune|p1a: Iron Crown
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Iron Crown|Volt Switch|p2a: Slowking
+|-supereffective|p2a: Slowking
+|-damage|p2a: Slowking|54/100
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevran2 has 15 seconds left this turn.
+|-end|p1a: Iron Crown|Quark Drive|[silent]
+|switch|p1a: Dragapult|Dragapult, F, shiny|317/317|[from] Volt Switch
+|move|p2a: Slowking|Surf|p1a: Dragapult
+|-resisted|p1a: Dragapult
+|-damage|p1a: Dragapult|249/317
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Dragapult|Dragon Darts|p2a: Slowking
+|-damage|p2a: Slowking|14/100
+|-anim|p1a: Dragapult|Dragon Darts|p2a: Slowking
+|-damage|p2a: Slowking|0 fnt
+|faint|p2a: Slowking
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Landorus|Landorus-Therian, M, shiny|30/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-fail|p1a: Dragapult|unboost|[from] ability: Clear Body|[of] p1a: Dragapult
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Dragapult|Dragon Darts|p2a: Landorus
+|-crit|p2a: Landorus
+|-damage|p2a: Landorus|0 fnt
+|faint|p2a: Landorus
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, F|69/100
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen5|[silent]
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M|355/382
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Kingambit|atk|1
+|move|p2a: Kingambit|Kowtow Cleave|p1a: Landorus
+|-damage|p1a: Landorus|211/382
+|-damage|p2a: Kingambit|53/100|[from] item: Rocky Helmet|[of] p1a: Landorus
+|-heal|p2a: Kingambit|59/100|[from] item: Leftovers
+|upkeep
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Landorus|Earth Power|p2a: Kingambit
+|-supereffective|p2a: Kingambit
+|-damage|p2a: Kingambit|0 fnt
+|faint|p2a: Kingambit
+|-end|p2a: Kingambit|fallen5|[silent]
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

@@ -18,6 +18,7 @@ ENFORCE = os.path.expanduser("~/.local/state/jev/memory-filter-enforce")
 STATE_DIR = os.path.expanduser(
     os.environ.get("JEV_FLEET_STATE_DIR", "~/.local/state/jev")
 )
+OPERATOR_OFF = os.path.expanduser("~/.local/state/jev/memory-filter.operator-off")
 HEARTBEAT_STATE = os.path.join(STATE_DIR, STATE_NAME)
 JOURNAL = os.path.join(HERE, "flips.jsonl")
 
@@ -69,6 +70,11 @@ def main():
     want_on = cur["state"] == "ON"
     is_on = os.path.exists(ENFORCE)
     auto_off = watcher_auto_off()
+    if want_on and os.path.exists(OPERATOR_OFF):
+        if is_on:
+            os.remove(ENFORCE)
+        print("operator OFF active; blocked scheduled ON for block %s" % cur["start"])
+        return 0
     if want_on and auto_off is not False:
         if auto_off is True and is_on:
             os.remove(ENFORCE)

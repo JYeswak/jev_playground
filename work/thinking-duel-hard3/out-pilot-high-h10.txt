@@ -1,0 +1,4 @@
+Working...
+Fixed `c.py`: LFU eviction (freq++, ties → LRU via op counter), absolute TTL from last `put` with lazy purge on every access, expired `put` reinserts at freq 1.
+
+Check: 9 fake-clock cases pass — LFU-over-LRU, tie→LRU, recency refresh on get/put, TTL expiry, expired-frees-capacity, put-update value+freq+TTL reset, get-doesn't-extend-TTL.

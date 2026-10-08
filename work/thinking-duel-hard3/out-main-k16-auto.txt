@@ -1,0 +1,7 @@
+Working...
+Done. `rsv.py` reimplemented as Algorithm R, single pass, no `random`:
+
+- `state = seed % 2**31`; per item (0-based `idx`): `state = (1103515245*state + 12345) % 2**31`, `j = state % (idx+1)` (= spec's 1-based modulus); first `k` appended, later replaced at `j` if `j < k`.
+- O(k) memory: iterates, never materializes the stream; works on generators.
+- Verified: byte-identical results across `range` vs `iter` inputs (one-pass), seed-sensitive determinism, `k>=n` returns all items, no `random`/`list()` in source.
+- Uniformity: n=5,k=2 over 20k seeds gives 0.396–0.404 per item (expected 0.40). Known caveat: raw-LCG-modulo inherits low-bit pathology at power-of-2 moduli (e.g. n=10,k=3 item 3 at ~0.12) — inherent to the mandated `state % m` formula, shared with any literal reference; structure itself checks uniform against an ideal RNG.

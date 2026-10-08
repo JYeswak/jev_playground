@@ -1,0 +1,4 @@
+Working...
+Fixed `resolver.py:15`: `cands[0]` → `cands[-1]` (index ascending, so last candidate is maximum satisfying `lo <= v < hi`). Unsatisfiable (no candidates / unknown package) already returns `None`; preserved.
+
+Verified: max-in-range, open-ended `hi=None`, unsatisfiable → `None`, single-version, empty reqs → `{}`, multi-package with one unsatisfiable → `None`, numeric part comparison (`1.10` > `1.2`).

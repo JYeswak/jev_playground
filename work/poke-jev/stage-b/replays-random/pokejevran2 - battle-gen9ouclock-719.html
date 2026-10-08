@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-719</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-719<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevran2</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">randombot2</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-719|init|battle
+|title|pokejevran2 vs. randombot2
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆randombot2
+|gametype|singles
+|player|p1|pokejevran2|lass-gen4|
+|player|p2|randombot2|camper-gen2|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Dragapult, F|
+|poke|p1|Primarina, F|
+|poke|p1|Iron Crown|
+|poke|p1|Samurott-Hisui, F|
+|poke|p1|Kingambit, M|
+|poke|p1|Landorus-Therian, M|
+|poke|p2|Enamorus, F|
+|poke|p2|Kyurem|
+|poke|p2|Landorus-Therian, M|
+|poke|p2|Kingambit, F|
+|poke|p2|Ogerpon-Wellspring, F|
+|poke|p2|Glimmora, F|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|start
+|switch|p1a: Landorus|Landorus-Therian, M|382/382
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Ogerpon|atk|1
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Enamorus|Enamorus, F|100/100
+|move|p1a: Landorus|U-turn|p2a: Enamorus
+|-resisted|p2a: Enamorus
+|-damage|p2a: Enamorus|93/100
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevran2 has 15 seconds left this turn.
+|switch|p1a: Iron Crown|Iron Crown|321/321|[from] U-turn
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|-terastallize|p2a: Enamorus|Stellar
+|move|p2a: Enamorus|Moonblast|p1a: Iron Crown
+|-resisted|p1a: Iron Crown
+|-damage|p1a: Iron Crown|246/321
+|-unboost|p1a: Iron Crown|spa|1
+|move|p1a: Iron Crown|Tachyon Cutter|p2a: Enamorus
+|-supereffective|p2a: Enamorus
+|-damage|p2a: Enamorus|41/100
+|-supereffective|p2a: Enamorus
+|-damage|p2a: Enamorus|0 fnt
+|faint|p2a: Enamorus
+|-hitcount|p2: Enamorus|2
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|-end|p1a: Iron Crown|Quark Drive|[silent]
+|switch|p1a: Dragapult|Dragapult, F, shiny|317/317
+|move|p2a: Ogerpon|Knock Off|p1a: Dragapult
+|-supereffective|p1a: Dragapult
+|-damage|p1a: Dragapult|3/317
+|-enditem|p1a: Dragapult|Choice Band|[from] move: Knock Off|[of] p2a: Ogerpon
+|upkeep
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p1a: Iron Crown|Iron Crown|246/321
+|move|p2a: Ogerpon|U-turn|p1a: Iron Crown
+|-damage|p1a: Iron Crown|159/321
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kyurem|Kyurem|100/100|[from] U-turn
+|-ability|p2a: Kyurem|Pressure
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Kyurem|Earth Power|p1a: Iron Crown
+|-supereffective|p1a: Iron Crown
+|-damage|p1a: Iron Crown|17/321
+|move|p1a: Iron Crown|Tachyon Cutter|p2a: Kyurem
+|-supereffective|p2a: Kyurem
+|-damage|p2a: Kyurem|55/100
+|-supereffective|p2a: Kyurem
+|-damage|p2a: Kyurem|8/100
+|-hitcount|p2a: Kyurem|2
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Landorus|Landorus-Therian, M|100/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-unboost|p1a: Iron Crown|atk|1
+|move|p1a: Iron Crown|Tachyon Cutter|p2a: Landorus
+|-damage|p2a: Landorus|75/100
+|-damage|p2a: Landorus|46/100
+|-hitcount|p2a: Landorus|2
+|upkeep
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Iron Crown|Tachyon Cutter|p2a: Landorus
+|-damage|p2a: Landorus|20/100
+|-damage|p2a: Landorus|0 fnt
+|faint|p2a: Landorus
+|-hitcount|p2: Landorus|2
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, F|100/100
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen2|[silent]
+|-item|p2a: Kingambit|Air Balloon
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Iron Crown|Focus Blast|p2a: Kingambit
+|-supereffective|p2a: Kingambit
+|-damage|p2a: Kingambit|0 fnt
+|-enditem|p2a: Kingambit|Air Balloon
+|faint|p2a: Kingambit
+|-end|p2a: Kingambit|fallen2|[silent]
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Glimmora|Glimmora, F|100/100
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Iron Crown|Tachyon Cutter|p2a: Glimmora
+|-supereffective|p2a: Glimmora
+|-damage|p2a: Glimmora|42/100
+|-supereffective|p2a: Glimmora
+|-damage|p2a: Glimmora|0 fnt
+|faint|p2a: Glimmora
+|-hitcount|p2: Glimmora|2
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kyurem|Kyurem|8/100
+|-ability|p2a: Kyurem|Pressure
+|-end|p1a: Iron Crown|Quark Drive|[silent]
+|switch|p1a: Dragapult|Dragapult, F, shiny|3/317
+|upkeep
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Kyurem|Freeze-Dry|p1a: Dragapult
+|-supereffective|p1a: Dragapult
+|-damage|p1a: Dragapult|0 fnt
+|faint|p1a: Dragapult
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevran2 has 15 seconds left this turn.
+|switch|p1a: Iron Crown|Iron Crown|17/321
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|move|p1a: Iron Crown|Tachyon Cutter|p2a: Ogerpon
+|-resisted|p2a: Ogerpon
+|-damage|p2a: Ogerpon|87/100
+|-resisted|p2a: Ogerpon
+|-damage|p2a: Ogerpon|71/100
+|-hitcount|p2a: Ogerpon|2
+|upkeep
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Kyurem|Kyurem|8/100
+|-ability|p2a: Kyurem|Pressure
+|-end|p1a: Iron Crown|Quark Drive|[silent]
+|switch|p1a: Kingambit|Kingambit, M|393/393
+|-activate|p1a: Kingambit|ability: Supreme Overlord
+|-start|p1a: Kingambit|fallen1|[silent]
+|upkeep
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Kyurem
+|-damage|p2a: Kyurem|0 fnt
+|faint|p2a: Kyurem
+|upkeep
+|inactive|randombot2 has 15 seconds left this turn.
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|71/100
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Ivy Cudgel|p1a: Kingambit|[anim] Ivy Cudgel Water
+|-crit|p1a: Kingambit
+|-damage|p1a: Kingambit|141/393
+|move|p1a: Kingambit|Kowtow Cleave|p2a: Ogerpon
+|-damage|p2a: Ogerpon|1/100
+|-heal|p1a: Kingambit|165/393|[from] item: Leftovers
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevran2 has 15 seconds left this turn.
+|inactive|randombot2 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Ogerpon
+|-damage|p2a: Ogerpon|0 fnt
+|faint|p2a: Ogerpon
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

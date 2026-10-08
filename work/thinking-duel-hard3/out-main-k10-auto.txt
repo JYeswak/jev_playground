@@ -1,0 +1,4 @@
+Working...
+Fixed `bucket.py`: `take()` now holds `self.lock`, reads `now()` once, refills `min(burst, tokens + elapsed*rate)` with `elapsed>0` guard, denies without deducting.
+
+Checks: capped refill after 100s idle grants exactly 10; 2.5s at rate 1 grants 2 not 3; deny deducts nothing; 1 `now()` call per `take()`; 20 threads × 10 takes on frozen clock grant exactly 100/200, 50/50 iterations race-free.

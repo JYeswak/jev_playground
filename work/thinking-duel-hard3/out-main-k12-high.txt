@@ -1,0 +1,4 @@
+Working...
+Fixed `resolver.py:15`: `cands[0]` → `max(cands, key=_t)`. Picks numeric-maximum satisfying `[lo, hi)` per package, `None` if any package unsatisfiable (no candidate / unknown package / empty range). `max` by parsed tuple instead of `cands[-1]` so correct even if index order is lexicographic (`1.10` vs `1.2`).
+
+Verified: max-pick, `hi=None` open-ended, exclusive upper bound, unknown package → `None`, empty range → `None`, multi-package, numeric (`1.10` > `1.2`) not lexicographic, single-version qualify/reject — ALL PASS.

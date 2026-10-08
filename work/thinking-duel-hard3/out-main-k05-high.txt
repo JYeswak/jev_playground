@@ -1,0 +1,4 @@
+Working...
+Fixed `flaky.py`: fail rate `fails/n` must satisfy `lo <= rate <= hi` with `n >= min_runs`; empty lists ignored; sorted output.
+
+Verified: flaky-in-band flagged, always-pass/always-fail excluded, under-`min_runs` ignored, `lo`/`hi` boundaries inclusive, empty dict and sorting correct — all checks passed.

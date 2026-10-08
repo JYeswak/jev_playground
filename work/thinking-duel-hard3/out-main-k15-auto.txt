@@ -1,0 +1,4 @@
+Working...
+Fixed `tmpl.py`: recursive `{{var}}` / `{{var|escape}}` (`html.escape(..., quote=True)`) + nestable `{% if %}` on `bool(ctx.get(name))`, unknown → `""`.
+
+Verified in `$PWD`: basic/unknown substitution, escape of `&<>"'`, if true/false/missing/empty, nested true/true, false-outer suppression, false-inner, escape-inside-if, whitespace variants — all pass.

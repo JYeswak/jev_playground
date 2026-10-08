@@ -1,0 +1,4 @@
+Working...
+Fixed `ivl.py`: `union` merges on `lo < hi` overlap only (`<=` iff `merge_adjacent`), skips empty `lo>=hi`; `gaps` clips to span, emits whole span when empty, `[]` on empty span.
+
+Check: adjacent/overlap/sort/clip/empty-span cases pass (`python3 -c` asserts above, all ok).

@@ -1,0 +1,8 @@
+Working...
+Fixed `pmap.py`: `ThreadPoolExecutor(max_workers=limit)` bounds parallelism, `as_completed` detects the first completed exception with no busy-wait, then `cancel()`s pending futures + `wait()`s in-flight before re-raising; success path returns `[f.result() ...]` in input order.
+
+Verified live in `$PWD`:
+- Order: varying-sleep map returns input order.
+- Bound: 12×20ms tasks at `limit=3` → `max_active=3 ≤ 3` and `>1`.
+- Fail-fast: `RuntimeError(boom-2)` re-raised, `started=4/10` (pending cancelled best-effort; one race pickup), elapsed 0.32s proving in-flight wait.
+- Empty → `[]`; `limit=0` → `ValueError`; source uses `concurrent.futures`, no `while/sleep` loop.

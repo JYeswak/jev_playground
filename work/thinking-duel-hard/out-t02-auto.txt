@@ -1,0 +1,8 @@
+Working...
+Fixed `retrypy.py`: honors `Retry-After`, backoff with jitter, total cap, no trailing sleep.
+
+Bugs fixed: ignored `Retry-After`, no jitter, tracked `total` but never capped (old sleeps summed to 3.1s for retries=5), slept after final attempt.
+
+New wait logic: `Retry-After` (case-insensitive, float-parsed) else `0.1 * 2**attempt * (0.5 + random.random())`, then `min(wait, 2.0 - total)`, skip sleep when budget exhausted or on last attempt.
+
+Verified (injected `sleeper`, no real sleep): 200 returns body; 404 raises `PermanentError` in 1 call; 503/429 then 200 succeeds; `TransientError` retried; `Retry-After: 0.7` sleeps `[0.7]`; 10×503 sums to exactly `2.0`; 5s `Retry-After` capped to `[2.0]`; retries=3 sleeps twice; jitter confirmed varied; default `time.sleep` intact.

@@ -1,0 +1,4 @@
+Working...
+Done: `shuffle.py` now Fisher-Yates with inline LCG, no `random` import.
+
+Evidence: repeated-subprocess check `order(100,12345)` identical across 3 runs; permutation/edge-case asserts pass (`n=0,1`, 5 distinct 52-permutations).

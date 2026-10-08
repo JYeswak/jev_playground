@@ -1,0 +1,10 @@
+Working...
+Fixed `prefix.py`: scrub full string before `[:200]`.
+
+```python
+def redact(cmd, home, secret_re):
+    scrubbed = secret_re.sub("[REDACTED]", cmd.replace(home, "~").strip())
+    return scrubbed[:200]
+```
+
+Check: straddling secret (`190×x + sk-S×30`) fully removed, `[REDACTED]` present, `len≤200`; old order leaked `sk-SSSSSSS` in the cut. Basic home/secret and 500-char truncation also pass.

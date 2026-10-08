@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-1808</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-1808<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby50</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot50</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-1808|init|battle
+|title|pokejevaby50 vs. abyssalbot50
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot50
+|gametype|singles
+|player|p1|pokejevaby50|punkgirl-gen7|
+|player|p2|abyssalbot50|acetrainer-gen4dp|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Dragapult, M|
+|poke|p1|Primarina, F|
+|poke|p1|Iron Crown|
+|poke|p1|Samurott-Hisui, F|
+|poke|p1|Kingambit, F|
+|poke|p1|Landorus-Therian, M|
+|poke|p2|Lokix, M|
+|poke|p2|Pecharunt|
+|poke|p2|Zamazenta-*|
+|poke|p2|Ting-Lu|
+|poke|p2|Latios, M|
+|poke|p2|Gliscor, F|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|start
+|switch|p1a: Dragapult|Dragapult, M, shiny|317/317
+|switch|p2a: Lokix|Lokix, M|100/100
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p2a: Lokix|Sucker Punch|p1a: Dragapult
+|-supereffective|p1a: Dragapult
+|-damage|p1a: Dragapult|21/317
+|move|p1a: Dragapult|U-turn|p2a: Lokix
+|-supereffective|p2a: Lokix
+|-damage|p2a: Lokix|0 fnt
+|faint|p2a: Lokix
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|switch|p1a: Primarina|Primarina, F|363/363|[from] U-turn
+|upkeep
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p2a: Pecharunt|Pecharunt|100/100
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p1a: Iron Crown|Iron Crown|321/321
+|move|p2a: Pecharunt|Malignant Chain|p1a: Iron Crown
+|-immune|p1a: Iron Crown
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p1a: Iron Crown|Future Sight|p2a: Pecharunt
+|-start|p1a: Iron Crown|move: Future Sight
+|move|p2a: Pecharunt|Foul Play|p1a: Iron Crown
+|-supereffective|p1a: Iron Crown
+|-damage|p1a: Iron Crown|219/321
+|upkeep
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p1a: Iron Crown|Future Sight||[still]
+|-fail|p1a: Iron Crown
+|move|p2a: Pecharunt|Foul Play|p1a: Iron Crown
+|-supereffective|p1a: Iron Crown
+|-damage|p1a: Iron Crown|121/321
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p1a: Iron Crown|Tachyon Cutter|p2a: Pecharunt
+|-damage|p2a: Pecharunt|76/100
+|-damage|p2a: Pecharunt|51/100
+|-hitcount|p2a: Pecharunt|2
+|move|p2a: Pecharunt|Foul Play|p1a: Iron Crown
+|-supereffective|p1a: Iron Crown
+|-damage|p1a: Iron Crown|27/321
+|-end|p2a: Pecharunt|move: Future Sight
+|-supereffective|p2a: Pecharunt
+|-damage|p2a: Pecharunt|0 fnt
+|faint|p2a: Pecharunt
+|upkeep
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p1a: Iron Crown|Focus Blast|p2a: Ting-Lu|[miss]
+|-miss|p1a: Iron Crown|p2a: Ting-Lu
+|move|p2a: Ting-Lu|Earthquake|p1a: Iron Crown
+|-supereffective|p1a: Iron Crown
+|-damage|p1a: Iron Crown|0 fnt
+|faint|p1a: Iron Crown
+|-end|p1a: Iron Crown|Quark Drive|[silent]
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M|382/382
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Ting-Lu|atk|1
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p1a: Landorus|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|80/100
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|switch|p1a: Primarina|Primarina, F|363/363|[from] U-turn
+|move|p2a: Ting-Lu|Stealth Rock|p1a: Primarina
+|-sidestart|p1: pokejevaby50|move: Stealth Rock
+|-heal|p2a: Ting-Lu|86/100|[from] item: Leftovers
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p1a: Primarina|Surf|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|48/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Primarina
+|-damage|p1a: Primarina|260/363
+|-heal|p2a: Ting-Lu|54/100|[from] item: Leftovers
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p1a: Primarina|Surf|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|19/100
+|move|p2a: Ting-Lu|Earthquake|p1a: Primarina
+|-damage|p1a: Primarina|160/363
+|-heal|p2a: Ting-Lu|25/100|[from] item: Leftovers
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p1a: Primarina|Surf|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|0 fnt
+|faint|p2a: Ting-Lu
+|upkeep
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p2a: Latios|Latios, M|100/100
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p1a: Dragapult|Dragapult, M, shiny|21/317
+|-damage|p1a: Dragapult|0 fnt|[from] Stealth Rock
+|faint|p1a: Dragapult
+|move|p2a: Latios|Psychic Noise|p1: Dragapult|[notarget]
+|-fail|p2a: Latios
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|switch|p1a: Samurott|Samurott-Hisui, F|321/321
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p2a: Latios|Draco Meteor|p1a: Samurott
+|-damage|p1a: Samurott|0 fnt
+|-unboost|p2a: Latios|spa|2
+|faint|p1a: Samurott
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|switch|p1a: Kingambit|Kingambit, F|393/393
+|-damage|p1a: Kingambit|369/393|[from] Stealth Rock
+|-activate|p1a: Kingambit|ability: Supreme Overlord
+|-start|p1a: Kingambit|fallen3|[silent]
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Latios
+|-supereffective|p2a: Latios
+|-damage|p2a: Latios|0 fnt
+|faint|p2a: Latios
+|-heal|p1a: Kingambit|393/393|[from] item: Leftovers
+|upkeep
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p2a: Zamazenta|Zamazenta|100/100
+|-ability|p2a: Zamazenta|Dauntless Shield|boost
+|-boost|p2a: Zamazenta|def|1
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallen3|[silent]
+|switch|p1a: Primarina|Primarina, F|160/363
+|move|p2a: Zamazenta|Close Combat|p1a: Primarina
+|-resisted|p1a: Primarina
+|-damage|p1a: Primarina|37/363
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M|382/382
+|-damage|p1a: Landorus|335/382|[from] Stealth Rock
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Zamazenta|atk|1
+|move|p2a: Zamazenta|Close Combat|p1a: Landorus
+|-resisted|p1a: Landorus
+|-damage|p1a: Landorus|284/382
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|-damage|p2a: Zamazenta|84/100|[from] item: Rocky Helmet|[of] p1a: Landorus
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p1a: Primarina|Primarina, F|37/363
+|move|p2a: Zamazenta|Ice Fang|p1a: Primarina
+|-resisted|p1a: Primarina
+|-damage|p1a: Primarina|4/363
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M|284/382
+|-damage|p1a: Landorus|237/382|[from] Stealth Rock
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Zamazenta|atk|1
+|move|p2a: Zamazenta|Close Combat|p1a: Landorus
+|-resisted|p1a: Landorus
+|-damage|p1a: Landorus|196/382
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|-damage|p2a: Zamazenta|67/100|[from] item: Rocky Helmet|[of] p1a: Landorus
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p2a: Gliscor|Gliscor, F|100/100
+|switch|p1a: Primarina|Primarina, F|4/363
+|-status|p2a: Gliscor|tox|[from] item: Toxic Orb
+|upkeep
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p2a: Gliscor|Spikes|p1a: Primarina
+|-sidestart|p1: pokejevaby50|Spikes
+|move|p1a: Primarina|Surf|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|0 fnt
+|faint|p2a: Gliscor
+|upkeep
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p2a: Zamazenta|Zamazenta|67/100
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Close Combat|p1a: Primarina
+|-resisted|p1a: Primarina
+|-damage|p1a: Primarina|0 fnt
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|faint|p1a: Primarina
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M|196/382
+|-damage|p1a: Landorus|149/382|[from] Stealth Rock
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Zamazenta|atk|1
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p1a: Kingambit|Kingambit, F|393/393
+|-damage|p1a: Kingambit|369/393|[from] Stealth Rock
+|-damage|p1a: Kingambit|320/393|[from] Spikes
+|-activate|p1a: Kingambit|ability: Supreme Overlord
+|-start|p1a: Kingambit|fallen4|[silent]
+|move|p2a: Zamazenta|Ice Fang|p1a: Kingambit
+|-resisted|p1a: Kingambit
+|-damage|p1a: Kingambit|298/393
+|-status|p1a: Kingambit|frz
+|-heal|p1a: Kingambit|322/393 frz|[from] item: Leftovers
+|upkeep
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallen4|[silent]
+|switch|p1a: Landorus|Landorus-Therian, M|149/382
+|-damage|p1a: Landorus|102/382|[from] Stealth Rock
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Zamazenta|atk|1
+|move|p2a: Zamazenta|Close Combat|p1a: Landorus
+|-resisted|p1a: Landorus
+|-damage|p1a: Landorus|64/382
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|-damage|p2a: Zamazenta|51/100|[from] item: Rocky Helmet|[of] p1a: Landorus
+|upkeep
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|switch|p1a: Kingambit|Kingambit, F|322/393 frz
+|-damage|p1a: Kingambit|298/393 frz|[from] Stealth Rock
+|-damage|p1a: Kingambit|249/393 frz|[from] Spikes
+|-activate|p1a: Kingambit|ability: Supreme Overlord
+|-start|p1a: Kingambit|fallen4|[silent]
+|move|p2a: Zamazenta|Ice Fang|p1a: Kingambit
+|-resisted|p1a: Kingambit
+|-damage|p1a: Kingambit|233/393 frz
+|-heal|p1a: Kingambit|257/393 frz|[from] item: Leftovers
+|upkeep
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallen4|[silent]
+|switch|p1a: Landorus|Landorus-Therian, M|64/382
+|-damage|p1a: Landorus|17/382|[from] Stealth Rock
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Zamazenta|atk|1
+|move|p2a: Zamazenta|Close Combat|p1a: Landorus
+|-resisted|p1a: Landorus
+|-damage|p1a: Landorus|0 fnt
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|-damage|p2a: Zamazenta|34/100|[from] item: Rocky Helmet|[of] p1a: Landorus
+|faint|p1a: Landorus
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|switch|p1a: Kingambit|Kingambit, F|257/393 frz
+|-damage|p1a: Kingambit|233/393 frz|[from] Stealth Rock
+|-damage|p1a: Kingambit|184/393 frz|[from] Spikes
+|-activate|p1a: Kingambit|ability: Supreme Overlord
+|-start|p1a: Kingambit|fallen5|[silent]
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby50 has 15 seconds left this turn.
+|inactive|abyssalbot50 has 15 seconds left this turn.
+|cant|p1a: Kingambit|frz
+|move|p2a: Zamazenta|Close Combat|p1a: Kingambit
+|-supereffective|p1a: Kingambit
+|-damage|p1a: Kingambit|0 fnt
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|faint|p1a: Kingambit
+|-end|p1a: Kingambit|fallen5|[silent]
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

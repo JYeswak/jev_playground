@@ -91,22 +91,5 @@
   ],
   "win_rate": 0.95,
   "wins": 19
-  },
-  "result_rows_committed": true,
-  "result_row_files": [
-    "work/poke-jev/stage-b/results-abyssal.jsonl",
-    "work/poke-jev/stage-b/results-abyssal-control.jsonl",
-    "work/poke-jev/stage-b/results-random.jsonl"
-  ],
-  "replays_committed": false,
-  "replay_manifest": {
-    "files": 420,
-    "bytes": 7143976,
-    "sha256": "65e906ea8bd9e534eb3222b13a96e6cbf21f88dc2929b2f1c9c31487c5c8adc8",
-    "sets": {
-      "replays-abyssal": {"files": 200, "bytes": 3493449, "sha256": "16827ffd3b2427704c3790581af45c7c75837966d0a20474332f440cc2c2de0b"},
-      "replays-abyssal-control": {"files": 200, "bytes": 3293514, "sha256": "0a15deba1b8286042f87f02c4fbd366c3d9c8da0a062068b2c7bb963bc24d6f5"},
-      "replays-random": {"files": 20, "bytes": 357013, "sha256": "1f290d133a191fe7709404e13539cef33d4fced274d8959163c354e0fb735ff1"}
-    }
-  }
+ }
 }

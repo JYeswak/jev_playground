@@ -1,0 +1,4 @@
+Working...
+Fixed `backoff.py`: `compute_delay` now full-jitter `rng.uniform(0, min(cap, base*2**n))`; `run_with_backoff` runs attempt 0 immediately, sleeps `delay(i-1)` before attempt `i`, lets non-`TransientError` propagate unslept, re-raises last `TransientError` on exhaustion, and raises `TimeoutError` without sleeping when `clock()-start+delay > max_elapsed`. Defaults: `time.monotonic` / `time.sleep` / fresh `random.Random()`; stdlib only.
+
+Verified with stub rng/clock/sleeper doubles, no real sleep — 19/19 pass: upper bounds (incl. cap), immediate first attempt, `i-1` retry mapping, non-transient propagation (attempts 0 and 1), exhaustion re-raise identity, timeout with zero sleeps (fresh and elapsed clocks), boundary equality sleeps, defaults and import surface.

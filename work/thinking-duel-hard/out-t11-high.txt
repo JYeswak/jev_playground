@@ -1,0 +1,6 @@
+Working...
+Fixed `topo.py`: 3-state DFS, cycle before done-check.
+
+Problem: `visited[n]=True` set on entry, `visited` checked before `stack` — back edge returned `None`, 2-cycles reported `ok True`.
+Decision: `1=in-stack`/`2=done`; `state==1` returns `stack[index:]`; `state==2` skips. Iterate `sorted(all_nodes)` and `sorted(deps.get(n,[]))`; `all_nodes` includes dep-only nodes. Cycle closed as `c+[c[0]]`.
+Check: 12-case inline run all pass — chain, diamond `['a','b','c','d']`, implicit `{'a':['b']}`, 2/3/self cycles closed on dependency edges, insertion-order determinism.

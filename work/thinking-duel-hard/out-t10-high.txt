@@ -1,0 +1,8 @@
+Working...
+Fixed `ttlcache.py`: `get` never checked TTL, expired entries counted toward capacity.
+
+- `_expired(ts,t)`: `(t-ts) > ttl`; `_purge(t)` drops all expired on every `get`/`put` using single `now()` call.
+- `get`: purge, return `None` if missing/expired, else `move_to_end`.
+- `put`: purge, delete-then-insert to refresh timestamp+recency, LRU-evict `popitem(last=False)` while over capacity.
+
+Verified with fake clock (`now=lambda:t[0]`): LRU eviction, expiry+removal, `ttl`-exact boundary hit, expired-not-counted, `put` refreshes timestamp/recency, missing→`None`. `ALL PASS`.

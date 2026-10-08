@@ -1,0 +1,6 @@
+Working...
+Fixed `qs.py`: strips one leading `?`, keeps order/repeats/blanks, skips only empty `&&` segments, `=`-less → `None`.
+
+Decoder scans left→right: `+`→space, `%XX`→byte-buffer flushed as UTF-8 (consecutive `%C3%A9`→`é`), invalid `%` left literal. `%`-before-`+` order preserves `%2B`→`+`.
+
+Verified in `$PWD`: 20/20 pass incl `a=&b=1&a=2`, `?`-strip, `a+b`→space, `%2B`→`+`, `%C3%A9`→`é`, `flag`→`None`, `%ZZ`/`%`/`%2` literal, `a=b=c`; no `urllib` in source.

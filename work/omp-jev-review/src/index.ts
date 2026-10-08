@@ -196,27 +196,38 @@ export async function readDiff(command: string): Promise<{ ok: true; diff: strin
   }
 }
 
-type ToolCallEvent = { toolName?: unknown; name?: unknown; toolCallId?: unknown; input?: unknown; command?: unknown };
+type ToolCallEvent = { toolName?: unknown; name?: unknown; toolCallId?: unknown; input?: unknown; command?: unknown; sessionId?: string | null };
 type ToolResultEvent = { toolName?: unknown; toolCallId?: unknown; content?: unknown; isError?: unknown };
+type HookContext = { sessionManager?: { getSessionId?: () => unknown } };
 type Host = {
-  on: (event: string, handler: (event: any) => Promise<unknown>) => void;
+  on: (event: string, handler: (event: any, context?: HookContext) => Promise<unknown>) => void;
   appendEntry: (type: string, data: Record<string, unknown>) => Promise<unknown>;
 };
+function sessionIdFrom(context?: HookContext): string | null {
+  try {
+    const id = context?.sessionManager?.getSessionId?.();
+    return typeof id === "string" && id.length > 0 && id === id.trim() && id.toLowerCase() !== "unknown" ? id : null;
+  } catch {
+    return null;
+  }
+}
 /** Production has no approved automatic Jev recipient or local git-execution policy. */
 export default function ompJevReview(
   pi: Host,
   authorizeSynthetic?: (event: ToolCallEvent) => { provider: boolean; localDiffExecution: boolean },
 ) {
-  /** toolCallId -> boundary score, for diffs that earned the advisory line. */
+  /** (sessionId, toolCallId) -> boundary score, for diffs that earned the advisory line. */
   const pending = new Map<string, number>();
 
-  pi.on("tool_result", async (event: ToolResultEvent) => {
+  pi.on("tool_result", async (event: ToolResultEvent, context?: HookContext) => {
     try {
       if (await jevLabOff("review")) return undefined;
+      const sessionId = sessionIdFrom(context);
       const id = typeof event?.toolCallId === "string" ? event.toolCallId : null;
-      if (id === null || !pending.has(id)) return undefined;
-      const boundary = pending.get(id) as number;
-      pending.delete(id);
+      const key = sessionId !== null && id !== null ? JSON.stringify([sessionId, id]) : null;
+      if (key === null || !pending.has(key)) return undefined;
+      const boundary = pending.get(key) as number;
+      pending.delete(key);
       if (event?.toolName !== "bash" || event?.isError === true || !Array.isArray(event?.content)) {
         return undefined;
       }
@@ -230,7 +241,7 @@ export default function ompJevReview(
     }
   });
 
-  pi.on("tool_call", async (event: ToolCallEvent) => {
+  pi.on("tool_call", async (event: ToolCallEvent, context?: HookContext) => {
     try {
       if (await jevLabOff("review")) return undefined;
       const tool = String(event?.toolName ?? event?.name ?? "");
@@ -245,10 +256,12 @@ export default function ompJevReview(
       const commandSha = createHash("sha256").update(command).digest("hex");
 
       const toolCallId = typeof event?.toolCallId === "string" ? event.toolCallId : null;
+      const sessionId = sessionIdFrom(context);
+      const identity = { toolCallId, sessionId };
       try {
         await pi.appendEntry(DIAG, {
           kind: "diff_command_observed",
-          toolCallId,
+          ...identity,
           timestamp: new Date().toISOString(),
         });
       } catch {}
@@ -259,7 +272,7 @@ export default function ompJevReview(
             kind: "review_not_applicable",
             applicable: false,
             commandSha,
-            toolCallId,
+            ...identity,
             reason,
             timestamp: new Date().toISOString(),
           });
@@ -269,8 +282,10 @@ export default function ompJevReview(
         return undefined;
       };
 
-      const approval = authorizeSynthetic?.(event);
-      if (toolCallId === null || approval?.provider !== true) return notApplicable("permission-denied");
+      if (sessionId === null) return notApplicable("missing-session-id");
+      if (toolCallId === null) return notApplicable("missing-tool-call-id");
+      const approval = authorizeSynthetic?.({ ...event, sessionId });
+      if (approval?.provider !== true) return notApplicable("permission-denied");
       if (approval.localDiffExecution !== true) return notApplicable("local-diff-denied");
 
       const loaded = await readDiff(command);
@@ -287,7 +302,7 @@ export default function ompJevReview(
             schemaVersion: 1,
             kind: "review_error",
             commandSha,
-            toolCallId,
+            ...identity,
             error: loaded.reason,
             failure: loaded.reason,
             timestamp: new Date().toISOString(),
@@ -320,7 +335,7 @@ export default function ompJevReview(
       const comment = toolCallId !== null && typeof boundary === "number" && boundary >= BOUNDARY_COMMENT;
       if (comment) {
         if (pending.size >= MAX_PENDING) pending.delete(pending.keys().next().value as string);
-        pending.set(toolCallId as string, boundary as number);
+        pending.set(JSON.stringify([sessionId, toolCallId]), boundary as number);
       }
 
       try {
@@ -328,7 +343,7 @@ export default function ompJevReview(
           schemaVersion: 1,
           kind: probabilities ? "review_scored" : "review_error",
           commandSha,
-          toolCallId,
+          ...identity,
           ...(probabilities ? { probabilities, comment } : {}),
           ...(filtered.dropped > 0 ? { vendoredFilesDropped: filtered.dropped } : {}),
           ...(error === undefined ? {} : { error }),

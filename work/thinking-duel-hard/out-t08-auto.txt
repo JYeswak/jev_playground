@@ -1,0 +1,15 @@
+Working...
+Fixed `prefix.py`: scrub the full string before cutting.
+
+```python
+def redact(cmd, home, secret_re):
+    s = secret_re.sub("[REDACTED]", cmd.replace(home, "~"))
+    return s.strip()[:200]
+```
+
+Was `cmd.replace(home,"~").strip()[:200]` then `sub` — cut first, so a secret needing chars past 200 never matched. Now `~`/redaction apply to the whole command, then cut to ≤200.
+
+Verified live:
+- basic: `~/proj run [REDACTED] rest`, home gone, secret gone, len ≤200
+- straddle (`x`*195 + `sk-`+`B`*16 + `y`*50): fixed tail `...xx[REDA`, zero secret chars, len ≤200; old order leaked `...xxsk-BB`
+- 300-char non-secret input → exactly 200

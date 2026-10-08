@@ -1,0 +1,4 @@
+Working...
+Fixed `ttlcache.py`: `get` now checks TTL, deletes expired entries, returns `None` without refreshing recency; `put` purges expired entries (single `now()` snapshot) before insert so dead entries don't consume capacity, then evicts LRU while over capacity.
+
+Verified with fake clock: LRU eviction, `get`/`put` recency refresh, TTL expiry (get doesn't extend TTL, put does), expired entries freed from capacity, missing key → `None`. `ALL PASS`.

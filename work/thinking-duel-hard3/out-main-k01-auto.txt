@@ -1,0 +1,4 @@
+Working...
+Fixed `kmerge.py`: `heapq.merge` with stream-index tiebreak (stable), outer `list(streams)` only, `key` passed through, empty input → `[]`. Stdlib only.
+
+Check: stability across streams, outer/inner generators, empty/no streams, `key=None` and `key=` paths, 10-way equal-key order — `ALL PASS`.

@@ -1,0 +1,6 @@
+Working...
+Fixed `census.py`: counts only `type=="toolCall"` with string `name`, sums only string `thinking` lengths, skips NUL/malformed/non-dict/non-assistant/missing-content/non-dict-items silently.
+
+Check: built `verify_h03.jsonl` covering nested/flat assistant, user-role skip, malformed, array row, wrong-case type, numeric/missing names, non-string thinking, non-dict items, message-level thinking, NUL line, blank line. `summarize()` returned `{"calls":{"search":2,"ok":1,"flat":1},"think_chars":12}` as expected. Imports stdlib-only (`json`, `collections`).
+
+Note: left `verify_h03.jsonl` in place (no-delete rule); it is git-ignored by the allowlist `.gitignore`.

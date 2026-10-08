@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-1593</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-1593<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby55</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot55</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-1593|init|battle
+|title|pokejevaby55 vs. abyssalbot55
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot55
+|gametype|singles
+|player|p1|pokejevaby55|daisy-gen3|
+|player|p2|abyssalbot55|boarder-gen2|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Skarmory, M|
+|poke|p1|Ting-Lu|
+|poke|p1|Zamazenta-*|
+|poke|p1|Weavile, F|
+|poke|p1|Kyurem|
+|poke|p1|Slowking-Galar, M|
+|poke|p2|Enamorus, F|
+|poke|p2|Kyurem|
+|poke|p2|Landorus-Therian, M|
+|poke|p2|Kingambit, F|
+|poke|p2|Ogerpon-Wellspring, F|
+|poke|p2|Glimmora, F|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|start
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|switch|p2a: Kingambit|Kingambit, F|100/100
+|-item|p2a: Kingambit|Air Balloon
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|325/325
+|-ability|p1a: Zamazenta|Dauntless Shield|boost
+|-boost|p1a: Zamazenta|def|1
+|move|p2a: Kingambit|Swords Dance|p2a: Kingambit
+|-boost|p2a: Kingambit|atk|2
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|-end|p2a: Kingambit|fallenundefined|[silent]
+|switch|p2a: Enamorus|Enamorus, F|100/100
+|move|p1a: Zamazenta|Close Combat|p2a: Enamorus
+|-resisted|p2a: Enamorus
+|-damage|p2a: Enamorus|75/100
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Zamazenta|Stone Edge|p2a: Enamorus
+|-supereffective|p2a: Enamorus
+|-damage|p2a: Enamorus|0 fnt
+|faint|p2a: Enamorus
+|upkeep
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Landorus|Landorus-Therian, M|100/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-unboost|p1a: Zamazenta|atk|1
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Kyurem|Kyurem|391/391
+|-ability|p1a: Kyurem|Pressure
+|move|p2a: Landorus|Earthquake|p1a: Kyurem
+|-damage|p1a: Kyurem|211/391
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, F|100/100
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen1|[silent]
+|-item|p2a: Kingambit|Air Balloon
+|move|p1a: Kyurem|Ice Beam|p2a: Kingambit
+|-resisted|p2a: Kingambit
+|-damage|p2a: Kingambit|72/100
+|-enditem|p2a: Kingambit|Air Balloon
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|325/325
+|move|p2a: Kingambit|Iron Head|p1a: Zamazenta
+|-damage|p1a: Zamazenta|178/325
+|upkeep
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|-end|p2a: Kingambit|fallen1|[silent]
+|switch|p2a: Landorus|Landorus-Therian, M|100/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-unboost|p1a: Zamazenta|atk|1
+|move|p1a: Zamazenta|Close Combat|p2a: Landorus
+|-resisted|p2a: Landorus
+|-damage|p2a: Landorus|80/100
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|-damage|p1a: Zamazenta|124/325|[from] item: Rocky Helmet|[of] p2a: Landorus
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Kyurem|Kyurem|211/391
+|-ability|p1a: Kyurem|Pressure
+|move|p2a: Landorus|Earthquake|p1a: Kyurem
+|-damage|p1a: Kyurem|28/391
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, F|72/100
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen1|[silent]
+|move|p1a: Kyurem|Ice Beam|p2a: Kingambit
+|-resisted|p2a: Kingambit
+|-damage|p2a: Kingambit|45/100
+|-status|p2a: Kingambit|frz
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|124/325
+|cant|p2a: Kingambit|frz
+|upkeep
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|-end|p2a: Kingambit|fallen1|[silent]
+|switch|p2a: Landorus|Landorus-Therian, M|80/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-unboost|p1a: Zamazenta|atk|1
+|move|p1a: Zamazenta|Close Combat|p2a: Landorus
+|-resisted|p2a: Landorus
+|-damage|p2a: Landorus|60/100
+|-unboost|p1a: Zamazenta|def|1
+|-unboost|p1a: Zamazenta|spd|1
+|-damage|p1a: Zamazenta|70/325|[from] item: Rocky Helmet|[of] p2a: Landorus
+|upkeep
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Kyurem|Kyurem|28/391
+|-ability|p1a: Kyurem|Pressure
+|move|p2a: Landorus|Earthquake|p1a: Kyurem
+|-damage|p1a: Kyurem|0 fnt
+|faint|p1a: Kyurem
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Weavile|Weavile, F|281/281
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Kingambit|Kingambit, F|45/100 frz
+|-activate|p2a: Kingambit|ability: Supreme Overlord
+|-start|p2a: Kingambit|fallen1|[silent]
+|move|p1a: Weavile|Ice Shard|p2a: Kingambit
+|-resisted|p2a: Kingambit
+|-damage|p2a: Kingambit|37/100 frz
+|upkeep
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Weavile|Low Kick|p2a: Kingambit
+|-supereffective|p2a: Kingambit
+|-damage|p2a: Kingambit|0 fnt
+|faint|p2a: Kingambit
+|-end|p2a: Kingambit|fallen1|[silent]
+|upkeep
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Glimmora|Glimmora, F|100/100
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|514/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Glimmora|Spikes|p1a: Ting-Lu
+|-sidestart|p1: pokejevaby55|Spikes
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Ogerpon|Ogerpon-Wellspring, F|100/100
+|move|p1a: Ting-Lu|Earthquake|p2a: Ogerpon
+|-resisted|p2a: Ogerpon
+|-damage|p2a: Ogerpon|76/100
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Ivy Cudgel|p1a: Ting-Lu|[anim] Ivy Cudgel Water
+|-supereffective|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|202/514
+|move|p1a: Ting-Lu|Ruination|p2a: Ogerpon
+|-damage|p2a: Ogerpon|38/100
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Ogerpon|Ivy Cudgel|p1a: Ting-Lu|[anim] Ivy Cudgel Water
+|-supereffective|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|0 fnt
+|faint|p1a: Ting-Lu
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Weavile|Weavile, F|281/281
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Weavile|Knock Off|p2a: Ogerpon
+|-damage|p2a: Ogerpon|0 fnt
+|faint|p2a: Ogerpon
+|upkeep
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Glimmora|Glimmora, F|100/100
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p1a: Weavile|Knock Off|p2a: Glimmora
+|-damage|p2a: Glimmora|62/100
+|-activate|p2a: Glimmora|ability: Toxic Debris
+|-sidestart|p1: pokejevaby55|move: Toxic Spikes
+|-enditem|p2a: Glimmora|Red Card|[from] move: Knock Off|[of] p1a: Weavile
+|move|p2a: Glimmora|Power Gem|p1a: Weavile
+|-supereffective|p1a: Weavile
+|-damage|p1a: Weavile|0 fnt
+|faint|p1a: Weavile
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|70/325
+|move|p2a: Glimmora|Power Gem|p1a: Zamazenta
+|-resisted|p1a: Zamazenta
+|-damage|p1a: Zamazenta|14/325
+|upkeep
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|-sideend|p1: pokejevaby55|move: Toxic Spikes|[of] p1a: Slowking
+|move|p2a: Glimmora|Earth Power|p1a: Slowking
+|-supereffective|p1a: Slowking
+|-damage|p1a: Slowking|266/394
+|upkeep
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Zamazenta|Zamazenta|14/325
+|move|p2a: Glimmora|Earth Power|p1a: Zamazenta
+|-damage|p1a: Zamazenta|0 fnt
+|faint|p1a: Zamazenta
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|312/394
+|upkeep
+|turn|26
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|27
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-crit|p1a: Slowking
+|-damage|p1a: Slowking|276/394
+|upkeep
+|turn|28
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|29
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|321/394
+|upkeep
+|turn|30
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|31
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|310/394
+|upkeep
+|turn|32
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|33
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|310/394
+|upkeep
+|turn|34
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|35
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|318/394
+|upkeep
+|turn|36
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|37
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|321/394
+|upkeep
+|turn|38
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|39
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|309/394
+|upkeep
+|turn|40
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|41
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|310/394
+|upkeep
+|turn|42
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|43
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|318/394
+|upkeep
+|turn|44
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|45
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|321/394
+|upkeep
+|turn|46
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|47
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|315/394
+|upkeep
+|turn|48
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|49
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|309/394
+|upkeep
+|turn|50
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Earth Power|p1a: Skarmory
+|-immune|p1a: Skarmory
+|upkeep
+|turn|51
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|307/394
+|upkeep
+|turn|52
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|333/333
+|move|p2a: Glimmora|Power Gem|p1a: Skarmory
+|-damage|p1a: Skarmory|170/333
+|upkeep
+|turn|53
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|316/394
+|upkeep
+|turn|54
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|170/333
+|move|p2a: Glimmora|Power Gem|p1a: Skarmory
+|-damage|p1a: Skarmory|20/333
+|upkeep
+|turn|55
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|315/394
+|upkeep
+|turn|56
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p1a: Skarmory|Skarmory, M|20/333
+|move|p2a: Glimmora|Power Gem|p1a: Skarmory
+|-damage|p1a: Skarmory|0 fnt
+|faint|p1a: Skarmory
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M|394/394
+|turn|57
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|315/394
+|move|p1a: Slowking|Future Sight|p2a: Glimmora
+|-start|p1a: Slowking|move: Future Sight
+|upkeep
+|turn|58
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|230/394
+|-prepare|p1a: Slowking|Chilly Reception|[premajor]
+|move|p1a: Slowking|Chilly Reception|p1a: Slowking
+|-weather|Snowscape
+|-weather|Snowscape|[upkeep]
+|upkeep
+|turn|59
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Glimmora|Power Gem|p1a: Slowking
+|-damage|p1a: Slowking|154/394
+|move|p1a: Slowking|Future Sight||[still]
+|-fail|p1a: Slowking
+|-weather|Snowscape|[upkeep]
+|-end|p2a: Glimmora|move: Future Sight
+|-supereffective|p2a: Glimmora
+|-damage|p2a: Glimmora|0 fnt
+|faint|p2a: Glimmora
+|upkeep
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|switch|p2a: Landorus|Landorus-Therian, M|60/100
+|-ability|p2a: Landorus|Intimidate|boost
+|-unboost|p1a: Slowking|atk|1
+|turn|60
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby55 has 15 seconds left this turn.
+|inactive|abyssalbot55 has 15 seconds left this turn.
+|move|p2a: Landorus|Earthquake|p1a: Slowking
+|-supereffective|p1a: Slowking
+|-damage|p1a: Slowking|0 fnt
+|faint|p1a: Slowking
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

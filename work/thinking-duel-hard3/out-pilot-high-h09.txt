@@ -1,0 +1,4 @@
+Working...
+Fixed `delim.py`: writer encodes None→`none_as` (`'""'` when empty), empty→bare, quotes fields containing delim/quotes/newlines or equal to nonempty `none_as` with `"`-doubling; reader parses quoted fields (doubled-quote unescape, embedded newlines) and inverts (quoted-empty→None iff `none_as` empty, bare `none_as`→None iff nonempty).
+
+Check: 54 round-trip combos (none_as `''`/`NULL`/`\N` × delim `|`/`,`/tab × adversarial values incl. None, `''`, delim, quotes, newlines, `NULL`) all pass; spec spot-checks on quoting exact.

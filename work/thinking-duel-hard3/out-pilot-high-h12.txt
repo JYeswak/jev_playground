@@ -1,0 +1,4 @@
+Working...
+Done. Fixed `beads.py:parse_rows` to handle both shapes (`- [mark] id | Title`, `- word id: Title`), all marks (`x`/space/`~`/`-`) and words (`closed`/`open`/`in_progress`/`in-progress`/`deferred`), first-separator split so titles keep `|`, `:`, brackets, malformed lines skipped, stdlib only (`re`).
+
+Check: ran 11 valid + 9 malformed + multi-line + empty cases in PWD — `ALL OK`.

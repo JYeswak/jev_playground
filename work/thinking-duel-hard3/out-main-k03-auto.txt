@@ -1,0 +1,4 @@
+Working...
+Fixed `sjoin.py`: `abspath+normpath` base, strip leading `/` from parts, `normpath` before directory-aware prefix check (`== base` or `startswith(base + sep)`).
+
+Verified: `../` traversal raises, `/etc/passwd` contained to `/tmp/x/etc/passwd`, `/../x-evil`→`../x-evil` raises, `../x-evil` and `../../tmp/x-evil` raise (prefix-confusion), `.`/`//`/trailing-slash normalize in-base.

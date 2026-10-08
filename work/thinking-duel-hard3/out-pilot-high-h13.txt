@@ -1,0 +1,4 @@
+Working...
+Fixed `mpatch.py`: `deepcopy` non-dict patch on replace, `deepcopy` dict target into new `result` (`{}` if target non-dict), null removes key, otherwise recursive `merge_patch(result.get(k), v)` so arrays replace and nested dicts merge without aliasing.
+
+Verified: 18 cases incl. RFC 7396 Appendix A, non-dict target/patch, missing-key nesting, plus no-mutation/no-alias checks on both inputs — `ALL PASS`.

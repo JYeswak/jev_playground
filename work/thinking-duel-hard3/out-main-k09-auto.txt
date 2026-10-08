@@ -1,0 +1,4 @@
+Working...
+Fixed `patcher.py`: parses `@@ -a,b +c,d @@` (count defaults to 1), ignores `---/+++/\<marker>/` outside hunks, applies top-down copying gap from original coordinates with implicit offset (`orig_idx` over original lines), validates every ` `/`-` line against original and hunk counts, raises `ValueError` on mismatch/bad position/overfull. Stdlib only (`re`).
+
+Verified: replace, two-hunk original-coordinate offset, shrink-then-insert offset, context/removal mismatch raises, empty diff no-op, empty-file insert, omitted counts, trailing newline, no-newline marker, bad position, top insert — all pass.

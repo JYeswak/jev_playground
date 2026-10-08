@@ -1,0 +1,8 @@
+Working...
+Fixed `wrap.py`: display-width via `unicodedata` (W/F=2, combining/Mn/Me=0, else 1); greedy space-break; oversize non-wide word on own line unbroken; all-wide oversize word chunked greedily by display width (single wide char alone if wider than width).
+
+Verified:
+- `wrap('あいうえお',4)` → `['あい','うえ','お']` widths [4,4,2]
+- `wrap('supercalifragilistic xyz',10)` → long word unbroken on own line
+- `wrap('ab é(cd combining) cd',4)` → combining counts 0, `['ab é','cd']`
+- Fullwidth `ＡＢＣＤ` chunks by 2; mixed `abcあいうえ` stays unbroken.

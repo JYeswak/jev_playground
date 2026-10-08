@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-914</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-914<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby6</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot6</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-914|init|battle
+|title|pokejevaby6 vs. abyssalbot6
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot6
+|gametype|singles
+|player|p1|pokejevaby6|pokekid|
+|player|p2|abyssalbot6|swimmerf-gen4dp|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Enamorus, F|
+|poke|p1|Kyurem|
+|poke|p1|Landorus-Therian, M|
+|poke|p1|Kingambit, F|
+|poke|p1|Ogerpon-Wellspring, F|
+|poke|p1|Glimmora, F|
+|poke|p2|Gliscor, M|
+|poke|p2|Alomomola, F|
+|poke|p2|Gholdengo|
+|poke|p2|Hoopa-Unbound|
+|poke|p2|Cinderace, F|
+|poke|p2|Zamazenta-*|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|start
+|switch|p1a: Ogerpon|Ogerpon-Wellspring, F|301/301
+|switch|p2a: Gliscor|Gliscor, M|100/100
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Gliscor|[anim] Ivy Cudgel Water
+|-supereffective|p2a: Gliscor
+|-crit|p2a: Gliscor
+|-damage|p2a: Gliscor|0 fnt
+|faint|p2a: Gliscor
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Zamazenta|Zamazenta|100/100
+|-ability|p2a: Zamazenta|Dauntless Shield|boost
+|-boost|p2a: Zamazenta|def|1
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Iron Defense|p2a: Zamazenta
+|-boost|p2a: Zamazenta|def|2
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Zamazenta|[anim] Ivy Cudgel Water
+|-damage|p2a: Zamazenta|83/100
+|-heal|p2a: Zamazenta|89/100|[from] item: Leftovers
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Body Press|p1a: Ogerpon
+|-damage|p1a: Ogerpon|0 fnt
+|faint|p1a: Ogerpon
+|-heal|p2a: Zamazenta|95/100|[from] item: Leftovers
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Enamorus|Enamorus, F|289/289
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Enamorus
+|-resisted|p1a: Enamorus
+|-damage|p1a: Enamorus|242/289
+|move|p1a: Enamorus|Moonblast|p2a: Zamazenta
+|-supereffective|p2a: Zamazenta
+|-damage|p2a: Zamazenta|3/100
+|-heal|p2a: Zamazenta|9/100|[from] item: Leftovers
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Crunch|p1a: Enamorus
+|-resisted|p1a: Enamorus
+|-damage|p1a: Enamorus|195/289
+|move|p1a: Enamorus|Moonblast|p2a: Zamazenta
+|-supereffective|p2a: Zamazenta
+|-damage|p2a: Zamazenta|0 fnt
+|faint|p2a: Zamazenta
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Gholdengo|Gholdengo|100/100
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gholdengo|Make It Rain|p1a: Enamorus
+|-supereffective|p1a: Enamorus
+|-damage|p1a: Enamorus|0 fnt
+|-unboost|p2a: Gholdengo|spa|1
+|faint|p1a: Enamorus
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Glimmora|Glimmora, F|368/368
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gholdengo|Make It Rain|p1a: Glimmora
+|-supereffective|p1a: Glimmora
+|-damage|p1a: Glimmora|0 fnt
+|-unboost|p2a: Gholdengo|spa|1
+|faint|p1a: Glimmora
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Kingambit|Kingambit, F|341/341
+|-activate|p1a: Kingambit|ability: Supreme Overlord
+|-start|p1a: Kingambit|fallen3|[silent]
+|-item|p1a: Kingambit|Air Balloon
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Gholdengo
+|-supereffective|p2a: Gholdengo
+|-damage|p2a: Gholdengo|0 fnt
+|faint|p2a: Gholdengo
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Cinderace|Cinderace, F|100/100
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Cinderace|Pyro Ball|p1a: Kingambit
+|-supereffective|p1a: Kingambit
+|-crit|p1a: Kingambit
+|-damage|p1a: Kingambit|0 fnt
+|-enditem|p1a: Kingambit|Air Balloon
+|faint|p1a: Kingambit
+|-end|p1a: Kingambit|fallen3|[silent]
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Kyurem|Kyurem|391/391
+|-ability|p1a: Kyurem|Pressure
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kyurem|Earth Power|p2a: Cinderace
+|-supereffective|p2a: Cinderace
+|-damage|p2a: Cinderace|0 fnt
+|faint|p2a: Cinderace
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Hoopa|Hoopa-Unbound|100/100
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kyurem|Earth Power|p2a: Hoopa
+|-damage|p2a: Hoopa|83/100
+|move|p2a: Hoopa|Psychic Noise|p1a: Kyurem
+|-damage|p1a: Kyurem|229/391
+|-start|p1a: Kyurem|move: Heal Block
+|upkeep
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kyurem|Earth Power|p2a: Hoopa
+|-damage|p2a: Hoopa|65/100
+|move|p2a: Hoopa|Psychic Noise|p1a: Kyurem
+|-damage|p1a: Kyurem|69/391
+|-end|p1a: Kyurem|move: Heal Block
+|upkeep
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kyurem|Earth Power|p2a: Hoopa
+|-damage|p2a: Hoopa|49/100
+|move|p2a: Hoopa|Psychic Noise|p1a: Kyurem
+|-damage|p1a: Kyurem|0 fnt
+|faint|p1a: Kyurem
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M|381/381
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Hoopa|atk|1
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Landorus|Earthquake|p2a: Hoopa
+|-damage|p2a: Hoopa|1/100
+|move|p2a: Hoopa|Psychic Noise|p1a: Landorus
+|-damage|p1a: Landorus|191/381
+|-start|p1a: Landorus|move: Heal Block
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Landorus|Earthquake|p2a: Hoopa
+|-damage|p2a: Hoopa|0 fnt
+|faint|p2a: Hoopa
+|-end|p1a: Landorus|move: Heal Block
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Alomomola|Alomomola, F|100/100
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Landorus|Earthquake|p2a: Alomomola
+|-damage|p2a: Alomomola|73/100
+|move|p2a: Alomomola|Flip Turn|p1a: Landorus
+|-supereffective|p1a: Landorus
+|-damage|p1a: Landorus|71/381
+|-damage|p2a: Alomomola|57/100|[from] item: Rocky Helmet|[of] p1a: Landorus
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-terastallize|p1a: Landorus|Ghost
+|move|p1a: Landorus|Earthquake|p2a: Alomomola
+|-damage|p2a: Alomomola|32/100
+|move|p2a: Alomomola|Flip Turn|p1a: Landorus
+|-damage|p1a: Landorus|8/381
+|-damage|p2a: Alomomola|16/100|[from] item: Rocky Helmet|[of] p1a: Landorus
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Landorus|Earthquake|p2a: Alomomola
+|-damage|p2a: Alomomola|0 fnt
+|faint|p2a: Alomomola
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

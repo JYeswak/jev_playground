@@ -1,0 +1,112 @@
+{
+  "status": "INCOMPLETE",
+  "generated_at": "2026-10-05T20:19:10.311Z",
+  "deployment_at": "2026-10-02T03:44:26Z",
+  "window_24h": {
+    "start": "2026-10-04T20:19:10.311Z",
+    "end": "2026-10-05T20:19:10.311Z",
+    "injection": {
+      "rows": 9048,
+      "statuses": {
+        "scored": 8305,
+        "annotated": 28,
+        "oversize": 713,
+        "failed": 2
+      },
+      "cap_rows": 0,
+      "scored_input_tokens": 19248269,
+      "recorded_jev_spend_usd": 0.808427298,
+      "explicit_withheld": 0
+    },
+    "memory_filter": {
+      "rows": 15893,
+      "statuses": {
+        "scored": 809,
+        "daily-cap": 839,
+        "memo": 294,
+        "deadline-keep": 697,
+        "late-ignored": 23,
+        "enforced": 25,
+        "scoring-off": 222,
+        "cap3-pruned": 12984
+      },
+      "scored_input_tokens": 399031,
+      "recorded_jev_spend_usd": 0.016759302
+    }
+  },
+  "post_change_observation": {
+    "requested_days": 7,
+    "observed_days": 3.6907906384,
+    "complete": false,
+    "injection": {
+      "current_log_schema": "jev-injection-shadow.v2",
+      "v3_cap_scope_rows": 0,
+      "current_schema_cap_rows": 0,
+      "legacy_schema_cap_rows": 849,
+      "current_schema_scored_rows": 15936,
+      "current_schema_explicit_withheld": 56,
+      "current_schema_explicit_withheld_rate": 0.003514056225,
+      "current_schema_explicit_withheld_wilson_95": [0.002707307089, 0.004560108909],
+      "current_schema_flag_rate": 0.006024096386,
+      "current_schema_flag_wilson_95": [0.00493599064, 0.007350295853],
+      "newly_covered_withhold_rate": null,
+      "newly_covered_rate_wilson_95": null,
+      "newly_covered_status": "UNMEASURABLE",
+      "newly_covered_reason": "No v3 records with cap-scope identity are present."
+    },
+    "memory_filter": {
+      "scored": 4435,
+      "daily_cap": 5613,
+      "memo": 1596,
+      "scored_share_of_scored_plus_cap_plus_memo": 0.3808828581,
+      "frozen_baseline_scored_share": 0.1928309476,
+      "tokens_saved_scored_and_memo_only": 196474,
+      "estimated_saved_value_usd": 0.589422,
+      "scored_input_tokens": 2254594,
+      "recorded_jev_spend_usd": 0.094692948,
+      "value_per_spend": 6.2245606716,
+      "minimum_value_per_spend": 3.0,
+      "cap3_pruned_rows_excluded": 28128
+    }
+  },
+  "frozen_baseline": {
+    "injection_cap_rows_7d": 7567,
+    "injection_cap_rows_per_day": 1081,
+    "memory_filter": {
+      "scored": 1630,
+      "daily_cap": 5243,
+      "memo": 1580,
+      "tokens_saved": 59522,
+      "scored_input_tokens": 760036,
+      "scored_share": 0.1928309476,
+      "saved_value_usd_at_3_per_million": 0.178566,
+      "jev_spend_usd_at_0_042_per_million": 0.031921512,
+      "value_per_spend": 5.5939079577
+    }
+  },
+  "bar_status": {
+    "injection_cap_drop_at_least_90_percent_for_7d": "PENDING",
+    "newly_covered_withhold_rate_with_wilson": "UNMEASURABLE",
+    "memory_scored_share_above_baseline_for_7d": "PENDING",
+    "memory_value_at_least_3x_for_7d": "PENDING"
+  },
+  "source_logs": {
+    "injection_shadow_sha256": "2b7dbc408e9fd48c4f746a1091a9f62a3264de107bbcf16e2bdb64d66dad4731",
+    "memory_filter_sha256": "8e97138706ea769d950a936524c3e5bae608491e8a50bea65c10406e5a47d6b1",
+    "first_scoped_v3_ts": null,
+    "malformed_rows": 0
+  },
+  "price_assumptions": {
+    "saved_tokens_usd_per_million": 3.0,
+    "jev_input_usd_per_million": 0.042,
+    "saved_token_rate_source": "Frozen OrangeFrog report: 59,522 saved tokens ~= $0.18, implying $3/M.",
+    "jev_rate_source": "AGENTS.md: $0.042/M input tokens; output free."
+  },
+  "boundary": [
+    "Only 3.6908 post-change days exist; the seven-day bars remain pending.",
+    "Current logs are v2 with no cap-scope ID or daily call ordinal; new cohort rate is unmeasurable.",
+    "v3 cap-scope/ordinal logging is implemented locally but is not present in a fresh-session log yet.",
+    "Recorded Jev spend uses scored-row input tokens; missing usage on failures is not imputed.",
+    "ROI excludes cap3-pruned items because the deterministic cap is unrelated to Jev memory-filter savings."
+  ]
+}

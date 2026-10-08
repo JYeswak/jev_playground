@@ -1,0 +1,3 @@
+Working...
+Score every trial on day-1 activation depth: no core action, <2 sessions, incomplete setup, zero invites/data = critical risk; declining usage slope precedes churn by 30-60 days. Use rule-based score to start (`Risk = 50 + activation miss +15, no return visit +12, support struggle +10`), tier 70+ immediate outreach, 50-69 contact within 7 days. Tie every tier to a specific intervention, hold 10-20% control to measure save rate. Optimize for recall over precision: false negative costs full lifetime value, false positive costs only the offer. Retrain quarterly; alert if AUC <0.70 or save rate <10%.
+

@@ -1,0 +1,6 @@
+Working...
+Fixed `csvexp.py` with stdlib `csv.writer` (`QUOTE_MINIMAL`, `doublequote=True`, `lineterminator="\r\n"`, `newline=""`).
+
+Verified:
+- `write_csv` round-trip on `b,c` / `d"e` / `f\ng` / `"""quoted"""` / `,,,` / embedded newline: OK
+- `cli.py` (unchanged interface, JSON stdin → CSV stdout) round-trip via `csv.reader`: OK

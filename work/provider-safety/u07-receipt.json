@@ -1,10 +1,10 @@
 {
   "bead": "jev-u07-infisical-argv-gi70",
   "result": "PASS",
-  "run_at": "2026-10-05T18:27:33.059Z",
+  "run_at": "2026-10-07T16:05:06.262Z",
   "reviewer_identity": {
-    "name": "CyanOtter (pane %32; legacy-unverified binding)",
-    "pane": "%32",
+    "name": "WildCarp",
+    "pane": "%27",
     "source": "JEV_REVIEWER",
     "independent": false
   },

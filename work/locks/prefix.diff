@@ -6,12 +6,12 @@
  # Usage: scripts/git-commit-serialized.sh [--only <paths>...] -m "msg [level]"
 +#     or scripts/git-commit-serialized.sh add -- <paths>...   (same mutex for git add)
  set -u
- 
+
  repo="$(git rev-parse --show-toplevel 2>/dev/null)" || { echo "git-commit-serialized: not in a git repo" >&2; exit 2; }
 @@ -40,11 +41,13 @@
    fi
  fi
- 
+
 +verb=commit
 +if [ "${1:-}" = add ]; then verb=add; shift; fi
  rc=0

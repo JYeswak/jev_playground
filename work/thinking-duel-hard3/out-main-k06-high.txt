@@ -1,0 +1,4 @@
+Working...
+Fixed `wrap.py`: display-width accounting (`W`/`F`=2, combining=0 via `unicodedata`, else 1), greedy space-break packing on display width, over-wide non-wide words on own line unbroken, all-wide words pre-chunked between chars (`width`-sized, ≥1 char/chunk).
+
+Verified: ASCII wrap, long-word overrun, CJK chunking (`日本語日本語`@6→`['日本語','日本語']`, odd width 5, width 1, spaceless sentence@8 all ≤width), mixed `ab日本語cd` unbroken, accented `café foo`@8 (combining=0, `len` 9 vs width 8).

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-799</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-799<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby6</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot6</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-799|init|battle
+|title|pokejevaby6 vs. abyssalbot6
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot6
+|gametype|singles
+|player|p1|pokejevaby6|pokekid|
+|player|p2|abyssalbot6|swimmerf-gen4dp|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Kingambit, F|
+|poke|p1|Cinderace, F|
+|poke|p1|Landorus-Therian, M|
+|poke|p1|Iron Valiant|
+|poke|p1|Kyurem|
+|poke|p1|Slowking-Galar, M|
+|poke|p2|Zapdos|
+|poke|p2|Hydrapple, F|
+|poke|p2|Zamazenta-*|
+|poke|p2|Slowking-Galar, M|
+|poke|p2|Tinkaton, F|
+|poke|p2|Ting-Lu|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|start
+|switch|p1a: Kingambit|Kingambit, F|381/381
+|switch|p2a: Slowking|Slowking-Galar, M|100/100
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Zamazenta|Zamazenta|100/100
+|-ability|p2a: Zamazenta|Dauntless Shield|boost
+|-boost|p2a: Zamazenta|def|1
+|move|p1a: Kingambit|Kowtow Cleave|p2a: Zamazenta
+|-resisted|p2a: Zamazenta
+|-damage|p2a: Zamazenta|85/100
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallenundefined|[silent]
+|switch|p1a: Iron Valiant|Iron Valiant|289/289
+|-enditem|p1a: Iron Valiant|Booster Energy
+|-activate|p1a: Iron Valiant|ability: Quark Drive|[fromitem]
+|-start|p1a: Iron Valiant|quarkdrivespe
+|move|p2a: Zamazenta|Close Combat|p1a: Iron Valiant
+|-resisted|p1a: Iron Valiant
+|-damage|p1a: Iron Valiant|175/289
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Iron Valiant|Moonblast|p2a: Zamazenta
+|-supereffective|p2a: Zamazenta
+|-damage|p2a: Zamazenta|0 fnt
+|faint|p2a: Zamazenta
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Slowking|Slowking-Galar, M|100/100
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-end|p1a: Iron Valiant|Quark Drive|[silent]
+|switch|p1a: Kingambit|Kingambit, F|381/381
+|move|p2a: Slowking|Future Sight|p1a: Kingambit
+|-start|p2a: Slowking|move: Future Sight
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|move|p1a: Kingambit|Kowtow Cleave|p2a: Ting-Lu
+|-resisted|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|91/100
+|-heal|p2a: Ting-Lu|97/100|[from] item: Leftovers
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kingambit|Iron Head|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|77/100
+|cant|p2a: Ting-Lu|flinch
+|-end|p1a: Kingambit|move: Future Sight
+|-immune|p1a: Kingambit
+|-heal|p2a: Ting-Lu|83/100|[from] item: Leftovers
+|upkeep
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kingambit|Iron Head|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|64/100
+|cant|p2a: Ting-Lu|flinch
+|-heal|p2a: Ting-Lu|70/100|[from] item: Leftovers
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kingambit|Iron Head|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|52/100
+|move|p2a: Ting-Lu|Body Press|p1a: Kingambit
+|-supereffective|p1a: Kingambit
+|-damage|p1a: Kingambit|21/381
+|-heal|p1a: Kingambit|44/381|[from] item: Leftovers
+|-heal|p2a: Ting-Lu|58/100|[from] item: Leftovers
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallenundefined|[silent]
+|switch|p1a: Kyurem|Kyurem, shiny|391/391
+|-ability|p1a: Kyurem|Pressure
+|move|p2a: Ting-Lu|Body Press|p1a: Kyurem
+|-supereffective|p1a: Kyurem
+|-damage|p1a: Kyurem|159/391
+|-heal|p2a: Ting-Lu|64/100|[from] item: Leftovers
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kyurem|Freeze-Dry|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-crit|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|0 fnt
+|faint|p2a: Ting-Lu
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Tinkaton|Tinkaton, F|100/100
+|-ability|p2a: Tinkaton|Mold Breaker
+|-item|p2a: Tinkaton|Air Balloon
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Cinderace|Cinderace, F, shiny|337/337
+|move|p2a: Tinkaton|Gigaton Hammer|p1a: Cinderace
+|-resisted|p1a: Cinderace
+|-damage|p1a: Cinderace|240/337
+|upkeep
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Cinderace|Pyro Ball|p2a: Tinkaton
+|-supereffective|p2a: Tinkaton
+|-damage|p2a: Tinkaton|0 fnt
+|-enditem|p2a: Tinkaton|Air Balloon
+|faint|p2a: Tinkaton
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Zapdos|Zapdos|100/100
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Kyurem|Kyurem, shiny|159/391
+|-ability|p1a: Kyurem|Pressure
+|move|p2a: Zapdos|Hurricane|p1a: Kyurem
+|-damage|p1a: Kyurem|0 fnt
+|faint|p1a: Kyurem
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Cinderace|Cinderace, F, shiny|240/337
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M, shiny|381/381
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Zapdos|atk|1
+|move|p2a: Zapdos|Hurricane|p1a: Landorus
+|-damage|p1a: Landorus|204/381
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Cinderace|Cinderace, F, shiny|240/337
+|move|p2a: Zapdos|Hurricane|p1a: Cinderace
+|-damage|p1a: Cinderace|29/337
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Cinderace|Pyro Ball|p2a: Zapdos
+|-damage|p2a: Zapdos|31/100
+|move|p2a: Zapdos|Hurricane|p1a: Cinderace
+|-damage|p1a: Cinderace|0 fnt
+|faint|p1a: Cinderace
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Iron Valiant|Iron Valiant|175/289
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Iron Valiant|Moonblast|p2a: Zapdos
+|-damage|p2a: Zapdos|0 fnt
+|faint|p2a: Zapdos
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Slowking|Slowking-Galar, M|100/100
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-end|p1a: Iron Valiant|Quark Drive|[silent]
+|switch|p1a: Kingambit|Kingambit, F|44/381
+|-activate|p1a: Kingambit|ability: Supreme Overlord
+|-start|p1a: Kingambit|fallen2|[silent]
+|move|p2a: Slowking|Future Sight|p1a: Kingambit
+|-start|p2a: Slowking|move: Future Sight
+|-heal|p1a: Kingambit|67/381|[from] item: Leftovers
+|upkeep
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Kingambit|Kowtow Cleave|p2a: Slowking
+|-supereffective|p2a: Slowking
+|-damage|p2a: Slowking|0 fnt
+|faint|p2a: Slowking
+|-heal|p1a: Kingambit|90/381|[from] item: Leftovers
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Hydrapple|Hydrapple, F|100/100
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallen2|[silent]
+|switch|p1a: Iron Valiant|Iron Valiant|175/289
+|move|p2a: Hydrapple|Earth Power|p1a: Iron Valiant
+|-damage|p1a: Iron Valiant|11/289
+|-end|p1a: Iron Valiant|move: Future Sight
+|-supereffective|p1a: Iron Valiant
+|-damage|p1a: Iron Valiant|0 fnt
+|faint|p1a: Iron Valiant
+|-end|p1a: Iron Valiant|Quark Drive|[silent]
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M, shiny|204/381
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Hydrapple|atk|1
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Landorus|U-turn|p2a: Hydrapple
+|-supereffective|p2a: Hydrapple
+|-damage|p2a: Hydrapple|76/100
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Kingambit|Kingambit, F|90/381|[from] U-turn
+|-activate|p1a: Kingambit|ability: Supreme Overlord
+|-start|p1a: Kingambit|fallen3|[silent]
+|move|p2a: Hydrapple|Draco Meteor|p1a: Kingambit
+|-resisted|p1a: Kingambit
+|-damage|p1a: Kingambit|0 fnt
+|-unboost|p2a: Hydrapple|spa|2
+|faint|p1a: Kingambit
+|-end|p1a: Kingambit|fallen3|[silent]
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 10 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M, shiny|204/381
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Hydrapple|atk|1
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Landorus|U-turn|p2a: Hydrapple
+|-supereffective|p2a: Hydrapple
+|-damage|p2a: Hydrapple|47/100
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Slowking|Slowking-Galar, M, shiny|393/393|[from] U-turn
+|move|p2a: Hydrapple|Draco Meteor|p1a: Slowking
+|-damage|p1a: Slowking|324/393
+|-unboost|p2a: Hydrapple|spa|2
+|upkeep
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Hydrapple|Earth Power|p1a: Slowking
+|-supereffective|p1a: Slowking
+|-damage|p1a: Slowking|282/393
+|move|p1a: Slowking|Future Sight|p2a: Hydrapple
+|-start|p1a: Slowking|move: Future Sight
+|upkeep
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Hydrapple|Earth Power|p1a: Slowking
+|-supereffective|p1a: Slowking
+|-damage|p1a: Slowking|240/393
+|move|p1a: Slowking|Future Sight||[still]
+|-fail|p1a: Slowking
+|upkeep
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Hydrapple|Earth Power|p1a: Slowking
+|-supereffective|p1a: Slowking
+|-damage|p1a: Slowking|194/393
+|-unboost|p1a: Slowking|spd|1
+|move|p1a: Slowking|Future Sight||[still]
+|-fail|p1a: Slowking
+|-end|p2a: Hydrapple|move: Future Sight
+|-damage|p2a: Hydrapple|4/100
+|upkeep
+|turn|26
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Hydrapple|Earth Power|p1a: Slowking
+|-supereffective|p1a: Slowking
+|-damage|p1a: Slowking|126/393
+|move|p1a: Slowking|Future Sight|p2a: Hydrapple
+|-start|p1a: Slowking|move: Future Sight
+|upkeep
+|turn|27
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Hydrapple|Earth Power|p1a: Slowking
+|-supereffective|p1a: Slowking
+|-damage|p1a: Slowking|58/393
+|move|p1a: Slowking|Future Sight||[still]
+|-fail|p1a: Slowking
+|upkeep
+|turn|28
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Landorus|Landorus-Therian, M, shiny|204/381
+|-ability|p1a: Landorus|Intimidate|boost
+|-unboost|p2a: Hydrapple|atk|1
+|move|p2a: Hydrapple|Earth Power|p1a: Landorus
+|-immune|p1a: Landorus
+|-end|p2a: Hydrapple|move: Future Sight
+|-damage|p2a: Hydrapple|0 fnt
+|faint|p2a: Hydrapple
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

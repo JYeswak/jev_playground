@@ -1,0 +1,6 @@
+Working...
+Fixed `topo.py`: 3-color DFS, sorted nodes/deps, dep-only nodes included, cycle slice + repeat.
+
+Problem: `visited[n]=True` before cycle check made `n in stack` unreachable → cycles missed; unsorted iteration; keys-only loop dropped dep-only nodes.
+Decision: 3-state (`in-stack` vs `done`), `sorted(all_nodes)` + `sorted(deps)`, `stack[idx:]+[start]` on cycle.
+Check: 10-case smoke (linear, diamond `['d','b','c','a']`, empty, dep-only, determinism, self-loop `['a','a']`, 2-cycle `['a','b','a']` with edge-following, 3-cycle closure, back-edge cycle, 50 random DAGs) — `ALL PASS`.

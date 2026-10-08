@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-1600</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-1600<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby57</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot57</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-1600|init|battle
+|title|pokejevaby57 vs. abyssalbot57
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot57
+|gametype|singles
+|player|p1|pokejevaby57|miku-flying|
+|player|p2|abyssalbot57|hala|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Enamorus, F|
+|poke|p1|Kyurem|
+|poke|p1|Landorus-Therian, M|
+|poke|p1|Kingambit, F|
+|poke|p1|Ogerpon-Wellspring, F|
+|poke|p1|Glimmora, F|
+|poke|p2|Blissey, F|
+|poke|p2|Ditto|
+|poke|p2|Dondozo, F|
+|poke|p2|Toxapex, F|
+|poke|p2|Alomomola, M|
+|poke|p2|Ting-Lu|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|start
+|switch|p1a: Ogerpon|Ogerpon-Wellspring, F|301/301
+|switch|p2a: Blissey|Blissey, F|100/100
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Blissey|[anim] Ivy Cudgel Water
+|-crit|p2a: Blissey
+|-damage|p2a: Blissey|14/100
+|move|p2a: Blissey|Stealth Rock|p1a: Ogerpon
+|-sidestart|p1: pokejevaby57|move: Stealth Rock
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Blissey|[anim] Ivy Cudgel Water
+|-damage|p2a: Blissey|0 fnt
+|faint|p2a: Blissey
+|upkeep
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|switch|p2a: Toxapex|Toxapex, F|100/100
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Toxapex|[anim] Ivy Cudgel Water
+|-resisted|p2a: Toxapex
+|-damage|p2a: Toxapex|84/100
+|move|p2a: Toxapex|Toxic Spikes|p1a: Ogerpon
+|-sidestart|p1: pokejevaby57|move: Toxic Spikes
+|upkeep
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|switch|p1a: Kyurem|Kyurem|391/391
+|-damage|p1a: Kyurem|294/391|[from] Stealth Rock
+|-status|p1a: Kyurem|psn
+|-ability|p1a: Kyurem|Pressure
+|move|p2a: Toxapex|Toxic||[still]
+|-fail|p2a: Toxapex
+|-damage|p1a: Kyurem|246/391 psn|[from] psn
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Kyurem|Earth Power|p2a: Toxapex
+|-supereffective|p2a: Toxapex
+|-damage|p2a: Toxapex|22/100
+|move|p2a: Toxapex|Toxic||[still]
+|-fail|p2a: Toxapex
+|-damage|p1a: Kyurem|198/391 psn|[from] psn
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|switch|p1a: Kingambit|Kingambit, F|341/341
+|-damage|p1a: Kingambit|320/341|[from] Stealth Rock
+|-item|p1a: Kingambit|Air Balloon
+|move|p2a: Toxapex|Toxic|p1a: Kingambit
+|-immune|p1a: Kingambit
+|upkeep
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Kingambit|Low Kick|p2a: Toxapex
+|-resisted|p2a: Toxapex
+|-damage|p2a: Toxapex|18/100
+|move|p2a: Toxapex|Toxic|p1a: Kingambit
+|-immune|p1a: Kingambit
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Kingambit|Iron Head|p2a: Toxapex
+|-resisted|p2a: Toxapex
+|-damage|p2a: Toxapex|5/100
+|move|p2a: Toxapex|Toxic|p1a: Kingambit
+|-immune|p1a: Kingambit
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Kingambit|Iron Head|p2a: Toxapex
+|-resisted|p2a: Toxapex
+|-damage|p2a: Toxapex|0 fnt
+|faint|p2a: Toxapex
+|upkeep
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Kingambit|Swords Dance|p1a: Kingambit
+|-boost|p1a: Kingambit|atk|2
+|move|p2a: Ting-Lu|Spikes|p1a: Kingambit
+|-sidestart|p1: pokejevaby57|Spikes
+|upkeep
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Kingambit|Low Kick|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|0 fnt
+|faint|p2a: Ting-Lu
+|upkeep
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|switch|p2a: Alomomola|Alomomola, M|100/100
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallenundefined|[silent]
+|switch|p1a: Ogerpon|Ogerpon-Wellspring, F|301/301
+|-damage|p1a: Ogerpon|264/301|[from] Stealth Rock
+|-status|p1a: Ogerpon|psn
+|-damage|p1a: Ogerpon|227/301 psn|[from] Spikes
+|move|p2a: Alomomola|Chilling Water|p1a: Ogerpon
+|-heal|p1a: Ogerpon|301/301 psn|[from] ability: Water Absorb|[of] p2a: Alomomola
+|-damage|p1a: Ogerpon|264/301 psn|[from] psn
+|upkeep
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Alomomola|[anim] Ivy Cudgel Water
+|-resisted|p2a: Alomomola
+|-damage|p2a: Alomomola|85/100
+|move|p2a: Alomomola|Chilling Water|p1a: Ogerpon
+|-heal|p1a: Ogerpon|301/301 psn|[from] ability: Water Absorb|[of] p2a: Alomomola
+|-damage|p1a: Ogerpon|264/301 psn|[from] psn
+|upkeep
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Alomomola|[anim] Ivy Cudgel Water
+|-resisted|p2a: Alomomola
+|-damage|p2a: Alomomola|69/100
+|move|p2a: Alomomola|Chilling Water|p1a: Ogerpon
+|-heal|p1a: Ogerpon|301/301 psn|[from] ability: Water Absorb|[of] p2a: Alomomola
+|-damage|p1a: Ogerpon|264/301 psn|[from] psn
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Alomomola|[anim] Ivy Cudgel Water
+|-resisted|p2a: Alomomola
+|-damage|p2a: Alomomola|54/100
+|move|p2a: Alomomola|Chilling Water|p1a: Ogerpon
+|-heal|p1a: Ogerpon|301/301 psn|[from] ability: Water Absorb|[of] p2a: Alomomola
+|-damage|p1a: Ogerpon|264/301 psn|[from] psn
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Alomomola|[anim] Ivy Cudgel Water
+|-resisted|p2a: Alomomola
+|-damage|p2a: Alomomola|39/100
+|move|p2a: Alomomola|Chilling Water|p1a: Ogerpon
+|-heal|p1a: Ogerpon|301/301 psn|[from] ability: Water Absorb|[of] p2a: Alomomola
+|-damage|p1a: Ogerpon|264/301 psn|[from] psn
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Alomomola|[anim] Ivy Cudgel Water
+|-resisted|p2a: Alomomola
+|-damage|p2a: Alomomola|25/100
+|move|p2a: Alomomola|Chilling Water|p1a: Ogerpon
+|-heal|p1a: Ogerpon|301/301 psn|[from] ability: Water Absorb|[of] p2a: Alomomola
+|-damage|p1a: Ogerpon|264/301 psn|[from] psn
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Alomomola|[anim] Ivy Cudgel Water
+|-resisted|p2a: Alomomola
+|-damage|p2a: Alomomola|9/100
+|move|p2a: Alomomola|Chilling Water|p1a: Ogerpon
+|-heal|p1a: Ogerpon|301/301 psn|[from] ability: Water Absorb|[of] p2a: Alomomola
+|-damage|p1a: Ogerpon|264/301 psn|[from] psn
+|upkeep
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Alomomola|[anim] Ivy Cudgel Water
+|-resisted|p2a: Alomomola
+|-damage|p2a: Alomomola|0 fnt
+|faint|p2a: Alomomola
+|-damage|p1a: Ogerpon|227/301 psn|[from] psn
+|upkeep
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|switch|p2a: Ditto|Ditto|100/100
+|-transform|p2a: Ditto|p1a: Ogerpon|[from] ability: Imposter
+|-item|p2a: Ditto|Air Balloon
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|U-turn|p2a: Ditto
+|-supereffective|p2a: Ditto
+|-damage|p2a: Ditto|26/100
+|-enditem|p2a: Ditto|Air Balloon
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|switch|p1a: Kingambit|Kingambit, F|320/341|[from] U-turn
+|-damage|p1a: Kingambit|299/341|[from] Stealth Rock
+|-item|p1a: Kingambit|Air Balloon
+|move|p2a: Ditto|Ivy Cudgel|p1a: Kingambit|[anim] Ivy Cudgel Water
+|-crit|p1a: Kingambit
+|-damage|p1a: Kingambit|70/341
+|-enditem|p1a: Kingambit|Air Balloon
+|upkeep
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Kingambit|Sucker Punch|p2a: Ditto
+|-damage|p2a: Ditto|0 fnt
+|faint|p2a: Ditto
+|upkeep
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|switch|p2a: Dondozo|Dondozo, F|100/100
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|-end|p1a: Kingambit|fallenundefined|[silent]
+|switch|p1a: Ogerpon|Ogerpon-Wellspring, F|227/301 psn
+|-damage|p1a: Ogerpon|190/301 psn|[from] Stealth Rock
+|-damage|p1a: Ogerpon|153/301 psn|[from] Spikes
+|move|p2a: Dondozo|Body Press|p1a: Ogerpon
+|-damage|p1a: Ogerpon|42/301 psn
+|-damage|p1a: Ogerpon|5/301 psn|[from] psn
+|upkeep
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Dondozo|[anim] Ivy Cudgel Water
+|-resisted|p2a: Dondozo
+|-damage|p2a: Dondozo|87/100
+|move|p2a: Dondozo|Body Press|p1a: Ogerpon
+|-damage|p1a: Ogerpon|0 fnt
+|faint|p1a: Ogerpon
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|switch|p1a: Enamorus|Enamorus, F|289/289
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Enamorus|Moonblast|p2a: Dondozo
+|-damage|p2a: Dondozo|41/100
+|-unboost|p2a: Dondozo|spa|1
+|move|p2a: Dondozo|Avalanche|p1a: Enamorus
+|-supereffective|p1a: Enamorus
+|-damage|p1a: Enamorus|51/289
+|upkeep
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby57 has 15 seconds left this turn.
+|inactive|abyssalbot57 has 15 seconds left this turn.
+|move|p1a: Enamorus|Moonblast|p2a: Dondozo
+|-damage|p2a: Dondozo|0 fnt
+|faint|p2a: Dondozo
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

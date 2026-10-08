@@ -1,0 +1,4 @@
+Working...
+Fixed `tmpl.py`: recursive `{% if %}…{% endif %}` parser (nestable, truthiness via `bool(ctx.get(name))`) + `{{name}}`/`{{name|escape}}` via `html.escape(…, quote=True)`; unknown → `""`.
+
+Verified in `$PWD`: basic, unknown, if true/false/missing/0, nested true/inner-false/outer-false, 3-deep nesting, `escape` of `&<>"'`, raw `{{v}}` unescaped, var-in-if rendered/skipped — all PASS.

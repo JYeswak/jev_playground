@@ -1,0 +1,8 @@
+Working...
+You're likely missing a `CHECK` on a `state/status` column: bare `TEXT` means the DB knows 0 legal states while your code enum defines N.
+
+Your nightly `DELETE ... WHERE state IN (...)` enumerates G < N, so terminal-but-unlisted states accumulate forever and runtime grows past sunrise.
+
+Check your rollup/metrics filter too — it usually shares the same omission, hiding growth until disk fills.
+
+And `DELETE` never reclaims disk without `VACUUM` — confirm autovacuum keeps up, the collector actually runs in prod, and omitted variants are truly terminal.

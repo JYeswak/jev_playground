@@ -1,0 +1,6 @@
+Working...
+Fixed `ivl.py`:
+- `union`: merge iff `lo < last_hi` (overlap) or (`merge_adjacent and lo == last_hi`); was `lo <= last_hi`. Skips empty `hi <= lo`.
+- `gaps`: complement of (sorted, clipped) merged within `[span_lo, span_hi)`; empty span → `[]`, empty merged → whole span.
+
+Verified: adjacent merges only with flag, overlap/sort/nesting, full-cover/clipped/empty-span gaps, `union`→`gaps` chain — all pass.

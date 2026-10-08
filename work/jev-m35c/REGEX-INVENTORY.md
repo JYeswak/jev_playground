@@ -32,7 +32,7 @@ Each row cites the exact active expression by source path and line, with a struc
 | `.omp/rules/kit-weasel-retry.md:4-5` | Two case-insensitive fixed-label patterns; line 4 has bounded whitespace and CRLF | Ledger edit/write content | `BOUNDED` |
 | `.omp/rules/scorer-reimplementation.md:2` | Function-name components around a `def` header, with optional word characters | Python edit/write content | `PROBE` — quantified word groups are separated by literals; no nested ambiguous group observed. |
 
-`kit-no-verify.md:13-19`, `kit-close-needs-evidence.md:4-6`, and `kit-jsonl-close.md:4` remain untouched. Benchmark/corpus results for those are not established by this change; they are not reported as safe.
+`kit-no-verify.md:13-19`, `kit-close-needs-evidence.md:4-6`, and `kit-jsonl-close.md:4` remain untouched. Two synthetic near-miss timing runs are recorded below; they do not establish general safety or positive behavior, so these expressions remain `HIGH-REVIEW`. No gate edit is proposed because no 50k case approached the 1 s limit.
 
 ## Active implementation regexes
 
@@ -66,6 +66,33 @@ Each row cites the exact active expression by source path and line, with a struc
 
 ## Verification boundary
 
-Targeted hook suites: `node --test .omp/hooks/post/jev-injection-shadow.test.mjs .omp/hooks/post/jev-webscreen.test.mjs .omp/hooks/pre/jev-test-rerun.test.mjs` — **50/50 pass**. Full hook/extension suites: `node --test .omp/hooks/post/*.test.mjs .omp/hooks/pre/*.test.mjs .omp/extensions/*.test.mjs` — **211/211 pass**. UBS on the six changed source/test files is **UNSOLVED**: the first command hit its 120 s deadline; the second returned `MODULE_TIMEOUT`, exit 2, partial scan. No TTSR/kit-guard gate condition was changed or benchmarked. `./foundation/gates.sh` exits 1: stage 80 is RED because `/Users/josh/Developer/jev/githooks/pre-commit-test-registry.sh` is missing. `./foundation/gates.sh --selftest` passes all stages (exit 0); no gate or filesystem bypass was used.
+Targeted hook suites: `node --test .omp/hooks/post/jev-injection-shadow.test.mjs .omp/hooks/post/jev-webscreen.test.mjs .omp/hooks/pre/jev-test-rerun.test.mjs` — **51/51 pass** on 2026-10-05 at nice 10. The full hook/extension suite reported **211/211 pass** in an earlier verification; not rerun under the current targeted-only instruction. UBS remains **UNSOLVED**: earlier multi-file runs timed out or returned `MODULE_TIMEOUT`; the latest `ubs work/jev-m35c/redos-timing.test.mjs` run hit its 180 s deadline. No TTSR/kit-guard gate condition was changed; synthetic 5k/50k probes for 16 `HIGH-REVIEW`/`PROBE` expressions are recorded below and do not prove general safety. An earlier `./foundation/gates.sh` run exited 1 because stage 80 could not find `/Users/josh/Developer/jev/githooks/pre-commit-test-registry.sh`; its `--selftest` passed. No gate or filesystem bypass was used.
 
-UBS follow-up: `ubs doctor --fix` completed, but the subsequent targeted-file and staged scans each hit the 300 s command deadline. UBS remains `UNSOLVED`, not a pass.
+Earlier UBS follow-up: `ubs doctor --fix` completed, but subsequent targeted-file and staged scans each hit the 300 s command deadline. These remain incomplete, not passes.
+
+## Adversarial timing
+
+`node --test work/jev-m35c/redos-timing.test.mjs` ran twice on Node v22.23.3. Each source expression was loaded from its inventory citation, tested against exact 5,000- and 50,000-character near-misses, and measured with three `RegExp.test()` calls per size. Values below are median milliseconds, `run 1 / run 2`; the worker watchdog is 1,200 ms. All 16 source expressions were covered, all generated inputs remained non-matches, and no candidate timed out. The planted 31-character `(a+)+$` near-miss satisfied the test's `>1 s or timeout` guard.
+
+| Source expression | 5k median ms (R1 / R2) | 50k median ms (R1 / R2) |
+|---|---:|---:|
+| `.omp/rules/bash-callsite-grep-exclusion.md:2` | 0.164 / 0.104 | 0.278 / 0.217 |
+| `.omp/rules/bash-glob-silenced.md:2` | 0.077 / 0.087 | 0.330 / 0.095 |
+| `.omp/rules/bash-pipe-exit.md:2` | 0.112 / 0.149 | 0.288 / 0.375 |
+| `.omp/rules/kit-close-needs-evidence.md:4` | 0.194 / 0.194 | 0.648 / 0.653 |
+| `.omp/rules/kit-close-needs-evidence.md:5` | 0.221 / 0.243 | 0.302 / 0.297 |
+| `.omp/rules/kit-close-needs-evidence.md:6` | 0.168 / 0.168 | 0.224 / 0.241 |
+| `.omp/rules/kit-jsonl-close.md:4` | 0.569 / 0.709 | 1.710 / 1.487 |
+| `.omp/rules/kit-no-verify.md:13` | 0.961 / 1.043 | 1.527 / 1.502 |
+| `.omp/rules/kit-no-verify.md:14` | 0.674 / 0.690 | 1.250 / 1.224 |
+| `.omp/rules/kit-no-verify.md:15` | 0.947 / 0.943 | 1.745 / 1.307 |
+| `.omp/rules/kit-no-verify.md:16` | 0.979 / 0.507 | 1.422 / 1.300 |
+| `.omp/rules/kit-no-verify.md:17` | 0.558 / 0.301 | 0.943 / 1.552 |
+| `.omp/rules/kit-no-verify.md:18` | 0.741 / 0.637 | 1.409 / 1.350 |
+| `.omp/rules/kit-no-verify.md:19` | 0.537 / 0.460 | 1.025 / 1.029 |
+| `.omp/rules/scorer-reimplementation.md:2` | 0.254 / 0.118 | 0.386 / 0.389 |
+| `.omp/hooks/post/jev-web-search-rerank.ts:115` | 0.138 / 0.130 | 0.270 / 0.245 |
+
+The run-2 host load averages were 35.50 / 36.69 / 35.96 on 32 cores; the run-1 load was not captured. Both commands ran at nice 10. These synthetic results are below the 1 s limit but do not establish that every possible input is safe.
+
+Static `regexploit-js` analysis of the TypeScript hook is `UNVERIFIED`: its installed parser rejected the existing type-only import at line 7. The dynamic Node/V8 timings above are the measured evidence; this limitation is not a safe verdict.

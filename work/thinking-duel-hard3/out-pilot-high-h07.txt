@@ -1,0 +1,7 @@
+Working...
+Done: `subset.py` reimplemented with inline LCG partial Fisher-Yates, no `random` import.
+
+- `state = seed`; per `i` in `n-1 … n-k`: `state = (1103515245*state+12345) % 2**31`, `j = state % (i+1)`, swap `a[i],a[j]`, collect `a[i]`.
+- Validates `0 <= k <= n`, `n >= 0`.
+
+Check: same-process repeat equal; cross-process equal (`[7, 8, 1, 9]` for `n=10,k=4,seed=42`); independent LCG trace matches; `k=0`/`k=n`/`n=0` edges ok; `random` string absent from file.

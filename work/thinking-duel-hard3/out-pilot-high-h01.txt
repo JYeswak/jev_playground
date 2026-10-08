@@ -1,0 +1,4 @@
+Working...
+Fixed `rotsearch.py`: returned last match, now returns first (`return i` on first `v == x`, else `-1`).
+
+Verified in-place: 10 targeted cases (empty/single/all-duplicate/rotated-dup) + exhaustive check (lengths 0–6 over `{0,1,2}`, all rotations, queries 0–3; 24,064 cases) + 5,000 randomized rotated arrays vs `list.index` oracle — all pass.

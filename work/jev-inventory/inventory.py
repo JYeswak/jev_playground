@@ -206,7 +206,11 @@ def live_state(surface: dict, ctx: dict) -> str:
             # mis-reports live-on. When enabled it fires on every web_search
             # (fleet volume guarantees rows within minutes); 3h silence = off.
             # Rows re-appear the moment anyone enables it, failing conformance.
-            return "on" if sum(log_statuses("websearch-rerank.jsonl", 3).values()) else "off"
+            return (
+                "on"
+                if sum(log_statuses("websearch-rerank.jsonl", 3).values())
+                else "off"
+            )
         return "on" if (ROOT / surface["file"]).exists() else "off"
     if kind == "extension":
         return "on" if surface["extension"] in ctx["extensions"] else "off"

@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<!-- version 1 -->
+<title>battle-gen9ouclock-855</title>
+<style>
+    html,
+    body {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        padding: 12px 0;
+    }
+
+    .battle-log {
+        font-family: Verdana, sans-serif;
+        font-size: 10pt;
+    }
+
+    .battle-log-inline {
+        border: 1px solid #AAAAAA;
+        background: #EEF2F5;
+        color: black;
+        max-width: 640px;
+        margin: 0 auto 80px;
+        padding-bottom: 5px;
+    }
+
+    .battle-log .inner {
+        padding: 4px 8px 0px 8px;
+    }
+
+    .battle-log .inner-preempt {
+        padding: 0 8px 4px 8px;
+    }
+
+    .battle-log .inner-after {
+        margin-top: 0.5em;
+    }
+
+    .battle-log h2 {
+        margin: 0.5em -8px;
+        padding: 4px 8px;
+        border: 1px solid #AAAAAA;
+        background: #E0E7EA;
+        border-left: 0;
+        border-right: 0;
+        font-family: Verdana, sans-serif;
+        font-size: 13pt;
+    }
+
+    .backprop {
+        top: 0;
+    }
+
+    .battle-log .chat {
+        vertical-align: middle;
+        padding: 3px 0 3px 0;
+        font-size: 8pt;
+    }
+
+    .battle-log .chat strong {
+        color: #40576A;
+    }
+
+    .battle-log .chat em {
+        padding: 1px 4px 1px 3px;
+        color: #000000;
+        font-style: normal;
+    }
+
+    .chat.mine {
+        background: rgba(0, 0, 0, 0.05);
+        margin-left: -8px;
+        margin-right: -8px;
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .spoiler {
+        color: #BBBBBB;
+        background: #BBBBBB;
+        padding: 0px 3px;
+    }
+
+    .spoiler:hover,
+    .spoiler:active,
+    .spoiler-shown {
+        color: #000000;
+        background: #E2E2E2;
+        padding: 0px 3px;
+    }
+
+    .spoiler a {
+        color: #BBBBBB;
+    }
+
+    .spoiler:hover a,
+    .spoiler:active a,
+    .spoiler-shown a {
+        color: #2288CC;
+    }
+
+    .chat code,
+    .chat .spoiler:hover code,
+    .chat .spoiler:active code,
+    .chat .spoiler-shown code {
+        border: 1px solid #C0C0C0;
+        background: #EEEEEE;
+        color: black;
+        padding: 0 2px;
+    }
+
+    .chat .spoiler code {
+        border: 1px solid #CCCCCC;
+        background: #CCCCCC;
+        color: #CCCCCC;
+    }
+
+    .battle-log .rated {
+        padding: 3px 4px;
+    }
+
+    .battle-log .rated strong {
+        color: white;
+        background: #89A;
+        padding: 1px 4px;
+        border-radius: 4px;
+    }
+
+    .spacer {
+        margin-top: 0.5em;
+    }
+
+    .message-announce {
+        background: #6688AA;
+        color: white;
+        padding: 1px 4px 2px;
+    }
+
+    .message-announce a,
+    .broadcast-green a,
+    .broadcast-blue a,
+    .broadcast-red a {
+        color: #DDEEFF;
+    }
+
+    .broadcast-green {
+        background-color: #559955;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .broadcast-blue {
+        background-color: #6688AA;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .infobox {
+        border: 1px solid #6688AA;
+        padding: 2px 4px;
+    }
+
+    .infobox-limited {
+        max-height: 200px;
+        overflow: auto;
+        overflow-x: hidden;
+    }
+
+    .broadcast-red {
+        background-color: #AA5544;
+        color: white;
+        padding: 2px 4px;
+    }
+
+    .message-learn-canlearn {
+        font-weight: bold;
+        color: #228822;
+        text-decoration: underline;
+    }
+
+    .message-learn-cannotlearn {
+        font-weight: bold;
+        color: #CC2222;
+        text-decoration: underline;
+    }
+
+    .message-effect-weak {
+        font-weight: bold;
+        color: #CC2222;
+    }
+
+    .message-effect-resist {
+        font-weight: bold;
+        color: #6688AA;
+    }
+
+    .message-effect-immune {
+        font-weight: bold;
+        color: #666666;
+    }
+
+    .message-learn-list {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+
+    .message-throttle-notice,
+    .message-error {
+        color: #992222;
+    }
+
+    .message-overflow,
+    .chat small.message-overflow {
+        font-size: 0pt;
+    }
+
+    .message-overflow::before {
+        font-size: 9pt;
+        content: '...';
+    }
+
+    .subtle {
+        color: #3A4A66;
+    }
+</style>
+<div class="wrapper replay-wrapper" style="max-width:1180px;margin:0 auto">
+    <input type="hidden" name="replayid" value="unregisteredserver-gen8randombattle-320064" />
+    <div class="battle"></div>
+    <div class="battle-log"></div>
+    <div class="replay-controls"></div>
+    <div class="replay-controls-2"></div>
+    <h1 style="font-weight:normal;text-align:center"><strong>poke-env battle replay</strong><br />battle-gen9ouclock-855<br /><a
+            href="http://pokemonshowdown.com/users/randomplayer1" class="subtle" target="_blank">pokejevaby6</a>
+        vs. <a href="http://pokemonshowdown.com/users/randomplayer2" class="subtle"
+            target="_blank">abyssalbot6</a></h1>
+    <script type="text/plain" class="battle-log-data">
+    >battle-gen9ouclock-855|init|battle
+|title|pokejevaby6 vs. abyssalbot6
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up.
+|J|☆abyssalbot6
+|gametype|singles
+|player|p1|pokejevaby6|pokekid|
+|player|p2|abyssalbot6|swimmerf-gen4dp|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|Gen 9 OU Clock
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Endless Battle Clause: Forcing endless battles is banned
+|rule|Species Clause: Limit one of each Pokémon
+|rule|OHKO Clause: OHKO moves are banned
+|rule|Evasion Items Clause: Evasion items are banned
+|rule|Evasion Moves Clause: Evasion moves are banned
+|rule|Evasion Abilities Clause: Evasion abilities are banned
+|rule|Sleep Moves Clause: Sleep-inducing moves are banned
+|clearpoke
+|poke|p1|Blissey, F|
+|poke|p1|Ditto|
+|poke|p1|Dondozo, F|
+|poke|p1|Toxapex, F|
+|poke|p1|Alomomola, F|
+|poke|p1|Ting-Lu|
+|poke|p2|Ting-Lu|
+|poke|p2|Dragapult, M|
+|poke|p2|Slowking-Galar, F|
+|poke|p2|Kingambit, F|
+|poke|p2|Gliscor, M|
+|poke|p2|Zamazenta-*|
+|teampreview
+|inactive|Time left: 15 sec this turn | 150 sec total | 1 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|start
+|switch|p1a: Blissey|Blissey, F|652/652
+|switch|p2a: Kingambit|Kingambit, F|100/100
+|turn|1
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Dondozo|Dondozo, F|503/503
+|move|p2a: Kingambit|Swords Dance|p2a: Kingambit
+|-boost|p2a: Kingambit|atk|2
+|upkeep
+|turn|2
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Kingambit|Swords Dance|p2a: Kingambit
+|-boost|p2a: Kingambit|atk|2
+|move|p1a: Dondozo|Body Press|p2a: Kingambit
+|-supereffective|p2a: Kingambit
+|-damage|p2a: Kingambit|20/100
+|-heal|p2a: Kingambit|26/100|[from] item: Leftovers
+|upkeep
+|turn|3
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Kingambit|Kowtow Cleave|p1a: Dondozo
+|-damage|p1a: Dondozo|392/503
+|move|p1a: Dondozo|Body Press|p2a: Kingambit
+|-supereffective|p2a: Kingambit
+|-damage|p2a: Kingambit|0 fnt
+|faint|p2a: Kingambit
+|-end|p2a: Kingambit|fallenundefined|[silent]
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Dragapult|Dragapult, M|100/100
+|turn|4
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|514/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Dragapult|Draco Meteor|p1a: Ting-Lu|[miss]
+|-miss|p2a: Dragapult|p1a: Ting-Lu
+|upkeep
+|turn|5
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Dragapult|Draco Meteor|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|399/514
+|-unboost|p2a: Dragapult|spa|2
+|move|p1a: Ting-Lu|Earthquake|p2a: Dragapult
+|-damage|p2a: Dragapult|45/100
+|upkeep
+|turn|6
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Dragapult|U-turn|p1a: Ting-Lu
+|-supereffective|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|307/514
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Zamazenta|Zamazenta|100/100|[from] U-turn
+|-ability|p2a: Zamazenta|Dauntless Shield|boost
+|-boost|p2a: Zamazenta|def|1
+|move|p1a: Ting-Lu|Earthquake|p2a: Zamazenta
+|-damage|p2a: Zamazenta|79/100
+|upkeep
+|turn|7
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Zamazenta|Close Combat|p1a: Toxapex
+|-resisted|p1a: Toxapex
+|-damage|p1a: Toxapex|252/303
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|upkeep
+|turn|8
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Dondozo|Dondozo, F|392/503
+|move|p2a: Zamazenta|Close Combat|p1a: Dondozo
+|-damage|p1a: Dondozo|260/503
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|upkeep
+|turn|9
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Zamazenta|Close Combat|p1a: Toxapex
+|-resisted|p1a: Toxapex
+|-damage|p1a: Toxapex|249/303
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|upkeep
+|turn|10
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Slowking|Slowking-Galar, F|100/100
+|move|p1a: Toxapex|Recover|p1a: Toxapex
+|-heal|p1a: Toxapex|303/303
+|upkeep
+|turn|11
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Ting-Lu|Ting-Lu|307/514
+|-ability|p1a: Ting-Lu|Vessel of Ruin
+|move|p2a: Slowking|Future Sight|p1a: Ting-Lu
+|-start|p2a: Slowking|move: Future Sight
+|upkeep
+|turn|12
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Earthquake|p2a: Slowking
+|-supereffective|p2a: Slowking
+|-damage|p2a: Slowking|28/100
+|move|p2a: Slowking|Flamethrower|p1a: Ting-Lu
+|-damage|p1a: Ting-Lu|262/514
+|upkeep
+|turn|13
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Ting-Lu|Earthquake|p2a: Slowking
+|-supereffective|p2a: Slowking
+|-damage|p2a: Slowking|0 fnt
+|faint|p2a: Slowking
+|-end|p1a: Ting-Lu|move: Future Sight
+|-immune|p1a: Ting-Lu
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Zamazenta|Zamazenta|79/100
+|turn|14
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Zamazenta|Close Combat|p1a: Toxapex
+|-resisted|p1a: Toxapex
+|-damage|p1a: Toxapex|246/303
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|upkeep
+|turn|15
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Close Combat|p1a: Toxapex
+|-resisted|p1a: Toxapex
+|-damage|p1a: Toxapex|193/303
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|move|p1a: Toxapex|Recover|p1a: Toxapex
+|-heal|p1a: Toxapex|303/303
+|upkeep
+|turn|16
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Close Combat|p1a: Toxapex
+|-resisted|p1a: Toxapex
+|-damage|p1a: Toxapex|252/303
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|move|p1a: Toxapex|Toxic|p2a: Zamazenta
+|-status|p2a: Zamazenta|tox
+|-damage|p2a: Zamazenta|73/100 tox|[from] psn
+|upkeep
+|turn|17
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Dragapult|Dragapult, M|45/100
+|move|p1a: Toxapex|Recover|p1a: Toxapex
+|-heal|p1a: Toxapex|303/303
+|upkeep
+|turn|18
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Dragapult|Draco Meteor|p1a: Toxapex
+|-damage|p1a: Toxapex|164/303
+|-unboost|p2a: Dragapult|spa|2
+|move|p1a: Toxapex|Toxic|p2a: Dragapult
+|-status|p2a: Dragapult|tox
+|-damage|p2a: Dragapult|39/100 tox|[from] psn
+|upkeep
+|turn|19
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Dondozo|Dondozo, F|260/503
+|move|p2a: Dragapult|Draco Meteor|p1a: Dondozo
+|-damage|p1a: Dondozo|0 fnt
+|-unboost|p2a: Dragapult|spa|2
+|faint|p1a: Dondozo
+|-damage|p2a: Dragapult|27/100 tox|[from] psn
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|265/303
+|turn|20
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|100/100
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|move|p1a: Toxapex|Toxic|p2a: Ting-Lu
+|-status|p2a: Ting-Lu|tox
+|-damage|p2a: Ting-Lu|94/100 tox|[from] psn
+|upkeep
+|turn|21
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|534/534
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|428/534
+|-heal|p2a: Ting-Lu|100/100 tox|[from] item: Leftovers
+|-damage|p2a: Ting-Lu|88/100 tox|[from] psn
+|upkeep
+|turn|22
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|79/100 tox
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|361/534
+|-heal|p2a: Ting-Lu|86/100 tox|[from] item: Leftovers
+|-damage|p2a: Ting-Lu|67/100 tox|[from] psn
+|upkeep
+|turn|23
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|59/100 tox
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|306/534
+|-heal|p2a: Ting-Lu|65/100 tox|[from] item: Leftovers
+|-damage|p2a: Ting-Lu|40/100 tox|[from] psn
+|upkeep
+|turn|24
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Alomomola|Chilling Water|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-crit|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|27/100 tox
+|-unboost|p2a: Ting-Lu|atk|1
+|move|p2a: Ting-Lu|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|261/534
+|-heal|p2a: Ting-Lu|34/100 tox|[from] item: Leftovers
+|-damage|p2a: Ting-Lu|2/100 tox|[from] psn
+|upkeep
+|turn|25
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Dragapult|Dragapult, M|27/100 tox
+|move|p1a: Alomomola|Chilling Water|p2a: Dragapult
+|-resisted|p2a: Dragapult
+|-damage|p2a: Dragapult|21/100 tox
+|-unboost|p2a: Dragapult|atk|1
+|-damage|p2a: Dragapult|15/100 tox|[from] psn
+|upkeep
+|turn|26
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Dragapult|Draco Meteor|p1a: Toxapex
+|-damage|p1a: Toxapex|159/303
+|-unboost|p2a: Dragapult|spa|2
+|-damage|p2a: Dragapult|3/100 tox|[from] psn
+|upkeep
+|turn|27
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Ditto|Ditto|299/299
+|-transform|p1a: Ditto|p2a: Dragapult|[from] ability: Imposter
+|-item|p1a: Ditto|Air Balloon
+|move|p2a: Dragapult|Draco Meteor|p1a: Ditto
+|-supereffective|p1a: Ditto
+|-damage|p1a: Ditto|45/299
+|-unboost|p2a: Dragapult|spa|2
+|-enditem|p1a: Ditto|Air Balloon
+|-damage|p2a: Dragapult|0 fnt|[from] psn
+|faint|p2a: Dragapult
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Ting-Lu|Ting-Lu|2/100 tox
+|-ability|p2a: Ting-Lu|Vessel of Ruin
+|turn|28
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p1a: Ditto|U-turn|p2a: Ting-Lu
+|-supereffective|p2a: Ting-Lu
+|-damage|p2a: Ting-Lu|0 fnt
+|faint|p2a: Ting-Lu
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|439/534|[from] U-turn
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Zamazenta|Zamazenta|73/100 tox
+|turn|29
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|260/303
+|move|p2a: Zamazenta|Close Combat|p1a: Toxapex
+|-resisted|p1a: Toxapex
+|-damage|p1a: Toxapex|204/303
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|-damage|p2a: Zamazenta|67/100 tox|[from] psn
+|upkeep
+|turn|30
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Ditto|Ditto|45/299
+|-transform|p1a: Ditto|p2a: Zamazenta|[from] ability: Imposter
+|-ability|p1a: Ditto|Dauntless Shield|boost
+|-boost|p1a: Ditto|def|1
+|move|p2a: Zamazenta|Close Combat|p1a: Ditto
+|-damage|p1a: Ditto|0 fnt
+|-unboost|p2a: Zamazenta|def|1
+|-unboost|p2a: Zamazenta|spd|1
+|faint|p1a: Ditto
+|-damage|p2a: Zamazenta|55/100 tox|[from] psn
+|upkeep
+|inactive|Time left: 15 sec this turn | 150 sec total | 5 sec grace
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|turn|31
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Stone Edge|p1a: Toxapex
+|-crit|p1a: Toxapex
+|-damage|p1a: Toxapex|207/303
+|move|p1a: Toxapex|Recover|p1a: Toxapex
+|-heal|p1a: Toxapex|303/303
+|-damage|p2a: Zamazenta|37/100 tox|[from] psn
+|upkeep
+|turn|32
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|534/534
+|move|p2a: Zamazenta|Stone Edge|p1a: Alomomola|[miss]
+|-miss|p2a: Zamazenta|p1a: Alomomola
+|-damage|p2a: Zamazenta|12/100 tox|[from] psn
+|upkeep
+|turn|33
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Zamazenta|Stone Edge|p1a: Alomomola
+|-damage|p1a: Alomomola|443/534
+|move|p1a: Alomomola|Whirlpool|p2a: Zamazenta
+|-damage|p2a: Zamazenta|3/100 tox
+|-activate|p2a: Zamazenta|move: Whirlpool|[of] p1a: Alomomola
+|-damage|p2a: Zamazenta|0 fnt|[from] psn
+|faint|p2a: Zamazenta
+|upkeep
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p2a: Gliscor|Gliscor, M|100/100
+|turn|34
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Gliscor|Earthquake|p1a: Toxapex
+|-supereffective|p1a: Toxapex
+|-damage|p1a: Toxapex|183/303
+|-status|p2a: Gliscor|tox|[from] item: Toxic Orb
+|upkeep
+|turn|35
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|534/534
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|upkeep
+|turn|36
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|348/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-crit|p2a: Gliscor
+|-damage|p2a: Gliscor|76/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|89/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|37
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|212/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|73/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|86/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|38
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|121/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|70/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|83/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|39
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|63/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|66/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|78/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|40
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|284/303
+|move|p2a: Gliscor|Earthquake|p1a: Toxapex
+|-supereffective|p1a: Toxapex
+|-damage|p1a: Toxapex|218/303
+|-heal|p2a: Gliscor|91/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|41
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|241/534
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|196/534
+|-heal|p2a: Gliscor|100/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|42
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|151/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-crit|p2a: Gliscor
+|-damage|p2a: Gliscor|77/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|89/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|43
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|115/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-crit|p2a: Gliscor
+|-damage|p2a: Gliscor|66/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|79/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|44
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|84/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|64/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|76/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|45
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|57/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|58/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|71/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|46
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|32/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|56/100 tox
+|-heal|p2a: Gliscor|68/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|47
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Gliscor|Earthquake|p1a: Toxapex
+|-supereffective|p1a: Toxapex
+|-damage|p1a: Toxapex|267/303
+|-heal|p2a: Gliscor|81/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|48
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|210/534
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|185/534
+|-heal|p2a: Gliscor|93/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|49
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Earthquake|p1a: Alomomola
+|-damage|p1a: Alomomola|163/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|77/100 tox
+|-heal|p2a: Gliscor|90/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|50
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Blissey|Blissey, F|652/652
+|move|p2a: Gliscor|Earthquake|p1a: Blissey
+|-damage|p1a: Blissey|595/652
+|-heal|p2a: Gliscor|100/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|51
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|upkeep
+|turn|52
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|53
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|54
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|55
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|56
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|57
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|58
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|59
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|60
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|61
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|62
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|63
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|64
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|65
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|66
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|67
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|341/534
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|upkeep
+|turn|68
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|212/534
+|-enditem|p1a: Alomomola|Heavy-Duty Boots|[from] move: Knock Off|[of] p2a: Gliscor
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|83/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|96/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|69
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Gliscor|Knock Off|p1a: Toxapex
+|-damage|p1a: Toxapex|240/303
+|-enditem|p1a: Toxapex|Heavy-Duty Boots|[from] move: Knock Off|[of] p2a: Gliscor
+|-heal|p2a: Gliscor|100/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|70
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|71
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|390/534
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|upkeep
+|turn|72
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|305/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|85/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|97/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|73
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|248/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|81/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|94/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|74
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|203/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|78/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|90/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|75
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Gliscor|Knock Off|p1a: Toxapex
+|-damage|p1a: Toxapex|286/303
+|-heal|p2a: Gliscor|100/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|76
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|77
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|78
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|79
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|381/534
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|upkeep
+|turn|80
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|301/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|83/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|95/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|81
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|239/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|80/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|93/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|82
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|199/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|78/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|91/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|83
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Gliscor|Knock Off|p1a: Toxapex
+|-damage|p1a: Toxapex|286/303
+|-heal|p2a: Gliscor|100/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|84
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|85
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|86
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|87
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|88
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|89
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|90
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|91
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Swords Dance|p2a: Gliscor
+|-boost|p2a: Gliscor|atk|2
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|92
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Toxapex
+|-damage|p1a: Toxapex|261/303
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|93
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Toxapex
+|-damage|p1a: Toxapex|236/303
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|upkeep
+|turn|94
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|377/534
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|337/534
+|upkeep
+|turn|95
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|299/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|85/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|98/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|96
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|274/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|82/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|95/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|97
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|253/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|79/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|91/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|98
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|235/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|74/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|87/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|99
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|220/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|72/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|84/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|100
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-crit|p1a: Alomomola
+|-damage|p1a: Alomomola|156/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|69/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|81/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|101
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Gliscor|Knock Off|p1a: Toxapex
+|-damage|p1a: Toxapex|296/303
+|-heal|p2a: Gliscor|94/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|102
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Toxapex
+|-damage|p1a: Toxapex|289/303
+|move|p1a: Toxapex|Haze|p1a: Toxapex
+|-clearallboost
+|-heal|p2a: Gliscor|100/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|103
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|334/534
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|293/534
+|upkeep
+|turn|104
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|251/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-crit|p2a: Gliscor
+|-damage|p2a: Gliscor|77/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|89/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|105
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|224/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|72/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|85/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|106
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|201/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|69/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|81/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|107
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Gliscor|Knock Off|p1a: Toxapex
+|-damage|p1a: Toxapex|292/303
+|-heal|p2a: Gliscor|94/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|108
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|379/534
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|363/534
+|-heal|p2a: Gliscor|100/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|109
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|345/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|83/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|95/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|110
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|332/534
+|move|p1a: Alomomola|Chilling Water|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|78/100 tox
+|-unboost|p2a: Gliscor|atk|1
+|-heal|p2a: Gliscor|91/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|111
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|319/534
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|79/100 tox
+|-activate|p2a: Gliscor|move: Whirlpool|[of] p1a: Alomomola
+|-heal|p2a: Gliscor|91/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|79/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|112
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-crit|p1a: Alomomola
+|-damage|p1a: Alomomola|255/534
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|67/100 tox
+|-heal|p2a: Gliscor|79/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|67/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|113
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Knock Off|p1a: Alomomola
+|-damage|p1a: Alomomola|243/534
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|56/100 tox
+|-heal|p2a: Gliscor|69/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|56/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|114
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect|p2a: Gliscor
+|-singleturn|p2a: Gliscor|Protect
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-activate|p2a: Gliscor|move: Protect
+|-heal|p2a: Gliscor|69/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|56/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|115
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect||[still]
+|-fail|p2a: Gliscor
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|44/100 tox
+|-heal|p2a: Gliscor|57/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|44/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|116
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect|p2a: Gliscor
+|-singleturn|p2a: Gliscor|Protect
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-activate|p2a: Gliscor|move: Protect
+|-heal|p2a: Gliscor|57/100 tox|[from] ability: Poison Heal
+|-end|p2a: Gliscor|Whirlpool|[partiallytrapped]
+|upkeep
+|turn|117
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Toxapex|Toxapex, F|303/303
+|move|p2a: Gliscor|Protect||[still]
+|-fail|p2a: Gliscor
+|-heal|p2a: Gliscor|69/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|118
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|switch|p1a: Alomomola|Alomomola, F|421/534
+|move|p2a: Gliscor|Protect||[still]
+|-fail|p2a: Gliscor
+|-heal|p2a: Gliscor|82/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|119
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect|p2a: Gliscor
+|-singleturn|p2a: Gliscor|Protect
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-activate|p2a: Gliscor|move: Protect
+|-heal|p2a: Gliscor|94/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|120
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect||[still]
+|-fail|p2a: Gliscor
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|82/100 tox
+|-activate|p2a: Gliscor|move: Whirlpool|[of] p1a: Alomomola
+|-heal|p2a: Gliscor|95/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|82/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|121
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect|p2a: Gliscor
+|-singleturn|p2a: Gliscor|Protect
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-activate|p2a: Gliscor|move: Protect
+|-heal|p2a: Gliscor|95/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|82/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|122
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect||[still]
+|-fail|p2a: Gliscor
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|72/100 tox
+|-heal|p2a: Gliscor|84/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|72/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|123
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect|p2a: Gliscor
+|-singleturn|p2a: Gliscor|Protect
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-activate|p2a: Gliscor|move: Protect
+|-heal|p2a: Gliscor|84/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|72/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|124
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect||[still]
+|-fail|p2a: Gliscor
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|61/100 tox
+|-heal|p2a: Gliscor|74/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|61/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|125
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect|p2a: Gliscor
+|-singleturn|p2a: Gliscor|Protect
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-activate|p2a: Gliscor|move: Protect
+|-heal|p2a: Gliscor|74/100 tox|[from] ability: Poison Heal
+|-end|p2a: Gliscor|Whirlpool|[partiallytrapped]
+|upkeep
+|turn|126
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect||[still]
+|-fail|p2a: Gliscor
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor|[miss]
+|-miss|p1a: Alomomola|p2a: Gliscor
+|-heal|p2a: Gliscor|86/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|127
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect|p2a: Gliscor
+|-singleturn|p2a: Gliscor|Protect
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-activate|p2a: Gliscor|move: Protect
+|-heal|p2a: Gliscor|99/100 tox|[from] ability: Poison Heal
+|upkeep
+|turn|128
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect||[still]
+|-fail|p2a: Gliscor
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-crit|p2a: Gliscor
+|-damage|p2a: Gliscor|82/100 tox
+|-activate|p2a: Gliscor|move: Whirlpool|[of] p1a: Alomomola
+|-heal|p2a: Gliscor|94/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|82/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|129
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|move|p2a: Gliscor|Protect|p2a: Gliscor
+|-singleturn|p2a: Gliscor|Protect
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-activate|p2a: Gliscor|move: Protect
+|-heal|p2a: Gliscor|94/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|82/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|130
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-activate|p2a: Gliscor|move: Struggle
+|move|p2a: Gliscor|Struggle|p1a: Alomomola
+|-damage|p1a: Alomomola|412/534
+|-damage|p2a: Gliscor|57/100 tox|[from] recoil
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|45/100 tox
+|-heal|p2a: Gliscor|57/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|45/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|131
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-activate|p2a: Gliscor|move: Struggle
+|move|p2a: Gliscor|Struggle|p1a: Alomomola
+|-damage|p1a: Alomomola|403/534
+|-damage|p2a: Gliscor|20/100 tox|[from] recoil
+|move|p1a: Alomomola|Whirlpool|p2a: Gliscor
+|-supereffective|p2a: Gliscor
+|-damage|p2a: Gliscor|8/100 tox
+|-heal|p2a: Gliscor|20/100 tox|[from] ability: Poison Heal
+|-damage|p2a: Gliscor|8/100 tox|[from] move: Whirlpool|[partiallytrapped]
+|upkeep
+|turn|132
+|inactive|Time left: 15 sec this turn | 150 sec total
+|inactive|pokejevaby6 has 15 seconds left this turn.
+|inactive|abyssalbot6 has 15 seconds left this turn.
+|-activate|p2a: Gliscor|move: Struggle
+|move|p2a: Gliscor|Struggle|p1a: Alomomola
+|-damage|p1a: Alomomola|393/534
+|-damage|p2a: Gliscor|0 fnt|[from] recoil
+|faint|p2a: Gliscor
+    </script>
+</div>
+
+<div class="battle-log battle-log-inline" style="display:none"></div>
+
+<script>
+    let daily = Math.floor(Date.now() / 1000 / 60 / 60 / 24); document.write('<script src="https://play.pokemonshowdown.com/js/replay-embed.js?version' + daily + '"></' + 'script>');
+</script>
+
+<p style="text-align:center"> Replay created by <a href="https://github.com/hsahovic/poke-env">poke-env</a>, with code from <a
+        href="https://github.com/smogon/pokemon-showdown"> pokemon-showdown</a>. If something goes wrong, don't hesitate
+    to open an <a href="https://github.com/hsahovic/poke-env/issues">issue!</a></p>

@@ -1,0 +1,6 @@
+Working...
+Fixed `semver.py`, all 18 checks pass (both argument orders):
+
+- **Problem:** `_upper("^")` returned `(0, m+1, 0)` for all `^0.x`, so `^0.0.3` gave `<0.1.0` instead of `<0.0.4`; exact `_range` returned `(v, v)` which is always empty under `lo >= hi`.
+- **Decision:** split caret into `M>0 → (M+1,0,0)`, `m>0 → (0,m+1,0)`, else `(0,0,p+1)`; exact maps to `((M,m,p),(M,m,p+1))`. Comparisons already tuple-based (`max`/`min` on int tuples), so `1.10.0 > 1.9.0` is correct.
+- **Check:** verified `^0.0.3∩* = ((0,0,3),(0,0,4))`, `^0.0.3∩^0.0.4 = None`, `1.2.3∩^1.0.0 = ((1,2,3),(1,2,4))`, `^1.2.3∩<1.2.3 = None`, `>=1.2.3∩<2.0.0`, `*∩*`, boundary `<1.2.3∩>=1.2.3 = None`.

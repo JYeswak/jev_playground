@@ -1,0 +1,4 @@
+Working...
+Fixed `wrap.py`: display-width via `unicodedata` (W/F=2, combining=0, else 1), greedy space-break, long non-wide words unbroken, all-wide words chunked at `width//2` chars.
+
+Verified: `hello 日本語 world`@10 → per-line widths ≤10; `日本語日本語`@6 → `['日本語','日本語']`; `supercalifragilistic`@6 unbroken; `café naïve test`@8 correct; combining `café` width 4 (len 5) wraps correctly; `ab日本 cd`@6 splits wide-aware; mixed `ab日本語cd`@4 unbroken.

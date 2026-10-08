@@ -1,0 +1,4 @@
+Working...
+Fixed `sjoin.py`: `abspath` base, `lstrip("/")` parts, `normpath(join(...))` before check, directory-aware `== base` or `startswith(base + sep)` (root special-cased).
+
+Verified: `a/../b`, `./a`, `a//b` normalize inside; `../etc/passwd`, `a/../../..`, `/../../etc/shadow`, `/../etc` raise; `../x-evil`, `..//x-evil/a` raise (prefix-confusion); `/etc/passwd` → `/tmp/x/etc/passwd`; `a/..` → base allowed.

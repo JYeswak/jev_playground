@@ -1,0 +1,4 @@
+Working...
+Fixed `runbox.py`: `start_new_session=True` + `os.killpg(SIGKILL)` on `TimeoutExpired`, then re-`communicate()` for partial output, return `124`. `communicate()` retained so large stderr/stdout can't deadlock.
+
+Check: `echo hi`→`(0,'hi\n','')`; sleep-print→`(124,'hello\n','')` in 0.52s; 500KB one-sided and 300KB+300KB both exact; `bash -c "sleep 30 & sleep 30; wait"`→`124` in 0.52s, `pgrep -af "sleep 30"` empty.

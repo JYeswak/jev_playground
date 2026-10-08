@@ -1,0 +1,4 @@
+Working...
+Fixed 0-based → 1-based: `ranks.add(i)` → `ranks.add(i + 1)` in `touches.py:7`.
+
+Check: `touched_ranks('a/b',['b','a/b','a'])` was `[0,1,2]`, now `[1,2,3]`. Verified empty hits/value → `[]`, empty hit skipped, duplicates yield unique sorted ranks, substring/suffix/exact all touch.

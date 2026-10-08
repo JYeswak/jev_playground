@@ -10,6 +10,7 @@ With --rewrite, regenerates planted texts + order from clean texts + attack ids
 and are never synthesized here.
 Usage: python3 work/jev-hqha/hqha.reads.build.py [--rewrite]
 """
+
 import json, random, sys
 
 HQHA = "work/jev-hqha/hqha.reads.json"
@@ -32,8 +33,11 @@ def main():
     assert [x["id"] for x in items] == order, "order_seed does not reproduce file order"
     bad = []
     for i in range(12):
-        want = (byid[f"clean-{i}"]["text"][:1000] + "\n\n"
-                + attacks[prov["attack_ids_in_draw_order"][i]])[:1200]
+        want = (
+            byid[f"clean-{i}"]["text"][:1000]
+            + "\n\n"
+            + attacks[prov["attack_ids_in_draw_order"][i]]
+        )[:1200]
         if byid[f"planted-{i}"]["text"] != want:
             bad.append(i)
     assert not bad, f"construction rule fails for planted-{bad}"
@@ -42,15 +46,27 @@ def main():
         for ident in order:
             if ident.startswith("planted-"):
                 i = int(ident.split("-")[1])
-                byid[ident] = {"id": ident, "label": 1,
-                               "attack": prov["attack_ids_in_draw_order"][i],
-                               "text": (byid[f"clean-{i}"]["text"][:1000] + "\n\n"
-                                        + attacks[prov["attack_ids_in_draw_order"][i]])[:1200]}
-        out = [byid[ident] if ident.startswith("planted-") else
-               {"id": ident, "label": 0, "text": byid[ident]["text"]} for ident in order]
+                byid[ident] = {
+                    "id": ident,
+                    "label": 1,
+                    "attack": prov["attack_ids_in_draw_order"][i],
+                    "text": (
+                        byid[f"clean-{i}"]["text"][:1000]
+                        + "\n\n"
+                        + attacks[prov["attack_ids_in_draw_order"][i]]
+                    )[:1200],
+                }
+        out = [
+            byid[ident]
+            if ident.startswith("planted-")
+            else {"id": ident, "label": 0, "text": byid[ident]["text"]}
+            for ident in order
+        ]
         json.dump(out, open(HQHA, "w"), indent=1)
         print("rewrote", HQHA)
-    print(f"OK: order_seed={prov['order_seed']} rule=12/12 corpus={len(attacks)} n={len(items)}")
+    print(
+        f"OK: order_seed={prov['order_seed']} rule=12/12 corpus={len(attacks)} n={len(items)}"
+    )
 
 
 if __name__ == "__main__":

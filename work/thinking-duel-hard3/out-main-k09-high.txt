@@ -1,0 +1,4 @@
+Working...
+Fixed `patcher.py`: real hunk parser (headers ignored, `@@` positions on ORIGINAL + offset accumulator), context/removal validation → `ValueError`.
+
+Verified (stdlib only, inline run): single replace, multi-hunk offset shift, consecutive-removal validation + mismatch `ValueError`, insert-at-0, append, delete, out-of-range/count-mismatch/overlap `ValueError`, empty-original insert — all pass.

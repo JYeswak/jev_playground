@@ -1,0 +1,4 @@
+Working...
+Fixed `topo.py`: Kahn's with min-heap (lexicographically smallest), deduped edges, implicit dep-nodes included; DFS cycle extraction over residual subgraph (`first` repeated at end).
+
+Check: empty, insertion-order trap `{'c':[], 'b':['c'], 'a':[]}` → `['a','c','b']`, implicit/dup deps, brute-force smallest via `itertools.permutations` on 6 graphs, cycles incl. self-loop and old-code-missed `a→b→c→b` — ALL PASS.

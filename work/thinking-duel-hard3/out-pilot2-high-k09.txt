@@ -1,0 +1,4 @@
+Working...
+Fixed `patcher.py`: parses `@@ -a,b +c,d @@` (defaults `,1`), ignores `---/+++` + `\ No newline`, validates ` `/`-` against current lines (`ValueError` on mismatch/OOR/overlap/count), positions from ORIGINAL via `offset` (`b==0` → `a+offset`, else `(a-1)+offset`).
+
+Verified: replace, 2-hunk offset add, delete-shift, mismatch/removal-mismatch/OOR/count-mismatch raise, empty diff, `+B` insert after line 1 vs `-0,0` prepend, omitted counts, func context, no-newline marker, empty original.

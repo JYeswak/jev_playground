@@ -1,0 +1,4 @@
+Working...
+Replaced `random.Random(seed).shuffle` with inline LCG Fisher-Yates (`state=(1103515245*state+12345)%2**31`, `j=state%(i+1)`, `i` from `n-1` to `1`).
+
+Check: no `random` import, repeated `order(10,42)` identical, `order(52,7)` is a valid permutation, `n=0/1` edge cases pass.

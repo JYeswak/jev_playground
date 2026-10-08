@@ -223,7 +223,40 @@ def fmt_value(value: float | None) -> str:
     return "—" if value is None else f"{value:.4f}"
 
 
-def markdown(rows: list[dict]) -> str:
+def harness_failures(decisions_path: Path, results_path: Path) -> list[dict]:
+    decisions = load_jsonl(decisions_path)
+    results = load_jsonl(results_path)
+    lost = {result["battle"] for result in results if result.get("won") is False}
+    buckets: dict[str, dict[str, object]] = {}
+    for decision in decisions:
+        failure = decision.get("fallback") or ""
+        if not failure:
+            continue
+        if "Unknown move: nothing" in failure:
+            label = "ValueError: Unknown move: nothing"
+        elif "TypeSafeAPIError" in failure and "402" in failure:
+            label = "TypeSafe 402 credit fallback"
+        elif "TimeoutError" in failure:
+            label = "TimeoutError fallback"
+        else:
+            label = "Other fallback"
+        bucket = buckets.setdefault(label, {"decisions": 0, "battles": set()})
+        bucket["decisions"] = int(bucket["decisions"]) + 1
+        cast_battles = bucket["battles"]
+        assert isinstance(cast_battles, set)
+        cast_battles.add(decision["battle"])
+    return [
+        {
+            "class": label,
+            "decisions": int(bucket["decisions"]),
+            "battles": len(bucket["battles"]),
+            "losses": sum(battle in lost for battle in bucket["battles"]),
+        }
+        for label, bucket in sorted(buckets.items())
+    ]
+
+
+def markdown(rows: list[dict], failures: list[dict]) -> str:
     classes = Counter(row["classification"] for row in rows)
     causes = Counter(row["cause"] for row in rows)
     active_rows = [
@@ -261,6 +294,17 @@ def markdown(rows: list[dict]) -> str:
         if label.startswith("excluded:")
     ):
         lines.append(f"| {label.removeprefix('excluded: ')} | {count} |")
+    lines += [
+        "",
+        "### Harness failure classes (all decisions)",
+        "",
+        "| Harness class | Fallback decisions | Battles | Losses |",
+        "|---|---:|---:|---:|",
+    ]
+    for failure in failures:
+        lines.append(
+            "| {class} | {decisions} | {battles} | {losses} |".format(**failure)
+        )
     lines += [
         "",
         "### Faint-cause counts",
@@ -305,14 +349,14 @@ def main() -> int:
         "--json", action="store_true", help="emit machine-readable rows"
     )
     args = parser.parse_args()
-    rows = analyse(
-        STAGE / f"decisions-{args.arm}.jsonl",
-        STAGE / f"results-{args.arm}.jsonl",
-    )
+    decision_path = STAGE / f"decisions-{args.arm}.jsonl"
+    result_path = STAGE / f"results-{args.arm}.jsonl"
+    rows = analyse(decision_path, result_path)
+    failures = harness_failures(decision_path, result_path)
     if args.json:
         print(json.dumps(rows, indent=2, sort_keys=True))
     else:
-        print(markdown(rows), end="")
+        print(markdown(rows, failures), end="")
     return 0
 
 

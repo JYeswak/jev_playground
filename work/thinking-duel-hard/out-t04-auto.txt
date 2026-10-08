@@ -1,0 +1,6 @@
+Working...
+Fixed `wilson.py:5` — margin was missing `/ denom`.
+
+Problem: `margin` omitted Wilson denominator division.
+Decision: appended `/ denom`; now `center ± z·sqrt(p(1−p)/n + z²/4n²)/denom`.
+Check: 15 cases (edges 0/n, n/n, z=1.0/1.645/2.576) vs independent form — worst diff 1.1e-16, within 1e-9; no imports, stdlib-only.

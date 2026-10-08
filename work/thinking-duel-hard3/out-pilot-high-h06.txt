@@ -1,0 +1,4 @@
+Working...
+Fixed `touches.py`: empty value/hit skips, glob branch via `fnmatchcase(value, hit)` or `fnmatchcase(value, '*/'+hit)` when `*`/`?`/`[` present, 1-based sorted unique ranks.
+
+Verified in `$PWD`: exact/suffix/substring, `*.py`/`a?`/`a[0-9]` matches + `*/` prefix, empty/no-hit negatives, duplicate-hit dedup `[2,3]` — ALL PASS.

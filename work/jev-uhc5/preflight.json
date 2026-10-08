@@ -1,7 +1,7 @@
 {
   "schema": "jev-uhc5-preflight/v2",
   "model": "jev-1.13.0",
-  "createdAt": "2026-10-01T09:28:48.700Z",
+  "createdAt": "2026-10-01T09:41:07.015Z",
   "endpoint": "http://127.0.0.1:11434/v1/systemone",
   "maxBodyBytes": 65536,
   "maxQuestions": 64,

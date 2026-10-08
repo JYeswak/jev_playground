@@ -1,0 +1,4 @@
+Failed to load extension ~/Developer/jev/.omp/extensions/jev-memory-filter.ts: Failed to load extension: logPath is not defined
+Working...
+Strip emdashes, `not X it's Y` pivots, `Here's why` lead-ins, and AI clusters like seamless/pivotal/delve; use is/has plainly. Cut significance commentary like `marks a pivotal moment` and trailing -ing clauses. Collapse filler to one sentence per claim and turn bold-label bullets into plain prose. Restore what slop displaced: names, dates, numbers, what changed and for whom. Read it aloud line by line until it sounds like an engineer explaining, not ad copy.
+

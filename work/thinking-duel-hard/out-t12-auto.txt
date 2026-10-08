@@ -1,0 +1,4 @@
+Working...
+Fixed `beads.py`: full 4-way status map with unknown marks skipped, id restricted to `[A-Za-z0-9_-]+`, first-`|` split preserved so titles keep `|`/brackets, whitespace-only titles skipped, leading indent and surrounding whitespace tolerated.
+
+Verified in-place: 13-case check (all statuses, `|`/bracket titles, `[?]`/`[X]`/bad-id/missing-space/empty-title rejections, indented row) — all pass, multi-line mix returns 2 correct rows.

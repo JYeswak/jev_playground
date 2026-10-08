@@ -1,0 +1,4 @@
+Working...
+Fixed `flaky.py`: fail rate `fails/n` in `[lo,hi]`, `n >= min_runs`, skips empty/all-pass/all-fail, sorted.
+
+Verified: flaky/boundary/sorted/min_runs/empty/all-pass/all-fail cases pass.

@@ -1,0 +1,47 @@
+{
+  "status": "LIVE_COMPLETE",
+  "created_at": "2026-09-27T06:37:54.105302Z",
+  "model": "jev-1.13.0",
+  "comparator": "dots-studio/dots-3-note-preview:free",
+  "corpus_sha256": "591ba40224ccea0c0873b7dfea64a85ec53ce16b476e71d4336115d5f7d884b7",
+  "prereg_sha256": "35f45a394becb4cccf7f0d0c27e421a30b01afb7fbc5d2a125bab5746f2c4469",
+  "rows": 300,
+  "stop_reason": null,
+  "usage_before": {
+    "captured_at": "2026-09-27T04:27:27.051043Z",
+    "usage_daily": 0,
+    "usage": 100.199757412,
+    "limit": null,
+    "limit_remaining": null
+  },
+  "usage_after": {
+    "captured_at": "2026-09-27T06:37:54.104486Z",
+    "usage_daily": 0,
+    "usage": 100.199757412,
+    "limit": null,
+    "limit_remaining": null
+  },
+  "stats": {
+    "paired_valid": 7,
+    "invalid": {
+      "jev": 290,
+      "comparator": 3
+    },
+    "jev_mae": 0.7142857142857143,
+    "comparator_mae": 1.7142857142857142,
+    "mean_ae_difference_jev_minus_comparator": -1.0,
+    "jev_exact_accuracy": 0.42857142857142855,
+    "comparator_exact_accuracy": 0.0,
+    "permutation": {
+      "seed": 20260927,
+      "flips": 10000,
+      "p_value": 0.18398160183981602
+    },
+    "pass_bar": {
+      "paired_valid_ge_278": false,
+      "jev_mae_lt_comparator": true,
+      "p_lt_005": false,
+      "confirmation": false
+    }
+  }
+}

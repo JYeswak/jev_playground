@@ -1,0 +1,4 @@
+Working...
+Fixed `bucket.py`: `take()` now holds `self.lock`, calls `now()` once, caps at `burst` via `min`, only advances `last` on forward time.
+
+Verified in-place (fake clock + threads): burst cap after long idle, continuous refill amounts, exactly 1 `now()` per `take`, 100/200 threaded takes succeed with `rate=0`, 5/20 succeed after 0.5s refill at 10/s, contended `take(3)` succeeds exactly once with no deduct-on-fail.
