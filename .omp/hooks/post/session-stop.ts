@@ -115,7 +115,9 @@ export function decideStop(
 
 function readyCount(): number {
   try {
-    const out = execFileSync("br", ["ready"], {
+    // Flags keep this read side-effect-free: unflagged `br ready` created one .beads/.br-wal-index-*
+    // dir per call (measured 823->824; flagged 824->824, 2026-10-08, chief 48337).
+    const out = execFileSync("br", ["ready", "--no-auto-flush", "--no-auto-import"], {
       encoding: "utf8",
       timeout: 8000,
       stdio: ["ignore", "pipe", "ignore"],
