@@ -75,9 +75,13 @@ export function decideStop(
     return {
       continue: true,
       additionalContext:
-        `BUILD FREEZE: ${world.freeze!.trim()}. Do only the review task pane 1 assigned you; ` +
-        `no bead implementation, no new scripts or tests, no br claims, no commits outside your review file. ` +
-        `If you have no assigned review, run \`ntm send jev --pane=1 "IDLE pane ${world.paneIndex}: <one line on what you finished>"\` ` +
+        // The freeze file's reason is the authority for what a freeze allows (it carries the board's
+        // current pause definition). Hard-coded "no new scripts or tests, no commits" here contradicted
+        // chief AM 48371 and blocked plan-validation work twice on 2026-10-08 (WildCarp Q13, CyanOtter Q12).
+        `BUILD FREEZE: ${world.freeze!.trim()} ` +
+        `Never claim or implement a bead from br ready during a freeze. ` +
+        `Do your assigned item; if you have none, take the next unclaimed item from the director's queue. ` +
+        `Only when nothing is left, run \`ntm send jev --pane=1 "IDLE pane ${world.paneIndex}: <one line on what you finished>"\` ` +
         `and stop.`,
     };
   }
