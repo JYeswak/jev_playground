@@ -354,7 +354,7 @@ async function main() {
       reason,
       message,
       code,
-      command: parsed.command,
+      command: `classifier ${parsed.command}`,
       option: parsed.command === "classify" ? "--labels" : undefined,
       path: parsed.command === "classify" ? option(args, "--labels") : undefined,
       cwd: process.cwd(),
@@ -362,7 +362,7 @@ async function main() {
     result = { ok: false, reason, error: cliError.message, ...(code ? { code } : {}) };
   }
   if (!cliError && result?.ok === false && parsed.command !== "doctor" && parsed.command !== "health") {
-    cliError = rewriteCliError({ reason: result.reason, message: result.error ?? result.message, command: parsed.command });
+    cliError = rewriteCliError({ reason: result.reason, message: result.error ?? result.message, command: `classifier ${parsed.command}` });
   }
   if (cliError) {
     const reasonByCode = {

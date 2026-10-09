@@ -139,3 +139,19 @@ kit/var/
 *.jsonl.owner.lock
 *.pid
 *.heartbeat
+
+# Local session captures and session-derived corpora may carry private prompts or
+# operational text; keep them local, as with the harvested-session rules above.
+work/jev-11qz/sessions/**/*.jsonl
+work/jev-ib1h-verify/r01/*.jsonl
+work/jev-ynn7/sessions/**/*.jsonl
+work/jev-ynn7/sessions-real/**/*.jsonl
+work/thinking-duel/sessions/**/*.jsonl
+work/thinking-duel-hard/sessions/**/*.jsonl
+work/thinking-duel-hard3/sessions/**/*.jsonl
+work/longres-rep/corpus3.json
+work/nev-injection/l3-frames-*.jsonl
+work/nev-routing/tool-select-labelled.jsonl
+work/nev-routing/tool-select-unlabelled.jsonl
+work/jev-zbb1/vectors.json
+work/jev-zbb1/vectors_body.json
