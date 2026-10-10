@@ -31,7 +31,8 @@ EXPECTATION_CLASSES = {
 
 def expectation_evidence(row: dict[str, object]) -> str:
     output = str(row.get("output", row["error"]))
-    if not output.lstrip().startswith("{"):
+    stripped = output.lstrip()
+    if not stripped.startswith(("{", "[")):
         return output
     try:
         envelope = json.loads(output)
@@ -155,6 +156,12 @@ def _selftest_doctor_expectations() -> None:
     for payload in (json.dumps(doctor)[:-1], {**doctor, "schema": "unknown"}):
         if not compare_expectations([doctor_row(payload)], doctor_expect):
             raise AssertionError("malformed or unsupported doctor output was accepted")
+    # JSON-array carriers are not doctor envelopes: NOT_RUN/no-key text inside
+    # them must not be graded as the typed refusal (valid or malformed array).
+    for carrier in (json.dumps([doctor]), json.dumps([{"note": "NOT_RUN: no key"}]),
+                    '["NOT_RUN: no key"', "  [\"NOT_RUN: no key\"]"):
+        if not compare_expectations([doctor_row(carrier)], doctor_expect):
+            raise AssertionError("JSON-array carrier was accepted as a no-key doctor envelope")
     plain = {"command": doctor_command, "rc": 1, "failure_class": "needs key",
              "output": "NOT_RUN: no key", "error": "NOT_RUN: no key"}
     if compare_expectations([plain], doctor_expect):
