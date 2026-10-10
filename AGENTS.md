@@ -602,3 +602,5 @@ br sync --flush-only                  # Export DB to JSONL after Beads mutations
 `br` never commits or pushes. Follow this repository's own git instructions before staging, committing, or pushing. If the repository says "commit only when asked," that rule overrides any generic workflow advice.
 
 <!-- end-bv-agent-instructions -->
+
+**This project overrides the generated block above on closing (fleet rule, `~/.agents/AGENTS.md` "the Guide loop").** Workers never run `br close`, and `--reason="Completed"` is never a close reason. When a bead's acceptance is met, report `DONE <bead> <sha> <evidence>` to the director; the director re-runs the acceptance and closes with the evidence in the reason (`br close <id> --reason "<command> -> <result>; commit <sha>"`). The kit enforces this at the act (`kit-close-needs-evidence`, `kit-flywheel-guard SELF_CLOSE_REFUSED`). On finishing or being blocked, take the next bead from your own frontier without waiting.
