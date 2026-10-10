@@ -66,3 +66,8 @@ runs, free-comparator arms (see NEGATIVE_EVIDENCE.md).
   idle notices use `ntm send`. Failed submissions are discarded, not retried.
   Heartbeat logic remains keyless; production registry coordination and
   supervised-service activation are pending.
+- Stranger-run CI (`jev-qx7b`): classify the complete typed doctor envelope
+  before the 300-character diagnostic display limit. The original
+  `NOT_RUN-no-key` expectation stays unchanged; malformed, unsupported and
+  contradictory envelopes are refused. Archived scheduled-run replay and
+  positive/negative selftests pass; the failed CI run was not rerun.

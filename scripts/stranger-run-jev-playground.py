@@ -9,6 +9,7 @@ inventory and one result row per unique command.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -28,7 +29,30 @@ EXPECTATION_CLASSES = {
 }
 
 
-def actual_expectation_class(row: dict[str, object]) -> str:
+def expectation_evidence(row: dict[str, object]) -> str:
+    output = str(row.get("output", row["error"]))
+    if not output.lstrip().startswith("{"):
+        return output
+    try:
+        envelope = json.loads(output)
+    except json.JSONDecodeError:
+        return ""
+    if not isinstance(envelope, dict) or envelope.get("schema") != "classifier.doctor.v1":
+        return ""
+    data = envelope.get("data")
+    backends = data.get("backends") if isinstance(data, dict) else None
+    jev = backends.get("jev") if isinstance(backends, dict) else None
+    if (
+        envelope.get("status") == "FINDINGS"
+        and isinstance(jev, dict)
+        and jev.get("status") == "NOT_RUN"
+        and jev.get("key_source") == "none"
+    ):
+        return "NOT_RUN: no key"
+    return ""
+
+
+def actual_expectation_class(row: dict[str, object], evidence: str) -> str:
     rc = str(row["rc"])
     if rc == "0":
         return "0"
@@ -36,7 +60,7 @@ def actual_expectation_class(row: dict[str, object]) -> str:
         return "TEMPLATE"
     if str(row["failure_class"]) == "expected nonzero":
         return "expected-nonzero"
-    lower = str(row["error"]).casefold()
+    lower = evidence.casefold()
     if "not_run" in lower:
         if any(
             marker in lower
@@ -81,13 +105,14 @@ def compare_expectations(
         if row is None:
             mismatches.append(f"missing README command row: {command}")
             continue
-        actual_class = actual_expectation_class(row)
+        evidence = expectation_evidence(row)
+        actual_class = actual_expectation_class(row, evidence)
         if actual_class != expected_class:
             mismatches.append(
                 f"row changed class: {command}: expected {expected_class}, got {actual_class}"
             )
             continue
-        if cause and cause.casefold() not in str(row["error"]).casefold():
+        if cause and cause.casefold() not in evidence.casefold():
             mismatches.append(
                 f"row changed cause: {command}: expected error to contain {cause!r}; "
                 f"got {row['error']!r}"
@@ -95,6 +120,46 @@ def compare_expectations(
     for command in sorted(set(actual) - set(expected)):
         mismatches.append(f"new README command lacks expectation row: {command}")
     return mismatches
+
+
+def _selftest_doctor_expectations() -> None:
+    # Reduced from run 38021176623: check records precede the buried backend
+    # state; the diagnostic head is not the complete classification input.
+    doctor = {
+        "schema": "classifier.doctor.v1",
+        "status": "FINDINGS",
+        "data": {
+            "checks": [{"id": name} for name in (
+                "fm-secrets-no-key-source", "fm-secrets-key-wrapper-missing",
+                "fm-secrets-machine-config-mode", "fm-secrets-recent-resolve-failures",
+                "fm-logs-silent-surface", "fm-logs-off-surface-writing",
+                "fm-logs-stale-schema-writer", "fm-logs-unparsable-rows",
+            )],
+            "backends": {"jev": {"status": "NOT_RUN", "key_source": "none"}},
+        },
+    }
+    doctor_command = "classifier doctor --robot"
+    def doctor_row(payload: object) -> dict[str, object]:
+        output = json.dumps(payload) if isinstance(payload, dict) else str(payload)
+        return {"command": doctor_command, "rc": 1, "failure_class": "needs key",
+                "output": output, "error": output[:300]}
+    doctor_expect = {doctor_command: ("NOT_RUN-no-key", "no key")}
+    if compare_expectations([doctor_row(doctor)], doctor_expect):
+        raise AssertionError("complete no-key doctor envelope was lost to diagnostic truncation")
+    for backend in ({"status": "UP", "key_source": "none"},
+                    {"status": "NOT_RUN", "key_source": "env"}, {}):
+        hostile = {**doctor, "data": {"backends": {"jev": backend}},
+                   "notes": ["NOT_RUN: no key"]}
+        if not compare_expectations([doctor_row(hostile)], doctor_expect):
+            raise AssertionError("unrelated no-key text overrode the typed backend state")
+    for payload in (json.dumps(doctor)[:-1], {**doctor, "schema": "unknown"}):
+        if not compare_expectations([doctor_row(payload)], doctor_expect):
+            raise AssertionError("malformed or unsupported doctor output was accepted")
+    plain = {"command": doctor_command, "rc": 1, "failure_class": "needs key",
+             "output": "NOT_RUN: no key", "error": "NOT_RUN: no key"}
+    if compare_expectations([plain], doctor_expect):
+        raise AssertionError("plain no-key refusal changed class")
+    print("SELFTEST PASS: complete typed no-key envelope; hostile/malformed/unsupported refusals")
 
 
 def run_selftest(expect_path: Path) -> int:
@@ -231,6 +296,7 @@ def run_selftest(expect_path: Path) -> int:
     }:
         raise AssertionError("receipt header does not record the actual UTC run date")
     print("SELFTEST PASS: receipt header records run date in UTC")
+    _selftest_doctor_expectations()
     return 0
 
 
@@ -827,6 +893,7 @@ def main() -> int:
                 "classification_note": classification_note,
                 "error": result["error"],
                 "last": result["last"],
+                "output": result["output"],
             }
         )
         print(
