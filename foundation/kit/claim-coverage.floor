@@ -6,3 +6,6 @@
 covered=124
 candidates=124
 unitizer_sha256=fec22a77b8e4222fc8005483a085a61696eff14614d4ed1f6f870f7b534e539d
+# README claim-coverage floor (jev-qx7b): read by the staged stage-15 README pass; the unitizer sha above applies to both documents.
+readme_covered=55
+readme_candidates=55
