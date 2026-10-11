@@ -1,0 +1,22 @@
+{
+ "authority": "test",
+ "confidence": "observed",
+ "evidence_id": "ev_9bd5e5d8e5068ef6fc0003309d25601ff904132ae4ce894d0faecd680a4bd541",
+ "limitations": [
+  "rerun evidence only; receipt.py absent in jev so prior ev_1b16 verified by rerun, not tool",
+  "kit count 207->255 via landed work after source_parent 451249cf"
+ ],
+ "operation": "jev-b35c.14-independent-verify",
+ "parameters": {
+  "commit": "e389ee87a432814ec39f4bb3a7d5353c91d61ee9",
+  "repair": "9/9-exit0",
+  "reviewer": "BeigeDog",
+  "suite": "255/255-exit0",
+  "test_blob": "2dd43116629f8137b0a4434347c13a7c7f9aa85c"
+ },
+ "producer": "BeigeDog",
+ "result_ref": {
+  "bytes": 444,
+  "sha256": "bc63f17dc6648f68e240d2aafaacc3bb6b35f7cc3cebc08fcca0baca2b6a11b0"
+ }
+}
