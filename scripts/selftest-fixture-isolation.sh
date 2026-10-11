@@ -16,8 +16,8 @@
 #   - the scrubbed fixture, the two real selftests and stage 60 MUST leave it byte-identical and still run.
 #
 # NOT COVERED HERE (measured by the throwaway sweep recorded on jev-n3lx, not re-run by this gate):
-#   gates.d/50 (needs private loop-kit), the python fixture tests, githooks/commit-msg-verification-level.sh
-#   --selftest, scripts/publish-export.sh.
+#   gates.d/50 (needs private loop-kit), the python fixture tests, scripts/publish-export.sh and
+#   work/miniwob-jev/run-after-rotation.sh (scrubbed under jev-90id; measured once, not re-run here).
 set -uo pipefail
 unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_CONFIG
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
@@ -100,6 +100,10 @@ if [ "$m" = vacuous ]; then no "mutant pin-liveness: scrub line not found, the m
 # serialized-add stops right after its fixture config (its arms would otherwise run against the decoy for ~30s).
 m=$(mutant serialized-add '/^unset GIT_DIR/{next} {print} /config user.name serialized-add-selftest/{print "exit 0"}' scripts/git-commit-serialized.sh scripts/git-commitd.py)
 if [ "$m" = vacuous ]; then no "mutant serialized-add: scrub line not found, the mutant equals the original"; else expect_leak "selftest-serialized-add without its scrub" "$m"; fi
+# jev-90id: the commit-msg hook's own --selftest, as shipped and with its scrub deleted (standalone copy).
+expect_untouched "commit-msg hook --selftest" "$root/githooks/commit-msg-verification-level.sh" --selftest
+awk '/^ *unset GIT_DIR/{next} {print}' "$root/githooks/commit-msg-verification-level.sh" > "$tmp/hook-mutant.sh"; chmod +x "$tmp/hook-mutant.sh"
+if cmp -s "$root/githooks/commit-msg-verification-level.sh" "$tmp/hook-mutant.sh"; then no "mutant hook: scrub line not found"; else expect_leak "commit-msg hook --selftest without its scrub" "$tmp/hook-mutant.sh" --selftest; fi
 
 printf 'selftest-fixture-isolation: pass=%d fail=%d\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

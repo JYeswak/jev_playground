@@ -80,7 +80,8 @@ Path(output).write_text("".join(f"{task},{seed},{rep}\n" for task, seed, rep in 
 PY
 }
 
-check_provenance() {
+check_provenance() (  # subshell: the scrub below must not reach the caller (jev-90id)
+  unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_CONFIG
   local step=$1
   local rows=$2
   local repo="$RUN_ROOT/provenance-$step"
@@ -93,7 +94,7 @@ check_provenance() {
   GIT_AUTHOR_DATE=2026-09-25T12:00:00Z GIT_COMMITTER_DATE=2026-09-25T12:00:00Z \
     git -C "$repo" commit -q -m "[test] fixture $step"
   JEV_REPO="$repo" python3 "$ROOT/scripts/row-provenance-check.py"
-}
+)
 
 run_step() {
   local step=$1

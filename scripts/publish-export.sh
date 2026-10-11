@@ -91,6 +91,8 @@ done
 # Pre-commit worktree scan: fail before minting history, not after.
 scan_export "$EXPORT" >/dev/null || { echo "EXPORT SCAN FAIL (worktree)"; scan_export "$EXPORT"; exit 1; }
 # One commit on an orphan branch: tip == history by construction.
+# jev-90id: the export is its own repo; a caller's exported GIT_DIR/GIT_WORK_TREE/GIT_INDEX_FILE must not steer it.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_CONFIG
 git -C "$EXPORT" init -q -b "$BRANCH"
 git -C "$EXPORT" config core.hooksPath ""
 git -C "$EXPORT" add -A
