@@ -78,3 +78,11 @@ runs, free-comparator arms (see NEGATIVE_EVIDENCE.md).
   `NOT_RUN-no-key` expectation stays unchanged; malformed, unsupported and
   contradictory envelopes are refused. Archived scheduled-run replay and
   positive/negative selftests pass; the failed CI run was not rerun.
+- Native tracker repair (2026-10-11, local): installed unmodified upstream
+  `a0b9c8525d9bf6f44feb612a1baeca603d2d9a83`, retaining the old executable.
+  Ordinary canonical writes, fresh-process readbacks and strict export now
+  pass; sync is healthy, dirty count 0, 675 issues with no coverage drift.
+  Historical failed-recovery evidence is unchanged. Native export now omits
+  machine-local `source_repo_path`, as documented by br; portable
+  `source_repo` and all other pre-existing issue facts are preserved.
+  No bead closure or classifier verdict implied.
