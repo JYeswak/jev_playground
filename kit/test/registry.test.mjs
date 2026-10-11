@@ -90,15 +90,76 @@ test('an injected family flows through the registry dispatch and generated surfa
 
 test('family naming validator rejects meta, family, hermes, and malformed names', () => {
   const errors = validateFamilyNames([
+    { name: 'overview' },
     { name: 'doctor' },
     { name: 'run' },
     { name: 'triage' },
     { name: 'bad-name' },
     { name: 'sales' },
   ]);
-  assert.equal(errors.length, 4);
+  assert.equal(errors.length, 5);
+  assert.ok(errors.some((error) => error.includes('reserved family name: overview')));
   assert.ok(errors.some((error) => error.includes('reserved family name: doctor')));
   assert.ok(errors.some((error) => error.includes('reserved family name: run')));
   assert.ok(errors.some((error) => error.includes('reserved family name: triage')));
   assert.ok(errors.some((error) => error.includes('invalid family name: bad-name')));
+});
+
+test('every command exposes its schema and exit metadata', async () => {
+  const home = await freshHome('classifier-registry-schema-all');
+  const capabilities = JSON.parse(runCli(['capabilities', '--json'], { home }).stdout);
+  for (const name of Object.keys(capabilities.commands)) {
+    const result = runCli(['schema', '--command', name], { home });
+    assert.equal(result.status, 0, `${name}: ${result.stderr}`);
+    const body = JSON.parse(result.stdout);
+    assert.deepEqual(Object.keys(body.commands), [name], name);
+    const command = body.commands[name];
+    assert.ok(command.usage, `${name} has usage`);
+    assert.ok(command.description, `${name} has description`);
+    assert.ok(Array.isArray(command.exit_codes) && command.exit_codes.length > 0, `${name} has exit codes`);
+    assert.ok(command.exit_codes.includes(0), `${name} documents success`);
+  }
+});
+
+test('generated surfaces are deterministic and stay parseable without color', async () => {
+  const home = await freshHome('classifier-registry-deterministic');
+  const first = runCli(['capabilities', '--json'], { home, env: { SOURCE_DATE_EPOCH: '1' } });
+  const second = runCli(['capabilities', '--json'], { home, env: { SOURCE_DATE_EPOCH: '9999999999' } });
+  assert.equal(first.status, 0, first.stderr);
+  assert.equal(second.status, 0, second.stderr);
+  assert.equal(second.stdout, first.stdout);
+  const noColor = runCli(['capabilities', '--json'], { home, env: { NO_COLOR: '1' } });
+  assert.equal(noColor.status, 0, noColor.stderr);
+  assert.ok(!noColor.stdout.includes(String.fromCharCode(27)), 'no ANSI escapes with NO_COLOR=1');
+  assert.ok(!noColor.stderr.includes(String.fromCharCode(27)), 'no ANSI escapes on stderr with NO_COLOR=1');
+  JSON.parse(noColor.stdout);
+  const docsFirst = runCli(['robot-docs', 'guide'], { home, env: { SOURCE_DATE_EPOCH: '1' } });
+  const docsSecond = runCli(['robot-docs', 'guide'], { home, env: { SOURCE_DATE_EPOCH: '9999999999' } });
+  assert.equal(docsFirst.status, 0, docsFirst.stderr);
+  assert.equal(docsSecond.stdout, docsFirst.stdout);
+});
+
+test('a family dropped from one surface or a mutated schema field breaks the surfaces', async () => {
+  const home = await freshHome('classifier-registry-consistency');
+  const capabilities = JSON.parse(runCli(['capabilities', '--json'], { home }).stdout);
+  const schema = JSON.parse(runCli(['schema', '--json'], { home }).stdout);
+  const docs = runCli(['robot-docs', 'guide'], { home }).stdout;
+  const inCapabilities = new Set(Object.keys(capabilities.commands));
+  const inSchema = new Set(Object.keys(schema.commands));
+  const inDocs = new Set(
+    docs.split('\n').filter((line) => line.startsWith('- ')).map((line) => line.slice(2).split(':')[0]),
+  );
+  for (const family of FAMILIES.map((entry) => entry.name)) {
+    assert.ok(inCapabilities.has(family), `${family} in capabilities`);
+    assert.ok(inSchema.has(family), `${family} in schema`);
+    assert.ok(inDocs.has(family), `${family} in robot-docs`);
+  }
+  const dropped = JSON.parse(JSON.stringify(capabilities));
+  delete dropped.commands[FAMILIES[0].name];
+  assert.ok(!Object.keys(dropped.commands).includes(FAMILIES[0].name), 'dropped family is gone from one surface');
+  assert.ok(inSchema.has(FAMILIES[0].name), 'but still present in the other surface');
+  assert.notDeepEqual(Object.keys(dropped.commands).sort(), Object.keys(schema.commands).sort());
+  const mutated = JSON.parse(JSON.stringify(schema));
+  mutated.commands[FAMILIES[0].name] = { ...mutated.commands[FAMILIES[0].name], exit_codes: [999] };
+  assert.notDeepEqual(mutated.commands[FAMILIES[0].name], capabilities.commands[FAMILIES[0].name]);
 });

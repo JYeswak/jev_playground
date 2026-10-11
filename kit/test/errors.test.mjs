@@ -115,3 +115,24 @@ test('clef-unreachable formatter preserves its online-required code without a li
   assert.ok(detail.includes('use hosted: --backend jev'));
   assert.ok(detail.includes('diagnose: classifier doctor'));
 });
+
+test('a json flag typo exits 64 and names the exact corrected command', async () => {
+  const home = await freshHome('classifier-error-jsno');
+  const result = runCli(['classify', '--jsno'], { home });
+  assert.equal(result.status, 64, `${result.stderr}\n${result.stdout}`);
+  assert.ok(result.stderr.includes('did you mean: classifier classify --json'), result.stderr);
+  assert.ok(result.stderr.includes('see: classifier --help'), result.stderr);
+});
+
+test('failure status is identical across human and robot output modes', async () => {
+  const home = await freshHome('classifier-error-modes');
+  const human = runCli(['classify', '--text', 'x', '--labels', 'nope.json'], { home });
+  const robot = runCli(['classify', '--text', 'x', '--labels', 'nope.json', '--robot'], { home });
+  assert.equal(human.status, 66, human.stderr);
+  assert.equal(robot.status, 66, robot.stderr);
+  assert.equal(JSON.parse(robot.stdout).status, 'NO_INPUT');
+  assert.ok(human.stderr.includes('example file: kit/examples/banking77-labels.json'));
+  assert.ok(robot.stderr.includes('example file: kit/examples/banking77-labels.json'));
+  const again = runCli(['classify', '--text', 'x', '--labels', 'nope.json', '--robot'], { home });
+  assert.equal(again.stdout, robot.stdout);
+});
