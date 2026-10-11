@@ -15,9 +15,9 @@
 #   - a planted unscrubbed fixture and the two real selftests with their scrub deleted MUST change the decoy;
 #   - the scrubbed fixture, the two real selftests and stage 60 MUST leave it byte-identical and still run.
 #
-# NOT COVERED HERE (measured by the throwaway sweep recorded on jev-n3lx, not re-run by this gate):
-#   gates.d/50 (needs private loop-kit), the python fixture tests, scripts/publish-export.sh and
-#   work/miniwob-jev/run-after-rotation.sh (scrubbed under jev-90id; measured once, not re-run here).
+# NOT COVERED HERE (measured once, recorded in docs/evidence/jev-90id-sentinel-20261011.md, not re-run by this gate):
+#   gates.d/50 (needs private loop-kit), the python fixture tests, and a full publish-export.sh run (its worktree scan
+#   refuses at HEAD before `git init`; the post-scan block is replayed below instead).
 set -uo pipefail
 unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_CONFIG
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
@@ -104,6 +104,36 @@ if [ "$m" = vacuous ]; then no "mutant serialized-add: scrub line not found, the
 expect_untouched "commit-msg hook --selftest" "$root/githooks/commit-msg-verification-level.sh" --selftest
 awk '/^ *unset GIT_DIR/{next} {print}' "$root/githooks/commit-msg-verification-level.sh" > "$tmp/hook-mutant.sh"; chmod +x "$tmp/hook-mutant.sh"
 if cmp -s "$root/githooks/commit-msg-verification-level.sh" "$tmp/hook-mutant.sh"; then no "mutant hook: scrub line not found"; else expect_leak "commit-msg hook --selftest without its scrub" "$tmp/hook-mutant.sh" --selftest; fi
+# jev-90id: run-registered-suites.py --selftest, as shipped and from a copy whose scrub (the os.environ.pop) is turned into `pass`.
+expect_untouched "run-registered-suites --selftest" python3 "$root/scripts/run-registered-suites.py" --selftest
+mkdir -p "$tmp/rrs/scripts"
+awk '/os\.environ\.pop\(_name, None\)/{sub(/os\.environ\.pop\(_name, None\)/, "pass")} {print}' "$root/scripts/run-registered-suites.py" > "$tmp/rrs/scripts/run-registered-suites.py"
+if cmp -s "$root/scripts/run-registered-suites.py" "$tmp/rrs/scripts/run-registered-suites.py"; then no "mutant run-registered-suites: scrub line not found"; else expect_leak "run-registered-suites --selftest without its scrub" python3 "$tmp/rrs/scripts/run-registered-suites.py" --selftest; fi
+# jev-90id: publish-export.sh cannot be run end to end (its worktree scan refuses at HEAD before `git init`), so its post-scan
+# block (unset .. commit) is replayed verbatim out of the script, as shipped and without the unset line. A replay, not a full run.
+mkdir -p "$tmp/pe1" "$tmp/pe2"; printf 'x\n' > "$tmp/pe1/f.txt"; printf 'x\n' > "$tmp/pe2/f.txt"
+pe_block() { awk '/^unset GIT_DIR/{on=1} on{print} on && /^  commit -qm/{exit}' "$root/scripts/publish-export.sh"; }
+# shellcheck disable=SC2016  # $1 belongs to the generated harness
+pe_head='set -euo pipefail\nEXPORT=$1\nBRANCH=sentinel-branch\n'
+{ printf '%b' "$pe_head"; pe_block; } > "$tmp/pe-shipped.sh"
+{ printf '%b' "$pe_head"; pe_block | awk '/^unset GIT_DIR/{next} {print}'; } > "$tmp/pe-mutant.sh"
+if ! grep -q 'commit -qm' "$tmp/pe-shipped.sh" || cmp -s "$tmp/pe-shipped.sh" "$tmp/pe-mutant.sh"; then
+  no "publish-export block: the post-scan block or its unset line was not found"
+else
+  expect_untouched "publish-export post-scan block (replay)" bash "$tmp/pe-shipped.sh" "$tmp/pe1"
+  expect_leak "publish-export post-scan block (replay) without its unset" bash "$tmp/pe-mutant.sh" "$tmp/pe2"
+fi
+# jev-90id: miniwob check_provenance, replayed out of run-after-rotation.sh (the script itself needs a live run sheet).
+mw_block() { awk '/^check_provenance\(\)/{on=1} on{print} on && /^\)$/{exit}' "$root/work/miniwob-jev/run-after-rotation.sh"; }
+# shellcheck disable=SC2016  # $1 / $ROOT belong to the generated harness
+{ printf 'ROOT=%s\nRUN_ROOT=$1\n' "$root"; mw_block; printf 'mkdir -p "$RUN_ROOT"; printf "{}\\n" > "$RUN_ROOT/rows.jsonl"\ncheck_provenance s1 "$RUN_ROOT/rows.jsonl" >/dev/null 2>&1 || true\n[ -d "$RUN_ROOT/provenance-s1/.git" ]\n'; } > "$tmp/mw-shipped.sh"
+awk '/^  unset GIT_DIR/{next} {print}' "$tmp/mw-shipped.sh" > "$tmp/mw-mutant.sh"
+if ! grep -q '^check_provenance' "$tmp/mw-shipped.sh" || cmp -s "$tmp/mw-shipped.sh" "$tmp/mw-mutant.sh"; then
+  no "miniwob block: check_provenance or its unset line was not found"
+else
+  expect_untouched "miniwob check_provenance (replay)" bash "$tmp/mw-shipped.sh" "$tmp/mw1"
+  expect_leak "miniwob check_provenance (replay) without its unset" bash "$tmp/mw-mutant.sh" "$tmp/mw2"
+fi
 
 printf 'selftest-fixture-isolation: pass=%d fail=%d\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

@@ -1,0 +1,19 @@
+{
+ "authority": "selftest",
+ "confidence": "observed",
+ "evidence_id": "ev_7fad54ef6d2be5c343fde4aebc4458a496a43efa5e09edccca778ebe2f5c0600",
+ "limitations": [
+  "publish-export full script not exercised past its scan (replay of its post-scan block only); miniwob script not run end to end; one env family; installed hook not updated"
+ ],
+ "operation": "jev-90id-residual-sentinel-evidence",
+ "parameters": {
+  "decisive_output": "rrs-prefix-dir-RED;rrs-shipped-none-dir-full-clean;x7-rc1-notleak-replay-py-absent;publish-export-refuses-pre-init-5-unexplained-280-blob;selftest-fixture-isolation-15of15;live-config-8c986e2a-unchanged",
+  "source_commit": "d1226888",
+  "subject_doc": "docs/evidence/jev-90id-sentinel-20261011.md"
+ },
+ "producer": "CyanLake",
+ "result_ref": {
+  "bytes": 6429,
+  "sha256": "6ee03d8da8ba2287bfc7ef08454303d920e5c69ca4333e7df7c63ba7cbc0d842"
+ }
+}
