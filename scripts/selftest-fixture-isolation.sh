@@ -16,8 +16,8 @@
 #   - the scrubbed fixture, the two real selftests and stage 60 MUST leave it byte-identical and still run.
 #
 # NOT COVERED HERE (measured once, recorded in docs/evidence/jev-90id-sentinel-20261011.md, not re-run by this gate):
-#   gates.d/50 (needs private loop-kit), the python fixture tests, and a full publish-export.sh run (its worktree scan
-#   refuses at HEAD before `git init`; the post-scan block is replayed below instead).
+#   gates.d/50 (needs private loop-kit) and the python fixture tests. publish-export.sh is run in full, in a fixture repo
+#   (jev-x5cy made that possible: against the real tree its scan refuses first); miniwob's check_provenance is a replay.
 set -uo pipefail
 unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_NAMESPACE GIT_CONFIG
 root=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd -P)
@@ -109,19 +109,23 @@ expect_untouched "run-registered-suites --selftest" python3 "$root/scripts/run-r
 mkdir -p "$tmp/rrs/scripts"
 awk '/os\.environ\.pop\(_name, None\)/{sub(/os\.environ\.pop\(_name, None\)/, "pass")} {print}' "$root/scripts/run-registered-suites.py" > "$tmp/rrs/scripts/run-registered-suites.py"
 if cmp -s "$root/scripts/run-registered-suites.py" "$tmp/rrs/scripts/run-registered-suites.py"; then no "mutant run-registered-suites: scrub line not found"; else expect_leak "run-registered-suites --selftest without its scrub" python3 "$tmp/rrs/scripts/run-registered-suites.py" --selftest; fi
-# jev-90id: publish-export.sh cannot be run end to end (its worktree scan refuses at HEAD before `git init`), so its post-scan
-# block (unset .. commit) is replayed verbatim out of the script, as shipped and without the unset line. A replay, not a full run.
-mkdir -p "$tmp/pe1" "$tmp/pe2"; printf 'x\n' > "$tmp/pe1/f.txt"; printf 'x\n' > "$tmp/pe2/f.txt"
-pe_block() { awk '/^unset GIT_DIR/{on=1} on{print} on && /^  commit -qm/{exit}' "$root/scripts/publish-export.sh"; }
-# shellcheck disable=SC2016  # $1 belongs to the generated harness
-pe_head='set -euo pipefail\nEXPORT=$1\nBRANCH=sentinel-branch\n'
-{ printf '%b' "$pe_head"; pe_block; } > "$tmp/pe-shipped.sh"
-{ printf '%b' "$pe_head"; pe_block | awk '/^unset GIT_DIR/{next} {print}'; } > "$tmp/pe-mutant.sh"
-if ! grep -q 'commit -qm' "$tmp/pe-shipped.sh" || cmp -s "$tmp/pe-shipped.sh" "$tmp/pe-mutant.sh"; then
-  no "publish-export block: the post-scan block or its unset line was not found"
+# jev-90id/jev-x5cy: publish-export.sh, the FULL script (archive, transforms, scan, git init, commit), run inside a tiny
+# fixture repo whose own .git is exported as the caller's GIT_DIR (the 2026-10-06 shape: caller repo == the script's repo).
+# As shipped the fixture repo must be untouched; with its `unset GIT_DIR ...` line deleted it must change. A full run.
+pe_root() { # pe_root <name> <script>: a tiny repo that is its own ROOT (export lands beside it, inside $tmp)
+  local d="$tmp/$1/root"; mkdir -p "$d/scripts" "$d/docs" "$d/data"
+  cp -p "$2" "$d/scripts/publish-export.sh"; printf '# none\n' > "$d/docs/publish-key-exceptions.txt"; printf 'x\n' > "$d/data/f.txt"
+  git init -q -b main "$d" && git -C "$d" add -A \
+    && git -C "$d" -c user.name=fi -c user.email=fi@example.invalid commit -q -m 'fixture [test]' && printf '%s' "$d"
+}
+awk '/^unset GIT_DIR/{next} {print}' "$root/scripts/publish-export.sh" > "$tmp/pe-mutant.sh"
+if cmp -s "$root/scripts/publish-export.sh" "$tmp/pe-mutant.sh"; then no "mutant publish-export: the unset line was not found"
+elif ! d1=$(pe_root pe1 "$root/scripts/publish-export.sh") || ! d2=$(pe_root pe2 "$tmp/pe-mutant.sh"); then no "publish-export fixture repo build failed"
 else
-  expect_untouched "publish-export post-scan block (replay)" bash "$tmp/pe-shipped.sh" "$tmp/pe1"
-  expect_leak "publish-export post-scan block (replay) without its unset" bash "$tmp/pe-mutant.sh" "$tmp/pe2"
+  decoy_main=$decoy
+  decoy=$d1; expect_untouched "publish-export.sh full run (fixture repo as the caller)" bash "$d1/scripts/publish-export.sh"
+  decoy=$d2; expect_leak "publish-export.sh full run without its unset" bash "$d2/scripts/publish-export.sh"
+  decoy=$decoy_main
 fi
 # jev-90id: miniwob check_provenance, replayed out of run-after-rotation.sh (the script itself needs a live run sheet).
 mw_block() { awk '/^check_provenance\(\)/{on=1} on{print} on && /^\)$/{exit}' "$root/work/miniwob-jev/run-after-rotation.sh"; }

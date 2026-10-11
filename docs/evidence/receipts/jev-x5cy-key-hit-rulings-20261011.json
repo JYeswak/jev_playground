@@ -1,0 +1,19 @@
+{
+ "authority": "selftest",
+ "confidence": "observed",
+ "evidence_id": "ev_910c0bec7f096bfb0f19938508f6089fca423b8e2aa6cf9a32b4546f3bfbc17e",
+ "limitations": [
+  "stage 30 no-secrets RED on origin/main independent of this change (x7 test_replay.py:136); key row 3 is a judgment not a proof; BSD grep/sed only; real jev_playground-export not built or scanned; one env family"
+ ],
+ "operation": "jev-x5cy-publish-export-scan-and-key-rulings",
+ "parameters": {
+  "decisive_output": "full-script-real-tree-rc0-3-env-shapes-caller-unchanged;mutant-unset-caller-changed;selftest-publish-export-scan-40of40;6-mutants-killed;5-per-line-rulings;547-signature-values-redacted-export-only;fixture-isolation-15of15",
+  "source_commit": "0d15436b",
+  "subject_doc": "docs/evidence/jev-x5cy-key-hit-rulings-20261011.md"
+ },
+ "producer": "CyanLake",
+ "result_ref": {
+  "bytes": 12542,
+  "sha256": "7346203b05009551ab65dbe277f0bebac10fffa2065bf6e89cb81e737a6f9fa9"
+ }
+}
