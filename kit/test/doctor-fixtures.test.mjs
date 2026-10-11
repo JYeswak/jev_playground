@@ -196,6 +196,32 @@ test('fixture corruption repairs, verifies, and restores the exact prior user st
   assert.equal(JSON.parse(undoneAgain.stdout).data.actions_taken, 0);
 });
 
+test('repair --apply refuses a diverged hook copy at the CLI with exit 4 and writes nothing', async () => {
+  const fixture = await makeRepairFixture('doctor-repair-diverged-hook');
+  const diverged = Buffer.concat([await readFile(fixture.target), Buffer.from('\n// operator edit\n')]);
+  await writeFile(fixture.target, diverged);
+  const before = await fileState(fixture.target);
+
+  const planned = runCli(['repair', '--only', 'fm-hooks-global-link-broken', '--robot'], {
+    home: fixture.home,
+    cwd: fixture.repo,
+    env: cliEnv(fixture),
+  });
+  assert.equal(planned.status, 4, `${planned.stderr}${planned.stdout}`);
+  assert.ok(JSON.parse(planned.stdout).status.includes('REFUSED'), planned.stdout);
+  assert.deepEqual(await fileState(fixture.target), before);
+
+  const applied = runCli(['repair', '--apply', '--only', 'fm-hooks-global-link-broken', '--robot'], {
+    home: fixture.home,
+    cwd: fixture.repo,
+    env: cliEnv(fixture),
+  });
+  assert.equal(applied.status, 4, `${applied.stderr}${applied.stdout}`);
+  assert.ok(JSON.parse(applied.stdout).status.includes('REFUSED'), applied.stdout);
+  assert.deepEqual(await fileState(fixture.target), before);
+  await assert.rejects(lstat(join(fixture.doctorDir, 'runs')), { code: 'ENOENT' });
+});
+
 test('mutate refuses protected user state before making a backup or action record', async () => {
   const fixture = await doctorFixture('doctor-repair-protected-target');
   const target = join(fixture.home, '.omp/agent/models.yml');
