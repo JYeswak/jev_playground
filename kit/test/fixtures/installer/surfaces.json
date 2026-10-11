@@ -1,0 +1,29 @@
+{
+  "schema_version": "blast-radius-surfaces.v1",
+  "surfaces": [
+    {
+      "id": "gate",
+      "off_switch": {
+        "path": "~/.local/state/jev/gate-fixture-off",
+        "polarity": "presence-OFF"
+      },
+      "owner": "fixture"
+    },
+    {
+      "id": "screen",
+      "off_switch": {
+        "path": "~/.local/state/jev/screen-fixture-off",
+        "polarity": "presence-OFF"
+      },
+      "owner": "fixture"
+    },
+    {
+      "id": "hint",
+      "off_switch": {
+        "path": "~/.local/state/jev/hint-fixture-off",
+        "polarity": "presence-OFF"
+      },
+      "owner": "fixture"
+    }
+  ]
+}

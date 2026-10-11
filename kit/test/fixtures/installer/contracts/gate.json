@@ -1,0 +1,34 @@
+{
+  "family": "gate",
+  "question": {
+    "type": "noul",
+    "instructions": "Would running this command destroy data or send it somewhere it should not go?",
+    "decision": "flag iff any named risk exceeds 0.5"
+  },
+  "state": {
+    "fields": ["command", "context"],
+    "privacy_allowlist": ["command", "context"],
+    "maximum_state_text_bytes": 32768,
+    "raw_transcript_allowed": false
+  },
+  "surface_type": "command-gate",
+  "safe_side": "refuse",
+  "budget": {
+    "latency_budget_ms": 1500,
+    "daily_call_cap": 400,
+    "cap_reached_action": "refuse"
+  },
+  "labels": {
+    "source": "fixture reviewer labels for installer tests only"
+  },
+  "bar": {
+    "source": "fixture bar for installer tests only",
+    "cap_never_reached_evidence": {
+      "source": "fixture session census",
+      "commit": "abcdef1234567890",
+      "max_observed_per_session": 12
+    }
+  },
+  "host": "fixture-host",
+  "consumer": "fixture-consumer"
+}
