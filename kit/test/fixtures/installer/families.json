@@ -1,0 +1,24 @@
+{
+  "schema_version": "installer-fixture-families.v1",
+  "families": [
+    {
+      "id": "gate",
+      "surface_type": "command-gate",
+      "kind": "gate",
+      "declared": "ON"
+    },
+    {
+      "id": "screen",
+      "surface_type": "result-screen",
+      "kind": "screen",
+      "declared": "OFF"
+    },
+    {
+      "id": "hint",
+      "surface_type": "advisory",
+      "kind": "extension",
+      "declared": "ON",
+      "supported_profiles": ["default"]
+    }
+  ]
+}
